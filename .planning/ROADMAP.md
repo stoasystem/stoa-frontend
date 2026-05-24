@@ -67,8 +67,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Add provider and router infrastructure.
-- [ ] 05-02: Add layouts and placeholder pages.
+- [x] 05-01: Add provider and router infrastructure.
+- [x] 05-02: Add layouts and placeholder pages.
 
 ### Phase 6: Services, State, Types, Hooks, and Common Components
 **Goal**: Add reusable API, state, type, hook, and common component foundations for future product work.
@@ -113,6 +113,6 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7
 | 2. Tooling Verification | v1.0 | 2/2 | Complete | 2026-05-24 |
 | 3. Documentation and Repository Readiness | v1.0 | 2/2 | Complete | 2026-05-24 |
 | 4. Styling and UI Foundation | v1.1 | 2/2 | Complete | 2026-05-24 |
-| 5. App Providers, Router, Layouts, and Pages | v1.1 | 0/2 | Not started | - |
+| 5. App Providers, Router, Layouts, and Pages | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 6. Services, State, Types, Hooks, and Common Components | v1.1 | 0/2 | Not started | - |
 | 7. Acceptance Page, Documentation, and Verification | v1.1 | 0/2 | Not started | - |
