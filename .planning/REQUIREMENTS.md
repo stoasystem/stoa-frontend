@@ -105,47 +105,47 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEPLOY-01 | TBD | Pending |
-| DEPLOY-02 | TBD | Pending |
-| DEPLOY-03 | TBD | Pending |
-| DEPLOY-04 | TBD | Pending |
-| DEPLOY-05 | TBD | Pending |
-| CI-01 | TBD | Pending |
-| CI-02 | TBD | Pending |
-| CI-03 | TBD | Pending |
-| QA-01 | TBD | Pending |
-| QA-02 | TBD | Pending |
-| QA-03 | TBD | Pending |
-| QA-04 | TBD | Pending |
-| E2E-01 | TBD | Pending |
-| E2E-02 | TBD | Pending |
-| E2E-03 | TBD | Pending |
-| E2E-04 | TBD | Pending |
-| E2E-05 | TBD | Pending |
-| E2E-06 | TBD | Pending |
-| FEED-01 | TBD | Pending |
-| FEED-02 | TBD | Pending |
-| FEED-03 | TBD | Pending |
-| FEED-04 | TBD | Pending |
-| FEED-05 | TBD | Pending |
-| BUG-01 | TBD | Pending |
-| BUG-02 | TBD | Pending |
-| PERF-01 | TBD | Pending |
-| PERF-02 | TBD | Pending |
-| SEC-01 | TBD | Pending |
-| SEC-02 | TBD | Pending |
-| LEGAL-01 | TBD | Pending |
-| LEGAL-02 | TBD | Pending |
-| DOCS-01 | TBD | Pending |
-| DOCS-02 | TBD | Pending |
-| DOCS-03 | TBD | Pending |
-| DOCS-04 | TBD | Pending |
+| DEPLOY-01 | Phase 35 | Pending |
+| DEPLOY-02 | Phase 35 | Pending |
+| DEPLOY-03 | Phase 35 | Pending |
+| DEPLOY-04 | Phase 35 | Pending |
+| DEPLOY-05 | Phase 35 | Pending |
+| CI-01 | Phase 36 | Pending |
+| CI-02 | Phase 36 | Pending |
+| CI-03 | Phase 36 | Pending |
+| QA-01 | Phase 38 | Pending |
+| QA-02 | Phase 38 | Pending |
+| QA-03 | Phase 38 | Pending |
+| QA-04 | Phase 38 | Pending |
+| E2E-01 | Phase 37 | Pending |
+| E2E-02 | Phase 37 | Pending |
+| E2E-03 | Phase 37 | Pending |
+| E2E-04 | Phase 37 | Pending |
+| E2E-05 | Phase 37 | Pending |
+| E2E-06 | Phase 37 | Pending |
+| FEED-01 | Phase 39 | Pending |
+| FEED-02 | Phase 39 | Pending |
+| FEED-03 | Phase 39 | Pending |
+| FEED-04 | Phase 39 | Pending |
+| FEED-05 | Phase 39 | Pending |
+| BUG-01 | Phase 39 | Pending |
+| BUG-02 | Phase 39 | Pending |
+| PERF-01 | Phase 40 | Pending |
+| PERF-02 | Phase 40 | Pending |
+| SEC-01 | Phase 40 | Pending |
+| SEC-02 | Phase 40 | Pending |
+| LEGAL-01 | Phase 40 | Pending |
+| LEGAL-02 | Phase 40 | Pending |
+| DOCS-01 | Phase 40 | Pending |
+| DOCS-02 | Phase 40 | Pending |
+| DOCS-03 | Phase 40 | Pending |
+| DOCS-04 | Phase 40 | Pending |
 
 **Coverage:**
 - v1.7 requirements: 35 total
-- Mapped to phases: 0 pending roadmap approval
-- Unmapped: 35
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.7 research*
+*Last updated: 2026-05-25 after v1.7 roadmap creation*

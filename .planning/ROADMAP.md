@@ -9,127 +9,112 @@
 - ✅ **v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow** - Phases 15-20 (implemented 2026-05-24)
 - ✅ **v1.5 Phase 6 Authentication, User Roles, and Parent Visibility** - Phases 21-27 (implemented 2026-05-24)
 - ✅ **v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness** - Phases 28-34 (implemented 2026-05-25)
+- 🔄 **v1.7 Phase 8 Staging Deployment, QA, and Early User Testing** - Phases 35-40 (planned 2026-05-25)
 
 ## Phases
 
 <details open>
-<summary>✅ v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness (Phases 28-34) - IMPLEMENTED 2026-05-25</summary>
+<summary>🔄 v1.7 Phase 8 Staging Deployment, QA, and Early User Testing (Phases 35-40) - PLANNED 2026-05-25</summary>
 
-**Milestone Goal:** Upgrade STOA from a functional education platform frontend into an MVP-ready product with polished UI, responsive flows, user feedback, analytics, parent reporting, tutor workflow improvements, demo readiness, and staging configuration.
+**Milestone Goal:** Upgrade STOA from a locally demoable MVP into a staging-ready product that early students, parents, tutors, and internal testers can access, test, and provide feedback on while CI and QA guard the iteration loop.
 
-- [x] **Phase 28: Shared UI Polish and Responsive Foundation** - Add UI standards, common page layout components, and mobile-friendly page/chat layout improvements.
-- [x] **Phase 29: Skeleton Loading and Toast Feedback** - Add skeleton loading states and operation-level toast feedback across key flows.
-- [x] **Phase 30: Validation and Error Boundary** - Add validation schemas, form validation, chat input guardrails, and app error boundary.
-- [x] **Phase 31: Analytics and Usage Tracking Contract** - Add frontend analytics client, event instrumentation, usage API contract, and local analytics storage.
-- [x] **Phase 32: Parent Weekly Report** - Add parent report types, API, hook, route, components, local backend endpoint, and seed report data.
-- [x] **Phase 33: Tutor Workflow Polish** - Add tutor request filtering, clearer request detail, teacher notes, local backend note endpoint, and tracking.
-- [x] **Phase 34: Demo, Staging, Documentation, and Verification** - Add demo shortcuts, staging env flags, demo seed readiness, README demo flow, and final verification.
+- [ ] **Phase 35: Staging Deployment Configuration** - Add SPA fallback, staging environment configuration, deployment docs, and local preview flow.
+- [ ] **Phase 36: CI and Preview Workflow** - Add GitHub Actions CI for npm install, lint, and build/type checks; document preview checks.
+- [ ] **Phase 37: Playwright E2E Smoke Suite** - Install Playwright, add config/scripts, and cover auth, student chat, parent, and tutor smoke paths.
+- [ ] **Phase 38: Manual QA, Demo Reset, and Early User Testing Docs** - Add manual QA checklist, MVP demo docs, early user testing plan, and demo reset process.
+- [ ] **Phase 39: Feedback Collection and Bug Workflow** - Add feedback UI/service/hook/backend persistence and GitHub bug workflow.
+- [ ] **Phase 40: Performance, Security, Privacy, and Readiness Plan** - Add performance baseline, security review, legal placeholders, production readiness plan, README update, and final verification.
 
-### Phase 28: Shared UI Polish and Responsive Foundation
+### Phase 35: Staging Deployment Configuration
 
-**Goal**: Establish shared UI standards and make the main app surfaces feel like one responsive product.
-**Depends on**: Phase 27
-**Requirements**: [UI-01, UI-02, UI-03, UI-04]
+**Goal**: Prepare static SPA deployment and staging environment configuration so direct staging links can be tested reliably.
+**Depends on**: Phase 34
+**Requirements**: [DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05]
 **Success Criteria** (what must be TRUE):
-  1. `src/styles/ui-guidelines.md` documents page, form, card, dashboard, sidebar, chat, badge, and mobile patterns.
-  2. `PageContainer`, `PageHeader`, and `SectionHeader` exist and are used by core dashboard/parent/tutor/profile/report pages.
-  3. Main role pages use consistent spacing and responsive grid behavior.
-  4. Chat mobile layout no longer relies on a permanently visible sidebar that compresses messages.
-  5. Text and controls do not create obvious horizontal overflow on mobile widths.
-**Plans**: 1 plan complete
+  1. Vercel and/or Netlify SPA fallback config exists and supports React Router deep links.
+  2. `.env.example` includes staging and production examples for API base URL, app env, demo shortcuts, analytics, and feedback flags.
+  3. Staging deployment docs explain URL, backend URL, env vars, deploy/redeploy, preview, and success checks.
+  4. Local preview flow is documented and can serve the built `dist` output.
+  5. Deep routes such as `/chat`, `/parent`, and `/tutor/requests/:id` are included in deployment verification.
+**Plans**: 0 plans complete
 
-### Phase 29: Skeleton Loading and Toast Feedback
+### Phase 36: CI and Preview Workflow
 
-**Goal**: Replace rough loading/operation feedback with consistent skeleton and toast patterns.
-**Depends on**: Phase 28
-**Requirements**: [LOAD-01, LOAD-02, FEED-01, FEED-02]
+**Goal**: Add a reliable repository-level build gate before future staging work continues.
+**Depends on**: Phase 35
+**Requirements**: [CI-01, CI-02, CI-03]
 **Success Criteria** (what must be TRUE):
-  1. Shared skeleton primitives and page-specific skeleton components exist.
-  2. Chat, dashboard, parent, tutor, profile, and report loading states use skeletons.
-  3. Toast provider is mounted once in app providers.
-  4. Auth, profile, upload, teacher-help, and tutor operations show success/error feedback.
-  5. Inline errors remain readable where toast alone is not enough.
-**Plans**: 1 plan complete
+  1. `.github/workflows/frontend-ci.yml` runs on push and pull request to `main`.
+  2. CI uses Node.js 20 and `npm ci`.
+  3. CI runs `npm run lint` and `npm run build`.
+  4. README or deployment docs explain how preview checks should be run locally or by deployment platform.
+**Plans**: 0 plans complete
 
-### Phase 30: Validation and Error Boundary
+### Phase 37: Playwright E2E Smoke Suite
 
-**Goal**: Add form guardrails and application-level render error recovery.
-**Depends on**: Phase 29
-**Requirements**: [VAL-01, VAL-02, VAL-03, VAL-04, VAL-05, ERR-01]
+**Goal**: Add initial browser smoke coverage for the core STOA student-parent-tutor loop.
+**Depends on**: Phase 36
+**Requirements**: [E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06]
 **Success Criteria** (what must be TRUE):
-  1. `src/lib/validation.ts` defines login, register, student profile, and chat input schemas.
-  2. Login and register forms block invalid submissions and show field-level errors.
-  3. Student profile blocks missing grade or empty subject lists.
-  4. Chat input blocks empty messages.
-  5. Existing file upload type, size, and count validation remains intact with clearer feedback.
-  6. `AppErrorBoundary` wraps the app and renders recovery UI on render failures.
-**Plans**: 1 plan complete
+  1. Playwright is installed as a dev dependency and configured for local Vite testing.
+  2. `npm run test:e2e` and `npm run test:e2e:ui` scripts exist.
+  3. `auth.spec.ts` covers demo login and logout.
+  4. `student-chat.spec.ts` covers student chat send and teacher-help request path.
+  5. `parent-dashboard.spec.ts` and `tutor-workflow.spec.ts` cover parent report and tutor request workflow.
+  6. E2E docs explain local backend/demo data requirements and failure debugging.
+**Plans**: 0 plans complete
 
-### Phase 31: Analytics and Usage Tracking Contract
+### Phase 38: Manual QA, Demo Reset, and Early User Testing Docs
 
-**Goal**: Add privacy-conscious MVP analytics instrumentation and a backend usage event contract.
-**Depends on**: Phase 30
-**Requirements**: [ANLY-01, ANLY-02, ANLY-03, ANLY-04]
+**Goal**: Make human testing and demo preparation repeatable for internal and early-user trials.
+**Depends on**: Phase 37
+**Requirements**: [QA-01, QA-02, QA-03, QA-04]
 **Success Criteria** (what must be TRUE):
-  1. `analyticsClient` defines MVP event names and payload type.
-  2. Login, register, conversation create, message send, streaming completion/stop, upload, teacher help, parent report, tutor open, and tutor status events are tracked.
-  3. Analytics respects environment flags and avoids sensitive message content.
-  4. README documents `POST /analytics/events`.
-  5. Local backend can store analytics events in SQLite.
-**Plans**: 1 plan complete
+  1. Manual QA checklist covers auth, student, parent, tutor, and responsive checks.
+  2. MVP demo flow doc covers student, tutor, and parent walkthroughs with demo accounts.
+  3. Early user testing doc identifies tester groups, session structure, observation goals, and feedback collection.
+  4. Demo reset process documents local SQLite reset and future staging reset expectations.
+**Plans**: 0 plans complete
 
-### Phase 32: Parent Weekly Report
+### Phase 39: Feedback Collection and Bug Workflow
 
-**Goal**: Add the first parent weekly report experience and local backend support.
-**Depends on**: Phase 31
-**Requirements**: [RPRT-01, RPRT-02, RPRT-03, RPRT-04]
+**Goal**: Give early users a lightweight way to report issues and give the team a triage workflow.
+**Depends on**: Phase 38
+**Requirements**: [FEED-01, FEED-02, FEED-03, FEED-04, FEED-05, BUG-01, BUG-02]
 **Success Criteria** (what must be TRUE):
-  1. Parent report types, service, query hook, route, and page exist.
-  2. Report displays student, period, summary, stats, top subjects, weak topics, and recommendations.
-  3. Parent dashboard/child summary provides a route into the report.
-  4. Local backend returns seeded report data only for bound children.
-  5. Viewing the report tracks `parent_report_viewed`.
-**Plans**: 1 plan complete
+  1. Feedback API service and mutation hook submit typed feedback payloads.
+  2. Feedback button/dialog are gated by `VITE_ENABLE_FEEDBACK`.
+  3. Feedback payload includes type, page, message, user role, and created timestamp context.
+  4. Local backend accepts `POST /feedback` and persists rows to SQLite.
+  5. Feedback workflow docs and GitHub bug template define triage and severity.
+**Plans**: 0 plans complete
 
-### Phase 33: Tutor Workflow Polish
+### Phase 40: Performance, Security, Privacy, and Readiness Plan
 
-**Goal**: Make tutor help-request handling clearer and more useful for MVP demos.
-**Depends on**: Phase 31
-**Requirements**: [TUTR-05, TUTR-06, TUTR-07, TUTR-08]
+**Goal**: Close the milestone with baseline quality documentation, public legal placeholders, and production-readiness handoff.
+**Depends on**: Phase 39
+**Requirements**: [PERF-01, PERF-02, SEC-01, SEC-02, LEGAL-01, LEGAL-02, DOCS-01, DOCS-02, DOCS-03, DOCS-04]
 **Success Criteria** (what must be TRUE):
-  1. Tutor request list supports status filtering.
-  2. Tutor list/detail show created time, grade, subject, summary, priority placeholder, and context.
-  3. Tutor can add a teacher note from request detail.
-  4. Local backend stores and returns teacher notes.
-  5. Status and note updates refresh tutor data and track analytics events.
-**Plans**: 1 plan complete
-
-### Phase 34: Demo, Staging, Documentation, and Verification
-
-**Goal**: Prepare Phase 7 for MVP demos, staging configuration, and handoff verification.
-**Depends on**: Phase 28, Phase 29, Phase 30, Phase 31, Phase 32, Phase 33
-**Requirements**: [DEMO-01, DEMO-02, ENV-01, DOCS-20, VERF-03]
-**Success Criteria** (what must be TRUE):
-  1. Demo seed data supports student, tutor, parent, report, upload metadata, and teacher-help story.
-  2. Demo login shortcuts render only when enabled by environment flags.
-  3. `.env.example` includes development, staging, production, demo shortcut, and analytics flags.
-  4. README documents Phase 7, demo accounts, demo flow, staging configuration, and MVP checklist.
-  5. Build, lint, backend seed, and route smoke checks pass or limitations are recorded.
-**Plans**: 1 plan complete
+  1. Performance baseline doc defines Lighthouse pages, target metrics, and build bundle warning policy.
+  2. Frontend security review doc covers secrets, localStorage, demo flags, route guards, 401/403, upload validation, and XSS.
+  3. Public `/privacy` and `/terms` placeholder routes exist and are linked where appropriate.
+  4. Production readiness plan documents remaining deployment, monitoring, analytics, privacy, support, and pilot launch work.
+  5. README documents Phase 8 staging, CI, E2E, feedback, legal placeholders, and demo flow.
+  6. Final verification records build, lint, E2E, backend feedback smoke, and route preview results.
+**Plans**: 0 plans complete
 
 </details>
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 28 -> 29 -> 30 -> 31 -> 32 -> 33 -> 34
+Phases execute in numeric order: 35 -> 36 -> 37 -> 38 -> 39 -> 40
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 28. Shared UI Polish and Responsive Foundation | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 29. Skeleton Loading and Toast Feedback | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 30. Validation and Error Boundary | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 31. Analytics and Usage Tracking Contract | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 32. Parent Weekly Report | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 33. Tutor Workflow Polish | v1.6 | 1/1 | Complete | 2026-05-25 |
-| 34. Demo, Staging, Documentation, and Verification | v1.6 | 1/1 | Complete | 2026-05-25 |
+| 35. Staging Deployment Configuration | v1.7 | 0/0 | Not Started | — |
+| 36. CI and Preview Workflow | v1.7 | 0/0 | Not Started | — |
+| 37. Playwright E2E Smoke Suite | v1.7 | 0/0 | Not Started | — |
+| 38. Manual QA, Demo Reset, and Early User Testing Docs | v1.7 | 0/0 | Not Started | — |
+| 39. Feedback Collection and Bug Workflow | v1.7 | 0/0 | Not Started | — |
+| 40. Performance, Security, Privacy, and Readiness Plan | v1.7 | 0/0 | Not Started | — |
