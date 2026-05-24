@@ -40,6 +40,11 @@ Plans:
 
 **Milestone Goal:** Turn the Phase 1 Vite foundation into a formal STOA frontend development base with styling, routing, providers, API layer, state stores, layouts, placeholder pages, theme entry, and documentation.
 
+- [x] **Phase 4: Styling and UI Foundation** - Configure TailwindCSS, shadcn-style UI primitives, lucide icons, alias support, STOA theme tokens, and design notes.
+- [x] **Phase 5: App Providers, Router, Layouts, and Pages** - Establish the app shell with providers, router, layouts, and placeholder routes.
+- [x] **Phase 6: Services, State, Types, Hooks, and Common Components** - Add reusable API, state, type, hook, and common component foundations for future product work.
+- [x] **Phase 7: Acceptance Page, Documentation, and Verification** - Prove the Phase 2 stack works through the Home acceptance page, README updates, command verification, and GitHub handoff.
+
 ### Phase 4: Styling and UI Foundation
 **Goal**: Configure TailwindCSS, shadcn-style UI primitives, lucide icons, alias support, STOA theme tokens, and design notes.
 **Depends on**: Phase 3

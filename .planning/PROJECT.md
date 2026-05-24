@@ -35,17 +35,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and continue STOA pro
 - ✓ Basic Cognito/Amplify, Axios, TanStack Query, and Zustand scaffolding exists — existing, but outside Phase 1 scope
 - ✓ GSD codebase map exists in `.planning/codebase/` — existing
 - ✓ Developers can install, run, build, lint, preview, and inspect the minimal STOA frontend foundation — v1.0
+- ✓ Frontend development foundation exists with TailwindCSS, UI primitives, routing, providers, services, stores, layouts, pages, theme notes, and docs — v1.1
 
 ### Active
 
-- [ ] TailwindCSS works through the Vite plugin and global CSS.
-- [ ] shadcn-style UI primitives exist under `src/components/ui/`.
-- [ ] `@` path alias works in Vite and TypeScript.
-- [ ] App providers wrap the router with TanStack Query.
-- [ ] Home, chat, dashboard, login, and not-found routes render.
-- [ ] Layouts and common components provide a reusable development shell.
-- [ ] API, store, hooks, and type directories are present for future business work.
-- [ ] README and `.env.example` document the Phase 2 development foundation.
+(None currently — v1.1 Frontend Development Foundation is complete)
 
 ### Out of Scope
 
@@ -94,8 +88,8 @@ Current codebase facts:
 | Keep Phase 1 as foundation-only | Prevents premature feature work before the repo can run and build cleanly | — Pending |
 | Treat existing role/API/auth scaffolding as non-Phase-1 context | The current repo includes later-stage placeholders, but Phase 1 acceptance is only the foundation | — Pending |
 | Complete v1.0 before expanding product features | Foundation commands and handoff documentation now pass, so later milestones can build on a stable base | ✓ Good |
-| Continue phase numbering into v1.1 | Keeps GSD history continuous across milestones | — Pending |
-| Use shadcn-style local UI components | Provides copyable, customizable primitives without coupling future work to opaque component packages | — Pending |
+| Continue phase numbering into v1.1 | Keeps GSD history continuous across milestones | ✓ Good |
+| Use shadcn-style local UI components | Provides copyable, customizable primitives without coupling future work to opaque component packages | ✓ Good |
 
 ## Evolution
 
@@ -115,4 +109,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after starting v1.1 Frontend Development Foundation*
+*Last updated: 2026-05-24 after v1.1 milestone audit*

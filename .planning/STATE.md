@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-05-24)
 Phase: 7 of 7 (Acceptance Page, Documentation, and Verification)
 Plan: 2 of 2 complete
 Status: Milestone complete
-Last activity: 2026-05-24 — Phase 7 completed and verified
+Last activity: 2026-05-24 — Milestone v1.1 audited and passed
 
 Progress: [██████████] 100%
 
@@ -68,6 +68,7 @@ Recent decisions affecting current work:
 - Phase 5 added app providers, router, layouts, and route placeholder pages.
 - Phase 6 added API services, Zustand stores, hooks, shared types, env example, and common components.
 - Phase 7 added the acceptance page, README updates, route checks, preview check, and final verification.
+- Milestone audit passed with 38/38 requirements satisfied.
 
 ### Pending Todos
 
