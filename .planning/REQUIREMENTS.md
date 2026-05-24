@@ -1,93 +1,87 @@
-# Requirements: STOA Frontend v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
+# Requirements: STOA Frontend v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
 
-**Defined:** 2026-05-24
+**Defined:** 2026-05-25
 **Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## v1.5 Requirements
+## v1.6 Requirements
 
-Requirements for the sixth-stage authentication, role, parent visibility, tutor help-request, and local SQLite testing milestone. Each maps to roadmap phases.
+Requirements for the seventh-stage MVP readiness milestone. Each maps to roadmap phases.
 
-### Authentication
+### UI and Responsive Readiness
 
-- [x] **AUTH-01**: User can register with name, email, password, and role.
-- [x] **AUTH-02**: User can log in with email and password.
-- [x] **AUTH-03**: User session persists across refresh using `stoa_access_token`.
-- [x] **AUTH-04**: User can log out and clear local auth state.
-- [x] **AUTH-05**: Frontend loads current user from `/auth/me`.
-- [x] **AUTH-06**: 401 responses clear auth and redirect to `/login`.
-- [x] **AUTH-07**: 403 responses redirect to `/forbidden` without clearing auth.
+- [ ] **UI-01**: Core pages use shared page container, page header, and section header patterns.
+- [ ] **UI-02**: UI guidelines document layout, cards, forms, badges, chat, dashboards, and mobile behavior.
+- [ ] **UI-03**: Login, register, dashboard, chat, profile, parent, child summary, tutor list, and tutor detail pages are usable on mobile and tablet widths.
+- [ ] **UI-04**: Chat mobile layout avoids permanent sidebar compression and keeps messages/input usable.
 
-### Roles and Routing
+### Loading and Feedback
 
-- [x] **ROLE-01**: App supports `student`, `parent`, `tutor`, and `admin` user roles.
-- [x] **ROLE-02**: Unauthenticated users cannot access protected routes.
-- [x] **ROLE-03**: Users cannot access routes outside their role.
-- [x] **ROLE-04**: Login and register redirect users to the correct role dashboard.
-- [x] **ROLE-05**: App layout shows role-specific navigation and user menu.
+- [ ] **LOAD-01**: Shared skeleton primitives and page skeletons exist.
+- [ ] **LOAD-02**: Chat, dashboard, parent, tutor, profile, and report loading states use skeletons.
+- [ ] **FEED-01**: Toast notification system is wired through app providers.
+- [ ] **FEED-02**: Auth, profile, upload, teacher-help, and tutor actions show success/error feedback.
 
-### Student
+### Validation and Resilience
 
-- [x] **STUD-01**: Student can access dashboard, chat, profile, and learning history.
-- [x] **STUD-02**: Student can view and update grade, school system, and primary subjects.
-- [x] **STUD-03**: Student can view their own learning history.
-- [x] **STUD-04**: Student chat and conversation data is scoped to the current user.
+- [ ] **VAL-01**: Login validation covers email format and required password.
+- [ ] **VAL-02**: Register validation covers name, email, password length, and role.
+- [ ] **VAL-03**: Student profile validation covers grade and at least one subject.
+- [ ] **VAL-04**: Chat input blocks empty messages.
+- [ ] **VAL-05**: File upload validation preserves type, size, and count rules with user-readable feedback.
+- [ ] **ERR-01**: App has an error boundary with recovery UI.
 
-### Parent
+### Analytics and Usage Tracking
 
-- [x] **PARN-01**: Parent can view bound children.
-- [x] **PARN-02**: Parent can view child learning summary.
-- [x] **PARN-03**: Parent can view child recent questions and weak topics.
-- [x] **PARN-04**: Parent can view child teacher-help records.
-- [x] **PARN-05**: Parent can view child learning-history summaries.
-- [x] **PARN-06**: Parent cannot directly participate in child chat.
+- [ ] **ANLY-01**: Analytics client defines MVP event names and payload type.
+- [ ] **ANLY-02**: Core auth, chat, upload, teacher-help, parent report, and tutor events are tracked.
+- [ ] **ANLY-03**: Usage tracking API contract is documented.
+- [ ] **ANLY-04**: Local backend can store analytics events.
 
-### Tutor
+### Parent Report
 
-- [x] **TUTR-01**: Tutor can view help requests by status.
-- [x] **TUTR-02**: Tutor can open help-request detail with question context.
-- [x] **TUTR-03**: Tutor can update request status.
-- [x] **TUTR-04**: Tutor only receives permitted help-request data.
+- [ ] **RPRT-01**: Parent report type, API, hook, and route exist.
+- [ ] **RPRT-02**: Report displays period, summary, stats, top subjects, weak topics, and recommendations.
+- [ ] **RPRT-03**: Local backend returns seed report data.
+- [ ] **RPRT-04**: Parent report view is tracked.
 
-### Local Backend and SQLite
+### Tutor Workflow
 
-- [x] **BACK-01**: Local FastAPI backend exposes the Phase 6 API contract.
-- [x] **BACK-02**: SQLite stores users, profiles, parent-child links, conversations, messages, uploads metadata, attachments, teacher help requests, and learning history.
-- [x] **BACK-03**: Seed script creates student, parent, tutor, and admin accounts.
-- [x] **BACK-04**: Backend hashes passwords and issues bearer access tokens.
-- [x] **BACK-05**: Backend enforces 401 and 403 behavior.
-- [x] **BACK-06**: Backend filters student, parent, and tutor data by current user and role.
-- [x] **BACK-07**: Conversation, message, teacher-help, and learning-history data can be saved to SQLite.
+- [ ] **TUTR-05**: Tutor request list supports status filtering.
+- [ ] **TUTR-06**: Tutor list and detail show created time, grade, subject, summary, priority placeholder, and context.
+- [ ] **TUTR-07**: Tutor can add teacher notes.
+- [ ] **TUTR-08**: Tutor status and note updates refresh UI and are tracked.
 
-### Documentation and Verification
+### Demo, Staging, and Documentation
 
-- [x] **DOCS-19**: README documents Phase 6 auth, roles, routes, endpoints, token storage, SQLite, and seed accounts.
-- [x] **VERF-01**: `npm install`, `npm run dev`, and `npm run build` are verified or any environment limitation is recorded.
-- [x] **VERF-02**: Student, parent, tutor, admin, protected-route, role-route, and SQLite-backed API flows are manually verified.
+- [ ] **DEMO-01**: Demo seed data supports full student to tutor to parent MVP flow.
+- [ ] **DEMO-02**: Demo login shortcuts appear only when enabled by environment.
+- [ ] **ENV-01**: `.env.example` includes app environment, analytics, and demo flags.
+- [ ] **DOCS-20**: README documents Phase 7, demo accounts, demo flow, staging config, and MVP checklist.
+- [ ] **VERF-03**: Build, lint, backend seed, and route smoke verification are recorded.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Authentication Hardening
+### Deployment and QA
 
-- **AUTH-08**: User can complete email verification.
-- **AUTH-09**: User can reset password through a secure email flow.
-- **AUTH-10**: Production auth uses a hardened token strategy such as httpOnly cookies or refresh tokens.
-- **AUTH-11**: Production SSO can be integrated.
+- **DEPLOY-02**: Staging deployment is configured and published.
+- **CI-01**: CI build check runs on pull requests.
+- **E2E-01**: E2E tests cover the student, tutor, and parent demo flow.
+- **QA-01**: Manual QA checklist is executed with early users.
 
-### Parent, Tutor, and Admin Expansion
+### Analytics and Reporting
 
-- **PARN-07**: Parent can invite or bind children through a real invitation workflow.
-- **TUTR-05**: Tutor can participate in live multi-person teacher chat.
-- **ADMN-01**: Admin can manage users, tutors, roles, and platform content.
-- **ORG-01**: Schools and organization structures can be modeled.
+- **ANLY-05**: Product analytics dashboards exist.
+- **RPRT-05**: Parent reports are generated automatically from real learning activity.
+- **OBS-01**: Production monitoring and error reporting exist.
 
-### Product Readiness
+### Product Expansion
 
-- **ANLY-01**: Product analytics and usage tracking exist.
-- **RPRT-01**: Parent report generation exists.
-- **COMP-01**: Audit logging and compliance documentation are production-ready.
-- **DEPLOY-01**: Staging and production deployment workflows exist.
+- **PAY-01**: Payment and subscription flows exist.
+- **ADMIN-02**: Full admin user and tutor management exists.
+- **BI-01**: Complex business intelligence dashboards exist.
+- **CONTENT-01**: Curriculum and content management exists.
 
 ## Out of Scope
 
@@ -95,18 +89,13 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Production SSO | Phase 6 validates core auth and role boundaries first. |
-| Complete email verification | Registration can work locally without full email infrastructure. |
-| Complete password reset | Deferred until production auth hardening. |
-| Refresh-token/httpOnly-cookie migration | Phase 6 uses `localStorage` for MVP validation and documents the limitation. |
-| Complex school organization | Not required for first role-boundary validation. |
-| Parent invitation workflow | Seeded parent-child links are enough for Phase 6. |
-| Live tutor chat | Tutor list/detail/status is enough for Phase 6. |
-| Full admin management | Admin route remains a placeholder. |
-| Payment system | Deferred until product and auth flows mature. |
-| Production SQLite | SQLite is local test infrastructure only. |
-| Direct frontend model API calls | The frontend must remain decoupled from model providers. |
-| Full audit logging and compliance documentation | Deferred to later security/compliance milestones. |
+| Production deployment | Phase 7 prepares staging config and demo readiness; deployment execution belongs to Phase 8. |
+| Full payment system | Not required for MVP demo readiness. |
+| Full admin backend | Admin remains outside Phase 7 polish scope. |
+| Complex BI dashboard | Phase 7 adds event tracking and contracts only. |
+| Production audit logging | Deferred to later security/compliance work. |
+| Automatic AI-generated reports | Phase 7 can use seed/local report data to validate parent value. |
+| Full school B2B management | Not required for early MVP flow. |
 
 ## Traceability
 
@@ -114,48 +103,43 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 21 | Complete |
-| AUTH-02 | Phase 21 | Complete |
-| AUTH-03 | Phase 21 | Complete |
-| AUTH-04 | Phase 21 | Complete |
-| AUTH-05 | Phase 21 | Complete |
-| AUTH-06 | Phase 21 | Complete |
-| AUTH-07 | Phase 21 | Complete |
-| ROLE-01 | Phase 21 | Complete |
-| ROLE-02 | Phase 21 | Complete |
-| ROLE-03 | Phase 21 | Complete |
-| ROLE-04 | Phase 21 | Complete |
-| ROLE-05 | Phase 27 | Complete |
-| BACK-01 | Phase 22 | Complete |
-| BACK-02 | Phase 22 | Complete |
-| BACK-03 | Phase 22 | Complete |
-| BACK-04 | Phase 22 | Complete |
-| BACK-05 | Phase 22 | Complete |
-| BACK-06 | Phase 22 | Complete |
-| BACK-07 | Phase 22 | Complete |
-| STUD-01 | Phase 23 | Complete |
-| STUD-02 | Phase 23 | Complete |
-| STUD-03 | Phase 23 | Complete |
-| STUD-04 | Phase 23 | Complete |
-| PARN-01 | Phase 24 | Complete |
-| PARN-02 | Phase 24 | Complete |
-| PARN-03 | Phase 24 | Complete |
-| PARN-04 | Phase 24 | Complete |
-| PARN-05 | Phase 24 | Complete |
-| PARN-06 | Phase 24 | Complete |
-| TUTR-01 | Phase 25 | Complete |
-| TUTR-02 | Phase 25 | Complete |
-| TUTR-03 | Phase 25 | Complete |
-| TUTR-04 | Phase 25 | Complete |
-| DOCS-19 | Phase 27 | Complete |
-| VERF-01 | Phase 27 | Complete |
-| VERF-02 | Phase 27 | Complete |
+| UI-01 | Phase 28 | Pending |
+| UI-02 | Phase 28 | Pending |
+| UI-03 | Phase 28 | Pending |
+| UI-04 | Phase 28 | Pending |
+| LOAD-01 | Phase 29 | Pending |
+| LOAD-02 | Phase 29 | Pending |
+| FEED-01 | Phase 29 | Pending |
+| FEED-02 | Phase 29 | Pending |
+| VAL-01 | Phase 30 | Pending |
+| VAL-02 | Phase 30 | Pending |
+| VAL-03 | Phase 30 | Pending |
+| VAL-04 | Phase 30 | Pending |
+| VAL-05 | Phase 30 | Pending |
+| ERR-01 | Phase 30 | Pending |
+| ANLY-01 | Phase 31 | Pending |
+| ANLY-02 | Phase 31 | Pending |
+| ANLY-03 | Phase 31 | Pending |
+| ANLY-04 | Phase 31 | Pending |
+| RPRT-01 | Phase 32 | Pending |
+| RPRT-02 | Phase 32 | Pending |
+| RPRT-03 | Phase 32 | Pending |
+| RPRT-04 | Phase 32 | Pending |
+| TUTR-05 | Phase 33 | Pending |
+| TUTR-06 | Phase 33 | Pending |
+| TUTR-07 | Phase 33 | Pending |
+| TUTR-08 | Phase 33 | Pending |
+| DEMO-01 | Phase 34 | Pending |
+| DEMO-02 | Phase 34 | Pending |
+| ENV-01 | Phase 34 | Pending |
+| DOCS-20 | Phase 34 | Pending |
+| VERF-03 | Phase 34 | Pending |
 
 **Coverage:**
-- v1.5 requirements: 36 total
-- Mapped to phases: 36
+- v1.6 requirements: 31 total
+- Mapped to phases: 31
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after v1.5 autonomous execution*
+*Requirements defined: 2026-05-25*
+*Last updated: 2026-05-25 after v1.6 initialization*
