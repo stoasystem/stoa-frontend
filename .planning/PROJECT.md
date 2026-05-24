@@ -4,25 +4,25 @@
 
 STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, and a backend-integrated student chat flow for real conversation data.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, and a local SQLite-backed test backend. The current product step is preparing the Phase 7 polish, analytics, and MVP readiness layer.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, and a local SQLite-backed test backend. The current product step is polishing that platform into an MVP-ready product that can be demonstrated, internally tested, and prepared for early student, parent, and tutor trials.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## Current Milestone: v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
+## Current Milestone: v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
 
-**Goal:** Upgrade STOA from a single-user learning prototype into an education platform with real user identity, role-specific access, parent visibility, tutor help-request handling, and a SQLite-backed local test backend.
+**Goal:** Upgrade STOA from a functional education platform frontend into an MVP-ready product with polished UI, responsive flows, user feedback, analytics, parent reporting, tutor workflow improvements, demo readiness, and staging configuration.
 
 **Target features:**
-- Login, register, logout, current-user hydration, local token storage, and 401/403 handling.
-- Student, Parent, Tutor, and Admin roles with protected routes and role guards.
-- Role-specific dashboards, layouts, and navigation.
-- Student profile editing and student learning history.
-- Parent child list, child learning summary, recent questions, weak topics, and child learning-history visibility.
-- Tutor help-request list, detail view, and status updates.
-- Local FastAPI + SQLite test backend with users, roles, profiles, conversations, messages, uploads metadata, teacher help requests, learning history, and seed data.
-- README documentation for authentication, roles, permissions, and local SQLite testing.
+- Shared UI guidelines, page containers, section headers, spacing, skeleton states, and mobile responsive polish.
+- Toast/notification feedback for key operations.
+- Form validation for login, register, profile, chat input, file upload, teacher help, and tutor status updates.
+- Application error boundary and global fallback behavior.
+- Frontend analytics event tracking and usage tracking API contract.
+- Parent weekly report route, API contract, components, and local test data.
+- Tutor workflow improvements with status filters, clearer request detail, and teacher notes.
+- Demo seed data, demo login shortcuts, MVP demo flow documentation, and staging environment variables.
 
 ## Current State
 
@@ -60,7 +60,15 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.5 Phase 6 Authentication, User Roles, and Parent Visibility is implemented)
+- [ ] Core pages use shared layout standards and remain usable on mobile, tablet, and small laptop widths.
+- [ ] Major loading states use skeletons instead of plain loading text.
+- [ ] Key operations provide toast feedback and readable error states.
+- [ ] Login, register, student profile, chat input, file upload, teacher help, and tutor status changes have basic validation.
+- [ ] App-level rendering failures are caught by an error boundary.
+- [ ] Core user actions are tracked through a frontend analytics client and usage event contract.
+- [ ] Parent can view a child weekly report with summary, stats, top subjects, weak topics, and recommendations.
+- [ ] Tutor help request workflow supports filtering, clearer context, status updates, and teacher notes.
+- [ ] Demo seed data, demo shortcuts, staging env variables, README, and MVP demo flow are ready.
 
 ### Out of Scope
 
@@ -72,10 +80,13 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Direct frontend calls to OpenAI, Claude, Gemini, DeepSeek, Codex, or any other model provider — frontend remains coupled only to STOA backend APIs.
 - Production SQLite usage — SQLite is local functional-test infrastructure only; production persistence remains a backend concern.
 - Full audit logging and Swiss data privacy compliance documentation — deferred until later security/compliance milestones.
+- Production deployment — Phase 7 prepares staging config only; deployment execution is Phase 8.
+- Complex BI dashboards and full admin analytics — Phase 7 only adds basic analytics events and usage contract.
+- Full curriculum/content management — not required for MVP readiness.
 
 ## Context
 
-The project brief for Phase 6 was provided in Chinese and defines authentication, role boundaries, parent visibility, tutor help-request handling, and a local SQLite-backed test backend. It builds on v1.4's streaming chat, upload, retry, new-conversation, and teacher-help status workflow while establishing who can use the system and what each role can see.
+The project brief for Phase 7 was provided in Chinese and defines product polish, responsive readiness, loading/feedback systems, validation, analytics, parent reporting, tutor workflow optimization, demo data, and staging preparation. It builds on v1.5's authenticated role model and local SQLite-backed backend.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -97,7 +108,7 @@ Current codebase facts:
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 6 adds authentication, role routing, local backend persistence, parent visibility, and tutor help-request handling; complex organizations, live teacher chat, payments, production SSO, and deployment stay out of scope.
+- **Scope**: Phase 7 polishes existing product flows for MVP demos and early testing; large new business modules, production deployment, complex BI, payments, and full admin remain out of scope.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -105,6 +116,8 @@ Current codebase facts:
 - **Auth token storage**: Phase 6 may use `localStorage` key `stoa_access_token`; production hardening is deferred.
 - **SQLite**: SQLite is only for local functional testing behind a local backend API; the browser frontend must never read SQLite directly.
 - **Permissions**: Frontend route guards are user-experience protection only; backend APIs must enforce real user and role data filtering.
+- **MVP readiness**: Main student, parent, and tutor paths should be demonstrable with local seed data.
+- **Analytics**: Phase 7 can log analytics locally or prepare backend contracts without committing to a third-party provider.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -133,6 +146,8 @@ Current codebase facts:
 | Use localStorage for Phase 6 access tokens | Simple MVP token persistence is enough to validate role workflows before production auth hardening | ✓ Good |
 | Add a local FastAPI + SQLite test backend | Lets frontend auth, role filtering, and learning-data workflows be tested before the formal backend is ready | ✓ Good |
 | Treat frontend route guards as non-security boundaries | Prevents UI checks from replacing backend authorization and keeps data isolation enforced by APIs | ✓ Good |
+| Keep Phase 7 focused on readiness instead of new product breadth | Stabilizes the core student-parent-tutor loop for demos and early trials before adding more modules | — Pending |
+| Start analytics with a thin frontend client and API contract | Enables usage visibility without locking the MVP to a vendor prematurely | — Pending |
 
 ## Evolution
 
@@ -152,4 +167,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.5 autonomous execution*
+*Last updated: 2026-05-25 after v1.6 milestone initialization*
