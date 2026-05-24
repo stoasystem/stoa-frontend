@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-05-24)
 Phase: 3 of 3 (Documentation and Repository Readiness)
 Plan: 2 of 2 complete
 Status: Milestone complete
-Last activity: 2026-05-24 — Phase 3 completed and verified
+Last activity: 2026-05-24 — Milestone v1.0 audited and passed
 
 Progress: [██████████] 100%
 
@@ -61,6 +61,7 @@ Recent decisions affecting current work:
 - Phase 1 simplified the runtime app surface to the minimal STOA foundation page.
 - Phase 2 verified install, build, lint, and preview workflows.
 - Phase 3 aligned README with Phase 1 and confirmed repository handoff readiness.
+- Milestone audit passed with 18/18 requirements satisfied.
 
 ### Pending Todos
 

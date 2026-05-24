@@ -30,17 +30,11 @@ Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and s
 - ✓ Initial role route shell exists under `src/pages/**` — existing, but outside Phase 1 scope
 - ✓ Basic Cognito/Amplify, Axios, TanStack Query, and Zustand scaffolding exists — existing, but outside Phase 1 scope
 - ✓ GSD codebase map exists in `.planning/codebase/` — existing
+- ✓ Developers can install, run, build, lint, preview, and inspect the minimal STOA frontend foundation — v1.0
 
 ### Active
 
-- [ ] Project has the standard Vite React TypeScript scaffold files needed to run and build locally.
-- [ ] Root app renders a minimal STOA initialization page instead of Vite example content or feature placeholders.
-- [ ] Default Vite demo assets and unused imports are removed.
-- [ ] `.gitignore` excludes dependencies, build output, local env files, and OS/editor noise.
-- [ ] `package.json` exposes `dev`, `build`, `lint`, and `preview` scripts.
-- [ ] README explains stack, install, dev, build, and preview commands.
-- [ ] `npm install`, `npm run dev`, and `npm run build` can succeed on a clean checkout.
-- [ ] Initial project state is committed and ready to push to GitHub.
+(None currently — v1.0 Frontend Foundation is complete)
 
 ### Out of Scope
 
@@ -91,6 +85,7 @@ Current codebase facts from `.planning/codebase/`:
 | Use npm | Default toolchain is simple for team members | — Pending |
 | Keep Phase 1 as foundation-only | Prevents premature feature work before the repo can run and build cleanly | — Pending |
 | Treat existing role/API/auth scaffolding as non-Phase-1 context | The current repo includes later-stage placeholders, but Phase 1 acceptance is only the foundation | — Pending |
+| Complete v1.0 before expanding product features | Foundation commands and handoff documentation now pass, so later milestones can build on a stable base | ✓ Good |
 
 ## Evolution
 
@@ -110,4 +105,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after initialization*
+*Last updated: 2026-05-24 after v1.0 milestone audit*
