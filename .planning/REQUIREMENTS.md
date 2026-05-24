@@ -1,90 +1,93 @@
-# Requirements: STOA Frontend v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+# Requirements: STOA Frontend v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 
 **Defined:** 2026-05-24
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat workflow backed only by the unified STOA backend API contract.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## v1.4 Requirements
+## v1.5 Requirements
 
-Requirements for the fifth-stage streaming chat, file upload, and real learning workflow milestone. Each maps to roadmap phases.
+Requirements for the sixth-stage authentication, role, parent visibility, tutor help-request, and local SQLite testing milestone. Each maps to roadmap phases.
 
-### Streaming Chat
+### Authentication
 
-- [x] **STREAM-01**: User can send a chat message through `POST /conversations/:conversationId/messages/stream`.
-- [x] **STREAM-02**: User message appears immediately as an optimistic local message after submit.
-- [x] **STREAM-03**: Assistant streaming placeholder appears immediately after stream start.
-- [x] **STREAM-04**: `message_delta` events append progressively to the assistant message.
-- [x] **STREAM-05**: `message_done` marks the assistant message as completed.
-- [x] **STREAM-06**: `message_error` or stream startup failure marks the relevant message as failed.
-- [x] **STREAM-07**: Completed streaming invalidates canonical conversation queries.
+- [ ] **AUTH-01**: User can register with name, email, password, and role.
+- [ ] **AUTH-02**: User can log in with email and password.
+- [ ] **AUTH-03**: User session persists across refresh using `stoa_access_token`.
+- [ ] **AUTH-04**: User can log out and clear local auth state.
+- [ ] **AUTH-05**: Frontend loads current user from `/auth/me`.
+- [ ] **AUTH-06**: 401 responses clear auth and redirect to `/login`.
+- [ ] **AUTH-07**: 403 responses redirect to `/forbidden` without clearing auth.
 
-### Message Actions
+### Roles and Routing
 
-- [x] **MSG-01**: User can stop an in-progress assistant generation.
-- [x] **MSG-02**: Stopped assistant messages show `stopped` status.
-- [x] **MSG-03**: User can retry failed user-message sends with original content and attachment IDs.
-- [x] **MSG-04**: Chat message types distinguish student, assistant, teacher, and system messages.
-- [x] **MSG-05**: Message bubbles display sending, streaming, completed, stopped, and failed states.
+- [ ] **ROLE-01**: App supports `student`, `parent`, `tutor`, and `admin` user roles.
+- [ ] **ROLE-02**: Unauthenticated users cannot access protected routes.
+- [ ] **ROLE-03**: Users cannot access routes outside their role.
+- [ ] **ROLE-04**: Login and register redirect users to the correct role dashboard.
+- [ ] **ROLE-05**: App layout shows role-specific navigation and user menu.
 
-### Conversation Flow
+### Student
 
-- [x] **CONV-01**: User can create a new conversation from `/chat`.
-- [x] **CONV-02**: Successful conversation creation refreshes the conversation list.
-- [x] **CONV-03**: Newly created conversation is automatically selected.
-- [x] **CONV-04**: User can send the first message in a newly created conversation.
+- [ ] **STUD-01**: Student can access dashboard, chat, profile, and learning history.
+- [ ] **STUD-02**: Student can view and update grade, school system, and primary subjects.
+- [ ] **STUD-03**: Student can view their own learning history.
+- [ ] **STUD-04**: Student chat and conversation data is scoped to the current user.
 
-### File Upload
+### Parent
 
-- [x] **FILE-01**: User can upload PNG homework files.
-- [x] **FILE-02**: User can upload JPEG homework files.
-- [x] **FILE-03**: User can upload PDF homework files.
-- [x] **FILE-04**: Unsupported file types are blocked before upload.
-- [x] **FILE-05**: Files over 10 MB are blocked before upload.
-- [x] **FILE-06**: More than 3 pending attachments are blocked before upload.
-- [x] **FILE-07**: Uploading, uploaded, and failed file states are visible.
-- [x] **FILE-08**: Uploaded attachment previews show filename, type, size/status, and remove action.
-- [x] **FILE-09**: Sending a chat message includes uploaded `attachmentIds`.
-- [x] **FILE-10**: File upload service calls `POST /files` with `multipart/form-data`.
+- [ ] **PARN-01**: Parent can view bound children.
+- [ ] **PARN-02**: Parent can view child learning summary.
+- [ ] **PARN-03**: Parent can view child recent questions and weak topics.
+- [ ] **PARN-04**: Parent can view child teacher-help records.
+- [ ] **PARN-05**: Parent can view child learning-history summaries.
+- [ ] **PARN-06**: Parent cannot directly participate in child chat.
 
-### Teacher Help
+### Tutor
 
-- [x] **TEACH-01**: User can request teacher help for the active conversation.
-- [x] **TEACH-02**: Teacher-help request pending state is visible.
-- [x] **TEACH-03**: Teacher-help assigned state is visible.
-- [x] **TEACH-04**: Teacher-help in-progress state is visible.
-- [x] **TEACH-05**: Teacher-help resolved state is visible.
-- [x] **TEACH-06**: Teacher-help request failures show a visible error state.
-- [x] **TEACH-07**: Teacher-help service supports status lookup through `GET /teacher-help/request/:requestId`.
+- [ ] **TUTR-01**: Tutor can view help requests by status.
+- [ ] **TUTR-02**: Tutor can open help-request detail with question context.
+- [ ] **TUTR-03**: Tutor can update request status.
+- [ ] **TUTR-04**: Tutor only receives permitted help-request data.
+
+### Local Backend and SQLite
+
+- [ ] **BACK-01**: Local FastAPI backend exposes the Phase 6 API contract.
+- [ ] **BACK-02**: SQLite stores users, profiles, parent-child links, conversations, messages, uploads metadata, attachments, teacher help requests, and learning history.
+- [ ] **BACK-03**: Seed script creates student, parent, tutor, and admin accounts.
+- [ ] **BACK-04**: Backend hashes passwords and issues bearer access tokens.
+- [ ] **BACK-05**: Backend enforces 401 and 403 behavior.
+- [ ] **BACK-06**: Backend filters student, parent, and tutor data by current user and role.
+- [ ] **BACK-07**: Conversation, message, teacher-help, and learning-history data can be saved to SQLite.
 
 ### Documentation and Verification
 
-- [x] **DOCS-15**: README documents Phase 5 streaming chat and file upload behavior.
-- [x] **DOCS-16**: README lists expected Phase 5 backend endpoints.
-- [x] **DOCS-17**: README states the frontend still does not call model-provider APIs directly.
-- [x] **DOCS-18**: Local verification covers build, lint, `/chat`, streaming, upload, and teacher-help states.
+- [ ] **DOCS-19**: README documents Phase 6 auth, roles, routes, endpoints, token storage, SQLite, and seed accounts.
+- [ ] **VERF-01**: `npm install`, `npm run dev`, and `npm run build` are verified or any environment limitation is recorded.
+- [ ] **VERF-02**: Student, parent, tutor, admin, protected-route, role-route, and SQLite-backed API flows are manually verified.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Authentication and Roles
+### Authentication Hardening
 
-- **AUTH-01**: User can register, log in, and persist sessions through real auth integration.
-- **ROLE-01**: Student, parent, tutor, and admin roles have protected route access.
-- **PARENT-01**: Parent dashboard can view student learning history.
-- **TUTOR-01**: Tutor or teacher dashboard can handle escalated sessions.
+- **AUTH-08**: User can complete email verification.
+- **AUTH-09**: User can reset password through a secure email flow.
+- **AUTH-10**: Production auth uses a hardened token strategy such as httpOnly cookies or refresh tokens.
+- **AUTH-11**: Production SSO can be integrated.
 
-### Advanced AI Workflow
+### Parent, Tutor, and Admin Expansion
 
-- **STREAM-08**: User can retry failed or partial assistant responses.
-- **STREAM-09**: Backend generation can be cancelled through a dedicated cancel endpoint.
-- **FILE-11**: User can see async OCR/PDF parsing progress beyond uploaded metadata.
-- **MEMORY-01**: User can manage long-term learning memory.
+- **PARN-07**: Parent can invite or bind children through a real invitation workflow.
+- **TUTR-05**: Tutor can participate in live multi-person teacher chat.
+- **ADMN-01**: Admin can manage users, tutors, roles, and platform content.
+- **ORG-01**: Schools and organization structures can be modeled.
 
-### Other Product Areas
+### Product Readiness
 
-- **DASHAPI-01**: Dashboard loads student overview data from `GET /students/me/dashboard`.
-- **PAY-01**: Payment and subscription flows exist.
-- **DEPLOY-01**: Production deployment workflow exists.
+- **ANLY-01**: Product analytics and usage tracking exist.
+- **RPRT-01**: Parent report generation exists.
+- **COMP-01**: Audit logging and compliance documentation are production-ready.
+- **DEPLOY-01**: Staging and production deployment workflows exist.
 
 ## Out of Scope
 
@@ -92,18 +95,18 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Direct frontend model API calls | The frontend must remain decoupled from OpenAI, Claude, Gemini, DeepSeek, Codex, and other providers. |
-| Frontend `STOA_AI_PROVIDER` config | AI provider selection is backend-only. |
-| WebSocket chat | Phase 5 only needs backend streaming response over fetch/SSE-style events. |
-| Dedicated backend cancel endpoint | Frontend abort is sufficient for Phase 5; backend cancellation can be added later. |
-| AI partial-response retry | Basic failed user-message retry is the Phase 5 requirement. |
-| Full OCR/PDF parsing UI | Phase 5 displays upload metadata and supports future parsing statuses. |
-| Live multi-person teacher chat | Phase 5 displays teacher-help request status only. |
-| Full auth enforcement | Authorization belongs to the next auth/roles milestone. |
-| Parent dashboard API | Phase 5 focuses on chat workflow. |
-| Tutor/teacher dashboard API | Teacher help is limited to request/status endpoints. |
-| Production deployment | Local integration and build verification only. |
+| Production SSO | Phase 6 validates core auth and role boundaries first. |
+| Complete email verification | Registration can work locally without full email infrastructure. |
+| Complete password reset | Deferred until production auth hardening. |
+| Refresh-token/httpOnly-cookie migration | Phase 6 uses `localStorage` for MVP validation and documents the limitation. |
+| Complex school organization | Not required for first role-boundary validation. |
+| Parent invitation workflow | Seeded parent-child links are enough for Phase 6. |
+| Live tutor chat | Tutor list/detail/status is enough for Phase 6. |
+| Full admin management | Admin route remains a placeholder. |
 | Payment system | Deferred until product and auth flows mature. |
+| Production SQLite | SQLite is local test infrastructure only. |
+| Direct frontend model API calls | The frontend must remain decoupled from model providers. |
+| Full audit logging and compliance documentation | Deferred to later security/compliance milestones. |
 
 ## Traceability
 
@@ -111,49 +114,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STREAM-01 | Phase 16 | Complete |
-| STREAM-02 | Phase 16 | Complete |
-| STREAM-03 | Phase 16 | Complete |
-| STREAM-04 | Phase 16 | Complete |
-| STREAM-05 | Phase 16 | Complete |
-| STREAM-06 | Phase 16 | Complete |
-| STREAM-07 | Phase 16 | Complete |
-| MSG-01 | Phase 18 | Complete |
-| MSG-02 | Phase 18 | Complete |
-| MSG-03 | Phase 18 | Complete |
-| MSG-04 | Phase 15 | Complete |
-| MSG-05 | Phase 18 | Complete |
-| CONV-01 | Phase 18 | Complete |
-| CONV-02 | Phase 18 | Complete |
-| CONV-03 | Phase 18 | Complete |
-| CONV-04 | Phase 18 | Complete |
-| FILE-01 | Phase 17 | Complete |
-| FILE-02 | Phase 17 | Complete |
-| FILE-03 | Phase 17 | Complete |
-| FILE-04 | Phase 17 | Complete |
-| FILE-05 | Phase 17 | Complete |
-| FILE-06 | Phase 17 | Complete |
-| FILE-07 | Phase 17 | Complete |
-| FILE-08 | Phase 17 | Complete |
-| FILE-09 | Phase 18 | Complete |
-| FILE-10 | Phase 17 | Complete |
-| TEACH-01 | Phase 19 | Complete |
-| TEACH-02 | Phase 19 | Complete |
-| TEACH-03 | Phase 19 | Complete |
-| TEACH-04 | Phase 19 | Complete |
-| TEACH-05 | Phase 19 | Complete |
-| TEACH-06 | Phase 19 | Complete |
-| TEACH-07 | Phase 19 | Complete |
-| DOCS-15 | Phase 20 | Complete |
-| DOCS-16 | Phase 20 | Complete |
-| DOCS-17 | Phase 20 | Complete |
-| DOCS-18 | Phase 20 | Complete |
+| AUTH-01 | Phase 21 | Pending |
+| AUTH-02 | Phase 21 | Pending |
+| AUTH-03 | Phase 21 | Pending |
+| AUTH-04 | Phase 21 | Pending |
+| AUTH-05 | Phase 21 | Pending |
+| AUTH-06 | Phase 21 | Pending |
+| AUTH-07 | Phase 21 | Pending |
+| ROLE-01 | Phase 21 | Pending |
+| ROLE-02 | Phase 21 | Pending |
+| ROLE-03 | Phase 21 | Pending |
+| ROLE-04 | Phase 21 | Pending |
+| ROLE-05 | Phase 27 | Pending |
+| BACK-01 | Phase 22 | Pending |
+| BACK-02 | Phase 22 | Pending |
+| BACK-03 | Phase 22 | Pending |
+| BACK-04 | Phase 22 | Pending |
+| BACK-05 | Phase 22 | Pending |
+| BACK-06 | Phase 22 | Pending |
+| BACK-07 | Phase 22 | Pending |
+| STUD-01 | Phase 23 | Pending |
+| STUD-02 | Phase 23 | Pending |
+| STUD-03 | Phase 23 | Pending |
+| STUD-04 | Phase 23 | Pending |
+| PARN-01 | Phase 24 | Pending |
+| PARN-02 | Phase 24 | Pending |
+| PARN-03 | Phase 24 | Pending |
+| PARN-04 | Phase 24 | Pending |
+| PARN-05 | Phase 24 | Pending |
+| PARN-06 | Phase 24 | Pending |
+| TUTR-01 | Phase 25 | Pending |
+| TUTR-02 | Phase 25 | Pending |
+| TUTR-03 | Phase 25 | Pending |
+| TUTR-04 | Phase 25 | Pending |
+| DOCS-19 | Phase 27 | Pending |
+| VERF-01 | Phase 27 | Pending |
+| VERF-02 | Phase 27 | Pending |
 
 **Coverage:**
-- v1.4 requirements: 37 total
-- Mapped to phases: 37
+- v1.5 requirements: 36 total
+- Mapped to phases: 36
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after v1.4 initialization*
+*Last updated: 2026-05-24 after v1.5 initialization*
