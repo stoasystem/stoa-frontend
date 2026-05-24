@@ -1,85 +1,88 @@
-# Requirements: STOA Frontend v1.3 Phase 4 Backend Integration and Real Chat API
+# Requirements: STOA Frontend v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
 
 **Defined:** 2026-05-24
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat workflow backed only by the unified STOA backend API contract.
 
-## v1.3 Requirements
+## v1.4 Requirements
 
-Requirements for the fourth-stage backend chat integration milestone. Each maps to roadmap phases.
+Requirements for the fifth-stage streaming chat, file upload, and real learning workflow milestone. Each maps to roadmap phases.
 
-### API Contract
+### Streaming Chat
 
-- [x] **API-01**: Frontend chat types define `ConversationSummary`, `Conversation`, `ConversationListResponse`, `CreateConversationRequest`, `SendMessageRequest`, `SendMessageResponse`, `TeacherHelpRequest`, and `TeacherHelpResponse`.
-- [x] **API-02**: Chat API client exposes typed functions for `GET /conversations`, `GET /conversations/:conversationId`, `POST /conversations`, `POST /conversations/:conversationId/messages`, and `POST /teacher-help/request`.
-- [x] **API-03**: Chat API requests use the shared Axios `httpClient` and keep endpoint calls centralized under `src/services/chat/`.
-- [x] **API-04**: Frontend contract uses frontend-friendly camelCase fields and prevents backend wire-format differences from leaking into chat components.
-- [x] **API-05**: Frontend documentation records that model-provider details, including testing-stage Codex usage, are backend-only and not frontend API concerns.
+- [x] **STREAM-01**: User can send a chat message through `POST /conversations/:conversationId/messages/stream`.
+- [x] **STREAM-02**: User message appears immediately as an optimistic local message after submit.
+- [x] **STREAM-03**: Assistant streaming placeholder appears immediately after stream start.
+- [x] **STREAM-04**: `message_delta` events append progressively to the assistant message.
+- [x] **STREAM-05**: `message_done` marks the assistant message as completed.
+- [x] **STREAM-06**: `message_error` or stream startup failure marks the relevant message as failed.
+- [x] **STREAM-07**: Completed streaming invalidates canonical conversation queries.
 
-### Query Integration
+### Message Actions
 
-- [x] **QRY-01**: Chat query keys are centralized in `src/services/chat/chatQueryKeys.ts`.
-- [x] **QRY-02**: `useConversationsQuery` loads the backend conversation list through TanStack Query.
-- [x] **QRY-03**: `useConversationQuery` loads the selected backend conversation detail and does not fetch when there is no active conversation ID.
-- [x] **QRY-04**: `useSendMessageMutation` posts messages to the active conversation and invalidates both conversation detail and list queries on success.
-- [x] **QRY-05**: `useTeacherHelpMutation` posts teacher-help requests through the backend API.
-- [x] **QRY-06**: Chat server state is managed through TanStack Query hooks under `src/hooks/chat/` rather than duplicated into Zustand or mock hooks.
+- [x] **MSG-01**: User can stop an in-progress assistant generation.
+- [x] **MSG-02**: Stopped assistant messages show `stopped` status.
+- [x] **MSG-03**: User can retry failed user-message sends with original content and attachment IDs.
+- [x] **MSG-04**: Chat message types distinguish student, assistant, teacher, and system messages.
+- [x] **MSG-05**: Message bubbles display sending, streaming, completed, stopped, and failed states.
 
-### Chat Page Data Flow
+### Conversation Flow
 
-- [x] **CHAT-13**: `/chat` no longer depends on `useMockChat` or `mockConversations` for conversation list, active messages, or send-message behavior.
-- [x] **CHAT-14**: `/chat` automatically selects the first backend conversation when conversations load and no active conversation is selected.
-- [x] **CHAT-15**: User can click a backend conversation summary and see the selected conversation detail load from the backend.
-- [x] **CHAT-16**: User can send a non-empty message from `/chat` and the frontend calls `POST /conversations/:conversationId/messages`.
-- [x] **CHAT-17**: After a successful send, the displayed messages refresh from backend conversation data including the returned assistant response.
-- [x] **CHAT-18**: During send-message pending state, chat input and send button are disabled and the message list shows assistant thinking.
-- [x] **CHAT-19**: User can request teacher help from the active conversation and the frontend calls `POST /teacher-help/request`.
-- [x] **CHAT-20**: User can start a first backend conversation from the empty conversation state through `POST /conversations`.
+- [x] **CONV-01**: User can create a new conversation from `/chat`.
+- [x] **CONV-02**: Successful conversation creation refreshes the conversation list.
+- [x] **CONV-03**: Newly created conversation is automatically selected.
+- [x] **CONV-04**: User can send the first message in a newly created conversation.
 
-### UI States and Feedback
+### File Upload
 
-- [x] **STATE-05**: Conversation list loading state is visible while `GET /conversations` is pending.
-- [x] **STATE-06**: Conversation list error state is visible when `GET /conversations` fails.
-- [x] **STATE-07**: Empty state is visible when `GET /conversations` returns no items.
-- [x] **STATE-08**: Conversation detail loading state is visible while `GET /conversations/:conversationId` is pending.
-- [x] **STATE-09**: Conversation detail error state is visible when selected conversation loading fails.
-- [x] **STATE-10**: Empty messages state is visible when a selected conversation has no messages.
-- [x] **STATE-11**: Send-message failures surface a visible operation-level error without introducing a toast dependency.
-- [x] **STATE-12**: Teacher-help pending, success, and failure states surface visible operation-level feedback.
-- [x] **STATE-13**: `ChatInput`, `TeacherEscalationCard`, `ConversationSidebar`, and `ConversationListItem` props are compatible with backend summary/detail data and pending disabled states.
+- [x] **FILE-01**: User can upload PNG homework files.
+- [x] **FILE-02**: User can upload JPEG homework files.
+- [x] **FILE-03**: User can upload PDF homework files.
+- [x] **FILE-04**: Unsupported file types are blocked before upload.
+- [x] **FILE-05**: Files over 10 MB are blocked before upload.
+- [x] **FILE-06**: More than 3 pending attachments are blocked before upload.
+- [x] **FILE-07**: Uploading, uploaded, and failed file states are visible.
+- [x] **FILE-08**: Uploaded attachment previews show filename, type, size/status, and remove action.
+- [x] **FILE-09**: Sending a chat message includes uploaded `attachmentIds`.
+- [x] **FILE-10**: File upload service calls `POST /files` with `multipart/form-data`.
 
-### Local Integration and Documentation
+### Teacher Help
 
-- [x] **DOCS-09**: `.env.example` includes `VITE_API_BASE_URL=http://localhost:8000`.
-- [x] **DOCS-10**: README documents Phase 4 backend integration endpoints and the expected local URLs for frontend, backend, and FastAPI docs.
-- [x] **DOCS-11**: README documents FastAPI CORS requirements for `http://localhost:5173`.
-- [x] **DOCS-12**: README documents that Phase 4 uses normal HTTP responses and does not implement streaming.
-- [x] **DOCS-13**: README documents the testing-stage Codex provider strategy as a backend-only implementation detail.
-- [x] **DOCS-14**: `npm install`, `npm run build`, and relevant `/chat` route checks pass after backend integration work.
+- [x] **TEACH-01**: User can request teacher help for the active conversation.
+- [x] **TEACH-02**: Teacher-help request pending state is visible.
+- [x] **TEACH-03**: Teacher-help assigned state is visible.
+- [x] **TEACH-04**: Teacher-help in-progress state is visible.
+- [x] **TEACH-05**: Teacher-help resolved state is visible.
+- [x] **TEACH-06**: Teacher-help request failures show a visible error state.
+- [x] **TEACH-07**: Teacher-help service supports status lookup through `GET /teacher-help/request/:requestId`.
+
+### Documentation and Verification
+
+- [x] **DOCS-15**: README documents Phase 5 streaming chat and file upload behavior.
+- [x] **DOCS-16**: README lists expected Phase 5 backend endpoints.
+- [x] **DOCS-17**: README states the frontend still does not call model-provider APIs directly.
+- [x] **DOCS-18**: Local verification covers build, lint, `/chat`, streaming, upload, and teacher-help states.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Streaming and Message UX
+### Authentication and Roles
 
-- **STREAM-01**: AI chat supports streaming responses.
-- **STREAM-02**: User can abort an in-progress assistant generation.
-- **MSG-01**: User can retry failed messages.
-- **MSG-02**: Chat uses full optimistic message updates with rollback.
+- **AUTH-01**: User can register, log in, and persist sessions through real auth integration.
+- **ROLE-01**: Student, parent, tutor, and admin roles have protected route access.
+- **PARENT-01**: Parent dashboard can view student learning history.
+- **TUTOR-01**: Tutor or teacher dashboard can handle escalated sessions.
 
-### Uploads and Learning Workflow
+### Advanced AI Workflow
 
-- **UPLOAD-01**: User can upload files for AI-supported learning.
-- **UPLOAD-02**: User can upload images or PDFs as homework question context.
-- **FLOW-01**: User can create a new conversation through a polished UI flow.
-- **FLOW-02**: Teacher escalation status updates beyond the initial request response.
+- **STREAM-08**: User can retry failed or partial assistant responses.
+- **STREAM-09**: Backend generation can be cancelled through a dedicated cancel endpoint.
+- **FILE-11**: User can see async OCR/PDF parsing progress beyond uploaded metadata.
+- **MEMORY-01**: User can manage long-term learning memory.
 
 ### Other Product Areas
 
 - **DASHAPI-01**: Dashboard loads student overview data from `GET /students/me/dashboard`.
-- **AUTH-01**: User can register, log in, and persist sessions through real auth integration.
-- **PARENT-01**: Parent dashboard uses backend data.
-- **TUTOR-01**: Tutor or teacher dashboard uses backend data.
 - **PAY-01**: Payment and subscription flows exist.
 - **DEPLOY-01**: Production deployment workflow exists.
 
@@ -89,16 +92,18 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Token streaming | Phase 4 proves normal HTTP request/response first; streaming belongs in Phase 5. |
-| WebSocket | Not required for the Phase 4 backend contract. |
 | Direct frontend model API calls | The frontend must remain decoupled from OpenAI, Claude, Gemini, DeepSeek, Codex, and other providers. |
 | Frontend `STOA_AI_PROVIDER` config | AI provider selection is backend-only. |
-| Real file upload | Upload is deferred to Phase 5. |
-| Full auth enforcement | Authorization expectations may be confirmed, but real login enforcement is not implemented here. |
-| Parent dashboard API | Phase 4 focuses on chat only. |
-| Tutor/teacher dashboard API | Teacher help is limited to the request endpoint. |
+| WebSocket chat | Phase 5 only needs backend streaming response over fetch/SSE-style events. |
+| Dedicated backend cancel endpoint | Frontend abort is sufficient for Phase 5; backend cancellation can be added later. |
+| AI partial-response retry | Basic failed user-message retry is the Phase 5 requirement. |
+| Full OCR/PDF parsing UI | Phase 5 displays upload metadata and supports future parsing statuses. |
+| Live multi-person teacher chat | Phase 5 displays teacher-help request status only. |
+| Full auth enforcement | Authorization belongs to the next auth/roles milestone. |
+| Parent dashboard API | Phase 5 focuses on chat workflow. |
+| Tutor/teacher dashboard API | Teacher help is limited to request/status endpoints. |
 | Production deployment | Local integration and build verification only. |
-| Complex permission system | Deferred until auth and role-specific APIs are defined. |
+| Payment system | Deferred until product and auth flows mature. |
 
 ## Traceability
 
@@ -106,46 +111,49 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 11 | Complete |
-| API-02 | Phase 11 | Complete |
-| API-03 | Phase 11 | Complete |
-| API-04 | Phase 11 | Complete |
-| API-05 | Phase 13 | Complete |
-| QRY-01 | Phase 12 | Complete |
-| QRY-02 | Phase 12 | Complete |
-| QRY-03 | Phase 12 | Complete |
-| QRY-04 | Phase 12 | Complete |
-| QRY-05 | Phase 12 | Complete |
-| QRY-06 | Phase 12 | Complete |
-| CHAT-13 | Phase 13 | Complete |
-| CHAT-14 | Phase 13 | Complete |
-| CHAT-15 | Phase 13 | Complete |
-| CHAT-16 | Phase 13 | Complete |
-| CHAT-17 | Phase 13 | Complete |
-| CHAT-18 | Phase 13 | Complete |
-| CHAT-19 | Phase 13 | Complete |
-| CHAT-20 | Phase 13 | Complete |
-| STATE-05 | Phase 13 | Complete |
-| STATE-06 | Phase 13 | Complete |
-| STATE-07 | Phase 13 | Complete |
-| STATE-08 | Phase 13 | Complete |
-| STATE-09 | Phase 13 | Complete |
-| STATE-10 | Phase 13 | Complete |
-| STATE-11 | Phase 13 | Complete |
-| STATE-12 | Phase 13 | Complete |
-| STATE-13 | Phase 13 | Complete |
-| DOCS-09 | Phase 14 | Complete |
-| DOCS-10 | Phase 14 | Complete |
-| DOCS-11 | Phase 14 | Complete |
-| DOCS-12 | Phase 14 | Complete |
-| DOCS-13 | Phase 14 | Complete |
-| DOCS-14 | Phase 14 | Complete |
+| STREAM-01 | Phase 16 | Complete |
+| STREAM-02 | Phase 16 | Complete |
+| STREAM-03 | Phase 16 | Complete |
+| STREAM-04 | Phase 16 | Complete |
+| STREAM-05 | Phase 16 | Complete |
+| STREAM-06 | Phase 16 | Complete |
+| STREAM-07 | Phase 16 | Complete |
+| MSG-01 | Phase 18 | Complete |
+| MSG-02 | Phase 18 | Complete |
+| MSG-03 | Phase 18 | Complete |
+| MSG-04 | Phase 15 | Complete |
+| MSG-05 | Phase 18 | Complete |
+| CONV-01 | Phase 18 | Complete |
+| CONV-02 | Phase 18 | Complete |
+| CONV-03 | Phase 18 | Complete |
+| CONV-04 | Phase 18 | Complete |
+| FILE-01 | Phase 17 | Complete |
+| FILE-02 | Phase 17 | Complete |
+| FILE-03 | Phase 17 | Complete |
+| FILE-04 | Phase 17 | Complete |
+| FILE-05 | Phase 17 | Complete |
+| FILE-06 | Phase 17 | Complete |
+| FILE-07 | Phase 17 | Complete |
+| FILE-08 | Phase 17 | Complete |
+| FILE-09 | Phase 18 | Complete |
+| FILE-10 | Phase 17 | Complete |
+| TEACH-01 | Phase 19 | Complete |
+| TEACH-02 | Phase 19 | Complete |
+| TEACH-03 | Phase 19 | Complete |
+| TEACH-04 | Phase 19 | Complete |
+| TEACH-05 | Phase 19 | Complete |
+| TEACH-06 | Phase 19 | Complete |
+| TEACH-07 | Phase 19 | Complete |
+| DOCS-15 | Phase 20 | Complete |
+| DOCS-16 | Phase 20 | Complete |
+| DOCS-17 | Phase 20 | Complete |
+| DOCS-18 | Phase 20 | Complete |
 
 **Coverage:**
-- v1.3 requirements: 34 total
-- Mapped to phases: 34
+- v1.4 requirements: 37 total
+- Mapped to phases: 37
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after v1.3 initialization*
+*Last updated: 2026-05-24 after v1.4 initialization*

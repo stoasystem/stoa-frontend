@@ -3,7 +3,7 @@ import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
-import { TeacherEscalationCard } from '@/components/chat/TeacherEscalationCard'
+import { TeacherHelpStatusCard } from '@/components/chat/TeacherHelpStatusCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingState } from '@/components/common/LoadingState'
@@ -12,17 +12,21 @@ import { Textarea } from '@/components/ui/textarea'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
-import { useSendMessageMutation } from '@/hooks/chat/useSendMessageMutation'
+import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
+import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
+import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 export function ChatPage() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
-  const [teacherHelpFeedback, setTeacherHelpFeedback] = useState<{
-    message: string
-    tone: 'success' | 'error'
-  } | null>(null)
+  const [teacherHelpRequest, setTeacherHelpRequest] = useState<TeacherHelpRequest | null>(null)
+  const [teacherHelpError, setTeacherHelpError] = useState<string | null>(null)
   const [newConversationMessage, setNewConversationMessage] = useState('')
+  const [queuedInitialMessage, setQueuedInitialMessage] = useState<{
+    conversationId: string
+    content: string
+  } | null>(null)
 
   const conversationsQuery = useConversationsQuery()
   const conversations = useMemo(
@@ -47,64 +51,106 @@ export function ChatPage() {
 
   const conversationQuery = useConversationQuery(activeConversationId)
   const createConversationMutation = useCreateConversationMutation()
-  const sendMessageMutation = useSendMessageMutation(activeConversationId)
   const teacherHelpMutation = useTeacherHelpMutation()
+  const teacherHelpStatusQuery = useTeacherHelpStatusQuery(teacherHelpRequest?.requestId ?? null)
+  const {
+    localMessages,
+    isStreaming,
+    sendStreamingMessage,
+    stopStreaming,
+    retryMessage,
+  } = useStreamingChat(activeConversationId)
+
+  useEffect(() => {
+    setTeacherHelpRequest(null)
+    setTeacherHelpError(null)
+  }, [activeConversationId])
+
+  const displayedMessages = useMemo(() => {
+    const backendMessages = conversationQuery.data?.messages ?? []
+    const backendMessageIds = new Set(backendMessages.map((message) => message.id))
+
+    return [
+      ...backendMessages,
+      ...localMessages.filter((message) => !backendMessageIds.has(message.id)),
+    ]
+  }, [conversationQuery.data?.messages, localMessages])
+
+  useEffect(() => {
+    if (
+      !queuedInitialMessage ||
+      !activeConversationId ||
+      queuedInitialMessage.conversationId !== activeConversationId ||
+      !conversationQuery.data
+    ) {
+      return
+    }
+
+    const content = queuedInitialMessage.content
+    setQueuedInitialMessage(null)
+    void sendStreamingMessage({ content })
+  }, [activeConversationId, conversationQuery.data, queuedInitialMessage, sendStreamingMessage])
 
   function handleCreateConversation(message?: string) {
-    const initialMessage = message?.trim() || 'I need help with a homework question.'
+    const initialMessage = message?.trim()
 
     createConversationMutation.mutate(
       {
         subject: 'General',
         grade: 'Grade 8',
-        initialMessage,
       },
       {
         onSuccess: (conversation) => {
           setActiveConversationId(conversation.id)
+          if (initialMessage) {
+            setQueuedInitialMessage({
+              conversationId: conversation.id,
+              content: initialMessage,
+            })
+          }
           setNewConversationMessage('')
-          setSendError(null)
-          setTeacherHelpFeedback(null)
+          setTeacherHelpRequest(null)
+          setTeacherHelpError(null)
         },
       },
     )
   }
 
-  function handleSendMessage(content: string) {
-    if (!activeConversationId || sendMessageMutation.isPending) return
+  function handleSendMessage(payload: {
+    content: string
+    attachmentIds?: string[]
+    attachments?: {
+      id: string
+      filename: string
+      mimeType: string
+      sizeBytes: number
+      status: 'uploaded' | 'processing' | 'parsed' | 'failed'
+      createdAt: string
+    }[]
+  }) {
+    if (!activeConversationId || isStreaming) return
 
     setSendError(null)
-    sendMessageMutation.mutate(
-      { content },
-      {
-        onError: (error) => {
-          setSendError(error instanceof Error ? error.message : 'Failed to send message.')
-        },
-      },
-    )
+    void sendStreamingMessage(payload)
   }
 
   function handleRequestTeacherHelp() {
     if (!activeConversationId || teacherHelpMutation.isPending) return
 
-    setTeacherHelpFeedback(null)
+    setTeacherHelpError(null)
     teacherHelpMutation.mutate(
       {
         conversationId: activeConversationId,
         message: 'Student requested help from a teacher.',
       },
       {
-        onSuccess: () => {
-          setTeacherHelpFeedback({
-            message: 'Teacher request sent. A tutor will review this conversation.',
-            tone: 'success',
-          })
+        onSuccess: (request) => {
+          setTeacherHelpRequest(request)
         },
         onError: (error) => {
-          setTeacherHelpFeedback({
-            message: error instanceof Error ? error.message : 'Failed to request teacher help.',
-            tone: 'error',
-          })
+          setTeacherHelpError(
+            error instanceof Error ? error.message : 'Failed to request teacher help.',
+          )
         },
       },
     )
@@ -155,7 +201,7 @@ export function ChatPage() {
             <Button
               type="submit"
               className="w-full"
-              disabled={createConversationMutation.isPending || !newConversationMessage.trim()}
+              disabled={createConversationMutation.isPending}
             >
               {createConversationMutation.isPending ? 'Starting...' : 'Start conversation'}
             </Button>
@@ -191,25 +237,32 @@ export function ChatPage() {
         {conversationQuery.data && (
           <>
             <ChatMessageList
-              messages={conversationQuery.data.messages}
-              isAssistantThinking={sendMessageMutation.isPending}
+              messages={displayedMessages}
+              isAssistantThinking={false}
+              onRetryMessage={retryMessage}
             />
-            {(sendError || sendMessageMutation.isError) && (
+            {sendError && (
               <div className="px-4 pb-3 md:px-6">
                 <div className="mx-auto max-w-3xl text-xs text-destructive">
-                  {sendError ?? 'Failed to send message.'}
+                  {sendError}
                 </div>
               </div>
             )}
-            <TeacherEscalationCard
+            <TeacherHelpStatusCard
               onRequestTeacher={handleRequestTeacherHelp}
               isRequesting={teacherHelpMutation.isPending}
-              feedback={teacherHelpFeedback?.message}
-              feedbackTone={teacherHelpFeedback?.tone}
+              request={teacherHelpStatusQuery.data ?? teacherHelpRequest}
+              error={
+                teacherHelpError ??
+                (teacherHelpStatusQuery.isError ? 'Failed to load teacher-help status.' : null)
+              }
             />
             <ChatInput
               onSendMessage={handleSendMessage}
-              disabled={sendMessageMutation.isPending}
+              onStopStreaming={stopStreaming}
+              isStreaming={isStreaming}
+              disabled={!activeConversationId}
+              conversationId={activeConversationId ?? undefined}
             />
           </>
         )}

@@ -1,5 +1,32 @@
 # Milestones
 
+## v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow (Implemented: 2026-05-24)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.4-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Streaming chat event types and fetch-based streaming client for `POST /conversations/:conversationId/messages/stream`.
+- Local streaming chat hook with optimistic student messages, assistant placeholders, chunk appending, stop generation, failed state, retry metadata, and query invalidation.
+- File upload service and mutation for `POST /files`.
+- PNG/JPEG/PDF upload UI with 10 MB and 3-attachment client-side limits.
+- Attachment previews and attachment-aware chat sends.
+- `/chat` upgraded to use streaming send flow, stop generation, retry failed user messages, and queued first-message sends after new conversation creation.
+- Teacher-help request/status service and stateful teacher-help status card.
+- README Phase 5 documentation for endpoints, upload limits, and backend-only model provider strategy.
+
+### Verification
+
+- Requirements: 37/37 implemented.
+- Phases: 6/6 implemented.
+- Build: passed.
+- Lint: passed.
+- Local `/chat` HTTP route: passed with Vite dev server returning 200.
+- Browser visual check: attempted, but the Browser plugin reported the in-app browser was unavailable in this session.
+
+---
+
 ## v1.3 Phase 4 Backend Integration and Real Chat API (Shipped: 2026-05-24)
 
 **Phases completed:** 4 phases, 9 plans, 0 tasks

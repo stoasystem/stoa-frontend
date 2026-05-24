@@ -1,9 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
-import { requestTeacherHelp } from '@/services/chat/chatApi'
-import type { TeacherHelpRequest } from '@/types/chat'
+import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 export function useTeacherHelpMutation() {
   return useMutation({
-    mutationFn: (payload: TeacherHelpRequest) => requestTeacherHelp(payload),
+    mutationFn: createTeacherHelpRequest,
   })
 }

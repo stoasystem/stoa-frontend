@@ -1,16 +1,15 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Phase 4 Backend Integration and Real Chat API
+milestone: v1.4
+milestone_name: Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
 status: Awaiting next milestone
-stopped_at: v1.3 implemented and verified
-last_updated: "2026-05-24T17:05:15.926Z"
-last_activity: 2026-05-24 — Milestone v1.3 completed and archived
+last_updated: "2026-05-24T18:06:32.887Z"
+last_activity: 2026-05-24 — Milestone v1.4 implemented
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 6
+  completed_plans: 6
   percent: 100
 ---
 
@@ -20,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-24)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
-**Current focus:** Milestone v1.3 complete; backend happy-path integration awaits a running FastAPI backend.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat workflow backed only by the unified STOA backend API contract.
+**Current focus:** Milestone v1.4 complete; Phase 5 frontend workflow awaits real backend smoke testing for streaming/upload/status endpoints.
 
 ## Current Position
 
-Phase: Milestone v1.3 complete
+Phase: Milestone v1.4 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-05-24 — Milestone v1.3 completed and archived
+Last activity: 2026-05-24 — Milestone v1.4 implemented and verified
 
 ## Performance Metrics
 
@@ -88,6 +87,15 @@ Recent decisions affecting current work:
 - Phase 12 added chat query keys and TanStack Query hooks.
 - Phase 13 replaced `useMockChat` on `/chat` with backend query/mutation data flow and state handling.
 - Phase 14 updated README backend integration docs and verified build, lint, and no-backend route behavior.
+- Milestone v1.4 started from the Phase 5 Streaming Chat, File Upload, and Real Learning Workflow brief.
+- Phase 5 frontend must keep model provider details backend-only while supporting fetch/SSE-style streaming from the unified STOA backend.
+- Phase 5 keeps token-level streaming state local to React and uses TanStack Query for canonical conversation data.
+- Phase 15 extended chat, file, and teacher-help contracts.
+- Phase 16 added fetch streaming and local optimistic streaming state.
+- Phase 17 added file upload service, validation, and attachment previews.
+- Phase 18 upgraded `/chat` to streaming send, stop, retry, new conversation, and attachment-aware sends.
+- Phase 19 added teacher-help request/status UI.
+- Phase 20 updated README and verified build, lint, and local `/chat` HTTP response.
 
 ### Pending Todos
 
@@ -101,6 +109,8 @@ None currently.
 
 - `npm run build` passed.
 - `npm run lint` passed.
+- Vite dev server returned HTTP 200 for `/chat`.
+- In-app Browser plugin was unavailable for visual verification in this session.
 - In-app browser route check for `/chat` passed against a local mock backend for list/detail/send-message/teacher-help.
 - In-app browser route check for `/chat` passed in no-backend mode by rendering `Failed to load conversations.`
 - Code review findings for empty-state create flow, stale active ID handling, and happy-path coverage were addressed.
@@ -113,7 +123,7 @@ Items acknowledged and carried forward from previous milestone close:
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | Product | Real login, real AI chat behavior, AI streaming, real file upload, teacher routing, parent/tutor dashboards, payments, backend integration, and deployment | Deferred to later milestones | v1.2 initialization |
-| Product | Streaming response, abort generation, retry message, real file upload, dashboard backend APIs, full auth enforcement, and production deployment | Deferred to Phase 5 or later | v1.3 initialization |
+| Product | Dashboard backend APIs, full auth enforcement, parent/tutor dashboards, production deployment, advanced AI partial-response retry, backend generation cancel endpoint, and OCR/PDF parsing progress UI | Deferred to later milestones | v1.4 completion |
 
 ## Session Continuity
 

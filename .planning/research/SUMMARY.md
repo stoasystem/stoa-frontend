@@ -1,32 +1,39 @@
-# Research Summary: v1.3 Backend Chat Integration
+# Project Research Summary: v1.4 Phase 5
 
 **Date:** 2026-05-24
-**Milestone:** v1.3 Phase 4 Backend Integration and Real Chat API
 
 ## Stack Additions
 
-No new frontend dependency is required. The milestone should use the existing React, TypeScript, Vite, Axios, and TanStack Query stack.
+- No new core frontend dependency is required.
+- Use `fetch` plus `ReadableStream.getReader()`, `TextDecoder`, and `AbortController` for `POST /conversations/:conversationId/messages/stream`.
+- Keep Axios `httpClient` for JSON and multipart endpoints.
+- Keep TanStack Query as the canonical server-state layer and invalidate conversation queries after streaming finishes.
 
 ## Feature Table Stakes
 
-- Typed chat API contract.
-- Backend-driven conversation list and detail.
-- Send-message mutation with query invalidation.
-- Teacher-help mutation.
-- Loading, error, empty, pending, and basic operation feedback states.
-- Local FastAPI/CORS/env documentation.
-- Codex testing provider documented as backend-only.
+- Streaming assistant response with `message_start`, `message_delta`, `message_done`, and `message_error`.
+- Stop generation through frontend abort and `stopped` assistant message status.
+- Basic failed user-message retry.
+- New conversation creation and auto-selection.
+- PNG/JPEG/PDF upload with type, size, and count validation.
+- Attachment previews and `attachmentIds` in send payload.
+- Teacher-help request status display across `pending`, `assigned`, `in_progress`, and `resolved`.
 
 ## Watch Out For
 
-- Do not expose provider-specific model calls or configuration to the frontend.
-- Do not implement streaming, WebSocket, real upload, auth enforcement, or dashboard backend APIs in this milestone.
-- Use centralized query keys and invalidation to keep the UI fresh after mutations.
-- Keep CORS and `VITE_API_BASE_URL` setup explicit in README and `.env.example`.
+- Parse stream events with buffering; do not assume chunk boundaries align with events.
+- Do not treat user abort as a normal failed message.
+- Keep streaming token updates out of Zustand.
+- Preserve failed user message content and attachment IDs for retry.
+- Do not add direct model provider SDKs or provider-specific env vars to the frontend.
 
-## Source Notes
+## Requirement/Roadmap Implications
 
-- TanStack Query supports targeted invalidation and mutation-success invalidation patterns for refreshing stale server state.
-- Vite exposes only `VITE_`-prefixed env variables to client code and warns that exposed values are bundled into frontend source.
-- Axios custom instances support request and response interceptors for centralized request/error handling.
-- FastAPI treats different localhost ports as different origins and requires explicit CORS configuration for browser frontend requests.
+The milestone should be split by implementation dependencies:
+
+1. Types and service contracts.
+2. Streaming hook and local optimistic message state.
+3. Upload services and attachment UI.
+4. Chat page integration including create conversation, stop, retry, and message display.
+5. Teacher-help status workflow.
+6. Documentation, build, lint, and local verification.

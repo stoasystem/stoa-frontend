@@ -1,44 +1,75 @@
-# Research: Architecture for v1.3 Backend Chat Integration
+# Project Research: Architecture for v1.4 Phase 5
 
+**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
 **Date:** 2026-05-24
-**Milestone:** v1.3 Phase 4 Backend Integration and Real Chat API
 
-## Current Architecture
+## Existing Architecture
 
-- `src/pages/chat/ChatPage.tsx` assembles chat UI.
-- `src/hooks/useMockChat.ts` owns mock active conversation state and local delayed replies.
-- `src/data/mockConversations.ts` drives the chat page.
-- `src/components/chat/*` are props-driven and reusable.
-- `src/services/api/httpClient.ts` centralizes Axios configuration.
+The app is a React SPA using Vite, React Router, TanStack Query, Axios service modules, local UI components, and route-level pages. v1.3 changed `/chat` from mock data to backend-driven conversation list/detail and send-message flows.
 
-## Target Architecture
+## Recommended Phase 5 Architecture
 
-Data flow:
+### Server State
 
-1. `ChatPage` owns only `activeConversationId` local state.
-2. `useConversationsQuery` reads conversation summaries.
-3. `useConversationQuery` reads active conversation messages.
-4. `useSendMessageMutation` sends message content and invalidates list/detail queries.
-5. `useTeacherHelpMutation` sends teacher-help requests.
-6. Presentational components continue receiving typed props.
-7. Backend provider details remain behind the backend Chat API.
+TanStack Query remains the source for:
 
-## Integration Points
+- Conversation list.
+- Conversation detail.
+- Create conversation mutation.
+- File upload mutation result.
+- Teacher-help request and status.
 
-- `src/types/chat.ts`: extend contract to include list response, send/create/request payloads, and teacher-help response.
-- `src/services/chat/chatApi.ts`: replace old `/chat` placeholder with conversation endpoint functions.
-- `src/services/chat/chatQueryKeys.ts`: centralize cache keys.
-- `src/hooks/chat/*`: add query/mutation wrappers.
-- `src/pages/chat/ChatPage.tsx`: swap `useMockChat` for query/mutation hooks.
-- `src/components/chat/ChatInput.tsx`: accept disabled state.
-- `src/components/chat/TeacherEscalationCard.tsx`: accept action and pending state.
-- `src/components/chat/ConversationSidebar.tsx` and `ConversationListItem.tsx`: accept `ConversationSummary[]`.
-- `README.md` and `.env.example`: document backend integration.
+After streaming completes, the frontend invalidates conversation detail and list queries so backend canonical messages replace local temporary messages.
 
-## Suggested Build Order
+### Local State
 
-1. Types and API client contract.
-2. Query keys and hooks.
-3. Component prop compatibility.
-4. ChatPage data-flow replacement and states.
-5. README/env documentation and verification.
+React component/hook state owns:
+
+- Streaming user-message optimistic state.
+- Assistant streaming placeholder and chunk content.
+- Current `AbortController`.
+- Pending attachments before send.
+- Input-level validation and upload errors.
+
+This avoids high-frequency global store updates while keeping the canonical state flow simple.
+
+### Services
+
+- `chatApi.ts`: normal JSON conversation operations already present.
+- `chatStreamApi.ts`: fetch streaming POST client and SSE-style parser.
+- `fileApi.ts`: multipart upload and optional status lookup.
+- `teacherHelpApi.ts`: create request and retrieve status.
+
+### Component Flow
+
+`ChatPage` should compose:
+
+- `ConversationSidebar` plus `NewConversationButton`.
+- `ChatMessageList` fed with canonical messages merged with local streaming messages.
+- `ChatInput` with file upload, attachment previews, send, disabled, and stop states.
+- `TeacherEscalationCard` or `TeacherHelpStatusCard` with stateful request display.
+
+### Data Merge Strategy
+
+During active streaming:
+
+1. Render backend conversation messages.
+2. Append local optimistic user message.
+3. Append local assistant placeholder/streaming message.
+4. On completion, invalidate queries and clear local temporary messages when refreshed data arrives.
+
+On failure:
+
+1. Preserve failed local user message.
+2. Display retry action.
+3. Retry resends the same content and attachment IDs.
+
+## Build Order
+
+1. Types and services.
+2. Streaming hook.
+3. File upload hook and UI.
+4. Conversation creation hook/button.
+5. Message/input component upgrades.
+6. Teacher help status UI.
+7. ChatPage composition and verification.

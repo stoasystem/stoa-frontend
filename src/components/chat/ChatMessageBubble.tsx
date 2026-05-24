@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat'
+import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
+import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
 
 function formatMessageTime(value: string) {
   return new Intl.DateTimeFormat('en', {
@@ -8,8 +10,42 @@ function formatMessageTime(value: string) {
   }).format(new Date(value))
 }
 
-export function ChatMessageBubble({ message }: { message: ChatMessage }) {
+function getRoleLabel(message: ChatMessage) {
+  if (message.role === 'teacher') return 'Teacher'
+  if (message.role === 'system') return 'System'
+  if (message.role === 'assistant') return 'STOA AI'
+  return null
+}
+
+function getStatusLabel(message: ChatMessage) {
+  if (message.status === 'sending') return 'Sending'
+  if (message.status === 'streaming') return 'Streaming'
+  if (message.status === 'stopped') return 'Generation stopped'
+  if (message.status === 'failed') return 'Failed'
+  return null
+}
+
+export function ChatMessageBubble({
+  message,
+  onRetry,
+}: {
+  message: ChatMessage
+  onRetry?: (messageId: string) => void
+}) {
   const isStudent = message.role === 'student'
+  const isSystem = message.role === 'system'
+  const roleLabel = getRoleLabel(message)
+  const statusLabel = getStatusLabel(message)
+
+  if (isSystem) {
+    return (
+      <div className="flex justify-center">
+        <div className="max-w-[min(90%,36rem)] rounded-md bg-muted px-3 py-2 text-center text-xs text-muted-foreground">
+          {message.content}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className={cn('flex w-full', isStudent ? 'justify-end' : 'justify-start')}>
@@ -18,18 +54,44 @@ export function ChatMessageBubble({ message }: { message: ChatMessage }) {
           'max-w-[min(80%,42rem)] rounded-lg px-4 py-3 text-sm leading-6 shadow-sm',
           isStudent
             ? 'bg-primary text-primary-foreground'
-            : 'border bg-card text-card-foreground',
+            : message.role === 'teacher'
+              ? 'border border-emerald-200 bg-emerald-50 text-emerald-950'
+              : 'border bg-card text-card-foreground',
+          message.status === 'failed' && 'border-destructive/50',
         )}
       >
+        {roleLabel && (
+          <div
+            className={cn(
+              'mb-1 text-[11px] font-medium',
+              message.role === 'teacher' ? 'text-emerald-700' : 'text-muted-foreground',
+            )}
+          >
+            {roleLabel}
+          </div>
+        )}
         <div className="whitespace-pre-wrap break-words">{message.content}</div>
+        {message.attachments && message.attachments.length > 0 && (
+          <div className="mt-3 grid gap-2">
+            {message.attachments.map((attachment) => (
+              <AttachmentPreview key={attachment.id} attachment={attachment} />
+            ))}
+          </div>
+        )}
         <div
           className={cn(
-            'mt-2 text-[11px]',
+            'mt-2 flex flex-wrap items-center gap-2 text-[11px]',
             isStudent ? 'text-primary-foreground/75' : 'text-muted-foreground',
           )}
         >
-          {formatMessageTime(message.createdAt)}
+          <span>{formatMessageTime(message.createdAt)}</span>
+          {statusLabel && <span>{statusLabel}</span>}
         </div>
+        {message.status === 'failed' && isStudent && onRetry && (
+          <div className="mt-3">
+            <RetryMessageButton onRetry={() => onRetry(message.id)} />
+          </div>
+        )}
       </div>
     </div>
   )

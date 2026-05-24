@@ -5,10 +5,12 @@ import type { ChatMessage } from '@/types/chat'
 
 export function ChatMessageList({
   messages,
-  isAssistantThinking,
+  isAssistantThinking = false,
+  onRetryMessage,
 }: {
   messages: ChatMessage[]
-  isAssistantThinking: boolean
+  isAssistantThinking?: boolean
+  onRetryMessage?: (messageId: string) => void
 }) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 md:px-6">
@@ -19,7 +21,7 @@ export function ChatMessageList({
           </div>
         ) : (
           messages.map((message) => (
-            <ChatMessageBubble key={message.id} message={message} />
+            <ChatMessageBubble key={message.id} message={message} onRetry={onRetryMessage} />
           ))
         )}
         {isAssistantThinking && (

@@ -1,25 +1,35 @@
-# Research: Pitfalls for v1.3 Backend Chat Integration
+# Project Research: Pitfalls for v1.4 Phase 5
 
+**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
 **Date:** 2026-05-24
-**Milestone:** v1.3 Phase 4 Backend Integration and Real Chat API
 
-## Pitfalls
+## Streaming Pitfalls
 
-| Pitfall | Prevention |
-|---------|------------|
-| Components become coupled to backend wire quirks | Keep API response shapes typed and normalized in services/types before rendering. |
-| Query keys diverge across hooks | Use `chatQueryKeys` everywhere. |
-| Send mutation succeeds but UI remains stale | Invalidate both active conversation detail and conversation list after success. |
-| Disabled queries accidentally fetch with null IDs | Gate conversation detail query with `enabled: Boolean(conversationId)`. |
-| Frontend leaks AI provider assumptions | README and code should state that Codex/testing provider is backend-only. |
-| CORS errors are mistaken for normal API errors | Document `http://localhost:5173` as an allowed FastAPI origin. |
-| Env names drift between docs and code | Standardize on `VITE_API_BASE_URL`; optionally preserve existing fallback compatibility if the code currently uses another name. |
-| Full optimistic UI adds complexity too early | Use pending disabled input plus assistant thinking, then invalidate and refetch on success. |
-| Empty conversation list blocks future create flow | Phase 4 should show empty state; full create-new-conversation UX can be Phase 5 unless minimal creation is explicitly required. |
+- **Assuming one chunk equals one event.** Network chunks can split or combine events. Keep a buffer and split on blank-line event boundaries.
+- **Ignoring final decoder flush.** Use `TextDecoder` consistently and handle the remaining buffer after the reader finishes.
+- **Treating abort as failure.** User-initiated abort should mark `stopped`, not `failed`.
+- **Over-invalidating during each delta.** Invalidate canonical queries only after done/error, not per chunk.
+- **Leaking controllers.** Clear the active controller after done, error, or stop.
 
-## Watch List
+## State Pitfalls
 
-- Confirm backend uses camelCase fields or add API-layer mapping.
-- Confirm send-message synchronously returns both `studentMessage` and `assistantMessage`.
-- Confirm teacher-help endpoint exists or returns a stable placeholder response.
-- Confirm auth header expectations before enforcing protected routes.
+- **Putting streaming tokens in Zustand.** High-frequency updates will create avoidable global render complexity.
+- **Duplicating canonical messages long-term.** Local streaming messages should be temporary and reconciled after query invalidation.
+- **Losing attachment IDs on retry.** Failed user messages need enough metadata to retry the same payload.
+- **Mixing UI errors.** Message errors, upload validation errors, teacher request errors, and page load errors need separate display surfaces.
+
+## Upload Pitfalls
+
+- **Relying only on backend validation.** Block unsupported file types, oversize files, and too many files before upload.
+- **Assuming uploaded means parsed.** Phase 5 can treat `uploaded` as sufficient, but the UI types should allow `processing`, `parsed`, and `failed`.
+- **Forgetting conversation association.** Include `conversationId` when available so backend can attach context early.
+
+## Teacher Help Pitfalls
+
+- **Static success message only.** Phase 5 should represent status values, even if polling/manual refresh is simple at first.
+- **Overbuilding live teacher chat.** Status cards are in scope; real-time teacher messaging is not.
+
+## Documentation Pitfalls
+
+- **Exposing model provider details.** README must continue to state that Codex or later providers are backend-only.
+- **Unclear backend contract.** Streaming event names, file fields, and teacher status enums should be documented for local integration.

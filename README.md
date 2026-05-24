@@ -137,6 +137,41 @@ Testing-stage AI model strategy:
 
 This phase does not implement streaming. AI responses are expected to be returned by the backend in the normal HTTP response.
 
+## Phase 5 Streaming Chat and File Upload
+
+This phase upgrades the chat experience from normal HTTP responses to streaming AI responses.
+
+New capabilities:
+
+- Streaming assistant responses
+- Stop generation
+- Retry failed user messages
+- Create new conversation
+- Upload homework images or PDFs
+- Attach uploaded files to chat messages
+- Teacher help request status
+
+Frontend still calls only the unified STOA backend API. The testing-stage AI provider may continue to be Codex on the backend side. The frontend must not call model APIs directly.
+
+Expected new endpoints:
+
+- `POST /conversations/:conversationId/messages/stream`
+- `POST /files`
+- `GET /files/:fileId`
+- `GET /teacher-help/request/:requestId`
+
+Local frontend environment:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+File upload limits:
+
+- Supported types: PNG, JPEG, PDF
+- Maximum size: 10 MB per file
+- Maximum pending attachments: 3
+
 ## Environment Variables
 
 Create a local environment file:
@@ -160,4 +195,4 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ## Project Status
 
-Phase 4: chat UI integrated with the backend Chat API contract.
+Phase 5: streaming chat, upload attachments, retry, stop generation, and teacher-help status workflow.
