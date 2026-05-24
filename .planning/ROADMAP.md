@@ -5,6 +5,7 @@
 - ✅ **v1.0 Frontend Foundation** - Phases 1-3 (shipped 2026-05-24)
 - ✅ **v1.1 Frontend Development Foundation** - Phases 4-7 (shipped 2026-05-24)
 - ✅ **v1.2 Core Product UI** - Phases 8-10 (shipped 2026-05-24)
+- ◆ **v1.3 Phase 4 Backend Integration and Real Chat API** - Phases 11-14 (current)
 
 ## Phases
 
@@ -13,27 +14,15 @@
 
 ### Phase 1: Vite Foundation App
 **Goal**: Complete the standard Vite React TypeScript scaffold and replace placeholder/demo UI with a minimal STOA initialization page.
-**Plans**: 2 plans
-
-Plans:
-- [x] 01-01: Add missing Vite scaffold files and normalize app entry points.
-- [x] 01-02: Replace placeholder route surface with the minimal STOA foundation page.
+**Plans**: 2 plans complete
 
 ### Phase 2: Tooling Verification
 **Goal**: Make local build, lint, preview, lockfile, and repository ignore rules reliable.
-**Plans**: 2 plans
-
-Plans:
-- [x] 02-01: Add or fix TypeScript, ESLint, and package tooling configuration.
-- [x] 02-02: Run verification commands and address failures.
+**Plans**: 2 plans complete
 
 ### Phase 3: Documentation and Repository Readiness
 **Goal**: Document the foundation workflow and ensure the repository is ready for initial GitHub handoff.
-**Plans**: 2 plans
-
-Plans:
-- [x] 03-01: Rewrite README for the Phase 1 foundation handoff.
-- [x] 03-02: Verify repository hygiene and document GitHub readiness.
+**Plans**: 2 plans complete
 
 </details>
 
@@ -71,62 +60,99 @@ Plans:
 - [x] **Phase 9: Mock Chat Interface** - Build the `/chat` product UI with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
 - [x] **Phase 10: Student Dashboard, Documentation, and Verification** - Build the `/dashboard` product UI, document Phase 3, and verify scripts/routes.
 
-### Phase 8: Product UI Types and Mock Data
-**Goal**: Define the chat and dashboard data contracts plus mock data that will drive the Phase 3 product UI.
-**Depends on**: Phase 7
-**Requirements**: [TYPE-04, TYPE-05, DATA-01, DATA-02]
+</details>
+
+<details open>
+<summary>◆ v1.3 Phase 4 Backend Integration and Real Chat API (Phases 11-14) - CURRENT</summary>
+
+**Milestone Goal:** Connect the Phase 3 chat UI to the real backend Chat API so conversations, messages, send-message, teacher-help requests, and local FastAPI/Codex-provider integration are driven through the unified STOA backend contract.
+
+- [ ] **Phase 11: Chat API Contract and Client** - Define chat API types and replace the old placeholder chat client with typed backend endpoint functions.
+- [ ] **Phase 12: Chat Query and Mutation Hooks** - Add TanStack Query keys, conversation queries, send-message mutation, and teacher-help mutation.
+- [ ] **Phase 13: Backend-Driven Chat Page and UI States** - Replace `useMockChat` on `/chat` with backend data flow, component prop updates, and user-visible loading/error/empty/pending feedback.
+- [ ] **Phase 14: Backend Integration Documentation and Verification** - Document local FastAPI/CORS/Codex-provider integration, update env examples, and verify build plus route behavior.
+
+### Phase 11: Chat API Contract and Client
+
+**Goal**: Define the Phase 4 chat API contract and centralize backend endpoint calls in the chat service layer.
+**Depends on**: Phase 10
+**Requirements**: [API-01, API-02, API-03, API-04]
 **Success Criteria** (what must be TRUE):
-  1. `src/types/chat.ts` defines the Phase 3 chat message and conversation contracts.
-  2. `src/types/dashboard.ts` defines dashboard stats, weak topics, recent questions, teacher feedback, and learning progress contracts.
-  3. `src/data/mockConversations.ts` contains at least two conversations with student and assistant messages.
-  4. `src/data/mockDashboard.ts` contains stats, weak topics, recent questions, learning progress, and teacher feedback.
-  5. Mock data is separated from presentational components.
+  1. `src/types/chat.ts` includes all Phase 4 request/response and conversation summary/detail types.
+  2. `src/services/chat/chatApi.ts` exposes typed functions for all required conversation and teacher-help endpoints.
+  3. Chat endpoint functions use the shared Axios `httpClient`.
+  4. Components do not import backend endpoint functions directly.
+  5. The API layer is ready to absorb camelCase/snake_case mapping if backend naming differs.
 **Plans**: 2 plans
 
 Plans:
-- [x] 08-01: Add chat and dashboard type contracts.
-- [x] 08-02: Add mock conversation and dashboard data.
+- [ ] 11-01: Update chat API type contracts.
+- [ ] 11-02: Refactor chat service endpoint functions.
 
-### Phase 9: Mock Chat Interface
-**Goal**: Build the `/chat` product UI with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
-**Depends on**: Phase 8
-**Requirements**: [CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, CHAT-07, CHAT-08, CHAT-09, CHAT-10, CHAT-11, CHAT-12]
+### Phase 12: Chat Query and Mutation Hooks
+
+**Goal**: Add TanStack Query integration for conversation list/detail, send-message, and teacher-help flows.
+**Depends on**: Phase 11
+**Requirements**: [QRY-01, QRY-02, QRY-03, QRY-04, QRY-05, QRY-06]
 **Success Criteria** (what must be TRUE):
-  1. `/chat` renders a full chat workspace rather than a placeholder.
-  2. Desktop users can see and select mock conversations from a sidebar.
-  3. The active conversation message history updates when a conversation is selected.
-  4. Sending a message appends the student message, shows an AI thinking state, and then appends a mock assistant response.
-  5. Upload and request-teacher placeholders are visible.
-  6. Small screens remain usable without serious horizontal overflow.
+  1. `chatQueryKeys` is the single source for chat query key construction.
+  2. `useConversationsQuery` loads `GET /conversations`.
+  3. `useConversationQuery` loads active conversation detail only when an ID exists.
+  4. `useSendMessageMutation` posts content and invalidates active conversation and conversation list queries on success.
+  5. `useTeacherHelpMutation` wraps the teacher-help request API.
+  6. Chat hooks live under `src/hooks/chat/` and do not depend on mock data.
 **Plans**: 2 plans
 
 Plans:
-- [x] 09-01: Build chat components and `useMockChat`.
-- [x] 09-02: Assemble `ChatPage` and verify chat interactions.
+- [ ] 12-01: Add chat query keys and read hooks.
+- [ ] 12-02: Add send-message and teacher-help mutation hooks.
 
-### Phase 10: Student Dashboard, Documentation, and Verification
-**Goal**: Build the `/dashboard` product UI, document Phase 3, and verify scripts/routes.
-**Depends on**: Phase 9
-**Requirements**: [DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DASH-08, DOCS-06, DOCS-07, DOCS-08]
+### Phase 13: Backend-Driven Chat Page and UI States
+
+**Goal**: Switch `/chat` from mock state to backend-backed query/mutation state while preserving the Phase 3 UI experience.
+**Depends on**: Phase 12
+**Requirements**: [API-05, CHAT-13, CHAT-14, CHAT-15, CHAT-16, CHAT-17, CHAT-18, CHAT-19, STATE-05, STATE-06, STATE-07, STATE-08, STATE-09, STATE-10, STATE-11, STATE-12, STATE-13]
 **Success Criteria** (what must be TRUE):
-  1. `/dashboard` renders a student learning overview rather than a placeholder.
-  2. Dashboard stat, recent question, weak topic, learning progress, and teacher feedback modules render from mock data.
-  3. Dashboard layouts use responsive grids that collapse cleanly on smaller screens.
-  4. README documents Phase 3 Core Product UI, included routes, included modules, and mock-data-only scope.
-  5. `npm install`, `npm run build`, and route checks for `/chat` and `/dashboard` pass.
-  6. Phase 3 work is committed with clear Core Product UI history.
+  1. `ChatPage` no longer imports `useMockChat`.
+  2. Conversation sidebar renders backend summaries and changes the active conversation ID.
+  3. Active conversation messages render from backend detail data.
+  4. Send-message pending disables input and shows assistant thinking.
+  5. Successful send refreshes messages through query invalidation/refetch.
+  6. Conversation list and detail loading/error/empty states are visible.
+  7. Send-message and teacher-help operation failures show page-level or inline feedback.
+  8. Teacher-help request action calls the backend mutation and exposes pending/success/error UI.
+**Plans**: 3 plans
+
+Plans:
+- [ ] 13-01: Update chat component props for backend data and disabled states.
+- [ ] 13-02: Refactor `ChatPage` to query/mutation data flow.
+- [ ] 13-03: Add chat loading, error, empty, and operation feedback states.
+
+### Phase 14: Backend Integration Documentation and Verification
+
+**Goal**: Document local backend integration and verify the Phase 4 frontend can build and run with the new chat data flow.
+**Depends on**: Phase 13
+**Requirements**: [DOCS-09, DOCS-10, DOCS-11, DOCS-12, DOCS-13, DOCS-14]
+**Success Criteria** (what must be TRUE):
+  1. `.env.example` includes `VITE_API_BASE_URL=http://localhost:8000`.
+  2. README lists the expected Phase 4 backend endpoints.
+  3. README documents frontend/backend/API docs local URLs.
+  4. README documents FastAPI CORS requirements for `http://localhost:5173`.
+  5. README states the frontend does not call model providers directly and Codex is backend-only during testing.
+  6. README states Phase 4 uses normal HTTP responses, not streaming.
+  7. `npm install`, `npm run build`, and relevant `/chat` route checks pass or any backend dependency limitation is recorded.
 **Plans**: 2 plans
 
 Plans:
-- [x] 10-01: Build dashboard components and assemble `StudentDashboardPage`.
-- [x] 10-02: Update README, run verification, and prepare commit handoff.
+- [ ] 14-01: Update env example and README backend integration docs.
+- [ ] 14-02: Run build and chat route verification.
 
 </details>
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 8 -> 9 -> 10
+Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -140,3 +166,7 @@ Phases execute in numeric order: 8 -> 9 -> 10
 | 8. Product UI Types and Mock Data | v1.2 | 2/2 | Complete | 2026-05-24 |
 | 9. Mock Chat Interface | v1.2 | 2/2 | Complete | 2026-05-24 |
 | 10. Student Dashboard, Documentation, and Verification | v1.2 | 2/2 | Complete | 2026-05-24 |
+| 11. Chat API Contract and Client | v1.3 | 0/2 | Pending | — |
+| 12. Chat Query and Mutation Hooks | v1.3 | 0/2 | Pending | — |
+| 13. Backend-Driven Chat Page and UI States | v1.3 | 0/3 | Pending | — |
+| 14. Backend Integration Documentation and Verification | v1.3 | 0/2 | Pending | — |

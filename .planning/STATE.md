@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-05-24T16:45:59.754Z"
 last_activity: 2026-05-24
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 9
   completed_plans: 0
   percent: 0
 ---
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-24)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and see a credible STOA product prototype that demonstrates the core student AI learning flow with mock data.
-**Current focus:** Milestone v1.2 complete; awaiting next milestone.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
+**Current focus:** Milestone v1.3 Phase 4 Backend Integration and Real Chat API.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 11 - Chat API Contract and Client
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-24 — Milestone v1.3 started
+Status: Roadmap initialized; ready to plan Phase 11
+Last activity: 2026-05-24 — Milestone v1.3 roadmap initialized
 
 ## Performance Metrics
 
@@ -79,6 +79,10 @@ Recent decisions affecting current work:
 - Phase 8 added Phase 3 chat/dashboard contracts and typed mock data.
 - Phase 9 replaced the chat placeholder with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
 - Phase 10 replaced the dashboard placeholder with mock product UI, updated README, and verified build, lint, and browser routes.
+- Milestone v1.3 started from the Phase 4 Backend Integration and Real Chat API brief.
+- v1.3 roadmap continues numbering into Phase 11, Phase 12, Phase 13, and Phase 14.
+- Phase 4 frontend must call only the unified backend Chat API; testing-stage Codex provider details remain backend-only.
+- Phase 4 uses normal HTTP response flow; streaming, WebSocket, real upload, full auth, and dashboard backend APIs are deferred.
 
 ### Pending Todos
 
@@ -95,13 +99,14 @@ Items acknowledged and carried forward from previous milestone close:
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | Product | Real login, real AI chat behavior, AI streaming, real file upload, teacher routing, parent/tutor dashboards, payments, backend integration, and deployment | Deferred to later milestones | v1.2 initialization |
+| Product | Streaming response, abort generation, retry message, real file upload, dashboard backend APIs, full auth enforcement, and production deployment | Deferred to Phase 5 or later | v1.3 initialization |
 
 ## Session Continuity
 
-Last session: 2026-05-24 18:29
-Stopped at: v1.2 complete and archived
+Last session: 2026-05-24 18:50
+Stopped at: v1.3 roadmap initialized
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Start Phase 11 with /gsd-plan-phase 11
