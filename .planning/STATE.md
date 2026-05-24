@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.4
-milestone_name: Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
-status: Awaiting next milestone
-last_updated: "2026-05-24T18:06:32.887Z"
-last_activity: 2026-05-24 — Milestone v1.4 implemented
+milestone: v1.5
+milestone_name: Phase 6 Authentication, User Roles, and Parent Visibility
+status: planning
+last_updated: "2026-05-24T21:56:40.746Z"
+last_activity: 2026-05-24
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-24)
 
 ## Current Position
 
-Phase: Milestone v1.4 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-24 — Milestone v1.4 implemented and verified
+Status: Defining requirements
+Last activity: 2026-05-24 — Milestone v1.5 started
 
 ## Performance Metrics
 

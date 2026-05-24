@@ -4,25 +4,25 @@
 
 STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, and a backend-integrated student chat flow for real conversation data.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, and a mock student learning dashboard. The current product step is upgrading `/chat` into a richer real learning workflow with streaming assistant responses, stop/retry controls, homework file upload, attachment-aware messages, and stateful teacher escalation.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, and a mock student learning dashboard. The current product step is adding real user identity boundaries, role-specific dashboards, parent learning visibility, tutor help-request handling, and a local SQLite-backed test backend.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat workflow backed only by the unified STOA backend API contract.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## Current Milestone: v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+## Current Milestone: v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 
-**Goal:** Upgrade `/chat` from ordinary HTTP Q&A to a real AI learning workflow with streaming assistant output, stop/retry controls, homework attachments, and stateful teacher help.
+**Goal:** Upgrade STOA from a single-user learning prototype into an education platform with real user identity, role-specific access, parent visibility, tutor help-request handling, and a SQLite-backed local test backend.
 
 **Target features:**
-- Streaming assistant responses through `POST /conversations/:conversationId/messages/stream`.
-- Abort generation and mark stopped assistant messages.
-- Basic retry for failed user messages.
-- New conversation flow available from the active chat workspace.
-- PNG, JPEG, and PDF homework upload with validation, upload state, and attachment previews.
-- Attachment IDs sent with chat messages.
-- Teacher-help request status display for pending, assigned, in-progress, and resolved states.
-- README and local integration documentation for Phase 5 endpoints and backend-only AI provider strategy.
+- Login, register, logout, current-user hydration, local token storage, and 401/403 handling.
+- Student, Parent, Tutor, and Admin roles with protected routes and role guards.
+- Role-specific dashboards, layouts, and navigation.
+- Student profile editing and student learning history.
+- Parent child list, child learning summary, recent questions, weak topics, and child learning-history visibility.
+- Tutor help-request list, detail view, and status updates.
+- Local FastAPI + SQLite test backend with users, roles, profiles, conversations, messages, uploads metadata, teacher help requests, learning history, and seed data.
+- README documentation for authentication, roles, permissions, and local SQLite testing.
 
 ## Current State
 
@@ -53,23 +53,28 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow is implemented)
+- [ ] Users can register, log in, stay authenticated across refresh, and log out through the frontend Auth flow.
+- [ ] Student, Parent, Tutor, and Admin users see only role-appropriate routes, navigation, dashboards, and data.
+- [ ] Students can manage their profile and see their own learning history while chat data remains scoped to the current user.
+- [ ] Parents can view bound children, child summaries, recent learning activity, weak topics, teacher-help records, and learning-history summaries.
+- [ ] Tutors can view and update teacher help requests with necessary student question context.
+- [ ] A local FastAPI + SQLite test backend supports auth, role-filtered data access, seed accounts, conversations, messages, file metadata, teacher help requests, and learning history.
+- [ ] README documents Phase 6 auth, roles, API endpoints, and local SQLite testing.
 
 ### Out of Scope
 
-- Real login implementation — auth UX and backend auth remain deferred.
-- Real teacher routing or tutor queue integration — Phase 5 shows request status only; live multi-person teacher chat remains deferred.
-- Parent/tutor/admin dashboard business logic — deferred to future product milestones.
+- Production SSO, email verification, password reset completion, refresh-token architecture, and httpOnly cookie migration — Phase 6 uses MVP auth with local token storage.
+- Complex school organization, parent invitation, and full admin management — Phase 6 keeps role surfaces minimal.
+- Real multi-person teacher chat — Phase 6 supports tutor help-request list/detail/status, not live teacher chat.
 - Payment system — billing and subscriptions are deferred.
 - Production deployment — hosting and CI/CD are deferred.
 - Direct frontend calls to OpenAI, Claude, Gemini, DeepSeek, Codex, or any other model provider — frontend remains coupled only to STOA backend APIs.
-- Production-ready mobile chat drawer — baseline responsive behavior is enough for the current chat surface.
-- Full OCR/PDF parsing management UI — Phase 5 only integrates upload metadata and optional parsed status.
-- Long-term memory management — deferred until later AI workflow milestones.
+- Production SQLite usage — SQLite is local functional-test infrastructure only; production persistence remains a backend concern.
+- Full audit logging and Swiss data privacy compliance documentation — deferred until later security/compliance milestones.
 
 ## Context
 
-The project brief for Phase 5 was provided in Chinese and defines the streaming chat, file upload, and real learning workflow milestone. It builds on v1.3's backend-integrated chat flow and keeps the same backend-only AI provider boundary while adding a streaming frontend protocol and richer local UI states.
+The project brief for Phase 6 was provided in Chinese and defines authentication, role boundaries, parent visibility, tutor help-request handling, and a local SQLite-backed test backend. It builds on v1.4's streaming chat, upload, retry, new-conversation, and teacher-help status workflow while establishing who can use the system and what each role can see.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -90,11 +95,14 @@ Current codebase facts:
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 5 upgrades `/chat` only; full parent/tutor dashboards, auth enforcement, payments, live teacher chat, and deployment stay out of scope.
+- **Scope**: Phase 6 adds authentication, role routing, local backend persistence, parent visibility, and tutor help-request handling; complex organizations, live teacher chat, payments, production SSO, and deployment stay out of scope.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
 - **Uploads**: Phase 5 supports PNG, JPEG, and PDF homework uploads up to 10 MB per file and at most 3 pending attachments per send.
+- **Auth token storage**: Phase 6 may use `localStorage` key `stoa_access_token`; production hardening is deferred.
+- **SQLite**: SQLite is only for local functional testing behind a local backend API; the browser frontend must never read SQLite directly.
+- **Permissions**: Frontend route guards are user-experience protection only; backend APIs must enforce real user and role data filtering.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -120,6 +128,9 @@ Current codebase facts:
 | Use fetch for streaming chat | Browser ReadableStream handling is simpler through fetch than Axios | — Pending |
 | Keep token-level streaming state local to React | Avoids high-frequency global Zustand updates and keeps canonical data in TanStack Query | — Pending |
 | Treat uploaded files as backend attachment metadata | Keeps OCR/PDF parsing behind backend APIs and lets frontend send only attachment IDs | — Pending |
+| Use localStorage for Phase 6 access tokens | Simple MVP token persistence is enough to validate role workflows before production auth hardening | — Pending |
+| Add a local FastAPI + SQLite test backend | Lets frontend auth, role filtering, and learning-data workflows be tested before the formal backend is ready | — Pending |
+| Treat frontend route guards as non-security boundaries | Prevents UI checks from replacing backend authorization and keeps data isolation enforced by APIs | — Pending |
 
 ## Evolution
 
@@ -139,4 +150,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.4 milestone initialization*
+*Last updated: 2026-05-24 after v1.5 milestone initialization*
