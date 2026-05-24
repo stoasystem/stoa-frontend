@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.5 Phase 6 Authentication, User Roles, and Parent Visibility (Implemented: 2026-05-24)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.5-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Login, register, current-user hydration, logout, local token persistence, and 401/403 handling.
+- Student, Parent, Tutor, and Admin role types, protected routes, role routes, and role-based redirects.
+- Role-aware app layout navigation, user menu, role badge, and admin placeholder.
+- Student profile editing and student learning-history page.
+- Parent dashboard, child summary, child learning-history page, and parent-visible learning records.
+- Tutor help-request dashboard, detail page, and status update workflow.
+- Local FastAPI + SQLite test backend with schema, seed accounts, conversations, messages, teacher help requests, learning history, and role-filtered endpoints.
+- README Phase 6 documentation for auth, roles, routes, endpoints, local SQLite backend, and seed accounts.
+
+### Verification
+
+- Requirements: 36/36 implemented.
+- Phases: 7/7 implemented.
+- Build: passed.
+- Lint: passed.
+- Python syntax check: passed.
+- SQLite seed: passed, including required tables and four seed accounts.
+- Local Vite route check: `/login` returned HTTP 200.
+- Full FastAPI runtime smoke testing still requires installing `backend/requirements.txt`.
+
+---
+
 ## v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow (Implemented: 2026-05-24)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

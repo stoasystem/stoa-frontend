@@ -4,7 +4,7 @@
 
 STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, and a backend-integrated student chat flow for real conversation data.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, and a mock student learning dashboard. The current product step is adding real user identity boundaries, role-specific dashboards, parent learning visibility, tutor help-request handling, and a local SQLite-backed test backend.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, and a local SQLite-backed test backend. The current product step is preparing the Phase 7 polish, analytics, and MVP readiness layer.
 
 ## Core Value
 
@@ -26,13 +26,19 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Current State
 
-**Latest shipped milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+**Latest shipped milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
 - `/chat` backend-integrated product UI with conversation list/detail queries, create-conversation, send-message, teacher-help request, and API state handling.
 - `/chat` streaming product UI with optimistic student messages, streaming assistant placeholders, stop generation, failed-message retry, attachment upload/preview, attachment-aware sends, and stateful teacher-help status display.
 - `/dashboard` mock student learning overview with stats, recent questions, weak topics, learning progress, and teacher feedback.
+- Auth routes for login/register, current-user hydration, token persistence, logout, and 401/403 handling.
+- Protected routes and role guards for student, parent, tutor, and admin surfaces.
+- Student profile and learning-history pages.
+- Parent dashboard, child summary, and child learning-history pages.
+- Tutor help-request dashboard, detail, and status update workflow.
+- Local FastAPI + SQLite test backend with seed users and role-filtered API endpoints.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -50,16 +56,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run the app and demo mock STOA chat plus student dashboard product UI — v1.2
 - ✓ Developers can run the app and exercise STOA chat through the unified backend Chat API contract — v1.3
 - ✓ Developers can run the app and exercise a streaming STOA chat workflow with file attachments and teacher-help status through the unified backend API contract — v1.4
+- ✓ Developers can run the app with authenticated role routes, parent visibility, tutor help requests, and a SQLite-backed local test backend — v1.5
 
 ### Active
 
-- [ ] Users can register, log in, stay authenticated across refresh, and log out through the frontend Auth flow.
-- [ ] Student, Parent, Tutor, and Admin users see only role-appropriate routes, navigation, dashboards, and data.
-- [ ] Students can manage their profile and see their own learning history while chat data remains scoped to the current user.
-- [ ] Parents can view bound children, child summaries, recent learning activity, weak topics, teacher-help records, and learning-history summaries.
-- [ ] Tutors can view and update teacher help requests with necessary student question context.
-- [ ] A local FastAPI + SQLite test backend supports auth, role-filtered data access, seed accounts, conversations, messages, file metadata, teacher help requests, and learning history.
-- [ ] README documents Phase 6 auth, roles, API endpoints, and local SQLite testing.
+(None currently — v1.5 Phase 6 Authentication, User Roles, and Parent Visibility is implemented)
 
 ### Out of Scope
 
@@ -89,6 +90,7 @@ Current codebase facts:
 - v1.2 shipped the first mock product UI for `/chat` and `/dashboard`.
 - v1.3 shipped backend-integrated `/chat` data flow using TanStack Query and Axios API services.
 - v1.4 shipped the Phase 5 real learning workflow: streaming response handling, upload attachments, retry, stop generation, new conversation flow, and teacher-help status progression.
+- v1.5 shipped Phase 6 authentication, protected/role routes, student profile/history, parent child visibility, tutor help-request handling, and a local SQLite-backed test backend.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
@@ -128,9 +130,9 @@ Current codebase facts:
 | Use fetch for streaming chat | Browser ReadableStream handling is simpler through fetch than Axios | — Pending |
 | Keep token-level streaming state local to React | Avoids high-frequency global Zustand updates and keeps canonical data in TanStack Query | — Pending |
 | Treat uploaded files as backend attachment metadata | Keeps OCR/PDF parsing behind backend APIs and lets frontend send only attachment IDs | — Pending |
-| Use localStorage for Phase 6 access tokens | Simple MVP token persistence is enough to validate role workflows before production auth hardening | — Pending |
-| Add a local FastAPI + SQLite test backend | Lets frontend auth, role filtering, and learning-data workflows be tested before the formal backend is ready | — Pending |
-| Treat frontend route guards as non-security boundaries | Prevents UI checks from replacing backend authorization and keeps data isolation enforced by APIs | — Pending |
+| Use localStorage for Phase 6 access tokens | Simple MVP token persistence is enough to validate role workflows before production auth hardening | ✓ Good |
+| Add a local FastAPI + SQLite test backend | Lets frontend auth, role filtering, and learning-data workflows be tested before the formal backend is ready | ✓ Good |
+| Treat frontend route guards as non-security boundaries | Prevents UI checks from replacing backend authorization and keeps data isolation enforced by APIs | ✓ Good |
 
 ## Evolution
 
@@ -150,4 +152,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.5 milestone initialization*
+*Last updated: 2026-05-24 after v1.5 autonomous execution*

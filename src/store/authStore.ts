@@ -4,24 +4,37 @@ import type { User, UserRole } from '@/types/user'
 export type CurrentUser = User
 export type { UserRole }
 
+export const TOKEN_KEY = 'stoa_access_token'
+
 type AuthState = {
   user: CurrentUser | null
-  token: string | null
+  accessToken: string | null
   isAuthenticated: boolean
-  setAuth: (user: CurrentUser, token: string) => void
+  setAuth: (user: CurrentUser, accessToken: string) => void
+  setUser: (user: CurrentUser) => void
   clearAuth: () => void
+  hydrateFromStorage: () => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  token: null,
+  accessToken: null,
   isAuthenticated: false,
-  setAuth: (user, token) => {
-    localStorage.setItem('stoa_access_token', token)
-    set({ user, token, isAuthenticated: true })
+  setAuth: (user, accessToken) => {
+    localStorage.setItem(TOKEN_KEY, accessToken)
+    set({ user, accessToken, isAuthenticated: true })
+  },
+  setUser: (user) => {
+    set({ user, isAuthenticated: true })
   },
   clearAuth: () => {
-    localStorage.removeItem('stoa_access_token')
-    set({ user: null, token: null, isAuthenticated: false })
+    localStorage.removeItem(TOKEN_KEY)
+    set({ user: null, accessToken: null, isAuthenticated: false })
+  },
+  hydrateFromStorage: () => {
+    const accessToken = localStorage.getItem(TOKEN_KEY)
+    if (accessToken) {
+      set({ accessToken, isAuthenticated: true })
+    }
   },
 }))

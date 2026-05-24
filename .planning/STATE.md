@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Phase 6 Authentication, User Roles, and Parent Visibility
-status: planning
-last_updated: "2026-05-24T22:01:24.833Z"
-last_activity: 2026-05-24
+status: complete
+last_updated: "2026-05-24T22:15:00.000Z"
+last_activity: 2026-05-24 — Milestone v1.5 implemented
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 7
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-24)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat workflow backed only by the unified STOA backend API contract.
-**Current focus:** Milestone v1.4 complete; Phase 5 frontend workflow awaits real backend smoke testing for streaming/upload/status endpoints.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
+**Current focus:** Milestone v1.5 complete; Phase 6 awaits deeper browser/API smoke testing with the local FastAPI service installed.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Milestone v1.5 complete
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-24 — Milestone v1.5 started
+Status: Complete
+Last activity: 2026-05-24 — Milestone v1.5 implemented and verified
 
 ## Performance Metrics
 
@@ -96,6 +96,14 @@ Recent decisions affecting current work:
 - Phase 18 upgraded `/chat` to streaming send, stop, retry, new conversation, and attachment-aware sends.
 - Phase 19 added teacher-help request/status UI.
 - Phase 20 updated README and verified build, lint, and local `/chat` HTTP response.
+- Milestone v1.5 started from the Phase 6 Authentication, User Roles, and Parent Visibility brief.
+- Phase 21 added auth contracts, auth store, auth API hooks, protected routes, role routes, and auth/error pages.
+- Phase 22 added a local FastAPI + SQLite test backend with seed data and role-filtered API endpoints.
+- Phase 23 added student profile and learning-history services, hooks, pages, and student role routes.
+- Phase 24 added parent dashboard, child summary, child history services/hooks/pages, and parent visibility components.
+- Phase 25 added tutor help-request services/hooks/pages and status update workflow.
+- Phase 26 added role-aware navigation, user menu, role badge, and admin placeholder.
+- Phase 27 updated README and verified build, lint, Python syntax, SQLite seed, and Vite route serving.
 
 ### Pending Todos
 
@@ -115,6 +123,10 @@ None currently.
 - In-app browser route check for `/chat` passed in no-backend mode by rendering `Failed to load conversations.`
 - Code review findings for empty-state create flow, stale active ID handling, and happy-path coverage were addressed.
 - Real FastAPI backend smoke testing remains once the backend service is available.
+- `python3 -m py_compile backend/app/*.py` passed.
+- `PYTHONPATH=. python3 -m app.seed` passed and created required SQLite tables plus student/parent/tutor/admin seed users.
+- Vite dev server returned HTTP 200 for `/login`.
+- Full FastAPI runtime smoke testing requires installing `backend/requirements.txt`.
 
 ## Deferred Items
 

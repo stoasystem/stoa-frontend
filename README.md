@@ -172,6 +172,114 @@ File upload limits:
 - Maximum size: 10 MB per file
 - Maximum pending attachments: 3
 
+## Phase 6 Authentication and User Roles
+
+This phase adds authentication, role-based routing, parent visibility, tutor help-request handling, and a local SQLite-backed test backend.
+
+User roles:
+
+- `student`
+- `parent`
+- `tutor`
+- `admin`
+
+Public routes:
+
+- `/login`
+- `/register`
+- `/forgot-password`
+
+Student routes:
+
+- `/dashboard`
+- `/chat`
+- `/profile`
+- `/learning-history`
+
+Parent routes:
+
+- `/parent`
+- `/parent/children/:childId`
+- `/parent/children/:childId/history`
+
+Tutor routes:
+
+- `/tutor`
+- `/tutor/requests/:requestId`
+
+Admin route:
+
+- `/admin`
+
+Expected backend endpoints:
+
+- `POST /auth/login`
+- `POST /auth/register`
+- `GET /auth/me`
+- `GET /students/me/profile`
+- `PATCH /students/me/profile`
+- `GET /students/me/learning-history`
+- `GET /conversations`
+- `GET /conversations/:conversationId`
+- `POST /conversations`
+- `POST /conversations/:conversationId/messages`
+- `POST /conversations/:conversationId/messages/stream`
+- `GET /parents/me/children`
+- `GET /parents/me/children/:childId/summary`
+- `GET /parents/me/children/:childId/history`
+- `GET /tutors/me/help-requests`
+- `GET /tutors/me/help-requests/:requestId`
+- `PATCH /tutors/me/help-requests/:requestId`
+
+Frontend token storage in this phase:
+
+- `localStorage` key: `stoa_access_token`
+
+Production security may later move to httpOnly cookies or refresh-token based flows.
+
+### Local SQLite Test Backend
+
+SQLite is used only for local functional testing. The frontend does not connect to SQLite directly. The frontend calls the local backend API, and the local backend reads and writes SQLite.
+
+Local backend structure:
+
+```text
+Frontend
+  -> HTTP
+Local FastAPI backend
+  -> SQLite local.db
+```
+
+The local database supports users, roles, profiles, parent-child links, conversations, messages, uploaded file metadata, teacher help requests, and learning history.
+
+Install local backend dependencies:
+
+```bash
+python3 -m venv backend/.venv
+backend/.venv/bin/pip install -r backend/requirements.txt
+```
+
+Seed local data:
+
+```bash
+cd backend
+PYTHONPATH=. .venv/bin/python -m app.seed
+```
+
+Start local backend:
+
+```bash
+cd backend
+PYTHONPATH=. .venv/bin/uvicorn app.main:app --reload --port 8000
+```
+
+Suggested seed accounts:
+
+- `student@test.com / password123`
+- `parent@test.com / password123`
+- `tutor@test.com / password123`
+- `admin@test.com / password123`
+
 ## Environment Variables
 
 Create a local environment file:
@@ -189,10 +297,19 @@ VITE_API_BASE_URL=http://localhost:8000
 ## Available Routes
 
 - `/` Home
-- `/chat` Backend-integrated chat product UI
-- `/dashboard` Student dashboard product UI
-- `/login` Login placeholder
+- `/login` Login
+- `/register` Register
+- `/dashboard` Student dashboard
+- `/chat` Student chat product UI
+- `/profile` Student profile
+- `/learning-history` Student learning history
+- `/parent` Parent dashboard
+- `/parent/children/:childId` Child learning summary
+- `/parent/children/:childId/history` Child learning history
+- `/tutor` Tutor dashboard
+- `/tutor/requests/:requestId` Tutor help-request detail
+- `/admin` Admin placeholder
 
 ## Project Status
 
-Phase 5: streaming chat, upload attachments, retry, stop generation, and teacher-help status workflow.
+Phase 6: authentication, role routing, parent visibility, tutor help-request workflow, and local SQLite-backed testing backend.

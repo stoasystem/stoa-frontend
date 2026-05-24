@@ -6,3 +6,8 @@ export type User = {
   email: string
   role: UserRole
 }
+
+export type AuthResponse = {
+  accessToken: string
+  user: User
+}
