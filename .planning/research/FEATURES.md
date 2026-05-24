@@ -1,76 +1,81 @@
-# Project Research: Features for v1.4 Phase 5
+# Project Research: Features for v1.5 Phase 6
 
-**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 **Date:** 2026-05-24
 
 ## Table Stakes
 
-### Streaming Chat
+### Authentication
 
-- User message appears immediately after submit.
-- Assistant placeholder appears immediately after streaming starts.
-- Assistant content updates chunk-by-chunk.
-- Completed stream marks assistant message complete.
-- Stream startup or mid-stream error marks the relevant message failed.
-- Input controls reflect streaming state and expose a stop action.
+- User can register with name, email, password, and role.
+- User can log in with email and password.
+- Frontend stores the access token for local session persistence.
+- Frontend loads the current user from `/auth/me`.
+- User can log out and clear local auth state.
+- Login/register failures are visible.
+- 401 clears auth and redirects to `/login`.
+- 403 redirects to `/forbidden` without clearing auth.
 
-### Abort Generation
+### Role Routing
 
-- Each active stream has one `AbortController`.
-- Stop calls `abort()` and marks the current assistant message `stopped`.
-- Future backend cancellation endpoint can be added without changing UI concepts.
+- Public routes include `/login`, `/register`, and placeholder `/forgot-password`.
+- Protected routes redirect unauthenticated users to `/login`.
+- Role routes redirect mismatched roles to `/forbidden`.
+- Login success redirects by role: student to `/dashboard`, parent to `/parent`, tutor to `/tutor`, admin to `/admin`.
+- Layout navigation changes by role.
 
-### Retry
+### Student Experience
 
-- At least failed user-message send retry is supported.
-- Retry reuses the original content and attachment IDs.
-- AI partial-response retry can be deferred because it needs clearer backend semantics.
+- Student can access `/dashboard`, `/chat`, `/profile`, and `/learning-history`.
+- Student can view and update grade, school system, and primary subjects.
+- Student can view personal learning-history items.
+- Student chat/conversation APIs remain scoped to the current student.
 
-### Conversation Creation
+### Parent Experience
 
-- User can create a new conversation from the sidebar or empty state.
-- Successful creation refreshes the conversation list.
-- The new conversation becomes selected.
-- First message can be sent immediately after creation.
+- Parent can access `/parent`.
+- Parent can view bound children.
+- Parent can open child summary.
+- Parent can view stats, weak topics, recent questions, teacher-help records, and learning-history summaries.
+- Parent cannot directly participate in child chat.
 
-### File Upload
+### Tutor Experience
 
-- User can select PNG, JPEG, and PDF files.
-- Unsupported file types are blocked before upload.
-- Files over 10 MB are blocked before upload.
-- At most 3 pending attachments are allowed.
-- Uploading, success, and failure states are visible.
-- Successful upload returns attachment metadata.
-- Pending attachments are previewed and can be removed before send.
-- Sending a message includes `attachmentIds`.
+- Tutor can access `/tutor`.
+- Tutor can view pending, assigned, in-progress, and resolved help requests.
+- Tutor can open a request detail view with necessary student question context.
+- Tutor can update request status.
 
-### Teacher Help
+### Admin Experience
 
-- User can request teacher help from the active conversation.
-- Teacher request state displays `pending`.
-- Status UI supports `assigned`, `in_progress`, and `resolved`.
-- Request failures display a retryable or visible error state.
+- Admin can access `/admin`.
+- Admin receives a placeholder only in this milestone.
+
+### Local SQLite Test Backend
+
+- Local backend can create `local.db`.
+- Seed data creates student, parent, tutor, and admin accounts.
+- SQLite stores users, student profiles, parent-child relationships, conversations, messages, uploaded file metadata, message attachments, teacher help requests, and learning history.
+- Backend filters data by token user and role.
+- Frontend calls only HTTP APIs.
 
 ## Differentiators For Later
 
-- Token-level typing animation separate from network chunks.
-- Retry AI partial response from a failed assistant message.
-- Backend cancellation endpoint.
-- Async file parsing progress polling beyond uploaded metadata.
-- Live teacher chat or teacher queue view.
-- User-level attachment library or learning history.
-
-## Dependencies On Existing Work
-
-- v1.3 already provides conversation list/detail queries and normal send-message service.
-- Phase 5 should preserve existing components where possible and extend props rather than replace the chat page wholesale.
-- Canonical conversation data remains backend-owned; local streaming data is temporary.
+- Production-grade refresh-token and httpOnly cookie strategy.
+- Email verification and password reset.
+- Parent invitation and child-binding workflow.
+- Full admin user/tutor/content management.
+- Real-time tutor chat.
+- Audit logs and compliance documentation.
+- Rich analytics and parent report exports.
 
 ## Acceptance-Oriented Feature Groups
 
-- Streaming protocol and types.
-- Streaming hook and message state.
-- Conversation creation flow.
-- Upload service and attachment UI.
-- Teacher-help status workflow.
-- Documentation and verification.
+- Auth contract, token handling, and auth store.
+- Protected and role-based routing.
+- Role-aware layout and user menu.
+- Student profile and learning history.
+- Parent dashboard and child visibility.
+- Tutor help-request workflow.
+- Local SQLite backend, schema, seed data, and permission filtering.
+- Documentation and build verification.

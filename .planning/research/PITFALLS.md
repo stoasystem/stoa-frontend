@@ -1,35 +1,41 @@
-# Project Research: Pitfalls for v1.4 Phase 5
+# Project Research: Pitfalls for v1.5 Phase 6
 
-**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 **Date:** 2026-05-24
 
-## Streaming Pitfalls
+## Auth Pitfalls
 
-- **Assuming one chunk equals one event.** Network chunks can split or combine events. Keep a buffer and split on blank-line event boundaries.
-- **Ignoring final decoder flush.** Use `TextDecoder` consistently and handle the remaining buffer after the reader finishes.
-- **Treating abort as failure.** User-initiated abort should mark `stopped`, not `failed`.
-- **Over-invalidating during each delta.** Invalidate canonical queries only after done/error, not per chunk.
-- **Leaking controllers.** Clear the active controller after done, error, or stop.
+- **Treating route guards as security.** React route checks only protect the user experience; backend authorization must filter every protected API.
+- **Hydration flicker.** A stored token may exist before `/auth/me` returns. Route guards need a predictable loading or hydration path so valid users are not incorrectly bounced.
+- **Clearing auth on 403.** 403 means the user is authenticated but unauthorized. Clear auth only for 401.
+- **Scattering role redirects.** Keep default role routes in one helper so login/register/layout behavior stays consistent.
+- **Overbuilding token strategy.** localStorage is acceptable for this MVP milestone, but README should state production may move to httpOnly cookies or refresh-token flows.
 
-## State Pitfalls
+## Role and Data Pitfalls
 
-- **Putting streaming tokens in Zustand.** High-frequency updates will create avoidable global render complexity.
-- **Duplicating canonical messages long-term.** Local streaming messages should be temporary and reconciled after query invalidation.
-- **Losing attachment IDs on retry.** Failed user messages need enough metadata to retry the same payload.
-- **Mixing UI errors.** Message errors, upload validation errors, teacher request errors, and page load errors need separate display surfaces.
+- **Duplicating role constants.** Define `UserRole` once and reuse it across stores, services, guards, and UI.
+- **Parent data leakage.** Parent child endpoints must verify the parent-child relationship before returning summaries or history.
+- **Tutor overexposure.** Tutor detail endpoints should expose only the context required for a help request.
+- **Admin scope creep.** Admin is a placeholder in Phase 6; full management belongs later.
+- **Chat regression.** Student chat must continue working while adding auth and data scoping.
 
-## Upload Pitfalls
+## SQLite Backend Pitfalls
 
-- **Relying only on backend validation.** Block unsupported file types, oversize files, and too many files before upload.
-- **Assuming uploaded means parsed.** Phase 5 can treat `uploaded` as sufficient, but the UI types should allow `processing`, `parsed`, and `failed`.
-- **Forgetting conversation association.** Include `conversationId` when available so backend can attach context early.
+- **Letting frontend depend on SQLite.** API contracts must not mention database implementation details.
+- **Saving plaintext passwords.** Even local seed users should use password hashes.
+- **Skipping seed idempotency.** Seed scripts should be safe to rerun during local testing.
+- **Weak permission tests.** Local backend smoke checks should verify 401, 403, student-only conversations, parent-child visibility, and tutor request access.
+- **Committing runtime database files.** `backend/local.db`, uploads, and generated data must stay ignored.
 
-## Teacher Help Pitfalls
+## UX Pitfalls
 
-- **Static success message only.** Phase 5 should represent status values, even if polling/manual refresh is simple at first.
-- **Overbuilding live teacher chat.** Status cards are in scope; real-time teacher messaging is not.
+- **Building marketing pages instead of task screens.** Phase 6 routes should open directly to login, dashboards, profile, lists, and detail views.
+- **Inconsistent role navigation.** Menus should show only the current role's natural destinations.
+- **Raw empty states.** Parent with no children, tutor with no requests, and history with no items need deliberate empty states.
+- **Unclear failure states.** Auth errors, profile save errors, parent summary errors, and tutor status update errors should display near the affected workflow.
 
 ## Documentation Pitfalls
 
-- **Exposing model provider details.** README must continue to state that Codex or later providers are backend-only.
-- **Unclear backend contract.** Streaming event names, file fields, and teacher status enums should be documented for local integration.
+- **Under-documenting local backend startup.** README should explain that frontend calls the local API and that SQLite is backend-internal.
+- **Missing seed credentials.** README should list the four test accounts.
+- **Leaving production security ambiguous.** README should clearly mark localStorage and SQLite as Phase 6 testing choices, not final production architecture.

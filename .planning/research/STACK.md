@@ -1,44 +1,52 @@
-# Project Research: Stack for v1.4 Phase 5
+# Project Research: Stack for v1.5 Phase 6
 
-**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 **Date:** 2026-05-24
 
 ## Summary
 
-No new core frontend framework is needed. The existing React, TypeScript, Vite, TanStack Query, Axios, and local component stack is enough for Phase 5.
+Phase 6 can use the current frontend stack for authentication and role-based UI: React, TypeScript, Vite, React Router, TanStack Query, Axios, and Zustand. The main frontend additions are typed auth/user services, route guards, role-aware layouts, and query hooks for student, parent, and tutor data.
 
-The main stack decision is to use browser `fetch` for the streaming endpoint while keeping Axios for normal JSON and multipart endpoints. MDN documents that a fetch `Response.body` is a `ReadableStream`, which can be consumed through `getReader()`. This maps cleanly to `POST /conversations/:conversationId/messages/stream`, where the request body includes content and attachment IDs.
-
-Server-Sent Events remain a good wire format, but `EventSource` is not the right frontend client for this contract because it is GET-oriented and does not send the POST JSON payload Phase 5 needs. The frontend can still parse an SSE-style `text/event-stream` response over fetch.
+The local persistence requirement belongs behind a local backend, not in the browser. A small FastAPI + SQLite service is a suitable test backend because it can expose the same HTTP contracts the production backend is expected to implement while using SQLite only as an internal local datastore.
 
 ## Recommended Stack Changes
 
-- Add no new runtime dependency for streaming; use `fetch`, `ReadableStream.getReader()`, `TextDecoder`, and `AbortController`.
-- Keep `httpClient`/Axios for `POST /files`, `GET /files/:fileId`, `POST /teacher-help/request`, and `GET /teacher-help/request/:requestId`.
-- Keep TanStack Query for conversation list/detail, create conversation mutation, file upload mutation, and teacher-help status query/mutation.
-- Keep local React state for high-frequency streaming message content and pending attachments.
-- Avoid putting token/chunk updates in Zustand.
+- Keep React Router for public, protected, and role-scoped route groups using layout routes with `<Outlet />`.
+- Keep TanStack Query for current-user, profile, learning-history, parent, and tutor server state.
+- Keep Axios for JSON API calls and request/response interceptors.
+- Refactor the existing Zustand auth store to hold `user`, `accessToken`, `isAuthenticated`, `setAuth`, `setUser`, `clearAuth`, and `hydrateFromStorage`.
+- Use `localStorage` key `stoa_access_token` for MVP token persistence in this milestone.
+- Add a local `backend/` FastAPI app with SQLite, SQLAlchemy or SQLModel, password hashing, JWT access tokens, seed data, and role-filtered routers.
+
+## Local Backend Stack
+
+- FastAPI for the local HTTP API.
+- SQLite for `backend/local.db` local functional testing.
+- SQLAlchemy or SQLModel for table mapping and query filtering.
+- bcrypt-compatible password hashing for local test credentials.
+- JWT bearer access tokens for `Authorization: Bearer ...`.
+- Seed script at `python -m app.seed`.
 
 ## Integration Points
 
-- `src/services/chat/chatStreamApi.ts`: fetch streaming client and event parser.
-- `src/hooks/chat/useStreamingChat.ts`: local optimistic messages, assistant placeholder, abort, failed/stopped states, canonical query invalidation.
-- `src/services/files/fileApi.ts`: multipart upload through shared `httpClient`.
-- `src/services/teacherHelp/teacherHelpApi.ts`: request and status retrieval through shared `httpClient`.
-- `src/hooks/files/useFileUploadMutation.ts`: file upload mutation.
-- `src/hooks/chat/useCreateConversationMutation.ts`: create conversation mutation plus query invalidation.
+- `src/services/api/httpClient.ts`: token injection plus 401/403 handling.
+- `src/services/auth/authApi.ts`: login, register, current user.
+- `src/hooks/auth/*`: mutations and current-user hydration.
+- `src/store/authStore.ts` or existing store path: token and user state.
+- `src/app/router/*`: protected and role route guards.
+- `src/services/student`, `src/services/parent`, `src/services/tutor`: role-specific API clients.
+- `backend/app/*`: local test backend and SQLite schema.
 
 ## What Not To Add
 
-- No direct OpenAI, Claude, Gemini, DeepSeek, or Codex SDK dependency.
-- No WebSocket dependency for Phase 5.
-- No global store for streaming token updates.
-- No OCR/PDF client parser dependency; parsing remains backend-owned.
-- No toast library unless existing UI feedback proves insufficient.
+- No direct browser SQLite access.
+- No production SSO or full refresh-token architecture.
+- No direct model-provider SDKs in the frontend.
+- No complex school organization or invitation workflow.
+- No live tutor chat transport.
 
 ## Sources
 
-- MDN, `ReadableStream`: fetch exposes `Response.body` as a readable stream and supports `getReader()`.
-- MDN, `Using readable streams`: stream consumption pattern uses a reader and repeated `read()` calls.
-- MDN, `Using server-sent events`: SSE uses `text/event-stream` and named events in a line-oriented format.
-- TanStack Query docs: mutations and invalidation are the intended path for refreshing canonical server state after writes.
+- FastAPI official documentation covers OAuth2 password flow, password hashing, bearer tokens, and JWT examples.
+- React Router official documentation supports nested route structures and child rendering with layout routes.
+- TanStack Query official documentation positions queries and mutations as the core server-state API.

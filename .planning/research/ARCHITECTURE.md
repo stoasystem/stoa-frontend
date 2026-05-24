@@ -1,75 +1,81 @@
-# Project Research: Architecture for v1.4 Phase 5
+# Project Research: Architecture for v1.5 Phase 6
 
-**Milestone:** v1.4 Phase 5 Streaming Chat, File Upload, and Real Learning Workflow
+**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
 **Date:** 2026-05-24
 
 ## Existing Architecture
 
-The app is a React SPA using Vite, React Router, TanStack Query, Axios service modules, local UI components, and route-level pages. v1.3 changed `/chat` from mock data to backend-driven conversation list/detail and send-message flows.
+The app is a React SPA using Vite, React Router, TanStack Query, Axios service modules, local UI components, and Zustand stores. v1.4 added a backend-integrated streaming chat workflow with file uploads and teacher-help status through unified backend API contracts.
 
-## Recommended Phase 5 Architecture
+## Recommended Phase 6 Architecture
+
+### Frontend Auth Boundary
+
+- `authApi` owns login, register, and current-user calls.
+- `authStore` owns token, user, and local persistence.
+- `httpClient` injects the token into every API request.
+- 401 clears auth and navigates to `/login`; 403 navigates to `/forbidden`.
+- `useCurrentUserQuery` hydrates user state when a token exists.
+
+### Frontend Route Boundary
+
+- Public auth routes stay outside protected groups.
+- `ProtectedRoute` checks authenticated state and renders an `<Outlet />`.
+- `RoleRoute` checks `user.role` against allowed roles and renders an `<Outlet />`.
+- `getDefaultRouteForRole` centralizes post-login navigation.
+- `AppLayout` reads current user and renders role-specific navigation.
 
 ### Server State
 
 TanStack Query remains the source for:
 
-- Conversation list.
-- Conversation detail.
-- Create conversation mutation.
-- File upload mutation result.
-- Teacher-help request and status.
+- Current user.
+- Student profile and learning history.
+- Parent children and child summary/history.
+- Tutor help-request list/detail/status updates.
+- Chat conversation data scoped by backend permissions.
 
-After streaming completes, the frontend invalidates conversation detail and list queries so backend canonical messages replace local temporary messages.
+### Local Backend Boundary
 
-### Local State
+The local backend should mirror production-facing contracts:
 
-React component/hook state owns:
+```text
+Frontend
+  -> HTTP API
+Local FastAPI backend
+  -> ORM / SQL
+SQLite local.db
+```
 
-- Streaming user-message optimistic state.
-- Assistant streaming placeholder and chunk content.
-- Current `AbortController`.
-- Pending attachments before send.
-- Input-level validation and upload errors.
+The frontend never reads SQLite files. The backend owns password hashing, token generation, token validation, and all data filtering.
 
-This avoids high-frequency global store updates while keeping the canonical state flow simple.
+### SQLite Tables
 
-### Services
+- `users`
+- `student_profiles`
+- `parent_children`
+- `conversations`
+- `messages`
+- `uploaded_files`
+- `message_attachments`
+- `teacher_help_requests`
+- `learning_history`
 
-- `chatApi.ts`: normal JSON conversation operations already present.
-- `chatStreamApi.ts`: fetch streaming POST client and SSE-style parser.
-- `fileApi.ts`: multipart upload and optional status lookup.
-- `teacherHelpApi.ts`: create request and retrieve status.
+### Build Order
 
-### Component Flow
+1. Define shared user, student, parent, tutor, dashboard, chat, and teacher-help types.
+2. Add frontend auth services, token injection, store, and auth hooks.
+3. Add protected and role routes plus auth/error pages.
+4. Add local FastAPI + SQLite schema, routers, auth service, and seed data.
+5. Add student profile/history screens and hooks.
+6. Add parent visibility screens and hooks.
+7. Add tutor help-request screens and hooks.
+8. Update layout, README, and verification.
 
-`ChatPage` should compose:
+## Data Isolation Strategy
 
-- `ConversationSidebar` plus `NewConversationButton`.
-- `ChatMessageList` fed with canonical messages merged with local streaming messages.
-- `ChatInput` with file upload, attachment previews, send, disabled, and stop states.
-- `TeacherEscalationCard` or `TeacherHelpStatusCard` with stateful request display.
-
-### Data Merge Strategy
-
-During active streaming:
-
-1. Render backend conversation messages.
-2. Append local optimistic user message.
-3. Append local assistant placeholder/streaming message.
-4. On completion, invalidate queries and clear local temporary messages when refreshed data arrives.
-
-On failure:
-
-1. Preserve failed local user message.
-2. Display retry action.
-3. Retry resends the same content and attachment IDs.
-
-## Build Order
-
-1. Types and services.
-2. Streaming hook.
-3. File upload hook and UI.
-4. Conversation creation hook/button.
-5. Message/input component upgrades.
-6. Teacher help status UI.
-7. ChatPage composition and verification.
+- Student queries filter by `student_user_id == current_user.id`.
+- Parent queries first verify a `parent_children` relationship.
+- Tutor queries return pending or assigned requests according to backend policy.
+- Admin receives only placeholder access in this milestone.
+- Frontend guards reduce accidental navigation, but backend authorization is mandatory.
