@@ -104,12 +104,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STYLE-01 | Phase 4 | Pending |
-| STYLE-02 | Phase 4 | Pending |
-| STYLE-03 | Phase 4 | Pending |
-| STYLE-04 | Phase 4 | Pending |
-| STYLE-05 | Phase 4 | Pending |
-| STYLE-06 | Phase 4 | Pending |
+| STYLE-01 | Phase 4 | Complete |
+| STYLE-02 | Phase 4 | Complete |
+| STYLE-03 | Phase 4 | Complete |
+| STYLE-04 | Phase 4 | Complete |
+| STYLE-05 | Phase 4 | Complete |
+| STYLE-06 | Phase 4 | Complete |
 | ARCH-01 | Phase 5 | Pending |
 | ARCH-02 | Phase 5 | Pending |
 | ARCH-03 | Phase 5 | Pending |
