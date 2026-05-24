@@ -99,8 +99,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: Build Home acceptance page and update README.
-- [ ] 07-02: Run verification and prepare GitHub handoff.
+- [x] 07-01: Build Home acceptance page and update README.
+- [x] 07-02: Run verification and prepare GitHub handoff.
 
 ## Progress
 
@@ -115,4 +115,4 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7
 | 4. Styling and UI Foundation | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 5. App Providers, Router, Layouts, and Pages | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 6. Services, State, Types, Hooks, and Common Components | v1.1 | 2/2 | Complete | 2026-05-24 |
-| 7. Acceptance Page, Documentation, and Verification | v1.1 | 0/2 | Not started | - |
+| 7. Acceptance Page, Documentation, and Verification | v1.1 | 2/2 | Complete | 2026-05-24 |

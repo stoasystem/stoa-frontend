@@ -136,12 +136,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COMP-03 | Phase 6 | Complete |
 | COMP-04 | Phase 6 | Complete |
 | COMP-05 | Phase 6 | Complete |
-| COMP-06 | Phase 7 | Pending |
-| DOCS-01 | Phase 7 | Pending |
-| DOCS-02 | Phase 7 | Pending |
-| DOCS-03 | Phase 7 | Pending |
-| DOCS-04 | Phase 7 | Pending |
-| DOCS-05 | Phase 7 | Pending |
+| COMP-06 | Phase 7 | Complete |
+| DOCS-01 | Phase 7 | Complete |
+| DOCS-02 | Phase 7 | Complete |
+| DOCS-03 | Phase 7 | Complete |
+| DOCS-04 | Phase 7 | Complete |
+| DOCS-05 | Phase 7 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 38 total

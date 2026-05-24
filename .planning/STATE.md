@@ -1,11 +1,11 @@
 ---
 milestone: v1.1
 milestone_name: Frontend Development Foundation
-status: in_progress
+status: complete
 progress:
-  completed_phases: 3
+  completed_phases: 4
   total_phases: 4
-  completed_plans: 6
+  completed_plans: 8
   total_plans: 8
 ---
 
@@ -16,21 +16,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and continue STOA product work from a stable, organized frontend application foundation.
-**Current focus:** Phase 7: Acceptance Page, Documentation, and Verification
+**Current focus:** Milestone v1.1 complete
 
 ## Current Position
 
 Phase: 7 of 7 (Acceptance Page, Documentation, and Verification)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-24 — Phase 6 completed and verified
+Plan: 2 of 2 complete
+Status: Milestone complete
+Last activity: 2026-05-24 — Phase 7 completed and verified
 
-Progress: [███████░░░] 75%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 8
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -41,9 +41,10 @@ Progress: [███████░░░] 75%
 | Phase 4 | 2 | n/a | n/a |
 | Phase 5 | 2 | n/a | n/a |
 | Phase 6 | 2 | n/a | n/a |
+| Phase 7 | 2 | n/a | n/a |
 
 **Recent Trend:**
-- Last 5 plans: 04-02, 05-01, 05-02, 06-01, 06-02
+- Last 5 plans: 05-02, 06-01, 06-02, 07-01, 07-02
 - Trend: n/a
 
 *Updated after each plan completion*
@@ -66,6 +67,7 @@ Recent decisions affecting current work:
 - Phase 4 added TailwindCSS, alias support, STOA theme files, lucide-react, and shadcn-style UI primitives.
 - Phase 5 added app providers, router, layouts, and route placeholder pages.
 - Phase 6 added API services, Zustand stores, hooks, shared types, env example, and common components.
+- Phase 7 added the acceptance page, README updates, route checks, preview check, and final verification.
 
 ### Pending Todos
 
