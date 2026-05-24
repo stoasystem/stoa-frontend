@@ -1,46 +1,42 @@
-# Project Research Summary: v1.5 Phase 6
+# Project Research Summary: v1.6 Phase 7
 
-**Date:** 2026-05-24
+**Date:** 2026-05-25
 
 ## Stack Additions
 
-- No new core frontend framework is required.
-- Keep React Router for public, protected, and role-scoped route groups.
-- Keep TanStack Query for current-user, student, parent, tutor, and chat server state.
-- Keep Axios for JSON API calls, token injection, and 401/403 handling.
-- Refactor the existing Zustand auth store for user, token, persistence, and auth clearing.
-- Add a local FastAPI + SQLite backend for local functional testing behind the same HTTP API contracts the frontend will use later.
+- Add `sonner` for operation-level toast notifications.
+- Add `zod`, and optionally `react-hook-form` plus `@hookform/resolvers`, for schema-backed form validation.
+- Add `react-error-boundary` or a local boundary component for app-level fallback UI.
+- Add a thin analytics client and environment flags instead of committing to an analytics vendor.
 
 ## Feature Table Stakes
 
-- Login, register, logout, current-user hydration, and visible auth failures.
-- Access token persistence in `localStorage` key `stoa_access_token` for this MVP milestone.
-- Student, Parent, Tutor, and Admin role types.
-- Protected routes for logged-in users and role routes for role-specific pages.
-- Role-based post-login redirect and role-aware layout navigation.
-- Student profile editing and learning-history display.
-- Parent child list, child summary, recent questions, weak topics, teacher-help records, and child learning-history summaries.
-- Tutor help-request list, detail context, and status updates.
-- Admin placeholder route.
-- SQLite tables and seed data for users, roles, profiles, relationships, conversations, messages, uploaded file metadata, teacher help requests, and learning history.
+- Shared UI guidelines, page containers, headers, and skeleton states.
+- Mobile usability for login, register, dashboard, chat, profile, parent, child summary, tutor list, and tutor detail pages.
+- Toast feedback and readable errors for key operations.
+- Validation for auth, profile, chat input, file upload, teacher help, and tutor status updates.
+- App error boundary.
+- Analytics events for login/register/chat/upload/teacher-help/parent-report/tutor actions.
+- Parent weekly report page and local backend endpoint.
+- Tutor filters, clearer request detail, and teacher notes.
+- Demo seed data, demo shortcuts, staging env flags, README, and MVP demo flow.
 
 ## Watch Out For
 
-- Frontend route guards are not security boundaries; backend APIs must enforce user and role filtering.
-- 401 and 403 need different behavior: clear auth for 401, keep auth and redirect for 403.
-- Hydrating from a stored token needs a predictable current-user loading path.
-- Parent and tutor endpoints are the highest data-leakage risk and need explicit backend filtering.
-- SQLite and localStorage are local/MVP choices, not final production security architecture.
-- The existing streaming chat workflow must keep working while auth and student data scoping are added.
+- Keep frontend route/visibility polish separate from backend authorization.
+- Do not use analytics payloads for sensitive message content.
+- Hide demo shortcuts outside development/staging demo mode.
+- Avoid broad design-system rewrites; polish the existing component system.
+- Keep skeletons dimensionally close to real content to reduce layout shift.
 
 ## Requirement/Roadmap Implications
 
-The milestone should be split by implementation dependencies:
+The milestone should split cleanly into:
 
-1. Auth, role, and shared data contracts.
-2. Frontend auth services, store, token handling, route guards, and auth pages.
-3. Local FastAPI + SQLite backend schema, seed data, auth endpoints, and permission filtering.
-4. Student profile, learning history, and chat scoping.
-5. Parent dashboard and child visibility.
-6. Tutor help-request workflow.
-7. Role-aware layout, documentation, and final verification.
+1. UI standards and responsive foundations.
+2. Loading skeletons and user feedback.
+3. Validation and error boundary.
+4. Analytics and usage tracking.
+5. Parent report.
+6. Tutor workflow polish.
+7. Demo/staging documentation and verification.

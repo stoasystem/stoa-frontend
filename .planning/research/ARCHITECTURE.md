@@ -1,81 +1,64 @@
-# Project Research: Architecture for v1.5 Phase 6
+# Project Research: Architecture for v1.6 Phase 7
 
-**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
-**Date:** 2026-05-24
+**Milestone:** v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
+**Date:** 2026-05-25
 
 ## Existing Architecture
 
-The app is a React SPA using Vite, React Router, TanStack Query, Axios service modules, local UI components, and Zustand stores. v1.4 added a backend-integrated streaming chat workflow with file uploads and teacher-help status through unified backend API contracts.
+The app is a React SPA using Vite, React Router, TanStack Query, Axios service modules, local UI components, and Zustand stores. v1.5 added authenticated role routes and a local FastAPI + SQLite backend with student, parent, tutor, and admin role surfaces.
 
-## Recommended Phase 6 Architecture
+## Recommended Phase 7 Architecture
 
-### Frontend Auth Boundary
+### Shared UI Layer
 
-- `authApi` owns login, register, and current-user calls.
-- `authStore` owns token, user, and local persistence.
-- `httpClient` injects the token into every API request.
-- 401 clears auth and navigates to `/login`; 403 navigates to `/forbidden`.
-- `useCurrentUserQuery` hydrates user state when a token exists.
+- Add `PageContainer`, `PageHeader`, and `SectionHeader`.
+- Add skeleton primitives and page-specific skeleton compositions.
+- Keep route pages responsible for data composition, but centralize page framing.
+- Document usage in `src/styles/ui-guidelines.md`.
 
-### Frontend Route Boundary
+### Feedback and Validation Layer
 
-- Public auth routes stay outside protected groups.
-- `ProtectedRoute` checks authenticated state and renders an `<Outlet />`.
-- `RoleRoute` checks `user.role` against allowed roles and renders an `<Outlet />`.
-- `getDefaultRouteForRole` centralizes post-login navigation.
-- `AppLayout` reads current user and renders role-specific navigation.
+- Add Toaster in `AppProviders`.
+- Add validation schemas in `src/lib/validation.ts`.
+- Keep immediate form errors near the relevant fields.
+- Use toast for operation result feedback.
 
-### Server State
+### Error Boundary
 
-TanStack Query remains the source for:
+- Wrap the app with `AppErrorBoundary` near the provider/router root.
+- Fallback should let the user retry without exposing stack traces.
 
-- Current user.
-- Student profile and learning history.
-- Parent children and child summary/history.
-- Tutor help-request list/detail/status updates.
-- Chat conversation data scoped by backend permissions.
+### Analytics Layer
 
-### Local Backend Boundary
+- Add `src/services/analytics/analyticsClient.ts`.
+- `trackEvent(name, payload)` logs in development and respects `VITE_ENABLE_ANALYTICS`.
+- Later implementations can send to `POST /analytics/events` without touching page code.
 
-The local backend should mirror production-facing contracts:
+### Parent Report Data Flow
 
-```text
-Frontend
-  -> HTTP API
-Local FastAPI backend
-  -> ORM / SQL
-SQLite local.db
-```
+- Type: `src/types/parentReport.ts`.
+- Service: `src/services/parent/parentReportApi.ts`.
+- Hook: `src/hooks/parent/useChildReportQuery.ts`.
+- Page: `src/pages/parent/ChildReportPage.tsx`.
+- Backend: `GET /parents/me/children/:childId/report`.
 
-The frontend never reads SQLite files. The backend owns password hashing, token generation, token validation, and all data filtering.
+### Tutor Note Data Flow
 
-### SQLite Tables
+- Backend table: `teacher_notes`.
+- Endpoint: `POST /tutors/me/help-requests/:requestId/notes`.
+- Frontend component: `TutorRequestNoteForm`.
+- Query invalidation refreshes request detail after note creation.
 
-- `users`
-- `student_profiles`
-- `parent_children`
-- `conversations`
-- `messages`
-- `uploaded_files`
-- `message_attachments`
-- `teacher_help_requests`
-- `learning_history`
+### Environment Layer
 
-### Build Order
+- Add `src/lib/env.ts` for `appEnv`, `isDevelopment`, `isStaging`, `isProduction`, `enableDemoShortcuts`, and `enableAnalytics`.
+- Update `.env.example` for local, staging, and production expectations.
 
-1. Define shared user, student, parent, tutor, dashboard, chat, and teacher-help types.
-2. Add frontend auth services, token injection, store, and auth hooks.
-3. Add protected and role routes plus auth/error pages.
-4. Add local FastAPI + SQLite schema, routers, auth service, and seed data.
-5. Add student profile/history screens and hooks.
-6. Add parent visibility screens and hooks.
-7. Add tutor help-request screens and hooks.
-8. Update layout, README, and verification.
+## Build Order
 
-## Data Isolation Strategy
-
-- Student queries filter by `student_user_id == current_user.id`.
-- Parent queries first verify a `parent_children` relationship.
-- Tutor queries return pending or assigned requests according to backend policy.
-- Admin receives only placeholder access in this milestone.
-- Frontend guards reduce accidental navigation, but backend authorization is mandatory.
+1. Shared UI standards, containers, and skeletons.
+2. Toast, validation, and error boundary.
+3. Analytics client and environment flags.
+4. Parent report types/API/hook/page/backend seed.
+5. Tutor workflow filters and notes.
+6. Demo shortcuts, README, and verification checklist.

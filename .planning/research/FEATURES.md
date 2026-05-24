@@ -1,81 +1,71 @@
-# Project Research: Features for v1.5 Phase 6
+# Project Research: Features for v1.6 Phase 7
 
-**Milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
-**Date:** 2026-05-24
+**Milestone:** v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
+**Date:** 2026-05-25
 
 ## Table Stakes
 
-### Authentication
+### UI Polish and Responsive Readiness
 
-- User can register with name, email, password, and role.
-- User can log in with email and password.
-- Frontend stores the access token for local session persistence.
-- Frontend loads the current user from `/auth/me`.
-- User can log out and clear local auth state.
-- Login/register failures are visible.
-- 401 clears auth and redirects to `/login`.
-- 403 redirects to `/forbidden` without clearing auth.
+- Shared `PageContainer`, `PageHeader`, and `SectionHeader` patterns.
+- Documented UI guidelines for containers, spacing, cards, forms, dashboards, sidebars, chat, badges, and mobile behavior.
+- Main pages remain usable at 375px, 430px, 768px, and 1024px widths.
+- Chat mobile view avoids a permanently visible conversation sidebar that crushes content.
 
-### Role Routing
+### Loading and Feedback
 
-- Public routes include `/login`, `/register`, and placeholder `/forgot-password`.
-- Protected routes redirect unauthenticated users to `/login`.
-- Role routes redirect mismatched roles to `/forbidden`.
-- Login success redirects by role: student to `/dashboard`, parent to `/parent`, tutor to `/tutor`, admin to `/admin`.
-- Layout navigation changes by role.
+- Skeleton components for page, dashboard, chat, parent, and tutor loading states.
+- Toast feedback for login/register/profile/upload/teacher-help/tutor actions.
+- User-readable inline errors where a toast alone is insufficient.
 
-### Student Experience
+### Validation and Resilience
 
-- Student can access `/dashboard`, `/chat`, `/profile`, and `/learning-history`.
-- Student can view and update grade, school system, and primary subjects.
-- Student can view personal learning-history items.
-- Student chat/conversation APIs remain scoped to the current student.
+- Login validates email and non-empty password.
+- Register validates name, email, password length, and role.
+- Student profile validates grade and at least one subject.
+- Chat input blocks empty sends.
+- File upload keeps type, size, and count validation.
+- App-level error boundary prevents full white-screen failures.
 
-### Parent Experience
+### Analytics and Usage Tracking
 
-- Parent can access `/parent`.
-- Parent can view bound children.
-- Parent can open child summary.
-- Parent can view stats, weak topics, recent questions, teacher-help records, and learning-history summaries.
-- Parent cannot directly participate in child chat.
+- `trackEvent()` supports core MVP events.
+- Events are safe to log in development and can be forwarded later.
+- Usage tracking API contract is documented and optionally supported by local backend.
 
-### Tutor Experience
+### Parent Report
 
-- Tutor can access `/tutor`.
-- Tutor can view pending, assigned, in-progress, and resolved help requests.
-- Tutor can open a request detail view with necessary student question context.
-- Tutor can update request status.
+- Parent can open `/parent/children/:childId/report`.
+- Report shows period, summary, stats, top subjects, weak topics, and recommendations.
+- Local backend can return seed report data.
 
-### Admin Experience
+### Tutor Workflow
 
-- Admin can access `/admin`.
-- Admin receives a placeholder only in this milestone.
+- Tutor request list supports status filtering.
+- Request list shows grade, subject, time, summary, and priority placeholder.
+- Request detail gives clearer context and supports teacher notes.
 
-### Local SQLite Test Backend
+### Demo and Staging
 
-- Local backend can create `local.db`.
-- Seed data creates student, parent, tutor, and admin accounts.
-- SQLite stores users, student profiles, parent-child relationships, conversations, messages, uploaded file metadata, message attachments, teacher help requests, and learning history.
-- Backend filters data by token user and role.
-- Frontend calls only HTTP APIs.
+- Demo seed data supports the full student -> tutor -> parent loop.
+- Development/staging can show demo login shortcuts.
+- `.env.example` includes app environment, analytics, and demo shortcut flags.
+- README documents the investor/demo flow.
 
 ## Differentiators For Later
 
-- Production-grade refresh-token and httpOnly cookie strategy.
-- Email verification and password reset.
-- Parent invitation and child-binding workflow.
-- Full admin user/tutor/content management.
-- Real-time tutor chat.
-- Audit logs and compliance documentation.
-- Rich analytics and parent report exports.
+- Full product analytics dashboards.
+- Real generated parent reports.
+- Production observability and audit logs.
+- Formal staging deployment, CI checks, and E2E coverage.
+- Real feedback collection workflow for early users.
 
 ## Acceptance-Oriented Feature Groups
 
-- Auth contract, token handling, and auth store.
-- Protected and role-based routing.
-- Role-aware layout and user menu.
-- Student profile and learning history.
-- Parent dashboard and child visibility.
-- Tutor help-request workflow.
-- Local SQLite backend, schema, seed data, and permission filtering.
-- Documentation and build verification.
+- Shared UI polish and responsive shell.
+- Skeleton and toast feedback.
+- Validation and error boundary.
+- Analytics and usage tracking.
+- Parent report.
+- Tutor workflow polish.
+- Demo/staging docs and verification.
