@@ -7,10 +7,10 @@ last_updated: "2026-05-24T16:16:58.545Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 3
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 33
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and see a credible STOA product prototype that demonstrates the core student AI learning flow with mock data.
-**Current focus:** Milestone v1.2 Core Product UI planning complete; ready to start Phase 8.
+**Current focus:** Phase 8 complete; ready to start Phase 9 Mock Chat Interface.
 
 ## Current Position
 
-Phase: 8 of 10 (Product UI Types and Mock Data)
+Phase: 9 of 10 (Mock Chat Interface)
 Plan: —
-Status: Roadmap initialized
-Last activity: 2026-05-24 — Milestone v1.2 roadmap initialized
+Status: Phase 8 complete
+Last activity: 2026-05-24 — Phase 8 product UI types and mock data completed
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Recent decisions affecting current work:
 - Milestone v1.2 started from the Phase 3 Core Product UI brief.
 - Phase 3 product UI remains mock-data-only; backend integration, streaming, real upload, and real teacher routing are deferred.
 - v1.2 roadmap continues numbering into Phase 8, Phase 9, and Phase 10.
+- Phase 8 added Phase 3 chat/dashboard contracts and typed mock data.
 
 ### Pending Todos
 

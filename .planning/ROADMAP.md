@@ -66,7 +66,7 @@ Plans:
 
 **Milestone Goal:** Build the first demonstrable STOA product interface with a mock-driven student chat experience and student dashboard on top of the Phase 2 frontend foundation.
 
-- [ ] **Phase 8: Product UI Types and Mock Data** - Define chat/dashboard contracts and mock data for the Phase 3 UI.
+- [x] **Phase 8: Product UI Types and Mock Data** - Define chat/dashboard contracts and mock data for the Phase 3 UI.
 - [ ] **Phase 9: Mock Chat Interface** - Build the `/chat` product UI with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
 - [ ] **Phase 10: Student Dashboard, Documentation, and Verification** - Build the `/dashboard` product UI, document Phase 3, and verify scripts/routes.
 
@@ -134,7 +134,6 @@ Phases execute in numeric order: 8 -> 9 -> 10
 | 5. App Providers, Router, Layouts, and Pages | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 6. Services, State, Types, Hooks, and Common Components | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 7. Acceptance Page, Documentation, and Verification | v1.1 | 2/2 | Complete | 2026-05-24 |
-| 8. Product UI Types and Mock Data | v1.2 | 0/2 | Pending | — |
+| 8. Product UI Types and Mock Data | v1.2 | 2/2 | Complete | 2026-05-24 |
 | 9. Mock Chat Interface | v1.2 | 0/2 | Pending | — |
 | 10. Student Dashboard, Documentation, and Verification | v1.2 | 0/2 | Pending | — |
-

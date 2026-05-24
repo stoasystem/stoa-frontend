@@ -86,10 +86,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TYPE-04 | Phase 8 | Pending |
-| TYPE-05 | Phase 8 | Pending |
-| DATA-01 | Phase 8 | Pending |
-| DATA-02 | Phase 8 | Pending |
+| TYPE-04 | Phase 8 | Complete |
+| TYPE-05 | Phase 8 | Complete |
+| DATA-01 | Phase 8 | Complete |
+| DATA-02 | Phase 8 | Complete |
 | CHAT-01 | Phase 9 | Pending |
 | CHAT-02 | Phase 9 | Pending |
 | CHAT-03 | Phase 9 | Pending |
