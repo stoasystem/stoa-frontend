@@ -5,7 +5,7 @@
 - ✅ **v1.0 Frontend Foundation** - Phases 1-3 (shipped 2026-05-24)
 - ✅ **v1.1 Frontend Development Foundation** - Phases 4-7 (shipped 2026-05-24)
 - ✅ **v1.2 Core Product UI** - Phases 8-10 (shipped 2026-05-24)
-- ◆ **v1.3 Phase 4 Backend Integration and Real Chat API** - Phases 11-14 (current)
+- ✅ **v1.3 Phase 4 Backend Integration and Real Chat API** - Phases 11-14 (shipped 2026-05-24)
 
 ## Phases
 
@@ -62,15 +62,15 @@
 
 </details>
 
-<details open>
-<summary>◆ v1.3 Phase 4 Backend Integration and Real Chat API (Phases 11-14) - CURRENT</summary>
+<details>
+<summary>✅ v1.3 Phase 4 Backend Integration and Real Chat API (Phases 11-14) - SHIPPED 2026-05-24</summary>
 
 **Milestone Goal:** Connect the Phase 3 chat UI to the real backend Chat API so conversations, messages, send-message, teacher-help requests, and local FastAPI/Codex-provider integration are driven through the unified STOA backend contract.
 
-- [ ] **Phase 11: Chat API Contract and Client** - Define chat API types and replace the old placeholder chat client with typed backend endpoint functions.
-- [ ] **Phase 12: Chat Query and Mutation Hooks** - Add TanStack Query keys, conversation queries, send-message mutation, and teacher-help mutation.
-- [ ] **Phase 13: Backend-Driven Chat Page and UI States** - Replace `useMockChat` on `/chat` with backend data flow, component prop updates, and user-visible loading/error/empty/pending feedback.
-- [ ] **Phase 14: Backend Integration Documentation and Verification** - Document local FastAPI/CORS/Codex-provider integration, update env examples, and verify build plus route behavior.
+- [x] **Phase 11: Chat API Contract and Client** - Define chat API types and replace the old placeholder chat client with typed backend endpoint functions.
+- [x] **Phase 12: Chat Query and Mutation Hooks** - Add TanStack Query keys, conversation queries, send-message mutation, and teacher-help mutation.
+- [x] **Phase 13: Backend-Driven Chat Page and UI States** - Replace `useMockChat` on `/chat` with backend data flow, component prop updates, and user-visible loading/error/empty/pending feedback.
+- [x] **Phase 14: Backend Integration Documentation and Verification** - Document local FastAPI/CORS/Codex-provider integration, update env examples, and verify build plus route behavior.
 
 ### Phase 11: Chat API Contract and Client
 
@@ -83,11 +83,11 @@
   3. Chat endpoint functions use the shared Axios `httpClient`.
   4. Components do not import backend endpoint functions directly.
   5. The API layer is ready to absorb camelCase/snake_case mapping if backend naming differs.
-**Plans**: 2 plans
+**Plans**: 2 plans complete
 
 Plans:
-- [ ] 11-01: Update chat API type contracts.
-- [ ] 11-02: Refactor chat service endpoint functions.
+- [x] 11-01: Update chat API type contracts.
+- [x] 11-02: Refactor chat service endpoint functions.
 
 ### Phase 12: Chat Query and Mutation Hooks
 
@@ -101,17 +101,17 @@ Plans:
   4. `useSendMessageMutation` posts content and invalidates active conversation and conversation list queries on success.
   5. `useTeacherHelpMutation` wraps the teacher-help request API.
   6. Chat hooks live under `src/hooks/chat/` and do not depend on mock data.
-**Plans**: 2 plans
+**Plans**: 2 plans complete
 
 Plans:
-- [ ] 12-01: Add chat query keys and read hooks.
-- [ ] 12-02: Add send-message and teacher-help mutation hooks.
+- [x] 12-01: Add chat query keys and read hooks.
+- [x] 12-02: Add send-message and teacher-help mutation hooks.
 
 ### Phase 13: Backend-Driven Chat Page and UI States
 
 **Goal**: Switch `/chat` from mock state to backend-backed query/mutation state while preserving the Phase 3 UI experience.
 **Depends on**: Phase 12
-**Requirements**: [API-05, CHAT-13, CHAT-14, CHAT-15, CHAT-16, CHAT-17, CHAT-18, CHAT-19, STATE-05, STATE-06, STATE-07, STATE-08, STATE-09, STATE-10, STATE-11, STATE-12, STATE-13]
+**Requirements**: [API-05, CHAT-13, CHAT-14, CHAT-15, CHAT-16, CHAT-17, CHAT-18, CHAT-19, CHAT-20, STATE-05, STATE-06, STATE-07, STATE-08, STATE-09, STATE-10, STATE-11, STATE-12, STATE-13]
 **Success Criteria** (what must be TRUE):
   1. `ChatPage` no longer imports `useMockChat`.
   2. Conversation sidebar renders backend summaries and changes the active conversation ID.
@@ -121,12 +121,12 @@ Plans:
   6. Conversation list and detail loading/error/empty states are visible.
   7. Send-message and teacher-help operation failures show page-level or inline feedback.
   8. Teacher-help request action calls the backend mutation and exposes pending/success/error UI.
-**Plans**: 3 plans
+**Plans**: 3 plans complete
 
 Plans:
-- [ ] 13-01: Update chat component props for backend data and disabled states.
-- [ ] 13-02: Refactor `ChatPage` to query/mutation data flow.
-- [ ] 13-03: Add chat loading, error, empty, and operation feedback states.
+- [x] 13-01: Update chat component props for backend data and disabled states.
+- [x] 13-02: Refactor `ChatPage` to query/mutation data flow.
+- [x] 13-03: Add chat loading, error, empty, and operation feedback states.
 
 ### Phase 14: Backend Integration Documentation and Verification
 
@@ -141,11 +141,11 @@ Plans:
   5. README states the frontend does not call model providers directly and Codex is backend-only during testing.
   6. README states Phase 4 uses normal HTTP responses, not streaming.
   7. `npm install`, `npm run build`, and relevant `/chat` route checks pass or any backend dependency limitation is recorded.
-**Plans**: 2 plans
+**Plans**: 2 plans complete
 
 Plans:
-- [ ] 14-01: Update env example and README backend integration docs.
-- [ ] 14-02: Run build and chat route verification.
+- [x] 14-01: Update env example and README backend integration docs.
+- [x] 14-02: Run build and chat route verification.
 
 </details>
 
@@ -166,7 +166,7 @@ Phases execute in numeric order: 11 -> 12 -> 13 -> 14
 | 8. Product UI Types and Mock Data | v1.2 | 2/2 | Complete | 2026-05-24 |
 | 9. Mock Chat Interface | v1.2 | 2/2 | Complete | 2026-05-24 |
 | 10. Student Dashboard, Documentation, and Verification | v1.2 | 2/2 | Complete | 2026-05-24 |
-| 11. Chat API Contract and Client | v1.3 | 0/2 | Pending | — |
-| 12. Chat Query and Mutation Hooks | v1.3 | 0/2 | Pending | — |
-| 13. Backend-Driven Chat Page and UI States | v1.3 | 0/3 | Pending | — |
-| 14. Backend Integration Documentation and Verification | v1.3 | 0/2 | Pending | — |
+| 11. Chat API Contract and Client | v1.3 | 2/2 | Complete | 2026-05-24 |
+| 12. Chat Query and Mutation Hooks | v1.3 | 2/2 | Complete | 2026-05-24 |
+| 13. Backend-Driven Chat Page and UI States | v1.3 | 3/3 | Complete | 2026-05-24 |
+| 14. Backend Integration Documentation and Verification | v1.3 | 2/2 | Complete | 2026-05-24 |

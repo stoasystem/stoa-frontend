@@ -11,11 +11,46 @@ export type ChatMessage = {
   status?: ChatMessageStatus
 }
 
-export type Conversation = {
+export type ConversationSummary = {
   id: string
   title: string
   subject: string
   grade: string
-  messages: ChatMessage[]
   updatedAt: string
+  lastMessagePreview?: string
+}
+
+export type Conversation = ConversationSummary & {
+  messages: ChatMessage[]
+}
+
+export type ConversationListResponse = {
+  items: ConversationSummary[]
+}
+
+export type SendMessageRequest = {
+  content: string
+}
+
+export type SendMessageResponse = {
+  studentMessage: ChatMessage
+  assistantMessage: ChatMessage
+}
+
+export type CreateConversationRequest = {
+  subject: string
+  grade: string
+  initialMessage: string
+}
+
+export type TeacherHelpRequest = {
+  conversationId: string
+  message?: string
+}
+
+export type TeacherHelpResponse = {
+  requestId: string
+  conversationId: string
+  status: 'pending' | 'assigned' | 'resolved'
+  createdAt: string
 }

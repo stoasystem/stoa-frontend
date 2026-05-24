@@ -9,51 +9,52 @@ Requirements for the fourth-stage backend chat integration milestone. Each maps 
 
 ### API Contract
 
-- [ ] **API-01**: Frontend chat types define `ConversationSummary`, `Conversation`, `ConversationListResponse`, `CreateConversationRequest`, `SendMessageRequest`, `SendMessageResponse`, `TeacherHelpRequest`, and `TeacherHelpResponse`.
-- [ ] **API-02**: Chat API client exposes typed functions for `GET /conversations`, `GET /conversations/:conversationId`, `POST /conversations`, `POST /conversations/:conversationId/messages`, and `POST /teacher-help/request`.
-- [ ] **API-03**: Chat API requests use the shared Axios `httpClient` and keep endpoint calls centralized under `src/services/chat/`.
-- [ ] **API-04**: Frontend contract uses frontend-friendly camelCase fields and prevents backend wire-format differences from leaking into chat components.
-- [ ] **API-05**: Frontend documentation records that model-provider details, including testing-stage Codex usage, are backend-only and not frontend API concerns.
+- [x] **API-01**: Frontend chat types define `ConversationSummary`, `Conversation`, `ConversationListResponse`, `CreateConversationRequest`, `SendMessageRequest`, `SendMessageResponse`, `TeacherHelpRequest`, and `TeacherHelpResponse`.
+- [x] **API-02**: Chat API client exposes typed functions for `GET /conversations`, `GET /conversations/:conversationId`, `POST /conversations`, `POST /conversations/:conversationId/messages`, and `POST /teacher-help/request`.
+- [x] **API-03**: Chat API requests use the shared Axios `httpClient` and keep endpoint calls centralized under `src/services/chat/`.
+- [x] **API-04**: Frontend contract uses frontend-friendly camelCase fields and prevents backend wire-format differences from leaking into chat components.
+- [x] **API-05**: Frontend documentation records that model-provider details, including testing-stage Codex usage, are backend-only and not frontend API concerns.
 
 ### Query Integration
 
-- [ ] **QRY-01**: Chat query keys are centralized in `src/services/chat/chatQueryKeys.ts`.
-- [ ] **QRY-02**: `useConversationsQuery` loads the backend conversation list through TanStack Query.
-- [ ] **QRY-03**: `useConversationQuery` loads the selected backend conversation detail and does not fetch when there is no active conversation ID.
-- [ ] **QRY-04**: `useSendMessageMutation` posts messages to the active conversation and invalidates both conversation detail and list queries on success.
-- [ ] **QRY-05**: `useTeacherHelpMutation` posts teacher-help requests through the backend API.
-- [ ] **QRY-06**: Chat server state is managed through TanStack Query hooks under `src/hooks/chat/` rather than duplicated into Zustand or mock hooks.
+- [x] **QRY-01**: Chat query keys are centralized in `src/services/chat/chatQueryKeys.ts`.
+- [x] **QRY-02**: `useConversationsQuery` loads the backend conversation list through TanStack Query.
+- [x] **QRY-03**: `useConversationQuery` loads the selected backend conversation detail and does not fetch when there is no active conversation ID.
+- [x] **QRY-04**: `useSendMessageMutation` posts messages to the active conversation and invalidates both conversation detail and list queries on success.
+- [x] **QRY-05**: `useTeacherHelpMutation` posts teacher-help requests through the backend API.
+- [x] **QRY-06**: Chat server state is managed through TanStack Query hooks under `src/hooks/chat/` rather than duplicated into Zustand or mock hooks.
 
 ### Chat Page Data Flow
 
-- [ ] **CHAT-13**: `/chat` no longer depends on `useMockChat` or `mockConversations` for conversation list, active messages, or send-message behavior.
-- [ ] **CHAT-14**: `/chat` automatically selects the first backend conversation when conversations load and no active conversation is selected.
-- [ ] **CHAT-15**: User can click a backend conversation summary and see the selected conversation detail load from the backend.
-- [ ] **CHAT-16**: User can send a non-empty message from `/chat` and the frontend calls `POST /conversations/:conversationId/messages`.
-- [ ] **CHAT-17**: After a successful send, the displayed messages refresh from backend conversation data including the returned assistant response.
-- [ ] **CHAT-18**: During send-message pending state, chat input and send button are disabled and the message list shows assistant thinking.
-- [ ] **CHAT-19**: User can request teacher help from the active conversation and the frontend calls `POST /teacher-help/request`.
+- [x] **CHAT-13**: `/chat` no longer depends on `useMockChat` or `mockConversations` for conversation list, active messages, or send-message behavior.
+- [x] **CHAT-14**: `/chat` automatically selects the first backend conversation when conversations load and no active conversation is selected.
+- [x] **CHAT-15**: User can click a backend conversation summary and see the selected conversation detail load from the backend.
+- [x] **CHAT-16**: User can send a non-empty message from `/chat` and the frontend calls `POST /conversations/:conversationId/messages`.
+- [x] **CHAT-17**: After a successful send, the displayed messages refresh from backend conversation data including the returned assistant response.
+- [x] **CHAT-18**: During send-message pending state, chat input and send button are disabled and the message list shows assistant thinking.
+- [x] **CHAT-19**: User can request teacher help from the active conversation and the frontend calls `POST /teacher-help/request`.
+- [x] **CHAT-20**: User can start a first backend conversation from the empty conversation state through `POST /conversations`.
 
 ### UI States and Feedback
 
-- [ ] **STATE-05**: Conversation list loading state is visible while `GET /conversations` is pending.
-- [ ] **STATE-06**: Conversation list error state is visible when `GET /conversations` fails.
-- [ ] **STATE-07**: Empty state is visible when `GET /conversations` returns no items.
-- [ ] **STATE-08**: Conversation detail loading state is visible while `GET /conversations/:conversationId` is pending.
-- [ ] **STATE-09**: Conversation detail error state is visible when selected conversation loading fails.
-- [ ] **STATE-10**: Empty messages state is visible when a selected conversation has no messages.
-- [ ] **STATE-11**: Send-message failures surface a visible operation-level error without introducing a toast dependency.
-- [ ] **STATE-12**: Teacher-help pending, success, and failure states surface visible operation-level feedback.
-- [ ] **STATE-13**: `ChatInput`, `TeacherEscalationCard`, `ConversationSidebar`, and `ConversationListItem` props are compatible with backend summary/detail data and pending disabled states.
+- [x] **STATE-05**: Conversation list loading state is visible while `GET /conversations` is pending.
+- [x] **STATE-06**: Conversation list error state is visible when `GET /conversations` fails.
+- [x] **STATE-07**: Empty state is visible when `GET /conversations` returns no items.
+- [x] **STATE-08**: Conversation detail loading state is visible while `GET /conversations/:conversationId` is pending.
+- [x] **STATE-09**: Conversation detail error state is visible when selected conversation loading fails.
+- [x] **STATE-10**: Empty messages state is visible when a selected conversation has no messages.
+- [x] **STATE-11**: Send-message failures surface a visible operation-level error without introducing a toast dependency.
+- [x] **STATE-12**: Teacher-help pending, success, and failure states surface visible operation-level feedback.
+- [x] **STATE-13**: `ChatInput`, `TeacherEscalationCard`, `ConversationSidebar`, and `ConversationListItem` props are compatible with backend summary/detail data and pending disabled states.
 
 ### Local Integration and Documentation
 
-- [ ] **DOCS-09**: `.env.example` includes `VITE_API_BASE_URL=http://localhost:8000`.
-- [ ] **DOCS-10**: README documents Phase 4 backend integration endpoints and the expected local URLs for frontend, backend, and FastAPI docs.
-- [ ] **DOCS-11**: README documents FastAPI CORS requirements for `http://localhost:5173`.
-- [ ] **DOCS-12**: README documents that Phase 4 uses normal HTTP responses and does not implement streaming.
-- [ ] **DOCS-13**: README documents the testing-stage Codex provider strategy as a backend-only implementation detail.
-- [ ] **DOCS-14**: `npm install`, `npm run build`, and relevant `/chat` route checks pass after backend integration work.
+- [x] **DOCS-09**: `.env.example` includes `VITE_API_BASE_URL=http://localhost:8000`.
+- [x] **DOCS-10**: README documents Phase 4 backend integration endpoints and the expected local URLs for frontend, backend, and FastAPI docs.
+- [x] **DOCS-11**: README documents FastAPI CORS requirements for `http://localhost:5173`.
+- [x] **DOCS-12**: README documents that Phase 4 uses normal HTTP responses and does not implement streaming.
+- [x] **DOCS-13**: README documents the testing-stage Codex provider strategy as a backend-only implementation detail.
+- [x] **DOCS-14**: `npm install`, `npm run build`, and relevant `/chat` route checks pass after backend integration work.
 
 ## Future Requirements
 
@@ -105,43 +106,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| API-01 | Phase 11 | Pending |
-| API-02 | Phase 11 | Pending |
-| API-03 | Phase 11 | Pending |
-| API-04 | Phase 11 | Pending |
-| API-05 | Phase 13 | Pending |
-| QRY-01 | Phase 12 | Pending |
-| QRY-02 | Phase 12 | Pending |
-| QRY-03 | Phase 12 | Pending |
-| QRY-04 | Phase 12 | Pending |
-| QRY-05 | Phase 12 | Pending |
-| QRY-06 | Phase 12 | Pending |
-| CHAT-13 | Phase 13 | Pending |
-| CHAT-14 | Phase 13 | Pending |
-| CHAT-15 | Phase 13 | Pending |
-| CHAT-16 | Phase 13 | Pending |
-| CHAT-17 | Phase 13 | Pending |
-| CHAT-18 | Phase 13 | Pending |
-| CHAT-19 | Phase 13 | Pending |
-| STATE-05 | Phase 13 | Pending |
-| STATE-06 | Phase 13 | Pending |
-| STATE-07 | Phase 13 | Pending |
-| STATE-08 | Phase 13 | Pending |
-| STATE-09 | Phase 13 | Pending |
-| STATE-10 | Phase 13 | Pending |
-| STATE-11 | Phase 13 | Pending |
-| STATE-12 | Phase 13 | Pending |
-| STATE-13 | Phase 13 | Pending |
-| DOCS-09 | Phase 14 | Pending |
-| DOCS-10 | Phase 14 | Pending |
-| DOCS-11 | Phase 14 | Pending |
-| DOCS-12 | Phase 14 | Pending |
-| DOCS-13 | Phase 14 | Pending |
-| DOCS-14 | Phase 14 | Pending |
+| API-01 | Phase 11 | Complete |
+| API-02 | Phase 11 | Complete |
+| API-03 | Phase 11 | Complete |
+| API-04 | Phase 11 | Complete |
+| API-05 | Phase 13 | Complete |
+| QRY-01 | Phase 12 | Complete |
+| QRY-02 | Phase 12 | Complete |
+| QRY-03 | Phase 12 | Complete |
+| QRY-04 | Phase 12 | Complete |
+| QRY-05 | Phase 12 | Complete |
+| QRY-06 | Phase 12 | Complete |
+| CHAT-13 | Phase 13 | Complete |
+| CHAT-14 | Phase 13 | Complete |
+| CHAT-15 | Phase 13 | Complete |
+| CHAT-16 | Phase 13 | Complete |
+| CHAT-17 | Phase 13 | Complete |
+| CHAT-18 | Phase 13 | Complete |
+| CHAT-19 | Phase 13 | Complete |
+| CHAT-20 | Phase 13 | Complete |
+| STATE-05 | Phase 13 | Complete |
+| STATE-06 | Phase 13 | Complete |
+| STATE-07 | Phase 13 | Complete |
+| STATE-08 | Phase 13 | Complete |
+| STATE-09 | Phase 13 | Complete |
+| STATE-10 | Phase 13 | Complete |
+| STATE-11 | Phase 13 | Complete |
+| STATE-12 | Phase 13 | Complete |
+| STATE-13 | Phase 13 | Complete |
+| DOCS-09 | Phase 14 | Complete |
+| DOCS-10 | Phase 14 | Complete |
+| DOCS-11 | Phase 14 | Complete |
+| DOCS-12 | Phase 14 | Complete |
+| DOCS-13 | Phase 14 | Complete |
+| DOCS-14 | Phase 14 | Complete |
 
 **Coverage:**
-- v1.3 requirements: 33 total
-- Mapped to phases: 33
+- v1.3 requirements: 34 total
+- Mapped to phases: 34
 - Unmapped: 0
 
 ---

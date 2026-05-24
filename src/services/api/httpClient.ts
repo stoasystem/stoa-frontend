@@ -20,5 +20,8 @@ httpClient.interceptors.request.use((config) => {
 
 httpClient.interceptors.response.use(
   (response) => response,
-  (error) => Promise.reject(error),
+  (error) => {
+    const message = error.response?.data?.message ?? error.message ?? 'Unknown API error'
+    return Promise.reject(new Error(message))
+  },
 )

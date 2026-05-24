@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Phase 4 Backend Integration and Real Chat API
-status: planning
+status: complete
 last_updated: "2026-05-24T16:45:59.754Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 9
-  completed_plans: 0
-  percent: 0
+  completed_plans: 9
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
-**Current focus:** Milestone v1.3 Phase 4 Backend Integration and Real Chat API.
+**Current focus:** Milestone v1.3 complete; backend happy-path integration awaits a running FastAPI backend.
 
 ## Current Position
 
-Phase: Phase 11 - Chat API Contract and Client
+Phase: Milestone v1.3 complete
 Plan: —
-Status: Roadmap initialized; ready to plan Phase 11
-Last activity: 2026-05-24 — Milestone v1.3 roadmap initialized
+Status: Complete
+Last activity: 2026-05-24 — Milestone v1.3 implemented and verified
 
 ## Performance Metrics
 
@@ -83,6 +83,10 @@ Recent decisions affecting current work:
 - v1.3 roadmap continues numbering into Phase 11, Phase 12, Phase 13, and Phase 14.
 - Phase 4 frontend must call only the unified backend Chat API; testing-stage Codex provider details remain backend-only.
 - Phase 4 uses normal HTTP response flow; streaming, WebSocket, real upload, full auth, and dashboard backend APIs are deferred.
+- Phase 11 added typed chat API contracts and backend endpoint functions.
+- Phase 12 added chat query keys and TanStack Query hooks.
+- Phase 13 replaced `useMockChat` on `/chat` with backend query/mutation data flow and state handling.
+- Phase 14 updated README backend integration docs and verified build, lint, and no-backend route behavior.
 
 ### Pending Todos
 
@@ -91,6 +95,15 @@ None yet.
 ### Blockers/Concerns
 
 None currently.
+
+### Verification Notes
+
+- `npm run build` passed.
+- `npm run lint` passed.
+- In-app browser route check for `/chat` passed against a local mock backend for list/detail/send-message/teacher-help.
+- In-app browser route check for `/chat` passed in no-backend mode by rendering `Failed to load conversations.`
+- Code review findings for empty-state create flow, stale active ID handling, and happy-path coverage were addressed.
+- Real FastAPI backend smoke testing remains once the backend service is available.
 
 ## Deferred Items
 
@@ -103,10 +116,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-24 18:50
-Stopped at: v1.3 roadmap initialized
+Last session: 2026-05-24 19:15
+Stopped at: v1.3 implemented and verified
 Resume file: None
 
 ## Operator Next Steps
 
-- Start Phase 11 with /gsd-plan-phase 11
+- Run the FastAPI backend and manually verify Phase 4 happy paths against real API responses.

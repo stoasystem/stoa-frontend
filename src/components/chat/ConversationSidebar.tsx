@@ -1,16 +1,18 @@
 import { MessageSquarePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
-import type { Conversation } from '@/types/chat'
+import type { ConversationSummary } from '@/types/chat'
 
 export function ConversationSidebar({
   conversations,
   activeConversationId,
   onSelectConversation,
+  onCreateConversation,
 }: {
-  conversations: Conversation[]
+  conversations: ConversationSummary[]
   activeConversationId: string
   onSelectConversation: (id: string) => void
+  onCreateConversation?: () => void
 }) {
   return (
     <aside className="hidden h-screen w-80 shrink-0 border-r bg-background/95 p-4 md:block">
@@ -19,7 +21,13 @@ export function ConversationSidebar({
           <div className="font-semibold tracking-tight">STOA Chat</div>
           <div className="text-xs text-muted-foreground">Student learning conversations</div>
         </div>
-        <Button size="icon" variant="outline" aria-label="New conversation">
+        <Button
+          size="icon"
+          variant="outline"
+          aria-label="New conversation"
+          onClick={onCreateConversation}
+          disabled={!onCreateConversation}
+        >
           <MessageSquarePlus className="h-4 w-4" />
         </Button>
       </div>

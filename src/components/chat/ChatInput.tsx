@@ -3,14 +3,19 @@ import { Send, Upload } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
-export function ChatInput({ onSendMessage }: { onSendMessage: (message: string) => void }) {
+type ChatInputProps = {
+  onSendMessage: (message: string) => void
+  disabled?: boolean
+}
+
+export function ChatInput({ onSendMessage, disabled = false }: ChatInputProps) {
   const [value, setValue] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const trimmed = value.trim()
-    if (!trimmed) return
+    if (!trimmed || disabled) return
 
     onSendMessage(trimmed)
     setValue('')
@@ -27,8 +32,9 @@ export function ChatInput({ onSendMessage }: { onSendMessage: (message: string) 
           onChange={(event) => setValue(event.target.value)}
           placeholder="Ask a homework question..."
           className="min-h-12 resize-none"
+          disabled={disabled}
         />
-        <Button type="submit" size="icon" aria-label="Send message">
+        <Button type="submit" size="icon" aria-label="Send message" disabled={disabled}>
           <Send className="h-4 w-4" />
         </Button>
       </div>

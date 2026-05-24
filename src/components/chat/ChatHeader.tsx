@@ -2,7 +2,12 @@ import { MessageSquarePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import type { Conversation } from '@/types/chat'
 
-export function ChatHeader({ conversation }: { conversation: Conversation | null }) {
+type ChatHeaderProps = {
+  conversation: Conversation | null
+  onCreateConversation?: () => void
+}
+
+export function ChatHeader({ conversation, onCreateConversation }: ChatHeaderProps) {
   return (
     <header className="flex min-h-16 items-center justify-between border-b bg-background/95 px-4 py-3 md:px-6">
       <div className="min-w-0">
@@ -13,7 +18,14 @@ export function ChatHeader({ conversation }: { conversation: Conversation | null
           {conversation ? `${conversation.subject} · ${conversation.grade}` : 'Select a conversation'}
         </p>
       </div>
-      <Button className="md:hidden" size="icon" variant="outline" aria-label="New conversation">
+      <Button
+        className="md:hidden"
+        size="icon"
+        variant="outline"
+        aria-label="New conversation"
+        onClick={onCreateConversation}
+        disabled={!onCreateConversation}
+      >
         <MessageSquarePlus className="h-4 w-4" />
       </Button>
     </header>

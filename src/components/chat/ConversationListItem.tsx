@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import type { Conversation } from '@/types/chat'
+import type { ConversationSummary } from '@/types/chat'
 
 function formatUpdatedAt(value: string) {
   return new Intl.DateTimeFormat('en', {
@@ -13,12 +13,10 @@ export function ConversationListItem({
   active,
   onClick,
 }: {
-  conversation: Conversation
+  conversation: ConversationSummary
   active: boolean
   onClick: () => void
 }) {
-  const latestMessage = conversation.messages[conversation.messages.length - 1]
-
   return (
     <button
       type="button"
@@ -35,9 +33,9 @@ export function ConversationListItem({
       <div className="mt-1 text-xs text-muted-foreground">
         {conversation.subject} · {conversation.grade}
       </div>
-      {latestMessage && (
+      {conversation.lastMessagePreview && (
         <div className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
-          {latestMessage.content}
+          {conversation.lastMessagePreview}
         </div>
       )}
     </button>
