@@ -1,0 +1,145 @@
+# Codebase Structure
+
+**Analysis Date:** 2026-05-24
+
+## Directory Layout
+
+```
+stoa-frontend/
+├── .gitignore              # Ignored dependencies, build output, and env files
+├── README.md               # Stack and setup notes
+├── package.json            # npm scripts and dependencies
+├── vite.config.ts          # Vite dev server and proxy config
+└── src/                    # React frontend source
+    ├── App.tsx             # Route table
+    ├── main.tsx            # React app bootstrap
+    ├── lib/                # API/auth client configuration
+    ├── stores/             # Zustand stores
+    └── pages/              # Role-specific route pages
+```
+
+## Directory Purposes
+
+**`src/`:**
+- Purpose: All application source code.
+- Contains: App bootstrap, routes, stores, client libraries, and page components.
+- Key files: `src/main.tsx`, `src/App.tsx`.
+- Subdirectories: `lib/`, `stores/`, `pages/`.
+
+**`src/lib/`:**
+- Purpose: External service and client configuration.
+- Contains: Axios API client and Amplify config.
+- Key files:
+  - `src/lib/api.ts` - Axios singleton with JWT request interceptor and 401 response handling.
+  - `src/lib/amplify.ts` - Cognito config derived from Vite environment variables.
+- Subdirectories: None.
+
+**`src/stores/`:**
+- Purpose: Global browser state managed by Zustand.
+- Contains: Small typed stores.
+- Key files:
+  - `src/stores/authStore.ts` - Current user and setter.
+  - `src/stores/questionStore.ts` - Pending image key for question flow.
+- Subdirectories: None.
+
+**`src/pages/`:**
+- Purpose: Route-level React components grouped by user role.
+- Contains: role directories for student, parent, teacher, and admin pages.
+- Key files:
+  - `src/pages/student/Home.tsx`
+  - `src/pages/student/Ask.tsx`
+  - `src/pages/student/Answer.tsx`
+  - `src/pages/student/History.tsx`
+  - `src/pages/parent/Dashboard.tsx`
+  - `src/pages/parent/Report.tsx`
+  - `src/pages/teacher/Queue.tsx`
+  - `src/pages/teacher/Session.tsx`
+  - `src/pages/admin/Dashboard.tsx`
+
+## Key File Locations
+
+**Entry Points:**
+- `src/main.tsx` - Configures Amplify, creates the React Query client, and mounts React.
+- `src/App.tsx` - Defines all client-side routes and root redirect.
+
+**Configuration:**
+- `package.json` - Scripts and dependencies.
+- `vite.config.ts` - Vite React plugin, dev server port, and backend proxy.
+- `.gitignore` - Excludes `node_modules/`, `dist/`, and env files.
+- `README.md` - Setup and environment variable documentation.
+
+**Core Logic:**
+- `src/lib/api.ts` - Backend API boundary and auth response behavior.
+- `src/lib/amplify.ts` - Cognito configuration.
+- `src/stores/authStore.ts` - User role and subscription state.
+- `src/stores/questionStore.ts` - Question image handoff state.
+
+**Testing:**
+- No test directory or test files exist.
+- No test script exists in `package.json`.
+
+**Documentation:**
+- `README.md` - Current user-facing and developer setup documentation.
+- `.planning/codebase/*.md` - GSD-generated codebase map.
+
+## Naming Conventions
+
+**Files:**
+- PascalCase `.tsx` for page components: `Home.tsx`, `Dashboard.tsx`, `Session.tsx`.
+- camelCase `.ts` for stores and libs: `authStore.ts`, `questionStore.ts`, `api.ts`, `amplify.ts`.
+- Uppercase markdown for root docs: `README.md`.
+
+**Directories:**
+- Lowercase role directories under `src/pages/`: `student`, `parent`, `teacher`, `admin`.
+- Plural directory names for collections: `pages`, `stores`.
+- Short functional directory name for shared clients: `lib`.
+
+**Special Patterns:**
+- Route components default-export a function component.
+- Stores export named `useXStore` hooks.
+- No barrel files are currently used.
+
+## Where to Add New Code
+
+**New Role Page:**
+- Primary code: add a `.tsx` file under the relevant `src/pages/<role>/` directory.
+- Route registration: add a `<Route>` in `src/App.tsx`.
+- Tests: add tests once a test framework is introduced.
+
+**New API-backed Feature:**
+- API calls: use `src/lib/api.ts` so Cognito JWT injection and 401 behavior are applied.
+- Server state: prefer TanStack Query hooks near the feature or in a future `src/hooks/` / `src/features/` structure.
+- Client state: use Zustand only for cross-route browser state that is not server-derived.
+
+**New Auth or Role Logic:**
+- Auth config: `src/lib/amplify.ts`.
+- Auth state shape: `src/stores/authStore.ts`.
+- Route protection: likely belongs in `src/App.tsx` or a future route guard component.
+
+**Shared UI Components:**
+- No shared component directory exists yet.
+- Add a dedicated `src/components/` or `src/features/<domain>/components/` directory when the first reusable UI appears.
+
+**Utilities:**
+- Shared non-UI helpers can go under `src/lib/` if they wrap infrastructure, or a future `src/utils/` if they are pure utility functions.
+
+## Special Directories
+
+**`.planning/`:**
+- Purpose: GSD planning and codebase intelligence documents.
+- Source: generated by GSD workflows.
+- Committed: expected to be committed when `commit_docs` is true.
+
+**`dist/`:**
+- Purpose: Vite production build output.
+- Source: generated by `npm run build`.
+- Committed: no, ignored in `.gitignore`.
+
+**`node_modules/`:**
+- Purpose: installed npm dependencies.
+- Source: generated by package manager install.
+- Committed: no, ignored in `.gitignore`.
+
+---
+*Structure analysis: 2026-05-24*
+*Update when directory structure changes*
