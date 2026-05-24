@@ -1,5 +1,30 @@
 # Milestones
 
+## v1.3 Phase 4 Backend Integration and Real Chat API (Shipped: 2026-05-24)
+
+**Phases completed:** 4 phases, 9 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.3-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Typed Phase 4 chat API contract for conversations, messages, conversation creation, and teacher-help requests.
+- Chat API service functions for `/conversations`, `/conversations/:conversationId`, `/conversations/:conversationId/messages`, and `/teacher-help/request`.
+- TanStack Query chat keys plus conversation, create-conversation, send-message, and teacher-help hooks.
+- `/chat` switched from `useMockChat` to backend query/mutation data flow.
+- Loading, error, empty, pending, send-failure, teacher-help success/error, and first-conversation states.
+- README Phase 4 backend integration documentation, including FastAPI CORS and backend-only Codex testing-provider strategy.
+
+### Verification
+
+- Requirements: 34/34 complete.
+- Phases: 4/4 complete.
+- Build: passed.
+- Lint: passed.
+- Browser route check with local mock backend: passed for list, detail, send-message, and teacher-help.
+- Browser route check without backend: passed with visible error state.
+
+---
+
 ## v1.2 Core Product UI - Complete
 
 **Completed:** 2026-05-24

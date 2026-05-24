@@ -2,33 +2,21 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation and a visible mock product prototype for AI-supported student learning.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, and a backend-integrated student chat flow for real conversation data.
 
-The app includes a demonstrable STOA core product UI: a mock-driven student chat workspace, conversation list, message flow, teacher-help placeholder, and student learning dashboard. The next major product step is backend integration for real conversations, messages, teacher-help requests, and dashboard data.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, and a mock student learning dashboard. The next major product step is a richer real learning workflow: streaming, upload, retry, and deeper teacher escalation states.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
-
-## Current Milestone: v1.3 Phase 4 Backend Integration and Real Chat API
-
-**Goal:** Connect the Phase 3 chat UI to the real backend Chat API so conversations, messages, send-message, teacher-help requests, and local FastAPI/Codex-provider integration are driven through the unified STOA backend contract.
-
-**Target features:**
-- Define and document the frontend/backend chat API contract for conversations, messages, conversation creation, send-message, and teacher-help request flows.
-- Replace `useMockChat` on `/chat` with TanStack Query hooks and Axios service functions that call the backend.
-- Add loading, error, empty, pending, and basic operation feedback states for the chat data flow.
-- Keep the frontend decoupled from model providers: the backend may use Codex during testing, but the frontend only calls STOA backend endpoints.
-- Document local FastAPI integration, CORS expectations, `.env.example`, and the non-streaming Phase 4 response model.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow backed by the unified backend Chat API contract.
 
 ## Current State
 
-**Latest shipped milestone:** v1.2 Core Product UI
-
-**Current milestone:** v1.3 Phase 4 Backend Integration and Real Chat API
+**Latest shipped milestone:** v1.3 Phase 4 Backend Integration and Real Chat API
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
+- `/chat` backend-integrated product UI with conversation list/detail queries, create-conversation, send-message, teacher-help request, and API state handling.
 - `/dashboard` mock student learning overview with stats, recent questions, weak topics, learning progress, and teacher feedback.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
@@ -45,15 +33,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can install, run, build, lint, preview, and inspect the minimal STOA frontend foundation — v1.0
 - ✓ Frontend development foundation exists with TailwindCSS, UI primitives, routing, providers, services, stores, layouts, pages, theme notes, and docs — v1.1
 - ✓ Developers can run the app and demo mock STOA chat plus student dashboard product UI — v1.2
+- ✓ Developers can run the app and exercise STOA chat through the unified backend Chat API contract — v1.3
 
 ### Active
 
-- [ ] Frontend and backend share a stable Phase 4 Chat API contract for conversation list, conversation detail, conversation creation, send-message, and teacher-help request endpoints.
-- [ ] `/chat` loads conversation summaries and selected conversation messages from the backend rather than `mockConversations`.
-- [ ] Sending a chat message calls the backend and refreshes conversation data after the backend returns the student and assistant messages.
-- [ ] Request-teacher action calls the backend teacher-help endpoint and surfaces pending/success/error feedback.
-- [ ] Chat loading, error, empty, and pending states are visible and usable.
-- [ ] README documents local FastAPI integration, CORS requirements, `VITE_API_BASE_URL`, and the testing-stage Codex-provider strategy.
+(None currently — v1.3 Backend Integration and Real Chat API is complete)
 
 ### Out of Scope
 
@@ -69,7 +53,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Context
 
-The project brief for Phase 4 was provided in Chinese and defines the backend integration milestone for the existing chat UI. It is not a streaming, upload, authentication, dashboard API, or production deployment milestone; it is focused on proving the real chat data flow through a unified backend API.
+The project brief for Phase 4 was provided in Chinese and defined the backend integration milestone for the existing chat UI. It was not a streaming, upload, authentication, dashboard API, or production deployment milestone; it focused on proving the real chat data flow through a unified backend API.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -82,7 +66,7 @@ Current codebase facts:
 - v1.0 shipped the minimal STOA Vite app.
 - v1.1 shipped TailwindCSS, shadcn-style UI primitives, routing, providers, API services, stores, layouts, common components, and documentation.
 - v1.2 shipped the first mock product UI for `/chat` and `/dashboard`.
-- The chat/dashboard UI is props-driven and mock-data-backed so v1.3 can replace local chat data with TanStack Query and Axios API flows.
+- v1.3 shipped backend-integrated `/chat` data flow using TanStack Query and Axios API services.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
@@ -113,6 +97,7 @@ Current codebase facts:
 | Continue phase numbering into v1.3 | Keeps GSD history continuous; Phase 4 product work will use GSD Phase 11+ execution numbers | ✓ Good |
 | Keep model-provider calls behind the backend | Lets testing use Codex now and swap providers later without frontend contract churn | — Pending |
 | Use non-streaming HTTP responses for Phase 4 chat replies | Proves the backend data path before adding streaming complexity in Phase 5 | — Pending |
+| Add create-conversation support in empty chat state | Prevents first-time users from hitting a dead end when the backend returns no conversations | ✓ Good |
 
 ## Evolution
 
@@ -132,4 +117,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.3 milestone initialization*
+*Last updated: 2026-05-24 after v1.3 milestone*
