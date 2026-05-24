@@ -59,6 +59,31 @@ This project now includes:
 - Axios
 - lucide-react
 
+## Phase 3 Core Product UI
+
+This phase adds the first version of the STOA product interface.
+
+Included pages:
+
+- `/chat`
+- `/dashboard`
+
+Included UI modules:
+
+- Conversation sidebar
+- Chat message list
+- Message bubbles
+- Chat input
+- Mock AI response state
+- Teacher help placeholder
+- Student dashboard cards
+- Recent questions
+- Weak topics
+- Learning progress
+- Teacher feedback
+
+This phase uses mock data only. Backend integration will be handled in the next phase.
+
 ## Environment Variables
 
 Create a local environment file:
@@ -76,10 +101,10 @@ VITE_API_BASE_URL=http://localhost:8000
 ## Available Routes
 
 - `/` Home
-- `/chat` Chat placeholder
-- `/dashboard` Student dashboard placeholder
+- `/chat` Mock chat product UI
+- `/dashboard` Student dashboard product UI
 - `/login` Login placeholder
 
 ## Project Status
 
-Phase 2: frontend development foundation initialized.
+Phase 3: core product UI prototype initialized with mock data.

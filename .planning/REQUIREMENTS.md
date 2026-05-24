@@ -102,17 +102,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CHAT-10 | Phase 9 | Complete |
 | CHAT-11 | Phase 9 | Complete |
 | CHAT-12 | Phase 9 | Complete |
-| DASH-01 | Phase 10 | Pending |
-| DASH-02 | Phase 10 | Pending |
-| DASH-03 | Phase 10 | Pending |
-| DASH-04 | Phase 10 | Pending |
-| DASH-05 | Phase 10 | Pending |
-| DASH-06 | Phase 10 | Pending |
-| DASH-07 | Phase 10 | Pending |
-| DASH-08 | Phase 10 | Pending |
-| DOCS-06 | Phase 10 | Pending |
-| DOCS-07 | Phase 10 | Pending |
-| DOCS-08 | Phase 10 | Pending |
+| DASH-01 | Phase 10 | Complete |
+| DASH-02 | Phase 10 | Complete |
+| DASH-03 | Phase 10 | Complete |
+| DASH-04 | Phase 10 | Complete |
+| DASH-05 | Phase 10 | Complete |
+| DASH-06 | Phase 10 | Complete |
+| DASH-07 | Phase 10 | Complete |
+| DASH-08 | Phase 10 | Complete |
+| DOCS-06 | Phase 10 | Complete |
+| DOCS-07 | Phase 10 | Complete |
+| DOCS-08 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.2 requirements: 27 total
