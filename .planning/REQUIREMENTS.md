@@ -1,67 +1,86 @@
-# Requirements: STOA Frontend v1.2 Core Product UI
+# Requirements: STOA Frontend v1.3 Phase 4 Backend Integration and Real Chat API
 
 **Defined:** 2026-05-24
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and see a credible STOA product prototype that demonstrates the core student AI learning flow with mock data.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA student chat flow that can switch from mock data to the unified backend Chat API.
 
-## v1.2 Requirements
+## v1.3 Requirements
 
-Requirements for the third-stage core product UI milestone. Each maps to roadmap phases.
+Requirements for the fourth-stage backend chat integration milestone. Each maps to roadmap phases.
 
-### Product Contracts
+### API Contract
 
-- [x] **TYPE-04**: Chat types define `ChatRole`, `ChatMessageStatus`, `ChatMessage`, and `Conversation` with subject, grade, timestamps, conversation IDs, and message status.
-- [x] **TYPE-05**: Dashboard types define dashboard stats, weak topics, recent questions, teacher feedback, and learning progress data contracts.
-- [x] **DATA-01**: Mock conversations exist under `src/data/` and include multiple conversations with student and assistant messages.
-- [x] **DATA-02**: Mock dashboard data exists under `src/data/` and includes stats, weak topics, recent questions, learning progress, and teacher feedback.
+- [ ] **API-01**: Frontend chat types define `ConversationSummary`, `Conversation`, `ConversationListResponse`, `CreateConversationRequest`, `SendMessageRequest`, `SendMessageResponse`, `TeacherHelpRequest`, and `TeacherHelpResponse`.
+- [ ] **API-02**: Chat API client exposes typed functions for `GET /conversations`, `GET /conversations/:conversationId`, `POST /conversations`, `POST /conversations/:conversationId/messages`, and `POST /teacher-help/request`.
+- [ ] **API-03**: Chat API requests use the shared Axios `httpClient` and keep endpoint calls centralized under `src/services/chat/`.
+- [ ] **API-04**: Frontend contract uses frontend-friendly camelCase fields and prevents backend wire-format differences from leaking into chat components.
+- [ ] **API-05**: Frontend documentation records that model-provider details, including testing-stage Codex usage, are backend-only and not frontend API concerns.
 
-### Chat UI
+### Query Integration
 
-- [x] **CHAT-01**: User can open `/chat` and see a full chat workspace instead of a placeholder page.
-- [x] **CHAT-02**: User can see a desktop conversation sidebar with existing mock conversations.
-- [x] **CHAT-03**: User can click different conversations and see the active message history update.
-- [x] **CHAT-04**: User can distinguish student and assistant messages through message bubble alignment and styling.
-- [x] **CHAT-05**: User can type a question in the chat input and send it with a button.
-- [x] **CHAT-06**: User sees their sent message appear immediately in the active conversation.
-- [x] **CHAT-07**: User sees an AI thinking/loading state after sending a message.
-- [x] **CHAT-08**: User receives a delayed mock assistant response after the loading state.
-- [x] **CHAT-09**: User can see a file upload entry point placeholder.
-- [x] **CHAT-10**: User can see a request-teacher entry point placeholder.
-- [x] **CHAT-11**: Chat UI remains usable on small screens by preventing message/input overflow and hiding the desktop sidebar.
-- [x] **CHAT-12**: Mock chat state is isolated in `useMockChat` and can later be replaced by API-backed query/mutation hooks.
+- [ ] **QRY-01**: Chat query keys are centralized in `src/services/chat/chatQueryKeys.ts`.
+- [ ] **QRY-02**: `useConversationsQuery` loads the backend conversation list through TanStack Query.
+- [ ] **QRY-03**: `useConversationQuery` loads the selected backend conversation detail and does not fetch when there is no active conversation ID.
+- [ ] **QRY-04**: `useSendMessageMutation` posts messages to the active conversation and invalidates both conversation detail and list queries on success.
+- [ ] **QRY-05**: `useTeacherHelpMutation` posts teacher-help requests through the backend API.
+- [ ] **QRY-06**: Chat server state is managed through TanStack Query hooks under `src/hooks/chat/` rather than duplicated into Zustand or mock hooks.
 
-### Student Dashboard
+### Chat Page Data Flow
 
-- [x] **DASH-01**: User can open `/dashboard` and see a student learning overview instead of a placeholder page.
-- [x] **DASH-02**: User can see dashboard stat cards for questions asked, teacher help sessions, and learning streak.
-- [x] **DASH-03**: User can see recent questions with subject and answer status.
-- [x] **DASH-04**: User can see weak topics with subject and level.
-- [x] **DASH-05**: User can see a learning progress module.
-- [x] **DASH-06**: User can see teacher feedback.
-- [x] **DASH-07**: Dashboard UI uses responsive grids that collapse to one column on small screens.
-- [x] **DASH-08**: Dashboard modules receive data through props so future API integration does not require rewriting presentational components.
+- [ ] **CHAT-13**: `/chat` no longer depends on `useMockChat` or `mockConversations` for conversation list, active messages, or send-message behavior.
+- [ ] **CHAT-14**: `/chat` automatically selects the first backend conversation when conversations load and no active conversation is selected.
+- [ ] **CHAT-15**: User can click a backend conversation summary and see the selected conversation detail load from the backend.
+- [ ] **CHAT-16**: User can send a non-empty message from `/chat` and the frontend calls `POST /conversations/:conversationId/messages`.
+- [ ] **CHAT-17**: After a successful send, the displayed messages refresh from backend conversation data including the returned assistant response.
+- [ ] **CHAT-18**: During send-message pending state, chat input and send button are disabled and the message list shows assistant thinking.
+- [ ] **CHAT-19**: User can request teacher help from the active conversation and the frontend calls `POST /teacher-help/request`.
 
-### Documentation and Verification
+### UI States and Feedback
 
-- [x] **DOCS-06**: README documents Phase 3 Core Product UI, included routes, included UI modules, and mock-data-only scope.
-- [x] **DOCS-07**: `npm install`, `npm run dev`, `npm run build`, and relevant route checks for `/chat` and `/dashboard` pass.
-- [x] **DOCS-08**: Phase 3 work is committed with a clear Core Product UI commit history.
+- [ ] **STATE-05**: Conversation list loading state is visible while `GET /conversations` is pending.
+- [ ] **STATE-06**: Conversation list error state is visible when `GET /conversations` fails.
+- [ ] **STATE-07**: Empty state is visible when `GET /conversations` returns no items.
+- [ ] **STATE-08**: Conversation detail loading state is visible while `GET /conversations/:conversationId` is pending.
+- [ ] **STATE-09**: Conversation detail error state is visible when selected conversation loading fails.
+- [ ] **STATE-10**: Empty messages state is visible when a selected conversation has no messages.
+- [ ] **STATE-11**: Send-message failures surface a visible operation-level error without introducing a toast dependency.
+- [ ] **STATE-12**: Teacher-help pending, success, and failure states surface visible operation-level feedback.
+- [ ] **STATE-13**: `ChatInput`, `TeacherEscalationCard`, `ConversationSidebar`, and `ConversationListItem` props are compatible with backend summary/detail data and pending disabled states.
+
+### Local Integration and Documentation
+
+- [ ] **DOCS-09**: `.env.example` includes `VITE_API_BASE_URL=http://localhost:8000`.
+- [ ] **DOCS-10**: README documents Phase 4 backend integration endpoints and the expected local URLs for frontend, backend, and FastAPI docs.
+- [ ] **DOCS-11**: README documents FastAPI CORS requirements for `http://localhost:5173`.
+- [ ] **DOCS-12**: README documents that Phase 4 uses normal HTTP responses and does not implement streaming.
+- [ ] **DOCS-13**: README documents the testing-stage Codex provider strategy as a backend-only implementation detail.
+- [ ] **DOCS-14**: `npm install`, `npm run build`, and relevant `/chat` route checks pass after backend integration work.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Backend Integration
+### Streaming and Message UX
 
-- **API-01**: Chat UI loads conversations from `GET /conversations`.
-- **API-02**: Chat UI loads a selected conversation from `GET /conversations/:conversationId`.
-- **API-03**: Chat UI sends messages through `POST /conversations/:conversationId/messages`.
-- **API-04**: User can create a conversation through `POST /conversations`.
-- **API-05**: User can request teacher help through `POST /teacher-help/request`.
-- **API-06**: Dashboard loads student overview data from `GET /students/me/dashboard`.
 - **STREAM-01**: AI chat supports streaming responses.
+- **STREAM-02**: User can abort an in-progress assistant generation.
+- **MSG-01**: User can retry failed messages.
+- **MSG-02**: Chat uses full optimistic message updates with rollback.
+
+### Uploads and Learning Workflow
+
 - **UPLOAD-01**: User can upload files for AI-supported learning.
+- **UPLOAD-02**: User can upload images or PDFs as homework question context.
+- **FLOW-01**: User can create a new conversation through a polished UI flow.
+- **FLOW-02**: Teacher escalation status updates beyond the initial request response.
+
+### Other Product Areas
+
+- **DASHAPI-01**: Dashboard loads student overview data from `GET /students/me/dashboard`.
 - **AUTH-01**: User can register, log in, and persist sessions through real auth integration.
+- **PARENT-01**: Parent dashboard uses backend data.
+- **TUTOR-01**: Tutor or teacher dashboard uses backend data.
 - **PAY-01**: Payment and subscription flows exist.
+- **DEPLOY-01**: Production deployment workflow exists.
 
 ## Out of Scope
 
@@ -69,16 +88,16 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Real AI API integration | Phase 3 proves the UI flow with mock data before backend contracts are wired. |
-| Real streaming response | Requires API contract and streaming technical design in a later phase. |
-| Real file upload | Phase 3 only exposes an upload affordance. |
-| Real login/auth enforcement | Existing auth scaffolding remains, but Phase 3 is not an auth milestone. |
-| Real teacher routing | Phase 3 only exposes the request-teacher placeholder. |
-| Parent dashboard | Student product UI is the only dashboard scope for this milestone. |
-| Tutor/teacher dashboard | Teacher escalation UI is placeholder-only. |
-| Payment | Explicitly excluded from this product UI milestone. |
-| Production deployment | Not part of this milestone. |
-| Mobile conversation drawer | Baseline responsive behavior is enough; drawer UX can be added later. |
+| Token streaming | Phase 4 proves normal HTTP request/response first; streaming belongs in Phase 5. |
+| WebSocket | Not required for the Phase 4 backend contract. |
+| Direct frontend model API calls | The frontend must remain decoupled from OpenAI, Claude, Gemini, DeepSeek, Codex, and other providers. |
+| Frontend `STOA_AI_PROVIDER` config | AI provider selection is backend-only. |
+| Real file upload | Upload is deferred to Phase 5. |
+| Full auth enforcement | Authorization expectations may be confirmed, but real login enforcement is not implemented here. |
+| Parent dashboard API | Phase 4 focuses on chat only. |
+| Tutor/teacher dashboard API | Teacher help is limited to the request endpoint. |
+| Production deployment | Local integration and build verification only. |
+| Complex permission system | Deferred until auth and role-specific APIs are defined. |
 
 ## Traceability
 
@@ -86,39 +105,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TYPE-04 | Phase 8 | Complete |
-| TYPE-05 | Phase 8 | Complete |
-| DATA-01 | Phase 8 | Complete |
-| DATA-02 | Phase 8 | Complete |
-| CHAT-01 | Phase 9 | Complete |
-| CHAT-02 | Phase 9 | Complete |
-| CHAT-03 | Phase 9 | Complete |
-| CHAT-04 | Phase 9 | Complete |
-| CHAT-05 | Phase 9 | Complete |
-| CHAT-06 | Phase 9 | Complete |
-| CHAT-07 | Phase 9 | Complete |
-| CHAT-08 | Phase 9 | Complete |
-| CHAT-09 | Phase 9 | Complete |
-| CHAT-10 | Phase 9 | Complete |
-| CHAT-11 | Phase 9 | Complete |
-| CHAT-12 | Phase 9 | Complete |
-| DASH-01 | Phase 10 | Complete |
-| DASH-02 | Phase 10 | Complete |
-| DASH-03 | Phase 10 | Complete |
-| DASH-04 | Phase 10 | Complete |
-| DASH-05 | Phase 10 | Complete |
-| DASH-06 | Phase 10 | Complete |
-| DASH-07 | Phase 10 | Complete |
-| DASH-08 | Phase 10 | Complete |
-| DOCS-06 | Phase 10 | Complete |
-| DOCS-07 | Phase 10 | Complete |
-| DOCS-08 | Phase 10 | Complete |
+| API-01 | Phase 11 | Pending |
+| API-02 | Phase 11 | Pending |
+| API-03 | Phase 11 | Pending |
+| API-04 | Phase 11 | Pending |
+| API-05 | Phase 13 | Pending |
+| QRY-01 | Phase 12 | Pending |
+| QRY-02 | Phase 12 | Pending |
+| QRY-03 | Phase 12 | Pending |
+| QRY-04 | Phase 12 | Pending |
+| QRY-05 | Phase 12 | Pending |
+| QRY-06 | Phase 12 | Pending |
+| CHAT-13 | Phase 13 | Pending |
+| CHAT-14 | Phase 13 | Pending |
+| CHAT-15 | Phase 13 | Pending |
+| CHAT-16 | Phase 13 | Pending |
+| CHAT-17 | Phase 13 | Pending |
+| CHAT-18 | Phase 13 | Pending |
+| CHAT-19 | Phase 13 | Pending |
+| STATE-05 | Phase 13 | Pending |
+| STATE-06 | Phase 13 | Pending |
+| STATE-07 | Phase 13 | Pending |
+| STATE-08 | Phase 13 | Pending |
+| STATE-09 | Phase 13 | Pending |
+| STATE-10 | Phase 13 | Pending |
+| STATE-11 | Phase 13 | Pending |
+| STATE-12 | Phase 13 | Pending |
+| STATE-13 | Phase 13 | Pending |
+| DOCS-09 | Phase 14 | Pending |
+| DOCS-10 | Phase 14 | Pending |
+| DOCS-11 | Phase 14 | Pending |
+| DOCS-12 | Phase 14 | Pending |
+| DOCS-13 | Phase 14 | Pending |
+| DOCS-14 | Phase 14 | Pending |
 
 **Coverage:**
-- v1.2 requirements: 27 total
-- Mapped to phases: 27
+- v1.3 requirements: 33 total
+- Mapped to phases: 33
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after v1.2 initialization*
+*Last updated: 2026-05-24 after v1.3 initialization*
