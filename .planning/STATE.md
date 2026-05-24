@@ -1,12 +1,16 @@
 ---
-milestone: v1.1
-milestone_name: Frontend Development Foundation
-status: complete
+gsd_state_version: 1.0
+milestone: v1.2
+milestone_name: Core Product UI
+status: planning
+last_updated: "2026-05-24T16:16:58.545Z"
+last_activity: 2026-05-24
 progress:
-  completed_phases: 4
-  total_phases: 4
-  completed_plans: 8
-  total_plans: 8
+  total_phases: 3
+  completed_phases: 0
+  total_plans: 6
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -15,21 +19,20 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-24)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and continue STOA product work from a stable, organized frontend application foundation.
-**Current focus:** Milestone v1.1 complete
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and see a credible STOA product prototype that demonstrates the core student AI learning flow with mock data.
+**Current focus:** Milestone v1.2 Core Product UI planning complete; ready to start Phase 8.
 
 ## Current Position
 
-Phase: 7 of 7 (Acceptance Page, Documentation, and Verification)
-Plan: 2 of 2 complete
-Status: Milestone complete
-Last activity: 2026-05-24 — Milestone v1.1 audited and passed
-
-Progress: [██████████] 100%
+Phase: 8 of 10 (Product UI Types and Mock Data)
+Plan: —
+Status: Roadmap initialized
+Last activity: 2026-05-24 — Milestone v1.2 roadmap initialized
 
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 8
 - Average duration: n/a
 - Total execution time: 0 hours
@@ -44,6 +47,7 @@ Progress: [██████████] 100%
 | Phase 7 | 2 | n/a | n/a |
 
 **Recent Trend:**
+
 - Last 5 plans: 05-02, 06-01, 06-02, 07-01, 07-02
 - Trend: n/a
 
@@ -69,6 +73,9 @@ Recent decisions affecting current work:
 - Phase 6 added API services, Zustand stores, hooks, shared types, env example, and common components.
 - Phase 7 added the acceptance page, README updates, route checks, preview check, and final verification.
 - Milestone audit passed with 38/38 requirements satisfied.
+- Milestone v1.2 started from the Phase 3 Core Product UI brief.
+- Phase 3 product UI remains mock-data-only; backend integration, streaming, real upload, and real teacher routing are deferred.
+- v1.2 roadmap continues numbering into Phase 8, Phase 9, and Phase 10.
 
 ### Pending Todos
 
@@ -84,10 +91,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Product | Real login, AI chat behavior, AI streaming, dashboard business logic, payments, backend integration, and deployment | Deferred to later milestones | v1.1 initialization |
+| Product | Real login, real AI chat behavior, AI streaming, real file upload, teacher routing, parent/tutor dashboards, payments, backend integration, and deployment | Deferred to later milestones | v1.2 initialization |
 
 ## Session Continuity
 
-Last session: 2026-05-24 17:20
-Stopped at: v1.1 roadmap initialized, autonomous execution ready to start at Phase 4
+Last session: 2026-05-24 18:18
+Stopped at: v1.2 roadmap initialized, ready to start Phase 8
 Resume file: None

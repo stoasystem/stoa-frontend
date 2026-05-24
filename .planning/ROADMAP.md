@@ -3,7 +3,8 @@
 ## Milestones
 
 - ✅ **v1.0 Frontend Foundation** - Phases 1-3 (shipped 2026-05-24)
-- 🚧 **v1.1 Frontend Development Foundation** - Phases 4-7 (in progress)
+- ✅ **v1.1 Frontend Development Foundation** - Phases 4-7 (shipped 2026-05-24)
+- 🚧 **v1.2 Core Product UI** - Phases 8-10 (in progress)
 
 ## Phases
 
@@ -36,81 +37,93 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Frontend Development Foundation (In Progress)
-
-**Milestone Goal:** Turn the Phase 1 Vite foundation into a formal STOA frontend development base with styling, routing, providers, API layer, state stores, layouts, placeholder pages, theme entry, and documentation.
-
-- [x] **Phase 4: Styling and UI Foundation** - Configure TailwindCSS, shadcn-style UI primitives, lucide icons, alias support, STOA theme tokens, and design notes.
-- [x] **Phase 5: App Providers, Router, Layouts, and Pages** - Establish the app shell with providers, router, layouts, and placeholder routes.
-- [x] **Phase 6: Services, State, Types, Hooks, and Common Components** - Add reusable API, state, type, hook, and common component foundations for future product work.
-- [x] **Phase 7: Acceptance Page, Documentation, and Verification** - Prove the Phase 2 stack works through the Home acceptance page, README updates, command verification, and GitHub handoff.
+<details>
+<summary>✅ v1.1 Frontend Development Foundation (Phases 4-7) - SHIPPED 2026-05-24</summary>
 
 ### Phase 4: Styling and UI Foundation
 **Goal**: Configure TailwindCSS, shadcn-style UI primitives, lucide icons, alias support, STOA theme tokens, and design notes.
-**Depends on**: Phase 3
 **Requirements**: [STYLE-01, STYLE-02, STYLE-03, STYLE-04, STYLE-05, STYLE-06]
-**Success Criteria** (what must be TRUE):
-  1. Developer can use Tailwind utility classes in pages and components.
-  2. Vite and TypeScript resolve `@/*` imports.
-  3. shadcn-style UI primitives exist under `src/components/ui/`.
-  4. STOA theme tokens and design notes exist under `src/styles/`.
-**Plans**: 2 plans
-
-Plans:
-- [x] 04-01: Install and configure TailwindCSS, icons, aliases, and theme files.
-- [x] 04-02: Add shadcn-style UI primitive components.
+**Plans**: 2 plans complete
 
 ### Phase 5: App Providers, Router, Layouts, and Pages
 **Goal**: Establish the app shell with providers, router, layouts, and placeholder routes.
-**Depends on**: Phase 4
 **Requirements**: [ARCH-01, ARCH-02, ARCH-03, ARCH-04, ARCH-05, LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04, LAYOUT-05]
-**Success Criteria** (what must be TRUE):
-  1. `AppProviders` wraps the app with TanStack Query.
-  2. `AppRouter` renders `/`, `/chat`, `/dashboard`, `/login`, and not-found routes.
-  3. Marketing, app, dashboard, and auth layouts exist.
-  4. Placeholder pages render through the router without console errors.
-**Plans**: 2 plans
-
-Plans:
-- [x] 05-01: Add provider and router infrastructure.
-- [x] 05-02: Add layouts and placeholder pages.
+**Plans**: 2 plans complete
 
 ### Phase 6: Services, State, Types, Hooks, and Common Components
 **Goal**: Add reusable API, state, type, hook, and common component foundations for future product work.
-**Depends on**: Phase 5
 **Requirements**: [SVC-01, SVC-02, SVC-03, SVC-04, STATE-01, STATE-02, STATE-03, STATE-04, TYPE-01, TYPE-02, TYPE-03, COMP-01, COMP-02, COMP-03, COMP-04, COMP-05]
-**Success Criteria** (what must be TRUE):
-  1. Axios HTTP client and chat API placeholder exist.
-  2. Auth and UI Zustand stores exist.
-  3. Shared user, chat, and API types exist.
-  4. Common app components exist and can be imported via `@`.
-  5. `.env.example` documents the API base URL.
-**Plans**: 2 plans
-
-Plans:
-- [x] 06-01: Add API services, stores, hooks, and types.
-- [x] 06-02: Add common reusable components.
+**Plans**: 2 plans complete
 
 ### Phase 7: Acceptance Page, Documentation, and Verification
 **Goal**: Prove the Phase 2 stack works through the Home acceptance page, README updates, command verification, and GitHub handoff.
-**Depends on**: Phase 6
 **Requirements**: [COMP-06, DOCS-01, DOCS-02, DOCS-03, DOCS-04, DOCS-05]
+**Plans**: 2 plans complete
+
+</details>
+
+### 🚧 v1.2 Core Product UI (In Progress)
+
+**Milestone Goal:** Build the first demonstrable STOA product interface with a mock-driven student chat experience and student dashboard on top of the Phase 2 frontend foundation.
+
+- [ ] **Phase 8: Product UI Types and Mock Data** - Define chat/dashboard contracts and mock data for the Phase 3 UI.
+- [ ] **Phase 9: Mock Chat Interface** - Build the `/chat` product UI with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
+- [ ] **Phase 10: Student Dashboard, Documentation, and Verification** - Build the `/dashboard` product UI, document Phase 3, and verify scripts/routes.
+
+### Phase 8: Product UI Types and Mock Data
+**Goal**: Define the chat and dashboard data contracts plus mock data that will drive the Phase 3 product UI.
+**Depends on**: Phase 7
+**Requirements**: [TYPE-04, TYPE-05, DATA-01, DATA-02]
 **Success Criteria** (what must be TRUE):
-  1. Home page uses TailwindCSS, Button/Card UI primitives, React Router links, and `@` imports.
-  2. Routes `/`, `/chat`, `/dashboard`, and `/login` are browser-verifiable.
-  3. README documents Phase 2 additions, env setup, and routes.
-  4. `npm install`, `npm run build`, `npm run lint`, and browser route checks pass.
-  5. Phase 2 work is committed and pushed to GitHub.
+  1. `src/types/chat.ts` defines the Phase 3 chat message and conversation contracts.
+  2. `src/types/dashboard.ts` defines dashboard stats, weak topics, recent questions, teacher feedback, and learning progress contracts.
+  3. `src/data/mockConversations.ts` contains at least two conversations with student and assistant messages.
+  4. `src/data/mockDashboard.ts` contains stats, weak topics, recent questions, learning progress, and teacher feedback.
+  5. Mock data is separated from presentational components.
 **Plans**: 2 plans
 
 Plans:
-- [x] 07-01: Build Home acceptance page and update README.
-- [x] 07-02: Run verification and prepare GitHub handoff.
+- [ ] 08-01: Add chat and dashboard type contracts.
+- [ ] 08-02: Add mock conversation and dashboard data.
+
+### Phase 9: Mock Chat Interface
+**Goal**: Build the `/chat` product UI with mock conversations, message sending, AI thinking state, upload placeholder, and teacher-help placeholder.
+**Depends on**: Phase 8
+**Requirements**: [CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06, CHAT-07, CHAT-08, CHAT-09, CHAT-10, CHAT-11, CHAT-12]
+**Success Criteria** (what must be TRUE):
+  1. `/chat` renders a full chat workspace rather than a placeholder.
+  2. Desktop users can see and select mock conversations from a sidebar.
+  3. The active conversation message history updates when a conversation is selected.
+  4. Sending a message appends the student message, shows an AI thinking state, and then appends a mock assistant response.
+  5. Upload and request-teacher placeholders are visible.
+  6. Small screens remain usable without serious horizontal overflow.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 09-01: Build chat components and `useMockChat`.
+- [ ] 09-02: Assemble `ChatPage` and verify chat interactions.
+
+### Phase 10: Student Dashboard, Documentation, and Verification
+**Goal**: Build the `/dashboard` product UI, document Phase 3, and verify scripts/routes.
+**Depends on**: Phase 9
+**Requirements**: [DASH-01, DASH-02, DASH-03, DASH-04, DASH-05, DASH-06, DASH-07, DASH-08, DOCS-06, DOCS-07, DOCS-08]
+**Success Criteria** (what must be TRUE):
+  1. `/dashboard` renders a student learning overview rather than a placeholder.
+  2. Dashboard stat, recent question, weak topic, learning progress, and teacher feedback modules render from mock data.
+  3. Dashboard layouts use responsive grids that collapse cleanly on smaller screens.
+  4. README documents Phase 3 Core Product UI, included routes, included modules, and mock-data-only scope.
+  5. `npm install`, `npm run build`, and route checks for `/chat` and `/dashboard` pass.
+  6. Phase 3 work is committed with clear Core Product UI history.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 10-01: Build dashboard components and assemble `StudentDashboardPage`.
+- [ ] 10-02: Update README, run verification, and prepare commit handoff.
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 8 -> 9 -> 10
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -121,3 +134,7 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7
 | 5. App Providers, Router, Layouts, and Pages | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 6. Services, State, Types, Hooks, and Common Components | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 7. Acceptance Page, Documentation, and Verification | v1.1 | 2/2 | Complete | 2026-05-24 |
+| 8. Product UI Types and Mock Data | v1.2 | 0/2 | Pending | — |
+| 9. Mock Chat Interface | v1.2 | 0/2 | Pending | — |
+| 10. Student Dashboard, Documentation, and Verification | v1.2 | 0/2 | Pending | — |
+
