@@ -1,65 +1,86 @@
-# Requirements: STOA Frontend
+# Requirements: STOA Frontend v1.1 Frontend Development Foundation
 
 **Defined:** 2026-05-24
-**Core Value:** Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and see a working STOA frontend foundation at `http://localhost:5173/`.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and continue STOA product work from a stable, organized frontend application foundation.
 
-## v1 Requirements
+## v1.1 Requirements
 
-Requirements for the initial frontend foundation milestone. Each maps to roadmap phases.
+Requirements for the second-stage frontend development foundation milestone. Each maps to roadmap phases.
 
-### Scaffold
+### Styling
 
-- [ ] **SCFD-01**: Developer can install dependencies with `npm install` from a clean checkout.
-- [ ] **SCFD-02**: Developer can run `npm run dev` and start the Vite dev server on `http://localhost:5173/`.
-- [ ] **SCFD-03**: Project includes the standard Vite React TypeScript scaffold files required for local development and production builds.
-- [ ] **SCFD-04**: Project includes a committed npm lockfile so installs are reproducible across team machines.
+- [ ] **STYLE-01**: Developer can use TailwindCSS utility classes in app pages and components.
+- [ ] **STYLE-02**: Vite is configured with the TailwindCSS Vite plugin.
+- [ ] **STYLE-03**: shadcn-style UI primitives exist under `src/components/ui/` for button, card, input, textarea, label, separator, badge, avatar, tabs, dialog, sheet, dropdown menu, and scroll area.
+- [ ] **STYLE-04**: STOA theme tokens exist in `src/styles/stoa-theme.css`.
+- [ ] **STYLE-05**: STOA design migration notes exist in `src/styles/design-notes.md`.
+- [ ] **STYLE-06**: `lucide-react` is installed for the icon system.
 
-### Application
+### Architecture
 
-- [ ] **APP-01**: User can open the root route and see a minimal STOA frontend initialization page.
-- [ ] **APP-02**: Default Vite demo content, demo assets, and unused demo imports are removed.
-- [ ] **APP-03**: Phase 1 app surface avoids unfinished business flows such as login, dashboards, AI chat, payment, and backend data views.
+- [ ] **ARCH-01**: Project has the Phase 2 directory structure for `app`, `components`, `layouts`, `pages`, `services`, `store`, `types`, `hooks`, `lib`, and `styles`.
+- [ ] **ARCH-02**: Vite and TypeScript support the `@/*` path alias.
+- [ ] **ARCH-03**: `AppProviders` wraps the app with TanStack Query.
+- [ ] **ARCH-04**: `queryClient` configures retry, stale time, and refetch behavior for server state.
+- [ ] **ARCH-05**: `AppRouter` defines routes for `/`, `/chat`, `/dashboard`, `/login`, and `*`.
 
-### Tooling
+### Layouts
 
-- [ ] **TOOL-01**: Developer can run `npm run build` successfully.
-- [ ] **TOOL-02**: Developer can run `npm run lint` successfully.
-- [ ] **TOOL-03**: Developer can run `npm run preview` after a production build.
-- [ ] **TOOL-04**: `.gitignore` excludes `node_modules/`, `dist/`, local env files, `.DS_Store`, and local-only editor or machine noise.
+- [ ] **LAYOUT-01**: `MarketingLayout` provides a public navigation shell.
+- [ ] **LAYOUT-02**: `AppLayout` provides an authenticated-app style shell.
+- [ ] **LAYOUT-03**: `DashboardLayout` exists as a dashboard-specific shell.
+- [ ] **LAYOUT-04**: `AuthLayout` exists as an auth-page shell.
+- [ ] **LAYOUT-05**: Home, chat, dashboard, login, and not-found pages render through the router.
+
+### Services
+
+- [ ] **SVC-01**: `.env.example` documents `VITE_API_BASE_URL`.
+- [ ] **SVC-02**: `services/api/httpClient.ts` exports an Axios client with JSON headers and bearer token injection from local storage.
+- [ ] **SVC-03**: `services/api/apiTypes.ts` defines reusable API response and error types.
+- [ ] **SVC-04**: `services/chat/chatApi.ts` defines a placeholder chat message request and response API.
+
+### State
+
+- [ ] **STATE-01**: `store/authStore.ts` defines user, token, authenticated state, `setAuth`, and `clearAuth`.
+- [ ] **STATE-02**: `store/uiStore.ts` defines sidebar open state and setter.
+- [ ] **STATE-03**: `hooks/useAuth.ts` exposes the auth store.
+- [ ] **STATE-04**: `hooks/useCurrentUser.ts` exposes current user state.
+
+### Types
+
+- [ ] **TYPE-01**: `types/user.ts` defines shared user and role types.
+- [ ] **TYPE-02**: `types/chat.ts` defines shared chat conversation and message types.
+- [ ] **TYPE-03**: `types/api.ts` defines reusable pagination types.
+
+### Components
+
+- [ ] **COMP-01**: Common `AppLogo` component exists.
+- [ ] **COMP-02**: Common `PageShell` component exists.
+- [ ] **COMP-03**: Common `LoadingState` component exists.
+- [ ] **COMP-04**: Common `ErrorState` component exists.
+- [ ] **COMP-05**: Common `EmptyState` component exists.
+- [ ] **COMP-06**: Home page uses TailwindCSS, shadcn-style Button/Card components, React Router links, and the `@` alias.
 
 ### Documentation
 
-- [ ] **DOCS-01**: README identifies the project as the STOA learning platform frontend.
-- [ ] **DOCS-02**: README documents the Phase 1 stack: React, TypeScript, Vite, and npm.
-- [ ] **DOCS-03**: README documents local install, development, build, and preview commands.
-- [ ] **DOCS-04**: README states the current project status as Phase 1 frontend foundation initialized.
+- [ ] **DOCS-01**: README documents Phase 2 frontend foundation additions.
+- [ ] **DOCS-02**: README documents environment variable setup through `.env.example`.
+- [ ] **DOCS-03**: README lists available routes.
+- [ ] **DOCS-04**: `npm install`, `npm run dev`, `npm run build`, `npm run lint`, and preview route checks pass.
+- [ ] **DOCS-05**: Phase 2 work is committed and pushed to GitHub.
 
-### Repository
-
-- [ ] **REPO-01**: Repository contains no committed `node_modules/` or build output.
-- [ ] **REPO-02**: Repository is ready for an initial GitHub push to `stoasystem/stoa-frontend` once remote access is configured.
-- [ ] **REPO-03**: Initial foundation work is committed with a clear commit history.
-
-## v2 Requirements
+## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Frontend Platform
+### Product UI
 
-- **PLAT-01**: Developer can use TailwindCSS for styling.
-- **PLAT-02**: Developer can use shadcn/ui component primitives.
-- **PLAT-03**: Developer can use lucide-react icons.
-- **PLAT-04**: Developer can use React Router for the formal route structure.
-- **PLAT-05**: Developer can use TanStack Query for API-backed server state.
-- **PLAT-06**: Developer can use Zustand for client state.
-- **PLAT-07**: Developer can use Axios through a documented API layer.
-
-### Product Features
-
-- **AUTH-01**: User can log in through the STOA authentication flow.
-- **AI-01**: Student can ask an AI-assisted learning question.
-- **DASH-01**: Student, parent, teacher, and admin users can access role-specific dashboards.
-- **PAY-01**: User can access payment or subscription flows.
+- **CHAT-01**: Student can use a real chat UI with conversation list, message bubbles, input, upload affordance, AI response placeholder, and teacher escalation placeholder.
+- **DASH-01**: Student dashboard has real learning progress UI.
+- **AUTH-01**: User can register, log in, and persist sessions through real auth integration.
+- **STREAM-01**: AI chat supports streaming responses.
+- **UPLOAD-01**: User can upload files for AI-supported learning.
+- **PAY-01**: Payment and subscription flows exist.
 
 ## Out of Scope
 
@@ -67,15 +88,15 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Complete page design | Phase 1 only proves the foundation runs. |
-| Backend API integration | Later milestones should define real API contracts and data flows. |
-| Login system | Auth UX is explicitly excluded from Phase 1. |
-| AI chat | Core AI product workflows are deferred. |
-| Dashboards | Role dashboards are deferred until the frontend platform is ready. |
-| Payment system | Billing and subscriptions are deferred. |
-| Real data state management | Phase 1 has no production data flows. |
-| Deployment configuration | Hosting and CI/CD are not required for the foundation milestone. |
-| Large business directory scaffold | Business directories should be added when real features need them. |
+| Complete UI design | Phase 2 only establishes the development foundation and acceptance page. |
+| Real login implementation | Auth is represented by structure and stores only. |
+| Real backend business API integration | API layer exists, but backend contracts are future work. |
+| Real AI chat behavior | Chat route and API placeholder only. |
+| AI streaming | Requires a later API and UI contract. |
+| Parent/tutor/admin dashboard business logic | Product dashboards are deferred. |
+| Payment | Explicitly excluded from Phase 2. |
+| Production deployment | Not part of this milestone. |
+| Full STOA homepage replication | Phase 2 creates style notes and tokens only. |
 
 ## Traceability
 
@@ -83,30 +104,50 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCFD-01 | Phase 1 | Complete |
-| SCFD-02 | Phase 1 | Complete |
-| SCFD-03 | Phase 1 | Complete |
-| SCFD-04 | Phase 1 | Complete |
-| APP-01 | Phase 1 | Complete |
-| APP-02 | Phase 1 | Complete |
-| APP-03 | Phase 1 | Complete |
-| TOOL-01 | Phase 2 | Complete |
-| TOOL-02 | Phase 2 | Complete |
-| TOOL-03 | Phase 2 | Complete |
-| TOOL-04 | Phase 2 | Complete |
-| DOCS-01 | Phase 3 | Complete |
-| DOCS-02 | Phase 3 | Complete |
-| DOCS-03 | Phase 3 | Complete |
-| DOCS-04 | Phase 3 | Complete |
-| REPO-01 | Phase 3 | Complete |
-| REPO-02 | Phase 3 | Complete |
-| REPO-03 | Phase 3 | Complete |
+| STYLE-01 | Phase 4 | Pending |
+| STYLE-02 | Phase 4 | Pending |
+| STYLE-03 | Phase 4 | Pending |
+| STYLE-04 | Phase 4 | Pending |
+| STYLE-05 | Phase 4 | Pending |
+| STYLE-06 | Phase 4 | Pending |
+| ARCH-01 | Phase 5 | Pending |
+| ARCH-02 | Phase 5 | Pending |
+| ARCH-03 | Phase 5 | Pending |
+| ARCH-04 | Phase 5 | Pending |
+| ARCH-05 | Phase 5 | Pending |
+| LAYOUT-01 | Phase 5 | Pending |
+| LAYOUT-02 | Phase 5 | Pending |
+| LAYOUT-03 | Phase 5 | Pending |
+| LAYOUT-04 | Phase 5 | Pending |
+| LAYOUT-05 | Phase 5 | Pending |
+| SVC-01 | Phase 6 | Pending |
+| SVC-02 | Phase 6 | Pending |
+| SVC-03 | Phase 6 | Pending |
+| SVC-04 | Phase 6 | Pending |
+| STATE-01 | Phase 6 | Pending |
+| STATE-02 | Phase 6 | Pending |
+| STATE-03 | Phase 6 | Pending |
+| STATE-04 | Phase 6 | Pending |
+| TYPE-01 | Phase 6 | Pending |
+| TYPE-02 | Phase 6 | Pending |
+| TYPE-03 | Phase 6 | Pending |
+| COMP-01 | Phase 6 | Pending |
+| COMP-02 | Phase 6 | Pending |
+| COMP-03 | Phase 6 | Pending |
+| COMP-04 | Phase 6 | Pending |
+| COMP-05 | Phase 6 | Pending |
+| COMP-06 | Phase 7 | Pending |
+| DOCS-01 | Phase 7 | Pending |
+| DOCS-02 | Phase 7 | Pending |
+| DOCS-03 | Phase 7 | Pending |
+| DOCS-04 | Phase 7 | Pending |
+| DOCS-05 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 18 total
-- Mapped to phases: 18
+- v1.1 requirements: 38 total
+- Mapped to phases: 38
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-24*
-*Last updated: 2026-05-24 after initialization*
+*Last updated: 2026-05-24 after v1.1 initialization*

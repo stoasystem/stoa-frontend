@@ -4,22 +4,26 @@
 
 STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The immediate project goal is to establish a clean, standard, maintainable frontend foundation that developers can clone, install, run locally, build, and use as the base for later STOA product features.
 
-The current repository already contains an early React/Vite shell with role route stubs, Cognito/Amplify configuration, an Axios API client, TanStack Query provider setup, and Zustand stores. The first planned milestone is to reconcile that repository with a stable Phase 1 frontend foundation: a minimal STOA initialization page, complete Vite scaffold, clear README, correct ignore rules, and verified local dev/build commands.
+The repository now has a verified React + TypeScript + Vite foundation from v1.0. The next milestone upgrades that foundation into the formal STOA frontend development base: TailwindCSS, shadcn-style UI primitives, routing, providers, API services, Zustand stores, layouts, placeholder pages, STOA theme entry, and documentation for continued product development.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and see a working STOA frontend foundation at `http://localhost:5173/`.
+Developers can clone `stoa-frontend`, run the npm scripts, and continue STOA product work from a stable, organized frontend application foundation.
 
-## Current Milestone: v1.0 Frontend Foundation
+## Current Milestone: v1.1 Frontend Development Foundation
 
-**Goal:** Make the STOA frontend repository a clean, runnable, buildable React + TypeScript + Vite project ready for team development.
+**Goal:** Turn the Phase 1 Vite foundation into a formal STOA frontend development base with styling, routing, providers, API layer, state stores, layouts, placeholder pages, theme entry, and documentation.
 
 **Target features:**
-- Complete the standard Vite React TypeScript project scaffold.
-- Replace default or placeholder code with a minimal STOA initialization page.
-- Verify local development, lint, build, and preview basics.
-- Document the local development workflow in README.
-- Keep the repository clean for GitHub collaboration.
+- Configure TailwindCSS and shadcn-style UI primitives.
+- Establish the STOA app directory structure.
+- Add React Router routes for `/`, `/chat`, `/dashboard`, `/login`, and not-found.
+- Add TanStack Query providers and query client.
+- Add Axios API client, API types, and chat API placeholder.
+- Add Zustand auth/UI stores and foundational global types/hooks.
+- Add Marketing/App layouts and common reusable components.
+- Add STOA theme tokens and design notes entry.
+- Update README, verify npm scripts, and push a clear Phase 2 commit series.
 
 ## Requirements
 
@@ -34,23 +38,30 @@ Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and s
 
 ### Active
 
-(None currently — v1.0 Frontend Foundation is complete)
+- [ ] TailwindCSS works through the Vite plugin and global CSS.
+- [ ] shadcn-style UI primitives exist under `src/components/ui/`.
+- [ ] `@` path alias works in Vite and TypeScript.
+- [ ] App providers wrap the router with TanStack Query.
+- [ ] Home, chat, dashboard, login, and not-found routes render.
+- [ ] Layouts and common components provide a reusable development shell.
+- [ ] API, store, hooks, and type directories are present for future business work.
+- [ ] README and `.env.example` document the Phase 2 development foundation.
 
 ### Out of Scope
 
-- Complete page design — Phase 1 only proves the foundation runs.
-- Backend API integration — later phases will define real API contracts and data flows.
-- Login system — Cognito scaffolding may exist, but auth UX is not part of Phase 1.
-- AI chat functionality — core AI learning workflows are deferred.
-- Dashboards — student, parent, teacher, and admin dashboards are deferred.
+- Complete UI design — Phase 2 establishes layout/style systems but does not finalize product screens.
+- Real backend API integration — Phase 2 creates request structure only.
+- Real login implementation — route and store placeholders are allowed, but auth UX and backend auth are deferred.
+- Real AI chat functionality — chat route and API placeholder only.
+- AI streaming — deferred until API contract exists.
+- Parent/tutor/admin dashboard business logic — deferred to product UI milestones.
 - Payment system — billing and subscriptions are deferred.
-- Real data state management — no production data flows in Phase 1.
-- Deployment configuration — hosting and CI/CD are deferred.
-- Formal business directory structure — folders such as `components`, `services`, `hooks`, `store`, and `types` should be added when the features need them.
+- Production deployment — hosting and CI/CD are deferred.
+- Full STOA homepage replication — Phase 2 creates design notes and theme entry, not a complete migration.
 
 ## Context
 
-The project brief for Phase 1 was provided in Chinese and defines a narrow foundation milestone. Its acceptance statement is: a developer can clone the project, run `npm install`, then `npm run dev`, and start the STOA frontend locally.
+The project brief for Phase 2 was provided in Chinese and defines an engineering foundation milestone. It does not ask for business functionality; it asks for the structure future STOA AI learning platform pages will use.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -59,20 +70,17 @@ Recommended baseline technology:
 - npm as the default package manager.
 - GitHub as the shared repository host, expected at `https://github.com/stoasystem/stoa-frontend`.
 
-Current codebase facts from `.planning/codebase/`:
-- `package.json` already includes React 19, React Router 7, TanStack Query 5, Zustand 5, Axios, AWS Amplify 6, TypeScript, Vite, and ESLint.
-- `vite.config.ts` configures Vite on port `5173` and proxies `/api` to `http://localhost:8000`.
-- `src/main.tsx` currently configures Amplify and React Query before rendering `App`.
-- `src/App.tsx` currently defines role routes for student, parent, teacher, and admin pages.
-- Existing role pages are TODO placeholders.
-- The repository is missing standard Vite scaffold files such as `index.html`, TypeScript config files, and a lockfile.
-- README currently describes a later-stage stack with Cognito and API env variables, not the narrow Phase 1 foundation target.
+Current codebase facts:
+- v1.0 has a working minimal STOA Vite app.
+- `package.json` already includes React Router, TanStack Query, Zustand, Axios, and AWS Amplify from earlier scaffolding.
+- TailwindCSS, lucide-react, UI primitives, route/layout structure, API services, and Phase 2 docs still need to be added.
+- The v1.0 README describes the foundation scripts and must be expanded for Phase 2.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 1 must avoid business feature implementation and focus on runnable foundation only.
+- **Scope**: Phase 2 must avoid real business implementation and focus on formal development foundations only.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -86,6 +94,8 @@ Current codebase facts from `.planning/codebase/`:
 | Keep Phase 1 as foundation-only | Prevents premature feature work before the repo can run and build cleanly | — Pending |
 | Treat existing role/API/auth scaffolding as non-Phase-1 context | The current repo includes later-stage placeholders, but Phase 1 acceptance is only the foundation | — Pending |
 | Complete v1.0 before expanding product features | Foundation commands and handoff documentation now pass, so later milestones can build on a stable base | ✓ Good |
+| Continue phase numbering into v1.1 | Keeps GSD history continuous across milestones | — Pending |
+| Use shadcn-style local UI components | Provides copyable, customizable primitives without coupling future work to opaque component packages | — Pending |
 
 ## Evolution
 
@@ -105,4 +115,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v1.0 milestone audit*
+*Last updated: 2026-05-24 after starting v1.1 Frontend Development Foundation*

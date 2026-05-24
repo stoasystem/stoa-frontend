@@ -1,77 +1,118 @@
 # Roadmap: STOA Frontend
 
-## Overview
+## Milestones
 
-The v1.0 milestone turns the current STOA frontend repository into a reliable React + TypeScript + Vite foundation. The work is intentionally narrow: first normalize the runnable Vite application surface, then make the local tooling pass, then update documentation and repository hygiene so teammates can clone and run the project confidently.
+- ✅ **v1.0 Frontend Foundation** - Phases 1-3 (shipped 2026-05-24)
+- 🚧 **v1.1 Frontend Development Foundation** - Phases 4-7 (in progress)
 
 ## Phases
 
-**Phase Numbering:**
-- Integer phases (1, 2, 3): Planned milestone work
-- Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
-
-Decimal phases appear between their surrounding integers in numeric order.
-
-- [x] **Phase 1: Vite Foundation App** - Complete the standard Vite scaffold and render the minimal STOA initialization page.
-- [x] **Phase 2: Tooling Verification** - Make build, lint, preview, lockfile, and ignore rules work for a clean checkout.
-- [x] **Phase 3: Documentation and Repository Readiness** - Align README and commit history with the Phase 1 handoff and GitHub readiness expectations.
-
-## Phase Details
+<details>
+<summary>✅ v1.0 Frontend Foundation (Phases 1-3) - SHIPPED 2026-05-24</summary>
 
 ### Phase 1: Vite Foundation App
 **Goal**: Complete the standard Vite React TypeScript scaffold and replace placeholder/demo UI with a minimal STOA initialization page.
-**Depends on**: Nothing (first phase)
-**Requirements**: [SCFD-01, SCFD-02, SCFD-03, SCFD-04, APP-01, APP-02, APP-03]
-**Success Criteria** (what must be TRUE):
-  1. Developer can install dependencies from a clean checkout with `npm install`.
-  2. Developer can run `npm run dev` and load the app at `http://localhost:5173/`.
-  3. User sees a minimal STOA frontend initialization page at the root route.
-  4. Default Vite demo assets and unfinished business route placeholders are not exposed as the Phase 1 first screen.
-  5. The project has the standard Vite HTML and TypeScript config files needed by the app.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01: Add missing Vite scaffold files and normalize app entry points.
-- [ ] 01-02: Replace placeholder route surface with the minimal STOA foundation page.
+- [x] 01-01: Add missing Vite scaffold files and normalize app entry points.
+- [x] 01-02: Replace placeholder route surface with the minimal STOA foundation page.
 
 ### Phase 2: Tooling Verification
 **Goal**: Make local build, lint, preview, lockfile, and repository ignore rules reliable.
-**Depends on**: Phase 1
-**Requirements**: [TOOL-01, TOOL-02, TOOL-03, TOOL-04]
-**Success Criteria** (what must be TRUE):
-  1. Developer can run `npm run build` successfully.
-  2. Developer can run `npm run lint` successfully.
-  3. Developer can run `npm run preview` after a production build.
-  4. `.gitignore` excludes dependencies, build output, env files, `.DS_Store`, and local-only noise.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 02-01: Add or fix TypeScript, ESLint, and package tooling configuration.
-- [ ] 02-02: Run verification commands and address failures.
+- [x] 02-01: Add or fix TypeScript, ESLint, and package tooling configuration.
+- [x] 02-02: Run verification commands and address failures.
 
 ### Phase 3: Documentation and Repository Readiness
 **Goal**: Document the foundation workflow and ensure the repository is ready for initial GitHub handoff.
-**Depends on**: Phase 2
-**Requirements**: [DOCS-01, DOCS-02, DOCS-03, DOCS-04, REPO-01, REPO-02, REPO-03]
-**Success Criteria** (what must be TRUE):
-  1. README explains the STOA frontend purpose, stack, install, dev, build, and preview commands.
-  2. README states that Phase 1 frontend foundation is initialized.
-  3. Repository status contains no committed dependencies or build output.
-  4. Git history contains clear commits for the foundation work.
-  5. GitHub push readiness is documented, with remote setup left to the user if credentials or repository access are unavailable.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Rewrite README for the Phase 1 foundation handoff.
-- [ ] 03-02: Verify repository hygiene and document GitHub readiness.
+- [x] 03-01: Rewrite README for the Phase 1 foundation handoff.
+- [x] 03-02: Verify repository hygiene and document GitHub readiness.
+
+</details>
+
+### 🚧 v1.1 Frontend Development Foundation (In Progress)
+
+**Milestone Goal:** Turn the Phase 1 Vite foundation into a formal STOA frontend development base with styling, routing, providers, API layer, state stores, layouts, placeholder pages, theme entry, and documentation.
+
+### Phase 4: Styling and UI Foundation
+**Goal**: Configure TailwindCSS, shadcn-style UI primitives, lucide icons, alias support, STOA theme tokens, and design notes.
+**Depends on**: Phase 3
+**Requirements**: [STYLE-01, STYLE-02, STYLE-03, STYLE-04, STYLE-05, STYLE-06]
+**Success Criteria** (what must be TRUE):
+  1. Developer can use Tailwind utility classes in pages and components.
+  2. Vite and TypeScript resolve `@/*` imports.
+  3. shadcn-style UI primitives exist under `src/components/ui/`.
+  4. STOA theme tokens and design notes exist under `src/styles/`.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 04-01: Install and configure TailwindCSS, icons, aliases, and theme files.
+- [ ] 04-02: Add shadcn-style UI primitive components.
+
+### Phase 5: App Providers, Router, Layouts, and Pages
+**Goal**: Establish the app shell with providers, router, layouts, and placeholder routes.
+**Depends on**: Phase 4
+**Requirements**: [ARCH-01, ARCH-02, ARCH-03, ARCH-04, ARCH-05, LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04, LAYOUT-05]
+**Success Criteria** (what must be TRUE):
+  1. `AppProviders` wraps the app with TanStack Query.
+  2. `AppRouter` renders `/`, `/chat`, `/dashboard`, `/login`, and not-found routes.
+  3. Marketing, app, dashboard, and auth layouts exist.
+  4. Placeholder pages render through the router without console errors.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 05-01: Add provider and router infrastructure.
+- [ ] 05-02: Add layouts and placeholder pages.
+
+### Phase 6: Services, State, Types, Hooks, and Common Components
+**Goal**: Add reusable API, state, type, hook, and common component foundations for future product work.
+**Depends on**: Phase 5
+**Requirements**: [SVC-01, SVC-02, SVC-03, SVC-04, STATE-01, STATE-02, STATE-03, STATE-04, TYPE-01, TYPE-02, TYPE-03, COMP-01, COMP-02, COMP-03, COMP-04, COMP-05]
+**Success Criteria** (what must be TRUE):
+  1. Axios HTTP client and chat API placeholder exist.
+  2. Auth and UI Zustand stores exist.
+  3. Shared user, chat, and API types exist.
+  4. Common app components exist and can be imported via `@`.
+  5. `.env.example` documents the API base URL.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 06-01: Add API services, stores, hooks, and types.
+- [ ] 06-02: Add common reusable components.
+
+### Phase 7: Acceptance Page, Documentation, and Verification
+**Goal**: Prove the Phase 2 stack works through the Home acceptance page, README updates, command verification, and GitHub handoff.
+**Depends on**: Phase 6
+**Requirements**: [COMP-06, DOCS-01, DOCS-02, DOCS-03, DOCS-04, DOCS-05]
+**Success Criteria** (what must be TRUE):
+  1. Home page uses TailwindCSS, Button/Card UI primitives, React Router links, and `@` imports.
+  2. Routes `/`, `/chat`, `/dashboard`, and `/login` are browser-verifiable.
+  3. README documents Phase 2 additions, env setup, and routes.
+  4. `npm install`, `npm run build`, `npm run lint`, and browser route checks pass.
+  5. Phase 2 work is committed and pushed to GitHub.
+**Plans**: 2 plans
+
+Plans:
+- [ ] 07-01: Build Home acceptance page and update README.
+- [ ] 07-02: Run verification and prepare GitHub handoff.
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3
+Phases execute in numeric order: 4 -> 5 -> 6 -> 7
 
-| Phase | Plans Complete | Status | Completed |
-|-------|----------------|--------|-----------|
-| 1. Vite Foundation App | 2/2 | Complete | 2026-05-24 |
-| 2. Tooling Verification | 2/2 | Complete | 2026-05-24 |
-| 3. Documentation and Repository Readiness | 2/2 | Complete | 2026-05-24 |
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Vite Foundation App | v1.0 | 2/2 | Complete | 2026-05-24 |
+| 2. Tooling Verification | v1.0 | 2/2 | Complete | 2026-05-24 |
+| 3. Documentation and Repository Readiness | v1.0 | 2/2 | Complete | 2026-05-24 |
+| 4. Styling and UI Foundation | v1.1 | 0/2 | Not started | - |
+| 5. App Providers, Router, Layouts, and Pages | v1.1 | 0/2 | Not started | - |
+| 6. Services, State, Types, Hooks, and Common Components | v1.1 | 0/2 | Not started | - |
+| 7. Acceptance Page, Documentation, and Verification | v1.1 | 0/2 | Not started | - |
