@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
+import { PageContainer } from '@/components/common/PageContainer'
+import { PageHeader } from '@/components/common/PageHeader'
+import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { useUpdateStudentProfileMutation } from '@/hooks/student/useUpdateStudentProfileMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { studentProfileSchema } from '@/lib/validation'
 
 export function StudentProfilePage() {
   const profileQuery = useStudentProfileQuery()
@@ -12,6 +17,7 @@ export function StudentProfilePage() {
   const [grade, setGrade] = useState('')
   const [schoolSystem, setSchoolSystem] = useState('')
   const [primarySubjects, setPrimarySubjects] = useState('')
+  const [errors, setErrors] = useState<{ grade?: string; primarySubjects?: string }>({})
 
   useEffect(() => {
     if (!profileQuery.data) return
@@ -22,33 +28,44 @@ export function StudentProfilePage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Student Profile</h1>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Keep grade and subject context current for STOA learning workflows.
-          </p>
-        </div>
-        {profileQuery.isLoading && <p className="text-sm text-muted-foreground">Loading profile...</p>}
+      <PageContainer className="max-w-2xl p-0">
+        <PageHeader
+          title="Student Profile"
+          description="Keep grade and subject context current for STOA learning workflows."
+        />
+        {profileQuery.isLoading && <PageSkeleton rows={1} />}
         {profileQuery.isError && <p className="text-sm text-destructive">Failed to load profile.</p>}
         {profileQuery.data && (
           <form
             className="space-y-4 rounded-lg border bg-card p-5"
             onSubmit={(event) => {
               event.preventDefault()
-              updateProfile.mutate({
+              const subjects = primarySubjects
+                .split(',')
+                .map((subject) => subject.trim())
+                .filter(Boolean)
+              const result = studentProfileSchema.safeParse({
                 grade,
                 schoolSystem,
-                primarySubjects: primarySubjects
-                  .split(',')
-                  .map((subject) => subject.trim())
-                  .filter(Boolean),
+                primarySubjects: subjects,
               })
+              if (!result.success) {
+                const fieldErrors = result.error.flatten().fieldErrors
+                setErrors({
+                  grade: fieldErrors.grade?.[0],
+                  primarySubjects: fieldErrors.primarySubjects?.[0],
+                })
+                toast.error('Check the profile fields before saving.')
+                return
+              }
+              setErrors({})
+              updateProfile.mutate(result.data)
             }}
           >
             <div className="space-y-2">
               <Label htmlFor="grade">Grade</Label>
               <Input id="grade" value={grade} onChange={(event) => setGrade(event.target.value)} />
+              {errors.grade && <p className="text-xs text-destructive">{errors.grade}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="subjects">Primary subjects</Label>
@@ -57,6 +74,9 @@ export function StudentProfilePage() {
                 value={primarySubjects}
                 onChange={(event) => setPrimarySubjects(event.target.value)}
               />
+              {errors.primarySubjects && (
+                <p className="text-xs text-destructive">{errors.primarySubjects}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="school-system">School system</Label>
@@ -73,7 +93,7 @@ export function StudentProfilePage() {
             </Button>
           </form>
         )}
-      </div>
+      </PageContainer>
     </DashboardLayout>
   )
 }

@@ -2,11 +2,11 @@ import { useEffect, useMemo, useState } from 'react'
 import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
+import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { TeacherHelpStatusCard } from '@/components/chat/TeacherHelpStatusCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
-import { LoadingState } from '@/components/common/LoadingState'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
@@ -157,11 +157,7 @@ export function ChatPage() {
   }
 
   if (conversationsQuery.isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background text-foreground">
-        <LoadingState />
-      </div>
-    )
+    return <ChatSkeleton />
   }
 
   if (conversationsQuery.isError) {
@@ -225,8 +221,8 @@ export function ChatPage() {
           onCreateConversation={() => handleCreateConversation()}
         />
         {conversationQuery.isLoading && (
-          <div className="flex flex-1 items-center justify-center">
-            <LoadingState />
+          <div className="flex-1 overflow-hidden">
+            <ChatSkeleton compact />
           </div>
         )}
         {conversationQuery.isError && (

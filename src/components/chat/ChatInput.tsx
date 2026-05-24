@@ -1,10 +1,12 @@
 import { type FormEvent, useState } from 'react'
 import { Send } from 'lucide-react'
+import { toast } from 'sonner'
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { FileUploadButton } from '@/components/chat/FileUploadButton'
 import { StopGeneratingButton } from '@/components/chat/StopGeneratingButton'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { chatInputSchema } from '@/lib/validation'
 import type { UploadedFile } from '@/types/file'
 
 type ChatInputProps = {
@@ -34,7 +36,15 @@ export function ChatInput({
     event.preventDefault()
 
     const trimmed = value.trim()
-    if ((!trimmed && attachments.length === 0) || disabled || isStreaming) return
+    if (disabled || isStreaming) return
+
+    if (attachments.length === 0) {
+      const result = chatInputSchema.safeParse({ content: trimmed })
+      if (!result.success) {
+        toast.error(result.error.flatten().fieldErrors.content?.[0] ?? 'Message cannot be empty.')
+        return
+      }
+    }
 
     onSendMessage({
       content: trimmed,

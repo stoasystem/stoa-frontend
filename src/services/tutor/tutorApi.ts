@@ -1,6 +1,10 @@
 import { httpClient } from '@/services/api/httpClient'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
-import type { TutorHelpRequestDetail, TutorHelpRequestSummary } from '@/types/tutor'
+import type {
+  TutorHelpRequestDetail,
+  TutorHelpRequestNote,
+  TutorHelpRequestSummary,
+} from '@/types/tutor'
 
 export async function getTutorHelpRequests() {
   const response = await httpClient.get<{ items: TutorHelpRequestSummary[] }>(
@@ -26,6 +30,20 @@ export async function updateTutorHelpRequestStatus({
   const response = await httpClient.patch<TutorHelpRequestSummary>(
     `/tutors/me/help-requests/${requestId}`,
     { status },
+  )
+  return response.data
+}
+
+export async function addTutorHelpRequestNote({
+  requestId,
+  content,
+}: {
+  requestId: string
+  content: string
+}) {
+  const response = await httpClient.post<TutorHelpRequestNote>(
+    `/tutors/me/help-requests/${requestId}/notes`,
+    { content },
   )
   return response.data
 }

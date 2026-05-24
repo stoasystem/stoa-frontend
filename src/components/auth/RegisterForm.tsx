@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
+import { registerSchema } from '@/lib/validation'
 import type { UserRole } from '@/types/user'
 
 const roles: UserRole[] = ['student', 'parent', 'tutor', 'admin']
@@ -13,6 +14,12 @@ export function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [role, setRole] = useState<UserRole>('student')
+  const [errors, setErrors] = useState<{
+    name?: string
+    email?: string
+    password?: string
+    role?: string
+  }>({})
   const registerMutation = useRegisterMutation()
 
   return (
@@ -20,12 +27,25 @@ export function RegisterForm() {
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
-        registerMutation.mutate({ name, email, password, role })
+        const result = registerSchema.safeParse({ name, email, password, role })
+        if (!result.success) {
+          const fieldErrors = result.error.flatten().fieldErrors
+          setErrors({
+            name: fieldErrors.name?.[0],
+            email: fieldErrors.email?.[0],
+            password: fieldErrors.password?.[0],
+            role: fieldErrors.role?.[0],
+          })
+          return
+        }
+        setErrors({})
+        registerMutation.mutate(result.data)
       }}
     >
       <div className="space-y-2">
         <Label htmlFor="name">Name</Label>
         <Input id="name" value={name} onChange={(event) => setName(event.target.value)} required />
+        {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
@@ -37,6 +57,7 @@ export function RegisterForm() {
           autoComplete="email"
           required
         />
+        {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">Password</Label>
@@ -48,6 +69,7 @@ export function RegisterForm() {
           autoComplete="new-password"
           required
         />
+        {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="role">Role</Label>
@@ -63,6 +85,7 @@ export function RegisterForm() {
             </option>
           ))}
         </select>
+        {errors.role && <p className="text-xs text-destructive">{errors.role}</p>}
       </div>
       {registerMutation.isError && (
         <p className="text-sm text-destructive">

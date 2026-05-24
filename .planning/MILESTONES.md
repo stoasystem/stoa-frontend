@@ -1,5 +1,35 @@
 # Milestones
 
+## v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness (Implemented: 2026-05-25)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.6-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Shared UI guidelines, page containers, page headers, section headers, and responsive layout polish.
+- Skeleton loading primitives and page-specific skeletons for chat, dashboard, parent, tutor, profile, and report flows.
+- Toast notifications for auth, profile, upload, teacher-help, and tutor actions.
+- Validation schemas and form guardrails for login, register, student profile, chat input, and file upload.
+- Application error boundary with recovery UI.
+- Analytics event tracking client, usage event contract, and local SQLite analytics event storage.
+- Parent weekly report route, components, API hook, local backend endpoint, and seed report data.
+- Tutor request status filtering, richer request list/detail information, teacher note UI, local note endpoint, and tracking.
+- Demo login shortcuts gated by environment flags, staging env configuration, demo seed readiness, and README MVP demo flow.
+
+### Verification
+
+- Requirements: 31/31 implemented.
+- Phases: 7/7 implemented.
+- Build: passed.
+- Lint: passed.
+- Python syntax check: passed.
+- SQLite seed: passed.
+- Vite route smoke: passed for login, chat, parent report, and tutor request routes.
+- FastAPI TestClient smoke: passed for parent report, tutor request/note, and analytics endpoints.
+
+---
+
 ## v1.5 Phase 6 Authentication, User Roles, and Parent Visibility (Implemented: 2026-05-24)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks

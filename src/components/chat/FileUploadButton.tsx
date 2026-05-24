@@ -1,5 +1,6 @@
 import { useRef } from 'react'
 import { Upload } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useFileUploadMutation } from '@/hooks/files/useFileUploadMutation'
 import type { UploadedFile } from '@/types/file'
@@ -44,11 +45,12 @@ export function FileUploadButton({
     const files = Array.from(event.target.files ?? [])
     event.target.value = ''
 
-    for (const file of files) {
-      const validationError = validateFile(file, pendingAttachmentCount)
+    for (const [index, file] of files.entries()) {
+      const validationError = validateFile(file, pendingAttachmentCount + index)
 
       if (validationError) {
         onUploadError(validationError)
+        toast.error(validationError)
         return
       }
 
@@ -70,6 +72,7 @@ export function FileUploadButton({
         ref={inputRef}
         className="hidden"
         type="file"
+        multiple
         accept={ACCEPTED_FILE_TYPES.join(',')}
         onChange={handleFileChange}
       />

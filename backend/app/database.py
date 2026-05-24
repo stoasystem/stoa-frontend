@@ -103,5 +103,38 @@ def initialize_database() -> None:
               summary TEXT NOT NULL,
               created_at TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS analytics_events (
+              id TEXT PRIMARY KEY,
+              user_id TEXT,
+              event_name TEXT NOT NULL,
+              role TEXT,
+              path TEXT,
+              session_id TEXT,
+              payload_json TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS parent_reports (
+              id TEXT PRIMARY KEY,
+              student_user_id TEXT NOT NULL,
+              period_start TEXT NOT NULL,
+              period_end TEXT NOT NULL,
+              summary TEXT NOT NULL,
+              stats_json TEXT NOT NULL,
+              top_subjects_json TEXT NOT NULL,
+              weak_topics_json TEXT NOT NULL,
+              recommendations_json TEXT NOT NULL,
+              created_at TEXT NOT NULL,
+              updated_at TEXT
+            );
+
+            CREATE TABLE IF NOT EXISTS teacher_notes (
+              id TEXT PRIMARY KEY,
+              help_request_id TEXT NOT NULL,
+              tutor_user_id TEXT NOT NULL,
+              note TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            );
             """
         )

@@ -12,6 +12,7 @@ import { HomePage } from '@/pages/home/HomePage'
 import { StudentLearningHistoryPage } from '@/pages/learning-history/StudentLearningHistoryPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ChildLearningHistoryPage } from '@/pages/parent/ChildLearningHistoryPage'
+import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
 import { StudentProfilePage } from '@/pages/profile/StudentProfilePage'
@@ -41,6 +42,7 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['parent']} />}>
             <Route path="/parent" element={<ParentDashboardPage />} />
             <Route path="/parent/children/:childId" element={<ChildSummaryPage />} />
+            <Route path="/parent/children/:childId/report" element={<ChildReportPage />} />
             <Route
               path="/parent/children/:childId/history"
               element={<ChildLearningHistoryPage />}

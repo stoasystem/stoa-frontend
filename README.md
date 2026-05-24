@@ -200,6 +200,7 @@ Parent routes:
 
 - `/parent`
 - `/parent/children/:childId`
+- `/parent/children/:childId/report`
 - `/parent/children/:childId/history`
 
 Tutor routes:
@@ -226,10 +227,12 @@ Expected backend endpoints:
 - `POST /conversations/:conversationId/messages/stream`
 - `GET /parents/me/children`
 - `GET /parents/me/children/:childId/summary`
+- `GET /parents/me/children/:childId/report`
 - `GET /parents/me/children/:childId/history`
 - `GET /tutors/me/help-requests`
 - `GET /tutors/me/help-requests/:requestId`
 - `PATCH /tutors/me/help-requests/:requestId`
+- `POST /tutors/me/help-requests/:requestId/notes`
 
 Frontend token storage in this phase:
 
@@ -280,6 +283,111 @@ Suggested seed accounts:
 - `tutor@test.com / password123`
 - `admin@test.com / password123`
 
+## Phase 7 Product Polishing and MVP Readiness
+
+This phase prepares the STOA frontend for MVP demos and early testing.
+
+Main improvements:
+
+- Unified UI polish through shared page containers, headers, section headers, and UI guidelines.
+- Mobile responsive improvements for chat, dashboards, parent pages, tutor pages, and forms.
+- Skeleton loading states for core pages.
+- Toast notifications for auth, profile, upload, teacher help, and tutor actions.
+- Form validation for login, register, student profile, chat input, and file upload.
+- Application error boundary with recovery UI.
+- Basic analytics tracking and a usage event API contract.
+- Parent weekly report view.
+- Tutor workflow filtering, status updates, and teacher notes.
+- Demo seed data and development demo login shortcuts.
+- Staging environment configuration preparation.
+
+New Phase 7 routes and endpoints:
+
+- `GET /parents/me/children/:childId/report`
+- `POST /analytics/events`
+- `POST /tutors/me/help-requests/:requestId/notes`
+
+Usage tracking contract:
+
+```http
+POST /analytics/events
+```
+
+```json
+{
+  "name": "chat_message_sent",
+  "payload": {
+    "conversationId": "conv-1",
+    "subject": "Mathematics",
+    "hasAttachments": true
+  },
+  "createdAt": "2026-05-24T12:00:00Z"
+}
+```
+
+The local SQLite backend can store analytics events when analytics is enabled.
+
+Demo accounts in local development:
+
+- `student@test.com / password123`
+- `parent@test.com / password123`
+- `tutor@test.com / password123`
+- `admin@test.com / password123`
+
+Recommended MVP demo flow:
+
+1. Login as student.
+2. Open dashboard.
+3. Start chat.
+4. Upload a homework image or PDF.
+5. Receive a streaming AI response.
+6. Request teacher help.
+7. Login as tutor.
+8. Filter and open the help request.
+9. Add a teacher note and resolve the request.
+10. Login as parent.
+11. View child summary and weekly report.
+
+Phase 7 environment variables:
+
+```bash
+VITE_API_BASE_URL=http://localhost:8000
+VITE_APP_ENV=development
+VITE_ENABLE_DEMO_SHORTCUTS=true
+VITE_ENABLE_ANALYTICS=false
+```
+
+Staging example:
+
+```bash
+VITE_API_BASE_URL=https://api-staging.stoa.example
+VITE_APP_ENV=staging
+VITE_ENABLE_DEMO_SHORTCUTS=true
+VITE_ENABLE_ANALYTICS=true
+```
+
+Production example:
+
+```bash
+VITE_API_BASE_URL=https://api.stoa.example
+VITE_APP_ENV=production
+VITE_ENABLE_DEMO_SHORTCUTS=false
+VITE_ENABLE_ANALYTICS=true
+```
+
+MVP readiness checklist:
+
+- Core pages use shared layout primitives.
+- Mobile chat, dashboard, parent, and tutor views avoid horizontal overflow.
+- Loading states use skeletons instead of plain loading text.
+- Key mutations show toast feedback.
+- Login, register, profile, chat input, and upload inputs validate before submit.
+- Parent can open the weekly report from child visibility flows.
+- Tutor can filter requests, update status, and add notes.
+- Analytics events are emitted without sensitive message content.
+- Demo seed data supports student, tutor, and parent walkthroughs.
+- `npm run build`, `npm run lint`, Python syntax check, and SQLite seed pass locally.
+
 ## Environment Variables
 
 Create a local environment file:
@@ -305,6 +413,7 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/learning-history` Student learning history
 - `/parent` Parent dashboard
 - `/parent/children/:childId` Child learning summary
+- `/parent/children/:childId/report` Child weekly report
 - `/parent/children/:childId/history` Child learning history
 - `/tutor` Tutor dashboard
 - `/tutor/requests/:requestId` Tutor help-request detail
@@ -312,4 +421,4 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ## Project Status
 
-Phase 6: authentication, role routing, parent visibility, tutor help-request workflow, and local SQLite-backed testing backend.
+Phase 7: MVP readiness polish, responsive UI, skeletons, toast feedback, validation, analytics, parent report, tutor workflow improvements, demo data, staging configuration, and local SQLite-backed testing backend updates.

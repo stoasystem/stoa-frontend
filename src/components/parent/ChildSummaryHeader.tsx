@@ -9,9 +9,14 @@ export function ChildSummaryHeader({ summary }: { summary: ChildLearningSummary 
         <h1 className="text-2xl font-semibold tracking-tight">{summary.student.name}</h1>
         <p className="mt-1 text-sm text-muted-foreground">{summary.student.grade}</p>
       </div>
-      <Button asChild variant="outline">
-        <Link to={`/parent/children/${summary.student.id}/history`}>Learning history</Link>
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button asChild variant="outline">
+          <Link to={`/parent/children/${summary.student.id}/report`}>Weekly report</Link>
+        </Button>
+        <Button asChild variant="outline">
+          <Link to={`/parent/children/${summary.student.id}/history`}>Learning history</Link>
+        </Button>
+      </div>
     </div>
   )
 }

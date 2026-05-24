@@ -8,7 +8,19 @@ export type TutorHelpRequestSummary = {
   subject: string
   grade: string
   status: TeacherHelpStatus
+  requestMessage?: string
+  priority?: 'low' | 'medium' | 'high'
   createdAt: string
+}
+
+export type TutorHelpRequestNote = {
+  id: string
+  note: string
+  createdAt: string
+  tutor: {
+    id: string
+    name: string
+  }
 }
 
 export type TutorHelpRequestDetail = {
@@ -21,5 +33,7 @@ export type TutorHelpRequestDetail = {
   }
   subject: string
   status: TeacherHelpStatus
+  requestMessage?: string
   messages: ChatMessage[]
+  notes?: TutorHelpRequestNote[]
 }

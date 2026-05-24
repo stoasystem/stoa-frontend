@@ -158,6 +158,145 @@ def insert_seed_data() -> None:
                 created_at,
             ),
         )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO uploaded_files
+            (id, conversation_id, uploaded_by_user_id, filename, mime_type, size_bytes, storage_path, status, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "file-demo-force-diagram",
+                "conv-2",
+                "user-student",
+                "force-diagram-homework.pdf",
+                "application/pdf",
+                184_320,
+                "local/demo/force-diagram-homework.pdf",
+                "parsed",
+                created_at,
+            ),
+        )
+        connection.execute(
+            """
+            INSERT OR REPLACE INTO parent_reports
+            (id, student_user_id, period_start, period_end, summary, stats_json, top_subjects_json, weak_topics_json, recommendations_json, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "parent-report-anna-week-1",
+                "user-student",
+                "2026-05-18",
+                "2026-05-24",
+                "Anna made steady progress this week, especially when she broke math and physics problems into smaller steps before asking for help.",
+                json.dumps(
+                    [
+                        {"label": "Questions asked", "value": "3", "description": "Across 3 subjects"},
+                        {"label": "Teacher help sessions", "value": "2", "description": "1 active with tutor"},
+                        {"label": "Practice streak", "value": "4 days", "description": "Recent local activity"},
+                    ]
+                ),
+                json.dumps(
+                    [
+                        {
+                            "id": "subject-math",
+                            "name": "Mathematics",
+                            "questionsAnswered": 1,
+                            "teacherHelpCount": 1,
+                            "progressLabel": "Improving",
+                            "summary": "More confident solving equations after step-by-step practice.",
+                        },
+                        {
+                            "id": "subject-physics",
+                            "name": "Physics",
+                            "questionsAnswered": 1,
+                            "teacherHelpCount": 1,
+                            "progressLabel": "Needs review",
+                            "summary": "Force diagrams are the main follow-up area for next week.",
+                        },
+                        {
+                            "id": "subject-english",
+                            "name": "English",
+                            "questionsAnswered": 1,
+                            "teacherHelpCount": 0,
+                            "progressLabel": "Steady",
+                            "summary": "Thesis practice is on track with short guided prompts.",
+                        },
+                    ]
+                ),
+                json.dumps(
+                    [
+                        {
+                            "id": "weak-topic-quadratics",
+                            "subject": "Mathematics",
+                            "topic": "Quadratic equations",
+                            "level": "medium",
+                            "summary": "Anna should keep writing each transformation before simplifying.",
+                        },
+                        {
+                            "id": "weak-topic-forces",
+                            "subject": "Physics",
+                            "topic": "Force diagrams",
+                            "level": "high",
+                            "summary": "Arrow labels and direction checks need focused practice.",
+                        },
+                    ]
+                ),
+                json.dumps(
+                    [
+                        {
+                            "id": "recommendation-force-diagram",
+                            "title": "Review one force diagram",
+                            "description": "Walk through labels, direction, and net force before the next physics assignment.",
+                            "priority": "high",
+                        },
+                        {
+                            "id": "recommendation-algebra-steps",
+                            "title": "Explain algebra steps aloud",
+                            "description": "Ask Anna to state why each transformation is valid before checking the answer.",
+                            "priority": "medium",
+                        },
+                        {
+                            "id": "recommendation-essay-prompts",
+                            "title": "Keep essay practice focused",
+                            "description": "Use short thesis prompts this week so writing practice stays manageable.",
+                            "priority": "low",
+                        },
+                    ]
+                ),
+                created_at,
+                created_at,
+            ),
+        )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO teacher_notes (id, help_request_id, tutor_user_id, note, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                "teacher-note-1",
+                "teacher-request-2",
+                "user-tutor",
+                "Student understands the concept but needs help labeling force arrows consistently.",
+                created_at,
+            ),
+        )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO analytics_events
+            (id, user_id, event_name, role, path, session_id, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "analytics-demo-parent-report",
+                "user-parent",
+                "parent_report_viewed",
+                "parent",
+                "/parent/children/user-student/report",
+                "demo-session",
+                json.dumps({"childId": "user-student", "source": "seed"}),
+                created_at,
+            ),
+        )
         connection.commit()
 
 

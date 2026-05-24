@@ -3,11 +3,11 @@ from __future__ import annotations
 import json
 import uuid
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from app.auth import create_access_token, current_user, hash_password, now_iso, public_user, require_role, verify_password
+from app.auth import create_access_token, current_user, decode_access_token, hash_password, now_iso, public_user, require_role, verify_password
 from app.database import get_connection, initialize_database
 
 app = FastAPI(title="STOA Local Test Backend")
@@ -42,6 +42,19 @@ class SendMessageRequest(BaseModel):
 
 class HelpStatusUpdate(BaseModel):
     status: str
+
+
+class AnalyticsEventRequest(BaseModel):
+    name: str | None = None
+    eventName: str | None = None
+    payload: dict[str, object] | None = None
+    path: str | None = None
+    sessionId: str | None = None
+
+
+class TeacherNoteRequest(BaseModel):
+    content: str | None = None
+    note: str | None = None
 
 
 @app.on_event("startup")
@@ -92,6 +105,54 @@ def register(payload: RegisterRequest) -> dict[str, object]:
             raise HTTPException(status_code=400, detail="Email already exists") from exc
     user = {"id": user_id, "name": payload.name, "email": payload.email, "role": payload.role}
     return {"accessToken": create_access_token(user_id), "user": user}
+
+
+@app.post("/analytics/events")
+def create_analytics_event(
+    payload: AnalyticsEventRequest,
+    authorization: str | None = Header(default=None),
+) -> dict[str, object]:
+    event_name = (payload.name or payload.eventName or "").strip()
+    if not event_name:
+        raise HTTPException(status_code=400, detail="Event name is required")
+    event_id = f"analytics-{uuid.uuid4()}"
+    created_at = now_iso()
+    user = optional_user_from_authorization(authorization)
+    with get_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO analytics_events
+            (id, user_id, event_name, role, path, session_id, payload_json, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                event_id,
+                user["id"],
+                event_name,
+                user["role"],
+                payload.path,
+                payload.sessionId,
+                json.dumps(payload.payload or {}),
+                created_at,
+            ),
+        )
+        connection.commit()
+    return {"id": event_id, "eventName": event_name, "createdAt": created_at}
+
+
+def optional_user_from_authorization(authorization: str | None) -> dict[str, str | None]:
+    if not authorization or not authorization.startswith("Bearer "):
+        return {"id": None, "role": None}
+    try:
+        user_id = decode_access_token(authorization.removeprefix("Bearer ").strip())
+    except HTTPException:
+        return {"id": None, "role": None}
+    with get_connection() as connection:
+        row = connection.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
+    if row is None:
+        return {"id": None, "role": None}
+    user = public_user(row)
+    return {"id": user["id"], "role": user["role"]}
 
 
 @app.get("/auth/me")
@@ -407,12 +468,51 @@ def child_history(child_id: str, user: dict[str, str] = Depends(require_role("pa
     return {"items": learning_history_for_student(child_id)}
 
 
+@app.get("/parents/me/children/{child_id}/report")
+def child_report(child_id: str, user: dict[str, str] = Depends(require_role("parent"))) -> dict[str, object]:
+    ensure_parent_child(user["id"], child_id)
+    with get_connection() as connection:
+        student = connection.execute(
+            """
+            SELECT u.id, u.name, sp.grade
+            FROM users u LEFT JOIN student_profiles sp ON sp.user_id = u.id
+            WHERE u.id = ?
+            """,
+            (child_id,),
+        ).fetchone()
+        report = connection.execute(
+            """
+            SELECT *
+            FROM parent_reports
+            WHERE student_user_id = ?
+            ORDER BY period_end DESC, created_at DESC
+            LIMIT 1
+            """,
+            (child_id,),
+        ).fetchone()
+    if student is None:
+        raise HTTPException(status_code=404, detail="Student not found")
+    if report is None:
+        raise HTTPException(status_code=404, detail="Report not found")
+    return {
+        "id": report["id"],
+        "student": {"id": student["id"], "name": student["name"], "grade": student["grade"] or ""},
+        "period": {"label": "This week", "startDate": report["period_start"], "endDate": report["period_end"]},
+        "summary": report["summary"],
+        "stats": json.loads(report["stats_json"]),
+        "topSubjects": json.loads(report["top_subjects_json"]),
+        "weakTopics": json.loads(report["weak_topics_json"]),
+        "recommendations": json.loads(report["recommendations_json"]),
+        "generatedAt": report["updated_at"] or report["created_at"],
+    }
+
+
 @app.get("/tutors/me/help-requests")
 def tutor_requests(user: dict[str, str] = Depends(require_role("tutor"))) -> dict[str, object]:
     with get_connection() as connection:
         rows = connection.execute(
             """
-            SELECT thr.id, thr.conversation_id, thr.status, thr.created_at, u.name, c.subject, c.grade
+            SELECT thr.id, thr.conversation_id, thr.status, thr.request_message, thr.created_at, u.name, c.subject, c.grade
             FROM teacher_help_requests thr
             JOIN users u ON u.id = thr.student_user_id
             JOIN conversations c ON c.id = thr.conversation_id
@@ -430,6 +530,8 @@ def tutor_requests(user: dict[str, str] = Depends(require_role("tutor"))) -> dic
                 "subject": row["subject"] or "",
                 "grade": row["grade"] or "",
                 "status": row["status"],
+                "requestMessage": row["request_message"] or "",
+                "priority": "high" if row["status"] == "pending" else "medium",
                 "createdAt": row["created_at"],
             }
             for row in rows
@@ -457,13 +559,34 @@ def tutor_request_detail(request_id: str, user: dict[str, str] = Depends(require
             "SELECT * FROM messages WHERE conversation_id = ? ORDER BY created_at ASC",
             (row["conversation_id"],),
         ).fetchall()
+        notes = connection.execute(
+            """
+            SELECT tn.id, tn.note, tn.created_at, u.id AS tutor_id, u.name AS tutor_name
+            FROM teacher_notes tn
+            JOIN users u ON u.id = tn.tutor_user_id
+            WHERE tn.help_request_id = ?
+            ORDER BY tn.created_at ASC
+            """,
+            (request_id,),
+        ).fetchall()
     return {
         "requestId": row["id"],
         "conversationId": row["conversation_id"],
         "student": {"id": row["student_user_id"], "name": row["name"], "grade": row["grade"] or ""},
         "subject": row["subject"] or "",
         "status": row["status"],
+        "requestMessage": row["request_message"] or "",
         "messages": [message_response(message) for message in messages],
+        "notes": [teacher_note_response(note) for note in notes],
+    }
+
+
+def teacher_note_response(row) -> dict[str, object]:
+    return {
+        "id": row["id"],
+        "note": row["note"],
+        "createdAt": row["created_at"],
+        "tutor": {"id": row["tutor_id"], "name": row["tutor_name"]},
     }
 
 
@@ -503,3 +626,50 @@ def update_tutor_request(
         "status": updated["status"],
         "createdAt": updated["created_at"],
     }
+
+
+@app.post("/tutors/me/help-requests/{request_id}/notes")
+def add_tutor_request_note(
+    request_id: str,
+    payload: TeacherNoteRequest,
+    user: dict[str, str] = Depends(require_role("tutor")),
+) -> dict[str, object]:
+    note = (payload.content or payload.note or "").strip()
+    if not note:
+        raise HTTPException(status_code=400, detail="Note is required")
+    note_id = f"teacher-note-{uuid.uuid4()}"
+    created_at = now_iso()
+    with get_connection() as connection:
+        request = connection.execute(
+            "SELECT * FROM teacher_help_requests WHERE id = ? AND (assigned_tutor_user_id IS NULL OR assigned_tutor_user_id = ?)",
+            (request_id, user["id"]),
+        ).fetchone()
+        if request is None:
+            raise HTTPException(status_code=404, detail="Request not found")
+        assigned_tutor = request["assigned_tutor_user_id"] or user["id"]
+        connection.execute(
+            """
+            UPDATE teacher_help_requests
+            SET assigned_tutor_user_id = ?, updated_at = ?
+            WHERE id = ?
+            """,
+            (assigned_tutor, created_at, request_id),
+        )
+        connection.execute(
+            """
+            INSERT INTO teacher_notes (id, help_request_id, tutor_user_id, note, created_at)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (note_id, request_id, user["id"], note, created_at),
+        )
+        connection.commit()
+        inserted = connection.execute(
+            """
+            SELECT tn.id, tn.note, tn.created_at, u.id AS tutor_id, u.name AS tutor_name
+            FROM teacher_notes tn
+            JOIN users u ON u.id = tn.tutor_user_id
+            WHERE tn.id = ?
+            """,
+            (note_id,),
+        ).fetchone()
+    return teacher_note_response(inserted)

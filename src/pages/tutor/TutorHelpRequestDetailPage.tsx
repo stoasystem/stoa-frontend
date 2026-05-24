@@ -1,25 +1,44 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { PageContainer } from '@/components/common/PageContainer'
+import { PageHeader } from '@/components/common/PageHeader'
+import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
+import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
+import { TutorRequestNoteForm } from '@/components/tutor/TutorRequestNoteForm'
+import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
 import { Button } from '@/components/ui/button'
+import { useAddTutorHelpRequestNoteMutation } from '@/hooks/tutor/useAddTutorHelpRequestNoteMutation'
 import { useTutorHelpRequestDetailQuery } from '@/hooks/tutor/useTutorHelpRequestDetailQuery'
 import { useUpdateTutorHelpRequestMutation } from '@/hooks/tutor/useUpdateTutorHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
-const statuses: TeacherHelpStatus[] = ['pending', 'assigned', 'in_progress', 'resolved']
+const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 
 export function TutorHelpRequestDetailPage() {
   const { requestId } = useParams()
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTutorHelpRequestMutation()
+  const addNote = useAddTutorHelpRequestNoteMutation()
+
+  useEffect(() => {
+    if (!requestId) return
+    trackEvent('tutor_request_opened', { requestId })
+  }, [requestId])
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
-        {requestQuery.isLoading && <p className="text-sm text-muted-foreground">Loading request...</p>}
+      <PageContainer className="p-0">
+        <PageHeader
+          title="Help Request"
+          description="Review the student's context and record the tutor follow-up."
+        />
+        {requestQuery.isLoading && <TutorDashboardSkeleton showHeader={false} />}
         {requestQuery.isError && <p className="text-sm text-destructive">Failed to load request.</p>}
         {requestQuery.data && (
-          <>
+          <div className="space-y-6">
             <HelpRequestDetailCard request={requestQuery.data} />
             <div className="flex flex-wrap gap-2">
               {statuses.map((status) => (
@@ -30,14 +49,23 @@ export function TutorHelpRequestDetailPage() {
                   disabled={updateStatus.isPending || !requestId}
                   onClick={() => requestId && updateStatus.mutate({ requestId, status })}
                 >
-                  Mark {status}
+                  Mark {status.replace('_', ' ')}
                 </Button>
               ))}
             </div>
             {updateStatus.isError && <p className="text-sm text-destructive">Failed to update status.</p>}
-          </>
+            <SectionHeader
+              title="Tutor notes"
+              description="Record the intervention, next step, or follow-up the student needs."
+            />
+            <TutorRequestNoteForm
+              isSubmitting={addNote.isPending}
+              onSubmit={(content) => requestId && addNote.mutate({ requestId, content })}
+            />
+            <TutorRequestTimeline notes={requestQuery.data.notes ?? []} />
+          </div>
         )}
-      </div>
+      </PageContainer>
     </DashboardLayout>
   )
 }

@@ -17,6 +17,12 @@ export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDe
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {request.requestMessage && (
+          <div className="rounded-md bg-secondary p-3">
+            <p className="text-xs uppercase text-muted-foreground">Request summary</p>
+            <p className="mt-2 text-sm leading-6">{request.requestMessage}</p>
+          </div>
+        )}
         {request.messages.map((message) => (
           <div key={message.id} className="rounded-md border p-3">
             <p className="text-xs uppercase text-muted-foreground">{message.role}</p>

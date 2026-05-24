@@ -8,6 +8,7 @@ dist/
 *.log
 .vscode/
 backend/local.db
+backend/.venv/
 backend/uploads/
 backend/__pycache__/
 backend/app/__pycache__/

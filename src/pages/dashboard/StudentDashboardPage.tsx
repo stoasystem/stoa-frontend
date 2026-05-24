@@ -1,3 +1,5 @@
+import { PageContainer } from '@/components/common/PageContainer'
+import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
@@ -15,13 +17,11 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 export function StudentDashboardPage() {
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Student Dashboard</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            Track learning progress, recent questions, weak topics, and teacher feedback.
-          </p>
-        </div>
+      <PageContainer className="space-y-8 p-0">
+        <PageHeader
+          title="Student Dashboard"
+          description="Track learning progress, recent questions, weak topics, and teacher feedback."
+        />
 
         <div className="grid gap-4 md:grid-cols-3">
           {dashboardStats.map((stat) => (
@@ -38,7 +38,7 @@ export function StudentDashboardPage() {
           <LearningProgressCard progress={learningProgress} />
           <TeacherFeedbackCard feedback={teacherFeedback} />
         </div>
-      </div>
+      </PageContainer>
     </DashboardLayout>
   )
 }

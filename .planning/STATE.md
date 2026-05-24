@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Phase 7 Product Polishing, Analytics, and MVP Readiness
-status: planning
-last_updated: "2026-05-24T22:40:40.590Z"
-last_activity: 2026-05-24
+status: implemented
+last_updated: "2026-05-25T00:00:00.000Z"
+last_activity: 2026-05-25
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 7
+  completed_phases: 7
+  total_plans: 7
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
-**Current focus:** Milestone v1.5 complete; Phase 6 awaits deeper browser/API smoke testing with the local FastAPI service installed.
+**Current focus:** Milestone v1.6 implemented and smoke-tested; ready for Phase 8 planning.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-24 — Milestone v1.6 started
+Phase: Phase 34 complete
+Plan: Phase 7 autonomous implementation
+Status: Implemented
+Last activity: 2026-05-25 — Milestone v1.6 implemented
 
 ## Performance Metrics
 
@@ -104,10 +104,18 @@ Recent decisions affecting current work:
 - Phase 25 added tutor help-request services/hooks/pages and status update workflow.
 - Phase 26 added role-aware navigation, user menu, role badge, and admin placeholder.
 - Phase 27 updated README and verified build, lint, Python syntax, SQLite seed, and Vite route serving.
+- Milestone v1.6 started from the Phase 7 Product Polishing, Analytics, and MVP Readiness brief.
+- Phase 28 added shared page layout primitives, skeleton foundations, UI guidelines, and mobile-aware dashboard/chat/parent/tutor layouts.
+- Phase 29 added skeleton loading states and toast feedback for key actions.
+- Phase 30 added validation schemas, form guardrails, file upload feedback, and the app error boundary.
+- Phase 31 added analytics event tracking and local SQLite analytics storage contract.
+- Phase 32 added the parent weekly report route, components, API hook, local backend endpoint, and seed report data.
+- Phase 33 added tutor request filtering, request summaries, priority placeholder, teacher notes, and note tracking.
+- Phase 34 added demo login shortcuts, staging env flags, README Phase 7 docs, and final verification.
 
 ### Pending Todos
 
-None yet.
+None currently.
 
 ### Blockers/Concerns
 
@@ -115,8 +123,8 @@ None currently.
 
 ### Verification Notes
 
-- `npm run build` passed.
-- `npm run lint` passed.
+- `npm run build` passed for v1.6.
+- `npm run lint` passed for v1.6.
 - Vite dev server returned HTTP 200 for `/chat`.
 - In-app Browser plugin was unavailable for visual verification in this session.
 - In-app browser route check for `/chat` passed against a local mock backend for list/detail/send-message/teacher-help.
@@ -127,6 +135,10 @@ None currently.
 - `PYTHONPATH=. python3 -m app.seed` passed and created required SQLite tables plus student/parent/tutor/admin seed users.
 - Vite dev server returned HTTP 200 for `/login`.
 - Full FastAPI runtime smoke testing requires installing `backend/requirements.txt`.
+- `python3 -m py_compile backend/app/*.py` passed for v1.6.
+- `python3 -m app.seed` passed from `backend/` for v1.6.
+- Vite route smoke returned HTTP 200 for `/login`, `/chat`, `/parent/children/user-student/report`, and `/tutor/requests/teacher-request-1`.
+- FastAPI TestClient smoke passed for parent login/report, tutor login/request list/note creation, and analytics event creation after installing backend dependencies in ignored local venv.
 
 ## Deferred Items
 
@@ -145,4 +157,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Start the next milestone with /gsd-new-milestone when ready for Phase 8.

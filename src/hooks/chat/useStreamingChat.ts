@@ -4,6 +4,7 @@ import {
   streamConversationMessage,
   type StreamMessagePayload,
 } from '@/services/chat/chatStreamApi'
+import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent } from '@/types/chat'
 
@@ -164,6 +165,11 @@ export function useStreamingChat(conversationId: string | null) {
           status: 'streaming',
         },
       ])
+      trackEvent('chat_message_sent', {
+        conversationId,
+        hasAttachments: Boolean(attachmentIds?.length),
+      })
+      trackEvent('chat_response_started', { conversationId })
 
       try {
         await streamConversationMessage({
@@ -184,6 +190,7 @@ export function useStreamingChat(conversationId: string | null) {
         })
 
         await invalidateConversation()
+        trackEvent('chat_response_completed', { conversationId })
         setLocalMessages([])
       } catch (error) {
         if (controller.signal.aborted && stoppedByUserRef.current) {
@@ -198,10 +205,11 @@ export function useStreamingChat(conversationId: string | null) {
                   ? {
                       ...message,
                       status: 'completed',
-                    }
-                  : message,
+              }
+                : message,
             ),
           )
+          trackEvent('chat_response_stopped', { conversationId })
           return
         }
 
