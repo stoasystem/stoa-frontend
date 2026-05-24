@@ -2,31 +2,33 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, and a backend-integrated student chat flow for real conversation data.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, and local test backend support.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, and a local SQLite-backed test backend. The current product step is polishing that platform into an MVP-ready product that can be demonstrated, internally tested, and prepared for early student, parent, and tutor trials.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, and a local SQLite-backed test backend. The current product step is moving that MVP from local demonstration into staging readiness, QA, early user testing, feedback collection, and production-readiness planning.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## Current Milestone: v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
+## Current Milestone: v1.7 Phase 8 Staging Deployment, QA, and Early User Testing
 
-**Goal:** Upgrade STOA from a functional education platform frontend into an MVP-ready product with polished UI, responsive flows, user feedback, analytics, parent reporting, tutor workflow improvements, demo readiness, and staging configuration.
+**Goal:** Upgrade STOA from a locally demoable MVP into a staging-ready product that early students, parents, tutors, and internal testers can access, test, and provide feedback on while CI and QA guard the iteration loop.
 
 **Target features:**
-- Shared UI guidelines, page containers, section headers, spacing, skeleton states, and mobile responsive polish.
-- Toast/notification feedback for key operations.
-- Form validation for login, register, profile, chat input, file upload, teacher help, and tutor status updates.
-- Application error boundary and global fallback behavior.
-- Frontend analytics event tracking and usage tracking API contract.
-- Parent weekly report route, API contract, components, and local test data.
-- Tutor workflow improvements with status filters, clearer request detail, and teacher notes.
-- Demo seed data, demo login shortcuts, MVP demo flow documentation, and staging environment variables.
+- Staging frontend deployment configuration, staging API environment variables, and SPA fallback.
+- GitHub Actions CI for npm install, lint, TypeScript/build checks, and future tests.
+- Preview deployment or documented local preview flow.
+- Manual QA checklist for auth, student, parent, tutor, and responsive paths.
+- Playwright E2E initial coverage for auth, student chat, parent report, and tutor workflow.
+- Feedback collection entry point, feedback API client, and local backend persistence.
+- Bug report issue template and bug severity workflow.
+- Performance baseline documentation and Lighthouse checklist.
+- Frontend security review checklist and privacy/terms placeholders.
+- Demo reset, early user testing, feedback workflow, deployment, testing, security, and MVP demo documentation.
 
 ## Current State
 
-**Latest shipped milestone:** v1.5 Phase 6 Authentication, User Roles, and Parent Visibility
+**Latest shipped milestone:** v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -38,6 +40,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Student profile and learning-history pages.
 - Parent dashboard, child summary, and child learning-history pages.
 - Tutor help-request dashboard, detail, and status update workflow.
+- Shared MVP UI polish, skeleton loading, toast feedback, validation, Error Boundary, analytics client, parent weekly report, tutor notes, demo shortcuts, staging env flags, and Phase 7 documentation.
 - Local FastAPI + SQLite test backend with seed users and role-filtered API endpoints.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
@@ -57,18 +60,24 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run the app and exercise STOA chat through the unified backend Chat API contract — v1.3
 - ✓ Developers can run the app and exercise a streaming STOA chat workflow with file attachments and teacher-help status through the unified backend API contract — v1.4
 - ✓ Developers can run the app with authenticated role routes, parent visibility, tutor help requests, and a SQLite-backed local test backend — v1.5
+- ✓ Developers can run the app as an MVP-ready local/demo product with responsive polish, skeletons, toast feedback, validation, analytics, parent reports, tutor notes, demo data, and staging env preparation — v1.6
 
 ### Active
 
-- [ ] Core pages use shared layout standards and remain usable on mobile, tablet, and small laptop widths.
-- [ ] Major loading states use skeletons instead of plain loading text.
-- [ ] Key operations provide toast feedback and readable error states.
-- [ ] Login, register, student profile, chat input, file upload, teacher help, and tutor status changes have basic validation.
-- [ ] App-level rendering failures are caught by an error boundary.
-- [ ] Core user actions are tracked through a frontend analytics client and usage event contract.
-- [ ] Parent can view a child weekly report with summary, stats, top subjects, weak topics, and recommendations.
-- [ ] Tutor help request workflow supports filtering, clearer context, status updates, and teacher notes.
-- [ ] Demo seed data, demo shortcuts, staging env variables, README, and MVP demo flow are ready.
+- [ ] Staging frontend deployment configuration and SPA fallback are ready.
+- [ ] Staging API environment variables and deployment docs are documented.
+- [ ] GitHub Actions CI runs install, lint, and build/type checks on push and pull request.
+- [ ] Preview deployment or local preview process is documented.
+- [ ] Manual QA checklist covers auth, student, parent, tutor, and responsive flows.
+- [ ] Playwright E2E initial tests cover auth, student chat, parent dashboard/report, and tutor workflow.
+- [ ] Demo data reset process is documented.
+- [ ] Early user testing plan and first-user feedback workflow are documented.
+- [ ] Feedback UI, service, mutation hook, and local backend endpoint exist.
+- [ ] Bug report template and severity workflow are established.
+- [ ] Performance baseline and Lighthouse checklist are documented.
+- [ ] Frontend security review checklist is documented.
+- [ ] Privacy and terms placeholder pages are available.
+- [ ] README documents Phase 8 staging, QA, E2E, feedback, and demo instructions.
 
 ### Out of Scope
 
@@ -76,17 +85,19 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Complex school organization, parent invitation, and full admin management — Phase 6 keeps role surfaces minimal.
 - Real multi-person teacher chat — Phase 6 supports tutor help-request list/detail/status, not live teacher chat.
 - Payment system — billing and subscriptions are deferred.
-- Production deployment — hosting and CI/CD are deferred.
+- Production deployment — Phase 8 targets staging only; production launch remains deferred.
 - Direct frontend calls to OpenAI, Claude, Gemini, DeepSeek, Codex, or any other model provider — frontend remains coupled only to STOA backend APIs.
 - Production SQLite usage — SQLite is local functional-test infrastructure only; production persistence remains a backend concern.
 - Full audit logging and Swiss data privacy compliance documentation — deferred until later security/compliance milestones.
-- Production deployment — Phase 7 prepares staging config only; deployment execution is Phase 8.
+- Full production deployment, SLA, and monitoring platform — Phase 8 prepares staging and readiness artifacts only.
 - Complex BI dashboards and full admin analytics — Phase 7 only adds basic analytics events and usage contract.
 - Full curriculum/content management — not required for MVP readiness.
+- Full legal compliance package — Phase 8 adds placeholders and checklists, not final legal documents.
+- Large-scale user growth, A/B testing, data warehouse, and formal support operations — deferred until later launch milestones.
 
 ## Context
 
-The project brief for Phase 7 was provided in Chinese and defines product polish, responsive readiness, loading/feedback systems, validation, analytics, parent reporting, tutor workflow optimization, demo data, and staging preparation. It builds on v1.5's authenticated role model and local SQLite-backed backend.
+The project brief for Phase 8 was provided in Chinese and defines staging deployment, CI, preview flow, manual QA, E2E tests, early user testing, feedback collection, bug tracking, performance baseline, frontend security review, privacy placeholders, demo reset, and deployment/testing documentation. It builds on v1.6's MVP-ready student-parent-tutor loop.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -102,13 +113,14 @@ Current codebase facts:
 - v1.3 shipped backend-integrated `/chat` data flow using TanStack Query and Axios API services.
 - v1.4 shipped the Phase 5 real learning workflow: streaming response handling, upload attachments, retry, stop generation, new conversation flow, and teacher-help status progression.
 - v1.5 shipped Phase 6 authentication, protected/role routes, student profile/history, parent child visibility, tutor help-request handling, and a local SQLite-backed test backend.
+- v1.6 shipped Phase 7 product polish, responsive foundations, loading/feedback systems, validation, error boundary, analytics, parent weekly report, tutor workflow notes, demo data, and staging env preparation.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 7 polishes existing product flows for MVP demos and early testing; large new business modules, production deployment, complex BI, payments, and full admin remain out of scope.
+- **Scope**: Phase 8 prepares staging, QA, E2E, feedback, and early user testing; large new business modules, production deployment, complex BI, payments, and full admin remain out of scope.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -118,6 +130,9 @@ Current codebase facts:
 - **Permissions**: Frontend route guards are user-experience protection only; backend APIs must enforce real user and role data filtering.
 - **MVP readiness**: Main student, parent, and tutor paths should be demonstrable with local seed data.
 - **Analytics**: Phase 7 can log analytics locally or prepare backend contracts without committing to a third-party provider.
+- **Feedback**: Phase 8 can use a simple local backend feedback endpoint and SQLite table; production support tooling remains deferred.
+- **Testing**: Playwright E2E should cover core demo paths without requiring production deployment.
+- **Staging**: Staging deployment config must not expose secrets, and SPA fallback must support route refreshes.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -148,6 +163,9 @@ Current codebase facts:
 | Treat frontend route guards as non-security boundaries | Prevents UI checks from replacing backend authorization and keeps data isolation enforced by APIs | ✓ Good |
 | Keep Phase 7 focused on readiness instead of new product breadth | Stabilizes the core student-parent-tutor loop for demos and early trials before adding more modules | — Pending |
 | Start analytics with a thin frontend client and API contract | Enables usage visibility without locking the MVP to a vendor prematurely | — Pending |
+| Keep Phase 8 focused on staging and testability | Early user trials need deployment, QA, E2E, feedback, and bug workflow more than new product modules | — Pending |
+| Use GitHub Actions as the first CI gate | It matches the repository host and gives immediate build/lint protection for MVP iteration | — Pending |
+| Add feedback through a thin frontend/backend contract | Gives early users a direct reporting path while keeping production support systems deferred | — Pending |
 
 ## Evolution
 
@@ -167,4 +185,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.6 milestone initialization*
+*Last updated: 2026-05-25 after v1.7 milestone initialization*
