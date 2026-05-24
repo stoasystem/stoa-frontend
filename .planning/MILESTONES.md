@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.7 Phase 8 Staging Deployment, QA, and Early User Testing (Implemented: 2026-05-25)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.7-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Staging-ready SPA fallback configuration for Vercel and Netlify, plus staging environment variable guidance.
+- GitHub Actions frontend CI running `npm ci`, lint, and build/type checks on push and pull request to `main`.
+- Playwright E2E setup with smoke coverage for auth, student chat and teacher help, parent report, and tutor request workflow.
+- Manual QA checklist, MVP demo flow, early user testing plan, and local SQLite demo reset process.
+- Feedback button/dialog, feedback API client and mutation hook, local backend `POST /feedback`, and SQLite feedback persistence.
+- GitHub bug report issue template with severity workflow.
+- Performance baseline, frontend security review, production readiness plan, and public privacy/terms placeholders.
+- README Phase 8 documentation for staging, CI, preview, E2E, feedback, legal placeholders, and demo flow.
+
+### Verification
+
+- Requirements: 35/35 implemented.
+- Phases: 6/6 implemented.
+- Build: passed.
+- Lint: passed.
+- Python syntax check: passed.
+- Local SQLite demo reset: passed.
+- FastAPI feedback smoke: passed.
+- Playwright E2E: passed, 4/4 smoke tests.
+
+---
+
 ## v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness (Implemented: 2026-05-25)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks

@@ -297,6 +297,22 @@ def insert_seed_data() -> None:
                 created_at,
             ),
         )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO feedback
+            (id, user_id, user_role, page, type, message, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                "feedback-demo-1",
+                "user-parent",
+                "parent",
+                "/parent/children/user-student/report",
+                "suggestion",
+                "The weekly report is useful. I would like a clearer next-step checklist.",
+                created_at,
+            ),
+        )
         connection.commit()
 
 

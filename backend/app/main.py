@@ -4,6 +4,7 @@ import json
 import uuid
 
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
@@ -11,6 +12,18 @@ from app.auth import create_access_token, current_user, decode_access_token, has
 from app.database import get_connection, initialize_database
 
 app = FastAPI(title="STOA Local Test Backend")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class LoginRequest(BaseModel):
@@ -40,6 +53,11 @@ class SendMessageRequest(BaseModel):
     attachmentIds: list[str] | None = None
 
 
+class TeacherHelpCreateRequest(BaseModel):
+    conversationId: str
+    message: str | None = None
+
+
 class HelpStatusUpdate(BaseModel):
     status: str
 
@@ -55,6 +73,14 @@ class AnalyticsEventRequest(BaseModel):
 class TeacherNoteRequest(BaseModel):
     content: str | None = None
     note: str | None = None
+
+
+class FeedbackRequest(BaseModel):
+    type: str
+    page: str
+    message: str
+    userRole: str | None = None
+    createdAt: str | None = None
 
 
 @app.on_event("startup")
@@ -153,6 +179,34 @@ def optional_user_from_authorization(authorization: str | None) -> dict[str, str
         return {"id": None, "role": None}
     user = public_user(row)
     return {"id": user["id"], "role": user["role"]}
+
+
+@app.post("/feedback")
+def submit_feedback(
+    payload: FeedbackRequest,
+    authorization: str | None = Header(default=None),
+) -> dict[str, object]:
+    feedback_type = payload.type.strip()
+    message = payload.message.strip()
+    page = payload.page.strip() or "/"
+    if feedback_type not in {"bug", "confusion", "suggestion", "praise"}:
+        raise HTTPException(status_code=400, detail="Invalid feedback type")
+    if not message:
+        raise HTTPException(status_code=400, detail="Feedback message is required")
+    user = optional_user_from_authorization(authorization)
+    feedback_id = f"feedback-{uuid.uuid4()}"
+    created_at = payload.createdAt or now_iso()
+    user_role = user["role"] or payload.userRole
+    with get_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO feedback (id, user_id, user_role, page, type, message, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (feedback_id, user["id"], user_role, page, feedback_type, message, created_at),
+        )
+        connection.commit()
+    return {"ok": True, "feedbackId": feedback_id}
 
 
 @app.get("/auth/me")
@@ -368,6 +422,74 @@ def message_response(row) -> dict[str, object]:
         "createdAt": row["created_at"],
         "attachments": [],
     }
+
+
+def teacher_help_response(row, teacher_name: str | None = None) -> dict[str, object]:
+    response = {
+        "requestId": row["id"],
+        "conversationId": row["conversation_id"],
+        "status": row["status"],
+        "createdAt": row["created_at"],
+        "updatedAt": row["updated_at"],
+    }
+    if teacher_name:
+        response["teacherName"] = teacher_name
+    return response
+
+
+@app.post("/teacher-help/request")
+def create_teacher_help_request(
+    payload: TeacherHelpCreateRequest,
+    user: dict[str, str] = Depends(require_role("student")),
+) -> dict[str, object]:
+    created_at = now_iso()
+    request_id = f"teacher-request-{uuid.uuid4()}"
+    with get_connection() as connection:
+        conversation = connection.execute(
+            "SELECT * FROM conversations WHERE id = ? AND student_user_id = ?",
+            (payload.conversationId, user["id"]),
+        ).fetchone()
+        if conversation is None:
+            raise HTTPException(status_code=404, detail="Conversation not found")
+        connection.execute(
+            """
+            INSERT INTO teacher_help_requests
+              (id, conversation_id, student_user_id, assigned_tutor_user_id, status, request_message, created_at, updated_at)
+            VALUES (?, ?, ?, NULL, ?, ?, ?, ?)
+            """,
+            (
+                request_id,
+                payload.conversationId,
+                user["id"],
+                "pending",
+                payload.message or "Student requested help from a teacher.",
+                created_at,
+                created_at,
+            ),
+        )
+        connection.commit()
+        row = connection.execute("SELECT * FROM teacher_help_requests WHERE id = ?", (request_id,)).fetchone()
+    return teacher_help_response(row)
+
+
+@app.get("/teacher-help/request/{request_id}")
+def get_teacher_help_request(
+    request_id: str,
+    user: dict[str, str] = Depends(require_role("student")),
+) -> dict[str, object]:
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT thr.*, u.name AS teacher_name
+            FROM teacher_help_requests thr
+            LEFT JOIN users u ON u.id = thr.assigned_tutor_user_id
+            WHERE thr.id = ? AND thr.student_user_id = ?
+            """,
+            (request_id, user["id"]),
+        ).fetchone()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Teacher help request not found")
+    return teacher_help_response(row, row["teacher_name"])
 
 
 @app.get("/parents/me/children")

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Phase 8 Staging Deployment, QA, and Early User Testing
-status: planning
-last_updated: "2026-05-24T23:02:43.693Z"
-last_activity: 2026-05-24
+status: complete
+last_updated: "2026-05-25T01:40:00+02:00"
+last_activity: 2026-05-25
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 6
+  completed_phases: 6
+  total_plans: 6
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
-**Current focus:** Milestone v1.6 implemented and smoke-tested; ready for Phase 8 planning.
+**Current focus:** Milestone v1.7 implemented and verified; ready for Phase 9 planning.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-24 — Milestone v1.7 started
+Phase: Phase 40 complete
+Plan: Phase 8 staging, QA, and early user testing readiness
+Status: Milestone complete
+Last activity: 2026-05-25 — Phase 8 implemented and verified
 
 ## Performance Metrics
 
@@ -112,6 +112,13 @@ Recent decisions affecting current work:
 - Phase 32 added the parent weekly report route, components, API hook, local backend endpoint, and seed report data.
 - Phase 33 added tutor request filtering, request summaries, priority placeholder, teacher notes, and note tracking.
 - Phase 34 added demo login shortcuts, staging env flags, README Phase 7 docs, and final verification.
+- Milestone v1.7 started from the Phase 8 Staging Deployment, QA, and Early User Testing brief.
+- Phase 35 added Vercel and Netlify SPA fallback configuration, feedback/staging env docs, and staging deployment guidance.
+- Phase 36 added GitHub Actions CI for `npm ci`, lint, and build/type checks.
+- Phase 37 added Playwright config, scripts, and E2E smoke coverage for auth, student chat, parent report, and tutor workflow.
+- Phase 38 added manual QA, MVP demo flow, early user testing, and local demo reset documentation.
+- Phase 39 added feedback UI, API client, mutation hook, local SQLite feedback persistence, and bug report workflow.
+- Phase 40 added performance baseline, frontend security review, privacy/terms placeholders, production readiness plan, README Phase 8 docs, and final verification.
 
 ### Pending Todos
 
@@ -123,8 +130,13 @@ None currently.
 
 ### Verification Notes
 
-- `npm run build` passed for v1.6.
-- `npm run lint` passed for v1.6.
+- `npm run build` passed for v1.7.
+- `npm run lint` passed for v1.7.
+- `npm run test:e2e` passed for v1.7 with 4/4 Playwright smoke tests.
+- `python3 -m py_compile backend/app/*.py` passed for v1.7.
+- `python -m app.reset_demo_data` passed for v1.7 and recreated the local SQLite demo data.
+- FastAPI TestClient feedback smoke passed for `POST /feedback`.
+- E2E surfaced and drove fixes for local backend CORS, protected-route token hydration, and missing student-facing teacher-help backend endpoints.
 - Vite dev server returned HTTP 200 for `/chat`.
 - In-app Browser plugin was unavailable for visual verification in this session.
 - In-app browser route check for `/chat` passed against a local mock backend for list/detail/send-message/teacher-help.

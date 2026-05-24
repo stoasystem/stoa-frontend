@@ -10,6 +10,8 @@ import { UnauthorizedPage } from '@/pages/error/UnauthorizedPage'
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 import { HomePage } from '@/pages/home/HomePage'
 import { StudentLearningHistoryPage } from '@/pages/learning-history/StudentLearningHistoryPage'
+import { PrivacyPage } from '@/pages/legal/PrivacyPage'
+import { TermsPage } from '@/pages/legal/TermsPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { ChildLearningHistoryPage } from '@/pages/parent/ChildLearningHistoryPage'
 import { ChildReportPage } from '@/pages/parent/ChildReportPage'
@@ -30,6 +32,8 @@ export function AppRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/terms" element={<TermsPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route element={<ProtectedRoute />}>

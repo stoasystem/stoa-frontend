@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { AppLogo } from '@/components/common/AppLogo'
+import { FeedbackButton } from '@/components/feedback/FeedbackButton'
 import { UserMenu } from '@/components/common/UserMenu'
+import { enableFeedback } from '@/lib/env'
 import { useAuthStore } from '@/store/authStore'
 
 const roleNavigation = {
@@ -44,6 +46,11 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </Link>
             ))}
           </nav>
+          {enableFeedback && (
+            <div className="mb-3">
+              <FeedbackButton />
+            </div>
+          )}
           <UserMenu />
         </aside>
         <main className="flex-1 p-6">{children}</main>

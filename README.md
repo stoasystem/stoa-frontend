@@ -355,6 +355,7 @@ VITE_API_BASE_URL=http://localhost:8000
 VITE_APP_ENV=development
 VITE_ENABLE_DEMO_SHORTCUTS=true
 VITE_ENABLE_ANALYTICS=false
+VITE_ENABLE_FEEDBACK=true
 ```
 
 Staging example:
@@ -364,6 +365,7 @@ VITE_API_BASE_URL=https://api-staging.stoa.example
 VITE_APP_ENV=staging
 VITE_ENABLE_DEMO_SHORTCUTS=true
 VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_FEEDBACK=true
 ```
 
 Production example:
@@ -373,6 +375,7 @@ VITE_API_BASE_URL=https://api.stoa.example
 VITE_APP_ENV=production
 VITE_ENABLE_DEMO_SHORTCUTS=false
 VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_FEEDBACK=true
 ```
 
 MVP readiness checklist:
@@ -387,6 +390,78 @@ MVP readiness checklist:
 - Analytics events are emitted without sensitive message content.
 - Demo seed data supports student, tutor, and parent walkthroughs.
 - `npm run build`, `npm run lint`, Python syntax check, and SQLite seed pass locally.
+
+## Phase 8 Staging, QA, and Early User Testing
+
+This phase prepares the STOA frontend for staging deployment and early user testing.
+
+Main additions:
+
+- Staging deployment configuration for Vite SPA hosting.
+- SPA fallback config for Vercel and Netlify.
+- GitHub Actions CI for install, lint, and build checks.
+- Manual QA checklist.
+- Playwright E2E smoke tests.
+- Feedback collection UI and backend endpoint.
+- Bug tracking workflow and issue template.
+- Performance baseline documentation.
+- Frontend security review checklist.
+- Privacy and terms placeholders.
+
+Staging environment variables:
+
+```bash
+VITE_API_BASE_URL=https://api-staging.stoa.example
+VITE_APP_ENV=staging
+VITE_ENABLE_DEMO_SHORTCUTS=true
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_FEEDBACK=true
+```
+
+Build and preview locally:
+
+```bash
+npm run build
+npm run preview
+```
+
+Run E2E tests:
+
+```bash
+npm run test:e2e
+```
+
+The E2E suite expects the local backend to be seeded and running:
+
+```bash
+cd backend
+.venv/bin/python -m app.reset_demo_data
+PYTHONPATH=. .venv/bin/uvicorn app.main:app --reload --port 8000
+```
+
+Recommended staging demo flow:
+
+1. Login as student.
+2. Create or open a chat conversation.
+3. Upload a homework file.
+4. Receive a streaming AI response.
+5. Request teacher help.
+6. Login as tutor.
+7. Resolve the teacher request.
+8. Login as parent.
+9. View child summary and report.
+10. Submit feedback.
+
+Phase 8 documents:
+
+- `docs/deployment/staging.md`
+- `docs/qa/manual-qa-checklist.md`
+- `docs/testing/e2e.md`
+- `docs/demo/mvp-demo-flow.md`
+- `docs/feedback/feedback-workflow.md`
+- `docs/security/frontend-security-review.md`
+- `docs/performance/performance-baseline.md`
+- `docs/deployment/production-readiness-plan.md`
 
 ## Environment Variables
 
@@ -407,6 +482,8 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/` Home
 - `/login` Login
 - `/register` Register
+- `/privacy` Privacy notice placeholder
+- `/terms` Terms placeholder
 - `/dashboard` Student dashboard
 - `/chat` Student chat product UI
 - `/profile` Student profile
@@ -421,4 +498,4 @@ VITE_API_BASE_URL=http://localhost:8000
 
 ## Project Status
 
-Phase 7: MVP readiness polish, responsive UI, skeletons, toast feedback, validation, analytics, parent report, tutor workflow improvements, demo data, staging configuration, and local SQLite-backed testing backend updates.
+Phase 8: staging deployment readiness, CI, QA, E2E smoke testing, feedback collection, bug workflow, performance/security docs, legal placeholders, and production-readiness planning.

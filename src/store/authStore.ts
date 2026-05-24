@@ -6,6 +6,9 @@ export type { UserRole }
 
 export const TOKEN_KEY = 'stoa_access_token'
 
+const getStoredToken = () =>
+  typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY)
+
 type AuthState = {
   user: CurrentUser | null
   accessToken: string | null
@@ -16,25 +19,29 @@ type AuthState = {
   hydrateFromStorage: () => void
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  accessToken: null,
-  isAuthenticated: false,
-  setAuth: (user, accessToken) => {
-    localStorage.setItem(TOKEN_KEY, accessToken)
-    set({ user, accessToken, isAuthenticated: true })
-  },
-  setUser: (user) => {
-    set({ user, isAuthenticated: true })
-  },
-  clearAuth: () => {
-    localStorage.removeItem(TOKEN_KEY)
-    set({ user: null, accessToken: null, isAuthenticated: false })
-  },
-  hydrateFromStorage: () => {
-    const accessToken = localStorage.getItem(TOKEN_KEY)
-    if (accessToken) {
-      set({ accessToken, isAuthenticated: true })
-    }
-  },
-}))
+export const useAuthStore = create<AuthState>((set) => {
+  const storedToken = getStoredToken()
+
+  return {
+    user: null,
+    accessToken: storedToken,
+    isAuthenticated: Boolean(storedToken),
+    setAuth: (user, accessToken) => {
+      localStorage.setItem(TOKEN_KEY, accessToken)
+      set({ user, accessToken, isAuthenticated: true })
+    },
+    setUser: (user) => {
+      set({ user, isAuthenticated: true })
+    },
+    clearAuth: () => {
+      localStorage.removeItem(TOKEN_KEY)
+      set({ user: null, accessToken: null, isAuthenticated: false })
+    },
+    hydrateFromStorage: () => {
+      const accessToken = getStoredToken()
+      if (accessToken) {
+        set({ accessToken, isAuthenticated: true })
+      }
+    },
+  }
+})

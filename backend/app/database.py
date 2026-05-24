@@ -136,5 +136,15 @@ def initialize_database() -> None:
               note TEXT NOT NULL,
               created_at TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS feedback (
+              id TEXT PRIMARY KEY,
+              user_id TEXT,
+              user_role TEXT,
+              page TEXT NOT NULL,
+              type TEXT NOT NULL,
+              message TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            );
             """
         )
