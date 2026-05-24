@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import { AppLogo } from '@/components/common/AppLogo'
 
 export function MarketingLayout({ children }: { children: ReactNode }) {
   return (
@@ -7,7 +8,7 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="border-b bg-background/90">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
           <Link to="/" className="font-semibold tracking-tight">
-            STOA
+            <AppLogo />
           </Link>
           <nav className="flex gap-6 text-sm text-muted-foreground">
             <Link className="transition-colors hover:text-foreground" to="/">

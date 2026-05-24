@@ -83,8 +83,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Add API services, stores, hooks, and types.
-- [ ] 06-02: Add common reusable components.
+- [x] 06-01: Add API services, stores, hooks, and types.
+- [x] 06-02: Add common reusable components.
 
 ### Phase 7: Acceptance Page, Documentation, and Verification
 **Goal**: Prove the Phase 2 stack works through the Home acceptance page, README updates, command verification, and GitHub handoff.
@@ -114,5 +114,5 @@ Phases execute in numeric order: 4 -> 5 -> 6 -> 7
 | 3. Documentation and Repository Readiness | v1.0 | 2/2 | Complete | 2026-05-24 |
 | 4. Styling and UI Foundation | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 5. App Providers, Router, Layouts, and Pages | v1.1 | 2/2 | Complete | 2026-05-24 |
-| 6. Services, State, Types, Hooks, and Common Components | v1.1 | 0/2 | Not started | - |
+| 6. Services, State, Types, Hooks, and Common Components | v1.1 | 2/2 | Complete | 2026-05-24 |
 | 7. Acceptance Page, Documentation, and Verification | v1.1 | 0/2 | Not started | - |
