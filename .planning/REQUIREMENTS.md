@@ -1,87 +1,89 @@
-# Requirements: STOA Frontend v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
+# Requirements: STOA Frontend v1.7 Phase 8 Staging Deployment, QA, and Early User Testing
 
 **Defined:** 2026-05-25
 **Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## v1.6 Requirements
+## v1.7 Requirements
 
-Requirements for the seventh-stage MVP readiness milestone. Each maps to roadmap phases.
+Requirements for the eighth-stage staging and early user testing milestone. Each maps to roadmap phases after approval.
 
-### UI and Responsive Readiness
+### Staging Deployment
 
-- [x] **UI-01**: Core pages use shared page container, page header, and section header patterns.
-- [x] **UI-02**: UI guidelines document layout, cards, forms, badges, chat, dashboards, and mobile behavior.
-- [x] **UI-03**: Login, register, dashboard, chat, profile, parent, child summary, tutor list, and tutor detail pages are usable on mobile and tablet widths.
-- [x] **UI-04**: Chat mobile layout avoids permanent sidebar compression and keeps messages/input usable.
+- [ ] **DEPLOY-01**: Staging frontend deployment configuration exists for a Vite SPA.
+- [ ] **DEPLOY-02**: React Router deep links refresh correctly through SPA fallback configuration.
+- [ ] **DEPLOY-03**: Staging environment variables are documented, including API base URL, app env, demo shortcuts, analytics, and feedback flags.
+- [ ] **DEPLOY-04**: A manual preview flow exists for local verification with `npm run build` and `npm run preview`.
+- [ ] **DEPLOY-05**: Deployment documentation explains staging URL, backend API URL, redeploy process, and verification checks.
 
-### Loading and Feedback
+### CI and Build Gate
 
-- [x] **LOAD-01**: Shared skeleton primitives and page skeletons exist.
-- [x] **LOAD-02**: Chat, dashboard, parent, tutor, profile, and report loading states use skeletons.
-- [x] **FEED-01**: Toast notification system is wired through app providers.
-- [x] **FEED-02**: Auth, profile, upload, teacher-help, and tutor actions show success/error feedback.
+- [ ] **CI-01**: GitHub Actions CI runs on push to `main` and pull requests to `main`.
+- [ ] **CI-02**: CI installs dependencies with `npm ci`.
+- [ ] **CI-03**: CI runs lint and build/type checks before changes are considered safe to merge.
 
-### Validation and Resilience
+### Manual QA and Early User Testing
 
-- [x] **VAL-01**: Login validation covers email format and required password.
-- [x] **VAL-02**: Register validation covers name, email, password length, and role.
-- [x] **VAL-03**: Student profile validation covers grade and at least one subject.
-- [x] **VAL-04**: Chat input blocks empty messages.
-- [x] **VAL-05**: File upload validation preserves type, size, and count rules with user-readable feedback.
-- [x] **ERR-01**: App has an error boundary with recovery UI.
+- [ ] **QA-01**: Manual QA checklist covers auth, student, parent, tutor, and responsive flows.
+- [ ] **QA-02**: MVP demo flow documentation covers student, tutor, and parent walkthroughs with demo accounts.
+- [ ] **QA-03**: Early user testing plan identifies target testers, session structure, observation goals, and feedback collection steps.
+- [ ] **QA-04**: Demo data reset process is documented for local SQLite and future staging reset usage.
 
-### Analytics and Usage Tracking
+### E2E Testing
 
-- [x] **ANLY-01**: Analytics client defines MVP event names and payload type.
-- [x] **ANLY-02**: Core auth, chat, upload, teacher-help, parent report, and tutor events are tracked.
-- [x] **ANLY-03**: Usage tracking API contract is documented.
-- [x] **ANLY-04**: Local backend can store analytics events.
+- [ ] **E2E-01**: Playwright is installed and configured for the Vite app.
+- [ ] **E2E-02**: Package scripts exist for headless and UI Playwright runs.
+- [ ] **E2E-03**: Auth E2E covers demo login and logout.
+- [ ] **E2E-04**: Student chat E2E covers opening chat, sending a question, and requesting teacher help.
+- [ ] **E2E-05**: Parent and tutor E2E tests cover child summary/report and tutor request workflow.
+- [ ] **E2E-06**: E2E documentation explains local prerequisites, backend expectations, and how to debug failures.
 
-### Parent Report
+### Feedback Collection
 
-- [x] **RPRT-01**: Parent report type, API, hook, and route exist.
-- [x] **RPRT-02**: Report displays period, summary, stats, top subjects, weak topics, and recommendations.
-- [x] **RPRT-03**: Local backend returns seed report data.
-- [x] **RPRT-04**: Parent report view is tracked.
+- [ ] **FEED-01**: Feedback API client and mutation hook exist.
+- [ ] **FEED-02**: Feedback button and dialog are available when `VITE_ENABLE_FEEDBACK=true`.
+- [ ] **FEED-03**: Feedback submissions include type, page, message, user role, and timestamp context.
+- [ ] **FEED-04**: Local backend supports `POST /feedback` and persists feedback to SQLite.
+- [ ] **FEED-05**: Feedback workflow documentation explains how the team reviews and converts feedback into issues.
 
-### Tutor Workflow
+### Bug Tracking
 
-- [x] **TUTR-05**: Tutor request list supports status filtering.
-- [x] **TUTR-06**: Tutor list and detail show created time, grade, subject, summary, priority placeholder, and context.
-- [x] **TUTR-07**: Tutor can add teacher notes.
-- [x] **TUTR-08**: Tutor status and note updates refresh UI and are tracked.
+- [ ] **BUG-01**: GitHub bug report issue template exists with role, route, repro steps, expected/actual behavior, environment, and severity fields.
+- [ ] **BUG-02**: Bug severity definitions are documented for Critical, High, Medium, and Low issues.
 
-### Demo, Staging, and Documentation
+### Performance Baseline
 
-- [x] **DEMO-01**: Demo seed data supports full student to tutor to parent MVP flow.
-- [x] **DEMO-02**: Demo login shortcuts appear only when enabled by environment.
-- [x] **ENV-01**: `.env.example` includes app environment, analytics, and demo flags.
-- [x] **DOCS-20**: README documents Phase 7, demo accounts, demo flow, staging config, and MVP checklist.
-- [x] **VERF-03**: Build, lint, backend seed, and route smoke verification are recorded.
+- [ ] **PERF-01**: Performance baseline documentation defines Lighthouse pages and target metrics for `/login`, `/dashboard`, `/chat`, `/parent`, and `/tutor`.
+- [ ] **PERF-02**: Build output and known bundle-size warning policy are documented for staging readiness.
+
+### Security and Privacy
+
+- [ ] **SEC-01**: Frontend security review checklist covers frontend secrets, database access, localStorage token risk, demo shortcuts, route guards, 401/403 handling, file upload limits, and dangerous HTML rendering.
+- [ ] **SEC-02**: Security review documentation explicitly marks frontend checks as complementary to backend authorization and validation.
+- [ ] **LEGAL-01**: Public `/privacy` placeholder page exists for testing-stage data handling notice.
+- [ ] **LEGAL-02**: Public `/terms` placeholder page exists for testing-stage usage notice.
+
+### Documentation and Readiness
+
+- [ ] **DOCS-01**: README documents Phase 8 staging, CI, preview, E2E, feedback, privacy, and demo flow.
+- [ ] **DOCS-02**: Deployment, QA, testing, demo, feedback, and security docs exist under `docs/`.
+- [ ] **DOCS-03**: Production readiness plan documents remaining work before pilot launch.
+- [ ] **DOCS-04**: Final verification records build, lint, E2E, backend feedback smoke, and route preview results.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Deployment and QA
+### Production Launch and Operations
 
-- **DEPLOY-02**: Staging deployment is configured and published.
-- **CI-01**: CI build check runs on pull requests.
-- **E2E-01**: E2E tests cover the student, tutor, and parent demo flow.
-- **QA-01**: Manual QA checklist is executed with early users.
-
-### Analytics and Reporting
-
-- **ANLY-05**: Product analytics dashboards exist.
-- **RPRT-05**: Parent reports are generated automatically from real learning activity.
-- **OBS-01**: Production monitoring and error reporting exist.
-
-### Product Expansion
-
-- **PAY-01**: Payment and subscription flows exist.
-- **ADMIN-02**: Full admin user and tutor management exists.
-- **BI-01**: Complex business intelligence dashboards exist.
-- **CONTENT-01**: Curriculum and content management exists.
+- **PROD-01**: Production deployment is configured and published.
+- **MON-01**: Error monitoring and uptime monitoring exist.
+- **OBS-01**: Production logging and alerting strategy exists.
+- **SUPPORT-01**: Support inbox or CRM workflow exists.
+- **LEGAL-03**: Final privacy policy and terms are legally reviewed.
+- **ADMIN-03**: Admin/support view exists for feedback and operational triage.
+- **ANLY-06**: Real analytics backend/dashboard exists beyond MVP event storage.
+- **CI-04**: E2E runs automatically against deployed preview URLs.
+- **PERF-03**: Lighthouse CI enforces performance budgets.
 
 ## Out of Scope
 
@@ -89,13 +91,13 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Production deployment | Phase 7 prepares staging config and demo readiness; deployment execution belongs to Phase 8. |
-| Full payment system | Not required for MVP demo readiness. |
-| Full admin backend | Admin remains outside Phase 7 polish scope. |
-| Complex BI dashboard | Phase 7 adds event tracking and contracts only. |
-| Production audit logging | Deferred to later security/compliance work. |
-| Automatic AI-generated reports | Phase 7 can use seed/local report data to validate parent value. |
-| Full school B2B management | Not required for early MVP flow. |
+| Production deployment | Phase 8 prepares staging and production-readiness planning only. |
+| Formal legal compliance package | Phase 8 adds placeholders and checklists, not final legal documents. |
+| Full monitoring platform | Early user staging needs baseline checks and feedback first. |
+| Full admin feedback dashboard | Feedback can persist locally and be triaged through documented workflow. |
+| Large E2E suite for every route | Phase 8 needs stable smoke coverage, not broad brittle test coverage. |
+| Complex A/B testing or data warehouse | Not needed for early user staging trials. |
+| Payment, subscription, or school B2B management | Outside staging/QA readiness scope. |
 
 ## Traceability
 
@@ -103,43 +105,47 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UI-01 | Phase 28 | Complete |
-| UI-02 | Phase 28 | Complete |
-| UI-03 | Phase 28 | Complete |
-| UI-04 | Phase 28 | Complete |
-| LOAD-01 | Phase 29 | Complete |
-| LOAD-02 | Phase 29 | Complete |
-| FEED-01 | Phase 29 | Complete |
-| FEED-02 | Phase 29 | Complete |
-| VAL-01 | Phase 30 | Complete |
-| VAL-02 | Phase 30 | Complete |
-| VAL-03 | Phase 30 | Complete |
-| VAL-04 | Phase 30 | Complete |
-| VAL-05 | Phase 30 | Complete |
-| ERR-01 | Phase 30 | Complete |
-| ANLY-01 | Phase 31 | Complete |
-| ANLY-02 | Phase 31 | Complete |
-| ANLY-03 | Phase 31 | Complete |
-| ANLY-04 | Phase 31 | Complete |
-| RPRT-01 | Phase 32 | Complete |
-| RPRT-02 | Phase 32 | Complete |
-| RPRT-03 | Phase 32 | Complete |
-| RPRT-04 | Phase 32 | Complete |
-| TUTR-05 | Phase 33 | Complete |
-| TUTR-06 | Phase 33 | Complete |
-| TUTR-07 | Phase 33 | Complete |
-| TUTR-08 | Phase 33 | Complete |
-| DEMO-01 | Phase 34 | Complete |
-| DEMO-02 | Phase 34 | Complete |
-| ENV-01 | Phase 34 | Complete |
-| DOCS-20 | Phase 34 | Complete |
-| VERF-03 | Phase 34 | Complete |
+| DEPLOY-01 | TBD | Pending |
+| DEPLOY-02 | TBD | Pending |
+| DEPLOY-03 | TBD | Pending |
+| DEPLOY-04 | TBD | Pending |
+| DEPLOY-05 | TBD | Pending |
+| CI-01 | TBD | Pending |
+| CI-02 | TBD | Pending |
+| CI-03 | TBD | Pending |
+| QA-01 | TBD | Pending |
+| QA-02 | TBD | Pending |
+| QA-03 | TBD | Pending |
+| QA-04 | TBD | Pending |
+| E2E-01 | TBD | Pending |
+| E2E-02 | TBD | Pending |
+| E2E-03 | TBD | Pending |
+| E2E-04 | TBD | Pending |
+| E2E-05 | TBD | Pending |
+| E2E-06 | TBD | Pending |
+| FEED-01 | TBD | Pending |
+| FEED-02 | TBD | Pending |
+| FEED-03 | TBD | Pending |
+| FEED-04 | TBD | Pending |
+| FEED-05 | TBD | Pending |
+| BUG-01 | TBD | Pending |
+| BUG-02 | TBD | Pending |
+| PERF-01 | TBD | Pending |
+| PERF-02 | TBD | Pending |
+| SEC-01 | TBD | Pending |
+| SEC-02 | TBD | Pending |
+| LEGAL-01 | TBD | Pending |
+| LEGAL-02 | TBD | Pending |
+| DOCS-01 | TBD | Pending |
+| DOCS-02 | TBD | Pending |
+| DOCS-03 | TBD | Pending |
+| DOCS-04 | TBD | Pending |
 
 **Coverage:**
-- v1.6 requirements: 31 total
-- Mapped to phases: 31
-- Unmapped: 0
+- v1.7 requirements: 35 total
+- Mapped to phases: 0 pending roadmap approval
+- Unmapped: 35
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.6 implementation*
+*Last updated: 2026-05-25 after v1.7 research*
