@@ -83,13 +83,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCFD-01 | Phase 1 | Pending |
-| SCFD-02 | Phase 1 | Pending |
-| SCFD-03 | Phase 1 | Pending |
-| SCFD-04 | Phase 1 | Pending |
-| APP-01 | Phase 1 | Pending |
-| APP-02 | Phase 1 | Pending |
-| APP-03 | Phase 1 | Pending |
+| SCFD-01 | Phase 1 | Complete |
+| SCFD-02 | Phase 1 | Complete |
+| SCFD-03 | Phase 1 | Complete |
+| SCFD-04 | Phase 1 | Complete |
+| APP-01 | Phase 1 | Complete |
+| APP-02 | Phase 1 | Complete |
+| APP-03 | Phase 1 | Complete |
 | TOOL-01 | Phase 2 | Pending |
 | TOOL-02 | Phase 2 | Pending |
 | TOOL-03 | Phase 2 | Pending |
