@@ -1,11 +1,11 @@
 ---
 milestone: v1.0
 milestone_name: Frontend Foundation
-status: in_progress
+status: complete
 progress:
-  completed_phases: 2
+  completed_phases: 3
   total_phases: 3
-  completed_plans: 4
+  completed_plans: 6
   total_plans: 6
 ---
 
@@ -16,21 +16,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and see a working STOA frontend foundation at `http://localhost:5173/`.
-**Current focus:** Phase 3: Documentation and Repository Readiness
+**Current focus:** Milestone v1.0 complete
 
 ## Current Position
 
 Phase: 3 of 3 (Documentation and Repository Readiness)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-05-24 — Phase 2 completed and verified
+Plan: 2 of 2 complete
+Status: Milestone complete
+Last activity: 2026-05-24 — Phase 3 completed and verified
 
-Progress: [██████░░░░] 67%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 6
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -40,9 +40,10 @@ Progress: [██████░░░░] 67%
 |-------|-------|-------|----------|
 | Phase 1 | 2 | n/a | n/a |
 | Phase 2 | 2 | n/a | n/a |
+| Phase 3 | 2 | n/a | n/a |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02, 02-01, 02-02
+- Last 5 plans: 01-02, 02-01, 02-02, 03-01, 03-02
 - Trend: n/a
 
 *Updated after each plan completion*
@@ -59,6 +60,7 @@ Recent decisions affecting current work:
 - Discussion is skipped for autonomous execution; roadmap and requirements are the source of truth.
 - Phase 1 simplified the runtime app surface to the minimal STOA foundation page.
 - Phase 2 verified install, build, lint, and preview workflows.
+- Phase 3 aligned README with Phase 1 and confirmed repository handoff readiness.
 
 ### Pending Todos
 
@@ -66,7 +68,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- GitHub push may require user credentials and a pre-created `stoasystem/stoa-frontend` repository.
+None currently.
 
 ## Deferred Items
 

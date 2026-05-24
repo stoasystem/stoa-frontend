@@ -1,26 +1,52 @@
-# stoa-frontend
+# STOA Frontend
 
-React 19 + TypeScript frontend for the STOA platform.
+STOA learning platform frontend.
 
-## Stack
+## Tech Stack
 
-- React 19 · TypeScript · Vite
-- Zustand (state) · TanStack Query (server state)
-- AWS Amplify JS (Cognito auth)
-- Axios (HTTP client with JWT interceptor)
+- React
+- TypeScript
+- Vite
+- npm
 
-## Setup
+## Local Development
+
+Install dependencies:
 
 ```bash
 npm install
-cp .env.example .env   # fill in VITE_API_URL + VITE_COGNITO_*
+```
+
+Start development server:
+
+```bash
 npm run dev
 ```
 
-## Environment Variables
+The app runs at:
 
-| Variable | Description |
-|----------|-------------|
-| `VITE_API_URL` | Backend API base URL |
-| `VITE_COGNITO_USER_POOL_ID` | From StoaAuthStack output |
-| `VITE_COGNITO_CLIENT_ID` | From StoaAuthStack output (role-specific client) |
+```text
+http://localhost:5173/
+```
+
+Build production version:
+
+```bash
+npm run build
+```
+
+Preview production build:
+
+```bash
+npm run preview
+```
+
+Check code quality:
+
+```bash
+npm run lint
+```
+
+## Project Status
+
+Phase 1: frontend foundation initialized.
