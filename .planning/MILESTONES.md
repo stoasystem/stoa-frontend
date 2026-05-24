@@ -1,5 +1,27 @@
 # Milestones
 
+## v1.2 Core Product UI - Complete
+
+**Completed:** 2026-05-24
+**Audit:** `.planning/milestones/v1.2-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Product UI contracts for chat and student dashboard data.
+- Mock conversation and dashboard data under `src/data/`.
+- `/chat` product UI with conversation sidebar, active message list, student/assistant bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
+- `/dashboard` product UI with student stats, recent questions, weak topics, learning progress, and teacher feedback.
+- README Phase 3 Core Product UI documentation.
+- Browser verification for `/chat` and `/dashboard`.
+
+### Verification
+
+- Requirements: 27/27 complete.
+- Phases: 3/3 complete.
+- Build: passed.
+- Lint: passed.
+- Browser dev route checks: passed.
+
 ## v1.0 Frontend Foundation - Complete
 
 **Completed:** 2026-05-24
