@@ -3,9 +3,9 @@ milestone: v1.0
 milestone_name: Frontend Foundation
 status: in_progress
 progress:
-  completed_phases: 1
+  completed_phases: 2
   total_phases: 3
-  completed_plans: 2
+  completed_plans: 4
   total_plans: 6
 ---
 
@@ -16,21 +16,21 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-24)
 
 **Core value:** Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and see a working STOA frontend foundation at `http://localhost:5173/`.
-**Current focus:** Phase 2: Tooling Verification
+**Current focus:** Phase 3: Documentation and Repository Readiness
 
 ## Current Position
 
-Phase: 2 of 3 (Tooling Verification)
+Phase: 3 of 3 (Documentation and Repository Readiness)
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-05-24 — Phase 1 completed and verified
+Last activity: 2026-05-24 — Phase 2 completed and verified
 
-Progress: [███░░░░░░░] 33%
+Progress: [██████░░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 4
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -39,9 +39,10 @@ Progress: [███░░░░░░░] 33%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | Phase 1 | 2 | n/a | n/a |
+| Phase 2 | 2 | n/a | n/a |
 
 **Recent Trend:**
-- Last 5 plans: 01-01, 01-02
+- Last 5 plans: 01-01, 01-02, 02-01, 02-02
 - Trend: n/a
 
 *Updated after each plan completion*
@@ -57,6 +58,7 @@ Recent decisions affecting current work:
 - Workflow defaults selected autonomously: YOLO mode, coarse phases, parallel execution, commit planning docs, balanced model profile.
 - Discussion is skipped for autonomous execution; roadmap and requirements are the source of truth.
 - Phase 1 simplified the runtime app surface to the minimal STOA foundation page.
+- Phase 2 verified install, build, lint, and preview workflows.
 
 ### Pending Todos
 
