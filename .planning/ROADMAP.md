@@ -30,7 +30,7 @@
 - [x] **Phase 98: Copy Governance and Scope Lock** - Establish locale-specific copy rules, glossary guidance, QA checklist expectations, and Phase 17 scope boundaries.
 - [x] **Phase 99: Title and Layout Infrastructure** - Add safe locale-aware title structures and typed layout hints for long localized UI copy.
 - [x] **Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup** - Rewrite homepage, onboarding, chat, parent, tutor, pricing, billing, support, and shared-state copy in EN/DE/FR/IT.
-- [ ] **Phase 101: Responsive Typography and Multilingual Fit Pass** - Verify and tune high-risk components so localized text remains readable across target viewports.
+- [x] **Phase 101: Responsive Typography and Multilingual Fit Pass** - Verify and tune high-risk components so localized text remains readable across target viewports.
 - [ ] **Phase 102: QA Evidence, Documentation, and Handoff** - Record copy review, visual QA, terminology audit, build verification, README notes, and remaining review gaps.
 
 ## Phase Details
@@ -86,7 +86,7 @@
   2. Navbar labels, CTA buttons, card titles, pricing cards, form labels, and chat action controls remain readable in English, German, French, and Italian.
   3. Targeted CSS or component adjustments are scoped to affected multilingual-fit problems and do not create a broad visual redesign.
   4. Long localized labels wrap or flow predictably without truncating essential meaning or causing horizontal overflow.
-**Plans**: TBD
+**Plans**: 1/1
 **UI hint**: yes
 
 ### Phase 102: QA Evidence, Documentation, and Handoff
@@ -124,5 +124,5 @@ Phase 17 phases planned in numeric order: 98 -> 99 -> 100 -> 101 -> 102
 | 98. Copy Governance and Scope Lock | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 99. Title and Layout Infrastructure | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 100. P0 Locale Copy Rewrite and Terminology Cleanup | v1.16 | 1/1 | Complete | 2026-05-25 |
-| 101. Responsive Typography and Multilingual Fit Pass | v1.16 | 0/1 | Not started | - |
+| 101. Responsive Typography and Multilingual Fit Pass | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 102. QA Evidence, Documentation, and Handoff | v1.16 | 0/1 | Not started | - |

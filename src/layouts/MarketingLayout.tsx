@@ -11,27 +11,27 @@ export function MarketingHeader() {
   return (
     <header className="sticky top-0 z-30 border-b bg-background/88 backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-6">
-        <Link to="/" className="font-semibold tracking-tight">
+        <Link to="/" className="min-w-0 font-semibold tracking-tight">
           <AppLogo />
         </Link>
-        <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
-          <Link className="transition-colors hover:text-foreground" to="/how-it-works">
+        <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
+          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/how-it-works">
             {t('navigation.howItWorks')}
           </Link>
-          <Link className="transition-colors hover:text-foreground" to="/for-parents">
+          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/for-parents">
             {t('navigation.parents')}
           </Link>
-          <Link className="transition-colors hover:text-foreground" to="/teacher-support">
+          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/teacher-support">
             {t('navigation.tutors')}
           </Link>
-          <Link className="transition-colors hover:text-foreground" to="/pricing">
+          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/pricing">
             {t('navigation.pricing')}
           </Link>
-          <Link className="transition-colors hover:text-foreground" to="/login">
+          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/login">
             {t('navigation.login')}
           </Link>
           <LanguageSwitcher compact />
-          <Button asChild size="sm" className="premium-button-lift premium-primary-button h-9 rounded-full px-4">
+          <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-full px-4 py-2 whitespace-normal text-center">
             <Link to="/login?next=/chat">{t('navigation.startLearning')}</Link>
           </Button>
         </nav>
@@ -47,20 +47,20 @@ export function MarketingFooter() {
     <footer className="border-t bg-background/88">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-7 text-sm text-muted-foreground">
         <span>{t('brand.platform')}</span>
-        <div className="flex flex-wrap gap-4">
-          <Link className="hover:text-foreground" to="/teacher-support">
+        <div className="flex min-w-0 flex-wrap gap-4">
+          <Link className="whitespace-nowrap hover:text-foreground" to="/teacher-support">
             {t('navigation.forTutors')}
           </Link>
-          <Link className="hover:text-foreground" to="/for-parents">
+          <Link className="whitespace-nowrap hover:text-foreground" to="/for-parents">
             {t('navigation.forParents')}
           </Link>
-          <Link className="hover:text-foreground" to="/privacy">
+          <Link className="whitespace-nowrap hover:text-foreground" to="/privacy">
             {t('navigation.privacy')}
           </Link>
-          <Link className="hover:text-foreground" to="/terms">
+          <Link className="whitespace-nowrap hover:text-foreground" to="/terms">
             {t('navigation.terms')}
           </Link>
-          <Link className="hover:text-foreground" to="/support">
+          <Link className="whitespace-nowrap hover:text-foreground" to="/support">
             {t('navigation.support')}
           </Link>
           <LanguageSwitcher compact />

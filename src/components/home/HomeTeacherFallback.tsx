@@ -6,8 +6,8 @@ export function HomeTeacherFallback() {
   const { t } = useTranslation('home')
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
-      <div className="relative min-h-[24rem] overflow-hidden rounded-xl border border-border/70 bg-[#152238] text-primary-foreground shadow-[0_24px_70px_hsl(217_45%_15%_/_0.14)]">
+    <section className="mx-auto grid w-full min-w-0 max-w-6xl gap-6 px-5 py-10 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+      <div className="relative min-w-0 overflow-hidden rounded-xl border border-border/70 bg-[#152238] text-primary-foreground shadow-[0_24px_70px_hsl(217_45%_15%_/_0.14)] min-h-[24rem]">
         <img
           src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80"
           alt="Teacher helping a student with schoolwork"
@@ -21,11 +21,11 @@ export function HomeTeacherFallback() {
           </p>
         </div>
       </div>
-      <div className="rounded-xl border border-border/70 bg-card/78 p-6">
+      <div className="min-w-0 rounded-xl border border-border/70 bg-card/78 p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
           {t('teacher.eyebrow')}
         </p>
-        <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
+        <h2 className="editorial-heading editorial-title-shell mt-5 break-words text-4xl font-semibold leading-tight text-foreground">
           {t('teacher.title')}
         </h2>
         <p className="mt-4 text-base leading-8 text-muted-foreground">

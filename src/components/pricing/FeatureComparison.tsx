@@ -16,7 +16,7 @@ export function FeatureComparison() {
           <thead className="text-muted-foreground">
             <tr>
               {headers.map((header) => (
-                <th key={header} className="py-2 pr-3 font-medium">
+                <th key={header} className="py-2 pr-3 font-medium leading-5">
                   {header}
                 </th>
               ))}
@@ -26,7 +26,7 @@ export function FeatureComparison() {
             {rows.map((row) => (
               <tr key={row[0]} className="border-t">
                 {row.map((cell) => (
-                  <td key={cell} className="py-3 pr-3">
+                  <td key={cell} className="py-3 pr-3 leading-5">
                     {cell}
                   </td>
                 ))}

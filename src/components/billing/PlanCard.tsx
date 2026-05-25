@@ -20,10 +20,12 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
     : plan.features
 
   return (
-    <Card className={featured ? 'border-primary shadow-sm' : undefined}>
+    <Card className={featured ? 'min-w-0 border-primary shadow-sm' : 'min-w-0'}>
       <CardHeader>
-        <div className="flex items-start justify-between gap-3">
-          <CardTitle className="text-xl">{t(`plans.${plan.id}.name`, { defaultValue: plan.name })}</CardTitle>
+        <div className="flex min-w-0 items-start justify-between gap-3">
+          <CardTitle className="min-w-0 break-words text-xl leading-7">
+            {t(`plans.${plan.id}.name`, { defaultValue: plan.name })}
+          </CardTitle>
           {plan.recommended && <RecommendedPlanBadge />}
         </div>
         <p className="text-3xl font-semibold text-foreground">{price}</p>
@@ -34,9 +36,9 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
       <CardContent>
         <ul className="space-y-3 text-sm text-muted-foreground">
           {features.map((feature) => (
-            <li key={feature} className="flex gap-2">
+            <li key={feature} className="flex min-w-0 gap-2">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <span>{feature}</span>
+              <span className="min-w-0 break-words leading-5">{feature}</span>
             </li>
           ))}
         </ul>
@@ -44,7 +46,7 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
       <CardFooter>
         <Button
           type="button"
-          className="w-full"
+          className="h-auto min-h-10 w-full whitespace-normal py-2 text-center leading-5"
           variant={featured ? 'default' : 'outline'}
           onClick={() => onSelect?.(plan.id)}
         >

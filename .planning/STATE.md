@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: "Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement"
 status: planning
-last_updated: "2026-05-25T22:20:00Z"
+last_updated: "2026-05-25T22:35:00Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, and a clean path to future real backend integration.
-**Current focus:** Phase 100 is complete; next planning target is Phase 101.
+**Current focus:** Phase 101 is complete; next planning target is Phase 102.
 
 ## Current Position
 
-Phase: 101 - Responsive Typography and Multilingual Fit Pass
+Phase: 102 - QA Evidence, Documentation, and Handoff
 Plan: TBD
-Status: Phase 100 complete; ready for Phase 101 planning
-Last activity: 2026-05-25 — Phase 100 P0 locale copy rewrite and terminology cleanup completed
+Status: Phase 101 complete; ready for Phase 102 planning
+Last activity: 2026-05-25 — Phase 101 responsive typography and multilingual fit pass completed
 
 ## Performance Metrics
 
@@ -187,10 +187,11 @@ Recent decisions affecting current work:
 - Phase 98 added Phase 17 locale copy rules, German/French/Italian copy rules, glossary/style-guide updates, translation QA additions, and scope boundaries.
 - Phase 99 added typed locale layout hints, optional `HomeHero` `titleLines` support, locale-aware hero width/action classes, and scoped stacked-title CSS.
 - Phase 100 rewrote P0 EN/DE/FR/IT homepage, auth, chat, parent, tutor, pricing, billing, and support copy; localized billing plan display text; and removed banned user-facing terminology from audited source paths.
+- Phase 101 added targeted responsive wrapping/min-width safeguards and verified 36 route/locale/viewport combinations with no overflow after fixing French mobile homepage overflow.
 
 ### Pending Todos
 
-- Plan Phase 101: Responsive Typography and Multilingual Fit Pass.
+- Plan Phase 102: QA Evidence, Documentation, and Handoff.
 
 ### Quick Tasks Completed
 

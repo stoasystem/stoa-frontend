@@ -13,9 +13,9 @@ export function PricingFAQ() {
       {faqs.map((faq) => (
         <Card key={faq.question}>
           <CardHeader>
-            <CardTitle className="text-base">{faq.question}</CardTitle>
+            <CardTitle className="break-words text-base leading-6">{faq.question}</CardTitle>
           </CardHeader>
-          <CardContent className="text-sm leading-6 text-muted-foreground">{faq.answer}</CardContent>
+          <CardContent className="break-words text-sm leading-6 text-muted-foreground">{faq.answer}</CardContent>
         </Card>
       ))}
     </section>

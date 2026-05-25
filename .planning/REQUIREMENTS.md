@@ -25,7 +25,7 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 - [x] **HERO-03**: User sees the French homepage hero title `Comprendre avec confiance.` with natural French subtitle and CTA copy.
 - [x] **HERO-04**: User sees the Italian homepage hero title `Studiare con più chiarezza.` with natural Italian subtitle and CTA copy.
 - [x] **HERO-05**: `HomeHero` supports optional localized `titleLines` while preserving a safe `title` fallback for locales that use a single title string.
-- [ ] **HERO-06**: German hero title rendering no longer breaks visual rhythm at mobile, tablet, desktop, or wide desktop widths.
+- [x] **HERO-06**: German hero title rendering no longer breaks visual rhythm at mobile, tablet, desktop, or wide desktop widths.
 
 ### Locale Layout Infrastructure
 
@@ -33,8 +33,8 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 - [x] **LAYOUT-02**: Locale layout hints can distinguish default and stacked hero title variants without placing rendering metadata inside translation strings.
 - [x] **LAYOUT-03**: Locale layout hints can identify button/action density needs for long German and French labels.
 - [x] **LAYOUT-04**: Hero typography and width constraints adapt to locale-specific title length without globally shrinking all headings.
-- [ ] **LAYOUT-05**: Navbar, CTA buttons, card titles, pricing cards, form labels, and chat action controls remain readable and do not overflow in English, German, French, or Italian.
-- [ ] **LAYOUT-06**: CSS or component adjustments for multilingual fit are scoped to affected components and do not introduce a broad visual redesign.
+- [x] **LAYOUT-05**: Navbar, CTA buttons, card titles, pricing cards, form labels, and chat action controls remain readable and do not overflow in English, German, French, or Italian.
+- [x] **LAYOUT-06**: CSS or component adjustments for multilingual fit are scoped to affected components and do not introduce a broad visual redesign.
 
 ### P0 Product Copy Rewrite
 
@@ -134,13 +134,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HERO-03 | Phase 100 | Complete |
 | HERO-04 | Phase 100 | Complete |
 | HERO-05 | Phase 99 | Complete |
-| HERO-06 | Phase 101 | Pending |
+| HERO-06 | Phase 101 | Complete |
 | LAYOUT-01 | Phase 99 | Complete |
 | LAYOUT-02 | Phase 99 | Complete |
 | LAYOUT-03 | Phase 99 | Complete |
 | LAYOUT-04 | Phase 99 | Complete |
-| LAYOUT-05 | Phase 101 | Pending |
-| LAYOUT-06 | Phase 101 | Pending |
+| LAYOUT-05 | Phase 101 | Complete |
+| LAYOUT-06 | Phase 101 | Complete |
 | P0COPY-01 | Phase 100 | Complete |
 | P0COPY-02 | Phase 100 | Complete |
 | P0COPY-03 | Phase 100 | Complete |
@@ -173,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 100 completion*
+*Last updated: 2026-05-25 after Phase 101 completion*

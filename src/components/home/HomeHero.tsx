@@ -87,11 +87,11 @@ export function HomeHero() {
             {t('home:hero.secondaryCta')}
           </Link>
         </div>
-        <div className="mt-7 grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+        <div className="mt-7 grid min-w-0 gap-3 text-sm text-muted-foreground sm:grid-cols-3">
           {bullets.map((item) => (
-            <div key={item} className="flex items-center gap-2">
+            <div key={item} className="flex min-w-0 items-center gap-2">
               <CheckCircle2 className="h-4 w-4 text-[hsl(var(--accent))]" />
-              <span>{item}</span>
+              <span className="min-w-0 leading-5">{item}</span>
             </div>
           ))}
         </div>
