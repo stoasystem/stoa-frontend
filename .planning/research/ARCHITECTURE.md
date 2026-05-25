@@ -1,545 +1,535 @@
-# Phase 17 Research: Architecture
+# Phase 18 Research: Architecture
 
 **Project:** STOA Frontend
-**Phase:** v1.16 Phase 17 - Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
-**Researched:** 2026-05-25
+**Phase:** v1.17 Phase 18 - Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
+**Researched:** 2026-05-26
+**Research mode:** Ecosystem / codebase integration
 **Overall confidence:** HIGH
 
 ## Recommendation
 
-Phase 17 should integrate as a narrow copy and responsive-layout refinement layer on top of the Phase 16 i18n foundation. Keep i18next, the existing `src/i18n/locales/{en,de,fr,it}` namespace structure, `LanguageSwitcher`, `stoa_language` persistence, and root `<html lang>` synchronization unchanged. Do not introduce locale routing, a CMS, automatic translation, backend preference persistence, or a new design system.
+Phase 18 should integrate as a narrow production-facing cleanup layer across existing routes, shared UI primitives, and environment gates. Do not add new product modules, new route families, a CMS, a new state layer, or a new design system. The right shape is: centralize environment visibility and internal-to-user label mapping, then update existing page/component call sites to consume those helpers and i18n keys.
 
-The architectural change worth adding is a small typed locale layout module, `src/i18n/localeLayout.ts`, that stores non-copy layout hints for supported languages and high-risk components. It should not contain translated strings. Locale files remain the source of text; `localeLayout.ts` only describes rendering density, typography variant, and wrapping behavior that components can apply consistently.
+The highest-leverage additions are:
 
-The highest-priority component integration is `src/components/home/HomeHero.tsx`. The current implementation renders `STOA` plus a single `home:hero.title` string inside large serif display typography. That works poorly for the known German title. Phase 17 should support `home.hero.titleLines` as an optional array in locale files, with `home.hero.title` preserved as the fallback/plain title. This lets German use explicit stacked title copy such as `["Lernen.", "Fragen.", "Verstehen."]` while English, French, and Italian can use one concise line where appropriate.
+- `src/lib/displayLabels.ts` for role/status/category/plan labels and fallbacks.
+- `src/lib/userFacingText.ts` for sanitizing or replacing backend/internal strings before render.
+- `src/components/common/SafeStatusLabel.tsx` for status badges and inline labels.
+- `src/components/common/InternalDebugPanel.tsx` for environment/debug details hidden from production.
+- A small route gate/helper in `src/app/router/routeConfig.ts` and `src/lib/env.ts` so demo/placeholder surfaces remain reachable only when explicitly enabled.
+- A QA scanning script or documented command that checks user-facing source and locale files for blocked production terms.
 
-## Existing Architecture
+This keeps the existing architecture intact: React pages stay page-owned, TanStack Query stays the server-state layer, existing `EmptyState` / `ErrorState` / skeleton components stay the state presentation layer, and `src/i18n/locales/{en,de,fr,it}` remains the source of user copy.
 
-### I18n Foundation
+## Existing Architecture Relevant to Phase 18
 
-Phase 16 already established:
+### Environment and Demo Boundaries
 
-- `src/main.tsx` imports `@/i18n` before rendering React.
-- `src/i18n/index.ts` initializes `i18next` and `react-i18next`.
-- Resources are loaded statically from `src/i18n/locales/{en,de,fr,it}`.
-- `src/i18n/languages.ts` defines `en`, `de`, `fr`, and `it`, plus `LANGUAGE_STORAGE_KEY = 'stoa_language'`.
-- Language initialization reads `localStorage`, falls back to browser language, then English.
-- `i18n.on('languageChanged')` updates `<html lang>` and persists the selected language.
-- `src/i18n/namespaces.ts` defines `common`, `home`, `auth`, `chat`, `parent`, `tutor`, `pricing`, `billing`, `support`, `admin`, and `errors`.
+`src/lib/env.ts` already centralizes browser-public configuration:
 
-This is enough infrastructure for Phase 17. The work should refine the data and rendering, not replace the localization system.
+- `appEnv`, `apiMode`, `apiBaseUrl`
+- `isDevelopment`, `isStaging`, `isProduction`
+- feature flags such as `enableDemoShortcuts`, `enableMockCheckout`, `enableDemoApi`, `allowDemoFallback`
 
-### Current Home Hero Rendering
+Use this file as the only Phase 18 environment integration point. Page components should not inspect raw `import.meta.env`.
 
-`HomeHero` currently:
+Current gaps:
 
-- reads copy via `useTranslation(['home', 'common'])`;
-- reads bullets with `returnObjects`;
-- renders `STOA` as one block and `home:hero.title` as one accented block;
-- uses fixed Tailwind breakpoint sizes: `text-5xl sm:text-6xl lg:text-7xl`;
-- uses `break-words` and `editorial-heading editorial-title-shell`.
+- Demo-only login shortcuts are gated by `enableDemoShortcuts`, which is correct.
+- Mock checkout and demo API fallback are separately gated, but user copy still says `demo` / `mock`.
+- Hidden/demo route metadata exists in `routeConfig.ts`, but `AppRouter.tsx` still declares all routes unconditionally.
+- Admin environment cards render raw environment/API values directly and should be moved behind an internal panel.
 
-The weak point is that `hero.title` is treated as a single display line. German, French, and Italian sometimes need different sentence structures, not literal copies forced into one display treatment.
+### Routing and Navigation
 
-### Current Typography Hooks
+`src/app/router/AppRouter.tsx` is the route declaration surface. `src/app/router/routeConfig.ts` already classifies route and nav metadata with `status: 'core' | 'demo' | 'placeholder' | 'duplicate' | 'deprecated'`.
 
-`src/styles/premium-theme.css` already provides:
+Phase 18 should use that existing status taxonomy rather than inventing new route metadata. The needed architectural change is to enforce visibility:
 
-- `.editorial-heading` with serif font, `letter-spacing: 0`, and `text-wrap: balance`;
-- `.editorial-title-shell` for the decorative rule;
-- `.editorial-accent` for highlighted title text;
-- `html[lang]` is already synchronized by i18n, making language-scoped CSS possible without adding global state.
+- core routes remain always available;
+- demo/placeholder/duplicate/deprecated routes are hidden from production navigation;
+- direct route access to demo-only pages should either redirect to `/` or render `NotFoundPage` in production;
+- compatibility aliases can remain if they do not expose demo terminology in visible UI.
 
-Phase 17 should extend these hooks narrowly. It should not replace the current Tailwind/theme structure.
+High-risk existing routes:
 
-## Recommended Integration Points
+- `/billing/checkout/demo` should become internal/demo-only, with user-facing copy changed to "checkout preview" or hidden outside demo mode.
+- `/ai-homework-help` should remain an alias only if marketing copy does not expose `AI` as the product concept.
+- `/admin/advanced-analytics`, `/admin/retention`, `/organization/**`, `/students/:studentId/diagnosis`, `/curriculum-graph`, and `/partnership/onboarding` are demo-classified and should be gated in production unless product owners explicitly promote them to core.
+- `/admin/users`, `/admin/billing-interest`, and `/admin/system` currently render placeholder contract shells; these should be gated or rewritten as internal operational previews.
 
-### Locale Files
+### I18n and Copy
 
-Keep the existing namespace structure:
+The app already uses i18next with static locale files:
 
 ```text
-src/i18n/locales/
-  en/home.json
-  de/home.json
-  fr/home.json
-  it/home.json
-  ...same namespaces as Phase 16
+src/i18n/locales/{en,de,fr,it}/{common,home,auth,chat,parent,tutor,pricing,billing,support,admin,errors}.json
 ```
 
-Add optional structured copy only where the UI genuinely needs structure. For `home.hero`, use this shape:
+Phase 18 should migrate hard-coded user-facing strings into these namespaces only when the component is visible to users. Developer docs and internal-only debug text can remain English if they are behind `InternalDebugPanel`.
 
-```json
-{
-  "hero": {
-    "eyebrow": "Learning Assistant first, teacher when needed",
-    "title": "Learn with clarity.",
-    "titleLines": ["Learn with clarity."],
-    "subtitle": "Students ask questions, receive clear explanations, and can request a real teacher when they need more help."
-  }
-}
-```
+Current high-priority hard-coded copy:
 
-Recommended rules:
+- `src/pages/onboarding/OnboardingPage.tsx`
+- `src/pages/support/SupportPage.tsx`
+- `src/components/support/SupportRequestForm.tsx`
+- `src/components/billing/BillingStatusAlert.tsx`
+- `src/components/billing/CheckoutButton.tsx`
+- `src/components/billing/PlanUsageCard.tsx`
+- `src/components/chat/TeacherHelpStatusCard.tsx`
+- `src/components/chat/ChatMessageBubble.tsx`
+- `src/components/chat/AttachmentPreview.tsx`
+- `src/pages/not-found/NotFoundPage.tsx`
+- `src/pages/admin/OperationsPlaceholder.tsx`
+- `src/components/admin/AdminEnvironmentCard.tsx`
 
-- `title` remains required as the plain text/fallback title.
-- `titleLines` is optional and only used by components that need explicit line control.
-- `titleLines` contains complete human-written lines, not fragments assembled by code.
-- Do not create `homeHeroTitleLine1`, `homeHeroTitleLine2`, etc.; arrays are easier to render and review.
-- Do not put layout metadata such as `compact`, `fontSize`, or `className` in JSON locale files.
-- Keep every namespace present for all four languages when adding keys.
+Do not create a generic translation-rendering abstraction. Add focused i18n keys next to the namespaces already used by each component.
 
-For the preferred Phase 17 hero direction:
+## Integration Points
 
-```json
-// en/home.json
-"title": "Learn with clarity.",
-"titleLines": ["Learn with clarity."]
+### 1. Environment Guards
 
-// de/home.json
-"title": "Lernen. Fragen. Verstehen.",
-"titleLines": ["Lernen.", "Fragen.", "Verstehen."]
-
-// fr/home.json
-"title": "Comprendre avec confiance.",
-"titleLines": ["Comprendre avec confiance."]
-
-// it/home.json
-"title": "Studiare con piu chiarezza.",
-"titleLines": ["Studiare con piu chiarezza."]
-```
-
-Use the correct accents in the actual Italian copy if the product copy review requires them; the example above is ASCII only for this research note.
-
-### `HomeHero` Title Rendering
-
-Modify `HomeHero` to resolve title lines safely:
-
-```tsx
-const title = t('home:hero.title')
-const rawTitleLines = t('home:hero.titleLines', {
-  returnObjects: true,
-  defaultValue: [],
-})
-const titleLines = Array.isArray(rawTitleLines) && rawTitleLines.every((line) => typeof line === 'string')
-  ? rawTitleLines
-  : [title]
-```
-
-Render each line as a block inside the accented title area:
-
-```tsx
-<h1 className={cn('editorial-heading editorial-title-shell break-words text-5xl font-semibold leading-[0.95] text-foreground sm:text-6xl lg:text-7xl', layout.homeHero.titleClassName)}>
-  <span className="block">STOA</span>
-  <span className="editorial-accent block" aria-label={title}>
-    {titleLines.map((line, index) => (
-      <span key={`${line}-${index}`} className={cn('block', layout.homeHero.titleLineClassName)}>
-        {line}
-      </span>
-    ))}
-  </span>
-</h1>
-```
-
-Implementation notes:
-
-- Use the existing `cn` helper from `src/lib/utils.ts` if extra conditional classes are needed.
-- Keep `home:hero.title` as the accessible plain title and fallback.
-- Do not hardcode `if (language === 'de')` inside `HomeHero`.
-- Do not split a sentence in JSX; use `titleLines` for copy-approved line breaks.
-- Do not move all home sections into a generic translation renderer. That would be a broad refactor with little benefit.
-
-### `src/i18n/localeLayout.ts`
-
-Add a small typed layout module for rendering hints. This file should depend only on `SupportedLanguage` and should export a helper that falls back to English.
-
-Recommended shape:
+Modify `src/lib/env.ts`:
 
 ```ts
-import { isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
+export const showInternalDebug = !isProduction && import.meta.env.VITE_SHOW_INTERNAL_DEBUG === 'true'
+export const enableProductionDemoSurfaces =
+  !isProduction && import.meta.env.VITE_ENABLE_DEMO_SURFACES === 'true'
+export const showDemoAccounts = enableDemoShortcuts && !isProduction
+export const showCheckoutPreview = enableMockCheckout && !isProduction
+```
 
-type CopyDensity = 'standard' | 'compact' | 'long'
-type HeroTitleVariant = 'singleLine' | 'stacked' | 'compactStacked'
+Recommended names should be production-oriented:
 
-export type LocaleLayout = {
-  copyDensity: CopyDensity
-  homeHero: {
-    titleVariant: HeroTitleVariant
-    titleClassName: string
-    titleLineClassName: string
-    subtitleClassName: string
-    ctaClassName: string
-  }
-  navigation: {
-    labelClassName: string
-  }
-  cards: {
-    titleClassName: string
-    bodyClassName: string
-  }
-}
+- use `showCheckoutPreview` in UI components;
+- keep `enableMockCheckout` only in API/service internals;
+- use `showDemoAccounts` in auth UI;
+- use `showInternalDebug` for admin environment and backend-contract panels;
+- use `enableProductionDemoSurfaces` or `showDemoSurfaces` for route gating.
 
-export const localeLayout: Record<SupportedLanguage, LocaleLayout> = {
-  en: {
-    copyDensity: 'standard',
-    homeHero: {
-      titleVariant: 'singleLine',
-      titleClassName: '',
-      titleLineClassName: '',
-      subtitleClassName: '',
-      ctaClassName: '',
-    },
-    navigation: { labelClassName: '' },
-    cards: { titleClassName: '', bodyClassName: '' },
-  },
-  de: {
-    copyDensity: 'long',
-    homeHero: {
-      titleVariant: 'compactStacked',
-      titleClassName: 'max-w-2xl lg:text-6xl',
-      titleLineClassName: 'leading-[0.98]',
-      subtitleClassName: 'max-w-xl',
-      ctaClassName: 'whitespace-normal text-center',
-    },
-    navigation: { labelClassName: 'max-w-36 whitespace-normal leading-tight' },
-    cards: { titleClassName: 'leading-snug', bodyClassName: 'leading-7' },
-  },
-  fr: {
-    copyDensity: 'long',
-    homeHero: {
-      titleVariant: 'singleLine',
-      titleClassName: 'max-w-3xl',
-      titleLineClassName: '',
-      subtitleClassName: 'max-w-2xl',
-      ctaClassName: 'whitespace-normal text-center',
-    },
-    navigation: { labelClassName: 'whitespace-normal leading-tight' },
-    cards: { titleClassName: 'leading-snug', bodyClassName: 'leading-7' },
-  },
-  it: {
-    copyDensity: 'standard',
-    homeHero: {
-      titleVariant: 'singleLine',
-      titleClassName: 'max-w-3xl',
-      titleLineClassName: '',
-      subtitleClassName: 'max-w-2xl',
-      ctaClassName: 'whitespace-normal text-center',
-    },
-    navigation: { labelClassName: 'whitespace-normal leading-tight' },
-    cards: { titleClassName: 'leading-snug', bodyClassName: 'leading-7' },
-  },
-}
+Modify `src/components/auth/LoginForm.tsx`:
 
-export function getLocaleLayout(language: string | null | undefined): LocaleLayout {
-  return localeLayout[isSupportedLanguage(language) ? language : 'en']
+- replace direct `enableDemoShortcuts` usage with `showDemoAccounts`;
+- leave demo account fill behavior unchanged;
+- change `auth:login.demoTitle` to a non-production-only label such as "Test account shortcuts" because it will never appear in production.
+
+Modify `src/components/billing/CheckoutButton.tsx`, `BillingStatusAlert.tsx`, `BillingPage.tsx`, and `VirtualCheckoutPage.tsx`:
+
+- user copy should say "checkout preview" or "plan review" when mock checkout is enabled;
+- the route `/billing/checkout/demo` can remain internally but should not be linked or described as `demo`;
+- production should not show checkout-preview controls unless `enablePayment` is true.
+
+Modify `src/components/admin/AdminEnvironmentCard.tsx` and `src/pages/admin/OperationsPlaceholder.tsx`:
+
+- wrap raw environment, endpoint, and API base URL details in `InternalDebugPanel`;
+- production user-facing admin pages should show operationally useful copy, not backend endpoint contracts.
+
+### 2. Route and Page Cleanup
+
+Modify `src/app/router/routeConfig.ts`:
+
+- add helper `isRouteVisibleInCurrentEnvironment(meta: AppRouteMeta): boolean`;
+- use existing `status` to suppress demo/placeholder/duplicate/deprecated routes when `isProduction`;
+- keep labels and descriptions product-facing, even for internal metadata, because metadata is already used in navigation and docs.
+
+Modify `src/lib/navigation.ts`:
+
+- filter nav items through the same visibility helper;
+- avoid showing any item with `status !== 'core'` in production unless a new explicit flag allows it.
+
+Modify `src/app/router/AppRouter.tsx`:
+
+- put demo-only route groups behind small wrappers or conditional route elements.
+- Recommended minimal pattern: create a `DemoSurfaceRoute` component under `src/app/router/DemoSurfaceRoute.tsx` that returns `<Outlet />` when `showDemoSurfaces` is true and `<NotFoundPage />` otherwise.
+- Use it around demo route blocks rather than putting env checks inside each page.
+
+Do not remove routes outright in Phase 18 unless there is no linked path and no E2E dependency. Gating is safer than deletion because previous milestone docs and tests may still use hidden paths.
+
+### 3. Display Labels and User-Facing Text
+
+Add `src/lib/displayLabels.ts`.
+
+Responsibilities:
+
+- Map known internal enum/API values to product copy keys.
+- Provide safe fallbacks for unknown statuses.
+- Keep returned values locale-aware by returning i18n keys, not English strings, where practical.
+
+Recommended API:
+
+```ts
+export type LabelDomain =
+  | 'chatMessageStatus'
+  | 'teacherHelpStatus'
+  | 'subscriptionStatus'
+  | 'attachmentStatus'
+  | 'supportTicketStatus'
+  | 'supportCategory'
+  | 'supportSeverity'
+  | 'routeStatus'
+
+export function getDisplayLabelKey(domain: LabelDomain, value: string): string
+export function getFallbackLabelKey(domain: LabelDomain): string
+```
+
+Add `src/lib/userFacingText.ts`.
+
+Responsibilities:
+
+- Normalize backend error messages before display.
+- Replace blocked internal terms when a string must be shown.
+- Avoid leaking raw API codes, endpoint names, env names, provider names, or internal statuses.
+
+Recommended API:
+
+```ts
+export function getUserFacingError(error: unknown, fallback: string): string
+export function sanitizeUserFacingText(value: string): string
+export function containsBlockedUserFacingTerm(value: string): boolean
+```
+
+Use it at query/mutation error render sites before showing `error.message`.
+
+First call sites:
+
+- `LoginForm` and `RegisterForm`: do not render raw auth error messages without fallback sanitization.
+- `ChatPage`: sanitize create-conversation, conversation-load, teacher-help, and send errors.
+- `SupportRequestForm`: local validation and mutation errors should use support/errors i18n keys.
+- `BillingPage` and checkout components: avoid raw plan/status strings.
+- `TutorDashboardPage` and tutor detail pages: do not show raw status update errors.
+
+### 4. `SafeStatusLabel`
+
+Add `src/components/common/SafeStatusLabel.tsx`.
+
+Purpose:
+
+- Render enum/status values through `displayLabels` and i18n.
+- Avoid direct rendering of API values such as `in_progress`, `pending_review`, `failed`, `mock`, or `demo`.
+- Preserve existing badge styling via `src/components/ui/badge.tsx`.
+
+Recommended props:
+
+```ts
+type SafeStatusLabelProps = {
+  domain: LabelDomain
+  value: string | null | undefined
+  variant?: 'badge' | 'text'
+  tone?: 'neutral' | 'success' | 'warning' | 'danger'
 }
 ```
 
-Use this module only where locale-specific layout is actually needed:
+Initial replacements:
 
-- `HomeHero` title/subtitle/CTA area.
-- Marketing navigation if labels crowd.
-- Pricing cards if long plan text breaks card rhythm.
-- Auth/onboarding form buttons if translated actions become too long.
+- `src/components/billing/SubscriptionBadge.tsx`
+- `src/components/tutor/HelpRequestStatusBadge.tsx`
+- `src/components/support/SupportTicketList.tsx`
+- `src/components/admin/AdminFeedbackList.tsx`
+- `src/components/chat/AttachmentPreview.tsx`
+- `src/components/chat/ChatMessageBubble.tsx`
+- `src/components/chat/TeacherHelpStatusCard.tsx`
+- `src/components/learning/CurriculumGraphView.tsx`
+- `src/components/dashboard/RecentQuestionsCard.tsx`
 
-Do not import it into every component by default. Broad application would create unnecessary coupling and make routine copy changes feel like layout work.
+Keep domain-specific wrappers if they improve readability. For example, `SubscriptionBadge` can remain but should delegate to `SafeStatusLabel`.
 
-### Component-Level Locale Variants
+### 5. `InternalDebugPanel`
 
-Use component-level variants for layout, not for copy. The preferred pattern is:
+Add `src/components/common/InternalDebugPanel.tsx`.
 
-```tsx
-const { t, i18n } = useTranslation(['home', 'common'])
-const layout = getLocaleLayout(i18n.resolvedLanguage ?? i18n.language)
-```
+Purpose:
 
-Then apply scoped class hooks:
+- Central place for endpoint names, API base URLs, env values, route metadata, mock/demo fallback notices, and backend-contract details.
+- Hidden unless `showInternalDebug` is true.
+- Makes QA scanning easier: debug terms can be allowed only inside this component, docs, service internals, and test files.
 
-```tsx
-<section data-locale-copy-density={layout.copyDensity}>
-  ...
-</section>
-```
+Recommended props:
 
-Recommended rules:
-
-- Centralize layout decisions in `localeLayout.ts`.
-- Keep translated text in JSON files.
-- Prefer `titleLines` and array/list rendering for intentional copy structure.
-- Prefer stable CSS/Tailwind classes over runtime text measurement.
-- Avoid truncating user-facing instructions. Use wrapping and stable dimensions instead.
-- Avoid per-language branching inside JSX except through typed layout data.
-
-### CSS and Typography Hooks
-
-Extend `src/styles/premium-theme.css` rather than adding a new global stylesheet. Keep hooks scoped and named around the copy/layout problem:
-
-```css
-.locale-display-title {
-  overflow-wrap: anywhere;
-  text-wrap: balance;
-}
-
-.locale-display-title-line {
-  display: block;
-}
-
-html[lang="de"] .locale-display-title {
-  line-height: 0.98;
-}
-
-html[lang="fr"] .locale-action,
-html[lang="de"] .locale-action,
-html[lang="it"] .locale-action {
-  white-space: normal;
-  min-height: 3rem;
+```ts
+type InternalDebugPanelProps = {
+  title: string
+  children: ReactNode
 }
 ```
 
-Typography constraints:
+Implementation:
 
-- Keep `letter-spacing: 0`; do not use negative tracking to force long copy into a box.
-- Do not use viewport-width font scaling. Continue using explicit breakpoint classes or scoped classes.
-- Prefer shorter local copy before shrinking typography.
-- Keep hero title dimensions stable across language switching so the page does not jump dramatically.
-- Buttons should wrap or grow vertically before truncating important action text.
-- Cards should have stable grid behavior; long translated text should not change sibling card widths.
+- return `null` when `showInternalDebug` is false;
+- render a subtle dashed card when visible;
+- include `data-internal-debug="true"` for Playwright/QA assertions.
 
-### Documentation Integration
+Initial call sites:
 
-Update existing docs rather than adding a parallel copy system:
+- `AdminEnvironmentCard`
+- `AdminOperationsPlaceholderPage`
+- billing checkout preview details
+- support endpoint fallback notes
+- any page that currently says endpoint/API/mocked/demo/test in visible copy
 
-- `docs/language/copy-style-guide.md`: add Phase 17 locale-specific voice rules.
-- `docs/language/glossary.md`: add refined Phase 17 terms if product copy changes approved wording.
-- `docs/language/translation-qa-checklist.md`: add visual QA matrix by locale and viewport.
-- `docs/language/terminology-replacement.md`: keep banned terms audit current.
-- `README.md`: briefly document language switching, local copy rules, and verification commands if the phase plan includes README closure.
+### 6. Query State Hardening
 
-The architecture research output itself should not become the operational checklist; keep the active checklist in `docs/language/translation-qa-checklist.md`.
+Do not change TanStack Query architecture. Harden page-level query rendering around existing query hooks.
 
-## New vs Modified Files
+Recommended shared state primitives:
 
-### New Files
+- keep `ChatSkeleton`, `DashboardSkeleton`, `ParentDashboardSkeleton`, `TutorDashboardSkeleton`, and `PageSkeleton`;
+- expand `EmptyState`, `ErrorState`, and `LoadingState` to accept optional `title`, `message`, `action`, and `className`;
+- use translated strings from the page namespace;
+- use `getUserFacingError` only when showing dynamic errors.
 
-| File | Purpose | Notes |
-| --- | --- | --- |
-| `src/i18n/localeLayout.ts` | Typed locale-specific layout hints | No translated strings; no dependencies beyond `languages.ts`. |
+Initial page targets:
 
-### Modified Files
+- `BillingPage`: render loading state when subscription/plans/usage/access are loading; render empty state if no plans or usage; render sanitized error state for failed billing queries.
+- `TutorDashboardPage`: handle stats query errors independently from request list; show filtered-empty state when the selected filter has no requests.
+- `ChatPage`: disable first-conversation submit when create mutation is pending or message is blank; sanitize create and teacher-help errors.
+- Parent report/history components: replace "No ..." hard-coded messages with i18n-backed empty states.
+- Support tickets and admin lists: use consistent empty/error/loading patterns.
 
-| File | Change | Scope |
-| --- | --- | --- |
-| `src/i18n/locales/en/home.json` | Rewrite hero and P0 homepage copy; add optional `hero.titleLines` | Copy only. |
-| `src/i18n/locales/de/home.json` | Rewrite German hero with short/stacked title; refine long section copy | Copy only. |
-| `src/i18n/locales/fr/home.json` | Rewrite French hero and section copy for natural local phrasing | Copy only. |
-| `src/i18n/locales/it/home.json` | Rewrite Italian hero and section copy for natural local phrasing | Copy only. |
-| `src/i18n/locales/*/{auth,chat,parent,tutor,pricing,billing,support,admin,errors}.json` | Refine P0 strings where Phase 17 requires better local copy | Avoid reshaping unless needed. |
-| `src/components/home/HomeHero.tsx` | Render optional `titleLines`; consume `localeLayout`; add scoped title/action classes | Highest-priority component change. |
-| `src/components/home/*.tsx` | Apply limited wrapping/density classes if visual QA finds breaks | Do not redesign sections. |
-| `src/layouts/MarketingLayout.tsx` / navigation components | Apply navigation label class if labels crowd | Only if QA finds breakage. |
-| `src/styles/premium-theme.css` | Add scoped locale typography/action hooks | No theme rewrite. |
-| `docs/language/*.md` | Add Phase 17 copy and visual QA guidance | Keep Phase 16 terminology decisions. |
-| `README.md` | Add concise Phase 17 verification notes if required | No broad README rewrite. |
+### 7. Duplicate-Submit Hardening
 
-### Files to Avoid Modifying
+Use existing mutation `isPending` flags, but ensure submit handlers also guard at function entry. Button disabling alone is insufficient because keyboard submit, fast double-clicks, and React StrictMode can still expose duplicate paths.
 
-| File/Area | Reason |
-| --- | --- |
-| `src/i18n/index.ts` | Initialization already satisfies Phase 17 needs. |
-| `src/i18n/languages.ts` | No new languages or persistence changes in scope. |
-| `src/i18n/namespaces.ts` | Existing namespace set is sufficient. |
-| `src/lib/api.ts`, API services, query hooks | Phase 17 has no backend/API behavior changes. |
-| Auth stores, route guards, demo backend | Language persistence remains browser-local; no production preference system. |
-| Major layout primitives/design system | Broad refactors are out of scope unless a specific locale break requires a small fix. |
+Modify:
 
-## Data Flow
+- `LoginForm`: if `loginMutation.isPending`, return before validation/mutation.
+- `RegisterForm`: guard `handleSubmit` and disable next/back transitions while register/upload mutation is pending where relevant.
+- `SupportRequestForm`: guard `handleSubmit` when `submitSupportRequest.isPending`.
+- `TeacherRequestInlineAction` / `ChatPage.handleRequestTeacherHelp`: already partially guarded; keep the page-level guard and ensure inline button always receives `isRequesting`.
+- `CheckoutButton` and `UpgradeButton`: guard `onClick` before `mutate`.
+- `PlanCard`: accept `isSelecting` or let parent pass a disabled state; avoid multiple checkout starts from repeated plan selection.
+- `PartnershipInterestForm`, `SupportTicketForm`, `TutorAvailabilityEditor`, and tutor note/status forms should receive the same pass.
+
+Do not introduce a global "submit lock" store. Mutation-level guards are simpler and scoped.
+
+### 8. QA Scanning
+
+Add a lightweight QA scan focused on user-facing source and locale files.
+
+Recommended file:
+
+- `scripts/scan-user-facing-copy.mjs`
+
+Recommended npm script:
+
+- `"qa:copy": "node scripts/scan-user-facing-copy.mjs"`
+
+Scan targets:
+
+- `src/pages/**/*.{ts,tsx}`
+- `src/components/**/*.{ts,tsx}`
+- `src/i18n/locales/**/*.json`
+
+Blocked terms for user-facing surfaces:
+
+- `demo`
+- `mock`
+- `test`
+- `Codex`
+- `development`
+- `sample`
+- `placeholder`
+- `AI` when used as a product noun
+
+Allowlist:
+
+- `src/lib/env.ts`
+- `src/services/demo/**`
+- `src/data/**`
+- `src/hooks/useMockChat.ts` until it is removed or internally gated
+- `src/components/common/InternalDebugPanel.tsx`
+- `docs/**`, `.planning/**`, `backend/**`, tests, and Playwright fixtures
+- translation keys may contain technical identifiers, but values should not expose blocked words unless explicitly internal.
+
+The scan should fail on values/text, not on every identifier. For TSX, string literals and JSX text are enough for Phase 18; do not attempt full AST certainty unless the simple scan produces too many false positives.
+
+## New Files
+
+| File | Responsibility | Why |
+|------|----------------|-----|
+| `src/lib/displayLabels.ts` | Central label-key mapping for internal statuses and API values | Prevents direct enum/status rendering across components |
+| `src/lib/userFacingText.ts` | Sanitizes dynamic errors/text before render | Prevents backend/internal wording leaks |
+| `src/components/common/SafeStatusLabel.tsx` | Shared status rendering through display labels and i18n | Makes status cleanup consistent |
+| `src/components/common/InternalDebugPanel.tsx` | Gated internal/debug details | Keeps useful diagnostics without production exposure |
+| `src/app/router/DemoSurfaceRoute.tsx` | Route guard for demo/placeholder surfaces | Centralizes production route cleanup |
+| `scripts/scan-user-facing-copy.mjs` | QA scan for blocked visible terms | Gives Phase 18 objective evidence |
+
+## Modified Files
+
+| File | Change |
+|------|--------|
+| `src/lib/env.ts` | Add semantic visibility flags: `showDemoAccounts`, `showCheckoutPreview`, `showInternalDebug`, `showDemoSurfaces` |
+| `src/app/router/AppRouter.tsx` | Wrap demo/placeholder route groups with `DemoSurfaceRoute` |
+| `src/app/router/routeConfig.ts` | Add route visibility helper and clean metadata descriptions |
+| `src/lib/navigation.ts` | Filter nav items by environment-visible route status |
+| `src/layouts/AppLayout.tsx` | Continue using nav config; avoid direct route/status labels |
+| `src/components/auth/LoginForm.tsx` | Gate demo shortcuts via `showDemoAccounts`; sanitize login errors; add pending guard |
+| `src/components/auth/RegisterForm.tsx` | Add submit guard; sanitize register errors; keep role/profile flow unchanged |
+| `src/pages/auth/RegisterPage.tsx` | Usually copy-only; ensure all visible text remains i18n-backed |
+| `src/pages/onboarding/OnboardingPage.tsx` | Move hard-coded pilot/support copy to i18n; replace pilot/demo wording with production-facing onboarding wording |
+| `src/components/chat/TeacherRequestInlineAction.tsx` | Keep i18n, ensure duplicate-submit disabled state, no raw pending label |
+| `src/components/chat/TeacherHelpStatusCard.tsx` | Replace hard-coded status maps with `SafeStatusLabel` and chat i18n |
+| `src/components/chat/ChatMessageBubble.tsx` | Replace hard-coded role/status labels and fixed English date locale |
+| `src/components/chat/AttachmentPreview.tsx` | Replace raw attachment status and MIME/internal text where visible |
+| `src/components/billing/PlanCard.tsx` | Add disabled/selecting support if parent checkout is pending; keep plan copy from i18n |
+| `src/pages/billing/BillingPage.tsx` | Add loading/empty/error states and replace payment/mock copy with production-facing labels |
+| `src/components/billing/*` | Replace raw status/copy; guard checkout submits |
+| `src/pages/support/SupportPage.tsx` | Move hard-coded text to support i18n; remove bug/pilot/internal wording from visible copy |
+| `src/components/support/SupportRequestForm.tsx` | Move labels/options/errors/placeholders to support/errors i18n; add pending submit guard |
+| `src/pages/not-found/NotFoundPage.tsx` | Translate route fallback and remove "does not exist yet" wording |
+| `src/components/admin/*` | Gate internal environment/backend details; map statuses through safe labels |
+| `src/i18n/locales/{en,de,fr,it}/*.json` | Add status, state, and cleanup copy keys across affected namespaces |
+| `package.json` | Add `qa:copy` script |
+
+## Suggested Build Order
+
+1. **Environment and route visibility foundation**
+   - Update `env.ts` semantic flags.
+   - Add `DemoSurfaceRoute`.
+   - Add route visibility helper in `routeConfig.ts`.
+   - Update `navigation.ts` and `AppRouter.tsx`.
+   - This prevents production from exposing demo-only surfaces before copy work is complete.
+
+2. **Shared label and text safety**
+   - Add `displayLabels.ts`, `userFacingText.ts`, `SafeStatusLabel`, and `InternalDebugPanel`.
+   - Update a small set of status components first: `SubscriptionBadge`, `HelpRequestStatusBadge`, `AttachmentPreview`.
+   - This creates stable primitives before broad page cleanup.
+
+3. **Auth, onboarding, support cleanup**
+   - Update `LoginForm`, `RegisterForm`, `RegisterPage`, `OnboardingPage`, `SupportPage`, and `SupportRequestForm`.
+   - Move hard-coded user copy into `auth`, `support`, `common`, and `errors` locale namespaces.
+   - Add duplicate-submit guards to auth/support forms.
+
+4. **Billing and checkout cleanup**
+   - Update `BillingPage`, `PlanCard`, `CheckoutButton`, `UpgradeButton`, `BillingStatusAlert`, `PlanUsageCard`, and checkout result/preview pages.
+   - Replace mock/demo/payment-disabled wording with product-safe states.
+   - Add explicit loading/empty/error handling for all billing queries.
+
+5. **Chat, tutor, parent, and admin status cleanup**
+   - Update chat message/status/attachment labels.
+   - Update teacher-help status cards and tutor request badges/filters.
+   - Replace parent/admin empty states with translated shared states.
+   - Gate admin internal contract shells behind `InternalDebugPanel`.
+
+6. **QA scan and evidence**
+   - Add `scripts/scan-user-facing-copy.mjs` and `npm run qa:copy`.
+   - Run `npm run lint`, `npm run build`, and `npm run qa:copy`.
+   - Add/adjust Playwright checks for production env route gating and absence of blocked terms on P0 routes.
+
+## Data Flow Notes
+
+### Environment Visibility Flow
 
 ```text
-Browser/localStorage
-  -> getInitialLanguage()
-  -> i18next active language
-  -> <html lang="{language}">
-  -> React components use useTranslation()
-  -> component reads locale JSON copy
-  -> component reads getLocaleLayout(i18n.resolvedLanguage)
-  -> JSX renders structured copy such as titleLines
-  -> scoped Tailwind/CSS hooks control wrapping and density
+VITE_* public config
+  -> src/lib/env.ts semantic flags
+  -> routeConfig/navigation/AppRouter gates
+  -> page/component conditional rendering
 ```
 
-Important boundaries:
+Rules:
 
-- Copy data flows from locale JSON into components.
-- Layout hints flow from `localeLayout.ts` into components.
-- Language state flows from i18next and `localStorage`.
-- CSS can use `<html lang>` for broad language-specific behavior.
-- No API request should be introduced for Phase 17 language or layout decisions.
+- Components consume semantic flags, not raw `import.meta.env`.
+- Production defaults hide demo accounts, checkout previews, debug panels, endpoint names, API base URLs, and demo-only routes.
+- Service internals may keep `mock`/`demo` names, but UI paths should use product-facing names.
 
-## Build Order
+### Status Label Flow
 
-1. **Copy rules first**
-   Update docs/language guidance so copywriters and implementers agree on locale-specific structure, banned terms, and visual QA rules.
-
-2. **Add `localeLayout.ts`**
-   Add the typed layout hint module with conservative defaults and English fallback.
-
-3. **Update `HomeHero` rendering**
-   Add optional `titleLines` support, use `getLocaleLayout`, and add scoped classes/data attributes. Verify English fallback still works if `titleLines` is missing.
-
-4. **Rewrite homepage locale copy**
-   Update the four `home.json` files. Keep key names stable unless adding optional structured keys such as `titleLines`.
-
-5. **Apply minimal CSS hooks**
-   Add only the typography/action hooks needed by visual QA. Prefer copy shortening before adding more CSS.
-
-6. **Refine P0 locale copy**
-   Work namespace by namespace: `auth`, `chat`, `parent`, `tutor`, `pricing`, `billing`, `support`, `admin`, `errors`. Avoid component changes unless text overflows.
-
-7. **Run terminology and build checks**
-   Run the existing banned-term `rg` audit, `npm run lint`, and `npm run build`.
-
-8. **Run visual QA**
-   Check `/`, auth/register, `/chat`, parent/report, tutor, pricing, billing, and support in EN/DE/FR/IT at mobile, tablet, and desktop widths.
-
-## Visual QA Workflow
-
-Use the existing app and language switcher; do not build a new visual regression platform in Phase 17 unless the phase plan explicitly asks for it.
-
-Recommended manual matrix:
-
-| Viewport | Purpose |
-| --- | --- |
-| 390px mobile | Long CTA, navbar/menu, stacked hero, form labels. |
-| 768px tablet | Two-column transitions, card wrapping, onboarding forms. |
-| 1280px desktop | Hero display typography, marketing navigation, pricing card rhythm. |
-
-Recommended routes:
-
-- `/`
-- `/login`
-- `/register`
-- `/chat`
-- `/parent`
-- `/parent/report` or nearest child report route
-- `/tutor`
-- `/pricing`
-- `/billing`
-- `/support`
-
-Checks:
-
-- Switch EN -> DE -> FR -> IT without reload.
-- Refresh and confirm `stoa_language` persists.
-- Inspect that `<html lang>` matches the selected language.
-- Confirm German hero title is stacked and no longer a long single display sentence.
-- Confirm buttons wrap cleanly without clipping icons or labels.
-- Confirm pricing/billing cards keep stable sibling widths.
-- Confirm chat action labels do not overflow compact controls.
-- Confirm no user-visible P0 copy uses banned AI-heavy/sales-heavy terms.
-
-Automated checks can stay lightweight:
-
-```bash
-npm run lint
-npm run build
-rg "\bAI\b|AI-|AI |Artificial Intelligence|Chatbot|Robot Tutor|Virtual Teacher|Automated Teacher|Human backup|Teacher Backup|teacher backup|human tutor|What STOA is selling|What we are selling|Buy now|Customers|frontend enforce" src/pages src/components src/i18n -n
+```text
+API/domain value
+  -> type in src/types/**
+  -> displayLabels.ts label key
+  -> SafeStatusLabel
+  -> i18n namespace value
+  -> Badge/text in UI
 ```
 
-If Playwright coverage is added, prefer a small locale smoke test that opens `/`, changes language, and asserts the hero title for each language. Do not try to encode every copy line into E2E tests.
+Rules:
 
-## Patterns to Follow
+- Never render raw `status`, `role`, `category`, `severity`, `apiMode`, or endpoint values in user-facing UI.
+- Unknown values use a generic translated fallback such as "Status unavailable".
+- Domain wrappers can remain for readability but must delegate to `SafeStatusLabel`.
 
-### Structured Copy, Not Fragment Assembly
+### Dynamic Error Flow
 
-**What:** Put complete copy units in locale JSON. Use arrays only when the UI displays true repeated/stacked units.
-
-**Example:**
-
-```json
-"title": "Lernen. Fragen. Verstehen.",
-"titleLines": ["Lernen.", "Fragen.", "Verstehen."]
+```text
+Axios/backend/mutation error
+  -> httpClient Error(message)
+  -> page/hook render site
+  -> getUserFacingError(error, translatedFallback)
+  -> ErrorState/toast/inline error
 ```
 
-**Why:** German, French, Italian, and English can use different grammar and rhythm without JSX assembling partial sentences.
+Rules:
 
-### Typed Layout Hints
+- Static validation errors should come from `errors` i18n keys.
+- Dynamic backend errors should be sanitized before render.
+- Raw backend messages can be logged through existing monitoring/logger paths, but not displayed directly.
 
-**What:** Use `localeLayout.ts` for per-language class hints.
+### Query State Flow
 
-**Why:** It avoids scattered `language === 'de'` checks while keeping layout decisions outside translation files.
+```text
+TanStack Query hook
+  -> page-owned loading/error/empty/data branch
+  -> shared state primitive
+  -> localized user copy
+```
 
-### Scoped CSS Hooks
+Rules:
 
-**What:** Add classes like `.locale-display-title` and `.locale-action`, optionally using `html[lang="de"]`.
+- Keep query ownership in pages and feature hooks.
+- Use skeletons for initial page loading, `EmptyState` for legitimate no-data cases, and `ErrorState` for failures.
+- Handle partial query failure where a page has multiple queries, especially billing and tutor dashboards.
 
-**Why:** The app already syncs `<html lang>`, so CSS can respond to language without extra React state.
+### Duplicate-Submit Flow
 
-## Anti-Patterns to Avoid
+```text
+form/button event
+  -> function-level pending guard
+  -> validation
+  -> mutation.mutate
+  -> disabled/pending UI state
+```
 
-### Hardcoded Per-Language JSX Copy
+Rules:
 
-**What:** Writing `language === 'de' ? '...' : '...'` in components.
+- Every mutation-triggering submit/click should guard at the handler top and disable the control.
+- Do not centralize submit state in Zustand.
+- Keep idempotency/security as backend responsibilities; frontend hardening is UX protection.
 
-**Why bad:** It bypasses i18n files, makes copy review harder, and spreads translation logic through UI code.
+## Architecture Anti-Patterns to Avoid
 
-**Instead:** Add keys to locale JSON and render them through `useTranslation`.
+- Do not remove demo backend service files just to remove user-facing words; service internals still support local development.
+- Do not replace i18next or add a CMS for cleanup copy.
+- Do not make route guards a security boundary. Backend authorization remains authoritative.
+- Do not scatter `isProduction` checks across many pages; centralize in env helpers and route/debug components.
+- Do not render raw API `message`, `code`, `status`, `role`, endpoint, or `apiMode` values.
+- Do not add broad feature modules, real payment logic, production backend work, new AI/provider integration, or new organization/analytics workflows.
 
-### Layout Metadata in Translation JSON
+## Verification Targets
 
-**What:** Adding keys such as `"fontSize": "small"` or `"compact": true` to `home.json`.
+Minimum Phase 18 checks:
 
-**Why bad:** Copy files become a mixed content/layout API and are harder to review across locales.
-
-**Instead:** Use `localeLayout.ts` for non-copy hints.
-
-### Broad Design-System Refactor
-
-**What:** Rebuilding typography tokens, card primitives, navigation, or page layout foundations as part of copy polish.
-
-**Why bad:** Phase 17 is copy and locale fit work; broad refactors increase regression risk across many shipped surfaces.
-
-**Instead:** Patch the high-risk components and add limited CSS hooks.
-
-### Shrinking Text Until It Fits
-
-**What:** Solving every long label by reducing font size.
-
-**Why bad:** It degrades readability and hides copy quality problems.
-
-**Instead:** Rewrite local copy first, then use wrapping, stable min heights, and scoped responsive classes.
-
-## Constraints
-
-- Keep Phase 17 limited to localized copy quality, responsive typography, and multilingual UI fit.
-- Do not add new product features, routes, languages, backend APIs, CMS/TMS integration, machine translation, or cross-device language preference persistence.
-- Do not change `stoa_language` behavior.
-- Do not change API mode, demo backend, auth, streaming, upload, billing, or role-guard logic.
-- Keep the frontend decoupled from model providers.
-- Preserve English fallback behavior for missing optional keys.
-- Preserve existing namespace imports and static JSON resources.
-- Keep locale copy education-centered and avoid user-visible banned terms from the Phase 16 docs.
-- Prefer local component and CSS patches over broad refactors.
-- Treat legal copy and final professional/legal translation review as future work unless explicitly planned.
-
-## Research Flags
-
-| Area | Confidence | Notes |
-| --- | --- | --- |
-| Existing i18n integration | HIGH | Verified in `src/i18n/index.ts`, `languages.ts`, `namespaces.ts`, and `src/main.tsx`. |
-| HomeHero architecture | HIGH | Verified current single-string title rendering in `HomeHero.tsx`; German overflow issue is documented in `.planning/PROJECT.md`. |
-| Locale layout module | HIGH | Fits existing TypeScript/Tailwind style and avoids broad refactors. |
-| CSS hook approach | HIGH | Existing `premium-theme.css` and synchronized `<html lang>` support scoped language styles. |
-| Visual QA scope | MEDIUM | Routes and commands are known, but exact route availability and screenshot automation details should be confirmed during phase planning. |
+- `npm run lint`
+- `npm run build`
+- `npm run qa:copy`
+- Playwright production-mode smoke for `/`, `/login`, `/register`, `/chat`, `/parent`, `/tutor`, `/billing`, `/support`, `/admin`
+- Playwright or route-level check that demo/placeholder routes are hidden or NotFound in production mode
+- Grep/scan evidence that blocked terms are absent from visible page/component text and locale values
+- Manual locale pass for English, German, French, and Italian on P0 pages touched by copy cleanup
 
 ## Sources
 
-- `.planning/PROJECT.md` - Phase 17 goal, scope, German hero issue, constraints, and decisions.
-- `.planning/ROADMAP.md` - Phase 16 i18n foundation and localization completion criteria.
-- `src/i18n/index.ts` - i18next initialization, resources, fallback, `<html lang>`, and `stoa_language` persistence.
-- `src/i18n/languages.ts` - supported language list and initial language resolution.
-- `src/i18n/namespaces.ts` - namespace structure.
-- `src/i18n/locales/{en,de,fr,it}/home.json` - current homepage copy shape and known single-title issue.
-- `src/components/home/HomeHero.tsx` - current hero title rendering and layout classes.
-- `src/components/home/*.tsx` - current homepage section translation usage.
-- `src/styles/premium-theme.css` and `src/index.css` - current typography/theme hooks.
-- `docs/language/glossary.md`, `copy-style-guide.md`, `terminology-replacement.md`, and `translation-qa-checklist.md` - Phase 16 terminology and QA rules.
-- `package.json` - available verification scripts.
+- `.planning/PROJECT.md` - Phase 18 goal, constraints, current state, and out-of-scope boundaries.
+- `src/lib/env.ts` - existing environment and feature-flag integration point.
+- `src/app/router/AppRouter.tsx` - current route declarations and demo/placeholder route exposure.
+- `src/app/router/routeConfig.ts` - existing route/nav status taxonomy.
+- `src/layouts/AppLayout.tsx` - navigation rendering and feedback/language integration.
+- `src/components/auth/LoginForm.tsx` - demo shortcut gate, auth submit flow, raw error display.
+- `src/pages/auth/RegisterPage.tsx` and `src/components/auth/RegisterForm.tsx` - registration copy and submit flow.
+- `src/pages/onboarding/OnboardingPage.tsx` - hard-coded pilot/onboarding copy.
+- `src/components/chat/TeacherRequestInlineAction.tsx`, `TeacherHelpStatusCard.tsx`, `ChatMessageBubble.tsx`, `AttachmentPreview.tsx` - teacher/status/internal-label surfaces.
+- `src/components/billing/PlanCard.tsx`, `src/pages/billing/BillingPage.tsx`, `BillingStatusAlert.tsx`, `CheckoutButton.tsx`, `PlanUsageCard.tsx` - billing state, checkout preview, and mock/demo copy surfaces.
+- `src/pages/support/SupportPage.tsx` and `src/components/support/SupportRequestForm.tsx` - support copy, categories, validation, and duplicate-submit flow.
+- `src/components/common/{EmptyState,ErrorState,LoadingState}.tsx` - current shared state primitives.
+- `src/i18n/index.ts`, `src/i18n/namespaces.ts`, and locale files - current i18n structure.
+- `package.json` - scripts and verification integration point.
