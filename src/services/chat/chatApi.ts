@@ -69,7 +69,7 @@ export async function requestTeacherHelp(payload: TeacherHelpRequest) {
     requestId: `teacher-help-${Date.now()}`,
     conversationId: payload.conversationId,
     status: 'pending',
-    teacherName: 'Demo Tutor',
+    teacherName: 'STOA teacher',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })
@@ -89,7 +89,7 @@ function createDemoMessageResponse(conversationId: string, payload: SendMessageR
     id: `assistant-${Date.now()}`,
     conversationId,
     role: 'assistant' as const,
-    content: 'The local backend saved your question. For x squared equals 9, x is 3 or -3.',
+    content: 'Here is a clear explanation. For x squared equals 9, x is 3 or -3.',
     createdAt: now,
     status: 'sent' as const,
   }

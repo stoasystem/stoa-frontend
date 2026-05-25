@@ -1,19 +1,13 @@
 import { CalendarDays, CreditCard } from 'lucide-react'
 import { SubscriptionBadge } from '@/components/billing/SubscriptionBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
 import type { SubscriptionPlan, SubscriptionStatus } from '@/types/user'
 
 type BillingSummaryCardProps = {
   plan: SubscriptionPlan
   status: SubscriptionStatus
   currentPeriodEnd?: string
-}
-
-const planLabels: Record<SubscriptionPlan, string> = {
-  free_trial: 'Free Trial',
-  student: 'Student Plan',
-  family: 'Family Plan',
-  tutor_supported: 'Tutor-supported Plan',
 }
 
 export function BillingSummaryCard({ plan, status, currentPeriodEnd }: BillingSummaryCardProps) {
@@ -29,9 +23,9 @@ export function BillingSummaryCard({ plan, status, currentPeriodEnd }: BillingSu
         <div className="flex items-start gap-3">
           <CreditCard className="mt-0.5 h-4 w-4 text-primary" />
           <div>
-            <p className="font-medium">{planLabels[plan]}</p>
+            <p className="font-medium">{getSubscriptionPlanLabel(plan)}</p>
             <p className="text-muted-foreground">
-              Access display is advisory. Backend APIs remain responsible for real quota checks.
+              Your plan shows the learning support currently available for this account.
             </p>
           </div>
         </div>

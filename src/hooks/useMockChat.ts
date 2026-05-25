@@ -48,8 +48,7 @@ export function useMockChat() {
         id: createId(),
         conversationId,
         role: 'assistant',
-        content:
-          'This is a mock AI response. In the next phase, this will be connected to the backend AI service.',
+        content: 'Here is a clear explanation to help you continue with the question.',
         createdAt: new Date().toISOString(),
         status: 'sent',
       }

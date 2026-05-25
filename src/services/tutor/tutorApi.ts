@@ -66,7 +66,7 @@ export async function addTutorHelpRequestNote({
     id: `note-${Date.now()}`,
     note: content,
     createdAt: new Date().toISOString(),
-    tutor: { id: 'demo-tutor', name: 'Demo Tutor' },
+    tutor: { id: 'demo-tutor', name: 'STOA teacher' },
   })
 }
 

@@ -1,11 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-type AdminBackendPendingProps = {
+type AdminUnavailableCardProps = {
   title: string
   description: string
 }
 
-export function AdminBackendPending({ title, description }: AdminBackendPendingProps) {
+export function AdminUnavailableCard({ title, description }: AdminUnavailableCardProps) {
   return (
     <Card className="border-dashed">
       <CardHeader>

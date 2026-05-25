@@ -1,14 +1,12 @@
-import { AdminBackendPending } from '@/components/admin/AdminBackendPending'
+import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function AdminOperationsPlaceholderPage({
   title,
-  endpoint,
 }: {
   title: string
-  endpoint: string
 }) {
   return (
     <DashboardLayout>
@@ -16,11 +14,11 @@ export function AdminOperationsPlaceholderPage({
         <PageHeader
           eyebrow="Admin operations"
           title={title}
-          description="Launch operations contract shell. Full workflow management remains deferred."
+          description="This operations area is being prepared for a later release."
         />
-        <AdminBackendPending
-          title={`${title} backend pending`}
-          description={`Expected endpoint: ${endpoint}. This route exists so early operations and backend contracts can be tested without building a full CRM or BI system.`}
+        <AdminUnavailableCard
+          title={`${title} unavailable`}
+          description="This page is not available yet. Use the active operations views for current pilot work."
         />
       </PageContainer>
     </DashboardLayout>

@@ -22,7 +22,7 @@ const sections = [
   },
   {
     title: 'Learning technology and third parties',
-    body: 'Learning technology, hosting, analytics, monitoring, and payment providers may process limited data under backend-controlled contracts. Browser configuration must not contain secrets or payment credentials.',
+    body: 'Learning technology, hosting, analytics, monitoring, and payment partners may process limited data under appropriate service agreements. STOA does not ask families to share secrets or payment credentials in support messages.',
   },
 ]
 

@@ -1,12 +1,9 @@
-import { AdminEnvironmentCard } from '@/components/admin/AdminEnvironmentCard'
 import { AdminOperationCard } from '@/components/admin/AdminOperationCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { apiBaseUrl, appEnv } from '@/lib/env'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import packageJson from '../../../package.json'
 
 export function AdminDashboardPage() {
   return (
@@ -21,7 +18,7 @@ export function AdminDashboardPage() {
         <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Phase 45 scope</CardTitle>
+              <CardTitle className="text-base">Operations scope</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
               <p>
@@ -34,21 +31,25 @@ export function AdminDashboardPage() {
               </p>
             </CardContent>
           </Card>
-          <AdminEnvironmentCard
-            environment={appEnv}
-            apiBaseUrl={apiBaseUrl}
-            version={packageJson.version}
-          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Service readiness</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>Use these views to monitor learning support, usage patterns, and feedback triage.</p>
+              <p>Configuration diagnostics are available only in the internal debug panel.</p>
+            </CardContent>
+          </Card>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <AdminOperationCard
             title="Usage summary"
-            description="Review active users, role counts, messages, help requests, uploads, and feedback totals when the backend endpoint is available."
+            description="Review active users, role counts, messages, help requests, uploads, and feedback totals."
             to="/admin/usage"
           />
           <AdminOperationCard
             title="Feedback triage"
-            description="Review the feedback list contract and any returned pilot feedback items without adding full support workflow controls."
+            description="Review pilot feedback items without adding full support workflow controls."
             to="/admin/feedback"
           />
           <AdminOperationCard

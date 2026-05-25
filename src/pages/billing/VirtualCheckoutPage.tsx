@@ -30,7 +30,7 @@ export function VirtualCheckoutPage() {
           />
           <Card>
             <CardContent className="space-y-4 p-6 text-sm text-muted-foreground">
-              <p>Online plan changes are not available in this environment right now.</p>
+              <p>Online plan changes are not available right now.</p>
               <Button asChild>
                 <Link to="/billing">Return to billing</Link>
               </Button>

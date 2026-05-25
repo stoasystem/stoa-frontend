@@ -15,7 +15,7 @@ export function useCreateCheckoutSessionMutation() {
       }
 
       if (!enablePayment) {
-        throw new Error('Payment is not enabled for this environment.')
+        throw new Error('Plan selection is being prepared. Please contact STOA to continue.')
       }
 
       return createCheckoutSession(plan)

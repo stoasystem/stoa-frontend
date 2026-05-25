@@ -33,3 +33,12 @@ verified: 2026-05-26
 ## Result
 
 Phase 105 passed. Copy cleanup and label-mapping boundaries are in place.
+
+## Post-Audit Fixes
+
+Milestone integration audit found additional rendered copy and error-boundary leaks after the original phase verification. These were fixed before milestone closeout:
+
+- Admin diagnostics were removed from the normal admin dashboard and moved behind the existing internal debug policy.
+- Admin, support, billing, and checkout copy no longer exposes backend, endpoint, contract, local-environment, or raw plan query values.
+- Register, chat streaming, and file-upload errors route through `toUserFacingError`.
+- Chat fallback assistant copy no longer renders local-backend language.

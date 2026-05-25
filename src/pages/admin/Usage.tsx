@@ -1,4 +1,4 @@
-import { AdminBackendPending } from '@/components/admin/AdminBackendPending'
+import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { AdminUsageSummaryCards } from '@/components/admin/AdminUsageSummaryCards'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -21,9 +21,9 @@ export function AdminUsagePage() {
         )}
         {usageQuery.data && <AdminUsageSummaryCards summary={usageQuery.data} />}
         {usageQuery.isError && (
-          <AdminBackendPending
-            title="Usage backend pending"
-            description="The frontend contract expects GET /admin/usage-summary to return activeUsers, roleCounts, messages, helpRequests, uploads, feedback, and optional generatedAt fields."
+          <AdminUnavailableCard
+            title="Usage summary unavailable"
+            description="We could not load the usage summary right now. Please try again in a moment."
           />
         )}
       </PageContainer>

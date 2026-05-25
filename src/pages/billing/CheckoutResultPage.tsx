@@ -6,10 +6,12 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { showCheckoutPreview } from '@/lib/env'
+import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
 
 export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' }) {
   const [searchParams] = useSearchParams()
   const plan = searchParams.get('plan') ?? 'family'
+  const planLabel = getSubscriptionPlanLabel(plan)
   const success = status === 'success'
   const Icon = success ? CheckCircle2 : XCircle
 
@@ -47,7 +49,7 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              Plan: <span className="font-medium text-foreground">{plan}</span>. In live payment mode,
+              Plan: <span className="font-medium text-foreground">{planLabel}</span>. In live payment mode,
               STOA services confirm the final subscription status.
             </p>
             <div className="flex flex-wrap gap-3">

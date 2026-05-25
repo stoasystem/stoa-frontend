@@ -94,8 +94,8 @@ export function SupportPage() {
                 confusion. The request is routed through the STOA support queue.
               </p>
               <p>
-                If the support endpoint is not available in a local environment, use the feedback
-                button in the app sidebar and select the closest feedback type.
+                If you cannot finish the form, use the feedback button in the app sidebar and
+                select the closest feedback type.
               </p>
             </CardContent>
           </Card>

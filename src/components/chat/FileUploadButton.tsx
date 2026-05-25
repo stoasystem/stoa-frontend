@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { useFileUploadMutation } from '@/hooks/files/useFileUploadMutation'
+import { toUserFacingError } from '@/lib/userFacingText'
 import type { UploadedFile } from '@/types/file'
 
 const ACCEPTED_FILE_TYPES = ['image/png', 'image/jpeg', 'application/pdf']
@@ -63,7 +64,7 @@ export function FileUploadButton({
         })
         onUploadComplete(uploadedFile)
       } catch (error) {
-        onUploadError(error instanceof Error ? error.message : 'Failed to upload file.')
+        onUploadError(toUserFacingError(error, 'We could not upload this file right now. Please try again.'))
       }
     }
   }

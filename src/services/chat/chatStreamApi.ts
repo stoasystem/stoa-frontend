@@ -94,7 +94,7 @@ async function emitDemoStream({
   onEvent({
     type: 'message_delta',
     messageId,
-    delta: `The local backend saved your question. For "${payload.content}", the key is to isolate the unknown step by step.`,
+    delta: `Here is a clear explanation for "${payload.content}". The key is to isolate the unknown step by step.`,
   })
   onEvent({ type: 'message_done', messageId, status: 'completed' })
 }

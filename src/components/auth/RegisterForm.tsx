@@ -9,6 +9,7 @@ import { StudentProfileStep } from '@/components/auth/StudentProfileStep'
 import { TutorProfileStep } from '@/components/auth/TutorProfileStep'
 import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
+import { toUserFacingError } from '@/lib/userFacingText'
 import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
 import type {
   ParentOnboardingProfile,
@@ -240,9 +241,7 @@ export function RegisterForm() {
       {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
       {registerMutation.isError && (
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
-          {registerMutation.error instanceof Error
-            ? registerMutation.error.message
-            : t('auth:register.failed')}
+          {toUserFacingError(registerMutation.error, t('auth:register.failed'))}
         </p>
       )}
 

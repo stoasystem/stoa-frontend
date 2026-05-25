@@ -1,4 +1,4 @@
-import { AdminBackendPending } from '@/components/admin/AdminBackendPending'
+import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { AdminFeedbackList } from '@/components/admin/AdminFeedbackList'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -14,16 +14,16 @@ export function AdminFeedbackPage() {
         <PageHeader
           eyebrow="Admin operations"
           title="Feedback"
-          description="Feedback list contract for pilot triage. Full support workflow management remains deferred."
+          description="Feedback list for pilot triage. Full support workflow management remains deferred."
         />
         {feedbackQuery.isLoading && (
           <p className="text-sm text-muted-foreground">Loading feedback.</p>
         )}
         {feedbackQuery.data && <AdminFeedbackList items={feedbackQuery.data.items} />}
         {feedbackQuery.isError && (
-          <AdminBackendPending
-            title="Feedback backend pending"
-            description="The frontend contract expects GET /admin/feedback to return items with id, type, message, page, createdAt, and optional userRole, userEmail, and status fields."
+          <AdminUnavailableCard
+            title="Feedback unavailable"
+            description="We could not load feedback right now. Please try again in a moment."
           />
         )}
       </PageContainer>

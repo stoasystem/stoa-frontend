@@ -19,6 +19,12 @@ verified: 2026-05-26
 | QA18-07 | Pass | README includes Phase 18 cleanup, environment guard, state hardening, and demo-backend boundary guidance. |
 | QA18-08 | Pass | Handoff identifies Phase 19 accessibility, cross-browser, visual regression, and release-gate work. |
 
+## Post-Audit Evidence
+
+The milestone integration audit initially found production-facing copy leaks in admin diagnostics, support, billing, register errors, chat streaming errors, checkout result plan labels, and chat fallback copy. All blocker findings were patched and `npm run build` passed again on 2026-05-26.
+
+Follow-up integration verdict: `PASS_WITH_TECH_DEBT`. Remaining notes are deferred Phase 19/release-quality work, not Phase 18 blockers.
+
 ## Result
 
 Phase 107 passed. Phase 18 is ready for milestone audit.

@@ -105,6 +105,8 @@ Result:
 - `npm run dev -- --host 127.0.0.1` started successfully after sandbox escalation and showed `http://127.0.0.1:5173/`.
 - Remaining prohibited-term source hits are internal key names, HTML placeholder attributes, internal imports, gated internal debug UI, and internal analytics identifiers rather than normal-mode rendered copy.
 - Remaining raw-status scan hits are comparisons/filtering or `SafeStatusLabel` call sites rather than direct user-visible raw labels.
+- Milestone integration audit found and fixed late leaks in admin diagnostics, support/billing operational copy, checkout result plan labels, register/chat/file-upload error paths, and chat fallback response copy.
+- Follow-up scan confirms remaining `backend`/`API` hits in `src/pages`, `src/components`, `src/hooks`, `src/services`, and `src/i18n/locales` are internal variable names, guarded debug UI, logging/HTTP internals, or non-rendered service identifiers.
 
 ## Completion Criteria
 

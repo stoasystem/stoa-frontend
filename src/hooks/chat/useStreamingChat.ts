@@ -6,6 +6,7 @@ import {
 } from '@/services/chat/chatStreamApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
+import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent } from '@/types/chat'
 
 type LocalChatMessage = ChatMessage & {
@@ -16,12 +17,15 @@ type SendStreamingMessagePayload = StreamMessagePayload & {
   attachments?: ChatAttachment[]
 }
 
+const streamErrorFallback =
+  'The explanation could not be prepared right now. Please try again or ask a teacher.'
+
 function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
 function getErrorMessage(error: unknown) {
-  return error instanceof Error ? error.message : 'Failed to stream message.'
+  return toUserFacingError(error, streamErrorFallback)
 }
 
 export function useStreamingChat(conversationId: string | null) {
@@ -108,13 +112,14 @@ export function useStreamingChat(conversationId: string | null) {
 
     if (event.type === 'message_error') {
       const messageId = event.messageId ?? activeAssistantMessageIdRef.current
+      const safeMessage = toUserFacingError(new Error(event.message), streamErrorFallback)
 
       setLocalMessages((messages) =>
         messages.map((message) =>
           message.id === messageId
             ? {
                 ...message,
-                content: message.content || event.message,
+                content: message.content || safeMessage,
                 status: 'failed',
               }
             : message,

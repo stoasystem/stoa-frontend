@@ -136,7 +136,7 @@ export function AppRouter() {
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
             <Route
               path="/admin/users"
-              element={<AdminOperationsPlaceholderPage title="Users" endpoint="GET /admin/users" />}
+              element={<AdminOperationsPlaceholderPage title="Users" />}
             />
             <Route
               path="/admin/support"
@@ -148,7 +148,6 @@ export function AppRouter() {
               element={
                 <AdminOperationsPlaceholderPage
                   title="Billing interest"
-                  endpoint="GET /admin/billing-interest"
                 />
               }
             />
@@ -157,7 +156,6 @@ export function AppRouter() {
               element={
                 <AdminOperationsPlaceholderPage
                   title="System status"
-                  endpoint="GET /admin/system-status"
                 />
               }
             />

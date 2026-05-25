@@ -25,7 +25,7 @@ export async function getTeacherHelpRequest(requestId: string) {
     requestId,
     conversationId: 'conv-1',
     status: 'pending',
-    teacherName: 'Demo Tutor',
+    teacherName: 'STOA teacher',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })
@@ -36,7 +36,7 @@ function createDemoTeacherHelpRequest(conversationId: string): TeacherHelpReques
     requestId: `teacher-help-${Date.now()}`,
     conversationId,
     status: 'pending',
-    teacherName: 'Demo Tutor',
+    teacherName: 'STOA teacher',
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }

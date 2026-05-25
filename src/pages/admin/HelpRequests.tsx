@@ -1,4 +1,4 @@
-import { AdminBackendPending } from '@/components/admin/AdminBackendPending'
+import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
@@ -31,9 +31,9 @@ export function AdminHelpRequestsPage() {
           </Card>
         ))}
         {query.isError && (
-          <AdminBackendPending
-            title="Help request backend pending"
-            description="Expected endpoint: GET /admin/help-requests returning requestId, studentName, subject, status, priority, and createdAt."
+          <AdminUnavailableCard
+            title="Help requests unavailable"
+            description="We could not load teacher help requests right now. Please try again in a moment."
           />
         )}
       </PageContainer>
