@@ -182,6 +182,7 @@ None currently.
 |------|------|----------|
 | 2026-05-25 | Current project and demo guide | `docs/demo/current-project-demo-guide.md` |
 | 2026-05-25 | Remove homepage foundation status card | `src/pages/home/HomePage.tsx` |
+| 2026-05-25 | Add student and teacher homepage navigation | `src/layouts/MarketingLayout.tsx` |
 
 ### Blockers/Concerns
 

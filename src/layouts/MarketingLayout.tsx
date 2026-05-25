@@ -10,9 +10,12 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
           <Link to="/" className="font-semibold tracking-tight">
             <AppLogo />
           </Link>
-          <nav className="flex gap-6 text-sm text-muted-foreground">
-            <Link className="transition-colors hover:text-foreground" to="/">
-              Home
+          <nav className="flex flex-wrap justify-end gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            <Link className="transition-colors hover:text-foreground" to="/dashboard">
+              Students
+            </Link>
+            <Link className="transition-colors hover:text-foreground" to="/tutor">
+              Teachers
             </Link>
             <Link className="transition-colors hover:text-foreground" to="/for-parents">
               Parents
