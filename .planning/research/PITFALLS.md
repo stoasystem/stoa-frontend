@@ -1,37 +1,35 @@
-# Research: Pitfalls for v1.9 Phase 10
+# Research: Pitfalls for v1.10 Phase 11
 
-## Payment Pitfalls
+## Scope Creep Pitfalls
 
-- Treating a frontend success redirect as proof of payment. Real subscription state must come from the backend after provider webhooks.
-- Asking for card numbers in the STOA frontend during a demo. Demo checkout must be visibly virtual and test-only.
-- Exposing payment secrets in `VITE_*` environment variables. All `VITE_*` values are public browser configuration.
-- Coupling plan names to provider price IDs in UI code. Keep frontend plans stable and let the backend map plans to provider prices.
-- Building cancellation, invoices, coupons, and accounting before validating willingness to pay.
+- Turning Phase 11 into a real backend milestone. This milestone is frontend-only; backend work must remain API contracts, mock/demo adapters, or local test support.
+- Expanding FastAPI/SQLite into billing, support, analytics, referral, or scheduling production infrastructure.
+- Adding Stripe SDKs, card forms, webhook handlers, invoice systems, CRM tools, BI embeds, or calendar platforms before product validation.
+- Treating frontend feature gates as real access control. They are advisory UI only.
 
-## Subscription Gating Pitfalls
+## Mock and Demo Pitfalls
 
-- Relying on route guards or disabled buttons for real quota enforcement.
-- Duplicating server subscription state into long-lived local stores.
-- Showing locked states without a clear upgrade or contact path.
-- Letting feature flags drift from README and `.env.example`.
+- Writing mock data directly inside page components, which makes later real API integration harder.
+- Keeping multiple mock mechanisms for the same contract. Prefer a single mock/demo API strategy.
+- Letting mock checkout routes be reachable in production-like environments unless explicitly enabled.
+- Persisting demo state in a way that makes tests order-dependent.
 
-## UX Pitfalls
+## Growth and Attribution Pitfalls
 
-- Optimizing pricing before parent value is clear.
-- Adding parent upgrade CTAs without explaining learning progress or teacher support value.
-- Making tutor request detail visually busy without answering what the tutor should do next.
-- Treating P2/P3 polish as equal to P0/P1 launch blockers.
+- Capturing arbitrary query params instead of a strict UTM/referral allowlist.
+- Losing UTM/referral state between landing, register, pricing, and checkout.
+- Storing sensitive tokens, passwords, payment data, chat content, support bodies, or file contents in analytics.
+- Adding ad pixels or growth SDKs before privacy and consent policy are ready.
 
-## Admin and Operations Pitfalls
+## UI and Operations Pitfalls
 
-- Expanding admin into a full CRM during launch preparation.
-- Building BI dashboards instead of focused usage, feedback, help request, support, billing interest, and system-status views.
-- Failing to show backend-pending states clearly where APIs are not ready.
-- Omitting role protection for admin-only routes.
+- Building parent acquisition pages as generic marketing pages instead of clear product flows with one CTA.
+- Adding support-ticket UI without status, list/detail, and admin triage states.
+- Building admin analytics from raw events in the browser instead of aggregated backend-shaped contracts.
+- Implementing tutor scheduling logic in the frontend instead of showing availability and letting backend future logic enforce matching/capacity.
 
-## Launch Pitfalls
+## Verification Pitfalls
 
-- Shipping without a rollback plan and new-registration pause plan.
-- Launching without monitoring checkout, login, chat, upload, parent report, teacher help, and runtime errors.
-- Treating privacy and terms drafts as legal review substitutes.
-- Updating launch docs without adding E2E/manual QA checks for the new pricing/billing/virtual checkout path.
+- E2E tests depending on real backend endpoints for frontend-only features.
+- Missing tests for referral code capture, UTM persistence, mock checkout, support ticket creation, tutor availability save, and admin analytics rendering.
+- Documentation claiming production backend or database capabilities that do not exist.

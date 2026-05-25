@@ -1,204 +1,194 @@
-# Requirements: STOA Frontend v1.9 Phase 10 Pilot Iteration, Payment Preparation, and Production Launch
+# Requirements: STOA Frontend v1.10 Phase 11 Paid Launch Frontend, Growth Funnel, and Operational UI Scaling
 
 **Defined:** 2026-05-25
 **Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## v1.9 Requirements
+## v1.10 Requirements
 
-Requirements for Phase 10. This milestone moves STOA from controlled pilot readiness into launch readiness and early commercial validation. Before real payment backend integration, the frontend must support a virtual payment flow so pricing, billing, subscription status, and checkout UX can be demonstrated and tested end to end.
+Phase 11 is frontend-only. It prepares paid launch, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM attribution, and demo/mock API behavior without implementing formal backend payment, subscription enforcement, analytics, support, or database systems.
 
-### Pilot Review and Critical Bug Sprint
+### Frontend-Only Boundary and Demo API Cleanup
 
-- [x] **PILOT-01**: The team can review a `docs/pilot/pilot-review.md` summary covering participants, usage metrics, student feedback, parent feedback, tutor feedback, critical bugs, UX issues, value signals, pricing signals, recommended changes, and Phase 10 priorities.
-- [x] **PILOT-02**: Pilot feedback is categorized into critical bug, UX confusion, value confusion, missing feature, performance issue, trust issue, payment/pricing issue, and content/AI quality issue.
-- [x] **PILOT-03**: P0/P1/P2/P3 bug priority definitions and launch rules are documented.
-- [x] **PILOT-04**: P0/P1 bug fixes or workarounds can be tracked with reproduction steps, fix notes, QA evidence, and E2E coverage expectations.
-- [x] **PILOT-05**: Launch readiness docs make clear that P0 bugs must be fixed and P1 bugs must be fixed or have explicit workarounds before public launch.
+- [ ] **BOUND-01**: Phase 11 docs explicitly state that formal backend, payment webhook, subscription enforcement, production analytics backend, complex admin backend, production support backend, and complex database design are out of scope.
+- [ ] **BOUND-02**: Existing local FastAPI/SQLite/demo backend support is documented as demo/test-only infrastructure.
+- [ ] **BOUND-03**: Prior backend-like features are reviewed and either documented, isolated, or marked for cleanup so they do not imply production backend architecture.
+- [ ] **BOUND-04**: Demo/mock API strategy is defined for billing, feature access, referrals, tutor availability, support tickets, and admin analytics.
+- [ ] **BOUND-05**: Mock/demo data is kept behind typed services or mock handlers, not embedded directly in page components.
 
-### Student, Parent, and Tutor UX Iteration
+### Billing, Usage, Feature Access, and Checkout Frontend
 
-- [x] **UX-01**: Student dashboard shows next recommended actions such as continue last conversation, review weak topic, upload homework question, and ask a teacher.
-- [x] **UX-02**: Student chat empty state, new conversation flow, upload guidance, AI loading state, teacher-help CTA, recent conversations, and learning-history entry are clearer than the pilot version.
-- [x] **UX-03**: Parent dashboard first screen highlights whether the child is learning, recent questions, weak topics, teacher involvement, next parent action, and STOA value.
-- [x] **UX-04**: Parent report explains weak topics, weekly summary, teacher help records, and why the learning signal matters.
-- [x] **UX-05**: Parent dashboard and child report include lightweight upgrade/conversion CTAs.
-- [x] **UX-06**: Tutor request detail clearly shows student identity, grade, subject, student question, AI answer, student follow-up, required tutor action, and resolution controls.
-- [x] **UX-07**: Tutor resolved-state flow requires a short note or resolution explanation.
-- [x] **UX-08**: Tutor dashboard shows pending count, resolved-today count, and average response-time placeholder or value.
-- [x] **UX-09**: Core UX iteration emits or documents analytics events for parent report views, upgrade CTA clicks, pricing page views, pricing plan selections, checkout starts, tutor opens, status changes, and tutor notes.
+- [ ] **BILL-01**: `src/types/billing.ts` defines billing plan, subscription, usage quota, feature access, and checkout-related types.
+- [ ] **BILL-02**: Billing service exposes contracts for plans, subscription, usage quota, feature access, checkout session, and manage-billing placeholder.
+- [ ] **BILL-03**: Billing hooks expose plans, subscription, usage, feature access, and checkout mutation through TanStack Query.
+- [ ] **BILL-04**: `/pricing` displays frontend-driven plan data, recommended plan state, comparison, FAQ, and parent value CTA.
+- [ ] **BILL-05**: `/billing` displays subscription status, current plan, usage quota, payment/demo mode, upgrade action, and manage-billing placeholder.
+- [ ] **BILL-06**: Billing success and cancelled routes show mock checkout return states and next actions.
+- [ ] **BILL-07**: Feature gating UI can show locked states for AI messages, file uploads, teacher help, and parent reports.
+- [ ] **BILL-08**: Upgrade prompt/dialog routes users to pricing or billing without pretending frontend gates are secure enforcement.
+- [ ] **BILL-09**: Checkout payload can include attribution/UTM metadata without exposing payment secrets.
 
-### Pricing, Subscription Model, and Feature Flags
+### Parent Acquisition and Landing Pages
 
-- [x] **PRICE-01**: `/pricing` clearly explains STOA value, free trial, Student Plan, Family Plan, Tutor-supported Plan, pilot status, and why parents should pay.
-- [x] **PRICE-02**: Pricing tiers list included capabilities for AI learning chat, homework upload, learning history, parent dashboard, weekly parent reports, teacher help quota, and priority teacher support.
-- [x] **PRICE-03**: Pricing CTAs support current launch state through start free trial, join pilot, talk to us, and upgrade after pilot actions.
-- [x] **PRICE-04**: `docs/pricing/pricing-validation.md` records pricing assumptions, pilot signals, validation questions, and launch decision criteria.
-- [x] **PRICE-05**: `docs/pricing/subscription-model.md` defines subscription tiers, access matrix, and backend-owned enforcement boundaries.
-- [x] **PRICE-06**: User subscription types include `trial`, `active`, `inactive`, `expired`, `free_trial`, `student`, `family`, and `tutor_supported`.
-- [x] **FLAG-01**: Frontend feature flags include payment, mock checkout, public registration, teacher help, and parent report controls.
-- [x] **FLAG-02**: `.env.example` and README document production feature flags and safe defaults.
+- [ ] **GROW-01**: `/for-parents` explains STOA value for parents and routes to pricing/register.
+- [ ] **GROW-02**: `/how-it-works` explains student asks, AI explains, file upload, teacher support, and parent report flow.
+- [ ] **GROW-03**: `/ai-homework-help` presents the AI homework help use case.
+- [ ] **GROW-04**: `/teacher-support` explains human teacher backup and tutor-supported plan value.
+- [ ] **GROW-05**: `/for-schools` and `/for-tutoring-centers` provide lightweight partnership entry placeholders.
+- [ ] **GROW-06**: Landing pages use shared components/content patterns and clear CTAs.
+- [ ] **GROW-07**: Parent funnel CTA clicks are tracked with privacy-safe analytics metadata.
 
-### Billing, Subscription UI, and Virtual Checkout
+### Referral and Invitation Flow
 
-- [x] **BILL-01**: Billing API client defines `GET /billing/subscription` and `POST /billing/checkout-session`.
-- [x] **BILL-02**: Billing hooks expose subscription query and create-checkout-session mutation using TanStack Query.
-- [x] **BILL-03**: `/billing` shows current plan, subscription status, trial end, upgrade path, and contact support path.
-- [x] **BILL-04**: Subscription badge, plan card, billing summary, and upgrade button components exist.
-- [x] **BILL-05**: The real payment path never collects card details in the frontend and redirects only to a backend-provided hosted checkout URL.
-- [x] **BILL-06**: Payment disabled state is clear and routes users to support, feedback, contact, or billing interest capture.
-- [x] **BILL-07**: Mock checkout flag enables a virtual checkout page for frontend demos and tests before the real backend exists.
-- [x] **BILL-08**: Virtual checkout can simulate plan selection, confirmation, success, and cancel states without real payment data.
-- [x] **BILL-09**: E2E or documented QA covers `/pricing` to `/billing` to virtual checkout success/cancel.
-- [x] **BILL-10**: Billing interest capture is represented through a documented frontend/backend contract or admin-visible placeholder.
+- [ ] **REF-01**: Referral types and service contract define `GET /referrals/me`.
+- [ ] **REF-02**: `/referrals` shows invite link, referral code, successful invites, copy action, and reward placeholder.
+- [ ] **REF-03**: Register page reads `ref` or referral code from the URL.
+- [ ] **REF-04**: Register payload can include referral code and stored attribution metadata.
+- [ ] **REF-05**: Referral link copy triggers a privacy-safe analytics event.
+- [ ] **REF-06**: Referral demo/mock response can return a deterministic invite link and successful invite count.
 
-### Parent Conversion Funnel
+### Tutor Availability UI
 
-- [x] **PARENT-01**: Parent dashboard includes a value explanation card that connects learning activity to parent decisions.
-- [x] **PARENT-02**: Parent report includes an upgrade prompt and pricing CTA.
-- [x] **PARENT-03**: Pricing CTA component can be reused from parent dashboard, report, and pricing surfaces.
-- [x] **PARENT-04**: Parent conversion funnel is documented from dashboard to report to value explanation to pricing CTA to pricing page to billing/contact.
-- [x] **PARENT-05**: Parent conversion analytics events are implemented or documented with privacy-safe payloads.
+- [ ] **TUTOR-01**: Tutor availability types and service contracts define `GET /tutors/me/availability` and `PATCH /tutors/me/availability`.
+- [ ] **TUTOR-02**: `/tutor/availability` displays current weekly availability, subjects, and availability status.
+- [ ] **TUTOR-03**: Tutor can edit weekly availability windows in the frontend UI.
+- [ ] **TUTOR-04**: Tutor can edit tutor-supported subjects in the frontend UI.
+- [ ] **TUTOR-05**: Availability save mutation shows success/error feedback and invalidates the relevant query.
+- [ ] **TUTOR-06**: Admin-facing tutor availability overview is represented as a placeholder or analytics card without implementing scheduling backend logic.
 
-### Admin Operations
+### Support Ticket UI
 
-- [x] **ADMIN-01**: `/admin/usage` is accessible to admins and shows usage summary data or clear backend-pending state.
-- [x] **ADMIN-02**: `/admin/feedback` is accessible to admins and shows feedback list data or clear backend-pending state.
-- [x] **ADMIN-03**: `/admin/help-requests` is accessible to admins and shows teacher help request data or clear backend-pending state.
-- [x] **ADMIN-04**: Admin route shells exist for users, support, billing interest, and system status.
-- [x] **ADMIN-05**: Admin API clients define users, feedback, support requests, usage summary, help requests, billing interest, and system status contracts.
-- [x] **ADMIN-06**: Admin query hooks exist for usage, feedback, help requests, and other Phase 10 admin contracts where useful.
-- [x] **ADMIN-07**: Non-admin users are blocked from admin pages and routed to `/forbidden`.
-- [x] **ADMIN-08**: Admin operations scope avoids full CRM, full BI, accounting, payroll, and school multi-tenant management.
+- [ ] **SUP-01**: Support ticket types and service contracts define user ticket create/list/detail and admin ticket list/detail/status update.
+- [ ] **SUP-02**: `/support/tickets` lets users create a ticket and view their ticket list.
+- [ ] **SUP-03**: `/support/tickets/:ticketId` shows ticket detail and status.
+- [ ] **SUP-04**: `/admin/support` shows admin support ticket queue with filter/status states.
+- [ ] **SUP-05**: `/admin/support/:ticketId` shows ticket detail and mock status update UI.
+- [ ] **SUP-06**: Support ticket analytics avoid full private ticket bodies and sensitive data.
 
-### Tutor Operations
+### Admin Operational Analytics
 
-- [x] **TUTOR-01**: Tutor help request queue shows status, priority placeholder, student context, subject, age/grade where available, and request age.
-- [x] **TUTOR-02**: Tutor request detail separates student question, AI answer, student follow-up, tutor notes, and status controls.
-- [x] **TUTOR-03**: Tutor notes can be submitted through a typed API contract.
-- [x] **TUTOR-04**: Marking a request resolved requires a resolution note.
-- [x] **TUTOR-05**: Tutor stats contract includes pending requests, resolved today, and average response time minutes.
-- [x] **TUTOR-06**: Tutor operation analytics record request opened, status changed, time to first action, resolved count, and note submitted events or documented placeholders.
+- [ ] **ADMIN-01**: Admin analytics types and service contract define `GET /admin/analytics/overview`.
+- [ ] **ADMIN-02**: `/admin/analytics` shows active users, weekly active students, registrations, messages, uploads, teacher-help requests, parent report views, checkout starts, checkout completions, and cancelled subscriptions.
+- [ ] **ADMIN-03**: Admin analytics UI shows loading, empty, backend-pending, and success states.
+- [ ] **ADMIN-04**: Billing interest/conversion overview is visible through admin analytics or a dedicated admin section.
+- [ ] **ADMIN-05**: Admin operational UI remains frontend-only and avoids BI/data warehouse implementation.
 
-### Privacy, Terms, Release, and Launch
+### UTM, Referral Attribution, and Paid Launch Analytics
 
-- [x] **LEGAL-01**: `/privacy` is updated to a launch-ready draft covering collected user data, student learning data, parent visibility, tutor visibility, data purpose, retention, deletion requests, contact, AI services, and third-party processing placeholders.
-- [x] **LEGAL-02**: `/terms` is updated to a launch-ready draft covering STOA as a learning aid, possible AI errors, review expectations, prohibited uploads, trial/subscription terms, service changes, termination, and contact.
-- [x] **LEGAL-03**: Registration requires terms/privacy consent before submit.
-- [x] **LEGAL-04**: App layout or footer links expose privacy and terms.
-- [x] **LAUNCH-01**: `docs/launch/release-process.md` documents branch/release flow, release gates, and environment checks.
-- [x] **LAUNCH-02**: `docs/launch/rollback-plan.md` documents deployment rollback, environment rollback, user communication, and new-registration pause procedures.
-- [x] **LAUNCH-03**: `docs/launch/post-launch-monitoring.md` documents 72-hour and first-week monitoring for login, chat, streaming, upload, teacher help, parent reports, checkout if enabled, and runtime errors.
-- [x] **LAUNCH-04**: `docs/launch/launch-checklist.md` covers CI, E2E, manual QA, P0/P1 status, environment variables, monitoring, analytics, support, privacy/terms, rollback, and launch approval.
-- [x] **LAUNCH-05**: README documents Phase 10 additions, launch flow, production feature flags, and billing API contracts.
-- [x] **LAUNCH-06**: Manual QA checklist includes pricing, billing, virtual checkout, parent conversion, tutor operations, admin operations, privacy/terms, and launch readiness checks.
-- [x] **LAUNCH-07**: E2E coverage includes the core demonstrable pricing/billing/virtual checkout flow where feasible.
-- [x] **LAUNCH-08**: `npm run build` remains passing at milestone completion.
+- [ ] **ATTR-01**: `src/lib/utm.ts` captures whitelisted UTM params from URL and stores them safely.
+- [ ] **ATTR-02**: Stored attribution can be read by register, checkout, referral, and analytics flows.
+- [ ] **ATTR-03**: App startup captures UTM/referral context.
+- [ ] **ATTR-04**: Paid launch analytics event names include pricing, checkout, billing, feature locked, upgrade prompt, parent landing, referral, tutor availability, support ticket, admin analytics, and UTM captured events.
+- [ ] **ATTR-05**: Analytics payloads exclude chat content, file contents, payment secrets, tokens, and full support bodies.
+- [ ] **FLAG-01**: `src/lib/env.ts` and `.env.example` include referral, support tickets, mock API, tutor availability, and admin analytics flags.
+
+### Documentation, QA, and Verification
+
+- [ ] **DOC-01**: README documents Phase 11 frontend-only scope, API contracts, demo backend/mock behavior, and main additions.
+- [ ] **DOC-02**: Growth docs cover parent acquisition funnel, referral program, and paid launch campaign.
+- [ ] **DOC-03**: Billing docs cover checkout flow contract and subscription access UI.
+- [ ] **DOC-04**: Operations docs cover tutor availability UI and support ticket UI.
+- [ ] **DOC-05**: Analytics docs cover paid launch events and operational dashboard.
+- [ ] **QA-01**: Manual QA checklist covers billing/pricing, feature gating, parent funnel, referral, tutor availability, support tickets, admin analytics, UTM, and build.
+- [ ] **QA-02**: E2E or route smoke coverage verifies core Phase 11 demo flows where feasible.
+- [ ] **QA-03**: `npm run build` passes at milestone completion.
 
 ## Future Requirements
 
-Deferred to later milestones. Tracked but not in current roadmap.
+Deferred to later milestones.
 
-### Paid Launch and Growth
-
-- **PAY-REAL-01**: Real Stripe Checkout backend integration is enabled in production with provider price IDs owned by backend configuration.
-- **SUB-ENF-01**: Backend enforces subscription access rules for message quota, upload quota, teacher-help quota, and parent-report access.
-- **PORTAL-01**: Users can manage cancellation, invoices, and payment methods through a customer portal or support workflow.
-- **GROWTH-01**: Parent acquisition funnel, referral/invitation, SEO, school partnership landing pages, and paid launch campaign support exist.
-- **OPS-01**: Full support ticket system, operational analytics dashboard, churn/retention tracking, and tutor scheduling workflow exist.
+- **BACKEND-PAY-01**: Real Stripe Checkout and Customer Portal backend sessions.
+- **BACKEND-SUB-01**: Real subscription persistence and quota enforcement.
+- **BACKEND-ANLY-01**: Production analytics aggregation backend.
+- **BACKEND-SUP-01**: Production support ticket backend and notifications.
+- **BACKEND-REF-01**: Referral reward accounting and fraud controls.
+- **BACKEND-SCHED-01**: Tutor scheduling, matching, capacity, and calendar integration backend.
+- **PLATFORM-01**: School/tutoring center multi-tenant backend and organization admin system.
 
 ## Out of Scope
 
-Explicitly excluded from Phase 10.
-
 | Feature | Reason |
 |---------|--------|
-| Full real payment processing | Phase 10 prepares contracts and demo flow; real provider rollout belongs to a backend-integrated paid launch phase. |
-| Direct frontend card collection | Payment details must stay on hosted provider pages or test-only virtual screens. |
-| Full subscription enforcement | Backend APIs must enforce true access and quota rules later. |
-| Full CRM/helpdesk | Phase 10 only needs early operations visibility and support workflow continuity. |
-| Complete accounting/invoice system | Not needed for pricing validation and first launch readiness. |
-| Tutor payroll | Outside product launch readiness. |
-| Complex coupons/promotions | Pricing validation needs simple tiers and CTAs. |
-| Enterprise school dashboard and multi-tenant school system | Outside early commercial validation scope. |
-| Full LMS courseware | STOA remains focused on AI learning help, parent visibility, and tutor support. |
-| Large-scale A/B testing platform or data warehouse | Analytics events and admin usage views are enough for Phase 10. |
+| Formal production backend | Phase 11 is frontend-only. |
+| Real Stripe webhook | Backend-owned future paid launch work. |
+| Real subscription enforcement | Backend APIs must enforce true access later. |
+| Production analytics backend | This milestone defines UI/contracts/events only. |
+| Complex admin backend | Admin pages use contracts/demo data only. |
+| Production support ticket backend | Support UI can be mocked/demoed first. |
+| Complex database schema | Demo/test data is enough for frontend flow validation. |
+| Full CRM/helpdesk | Too much operational scope. |
+| Tutor payroll and scheduling engine | Outside frontend paid launch UI. |
+| CMS/SEO content system | Landing entries only; no content backend. |
+| Ad pixels/growth SDKs/A-B testing platform | Attribution and event taxonomy are enough. |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PILOT-01 | Phase 48 | Complete |
-| PILOT-02 | Phase 48 | Complete |
-| PILOT-03 | Phase 48 | Complete |
-| PILOT-04 | Phase 48 | Complete |
-| PILOT-05 | Phase 48 | Complete |
-| UX-01 | Phase 49 | Complete |
-| UX-02 | Phase 49 | Complete |
-| UX-03 | Phase 49 | Complete |
-| UX-04 | Phase 49 | Complete |
-| UX-05 | Phase 49 | Complete |
-| UX-06 | Phase 50 | Complete |
-| UX-07 | Phase 50 | Complete |
-| UX-08 | Phase 50 | Complete |
-| UX-09 | Phase 49 | Complete |
-| PRICE-01 | Phase 51 | Complete |
-| PRICE-02 | Phase 51 | Complete |
-| PRICE-03 | Phase 51 | Complete |
-| PRICE-04 | Phase 51 | Complete |
-| PRICE-05 | Phase 51 | Complete |
-| PRICE-06 | Phase 52 | Complete |
-| FLAG-01 | Phase 52 | Complete |
-| FLAG-02 | Phase 52 | Complete |
-| BILL-01 | Phase 52 | Complete |
-| BILL-02 | Phase 52 | Complete |
-| BILL-03 | Phase 52 | Complete |
-| BILL-04 | Phase 52 | Complete |
-| BILL-05 | Phase 52 | Complete |
-| BILL-06 | Phase 52 | Complete |
-| BILL-07 | Phase 52 | Complete |
-| BILL-08 | Phase 52 | Complete |
-| BILL-09 | Phase 55 | Complete |
-| BILL-10 | Phase 53 | Complete |
-| PARENT-01 | Phase 49 | Complete |
-| PARENT-02 | Phase 49 | Complete |
-| PARENT-03 | Phase 51 | Complete |
-| PARENT-04 | Phase 51 | Complete |
-| PARENT-05 | Phase 49 | Complete |
-| ADMIN-01 | Phase 53 | Complete |
-| ADMIN-02 | Phase 53 | Complete |
-| ADMIN-03 | Phase 53 | Complete |
-| ADMIN-04 | Phase 53 | Complete |
-| ADMIN-05 | Phase 53 | Complete |
-| ADMIN-06 | Phase 53 | Complete |
-| ADMIN-07 | Phase 53 | Complete |
-| ADMIN-08 | Phase 53 | Complete |
-| TUTOR-01 | Phase 50 | Complete |
-| TUTOR-02 | Phase 50 | Complete |
-| TUTOR-03 | Phase 50 | Complete |
-| TUTOR-04 | Phase 50 | Complete |
-| TUTOR-05 | Phase 50 | Complete |
-| TUTOR-06 | Phase 50 | Complete |
-| LEGAL-01 | Phase 54 | Complete |
-| LEGAL-02 | Phase 54 | Complete |
-| LEGAL-03 | Phase 54 | Complete |
-| LEGAL-04 | Phase 54 | Complete |
-| LAUNCH-01 | Phase 54 | Complete |
-| LAUNCH-02 | Phase 54 | Complete |
-| LAUNCH-03 | Phase 54 | Complete |
-| LAUNCH-04 | Phase 54 | Complete |
-| LAUNCH-05 | Phase 55 | Complete |
-| LAUNCH-06 | Phase 55 | Complete |
-| LAUNCH-07 | Phase 55 | Complete |
-| LAUNCH-08 | Phase 55 | Complete |
+| BOUND-01 | Phase 56 | Planned |
+| BOUND-02 | Phase 56 | Planned |
+| BOUND-03 | Phase 56 | Planned |
+| BOUND-04 | Phase 56 | Planned |
+| BOUND-05 | Phase 56 | Planned |
+| ATTR-01 | Phase 56 | Planned |
+| ATTR-02 | Phase 56 | Planned |
+| ATTR-03 | Phase 56 | Planned |
+| ATTR-04 | Phase 56 | Planned |
+| ATTR-05 | Phase 56 | Planned |
+| FLAG-01 | Phase 56 | Planned |
+| BILL-01 | Phase 57 | Planned |
+| BILL-02 | Phase 57 | Planned |
+| BILL-03 | Phase 57 | Planned |
+| BILL-04 | Phase 57 | Planned |
+| BILL-05 | Phase 57 | Planned |
+| BILL-06 | Phase 57 | Planned |
+| BILL-07 | Phase 57 | Planned |
+| BILL-08 | Phase 57 | Planned |
+| BILL-09 | Phase 57 | Planned |
+| GROW-01 | Phase 58 | Planned |
+| GROW-02 | Phase 58 | Planned |
+| GROW-03 | Phase 58 | Planned |
+| GROW-04 | Phase 58 | Planned |
+| GROW-05 | Phase 58 | Planned |
+| GROW-06 | Phase 58 | Planned |
+| GROW-07 | Phase 58 | Planned |
+| REF-01 | Phase 59 | Planned |
+| REF-02 | Phase 59 | Planned |
+| REF-03 | Phase 59 | Planned |
+| REF-04 | Phase 59 | Planned |
+| REF-05 | Phase 59 | Planned |
+| REF-06 | Phase 59 | Planned |
+| TUTOR-01 | Phase 60 | Planned |
+| TUTOR-02 | Phase 60 | Planned |
+| TUTOR-03 | Phase 60 | Planned |
+| TUTOR-04 | Phase 60 | Planned |
+| TUTOR-05 | Phase 60 | Planned |
+| TUTOR-06 | Phase 60 | Planned |
+| SUP-01 | Phase 61 | Planned |
+| SUP-02 | Phase 61 | Planned |
+| SUP-03 | Phase 61 | Planned |
+| SUP-04 | Phase 61 | Planned |
+| SUP-05 | Phase 61 | Planned |
+| SUP-06 | Phase 61 | Planned |
+| ADMIN-01 | Phase 62 | Planned |
+| ADMIN-02 | Phase 62 | Planned |
+| ADMIN-03 | Phase 62 | Planned |
+| ADMIN-04 | Phase 62 | Planned |
+| ADMIN-05 | Phase 62 | Planned |
+| DOC-01 | Phase 63 | Planned |
+| DOC-02 | Phase 63 | Planned |
+| DOC-03 | Phase 63 | Planned |
+| DOC-04 | Phase 63 | Planned |
+| DOC-05 | Phase 63 | Planned |
+| QA-01 | Phase 63 | Planned |
+| QA-02 | Phase 63 | Planned |
+| QA-03 | Phase 63 | Planned |
 
 **Coverage:**
-- v1.9 requirements: 62 total
-- Mapped to phases: 62
-- Complete: 62
+- v1.10 requirements: 57 total
+- Mapped to phases: 57
+- Planned: 57
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.9 roadmap creation*
+*Last updated: 2026-05-25 after v1.10 roadmap creation*

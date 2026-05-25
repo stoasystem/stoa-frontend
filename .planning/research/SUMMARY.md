@@ -1,45 +1,65 @@
-# Research Summary: v1.9 Phase 10
+# Research Summary: v1.10 Phase 11
 
 ## Stack Additions
 
-- Continue existing React, TypeScript, Vite, TanStack Query, Axios/httpClient, and role-route architecture.
-- Add billing services/hooks and subscription UI without adding direct card handling.
-- Prefer Stripe Checkout for real payment provider direction because it supports hosted subscription checkout and keeps payment details outside the STOA frontend.
-- Add explicit virtual checkout mode so the frontend can demo and test pricing-to-billing flows before the real backend payment integration exists.
+- Keep React, TypeScript, Vite, React Router, TanStack Query, Axios `httpClient`, Tailwind, local UI primitives, Zod, React Hook Form, Zustand for limited UI/session state, and Playwright.
+- Recommended optional additions:
+  - `msw` for frontend-only mock/demo API support.
+  - `recharts` for lightweight admin operational analytics charts.
+  - `date-fns` only if tutor availability date math becomes non-trivial.
+- Avoid Stripe frontend SDKs, CRM/helpdesk widgets, BI embeds, FullCalendar, GraphQL/tRPC, backend/data packages, growth SDKs, and A/B testing platforms.
 
 ## Feature Table Stakes
 
-- Pilot feedback review and P0/P1 launch blocker tracking.
-- Student, Parent, and Tutor UX iteration based on pilot evidence.
-- Pricing page with clear tiers and conversion CTAs.
-- Billing page with subscription summary, status badge, upgrade path, and support path.
-- Billing API contract for checkout session and subscription status.
-- Feature flags for payment, mock checkout, registration, teacher help, and parent reports.
-- Parent conversion funnel and analytics events.
-- Admin usage, feedback, help requests, support, billing interest, users, and system route shells.
-- Tutor operations metrics and required resolution notes.
-- Launch-ready privacy/terms, release process, rollback plan, post-launch monitoring, launch checklist, README, E2E, and manual QA.
+- Billing plans, subscription status, usage quota, feature access, checkout session, and manage-billing placeholder contracts.
+- Usage quota UI, locked feature cards, upgrade prompts, and advisory feature gates.
+- Parent acquisition pages: parents, how it works, AI homework help, teacher support, schools, and tutoring centers.
+- Referral/invitation page, referral code capture, invite link copy, and register/checkout attribution.
+- Tutor availability and subject editor.
+- User support ticket list/detail/create and admin support triage.
+- Admin operational analytics dashboard for usage, conversion, billing, support, tutor capacity, and retention placeholders.
+- UTM capture utility and paid launch analytics taxonomy.
+- Demo/mock API strategy and explicit cleanup/isolation of previous demo backend/database complexity.
 
-## Key Architectural Decision
+## Architecture Guidance
 
-Real payment flow:
+Use the existing shape:
 
-Frontend selects plan -> backend creates checkout session -> frontend redirects to hosted checkout -> backend receives webhook -> frontend reads subscription status.
+```text
+Route/Page -> Feature Components -> Hooks -> Services -> httpClient or demo/mock adapter
+```
 
-Demo payment flow:
+- TanStack Query owns server/demo state.
+- Services define typed API contracts.
+- Pages compose components and avoid direct API/mocking logic.
+- `src/lib/env.ts` owns public feature flags.
+- `src/lib/utm.ts` or attribution utilities own UTM/referral persistence.
+- Mock/demo behavior should live behind services or MSW handlers, not inside product components.
 
-Frontend selects plan -> virtual checkout route -> demo success/cancel route -> subscription/status UI can be verified without real backend payment infrastructure.
+## Backend Boundary
 
-## Watch Out For
+Phase 11 must keep backend-like work explicitly demo/test-only:
 
-- Never treat frontend success redirects as authoritative subscription proof.
-- Never collect real card details in the frontend.
-- Keep real access enforcement in backend APIs.
-- Keep payment feature flags and docs synchronized.
-- Preserve launch scope: no full CRM, accounting, coupon system, payroll, school multi-tenant platform, or growth campaign platform in Phase 10.
+- No formal backend implementation.
+- No production database design.
+- No real payment webhook.
+- No real subscription enforcement.
+- No production analytics backend.
+- No complex support/admin backend.
+- Any existing FastAPI/SQLite code remains local demo/test infrastructure.
 
-## Source Notes
+## Suggested Phase Slices
 
-- Stripe Checkout Sessions support subscription mode for recurring billing: https://docs.stripe.com/api/checkout/sessions/create
-- Stripe Checkout uses hosted payment pages reached through a checkout session URL: https://docs.stripe.com/payments/checkout/how-checkout-works
-- Stripe test cards support fake successful and failed card scenarios for integration testing: https://docs.stripe.com/testing
+1. Demo API boundary, UTM, analytics taxonomy, and backend cleanup docs.
+2. Billing plans, usage quotas, feature gates, and mock checkout contract.
+3. Parent acquisition and referral/invitation flow.
+4. Tutor availability and support ticket UI.
+5. Admin operational analytics and support operations UI.
+6. Docs, demo QA, E2E, and final verification.
+
+## Watch Outs
+
+- Do not imply production payment, analytics, support, subscription, or database capabilities.
+- Do not record sensitive learning, file, payment, or support content in analytics.
+- Do not duplicate mock logic between components, services, backend, and tests.
+- Keep all routes and CTA flows demoable without formal backend readiness.
