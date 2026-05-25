@@ -21,6 +21,13 @@ export function HomeParentVisibility() {
             STOA keeps the student learning path focused while giving parents a calm view of
             progress, recurring weak topics, and teacher-help moments.
           </p>
+          <div className="mt-6 overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+            <img
+              src="https://images.unsplash.com/photo-1491308056676-205b7c9a7dc1?auto=format&fit=crop&w=1000&q=80"
+              alt="Parent and child reviewing schoolwork together"
+              className="h-56 w-full object-cover"
+            />
+          </div>
         </div>
         <div className="grid gap-3">
           {items.map(([title, description, Icon]) => (

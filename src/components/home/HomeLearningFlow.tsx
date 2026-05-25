@@ -26,13 +26,32 @@ const steps = [
 export function HomeLearningFlow() {
   return (
     <section className="mx-auto max-w-6xl px-5 py-14 sm:px-6">
-      <div className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
-          How STOA helps students
-        </p>
-        <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-          One learning path, not three disconnected tools.
-        </h2>
+      <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+        <div className="max-w-2xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
+            How STOA helps students
+          </p>
+          <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
+            One learning path, not three disconnected tools.
+          </h2>
+        </div>
+        <div className="relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70 bg-[#152238] shadow-[0_24px_70px_hsl(217_45%_15%_/_0.12)]">
+          <img
+            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80"
+            alt="Student using a laptop while studying at a desk"
+            className="absolute inset-0 h-full w-full object-cover opacity-75"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(120deg,hsl(217_45%_15%_/_0.82),hsl(217_45%_15%_/_0.18)_58%,hsl(40_39%_49%_/_0.35))]" />
+          <div className="absolute bottom-5 left-5 right-5 rounded-xl border border-white/15 bg-white/88 p-4 text-[#152238] shadow-2xl backdrop-blur">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8f7c]">
+              Learning room
+            </p>
+            <p className="mt-2 text-lg font-semibold leading-6">
+              The student stays in one conversation while AI, tutor help, and parent visibility
+              work around it.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="mt-9 grid gap-4 lg:grid-cols-4">
         {steps.map((step, index) => {
