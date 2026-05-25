@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { enableMockCheckout } from '@/lib/env'
+import { showCheckoutPreview } from '@/lib/env'
 
 export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' }) {
   const [searchParams] = useSearchParams()
@@ -13,14 +13,14 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
   const success = status === 'success'
   const Icon = success ? CheckCircle2 : XCircle
 
-  if (!enableMockCheckout) {
+  if (!showCheckoutPreview) {
     return (
       <DashboardLayout>
         <PageContainer className="p-0">
           <PageHeader
             eyebrow="Checkout unavailable"
-            title="Virtual checkout is disabled"
-            description="Success and cancel demo states are only available when mock checkout is enabled."
+            title="Plan selection is being prepared"
+            description="Please return to billing or contact STOA to continue."
           />
           <Button asChild>
             <Link to="/billing">Return to billing</Link>

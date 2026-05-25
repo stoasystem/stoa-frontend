@@ -19,12 +19,12 @@ Requirements for Phase 18. Each requirement maps to exactly one roadmap phase.
 
 ### Environment Guards and Demo Surface Isolation
 
-- [ ] **GUARD18-01**: `src/lib/env.ts` exposes typed, semantic public configuration for demo accounts, demo badges, checkout preview, demo surfaces, and internal debug visibility.
-- [ ] **GUARD18-02**: Demo accounts are hidden by default from normal login, register, homepage, and user-facing help paths unless an explicit demo/development flag enables them.
-- [ ] **GUARD18-03**: Demo badges, demo-only navigation, mock/virtual checkout affordances, and internal debug surfaces are hidden by default in production-facing and staging-pilot modes.
-- [ ] **GUARD18-04**: Demo-only routes or placeholder surfaces are either gated, redirected, or relabeled so normal users do not see development language.
-- [ ] **GUARD18-05**: `InternalDebugPanel` or equivalent developer diagnostics are available only in development with an explicit debug flag and do not expose secrets, tokens, passwords, or full private chat content.
-- [ ] **GUARD18-06**: Local/demo workflows and E2E flows that depend on demo accounts, demo fallback, or virtual checkout remain available under explicit non-production flags.
+- [x] **GUARD18-01**: `src/lib/env.ts` exposes typed, semantic public configuration for demo accounts, demo badges, checkout preview, demo surfaces, and internal debug visibility.
+- [x] **GUARD18-02**: Demo accounts are hidden by default from normal login, register, homepage, and user-facing help paths unless an explicit demo/development flag enables them.
+- [x] **GUARD18-03**: Demo badges, demo-only navigation, mock/virtual checkout affordances, and internal debug surfaces are hidden by default in production-facing and staging-pilot modes.
+- [x] **GUARD18-04**: Demo-only routes or placeholder surfaces are either gated, redirected, or relabeled so normal users do not see development language.
+- [x] **GUARD18-05**: `InternalDebugPanel` or equivalent developer diagnostics are available only in development with an explicit debug flag and do not expose secrets, tokens, passwords, or full private chat content.
+- [x] **GUARD18-06**: Local/demo workflows and E2E flows that depend on demo accounts, demo fallback, or virtual checkout remain available under explicit non-production flags.
 
 ### Production-Facing Copy Cleanup
 
@@ -125,12 +125,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUDIT18-04 | Phase 103 | Complete |
 | AUDIT18-05 | Phase 103 | Complete |
 | AUDIT18-06 | Phase 103 | Complete |
-| GUARD18-01 | Phase 104 | Planned |
-| GUARD18-02 | Phase 104 | Planned |
-| GUARD18-03 | Phase 104 | Planned |
-| GUARD18-04 | Phase 104 | Planned |
-| GUARD18-05 | Phase 104 | Planned |
-| GUARD18-06 | Phase 104 | Planned |
+| GUARD18-01 | Phase 104 | Complete |
+| GUARD18-02 | Phase 104 | Complete |
+| GUARD18-03 | Phase 104 | Complete |
+| GUARD18-04 | Phase 104 | Complete |
+| GUARD18-05 | Phase 104 | Complete |
+| GUARD18-06 | Phase 104 | Complete |
 | COPY18-01 | Phase 105 | Planned |
 | COPY18-02 | Phase 105 | Planned |
 | COPY18-03 | Phase 105 | Planned |
@@ -170,4 +170,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after Phase 103 completion*
+*Last updated: 2026-05-26 after Phase 104 completion*

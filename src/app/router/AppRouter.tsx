@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
+import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
 import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage'
@@ -108,17 +109,17 @@ export function AppRouter() {
             />
           </Route>
           <Route element={<RoleRoute allowedRoles={['admin', 'organization_admin', 'school_teacher', 'school_viewer']} />}>
-            <Route path="/organization" element={<OrganizationDashboardPage />} />
-            <Route path="/organization/students" element={<OrganizationStudentsPage />} />
-            <Route path="/organization/tutors" element={<OrganizationTutorsPage />} />
-            <Route path="/organization/reports" element={<OrganizationReportsPage />} />
-            <Route path="/organization/analytics" element={<OrganizationAnalyticsPage />} />
-            <Route path="/organization/tutor-assignment" element={<TutorAssignmentBoardPage />} />
-            <Route path="/organization/students/:studentId/learning-profile" element={<StudentLearningProfilePage />} />
-            <Route path="/students/:studentId/learning-profile" element={<StudentLearningProfilePage />} />
-            <Route path="/students/:studentId/diagnosis" element={<WeakPointDiagnosisPage />} />
-            <Route path="/students/:studentId/curriculum-graph" element={<CurriculumGraphPage />} />
-            <Route path="/curriculum-graph" element={<CurriculumGraphPage />} />
+            <Route path="/organization" element={<DemoSurfaceRoute><OrganizationDashboardPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/students" element={<DemoSurfaceRoute><OrganizationStudentsPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/tutors" element={<DemoSurfaceRoute><OrganizationTutorsPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/reports" element={<DemoSurfaceRoute><OrganizationReportsPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/analytics" element={<DemoSurfaceRoute><OrganizationAnalyticsPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/tutor-assignment" element={<DemoSurfaceRoute><TutorAssignmentBoardPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/students/:studentId/learning-profile" element={<DemoSurfaceRoute><StudentLearningProfilePage /></DemoSurfaceRoute>} />
+            <Route path="/students/:studentId/learning-profile" element={<DemoSurfaceRoute><StudentLearningProfilePage /></DemoSurfaceRoute>} />
+            <Route path="/students/:studentId/diagnosis" element={<DemoSurfaceRoute><WeakPointDiagnosisPage /></DemoSurfaceRoute>} />
+            <Route path="/students/:studentId/curriculum-graph" element={<DemoSurfaceRoute><CurriculumGraphPage /></DemoSurfaceRoute>} />
+            <Route path="/curriculum-graph" element={<DemoSurfaceRoute><CurriculumGraphPage /></DemoSurfaceRoute>} />
           </Route>
           <Route element={<RoleRoute allowedRoles={['tutor']} />}>
             <Route path="/tutor" element={<TutorDashboardPage />} />
@@ -128,8 +129,8 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
-            <Route path="/admin/advanced-analytics" element={<AdvancedAnalyticsPage />} />
-            <Route path="/admin/retention" element={<RetentionPage />} />
+            <Route path="/admin/advanced-analytics" element={<DemoSurfaceRoute><AdvancedAnalyticsPage /></DemoSurfaceRoute>} />
+            <Route path="/admin/retention" element={<DemoSurfaceRoute><RetentionPage /></DemoSurfaceRoute>} />
             <Route path="/admin/usage" element={<AdminUsagePage />} />
             <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />

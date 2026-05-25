@@ -7,10 +7,10 @@ last_updated: "2026-05-26T00:00:00+02:00"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 104 - Environment Guards and Demo UI Isolation
+Phase: 105 - Production Copy Cleanup and Display Label Mapping
 Plan: —
 Status: Ready for phase planning
-Last activity: 2026-05-26 - Phase 103 completed; Phase 104 is next
+Last activity: 2026-05-26 - Phase 104 completed; Phase 105 is next
 
 ## Performance Metrics
 
@@ -191,10 +191,11 @@ Recent decisions affecting current work:
 - Phase 102 added copy and visual QA documentation, README Phase 17 handoff guidance, final terminology/build evidence, and a mobile tutor dashboard overflow fix. Final visual QA checked 200 route/locale/viewport combinations with no failures.
 - Milestone v1.17 started from the Phase 18 production-facing cleanup, stability hardening, and demo artifact removal brief.
 - Phase 103 created the production-facing copy audit, demo artifact removal checklist, and stability hardening checklist; it classified source matches so later cleanup can gate rendered UI without deleting developer/demo infrastructure.
+- Phase 104 added semantic environment visibility flags, demo navigation and route guards, checkout preview gating, login demo-account gating, and a development-only internal debug panel.
 
 ### Pending Todos
 
-- Plan Phase 104 with `$gsd-plan-phase 104` or continue autonomous execution from the Phase 18 roadmap.
+- Plan Phase 105 with `$gsd-plan-phase 105` or continue autonomous execution from the Phase 18 roadmap.
 
 ### Quick Tasks Completed
 

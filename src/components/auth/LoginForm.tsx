@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
-import { enableDemoShortcuts } from '@/lib/env'
+import { showDemoAccounts } from '@/lib/env'
 import { createLoginSchema } from '@/lib/validation'
 
 export function LoginForm() {
@@ -40,7 +40,7 @@ export function LoginForm() {
         loginMutation.mutate(result.data)
       }}
     >
-      {enableDemoShortcuts && (
+      {showDemoAccounts && (
         <div className="rounded-md border bg-secondary/40 p-3 text-sm">
           <p className="font-medium">{t('auth:login.demoTitle')}</p>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">

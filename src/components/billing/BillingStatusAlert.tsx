@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react'
-import { enableMockCheckout, enablePayment } from '@/lib/env'
+import { enablePayment, showCheckoutPreview } from '@/lib/env'
 
 export function BillingStatusAlert() {
   return (
@@ -8,7 +8,7 @@ export function BillingStatusAlert() {
       <p>
         {enablePayment
           ? 'Payment is enabled. STOA will open a secure checkout when a plan is selected.'
-          : enableMockCheckout
+          : showCheckoutPreview
             ? 'Payment is disabled and demo checkout is available for plan review.'
             : 'Payment is disabled. Plan choices help validate family interest until live checkout is available.'}
       </p>

@@ -6,6 +6,7 @@ import {
   type AppNavItem,
   type AppRouteRole,
 } from '@/app/router/routeConfig'
+import { canShowDemoNavigation } from '@/lib/demoVisibility'
 import type { UserRole } from '@/types/user'
 
 type NavOptions = {
@@ -15,11 +16,13 @@ type NavOptions = {
 }
 
 export function getNavItemsForRole(role: AppRouteRole, options: NavOptions = {}) {
+  const showDemo = canShowDemoNavigation(options.showDemo)
+
   return navItems.filter((item) => {
     if (item.role !== role) return false
     if (item.status === 'deprecated') return false
-    if (item.priority === 'hidden' && !options.showDemo) return false
-    if (item.status === 'demo' && !options.showDemo && item.role !== 'organization') return false
+    if (item.priority === 'hidden' && !showDemo) return false
+    if (item.status === 'demo' && !showDemo) return false
     if (!options.includeSecondary && item.priority === 'secondary') return false
     if (options.mobileOnly && !item.mobile) return false
 

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { enableMockCheckout } from '@/lib/env'
+import { showCheckoutPreview } from '@/lib/env'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function VirtualCheckoutPage() {
@@ -19,18 +19,18 @@ export function VirtualCheckoutPage() {
   const price = plan.priceMonthly === 0 ? `${plan.currency} 0` : `${plan.currency} ${plan.priceMonthly}/mo`
   const planName = t(`plans.${plan.id}.name`, { defaultValue: plan.name })
 
-  if (!enableMockCheckout) {
+  if (!showCheckoutPreview) {
     return (
       <DashboardLayout>
         <PageContainer className="p-0">
           <PageHeader
             eyebrow="Checkout unavailable"
-            title="Virtual checkout is disabled"
-            description="This environment is not configured for mock checkout demos."
+            title="Plan selection is being prepared"
+            description="Please return to billing or contact STOA to continue."
           />
           <Card>
             <CardContent className="space-y-4 p-6 text-sm text-muted-foreground">
-              <p>Use billing support or enable the mock checkout flag in a local demo environment.</p>
+              <p>Online plan changes are not available in this environment right now.</p>
               <Button asChild>
                 <Link to="/billing">Return to billing</Link>
               </Button>

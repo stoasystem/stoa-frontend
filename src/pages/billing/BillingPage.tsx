@@ -16,7 +16,7 @@ import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
 import { useBillingUsageQuery } from '@/hooks/billing/useBillingUsageQuery'
 import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
 import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
-import { enableMockCheckout, enablePayment } from '@/lib/env'
+import { enablePayment, showCheckoutPreview } from '@/lib/env'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
@@ -75,7 +75,7 @@ export function BillingPage() {
                   : t('billing:paymentDisabledBody')}
               </p>
               <p>
-                {enableMockCheckout
+                {showCheckoutPreview
                   ? t('billing:mockCheckoutEnabled')
                   : t('billing:mockCheckoutDisabled')}
               </p>

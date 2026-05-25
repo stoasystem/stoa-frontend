@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import { enableMockCheckout, enablePayment } from '@/lib/env'
+import { enablePayment, showCheckoutPreview } from '@/lib/env'
 import { getStoredUTM } from '@/lib/utm'
 import { createCheckoutSession } from '@/services/billing/billingApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -8,9 +8,9 @@ import type { SubscriptionPlan } from '@/types/billing'
 export function useCreateCheckoutSessionMutation() {
   return useMutation({
     mutationFn: async (plan: SubscriptionPlan) => {
-      trackEvent('checkout_started', { plan, mode: enableMockCheckout ? 'mock' : 'hosted', ...getStoredUTM() })
+      trackEvent('checkout_started', { plan, mode: showCheckoutPreview ? 'preview' : 'hosted', ...getStoredUTM() })
 
-      if (enableMockCheckout) {
+      if (showCheckoutPreview) {
         return { checkoutUrl: `/billing/checkout/demo?plan=${plan}` }
       }
 

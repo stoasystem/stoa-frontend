@@ -18,6 +18,7 @@ import { Link, NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
 import { FeedbackButton } from '@/components/feedback/FeedbackButton'
+import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { UserMenu } from '@/components/common/UserMenu'
 import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
@@ -153,6 +154,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </nav>
       )}
+      <InternalDebugPanel />
     </div>
   )
 }
