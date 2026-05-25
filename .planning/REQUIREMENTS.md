@@ -1,94 +1,89 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-25
-**Milestone:** v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, and a clean path to future real backend integration.
+**Milestone:** v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, and a clean path to future real backend integration.
 
-## v1.15 Requirements
+## v1.16 Requirements
 
-Requirements for Phase 16. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 
-### I18n Foundation
+### Locale Copy Governance
 
-- [x] **I18N-01**: User can run the app with `i18next` and `react-i18next` initialized before React renders.
-- [x] **I18N-02**: User can switch between `en`, `de`, `fr`, and `it` with English fallback.
-- [x] **I18N-03**: User language choice persists across refresh through `localStorage` key `stoa_language`.
-- [x] **I18N-04**: Assistive technology can read the active language because the app updates `document.documentElement.lang`.
-- [x] **I18N-05**: Developers can add translations by namespace under `src/i18n/locales/{en,de,fr,it}`.
-- [x] **I18N-06**: Developers can reference supported languages and namespaces from typed constants.
-- [x] **I18N-07**: Demo/auth payload contracts can optionally carry `preferredLanguage` without requiring a production backend preference system.
+- [ ] **LCOPY-01**: Developers can read `docs/language/locale-copy-rules.md` to understand that English, German, French, and Italian may use different sentence structures while preserving product meaning, tone, and brand.
+- [ ] **LCOPY-02**: Developers can read `docs/language/german-copy-rules.md` for German headline, CTA, long-word, sentence-splitting, and layout-fit rules.
+- [ ] **LCOPY-03**: Developers can read `docs/language/french-copy-rules.md` for French title, CTA, punctuation, sentence-length, and natural product-copy rules.
+- [ ] **LCOPY-04**: Developers can read `docs/language/italian-copy-rules.md` for Italian title, CTA, warmth, clarity, and UI-fit rules.
+- [ ] **LCOPY-05**: Developers can consult updated glossary and copy style guide guidance for Phase 17 locale-specific copy decisions.
+- [ ] **LCOPY-06**: Developers can consult an updated translation QA checklist that includes localized copy quality, title length, terminology, and visual fit checks.
+- [ ] **LCOPY-07**: Developers can see explicit Phase 17 scope boundaries that exclude new languages, CMS/TMS, automatic translation, SEO localization, legal final translation, backend preference sync, and new business features.
 
-### Language Switcher
+### Hero Copy and Title Structure
 
-- [x] **LANG-01**: User can access a language switcher in the public marketing navigation.
-- [x] **LANG-02**: User can access a language switcher on login and register pages.
-- [x] **LANG-03**: Signed-in users can access a language switcher from the app user/menu area.
-- [x] **LANG-04**: User can access language choices in the footer without relying on flags.
-- [x] **LANG-05**: Mobile layouts keep language switching usable without crowding chat input or primary study controls.
+- [ ] **HERO-01**: User sees the English homepage hero title `Learn with clarity.` with a natural English subtitle and CTA copy.
+- [ ] **HERO-02**: User sees the German homepage hero as stacked short title lines `Lernen.`, `Fragen.`, `Verstehen.` with explanatory subtitle copy instead of one long translated sentence.
+- [ ] **HERO-03**: User sees the French homepage hero title `Comprendre avec confiance.` with natural French subtitle and CTA copy.
+- [ ] **HERO-04**: User sees the Italian homepage hero title `Studiare con più chiarezza.` with natural Italian subtitle and CTA copy.
+- [ ] **HERO-05**: `HomeHero` supports optional localized `titleLines` while preserving a safe `title` fallback for locales that use a single title string.
+- [ ] **HERO-06**: German hero title rendering no longer breaks visual rhythm at mobile, tablet, desktop, or wide desktop widths.
 
-### Terminology and Copy System
+### Locale Layout Infrastructure
 
-- [x] **TERM-01**: User-visible UI no longer uses `AI` as the main product term on core pages.
-- [x] **TERM-02**: User-visible UI uses `Learning Assistant` for first-response learning help in English.
-- [x] **TERM-03**: User-visible UI uses `Lernassistent`, `Assistant d’apprentissage`, and `Assistente all’apprendimento` in German, French, and Italian.
-- [x] **TERM-04**: User-visible UI uses `Professional teacher support` and equivalent DE/FR/IT terms instead of `human backup` or `teacher backup`.
-- [x] **TERM-05**: Pricing and marketing copy avoids sales-heavy wording such as `what we are selling`, `buy now`, and generic `customers`.
-- [x] **TERM-06**: Developers can consult `docs/language/glossary.md` for approved terms and banned terms.
-- [x] **TERM-07**: Developers can consult `docs/language/copy-style-guide.md` for tone rules.
-- [x] **TERM-08**: Developers can consult `docs/language/terminology-replacement.md` for concrete replacement patterns and grep targets.
+- [ ] **LAYOUT-01**: Developers can use a typed `localeLayout` helper for supported locales `en`, `de`, `fr`, and `it`.
+- [ ] **LAYOUT-02**: Locale layout hints can distinguish default and stacked hero title variants without placing rendering metadata inside translation strings.
+- [ ] **LAYOUT-03**: Locale layout hints can identify button/action density needs for long German and French labels.
+- [ ] **LAYOUT-04**: Hero typography and width constraints adapt to locale-specific title length without globally shrinking all headings.
+- [ ] **LAYOUT-05**: Navbar, CTA buttons, card titles, pricing cards, form labels, and chat action controls remain readable and do not overflow in English, German, French, or Italian.
+- [ ] **LAYOUT-06**: CSS or component adjustments for multilingual fit are scoped to affected components and do not introduce a broad visual redesign.
 
-### Public, Auth, and Onboarding Localization
+### P0 Product Copy Rewrite
 
-- [x] **PUBLIC-01**: Homepage content supports English, German, French, and Italian.
-- [x] **PUBLIC-02**: Homepage CTA and flow copy use learning-support language rather than AI-first technology language.
-- [x] **PUBLIC-03**: Marketing navigation and footer labels support English, German, French, and Italian.
-- [x] **PUBLIC-04**: Login page supports English, German, French, and Italian.
-- [x] **PUBLIC-05**: Register page supports English, German, French, and Italian.
-- [x] **PUBLIC-06**: Student onboarding role/profile copy supports English, German, French, and Italian.
-- [x] **PUBLIC-07**: Parent and tutor onboarding copy, including tutor credential upload messaging, supports English, German, French, and Italian.
+- [ ] **P0COPY-01**: Homepage section titles, body copy, learning-flow copy, teacher-support copy, and CTA copy read naturally in English, German, French, and Italian.
+- [ ] **P0COPY-02**: Register and onboarding role-selection, student, parent, and tutor copy read naturally in English, German, French, and Italian.
+- [ ] **P0COPY-03**: Chat empty states, input placeholders, Learning Assistant states, teacher request action, loading text, and errors read naturally in English, German, French, and Italian.
+- [ ] **P0COPY-04**: Parent dashboard and parent report copy remains calm, supportive, and non-alarmist in English, German, French, and Italian.
+- [ ] **P0COPY-05**: Tutor workflow copy remains professional and does not imply teachers are replaced or used as backup in English, German, French, and Italian.
+- [ ] **P0COPY-06**: Pricing and billing copy uses education-value language and avoids aggressive sales phrasing in English, German, French, and Italian.
+- [ ] **P0COPY-07**: Support, feedback, error, toast, empty, and loading messages are concise and localized without technical or machine-translated tone.
+- [ ] **P0COPY-08**: Data-driven pricing, billing, plan, and demo copy that appears in P0 UI is localized or mapped from stable IDs instead of leaking English mock text.
 
-### Chat and Interaction Localization
+### Terminology Cleanup
 
-- [x] **CHAT-01**: Chat empty state supports English, German, French, and Italian.
-- [x] **CHAT-02**: Chat input placeholder supports English, German, French, and Italian.
-- [x] **CHAT-03**: Learning Assistant loading/thinking state supports English, German, French, and Italian.
-- [x] **CHAT-04**: Assistant response and teacher escalation copy support English, German, French, and Italian.
-- [x] **CHAT-05**: Teacher request CTA uses `Ask a teacher` style language in all four languages.
-- [x] **CHAT-06**: Form validation messages come from `errors` translations instead of hardcoded English.
-- [x] **CHAT-07**: Toast, empty, loading, and error states for core flows come from locale files.
+- [ ] **TERM17-01**: User-visible P0 copy avoids `AI`, `Artificial Intelligence`, `AI Support`, `AI answer`, `AI response`, `AI tutor`, `Chatbot`, and `Bot` unless explicitly documented as technical/internal copy.
+- [ ] **TERM17-02**: User-visible P0 copy avoids `Human backup` and `Teacher backup`.
+- [ ] **TERM17-03**: User-visible P0 pricing and marketing copy avoids `What we are selling`, `Buy now`, and equivalent aggressive sales phrasing.
+- [ ] **TERM17-04**: Parent/family-facing user-visible copy uses `families`, `parents`, or role-appropriate language instead of unnatural `customers` wording.
+- [ ] **TERM17-05**: User-visible teacher escalation terminology consistently uses `Professional teacher support` or approved locale-specific equivalents.
+- [ ] **TERM17-06**: Terminology cleanup preserves internal identifiers where changing them would create unnecessary code churn, while removing banned terms from rendered user copy.
 
-### Core Role and Commercial Page Localization
+### Copy and Visual QA
 
-- [x] **CORE-01**: Parent dashboard supports English, German, French, and Italian.
-- [x] **CORE-02**: Parent report and learning-history surfaces support English, German, French, and Italian.
-- [x] **CORE-03**: Tutor request list/detail/status workflow supports English, German, French, and Italian.
-- [x] **CORE-04**: Pricing page supports English, German, French, and Italian with education-oriented wording.
-- [x] **CORE-05**: Billing, subscription, usage, and virtual checkout pages support English, German, French, and Italian.
-- [x] **CORE-06**: Support and feedback pages support English, German, French, and Italian.
-- [x] **CORE-07**: Profile and student learning-history P1 pages have baseline English, German, French, and Italian localization.
-- [x] **CORE-08**: Referral and tutor availability P1 pages have baseline English, German, French, and Italian localization.
-- [x] **CORE-09**: Admin overview P1 page has baseline English, German, French, and Italian localization.
+- [ ] **QA17-01**: `docs/language/copy-review-matrix.md` records key copy for homepage, register, chat, pricing, billing, parent report, tutor workflow, support, and shared states in English, German, French, and Italian.
+- [ ] **QA17-02**: `docs/language/copy-review-matrix.md` includes tone, length, UI fit, and approval status for critical keys such as `home.hero.title`.
+- [ ] **QA17-03**: `docs/language/visual-qa-by-locale.md` defines required locale and viewport checks for `375px`, `430px`, `768px`, `1024px`, and `1440px`.
+- [ ] **QA17-04**: Visual QA covers P0 pages: homepage, register, chat, pricing, parent report, and any additional available billing, tutor, and support surfaces.
+- [ ] **QA17-05**: QA evidence confirms German long titles, French subtitles, Italian CTAs, navbar labels, pricing cards, register forms, and chat teacher-request actions do not overflow or break layout.
+- [ ] **QA17-06**: Terminology grep or equivalent audit confirms banned user-facing terminology is removed from P0 rendered copy sources.
+- [ ] **QA17-07**: `npm run build` passes after Phase 17 changes.
 
-### QA and Documentation
+### Documentation and Handoff
 
-- [x] **QA-01**: Translation QA checklist exists and covers EN/DE/FR/IT page and flow testing.
-- [x] **QA-02**: QA checks confirm no user-visible core-page `AI`, `AI tutor`, `chatbot`, `human backup`, or `teacher backup` wording remains.
-- [x] **QA-03**: QA checks confirm German, French, and Italian text does not break navbar, buttons, pricing cards, forms, or chat actions on mobile.
-- [x] **QA-04**: QA checks confirm language selection persists after refresh.
-- [x] **QA-05**: QA checks confirm core demo flows still run in English, German, French, and Italian.
-- [x] **QA-06**: README documents Phase 16 multilingual setup, language switching, terminology rules, and verification commands.
-- [x] **QA-07**: `npm run build` passes after Phase 16 changes.
+- [ ] **DOCS17-01**: README documents Phase 17 locale-specific copy and UI refinement goals, rules, terminology warnings, and example hero copy.
+- [ ] **DOCS17-02**: README or language docs explain that STOA prioritizes meaning, tone, brand consistency, natural reading, and layout stability over literal translation.
+- [ ] **DOCS17-03**: Phase 17 handoff notes identify remaining native-speaker review, legal-sensitive translation, and future cross-locale QA automation gaps.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in current roadmap.
 
-### Phase 17 Design System and Accessibility
+### Phase 18 Accessibility, Design System, and Cross-Locale QA
 
-- **DS-01**: Team can review component documentation for Button, Card, Form, Table, Badge, layout primitives, and shared state components.
-- **DS-02**: Team can review a consolidated token system for colors, typography, spacing, borders, shadows, and motion.
 - **A11Y-01**: App has accessibility audit coverage for keyboard navigation, screen reader labels, focus states, language attributes, and color contrast.
+- **A11Y-02**: App supports stronger screen reader behavior for form errors, route changes, chat status updates, and dynamic loading states.
+- **DS-01**: Team can review documented design tokens for colors, typography, spacing, borders, shadows, and motion.
+- **DS-02**: Team can review component documentation for Button, Card, Form, Table, Badge, layout primitives, and shared state components.
 - **QA-UI-01**: App has visual regression or screenshot comparison coverage for major route surfaces across supported languages.
+- **QA-LOCALE-AUTO-01**: Cross-locale QA has automated coverage for route, locale, viewport, and overflow checks.
 
 ### Future Localization
 
@@ -96,6 +91,7 @@ Deferred to later milestones. Tracked but not in current roadmap.
 - **L10N-CMS-01**: Team can manage high-volume translated content through a CMS or translation platform if content volume grows.
 - **L10N-BE-01**: Formal backend can persist `preferredLanguage` across devices for authenticated users.
 - **L10N-LEGAL-01**: Legal copy receives professional translation and legal review before broad public launch.
+- **L10N-EMAIL-01**: Email templates can be localized if STOA adds production email flows.
 
 ### Production Backend
 
@@ -104,19 +100,21 @@ Deferred to later milestones. Tracked but not in current roadmap.
 
 ## Out of Scope
 
-Explicitly excluded from v1.15 to prevent scope creep.
+Explicitly excluded from v1.16 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| New business modules | Phase 16 optimizes language and terminology only. |
-| Formal backend language preference system | Browser-local persistence is enough for the demo and frontend migration. |
-| Translation CMS or TMS | Local JSON files are sufficient for this milestone. |
-| Automatic machine translation pipeline | Phase 16 uses controlled copy and reviewed locale files, not automated translation. |
-| Locale-prefixed routing and SEO localization | Useful later, but not required for demo/product flow usability. |
-| Legal final review | Privacy/terms translations remain product drafts until legal review. |
-| Email template localization | No email template system is in current frontend scope. |
-| Regional pricing or currency localization | Phase 16 does not change pricing mechanics. |
-| Full design-system/a11y hardening | Reserved for Phase 17 except layout fixes needed by multilingual copy. |
+| New languages | Phase 17 refines English, German, French, and Italian only. |
+| New business modules | Phase 17 improves copy and layout quality on existing surfaces. |
+| Formal backend language preference system | Browser-local language persistence already exists; backend sync is future scope. |
+| Translation CMS or TMS | Local JSON files are sufficient for the current product surface. |
+| Automatic machine translation pipeline | Phase 17 requires controlled product copywriting, not automated translation. |
+| Locale-prefixed routing and SEO localization | Useful later, but not required for current UI quality. |
+| Full legal-document translation and legal review | Legal-sensitive copy remains draft/product language until professional legal review. |
+| Email template localization | No production email template system is in current frontend scope. |
+| Regional pricing or currency localization | Phase 17 does not change pricing mechanics. |
+| Broad design-system or accessibility hardening | Reserved for Phase 18 except targeted layout fixes needed by multilingual copy. |
+| Core product logic changes | Phase 17 must not change learning, billing, auth, backend, or role workflow behavior. |
 
 ## Traceability
 
@@ -124,62 +122,55 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| I18N-01 | Phase 92 | Complete |
-| I18N-02 | Phase 92 | Complete |
-| I18N-03 | Phase 92 | Complete |
-| I18N-04 | Phase 92 | Complete |
-| I18N-05 | Phase 92 | Complete |
-| I18N-06 | Phase 92 | Complete |
-| I18N-07 | Phase 92 | Complete |
-| LANG-01 | Phase 92 | Complete |
-| LANG-02 | Phase 92 | Complete |
-| LANG-03 | Phase 92 | Complete |
-| LANG-04 | Phase 92 | Complete |
-| LANG-05 | Phase 92 | Complete |
-| TERM-01 | Phase 93 | Complete |
-| TERM-02 | Phase 93 | Complete |
-| TERM-03 | Phase 93 | Complete |
-| TERM-04 | Phase 93 | Complete |
-| TERM-05 | Phase 93 | Complete |
-| TERM-06 | Phase 93 | Complete |
-| TERM-07 | Phase 93 | Complete |
-| TERM-08 | Phase 93 | Complete |
-| PUBLIC-01 | Phase 94 | Complete |
-| PUBLIC-02 | Phase 94 | Complete |
-| PUBLIC-03 | Phase 94 | Complete |
-| PUBLIC-04 | Phase 94 | Complete |
-| PUBLIC-05 | Phase 94 | Complete |
-| PUBLIC-06 | Phase 94 | Complete |
-| PUBLIC-07 | Phase 94 | Complete |
-| CHAT-01 | Phase 95 | Complete |
-| CHAT-02 | Phase 95 | Complete |
-| CHAT-03 | Phase 95 | Complete |
-| CHAT-04 | Phase 95 | Complete |
-| CHAT-05 | Phase 95 | Complete |
-| CHAT-06 | Phase 95 | Complete |
-| CHAT-07 | Phase 95 | Complete |
-| CORE-01 | Phase 96 | Complete |
-| CORE-02 | Phase 96 | Complete |
-| CORE-03 | Phase 96 | Complete |
-| CORE-04 | Phase 96 | Complete |
-| CORE-05 | Phase 96 | Complete |
-| CORE-06 | Phase 96 | Complete |
-| CORE-07 | Phase 96 | Complete |
-| CORE-08 | Phase 96 | Complete |
-| CORE-09 | Phase 96 | Complete |
-| QA-01 | Phase 97 | Complete |
-| QA-02 | Phase 97 | Complete |
-| QA-03 | Phase 97 | Complete |
-| QA-04 | Phase 97 | Complete |
-| QA-05 | Phase 97 | Complete |
-| QA-06 | Phase 97 | Complete |
-| QA-07 | Phase 97 | Complete |
+| LCOPY-01 | TBD | Pending |
+| LCOPY-02 | TBD | Pending |
+| LCOPY-03 | TBD | Pending |
+| LCOPY-04 | TBD | Pending |
+| LCOPY-05 | TBD | Pending |
+| LCOPY-06 | TBD | Pending |
+| LCOPY-07 | TBD | Pending |
+| HERO-01 | TBD | Pending |
+| HERO-02 | TBD | Pending |
+| HERO-03 | TBD | Pending |
+| HERO-04 | TBD | Pending |
+| HERO-05 | TBD | Pending |
+| HERO-06 | TBD | Pending |
+| LAYOUT-01 | TBD | Pending |
+| LAYOUT-02 | TBD | Pending |
+| LAYOUT-03 | TBD | Pending |
+| LAYOUT-04 | TBD | Pending |
+| LAYOUT-05 | TBD | Pending |
+| LAYOUT-06 | TBD | Pending |
+| P0COPY-01 | TBD | Pending |
+| P0COPY-02 | TBD | Pending |
+| P0COPY-03 | TBD | Pending |
+| P0COPY-04 | TBD | Pending |
+| P0COPY-05 | TBD | Pending |
+| P0COPY-06 | TBD | Pending |
+| P0COPY-07 | TBD | Pending |
+| P0COPY-08 | TBD | Pending |
+| TERM17-01 | TBD | Pending |
+| TERM17-02 | TBD | Pending |
+| TERM17-03 | TBD | Pending |
+| TERM17-04 | TBD | Pending |
+| TERM17-05 | TBD | Pending |
+| TERM17-06 | TBD | Pending |
+| QA17-01 | TBD | Pending |
+| QA17-02 | TBD | Pending |
+| QA17-03 | TBD | Pending |
+| QA17-04 | TBD | Pending |
+| QA17-05 | TBD | Pending |
+| QA17-06 | TBD | Pending |
+| QA17-07 | TBD | Pending |
+| DOCS17-01 | TBD | Pending |
+| DOCS17-02 | TBD | Pending |
+| DOCS17-03 | TBD | Pending |
 
 **Coverage:**
-- v1.15 requirements: 50 total
-- Mapped to phases: 50
-- Unmapped: 0
+- v1.16 requirements: 43 total
+- Mapped to phases: 0
+- Unmapped: 43
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 at Phase 16 completion*
+*Last updated: 2026-05-25 during Phase 17 requirements definition*
