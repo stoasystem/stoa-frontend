@@ -1,4 +1,5 @@
 import { FileText, Image, X } from 'lucide-react'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import type { UploadedFile } from '@/types/file'
@@ -41,7 +42,8 @@ export function AttachmentPreview({
             isFailed && 'text-destructive',
           )}
         >
-          {attachment.mimeType} · {formatFileSize(attachment.sizeBytes)} · {attachment.status}
+          {attachment.mimeType} · {formatFileSize(attachment.sizeBytes)} ·{' '}
+          <SafeStatusLabel kind="file" value={attachment.status} />
         </div>
       </div>
       {onRemove && (

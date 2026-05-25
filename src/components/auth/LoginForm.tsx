@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { showDemoAccounts } from '@/lib/env'
+import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
 
 export function LoginForm() {
@@ -90,7 +91,7 @@ export function LoginForm() {
       </div>
       {loginMutation.isError && (
         <p className="text-sm text-destructive">
-          {loginMutation.error instanceof Error ? loginMutation.error.message : t('auth:login.failed')}
+          {toUserFacingError(loginMutation.error, t('auth:login.failed'))}
         </p>
       )}
       <Button type="submit" className="w-full" disabled={loginMutation.isPending}>

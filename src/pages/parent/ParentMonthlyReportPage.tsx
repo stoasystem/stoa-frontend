@@ -26,7 +26,7 @@ export function ParentMonthlyReportPage() {
         <PageHeader
           eyebrow="Parent report"
           title="Monthly learning report"
-          description="Higher-level monthly report demo that connects usage, weak-point trends, tutor support, and parent actions."
+          description="A higher-level report that connects usage, weak-point trends, teacher support, and parent actions."
           actions={
             <PageActions
               primary={

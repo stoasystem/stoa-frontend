@@ -28,24 +28,24 @@ Requirements for Phase 18. Each requirement maps to exactly one roadmap phase.
 
 ### Production-Facing Copy Cleanup
 
-- [ ] **COPY18-01**: Homepage, login, register, onboarding, chat, parent, parent report, tutor, pricing, billing, support, and admin primary surfaces do not show user-facing `demo`, `mock`, `test account`, `Codex`, `fake`, `sample`, `placeholder`, `development`, or equivalent internal wording in normal mode.
-- [ ] **COPY18-02**: Register and onboarding copy presents account setup, role selection, student, parent, and teacher paths as real product flows instead of demo onboarding paths or public admin-account rules.
-- [ ] **COPY18-03**: Login copy does not display demo account credentials or test-account shortcuts in normal mode.
-- [ ] **COPY18-04**: Chat copy does not expose provider, model, Codex, mock assistant, mock response, or internal backend wording.
-- [ ] **COPY18-05**: Parent dashboard and report copy does not expose demo child, sample report, or alarmist progress language.
-- [ ] **COPY18-06**: Tutor and teacher-help copy does not expose mock request, demo student, raw queue status, or teacher-as-backup wording.
-- [ ] **COPY18-07**: Pricing and billing copy does not expose mock checkout, fake subscription, virtual payment, or aggressive `buy now` phrasing; if payment is not live, the UI uses product-safe preparation/contact wording.
-- [ ] **COPY18-08**: Support, feedback, toast, loading, empty, error, and success states use localized, user-friendly copy instead of internal/debug/provider/backend terms.
-- [ ] **COPY18-09**: English, German, French, and Italian locale files are updated together for all changed P0 user-facing copy.
+- [x] **COPY18-01**: Homepage, login, register, onboarding, chat, parent, parent report, tutor, pricing, billing, support, and admin primary surfaces do not show user-facing `demo`, `mock`, `test account`, `Codex`, `fake`, `sample`, `placeholder`, `development`, or equivalent internal wording in normal mode.
+- [x] **COPY18-02**: Register and onboarding copy presents account setup, role selection, student, parent, and teacher paths as real product flows instead of demo onboarding paths or public admin-account rules.
+- [x] **COPY18-03**: Login copy does not display demo account credentials or test-account shortcuts in normal mode.
+- [x] **COPY18-04**: Chat copy does not expose provider, model, Codex, mock assistant, mock response, or internal backend wording.
+- [x] **COPY18-05**: Parent dashboard and report copy does not expose demo child, sample report, or alarmist progress language.
+- [x] **COPY18-06**: Tutor and teacher-help copy does not expose mock request, demo student, raw queue status, or teacher-as-backup wording.
+- [x] **COPY18-07**: Pricing and billing copy does not expose mock checkout, fake subscription, virtual payment, or aggressive `buy now` phrasing; if payment is not live, the UI uses product-safe preparation/contact wording.
+- [x] **COPY18-08**: Support, feedback, toast, loading, empty, error, and success states use localized, user-friendly copy instead of internal/debug/provider/backend terms.
+- [x] **COPY18-09**: English, German, French, and Italian locale files are updated together for all changed P0 user-facing copy.
 
 ### Display Labels and User-Facing Text Boundaries
 
-- [ ] **LABEL18-01**: `src/lib/displayLabels.ts` or equivalent mapping prevents raw internal statuses from rendering directly in user-facing UI.
-- [ ] **LABEL18-02**: Teacher-help statuses, support ticket statuses, billing/subscription statuses, onboarding/review statuses, attachment states, route statuses, and admin/learning statuses render through localized user-facing labels.
-- [ ] **LABEL18-03**: `SafeStatusLabel` or equivalent shared component handles unknown, empty, deprecated, or internal status values with product-safe fallback copy.
-- [ ] **LABEL18-04**: `src/lib/userFacingText.ts` or equivalent helper sanitizes backend/API errors so endpoint names, provider names, raw exception text, internal codes, and mock/demo terms do not reach users.
-- [ ] **LABEL18-05**: UI code avoids direct display of snake_case, kebab-case, raw enum IDs, route IDs, plan IDs, API status strings, and fallback demo-data labels.
-- [ ] **LABEL18-06**: User-facing label mappings preserve internal identifiers where useful for code stability, but the rendered text remains localized and product-safe.
+- [x] **LABEL18-01**: `src/lib/displayLabels.ts` or equivalent mapping prevents raw internal statuses from rendering directly in user-facing UI.
+- [x] **LABEL18-02**: Teacher-help statuses, support ticket statuses, billing/subscription statuses, onboarding/review statuses, attachment states, route statuses, and admin/learning statuses render through localized user-facing labels.
+- [x] **LABEL18-03**: `SafeStatusLabel` or equivalent shared component handles unknown, empty, deprecated, or internal status values with product-safe fallback copy.
+- [x] **LABEL18-04**: `src/lib/userFacingText.ts` or equivalent helper sanitizes backend/API errors so endpoint names, provider names, raw exception text, internal codes, and mock/demo terms do not reach users.
+- [x] **LABEL18-05**: UI code avoids direct display of snake_case, kebab-case, raw enum IDs, route IDs, plan IDs, API status strings, and fallback demo-data labels.
+- [x] **LABEL18-06**: User-facing label mappings preserve internal identifiers where useful for code stability, but the rendered text remains localized and product-safe.
 
 ### Stability Hardening
 
@@ -131,21 +131,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GUARD18-04 | Phase 104 | Complete |
 | GUARD18-05 | Phase 104 | Complete |
 | GUARD18-06 | Phase 104 | Complete |
-| COPY18-01 | Phase 105 | Planned |
-| COPY18-02 | Phase 105 | Planned |
-| COPY18-03 | Phase 105 | Planned |
-| COPY18-04 | Phase 105 | Planned |
-| COPY18-05 | Phase 105 | Planned |
-| COPY18-06 | Phase 105 | Planned |
-| COPY18-07 | Phase 105 | Planned |
-| COPY18-08 | Phase 105 | Planned |
-| COPY18-09 | Phase 105 | Planned |
-| LABEL18-01 | Phase 105 | Planned |
-| LABEL18-02 | Phase 105 | Planned |
-| LABEL18-03 | Phase 105 | Planned |
-| LABEL18-04 | Phase 105 | Planned |
-| LABEL18-05 | Phase 105 | Planned |
-| LABEL18-06 | Phase 105 | Planned |
+| COPY18-01 | Phase 105 | Complete |
+| COPY18-02 | Phase 105 | Complete |
+| COPY18-03 | Phase 105 | Complete |
+| COPY18-04 | Phase 105 | Complete |
+| COPY18-05 | Phase 105 | Complete |
+| COPY18-06 | Phase 105 | Complete |
+| COPY18-07 | Phase 105 | Complete |
+| COPY18-08 | Phase 105 | Complete |
+| COPY18-09 | Phase 105 | Complete |
+| LABEL18-01 | Phase 105 | Complete |
+| LABEL18-02 | Phase 105 | Complete |
+| LABEL18-03 | Phase 105 | Complete |
+| LABEL18-04 | Phase 105 | Complete |
+| LABEL18-05 | Phase 105 | Complete |
+| LABEL18-06 | Phase 105 | Complete |
 | STATE18-01 | Phase 106 | Planned |
 | STATE18-02 | Phase 106 | Planned |
 | STATE18-03 | Phase 106 | Planned |
@@ -170,4 +170,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after Phase 104 completion*
+*Last updated: 2026-05-26 after Phase 105 completion*

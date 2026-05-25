@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -26,7 +27,7 @@ export function SupportTicketDetailPage() {
         <PageHeader
           eyebrow="Support ticket"
           title={ticket?.subject ?? 'Ticket'}
-          description="Ticket detail is backed by demo API data until a production support backend exists."
+          description="Review the request, latest status, and next support step."
           actions={
             <PageActions
               primary={<Button asChild><Link to="/support">Contact support</Link></Button>}
@@ -46,7 +47,8 @@ export function SupportTicketDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base">
-                {ticket.status} · {ticket.priority}
+                <SafeStatusLabel kind="supportTicket" value={ticket.status} /> ·{' '}
+                <SafeStatusLabel kind="supportPriority" value={ticket.priority} />
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">

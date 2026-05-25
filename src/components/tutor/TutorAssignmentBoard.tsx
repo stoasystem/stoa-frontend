@@ -33,7 +33,7 @@ export function TutorAssignmentBoard({ board }: { board: TutorAssignmentBoardDat
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => toast.info('Manual assignment is a Phase 12 frontend placeholder.')}
+                    onClick={() => toast.info('Manual assignment is being prepared.')}
                   >
                     Assign
                   </Button>
@@ -45,7 +45,7 @@ export function TutorAssignmentBoard({ board }: { board: TutorAssignmentBoardDat
                           requestId: request.requestId,
                           tutorId: suggestion.tutorId,
                         })
-                        toast.info('Suggested assignment is a frontend placeholder.')
+                        toast.info('Suggested assignment is being prepared.')
                       }}
                     >
                       Use suggestion

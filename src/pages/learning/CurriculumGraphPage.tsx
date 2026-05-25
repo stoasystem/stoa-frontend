@@ -31,7 +31,7 @@ export function CurriculumGraphPage() {
         <PageHeader
           eyebrow="Learning intelligence"
           title="Curriculum graph"
-          description="Static mock topic graph. The frontend renders status and selection; it does not compute graph relationships."
+          description="Topic graph view for reviewing learning status and related concepts."
           actions={
             <PageActions
               primary={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Diagnosis</Link></Button>}

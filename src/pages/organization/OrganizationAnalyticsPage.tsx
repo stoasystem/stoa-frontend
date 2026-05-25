@@ -16,7 +16,7 @@ export function OrganizationAnalyticsPage() {
         <PageHeader
           eyebrow="Organization"
           title="Organization analytics"
-          description="Aggregated demo analytics for a selected school or tutoring workspace."
+          description="Aggregated analytics for a selected school or tutoring workspace."
         />
         <AdvancedAnalyticsContent scope="organization" />
       </PageContainer>

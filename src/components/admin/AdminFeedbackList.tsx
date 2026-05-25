@@ -1,3 +1,4 @@
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { AdminFeedbackItem } from '@/services/admin/adminApi'
@@ -18,7 +19,7 @@ export function AdminFeedbackList({ items }: AdminFeedbackListProps) {
           <CardContent className="space-y-3 p-4">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{item.type}</Badge>
-              {item.status && <Badge variant="outline">{item.status}</Badge>}
+              {item.status && <Badge variant="outline"><SafeStatusLabel kind="adminFeedback" value={item.status} /></Badge>}
               {item.userRole && <Badge variant="outline">{item.userRole}</Badge>}
             </div>
             <p className="text-sm leading-6 text-foreground">{item.message}</p>

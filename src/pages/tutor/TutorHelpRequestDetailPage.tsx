@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
@@ -85,7 +86,7 @@ export function TutorHelpRequestDetailPage() {
                     })
                   }
                 >
-                  Mark {status.replace('_', ' ')}
+                  Mark <SafeStatusLabel kind="teacherHelp" value={status} />
                 </Button>
               ))}
             </div>

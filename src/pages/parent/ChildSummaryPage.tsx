@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
@@ -73,7 +74,7 @@ export function ChildSummaryPage() {
               <CardContent className="space-y-2">
                 {summary.teacherHelpRecords.map((record) => (
                   <p key={record.id} className="text-sm">
-                    {record.subject}: {record.status}
+                    {record.subject}: <SafeStatusLabel kind="teacherHelp" value={record.status} />
                   </p>
                 ))}
               </CardContent>

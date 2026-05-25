@@ -27,7 +27,7 @@ export function OrganizationDashboardPage() {
         <PageHeader
           eyebrow="Organization"
           title="Workspace dashboard"
-          description="Frontend-only organization overview for school and tutoring center demos."
+          description="Organization overview for school and tutoring center learning support."
           actions={<Button asChild><Link to="/organization/students">View students</Link></Button>}
         />
         <OrganizationSelector

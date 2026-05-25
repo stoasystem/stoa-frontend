@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { LearningProfileHeader } from '@/components/learning/LearningProfileHeader'
 import { RecommendedActionsCard } from '@/components/learning/RecommendedActionsCard'
 import { StrongTopicList } from '@/components/learning/StrongTopicList'
@@ -29,7 +30,7 @@ export function StudentLearningProfilePage() {
         <PageHeader
           eyebrow="Learning intelligence"
           title="Advanced learning profile"
-          description="Mock learning profile designed to show the future backend data contract."
+          description="Learning profile view for reviewing progress patterns, topic history, and recommended next steps."
           actions={
             <PageActions
               primary={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Open diagnosis</Link></Button>}
@@ -78,7 +79,7 @@ export function StudentLearningProfilePage() {
                     <div key={item.id} className="rounded-md border p-3">
                       <p className="font-medium">{item.subject}</p>
                       <p className="text-sm text-muted-foreground">{item.summary}</p>
-                      <p className="mt-2 text-sm">{item.status}</p>
+                      <p className="mt-2 text-sm"><SafeStatusLabel kind="teacherHelp" value={item.status} /></p>
                     </div>
                   ))}
                 </CardContent>

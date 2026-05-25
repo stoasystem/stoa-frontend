@@ -19,7 +19,7 @@ export function AdminAnalyticsPage() {
         <PageHeader
           eyebrow="Admin"
           title="Operational analytics"
-          description="Demo launch dashboard for usage, conversion, support, tutor capacity, and retention signals."
+          description="Review usage, conversion, support, teacher capacity, and retention signals."
         />
         {overviewQuery.data && <AdminAnalyticsCards overview={overviewQuery.data} />}
       </PageContainer>

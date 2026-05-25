@@ -1,3 +1,4 @@
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import type { CurriculumGraph, CurriculumTopicNode } from '@/types/curriculumGraph'
 
 const statusClassNames: Record<CurriculumTopicNode['status'], string> = {
@@ -53,7 +54,7 @@ export function CurriculumGraphView({
             onClick={() => onSelectTopic(node)}
           >
             <span className="block font-medium">{node.label}</span>
-            <span className="mt-1 block text-xs">{node.status}</span>
+            <span className="mt-1 block text-xs"><SafeStatusLabel kind="learningTopic" value={node.status} /></span>
           </button>
         ))}
       </div>

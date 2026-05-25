@@ -19,7 +19,7 @@ export function OrganizationStudentsPage() {
         <PageHeader
           eyebrow="Organization"
           title="Students"
-          description="Student list with learning intelligence entry points for platform demos."
+          description="Student list with learning intelligence entry points."
         />
         <OrganizationSelector
           organizations={organizations}

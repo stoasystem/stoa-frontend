@@ -33,7 +33,7 @@ export function AdminSupportTicketDetailPage() {
         <PageHeader
           eyebrow="Admin support"
           title={ticket?.subject ?? 'Ticket detail'}
-          description="Status changes are saved for the current demo session."
+          description="Update the support request status and keep the service team aligned."
           actions={
             <PageActions
               primary={<Button asChild><Link to="/admin/help-requests">Help requests</Link></Button>}

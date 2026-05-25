@@ -45,9 +45,9 @@ export function VirtualCheckoutPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <PageHeader
-          eyebrow="Virtual checkout"
-          title="Demo checkout"
-          description="Test the launch payment journey without real payment data."
+          eyebrow="Plan selection"
+          title="Plan selection preview"
+          description="Review the plan journey without entering payment details."
           actions={<Badge variant="secondary">No card required</Badge>}
         />
         <Card>
@@ -62,8 +62,8 @@ export function VirtualCheckoutPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              This is a demo checkout for reviewing the plan journey. Do not enter real card
-              numbers. Live payment collection will use a secure hosted checkout.
+              This preview is for reviewing the plan journey. Do not enter card numbers.
+              Live payment collection will use a secure hosted checkout.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button
@@ -74,7 +74,7 @@ export function VirtualCheckoutPage() {
                   navigate(`/billing/checkout/success?plan=${plan.id}`)
                 }}
               >
-                Complete virtual checkout
+                Complete plan preview
               </Button>
               <Button
                 type="button"

@@ -26,7 +26,7 @@ export function WeakPointDiagnosisPage() {
         <PageHeader
           eyebrow="Learning intelligence"
           title="Weak-point diagnosis"
-          description="Demo diagnosis result. The frontend renders evidence and recommendations but does not run a live diagnosis engine."
+          description="Review evidence, recommendations, and next steps for topics that need more practice."
           actions={
             <PageActions
               primary={<Button asChild><Link to={`/students/${studentId}/curriculum-graph`}>View graph</Link></Button>}

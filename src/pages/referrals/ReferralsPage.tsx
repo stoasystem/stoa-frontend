@@ -20,12 +20,12 @@ export function ReferralsPage() {
         <PageHeader
           eyebrow="Referral"
           title="Invite another family"
-          description="Share STOA with families during early paid validation. Rewards are placeholders until backend rules are finalized."
+          description="Share STOA with families and track invited-family interest."
         />
         {referralQuery.data && <InviteLinkCard referral={referralQuery.data} />}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Reward placeholder</CardTitle>
+            <CardTitle className="text-base">Invite rewards</CardTitle>
           </CardHeader>
           <CardContent className="text-sm leading-6 text-muted-foreground">
             Invite rewards can become trial extensions, account credits, or family plan discounts

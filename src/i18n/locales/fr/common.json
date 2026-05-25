@@ -72,6 +72,55 @@
     "ready": "Prêt",
     "pending": "En attente",
     "resolved": "Résolu",
-    "inProgress": "En cours"
+    "inProgress": "En cours",
+    "unavailable": "Statut indisponible",
+    "teacherHelp": {
+      "pending": "En attente",
+      "assigned": "Attribué",
+      "in_progress": "En cours",
+      "resolved": "Terminé",
+      "cancelled": "Annulé"
+    },
+    "supportTicket": {
+      "open": "Ouvert",
+      "waiting_on_user": "En attente de réponse",
+      "in_review": "En examen",
+      "resolved": "Résolu"
+    },
+    "priority": {
+      "low": "Faible",
+      "normal": "Normale",
+      "high": "Élevée",
+      "urgent": "Urgente"
+    },
+    "subscription": {
+      "trial": "Essai",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "expired": "Expiré"
+    },
+    "plan": {
+      "free_trial": "Essai gratuit",
+      "student": "Formule élève",
+      "family": "Formule famille",
+      "tutor_supported": "Formule avec enseignant"
+    },
+    "file": {
+      "uploaded": "Téléversé",
+      "processing": "En traitement",
+      "parsed": "Prêt",
+      "failed": "Échec"
+    },
+    "learningTopic": {
+      "strong": "Solide",
+      "stable": "Stable",
+      "developing": "En progression",
+      "weak": "À travailler"
+    },
+    "adminFeedback": {
+      "new": "Nouveau",
+      "reviewed": "Examiné",
+      "resolved": "Résolu"
+    }
   }
 }

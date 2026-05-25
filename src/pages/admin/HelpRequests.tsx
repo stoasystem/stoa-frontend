@@ -1,6 +1,7 @@
 import { AdminBackendPending } from '@/components/admin/AdminBackendPending'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { Card, CardContent } from '@/components/ui/card'
 import { useAdminHelpRequestsQuery } from '@/hooks/admin/useAdminHelpRequestsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -21,7 +22,9 @@ export function AdminHelpRequestsPage() {
             <CardContent className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm">
               <div>
                 <p className="font-medium">{request.studentName}</p>
-                <p className="text-muted-foreground">{request.subject} - {request.status}</p>
+                <p className="text-muted-foreground">
+                  {request.subject} - <SafeStatusLabel kind="teacherHelp" value={request.status} />
+                </p>
               </div>
               <p className="text-muted-foreground">{new Date(request.createdAt).toLocaleString()}</p>
             </CardContent>

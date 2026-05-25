@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { SupportTicket } from '@/types/supportTicket'
@@ -27,8 +28,8 @@ export function SupportTicketList({
               </p>
             </div>
             <div className="flex gap-2">
-              <Badge variant="secondary">{ticket.priority}</Badge>
-              <Badge>{ticket.status}</Badge>
+              <Badge variant="secondary"><SafeStatusLabel kind="supportPriority" value={ticket.priority} /></Badge>
+              <Badge><SafeStatusLabel kind="supportTicket" value={ticket.status} /></Badge>
             </div>
           </CardContent>
         </Card>

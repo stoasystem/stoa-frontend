@@ -7,10 +7,10 @@ last_updated: "2026-05-26T00:00:00+02:00"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 105 - Production Copy Cleanup and Display Label Mapping
+Phase: 106 - State Hardening and Duplicate-Submit Controls
 Plan: —
 Status: Ready for phase planning
-Last activity: 2026-05-26 - Phase 104 completed; Phase 105 is next
+Last activity: 2026-05-26 - Phase 105 completed; Phase 106 is next
 
 ## Performance Metrics
 
@@ -192,10 +192,11 @@ Recent decisions affecting current work:
 - Milestone v1.17 started from the Phase 18 production-facing cleanup, stability hardening, and demo artifact removal brief.
 - Phase 103 created the production-facing copy audit, demo artifact removal checklist, and stability hardening checklist; it classified source matches so later cleanup can gate rendered UI without deleting developer/demo infrastructure.
 - Phase 104 added semantic environment visibility flags, demo navigation and route guards, checkout preview gating, login demo-account gating, and a development-only internal debug panel.
+- Phase 105 added display-label and user-facing error boundaries, localized status labels, and cleaned rendered copy across auth, billing, pricing, home, admin, support, referral, organization, learning, parent, and tutor surfaces.
 
 ### Pending Todos
 
-- Plan Phase 105 with `$gsd-plan-phase 105` or continue autonomous execution from the Phase 18 roadmap.
+- Plan Phase 106 with `$gsd-plan-phase 106` or continue autonomous execution from the Phase 18 roadmap.
 
 ### Quick Tasks Completed
 

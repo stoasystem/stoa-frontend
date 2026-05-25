@@ -30,7 +30,7 @@ export function PlanUsageCard({ usage }: { usage: BillingUsage }) {
         <UsageRow label="File uploads" used={usage.fileUploadsUsed} limit={usage.fileUploadsLimit} />
         <UsageRow label="Teacher help" used={usage.teacherHelpUsed} limit={usage.teacherHelpLimit} />
         <p className="text-xs text-muted-foreground">
-          Current demo period: {new Date(usage.periodStart).toLocaleDateString()} -{' '}
+          Current period: {new Date(usage.periodStart).toLocaleDateString()} -{' '}
           {new Date(usage.periodEnd).toLocaleDateString()}
         </p>
       </CardContent>

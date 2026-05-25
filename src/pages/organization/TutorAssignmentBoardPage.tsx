@@ -20,7 +20,7 @@ export function TutorAssignmentBoardPage() {
         <PageHeader
           eyebrow="Tutor operations"
           title="Assignment board"
-          description="Demo request assignment surface. Suggestions are returned by mock/API contract, not computed in the browser."
+          description="Request assignment workspace for matching students with available teachers."
         />
         {boardQuery.data && (
           <>

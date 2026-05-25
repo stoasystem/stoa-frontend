@@ -13,7 +13,7 @@ export function AdminSupportTicketsPage() {
         <PageHeader
           eyebrow="Admin"
           title="Support triage"
-          description="Mock admin ticket queue for operator workflow demos."
+          description="Review support requests and coordinate the next operational step."
         />
         {ticketsQuery.data && <SupportTicketList tickets={ticketsQuery.data.items} admin />}
       </PageContainer>

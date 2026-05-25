@@ -42,7 +42,7 @@
   "trust": {
     "items": [
       { "title": "Contexte scolaire suisse", "description": "Conçu autour des devoirs quotidiens, du niveau scolaire et de la visibilité familiale." },
-      { "title": "Démo prête aujourd’hui", "description": "Comptes de démo fixes, données réinitialisables, facturation simulée, support, parrainage et aperçu admin." },
+      { "title": "Pensé pour de vraies routines d’apprentissage", "description": "Explications claires, visibilité parentale, demandes de soutien, parrainage et vue admin restent connectés." },
       { "title": "Prêt à évoluer", "description": "STOA garde l’expérience d’apprentissage claire aujourd’hui tout en laissant de la place aux futurs services de production." }
     ]
   },

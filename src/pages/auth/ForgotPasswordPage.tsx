@@ -8,7 +8,7 @@ export function ForgotPasswordPage() {
           Forgot password
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Password reset is not available from this demo screen yet. Contact support if you need account help.
+          Password reset is not available from this page yet. Contact support if you need account help.
         </p>
       </section>
     </AuthLayout>

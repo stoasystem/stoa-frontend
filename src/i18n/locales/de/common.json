@@ -72,6 +72,55 @@
     "ready": "Bereit",
     "pending": "Ausstehend",
     "resolved": "Gelöst",
-    "inProgress": "In Bearbeitung"
+    "inProgress": "In Bearbeitung",
+    "unavailable": "Status nicht verfügbar",
+    "teacherHelp": {
+      "pending": "Ausstehend",
+      "assigned": "Zugewiesen",
+      "in_progress": "In Bearbeitung",
+      "resolved": "Abgeschlossen",
+      "cancelled": "Abgebrochen"
+    },
+    "supportTicket": {
+      "open": "Offen",
+      "waiting_on_user": "Wartet auf Antwort",
+      "in_review": "In Prüfung",
+      "resolved": "Gelöst"
+    },
+    "priority": {
+      "low": "Niedrig",
+      "normal": "Normal",
+      "high": "Hoch",
+      "urgent": "Dringend"
+    },
+    "subscription": {
+      "trial": "Probephase",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "expired": "Abgelaufen"
+    },
+    "plan": {
+      "free_trial": "Kostenlose Probephase",
+      "student": "Schüler-Plan",
+      "family": "Familienplan",
+      "tutor_supported": "Plan mit Lehrperson"
+    },
+    "file": {
+      "uploaded": "Hochgeladen",
+      "processing": "Wird verarbeitet",
+      "parsed": "Bereit",
+      "failed": "Fehlgeschlagen"
+    },
+    "learningTopic": {
+      "strong": "Stark",
+      "stable": "Stabil",
+      "developing": "Im Aufbau",
+      "weak": "Weiter üben"
+    },
+    "adminFeedback": {
+      "new": "Neu",
+      "reviewed": "Geprüft",
+      "resolved": "Gelöst"
+    }
   }
 }

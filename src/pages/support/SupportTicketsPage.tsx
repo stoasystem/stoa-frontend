@@ -14,7 +14,7 @@ export function SupportTicketsPage() {
         <PageHeader
           eyebrow="Support"
           title="Support tickets"
-          description="Create and review support requests in the frontend demo ticket flow."
+          description="Create and review support requests connected to your account."
         />
         <SupportTicketForm />
         {ticketsQuery.data && <SupportTicketList tickets={ticketsQuery.data.items} />}

@@ -20,7 +20,7 @@ export function TutorAvailabilityPage() {
         <PageHeader
           eyebrow="Tutor operations"
           title="Availability"
-          description="Set demo availability and subjects. Matching and scheduling enforcement remain future backend work."
+          description="Set availability and subjects so support requests can be routed clearly."
         />
         {availabilityQuery.data && (
           <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">

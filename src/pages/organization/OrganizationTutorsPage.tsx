@@ -19,7 +19,7 @@ export function OrganizationTutorsPage() {
         <PageHeader
           eyebrow="Organization"
           title="Tutors"
-          description="Tutor coverage, availability, load, and response-time placeholders."
+          description="Teacher coverage, availability, load, and response-time overview."
         />
         <OrganizationSelector
           organizations={organizations}

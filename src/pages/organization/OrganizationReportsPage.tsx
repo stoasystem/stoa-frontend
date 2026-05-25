@@ -21,7 +21,7 @@ export function OrganizationReportsPage() {
         <PageHeader
           eyebrow="Organization"
           title="Reports overview"
-          description="Weekly and monthly report entry points for parent-facing value demos."
+          description="Weekly and monthly report entry points for parent-facing value."
         />
         <OrganizationSelector
           organizations={organizations}
@@ -57,7 +57,7 @@ export function OrganizationReportsPage() {
                   </p>
                 ))}
                 <Button asChild>
-                  <Link to="/parent/children/student-anna/monthly-report">Open monthly report demo</Link>
+                  <Link to="/parent/children/student-anna/monthly-report">Open monthly report</Link>
                 </Button>
               </CardContent>
             </Card>

@@ -52,7 +52,7 @@ export function AdvancedAnalyticsContent({ scope = 'platform' }: { scope?: strin
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle className="text-xl">Churn-risk placeholders</CardTitle>
+          <CardTitle className="text-xl">Churn-risk signals</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3 md:grid-cols-2">
           {analyticsQuery.data.churnRiskStudents.map((student) => (
@@ -79,7 +79,7 @@ export function AdvancedAnalyticsPage() {
         <PageHeader
           eyebrow="Admin"
           title="Advanced analytics"
-          description="Frontend-only operational analytics demo. Data is aggregated mock/API contract data, not a production BI system."
+          description="Review operational analytics across learning activity, retention, conversion, and teacher support."
         />
         <AdvancedAnalyticsContent />
       </PageContainer>
