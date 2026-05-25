@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
+import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
 import { registerSchema } from '@/lib/validation'
 import type { UserRole } from '@/types/user'
 
@@ -50,6 +51,8 @@ export function RegisterForm() {
           acceptedTerms: true,
           termsVersion: 'launch-draft-2026-05-25',
           acceptedAt: new Date().toISOString(),
+          referralCode: getStoredReferralCode() ?? undefined,
+          utm: getStoredUTM(),
         })
       }}
     >

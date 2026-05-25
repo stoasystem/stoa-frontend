@@ -564,7 +564,10 @@ VITE_ENABLE_MOCK_CHECKOUT=true
 
 Billing API contracts:
 
+- `GET /billing/plans`
 - `GET /billing/subscription`
+- `GET /billing/usage`
+- `GET /billing/feature-access`
 - `POST /billing/checkout-session`
 
 Recommended launch flow:
@@ -609,6 +612,12 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/privacy` Privacy pilot draft
 - `/terms` Terms launch draft
 - `/pricing` Pricing validation
+- `/for-parents` Parent acquisition landing
+- `/how-it-works` Product flow landing
+- `/ai-homework-help` AI homework help entry
+- `/teacher-support` Teacher support landing
+- `/for-schools` School partnership placeholder
+- `/for-tutoring-centers` Tutoring center partnership placeholder
 - `/onboarding` Pilot onboarding
 - `/support` Pilot support
 - `/dashboard` Student dashboard
@@ -619,21 +628,73 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/billing/checkout/demo` Virtual checkout
 - `/billing/checkout/success` Virtual checkout success
 - `/billing/checkout/cancel` Virtual checkout cancel
+- `/billing/success` Billing success alias
+- `/billing/cancelled` Billing cancelled alias
+- `/referrals` Referral invite page
+- `/support/tickets` Support tickets
+- `/support/tickets/:ticketId` Support ticket detail
 - `/parent` Parent dashboard
 - `/parent/children/:childId` Child learning summary
 - `/parent/children/:childId/report` Child weekly report
 - `/parent/children/:childId/history` Child learning history
 - `/tutor` Tutor dashboard
+- `/tutor/availability` Tutor availability editor
 - `/tutor/requests/:requestId` Tutor help-request detail
 - `/admin` Admin dashboard
+- `/admin/analytics` Admin operational analytics
 - `/admin/usage` Admin usage summary
 - `/admin/feedback` Admin feedback list
 - `/admin/help-requests` Admin help request list
 - `/admin/users` Admin users contract shell
-- `/admin/support` Admin support contract shell
+- `/admin/support` Admin support ticket triage
+- `/admin/support/:ticketId` Admin support ticket detail
 - `/admin/billing-interest` Admin billing interest shell
 - `/admin/system` Admin system status shell
 
+## Phase 11 Paid Launch Frontend and Operational UI Scaling
+
+This phase prepares the STOA frontend for early paid validation and operational scaling.
+
+Scope note: Phase 11 is frontend-only. It does not implement production backend services, payment webhooks, subscription enforcement backend, production analytics backend, formal support ticket backend, or complex database design. Existing local backend/database code is demo and test support only.
+
+Main additions:
+
+- Pricing plans from a frontend API contract with demo fallback data.
+- Billing page with subscription status, usage quota, feature access, and mock checkout.
+- Feature gating UI for quota and upgrade prompts.
+- Parent acquisition pages: `/for-parents`, `/how-it-works`, `/ai-homework-help`, `/teacher-support`.
+- Partner entry pages: `/for-schools`, `/for-tutoring-centers`.
+- Referral page and referral-code capture through registration.
+- Tutor availability editor.
+- Support ticket UI for users and admins.
+- Admin operational analytics dashboard.
+- UTM campaign tracking.
+
+Additional API contracts:
+
+- `GET /referrals/me`
+- `GET /tutors/me/availability`
+- `PATCH /tutors/me/availability`
+- `POST /support/tickets`
+- `GET /support/tickets`
+- `GET /support/tickets/:ticketId`
+- `GET /admin/support/tickets`
+- `GET /admin/analytics/overview`
+
+Phase 11 documents:
+
+- `docs/demo/frontend-only-boundary.md`
+- `docs/billing/checkout-flow-contract.md`
+- `docs/billing/subscription-access-ui.md`
+- `docs/growth/parent-acquisition-funnel.md`
+- `docs/growth/referral-program.md`
+- `docs/growth/paid-launch-campaign.md`
+- `docs/operations/tutor-availability-ui.md`
+- `docs/operations/support-ticket-ui.md`
+- `docs/analytics/paid-launch-events.md`
+- `docs/analytics/operational-dashboard.md`
+- `docs/qa/phase11-manual-qa-checklist.md`
+
 ## Project Status
 
-Phase 10: pilot iteration, pricing validation, billing preparation, virtual checkout demo flow, launch operations, privacy/terms finalization, and production launch readiness.
+Phase 11: frontend-only paid launch, growth funnel, referral, tutor availability, support ticket, admin analytics, UTM tracking, and demo API readiness.

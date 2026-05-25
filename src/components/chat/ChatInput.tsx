@@ -6,6 +6,7 @@ import { FileUploadButton } from '@/components/chat/FileUploadButton'
 import { StopGeneratingButton } from '@/components/chat/StopGeneratingButton'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
 import { chatInputSchema } from '@/lib/validation'
 import type { UploadedFile } from '@/types/file'
 
@@ -31,12 +32,18 @@ export function ChatInput({
   const [value, setValue] = useState('')
   const [attachments, setAttachments] = useState<UploadedFile[]>([])
   const [uploadError, setUploadError] = useState<string | null>(null)
+  const featureAccessQuery = useFeatureAccessQuery()
+  const access = featureAccessQuery.data
+  const chatLocked = access?.canUseChat === false
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const trimmed = value.trim()
-    if (disabled || isStreaming) return
+    if (disabled || isStreaming || chatLocked) {
+      if (chatLocked) toast.error(access?.reason?.chat ?? 'AI message quota reached.')
+      return
+    }
 
     if (attachments.length === 0) {
       const result = chatInputSchema.safeParse({ content: trimmed })
@@ -80,6 +87,11 @@ export function ChatInput({
             conversationId={conversationId}
             pendingAttachmentCount={attachments.length}
             disabled={disabled || isStreaming || !conversationId}
+            lockedReason={
+              access?.canUploadFiles === false
+                ? access.reason?.fileUploads ?? 'File upload quota reached.'
+                : undefined
+            }
             onUploadComplete={(file) => {
               setAttachments((current) => [...current, file])
               setUploadError(null)
@@ -91,7 +103,7 @@ export function ChatInput({
             onChange={(event) => setValue(event.target.value)}
             placeholder="Ask a homework question..."
             className="min-h-12 resize-none"
-            disabled={disabled || isStreaming}
+            disabled={disabled || isStreaming || chatLocked}
           />
           {isStreaming && onStopStreaming ? (
             <StopGeneratingButton onStop={onStopStreaming} />
@@ -100,7 +112,7 @@ export function ChatInput({
               type="submit"
               size="icon"
               aria-label="Send message"
-              disabled={disabled || isStreaming || (!value.trim() && attachments.length === 0)}
+              disabled={disabled || isStreaming || chatLocked || (!value.trim() && attachments.length === 0)}
             >
               <Send className="h-4 w-4" />
             </Button>

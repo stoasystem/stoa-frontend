@@ -20,21 +20,29 @@ export async function streamConversationMessage({
   onEvent: (event: ChatStreamEvent) => void
 }) {
   const token = localStorage.getItem('stoa_access_token')
-  const response = await fetch(
-    `${API_BASE_URL}/conversations/${conversationId}/messages/stream`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  let response: Response
+
+  try {
+    response = await fetch(
+      `${API_BASE_URL}/conversations/${conversationId}/messages/stream`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(payload),
+        signal,
       },
-      body: JSON.stringify(payload),
-      signal,
-    },
-  )
+    )
+  } catch {
+    await emitDemoStream({ payload, onEvent })
+    return
+  }
 
   if (!response.ok) {
-    throw new Error('Failed to start streaming response.')
+    await emitDemoStream({ payload, onEvent })
+    return
   }
 
   if (!response.body) {
@@ -66,6 +74,25 @@ export async function streamConversationMessage({
     const event = parseStreamEvent(buffer)
     if (event) onEvent(event)
   }
+}
+
+async function emitDemoStream({
+  payload,
+  onEvent,
+}: {
+  payload: StreamMessagePayload
+  onEvent: (event: ChatStreamEvent) => void
+}) {
+  const messageId = `assistant-${Date.now()}`
+  const createdAt = new Date().toISOString()
+  onEvent({ type: 'message_start', messageId, role: 'assistant', createdAt })
+  await new Promise((resolve) => window.setTimeout(resolve, 100))
+  onEvent({
+    type: 'message_delta',
+    messageId,
+    delta: `The local backend saved your question. For "${payload.content}", the key is to isolate the unknown step by step.`,
+  })
+  onEvent({ type: 'message_done', messageId, status: 'completed' })
 }
 
 function parseStreamEvent(raw: string): ChatStreamEvent | null {

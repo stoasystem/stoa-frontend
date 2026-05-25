@@ -191,7 +191,9 @@ export function useStreamingChat(conversationId: string | null) {
 
         await invalidateConversation()
         trackEvent('chat_response_completed', { conversationId })
-        setLocalMessages([])
+        if (!localStorage.getItem('stoa_access_token')?.startsWith('demo:')) {
+          setLocalMessages([])
+        }
       } catch (error) {
         if (controller.signal.aborted && stoppedByUserRef.current) {
           setLocalMessages((messages) =>

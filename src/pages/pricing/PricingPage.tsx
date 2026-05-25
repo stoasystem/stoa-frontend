@@ -1,17 +1,20 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FeatureComparison } from '@/components/pricing/FeatureComparison'
-import { pricingPlans } from '@/components/pricing/pricingPlans'
+import { PricingFAQ } from '@/components/pricing/PricingFAQ'
 import { PlanCard } from '@/components/billing/PlanCard'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { SubscriptionPlan } from '@/types/user'
+import type { SubscriptionPlan } from '@/types/billing'
 
 export function PricingPage() {
   const navigate = useNavigate()
+  const plansQuery = useBillingPlansQuery()
+  const pricingPlans = plansQuery.data?.items ?? []
 
   useEffect(() => {
     trackEvent('pricing_page_viewed')
@@ -64,13 +67,14 @@ export function PricingPage() {
           <PlanCard
             key={plan.id}
             plan={plan}
-            featured={plan.id === 'family'}
+            featured={plan.recommended}
             onSelect={selectPlan}
           />
         ))}
       </section>
 
       <FeatureComparison />
+      <PricingFAQ />
     </PageContainer>
   )
 }

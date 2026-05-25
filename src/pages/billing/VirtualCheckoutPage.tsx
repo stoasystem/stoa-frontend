@@ -14,6 +14,7 @@ export function VirtualCheckoutPage() {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const plan = pricingPlans.find((item) => item.id === searchParams.get('plan')) ?? pricingPlans[2]
+  const price = plan.priceMonthly === 0 ? `${plan.currency} 0` : `${plan.currency} ${plan.priceMonthly}/mo`
 
   if (!enableMockCheckout) {
     return (
@@ -52,7 +53,7 @@ export function VirtualCheckoutPage() {
               <ShieldCheck className="mt-1 h-5 w-5 text-primary" />
               <div>
                 <CardTitle>{plan.name}</CardTitle>
-                <p className="mt-1 text-sm text-muted-foreground">{plan.price}</p>
+                <p className="mt-1 text-sm text-muted-foreground">{price}</p>
               </div>
             </div>
           </CardHeader>
@@ -66,6 +67,7 @@ export function VirtualCheckoutPage() {
                 type="button"
                 onClick={() => {
                   trackEvent('billing_virtual_checkout_completed', { plan: plan.id })
+                  trackEvent('checkout_mock_completed', { plan: plan.id })
                   navigate(`/billing/checkout/success?plan=${plan.id}`)
                 }}
               >

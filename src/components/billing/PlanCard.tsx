@@ -1,16 +1,8 @@
 import { CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import type { SubscriptionPlan } from '@/types/user'
-
-export type BillingPlan = {
-  id: SubscriptionPlan
-  name: string
-  price: string
-  audience: string
-  features: string[]
-  cta: string
-}
+import { RecommendedPlanBadge } from '@/components/pricing/RecommendedPlanBadge'
+import type { BillingPlan, SubscriptionPlan } from '@/types/billing'
 
 type PlanCardProps = {
   plan: BillingPlan
@@ -19,11 +11,16 @@ type PlanCardProps = {
 }
 
 export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
+  const price = plan.priceMonthly === 0 ? `${plan.currency} 0` : `${plan.currency} ${plan.priceMonthly}/mo`
+
   return (
     <Card className={featured ? 'border-primary shadow-sm' : undefined}>
       <CardHeader>
-        <CardTitle className="text-xl">{plan.name}</CardTitle>
-        <p className="text-3xl font-semibold text-foreground">{plan.price}</p>
+        <div className="flex items-start justify-between gap-3">
+          <CardTitle className="text-xl">{plan.name}</CardTitle>
+          {plan.recommended && <RecommendedPlanBadge />}
+        </div>
+        <p className="text-3xl font-semibold text-foreground">{price}</p>
         <p className="text-sm leading-6 text-muted-foreground">{plan.audience}</p>
       </CardHeader>
       <CardContent>

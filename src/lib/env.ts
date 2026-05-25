@@ -12,3 +12,6 @@ export const enableMockCheckout = import.meta.env.VITE_ENABLE_MOCK_CHECKOUT === 
 export const enablePublicRegister = import.meta.env.VITE_ENABLE_PUBLIC_REGISTER === 'true'
 export const enableTeacherHelp = import.meta.env.VITE_ENABLE_TEACHER_HELP !== 'false'
 export const enableParentReport = import.meta.env.VITE_ENABLE_PARENT_REPORT !== 'false'
+export const enableReferral = import.meta.env.VITE_ENABLE_REFERRAL !== 'false'
+export const enableSupportTickets = import.meta.env.VITE_ENABLE_SUPPORT_TICKETS !== 'false'
+export const enableDemoApi = import.meta.env.VITE_ENABLE_DEMO_API !== 'false'

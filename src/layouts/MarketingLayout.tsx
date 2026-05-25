@@ -14,16 +14,32 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
             <Link className="transition-colors hover:text-foreground" to="/">
               Home
             </Link>
+            <Link className="transition-colors hover:text-foreground" to="/for-parents">
+              Parents
+            </Link>
+            <Link className="transition-colors hover:text-foreground" to="/pricing">
+              Pricing
+            </Link>
             <Link className="transition-colors hover:text-foreground" to="/login">
               Login
-            </Link>
-            <Link className="transition-colors hover:text-foreground" to="/chat">
-              Chat
             </Link>
           </nav>
         </div>
       </header>
       <main>{children}</main>
+      <footer className="border-t bg-background/90">
+        <div className="mx-auto flex max-w-6xl flex-wrap gap-4 px-6 py-6 text-sm text-muted-foreground">
+          <Link className="hover:text-foreground" to="/privacy">
+            Privacy
+          </Link>
+          <Link className="hover:text-foreground" to="/terms">
+            Terms
+          </Link>
+          <Link className="hover:text-foreground" to="/support">
+            Support
+          </Link>
+        </div>
+      </footer>
     </div>
   )
 }

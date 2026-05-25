@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.10
 milestone_name: "Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling"
-status: planning
-last_updated: "2026-05-25T09:47:02.007Z"
+status: implemented
+last_updated: "2026-05-25T12:10:00.000Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 8
-  completed_phases: 0
+  completed_phases: 8
   total_plans: 8
-  completed_plans: 0
-  percent: 0
+  completed_plans: 8
+  percent: 100
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-25)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
-**Current focus:** Milestone v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling is planned and ready to begin at Phase 56.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, paid launch demo flows, growth pages, operations UI, and frontend-only mock/demo API contracts.
+**Current focus:** Milestone v1.10 Phase 11 has been implemented and verified.
 
 ## Current Position
 
-Phase: Phase 56 planned
-Plan: Frontend Boundary, Demo API Strategy, and Attribution Foundation
-Status: Ready to plan Phase 56
-Last activity: 2026-05-25 — Milestone v1.10 requirements and roadmap created
+Phase: Phase 63 complete
+Plan: Docs, QA, E2E, and Phase 11 Verification
+Status: Phase 11 implementation complete; lifecycle audit/cleanup not yet run
+Last activity: 2026-05-25 — Implemented frontend-only paid launch, growth, referral, tutor availability, support ticket, admin analytics, UTM, and demo API fallback surfaces; build/lint/E2E passed
 
 ## Performance Metrics
 
@@ -131,10 +131,20 @@ Recent decisions affecting current work:
 - Phase 45 added basic admin usage and feedback views plus admin service/query boundaries.
 - Phase 46 upgraded privacy/terms drafts, added backup/restore and privacy review docs, and added pricing/billing placeholders.
 - Phase 47 added launch checklist, pilot launch plan, post-pilot feedback report template, README updates, and final verification.
+- Milestone v1.10 started from the Phase 11 paid launch frontend brief.
+- Phase 11 boundary confirmed: only frontend, API contract, mock/demo API, and demo/test backend support are in scope.
+- Phase 56 documented the frontend-only boundary and added UTM/referral attribution plus Phase 11 feature flags.
+- Phase 57 expanded billing contracts, plan catalog, subscription, usage quota, feature access, mock checkout, and locked-state UI.
+- Phase 58 added parent acquisition, how-it-works, AI homework help, teacher support, school, and tutoring center landing routes.
+- Phase 59 added referral service/hooks/page, invite-link copy, referral code capture, and register payload propagation.
+- Phase 60 added tutor availability service/hooks/page, editor, subject selector, summary, and save mutation.
+- Phase 61 added support ticket user/admin service hooks, ticket pages, admin triage, and mock status updates.
+- Phase 62 added admin operational analytics contract, query hook, cards, and dashboard route.
+- Phase 63 updated README and growth/billing/operations/analytics/demo docs, and verified build/lint/E2E.
 
 ### Pending Todos
 
-None currently.
+Milestone lifecycle audit/complete/cleanup remains pending if the team wants to archive v1.10 immediately.
 
 ### Blockers/Concerns
 
@@ -142,13 +152,17 @@ None currently.
 
 ### Verification Notes
 
+- `npm run build` passed for v1.10.
+- `npm run lint` passed for v1.10.
+- `npm run test:e2e` passed for v1.10 with 6/6 Playwright tests after sandbox escalation for local Vite binding.
+- First sandboxed E2E attempt failed with `listen EPERM` on `127.0.0.1:5173`; rerunning with approved escalation resolved the environment limitation.
+- Production build still emits Vite's existing large chunk warning.
 - `npm run build` passed for v1.8.
 - `npm run lint` passed for v1.8.
 - `python3 -m py_compile backend/app/*.py` passed for v1.8.
 - `PYTHONPATH=. python3 -m app.reset_demo_data` passed for v1.8.
 - Local FastAPI backend started with `backend/.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000` after sandbox escalation.
 - `npm run test:e2e` passed for v1.8 with 4/4 Playwright smoke tests after sandbox escalation for local Vite binding.
-- Production build still emits Vite's existing large chunk warning.
 - `npm run build` passed for v1.7.
 - `npm run lint` passed for v1.7.
 - `npm run test:e2e` passed for v1.7 with 4/4 Playwright smoke tests.

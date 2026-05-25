@@ -1,18 +1,24 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { BillingStatusAlert } from '@/components/billing/BillingStatusAlert'
 import { BillingSummaryCard } from '@/components/billing/BillingSummaryCard'
-import { PlanCard } from '@/components/billing/PlanCard'
-import { UpgradeButton } from '@/components/billing/UpgradeButton'
-import { pricingPlans } from '@/components/pricing/pricingPlans'
+import { CheckoutButton } from '@/components/billing/CheckoutButton'
+import { LockedFeatureCard } from '@/components/billing/LockedFeatureCard'
+import { ManageBillingButton } from '@/components/billing/ManageBillingButton'
+import { PlanUsageCard } from '@/components/billing/PlanUsageCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
+import { useBillingUsageQuery } from '@/hooks/billing/useBillingUsageQuery'
+import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
 import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
 import { enableMockCheckout, enablePayment } from '@/lib/env'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import type { SubscriptionPlan } from '@/types/user'
+import { trackEvent } from '@/services/analytics/analyticsClient'
+import type { SubscriptionPlan } from '@/types/billing'
 
 function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
   return ['free_trial', 'student', 'family', 'tutor_supported'].includes(plan ?? '')
@@ -22,6 +28,9 @@ export function BillingPage() {
   const [searchParams] = useSearchParams()
   const requestedPlan = searchParams.get('plan')
   const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
+  const plansQuery = useBillingPlansQuery()
+  const usageQuery = useBillingUsageQuery()
+  const featureAccessQuery = useFeatureAccessQuery()
   const subscriptionQuery = useSubscriptionQuery()
   const subscription = subscriptionQuery.data ?? {
     plan: 'free_trial' as SubscriptionPlan,
@@ -29,9 +38,13 @@ export function BillingPage() {
     currentPeriodEnd: '2026-06-30T00:00:00Z',
   }
   const plan = useMemo(
-    () => pricingPlans.find((item) => item.id === selectedPlan) ?? pricingPlans[2],
-    [selectedPlan],
+    () => plansQuery.data?.items.find((item) => item.id === selectedPlan),
+    [plansQuery.data?.items, selectedPlan],
   )
+
+  useEffect(() => {
+    trackEvent('billing_page_viewed', { selectedPlan })
+  }, [selectedPlan])
 
   return (
     <DashboardLayout>
@@ -65,7 +78,8 @@ export function BillingPage() {
                   : 'Mock checkout is disabled. Real checkout requires a backend checkoutUrl response.'}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <UpgradeButton plan={selectedPlan}>Start checkout</UpgradeButton>
+                <CheckoutButton plan={selectedPlan} />
+                <ManageBillingButton />
                 <Button asChild variant="outline">
                   <Link to="/support">Contact support</Link>
                 </Button>
@@ -74,13 +88,20 @@ export function BillingPage() {
           </Card>
         </div>
 
-        <section className="grid gap-6 lg:grid-cols-[22rem_1fr]">
-          <PlanCard plan={plan} featured onSelect={() => undefined} />
+        <BillingStatusAlert />
+
+        <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          {usageQuery.data && <PlanUsageCard usage={usageQuery.data} />}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Subscription rules</CardTitle>
+              <CardTitle className="text-base">Selected plan</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>
+                {plan
+                  ? `${plan.name}: ${plan.currency} ${plan.priceMonthly}/mo. ${plan.audience}`
+                  : 'Plan details are loading from the billing plans contract.'}
+              </p>
               <p>
                 Frontend locked states and upgrade prompts are advisory. Backend APIs must enforce
                 AI message quota, upload quota, teacher-help quota, and parent-report access.
@@ -91,6 +112,27 @@ export function BillingPage() {
               </p>
             </CardContent>
           </Card>
+        </section>
+
+        <section className="grid gap-6 md:grid-cols-2">
+          {featureAccessQuery.data?.canRequestTeacherHelp === false && (
+            <LockedFeatureCard
+              feature="Teacher help"
+              reason={featureAccessQuery.data.reason?.teacherHelp ?? 'Upgrade to keep teacher support active.'}
+            />
+          )}
+          {featureAccessQuery.data?.canUploadFiles === false && (
+            <LockedFeatureCard
+              feature="File uploads"
+              reason={featureAccessQuery.data.reason?.fileUploads ?? 'File upload quota reached.'}
+            />
+          )}
+          {featureAccessQuery.data?.canViewParentReports === false && (
+            <LockedFeatureCard
+              feature="Parent reports"
+              reason={featureAccessQuery.data.reason?.parentReports ?? 'Family Plan is required for reports.'}
+            />
+          )}
         </section>
       </PageContainer>
     </DashboardLayout>

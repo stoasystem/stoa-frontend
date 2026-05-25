@@ -29,12 +29,14 @@ export function FileUploadButton({
   conversationId,
   pendingAttachmentCount,
   disabled = false,
+  lockedReason,
   onUploadComplete,
   onUploadError,
 }: {
   conversationId?: string
   pendingAttachmentCount: number
   disabled?: boolean
+  lockedReason?: string
   onUploadComplete: (file: UploadedFile) => void
   onUploadError: (message: string) => void
 }) {
@@ -83,6 +85,10 @@ export function FileUploadButton({
         aria-label="Upload homework file"
         disabled={disabled || uploadMutation.isPending}
         onClick={() => {
+          if (lockedReason) {
+            toast.error(lockedReason)
+            return
+          }
           inputRef.current?.click()
         }}
       >
