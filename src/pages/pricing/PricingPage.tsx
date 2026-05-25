@@ -28,10 +28,10 @@ export function PricingPage() {
   return (
     <PageContainer size="wide">
       <PageHeader
-        eyebrow="Launch pricing validation"
+        eyebrow="Plans for families"
         title="Pricing"
-        description="Clear subscription options for launch validation. Real payment collection stays behind backend-created hosted checkout sessions."
-        actions={<Badge variant="secondary">Virtual checkout ready</Badge>}
+        description="Choose the level of homework support your family needs, from AI-guided practice to tutor-supported explanations."
+        actions={<Badge variant="secondary">Safe checkout preview</Badge>}
       />
 
       <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
@@ -42,12 +42,11 @@ export function PricingPage() {
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
             <p>
               STOA combines AI homework guidance, parent-visible learning signals, and tutor
-              support escalation. Phase 10 validates whether parents understand that value before
-              the real payment backend is enabled.
+              support escalation so students can get unstuck while families stay informed.
             </p>
             <p>
-              The checkout path can run in virtual mode for demos and E2E tests. Production card
-              collection must use a hosted provider page created by the backend.
+              During this demo, checkout shows the purchase path without charging a card. Live
+              payment collection will use a secure hosted payment page.
             </p>
           </CardContent>
         </Card>
@@ -56,8 +55,8 @@ export function PricingPage() {
             <CardTitle className="text-xl">Pilot promise</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>Start with a free trial, validate family interest, then enable payment when ready.</p>
-            <p>Plans and access rules are visible now so product, QA, and parent feedback align.</p>
+            <p>Start with a free trial, see whether STOA fits your family routine, then choose a plan when ready.</p>
+            <p>Each plan makes the student, parent, and tutor support level clear before checkout.</p>
           </CardContent>
         </Card>
       </section>

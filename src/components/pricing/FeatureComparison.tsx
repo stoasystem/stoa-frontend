@@ -5,7 +5,7 @@ const rows = [
   ['Homework upload', 'Limited', 'Included', 'Included', 'Included'],
   ['Parent dashboard', 'Preview', '—', 'Included', 'Included'],
   ['Weekly reports', 'Preview', '—', 'Included', 'Included'],
-  ['Teacher help', 'Limited', '—', '—', 'Quota included'],
+  ['Teacher help', 'Limited', '—', '—', 'Teacher sessions included'],
 ]
 
 export function FeatureComparison() {

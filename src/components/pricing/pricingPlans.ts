@@ -36,6 +36,6 @@ export const pricingPlans: BillingPlan[] = [
     currency: 'CHF',
     audience: 'Families who want human teacher backup.',
     cta: 'Select tutor support',
-    features: ['Everything in Family', 'Human teacher help quota', 'Priority teacher support'],
+    features: ['Everything in Family', 'Teacher help credits', 'Priority teacher support'],
   },
 ]

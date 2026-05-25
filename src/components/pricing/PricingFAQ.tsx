@@ -7,11 +7,11 @@ const faqs = [
   },
   {
     question: 'Can parents test before paying?',
-    answer: 'Yes. The free trial keeps the early family validation path visible while pricing is tested.',
+    answer: 'Yes. Families can start with the free trial, see how STOA fits homework routines, and choose a paid plan later.',
   },
   {
-    question: 'Does the frontend enforce quotas?',
-    answer: 'Plan limits are shown in the product experience. In a live subscription, account services enforce usage automatically.',
+    question: 'What happens when a plan limit is reached?',
+    answer: 'STOA will show a clear upgrade or renewal path before a student loses access to the support they need.',
   },
 ]
 
