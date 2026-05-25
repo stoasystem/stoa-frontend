@@ -1,126 +1,92 @@
-# Feature Research
+# Phase 14 Research: Features
 
-**Domain:** Frontend information architecture, page flow, and UX optimization
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Question
 
-## Feature Landscape
+How should Phase 14 demo backend features work so the existing frontend can demonstrate complete flows without adding product scope?
 
-### Table Stakes (Users Expect These)
+## Table Stakes
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Complete page inventory | Teams cannot improve IA without knowing every page and route. | MEDIUM | Must reconcile `AppRouter.tsx`, `src/pages/**`, docs, and role guards. |
-| Route map by role and visibility | Users expect navigation to match their role and task. | MEDIUM | Include public, student, parent, tutor, admin, organization, billing/support, and demo routes. |
-| Core/secondary/hidden/demo classification | Prevents placeholder and demo pages from crowding main nav. | LOW | Use status and priority fields in route config and docs. |
-| Role-based primary navigation | Users expect stable navigation within their role. | MEDIUM | Student/parent/tutor/admin/organization should each have distinct top-level priorities. |
-| Active nav state | Users need to know where they are. | LOW | React Router NavLink supports active state and applies `aria-current`. |
-| Breadcrumbs on deep pages | Interior pages need hierarchy and orientation. | LOW | WAI-ARIA APG and USWDS both support breadcrumb use for hierarchical pages. |
-| Back/return paths on detail pages | Detail pages should not dead-end after task completion. | LOW | Parent child/report, tutor request detail, admin ticket detail, organization student profile are required targets. |
-| CTA hierarchy | Users need one obvious next action per page. | MEDIUM | Primary/secondary/tertiary/danger should be documented and reflected in major pages. |
-| Empty/loading/error/success state guidance | State handling must remain predictable across many modules. | MEDIUM | Use existing `EmptyState`, `LoadingState`, `ErrorState`, skeletons, and toast patterns. |
-| Mobile nav path rules | Sidebar-heavy IA fails on small screens. | MEDIUM | Student/parent/tutor require concise mobile destinations; admin/org can degrade. |
-| Demo flow | STOA needs an executable investor/tester path without manual URLs. | MEDIUM | Final demo should use only visible entry points and stable demo data. |
+### Demo Backend Boundary
 
-### Differentiators (Competitive Advantage)
+- The demo backend is explicitly a frontend demo and test tool.
+- It has a documented scope and replacement boundary.
+- It exposes API contracts that future real backend teams can implement.
+- It avoids formal production architecture.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Page inventory linked to route config | Makes IA docs actionable instead of static paperwork. | MEDIUM | Keep docs and config aligned during Phase 73/74. |
-| Role journey maps tied to CTAs | Helps STOA show "what should I do next?" for every role. | MEDIUM | Especially important after Phase 12 platform expansion. |
-| Demo/advanced route gating | Lets STOA preserve rich demos without confusing normal users. | MEDIUM | Use `priority: hidden` and `status: demo/placeholder`. |
-| Duplicate/overlap disposition | Prevents route bloat from becoming permanent product debt. | MEDIUM | Report/monthly report/history, admin usage/analytics, feedback/support are key overlaps. |
-| Mobile-first role subset | Improves usability without forcing full desktop admin parity on phones. | LOW | Keep mobile nav intentionally smaller than desktop nav. |
+### Auth Demo
 
-### Anti-Features (Commonly Requested, Often Problematic)
+- Fixed student, parent, tutor, and admin accounts.
+- Demo login returns an access token and user object.
+- Demo tokens are not real JWTs but are used like bearer tokens by the frontend.
+- `/auth/me` resolves current user from the authorization header.
+- Register returns a fake/current-session user without production auth promises.
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| Put every route in the sidebar | Makes everything "discoverable." | Creates cognitive overload and hides core actions. | Only primary role paths in nav; contextual entry cards for advanced pages. |
-| Breadcrumb every page | Seems consistent. | Redundant on top-level pages and can add clutter. | Use breadcrumbs for second-level/deep hierarchical pages. |
-| Merge all admin pages immediately | Reduces nav length. | Risky without understanding operational distinctions. | Document overlap first, hide or group low-priority pages, merge later if verified. |
-| Full route architecture migration | Feels cleaner. | Too much scope for Phase 13. | Add typed config around existing router. |
-| Rebrand/redesign all pages | May make the product feel new. | Distracts from IA cleanup and risks inconsistent partial redesign. | Polish layout, CTA, and navigation within current visual system. |
+### Student Chat Demo
 
-## Feature Dependencies
+- Student can list, open, and create conversations.
+- Student can send messages and receive deterministic demo assistant responses.
+- Uploaded file metadata can appear in at least one conversation or message flow.
+- Streaming can be mocked or documented as a non-blocking future-compatible endpoint.
 
-```text
-Page inventory
-  -> route map
-  -> orphan/duplicate/entry-exit audits
-  -> routeConfig and routeGroups
-  -> role-based navigation rendering
-  -> breadcrumbs/back/page actions
-  -> mobile nav and demo flow
-  -> QA/E2E/build closure
-```
+### Teacher Help Demo
 
-### Dependency Notes
+- Student can request teacher help from a conversation.
+- Tutor can list pending/in-progress/resolved requests.
+- Tutor can open details and update status.
+- Student and parent surfaces can reflect the changed status in the same demo session where practical.
 
-- **Inventory before nav refactor:** Navigation config needs complete route/status/priority facts.
-- **Route map before breadcrumbs:** Deep-page breadcrumb hierarchy depends on route grouping and role context.
-- **CTA/state guidelines before final QA:** Manual QA needs stable page action and state expectations.
-- **Mobile nav after desktop role nav:** Mobile should reduce the already clarified role model, not invent a separate IA.
+### Parent Demo
 
-## MVP Definition
+- Parent is linked to one child.
+- Parent can view child summary, learning history, weekly report, monthly report placeholder, recent questions, and teacher help records.
 
-### Launch With (v1.12)
+### Billing Demo
 
-- [ ] Page inventory and route map.
-- [ ] Entry/exit, orphan, and duplicate audits.
-- [ ] Role navigation architecture and typed config.
-- [ ] Navigation utility and role-filtered nav rendering.
-- [ ] Breadcrumbs, BackButton, PageActions for deep/detail flows.
-- [ ] Layout, CTA, state, mobile navigation guidelines.
-- [ ] Final demo flow, README, manual QA, E2E/route smoke updates.
-- [ ] Build verification.
+- Plans, subscription, usage quota, feature access, and mock checkout session are available.
+- Mock checkout returns a local frontend URL such as `/billing/success?plan=family`.
+- No card data, payment secrets, Stripe webhook, or real subscription enforcement.
 
-### Add After Validation (v1.13/v1.14)
+### Referral, Support, and Admin Demo
 
-- [ ] Component documentation and visual regression coverage.
-- [ ] Accessibility audit and keyboard/screen reader hardening.
-- [ ] Full design token hardening and component consistency pass.
+- Referral returns a stable code and invite URL.
+- Support/feedback can create items visible in the current demo session.
+- Admin endpoints return analytics overview, support tickets, feedback, help requests, and billing interest mock data.
 
-### Future Consideration (v2+)
+### Reset and Health
 
-- [ ] Data-router route handles for dynamic breadcrumbs if STOA migrates routing style.
-- [ ] Product analytics for navigation usage and route drop-off once real user telemetry is available.
+- `/health` distinguishes demo backend uptime from frontend issues.
+- Reset command restores fixed demo state and clears temporary session data.
+- Error responses use `{ message, code }`.
 
-## Feature Prioritization Matrix
+## Differentiators Worth Including
 
-| Feature | User Value | Implementation Cost | Priority |
-|---------|------------|---------------------|----------|
-| Page inventory and route map | HIGH | MEDIUM | P1 |
-| Role navigation config | HIGH | MEDIUM | P1 |
-| Entry/exit and orphan audit | HIGH | MEDIUM | P1 |
-| Breadcrumbs/back/page actions | HIGH | LOW | P1 |
-| CTA/layout/state guidelines | MEDIUM | LOW | P1 |
-| Mobile nav rules | MEDIUM | MEDIUM | P2 |
-| Final demo flow | HIGH | LOW | P1 |
-| E2E/route smoke updates | MEDIUM | MEDIUM | P2 |
-| Full data-router migration | LOW | HIGH | P3 |
+- API mode documentation for `mock`, `demo`, `staging`, and `production`.
+- Real backend readiness matrix mapping each endpoint to request/response, current demo status, future backend owner, status codes, error codes, and env vars.
+- AWS readiness notes limited to frontend-facing integration boundaries.
+- QA checklist that walks through the exact end-to-end demo path.
 
-## Competitor / Pattern Analysis
+## Anti-Features
 
-| Pattern | Observed Source | STOA Approach |
-|---------|-----------------|---------------|
-| Single source of truth for navigation | Atlassian described a shared navigation library and usage guidelines to reduce inconsistent navigation. | Use local typed route/nav config and docs; avoid adding a package. |
-| Breadcrumbs for hierarchy | WAI-ARIA APG and USWDS define breadcrumbs as orientation for interior hierarchical pages. | Add Breadcrumbs to deep pages; omit from first-level pages. |
-| Bottom nav limits | Material Design recommends bottom nav for a small set of top-level destinations. | Student/parent/tutor mobile nav should be intentionally short. |
-| Consistent navigation/identification | WCAG 2.2 includes consistent navigation and consistent identification success criteria. | Keep nav order, labels, icons, and action meanings stable across role surfaces. |
+- Production auth system.
+- Refresh tokens and password-security architecture.
+- Production database schema.
+- Real AI model provider orchestration.
+- Real streaming infrastructure.
+- Real payment webhooks.
+- Real subscription enforcement.
+- Production analytics storage.
+- AWS deployment.
 
-## Sources
+## Recommended Scope
 
-- React Router NavLink docs: https://reactrouter.com/api/components/NavLink
-- React Router handle/useMatches docs: https://reactrouter.com/how-to/using-handle
-- WAI-ARIA APG Breadcrumb Pattern: https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/
-- WCAG 2.2 Recommendation: https://www.w3.org/TR/WCAG22/
-- U.S. Web Design System Breadcrumb: https://designsystem.digital.gov/components/breadcrumb/
-- Material Design Navigation Drawer: https://m2.material.io/components/navigation-drawer
-- Material Design Bottom Navigation: https://m2.material.io/develop/flutter/components/bottom-navigation/
-- Atlassian navigation redesign write-up: https://www.atlassian.com/blog/design/designing-atlassians-new-navigation
-- Existing STOA code: `src/app/router/AppRouter.tsx`, `src/layouts/AppLayout.tsx`
+Phase 14 should ship enough endpoint behavior and documentation for the complete demo path:
 
----
-*Feature research for: STOA Phase 13 frontend IA and UX optimization*
-*Researched: 2026-05-25*
+1. User registers or logs in.
+2. Student asks an AI question and receives a demo response.
+3. Student requests teacher help.
+4. Tutor marks the request resolved.
+5. Parent sees child learning records/report.
+6. Parent opens pricing/billing and completes mock checkout.
+7. User sees subscription status.
+8. Referral, support, and admin demo pages work.
+

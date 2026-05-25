@@ -1,221 +1,94 @@
-# Architecture Research
+# Phase 14 Research: Architecture
 
-**Domain:** Frontend route, navigation, and page-flow architecture for a React SPA
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Question
 
-## Standard Architecture
+How should demo backend stabilization integrate with the existing STOA frontend architecture?
 
-### System Overview
+## Existing Architecture
 
-```text
-src/app/router/AppRouter.tsx
-  -> defines renderable routes and role guards
+- Browser SPA built with React, TypeScript, Vite, React Router, TanStack Query, Axios, Zustand, and service modules.
+- API calls should flow through `src/services/**` and shared API utilities, not page components.
+- Existing local backend under `backend/` already provides previous auth/chat/parent/tutor/support/analytics-style demo and test support.
+- Prior milestones established that local backend/database code is demo/test infrastructure only.
 
-src/app/router/routeConfig.ts
-  -> defines route metadata, nav labels, role ownership, status, priority
+## Target Architecture
 
-src/app/router/routeGroups.ts
-  -> defines public/student/parent/tutor/admin/organization/demo route groups
+### Frontend
 
-src/lib/navigation.ts
-  -> filters nav items by role, demo mode, status, active route
+- `src/lib/env.ts` exposes:
+  - `apiMode`
+  - `apiBaseUrl`
+  - `enableMSW`
+- `src/services/api/httpClient.ts` owns base URL, auth header, timeout, and error normalization.
+- Feature services own endpoint paths and types.
+- Components use hooks/services and avoid direct `fetch('/some-api')` calls.
 
-src/layouts/AppLayout.tsx
-  -> renders role navigation from config, not local hard-coded arrays
+### Demo Backend
 
-src/components/common/
-  -> Breadcrumbs, BackButton, PageActions, existing PageContainer/PageHeader/state components
-
-docs/ia and docs/ux
-  -> source-of-truth rationale, audits, journeys, layout/CTA/mobile/demo policy
-```
-
-### Component Responsibilities
-
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| `routeConfig.ts` | Route/nav metadata source | Typed array of `AppNavItem` and page metadata. |
-| `routeGroups.ts` | Route grouping and route ownership | Literal route arrays by role and visibility. |
-| `navigation.ts` | Role/demo/active filtering | Pure functions over route/nav config. |
-| `AppLayout` | Role navigation rendering | Uses current user role and `getNavItemsForRole`. |
-| `Breadcrumbs` | Hierarchical page orientation | `nav aria-label`, `ol/li`, current item semantics. |
-| `BackButton` | Detail-page return action | Link or navigate fallback with consistent label/icon. |
-| `PageActions` | CTA grouping | Renders primary, secondary, tertiary, danger actions consistently. |
-| IA docs | Audit and product decisions | Markdown artifacts under `docs/ia/`. |
-
-## Recommended Project Structure
+Recommended shape:
 
 ```text
-src/
-├── app/
-│   └── router/
-│       ├── AppRouter.tsx
-│       ├── routeConfig.ts
-│       └── routeGroups.ts
-├── components/
-│   └── common/
-│       ├── Breadcrumbs.tsx
-│       ├── BackButton.tsx
-│       └── PageActions.tsx
-├── layouts/
-│   ├── AppLayout.tsx
-│   ├── DashboardLayout.tsx
-│   └── MarketingLayout.tsx
-└── lib/
-    └── navigation.ts
-
-docs/
-├── ia/
-│   ├── page-inventory.md
-│   ├── route-map.md
-│   ├── navigation-architecture.md
-│   ├── user-journeys.md
-│   ├── page-entry-exit-audit.md
-│   ├── orphan-page-audit.md
-│   └── duplicate-page-audit.md
-├── ux/
-│   ├── cta-guidelines.md
-│   ├── layout-guidelines.md
-│   └── mobile-navigation.md
-└── demo/
-    └── final-demo-flow.md
+backend/ or demo-backend/
+  README.md
+  app/main.py or server.ts
+  app/reset_demo_data.py or reset.ts
+  data/seed.json
+  data/current.json
 ```
 
-### Structure Rationale
+If reusing `backend/`, docs must call it the demo backend for Phase 14 and prevent it from being treated as the formal backend.
 
-- **`src/app/router/`:** route decisions belong near `AppRouter.tsx`, but config should be separate from component rendering.
-- **`src/lib/navigation.ts`:** pure nav helpers should be usable by layout, tests, and future docs checks.
-- **`src/components/common/`:** Breadcrumbs, BackButton, and PageActions are cross-role helpers, not role-specific features.
-- **`docs/ia/` and `docs/ux/`:** route/page decisions need written rationale because many choices are product hierarchy decisions, not just code decisions.
+### State
 
-## Architectural Patterns
+Use JSON-file state if practical for Phase 14:
 
-### Pattern 1: Typed Navigation Metadata
+- `seed.json` is the source of truth for reset.
+- `current.json` stores demo-session changes.
+- reset copies seed to current.
+- Runtime handlers read/write current.
 
-**What:** Define route/nav entries once with role, path, label, priority, status, and optional grouping.
-**When to use:** When role navigation has grown beyond a few static links.
-**Trade-offs:** Adds metadata maintenance, but prevents hard-coded sidebar drift.
+If existing FastAPI/SQLite code is retained:
 
-```typescript
-export type AppRouteRole = 'student' | 'parent' | 'tutor' | 'admin' | 'organization'
-export type AppRoutePriority = 'primary' | 'secondary' | 'hidden'
-export type AppRouteStatus = 'core' | 'demo' | 'placeholder' | 'duplicate' | 'deprecated'
+- Keep reset command deterministic.
+- Keep schema simple and local-only.
+- Document SQLite as a local functional-test detail, not a production persistence model.
 
-export type AppNavItem = {
-  label: string
-  path: string
-  role: AppRouteRole
-  priority: AppRoutePriority
-  status: AppRouteStatus
-}
-```
+### API Contract
 
-### Pattern 2: Role-Filtered Navigation
+Every endpoint should document:
 
-**What:** Layout asks a helper for nav items based on current role and demo visibility.
-**When to use:** Always in `AppLayout`; page code should not rebuild role nav.
-**Trade-offs:** Requires clear role mapping for organization admin/school roles.
+- method and path
+- request body
+- response body
+- auth expectations
+- demo behavior
+- future real backend notes
+- possible error codes
 
-```typescript
-export function getNavItemsForRole(
-  role: AppRouteRole,
-  options: { showDemo?: boolean } = {},
-) {
-  return navItems.filter((item) => {
-    if (item.role !== role) return false
-    if (item.priority === 'hidden' && !options.showDemo) return false
-    if (item.status === 'demo' && !options.showDemo) return false
-    return item.status !== 'deprecated'
-  })
-}
-```
+### Integration Boundary
 
-### Pattern 3: Explicit Deep-Page Orientation
+Frontend and future backend meet at:
 
-**What:** Deep pages receive breadcrumb/back metadata from route config or page context.
-**When to use:** Parent child detail/report, tutor request detail, admin ticket detail, organization student learning profile, learning profile/graph/diagnosis.
-**Trade-offs:** Explicit metadata is less automatic but avoids poor dynamic labels.
+- environment-configurable base URL
+- bearer token auth header
+- typed request/response bodies
+- standard error shape
+- health endpoint
+- CORS expectations
+- streaming endpoint contract
+- file upload metadata contract
 
-### Pattern 4: Documentation-Driven IA
+## Build Order
 
-**What:** Phase 73 creates a full inventory and audit before Phase 74 edits navigation.
-**When to use:** Brownfield product with accumulated routes and demo pages.
-**Trade-offs:** Slower start, but reduces risk of deleting or hiding a needed path.
+1. Document demo backend scope and API contract.
+2. Decide whether Phase 14 implementation reuses `backend/` or adds a `demo-backend/` directory.
+3. Normalize demo data and reset.
+4. Fill endpoint gaps.
+5. Align frontend env/API mode and service calls.
+6. Add integration and AWS readiness docs.
+7. Verify demo flow and build.
 
-## Data Flow
+## Architectural Risk
 
-### Navigation Flow
+The main risk is overbuilding the demo backend. Phase 14 should prefer explicit route handlers, small data files, and clear docs over reusable backend frameworks, database abstractions, and deployment infrastructure.
 
-```text
-current user role
-  -> role normalization
-  -> getNavItemsForRole(role, { showDemo })
-  -> AppLayout nav
-  -> NavLink active state / custom active matcher
-  -> visible role navigation
-```
-
-### Page-Flow Audit Flow
-
-```text
-AppRouter route list
-  -> page inventory
-  -> route map
-  -> entry/exit audit
-  -> orphan/duplicate decisions
-  -> routeConfig status/priority
-  -> navigation and page helper changes
-  -> QA/demo/E2E verification
-```
-
-## Anti-Patterns
-
-### Anti-Pattern 1: Navigation as Scattered Arrays
-
-**What people do:** Keep role navigation hard-coded in `AppLayout` and add links whenever pages appear.
-**Why it's wrong:** Navigation drifts from route map and exposes low-priority demo pages.
-**Do this instead:** Use typed route/nav config and pure filtering helpers.
-
-### Anti-Pattern 2: URL-Derived IA
-
-**What people do:** Treat URL prefixes as the product structure.
-**Why it's wrong:** URLs often preserve implementation history, not user mental models.
-**Do this instead:** Use route map plus role journeys to decide visible hierarchy.
-
-### Anti-Pattern 3: Breadcrumbs as Back Buttons
-
-**What people do:** Add breadcrumbs and remove local return actions.
-**Why it's wrong:** Breadcrumbs express hierarchy; Back buttons express task return.
-**Do this instead:** Use both on complex detail pages when they answer different user questions.
-
-### Anti-Pattern 4: Demo Pages in Core Navigation
-
-**What people do:** Expose all high-value demo surfaces in primary nav.
-**Why it's wrong:** Students/parents/tutors lose the main task path.
-**Do this instead:** Use hidden/demo priority and contextual cards from dashboards/reports.
-
-## Integration Points
-
-### Internal Boundaries
-
-| Boundary | Communication | Notes |
-|----------|---------------|-------|
-| `AppRouter` to `routeConfig` | Same path constants or explicit sync | Avoid route paths diverging between render and nav metadata. |
-| `AppLayout` to `navigation.ts` | Function calls | Layout owns rendering, helper owns filtering. |
-| Page components to Breadcrumbs | Props/context | Dynamic labels such as child/student/request names come from page data. |
-| Docs to code | Manual verification and future tests | Phase 13 can add simple tests later if useful, but docs are first. |
-
-## Sources
-
-- React Router NavLink docs: https://reactrouter.com/api/components/NavLink
-- React Router handle/useMatches docs: https://reactrouter.com/how-to/using-handle
-- WAI-ARIA APG Breadcrumb Pattern: https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/
-- WCAG 2.2 Recommendation: https://www.w3.org/TR/WCAG22/
-- U.S. Web Design System Breadcrumb: https://designsystem.digital.gov/components/breadcrumb/
-- Atlassian navigation redesign write-up: https://www.atlassian.com/blog/design/designing-atlassians-new-navigation
-- Existing STOA code: `src/app/router/AppRouter.tsx`, `src/layouts/AppLayout.tsx`
-
----
-*Architecture research for: STOA Phase 13 frontend IA and UX optimization*
-*Researched: 2026-05-25*

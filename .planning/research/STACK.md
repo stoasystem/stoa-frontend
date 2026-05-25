@@ -1,105 +1,78 @@
-# Stack Research
+# Phase 14 Research: Stack
 
-**Domain:** Frontend information architecture, navigation, and UX optimization for a React SPA
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Question
 
-## Recommended Stack
+What stack additions or changes are needed to stabilize a lightweight demo backend for STOA Frontend without turning it into production backend architecture?
 
-Phase 13 should not add new runtime dependencies. The existing STOA stack already has the required primitives for route inventory, role navigation, breadcrumbs, back buttons, page actions, layout consistency, and mobile navigation.
+## Current Context
 
-### Core Technologies
+- Frontend stack remains React, TypeScript, Vite, npm, Axios, TanStack Query, Zustand, and Playwright.
+- Existing local test backend lives under `backend/` and uses FastAPI plus SQLite for previous functional testing.
+- Current frontend services already centralize many API calls under `src/services/**` and `src/services/api/httpClient.ts`.
+- Phase 14 requires demo auth, conversations, teacher help, parent reporting, billing, referrals, support, admin analytics, health, reset, API modes, and backend integration docs.
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| React | ^19.0.0 | Component rendering | Existing app framework; no IA work requires a framework change. |
-| React Router DOM | ^7.0.0 | Routes, links, active navigation | Existing router. Official NavLink docs support active/pending link states and `aria-current="page"` for active links. |
-| TypeScript | ^5.5.0 | Typed route/nav metadata | Route config and navigation utilities should be typed so hidden/demo/status/role decisions are compile-time visible. |
-| Vite | ^6.0.0 | Dev/build tooling | Existing build path; Phase 13 should preserve standard npm scripts. |
-| TailwindCSS | ^4.3.0 | Styling utilities | Existing styling layer; sufficient for layout and mobile nav cleanup without CSS framework churn. |
+## Options Reviewed
 
-### Supporting Libraries
+### Option A: MSW plus mock data
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| lucide-react | ^1.16.0 | Navigation/action icons | Use in nav, back buttons, page actions, and mobile affordances when an icon improves scanability. |
-| @radix-ui/react-dialog | ^1.1.15 | Drawer/dialog primitives | Use only if mobile navigation needs an accessible drawer/sheet and existing app patterns support it. |
-| @radix-ui/react-tabs | ^1.1.13 | Report/detail tab grouping | Useful for consolidating parent report/history/monthly report overlap where tabs already fit local UI conventions. |
-| class-variance-authority / clsx / tailwind-merge | existing | Variant composition | Reuse for PageActions, BackButton, Breadcrumbs, and role/status badges if variants are needed. |
-| Playwright | ^1.60.0 | Route and flow smoke checks | Use for demo and core path verification after navigation changes. |
+MSW intercepts network requests at the request layer and can mock REST/GraphQL APIs across browser and Node environments. It is strongest when the frontend needs realistic request/response behavior without running a backend process.
 
-### Development Tools
+Source: https://mswjs.io/
 
-| Tool | Purpose | Notes |
-|------|---------|-------|
-| `rg` | Route/page inventory | Use `rg "<Route path=" src/app/router src/pages` and `rg --files src/pages` to reconcile routes and page components. |
-| `npm run lint` | Static quality gate | Run after route/nav config and component changes. |
-| `npm run build` | Type/build gate | Required acceptance gate for Phase 13. |
-| `npm run test:e2e` | Core path verification | Update only when final demo/core route paths change. |
+Fit for Phase 14:
+- Good for frontend-only development and test scenarios.
+- Good for error-state simulation and service-layer verification.
+- Weak for shared demo state unless state is kept in memory/browser storage or backed by a small local persistence mechanism.
+- Adds a new dependency and mock-worker setup.
 
-## Installation
+### Option B: json-server
 
-No package installation is recommended for Phase 13.
+json-server can expose REST-style resources from a JSON file with minimal setup, including common collection routes like GET, POST, PUT, PATCH, and DELETE.
 
-```bash
-# Keep existing dependencies.
-npm install
-npm run lint
-npm run build
-```
+Source: https://github.com/typicode/json-server
 
-## Alternatives Considered
+Fit for Phase 14:
+- Good for simple CRUD-style JSON data.
+- Weak for custom auth, token mapping, nested role-specific endpoints, mock checkout behavior, streaming-like chat behavior, and standardized error responses.
+- Current v1 docs are beta and may introduce behavior changes, so it is not ideal as the core Phase 14 path.
 
-| Recommended | Alternative | When to Use Alternative |
-|-------------|-------------|-------------------------|
-| Typed local `routeConfig.ts` | File-system router migration | Only consider later if STOA adopts a data-router/file-route architecture broadly. |
-| Existing declarative `<Routes>` | `createBrowserRouter` migration | Not needed for Phase 13; would increase scope. Could be revisited if route-level loaders/handles become necessary. |
-| Simple Breadcrumbs component from metadata | React Router route `handle` + `useMatches` | Good future pattern, but current app uses declarative routes and can start with explicit breadcrumb props/config. |
-| Existing AppLayout | New navigation package | Avoid dependency churn; local config is enough. |
+### Option C: Minimal Express demo backend
 
-## What NOT to Use
+Express exposes straightforward HTTP routing through `app.METHOD(PATH, HANDLER)` and keeps Node/TypeScript close to the frontend stack.
 
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| New routing framework | Phase 13 is organization work, not architecture replacement. | Typed config around existing React Router. |
-| Untyped string arrays for nav | They recreate the current drift problem. | `AppNavItem` and route group types. |
-| URL-derived breadcrumbs only | Dynamic ids produce poor labels and incorrect hierarchy. | Explicit breadcrumb metadata, with dynamic labels passed by page context. |
-| Large component-library rewrite | Out of scope and risky. | Narrow Breadcrumbs, BackButton, PageActions helpers. |
-| Adding hidden/demo routes to core nav | Makes roles confusing. | Status/priority filtering in `navigation.ts`. |
+Source: https://expressjs.com/en/starter/basic-routing.html
 
-## Stack Patterns by Variant
+Fit for Phase 14:
+- Good if the team wants a JavaScript/TypeScript-only demo backend.
+- Requires adding backend dependencies and scripts.
+- Fits JSON-file state and custom endpoints well.
+- Duplicates some existing local backend work already present in `backend/`.
 
-**If the page is a core first-level route:**
-- Use role-filtered nav item metadata and no breadcrumb.
-- Because primary navigation should orient the user without duplicating hierarchy.
+### Option D: Minimal FastAPI demo backend
 
-**If the page is a second-level or detail route:**
-- Use Breadcrumbs and/or BackButton.
-- Because WAI and USWDS guidance frame breadcrumbs as orientation for hierarchical interior pages.
+FastAPI maps HTTP methods and paths to Python path operations and returns JSON naturally.
 
-**If the page is demo/advanced/placeholder:**
-- Mark it in route config and docs, hide from default role nav, and expose only through contextual cards or demo flows.
-- Because Phase 13 should protect core paths from feature sprawl.
+Source: https://fastapi.tiangolo.com/tutorial/first-steps/
 
-## Version Compatibility
+Fit for Phase 14:
+- Good because the repo already has a local FastAPI backend.
+- Avoids introducing a second backend runtime solely for demo support.
+- Can expose custom auth, parent/tutor/admin/billing/referral/support routes and reset behavior.
+- Must avoid expanding into formal database, ORM, migrations, or production architecture.
 
-| Package A | Compatible With | Notes |
-|-----------|-----------------|-------|
-| react-router-dom ^7.0.0 | React ^19.0.0 | Existing app compiles with this pairing; use `NavLink` active state instead of manual active class logic. |
-| TailwindCSS ^4.3.0 | Vite ^6.0.0 | Existing setup; no new styling tooling needed. |
-| Playwright ^1.60.0 | Vite dev server | Existing E2E setup can verify final demo/core route paths. |
+## Recommendation
 
-## Sources
+Use the existing local FastAPI backend as the immediate Phase 14 demo backend foundation, but simplify and document it as demo-only:
 
-- React Router NavLink docs: https://reactrouter.com/api/components/NavLink
-- React Router handle/useMatches docs: https://reactrouter.com/how-to/using-handle
-- WAI-ARIA APG Breadcrumb Pattern: https://www.w3.org/WAI/ARIA/apg/patterns/breadcrumb/
-- WCAG 2.2 Recommendation: https://www.w3.org/TR/WCAG22/
-- U.S. Web Design System Breadcrumb: https://designsystem.digital.gov/components/breadcrumb/
-- Material Design Navigation Drawer: https://m2.material.io/components/navigation-drawer
-- Material Design Bottom Navigation: https://m2.material.io/develop/flutter/components/bottom-navigation/
-- Existing STOA code: `package.json`, `src/app/router/AppRouter.tsx`, `src/layouts/AppLayout.tsx`
+- Keep a minimal route surface.
+- Prefer JSON-file or explicit seed/reset data over complex persistence for demo state.
+- Keep SQLite only if existing code makes removal risky; document it as local/demo/test support, not production architecture.
+- Add `npm run demo:backend` and `npm run demo:reset` wrappers if practical so frontend developers can stay on npm scripts.
+- Keep frontend API switching through `VITE_API_MODE`, `VITE_API_BASE_URL`, and optional `VITE_ENABLE_MSW`.
 
----
-*Stack research for: STOA Phase 13 frontend IA and UX optimization*
-*Researched: 2026-05-25*
+MSW remains a useful optional `mock` mode, but Phase 14 should not block on adding full MSW if the immediate goal is a stable local demo backend.
+
+## What Not To Add
+
+- Prisma, TypeORM, SQLAlchemy models, Alembic migrations, production SQL schema, Docker Compose, Kubernetes, AWS CDK, real Cognito wiring, Stripe webhooks, real AI provider orchestration, or production analytics storage.
+
