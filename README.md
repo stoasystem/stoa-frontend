@@ -62,6 +62,7 @@ npm run demo:reset
 
 Phase 14 docs:
 
+- `docs/demo/current-project-demo-guide.md`
 - `docs/demo-backend/demo-backend-scope.md`
 - `docs/demo-backend/demo-api-contract.md`
 - `docs/demo-backend/demo-data.md`

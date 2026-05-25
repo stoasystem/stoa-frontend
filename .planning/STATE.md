@@ -176,6 +176,12 @@ Recent decisions affecting current work:
 
 None currently.
 
+### Quick Tasks Completed
+
+| Date | Task | Artifact |
+|------|------|----------|
+| 2026-05-25 | Current project and demo guide | `docs/demo/current-project-demo-guide.md` |
+
 ### Blockers/Concerns
 
 None currently.
