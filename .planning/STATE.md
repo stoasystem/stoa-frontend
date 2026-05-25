@@ -196,6 +196,7 @@ None currently.
 | 2026-05-25 | Polish pricing user copy | `src/pages/pricing/PricingPage.tsx` |
 | 2026-05-25 | Remove login test account prefill | `src/components/auth/LoginForm.tsx` |
 | 2026-05-25 | Add public page navigation | `src/layouts/MarketingLayout.tsx` |
+| 2026-05-25 | Fix homepage bottom CTA contrast | `src/components/home/HomeCTASection.tsx` |
 
 ### Blockers/Concerns
 
@@ -228,6 +229,7 @@ None currently.
 - Pricing user-copy polish passed developer-term search, `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright pricing text checks.
 - Login prefill cleanup passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright input-value checks for `/login?next=/chat`.
 - Public page navigation cleanup passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright nav-count checks across public pages.
+- Homepage bottom CTA contrast fix passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright computed-style checks for all homepage `Start Learning` buttons.
 - `python3 -m py_compile backend/app/*.py` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.

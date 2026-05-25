@@ -27,7 +27,7 @@ export function HomeCTASection() {
               Enter the learning platform and ask your first homework question.
             </h2>
           </div>
-          <Button asChild size="lg" className="premium-button-lift premium-light-button h-12 rounded-full bg-[#f7f3ec] px-7 hover:bg-white">
+          <Button asChild variant="secondary" size="lg" className="premium-button-lift premium-light-button h-12 rounded-full bg-[#f7f3ec] px-7 hover:bg-white">
             <Link to={getHref(isAuthenticated ? user?.role : null)}>
               Start Learning
               <ArrowRight className="h-4 w-4" />
