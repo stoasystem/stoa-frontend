@@ -14,139 +14,114 @@
 - ✅ **v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch** - Phases 48-55 (implemented 2026-05-25)
 - ✅ **v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling** - Phases 56-63 (implemented 2026-05-25)
 - ✅ **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (implemented 2026-05-25)
+- 🚧 **v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization** - Phases 73-79 (planned)
 
 ## Phases
 
 <details open>
-<summary>🚧 v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design (Phases 64-72)</summary>
+<summary>🚧 v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization (Phases 73-79)</summary>
 
-**Milestone Goal:** Build frontend-only platform expansion, organization management, school/tutoring partnership, advanced learning intelligence, parent monthly reporting, retention, and advanced analytics demo surfaces so STOA can demonstrate platform potential without implementing production multi-tenant, organization database, AI diagnosis, curriculum graph, tutor matching, or partnership backend systems.
+**Milestone Goal:** Organize the existing STOA frontend into a clear, role-based, maintainable product structure by documenting all pages/routes, clarifying navigation and user journeys, reducing orphan/duplicate/placeholder exposure, standardizing layout and CTA patterns, and polishing core flows without adding new product modules.
 
-- [x] **Phase 64: Platform Boundary, Organization Contracts, and Workspace Foundation** - Establish Phase 12 frontend-only boundaries, organization/workspace types, services, hooks, selector, feature/mock strategy, and analytics event taxonomy.
-- [x] **Phase 65: Organization Dashboard, Students, Tutors, and Reports UI** - Build organization dashboard, student list, tutor list, reports overview, and organization navigation.
-- [x] **Phase 66: Advanced Learning Profile and Weak-Point Diagnosis UI** - Build advanced student learning profile plus weak-point diagnosis surfaces with mock evidence and recommendations.
-- [x] **Phase 67: Curriculum Graph and Topic Detail UI** - Build curriculum/topic graph visualization, status nodes, prerequisite/related edges, and topic detail panel.
-- [x] **Phase 68: Tutor Assignment Board and Schedule Overview UI** - Build tutor assignment board, available tutor list, suggested assignment placeholder, manual assign placeholder, and schedule overview.
-- [x] **Phase 69: Parent Monthly Report and Report Integration UI** - Build parent monthly report page, PDF placeholder, report links, and monthly value presentation.
-- [x] **Phase 70: Advanced Analytics and Retention UI** - Build advanced analytics dashboards, organization analytics, retention page, metric/chart/table components, and churn-risk placeholders.
-- [x] **Phase 71: Partnership Onboarding and School/Tutoring Landing Flow** - Build partnership onboarding form/workflow, update partner landing routes, and mock interest submission.
-- [x] **Phase 72: Docs, QA, E2E, and Phase 12 Verification** - Update README, platform/learning/partnership/analytics docs, QA checklist, route smoke/E2E coverage, and final build verification.
+- [ ] **Phase 73: Page Inventory, Route Map, and IA Audits** - Document every current page/route, classify role/status/priority, and record orphan/duplicate/entry-exit decisions.
+- [ ] **Phase 74: Route Groups, Navigation Config, and Role-Based Navigation** - Add typed route/nav configuration and refactor navigation generation for student, parent, tutor, admin, and organization modes.
+- [ ] **Phase 75: User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers** - Document core journeys and add reusable navigation helpers so deep pages have clear return/next paths.
+- [ ] **Phase 76: Layout Standards, CTA Hierarchy, and Page State Guidelines** - Standardize page layout expectations, CTA hierarchy, placeholder/demo policy, and shared page-state usage.
+- [ ] **Phase 77: Mobile Navigation and Responsive Flow Optimization** - Define and implement mobile navigation expectations for the major role flows and high-risk pages.
+- [ ] **Phase 78: Final Demo Flow, README, Manual QA, and E2E Path Updates** - Produce the final demo flow and update docs, README, manual QA, and route smoke/E2E coverage.
+- [ ] **Phase 79: Phase 13 Verification and Build Closure** - Verify install/dev/build, run manual or automated flow checks, close traceability, and prepare the milestone for execution handoff.
 
-### Phase 64: Platform Boundary, Organization Contracts, and Workspace Foundation
+### Phase 73: Page Inventory, Route Map, and IA Audits
 
-**Goal**: Establish the frontend-only platform boundary and shared organization/workspace foundation.
-**Depends on**: Phase 63
-**Requirements**: [BOUND-01, BOUND-02, BOUND-03, BOUND-04, ORG-01, ORG-02, ORG-03, ORG-08]
+**Goal**: Make the full frontend surface understandable before changing navigation.
+**Depends on**: Phase 72
+**Requirements**: [IA-01, IA-02, IA-03, IA-04, IA-05, ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, ROUTE-05, ROUTE-06, AUDIT-01, AUDIT-02, AUDIT-03, AUDIT-04, AUDIT-05]
 **Success Criteria** (what must be TRUE):
-  1. Docs state Phase 12 platform, organization, AI diagnosis, graph, scheduling, analytics, and partnership backend systems are out of scope.
-  2. Organization types, services, hooks, mock data, and selector exist.
-  3. Organization selector can display and switch a mock workspace.
-  4. Organization events and mock/demo data strategy are defined.
-**Plans**: 1/1
+  1. `docs/ia/page-inventory.md` lists all current routes and page components with role, module, purpose, entry/exit, status, priority, and notes.
+  2. `docs/ia/route-map.md` groups public, student, parent, tutor, admin, organization, and demo/advanced routes and records hiding/ownership decisions.
+  3. Entry/exit, orphan-page, and duplicate/overlap audit docs exist and record treatment decisions.
+  4. No core route is left unclassified or undocumented.
+**Plans**: 0/1
 
-### Phase 65: Organization Dashboard, Students, Tutors, and Reports UI
+### Phase 74: Route Groups, Navigation Config, and Role-Based Navigation
 
-**Goal**: Make the organization workspace demonstrable for school/tutoring center operators.
-**Depends on**: Phase 64
-**Requirements**: [ORG-04, ORG-05, ORG-06, ORG-07]
+**Goal**: Move navigation decisions into typed configuration and make role navigation easier to maintain.
+**Depends on**: Phase 73
+**Requirements**: [NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10]
 **Success Criteria** (what must be TRUE):
-  1. `/organization` displays summary metrics, weak topics, tutor workload, and navigation.
-  2. `/organization/students` displays student list and learning profile links.
-  3. `/organization/tutors` displays tutor coverage, availability, load, and response-time placeholder.
-  4. `/organization/reports` displays report overview and monthly/weekly report entry points.
-**Plans**: 1/1
+  1. `docs/ia/navigation-architecture.md` defines student, parent, tutor, admin, and organization navigation structures.
+  2. `src/app/router/routeConfig.ts` and `src/app/router/routeGroups.ts` define route/nav metadata and grouped route lists.
+  3. `src/lib/navigation.ts` returns role-filtered nav items, hides hidden/demo entries by default, and detects active routes.
+  4. App navigation renders from shared configuration and does not overexpose advanced/demo/placeholder pages in core role navigation.
+**Plans**: 0/1
 
-### Phase 66: Advanced Learning Profile and Weak-Point Diagnosis UI
+### Phase 75: User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers
 
-**Goal**: Show richer student learning intelligence without implementing a real AI diagnosis engine.
-**Depends on**: Phase 64, Phase 65
-**Requirements**: [LEARN-01, LEARN-02, LEARN-03, LEARN-04, LEARN-05, DIAG-01, DIAG-02, DIAG-03, DIAG-04, DIAG-05]
+**Goal**: Remove dead ends and make primary journeys obvious for each role.
+**Depends on**: Phase 74
+**Requirements**: [FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05, FLOW-06, FLOW-07, UX-01, UX-02, UX-03, UX-04, UX-05, UX-06]
 **Success Criteria** (what must be TRUE):
-  1. Learning profile and diagnosis types/services/hooks exist with demo fallback data.
-  2. Learning profile page shows student info, subjects, weak/strong topics, history, usage, teacher help, recommendations, and report links.
-  3. Diagnosis page shows summary, weak points, evidence, practice suggestions, teacher-help recommendation, and parent explanation.
-  4. UI and docs preserve the mock/demo learning-intelligence boundary.
-**Plans**: 1/1
+  1. `docs/ia/user-journeys.md` documents student, parent, tutor, admin, and organization primary journeys.
+  2. Breadcrumbs, BackButton, and PageActions shared components exist and match existing component conventions.
+  3. Required deep parent, tutor, organization, and learning-intelligence pages have clear return or next-step handling.
+  4. Core flow checks confirm users can move from dashboard/list pages into detail pages and back without manual URL entry.
+**Plans**: 0/1
 
-### Phase 67: Curriculum Graph and Topic Detail UI
+### Phase 76: Layout Standards, CTA Hierarchy, and Page State Guidelines
 
-**Goal**: Visualize topic relationships and learning status with frontend mock graph data.
-**Depends on**: Phase 66
-**Requirements**: [GRAPH-01, GRAPH-02, GRAPH-03, GRAPH-04, GRAPH-05, GRAPH-06]
+**Goal**: Make page structure and actions consistent across the accumulated feature surfaces.
+**Depends on**: Phase 75
+**Requirements**: [LAYOUT-01, LAYOUT-02, LAYOUT-03, CTA-01, CTA-02, STATE-01, STATE-02]
 **Success Criteria** (what must be TRUE):
-  1. Curriculum graph types/services/hooks exist.
-  2. Graph page displays topic nodes, edges, subject labels, and status.
-  3. Selecting a topic shows topic detail, recent questions, and recommendations.
-  4. Graph UI remains usable on mobile and tracks graph/topic events.
-**Plans**: 1/1
+  1. `docs/ux/layout-guidelines.md` defines DashboardLayout, DetailLayout, FormLayout, SplitLayout, and MarketingLayout usage.
+  2. `docs/ux/cta-guidelines.md` defines primary, secondary, tertiary, and danger action hierarchy with STOA examples.
+  3. Major student, parent, tutor, billing, support, and admin surfaces have clear page titles, descriptions, primary actions, and state handling expectations.
+  4. Placeholder and demo pages are visibly marked and excluded from core navigation where appropriate.
+**Plans**: 0/1
 
-### Phase 68: Tutor Assignment Board and Schedule Overview UI
+### Phase 77: Mobile Navigation and Responsive Flow Optimization
 
-**Goal**: Demonstrate a more systematic tutor operations view without real matching logic.
-**Depends on**: Phase 64, Phase 65
-**Requirements**: [ASSIGN-01, ASSIGN-02, ASSIGN-03, ASSIGN-04, ASSIGN-05, ASSIGN-06]
+**Goal**: Keep role flows usable on mobile after route and navigation cleanup.
+**Depends on**: Phase 76
+**Requirements**: [MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, MOBILE-05, MOBILE-06]
 **Success Criteria** (what must be TRUE):
-  1. Tutor assignment types/services/hooks and mock data exist.
-  2. Assignment board displays pending requests, available tutors, load, and suggestions.
-  3. Manual assign action has clear placeholder/demo behavior.
-  4. Schedule overview displays upcoming availability or coverage by subject.
-**Plans**: 1/1
+  1. `docs/ux/mobile-navigation.md` defines mobile navigation expectations by role.
+  2. Student mobile paths prioritize Dashboard, Chat, and Profile.
+  3. Parent and tutor mobile paths prioritize their key overview/report/request/availability tasks.
+  4. Admin and organization mobile surfaces degrade to scannable lists/cards where desktop navigation is too dense.
+**Plans**: 0/1
 
-### Phase 69: Parent Monthly Report and Report Integration UI
+### Phase 78: Final Demo Flow, README, Manual QA, and E2E Path Updates
 
-**Goal**: Add higher-value parent monthly reporting that connects learning intelligence to parent-visible progress.
-**Depends on**: Phase 66
-**Requirements**: [MONTH-01, MONTH-02, MONTH-03, MONTH-04, MONTH-05]
+**Goal**: Make the product demo and verification paths executable without manual route guessing.
+**Depends on**: Phase 77
+**Requirements**: [DEMO-01, DEMO-02, DEMO-03, DOC-01, DOC-02, DOC-03]
 **Success Criteria** (what must be TRUE):
-  1. Monthly report types/mock data exist.
-  2. `/parent/children/:childId/monthly-report` displays monthly summary, subject breakdown, weak-point trend, teacher-help summary, recommendations, and parent actions.
-  3. PDF export placeholder behaves clearly without real PDF generation.
-  4. Monthly report is linked from relevant report/profile surfaces and tracked.
-**Plans**: 1/1
+  1. `docs/demo/final-demo-flow.md` documents the recommended end-to-end demo path and demo data/account expectations.
+  2. README includes Phase 13 purpose, non-expansion principle, IA docs, navigation cleanup, UX standards, and verification notes.
+  3. Manual QA checklist includes IA, navigation, entry/exit, orphan/duplicate, breadcrumb/back, mobile, demo, and build checks.
+  4. E2E or route-smoke documentation/code reflects the final core role and demo paths.
+**Plans**: 0/1
 
-### Phase 70: Advanced Analytics and Retention UI
+### Phase 79: Phase 13 Verification and Build Closure
 
-**Goal**: Demonstrate platform-level analytics and retention operations without production BI or automation systems.
-**Depends on**: Phase 64, Phase 65
-**Requirements**: [ANALYTICS-01, ANALYTICS-02, ANALYTICS-03, ANALYTICS-04, ANALYTICS-05, ANALYTICS-06]
+**Goal**: Close the milestone with verified commands and traceability evidence.
+**Depends on**: Phase 78
+**Requirements**: [QA-01, QA-02, QA-03, QA-04, QA-05]
 **Success Criteria** (what must be TRUE):
-  1. Advanced analytics types/mock data exist.
-  2. `/admin/advanced-analytics` shows platform metrics, subject breakdown, funnel, retention, and churn risk.
-  3. `/organization/analytics` shows organization-specific analytics.
-  4. `/admin/retention` shows inactive/at-risk users and placeholder actions.
-**Plans**: 1/1
-
-### Phase 71: Partnership Onboarding and School/Tutoring Landing Flow
-
-**Goal**: Make school and tutoring center partnership onboarding presentable as a frontend demo.
-**Depends on**: Phase 64
-**Requirements**: [PARTNER-01, PARTNER-02, PARTNER-03, PARTNER-04, PARTNER-05, PARTNER-06]
-**Success Criteria** (what must be TRUE):
-  1. Partnership types/services/hooks and mock submit behavior exist.
-  2. `/partnership/onboarding` shows onboarding steps and form.
-  3. `/for-schools` and `/for-tutoring-centers` route to onboarding/contact.
-  4. Submission shows confirmation and tracks events.
-**Plans**: 1/1
-
-### Phase 72: Docs, QA, E2E, and Phase 12 Verification
-
-**Goal**: Close Phase 12 with documentation and verification evidence for platform frontend demo readiness.
-**Depends on**: Phase 71
-**Requirements**: [DOC-01, DOC-02, DOC-03, DOC-04, DOC-05, QA-01, QA-02, QA-03]
-**Success Criteria** (what must be TRUE):
-  1. README documents Phase 12 frontend-only scope, routes, contracts, and mock/demo behavior.
-  2. Platform, learning intelligence, partnership, analytics, and retention docs exist.
-  3. Manual QA checklist covers all Phase 12 flows.
-  4. E2E or route smoke coverage verifies core demo routes where feasible.
-  5. `npm run build` passes.
-**Plans**: 1/1
+  1. Dependency/install state is verified or documented.
+  2. `npm run dev` can start the frontend locally.
+  3. `npm run build` passes.
+  4. Main student, parent, tutor, admin, organization, billing/support, and demo paths are manually QA'd or covered by smoke/E2E checks.
+  5. Phase 13 closes with clean planning traceability and no unrelated generated artifacts committed.
+**Plans**: 0/1
 
 </details>
 
 <details>
-<summary>✅ Previous shipped milestones (Phases 1-63)</summary>
+<summary>✅ Previous shipped milestones (Phases 1-72)</summary>
 
-Phases 1-63 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, launch-ready legal drafts, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM tracking, and Phase 11 verification.
+Phases 1-72 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, launch-ready legal drafts, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM tracking, platform/organization demos, learning-intelligence demos, curriculum graph UI, weak-point diagnosis UI, monthly parent report, retention UI, partnership onboarding, and Phase 12 verification.
 
 See `.planning/MILESTONES.md` and archived milestone audit files for detailed shipped scope and verification evidence.
 
@@ -155,16 +130,14 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 64 -> 65 -> 66 -> 67 -> 68 -> 69 -> 70 -> 71 -> 72
+Phases execute in numeric order: 73 -> 74 -> 75 -> 76 -> 77 -> 78 -> 79
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 64. Platform Boundary, Organization Contracts, and Workspace Foundation | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 65. Organization Dashboard, Students, Tutors, and Reports UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 66. Advanced Learning Profile and Weak-Point Diagnosis UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 67. Curriculum Graph and Topic Detail UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 68. Tutor Assignment Board and Schedule Overview UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 69. Parent Monthly Report and Report Integration UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 70. Advanced Analytics and Retention UI | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 71. Partnership Onboarding and School/Tutoring Landing Flow | v1.11 | 1/1 | Complete | 2026-05-25 |
-| 72. Docs, QA, E2E, and Phase 12 Verification | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 73. Page Inventory, Route Map, and IA Audits | v1.12 | 0/1 | Pending | — |
+| 74. Route Groups, Navigation Config, and Role-Based Navigation | v1.12 | 0/1 | Pending | — |
+| 75. User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers | v1.12 | 0/1 | Pending | — |
+| 76. Layout Standards, CTA Hierarchy, and Page State Guidelines | v1.12 | 0/1 | Pending | — |
+| 77. Mobile Navigation and Responsive Flow Optimization | v1.12 | 0/1 | Pending | — |
+| 78. Final Demo Flow, README, Manual QA, and E2E Path Updates | v1.12 | 0/1 | Pending | — |
+| 79. Phase 13 Verification and Build Closure | v1.12 | 0/1 | Pending | — |

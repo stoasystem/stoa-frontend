@@ -131,75 +131,75 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IA-01 | TBD | Pending |
-| IA-02 | TBD | Pending |
-| IA-03 | TBD | Pending |
-| IA-04 | TBD | Pending |
-| IA-05 | TBD | Pending |
-| ROUTE-01 | TBD | Pending |
-| ROUTE-02 | TBD | Pending |
-| ROUTE-03 | TBD | Pending |
-| ROUTE-04 | TBD | Pending |
-| ROUTE-05 | TBD | Pending |
-| ROUTE-06 | TBD | Pending |
-| AUDIT-01 | TBD | Pending |
-| AUDIT-02 | TBD | Pending |
-| AUDIT-03 | TBD | Pending |
-| AUDIT-04 | TBD | Pending |
-| AUDIT-05 | TBD | Pending |
-| NAV-01 | TBD | Pending |
-| NAV-02 | TBD | Pending |
-| NAV-03 | TBD | Pending |
-| NAV-04 | TBD | Pending |
-| NAV-05 | TBD | Pending |
-| NAV-06 | TBD | Pending |
-| NAV-07 | TBD | Pending |
-| NAV-08 | TBD | Pending |
-| NAV-09 | TBD | Pending |
-| NAV-10 | TBD | Pending |
-| FLOW-01 | TBD | Pending |
-| FLOW-02 | TBD | Pending |
-| FLOW-03 | TBD | Pending |
-| FLOW-04 | TBD | Pending |
-| FLOW-05 | TBD | Pending |
-| FLOW-06 | TBD | Pending |
-| FLOW-07 | TBD | Pending |
-| UX-01 | TBD | Pending |
-| UX-02 | TBD | Pending |
-| UX-03 | TBD | Pending |
-| UX-04 | TBD | Pending |
-| UX-05 | TBD | Pending |
-| UX-06 | TBD | Pending |
-| LAYOUT-01 | TBD | Pending |
-| LAYOUT-02 | TBD | Pending |
-| LAYOUT-03 | TBD | Pending |
-| CTA-01 | TBD | Pending |
-| CTA-02 | TBD | Pending |
-| STATE-01 | TBD | Pending |
-| STATE-02 | TBD | Pending |
-| MOBILE-01 | TBD | Pending |
-| MOBILE-02 | TBD | Pending |
-| MOBILE-03 | TBD | Pending |
-| MOBILE-04 | TBD | Pending |
-| MOBILE-05 | TBD | Pending |
-| MOBILE-06 | TBD | Pending |
-| DEMO-01 | TBD | Pending |
-| DEMO-02 | TBD | Pending |
-| DEMO-03 | TBD | Pending |
-| DOC-01 | TBD | Pending |
-| DOC-02 | TBD | Pending |
-| DOC-03 | TBD | Pending |
-| QA-01 | TBD | Pending |
-| QA-02 | TBD | Pending |
-| QA-03 | TBD | Pending |
-| QA-04 | TBD | Pending |
-| QA-05 | TBD | Pending |
+| IA-01 | Phase 73 | Pending |
+| IA-02 | Phase 73 | Pending |
+| IA-03 | Phase 73 | Pending |
+| IA-04 | Phase 73 | Pending |
+| IA-05 | Phase 73 | Pending |
+| ROUTE-01 | Phase 73 | Pending |
+| ROUTE-02 | Phase 73 | Pending |
+| ROUTE-03 | Phase 73 | Pending |
+| ROUTE-04 | Phase 73 | Pending |
+| ROUTE-05 | Phase 73 | Pending |
+| ROUTE-06 | Phase 73 | Pending |
+| AUDIT-01 | Phase 73 | Pending |
+| AUDIT-02 | Phase 73 | Pending |
+| AUDIT-03 | Phase 73 | Pending |
+| AUDIT-04 | Phase 73 | Pending |
+| AUDIT-05 | Phase 73 | Pending |
+| NAV-01 | Phase 74 | Pending |
+| NAV-02 | Phase 74 | Pending |
+| NAV-03 | Phase 74 | Pending |
+| NAV-04 | Phase 74 | Pending |
+| NAV-05 | Phase 74 | Pending |
+| NAV-06 | Phase 74 | Pending |
+| NAV-07 | Phase 74 | Pending |
+| NAV-08 | Phase 74 | Pending |
+| NAV-09 | Phase 74 | Pending |
+| NAV-10 | Phase 74 | Pending |
+| FLOW-01 | Phase 75 | Pending |
+| FLOW-02 | Phase 75 | Pending |
+| FLOW-03 | Phase 75 | Pending |
+| FLOW-04 | Phase 75 | Pending |
+| FLOW-05 | Phase 75 | Pending |
+| FLOW-06 | Phase 75 | Pending |
+| FLOW-07 | Phase 75 | Pending |
+| UX-01 | Phase 75 | Pending |
+| UX-02 | Phase 75 | Pending |
+| UX-03 | Phase 75 | Pending |
+| UX-04 | Phase 75 | Pending |
+| UX-05 | Phase 75 | Pending |
+| UX-06 | Phase 75 | Pending |
+| LAYOUT-01 | Phase 76 | Pending |
+| LAYOUT-02 | Phase 76 | Pending |
+| LAYOUT-03 | Phase 76 | Pending |
+| CTA-01 | Phase 76 | Pending |
+| CTA-02 | Phase 76 | Pending |
+| STATE-01 | Phase 76 | Pending |
+| STATE-02 | Phase 76 | Pending |
+| MOBILE-01 | Phase 77 | Pending |
+| MOBILE-02 | Phase 77 | Pending |
+| MOBILE-03 | Phase 77 | Pending |
+| MOBILE-04 | Phase 77 | Pending |
+| MOBILE-05 | Phase 77 | Pending |
+| MOBILE-06 | Phase 77 | Pending |
+| DEMO-01 | Phase 78 | Pending |
+| DEMO-02 | Phase 78 | Pending |
+| DEMO-03 | Phase 78 | Pending |
+| DOC-01 | Phase 78 | Pending |
+| DOC-02 | Phase 78 | Pending |
+| DOC-03 | Phase 78 | Pending |
+| QA-01 | Phase 79 | Pending |
+| QA-02 | Phase 79 | Pending |
+| QA-03 | Phase 79 | Pending |
+| QA-04 | Phase 79 | Pending |
+| QA-05 | Phase 79 | Pending |
 
 **Coverage:**
-- v1.12 requirements: 62 total
-- Mapped to phases: 0
-- Unmapped: 62
+- v1.12 requirements: 63 total
+- Mapped to phases: 63
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.12 requirements definition*
+*Last updated: 2026-05-25 after v1.12 roadmap creation*

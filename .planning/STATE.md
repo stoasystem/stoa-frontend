@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-05-25T11:42:51.558Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
-  total_plans: 0
+  total_plans: 7
   completed_plans: 0
   percent: 0
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, documented page structure, coherent demo flows, and frontend-only mock/API-contract support.
-**Current focus:** Milestone v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization is defining requirements.
+**Current focus:** Milestone v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization has a roadmap; Phase 73 is ready to plan.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-25 — Milestone v1.12 started
+Phase: 73 ready to plan
+Plan: Phase 73 not started
+Status: Roadmap created
+Last activity: 2026-05-25 — Milestone v1.12 roadmap created
 
 ## Performance Metrics
 
@@ -152,6 +152,9 @@ Recent decisions affecting current work:
 - Phase 70 added advanced analytics and retention UI with lightweight CSS charts/tables.
 - Phase 71 added partnership onboarding form and school/tutoring landing CTAs.
 - Phase 72 updated docs, README, QA checklist, and Playwright route smoke coverage.
+- Milestone v1.12 started from the Phase 13 information architecture, page flow, and UX optimization brief.
+- Phase 13 does not add new product modules; it organizes existing routes, navigation, page hierarchy, user journeys, demo flow, mobile navigation, and frontend-only UX polish.
+- v1.12 roadmap continues numbering into Phase 73 through Phase 79.
 
 ### Pending Todos
 
