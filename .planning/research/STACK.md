@@ -1,78 +1,60 @@
-# Phase 14 Research: Stack
+# Stack Research
 
-## Question
+**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
+**Researched:** 2026-05-25
+**Confidence:** HIGH
 
-What stack additions or changes are needed to stabilize a lightweight demo backend for STOA Frontend without turning it into production backend architecture?
+## Recommended Stack
 
-## Current Context
+### Core Technologies
 
-- Frontend stack remains React, TypeScript, Vite, npm, Axios, TanStack Query, Zustand, and Playwright.
-- Existing local test backend lives under `backend/` and uses FastAPI plus SQLite for previous functional testing.
-- Current frontend services already centralize many API calls under `src/services/**` and `src/services/api/httpClient.ts`.
-- Phase 14 requires demo auth, conversations, teacher help, parent reporting, billing, referrals, support, admin analytics, health, reset, API modes, and backend integration docs.
+| Technology | Version | Purpose | Why Recommended |
+|------------|---------|---------|-----------------|
+| React | Existing `^19.0.0` | UI composition | Keep the current app stack and avoid framework churn during a design refinement milestone. |
+| TypeScript | Existing `^5.5.0` | Typed onboarding contracts and chat UI state | The new role-specific registration payloads need explicit types to keep service contracts and forms aligned. |
+| Vite | Existing `^6.0.0` | Local development and build | Continue the current validated frontend workflow. |
+| TailwindCSS | Existing project setup | Premium visual system and responsive layout | Token-driven utility classes are enough for the requested editorial layout, transitions, and mobile responsiveness. |
+| TanStack Query | Existing `^5.40.0` | Register/upload/chat mutations | Reuse the existing server-state pattern rather than adding a form framework or new state layer. |
+| Axios/fetch service wrappers | Existing | API calls | Keep the Phase 14 contract boundary: page components should call services/hooks, not raw URLs. |
 
-## Options Reviewed
+### Supporting Libraries
 
-### Option A: MSW plus mock data
-
-MSW intercepts network requests at the request layer and can mock REST/GraphQL APIs across browser and Node environments. It is strongest when the frontend needs realistic request/response behavior without running a backend process.
-
-Source: https://mswjs.io/
-
-Fit for Phase 14:
-- Good for frontend-only development and test scenarios.
-- Good for error-state simulation and service-layer verification.
-- Weak for shared demo state unless state is kept in memory/browser storage or backed by a small local persistence mechanism.
-- Adds a new dependency and mock-worker setup.
-
-### Option B: json-server
-
-json-server can expose REST-style resources from a JSON file with minimal setup, including common collection routes like GET, POST, PUT, PATCH, and DELETE.
-
-Source: https://github.com/typicode/json-server
-
-Fit for Phase 14:
-- Good for simple CRUD-style JSON data.
-- Weak for custom auth, token mapping, nested role-specific endpoints, mock checkout behavior, streaming-like chat behavior, and standardized error responses.
-- Current v1 docs are beta and may introduce behavior changes, so it is not ideal as the core Phase 14 path.
-
-### Option C: Minimal Express demo backend
-
-Express exposes straightforward HTTP routing through `app.METHOD(PATH, HANDLER)` and keeps Node/TypeScript close to the frontend stack.
-
-Source: https://expressjs.com/en/starter/basic-routing.html
-
-Fit for Phase 14:
-- Good if the team wants a JavaScript/TypeScript-only demo backend.
-- Requires adding backend dependencies and scripts.
-- Fits JSON-file state and custom endpoints well.
-- Duplicates some existing local backend work already present in `backend/`.
-
-### Option D: Minimal FastAPI demo backend
-
-FastAPI maps HTTP methods and paths to Python path operations and returns JSON naturally.
-
-Source: https://fastapi.tiangolo.com/tutorial/first-steps/
-
-Fit for Phase 14:
-- Good because the repo already has a local FastAPI backend.
-- Avoids introducing a second backend runtime solely for demo support.
-- Can expose custom auth, parent/tutor/admin/billing/referral/support routes and reset behavior.
-- Must avoid expanding into formal database, ORM, migrations, or production architecture.
-
-## Recommendation
-
-Use the existing local FastAPI backend as the immediate Phase 14 demo backend foundation, but simplify and document it as demo-only:
-
-- Keep a minimal route surface.
-- Prefer JSON-file or explicit seed/reset data over complex persistence for demo state.
-- Keep SQLite only if existing code makes removal risky; document it as local/demo/test support, not production architecture.
-- Add `npm run demo:backend` and `npm run demo:reset` wrappers if practical so frontend developers can stay on npm scripts.
-- Keep frontend API switching through `VITE_API_MODE`, `VITE_API_BASE_URL`, and optional `VITE_ENABLE_MSW`.
-
-MSW remains a useful optional `mock` mode, but Phase 14 should not block on adding full MSW if the immediate goal is a stable local demo backend.
+| Library | Version | Purpose | When to Use |
+|---------|---------|---------|-------------|
+| lucide-react | Existing | Icons | Use for restrained navigation, onboarding steps, upload state, and inline teacher request actions. |
+| CSS transitions | Native | Motion | Preferred for Phase 15; avoids adding framer-motion unless richer animation becomes necessary later. |
+| Browser `File` API | Native | Tutor credential validation | Enough for extension and file-size validation before mock upload. |
 
 ## What Not To Add
 
-- Prisma, TypeORM, SQLAlchemy models, Alembic migrations, production SQL schema, Docker Compose, Kubernetes, AWS CDK, real Cognito wiring, Stripe webhooks, real AI provider orchestration, or production analytics storage.
+| Avoid | Why | Use Instead |
+|-------|-----|-------------|
+| framer-motion as a new dependency | The requested motion is subtle and can be handled with CSS transitions/keyframes. | Tailwind/CSS animation utilities. |
+| A large form library | Existing forms are manageable and the flow is milestone-scoped. | Local typed React state with focused components. |
+| Real credential verification/OCR | Out of scope and backend-owned. | Mock file upload contract and clear pending-review UI. |
+| New design-system rewrite | Phase 16 is the right place for systematic component hardening. | Premium theme CSS and scoped component refinements. |
 
+## Stack Patterns
+
+**Homepage and auth UI**
+- Add domain components under `src/components/home` and `src/components/auth`.
+- Use premium theme CSS variables and existing Tailwind tokens.
+
+**Onboarding API**
+- Extend `POST /auth/register` payload shape.
+- Add `POST /files/tutor-credentials` mock upload.
+
+**Chat escalation**
+- Keep existing chat APIs.
+- Move teacher escalation presentation into message-level UI.
+
+## Sources
+
+- Appcues onboarding guide, 2026-05-19: onboarding should guide users to repeatable value, not act as a one-time product tour.
+- Nielsen Norman Group mobile image guidance, 2023-11-08: mobile images should add informational value, not just decoration.
+- Tavi AI education product page, accessed 2026-05-25: child-facing AI tutoring benefits from a clear product promise, parent-owned visibility, and constrained help behavior.
+- arXiv 2605.11155, submitted 2026-05-11: hybrid human-AI tutoring can outperform AI-only tutoring and supports differentiating proactive/reactive human help based on student needs.
+
+---
+*Stack research for: STOA Phase 15*
+*Researched: 2026-05-25*

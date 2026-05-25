@@ -1,92 +1,67 @@
-# Phase 14 Research: Features
+# Feature Research
 
-## Question
+**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
+**Researched:** 2026-05-25
+**Confidence:** HIGH
 
-How should Phase 14 demo backend features work so the existing frontend can demonstrate complete flows without adding product scope?
+## Feature Landscape
 
-## Table Stakes
+### Table Stakes
 
-### Demo Backend Boundary
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Student-first homepage CTA | The product promise is learning help; students need the first action immediately. | LOW | `Start Learning` should route through login when needed and then to `/chat`. |
+| Sequential learning explanation | Users need to understand AI, teacher, and parent roles as a flow. | LOW | Replace parallel cards with steps: ask, AI explains, teacher helps if needed, parent follows progress. |
+| Role-based registration | Students, parents, and tutors need different setup questions. | MEDIUM | Use one multi-step page with typed role-specific profile payloads. |
+| Student parent-link fields | Student onboarding must collect parent name/email for family visibility. | LOW | Demo response can return `parentLinked: true`. |
+| Tutor credential upload UI | Tutor registration needs trust-building credential collection. | MEDIUM | Mock-upload PDF/PNG/JPEG up to 10 MB, then show pending review. |
+| AI-first chat empty state | First-time student should ask directly, not choose a product module. | MEDIUM | Empty state should use homework-focused copy and default input. |
+| Inline teacher escalation | Teacher help should appear after AI responses, not as a homepage module. | MEDIUM | Add message feedback/action component near assistant messages. |
 
-- The demo backend is explicitly a frontend demo and test tool.
-- It has a documented scope and replacement boundary.
-- It exposes API contracts that future real backend teams can implement.
-- It avoids formal production architecture.
+### Differentiators
 
-### Auth Demo
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Premium editorial homepage | Makes STOA feel like a credible education product rather than a generic SaaS demo. | MEDIUM | Use image-driven composition, restrained colors, and dense-but-clear storytelling. |
+| Swiss/local education trust context | Builds relevance and seriousness for families. | LOW | Keep claims modest and demo-safe. |
+| Parent visibility as value layer | Shows family value without stealing student path priority. | LOW | Explain that parents can follow learning progress after student activity. |
+| Pending review tutor state | Makes tutor onboarding feel realistic while staying demo-only. | MEDIUM | Avoid implying real approval. |
 
-- Fixed student, parent, tutor, and admin accounts.
-- Demo login returns an access token and user object.
-- Demo tokens are not real JWTs but are used like bearer tokens by the frontend.
-- `/auth/me` resolves current user from the authorization header.
-- Register returns a fake/current-session user without production auth promises.
+### Anti-Features
 
-### Student Chat Demo
+| Feature | Why Requested | Why Problematic | Alternative |
+|---------|---------------|-----------------|-------------|
+| Three equal homepage cards for AI, teacher, parent | Easy to explain features separately. | Misrepresents the product as three parallel tools. | One student learning flow with teacher and parent roles contextualized. |
+| Full production onboarding/auth | Feels complete. | Out of scope and creates backend/security debt. | Demo register contract and clear backend readiness notes. |
+| Real tutor verification | Adds trust. | Requires operations, storage, review, legal, and security processes. | Mock credential upload and `pending_review` status. |
+| Heavy animation library | Looks polished quickly. | Adds dependency and can hurt mobile performance. | CSS-only subtle fades, lifts, and focus transitions. |
 
-- Student can list, open, and create conversations.
-- Student can send messages and receive deterministic demo assistant responses.
-- Uploaded file metadata can appear in at least one conversation or message flow.
-- Streaming can be mocked or documented as a non-blocking future-compatible endpoint.
+## MVP Definition
 
-### Teacher Help Demo
+### Launch With
 
-- Student can request teacher help from a conversation.
-- Tutor can list pending/in-progress/resolved requests.
-- Tutor can open details and update status.
-- Student and parent surfaces can reflect the changed status in the same demo session where practical.
+- [ ] Magazine-style homepage with student-first CTA.
+- [ ] Home learning flow replacing parallel AI/teacher/parent cards.
+- [ ] Login/register path that supports next-route handoff.
+- [ ] Multi-step registration for student, parent, and tutor.
+- [ ] Tutor credential upload UI and mock upload API.
+- [ ] Chat empty state and AI-response inline teacher escalation.
+- [ ] Demo backend support for expanded register and credential upload.
 
-### Parent Demo
+### Add After Validation
 
-- Parent is linked to one child.
-- Parent can view child summary, learning history, weekly report, monthly report placeholder, recent questions, and teacher help records.
+- [ ] Richer onboarding persistence across browser reloads.
+- [ ] Real invitation email flow for parent linking.
+- [ ] Real tutor credential review dashboard.
+- [ ] Motion library if Phase 16 visual QA proves CSS motion insufficient.
 
-### Billing Demo
+## Sources
 
-- Plans, subscription, usage quota, feature access, and mock checkout session are available.
-- Mock checkout returns a local frontend URL such as `/billing/success?plan=family`.
-- No card data, payment secrets, Stripe webhook, or real subscription enforcement.
+- Appcues onboarding guide, 2026-05-19: activation depends on guiding new users to meaningful value, not front-loading features.
+- Openfield EdTech instructor onboarding article: instructors are learners too; onboarding should reduce complexity and use progressive scaffolding.
+- Tavi AI education product page: parent visibility and constrained AI tutoring are best framed around one clear product promise.
+- arXiv 2605.11155: hybrid human-AI tutoring supports human tutor involvement as differentiated support, not just a separate feature bucket.
 
-### Referral, Support, and Admin Demo
-
-- Referral returns a stable code and invite URL.
-- Support/feedback can create items visible in the current demo session.
-- Admin endpoints return analytics overview, support tickets, feedback, help requests, and billing interest mock data.
-
-### Reset and Health
-
-- `/health` distinguishes demo backend uptime from frontend issues.
-- Reset command restores fixed demo state and clears temporary session data.
-- Error responses use `{ message, code }`.
-
-## Differentiators Worth Including
-
-- API mode documentation for `mock`, `demo`, `staging`, and `production`.
-- Real backend readiness matrix mapping each endpoint to request/response, current demo status, future backend owner, status codes, error codes, and env vars.
-- AWS readiness notes limited to frontend-facing integration boundaries.
-- QA checklist that walks through the exact end-to-end demo path.
-
-## Anti-Features
-
-- Production auth system.
-- Refresh tokens and password-security architecture.
-- Production database schema.
-- Real AI model provider orchestration.
-- Real streaming infrastructure.
-- Real payment webhooks.
-- Real subscription enforcement.
-- Production analytics storage.
-- AWS deployment.
-
-## Recommended Scope
-
-Phase 14 should ship enough endpoint behavior and documentation for the complete demo path:
-
-1. User registers or logs in.
-2. Student asks an AI question and receives a demo response.
-3. Student requests teacher help.
-4. Tutor marks the request resolved.
-5. Parent sees child learning records/report.
-6. Parent opens pricing/billing and completes mock checkout.
-7. User sees subscription status.
-8. Referral, support, and admin demo pages work.
-
+---
+*Feature research for: STOA Phase 15*
+*Researched: 2026-05-25*

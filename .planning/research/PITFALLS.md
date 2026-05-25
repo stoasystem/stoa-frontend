@@ -1,100 +1,84 @@
-# Phase 14 Research: Pitfalls
+# Pitfalls Research
 
-## Question
+**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
+**Researched:** 2026-05-25
+**Confidence:** HIGH
 
-What mistakes are common when adding demo backend support to an existing frontend, and how should Phase 14 prevent them?
+## Critical Pitfalls
 
-## Pitfalls and Prevention
+### Pitfall 1: Recreating the Three-Module Confusion
 
-### Pitfall: Demo backend becomes production backend by accident
+**What goes wrong:** The redesigned homepage still gives AI, teachers, and parents equal visual weight.
+**Why it happens:** Feature lists are easier to build than product narratives.
+**How to avoid:** Make the homepage story a sequence: student asks, AI responds, teacher helps if needed, parent follows progress.
+**Warning signs:** Multiple hero buttons for role demos; large equal cards named after internal capabilities.
+**Phase to address:** Homepage redesign.
 
-Warning signs:
-- ORM models, migrations, production deployment config, cloud resources, or security architecture appear in the milestone.
-- Docs describe demo behavior as production-ready.
+### Pitfall 2: Onboarding Collects Data Before Delivering Value
 
-Prevention:
-- Keep Phase 14 language explicit: demo-only, replaceable, frontend demo/test support.
-- Add real backend readiness docs instead of production implementation.
+**What goes wrong:** Registration asks many questions but does not connect users to chat quickly.
+**Why it happens:** Profile completeness is treated as more important than first learning value.
+**How to avoid:** Keep the wizard short, show progress, and redirect students to `/chat` with a welcome prompt.
+**Warning signs:** Long single-page forms; no visible next step after registration.
+**Phase to address:** Onboarding flow.
 
-### Pitfall: Mock data leaks into page components
+### Pitfall 3: Demo Credential Upload Looks Like Real Approval
 
-Warning signs:
-- Components call `fetch('/endpoint')` directly.
-- Components import demo seed JSON.
-- Different pages duplicate endpoint paths or response mapping.
+**What goes wrong:** Tutor upload UI implies credentials are verified.
+**Why it happens:** Trust UI often overstates demo capability.
+**How to avoid:** Use `pending_review` language and clearly avoid "verified" after mock upload.
+**Warning signs:** "Approved tutor" badges after upload; no pending status.
+**Phase to address:** Tutor onboarding and demo backend support.
 
-Prevention:
-- Route all API calls through `src/services/**`.
-- Add service-layer audit as a requirement.
-- Keep API mode in config, not in components.
+### Pitfall 4: Premium UI Becomes Decorative Instead of Functional
 
-### Pitfall: State changes cannot be demonstrated
+**What goes wrong:** Magazine visuals slow the page or distract from the student CTA.
+**Why it happens:** Image-heavy landing pages over-prioritize atmosphere.
+**How to avoid:** Use one image-led hero with informational UI preview, responsive constraints, and meaningful alt text.
+**Warning signs:** Hero image consumes mobile viewport without showing CTA; decorative assets dominate real content.
+**Phase to address:** Homepage redesign and visual QA.
 
-Warning signs:
-- All endpoints return static data.
-- Teacher help, support ticket, register, and checkout flows cannot show state progression.
+### Pitfall 5: Teacher Escalation Becomes Another Entry Point
 
-Prevention:
-- Use session or JSON-file demo state for mutable flows.
-- Provide a reset command.
-- Define which state changes must persist during the running demo session.
+**What goes wrong:** Teacher request remains a standalone card/button outside the AI answer context.
+**Why it happens:** Existing UI patterns are reused without changing product hierarchy.
+**How to avoid:** Render teacher escalation below assistant messages and near the input as a secondary action.
+**Warning signs:** Homepage "Teacher Backup" card; chat landing requires choosing support type.
+**Phase to address:** Chat refinement.
 
-### Pitfall: Reset is unreliable
+## Technical Debt Patterns
 
-Warning signs:
-- Demo accounts differ between runs.
-- Parent-child linkage breaks after reset.
-- Pending tutor requests disappear.
+| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
+|----------|-------------------|----------------|-----------------|
+| Hard-coded mock register data in components | Fast demo | Blocks real backend migration | Never; use service contract. |
+| File upload logic inside wizard step | Fewer files | Hard to test/reuse | Avoid; use files service/hook. |
+| Large global theme rewrite | Broad visual consistency | High regression risk | Defer to Phase 16. |
+| Heavy animation dependency | Quick animation | Dependency and performance cost | Only after CSS proves insufficient. |
 
-Prevention:
-- Keep a single seed source.
-- Reset fixed users, conversations, reports, help requests, billing, referrals, support, and admin data.
-- QA reset before core flow testing.
+## UX Pitfalls
 
-### Pitfall: Auth looks real but is not secure
+| Pitfall | User Impact | Better Approach |
+|---------|-------------|-----------------|
+| Admin/tutor/parent CTAs compete with student CTA | Students do not know where to start. | One primary `Start Learning` CTA. |
+| Registration role choices use internal names | Users hesitate. | Use plain labels and descriptions: Student, Parent, Tutor. |
+| Chat empty state feels like a dashboard | Students wait instead of asking. | Direct homework input with onboarding welcome copy. |
+| Parent visibility appears as surveillance | Families may distrust the product. | Frame as progress visibility and learning support. |
 
-Warning signs:
-- Demo token is described as JWT.
-- Password handling is framed as production-safe.
-- Frontend assumes demo token semantics.
+## "Looks Done But Isn't" Checklist
 
-Prevention:
-- Document demo tokens as opaque placeholder tokens.
-- Still send `Authorization: Bearer <token>` so future backend integration remains aligned.
-- Keep production auth explicitly out of scope.
+- [ ] **Homepage:** Verify mobile first viewport shows brand, CTA, and a hint of next section.
+- [ ] **Onboarding:** Verify each role can complete registration and route correctly.
+- [ ] **Tutor upload:** Verify PDF/PNG/JPEG and 10 MB limit UI behavior.
+- [ ] **Chat:** Verify assistant response shows teacher request action.
+- [ ] **Demo backend:** Verify reset still restores fixed demo accounts and new mock flows work.
 
-### Pitfall: Billing demo implies real payment
+## Sources
 
-Warning signs:
-- Frontend asks for card details.
-- Mock checkout resembles live Stripe without clear labels.
-- Subscription enforcement is presented as real.
+- Appcues onboarding guide, 2026-05-19: onboarding fails when teams front-load features instead of guiding users to value.
+- Nielsen Norman Group mobile image guidance, 2023-11-08: decorative mobile images slow pages and should be used only when informative.
+- Openfield EdTech instructor onboarding article: education onboarding should reduce complexity and scaffold progressively.
+- Tavi AI education product page: parent visibility and bounded AI help should be expressed as part of one product promise.
 
-Prevention:
-- Use local mock checkout success/cancel URLs.
-- Document no webhook and no real payment.
-- Keep feature access advisory in frontend and backend-owned later.
-
-### Pitfall: Research creates unnecessary dependencies
-
-Warning signs:
-- Adding MSW, json-server, Express, and FastAPI all at once.
-- Introducing a second backend runtime when the existing local backend is enough.
-
-Prevention:
-- Pick one primary demo backend path.
-- Keep optional MSW mode documented for future or test-specific use.
-- Avoid adding packages unless a roadmap phase proves they are needed.
-
-### Pitfall: Future backend team lacks a clear handoff
-
-Warning signs:
-- Endpoints exist only in code.
-- Error formats are inconsistent.
-- CORS, auth headers, upload, streaming, and env variables are undocumented.
-
-Prevention:
-- Create `docs/backend-integration/real-backend-readiness.md`.
-- Create `docs/backend-integration/aws-readiness-notes.md`.
-- Include endpoint matrix and migration checklist.
-
+---
+*Pitfalls research for: STOA Phase 15*
+*Researched: 2026-05-25*

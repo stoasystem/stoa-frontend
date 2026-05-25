@@ -1,94 +1,143 @@
-# Phase 14 Research: Architecture
+# Architecture Research
 
-## Question
+**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
+**Researched:** 2026-05-25
+**Confidence:** HIGH
 
-How should demo backend stabilization integrate with the existing STOA frontend architecture?
+## Standard Architecture
 
-## Existing Architecture
+```
+Homepage
+  -> MarketingLayout navigation
+  -> Home sections with premium theme CSS
+  -> Start Learning route decision
 
-- Browser SPA built with React, TypeScript, Vite, React Router, TanStack Query, Axios, Zustand, and service modules.
-- API calls should flow through `src/services/**` and shared API utilities, not page components.
-- Existing local backend under `backend/` already provides previous auth/chat/parent/tutor/support/analytics-style demo and test support.
-- Prior milestones established that local backend/database code is demo/test infrastructure only.
+Auth / Onboarding
+  -> RegisterPage local wizard state
+  -> Role-specific step components
+  -> auth service register mutation
+  -> route redirect by returned role/status
 
-## Target Architecture
+Tutor Credential Upload
+  -> TutorCredentialUpload component
+  -> file validation
+  -> files service upload mutation
+  -> mock uploaded file ids in tutor profile payload
 
-### Frontend
+Chat
+  -> existing conversation/message hooks
+  -> AI-first empty state
+  -> assistant message feedback component
+  -> existing teacher-help request mutation
 
-- `src/lib/env.ts` exposes:
-  - `apiMode`
-  - `apiBaseUrl`
-  - `enableMSW`
-- `src/services/api/httpClient.ts` owns base URL, auth header, timeout, and error normalization.
-- Feature services own endpoint paths and types.
-- Components use hooks/services and avoid direct `fetch('/some-api')` calls.
-
-### Demo Backend
-
-Recommended shape:
-
-```text
-backend/ or demo-backend/
-  README.md
-  app/main.py or server.ts
-  app/reset_demo_data.py or reset.ts
-  data/seed.json
-  data/current.json
+Demo Backend
+  -> /auth/register accepts profile payload
+  -> /files/tutor-credentials accepts multipart mock file
+  -> existing chat and teacher-help APIs remain canonical
 ```
 
-If reusing `backend/`, docs must call it the demo backend for Phase 14 and prevent it from being treated as the formal backend.
+## Recommended Project Structure
 
-### State
+```
+src/
+  components/
+    home/                 # Homepage editorial sections
+    auth/                 # Registration wizard steps
+    chat/                 # Inline AI feedback and teacher escalation
+  pages/
+    home/HomePage.tsx
+    auth/RegisterPage.tsx
+  services/
+    files/tutorCredentialApi.ts
+  hooks/
+    files/useTutorCredentialUploadMutation.ts
+  types/onboarding.ts
+  styles/premium-theme.css
+backend/
+  app/main.py             # Demo register/upload support
+```
 
-Use JSON-file state if practical for Phase 14:
+## Architectural Patterns
 
-- `seed.json` is the source of truth for reset.
-- `current.json` stores demo-session changes.
-- reset copies seed to current.
-- Runtime handlers read/write current.
+### Pattern 1: Role-Specific Wizard State
 
-If existing FastAPI/SQLite code is retained:
+**What:** Keep a single register flow with a shared account step and role-specific profile step.
+**Why:** Avoids duplicate register pages while preserving role-specific requirements.
+**Trade-off:** Local state is enough for demo; later production onboarding may need resumability.
 
-- Keep reset command deterministic.
-- Keep schema simple and local-only.
-- Document SQLite as a local functional-test detail, not a production persistence model.
+### Pattern 2: Contract-First Service Wrappers
 
-### API Contract
+**What:** Register and credential upload go through typed service/hook modules.
+**Why:** Preserves Phase 14's demo/real backend decoupling.
+**Trade-off:** Slightly more files, but cleaner migration path.
 
-Every endpoint should document:
+### Pattern 3: Inline Escalation in Chat
 
-- method and path
-- request body
-- response body
-- auth expectations
-- demo behavior
-- future real backend notes
-- possible error codes
+**What:** Teacher help CTA renders near assistant output.
+**Why:** Matches the AI-first product model and prevents homepage/module confusion.
+**Trade-off:** Needs careful UI state to avoid duplicate requests.
 
-### Integration Boundary
+## Data Flow
 
-Frontend and future backend meet at:
+### Student Start Learning
 
-- environment-configurable base URL
-- bearer token auth header
-- typed request/response bodies
-- standard error shape
-- health endpoint
-- CORS expectations
-- streaming endpoint contract
-- file upload metadata contract
+```
+Homepage CTA
+  -> /login?next=/chat when unauthenticated
+  -> /chat when student session exists
+  -> role home when parent/tutor/admin session exists
+```
 
-## Build Order
+### Registration
 
-1. Document demo backend scope and API contract.
-2. Decide whether Phase 14 implementation reuses `backend/` or adds a `demo-backend/` directory.
-3. Normalize demo data and reset.
-4. Fill endpoint gaps.
-5. Align frontend env/API mode and service calls.
-6. Add integration and AWS readiness docs.
-7. Verify demo flow and build.
+```
+Choose role
+  -> account details
+  -> role profile
+  -> optional tutor credential upload
+  -> POST /auth/register
+  -> token/user persisted
+  -> redirect by role/status
+```
 
-## Architectural Risk
+### Chat Escalation
 
-The main risk is overbuilding the demo backend. Phase 14 should prefer explicit route handlers, small data files, and clear docs over reusable backend frameworks, database abstractions, and deployment infrastructure.
+```
+Student sends message
+  -> existing chat mutation/stream
+  -> assistant response appears
+  -> AIResponseFeedback renders "Ask a human tutor"
+  -> POST /teacher-help/request
+  -> request state visible to tutor/parent demo surfaces
+```
 
+## Anti-Patterns
+
+### Homepage Feature Buckets
+
+**What people do:** Put AI, teacher, and parent cards side-by-side.
+**Why wrong:** It creates three competing product mental models.
+**Do instead:** Show a sequential learning flow.
+
+### Component-Level API URLs
+
+**What people do:** Put `fetch('/files/tutor-credentials')` inside upload UI.
+**Why wrong:** It breaks future backend replacement.
+**Do instead:** Use service functions and hooks.
+
+### Credential Review Claims
+
+**What people do:** Show "verified" or "approved" after upload.
+**Why wrong:** The demo backend cannot verify credentials.
+**Do instead:** Show `pending_review`.
+
+## Sources
+
+- Appcues onboarding guide, 2026-05-19: role/use-case segmented onboarding is a standard pattern for activation.
+- Nielsen Norman Group mobile image guidance, 2023-11-08: use images when they carry informational value, especially on mobile.
+- Openfield EdTech onboarding article: progressive scaffolding reduces complexity for education users.
+- arXiv 2605.11155: human tutor support can be differentiated by student need in hybrid human-AI tutoring.
+
+---
+*Architecture research for: STOA Phase 15*
+*Researched: 2026-05-25*
