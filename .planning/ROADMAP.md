@@ -24,29 +24,90 @@
 
 ## Phases
 
-<details open>
-<summary>🚧 v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Phases 108-112) — PLANNING</summary>
+### Active Milestone: v1.18 Phase 19
 
 Phase 19 aligns the STOA learning platform visually with the company homepage design language without modifying `/Users/zhdeng/newweb`, copying its source files, or turning the app into a homepage clone. The target relationship is same brand family, different product surface.
 
-- [ ] Phase 108: Main Website Read-Only Audit and Design Translation (0/1 plan)
-  - Requirements: SAFE19-01 through SAFE19-06, TRANS19-01 through TRANS19-06
-  - Deliverables: `docs/design/main-website-readonly-audit.md`, `docs/design/main-website-design-translation.md`
-  - Notes: record `/Users/zhdeng/newweb` pre/post `git status`, including the pre-existing `img/team/.DS_Store` modification if still present.
-- [ ] Phase 109: Learning Platform Brand Tokens and Theme Layer (0/1 plan)
-  - Requirements: TOKEN19-01 through TOKEN19-07
-  - Deliverables: `docs/design/learning-platform-token-adjustment.md`, `src/styles/brand-tokens.css`, `src/styles/platform-theme.css` or equivalent integration with existing theme files.
-- [ ] Phase 110: Shared Component Visual Refinement (0/1 plan)
-  - Requirements: COMP19-01 through COMP19-06
-  - Deliverables: refined button, card, badge, form, navigation, header, chat, pricing, billing, and report component styling using translated tokens.
-- [ ] Phase 111: Public and Auth Surface Alignment (0/1 plan)
-  - Requirements: PAGE19-01 through PAGE19-02
-  - Deliverables: brand-aligned homepage, login, register, and onboarding visuals without new product functionality.
-- [ ] Phase 112: App Page Alignment, Visual QA, README, and Handoff (0/1 plan)
-  - Requirements: PAGE19-03 through PAGE19-09, QA19-01 through QA19-10
-  - Deliverables: chat, student dashboard, parent dashboard/report, pricing, billing, tutor/support/admin token consistency, visual compatibility QA, README update, build/dev status, and final `/Users/zhdeng/newweb` read-only confirmation.
+#### Phase 108: Main Website Read-Only Audit and Design Translation
 
-</details>
+**Status:** Pending
+**Plans:** 0/1
+**Goal:** Establish the read-only source audit and design translation baseline before any learning-platform visual edits begin.
+
+**Scope:**
+- Record `/Users/zhdeng/newweb` pre-work `git status`, including the pre-existing `img/team/.DS_Store` modification if it remains present.
+- Inspect company homepage CSS, HTML, image usage, typography imports, spacing, layout, buttons, cards, hero treatment, and overall brand tone without modifying the source project.
+- Create `docs/design/main-website-readonly-audit.md` with the source audit, safety evidence, and no-copy/no-write policy.
+- Create `docs/design/main-website-design-translation.md` defining same brand family, different product surface.
+- Distinguish reusable design signals from implementation details that must not be imported or copied.
+- Define page-level adaptation rules for homepage, auth, chat, dashboards, parent report, pricing, and billing.
+
+**Requirements:** SAFE19-01 through SAFE19-06, TRANS19-01 through TRANS19-06
+
+#### Phase 109: Learning Platform Brand Tokens and Theme Layer
+
+**Status:** Pending
+**Plans:** 0/1
+**Goal:** Create a derived learning-platform token and theme layer from the design translation without copying homepage source CSS.
+
+**Scope:**
+- Create `docs/design/learning-platform-token-adjustment.md`.
+- Add `src/styles/brand-tokens.css`, `src/styles/platform-theme.css`, or equivalent integration with existing theme files.
+- Translate homepage burgundy, charcoal, warm grey, white, and muted grey signals into app-safe brand, accent, surface, text, border, and interactive tokens.
+- Reduce bright SaaS blue/teal dominance while preserving accessible interaction states.
+- Support editorial display headings on public/auth/report surfaces and readable app typography on chat/dashboard surfaces.
+- Preserve Phase 17 multilingual layout safeguards and avoid new dependencies.
+
+**Requirements:** TOKEN19-01 through TOKEN19-07
+
+#### Phase 110: Shared Component Visual Refinement
+
+**Status:** Pending
+**Plans:** 0/1
+**Goal:** Refine shared component styling through translated tokens while keeping component behavior unchanged.
+
+**Scope:**
+- Refine button variants for premium brand alignment while preserving focus, disabled, hover, and pending states.
+- Refine cards with subtler borders, surfaces, shadows, padding, and radius.
+- Refine badge/status colors to stay clear without overly bright red/green/blue styling.
+- Align input, textarea, select, and form surfaces with the translated token system.
+- Adjust PageHeader, SectionHeader, AppLogo, navigation, and sidebar styling without making app pages feel like marketing pages.
+- Align chat bubbles, chat input, teacher-support actions, pricing cards, billing cards, and report cards with the translated brand language.
+
+**Requirements:** COMP19-01 through COMP19-06
+
+#### Phase 111: Public and Auth Surface Alignment
+
+**Status:** Pending
+**Plans:** 0/1
+**Goal:** Bring homepage, login, register, and onboarding visuals closer to STOA brand language without adding product functionality.
+
+**Scope:**
+- Refine homepage visual rhythm, typography, CTA treatment, imagery treatment, and section spacing.
+- Keep homepage clearly positioned as the learning-platform entry point, not a direct company-homepage copy.
+- Refine login and register/onboarding visuals for brand trust, premium tone, and form clarity.
+- Preserve existing registration flow behavior, copy safety, environment guards, and multilingual layout stability.
+
+**Requirements:** PAGE19-01 through PAGE19-02
+
+#### Phase 112: App Page Alignment, Visual QA, README, and Handoff
+
+**Status:** Pending
+**Plans:** 0/1
+**Goal:** Align app surfaces, complete visual compatibility QA, update docs, and close Phase 19 with build and read-only evidence.
+
+**Scope:**
+- Refine chat, student dashboard, parent dashboard/report, pricing, billing, tutor, support, and admin/token-level surfaces.
+- Keep Chat and dashboards app-like, scannable, and usable.
+- Preserve Phase 18 production-facing copy and payment-readiness boundaries.
+- Create `docs/design/visual-compatibility-qa.md`.
+- Compare brand similarity, product independence, and visual quality for target P0 surfaces.
+- Verify English, German, French, Italian, and mobile layouts remain stable.
+- Run or document `npm install`, `npm run dev`, `npm run build`, and relevant browser checks.
+- Recheck `/Users/zhdeng/newweb` `git status` and document read-only status.
+- Update README with Phase 19 scope, source policy, design translation goals, and non-copying rule.
+
+**Requirements:** PAGE19-03 through PAGE19-09, QA19-01 through QA19-10
 
 <details>
 <summary>✅ v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Phases 103-107) — SHIPPED 2026-05-26</summary>
