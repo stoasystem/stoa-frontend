@@ -204,6 +204,7 @@ None currently.
 | 2026-05-25 | Fix parent growth visual | `src/components/landing/ParentHero.tsx` |
 | 2026-05-25 | Fix image text matches | `src/components/landing/ParentHero.tsx` |
 | 2026-05-25 | Polish public title typography | `src/styles/premium-theme.css` |
+| 2026-05-25 | Fix Vite large chunk build warning | `vite.config.ts` |
 
 ### Blockers/Concerns
 
@@ -243,6 +244,7 @@ None currently.
 - Image/text matching audit replaced mismatched parent/pricing visuals and passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright screenshot checks.
 - `python3 -m py_compile backend/app/*.py` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
+- Vite chunk warning quick fix passed `npm run build` without the large chunk warning; largest JS chunks are `index` 279.19 kB and `vendor-react` 194.29 kB. `npm run lint` also passed.
 - `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.
 - Demo backend smoke checks passed for `/health`, student `POST /auth/register`, and `POST /files/tutor-credentials`.
 - Playwright text checks passed for homepage old-card removal, registration role buttons, and login create-account path after sandbox escalation for Chromium.

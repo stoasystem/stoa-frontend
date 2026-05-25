@@ -5,6 +5,64 @@ import path from 'node:path'
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined
+
+          const normalizedId = id.replaceAll('\\', '/')
+
+          if (
+            normalizedId.includes('/react/') ||
+            normalizedId.includes('/react-dom/') ||
+            normalizedId.includes('/scheduler/')
+          ) {
+            return 'vendor-react'
+          }
+
+          if (
+            normalizedId.includes('/react-router/') ||
+            normalizedId.includes('/react-router-dom/') ||
+            normalizedId.includes('/@tanstack/react-query/') ||
+            normalizedId.includes('/zustand/')
+          ) {
+            return 'vendor-router-state'
+          }
+
+          if (
+            normalizedId.includes('/i18next/') ||
+            normalizedId.includes('/react-i18next/')
+          ) {
+            return 'vendor-i18n'
+          }
+
+          if (
+            normalizedId.includes('/aws-amplify/') ||
+            normalizedId.includes('/@aws-amplify/')
+          ) {
+            return 'vendor-aws'
+          }
+
+          if (
+            normalizedId.includes('/@radix-ui/') ||
+            normalizedId.includes('/lucide-react/') ||
+            normalizedId.includes('/sonner/') ||
+            normalizedId.includes('/class-variance-authority/') ||
+            normalizedId.includes('/tailwind-merge/')
+          ) {
+            return 'vendor-ui'
+          }
+
+          if (normalizedId.includes('/axios/')) {
+            return 'vendor-http'
+          }
+
+          return 'vendor'
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
