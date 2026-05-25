@@ -36,7 +36,7 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
         <PageHeader
           eyebrow="Checkout"
           title={success ? 'Virtual checkout complete' : 'Checkout canceled'}
-          description="This page validates the post-checkout frontend state before real payment integration."
+          description="This page confirms the demo checkout outcome before live payment collection is enabled."
         />
         <Card>
           <CardHeader>
@@ -47,8 +47,8 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              Plan: <span className="font-medium text-foreground">{plan}</span>. In production,
-              backend webhooks decide final subscription status.
+              Plan: <span className="font-medium text-foreground">{plan}</span>. In live payment mode,
+              STOA services confirm the final subscription status.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild>

@@ -29,7 +29,7 @@
 
 - [x] **Phase 98: Copy Governance and Scope Lock** - Establish locale-specific copy rules, glossary guidance, QA checklist expectations, and Phase 17 scope boundaries.
 - [x] **Phase 99: Title and Layout Infrastructure** - Add safe locale-aware title structures and typed layout hints for long localized UI copy.
-- [ ] **Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup** - Rewrite homepage, onboarding, chat, parent, tutor, pricing, billing, support, and shared-state copy in EN/DE/FR/IT.
+- [x] **Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup** - Rewrite homepage, onboarding, chat, parent, tutor, pricing, billing, support, and shared-state copy in EN/DE/FR/IT.
 - [ ] **Phase 101: Responsive Typography and Multilingual Fit Pass** - Verify and tune high-risk components so localized text remains readable across target viewports.
 - [ ] **Phase 102: QA Evidence, Documentation, and Handoff** - Record copy review, visual QA, terminology audit, build verification, README notes, and remaining review gaps.
 
@@ -73,7 +73,7 @@
   3. Parent and tutor copy stays calm, professional, and education-centered, without implying teacher replacement or backup treatment.
   4. Pricing, billing, plan, and demo copy avoids aggressive sales language and uses localized display text or stable-ID mapping instead of leaked English mock text.
   5. User-visible P0 copy removes banned AI-heavy, backup, customer, and sales terms while preserving internal identifiers where changing them would create unnecessary code churn.
-**Plans**: TBD
+**Plans**: 1/1
 **UI hint**: yes
 
 ### Phase 101: Responsive Typography and Multilingual Fit Pass
@@ -123,6 +123,6 @@ Phase 17 phases planned in numeric order: 98 -> 99 -> 100 -> 101 -> 102
 |-------|-----------|----------------|--------|-----------|
 | 98. Copy Governance and Scope Lock | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 99. Title and Layout Infrastructure | v1.16 | 1/1 | Complete | 2026-05-25 |
-| 100. P0 Locale Copy Rewrite and Terminology Cleanup | v1.16 | 0/1 | Not started | - |
+| 100. P0 Locale Copy Rewrite and Terminology Cleanup | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 101. Responsive Typography and Multilingual Fit Pass | v1.16 | 0/1 | Not started | - |
 | 102. QA Evidence, Documentation, and Handoff | v1.16 | 0/1 | Not started | - |

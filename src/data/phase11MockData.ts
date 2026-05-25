@@ -14,9 +14,9 @@ export const mockBillingPlans: BillingPlan[] = [
     name: 'Free Trial',
     priceMonthly: 0,
     currency: 'CHF',
-    audience: 'Families validating fit before committing.',
+    audience: 'Families trying STOA before choosing a plan.',
     cta: 'Start free trial',
-    features: ['Limited AI questions', 'Limited file uploads', 'Basic learning history'],
+    features: ['Guided learning questions', 'Limited file uploads', 'Basic learning history'],
   },
   {
     id: 'student',
@@ -25,7 +25,7 @@ export const mockBillingPlans: BillingPlan[] = [
     currency: 'CHF',
     audience: 'A student who needs consistent homework help.',
     cta: 'Select student',
-    features: ['AI learning chat', 'Homework upload', 'Learning history'],
+    features: ['Learning space', 'Homework upload', 'Learning history'],
   },
   {
     id: 'family',
@@ -42,9 +42,9 @@ export const mockBillingPlans: BillingPlan[] = [
     name: 'Tutor-supported Plan',
     priceMonthly: 89,
     currency: 'CHF',
-    audience: 'Families who want teacher support when AI is not enough.',
+    audience: 'Families who want professional teacher support when students need more guidance.',
     cta: 'Select tutor support',
-    features: ['Everything in Family', 'Human teacher help quota', 'Priority support'],
+    features: ['Everything in Family', 'Teacher support sessions', 'Priority learning support'],
   },
 ]
 

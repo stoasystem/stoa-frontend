@@ -1,24 +1,50 @@
 {
   "title": "Abonnement",
   "subscription": "Abonnement",
-  "description": "Consultez l’état de l’abonnement et lancez un checkout hébergé ou virtuel.",
+  "description": "Consultez votre formule et lancez un checkout sécurisé ou de démonstration.",
   "paymentEnabled": "Paiement activé",
   "paymentDisabled": "Paiement désactivé",
   "usage": "Utilisation",
   "checkout": "Checkout",
   "checkoutMode": "Mode de paiement",
-  "paymentEnabledBody": "Le paiement est activé. Le frontend demandera une session de paiement au backend.",
-  "paymentDisabledBody": "Le paiement est désactivé. Cette page sert à valider l’intérêt des familles et le contenu des plans.",
+  "paymentEnabledBody": "Le paiement est activé. STOA ouvrira un checkout sécurisé lorsqu’une formule sera choisie.",
+  "paymentDisabledBody": "Le paiement est désactivé. Cette page aide à évaluer la formule adaptée aux familles.",
   "mockCheckoutEnabled": "Le checkout de démonstration est activé ; la sélection d’un plan ouvre un checkout virtuel.",
-  "mockCheckoutDisabled": "Le checkout de démonstration est désactivé. Le checkout réel nécessite une checkoutUrl du backend.",
+  "mockCheckoutDisabled": "Le checkout de démonstration est désactivé. Le checkout réel s’ouvrira lorsque la configuration de paiement sera disponible.",
   "selectedPlan": "Plan sélectionné",
-  "planLoading": "Les détails du plan se chargent depuis le contrat de facturation.",
-  "limitsBody": "Dans la démo, les états verrouillés et les invitations à changer de plan sont indicatifs. Les APIs backend devront appliquer les limites de messages, fichiers, aide enseignant et rapports.",
+  "planLoading": "Les détails de la formule se chargent.",
+  "limitsBody": "Dans la démo, les limites de formule servent de repère pour les élèves et les familles. Les règles d’accès réelles sont gérées par les services STOA.",
   "securityBody": "Le checkout hébergé est l’orientation privilégiée pour les vrais paiements. Le navigateur ne reçoit jamais les données de carte ni les secrets de paiement.",
   "teacherUpgradeReason": "Choisissez un plan avec accompagnement par un enseignant qualifié.",
   "fileUploadReason": "Quota de téléversement atteint.",
   "parentReportReason": "Un plan famille est requis pour les rapports.",
   "success": "Statut d’abonnement mis à jour.",
   "choosePlan": "Choisir un plan",
-  "mockCheckout": "Checkout de démo"
+  "mockCheckout": "Checkout de démo",
+  "plans": {
+    "free_trial": {
+      "name": "Essai gratuit",
+      "audience": "Familles qui souhaitent essayer STOA avant de choisir une formule.",
+      "cta": "Commencer l’essai",
+      "features": ["Questions guidées", "Téléversement de devoirs", "Historique simple"]
+    },
+    "student": {
+      "name": "Formule élève",
+      "audience": "Un élève qui a besoin d’un soutien régulier pour les devoirs.",
+      "cta": "Choisir élève",
+      "features": ["Espace d’apprentissage", "Téléversement de devoirs", "Historique d’apprentissage"]
+    },
+    "family": {
+      "name": "Formule famille",
+      "audience": "Parents qui souhaitent une vision claire des progrès.",
+      "cta": "Choisir famille",
+      "features": ["Tout dans Élève", "Espace parents", "Rapport hebdomadaire"]
+    },
+    "tutor_supported": {
+      "name": "Formule avec enseignant",
+      "audience": "Familles qui souhaitent un accompagnement par un enseignant qualifié lorsque l’élève a besoin de plus de guidance.",
+      "cta": "Choisir enseignant",
+      "features": ["Tout dans Famille", "Séances enseignant", "Soutien prioritaire"]
+    }
+  }
 }

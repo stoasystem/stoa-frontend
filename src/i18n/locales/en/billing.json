@@ -1,24 +1,50 @@
 {
   "title": "Billing",
   "subscription": "Subscription",
-  "description": "Review subscription state and start a hosted or virtual checkout flow.",
+  "description": "Review your plan and choose a hosted or demo checkout flow.",
   "paymentEnabled": "Payment enabled",
   "paymentDisabled": "Payment disabled",
   "usage": "Usage",
   "checkout": "Checkout",
   "checkoutMode": "Checkout mode",
-  "paymentEnabledBody": "Payment is enabled. The frontend will request a backend checkout session.",
-  "paymentDisabledBody": "Payment is disabled. Use this page to validate family interest and plan content.",
+  "paymentEnabledBody": "Payment is enabled. STOA will open a secure checkout when a plan is selected.",
+  "paymentDisabledBody": "Payment is disabled. Use this page to review plan fit with families.",
   "mockCheckoutEnabled": "Demo checkout is enabled, so plan selection opens a virtual checkout for demos and tests.",
-  "mockCheckoutDisabled": "Demo checkout is disabled. Real checkout requires a backend checkoutUrl response.",
+  "mockCheckoutDisabled": "Demo checkout is disabled. Live checkout will open when payment setup is available.",
   "selectedPlan": "Selected plan",
   "planLoading": "Plan details are loading from the billing plans contract.",
-  "limitsBody": "Locked states and upgrade prompts are advisory in the demo. Backend APIs must enforce message, upload, teacher-help, and report access limits.",
+  "limitsBody": "Plan limits shown in the demo are guidance for students and families. Live access rules are handled by STOA services.",
   "securityBody": "Hosted checkout is the preferred real payment direction. The browser never receives card details or payment secrets.",
   "teacherUpgradeReason": "Choose a plan with professional teacher support.",
   "fileUploadReason": "File upload quota reached.",
   "parentReportReason": "A family plan is required for reports.",
   "success": "Subscription status updated.",
   "choosePlan": "Choose a plan",
-  "mockCheckout": "Demo checkout"
+  "mockCheckout": "Demo checkout",
+  "plans": {
+    "free_trial": {
+      "name": "Free trial",
+      "audience": "Families who want to try STOA before choosing a plan.",
+      "cta": "Start free trial",
+      "features": ["Guided learning questions", "Homework file uploads", "Basic learning history"]
+    },
+    "student": {
+      "name": "Student plan",
+      "audience": "A focused learner who needs steady homework support.",
+      "cta": "Choose student",
+      "features": ["Learning space", "Homework upload", "Learning history"]
+    },
+    "family": {
+      "name": "Family plan",
+      "audience": "Parents who want a clear view of progress.",
+      "cta": "Choose family",
+      "features": ["Everything in Student", "Parent dashboard", "Weekly parent report"]
+    },
+    "tutor_supported": {
+      "name": "Teacher-supported plan",
+      "audience": "Families who want professional teacher support when students need more guidance.",
+      "cta": "Choose teacher support",
+      "features": ["Everything in Family", "Teacher support sessions", "Priority learning support"]
+    }
+  }
 }

@@ -1,13 +1,13 @@
 {
   "title": "Preise",
   "eyebrow": "Pläne für Familien",
-  "description": "Wählen Sie die passende Hausaufgabenunterstützung für Ihre Familie, von geführter Übung bis zu Erklärungen mit Lehrpersonen.",
+  "description": "Wählen Sie die passende Hausaufgabenunterstützung für Ihre Familie, von geführter Übung bis zu professioneller Unterstützung durch Lehrpersonen.",
   "badge": "Sichere Checkout-Vorschau",
-  "supportLevel": "Unterstützungsniveau wählen",
-  "supportLevelBody": "Geführtes Üben, Elternberichte und Hilfe durch Lehrpersonen bleiben in einem Familienplan verbunden.",
+  "supportLevel": "Unterstützung wählen",
+  "supportLevelBody": "Geführtes Üben, Elternberichte und professionelle Lehrpersonen-Unterstützung bleiben in einem Lernweg verbunden.",
   "valueTitle": "Der Wert für Familien",
   "valueBody": "STOA verbindet geführte Hausaufgabenhilfe, sichtbare Lernsignale für Eltern und Unterstützung durch Lehrpersonen, damit Schüler weiterkommen und Familien informiert bleiben.",
-  "checkoutBody": "In dieser Demo zeigt der Checkout den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
+  "checkoutBody": "In dieser Demo zeigt der Checkout die Planwahl, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
   "pilotTitle": "Pilotversprechen",
   "pilotBody": "Starten Sie mit einer kostenlosen Probephase, prüfen Sie STOA im Familienalltag und wählen Sie danach einen Plan.",
   "pilotDetail": "Jeder Plan zeigt vor dem Checkout klar, welche Unterstützung Schüler, Eltern und Lehrpersonen erhalten.",
@@ -23,11 +23,11 @@
     ]
   },
   "faqPaymentTitle": "Ist die Zahlung jetzt live?",
-  "faqPaymentBody": "Der Checkout zeigt aktuell den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
+  "faqPaymentBody": "Der Checkout zeigt aktuell die Planwahl, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
   "faqs": [
     {
       "question": "Ist die Zahlung jetzt live?",
-      "answer": "Der Checkout zeigt aktuell den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite."
+      "answer": "Der Checkout zeigt aktuell die Planwahl, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite."
     },
     {
       "question": "Können Eltern vor dem Bezahlen testen?",

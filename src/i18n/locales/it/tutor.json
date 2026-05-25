@@ -1,10 +1,10 @@
 {
-  "dashboardTitle": "Richieste insegnante",
-  "dashboardDescription": "Rivedi le domande degli studenti che richiedono supporto professionale.",
+  "dashboardTitle": "Richieste di supporto",
+  "dashboardDescription": "Rivedi le domande degli studenti in cui una guida qualificata può aiutare.",
   "loadRequestsFailed": "Impossibile caricare le richieste.",
   "availabilityTitle": "Disponibilità insegnante",
   "detailTitle": "Dettaglio richiesta",
-  "markInProgress": "Segna in corso",
+  "markInProgress": "Inizia revisione",
   "markResolved": "Segna risolta",
   "notes": "Note dell’insegnante"
 }

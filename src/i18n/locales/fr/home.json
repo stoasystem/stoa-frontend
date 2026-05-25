@@ -1,33 +1,33 @@
 {
   "hero": {
     "eyebrow": "Assistant d’apprentissage d’abord, enseignant si nécessaire",
-    "title": "Un soutien d’apprentissage au moment où les élèves en ont besoin.",
-    "subtitle": "Les élèves posent leurs questions, reçoivent des explications claires et peuvent demander l’aide d’un véritable enseignant si nécessaire.",
-    "secondaryCta": "Voir comment STOA fonctionne",
-    "bullets": ["Question en quelques secondes", "Explication claire d’abord", "Enseignant dans le chat"],
+    "title": "Comprendre avec confiance.",
+    "subtitle": "STOA aide les élèves à poser leurs questions, à recevoir des explications claires et à obtenir l’accompagnement d’un enseignant qualifié si nécessaire.",
+    "secondaryCta": "Comment ça fonctionne",
+    "bullets": ["Poser une question rapidement", "Comprendre l’étape suivante", "Enseignant si nécessaire"],
     "imageBadge": "Espace d’étude",
     "imageLabel": "Explication en direct",
-    "imageTitle": "Commence par ta question. STOA explique l’étape suivante avant qu’un enseignant intervienne.",
+    "imageTitle": "Commence par ta question. STOA explique l’étape suivante et garde l’accompagnement enseignant dans le contexte.",
     "imagePrompt": "Essai : « Pourquoi soustraire 2 des deux côtés garde-t-il l’équation équilibrée ? »"
   },
   "flow": {
     "eyebrow": "Comment STOA aide les élèves",
-    "title": "Un seul parcours d’apprentissage, pas trois outils séparés.",
+    "title": "Un parcours d’apprentissage clair.",
     "visualLabel": "Espace d’apprentissage",
-    "visualText": "L’élève reste dans une seule conversation pendant que l’Assistant d’apprentissage, l’aide enseignante et la visibilité parentale l’accompagnent.",
+    "visualText": "L’élève reste dans une seule conversation, avec explications, accompagnement enseignant et visibilité parentale reliés.",
     "steps": [
       { "title": "Poser une question", "description": "Les élèves commencent directement dans le chat avec une question ou un devoir téléversé." },
-      { "title": "Recevoir une explication claire", "description": "L’Assistant d’apprentissage donne une première explication immédiate, avec le contexte visible." },
+      { "title": "Comprendre l’étape suivante", "description": "L’Assistant d’apprentissage donne une première explication claire, avec le contexte visible." },
       { "title": "Demander un enseignant si besoin", "description": "Si l’explication n’est pas assez claire, un enseignant qualifié peut rejoindre le même fil." },
       { "title": "Les parents suivent les progrès", "description": "Les parents voient l’historique, les rapports et les demandes d’aide sans interrompre l’étude." }
     ]
   },
   "teacher": {
     "eyebrow": "Accompagnement par un enseignant qualifié",
-    "visualText": "Les enseignants ne sont pas une porte séparée. Ils accompagnent le moment d’apprentissage.",
-    "title": "Quand l’explication ne suffit pas, la question a déjà son contexte.",
+    "visualText": "L’accompagnement d’un enseignant qualifié reste relié au moment d’apprentissage.",
+    "title": "Quand un accompagnement est nécessaire, le contexte est déjà là.",
     "body": "Un enseignant voit la conversation, la question de l’élève et l’explication précédente. L’aide arrive là où la confusion apparaît.",
-    "link": "Parcours d’aide enseignante"
+    "link": "Accompagnement par un enseignant"
   },
   "parents": {
     "eyebrow": "Visibilité pour les parents",
@@ -43,11 +43,11 @@
     "items": [
       { "title": "Contexte scolaire suisse", "description": "Conçu autour des devoirs quotidiens, du niveau scolaire et de la visibilité familiale." },
       { "title": "Démo prête aujourd’hui", "description": "Comptes de démo fixes, données réinitialisables, facturation simulée, support, parrainage et aperçu admin." },
-      { "title": "Prêt pour le futur backend", "description": "Le frontend dépend de contrats API afin que le backend de démo puisse être remplacé." }
+      { "title": "Prêt à évoluer", "description": "STOA garde l’expérience d’apprentissage claire aujourd’hui tout en laissant de la place aux futurs services de production." }
     ]
   },
   "cta": {
     "eyebrow": "Commencer par une question",
-    "title": "Entre dans la plateforme et pose ta première question."
+    "title": "Commence avec une question claire."
   }
 }

@@ -1,13 +1,13 @@
 {
   "title": "Tarifs",
   "eyebrow": "Plans pour les familles",
-  "description": "Choisissez le niveau de soutien aux devoirs dont votre famille a besoin, de la pratique guidée aux explications avec enseignant.",
+  "description": "Choisissez le niveau de soutien aux devoirs dont votre famille a besoin, de la pratique guidée à l’accompagnement par un enseignant qualifié.",
   "badge": "Aperçu de paiement sécurisé",
   "supportLevel": "Choisir le niveau de soutien",
-  "supportLevelBody": "Pratique guidée, rapports parents et aide d’un enseignant restent réunis dans un même plan familial.",
+  "supportLevelBody": "Pratique guidée, rapports parents et accompagnement par un enseignant qualifié restent réunis dans un même parcours familial.",
   "valueTitle": "La valeur pour les familles",
   "valueBody": "STOA combine un soutien guidé aux devoirs, des signaux visibles pour les parents et un accompagnement enseignant pour aider les élèves sans laisser les familles dans le flou.",
-  "checkoutBody": "Dans cette démo, le checkout montre le parcours d’achat sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée.",
+  "checkoutBody": "Dans cette démo, le checkout montre le choix de formule sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée.",
   "pilotTitle": "Promesse pilote",
   "pilotBody": "Commencez par un essai gratuit, voyez si STOA convient à votre routine familiale, puis choisissez un plan.",
   "pilotDetail": "Chaque plan clarifie le niveau de soutien pour l’élève, les parents et l’enseignant avant le paiement.",
@@ -23,11 +23,11 @@
     ]
   },
   "faqPaymentTitle": "Le paiement est-il actif ?",
-  "faqPaymentBody": "Le checkout montre actuellement le parcours d’achat sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée.",
+  "faqPaymentBody": "Le checkout montre actuellement le choix de formule sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée.",
   "faqs": [
     {
       "question": "Le paiement est-il actif ?",
-      "answer": "Le checkout montre actuellement le parcours d’achat sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée."
+      "answer": "Le checkout montre actuellement le choix de formule sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée."
     },
     {
       "question": "Les parents peuvent-ils essayer avant de payer ?",

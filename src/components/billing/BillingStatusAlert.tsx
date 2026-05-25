@@ -7,10 +7,10 @@ export function BillingStatusAlert() {
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
       <p>
         {enablePayment
-          ? 'Payment is enabled. Checkout URLs must still come from the backend contract.'
+          ? 'Payment is enabled. STOA will open a secure checkout when a plan is selected.'
           : enableMockCheckout
-            ? 'Payment is disabled and mock checkout is enabled for frontend demos.'
-            : 'Payment is disabled. Plan CTAs collect intent until backend checkout is ready.'}
+            ? 'Payment is disabled and demo checkout is available for plan review.'
+            : 'Payment is disabled. Plan choices help validate family interest until live checkout is available.'}
       </p>
     </div>
   )

@@ -1,24 +1,50 @@
 {
   "title": "Abrechnung",
   "subscription": "Abonnement",
-  "description": "Prüfen Sie den Abonnementstatus und starten Sie einen gehosteten oder virtuellen Checkout.",
+  "description": "Prüfen Sie Ihren Plan und starten Sie einen sicheren oder Demo-Checkout.",
   "paymentEnabled": "Zahlung aktiviert",
   "paymentDisabled": "Zahlung deaktiviert",
   "usage": "Nutzung",
   "checkout": "Checkout",
   "checkoutMode": "Checkout-Modus",
-  "paymentEnabledBody": "Zahlung ist aktiviert. Das Frontend fordert eine Backend-Checkout-Session an.",
-  "paymentDisabledBody": "Zahlung ist deaktiviert. Diese Seite validiert Familieninteresse und Planinhalte.",
+  "paymentEnabledBody": "Zahlung ist aktiviert. STOA öffnet bei der Planwahl einen sicheren Checkout.",
+  "paymentDisabledBody": "Zahlung ist deaktiviert. Diese Seite hilft, die passende Planwahl für Familien zu prüfen.",
   "mockCheckoutEnabled": "Demo-Checkout ist aktiviert, daher öffnet die Planauswahl einen virtuellen Checkout.",
-  "mockCheckoutDisabled": "Demo-Checkout ist deaktiviert. Echter Checkout benötigt eine checkoutUrl vom Backend.",
+  "mockCheckoutDisabled": "Demo-Checkout ist deaktiviert. Live-Checkout öffnet sich, sobald die Zahlungseinrichtung verfügbar ist.",
   "selectedPlan": "Ausgewählter Plan",
-  "planLoading": "Plandetails werden aus dem Billing-Vertrag geladen.",
-  "limitsBody": "Gesperrte Zustände und Upgrade-Hinweise sind in der Demo beratend. Backend-APIs müssen Nachrichten-, Upload-, Lehrpersonen- und Berichtslimits durchsetzen.",
+  "planLoading": "Plandetails werden geladen.",
+  "limitsBody": "Planlimits in der Demo dienen als Orientierung für Schüler und Familien. Live-Zugangsregeln werden von STOA-Diensten verwaltet.",
   "securityBody": "Gehosteter Checkout ist die bevorzugte Richtung für echte Zahlungen. Der Browser erhält nie Kartendaten oder Zahlungsgeheimnisse.",
   "teacherUpgradeReason": "Wählen Sie einen Plan mit professioneller Unterstützung durch Lehrpersonen.",
   "fileUploadReason": "Upload-Kontingent erreicht.",
   "parentReportReason": "Für Berichte ist ein Familienplan erforderlich.",
   "success": "Abonnementstatus aktualisiert.",
   "choosePlan": "Plan wählen",
-  "mockCheckout": "Demo-Checkout"
+  "mockCheckout": "Demo-Checkout",
+  "plans": {
+    "free_trial": {
+      "name": "Kostenlose Probephase",
+      "audience": "Familien, die STOA vor der Planwahl ausprobieren möchten.",
+      "cta": "Probephase starten",
+      "features": ["Geführte Lernfragen", "Hausaufgaben-Uploads", "Einfacher Lernverlauf"]
+    },
+    "student": {
+      "name": "Schüler-Plan",
+      "audience": "Ein fokussierter Schüler mit regelmässiger Hausaufgabenunterstützung.",
+      "cta": "Schüler-Plan wählen",
+      "features": ["Lernraum", "Hausaufgaben-Upload", "Lernverlauf"]
+    },
+    "family": {
+      "name": "Familienplan",
+      "audience": "Eltern, die einen klaren Blick auf Fortschritte wünschen.",
+      "cta": "Familienplan wählen",
+      "features": ["Alles im Schüler-Plan", "Elternbereich", "Wöchentlicher Elternbericht"]
+    },
+    "tutor_supported": {
+      "name": "Plan mit Lehrpersonen",
+      "audience": "Familien, die professionelle Lehrpersonen-Unterstützung wünschen, wenn Schüler mehr Orientierung brauchen.",
+      "cta": "Lehrpersonen-Plan wählen",
+      "features": ["Alles im Familienplan", "Sitzungen mit Lehrpersonen", "Priorisierte Lernunterstützung"]
+    }
+  }
 }

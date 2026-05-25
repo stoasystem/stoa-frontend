@@ -1,7 +1,7 @@
 {
-  "title": "Lernchat",
+  "title": "Lernraum",
   "emptyTitle": "Stelle deine erste Hausaufgabenfrage.",
-  "emptyDescription": "Der Lernassistent bereitet eine klare Erklärung vor. Wenn du mehr Hilfe brauchst, frage eine Lehrperson im selben Gespräch.",
+  "emptyDescription": "Der Lernassistent bereitet eine klare Erklärung vor. Wenn du mehr Orientierung brauchst, frage eine Lehrperson im selben Gespräch.",
   "welcome": "Willkommen bei STOA. Stelle unten deine erste Hausaufgabenfrage.",
   "placeholder": "Gib hier deine Hausaufgabenfrage ein...",
   "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
@@ -10,19 +10,19 @@
   "createFailed": "Das Gespräch konnte nicht erstellt werden.",
   "starting": "Wird gestartet...",
   "startConversation": "Gespräch starten",
-  "quotaReached": "Kontingent für Lernnachrichten erreicht.",
-  "fileQuotaReached": "Kontingent für Datei-Uploads erreicht.",
+  "quotaReached": "Die Lernnachrichten in diesem Plan sind aufgebraucht.",
+  "fileQuotaReached": "Die Datei-Uploads in diesem Plan sind aufgebraucht.",
   "emptyMessage": "Nachricht darf nicht leer sein.",
   "upload": "Hausaufgabendatei hochladen",
   "uploadFailed": "Datei-Upload fehlgeschlagen.",
   "retry": "Erneut versuchen",
   "newConversation": "Neue Unterhaltung",
   "teacher": {
-    "title": "Soll eine Lehrperson das erklären?",
-    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson für eine klarere Erklärung.",
+    "title": "Kann eine Lehrperson das klären?",
+    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson für klarere Orientierung.",
     "cta": "Lehrperson fragen",
     "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
-    "failed": "Anfrage an Lehrperson fehlgeschlagen."
+    "failed": "Die Anfrage an die Lehrperson konnte nicht gesendet werden."
   },
   "status": {
     "pending": "Wartet auf Lehrperson",

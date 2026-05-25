@@ -1,33 +1,34 @@
 {
   "hero": {
     "eyebrow": "Erst Lernassistent, bei Bedarf Lehrperson",
-    "title": "Lernunterstützung genau dann, wenn Schüler sie brauchen.",
-    "subtitle": "Schüler stellen Fragen, erhalten klare Erklärungen und können bei Bedarf eine echte Lehrperson hinzuziehen.",
+    "title": "Lernen. Fragen. Verstehen.",
+    "titleLines": ["Lernen.", "Fragen.", "Verstehen."],
+    "subtitle": "STOA unterstützt Schüler bei Hausaufgaben und Lernfragen – mit klaren Erklärungen und professioneller Unterstützung durch Lehrpersonen, wenn es nötig ist.",
     "secondaryCta": "So funktioniert STOA",
-    "bullets": ["In Sekunden fragen", "Zuerst klare Erklärung", "Lehrperson direkt im Chat"],
+    "bullets": ["Schnell fragen", "Nächsten Schritt verstehen", "Lehrperson bei Bedarf"],
     "imageBadge": "Lernraum",
     "imageLabel": "Live-Erklärung",
-    "imageTitle": "Beginne mit deiner Frage. STOA erklärt den nächsten Schritt, bevor eine Lehrperson dazukommt.",
+    "imageTitle": "Beginne mit deiner Frage. STOA erklärt den nächsten Schritt und hält Lehrpersonen-Unterstützung im Kontext.",
     "imagePrompt": "Beispiel: \"Warum bleibt eine Gleichung ausgeglichen, wenn man auf beiden Seiten 2 abzieht?\""
   },
   "flow": {
     "eyebrow": "Wie STOA Schüler unterstützt",
-    "title": "Ein Lernweg, keine drei getrennten Werkzeuge.",
+    "title": "Ein klarer Lernweg.",
     "visualLabel": "Lernraum",
-    "visualText": "Der Schüler bleibt in einer Unterhaltung, während Lernassistent, Lehrpersonenhilfe und Elternsichtbarkeit darum herum arbeiten.",
+    "visualText": "Der Schüler bleibt in einer Unterhaltung, während Erklärung, Lehrpersonen-Unterstützung und Elternsicht verbunden bleiben.",
     "steps": [
       { "title": "Frage stellen", "description": "Schüler starten direkt im Chat mit einer Hausaufgabenfrage oder hochgeladenen Aufgabe." },
-      { "title": "Klare Erklärung erhalten", "description": "Der Lernassistent gibt sofort eine erste Erklärung, während der Kontext sichtbar bleibt." },
+      { "title": "Nächsten Schritt verstehen", "description": "Der Lernassistent gibt eine klare erste Erklärung, während der Kontext sichtbar bleibt." },
       { "title": "Bei Bedarf Lehrperson fragen", "description": "Wenn die Erklärung nicht klar genug ist, kann eine qualifizierte Lehrperson in denselben Verlauf einsteigen." },
       { "title": "Eltern verfolgen Fortschritt", "description": "Eltern sehen Lernverlauf, Berichte und Lehrpersonen-Anfragen, ohne das Lernen zu unterbrechen." }
     ]
   },
   "teacher": {
     "eyebrow": "Professionelle Unterstützung durch Lehrpersonen",
-    "visualText": "Lehrpersonen sind kein eigener Eingang. Sie sind die Unterstützung im Lernmoment.",
-    "title": "Wenn die Erklärung nicht reicht, hat die Frage bereits Kontext.",
+    "visualText": "Professionelle Unterstützung durch Lehrpersonen bleibt mit dem Lernmoment verbunden.",
+    "title": "Wenn mehr Orientierung nötig ist, ist der Kontext schon da.",
     "body": "Eine Lehrperson sieht die Unterhaltung, die Frage des Schülers und die vorherige Erklärung. Die Unterstützung beginnt dort, wo Unklarheit entsteht.",
-    "link": "Weg zur Lehrpersonen-Unterstützung"
+    "link": "Professionelle Lehrpersonen-Unterstützung"
   },
   "parents": {
     "eyebrow": "Elternsichtbarkeit",
@@ -43,11 +44,11 @@
     "items": [
       { "title": "Schweizer Schulkontext", "description": "Ausgerichtet auf Hausaufgaben, Klassenstufe und Familiensichtbarkeit." },
       { "title": "Demo heute bereit", "description": "Feste Demo-Konten, zurücksetzbare Daten, Abrechnungsdemo, Support, Empfehlungen und Admin-Übersicht sind verfügbar." },
-      { "title": "Später backend-bereit", "description": "Das Frontend nutzt API-Verträge, damit das Demo-Backend ersetzt werden kann." }
+      { "title": "Bereit zu wachsen", "description": "STOA hält das Lernerlebnis heute klar und lässt Raum für künftige Produktionsdienste." }
     ]
   },
   "cta": {
     "eyebrow": "Mit einer Frage starten",
-    "title": "Öffne die Lernplattform und stelle deine erste Frage."
+    "title": "Starte mit einer klaren Frage."
   }
 }

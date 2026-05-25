@@ -1,33 +1,33 @@
 {
   "hero": {
     "eyebrow": "Prima l’assistente, poi l’insegnante quando serve",
-    "title": "Supporto allo studio proprio quando gli studenti ne hanno bisogno.",
-    "subtitle": "Gli studenti fanno domande, ricevono spiegazioni chiare e possono chiedere l’aiuto di un insegnante reale quando serve.",
-    "secondaryCta": "Scopri come funziona STOA",
-    "bullets": ["Domanda in pochi secondi", "Prima una spiegazione chiara", "Insegnante dentro la chat"],
+    "title": "Studiare con più chiarezza.",
+    "subtitle": "STOA aiuta gli studenti a fare domande, ricevere spiegazioni chiare e ottenere il supporto di un insegnante qualificato quando serve.",
+    "secondaryCta": "Come funziona",
+    "bullets": ["Fai una domanda rapidamente", "Capisci il prossimo passo", "Insegnante quando serve"],
     "imageBadge": "Aula studio",
     "imageLabel": "Spiegazione dal vivo",
-    "imageTitle": "Inizia con la tua domanda. STOA spiega il prossimo passo prima che intervenga un insegnante.",
+    "imageTitle": "Inizia con la tua domanda. STOA spiega il prossimo passo e mantiene il supporto dell’insegnante nel contesto.",
     "imagePrompt": "Prova: \"Perché sottrarre 2 da entrambi i lati mantiene l’equazione bilanciata?\""
   },
   "flow": {
     "eyebrow": "Come STOA aiuta gli studenti",
-    "title": "Un unico percorso di studio, non tre strumenti separati.",
+    "title": "Un percorso di studio chiaro.",
     "visualLabel": "Spazio di studio",
-    "visualText": "Lo studente resta in una conversazione mentre l’Assistente all’apprendimento, l’aiuto dell’insegnante e la visibilità dei genitori lavorano attorno a lui.",
+    "visualText": "Lo studente resta in una sola conversazione, con spiegazioni, supporto dell’insegnante e visibilità per i genitori collegati.",
     "steps": [
       { "title": "Fai una domanda", "description": "Gli studenti iniziano direttamente in chat con una domanda o un compito caricato." },
-      { "title": "Ricevi una spiegazione chiara", "description": "L’Assistente all’apprendimento offre subito una prima spiegazione con il contesto visibile." },
+      { "title": "Capisci il prossimo passo", "description": "L’Assistente all’apprendimento offre una prima spiegazione chiara con il contesto visibile." },
       { "title": "Chiedi a un insegnante se serve", "description": "Se la spiegazione non è abbastanza chiara, un insegnante qualificato può intervenire nello stesso filo." },
       { "title": "I genitori seguono i progressi", "description": "I genitori vedono cronologia, report e richieste di aiuto senza interrompere lo studio." }
     ]
   },
   "teacher": {
     "eyebrow": "Supporto di un insegnante qualificato",
-    "visualText": "Gli insegnanti non sono un ingresso separato. Sono il supporto nel momento di studio.",
-    "title": "Quando la spiegazione non basta, la domanda ha già contesto.",
+    "visualText": "Il supporto di un insegnante qualificato resta collegato al momento di studio.",
+    "title": "Quando serve più guida, il contesto è già lì.",
     "body": "Un insegnante vede la conversazione, la domanda dello studente e la spiegazione precedente. Il supporto arriva dove nasce la confusione.",
-    "link": "Percorso di supporto insegnante"
+    "link": "Supporto di un insegnante"
   },
   "parents": {
     "eyebrow": "Visibilità per i genitori",
@@ -43,11 +43,11 @@
     "items": [
       { "title": "Contesto scolastico svizzero", "description": "Pensato per compiti quotidiani, livello scolastico e visibilità familiare." },
       { "title": "Demo pronta oggi", "description": "Account demo fissi, dati ripristinabili, fatturazione simulata, supporto, inviti e panoramica admin." },
-      { "title": "Pronto per il backend futuro", "description": "Il frontend usa contratti API così il backend demo può essere sostituito." }
+      { "title": "Pronto a crescere", "description": "STOA mantiene chiara l’esperienza di studio oggi e lascia spazio ai futuri servizi di produzione." }
     ]
   },
   "cta": {
     "eyebrow": "Inizia con una domanda",
-    "title": "Entra nella piattaforma e fai la tua prima domanda."
+    "title": "Inizia con una domanda chiara."
   }
 }

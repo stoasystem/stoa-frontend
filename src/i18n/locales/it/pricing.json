@@ -1,13 +1,13 @@
 {
   "title": "Prezzi",
   "eyebrow": "Piani per famiglie",
-  "description": "Scegli il livello di supporto ai compiti di cui la tua famiglia ha bisogno, dalla pratica guidata alle spiegazioni con insegnante.",
+  "description": "Scegli il livello di supporto ai compiti di cui la tua famiglia ha bisogno, dalla pratica guidata al supporto di un insegnante qualificato.",
   "badge": "Anteprima checkout sicura",
   "supportLevel": "Scegli il livello di supporto",
-  "supportLevelBody": "Pratica guidata, report per genitori e aiuto insegnante restano nello stesso piano familiare.",
+  "supportLevelBody": "Pratica guidata, report per genitori e supporto di un insegnante qualificato restano nello stesso percorso familiare.",
   "valueTitle": "Il valore per le famiglie",
   "valueBody": "STOA unisce supporto guidato ai compiti, segnali visibili ai genitori e supporto insegnante, così gli studenti avanzano e le famiglie restano informate.",
-  "checkoutBody": "In questa demo il checkout mostra il percorso d’acquisto senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata.",
+  "checkoutBody": "In questa demo il checkout mostra la scelta del piano senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata.",
   "pilotTitle": "Promessa pilota",
   "pilotBody": "Inizia con una prova gratuita, verifica se STOA si adatta alla routine familiare e poi scegli un piano.",
   "pilotDetail": "Ogni piano chiarisce prima del checkout il livello di supporto per studente, genitori e insegnante.",
@@ -23,11 +23,11 @@
     ]
   },
   "faqPaymentTitle": "Il pagamento è già attivo?",
-  "faqPaymentBody": "Il checkout mostra ora il percorso d’acquisto senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata.",
+  "faqPaymentBody": "Il checkout mostra ora la scelta del piano senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata.",
   "faqs": [
     {
       "question": "Il pagamento è già attivo?",
-      "answer": "Il checkout mostra ora il percorso d’acquisto senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata."
+      "answer": "Il checkout mostra ora la scelta del piano senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata."
     },
     {
       "question": "I genitori possono provare prima di pagare?",

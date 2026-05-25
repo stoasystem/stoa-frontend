@@ -1,10 +1,10 @@
 {
-  "dashboardTitle": "Demandes enseignant",
-  "dashboardDescription": "Examinez les questions d’élèves qui nécessitent un accompagnement enseignant.",
+  "dashboardTitle": "Demandes d’accompagnement",
+  "dashboardDescription": "Examinez les questions d’élèves où un accompagnement qualifié peut aider.",
   "loadRequestsFailed": "Impossible de charger les demandes.",
   "availabilityTitle": "Disponibilité enseignant",
   "detailTitle": "Détail de la demande",
-  "markInProgress": "Marquer en cours",
+  "markInProgress": "Commencer l’examen",
   "markResolved": "Marquer résolu",
   "notes": "Notes de l’enseignant"
 }

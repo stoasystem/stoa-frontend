@@ -20,10 +20,10 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 
 ### Hero Copy and Title Structure
 
-- [ ] **HERO-01**: User sees the English homepage hero title `Learn with clarity.` with a natural English subtitle and CTA copy.
-- [ ] **HERO-02**: User sees the German homepage hero as stacked short title lines `Lernen.`, `Fragen.`, `Verstehen.` with explanatory subtitle copy instead of one long translated sentence.
-- [ ] **HERO-03**: User sees the French homepage hero title `Comprendre avec confiance.` with natural French subtitle and CTA copy.
-- [ ] **HERO-04**: User sees the Italian homepage hero title `Studiare con più chiarezza.` with natural Italian subtitle and CTA copy.
+- [x] **HERO-01**: User sees the English homepage hero title `Learn with clarity.` with a natural English subtitle and CTA copy.
+- [x] **HERO-02**: User sees the German homepage hero as stacked short title lines `Lernen.`, `Fragen.`, `Verstehen.` with explanatory subtitle copy instead of one long translated sentence.
+- [x] **HERO-03**: User sees the French homepage hero title `Comprendre avec confiance.` with natural French subtitle and CTA copy.
+- [x] **HERO-04**: User sees the Italian homepage hero title `Studiare con più chiarezza.` with natural Italian subtitle and CTA copy.
 - [x] **HERO-05**: `HomeHero` supports optional localized `titleLines` while preserving a safe `title` fallback for locales that use a single title string.
 - [ ] **HERO-06**: German hero title rendering no longer breaks visual rhythm at mobile, tablet, desktop, or wide desktop widths.
 
@@ -38,23 +38,23 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 
 ### P0 Product Copy Rewrite
 
-- [ ] **P0COPY-01**: Homepage section titles, body copy, learning-flow copy, teacher-support copy, and CTA copy read naturally in English, German, French, and Italian.
-- [ ] **P0COPY-02**: Register and onboarding role-selection, student, parent, and tutor copy read naturally in English, German, French, and Italian.
-- [ ] **P0COPY-03**: Chat empty states, input placeholders, Learning Assistant states, teacher request action, loading text, and errors read naturally in English, German, French, and Italian.
-- [ ] **P0COPY-04**: Parent dashboard and parent report copy remains calm, supportive, and non-alarmist in English, German, French, and Italian.
-- [ ] **P0COPY-05**: Tutor workflow copy remains professional and does not imply teachers are replaced or used as backup in English, German, French, and Italian.
-- [ ] **P0COPY-06**: Pricing and billing copy uses education-value language and avoids aggressive sales phrasing in English, German, French, and Italian.
-- [ ] **P0COPY-07**: Support, feedback, error, toast, empty, and loading messages are concise and localized without technical or machine-translated tone.
-- [ ] **P0COPY-08**: Data-driven pricing, billing, plan, and demo copy that appears in P0 UI is localized or mapped from stable IDs instead of leaking English mock text.
+- [x] **P0COPY-01**: Homepage section titles, body copy, learning-flow copy, teacher-support copy, and CTA copy read naturally in English, German, French, and Italian.
+- [x] **P0COPY-02**: Register and onboarding role-selection, student, parent, and tutor copy read naturally in English, German, French, and Italian.
+- [x] **P0COPY-03**: Chat empty states, input placeholders, Learning Assistant states, teacher request action, loading text, and errors read naturally in English, German, French, and Italian.
+- [x] **P0COPY-04**: Parent dashboard and parent report copy remains calm, supportive, and non-alarmist in English, German, French, and Italian.
+- [x] **P0COPY-05**: Tutor workflow copy remains professional and does not imply teachers are replaced or used as backup in English, German, French, and Italian.
+- [x] **P0COPY-06**: Pricing and billing copy uses education-value language and avoids aggressive sales phrasing in English, German, French, and Italian.
+- [x] **P0COPY-07**: Support, feedback, error, toast, empty, and loading messages are concise and localized without technical or machine-translated tone.
+- [x] **P0COPY-08**: Data-driven pricing, billing, plan, and demo copy that appears in P0 UI is localized or mapped from stable IDs instead of leaking English mock text.
 
 ### Terminology Cleanup
 
-- [ ] **TERM17-01**: User-visible P0 copy avoids `AI`, `Artificial Intelligence`, `AI Support`, `AI answer`, `AI response`, `AI tutor`, `Chatbot`, and `Bot` unless explicitly documented as technical/internal copy.
-- [ ] **TERM17-02**: User-visible P0 copy avoids `Human backup` and `Teacher backup`.
-- [ ] **TERM17-03**: User-visible P0 pricing and marketing copy avoids `What we are selling`, `Buy now`, and equivalent aggressive sales phrasing.
-- [ ] **TERM17-04**: Parent/family-facing user-visible copy uses `families`, `parents`, or role-appropriate language instead of unnatural `customers` wording.
-- [ ] **TERM17-05**: User-visible teacher escalation terminology consistently uses `Professional teacher support` or approved locale-specific equivalents.
-- [ ] **TERM17-06**: Terminology cleanup preserves internal identifiers where changing them would create unnecessary code churn, while removing banned terms from rendered user copy.
+- [x] **TERM17-01**: User-visible P0 copy avoids `AI`, `Artificial Intelligence`, `AI Support`, `AI answer`, `AI response`, `AI tutor`, `Chatbot`, and `Bot` unless explicitly documented as technical/internal copy.
+- [x] **TERM17-02**: User-visible P0 copy avoids `Human backup` and `Teacher backup`.
+- [x] **TERM17-03**: User-visible P0 pricing and marketing copy avoids `What we are selling`, `Buy now`, and equivalent aggressive sales phrasing.
+- [x] **TERM17-04**: Parent/family-facing user-visible copy uses `families`, `parents`, or role-appropriate language instead of unnatural `customers` wording.
+- [x] **TERM17-05**: User-visible teacher escalation terminology consistently uses `Professional teacher support` or approved locale-specific equivalents.
+- [x] **TERM17-06**: Terminology cleanup preserves internal identifiers where changing them would create unnecessary code churn, while removing banned terms from rendered user copy.
 
 ### Copy and Visual QA
 
@@ -129,10 +129,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LCOPY-05 | Phase 98 | Complete |
 | LCOPY-06 | Phase 98 | Complete |
 | LCOPY-07 | Phase 98 | Complete |
-| HERO-01 | Phase 100 | Pending |
-| HERO-02 | Phase 100 | Pending |
-| HERO-03 | Phase 100 | Pending |
-| HERO-04 | Phase 100 | Pending |
+| HERO-01 | Phase 100 | Complete |
+| HERO-02 | Phase 100 | Complete |
+| HERO-03 | Phase 100 | Complete |
+| HERO-04 | Phase 100 | Complete |
 | HERO-05 | Phase 99 | Complete |
 | HERO-06 | Phase 101 | Pending |
 | LAYOUT-01 | Phase 99 | Complete |
@@ -141,20 +141,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LAYOUT-04 | Phase 99 | Complete |
 | LAYOUT-05 | Phase 101 | Pending |
 | LAYOUT-06 | Phase 101 | Pending |
-| P0COPY-01 | Phase 100 | Pending |
-| P0COPY-02 | Phase 100 | Pending |
-| P0COPY-03 | Phase 100 | Pending |
-| P0COPY-04 | Phase 100 | Pending |
-| P0COPY-05 | Phase 100 | Pending |
-| P0COPY-06 | Phase 100 | Pending |
-| P0COPY-07 | Phase 100 | Pending |
-| P0COPY-08 | Phase 100 | Pending |
-| TERM17-01 | Phase 100 | Pending |
-| TERM17-02 | Phase 100 | Pending |
-| TERM17-03 | Phase 100 | Pending |
-| TERM17-04 | Phase 100 | Pending |
-| TERM17-05 | Phase 100 | Pending |
-| TERM17-06 | Phase 100 | Pending |
+| P0COPY-01 | Phase 100 | Complete |
+| P0COPY-02 | Phase 100 | Complete |
+| P0COPY-03 | Phase 100 | Complete |
+| P0COPY-04 | Phase 100 | Complete |
+| P0COPY-05 | Phase 100 | Complete |
+| P0COPY-06 | Phase 100 | Complete |
+| P0COPY-07 | Phase 100 | Complete |
+| P0COPY-08 | Phase 100 | Complete |
+| TERM17-01 | Phase 100 | Complete |
+| TERM17-02 | Phase 100 | Complete |
+| TERM17-03 | Phase 100 | Complete |
+| TERM17-04 | Phase 100 | Complete |
+| TERM17-05 | Phase 100 | Complete |
+| TERM17-06 | Phase 100 | Complete |
 | QA17-01 | Phase 102 | Pending |
 | QA17-02 | Phase 102 | Pending |
 | QA17-03 | Phase 102 | Pending |
@@ -173,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 99 completion*
+*Last updated: 2026-05-25 after Phase 100 completion*

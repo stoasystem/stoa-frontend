@@ -1,4 +1,4 @@
-import { Bot } from 'lucide-react'
+import { Lightbulb } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -43,7 +43,7 @@ export function ChatMessageList({
         {isAssistantThinking && (
           <div className="flex justify-start">
             <div className="flex max-w-[80%] items-center gap-2 rounded-lg border bg-card px-4 py-3 text-sm text-muted-foreground shadow-sm">
-              <Bot className="h-4 w-4" />
+              <Lightbulb className="h-4 w-4" />
               <span>{t('preparing')}</span>
             </div>
           </div>

@@ -1,7 +1,7 @@
-import { Bot, GraduationCap, MessageSquareText, Users } from 'lucide-react'
+import { GraduationCap, Lightbulb, MessageSquareText, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
-const stepIcons = [MessageSquareText, Bot, GraduationCap, Users]
+const stepIcons = [MessageSquareText, Lightbulb, GraduationCap, Users]
 
 export function HomeLearningFlow() {
   const { t } = useTranslation('home')

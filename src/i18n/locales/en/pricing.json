@@ -1,13 +1,13 @@
 {
   "title": "Pricing",
   "eyebrow": "Plans for families",
-  "description": "Choose the level of homework support your family needs, from guided practice to teacher-supported explanations.",
+  "description": "Choose the level of homework support your family needs, from guided practice to professional teacher support.",
   "badge": "Safe checkout preview",
   "supportLevel": "Choose support level",
-  "supportLevelBody": "Guided practice, parent reports, and teacher help sit in one family plan conversation.",
+  "supportLevelBody": "Guided practice, parent reports, and professional teacher support stay connected in one family learning path.",
   "valueTitle": "The value for families",
   "valueBody": "STOA combines guided homework support, parent-visible learning signals, and teacher support escalation so students can get unstuck while families stay informed.",
-  "checkoutBody": "During this demo, checkout shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page.",
+  "checkoutBody": "During this demo, checkout shows the plan choice flow without charging a card. Live payment collection will use a secure hosted payment page.",
   "pilotTitle": "Pilot promise",
   "pilotBody": "Start with a free trial, see whether STOA fits your family routine, then choose a plan when ready.",
   "pilotDetail": "Each plan makes the student, parent, and teacher support level clear before checkout.",
@@ -19,15 +19,15 @@
       ["Homework upload", "Limited", "Included", "Included", "Included"],
       ["Parent dashboard", "Preview", "—", "Included", "Included"],
       ["Weekly reports", "Preview", "—", "Included", "Included"],
-      ["Teacher help", "Limited", "—", "—", "Teacher sessions included"]
+      ["Teacher support", "Limited", "—", "—", "Teacher sessions included"]
     ]
   },
   "faqPaymentTitle": "Is payment live now?",
-  "faqPaymentBody": "Checkout currently shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page.",
+  "faqPaymentBody": "Checkout currently shows the plan choice flow without charging a card. Live payment collection will use a secure hosted payment page.",
   "faqs": [
     {
       "question": "Is payment live now?",
-      "answer": "Checkout currently shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page."
+      "answer": "Checkout currently shows the plan choice flow without charging a card. Live payment collection will use a secure hosted payment page."
     },
     {
       "question": "Can parents test before paying?",

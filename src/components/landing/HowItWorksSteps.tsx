@@ -1,9 +1,9 @@
-import { Bot, FileUp, GraduationCap, MessageCircle, Newspaper } from 'lucide-react'
+import { FileUp, GraduationCap, Lightbulb, MessageCircle, Newspaper } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const steps = [
   { title: 'Student asks', description: 'The learner starts with a question or homework photo.', Icon: MessageCircle },
-  { title: 'Learning Assistant explains', description: 'STOA gives a step-by-step learning answer.', Icon: Bot },
+  { title: 'Learning Assistant explains', description: 'STOA gives a step-by-step explanation.', Icon: Lightbulb },
   { title: 'Upload if needed', description: 'Files keep visual homework questions in context.', Icon: FileUp },
   { title: 'Teacher helps', description: 'Professional teacher support is available when the explanation is not enough.', Icon: GraduationCap },
   { title: 'Parent sees progress', description: 'Reports translate activity into clear learning signals.', Icon: Newspaper },

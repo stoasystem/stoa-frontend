@@ -1,5 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { ShieldCheck } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { pricingPlans } from '@/components/pricing/pricingPlans'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -11,10 +12,12 @@ import { enableMockCheckout } from '@/lib/env'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function VirtualCheckoutPage() {
+  const { t } = useTranslation('billing')
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
   const plan = pricingPlans.find((item) => item.id === searchParams.get('plan')) ?? pricingPlans[2]
   const price = plan.priceMonthly === 0 ? `${plan.currency} 0` : `${plan.currency} ${plan.priceMonthly}/mo`
+  const planName = t(`plans.${plan.id}.name`, { defaultValue: plan.name })
 
   if (!enableMockCheckout) {
     return (
@@ -52,15 +55,15 @@ export function VirtualCheckoutPage() {
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-1 h-5 w-5 text-primary" />
               <div>
-                <CardTitle>{plan.name}</CardTitle>
+                <CardTitle>{planName}</CardTitle>
                 <p className="mt-1 text-sm text-muted-foreground">{price}</p>
               </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              This is a virtual checkout for frontend demos and E2E tests. Do not enter real card
-              numbers. Production payment must redirect to a backend-created hosted checkout URL.
+              This is a demo checkout for reviewing the plan journey. Do not enter real card
+              numbers. Live payment collection will use a secure hosted checkout.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button

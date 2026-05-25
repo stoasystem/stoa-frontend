@@ -1,18 +1,18 @@
 {
   "dashboardTitle": "Elternbereich",
-  "dashboardDescription": "Verfolgen Sie Lernrhythmus, aktuelle Fragen, Berichte und Lehrpersonen-Unterstützung.",
+  "dashboardDescription": "Verfolgen Sie Lernrhythmus, aktuelle Fragen, Berichte und Momente mit Lehrpersonen-Unterstützung.",
   "loadChildrenFailed": "Kinder konnten nicht geladen werden.",
   "noChildren": "Mit diesem Elternkonto sind keine Kinder verknüpft.",
   "child": "Kind",
   "weeklyReport": "Wochenbericht",
   "monthlyReport": "Monatsbericht",
   "childSummary": "Kindübersicht",
-  "reportDescription": "Für Eltern sichtbarer Fortschritt, Themenrisiken und nächste Schritte für das ausgewählte Kind.",
+  "reportDescription": "Ein ruhiger Blick auf Fortschritt, Themen zum Weiterüben und hilfreiche nächste Schritte für das ausgewählte Kind.",
   "loadReportFailed": "Bericht konnte nicht geladen werden.",
   "reportTitle": "Bericht zum Kind",
   "historyTitle": "Lernverlauf des Kindes",
   "growth": "Lernfortschritt",
   "recentQuestions": "Aktuelle Fragen",
-  "teacherRecords": "Unterstützung durch Lehrpersonen",
+  "teacherRecords": "Momente mit Lehrpersonen-Unterstützung",
   "nextAction": "Empfohlener nächster Schritt"
 }

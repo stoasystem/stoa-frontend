@@ -1,7 +1,7 @@
 {
   "title": "Espace d’apprentissage",
   "emptyTitle": "Pose ta première question sur tes devoirs.",
-  "emptyDescription": "L’Assistant d’apprentissage prépare une explication claire. Si tu as besoin de plus d’aide, demande à un enseignant dans la même conversation.",
+  "emptyDescription": "L’Assistant d’apprentissage prépare une explication claire. Si tu as besoin de plus d’accompagnement, demande à un enseignant dans la même conversation.",
   "welcome": "Bienvenue sur STOA. Pose ta première question sur tes devoirs ci-dessous.",
   "placeholder": "Écris ici ta question sur tes devoirs...",
   "preparing": "L’Assistant d’apprentissage prépare une explication...",
@@ -10,19 +10,19 @@
   "createFailed": "Impossible de créer la conversation.",
   "starting": "Démarrage...",
   "startConversation": "Démarrer la conversation",
-  "quotaReached": "Quota de messages d’apprentissage atteint.",
-  "fileQuotaReached": "Quota de téléversement atteint.",
+  "quotaReached": "Les messages d’apprentissage de cette formule ont été utilisés.",
+  "fileQuotaReached": "Les téléversements de cette formule ont été utilisés.",
   "emptyMessage": "Le message ne peut pas être vide.",
   "upload": "Téléverser un devoir",
   "uploadFailed": "Échec du téléversement.",
   "retry": "Réessayer",
   "newConversation": "Nouvelle conversation",
   "teacher": {
-    "title": "Souhaitez-vous qu’un enseignant l’explique ?",
-    "description": "Envoyez cette conversation à un enseignant qualifié pour une explication plus claire.",
+    "title": "Un enseignant peut-il aider à clarifier ?",
+    "description": "Envoyez cette conversation à un enseignant qualifié pour un accompagnement plus clair.",
     "cta": "Demander à un enseignant",
     "submitted": "Votre demande a été envoyée à un enseignant.",
-    "failed": "Échec de la demande enseignant."
+    "failed": "La demande à l’enseignant n’a pas pu être envoyée."
   },
   "status": {
     "pending": "En attente d’un enseignant",

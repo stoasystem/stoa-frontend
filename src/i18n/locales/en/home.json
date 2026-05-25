@@ -1,33 +1,33 @@
 {
   "hero": {
-    "eyebrow": "Learning Assistant first, teacher when needed",
-    "title": "Learning support when students need it most.",
-    "subtitle": "Students ask questions, receive clear explanations, and can request a real teacher when they need more help.",
-    "secondaryCta": "See how STOA works",
-    "bullets": ["Ask in seconds", "Clear explanation first", "Teacher help inside chat"],
+    "eyebrow": "Learning Assistant first, teacher support when needed",
+    "title": "Learn with clarity.",
+    "subtitle": "STOA helps students ask questions, receive clear explanations, and get professional teacher support when they need more guidance.",
+    "secondaryCta": "How it works",
+    "bullets": ["Ask in seconds", "Understand the next step", "Teacher support when needed"],
     "imageBadge": "Study room",
     "imageLabel": "Live explanation",
-    "imageTitle": "Start with your question. STOA explains the next step before a teacher joins.",
+    "imageTitle": "Start with your question. STOA explains the next step and keeps teacher support in context.",
     "imagePrompt": "Try: \"Why does subtracting 2 from both sides keep the equation balanced?\""
   },
   "flow": {
     "eyebrow": "How STOA helps students",
-    "title": "One learning path, not three disconnected tools.",
+    "title": "One clear learning path.",
     "visualLabel": "Learning room",
-    "visualText": "The student stays in one conversation while the Learning Assistant, teacher help, and parent visibility work around it.",
+    "visualText": "The student stays in one conversation while explanations, teacher support, and parent visibility stay connected.",
     "steps": [
       { "title": "Ask a question", "description": "Students begin directly in chat with a homework question or uploaded assignment." },
-      { "title": "Get a clear explanation", "description": "The Learning Assistant gives a first explanation immediately, with the work still visible in context." },
+      { "title": "Understand the next step", "description": "The Learning Assistant gives a clear first explanation with the work still visible in context." },
       { "title": "Ask a teacher if needed", "description": "When the answer is not clear enough, a qualified teacher can step into the same thread." },
       { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-help records without interrupting study." }
     ]
   },
   "teacher": {
     "eyebrow": "Professional teacher support",
-    "visualText": "Teachers are not a separate doorway. They are the support layer inside the learning moment.",
-    "title": "When the explanation is not enough, the question already has context.",
-    "body": "A teacher sees the conversation, the student question, and the previous explanation. The support happens where confusion appears, so the student does not have to restart.",
-    "link": "Teacher support pathway"
+    "visualText": "Professional teacher support stays connected to the learning moment.",
+    "title": "When more guidance is needed, the context is already there.",
+    "body": "A teacher sees the conversation, the student question, and the previous explanation. Support happens where confusion appears, so the student does not have to restart.",
+    "link": "Professional teacher support"
   },
   "parents": {
     "eyebrow": "Parent visibility",
@@ -43,11 +43,11 @@
     "items": [
       { "title": "Swiss school context", "description": "Designed around everyday homework questions, grade context, and family visibility." },
       { "title": "Demo-ready today", "description": "Fixed demo accounts, resettable data, billing mock, support, referrals, and admin overview are available." },
-      { "title": "Backend-ready later", "description": "Frontend depends on API contracts so the demo backend can be replaced by the real backend." }
+      { "title": "Ready to grow", "description": "STOA keeps the learning experience clear today while leaving room for future production services." }
     ]
   },
   "cta": {
     "eyebrow": "Start with one question",
-    "title": "Enter the learning platform and ask your first question."
+    "title": "Start learning with one clear question."
   }
 }
