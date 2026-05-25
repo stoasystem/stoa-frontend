@@ -20,8 +20,33 @@
 - ✅ **v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement** - Phases 92-97 (implemented 2026-05-25)
 - ✅ **v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement** - Phases 98-102 (implemented 2026-05-25)
 - ✅ **v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal** - Phases 103-107 (implemented 2026-05-26)
+- 🚧 **v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation** - Phases 108-112 (planning)
 
 ## Phases
+
+<details open>
+<summary>🚧 v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Phases 108-112) — PLANNING</summary>
+
+Phase 19 aligns the STOA learning platform visually with the company homepage design language without modifying `/Users/zhdeng/newweb`, copying its source files, or turning the app into a homepage clone. The target relationship is same brand family, different product surface.
+
+- [ ] Phase 108: Main Website Read-Only Audit and Design Translation (0/1 plan)
+  - Requirements: SAFE19-01 through SAFE19-06, TRANS19-01 through TRANS19-06
+  - Deliverables: `docs/design/main-website-readonly-audit.md`, `docs/design/main-website-design-translation.md`
+  - Notes: record `/Users/zhdeng/newweb` pre/post `git status`, including the pre-existing `img/team/.DS_Store` modification if still present.
+- [ ] Phase 109: Learning Platform Brand Tokens and Theme Layer (0/1 plan)
+  - Requirements: TOKEN19-01 through TOKEN19-07
+  - Deliverables: `docs/design/learning-platform-token-adjustment.md`, `src/styles/brand-tokens.css`, `src/styles/platform-theme.css` or equivalent integration with existing theme files.
+- [ ] Phase 110: Shared Component Visual Refinement (0/1 plan)
+  - Requirements: COMP19-01 through COMP19-06
+  - Deliverables: refined button, card, badge, form, navigation, header, chat, pricing, billing, and report component styling using translated tokens.
+- [ ] Phase 111: Public and Auth Surface Alignment (0/1 plan)
+  - Requirements: PAGE19-01 through PAGE19-02
+  - Deliverables: brand-aligned homepage, login, register, and onboarding visuals without new product functionality.
+- [ ] Phase 112: App Page Alignment, Visual QA, README, and Handoff (0/1 plan)
+  - Requirements: PAGE19-03 through PAGE19-09, QA19-01 through QA19-10
+  - Deliverables: chat, student dashboard, parent dashboard/report, pricing, billing, tutor/support/admin token consistency, visual compatibility QA, README update, build/dev status, and final `/Users/zhdeng/newweb` read-only confirmation.
+
+</details>
 
 <details>
 <summary>✅ v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Phases 103-107) — SHIPPED 2026-05-26</summary>
@@ -67,12 +92,12 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Start with Phase 103. Phase 103 must complete the source inventory and cleanup scope before implementation phases gate or rewrite UI.
+Start with Phase 108. Phase 108 must complete the read-only source audit and design translation before any learning-platform visual edits are planned or implemented.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 103. Production-Facing Audit and Source Inventory | v1.17 | 1/1 | Complete | 2026-05-26 |
-| 104. Environment Guards and Demo UI Isolation | v1.17 | 1/1 | Complete | 2026-05-26 |
-| 105. Production Copy Cleanup and Display Label Mapping | v1.17 | 1/1 | Complete | 2026-05-26 |
-| 106. State Hardening and Duplicate-Submit Controls | v1.17 | 1/1 | Complete | 2026-05-26 |
-| 107. Production-Facing QA, README, and Handoff | v1.17 | 1/1 | Complete | 2026-05-26 |
+| 108. Main Website Read-Only Audit and Design Translation | v1.18 | 0/1 | Not Started | — |
+| 109. Learning Platform Brand Tokens and Theme Layer | v1.18 | 0/1 | Not Started | — |
+| 110. Shared Component Visual Refinement | v1.18 | 0/1 | Not Started | — |
+| 111. Public and Auth Surface Alignment | v1.18 | 0/1 | Not Started | — |
+| 112. App Page Alignment, Visual QA, README, and Handoff | v1.18 | 0/1 | Not Started | — |

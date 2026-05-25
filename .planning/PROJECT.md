@@ -8,7 +8,7 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, and a clean path to future real backend integration.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, and a clean path to future real backend integration.
 
 ## Latest Shipped Milestone: v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
 
@@ -93,7 +93,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 19 should improve accessibility, keyboard navigation, screen reader behavior, color contrast, cross-browser QA, visual regression, mobile device QA, performance sanity, and final release quality gates without expanding product scope.
+- Phase 19 should align the STOA learning platform visually with the company homepage design language while keeping `/Users/zhdeng/newweb` strictly read-only, avoiding direct copying, preserving product-app usability, and not expanding product scope.
 
 ### Out of Scope
 
@@ -117,6 +117,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - New large business modules, new formal backend, complex database work, new AI features, new payment features, new admin backend, production infrastructure, full visual redesign, and large-scale component-library rewrites — outside Phase 13 information architecture and UX optimization scope.
 - Formal production backend development, complex database schema/migrations, production authentication, refresh-token architecture, real payment webhooks, real subscription enforcement, real AI provider orchestration, AWS deployment, production admin backend, and production analytics storage — outside Phase 14 demo backend stabilization scope.
 - New business modules, new languages, formal backend implementation, real payment collection, real teacher verification, AWS deployment, major visual redesign, and large architecture rewrites — outside Phase 18 production-facing cleanup scope.
+- Modifying `/Users/zhdeng/newweb`, copying homepage source files/assets/components, adding product features, changing backend/payment behavior, adding dependencies, or making the learning platform a direct homepage clone — outside Phase 19 brand-aligned visual refinement scope.
 
 ## Context
 
@@ -125,6 +126,8 @@ The project brief for Phase 17 was provided in Chinese and defines locale-specif
 The immediate visible issue is the German homepage hero title `STOA Lernunterstützung genau dann, wenn Schüler sie brauchen.`, which is too long for large serif hero typography and should become short title copy plus explanatory subtitle. The preferred four-language hero direction is: English `Learn with clarity.`, German `Lernen. Fragen. Verstehen.`, French `Comprendre avec confiance.`, and Italian `Studiare con più chiarezza.`.
 
 The project brief for Phase 18 was provided in Chinese and defines production-facing cleanup, stability hardening, and demo artifact removal. Phase 18 explicitly does not add product scope. It removes user-visible `demo`, `mock`, `test`, `Codex`, `development`, `sample`, `placeholder`, and internal-rule wording from existing UI, improves loading/error/empty/success states, hides demo-only UI behind environment flags, and keeps demo/backend internals available only to developers.
+
+The project brief for Phase 19 was provided in Chinese and defines brand-aligned visual refinement based on the company homepage source at `/Users/zhdeng/newweb`. That source project is read-only for this milestone. Phase 19 should extract design signals such as burgundy/charcoal/warm-grey color, editorial Prata display typography, Inter UI text, restrained square button treatment, generous public-page spacing, and education photography tone, then translate those signals into a learning-platform design system that feels related but remains independent and app-like.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
