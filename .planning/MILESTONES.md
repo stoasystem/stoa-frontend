@@ -1,5 +1,32 @@
 # Milestones
 
+## v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch (Implemented: 2026-05-25)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/v1.8-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Production readiness documentation with production frontend/backend URL guidance, production environment variables, SQLite-to-production database boundary, and pilot API contract freeze.
+- Frontend error monitoring service, Error Boundary reporting, production-safe logger, and monitoring/logging operations docs.
+- Analytics backend delivery through `POST /analytics/events` with privacy-safe payload filtering and pilot analytics documentation.
+- Pilot onboarding and support routes, role-specific onboarding guidance, support request service/hook, and support workflow documentation.
+- Basic admin operations routes for dashboard, usage, and feedback, with admin service/query boundaries.
+- Privacy and terms pilot drafts, data privacy review, backup/restore strategy, pricing placeholder, billing placeholder, and subscription type placeholders.
+- Launch checklist, pilot launch plan, post-pilot feedback report template, and README Phase 9 documentation.
+
+### Verification
+
+- Requirements: 49/49 implemented.
+- Phases: 7/7 implemented.
+- Build: passed.
+- Lint: passed.
+- Python syntax check: passed.
+- Local SQLite demo reset: passed.
+- Playwright E2E: passed, 4/4 smoke tests.
+
+---
+
 ## v1.7 Phase 8 Staging Deployment, QA, and Early User Testing (Implemented: 2026-05-25)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

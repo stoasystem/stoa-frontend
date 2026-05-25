@@ -1,4 +1,6 @@
 import { enableAnalytics, isDevelopment } from '@/lib/env'
+import { DEFAULT_API_BASE_URL } from '@/lib/constants'
+import { TOKEN_KEY } from '@/store/authStore'
 
 export type AnalyticsEventName =
   | 'user_login'
@@ -17,29 +19,105 @@ export type AnalyticsEventName =
   | 'tutor_request_opened'
   | 'tutor_request_status_updated'
   | 'tutor_note_added'
+  | 'feedback_submitted'
 
-export type AnalyticsPayload = Record<string, string | number | boolean | null | undefined>
+export type AnalyticsPayload = Record<string, unknown>
+
+type SanitizedAnalyticsPayload = Record<string, string | number | boolean | null>
+
+const ANALYTICS_ENDPOINT = '/analytics/events'
+const SESSION_ID_KEY = 'stoa_analytics_session_id'
+const BLOCKED_PAYLOAD_KEYS = new Set([
+  'attachment',
+  'attachments',
+  'body',
+  'content',
+  'file',
+  'filecontent',
+  'filename',
+  'message',
+  'messages',
+  'note',
+  'prompt',
+  'response',
+  'text',
+  'transcript',
+])
+const MAX_STRING_LENGTH = 120
+
+function getApiBaseUrl() {
+  return import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
+}
+
+function getSessionId() {
+  try {
+    const existingSessionId = sessionStorage.getItem(SESSION_ID_KEY)
+
+    if (existingSessionId) return existingSessionId
+
+    const nextSessionId = crypto.randomUUID()
+    sessionStorage.setItem(SESSION_ID_KEY, nextSessionId)
+    return nextSessionId
+  } catch {
+    return undefined
+  }
+}
+
+function getAccessToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch {
+    return null
+  }
+}
+
+function sanitizeValue(value: unknown): string | number | boolean | null | undefined {
+  if (value === undefined) return undefined
+  if (value === null) return null
+  if (typeof value === 'boolean' || typeof value === 'number') return value
+  if (typeof value === 'string') return value.slice(0, MAX_STRING_LENGTH)
+  if (Array.isArray(value)) return value.length
+
+  return undefined
+}
+
+export function sanitizeAnalyticsPayload(payload: AnalyticsPayload = {}) {
+  return Object.entries(payload).reduce<SanitizedAnalyticsPayload>((result, [key, value]) => {
+    if (BLOCKED_PAYLOAD_KEYS.has(key.toLowerCase())) return result
+
+    const sanitizedValue = sanitizeValue(value)
+    if (sanitizedValue !== undefined) {
+      result[key] = sanitizedValue
+    }
+
+    return result
+  }, {})
+}
 
 export function trackEvent(name: AnalyticsEventName, payload: AnalyticsPayload = {}) {
+  const sanitizedPayload = sanitizeAnalyticsPayload(payload)
+
   if (isDevelopment) {
-    console.info('[analytics]', name, payload)
+    console.info('[analytics]', name, sanitizedPayload)
   }
 
   if (!enableAnalytics) return
 
+  const token = getAccessToken()
   const body = {
     name,
-    payload,
+    payload: sanitizedPayload,
+    path: window.location.pathname,
+    sessionId: getSessionId(),
     createdAt: new Date().toISOString(),
   }
 
-  void fetch(`${import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'}/analytics/events`, {
+  void fetch(`${getApiBaseUrl()}${ANALYTICS_ENDPOINT}`, {
     method: 'POST',
+    keepalive: true,
     headers: {
       'Content-Type': 'application/json',
-      ...(localStorage.getItem('stoa_access_token')
-        ? { Authorization: `Bearer ${localStorage.getItem('stoa_access_token')}` }
-        : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify(body),
   }).catch(() => {

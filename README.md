@@ -463,6 +463,69 @@ Phase 8 documents:
 - `docs/performance/performance-baseline.md`
 - `docs/deployment/production-readiness-plan.md`
 
+## Phase 9 Production Readiness and Pilot Launch
+
+This phase prepares STOA for a small-scale real pilot launch.
+
+Main additions:
+
+- Production deployment plan
+- Production environment variables
+- SQLite-to-production database boundary
+- Pilot API contract freeze
+- Error monitoring
+- Logging strategy
+- Real analytics backend delivery
+- Pilot onboarding flow
+- Support workflow
+- Basic admin operations
+- Privacy review
+- Backup and restore strategy
+- Pricing placeholder
+- Billing placeholder
+- Pilot launch checklist
+
+Production environment example:
+
+```bash
+VITE_API_BASE_URL=https://api.stoa.example
+VITE_APP_ENV=production
+VITE_ENABLE_DEMO_SHORTCUTS=false
+VITE_ENABLE_ANALYTICS=true
+VITE_ENABLE_FEEDBACK=true
+VITE_ENABLE_ERROR_MONITORING=true
+```
+
+Pilot launch goal:
+
+- 5-10 students
+- 3-5 parents
+- 1-3 tutors
+- 1-2 weeks of controlled testing
+
+Before pilot launch:
+
+- CI must pass
+- E2E tests must pass or be scheduled as a launch gate
+- Manual QA must be completed
+- Error monitoring must be active
+- Feedback or support collection must be active
+- Privacy and terms pages must be accessible
+- Backup and restore ownership must be confirmed with the backend team
+
+Phase 9 documents:
+
+- `docs/production/production-readiness.md`
+- `docs/production/launch-checklist.md`
+- `docs/operations/error-monitoring.md`
+- `docs/operations/logging.md`
+- `docs/operations/analytics.md`
+- `docs/operations/support-workflow.md`
+- `docs/operations/backup-restore.md`
+- `docs/privacy/privacy-review.md`
+- `docs/pilot/pilot-launch-plan.md`
+- `docs/pilot/pilot-feedback-report-template.md`
+
 ## Environment Variables
 
 Create a local environment file:
@@ -482,20 +545,26 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/` Home
 - `/login` Login
 - `/register` Register
-- `/privacy` Privacy notice placeholder
-- `/terms` Terms placeholder
+- `/privacy` Privacy pilot draft
+- `/terms` Terms pilot draft
+- `/pricing` Pricing placeholder
+- `/onboarding` Pilot onboarding
+- `/support` Pilot support
 - `/dashboard` Student dashboard
 - `/chat` Student chat product UI
 - `/profile` Student profile
 - `/learning-history` Student learning history
+- `/billing` Billing placeholder
 - `/parent` Parent dashboard
 - `/parent/children/:childId` Child learning summary
 - `/parent/children/:childId/report` Child weekly report
 - `/parent/children/:childId/history` Child learning history
 - `/tutor` Tutor dashboard
 - `/tutor/requests/:requestId` Tutor help-request detail
-- `/admin` Admin placeholder
+- `/admin` Admin dashboard
+- `/admin/usage` Admin usage summary
+- `/admin/feedback` Admin feedback list
 
 ## Project Status
 
-Phase 8: staging deployment readiness, CI, QA, E2E smoke testing, feedback collection, bug workflow, performance/security docs, legal placeholders, and production-readiness planning.
+Phase 9: production readiness, monitoring, analytics delivery, onboarding, support, admin operations, privacy review, backup/restore planning, pricing/billing placeholders, and controlled pilot launch preparation.

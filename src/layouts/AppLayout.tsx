@@ -12,16 +12,26 @@ const roleNavigation = {
     { label: 'Chat', to: '/chat' },
     { label: 'Learning History', to: '/learning-history' },
     { label: 'Profile', to: '/profile' },
+    { label: 'Onboarding', to: '/onboarding' },
+    { label: 'Support', to: '/support' },
   ],
   parent: [
     { label: 'Parent Dashboard', to: '/parent' },
     { label: 'Children', to: '/parent' },
+    { label: 'Onboarding', to: '/onboarding' },
+    { label: 'Support', to: '/support' },
   ],
   tutor: [
     { label: 'Tutor Dashboard', to: '/tutor' },
     { label: 'Help Requests', to: '/tutor' },
+    { label: 'Onboarding', to: '/onboarding' },
+    { label: 'Support', to: '/support' },
   ],
-  admin: [{ label: 'Admin Dashboard', to: '/admin' }],
+  admin: [
+    { label: 'Admin Dashboard', to: '/admin' },
+    { label: 'Onboarding', to: '/onboarding' },
+    { label: 'Support', to: '/support' },
+  ],
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
