@@ -28,7 +28,7 @@
 **Milestone Goal:** Refine STOA's English, German, French, and Italian product copy and responsive layouts so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
 
 - [x] **Phase 98: Copy Governance and Scope Lock** - Establish locale-specific copy rules, glossary guidance, QA checklist expectations, and Phase 17 scope boundaries.
-- [ ] **Phase 99: Title and Layout Infrastructure** - Add safe locale-aware title structures and typed layout hints for long localized UI copy.
+- [x] **Phase 99: Title and Layout Infrastructure** - Add safe locale-aware title structures and typed layout hints for long localized UI copy.
 - [ ] **Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup** - Rewrite homepage, onboarding, chat, parent, tutor, pricing, billing, support, and shared-state copy in EN/DE/FR/IT.
 - [ ] **Phase 101: Responsive Typography and Multilingual Fit Pass** - Verify and tune high-risk components so localized text remains readable across target viewports.
 - [ ] **Phase 102: QA Evidence, Documentation, and Handoff** - Record copy review, visual QA, terminology audit, build verification, README notes, and remaining review gaps.
@@ -59,7 +59,7 @@
   3. Locale layout hints distinguish default and stacked hero title variants without putting layout metadata in locale copy.
   4. Locale layout hints identify long-label density needs for buttons, actions, and high-risk German or French UI labels.
   5. Hero typography and width constraints adapt to locale-specific title length without globally shrinking every heading.
-**Plans**: TBD
+**Plans**: 1/1
 **UI hint**: yes
 
 ### Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup
@@ -122,7 +122,7 @@ Phase 17 phases planned in numeric order: 98 -> 99 -> 100 -> 101 -> 102
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 98. Copy Governance and Scope Lock | v1.16 | 1/1 | Complete | 2026-05-25 |
-| 99. Title and Layout Infrastructure | v1.16 | 0/1 | Not started | - |
+| 99. Title and Layout Infrastructure | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 100. P0 Locale Copy Rewrite and Terminology Cleanup | v1.16 | 0/1 | Not started | - |
 | 101. Responsive Typography and Multilingual Fit Pass | v1.16 | 0/1 | Not started | - |
 | 102. QA Evidence, Documentation, and Handoff | v1.16 | 0/1 | Not started | - |

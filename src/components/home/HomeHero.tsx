@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { HomeMagazineImage } from '@/components/home/HomeMagazineImage'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { getLocaleLayout } from '@/lib/localeLayout'
+import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
 function getLearningHref(role?: string | null) {
@@ -14,11 +16,26 @@ function getLearningHref(role?: string | null) {
   return '/login?next=/chat'
 }
 
+function getTitleLines(value: unknown, fallback: string) {
+  if (Array.isArray(value)) {
+    const lines = value.filter((line): line is string => typeof line === 'string' && line.trim().length > 0)
+
+    if (lines.length > 0) {
+      return lines
+    }
+  }
+
+  return [fallback]
+}
+
 export function HomeHero() {
-  const { t } = useTranslation(['home', 'common'])
+  const { i18n, t } = useTranslation(['home', 'common'])
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const learningHref = getLearningHref(isAuthenticated ? user?.role : null)
+  const layout = getLocaleLayout(i18n.language)
+  const title = t('home:hero.title')
+  const titleLines = getTitleLines(t('home:hero.titleLines', { returnObjects: true }), title)
   const bullets = t('home:hero.bullets', { returnObjects: true }) as string[]
 
   return (
@@ -28,15 +45,33 @@ export function HomeHero() {
           <BookOpen className="h-3.5 w-3.5" />
           {t('home:hero.eyebrow')}
         </Badge>
-        <h1 className="editorial-heading editorial-title-shell break-words text-5xl font-semibold leading-[0.95] text-foreground sm:text-6xl lg:text-7xl">
+        <h1
+          className={cn(
+            'editorial-heading editorial-title-shell break-words font-semibold leading-[0.95] text-foreground',
+            layout.heroTitleClassName,
+            layout.heroTitleMaxWidthClassName,
+            layout.heroTitleVariant === 'stacked' && 'hero-title-stacked',
+          )}
+        >
           <span className="block">STOA</span>
-          <span className="editorial-accent block">{t('home:hero.title')}</span>
+          {titleLines.map((line) => (
+            <span key={line} className="editorial-accent block">
+              {line}
+            </span>
+          ))}
         </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
+        <p className={cn('mt-6 text-lg leading-8 text-muted-foreground sm:text-xl', layout.heroSubtitleMaxWidthClassName)}>
           {t('home:hero.subtitle')}
         </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button asChild size="lg" className="premium-button-lift premium-primary-button h-12 rounded-full px-7 text-base">
+        <div className={cn('mt-8 flex flex-col gap-3 sm:flex-row sm:items-center', layout.heroActionClassName)}>
+          <Button
+            asChild
+            size="lg"
+            className={cn(
+              'premium-button-lift premium-primary-button min-h-12 rounded-full px-7 py-3 text-base',
+              layout.buttonSize === 'wide' && 'sm:px-8',
+            )}
+          >
             <Link to={learningHref}>
               {t('common:actions.startLearning')}
               <ArrowRight className="h-4 w-4" />
@@ -44,7 +79,10 @@ export function HomeHero() {
           </Button>
           <Link
             to="/how-it-works"
-            className="inline-flex h-12 items-center justify-center rounded-full border border-border/80 bg-card/60 px-6 text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-card"
+            className={cn(
+              'inline-flex min-h-12 items-center justify-center rounded-full border border-border/80 bg-card/60 px-6 py-3 text-center text-sm font-medium text-foreground transition-colors hover:border-primary/30 hover:bg-card',
+              layout.buttonSize === 'wide' && 'sm:px-7',
+            )}
           >
             {t('home:hero.secondaryCta')}
           </Link>

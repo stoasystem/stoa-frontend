@@ -24,15 +24,15 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 - [ ] **HERO-02**: User sees the German homepage hero as stacked short title lines `Lernen.`, `Fragen.`, `Verstehen.` with explanatory subtitle copy instead of one long translated sentence.
 - [ ] **HERO-03**: User sees the French homepage hero title `Comprendre avec confiance.` with natural French subtitle and CTA copy.
 - [ ] **HERO-04**: User sees the Italian homepage hero title `Studiare con più chiarezza.` with natural Italian subtitle and CTA copy.
-- [ ] **HERO-05**: `HomeHero` supports optional localized `titleLines` while preserving a safe `title` fallback for locales that use a single title string.
+- [x] **HERO-05**: `HomeHero` supports optional localized `titleLines` while preserving a safe `title` fallback for locales that use a single title string.
 - [ ] **HERO-06**: German hero title rendering no longer breaks visual rhythm at mobile, tablet, desktop, or wide desktop widths.
 
 ### Locale Layout Infrastructure
 
-- [ ] **LAYOUT-01**: Developers can use a typed `localeLayout` helper for supported locales `en`, `de`, `fr`, and `it`.
-- [ ] **LAYOUT-02**: Locale layout hints can distinguish default and stacked hero title variants without placing rendering metadata inside translation strings.
-- [ ] **LAYOUT-03**: Locale layout hints can identify button/action density needs for long German and French labels.
-- [ ] **LAYOUT-04**: Hero typography and width constraints adapt to locale-specific title length without globally shrinking all headings.
+- [x] **LAYOUT-01**: Developers can use a typed `localeLayout` helper for supported locales `en`, `de`, `fr`, and `it`.
+- [x] **LAYOUT-02**: Locale layout hints can distinguish default and stacked hero title variants without placing rendering metadata inside translation strings.
+- [x] **LAYOUT-03**: Locale layout hints can identify button/action density needs for long German and French labels.
+- [x] **LAYOUT-04**: Hero typography and width constraints adapt to locale-specific title length without globally shrinking all headings.
 - [ ] **LAYOUT-05**: Navbar, CTA buttons, card titles, pricing cards, form labels, and chat action controls remain readable and do not overflow in English, German, French, or Italian.
 - [ ] **LAYOUT-06**: CSS or component adjustments for multilingual fit are scoped to affected components and do not introduce a broad visual redesign.
 
@@ -133,12 +133,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HERO-02 | Phase 100 | Pending |
 | HERO-03 | Phase 100 | Pending |
 | HERO-04 | Phase 100 | Pending |
-| HERO-05 | Phase 99 | Pending |
+| HERO-05 | Phase 99 | Complete |
 | HERO-06 | Phase 101 | Pending |
-| LAYOUT-01 | Phase 99 | Pending |
-| LAYOUT-02 | Phase 99 | Pending |
-| LAYOUT-03 | Phase 99 | Pending |
-| LAYOUT-04 | Phase 99 | Pending |
+| LAYOUT-01 | Phase 99 | Complete |
+| LAYOUT-02 | Phase 99 | Complete |
+| LAYOUT-03 | Phase 99 | Complete |
+| LAYOUT-04 | Phase 99 | Complete |
 | LAYOUT-05 | Phase 101 | Pending |
 | LAYOUT-06 | Phase 101 | Pending |
 | P0COPY-01 | Phase 100 | Pending |
@@ -173,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 98 completion*
+*Last updated: 2026-05-25 after Phase 99 completion*

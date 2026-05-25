@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: "Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement"
 status: planning
-last_updated: "2026-05-25T21:55:00Z"
+last_updated: "2026-05-25T22:05:00Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, and a clean path to future real backend integration.
-**Current focus:** Phase 98 is complete; next planning target is Phase 99.
+**Current focus:** Phase 99 is complete; next planning target is Phase 100.
 
 ## Current Position
 
-Phase: 99 - Title and Layout Infrastructure
+Phase: 100 - P0 Locale Copy Rewrite and Terminology Cleanup
 Plan: TBD
-Status: Phase 98 complete; ready for Phase 99 planning
-Last activity: 2026-05-25 — Phase 98 copy governance and scope lock completed
+Status: Phase 99 complete; ready for Phase 100 planning
+Last activity: 2026-05-25 — Phase 99 title and layout infrastructure completed
 
 ## Performance Metrics
 
@@ -185,10 +185,11 @@ Recent decisions affecting current work:
 - Phase 17 keeps product functionality stable while refining EN/DE/FR/IT copy quality, title structure, layout fit, terminology cleanup, visual QA, and handoff documentation.
 - v1.16 roadmap continues numbering into Phase 98 through Phase 102.
 - Phase 98 added Phase 17 locale copy rules, German/French/Italian copy rules, glossary/style-guide updates, translation QA additions, and scope boundaries.
+- Phase 99 added typed locale layout hints, optional `HomeHero` `titleLines` support, locale-aware hero width/action classes, and scoped stacked-title CSS.
 
 ### Pending Todos
 
-- Plan Phase 99: Title and Layout Infrastructure.
+- Plan Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup.
 
 ### Quick Tasks Completed
 
