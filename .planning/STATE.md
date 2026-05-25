@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: "Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal"
-status: verifying
-last_updated: "2026-05-26T00:00:00+02:00"
-last_activity: 2026-05-26
+status: Awaiting next milestone
+stopped_at: v1.16 roadmap created and ready for Phase 98 planning
+last_updated: "2026-05-26T00:00:00.000Z"
+last_activity: 2026-05-26 — Milestone v1.17 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -20,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, and a clean path to future real backend integration.
-**Current focus:** v1.17 Phase 18 phases are complete; milestone audit is next.
+**Current focus:** Milestone v1.17 is archived; next milestone planning should start with Phase 19 accessibility, cross-browser QA, and release quality gates.
 
 ## Current Position
 
-Phase: 107 - Production-Facing QA, README, and Handoff
+Phase: Milestone v1.17 complete
 Plan: —
-Status: Complete; ready for milestone audit
-Last activity: 2026-05-26 - Phase 107 completed; milestone audit is next
+Status: Awaiting next milestone
+Last activity: 2026-05-26 — Milestone v1.17 completed and archived
 
 ## Performance Metrics
 
@@ -195,10 +196,12 @@ Recent decisions affecting current work:
 - Phase 105 added display-label and user-facing error boundaries, localized status labels, and cleaned rendered copy across auth, billing, pricing, home, admin, support, referral, organization, learning, parent, and tutor surfaces.
 - Phase 106 added handler-level pending guards, reset-on-success form behavior, support/billing empty states, and safer chat/support error messages.
 - Phase 107 updated README and QA evidence, ran production-facing copy/raw-status scans, verified build, and confirmed the Vite dev server starts.
+- Milestone integration audit found late production-facing copy leaks; commit `159edeb` fixed admin diagnostics, support/billing operational copy, checkout plan labels, register/chat/file-upload error paths, and chat fallback response copy before v1.17 archival.
+- Milestone v1.17 audit passed with 43/43 requirements satisfied and no remaining Phase 18 blockers.
 
 ### Pending Todos
 
-- Run milestone audit, then complete and clean up v1.17.
+- Start the next milestone when ready: Phase 19 accessibility, cross-browser QA, and release quality gate.
 
 ### Quick Tasks Completed
 

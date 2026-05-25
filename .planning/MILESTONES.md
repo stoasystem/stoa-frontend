@@ -1,5 +1,32 @@
 # Milestones
 
+## v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Shipped: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.17-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Production-facing copy audit, demo artifact removal checklist, and stability hardening checklist for Phase 18.
+- Environment guard helpers for demo accounts, demo badges, demo route surfaces, checkout previews, and internal debug visibility.
+- Login, navigation, checkout, and demo-only route gating so normal users do not see development/demo surfaces by default.
+- Product-safe copy cleanup across auth/register, chat, parent, tutor, pricing, billing, support, admin, and related P0/P1 surfaces.
+- Display label and user-facing error helpers that prevent raw internal statuses, raw plan IDs, provider/model/backend terms, and unsafe API errors from rendering.
+- Duplicate-submit guards and safer loading/empty/error states for key auth, chat, support, tutor, billing, and checkout flows.
+- README and QA evidence documenting production-facing cleanup, environment guards, state hardening, and demo-backend boundaries.
+- Integration audit closure for late leaks in admin diagnostics, support/billing copy, checkout plan labels, register/chat/file-upload errors, and chat fallback copy.
+
+### Verification
+
+- Requirements: 43/43 implemented.
+- Phases: 5/5 implemented.
+- Milestone integration audit: passed after closure fixes.
+- Build: passed.
+- Dev server: started successfully at `http://127.0.0.1:5173/` after sandbox escalation.
+- Remaining handoff gaps: accessibility, keyboard navigation, screen reader behavior, color contrast, cross-browser QA, visual regression, mobile QA, performance sanity, and final release quality gate for Phase 19.
+
+---
+
 ## v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement (Shipped: 2026-05-25)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

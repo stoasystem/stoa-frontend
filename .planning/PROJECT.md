@@ -2,7 +2,7 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, and locale-specific product copy refinement.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, and production-facing UI cleanup.
 
 The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, and responsive multilingual layout QA.
 
@@ -10,36 +10,35 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, and a clean path to future real backend integration.
 
-## Latest Shipped Milestone: v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
+## Latest Shipped Milestone: v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
 
-**Shipped:** 2026-05-25
+**Shipped:** 2026-05-26
 
-**Delivered:** STOA's English, German, French, and Italian product copy and responsive layouts were refined so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
-
-**Target features:**
-- Locale-specific copywriting rules that explicitly allow English, German, French, and Italian to use different sentence structures while preserving meaning, tone, and brand.
-- Rewritten homepage hero titles, subtitles, CTAs, and core section copy for all four languages, including stacked German hero title support.
-- Refined copy across P0 surfaces: homepage, register/onboarding, chat, parent dashboard/report, tutor workflow, pricing, billing, and support/error/toast states.
-- Locale-specific typography and layout hints for hero titles, buttons, cards, navbar labels, pricing cards, and long text handling.
-- German, French, and Italian copy rules covering long compounds, sentence length, CTA tone, punctuation, and UI fit.
-- Terminology cleanup to remove user-visible `AI`, `Human backup`, `Teacher backup`, `What we are selling`, `Buy now`, and inappropriate customer/sales language.
-- Documentation updates for copy rules, copy review matrix, visual QA by locale, glossary, copy style guide, translation QA checklist, README, and build verification.
-
-## Current Milestone: v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
-
-**Goal:** Remove user-visible development and demo artifacts, harden existing STOA frontend states, and make the product feel production-facing without adding new business features.
+**Delivered:** STOA's normal user-facing UI was cleaned of development/demo artifacts, guarded so demo-only surfaces stay hidden by default, and hardened across key loading, empty, error, success, and duplicate-submit states without adding new business features.
 
 **Target features:**
-- Production-facing copy audit and cleanup for `demo`, `mock`, `test`, `Codex`, `development`, `sample`, `placeholder`, and related development wording across user-visible UI.
-- Register/onboarding, login, chat, parent, tutor, pricing, billing, support, and admin copy cleanup so pages use real product language.
-- Environment guards for demo-only accounts, demo badges, and internal debug UI.
-- Display-label mapping so internal statuses and API values are not rendered directly.
-- Stability hardening for loading, empty, error, success, duplicate-submit, and route fallback states.
-- QA docs, README updates, and release checklist evidence for production-facing cleanup.
+- Production-facing copy audit for P0/P1 routes and prohibited user-visible development terms.
+- Environment guards for demo accounts, demo badges, demo routes, checkout preview behavior, and internal debug UI.
+- Display-label mapping and user-facing error sanitization for internal statuses, raw plan IDs, and backend/API errors.
+- Product-safe register/onboarding, login, chat, parent, tutor, pricing, billing, support, and admin copy.
+- Duplicate-submit and state hardening for auth, chat, teacher-help, tutor, support, billing, and checkout flows.
+- README and QA evidence for Phase 18 production-facing cleanup, with Phase 19 accessibility/release-quality work deferred.
+
+## Next Milestone Goals: Phase 19 Accessibility, Cross-Browser QA, and Release Quality Gate
+
+**Goal:** Improve release quality without expanding business functionality.
+
+**Target features:**
+- Accessibility audit, keyboard navigation, and screen reader behavior.
+- Color contrast audit and focus-state review.
+- Cross-browser and mobile device QA.
+- Visual regression or screenshot comparison coverage.
+- Performance sanity check for core flows.
+- Final pre-launch release quality checklist.
 
 ## Current State
 
-**Latest shipped milestone:** v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
+**Latest shipped milestone:** v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -60,6 +59,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 12 frontend-only platform surfaces with organization dashboard/students/tutors/reports/analytics, advanced learning profile, weak-point diagnosis, curriculum graph, tutor assignment board, schedule overview, parent monthly report, advanced analytics, retention UI, partnership onboarding, docs, and 8/8 E2E coverage.
 - Phase 16 multilingual foundations with English, German, French, and Italian i18n, language switching, local language persistence, and user-facing terminology replacement.
 - Phase 17 locale-specific copy refinement with natural four-language P0 copy, German stacked hero title support, typed locale layout hints, copy review matrix, visual QA by locale, terminology cleanup, README guidance, and 200 route/locale/viewport visual checks.
+- Phase 18 production-facing cleanup with guarded demo-only surfaces, internal debug isolation, product-safe visible copy, display-label boundaries, sanitized user-facing errors, pending guards, improved empty/error states, QA evidence, README guidance, and milestone integration audit fixes.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -89,10 +89,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify a premium STOA homepage, role-based onboarding, AI-first chat entry, inline teacher escalation, and demo backend onboarding/upload support — v1.14
 - ✓ Developers can run and verify English, German, French, and Italian language support with language switching, local language persistence, glossary/style guidance, and user-facing terminology replacement — v1.15
 - ✓ Developers can run and verify natural locale-specific P0 copy, German stacked hero title rendering, responsive multilingual layout fit, copy review documentation, visual QA evidence, terminology cleanup, and README handoff guidance — v1.16
+- ✓ Developers can run and verify production-facing UI cleanup, demo-only UI guards, display-label mapping, sanitized user-facing errors, duplicate-submit guards, stable empty/error states, QA evidence, and README guidance — v1.17
 
 ### Active
 
-- Phase 18 production-facing cleanup and stability hardening should remove user-visible development/demo/test/mock/Codex wording, hide demo-only UI by default, map internal statuses to user-facing labels, harden core loading/error/empty/success states, prevent duplicate submissions, and document production-facing QA.
+- Phase 19 should improve accessibility, keyboard navigation, screen reader behavior, color contrast, cross-browser QA, visual regression, mobile device QA, performance sanity, and final release quality gates without expanding product scope.
 
 ### Out of Scope
 
