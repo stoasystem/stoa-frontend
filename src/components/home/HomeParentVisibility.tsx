@@ -23,8 +23,8 @@ export function HomeParentVisibility() {
           </p>
           <div className="mt-6 overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
             <img
-              src="https://images.unsplash.com/photo-1491308056676-205b7c9a7dc1?auto=format&fit=crop&w=1000&q=80"
-              alt="Parent and child reviewing schoolwork together"
+              src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Family learning together on a laptop at home"
               className="h-56 w-full object-cover"
             />
           </div>

@@ -40,8 +40,8 @@ export function PricingPage() {
           <Card className="overflow-hidden">
             <div className="relative h-56 bg-[#152238]">
               <img
-                src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80"
-                alt="Family reviewing a learning plan on a laptop"
+                src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                alt="Family reviewing online learning together at home"
                 className="absolute inset-0 h-full w-full object-cover opacity-76"
               />
               <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(217_45%_15%_/_0.72),transparent_58%)]" />

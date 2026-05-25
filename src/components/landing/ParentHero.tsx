@@ -35,8 +35,8 @@ export function ParentHero() {
       </div>
       <div className="relative min-h-[27rem] overflow-hidden rounded-xl border border-border/70 bg-[#152238] shadow-[0_24px_70px_hsl(217_45%_15%_/_0.12)]">
         <img
-          src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80"
-          alt="Child learning in a classroom with focused attention"
+          src="https://images.pexels.com/photos/10109025/pexels-photo-10109025.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          alt="Smiling child writing homework at a study desk"
           className="absolute inset-0 h-full w-full object-cover opacity-72"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(217_45%_15%_/_0.1),hsl(217_45%_15%_/_0.82))]" />
