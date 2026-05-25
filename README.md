@@ -9,6 +9,69 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 14 Demo Backend Stabilization
+
+Phase 14 does not build the production backend. It stabilizes a lightweight demo backend for frontend testing and product demos, while keeping the backend simple, replaceable, and decoupled from future real backend and AWS work.
+
+The demo backend supports:
+
+- demo login and register
+- student chat demo
+- teacher help request demo
+- parent learning records and reports
+- pricing and mock checkout flow
+- referral link demo
+- support ticket demo
+- admin analytics mock data
+
+Recommended local API mode:
+
+```bash
+VITE_API_MODE=demo
+VITE_API_BASE_URL=http://localhost:8000
+VITE_ENABLE_MSW=false
+VITE_ENABLE_DEMO_API=true
+```
+
+Other supported API modes:
+
+```bash
+VITE_API_MODE=mock
+VITE_API_MODE=staging
+VITE_API_MODE=production
+```
+
+Demo accounts:
+
+- `student@test.com / password123`
+- `parent@test.com / password123`
+- `tutor@test.com / password123`
+- `admin@test.com / password123`
+
+Run demo backend:
+
+```bash
+npm run demo:backend
+```
+
+Reset demo data:
+
+```bash
+npm run demo:reset
+```
+
+Phase 14 docs:
+
+- `docs/demo-backend/demo-backend-scope.md`
+- `docs/demo-backend/demo-api-contract.md`
+- `docs/demo-backend/demo-data.md`
+- `docs/demo-backend/demo-reset-flow.md`
+- `docs/backend-integration/real-backend-readiness.md`
+- `docs/backend-integration/aws-readiness-notes.md`
+- `docs/qa/demo-backend-qa.md`
+
+The frontend should depend only on API contracts, not on demo backend internals.
+
 ## Phase 13 Information Architecture and UX Optimization
 
 Phase 13 does not add new product modules. It organizes the existing STOA frontend pages, routes, navigation, page hierarchy, user journeys, demo paths, and UI structure so each role has a clearer product flow.

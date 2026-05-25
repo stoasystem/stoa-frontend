@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.13
 milestone_name: "Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness"
-status: planning
+status: complete
 last_updated: "2026-05-25T14:57:18.313Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 7
   total_plans: 7
-  completed_plans: 0
-  percent: 0
+  completed_plans: 7
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness is defining requirements.
+**Current focus:** Milestone v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness is implemented and verified.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Roadmap ready
-Last activity: 2026-05-25 — Milestone v1.13 requirements and roadmap created
+Phase: 86 complete
+Plan: Phase 14 plans 80-86 complete
+Status: Verified
+Last activity: 2026-05-25 — Phase 14 demo backend stabilization and integration readiness implemented and verified
 
 ## Performance Metrics
 
@@ -164,6 +164,13 @@ Recent decisions affecting current work:
 - Phase 79 verified lint, TypeScript, build, route smoke, and E2E.
 - Milestone v1.13 started from the Phase 14 demo backend stabilization, test flow completion, and backend integration readiness brief.
 - Phase 14 must stabilize a simple replaceable demo backend/API contract layer while keeping formal backend development, complex database design, production auth, real payments, real AI orchestration, and AWS deployment out of scope.
+- Phase 80 added demo backend scope, API contract, data, and reset-flow documentation.
+- Phase 81 stabilized demo seed/reset data and npm demo backend/reset scripts.
+- Phase 82 stabilized demo health, auth, student chat, message, stream, attachment, and error response behavior.
+- Phase 83 stabilized teacher-help, tutor, parent report, and monthly report demo APIs.
+- Phase 84 added billing, referral, support ticket, feedback/admin, and operational demo APIs.
+- Phase 85 added explicit frontend API mode/base URL/MSW configuration and gated demo fallback behavior.
+- Phase 86 added real backend readiness, AWS readiness, demo backend QA docs, README updates, and final verification.
 
 ### Pending Todos
 
@@ -188,6 +195,12 @@ None currently.
 - Local route smoke returned HTTP 200 for `/`, `/dashboard`, and `/admin`.
 - First sandboxed E2E attempt failed with `listen EPERM` on `127.0.0.1:5173`; rerunning with approved escalation resolved the environment limitation.
 - Production build still emits Vite's existing large chunk warning.
+- `python3 -m py_compile backend/app/*.py` passed for v1.13.
+- `cd backend && PYTHONPATH=. python3 -m app.reset_demo_data` passed for v1.13.
+- Phase 14 backend TestClient smoke passed with `backend/.venv/bin/python`.
+- `npx tsc -b --pretty false` passed for v1.13.
+- `npm run lint` passed for v1.13.
+- `npm run build` passed for v1.13 with Vite's existing large chunk warning and a Node deprecation warning.
 - `npm run build` passed for v1.8.
 - `npm run lint` passed for v1.8.
 - `python3 -m py_compile backend/app/*.py` passed for v1.8.

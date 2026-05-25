@@ -1,5 +1,37 @@
 # Milestones
 
+## v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness (Implemented: 2026-05-25)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/v1.13-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Demo backend scope, API contract, demo data, and reset-flow documentation.
+- Fixed demo seed data for student, parent, tutor, and admin accounts.
+- Demo reset command and npm scripts for backend startup/reset.
+- Standard demo backend health response and `{ message, code }` error format.
+- Auth, student chat, deterministic assistant answer, mock streaming, and attachment metadata behavior.
+- Teacher-help, tutor request handling, parent summary/history/weekly/monthly report demo APIs.
+- Billing plans/subscription/usage/feature access/mock checkout, referral, support ticket, feedback/admin, and admin operational demo APIs.
+- Frontend API mode configuration for mock, demo, staging, and production.
+- Demo fallback gating so staging/production examples do not silently use mock data.
+- Real backend readiness, AWS readiness, demo backend QA docs, and README Phase 14 workflow.
+
+### Verification
+
+- Requirements: 48/48 implemented.
+- Phases: 7/7 implemented.
+- Python syntax check: passed.
+- Demo reset: passed.
+- Backend TestClient smoke: passed.
+- TypeScript build check: passed.
+- Lint: passed.
+- Build: passed.
+- Remaining warnings: Vite's existing large chunk warning and a Node deprecation warning.
+
+---
+
 ## v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization (Implemented: 2026-05-25)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks

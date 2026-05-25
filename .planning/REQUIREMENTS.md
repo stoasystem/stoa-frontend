@@ -10,78 +10,78 @@ Requirements for Phase 14. Each requirement maps to exactly one roadmap phase.
 
 ### Scope and Documentation
 
-- [ ] **SCOPE-01**: Team can review `docs/demo-backend/demo-backend-scope.md` defining demo backend responsibilities, replacement boundary, and explicit non-production scope.
-- [ ] **SCOPE-02**: Team can review `docs/demo-backend/demo-api-contract.md` documenting all Phase 14 demo endpoints, request/response shapes, auth expectations, status codes, and error codes.
-- [ ] **SCOPE-03**: Team can review `docs/demo-backend/demo-data.md` documenting fixed demo accounts, role relationships, conversations, parent reports, tutor requests, billing, referrals, support, and admin mock data.
-- [ ] **SCOPE-04**: Team can review `docs/demo-backend/demo-reset-flow.md` documenting how demo state is reset and what data must be restored.
+- [x] **SCOPE-01**: Team can review `docs/demo-backend/demo-backend-scope.md` defining demo backend responsibilities, replacement boundary, and explicit non-production scope.
+- [x] **SCOPE-02**: Team can review `docs/demo-backend/demo-api-contract.md` documenting all Phase 14 demo endpoints, request/response shapes, auth expectations, status codes, and error codes.
+- [x] **SCOPE-03**: Team can review `docs/demo-backend/demo-data.md` documenting fixed demo accounts, role relationships, conversations, parent reports, tutor requests, billing, referrals, support, and admin mock data.
+- [x] **SCOPE-04**: Team can review `docs/demo-backend/demo-reset-flow.md` documenting how demo state is reset and what data must be restored.
 
 ### Demo Data and Reset
 
-- [ ] **DATA-01**: Demo data includes fixed `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com` accounts using `password123`.
-- [ ] **DATA-02**: Demo data includes student conversations, messages, uploaded file metadata, learning history, weak topics, and recommended next actions.
-- [ ] **DATA-03**: Demo data includes parent-child linkage, child summary, weekly report, monthly report placeholder, recent questions, and teacher help records.
-- [ ] **DATA-04**: Demo data includes tutor pending, in-progress, and resolved help requests plus availability and stats.
-- [ ] **DATA-05**: Demo data includes billing plans, subscription, usage quota, feature access, mock checkout behavior, referral data, support/feedback data, and admin analytics.
-- [ ] **DATA-06**: A reset command restores fixed demo data and clears temporary registration/support/session changes.
+- [x] **DATA-01**: Demo data includes fixed `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com` accounts using `password123`.
+- [x] **DATA-02**: Demo data includes student conversations, messages, uploaded file metadata, learning history, weak topics, and recommended next actions.
+- [x] **DATA-03**: Demo data includes parent-child linkage, child summary, weekly report, monthly report placeholder, recent questions, and teacher help records.
+- [x] **DATA-04**: Demo data includes tutor pending, in-progress, and resolved help requests plus availability and stats.
+- [x] **DATA-05**: Demo data includes billing plans, subscription, usage quota, feature access, mock checkout behavior, referral data, support/feedback data, and admin analytics.
+- [x] **DATA-06**: A reset command restores fixed demo data and clears temporary registration/support/session changes.
 
 ### Auth and Health
 
-- [ ] **AUTH-01**: `GET /health` returns demo backend health with `ok`, service name, and mode.
-- [ ] **AUTH-02**: `POST /auth/login` accepts fixed demo credentials and returns an opaque demo access token plus user object.
-- [ ] **AUTH-03**: `POST /auth/register` supports mock registration for the current demo session without implying production auth.
-- [ ] **AUTH-04**: `GET /auth/me` resolves current user from the `Authorization: Bearer <token>` header.
-- [ ] **AUTH-05**: Auth failures and unauthorized requests return standard `{ message, code }` demo error responses.
+- [x] **AUTH-01**: `GET /health` returns demo backend health with `ok`, service name, and mode.
+- [x] **AUTH-02**: `POST /auth/login` accepts fixed demo credentials and returns an opaque demo access token plus user object.
+- [x] **AUTH-03**: `POST /auth/register` supports mock registration for the current demo session without implying production auth.
+- [x] **AUTH-04**: `GET /auth/me` resolves current user from the `Authorization: Bearer <token>` header.
+- [x] **AUTH-05**: Auth failures and unauthorized requests return standard `{ message, code }` demo error responses.
 
 ### Student Chat
 
-- [ ] **CHAT-01**: Student can list own demo conversations through `GET /conversations`.
-- [ ] **CHAT-02**: Student can open a conversation through `GET /conversations/:conversationId`.
-- [ ] **CHAT-03**: Student can create a temporary conversation through `POST /conversations`.
-- [ ] **CHAT-04**: Student can send a message through `POST /conversations/:conversationId/messages` and receive a deterministic demo assistant answer.
-- [ ] **CHAT-05**: Demo backend preserves message/conversation changes for the current demo session or until reset.
-- [ ] **CHAT-06**: Streaming message behavior is supported by a mock endpoint or documented as a future-compatible non-blocking contract.
+- [x] **CHAT-01**: Student can list own demo conversations through `GET /conversations`.
+- [x] **CHAT-02**: Student can open a conversation through `GET /conversations/:conversationId`.
+- [x] **CHAT-03**: Student can create a temporary conversation through `POST /conversations`.
+- [x] **CHAT-04**: Student can send a message through `POST /conversations/:conversationId/messages` and receive a deterministic demo assistant answer.
+- [x] **CHAT-05**: Demo backend preserves message/conversation changes for the current demo session or until reset.
+- [x] **CHAT-06**: Streaming message behavior is supported by a mock endpoint or documented as a future-compatible non-blocking contract.
 
 ### Teacher Help and Tutor Handling
 
-- [ ] **HELP-01**: Student can request teacher help through `POST /teacher-help/request`.
-- [ ] **HELP-02**: Tutor can list assigned help requests through `GET /tutors/me/help-requests`.
-- [ ] **HELP-03**: Tutor can open a request detail through `GET /tutors/me/help-requests/:requestId`.
-- [ ] **HELP-04**: Tutor can update request status through `PATCH /tutors/me/help-requests/:requestId`.
-- [ ] **HELP-05**: Student and parent related views can observe help-request status changes during the current demo session where applicable.
+- [x] **HELP-01**: Student can request teacher help through `POST /teacher-help/request`.
+- [x] **HELP-02**: Tutor can list assigned help requests through `GET /tutors/me/help-requests`.
+- [x] **HELP-03**: Tutor can open a request detail through `GET /tutors/me/help-requests/:requestId`.
+- [x] **HELP-04**: Tutor can update request status through `PATCH /tutors/me/help-requests/:requestId`.
+- [x] **HELP-05**: Student and parent related views can observe help-request status changes during the current demo session where applicable.
 
 ### Parent Reports
 
-- [ ] **PARENT-01**: Parent can list linked children through `GET /parents/me/children`.
-- [ ] **PARENT-02**: Parent can view child summary through `GET /parents/me/children/:childId/summary`.
-- [ ] **PARENT-03**: Parent can view child learning history through `GET /parents/me/children/:childId/history`.
-- [ ] **PARENT-04**: Parent can view child weekly report through `GET /parents/me/children/:childId/report`.
-- [ ] **PARENT-05**: Parent can view a monthly report placeholder through `GET /parents/me/children/:childId/monthly-report`.
+- [x] **PARENT-01**: Parent can list linked children through `GET /parents/me/children`.
+- [x] **PARENT-02**: Parent can view child summary through `GET /parents/me/children/:childId/summary`.
+- [x] **PARENT-03**: Parent can view child learning history through `GET /parents/me/children/:childId/history`.
+- [x] **PARENT-04**: Parent can view child weekly report through `GET /parents/me/children/:childId/report`.
+- [x] **PARENT-05**: Parent can view a monthly report placeholder through `GET /parents/me/children/:childId/monthly-report`.
 
 ### Billing, Referral, Support, and Admin Demo APIs
 
-- [ ] **OPS-01**: Billing demo exposes plans, subscription, usage, feature access, and mock checkout session endpoints.
-- [ ] **OPS-02**: Mock checkout returns a local checkout success URL and does not collect card data or call real Stripe.
-- [ ] **OPS-03**: Referral demo exposes stable referral code, invite URL, and successful invite count.
-- [ ] **OPS-04**: Feedback and support ticket APIs allow creating and viewing demo-session items.
-- [ ] **OPS-05**: Admin demo APIs expose analytics overview, support tickets, help requests, and feedback.
-- [ ] **OPS-06**: Demo backend applies consistent error responses across billing, referral, support, and admin endpoints.
+- [x] **OPS-01**: Billing demo exposes plans, subscription, usage, feature access, and mock checkout session endpoints.
+- [x] **OPS-02**: Mock checkout returns a local checkout success URL and does not collect card data or call real Stripe.
+- [x] **OPS-03**: Referral demo exposes stable referral code, invite URL, and successful invite count.
+- [x] **OPS-04**: Feedback and support ticket APIs allow creating and viewing demo-session items.
+- [x] **OPS-05**: Admin demo APIs expose analytics overview, support tickets, help requests, and feedback.
+- [x] **OPS-06**: Demo backend applies consistent error responses across billing, referral, support, and admin endpoints.
 
 ### Frontend API Mode and Service Alignment
 
-- [ ] **API-01**: `.env.example` documents `VITE_API_MODE`, `VITE_API_BASE_URL`, and `VITE_ENABLE_MSW`.
-- [ ] **API-02**: `src/lib/env.ts` exposes API mode, base URL, and MSW flag with safe defaults.
-- [ ] **API-03**: Shared API client uses the configured API base URL and preserves bearer-token request behavior.
-- [ ] **API-04**: API mode values `mock`, `demo`, `staging`, and `production` are documented for frontend developers.
-- [ ] **API-05**: Frontend API usage is audited so page components do not hard-code endpoint URLs or import demo backend internals.
+- [x] **API-01**: `.env.example` documents `VITE_API_MODE`, `VITE_API_BASE_URL`, and `VITE_ENABLE_MSW`.
+- [x] **API-02**: `src/lib/env.ts` exposes API mode, base URL, and MSW flag with safe defaults.
+- [x] **API-03**: Shared API client uses the configured API base URL and preserves bearer-token request behavior.
+- [x] **API-04**: API mode values `mock`, `demo`, `staging`, and `production` are documented for frontend developers.
+- [x] **API-05**: Frontend API usage is audited so page components do not hard-code endpoint URLs or import demo backend internals.
 
 ### Integration Readiness and QA
 
-- [ ] **READY-01**: `docs/backend-integration/real-backend-readiness.md` maps current frontend endpoints to request/response contracts, demo coverage, future backend ownership, status codes, error codes, env vars, CORS, and auth headers.
-- [ ] **READY-02**: `docs/backend-integration/aws-readiness-notes.md` documents frontend-facing AWS readiness concerns without implementing AWS deployment.
-- [ ] **READY-03**: `docs/qa/demo-backend-qa.md` includes startup, health, reset, auth, chat, teacher help, parent, billing, referral, support, admin, and future integration checks.
-- [ ] **READY-04**: README documents Phase 14 demo backend workflow, demo accounts, run/reset commands, API modes, and non-production boundary.
-- [ ] **READY-05**: Complete demo flow is manually or automatically verified against the demo backend.
-- [ ] **READY-06**: `npm run build` passes after Phase 14 changes.
+- [x] **READY-01**: `docs/backend-integration/real-backend-readiness.md` maps current frontend endpoints to request/response contracts, demo coverage, future backend ownership, status codes, error codes, env vars, CORS, and auth headers.
+- [x] **READY-02**: `docs/backend-integration/aws-readiness-notes.md` documents frontend-facing AWS readiness concerns without implementing AWS deployment.
+- [x] **READY-03**: `docs/qa/demo-backend-qa.md` includes startup, health, reset, auth, chat, teacher help, parent, billing, referral, support, admin, and future integration checks.
+- [x] **READY-04**: README documents Phase 14 demo backend workflow, demo accounts, run/reset commands, API modes, and non-production boundary.
+- [x] **READY-05**: Complete demo flow is manually or automatically verified against the demo backend.
+- [x] **READY-06**: `npm run build` passes after Phase 14 changes.
 
 ## Future Requirements
 
@@ -164,12 +164,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | API-03 | Phase 85 | Complete |
 | API-04 | Phase 85 | Complete |
 | API-05 | Phase 85 | Complete |
-| READY-01 | Phase 86 | Pending |
-| READY-02 | Phase 86 | Pending |
-| READY-03 | Phase 86 | Pending |
-| READY-04 | Phase 86 | Pending |
-| READY-05 | Phase 86 | Pending |
-| READY-06 | Phase 86 | Pending |
+| READY-01 | Phase 86 | Complete |
+| READY-02 | Phase 86 | Complete |
+| READY-03 | Phase 86 | Complete |
+| READY-04 | Phase 86 | Complete |
+| READY-05 | Phase 86 | Complete |
+| READY-06 | Phase 86 | Complete |
 
 **Coverage:**
 - v1.13 requirements: 48 total
@@ -178,4 +178,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 14 roadmap creation*
+*Last updated: 2026-05-25 after Phase 14 verification*
