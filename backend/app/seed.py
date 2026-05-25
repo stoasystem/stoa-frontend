@@ -178,6 +178,40 @@ def insert_seed_data() -> None:
         )
         connection.execute(
             """
+            INSERT OR IGNORE INTO message_attachments (id, message_id, file_id, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            ("attachment-demo-force-diagram", "msg-conv-2-1", "file-demo-force-diagram", created_at),
+        )
+        help_requests = [
+            (
+                "teacher-request-3",
+                "conv-3",
+                "user-student",
+                None,
+                "pending",
+                "Can a teacher check whether my essay thesis is specific enough?",
+            ),
+            (
+                "teacher-request-4",
+                "conv-1",
+                "user-student",
+                "user-tutor",
+                "resolved",
+                "Please confirm my factoring steps.",
+            ),
+        ]
+        for request in help_requests:
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO teacher_help_requests
+                (id, conversation_id, student_user_id, assigned_tutor_user_id, status, request_message, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (*request, created_at, created_at),
+            )
+        connection.execute(
+            """
             INSERT OR REPLACE INTO parent_reports
             (id, student_user_id, period_start, period_end, summary, stats_json, top_subjects_json, weak_topics_json, recommendations_json, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -312,6 +346,47 @@ def insert_seed_data() -> None:
                 "The weekly report is useful. I would like a clearer next-step checklist.",
                 created_at,
             ),
+        )
+        support_tickets = [
+            (
+                "ticket-101",
+                "user-parent",
+                "parent@test.com",
+                "Parent report did not refresh",
+                "The weekly report still shows last week for my child.",
+                "in_review",
+                "normal",
+                "parent_report",
+                "/parent/children/user-student/report",
+            ),
+            (
+                "ticket-102",
+                "user-student",
+                "student@test.com",
+                "Question upload failed on mobile",
+                "The image upload stopped after selecting a homework photo.",
+                "open",
+                "high",
+                "file_upload",
+                "/chat",
+            ),
+        ]
+        for ticket in support_tickets:
+            connection.execute(
+                """
+                INSERT OR IGNORE INTO support_tickets
+                (id, requester_user_id, requester_email, subject, message, status, priority, category, page, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (*ticket, created_at, created_at),
+            )
+        connection.execute(
+            """
+            INSERT OR IGNORE INTO billing_interest
+            (id, user_id, email, plan, source, created_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+            """,
+            ("billing-interest-demo-1", "user-parent", "parent@test.com", "family", "mock_checkout", created_at),
         )
         connection.commit()
 

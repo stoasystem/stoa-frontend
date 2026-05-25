@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "demo:backend": "cd backend && PYTHONPATH=. python3 -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "demo:reset": "cd backend && PYTHONPATH=. python3 -m app.reset_demo_data",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "eslint .",

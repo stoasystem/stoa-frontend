@@ -15,7 +15,7 @@
 - ✅ **v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling** - Phases 56-63 (implemented 2026-05-25)
 - ✅ **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (implemented 2026-05-25)
 - ✅ **v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization** - Phases 73-79 (implemented 2026-05-25)
-- ⏳ **v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness** - Phases 80-86 (planned)
+- ⏳ **v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness** - Phases 80-86 (in progress)
 
 ## Phases
 
@@ -24,11 +24,11 @@
 
 **Milestone Goal:** Stabilize a simple, replaceable demo backend and API contract layer so the existing STOA frontend can run complete demo flows for auth, student chat, teacher help, parent reports, billing, referrals, support, and admin analytics while preparing for future real backend and AWS integration.
 
-- [ ] **Phase 80: Demo Backend Scope, API Contract, and Data Documentation** - Document demo backend boundaries, endpoint contracts, demo data, and reset flow before implementation changes.
-- [ ] **Phase 81: Demo Data Seed and Reset Stabilization** - Normalize fixed demo accounts, demo state, and reset behavior for repeatable frontend demos.
-- [ ] **Phase 82: Auth, Health, Student Chat, and Message Demo APIs** - Stabilize health/auth/conversation/message endpoints and deterministic assistant responses.
-- [ ] **Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs** - Stabilize help-request status flow and parent child/report/history endpoints.
-- [ ] **Phase 84: Billing, Referral, Support, and Admin Demo APIs** - Stabilize mock checkout, referrals, support tickets, feedback, and admin analytics endpoints.
+- [x] **Phase 80: Demo Backend Scope, API Contract, and Data Documentation** - Document demo backend boundaries, endpoint contracts, demo data, and reset flow before implementation changes.
+- [x] **Phase 81: Demo Data Seed and Reset Stabilization** - Normalize fixed demo accounts, demo state, and reset behavior for repeatable frontend demos.
+- [x] **Phase 82: Auth, Health, Student Chat, and Message Demo APIs** - Stabilize health/auth/conversation/message endpoints and deterministic assistant responses.
+- [x] **Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs** - Stabilize help-request status flow and parent child/report/history endpoints.
+- [x] **Phase 84: Billing, Referral, Support, and Admin Demo APIs** - Stabilize mock checkout, referrals, support tickets, feedback, and admin analytics endpoints.
 - [ ] **Phase 85: Frontend API Mode and Service Layer Alignment** - Add API mode configuration and audit frontend API calls through service boundaries.
 - [ ] **Phase 86: Backend Integration Readiness, QA, README, and Build Closure** - Add real backend/AWS readiness docs, demo backend QA, README updates, and final verification.
 
@@ -42,7 +42,7 @@
   2. `docs/demo-backend/demo-api-contract.md` documents all Phase 14 endpoint methods, paths, request/response shapes, auth expectations, status codes, and error codes.
   3. `docs/demo-backend/demo-data.md` documents fixed accounts, role links, and minimum demo data by domain.
   4. `docs/demo-backend/demo-reset-flow.md` documents reset command behavior and restored/cleared state.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 81: Demo Data Seed and Reset Stabilization
 
@@ -54,7 +54,7 @@
   2. Demo data covers conversations, uploaded file metadata, learning history, parent reports, tutor requests, billing, referrals, support, and admin analytics.
   3. Parent is linked to the demo student and tutor/admin records reference stable IDs.
   4. Reset command restores fixed state and clears temporary registration/support/session changes.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 82: Auth, Health, Student Chat, and Message Demo APIs
 
@@ -66,7 +66,7 @@
   2. Student can list, open, and create conversations through documented endpoints.
   3. Student can send messages and receive deterministic assistant demo answers.
   4. Conversation/message changes persist for the current demo session or until reset.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs
 
@@ -78,7 +78,7 @@
   2. Tutor can list, open, and update help-request status.
   3. Parent endpoints return child list, summary, history, weekly report, and monthly report placeholder.
   4. Help-request state changes are visible to related demo surfaces where applicable.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 84: Billing, Referral, Support, and Admin Demo APIs
 
@@ -90,7 +90,7 @@
   2. Referral endpoint returns stable code, invite URL, and successful invite count.
   3. Feedback/support ticket APIs can create and view demo-session records.
   4. Admin endpoints return analytics overview, support tickets, help requests, and feedback with standard demo errors.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 85: Frontend API Mode and Service Layer Alignment
 
@@ -137,11 +137,10 @@ Phase 14 phases planned in numeric order: 80 -> 81 -> 82 -> 83 -> 84 -> 85 -> 86
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 80. Demo Backend Scope, API Contract, and Data Documentation | v1.13 | 0/1 | Not Started | — |
-| 81. Demo Data Seed and Reset Stabilization | v1.13 | 0/1 | Not Started | — |
-| 82. Auth, Health, Student Chat, and Message Demo APIs | v1.13 | 0/1 | Not Started | — |
-| 83. Teacher Help, Tutor Handling, and Parent Report APIs | v1.13 | 0/1 | Not Started | — |
-| 84. Billing, Referral, Support, and Admin Demo APIs | v1.13 | 0/1 | Not Started | — |
+| 80. Demo Backend Scope, API Contract, and Data Documentation | v1.13 | 1/1 | Complete | 2026-05-25 |
+| 81. Demo Data Seed and Reset Stabilization | v1.13 | 1/1 | Complete | 2026-05-25 |
+| 82. Auth, Health, Student Chat, and Message Demo APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
+| 83. Teacher Help, Tutor Handling, and Parent Report APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
+| 84. Billing, Referral, Support, and Admin Demo APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
 | 85. Frontend API Mode and Service Layer Alignment | v1.13 | 0/1 | Not Started | — |
 | 86. Backend Integration Readiness, QA, README, and Build Closure | v1.13 | 0/1 | Not Started | — |
-

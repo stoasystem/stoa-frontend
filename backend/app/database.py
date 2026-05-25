@@ -146,5 +146,28 @@ def initialize_database() -> None:
               message TEXT NOT NULL,
               created_at TEXT NOT NULL
             );
+
+            CREATE TABLE IF NOT EXISTS support_tickets (
+              id TEXT PRIMARY KEY,
+              requester_user_id TEXT,
+              requester_email TEXT,
+              subject TEXT NOT NULL,
+              message TEXT NOT NULL,
+              status TEXT NOT NULL,
+              priority TEXT NOT NULL,
+              category TEXT NOT NULL,
+              page TEXT,
+              created_at TEXT NOT NULL,
+              updated_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS billing_interest (
+              id TEXT PRIMARY KEY,
+              user_id TEXT,
+              email TEXT NOT NULL,
+              plan TEXT NOT NULL,
+              source TEXT NOT NULL,
+              created_at TEXT NOT NULL
+            );
             """
         )
