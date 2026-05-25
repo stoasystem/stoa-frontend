@@ -11,7 +11,7 @@ export function ForTutoringCentersPage() {
       <PageContainer size="wide">
         <PageHeader
           eyebrow="For tutoring centers"
-          title="AI plus tutor operations"
+          title="Learning support plus teacher operations"
           description="A front-end path for partner discussions. Payroll, matching algorithms, scheduling enforcement, and CRM remain out of scope."
           actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
@@ -19,7 +19,7 @@ export function ForTutoringCentersPage() {
         <Card>
           <CardHeader><CardTitle>Operational fit</CardTitle></CardHeader>
           <CardContent className="grid gap-4 text-sm leading-6 text-muted-foreground md:grid-cols-3">
-            <p>Teachers handle requests with AI context already visible.</p>
+            <p>Teachers handle requests with learning context already visible.</p>
             <p>Availability setup shows future capacity planning direction.</p>
             <p>Admin analytics surfaces early demand signals for operators.</p>
           </CardContent>

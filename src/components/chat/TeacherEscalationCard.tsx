@@ -42,7 +42,7 @@ export function TeacherEscalationCard({
             <div>
               <div className="font-medium">Need help from a teacher?</div>
               <p className="mt-1 text-muted-foreground">
-                Request human tutor support when the AI explanation is not clear enough.
+                Request professional teacher support when the explanation is not clear enough.
               </p>
               {feedback && (
                 <p

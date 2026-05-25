@@ -1,0 +1,77 @@
+{
+  "brand": {
+    "name": "STOA",
+    "platform": "STOA Lernplattform",
+    "learningAssistant": "Lernassistent",
+    "teacherSupport": "Professionelle Unterstützung durch Lehrpersonen"
+  },
+  "navigation": {
+    "howItWorks": "So funktioniert es",
+    "parents": "Eltern",
+    "tutors": "Lehrpersonen",
+    "pricing": "Preise",
+    "login": "Login",
+    "startLearning": "Lernen starten",
+    "forTutors": "Für Lehrpersonen",
+    "forParents": "Für Eltern",
+    "privacy": "Datenschutz",
+    "terms": "Bedingungen",
+    "support": "Support",
+    "dashboard": "Übersicht",
+    "chat": "Lernchat",
+    "learningHistory": "Lernverlauf",
+    "profile": "Profil",
+    "overview": "Übersicht",
+    "reports": "Berichte",
+    "billing": "Abrechnung",
+    "referrals": "Einladungen",
+    "requests": "Anfragen",
+    "availability": "Verfügbarkeit",
+    "users": "Schüler",
+    "learningActivity": "Lernaktivität",
+    "helpRequests": "Lehrpersonen-Anfragen",
+    "supportInbox": "Support-Eingang",
+    "analytics": "Analysen",
+    "more": "Mehr"
+  },
+  "actions": {
+    "startLearning": "Lernen starten",
+    "continue": "Weiter",
+    "back": "Zurück",
+    "createAccount": "Konto erstellen",
+    "creatingAccount": "Konto wird erstellt...",
+    "signIn": "Einloggen",
+    "signingIn": "Einloggen...",
+    "register": "Registrieren",
+    "choosePlan": "Plan wählen",
+    "viewPricing": "Preise ansehen",
+    "askTeacher": "Lehrperson fragen",
+    "send": "Nachricht senden",
+    "stop": "Stoppen"
+  },
+  "roles": {
+    "student": "Schüler",
+    "parent": "Elternteil",
+    "tutor": "Lehrperson",
+    "admin": "Admin",
+    "organization_admin": "Organisationsadmin",
+    "school_teacher": "Schullehrperson",
+    "school_viewer": "Schulansicht"
+  },
+  "language": {
+    "label": "Sprache",
+    "english": "English",
+    "german": "Deutsch",
+    "french": "Français",
+    "italian": "Italiano"
+  },
+  "status": {
+    "loading": "Wird geladen...",
+    "error": "Etwas ist schiefgelaufen.",
+    "empty": "Noch nichts vorhanden.",
+    "ready": "Bereit",
+    "pending": "Ausstehend",
+    "resolved": "Gelöst",
+    "inProgress": "In Bearbeitung"
+  }
+}

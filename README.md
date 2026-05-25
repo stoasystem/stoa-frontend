@@ -9,13 +9,57 @@ STOA learning platform frontend.
 - Vite
 - npm
 
-## Phase 15 Homepage Onboarding and AI-First Chat
+## Phase 16 Multilingual Language Optimization
+
+Phase 16 adds STOA's first multilingual language system for the Swiss market and replaces user-facing technology-heavy wording with calmer education language.
+
+Supported UI languages:
+
+- English
+- Deutsch
+- Français
+- Italiano
+
+Language behavior:
+
+- translations live under `src/i18n/locales/{en,de,fr,it}`
+- namespaces include `common`, `home`, `auth`, `chat`, `parent`, `tutor`, `pricing`, `billing`, `support`, `admin`, and `errors`
+- `LanguageSwitcher` persists the selected language in `localStorage` as `stoa_language`
+- the app updates the root `<html lang>` attribute when language changes
+- demo registration can pass optional `preferredLanguage`
+
+User-facing terminology now prefers:
+
+- `Learning Assistant`
+- `Professional teacher support`
+- `Explanation`
+- `Ask a teacher`
+- `Choose a plan`
+
+Avoid user-facing copy such as `AI tutor`, `AI answer`, `chatbot`, `human backup`, `teacher backup`, and developer-facing pricing language.
+
+Phase 16 docs:
+
+- `docs/language/glossary.md`
+- `docs/language/copy-style-guide.md`
+- `docs/language/terminology-replacement.md`
+- `docs/language/translation-qa-checklist.md`
+
+Verification:
+
+```bash
+npm run lint
+npm run build
+rg "\bAI\b|AI-|AI |Artificial Intelligence|Chatbot|Robot Tutor|Virtual Teacher|Automated Teacher|Human backup|Teacher Backup|teacher backup|human tutor|What STOA is selling|What we are selling|Buy now|Customers|frontend enforce" src/pages src/components src/i18n -n
+```
+
+## Phase 15 Homepage Onboarding and Learning-First Chat
 
 Phase 15 refines STOA's first impression and core learning path. It does not add a production backend or new large product modules. It makes the product story clearer:
 
 ```text
 Student starts learning
-  -> AI answers first
+  -> Learning Assistant explains first
   -> teacher joins only when needed
   -> parent follows progress
 ```
@@ -23,14 +67,14 @@ Student starts learning
 Main Phase 15 updates:
 
 - magazine-style homepage with one primary `Start Learning` CTA
-- homepage learning flow replacing the old AI / teacher / parent parallel-card presentation
+- homepage learning flow replacing the old technology / teacher / parent parallel-card presentation
 - premium UI direction using deep navy, warm ivory, muted sage, and soft gold accents
 - role-based registration for Student, Parent, and Tutor
 - student onboarding with school, grade, subjects, and parent link fields
 - parent onboarding with child profile fields
 - tutor onboarding with teaching profile and mock credential upload
 - chat empty state that sends students straight into asking homework questions
-- inline `Ask a human tutor` action below AI responses
+- inline `Ask a teacher` action below Learning Assistant explanations
 
 Recommended Phase 15 demo path:
 

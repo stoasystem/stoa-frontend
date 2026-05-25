@@ -14,7 +14,7 @@ export function ParentHero() {
             <span className="editorial-accent">homework support is working</span>.
           </h1>
           <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-            Students get immediate AI explanations, tutors step in when needed, and parents see
+            Students get immediate explanations, teachers step in when needed, and parents see
             concise learning signals without reading every chat.
           </p>
         </div>

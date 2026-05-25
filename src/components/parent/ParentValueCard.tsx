@@ -22,8 +22,8 @@ export function ParentValueCard({
               topics, teacher involvement, and the next practical action.
             </p>
             <p>
-              Parent reports turn homework activity into a weekly decision: continue AI support,
-              request tutor backup, or review a topic together.
+              Parent reports turn homework activity into a weekly decision: continue guided support,
+              request teacher support, or review a topic together.
             </p>
           </>
         )}

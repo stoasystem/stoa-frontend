@@ -15,7 +15,7 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{profile.usage.aiMessagesThisMonth}</p>
-            <p className="text-muted-foreground">AI messages</p>
+            <p className="text-muted-foreground">Learning messages</p>
           </div>
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{profile.usage.fileUploadsThisMonth}</p>

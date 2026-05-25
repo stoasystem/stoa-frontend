@@ -1,0 +1,53 @@
+{
+  "hero": {
+    "eyebrow": "Erst Lernassistent, bei Bedarf Lehrperson",
+    "title": "Lernunterstützung genau dann, wenn Schüler sie brauchen.",
+    "subtitle": "Schüler stellen Fragen, erhalten klare Erklärungen und können bei Bedarf eine echte Lehrperson hinzuziehen.",
+    "secondaryCta": "So funktioniert STOA",
+    "bullets": ["In Sekunden fragen", "Zuerst klare Erklärung", "Lehrperson direkt im Chat"],
+    "imageBadge": "Lernraum",
+    "imageLabel": "Live-Erklärung",
+    "imageTitle": "Beginne mit deiner Frage. STOA erklärt den nächsten Schritt, bevor eine Lehrperson dazukommt.",
+    "imagePrompt": "Beispiel: \"Warum bleibt eine Gleichung ausgeglichen, wenn man auf beiden Seiten 2 abzieht?\""
+  },
+  "flow": {
+    "eyebrow": "Wie STOA Schüler unterstützt",
+    "title": "Ein Lernweg, keine drei getrennten Werkzeuge.",
+    "visualLabel": "Lernraum",
+    "visualText": "Der Schüler bleibt in einer Unterhaltung, während Lernassistent, Lehrpersonenhilfe und Elternsichtbarkeit darum herum arbeiten.",
+    "steps": [
+      { "title": "Frage stellen", "description": "Schüler starten direkt im Chat mit einer Hausaufgabenfrage oder hochgeladenen Aufgabe." },
+      { "title": "Klare Erklärung erhalten", "description": "Der Lernassistent gibt sofort eine erste Erklärung, während der Kontext sichtbar bleibt." },
+      { "title": "Bei Bedarf Lehrperson fragen", "description": "Wenn die Erklärung nicht klar genug ist, kann eine qualifizierte Lehrperson in denselben Verlauf einsteigen." },
+      { "title": "Eltern verfolgen Fortschritt", "description": "Eltern sehen Lernverlauf, Berichte und Lehrpersonen-Anfragen, ohne das Lernen zu unterbrechen." }
+    ]
+  },
+  "teacher": {
+    "eyebrow": "Professionelle Unterstützung durch Lehrpersonen",
+    "visualText": "Lehrpersonen sind kein eigener Eingang. Sie sind die Unterstützung im Lernmoment.",
+    "title": "Wenn die Erklärung nicht reicht, hat die Frage bereits Kontext.",
+    "body": "Eine Lehrperson sieht die Unterhaltung, die Frage des Schülers und die vorherige Erklärung. Die Unterstützung beginnt dort, wo Unklarheit entsteht.",
+    "link": "Weg zur Lehrpersonen-Unterstützung"
+  },
+  "parents": {
+    "eyebrow": "Elternsichtbarkeit",
+    "title": "Eltern erkennen das Muster, ohne ein weiteres Dashboard zu verwalten.",
+    "body": "STOA hält den Lernweg fokussiert und gibt Eltern einen ruhigen Blick auf Fortschritt, wiederkehrende Schwächen und Lehrpersonenhilfe.",
+    "items": [
+      { "title": "Aktuelle Fragen", "description": "Sehen, woran Ihr Kind übt, ohne die Lerneinheit zu unterbrechen." },
+      { "title": "Wochenberichte", "description": "Stärken, schwache Themen und nächste Schritte aus dem Lernverlauf prüfen." },
+      { "title": "Unterstützungsnachweise", "description": "Verstehen, wann eine Lehrperson gefragt wurde und wie die Anfrage weiterging." }
+    ]
+  },
+  "trust": {
+    "items": [
+      { "title": "Schweizer Schulkontext", "description": "Ausgerichtet auf Hausaufgaben, Klassenstufe und Familiensichtbarkeit." },
+      { "title": "Demo heute bereit", "description": "Feste Demo-Konten, zurücksetzbare Daten, Abrechnungsdemo, Support, Empfehlungen und Admin-Übersicht sind verfügbar." },
+      { "title": "Später backend-bereit", "description": "Das Frontend nutzt API-Verträge, damit das Demo-Backend ersetzt werden kann." }
+    ]
+  },
+  "cta": {
+    "eyebrow": "Mit einer Frage starten",
+    "title": "Öffne die Lernplattform und stelle deine erste Frage."
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "dashboardTitle": "Area genitori",
+  "dashboardDescription": "Segui ritmo di studio, domande recenti, report e momenti di supporto insegnante.",
+  "loadChildrenFailed": "Impossibile caricare i figli.",
+  "noChildren": "Nessun figlio è collegato a questo account genitore.",
+  "child": "Figlio",
+  "weeklyReport": "Report settimanale",
+  "monthlyReport": "Report mensile",
+  "childSummary": "Riepilogo figlio",
+  "reportDescription": "Progressi visibili ai genitori, temi critici e prossimi passi per il figlio selezionato.",
+  "loadReportFailed": "Impossibile caricare il report.",
+  "reportTitle": "Report del figlio",
+  "historyTitle": "Cronologia di apprendimento del figlio",
+  "growth": "Progressi di apprendimento",
+  "recentQuestions": "Domande recenti",
+  "teacherRecords": "Supporto insegnante",
+  "nextAction": "Prossima azione consigliata"
+}

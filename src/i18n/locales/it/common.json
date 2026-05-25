@@ -1,0 +1,77 @@
+{
+  "brand": {
+    "name": "STOA",
+    "platform": "Piattaforma di apprendimento STOA",
+    "learningAssistant": "Assistente all’apprendimento",
+    "teacherSupport": "Supporto di un insegnante qualificato"
+  },
+  "navigation": {
+    "howItWorks": "Come funziona",
+    "parents": "Genitori",
+    "tutors": "Insegnanti",
+    "pricing": "Prezzi",
+    "login": "Accesso",
+    "startLearning": "Inizia a studiare",
+    "forTutors": "Per insegnanti",
+    "forParents": "Per genitori",
+    "privacy": "Privacy",
+    "terms": "Termini",
+    "support": "Supporto",
+    "dashboard": "Panoramica",
+    "chat": "Chat di studio",
+    "learningHistory": "Cronologia",
+    "profile": "Profilo",
+    "overview": "Panoramica",
+    "reports": "Report",
+    "billing": "Abbonamento",
+    "referrals": "Inviti",
+    "requests": "Richieste",
+    "availability": "Disponibilità",
+    "users": "Studenti",
+    "learningActivity": "Attività di studio",
+    "helpRequests": "Richieste insegnante",
+    "supportInbox": "Supporto",
+    "analytics": "Analisi",
+    "more": "Altro"
+  },
+  "actions": {
+    "startLearning": "Inizia a studiare",
+    "continue": "Continua",
+    "back": "Indietro",
+    "createAccount": "Crea account",
+    "creatingAccount": "Creazione account...",
+    "signIn": "Accedi",
+    "signingIn": "Accesso...",
+    "register": "Registrati",
+    "choosePlan": "Scegli un piano",
+    "viewPricing": "Vedi i prezzi",
+    "askTeacher": "Chiedi a un insegnante",
+    "send": "Invia messaggio",
+    "stop": "Ferma"
+  },
+  "roles": {
+    "student": "Studente",
+    "parent": "Genitore",
+    "tutor": "Insegnante",
+    "admin": "Admin",
+    "organization_admin": "Admin organizzazione",
+    "school_teacher": "Insegnante scolastico",
+    "school_viewer": "Visitatore scuola"
+  },
+  "language": {
+    "label": "Lingua",
+    "english": "English",
+    "german": "Deutsch",
+    "french": "Français",
+    "italian": "Italiano"
+  },
+  "status": {
+    "loading": "Caricamento...",
+    "error": "Qualcosa è andato storto.",
+    "empty": "Non c’è ancora nulla da mostrare.",
+    "ready": "Pronto",
+    "pending": "In attesa",
+    "resolved": "Risolto",
+    "inProgress": "In corso"
+  }
+}

@@ -35,6 +35,7 @@ class LoginRequest(BaseModel):
 class RegisterRequest(LoginRequest):
     name: str
     role: str
+    preferredLanguage: str | None = None
     profile: dict[str, object] | None = None
 
 
@@ -236,6 +237,8 @@ def register(payload: RegisterRequest) -> dict[str, object]:
         except Exception as exc:
             raise HTTPException(status_code=400, detail="Email already exists") from exc
     user = {"id": user_id, "name": payload.name, "email": payload.email, "role": payload.role}
+    if payload.preferredLanguage:
+        user["preferredLanguage"] = payload.preferredLanguage
     response = {"accessToken": create_access_token(user_id), "user": user, "onboardingStatus": "completed"}
     if payload.role == "student":
         response["parentLinked"] = True

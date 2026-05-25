@@ -14,6 +14,7 @@ export type RegisterRequest = RegisterPayload | {
   email: string
   password: string
   role: UserRole
+  preferredLanguage?: string
   acceptedTerms?: true
   termsVersion?: string
   acceptedAt?: string
@@ -42,7 +43,7 @@ export async function register(payload: RegisterRequest) {
     return response.data
   } catch (error) {
     if (!allowDemoFallback) throw error
-    return createDemoAuthResponse(payload.email, payload.role, payload.name)
+    return createDemoAuthResponse(payload.email, payload.role, payload.name, payload.preferredLanguage)
   }
 }
 
@@ -68,21 +69,22 @@ function inferRole(email: string): UserRole {
   return 'student'
 }
 
-function createDemoUser(email: string, role = inferRole(email), name?: string): User {
+function createDemoUser(email: string, role = inferRole(email), name?: string, preferredLanguage?: string): User {
   return {
     id: `demo-${role}`,
     name: name || `Demo ${role}`,
     email,
     role,
+    preferredLanguage,
     subscriptionStatus: 'trial',
     plan: 'free_trial',
   }
 }
 
-function createDemoAuthResponse(email: string, role = inferRole(email), name?: string): AuthResponse {
+function createDemoAuthResponse(email: string, role = inferRole(email), name?: string, preferredLanguage?: string): AuthResponse {
   const response: AuthResponse = {
     accessToken: `demo:${role}`,
-    user: createDemoUser(email, role, name),
+    user: createDemoUser(email, role, name, preferredLanguage),
   }
 
   if (role === 'student') {

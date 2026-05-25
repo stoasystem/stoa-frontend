@@ -10,7 +10,7 @@ export function ContinueLearningCard() {
       </CardHeader>
       <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
         <p>
-          Your fastest path is to reopen the last chat, compare the AI answer with your class
+          Your fastest path is to reopen the last chat, compare the explanation with your class
           notes, then request teacher support if the explanation still feels unclear.
         </p>
         <div className="flex flex-wrap gap-3">

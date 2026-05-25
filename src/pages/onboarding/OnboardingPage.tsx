@@ -27,7 +27,7 @@ const roleGuides = [
       {
         title: 'Escalate when stuck',
         description:
-          'Use teacher help from Chat when the AI answer is unclear or you need a tutor to review the question.',
+          'Use teacher help from Chat when the explanation is unclear or you need a teacher to review the question.',
       },
     ],
   },

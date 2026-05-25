@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { FeatureComparison } from '@/components/pricing/FeatureComparison'
 import { PricingFAQ } from '@/components/pricing/PricingFAQ'
 import { PlanCard } from '@/components/billing/PlanCard'
@@ -13,6 +14,7 @@ import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
 
 export function PricingPage() {
+  const { t } = useTranslation('pricing')
   const navigate = useNavigate()
   const plansQuery = useBillingPlansQuery()
   const pricingPlans = plansQuery.data?.items ?? []
@@ -30,10 +32,10 @@ export function PricingPage() {
     <MarketingLayout>
       <PageContainer size="wide">
         <PageHeader
-          eyebrow="Plans for families"
-          title="Pricing"
-          description="Choose the level of homework support your family needs, from AI-guided practice to tutor-supported explanations."
-          actions={<Badge variant="secondary">Safe checkout preview</Badge>}
+          eyebrow={t('eyebrow')}
+          title={t('title')}
+          description={t('description')}
+          actions={<Badge variant="secondary">{t('badge')}</Badge>}
           titleClassName="editorial-heading editorial-title-shell text-4xl leading-tight md:text-6xl"
         />
 
@@ -48,37 +50,28 @@ export function PricingPage() {
               <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(217_45%_15%_/_0.72),transparent_58%)]" />
               <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/15 bg-white/90 p-4 text-[#152238] backdrop-blur">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b08a4a]">
-                  Choose support level
+                  {t('supportLevel')}
                 </p>
                 <p className="mt-2 text-sm leading-6">
-                  AI practice, parent reports, and teacher help sit in one family plan conversation.
+                  {t('supportLevelBody')}
                 </p>
               </div>
             </div>
             <CardHeader>
-              <CardTitle className="text-xl">What STOA is selling</CardTitle>
+              <CardTitle className="text-xl">{t('valueTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                STOA combines AI homework guidance, parent-visible learning signals, and tutor
-                support escalation so students can get unstuck while families stay informed.
-              </p>
-              <p>
-                During this demo, checkout shows the purchase path without charging a card. Live
-                payment collection will use a secure hosted payment page.
-              </p>
+              <p>{t('valueBody')}</p>
+              <p>{t('checkoutBody')}</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Pilot promise</CardTitle>
+              <CardTitle className="text-xl">{t('pilotTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                Start with a free trial, see whether STOA fits your family routine, then choose a
-                plan when ready.
-              </p>
-              <p>Each plan makes the student, parent, and tutor support level clear before checkout.</p>
+              <p>{t('pilotBody')}</p>
+              <p>{t('pilotDetail')}</p>
             </CardContent>
           </Card>
         </section>

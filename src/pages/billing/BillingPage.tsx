@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BillingStatusAlert } from '@/components/billing/BillingStatusAlert'
 import { BillingSummaryCard } from '@/components/billing/BillingSummaryCard'
 import { CheckoutButton } from '@/components/billing/CheckoutButton'
@@ -25,6 +26,7 @@ function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
 }
 
 export function BillingPage() {
+  const { t } = useTranslation(['billing', 'common'])
   const [searchParams] = useSearchParams()
   const requestedPlan = searchParams.get('plan')
   const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
@@ -50,10 +52,10 @@ export function BillingPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <PageHeader
-          eyebrow="Billing"
-          title="Subscription"
-          description="Review launch-ready subscription state and start a hosted or virtual checkout flow."
-          actions={<Badge variant="secondary">{enablePayment ? 'Payment enabled' : 'Payment disabled'}</Badge>}
+          eyebrow={t('billing:title')}
+          title={t('billing:subscription')}
+          description={t('billing:description')}
+          actions={<Badge variant="secondary">{enablePayment ? t('billing:paymentEnabled') : t('billing:paymentDisabled')}</Badge>}
         />
 
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -64,24 +66,24 @@ export function BillingPage() {
           />
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Checkout mode</CardTitle>
+              <CardTitle className="text-base">{t('billing:checkoutMode')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
               <p>
                 {enablePayment
-                  ? 'Payment is enabled. The frontend will request a backend checkout session.'
-                  : 'Payment is disabled. Use this page to capture interest and validate content.'}
+                  ? t('billing:paymentEnabledBody')
+                  : t('billing:paymentDisabledBody')}
               </p>
               <p>
                 {enableMockCheckout
-                  ? 'Mock checkout is enabled, so plan selection opens a virtual checkout for demos and tests.'
-                  : 'Mock checkout is disabled. Real checkout requires a backend checkoutUrl response.'}
+                  ? t('billing:mockCheckoutEnabled')
+                  : t('billing:mockCheckoutDisabled')}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <CheckoutButton plan={selectedPlan} />
                 <ManageBillingButton />
                 <Button asChild variant="outline">
-                  <Link to="/support">Contact support</Link>
+                  <Link to="/support">{t('common:navigation.support')}</Link>
                 </Button>
               </div>
             </CardContent>
@@ -94,22 +96,16 @@ export function BillingPage() {
           {usageQuery.data && <PlanUsageCard usage={usageQuery.data} />}
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Selected plan</CardTitle>
+              <CardTitle className="text-base">{t('billing:selectedPlan')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
               <p>
                 {plan
                   ? `${plan.name}: ${plan.currency} ${plan.priceMonthly}/mo. ${plan.audience}`
-                  : 'Plan details are loading from the billing plans contract.'}
+                  : t('billing:planLoading')}
               </p>
-              <p>
-                Frontend locked states and upgrade prompts are advisory. Backend APIs must enforce
-                AI message quota, upload quota, teacher-help quota, and parent-report access.
-              </p>
-              <p>
-                Stripe Checkout is the preferred real payment direction. The browser never receives
-                card details or payment secrets.
-              </p>
+              <p>{t('billing:limitsBody')}</p>
+              <p>{t('billing:securityBody')}</p>
             </CardContent>
           </Card>
         </section>
@@ -118,19 +114,19 @@ export function BillingPage() {
           {featureAccessQuery.data?.canRequestTeacherHelp === false && (
             <LockedFeatureCard
               feature="Teacher help"
-              reason={featureAccessQuery.data.reason?.teacherHelp ?? 'Upgrade to keep teacher support active.'}
+              reason={featureAccessQuery.data.reason?.teacherHelp ?? t('billing:teacherUpgradeReason')}
             />
           )}
           {featureAccessQuery.data?.canUploadFiles === false && (
             <LockedFeatureCard
               feature="File uploads"
-              reason={featureAccessQuery.data.reason?.fileUploads ?? 'File upload quota reached.'}
+              reason={featureAccessQuery.data.reason?.fileUploads ?? t('billing:fileUploadReason')}
             />
           )}
           {featureAccessQuery.data?.canViewParentReports === false && (
             <LockedFeatureCard
               feature="Parent reports"
-              reason={featureAccessQuery.data.reason?.parentReports ?? 'Family Plan is required for reports.'}
+              reason={featureAccessQuery.data.reason?.parentReports ?? t('billing:parentReportReason')}
             />
           )}
         </section>

@@ -14,15 +14,15 @@ const sections = [
   },
   {
     title: 'Parent and tutor visibility',
-    body: 'Parents can see child learning summaries, reports, weak topics, and teacher involvement. Tutors can see the student context needed to answer a help request, including the relevant question and AI answer.',
+    body: 'Parents can see child learning summaries, reports, weak topics, and teacher involvement. Teachers can see the student context needed to answer a help request, including the relevant question and prior explanation.',
   },
   {
     title: 'Use, retention, and deletion',
     body: 'Data is used to operate STOA, improve learning support, provide reports, handle support, monitor reliability, and prepare launch operations. Retention and deletion requests should be sent through support until self-service controls exist.',
   },
   {
-    title: 'AI and third parties',
-    body: 'AI providers, hosting, analytics, monitoring, and payment providers may process limited data under backend-controlled contracts. Browser configuration must not contain secrets or payment credentials.',
+    title: 'Learning technology and third parties',
+    body: 'Learning technology, hosting, analytics, monitoring, and payment providers may process limited data under backend-controlled contracts. Browser configuration must not contain secrets or payment credentials.',
   },
 ]
 

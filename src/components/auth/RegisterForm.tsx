@@ -1,5 +1,6 @@
 import { type FormEvent, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { RegisterAccountStep } from '@/components/auth/RegisterAccountStep'
 import { RegisterConfirmationStep } from '@/components/auth/RegisterConfirmationStep'
 import { ParentProfileStep } from '@/components/auth/ParentProfileStep'
@@ -61,6 +62,7 @@ function getStepNumber(step: Step) {
 }
 
 export function RegisterForm() {
+  const { t, i18n } = useTranslation(['auth', 'common', 'errors'])
   const [step, setStep] = useState<Step>('role')
   const [role, setRole] = useState<RegisterRole>('student')
   const [name, setName] = useState('')
@@ -102,26 +104,26 @@ export function RegisterForm() {
 
   function validateCurrentStep() {
     if (step === 'account') {
-      if (!name.trim() || !email.trim() || !password.trim()) return 'Name, email, and password are required.'
-      if (password.length < 8) return 'Password must be at least 8 characters.'
-      if (!acceptedTerms) return 'Please accept the privacy policy and terms.'
+      if (!name.trim() || !email.trim() || !password.trim()) return t('errors:required')
+      if (password.length < 8) return t('errors:passwordTooShort')
+      if (!acceptedTerms) return t('errors:acceptTerms')
     }
 
     if (step === 'profile') {
       if (role === 'student') {
-        if (!studentProfile.school.trim() || !studentProfile.grade.trim()) return 'School and grade are required.'
-        if (!studentProfile.parentName.trim() || !studentProfile.parentEmail.trim()) return 'Parent name and email are required.'
-        if (splitSubjects(studentSubjects).length === 0) return 'Add at least one subject.'
+        if (!studentProfile.school.trim() || !studentProfile.grade.trim()) return t('errors:schoolGradeRequired')
+        if (!studentProfile.parentName.trim() || !studentProfile.parentEmail.trim()) return t('errors:parentRequired')
+        if (splitSubjects(studentSubjects).length === 0) return t('errors:subjectRequired')
       }
       if (role === 'parent') {
-        if (!parentProfile.childName.trim() || !parentProfile.childGrade.trim()) return 'Child name and grade are required.'
-        if (splitSubjects(parentSubjects).length === 0) return 'Add at least one subject.'
+        if (!parentProfile.childName.trim() || !parentProfile.childGrade.trim()) return t('errors:childRequired')
+        if (splitSubjects(parentSubjects).length === 0) return t('errors:subjectRequired')
       }
       if (role === 'tutor') {
-        if (splitSubjects(tutorSubjects).length === 0) return 'Add at least one teaching subject.'
-        if (!tutorProfile.educationBackground.trim()) return 'Education background is required.'
-        if (!tutorProfile.introduction.trim()) return 'Short introduction is required.'
-        if (credentialFiles.length === 0) return 'Upload at least one credential document.'
+        if (splitSubjects(tutorSubjects).length === 0) return t('errors:teachingSubjectRequired')
+        if (!tutorProfile.educationBackground.trim()) return t('errors:educationRequired')
+        if (!tutorProfile.introduction.trim()) return t('errors:introductionRequired')
+        if (credentialFiles.length === 0) return t('errors:credentialRequired')
       }
     }
 
@@ -158,6 +160,7 @@ export function RegisterForm() {
       name: name.trim(),
       email: email.trim(),
       password,
+      preferredLanguage: i18n.resolvedLanguage ?? i18n.language,
       profile,
       acceptedTerms: true,
       termsVersion: 'launch-draft-2026-05-25',
@@ -179,8 +182,8 @@ export function RegisterForm() {
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-        <span>Step {stepNumber} of 4</span>
-        <span className="capitalize">{role} onboarding</span>
+        <span>{t('auth:register.step', { step: stepNumber })}</span>
+        <span>{t('auth:register.onboarding', { role: t(`common:roles.${role}`) })}</span>
       </div>
 
       {step === 'role' && <RegisterRoleStep selectedRole={role} onSelectRole={setRole} />}
@@ -238,27 +241,27 @@ export function RegisterForm() {
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {registerMutation.error instanceof Error
             ? registerMutation.error.message
-            : 'Registration failed.'}
+            : t('auth:register.failed')}
         </p>
       )}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         {canGoBack ? (
           <Button type="button" variant="outline" onClick={handleBack}>
-            Back
+            {t('common:actions.back')}
           </Button>
         ) : (
           <Link className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline" to="/login">
-            Already registered?
+            {t('auth:register.alreadyRegistered')}
           </Link>
         )}
         {step === 'profile' ? (
           <Button type="submit" disabled={registerMutation.isPending}>
-            {registerMutation.isPending ? 'Creating account...' : 'Create account'}
+            {registerMutation.isPending ? t('common:actions.creatingAccount') : t('common:actions.createAccount')}
           </Button>
         ) : (
           <Button type="button" onClick={handleNext}>
-            Continue
+            {t('common:actions.continue')}
           </Button>
         )}
       </div>

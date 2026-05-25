@@ -36,6 +36,7 @@ export type User = {
   name: string
   email: string
   role: UserRole
+  preferredLanguage?: string
   subscriptionStatus?: SubscriptionStatus
   plan?: SubscriptionPlan
   subscription?: UserSubscription

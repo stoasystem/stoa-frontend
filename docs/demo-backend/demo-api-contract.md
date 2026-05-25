@@ -61,7 +61,7 @@ Response:
 
 ### `POST /auth/register`
 
-Accepts `name`, `email`, `password`, `role`, and an optional role-specific `profile`. Public demo registration supports `student`, `parent`, and `tutor`; admin accounts remain fixed demo accounts.
+Accepts `name`, `email`, `password`, `role`, optional `preferredLanguage`, and an optional role-specific `profile`. Public demo registration supports `student`, `parent`, and `tutor`; admin accounts remain fixed demo accounts.
 
 Student request example:
 
@@ -71,6 +71,7 @@ Student request example:
   "name": "Anna Keller",
   "email": "anna@example.com",
   "password": "password123",
+  "preferredLanguage": "de",
   "profile": {
     "age": 14,
     "school": "Kantonsschule Zürich Nord",
@@ -92,7 +93,8 @@ Student response can include:
     "id": "user-student-new",
     "name": "Anna Keller",
     "email": "anna@example.com",
-    "role": "student"
+    "role": "student",
+    "preferredLanguage": "de"
   },
   "onboardingStatus": "completed",
   "parentLinked": true

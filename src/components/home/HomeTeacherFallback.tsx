@@ -1,7 +1,10 @@
 import { ArrowRight, GraduationCap } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 export function HomeTeacherFallback() {
+  const { t } = useTranslation('home')
+
   return (
     <section className="mx-auto grid max-w-6xl gap-6 px-5 py-10 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
       <div className="relative min-h-[24rem] overflow-hidden rounded-xl border border-border/70 bg-[#152238] text-primary-foreground shadow-[0_24px_70px_hsl(217_45%_15%_/_0.14)]">
@@ -14,28 +17,25 @@ export function HomeTeacherFallback() {
         <div className="absolute bottom-5 left-5 right-5 rounded-xl border border-white/15 bg-[#152238]/86 p-5 backdrop-blur">
           <GraduationCap className="h-8 w-8 text-[#c2a15a]" />
           <p className="mt-5 text-2xl font-semibold leading-tight">
-            Teachers are not a separate doorway. They are the support layer inside the learning
-            moment.
+            {t('teacher.visualText')}
           </p>
         </div>
       </div>
       <div className="rounded-xl border border-border/70 bg-card/78 p-6">
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
-          Human support
+          {t('teacher.eyebrow')}
         </p>
         <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
-          When AI is not enough, the question already has{' '}
-          <span className="editorial-accent">context</span>.
+          {t('teacher.title')}
         </h2>
         <p className="mt-4 text-base leading-8 text-muted-foreground">
-          A tutor sees the conversation, the student question, and the previous AI explanation. The
-          escalation happens where confusion appears, so the student does not have to restart.
+          {t('teacher.body')}
         </p>
         <Link
           to="/teacher-support"
           className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground transition-colors hover:text-[hsl(var(--accent))]"
         >
-          Tutor pathway
+          {t('teacher.link')}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

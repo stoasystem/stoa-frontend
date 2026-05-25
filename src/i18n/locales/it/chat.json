@@ -1,0 +1,32 @@
+{
+  "title": "Chat di studio",
+  "emptyTitle": "Fai la tua prima domanda sui compiti.",
+  "emptyDescription": "L’Assistente all’apprendimento prepara una spiegazione chiara. Se serve altro aiuto, chiedi a un insegnante nella stessa conversazione.",
+  "welcome": "Benvenuto in STOA. Fai qui sotto la tua prima domanda sui compiti.",
+  "placeholder": "Scrivi qui la tua domanda sui compiti...",
+  "preparing": "L’Assistente all’apprendimento sta preparando una spiegazione...",
+  "loadFailed": "Impossibile caricare le conversazioni.",
+  "conversationLoadFailed": "Impossibile caricare questa conversazione.",
+  "createFailed": "Impossibile creare la conversazione.",
+  "starting": "Avvio...",
+  "startConversation": "Avvia conversazione",
+  "quotaReached": "Quota messaggi di studio raggiunta.",
+  "fileQuotaReached": "Quota caricamento file raggiunta.",
+  "emptyMessage": "Il messaggio non può essere vuoto.",
+  "upload": "Carica file dei compiti",
+  "uploadFailed": "Caricamento file non riuscito.",
+  "retry": "Riprova",
+  "newConversation": "Nuova conversazione",
+  "teacher": {
+    "title": "Vuoi che un insegnante lo spieghi?",
+    "description": "Invia questa conversazione a un insegnante qualificato per un chiarimento.",
+    "cta": "Chiedi a un insegnante",
+    "submitted": "La tua richiesta è stata inviata a un insegnante.",
+    "failed": "Richiesta insegnante non riuscita."
+  },
+  "status": {
+    "pending": "In attesa di un insegnante",
+    "in_progress": "L’insegnante sta esaminando",
+    "resolved": "Supporto insegnante completato"
+  }
+}

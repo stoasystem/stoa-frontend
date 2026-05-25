@@ -1,30 +1,31 @@
 import { GraduationCap, UserRound, Users } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { RegisterRole } from '@/types/onboarding'
 
 const roleOptions = [
   {
     role: 'student',
-    title: 'Student',
-    description: 'Ask homework questions and get AI-first learning help.',
+    titleKey: 'common:roles.student',
+    descriptionKey: 'auth:register.studentHelp',
     icon: UserRound,
   },
   {
     role: 'parent',
-    title: 'Parent',
-    description: 'Follow your child progress, reports, and teacher-help records.',
+    titleKey: 'common:roles.parent',
+    descriptionKey: 'auth:register.parentHelp',
     icon: Users,
   },
   {
     role: 'tutor',
-    title: 'Tutor',
-    description: 'Support students when an AI explanation is not enough.',
+    titleKey: 'common:roles.tutor',
+    descriptionKey: 'auth:register.tutorHelp',
     icon: GraduationCap,
   },
 ] satisfies Array<{
   role: RegisterRole
-  title: string
-  description: string
+  titleKey: string
+  descriptionKey: string
   icon: typeof UserRound
 }>
 
@@ -35,6 +36,8 @@ export function RegisterRoleStep({
   selectedRole: RegisterRole
   onSelectRole: (role: RegisterRole) => void
 }) {
+  const { t } = useTranslation(['auth', 'common'])
+
   return (
     <div className="grid gap-3 md:grid-cols-3">
       {roleOptions.map((option) => {
@@ -54,8 +57,8 @@ export function RegisterRoleStep({
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
               <Icon className="h-5 w-5" />
             </div>
-            <h3 className="mt-5 text-lg font-semibold text-foreground">{option.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">{option.description}</p>
+            <h3 className="mt-5 text-lg font-semibold text-foreground">{t(option.titleKey)}</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(option.descriptionKey)}</p>
           </button>
         )
       })}

@@ -1,0 +1,77 @@
+{
+  "brand": {
+    "name": "STOA",
+    "platform": "STOA Learning Platform",
+    "learningAssistant": "Learning Assistant",
+    "teacherSupport": "Professional teacher support"
+  },
+  "navigation": {
+    "howItWorks": "How it works",
+    "parents": "Parents",
+    "tutors": "Tutors",
+    "pricing": "Pricing",
+    "login": "Login",
+    "startLearning": "Start learning",
+    "forTutors": "For tutors",
+    "forParents": "For parents",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "support": "Support",
+    "dashboard": "Dashboard",
+    "chat": "Learning chat",
+    "learningHistory": "Learning history",
+    "profile": "Profile",
+    "overview": "Overview",
+    "reports": "Reports",
+    "billing": "Billing",
+    "referrals": "Referrals",
+    "requests": "Requests",
+    "availability": "Availability",
+    "users": "Students",
+    "learningActivity": "Learning activity",
+    "helpRequests": "Teacher requests",
+    "supportInbox": "Support inbox",
+    "analytics": "Analytics",
+    "more": "More"
+  },
+  "actions": {
+    "startLearning": "Start learning",
+    "continue": "Continue",
+    "back": "Back",
+    "createAccount": "Create account",
+    "creatingAccount": "Creating account...",
+    "signIn": "Sign in",
+    "signingIn": "Signing in...",
+    "register": "Register",
+    "choosePlan": "Choose a plan",
+    "viewPricing": "View pricing",
+    "askTeacher": "Ask a teacher",
+    "send": "Send message",
+    "stop": "Stop"
+  },
+  "roles": {
+    "student": "Student",
+    "parent": "Parent",
+    "tutor": "Teacher",
+    "admin": "Admin",
+    "organization_admin": "Organization admin",
+    "school_teacher": "School teacher",
+    "school_viewer": "School viewer"
+  },
+  "language": {
+    "label": "Language",
+    "english": "English",
+    "german": "Deutsch",
+    "french": "Français",
+    "italian": "Italiano"
+  },
+  "status": {
+    "loading": "Loading...",
+    "error": "Something went wrong.",
+    "empty": "Nothing to show yet.",
+    "ready": "Ready",
+    "pending": "Pending",
+    "resolved": "Resolved",
+    "inProgress": "In progress"
+  }
+}

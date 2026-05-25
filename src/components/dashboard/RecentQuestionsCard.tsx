@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { RecentQuestion } from '@/types/dashboard'
 
 const statusLabel: Record<RecentQuestion['status'], string> = {
-  answered_by_ai: 'Answered by AI',
+  answered_by_ai: 'Explained',
   teacher_helped: 'Teacher helped',
   pending: 'Pending',
 }

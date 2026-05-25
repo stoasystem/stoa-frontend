@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import type { TFunction } from 'i18next'
 
 export const userRoleSchema = z.enum([
   'student',
@@ -34,3 +35,16 @@ export const studentProfileSchema = z.object({
 export const chatInputSchema = z.object({
   content: z.string().min(1, 'Message cannot be empty.'),
 })
+
+export function createLoginSchema(t: TFunction) {
+  return z.object({
+    email: z.string().email(t('errors:invalidEmail')),
+    password: z.string().min(1, t('errors:required')),
+  })
+}
+
+export function createChatInputSchema(t: TFunction) {
+  return z.object({
+    content: z.string().min(1, t('chat:emptyMessage')),
+  })
+}

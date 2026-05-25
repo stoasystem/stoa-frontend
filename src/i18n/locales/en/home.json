@@ -1,0 +1,53 @@
+{
+  "hero": {
+    "eyebrow": "Learning Assistant first, teacher when needed",
+    "title": "Learning support when students need it most.",
+    "subtitle": "Students ask questions, receive clear explanations, and can request a real teacher when they need more help.",
+    "secondaryCta": "See how STOA works",
+    "bullets": ["Ask in seconds", "Clear explanation first", "Teacher help inside chat"],
+    "imageBadge": "Study room",
+    "imageLabel": "Live explanation",
+    "imageTitle": "Start with your question. STOA explains the next step before a teacher joins.",
+    "imagePrompt": "Try: \"Why does subtracting 2 from both sides keep the equation balanced?\""
+  },
+  "flow": {
+    "eyebrow": "How STOA helps students",
+    "title": "One learning path, not three disconnected tools.",
+    "visualLabel": "Learning room",
+    "visualText": "The student stays in one conversation while the Learning Assistant, teacher help, and parent visibility work around it.",
+    "steps": [
+      { "title": "Ask a question", "description": "Students begin directly in chat with a homework question or uploaded assignment." },
+      { "title": "Get a clear explanation", "description": "The Learning Assistant gives a first explanation immediately, with the work still visible in context." },
+      { "title": "Ask a teacher if needed", "description": "When the answer is not clear enough, a qualified teacher can step into the same thread." },
+      { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-help records without interrupting study." }
+    ]
+  },
+  "teacher": {
+    "eyebrow": "Professional teacher support",
+    "visualText": "Teachers are not a separate doorway. They are the support layer inside the learning moment.",
+    "title": "When the explanation is not enough, the question already has context.",
+    "body": "A teacher sees the conversation, the student question, and the previous explanation. The support happens where confusion appears, so the student does not have to restart.",
+    "link": "Teacher support pathway"
+  },
+  "parents": {
+    "eyebrow": "Parent visibility",
+    "title": "Parents get the pattern, not another dashboard to manage.",
+    "body": "STOA keeps the student learning path focused while giving parents a calm view of progress, recurring weak topics, and teacher-help moments.",
+    "items": [
+      { "title": "Recent questions", "description": "See what your child is practicing without interrupting the study session." },
+      { "title": "Weekly reports", "description": "Review strengths, weak topics, and next actions from the learning history." },
+      { "title": "Support records", "description": "Understand when a teacher was requested and how the request moved forward." }
+    ]
+  },
+  "trust": {
+    "items": [
+      { "title": "Swiss school context", "description": "Designed around everyday homework questions, grade context, and family visibility." },
+      { "title": "Demo-ready today", "description": "Fixed demo accounts, resettable data, billing mock, support, referrals, and admin overview are available." },
+      { "title": "Backend-ready later", "description": "Frontend depends on API contracts so the demo backend can be replaced by the real backend." }
+    ]
+  },
+  "cta": {
+    "eyebrow": "Start with one question",
+    "title": "Enter the learning platform and ask your first question."
+  }
+}

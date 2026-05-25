@@ -1,0 +1,41 @@
+{
+  "title": "Pricing",
+  "eyebrow": "Plans for families",
+  "description": "Choose the level of homework support your family needs, from guided practice to teacher-supported explanations.",
+  "badge": "Safe checkout preview",
+  "supportLevel": "Choose support level",
+  "supportLevelBody": "Guided practice, parent reports, and teacher help sit in one family plan conversation.",
+  "valueTitle": "The value for families",
+  "valueBody": "STOA combines guided homework support, parent-visible learning signals, and teacher support escalation so students can get unstuck while families stay informed.",
+  "checkoutBody": "During this demo, checkout shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page.",
+  "pilotTitle": "Pilot promise",
+  "pilotBody": "Start with a free trial, see whether STOA fits your family routine, then choose a plan when ready.",
+  "pilotDetail": "Each plan makes the student, parent, and teacher support level clear before checkout.",
+  "comparison": {
+    "title": "Plan access",
+    "headers": ["Feature", "Trial", "Student", "Family", "Teacher-supported"],
+    "rows": [
+      ["Learning chat", "Limited", "Included", "Included", "Included"],
+      ["Homework upload", "Limited", "Included", "Included", "Included"],
+      ["Parent dashboard", "Preview", "—", "Included", "Included"],
+      ["Weekly reports", "Preview", "—", "Included", "Included"],
+      ["Teacher help", "Limited", "—", "—", "Teacher sessions included"]
+    ]
+  },
+  "faqPaymentTitle": "Is payment live now?",
+  "faqPaymentBody": "Checkout currently shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page.",
+  "faqs": [
+    {
+      "question": "Is payment live now?",
+      "answer": "Checkout currently shows the purchase path without charging a card. Live payment collection will use a secure hosted payment page."
+    },
+    {
+      "question": "Can parents test before paying?",
+      "answer": "Yes. Families can start with the free trial, see how STOA fits homework routines, and choose a paid plan later."
+    },
+    {
+      "question": "What happens when a plan limit is reached?",
+      "answer": "STOA shows a clear upgrade or renewal path before support is interrupted."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Preise",
+  "eyebrow": "Pläne für Familien",
+  "description": "Wählen Sie die passende Hausaufgabenunterstützung für Ihre Familie, von geführter Übung bis zu Erklärungen mit Lehrpersonen.",
+  "badge": "Sichere Checkout-Vorschau",
+  "supportLevel": "Unterstützungsniveau wählen",
+  "supportLevelBody": "Geführtes Üben, Elternberichte und Hilfe durch Lehrpersonen bleiben in einem Familienplan verbunden.",
+  "valueTitle": "Der Wert für Familien",
+  "valueBody": "STOA verbindet geführte Hausaufgabenhilfe, sichtbare Lernsignale für Eltern und Unterstützung durch Lehrpersonen, damit Schüler weiterkommen und Familien informiert bleiben.",
+  "checkoutBody": "In dieser Demo zeigt der Checkout den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
+  "pilotTitle": "Pilotversprechen",
+  "pilotBody": "Starten Sie mit einer kostenlosen Probephase, prüfen Sie STOA im Familienalltag und wählen Sie danach einen Plan.",
+  "pilotDetail": "Jeder Plan zeigt vor dem Checkout klar, welche Unterstützung Schüler, Eltern und Lehrpersonen erhalten.",
+  "comparison": {
+    "title": "Planzugang",
+    "headers": ["Funktion", "Probephase", "Schüler", "Familie", "Mit Lehrpersonen"],
+    "rows": [
+      ["Lernchat", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
+      ["Hausaufgaben-Upload", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
+      ["Elternbereich", "Vorschau", "—", "Enthalten", "Enthalten"],
+      ["Wochenberichte", "Vorschau", "—", "Enthalten", "Enthalten"],
+      ["Lehrperson fragen", "Begrenzt", "—", "—", "Lehrperson-Sitzungen enthalten"]
+    ]
+  },
+  "faqPaymentTitle": "Ist die Zahlung jetzt live?",
+  "faqPaymentBody": "Der Checkout zeigt aktuell den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
+  "faqs": [
+    {
+      "question": "Ist die Zahlung jetzt live?",
+      "answer": "Der Checkout zeigt aktuell den Kaufweg, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite."
+    },
+    {
+      "question": "Können Eltern vor dem Bezahlen testen?",
+      "answer": "Ja. Familien können mit der kostenlosen Probephase starten, STOA im Hausaufgabenalltag prüfen und später einen bezahlten Plan wählen."
+    },
+    {
+      "question": "Was passiert, wenn ein Planlimit erreicht ist?",
+      "answer": "STOA zeigt einen klaren Upgrade- oder Erneuerungsweg, bevor Unterstützung unterbrochen wird."
+    }
+  ]
+}

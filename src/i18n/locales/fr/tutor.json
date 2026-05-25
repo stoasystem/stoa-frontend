@@ -1,0 +1,10 @@
+{
+  "dashboardTitle": "Demandes enseignant",
+  "dashboardDescription": "Examinez les questions d’élèves qui nécessitent un accompagnement enseignant.",
+  "loadRequestsFailed": "Impossible de charger les demandes.",
+  "availabilityTitle": "Disponibilité enseignant",
+  "detailTitle": "Détail de la demande",
+  "markInProgress": "Marquer en cours",
+  "markResolved": "Marquer résolu",
+  "notes": "Notes de l’enseignant"
+}

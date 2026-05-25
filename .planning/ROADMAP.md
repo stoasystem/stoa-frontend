@@ -17,21 +17,21 @@
 - ✅ **v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization** - Phases 73-79 (implemented 2026-05-25)
 - ✅ **v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness** - Phases 80-86 (implemented 2026-05-25)
 - ✅ **v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement** - Phases 87-91 (implemented 2026-05-25)
-- 🔄 **v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement** - Phases 92-97 (planned)
+- ✅ **v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement** - Phases 92-97 (implemented 2026-05-25)
 
 ## Phases
 
 <details open>
-<summary>🔄 v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement (Phases 92-97)</summary>
+<summary>✅ v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement (Phases 92-97)</summary>
 
 **Milestone Goal:** Make STOA usable across English, German, French, and Italian while replacing user-visible AI-heavy terminology with calmer education-centered language.
 
-- [ ] **Phase 92: I18n Foundation and Language Switching** - Add i18next/react-i18next, locale scaffolding, language constants, persistence, root language updates, and switcher placement.
-- [ ] **Phase 93: Glossary, Copy System, and Terminology Audit** - Document approved terminology, banned terms, copy tone, and replacement rules; prepare audit checks for user-facing AI-heavy copy.
-- [ ] **Phase 94: Public, Auth, and Onboarding Localization** - Localize homepage, marketing navigation/footer, login, register, and role onboarding in EN/DE/FR/IT.
-- [ ] **Phase 95: Chat and Interaction Localization** - Localize chat, teacher escalation, validation, toast, loading, empty, and error states with Learning Assistant language.
-- [ ] **Phase 96: Core Role, Commercial, and P1 Page Localization** - Localize parent, tutor, pricing, billing, support, profile/history/referral/tutor availability/admin overview surfaces.
-- [ ] **Phase 97: Multilingual QA, Documentation, and Build Closure** - Verify four-language demo flows, long-copy layout, terminology cleanup, persistence, README, and build.
+- [x] **Phase 92: I18n Foundation and Language Switching** - Add i18next/react-i18next, locale scaffolding, language constants, persistence, root language updates, and switcher placement.
+- [x] **Phase 93: Glossary, Copy System, and Terminology Audit** - Document approved terminology, banned terms, copy tone, and replacement rules; prepare audit checks for user-facing AI-heavy copy.
+- [x] **Phase 94: Public, Auth, and Onboarding Localization** - Localize homepage, marketing navigation/footer, login, register, and role onboarding in EN/DE/FR/IT.
+- [x] **Phase 95: Chat and Interaction Localization** - Localize chat, teacher escalation, validation, toast, loading, empty, and error states with Learning Assistant language.
+- [x] **Phase 96: Core Role, Commercial, and P1 Page Localization** - Localize parent, tutor, pricing, billing, support, profile/history/referral/tutor availability/admin overview surfaces.
+- [x] **Phase 97: Multilingual QA, Documentation, and Build Closure** - Verify four-language demo flows, long-copy layout, terminology cleanup, persistence, README, and build.
 
 ### Phase 92: I18n Foundation and Language Switching
 
@@ -44,7 +44,7 @@
   3. `LanguageSwitcher` changes language, persists `stoa_language`, and updates `document.documentElement.lang`.
   4. Language switching appears in marketing navigation, auth pages, app menu/user area, and footer without crowding mobile layouts.
   5. Auth/demo contract types can carry optional `preferredLanguage` without requiring backend persistence.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 93: Glossary, Copy System, and Terminology Audit
 
@@ -57,7 +57,7 @@
   3. `docs/language/terminology-replacement.md` lists banned user-facing terms and concrete replacements.
   4. A source audit identifies current user-visible `AI`, `AI tutor`, `AI answer`, `human backup`, `teacher backup`, `what we are selling`, `buy now`, `customers`, and overly technical/sales-heavy wording.
   5. Planned locale keys use the approved terminology system rather than translating deprecated copy literally.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 94: Public, Auth, and Onboarding Localization
 
@@ -70,7 +70,7 @@
   3. Login and register pages render from locale files in EN/DE/FR/IT.
   4. Student, parent, and tutor onboarding steps render role labels, fields, helper text, upload messaging, and completion copy from locale files.
   5. Public/auth/onboarding copy uses Learning Assistant and professional teacher support terminology instead of AI-first technology language.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 95: Chat and Interaction Localization
 
@@ -83,7 +83,7 @@
   3. Assistant response feedback and teacher escalation CTA render in EN/DE/FR/IT.
   4. Form validation strings come from `errors` translations instead of hardcoded English.
   5. Toast, empty, loading, and error states for login/register/chat/upload/profile/support/checkout core flows use locale keys.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 96: Core Role, Commercial, and P1 Page Localization
 
@@ -96,7 +96,7 @@
   3. Pricing, billing, subscription, usage, and virtual checkout pages render in EN/DE/FR/IT with education-oriented commercial copy.
   4. Support and feedback pages render in EN/DE/FR/IT.
   5. Profile, student learning history, referral, tutor availability, and admin overview have baseline EN/DE/FR/IT localization.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 97: Multilingual QA, Documentation, and Build Closure
 
@@ -109,7 +109,7 @@
   3. Mobile checks verify German, French, and Italian text does not break navbar, buttons, pricing cards, forms, or chat actions.
   4. Language selection persists after refresh.
   5. README documents Phase 16 setup, language switching, terminology rules, and verification commands, and `npm run build` passes.
-**Plans**: 0/1
+**Plans**: 1/1
 
 </details>
 
@@ -129,9 +129,9 @@ Phase 16 phases planned in numeric order: 92 -> 93 -> 94 -> 95 -> 96 -> 97
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 92. I18n Foundation and Language Switching | v1.15 | 0/1 | Planned | — |
-| 93. Glossary, Copy System, and Terminology Audit | v1.15 | 0/1 | Planned | — |
-| 94. Public, Auth, and Onboarding Localization | v1.15 | 0/1 | Planned | — |
-| 95. Chat and Interaction Localization | v1.15 | 0/1 | Planned | — |
-| 96. Core Role, Commercial, and P1 Page Localization | v1.15 | 0/1 | Planned | — |
-| 97. Multilingual QA, Documentation, and Build Closure | v1.15 | 0/1 | Planned | — |
+| 92. I18n Foundation and Language Switching | v1.15 | 1/1 | Complete | 2026-05-25 |
+| 93. Glossary, Copy System, and Terminology Audit | v1.15 | 1/1 | Complete | 2026-05-25 |
+| 94. Public, Auth, and Onboarding Localization | v1.15 | 1/1 | Complete | 2026-05-25 |
+| 95. Chat and Interaction Localization | v1.15 | 1/1 | Complete | 2026-05-25 |
+| 96. Core Role, Commercial, and P1 Page Localization | v1.15 | 1/1 | Complete | 2026-05-25 |
+| 97. Multilingual QA, Documentation, and Build Closure | v1.15 | 1/1 | Complete | 2026-05-25 |

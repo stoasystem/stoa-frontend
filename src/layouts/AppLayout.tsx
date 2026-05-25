@@ -15,8 +15,10 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Link, NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
 import { FeedbackButton } from '@/components/feedback/FeedbackButton'
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { UserMenu } from '@/components/common/UserMenu'
 import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
 import { enableFeedback } from '@/lib/env'
@@ -39,8 +41,33 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   tutors: GraduationCap,
 }
 
+const navLabelKeys: Record<string, string> = {
+  'Advanced Analytics': 'navigation.analytics',
+  Analytics: 'navigation.analytics',
+  Availability: 'navigation.availability',
+  Billing: 'navigation.billing',
+  Chat: 'navigation.chat',
+  Dashboard: 'navigation.dashboard',
+  'Help Requests': 'navigation.helpRequests',
+  'Learning Activity': 'navigation.learningActivity',
+  'Learning History': 'navigation.learningHistory',
+  Overview: 'navigation.overview',
+  Profile: 'navigation.profile',
+  Referrals: 'navigation.referrals',
+  Reports: 'navigation.reports',
+  Requests: 'navigation.requests',
+  Retention: 'navigation.analytics',
+  Students: 'navigation.users',
+  Support: 'navigation.support',
+  'Support Inbox': 'navigation.supportInbox',
+  Tutors: 'navigation.tutors',
+  Users: 'navigation.users',
+}
+
 function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: boolean }) {
   const Icon = navIcons[item.icon]
+  const { t } = useTranslation('common')
+  const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
 
   return (
     <NavLink
@@ -57,12 +84,13 @@ function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: bo
       to={item.path}
     >
       <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
-      <span className={compact ? 'truncate' : undefined}>{item.label}</span>
+      <span className={compact ? 'truncate' : undefined}>{label}</span>
     </NavLink>
   )
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
   const items = user ? getNavItemsForUserRole(user.role, { includeSecondary: true }) : []
   const primaryItems = items.filter((item) => item.priority === 'primary')
@@ -83,7 +111,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             {secondaryItems.length > 0 && (
               <div className="mt-4 border-t pt-4">
                 <p className="mb-2 px-2 text-xs font-medium uppercase tracking-normal text-muted-foreground">
-                  More
+                  {t('navigation.more')}
                 </p>
                 <div className="flex flex-col gap-2">
                   {secondaryItems.map((item) => (
@@ -98,12 +126,15 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <FeedbackButton />
             </div>
           )}
+          <div className="mb-3">
+            <LanguageSwitcher compact />
+          </div>
           <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
             <Link className="hover:text-foreground" to="/privacy">
-              Privacy
+              {t('navigation.privacy')}
             </Link>
             <Link className="hover:text-foreground" to="/terms">
-              Terms
+              {t('navigation.terms')}
             </Link>
           </div>
           <UserMenu />

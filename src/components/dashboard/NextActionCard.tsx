@@ -6,7 +6,7 @@ const actions = [
   { label: 'Continue last conversation', to: '/chat', detail: 'Pick up the current homework thread.' },
   { label: 'Review weak topic', to: '/learning-history', detail: 'Use history to revisit recent gaps.' },
   { label: 'Upload homework question', to: '/chat', detail: 'Attach a photo or PDF before asking.' },
-  { label: 'Ask a teacher', to: '/chat', detail: 'Escalate when the AI answer is not enough.' },
+  { label: 'Ask a teacher', to: '/chat', detail: 'Ask for professional teacher support when the explanation is not enough.' },
 ]
 
 export function NextActionCard() {

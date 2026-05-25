@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -18,6 +19,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function ChildReportPage() {
+  const { t } = useTranslation('parent')
   const { childId } = useParams()
   const reportQuery = useChildReportQuery(childId)
   const report = reportQuery.data
@@ -39,30 +41,30 @@ export function ChildReportPage() {
           <div className="space-y-3">
             <Breadcrumbs
               items={[
-                { label: 'Parent', to: '/parent' },
-                { label: report?.student.name ?? 'Child', to: childId ? `/parent/children/${childId}` : undefined },
-                { label: 'Weekly report' },
+                { label: t('dashboardTitle'), to: '/parent' },
+                { label: report?.student.name ?? t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+                { label: t('weeklyReport') },
               ]}
             />
             <PageHeader
               className="mb-0"
-              title="Weekly Report"
-              description="Parent-visible progress, topic risks, and next steps for the selected child."
+              title={t('weeklyReport')}
+              description={t('reportDescription')}
             />
           </div>
           <PageActions
             primary={
               childId && (
                 <Button asChild>
-                  <Link to={`/parent/children/${childId}/monthly-report`}>Monthly report</Link>
+                  <Link to={`/parent/children/${childId}/monthly-report`}>{t('monthlyReport')}</Link>
                 </Button>
               )
             }
-            secondary={childId && <BackButton label="Child summary" to={`/parent/children/${childId}`} />}
+            secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
           />
         </div>
         {reportQuery.isLoading && <PageSkeleton rows={4} />}
-        {reportQuery.isError && <p className="text-sm text-destructive">Failed to load report.</p>}
+        {reportQuery.isError && <p className="text-sm text-destructive">{t('loadReportFailed')}</p>}
         {report && (
           <div className="space-y-6">
             <ParentReportSummaryCard report={report} />

@@ -11,8 +11,8 @@ export function TeacherSupportPage() {
       <PageContainer size="wide">
         <PageHeader
           eyebrow="Teacher support"
-          title="Human backup for harder homework moments"
-          description="Students ask AI first, then request a tutor inside chat when an explanation needs a human follow-up."
+          title="Professional teacher support for harder homework moments"
+          description="Students start with the Learning Assistant, then request a teacher inside chat when an explanation needs a professional follow-up."
           actions={<Button asChild><Link to="/pricing">View tutor-supported plan</Link></Button>}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />

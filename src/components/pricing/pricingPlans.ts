@@ -8,7 +8,7 @@ export const pricingPlans: BillingPlan[] = [
     currency: 'CHF',
     audience: 'Families validating fit during pilot.',
     cta: 'Start free trial',
-    features: ['Limited AI questions', 'Limited file uploads', 'Basic learning history'],
+    features: ['Limited learning questions', 'Limited file uploads', 'Basic learning history'],
   },
   {
     id: 'student',
@@ -17,7 +17,7 @@ export const pricingPlans: BillingPlan[] = [
     currency: 'CHF',
     audience: 'A focused learner who needs guided homework help.',
     cta: 'Select student',
-    features: ['AI learning chat', 'Homework upload', 'Learning history'],
+    features: ['Learning chat', 'Homework upload', 'Learning history'],
   },
   {
     id: 'family',
@@ -34,7 +34,7 @@ export const pricingPlans: BillingPlan[] = [
     name: 'Tutor-supported Plan',
     priceMonthly: 89,
     currency: 'CHF',
-    audience: 'Families who want human teacher backup.',
+    audience: 'Families who want professional teacher support.',
     cta: 'Select tutor support',
     features: ['Everything in Family', 'Teacher help credits', 'Priority teacher support'],
   },

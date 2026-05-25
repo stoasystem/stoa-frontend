@@ -4,7 +4,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import type { TeacherHelpRequest, TeacherHelpStatus } from '@/types/teacherHelp'
 
 const statusCopy: Record<TeacherHelpStatus | 'idle' | 'failed', string> = {
-  idle: 'Request human tutor support when the AI explanation is not clear enough.',
+  idle: 'Request professional teacher support when the explanation is not clear enough.',
   pending: 'Waiting for a teacher to review this conversation.',
   assigned: 'A teacher has been assigned to this conversation.',
   in_progress: 'A teacher is helping with this conversation.',

@@ -1,28 +1,25 @@
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const rows = [
-  ['AI learning chat', 'Limited', 'Included', 'Included', 'Included'],
-  ['Homework upload', 'Limited', 'Included', 'Included', 'Included'],
-  ['Parent dashboard', 'Preview', '—', 'Included', 'Included'],
-  ['Weekly reports', 'Preview', '—', 'Included', 'Included'],
-  ['Teacher help', 'Limited', '—', '—', 'Teacher sessions included'],
-]
-
 export function FeatureComparison() {
+  const { t } = useTranslation('pricing')
+  const headers = t('comparison.headers', { returnObjects: true }) as string[]
+  const rows = t('comparison.rows', { returnObjects: true }) as string[][]
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Access matrix</CardTitle>
+        <CardTitle className="text-base">{t('comparison.title')}</CardTitle>
       </CardHeader>
       <CardContent className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead className="text-muted-foreground">
             <tr>
-              <th className="py-2 pr-3 font-medium">Feature</th>
-              <th className="py-2 pr-3 font-medium">Trial</th>
-              <th className="py-2 pr-3 font-medium">Student</th>
-              <th className="py-2 pr-3 font-medium">Family</th>
-              <th className="py-2 font-medium">Tutor-supported</th>
+              {headers.map((header) => (
+                <th key={header} className="py-2 pr-3 font-medium">
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>

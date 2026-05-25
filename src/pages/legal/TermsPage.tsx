@@ -9,8 +9,8 @@ const sections = [
     body: 'STOA is a learning support tool. It does not replace school instruction, parent judgment, or professional tutoring decisions.',
   },
   {
-    title: 'AI answers may be wrong',
-    body: 'AI-generated explanations can be incomplete or incorrect. Important answers should be checked by the student, parent, teacher, or tutor before relying on them.',
+    title: 'Explanations may be wrong',
+    body: 'Learning explanations can be incomplete or incorrect. Important answers should be checked by the student, parent, teacher, or tutor before relying on them.',
   },
   {
     title: 'Acceptable use',
@@ -33,7 +33,7 @@ export function TermsPage() {
         <PageHeader
           eyebrow="Launch draft"
           title="Terms"
-          description="Launch-ready frontend draft for STOA usage, AI limits, subscriptions, and acceptable use."
+          description="Launch-ready frontend draft for STOA usage, learning support limits, subscriptions, and acceptable use."
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">

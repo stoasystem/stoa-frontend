@@ -1,0 +1,77 @@
+{
+  "brand": {
+    "name": "STOA",
+    "platform": "Plateforme d’apprentissage STOA",
+    "learningAssistant": "Assistant d’apprentissage",
+    "teacherSupport": "Accompagnement par un enseignant qualifié"
+  },
+  "navigation": {
+    "howItWorks": "Fonctionnement",
+    "parents": "Parents",
+    "tutors": "Enseignants",
+    "pricing": "Tarifs",
+    "login": "Connexion",
+    "startLearning": "Commencer à apprendre",
+    "forTutors": "Pour les enseignants",
+    "forParents": "Pour les parents",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "support": "Support",
+    "dashboard": "Tableau de bord",
+    "chat": "Espace d’apprentissage",
+    "learningHistory": "Historique",
+    "profile": "Profil",
+    "overview": "Vue d’ensemble",
+    "reports": "Rapports",
+    "billing": "Abonnement",
+    "referrals": "Invitations",
+    "requests": "Demandes",
+    "availability": "Disponibilité",
+    "users": "Élèves",
+    "learningActivity": "Activité d’apprentissage",
+    "helpRequests": "Demandes enseignant",
+    "supportInbox": "Support",
+    "analytics": "Analyses",
+    "more": "Plus"
+  },
+  "actions": {
+    "startLearning": "Commencer à apprendre",
+    "continue": "Continuer",
+    "back": "Retour",
+    "createAccount": "Créer un compte",
+    "creatingAccount": "Création du compte...",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion...",
+    "register": "S’inscrire",
+    "choosePlan": "Choisir un plan",
+    "viewPricing": "Voir les tarifs",
+    "askTeacher": "Demander à un enseignant",
+    "send": "Envoyer le message",
+    "stop": "Arrêter"
+  },
+  "roles": {
+    "student": "Élève",
+    "parent": "Parent",
+    "tutor": "Enseignant",
+    "admin": "Admin",
+    "organization_admin": "Admin organisation",
+    "school_teacher": "Enseignant scolaire",
+    "school_viewer": "Observateur scolaire"
+  },
+  "language": {
+    "label": "Langue",
+    "english": "English",
+    "german": "Deutsch",
+    "french": "Français",
+    "italian": "Italiano"
+  },
+  "status": {
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue.",
+    "empty": "Rien à afficher pour le moment.",
+    "ready": "Prêt",
+    "pending": "En attente",
+    "resolved": "Résolu",
+    "inProgress": "En cours"
+  }
+}

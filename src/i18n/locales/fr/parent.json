@@ -1,0 +1,18 @@
+{
+  "dashboardTitle": "Espace parents",
+  "dashboardDescription": "Suivez le rythme d’apprentissage, les questions récentes, les rapports et l’aide enseignante.",
+  "loadChildrenFailed": "Impossible de charger les enfants.",
+  "noChildren": "Aucun enfant n’est lié à ce compte parent.",
+  "child": "Enfant",
+  "weeklyReport": "Rapport hebdomadaire",
+  "monthlyReport": "Rapport mensuel",
+  "childSummary": "Résumé de l’enfant",
+  "reportDescription": "Progrès visibles pour les parents, sujets à risque et prochaines étapes pour l’enfant sélectionné.",
+  "loadReportFailed": "Impossible de charger le rapport.",
+  "reportTitle": "Rapport de l’enfant",
+  "historyTitle": "Historique d’apprentissage de l’enfant",
+  "growth": "Progrès d’apprentissage",
+  "recentQuestions": "Questions récentes",
+  "teacherRecords": "Accompagnement enseignant",
+  "nextAction": "Prochaine action recommandée"
+}

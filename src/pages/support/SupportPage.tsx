@@ -1,5 +1,6 @@
 import { Bug, GraduationCap, HelpCircle, Mail, TimerReset } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SupportInfoSection } from '@/components/support/SupportInfoSection'
@@ -49,17 +50,19 @@ const sections = [
 ]
 
 export function SupportPage() {
+  const { t } = useTranslation(['support', 'common'])
+
   return (
     <MarketingLayout>
       <PageContainer className="space-y-8">
         <PageHeader
-          eyebrow="Pilot support"
-          title="Support and feedback"
-          description="Use this page to understand pilot support paths, distinguish product support from teacher help, and contact the STOA team."
+          eyebrow={t('support:eyebrow')}
+          title={t('support:title')}
+          description={t('support:description')}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
             <Button variant="outline" asChild>
-              <Link to="/onboarding">View onboarding</Link>
+              <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
             </Button>
           }
         />
@@ -83,7 +86,7 @@ export function SupportPage() {
               <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
                 <Mail className="h-5 w-5" aria-hidden="true" />
               </div>
-              <CardTitle className="text-xl">Contact path</CardTitle>
+              <CardTitle className="text-xl">{t('support:contact')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
               <p>
@@ -99,7 +102,7 @@ export function SupportPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Send a support request</CardTitle>
+              <CardTitle className="text-xl">{t('support:submit')}</CardTitle>
             </CardHeader>
             <CardContent>
               <SupportRequestForm />

@@ -1,0 +1,32 @@
+{
+  "title": "Lernchat",
+  "emptyTitle": "Stelle deine erste Hausaufgabenfrage.",
+  "emptyDescription": "Der Lernassistent bereitet eine klare Erklärung vor. Wenn du mehr Hilfe brauchst, frage eine Lehrperson im selben Gespräch.",
+  "welcome": "Willkommen bei STOA. Stelle unten deine erste Hausaufgabenfrage.",
+  "placeholder": "Gib hier deine Hausaufgabenfrage ein...",
+  "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
+  "loadFailed": "Gespräche konnten nicht geladen werden.",
+  "conversationLoadFailed": "Dieses Gespräch konnte nicht geladen werden.",
+  "createFailed": "Das Gespräch konnte nicht erstellt werden.",
+  "starting": "Wird gestartet...",
+  "startConversation": "Gespräch starten",
+  "quotaReached": "Kontingent für Lernnachrichten erreicht.",
+  "fileQuotaReached": "Kontingent für Datei-Uploads erreicht.",
+  "emptyMessage": "Nachricht darf nicht leer sein.",
+  "upload": "Hausaufgabendatei hochladen",
+  "uploadFailed": "Datei-Upload fehlgeschlagen.",
+  "retry": "Erneut versuchen",
+  "newConversation": "Neue Unterhaltung",
+  "teacher": {
+    "title": "Soll eine Lehrperson das erklären?",
+    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson für eine klarere Erklärung.",
+    "cta": "Lehrperson fragen",
+    "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
+    "failed": "Anfrage an Lehrperson fehlgeschlagen."
+  },
+  "status": {
+    "pending": "Wartet auf Lehrperson",
+    "in_progress": "Lehrperson prüft",
+    "resolved": "Unterstützung abgeschlossen"
+  }
+}

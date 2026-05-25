@@ -1,0 +1,32 @@
+{
+  "title": "Learning chat",
+  "emptyTitle": "Ask your first homework question.",
+  "emptyDescription": "The Learning Assistant will prepare a clear explanation. If you need more help, ask a teacher in the same conversation.",
+  "welcome": "Welcome to STOA. Ask your first homework question below.",
+  "placeholder": "Type your homework question here...",
+  "preparing": "The Learning Assistant is preparing an explanation...",
+  "loadFailed": "Failed to load conversations.",
+  "conversationLoadFailed": "Failed to load this conversation.",
+  "createFailed": "Failed to create conversation.",
+  "starting": "Starting...",
+  "startConversation": "Start conversation",
+  "quotaReached": "Learning message quota reached.",
+  "fileQuotaReached": "File upload quota reached.",
+  "emptyMessage": "Message cannot be empty.",
+  "upload": "Upload homework file",
+  "uploadFailed": "File upload failed.",
+  "retry": "Retry",
+  "newConversation": "New conversation",
+  "teacher": {
+    "title": "Need a teacher to explain this?",
+    "description": "Send this conversation to a qualified teacher for a clearer follow-up.",
+    "cta": "Ask a teacher",
+    "submitted": "Your request has been sent to a teacher.",
+    "failed": "Teacher request failed."
+  },
+  "status": {
+    "pending": "Waiting for a teacher",
+    "in_progress": "Teacher is reviewing",
+    "resolved": "Teacher support completed"
+  }
+}

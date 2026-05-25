@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
@@ -17,6 +18,7 @@ import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuer
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 export function ChatPage() {
+  const { t } = useTranslation('chat')
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
   const [teacherHelpRequest, setTeacherHelpRequest] = useState<TeacherHelpRequest | null>(null)
@@ -148,7 +150,7 @@ export function ChatPage() {
         },
         onError: (error) => {
           setTeacherHelpError(
-            error instanceof Error ? error.message : 'Failed to request teacher help.',
+            error instanceof Error ? error.message : t('teacher.failed'),
           )
         },
       },
@@ -162,7 +164,7 @@ export function ChatPage() {
   if (conversationsQuery.isError) {
     return (
       <div className="flex h-screen items-center justify-center bg-background text-foreground">
-        <ErrorState message="Failed to load conversations." />
+        <ErrorState message={t('loadFailed')} />
       </div>
     )
   }
@@ -171,7 +173,7 @@ export function ChatPage() {
     return (
       <div className="flex h-screen items-center justify-center bg-background px-4 text-foreground">
         <div className="w-full max-w-xl rounded-lg border bg-card p-5 shadow-sm">
-          <EmptyState message="Welcome to STOA. Ask your first homework question below." />
+          <EmptyState message={t('welcome')} />
           <form
             className="mt-5 space-y-3"
             onSubmit={(event) => {
@@ -182,7 +184,7 @@ export function ChatPage() {
             <Textarea
               value={newConversationMessage}
               onChange={(event) => setNewConversationMessage(event.target.value)}
-              placeholder="Type your homework question here..."
+              placeholder={t('placeholder')}
               className="min-h-24 resize-none"
               disabled={createConversationMutation.isPending}
             />
@@ -190,7 +192,7 @@ export function ChatPage() {
               <p className="text-xs text-destructive">
                 {createConversationMutation.error instanceof Error
                   ? createConversationMutation.error.message
-                  : 'Failed to create conversation.'}
+                  : t('createFailed')}
               </p>
             )}
             <Button
@@ -198,7 +200,7 @@ export function ChatPage() {
               className="w-full"
               disabled={createConversationMutation.isPending}
             >
-              {createConversationMutation.isPending ? 'Starting...' : 'Start conversation'}
+              {createConversationMutation.isPending ? t('starting') : t('startConversation')}
             </Button>
           </form>
         </div>
@@ -226,7 +228,7 @@ export function ChatPage() {
         )}
         {conversationQuery.isError && (
           <div className="flex flex-1 items-center justify-center">
-            <ErrorState message="Failed to load this conversation." />
+            <ErrorState message={t('conversationLoadFailed')} />
           </div>
         )}
         {conversationQuery.data && (
@@ -240,7 +242,7 @@ export function ChatPage() {
               teacherFeedback={
                 teacherHelpError ??
                 (teacherHelpStatusQuery.data || teacherHelpRequest
-                  ? 'Teacher request created. A tutor can pick it up from the tutor dashboard.'
+                  ? t('teacher.submitted')
                   : null)
               }
             />

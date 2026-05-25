@@ -1,0 +1,18 @@
+{
+  "dashboardTitle": "Parent dashboard",
+  "dashboardDescription": "Follow learning rhythm, recent questions, reports, and teacher support moments.",
+  "loadChildrenFailed": "Failed to load children.",
+  "noChildren": "No children are linked to this parent account.",
+  "child": "Child",
+  "weeklyReport": "Weekly report",
+  "monthlyReport": "Monthly report",
+  "childSummary": "Child summary",
+  "reportDescription": "Parent-visible progress, topic risks, and next steps for the selected child.",
+  "loadReportFailed": "Failed to load report.",
+  "reportTitle": "Child report",
+  "historyTitle": "Child learning history",
+  "growth": "Learning progress",
+  "recentQuestions": "Recent questions",
+  "teacherRecords": "Teacher support records",
+  "nextAction": "Recommended next action"
+}

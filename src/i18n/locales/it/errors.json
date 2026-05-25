@@ -1,0 +1,21 @@
+{
+  "required": "Questo campo è obbligatorio.",
+  "invalidEmail": "Inserisci un indirizzo email valido.",
+  "passwordRequired": "La password è obbligatoria.",
+  "passwordTooShort": "La password deve contenere almeno 8 caratteri.",
+  "nameTooShort": "Il nome deve contenere almeno 2 caratteri.",
+  "acceptTerms": "Accetta privacy e termini per continuare.",
+  "gradeRequired": "La classe è obbligatoria.",
+  "subjectRequired": "Aggiungi almeno una materia.",
+  "messageEmpty": "Il messaggio non può essere vuoto.",
+  "fileTooLarge": "Il file è troppo grande.",
+  "unsupportedFileType": "Questo tipo di file non è supportato.",
+  "uploadFailed": "Caricamento del file non riuscito.",
+  "schoolGradeRequired": "Scuola e classe sono obbligatorie.",
+  "parentRequired": "Nome ed email del genitore sono obbligatori.",
+  "childRequired": "Nome e classe del figlio sono obbligatori.",
+  "teachingSubjectRequired": "Aggiungi almeno una materia insegnata.",
+  "educationRequired": "La formazione è obbligatoria.",
+  "introductionRequired": "La breve presentazione è obbligatoria.",
+  "credentialRequired": "Carica almeno un documento di qualifica."
+}

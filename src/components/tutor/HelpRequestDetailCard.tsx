@@ -33,7 +33,7 @@ export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDe
             }
           >
             <p className="text-xs uppercase text-muted-foreground">
-              {message.role === 'assistant' ? 'AI answer' : message.role}
+              {message.role === 'assistant' ? 'Learning Assistant explanation' : message.role}
             </p>
             <p className="mt-2 text-sm leading-6">{message.content}</p>
           </div>

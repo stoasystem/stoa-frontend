@@ -1,0 +1,21 @@
+{
+  "required": "This field is required.",
+  "invalidEmail": "Please enter a valid email address.",
+  "passwordRequired": "Password is required.",
+  "passwordTooShort": "Password must be at least 8 characters.",
+  "nameTooShort": "Name must be at least 2 characters.",
+  "acceptTerms": "Accept the privacy policy and terms to continue.",
+  "gradeRequired": "Grade is required.",
+  "subjectRequired": "Add at least one subject.",
+  "messageEmpty": "Message cannot be empty.",
+  "fileTooLarge": "The file is too large.",
+  "unsupportedFileType": "This file type is not supported.",
+  "uploadFailed": "File upload failed.",
+  "schoolGradeRequired": "School and grade are required.",
+  "parentRequired": "Parent name and email are required.",
+  "childRequired": "Child name and grade are required.",
+  "teachingSubjectRequired": "Add at least one teaching subject.",
+  "educationRequired": "Education background is required.",
+  "introductionRequired": "Short introduction is required.",
+  "credentialRequired": "Upload at least one credential document."
+}

@@ -31,6 +31,7 @@ export type RegisterPayload = {
   name: string
   email: string
   password: string
+  preferredLanguage?: string
   profile:
     | StudentOnboardingProfile
     | ParentOnboardingProfile

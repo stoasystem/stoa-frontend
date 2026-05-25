@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
@@ -20,14 +21,16 @@ export function RegisterAccountStep({
     acceptedTerms: boolean
   }>) => void
 }) {
+  const { t } = useTranslation(['auth', 'common'])
+
   return (
     <div className="grid gap-4">
       <div className="space-y-2">
-        <Label htmlFor="name">Name</Label>
+        <Label htmlFor="name">{t('auth:register.name')}</Label>
         <Input id="name" value={name} onChange={(event) => onChange({ name: event.target.value })} required />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('auth:register.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -38,7 +41,7 @@ export function RegisterAccountStep({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{t('auth:register.password')}</Label>
         <Input
           id="password"
           type="password"
@@ -57,15 +60,14 @@ export function RegisterAccountStep({
             onChange={(event) => onChange({ acceptedTerms: event.target.checked })}
           />
           <span>
-            I agree to STOA's{' '}
+            {t('auth:register.acceptTerms')}{' '}
             <Link className="font-medium underline" to="/privacy">
-              Privacy Policy
+              {t('common:navigation.privacy')}
             </Link>{' '}
-            and{' '}
+            /{' '}
             <Link className="font-medium underline" to="/terms">
-              Terms
+              {t('common:navigation.terms')}
             </Link>
-            .
           </span>
         </label>
       </div>

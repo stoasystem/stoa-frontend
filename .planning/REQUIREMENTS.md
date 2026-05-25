@@ -10,74 +10,74 @@ Requirements for Phase 16. Each requirement maps to exactly one roadmap phase.
 
 ### I18n Foundation
 
-- [ ] **I18N-01**: User can run the app with `i18next` and `react-i18next` initialized before React renders.
-- [ ] **I18N-02**: User can switch between `en`, `de`, `fr`, and `it` with English fallback.
-- [ ] **I18N-03**: User language choice persists across refresh through `localStorage` key `stoa_language`.
-- [ ] **I18N-04**: Assistive technology can read the active language because the app updates `document.documentElement.lang`.
-- [ ] **I18N-05**: Developers can add translations by namespace under `src/i18n/locales/{en,de,fr,it}`.
-- [ ] **I18N-06**: Developers can reference supported languages and namespaces from typed constants.
-- [ ] **I18N-07**: Demo/auth payload contracts can optionally carry `preferredLanguage` without requiring a production backend preference system.
+- [x] **I18N-01**: User can run the app with `i18next` and `react-i18next` initialized before React renders.
+- [x] **I18N-02**: User can switch between `en`, `de`, `fr`, and `it` with English fallback.
+- [x] **I18N-03**: User language choice persists across refresh through `localStorage` key `stoa_language`.
+- [x] **I18N-04**: Assistive technology can read the active language because the app updates `document.documentElement.lang`.
+- [x] **I18N-05**: Developers can add translations by namespace under `src/i18n/locales/{en,de,fr,it}`.
+- [x] **I18N-06**: Developers can reference supported languages and namespaces from typed constants.
+- [x] **I18N-07**: Demo/auth payload contracts can optionally carry `preferredLanguage` without requiring a production backend preference system.
 
 ### Language Switcher
 
-- [ ] **LANG-01**: User can access a language switcher in the public marketing navigation.
-- [ ] **LANG-02**: User can access a language switcher on login and register pages.
-- [ ] **LANG-03**: Signed-in users can access a language switcher from the app user/menu area.
-- [ ] **LANG-04**: User can access language choices in the footer without relying on flags.
-- [ ] **LANG-05**: Mobile layouts keep language switching usable without crowding chat input or primary study controls.
+- [x] **LANG-01**: User can access a language switcher in the public marketing navigation.
+- [x] **LANG-02**: User can access a language switcher on login and register pages.
+- [x] **LANG-03**: Signed-in users can access a language switcher from the app user/menu area.
+- [x] **LANG-04**: User can access language choices in the footer without relying on flags.
+- [x] **LANG-05**: Mobile layouts keep language switching usable without crowding chat input or primary study controls.
 
 ### Terminology and Copy System
 
-- [ ] **TERM-01**: User-visible UI no longer uses `AI` as the main product term on core pages.
-- [ ] **TERM-02**: User-visible UI uses `Learning Assistant` for first-response learning help in English.
-- [ ] **TERM-03**: User-visible UI uses `Lernassistent`, `Assistant d’apprentissage`, and `Assistente all’apprendimento` in German, French, and Italian.
-- [ ] **TERM-04**: User-visible UI uses `Professional teacher support` and equivalent DE/FR/IT terms instead of `human backup` or `teacher backup`.
-- [ ] **TERM-05**: Pricing and marketing copy avoids sales-heavy wording such as `what we are selling`, `buy now`, and generic `customers`.
-- [ ] **TERM-06**: Developers can consult `docs/language/glossary.md` for approved terms and banned terms.
-- [ ] **TERM-07**: Developers can consult `docs/language/copy-style-guide.md` for tone rules.
-- [ ] **TERM-08**: Developers can consult `docs/language/terminology-replacement.md` for concrete replacement patterns and grep targets.
+- [x] **TERM-01**: User-visible UI no longer uses `AI` as the main product term on core pages.
+- [x] **TERM-02**: User-visible UI uses `Learning Assistant` for first-response learning help in English.
+- [x] **TERM-03**: User-visible UI uses `Lernassistent`, `Assistant d’apprentissage`, and `Assistente all’apprendimento` in German, French, and Italian.
+- [x] **TERM-04**: User-visible UI uses `Professional teacher support` and equivalent DE/FR/IT terms instead of `human backup` or `teacher backup`.
+- [x] **TERM-05**: Pricing and marketing copy avoids sales-heavy wording such as `what we are selling`, `buy now`, and generic `customers`.
+- [x] **TERM-06**: Developers can consult `docs/language/glossary.md` for approved terms and banned terms.
+- [x] **TERM-07**: Developers can consult `docs/language/copy-style-guide.md` for tone rules.
+- [x] **TERM-08**: Developers can consult `docs/language/terminology-replacement.md` for concrete replacement patterns and grep targets.
 
 ### Public, Auth, and Onboarding Localization
 
-- [ ] **PUBLIC-01**: Homepage content supports English, German, French, and Italian.
-- [ ] **PUBLIC-02**: Homepage CTA and flow copy use learning-support language rather than AI-first technology language.
-- [ ] **PUBLIC-03**: Marketing navigation and footer labels support English, German, French, and Italian.
-- [ ] **PUBLIC-04**: Login page supports English, German, French, and Italian.
-- [ ] **PUBLIC-05**: Register page supports English, German, French, and Italian.
-- [ ] **PUBLIC-06**: Student onboarding role/profile copy supports English, German, French, and Italian.
-- [ ] **PUBLIC-07**: Parent and tutor onboarding copy, including tutor credential upload messaging, supports English, German, French, and Italian.
+- [x] **PUBLIC-01**: Homepage content supports English, German, French, and Italian.
+- [x] **PUBLIC-02**: Homepage CTA and flow copy use learning-support language rather than AI-first technology language.
+- [x] **PUBLIC-03**: Marketing navigation and footer labels support English, German, French, and Italian.
+- [x] **PUBLIC-04**: Login page supports English, German, French, and Italian.
+- [x] **PUBLIC-05**: Register page supports English, German, French, and Italian.
+- [x] **PUBLIC-06**: Student onboarding role/profile copy supports English, German, French, and Italian.
+- [x] **PUBLIC-07**: Parent and tutor onboarding copy, including tutor credential upload messaging, supports English, German, French, and Italian.
 
 ### Chat and Interaction Localization
 
-- [ ] **CHAT-01**: Chat empty state supports English, German, French, and Italian.
-- [ ] **CHAT-02**: Chat input placeholder supports English, German, French, and Italian.
-- [ ] **CHAT-03**: Learning Assistant loading/thinking state supports English, German, French, and Italian.
-- [ ] **CHAT-04**: Assistant response and teacher escalation copy support English, German, French, and Italian.
-- [ ] **CHAT-05**: Teacher request CTA uses `Ask a teacher` style language in all four languages.
-- [ ] **CHAT-06**: Form validation messages come from `errors` translations instead of hardcoded English.
-- [ ] **CHAT-07**: Toast, empty, loading, and error states for core flows come from locale files.
+- [x] **CHAT-01**: Chat empty state supports English, German, French, and Italian.
+- [x] **CHAT-02**: Chat input placeholder supports English, German, French, and Italian.
+- [x] **CHAT-03**: Learning Assistant loading/thinking state supports English, German, French, and Italian.
+- [x] **CHAT-04**: Assistant response and teacher escalation copy support English, German, French, and Italian.
+- [x] **CHAT-05**: Teacher request CTA uses `Ask a teacher` style language in all four languages.
+- [x] **CHAT-06**: Form validation messages come from `errors` translations instead of hardcoded English.
+- [x] **CHAT-07**: Toast, empty, loading, and error states for core flows come from locale files.
 
 ### Core Role and Commercial Page Localization
 
-- [ ] **CORE-01**: Parent dashboard supports English, German, French, and Italian.
-- [ ] **CORE-02**: Parent report and learning-history surfaces support English, German, French, and Italian.
-- [ ] **CORE-03**: Tutor request list/detail/status workflow supports English, German, French, and Italian.
-- [ ] **CORE-04**: Pricing page supports English, German, French, and Italian with education-oriented wording.
-- [ ] **CORE-05**: Billing, subscription, usage, and virtual checkout pages support English, German, French, and Italian.
-- [ ] **CORE-06**: Support and feedback pages support English, German, French, and Italian.
-- [ ] **CORE-07**: Profile and student learning-history P1 pages have baseline English, German, French, and Italian localization.
-- [ ] **CORE-08**: Referral and tutor availability P1 pages have baseline English, German, French, and Italian localization.
-- [ ] **CORE-09**: Admin overview P1 page has baseline English, German, French, and Italian localization.
+- [x] **CORE-01**: Parent dashboard supports English, German, French, and Italian.
+- [x] **CORE-02**: Parent report and learning-history surfaces support English, German, French, and Italian.
+- [x] **CORE-03**: Tutor request list/detail/status workflow supports English, German, French, and Italian.
+- [x] **CORE-04**: Pricing page supports English, German, French, and Italian with education-oriented wording.
+- [x] **CORE-05**: Billing, subscription, usage, and virtual checkout pages support English, German, French, and Italian.
+- [x] **CORE-06**: Support and feedback pages support English, German, French, and Italian.
+- [x] **CORE-07**: Profile and student learning-history P1 pages have baseline English, German, French, and Italian localization.
+- [x] **CORE-08**: Referral and tutor availability P1 pages have baseline English, German, French, and Italian localization.
+- [x] **CORE-09**: Admin overview P1 page has baseline English, German, French, and Italian localization.
 
 ### QA and Documentation
 
-- [ ] **QA-01**: Translation QA checklist exists and covers EN/DE/FR/IT page and flow testing.
-- [ ] **QA-02**: QA checks confirm no user-visible core-page `AI`, `AI tutor`, `chatbot`, `human backup`, or `teacher backup` wording remains.
-- [ ] **QA-03**: QA checks confirm German, French, and Italian text does not break navbar, buttons, pricing cards, forms, or chat actions on mobile.
-- [ ] **QA-04**: QA checks confirm language selection persists after refresh.
-- [ ] **QA-05**: QA checks confirm core demo flows still run in English, German, French, and Italian.
-- [ ] **QA-06**: README documents Phase 16 multilingual setup, language switching, terminology rules, and verification commands.
-- [ ] **QA-07**: `npm run build` passes after Phase 16 changes.
+- [x] **QA-01**: Translation QA checklist exists and covers EN/DE/FR/IT page and flow testing.
+- [x] **QA-02**: QA checks confirm no user-visible core-page `AI`, `AI tutor`, `chatbot`, `human backup`, or `teacher backup` wording remains.
+- [x] **QA-03**: QA checks confirm German, French, and Italian text does not break navbar, buttons, pricing cards, forms, or chat actions on mobile.
+- [x] **QA-04**: QA checks confirm language selection persists after refresh.
+- [x] **QA-05**: QA checks confirm core demo flows still run in English, German, French, and Italian.
+- [x] **QA-06**: README documents Phase 16 multilingual setup, language switching, terminology rules, and verification commands.
+- [x] **QA-07**: `npm run build` passes after Phase 16 changes.
 
 ## Future Requirements
 
@@ -124,56 +124,56 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| I18N-01 | Phase 92 | Planned |
-| I18N-02 | Phase 92 | Planned |
-| I18N-03 | Phase 92 | Planned |
-| I18N-04 | Phase 92 | Planned |
-| I18N-05 | Phase 92 | Planned |
-| I18N-06 | Phase 92 | Planned |
-| I18N-07 | Phase 92 | Planned |
-| LANG-01 | Phase 92 | Planned |
-| LANG-02 | Phase 92 | Planned |
-| LANG-03 | Phase 92 | Planned |
-| LANG-04 | Phase 92 | Planned |
-| LANG-05 | Phase 92 | Planned |
-| TERM-01 | Phase 93 | Planned |
-| TERM-02 | Phase 93 | Planned |
-| TERM-03 | Phase 93 | Planned |
-| TERM-04 | Phase 93 | Planned |
-| TERM-05 | Phase 93 | Planned |
-| TERM-06 | Phase 93 | Planned |
-| TERM-07 | Phase 93 | Planned |
-| TERM-08 | Phase 93 | Planned |
-| PUBLIC-01 | Phase 94 | Planned |
-| PUBLIC-02 | Phase 94 | Planned |
-| PUBLIC-03 | Phase 94 | Planned |
-| PUBLIC-04 | Phase 94 | Planned |
-| PUBLIC-05 | Phase 94 | Planned |
-| PUBLIC-06 | Phase 94 | Planned |
-| PUBLIC-07 | Phase 94 | Planned |
-| CHAT-01 | Phase 95 | Planned |
-| CHAT-02 | Phase 95 | Planned |
-| CHAT-03 | Phase 95 | Planned |
-| CHAT-04 | Phase 95 | Planned |
-| CHAT-05 | Phase 95 | Planned |
-| CHAT-06 | Phase 95 | Planned |
-| CHAT-07 | Phase 95 | Planned |
-| CORE-01 | Phase 96 | Planned |
-| CORE-02 | Phase 96 | Planned |
-| CORE-03 | Phase 96 | Planned |
-| CORE-04 | Phase 96 | Planned |
-| CORE-05 | Phase 96 | Planned |
-| CORE-06 | Phase 96 | Planned |
-| CORE-07 | Phase 96 | Planned |
-| CORE-08 | Phase 96 | Planned |
-| CORE-09 | Phase 96 | Planned |
-| QA-01 | Phase 97 | Planned |
-| QA-02 | Phase 97 | Planned |
-| QA-03 | Phase 97 | Planned |
-| QA-04 | Phase 97 | Planned |
-| QA-05 | Phase 97 | Planned |
-| QA-06 | Phase 97 | Planned |
-| QA-07 | Phase 97 | Planned |
+| I18N-01 | Phase 92 | Complete |
+| I18N-02 | Phase 92 | Complete |
+| I18N-03 | Phase 92 | Complete |
+| I18N-04 | Phase 92 | Complete |
+| I18N-05 | Phase 92 | Complete |
+| I18N-06 | Phase 92 | Complete |
+| I18N-07 | Phase 92 | Complete |
+| LANG-01 | Phase 92 | Complete |
+| LANG-02 | Phase 92 | Complete |
+| LANG-03 | Phase 92 | Complete |
+| LANG-04 | Phase 92 | Complete |
+| LANG-05 | Phase 92 | Complete |
+| TERM-01 | Phase 93 | Complete |
+| TERM-02 | Phase 93 | Complete |
+| TERM-03 | Phase 93 | Complete |
+| TERM-04 | Phase 93 | Complete |
+| TERM-05 | Phase 93 | Complete |
+| TERM-06 | Phase 93 | Complete |
+| TERM-07 | Phase 93 | Complete |
+| TERM-08 | Phase 93 | Complete |
+| PUBLIC-01 | Phase 94 | Complete |
+| PUBLIC-02 | Phase 94 | Complete |
+| PUBLIC-03 | Phase 94 | Complete |
+| PUBLIC-04 | Phase 94 | Complete |
+| PUBLIC-05 | Phase 94 | Complete |
+| PUBLIC-06 | Phase 94 | Complete |
+| PUBLIC-07 | Phase 94 | Complete |
+| CHAT-01 | Phase 95 | Complete |
+| CHAT-02 | Phase 95 | Complete |
+| CHAT-03 | Phase 95 | Complete |
+| CHAT-04 | Phase 95 | Complete |
+| CHAT-05 | Phase 95 | Complete |
+| CHAT-06 | Phase 95 | Complete |
+| CHAT-07 | Phase 95 | Complete |
+| CORE-01 | Phase 96 | Complete |
+| CORE-02 | Phase 96 | Complete |
+| CORE-03 | Phase 96 | Complete |
+| CORE-04 | Phase 96 | Complete |
+| CORE-05 | Phase 96 | Complete |
+| CORE-06 | Phase 96 | Complete |
+| CORE-07 | Phase 96 | Complete |
+| CORE-08 | Phase 96 | Complete |
+| CORE-09 | Phase 96 | Complete |
+| QA-01 | Phase 97 | Complete |
+| QA-02 | Phase 97 | Complete |
+| QA-03 | Phase 97 | Complete |
+| QA-04 | Phase 97 | Complete |
+| QA-05 | Phase 97 | Complete |
+| QA-06 | Phase 97 | Complete |
+| QA-07 | Phase 97 | Complete |
 
 **Coverage:**
 - v1.15 requirements: 50 total
@@ -182,4 +182,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 at Phase 16 planning*
+*Last updated: 2026-05-25 at Phase 16 completion*

@@ -1,0 +1,10 @@
+{
+  "dashboardTitle": "Teacher requests",
+  "dashboardDescription": "Review student questions that need professional teacher support.",
+  "loadRequestsFailed": "Failed to load requests.",
+  "availabilityTitle": "Teacher availability",
+  "detailTitle": "Request detail",
+  "markInProgress": "Mark in progress",
+  "markResolved": "Mark resolved",
+  "notes": "Teacher notes"
+}

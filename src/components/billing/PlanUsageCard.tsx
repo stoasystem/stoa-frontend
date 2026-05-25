@@ -26,7 +26,7 @@ export function PlanUsageCard({ usage }: { usage: BillingUsage }) {
         <CardTitle className="text-base">Usage quota</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
-        <UsageRow label="AI messages" used={usage.aiMessagesUsed} limit={usage.aiMessagesLimit} />
+        <UsageRow label="Learning messages" used={usage.aiMessagesUsed} limit={usage.aiMessagesLimit} />
         <UsageRow label="File uploads" used={usage.fileUploadsUsed} limit={usage.fileUploadsLimit} />
         <UsageRow label="Teacher help" used={usage.teacherHelpUsed} limit={usage.teacherHelpLimit} />
         <p className="text-xs text-muted-foreground">

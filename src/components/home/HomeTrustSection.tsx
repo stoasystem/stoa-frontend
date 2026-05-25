@@ -1,18 +1,20 @@
-const notes = [
-  ['Swiss school context', 'Designed around everyday homework questions, grade context, and family visibility.'],
-  ['Calm progress signals', 'Parents see patterns, weak topics, and teacher-help moments without reading every chat.'],
-  ['Built for routines', 'Students can ask quick questions after school, during homework, or before a tutoring session.'],
-]
+import { useTranslation } from 'react-i18next'
 
 export function HomeTrustSection() {
+  const { t } = useTranslation('home')
+  const notes = t('trust.items', { returnObjects: true }) as Array<{
+    title: string
+    description: string
+  }>
+
   return (
     <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6">
       <div className="grid gap-8 border-y border-border/70 py-10 lg:grid-cols-[1fr_0.72fr] lg:items-center">
         <div className="grid gap-6 md:grid-cols-3">
-          {notes.map(([title, description]) => (
-            <div key={title}>
-              <h3 className="text-lg font-semibold text-foreground">{title}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+          {notes.map((note) => (
+            <div key={note.title}>
+              <h3 className="text-lg font-semibold text-foreground">{note.title}</h3>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{note.description}</p>
             </div>
           ))}
         </div>
