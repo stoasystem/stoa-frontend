@@ -198,6 +198,7 @@ None currently.
 | 2026-05-25 | Add public page navigation | `src/layouts/MarketingLayout.tsx` |
 | 2026-05-25 | Fix homepage bottom CTA contrast | `src/components/home/HomeCTASection.tsx` |
 | 2026-05-25 | Add marketing visuals | `src/components/home/HomeLearningFlow.tsx` |
+| 2026-05-25 | Fix parent growth visual | `src/components/landing/ParentHero.tsx` |
 
 ### Blockers/Concerns
 
@@ -232,6 +233,7 @@ None currently.
 - Public page navigation cleanup passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright nav-count checks across public pages.
 - Homepage bottom CTA contrast fix passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright computed-style checks for all homepage `Start Learning` buttons.
 - Marketing visual pass added image-backed sections to homepage, parent, teacher support, and pricing pages; passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright image coverage checks.
+- Parent growth visual fix passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright `/for-parents` image/copy checks.
 - `python3 -m py_compile backend/app/*.py` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.

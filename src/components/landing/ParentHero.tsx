@@ -35,17 +35,17 @@ export function ParentHero() {
       </div>
       <div className="relative min-h-[27rem] overflow-hidden rounded-xl border border-border/70 bg-[#152238] shadow-[0_24px_70px_hsl(217_45%_15%_/_0.12)]">
         <img
-          src="https://images.unsplash.com/photo-1605711285791-0219e80e43a3?auto=format&fit=crop&w=1000&q=80"
-          alt="Parent and child studying together at home"
+          src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=80"
+          alt="Child learning in a classroom with focused attention"
           className="absolute inset-0 h-full w-full object-cover opacity-72"
         />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(217_45%_15%_/_0.1),hsl(217_45%_15%_/_0.82))]" />
         <div className="absolute bottom-5 left-5 right-5 rounded-xl border border-white/15 bg-white/90 p-4 text-[#152238] shadow-2xl backdrop-blur">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8f7c]">
-            Weekly signal
+            Growth this week
           </p>
           <div className="mt-3 space-y-2">
-            {['Practiced twice this week', 'Weak topic: fractions', 'Teacher helped once'].map((item) => (
+            {['Completed 3 focused practice sessions', 'Confidence improving in fractions', 'Next step ready for tomorrow'].map((item) => (
               <div key={item} className="rounded-md border border-[#ddd6cc] bg-[#f7f3ec] px-3 py-2 text-sm font-medium">
                 {item}
               </div>
