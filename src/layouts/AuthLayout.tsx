@@ -1,16 +1,15 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
-import { AppLogo } from '@/components/common/AppLogo'
+import { MarketingHeader } from '@/layouts/MarketingLayout'
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen place-items-center bg-background px-5 py-8 text-foreground sm:px-6">
-      <div className="w-full max-w-4xl">
-        <Link to="/" className="mb-8 block text-center text-lg font-semibold tracking-tight">
-          <AppLogo />
-        </Link>
-        {children}
-      </div>
+    <div className="premium-shell min-h-screen text-foreground">
+      <MarketingHeader />
+      <main className="grid min-h-[calc(100vh-4rem)] place-items-center px-5 py-10 sm:px-6">
+        <div className="w-full max-w-4xl">
+          {children}
+        </div>
+      </main>
     </div>
   )
 }

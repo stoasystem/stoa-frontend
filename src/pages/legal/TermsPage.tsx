@@ -1,6 +1,7 @@
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { MarketingLayout } from '@/layouts/MarketingLayout'
 
 const sections = [
   {
@@ -27,24 +28,26 @@ const sections = [
 
 export function TermsPage() {
   return (
-    <PageContainer>
-      <PageHeader
-        eyebrow="Launch draft"
-        title="Terms"
-        description="Launch-ready frontend draft for STOA usage, AI limits, subscriptions, and acceptable use."
-      />
-      <div className="space-y-4">
-        {sections.map((section) => (
-          <Card key={section.title}>
-            <CardHeader>
-              <CardTitle className="text-base">{section.title}</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm leading-6 text-muted-foreground">
-              {section.body}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </PageContainer>
+    <MarketingLayout>
+      <PageContainer>
+        <PageHeader
+          eyebrow="Launch draft"
+          title="Terms"
+          description="Launch-ready frontend draft for STOA usage, AI limits, subscriptions, and acceptable use."
+        />
+        <div className="space-y-4">
+          {sections.map((section) => (
+            <Card key={section.title}>
+              <CardHeader>
+                <CardTitle className="text-base">{section.title}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm leading-6 text-muted-foreground">
+                {section.body}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </PageContainer>
+    </MarketingLayout>
   )
 }

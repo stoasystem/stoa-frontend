@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
+import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
 
@@ -26,54 +27,59 @@ export function PricingPage() {
   }
 
   return (
-    <PageContainer size="wide">
-      <PageHeader
-        eyebrow="Plans for families"
-        title="Pricing"
-        description="Choose the level of homework support your family needs, from AI-guided practice to tutor-supported explanations."
-        actions={<Badge variant="secondary">Safe checkout preview</Badge>}
-      />
+    <MarketingLayout>
+      <PageContainer size="wide">
+        <PageHeader
+          eyebrow="Plans for families"
+          title="Pricing"
+          description="Choose the level of homework support your family needs, from AI-guided practice to tutor-supported explanations."
+          actions={<Badge variant="secondary">Safe checkout preview</Badge>}
+        />
 
-      <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">What STOA is selling</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>
-              STOA combines AI homework guidance, parent-visible learning signals, and tutor
-              support escalation so students can get unstuck while families stay informed.
-            </p>
-            <p>
-              During this demo, checkout shows the purchase path without charging a card. Live
-              payment collection will use a secure hosted payment page.
-            </p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Pilot promise</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-            <p>Start with a free trial, see whether STOA fits your family routine, then choose a plan when ready.</p>
-            <p>Each plan makes the student, parent, and tutor support level clear before checkout.</p>
-          </CardContent>
-        </Card>
-      </section>
+        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">What STOA is selling</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>
+                STOA combines AI homework guidance, parent-visible learning signals, and tutor
+                support escalation so students can get unstuck while families stay informed.
+              </p>
+              <p>
+                During this demo, checkout shows the purchase path without charging a card. Live
+                payment collection will use a secure hosted payment page.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Pilot promise</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>
+                Start with a free trial, see whether STOA fits your family routine, then choose a
+                plan when ready.
+              </p>
+              <p>Each plan makes the student, parent, and tutor support level clear before checkout.</p>
+            </CardContent>
+          </Card>
+        </section>
 
-      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-        {pricingPlans.map((plan) => (
-          <PlanCard
-            key={plan.id}
-            plan={plan}
-            featured={plan.recommended}
-            onSelect={selectPlan}
-          />
-        ))}
-      </section>
+        <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {pricingPlans.map((plan) => (
+            <PlanCard
+              key={plan.id}
+              plan={plan}
+              featured={plan.recommended}
+              onSelect={selectPlan}
+            />
+          ))}
+        </section>
 
-      <FeatureComparison />
-      <PricingFAQ />
-    </PageContainer>
+        <FeatureComparison />
+        <PricingFAQ />
+      </PageContainer>
+    </MarketingLayout>
   )
 }

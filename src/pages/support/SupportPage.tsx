@@ -7,7 +7,7 @@ import { SupportRequestForm } from '@/components/support/SupportRequestForm'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { MarketingLayout } from '@/layouts/MarketingLayout'
 
 const sections = [
   {
@@ -50,8 +50,8 @@ const sections = [
 
 export function SupportPage() {
   return (
-    <DashboardLayout>
-      <PageContainer className="space-y-8 p-0">
+    <MarketingLayout>
+      <PageContainer className="space-y-8">
         <PageHeader
           eyebrow="Pilot support"
           title="Support and feedback"
@@ -106,6 +106,6 @@ export function SupportPage() {
           </Card>
         </section>
       </PageContainer>
-    </DashboardLayout>
+    </MarketingLayout>
   )
 }

@@ -6,7 +6,7 @@ import { OnboardingRoleGuide } from '@/components/onboarding/OnboardingRoleGuide
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { MarketingLayout } from '@/layouts/MarketingLayout'
 
 const roleGuides = [
   {
@@ -79,8 +79,8 @@ const roleGuides = [
 
 export function OnboardingPage() {
   return (
-    <DashboardLayout>
-      <PageContainer className="space-y-8 p-0">
+    <MarketingLayout>
+      <PageContainer className="space-y-8">
         <PageHeader
           eyebrow="Pilot onboarding"
           title="Get ready for the STOA pilot"
@@ -124,6 +124,6 @@ export function OnboardingPage() {
           ))}
         </section>
       </PageContainer>
-    </DashboardLayout>
+    </MarketingLayout>
   )
 }
