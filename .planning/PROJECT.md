@@ -10,19 +10,22 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
 
-## Current Milestone: v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness
+## Current Milestone: v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement
 
-**Goal:** Stabilize a simple, replaceable demo backend and API contract layer so the existing STOA frontend can run complete demo flows for auth, student chat, teacher help, parent reports, billing, referrals, support, and admin analytics while preparing for future real backend and AWS integration.
+**Goal:** Refine STOA's first impression and core learning path with a magazine-style homepage, role-aware onboarding, AI-first chat flow, and a more premium, restrained education product UI.
 
 **Target features:**
-- Demo backend scope, API contract, data model, reset flow, QA, and integration documentation.
-- Fixed demo accounts for student, parent, tutor, and admin roles with stable token-style auth responses.
-- Lightweight demo backend or mock setup with `/health`, auth, conversations/messages, teacher help, parent, billing, referral, support, and admin endpoints.
-- Demo state reset flow that restores fixed users, conversations, reports, help requests, billing data, referrals, support data, and admin analytics.
-- Frontend API mode strategy for mock, demo, staging, and production backends through environment configuration.
-- Frontend API client/service alignment so page components depend on contracts instead of demo-backend internals.
-- Real backend readiness and AWS readiness notes covering API base URL, auth headers, CORS, streaming, upload, health, error format, and migration checklist.
-- README updates and verification for startup, reset, core demo flows, and build.
+- Magazine-style STOA homepage with a clear student-first `Start Learning` CTA.
+- Navigation that keeps student entry prominent while moving parent and tutor entry points into lower-priority navigation or auth/onboarding flows.
+- Replacement of the current `AI Support / Teacher Backup / Parent Visibility` parallel-card presentation with a sequential learning flow: ask, receive AI help, request a teacher if needed, and let parents follow progress.
+- Role-based registration and onboarding for students, parents, and tutors, excluding public admin registration.
+- Student onboarding fields for age, school, grade, school system, subjects needing help, and parent information.
+- Parent onboarding fields for child profile and subjects needing help.
+- Tutor onboarding fields for teaching subjects, education background, experience, introduction, and credential upload UI.
+- AI-first chat entry where students can ask immediately and teacher escalation appears inline after assistant responses.
+- Demo backend/API contract support for expanded register payloads, tutor credential mock upload, new student chat, and teacher-help request flow.
+- Premium visual treatment using deep navy, warm ivory, muted sage, soft gold accents, restrained transitions, and mobile-safe responsive layouts.
+- README, QA, and demo-flow updates with build verification.
 
 ## Current State
 
@@ -74,7 +77,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.13 Phase 14 is implemented and verified.)
+- Phase 15 must improve STOA's homepage, onboarding path, AI-first chat experience, and visual quality without turning into a broad feature-expansion or production-backend milestone.
 
 ### Out of Scope
 
@@ -100,7 +103,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Context
 
-The project brief for Phase 14 was provided in Chinese and defines demo backend stabilization, API contract cleanup, fixed demo accounts, JSON-file or similarly simple demo state, reset flow, auth/chat/teacher-help/parent/billing/referral/support/admin mock APIs, API mode configuration, frontend service-layer alignment, real backend readiness documentation, AWS readiness notes, README updates, QA checklist, full demo flow verification, and build verification. The user explicitly clarified that Phase 14 does not continue expanding product features and does not build a formal production backend.
+The project brief for Phase 15 was provided in Chinese and defines homepage redesign, onboarding flow, and premium UI refinement. The key product correction is that AI support, teacher help, and parent visibility are not three equal homepage product entrances. STOA should present one student learning platform where AI is the default first responder, teachers are available as escalation when AI is not enough, and parents can follow learning progress. The user explicitly wants a more premium, restrained education-product visual direction while keeping the milestone scoped to homepage, auth/onboarding, chat entry logic, and demo-backend support only.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -130,7 +133,7 @@ Current codebase facts:
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 14 is demo-backend and integration-readiness work. It stabilizes simple demo APIs, data, reset, docs, and frontend service alignment without adding new large business modules or production backend systems.
+- **Scope**: Phase 15 is first-impression, onboarding, AI-first chat flow, and premium UI refinement work. It must avoid new large product modules, production backend systems, real credential verification, real parent identity verification, real payment expansion, and full design-system rewrites.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -149,6 +152,7 @@ Current codebase facts:
 - **Demo backend boundary**: Any local FastAPI, SQLite, JSON, in-memory, MSW, or mock API support in this repo exists only to demonstrate and test frontend flows. It must not be treated as production backend architecture.
 - **Demo backend simplicity**: Phase 14 demo backend work should prefer MSW/mock data or a minimal local server with JSON-file state; avoid complex ORM, migrations, SQL schema design, Docker Compose, Kubernetes, and AWS CDK.
 - **Demo accounts**: Phase 14 demo users are fixed as `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com`, all using `password123`, and reset must preserve those accounts.
+- **Onboarding boundary**: Phase 15 registration profile fields and tutor credential upload are demo/onboarding UI and API-contract work only; they must not imply production verification, OCR, identity checks, or admission decisions.
 - **API modes**: Frontend API mode must be configurable for `mock`, `demo`, `staging`, and `production`; page components should not hard-code API URLs or demo data internals.
 - **Error format**: Demo backend errors should use a consistent `{ message, code }` response with demo-specific codes so frontend error states remain testable.
 - **Learning intelligence boundary**: Advanced learning profiles, diagnosis, curriculum graph, and recommendations in Phase 12 are mock/demo UI surfaces only. They must not present themselves as real AI diagnosis or graph computation.
@@ -201,6 +205,9 @@ Current codebase facts:
 | Keep Phase 13 focused on information architecture and UX optimization | STOA now has many role surfaces and demo routes; the next value is making the product understandable, navigable, and maintainable rather than adding more pages | — Pending |
 | Keep Phase 14 as demo backend stabilization, not formal backend development | The frontend needs stable demonstration and testing flows now, while production backend, database, auth, payments, AI orchestration, and AWS infrastructure remain future backend-owned work | ✓ Good |
 | Prefer a simple replaceable demo backend/API contract boundary | Local demo state, reset commands, fixed accounts, and documented contracts give frontend demos enough realism without creating long-term backend technical debt | ✓ Good |
+| Keep Phase 15 focused on first impression and core path refinement | STOA now has stable demo flows; the next value is making the student-first learning path obvious and visually credible rather than adding broad new modules | — Pending |
+| Present teachers as inline escalation, not a parallel product entry | AI should be the default first response in the learning flow, while teacher support appears when an AI answer is not enough | — Pending |
+| Treat tutor credential upload as demo onboarding only | The UI can collect and mock-upload documents for product demonstration, but real verification, OCR, and approval rules remain future backend/operations work | — Pending |
 
 ## Evolution
 
@@ -220,4 +227,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.13 Phase 14 completion*
+*Last updated: 2026-05-25 at v1.14 Phase 15 start*

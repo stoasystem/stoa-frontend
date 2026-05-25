@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.13
-milestone_name: "Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness"
-status: complete
-last_updated: "2026-05-25T14:57:18.313Z"
+milestone: v1.14
+milestone_name: "Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement"
+status: planning
+last_updated: "2026-05-25T18:05:00.000Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-25)
 
 ## Current Position
 
-Phase: 86 complete
-Plan: Phase 14 plans 80-86 complete
-Status: Verified
-Last activity: 2026-05-25 — Phase 14 demo backend stabilization and integration readiness implemented and verified
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-25 — Milestone v1.14 started
 
 ## Performance Metrics
 
