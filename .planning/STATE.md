@@ -7,10 +7,10 @@ last_updated: "2026-05-26T00:00:00+02:00"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 103 - Production-Facing Audit and Source Inventory
+Phase: 104 - Environment Guards and Demo UI Isolation
 Plan: —
 Status: Ready for phase planning
-Last activity: 2026-05-26 - Requirements and roadmap defined for milestone v1.17
+Last activity: 2026-05-26 - Phase 103 completed; Phase 104 is next
 
 ## Performance Metrics
 
@@ -189,10 +189,12 @@ Recent decisions affecting current work:
 - Phase 100 rewrote P0 EN/DE/FR/IT homepage, auth, chat, parent, tutor, pricing, billing, and support copy; localized billing plan display text; and removed banned user-facing terminology from audited source paths.
 - Phase 101 added targeted responsive wrapping/min-width safeguards and verified 36 route/locale/viewport combinations with no overflow after fixing French mobile homepage overflow.
 - Phase 102 added copy and visual QA documentation, README Phase 17 handoff guidance, final terminology/build evidence, and a mobile tutor dashboard overflow fix. Final visual QA checked 200 route/locale/viewport combinations with no failures.
+- Milestone v1.17 started from the Phase 18 production-facing cleanup, stability hardening, and demo artifact removal brief.
+- Phase 103 created the production-facing copy audit, demo artifact removal checklist, and stability hardening checklist; it classified source matches so later cleanup can gate rendered UI without deleting developer/demo infrastructure.
 
 ### Pending Todos
 
-- Plan Phase 103 with `$gsd-plan-phase 103` or continue autonomous execution from the Phase 18 roadmap.
+- Plan Phase 104 with `$gsd-plan-phase 104` or continue autonomous execution from the Phase 18 roadmap.
 
 ### Quick Tasks Completed
 

@@ -10,12 +10,12 @@ Requirements for Phase 18. Each requirement maps to exactly one roadmap phase.
 
 ### Audit Calibration and Scope Control
 
-- [ ] **AUDIT18-01**: Developers can review `docs/qa/production-facing-copy-audit.md` to see the Phase 18 route, locale, state, and banned-term audit scope.
-- [ ] **AUDIT18-02**: Developers can review `docs/qa/demo-artifact-removal-checklist.md` to understand which demo, mock, test, sample, placeholder, Codex, development, and internal terms are prohibited in normal user-facing UI.
-- [ ] **AUDIT18-03**: Developers can review `docs/qa/stability-hardening-checklist.md` to see the Phase 18 loading, empty, error, success, duplicate-submit, and route-fallback stability checks.
-- [ ] **AUDIT18-04**: The milestone has a calibrated source inventory that separates rendered product copy, developer-only UI, internal identifiers, tests, fixtures, documentation, and backend/API contract strings.
-- [ ] **AUDIT18-05**: The milestone records P0, P1, and P2 cleanup priorities without expanding STOA into new business features, new languages, production payment, production backend work, or a redesign.
-- [ ] **AUDIT18-06**: Existing demo mechanics needed for local development and E2E are identified before any UI cleanup removes or gates them.
+- [x] **AUDIT18-01**: Developers can review `docs/qa/production-facing-copy-audit.md` to see the Phase 18 route, locale, state, and banned-term audit scope.
+- [x] **AUDIT18-02**: Developers can review `docs/qa/demo-artifact-removal-checklist.md` to understand which demo, mock, test, sample, placeholder, Codex, development, and internal terms are prohibited in normal user-facing UI.
+- [x] **AUDIT18-03**: Developers can review `docs/qa/stability-hardening-checklist.md` to see the Phase 18 loading, empty, error, success, duplicate-submit, and route-fallback stability checks.
+- [x] **AUDIT18-04**: The milestone has a calibrated source inventory that separates rendered product copy, developer-only UI, internal identifiers, tests, fixtures, documentation, and backend/API contract strings.
+- [x] **AUDIT18-05**: The milestone records P0, P1, and P2 cleanup priorities without expanding STOA into new business features, new languages, production payment, production backend work, or a redesign.
+- [x] **AUDIT18-06**: Existing demo mechanics needed for local development and E2E are identified before any UI cleanup removes or gates them.
 
 ### Environment Guards and Demo Surface Isolation
 
@@ -119,12 +119,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUDIT18-01 | Phase 103 | Planned |
-| AUDIT18-02 | Phase 103 | Planned |
-| AUDIT18-03 | Phase 103 | Planned |
-| AUDIT18-04 | Phase 103 | Planned |
-| AUDIT18-05 | Phase 103 | Planned |
-| AUDIT18-06 | Phase 103 | Planned |
+| AUDIT18-01 | Phase 103 | Complete |
+| AUDIT18-02 | Phase 103 | Complete |
+| AUDIT18-03 | Phase 103 | Complete |
+| AUDIT18-04 | Phase 103 | Complete |
+| AUDIT18-05 | Phase 103 | Complete |
+| AUDIT18-06 | Phase 103 | Complete |
 | GUARD18-01 | Phase 104 | Planned |
 | GUARD18-02 | Phase 104 | Planned |
 | GUARD18-03 | Phase 104 | Planned |
@@ -170,4 +170,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 before Phase 103 planning*
+*Last updated: 2026-05-26 after Phase 103 completion*
