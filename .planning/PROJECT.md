@@ -2,17 +2,19 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, and coherent role-based information architecture.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, and locale-specific product copy refinement.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, and backend integration readiness documentation.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, and responsive multilingual layout QA.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, and a clean path to future real backend integration.
 
-## Current Milestone: v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
+## Latest Shipped Milestone: v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
 
-**Goal:** Refine STOA's English, German, French, and Italian product copy and responsive layouts so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
+**Shipped:** 2026-05-25
+
+**Delivered:** STOA's English, German, French, and Italian product copy and responsive layouts were refined so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
 
 **Target features:**
 - Locale-specific copywriting rules that explicitly allow English, German, French, and Italian to use different sentence structures while preserving meaning, tone, and brand.
@@ -25,7 +27,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Current State
 
-**Latest shipped milestone:** v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness
+**Latest shipped milestone:** v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -44,6 +46,8 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 10 pricing validation, subscription UI, feature flags, parent conversion prompts, tutor operations improvements, admin launch routes, virtual checkout demo/success/cancel flow, launch-ready privacy/terms drafts, release/rollback/monitoring docs, and 6/6 E2E coverage.
 - Phase 11 frontend-only paid launch and operations surfaces with pricing/billing plan contracts, usage quota, feature access, mock checkout, parent acquisition pages, referrals, tutor availability, support tickets, admin operational analytics, UTM tracking, demo API fallback, docs, and 6/6 E2E coverage.
 - Phase 12 frontend-only platform surfaces with organization dashboard/students/tutors/reports/analytics, advanced learning profile, weak-point diagnosis, curriculum graph, tutor assignment board, schedule overview, parent monthly report, advanced analytics, retention UI, partnership onboarding, docs, and 8/8 E2E coverage.
+- Phase 16 multilingual foundations with English, German, French, and Italian i18n, language switching, local language persistence, and user-facing terminology replacement.
+- Phase 17 locale-specific copy refinement with natural four-language P0 copy, German stacked hero title support, typed locale layout hints, copy review matrix, visual QA by locale, terminology cleanup, README guidance, and 200 route/locale/viewport visual checks.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -71,10 +75,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify a clearer frontend information architecture with route inventory, role-based navigation, breadcrumbs/back actions, mobile navigation, final demo flow, docs, and E2E coverage — v1.12
 - ✓ Developers can run and verify stable demo backend support, API mode configuration, demo reset, core demo APIs, real backend readiness docs, AWS readiness notes, QA docs, and README workflow — v1.13
 - ✓ Developers can run and verify a premium STOA homepage, role-based onboarding, AI-first chat entry, inline teacher escalation, and demo backend onboarding/upload support — v1.14
+- ✓ Developers can run and verify English, German, French, and Italian language support with language switching, local language persistence, glossary/style guidance, and user-facing terminology replacement — v1.15
+- ✓ Developers can run and verify natural locale-specific P0 copy, German stacked hero title rendering, responsive multilingual layout fit, copy review documentation, visual QA evidence, terminology cleanup, and README handoff guidance — v1.16
 
 ### Active
 
-- Phase 17 locale-specific copywriting and multilingual UI refinement requirements will cover local copy rules, responsive headline/layout rules, rewritten four-language P0 copy, terminology cleanup, copy review documentation, visual QA by locale, and README updates without expanding product features.
+- Phase 18 accessibility, design system hardening, and cross-locale QA should cover keyboard navigation, screen reader support, color contrast, design-token cleanup, component documentation, visual regression automation, and cross-browser/cross-locale QA.
 
 ### Out of Scope
 
@@ -128,7 +134,7 @@ Current codebase facts:
 - v1.13 shipped Phase 14 and stabilized the demo backend/API layer so the frontend can run complete demonstration flows while staying decoupled from future formal backend and AWS implementations.
 - v1.14 shipped Phase 15 and redesigned STOA's first impression, role onboarding, and AI-first chat path with premium UI styling and demo backend onboarding/upload support.
 - v1.15 shipped Phase 16 to add English/German/French/Italian localization, language switching, persistent language preference, user-facing terminology replacement, and language QA.
-- v1.16 starts Phase 17 to refine locale-specific product copy, responsive headline typography, layout hints, P0 page copy quality, terminology cleanup, and visual QA across English, German, French, and Italian.
+- v1.16 shipped Phase 17 to refine locale-specific product copy, responsive headline typography, layout hints, P0 page copy quality, terminology cleanup, copy review documentation, and visual QA across English, German, French, and Italian.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
@@ -214,11 +220,11 @@ Current codebase facts:
 | Keep Phase 15 focused on first impression and core path refinement | STOA now has stable demo flows; the next value is making the student-first learning path obvious and visually credible rather than adding broad new modules | ✓ Good |
 | Present teachers as inline escalation, not a parallel product entry | AI should be the default first response in the learning flow, while teacher support appears when an AI answer is not enough | ✓ Good |
 | Treat tutor credential upload as demo onboarding only | The UI can collect and mock-upload documents for product demonstration, but real verification, OCR, and approval rules remain future backend/operations work | ✓ Good |
-| Keep Phase 16 focused on language, not feature expansion | Swiss-market readiness now depends on multilingual UX and trustworthy education terminology more than new product surfaces | — Pending |
-| Use `Learning Assistant` as the user-facing first-response term | It is warmer and more education-oriented than `AI`, avoids implying teacher replacement, and works naturally with teacher escalation | — Pending |
-| Use browser-local language persistence first | `localStorage` is enough for demo and frontend validation while cross-device preferences remain a future backend concern | — Pending |
-| Keep Phase 17 focused on localized copy and layout stability | The multilingual infrastructure exists; the next value is making each language feel native, premium, and readable in the UI rather than expanding features | — Pending |
-| Allow locale-specific title structures | German and other long-text locales need stacked or shorter headlines so typography and layout remain stable without forcing literal translation | — Pending |
+| Keep Phase 16 focused on language, not feature expansion | Swiss-market readiness now depends on multilingual UX and trustworthy education terminology more than new product surfaces | ✓ Good |
+| Use `Learning Assistant` as the user-facing first-response term | It is warmer and more education-oriented than `AI`, avoids implying teacher replacement, and works naturally with teacher escalation | ✓ Good |
+| Use browser-local language persistence first | `localStorage` is enough for demo and frontend validation while cross-device preferences remain a future backend concern | ✓ Good |
+| Keep Phase 17 focused on localized copy and layout stability | The multilingual infrastructure exists; the next value is making each language feel native, premium, and readable in the UI rather than expanding features | ✓ Good |
+| Allow locale-specific title structures | German and other long-text locales need stacked or shorter headlines so typography and layout remain stable without forcing literal translation | ✓ Good |
 
 ## Evolution
 
@@ -238,4 +244,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 for v1.16 Phase 17 planning*
+*Last updated: 2026-05-25 after v1.16 milestone*

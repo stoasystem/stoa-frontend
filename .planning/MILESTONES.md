@@ -1,5 +1,33 @@
 # Milestones
 
+## v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement (Shipped: 2026-05-25)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.16-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Locale-specific copywriting rules for English, German, French, and Italian.
+- German, French, and Italian language-specific copy rules for headline rhythm, CTA tone, sentence length, punctuation, and UI fit.
+- Rewritten four-language P0 copy for homepage, registration, chat, parent, tutor, pricing, billing, support, and shared states.
+- `HomeHero` support for locale-specific `titleLines`, plus typed `localeLayout` hints for long-text UI handling.
+- Stacked German homepage hero title: `Lernen. Fragen. Verstehen.`
+- Targeted responsive wrapping and `min-w-0` safeguards across hero, navigation, pricing, billing, chat, and tutor surfaces.
+- Copy review matrix and visual QA by locale documentation.
+- README Phase 17 guidance for natural localized copy, terminology warnings, hero examples, and handoff gaps.
+
+### Verification
+
+- Requirements: 43/43 implemented.
+- Phases: 5/5 implemented.
+- TypeScript build check: passed.
+- Build: passed.
+- Terminology grep: passed with no banned user-facing P0 copy matches.
+- Visual QA: passed for 200 route/locale/viewport combinations.
+- Remaining handoff gaps: native-speaker review, legal-sensitive translation review, and reusable visual-regression automation for Phase 18.
+
+---
+
 ## v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement (Implemented: 2026-05-25)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks
