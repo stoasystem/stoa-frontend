@@ -15,113 +15,116 @@
 - ✅ **v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling** - Phases 56-63 (implemented 2026-05-25)
 - ✅ **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (implemented 2026-05-25)
 - ✅ **v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization** - Phases 73-79 (implemented 2026-05-25)
+- ⏳ **v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness** - Phases 80-86 (planned)
 
 ## Phases
 
 <details open>
-<summary>✅ v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization (Phases 73-79)</summary>
+<summary>⏳ v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness (Phases 80-86)</summary>
 
-**Milestone Goal:** Organize the existing STOA frontend into a clear, role-based, maintainable product structure by documenting all pages/routes, clarifying navigation and user journeys, reducing orphan/duplicate/placeholder exposure, standardizing layout and CTA patterns, and polishing core flows without adding new product modules.
+**Milestone Goal:** Stabilize a simple, replaceable demo backend and API contract layer so the existing STOA frontend can run complete demo flows for auth, student chat, teacher help, parent reports, billing, referrals, support, and admin analytics while preparing for future real backend and AWS integration.
 
-- [x] **Phase 73: Page Inventory, Route Map, and IA Audits** - Document every current page/route, classify role/status/priority, and record orphan/duplicate/entry-exit decisions.
-- [x] **Phase 74: Route Groups, Navigation Config, and Role-Based Navigation** - Add typed route/nav configuration and refactor navigation generation for student, parent, tutor, admin, and organization modes.
-- [x] **Phase 75: User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers** - Document core journeys and add reusable navigation helpers so deep pages have clear return/next paths.
-- [x] **Phase 76: Layout Standards, CTA Hierarchy, and Page State Guidelines** - Standardize page layout expectations, CTA hierarchy, placeholder/demo policy, and shared page-state usage.
-- [x] **Phase 77: Mobile Navigation and Responsive Flow Optimization** - Define and implement mobile navigation expectations for the major role flows and high-risk pages.
-- [x] **Phase 78: Final Demo Flow, README, Manual QA, and E2E Path Updates** - Produce the final demo flow and update docs, README, manual QA, and route smoke/E2E coverage.
-- [x] **Phase 79: Phase 13 Verification and Build Closure** - Verify install/dev/build, run manual or automated flow checks, close traceability, and prepare the milestone for execution handoff.
+- [ ] **Phase 80: Demo Backend Scope, API Contract, and Data Documentation** - Document demo backend boundaries, endpoint contracts, demo data, and reset flow before implementation changes.
+- [ ] **Phase 81: Demo Data Seed and Reset Stabilization** - Normalize fixed demo accounts, demo state, and reset behavior for repeatable frontend demos.
+- [ ] **Phase 82: Auth, Health, Student Chat, and Message Demo APIs** - Stabilize health/auth/conversation/message endpoints and deterministic assistant responses.
+- [ ] **Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs** - Stabilize help-request status flow and parent child/report/history endpoints.
+- [ ] **Phase 84: Billing, Referral, Support, and Admin Demo APIs** - Stabilize mock checkout, referrals, support tickets, feedback, and admin analytics endpoints.
+- [ ] **Phase 85: Frontend API Mode and Service Layer Alignment** - Add API mode configuration and audit frontend API calls through service boundaries.
+- [ ] **Phase 86: Backend Integration Readiness, QA, README, and Build Closure** - Add real backend/AWS readiness docs, demo backend QA, README updates, and final verification.
 
-### Phase 73: Page Inventory, Route Map, and IA Audits
+### Phase 80: Demo Backend Scope, API Contract, and Data Documentation
 
-**Goal**: Make the full frontend surface understandable before changing navigation.
-**Depends on**: Phase 72
-**Requirements**: [IA-01, IA-02, IA-03, IA-04, IA-05, ROUTE-01, ROUTE-02, ROUTE-03, ROUTE-04, ROUTE-05, ROUTE-06, AUDIT-01, AUDIT-02, AUDIT-03, AUDIT-04, AUDIT-05]
+**Goal**: Establish the Phase 14 contract and boundary before backend or frontend changes.
+**Depends on**: Phase 79
+**Requirements**: [SCOPE-01, SCOPE-02, SCOPE-03, SCOPE-04]
 **Success Criteria** (what must be TRUE):
-  1. `docs/ia/page-inventory.md` lists all current routes and page components with role, module, purpose, entry/exit, status, priority, and notes.
-  2. `docs/ia/route-map.md` groups public, student, parent, tutor, admin, organization, and demo/advanced routes and records hiding/ownership decisions.
-  3. Entry/exit, orphan-page, and duplicate/overlap audit docs exist and record treatment decisions.
-  4. No core route is left unclassified or undocumented.
-**Plans**: 1/1
+  1. `docs/demo-backend/demo-backend-scope.md` states demo-only responsibilities, replacement boundary, and explicit non-goals.
+  2. `docs/demo-backend/demo-api-contract.md` documents all Phase 14 endpoint methods, paths, request/response shapes, auth expectations, status codes, and error codes.
+  3. `docs/demo-backend/demo-data.md` documents fixed accounts, role links, and minimum demo data by domain.
+  4. `docs/demo-backend/demo-reset-flow.md` documents reset command behavior and restored/cleared state.
+**Plans**: 0/1
 
-### Phase 74: Route Groups, Navigation Config, and Role-Based Navigation
+### Phase 81: Demo Data Seed and Reset Stabilization
 
-**Goal**: Move navigation decisions into typed configuration and make role navigation easier to maintain.
-**Depends on**: Phase 73
-**Requirements**: [NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, NAV-06, NAV-07, NAV-08, NAV-09, NAV-10]
+**Goal**: Make demo data deterministic and resettable without adding production persistence complexity.
+**Depends on**: Phase 80
+**Requirements**: [DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06]
 **Success Criteria** (what must be TRUE):
-  1. `docs/ia/navigation-architecture.md` defines student, parent, tutor, admin, and organization navigation structures.
-  2. `src/app/router/routeConfig.ts` and `src/app/router/routeGroups.ts` define route/nav metadata and grouped route lists.
-  3. `src/lib/navigation.ts` returns role-filtered nav items, hides hidden/demo entries by default, and detects active routes.
-  4. App navigation renders from shared configuration and does not overexpose advanced/demo/placeholder pages in core role navigation.
-**Plans**: 1/1
+  1. Fixed student, parent, tutor, and admin demo accounts exist after reset.
+  2. Demo data covers conversations, uploaded file metadata, learning history, parent reports, tutor requests, billing, referrals, support, and admin analytics.
+  3. Parent is linked to the demo student and tutor/admin records reference stable IDs.
+  4. Reset command restores fixed state and clears temporary registration/support/session changes.
+**Plans**: 0/1
 
-### Phase 75: User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers
+### Phase 82: Auth, Health, Student Chat, and Message Demo APIs
 
-**Goal**: Remove dead ends and make primary journeys obvious for each role.
-**Depends on**: Phase 74
-**Requirements**: [FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05, FLOW-06, FLOW-07, UX-01, UX-02, UX-03, UX-04, UX-05, UX-06]
+**Goal**: Stabilize the core student-facing backend demo loop.
+**Depends on**: Phase 81
+**Requirements**: [AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, CHAT-01, CHAT-02, CHAT-03, CHAT-04, CHAT-05, CHAT-06]
 **Success Criteria** (what must be TRUE):
-  1. `docs/ia/user-journeys.md` documents student, parent, tutor, admin, and organization primary journeys.
-  2. Breadcrumbs, BackButton, and PageActions shared components exist and match existing component conventions.
-  3. Required deep parent, tutor, organization, and learning-intelligence pages have clear return or next-step handling.
-  4. Core flow checks confirm users can move from dashboard/list pages into detail pages and back without manual URL entry.
-**Plans**: 1/1
+  1. `/health`, `/auth/login`, `/auth/register`, and `/auth/me` return documented demo responses and errors.
+  2. Student can list, open, and create conversations through documented endpoints.
+  3. Student can send messages and receive deterministic assistant demo answers.
+  4. Conversation/message changes persist for the current demo session or until reset.
+**Plans**: 0/1
 
-### Phase 76: Layout Standards, CTA Hierarchy, and Page State Guidelines
+### Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs
 
-**Goal**: Make page structure and actions consistent across the accumulated feature surfaces.
-**Depends on**: Phase 75
-**Requirements**: [LAYOUT-01, LAYOUT-02, LAYOUT-03, CTA-01, CTA-02, STATE-01, STATE-02]
+**Goal**: Close the cross-role learning support loop for student, tutor, and parent demos.
+**Depends on**: Phase 82
+**Requirements**: [HELP-01, HELP-02, HELP-03, HELP-04, HELP-05, PARENT-01, PARENT-02, PARENT-03, PARENT-04, PARENT-05]
 **Success Criteria** (what must be TRUE):
-  1. `docs/ux/layout-guidelines.md` defines DashboardLayout, DetailLayout, FormLayout, SplitLayout, and MarketingLayout usage.
-  2. `docs/ux/cta-guidelines.md` defines primary, secondary, tertiary, and danger action hierarchy with STOA examples.
-  3. Major student, parent, tutor, billing, support, and admin surfaces have clear page titles, descriptions, primary actions, and state handling expectations.
-  4. Placeholder and demo pages are visibly marked and excluded from core navigation where appropriate.
-**Plans**: 1/1
+  1. Student can create teacher-help requests tied to conversations.
+  2. Tutor can list, open, and update help-request status.
+  3. Parent endpoints return child list, summary, history, weekly report, and monthly report placeholder.
+  4. Help-request state changes are visible to related demo surfaces where applicable.
+**Plans**: 0/1
 
-### Phase 77: Mobile Navigation and Responsive Flow Optimization
+### Phase 84: Billing, Referral, Support, and Admin Demo APIs
 
-**Goal**: Keep role flows usable on mobile after route and navigation cleanup.
-**Depends on**: Phase 76
-**Requirements**: [MOBILE-01, MOBILE-02, MOBILE-03, MOBILE-04, MOBILE-05, MOBILE-06]
+**Goal**: Stabilize commercial, support, and operational demo APIs.
+**Depends on**: Phase 83
+**Requirements**: [OPS-01, OPS-02, OPS-03, OPS-04, OPS-05, OPS-06]
 **Success Criteria** (what must be TRUE):
-  1. `docs/ux/mobile-navigation.md` defines mobile navigation expectations by role.
-  2. Student mobile paths prioritize Dashboard, Chat, and Profile.
-  3. Parent and tutor mobile paths prioritize their key overview/report/request/availability tasks.
-  4. Admin and organization mobile surfaces degrade to scannable lists/cards where desktop navigation is too dense.
-**Plans**: 1/1
+  1. Billing endpoints return plans, subscription, usage, feature access, and mock checkout URL.
+  2. Referral endpoint returns stable code, invite URL, and successful invite count.
+  3. Feedback/support ticket APIs can create and view demo-session records.
+  4. Admin endpoints return analytics overview, support tickets, help requests, and feedback with standard demo errors.
+**Plans**: 0/1
 
-### Phase 78: Final Demo Flow, README, Manual QA, and E2E Path Updates
+### Phase 85: Frontend API Mode and Service Layer Alignment
 
-**Goal**: Make the product demo and verification paths executable without manual route guessing.
-**Depends on**: Phase 77
-**Requirements**: [DEMO-01, DEMO-02, DEMO-03, DOC-01, DOC-02, DOC-03]
+**Goal**: Keep the frontend decoupled from demo backend internals and ready to switch API modes.
+**Depends on**: Phase 84
+**Requirements**: [API-01, API-02, API-03, API-04, API-05]
 **Success Criteria** (what must be TRUE):
-  1. `docs/demo/final-demo-flow.md` documents the recommended end-to-end demo path and demo data/account expectations.
-  2. README includes Phase 13 purpose, non-expansion principle, IA docs, navigation cleanup, UX standards, and verification notes.
-  3. Manual QA checklist includes IA, navigation, entry/exit, orphan/duplicate, breadcrumb/back, mobile, demo, and build checks.
-  4. E2E or route-smoke documentation/code reflects the final core role and demo paths.
-**Plans**: 1/1
+  1. `.env.example` documents `VITE_API_MODE`, `VITE_API_BASE_URL`, and `VITE_ENABLE_MSW`.
+  2. `src/lib/env.ts` exports API mode, API base URL, and MSW flag with documented safe defaults.
+  3. Shared API client uses configured base URL and bearer-token behavior.
+  4. API mode values `mock`, `demo`, `staging`, and `production` are documented.
+  5. Frontend API usage audit finds no page component API URL hard-coding that should be moved to services.
+**Plans**: 0/1
 
-### Phase 79: Phase 13 Verification and Build Closure
+### Phase 86: Backend Integration Readiness, QA, README, and Build Closure
 
-**Goal**: Close the milestone with verified commands and traceability evidence.
-**Depends on**: Phase 78
-**Requirements**: [QA-01, QA-02, QA-03, QA-04, QA-05]
+**Goal**: Close Phase 14 with backend handoff docs and verified demo workflow.
+**Depends on**: Phase 85
+**Requirements**: [READY-01, READY-02, READY-03, READY-04, READY-05, READY-06]
 **Success Criteria** (what must be TRUE):
-  1. Dependency/install state is verified or documented.
-  2. `npm run dev` can start the frontend locally.
-  3. `npm run build` passes.
-  4. Main student, parent, tutor, admin, organization, billing/support, and demo paths are manually QA'd or covered by smoke/E2E checks.
-  5. Phase 13 closes with clean planning traceability and no unrelated generated artifacts committed.
-**Plans**: 1/1
+  1. `docs/backend-integration/real-backend-readiness.md` maps endpoint contracts and future backend implementation needs.
+  2. `docs/backend-integration/aws-readiness-notes.md` documents frontend-facing AWS readiness concerns.
+  3. `docs/qa/demo-backend-qa.md` covers startup, health, reset, core demo flows, and integration readiness checks.
+  4. README documents Phase 14 workflow, demo accounts, run/reset commands, API modes, and non-production boundary.
+  5. Complete demo flow is verified against the demo backend where practical.
+  6. `npm run build` passes.
+**Plans**: 0/1
 
 </details>
 
 <details>
-<summary>✅ Previous shipped milestones (Phases 1-72)</summary>
+<summary>✅ Previous shipped milestones (Phases 1-79)</summary>
 
-Phases 1-72 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, launch-ready legal drafts, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM tracking, platform/organization demos, learning-intelligence demos, curriculum graph UI, weak-point diagnosis UI, monthly parent report, retention UI, partnership onboarding, and Phase 12 verification.
+Phases 1-79 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, launch-ready legal drafts, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM tracking, platform/organization demos, learning-intelligence demos, curriculum graph UI, weak-point diagnosis UI, monthly parent report, retention UI, partnership onboarding, information architecture, route inventory, role-based navigation, breadcrumbs, page-flow helpers, mobile navigation, final demo flow, and Phase 13 verification.
 
 See `.planning/MILESTONES.md` and archived milestone audit files for detailed shipped scope and verification evidence.
 
@@ -130,14 +133,15 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Phases completed in numeric order: 73 -> 74 -> 75 -> 76 -> 77 -> 78 -> 79
+Phase 14 phases planned in numeric order: 80 -> 81 -> 82 -> 83 -> 84 -> 85 -> 86
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 73. Page Inventory, Route Map, and IA Audits | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 74. Route Groups, Navigation Config, and Role-Based Navigation | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 75. User Journeys, Breadcrumbs, Back Buttons, and Page Flow Helpers | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 76. Layout Standards, CTA Hierarchy, and Page State Guidelines | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 77. Mobile Navigation and Responsive Flow Optimization | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 78. Final Demo Flow, README, Manual QA, and E2E Path Updates | v1.12 | 1/1 | Complete | 2026-05-25 |
-| 79. Phase 13 Verification and Build Closure | v1.12 | 1/1 | Complete | 2026-05-25 |
+| 80. Demo Backend Scope, API Contract, and Data Documentation | v1.13 | 0/1 | Not Started | — |
+| 81. Demo Data Seed and Reset Stabilization | v1.13 | 0/1 | Not Started | — |
+| 82. Auth, Health, Student Chat, and Message Demo APIs | v1.13 | 0/1 | Not Started | — |
+| 83. Teacher Help, Tutor Handling, and Parent Report APIs | v1.13 | 0/1 | Not Started | — |
+| 84. Billing, Referral, Support, and Admin Demo APIs | v1.13 | 0/1 | Not Started | — |
+| 85. Frontend API Mode and Service Layer Alignment | v1.13 | 0/1 | Not Started | — |
+| 86. Backend Integration Readiness, QA, README, and Build Closure | v1.13 | 0/1 | Not Started | — |
+
