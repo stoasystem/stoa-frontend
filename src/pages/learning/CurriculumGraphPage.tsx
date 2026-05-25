@@ -1,5 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
+import { Button } from '@/components/ui/button'
 import { CurriculumGraphView } from '@/components/learning/CurriculumGraphView'
 import { TopicDetailPanel } from '@/components/learning/TopicDetailPanel'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -28,6 +32,21 @@ export function CurriculumGraphPage() {
           eyebrow="Learning intelligence"
           title="Curriculum graph"
           description="Static mock topic graph. The frontend renders status and selection; it does not compute graph relationships."
+          actions={
+            <PageActions
+              primary={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Diagnosis</Link></Button>}
+              secondary={<BackButton label="Learning profile" to={`/students/${studentId}/learning-profile`} />}
+            />
+          }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Organization', to: '/organization' },
+            { label: 'Students', to: '/organization/students' },
+            { label: 'Learning profile', to: `/students/${studentId}/learning-profile` },
+            { label: 'Curriculum graph' },
+          ]}
         />
         {graphQuery.data && (
           <div className="grid gap-4 xl:grid-cols-[1.5fr_0.8fr]">

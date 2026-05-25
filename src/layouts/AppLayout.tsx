@@ -1,78 +1,73 @@
 import type { ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import {
+  BarChart3,
+  BookOpen,
+  CreditCard,
+  GraduationCap,
+  HelpCircle,
+  History,
+  LayoutDashboard,
+  MessageCircle,
+  Settings,
+  TicketCheck,
+  User,
+  Users,
+  type LucideIcon,
+} from 'lucide-react'
+import { Link, NavLink } from 'react-router-dom'
 import { AppLogo } from '@/components/common/AppLogo'
 import { FeedbackButton } from '@/components/feedback/FeedbackButton'
 import { UserMenu } from '@/components/common/UserMenu'
+import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
 import { enableFeedback } from '@/lib/env'
+import { cn } from '@/lib/utils'
+import { getNavItemsForUserRole } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
 
-const roleNavigation = {
-  student: [
-    { label: 'Dashboard', to: '/dashboard' },
-    { label: 'Chat', to: '/chat' },
-    { label: 'Learning History', to: '/learning-history' },
-    { label: 'Billing', to: '/billing' },
-    { label: 'Referrals', to: '/referrals' },
-    { label: 'Profile', to: '/profile' },
-    { label: 'Onboarding', to: '/onboarding' },
-    { label: 'Support', to: '/support' },
-  ],
-  parent: [
-    { label: 'Parent Dashboard', to: '/parent' },
-    { label: 'Children', to: '/parent' },
-    { label: 'Billing', to: '/billing' },
-    { label: 'Referrals', to: '/referrals' },
-    { label: 'Onboarding', to: '/onboarding' },
-    { label: 'Support', to: '/support' },
-  ],
-  tutor: [
-    { label: 'Tutor Dashboard', to: '/tutor' },
-    { label: 'Help Requests', to: '/tutor' },
-    { label: 'Availability', to: '/tutor/availability' },
-    { label: 'Billing', to: '/billing' },
-    { label: 'Onboarding', to: '/onboarding' },
-    { label: 'Support', to: '/support' },
-  ],
-  admin: [
-    { label: 'Admin Dashboard', to: '/admin' },
-    { label: 'Analytics', to: '/admin/analytics' },
-    { label: 'Advanced Analytics', to: '/admin/advanced-analytics' },
-    { label: 'Retention', to: '/admin/retention' },
-    { label: 'Organization', to: '/organization' },
-    { label: 'Tutor Assignment', to: '/organization/tutor-assignment' },
-    { label: 'Usage', to: '/admin/usage' },
-    { label: 'Feedback', to: '/admin/feedback' },
-    { label: 'Help Requests', to: '/admin/help-requests' },
-    { label: 'Support Tickets', to: '/admin/support' },
-    { label: 'Onboarding', to: '/onboarding' },
-    { label: 'Support', to: '/support' },
-  ],
-  organization_admin: [
-    { label: 'Organization', to: '/organization' },
-    { label: 'Students', to: '/organization/students' },
-    { label: 'Tutors', to: '/organization/tutors' },
-    { label: 'Reports', to: '/organization/reports' },
-    { label: 'Analytics', to: '/organization/analytics' },
-    { label: 'Tutor Assignment', to: '/organization/tutor-assignment' },
-    { label: 'Support', to: '/support' },
-  ],
-  school_teacher: [
-    { label: 'Organization', to: '/organization' },
-    { label: 'Students', to: '/organization/students' },
-    { label: 'Reports', to: '/organization/reports' },
-    { label: 'Support', to: '/support' },
-  ],
-  school_viewer: [
-    { label: 'Organization', to: '/organization' },
-    { label: 'Reports', to: '/organization/reports' },
-    { label: 'Analytics', to: '/organization/analytics' },
-    { label: 'Support', to: '/support' },
-  ],
+const navIcons: Record<AppNavIcon, LucideIcon> = {
+  analytics: BarChart3,
+  billing: CreditCard,
+  chat: MessageCircle,
+  dashboard: LayoutDashboard,
+  history: History,
+  profile: User,
+  reports: BookOpen,
+  requests: TicketCheck,
+  settings: Settings,
+  students: Users,
+  support: HelpCircle,
+  tutors: GraduationCap,
+}
+
+function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: boolean }) {
+  const Icon = navIcons[item.icon]
+
+  return (
+    <NavLink
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
+          compact ? 'min-w-0 flex-1 justify-center px-2 py-2 text-xs' : 'px-2 py-1.5',
+          isActive
+            ? 'bg-primary text-primary-foreground shadow-sm'
+            : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+        )
+      }
+      end={item.path === '/'}
+      to={item.path}
+    >
+      <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
+      <span className={compact ? 'truncate' : undefined}>{item.label}</span>
+    </NavLink>
+  )
 }
 
 export function AppLayout({ children }: { children: ReactNode }) {
   const user = useAuthStore((state) => state.user)
-  const items = user ? roleNavigation[user.role] : []
+  const items = user ? getNavItemsForUserRole(user.role, { includeSecondary: true }) : []
+  const primaryItems = items.filter((item) => item.priority === 'primary')
+  const secondaryItems = items.filter((item) => item.priority === 'secondary')
+  const mobileItems = user ? getNavItemsForUserRole(user.role, { mobileOnly: true }).slice(0, 5) : []
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -81,16 +76,22 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Link to="/" className="font-semibold tracking-tight">
             <AppLogo />
           </Link>
-          <nav className="mt-6 flex flex-1 flex-col gap-2 text-sm text-muted-foreground">
-            {items.map((item) => (
-              <Link
-                key={`${item.to}-${item.label}`}
-                className="rounded-md px-2 py-1.5 hover:bg-secondary hover:text-foreground"
-                to={item.to}
-              >
-                {item.label}
-              </Link>
+          <nav aria-label="Primary" className="mt-6 flex flex-1 flex-col gap-2">
+            {primaryItems.map((item) => (
+              <NavItemLink item={item} key={`${item.path}-${item.label}`} />
             ))}
+            {secondaryItems.length > 0 && (
+              <div className="mt-4 border-t pt-4">
+                <p className="mb-2 px-2 text-xs font-medium uppercase tracking-normal text-muted-foreground">
+                  More
+                </p>
+                <div className="flex flex-col gap-2">
+                  {secondaryItems.map((item) => (
+                    <NavItemLink item={item} key={`${item.path}-${item.label}`} />
+                  ))}
+                </div>
+              </div>
+            )}
           </nav>
           {enableFeedback && (
             <div className="mb-3">
@@ -107,8 +108,20 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <UserMenu />
         </aside>
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 p-4 pb-24 md:p-6">{children}</main>
       </div>
+      {mobileItems.length > 0 && (
+        <nav
+          aria-label="Mobile primary"
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-2 py-2 shadow-lg backdrop-blur md:hidden"
+        >
+          <div className="mx-auto flex max-w-md gap-1">
+            {mobileItems.map((item) => (
+              <NavItemLink compact item={item} key={`${item.path}-${item.label}-mobile`} />
+            ))}
+          </div>
+        </nav>
+      )}
     </div>
   )
 }

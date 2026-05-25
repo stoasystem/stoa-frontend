@@ -1,5 +1,8 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
 import { LearningProfileHeader } from '@/components/learning/LearningProfileHeader'
 import { RecommendedActionsCard } from '@/components/learning/RecommendedActionsCard'
 import { StrongTopicList } from '@/components/learning/StrongTopicList'
@@ -27,7 +30,20 @@ export function StudentLearningProfilePage() {
           eyebrow="Learning intelligence"
           title="Advanced learning profile"
           description="Mock learning profile designed to show the future backend data contract."
-          actions={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Open diagnosis</Link></Button>}
+          actions={
+            <PageActions
+              primary={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Open diagnosis</Link></Button>}
+              secondary={<BackButton label="Students" to="/organization/students" />}
+            />
+          }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Organization', to: '/organization' },
+            { label: 'Students', to: '/organization/students' },
+            { label: profileQuery.data?.student.name ?? 'Learning profile' },
+          ]}
         />
         {profileQuery.data && (
           <>

@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -25,10 +28,28 @@ export function ParentMonthlyReportPage() {
           title="Monthly learning report"
           description="Higher-level monthly report demo that connects usage, weak-point trends, tutor support, and parent actions."
           actions={
-            <Button variant="outline" onClick={() => toast.info('PDF export will be available later.')}>
-              Download PDF
-            </Button>
+            <PageActions
+              primary={
+                <Button asChild>
+                  <Link to={`/parent/children/${childId}/report`}>Weekly report</Link>
+                </Button>
+              }
+              secondary={<BackButton label="Child summary" to={`/parent/children/${childId}`} />}
+              tertiary={
+                <Button variant="outline" onClick={() => toast.info('PDF export will be available later.')}>
+                  Download PDF
+                </Button>
+              }
+            />
           }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Parent', to: '/parent' },
+            { label: reportQuery.data?.student.name ?? 'Child', to: `/parent/children/${childId}` },
+            { label: 'Monthly report' },
+          ]}
         />
         {reportQuery.data && (
           <>

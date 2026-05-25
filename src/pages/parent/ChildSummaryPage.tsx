@@ -1,4 +1,7 @@
 import { useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
@@ -12,6 +15,15 @@ export function ChildSummaryPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <Breadcrumbs
+            items={[
+              { label: 'Parent', to: '/parent' },
+              { label: summary?.student.name ?? 'Child summary' },
+            ]}
+          />
+          <PageActions secondary={<BackButton label="Parent overview" to="/parent" />} />
+        </div>
         {summaryQuery.isLoading && <p className="text-sm text-muted-foreground">Loading child summary...</p>}
         {summaryQuery.isError && <p className="text-sm text-destructive">Failed to load child summary.</p>}
         {summary && (

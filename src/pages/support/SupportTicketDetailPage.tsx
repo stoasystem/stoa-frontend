@@ -1,4 +1,7 @@
 import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -24,7 +27,20 @@ export function SupportTicketDetailPage() {
           eyebrow="Support ticket"
           title={ticket?.subject ?? 'Ticket'}
           description="Ticket detail is backed by demo API data until a production support backend exists."
-          actions={<Button asChild variant="outline"><Link to="/support/tickets">All tickets</Link></Button>}
+          actions={
+            <PageActions
+              primary={<Button asChild><Link to="/support">Contact support</Link></Button>}
+              secondary={<BackButton label="All tickets" to="/support/tickets" />}
+            />
+          }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Support', to: '/support' },
+            { label: 'Tickets', to: '/support/tickets' },
+            { label: ticket?.subject ?? 'Ticket' },
+          ]}
         />
         {ticket && (
           <Card>

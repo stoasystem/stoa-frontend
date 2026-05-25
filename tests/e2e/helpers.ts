@@ -5,6 +5,7 @@ export const demoUsers = {
   parent: { email: 'parent@test.com', password: 'password123' },
   tutor: { email: 'tutor@test.com', password: 'password123' },
   admin: { email: 'admin@test.com', password: 'password123' },
+  organization: { email: 'organization@test.com', password: 'password123' },
 }
 
 const roleLandingRoutes: Record<keyof typeof demoUsers, RegExp> = {
@@ -12,6 +13,7 @@ const roleLandingRoutes: Record<keyof typeof demoUsers, RegExp> = {
   parent: /\/parent/,
   tutor: /\/tutor/,
   admin: /\/admin/,
+  organization: /\/organization/,
 }
 
 export async function loginAs(page: Page, role: keyof typeof demoUsers) {

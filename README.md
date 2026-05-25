@@ -9,6 +9,43 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 13 Information Architecture and UX Optimization
+
+Phase 13 does not add new product modules. It organizes the existing STOA frontend pages, routes, navigation, page hierarchy, user journeys, demo paths, and UI structure so each role has a clearer product flow.
+
+Main work:
+
+- Page inventory and route map
+- Role-based navigation architecture
+- User journey map
+- Page entry / exit audit
+- Orphan page audit
+- Duplicate page audit
+- Route and navigation configuration
+- Breadcrumbs, back buttons, and page action helpers
+- CTA hierarchy and layout guidelines
+- Mobile navigation rules
+- Final demo flow cleanup
+
+Key files:
+
+- `docs/ia/page-inventory.md`
+- `docs/ia/route-map.md`
+- `docs/ia/navigation-architecture.md`
+- `docs/ia/user-journeys.md`
+- `docs/ia/page-entry-exit-audit.md`
+- `docs/ia/orphan-page-audit.md`
+- `docs/ia/duplicate-page-audit.md`
+- `docs/ux/cta-guidelines.md`
+- `docs/ux/layout-guidelines.md`
+- `docs/ux/mobile-navigation.md`
+- `docs/demo/final-demo-flow.md`
+- `src/app/router/routeConfig.ts`
+- `src/app/router/routeGroups.ts`
+- `src/lib/navigation.ts`
+
+Important principle: the goal is to make STOA easier to understand and navigate, not to add more features.
+
 ## Phase 12 Frontend Platform Scaling and Advanced Learning Intelligence Design
 
 Phase 12 is frontend-only. It prepares STOA for platform-level demos across organizations, schools, tutoring centers, learning intelligence, tutor operations, parent monthly reporting, analytics, retention, and partnership onboarding.

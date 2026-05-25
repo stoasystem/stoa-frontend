@@ -68,16 +68,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify launch-ready commercial validation UI with pricing, billing, virtual checkout, parent conversion, tutor/admin launch operations, privacy/terms, launch docs, and E2E coverage — v1.9
 - ✓ Developers can run and verify frontend-only paid launch, growth, referral, tutor availability, support ticket, admin analytics, UTM, and demo API fallback surfaces — v1.10
 - ✓ Developers can run and verify frontend-only platform, organization, learning-intelligence, curriculum graph, diagnosis, tutor assignment, monthly report, advanced analytics, retention, partnership, docs, and E2E surfaces — v1.11
+- ✓ Developers can run and verify a clearer frontend information architecture with route inventory, role-based navigation, breadcrumbs/back actions, mobile navigation, final demo flow, docs, and E2E coverage — v1.12
 
 ### Active
 
-- Phase 13 must remain frontend-only and must not add large product modules.
-- All existing routes and pages must be inventoried with role, module, purpose, entry points, exit points, status, priority, and notes.
-- Routes must be grouped into public, student, parent, tutor, admin, organization, and demo/advanced categories with clear primary, secondary, hidden, demo, placeholder, duplicate, and deprecated decisions.
-- Student, parent, tutor, admin, and organization navigation must become role-based, configuration-driven, and easier to scan.
-- Core pages must have clear entry and exit paths; deep detail pages must provide breadcrumbs, back buttons, primary CTAs, or related links where appropriate.
-- Duplicate, overlapping, orphan, placeholder, and demo pages must be documented and either hidden, merged, downgraded, or linked appropriately.
-- Page layout, CTA hierarchy, state patterns, title/description usage, mobile navigation, final demo flow, README, manual QA, and E2E/smoke checks must be updated.
+(None currently — v1.12 Phase 13 is implemented and verified.)
 
 ### Out of Scope
 
@@ -215,4 +210,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 for v1.12 Phase 13 milestone initialization*
+*Last updated: 2026-05-25 after v1.12 Phase 13 completion*

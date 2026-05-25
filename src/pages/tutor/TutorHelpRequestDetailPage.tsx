@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
+import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
@@ -35,6 +38,15 @@ export function TutorHelpRequestDetailPage() {
         <PageHeader
           title="Help Request"
           description="Review the student's context and record the tutor follow-up."
+          actions={<PageActions secondary={<BackButton label="Requests" to="/tutor" />} />}
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Tutor', to: '/tutor' },
+            { label: 'Requests', to: '/tutor' },
+            { label: requestQuery.data?.student.name ?? 'Request detail' },
+          ]}
         />
         {requestQuery.isLoading && <TutorDashboardSkeleton showHeader={false} />}
         {requestQuery.isError && <p className="text-sm text-destructive">Failed to load request.</p>}

@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { DiagnosisSummaryCard } from '@/components/learning/DiagnosisSummaryCard'
+import { PageActions } from '@/components/common/PageActions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -24,7 +27,21 @@ export function WeakPointDiagnosisPage() {
           eyebrow="Learning intelligence"
           title="Weak-point diagnosis"
           description="Demo diagnosis result. The frontend renders evidence and recommendations but does not run an AI diagnosis engine."
-          actions={<Button asChild variant="outline"><Link to={`/students/${studentId}/curriculum-graph`}>View graph</Link></Button>}
+          actions={
+            <PageActions
+              primary={<Button asChild><Link to={`/students/${studentId}/curriculum-graph`}>View graph</Link></Button>}
+              secondary={<BackButton label="Learning profile" to={`/students/${studentId}/learning-profile`} />}
+            />
+          }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Organization', to: '/organization' },
+            { label: 'Students', to: '/organization/students' },
+            { label: 'Learning profile', to: `/students/${studentId}/learning-profile` },
+            { label: 'Diagnosis' },
+          ]}
         />
         {diagnosisQuery.data && (
           <>

@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
+import { PageActions } from '@/components/common/PageActions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -31,7 +34,20 @@ export function AdminSupportTicketDetailPage() {
           eyebrow="Admin support"
           title={ticket?.subject ?? 'Ticket detail'}
           description="Admin status updates are mocked in memory for Phase 11."
-          actions={<Button asChild variant="outline"><Link to="/admin/support">Back</Link></Button>}
+          actions={
+            <PageActions
+              primary={<Button asChild><Link to="/admin/help-requests">Help requests</Link></Button>}
+              secondary={<BackButton label="Support inbox" to="/admin/support" />}
+            />
+          }
+        />
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { label: 'Admin', to: '/admin' },
+            { label: 'Support inbox', to: '/admin/support' },
+            { label: ticket?.subject ?? 'Ticket detail' },
+          ]}
         />
         {ticket && (
           <Card>

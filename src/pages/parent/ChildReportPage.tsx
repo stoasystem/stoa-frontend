@@ -1,6 +1,9 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { BackButton } from '@/components/common/BackButton'
+import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
+import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { ParentReportRecommendations } from '@/components/parent/ParentReportRecommendations'
@@ -33,16 +36,30 @@ export function ChildReportPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <PageHeader
-            className="mb-0"
-            title="Weekly Report"
-            description="Parent-visible progress, topic risks, and next steps for the selected child."
+          <div className="space-y-3">
+            <Breadcrumbs
+              items={[
+                { label: 'Parent', to: '/parent' },
+                { label: report?.student.name ?? 'Child', to: childId ? `/parent/children/${childId}` : undefined },
+                { label: 'Weekly report' },
+              ]}
+            />
+            <PageHeader
+              className="mb-0"
+              title="Weekly Report"
+              description="Parent-visible progress, topic risks, and next steps for the selected child."
+            />
+          </div>
+          <PageActions
+            primary={
+              childId && (
+                <Button asChild>
+                  <Link to={`/parent/children/${childId}/monthly-report`}>Monthly report</Link>
+                </Button>
+              )
+            }
+            secondary={childId && <BackButton label="Child summary" to={`/parent/children/${childId}`} />}
           />
-          {childId && (
-            <Button asChild variant="outline">
-              <Link to={`/parent/children/${childId}`}>Child summary</Link>
-            </Button>
-          )}
         </div>
         {reportQuery.isLoading && <PageSkeleton rows={4} />}
         {reportQuery.isError && <p className="text-sm text-destructive">Failed to load report.</p>}

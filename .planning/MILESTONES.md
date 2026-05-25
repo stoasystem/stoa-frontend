@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization (Implemented: 2026-05-25)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/v1.12-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Complete frontend page inventory, route map, page entry/exit audit, orphan page audit, and duplicate/overlap audit.
+- Role-based navigation architecture for student, parent, tutor, admin, and organization modes.
+- Typed route and navigation configuration with route groups and role-filtered navigation helpers.
+- Config-driven desktop sidebar and mobile primary navigation in `AppLayout`.
+- Breadcrumbs, BackButton, and PageActions shared components.
+- Breadcrumb/back/page action treatment for key parent, tutor, support, admin, and learning-intelligence detail pages.
+- UX layout, CTA hierarchy, and mobile navigation guidelines.
+- Final demo flow documentation and Phase 13 README/manual QA updates.
+- Phase 13 E2E coverage for focused role navigation, hidden demo routes, breadcrumbs/back actions, and organization-mode navigation.
+
+### Verification
+
+- Requirements: 63/63 implemented.
+- Phases: 7/7 implemented.
+- Lint: passed.
+- TypeScript build check: passed.
+- Build: passed.
+- Playwright E2E: passed, 12/12 tests.
+- Remaining warning: Vite's existing large chunk warning.
+
+---
+
 ## v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch (Implemented: 2026-05-25)
 
 **Phases completed:** 8 phases, 8 plans, 0 tasks
