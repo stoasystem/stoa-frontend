@@ -32,14 +32,14 @@ export function HomePage() {
           <div>
             <Badge variant="secondary" className="mb-5 gap-2">
               <BookOpen className="h-3.5 w-3.5" />
-              Phase 2 foundation
+              Demo-ready learning platform
             </Badge>
             <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight text-foreground md:text-5xl">
               STOA Learning Platform
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-              A modern AI learning platform foundation with routing, providers, reusable UI primitives,
-              API structure, and state stores ready for product development.
+              A role-based demo for student AI help, tutor escalation, parent learning visibility,
+              billing, support, and admin operations.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
@@ -48,24 +48,9 @@ export function HomePage() {
               <Button variant="outline" asChild>
                 <Link to="/dashboard">View Dashboard</Link>
               </Button>
-            </div>
-          </div>
-
-          <div className="rounded-lg border bg-card p-5 shadow-sm">
-            <div className="text-sm font-medium text-muted-foreground">Foundation status</div>
-            <div className="mt-4 grid gap-3 text-sm">
-              <div className="flex items-center justify-between rounded-md bg-secondary px-3 py-2">
-                <span>TailwindCSS</span>
-                <span className="font-medium text-primary">Ready</span>
-              </div>
-              <div className="flex items-center justify-between rounded-md bg-secondary px-3 py-2">
-                <span>React Router</span>
-                <span className="font-medium text-primary">Ready</span>
-              </div>
-              <div className="flex items-center justify-between rounded-md bg-secondary px-3 py-2">
-                <span>TanStack Query</span>
-                <span className="font-medium text-primary">Ready</span>
-              </div>
+              <Button variant="outline" asChild>
+                <Link to="/for-parents">Parent Demo</Link>
+              </Button>
             </div>
           </div>
         </section>

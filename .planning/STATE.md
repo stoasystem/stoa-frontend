@@ -181,6 +181,7 @@ None currently.
 | Date | Task | Artifact |
 |------|------|----------|
 | 2026-05-25 | Current project and demo guide | `docs/demo/current-project-demo-guide.md` |
+| 2026-05-25 | Remove homepage foundation status card | `src/pages/home/HomePage.tsx` |
 
 ### Blockers/Concerns
 
