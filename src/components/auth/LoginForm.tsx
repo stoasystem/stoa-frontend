@@ -8,8 +8,8 @@ import { enableDemoShortcuts } from '@/lib/env'
 import { loginSchema } from '@/lib/validation'
 
 export function LoginForm() {
-  const [email, setEmail] = useState('student@test.com')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const loginMutation = useLoginMutation()
 

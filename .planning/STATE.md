@@ -194,6 +194,7 @@ None currently.
 | 2026-05-25 | Fix primary button contrast across landing pages | `src/components/ui/button.tsx` |
 | 2026-05-25 | Remove phase copy from user-facing UI | `src/components/pricing/PricingFAQ.tsx` |
 | 2026-05-25 | Polish pricing user copy | `src/pages/pricing/PricingPage.tsx` |
+| 2026-05-25 | Remove login test account prefill | `src/components/auth/LoginForm.tsx` |
 
 ### Blockers/Concerns
 
@@ -224,6 +225,7 @@ None currently.
 - Primary button contrast quick fix passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright computed-style checks for `/for-parents` `View pricing`.
 - User-facing phase copy cleanup passed `rg "Phase 11|phase 11" src -n`, `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright pricing text checks.
 - Pricing user-copy polish passed developer-term search, `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright pricing text checks.
+- Login prefill cleanup passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright input-value checks for `/login?next=/chat`.
 - `python3 -m py_compile backend/app/*.py` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.
