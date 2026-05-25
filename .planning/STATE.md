@@ -191,6 +191,7 @@ None currently.
 | 2026-05-25 | Remove homepage foundation status card | `src/pages/home/HomePage.tsx` |
 | 2026-05-25 | Add student and teacher homepage navigation | `src/layouts/MarketingLayout.tsx` |
 | 2026-05-25 | Fix Start Learning CTA contrast | `src/styles/premium-theme.css` |
+| 2026-05-25 | Fix primary button contrast across landing pages | `src/components/ui/button.tsx` |
 
 ### Blockers/Concerns
 
@@ -218,6 +219,7 @@ None currently.
 - `npm run lint` passed for v1.13.
 - `npm run build` passed for v1.13 with Vite's existing large chunk warning and a Node deprecation warning.
 - `npx tsc -b --pretty false` passed for v1.14.
+- Primary button contrast quick fix passed `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright computed-style checks for `/for-parents` `View pricing`.
 - `python3 -m py_compile backend/app/*.py` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
 - `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.
