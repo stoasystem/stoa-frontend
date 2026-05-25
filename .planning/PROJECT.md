@@ -2,33 +2,32 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, and local test backend support.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, and early user feedback workflow.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, and a local SQLite-backed test backend. The current product step is moving that MVP from local demonstration into staging readiness, QA, early user testing, feedback collection, and production-readiness planning.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, and staging documentation. The current product step is moving that staging-ready MVP into production readiness, monitoring, support, privacy, backup, and pilot-launch preparation for a controlled group of real users.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## Current Milestone: v1.7 Phase 8 Staging Deployment, QA, and Early User Testing
+## Current Milestone: v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch
 
-**Goal:** Upgrade STOA from a locally demoable MVP into a staging-ready product that early students, parents, tutors, and internal testers can access, test, and provide feedback on while CI and QA guard the iteration loop.
+**Goal:** Upgrade STOA from a staging early-user product into a production-like pilot launch frontend that can support a small real user group with monitoring, analytics, support, privacy, and launch operations in place.
 
 **Target features:**
-- Staging frontend deployment configuration, staging API environment variables, and SPA fallback.
-- GitHub Actions CI for npm install, lint, TypeScript/build checks, and future tests.
-- Preview deployment or documented local preview flow.
-- Manual QA checklist for auth, student, parent, tutor, and responsive paths.
-- Playwright E2E initial coverage for auth, student chat, parent report, and tutor workflow.
-- Feedback collection entry point, feedback API client, and local backend persistence.
-- Bug report issue template and bug severity workflow.
-- Performance baseline documentation and Lighthouse checklist.
-- Frontend security review checklist and privacy/terms placeholders.
-- Demo reset, early user testing, feedback workflow, deployment, testing, security, and MVP demo documentation.
+- Production deployment plan, production environment variable plan, and production backend API connection guidance.
+- SQLite-to-production database boundary, backend production database coordination, and pilot API contract freeze.
+- Frontend error monitoring, Error Boundary reporting, logging policy, and privacy-safe monitoring payloads.
+- Real analytics event delivery through a stable backend endpoint.
+- Pilot onboarding, support workflow, and support request service boundary.
+- Basic admin operations for usage and feedback visibility.
+- Pilot privacy and terms draft pages, data privacy review, and backup/restore coordination docs.
+- Pricing and billing placeholders for subscription preparation without implementing payments.
+- Pilot launch plan, launch checklist, post-pilot feedback report template, and README production readiness updates.
 
 ## Current State
 
-**Latest shipped milestone:** v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness
+**Latest shipped milestone:** v1.7 Phase 8 Staging Deployment, QA, and Early User Testing
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -42,6 +41,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Tutor help-request dashboard, detail, and status update workflow.
 - Shared MVP UI polish, skeleton loading, toast feedback, validation, Error Boundary, analytics client, parent weekly report, tutor notes, demo shortcuts, staging env flags, and Phase 7 documentation.
 - Local FastAPI + SQLite test backend with seed users and role-filtered API endpoints.
+- Staging deployment configuration, GitHub Actions CI, Playwright E2E smoke coverage, manual QA docs, feedback collection, bug tracking, performance/security readiness docs, and privacy/terms placeholders.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -61,23 +61,22 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run the app and exercise a streaming STOA chat workflow with file attachments and teacher-help status through the unified backend API contract — v1.4
 - ✓ Developers can run the app with authenticated role routes, parent visibility, tutor help requests, and a SQLite-backed local test backend — v1.5
 - ✓ Developers can run the app as an MVP-ready local/demo product with responsive polish, skeletons, toast feedback, validation, analytics, parent reports, tutor notes, demo data, and staging env preparation — v1.6
+- ✓ Developers can run the app as a staging-ready MVP with CI, E2E smoke coverage, manual QA docs, feedback collection, bug workflow, performance/security checks, and legal placeholders — v1.7
 
 ### Active
 
-- [ ] Staging frontend deployment configuration and SPA fallback are ready.
-- [ ] Staging API environment variables and deployment docs are documented.
-- [ ] GitHub Actions CI runs install, lint, and build/type checks on push and pull request.
-- [ ] Preview deployment or local preview process is documented.
-- [ ] Manual QA checklist covers auth, student, parent, tutor, and responsive flows.
-- [ ] Playwright E2E initial tests cover auth, student chat, parent dashboard/report, and tutor workflow.
-- [ ] Demo data reset process is documented.
-- [ ] Early user testing plan and first-user feedback workflow are documented.
-- [ ] Feedback UI, service, mutation hook, and local backend endpoint exist.
-- [ ] Bug report template and severity workflow are established.
-- [ ] Performance baseline and Lighthouse checklist are documented.
-- [ ] Frontend security review checklist is documented.
-- [ ] Privacy and terms placeholder pages are available.
-- [ ] README documents Phase 8 staging, QA, E2E, feedback, and demo instructions.
+- [ ] Production deployment plan, production frontend URL options, production backend API URL, and production environment variables are documented.
+- [ ] SQLite is explicitly limited to local/demo/testing, backend production database options are documented, and pilot API contracts are frozen.
+- [ ] Error monitoring service, privacy-safe payload format, and Error Boundary reporting path exist.
+- [ ] Frontend logging utility and logging policy distinguish development, pilot, and production behavior.
+- [ ] Analytics client sends allowed events to a real backend endpoint when enabled and degrades gracefully on failure.
+- [ ] Pilot onboarding flow exists for student, parent, and tutor roles.
+- [ ] Support page, support request service boundary, and support workflow documentation exist.
+- [ ] Basic admin usage and feedback views or placeholders exist for pilot operations.
+- [ ] Privacy and terms pages are upgraded from placeholders to pilot drafts.
+- [ ] Backup/restore, production readiness, launch checklist, pilot launch plan, and post-pilot feedback report docs exist.
+- [ ] Pricing and billing placeholders prepare subscription positioning without implementing payment.
+- [ ] README documents Phase 9 production readiness and pilot launch configuration.
 
 ### Out of Scope
 
@@ -85,19 +84,21 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Complex school organization, parent invitation, and full admin management — Phase 6 keeps role surfaces minimal.
 - Real multi-person teacher chat — Phase 6 supports tutor help-request list/detail/status, not live teacher chat.
 - Payment system — billing and subscriptions are deferred.
-- Production deployment — Phase 8 targets staging only; production launch remains deferred.
+- Large-scale public launch — Phase 9 targets a small controlled pilot only.
 - Direct frontend calls to OpenAI, Claude, Gemini, DeepSeek, Codex, or any other model provider — frontend remains coupled only to STOA backend APIs.
 - Production SQLite usage — SQLite is local functional-test infrastructure only; production persistence remains a backend concern.
 - Full audit logging and Swiss data privacy compliance documentation — deferred until later security/compliance milestones.
-- Full production deployment, SLA, and monitoring platform — Phase 8 prepares staging and readiness artifacts only.
+- Full observability platform, SLA, and uptime alerting — Phase 9 adds monitoring foundation only.
 - Complex BI dashboards and full admin analytics — Phase 7 only adds basic analytics events and usage contract.
 - Full curriculum/content management — not required for MVP readiness.
-- Full legal compliance package — Phase 8 adds placeholders and checklists, not final legal documents.
+- Full legal compliance package — Phase 9 adds pilot drafts and privacy review, not final legal-reviewed documents.
 - Large-scale user growth, A/B testing, data warehouse, and formal support operations — deferred until later launch milestones.
+- Full payment processing and subscription enforcement — Phase 9 adds pricing/billing placeholders only.
+- Full admin user management, CRM, school B2B onboarding, financial reporting, and multi-tenant school organization — outside pilot launch readiness.
 
 ## Context
 
-The project brief for Phase 8 was provided in Chinese and defines staging deployment, CI, preview flow, manual QA, E2E tests, early user testing, feedback collection, bug tracking, performance baseline, frontend security review, privacy placeholders, demo reset, and deployment/testing documentation. It builds on v1.6's MVP-ready student-parent-tutor loop.
+The project brief for Phase 9 was provided in Chinese and defines production deployment planning, production environment variables, backend production database boundaries, error monitoring, logging strategy, real analytics event delivery, pilot onboarding, support workflow, basic admin operations, data privacy review, backup/restore strategy, pricing/subscription preparation, launch checklist, and post-pilot feedback reporting. It builds on v1.7's staging deployment, CI, E2E, manual QA, early user testing, feedback collection, performance baseline, security review, and privacy/terms placeholders.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -114,13 +115,14 @@ Current codebase facts:
 - v1.4 shipped the Phase 5 real learning workflow: streaming response handling, upload attachments, retry, stop generation, new conversation flow, and teacher-help status progression.
 - v1.5 shipped Phase 6 authentication, protected/role routes, student profile/history, parent child visibility, tutor help-request handling, and a local SQLite-backed test backend.
 - v1.6 shipped Phase 7 product polish, responsive foundations, loading/feedback systems, validation, error boundary, analytics, parent weekly report, tutor workflow notes, demo data, and staging env preparation.
+- v1.7 shipped Phase 8 staging deployment configuration, CI, Playwright E2E smoke tests, manual QA and demo docs, feedback collection, bug workflow, performance/security docs, privacy/terms placeholders, and production readiness planning.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 8 prepares staging, QA, E2E, feedback, and early user testing; large new business modules, production deployment, complex BI, payments, and full admin remain out of scope.
+- **Scope**: Phase 9 prepares production-like pilot launch readiness; large public launch, full payments, full CRM, school B2B onboarding, complex admin, and full compliance certification remain out of scope.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -133,6 +135,10 @@ Current codebase facts:
 - **Feedback**: Phase 8 can use a simple local backend feedback endpoint and SQLite table; production support tooling remains deferred.
 - **Testing**: Playwright E2E should cover core demo paths without requiring production deployment.
 - **Staging**: Staging deployment config must not expose secrets, and SPA fallback must support route refreshes.
+- **Production env**: `VITE_*` variables are public browser configuration and must not contain secrets.
+- **Production database**: SQLite remains local/demo/test infrastructure only; production persistence must stay behind backend APIs and should use a backend-managed production database plan.
+- **Telemetry privacy**: Monitoring, analytics, logging, feedback, and support payloads must not include passwords, tokens, file contents, or full private chat content by default.
+- **Pilot size**: Phase 9 targets a controlled pilot group, roughly 5-10 students, 3-5 parents, 1-3 tutors, and 1-2 weeks of testing.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -166,6 +172,10 @@ Current codebase facts:
 | Keep Phase 8 focused on staging and testability | Early user trials need deployment, QA, E2E, feedback, and bug workflow more than new product modules | — Pending |
 | Use GitHub Actions as the first CI gate | It matches the repository host and gives immediate build/lint protection for MVP iteration | — Pending |
 | Add feedback through a thin frontend/backend contract | Gives early users a direct reporting path while keeping production support systems deferred | — Pending |
+| Keep Phase 9 focused on pilot readiness instead of feature breadth | Real users need monitoring, support, privacy, backup, and launch discipline before new product expansion | — Pending |
+| Keep monitoring and analytics vendor-neutral behind service wrappers | Lets the team use Sentry, Highlight, LogRocket, PostHog, or backend endpoints later without rewriting product UI | — Pending |
+| Treat SQLite as non-production infrastructure | Protects pilot data planning from relying on a local functional-test database | — Pending |
+| Prepare pricing and billing as placeholders only | Supports commercial validation without adding payment complexity before pilot evidence exists | — Pending |
 
 ## Evolution
 
@@ -185,4 +195,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.7 milestone initialization*
+*Last updated: 2026-05-25 after v1.8 milestone initialization*

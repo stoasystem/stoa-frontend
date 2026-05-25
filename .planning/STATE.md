@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Phase 8 Staging Deployment, QA, and Early User Testing
-status: complete
-last_updated: "2026-05-25T01:40:00+02:00"
+milestone: v1.8
+milestone_name: Phase 9 Production Readiness, Monitoring, and Pilot Launch
+status: planning
+last_updated: "2026-05-25T08:10:02.459Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 7
+  completed_phases: 0
+  total_plans: 7
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-24)
+See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
-**Current focus:** Milestone v1.7 implemented and verified; ready for Phase 9 planning.
+**Current focus:** Milestone v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch is planned; ready to start Phase 41.
 
 ## Current Position
 
-Phase: Phase 40 complete
-Plan: Phase 8 staging, QA, and early user testing readiness
-Status: Milestone complete
-Last activity: 2026-05-25 — Phase 8 implemented and verified
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-25 — Milestone v1.8 started
 
 ## Performance Metrics
 
@@ -119,6 +119,11 @@ Recent decisions affecting current work:
 - Phase 38 added manual QA, MVP demo flow, early user testing, and local demo reset documentation.
 - Phase 39 added feedback UI, API client, mutation hook, local SQLite feedback persistence, and bug report workflow.
 - Phase 40 added performance baseline, frontend security review, privacy/terms placeholders, production readiness plan, README Phase 8 docs, and final verification.
+- Milestone v1.8 started from the Phase 9 Production Readiness, Monitoring, and Pilot Launch brief.
+- Phase 9 keeps STOA in controlled pilot-launch scope, not large-scale public launch.
+- Phase 9 treats production `VITE_*` variables as public browser configuration and keeps secrets out of frontend configuration.
+- Phase 9 treats SQLite as local/demo/test infrastructure only and keeps production database selection behind backend APIs.
+- Phase 9 roadmap continues numbering into Phase 41 through Phase 47.
 
 ### Pending Todos
 
@@ -169,4 +174,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone when ready for Phase 8.
+- Start Phase 41 with /gsd-plan-phase 41 when ready to execute production deployment and API readiness.

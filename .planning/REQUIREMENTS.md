@@ -1,89 +1,99 @@
-# Requirements: STOA Frontend v1.7 Phase 8 Staging Deployment, QA, and Early User Testing
+# Requirements: STOA Frontend v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch
 
 **Defined:** 2026-05-25
 **Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## v1.7 Requirements
+## v1.8 Requirements
 
-Requirements for the eighth-stage staging and early user testing milestone. Each maps to roadmap phases after approval.
+Requirements for the ninth-stage production readiness and controlled pilot launch milestone. Each maps to roadmap phases after approval.
 
-### Staging Deployment
+### Production Readiness
 
-- [x] **DEPLOY-01**: Staging frontend deployment configuration exists for a Vite SPA.
-- [x] **DEPLOY-02**: React Router deep links refresh correctly through SPA fallback configuration.
-- [x] **DEPLOY-03**: Staging environment variables are documented, including API base URL, app env, demo shortcuts, analytics, and feedback flags.
-- [x] **DEPLOY-04**: A manual preview flow exists for local verification with `npm run build` and `npm run preview`.
-- [x] **DEPLOY-05**: Deployment documentation explains staging URL, backend API URL, redeploy process, and verification checks.
+- [ ] **PROD-01**: Production frontend URL options and the preferred stable pilot URL are documented.
+- [ ] **PROD-02**: Production backend API URL and frontend connection expectations are documented.
+- [ ] **PROD-03**: Production environment variables are documented, including API base URL, app env, demo shortcuts, analytics, feedback, and error monitoring flags.
+- [ ] **PROD-04**: Production configuration explicitly disables demo shortcuts and avoids localhost APIs.
+- [ ] **PROD-05**: Build and preview launch gate commands are documented as `npm run build` and `npm run preview`.
+- [ ] **PROD-06**: README documents Phase 9 production readiness and pilot launch setup.
 
-### CI and Build Gate
+### Database and API Contract
 
-- [x] **CI-01**: GitHub Actions CI runs on push to `main` and pull requests to `main`.
-- [x] **CI-02**: CI installs dependencies with `npm ci`.
-- [x] **CI-03**: CI runs lint and build/type checks before changes are considered safe to merge.
+- [ ] **DATA-01**: SQLite is documented as local development, demo, and functional-test infrastructure only.
+- [ ] **DATA-02**: Backend production database options and migration boundaries are documented without coupling frontend code to a database implementation.
+- [ ] **DATA-03**: Pilot API contract freeze list is documented for auth, conversations, files, teacher help, parent reports, tutor workflows, feedback, and analytics.
+- [ ] **DATA-04**: Breaking API change coordination expectations are documented for frontend/backend work.
 
-### Manual QA and Early User Testing
+### Monitoring and Logging
 
-- [x] **QA-01**: Manual QA checklist covers auth, student, parent, tutor, and responsive flows.
-- [x] **QA-02**: MVP demo flow documentation covers student, tutor, and parent walkthroughs with demo accounts.
-- [x] **QA-03**: Early user testing plan identifies target testers, session structure, observation goals, and feedback collection steps.
-- [x] **QA-04**: Demo data reset process is documented for local SQLite and future staging reset usage.
+- [ ] **MON-01**: Frontend error monitoring service exists for reporting sanitized runtime errors.
+- [ ] **MON-02**: `AppErrorBoundary` reports production runtime errors without causing a secondary crash.
+- [ ] **MON-03**: Error payload includes message, optional stack, route, user role/id when available, app environment, and timestamp.
+- [ ] **MON-04**: Error monitoring policy excludes passwords, tokens, file contents, and full private chat content.
+- [ ] **LOG-01**: Frontend logger utility exists with development-only debug/info behavior and production-safe warn/error behavior.
+- [ ] **LOG-02**: Logging strategy documentation defines debug, info, warn, and error usage for pilot and production.
 
-### E2E Testing
+### Analytics
 
-- [x] **E2E-01**: Playwright is installed and configured for the Vite app.
-- [x] **E2E-02**: Package scripts exist for headless and UI Playwright runs.
-- [x] **E2E-03**: Auth E2E covers demo login and logout.
-- [x] **E2E-04**: Student chat E2E covers opening chat, sending a question, and requesting teacher help.
-- [x] **E2E-05**: Parent and tutor E2E tests cover child summary/report and tutor request workflow.
-- [x] **E2E-06**: E2E documentation explains local prerequisites, backend expectations, and how to debug failures.
+- [ ] **ANLY-01**: Analytics client sends enabled events to `POST /analytics/events`.
+- [ ] **ANLY-02**: Analytics client no-ops or logs only in disabled/development modes according to environment flags.
+- [ ] **ANLY-03**: Analytics failures do not block chat, upload, report, tutor, feedback, support, or navigation flows.
+- [ ] **ANLY-04**: Pilot analytics event list is documented.
+- [ ] **ANLY-05**: Analytics payload policy excludes full chat content and file contents.
 
-### Feedback Collection
+### Pilot Onboarding and Support
 
-- [x] **FEED-01**: Feedback API client and mutation hook exist.
-- [x] **FEED-02**: Feedback button and dialog are available when `VITE_ENABLE_FEEDBACK=true`.
-- [x] **FEED-03**: Feedback submissions include type, page, message, user role, and timestamp context.
-- [x] **FEED-04**: Local backend supports `POST /feedback` and persists feedback to SQLite.
-- [x] **FEED-05**: Feedback workflow documentation explains how the team reviews and converts feedback into issues.
+- [ ] **ONB-01**: `/onboarding` route exists for pilot onboarding.
+- [ ] **ONB-02**: Student onboarding explains grade/subject setup and entry into Chat.
+- [ ] **ONB-03**: Parent onboarding explains child dashboard and report visibility.
+- [ ] **ONB-04**: Tutor onboarding explains help request list/detail/status workflow.
+- [ ] **SUP-01**: `/support` route exists and is reachable from the app navigation or user menu.
+- [ ] **SUP-02**: Support page explains FAQ, bug feedback, teacher-help distinction, contact path, and pilot-stage expectations.
+- [ ] **SUP-03**: Support request service and mutation hook exist for typed support submissions or a documented feedback-compatible backend path.
+- [ ] **SUP-04**: Support workflow documentation explains triage, severity, ownership, and response expectations.
 
-### Bug Tracking
+### Admin Operations
 
-- [x] **BUG-01**: GitHub bug report issue template exists with role, route, repro steps, expected/actual behavior, environment, and severity fields.
-- [x] **BUG-02**: Bug severity definitions are documented for Critical, High, Medium, and Low issues.
+- [ ] **ADMIN-01**: `/admin` route communicates pilot operations status and environment/version basics.
+- [ ] **ADMIN-02**: `/admin/usage` route shows usage summary cards or a backend-pending placeholder for active users, role counts, messages, help requests, uploads, and feedback.
+- [ ] **ADMIN-03**: `/admin/feedback` route shows feedback list contract or backend-pending placeholder.
+- [ ] **ADMIN-04**: Admin API service and query hooks exist for usage summary and feedback list boundaries.
+- [ ] **ADMIN-05**: Full admin user management remains explicitly deferred.
 
-### Performance Baseline
+### Privacy, Legal, Backup, and Commercial Preparation
 
-- [x] **PERF-01**: Performance baseline documentation defines Lighthouse pages and target metrics for `/login`, `/dashboard`, `/chat`, `/parent`, and `/tutor`.
-- [x] **PERF-02**: Build output and known bundle-size warning policy are documented for staging readiness.
+- [ ] **PRIV-01**: `/privacy` page is upgraded from placeholder to pilot draft explaining collected data, purpose, visibility, learning feedback use, parent visibility, pilot limits, and contact path.
+- [ ] **PRIV-02**: `/terms` page is upgraded from placeholder to pilot draft explaining pilot nature, AI limitations, non-school-certification status, and supervision expectations.
+- [ ] **PRIV-03**: Data privacy review document covers analytics, feedback, support, error monitoring, demo data separation, and child/parent/tutor visibility.
+- [ ] **BACKUP-01**: Backup and restore strategy document identifies data ranges requiring backup.
+- [ ] **BACKUP-02**: Backup and restore strategy distinguishes SQLite pilot fallback from production database backup/PITR expectations.
+- [ ] **BACKUP-03**: Frontend restore verification checks cover login, conversations, parent report, and tutor requests.
+- [ ] **PRICE-01**: `/pricing` route exists with pilot-stage tiers for Free Trial, Student Plan, Family Plan, and Tutor-supported Plan.
+- [ ] **PRICE-02**: `/billing` route exists and clearly states billing is unavailable until after pilot.
+- [ ] **PRICE-03**: User/subscription type placeholders are prepared where appropriate without enforcing payment behavior.
 
-### Security and Privacy
+### Pilot Launch Documentation and Verification
 
-- [x] **SEC-01**: Frontend security review checklist covers frontend secrets, database access, localStorage token risk, demo shortcuts, route guards, 401/403 handling, file upload limits, and dangerous HTML rendering.
-- [x] **SEC-02**: Security review documentation explicitly marks frontend checks as complementary to backend authorization and validation.
-- [x] **LEGAL-01**: Public `/privacy` placeholder page exists for testing-stage data handling notice.
-- [x] **LEGAL-02**: Public `/terms` placeholder page exists for testing-stage usage notice.
-
-### Documentation and Readiness
-
-- [x] **DOCS-01**: README documents Phase 8 staging, CI, preview, E2E, feedback, privacy, and demo flow.
-- [x] **DOCS-02**: Deployment, QA, testing, demo, feedback, and security docs exist under `docs/`.
-- [x] **DOCS-03**: Production readiness plan documents remaining work before pilot launch.
-- [x] **DOCS-04**: Final verification records build, lint, E2E, backend feedback smoke, and route preview results.
+- [ ] **PILOT-01**: Production readiness document exists under `docs/production/`.
+- [ ] **PILOT-02**: Launch checklist exists and covers production-like deployment, monitoring, analytics, onboarding, support, admin, privacy, and pilot launch gates.
+- [ ] **PILOT-03**: Pilot launch plan defines goals, user counts, user types, timeline, success metrics, test tasks, feedback method, support method, risks, and retrospective process.
+- [ ] **PILOT-04**: Post-pilot feedback report template exists.
+- [ ] **PILOT-05**: Final verification records build, E2E/manual QA expectations, privacy/security review status, production-like demo status, and remaining blockers.
 
 ## Future Requirements
 
 Deferred to future milestones. Tracked but not in current roadmap.
 
-### Production Launch and Operations
+### Public Launch and Monetization
 
-- **PROD-01**: Production deployment is configured and published.
-- **MON-01**: Error monitoring and uptime monitoring exist.
-- **OBS-01**: Production logging and alerting strategy exists.
-- **SUPPORT-01**: Support inbox or CRM workflow exists.
-- **LEGAL-03**: Final privacy policy and terms are legally reviewed.
-- **ADMIN-03**: Admin/support view exists for feedback and operational triage.
-- **ANLY-06**: Real analytics backend/dashboard exists beyond MVP event storage.
-- **CI-04**: E2E runs automatically against deployed preview URLs.
-- **PERF-03**: Lighthouse CI enforces performance budgets.
+- **PAY-01**: Payment provider is selected and integrated.
+- **SUB-01**: Subscription status is enforced in product flows.
+- **BILL-01**: Billing history and invoices are available.
+- **ADMIN-06**: Admin can fully manage pilot users, roles, account status, and support cases.
+- **CRM-01**: Support workflow is integrated with a full CRM or helpdesk.
+- **OBS-01**: Full observability platform includes traces, replay, uptime monitoring, alert routing, and dashboards.
+- **LEGAL-01**: Privacy policy and terms are legally reviewed and finalized.
+- **SCHOOL-01**: School B2B onboarding and multi-tenant organization management exist.
+- **BI-01**: Production analytics warehouse and BI dashboard exist.
 
 ## Out of Scope
 
@@ -91,13 +101,16 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Production deployment | Phase 8 prepares staging and production-readiness planning only. |
-| Formal legal compliance package | Phase 8 adds placeholders and checklists, not final legal documents. |
-| Full monitoring platform | Early user staging needs baseline checks and feedback first. |
-| Full admin feedback dashboard | Feedback can persist locally and be triaged through documented workflow. |
-| Large E2E suite for every route | Phase 8 needs stable smoke coverage, not broad brittle test coverage. |
-| Complex A/B testing or data warehouse | Not needed for early user staging trials. |
-| Payment, subscription, or school B2B management | Outside staging/QA readiness scope. |
+| Large-scale public launch | Phase 9 validates a small controlled pilot only. |
+| Full payment system | Pricing and billing placeholders are enough before pilot validation. |
+| Full CRM/helpdesk | Support can be handled through a lightweight support/feedback workflow. |
+| Complete school B2B onboarding | Pilot user onboarding is individual and controlled. |
+| Complex admin dashboard | Phase 9 needs minimal usage/feedback/admin placeholders only. |
+| Full financial reporting | No payment system is implemented in this milestone. |
+| Formal compliance certification | Phase 9 performs a privacy review and pilot drafts, not full certification. |
+| Full observability platform | Error monitoring and logging foundations are enough for pilot readiness. |
+| Multi-tenant school organization system | Outside controlled pilot scope. |
+| Marketing growth system and A/B testing | Pilot launch prioritizes learning, support, and reliability signals. |
 
 ## Traceability
 
@@ -105,47 +118,60 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEPLOY-01 | Phase 35 | Complete |
-| DEPLOY-02 | Phase 35 | Complete |
-| DEPLOY-03 | Phase 35 | Complete |
-| DEPLOY-04 | Phase 35 | Complete |
-| DEPLOY-05 | Phase 35 | Complete |
-| CI-01 | Phase 36 | Complete |
-| CI-02 | Phase 36 | Complete |
-| CI-03 | Phase 36 | Complete |
-| QA-01 | Phase 38 | Complete |
-| QA-02 | Phase 38 | Complete |
-| QA-03 | Phase 38 | Complete |
-| QA-04 | Phase 38 | Complete |
-| E2E-01 | Phase 37 | Complete |
-| E2E-02 | Phase 37 | Complete |
-| E2E-03 | Phase 37 | Complete |
-| E2E-04 | Phase 37 | Complete |
-| E2E-05 | Phase 37 | Complete |
-| E2E-06 | Phase 37 | Complete |
-| FEED-01 | Phase 39 | Complete |
-| FEED-02 | Phase 39 | Complete |
-| FEED-03 | Phase 39 | Complete |
-| FEED-04 | Phase 39 | Complete |
-| FEED-05 | Phase 39 | Complete |
-| BUG-01 | Phase 39 | Complete |
-| BUG-02 | Phase 39 | Complete |
-| PERF-01 | Phase 40 | Complete |
-| PERF-02 | Phase 40 | Complete |
-| SEC-01 | Phase 40 | Complete |
-| SEC-02 | Phase 40 | Complete |
-| LEGAL-01 | Phase 40 | Complete |
-| LEGAL-02 | Phase 40 | Complete |
-| DOCS-01 | Phase 40 | Complete |
-| DOCS-02 | Phase 40 | Complete |
-| DOCS-03 | Phase 40 | Complete |
-| DOCS-04 | Phase 40 | Complete |
+| PROD-01 | Phase 41 | Pending |
+| PROD-02 | Phase 41 | Pending |
+| PROD-03 | Phase 41 | Pending |
+| PROD-04 | Phase 41 | Pending |
+| PROD-05 | Phase 41 | Pending |
+| PROD-06 | Phase 47 | Pending |
+| DATA-01 | Phase 41 | Pending |
+| DATA-02 | Phase 41 | Pending |
+| DATA-03 | Phase 41 | Pending |
+| DATA-04 | Phase 41 | Pending |
+| MON-01 | Phase 42 | Pending |
+| MON-02 | Phase 42 | Pending |
+| MON-03 | Phase 42 | Pending |
+| MON-04 | Phase 42 | Pending |
+| LOG-01 | Phase 42 | Pending |
+| LOG-02 | Phase 42 | Pending |
+| ANLY-01 | Phase 43 | Pending |
+| ANLY-02 | Phase 43 | Pending |
+| ANLY-03 | Phase 43 | Pending |
+| ANLY-04 | Phase 43 | Pending |
+| ANLY-05 | Phase 43 | Pending |
+| ONB-01 | Phase 44 | Pending |
+| ONB-02 | Phase 44 | Pending |
+| ONB-03 | Phase 44 | Pending |
+| ONB-04 | Phase 44 | Pending |
+| SUP-01 | Phase 44 | Pending |
+| SUP-02 | Phase 44 | Pending |
+| SUP-03 | Phase 44 | Pending |
+| SUP-04 | Phase 44 | Pending |
+| ADMIN-01 | Phase 45 | Pending |
+| ADMIN-02 | Phase 45 | Pending |
+| ADMIN-03 | Phase 45 | Pending |
+| ADMIN-04 | Phase 45 | Pending |
+| ADMIN-05 | Phase 45 | Pending |
+| PRIV-01 | Phase 46 | Pending |
+| PRIV-02 | Phase 46 | Pending |
+| PRIV-03 | Phase 46 | Pending |
+| BACKUP-01 | Phase 46 | Pending |
+| BACKUP-02 | Phase 46 | Pending |
+| BACKUP-03 | Phase 46 | Pending |
+| PRICE-01 | Phase 46 | Pending |
+| PRICE-02 | Phase 46 | Pending |
+| PRICE-03 | Phase 46 | Pending |
+| PILOT-01 | Phase 47 | Pending |
+| PILOT-02 | Phase 47 | Pending |
+| PILOT-03 | Phase 47 | Pending |
+| PILOT-04 | Phase 47 | Pending |
+| PILOT-05 | Phase 47 | Pending |
 
 **Coverage:**
-- v1.7 requirements: 35 total
-- Mapped to phases: 35
+- v1.8 requirements: 49 total
+- Mapped to phases: 49
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.7 implementation and verification*
+*Last updated: 2026-05-25 after v1.8 roadmap creation*

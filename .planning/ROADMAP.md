@@ -10,111 +10,129 @@
 - ✅ **v1.5 Phase 6 Authentication, User Roles, and Parent Visibility** - Phases 21-27 (implemented 2026-05-24)
 - ✅ **v1.6 Phase 7 Product Polishing, Analytics, and MVP Readiness** - Phases 28-34 (implemented 2026-05-25)
 - ✅ **v1.7 Phase 8 Staging Deployment, QA, and Early User Testing** - Phases 35-40 (implemented 2026-05-25)
+- 🔄 **v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch** - Phases 41-47 (planned 2026-05-25)
 
 ## Phases
 
 <details open>
-<summary>✅ v1.7 Phase 8 Staging Deployment, QA, and Early User Testing (Phases 35-40) - IMPLEMENTED 2026-05-25</summary>
+<summary>🔄 v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch (Phases 41-47) - PLANNED</summary>
 
-**Milestone Goal:** Upgrade STOA from a locally demoable MVP into a staging-ready product that early students, parents, tutors, and internal testers can access, test, and provide feedback on while CI and QA guard the iteration loop.
+**Milestone Goal:** Upgrade STOA from a staging early-user product into a production-like pilot launch frontend that can support a small real user group with monitoring, analytics, support, privacy, and launch operations in place.
 
-- [x] **Phase 35: Staging Deployment Configuration** - Add SPA fallback, staging environment configuration, deployment docs, and local preview flow.
-- [x] **Phase 36: CI and Preview Workflow** - Add GitHub Actions CI for npm install, lint, and build/type checks; document preview checks.
-- [x] **Phase 37: Playwright E2E Smoke Suite** - Install Playwright, add config/scripts, and cover auth, student chat, parent, and tutor smoke paths.
-- [x] **Phase 38: Manual QA, Demo Reset, and Early User Testing Docs** - Add manual QA checklist, MVP demo docs, early user testing plan, and demo reset process.
-- [x] **Phase 39: Feedback Collection and Bug Workflow** - Add feedback UI/service/hook/backend persistence and GitHub bug workflow.
-- [x] **Phase 40: Performance, Security, Privacy, and Readiness Plan** - Add performance baseline, security review, legal placeholders, production readiness plan, README update, and final verification.
+- [ ] **Phase 41: Production Deployment and API Readiness** - Document production frontend/backend URLs, environment variables, SQLite boundaries, database plan coordination, and pilot API contract freeze.
+- [ ] **Phase 42: Monitoring and Logging Foundation** - Add frontend error monitoring service, Error Boundary reporting, logger utility, and monitoring/logging docs.
+- [ ] **Phase 43: Analytics Backend Delivery** - Upgrade analytics delivery to a backend endpoint and document event list, payload policy, and failure behavior.
+- [ ] **Phase 44: Pilot Onboarding and Support Workflow** - Add onboarding and support routes, role-specific onboarding components, support request boundary, and support workflow docs.
+- [ ] **Phase 45: Basic Admin Operations** - Add pilot admin usage and feedback views/placeholders, admin service/query boundaries, and admin operations scope docs.
+- [ ] **Phase 46: Privacy, Backup, Pricing, and Billing Preparation** - Upgrade privacy/terms drafts, add backup/restore and privacy review docs, and add pricing/billing placeholders.
+- [ ] **Phase 47: Launch Checklist, Pilot Plan, README, and Final Verification** - Add production readiness docs, launch checklist, pilot plan, feedback report template, README updates, and final verification record.
 
-### Phase 35: Staging Deployment Configuration
+### Phase 41: Production Deployment and API Readiness
 
-**Goal**: Prepare static SPA deployment and staging environment configuration so direct staging links can be tested reliably.
-**Depends on**: Phase 34
-**Requirements**: [DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04, DEPLOY-05]
+**Goal**: Make production-like deployment, environment configuration, database boundaries, and pilot API contracts explicit before adding operational code.
+**Depends on**: Phase 40
+**Requirements**: [PROD-01, PROD-02, PROD-03, PROD-04, PROD-05, DATA-01, DATA-02, DATA-03, DATA-04]
 **Success Criteria** (what must be TRUE):
-  1. Vercel and/or Netlify SPA fallback config exists and supports React Router deep links.
-  2. `.env.example` includes staging and production examples for API base URL, app env, demo shortcuts, analytics, and feedback flags.
-  3. Staging deployment docs explain URL, backend URL, env vars, deploy/redeploy, preview, and success checks.
-  4. Local preview flow is documented and can serve the built `dist` output.
-  5. Deep routes such as `/chat`, `/parent`, and `/tutor/requests/:id` are included in deployment verification.
-**Plans**: 1 plan complete
+  1. Production readiness docs identify frontend URL options, backend API URL expectations, and launch gate commands.
+  2. `.env.example` or production documentation includes `VITE_API_BASE_URL`, `VITE_APP_ENV`, demo shortcut, analytics, feedback, and error monitoring flags.
+  3. Production docs explicitly state that `VITE_*` values are public browser configuration and cannot contain secrets.
+  4. SQLite is documented as local/demo/test only, with production database planning owned behind backend APIs.
+  5. Pilot API contract freeze list and breaking-change coordination expectations are documented.
+**Plans**: 0/1 planned
 
-### Phase 36: CI and Preview Workflow
+### Phase 42: Monitoring and Logging Foundation
 
-**Goal**: Add a reliable repository-level build gate before future staging work continues.
-**Depends on**: Phase 35
-**Requirements**: [CI-01, CI-02, CI-03]
+**Goal**: Ensure pilot runtime errors can be captured without exposing sensitive student data or breaking the user experience.
+**Depends on**: Phase 41
+**Requirements**: [MON-01, MON-02, MON-03, MON-04, LOG-01, LOG-02]
 **Success Criteria** (what must be TRUE):
-  1. `.github/workflows/frontend-ci.yml` runs on push and pull request to `main`.
-  2. CI uses Node.js 20 and `npm ci`.
-  3. CI runs `npm run lint` and `npm run build`.
-  4. README or deployment docs explain how preview checks should be run locally or by deployment platform.
-**Plans**: 1 plan complete
+  1. `src/services/monitoring/errorMonitoringApi.ts` reports sanitized frontend errors through the STOA API boundary.
+  2. `AppErrorBoundary` calls monitoring in enabled environments while still showing a recovery UI.
+  3. Error payload includes route and app environment.
+  4. Monitoring failures are swallowed or logged safely and never create a second user-facing crash.
+  5. `src/services/logging/logger.ts` exists and logging docs define allowed/disallowed production logging content.
+**Plans**: 0/1 planned
 
-### Phase 37: Playwright E2E Smoke Suite
+### Phase 43: Analytics Backend Delivery
 
-**Goal**: Add initial browser smoke coverage for the core STOA student-parent-tutor loop.
-**Depends on**: Phase 36
-**Requirements**: [E2E-01, E2E-02, E2E-03, E2E-04, E2E-05, E2E-06]
+**Goal**: Replace development-only analytics behavior with stable backend event delivery suitable for pilot usage review.
+**Depends on**: Phase 42
+**Requirements**: [ANLY-01, ANLY-02, ANLY-03, ANLY-04, ANLY-05]
 **Success Criteria** (what must be TRUE):
-  1. Playwright is installed as a dev dependency and configured for local Vite testing.
-  2. `npm run test:e2e` and `npm run test:e2e:ui` scripts exist.
-  3. `auth.spec.ts` covers demo login and logout.
-  4. `student-chat.spec.ts` covers student chat send and teacher-help request path.
-  5. `parent-dashboard.spec.ts` and `tutor-workflow.spec.ts` cover parent report and tutor request workflow.
-  6. E2E docs explain local backend/demo data requirements and failure debugging.
-**Plans**: 1 plan complete
+  1. Analytics client posts enabled events to `POST /analytics/events`.
+  2. Disabled analytics no-ops or logs only according to environment flags.
+  3. Analytics request failures do not block product actions.
+  4. Docs list pilot analytics events including login, chat, upload, teacher help, parent report, tutor request, and feedback events.
+  5. Payload policy clearly excludes full chat content and file contents.
+**Plans**: 0/1 planned
 
-### Phase 38: Manual QA, Demo Reset, and Early User Testing Docs
+### Phase 44: Pilot Onboarding and Support Workflow
 
-**Goal**: Make human testing and demo preparation repeatable for internal and early-user trials.
-**Depends on**: Phase 37
-**Requirements**: [QA-01, QA-02, QA-03, QA-04]
+**Goal**: Give invited pilot users clear role-specific entry paths and a reliable way to request help.
+**Depends on**: Phase 43
+**Requirements**: [ONB-01, ONB-02, ONB-03, ONB-04, SUP-01, SUP-02, SUP-03, SUP-04]
 **Success Criteria** (what must be TRUE):
-  1. Manual QA checklist covers auth, student, parent, tutor, and responsive checks.
-  2. MVP demo flow doc covers student, tutor, and parent walkthroughs with demo accounts.
-  3. Early user testing doc identifies tester groups, session structure, observation goals, and feedback collection.
-  4. Demo reset process documents local SQLite reset and future staging reset expectations.
-**Plans**: 1 plan complete
+  1. `/onboarding` route renders student, parent, and tutor guidance.
+  2. Student onboarding points users toward grade/subject setup and Chat.
+  3. Parent onboarding explains child dashboard and report visibility.
+  4. Tutor onboarding explains help request list/detail/status workflow.
+  5. `/support` route explains FAQ, bug feedback, teacher help, contact, and pilot-stage expectations.
+  6. Support service/hook boundary exists and support workflow docs define triage and response expectations.
+**Plans**: 0/1 planned
 
-### Phase 39: Feedback Collection and Bug Workflow
+### Phase 45: Basic Admin Operations
 
-**Goal**: Give early users a lightweight way to report issues and give the team a triage workflow.
-**Depends on**: Phase 38
-**Requirements**: [FEED-01, FEED-02, FEED-03, FEED-04, FEED-05, BUG-01, BUG-02]
+**Goal**: Add minimal pilot operations visibility without expanding into a full admin product.
+**Depends on**: Phase 44
+**Requirements**: [ADMIN-01, ADMIN-02, ADMIN-03, ADMIN-04, ADMIN-05]
 **Success Criteria** (what must be TRUE):
-  1. Feedback API service and mutation hook submit typed feedback payloads.
-  2. Feedback button/dialog are gated by `VITE_ENABLE_FEEDBACK`.
-  3. Feedback payload includes type, page, message, user role, and created timestamp context.
-  4. Local backend accepts `POST /feedback` and persists rows to SQLite.
-  5. Feedback workflow docs and GitHub bug template define triage and severity.
-**Plans**: 1 plan complete
+  1. `/admin` communicates pilot operations status and environment/version basics.
+  2. `/admin/usage` renders usage summary cards or a clear backend-pending placeholder.
+  3. `/admin/feedback` renders feedback list contract or a clear backend-pending placeholder.
+  4. Admin API service and query hooks define usage summary and feedback list boundaries.
+  5. Documentation keeps full user management and complex BI dashboards out of Phase 9 scope.
+**Plans**: 0/1 planned
 
-### Phase 40: Performance, Security, Privacy, and Readiness Plan
+### Phase 46: Privacy, Backup, Pricing, and Billing Preparation
 
-**Goal**: Close the milestone with baseline quality documentation, public legal placeholders, and production-readiness handoff.
-**Depends on**: Phase 39
-**Requirements**: [PERF-01, PERF-02, SEC-01, SEC-02, LEGAL-01, LEGAL-02, DOCS-01, DOCS-02, DOCS-03, DOCS-04]
+**Goal**: Prepare pilot users and operators for data handling, recovery expectations, and commercial positioning without adding full compliance or payments.
+**Depends on**: Phase 45
+**Requirements**: [PRIV-01, PRIV-02, PRIV-03, BACKUP-01, BACKUP-02, BACKUP-03, PRICE-01, PRICE-02, PRICE-03]
 **Success Criteria** (what must be TRUE):
-  1. Performance baseline doc defines Lighthouse pages, target metrics, and build bundle warning policy.
-  2. Frontend security review doc covers secrets, localStorage, demo flags, route guards, 401/403, upload validation, and XSS.
-  3. Public `/privacy` and `/terms` placeholder routes exist and are linked where appropriate.
-  4. Production readiness plan documents remaining deployment, monitoring, analytics, privacy, support, and pilot launch work.
-  5. README documents Phase 8 staging, CI, E2E, feedback, legal placeholders, and demo flow.
-  6. Final verification records build, lint, E2E, backend feedback smoke, and route preview results.
-**Plans**: 1 plan complete
+  1. `/privacy` describes pilot data collection, use, visibility, parent access, limits, and contact path.
+  2. `/terms` describes pilot nature, AI limitations, non-school-certification status, and supervision expectations.
+  3. Privacy review docs cover telemetry, feedback, support, monitoring, demo data, and role visibility.
+  4. Backup/restore docs identify backup data scope and distinguish SQLite pilot fallback from production database/PITR expectations.
+  5. Frontend restore checks cover login, conversations, parent report, and tutor requests.
+  6. `/pricing` and `/billing` routes exist as pilot-stage placeholders without payment enforcement.
+**Plans**: 0/1 planned
+
+### Phase 47: Launch Checklist, Pilot Plan, README, and Final Verification
+
+**Goal**: Close Phase 9 with launch artifacts and verification evidence needed to start a controlled pilot.
+**Depends on**: Phase 46
+**Requirements**: [PROD-06, PILOT-01, PILOT-02, PILOT-03, PILOT-04, PILOT-05]
+**Success Criteria** (what must be TRUE):
+  1. Production readiness and launch checklist docs exist under `docs/production/`.
+  2. Pilot launch plan defines goals, user counts, timeline, success metrics, test tasks, feedback path, support path, risks, and retrospective process.
+  3. Post-pilot feedback report template exists.
+  4. README documents Phase 9 production readiness, production env example, pilot launch goals, and before-launch gates.
+  5. Final verification records build, E2E/manual QA expectations, privacy/security review status, production-like demo status, and remaining blockers.
+**Plans**: 0/1 planned
 
 </details>
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 35 -> 36 -> 37 -> 38 -> 39 -> 40
+Phases execute in numeric order: 41 -> 42 -> 43 -> 44 -> 45 -> 46 -> 47
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 35. Staging Deployment Configuration | v1.7 | 1/1 | Complete | 2026-05-25 |
-| 36. CI and Preview Workflow | v1.7 | 1/1 | Complete | 2026-05-25 |
-| 37. Playwright E2E Smoke Suite | v1.7 | 1/1 | Complete | 2026-05-25 |
-| 38. Manual QA, Demo Reset, and Early User Testing Docs | v1.7 | 1/1 | Complete | 2026-05-25 |
-| 39. Feedback Collection and Bug Workflow | v1.7 | 1/1 | Complete | 2026-05-25 |
-| 40. Performance, Security, Privacy, and Readiness Plan | v1.7 | 1/1 | Complete | 2026-05-25 |
+| 41. Production Deployment and API Readiness | v1.8 | 0/1 | Pending | — |
+| 42. Monitoring and Logging Foundation | v1.8 | 0/1 | Pending | — |
+| 43. Analytics Backend Delivery | v1.8 | 0/1 | Pending | — |
+| 44. Pilot Onboarding and Support Workflow | v1.8 | 0/1 | Pending | — |
+| 45. Basic Admin Operations | v1.8 | 0/1 | Pending | — |
+| 46. Privacy, Backup, Pricing, and Billing Preparation | v1.8 | 0/1 | Pending | — |
+| 47. Launch Checklist, Pilot Plan, README, and Final Verification | v1.8 | 0/1 | Pending | — |
