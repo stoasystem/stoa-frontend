@@ -50,6 +50,22 @@ body {
   box-shadow: 0 14px 34px hsl(217 45% 15% / 0.14);
 }
 
+.premium-primary-button {
+  color: #f7f3ec !important;
+}
+
+.premium-primary-button:hover {
+  color: #ffffff !important;
+}
+
+.premium-light-button {
+  color: #152238 !important;
+}
+
+.premium-light-button:hover {
+  color: #152238 !important;
+}
+
 .premium-reveal {
   animation: premium-reveal 620ms ease both;
 }

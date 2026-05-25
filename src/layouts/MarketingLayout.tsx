@@ -27,7 +27,7 @@ export function MarketingLayout({ children }: { children: ReactNode }) {
             <Link className="transition-colors hover:text-foreground" to="/login">
               Login
             </Link>
-            <Button asChild size="sm" className="premium-button-lift h-9 rounded-full px-4">
+            <Button asChild size="sm" className="premium-button-lift premium-primary-button h-9 rounded-full px-4">
               <Link to="/login?next=/chat">Start Learning</Link>
             </Button>
           </nav>

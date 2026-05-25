@@ -33,7 +33,7 @@ export function HomeHero() {
           when progress matters.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <Button asChild size="lg" className="premium-button-lift h-12 rounded-full px-7 text-base">
+          <Button asChild size="lg" className="premium-button-lift premium-primary-button h-12 rounded-full px-7 text-base">
             <Link to={learningHref}>
               Start Learning
               <ArrowRight className="h-4 w-4" />
