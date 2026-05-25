@@ -24,17 +24,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Duplicate-submit and state hardening for auth, chat, teacher-help, tutor, support, billing, and checkout flows.
 - README and QA evidence for Phase 18 production-facing cleanup, with Phase 19 accessibility/release-quality work deferred.
 
-## Next Milestone Goals: Phase 19 Accessibility, Cross-Browser QA, and Release Quality Gate
+## Current Milestone: v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation
 
-**Goal:** Improve release quality without expanding business functionality.
+**Goal:** Align the STOA learning platform visually with the company homepage design language while keeping the platform independent, app-like, and usable.
 
 **Target features:**
-- Accessibility audit, keyboard navigation, and screen reader behavior.
-- Color contrast audit and focus-state review.
-- Cross-browser and mobile device QA.
-- Visual regression or screenshot comparison coverage.
-- Performance sanity check for core flows.
-- Final pre-launch release quality checklist.
+- Read-only design audit of `/Users/zhdeng/newweb`, with no writes, formatting, dependency installs, commits, or file moves in that source project.
+- Design translation documentation that extracts company homepage colors, typography, spacing, component style, image style, and brand tone.
+- Learning-platform design-token proposal derived from the homepage without directly copying it.
+- Small-scope visual calibration for homepage, login, register/onboarding, chat, student dashboard, parent dashboard/report, pricing, and billing.
+- Component-level refinement for buttons, cards, badges, form controls, navigation, page headers, chat bubbles, pricing cards, and report cards.
+- Visual compatibility QA proving brand similarity is medium-high, product independence remains high, and English/German/French/Italian/mobile layouts stay stable.
 
 ## Current State
 
