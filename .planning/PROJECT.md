@@ -10,21 +10,18 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
 
-## Current Milestone: v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement
+## Current Milestone: v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
 
-**Goal:** Make STOA usable across English, German, French, and Italian while replacing user-visible AI-heavy terminology with calmer education-centered language.
+**Goal:** Refine STOA's English, German, French, and Italian product copy and responsive layouts so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
 
 **Target features:**
-- i18n foundation using `i18next` and `react-i18next` with locale namespaces for English, German, French, and Italian.
-- Language switcher in public navigation, auth pages, app user menu, and footer, with `localStorage` persistence.
-- STOA language glossary and copy style guide defining `Learning Assistant`, `Professional teacher support`, and Swiss-market terminology.
-- User-visible terminology replacement so `AI`, `AI tutor`, `AI answer`, `Human backup`, `Teacher backup`, and sales-heavy copy are replaced with education-oriented wording.
-- P0 page localization for homepage, login, register/onboarding, chat, teacher request action, parent dashboard/report, tutor requests, pricing, billing, and support.
-- P1 baseline localization for profile, learning history, referral, tutor availability, and admin overview.
-- Form validation, toast, empty/loading/error state localization.
-- Demo backend/mock language preference readiness without adding a formal backend preference system.
-- Multilingual QA for long German/French/Italian copy, mobile layout, and core demo flows.
-- README and language documentation updates with build verification.
+- Locale-specific copywriting rules that explicitly allow English, German, French, and Italian to use different sentence structures while preserving meaning, tone, and brand.
+- Rewritten homepage hero titles, subtitles, CTAs, and core section copy for all four languages, including stacked German hero title support.
+- Refined copy across P0 surfaces: homepage, register/onboarding, chat, parent dashboard/report, tutor workflow, pricing, billing, and support/error/toast states.
+- Locale-specific typography and layout hints for hero titles, buttons, cards, navbar labels, pricing cards, and long text handling.
+- German, French, and Italian copy rules covering long compounds, sentence length, CTA tone, punctuation, and UI fit.
+- Terminology cleanup to remove user-visible `AI`, `Human backup`, `Teacher backup`, `What we are selling`, `Buy now`, and inappropriate customer/sales language.
+- Documentation updates for copy rules, copy review matrix, visual QA by locale, glossary, copy style guide, translation QA checklist, README, and build verification.
 
 ## Current State
 
@@ -77,7 +74,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 16 multilingual support and terminology replacement requirements will cover i18n foundation, language switching, glossary/style docs, user-facing AI terminology cleanup, P0/P1 page localization, validation/toast/status localization, layout QA, and README updates.
+- Phase 17 locale-specific copywriting and multilingual UI refinement requirements will cover local copy rules, responsive headline/layout rules, rewritten four-language P0 copy, terminology cleanup, copy review documentation, visual QA by locale, and README updates without expanding product features.
 
 ### Out of Scope
 
@@ -103,7 +100,9 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Context
 
-The project brief for Phase 16 was provided in Chinese and defined multilingual language optimization and AI terminology replacement. The milestone keeps product functionality stable while adapting STOA for English, German, French, and Italian Swiss-market usage. The key product-language correction is that user-facing copy should not lead with `AI`; STOA should describe the first-response system as the `Learning Assistant` and describe human escalation as `Professional teacher support`. The milestone focuses on language architecture, copy quality, terminology consistency, core-page localization, and multilingual QA rather than new business modules.
+The project brief for Phase 17 was provided in Chinese and defines locale-specific copywriting, responsive typography, and multilingual UI refinement. Phase 16 established the English, German, French, and Italian i18n foundation, terminology system, glossary, copy style guide, and translation QA checklist. Phase 17 keeps that product surface stable but treats each language as local product copy rather than literal translation: German should be concise and stable, French elegant and clear, Italian natural and warm, and English calm, premium, and education-centered.
+
+The immediate visible issue is the German homepage hero title `STOA Lernunterstützung genau dann, wenn Schüler sie brauchen.`, which is too long for large serif hero typography and should become short title copy plus explanatory subtitle. The preferred four-language hero direction is: English `Learn with clarity.`, German `Lernen. Fragen. Verstehen.`, French `Comprendre avec confiance.`, and Italian `Studiare con più chiarezza.`.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -128,14 +127,15 @@ Current codebase facts:
 - v1.12 shipped Phase 13 and turned the accumulated frontend pages into a coherent role-based product structure with documented page hierarchy, navigation, journeys, page flows, demo flow, mobile path checks, and frontend-only UX polish.
 - v1.13 shipped Phase 14 and stabilized the demo backend/API layer so the frontend can run complete demonstration flows while staying decoupled from future formal backend and AWS implementations.
 - v1.14 shipped Phase 15 and redesigned STOA's first impression, role onboarding, and AI-first chat path with premium UI styling and demo backend onboarding/upload support.
-- v1.15 starts Phase 16 to add English/German/French/Italian localization, language switching, persistent language preference, user-facing terminology replacement, and language QA.
+- v1.15 shipped Phase 16 to add English/German/French/Italian localization, language switching, persistent language preference, user-facing terminology replacement, and language QA.
+- v1.16 starts Phase 17 to refine locale-specific product copy, responsive headline typography, layout hints, P0 page copy quality, terminology cleanup, and visual QA across English, German, French, and Italian.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 16 is language-system, terminology, and multilingual UX work. It must avoid new business modules, formal backend language preference systems, CMS work, automatic translation pipelines, final legal review, SEO localization, email-template localization, and regional pricing changes.
+- **Scope**: Phase 17 is locale-specific copywriting, responsive typography, and multilingual UI refinement work. It must avoid new business modules, new languages, complex backend work, CMS work, automatic translation pipelines, full legal-document translation, SEO article localization, email-template localization, complex personalization, and core product logic changes.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -156,6 +156,8 @@ Current codebase facts:
 - **Demo accounts**: Phase 14 demo users are fixed as `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com`, all using `password123`, and reset must preserve those accounts.
 - **Onboarding boundary**: Phase 15 registration profile fields and tutor credential upload are demo/onboarding UI and API-contract work only; they must not imply production verification, OCR, identity checks, or admission decisions.
 - **Language terminology**: User-visible UI copy should avoid presenting `AI` as the primary product concept. Use `Learning Assistant` for first-response learning help and `Professional teacher support` for teacher escalation; technical identifiers and developer docs may still use AI-related implementation terms where appropriate.
+- **Locale-specific copy**: English, German, French, and Italian may use different sentence structures and title component structures when needed for natural reading and stable UI layout, as long as meaning, tone, and brand remain consistent.
+- **German layout**: German hero titles should use short phrases or explicit stacked title lines instead of long translated sentences in large display typography.
 - **Language persistence**: Phase 16 language choice should persist in the browser through `localStorage` key `stoa_language`; formal cross-device user preference syncing is deferred to a future backend milestone.
 - **API modes**: Frontend API mode must be configurable for `mock`, `demo`, `staging`, and `production`; page components should not hard-code API URLs or demo data internals.
 - **Error format**: Demo backend errors should use a consistent `{ message, code }` response with demo-specific codes so frontend error states remain testable.
@@ -215,6 +217,8 @@ Current codebase facts:
 | Keep Phase 16 focused on language, not feature expansion | Swiss-market readiness now depends on multilingual UX and trustworthy education terminology more than new product surfaces | — Pending |
 | Use `Learning Assistant` as the user-facing first-response term | It is warmer and more education-oriented than `AI`, avoids implying teacher replacement, and works naturally with teacher escalation | — Pending |
 | Use browser-local language persistence first | `localStorage` is enough for demo and frontend validation while cross-device preferences remain a future backend concern | — Pending |
+| Keep Phase 17 focused on localized copy and layout stability | The multilingual infrastructure exists; the next value is making each language feel native, premium, and readable in the UI rather than expanding features | — Pending |
+| Allow locale-specific title structures | German and other long-text locales need stacked or shorter headlines so typography and layout remain stable without forcing literal translation | — Pending |
 
 ## Evolution
 
@@ -234,4 +238,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 for v1.15 Phase 16 planning*
+*Last updated: 2026-05-25 for v1.16 Phase 17 planning*
