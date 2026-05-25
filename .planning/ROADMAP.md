@@ -27,7 +27,7 @@
 
 **Milestone Goal:** Refine STOA's English, German, French, and Italian product copy and responsive layouts so each locale reads naturally, preserves the same education-centered meaning, and remains visually stable without adding new business features.
 
-- [ ] **Phase 98: Copy Governance and Scope Lock** - Establish locale-specific copy rules, glossary guidance, QA checklist expectations, and Phase 17 scope boundaries.
+- [x] **Phase 98: Copy Governance and Scope Lock** - Establish locale-specific copy rules, glossary guidance, QA checklist expectations, and Phase 17 scope boundaries.
 - [ ] **Phase 99: Title and Layout Infrastructure** - Add safe locale-aware title structures and typed layout hints for long localized UI copy.
 - [ ] **Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup** - Rewrite homepage, onboarding, chat, parent, tutor, pricing, billing, support, and shared-state copy in EN/DE/FR/IT.
 - [ ] **Phase 101: Responsive Typography and Multilingual Fit Pass** - Verify and tune high-risk components so localized text remains readable across target viewports.
@@ -45,7 +45,7 @@
   2. Developers can use German, French, and Italian copy-rule docs to decide headline rhythm, CTA tone, punctuation, sentence length, compounds, warmth, clarity, and UI fit.
   3. Developers can consult updated glossary, copy style guide, and translation QA checklist entries for Phase 17 copy decisions.
   4. Developers can identify explicit Phase 17 exclusions, including new languages, CMS/TMS, automatic translation, SEO localization, legal final translation, backend preference sync, and new business features.
-**Plans**: TBD
+**Plans**: 1/1
 **UI hint**: yes
 
 ### Phase 99: Title and Layout Infrastructure
@@ -121,7 +121,7 @@ Phase 17 phases planned in numeric order: 98 -> 99 -> 100 -> 101 -> 102
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 98. Copy Governance and Scope Lock | v1.16 | 0/1 | Not started | - |
+| 98. Copy Governance and Scope Lock | v1.16 | 1/1 | Complete | 2026-05-25 |
 | 99. Title and Layout Infrastructure | v1.16 | 0/1 | Not started | - |
 | 100. P0 Locale Copy Rewrite and Terminology Cleanup | v1.16 | 0/1 | Not started | - |
 | 101. Responsive Typography and Multilingual Fit Pass | v1.16 | 0/1 | Not started | - |

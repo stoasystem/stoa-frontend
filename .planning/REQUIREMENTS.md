@@ -10,13 +10,13 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 
 ### Locale Copy Governance
 
-- [ ] **LCOPY-01**: Developers can read `docs/language/locale-copy-rules.md` to understand that English, German, French, and Italian may use different sentence structures while preserving product meaning, tone, and brand.
-- [ ] **LCOPY-02**: Developers can read `docs/language/german-copy-rules.md` for German headline, CTA, long-word, sentence-splitting, and layout-fit rules.
-- [ ] **LCOPY-03**: Developers can read `docs/language/french-copy-rules.md` for French title, CTA, punctuation, sentence-length, and natural product-copy rules.
-- [ ] **LCOPY-04**: Developers can read `docs/language/italian-copy-rules.md` for Italian title, CTA, warmth, clarity, and UI-fit rules.
-- [ ] **LCOPY-05**: Developers can consult updated glossary and copy style guide guidance for Phase 17 locale-specific copy decisions.
-- [ ] **LCOPY-06**: Developers can consult an updated translation QA checklist that includes localized copy quality, title length, terminology, and visual fit checks.
-- [ ] **LCOPY-07**: Developers can see explicit Phase 17 scope boundaries that exclude new languages, CMS/TMS, automatic translation, SEO localization, legal final translation, backend preference sync, and new business features.
+- [x] **LCOPY-01**: Developers can read `docs/language/locale-copy-rules.md` to understand that English, German, French, and Italian may use different sentence structures while preserving product meaning, tone, and brand.
+- [x] **LCOPY-02**: Developers can read `docs/language/german-copy-rules.md` for German headline, CTA, long-word, sentence-splitting, and layout-fit rules.
+- [x] **LCOPY-03**: Developers can read `docs/language/french-copy-rules.md` for French title, CTA, punctuation, sentence-length, and natural product-copy rules.
+- [x] **LCOPY-04**: Developers can read `docs/language/italian-copy-rules.md` for Italian title, CTA, warmth, clarity, and UI-fit rules.
+- [x] **LCOPY-05**: Developers can consult updated glossary and copy style guide guidance for Phase 17 locale-specific copy decisions.
+- [x] **LCOPY-06**: Developers can consult an updated translation QA checklist that includes localized copy quality, title length, terminology, and visual fit checks.
+- [x] **LCOPY-07**: Developers can see explicit Phase 17 scope boundaries that exclude new languages, CMS/TMS, automatic translation, SEO localization, legal final translation, backend preference sync, and new business features.
 
 ### Hero Copy and Title Structure
 
@@ -122,13 +122,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LCOPY-01 | Phase 98 | Pending |
-| LCOPY-02 | Phase 98 | Pending |
-| LCOPY-03 | Phase 98 | Pending |
-| LCOPY-04 | Phase 98 | Pending |
-| LCOPY-05 | Phase 98 | Pending |
-| LCOPY-06 | Phase 98 | Pending |
-| LCOPY-07 | Phase 98 | Pending |
+| LCOPY-01 | Phase 98 | Complete |
+| LCOPY-02 | Phase 98 | Complete |
+| LCOPY-03 | Phase 98 | Complete |
+| LCOPY-04 | Phase 98 | Complete |
+| LCOPY-05 | Phase 98 | Complete |
+| LCOPY-06 | Phase 98 | Complete |
+| LCOPY-07 | Phase 98 | Complete |
 | HERO-01 | Phase 100 | Pending |
 | HERO-02 | Phase 100 | Pending |
 | HERO-03 | Phase 100 | Pending |
@@ -173,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 during Phase 17 roadmap creation*
+*Last updated: 2026-05-25 after Phase 98 completion*

@@ -1,6 +1,6 @@
 # STOA Language Glossary
 
-Phase 16 standardizes STOA's user-facing language for English, German, French, and Italian.
+Phase 16 standardized STOA's user-facing language for English, German, French, and Italian. Phase 17 adds locale-specific copywriting rules so each language can read naturally instead of mirroring English word order.
 
 ## Core Terms
 
@@ -12,6 +12,8 @@ Phase 16 standardizes STOA's user-facing language for English, German, French, a
 | Parent area | Parent dashboard | Elternbereich | Espace parents | Area genitori |
 | Teacher request | Ask a teacher | Lehrperson fragen | Demander à un enseignant | Chiedi a un insegnante |
 | Student entry CTA | Start learning | Lernen starten | Commencer à apprendre | Inizia a studiare |
+| Homepage hero title | Learn with clarity. | Lernen. Fragen. Verstehen. | Comprendre avec confiance. | Studiare con più chiarezza. |
+| Secondary homepage CTA | How it works | So funktioniert STOA | Comment ça fonctionne | Come funziona |
 
 ## Product Sentence
 
@@ -45,3 +47,14 @@ Prima aiuta l’assistente all’apprendimento. Se necessario, interviene un ins
 - customers, when `families`, `parents`, `students`, or `teachers` is clearer
 
 Internal code identifiers such as `aiMessagesUsed` can remain where they are API or data model names.
+
+## Phase 17 Copy Rule
+
+Do not force one source sentence into every language. Locales may use different structures when the result is clearer and more stable in the UI.
+
+Example:
+
+- English can use one hero title string: `Learn with clarity.`
+- German can use stacked title lines: `Lernen. Fragen. Verstehen.`
+- French can keep a confident sentence-like title: `Comprendre avec confiance.`
+- Italian can use a warmer title: `Studiare con più chiarezza.`
