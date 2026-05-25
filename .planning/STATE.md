@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.14
-milestone_name: "Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement"
-status: complete
-last_updated: "2026-05-25T18:05:00.000Z"
+milestone: v1.15
+milestone_name: "Phase 16: Multilingual Language Optimization and AI Terminology Replacement"
+status: planning
+last_updated: "2026-05-25T19:58:26.638Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 6
+  completed_phases: 0
+  total_plans: 6
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement is implemented and verified.
+**Current focus:** Milestone v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement is planned and ready for Phase 92.
 
 ## Current Position
 
-Phase: 91 complete
-Plan: Phase 15 plans 87-91 complete
-Status: Verified
-Last activity: 2026-05-25 — Phase 15 homepage, onboarding, AI-first chat, demo backend support, docs, and build closure completed
+Phase: 92 planned
+Plan: Phase 16 plans 92-97 pending
+Status: Roadmap ready
+Last activity: 2026-05-25 — Milestone v1.15 planned after i18n and terminology research
 
 ## Performance Metrics
 
@@ -178,6 +178,9 @@ Recent decisions affecting current work:
 - Phase 89 added multi-step student, parent, and tutor registration without public admin signup.
 - Phase 90 moved teacher escalation into inline AI response feedback and refined chat empty/input copy.
 - Phase 91 updated README, demo docs, API contract, QA checklist, and verified TypeScript, backend import/reset, endpoint smoke checks, Playwright text checks, and build.
+- Milestone v1.15 started from the Phase 16 multilingual language optimization and AI terminology replacement brief.
+- Phase 16 keeps product functionality stable while adding English, German, French, and Italian language support, replacing user-visible AI-heavy terminology with Learning Assistant and professional teacher support language, and validating multilingual layout.
+- Phase 16 research confirmed `i18next` plus `react-i18next`, namespace locale files, browser-local `stoa_language` persistence, and root `html lang` updates as the recommended implementation path.
 
 ### Pending Todos
 

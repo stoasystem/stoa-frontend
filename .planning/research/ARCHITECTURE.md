@@ -1,143 +1,84 @@
-# Architecture Research
+# Phase 16 Research: Architecture
 
-**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Integration Points
 
-## Standard Architecture
+### App Bootstrap
 
-```
-Homepage
-  -> MarketingLayout navigation
-  -> Home sections with premium theme CSS
-  -> Start Learning route decision
+`src/main.tsx` should import `@/i18n` before rendering the app so React components can call `useTranslation`.
 
-Auth / Onboarding
-  -> RegisterPage local wizard state
-  -> Role-specific step components
-  -> auth service register mutation
-  -> route redirect by returned role/status
+The i18n initializer should also set `document.documentElement.lang` on first load and after language changes. W3C guidance favors language attributes on the `html` element for text-processing language, so this should be part of the frontend architecture rather than only a UI preference.
 
-Tutor Credential Upload
-  -> TutorCredentialUpload component
-  -> file validation
-  -> files service upload mutation
-  -> mock uploaded file ids in tutor profile payload
+### Locale Structure
 
-Chat
-  -> existing conversation/message hooks
-  -> AI-first empty state
-  -> assistant message feedback component
-  -> existing teacher-help request mutation
+Use this structure:
 
-Demo Backend
-  -> /auth/register accepts profile payload
-  -> /files/tutor-credentials accepts multipart mock file
-  -> existing chat and teacher-help APIs remain canonical
+```text
+src/i18n/
+  index.ts
+  languages.ts
+  namespaces.ts
+  locales/
+    en/
+    de/
+    fr/
+    it/
 ```
 
-## Recommended Project Structure
+Namespaces should match product areas:
 
-```
-src/
-  components/
-    home/                 # Homepage editorial sections
-    auth/                 # Registration wizard steps
-    chat/                 # Inline AI feedback and teacher escalation
-  pages/
-    home/HomePage.tsx
-    auth/RegisterPage.tsx
-  services/
-    files/tutorCredentialApi.ts
-  hooks/
-    files/useTutorCredentialUploadMutation.ts
-  types/onboarding.ts
-  styles/premium-theme.css
-backend/
-  app/main.py             # Demo register/upload support
-```
+- `common`
+- `home`
+- `auth`
+- `chat`
+- `parent`
+- `tutor`
+- `pricing`
+- `billing`
+- `support`
+- `admin`
+- `errors`
 
-## Architectural Patterns
+### Component Usage
 
-### Pattern 1: Role-Specific Wizard State
+Use `useTranslation(namespace)` for plain strings. Use `Trans` only when translations need inline React elements or links. Avoid translating by assembling long sentences from fragments; German, French, and Italian grammar may require different word order.
 
-**What:** Keep a single register flow with a shared account step and role-specific profile step.
-**Why:** Avoids duplicate register pages while preserving role-specific requirements.
-**Trade-off:** Local state is enough for demo; later production onboarding may need resumability.
+### Language Switcher
 
-### Pattern 2: Contract-First Service Wrappers
+Create `src/components/common/LanguageSwitcher.tsx`.
 
-**What:** Register and credential upload go through typed service/hook modules.
-**Why:** Preserves Phase 14's demo/real backend decoupling.
-**Trade-off:** Slightly more files, but cleaner migration path.
+Responsibilities:
 
-### Pattern 3: Inline Escalation in Chat
+- Read `i18n.language`.
+- Render language names.
+- Call `i18n.changeLanguage`.
+- Store `stoa_language` in `localStorage`.
+- Update `document.documentElement.lang`.
 
-**What:** Teacher help CTA renders near assistant output.
-**Why:** Matches the AI-first product model and prevents homepage/module confusion.
-**Trade-off:** Needs careful UI state to avoid duplicate requests.
+The switcher should be reusable in:
 
-## Data Flow
+- `MarketingLayout`
+- `AuthLayout`
+- `AppLayout` user/menu area
+- `HomeFooter`
 
-### Student Start Learning
+### Services and API Contracts
 
-```
-Homepage CTA
-  -> /login?next=/chat when unauthenticated
-  -> /chat when student session exists
-  -> role home when parent/tutor/admin session exists
-```
+No production backend preference system is required. Demo/mock support can add `preferredLanguage` to register/current-user payloads, but the frontend should remain functional with only local storage.
 
-### Registration
+### Migration Order
 
-```
-Choose role
-  -> account details
-  -> role profile
-  -> optional tutor credential upload
-  -> POST /auth/register
-  -> token/user persisted
-  -> redirect by role/status
-```
+1. Add i18n foundation and language switcher.
+2. Add docs and glossary.
+3. Localize public/home/auth flows.
+4. Localize chat and teacher escalation.
+5. Localize parent/tutor/pricing/billing/support.
+6. Localize P1 pages.
+7. Add QA checks for AI terminology and language layout.
 
-### Chat Escalation
+## Architecture Constraints
 
-```
-Student sends message
-  -> existing chat mutation/stream
-  -> assistant response appears
-  -> AIResponseFeedback renders "Ask a human tutor"
-  -> POST /teacher-help/request
-  -> request state visible to tutor/parent demo surfaces
-```
-
-## Anti-Patterns
-
-### Homepage Feature Buckets
-
-**What people do:** Put AI, teacher, and parent cards side-by-side.
-**Why wrong:** It creates three competing product mental models.
-**Do instead:** Show a sequential learning flow.
-
-### Component-Level API URLs
-
-**What people do:** Put `fetch('/files/tutor-credentials')` inside upload UI.
-**Why wrong:** It breaks future backend replacement.
-**Do instead:** Use service functions and hooks.
-
-### Credential Review Claims
-
-**What people do:** Show "verified" or "approved" after upload.
-**Why wrong:** The demo backend cannot verify credentials.
-**Do instead:** Show `pending_review`.
-
-## Sources
-
-- Appcues onboarding guide, 2026-05-19: role/use-case segmented onboarding is a standard pattern for activation.
-- Nielsen Norman Group mobile image guidance, 2023-11-08: use images when they carry informational value, especially on mobile.
-- Openfield EdTech onboarding article: progressive scaffolding reduces complexity for education users.
-- arXiv 2605.11155: human tutor support can be differentiated by student need in hybrid human-AI tutoring.
-
----
-*Architecture research for: STOA Phase 15*
-*Researched: 2026-05-25*
+- Do not put translation strings directly in components after migration.
+- Do not put translation files in backend/demo data.
+- Do not localize by hardcoding conditional strings per language in JSX.
+- Keep API URLs and API mode logic unchanged.
+- Keep design-system and accessibility hardening for the next milestone unless layout fixes are required for multilingual text.

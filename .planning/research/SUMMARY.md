@@ -1,56 +1,49 @@
-# Research Summary
+# Phase 16 Research Summary
 
-**Milestone:** v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Sources Used
+
+- i18next fallback documentation: https://www.i18next.com/principles/fallback
+- react-i18next multiple translation files: https://react.i18next.com/guides/multiple-translation-files
+- react-i18next `useTranslation`: https://react.i18next.com/latest/usetranslation-hook
+- react-i18next i18next instance setup: https://react.i18next.com/latest/i18next-instance
+- i18next browser language detector: https://github.com/i18next/i18next-browser-languageDetector
+- W3C language attributes guidance: https://www.w3.org/International/geo/html-tech/tech-lang.html
 
 ## Key Findings
 
-### Stack Additions
+- `i18next` + `react-i18next` is the right Phase 16 stack. It supports React hooks, language switching, interpolation, fallback language, and namespace-based translation files.
+- Namespace files match the requested page-group migration and reduce risk compared with one large translation file.
+- i18next fallback behavior supports phased migration, but P0/P1 pages should still get explicit complete translations.
+- `i18next-browser-languagedetector` can detect and cache language in localStorage/cookies, but Phase 16 can stay simpler by manually persisting `stoa_language`.
+- The app should update the root `html lang` attribute when language changes. W3C guidance supports language attributes on the `html` element for default text-processing language.
+- The biggest delivery risk is not library setup; it is hidden hardcoded strings in validation, toast, loading, empty, and error states.
+- The biggest brand risk is translating old copy while leaving `AI`, `AI tutor`, `AI answer`, `human backup`, `teacher backup`, `what we are selling`, or purchase-heavy terms in place.
 
-No major dependency additions are needed. The existing React, TypeScript, Vite, TailwindCSS, TanStack Query, Axios/fetch services, and lucide-react stack can support the milestone. CSS transitions and keyframes are preferable to adding a motion library for this scope.
+## Stack Recommendation
 
-### Feature Table Stakes
+Add:
 
-- Student-first homepage CTA.
-- Sequential learning flow replacing parallel AI/teacher/parent cards.
-- Multi-step role-based registration for student, parent, and tutor.
-- Student parent-link fields.
-- Parent child-profile fields.
-- Tutor teaching profile and credential upload UI.
-- AI-first chat empty state.
-- Inline teacher escalation after assistant responses.
-- Demo backend support for expanded register payloads and tutor credential mock upload.
+- `i18next`
+- `react-i18next`
 
-### Differentiators
+Defer unless needed:
 
-- Premium editorial education homepage with one strong visual memory.
-- Parent visibility framed as support and progress, not a competing product module.
-- Teacher support framed as contextual escalation, not a separate homepage entry.
-- Local Swiss education context used carefully as trust texture rather than overclaiming.
+- `i18next-browser-languagedetector`
 
-### Watch Out For
+## Milestone Build Order
 
-- Do not recreate the same feature-bucket confusion with prettier cards.
-- Do not make onboarding so long that student first value is delayed.
-- Do not imply tutor credentials are truly verified.
-- Do not use decorative images on mobile unless they help explain the product.
-- Do not hard-code API calls inside components.
+1. i18n foundation, locale scaffolding, language switcher, and persistence.
+2. Language glossary, copy style guide, terminology replacement guide, and translation QA checklist.
+3. Public/home/auth localization and visible terminology replacement.
+4. Chat and teacher escalation localization using `Learning Assistant` and `Professional teacher support`.
+5. Parent, tutor, pricing, billing, support, and P1 app page localization.
+6. Layout and copy QA for English, German, French, and Italian.
+7. README update and final verification.
 
-## Implementation Implications
+## Recommended Phase 16 Terminology Rule
 
-1. Build homepage sections first, because they define the new product story.
-2. Then add typed onboarding and register service support.
-3. Then refine chat to make teacher escalation contextual.
-4. Then update the demo backend, docs, QA, and build checks.
+User-visible product language should be:
 
-## Sources
+> Learning Assistant first. Professional teacher support when needed. Parents stay informed.
 
-- Appcues onboarding guide, 2026-05-19: onboarding is the full journey to repeatable value, not a one-time product tour.
-- Nielsen Norman Group mobile image guidance, 2023-11-08: mobile images should add informational value.
-- Openfield EdTech instructor onboarding article: education onboarding should reduce complexity and progressively scaffold new users.
-- Tavi AI education product page, accessed 2026-05-25: effective child-facing AI tutoring can frame parent visibility and answer restraint under one product promise.
-- arXiv 2605.11155, submitted 2026-05-11: hybrid human-AI tutoring can improve outcomes over AI-only baselines and supports differentiated human help.
-
----
-*Research summary for: STOA Phase 15*
+Do not use `AI` as the primary visible product term. Technical implementation names and developer-facing docs may still use AI-related terms where they describe backend/provider internals.

@@ -10,22 +10,21 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
 
-## Current Milestone: v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement
+## Current Milestone: v1.15 Phase 16: Multilingual Language Optimization and AI Terminology Replacement
 
-**Goal:** Refine STOA's first impression and core learning path with a magazine-style homepage, role-aware onboarding, AI-first chat flow, and a more premium, restrained education product UI.
+**Goal:** Make STOA usable across English, German, French, and Italian while replacing user-visible AI-heavy terminology with calmer education-centered language.
 
 **Target features:**
-- Magazine-style STOA homepage with a clear student-first `Start Learning` CTA.
-- Navigation that keeps student entry prominent while moving parent and tutor entry points into lower-priority navigation or auth/onboarding flows.
-- Replacement of the current `AI Support / Teacher Backup / Parent Visibility` parallel-card presentation with a sequential learning flow: ask, receive AI help, request a teacher if needed, and let parents follow progress.
-- Role-based registration and onboarding for students, parents, and tutors, excluding public admin registration.
-- Student onboarding fields for age, school, grade, school system, subjects needing help, and parent information.
-- Parent onboarding fields for child profile and subjects needing help.
-- Tutor onboarding fields for teaching subjects, education background, experience, introduction, and credential upload UI.
-- AI-first chat entry where students can ask immediately and teacher escalation appears inline after assistant responses.
-- Demo backend/API contract support for expanded register payloads, tutor credential mock upload, new student chat, and teacher-help request flow.
-- Premium visual treatment using deep navy, warm ivory, muted sage, soft gold accents, restrained transitions, and mobile-safe responsive layouts.
-- README, QA, and demo-flow updates with build verification.
+- i18n foundation using `i18next` and `react-i18next` with locale namespaces for English, German, French, and Italian.
+- Language switcher in public navigation, auth pages, app user menu, and footer, with `localStorage` persistence.
+- STOA language glossary and copy style guide defining `Learning Assistant`, `Professional teacher support`, and Swiss-market terminology.
+- User-visible terminology replacement so `AI`, `AI tutor`, `AI answer`, `Human backup`, `Teacher backup`, and sales-heavy copy are replaced with education-oriented wording.
+- P0 page localization for homepage, login, register/onboarding, chat, teacher request action, parent dashboard/report, tutor requests, pricing, billing, and support.
+- P1 baseline localization for profile, learning history, referral, tutor availability, and admin overview.
+- Form validation, toast, empty/loading/error state localization.
+- Demo backend/mock language preference readiness without adding a formal backend preference system.
+- Multilingual QA for long German/French/Italian copy, mobile layout, and core demo flows.
+- README and language documentation updates with build verification.
 
 ## Current State
 
@@ -78,7 +77,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.14 Phase 15 is implemented and verified.)
+- Phase 16 multilingual support and terminology replacement requirements will cover i18n foundation, language switching, glossary/style docs, user-facing AI terminology cleanup, P0/P1 page localization, validation/toast/status localization, layout QA, and README updates.
 
 ### Out of Scope
 
@@ -104,7 +103,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Context
 
-The project brief for Phase 15 was provided in Chinese and defined homepage redesign, onboarding flow, and premium UI refinement. The key product correction was that AI support, teacher help, and parent visibility are not three equal homepage product entrances. STOA now presents one student learning platform where AI is the default first responder, teachers are available as escalation when AI is not enough, and parents can follow learning progress. The user explicitly wanted a more premium, restrained education-product visual direction while keeping the milestone scoped to homepage, auth/onboarding, chat entry logic, and demo-backend support only.
+The project brief for Phase 16 was provided in Chinese and defined multilingual language optimization and AI terminology replacement. The milestone keeps product functionality stable while adapting STOA for English, German, French, and Italian Swiss-market usage. The key product-language correction is that user-facing copy should not lead with `AI`; STOA should describe the first-response system as the `Learning Assistant` and describe human escalation as `Professional teacher support`. The milestone focuses on language architecture, copy quality, terminology consistency, core-page localization, and multilingual QA rather than new business modules.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -129,13 +128,14 @@ Current codebase facts:
 - v1.12 shipped Phase 13 and turned the accumulated frontend pages into a coherent role-based product structure with documented page hierarchy, navigation, journeys, page flows, demo flow, mobile path checks, and frontend-only UX polish.
 - v1.13 shipped Phase 14 and stabilized the demo backend/API layer so the frontend can run complete demonstration flows while staying decoupled from future formal backend and AWS implementations.
 - v1.14 shipped Phase 15 and redesigned STOA's first impression, role onboarding, and AI-first chat path with premium UI styling and demo backend onboarding/upload support.
+- v1.15 starts Phase 16 to add English/German/French/Italian localization, language switching, persistent language preference, user-facing terminology replacement, and language QA.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 15 is first-impression, onboarding, AI-first chat flow, and premium UI refinement work. It must avoid new large product modules, production backend systems, real credential verification, real parent identity verification, real payment expansion, and full design-system rewrites.
+- **Scope**: Phase 16 is language-system, terminology, and multilingual UX work. It must avoid new business modules, formal backend language preference systems, CMS work, automatic translation pipelines, final legal review, SEO localization, email-template localization, and regional pricing changes.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -155,6 +155,8 @@ Current codebase facts:
 - **Demo backend simplicity**: Phase 14 demo backend work should prefer MSW/mock data or a minimal local server with JSON-file state; avoid complex ORM, migrations, SQL schema design, Docker Compose, Kubernetes, and AWS CDK.
 - **Demo accounts**: Phase 14 demo users are fixed as `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com`, all using `password123`, and reset must preserve those accounts.
 - **Onboarding boundary**: Phase 15 registration profile fields and tutor credential upload are demo/onboarding UI and API-contract work only; they must not imply production verification, OCR, identity checks, or admission decisions.
+- **Language terminology**: User-visible UI copy should avoid presenting `AI` as the primary product concept. Use `Learning Assistant` for first-response learning help and `Professional teacher support` for teacher escalation; technical identifiers and developer docs may still use AI-related implementation terms where appropriate.
+- **Language persistence**: Phase 16 language choice should persist in the browser through `localStorage` key `stoa_language`; formal cross-device user preference syncing is deferred to a future backend milestone.
 - **API modes**: Frontend API mode must be configurable for `mock`, `demo`, `staging`, and `production`; page components should not hard-code API URLs or demo data internals.
 - **Error format**: Demo backend errors should use a consistent `{ message, code }` response with demo-specific codes so frontend error states remain testable.
 - **Learning intelligence boundary**: Advanced learning profiles, diagnosis, curriculum graph, and recommendations in Phase 12 are mock/demo UI surfaces only. They must not present themselves as real AI diagnosis or graph computation.
@@ -210,6 +212,9 @@ Current codebase facts:
 | Keep Phase 15 focused on first impression and core path refinement | STOA now has stable demo flows; the next value is making the student-first learning path obvious and visually credible rather than adding broad new modules | ✓ Good |
 | Present teachers as inline escalation, not a parallel product entry | AI should be the default first response in the learning flow, while teacher support appears when an AI answer is not enough | ✓ Good |
 | Treat tutor credential upload as demo onboarding only | The UI can collect and mock-upload documents for product demonstration, but real verification, OCR, and approval rules remain future backend/operations work | ✓ Good |
+| Keep Phase 16 focused on language, not feature expansion | Swiss-market readiness now depends on multilingual UX and trustworthy education terminology more than new product surfaces | — Pending |
+| Use `Learning Assistant` as the user-facing first-response term | It is warmer and more education-oriented than `AI`, avoids implying teacher replacement, and works naturally with teacher escalation | — Pending |
+| Use browser-local language persistence first | `localStorage` is enough for demo and frontend validation while cross-device preferences remain a future backend concern | — Pending |
 
 ## Evolution
 
@@ -229,4 +234,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.14 Phase 15 completion*
+*Last updated: 2026-05-25 for v1.15 Phase 16 planning*

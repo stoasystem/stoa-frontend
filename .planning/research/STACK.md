@@ -1,60 +1,56 @@
-# Stack Research
-
-**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
-**Researched:** 2026-05-25
-**Confidence:** HIGH
-
-## Recommended Stack
-
-### Core Technologies
-
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| React | Existing `^19.0.0` | UI composition | Keep the current app stack and avoid framework churn during a design refinement milestone. |
-| TypeScript | Existing `^5.5.0` | Typed onboarding contracts and chat UI state | The new role-specific registration payloads need explicit types to keep service contracts and forms aligned. |
-| Vite | Existing `^6.0.0` | Local development and build | Continue the current validated frontend workflow. |
-| TailwindCSS | Existing project setup | Premium visual system and responsive layout | Token-driven utility classes are enough for the requested editorial layout, transitions, and mobile responsiveness. |
-| TanStack Query | Existing `^5.40.0` | Register/upload/chat mutations | Reuse the existing server-state pattern rather than adding a form framework or new state layer. |
-| Axios/fetch service wrappers | Existing | API calls | Keep the Phase 14 contract boundary: page components should call services/hooks, not raw URLs. |
-
-### Supporting Libraries
-
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| lucide-react | Existing | Icons | Use for restrained navigation, onboarding steps, upload state, and inline teacher request actions. |
-| CSS transitions | Native | Motion | Preferred for Phase 15; avoids adding framer-motion unless richer animation becomes necessary later. |
-| Browser `File` API | Native | Tutor credential validation | Enough for extension and file-size validation before mock upload. |
-
-## What Not To Add
-
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| framer-motion as a new dependency | The requested motion is subtle and can be handled with CSS transitions/keyframes. | Tailwind/CSS animation utilities. |
-| A large form library | Existing forms are manageable and the flow is milestone-scoped. | Local typed React state with focused components. |
-| Real credential verification/OCR | Out of scope and backend-owned. | Mock file upload contract and clear pending-review UI. |
-| New design-system rewrite | Phase 16 is the right place for systematic component hardening. | Premium theme CSS and scoped component refinements. |
-
-## Stack Patterns
-
-**Homepage and auth UI**
-- Add domain components under `src/components/home` and `src/components/auth`.
-- Use premium theme CSS variables and existing Tailwind tokens.
-
-**Onboarding API**
-- Extend `POST /auth/register` payload shape.
-- Add `POST /files/tutor-credentials` mock upload.
-
-**Chat escalation**
-- Keep existing chat APIs.
-- Move teacher escalation presentation into message-level UI.
+# Phase 16 Research: Stack
 
 ## Sources
 
-- Appcues onboarding guide, 2026-05-19: onboarding should guide users to repeatable value, not act as a one-time product tour.
-- Nielsen Norman Group mobile image guidance, 2023-11-08: mobile images should add informational value, not just decoration.
-- Tavi AI education product page, accessed 2026-05-25: child-facing AI tutoring benefits from a clear product promise, parent-owned visibility, and constrained help behavior.
-- arXiv 2605.11155, submitted 2026-05-11: hybrid human-AI tutoring can outperform AI-only tutoring and supports differentiating proactive/reactive human help based on student needs.
+- i18next fallback documentation: https://www.i18next.com/principles/fallback
+- react-i18next multiple translation files: https://react.i18next.com/guides/multiple-translation-files
+- react-i18next `useTranslation`: https://react.i18next.com/latest/usetranslation-hook
+- react-i18next i18next instance setup: https://react.i18next.com/latest/i18next-instance
+- i18next browser language detector: https://github.com/i18next/i18next-browser-languageDetector
+- W3C language attributes guidance: https://www.w3.org/International/geo/html-tech/tech-lang.html
 
----
-*Stack research for: STOA Phase 15*
-*Researched: 2026-05-25*
+## Recommended Stack Additions
+
+Phase 16 should add:
+
+- `i18next`
+- `react-i18next`
+
+Optional, but not required for the first implementation:
+
+- `i18next-browser-languagedetector`
+
+The user asked for explicit persistence in `localStorage` key `stoa_language`, so the first build can manually read/write that key and call `i18n.changeLanguage`. The detector package is useful later if STOA wants browser language fallback or query/path language detection.
+
+## Why This Stack Fits
+
+`react-i18next` exposes the `t` function and the i18n instance through `useTranslation`, which fits the current React component structure. It also supports namespace-based translation loading, matching the requested files such as `common`, `home`, `auth`, `chat`, `parent`, `tutor`, `pricing`, `billing`, `support`, `admin`, and `errors`.
+
+i18next has built-in fallback behavior. This matters because Phase 16 can migrate P0/P1 pages first while leaving lower-priority demo pages to fall back cleanly until later work.
+
+## Configuration Direction
+
+Use bundled JSON imports at first:
+
+- `src/i18n/index.ts`
+- `src/i18n/languages.ts`
+- `src/i18n/namespaces.ts`
+- `src/i18n/locales/{en,de,fr,it}/{namespace}.json`
+
+Initialize with:
+
+- `fallbackLng: 'en'`
+- `defaultNS: 'common'`
+- `ns` listing all phase namespaces
+- `interpolation.escapeValue: false`
+- language from `localStorage.getItem('stoa_language') ?? 'en'`
+
+On language change:
+
+- call `i18n.changeLanguage(language)`
+- write `localStorage.setItem('stoa_language', language)`
+- update `document.documentElement.lang = language`
+
+## What Not To Add Now
+
+Do not add a CMS, remote translation backend, SEO routing, locale-prefixed URLs, automatic machine translation pipeline, or backend preference sync in Phase 16. These are beyond the milestone boundary and would slow the main objective: making the current demo/product surface multilingual and terminology-safe.

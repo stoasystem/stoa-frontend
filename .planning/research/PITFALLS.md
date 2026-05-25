@@ -1,84 +1,49 @@
-# Pitfalls Research
+# Phase 16 Research: Pitfalls
 
-**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Translation Scope Creep
 
-## Critical Pitfalls
+Risk: Trying to localize every advanced demo page at once will delay the P0 student/parent/tutor flow.
 
-### Pitfall 1: Recreating the Three-Module Confusion
+Prevention: Define P0 and P1 explicitly. Lower-priority platform/organization/advanced analytics pages can remain later follow-up unless they expose high-visibility copy during demos.
 
-**What goes wrong:** The redesigned homepage still gives AI, teachers, and parents equal visual weight.
-**Why it happens:** Feature lists are easier to build than product narratives.
-**How to avoid:** Make the homepage story a sequence: student asks, AI responds, teacher helps if needed, parent follows progress.
-**Warning signs:** Multiple hero buttons for role demos; large equal cards named after internal capabilities.
-**Phase to address:** Homepage redesign.
+## Reintroducing AI-Hype Copy
 
-### Pitfall 2: Onboarding Collects Data Before Delivering Value
+Risk: Some copy can be translated while still saying `AI`, `AI answer`, `AI tutor`, or `human backup`.
 
-**What goes wrong:** Registration asks many questions but does not connect users to chat quickly.
-**Why it happens:** Profile completeness is treated as more important than first learning value.
-**How to avoid:** Keep the wizard short, show progress, and redirect students to `/chat` with a welcome prompt.
-**Warning signs:** Long single-page forms; no visible next step after registration.
-**Phase to address:** Onboarding flow.
+Prevention: Add a terminology replacement document, glossary, and QA grep checks for user-facing `AI`, `chatbot`, `robot`, `human backup`, `teacher backup`, `what we are selling`, `buy now`, and `customers`.
 
-### Pitfall 3: Demo Credential Upload Looks Like Real Approval
+## Sentence Fragment Translation
 
-**What goes wrong:** Tutor upload UI implies credentials are verified.
-**Why it happens:** Trust UI often overstates demo capability.
-**How to avoid:** Use `pending_review` language and clearly avoid "verified" after mock upload.
-**Warning signs:** "Approved tutor" badges after upload; no pending status.
-**Phase to address:** Tutor onboarding and demo backend support.
+Risk: Splitting sentences across JSX fragments creates unnatural German, French, and Italian grammar.
 
-### Pitfall 4: Premium UI Becomes Decorative Instead of Functional
+Prevention: Store full sentences in locale files. Use interpolation or `Trans` for links/emphasis instead of sentence assembly.
 
-**What goes wrong:** Magazine visuals slow the page or distract from the student CTA.
-**Why it happens:** Image-heavy landing pages over-prioritize atmosphere.
-**How to avoid:** Use one image-led hero with informational UI preview, responsive constraints, and meaningful alt text.
-**Warning signs:** Hero image consumes mobile viewport without showing CTA; decorative assets dominate real content.
-**Phase to address:** Homepage redesign and visual QA.
+## German and French Layout Overflow
 
-### Pitfall 5: Teacher Escalation Becomes Another Entry Point
+Risk: German and French strings are often longer than English. Fixed-width buttons, nav bars, pricing cards, and chat actions can overflow.
 
-**What goes wrong:** Teacher request remains a standalone card/button outside the AI answer context.
-**Why it happens:** Existing UI patterns are reused without changing product hierarchy.
-**How to avoid:** Render teacher escalation below assistant messages and near the input as a secondary action.
-**Warning signs:** Homepage "Teacher Backup" card; chat landing requires choosing support type.
-**Phase to address:** Chat refinement.
+Prevention: Use flexible widths, wrapping labels, mobile menus, and route-level Playwright checks at mobile width for `de`, `fr`, and `it`.
 
-## Technical Debt Patterns
+## Hidden English Strings
 
-| Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
-|----------|-------------------|----------------|-----------------|
-| Hard-coded mock register data in components | Fast demo | Blocks real backend migration | Never; use service contract. |
-| File upload logic inside wizard step | Fewer files | Hard to test/reuse | Avoid; use files service/hook. |
-| Large global theme rewrite | Broad visual consistency | High regression risk | Defer to Phase 16. |
-| Heavy animation dependency | Quick animation | Dependency and performance cost | Only after CSS proves insufficient. |
+Risk: Form validation schemas, toasts, loading states, empty states, and error handlers often keep hardcoded English after page text is localized.
 
-## UX Pitfalls
+Prevention: Treat `errors.json`, `common.status`, and toast keys as P0, and audit components for hardcoded strings.
 
-| Pitfall | User Impact | Better Approach |
-|---------|-------------|-----------------|
-| Admin/tutor/parent CTAs compete with student CTA | Students do not know where to start. | One primary `Start Learning` CTA. |
-| Registration role choices use internal names | Users hesitate. | Use plain labels and descriptions: Student, Parent, Tutor. |
-| Chat empty state feels like a dashboard | Students wait instead of asking. | Direct homework input with onboarding welcome copy. |
-| Parent visibility appears as surveillance | Families may distrust the product. | Frame as progress visibility and learning support. |
+## Accessibility Regression
 
-## "Looks Done But Isn't" Checklist
+Risk: Language switching without updating `<html lang>` harms screen readers and text processing.
 
-- [ ] **Homepage:** Verify mobile first viewport shows brand, CTA, and a hint of next section.
-- [ ] **Onboarding:** Verify each role can complete registration and route correctly.
-- [ ] **Tutor upload:** Verify PDF/PNG/JPEG and 10 MB limit UI behavior.
-- [ ] **Chat:** Verify assistant response shows teacher request action.
-- [ ] **Demo backend:** Verify reset still restores fixed demo accounts and new mock flows work.
+Prevention: Set `document.documentElement.lang` on init and language change, and include it in QA.
 
-## Sources
+## Overbuilding Localization Infrastructure
 
-- Appcues onboarding guide, 2026-05-19: onboarding fails when teams front-load features instead of guiding users to value.
-- Nielsen Norman Group mobile image guidance, 2023-11-08: decorative mobile images slow pages and should be used only when informative.
-- Openfield EdTech instructor onboarding article: education onboarding should reduce complexity and scaffold progressively.
-- Tavi AI education product page: parent visibility and bounded AI help should be expressed as part of one product promise.
+Risk: Adding CMS, remote translation backends, locale-prefixed routing, or backend preference sync before core migration creates unnecessary complexity.
 
----
-*Pitfalls research for: STOA Phase 15*
-*Researched: 2026-05-25*
+Prevention: Start with local JSON imports and localStorage persistence. Document future backend preference sync separately.
+
+## Legal Copy Risk
+
+Risk: Translated privacy/terms copy may be mistaken as legally approved.
+
+Prevention: Keep legal pages marked as launch drafts and document that final legal review is out of scope.

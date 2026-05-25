@@ -1,67 +1,94 @@
-# Feature Research
+# Phase 16 Research: Features
 
-**Domain:** STOA Phase 15 homepage, onboarding, and AI-first learning UI
-**Researched:** 2026-05-25
-**Confidence:** HIGH
+## Table Stakes
 
-## Feature Landscape
+### Multilingual Foundation
 
-### Table Stakes
+- Four supported languages: English, German, French, Italian.
+- Default language: English.
+- Locale files are grouped by namespace so migration can happen in P0/P1 slices.
+- Missing translations fall back to English.
+- Current language persists through page refresh.
+- The root HTML `lang` value follows the active language.
 
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Student-first homepage CTA | The product promise is learning help; students need the first action immediately. | LOW | `Start Learning` should route through login when needed and then to `/chat`. |
-| Sequential learning explanation | Users need to understand AI, teacher, and parent roles as a flow. | LOW | Replace parallel cards with steps: ask, AI explains, teacher helps if needed, parent follows progress. |
-| Role-based registration | Students, parents, and tutors need different setup questions. | MEDIUM | Use one multi-step page with typed role-specific profile payloads. |
-| Student parent-link fields | Student onboarding must collect parent name/email for family visibility. | LOW | Demo response can return `parentLinked: true`. |
-| Tutor credential upload UI | Tutor registration needs trust-building credential collection. | MEDIUM | Mock-upload PDF/PNG/JPEG up to 10 MB, then show pending review. |
-| AI-first chat empty state | First-time student should ask directly, not choose a product module. | MEDIUM | Empty state should use homework-focused copy and default input. |
-| Inline teacher escalation | Teacher help should appear after AI responses, not as a homepage module. | MEDIUM | Add message feedback/action component near assistant messages. |
+### Language Switcher
 
-### Differentiators
+- Available in public navigation, login/register, app user menu, and footer.
+- Displays language names, not flags.
+- Supports `English`, `Deutsch`, `Français`, and `Italiano`.
+- Works on desktop and mobile without forcing narrow buttons.
+- Does not appear near the chat input where it would distract from studying.
 
-| Feature | Value Proposition | Complexity | Notes |
-|---------|-------------------|------------|-------|
-| Premium editorial homepage | Makes STOA feel like a credible education product rather than a generic SaaS demo. | MEDIUM | Use image-driven composition, restrained colors, and dense-but-clear storytelling. |
-| Swiss/local education trust context | Builds relevance and seriousness for families. | LOW | Keep claims modest and demo-safe. |
-| Parent visibility as value layer | Shows family value without stealing student path priority. | LOW | Explain that parents can follow learning progress after student activity. |
-| Pending review tutor state | Makes tutor onboarding feel realistic while staying demo-only. | MEDIUM | Avoid implying real approval. |
+### Terminology Replacement
 
-### Anti-Features
+User-visible copy should avoid `AI` as the primary product concept. Replace with:
 
-| Feature | Why Requested | Why Problematic | Alternative |
-|---------|---------------|-----------------|-------------|
-| Three equal homepage cards for AI, teacher, parent | Easy to explain features separately. | Misrepresents the product as three parallel tools. | One student learning flow with teacher and parent roles contextualized. |
-| Full production onboarding/auth | Feels complete. | Out of scope and creates backend/security debt. | Demo register contract and clear backend readiness notes. |
-| Real tutor verification | Adds trust. | Requires operations, storage, review, legal, and security processes. | Mock credential upload and `pending_review` status. |
-| Heavy animation library | Looks polished quickly. | Adds dependency and can hurt mobile performance. | CSS-only subtle fades, lifts, and focus transitions. |
+- `Learning Assistant`
+- `STOA Learning Assistant`
+- `Learning support`
+- `Explanation`
+- `Professional teacher support`
 
-## MVP Definition
+Avoid:
 
-### Launch With
+- `AI`
+- `AI Tutor`
+- `Chatbot`
+- `Robot Tutor`
+- `Virtual Teacher`
+- `Automated Teacher`
+- `Human backup`
+- `Teacher backup`
 
-- [ ] Magazine-style homepage with student-first CTA.
-- [ ] Home learning flow replacing parallel AI/teacher/parent cards.
-- [ ] Login/register path that supports next-route handoff.
-- [ ] Multi-step registration for student, parent, and tutor.
-- [ ] Tutor credential upload UI and mock upload API.
-- [ ] Chat empty state and AI-response inline teacher escalation.
-- [ ] Demo backend support for expanded register and credential upload.
+### Core Page Localization
 
-### Add After Validation
+P0 pages:
 
-- [ ] Richer onboarding persistence across browser reloads.
-- [ ] Real invitation email flow for parent linking.
-- [ ] Real tutor credential review dashboard.
-- [ ] Motion library if Phase 16 visual QA proves CSS motion insufficient.
+- Homepage
+- Login
+- Register and role onboarding
+- Chat
+- Teacher request action
+- Parent dashboard
+- Parent report
+- Tutor request flow
+- Pricing
+- Billing
+- Support
 
-## Sources
+P1 pages:
 
-- Appcues onboarding guide, 2026-05-19: activation depends on guiding new users to meaningful value, not front-loading features.
-- Openfield EdTech instructor onboarding article: instructors are learners too; onboarding should reduce complexity and use progressive scaffolding.
-- Tavi AI education product page: parent visibility and constrained AI tutoring are best framed around one clear product promise.
-- arXiv 2605.11155: hybrid human-AI tutoring supports human tutor involvement as differentiated support, not just a separate feature bucket.
+- Profile
+- Learning history
+- Referral
+- Tutor availability
+- Admin overview
 
----
-*Feature research for: STOA Phase 15*
-*Researched: 2026-05-25*
+### Interaction Copy Localization
+
+- Form validation messages.
+- Toast messages.
+- Empty/loading/error states.
+- CTA labels.
+- Role labels.
+- Plan/pricing labels.
+- Support ticket statuses and severity labels.
+
+## Differentiators
+
+- Swiss-market language set from the start: EN / DE / FR / IT.
+- Education-first language system instead of technical hype.
+- Clear hierarchy: Learning Assistant first, professional teacher support when needed, parents stay informed.
+- Glossary and style guide included so future contributors do not reintroduce weak terminology.
+
+## Anti-Features
+
+Do not:
+
+- Treat `AI` as a visible selling point.
+- Add a translation management platform.
+- Add backend language preference syncing.
+- Add locale URL routing.
+- Localize legal text as if it were legally approved final copy.
+- Auto-translate production copy without review.
+- Hide long German/French labels through truncation when the text is essential.
