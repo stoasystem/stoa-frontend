@@ -1,5 +1,4 @@
-import { enableAnalytics, isDevelopment } from '@/lib/env'
-import { DEFAULT_API_BASE_URL } from '@/lib/constants'
+import { apiBaseUrl, enableAnalytics, isDevelopment } from '@/lib/env'
 import { TOKEN_KEY } from '@/store/authStore'
 
 export type AnalyticsEventName =
@@ -81,10 +80,6 @@ const BLOCKED_PAYLOAD_KEYS = new Set([
 ])
 const MAX_STRING_LENGTH = 120
 
-function getApiBaseUrl() {
-  return import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
-}
-
 function getSessionId() {
   try {
     const existingSessionId = sessionStorage.getItem(SESSION_ID_KEY)
@@ -148,7 +143,7 @@ export function trackEvent(name: AnalyticsEventName, payload: AnalyticsPayload =
     createdAt: new Date().toISOString(),
   }
 
-  void fetch(`${getApiBaseUrl()}${ANALYTICS_ENDPOINT}`, {
+  void fetch(`${apiBaseUrl}${ANALYTICS_ENDPOINT}`, {
     method: 'POST',
     keepalive: true,
     headers: {

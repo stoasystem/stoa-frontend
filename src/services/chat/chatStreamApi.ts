@@ -1,7 +1,5 @@
-import { DEFAULT_API_BASE_URL } from '@/lib/constants'
+import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import type { ChatStreamEvent } from '@/types/chat'
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
 
 export type StreamMessagePayload = {
   content: string
@@ -24,7 +22,7 @@ export async function streamConversationMessage({
 
   try {
     response = await fetch(
-      `${API_BASE_URL}/conversations/${conversationId}/messages/stream`,
+      `${apiBaseUrl}/conversations/${conversationId}/messages/stream`,
       {
         method: 'POST',
         headers: {
@@ -35,12 +33,18 @@ export async function streamConversationMessage({
         signal,
       },
     )
-  } catch {
+  } catch (error) {
+    if (!allowDemoFallback) {
+      throw error
+    }
     await emitDemoStream({ payload, onEvent })
     return
   }
 
   if (!response.ok) {
+    if (!allowDemoFallback) {
+      throw new Error(`Streaming request failed with status ${response.status}`)
+    }
     await emitDemoStream({ payload, onEvent })
     return
   }

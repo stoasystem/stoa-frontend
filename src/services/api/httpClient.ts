@@ -1,9 +1,9 @@
 import axios from 'axios'
-import { DEFAULT_API_BASE_URL } from '@/lib/constants'
+import { apiBaseUrl } from '@/lib/env'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 
 export const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },

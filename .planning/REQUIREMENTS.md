@@ -159,11 +159,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | OPS-04 | Phase 84 | Complete |
 | OPS-05 | Phase 84 | Complete |
 | OPS-06 | Phase 84 | Complete |
-| API-01 | Phase 85 | Pending |
-| API-02 | Phase 85 | Pending |
-| API-03 | Phase 85 | Pending |
-| API-04 | Phase 85 | Pending |
-| API-05 | Phase 85 | Pending |
+| API-01 | Phase 85 | Complete |
+| API-02 | Phase 85 | Complete |
+| API-03 | Phase 85 | Complete |
+| API-04 | Phase 85 | Complete |
+| API-05 | Phase 85 | Complete |
 | READY-01 | Phase 86 | Pending |
 | READY-02 | Phase 86 | Pending |
 | READY-03 | Phase 86 | Pending |

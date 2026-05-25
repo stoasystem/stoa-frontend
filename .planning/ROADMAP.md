@@ -29,7 +29,7 @@
 - [x] **Phase 82: Auth, Health, Student Chat, and Message Demo APIs** - Stabilize health/auth/conversation/message endpoints and deterministic assistant responses.
 - [x] **Phase 83: Teacher Help, Tutor Handling, and Parent Report APIs** - Stabilize help-request status flow and parent child/report/history endpoints.
 - [x] **Phase 84: Billing, Referral, Support, and Admin Demo APIs** - Stabilize mock checkout, referrals, support tickets, feedback, and admin analytics endpoints.
-- [ ] **Phase 85: Frontend API Mode and Service Layer Alignment** - Add API mode configuration and audit frontend API calls through service boundaries.
+- [x] **Phase 85: Frontend API Mode and Service Layer Alignment** - Add API mode configuration and audit frontend API calls through service boundaries.
 - [ ] **Phase 86: Backend Integration Readiness, QA, README, and Build Closure** - Add real backend/AWS readiness docs, demo backend QA, README updates, and final verification.
 
 ### Phase 80: Demo Backend Scope, API Contract, and Data Documentation
@@ -103,7 +103,7 @@
   3. Shared API client uses configured base URL and bearer-token behavior.
   4. API mode values `mock`, `demo`, `staging`, and `production` are documented.
   5. Frontend API usage audit finds no page component API URL hard-coding that should be moved to services.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 86: Backend Integration Readiness, QA, README, and Build Closure
 
@@ -142,5 +142,5 @@ Phase 14 phases planned in numeric order: 80 -> 81 -> 82 -> 83 -> 84 -> 85 -> 86
 | 82. Auth, Health, Student Chat, and Message Demo APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
 | 83. Teacher Help, Tutor Handling, and Parent Report APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
 | 84. Billing, Referral, Support, and Admin Demo APIs | v1.13 | 1/1 | Complete | 2026-05-25 |
-| 85. Frontend API Mode and Service Layer Alignment | v1.13 | 0/1 | Not Started | — |
+| 85. Frontend API Mode and Service Layer Alignment | v1.13 | 1/1 | Complete | 2026-05-25 |
 | 86. Backend Integration Readiness, QA, README, and Build Closure | v1.13 | 0/1 | Not Started | — |

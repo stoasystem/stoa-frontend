@@ -4,14 +4,11 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { DEFAULT_API_BASE_URL } from '@/lib/constants'
-import { appEnv } from '@/lib/env'
+import { apiBaseUrl, appEnv } from '@/lib/env'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import packageJson from '../../../package.json'
 
 export function AdminDashboardPage() {
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
-
   return (
     <DashboardLayout>
       <PageContainer className="p-0">
