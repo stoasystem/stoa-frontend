@@ -1,35 +1,37 @@
-# Project Research - Pitfalls for v1.8 Phase 9
+# Research: Pitfalls for v1.9 Phase 10
 
-## Pitfalls
+## Payment Pitfalls
 
-### Treating Vite Env Vars as Secrets
+- Treating a frontend success redirect as proof of payment. Real subscription state must come from the backend after provider webhooks.
+- Asking for card numbers in the STOA frontend during a demo. Demo checkout must be visibly virtual and test-only.
+- Exposing payment secrets in `VITE_*` environment variables. All `VITE_*` values are public browser configuration.
+- Coupling plan names to provider price IDs in UI code. Keep frontend plans stable and let the backend map plans to provider prices.
+- Building cancellation, invoices, coupons, and accounting before validating willingness to pay.
 
-`VITE_` values are exposed to browser code. Production API URLs and feature flags are fine; API keys, database credentials, tokens, and private DSNs are not.
+## Subscription Gating Pitfalls
 
-### Uploading Sensitive Learning Content to Telemetry
+- Relying on route guards or disabled buttons for real quota enforcement.
+- Duplicating server subscription state into long-lived local stores.
+- Showing locked states without a clear upgrade or contact path.
+- Letting feature flags drift from README and `.env.example`.
 
-Error and analytics payloads must not include full chat content, passwords, tokens, file contents, or sensitive student data. Prefer IDs, roles, route, status, duration, and coarse subject metadata.
+## UX Pitfalls
 
-### Assuming SQLite Is Production
+- Optimizing pricing before parent value is clear.
+- Adding parent upgrade CTAs without explaining learning progress or teacher support value.
+- Making tutor request detail visually busy without answering what the tutor should do next.
+- Treating P2/P3 polish as equal to P0/P1 launch blockers.
 
-SQLite remains useful for local and demo flows, but Phase 9 must document that production data protection belongs to the backend database plan. If pilot temporarily uses SQLite-like storage, backup/restore must be explicit and rehearsed.
+## Admin and Operations Pitfalls
 
-### Building Too Much Admin
+- Expanding admin into a full CRM during launch preparation.
+- Building BI dashboards instead of focused usage, feedback, help request, support, billing interest, and system-status views.
+- Failing to show backend-pending states clearly where APIs are not ready.
+- Omitting role protection for admin-only routes.
 
-Pilot admin operations should show usage, feedback, help-request visibility, environment/version status, and placeholders. Full user management and BI dashboards should remain deferred.
+## Launch Pitfalls
 
-### Blocking User Flows on Telemetry
-
-Analytics, support telemetry, and monitoring should degrade gracefully. A failed analytics request must not prevent chat, report viewing, tutor workflow, or support UI from continuing.
-
-### Legal Placeholder Drift
-
-Privacy and terms pages can remain pilot drafts, but they must state pilot nature, AI limitations, parent visibility, data categories, and contact path clearly enough for real pilot users.
-
-## Prevention Strategy
-
-- Keep telemetry services thin and privacy-filtered.
-- Add explicit docs for allowed/disallowed event payload fields.
-- Gate demo shortcuts and telemetry with environment flags.
-- Verify `/privacy`, `/terms`, `/support`, `/pricing`, `/billing`, and `/admin` routes before launch.
-- Use launch checklist as the final go/no-go artifact.
+- Shipping without a rollback plan and new-registration pause plan.
+- Launching without monitoring checkout, login, chat, upload, parent report, teacher help, and runtime errors.
+- Treating privacy and terms drafts as legal review substitutes.
+- Updating launch docs without adding E2E/manual QA checks for the new pricing/billing/virtual checkout path.

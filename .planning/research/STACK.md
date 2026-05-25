@@ -1,30 +1,74 @@
-# Project Research - Stack for v1.8 Phase 9
+# Research: Stack Additions for v1.9 Phase 10
 
 ## Scope
 
-Research focused on production readiness, monitoring, analytics delivery, support workflows, privacy review, backup/restore coordination, and pilot launch preparation for the existing React + TypeScript + Vite STOA frontend.
+Phase 10 adds pilot iteration, pricing validation, billing/subscription preparation, virtual checkout demos, parent conversion, tutor/admin operations, and launch readiness to the existing React + TypeScript + Vite frontend.
 
-## Findings
+## Recommended Stack Choices
 
-- Vite exposes only variables prefixed with `VITE_` to browser code, and those values are bundled into client assets. Phase 9 production env variables must be treated as public configuration, never secrets.
-- Vercel supports Vite deployments and environment-specific variables. STOA should document production and preview/staging values separately so pilot users do not hit localhost or staging-only APIs by accident.
-- Error monitoring can start with either Sentry or a backend endpoint such as `POST /monitoring/frontend-errors`. For this milestone, a wrapper service keeps the frontend independent from the eventual vendor.
-- Sentry's JavaScript SDK can collect runtime errors and contextual data; configuration must avoid sending default PII unless explicitly approved by the privacy policy.
-- Analytics can remain a thin frontend client that posts event name, allowed metadata, and timestamp to `POST /analytics/events`. This avoids vendor lock-in while creating a stable backend collection contract.
-- PostgreSQL backup and restore planning should account for base backups plus WAL/continuous archiving when point-in-time recovery is required. If the pilot backend remains SQLite-like, the backup process must explicitly describe database-file copies and restore rehearsal.
+### Billing and Checkout
 
-## Recommended Stack Additions
+- Use a STOA backend endpoint as the only real payment boundary: `POST /billing/checkout-session`.
+- Prefer Stripe Checkout for real subscription collection once the backend is ready.
+- Keep the frontend response shape simple: `{ checkoutUrl: string }`.
+- Redirect the browser to the returned hosted checkout URL for real payment flows.
+- Do not add Stripe secret keys, card fields, or direct Payment Element handling to the frontend in Phase 10.
 
-- `src/services/monitoring/errorMonitoringApi.ts` for frontend error reporting.
-- `src/services/logging/logger.ts` for environment-aware logging.
-- `src/services/support/supportApi.ts` for support request submission.
-- `src/services/admin/adminApi.ts` for usage and feedback placeholder contracts.
-- Continue using TanStack Query for admin/support mutations and queries.
-- Keep analytics vendor-neutral through the existing analytics client until the backend selects a durable analytics store or third-party vendor.
+Source notes:
+- Stripe Checkout Sessions support `mode=subscription` for recurring plans.
+- Stripe-hosted Checkout returns a URL that customers use to complete payment.
+- Stripe test cards support fake successful and failed payment scenarios for real integration testing once the backend is connected.
 
-## Sources
+Primary references:
+- https://docs.stripe.com/api/checkout/sessions/create
+- https://docs.stripe.com/payments/checkout/how-checkout-works
+- https://docs.stripe.com/testing
 
-- Vite Env Variables and Modes: https://vite.dev/guide/env-and-mode/
-- Vercel Vite framework docs: https://vercel.com/docs/frameworks/frontend/vite
-- Sentry JavaScript data collection docs: https://docs.sentry.io/platforms/javascript/guides/remix/data-management/data-collected
-- PostgreSQL continuous archiving and PITR docs: https://www.postgresql.org/docs/17/continuous-archiving.html
+### Virtual Payment Demo
+
+Because the real payment backend is not connected yet, add an explicit frontend demo mode:
+
+- `VITE_ENABLE_PAYMENT=false`: payment disabled, show interest/contact paths.
+- `VITE_ENABLE_PAYMENT=true` and `VITE_ENABLE_MOCK_CHECKOUT=true`: run a virtual checkout flow inside STOA for demos and E2E tests.
+- `VITE_ENABLE_PAYMENT=true` and `VITE_ENABLE_MOCK_CHECKOUT=false`: call `POST /billing/checkout-session` and redirect to `checkoutUrl`.
+
+Suggested routes:
+
+- `/billing`
+- `/billing/checkout/demo`
+- `/billing/checkout/success`
+- `/billing/checkout/cancel`
+
+The virtual checkout route must clearly indicate that it is a demo/test checkout and must never ask for real card numbers.
+
+### Feature Flags
+
+Extend the existing environment pattern in `src/lib/env.ts`:
+
+- `VITE_ENABLE_PAYMENT`
+- `VITE_ENABLE_MOCK_CHECKOUT`
+- `VITE_ENABLE_PUBLIC_REGISTER`
+- `VITE_ENABLE_TEACHER_HELP`
+- `VITE_ENABLE_PARENT_REPORT`
+
+### API Services and Hooks
+
+Continue the existing service/hook architecture:
+
+- `src/services/billing/billingApi.ts`
+- `src/hooks/billing/useSubscriptionQuery.ts`
+- `src/hooks/billing/useCreateCheckoutSessionMutation.ts`
+- `src/services/admin/*`
+- `src/hooks/admin/*`
+- `src/services/tutor/*`
+- `src/hooks/tutor/*`
+
+Use TanStack Query for server state and mutations. Use Zustand only for lightweight UI/session state when query state is not appropriate.
+
+## Stack Additions To Avoid
+
+- Do not add a frontend payment SDK unless it is needed for a real backend-integrated Stripe flow.
+- Do not add a full CRM/helpdesk package.
+- Do not add a data warehouse or A/B testing platform.
+- Do not add a direct browser-to-payment-provider secret integration.
+- Do not add complex accounting, invoice, coupon, or payroll libraries in Phase 10.

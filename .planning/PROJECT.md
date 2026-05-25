@@ -2,28 +2,29 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, and early user feedback workflow.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, and production-like pilot launch readiness.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, and staging documentation. The current product step is moving that staging-ready MVP into production readiness, monitoring, support, privacy, backup, and pilot-launch preparation for a controlled group of real users.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing placeholders, and pilot launch artifacts. The current product step is moving that pilot-ready product into a launch-ready early commercial frontend with pilot feedback review, critical bug resolution, core UX iteration, pricing validation, subscription preparation, a demonstrable virtual payment flow, stronger tutor/admin operations, final privacy/terms drafts, and production launch process discipline.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
 
-## Current Milestone: v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch
+## Current Milestone: v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch
 
-**Goal:** Completed. STOA has been upgraded from a staging early-user product into a production-like pilot launch frontend that can support a small real user group with monitoring, analytics, support, privacy, and launch operations in place.
+**Goal:** Upgrade STOA from a controlled pilot launch frontend into a launch-ready early commercial product frontend that can demonstrate and test pricing, billing intent, subscription state, parent conversion, tutor operations, and admin operations before real payment/backend rollout.
 
 **Target features:**
-- Production deployment plan, production environment variable plan, and production backend API connection guidance.
-- SQLite-to-production database boundary, backend production database coordination, and pilot API contract freeze.
-- Frontend error monitoring, Error Boundary reporting, logging policy, and privacy-safe monitoring payloads.
-- Real analytics event delivery through a stable backend endpoint.
-- Pilot onboarding, support workflow, and support request service boundary.
-- Basic admin operations for usage and feedback visibility.
-- Pilot privacy and terms draft pages, data privacy review, and backup/restore coordination docs.
-- Pricing and billing placeholders for subscription preparation without implementing payments.
-- Pilot launch plan, launch checklist, post-pilot feedback report template, and README production readiness updates.
+- Pilot feedback review, analytics review, support record review, and critical bug prioritization.
+- P0/P1 bug-fix sprint with QA and E2E coverage for core flows.
+- Student, Parent, and Tutor UX iteration based on pilot evidence.
+- Launch-ready pricing page, subscription tiers, access matrix, and parent conversion CTA.
+- Billing API contract, billing service/hooks, subscription status UI, and feature flags.
+- Virtual/mock checkout flow for frontend demo and testing before real backend payment integration.
+- Admin usage, feedback, help-request, support, billing-interest, user, and system routes with launch-operations boundaries.
+- Tutor workflow improvements including clearer request context, required resolution notes, and tutor stats.
+- Launch-ready privacy policy and terms drafts with registration consent and layout/footer links.
+- Release process, rollback plan, post-launch monitoring plan, launch checklist, README updates, and production launch readiness verification.
 
 ## Current State
 
@@ -67,15 +68,21 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.8 is complete. Start the next milestone for Phase 10 scope.)
+- Pilot feedback, analytics, support records, bug reports, tutor notes, parent/student interviews, error reports, QA notes, and E2E failures need to be consolidated into launch priorities.
+- Critical P0/P1 bugs must be fixed or given explicit workarounds before production launch.
+- Student, Parent, and Tutor core paths need pilot-informed UX iteration.
+- Pricing must move from placeholder to a real validation page with clear tiers and conversion CTAs.
+- Billing and subscription UI must be demonstrable without a real payment backend, while remaining compatible with a future Stripe Checkout backend contract.
+- Admin and tutor operations must support early real-user operations.
+- Privacy policy, terms, release process, rollback plan, post-launch monitoring, launch checklist, and README must be launch-ready.
 
 ### Out of Scope
 
 - Production SSO, email verification, password reset completion, refresh-token architecture, and httpOnly cookie migration — Phase 6 uses MVP auth with local token storage.
 - Complex school organization, parent invitation, and full admin management — Phase 6 keeps role surfaces minimal.
 - Real multi-person teacher chat — Phase 6 supports tutor help-request list/detail/status, not live teacher chat.
-- Payment system — billing and subscriptions are deferred.
-- Large-scale public launch — Phase 9 targets a small controlled pilot only.
+- Full real payment processing and subscription enforcement — Phase 10 prepares Stripe-ready contracts and virtual checkout/demo flows before production backend payment rollout.
+- Large-scale paid growth and operational scaling — Phase 10 targets first real launch and payment validation readiness, not growth-scale systems.
 - Direct frontend calls to OpenAI, Claude, Gemini, DeepSeek, Codex, or any other model provider — frontend remains coupled only to STOA backend APIs.
 - Production SQLite usage — SQLite is local functional-test infrastructure only; production persistence remains a backend concern.
 - Full audit logging and Swiss data privacy compliance documentation — deferred until later security/compliance milestones.
@@ -84,12 +91,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Full curriculum/content management — not required for MVP readiness.
 - Full legal compliance package — Phase 9 adds pilot drafts and privacy review, not final legal-reviewed documents.
 - Large-scale user growth, A/B testing, data warehouse, and formal support operations — deferred until later launch milestones.
-- Full payment processing and subscription enforcement — Phase 9 adds pricing/billing placeholders only.
+- Direct frontend card handling — payment details must remain with hosted payment pages such as Stripe Checkout or virtual demo screens.
 - Full admin user management, CRM, school B2B onboarding, financial reporting, and multi-tenant school organization — outside pilot launch readiness.
 
 ## Context
 
-The project brief for Phase 9 was provided in Chinese and defines production deployment planning, production environment variables, backend production database boundaries, error monitoring, logging strategy, real analytics event delivery, pilot onboarding, support workflow, basic admin operations, data privacy review, backup/restore strategy, pricing/subscription preparation, launch checklist, and post-pilot feedback reporting. It builds on v1.7's staging deployment, CI, E2E, manual QA, early user testing, feedback collection, performance baseline, security review, and privacy/terms placeholders.
+The project brief for Phase 10 was provided in Chinese and defines pilot feedback review, critical bug resolution, Student/Parent/Tutor UX iteration, pricing validation, payment provider selection, subscription model preparation, billing UI, parent conversion funnel, tutor/admin operations, final privacy/terms integration, release process, rollback planning, post-launch monitoring, and public launch readiness. The user clarified that before connecting a real backend payment provider, the frontend must still support demo and testing of a complete virtual payment flow so pricing and billing pages can be validated end to end.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -108,13 +115,14 @@ Current codebase facts:
 - v1.6 shipped Phase 7 product polish, responsive foundations, loading/feedback systems, validation, error boundary, analytics, parent weekly report, tutor workflow notes, demo data, and staging env preparation.
 - v1.7 shipped Phase 8 staging deployment configuration, CI, Playwright E2E smoke tests, manual QA and demo docs, feedback collection, bug workflow, performance/security docs, privacy/terms placeholders, and production readiness planning.
 - v1.8 shipped Phase 9 production readiness docs, monitoring/logging, analytics delivery, onboarding/support, admin operations, privacy/terms drafts, backup/restore docs, pricing/billing placeholders, launch checklist, pilot plan, post-pilot feedback template, and README updates.
+- v1.9 starts Phase 10 and must bridge pilot evidence into launch readiness, including a Stripe-ready billing contract and a frontend-only virtual checkout path for demos and tests before real payment backend integration.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 9 prepares production-like pilot launch readiness; large public launch, full payments, full CRM, school B2B onboarding, complex admin, and full compliance certification remain out of scope.
+- **Scope**: Phase 10 prepares launch readiness and early commercial validation; large growth campaigns, full CRM, school B2B onboarding, full payment enforcement, tutor payroll, complete accounting, and full compliance certification remain out of scope.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -128,9 +136,11 @@ Current codebase facts:
 - **Testing**: Playwright E2E should cover core demo paths without requiring production deployment.
 - **Staging**: Staging deployment config must not expose secrets, and SPA fallback must support route refreshes.
 - **Production env**: `VITE_*` variables are public browser configuration and must not contain secrets.
+- **Payment safety**: The frontend must not directly handle card numbers or payment secrets. Real payment collection should use backend-created hosted checkout sessions; pre-backend demos must use explicit virtual/mock checkout flows.
 - **Production database**: SQLite remains local/demo/test infrastructure only; production persistence must stay behind backend APIs and should use a backend-managed production database plan.
 - **Telemetry privacy**: Monitoring, analytics, logging, feedback, and support payloads must not include passwords, tokens, file contents, or full private chat content by default.
 - **Pilot size**: Phase 9 targets a controlled pilot group, roughly 5-10 students, 3-5 parents, 1-3 tutors, and 1-2 weeks of testing.
+- **Commercial validation**: Phase 10 can test pricing and billing intent through visible CTAs, billing interest capture, and virtual checkout completion before real payment collection is enabled.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
@@ -168,6 +178,9 @@ Current codebase facts:
 | Keep monitoring and analytics vendor-neutral behind service wrappers | Lets the team use Sentry, Highlight, LogRocket, PostHog, or backend endpoints later without rewriting product UI | ✓ Good |
 | Treat SQLite as non-production infrastructure | Protects pilot data planning from relying on a local functional-test database | ✓ Good |
 | Prepare pricing and billing as placeholders only | Supports commercial validation without adding payment complexity before pilot evidence exists | ✓ Good |
+| Use Stripe Checkout as the preferred payment-provider direction for Phase 10 planning | Hosted checkout minimizes frontend PCI exposure and fits subscription validation, while the backend owns session creation and webhooks | — Pending |
+| Add a virtual checkout mode before real backend payment rollout | Lets frontend developers demo and test the complete pricing-to-billing path without handling real payment data or depending on production Stripe/backend readiness | — Pending |
+| Keep subscription gating advisory in the frontend | Frontend can show locked states and upgrade prompts, but backend APIs must enforce quota and access rules | — Pending |
 
 ## Evolution
 
@@ -187,4 +200,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.8 implementation and verification*
+*Last updated: 2026-05-25 for v1.9 Phase 10 milestone initialization*

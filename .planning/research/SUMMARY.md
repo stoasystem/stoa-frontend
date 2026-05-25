@@ -1,32 +1,45 @@
-# Research Summary: STOA Frontend v1.8 Phase 9
+# Research Summary: v1.9 Phase 10
 
 ## Stack Additions
 
-- Vendor-neutral monitoring wrapper using `POST /monitoring/frontend-errors`, with optional Sentry integration later.
-- Environment-aware logger service.
-- Real analytics event delivery to `POST /analytics/events`.
-- Support and admin service boundaries for pilot operations.
-- Production/pilot documentation for env vars, deployment, backup/restore, privacy, support, and launch.
+- Continue existing React, TypeScript, Vite, TanStack Query, Axios/httpClient, and role-route architecture.
+- Add billing services/hooks and subscription UI without adding direct card handling.
+- Prefer Stripe Checkout for real payment provider direction because it supports hosted subscription checkout and keeps payment details outside the STOA frontend.
+- Add explicit virtual checkout mode so the frontend can demo and test pricing-to-billing flows before the real backend payment integration exists.
 
 ## Feature Table Stakes
 
-- Production deployment and environment variable plan.
-- SQLite-to-production database boundary and pilot API contract freeze.
-- Error monitoring and privacy-safe logging.
-- Analytics delivery that avoids full chat/file content.
-- Pilot onboarding, support entry, and basic admin usage/feedback routes.
-- Privacy/terms pilot drafts, backup/restore docs, pricing/billing placeholders, launch checklist, and feedback report template.
+- Pilot feedback review and P0/P1 launch blocker tracking.
+- Student, Parent, and Tutor UX iteration based on pilot evidence.
+- Pricing page with clear tiers and conversion CTAs.
+- Billing page with subscription summary, status badge, upgrade path, and support path.
+- Billing API contract for checkout session and subscription status.
+- Feature flags for payment, mock checkout, registration, teacher help, and parent reports.
+- Parent conversion funnel and analytics events.
+- Admin usage, feedback, help requests, support, billing interest, users, and system route shells.
+- Tutor operations metrics and required resolution notes.
+- Launch-ready privacy/terms, release process, rollback plan, post-launch monitoring, launch checklist, README, E2E, and manual QA.
+
+## Key Architectural Decision
+
+Real payment flow:
+
+Frontend selects plan -> backend creates checkout session -> frontend redirects to hosted checkout -> backend receives webhook -> frontend reads subscription status.
+
+Demo payment flow:
+
+Frontend selects plan -> virtual checkout route -> demo success/cancel route -> subscription/status UI can be verified without real backend payment infrastructure.
 
 ## Watch Out For
 
-- `VITE_` variables are public browser configuration, not secrets.
-- Monitoring tools can collect contextual data; keep PII disabled unless policy and backend support are ready.
-- Backup strategy is a backend responsibility, but frontend restore checks must be documented.
-- Do not expand Phase 9 into full public launch, payment, CRM, school onboarding, or full compliance certification.
+- Never treat frontend success redirects as authoritative subscription proof.
+- Never collect real card details in the frontend.
+- Keep real access enforcement in backend APIs.
+- Keep payment feature flags and docs synchronized.
+- Preserve launch scope: no full CRM, accounting, coupon system, payroll, school multi-tenant platform, or growth campaign platform in Phase 10.
 
-## Sources
+## Source Notes
 
-- Vite Env Variables and Modes: https://vite.dev/guide/env-and-mode/
-- Vercel Vite framework docs: https://vercel.com/docs/frameworks/frontend/vite
-- Sentry JavaScript data collection docs: https://docs.sentry.io/platforms/javascript/guides/remix/data-management/data-collected
-- PostgreSQL continuous archiving and PITR docs: https://www.postgresql.org/docs/17/continuous-archiving.html
+- Stripe Checkout Sessions support subscription mode for recurring billing: https://docs.stripe.com/api/checkout/sessions/create
+- Stripe Checkout uses hosted payment pages reached through a checkout session URL: https://docs.stripe.com/payments/checkout/how-checkout-works
+- Stripe test cards support fake successful and failed card scenarios for integration testing: https://docs.stripe.com/testing

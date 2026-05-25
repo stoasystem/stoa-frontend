@@ -1,61 +1,90 @@
-# Project Research - Architecture for v1.8 Phase 9
+# Research: Architecture Integration for v1.9 Phase 10
 
 ## Existing Architecture Fit
 
-Phase 9 should preserve the current architecture:
+Phase 10 should extend existing patterns:
 
-```text
-React/Vite frontend
-  -> STOA HTTP API
-  -> backend services
-  -> production database or pilot backend database
-```
+- Routes live under `src/pages/**` and are wired through `src/app/router/AppRouter.tsx`.
+- Server API calls live under `src/services/**`.
+- Query and mutation wrappers live under `src/hooks/**`.
+- Shared UI cards and controls live under `src/components/**`.
+- Environment flags are centralized in `src/lib/env.ts`.
+- Role protection uses existing protected/role route components.
 
-The frontend must not depend on whether the backend uses SQLite, PostgreSQL, Supabase, Neon, RDS, or another store.
+## Billing Data Flow
 
-## New Integration Points
+Real payment path:
 
-- App bootstrap/env utilities read `VITE_APP_ENV`, `VITE_ENABLE_ANALYTICS`, `VITE_ENABLE_FEEDBACK`, `VITE_ENABLE_ERROR_MONITORING`, and `VITE_ENABLE_DEMO_SHORTCUTS`.
-- `AppErrorBoundary` reports sanitized runtime errors through monitoring service.
-- Analytics client sends event payloads through the existing HTTP client boundary.
-- Support request form sends typed support requests through a support service.
-- Admin usage/feedback pages read from admin service hooks, with placeholder states until backend APIs exist.
+1. User selects a plan from `/pricing` or `/billing`.
+2. Frontend calls `POST /billing/checkout-session` with `{ plan }`.
+3. Backend creates a hosted checkout session.
+4. Frontend redirects to `checkoutUrl`.
+5. Payment provider handles card/payment details.
+6. Backend receives payment webhooks and stores subscription status.
+7. Frontend reads subscription through `GET /billing/subscription`.
 
-## Data Flow
+Virtual demo path:
 
-### Error Monitoring
+1. User selects a plan while mock checkout is enabled.
+2. Frontend navigates to `/billing/checkout/demo?plan=...`.
+3. Demo checkout displays plan, trial/payment copy, and test-only controls.
+4. User completes or cancels the demo.
+5. Success/cancel pages show expected post-checkout UI.
+6. E2E tests assert the complete frontend flow without a payment backend.
 
-```text
-Runtime error
-  -> AppErrorBoundary
-  -> sanitize payload
-  -> reportFrontendError()
-  -> POST /monitoring/frontend-errors
-```
+## Subscription Gating
 
-### Analytics
+Frontend responsibilities:
 
-```text
-Product action
-  -> trackEvent(name, allowedPayload)
-  -> analyticsClient
-  -> POST /analytics/events
-```
+- Show current plan and status.
+- Show locked states and upgrade prompts.
+- Hide or disable unavailable actions when feature flags say so.
+- Track conversion events.
 
-### Support
+Backend responsibilities:
 
-```text
-Pilot user submits support request
-  -> SupportRequestForm
-  -> useSubmitSupportRequestMutation
-  -> submitSupportRequest()
-  -> POST /support/requests or feedback-compatible backend path
-```
+- Enforce message quotas.
+- Enforce upload quotas.
+- Enforce teacher-help quotas.
+- Enforce parent-report access.
+- Persist subscription status.
 
-## Build Order
+## Admin Architecture
 
-1. Production/pilot documentation and environment contracts.
-2. Monitoring/logging/analytics service foundations.
-3. Onboarding/support/admin route surfaces.
-4. Privacy/terms/pricing/billing placeholder upgrades.
-5. README and launch checklist verification.
+Minimum Phase 10 admin routes:
+
+- `/admin/usage`
+- `/admin/feedback`
+- `/admin/help-requests`
+
+Additional shells:
+
+- `/admin/users`
+- `/admin/support`
+- `/admin/billing-interest`
+- `/admin/system`
+
+Each route should use typed service contracts and clear backend-pending placeholders where the backend is not ready.
+
+## Tutor Architecture
+
+Tutor operations should extend existing tutor services and pages:
+
+- Help request list with priority/status clarity.
+- Request detail with conversation context and student question emphasis.
+- Required resolution note validation.
+- Tutor stats query for pending/resolved/average response time.
+
+## Documentation Architecture
+
+Add or update:
+
+- `docs/pilot/pilot-review.md`
+- `docs/pricing/pricing-validation.md`
+- `docs/pricing/subscription-model.md`
+- `docs/launch/launch-checklist.md`
+- `docs/launch/release-process.md`
+- `docs/launch/rollback-plan.md`
+- `docs/launch/post-launch-monitoring.md`
+
+Keep production database, payment webhooks, and true subscription enforcement documented as backend-owned boundaries.
