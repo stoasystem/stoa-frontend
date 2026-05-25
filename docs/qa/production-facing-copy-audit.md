@@ -77,16 +77,34 @@ rg -n "demo|Demo|mock|Mock|test account|Test account|sample|Sample|staging|devel
 
 | Route | Page | Issue found | Fix applied | Approved |
 |---|---|---|---|---|
-| `/` | Homepage | Locale copy contains some demo-ready wording in non-English files. | Pending Phase 105 | No |
-| `/login` | Login | Demo account UI exists for local shortcuts. | Pending Phase 104 | No |
-| `/register` | Register/onboarding | Role setup copy must avoid demo onboarding/admin-account language. | Pending Phase 105 | No |
-| `/chat` | Chat | Provider/mock terminology must stay backend/internal. | Pending Phase 105 | No |
-| `/parent/children/:childId/report` | Parent report | Sample/demo labels must not render. | Pending Phase 105 | No |
-| `/tutor` | Tutor dashboard | Raw request statuses must use safe labels. | Pending Phase 105 | No |
-| `/pricing` | Pricing | Virtual/mock checkout copy must be product-safe. | Pending Phase 105 | No |
-| `/billing` | Billing | Demo/mock checkout strings visible in locale copy. | Pending Phase 105 | No |
-| `/support` | Support | Support copy and errors need user-facing state audit. | Pending Phase 106 | No |
-| `/admin` | Admin | Admin operational demo labels need gating or product wording. | Pending Phase 104/105 | No |
+| `/` | Homepage | Locale copy contained demo-ready wording. | Rewritten as product-facing trust copy. | Yes |
+| `/login` | Login | Local account shortcuts could appear in normal mode. | Gated by `showDemoAccounts`; shortcut label no longer says demo account. | Yes |
+| `/register` | Register/onboarding | Role setup copy mentioned onboarding path and admin-account rules. | Rewritten as account setup and role-specific product copy. | Yes |
+| `/chat` | Chat | Provider/mock terminology must stay backend/internal. | User-facing copy and errors use Learning Assistant and sanitized messages. | Yes |
+| `/parent/children/:childId/report` | Parent report | Sample/demo labels must not render. | Parent report copy remains supportive and product-facing. | Yes |
+| `/tutor` | Tutor dashboard | Raw request statuses could render. | Teacher-help statuses render through `SafeStatusLabel`. | Yes |
+| `/pricing` | Pricing | Virtual/mock checkout copy needed product-safe wording. | Rewritten as plan selection/contact wording. | Yes |
+| `/billing` | Billing | Demo/mock checkout strings visible in locale copy. | Rewritten as plan-selection wording; preview gated by environment. | Yes |
+| `/support` | Support | Support copy and errors needed user-facing state audit. | Ticket copy, empty states, and errors are product-facing. | Yes |
+| `/admin` | Admin | Admin operational demo labels needed gating or product wording. | Admin copy cleaned; advanced/demo routes gated. | Yes |
+
+## Final Phase 18 Evidence
+
+Commands run:
+
+```bash
+npm run build
+npm run dev -- --host 127.0.0.1
+rg -n "demo|Demo|mock|Mock|test account|Test account|sample|Sample|Codex|fake|Fake|placeholder|Placeholder|development|virtual checkout|Virtual checkout|not created publicly" src/i18n/locales src/pages src/components
+rg -n "status\\.replace|>\\{[^\\n}]*\\.status\\}|ticket\\.status|request\\.status|record\\.status|item\\.status|node\\.status|attachment\\.status" src/components src/pages
+```
+
+Result:
+
+- `npm run build` passed.
+- `npm run dev -- --host 127.0.0.1` started successfully after sandbox escalation and showed `http://127.0.0.1:5173/`.
+- Remaining prohibited-term source hits are internal key names, HTML placeholder attributes, internal imports, gated internal debug UI, and internal analytics identifiers rather than normal-mode rendered copy.
+- Remaining raw-status scan hits are comparisons/filtering or `SafeStatusLabel` call sites rather than direct user-visible raw labels.
 
 ## Completion Criteria
 

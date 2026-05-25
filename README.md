@@ -9,6 +9,65 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 18 Production-Facing Cleanup and Stability Hardening
+
+Phase 18 removes development, demo, mock, test, and Codex-related artifacts from normal user-facing UI while preserving explicitly gated local/demo workflows for development and QA.
+
+Main goals:
+
+- Remove demo/test/mock wording from normal user-facing pages.
+- Remove provider/model/Codex traces from UI.
+- Hide local account shortcuts from normal login/register paths unless explicit non-production flags enable them.
+- Replace internal status values with user-friendly labels.
+- Add environment guards for demo-only UI.
+- Improve loading, empty, error, and success states.
+- Prevent duplicate submissions in core flows.
+- Keep local demo backend mechanics internal and documented, not visible to normal users.
+
+Environment guard flags:
+
+```bash
+VITE_SHOW_DEMO_ACCOUNTS=false
+VITE_SHOW_DEMO_BADGES=false
+VITE_SHOW_DEMO_SURFACES=false
+VITE_SHOW_INTERNAL_DEBUG=false
+```
+
+Important rule:
+
+Demo backend and fallback data may still exist internally, but normal users should never see development language.
+
+Bad:
+
+- Demo onboarding path
+- Mock checkout
+- Codex response
+- Test account
+- Admin accounts are not created publicly
+
+Good:
+
+- Account setup
+- Choose a plan
+- Preparing your explanation
+- Sign in to continue
+- This page is not available for your account
+
+Phase 18 docs:
+
+- `docs/qa/production-facing-copy-audit.md`
+- `docs/qa/demo-artifact-removal-checklist.md`
+- `docs/qa/stability-hardening-checklist.md`
+
+Verification:
+
+```bash
+npm run build
+npm run dev -- --host 127.0.0.1
+rg -n "demo|Demo|mock|Mock|test account|Test account|sample|Sample|Codex|fake|Fake|placeholder|Placeholder|development|virtual checkout|Virtual checkout|not created publicly" src/i18n/locales src/pages src/components
+rg -n "status\\.replace|ticket\\.status|request\\.status|record\\.status|item\\.status|node\\.status|attachment\\.status" src/components src/pages
+```
+
 ## Phase 16 Multilingual Language Optimization
 
 Phase 16 adds STOA's first multilingual language system for the Swiss market and replaces user-facing technology-heavy wording with calmer education language.

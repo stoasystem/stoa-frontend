@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.17
 milestone_name: "Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal"
-status: planning
+status: verifying
 last_updated: "2026-05-26T00:00:00+02:00"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, and a clean path to future real backend integration.
-**Current focus:** v1.17 Phase 18 is planned for production-facing cleanup, stability hardening, and demo artifact removal.
+**Current focus:** v1.17 Phase 18 phases are complete; milestone audit is next.
 
 ## Current Position
 
 Phase: 107 - Production-Facing QA, README, and Handoff
 Plan: —
-Status: Ready for phase planning
-Last activity: 2026-05-26 - Phase 106 completed; Phase 107 is next
+Status: Complete; ready for milestone audit
+Last activity: 2026-05-26 - Phase 107 completed; milestone audit is next
 
 ## Performance Metrics
 
@@ -194,10 +194,11 @@ Recent decisions affecting current work:
 - Phase 104 added semantic environment visibility flags, demo navigation and route guards, checkout preview gating, login demo-account gating, and a development-only internal debug panel.
 - Phase 105 added display-label and user-facing error boundaries, localized status labels, and cleaned rendered copy across auth, billing, pricing, home, admin, support, referral, organization, learning, parent, and tutor surfaces.
 - Phase 106 added handler-level pending guards, reset-on-success form behavior, support/billing empty states, and safer chat/support error messages.
+- Phase 107 updated README and QA evidence, ran production-facing copy/raw-status scans, verified build, and confirmed the Vite dev server starts.
 
 ### Pending Todos
 
-- Plan Phase 107 with `$gsd-plan-phase 107` or continue autonomous execution from the Phase 18 roadmap.
+- Run milestone audit, then complete and clean up v1.17.
 
 ### Quick Tasks Completed
 

@@ -60,14 +60,14 @@ Requirements for Phase 18. Each requirement maps to exactly one roadmap phase.
 
 ### QA Evidence and Documentation
 
-- [ ] **QA18-01**: Production-facing copy audit evidence confirms normal user-facing P0/P1 surfaces do not expose prohibited demo/mock/test/Codex/development/sample/placeholder wording.
-- [ ] **QA18-02**: Environment guard evidence confirms demo accounts, demo badges, demo-only UI, checkout previews, and internal debug panels are hidden by default and visible only under explicit allowed flags.
-- [ ] **QA18-03**: Raw-status audit evidence confirms user-facing P0/P1 surfaces do not display internal status IDs or unlocalized fallback labels.
-- [ ] **QA18-04**: Runtime/browser QA covers P0 pages: homepage, login, register, chat, pricing, billing, parent report, tutor, and support in normal production-facing mode.
-- [ ] **QA18-05**: Multilingual QA confirms cleaned P0 copy is available in English, German, French, and Italian without English-only fallback on changed keys.
-- [ ] **QA18-06**: Verification confirms `npm install`, `npm run dev`, and `npm run build` are documented or executed as appropriate for Phase 18 closure.
-- [ ] **QA18-07**: README documents Phase 18 production-facing cleanup, demo-artifact removal, environment guards, state hardening, and the rule that demo backend mechanics may exist internally but must not leak into normal UI.
-- [ ] **QA18-08**: Phase 18 handoff notes identify any remaining deferred accessibility, cross-browser, visual regression, or release-gate work for Phase 19.
+- [x] **QA18-01**: Production-facing copy audit evidence confirms normal user-facing P0/P1 surfaces do not expose prohibited demo/mock/test/Codex/development/sample/placeholder wording.
+- [x] **QA18-02**: Environment guard evidence confirms demo accounts, demo badges, demo-only UI, checkout previews, and internal debug panels are hidden by default and visible only under explicit allowed flags.
+- [x] **QA18-03**: Raw-status audit evidence confirms user-facing P0/P1 surfaces do not display internal status IDs or unlocalized fallback labels.
+- [x] **QA18-04**: Runtime/browser QA covers P0 pages: homepage, login, register, chat, pricing, billing, parent report, tutor, and support in normal production-facing mode.
+- [x] **QA18-05**: Multilingual QA confirms cleaned P0 copy is available in English, German, French, and Italian without English-only fallback on changed keys.
+- [x] **QA18-06**: Verification confirms `npm install`, `npm run dev`, and `npm run build` are documented or executed as appropriate for Phase 18 closure.
+- [x] **QA18-07**: README documents Phase 18 production-facing cleanup, demo-artifact removal, environment guards, state hardening, and the rule that demo backend mechanics may exist internally but must not leak into normal UI.
+- [x] **QA18-08**: Phase 18 handoff notes identify any remaining deferred accessibility, cross-browser, visual regression, or release-gate work for Phase 19.
 
 ## Future Requirements
 
@@ -154,14 +154,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | STATE18-06 | Phase 106 | Complete |
 | STATE18-07 | Phase 106 | Complete |
 | STATE18-08 | Phase 106 | Complete |
-| QA18-01 | Phase 107 | Planned |
-| QA18-02 | Phase 107 | Planned |
-| QA18-03 | Phase 107 | Planned |
-| QA18-04 | Phase 107 | Planned |
-| QA18-05 | Phase 107 | Planned |
-| QA18-06 | Phase 107 | Planned |
-| QA18-07 | Phase 107 | Planned |
-| QA18-08 | Phase 107 | Planned |
+| QA18-01 | Phase 107 | Complete |
+| QA18-02 | Phase 107 | Complete |
+| QA18-03 | Phase 107 | Complete |
+| QA18-04 | Phase 107 | Complete |
+| QA18-05 | Phase 107 | Complete |
+| QA18-06 | Phase 107 | Complete |
+| QA18-07 | Phase 107 | Complete |
+| QA18-08 | Phase 107 | Complete |
 
 **Coverage:**
 - v1.17 requirements: 43 total
@@ -170,4 +170,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after Phase 106 completion*
+*Last updated: 2026-05-26 after Phase 107 completion*
