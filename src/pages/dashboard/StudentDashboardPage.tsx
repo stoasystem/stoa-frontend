@@ -1,7 +1,9 @@
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
+import { ContinueLearningCard } from '@/components/dashboard/ContinueLearningCard'
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
+import { NextActionCard } from '@/components/dashboard/NextActionCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
 import { TeacherFeedbackCard } from '@/components/dashboard/TeacherFeedbackCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
@@ -27,6 +29,11 @@ export function StudentDashboardPage() {
           {dashboardStats.map((stat) => (
             <DashboardStatCard key={stat.label} stat={stat} />
           ))}
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <NextActionCard />
+          <ContinueLearningCard />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">

@@ -11,6 +11,9 @@ export type RegisterRequest = {
   email: string
   password: string
   role: UserRole
+  acceptedTerms?: true
+  termsVersion?: string
+  acceptedAt?: string
 }
 
 export async function login(payload: LoginRequest) {

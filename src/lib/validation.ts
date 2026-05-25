@@ -12,6 +12,9 @@ export const registerSchema = z.object({
   email: z.string().email('Enter a valid email address.'),
   password: z.string().min(8, 'Password must be at least 8 characters.'),
   role: userRoleSchema,
+  acceptedTerms: z.literal(true, {
+    message: 'Accept the privacy policy and terms to continue.',
+  }),
 })
 
 export const studentProfileSchema = z.object({

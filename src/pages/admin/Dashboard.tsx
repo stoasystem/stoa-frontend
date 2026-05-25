@@ -54,6 +54,16 @@ export function AdminDashboardPage() {
             description="Review the feedback list contract and any returned pilot feedback items without adding full support workflow controls."
             to="/admin/feedback"
           />
+          <AdminOperationCard
+            title="Help requests"
+            description="Monitor teacher-help request volume and launch-time service status."
+            to="/admin/help-requests"
+          />
+          <AdminOperationCard
+            title="Billing interest"
+            description="Review plan interest before real payment collection is enabled."
+            to="/admin/billing-interest"
+          />
         </div>
       </PageContainer>
     </DashboardLayout>

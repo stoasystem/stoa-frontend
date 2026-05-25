@@ -12,7 +12,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Current Milestone: v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch
 
-**Goal:** Upgrade STOA from a controlled pilot launch frontend into a launch-ready early commercial product frontend that can demonstrate and test pricing, billing intent, subscription state, parent conversion, tutor operations, and admin operations before real payment/backend rollout.
+**Goal:** Completed. STOA has been upgraded from a controlled pilot launch frontend into a launch-ready early commercial product frontend that can demonstrate and test pricing, billing intent, subscription state, parent conversion, tutor operations, and admin operations before real payment/backend rollout.
 
 **Target features:**
 - Pilot feedback review, analytics review, support record review, and critical bug prioritization.
@@ -68,13 +68,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Pilot feedback, analytics, support records, bug reports, tutor notes, parent/student interviews, error reports, QA notes, and E2E failures need to be consolidated into launch priorities.
-- Critical P0/P1 bugs must be fixed or given explicit workarounds before production launch.
-- Student, Parent, and Tutor core paths need pilot-informed UX iteration.
-- Pricing must move from placeholder to a real validation page with clear tiers and conversion CTAs.
-- Billing and subscription UI must be demonstrable without a real payment backend, while remaining compatible with a future Stripe Checkout backend contract.
-- Admin and tutor operations must support early real-user operations.
-- Privacy policy, terms, release process, rollback plan, post-launch monitoring, launch checklist, and README must be launch-ready.
+(None currently — v1.9 is complete. Start the next milestone for Phase 11 scope.)
 
 ### Out of Scope
 

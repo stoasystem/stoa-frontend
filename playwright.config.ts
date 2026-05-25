@@ -15,8 +15,12 @@ export default defineConfig({
   },
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1',
+    env: {
+      VITE_ENABLE_MOCK_CHECKOUT: 'true',
+      VITE_ENABLE_PAYMENT: 'false',
+    },
     url: 'http://127.0.0.1:5173',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     stdout: 'ignore',
     stderr: 'pipe',
   },

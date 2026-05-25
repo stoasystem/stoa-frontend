@@ -32,8 +32,14 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
                   </p>
                 )}
                 <time className="mt-2 block text-xs text-muted-foreground">
-                  {new Date(request.createdAt).toLocaleString()}
+                  Opened {new Date(request.createdAt).toLocaleString()}
                 </time>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  First tutor action:{' '}
+                  {request.firstTutorActionAt
+                    ? new Date(request.firstTutorActionAt).toLocaleString()
+                    : 'not recorded'}
+                </p>
               </div>
               <HelpRequestStatusBadge status={request.status} />
             </CardContent>

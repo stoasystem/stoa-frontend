@@ -1,80 +1,98 @@
-import { CreditCard, FileText, ShieldCheck } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import { BillingSummaryCard } from '@/components/billing/BillingSummaryCard'
+import { PlanCard } from '@/components/billing/PlanCard'
+import { UpgradeButton } from '@/components/billing/UpgradeButton'
+import { pricingPlans } from '@/components/pricing/pricingPlans'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
+import { enableMockCheckout, enablePayment } from '@/lib/env'
+import { DashboardLayout } from '@/layouts/DashboardLayout'
+import type { SubscriptionPlan } from '@/types/user'
 
-const billingItems = [
-  {
-    title: 'Subscription status',
-    description: 'Pilot access is available without a paid subscription requirement.',
-    icon: ShieldCheck,
-  },
-  {
-    title: 'Payment method',
-    description: 'No payment method is collected or stored by the frontend in this phase.',
-    icon: CreditCard,
-  },
-  {
-    title: 'Invoices and receipts',
-    description: 'Invoice history will remain empty until a production billing provider is enabled.',
-    icon: FileText,
-  },
-]
+function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
+  return ['free_trial', 'student', 'family', 'tutor_supported'].includes(plan ?? '')
+}
 
 export function BillingPage() {
+  const [searchParams] = useSearchParams()
+  const requestedPlan = searchParams.get('plan')
+  const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
+  const subscriptionQuery = useSubscriptionQuery()
+  const subscription = subscriptionQuery.data ?? {
+    plan: 'free_trial' as SubscriptionPlan,
+    status: 'trial' as const,
+    currentPeriodEnd: '2026-06-30T00:00:00Z',
+  }
+  const plan = useMemo(
+    () => pricingPlans.find((item) => item.id === selectedPlan) ?? pricingPlans[2],
+    [selectedPlan],
+  )
+
   return (
-    <PageContainer>
-      <PageHeader
-        title="Billing"
-        description="Billing preparation placeholder. Payments, invoices, and subscription enforcement are not active."
-      />
+    <DashboardLayout>
+      <PageContainer className="p-0">
+        <PageHeader
+          eyebrow="Billing"
+          title="Subscription"
+          description="Review launch-ready subscription state and start a hosted or virtual checkout flow."
+          actions={<Badge variant="secondary">{enablePayment ? 'Payment enabled' : 'Payment disabled'}</Badge>}
+        />
 
-      <section className="rounded-lg border bg-card p-6">
-        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
-          <Badge variant="secondary">Pilot access</Badge>
-          <span>Current state: billing not configured.</span>
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <BillingSummaryCard
+            plan={subscription.plan}
+            status={subscription.status}
+            currentPeriodEnd={subscription.currentPeriodEnd}
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Checkout mode</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>
+                {enablePayment
+                  ? 'Payment is enabled. The frontend will request a backend checkout session.'
+                  : 'Payment is disabled. Use this page to capture interest and validate content.'}
+              </p>
+              <p>
+                {enableMockCheckout
+                  ? 'Mock checkout is enabled, so plan selection opens a virtual checkout for demos and tests.'
+                  : 'Mock checkout is disabled. Real checkout requires a backend checkoutUrl response.'}
+              </p>
+              <div className="flex flex-wrap gap-3 pt-2">
+                <UpgradeButton plan={selectedPlan}>Start checkout</UpgradeButton>
+                <Button asChild variant="outline">
+                  <Link to="/support">Contact support</Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      </section>
 
-      <section className="grid gap-6 md:grid-cols-3">
-        {billingItems.map((item) => {
-          const Icon = item.icon
-
-          return (
-            <Card key={item.title}>
-              <CardHeader>
-                <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <CardTitle className="text-xl">{item.title}</CardTitle>
-              </CardHeader>
-              <CardContent className="text-sm leading-6 text-muted-foreground">
-                {item.description}
-              </CardContent>
-            </Card>
-          )
-        })}
-      </section>
-
-      <section className="rounded-lg border bg-card p-6 text-sm leading-6 text-muted-foreground">
-        <h2 className="text-lg font-semibold text-foreground">Before Billing Goes Live</h2>
-        <p className="mt-2">
-          STOA should select a payment provider, define plan entitlements, document cancellation
-          and refund rules, add server-side subscription verification, and complete privacy and
-          terms updates before enforcing paid access.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Button asChild>
-            <Link to="/pricing">View pricing</Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to="/privacy">Privacy notice</Link>
-          </Button>
-        </div>
-      </section>
-    </PageContainer>
+        <section className="grid gap-6 lg:grid-cols-[22rem_1fr]">
+          <PlanCard plan={plan} featured onSelect={() => undefined} />
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Subscription rules</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+              <p>
+                Frontend locked states and upgrade prompts are advisory. Backend APIs must enforce
+                AI message quota, upload quota, teacher-help quota, and parent-report access.
+              </p>
+              <p>
+                Stripe Checkout is the preferred real payment direction. The browser never receives
+                card details or payment secrets.
+              </p>
+            </CardContent>
+          </Card>
+        </section>
+      </PageContainer>
+    </DashboardLayout>
   )
 }

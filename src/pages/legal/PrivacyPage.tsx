@@ -1,98 +1,50 @@
-import { Link } from 'react-router-dom'
-import { Badge } from '@/components/ui/badge'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const privacySections = [
+const sections = [
   {
-    title: 'What STOA Collects During The Pilot',
-    items: [
-      'Account details such as name, email address, role, and linked parent or student relationships.',
-      'Learning activity such as questions, answers, conversation history, tutor help requests, feedback, and progress summaries.',
-      'Uploaded learning materials when a tester chooses to attach a file or image to a learning request.',
-      'Technical records needed to keep the service working, including authentication events, API errors, and basic security logs.',
-    ],
+    title: 'Data we collect',
+    body: 'STOA may collect account data, role, contact details, student learning activity, questions, uploaded homework metadata, support requests, feedback, analytics events, and frontend error reports.',
   },
   {
-    title: 'How STOA Uses Pilot Data',
-    items: [
-      'To provide AI learning support, route requests to tutors when help is needed, and show parent-facing learning summaries.',
-      'To operate staging and pilot environments, diagnose product issues, improve reliability, and respond to tester feedback.',
-      'To prepare aggregated product insights. Pilot reporting should avoid identifying a student unless the viewer is authorized for that student.',
-    ],
+    title: 'Student learning data',
+    body: 'Learning data can include recent questions, conversation metadata, weak topics, teacher-help requests, report summaries, and progress signals used to support the student and inform parents.',
   },
   {
-    title: 'Sharing And Access',
-    items: [
-      'Parents may see learning summaries and reports for students linked to their account.',
-      'Tutors and authorized STOA operators may review learning requests when needed to provide help, investigate issues, or protect the service.',
-      'STOA does not sell pilot learning data. Third-party processors may be used for hosting, authentication, storage, and AI support under vendor terms.',
-    ],
+    title: 'Parent and tutor visibility',
+    body: 'Parents can see child learning summaries, reports, weak topics, and teacher involvement. Tutors can see the student context needed to answer a help request, including the relevant question and AI answer.',
   },
   {
-    title: 'Retention, Deletion, And Restore Expectations',
-    items: [
-      'Pilot accounts, demo data, and staging data may be reset as part of testing or incident recovery.',
-      'Production retention schedules are not final. Before production launch, STOA should define deletion timelines for account, learning, upload, and backup records.',
-      'Backups are used for continuity and restore testing. A deletion request may not immediately remove records from immutable or point-in-time backups.',
-    ],
+    title: 'Use, retention, and deletion',
+    body: 'Data is used to operate STOA, improve learning support, provide reports, handle support, monitor reliability, and prepare launch operations. Retention and deletion requests should be sent through support until self-service controls exist.',
+  },
+  {
+    title: 'AI and third parties',
+    body: 'AI providers, hosting, analytics, monitoring, and payment providers may process limited data under backend-controlled contracts. Browser configuration must not contain secrets or payment credentials.',
   },
 ]
 
 export function PrivacyPage() {
   return (
-    <PageContainer className="max-w-4xl">
+    <PageContainer>
       <PageHeader
-        title="Privacy Notice"
-        description="Pilot draft for STOA staging and early learning trials. This is not final production legal advice."
+        eyebrow="Launch draft"
+        title="Privacy Policy"
+        description="Launch-ready frontend draft for STOA data handling. Final legal review remains required before broad public launch."
       />
-      <section className="space-y-6 rounded-lg border bg-card p-6 text-sm leading-6 text-muted-foreground">
-        <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="secondary">Pilot draft</Badge>
-          <span>Last reviewed: Phase 46</span>
-        </div>
-        <p>
-          STOA is an early-stage learning platform that helps students ask learning questions,
-          receive AI-assisted support, request tutor backup, and share learning progress with
-          authorized parents. This notice explains the current pilot data practices so testers know
-          what to expect before production policies are finalized.
-        </p>
-
-        {privacySections.map((section) => (
-          <section key={section.title} className="space-y-3">
-            <h2 className="text-lg font-semibold text-foreground">{section.title}</h2>
-            <ul className="list-disc space-y-2 pl-5">
-              {section.items.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </section>
+      <div className="space-y-4">
+        {sections.map((section) => (
+          <Card key={section.title}>
+            <CardHeader>
+              <CardTitle className="text-base">{section.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm leading-6 text-muted-foreground">
+              {section.body}
+            </CardContent>
+          </Card>
         ))}
-
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Pilot Tester Guidance</h2>
-          <p>
-            Testers should avoid uploading highly sensitive personal, health, financial, or
-            confidential school records unless STOA has explicitly approved that testing scenario.
-            Parents, students, and tutors should report privacy concerns through the pilot feedback
-            process.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-foreground">Before Production Launch</h2>
-          <p>
-            STOA should complete a legal review, confirm processor agreements, document regional
-            privacy requirements, define data retention periods, and publish contact instructions
-            for access, deletion, correction, and consent questions.
-          </p>
-        </section>
-
-        <Button asChild variant="outline">
-          <Link to="/">Back to STOA</Link>
-        </Button>
-      </section>
+      </div>
     </PageContainer>
   )
 }

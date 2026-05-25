@@ -526,6 +526,67 @@ Phase 9 documents:
 - `docs/pilot/pilot-launch-plan.md`
 - `docs/pilot/pilot-feedback-report-template.md`
 
+## Phase 10 Pilot Iteration, Payment Preparation, and Production Launch
+
+This phase prepares STOA for production launch and early commercial validation.
+
+Main additions:
+
+- Pilot feedback review
+- Critical bug fix sprint
+- Core Student, Parent, and Tutor UX iteration
+- Pricing page upgrade
+- Billing and subscription preparation
+- Stripe Checkout direction with backend-owned session creation
+- Virtual checkout flow for frontend demos and E2E before real backend payment integration
+- Parent conversion funnel
+- Tutor operations improvements
+- Admin operations improvements
+- Privacy and terms launch-ready drafts
+- Production release process, rollback plan, and post-launch monitoring plan
+
+Production feature flags:
+
+```bash
+VITE_ENABLE_PAYMENT=false
+VITE_ENABLE_MOCK_CHECKOUT=false
+VITE_ENABLE_PUBLIC_REGISTER=false
+VITE_ENABLE_TEACHER_HELP=true
+VITE_ENABLE_PARENT_REPORT=true
+```
+
+Local demo checkout flags:
+
+```bash
+VITE_ENABLE_PAYMENT=false
+VITE_ENABLE_MOCK_CHECKOUT=true
+```
+
+Billing API contracts:
+
+- `GET /billing/subscription`
+- `POST /billing/checkout-session`
+
+Recommended launch flow:
+
+1. Review pilot feedback.
+2. Fix P0 and P1 bugs or document workarounds.
+3. Run CI, build, lint, and E2E tests.
+4. Run manual QA including pricing, billing, and virtual checkout.
+5. Confirm monitoring, analytics, support workflow, privacy, and terms.
+6. Deploy production frontend.
+7. Monitor the first 72 hours.
+
+Phase 10 documents:
+
+- `docs/pilot/pilot-review.md`
+- `docs/pricing/pricing-validation.md`
+- `docs/pricing/subscription-model.md`
+- `docs/launch/launch-checklist.md`
+- `docs/launch/release-process.md`
+- `docs/launch/rollback-plan.md`
+- `docs/launch/post-launch-monitoring.md`
+
 ## Environment Variables
 
 Create a local environment file:
@@ -546,15 +607,18 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/login` Login
 - `/register` Register
 - `/privacy` Privacy pilot draft
-- `/terms` Terms pilot draft
-- `/pricing` Pricing placeholder
+- `/terms` Terms launch draft
+- `/pricing` Pricing validation
 - `/onboarding` Pilot onboarding
 - `/support` Pilot support
 - `/dashboard` Student dashboard
 - `/chat` Student chat product UI
 - `/profile` Student profile
 - `/learning-history` Student learning history
-- `/billing` Billing placeholder
+- `/billing` Billing and subscription
+- `/billing/checkout/demo` Virtual checkout
+- `/billing/checkout/success` Virtual checkout success
+- `/billing/checkout/cancel` Virtual checkout cancel
 - `/parent` Parent dashboard
 - `/parent/children/:childId` Child learning summary
 - `/parent/children/:childId/report` Child weekly report
@@ -564,7 +628,12 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/admin` Admin dashboard
 - `/admin/usage` Admin usage summary
 - `/admin/feedback` Admin feedback list
+- `/admin/help-requests` Admin help request list
+- `/admin/users` Admin users contract shell
+- `/admin/support` Admin support contract shell
+- `/admin/billing-interest` Admin billing interest shell
+- `/admin/system` Admin system status shell
 
 ## Project Status
 
-Phase 9: production readiness, monitoring, analytics delivery, onboarding, support, admin operations, privacy review, backup/restore planning, pricing/billing placeholders, and controlled pilot launch preparation.
+Phase 10: pilot iteration, pricing validation, billing preparation, virtual checkout demo flow, launch operations, privacy/terms finalization, and production launch readiness.

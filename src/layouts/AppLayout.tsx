@@ -11,6 +11,7 @@ const roleNavigation = {
     { label: 'Dashboard', to: '/dashboard' },
     { label: 'Chat', to: '/chat' },
     { label: 'Learning History', to: '/learning-history' },
+    { label: 'Billing', to: '/billing' },
     { label: 'Profile', to: '/profile' },
     { label: 'Onboarding', to: '/onboarding' },
     { label: 'Support', to: '/support' },
@@ -18,17 +19,22 @@ const roleNavigation = {
   parent: [
     { label: 'Parent Dashboard', to: '/parent' },
     { label: 'Children', to: '/parent' },
+    { label: 'Billing', to: '/billing' },
     { label: 'Onboarding', to: '/onboarding' },
     { label: 'Support', to: '/support' },
   ],
   tutor: [
     { label: 'Tutor Dashboard', to: '/tutor' },
     { label: 'Help Requests', to: '/tutor' },
+    { label: 'Billing', to: '/billing' },
     { label: 'Onboarding', to: '/onboarding' },
     { label: 'Support', to: '/support' },
   ],
   admin: [
     { label: 'Admin Dashboard', to: '/admin' },
+    { label: 'Usage', to: '/admin/usage' },
+    { label: 'Feedback', to: '/admin/feedback' },
+    { label: 'Help Requests', to: '/admin/help-requests' },
     { label: 'Onboarding', to: '/onboarding' },
     { label: 'Support', to: '/support' },
   ],
@@ -61,6 +67,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <FeedbackButton />
             </div>
           )}
+          <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
+            <Link className="hover:text-foreground" to="/privacy">
+              Privacy
+            </Link>
+            <Link className="hover:text-foreground" to="/terms">
+              Terms
+            </Link>
+          </div>
           <UserMenu />
         </aside>
         <main className="flex-1 p-6">{children}</main>

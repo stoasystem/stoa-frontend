@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch (Implemented: 2026-05-25)
+
+**Phases completed:** 8 phases, 8 plans, 0 tasks
+**Audit:** `.planning/v1.9-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Pilot review documentation and critical bug sprint launch rules.
+- Student dashboard next-action and continue-learning cards.
+- Parent value explanation and upgrade prompt cards on dashboard/report flows.
+- Tutor operations improvements with stats contract, request context clarity, first-action metadata, and required resolution notes.
+- Pricing validation page with four launch plans, feature comparison, conversion analytics, and pricing/subscription docs.
+- Billing service/hooks, subscription UI, feature flags, and virtual checkout success/cancel flow for demos and E2E before real payment backend integration.
+- Admin launch operations routes for help requests and contract shells for users, support, billing interest, and system status.
+- Launch-ready privacy/terms drafts, registration consent, layout legal links, release process, rollback plan, post-launch monitoring, and launch checklist.
+- README, manual QA, and Playwright E2E updates including pricing/billing/virtual checkout coverage.
+
+### Verification
+
+- Requirements: 62/62 implemented.
+- Phases: 8/8 implemented.
+- Build: passed.
+- Lint: passed.
+- Playwright E2E: passed, 6/6 tests.
+- Code review: completed; payment flag blocker fixed.
+- Remaining warning: Vite's existing large chunk warning.
+
+---
+
 ## v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch (Implemented: 2026-05-25)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks

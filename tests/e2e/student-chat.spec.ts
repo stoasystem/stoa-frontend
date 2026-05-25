@@ -10,8 +10,8 @@ test('student can use chat and request teacher help', async ({ page }) => {
     .fill('How do I solve x squared equals 9?')
   await page.getByRole('button', { name: /send message/i }).click()
 
-  await expect(page.getByRole('main').getByText(/x squared equals 9/i)).toBeVisible()
-  await expect(page.getByText(/local backend saved your question/i)).toBeVisible()
+  await expect(page.getByRole('main').getByText(/x squared equals 9/i).first()).toBeVisible()
+  await expect(page.getByText(/local backend saved your question/i).first()).toBeVisible()
 
   await page.getByRole('button', { name: /request teacher/i }).click()
   await expect(page.getByText(/teacher help requested/i)).toBeVisible()

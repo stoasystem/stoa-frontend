@@ -1,74 +1,49 @@
-import { Link } from 'react-router-dom'
-import { Badge } from '@/components/ui/badge'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
-const termSections = [
+const sections = [
   {
-    title: 'Pilot Access',
-    body:
-      'STOA pilot access is provided for evaluation, learning-flow testing, and feedback. The pilot may change, be interrupted, or reset while the product team validates the platform foundation.',
+    title: 'Learning aid',
+    body: 'STOA is a learning support tool. It does not replace school instruction, parent judgment, or professional tutoring decisions.',
   },
   {
-    title: 'Learning Content And AI Output',
-    body:
-      'AI responses and tutor workflows are learning aids, not guarantees of correctness. Students, parents, and tutors should review important answers independently before relying on them for schoolwork or assessment decisions.',
+    title: 'AI answers may be wrong',
+    body: 'AI-generated explanations can be incomplete or incorrect. Important answers should be checked by the student, parent, teacher, or tutor before relying on them.',
   },
   {
-    title: 'User Responsibilities',
-    body:
-      'Users should provide accurate account information, use the service only for lawful learning purposes, avoid uploading confidential or highly sensitive materials during the pilot, and respect linked student and parent access boundaries.',
+    title: 'Acceptable use',
+    body: 'Users must not upload illegal, unsafe, highly sensitive, or unrelated content. Homework uploads should be limited to material needed for learning support.',
   },
   {
-    title: 'Accounts, Resets, And Availability',
-    body:
-      'Pilot accounts and demo records may be reset for testing, support, or incident recovery. STOA is not committing to production uptime, data retention, paid subscription access, or service-level guarantees in this pilot draft.',
+    title: 'Trials and subscriptions',
+    body: 'Pricing and billing screens may be used for pilot and launch validation. A paid obligation begins only when STOA enables an approved payment workflow and presents final commercial terms.',
   },
   {
-    title: 'Pricing And Billing Preparation',
-    body:
-      'Pricing and billing screens may appear in the product for planning purposes. They do not create a payment obligation until STOA publishes final commercial terms and enables an approved payment workflow.',
+    title: 'Service changes',
+    body: 'STOA may change, pause, or terminate access during pilot and launch operations to protect students, data, reliability, and support quality. Contact support for questions or account requests.',
   },
 ]
 
 export function TermsPage() {
   return (
-    <PageContainer className="max-w-4xl">
+    <PageContainer>
       <PageHeader
-        title="Terms Of Use"
-        description="Pilot draft for STOA staging and early user trials. Final production terms require separate legal review."
+        eyebrow="Launch draft"
+        title="Terms"
+        description="Launch-ready frontend draft for STOA usage, AI limits, subscriptions, and acceptable use."
       />
-      <div className="space-y-6 rounded-lg border bg-card p-6 text-sm leading-6 text-muted-foreground">
-        <div className="flex flex-wrap items-center gap-3">
-          <Badge variant="secondary">Pilot draft</Badge>
-          <span>Last reviewed: Phase 46</span>
-        </div>
-        <p>
-          These terms describe expected use of STOA during pilot testing. They are intended to set
-          clear operating expectations for testers and internal reviewers before final production
-          terms are prepared.
-        </p>
-
-        {termSections.map((section) => (
-          <section key={section.title} className="space-y-2">
-            <h2 className="text-lg font-semibold text-foreground">{section.title}</h2>
-            <p>{section.body}</p>
-          </section>
+      <div className="space-y-4">
+        {sections.map((section) => (
+          <Card key={section.title}>
+            <CardHeader>
+              <CardTitle className="text-base">{section.title}</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm leading-6 text-muted-foreground">
+              {section.body}
+            </CardContent>
+          </Card>
         ))}
-
-        <section className="space-y-2">
-          <h2 className="text-lg font-semibold text-foreground">Production Readiness</h2>
-          <p>
-            Before STOA is offered as a production service, the product team should replace this
-            pilot draft with approved legal terms covering eligibility, payment, cancellation,
-            content rights, privacy, support, acceptable use, disclaimers, and dispute handling.
-          </p>
-        </section>
-
-        <Button asChild variant="outline">
-          <Link to="/">Back to STOA</Link>
-        </Button>
       </div>
     </PageContainer>
   )

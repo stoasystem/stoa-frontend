@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -19,6 +19,7 @@ const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 
 export function TutorHelpRequestDetailPage() {
   const { requestId } = useParams()
+  const [resolutionNote, setResolutionNote] = useState('')
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTutorHelpRequestMutation()
   const addNote = useAddTutorHelpRequestNoteMutation()
@@ -40,14 +41,37 @@ export function TutorHelpRequestDetailPage() {
         {requestQuery.data && (
           <div className="space-y-6">
             <HelpRequestDetailCard request={requestQuery.data} />
+            <div className="rounded-lg border p-4">
+              <label className="text-sm font-medium" htmlFor="resolution-note">
+                Resolution note
+              </label>
+              <textarea
+                id="resolution-note"
+                className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                value={resolutionNote}
+                onChange={(event) => setResolutionNote(event.target.value)}
+                placeholder="Required before marking resolved."
+              />
+            </div>
             <div className="flex flex-wrap gap-2">
               {statuses.map((status) => (
                 <Button
                   key={status}
                   type="button"
                   variant="outline"
-                  disabled={updateStatus.isPending || !requestId}
-                  onClick={() => requestId && updateStatus.mutate({ requestId, status })}
+                  disabled={
+                    updateStatus.isPending ||
+                    !requestId ||
+                    (status === 'resolved' && resolutionNote.trim().length === 0)
+                  }
+                  onClick={() =>
+                    requestId &&
+                    updateStatus.mutate({
+                      requestId,
+                      status,
+                      resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
+                    })
+                  }
                 >
                   Mark {status.replace('_', ' ')}
                 </Button>

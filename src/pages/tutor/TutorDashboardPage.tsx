@@ -3,15 +3,18 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { HelpRequestList } from '@/components/tutor/HelpRequestList'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
+import { TutorStatsCards } from '@/components/tutor/TutorStatsCards'
 import {
   TutorRequestFilters,
   type TutorRequestFilter,
 } from '@/components/tutor/TutorRequestFilters'
 import { useTutorHelpRequestsQuery } from '@/hooks/tutor/useTutorHelpRequestsQuery'
+import { useTutorStatsQuery } from '@/hooks/tutor/useTutorStatsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function TutorDashboardPage() {
   const requestsQuery = useTutorHelpRequestsQuery()
+  const statsQuery = useTutorStatsQuery()
   const [filter, setFilter] = useState<TutorRequestFilter>('all')
   const requests = requestsQuery.data?.items ?? []
   const filteredRequests = useMemo(
@@ -30,6 +33,7 @@ export function TutorDashboardPage() {
         {requestsQuery.isError && <p className="text-sm text-destructive">Failed to load requests.</p>}
         {requestsQuery.data && (
           <div className="space-y-4">
+            <TutorStatsCards stats={statsQuery.data} />
             <TutorRequestFilters value={filter} onChange={setFilter} />
             <HelpRequestList requests={filteredRequests} />
           </div>

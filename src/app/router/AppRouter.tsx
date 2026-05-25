@@ -4,8 +4,12 @@ import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
 import { AdminFeedbackPage } from '@/pages/admin/Feedback'
+import { AdminHelpRequestsPage } from '@/pages/admin/HelpRequests'
+import { AdminOperationsPlaceholderPage } from '@/pages/admin/OperationsPlaceholder'
 import { AdminUsagePage } from '@/pages/admin/Usage'
 import { BillingPage } from '@/pages/billing/BillingPage'
+import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
+import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
 import { ForbiddenPage } from '@/pages/error/ForbiddenPage'
@@ -47,6 +51,9 @@ export function AppRouter() {
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/billing" element={<BillingPage />} />
+          <Route path="/billing/checkout/demo" element={<VirtualCheckoutPage />} />
+          <Route path="/billing/checkout/success" element={<CheckoutResultPage status="success" />} />
+          <Route path="/billing/checkout/cancel" element={<CheckoutResultPage status="cancel" />} />
           <Route element={<RoleRoute allowedRoles={['student']} />}>
             <Route path="/dashboard" element={<StudentDashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
@@ -70,6 +77,38 @@ export function AppRouter() {
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/usage" element={<AdminUsagePage />} />
             <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
+            <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
+            <Route
+              path="/admin/users"
+              element={<AdminOperationsPlaceholderPage title="Users" endpoint="GET /admin/users" />}
+            />
+            <Route
+              path="/admin/support"
+              element={
+                <AdminOperationsPlaceholderPage
+                  title="Support requests"
+                  endpoint="GET /admin/support-requests"
+                />
+              }
+            />
+            <Route
+              path="/admin/billing-interest"
+              element={
+                <AdminOperationsPlaceholderPage
+                  title="Billing interest"
+                  endpoint="GET /admin/billing-interest"
+                />
+              }
+            />
+            <Route
+              path="/admin/system"
+              element={
+                <AdminOperationsPlaceholderPage
+                  title="System status"
+                  endpoint="GET /admin/system-status"
+                />
+              }
+            />
           </Route>
         </Route>
         <Route path="*" element={<NotFoundPage />} />

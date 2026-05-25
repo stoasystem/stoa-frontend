@@ -11,6 +11,7 @@ export type TutorHelpRequestSummary = {
   requestMessage?: string
   priority?: 'low' | 'medium' | 'high'
   createdAt: string
+  firstTutorActionAt?: string
 }
 
 export type TutorHelpRequestNote = {
@@ -36,4 +37,11 @@ export type TutorHelpRequestDetail = {
   requestMessage?: string
   messages: ChatMessage[]
   notes?: TutorHelpRequestNote[]
+  firstTutorActionAt?: string
+}
+
+export type TutorStats = {
+  pendingRequests: number
+  resolvedToday: number
+  averageResponseTimeMinutes: number
 }

@@ -1,6 +1,14 @@
 export type UserRole = 'student' | 'parent' | 'tutor' | 'admin'
 
-export type SubscriptionPlan = 'pilot' | 'family' | 'school' | 'enterprise'
+export type SubscriptionStatus = 'trial' | 'active' | 'inactive' | 'expired'
+
+export type SubscriptionPlan =
+  | 'free_trial'
+  | 'student'
+  | 'family'
+  | 'tutor_supported'
+
+export type LegacySubscriptionPlan = 'pilot' | 'school' | 'enterprise'
 
 export type BillingStatus =
   | 'not_configured'
@@ -11,7 +19,7 @@ export type BillingStatus =
   | 'canceled'
 
 export type UserSubscription = {
-  plan: SubscriptionPlan
+  plan: SubscriptionPlan | LegacySubscriptionPlan
   status: BillingStatus
   currentPeriodEndsAt?: string
 }
@@ -21,6 +29,8 @@ export type User = {
   name: string
   email: string
   role: UserRole
+  subscriptionStatus?: SubscriptionStatus
+  plan?: SubscriptionPlan
   subscription?: UserSubscription
 }
 

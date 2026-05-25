@@ -7,6 +7,8 @@ import { ParentReportRecommendations } from '@/components/parent/ParentReportRec
 import { ParentReportStats } from '@/components/parent/ParentReportStats'
 import { ParentReportSubjects } from '@/components/parent/ParentReportSubjects'
 import { ParentReportSummaryCard } from '@/components/parent/ParentReportSummaryCard'
+import { ParentValueCard } from '@/components/parent/ParentValueCard'
+import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Button } from '@/components/ui/button'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -49,6 +51,10 @@ export function ChildReportPage() {
             <ParentReportSummaryCard report={report} />
             <ParentReportStats stats={report.stats} />
             <ParentReportSubjects subjects={report.topSubjects} weakTopics={report.weakTopics} />
+            <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
+              <ParentValueCard />
+              <UpgradePromptCard source="parent_report" />
+            </div>
             <ParentReportRecommendations recommendations={report.recommendations} />
           </div>
         )}

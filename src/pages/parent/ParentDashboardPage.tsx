@@ -2,6 +2,8 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ChildCard } from '@/components/parent/ChildCard'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
+import { ParentValueCard } from '@/components/parent/ParentValueCard'
+import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
@@ -11,11 +13,15 @@ export function ParentDashboardPage() {
 
   return (
     <DashboardLayout>
-      <PageContainer className="p-0">
+      <PageContainer className="space-y-6 p-0">
         <PageHeader
           title="Parent Dashboard"
-          description="Monitor bound student learning summaries and teacher-help activity."
+          description="See whether your child is learning, where they struggle, and when teacher support helps."
         />
+        <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
+          <ParentValueCard />
+          <UpgradePromptCard source="parent_dashboard" />
+        </div>
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-destructive">Failed to load children.</p>}
         {childrenQuery.data && children.length === 0 && (
