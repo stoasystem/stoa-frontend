@@ -2,26 +2,27 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, and platform-level organization/learning-intelligence demos.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, and coherent role-based information architecture.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, and partnership onboarding. The current product step is organizing those accumulated pages into a clear information architecture, role-based navigation model, page-flow system, and demo path so the frontend feels like a coherent product rather than a collection of feature surfaces.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, and demo-flow documentation. The current product step is stabilizing the demo backend and API boundary so the existing frontend surfaces can be demonstrated end to end while remaining easy to replace with a formal backend and AWS services later.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, documented page structure, coherent demo flows, and frontend-only mock/API-contract support.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
 
-## Current Milestone: v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization
+## Current Milestone: v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness
 
-**Goal:** Organize the existing STOA frontend into a clear, role-based, maintainable product structure by documenting all pages/routes, clarifying navigation and user journeys, reducing orphan/duplicate/placeholder exposure, standardizing layout and CTA patterns, and polishing core flows without adding new product modules.
+**Goal:** Stabilize a simple, replaceable demo backend and API contract layer so the existing STOA frontend can run complete demo flows for auth, student chat, teacher help, parent reports, billing, referrals, support, and admin analytics while preparing for future real backend and AWS integration.
 
 **Target features:**
-- Complete frontend information architecture documentation: page inventory, route map, role-based navigation architecture, user journeys, entry/exit audit, orphan audit, and duplicate/overlap audit.
-- Route and navigation configuration for public, student, parent, tutor, admin, organization, and demo/advanced route groups.
-- Unified navigation utility for role-based nav generation, hidden/demo route filtering, and active route detection.
-- Breadcrumbs, BackButton, PageActions, and related helper components for deeper pages and detail flows.
-- Page layout, CTA hierarchy, empty/loading/error/success state, title/description, and mobile navigation guidelines.
-- Targeted app navigation and page-flow cleanup so core student, parent, tutor, admin, organization, billing, support, and demo paths are reachable without manual URLs.
-- Final demo flow documentation, README updates, manual QA updates, and E2E/smoke path updates.
+- Demo backend scope, API contract, data model, reset flow, QA, and integration documentation.
+- Fixed demo accounts for student, parent, tutor, and admin roles with stable token-style auth responses.
+- Lightweight demo backend or mock setup with `/health`, auth, conversations/messages, teacher help, parent, billing, referral, support, and admin endpoints.
+- Demo state reset flow that restores fixed users, conversations, reports, help requests, billing data, referrals, support data, and admin analytics.
+- Frontend API mode strategy for mock, demo, staging, and production backends through environment configuration.
+- Frontend API client/service alignment so page components depend on contracts instead of demo-backend internals.
+- Real backend readiness and AWS readiness notes covering API base URL, auth headers, CORS, streaming, upload, health, error format, and migration checklist.
+- README updates and verification for startup, reset, core demo flows, and build.
 
 ## Current State
 
@@ -72,7 +73,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None currently — v1.12 Phase 13 is implemented and verified.)
+- [ ] Stabilize a lightweight demo backend or mock setup that supports the existing STOA frontend demo flows without becoming production backend architecture.
+- [ ] Document the demo backend boundary, API contract, demo data, reset flow, QA checklist, real backend readiness, and AWS readiness.
+- [ ] Provide fixed demo accounts and stable demo data for student, parent, tutor, and admin roles.
+- [ ] Ensure frontend API calls stay behind services and can switch between mock, demo, staging, and production API modes.
+- [ ] Verify complete demo flow coverage and `npm run build` before Phase 14 is considered complete.
 
 ### Out of Scope
 
@@ -94,10 +99,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Formal production backend, formal payment webhooks, real subscription enforcement, production analytics backend, complex admin backend, production support ticket backend, complex database design, and backend-owned security/compliance implementation — outside Phase 11 frontend-only scope.
 - Production multi-tenant backend, real organization database, formal school admin backend, real AI diagnosis engine, real curriculum graph backend, tutor matching algorithm, automated marketing backend, enterprise invoicing, and complex data warehouse — outside Phase 12 frontend-only scope.
 - New large business modules, new formal backend, complex database work, new AI features, new payment features, new admin backend, production infrastructure, full visual redesign, and large-scale component-library rewrites — outside Phase 13 information architecture and UX optimization scope.
+- Formal production backend development, complex database schema/migrations, production authentication, refresh-token architecture, real payment webhooks, real subscription enforcement, real AI provider orchestration, AWS deployment, production admin backend, and production analytics storage — outside Phase 14 demo backend stabilization scope.
 
 ## Context
 
-The project brief for Phase 13 was provided in Chinese and defines frontend information architecture cleanup, page inventory, route map, role-based navigation, user journeys, page entry/exit audits, orphan and duplicate audits, placeholder/demo policy, route/nav config, breadcrumbs, back buttons, CTA hierarchy, layout standardization, mobile navigation, final demo flow, README/docs updates, manual QA, and E2E/build verification. The user explicitly clarified that Phase 13 does not continue expanding product features: it organizes and polishes the existing frontend system.
+The project brief for Phase 14 was provided in Chinese and defines demo backend stabilization, API contract cleanup, fixed demo accounts, JSON-file or similarly simple demo state, reset flow, auth/chat/teacher-help/parent/billing/referral/support/admin mock APIs, API mode configuration, frontend service-layer alignment, real backend readiness documentation, AWS readiness notes, README updates, QA checklist, full demo flow verification, and build verification. The user explicitly clarified that Phase 14 does not continue expanding product features and does not build a formal production backend.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -119,14 +125,15 @@ Current codebase facts:
 - v1.9 shipped Phase 10 launch readiness with pricing validation, billing/subscription UI, feature flags, virtual checkout, parent conversion, tutor/admin operations improvements, legal drafts, launch docs, and E2E coverage.
 - v1.10 shipped Phase 11 paid launch frontend, growth funnel, referrals, tutor availability, support ticket UI, admin analytics, UTM tracking, demo API fallback, and Phase 11 docs.
 - v1.11 shipped Phase 12 platform/organization/school/learning-intelligence demos while keeping all backend/database/AI/graph/multi-tenant work limited to API contracts, mock data, and demo/test-only support.
-- v1.12 starts Phase 13 and must turn the accumulated frontend pages into a coherent role-based product structure with documented page hierarchy, navigation, journeys, page flows, demo flow, mobile path checks, and frontend-only UX polish.
+- v1.12 shipped Phase 13 and turned the accumulated frontend pages into a coherent role-based product structure with documented page hierarchy, navigation, journeys, page flows, demo flow, mobile path checks, and frontend-only UX polish.
+- v1.13 starts Phase 14 and must stabilize the demo backend/API layer so the frontend can run complete demonstration flows while staying decoupled from future formal backend and AWS implementations.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 13 is frontend-only. It organizes existing pages, routes, navigation, page hierarchy, user journeys, demo flow, and UX patterns without adding new large business modules.
+- **Scope**: Phase 14 is demo-backend and integration-readiness work. It stabilizes simple demo APIs, data, reset, docs, and frontend service alignment without adding new large business modules or production backend systems.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -143,6 +150,10 @@ Current codebase facts:
 - **Payment safety**: The frontend must not directly handle card numbers or payment secrets. Real payment collection should use backend-created hosted checkout sessions; pre-backend demos must use explicit virtual/mock checkout flows.
 - **Production database**: SQLite remains local/demo/test infrastructure only; production persistence must stay behind backend APIs and should use a backend-managed production database plan.
 - **Demo backend boundary**: Any local FastAPI, SQLite, JSON, in-memory, MSW, or mock API support in this repo exists only to demonstrate and test frontend flows. It must not be treated as production backend architecture.
+- **Demo backend simplicity**: Phase 14 demo backend work should prefer MSW/mock data or a minimal local server with JSON-file state; avoid complex ORM, migrations, SQL schema design, Docker Compose, Kubernetes, and AWS CDK.
+- **Demo accounts**: Phase 14 demo users are fixed as `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com`, all using `password123`, and reset must preserve those accounts.
+- **API modes**: Frontend API mode must be configurable for `mock`, `demo`, `staging`, and `production`; page components should not hard-code API URLs or demo data internals.
+- **Error format**: Demo backend errors should use a consistent `{ message, code }` response with demo-specific codes so frontend error states remain testable.
 - **Learning intelligence boundary**: Advanced learning profiles, diagnosis, curriculum graph, and recommendations in Phase 12 are mock/demo UI surfaces only. They must not present themselves as real AI diagnosis or graph computation.
 - **Telemetry privacy**: Monitoring, analytics, logging, feedback, and support payloads must not include passwords, tokens, file contents, or full private chat content by default.
 - **Pilot size**: Phase 9 targets a controlled pilot group, roughly 5-10 students, 3-5 parents, 1-3 tutors, and 1-2 weeks of testing.
@@ -191,6 +202,8 @@ Current codebase facts:
 | Treat prior local backend/database code as demo/test support only | Prevents local FastAPI/SQLite scaffolding from drifting into formal backend architecture inside the frontend repo | — Pending |
 | Keep Phase 12 strictly frontend-only | Platform, school, organization, and learning intelligence demos need UI/contracts now, while production multi-tenant, AI diagnosis, graph, and scheduling systems remain backend-owned future work | — Pending |
 | Keep Phase 13 focused on information architecture and UX optimization | STOA now has many role surfaces and demo routes; the next value is making the product understandable, navigable, and maintainable rather than adding more pages | — Pending |
+| Keep Phase 14 as demo backend stabilization, not formal backend development | The frontend needs stable demonstration and testing flows now, while production backend, database, auth, payments, AI orchestration, and AWS infrastructure remain future backend-owned work | — Pending |
+| Prefer a simple replaceable demo backend/API contract boundary | JSON-file state, reset commands, fixed accounts, and documented contracts give frontend demos enough realism without creating long-term backend technical debt | — Pending |
 
 ## Evolution
 
@@ -210,4 +223,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.12 Phase 13 completion*
+*Last updated: 2026-05-25 after v1.13 Phase 14 initialization*

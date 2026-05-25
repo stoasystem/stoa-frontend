@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.12
-milestone_name: "Phase 13: Information Architecture, Page Flow, and UX Optimization"
-status: complete
-last_updated: "2026-05-25T11:42:51.558Z"
+milestone: v1.13
+milestone_name: "Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness"
+status: planning
+last_updated: "2026-05-25T14:57:18.313Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 7
-  completed_plans: 7
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-25)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, documented page structure, coherent demo flows, and frontend-only mock/API-contract support.
-**Current focus:** Milestone v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization is implemented and verified.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
+**Current focus:** Milestone v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness is defining requirements.
 
 ## Current Position
 
-Phase: 79 complete
-Plan: Phase 13 plans 73-79 complete
-Status: Verified
-Last activity: 2026-05-25 — Phase 13 information architecture and UX optimization implemented and verified
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-25 — Milestone v1.13 started
 
 ## Performance Metrics
 
@@ -162,6 +162,8 @@ Recent decisions affecting current work:
 - Phase 77 added mobile navigation guidance and mobile role navigation.
 - Phase 78 added final demo flow, README Phase 13 docs, manual QA checklist, and E2E coverage.
 - Phase 79 verified lint, TypeScript, build, route smoke, and E2E.
+- Milestone v1.13 started from the Phase 14 demo backend stabilization, test flow completion, and backend integration readiness brief.
+- Phase 14 must stabilize a simple replaceable demo backend/API contract layer while keeping formal backend development, complex database design, production auth, real payments, real AI orchestration, and AWS deployment out of scope.
 
 ### Pending Todos
 
