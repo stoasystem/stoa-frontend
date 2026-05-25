@@ -94,6 +94,16 @@ export function BillingPage() {
 
         <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           {usageQuery.data && <PlanUsageCard usage={usageQuery.data} />}
+          {!usageQuery.isLoading && !usageQuery.data && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t('billing:usage')}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Usage details are not available yet. Learning activity will appear here once the account is active.
+              </CardContent>
+            </Card>
+          )}
           <Card>
             <CardHeader>
               <CardTitle className="text-base">{t('billing:selectedPlan')}</CardTitle>

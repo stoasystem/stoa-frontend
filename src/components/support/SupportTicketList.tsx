@@ -11,6 +11,10 @@ export function SupportTicketList({
   tickets: SupportTicket[]
   admin?: boolean
 }) {
+  if (tickets.length === 0) {
+    return <p className="text-sm text-muted-foreground">No support tickets yet. Create a request when you need help.</p>
+  }
+
   return (
     <div className="space-y-3">
       {tickets.map((ticket) => (

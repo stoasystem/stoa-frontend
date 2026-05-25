@@ -149,6 +149,7 @@ export function RegisterForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (registerMutation.isPending) return
     const validationError = validateCurrentStep()
     if (validationError) {
       setError(validationError)

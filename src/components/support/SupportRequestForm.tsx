@@ -40,6 +40,7 @@ export function SupportRequestForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (submitSupportRequest.isPending) return
     const trimmedSubject = subject.trim()
     const trimmedMessage = message.trim()
     const trimmedContactEmail = contactEmail.trim()
@@ -143,6 +144,9 @@ export function SupportRequestForm() {
       <Button type="submit" disabled={submitSupportRequest.isPending}>
         {submitSupportRequest.isPending ? 'Sending...' : 'Send support request'}
       </Button>
+      {submitSupportRequest.isError && (
+        <p className="text-sm text-destructive">We could not send your support request right now. Please try again.</p>
+      )}
     </form>
   )
 }

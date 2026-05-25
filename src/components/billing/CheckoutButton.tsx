@@ -10,7 +10,10 @@ export function CheckoutButton({ plan, label = 'Start checkout' }: { plan: Subsc
     <Button
       type="button"
       disabled={checkoutMutation.isPending}
-      onClick={() => checkoutMutation.mutate(plan)}
+      onClick={() => {
+        if (checkoutMutation.isPending) return
+        checkoutMutation.mutate(plan)
+      }}
       className="gap-2"
     >
       <CreditCard className="h-4 w-4" />

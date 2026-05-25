@@ -49,14 +49,14 @@ Requirements for Phase 18. Each requirement maps to exactly one roadmap phase.
 
 ### Stability Hardening
 
-- [ ] **STATE18-01**: Login and register submissions cannot be accidentally submitted twice while pending, and failed submissions remain retryable.
-- [ ] **STATE18-02**: Chat message sends, attachment sends, retry actions, and teacher-help requests cannot create duplicate requests through repeated clicks while pending.
-- [ ] **STATE18-03**: Tutor status updates, support ticket submissions, billing/checkout actions, uploads, and partnership/support forms use pending guards and preserve user input on failure.
-- [ ] **STATE18-04**: Core query surfaces handle loading, error, empty, and success states for auth, chat, parent, parent report, tutor, pricing, billing, support, and admin flows.
-- [ ] **STATE18-05**: Empty states for no conversations, no parent children, no reports, no tutor requests, no billing usage, and no support tickets do not crash and provide a clear next action or expectation.
-- [ ] **STATE18-06**: API errors render user-friendly recovery actions such as retry, return, contact support, or sign in, without exposing backend internals.
-- [ ] **STATE18-07**: Unknown routes, unauthorized routes, forbidden role access, unknown roles, and gated demo-only routes resolve to user-friendly fallback pages or redirects.
-- [ ] **STATE18-08**: Stability hardening preserves existing route behavior and demo/E2E coverage unless the roadmap explicitly gates a surface in production-facing mode.
+- [x] **STATE18-01**: Login and register submissions cannot be accidentally submitted twice while pending, and failed submissions remain retryable.
+- [x] **STATE18-02**: Chat message sends, attachment sends, retry actions, and teacher-help requests cannot create duplicate requests through repeated clicks while pending.
+- [x] **STATE18-03**: Tutor status updates, support ticket submissions, billing/checkout actions, uploads, and partnership/support forms use pending guards and preserve user input on failure.
+- [x] **STATE18-04**: Core query surfaces handle loading, error, empty, and success states for auth, chat, parent, parent report, tutor, pricing, billing, support, and admin flows.
+- [x] **STATE18-05**: Empty states for no conversations, no parent children, no reports, no tutor requests, no billing usage, and no support tickets do not crash and provide a clear next action or expectation.
+- [x] **STATE18-06**: API errors render user-friendly recovery actions such as retry, return, contact support, or sign in, without exposing backend internals.
+- [x] **STATE18-07**: Unknown routes, unauthorized routes, forbidden role access, unknown roles, and gated demo-only routes resolve to user-friendly fallback pages or redirects.
+- [x] **STATE18-08**: Stability hardening preserves existing route behavior and demo/E2E coverage unless the roadmap explicitly gates a surface in production-facing mode.
 
 ### QA Evidence and Documentation
 
@@ -146,14 +146,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LABEL18-04 | Phase 105 | Complete |
 | LABEL18-05 | Phase 105 | Complete |
 | LABEL18-06 | Phase 105 | Complete |
-| STATE18-01 | Phase 106 | Planned |
-| STATE18-02 | Phase 106 | Planned |
-| STATE18-03 | Phase 106 | Planned |
-| STATE18-04 | Phase 106 | Planned |
-| STATE18-05 | Phase 106 | Planned |
-| STATE18-06 | Phase 106 | Planned |
-| STATE18-07 | Phase 106 | Planned |
-| STATE18-08 | Phase 106 | Planned |
+| STATE18-01 | Phase 106 | Complete |
+| STATE18-02 | Phase 106 | Complete |
+| STATE18-03 | Phase 106 | Complete |
+| STATE18-04 | Phase 106 | Complete |
+| STATE18-05 | Phase 106 | Complete |
+| STATE18-06 | Phase 106 | Complete |
+| STATE18-07 | Phase 106 | Complete |
+| STATE18-08 | Phase 106 | Complete |
 | QA18-01 | Phase 107 | Planned |
 | QA18-02 | Phase 107 | Planned |
 | QA18-03 | Phase 107 | Planned |
@@ -170,4 +170,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after Phase 105 completion*
+*Last updated: 2026-05-26 after Phase 106 completion*

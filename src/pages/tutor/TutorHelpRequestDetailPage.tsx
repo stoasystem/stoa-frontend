@@ -97,7 +97,9 @@ export function TutorHelpRequestDetailPage() {
             />
             <TutorRequestNoteForm
               isSubmitting={addNote.isPending}
-              onSubmit={(content) => requestId && addNote.mutate({ requestId, content })}
+              onSubmit={(content, onSuccess) =>
+                requestId && addNote.mutate({ requestId, content }, { onSuccess })
+              }
             />
             <TutorRequestTimeline notes={requestQuery.data.notes ?? []} />
           </div>

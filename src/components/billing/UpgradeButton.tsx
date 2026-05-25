@@ -15,7 +15,10 @@ export function UpgradeButton({
     <Button
       type="button"
       disabled={checkoutMutation.isPending}
-      onClick={() => checkoutMutation.mutate(plan)}
+      onClick={() => {
+        if (checkoutMutation.isPending) return
+        checkoutMutation.mutate(plan)
+      }}
     >
       {checkoutMutation.isPending ? 'Starting checkout...' : children}
     </Button>

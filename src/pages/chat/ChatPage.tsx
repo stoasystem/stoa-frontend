@@ -15,6 +15,7 @@ import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversatio
 import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
+import { toUserFacingError } from '@/lib/userFacingText'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 export function ChatPage() {
@@ -93,6 +94,7 @@ export function ChatPage() {
   }, [activeConversationId, conversationQuery.data, queuedInitialMessage, sendStreamingMessage])
 
   function handleCreateConversation(message?: string) {
+    if (createConversationMutation.isPending) return
     const initialMessage = message?.trim()
 
     createConversationMutation.mutate(
@@ -149,9 +151,7 @@ export function ChatPage() {
           setTeacherHelpRequest(request)
         },
         onError: (error) => {
-          setTeacherHelpError(
-            error instanceof Error ? error.message : t('teacher.failed'),
-          )
+          setTeacherHelpError(toUserFacingError(error, t('teacher.failed')))
         },
       },
     )
@@ -178,6 +178,7 @@ export function ChatPage() {
             className="mt-5 space-y-3"
             onSubmit={(event) => {
               event.preventDefault()
+              if (createConversationMutation.isPending) return
               handleCreateConversation(newConversationMessage)
             }}
           >
@@ -190,9 +191,7 @@ export function ChatPage() {
             />
             {createConversationMutation.isError && (
               <p className="text-xs text-destructive">
-                {createConversationMutation.error instanceof Error
-                  ? createConversationMutation.error.message
-                  : t('createFailed')}
+                {toUserFacingError(createConversationMutation.error, t('createFailed'))}
               </p>
             )}
             <Button

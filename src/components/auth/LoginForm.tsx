@@ -28,6 +28,7 @@ export function LoginForm() {
       className="space-y-4"
       onSubmit={(event) => {
         event.preventDefault()
+        if (loginMutation.isPending) return
         const result = loginSchema.safeParse({ email, password })
         if (!result.success) {
           const fieldErrors = result.error.flatten().fieldErrors

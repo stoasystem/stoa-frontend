@@ -6,16 +6,16 @@ export function TutorRequestNoteForm({
   onSubmit,
 }: {
   isSubmitting: boolean
-  onSubmit: (content: string) => void
+  onSubmit: (content: string, onSuccess: () => void) => void
 }) {
   const [content, setContent] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (isSubmitting) return
     const trimmed = content.trim()
     if (!trimmed) return
-    onSubmit(trimmed)
-    setContent('')
+    onSubmit(trimmed, () => setContent(''))
   }
 
   return (
@@ -29,6 +29,7 @@ export function TutorRequestNoteForm({
         placeholder="Add the next step, explanation focus, or follow-up needed."
         value={content}
         onChange={(event) => setContent(event.target.value)}
+        disabled={isSubmitting}
       />
       <Button type="submit" disabled={isSubmitting || content.trim().length === 0}>
         Add note

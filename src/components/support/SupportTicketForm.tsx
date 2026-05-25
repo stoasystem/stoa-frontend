@@ -19,9 +19,16 @@ export function SupportTicketForm() {
       className="space-y-4 rounded-lg border bg-card p-5"
       onSubmit={(event) => {
         event.preventDefault()
-        createMutation.mutate({ subject, message, category, priority, contactEmail })
-        setSubject('')
-        setMessage('')
+        if (createMutation.isPending) return
+        createMutation.mutate(
+          { subject, message, category, priority, contactEmail },
+          {
+            onSuccess: () => {
+              setSubject('')
+              setMessage('')
+            },
+          },
+        )
       }}
     >
       <div className="grid gap-4 md:grid-cols-2">
@@ -59,6 +66,9 @@ export function SupportTicketForm() {
         <Label htmlFor="ticket-message">Message</Label>
         <Textarea id="ticket-message" value={message} onChange={(event) => setMessage(event.target.value)} required />
       </div>
+      {createMutation.isError && (
+        <p className="text-sm text-destructive">We could not create this support request right now. Please try again.</p>
+      )}
       <Button type="submit" disabled={createMutation.isPending}>
         {createMutation.isPending ? 'Creating...' : 'Create ticket'}
       </Button>
