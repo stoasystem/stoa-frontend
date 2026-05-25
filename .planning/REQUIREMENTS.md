@@ -1,194 +1,199 @@
-# Requirements: STOA Frontend v1.10 Phase 11 Paid Launch Frontend, Growth Funnel, and Operational UI Scaling
+# Requirements: STOA Frontend v1.11 Phase 12 Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design
 
 **Defined:** 2026-05-25
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA platform frontend workflow with organization, school partnership, learning intelligence, analytics, and demo/mock API surfaces.
 
-## v1.10 Requirements
+## v1.11 Requirements
 
-Phase 11 is frontend-only. It prepares paid launch, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM attribution, and demo/mock API behavior without implementing formal backend payment, subscription enforcement, analytics, support, or database systems.
+Phase 12 is frontend-only. It prepares platform-level organization UI, school/tutoring partnership demos, advanced learning profile UI, curriculum graph UI, weak-point diagnosis UI, tutor assignment UI, parent monthly reports, advanced analytics, retention UI, API contracts, mock data, and demo support without implementing production backend, database, real multi-tenant permissions, real AI diagnosis, or real curriculum graph computation.
 
-### Frontend-Only Boundary and Demo API Cleanup
+### Frontend-Only Platform Boundary
 
-- [x] **BOUND-01**: Phase 11 docs explicitly state that formal backend, payment webhook, subscription enforcement, production analytics backend, complex admin backend, production support backend, and complex database design are out of scope.
-- [x] **BOUND-02**: Existing local FastAPI/SQLite/demo backend support is documented as demo/test-only infrastructure.
-- [x] **BOUND-03**: Prior backend-like features are reviewed and either documented, isolated, or marked for cleanup so they do not imply production backend architecture.
-- [x] **BOUND-04**: Demo/mock API strategy is defined for billing, feature access, referrals, tutor availability, support tickets, and admin analytics.
-- [x] **BOUND-05**: Mock/demo data is kept behind typed services or mock handlers, not embedded directly in page components.
+- [ ] **BOUND-01**: Phase 12 docs explicitly state that production multi-tenant backend, organization database, school backend, AI diagnosis engine, curriculum graph backend, tutor matching algorithm, automated marketing backend, enterprise invoicing, and data warehouse are out of scope.
+- [ ] **BOUND-02**: Demo/mock API strategy is defined for organizations, learning profiles, curriculum graph, diagnosis, tutor assignment, monthly reports, advanced analytics, retention, and partnership onboarding.
+- [ ] **BOUND-03**: Organization roles and workspace concepts are documented as frontend display/demo concepts only.
+- [ ] **BOUND-04**: Mock/demo data remains behind typed services or mock data modules, not embedded directly in page components.
 
-### Billing, Usage, Feature Access, and Checkout Frontend
+### Organization Workspace UI
 
-- [x] **BILL-01**: `src/types/billing.ts` defines billing plan, subscription, usage quota, feature access, and checkout-related types.
-- [x] **BILL-02**: Billing service exposes contracts for plans, subscription, usage quota, feature access, checkout session, and manage-billing placeholder.
-- [x] **BILL-03**: Billing hooks expose plans, subscription, usage, feature access, and checkout mutation through TanStack Query.
-- [x] **BILL-04**: `/pricing` displays frontend-driven plan data, recommended plan state, comparison, FAQ, and parent value CTA.
-- [x] **BILL-05**: `/billing` displays subscription status, current plan, usage quota, payment/demo mode, upgrade action, and manage-billing placeholder.
-- [x] **BILL-06**: Billing success and cancelled routes show mock checkout return states and next actions.
-- [x] **BILL-07**: Feature gating UI can show locked states for AI messages, file uploads, teacher help, and parent reports.
-- [x] **BILL-08**: Upgrade prompt/dialog routes users to pricing or billing without pretending frontend gates are secure enforcement.
-- [x] **BILL-09**: Checkout payload can include attribution/UTM metadata without exposing payment secrets.
+- [ ] **ORG-01**: `src/types/organization.ts` defines organization, organization type, member role, summary, student, tutor, and report overview types.
+- [ ] **ORG-02**: Organization services and hooks expose `GET /organizations`, `GET /organizations/:id/summary`, `GET /organizations/:id/students`, `GET /organizations/:id/tutors`, and `GET /organizations/:id/reports` contracts.
+- [ ] **ORG-03**: `OrganizationSelector` displays and switches the current workspace and triggers `organization_switched` analytics.
+- [ ] **ORG-04**: `/organization` displays organization summary metrics, weak topic overview, tutor workload, and links to students/tutors/reports/analytics.
+- [ ] **ORG-05**: `/organization/students` displays a student list with grade, subjects, last active, weak topic count, teacher help count, and learning profile links.
+- [ ] **ORG-06**: `/organization/tutors` displays tutor subjects, availability, pending requests, resolved requests, and response time placeholder.
+- [ ] **ORG-07**: `/organization/reports` displays organization-level report overview and monthly/weekly report entry points.
+- [ ] **ORG-08**: Organization mock data includes at least one tutoring center, one school, multiple students, tutors, and organization analytics.
 
-### Parent Acquisition and Landing Pages
+### Advanced Learning Profile
 
-- [x] **GROW-01**: `/for-parents` explains STOA value for parents and routes to pricing/register.
-- [x] **GROW-02**: `/how-it-works` explains student asks, AI explains, file upload, teacher support, and parent report flow.
-- [x] **GROW-03**: `/ai-homework-help` presents the AI homework help use case.
-- [x] **GROW-04**: `/teacher-support` explains human teacher backup and tutor-supported plan value.
-- [x] **GROW-05**: `/for-schools` and `/for-tutoring-centers` provide lightweight partnership entry placeholders.
-- [x] **GROW-06**: Landing pages use shared components/content patterns and clear CTAs.
-- [x] **GROW-07**: Parent funnel CTA clicks are tracked with privacy-safe analytics metadata.
+- [ ] **LEARN-01**: `src/types/learningProfile.ts` defines learning profile, active subjects, weak topics, strong topics, recent history, usage, teacher help history, and recommended actions.
+- [ ] **LEARN-02**: Learning profile service/hook exposes `GET /students/:studentId/learning-profile`.
+- [ ] **LEARN-03**: `/students/:studentId/learning-profile` or `/organization/students/:studentId/learning-profile` displays basic info, subjects, weak topics, strong topics, recent history, teacher help, usage, recommendations, and parent report links.
+- [ ] **LEARN-04**: Learning profile components separate header, weak topics, strong topics, history, and recommendations.
+- [ ] **LEARN-05**: `learning_profile_viewed` and `organization_student_opened` events are tracked with privacy-safe metadata.
 
-### Referral and Invitation Flow
+### Curriculum Graph UI
 
-- [x] **REF-01**: Referral types and service contract define `GET /referrals/me`.
-- [x] **REF-02**: `/referrals` shows invite link, referral code, successful invites, copy action, and reward placeholder.
-- [x] **REF-03**: Register page reads `ref` or referral code from the URL.
-- [x] **REF-04**: Register payload can include referral code and stored attribution metadata.
-- [x] **REF-05**: Referral link copy triggers a privacy-safe analytics event.
-- [x] **REF-06**: Referral demo/mock response can return a deterministic invite link and successful invite count.
+- [ ] **GRAPH-01**: `src/types/curriculumGraph.ts` defines topic nodes, edges, topic status, relations, and topic detail.
+- [ ] **GRAPH-02**: Curriculum graph service/hook exposes `GET /students/:studentId/curriculum-graph`.
+- [ ] **GRAPH-03**: `/curriculum-graph` and/or `/students/:studentId/curriculum-graph` displays topic nodes, prerequisite/related edges, and weak/developing/stable/strong status.
+- [ ] **GRAPH-04**: Clicking a topic opens a detail panel with topic detail, recent questions, and recommendations.
+- [ ] **GRAPH-05**: Curriculum graph UI remains usable on mobile without severe overflow.
+- [ ] **GRAPH-06**: `curriculum_graph_viewed` and `curriculum_topic_selected` events are tracked without sensitive content.
 
-### Tutor Availability UI
+### Weak-Point Diagnosis UI
 
-- [x] **TUTOR-01**: Tutor availability types and service contracts define `GET /tutors/me/availability` and `PATCH /tutors/me/availability`.
-- [x] **TUTOR-02**: `/tutor/availability` displays current weekly availability, subjects, and availability status.
-- [x] **TUTOR-03**: Tutor can edit weekly availability windows in the frontend UI.
-- [x] **TUTOR-04**: Tutor can edit tutor-supported subjects in the frontend UI.
-- [x] **TUTOR-05**: Availability save mutation shows success/error feedback and invalidates the relevant query.
-- [x] **TUTOR-06**: Admin-facing tutor availability overview is represented as a placeholder or analytics card without implementing scheduling backend logic.
+- [ ] **DIAG-01**: `src/types/diagnosis.ts` defines diagnosis summary, weak point severity, evidence, recommendations, teacher-help suggestion, and parent explanation.
+- [ ] **DIAG-02**: Diagnosis service/hook exposes `GET /students/:studentId/diagnosis`.
+- [ ] **DIAG-03**: `/students/:studentId/diagnosis` displays diagnosis summary, weak points, evidence list, suggested practice, teacher-help recommendation, and parent explanation.
+- [ ] **DIAG-04**: Diagnosis UI clearly remains a mock/demo frontend result and does not claim real AI diagnosis.
+- [ ] **DIAG-05**: `weak_point_diagnosis_viewed` is tracked with student/topic identifiers only.
 
-### Support Ticket UI
+### Tutor Assignment And Scheduling UI
 
-- [x] **SUP-01**: Support ticket types and service contracts define user ticket create/list/detail and admin ticket list/detail/status update.
-- [x] **SUP-02**: `/support/tickets` lets users create a ticket and view their ticket list.
-- [x] **SUP-03**: `/support/tickets/:ticketId` shows ticket detail and status.
-- [x] **SUP-04**: `/admin/support` shows admin support ticket queue with filter/status states.
-- [x] **SUP-05**: `/admin/support/:ticketId` shows ticket detail and mock status update UI.
-- [x] **SUP-06**: Support ticket analytics avoid full private ticket bodies and sensitive data.
+- [ ] **ASSIGN-01**: `src/types/tutorAssignment.ts` defines pending requests, available tutors, assignment suggestions, and schedule overview data.
+- [ ] **ASSIGN-02**: Tutor assignment service/hook exposes assignment board contracts for pending requests, available tutors, and suggestions.
+- [ ] **ASSIGN-03**: `/organization/tutor-assignment` or `/admin/tutor-assignment` displays pending requests, available tutors, load, availability, and suggested assignment.
+- [ ] **ASSIGN-04**: Manual assign button has placeholder/demo behavior without implementing a real matching algorithm.
+- [ ] **ASSIGN-05**: Tutor schedule overview displays upcoming availability or coverage by subject.
+- [ ] **ASSIGN-06**: `tutor_assignment_board_viewed` and `tutor_assignment_suggested_clicked` events are tracked.
 
-### Admin Operational Analytics
+### Parent Monthly Report
 
-- [x] **ADMIN-01**: Admin analytics types and service contract define `GET /admin/analytics/overview`.
-- [x] **ADMIN-02**: `/admin/analytics` shows active users, weekly active students, registrations, messages, uploads, teacher-help requests, parent report views, checkout starts, checkout completions, and cancelled subscriptions.
-- [x] **ADMIN-03**: Admin analytics UI shows loading, empty, backend-pending, and success states.
-- [x] **ADMIN-04**: Billing interest/conversion overview is visible through admin analytics or a dedicated admin section.
-- [x] **ADMIN-05**: Admin operational UI remains frontend-only and avoids BI/data warehouse implementation.
+- [ ] **MONTH-01**: Parent monthly report types/mock data cover summary, subject breakdown, weak-point trend, teacher help summary, practice recommendations, and parent actions.
+- [ ] **MONTH-02**: `/parent/children/:childId/monthly-report` displays monthly report content.
+- [ ] **MONTH-03**: Monthly report includes a PDF export placeholder that does not generate a real PDF.
+- [ ] **MONTH-04**: Parent monthly report links from learning profile or organization report surfaces where appropriate.
+- [ ] **MONTH-05**: `parent_monthly_report_viewed` is tracked.
 
-### UTM, Referral Attribution, and Paid Launch Analytics
+### Advanced Analytics And Retention UI
 
-- [x] **ATTR-01**: `src/lib/utm.ts` captures whitelisted UTM params from URL and stores them safely.
-- [x] **ATTR-02**: Stored attribution can be read by register, checkout, referral, and analytics flows.
-- [x] **ATTR-03**: App startup captures UTM/referral context.
-- [x] **ATTR-04**: Paid launch analytics event names include pricing, checkout, billing, feature locked, upgrade prompt, parent landing, referral, tutor availability, support ticket, admin analytics, and UTM captured events.
-- [x] **ATTR-05**: Analytics payloads exclude chat content, file contents, payment secrets, tokens, and full support bodies.
-- [x] **FLAG-01**: `src/lib/env.ts` and `.env.example` include referral, support tickets, mock API, tutor availability, and admin analytics flags.
+- [ ] **ANALYTICS-01**: Advanced analytics types/mock data cover active students/parents, questions by subject, teacher-help rate, upload rate, report view rate, retention cohort, churn risk, and conversion funnel.
+- [ ] **ANALYTICS-02**: `/admin/advanced-analytics` displays advanced metrics, subject breakdown, funnel, retention table, and churn risk placeholders.
+- [ ] **ANALYTICS-03**: `/organization/analytics` displays organization-specific analytics.
+- [ ] **ANALYTICS-04**: Analytics components include reusable metric card, subject chart/table, funnel chart/table, and retention table.
+- [ ] **ANALYTICS-05**: `/admin/retention` displays inactive students, at-risk families, suggested actions, and placeholder reminder/follow-up actions.
+- [ ] **ANALYTICS-06**: `advanced_analytics_viewed` and `retention_page_viewed` are tracked.
 
-### Documentation, QA, and Verification
+### Partnership Onboarding
 
-- [x] **DOC-01**: README documents Phase 11 frontend-only scope, API contracts, demo backend/mock behavior, and main additions.
-- [x] **DOC-02**: Growth docs cover parent acquisition funnel, referral program, and paid launch campaign.
-- [x] **DOC-03**: Billing docs cover checkout flow contract and subscription access UI.
-- [x] **DOC-04**: Operations docs cover tutor availability UI and support ticket UI.
-- [x] **DOC-05**: Analytics docs cover paid launch events and operational dashboard.
-- [x] **QA-01**: Manual QA checklist covers billing/pricing, feature gating, parent funnel, referral, tutor availability, support tickets, admin analytics, UTM, and build.
-- [x] **QA-02**: E2E or route smoke coverage verifies core Phase 11 demo flows where feasible.
-- [x] **QA-03**: `npm run build` passes at milestone completion.
+- [ ] **PARTNER-01**: `src/types/partnership.ts` defines partnership interest payload, organization type, subjects, contacts, and response.
+- [ ] **PARTNER-02**: Partnership service/hook exposes `POST /partnership/interests`.
+- [ ] **PARTNER-03**: `/partnership/onboarding` displays the partnership onboarding steps and interest form.
+- [ ] **PARTNER-04**: `/for-schools` and `/for-tutoring-centers` are updated or retained as partnership landing entries that route to onboarding/contact.
+- [ ] **PARTNER-05**: Partnership form submit uses mock/demo mutation and shows confirmation.
+- [ ] **PARTNER-06**: `partnership_page_viewed` and `partnership_interest_submitted` are tracked.
+
+### Documentation, QA, And Verification
+
+- [ ] **DOC-01**: README documents Phase 12 frontend-only scope, main additions, route list, and mock API contracts.
+- [ ] **DOC-02**: Platform docs cover organization frontend architecture and workspace navigation.
+- [ ] **DOC-03**: Learning intelligence docs cover learning profile UI, curriculum graph UI, and weak-point diagnosis UI.
+- [ ] **DOC-04**: Partnership docs cover school partnership frontend and tutoring center onboarding.
+- [ ] **DOC-05**: Analytics docs cover advanced analytics UI and retention UI.
+- [ ] **QA-01**: Manual QA checklist covers organization UI, learning profile, curriculum graph, diagnosis, tutor assignment, monthly report, partnership onboarding, analytics, retention, and build.
+- [ ] **QA-02**: E2E or route smoke coverage verifies core Phase 12 demo routes where feasible.
+- [ ] **QA-03**: `npm run build` passes at milestone completion.
 
 ## Future Requirements
 
 Deferred to later milestones.
 
-- **BACKEND-PAY-01**: Real Stripe Checkout and Customer Portal backend sessions.
-- **BACKEND-SUB-01**: Real subscription persistence and quota enforcement.
-- **BACKEND-ANLY-01**: Production analytics aggregation backend.
-- **BACKEND-SUP-01**: Production support ticket backend and notifications.
-- **BACKEND-REF-01**: Referral reward accounting and fraud controls.
-- **BACKEND-SCHED-01**: Tutor scheduling, matching, capacity, and calendar integration backend.
-- **PLATFORM-01**: School/tutoring center multi-tenant backend and organization admin system.
+- **BACKEND-ORG-01**: Production multi-tenant organization backend and role/permission enforcement.
+- **BACKEND-SCHOOL-01**: Real school/tutoring center onboarding backend and organization database.
+- **AI-DIAG-01**: Real AI weak-point diagnosis engine and evaluation pipeline.
+- **GRAPH-ENGINE-01**: Real curriculum graph computation and graph data backend.
+- **SCHED-01**: Real tutor assignment algorithm, scheduling enforcement, and calendar integration.
+- **RETENTION-AUTO-01**: Automated retention messaging and follow-up task backend.
+- **ANALYTICS-WAREHOUSE-01**: Production data warehouse and advanced analytics aggregation.
+- **PDF-REPORT-01**: Real monthly report PDF generation and delivery.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Formal production backend | Phase 11 is frontend-only. |
-| Real Stripe webhook | Backend-owned future paid launch work. |
-| Real subscription enforcement | Backend APIs must enforce true access later. |
-| Production analytics backend | This milestone defines UI/contracts/events only. |
-| Complex admin backend | Admin pages use contracts/demo data only. |
-| Production support ticket backend | Support UI can be mocked/demoed first. |
-| Complex database schema | Demo/test data is enough for frontend flow validation. |
-| Full CRM/helpdesk | Too much operational scope. |
-| Tutor payroll and scheduling engine | Outside frontend paid launch UI. |
-| CMS/SEO content system | Landing entries only; no content backend. |
-| Ad pixels/growth SDKs/A-B testing platform | Attribution and event taxonomy are enough. |
+| Production multi-tenant backend | Phase 12 is frontend-only. |
+| Real organization database | Mock/demo data is enough for frontend flow validation. |
+| Formal school admin backend | Future backend/platform work. |
+| Real AI diagnosis engine | Phase 12 only designs UI and contracts. |
+| Real curriculum graph computation | Phase 12 only shows mock graph data. |
+| Tutor assignment algorithm | UI can show suggestions, not compute real matching. |
+| Automated marketing/retention backend | Retention UI only. |
+| Enterprise invoicing/contracting | Not needed for platform frontend demo. |
+| Data warehouse/BI system | Advanced analytics UI only. |
+| CRM/helpdesk integration | Outside partnership UI scope. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BOUND-01 | Phase 56 | Complete |
-| BOUND-02 | Phase 56 | Complete |
-| BOUND-03 | Phase 56 | Complete |
-| BOUND-04 | Phase 56 | Complete |
-| BOUND-05 | Phase 56 | Complete |
-| ATTR-01 | Phase 56 | Complete |
-| ATTR-02 | Phase 56 | Complete |
-| ATTR-03 | Phase 56 | Complete |
-| ATTR-04 | Phase 56 | Complete |
-| ATTR-05 | Phase 56 | Complete |
-| FLAG-01 | Phase 56 | Complete |
-| BILL-01 | Phase 57 | Complete |
-| BILL-02 | Phase 57 | Complete |
-| BILL-03 | Phase 57 | Complete |
-| BILL-04 | Phase 57 | Complete |
-| BILL-05 | Phase 57 | Complete |
-| BILL-06 | Phase 57 | Complete |
-| BILL-07 | Phase 57 | Complete |
-| BILL-08 | Phase 57 | Complete |
-| BILL-09 | Phase 57 | Complete |
-| GROW-01 | Phase 58 | Complete |
-| GROW-02 | Phase 58 | Complete |
-| GROW-03 | Phase 58 | Complete |
-| GROW-04 | Phase 58 | Complete |
-| GROW-05 | Phase 58 | Complete |
-| GROW-06 | Phase 58 | Complete |
-| GROW-07 | Phase 58 | Complete |
-| REF-01 | Phase 59 | Complete |
-| REF-02 | Phase 59 | Complete |
-| REF-03 | Phase 59 | Complete |
-| REF-04 | Phase 59 | Complete |
-| REF-05 | Phase 59 | Complete |
-| REF-06 | Phase 59 | Complete |
-| TUTOR-01 | Phase 60 | Complete |
-| TUTOR-02 | Phase 60 | Complete |
-| TUTOR-03 | Phase 60 | Complete |
-| TUTOR-04 | Phase 60 | Complete |
-| TUTOR-05 | Phase 60 | Complete |
-| TUTOR-06 | Phase 60 | Complete |
-| SUP-01 | Phase 61 | Complete |
-| SUP-02 | Phase 61 | Complete |
-| SUP-03 | Phase 61 | Complete |
-| SUP-04 | Phase 61 | Complete |
-| SUP-05 | Phase 61 | Complete |
-| SUP-06 | Phase 61 | Complete |
-| ADMIN-01 | Phase 62 | Complete |
-| ADMIN-02 | Phase 62 | Complete |
-| ADMIN-03 | Phase 62 | Complete |
-| ADMIN-04 | Phase 62 | Complete |
-| ADMIN-05 | Phase 62 | Complete |
-| DOC-01 | Phase 63 | Complete |
-| DOC-02 | Phase 63 | Complete |
-| DOC-03 | Phase 63 | Complete |
-| DOC-04 | Phase 63 | Complete |
-| DOC-05 | Phase 63 | Complete |
-| QA-01 | Phase 63 | Complete |
-| QA-02 | Phase 63 | Complete |
-| QA-03 | Phase 63 | Complete |
+| BOUND-01 | Phase 64 | Planned |
+| BOUND-02 | Phase 64 | Planned |
+| BOUND-03 | Phase 64 | Planned |
+| BOUND-04 | Phase 64 | Planned |
+| ORG-01 | Phase 64 | Planned |
+| ORG-02 | Phase 64 | Planned |
+| ORG-03 | Phase 64 | Planned |
+| ORG-08 | Phase 64 | Planned |
+| ORG-04 | Phase 65 | Planned |
+| ORG-05 | Phase 65 | Planned |
+| ORG-06 | Phase 65 | Planned |
+| ORG-07 | Phase 65 | Planned |
+| LEARN-01 | Phase 66 | Planned |
+| LEARN-02 | Phase 66 | Planned |
+| LEARN-03 | Phase 66 | Planned |
+| LEARN-04 | Phase 66 | Planned |
+| LEARN-05 | Phase 66 | Planned |
+| DIAG-01 | Phase 66 | Planned |
+| DIAG-02 | Phase 66 | Planned |
+| DIAG-03 | Phase 66 | Planned |
+| DIAG-04 | Phase 66 | Planned |
+| DIAG-05 | Phase 66 | Planned |
+| GRAPH-01 | Phase 67 | Planned |
+| GRAPH-02 | Phase 67 | Planned |
+| GRAPH-03 | Phase 67 | Planned |
+| GRAPH-04 | Phase 67 | Planned |
+| GRAPH-05 | Phase 67 | Planned |
+| GRAPH-06 | Phase 67 | Planned |
+| ASSIGN-01 | Phase 68 | Planned |
+| ASSIGN-02 | Phase 68 | Planned |
+| ASSIGN-03 | Phase 68 | Planned |
+| ASSIGN-04 | Phase 68 | Planned |
+| ASSIGN-05 | Phase 68 | Planned |
+| ASSIGN-06 | Phase 68 | Planned |
+| MONTH-01 | Phase 69 | Planned |
+| MONTH-02 | Phase 69 | Planned |
+| MONTH-03 | Phase 69 | Planned |
+| MONTH-04 | Phase 69 | Planned |
+| MONTH-05 | Phase 69 | Planned |
+| ANALYTICS-01 | Phase 70 | Planned |
+| ANALYTICS-02 | Phase 70 | Planned |
+| ANALYTICS-03 | Phase 70 | Planned |
+| ANALYTICS-04 | Phase 70 | Planned |
+| ANALYTICS-05 | Phase 70 | Planned |
+| ANALYTICS-06 | Phase 70 | Planned |
+| PARTNER-01 | Phase 71 | Planned |
+| PARTNER-02 | Phase 71 | Planned |
+| PARTNER-03 | Phase 71 | Planned |
+| PARTNER-04 | Phase 71 | Planned |
+| PARTNER-05 | Phase 71 | Planned |
+| PARTNER-06 | Phase 71 | Planned |
+| DOC-01 | Phase 72 | Planned |
+| DOC-02 | Phase 72 | Planned |
+| DOC-03 | Phase 72 | Planned |
+| DOC-04 | Phase 72 | Planned |
+| DOC-05 | Phase 72 | Planned |
+| QA-01 | Phase 72 | Planned |
+| QA-02 | Phase 72 | Planned |
+| QA-03 | Phase 72 | Planned |
 
 **Coverage:**
-- v1.10 requirements: 57 total
-- Mapped to phases: 57
-- Complete: 57
+- v1.11 requirements: 60 total
+- Mapped to phases: 60
+- Planned: 60
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after v1.10 implementation and verification*
+*Last updated: 2026-05-25 after v1.11 roadmap creation*

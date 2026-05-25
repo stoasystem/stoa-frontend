@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.10
-milestone_name: "Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling"
-status: implemented
-last_updated: "2026-05-25T12:10:00.000Z"
+milestone: v1.11
+milestone_name: "Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design"
+status: planning
+last_updated: "2026-05-25T10:40:51.109Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 8
-  completed_phases: 8
-  total_plans: 8
-  completed_plans: 8
-  percent: 100
+  total_phases: 9
+  completed_phases: 0
+  total_plans: 9
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-25)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, paid launch demo flows, growth pages, operations UI, and frontend-only mock/demo API contracts.
-**Current focus:** Milestone v1.10 Phase 11 has been implemented and verified.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, paid launch demo flows, platform-level organization UI, and frontend-only mock/API-contract support.
+**Current focus:** Milestone v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design is planned and ready to begin at Phase 64.
 
 ## Current Position
 
-Phase: Phase 63 complete
-Plan: Docs, QA, E2E, and Phase 11 Verification
-Status: Phase 11 implementation complete; lifecycle audit/cleanup not yet run
-Last activity: 2026-05-25 — Implemented frontend-only paid launch, growth, referral, tutor availability, support ticket, admin analytics, UTM, and demo API fallback surfaces; build/lint/E2E passed
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-25 — Milestone v1.11 requirements and roadmap created
 
 ## Performance Metrics
 
@@ -141,10 +141,12 @@ Recent decisions affecting current work:
 - Phase 61 added support ticket user/admin service hooks, ticket pages, admin triage, and mock status updates.
 - Phase 62 added admin operational analytics contract, query hook, cards, and dashboard route.
 - Phase 63 updated README and growth/billing/operations/analytics/demo docs, and verified build/lint/E2E.
+- Milestone v1.11 started from the Phase 12 platform scaling and advanced learning intelligence brief.
+- Phase 12 remains frontend-only: organization, school, learning intelligence, curriculum graph, diagnosis, scheduling, analytics, retention, and partnership capabilities are UI/API-contract/mock/demo surfaces only.
 
 ### Pending Todos
 
-Milestone lifecycle audit/complete/cleanup remains pending if the team wants to archive v1.10 immediately.
+None currently.
 
 ### Blockers/Concerns
 

@@ -2,33 +2,33 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, and launch-ready commercial validation UI.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, and early paid growth/operations demo surfaces.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, and launch artifacts. The current product step is moving that launch-ready commercial validation frontend into a broader frontend-only paid launch experience with parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, and clearer demo-backend boundaries.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, and clearer demo-backend boundaries. The current product step is moving that frontend-only paid launch surface into platform expansion demos for organizations, schools, tutoring centers, advanced learning profiles, curriculum graphs, weak-point diagnosis, monthly parent reports, retention entry points, and partnership onboarding.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries backed only by the unified STOA backend API contract.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, paid launch demo flows, platform-level organization UI, and frontend-only mock/API-contract support.
 
-## Current Milestone: v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling
+## Current Milestone: v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design
 
-**Goal:** Build frontend-only paid launch, growth funnel, referral, tutor availability, support ticket, admin operational analytics, UTM tracking, and demo/mock API surfaces so STOA can demonstrate early paid growth and operational workflows without implementing formal backend payment, subscription enforcement, analytics, support, or database systems.
+**Goal:** Build frontend-only platform expansion, organization management, school/tutoring partnership, advanced learning intelligence, parent monthly reporting, retention, and advanced analytics demo surfaces without implementing formal multi-tenant backend, organization database, AI diagnosis engine, curriculum graph backend, or production partnership systems.
 
 **Target features:**
-- Frontend-only boundary documentation and cleanup plan for demo backend/database support introduced in prior milestones.
-- Billing plans, subscription status, usage quota, feature access, checkout-session, and mock checkout API contracts.
-- Pricing, billing, billing success/cancelled, plan usage, manage billing placeholder, and feature gating UI.
-- Parent acquisition landing pages for parents, how-it-works, AI homework help, teacher support, schools, and tutoring centers.
-- Referral/invitation frontend with invite link, copy action, referral code capture, and register payload support.
-- Tutor availability and subject-setting UI with mock/demo API contracts.
-- Support ticket user and admin pages with status, detail, create, and mock status update flows.
-- Admin operational analytics dashboard and billing/conversion/support overview UI.
-- UTM capture utility, register/checkout payload propagation, and paid launch analytics event definitions.
-- README, growth, billing, operations, analytics, demo, and QA documentation updates.
+- Frontend-only platform boundary for organization, school, curriculum, diagnosis, scheduling, analytics, and partnership demo features.
+- Organization/workspace selector plus organization dashboard, students, tutors, reports, and analytics pages.
+- Advanced student learning profile, weak/strong topics, recent learning history, and recommended actions.
+- Curriculum/topic graph UI with node status, prerequisite/related edges, and topic detail panel.
+- Weak-point diagnosis UI with evidence, severity, recommendations, teacher-help suggestion, and parent explanation.
+- Tutor assignment board and schedule overview UI with suggested assignment placeholders.
+- Parent monthly report page with subject breakdown, weak-point trend, teacher-help summary, recommendations, and PDF placeholder.
+- Advanced analytics dashboard and retention/reactivation frontend entry.
+- Partnership onboarding workflow and school/tutoring center partnership pages.
+- API contracts, mock data, demo support docs, README, platform docs, learning-intelligence docs, partnership docs, and QA checklist.
 
 ## Current State
 
-**Latest shipped milestone:** v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch
+**Latest shipped milestone:** v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -45,6 +45,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Staging deployment configuration, GitHub Actions CI, Playwright E2E smoke coverage, manual QA docs, feedback collection, bug tracking, performance/security readiness docs, and privacy/terms placeholders.
 - Production readiness docs, error monitoring/logging foundation, analytics backend delivery, pilot onboarding, support workflow, basic admin operations, privacy/terms pilot drafts, backup/restore strategy, pricing/billing placeholders, launch checklist, pilot plan, and post-pilot feedback template.
 - Phase 10 pricing validation, subscription UI, feature flags, parent conversion prompts, tutor operations improvements, admin launch routes, virtual checkout demo/success/cancel flow, launch-ready privacy/terms drafts, release/rollback/monitoring docs, and 6/6 E2E coverage.
+- Phase 11 frontend-only paid launch and operations surfaces with pricing/billing plan contracts, usage quota, feature access, mock checkout, parent acquisition pages, referrals, tutor availability, support tickets, admin operational analytics, UTM tracking, demo API fallback, docs, and 6/6 E2E coverage.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -67,13 +68,15 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run the app as a staging-ready MVP with CI, E2E smoke coverage, manual QA docs, feedback collection, bug workflow, performance/security checks, and legal placeholders — v1.7
 - ✓ Developers can prepare a controlled pilot launch with production readiness docs, monitoring/logging, analytics delivery, onboarding, support, admin operations, privacy/terms drafts, backup/restore docs, pricing/billing placeholders, and pilot launch artifacts — v1.8
 - ✓ Developers can run and verify launch-ready commercial validation UI with pricing, billing, virtual checkout, parent conversion, tutor/admin launch operations, privacy/terms, launch docs, and E2E coverage — v1.9
+- ✓ Developers can run and verify frontend-only paid launch, growth, referral, tutor availability, support ticket, admin analytics, UTM, and demo API fallback surfaces — v1.10
 
 ### Active
 
-- Phase 11 must remain frontend-only and may only use demo/mock API or minimal local demo backend support for page flows and E2E.
-- Pricing, billing, quota, feature gating, referral, tutor availability, support ticket, admin analytics, and UTM flows need frontend API contracts and mock/demo behavior.
-- Prior demo backend/database complexity must be reviewed, documented, and kept clearly separated from formal backend architecture.
-- Parent acquisition, referral, support, and operational dashboards need page-level frontend experiences suitable for early paid growth demos.
+- Phase 12 must remain frontend-only and may only use demo/mock API or minimal local demo backend support for page flows and E2E.
+- Organization, school/tutoring center, learning profile, curriculum graph, diagnosis, tutor assignment, monthly report, advanced analytics, retention, and partnership flows need frontend API contracts and mock/demo behavior.
+- Organization roles and workspace concepts are frontend display/demo concepts only; production permissions and multi-tenant backend remain future backend work.
+- Learning intelligence pages must not imply a real AI diagnosis engine or real curriculum graph computation.
+- Platform and partnership pages need page-level frontend experiences suitable for school/tutoring center demos.
 
 ### Out of Scope
 
@@ -93,10 +96,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Direct frontend card handling — payment details must remain with hosted payment pages such as Stripe Checkout or virtual demo screens.
 - Full admin user management, CRM, school B2B onboarding, financial reporting, and multi-tenant school organization — outside pilot launch readiness.
 - Formal production backend, formal payment webhooks, real subscription enforcement, production analytics backend, complex admin backend, production support ticket backend, complex database design, and backend-owned security/compliance implementation — outside Phase 11 frontend-only scope.
+- Production multi-tenant backend, real organization database, formal school admin backend, real AI diagnosis engine, real curriculum graph backend, tutor matching algorithm, automated marketing backend, enterprise invoicing, and complex data warehouse — outside Phase 12 frontend-only scope.
 
 ## Context
 
-The project brief for Phase 11 was provided in Chinese and defines paid launch frontend preparation, growth conversion pages, operational UI scaling, billing/pricing contracts, usage quota display, feature gating UI, parent acquisition funnel, referral/invitation flow, tutor availability, support ticket frontend, admin operational analytics, UTM campaign tracking, and demo/mock API support. The user clarified that this milestone must also clean up and re-bound backend/database functionality introduced in prior stages: anything backend-like in this frontend repository is only for demo or testing and must not become formal backend architecture.
+The project brief for Phase 12 was provided in Chinese and defines platform-level frontend scaling, school/tutoring partnership UI, organization dashboards, advanced learning profiles, curriculum graph UI, weak-point diagnosis UI, tutor assignment/scheduling UI, parent monthly reports, advanced analytics, retention UI, partnership onboarding, API contracts, mock data, and demo backend support. The user again clarified that the milestone must stay frontend-only: backend/database/AI/graph/multi-tenant systems are future backend work, and anything backend-like in this repo is only for demo or testing.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -116,14 +120,15 @@ Current codebase facts:
 - v1.7 shipped Phase 8 staging deployment configuration, CI, Playwright E2E smoke tests, manual QA and demo docs, feedback collection, bug workflow, performance/security docs, privacy/terms placeholders, and production readiness planning.
 - v1.8 shipped Phase 9 production readiness docs, monitoring/logging, analytics delivery, onboarding/support, admin operations, privacy/terms drafts, backup/restore docs, pricing/billing placeholders, launch checklist, pilot plan, post-pilot feedback template, and README updates.
 - v1.9 shipped Phase 10 launch readiness with pricing validation, billing/subscription UI, feature flags, virtual checkout, parent conversion, tutor/admin operations improvements, legal drafts, launch docs, and E2E coverage.
-- v1.10 starts Phase 11 and must expand the frontend paid growth and operations surface while keeping all backend/payment/database work limited to API contracts, mock data, and demo/test-only support.
+- v1.10 shipped Phase 11 paid launch frontend, growth funnel, referrals, tutor availability, support ticket UI, admin analytics, UTM tracking, demo API fallback, and Phase 11 docs.
+- v1.11 starts Phase 12 and must expand the frontend into platform/organization/school/learning-intelligence demos while keeping all backend/database/AI/graph/multi-tenant work limited to API contracts, mock data, and demo/test-only support.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 11 is frontend-only. It prepares paid launch UI, growth funnel UI, mock/demo API contracts, and operational dashboards without implementing formal backend payment, subscription enforcement, analytics, support, or database systems.
+- **Scope**: Phase 12 is frontend-only. It prepares organization, school/tutoring partnership, learning-intelligence, curriculum graph, diagnosis, tutor assignment, monthly report, retention, and advanced analytics UI without implementing formal multi-tenant backend, organization database, AI diagnosis engine, curriculum graph backend, or production partnership systems.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -140,6 +145,7 @@ Current codebase facts:
 - **Payment safety**: The frontend must not directly handle card numbers or payment secrets. Real payment collection should use backend-created hosted checkout sessions; pre-backend demos must use explicit virtual/mock checkout flows.
 - **Production database**: SQLite remains local/demo/test infrastructure only; production persistence must stay behind backend APIs and should use a backend-managed production database plan.
 - **Demo backend boundary**: Any local FastAPI, SQLite, JSON, in-memory, MSW, or mock API support in this repo exists only to demonstrate and test frontend flows. It must not be treated as production backend architecture.
+- **Learning intelligence boundary**: Advanced learning profiles, diagnosis, curriculum graph, and recommendations in Phase 12 are mock/demo UI surfaces only. They must not present themselves as real AI diagnosis or graph computation.
 - **Telemetry privacy**: Monitoring, analytics, logging, feedback, and support payloads must not include passwords, tokens, file contents, or full private chat content by default.
 - **Pilot size**: Phase 9 targets a controlled pilot group, roughly 5-10 students, 3-5 parents, 1-3 tutors, and 1-2 weeks of testing.
 - **Commercial validation**: Phase 10 can test pricing and billing intent through visible CTAs, billing interest capture, and virtual checkout completion before real payment collection is enabled.
@@ -185,6 +191,7 @@ Current codebase facts:
 | Keep subscription gating advisory in the frontend | Frontend can show locked states and upgrade prompts, but backend APIs must enforce quota and access rules | — Pending |
 | Keep Phase 11 strictly frontend-only | Paid launch growth and operational workflows need UI/contracts now, while real payment, subscriptions, analytics, support, and database systems remain backend-owned future work | — Pending |
 | Treat prior local backend/database code as demo/test support only | Prevents local FastAPI/SQLite scaffolding from drifting into formal backend architecture inside the frontend repo | — Pending |
+| Keep Phase 12 strictly frontend-only | Platform, school, organization, and learning intelligence demos need UI/contracts now, while production multi-tenant, AI diagnosis, graph, and scheduling systems remain backend-owned future work | — Pending |
 
 ## Evolution
 
@@ -204,4 +211,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 for v1.10 Phase 11 milestone initialization*
+*Last updated: 2026-05-25 for v1.11 Phase 12 milestone initialization*
