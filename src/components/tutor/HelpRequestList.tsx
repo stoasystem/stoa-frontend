@@ -9,32 +9,32 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
   }
 
   return (
-    <div className="space-y-3">
+    <div className="min-w-0 space-y-3">
       {requests.map((request) => (
-        <Link key={request.requestId} to={`/tutor/requests/${request.requestId}`}>
-          <Card className="transition-colors hover:bg-secondary/40">
-            <CardContent className="grid gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
+        <Link className="block min-w-0" key={request.requestId} to={`/tutor/requests/${request.requestId}`}>
+          <Card className="min-w-0 transition-colors hover:bg-secondary/40">
+            <CardContent className="grid min-w-0 gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-medium">{request.studentName}</h2>
+                  <h2 className="min-w-0 break-words font-medium">{request.studentName}</h2>
                   {request.priority && (
                     <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
                       {request.priority} priority
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="break-words text-sm text-muted-foreground">
                   {request.subject} - {request.grade}
                 </p>
                 {request.requestMessage && (
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
+                  <p className="mt-2 line-clamp-2 break-words text-sm text-muted-foreground">
                     {request.requestMessage}
                   </p>
                 )}
                 <time className="mt-2 block text-xs text-muted-foreground">
                   Opened {new Date(request.createdAt).toLocaleString()}
                 </time>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 break-words text-xs text-muted-foreground">
                   First tutor action:{' '}
                   {request.firstTutorActionAt
                     ? new Date(request.firstTutorActionAt).toLocaleString()

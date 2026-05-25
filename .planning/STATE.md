@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: "Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement"
-status: planning
-last_updated: "2026-05-25T22:35:00Z"
+status: complete
+last_updated: "2026-05-25T23:05:00Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, and a clean path to future real backend integration.
-**Current focus:** Phase 101 is complete; next planning target is Phase 102.
+**Current focus:** Phase 17 implementation is complete; milestone audit and archival are the next lifecycle steps.
 
 ## Current Position
 
 Phase: 102 - QA Evidence, Documentation, and Handoff
-Plan: TBD
-Status: Phase 101 complete; ready for Phase 102 planning
-Last activity: 2026-05-25 — Phase 101 responsive typography and multilingual fit pass completed
+Plan: 102-PLAN
+Status: Phase 102 complete; all v1.16 requirements satisfied
+Last activity: 2026-05-25 — Phase 102 QA evidence, documentation, and handoff completed
 
 ## Performance Metrics
 
@@ -188,10 +188,11 @@ Recent decisions affecting current work:
 - Phase 99 added typed locale layout hints, optional `HomeHero` `titleLines` support, locale-aware hero width/action classes, and scoped stacked-title CSS.
 - Phase 100 rewrote P0 EN/DE/FR/IT homepage, auth, chat, parent, tutor, pricing, billing, and support copy; localized billing plan display text; and removed banned user-facing terminology from audited source paths.
 - Phase 101 added targeted responsive wrapping/min-width safeguards and verified 36 route/locale/viewport combinations with no overflow after fixing French mobile homepage overflow.
+- Phase 102 added copy and visual QA documentation, README Phase 17 handoff guidance, final terminology/build evidence, and a mobile tutor dashboard overflow fix. Final visual QA checked 200 route/locale/viewport combinations with no failures.
 
 ### Pending Todos
 
-- Plan Phase 102: QA Evidence, Documentation, and Handoff.
+- Run milestone audit and completion lifecycle for v1.16.
 
 ### Quick Tasks Completed
 

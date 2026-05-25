@@ -19,13 +19,14 @@ export function TutorRequestFilters({
   onChange: (value: TutorRequestFilter) => void
 }) {
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
+    <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
       {filterOptions.map((option) => (
         <Button
           key={option.value}
           type="button"
           variant={value === option.value ? 'default' : 'outline'}
           size="sm"
+          className="shrink-0"
           onClick={() => onChange(option.value)}
         >
           {option.label}

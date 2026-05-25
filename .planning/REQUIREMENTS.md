@@ -58,19 +58,19 @@ Requirements for Phase 17. Each requirement maps to exactly one roadmap phase.
 
 ### Copy and Visual QA
 
-- [ ] **QA17-01**: `docs/language/copy-review-matrix.md` records key copy for homepage, register, chat, pricing, billing, parent report, tutor workflow, support, and shared states in English, German, French, and Italian.
-- [ ] **QA17-02**: `docs/language/copy-review-matrix.md` includes tone, length, UI fit, and approval status for critical keys such as `home.hero.title`.
-- [ ] **QA17-03**: `docs/language/visual-qa-by-locale.md` defines required locale and viewport checks for `375px`, `430px`, `768px`, `1024px`, and `1440px`.
-- [ ] **QA17-04**: Visual QA covers P0 pages: homepage, register, chat, pricing, parent report, and any additional available billing, tutor, and support surfaces.
-- [ ] **QA17-05**: QA evidence confirms German long titles, French subtitles, Italian CTAs, navbar labels, pricing cards, register forms, and chat teacher-request actions do not overflow or break layout.
-- [ ] **QA17-06**: Terminology grep or equivalent audit confirms banned user-facing terminology is removed from P0 rendered copy sources.
-- [ ] **QA17-07**: `npm run build` passes after Phase 17 changes.
+- [x] **QA17-01**: `docs/language/copy-review-matrix.md` records key copy for homepage, register, chat, pricing, billing, parent report, tutor workflow, support, and shared states in English, German, French, and Italian.
+- [x] **QA17-02**: `docs/language/copy-review-matrix.md` includes tone, length, UI fit, and approval status for critical keys such as `home.hero.title`.
+- [x] **QA17-03**: `docs/language/visual-qa-by-locale.md` defines required locale and viewport checks for `375px`, `430px`, `768px`, `1024px`, and `1440px`.
+- [x] **QA17-04**: Visual QA covers P0 pages: homepage, register, chat, pricing, parent report, and any additional available billing, tutor, and support surfaces.
+- [x] **QA17-05**: QA evidence confirms German long titles, French subtitles, Italian CTAs, navbar labels, pricing cards, register forms, and chat teacher-request actions do not overflow or break layout.
+- [x] **QA17-06**: Terminology grep or equivalent audit confirms banned user-facing terminology is removed from P0 rendered copy sources.
+- [x] **QA17-07**: `npm run build` passes after Phase 17 changes.
 
 ### Documentation and Handoff
 
-- [ ] **DOCS17-01**: README documents Phase 17 locale-specific copy and UI refinement goals, rules, terminology warnings, and example hero copy.
-- [ ] **DOCS17-02**: README or language docs explain that STOA prioritizes meaning, tone, brand consistency, natural reading, and layout stability over literal translation.
-- [ ] **DOCS17-03**: Phase 17 handoff notes identify remaining native-speaker review, legal-sensitive translation, and future cross-locale QA automation gaps.
+- [x] **DOCS17-01**: README documents Phase 17 locale-specific copy and UI refinement goals, rules, terminology warnings, and example hero copy.
+- [x] **DOCS17-02**: README or language docs explain that STOA prioritizes meaning, tone, brand consistency, natural reading, and layout stability over literal translation.
+- [x] **DOCS17-03**: Phase 17 handoff notes identify remaining native-speaker review, legal-sensitive translation, and future cross-locale QA automation gaps.
 
 ## Future Requirements
 
@@ -155,16 +155,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | TERM17-04 | Phase 100 | Complete |
 | TERM17-05 | Phase 100 | Complete |
 | TERM17-06 | Phase 100 | Complete |
-| QA17-01 | Phase 102 | Pending |
-| QA17-02 | Phase 102 | Pending |
-| QA17-03 | Phase 102 | Pending |
-| QA17-04 | Phase 102 | Pending |
-| QA17-05 | Phase 102 | Pending |
-| QA17-06 | Phase 102 | Pending |
-| QA17-07 | Phase 102 | Pending |
-| DOCS17-01 | Phase 102 | Pending |
-| DOCS17-02 | Phase 102 | Pending |
-| DOCS17-03 | Phase 102 | Pending |
+| QA17-01 | Phase 102 | Complete |
+| QA17-02 | Phase 102 | Complete |
+| QA17-03 | Phase 102 | Complete |
+| QA17-04 | Phase 102 | Complete |
+| QA17-05 | Phase 102 | Complete |
+| QA17-06 | Phase 102 | Complete |
+| QA17-07 | Phase 102 | Complete |
+| DOCS17-01 | Phase 102 | Complete |
+| DOCS17-02 | Phase 102 | Complete |
+| DOCS17-03 | Phase 102 | Complete |
 
 **Coverage:**
 - v1.16 requirements: 43 total
@@ -173,4 +173,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 101 completion*
+*Last updated: 2026-05-25 after Phase 102 completion*

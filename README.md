@@ -53,6 +53,60 @@ npm run build
 rg "\bAI\b|AI-|AI |Artificial Intelligence|Chatbot|Robot Tutor|Virtual Teacher|Automated Teacher|Human backup|Teacher Backup|teacher backup|human tutor|What STOA is selling|What we are selling|Buy now|Customers|frontend enforce" src/pages src/components src/i18n -n
 ```
 
+## Phase 17 Locale-Specific Copy and UI Refinement
+
+Phase 17 improves multilingual copy and layout quality without adding new product features. The goal is not literal translation. Each language should use natural, local, education-friendly wording while preserving the same product meaning, tone, and brand.
+
+Main rules:
+
+- English, German, French, and Italian can use different sentence structures.
+- German hero titles should be shorter or split into multiple lines.
+- Avoid long direct translations in large headings.
+- Avoid user-facing terms such as `AI`, `human backup`, `teacher backup`, `what we are selling`, and `buy now`.
+- Use `Learning Assistant` and `Professional teacher support` instead.
+- Prefer education value language over sales language.
+- Keep parent report copy calm and non-alarmist.
+- Keep tutor copy professional and avoid implying teachers are replaced.
+
+Hero copy examples:
+
+```text
+English:
+Learn with clarity.
+
+German:
+Lernen. Fragen. Verstehen.
+
+French:
+Comprendre avec confiance.
+
+Italian:
+Studiare con più chiarezza.
+```
+
+Phase 17 docs:
+
+- `docs/language/locale-copy-rules.md`
+- `docs/language/german-copy-rules.md`
+- `docs/language/french-copy-rules.md`
+- `docs/language/italian-copy-rules.md`
+- `docs/language/copy-review-matrix.md`
+- `docs/language/visual-qa-by-locale.md`
+
+Verification:
+
+```bash
+npx tsc -b --pretty false
+npm run build
+rg "\bAI\b|Artificial Intelligence|AI Support|AI answer|AI response|AI tutor|Chatbot|\bBot\b|Human backup|Teacher backup|What we are selling|What STOA is selling|Buy now|Customers|human tutor|teacher backup|human backup" src/i18n src/data src/components src/pages -n
+```
+
+Handoff gaps:
+
+- German, French, and Italian still need native-speaker review before a broad market launch.
+- Legal-sensitive copy still needs professional legal translation and legal review.
+- Phase 18 should automate cross-locale screenshot or visual-regression checks.
+
 ## Phase 15 Homepage Onboarding and Learning-First Chat
 
 Phase 15 refines STOA's first impression and core learning path. It does not add a production backend or new large product modules. It makes the product story clearer:
