@@ -122,55 +122,55 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LCOPY-01 | TBD | Pending |
-| LCOPY-02 | TBD | Pending |
-| LCOPY-03 | TBD | Pending |
-| LCOPY-04 | TBD | Pending |
-| LCOPY-05 | TBD | Pending |
-| LCOPY-06 | TBD | Pending |
-| LCOPY-07 | TBD | Pending |
-| HERO-01 | TBD | Pending |
-| HERO-02 | TBD | Pending |
-| HERO-03 | TBD | Pending |
-| HERO-04 | TBD | Pending |
-| HERO-05 | TBD | Pending |
-| HERO-06 | TBD | Pending |
-| LAYOUT-01 | TBD | Pending |
-| LAYOUT-02 | TBD | Pending |
-| LAYOUT-03 | TBD | Pending |
-| LAYOUT-04 | TBD | Pending |
-| LAYOUT-05 | TBD | Pending |
-| LAYOUT-06 | TBD | Pending |
-| P0COPY-01 | TBD | Pending |
-| P0COPY-02 | TBD | Pending |
-| P0COPY-03 | TBD | Pending |
-| P0COPY-04 | TBD | Pending |
-| P0COPY-05 | TBD | Pending |
-| P0COPY-06 | TBD | Pending |
-| P0COPY-07 | TBD | Pending |
-| P0COPY-08 | TBD | Pending |
-| TERM17-01 | TBD | Pending |
-| TERM17-02 | TBD | Pending |
-| TERM17-03 | TBD | Pending |
-| TERM17-04 | TBD | Pending |
-| TERM17-05 | TBD | Pending |
-| TERM17-06 | TBD | Pending |
-| QA17-01 | TBD | Pending |
-| QA17-02 | TBD | Pending |
-| QA17-03 | TBD | Pending |
-| QA17-04 | TBD | Pending |
-| QA17-05 | TBD | Pending |
-| QA17-06 | TBD | Pending |
-| QA17-07 | TBD | Pending |
-| DOCS17-01 | TBD | Pending |
-| DOCS17-02 | TBD | Pending |
-| DOCS17-03 | TBD | Pending |
+| LCOPY-01 | Phase 98 | Pending |
+| LCOPY-02 | Phase 98 | Pending |
+| LCOPY-03 | Phase 98 | Pending |
+| LCOPY-04 | Phase 98 | Pending |
+| LCOPY-05 | Phase 98 | Pending |
+| LCOPY-06 | Phase 98 | Pending |
+| LCOPY-07 | Phase 98 | Pending |
+| HERO-01 | Phase 100 | Pending |
+| HERO-02 | Phase 100 | Pending |
+| HERO-03 | Phase 100 | Pending |
+| HERO-04 | Phase 100 | Pending |
+| HERO-05 | Phase 99 | Pending |
+| HERO-06 | Phase 101 | Pending |
+| LAYOUT-01 | Phase 99 | Pending |
+| LAYOUT-02 | Phase 99 | Pending |
+| LAYOUT-03 | Phase 99 | Pending |
+| LAYOUT-04 | Phase 99 | Pending |
+| LAYOUT-05 | Phase 101 | Pending |
+| LAYOUT-06 | Phase 101 | Pending |
+| P0COPY-01 | Phase 100 | Pending |
+| P0COPY-02 | Phase 100 | Pending |
+| P0COPY-03 | Phase 100 | Pending |
+| P0COPY-04 | Phase 100 | Pending |
+| P0COPY-05 | Phase 100 | Pending |
+| P0COPY-06 | Phase 100 | Pending |
+| P0COPY-07 | Phase 100 | Pending |
+| P0COPY-08 | Phase 100 | Pending |
+| TERM17-01 | Phase 100 | Pending |
+| TERM17-02 | Phase 100 | Pending |
+| TERM17-03 | Phase 100 | Pending |
+| TERM17-04 | Phase 100 | Pending |
+| TERM17-05 | Phase 100 | Pending |
+| TERM17-06 | Phase 100 | Pending |
+| QA17-01 | Phase 102 | Pending |
+| QA17-02 | Phase 102 | Pending |
+| QA17-03 | Phase 102 | Pending |
+| QA17-04 | Phase 102 | Pending |
+| QA17-05 | Phase 102 | Pending |
+| QA17-06 | Phase 102 | Pending |
+| QA17-07 | Phase 102 | Pending |
+| DOCS17-01 | Phase 102 | Pending |
+| DOCS17-02 | Phase 102 | Pending |
+| DOCS17-03 | Phase 102 | Pending |
 
 **Coverage:**
 - v1.16 requirements: 43 total
-- Mapped to phases: 0
-- Unmapped: 43
+- Mapped to phases: 43
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 during Phase 17 requirements definition*
+*Last updated: 2026-05-25 during Phase 17 roadmap creation*

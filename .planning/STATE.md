@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.16
 milestone_name: "Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement"
 status: planning
-last_updated: "2026-05-25T21:30:43.409Z"
+last_updated: "2026-05-25T21:43:52Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-25)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.15 Phase 16 is implemented and ready for review/handoff.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, and a clean path to future real backend integration.
+**Current focus:** Milestone v1.16 Phase 17 roadmap is created; next planning target is Phase 98.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-25 — Milestone v1.16 started
+Phase: 98 - Copy Governance and Scope Lock
+Plan: TBD
+Status: Roadmap created; ready for phase planning
+Last activity: 2026-05-25 — Milestone v1.16 roadmap created with Phases 98-102 and 43/43 requirements mapped
 
 ## Performance Metrics
 
@@ -181,10 +181,13 @@ Recent decisions affecting current work:
 - Milestone v1.15 started from the Phase 16 multilingual language optimization and AI terminology replacement brief.
 - Phase 16 keeps product functionality stable while adding English, German, French, and Italian language support, replacing user-visible AI-heavy terminology with Learning Assistant and professional teacher support language, and validating multilingual layout.
 - Phase 16 research confirmed `i18next` plus `react-i18next`, namespace locale files, browser-local `stoa_language` persistence, and root `html lang` updates as the recommended implementation path.
+- Milestone v1.16 started from the Phase 17 locale-specific copywriting, responsive typography, and multilingual UI refinement brief.
+- Phase 17 keeps product functionality stable while refining EN/DE/FR/IT copy quality, title structure, layout fit, terminology cleanup, visual QA, and handoff documentation.
+- v1.16 roadmap continues numbering into Phase 98 through Phase 102.
 
 ### Pending Todos
 
-None currently.
+- Plan Phase 98: Copy Governance and Scope Lock.
 
 ### Quick Tasks Completed
 
@@ -288,10 +291,10 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-05-24 19:15
-Stopped at: v1.3 implemented and verified
+Last session: 2026-05-25
+Stopped at: v1.16 roadmap created and ready for Phase 98 planning
 Resume file: None
 
 ## Operator Next Steps
 
-- Review Phase 9 pilot readiness artifacts and decide whether to begin Phase 10: Pilot Iteration, Payment Preparation, and Production Launch.
+- Run `$gsd-plan-phase 98` to plan Copy Governance and Scope Lock.
