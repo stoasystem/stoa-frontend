@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import uuid
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
@@ -34,6 +35,7 @@ class LoginRequest(BaseModel):
 class RegisterRequest(LoginRequest):
     name: str
     role: str
+    profile: dict[str, object] | None = None
 
 
 class StudentProfileUpdate(BaseModel):
@@ -51,6 +53,15 @@ class CreateConversationRequest(BaseModel):
 class SendMessageRequest(BaseModel):
     content: str
     attachmentIds: list[str] | None = None
+
+
+class UploadedFileResponse(BaseModel):
+    id: str
+    filename: str
+    mimeType: str
+    sizeBytes: int
+    status: str
+    createdAt: str
 
 
 class TeacherHelpCreateRequest(BaseModel):
@@ -147,10 +158,11 @@ def login(payload: LoginRequest) -> dict[str, object]:
 
 @app.post("/auth/register")
 def register(payload: RegisterRequest) -> dict[str, object]:
-    if payload.role not in {"student", "parent", "tutor", "admin"}:
+    if payload.role not in {"student", "parent", "tutor"}:
         raise HTTPException(status_code=400, detail="Invalid role")
     user_id = f"user-{uuid.uuid4()}"
     created_at = now_iso()
+    profile = payload.profile or {}
     with get_connection() as connection:
         try:
             connection.execute(
@@ -161,18 +173,163 @@ def register(payload: RegisterRequest) -> dict[str, object]:
                 (user_id, payload.name, payload.email, hash_password(payload.password), payload.role, created_at),
             )
             if payload.role == "student":
+                subjects = profile.get("subjectsNeedingHelp")
+                if not isinstance(subjects, list):
+                    subjects = []
                 connection.execute(
                     """
                     INSERT INTO student_profiles (id, user_id, grade, school_system, primary_subjects, created_at)
                     VALUES (?, ?, ?, ?, ?, ?)
                     """,
-                    (f"profile-{uuid.uuid4()}", user_id, "Grade 8", "", json.dumps([]), created_at),
+                    (
+                        f"profile-{uuid.uuid4()}",
+                        user_id,
+                        str(profile.get("grade") or "Grade 8"),
+                        str(profile.get("schoolSystem") or ""),
+                        json.dumps(subjects),
+                        created_at,
+                    ),
+                )
+            if payload.role == "parent":
+                child_id = f"user-child-{uuid.uuid4()}"
+                child_name = str(profile.get("childName") or "Demo child")
+                child_grade = str(profile.get("childGrade") or "Grade 8")
+                child_subjects = profile.get("subjectsNeedingHelp")
+                if not isinstance(child_subjects, list):
+                    child_subjects = []
+                connection.execute(
+                    """
+                    INSERT INTO users (id, name, email, password_hash, role, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        child_id,
+                        child_name,
+                        f"child-{uuid.uuid4()}@demo.local",
+                        hash_password("password123"),
+                        "student",
+                        created_at,
+                    ),
+                )
+                connection.execute(
+                    """
+                    INSERT INTO student_profiles (id, user_id, grade, school_system, primary_subjects, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (
+                        f"profile-{uuid.uuid4()}",
+                        child_id,
+                        child_grade,
+                        "Demo onboarding",
+                        json.dumps(child_subjects),
+                        created_at,
+                    ),
+                )
+                connection.execute(
+                    """
+                    INSERT INTO parent_children (id, parent_user_id, student_user_id, created_at)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (f"parent-child-{uuid.uuid4()}", user_id, child_id, created_at),
                 )
             connection.commit()
         except Exception as exc:
             raise HTTPException(status_code=400, detail="Email already exists") from exc
     user = {"id": user_id, "name": payload.name, "email": payload.email, "role": payload.role}
-    return {"accessToken": create_access_token(user_id), "user": user}
+    response = {"accessToken": create_access_token(user_id), "user": user, "onboardingStatus": "completed"}
+    if payload.role == "student":
+        response["parentLinked"] = True
+    if payload.role == "tutor":
+        response["onboardingStatus"] = "pending_review"
+        response["verificationStatus"] = "pending_review"
+    return response
+
+
+async def parse_demo_multipart_upload(request: Request) -> tuple[str, str, bytes]:
+    content_type_header = request.headers.get("content-type", "")
+    if "multipart/form-data" not in content_type_header:
+        raise HTTPException(status_code=400, detail="Expected multipart form data")
+    body = await request.body()
+    body_text = body[:4096].decode("latin-1", errors="ignore")
+    filename_match = re.search(r'filename="([^"]+)"', body_text)
+    content_type_match = re.search(r"Content-Type:\s*([^\r\n]+)", body_text)
+    filename = filename_match.group(1) if filename_match else "upload"
+    content_type = content_type_match.group(1).strip() if content_type_match else "application/octet-stream"
+    return filename, content_type, body
+
+
+def validate_demo_upload(filename: str, content_type: str, content: bytes) -> None:
+    allowed_types = {"application/pdf", "image/png", "image/jpeg"}
+    if content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Only PDF, PNG, and JPEG files are supported")
+    if len(content) > 10 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File must be 10 MB or smaller")
+
+
+@app.post("/files/tutor-credentials")
+async def upload_tutor_credential(request: Request) -> dict[str, object]:
+    filename, content_type, content = await parse_demo_multipart_upload(request)
+    validate_demo_upload(filename, content_type, content)
+    file_id = f"credential-file-{uuid.uuid4()}"
+    created_at = now_iso()
+    with get_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO uploaded_files
+            (id, conversation_id, uploaded_by_user_id, filename, mime_type, size_bytes, storage_path, status, created_at)
+            VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                file_id,
+                "demo-onboarding",
+                filename,
+                content_type,
+                len(content),
+                f"local/demo/tutor-credentials/{file_id}",
+                "uploaded",
+                created_at,
+            ),
+        )
+        connection.commit()
+    return {"id": file_id, "filename": filename, "status": "uploaded"}
+
+
+@app.post("/files")
+async def upload_homework_file(
+    request: Request,
+    user: dict[str, str] = Depends(require_role("student")),
+) -> dict[str, object]:
+    filename, content_type, content = await parse_demo_multipart_upload(request)
+    validate_demo_upload(filename, content_type, content)
+    file_id = f"file-{uuid.uuid4()}"
+    created_at = now_iso()
+    with get_connection() as connection:
+        connection.execute(
+            """
+            INSERT INTO uploaded_files
+            (id, conversation_id, uploaded_by_user_id, filename, mime_type, size_bytes, storage_path, status, created_at)
+            VALUES (?, NULL, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                file_id,
+                user["id"],
+                filename,
+                content_type,
+                len(content),
+                f"local/demo/homework/{file_id}",
+                "uploaded",
+                created_at,
+            ),
+        )
+        connection.commit()
+    return {
+        "id": file_id,
+        "filename": filename,
+        "mimeType": content_type,
+        "sizeBytes": len(content),
+        "status": "uploaded",
+        "createdAt": created_at,
+    }
 
 
 @app.post("/analytics/events")

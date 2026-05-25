@@ -15,8 +15,25 @@
 - [ ] `tutor@test.com / password123` can log in.
 - [ ] `admin@test.com / password123` can log in.
 - [ ] Register returns a demo user and token.
+- [ ] Student registration accepts age, school, grade, subjects, parent name, and parent email.
+- [ ] Student registration can return `parentLinked: true`.
+- [ ] Parent registration accepts child profile fields and creates a linked demo child.
+- [ ] Tutor registration accepts teaching profile fields and returns `verificationStatus: pending_review`.
 - [ ] `/auth/me` returns the current user.
 - [ ] Invalid credentials return `{ message, code }`.
+
+## Phase 15 Homepage and Onboarding
+
+- [ ] Homepage has a magazine-style hero.
+- [ ] Homepage primary CTA is `Start Learning`.
+- [ ] Homepage no longer shows AI Support / Teacher Backup / Parent Visibility as three equal entry cards.
+- [ ] Homepage explains ask -> AI explanation -> teacher if needed -> parent progress.
+- [ ] `Start Learning` routes unauthenticated users to `/login?next=/chat`.
+- [ ] Login page links to register.
+- [ ] Register first step offers Student, Parent, and Tutor only.
+- [ ] Admin is not offered in public registration.
+- [ ] Tutor credential upload accepts PDF, PNG, and JPEG.
+- [ ] Tutor credential upload rejects unsupported file types and files larger than 10 MB.
 
 ## Student Chat
 
@@ -31,6 +48,7 @@
 ## Teacher Help and Tutor
 
 - [ ] Student can request teacher help.
+- [ ] Teacher help request appears inline below an AI response.
 - [ ] Tutor can list help requests.
 - [ ] Tutor can open request detail.
 - [ ] Tutor can update request status.
@@ -62,10 +80,10 @@
 ## Integration Readiness
 
 - [ ] All Phase 14 endpoints are documented.
+- [ ] Phase 15 onboarding and tutor credential upload demo contracts are documented.
 - [ ] API mode is documented for `mock`, `demo`, `staging`, and `production`.
 - [ ] Frontend API base URL is configurable.
 - [ ] Demo fallback is disabled for staging/production examples.
 - [ ] Real backend readiness document is complete.
 - [ ] AWS readiness notes are complete.
 - [ ] `npm run build` passes.
-

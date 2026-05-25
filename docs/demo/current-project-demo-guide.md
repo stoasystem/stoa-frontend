@@ -4,6 +4,28 @@
 
 This document summarizes what the STOA frontend currently implements and how to run the local demo experience. It is intended for developers, product reviewers, and anyone preparing a STOA demo.
 
+## Phase 15 Demo Update
+
+The current demo now starts with a redesigned homepage and a student-first learning path:
+
+1. Open `/`.
+2. Click `Start Learning`.
+3. If not logged in, sign in or create an account.
+4. Students continue to `/chat` and ask a homework question directly.
+5. STOA AI answers first.
+6. The teacher request action appears inline below the AI response.
+7. Parents can follow learning history and reports from `/parent`.
+
+The homepage no longer presents `AI Support`, `Teacher Backup`, and `Parent Visibility` as three equal product entries. Those capabilities are now explained as one ordered learning flow.
+
+New registration demo paths:
+
+- Student: age, school, grade, subjects, and parent link fields.
+- Parent: child profile and subjects needing help.
+- Tutor: teaching profile plus mock credential upload.
+
+Tutor credential upload is demo-only. Uploaded documents are marked `pending_review`; no real verification or OCR is performed.
+
 ## 1. Current Project Status
 
 STOA Frontend is a React + TypeScript + Vite application for the STOA learning platform. The project has moved beyond a basic scaffold and now includes a broad demo-ready product surface:
@@ -778,4 +800,3 @@ It should not be presented as:
 - a real AI diagnosis engine
 - a deployed AWS architecture
 - a complete school/enterprise platform backend
-

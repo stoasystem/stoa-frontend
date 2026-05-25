@@ -9,6 +9,44 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 15 Homepage Onboarding and AI-First Chat
+
+Phase 15 refines STOA's first impression and core learning path. It does not add a production backend or new large product modules. It makes the product story clearer:
+
+```text
+Student starts learning
+  -> AI answers first
+  -> teacher joins only when needed
+  -> parent follows progress
+```
+
+Main Phase 15 updates:
+
+- magazine-style homepage with one primary `Start Learning` CTA
+- homepage learning flow replacing the old AI / teacher / parent parallel-card presentation
+- premium UI direction using deep navy, warm ivory, muted sage, and soft gold accents
+- role-based registration for Student, Parent, and Tutor
+- student onboarding with school, grade, subjects, and parent link fields
+- parent onboarding with child profile fields
+- tutor onboarding with teaching profile and mock credential upload
+- chat empty state that sends students straight into asking homework questions
+- inline `Ask a human tutor` action below AI responses
+
+Recommended Phase 15 demo path:
+
+```text
+/ -> Start Learning -> /login?next=/chat -> register or login -> /chat
+```
+
+Demo backend additions:
+
+- `POST /auth/register` accepts role-specific `profile` payloads
+- `POST /files/tutor-credentials` accepts mock PDF, PNG, and JPEG uploads up to 10 MB
+- tutor onboarding returns `verificationStatus: pending_review`
+- student onboarding can return `parentLinked: true`
+
+See `docs/demo/phase15-demo-flow.md` and `docs/qa/demo-backend-qa.md`.
+
 ## Phase 14 Demo Backend Stabilization
 
 Phase 14 does not build the production backend. It stabilizes a lightweight demo backend for frontend testing and product demos, while keeping the backend simple, replaceable, and decoupled from future real backend and AWS work.

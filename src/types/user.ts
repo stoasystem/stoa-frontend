@@ -44,4 +44,7 @@ export type User = {
 export type AuthResponse = {
   accessToken: string
   user: User
+  onboardingStatus?: 'completed' | 'pending_review'
+  parentLinked?: boolean
+  verificationStatus?: 'pending_review'
 }

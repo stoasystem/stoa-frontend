@@ -4,8 +4,8 @@ import { AppLogo } from '@/components/common/AppLogo'
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen place-items-center bg-background px-6 text-foreground">
-      <div className="w-full max-w-sm">
+    <div className="grid min-h-screen place-items-center bg-background px-5 py-8 text-foreground sm:px-6">
+      <div className="w-full max-w-4xl">
         <Link to="/" className="mb-8 block text-center text-lg font-semibold tracking-tight">
           <AppLogo />
         </Link>

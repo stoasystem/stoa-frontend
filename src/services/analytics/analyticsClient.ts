@@ -29,6 +29,7 @@ export type AnalyticsEventName =
   | 'referral_link_copied'
   | 'tutor_availability_viewed'
   | 'tutor_availability_updated'
+  | 'tutor_credential_uploaded'
   | 'support_ticket_created'
   | 'support_ticket_viewed'
   | 'admin_analytics_viewed'

@@ -61,7 +61,61 @@ Response:
 
 ### `POST /auth/register`
 
-Accepts `name`, `email`, `password`, and `role`. Creates a demo-session user and returns the same shape as login. This is not production registration.
+Accepts `name`, `email`, `password`, `role`, and an optional role-specific `profile`. Public demo registration supports `student`, `parent`, and `tutor`; admin accounts remain fixed demo accounts.
+
+Student request example:
+
+```json
+{
+  "role": "student",
+  "name": "Anna Keller",
+  "email": "anna@example.com",
+  "password": "password123",
+  "profile": {
+    "age": 14,
+    "school": "Kantonsschule Zürich Nord",
+    "grade": "Grade 8",
+    "schoolSystem": "Swiss Gymnasium",
+    "subjectsNeedingHelp": ["Mathematics", "Physics"],
+    "parentName": "Michael Keller",
+    "parentEmail": "michael@example.com"
+  }
+}
+```
+
+Student response can include:
+
+```json
+{
+  "accessToken": "demo-token-student",
+  "user": {
+    "id": "user-student-new",
+    "name": "Anna Keller",
+    "email": "anna@example.com",
+    "role": "student"
+  },
+  "onboardingStatus": "completed",
+  "parentLinked": true
+}
+```
+
+Tutor response can include:
+
+```json
+{
+  "accessToken": "demo-token-tutor",
+  "user": {
+    "id": "user-tutor-new",
+    "name": "Dr. Sample Tutor",
+    "email": "tutor@example.com",
+    "role": "tutor"
+  },
+  "onboardingStatus": "pending_review",
+  "verificationStatus": "pending_review"
+}
+```
+
+This is not production registration or real identity verification.
 
 ### `GET /auth/me`
 
@@ -103,6 +157,28 @@ Accepts `content` and optional `attachmentIds`, stores a student message, and re
 ### `POST /conversations/:conversationId/messages/stream`
 
 Returns SSE-style demo events compatible with the frontend streaming client. This is a mock stream, not real AI provider streaming.
+
+## Files
+
+### `POST /files`
+
+Accepts demo homework uploads for logged-in students. Supported formats are PDF, PNG, and JPEG up to 10 MB. Returns uploaded file metadata.
+
+### `POST /files/tutor-credentials`
+
+Accepts mock tutor credential uploads for onboarding. Supported formats are PDF, PNG, and JPEG up to 10 MB.
+
+Response:
+
+```json
+{
+  "id": "credential-file-1",
+  "filename": "diploma.pdf",
+  "status": "uploaded"
+}
+```
+
+The upload is demo-only and does not perform OCR, storage hardening, identity verification, or credential approval.
 
 ## Teacher Help and Tutor
 
@@ -223,4 +299,3 @@ Returns teacher help requests across demo users.
 ### `GET /admin/feedback`
 
 Returns feedback items.
-

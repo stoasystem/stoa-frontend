@@ -7,21 +7,34 @@ export function ChatMessageList({
   messages,
   isAssistantThinking = false,
   onRetryMessage,
+  onRequestTeacher,
+  isRequestingTeacher,
+  teacherFeedback,
 }: {
   messages: ChatMessage[]
   isAssistantThinking?: boolean
   onRetryMessage?: (messageId: string) => void
+  onRequestTeacher?: () => void
+  isRequestingTeacher?: boolean
+  teacherFeedback?: string | null
 }) {
   return (
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 md:px-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
         {messages.length === 0 ? (
           <div className="flex min-h-64 items-center justify-center">
-            <EmptyState message="No messages yet." />
+            <EmptyState message="Ask your first homework question below." />
           </div>
         ) : (
           messages.map((message) => (
-            <ChatMessageBubble key={message.id} message={message} onRetry={onRetryMessage} />
+            <ChatMessageBubble
+              key={message.id}
+              message={message}
+              onRetry={onRetryMessage}
+              onRequestTeacher={onRequestTeacher}
+              isRequestingTeacher={isRequestingTeacher}
+              teacherFeedback={teacherFeedback}
+            />
           ))
         )}
         {isAssistantThinking && (

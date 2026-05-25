@@ -1,5 +1,6 @@
 import { httpClient } from '@/services/api/httpClient'
 import type { AuthResponse, User, UserRole } from '@/types/user'
+import type { RegisterPayload } from '@/types/onboarding'
 import { TOKEN_KEY } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
 
@@ -8,7 +9,7 @@ export type LoginRequest = {
   password: string
 }
 
-export type RegisterRequest = {
+export type RegisterRequest = RegisterPayload | {
   name: string
   email: string
   password: string
@@ -79,8 +80,20 @@ function createDemoUser(email: string, role = inferRole(email), name?: string): 
 }
 
 function createDemoAuthResponse(email: string, role = inferRole(email), name?: string): AuthResponse {
-  return {
+  const response: AuthResponse = {
     accessToken: `demo:${role}`,
     user: createDemoUser(email, role, name),
   }
+
+  if (role === 'student') {
+    response.onboardingStatus = 'completed'
+    response.parentLinked = true
+  }
+
+  if (role === 'tutor') {
+    response.onboardingStatus = 'pending_review'
+    response.verificationStatus = 'pending_review'
+  }
+
+  return response
 }

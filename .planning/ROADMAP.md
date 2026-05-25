@@ -16,20 +16,20 @@
 - ✅ **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (implemented 2026-05-25)
 - ✅ **v1.12 Phase 13: Information Architecture, Page Flow, and UX Optimization** - Phases 73-79 (implemented 2026-05-25)
 - ✅ **v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness** - Phases 80-86 (implemented 2026-05-25)
-- ⏳ **v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement** - Phases 87-91
+- ✅ **v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement** - Phases 87-91 (implemented 2026-05-25)
 
 ## Phases
 
 <details open>
-<summary>⏳ v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement (Phases 87-91)</summary>
+<summary>✅ v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement (Phases 87-91)</summary>
 
 **Milestone Goal:** Refine STOA's first impression and core learning path with a magazine-style homepage, role-aware onboarding, AI-first chat flow, and a more premium, restrained education product UI.
 
-- [ ] **Phase 87: Premium Homepage Story, Navigation, and Theme Direction** - Redesign the marketing homepage around a student-first magazine-style story and premium visual language.
-- [ ] **Phase 88: Onboarding Contracts and Demo Backend Support** - Add typed onboarding contracts, registration payload support, tutor credential mock upload, and reset behavior.
-- [ ] **Phase 89: Role-Based Registration and Onboarding UI** - Build the multi-step registration flow for student, parent, and tutor profiles with correct redirects.
-- [ ] **Phase 90: AI-First Chat and Inline Teacher Escalation** - Refine chat entry, empty state, assistant feedback, and teacher request placement.
-- [ ] **Phase 91: Phase 15 QA, Documentation, and Build Closure** - Update docs and QA artifacts, verify the demo flow, and close with build verification.
+- [x] **Phase 87: Premium Homepage Story, Navigation, and Theme Direction** - Redesign the marketing homepage around a student-first magazine-style story and premium visual language.
+- [x] **Phase 88: Onboarding Contracts and Demo Backend Support** - Add typed onboarding contracts, registration payload support, tutor credential mock upload, and reset behavior.
+- [x] **Phase 89: Role-Based Registration and Onboarding UI** - Build the multi-step registration flow for student, parent, and tutor profiles with correct redirects.
+- [x] **Phase 90: AI-First Chat and Inline Teacher Escalation** - Refine chat entry, empty state, assistant feedback, and teacher request placement.
+- [x] **Phase 91: Phase 15 QA, Documentation, and Build Closure** - Update docs and QA artifacts, verify the demo flow, and close with build verification.
 
 ### Phase 87: Premium Homepage Story, Navigation, and Theme Direction
 
@@ -42,7 +42,7 @@
   3. A learning-flow section communicates AI-first help, teacher escalation, and parent progress in order.
   4. Marketing navigation keeps student entry prominent while preserving parent/tutor/pricing/login access at lower visual weight.
   5. Premium theme tokens and subtle transitions are applied without mobile text/image overlap.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 88: Onboarding Contracts and Demo Backend Support
 
@@ -55,7 +55,7 @@
   3. Tutor credential upload service and hook use service-layer API calls, not component-local URLs.
   4. Demo backend supports expanded `POST /auth/register` and `POST /files/tutor-credentials` mock behavior.
   5. Demo reset preserves fixed accounts and clears temporary onboarding/upload state.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 89: Role-Based Registration and Onboarding UI
 
@@ -68,7 +68,7 @@
   3. Student, parent, and tutor profile steps collect the required role-specific fields.
   4. Tutor credential upload UI validates PDF/PNG/JPEG and 10 MB maximum files.
   5. Completion screen and redirect behavior match the returned role/onboarding status.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 90: AI-First Chat and Inline Teacher Escalation
 
@@ -81,7 +81,7 @@
   3. Assistant replies render an inline `Ask a human tutor` style action.
   4. Teacher request creation still uses existing service/hook behavior and remains visible to tutor/parent demo surfaces.
   5. The UI no longer treats teacher help as a standalone module on the student entry path.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 91: Phase 15 QA, Documentation, and Build Closure
 
@@ -94,7 +94,7 @@
   3. Demo guide explains how to use the current Phase 15 demo from homepage to chat and role surfaces.
   4. `npm run build` passes after Phase 15 changes.
   5. Phase 15 requirements traceability is complete.
-**Plans**: 0/1
+**Plans**: 1/1
 
 </details>
 
@@ -114,9 +114,8 @@ Phase 15 phases planned in numeric order: 87 -> 88 -> 89 -> 90 -> 91
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 87. Premium Homepage Story, Navigation, and Theme Direction | v1.14 | 0/1 | Planned | — |
-| 88. Onboarding Contracts and Demo Backend Support | v1.14 | 0/1 | Planned | — |
-| 89. Role-Based Registration and Onboarding UI | v1.14 | 0/1 | Planned | — |
-| 90. AI-First Chat and Inline Teacher Escalation | v1.14 | 0/1 | Planned | — |
-| 91. Phase 15 QA, Documentation, and Build Closure | v1.14 | 0/1 | Planned | — |
-
+| 87. Premium Homepage Story, Navigation, and Theme Direction | v1.14 | 1/1 | Complete | 2026-05-25 |
+| 88. Onboarding Contracts and Demo Backend Support | v1.14 | 1/1 | Complete | 2026-05-25 |
+| 89. Role-Based Registration and Onboarding UI | v1.14 | 1/1 | Complete | 2026-05-25 |
+| 90. AI-First Chat and Inline Teacher Escalation | v1.14 | 1/1 | Complete | 2026-05-25 |
+| 91. Phase 15 QA, Documentation, and Build Closure | v1.14 | 1/1 | Complete | 2026-05-25 |

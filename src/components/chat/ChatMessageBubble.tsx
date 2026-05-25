@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat'
+import { AIResponseFeedback } from '@/components/chat/AIResponseFeedback'
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
 
@@ -28,9 +29,15 @@ function getStatusLabel(message: ChatMessage) {
 export function ChatMessageBubble({
   message,
   onRetry,
+  onRequestTeacher,
+  isRequestingTeacher,
+  teacherFeedback,
 }: {
   message: ChatMessage
   onRetry?: (messageId: string) => void
+  onRequestTeacher?: () => void
+  isRequestingTeacher?: boolean
+  teacherFeedback?: string | null
 }) {
   const isStudent = message.role === 'student'
   const isSystem = message.role === 'system'
@@ -91,6 +98,13 @@ export function ChatMessageBubble({
           <div className="mt-3">
             <RetryMessageButton onRetry={() => onRetry(message.id)} />
           </div>
+        )}
+        {message.role === 'assistant' && message.status !== 'streaming' && (
+          <AIResponseFeedback
+            onRequestTeacher={onRequestTeacher}
+            isRequesting={isRequestingTeacher}
+            feedback={teacherFeedback}
+          />
         )}
       </div>
     </div>

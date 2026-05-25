@@ -4,7 +4,6 @@ import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
 import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
-import { TeacherHelpStatusCard } from '@/components/chat/TeacherHelpStatusCard'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
@@ -172,7 +171,7 @@ export function ChatPage() {
     return (
       <div className="flex h-screen items-center justify-center bg-background px-4 text-foreground">
         <div className="w-full max-w-xl rounded-lg border bg-card p-5 shadow-sm">
-          <EmptyState message="No conversations yet." />
+          <EmptyState message="Welcome to STOA. Ask your first homework question below." />
           <form
             className="mt-5 space-y-3"
             onSubmit={(event) => {
@@ -183,7 +182,7 @@ export function ChatPage() {
             <Textarea
               value={newConversationMessage}
               onChange={(event) => setNewConversationMessage(event.target.value)}
-              placeholder="Start with a homework question..."
+              placeholder="Type your homework question here..."
               className="min-h-24 resize-none"
               disabled={createConversationMutation.isPending}
             />
@@ -236,6 +235,14 @@ export function ChatPage() {
               messages={displayedMessages}
               isAssistantThinking={false}
               onRetryMessage={retryMessage}
+              onRequestTeacher={handleRequestTeacherHelp}
+              isRequestingTeacher={teacherHelpMutation.isPending}
+              teacherFeedback={
+                teacherHelpError ??
+                (teacherHelpStatusQuery.data || teacherHelpRequest
+                  ? 'Teacher request created. A tutor can pick it up from the tutor dashboard.'
+                  : null)
+              }
             />
             {sendError && (
               <div className="px-4 pb-3 md:px-6">
@@ -244,15 +251,6 @@ export function ChatPage() {
                 </div>
               </div>
             )}
-            <TeacherHelpStatusCard
-              onRequestTeacher={handleRequestTeacherHelp}
-              isRequesting={teacherHelpMutation.isPending}
-              request={teacherHelpStatusQuery.data ?? teacherHelpRequest}
-              error={
-                teacherHelpError ??
-                (teacherHelpStatusQuery.isError ? 'Failed to load teacher-help status.' : null)
-              }
-            />
             <ChatInput
               onSendMessage={handleSendMessage}
               onStopStreaming={stopStreaming}

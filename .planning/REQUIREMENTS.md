@@ -10,47 +10,47 @@ Requirements for Phase 15. Each requirement maps to exactly one roadmap phase.
 
 ### Homepage and Navigation
 
-- [ ] **HOME-01**: User can land on a magazine-style homepage that immediately presents STOA as a premium student learning platform.
-- [ ] **HOME-02**: User can click a single primary `Start Learning` CTA that starts the student learning path.
-- [ ] **HOME-03**: Homepage no longer presents `AI Support`, `Teacher Backup`, and `Parent Visibility` as three parallel primary product entries.
-- [ ] **HOME-04**: Homepage explains STOA as a sequential learning flow: ask a question, get an AI explanation, ask a teacher if needed, and let parents follow progress.
-- [ ] **HOME-05**: Marketing navigation gives student learning the highest priority while keeping parent/tutor/login/pricing entry points available at lower visual weight.
-- [ ] **HOME-06**: Homepage mobile layout shows brand, primary CTA, and a hint of the next section without text or image overlap.
+- [x] **HOME-01**: User can land on a magazine-style homepage that immediately presents STOA as a premium student learning platform.
+- [x] **HOME-02**: User can click a single primary `Start Learning` CTA that starts the student learning path.
+- [x] **HOME-03**: Homepage no longer presents `AI Support`, `Teacher Backup`, and `Parent Visibility` as three parallel primary product entries.
+- [x] **HOME-04**: Homepage explains STOA as a sequential learning flow: ask a question, get an AI explanation, ask a teacher if needed, and let parents follow progress.
+- [x] **HOME-05**: Marketing navigation gives student learning the highest priority while keeping parent/tutor/login/pricing entry points available at lower visual weight.
+- [x] **HOME-06**: Homepage mobile layout shows brand, primary CTA, and a hint of the next section without text or image overlap.
 
 ### Auth and Onboarding
 
-- [ ] **AUTH-01**: Unauthenticated users who click `Start Learning` are routed to `/login?next=/chat`.
-- [ ] **AUTH-02**: Login page exposes a clear path to create an account.
-- [ ] **AUTH-03**: Registration flow starts with role selection for `student`, `parent`, and `tutor`; public admin registration is not offered.
-- [ ] **AUTH-04**: Student registration collects age, school, grade, optional school system, subjects needing help, parent name, and parent email.
-- [ ] **AUTH-05**: Parent registration collects child name, child age or grade, child school, and subjects needing help.
-- [ ] **AUTH-06**: Tutor registration collects subjects, education background, years of teaching experience, short introduction, and credential file references.
-- [ ] **AUTH-07**: Tutor registration supports PDF, PNG, and JPEG credential upload UI with a 10 MB limit and pending-review messaging.
-- [ ] **AUTH-08**: Registration completion routes users by role to `/chat`, `/parent`, or `/tutor`.
+- [x] **AUTH-01**: Unauthenticated users who click `Start Learning` are routed to `/login?next=/chat`.
+- [x] **AUTH-02**: Login page exposes a clear path to create an account.
+- [x] **AUTH-03**: Registration flow starts with role selection for `student`, `parent`, and `tutor`; public admin registration is not offered.
+- [x] **AUTH-04**: Student registration collects age, school, grade, optional school system, subjects needing help, parent name, and parent email.
+- [x] **AUTH-05**: Parent registration collects child name, child age or grade, child school, and subjects needing help.
+- [x] **AUTH-06**: Tutor registration collects subjects, education background, years of teaching experience, short introduction, and credential file references.
+- [x] **AUTH-07**: Tutor registration supports PDF, PNG, and JPEG credential upload UI with a 10 MB limit and pending-review messaging.
+- [x] **AUTH-08**: Registration completion routes users by role to `/chat`, `/parent`, or `/tutor`.
 
 ### AI-First Chat
 
-- [ ] **CHAT-01**: Student can enter `/chat` and ask a homework question directly without choosing an `AI Support` module.
-- [ ] **CHAT-02**: Chat empty state uses first-question guidance and a homework-focused input placeholder.
-- [ ] **CHAT-03**: Assistant responses show an inline teacher escalation action after the AI answer.
-- [ ] **CHAT-04**: Teacher escalation copy is framed as a user action such as `Ask a human tutor`, not as a separate `Teacher Backup` product module.
-- [ ] **CHAT-05**: Created teacher-help requests remain compatible with existing tutor and parent demo flows.
+- [x] **CHAT-01**: Student can enter `/chat` and ask a homework question directly without choosing an `AI Support` module.
+- [x] **CHAT-02**: Chat empty state uses first-question guidance and a homework-focused input placeholder.
+- [x] **CHAT-03**: Assistant responses show an inline teacher escalation action after the AI answer.
+- [x] **CHAT-04**: Teacher escalation copy is framed as a user action such as `Ask a human tutor`, not as a separate `Teacher Backup` product module.
+- [x] **CHAT-05**: Created teacher-help requests remain compatible with existing tutor and parent demo flows.
 
 ### Demo Backend and API Contracts
 
-- [ ] **API-01**: `POST /auth/register` accepts role-specific `profile` payloads for student, parent, and tutor onboarding.
-- [ ] **API-02**: Student registration response can include `parentLinked: true` for demo parent-link behavior.
-- [ ] **API-03**: Tutor registration response can include `verificationStatus: pending_review`.
-- [ ] **API-04**: `POST /files/tutor-credentials` accepts mock PDF, PNG, and JPEG uploads and returns uploaded file metadata.
-- [ ] **API-05**: Demo reset preserves fixed demo accounts while clearing temporary registration/upload changes.
+- [x] **API-01**: `POST /auth/register` accepts role-specific `profile` payloads for student, parent, and tutor onboarding.
+- [x] **API-02**: Student registration response can include `parentLinked: true` for demo parent-link behavior.
+- [x] **API-03**: Tutor registration response can include `verificationStatus: pending_review`.
+- [x] **API-04**: `POST /files/tutor-credentials` accepts mock PDF, PNG, and JPEG uploads and returns uploaded file metadata.
+- [x] **API-05**: Demo reset preserves fixed demo accounts while clearing temporary registration/upload changes.
 
 ### Premium UI, QA, and Documentation
 
-- [ ] **UI-01**: Homepage, login, register, and chat share a premium visual language using deep navy, warm ivory, muted sage, soft gold accents, and restrained surfaces.
-- [ ] **UI-02**: CTAs, cards, input focus states, and interactive controls have subtle transitions that do not harm mobile usability.
-- [ ] **QA-01**: Phase 15 README and demo documentation explain the redesigned homepage, onboarding flow, AI-first chat path, and demo backend behavior.
-- [ ] **QA-02**: QA checklist covers homepage, onboarding roles, tutor credential upload, chat escalation, demo backend reset, and mobile checks.
-- [ ] **QA-03**: `npm run build` passes after Phase 15 changes.
+- [x] **UI-01**: Homepage, login, register, and chat share a premium visual language using deep navy, warm ivory, muted sage, soft gold accents, and restrained surfaces.
+- [x] **UI-02**: CTAs, cards, input focus states, and interactive controls have subtle transitions that do not harm mobile usability.
+- [x] **QA-01**: Phase 15 README and demo documentation explain the redesigned homepage, onboarding flow, AI-first chat path, and demo backend behavior.
+- [x] **QA-02**: QA checklist covers homepage, onboarding roles, tutor credential upload, chat escalation, demo backend reset, and mobile checks.
+- [x] **QA-03**: `npm run build` passes after Phase 15 changes.
 
 ## Future Requirements
 
@@ -88,35 +88,35 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HOME-01 | Phase 87 | Planned |
-| HOME-02 | Phase 87 | Planned |
-| HOME-03 | Phase 87 | Planned |
-| HOME-04 | Phase 87 | Planned |
-| HOME-05 | Phase 87 | Planned |
-| HOME-06 | Phase 87 | Planned |
-| UI-01 | Phase 87 | Planned |
-| UI-02 | Phase 87 | Planned |
-| API-01 | Phase 88 | Planned |
-| API-02 | Phase 88 | Planned |
-| API-03 | Phase 88 | Planned |
-| API-04 | Phase 88 | Planned |
-| API-05 | Phase 88 | Planned |
-| AUTH-03 | Phase 89 | Planned |
-| AUTH-04 | Phase 89 | Planned |
-| AUTH-05 | Phase 89 | Planned |
-| AUTH-06 | Phase 89 | Planned |
-| AUTH-07 | Phase 89 | Planned |
-| AUTH-08 | Phase 89 | Planned |
-| AUTH-01 | Phase 89 | Planned |
-| AUTH-02 | Phase 89 | Planned |
-| CHAT-01 | Phase 90 | Planned |
-| CHAT-02 | Phase 90 | Planned |
-| CHAT-03 | Phase 90 | Planned |
-| CHAT-04 | Phase 90 | Planned |
-| CHAT-05 | Phase 90 | Planned |
-| QA-01 | Phase 91 | Planned |
-| QA-02 | Phase 91 | Planned |
-| QA-03 | Phase 91 | Planned |
+| HOME-01 | Phase 87 | Complete |
+| HOME-02 | Phase 87 | Complete |
+| HOME-03 | Phase 87 | Complete |
+| HOME-04 | Phase 87 | Complete |
+| HOME-05 | Phase 87 | Complete |
+| HOME-06 | Phase 87 | Complete |
+| UI-01 | Phase 87 | Complete |
+| UI-02 | Phase 87 | Complete |
+| API-01 | Phase 88 | Complete |
+| API-02 | Phase 88 | Complete |
+| API-03 | Phase 88 | Complete |
+| API-04 | Phase 88 | Complete |
+| API-05 | Phase 88 | Complete |
+| AUTH-03 | Phase 89 | Complete |
+| AUTH-04 | Phase 89 | Complete |
+| AUTH-05 | Phase 89 | Complete |
+| AUTH-06 | Phase 89 | Complete |
+| AUTH-07 | Phase 89 | Complete |
+| AUTH-08 | Phase 89 | Complete |
+| AUTH-01 | Phase 89 | Complete |
+| AUTH-02 | Phase 89 | Complete |
+| CHAT-01 | Phase 90 | Complete |
+| CHAT-02 | Phase 90 | Complete |
+| CHAT-03 | Phase 90 | Complete |
+| CHAT-04 | Phase 90 | Complete |
+| CHAT-05 | Phase 90 | Complete |
+| QA-01 | Phase 91 | Complete |
+| QA-02 | Phase 91 | Complete |
+| QA-03 | Phase 91 | Complete |
 
 **Coverage:**
 - v1.14 requirements: 29 total

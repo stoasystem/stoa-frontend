@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./styles/stoa-theme.css";
+@import "./styles/premium-theme.css";
 
 @theme {
   --color-background: hsl(var(--background));

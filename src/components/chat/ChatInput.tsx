@@ -101,7 +101,7 @@ export function ChatInput({
           <Textarea
             value={value}
             onChange={(event) => setValue(event.target.value)}
-            placeholder="Ask a homework question..."
+            placeholder="Type your homework question here..."
             className="min-h-12 resize-none"
             disabled={disabled || isStreaming || chatLocked}
           />

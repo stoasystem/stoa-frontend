@@ -74,10 +74,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify frontend-only platform, organization, learning-intelligence, curriculum graph, diagnosis, tutor assignment, monthly report, advanced analytics, retention, partnership, docs, and E2E surfaces — v1.11
 - ✓ Developers can run and verify a clearer frontend information architecture with route inventory, role-based navigation, breadcrumbs/back actions, mobile navigation, final demo flow, docs, and E2E coverage — v1.12
 - ✓ Developers can run and verify stable demo backend support, API mode configuration, demo reset, core demo APIs, real backend readiness docs, AWS readiness notes, QA docs, and README workflow — v1.13
+- ✓ Developers can run and verify a premium STOA homepage, role-based onboarding, AI-first chat entry, inline teacher escalation, and demo backend onboarding/upload support — v1.14
 
 ### Active
 
-- Phase 15 must improve STOA's homepage, onboarding path, AI-first chat experience, and visual quality without turning into a broad feature-expansion or production-backend milestone.
+(None currently — v1.14 Phase 15 is implemented and verified.)
 
 ### Out of Scope
 
@@ -103,7 +104,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Context
 
-The project brief for Phase 15 was provided in Chinese and defines homepage redesign, onboarding flow, and premium UI refinement. The key product correction is that AI support, teacher help, and parent visibility are not three equal homepage product entrances. STOA should present one student learning platform where AI is the default first responder, teachers are available as escalation when AI is not enough, and parents can follow learning progress. The user explicitly wants a more premium, restrained education-product visual direction while keeping the milestone scoped to homepage, auth/onboarding, chat entry logic, and demo-backend support only.
+The project brief for Phase 15 was provided in Chinese and defined homepage redesign, onboarding flow, and premium UI refinement. The key product correction was that AI support, teacher help, and parent visibility are not three equal homepage product entrances. STOA now presents one student learning platform where AI is the default first responder, teachers are available as escalation when AI is not enough, and parents can follow learning progress. The user explicitly wanted a more premium, restrained education-product visual direction while keeping the milestone scoped to homepage, auth/onboarding, chat entry logic, and demo-backend support only.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -127,6 +128,7 @@ Current codebase facts:
 - v1.11 shipped Phase 12 platform/organization/school/learning-intelligence demos while keeping all backend/database/AI/graph/multi-tenant work limited to API contracts, mock data, and demo/test-only support.
 - v1.12 shipped Phase 13 and turned the accumulated frontend pages into a coherent role-based product structure with documented page hierarchy, navigation, journeys, page flows, demo flow, mobile path checks, and frontend-only UX polish.
 - v1.13 shipped Phase 14 and stabilized the demo backend/API layer so the frontend can run complete demonstration flows while staying decoupled from future formal backend and AWS implementations.
+- v1.14 shipped Phase 15 and redesigned STOA's first impression, role onboarding, and AI-first chat path with premium UI styling and demo backend onboarding/upload support.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
@@ -205,9 +207,9 @@ Current codebase facts:
 | Keep Phase 13 focused on information architecture and UX optimization | STOA now has many role surfaces and demo routes; the next value is making the product understandable, navigable, and maintainable rather than adding more pages | — Pending |
 | Keep Phase 14 as demo backend stabilization, not formal backend development | The frontend needs stable demonstration and testing flows now, while production backend, database, auth, payments, AI orchestration, and AWS infrastructure remain future backend-owned work | ✓ Good |
 | Prefer a simple replaceable demo backend/API contract boundary | Local demo state, reset commands, fixed accounts, and documented contracts give frontend demos enough realism without creating long-term backend technical debt | ✓ Good |
-| Keep Phase 15 focused on first impression and core path refinement | STOA now has stable demo flows; the next value is making the student-first learning path obvious and visually credible rather than adding broad new modules | — Pending |
-| Present teachers as inline escalation, not a parallel product entry | AI should be the default first response in the learning flow, while teacher support appears when an AI answer is not enough | — Pending |
-| Treat tutor credential upload as demo onboarding only | The UI can collect and mock-upload documents for product demonstration, but real verification, OCR, and approval rules remain future backend/operations work | — Pending |
+| Keep Phase 15 focused on first impression and core path refinement | STOA now has stable demo flows; the next value is making the student-first learning path obvious and visually credible rather than adding broad new modules | ✓ Good |
+| Present teachers as inline escalation, not a parallel product entry | AI should be the default first response in the learning flow, while teacher support appears when an AI answer is not enough | ✓ Good |
+| Treat tutor credential upload as demo onboarding only | The UI can collect and mock-upload documents for product demonstration, but real verification, OCR, and approval rules remain future backend/operations work | ✓ Good |
 
 ## Evolution
 
@@ -227,4 +229,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 at v1.14 Phase 15 start*
+*Last updated: 2026-05-25 after v1.14 Phase 15 completion*

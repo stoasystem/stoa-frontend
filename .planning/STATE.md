@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.14
 milestone_name: "Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement"
-status: planning
+status: complete
 last_updated: "2026-05-25T18:05:00.000Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 0
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 5
+  completed_phases: 5
+  total_plans: 5
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement is planned and ready for autonomous execution.
+**Current focus:** Milestone v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement is implemented and verified.
 
 ## Current Position
 
-Phase: 87 ready
-Plan: Phase 15 plans 87-91 defined
-Status: Ready for autonomous execution
-Last activity: 2026-05-25 — Milestone v1.14 requirements and roadmap defined
+Phase: 91 complete
+Plan: Phase 15 plans 87-91 complete
+Status: Verified
+Last activity: 2026-05-25 — Phase 15 homepage, onboarding, AI-first chat, demo backend support, docs, and build closure completed
 
 ## Performance Metrics
 
@@ -171,6 +171,13 @@ Recent decisions affecting current work:
 - Phase 84 added billing, referral, support ticket, feedback/admin, and operational demo APIs.
 - Phase 85 added explicit frontend API mode/base URL/MSW configuration and gated demo fallback behavior.
 - Phase 86 added real backend readiness, AWS readiness, demo backend QA docs, README updates, and final verification.
+- Milestone v1.14 started from the Phase 15 homepage redesign, onboarding flow, and premium UI refinement brief.
+- Phase 15 keeps STOA focused on first impression, role onboarding, AI-first chat, and premium UI quality without expanding into production backend or real verification systems.
+- Phase 87 redesigned the homepage, navigation, premium theme, and learning-flow story.
+- Phase 88 added onboarding contracts, tutor credential upload service, and demo backend register/upload support.
+- Phase 89 added multi-step student, parent, and tutor registration without public admin signup.
+- Phase 90 moved teacher escalation into inline AI response feedback and refined chat empty/input copy.
+- Phase 91 updated README, demo docs, API contract, QA checklist, and verified TypeScript, backend import/reset, endpoint smoke checks, Playwright text checks, and build.
 
 ### Pending Todos
 
@@ -209,6 +216,13 @@ None currently.
 - `npx tsc -b --pretty false` passed for v1.13.
 - `npm run lint` passed for v1.13.
 - `npm run build` passed for v1.13 with Vite's existing large chunk warning and a Node deprecation warning.
+- `npx tsc -b --pretty false` passed for v1.14.
+- `python3 -m py_compile backend/app/*.py` passed for v1.14.
+- `cd backend && PYTHONPATH=. .venv/bin/python -c "from app.main import app; print(app.title)"` passed for v1.14.
+- `cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data` passed for v1.14.
+- Demo backend smoke checks passed for `/health`, student `POST /auth/register`, and `POST /files/tutor-credentials`.
+- Playwright text checks passed for homepage old-card removal, registration role buttons, and login create-account path after sandbox escalation for Chromium.
+- `npm run build` passed for v1.14 with Vite's existing large chunk warning and a Node deprecation warning.
 - `npm run build` passed for v1.8.
 - `npm run lint` passed for v1.8.
 - `python3 -m py_compile backend/app/*.py` passed for v1.8.

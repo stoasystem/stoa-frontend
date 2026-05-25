@@ -6,7 +6,7 @@ import { register, type RegisterRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore } from '@/store/authStore'
 
-export function useRegisterMutation() {
+export function useRegisterMutation(options: { redirect?: boolean } = {}) {
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
 
@@ -15,8 +15,14 @@ export function useRegisterMutation() {
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken)
       trackEvent('user_register', { role: data.user.role, userId: data.user.id })
-      toast.success('Account created')
-      navigate(getDefaultRouteForRole(data.user.role))
+      if (data.verificationStatus === 'pending_review') {
+        toast.success('Tutor profile submitted for review')
+      } else {
+        toast.success('Account created')
+      }
+      if (options.redirect !== false) {
+        navigate(data.user.role === 'student' ? '/chat' : getDefaultRouteForRole(data.user.role))
+      }
     },
     onError: () => {
       toast.error('Registration failed')

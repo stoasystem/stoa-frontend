@@ -1,5 +1,39 @@
 # Milestones
 
+## v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement (Implemented: 2026-05-25)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/v1.14-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Premium magazine-style STOA homepage with a clear student-first `Start Learning` CTA.
+- Marketing navigation that preserves parent/tutor/pricing/login access while making student learning the primary path.
+- Sequential homepage learning flow replacing the old `AI Support`, `Teacher Backup`, and `Parent Visibility` parallel-card model.
+- Premium visual theme direction using deep navy, warm ivory, muted sage, soft gold accents, and subtle CSS transitions.
+- Role-based registration for student, parent, and tutor, excluding public admin registration.
+- Student onboarding fields for age, school, grade, school system, subjects, parent name, and parent email.
+- Parent onboarding fields for child profile and subjects needing help.
+- Tutor onboarding fields for subjects, education background, teaching experience, introduction, and mock credential upload.
+- Demo backend support for role-specific register payloads, `parentLinked`, `verificationStatus: pending_review`, and tutor credential mock upload.
+- AI-first chat copy with direct homework question entry and inline `Ask a human tutor` escalation below assistant responses.
+- Phase 15 README, demo flow, QA checklist, and demo API contract updates.
+
+### Verification
+
+- Requirements: 29/29 implemented.
+- Phases: 5/5 implemented.
+- TypeScript build check: passed.
+- Python syntax check: passed.
+- Demo backend import check: passed with `backend/.venv/bin/python`.
+- Demo reset: passed.
+- Demo backend smoke: passed for health, student register, and tutor credential upload.
+- Playwright text checks: passed for homepage, register, and login.
+- Build: passed.
+- Remaining warnings: Vite's existing large chunk warning and a Node deprecation warning.
+
+---
+
 ## v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness (Implemented: 2026-05-25)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks
