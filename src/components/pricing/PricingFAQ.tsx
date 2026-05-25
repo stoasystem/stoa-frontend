@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 const faqs = [
   {
     question: 'Is payment live now?',
-    answer: 'Phase 11 supports a mock checkout flow. Real hosted checkout will be created by a future backend.',
+    answer: 'Checkout is currently shown as a safe demo flow. When payments are enabled, STOA will send families through a hosted checkout page.',
   },
   {
     question: 'Can parents test before paying?',
@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     question: 'Does the frontend enforce quotas?',
-    answer: 'No. The frontend displays locked states from API contracts; future backend services enforce limits.',
+    answer: 'Plan limits are shown in the product experience. In a live subscription, account services enforce usage automatically.',
   },
 ]
 

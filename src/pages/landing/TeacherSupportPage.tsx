@@ -12,7 +12,7 @@ export function TeacherSupportPage() {
         <PageHeader
           eyebrow="Teacher support"
           title="Human backup for harder homework moments"
-          description="Phase 11 demonstrates the support path and availability UI without implementing tutor matching backend logic."
+          description="Students ask AI first, then request a tutor inside chat when an explanation needs a human follow-up."
           actions={<Button asChild><Link to="/pricing">View tutor-supported plan</Link></Button>}
         />
         <TeacherSupportExplainer />

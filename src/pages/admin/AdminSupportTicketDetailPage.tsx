@@ -33,7 +33,7 @@ export function AdminSupportTicketDetailPage() {
         <PageHeader
           eyebrow="Admin support"
           title={ticket?.subject ?? 'Ticket detail'}
-          description="Admin status updates are mocked in memory for Phase 11."
+          description="Status changes are saved for the current demo session."
           actions={
             <PageActions
               primary={<Button asChild><Link to="/admin/help-requests">Help requests</Link></Button>}

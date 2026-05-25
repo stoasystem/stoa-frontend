@@ -28,8 +28,8 @@ export function ReferralsPage() {
             <CardTitle className="text-base">Reward placeholder</CardTitle>
           </CardHeader>
           <CardContent className="text-sm leading-6 text-muted-foreground">
-            Future paid launch work can connect successful invites to trial extension, account credit,
-            or a family plan discount. Phase 11 only demonstrates the frontend flow.
+            Invite rewards can become trial extensions, account credits, or family plan discounts
+            once the referral program is enabled.
           </CardContent>
         </Card>
       </PageContainer>
