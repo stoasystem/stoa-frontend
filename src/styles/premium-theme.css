@@ -66,6 +66,47 @@ body {
   color: #152238 !important;
 }
 
+.editorial-heading {
+  font-family: Georgia, Cambria, "Times New Roman", ui-serif, serif;
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.editorial-title-shell {
+  position: relative;
+  isolation: isolate;
+}
+
+.editorial-title-shell::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -0.55rem;
+  width: 4.5rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, hsl(var(--accent)), hsl(103 11% 52% / 0.42));
+}
+
+.editorial-accent {
+  position: relative;
+  display: inline;
+  color: hsl(var(--accent));
+  isolation: isolate;
+}
+
+.editorial-accent::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0.03em;
+  right: 0.03em;
+  bottom: 0.08em;
+  height: 0.2em;
+  border-radius: 999px;
+  background: hsl(var(--accent) / 0.18);
+}
+
 .premium-reveal {
   animation: premium-reveal 620ms ease both;
 }

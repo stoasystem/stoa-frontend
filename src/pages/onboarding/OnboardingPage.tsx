@@ -85,6 +85,7 @@ export function OnboardingPage() {
           eyebrow="Pilot onboarding"
           title="Get ready for the STOA pilot"
           description="A short role-specific guide for students, parents, and tutors using the pilot version of STOA."
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
             <Button asChild>
               <Link to="/support">Need help?</Link>

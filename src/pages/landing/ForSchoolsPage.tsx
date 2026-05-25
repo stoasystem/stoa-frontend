@@ -14,6 +14,7 @@ export function ForSchoolsPage() {
           title="School partnership demos"
           description="Evaluate organization dashboards, student learning profiles, and parent report examples without a production school backend."
           actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <Card>
           <CardHeader><CardTitle>What schools can evaluate</CardTitle></CardHeader>

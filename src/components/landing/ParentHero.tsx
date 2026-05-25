@@ -9,8 +9,9 @@ export function ParentHero() {
       <div className="space-y-6">
         <div className="space-y-3">
           <p className="text-sm font-medium text-primary">For parents</p>
-          <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-            STOA helps families see when homework support is working.
+          <h1 className="editorial-heading editorial-title-shell max-w-3xl text-4xl font-semibold leading-tight text-foreground md:text-6xl">
+            STOA helps families see when{' '}
+            <span className="editorial-accent">homework support is working</span>.
           </h1>
           <p className="max-w-2xl text-base leading-7 text-muted-foreground">
             Students get immediate AI explanations, tutors step in when needed, and parents see

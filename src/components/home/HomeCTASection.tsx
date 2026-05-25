@@ -23,8 +23,9 @@ export function HomeCTASection() {
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#c2a15a]">
               Start with one question
             </p>
-            <h2 className="mt-3 max-w-2xl text-3xl font-semibold leading-tight md:text-4xl">
-              Enter the learning platform and ask your first homework question.
+            <h2 className="editorial-heading mt-3 max-w-2xl text-4xl font-semibold leading-tight md:text-5xl">
+              Enter the learning platform and ask your{' '}
+              <span className="text-[#c2a15a]">first question</span>.
             </h2>
           </div>
           <Button asChild variant="secondary" size="lg" className="premium-button-lift premium-light-button h-12 rounded-full bg-[#f7f3ec] px-7 hover:bg-white">

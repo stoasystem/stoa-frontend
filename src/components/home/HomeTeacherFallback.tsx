@@ -23,8 +23,9 @@ export function HomeTeacherFallback() {
         <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
           Human support
         </p>
-        <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground">
-          When AI is not enough, the question already has context.
+        <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
+          When AI is not enough, the question already has{' '}
+          <span className="editorial-accent">context</span>.
         </h2>
         <p className="mt-4 text-base leading-8 text-muted-foreground">
           A tutor sees the conversation, the student question, and the previous AI explanation. The

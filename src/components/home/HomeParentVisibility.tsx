@@ -14,8 +14,8 @@ export function HomeParentVisibility() {
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#7e8f7c]">
             Parent visibility
           </p>
-          <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground">
-            Parents get the pattern, not another student dashboard to manage.
+          <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
+            Parents get the pattern, <span className="editorial-accent">not another dashboard</span>.
           </h2>
           <p className="mt-4 text-base leading-8 text-muted-foreground">
             STOA keeps the student learning path focused while giving parents a calm view of

@@ -34,6 +34,7 @@ export function TermsPage() {
           eyebrow="Launch draft"
           title="Terms"
           description="Launch-ready frontend draft for STOA usage, AI limits, subscriptions, and acceptable use."
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
           {sections.map((section) => (

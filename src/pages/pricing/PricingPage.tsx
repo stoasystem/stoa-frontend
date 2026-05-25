@@ -34,6 +34,7 @@ export function PricingPage() {
           title="Pricing"
           description="Choose the level of homework support your family needs, from AI-guided practice to tutor-supported explanations."
           actions={<Badge variant="secondary">Safe checkout preview</Badge>}
+          titleClassName="editorial-heading editorial-title-shell text-4xl leading-tight md:text-6xl"
         />
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">

@@ -200,6 +200,7 @@ None currently.
 | 2026-05-25 | Add marketing visuals | `src/components/home/HomeLearningFlow.tsx` |
 | 2026-05-25 | Fix parent growth visual | `src/components/landing/ParentHero.tsx` |
 | 2026-05-25 | Fix image text matches | `src/components/landing/ParentHero.tsx` |
+| 2026-05-25 | Polish public title typography | `src/styles/premium-theme.css` |
 
 ### Blockers/Concerns
 
@@ -218,6 +219,7 @@ None currently.
 - `npm run build` passed for v1.12 with Vite's existing large chunk warning.
 - `npm run test:e2e` passed for v1.12 with 12/12 Playwright tests after sandbox escalation for local Vite binding and Chromium.
 - Local route smoke returned HTTP 200 for `/`, `/dashboard`, and `/admin`.
+- Quick task `polish-title-typography`: `npx tsc -b --pretty false`, `npm run lint`, `npm run build`, and Playwright computed-style checks passed for `/`, `/for-parents`, `/pricing`, `/teacher-support`, `/login?next=/chat`, and `/register`.
 - First sandboxed E2E attempt failed with `listen EPERM` on `127.0.0.1:5173`; rerunning with approved escalation resolved the environment limitation.
 - Production build still emits Vite's existing large chunk warning.
 - `python3 -m py_compile backend/app/*.py` passed for v1.13.

@@ -25,8 +25,9 @@ export function HomeHero() {
           <BookOpen className="h-3.5 w-3.5" />
           AI first, teacher when needed
         </Badge>
-        <h1 className="text-[3rem] font-semibold leading-[0.95] tracking-normal text-foreground sm:text-[4.5rem] lg:text-[5.4rem]">
-          STOA Learning Platform
+        <h1 className="editorial-heading editorial-title-shell text-5xl font-semibold leading-[0.95] text-foreground sm:text-6xl lg:text-7xl">
+          <span className="block">STOA </span>
+          <span className="editorial-accent block">Learning Platform</span>
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
           Instant homework help guided by AI, supported by real teachers, and visible to parents

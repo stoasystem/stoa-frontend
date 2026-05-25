@@ -56,6 +56,7 @@ export function SupportPage() {
           eyebrow="Pilot support"
           title="Support and feedback"
           description="Use this page to understand pilot support paths, distinguish product support from teacher help, and contact the STOA team."
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
             <Button variant="outline" asChild>
               <Link to="/onboarding">View onboarding</Link>

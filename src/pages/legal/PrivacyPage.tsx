@@ -34,6 +34,7 @@ export function PrivacyPage() {
           eyebrow="Launch draft"
           title="Privacy Policy"
           description="Launch-ready frontend draft for STOA data handling. Final legal review remains required before broad public launch."
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
           {sections.map((section) => (

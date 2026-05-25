@@ -31,8 +31,8 @@ export function HomeLearningFlow() {
           <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
             How STOA helps students
           </p>
-          <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground sm:text-4xl">
-            One learning path, not three disconnected tools.
+          <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
+            One learning path, <span className="editorial-accent">not three disconnected tools</span>.
           </h2>
         </div>
         <div className="relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70 bg-[#152238] shadow-[0_24px_70px_hsl(217_45%_15%_/_0.12)]">

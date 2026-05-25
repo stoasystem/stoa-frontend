@@ -14,6 +14,7 @@ export function HowItWorksPage() {
           title="A simple learning support loop"
           description="STOA keeps the student workflow direct while making parent and tutor visibility possible."
           actions={<Button asChild><Link to="/pricing">Compare plans</Link></Button>}
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <HowItWorksSteps />
       </PageContainer>

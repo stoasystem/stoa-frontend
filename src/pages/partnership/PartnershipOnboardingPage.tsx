@@ -18,6 +18,7 @@ export function PartnershipOnboardingPage() {
           eyebrow="Partnership"
           title="Pilot onboarding"
           description="Frontend-only onboarding workflow for schools and tutoring centers evaluating STOA."
+          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <PartnershipSteps />
         <PartnershipInterestForm />
