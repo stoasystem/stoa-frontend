@@ -1,93 +1,62 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-25
-**Milestone:** v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness
+**Milestone:** v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement
 **Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
 
-## v1.13 Requirements
+## v1.14 Requirements
 
-Requirements for Phase 14. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 15. Each requirement maps to exactly one roadmap phase.
 
-### Scope and Documentation
+### Homepage and Navigation
 
-- [x] **SCOPE-01**: Team can review `docs/demo-backend/demo-backend-scope.md` defining demo backend responsibilities, replacement boundary, and explicit non-production scope.
-- [x] **SCOPE-02**: Team can review `docs/demo-backend/demo-api-contract.md` documenting all Phase 14 demo endpoints, request/response shapes, auth expectations, status codes, and error codes.
-- [x] **SCOPE-03**: Team can review `docs/demo-backend/demo-data.md` documenting fixed demo accounts, role relationships, conversations, parent reports, tutor requests, billing, referrals, support, and admin mock data.
-- [x] **SCOPE-04**: Team can review `docs/demo-backend/demo-reset-flow.md` documenting how demo state is reset and what data must be restored.
+- [ ] **HOME-01**: User can land on a magazine-style homepage that immediately presents STOA as a premium student learning platform.
+- [ ] **HOME-02**: User can click a single primary `Start Learning` CTA that starts the student learning path.
+- [ ] **HOME-03**: Homepage no longer presents `AI Support`, `Teacher Backup`, and `Parent Visibility` as three parallel primary product entries.
+- [ ] **HOME-04**: Homepage explains STOA as a sequential learning flow: ask a question, get an AI explanation, ask a teacher if needed, and let parents follow progress.
+- [ ] **HOME-05**: Marketing navigation gives student learning the highest priority while keeping parent/tutor/login/pricing entry points available at lower visual weight.
+- [ ] **HOME-06**: Homepage mobile layout shows brand, primary CTA, and a hint of the next section without text or image overlap.
 
-### Demo Data and Reset
+### Auth and Onboarding
 
-- [x] **DATA-01**: Demo data includes fixed `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com` accounts using `password123`.
-- [x] **DATA-02**: Demo data includes student conversations, messages, uploaded file metadata, learning history, weak topics, and recommended next actions.
-- [x] **DATA-03**: Demo data includes parent-child linkage, child summary, weekly report, monthly report placeholder, recent questions, and teacher help records.
-- [x] **DATA-04**: Demo data includes tutor pending, in-progress, and resolved help requests plus availability and stats.
-- [x] **DATA-05**: Demo data includes billing plans, subscription, usage quota, feature access, mock checkout behavior, referral data, support/feedback data, and admin analytics.
-- [x] **DATA-06**: A reset command restores fixed demo data and clears temporary registration/support/session changes.
+- [ ] **AUTH-01**: Unauthenticated users who click `Start Learning` are routed to `/login?next=/chat`.
+- [ ] **AUTH-02**: Login page exposes a clear path to create an account.
+- [ ] **AUTH-03**: Registration flow starts with role selection for `student`, `parent`, and `tutor`; public admin registration is not offered.
+- [ ] **AUTH-04**: Student registration collects age, school, grade, optional school system, subjects needing help, parent name, and parent email.
+- [ ] **AUTH-05**: Parent registration collects child name, child age or grade, child school, and subjects needing help.
+- [ ] **AUTH-06**: Tutor registration collects subjects, education background, years of teaching experience, short introduction, and credential file references.
+- [ ] **AUTH-07**: Tutor registration supports PDF, PNG, and JPEG credential upload UI with a 10 MB limit and pending-review messaging.
+- [ ] **AUTH-08**: Registration completion routes users by role to `/chat`, `/parent`, or `/tutor`.
 
-### Auth and Health
+### AI-First Chat
 
-- [x] **AUTH-01**: `GET /health` returns demo backend health with `ok`, service name, and mode.
-- [x] **AUTH-02**: `POST /auth/login` accepts fixed demo credentials and returns an opaque demo access token plus user object.
-- [x] **AUTH-03**: `POST /auth/register` supports mock registration for the current demo session without implying production auth.
-- [x] **AUTH-04**: `GET /auth/me` resolves current user from the `Authorization: Bearer <token>` header.
-- [x] **AUTH-05**: Auth failures and unauthorized requests return standard `{ message, code }` demo error responses.
+- [ ] **CHAT-01**: Student can enter `/chat` and ask a homework question directly without choosing an `AI Support` module.
+- [ ] **CHAT-02**: Chat empty state uses first-question guidance and a homework-focused input placeholder.
+- [ ] **CHAT-03**: Assistant responses show an inline teacher escalation action after the AI answer.
+- [ ] **CHAT-04**: Teacher escalation copy is framed as a user action such as `Ask a human tutor`, not as a separate `Teacher Backup` product module.
+- [ ] **CHAT-05**: Created teacher-help requests remain compatible with existing tutor and parent demo flows.
 
-### Student Chat
+### Demo Backend and API Contracts
 
-- [x] **CHAT-01**: Student can list own demo conversations through `GET /conversations`.
-- [x] **CHAT-02**: Student can open a conversation through `GET /conversations/:conversationId`.
-- [x] **CHAT-03**: Student can create a temporary conversation through `POST /conversations`.
-- [x] **CHAT-04**: Student can send a message through `POST /conversations/:conversationId/messages` and receive a deterministic demo assistant answer.
-- [x] **CHAT-05**: Demo backend preserves message/conversation changes for the current demo session or until reset.
-- [x] **CHAT-06**: Streaming message behavior is supported by a mock endpoint or documented as a future-compatible non-blocking contract.
+- [ ] **API-01**: `POST /auth/register` accepts role-specific `profile` payloads for student, parent, and tutor onboarding.
+- [ ] **API-02**: Student registration response can include `parentLinked: true` for demo parent-link behavior.
+- [ ] **API-03**: Tutor registration response can include `verificationStatus: pending_review`.
+- [ ] **API-04**: `POST /files/tutor-credentials` accepts mock PDF, PNG, and JPEG uploads and returns uploaded file metadata.
+- [ ] **API-05**: Demo reset preserves fixed demo accounts while clearing temporary registration/upload changes.
 
-### Teacher Help and Tutor Handling
+### Premium UI, QA, and Documentation
 
-- [x] **HELP-01**: Student can request teacher help through `POST /teacher-help/request`.
-- [x] **HELP-02**: Tutor can list assigned help requests through `GET /tutors/me/help-requests`.
-- [x] **HELP-03**: Tutor can open a request detail through `GET /tutors/me/help-requests/:requestId`.
-- [x] **HELP-04**: Tutor can update request status through `PATCH /tutors/me/help-requests/:requestId`.
-- [x] **HELP-05**: Student and parent related views can observe help-request status changes during the current demo session where applicable.
-
-### Parent Reports
-
-- [x] **PARENT-01**: Parent can list linked children through `GET /parents/me/children`.
-- [x] **PARENT-02**: Parent can view child summary through `GET /parents/me/children/:childId/summary`.
-- [x] **PARENT-03**: Parent can view child learning history through `GET /parents/me/children/:childId/history`.
-- [x] **PARENT-04**: Parent can view child weekly report through `GET /parents/me/children/:childId/report`.
-- [x] **PARENT-05**: Parent can view a monthly report placeholder through `GET /parents/me/children/:childId/monthly-report`.
-
-### Billing, Referral, Support, and Admin Demo APIs
-
-- [x] **OPS-01**: Billing demo exposes plans, subscription, usage, feature access, and mock checkout session endpoints.
-- [x] **OPS-02**: Mock checkout returns a local checkout success URL and does not collect card data or call real Stripe.
-- [x] **OPS-03**: Referral demo exposes stable referral code, invite URL, and successful invite count.
-- [x] **OPS-04**: Feedback and support ticket APIs allow creating and viewing demo-session items.
-- [x] **OPS-05**: Admin demo APIs expose analytics overview, support tickets, help requests, and feedback.
-- [x] **OPS-06**: Demo backend applies consistent error responses across billing, referral, support, and admin endpoints.
-
-### Frontend API Mode and Service Alignment
-
-- [x] **API-01**: `.env.example` documents `VITE_API_MODE`, `VITE_API_BASE_URL`, and `VITE_ENABLE_MSW`.
-- [x] **API-02**: `src/lib/env.ts` exposes API mode, base URL, and MSW flag with safe defaults.
-- [x] **API-03**: Shared API client uses the configured API base URL and preserves bearer-token request behavior.
-- [x] **API-04**: API mode values `mock`, `demo`, `staging`, and `production` are documented for frontend developers.
-- [x] **API-05**: Frontend API usage is audited so page components do not hard-code endpoint URLs or import demo backend internals.
-
-### Integration Readiness and QA
-
-- [x] **READY-01**: `docs/backend-integration/real-backend-readiness.md` maps current frontend endpoints to request/response contracts, demo coverage, future backend ownership, status codes, error codes, env vars, CORS, and auth headers.
-- [x] **READY-02**: `docs/backend-integration/aws-readiness-notes.md` documents frontend-facing AWS readiness concerns without implementing AWS deployment.
-- [x] **READY-03**: `docs/qa/demo-backend-qa.md` includes startup, health, reset, auth, chat, teacher help, parent, billing, referral, support, admin, and future integration checks.
-- [x] **READY-04**: README documents Phase 14 demo backend workflow, demo accounts, run/reset commands, API modes, and non-production boundary.
-- [x] **READY-05**: Complete demo flow is manually or automatically verified against the demo backend.
-- [x] **READY-06**: `npm run build` passes after Phase 14 changes.
+- [ ] **UI-01**: Homepage, login, register, and chat share a premium visual language using deep navy, warm ivory, muted sage, soft gold accents, and restrained surfaces.
+- [ ] **UI-02**: CTAs, cards, input focus states, and interactive controls have subtle transitions that do not harm mobile usability.
+- [ ] **QA-01**: Phase 15 README and demo documentation explain the redesigned homepage, onboarding flow, AI-first chat path, and demo backend behavior.
+- [ ] **QA-02**: QA checklist covers homepage, onboarding roles, tutor credential upload, chat escalation, demo backend reset, and mobile checks.
+- [ ] **QA-03**: `npm run build` passes after Phase 15 changes.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in current roadmap.
 
-### Phase 15 Quality Hardening
+### Phase 16 Design System and Accessibility
 
 - **DS-01**: Team can review component documentation for Button, Card, Form, Table, Badge, layout primitives, and shared state components.
 - **DS-02**: Team can review a consolidated token system for colors, typography, spacing, borders, shadows, and motion.
@@ -96,25 +65,22 @@ Deferred to later milestones. Tracked but not in current roadmap.
 
 ### Production Backend
 
-- **BACKEND-01**: Formal backend implements production authentication, authorization, persistence, AI orchestration, payment webhooks, subscription enforcement, analytics storage, support workflows, and admin operations.
+- **BACKEND-01**: Formal backend implements production authentication, authorization, persistence, AI orchestration, payment webhooks, subscription enforcement, analytics storage, support workflows, admin operations, parent invitations, and tutor verification.
 - **AWS-01**: Production infrastructure deploys through a separately planned backend/cloud milestone.
 
 ## Out of Scope
 
-Explicitly excluded from v1.13 to prevent scope creep.
+Explicitly excluded from v1.14 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Formal production backend | Phase 14 stabilizes demo backend support only. |
-| Complex database schema or migrations | Demo data should remain simple, resettable, and replaceable. |
-| Production authentication or refresh tokens | Demo auth uses fixed accounts and opaque demo tokens for frontend flow testing. |
-| Real password security architecture | Demo credentials are fixed and not production security infrastructure. |
-| Real AI provider orchestration | Demo assistant responses are deterministic mock responses behind backend-shaped APIs. |
-| Real streaming infrastructure | Streaming can be mocked or documented, but production streaming belongs to the real backend. |
-| Real Stripe checkout or webhooks | Billing remains virtual/mock and must not collect card data. |
-| Real subscription enforcement | Frontend feature access remains advisory; backend enforcement is future work. |
-| AWS deployment or CDK architecture | Phase 14 documents readiness notes only. |
-| New product modules | Phase 14 supports existing demo surfaces rather than expanding STOA product breadth. |
+| Formal production backend | Phase 15 only extends demo contracts needed by onboarding and chat demos. |
+| Real identity, parent, or tutor verification | Credential upload is mock onboarding UI and cannot imply real approval. |
+| Certificate OCR or document review workflow | Requires backend, storage, operations, and security scope outside this milestone. |
+| Production authentication redesign | Current demo auth flow remains enough for frontend demonstration. |
+| Real payment system expansion | Phase 15 is homepage/onboarding/chat refinement, not billing expansion. |
+| Broad feature expansion | The milestone fixes first impression and core path rather than adding new product modules. |
+| Full design-system rewrite | Phase 16 is reserved for design system hardening and accessibility. |
 
 ## Traceability
 
@@ -122,60 +88,41 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCOPE-01 | Phase 80 | Complete |
-| SCOPE-02 | Phase 80 | Complete |
-| SCOPE-03 | Phase 80 | Complete |
-| SCOPE-04 | Phase 80 | Complete |
-| DATA-01 | Phase 81 | Complete |
-| DATA-02 | Phase 81 | Complete |
-| DATA-03 | Phase 81 | Complete |
-| DATA-04 | Phase 81 | Complete |
-| DATA-05 | Phase 81 | Complete |
-| DATA-06 | Phase 81 | Complete |
-| AUTH-01 | Phase 82 | Complete |
-| AUTH-02 | Phase 82 | Complete |
-| AUTH-03 | Phase 82 | Complete |
-| AUTH-04 | Phase 82 | Complete |
-| AUTH-05 | Phase 82 | Complete |
-| CHAT-01 | Phase 82 | Complete |
-| CHAT-02 | Phase 82 | Complete |
-| CHAT-03 | Phase 82 | Complete |
-| CHAT-04 | Phase 82 | Complete |
-| CHAT-05 | Phase 82 | Complete |
-| CHAT-06 | Phase 82 | Complete |
-| HELP-01 | Phase 83 | Complete |
-| HELP-02 | Phase 83 | Complete |
-| HELP-03 | Phase 83 | Complete |
-| HELP-04 | Phase 83 | Complete |
-| HELP-05 | Phase 83 | Complete |
-| PARENT-01 | Phase 83 | Complete |
-| PARENT-02 | Phase 83 | Complete |
-| PARENT-03 | Phase 83 | Complete |
-| PARENT-04 | Phase 83 | Complete |
-| PARENT-05 | Phase 83 | Complete |
-| OPS-01 | Phase 84 | Complete |
-| OPS-02 | Phase 84 | Complete |
-| OPS-03 | Phase 84 | Complete |
-| OPS-04 | Phase 84 | Complete |
-| OPS-05 | Phase 84 | Complete |
-| OPS-06 | Phase 84 | Complete |
-| API-01 | Phase 85 | Complete |
-| API-02 | Phase 85 | Complete |
-| API-03 | Phase 85 | Complete |
-| API-04 | Phase 85 | Complete |
-| API-05 | Phase 85 | Complete |
-| READY-01 | Phase 86 | Complete |
-| READY-02 | Phase 86 | Complete |
-| READY-03 | Phase 86 | Complete |
-| READY-04 | Phase 86 | Complete |
-| READY-05 | Phase 86 | Complete |
-| READY-06 | Phase 86 | Complete |
+| HOME-01 | Phase 87 | Planned |
+| HOME-02 | Phase 87 | Planned |
+| HOME-03 | Phase 87 | Planned |
+| HOME-04 | Phase 87 | Planned |
+| HOME-05 | Phase 87 | Planned |
+| HOME-06 | Phase 87 | Planned |
+| UI-01 | Phase 87 | Planned |
+| UI-02 | Phase 87 | Planned |
+| API-01 | Phase 88 | Planned |
+| API-02 | Phase 88 | Planned |
+| API-03 | Phase 88 | Planned |
+| API-04 | Phase 88 | Planned |
+| API-05 | Phase 88 | Planned |
+| AUTH-03 | Phase 89 | Planned |
+| AUTH-04 | Phase 89 | Planned |
+| AUTH-05 | Phase 89 | Planned |
+| AUTH-06 | Phase 89 | Planned |
+| AUTH-07 | Phase 89 | Planned |
+| AUTH-08 | Phase 89 | Planned |
+| AUTH-01 | Phase 89 | Planned |
+| AUTH-02 | Phase 89 | Planned |
+| CHAT-01 | Phase 90 | Planned |
+| CHAT-02 | Phase 90 | Planned |
+| CHAT-03 | Phase 90 | Planned |
+| CHAT-04 | Phase 90 | Planned |
+| CHAT-05 | Phase 90 | Planned |
+| QA-01 | Phase 91 | Planned |
+| QA-02 | Phase 91 | Planned |
+| QA-03 | Phase 91 | Planned |
 
 **Coverage:**
-- v1.13 requirements: 48 total
-- Mapped to phases: 48
+- v1.14 requirements: 29 total
+- Mapped to phases: 29
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after Phase 14 verification*
+*Last updated: 2026-05-25 at Phase 15 planning*

@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.13 Phase 14: Demo Backend Stabilization, Test Flow Completion, and Backend Integration Readiness is implemented and verified.
+**Current focus:** Milestone v1.14 Phase 15: Homepage Redesign, Onboarding Flow, and Premium UI Refinement is planned and ready for autonomous execution.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-25 — Milestone v1.14 started
+Phase: 87 ready
+Plan: Phase 15 plans 87-91 defined
+Status: Ready for autonomous execution
+Last activity: 2026-05-25 — Milestone v1.14 requirements and roadmap defined
 
 ## Performance Metrics
 
