@@ -25,6 +25,18 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Terminology cleanup to remove user-visible `AI`, `Human backup`, `Teacher backup`, `What we are selling`, `Buy now`, and inappropriate customer/sales language.
 - Documentation updates for copy rules, copy review matrix, visual QA by locale, glossary, copy style guide, translation QA checklist, README, and build verification.
 
+## Current Milestone: v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
+
+**Goal:** Remove user-visible development and demo artifacts, harden existing STOA frontend states, and make the product feel production-facing without adding new business features.
+
+**Target features:**
+- Production-facing copy audit and cleanup for `demo`, `mock`, `test`, `Codex`, `development`, `sample`, `placeholder`, and related development wording across user-visible UI.
+- Register/onboarding, login, chat, parent, tutor, pricing, billing, support, and admin copy cleanup so pages use real product language.
+- Environment guards for demo-only accounts, demo badges, and internal debug UI.
+- Display-label mapping so internal statuses and API values are not rendered directly.
+- Stability hardening for loading, empty, error, success, duplicate-submit, and route fallback states.
+- QA docs, README updates, and release checklist evidence for production-facing cleanup.
+
 ## Current State
 
 **Latest shipped milestone:** v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement
@@ -80,7 +92,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 18 accessibility, design system hardening, and cross-locale QA should cover keyboard navigation, screen reader support, color contrast, design-token cleanup, component documentation, visual regression automation, and cross-browser/cross-locale QA.
+- Phase 18 production-facing cleanup and stability hardening should remove user-visible development/demo/test/mock/Codex wording, hide demo-only UI by default, map internal statuses to user-facing labels, harden core loading/error/empty/success states, prevent duplicate submissions, and document production-facing QA.
 
 ### Out of Scope
 
@@ -103,12 +115,15 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Production multi-tenant backend, real organization database, formal school admin backend, real AI diagnosis engine, real curriculum graph backend, tutor matching algorithm, automated marketing backend, enterprise invoicing, and complex data warehouse — outside Phase 12 frontend-only scope.
 - New large business modules, new formal backend, complex database work, new AI features, new payment features, new admin backend, production infrastructure, full visual redesign, and large-scale component-library rewrites — outside Phase 13 information architecture and UX optimization scope.
 - Formal production backend development, complex database schema/migrations, production authentication, refresh-token architecture, real payment webhooks, real subscription enforcement, real AI provider orchestration, AWS deployment, production admin backend, and production analytics storage — outside Phase 14 demo backend stabilization scope.
+- New business modules, new languages, formal backend implementation, real payment collection, real teacher verification, AWS deployment, major visual redesign, and large architecture rewrites — outside Phase 18 production-facing cleanup scope.
 
 ## Context
 
 The project brief for Phase 17 was provided in Chinese and defines locale-specific copywriting, responsive typography, and multilingual UI refinement. Phase 16 established the English, German, French, and Italian i18n foundation, terminology system, glossary, copy style guide, and translation QA checklist. Phase 17 keeps that product surface stable but treats each language as local product copy rather than literal translation: German should be concise and stable, French elegant and clear, Italian natural and warm, and English calm, premium, and education-centered.
 
 The immediate visible issue is the German homepage hero title `STOA Lernunterstützung genau dann, wenn Schüler sie brauchen.`, which is too long for large serif hero typography and should become short title copy plus explanatory subtitle. The preferred four-language hero direction is: English `Learn with clarity.`, German `Lernen. Fragen. Verstehen.`, French `Comprendre avec confiance.`, and Italian `Studiare con più chiarezza.`.
+
+The project brief for Phase 18 was provided in Chinese and defines production-facing cleanup, stability hardening, and demo artifact removal. Phase 18 explicitly does not add product scope. It removes user-visible `demo`, `mock`, `test`, `Codex`, `development`, `sample`, `placeholder`, and internal-rule wording from existing UI, improves loading/error/empty/success states, hides demo-only UI behind environment flags, and keeps demo/backend internals available only to developers.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -135,13 +150,14 @@ Current codebase facts:
 - v1.14 shipped Phase 15 and redesigned STOA's first impression, role onboarding, and AI-first chat path with premium UI styling and demo backend onboarding/upload support.
 - v1.15 shipped Phase 16 to add English/German/French/Italian localization, language switching, persistent language preference, user-facing terminology replacement, and language QA.
 - v1.16 shipped Phase 17 to refine locale-specific product copy, responsive headline typography, layout hints, P0 page copy quality, terminology cleanup, copy review documentation, and visual QA across English, German, French, and Italian.
+- v1.17 starts Phase 18 to remove development/demo artifacts from user-facing UI, add environment guards for demo-only surfaces, harden core states, and document production-facing cleanup QA.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 17 is locale-specific copywriting, responsive typography, and multilingual UI refinement work. It must avoid new business modules, new languages, complex backend work, CMS work, automatic translation pipelines, full legal-document translation, SEO article localization, email-template localization, complex personalization, and core product logic changes.
+- **Scope**: Phase 18 is production-facing UI cleanup and stability hardening work. It must avoid new business modules, new languages, formal backend implementation, real payment collection, real teacher verification, AWS deployment, major visual redesign, and large architecture rewrites.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -225,6 +241,9 @@ Current codebase facts:
 | Use browser-local language persistence first | `localStorage` is enough for demo and frontend validation while cross-device preferences remain a future backend concern | ✓ Good |
 | Keep Phase 17 focused on localized copy and layout stability | The multilingual infrastructure exists; the next value is making each language feel native, premium, and readable in the UI rather than expanding features | ✓ Good |
 | Allow locale-specific title structures | German and other long-text locales need stacked or shorter headlines so typography and layout remain stable without forcing literal translation | ✓ Good |
+| Keep Phase 18 focused on production-facing cleanup | Existing surfaces still contain demo and development traces; removing those artifacts improves trust without expanding product scope | — Pending |
+| Hide demo-only UI by default | Demo accounts, debug panels, badges, and internal hints help development but should not appear in normal user-facing paths | — Pending |
+| Map internal status values before rendering | API/demo status strings may contain implementation language and need stable user-facing labels across locales | — Pending |
 
 ## Evolution
 
@@ -244,4 +263,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 after v1.16 milestone*
+*Last updated: 2026-05-26 for v1.17 Phase 18 planning*
