@@ -11,16 +11,16 @@ export function ForSchoolsPage() {
       <PageContainer size="wide">
         <PageHeader
           eyebrow="For schools"
-          title="School partnership UI placeholder"
-          description="A lightweight entry point for future school pilots, intentionally without multi-tenant backend scope."
-          actions={<Button asChild><Link to="/support">Contact STOA</Link></Button>}
+          title="School partnership demos"
+          description="Evaluate organization dashboards, student learning profiles, and parent report examples without a production school backend."
+          actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
         />
         <Card>
           <CardHeader><CardTitle>What schools can evaluate</CardTitle></CardHeader>
           <CardContent className="grid gap-4 text-sm leading-6 text-muted-foreground md:grid-cols-3">
-            <p>Homework support usage and student engagement signals.</p>
-            <p>Tutor escalation operations for after-school support.</p>
-            <p>Parent-facing reporting examples for pilot conversations.</p>
+            <p>Organization dashboards show student engagement and teacher-help demand.</p>
+            <p>Learning profiles and weak-point diagnosis clarify where students need support.</p>
+            <p>Parent monthly reports turn platform signals into family-facing value.</p>
           </CardContent>
         </Card>
       </PageContainer>

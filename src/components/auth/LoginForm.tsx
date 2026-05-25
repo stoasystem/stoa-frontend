@@ -46,6 +46,7 @@ export function LoginForm() {
               ['Parent', 'parent@test.com'],
               ['Tutor', 'tutor@test.com'],
               ['Admin', 'admin@test.com'],
+              ['Org admin', 'organization@test.com'],
             ].map(([label, demoEmail]) => (
               <Button
                 key={demoEmail}

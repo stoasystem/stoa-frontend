@@ -11,9 +11,9 @@ export function ForTutoringCentersPage() {
       <PageContainer size="wide">
         <PageHeader
           eyebrow="For tutoring centers"
-          title="AI plus teacher support demo path"
-          description="A front-end entry for partner discussions. Payroll, scheduling enforcement, and CRM remain out of scope."
-          actions={<Button asChild><Link to="/teacher-support">See support model</Link></Button>}
+          title="AI plus tutor operations"
+          description="A front-end path for partner discussions. Payroll, matching algorithms, scheduling enforcement, and CRM remain out of scope."
+          actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
         />
         <Card>
           <CardHeader><CardTitle>Operational fit</CardTitle></CardHeader>

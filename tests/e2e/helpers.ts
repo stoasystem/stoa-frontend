@@ -4,12 +4,14 @@ export const demoUsers = {
   student: { email: 'student@test.com', password: 'password123' },
   parent: { email: 'parent@test.com', password: 'password123' },
   tutor: { email: 'tutor@test.com', password: 'password123' },
+  admin: { email: 'admin@test.com', password: 'password123' },
 }
 
 const roleLandingRoutes: Record<keyof typeof demoUsers, RegExp> = {
   student: /\/dashboard/,
   parent: /\/parent/,
   tutor: /\/tutor/,
+  admin: /\/admin/,
 }
 
 export async function loginAs(page: Page, role: keyof typeof demoUsers) {

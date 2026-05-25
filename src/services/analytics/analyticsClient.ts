@@ -42,6 +42,20 @@ export type AnalyticsEventName =
   | 'tutor_time_to_first_action_recorded'
   | 'tutor_note_added'
   | 'feedback_submitted'
+  | 'organization_dashboard_viewed'
+  | 'organization_switched'
+  | 'organization_student_opened'
+  | 'learning_profile_viewed'
+  | 'curriculum_graph_viewed'
+  | 'curriculum_topic_selected'
+  | 'weak_point_diagnosis_viewed'
+  | 'tutor_assignment_board_viewed'
+  | 'tutor_assignment_suggested_clicked'
+  | 'parent_monthly_report_viewed'
+  | 'advanced_analytics_viewed'
+  | 'retention_page_viewed'
+  | 'partnership_page_viewed'
+  | 'partnership_interest_submitted'
 
 export type AnalyticsPayload = Record<string, unknown>
 

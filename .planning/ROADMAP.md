@@ -13,7 +13,7 @@
 - ✅ **v1.8 Phase 9 Production Readiness, Monitoring, and Pilot Launch** - Phases 41-47 (implemented 2026-05-25)
 - ✅ **v1.9 Phase 10: Pilot Iteration, Payment Preparation, and Production Launch** - Phases 48-55 (implemented 2026-05-25)
 - ✅ **v1.10 Phase 11: Paid Launch Frontend, Growth Funnel, and Operational UI Scaling** - Phases 56-63 (implemented 2026-05-25)
-- 🚧 **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (planned)
+- ✅ **v1.11 Phase 12: Frontend Platform Scaling, School Partnership UI, and Advanced Learning Intelligence Design** - Phases 64-72 (implemented 2026-05-25)
 
 ## Phases
 
@@ -22,15 +22,15 @@
 
 **Milestone Goal:** Build frontend-only platform expansion, organization management, school/tutoring partnership, advanced learning intelligence, parent monthly reporting, retention, and advanced analytics demo surfaces so STOA can demonstrate platform potential without implementing production multi-tenant, organization database, AI diagnosis, curriculum graph, tutor matching, or partnership backend systems.
 
-- [ ] **Phase 64: Platform Boundary, Organization Contracts, and Workspace Foundation** - Establish Phase 12 frontend-only boundaries, organization/workspace types, services, hooks, selector, feature/mock strategy, and analytics event taxonomy.
-- [ ] **Phase 65: Organization Dashboard, Students, Tutors, and Reports UI** - Build organization dashboard, student list, tutor list, reports overview, and organization navigation.
-- [ ] **Phase 66: Advanced Learning Profile and Weak-Point Diagnosis UI** - Build advanced student learning profile plus weak-point diagnosis surfaces with mock evidence and recommendations.
-- [ ] **Phase 67: Curriculum Graph and Topic Detail UI** - Build curriculum/topic graph visualization, status nodes, prerequisite/related edges, and topic detail panel.
-- [ ] **Phase 68: Tutor Assignment Board and Schedule Overview UI** - Build tutor assignment board, available tutor list, suggested assignment placeholder, manual assign placeholder, and schedule overview.
-- [ ] **Phase 69: Parent Monthly Report and Report Integration UI** - Build parent monthly report page, PDF placeholder, report links, and monthly value presentation.
-- [ ] **Phase 70: Advanced Analytics and Retention UI** - Build advanced analytics dashboards, organization analytics, retention page, metric/chart/table components, and churn-risk placeholders.
-- [ ] **Phase 71: Partnership Onboarding and School/Tutoring Landing Flow** - Build partnership onboarding form/workflow, update partner landing routes, and mock interest submission.
-- [ ] **Phase 72: Docs, QA, E2E, and Phase 12 Verification** - Update README, platform/learning/partnership/analytics docs, QA checklist, route smoke/E2E coverage, and final build verification.
+- [x] **Phase 64: Platform Boundary, Organization Contracts, and Workspace Foundation** - Establish Phase 12 frontend-only boundaries, organization/workspace types, services, hooks, selector, feature/mock strategy, and analytics event taxonomy.
+- [x] **Phase 65: Organization Dashboard, Students, Tutors, and Reports UI** - Build organization dashboard, student list, tutor list, reports overview, and organization navigation.
+- [x] **Phase 66: Advanced Learning Profile and Weak-Point Diagnosis UI** - Build advanced student learning profile plus weak-point diagnosis surfaces with mock evidence and recommendations.
+- [x] **Phase 67: Curriculum Graph and Topic Detail UI** - Build curriculum/topic graph visualization, status nodes, prerequisite/related edges, and topic detail panel.
+- [x] **Phase 68: Tutor Assignment Board and Schedule Overview UI** - Build tutor assignment board, available tutor list, suggested assignment placeholder, manual assign placeholder, and schedule overview.
+- [x] **Phase 69: Parent Monthly Report and Report Integration UI** - Build parent monthly report page, PDF placeholder, report links, and monthly value presentation.
+- [x] **Phase 70: Advanced Analytics and Retention UI** - Build advanced analytics dashboards, organization analytics, retention page, metric/chart/table components, and churn-risk placeholders.
+- [x] **Phase 71: Partnership Onboarding and School/Tutoring Landing Flow** - Build partnership onboarding form/workflow, update partner landing routes, and mock interest submission.
+- [x] **Phase 72: Docs, QA, E2E, and Phase 12 Verification** - Update README, platform/learning/partnership/analytics docs, QA checklist, route smoke/E2E coverage, and final build verification.
 
 ### Phase 64: Platform Boundary, Organization Contracts, and Workspace Foundation
 
@@ -42,7 +42,7 @@
   2. Organization types, services, hooks, mock data, and selector exist.
   3. Organization selector can display and switch a mock workspace.
   4. Organization events and mock/demo data strategy are defined.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 65: Organization Dashboard, Students, Tutors, and Reports UI
 
@@ -54,7 +54,7 @@
   2. `/organization/students` displays student list and learning profile links.
   3. `/organization/tutors` displays tutor coverage, availability, load, and response-time placeholder.
   4. `/organization/reports` displays report overview and monthly/weekly report entry points.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 66: Advanced Learning Profile and Weak-Point Diagnosis UI
 
@@ -66,7 +66,7 @@
   2. Learning profile page shows student info, subjects, weak/strong topics, history, usage, teacher help, recommendations, and report links.
   3. Diagnosis page shows summary, weak points, evidence, practice suggestions, teacher-help recommendation, and parent explanation.
   4. UI and docs preserve the mock/demo learning-intelligence boundary.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 67: Curriculum Graph and Topic Detail UI
 
@@ -78,7 +78,7 @@
   2. Graph page displays topic nodes, edges, subject labels, and status.
   3. Selecting a topic shows topic detail, recent questions, and recommendations.
   4. Graph UI remains usable on mobile and tracks graph/topic events.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 68: Tutor Assignment Board and Schedule Overview UI
 
@@ -90,7 +90,7 @@
   2. Assignment board displays pending requests, available tutors, load, and suggestions.
   3. Manual assign action has clear placeholder/demo behavior.
   4. Schedule overview displays upcoming availability or coverage by subject.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 69: Parent Monthly Report and Report Integration UI
 
@@ -102,7 +102,7 @@
   2. `/parent/children/:childId/monthly-report` displays monthly summary, subject breakdown, weak-point trend, teacher-help summary, recommendations, and parent actions.
   3. PDF export placeholder behaves clearly without real PDF generation.
   4. Monthly report is linked from relevant report/profile surfaces and tracked.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 70: Advanced Analytics and Retention UI
 
@@ -114,7 +114,7 @@
   2. `/admin/advanced-analytics` shows platform metrics, subject breakdown, funnel, retention, and churn risk.
   3. `/organization/analytics` shows organization-specific analytics.
   4. `/admin/retention` shows inactive/at-risk users and placeholder actions.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 71: Partnership Onboarding and School/Tutoring Landing Flow
 
@@ -126,7 +126,7 @@
   2. `/partnership/onboarding` shows onboarding steps and form.
   3. `/for-schools` and `/for-tutoring-centers` route to onboarding/contact.
   4. Submission shows confirmation and tracks events.
-**Plans**: 0/1
+**Plans**: 1/1
 
 ### Phase 72: Docs, QA, E2E, and Phase 12 Verification
 
@@ -139,7 +139,7 @@
   3. Manual QA checklist covers all Phase 12 flows.
   4. E2E or route smoke coverage verifies core demo routes where feasible.
   5. `npm run build` passes.
-**Plans**: 0/1
+**Plans**: 1/1
 
 </details>
 
@@ -159,12 +159,12 @@ Phases execute in numeric order: 64 -> 65 -> 66 -> 67 -> 68 -> 69 -> 70 -> 71 ->
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 64. Platform Boundary, Organization Contracts, and Workspace Foundation | v1.11 | 0/1 | Planned | — |
-| 65. Organization Dashboard, Students, Tutors, and Reports UI | v1.11 | 0/1 | Planned | — |
-| 66. Advanced Learning Profile and Weak-Point Diagnosis UI | v1.11 | 0/1 | Planned | — |
-| 67. Curriculum Graph and Topic Detail UI | v1.11 | 0/1 | Planned | — |
-| 68. Tutor Assignment Board and Schedule Overview UI | v1.11 | 0/1 | Planned | — |
-| 69. Parent Monthly Report and Report Integration UI | v1.11 | 0/1 | Planned | — |
-| 70. Advanced Analytics and Retention UI | v1.11 | 0/1 | Planned | — |
-| 71. Partnership Onboarding and School/Tutoring Landing Flow | v1.11 | 0/1 | Planned | — |
-| 72. Docs, QA, E2E, and Phase 12 Verification | v1.11 | 0/1 | Planned | — |
+| 64. Platform Boundary, Organization Contracts, and Workspace Foundation | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 65. Organization Dashboard, Students, Tutors, and Reports UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 66. Advanced Learning Profile and Weak-Point Diagnosis UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 67. Curriculum Graph and Topic Detail UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 68. Tutor Assignment Board and Schedule Overview UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 69. Parent Monthly Report and Report Integration UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 70. Advanced Analytics and Retention UI | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 71. Partnership Onboarding and School/Tutoring Landing Flow | v1.11 | 1/1 | Complete | 2026-05-25 |
+| 72. Docs, QA, E2E, and Phase 12 Verification | v1.11 | 1/1 | Complete | 2026-05-25 |

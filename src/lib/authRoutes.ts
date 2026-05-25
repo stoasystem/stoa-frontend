@@ -10,6 +10,10 @@ export function getDefaultRouteForRole(role: UserRole) {
       return '/tutor'
     case 'admin':
       return '/admin'
+    case 'organization_admin':
+    case 'school_teacher':
+    case 'school_viewer':
+      return '/organization'
     default:
       return '/dashboard'
   }

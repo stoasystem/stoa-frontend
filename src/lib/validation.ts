@@ -1,6 +1,14 @@
 import { z } from 'zod'
 
-export const userRoleSchema = z.enum(['student', 'parent', 'tutor', 'admin'])
+export const userRoleSchema = z.enum([
+  'student',
+  'parent',
+  'tutor',
+  'admin',
+  'organization_admin',
+  'school_teacher',
+  'school_viewer',
+])
 
 export const loginSchema = z.object({
   email: z.string().email('Enter a valid email address.'),

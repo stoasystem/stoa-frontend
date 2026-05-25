@@ -54,6 +54,9 @@ export async function getCurrentUser() {
 }
 
 function inferRole(email: string): UserRole {
+  if (email.includes('organization')) return 'organization_admin'
+  if (email.includes('school.teacher')) return 'school_teacher'
+  if (email.includes('school.viewer')) return 'school_viewer'
   if (email.includes('parent')) return 'parent'
   if (email.includes('tutor') || email.includes('teacher')) return 'tutor'
   if (email.includes('admin')) return 'admin'

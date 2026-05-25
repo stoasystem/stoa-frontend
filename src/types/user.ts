@@ -1,4 +1,11 @@
-export type UserRole = 'student' | 'parent' | 'tutor' | 'admin'
+export type UserRole =
+  | 'student'
+  | 'parent'
+  | 'tutor'
+  | 'admin'
+  | 'organization_admin'
+  | 'school_teacher'
+  | 'school_viewer'
 
 export type SubscriptionStatus = 'trial' | 'active' | 'inactive' | 'expired'
 

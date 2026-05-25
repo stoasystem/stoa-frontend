@@ -9,6 +9,58 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 12 Frontend Platform Scaling and Advanced Learning Intelligence Design
+
+Phase 12 is frontend-only. It prepares STOA for platform-level demos across organizations, schools, tutoring centers, learning intelligence, tutor operations, parent monthly reporting, analytics, retention, and partnership onboarding.
+
+This phase does not implement production backend, production database, real multi-tenant permissions, real AI diagnosis, curriculum graph computation, tutor matching, marketing automation, or CRM systems. Demo and test behavior uses typed API contracts plus mock fallback data.
+
+Main additions:
+
+- Organization selector and workspace dashboard
+- Organization students, tutors, reports, and analytics pages
+- Advanced student learning profile
+- Weak-point diagnosis UI
+- Curriculum graph UI
+- Tutor assignment board and schedule overview
+- Parent monthly report UI
+- Advanced analytics and retention UI
+- School and tutoring center partnership onboarding
+
+Important mock API contracts:
+
+- `GET /organizations`
+- `GET /organizations/:organizationId/summary`
+- `GET /organizations/:organizationId/students`
+- `GET /organizations/:organizationId/tutors`
+- `GET /organizations/:organizationId/reports`
+- `GET /students/:studentId/learning-profile`
+- `GET /students/:studentId/diagnosis`
+- `GET /students/:studentId/curriculum-graph`
+- `GET /parent/children/:childId/monthly-report`
+- `GET /tutors/assignment-board`
+- `GET /admin/advanced-analytics`
+- `GET /admin/retention`
+- `POST /partnership/interests`
+
+Demo routes:
+
+- `/organization`
+- `/organization/students`
+- `/organization/tutors`
+- `/organization/reports`
+- `/organization/analytics`
+- `/organization/tutor-assignment`
+- `/students/student-anna/learning-profile`
+- `/students/student-anna/diagnosis`
+- `/students/student-anna/curriculum-graph`
+- `/parent/children/student-anna/monthly-report`
+- `/admin/advanced-analytics`
+- `/admin/retention`
+- `/for-schools`
+- `/for-tutoring-centers`
+- `/partnership/onboarding`
+
 ## Local Development
 
 Install dependencies:

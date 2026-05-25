@@ -8,7 +8,7 @@ import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
 import { registerSchema } from '@/lib/validation'
 import type { UserRole } from '@/types/user'
 
-const roles: UserRole[] = ['student', 'parent', 'tutor', 'admin']
+const roles: UserRole[] = ['student', 'parent', 'tutor', 'admin', 'organization_admin']
 
 export function RegisterForm() {
   const [name, setName] = useState('')

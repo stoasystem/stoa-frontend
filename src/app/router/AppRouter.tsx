@@ -10,6 +10,8 @@ import { AdminOperationsPlaceholderPage } from '@/pages/admin/OperationsPlacehol
 import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
 import { AdminSupportTicketsPage } from '@/pages/admin/AdminSupportTicketsPage'
 import { AdminUsagePage } from '@/pages/admin/Usage'
+import { AdvancedAnalyticsPage } from '@/pages/admin/AdvancedAnalyticsPage'
+import { RetentionPage } from '@/pages/admin/RetentionPage'
 import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
 import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
@@ -25,14 +27,25 @@ import { ForTutoringCentersPage } from '@/pages/landing/ForTutoringCentersPage'
 import { HowItWorksPage } from '@/pages/landing/HowItWorksPage'
 import { TeacherSupportPage } from '@/pages/landing/TeacherSupportPage'
 import { StudentLearningHistoryPage } from '@/pages/learning-history/StudentLearningHistoryPage'
+import { CurriculumGraphPage } from '@/pages/learning/CurriculumGraphPage'
+import { StudentLearningProfilePage } from '@/pages/learning/StudentLearningProfilePage'
+import { WeakPointDiagnosisPage } from '@/pages/learning/WeakPointDiagnosisPage'
 import { PrivacyPage } from '@/pages/legal/PrivacyPage'
 import { TermsPage } from '@/pages/legal/TermsPage'
 import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { OnboardingPage } from '@/pages/onboarding/OnboardingPage'
 import { ChildLearningHistoryPage } from '@/pages/parent/ChildLearningHistoryPage'
+import { ParentMonthlyReportPage } from '@/pages/parent/ParentMonthlyReportPage'
 import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
+import { OrganizationAnalyticsPage } from '@/pages/organization/OrganizationAnalyticsPage'
+import { OrganizationDashboardPage } from '@/pages/organization/OrganizationDashboardPage'
+import { OrganizationReportsPage } from '@/pages/organization/OrganizationReportsPage'
+import { OrganizationStudentsPage } from '@/pages/organization/OrganizationStudentsPage'
+import { OrganizationTutorsPage } from '@/pages/organization/OrganizationTutorsPage'
+import { TutorAssignmentBoardPage } from '@/pages/organization/TutorAssignmentBoardPage'
+import { PartnershipOnboardingPage } from '@/pages/partnership/PartnershipOnboardingPage'
 import { PricingPage } from '@/pages/pricing/PricingPage'
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage'
 import { StudentProfilePage } from '@/pages/profile/StudentProfilePage'
@@ -61,6 +74,7 @@ export function AppRouter() {
         <Route path="/teacher-support" element={<TeacherSupportPage />} />
         <Route path="/for-schools" element={<ForSchoolsPage />} />
         <Route path="/for-tutoring-centers" element={<ForTutoringCentersPage />} />
+        <Route path="/partnership/onboarding" element={<PartnershipOnboardingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
@@ -87,10 +101,24 @@ export function AppRouter() {
             <Route path="/parent" element={<ParentDashboardPage />} />
             <Route path="/parent/children/:childId" element={<ChildSummaryPage />} />
             <Route path="/parent/children/:childId/report" element={<ChildReportPage />} />
+            <Route path="/parent/children/:childId/monthly-report" element={<ParentMonthlyReportPage />} />
             <Route
               path="/parent/children/:childId/history"
               element={<ChildLearningHistoryPage />}
             />
+          </Route>
+          <Route element={<RoleRoute allowedRoles={['admin', 'organization_admin', 'school_teacher', 'school_viewer']} />}>
+            <Route path="/organization" element={<OrganizationDashboardPage />} />
+            <Route path="/organization/students" element={<OrganizationStudentsPage />} />
+            <Route path="/organization/tutors" element={<OrganizationTutorsPage />} />
+            <Route path="/organization/reports" element={<OrganizationReportsPage />} />
+            <Route path="/organization/analytics" element={<OrganizationAnalyticsPage />} />
+            <Route path="/organization/tutor-assignment" element={<TutorAssignmentBoardPage />} />
+            <Route path="/organization/students/:studentId/learning-profile" element={<StudentLearningProfilePage />} />
+            <Route path="/students/:studentId/learning-profile" element={<StudentLearningProfilePage />} />
+            <Route path="/students/:studentId/diagnosis" element={<WeakPointDiagnosisPage />} />
+            <Route path="/students/:studentId/curriculum-graph" element={<CurriculumGraphPage />} />
+            <Route path="/curriculum-graph" element={<CurriculumGraphPage />} />
           </Route>
           <Route element={<RoleRoute allowedRoles={['tutor']} />}>
             <Route path="/tutor" element={<TutorDashboardPage />} />
@@ -100,6 +128,8 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+            <Route path="/admin/advanced-analytics" element={<AdvancedAnalyticsPage />} />
+            <Route path="/admin/retention" element={<RetentionPage />} />
             <Route path="/admin/usage" element={<AdminUsagePage />} />
             <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
