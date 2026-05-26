@@ -1,5 +1,34 @@
 # Milestones
 
+## v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation (Shipped: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Commits:** Phase 20 commits from German style reference through final QA handoff.
+
+### Delivered
+
+- Read-only German writing style study from `/Users/zhdeng/newweb`, with the pre-existing `M img/team/.DS_Store` source status recorded and preserved.
+- German copy reference documenting headline rhythm, CTA style, education vocabulary, tone, and what not to copy from the company homepage.
+- English, German, French, and Italian copy rules for Phase 20.
+- Cross-locale copy review matrix that allows non-literal structures while requiring meaning, tone, and UI fit.
+- Refined EN/DE/FR/IT copy for homepage, register/auth, chat, parent report, pricing, billing, support, and shared CTA labels.
+- Reduced German compound-heavy phrasing, improved French apostrophe-sensitive copy, and added Italian-friendly CTA treatment.
+- Locale layout hints for mobile-short CTA labels, wider CTA buttons, and German hero hyphenation.
+- Cross-locale visual QA documentation and README Phase 20 handoff guidance.
+
+### Verification
+
+- Install: passed.
+- Dev server: started successfully at `http://127.0.0.1:5173/` after sandbox escalation.
+- Build: passed.
+- Browser smoke: 32 route/locale/viewport combinations checked with no page-level horizontal overflow.
+- Locale JSON parse: passed.
+- Targeted terminology scan: passed.
+- Source safety: `/Users/zhdeng/newweb` was not modified by Phase 20; it still showed the pre-existing `M img/team/.DS_Store` change.
+- Remaining handoff gaps: native-speaker review, legal-sensitive translation review, authenticated full-route visual regression, accessibility, cross-browser QA, performance sanity, and release quality gate.
+
+---
+
 ## v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Shipped: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

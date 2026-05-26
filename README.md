@@ -9,6 +9,58 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 20 Cross-Locale Copy Refinement
+
+Phase 20 refines English, German, French, and Italian copy across the STOA learning platform and adapts layout where language length affects UI fit. The goal is natural local product copy, not literal translation.
+
+Source reference:
+
+```text
+/Users/zhdeng/newweb
+```
+
+Important rule:
+
+Do not modify anything inside `/Users/zhdeng/newweb`. The company homepage is read-only for this phase and may only be used to study German writing style.
+
+Main goals:
+
+- Learn from the German writing style of the company homepage without copying its components or long text blocks.
+- Improve German copy so it reads like STOA-native German, not direct English translation.
+- Keep English calm, premium, and education-oriented.
+- Use French typographic apostrophes such as `d’apprentissage`, `l’élève`, and `qu’un`.
+- Keep Italian CTA labels natural and button-friendly.
+- Preserve the same product meaning across all four languages without forcing literal structure.
+- Adapt locale layout hints for mobile CTA fit and German heading stability.
+
+Phase 20 docs:
+
+- `docs/language/main-website-german-style-study.md`
+- `docs/language/main-website-german-copy-reference.md`
+- `docs/language/english-copy-rules.md`
+- `docs/language/german-copy-rules.md`
+- `docs/language/french-copy-rules.md`
+- `docs/language/italian-copy-rules.md`
+- `docs/language/cross-locale-copy-review-matrix.md`
+- `docs/language/cross-locale-visual-qa.md`
+
+Verification:
+
+```bash
+npm install
+npm run dev -- --host 127.0.0.1
+npm run build
+```
+
+Source-safety check:
+
+```bash
+cd /Users/zhdeng/newweb
+git status --short
+```
+
+Phase 20 does not add product features or new languages.
+
 ## Phase 18 Production-Facing Cleanup and Stability Hardening
 
 Phase 18 removes development, demo, mock, test, and Codex-related artifacts from normal user-facing UI while preserving explicitly gated local/demo workflows for development and QA.
