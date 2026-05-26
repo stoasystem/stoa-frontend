@@ -17,6 +17,7 @@ import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
 import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
+import { ContactPage } from '@/pages/contact/ContactPage'
 import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
 import { ForbiddenPage } from '@/pages/error/ForbiddenPage'
 import { UnauthorizedPage } from '@/pages/error/UnauthorizedPage'
@@ -80,6 +81,7 @@ export function AppRouter() {
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
         <Route path="/support" element={<SupportPage />} />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route element={<ProtectedRoute />}>

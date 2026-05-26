@@ -1,0 +1,66 @@
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { FooterContactInfo } from '@/components/common/FooterContactInfo'
+import { FooterLegalLinks } from '@/components/common/FooterLegalLinks'
+import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
+import { StoaLogo } from '@/components/common/StoaLogo'
+
+export function AppFooter() {
+  const { t } = useTranslation('common')
+
+  return (
+    <footer className="border-t border-border/70 bg-card/88">
+      <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-6 md:grid-cols-[1.15fr_1fr_1fr]">
+        <div className="min-w-0 space-y-4">
+          <Link to="/" className="inline-flex">
+            <StoaLogo size="md" />
+          </Link>
+          <p className="max-w-sm text-sm leading-6 text-muted-foreground">
+            {t('footer.description')}
+          </p>
+          <LanguageSwitcher compact />
+        </div>
+
+        <div className="min-w-0">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-[0.14em] text-foreground">
+            {t('footer.contactInfo')}
+          </h2>
+          <FooterContactInfo />
+        </div>
+
+        <div className="min-w-0 space-y-4">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-foreground">
+            {t('footer.platform')}
+          </h2>
+          <div className="grid gap-2 text-sm text-muted-foreground">
+            <Link className="hover:text-foreground" to="/how-it-works">
+              {t('navigation.howItWorks')}
+            </Link>
+            <Link className="hover:text-foreground" to="/for-parents">
+              {t('navigation.forParents')}
+            </Link>
+            <Link className="hover:text-foreground" to="/teacher-support">
+              {t('navigation.forTutors')}
+            </Link>
+            <Link className="hover:text-foreground" to="/pricing">
+              {t('navigation.pricing')}
+            </Link>
+            <Link className="hover:text-foreground" to="/support">
+              {t('navigation.support')}
+            </Link>
+            <Link className="hover:text-foreground" to="/contact">
+              {t('navigation.contact')}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-border/60">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5 text-xs text-muted-foreground sm:px-6">
+          <span>{t('footer.copyright')}</span>
+          <FooterLegalLinks />
+        </div>
+      </div>
+    </footer>
+  )
+}

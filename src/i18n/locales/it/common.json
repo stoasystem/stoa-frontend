@@ -16,6 +16,7 @@
     "forParents": "Per genitori",
     "privacy": "Privacy",
     "terms": "Termini",
+    "contact": "Contatto",
     "support": "Assistenza",
     "dashboard": "Panoramica",
     "chat": "Chat di studio",
@@ -65,6 +66,18 @@
     "german": "Deutsch",
     "french": "Français",
     "italian": "Italiano"
+  },
+  "footer": {
+    "description": "Una piattaforma di apprendimento chiara per fare domande, ricevere spiegazioni, seguire i progressi e ottenere supporto da un insegnante qualificato.",
+    "contactInfo": "Contatto",
+    "address": "Sedi",
+    "email": "Email",
+    "phone": "Telefono",
+    "platform": "Piattaforma",
+    "legal": "Link legali",
+    "contact": "Contatto",
+    "backToHomepage": "Torna al sito STOA",
+    "copyright": "© 2026 STOA. Tutti i diritti riservati."
   },
   "status": {
     "loading": "Caricamento...",

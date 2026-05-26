@@ -11,6 +11,7 @@ import enTutor from '@/i18n/locales/en/tutor.json'
 import enPricing from '@/i18n/locales/en/pricing.json'
 import enBilling from '@/i18n/locales/en/billing.json'
 import enSupport from '@/i18n/locales/en/support.json'
+import enContact from '@/i18n/locales/en/contact.json'
 import enAdmin from '@/i18n/locales/en/admin.json'
 import enErrors from '@/i18n/locales/en/errors.json'
 import deCommon from '@/i18n/locales/de/common.json'
@@ -22,6 +23,7 @@ import deTutor from '@/i18n/locales/de/tutor.json'
 import dePricing from '@/i18n/locales/de/pricing.json'
 import deBilling from '@/i18n/locales/de/billing.json'
 import deSupport from '@/i18n/locales/de/support.json'
+import deContact from '@/i18n/locales/de/contact.json'
 import deAdmin from '@/i18n/locales/de/admin.json'
 import deErrors from '@/i18n/locales/de/errors.json'
 import frCommon from '@/i18n/locales/fr/common.json'
@@ -33,6 +35,7 @@ import frTutor from '@/i18n/locales/fr/tutor.json'
 import frPricing from '@/i18n/locales/fr/pricing.json'
 import frBilling from '@/i18n/locales/fr/billing.json'
 import frSupport from '@/i18n/locales/fr/support.json'
+import frContact from '@/i18n/locales/fr/contact.json'
 import frAdmin from '@/i18n/locales/fr/admin.json'
 import frErrors from '@/i18n/locales/fr/errors.json'
 import itCommon from '@/i18n/locales/it/common.json'
@@ -44,6 +47,7 @@ import itTutor from '@/i18n/locales/it/tutor.json'
 import itPricing from '@/i18n/locales/it/pricing.json'
 import itBilling from '@/i18n/locales/it/billing.json'
 import itSupport from '@/i18n/locales/it/support.json'
+import itContact from '@/i18n/locales/it/contact.json'
 import itAdmin from '@/i18n/locales/it/admin.json'
 import itErrors from '@/i18n/locales/it/errors.json'
 
@@ -58,6 +62,7 @@ export const resources = {
     pricing: enPricing,
     billing: enBilling,
     support: enSupport,
+    contact: enContact,
     admin: enAdmin,
     errors: enErrors,
   },
@@ -71,6 +76,7 @@ export const resources = {
     pricing: dePricing,
     billing: deBilling,
     support: deSupport,
+    contact: deContact,
     admin: deAdmin,
     errors: deErrors,
   },
@@ -84,6 +90,7 @@ export const resources = {
     pricing: frPricing,
     billing: frBilling,
     support: frSupport,
+    contact: frContact,
     admin: frAdmin,
     errors: frErrors,
   },
@@ -97,6 +104,7 @@ export const resources = {
     pricing: itPricing,
     billing: itBilling,
     support: itSupport,
+    contact: itContact,
     admin: itAdmin,
     errors: itErrors,
   },

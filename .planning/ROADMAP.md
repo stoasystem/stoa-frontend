@@ -46,8 +46,8 @@ Phase 21 raises STOA frontend to a release-quality gate without broad business e
 
 #### Phase 119: Footer, Logo, Contact Page, and Contact API Contract
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Integrate adapted brand footer details, logo variants, and a multilingual contact form with frontend/demo API contract only.
 
 **Requirements:** BRAND21-06 through BRAND21-10; CONTACT21-01 through CONTACT21-10
@@ -175,7 +175,7 @@ Start with Phase 118. Phase 118 must complete read-only brand detail extraction 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 118. Brand Detail Read-Only Audit and Integration Plan | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 0/1 | Planned | — |
+| 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 0/1 | Planned | — |
 | 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 0/1 | Planned | — |
 | 122. Release Quality Gate, README, and Handoff | v1.20 | 0/1 | Planned | — |

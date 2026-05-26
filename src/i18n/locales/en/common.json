@@ -16,6 +16,7 @@
     "forParents": "For parents",
     "privacy": "Privacy",
     "terms": "Terms",
+    "contact": "Contact",
     "support": "Support",
     "dashboard": "Dashboard",
     "chat": "Learning chat",
@@ -65,6 +66,18 @@
     "german": "Deutsch",
     "french": "Français",
     "italian": "Italiano"
+  },
+  "footer": {
+    "description": "A calm learning platform for questions, clear explanations, parent visibility, and professional teacher support.",
+    "contactInfo": "Contact",
+    "address": "Locations",
+    "email": "Email",
+    "phone": "Phone",
+    "platform": "Platform",
+    "legal": "Legal links",
+    "contact": "Contact",
+    "backToHomepage": "Back to STOA homepage",
+    "copyright": "© 2026 STOA. All rights reserved."
   },
   "status": {
     "loading": "Loading...",

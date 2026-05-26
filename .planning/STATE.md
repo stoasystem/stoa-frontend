@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.20
 milestone_name: "Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate"
 status: planning
-last_updated: "2026-05-26T03:22:00.000Z"
+last_updated: "2026-05-26T01:01:40.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 119. Footer, Logo, Contact Page, and Contact API Contract
+Phase: 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening
 Plan: —
 Status: Ready to plan
-Last activity: 2026-05-26 — Phase 118 completed read-only brand detail audit and integration plan.
+Last activity: 2026-05-26 — Phase 119 completed footer, logo, contact page, localized contact form, and contact API contract.
 
 ## Performance Metrics
 
@@ -204,10 +204,11 @@ Recent decisions affecting current work:
 - Phase 117 added cross-locale visual QA documentation, updated README, verified `npm install`, dev server startup, a 32-combination browser smoke, `npm run build`, and unchanged `/Users/zhdeng/newweb` source status.
 - Milestone v1.20 started as Phase 21, focused on accessibility, cross-browser QA, brand detail integration, contact form adaptation, and release quality gates.
 - Phase 118 documented homepage footer/contact/logo/contact-form details from `/Users/zhdeng/newweb` in read-only mode and confirmed only the pre-existing `.DS_Store` source status remains.
+- Phase 119 integrated localized footer contact details, token-based STOA logo, `/contact`, accessible contact form, contact API client/hook, and local backend `/contact/requests` contract.
 
 ### Pending Todos
 
-- Phase 21 next: start Phase 118 with read-only brand detail extraction from `/Users/zhdeng/newweb`.
+- Phase 21 next: start Phase 120 accessibility, keyboard, screen-reader, and contrast hardening.
 
 ### Quick Tasks Completed
 

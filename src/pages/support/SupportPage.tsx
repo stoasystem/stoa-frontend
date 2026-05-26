@@ -61,9 +61,14 @@ export function SupportPage() {
           description={t('support:description')}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
-            <Button variant="outline" asChild>
-              <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
-            </Button>
+            <>
+              <Button variant="outline" asChild>
+                <Link to="/contact">{t('common:navigation.contact')}</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
+              </Button>
+            </>
           }
         />
 
@@ -90,13 +95,16 @@ export function SupportPage() {
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
               <p>
-                Send a support request for pilot access, bugs, report questions, or workflow
-                confusion. The request is routed through the STOA support queue.
+                Send a support request for access, bugs, report questions, or workflow confusion.
+                The request is routed through the STOA support queue.
               </p>
               <p>
-                If you cannot finish the form, use the feedback button in the app sidebar and
-                select the closest feedback type.
+                For general questions about STOA, parent support, teacher applications, or school
+                partnerships, use the contact page.
               </p>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/contact">{t('common:navigation.contact')}</Link>
+              </Button>
             </CardContent>
           </Card>
 

@@ -8,6 +8,7 @@ export const namespaces = [
   'pricing',
   'billing',
   'support',
+  'contact',
   'admin',
   'errors',
 ] as const

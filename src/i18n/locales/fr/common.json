@@ -16,6 +16,7 @@
     "forParents": "Pour les parents",
     "privacy": "Confidentialité",
     "terms": "Conditions",
+    "contact": "Contact",
     "support": "Aide",
     "dashboard": "Tableau de bord",
     "chat": "Espace d’apprentissage",
@@ -65,6 +66,18 @@
     "german": "Deutsch",
     "french": "Français",
     "italian": "Italiano"
+  },
+  "footer": {
+    "description": "Une plateforme d’apprentissage claire pour poser des questions, comprendre les explications, suivre les progrès et recevoir l’appui d’un enseignant qualifié.",
+    "contactInfo": "Contact",
+    "address": "Adresses",
+    "email": "E-mail",
+    "phone": "Téléphone",
+    "platform": "Plateforme",
+    "legal": "Liens légaux",
+    "contact": "Contact",
+    "backToHomepage": "Retour au site STOA",
+    "copyright": "© 2026 STOA. Tous droits réservés."
   },
   "status": {
     "loading": "Chargement...",

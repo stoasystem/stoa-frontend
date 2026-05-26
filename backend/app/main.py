@@ -111,6 +111,16 @@ class SupportTicketCreateRequest(BaseModel):
     createdAt: str | None = None
 
 
+class ContactRequest(BaseModel):
+    name: str
+    email: str
+    phone: str | None = None
+    role: str
+    topic: str
+    message: str
+    preferredLanguage: str | None = None
+
+
 class SupportTicketStatusUpdate(BaseModel):
     status: str
 
@@ -1233,6 +1243,32 @@ def create_support_request(
 ) -> dict[str, object]:
     ticket = create_support_ticket(payload, authorization)
     return {"ok": True, "requestId": ticket["id"]}
+
+
+@app.post("/contact/requests")
+def create_contact_request(payload: ContactRequest) -> dict[str, object]:
+    name = payload.name.strip()
+    email = payload.email.strip()
+    message = payload.message.strip()
+    if not name or not email or not message:
+        raise HTTPException(status_code=400, detail="Name, email, and message are required")
+    if not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", email):
+        raise HTTPException(status_code=400, detail="A valid email address is required")
+    if payload.role not in {"parent", "student", "teacher", "school", "other"}:
+        raise HTTPException(status_code=400, detail="Invalid contact role")
+    if payload.topic not in {
+        "learning_platform",
+        "teacher_support",
+        "parent_reports",
+        "pricing",
+        "tutor_application",
+        "school_partnership",
+        "technical_support",
+        "other",
+    }:
+        raise HTTPException(status_code=400, detail="Invalid contact topic")
+
+    return {"ok": True, "requestId": f"contact-request-{uuid.uuid4()}"}
 
 
 @app.get("/support/tickets")
