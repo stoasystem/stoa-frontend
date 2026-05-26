@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.21
 milestone_name: "Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation"
-status: planning
+status: complete
 last_updated: "2026-05-26T12:01:24.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 123. Final Demo Package and Audience Scripts
+Phase: 127. Final Demo Run, README, and Launch Candidate Branch Preparation
 Plan: —
-Status: Planning complete; ready for Phase 123 execution
-Last activity: 2026-05-26 — Milestone v1.21 requirements, research, and roadmap initialized
+Status: Phase 22 complete; external stakeholder approval remains a release gate
+Last activity: 2026-05-26 — Milestone v1.21 phases 123-127 completed and final demo run recorded
 
 ## Performance Metrics
 
@@ -210,11 +210,16 @@ Recent decisions affecting current work:
 - Phase 122 added release quality gate and final pre-launch checklist, updated README, verified build and E2E, and confirmed `/Users/zhdeng/newweb` source status was unchanged.
 - Milestone v1.21 started as Phase 22, focused on final demo packaging, stakeholder review, final copy/design/translation/API locks, release notes, known issues, launch-candidate approval, final demo run, README handoff, and release branch preparation.
 - Phase 22 research confirmed no new dependencies are needed and the milestone should remain documentation, verification, and process-oriented unless a blocker bug prevents demo or launch-candidate readiness.
+- Phase 123 created the final demo package and audience scripts.
+- Phase 124 locked demo accounts, demo reset expectations, and final demo API contract.
+- Phase 125 created stakeholder review and final copy/design/translation/bug locks.
+- Phase 126 created release notes, known issues, next-stage backlog, and launch-candidate approval checklist.
+- Phase 127 recorded final demo run evidence, updated README, aligned demo backend npm scripts to the local venv, and verified install, reset, backend startup, dev server, lint, build, and core API smoke.
 
 ### Pending Todos
 
-- Execute Phase 123: Final Demo Package and Audience Scripts.
-- Keep Phase 22 scope locked: no new product features, broad redesign, demo backend rewrite, AWS work, or real payment/support operations unless required to unblock launch-candidate readiness.
+- External stakeholder review and launch-candidate approval sign-off remain pending release gates.
+- Phase 23 should handle launch-candidate bug fixes, final approval changes, public demo release preparation, deployment handoff, demo monitoring, and first external presentation support.
 
 ### Quick Tasks Completed
 

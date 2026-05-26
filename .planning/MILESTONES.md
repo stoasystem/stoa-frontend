@@ -1,5 +1,35 @@
 # Milestones
 
+## v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation (Implemented: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/v1.21-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Final demo package under `docs/demo/final-demo-package/`.
+- Audience-specific investor, parent, student, tutor, and admin demo scripts.
+- Demo account, demo data reset, known limitation, and troubleshooting docs.
+- Stakeholder review checklist.
+- Final bug triage, copy lock, design lock, translation lock, and demo API contract lock.
+- Launch-candidate release notes, known issues list, next-stage backlog, and approval checklist.
+- Final demo run result with command and API-smoke evidence.
+- README Phase 22 final demo package and launch-candidate guidance.
+- Demo backend npm scripts aligned to the repo-local backend virtualenv for repeatable startup.
+
+### Verification
+
+- `npm install --ignore-scripts`: passed.
+- `npm run demo:reset`: passed.
+- `npm run demo:backend`: passed after script alignment.
+- Frontend dev server: HTTP 200.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- API smoke: passed for health, four fixed demo account logins, student conversations, parent child link, tutor help requests, admin analytics, contact request, and support ticket.
+- Remaining release gates: stakeholder sign-off, known issues acceptance, manual browser/device pass, manual screen-reader smoke, and native-speaker review.
+
+---
+
 ## v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate (Shipped: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

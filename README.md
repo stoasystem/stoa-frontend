@@ -9,6 +9,70 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 22 Final Demo Package and Launch Candidate
+
+This phase does not add new features.
+
+It packages the STOA Learning Platform frontend into a stable launch candidate for review and demo.
+
+Main tasks:
+
+- Final demo package
+- Investor demo script
+- Parent demo script
+- Student demo script
+- Tutor demo script
+- Admin demo script
+- Stakeholder review checklist
+- Final bug triage
+- Final copy lock
+- Final design lock
+- Final translation lock
+- Final demo API contract lock
+- Launch candidate branch
+- Release notes
+- Known issues list
+- Launch candidate approval
+
+Launch candidate rule:
+
+After the launch candidate branch is created, only bug fixes are allowed. New features must go into the next-stage backlog.
+
+Phase 22 docs:
+
+- `docs/demo/final-demo-package/demo-overview.md`
+- `docs/demo/final-demo-package/investor-demo-script.md`
+- `docs/demo/final-demo-package/parent-demo-script.md`
+- `docs/demo/final-demo-package/student-demo-script.md`
+- `docs/demo/final-demo-package/tutor-demo-script.md`
+- `docs/demo/final-demo-package/admin-demo-script.md`
+- `docs/demo/final-demo-package/demo-accounts.md`
+- `docs/demo/final-demo-package/demo-data-reset.md`
+- `docs/demo/final-demo-package/demo-known-limitations.md`
+- `docs/demo/final-demo-package/demo-troubleshooting.md`
+- `docs/demo/final-demo-run-result.md`
+- `docs/review/stakeholder-review-checklist.md`
+- `docs/release/final-bug-triage.md`
+- `docs/release/final-copy-lock.md`
+- `docs/release/final-design-lock.md`
+- `docs/release/final-translation-lock.md`
+- `docs/release/final-demo-api-contract-lock.md`
+- `docs/release/release-notes-lc1.md`
+- `docs/release/known-issues.md`
+- `docs/release/next-stage-backlog.md`
+- `docs/release/launch-candidate-approval.md`
+
+Verification:
+
+```bash
+npm install --ignore-scripts
+npm run demo:reset
+npm run demo:backend
+npm run dev -- --host 127.0.0.1
+npm run lint
+npm run build
+```
+
 ## Phase 21 Accessibility, Brand Details, and Release Quality Gate
 
 Phase 21 prepares STOA Frontend for release-candidate review without adding broad business scope. It integrates read-only brand details from the company homepage, adds a real contact surface, improves accessibility foundations, and records QA/release gates.
