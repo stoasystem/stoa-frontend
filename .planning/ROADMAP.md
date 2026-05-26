@@ -30,7 +30,7 @@
 
 ## Phases
 
-### Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold
+### Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold ✅
 
 **Goal:** Define the Learning Assistant functional QA plan, relevance and multi-turn behavior rules, repair workflow, readiness threshold, and bug reproduction process.
 
@@ -42,6 +42,8 @@
 2. Learning Assistant rule docs cover relevance, multi-turn consistency, repair prompt workflow, and demo readiness thresholds.
 3. Bug reproduction log template supports repeatable tracking from failure to regression test.
 4. Docs explicitly state Phase 26 does not add product features or UI redesign.
+
+**Status:** Complete.
 
 ### Phase 138: Multi-Turn Regression Data and Behavior Test Suite
 
@@ -98,10 +100,10 @@
 
 ## Next Up
 
-**Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold** - Define the behavior QA rules and bug tracking foundation before expanding tests and evaluator logic.
+**Phase 138: Multi-Turn Regression Data and Behavior Test Suite** - Add the multi-turn test data and focused behavior tests that reproduce relevance, grade, subject, context, escalation, internal-term, and cheating scenarios.
 
 Run:
 
 ```bash
-$gsd-plan-phase 137
+$gsd-plan-phase 138
 ```

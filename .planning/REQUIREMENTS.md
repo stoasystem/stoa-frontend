@@ -10,12 +10,12 @@ Requirements for Phase 26. Each requirement maps to exactly one roadmap phase.
 
 ### QA Planning and Behavior Rules
 
-- [ ] **QA26-01**: `docs/qa/learning-assistant-functional-qa-plan.md` defines the Learning Assistant functional QA dimensions, test method, P0 failure categories, and verification commands.
-- [ ] **RULE26-01**: `docs/learning-assistant/relevance-rules.md` defines what relevant answers must include for core demo questions and what counts as irrelevant or hallucinated output.
-- [ ] **RULE26-02**: `docs/learning-assistant/multi-turn-behavior-rules.md` defines context consistency expectations for follow-up questions, repeated confusion, unrelated turns, and simulated unclear uploads.
-- [ ] **RULE26-03**: `docs/learning-assistant/repair-prompt-rules.md` defines allowed repair triggers, repair-prompt constraints, and forbidden hard-coded answer fixes.
-- [ ] **RULE26-04**: `docs/learning-assistant/demo-readiness-threshold.md` defines P0 behavior failure thresholds, internal-term leakage thresholds, grade/subject scope thresholds, and acceptable known-issue handling.
-- [ ] **BUG26-01**: `docs/qa/learning-assistant-bug-reproduction-log.md` provides a reproducible bug log template with bug ID, date, test case, profile, turns, actual/expected response, failure type, provider, fix attempt, status, and regression-test flag.
+- [x] **QA26-01**: `docs/qa/learning-assistant-functional-qa-plan.md` defines the Learning Assistant functional QA dimensions, test method, P0 failure categories, and verification commands.
+- [x] **RULE26-01**: `docs/learning-assistant/relevance-rules.md` defines what relevant answers must include for core demo questions and what counts as irrelevant or hallucinated output.
+- [x] **RULE26-02**: `docs/learning-assistant/multi-turn-behavior-rules.md` defines context consistency expectations for follow-up questions, repeated confusion, unrelated turns, and simulated unclear uploads.
+- [x] **RULE26-03**: `docs/learning-assistant/repair-prompt-rules.md` defines allowed repair triggers, repair-prompt constraints, and forbidden hard-coded answer fixes.
+- [x] **RULE26-04**: `docs/learning-assistant/demo-readiness-threshold.md` defines P0 behavior failure thresholds, internal-term leakage thresholds, grade/subject scope thresholds, and acceptable known-issue handling.
+- [x] **BUG26-01**: `docs/qa/learning-assistant-bug-reproduction-log.md` provides a reproducible bug log template with bug ID, date, test case, profile, turns, actual/expected response, failure type, provider, fix attempt, status, and regression-test flag.
 
 ### Regression Data and Test Suite
 
@@ -86,12 +86,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QA26-01 | Phase 137 | Pending |
-| RULE26-01 | Phase 137 | Pending |
-| RULE26-02 | Phase 137 | Pending |
-| RULE26-03 | Phase 137 | Pending |
-| RULE26-04 | Phase 137 | Pending |
-| BUG26-01 | Phase 137 | Pending |
+| QA26-01 | Phase 137 | Complete |
+| RULE26-01 | Phase 137 | Complete |
+| RULE26-02 | Phase 137 | Complete |
+| RULE26-03 | Phase 137 | Complete |
+| RULE26-04 | Phase 137 | Complete |
+| BUG26-01 | Phase 137 | Complete |
 | DATA26-01 | Phase 138 | Pending |
 | TEST26-01 | Phase 138 | Pending |
 | TEST26-02 | Phase 138 | Pending |
