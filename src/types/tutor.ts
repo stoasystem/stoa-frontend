@@ -1,4 +1,5 @@
 import type { ChatMessage } from '@/types/chat'
+import type { PracticeTeacherRequestContext } from '@/types/practice'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 export type TutorHelpRequestSummary = {
@@ -35,6 +36,7 @@ export type TutorHelpRequestDetail = {
   subject: string
   status: TeacherHelpStatus
   requestMessage?: string
+  practiceContext?: PracticeTeacherRequestContext
   messages: ChatMessage[]
   notes?: TutorHelpRequestNote[]
   firstTutorActionAt?: string

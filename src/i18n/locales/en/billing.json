@@ -17,7 +17,7 @@
   "securityBody": "Hosted checkout is the preferred real payment direction. The browser never receives card details or payment secrets.",
   "teacherUpgradeReason": "Choose a plan with professional teacher support.",
   "fileUploadReason": "File upload quota reached.",
-  "parentReportReason": "A family plan is required for reports.",
+  "parentReportReason": "A paid plan is required for weekly reports.",
   "success": "Subscription status updated.",
   "choosePlan": "Choose a plan",
   "mockCheckout": "Plan selection",
@@ -26,25 +26,25 @@
       "name": "Free trial",
       "audience": "Families who want to try STOA before choosing a plan.",
       "cta": "Start free trial",
-      "features": ["Guided learning questions", "Homework file uploads", "Basic learning history"]
+      "features": ["Guided learning questions", "Parent dashboard", "Basic learning history"]
     },
     "student": {
       "name": "Student plan",
       "audience": "A focused learner who needs steady homework support.",
       "cta": "Choose student",
-      "features": ["Learning space", "Homework upload", "Learning history"]
-    },
-    "family": {
-      "name": "Family plan",
-      "audience": "Parents who want a clear view of progress.",
-      "cta": "Choose family",
-      "features": ["Everything in Student", "Parent dashboard", "Weekly parent report"]
+      "features": ["Learning space", "Homework upload", "Parent dashboard"]
     },
     "tutor_supported": {
       "name": "Teacher-supported plan",
-      "audience": "Families who want professional teacher support when students need more guidance.",
+      "audience": "Families who want limited weekly teacher Q&A.",
       "cta": "Choose teacher support",
-      "features": ["Everything in Family", "Teacher support sessions", "Priority learning support"]
+      "features": ["Everything in Student", "Weekly parent report", "Limited weekly teacher Q&A"]
+    },
+    "family": {
+      "name": "Family plan",
+      "audience": "Families who want the highest support level and shared access.",
+      "cta": "Choose family",
+      "features": ["Everything in Teacher-supported", "5x more teacher Q&A time", "Shared benefits for up to 3 people"]
     }
   }
 }

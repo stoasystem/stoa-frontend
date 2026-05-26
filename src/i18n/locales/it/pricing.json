@@ -13,29 +13,14 @@
   "pilotDetail": "Ogni piano chiarisce prima del checkout il livello di supporto per studente, genitori e insegnante.",
   "comparison": {
     "title": "Accesso per piano",
-    "headers": ["Funzione", "Prova", "Studente", "Famiglia", "Con insegnante"],
+    "headers": ["Funzione", "Prova", "Studente", "Con insegnante", "Famiglia"],
     "rows": [
       ["Chat di studio", "Limitata", "Inclusa", "Inclusa", "Inclusa"],
       ["Caricamento compiti", "Limitato", "Incluso", "Incluso", "Incluso"],
-      ["Area genitori", "Anteprima", "—", "Inclusa", "Inclusa"],
-      ["Report settimanali", "Anteprima", "—", "Inclusi", "Inclusi"],
-      ["Chiedi a un insegnante", "Limitato", "—", "—", "Sessioni insegnante incluse"]
+      ["Area genitori", "Inclusa", "Inclusa", "Inclusa", "Inclusa"],
+      ["Report settimanali", "—", "Inclusi", "Inclusi", "Inclusi"],
+      ["Domande a un insegnante", "—", "—", "Limitate ogni settimana", "5x più tempo insegnante"],
+      ["Vantaggi condivisi", "—", "—", "—", "Fino a 3 persone"]
     ]
-  },
-  "faqPaymentTitle": "Il pagamento è già attivo?",
-  "faqPaymentBody": "Il checkout mostra ora la scelta del piano senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata.",
-  "faqs": [
-    {
-      "question": "Il pagamento è già attivo?",
-      "answer": "Il checkout mostra ora la scelta del piano senza addebitare una carta. I pagamenti reali useranno una pagina sicura ospitata."
-    },
-    {
-      "question": "I genitori possono provare prima di pagare?",
-      "answer": "Sì. Le famiglie possono iniziare con la prova gratuita, vedere come STOA si adatta ai compiti e scegliere un piano a pagamento più tardi."
-    },
-    {
-      "question": "Cosa succede quando si raggiunge un limite del piano?",
-      "answer": "STOA mostra un percorso chiaro di upgrade o rinnovo prima che il supporto venga interrotto."
-    }
-  ]
+  }
 }

@@ -13,29 +13,14 @@
   "pilotDetail": "Jeder Plan zeigt vor dem Checkout klar, welche Unterstützung Schüler, Eltern und Lehrpersonen erhalten.",
   "comparison": {
     "title": "Planzugang",
-    "headers": ["Funktion", "Probephase", "Schüler", "Familie", "Mit Lehrpersonen"],
+    "headers": ["Funktion", "Probephase", "Schüler", "Mit Lehrpersonen", "Familie"],
     "rows": [
       ["Lernchat", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
       ["Hausaufgaben-Upload", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
-      ["Elternbereich", "Vorschau", "—", "Enthalten", "Enthalten"],
-      ["Wochenberichte", "Vorschau", "—", "Enthalten", "Enthalten"],
-      ["Lehrperson fragen", "Begrenzt", "—", "—", "Sitzungen enthalten"]
+      ["Elternbereich", "Enthalten", "Enthalten", "Enthalten", "Enthalten"],
+      ["Wochenberichte", "—", "Enthalten", "Enthalten", "Enthalten"],
+      ["Lehrperson fragen", "—", "—", "Wöchentlich begrenzt", "5x mehr Zeit mit Lehrpersonen"],
+      ["Gemeinsame Nutzung", "—", "—", "—", "Bis zu 3 Personen"]
     ]
-  },
-  "faqPaymentTitle": "Ist die Zahlung jetzt live?",
-  "faqPaymentBody": "Der Checkout zeigt aktuell die Planwahl, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite.",
-  "faqs": [
-    {
-      "question": "Ist die Zahlung jetzt live?",
-      "answer": "Der Checkout zeigt aktuell die Planwahl, ohne eine Karte zu belasten. Live-Zahlungen nutzen später eine sichere gehostete Zahlungsseite."
-    },
-    {
-      "question": "Können Eltern vor dem Bezahlen testen?",
-      "answer": "Ja. Familien können mit der kostenlosen Probephase starten, STOA im Hausaufgabenalltag prüfen und später einen bezahlten Plan wählen."
-    },
-    {
-      "question": "Was passiert, wenn ein Planlimit erreicht ist?",
-      "answer": "STOA zeigt einen klaren Upgrade- oder Erneuerungsweg, bevor Unterstützung unterbrochen wird."
-    }
-  ]
+  }
 }

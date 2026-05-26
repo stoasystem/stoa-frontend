@@ -1,6 +1,8 @@
 {
   "title": "Practice",
+  "entryMessage": "Start with practice. Ask for an explanation when you get stuck.",
   "continuePractice": "Continue practice",
+  "openLearningChat": "Open Learning Chat",
   "startLesson": "Start lesson",
   "tryAgain": "Try again",
   "checkAnswer": "Check answer",

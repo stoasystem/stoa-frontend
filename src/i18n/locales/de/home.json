@@ -18,15 +18,42 @@
     "visualText": "Der Lernweg bleibt an einem Ort, während Erklärung, Unterstützung durch Lehrpersonen und Elternsicht verbunden bleiben.",
     "steps": [
       { "title": "Frage stellen", "description": "Lernende starten direkt im Chat mit einer Hausaufgabenfrage oder hochgeladenen Aufgabe." },
-      { "title": "Nächsten Schritt verstehen", "description": "Der Lernassistent gibt eine klare erste Erklärung, während der Kontext sichtbar bleibt." },
+      { "title": "Nächsten Schritt verstehen", "description": "Der Lernassistent erklärt den nächsten Schritt klar, damit Lernende dem Lösungsweg weiter folgen können." },
       { "title": "Bei Bedarf Lehrperson fragen", "description": "Wenn die Erklärung nicht klar genug ist, kann eine qualifizierte Lehrperson in denselben Verlauf einsteigen." },
       { "title": "Eltern verfolgen Fortschritt", "description": "Eltern sehen Lernverlauf, Berichte und Anfragen an Lehrpersonen, ohne das Lernen zu unterbrechen." }
+    ]
+  },
+  "practiceEntry": {
+    "eyebrow": "Üben als Einstieg",
+    "title": "Mit Übungen starten. Klar weiterlernen.",
+    "body": "Practice Path gibt Lernenden einen ruhigen Einstieg mit kurzen geführten Übungen. Wenn ein Schritt unklar ist, kann dieselbe Aufgabe mit Frage, Antwort, Versuchen und Lektion direkt im Lernchat geöffnet werden.",
+    "primaryCta": "Lernen starten",
+    "secondaryCta": "Übungsweg ansehen",
+    "signals": [
+      { "title": "Kurze Übungen", "body": "Lernende versuchen zuerst einen fokussierten Gleichungsschritt." },
+      { "title": "Erklärung am Knackpunkt", "body": "Der Lernchat öffnet genau den Schritt, ohne dass Lernende neu beginnen." }
+    ],
+    "flow": [
+      { "label": "Üben", "detail": "Kurze Gleichungsschritte helfen beim selbstständigen Start." },
+      { "label": "Hinweis", "detail": "Ein ruhiger Hinweis zeigt den nächsten sinnvollen Schritt." },
+      { "label": "Lernchat", "detail": "Der unklare Schritt öffnet sich mit Kontext." },
+      { "label": "Lehrperson", "detail": "Eine qualifizierte Lehrperson hilft, wenn Erklärung nicht reicht." },
+      { "label": "Elternbericht", "detail": "Familien sehen die ganze Lernaktivität, nicht einzelne Werkzeuge." }
+    ]
+  },
+  "journey": {
+    "eyebrow": "Plattform-Hierarchie",
+    "layers": [
+      { "title": "Üben startet", "detail": "Eine kurze Aufgabe zeigt, was Lernende selbst versuchen." },
+      { "title": "Lernchat erklärt", "detail": "Der unklare Schritt wird zur gezielten Erklärung." },
+      { "title": "Lehrpersonen helfen", "detail": "Professionelle Unterstützung greift bei wiederholter Unklarheit." },
+      { "title": "Eltern sehen Fortschritt", "detail": "Berichte verbinden Übungen, Fragen, Erklärungen und Unterstützung." }
     ]
   },
   "teacher": {
     "eyebrow": "Professionelle Unterstützung durch Lehrpersonen",
     "visualText": "Unterstützung durch Lehrpersonen bleibt mit dem Lernmoment verbunden.",
-    "title": "Wenn mehr Orientierung nötig ist, ist der Kontext schon da.",
+    "title": "Eine Lehrperson kann helfen, ohne dass Lernende neu beginnen müssen.",
     "body": "Eine Lehrperson sieht die Unterhaltung, die Frage und die vorherige Erklärung. Die Unterstützung beginnt dort, wo Unklarheit entsteht.",
     "link": "Unterstützung durch Lehrpersonen"
   },
@@ -42,13 +69,13 @@
   },
   "trust": {
     "items": [
-      { "title": "Schweizer Schulkontext", "description": "Ausgerichtet auf Hausaufgaben, Klassenstufe und Familiensichtbarkeit." },
+      { "title": "Für Schweizer Schulaufgaben", "description": "Ausgerichtet auf alltägliche Hausaufgaben, Klassenstufe und Einblick für Familien." },
       { "title": "Für echte Lernroutinen", "description": "Klare Erklärungen, Elternsicht, Anfragen an Lehrpersonen und Empfehlungen bleiben verbunden." },
       { "title": "Bereit zu wachsen", "description": "STOA hält das Lernerlebnis heute klar und lässt Raum für künftige Dienste." }
     ]
   },
   "cta": {
-    "eyebrow": "Mit einer Frage starten",
+    "eyebrow": "Bereit, wenn du es bist",
     "title": "Starte mit einer klaren Frage."
   }
 }

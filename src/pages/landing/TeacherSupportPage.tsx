@@ -12,8 +12,12 @@ export function TeacherSupportPage() {
         <PageHeader
           eyebrow="Teacher support"
           title="Professional teacher support for harder homework moments"
-          description="Students start with the Learning Assistant, then request a teacher inside chat when an explanation needs a professional follow-up."
-          actions={<Button asChild><Link to="/pricing">View tutor-supported plan</Link></Button>}
+          description="Students start with the Learning Assistant. Qualified teachers step in when a student needs a teacher explanation, a confidence check, or a clearer next step."
+          actions={
+            <Button asChild className="premium-button-lift premium-primary-button hover:text-primary-foreground">
+              <Link to="/register?role=tutor">Apply to teach on STOA</Link>
+            </Button>
+          }
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <TeacherSupportExplainer />

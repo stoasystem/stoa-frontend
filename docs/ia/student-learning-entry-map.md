@@ -1,17 +1,70 @@
 # Student Learning Entry Map
 
-## Path A: Direct Question
+## Product Relationship
 
-Student Dashboard -> Ask a question -> Learning Chat -> Learning Assistant explanation -> teacher support if needed.
+```text
+Practice Path
+  -> finds where the student gets stuck
+Learning Chat
+  -> explains the step clearly
+Professional teacher support
+  -> helps when explanation is not enough
+Parent Report
+  -> shows the full learning process
+```
 
-## Path B: Active Practice
+## Student Entry Points
 
-Student Dashboard -> Continue Practice -> Practice Path -> Lesson -> feedback and hint -> lesson complete.
+### Continue Practice
 
-## Path C: Practice to Chat
+Use when a student wants to start learning without formulating a homework question first.
 
-Practice Lesson -> student gets stuck -> Explain this step -> Learning Chat opens with challenge context -> Learning Assistant explains the current step -> Back to lesson.
+Expected copy:
 
-## Design Goal
+> Continue your equation practice. Pick up where you left off. If a step is unclear, you can ask for an explanation.
 
-Students should always know whether they are practicing, asking a specific question, or escalating to a teacher. The UI should make movement between these states feel intentional and reversible.
+### Open Learning Chat
+
+Use when a student already has a specific homework question or needs a clearer explanation.
+
+Expected copy:
+
+> Have a specific homework question? Open Learning Chat for a step-by-step explanation.
+
+## Practice Feedback Flow
+
+1. Student answers a challenge.
+2. If the answer is incorrect, show direct feedback.
+3. Offer Show hint and Explain this step.
+4. Let the student retry.
+5. After repeated confusion, offer teacher support.
+
+Teacher support should not appear as the first response to a normal mistake.
+
+## Practice-to-Chat Context
+
+When Practice opens Learning Chat, pass:
+
+- Source: Practice
+- Subject
+- Lesson
+- Challenge
+- Topic
+- Prompt
+- Student answer
+- Correct answer when available
+- Attempts
+- Hint viewed
+- Return route
+
+The student should never need to retype the practice question.
+
+## Return Path
+
+Learning Chat should show Back to lesson whenever `returnTo` exists in the Practice context.
+
+## Parent Visibility
+
+Parent Report should convert the flow into one learning story:
+
+> Your child practised equations and asked for explanations when a step was unclear. This helps show where understanding is already strong and where more practice may help.

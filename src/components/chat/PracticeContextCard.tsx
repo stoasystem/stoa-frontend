@@ -31,6 +31,18 @@ export function PracticeContextCard({
               {t('practiceContext.recentAnswer')}: {context.studentAnswer}
             </p>
           )}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+            {typeof context.attempts === 'number' && (
+              <span className="rounded-full border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
+                Attempts: {context.attempts}
+              </span>
+            )}
+            {context.hintViewed && (
+              <span className="rounded-full border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
+                Hint viewed
+              </span>
+            )}
+          </div>
         </div>
         {context.returnTo && onBackToLesson && (
           <Button onClick={onBackToLesson} type="button" variant="outline">

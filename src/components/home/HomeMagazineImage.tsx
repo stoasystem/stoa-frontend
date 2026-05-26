@@ -1,9 +1,14 @@
 import { MessageCircle, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 const libraryStudyTableImageUrl = new URL('../../../img/library-study-table.jpeg', import.meta.url).href
 
-export function HomeMagazineImage() {
+type HomeMagazineImageProps = {
+  learningHref: string
+}
+
+export function HomeMagazineImage({ learningHref }: HomeMagazineImageProps) {
   const { t } = useTranslation('home')
 
   return (
@@ -18,7 +23,11 @@ export function HomeMagazineImage() {
         {t('hero.imageBadge')}
       </div>
       <div className="absolute bottom-5 left-5 right-5 grid gap-4 md:grid-cols-[1fr_0.78fr] md:items-end">
-        <div className="rounded-lg border border-white/18 bg-white/88 p-4 text-[hsl(var(--stoa-brand-ink))] shadow-2xl backdrop-blur">
+        <Link
+          to={learningHref}
+          className="group rounded-lg border border-white/18 bg-white/88 p-4 text-[hsl(var(--stoa-brand-ink))] shadow-2xl backdrop-blur transition-transform hover:-translate-y-0.5 hover:border-white/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          aria-label={t('hero.imageTitle')}
+        >
           <div className="brand-section-kicker flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             {t('hero.imageLabel')}
@@ -29,8 +38,12 @@ export function HomeMagazineImage() {
           <div className="mt-4 rounded-md bg-[hsl(var(--stoa-brand-paper))] p-3 text-sm leading-6 text-muted-foreground">
             {t('hero.imagePrompt')}
           </div>
-        </div>
-        <div className="brand-ink-card rounded-lg border border-white/16 p-4 text-white shadow-2xl backdrop-blur">
+        </Link>
+        <Link
+          to="/teacher-support"
+          className="brand-ink-card rounded-lg border border-white/16 p-4 text-white shadow-2xl backdrop-blur transition-transform hover:-translate-y-0.5 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          aria-label={t('teacher.link')}
+        >
           <div className="flex items-center gap-2 text-sm font-medium">
             <MessageCircle className="h-4 w-4 text-[hsl(38_42%_72%)]" />
             {t('teacher.eyebrow')}
@@ -38,7 +51,7 @@ export function HomeMagazineImage() {
           <p className="mt-2 text-sm leading-6 text-white/75">
             {t('teacher.body')}
           </p>
-        </div>
+        </Link>
       </div>
     </div>
   )

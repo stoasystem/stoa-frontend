@@ -1,6 +1,8 @@
 {
   "title": "S’entraîner",
+  "entryMessage": "Commencer par s’entraîner. Demander une explication en cas de blocage.",
   "continuePractice": "Continuer l’entraînement",
+  "openLearningChat": "Ouvrir le chat d’apprentissage",
   "startLesson": "Commencer",
   "tryAgain": "Réessayer",
   "checkAnswer": "Vérifier",

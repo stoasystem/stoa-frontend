@@ -173,6 +173,9 @@ export type PracticeChatContext = {
   challengePrompt: string
   studentAnswer?: string
   correctAnswer?: string
+  attempts?: number
+  hintViewed?: boolean
+  learningChatExplanationRequested?: boolean
   topic: string
   gradeLevel: string
   returnTo?: string
@@ -183,9 +186,13 @@ export type PracticeTeacherRequestContext = {
   subjectId: string
   lessonId: string
   challengeId: string
+  challengePrompt?: string
   topic: string
   studentAnswer?: string
+  correctAnswer?: string
   attempts: number
+  hintViewed?: boolean
+  learningChatExplanationRequested?: boolean
 }
 
 export type PracticeChatLocationState = {

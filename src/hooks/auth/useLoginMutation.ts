@@ -20,12 +20,15 @@ export function useLoginMutation() {
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''
       const queryNext = new URLSearchParams(location.search).get('next')
+      const defaultRoute = getDefaultRouteForRole(data.user.role)
       const nextPath =
-        typeof queryNext === 'string' && queryNext.startsWith('/') && !queryNext.startsWith('//')
-          ? queryNext
-          : typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
-            ? `${from}${search}`
-            : getDefaultRouteForRole(data.user.role)
+        data.user.role === 'student'
+          ? defaultRoute
+          : typeof queryNext === 'string' && queryNext.startsWith('/') && !queryNext.startsWith('//')
+            ? queryNext
+            : typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
+              ? `${from}${search}`
+              : defaultRoute
       navigate(nextPath)
     },
     onError: () => {

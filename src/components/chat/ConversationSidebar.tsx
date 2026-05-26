@@ -1,5 +1,6 @@
 import { MessageSquarePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ChatPageNavigation } from '@/components/chat/ChatPageNavigation'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
 import type { ConversationSummary } from '@/types/chat'
 
@@ -31,6 +32,7 @@ export function ConversationSidebar({
           <MessageSquarePlus className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
         </Button>
       </div>
+      <ChatPageNavigation className="mb-4" />
       <div className="space-y-2">
         {conversations.map((conversation) => (
           <ConversationListItem

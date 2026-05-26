@@ -6,11 +6,54 @@ import { cn } from '@/lib/utils'
 type LanguageSwitcherProps = {
   compact?: boolean
   className?: string
+  variant?: 'select' | 'footer'
 }
 
-export function LanguageSwitcher({ compact = false, className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ compact = false, className, variant = 'select' }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation('common')
   const currentLanguage = languageOptions.find((language) => language.code === i18n.language) ?? languageOptions[0]
+
+  if (variant === 'footer') {
+    return (
+      <div
+        className={cn(
+          'inline-flex max-w-full flex-wrap items-center gap-2 rounded-md border border-border/80 bg-[hsl(var(--stoa-brand-paper)_/_0.75)] p-1.5 text-sm shadow-[inset_0_1px_0_hsl(42_35%_98%/0.65)]',
+          className,
+        )}
+        role="group"
+        aria-label={t('language.label')}
+      >
+        <span className="inline-flex items-center gap-2 px-2 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          <Languages className="h-4 w-4 text-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
+          {t('language.label')}
+        </span>
+        <div className="flex rounded-md border border-border/70 bg-card/70 p-0.5">
+          {languageOptions.map((language) => {
+            const isActive = language.code === currentLanguage.code
+
+            return (
+              <button
+                key={language.code}
+                type="button"
+                className={cn(
+                  'min-h-8 min-w-9 rounded px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  isActive
+                    ? 'bg-[hsl(var(--stoa-brand-burgundy))] text-white shadow-sm'
+                    : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
+                )}
+                aria-pressed={isActive}
+                onClick={() => {
+                  void i18n.changeLanguage(language.code)
+                }}
+              >
+                {language.shortLabel}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <label

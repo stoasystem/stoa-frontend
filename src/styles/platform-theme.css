@@ -14,6 +14,20 @@ body {
     linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(38 20% 94%) 100%);
 }
 
+.platform-nav-active {
+  background: hsl(var(--stoa-brand-burgundy));
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.platform-nav-active:hover {
+  background: hsl(var(--stoa-brand-burgundy-strong));
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.platform-nav-active svg {
+  color: inherit;
+}
+
 .editorial-heading {
   font-family: "Prata", Georgia, Cambria, "Times New Roman", ui-serif, serif;
 }

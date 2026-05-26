@@ -1,6 +1,20 @@
 import { httpClient } from '@/services/api/httpClient'
 import { withDemoFallback } from '@/services/demo/demoFallback'
-import type { TeacherHelpRequest } from '@/types/teacherHelp'
+import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'
+
+export async function getTeacherAvailability() {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<TeacherAvailability>(
+      '/teacher-help/availability',
+    )
+    return response.data
+  }, {
+    online: true,
+    availableTeachers: 1,
+    nextWindow: 'Today 16:00-19:00',
+    responseTime: 'Usually within a few minutes when a teacher is online.',
+  })
+}
 
 export async function createTeacherHelpRequest(payload: {
   conversationId: string

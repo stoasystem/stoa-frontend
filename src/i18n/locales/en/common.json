@@ -6,13 +6,15 @@
     "teacherSupport": "Professional teacher support"
   },
   "navigation": {
+    "home": "Home",
     "howItWorks": "How it works",
     "parents": "Parents",
-    "tutors": "Tutors",
+    "tutors": "Teachers",
     "pricing": "Pricing",
+    "qa": "Q&A",
     "login": "Login",
     "startLearning": "Start learning",
-    "forTutors": "For tutors",
+    "forTutors": "For teachers",
     "forParents": "For parents",
     "privacy": "Privacy",
     "terms": "Terms",

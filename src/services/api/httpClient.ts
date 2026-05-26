@@ -31,7 +31,11 @@ httpClient.interceptors.response.use(
       }
     }
 
-    if (status === 403 && window.location.pathname !== '/forbidden') {
+    if (
+      status === 403 &&
+      window.location.pathname !== '/login' &&
+      window.location.pathname !== '/forbidden'
+    ) {
       window.location.assign('/forbidden')
     }
 

@@ -1,5 +1,5 @@
 import { type FormEvent, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { RegisterAccountStep } from '@/components/auth/RegisterAccountStep'
 import { RegisterConfirmationStep } from '@/components/auth/RegisterConfirmationStep'
@@ -62,10 +62,16 @@ function getStepNumber(step: Step) {
   return 4
 }
 
+function getInitialRole(value: string | null): RegisterRole {
+  if (value === 'parent' || value === 'tutor') return value
+  return 'student'
+}
+
 export function RegisterForm() {
   const { t, i18n } = useTranslation(['auth', 'common', 'errors'])
+  const [searchParams] = useSearchParams()
   const [step, setStep] = useState<Step>('role')
-  const [role, setRole] = useState<RegisterRole>('student')
+  const [role, setRole] = useState<RegisterRole>(() => getInitialRole(searchParams.get('role')))
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -183,10 +189,7 @@ export function RegisterForm() {
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="flex items-center justify-between gap-3 text-sm text-muted-foreground">
-        <span>{t('auth:register.step', { step: stepNumber })}</span>
-        <span>{t('auth:register.onboarding', { role: t(`common:roles.${role}`) })}</span>
-      </div>
+      <p className="text-sm text-muted-foreground">{t('auth:register.step', { step: stepNumber })}</p>
 
       {step === 'role' && <RegisterRoleStep selectedRole={role} onSelectRole={setRole} />}
 

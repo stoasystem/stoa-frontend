@@ -1,5 +1,6 @@
-import { CheckCircle2, MessageCircle, RotateCcw, XCircle } from 'lucide-react'
+import { CheckCircle2, RotateCcw, XCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { PracticeToChatCTA } from '@/components/practice/PracticeToChatCTA'
 import { Button } from '@/components/ui/button'
 import type { PracticeAnswerResult } from '@/types/practice'
 
@@ -42,10 +43,7 @@ export function ChallengeFeedback({
                 {t('showHint')}
               </Button>
               {onExplain && (
-                <Button onClick={onExplain} type="button" variant="outline">
-                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                  {t('explainStep')}
-                </Button>
+                <PracticeToChatCTA onExplain={onExplain} />
               )}
               <Button onClick={onRetry} type="button" variant="secondary">
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />

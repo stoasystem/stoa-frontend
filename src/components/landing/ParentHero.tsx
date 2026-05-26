@@ -27,8 +27,8 @@ const parentWeeklySignals = [
 ]
 
 const topicProgress = [
-  { label: 'Fractions', before: 42, after: 76 },
-  { label: 'Word problems', before: 48, after: 63 },
+  { label: 'Fractions', before: 42, after: 76, gain: 34 },
+  { label: 'Word problems', before: 48, after: 63, gain: 15 },
 ]
 
 export function ParentHero() {
@@ -38,12 +38,12 @@ export function ParentHero() {
         <div className="space-y-3">
           <p className="text-sm font-medium text-primary">For parents</p>
           <h1 className="editorial-heading editorial-title-shell max-w-3xl text-4xl font-semibold leading-tight text-foreground md:text-6xl">
-            STOA helps families see when{' '}
-            <span className="editorial-accent">homework support is working</span>.
+            STOA helps families see how their{' '}
+            <span className="editorial-accent">child is growing</span>.
           </h1>
           <p className="max-w-2xl text-base leading-7 text-muted-foreground">
-            Students get immediate explanations, teachers step in when needed, and parents see
-            concise learning signals without reading every chat.
+            Students get clear explanations and steady practice, while parents see effort,
+            weak topics, confidence signals, and the next useful step without reading every chat.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -95,17 +95,24 @@ export function ParentHero() {
           <div className="mt-4 rounded-md border border-border/70 bg-[hsl(var(--stoa-brand-paper))] p-3">
             <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
               <Target className="h-3.5 w-3.5 text-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
-              <span>Knowledge mastery</span>
+              <span>Topic progress this week</span>
             </div>
             <div className="mt-3 space-y-3">
               {topicProgress.map((topic) => (
                 <div key={topic.label}>
                   <div className="flex items-center justify-between gap-3 text-xs">
                     <span className="font-semibold text-foreground">{topic.label}</span>
-                    <span className="text-muted-foreground">{topic.before}% to {topic.after}%</span>
+                    <span className="font-semibold text-[hsl(var(--stoa-brand-burgundy))]">+{topic.gain} pts</span>
                   </div>
-                  <div className="mt-1.5 h-2 rounded-full bg-border/70" aria-hidden="true">
-                    <div className="h-2 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]" style={{ width: `${topic.after}%` }} />
+                  <div className="relative mt-1.5 h-2 rounded-full bg-border/70" aria-hidden="true">
+                    <div
+                      className="absolute inset-y-0 rounded-full bg-[hsl(var(--stoa-brand-burgundy)_/_0.32)]"
+                      style={{ left: `${topic.before}%`, width: `${topic.after - topic.before}%` }}
+                    />
+                    <div
+                      className="absolute inset-y-0 w-2 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]"
+                      style={{ left: `calc(${topic.after}% - 0.25rem)` }}
+                    />
                   </div>
                 </div>
               ))}

@@ -1,6 +1,6 @@
-import { Lightbulb, MessageCircle, UserRoundCheck } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Button } from '@/components/ui/button'
+import { Lightbulb } from 'lucide-react'
+import { PracticeTeacherSupportCTA } from '@/components/practice/PracticeTeacherSupportCTA'
+import { PracticeToChatCTA } from '@/components/practice/PracticeToChatCTA'
 import type { PracticeHintResponse } from '@/types/practice'
 
 export function HintPanel({
@@ -16,8 +16,6 @@ export function HintPanel({
   teacherHelpVisible?: boolean
   teacherHelpMessage?: string
 }) {
-  const { t } = useTranslation('practice')
-
   if (!hint) return null
 
   return (
@@ -29,18 +27,9 @@ export function HintPanel({
           <p className="text-sm leading-6 text-muted-foreground">{hint.hint}</p>
           <p className="rounded-md border bg-card/80 px-3 py-2 text-sm leading-6">{hint.nextStep}</p>
           <div className="flex flex-wrap gap-2 pt-2">
-            <Button onClick={onExplain} type="button" variant="outline">
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              {t('askLearningChat')}
-            </Button>
+            <PracticeToChatCTA onExplain={onExplain} />
             {teacherHelpVisible && (
-              <div className="flex flex-col gap-2 rounded-md border bg-card/70 p-3">
-                <p className="text-sm font-medium">{t('teacherSupportPrompt')}</p>
-                <Button onClick={onTeacherHelp} type="button" variant="secondary">
-                  <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
-                  {t('askTeacher')}
-                </Button>
-              </div>
+              <PracticeTeacherSupportCTA onTeacherHelp={onTeacherHelp} />
             )}
           </div>
           {teacherHelpMessage && <p className="text-sm text-muted-foreground">{teacherHelpMessage}</p>}

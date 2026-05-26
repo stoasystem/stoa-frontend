@@ -6,10 +6,12 @@
     "teacherSupport": "Professionelle Unterstützung durch Lehrpersonen"
   },
   "navigation": {
+    "home": "Startseite",
     "howItWorks": "So funktioniert es",
     "parents": "Eltern",
     "tutors": "Lehrpersonen",
     "pricing": "Preise",
+    "qa": "Q&A",
     "login": "Login",
     "startLearning": "Lernen starten",
     "forTutors": "Für Lehrpersonen",

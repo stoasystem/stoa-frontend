@@ -26,7 +26,7 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-          This session strengthened one equation step. Review any missed step while the method is still fresh.
+          Review the steps you found difficult while the method is still fresh.
         </p>
         <div className="grid gap-4 sm:grid-cols-4">
           <ResultMetric label="Correct" value={`${result.correctCount}/${result.totalCount}`} />
@@ -50,7 +50,7 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
                   prompt: 'Can you explain this step?',
                 }}
               >
-                {t('askLearningChat')}
+                Review with Learning Chat
               </Link>
             </Button>
           )}
@@ -74,6 +74,9 @@ function buildPracticeChatContext(
     challengePrompt: mistake.prompt,
     studentAnswer: mistake.studentAnswer,
     correctAnswer: mistake.correctAnswer,
+    attempts: 2,
+    hintViewed: true,
+    learningChatExplanationRequested: true,
     topic: mistake.topic,
     gradeLevel: 'Lower secondary',
     returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,

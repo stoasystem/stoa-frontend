@@ -13,29 +13,14 @@
   "pilotDetail": "Chaque plan clarifie le niveau de soutien pour l’élève, les parents et l’enseignant avant le paiement.",
   "comparison": {
     "title": "Accès par plan",
-    "headers": ["Fonction", "Essai", "Élève", "Famille", "Avec enseignant"],
+    "headers": ["Fonction", "Essai", "Élève", "Avec enseignant", "Famille"],
     "rows": [
       ["Espace d’apprentissage", "Limité", "Inclus", "Inclus", "Inclus"],
       ["Téléversement de devoirs", "Limité", "Inclus", "Inclus", "Inclus"],
-      ["Espace parents", "Aperçu", "—", "Inclus", "Inclus"],
-      ["Rapports hebdomadaires", "Aperçu", "—", "Inclus", "Inclus"],
-      ["Demander à un enseignant", "Limité", "—", "—", "Séances enseignant incluses"]
+      ["Espace parents", "Inclus", "Inclus", "Inclus", "Inclus"],
+      ["Rapports hebdomadaires", "—", "Inclus", "Inclus", "Inclus"],
+      ["Questions à un enseignant", "—", "—", "Limité chaque semaine", "5x plus de temps enseignant"],
+      ["Avantages partagés", "—", "—", "—", "Jusqu’à 3 personnes"]
     ]
-  },
-  "faqPaymentTitle": "Le paiement est-il actif ?",
-  "faqPaymentBody": "Le checkout montre actuellement le choix de formule sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée.",
-  "faqs": [
-    {
-      "question": "Le paiement est-il actif ?",
-      "answer": "Le checkout montre actuellement le choix de formule sans débiter de carte. Le paiement réel utilisera une page hébergée sécurisée."
-    },
-    {
-      "question": "Les parents peuvent-ils essayer avant de payer ?",
-      "answer": "Oui. Les familles peuvent commencer par l’essai gratuit, vérifier si STOA convient aux devoirs, puis choisir un plan payant."
-    },
-    {
-      "question": "Que se passe-t-il lorsqu’une limite de plan est atteinte ?",
-      "answer": "STOA affiche un chemin clair de mise à niveau ou de renouvellement avant toute interruption du soutien."
-    }
-  ]
+  }
 }

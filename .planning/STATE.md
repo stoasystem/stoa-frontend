@@ -2,56 +2,56 @@
 gsd_state_version: 1.0
 milestone: v1.29
 milestone_name: "Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment"
-status: planning
-last_updated: "2026-05-26T22:00:56.518Z"
-last_activity: 2026-05-26
+status: complete
+last_updated: "2026-05-27T00:23:00+02:00"
+last_activity: 2026-05-27 — Milestone v1.29 implementation and verification complete
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 6
   total_plans: 6
-  completed_plans: 0
-  percent: 0
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-26)
+See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.29 Phase 31 integrates Practice Path into the homepage, student dashboard, parent surfaces, tutor surfaces, navigation, four-language copy, demo script, and QA as a low-friction entry into Learning Chat while preserving STOA's product hierarchy.
+**Current focus:** v1.29 Phase 31 is complete. The next planning focus is Phase 32 external testing for the integrated Practice -> Learning Chat -> Parent/Tutor flow.
 
 ## Current Position
 
-Phase: 165 Practice Positioning, Research, and Site IA
+Phase: Milestone v1.29 complete
 Plan: —
-Status: Milestone planned; ready for phase planning
-Last activity: 2026-05-26 — Milestone v1.29 research, requirements, and roadmap created
+Status: Complete
+Last activity: 2026-05-27 — Practice entry, site layout, parent/tutor context, docs, build, and browser smoke complete
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 6
-- Average duration: not started
-- Total execution time: not started
+- Total plans completed this milestone: 6 of 6
+- Average duration: same-session implementation slice
+- Total execution time: same-session implementation slice
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 165 | 0/1 | Planned | — |
-| 166 | 0/1 | Planned | — |
-| 167 | 0/1 | Planned | — |
-| 168 | 0/1 | Planned | — |
-| 169 | 0/1 | Planned | — |
-| 170 | 0/1 | Planned | — |
+| 165 | 1/1 | Complete | same session |
+| 166 | 1/1 | Complete | same session |
+| 167 | 1/1 | Complete | same session |
+| 168 | 1/1 | Complete | same session |
+| 169 | 1/1 | Complete | same session |
+| 170 | 1/1 | Complete | same session |
 
 **Recent Trend:**
 
-- Last 5 plans: v1.28 Phase 30 plans complete
-- Trend: Phase 31 now moves from milestone definition into Phase 165 planning
+- Last 5 plans: 166, 167, 168, 169, 170 complete
+- Trend: Phase 31 implementation complete; ready for Phase 32 external testing
 
 *Updated after each plan completion*
 
@@ -84,11 +84,14 @@ Recent decisions affecting current work:
 - Phase 31 positions Practice as a student learning entry path, not as the full product or a game-platform identity.
 - Learning Chat remains the central explanation surface; professional teacher support remains delayed escalation; Parent Report remains the visibility layer.
 - Public navigation should not add Practice as a top-level item unless a specific product reason is documented.
+- Phase 31 keeps Practice out of the public navbar while adding homepage Practice explanation.
+- Phase 31 student dashboard now prioritizes Continue Practice and Learning Chat.
+- Phase 31 parent pages use Learning activity to combine Practice, Chat, teacher support, and next focus.
+- Phase 31 tutor requests show Practice context before the transcript when available.
 
 ### Pending Todos
 
-- Plan Phase 165: Practice Positioning, Research, and Site IA.
-- Execute Phase 31 phases 165-170 in order unless the user reprioritizes implementation.
+- Start Phase 32 external user testing for the integrated Practice -> Learning Chat -> Parent/Tutor flow.
 
 ### Quick Tasks Completed
 

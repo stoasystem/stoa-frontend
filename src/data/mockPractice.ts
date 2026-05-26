@@ -358,10 +358,10 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     practiceStreak: 5,
     currentPracticePath: 'Equations',
     recommendedNextTopic: 'Two-step equations and substitution',
-    supportiveNote: 'Anna is currently practicing equations. She is confident with one-step equations and could benefit from more practice with two-step problems and simple systems.',
+    supportiveNote: 'Anna practised equations and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
     questionsAsked: 2,
     teacherSupportRequested: 1,
-    learningActivityNote: 'This week combines short equation practice with guided questions when a step was unclear.',
+    learningActivityNote: 'This week combines independent equation practice with Learning Chat explanations and one teacher-support moment.',
   }
 }
 

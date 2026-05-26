@@ -5,6 +5,7 @@ export const routeGroups = {
     '/register',
     '/forgot-password',
     '/pricing',
+    '/qa',
     '/for-parents',
     '/how-it-works',
     '/ai-homework-help',

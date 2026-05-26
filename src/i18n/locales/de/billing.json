@@ -17,7 +17,7 @@
   "securityBody": "Gehosteter Checkout ist die bevorzugte Richtung für echte Zahlungen. Der Browser erhält nie Kartendaten oder Zahlungsgeheimnisse.",
   "teacherUpgradeReason": "Wählen Sie einen Plan mit Unterstützung durch Lehrpersonen.",
   "fileUploadReason": "Upload-Kontingent erreicht.",
-  "parentReportReason": "Für Berichte ist ein Familienplan erforderlich.",
+  "parentReportReason": "Für Wochenberichte ist ein bezahlter Plan erforderlich.",
   "success": "Abonnementstatus aktualisiert.",
   "choosePlan": "Plan wählen",
   "mockCheckout": "Planwahl",
@@ -26,25 +26,25 @@
       "name": "Kostenlose Probephase",
       "audience": "Familien, die STOA vor der Planwahl ausprobieren möchten.",
       "cta": "Probephase starten",
-      "features": ["Geführte Lernfragen", "Hausaufgaben-Uploads", "Einfacher Lernverlauf"]
+      "features": ["Geführte Lernfragen", "Elternbereich", "Einfacher Lernverlauf"]
     },
     "student": {
       "name": "Schüler-Plan",
       "audience": "Ein fokussierter Schüler mit regelmässiger Hausaufgabenunterstützung.",
       "cta": "Schüler-Plan wählen",
-      "features": ["Lernraum", "Hausaufgaben-Upload", "Lernverlauf"]
-    },
-    "family": {
-      "name": "Familienplan",
-      "audience": "Eltern, die einen klaren Blick auf Fortschritte wünschen.",
-      "cta": "Familienplan wählen",
-      "features": ["Alles im Schüler-Plan", "Elternbereich", "Wöchentlicher Elternbericht"]
+      "features": ["Lernraum", "Hausaufgaben-Upload", "Elternbereich"]
     },
     "tutor_supported": {
       "name": "Plan mit Lehrpersonen",
-      "audience": "Familien, die Unterstützung durch Lehrpersonen wünschen, wenn Lernende mehr Orientierung brauchen.",
+      "audience": "Familien, die wöchentlich begrenzte Lehrpersonenhilfe möchten.",
       "cta": "Plan mit Lehrperson wählen",
-      "features": ["Alles im Familienplan", "Sitzungen mit Lehrpersonen", "Priorisierte Lernunterstützung"]
+      "features": ["Alles im Schüler-Plan", "Wöchentlicher Elternbericht", "Wöchentlich begrenzte Lehrpersonenhilfe"]
+    },
+    "family": {
+      "name": "Familienplan",
+      "audience": "Familien, die das höchste Unterstützungsniveau und gemeinsame Nutzung wünschen.",
+      "cta": "Familienplan wählen",
+      "features": ["Alles im Plan mit Lehrpersonen", "5x mehr Zeit mit Lehrpersonen", "Vorteile für bis zu 3 Personen"]
     }
   }
 }

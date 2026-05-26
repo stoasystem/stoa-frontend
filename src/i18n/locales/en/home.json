@@ -17,15 +17,42 @@
     "visualText": "The learning thread stays in one place, with explanations, teacher support, and parent visibility connected.",
     "steps": [
       { "title": "Ask a question", "description": "Students begin directly in chat with a homework question or uploaded assignment." },
-      { "title": "Understand the next step", "description": "The Learning Assistant gives a clear first explanation with the work still visible in context." },
+      { "title": "Understand the next step", "description": "The Learning Assistant explains the next step clearly, so the student can keep following the work." },
       { "title": "Ask a teacher if needed", "description": "When the answer is not clear enough, a qualified teacher can step into the same thread." },
       { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-support records without interrupting study." }
+    ]
+  },
+  "practiceEntry": {
+    "eyebrow": "Practice as a learning entry",
+    "title": "Start with practice. Continue with clear explanations.",
+    "body": "Practice Path gives students a calm place to begin with short guided exercises. When a step is unclear, the same work can open in Learning Chat with the question, answer, attempts, and lesson context already attached.",
+    "primaryCta": "Start learning",
+    "secondaryCta": "See how practice works",
+    "signals": [
+      { "title": "Short practice lessons", "body": "Students try a focused equation step before asking for a full explanation." },
+      { "title": "Explanation at the stuck point", "body": "Learning Chat opens from the exact step, so the student does not restart." }
+    ],
+    "flow": [
+      { "label": "Practice", "detail": "Short equation steps help the student start independently." },
+      { "label": "Hint", "detail": "A calm prompt points to the next useful move." },
+      { "label": "Learning Chat", "detail": "The unclear step opens with context already attached." },
+      { "label": "Teacher Support", "detail": "A qualified teacher joins when explanation is still not enough." },
+      { "label": "Parent Report", "detail": "Families see the complete learning activity, not isolated tools." }
+    ]
+  },
+  "journey": {
+    "eyebrow": "Platform hierarchy",
+    "layers": [
+      { "title": "Practice starts learning", "detail": "A short exercise shows what the student can try independently." },
+      { "title": "Learning Chat explains", "detail": "The unclear step becomes a focused explanation thread." },
+      { "title": "Teachers unblock", "detail": "Professional support joins after repeated confusion or a support request." },
+      { "title": "Parents see progress", "detail": "Reports connect practice, questions, explanations, and support moments." }
     ]
   },
   "teacher": {
     "eyebrow": "Professional teacher support",
     "visualText": "Professional teacher support stays connected to the learning moment.",
-    "title": "When more guidance is needed, the context is already there.",
+    "title": "A teacher can step in without making the student start over.",
     "body": "A teacher sees the conversation, the student question, and the previous explanation. Support happens where confusion appears, so the student does not have to restart.",
     "link": "Professional teacher support"
   },
@@ -41,13 +68,13 @@
   },
   "trust": {
     "items": [
-      { "title": "Swiss school context", "description": "Designed around everyday homework questions, grade context, and family visibility." },
+      { "title": "Built for Swiss schoolwork", "description": "Designed around everyday homework questions, grade level, and family visibility." },
       { "title": "Built for real learning routines", "description": "Clear explanations, parent visibility, support requests, referrals, and admin overview stay connected." },
       { "title": "Ready to grow", "description": "STOA keeps the learning experience clear today while leaving room for future services." }
     ]
   },
   "cta": {
-    "eyebrow": "Start with one question",
+    "eyebrow": "Ready when you are",
     "title": "Start learning with one clear question."
   }
 }

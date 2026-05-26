@@ -17,15 +17,42 @@
     "visualText": "Le fil d’apprentissage reste au même endroit, avec les explications, l’accompagnement enseignant et la visibilité parentale reliés.",
     "steps": [
       { "title": "Poser une question", "description": "Les élèves commencent directement dans le chat avec une question ou un devoir téléversé." },
-      { "title": "Comprendre l’étape suivante", "description": "L’Assistant d’apprentissage donne une première explication claire, avec le contexte visible." },
+      { "title": "Comprendre l’étape suivante", "description": "L’Assistant d’apprentissage explique clairement l’étape suivante, pour que l’élève puisse suivre le raisonnement." },
       { "title": "Demander à un enseignant", "description": "Si l’explication n’est pas assez claire, un enseignant qualifié peut rejoindre le même fil." },
       { "title": "Les parents suivent les progrès", "description": "Les parents voient l’historique, les rapports et les demandes d’aide sans interrompre l’étude." }
+    ]
+  },
+  "practiceEntry": {
+    "eyebrow": "L’entraînement comme point d’entrée",
+    "title": "Commencer par s’entraîner. Continuer avec des explications claires.",
+    "body": "Practice Path offre aux élèves un point de départ calme avec de courts exercices guidés. Lorsqu’une étape n’est pas claire, le même travail peut s’ouvrir dans le chat d’apprentissage avec la question, la réponse, les essais et le contexte de la leçon.",
+    "primaryCta": "Commencer",
+    "secondaryCta": "Voir le parcours",
+    "signals": [
+      { "title": "Exercices courts", "body": "L’élève essaie d’abord une étape ciblée d’équation." },
+      { "title": "Explication au bon moment", "body": "Le chat d’apprentissage s’ouvre sur l’étape exacte, sans recommencer." }
+    ],
+    "flow": [
+      { "label": "S’entraîner", "detail": "De courtes étapes aident l’élève à commencer seul." },
+      { "label": "Indice", "detail": "Un indice calme pointe vers la prochaine action utile." },
+      { "label": "Chat", "detail": "L’étape bloquante s’ouvre avec son contexte." },
+      { "label": "Enseignant", "detail": "Un enseignant qualifié intervient si l’explication ne suffit pas." },
+      { "label": "Rapport parent", "detail": "La famille voit l’activité complète, pas des outils séparés." }
+    ]
+  },
+  "journey": {
+    "eyebrow": "Hiérarchie de la plateforme",
+    "layers": [
+      { "title": "La pratique démarre", "detail": "Un exercice court montre ce que l’élève tente seul." },
+      { "title": "Le chat explique", "detail": "L’étape peu claire devient un fil d’explication ciblé." },
+      { "title": "L’enseignant débloque", "detail": "Le soutien intervient après une confusion répétée ou une demande." },
+      { "title": "Les parents voient", "detail": "Les rapports relient exercices, questions, explications et soutien." }
     ]
   },
   "teacher": {
     "eyebrow": "Accompagnement par un enseignant qualifié",
     "visualText": "L’accompagnement d’un enseignant qualifié reste relié au moment d’apprentissage.",
-    "title": "Quand un accompagnement est nécessaire, le contexte est déjà là.",
+    "title": "Un enseignant peut aider sans que l’élève reparte de zéro.",
     "body": "Un enseignant voit la conversation, la question de l’élève et l’explication précédente. L’aide arrive là où la confusion apparaît.",
     "link": "Accompagnement par un enseignant"
   },
@@ -41,13 +68,13 @@
   },
   "trust": {
     "items": [
-      { "title": "Contexte scolaire suisse", "description": "Conçu autour des devoirs quotidiens, du niveau scolaire et de la visibilité familiale." },
+      { "title": "Pensé pour les devoirs en Suisse", "description": "Conçu autour des devoirs quotidiens, du niveau de classe et de la visibilité pour la famille." },
       { "title": "Pensé pour de vraies routines d’apprentissage", "description": "Explications claires, visibilité parentale, demandes de soutien et recommandations restent connectées." },
       { "title": "Prêt à évoluer", "description": "STOA garde l’expérience d’apprentissage claire aujourd’hui tout en laissant de la place aux futurs services." }
     ]
   },
   "cta": {
-    "eyebrow": "Commencer par une question",
+    "eyebrow": "Prêt quand tu l’es",
     "title": "Commence avec une question claire."
   }
 }

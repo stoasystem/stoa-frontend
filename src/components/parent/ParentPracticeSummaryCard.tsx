@@ -12,7 +12,7 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
           </div>
           <div>
             <p className="brand-section-kicker">Learning activity</p>
-            <CardTitle className="text-xl">Practice and questions summary</CardTitle>
+            <CardTitle className="text-xl">Complete learning activity</CardTitle>
           </div>
         </div>
       </CardHeader>
@@ -31,6 +31,10 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
           </div>
         )}
         <div className="space-y-2 text-sm leading-6">
+          <p className="text-muted-foreground">
+            Your child practised equations and asked for explanations when a step was unclear.
+            This helps show where understanding is already strong and where more practice may help.
+          </p>
           <p>
             <span className="font-medium">Current path:</span> {summary.currentPracticePath}
           </p>

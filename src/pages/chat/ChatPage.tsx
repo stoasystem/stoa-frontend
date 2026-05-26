@@ -323,5 +323,7 @@ function buildInitialMessage(
     `Practice topic: ${practiceContext.topic}`,
     `Practice question: ${practiceContext.challengePrompt}`,
     practiceContext.studentAnswer ? `My answer: ${practiceContext.studentAnswer}` : '',
+    typeof practiceContext.attempts === 'number' ? `Attempts: ${practiceContext.attempts}` : '',
+    practiceContext.hintViewed ? 'Hint viewed: yes' : '',
   ].filter(Boolean).join('\n')
 }

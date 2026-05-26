@@ -80,6 +80,9 @@ export function LessonPage() {
       challengePrompt: targetChallenge.prompt,
       studentAnswer: formatPracticeAnswer(state.answer),
       correctAnswer: formatPracticeAnswer(targetChallenge.correctAnswer),
+      attempts: state.incorrectAttempts,
+      hintViewed: state.hintsShown > 0 || Boolean(hintMutation.data),
+      learningChatExplanationRequested: true,
       topic: targetChallenge.topic,
       gradeLevel: targetChallenge.gradeLevel,
       returnTo: `/practice/${lesson?.subjectId ?? selectedSubjectPath}/lessons/${lesson?.id ?? lessonId}`,
@@ -111,9 +114,13 @@ export function LessonPage() {
         subjectId: lesson.subjectId,
         lessonId: lesson.id,
         challengeId: challenge.id,
+        challengePrompt: challenge.prompt,
         topic: challenge.topic,
         studentAnswer: formatPracticeAnswer(state.answer),
+        correctAnswer: formatPracticeAnswer(challenge.correctAnswer),
         attempts: state.incorrectAttempts,
+        hintViewed: state.hintsShown > 0 || Boolean(hintMutation.data),
+        learningChatExplanationRequested: Boolean(hintMutation.data),
       },
     })
     setTeacherHelpMessage(response.message)

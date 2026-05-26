@@ -31,16 +31,16 @@
 - ✅ **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (implemented 2026-05-26)
 - ✅ **v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization** - Phases 153-158 (implemented 2026-05-26)
 - ✅ **v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement** - Phases 159-164 (shipped 2026-05-26)
-- 🚧 **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (planned 2026-05-26)
+- ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
 
 ## Phases
 
-- [ ] **Phase 165: Practice Positioning, Research, and Site IA** - Lock Practice as a student learning entry and document public/app information architecture.
-- [ ] **Phase 166: Homepage Practice Entry and Learning Funnel Presentation** - Add homepage Practice introduction and restrained Practice -> Chat -> Teacher -> Parent flow.
-- [ ] **Phase 167: Student Dashboard and Practice-to-Chat Flow** - Reorganize student entry points and improve Practice wrong-answer, explanation, and return flows.
-- [ ] **Phase 168: Parent Learning Activity and Report Integration** - Present Practice and Chat as one parent-visible learning activity.
-- [ ] **Phase 169: Tutor Practice Context and Role Navigation Alignment** - Expose Practice-origin request context and align student/parent/tutor navigation.
-- [ ] **Phase 170: Four-Language Copy, Demo Script, QA, README, and Build Closure** - Complete i18n, docs, demo script, QA checklist, README, and build verification.
+- [x] **Phase 165: Practice Positioning, Research, and Site IA** - Lock Practice as a student learning entry and document public/app information architecture.
+- [x] **Phase 166: Homepage Practice Entry and Learning Funnel Presentation** - Add homepage Practice introduction and restrained Practice -> Chat -> Teacher -> Parent flow.
+- [x] **Phase 167: Student Dashboard and Practice-to-Chat Flow** - Reorganize student entry points and improve Practice wrong-answer, explanation, and return flows.
+- [x] **Phase 168: Parent Learning Activity and Report Integration** - Present Practice and Chat as one parent-visible learning activity.
+- [x] **Phase 169: Tutor Practice Context and Role Navigation Alignment** - Expose Practice-origin request context and align student/parent/tutor navigation.
+- [x] **Phase 170: Four-Language Copy, Demo Script, QA, README, and Build Closure** - Complete i18n, docs, demo script, QA checklist, README, and build verification.
 
 ## Phase Details
 
@@ -134,12 +134,12 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 165. Practice Positioning, Research, and Site IA | 0/1 | Planned | — |
-| 166. Homepage Practice Entry and Learning Funnel Presentation | 0/1 | Planned | — |
-| 167. Student Dashboard and Practice-to-Chat Flow | 0/1 | Planned | — |
-| 168. Parent Learning Activity and Report Integration | 0/1 | Planned | — |
-| 169. Tutor Practice Context and Role Navigation Alignment | 0/1 | Planned | — |
-| 170. Four-Language Copy, Demo Script, QA, README, and Build Closure | 0/1 | Planned | — |
+| 165. Practice Positioning, Research, and Site IA | 1/1 | Complete | 2026-05-27 |
+| 166. Homepage Practice Entry and Learning Funnel Presentation | 1/1 | Complete | 2026-05-27 |
+| 167. Student Dashboard and Practice-to-Chat Flow | 1/1 | Complete | 2026-05-27 |
+| 168. Parent Learning Activity and Report Integration | 1/1 | Complete | 2026-05-27 |
+| 169. Tutor Practice Context and Role Navigation Alignment | 1/1 | Complete | 2026-05-27 |
+| 170. Four-Language Copy, Demo Script, QA, README, and Build Closure | 1/1 | Complete | 2026-05-27 |
 
 ## Coverage
 
@@ -158,6 +158,4 @@
 
 ## Next Up
 
-**Phase 165: Practice Positioning, Research, and Site IA** — Lock Practice as a student learning entry and document public/app information architecture.
-
-`$gsd-plan-phase 165`
+Phase 31 implementation is complete. Next recommended milestone: Phase 32 External User Testing for Integrated Learning Flow.

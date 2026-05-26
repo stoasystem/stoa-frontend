@@ -13,3 +13,10 @@ export type TeacherHelpRequest = {
   createdAt: string
   updatedAt?: string
 }
+
+export type TeacherAvailability = {
+  online: boolean
+  availableTeachers: number
+  nextWindow?: string
+  responseTime?: string
+}

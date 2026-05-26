@@ -12,6 +12,9 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
     challengePrompt: mistake.prompt,
     studentAnswer: mistake.studentAnswer,
     correctAnswer: mistake.correctAnswer,
+    attempts: 2,
+    hintViewed: true,
+    learningChatExplanationRequested: true,
     topic: mistake.topic,
     gradeLevel: 'Lower secondary',
     returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
@@ -41,7 +44,7 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
                   prompt: 'Can you explain this step?',
                 }}
               >
-                Ask in Learning Chat
+                Review with Learning Chat
               </Link>
             </Button>
           </div>

@@ -17,15 +17,42 @@
     "visualText": "Il percorso di studio resta in un unico spazio, con spiegazioni, supporto dell’insegnante e visibilità per i genitori collegati.",
     "steps": [
       { "title": "Fai una domanda", "description": "Gli studenti iniziano direttamente in chat con una domanda o un compito caricato." },
-      { "title": "Capisci il prossimo passo", "description": "L’Assistente all’apprendimento offre una prima spiegazione chiara con il contesto visibile." },
+      { "title": "Capisci il prossimo passo", "description": "L’Assistente all’apprendimento spiega chiaramente il prossimo passo, così lo studente può seguire il ragionamento." },
       { "title": "Chiedi a un insegnante se serve", "description": "Se la spiegazione non è abbastanza chiara, un insegnante qualificato può intervenire nello stesso filo." },
       { "title": "I genitori seguono i progressi", "description": "I genitori vedono cronologia, report e richieste di aiuto senza interrompere lo studio." }
+    ]
+  },
+  "practiceEntry": {
+    "eyebrow": "La pratica come ingresso",
+    "title": "Inizia con la pratica. Continua con spiegazioni chiare.",
+    "body": "Practice Path offre agli studenti un punto di partenza tranquillo con brevi esercizi guidati. Quando un passaggio non è chiaro, lo stesso lavoro può aprirsi nella chat di apprendimento con domanda, risposta, tentativi e contesto della lezione.",
+    "primaryCta": "Inizia a studiare",
+    "secondaryCta": "Vedi il percorso",
+    "signals": [
+      { "title": "Esercizi brevi", "body": "Lo studente prova prima un passaggio mirato di equazione." },
+      { "title": "Spiegazione nel punto giusto", "body": "La chat di apprendimento si apre sul passaggio esatto, senza ricominciare." }
+    ],
+    "flow": [
+      { "label": "Pratica", "detail": "Brevi passaggi aiutano lo studente a iniziare in autonomia." },
+      { "label": "Suggerimento", "detail": "Un aiuto calmo indica la prossima mossa utile." },
+      { "label": "Chat", "detail": "Il passaggio poco chiaro si apre con il contesto." },
+      { "label": "Insegnante", "detail": "Un insegnante qualificato interviene quando serve più guida." },
+      { "label": "Report", "detail": "La famiglia vede l’attività completa, non strumenti separati." }
+    ]
+  },
+  "journey": {
+    "eyebrow": "Gerarchia della piattaforma",
+    "layers": [
+      { "title": "La pratica avvia", "detail": "Un esercizio breve mostra cosa lo studente prova da solo." },
+      { "title": "La chat spiega", "detail": "Il passaggio poco chiaro diventa una spiegazione mirata." },
+      { "title": "L’insegnante sblocca", "detail": "Il supporto arriva dopo confusione ripetuta o richiesta." },
+      { "title": "I genitori vedono", "detail": "I report collegano pratica, domande, spiegazioni e supporto." }
     ]
   },
   "teacher": {
     "eyebrow": "Supporto di un insegnante qualificato",
     "visualText": "Il supporto di un insegnante qualificato resta collegato al momento di studio.",
-    "title": "Quando serve più guida, il contesto è già lì.",
+    "title": "Un insegnante può aiutare senza far ricominciare lo studente da capo.",
     "body": "Un insegnante vede la conversazione, la domanda dello studente e la spiegazione precedente. Il supporto arriva dove nasce la confusione.",
     "link": "Supporto di un insegnante"
   },
@@ -41,13 +68,13 @@
   },
   "trust": {
     "items": [
-      { "title": "Contesto scolastico svizzero", "description": "Pensato per compiti quotidiani, livello scolastico e visibilità familiare." },
+      { "title": "Pensato per i compiti in Svizzera", "description": "Pensato per compiti quotidiani, livello di classe e visibilità per la famiglia." },
       { "title": "Pensato per vere routine di studio", "description": "Spiegazioni chiare, visibilità per i genitori, richieste di supporto e consigli restano collegati." },
       { "title": "Pronto a crescere", "description": "STOA mantiene chiara l’esperienza di studio oggi e lascia spazio ai servizi futuri." }
     ]
   },
   "cta": {
-    "eyebrow": "Inizia con una domanda",
+    "eyebrow": "Pronto quando lo sei",
     "title": "Inizia con una domanda chiara."
   }
 }

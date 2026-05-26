@@ -11,6 +11,7 @@ import { ParentReportRecommendations } from '@/components/parent/ParentReportRec
 import { ParentReportStats } from '@/components/parent/ParentReportStats'
 import { ParentReportSubjects } from '@/components/parent/ParentReportSubjects'
 import { ParentReportSummaryCard } from '@/components/parent/ParentReportSummaryCard'
+import { LearningActivitySummary } from '@/components/parent/LearningActivitySummary'
 import { ParentPracticeSummaryCard } from '@/components/parent/ParentPracticeSummaryCard'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
@@ -72,6 +73,7 @@ export function ChildReportPage() {
           <div className="report-surface space-y-6 rounded-lg border border-border/70 p-4 shadow-[var(--platform-shadow-soft)] sm:p-6">
             <ParentReportSummaryCard report={report} />
             <ParentReportStats stats={report.stats} />
+            <LearningActivitySummary summary={practiceSummaryQuery.data} />
             {practiceSummaryQuery.data && (
               <ParentPracticeSummaryCard summary={practiceSummaryQuery.data} />
             )}

@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { FooterContactInfo } from '@/components/common/FooterContactInfo'
 import { FooterLegalLinks } from '@/components/common/FooterLegalLinks'
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { StoaLogo } from '@/components/common/StoaLogo'
 
 export function AppFooter() {
@@ -18,7 +17,6 @@ export function AppFooter() {
           <p className="max-w-sm text-sm leading-6 text-muted-foreground">
             {t('footer.description')}
           </p>
-          <LanguageSwitcher compact />
         </div>
 
         <div className="min-w-0">
@@ -44,6 +42,9 @@ export function AppFooter() {
             </Link>
             <Link className="hover:text-foreground" to="/pricing">
               {t('navigation.pricing')}
+            </Link>
+            <Link className="hover:text-foreground" to="/qa">
+              {t('navigation.qa')}
             </Link>
             <Link className="hover:text-foreground" to="/support">
               {t('navigation.support')}

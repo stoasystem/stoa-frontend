@@ -8,6 +8,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
+import { PracticeRequestContextCard } from '@/components/tutor/PracticeRequestContextCard'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
 import { TutorRequestNoteForm } from '@/components/tutor/TutorRequestNoteForm'
 import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
@@ -53,6 +54,9 @@ export function TutorHelpRequestDetailPage() {
         {requestQuery.isError && <p className="text-sm text-destructive">Failed to load request.</p>}
         {requestQuery.data && (
           <div className="space-y-6">
+            {requestQuery.data.practiceContext && (
+              <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
+            )}
             <HelpRequestDetailCard request={requestQuery.data} />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">

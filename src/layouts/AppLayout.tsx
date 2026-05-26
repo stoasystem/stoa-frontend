@@ -6,6 +6,7 @@ import {
   GraduationCap,
   HelpCircle,
   History,
+  Home,
   LayoutDashboard,
   MessageCircle,
   Route,
@@ -50,9 +51,11 @@ const navLabelKeys: Record<string, string> = {
   Availability: 'navigation.availability',
   Billing: 'navigation.billing',
   Chat: 'navigation.chat',
+  Contact: 'navigation.contact',
   Dashboard: 'navigation.dashboard',
   'Help Requests': 'navigation.helpRequests',
   'Learning Activity': 'navigation.learningActivity',
+  'Learning Chat': 'navigation.chat',
   'Learning History': 'navigation.learningHistory',
   Overview: 'navigation.overview',
   Profile: 'navigation.profile',
@@ -80,7 +83,7 @@ function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: bo
           'flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
           compact ? 'min-w-0 flex-1 justify-center px-2 py-2 text-xs' : 'px-2 py-1.5',
           isActive
-            ? 'bg-primary text-primary-foreground shadow-sm'
+            ? 'platform-nav-active shadow-sm'
             : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
         )
       }
@@ -89,6 +92,28 @@ function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: bo
     >
       <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
       <span className={compact ? 'truncate' : undefined}>{label}</span>
+    </NavLink>
+  )
+}
+
+function TopNavItemLink({ item }: { item: AppNavItem }) {
+  const { t } = useTranslation('common')
+  const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
+
+  return (
+    <NavLink
+      className={({ isActive }) =>
+        cn(
+          'inline-flex min-h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors',
+          isActive
+            ? 'platform-nav-active shadow-sm'
+            : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
+        )
+      }
+      end={item.path === '/'}
+      to={item.path}
+    >
+      {label}
     </NavLink>
   )
 }
@@ -143,7 +168,34 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </div>
           <UserMenu />
         </aside>
-        <main className="min-w-0 flex-1 p-4 pb-24 md:p-6">{children}</main>
+        <main className="min-w-0 flex-1 pb-24">
+          <header className="sticky top-0 z-30 border-b bg-[hsl(var(--platform-surface-app)_/_0.94)] px-4 py-3 shadow-[0_10px_30px_hsl(var(--stoa-brand-charcoal)_/_0.04)] backdrop-blur md:px-6">
+            <div className="flex min-h-11 items-center gap-3">
+              <Link
+                to="/"
+                className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))]"
+              >
+                <Home className="h-4 w-4" aria-hidden="true" />
+                {t('navigation.home')}
+              </Link>
+              <nav
+                aria-label="App top navigation"
+                className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex"
+              >
+                {primaryItems.map((item) => (
+                  <TopNavItemLink item={item} key={`${item.path}-${item.label}-top`} />
+                ))}
+              </nav>
+              <div className="ml-auto flex shrink-0 items-center gap-3">
+                <LanguageSwitcher compact />
+                <div className="hidden sm:block">
+                  <UserMenu variant="top" />
+                </div>
+              </div>
+            </div>
+          </header>
+          <div className="p-4 md:p-6">{children}</div>
+        </main>
       </div>
       {mobileItems.length > 0 && (
         <nav

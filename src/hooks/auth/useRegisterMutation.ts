@@ -9,18 +9,27 @@ import { useAuthStore } from '@/store/authStore'
 export function useRegisterMutation(options: { redirect?: boolean } = {}) {
   const navigate = useNavigate()
   const setAuth = useAuthStore((state) => state.setAuth)
+  const clearAuth = useAuthStore((state) => state.clearAuth)
 
   return useMutation({
     mutationFn: (payload: RegisterRequest) => register(payload),
     onSuccess: (data) => {
-      setAuth(data.user, data.accessToken)
+      if (data.verificationStatus === 'pending_review') {
+        clearAuth()
+      } else {
+        setAuth(data.user, data.accessToken)
+      }
       trackEvent('user_register', { role: data.user.role, userId: data.user.id })
       if (data.verificationStatus === 'pending_review') {
-        toast.success('Tutor profile submitted for review')
+        toast.success('Teacher application submitted')
       } else {
         toast.success('Account created')
       }
       if (options.redirect !== false) {
+        if (data.verificationStatus === 'pending_review') {
+          navigate('/teacher-support')
+          return
+        }
         navigate(data.user.role === 'student' ? '/chat' : getDefaultRouteForRole(data.user.role))
       }
     },

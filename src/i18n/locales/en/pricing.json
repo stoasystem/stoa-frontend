@@ -13,29 +13,14 @@
   "pilotDetail": "Each plan makes the student, parent, and teacher support level clear before checkout.",
   "comparison": {
     "title": "Plan access",
-    "headers": ["Feature", "Trial", "Student", "Family", "Teacher-supported"],
+    "headers": ["Feature", "Trial", "Student", "Teacher-supported", "Family"],
     "rows": [
       ["Learning chat", "Limited", "Included", "Included", "Included"],
       ["Homework upload", "Limited", "Included", "Included", "Included"],
-      ["Parent dashboard", "Preview", "—", "Included", "Included"],
-      ["Weekly reports", "Preview", "—", "Included", "Included"],
-      ["Teacher support", "Limited", "—", "—", "Teacher sessions included"]
+      ["Parent dashboard", "Included", "Included", "Included", "Included"],
+      ["Weekly reports", "—", "Included", "Included", "Included"],
+      ["Teacher Q&A", "—", "—", "Limited weekly", "5x teacher Q&A time"],
+      ["Shared benefits", "—", "—", "—", "Up to 3 people"]
     ]
-  },
-  "faqPaymentTitle": "Is payment live now?",
-  "faqPaymentBody": "Checkout currently shows the plan choice flow without charging a card. Live payment collection will use a secure hosted payment page.",
-  "faqs": [
-    {
-      "question": "Is payment live now?",
-      "answer": "Checkout currently shows the plan choice flow without charging a card. Live payment collection will use a secure hosted payment page."
-    },
-    {
-      "question": "Can parents test before paying?",
-      "answer": "Yes. Families can start with the free trial, see how STOA fits homework routines, and choose a paid plan later."
-    },
-    {
-      "question": "What happens when a plan limit is reached?",
-      "answer": "STOA shows a clear upgrade or renewal path before support is interrupted."
-    }
-  ]
+  }
 }

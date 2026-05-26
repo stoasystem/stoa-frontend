@@ -40,6 +40,7 @@ export type User = {
   subscriptionStatus?: SubscriptionStatus
   plan?: SubscriptionPlan
   subscription?: UserSubscription
+  verificationStatus?: 'approved' | 'pending_review'
 }
 
 export type AuthResponse = {

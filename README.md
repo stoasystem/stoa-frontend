@@ -1376,6 +1376,7 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/privacy` Privacy pilot draft
 - `/terms` Terms launch draft
 - `/pricing` Pricing validation
+- `/qa` Categorized Q&A
 - `/for-parents` Parent acquisition landing
 - `/how-it-works` Product flow landing
 - `/ai-homework-help` AI homework help entry
@@ -1386,6 +1387,11 @@ VITE_API_BASE_URL=http://localhost:8000
 - `/support` Pilot support
 - `/dashboard` Student dashboard
 - `/chat` Student chat product UI
+- `/practice` Student Practice Path overview
+- `/practice/:subjectId` Subject practice path
+- `/practice/:subjectId/lessons/:lessonId` Practice lesson
+- `/practice/:subjectId/lessons/:lessonId/result` Practice lesson result
+- `/practice/mistakes` Practice mistake review
 - `/profile` Student profile
 - `/learning-history` Student learning history
 - `/billing` Billing and subscription
@@ -1489,6 +1495,37 @@ Implemented Phase 19 artifacts:
 - `src/styles/platform-theme.css`
 
 This phase does not add new product features, new routes, new languages, backend behavior, payment behavior, or copied homepage source.
+
+## Phase 31 Practice Entry and Site Layout Integration
+
+This phase refines how Practice Path fits into the STOA learning platform. Practice is not the whole product. It is one of the main entry points into learning.
+
+The product hierarchy is:
+
+1. Practice helps students start.
+2. Learning Chat explains when they get stuck.
+3. Professional teacher support helps when more guidance is needed.
+4. Parent Report shows the complete learning activity.
+
+Main changes:
+
+- Integrates a restrained Practice introduction into the homepage.
+- Reorganizes Student Dashboard around Continue Practice and Learning Chat.
+- Adds Practice-to-Chat context and return flow.
+- Adds Practice context inside teacher support requests.
+- Improves Parent Dashboard and Parent Report learning activity framing.
+- Keeps Practice out of the public navbar so the public site stays focused.
+- Adds four-language Practice-as-entry copy and Phase 31 demo/QA docs.
+
+Phase 31 documents:
+
+- `docs/ia/site-layout-with-practice-entry.md`
+- `docs/ia/student-learning-entry-map.md`
+- `docs/practice/practice-as-learning-chat-entry.md`
+- `docs/practice/practice-to-chat-cta-rules.md`
+- `docs/practice/practice-to-teacher-support-rules.md`
+- `docs/demo/practice-as-learning-chat-entry-demo.md`
+- `docs/qa/phase31-practice-entry-checklist.md`
 
 ## Project Status
 

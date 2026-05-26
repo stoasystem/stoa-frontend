@@ -106,7 +106,7 @@ export function HomeHero() {
           ))}
         </div>
       </div>
-      <HomeMagazineImage />
+      <HomeMagazineImage learningHref={learningHref} />
     </section>
   )
 }

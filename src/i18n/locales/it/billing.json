@@ -17,7 +17,7 @@
   "securityBody": "Il checkout ospitato è la direzione preferita per i pagamenti reali. Il browser non riceve mai dati carta o segreti di pagamento.",
   "teacherUpgradeReason": "Scegli un piano con supporto di un insegnante qualificato.",
   "fileUploadReason": "Quota caricamento file raggiunta.",
-  "parentReportReason": "Per i report è necessario un piano famiglia.",
+  "parentReportReason": "Per i report settimanali è necessario un piano a pagamento.",
   "success": "Stato abbonamento aggiornato.",
   "choosePlan": "Scegli un piano",
   "mockCheckout": "Scelta del piano",
@@ -26,25 +26,25 @@
       "name": "Prova gratuita",
       "audience": "Famiglie che vogliono provare STOA prima di scegliere un piano.",
       "cta": "Inizia prova",
-      "features": ["Domande guidate", "Caricamento compiti", "Cronologia semplice"]
+      "features": ["Domande guidate", "Area genitori", "Cronologia semplice"]
     },
     "student": {
       "name": "Piano studente",
       "audience": "Uno studente che ha bisogno di supporto costante nei compiti.",
       "cta": "Scegli studente",
-      "features": ["Spazio di studio", "Caricamento compiti", "Cronologia di studio"]
-    },
-    "family": {
-      "name": "Piano famiglia",
-      "audience": "Genitori che desiderano una vista chiara sui progressi.",
-      "cta": "Scegli famiglia",
-      "features": ["Tutto in Studente", "Area genitori", "Report settimanale"]
+      "features": ["Spazio di studio", "Caricamento compiti", "Area genitori"]
     },
     "tutor_supported": {
       "name": "Piano con insegnante",
-      "audience": "Famiglie che desiderano il supporto di un insegnante qualificato quando serve più guida.",
+      "audience": "Famiglie che vogliono domande settimanali limitate a un insegnante.",
       "cta": "Scegli insegnante",
-      "features": ["Tutto in Famiglia", "Sessioni con insegnante", "Supporto prioritario"]
+      "features": ["Tutto in Studente", "Report settimanale", "Domande insegnante limitate ogni settimana"]
+    },
+    "family": {
+      "name": "Piano famiglia",
+      "audience": "Famiglie che vogliono il livello di supporto più alto e accesso condiviso.",
+      "cta": "Scegli famiglia",
+      "features": ["Tutto in Con insegnante", "5x più tempo insegnante", "Vantaggi condivisi fino a 3 persone"]
     }
   }
 }

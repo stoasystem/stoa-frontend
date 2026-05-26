@@ -6,10 +6,12 @@
     "teacherSupport": "Accompagnement par un enseignant qualifié"
   },
   "navigation": {
+    "home": "Accueil",
     "howItWorks": "Fonctionnement",
     "parents": "Parents",
     "tutors": "Enseignants",
     "pricing": "Tarifs",
+    "qa": "Q&R",
     "login": "Connexion",
     "startLearning": "Commencer à apprendre",
     "forTutors": "Pour les enseignants",
