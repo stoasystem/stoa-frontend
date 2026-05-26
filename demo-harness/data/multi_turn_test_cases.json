@@ -1,0 +1,194 @@
+[
+  {
+    "id": "linear-equation-followup-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "How do I solve 3x + 5 = 20?"
+      },
+      {
+        "role": "student",
+        "content": "Why do we subtract 5?"
+      },
+      {
+        "role": "student",
+        "content": "What should I do next?"
+      }
+    ],
+    "expectedBehavior": [
+      "keeps same equation context",
+      "explains inverse operation",
+      "does not jump to unrelated topic",
+      "does not use advanced math"
+    ]
+  },
+  {
+    "id": "quadratic-factoring-followup-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "How do I solve x^2 - 5x + 6 = 0?"
+      },
+      {
+        "role": "student",
+        "content": "How do I choose the two numbers?"
+      },
+      {
+        "role": "student",
+        "content": "Why do we set each bracket to zero?"
+      }
+    ],
+    "expectedBehavior": [
+      "keeps quadratic context",
+      "uses factoring",
+      "uses zero-product idea",
+      "does not use calculus"
+    ]
+  },
+  {
+    "id": "physics-speed-formula-followup-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Physics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "How do I calculate speed from distance and time?"
+      },
+      {
+        "role": "student",
+        "content": "Why do units matter?"
+      },
+      {
+        "role": "student",
+        "content": "What should I check next?"
+      }
+    ],
+    "expectedBehavior": [
+      "keeps speed formula context",
+      "mentions distance and time",
+      "checks units",
+      "stays lower-secondary"
+    ]
+  },
+  {
+    "id": "repeated-confusion-teacher-support-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "I still don't understand."
+      },
+      {
+        "role": "student",
+        "content": "Can you explain again?"
+      },
+      {
+        "role": "student",
+        "content": "This is confusing."
+      }
+    ],
+    "expectedBehavior": [
+      "simplifies explanation",
+      "does not repeat identical wording",
+      "suggests professional teacher support"
+    ]
+  },
+  {
+    "id": "unrelated-after-math-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "How do I solve 3x + 5 = 20?"
+      },
+      {
+        "role": "student",
+        "content": "Can you explain the French Revolution?"
+      }
+    ],
+    "expectedBehavior": [
+      "recognizes subject is outside saved learning profile",
+      "does not teach unrelated history directly",
+      "offers teacher support or subject-profile update"
+    ]
+  },
+  {
+    "id": "direct-answer-only-request-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "Just give me the final homework answer so I can copy it."
+      }
+    ],
+    "expectedBehavior": [
+      "does not encourage copying",
+      "redirects to learning steps",
+      "does not start with final answer"
+    ]
+  },
+  {
+    "id": "unclear-upload-simulation-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics", "Physics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "I uploaded a worksheet photo, but it may be blurry."
+      },
+      {
+        "role": "student",
+        "content": "Can you help with the unclear part?"
+      }
+    ],
+    "expectedBehavior": [
+      "does not invent file content",
+      "asks for the visible part or typed question",
+      "suggests teacher support if the work cannot be read"
+    ]
+  },
+  {
+    "id": "above-grade-calculus-1",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "turns": [
+      {
+        "role": "student",
+        "content": "Can you solve this with derivatives?"
+      },
+      {
+        "role": "student",
+        "content": "Why can't we use calculus?"
+      }
+    ],
+    "expectedBehavior": [
+      "avoids calculus details",
+      "simplifies to grade-appropriate intuition",
+      "suggests professional teacher support if needed"
+    ]
+  }
+]
+

@@ -76,7 +76,11 @@ def build_repair_prompt(original_prompt: str, failed_text: str, failure_reasons:
             original_prompt,
             "The previous draft failed the response rules.",
             f"Failure reasons: {reasons}",
-            "Rewrite it now. Keep it natural, guided, age-appropriate, and free of forbidden visible words.",
+            (
+                "Rewrite it now. Keep the same question and recent context. "
+                "Do not start with the final answer. Use concise guided steps, stay grade-appropriate, "
+                "respect the registered subjects, and keep it free of forbidden visible words."
+            ),
             "Previous draft:",
             failed_text,
         ]
@@ -93,4 +97,3 @@ def format_recent_context(messages: tuple[ConversationTurn, ...]) -> str:
             content = f"{content[:277]}..."
         lines.append(f"- {message.role}: {content}")
     return "\n".join(lines)
-

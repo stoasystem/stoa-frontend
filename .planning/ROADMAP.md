@@ -45,7 +45,7 @@
 
 **Status:** Complete.
 
-### Phase 138: Multi-Turn Regression Data and Behavior Test Suite
+### Phase 138: Multi-Turn Regression Data and Behavior Test Suite ✅
 
 **Goal:** Add the multi-turn test data and focused behavior tests that reproduce relevance, grade, subject, context, escalation, internal-term, and cheating scenarios.
 
@@ -58,7 +58,9 @@
 3. Existing Phase 25 provider tests continue to run from the repo root.
 4. The test suite produces actionable failure names that map to the bug reproduction log.
 
-### Phase 139: Evaluator, Prompt, Repair, and Fallback Stabilization
+**Status:** Complete.
+
+### Phase 139: Evaluator, Prompt, Repair, and Fallback Stabilization ✅
 
 **Goal:** Improve the harness evaluator, prompt/repair rules, and fallback behavior so detected Learning Assistant behavior bugs are fixed in the harness layer.
 
@@ -70,6 +72,8 @@
 2. Evaluator detects generic/irrelevant answers, direct homework answers, high-risk or cheating requests, internal terms, and multi-turn context loss for regression scenarios.
 3. Repair prompt rules keep responses concise, relevant, grade-appropriate, step-guided, and internal-term-free.
 4. Fallback responses support relevance, subject-scope, confusion, cheating, and teacher-escalation scenarios without single-question hardcoding.
+
+**Status:** Complete.
 
 ### Phase 140: Demo Flow QA, Regression Report, README, and Final Verification
 
@@ -100,10 +104,10 @@
 
 ## Next Up
 
-**Phase 138: Multi-Turn Regression Data and Behavior Test Suite** - Add the multi-turn test data and focused behavior tests that reproduce relevance, grade, subject, context, escalation, internal-term, and cheating scenarios.
+**Phase 140: Demo Flow QA, Regression Report, README, and Final Verification** - Verify the Learning Assistant behavior in the demo flow, document regression results, update README, and confirm build/test readiness.
 
 Run:
 
 ```bash
-$gsd-plan-phase 138
+$gsd-plan-phase 140
 ```

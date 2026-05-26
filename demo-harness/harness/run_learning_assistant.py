@@ -109,5 +109,6 @@ def check_response(text: str, request: LearningAssistantRequest) -> ResponseChec
             grade_level=request.grade_level,
             subject=request.subject,
             registered_subjects=request.registered_subjects,
+            recent_messages=tuple(message.content for message in request.recent_messages),
         )
     )

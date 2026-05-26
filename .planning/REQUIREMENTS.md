@@ -19,26 +19,26 @@ Requirements for Phase 26. Each requirement maps to exactly one roadmap phase.
 
 ### Regression Data and Test Suite
 
-- [ ] **DATA26-01**: `demo-harness/data/multi_turn_test_cases.json` contains at least the eight required multi-turn scenarios: linear equation follow-up, quadratic factoring follow-up, physics speed formula follow-up, repeated confusion, unrelated question after math, direct-answer-only request, unclear upload simulation, and above-grade question.
-- [ ] **TEST26-01**: `demo-harness/tests/test_relevance.py` verifies core Learning Assistant answers stay relevant to the student question.
-- [ ] **TEST26-02**: `demo-harness/tests/test_grade_scope.py` verifies lower-secondary demo questions do not use advanced concepts such as derivatives, integrals, complex roots, linear algebra, or university notation.
-- [ ] **TEST26-03**: `demo-harness/tests/test_subject_scope.py` verifies out-of-subject questions are gently redirected to saved learning scope or professional teacher support.
-- [ ] **TEST26-04**: `demo-harness/tests/test_multi_turn_context.py` verifies follow-up turns preserve the same equation, formula, or confusion context where expected.
-- [ ] **TEST26-05**: `demo-harness/tests/test_teacher_escalation.py` verifies repeated confusion and teacher requests suggest professional teacher support.
-- [ ] **TEST26-06**: `demo-harness/tests/test_internal_term_leakage.py` verifies assistant-visible output does not contain Codex, AI, model, prompt, demo, backend, mock, provider, or system instruction terms.
-- [ ] **TEST26-07**: `demo-harness/tests/test_cheating_behavior.py` verifies direct homework-copy requests are redirected to learning steps and do not provide copy-ready final answers first.
-- [ ] **TEST26-08**: Existing Phase 25 provider behavior tests continue to pass from the repository root.
+- [x] **DATA26-01**: `demo-harness/data/multi_turn_test_cases.json` contains at least the eight required multi-turn scenarios: linear equation follow-up, quadratic factoring follow-up, physics speed formula follow-up, repeated confusion, unrelated question after math, direct-answer-only request, unclear upload simulation, and above-grade question.
+- [x] **TEST26-01**: `demo-harness/tests/test_relevance.py` verifies core Learning Assistant answers stay relevant to the student question.
+- [x] **TEST26-02**: `demo-harness/tests/test_grade_scope.py` verifies lower-secondary demo questions do not use advanced concepts such as derivatives, integrals, complex roots, linear algebra, or university notation.
+- [x] **TEST26-03**: `demo-harness/tests/test_subject_scope.py` verifies out-of-subject questions are gently redirected to saved learning scope or professional teacher support.
+- [x] **TEST26-04**: `demo-harness/tests/test_multi_turn_context.py` verifies follow-up turns preserve the same equation, formula, or confusion context where expected.
+- [x] **TEST26-05**: `demo-harness/tests/test_teacher_escalation.py` verifies repeated confusion and teacher requests suggest professional teacher support.
+- [x] **TEST26-06**: `demo-harness/tests/test_internal_term_leakage.py` verifies assistant-visible output does not contain Codex, AI, model, prompt, demo, backend, mock, provider, or system instruction terms.
+- [x] **TEST26-07**: `demo-harness/tests/test_cheating_behavior.py` verifies direct homework-copy requests are redirected to learning steps and do not provide copy-ready final answers first.
+- [x] **TEST26-08**: Existing Phase 25 provider behavior tests continue to pass from the repository root.
 
 ### Evaluator, Prompt, and Fallback Fixes
 
-- [ ] **EVAL26-01**: `demo-harness/harness/evaluate_response.py` exposes focused evaluator helpers for relevance, grade scope, subject scope, no-direct-answer-first, internal terms, teacher escalation need, length, and context consistency.
-- [ ] **EVAL26-02**: Response evaluation detects irrelevant or generic answers for core demo questions.
-- [ ] **EVAL26-03**: Response evaluation detects direct-answer-first output for homework-style questions.
-- [ ] **EVAL26-04**: Response evaluation detects internal-term leakage including Codex, AI, model, prompt, demo, backend, mock, provider, and system instruction.
-- [ ] **EVAL26-05**: Response evaluation detects high-risk or cheating requests and requires a learning-oriented refusal/redirect.
-- [ ] **EVAL26-06**: Response evaluation can check multi-turn context consistency for the regression scenarios.
-- [ ] **PROMPT26-01**: Prompt or repair-prompt rules are updated so repair responses stay concise, relevant, grade-appropriate, step-guided, and free of internal terms.
-- [ ] **FALLBACK26-01**: Template fallback responses support relevance, subject-scope, confusion, cheating, and teacher-escalation scenarios without overfitting to a single question.
+- [x] **EVAL26-01**: `demo-harness/harness/evaluate_response.py` exposes focused evaluator helpers for relevance, grade scope, subject scope, no-direct-answer-first, internal terms, teacher escalation need, length, and context consistency.
+- [x] **EVAL26-02**: Response evaluation detects irrelevant or generic answers for core demo questions.
+- [x] **EVAL26-03**: Response evaluation detects direct-answer-first output for homework-style questions.
+- [x] **EVAL26-04**: Response evaluation detects internal-term leakage including Codex, AI, model, prompt, demo, backend, mock, provider, and system instruction.
+- [x] **EVAL26-05**: Response evaluation detects high-risk or cheating requests and requires a learning-oriented refusal/redirect.
+- [x] **EVAL26-06**: Response evaluation can check multi-turn context consistency for the regression scenarios.
+- [x] **PROMPT26-01**: Prompt or repair-prompt rules are updated so repair responses stay concise, relevant, grade-appropriate, step-guided, and free of internal terms.
+- [x] **FALLBACK26-01**: Template fallback responses support relevance, subject-scope, confusion, cheating, and teacher-escalation scenarios without overfitting to a single question.
 
 ### Demo Flow Stability and Reporting
 
@@ -92,23 +92,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RULE26-03 | Phase 137 | Complete |
 | RULE26-04 | Phase 137 | Complete |
 | BUG26-01 | Phase 137 | Complete |
-| DATA26-01 | Phase 138 | Pending |
-| TEST26-01 | Phase 138 | Pending |
-| TEST26-02 | Phase 138 | Pending |
-| TEST26-03 | Phase 138 | Pending |
-| TEST26-04 | Phase 138 | Pending |
-| TEST26-05 | Phase 138 | Pending |
-| TEST26-06 | Phase 138 | Pending |
-| TEST26-07 | Phase 138 | Pending |
-| TEST26-08 | Phase 138 | Pending |
-| EVAL26-01 | Phase 139 | Pending |
-| EVAL26-02 | Phase 139 | Pending |
-| EVAL26-03 | Phase 139 | Pending |
-| EVAL26-04 | Phase 139 | Pending |
-| EVAL26-05 | Phase 139 | Pending |
-| EVAL26-06 | Phase 139 | Pending |
-| PROMPT26-01 | Phase 139 | Pending |
-| FALLBACK26-01 | Phase 139 | Pending |
+| DATA26-01 | Phase 138 | Complete |
+| TEST26-01 | Phase 138 | Complete |
+| TEST26-02 | Phase 138 | Complete |
+| TEST26-03 | Phase 138 | Complete |
+| TEST26-04 | Phase 138 | Complete |
+| TEST26-05 | Phase 138 | Complete |
+| TEST26-06 | Phase 138 | Complete |
+| TEST26-07 | Phase 138 | Complete |
+| TEST26-08 | Phase 138 | Complete |
+| EVAL26-01 | Phase 139 | Complete |
+| EVAL26-02 | Phase 139 | Complete |
+| EVAL26-03 | Phase 139 | Complete |
+| EVAL26-04 | Phase 139 | Complete |
+| EVAL26-05 | Phase 139 | Complete |
+| EVAL26-06 | Phase 139 | Complete |
+| PROMPT26-01 | Phase 139 | Complete |
+| FALLBACK26-01 | Phase 139 | Complete |
 | CHAT26-01 | Phase 140 | Pending |
 | PARENT26-01 | Phase 140 | Pending |
 | TUTOR26-01 | Phase 140 | Pending |
