@@ -1,5 +1,30 @@
 # Milestones
 
+## v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing (Shipped: 2026-05-26)
+
+**Phases completed:** 4 phases, 4 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.24-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Learning Assistant functional QA plan, relevance rules, multi-turn behavior rules, repair prompt rules, demo readiness threshold, and bug reproduction log.
+- Eight-scenario multi-turn regression data set covering equation follow-up, quadratic factoring, speed formula, repeated confusion, unrelated subject, direct-answer request, unclear upload simulation, and above-grade question.
+- Focused Python regression tests for relevance, grade scope, subject scope, multi-turn context, teacher escalation, internal-term leakage, and cheating behavior.
+- Enhanced response evaluator helpers for relevance, grade scope, subject scope, direct-answer-first, internal terms, teacher escalation, length, context consistency, cheating, and high-risk behavior.
+- Tightened repair prompt and improved template fallback responses for core behavior scenarios and EN/DE/FR/IT smoke coverage.
+- Regression report, README Phase 26 guidance, and final QA evidence for student chat, teacher support, parent records, tutor workflow, billing, referral, support, and admin flows.
+
+### Verification
+
+- `npm install --ignore-scripts`: passed.
+- `python3 -m unittest discover -s demo-harness/tests`: passed with 23 tests.
+- Backend syntax check: passed.
+- Student chat, teacher support, parent, tutor, billing, referral, support, admin, and multilingual fallback smokes: passed.
+- `npm run lint`: passed.
+- `npm run build`: passed with the existing Node `DEP0205` deprecation warning from tooling.
+
+---
+
 ## v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow (Shipped: 2026-05-26)
 
 **Phases completed:** 4 phases, 4 plans, 0 tasks

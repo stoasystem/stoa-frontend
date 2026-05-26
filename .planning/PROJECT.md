@@ -10,33 +10,26 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
+## Latest Shipped Milestone: v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA's local demo Learning Assistant now has a Python prompt harness, internal Codex CLI adapter, template fallback provider, provider router, response checks, behavior regression tests, FastAPI chat integration, provider health endpoint, QA documentation, and future production-provider handoff notes. The frontend remains provider-agnostic and continues to call the same Chat API.
+**Delivered:** STOA's demo Learning Assistant now has functional QA documentation, multi-turn behavior regression data, focused evaluator tests, stronger response evaluation, tightened repair prompt rules, improved template fallback behavior, regression reporting, and verified demo-flow smoke coverage. The frontend remains provider-agnostic and continues to call the same Chat API.
 
 **Target features:**
-- Backend-internal provider interface, Codex CLI adapter, template fallback provider, provider router, timeout handling, and provider health check.
-- Python prompt harness with student profile context, grade-level rules, subject-scope rules, teacher escalation rules, forbidden internal-term controls, response repair, and fallback.
-- Demo backend chat endpoint integration that preserves the existing frontend Chat API response shape and hides provider/debug details from user-facing UI.
-- Codex behavior regression set, provider tests, local runbook/readiness checklist, and QA evidence.
-- Future provider handoff notes and README Phase 25 guidance.
+- Functional QA rules for relevance, grade scope, subject scope, direct-answer-first behavior, teacher escalation, internal-term leakage, multi-turn context, and cheating/safety handling.
+- Multi-turn regression cases for math, physics, repeated confusion, unrelated turns, direct-answer requests, unclear upload simulation, and above-grade questions.
+- Focused Python behavior tests and enhanced evaluator helpers for deterministic regression coverage.
+- Repair prompt and template fallback improvements that keep local demo answers guided, scoped, concise, and internal-term-free.
+- Regression report, README Phase 26 guidance, and smoke verification across student, parent, tutor, billing, referral, support, and admin flows.
 
-## Current Milestone: v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing
+## Current Milestone
 
-**Goal:** Stabilize the demo Learning Assistant behavior through functional QA, multi-turn tests, evaluator/prompt bug fixes, regression reporting, and full demo-flow checks without adding product features or redesigning UI.
-
-**Target features:**
-- Learning Assistant functional QA plan covering relevance, grade scope, subject scope, no-direct-answer behavior, teacher escalation, unsafe/cheating handling, internal-term leakage, and multi-language basics.
-- Multi-turn conversation test cases for math, physics, repeated confusion, unrelated follow-ups, direct-answer requests, unclear upload simulation, and above-grade questions.
-- Expanded Python harness tests for relevance, grade scope, subject scope, multi-turn context, teacher escalation, internal terms, and cheating behavior.
-- Response evaluator and repair-prompt improvements for relevance, context consistency, grade scope, subject scope, direct-answer-first detection, internal-term leakage, length, and safe fallback.
-- Bug reproduction log, regression report, README guidance, and full demo-flow verification across student chat, tutor requests, parent history/report, billing, referral, support/contact, and admin overview.
+No active milestone. The recommended next milestone is Phase 27: Demo Scenario Rehearsal, External Presentation QA, and Feedback Capture.
 
 ## Current State
 
-**Latest shipped milestone:** v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
+**Latest shipped milestone:** v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -64,6 +57,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 22 final demo package and launch-candidate preparation with audience demo scripts, locked demo accounts, stakeholder review checklist, release locks, known issues, launch-candidate approval, and final demo run evidence.
 - Phase 23 public demo release package with final approval changes, P0/P1 blocker verification, release-lock preservation, final demo rerun, multilingual/responsive/accessibility smoke evidence, deployment handoff, monitoring plan, external presentation support, release notes, Go / No-Go, release branch, and release tag.
 - Phase 25 local Learning Assistant provider integration with Python prompt harness, Codex CLI adapter, template fallback, provider router, response checks, behavior regression tests, FastAPI chat integration, provider health endpoint, QA docs, README guidance, and production-provider handoff notes.
+- Phase 26 Learning Assistant functional QA with multi-turn regression data, focused behavior tests, evaluator and repair/fallback stabilization, regression report, README guidance, and full demo-flow verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -95,10 +89,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify natural locale-specific P0 copy, German stacked hero title rendering, responsive multilingual layout fit, copy review documentation, visual QA evidence, terminology cleanup, and README handoff guidance — v1.16
 - ✓ Developers can run and verify production-facing UI cleanup, demo-only UI guards, display-label mapping, sanitized user-facing errors, duplicate-submit guards, stable empty/error states, QA evidence, and README guidance — v1.17
 - ✓ Developers can run and verify local demo Learning Assistant provider integration with Python prompt harness, internal Codex provider adapter, template fallback, provider health check, response behavior tests, FastAPI chat integration, QA docs, README guidance, and future provider handoff notes — v1.23
+- ✓ Developers can run and verify Learning Assistant functional QA, multi-turn regression tests, evaluator/prompt/fallback stabilization, regression reporting, and full demo-flow behavior checks — v1.24
 
 ### Active
 
-- Phase 26 should stabilize Learning Assistant behavior through functional QA, multi-turn behavior tests, response evaluator improvements, prompt/repair/fallback fixes, regression tests, bug reproduction logs, and demo readiness reports. It must not add new product pages, redesign UI, build a formal AI backend, add a complex agent framework, implement long-term memory, build a knowledge graph, add production content safety infrastructure, fine-tune models, add multi-model scheduling, or deploy AWS infrastructure.
+- No active milestone. Phase 27 is recommended next for demo scenario rehearsal, external presentation QA, and feedback capture.
 
 ### Out of Scope
 
@@ -181,6 +176,7 @@ Current codebase facts:
 - v1.21 shipped Phase 22 to package the current frontend for final demo, stakeholder review, release locks, launch-candidate approval, final demo run, and branch preparation without adding new features.
 - v1.22 starts Phase 23 to convert the launch candidate into a public demo release through bug-fix-only changes, final approval closure, release smoke tests, handoff docs, Go/No-Go, and branch/tag/deployment confirmation.
 - v1.23 starts Phase 25 to connect Codex as a local-only demo Learning Assistant provider behind the Python harness/demo backend while keeping the frontend provider-agnostic and preserving all public demo flows.
+- v1.24 shipped Phase 26 to stabilize Learning Assistant behavior through functional QA, multi-turn regression tests, evaluator/repair/fallback improvements, and full demo-flow verification without expanding product scope.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
@@ -325,4 +321,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 during v1.24 milestone initialization*
+*Last updated: 2026-05-26 after v1.24 milestone completion*
