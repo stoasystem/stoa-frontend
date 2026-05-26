@@ -106,53 +106,61 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| REF27-01 | TBD | Pending |
-| SCOPE27-01 | TBD | Pending |
-| STYLE27-01 | TBD | Pending |
-| COPY27-01 | TBD | Pending |
-| TYPE27-01 | TBD | Pending |
-| DATA27-01 | TBD | Pending |
-| DATA27-02 | TBD | Pending |
-| API27-01 | TBD | Pending |
-| API27-02 | TBD | Pending |
-| QUERY27-01 | TBD | Pending |
-| STATE27-01 | TBD | Pending |
-| MOCK27-01 | TBD | Pending |
-| ROUTE27-01 | TBD | Pending |
-| OVERVIEW27-01 | TBD | Pending |
-| PATH27-01 | TBD | Pending |
-| LESSON27-01 | TBD | Pending |
-| CHAL27-01 | TBD | Pending |
-| CHAL27-02 | TBD | Pending |
-| CHAL27-03 | TBD | Pending |
-| FEED27-01 | TBD | Pending |
-| RESULT27-01 | TBD | Pending |
-| MISTAKE27-01 | TBD | Pending |
-| HINT27-01 | TBD | Pending |
-| ASSIST27-01 | TBD | Pending |
-| ASSIST27-02 | TBD | Pending |
-| TEACH27-01 | TBD | Pending |
-| BOUND27-01 | TBD | Pending |
-| DASH27-01 | TBD | Pending |
-| NAV27-01 | TBD | Pending |
-| PARENT27-01 | TBD | Pending |
-| PARENT27-02 | TBD | Pending |
-| LANG27-01 | TBD | Pending |
-| LANG27-02 | TBD | Pending |
-| LANG27-03 | TBD | Pending |
-| LANG27-04 | TBD | Pending |
-| UI27-01 | TBD | Pending |
-| A11Y27-01 | TBD | Pending |
-| DOC27-01 | TBD | Pending |
-| QA27-01 | TBD | Pending |
-| README27-01 | TBD | Pending |
-| VERIFY27-01 | TBD | Pending |
+| REF27-01 | Phase 141 | Pending |
+| SCOPE27-01 | Phase 141 | Pending |
+| STYLE27-01 | Phase 141 | Pending |
+| COPY27-01 | Phase 141 | Pending |
+| TYPE27-01 | Phase 142 | Pending |
+| DATA27-01 | Phase 142 | Pending |
+| DATA27-02 | Phase 142 | Pending |
+| API27-01 | Phase 142 | Pending |
+| API27-02 | Phase 142 | Pending |
+| QUERY27-01 | Phase 142 | Pending |
+| STATE27-01 | Phase 142 | Pending |
+| MOCK27-01 | Phase 142 | Pending |
+| ROUTE27-01 | Phase 143 | Pending |
+| OVERVIEW27-01 | Phase 143 | Pending |
+| PATH27-01 | Phase 143 | Pending |
+| LESSON27-01 | Phase 143 | Pending |
+| CHAL27-01 | Phase 143 | Pending |
+| CHAL27-02 | Phase 143 | Pending |
+| CHAL27-03 | Phase 143 | Pending |
+| FEED27-01 | Phase 143 | Pending |
+| RESULT27-01 | Phase 143 | Pending |
+| MISTAKE27-01 | Phase 143 | Pending |
+| HINT27-01 | Phase 144 | Pending |
+| ASSIST27-01 | Phase 144 | Pending |
+| ASSIST27-02 | Phase 144 | Pending |
+| TEACH27-01 | Phase 144 | Pending |
+| BOUND27-01 | Phase 142 | Pending |
+| DASH27-01 | Phase 145 | Pending |
+| NAV27-01 | Phase 143 | Pending |
+| PARENT27-01 | Phase 145 | Pending |
+| PARENT27-02 | Phase 145 | Pending |
+| LANG27-01 | Phase 146 | Pending |
+| LANG27-02 | Phase 146 | Pending |
+| LANG27-03 | Phase 146 | Pending |
+| LANG27-04 | Phase 146 | Pending |
+| UI27-01 | Phase 146 | Pending |
+| A11Y27-01 | Phase 146 | Pending |
+| DOC27-01 | Phase 146 | Pending |
+| QA27-01 | Phase 146 | Pending |
+| README27-01 | Phase 146 | Pending |
+| VERIFY27-01 | Phase 146 | Pending |
 
 **Coverage:**
 - v1.25 requirements: 41 total
-- Mapped to phases: 0
-- Unmapped: 41
+- Mapped to phases: 41
+- Unmapped: 0
+
+**Phase distribution:**
+- Phase 141: 4 requirements
+- Phase 142: 9 requirements
+- Phase 143: 11 requirements
+- Phase 144: 4 requirements
+- Phase 145: 3 requirements
+- Phase 146: 10 requirements
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after v1.25 requirements definition*
+*Last updated: 2026-05-26 after v1.25 roadmap creation*
