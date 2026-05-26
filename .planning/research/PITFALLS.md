@@ -1,49 +1,118 @@
-# Phase 23 Research: Pitfalls
+# Research: Pitfalls for v1.23 Phase 25
 
-**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
-**Date:** 2026-05-26
+## Pitfall: Treating Codex CLI as a Production Provider
 
-## Common Risks
+Risk:
 
-### Scope Creep During Bug Fixing
+- Codex CLI is a local coding-agent workflow, not the formal production backend provider layer for a learning product.
 
-Release-candidate cleanup can turn into redesign or feature expansion. Prevent this by requiring every change to map to a bug, approval item, or release blocker.
+Prevention:
 
-### Breaking Release Locks
+- Name the adapter `CodexProvider` internally but document it as local demo infrastructure only.
+- Add handoff notes that future production integration should use a backend-owned provider, likely OpenAI Responses API or another formal provider API.
+- Keep `STOA_DEMO_PROVIDER` scoped to backend/harness env only.
 
-Small copy or layout fixes can accidentally violate copy, design, translation, or API locks. Prevent this by checking the relevant lock doc after any change.
+## Pitfall: Provider Details Leaking Into UI
 
-### One-Language Fixes
+Risk:
 
-Fixing only English can leave German/French/Italian inconsistent or broken. Prevent this by treating visible copy and layout changes as cross-locale work.
+- Existing Phase 18/23 release locks explicitly avoid user-visible internal terms.
+- A failed provider call could accidentally return "Codex failed", "model failed", or "demo provider unavailable".
 
-### Demo Artifact Leaks
+Prevention:
 
-Internal language such as demo backend, mock API, fake checkout, or Codex can reappear through errors, docs copied into UI, or fallback labels. Prevent this with targeted scans and manual page review.
+- Add forbidden-term post-checks.
+- Use sanitized fallback text.
+- Do not include provider fields in Chat API responses.
+- Keep debug behind logs or a future internal endpoint only.
 
-### Unstable Demo Backend State
+## Pitfall: Direct Answers Instead of Guided Learning
 
-Manual testing can create dirty demo state. Prevent this by resetting demo data before formal final runs and recording reset status.
+Risk:
 
-### Public Demo Mislabeling
+- The current frontend mock fallback says, "For x squared equals 9, x is 3 or -3."
+- Codex may also answer directly unless the harness enforces behavior.
 
-Public demo release is not production launch. Prevent this by separating internal and external release notes and documenting known limitations accurately.
+Prevention:
 
-### Environment Drift
+- Update frontend mock fallback copy and backend fallback copy to guided language.
+- Prompt with no-direct-answer-first rules.
+- Add regression tests for direct-answer-first patterns.
+- Reject or repair responses that start with final-answer language.
 
-Public demo flags can expose demo accounts or debug panels if misconfigured. Prevent this with deployment handoff env-variable checklist.
+## Pitfall: Weak Grade and Subject Scope Enforcement
 
-### Insufficient Evidence
+Risk:
 
-A Go decision without flow evidence is weak. Prevent this by recording date, commit hash, environment, tester, browser, device, language, flow results, issues, and Go/No-Go.
+- Simple prompt rules alone may not prevent out-of-scope concepts.
 
-## Warning Signs
+Prevention:
 
-- P0 bug accepted as a known issue.
-- P1 bug has no workaround.
-- A fix touches many unrelated files.
-- New dependencies appear in a bug-fix milestone.
-- Copy/design changes are not tied to a release blocker.
-- Four-language checks are skipped after UI text changes.
-- Contact/logo/footer changes are made without trust/info verification.
+- Inject grade and subject rules into prompt.
+- Add deterministic checks for regression cases such as calculus terms for lower-secondary students.
+- Handle out-of-subject questions gently by redirecting to registered subjects or teacher support.
+- Document that this is demo guardrail coverage, not a full content safety platform.
 
+## Pitfall: Codex Timeout Breaking the Demo
+
+Risk:
+
+- CLI provider calls can be slow, unavailable, unauthenticated, or blocked by local config.
+
+Prevention:
+
+- Enforce Python `subprocess.run(..., timeout=...)`.
+- Add `STOA_DEMO_PROVIDER_TIMEOUT_SECONDS`.
+- Always route to template fallback on timeout.
+- Add a pre-demo provider readiness checklist.
+
+## Pitfall: Provider Call Mutates Workspace
+
+Risk:
+
+- Codex is a coding agent and can normally read/write/run commands depending on mode.
+
+Prevention:
+
+- Use `--ephemeral`.
+- Use `--sandbox read-only`.
+- Avoid passing repo-editing instructions.
+- Keep provider prompt focused on returning a Learning Assistant answer only.
+- Treat any failure to run read-only as fallback-worthy.
+
+## Pitfall: Over-Logging Sensitive Data
+
+Risk:
+
+- Provider logs might capture private student text or uploaded file contents.
+
+Prevention:
+
+- Log provider selected, fallback used, failure category, timeout, and optional regression case ID.
+- Do not log passwords, tokens, full uploaded file contents, or full private chat content.
+- Add `demo-harness/logs/` to `.gitignore`.
+
+## Pitfall: Breaking Existing Demo Flows
+
+Risk:
+
+- Chat endpoint changes could disrupt tutor, parent, billing, referral, contact, or admin flows.
+
+Prevention:
+
+- Keep response shapes unchanged.
+- Add targeted backend tests and full demo QA.
+- Run build and existing smoke scripts after integration.
+
+## Pitfall: Over-Engineering the Harness
+
+Risk:
+
+- Building a formal provider system, queue, database schema, or safety platform would exceed Phase 25.
+
+Prevention:
+
+- Use a small Protocol-based provider interface.
+- Keep fallback deterministic.
+- Keep storage unchanged except existing message persistence.
+- Put future production requirements in `docs/backend-integration/learning-provider-handoff.md`.
