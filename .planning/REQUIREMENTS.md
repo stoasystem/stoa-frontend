@@ -104,12 +104,56 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
+| STYLE20-01 | Phase 113 | Planned |
+| STYLE20-02 | Phase 113 | Planned |
+| STYLE20-03 | Phase 113 | Planned |
+| STYLE20-04 | Phase 113 | Planned |
+| STYLE20-05 | Phase 113 | Planned |
+| STYLE20-06 | Phase 113 | Planned |
+| RULE20-01 | Phase 114 | Planned |
+| RULE20-02 | Phase 114 | Planned |
+| RULE20-03 | Phase 114 | Planned |
+| RULE20-04 | Phase 114 | Planned |
+| RULE20-05 | Phase 114 | Planned |
+| RULE20-06 | Phase 114 | Planned |
+| RULE20-07 | Phase 114 | Planned |
+| COPY20-01 | Phase 115 | Planned |
+| COPY20-02 | Phase 115 | Planned |
+| COPY20-03 | Phase 115 | Planned |
+| COPY20-04 | Phase 115 | Planned |
+| COPY20-05 | Phase 115 | Planned |
+| COPY20-06 | Phase 115 | Planned |
+| COPY20-07 | Phase 115 | Planned |
+| COPY20-08 | Phase 115 | Planned |
+| COPY20-09 | Phase 115 | Planned |
+| COPY20-10 | Phase 115 | Planned |
+| COPY20-11 | Phase 115 | Planned |
+| COPY20-12 | Phase 115 | Planned |
+| LAYOUT20-01 | Phase 116 | Planned |
+| LAYOUT20-02 | Phase 116 | Planned |
+| LAYOUT20-03 | Phase 116 | Planned |
+| LAYOUT20-04 | Phase 116 | Planned |
+| LAYOUT20-05 | Phase 116 | Planned |
+| LAYOUT20-06 | Phase 116 | Planned |
+| LAYOUT20-07 | Phase 116 | Planned |
+| LAYOUT20-08 | Phase 116 | Planned |
+| LAYOUT20-09 | Phase 116 | Planned |
+| QA20-01 | Phase 117 | Planned |
+| QA20-02 | Phase 117 | Planned |
+| QA20-03 | Phase 117 | Planned |
+| QA20-04 | Phase 117 | Planned |
+| QA20-05 | Phase 117 | Planned |
+| QA20-06 | Phase 117 | Planned |
+| QA20-07 | Phase 117 | Planned |
+| QA20-08 | Phase 117 | Planned |
+| QA20-09 | Phase 117 | Planned |
+| QA20-10 | Phase 117 | Planned |
+| QA20-11 | Phase 117 | Planned |
 
 **Coverage:**
 - v1.19 requirements: 45 total
-- Mapped to phases: 0
-- Unmapped: 45
+- Mapped to phases: 45
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-

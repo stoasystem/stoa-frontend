@@ -21,93 +21,102 @@
 - ✅ **v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement** - Phases 98-102 (implemented 2026-05-25)
 - ✅ **v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal** - Phases 103-107 (implemented 2026-05-26)
 - ✅ **v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation** - Phases 108-112 (implemented 2026-05-26)
+- 🔄 **v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation** - Phases 113-117 (planning 2026-05-26)
 
 ## Phases
 
-### Active Milestone: v1.18 Phase 19
+### Active Milestone: v1.19 Phase 20
 
-Phase 19 aligns the STOA learning platform visually with the company homepage design language without modifying `/Users/zhdeng/newweb`, copying its source files, or turning the app into a homepage clone. The target relationship is same brand family, different product surface.
+Phase 20 refines English, German, French, and Italian product copy across the STOA learning platform while adapting UI layout so each locale reads naturally and remains stable. It continues the Phase 19 source-safety rule: `/Users/zhdeng/newweb` is read-only and may be used only to study German writing style, not as a source to modify or copy.
 
-#### Phase 108: Main Website Read-Only Audit and Design Translation
+#### Phase 113: Source Safety and German Style Study
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Establish the read-only source audit and design translation baseline before any learning-platform visual edits begin.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Establish the read-only German copy style baseline from the company homepage before changing learning-platform locale files.
 
-**Scope:**
-- Record `/Users/zhdeng/newweb` pre-work `git status`, including the pre-existing `img/team/.DS_Store` modification if it remains present.
-- Inspect company homepage CSS, HTML, image usage, typography imports, spacing, layout, buttons, cards, hero treatment, and overall brand tone without modifying the source project.
-- Create `docs/design/main-website-readonly-audit.md` with the source audit, safety evidence, and no-copy/no-write policy.
-- Create `docs/design/main-website-design-translation.md` defining same brand family, different product surface.
-- Distinguish reusable design signals from implementation details that must not be imported or copied.
-- Define page-level adaptation rules for homepage, auth, chat, dashboards, parent report, pricing, and billing.
+**Requirements:** STYLE20-01 through STYLE20-06
 
-**Requirements:** SAFE19-01 through SAFE19-06, TRANS19-01 through TRANS19-06
+**Success Criteria:**
+1. `docs/language/main-website-german-style-study.md` documents German headline rhythm, CTA style, sentence length, tone, education wording, and address-form observations.
+2. `docs/language/main-website-german-copy-reference.md` captures abstract style signals and explicitly avoids copying homepage text.
+3. Pre-work and post-work `/Users/zhdeng/newweb` status are recorded, including the pre-existing `img/team/.DS_Store` change if present.
+4. No source files, components, CSS, assets, or full text blocks from `/Users/zhdeng/newweb` are copied into `stoa-frontend`.
 
-#### Phase 109: Learning Platform Brand Tokens and Theme Layer
+#### Phase 114: Cross-Locale Copy Rules and Review Matrix
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Create a derived learning-platform token and theme layer from the design translation without copying homepage source CSS.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Define the language-specific rules and review matrix that guide all Phase 20 copy edits.
 
-**Scope:**
-- Create `docs/design/learning-platform-token-adjustment.md`.
-- Add `src/styles/brand-tokens.css`, `src/styles/platform-theme.css`, or equivalent integration with existing theme files.
-- Translate homepage burgundy, charcoal, warm grey, white, and muted grey signals into app-safe brand, accent, surface, text, border, and interactive tokens.
-- Reduce bright SaaS blue/teal dominance while preserving accessible interaction states.
-- Support editorial display headings on public/auth/report surfaces and readable app typography on chat/dashboard surfaces.
-- Preserve Phase 17 multilingual layout safeguards and avoid new dependencies.
+**Requirements:** RULE20-01 through RULE20-07
 
-**Requirements:** TOKEN19-01 through TOKEN19-07
+**Success Criteria:**
+1. English, German, French, and Italian copy-rule documents exist or are updated for Phase 20.
+2. German rules reflect the company-homepage-inspired style while preserving learning-platform vocabulary.
+3. French rules cover typographic apostrophes and punctuation fit; Italian rules cover CTA length and natural phrasing.
+4. `docs/language/cross-locale-copy-review-matrix.md` records key copy with meaning, tone, literal-match, UI-length, and approval checks.
+5. Phase 18 production-facing terminology safety remains explicit in copy rules.
 
-#### Phase 110: Shared Component Visual Refinement
+#### Phase 115: Core Locale Copy Refinement
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Refine shared component styling through translated tokens while keeping component behavior unchanged.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Refine English, German, French, and Italian locale JSON across P0 surfaces without adding product functionality.
 
-**Scope:**
-- Refine button variants for premium brand alignment while preserving focus, disabled, hover, and pending states.
-- Refine cards with subtler borders, surfaces, shadows, padding, and radius.
-- Refine badge/status colors to stay clear without overly bright red/green/blue styling.
-- Align input, textarea, select, and form surfaces with the translated token system.
-- Adjust PageHeader, SectionHeader, AppLogo, navigation, and sidebar styling without making app pages feel like marketing pages.
-- Align chat bubbles, chat input, teacher-support actions, pricing cards, billing cards, and report cards with the translated brand language.
+**Requirements:** COPY20-01 through COPY20-12
 
-**Requirements:** COMP19-01 through COMP19-06
+**Success Criteria:**
+1. Homepage, register/onboarding, chat, parent report, pricing, billing, and support copy are refined across all four locales.
+2. German copy avoids direct English sentence structure and uses shorter, calmer education-service phrasing.
+3. French uses consistent typographic apostrophes where applicable.
+4. Italian CTA and support copy remains natural and button-friendly.
+5. English copy remains calm, precise, education-centered, and not SaaS/sales-heavy.
 
-#### Phase 111: Public and Auth Surface Alignment
+#### Phase 116: Locale Layout Adaptation and Component Fit
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Bring homepage, login, register, and onboarding visuals closer to STOA brand language without adding product functionality.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Adapt locale layout hints and targeted components so refined copy stays stable on mobile and desktop.
 
-**Scope:**
-- Refine homepage visual rhythm, typography, CTA treatment, imagery treatment, and section spacing.
-- Keep homepage clearly positioned as the learning-platform entry point, not a direct company-homepage copy.
-- Refine login and register/onboarding visuals for brand trust, premium tone, and form clarity.
-- Preserve existing registration flow behavior, copy safety, environment guards, and multilingual layout stability.
+**Requirements:** LAYOUT20-01 through LAYOUT20-09
 
-**Requirements:** PAGE19-01 through PAGE19-02
+**Success Criteria:**
+1. `src/lib/localeLayout.ts` is reviewed and updated only where a concrete locale fit need exists.
+2. German long words and headings do not overflow or create awkward hero/title wrapping.
+3. French apostrophe-heavy strings do not truncate in buttons, cards, navigation, forms, or chat surfaces.
+4. Italian CTA labels fit homepage, register, chat, pricing, billing, and support button contexts.
+5. Navbar, register, pricing/billing, chat, and parent report surfaces remain usable across all four locales.
 
-#### Phase 112: App Page Alignment, Visual QA, README, and Handoff
+#### Phase 117: Cross-Locale Visual QA, README, and Handoff
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Align app surfaces, complete visual compatibility QA, update docs, and close Phase 19 with build and read-only evidence.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Complete cross-locale QA, verification, README updates, and source-safety handoff for Phase 20.
 
-**Scope:**
-- Refine chat, student dashboard, parent dashboard/report, pricing, billing, tutor, support, and admin/token-level surfaces.
-- Keep Chat and dashboards app-like, scannable, and usable.
-- Preserve Phase 18 production-facing copy and payment-readiness boundaries.
-- Create `docs/design/visual-compatibility-qa.md`.
-- Compare brand similarity, product independence, and visual quality for target P0 surfaces.
-- Verify English, German, French, Italian, and mobile layouts remain stable.
-- Run or document `npm install`, `npm run dev`, `npm run build`, and relevant browser checks.
-- Recheck `/Users/zhdeng/newweb` `git status` and document read-only status.
-- Update README with Phase 19 scope, source policy, design translation goals, and non-copying rule.
+**Requirements:** QA20-01 through QA20-11
 
-**Requirements:** PAGE19-03 through PAGE19-09, QA19-01 through QA19-10
+**Success Criteria:**
+1. `docs/language/cross-locale-visual-qa.md` records or defines QA across Homepage, Register, Chat, Parent Report, Pricing, and Billing for English, German, French, and Italian.
+2. QA covers target widths 375, 430, 768, 1024, and 1440 where feasible, or documents any reduced evidence set.
+3. QA confirms German long text, French apostrophes, Italian CTAs, and English tone are acceptable.
+4. `npm install`, `npm run dev`, and `npm run build` are verified or exact environment limitations are documented.
+5. README documents Phase 20 scope, read-only source policy, German style alignment, cross-locale copy rules, and layout adaptation goals.
+6. Post-work `/Users/zhdeng/newweb` status confirms Phase 20 did not modify the source project.
+
+<details>
+<summary>✅ v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Phases 108-112) — SHIPPED 2026-05-26</summary>
+
+- [x] Phase 108: Main Website Read-Only Audit and Design Translation (1/1 plan) — completed 2026-05-26
+- [x] Phase 109: Learning Platform Brand Tokens and Theme Layer (1/1 plan) — completed 2026-05-26
+- [x] Phase 110: Shared Component Visual Refinement (1/1 plan) — completed 2026-05-26
+- [x] Phase 111: Public and Auth Surface Alignment (1/1 plan) — completed 2026-05-26
+- [x] Phase 112: App Page Alignment, Visual QA, README, and Handoff (1/1 plan) — completed 2026-05-26
+
+Commit:
+- `849c439 Align learning platform visuals with STOA brand language`
+
+</details>
 
 <details>
 <summary>✅ v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Phases 103-107) — SHIPPED 2026-05-26</summary>
@@ -117,11 +126,6 @@ Phase 19 aligns the STOA learning platform visually with the company homepage de
 - [x] Phase 105: Production Copy Cleanup and Display Label Mapping (1/1 plan) — completed 2026-05-26
 - [x] Phase 106: State Hardening and Duplicate-Submit Controls (1/1 plan) — completed 2026-05-26
 - [x] Phase 107: Production-Facing QA, README, and Handoff (1/1 plan) — completed 2026-05-26
-
-Archive:
-- `.planning/milestones/v1.17-ROADMAP.md`
-- `.planning/milestones/v1.17-REQUIREMENTS.md`
-- `.planning/milestones/v1.17-MILESTONE-AUDIT.md`
 
 </details>
 
@@ -133,11 +137,6 @@ Archive:
 - [x] Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup (1/1 plan) — completed 2026-05-25
 - [x] Phase 101: Responsive Typography and Multilingual Fit Pass (1/1 plan) — completed 2026-05-25
 - [x] Phase 102: QA Evidence, Documentation, and Handoff (1/1 plan) — completed 2026-05-25
-
-Archive:
-- `.planning/milestones/v1.16-ROADMAP.md`
-- `.planning/milestones/v1.16-REQUIREMENTS.md`
-- `.planning/milestones/v1.16-MILESTONE-AUDIT.md`
 
 </details>
 
@@ -153,12 +152,12 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Start with Phase 108. Phase 108 must complete the read-only source audit and design translation before any learning-platform visual edits are planned or implemented.
+Start with Phase 113. Phase 113 must complete the source-safety and German style study before learning-platform locale copy is rewritten.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 108. Main Website Read-Only Audit and Design Translation | v1.18 | 1/1 | Complete | 2026-05-26 |
-| 109. Learning Platform Brand Tokens and Theme Layer | v1.18 | 1/1 | Complete | 2026-05-26 |
-| 110. Shared Component Visual Refinement | v1.18 | 1/1 | Complete | 2026-05-26 |
-| 111. Public and Auth Surface Alignment | v1.18 | 1/1 | Complete | 2026-05-26 |
-| 112. App Page Alignment, Visual QA, README, and Handoff | v1.18 | 1/1 | Complete | 2026-05-26 |
+| 113. Source Safety and German Style Study | v1.19 | 0/1 | Planned | — |
+| 114. Cross-Locale Copy Rules and Review Matrix | v1.19 | 0/1 | Planned | — |
+| 115. Core Locale Copy Refinement | v1.19 | 0/1 | Planned | — |
+| 116. Locale Layout Adaptation and Component Fit | v1.19 | 0/1 | Planned | — |
+| 117. Cross-Locale Visual QA, README, and Handoff | v1.19 | 0/1 | Planned | — |
