@@ -30,126 +30,132 @@
 - ✅ **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (implemented 2026-05-26)
 - ✅ **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (implemented 2026-05-26)
 - ✅ **v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization** - Phases 153-158 (implemented 2026-05-26)
+- 🔄 **v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement** - Phases 159-164 (planned 2026-05-26)
 
 ## Phases
 
-- [x] **Phase 153: Practice Interaction Research and Contract Definition** - Convert research into Phase 29 design constraints, docs, and frontend/demo context contracts.
-- [x] **Phase 154: Practice Lesson Interaction Refinement** - Refine lesson start, challenge, feedback, hint, retry, result, and mistakes review interaction.
-- [x] **Phase 155: Practice to Learning Chat Transition** - Add challenge-context handoff, Chat context card, and Back to lesson behavior.
-- [x] **Phase 156: Practice to Teacher Support Escalation** - Add delayed teacher-support escalation and practice context for teacher requests.
-- [x] **Phase 157: Learning Platform Entry IA and Parent Activity Integration** - Reorganize homepage, Student Dashboard, navigation, and Parent Report framing around unified learning activity.
-- [x] **Phase 158: Localization, Demo QA, README, and Final Verification** - Add four-language labels, QA docs, integrated demo flow, README update, build, and browser smoke.
+- [ ] **Phase 159: Final Demo Curriculum Package** - Lock and document the equation-focused demo curriculum package and its limitations.
+- [ ] **Phase 160: Integrated Product Story and Demo Scripts** - Package Practice, Learning Chat, teacher support, and Parent Report into 3, 10, and 15 minute demo narratives.
+- [ ] **Phase 161: External Testing Task Sheets and Plan** - Prepare student, parent, tutor, stakeholder, and internal-review testing materials.
+- [ ] **Phase 162: Feedback Collection and Evaluation Framework** - Define structured feedback forms, role-specific questions, severity tags, and follow-up handling.
+- [ ] **Phase 163: Parent Value Framing and Future Handoff Requirements** - Refine parent-facing value language and document future curriculum/backend/backlog needs.
+- [ ] **Phase 164: README, Demo QA, and Milestone Handoff** - Update README, verify the existing demo flow, run build, and summarize risks and next steps.
 
 ## Phase Details
 
-### Phase 153: Practice Interaction Research and Contract Definition
+### Phase 159: Final Demo Curriculum Package
 
-**Goal**: Phase 29 has research-backed UI constraints and frontend/demo contracts before implementation starts.
-**Depends on**: Phase 152
-**Requirements**: SCOPE29-01, SCOPE29-02, SCOPE29-03, CHAT29-01, TEACH29-03, DOC29-01
+**Goal**: The equation-focused final demo curriculum is clearly packaged, scoped, and limited.
+**Depends on**: Phase 158
+**Requirements**: CURR30-01, CURR30-02, CURR30-03, CURR30-04, CURR30-05
 **Success Criteria** (what must be TRUE):
-  1. Research docs explain which Duolingo-style mechanics STOA adapts and which gamification patterns it avoids.
-  2. Practice interaction docs define lesson start, challenge, feedback, hint, retry, result, and mistakes review behavior.
-  3. `PracticeChatContext` and `PracticeTeacherRequestContext` contracts are documented and/or typed for frontend/demo use.
-  4. Scope docs confirm no new curriculum, production backend, database, adaptive learning, or game-first features.
-**Plans**: 153-PLAN.md
-**UI hint**: yes
+  1. `docs/curriculum/final-demo-curriculum-package/` contains overview, equation path summary, unit demo docs, flow docs, parent report summary, limitations, and future curriculum requirements.
+  2. The package locks the demo to lower-secondary Mathematics equations and excludes geometry, probability, physics, trigonometry, calculus, advanced functions, and broad course libraries.
+  3. Unit summaries explain linear equations, quadratic equations, and linear systems in terms that students, parents, and teachers can understand.
+  4. The rationale for choosing equations is clear and suitable for external demo narration.
+  5. Demo limitations are explicit and do not weaken the core story by overclaiming real curriculum coverage.
+**Plans**: 159-PLAN.md
+**UI hint**: no
 
-### Phase 154: Practice Lesson Interaction Refinement
+### Phase 160: Integrated Product Story and Demo Scripts
 
-**Goal**: Existing equation Practice lessons feel smoother, more stable, and easier to demonstrate.
-**Depends on**: Phase 153
-**Requirements**: PRACTICE29-01, PRACTICE29-02, PRACTICE29-03, PRACTICE29-04, PRACTICE29-05, PRACTICE29-06, PRACTICE29-07
+**Goal**: STOA's existing Practice, Chat, teacher support, and Parent Report surfaces read as one product story.
+**Depends on**: Phase 159
+**Requirements**: STORY30-01, STORY30-02, STORY30-03, STORY30-04, STORY30-05
 **Success Criteria** (what must be TRUE):
-  1. Lesson start screen sets expectations before the first challenge.
-  2. Challenge screen uses stable layout for progress, prompt, answer control, attempts, and primary action.
-  3. Correct and incorrect feedback panels are calm, specific, and visually stable.
-  4. Hint and retry flow does not reveal the final answer first and does not cause large layout jumps.
-  5. Lesson result and mistakes review provide clear next actions without failure language.
-**Plans**: 154-PLAN.md
-**UI hint**: yes
+  1. A single product story statement exists in English, German, French, and Italian or is ready for localization.
+  2. A 10-minute script covers Homepage, Dashboard, Practice, mistake, hint, Explain this step, Learning Chat, teacher support, and Parent Report.
+  3. A 3-minute script covers the fastest credible Practice -> hint -> Learning Chat -> Parent Report narrative.
+  4. A 15-minute stakeholder script explains positioning, student value, parent value, teacher support, learning data, pricing/growth direction, and roadmap boundaries.
+  5. Scripts avoid internal terms such as mock, demo backend, provider names, debug labels, and implementation details.
+**Plans**: 160-PLAN.md
+**UI hint**: no
 
-### Phase 155: Practice to Learning Chat Transition
+### Phase 161: External Testing Task Sheets and Plan
 
-**Goal**: A student who gets stuck in Practice can move into Learning Chat with context and return to the lesson.
-**Depends on**: Phase 154
-**Requirements**: CHAT29-02, CHAT29-03, CHAT29-04, CHAT29-05, CHAT29-06
+**Goal**: External testers can exercise the final demo consistently by role.
+**Depends on**: Phase 160
+**Requirements**: TEST30-01, TEST30-02, TEST30-03, TEST30-04, TEST30-05
 **Success Criteria** (what must be TRUE):
-  1. `Explain this step` opens Learning Chat with the active challenge context.
-  2. Result and mistake review states can open Learning Chat with relevant practice context.
-  3. Chat renders a practice context card instead of looking like a cold-start conversation.
-  4. Chat provides `Back to lesson` when a return path is present.
-  5. Visible copy uses Learning Assistant / Learning Chat language, not `AI help`.
-**Plans**: 155-PLAN.md
-**UI hint**: yes
+  1. External testing plan defines tester groups, goals, session setup, timing, facilitation notes, and success signals.
+  2. Student task sheet walks through Dashboard -> Practice -> intentional mistake -> hint -> Explain this step -> Chat -> back to lesson -> completion.
+  3. Parent task sheet walks through child overview/report and asks the tester to interpret learning activity, questions, teacher support, and recommendations.
+  4. Tutor task sheet walks through a Practice-origin request and context sufficiency review.
+  5. Internal reviewer checklist supports 3, 10, and 15 minute rehearsal passes.
+**Plans**: 161-PLAN.md
+**UI hint**: no
 
-### Phase 156: Practice to Teacher Support Escalation
+### Phase 162: Feedback Collection and Evaluation Framework
 
-**Goal**: Teacher support appears at the right time and carries useful practice context.
-**Depends on**: Phase 155
-**Requirements**: TEACH29-01, TEACH29-02, TEACH29-04, TEACH29-05
+**Goal**: Feedback from students, parents, tutors, and stakeholders can be captured and triaged consistently.
+**Depends on**: Phase 161
+**Requirements**: FEED30-01, FEED30-02, FEED30-03, FEED30-04, FEED30-05
 **Success Criteria** (what must be TRUE):
-  1. First incorrect answer does not show teacher support as the primary next action.
-  2. Repeated incorrect attempts, hint use, Learning Assistant explanation, or explicit stuck intent can reveal teacher support.
-  3. Student-facing copy asks whether a teacher should explain the step without implying failure.
-  4. Teacher/tutor request UI or mock context shows practice topic/challenge/attempt details when available.
-**Plans**: 156-PLAN.md
-**UI hint**: yes
+  1. Feedback form covers clarity, ease of use, learning value, trust, parent visibility, teacher support, visual design, language clarity, confusing moments, and suggestions.
+  2. Student questions test next-step clarity, hint usefulness, explanation usefulness, homework relevance, and teacher-support timing.
+  3. Parent questions test report comprehension, value, trust, at-home visibility, and missing information.
+  4. Tutor questions test context sufficiency, student struggle visibility, workflow clarity, and teaching efficiency.
+  5. Feedback triage guidance separates observation, severity, audience, follow-up, and Phase 31 backlog candidate status.
+**Plans**: 162-PLAN.md
+**UI hint**: no
 
-### Phase 157: Learning Platform Entry IA and Parent Activity Integration
+### Phase 163: Parent Value Framing and Future Handoff Requirements
 
-**Goal**: Practice and Learning Chat read as connected learning paths across homepage, dashboard, navigation, and parent report.
-**Depends on**: Phase 156
-**Requirements**: IA29-01, IA29-02, IA29-03, IA29-04, IA29-05, PARENT29-01, PARENT29-02, PARENT29-03
+**Goal**: Parent-facing value and future implementation needs are documented without expanding Phase 30 product scope.
+**Depends on**: Phase 162
+**Requirements**: PARENT30-01, PARENT30-02, PARENT30-03, PARENT30-04, FUTURE30-01, FUTURE30-02, FUTURE30-03, FUTURE30-04
 **Success Criteria** (what must be TRUE):
-  1. Homepage entry copy explains that students can practice step by step or ask a question when stuck.
-  2. Student navigation labels Dashboard, Practice, Learning Chat, History, and Profile clearly.
-  3. Student Dashboard makes Continue Practice and Ask a question distinct but connected.
-  4. Practice/Chat breadcrumbs or return behavior prevent students from feeling lost.
-  5. Parent Report presents questions, practice, mistakes, teacher support, and next recommendations as one learning activity story.
-**Plans**: 157-PLAN.md
-**UI hint**: yes
+  1. Parent value framing explains Practice and Chat as one learning activity with supportive language.
+  2. Parent report guidance covers what the child practised, what is improving, what still benefits from practice, when Learning Assistant helped, and when teacher support may help.
+  3. Parent copy rules explicitly reject failure, weakness, ranking, and anxiety wording.
+  4. Future curriculum requirements define how to expand beyond equations later without broadening Phase 30.
+  5. Future backend integration requirements cover persisted progress, Practice-to-Chat context, teacher request context, feedback capture, and reporting data.
+  6. Next-iteration backlog separates Phase 31 demo refinements from later real product/backend/curriculum work.
+**Plans**: 163-PLAN.md
+**UI hint**: no
 
-### Phase 158: Localization, Demo QA, README, and Final Verification
+### Phase 164: README, Demo QA, and Milestone Handoff
 
-**Goal**: Phase 29 is documented, localized, buildable, and demonstrable end to end.
-**Depends on**: Phase 157
-**Requirements**: LANG29-01, LANG29-02, QA29-01, QA29-02, README29-01
+**Goal**: Phase 30 is documented, verified, and ready to move into external testing or Phase 31 demo rehearsal.
+**Depends on**: Phase 163
+**Requirements**: DOC30-01, DOC30-02, QA30-01, QA30-02, QA30-03
 **Success Criteria** (what must be TRUE):
-  1. EN/DE/FR/IT labels cover Explain this step, Ask in Learning Chat, Back to lesson, Ask a question, and teacher escalation copy.
-  2. Multilingual labels fit mobile and desktop controls.
-  3. QA docs cover Practice interaction, Practice-to-Chat, Practice-to-teacher, overall layout, parent report, and demo flow.
-  4. Browser smoke covers Homepage -> Dashboard -> Practice -> hint -> Chat context -> Back to lesson -> completion -> Parent Report.
-  5. `npm run build` passes and README includes Phase 29 guidance.
-**Plans**: 158-PLAN.md
-**UI hint**: yes
+  1. Required curriculum, testing, feedback, demo, and handoff documents exist in their requested directories.
+  2. README explains Phase 30 scope, product story, external testing plan, exclusions, and next milestone entry.
+  3. Verification confirms the existing Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report story remains coherent.
+  4. `npm run build` passes.
+  5. Final handoff records remaining risks, external-testing assumptions, and the reason no new feature scope was added.
+**Plans**: 164-PLAN.md
+**UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 153. Practice Interaction Research and Contract Definition | 1/1 | Complete | 2026-05-26 |
-| 154. Practice Lesson Interaction Refinement | 1/1 | Complete | 2026-05-26 |
-| 155. Practice to Learning Chat Transition | 1/1 | Complete | 2026-05-26 |
-| 156. Practice to Teacher Support Escalation | 1/1 | Complete | 2026-05-26 |
-| 157. Learning Platform Entry IA and Parent Activity Integration | 1/1 | Complete | 2026-05-26 |
-| 158. Localization, Demo QA, README, and Final Verification | 1/1 | Complete | 2026-05-26 |
+| 159. Final Demo Curriculum Package | 0/1 | Pending | — |
+| 160. Integrated Product Story and Demo Scripts | 0/1 | Pending | — |
+| 161. External Testing Task Sheets and Plan | 0/1 | Pending | — |
+| 162. Feedback Collection and Evaluation Framework | 0/1 | Pending | — |
+| 163. Parent Value Framing and Future Handoff Requirements | 0/1 | Pending | — |
+| 164. README, Demo QA, and Milestone Handoff | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 153 | 6 | SCOPE29-01, SCOPE29-02, SCOPE29-03, CHAT29-01, TEACH29-03, DOC29-01 |
-| 154 | 7 | PRACTICE29-01, PRACTICE29-02, PRACTICE29-03, PRACTICE29-04, PRACTICE29-05, PRACTICE29-06, PRACTICE29-07 |
-| 155 | 5 | CHAT29-02, CHAT29-03, CHAT29-04, CHAT29-05, CHAT29-06 |
-| 156 | 4 | TEACH29-01, TEACH29-02, TEACH29-04, TEACH29-05 |
-| 157 | 8 | IA29-01, IA29-02, IA29-03, IA29-04, IA29-05, PARENT29-01, PARENT29-02, PARENT29-03 |
-| 158 | 5 | LANG29-01, LANG29-02, QA29-01, QA29-02, README29-01 |
+| 159 | 5 | CURR30-01, CURR30-02, CURR30-03, CURR30-04, CURR30-05 |
+| 160 | 5 | STORY30-01, STORY30-02, STORY30-03, STORY30-04, STORY30-05 |
+| 161 | 5 | TEST30-01, TEST30-02, TEST30-03, TEST30-04, TEST30-05 |
+| 162 | 5 | FEED30-01, FEED30-02, FEED30-03, FEED30-04, FEED30-05 |
+| 163 | 8 | PARENT30-01, PARENT30-02, PARENT30-03, PARENT30-04, FUTURE30-01, FUTURE30-02, FUTURE30-03, FUTURE30-04 |
+| 164 | 5 | DOC30-01, DOC30-02, QA30-01, QA30-02, QA30-03 |
 
-**Total requirements:** 35
-**Mapped requirements:** 35
+**Total requirements:** 33
+**Mapped requirements:** 33
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Milestone v1.27 implementation is complete. Recommended next milestone: Phase 30 Final Demo Curriculum Packaging, External Testing, and Product Story Refinement.
+**Phase 159: Final Demo Curriculum Package** — Lock and document the equation-focused demo curriculum package and its limitations.
+
+`$gsd-plan-phase 159`

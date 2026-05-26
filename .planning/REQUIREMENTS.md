@@ -98,45 +98,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CURR30-01 | TBD | Pending |
-| CURR30-02 | TBD | Pending |
-| CURR30-03 | TBD | Pending |
-| CURR30-04 | TBD | Pending |
-| CURR30-05 | TBD | Pending |
-| STORY30-01 | TBD | Pending |
-| STORY30-02 | TBD | Pending |
-| STORY30-03 | TBD | Pending |
-| STORY30-04 | TBD | Pending |
-| STORY30-05 | TBD | Pending |
-| TEST30-01 | TBD | Pending |
-| TEST30-02 | TBD | Pending |
-| TEST30-03 | TBD | Pending |
-| TEST30-04 | TBD | Pending |
-| TEST30-05 | TBD | Pending |
-| FEED30-01 | TBD | Pending |
-| FEED30-02 | TBD | Pending |
-| FEED30-03 | TBD | Pending |
-| FEED30-04 | TBD | Pending |
-| FEED30-05 | TBD | Pending |
-| PARENT30-01 | TBD | Pending |
-| PARENT30-02 | TBD | Pending |
-| PARENT30-03 | TBD | Pending |
-| PARENT30-04 | TBD | Pending |
-| FUTURE30-01 | TBD | Pending |
-| FUTURE30-02 | TBD | Pending |
-| FUTURE30-03 | TBD | Pending |
-| FUTURE30-04 | TBD | Pending |
-| DOC30-01 | TBD | Pending |
-| DOC30-02 | TBD | Pending |
-| QA30-01 | TBD | Pending |
-| QA30-02 | TBD | Pending |
-| QA30-03 | TBD | Pending |
+| CURR30-01 | Phase 159 | Pending |
+| CURR30-02 | Phase 159 | Pending |
+| CURR30-03 | Phase 159 | Pending |
+| CURR30-04 | Phase 159 | Pending |
+| CURR30-05 | Phase 159 | Pending |
+| STORY30-01 | Phase 160 | Pending |
+| STORY30-02 | Phase 160 | Pending |
+| STORY30-03 | Phase 160 | Pending |
+| STORY30-04 | Phase 160 | Pending |
+| STORY30-05 | Phase 160 | Pending |
+| TEST30-01 | Phase 161 | Pending |
+| TEST30-02 | Phase 161 | Pending |
+| TEST30-03 | Phase 161 | Pending |
+| TEST30-04 | Phase 161 | Pending |
+| TEST30-05 | Phase 161 | Pending |
+| FEED30-01 | Phase 162 | Pending |
+| FEED30-02 | Phase 162 | Pending |
+| FEED30-03 | Phase 162 | Pending |
+| FEED30-04 | Phase 162 | Pending |
+| FEED30-05 | Phase 162 | Pending |
+| PARENT30-01 | Phase 163 | Pending |
+| PARENT30-02 | Phase 163 | Pending |
+| PARENT30-03 | Phase 163 | Pending |
+| PARENT30-04 | Phase 163 | Pending |
+| FUTURE30-01 | Phase 163 | Pending |
+| FUTURE30-02 | Phase 163 | Pending |
+| FUTURE30-03 | Phase 163 | Pending |
+| FUTURE30-04 | Phase 163 | Pending |
+| DOC30-01 | Phase 164 | Pending |
+| DOC30-02 | Phase 164 | Pending |
+| QA30-01 | Phase 164 | Pending |
+| QA30-02 | Phase 164 | Pending |
+| QA30-03 | Phase 164 | Pending |
 
 **Coverage:**
 - v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33
+- Mapped to phases: 33
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after v1.28 requirements definition*
+*Last updated: 2026-05-26 after v1.28 roadmap creation*

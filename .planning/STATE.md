@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.28
 milestone_name: "Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement"
-status: planning
-last_updated: "2026-05-26T20:52:00.524Z"
+status: roadmap_ready
+last_updated: "2026-05-26T21:05:00.000Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 6
   completed_plans: 0
   percent: 0
 ---
@@ -20,38 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.27 complete. Recommended next milestone: Phase 30 Final Demo Curriculum Packaging, External Testing, and Product Story Refinement.
+**Current focus:** v1.28 Phase 30 packages the existing Practice Path, Learning Chat, teacher support, and Parent Report flow into a final external demo curriculum story with testing materials, feedback capture, and future handoff requirements.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.28 started
+Phase: 159 of 164 (0 of 6 in v1.28)
+Plan: Roadmap created; Phase 159 ready for planning
+Status: Ready to plan Phase 159
+Last activity: 2026-05-26 — Milestone v1.28 requirements and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6 of 6
-- Average duration: same-session milestone execution
-- Total execution time: same-session milestone execution
+- Total plans completed this milestone: 0 of 6
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 153 | 1/1 | Complete | same session |
-| 154 | 1/1 | Complete | same session |
-| 155 | 1/1 | Complete | same session |
-| 156 | 1/1 | Complete | same session |
-| 157 | 1/1 | Complete | same session |
-| 158 | 1/1 | Complete | same session |
+| 159 | 0/1 | Pending | — |
+| 160 | 0/1 | Pending | — |
+| 161 | 0/1 | Pending | — |
+| 162 | 0/1 | Pending | — |
+| 163 | 0/1 | Pending | — |
+| 164 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 154, 155, 156, 157, 158 complete
-- Trend: frontend interaction and IA milestone completed in one autonomous pass
+- Last 5 plans: none in v1.28 yet
+- Trend: roadmap ready; execution not started
 
 *Updated after each plan completion*
 
@@ -75,10 +75,14 @@ Recent decisions affecting current work:
 - Phase 29 research should use Duolingo-style interaction mechanics as analogy only, not visual or backend source material.
 - Phase 29 uses frontend route state for Practice-to-Chat context and keeps production persistence deferred.
 - Phase 29 keeps teacher support as a tertiary escalation after hint/retry or repeated confusion.
+- v1.28 continues roadmap numbering from Phase 159 after v1.27 ended at Phase 158.
+- Phase 30 skips new domain research by user instruction and focuses on packaging, testing materials, product story, feedback capture, parent value framing, and future handoff docs.
+- Phase 30 does not expand curriculum, UI functionality, backend/database scope, CMS, payment, formal teacher scheduling, or large UI redesign.
+- Phase 30 keeps the final demo curriculum locked to lower-secondary equations.
 
 ### Pending Todos
 
-- Phase 30 should package Chat + Practice + Parent Report into a complete external demo story and prepare feedback collection.
+- Phase 159 should create the final demo curriculum package under `docs/curriculum/final-demo-curriculum-package/`.
 
 ### Blockers/Concerns
 
