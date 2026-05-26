@@ -1,5 +1,29 @@
 # Milestones
 
+## v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement (Shipped: 2026-05-26)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.28-MILESTONE-AUDIT.md`
+**Known deferred items at close:** 21 unrelated open debug/quick artifacts acknowledged in `.planning/STATE.md`.
+
+### Delivered
+
+- Final equation demo curriculum package for the lower-secondary Mathematics Practice Path.
+- Product story statements and 3-minute, 10-minute, and 15-minute demo scripts.
+- Student, parent, tutor, stakeholder, and internal reviewer external testing materials.
+- Structured feedback form, role-specific feedback questions, severity model, and evaluation guidance.
+- Parent value framing and learning report integration guidance for Practice plus Learning Chat activity.
+- Future curriculum requirements, future backend handoff requirements, and Phase 31 follow-up backlog.
+- README Phase 30 guidance, final demo story QA, handoff notes, and build verification.
+
+### Verification
+
+- `npm run build`: passed with the existing Node `DEP0205` deprecation warning from tooling.
+- `gsd-sdk query roadmap.analyze`: 6/6 phases complete, 6/6 plans, 100% progress.
+- Milestone audit: passed with 33/33 requirements satisfied and no critical gaps.
+
+---
+
 ## v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization (Shipped: 2026-05-26)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

@@ -10,35 +10,32 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
+## Latest Shipped Milestone: v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA Practice Path now has a smoother lesson start/challenge/feedback/hint/retry/result loop, Practice-to-Learning-Chat context handoff, Chat practice context card, Back to lesson behavior, delayed teacher-support escalation with practice context, reorganized student learning entry points, homepage learning-entry framing, unified parent learning activity summary, four-language action copy, Phase 29 docs, README guidance, and verified build/browser smoke coverage.
-
-**Target features:**
-- Research-backed Practice interaction refinements adapted from Duolingo-style mechanics without copying its visual/product/backend model.
-- Lesson intro, stable challenge flow, calm feedback, hint-first retry, result summary, and mistakes review actions.
-- Practice-to-Learning-Chat route-state context and Chat practice context card.
-- Back to lesson flow from Chat.
-- Teacher support shown after repeated confusion with practice context.
-- Dashboard, homepage, navigation, parent report, docs, localization, QA, README, build, and browser smoke.
-
-## Current Milestone: v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement
-
-**Goal:** Package the existing Practice Path, Learning Chat, teacher support, and Parent Report surfaces into a focused external demo curriculum story with testing materials, feedback capture, and future curriculum/backend handoff guidance while avoiding new feature expansion.
+**Delivered:** STOA now has a final equation demo curriculum package, integrated product story statements, 3/10/15 minute demo scripts, role-specific external testing task sheets, structured feedback forms, parent value framing, future curriculum/backend handoff requirements, Phase 31 backlog guidance, README handoff, and verified build evidence.
 
 **Target features:**
 - Final demo curriculum package for the equation-focused Practice Path.
-- Locked product story connecting Practice, hint-first help, Learning Chat, professional teacher support, and Parent Report visibility.
+- Product story connecting Practice, hint-first help, Learning Chat, professional teacher support, and Parent Report visibility.
 - Student, parent, tutor, investor, and stakeholder demo scripts/task sheets for external testing.
 - External testing plan, feedback form, role-specific feedback questions, and evaluation guidance.
 - Parent value framing and integrated learning-report narrative for Practice plus Chat activity.
 - Future real curriculum requirements, future backend integration requirements, next-iteration backlog, README handoff, and demo documentation.
 
+## Current Milestone: Awaiting Phase 31
+
+**Goal:** Define the next milestone from Phase 30 external demo rehearsal, feedback review, and Practice story refinement needs.
+
+**Target features:**
+- Phase 31 scope should be defined through `$gsd-new-milestone`.
+- Recommended direction: external demo rehearsal, feedback review, and Practice story refinement.
+- Keep broad curriculum, production backend, CMS, and formal teacher operations deferred until explicitly scoped.
+
 ## Current State
 
-**Latest shipped milestone:** v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
+**Latest shipped milestone:** v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -70,6 +67,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 27 Practice Path frontend/demo integration with `/practice`, subject path, lesson flow, challenge feedback, hint flow, lesson result, mistakes review, Student Dashboard practice summary, Parent Report practice summary, API contracts, mock data, and four-language Practice copy.
 - Phase 28 Practice Path QA and equation demo polishing with an equation-only Mathematics path, refined lesson content, challenge-specific feedback, hint-first support behavior, parent summary copy, demo scenario docs, content QA, and verified build/browser smoke.
 - Phase 29 Practice Path interaction and learning-entry integration with lesson intro, stable challenge/feedback/hint/retry flow, Practice-to-Learning-Chat context handoff, Chat context card, Back to lesson, delayed teacher escalation, Dashboard/homepage IA polish, unified Parent Report learning activity, docs, localization, build, and browser smoke.
+- Phase 30 final demo curriculum packaging with an equation-focused curriculum package, product story statements, 3/10/15 minute demo scripts, role-specific external testing task sheets, feedback form and evaluation framework, parent value framing, future curriculum/backend handoff requirements, Phase 31 follow-up backlog, README handoff, milestone audit, and build verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -103,13 +101,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify local demo Learning Assistant provider integration with Python prompt harness, internal Codex provider adapter, template fallback, provider health check, response behavior tests, FastAPI chat integration, QA docs, README guidance, and future provider handoff notes — v1.23
 - ✓ Developers can run and verify Learning Assistant functional QA, multi-turn regression tests, evaluator/prompt/fallback stabilization, regression reporting, and full demo-flow behavior checks — v1.24
 - ✓ Developers can run and verify Practice Path interaction refinements, Practice-to-Learning-Chat context handoff, delayed teacher escalation, unified dashboard/homepage/parent learning activity framing, four-language labels, docs, build, and browser smoke — v1.27
+- ✓ Developers can use the final equation demo curriculum package, product story scripts, role-specific external testing materials, feedback framework, parent value framing, future handoff requirements, README guidance, audit evidence, and build verification — v1.28
 
 ### Active
 
-- [ ] Package the existing equation Practice Path into a final demo curriculum experience — v1.28
-- [ ] Define external testing tasks and feedback collection for students, parents, tutors, and stakeholders — v1.28
-- [ ] Refine the product story and demo scripts around Practice, Learning Chat, teacher support, and Parent Report visibility — v1.28
-- [ ] Document future real curriculum and backend integration requirements without implementing new backend scope — v1.28
+(None — v1.28 implementation is complete. Next active scope should be defined by Phase 31.)
 
 ### Out of Scope
 
@@ -364,4 +360,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after v1.28 milestone start*
+*Last updated: 2026-05-26 after v1.28 milestone completion*

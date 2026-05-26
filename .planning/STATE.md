@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.28
 milestone_name: "Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement"
-status: milestone_complete
-last_updated: "2026-05-26T21:05:00.000Z"
-last_activity: 2026-05-26
+status: Awaiting next milestone
+stopped_at: v1.26 Phase 28 implementation complete and verified.
+last_updated: "2026-05-26T21:09:06.329Z"
+last_activity: 2026-05-26 — Milestone v1.28 completed and archived
 progress:
   total_phases: 6
   completed_phases: 6
@@ -24,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 164 of 164 (6 of 6 in v1.28)
-Plan: Phase 30 final demo curriculum packaging complete
-Status: Milestone complete
-Last activity: 2026-05-26 — README, demo QA, build verification, and milestone handoff completed.
+Phase: Milestone v1.28 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-26 — Milestone v1.28 completed and archived
 
 ## Performance Metrics
 
@@ -92,6 +93,32 @@ Recent decisions affecting current work:
 
 ## Deferred Items
 
+Items acknowledged and deferred at milestone close on 2026-05-26:
+
+| Category | Item | Status |
+|----------|------|--------|
+| debug_session | chat-new-conversation-icon | investigating |
+| quick_task | 260526-qec-show-teacher-online-availability-status- | unknown |
+| quick_task | 260526-qm3-refocus-the-parents-landing-page-on-chil | unknown |
+| quick_task | 260526-qpm-make-homepage-live-explanation-card-link | unknown |
+| quick_task | 260526-qro-make-homepage-professional-teacher-suppo | unknown |
+| quick_task | 260526-qtt-polish-homepage-teacher-support-headline | unknown |
+| quick_task | 260526-qvw-polish-homepage-swiss-school-trust-copy | unknown |
+| quick_task | 260526-qyj-remove-duplicate-homepage-bottom-cta-cop | unknown |
+| quick_task | 260526-r10-change-public-tutors-navigation-copy-to- | unknown |
+| quick_task | 260526-r36-improve-footer-language-switcher-styling | unknown |
+| quick_task | 260526-r6i-clarify-registration-step-label-copy | unknown |
+| quick_task | 260526-ral-clean-up-pricing-page-layout | unknown |
+| quick_task | 260526-rfo-update-subscription-tier-definitions-and | unknown |
+| quick_task | 260526-rna-clarify-parent-page-mastery-progress-lab | unknown |
+| quick_task | 260526-rs6-fix-student-dashboard-open-chat-button-r | unknown |
+| quick_task | 260526-rvj-fix-student-dashboard-sidebar-active-nav | unknown |
+| quick_task | 260526-ry4-add-authenticated-dashboard-top-navigati | unknown |
+| quick_task | 260526-s11-make-student-login-redirect-to-dashboard | unknown |
+| quick_task | 260526-sbd-make-dashboard-top-account-menu-less-cro | unknown |
+| quick_task | 260526-se4-change-dashboard-top-stoa-link-to-homepa | unknown |
+| quick_task | 260526-sh9-show-student-name-in-dashboard-top-accou | unknown |
+
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
 | Practice content QA | Full content accuracy and demo scenario polishing | Future Requirements | v1.25 requirements |
@@ -103,3 +130,7 @@ Recent decisions affecting current work:
 Last session: 2026-05-26 21:05 UTC
 Stopped at: v1.26 Phase 28 implementation complete and verified.
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
