@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.28
-milestone_name: "Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement"
-status: Awaiting next milestone
-stopped_at: v1.26 Phase 28 implementation complete and verified.
-last_updated: "2026-05-26T21:09:06.329Z"
-last_activity: 2026-05-26 — Milestone v1.28 completed and archived
+milestone: v1.29
+milestone_name: "Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment"
+status: planning
+last_updated: "2026-05-26T22:00:56.518Z"
+last_activity: 2026-05-26
 progress:
   total_phases: 6
-  completed_phases: 6
+  completed_phases: 0
   total_plans: 6
-  completed_plans: 6
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,38 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.28 Phase 30 packages the existing Practice Path, Learning Chat, teacher support, and Parent Report flow into a final external demo curriculum story with testing materials, feedback capture, and future handoff requirements.
+**Current focus:** v1.29 Phase 31 integrates Practice Path into the homepage, student dashboard, parent surfaces, tutor surfaces, navigation, four-language copy, demo script, and QA as a low-friction entry into Learning Chat while preserving STOA's product hierarchy.
 
 ## Current Position
 
-Phase: Milestone v1.28 complete
+Phase: 165 Practice Positioning, Research, and Site IA
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-26 — Milestone v1.28 completed and archived
+Status: Milestone planned; ready for phase planning
+Last activity: 2026-05-26 — Milestone v1.29 research, requirements, and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6 of 6
-- Average duration: same-session documentation slice
-- Total execution time: same-session documentation slice
+- Total plans completed this milestone: 0 of 6
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 159 | 1/1 | Complete | same session |
-| 160 | 1/1 | Complete | same session |
-| 161 | 1/1 | Complete | same session |
-| 162 | 1/1 | Complete | same session |
-| 163 | 1/1 | Complete | same session |
-| 164 | 1/1 | Complete | same session |
+| 165 | 0/1 | Planned | — |
+| 166 | 0/1 | Planned | — |
+| 167 | 0/1 | Planned | — |
+| 168 | 0/1 | Planned | — |
+| 169 | 0/1 | Planned | — |
+| 170 | 0/1 | Planned | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 160, 161, 162, 163, 164 complete
-- Trend: Phase 30 documentation and demo packaging milestone complete
+- Last 5 plans: v1.28 Phase 30 plans complete
+- Trend: Phase 31 now moves from milestone definition into Phase 165 planning
 
 *Updated after each plan completion*
 
@@ -80,10 +79,26 @@ Recent decisions affecting current work:
 - Phase 30 skips new domain research by user instruction and focuses on packaging, testing materials, product story, feedback capture, parent value framing, and future handoff docs.
 - Phase 30 does not expand curriculum, UI functionality, backend/database scope, CMS, payment, formal teacher scheduling, or large UI redesign.
 - Phase 30 keeps the final demo curriculum locked to lower-secondary equations.
+- v1.29 continues roadmap numbering from Phase 165 after v1.28 ended at Phase 164.
+- Phase 31 uses webpage-organization research before implementation, focused on IA before navigation, uncluttered public nav, homepage hierarchy, role dashboard hierarchy, and explicit Practice-to-Chat wayfinding.
+- Phase 31 positions Practice as a student learning entry path, not as the full product or a game-platform identity.
+- Learning Chat remains the central explanation surface; professional teacher support remains delayed escalation; Parent Report remains the visibility layer.
+- Public navigation should not add Practice as a top-level item unless a specific product reason is documented.
 
 ### Pending Todos
 
-- Phase 31 should rehearse the external demo, collect feedback, and refine the Practice + Chat + Parent story based on real observations.
+- Plan Phase 165: Practice Positioning, Research, and Site IA.
+- Execute Phase 31 phases 165-170 in order unless the user reprioritizes implementation.
+
+### Quick Tasks Completed
+
+| Date | Task | Verification |
+|------|------|--------------|
+| 2026-05-26 | Fix register account type copy and remove duplicate step label | Browser check on `/register`; `npm run build` |
+| 2026-05-26 | Polish teacher CTA readability and remove footer language switcher | Browser checks on `/teacher-support` and `/register`; `npm run build` |
+| 2026-05-26 | Replace generic human support copy with teacher-specific copy | Browser check on `/teacher-support`; `npm run build` |
+| 2026-05-26 | Create independent categorized Q&A page | Browser checks on `/qa` and `/pricing`; `npm run build` |
+| 2026-05-26 | Improve teacher application CTA readability | Browser check on `/teacher-support`; `npm run build` |
 
 ### Blockers/Concerns
 

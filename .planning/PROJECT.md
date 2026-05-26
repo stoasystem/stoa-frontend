@@ -24,14 +24,21 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Parent value framing and integrated learning-report narrative for Practice plus Chat activity.
 - Future real curriculum requirements, future backend integration requirements, next-iteration backlog, README handoff, and demo documentation.
 
-## Current Milestone: Awaiting Phase 31
+## Current Milestone: v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment
 
-**Goal:** Define the next milestone from Phase 30 external demo rehearsal, feedback review, and Practice story refinement needs.
+**Goal:** Integrate Practice Path into the homepage, student dashboard, parent surfaces, tutor surfaces, navigation, documentation, and demo flow as a low-friction entry into Learning Chat while preserving STOA's hierarchy: Practice starts learning, Learning Chat explains unclear steps, professional teacher support escalates when explanation is not enough, and Parent Report makes the learning process visible.
 
 **Target features:**
-- Phase 31 scope should be defined through `$gsd-new-milestone`.
-- Recommended direction: external demo rehearsal, feedback review, and Practice story refinement.
-- Keep broad curriculum, production backend, CMS, and formal teacher operations deferred until explicitly scoped.
+- Research-backed webpage organization guidance for presenting Practice without turning STOA into a game-first platform.
+- Product-positioning and site IA docs for Practice as student entry, Learning Chat as explanation center, teacher support as escalation, and Parent Report as visibility layer.
+- Homepage Practice entry section and restrained Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report flow.
+- Student Dashboard reorganization around Continue Practice and Ask a Question / Open Learning Chat.
+- Practice feedback, repeated-error, and lesson-result CTA rules for hint, explanation, and delayed teacher escalation.
+- Learning Chat Practice context card and Back to lesson return flow.
+- Parent Dashboard and Parent Report learning activity framing that combines Practice and Chat.
+- Tutor Request Detail Practice context for source, topic, question, student answer, attempts, hint state, and Chat explanation state.
+- Public, student, parent, and tutor navigation alignment without overcrowding the public navbar.
+- Four-language core copy, demo script, QA checklist, README update, build verification, and browser/manual flow verification.
 
 ## Current State
 
@@ -105,7 +112,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None — v1.28 implementation is complete. Next active scope should be defined by Phase 31.)
+- Practice Path must be positioned as a learning entry path, not the whole STOA product.
+- Homepage must mention Practice without allowing it to overshadow Learning Chat, professional teacher support, or parent visibility.
+- Student Dashboard must make Practice and Learning Chat clearly available while explaining their relationship.
+- Practice must provide clear `Explain this step` and delayed `Ask a teacher` routes after appropriate learning friction.
+- Learning Chat must display Practice context and return to the lesson when opened from Practice.
+- Parent pages must express Practice and Chat as one learning activity rather than disconnected modules.
+- Tutor pages must expose Practice-origin context so teachers can understand where the student got stuck.
+- Navigation and Q&A organization must stay clear, task-oriented, and not overcrowded.
+- English, German, French, and Italian copy must remain natural, concise, and consistent with STOA's calm premium education tone.
+- README, QA checklist, and demo script must explain the integrated Practice-as-Learning-Chat-entry flow.
 
 ### Out of Scope
 
@@ -243,6 +259,11 @@ Current codebase facts:
 - **Phase 30 demo curriculum lock**: The final demo curriculum remains Mathematics equations for lower-secondary learners: linear equations in one variable, simple quadratic equations, and linear systems in two variables.
 - **Phase 30 external testing boundary**: Testing materials and feedback capture can prepare external review, but they do not implement formal research operations, analytics pipelines, CRM systems, or production data collection.
 - **Phase 30 product story boundary**: Product storytelling should make the Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report flow understandable without exposing mock/demo/backend/provider terminology to external audiences.
+- **Phase 31 positioning boundary**: Practice Path is a low-friction student learning entry, not a replacement for Learning Chat, teacher support, Parent Report, or STOA's broader learning platform positioning.
+- **Phase 31 public navigation boundary**: Practice should not be added as a top-level public navbar item unless a specific product reason is documented; it belongs primarily in authenticated student navigation and homepage explanation.
+- **Phase 31 implementation boundary**: Phase 31 may add frontend components, route-state/mock contracts, copy, docs, and QA, but must not add formal backend/database/CMS/payment infrastructure or broad curriculum expansion.
+- **Phase 31 gamification boundary**: Keep progress, hints, and short practice sessions calm and education-centered; do not add shops, gems, hearts, cartoon rewards, leaderboards, or game-first CTAs.
+- **Phase 31 research guidance**: Webpage organization should follow the Phase 31 research note: define IA before navigation, keep public navigation task-oriented, make homepage Practice a concrete example, prioritize role dashboards by next action, and add explicit wayfinding for Practice-to-Chat flows.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -341,6 +362,9 @@ Current codebase facts:
 | Keep Phase 30 as demo packaging, not feature expansion | The next value is a clear external product story, testing kit, and curriculum/backend handoff, not more UI surfaces or curriculum breadth | — Pending |
 | Lock the final demo around equations | Equations are familiar to parents, easy to scaffold step by step, and strong for showing hints, guided explanations, and teacher escalation | — Pending |
 | Treat external testing as structured feedback preparation | Phase 30 should prepare task sheets and feedback forms so later testing is consistent, without building a production research platform | — Pending |
+| Keep Phase 31 focused on Practice as entry, not product replacement | Practice should create a natural starting point for students while Learning Chat, professional teacher support, and Parent Report remain the main STOA learning-platform hierarchy | — Pending |
+| Research IA and webpage organization before page changes | Phase 31 needs homepage, dashboard, role navigation, wayfinding, and Q&A decisions grounded in IA and UX research rather than visual preference alone | — Pending |
+| Keep public navigation task-oriented and uncluttered | Practice is primarily a student app capability, so the public site should explain it without adding a top-level public Practice island | — Pending |
 
 ## Evolution
 
