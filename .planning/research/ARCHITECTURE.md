@@ -1,54 +1,82 @@
-# Project Research — Architecture
+# Research: Architecture Integration for Phase 29
 
-## Existing Integration Points
+**Milestone:** v1.27 Phase 29
+**Date:** 2026-05-26
 
-Phase 27 already created the Practice architecture:
+## Question
 
-- `src/types/practice.ts`
-- `src/data/mockPractice.ts`
-- `src/services/practice/practiceApi.ts`
-- `src/hooks/practice/*`
-- `src/components/practice/*`
-- `src/pages/practice/*`
-- Dashboard and parent report integration
-- Practice i18n namespace
+How should Practice Path connect to Learning Chat and site navigation without changing the backend architecture?
 
-## Recommended Build Order
+## Integration Points
 
-1. Lock equation path data shape and docs.
-2. Replace broad demo lesson data with an equation-only Mathematics path.
-3. Refine challenge feedback and hint copy in mock data.
-4. Adjust UI copy/components only where the current flow cannot express the improved content.
-5. Update parent summary data and component wording.
-6. Update docs, QA checklist, README.
-7. Run build and browser smoke.
+### Types
 
-## Data Flow
+Add frontend/demo contract types:
 
-The current data flow is sufficient:
+```ts
+export type PracticeChatContext = {
+  source: 'practice'
+  subjectId: string
+  lessonId: string
+  challengeId: string
+  challengePrompt: string
+  studentAnswer?: string
+  correctAnswer?: string
+  topic: string
+  gradeLevel: string
+  returnTo?: string
+}
 
-Practice pages -> hooks -> `practiceApi.ts` -> mock/demo fallback -> `mockPractice.ts`
+export type PracticeTeacherRequestContext = {
+  source: 'practice'
+  subjectId: string
+  lessonId: string
+  challengeId: string
+  topic: string
+  studentAnswer?: string
+  attempts: number
+}
+```
 
-No new persistence model is required. Consistency across dashboard, lessons, results, mistakes, and parent report should come from shared mock data, not page-local hard-coded content.
+### Practice Page
 
-## UI Architecture Notes
+- Lesson page builds `PracticeChatContext` from current challenge state.
+- `Explain this step` navigates to Chat with route state.
+- `Ask a teacher` stays hidden until repeated confusion.
+- Result and mistakes review pages can link to Chat with the relevant challenge context.
 
-The work should stay inside the existing STOA design language:
+### Chat Page
 
-- calm path structure
-- restrained progress
-- clear feedback panels
-- stable buttons
-- no loud reward animations
-- no game shop/gems/hearts
+- Chat reads route state.
+- If `source === 'practice'`, render a compact context card above the conversation or near the input.
+- Pre-fill or seed the input with "Can you explain this step?" where current chat flow supports it.
+- Show `Back to lesson` with the original `returnTo` path.
 
-The demo path should make the first screen visibly about equations, so the Practice overview and subject path should not imply broad Physics practice for this milestone.
+### Teacher Support
 
-## Learning Assistant Boundary
+- Teacher request path can include `practiceContext` in the frontend payload or mock data.
+- Tutor-facing UI should show topic/challenge context if the existing request detail page has a place for it.
+- Do not require production backend persistence in Phase 29.
 
-Practice should not call model providers directly. The frontend can show a practice-context explanation panel or route through existing service boundaries, but the behavior rules remain:
+### Dashboard and IA
 
-- hint first
-- no direct final answer first
-- age-appropriate next-step explanation
-- teacher support after repeated confusion
+- Student Dashboard should present Practice first as the next recommended action, and Chat as the specific-question action.
+- Homepage should use a broad `Start learning` CTA, then split inside the student app.
+- Parent Report should avoid reporting Practice and Chat separately as competing systems; group them into "Learning activity".
+
+## Build Order
+
+1. Document interaction contract and site entry map.
+2. Refine Practice lesson surfaces.
+3. Add Practice-to-Chat route state and Chat context card.
+4. Add teacher escalation context.
+5. Reorganize Dashboard/homepage/parent report entry framing.
+6. Localize, QA, and update demo script.
+
+## Sources
+
+- Reference clone lesson decomposition: https://github.com/sanidhyy/duolingo-clone
+- Raw lesson shell and footer reference:
+  - https://raw.githubusercontent.com/sanidhyy/duolingo-clone/main/app/lesson/quiz.tsx
+  - https://raw.githubusercontent.com/sanidhyy/duolingo-clone/main/app/lesson/footer.tsx
+

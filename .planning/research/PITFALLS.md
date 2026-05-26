@@ -1,43 +1,72 @@
-# Project Research — Pitfalls
+# Research: Pitfalls for Phase 29
 
-## Pitfall: Broad Curriculum Creep
+**Milestone:** v1.27 Phase 29
+**Date:** 2026-05-26
 
-Risk: Adding more topics makes the demo look richer but less teachable.
+## Common Mistakes
 
-Prevention: Keep visible demo content equation-only. Move Physics and unrelated math paths out of the Phase 28 demo surface or mark them as deferred/future.
+### Copying Duolingo Too Literally
 
-## Pitfall: Hints Reveal Answers
+The reference clone has language-learning, hearts, modal, audio, subscription, and full-stack assumptions. STOA should adapt interaction sequencing, not the product category or backend architecture.
 
-Risk: A hint like "the answer is x = 5" breaks the learning behavior and conflicts with Learning Assistant rules.
+Prevention:
 
-Prevention: Review every hint. Hints should name the next operation or check strategy, not the final answer.
+- Keep `Practice Path` as the module name.
+- Avoid shop/gems/leaderboards and loud reward language.
+- Keep attempts neutral and educational.
 
-## Pitfall: Quadratics Become Too Advanced
+### Feedback Panel Layout Shift
 
-Risk: The quadratic unit can drift into high-school formula/discriminant/complex-root territory.
+If feedback, hint, and retry controls appear in different places, the lesson feels unstable.
 
-Prevention: Limit quadratics to recognition, simple factoring, zero-product property, and checking two solutions.
+Prevention:
 
-## Pitfall: Feedback Is Too Generic
+- Reserve a consistent feedback area.
+- Keep primary action fixed.
+- Treat `Explain this step` as secondary and `Ask a teacher` as tertiary.
 
-Risk: "Correct" and "Not quite" alone do not teach.
+### Direct Answer Leakage
 
-Prevention: Correct feedback should name the useful move. Incorrect feedback should identify the next thing to inspect.
+If Chat receives `correctAnswer` and immediately reveals it, Practice becomes answer lookup rather than learning.
 
-## Pitfall: Demo Takes Too Long
+Prevention:
 
-Risk: Too many lessons or questions makes the 3-5 minute demo drag.
+- Chat context card can include the challenge prompt and student answer.
+- Learning Assistant prompt/behavior should explain the next step first.
+- Correct answer can remain in context for internal evaluation but should not be shown as the first visible response.
 
-Prevention: Keep a recommended demo route with one short lesson and one controlled incorrect answer moment.
+### Teacher Escalation Too Early
 
-## Pitfall: Parent Copy Creates Anxiety
+Immediate teacher CTA makes the Learning Assistant feel bypassed and can increase perceived failure.
 
-Risk: Parent summaries can sound like failure reports.
+Prevention:
 
-Prevention: Use neutral activity language and "could benefit from more practice" phrasing. Avoid "failed", "weak", and ranking language.
+- Require repeated wrong attempts, hint usage, or explicit "still don't understand".
+- Use wording like "Would you like a teacher to explain this?"
 
-## Pitfall: UI Claims More Than The Data Supports
+### IA Fragmentation
 
-Risk: The app may appear to have a full curriculum, adaptive learning, or production tracking.
+Adding Practice without reworking entry points can make STOA feel like several unrelated tools.
 
-Prevention: Keep docs and copy clear that Phase 28 is demo content polish. The UI should show a focused path, not a complete course catalog.
+Prevention:
+
+- Dashboard: Practice and Chat as two routes under one learning workflow.
+- Homepage: `Start learning`, not competing Practice/Chat CTAs.
+- Parent Report: unified learning activity summary.
+
+### Over-Gamification
+
+Research on gamification misuse warns that badges, points, leaderboards, and playful pressure can distract from learning if users optimize for rewards rather than understanding.
+
+Prevention:
+
+- Keep progress feedback restrained.
+- Use streak/progress only as supportive context.
+- Avoid punitive hearts and leaderboard competition.
+
+## Sources
+
+- Gamification misuse research: https://arxiv.org/abs/2203.16175
+- Multiple-try feedback and hints: https://link.springer.com/article/10.1007/s11423-022-10105-z
+- Reference clone mechanics: https://github.com/sanidhyy/duolingo-clone
+

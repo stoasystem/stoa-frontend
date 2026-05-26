@@ -1,44 +1,40 @@
-# Project Research — Stack
+# Research: Stack Implications for Phase 29
 
-## Scope
+**Milestone:** v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
+**Date:** 2026-05-26
 
-Phase 28 is frontend design/content polishing for the existing Practice Path. It should not add new framework, database, backend, or AI-provider dependencies.
+## Question
 
-## Stack Decision
+What stack additions or changes are needed to refine a Duolingo-style Practice interaction and connect it to Learning Chat?
 
-No stack additions are needed.
+## Findings
 
-Use the existing stack:
+No new runtime dependency is required for Phase 29.
 
-- React + TypeScript + Vite for pages and UI.
-- TanStack Query hooks already added in Phase 27.
-- Existing mock/demo service boundary in `src/services/practice/practiceApi.ts`.
-- Existing i18n namespace pattern for English, German, French, and Italian.
-- Existing Playwright/local browser smoke style for demo verification.
+The reference repository `sanidhyy/duolingo-clone` uses a broader full-stack setup: Next.js routes, actions for challenge progress and user progress, Drizzle/PostgreSQL-style data access, subscription/payment support, modal stores, sound assets, and lesson components such as `Quiz`, `Header`, `Footer`, `Challenge`, and `Card`. STOA should not copy that stack. The useful idea is the separation of a lesson shell from challenge cards, progress header, bottom feedback footer, and completion state.
 
-## Implementation Implication
+Current STOA stack is sufficient:
 
-Phase 28 should modify:
+- React Router route state can carry Practice context into Chat.
+- Existing React/TypeScript components can render a context card and `Back to lesson` behavior.
+- Existing TanStack Query/service conventions can expose mock/demo API contracts without production backend work.
+- Existing i18n JSON can hold short CTA labels across EN/DE/FR/IT.
+- Existing mock Practice data can include answer-response capability flags such as `canAskLearningAssistant` and `canAskTeacher`.
 
-- `src/data/mockPractice.ts`
-- Practice components/pages if copy, result layout, or hint panels need refinement
-- Parent practice summary component/copy
-- `docs/practice/*`
-- README
+## Recommended Stack Work
 
-It should avoid:
+- Add TypeScript-only context types:
+  - `PracticeChatContext`
+  - `PracticeTeacherRequestContext`
+- Use `navigate('/chat', { state })` or an equivalent existing routing path for the demo transition.
+- Keep context persistence simple; route state is enough for demo, with optional query/local fallback only if current app patterns already support it.
+- Avoid adding animation, sound, confetti, gamification, state-machine, or backend dependencies.
 
-- new package dependencies
-- database work
-- demo backend expansion unless a thin static mock data mirror already exists
-- production API or AI provider integration
+## Sources
 
-## Research Notes
+- Reference repo structure and lesson-related files: https://github.com/sanidhyy/duolingo-clone
+- Lesson quiz mechanics observed in reference raw files:
+  - https://raw.githubusercontent.com/sanidhyy/duolingo-clone/main/app/lesson/quiz.tsx
+  - https://raw.githubusercontent.com/sanidhyy/duolingo-clone/main/app/lesson/footer.tsx
+  - https://raw.githubusercontent.com/sanidhyy/duolingo-clone/main/app/lesson/challenge.tsx
 
-External research supports the existing frontend-only approach. The content scope is curriculum/demo quality, not infrastructure. Common Core Grade 8 emphasizes solving linear equations and systems of linear equations; High School Algebra includes quadratic equation methods including factoring, but Phase 28 should use only the simplest factoring/zero-product slice for a lower-secondary demo.
-
-Sources:
-
-- Common Core Grade 8 introduction: https://www.thecorestandards.org/Math/Content/8/introduction/
-- Common Core Grade 8 Expressions & Equations: https://www.thecorestandards.org/Math/Content/8/EE/
-- Common Core High School Algebra Reasoning with Equations & Inequalities: https://www.thecorestandards.org/Math/Content/HSA/REI/

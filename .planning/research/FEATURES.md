@@ -1,50 +1,63 @@
-# Project Research — Features
+# Research: Feature Patterns for Phase 29
 
-## Feature Focus
+**Milestone:** v1.27 Phase 29
+**Date:** 2026-05-26
 
-Phase 28 should make the Practice Path demo feel coherent, teachable, and stable. It is not a feature expansion milestone.
+## Question
+
+Which Practice interaction features are table-stakes, and which should STOA avoid or defer?
 
 ## Table Stakes
 
-- Equation-only Mathematics path.
-- Three visible units:
-  - Linear equations in one variable
-  - Quadratic equations
-  - Linear systems in two variables
-- Each lesson has one clear skill goal.
-- Each challenge checks one step or one idea.
-- Challenge order moves from recognition to simple calculation, step choice, full solution, and optional review/word problem.
-- Correct feedback names the useful step.
-- Incorrect feedback points to the next step without revealing the answer.
-- Hints stay short, directional, and age-appropriate.
-- `Explain this step` gives practice-context guidance without direct final-answer-first behavior.
-- Teacher support appears after repeated confusion or explicit stuck state.
-- Parent report explains what was practiced and what could benefit from more work without anxiety language.
-- Demo scenario can run in 3-5 minutes.
+### Practice Interaction
 
-## Differentiators
+- A lesson start screen should set expectations before the first challenge: title, what will be practiced, estimated time, number of checks, and start action.
+- Challenge screens should have stable structure: progress, prompt, answer control, attempts indicator, and one primary action.
+- Correct feedback should be immediate, specific, and short.
+- Incorrect feedback should be supportive, preserve the retry path, and avoid revealing the final answer too early.
+- Hint display should be stable and close to the feedback area.
+- Lesson completion should summarize result, topics practiced, mistakes to review, and next actions.
 
-- STOA frames practice as calm academic progress, not a game.
-- The UI can show a clearly designed learning path without needing a full curriculum database.
-- The demo can show a specific wrong-answer journey: feedback, hint, retry, explanation, and teacher support.
-- Parent summary can translate challenge activity into understandable learning progress.
+### Practice to Learning Chat
+
+- `Explain this step` should appear as a secondary action when a student is stuck.
+- Chat should open with the current practice context visible.
+- Chat should provide a clear `Back to lesson` action.
+- The context card should explain that the student is reviewing a practice step, not starting a disconnected chat.
+
+### Practice to Teacher Support
+
+- Teacher support should be delayed until repeated confusion, repeated wrong answers, or explicit stuck intent.
+- Teacher support should carry topic, lesson, challenge, answer, and attempt context.
+- Copy should ask whether a teacher should explain the step, not imply failure.
+
+### Site Layout
+
+- Student Dashboard should become the learning entry center.
+- Practice and Chat should be framed as two learning modes:
+  - Practice a topic.
+  - Ask a question.
+- Parent reporting should combine questions, practice lessons, mistakes reviewed, teacher support, and next recommendation under learning activity.
+
+## Differentiators for STOA
+
+- Premium, restrained educational styling instead of cartoon reward styling.
+- Contextual Learning Assistant escalation, not generic "AI help".
+- Parent-readable learning activity framing that does not create anxiety.
+- Stable demo flow that can be explained in 3-5 minutes.
 
 ## Anti-Features
 
-- Broad Mathematics/Physics curriculum expansion.
-- Geometry, probability, functions, or physics practice paths.
-- Large problem bank.
-- Adaptive algorithm.
-- Real course database.
-- Formula-heavy quadratic treatment.
-- High-school advanced content such as discriminants, complex roots, vertex formula, or calculus.
+- Hearts as punitive blockers.
+- Shop, gems, leaderboards, loud celebratory animations, or mascot-driven reward loops.
+- Direct answer reveal on the first wrong attempt.
+- Practice and Chat as visually unrelated product islands.
+- Production backend, real adaptive learning, or large curriculum expansion during this milestone.
 
-## Research Notes
+## Sources
 
-Common Core Grade 8 explicitly includes solving linear equations and systems of two linear equations. Khan Academy's algebra basics sequencing also places systems after linear equations and before quadratics/polynomials, supporting the proposed demo progression when the quadratic content is kept simple.
+- Duolingo clone reference repo and lesson mechanics: https://github.com/sanidhyy/duolingo-clone
+- Gamification misuse research: https://arxiv.org/abs/2203.16175
+- Multiple-try feedback and hints research: https://link.springer.com/article/10.1007/s11423-022-10105-z
+- Duolingo gamification case study used as market/UX context, not implementation authority: https://trophy.so/blog/duolingo-gamification-case-study
 
-Sources:
-
-- Common Core Grade 8 Expressions & Equations: https://www.thecorestandards.org/Math/Content/8/EE/
-- Khan Academy Algebra basics systems of equations: https://www.khanacademy.org/math/algebra-basics/alg-basics-systems-of-equations
-- Khan Academy Algebra overview: https://www.khanacademy.org/algebra
