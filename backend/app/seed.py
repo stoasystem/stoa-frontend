@@ -119,7 +119,7 @@ def insert_seed_data() -> None:
                     conversation_id,
                     subject,
                     title,
-                    f"Practiced {title.lower()} with guided AI support.",
+                    f"Practiced {title.lower()} with guided Learning Assistant support.",
                     created_at,
                 ),
             )

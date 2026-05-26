@@ -89,7 +89,7 @@ function createDemoMessageResponse(conversationId: string, payload: SendMessageR
     id: `assistant-${Date.now()}`,
     conversationId,
     role: 'assistant' as const,
-    content: 'Here is a clear explanation. For x squared equals 9, x is 3 or -3.',
+    content: 'Let’s work through this step by step. First, identify what the question is asking, then choose the method that fits your current level.',
     createdAt: now,
     status: 'sent' as const,
   }
