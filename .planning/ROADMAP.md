@@ -22,7 +22,7 @@
 - ✅ **v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal** - Phases 103-107 (implemented 2026-05-26)
 - ✅ **v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation** - Phases 108-112 (implemented 2026-05-26)
 - ✅ **v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation** - Phases 113-117 (implemented 2026-05-26)
-- 🔄 **v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate** - Phases 118-122 (planning 2026-05-26)
+- ✅ **v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate** - Phases 118-122 (implemented 2026-05-26)
 
 ## Phases
 
@@ -91,8 +91,8 @@ Phase 21 raises STOA frontend to a release-quality gate without broad business e
 
 #### Phase 122: Release Quality Gate, README, and Handoff
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Create the final release-quality gate and pre-launch checklist, update README, and hand off Phase 21 with source-safety and verification evidence.
 
 **Requirements:** RELEASE21-01 through RELEASE21-09
@@ -178,4 +178,4 @@ Start with Phase 118. Phase 118 must complete read-only brand detail extraction 
 | 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 122. Release Quality Gate, README, and Handoff | v1.20 | 0/1 | Planned | — |
+| 122. Release Quality Gate, README, and Handoff | v1.20 | 1/1 | Complete | 2026-05-26 |

@@ -9,6 +9,63 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 21 Accessibility, Brand Details, and Release Quality Gate
+
+Phase 21 prepares STOA Frontend for release-candidate review without adding broad business scope. It integrates read-only brand details from the company homepage, adds a real contact surface, improves accessibility foundations, and records QA/release gates.
+
+Source reference:
+
+```text
+/Users/zhdeng/newweb
+```
+
+Important rule:
+
+Do not modify anything inside `/Users/zhdeng/newweb`. Phase 21 only reads company homepage footer, logo, and contact-form patterns, then reimplements suitable details inside the learning platform.
+
+Main updates:
+
+- Footer now includes STOA contact facts: `info@stoaedu.ch`, `+41 78 332 37 96`, and `Zürich · Schindellegi (SZ) · Würenlos (AG)`.
+- `StoaLogo` provides platform-theme logo variants without copying homepage assets.
+- `/contact` provides a multilingual contact form for parents, students, teachers, schools, and other requests.
+- `POST /contact/requests` is documented and supported by the local demo backend contract.
+- Login, register, chat, support, and contact received targeted accessibility hardening.
+- Playwright E2E runs in deterministic frontend demo QA mode and passes 12 smoke tests.
+- Release quality gate and final pre-launch checklist are documented.
+
+Phase 21 docs:
+
+- `docs/brand/main-website-brand-details.md`
+- `docs/brand/footer-contact-integration.md`
+- `docs/brand/logo-adaptation.md`
+- `docs/brand/contact-form-adaptation.md`
+- `docs/accessibility/accessibility-audit.md`
+- `docs/accessibility/keyboard-navigation.md`
+- `docs/accessibility/screen-reader-smoke-test.md`
+- `docs/accessibility/color-contrast-audit.md`
+- `docs/qa/cross-browser-qa.md`
+- `docs/qa/mobile-device-qa.md`
+- `docs/qa/visual-regression-testing.md`
+- `docs/qa/performance-sanity-check.md`
+- `docs/release/release-quality-gate.md`
+- `docs/release/final-pre-launch-checklist.md`
+
+Verification:
+
+```bash
+npm install --ignore-scripts
+npm run dev -- --host 127.0.0.1
+npm run build
+npm run test:e2e
+```
+
+Manual gates still required before launch candidate:
+
+- Safari, Firefox, Edge, Mobile Safari, and Android Chrome QA.
+- Real screen-reader smoke test.
+- Rendered color contrast audit.
+- Screenshot visual-regression baselines if the team wants PNG snapshots committed.
+
 ## Phase 20 Cross-Locale Copy Refinement
 
 Phase 20 refines English, German, French, and Italian copy across the STOA learning platform and adapts layout where language length affects UI fit. The goal is natural local product copy, not literal translation.
