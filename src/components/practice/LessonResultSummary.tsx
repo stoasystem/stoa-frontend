@@ -1,0 +1,54 @@
+import { Link } from 'react-router-dom'
+import { CheckCircle2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { PracticeLessonResult } from '@/types/practice'
+
+export function LessonResultSummary({ result }: { result: PracticeLessonResult }) {
+  const { t } = useTranslation('practice')
+
+  return (
+    <Card className="border-primary/15 bg-card/95">
+      <CardHeader>
+        <div className="flex items-center gap-3">
+          <div className="rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] p-2 text-primary">
+            <CheckCircle2 className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <div>
+            <p className="brand-section-kicker">{t('lessonComplete')}</p>
+            <CardTitle className="text-3xl">Practice summary</CardTitle>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid gap-4 sm:grid-cols-4">
+          <ResultMetric label="Correct" value={`${result.correctCount}/${result.totalCount}`} />
+          <ResultMetric label="Time" value={`${Math.round(result.timeSpentSeconds / 60)} min`} />
+          <ResultMetric label="Points" value={`+${result.progressPoints}`} />
+          <ResultMetric label="Streak" value={`${result.studyStreak} days`} />
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button asChild>
+            <Link to={`/practice/${result.subjectId}`}>{t('continuePractice')}</Link>
+          </Button>
+          <Button asChild variant="outline">
+            <Link to="/practice/mistakes">{t('reviewMistakes')}</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link to="/dashboard">Back to dashboard</Link>
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ResultMetric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
+      <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
+      <p className="mt-2 text-2xl font-semibold">{value}</p>
+    </div>
+  )
+}

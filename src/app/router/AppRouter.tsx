@@ -49,6 +49,11 @@ import { OrganizationTutorsPage } from '@/pages/organization/OrganizationTutorsP
 import { TutorAssignmentBoardPage } from '@/pages/organization/TutorAssignmentBoardPage'
 import { PartnershipOnboardingPage } from '@/pages/partnership/PartnershipOnboardingPage'
 import { PricingPage } from '@/pages/pricing/PricingPage'
+import { LessonPage } from '@/pages/practice/LessonPage'
+import { LessonResultPage } from '@/pages/practice/LessonResultPage'
+import { MistakesReviewPage } from '@/pages/practice/MistakesReviewPage'
+import { PracticeOverviewPage } from '@/pages/practice/PracticeOverviewPage'
+import { SubjectPathPage } from '@/pages/practice/SubjectPathPage'
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage'
 import { StudentProfilePage } from '@/pages/profile/StudentProfilePage'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -97,6 +102,11 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['student']} />}>
             <Route path="/dashboard" element={<StudentDashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/practice" element={<PracticeOverviewPage />} />
+            <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
+            <Route path="/practice/:subjectId" element={<SubjectPathPage />} />
+            <Route path="/practice/:subjectId/lessons/:lessonId" element={<LessonPage />} />
+            <Route path="/practice/:subjectId/lessons/:lessonId/result" element={<LessonResultPage />} />
             <Route path="/profile" element={<StudentProfilePage />} />
             <Route path="/learning-history" element={<StudentLearningHistoryPage />} />
           </Route>

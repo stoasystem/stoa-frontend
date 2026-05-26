@@ -4,6 +4,7 @@ export const namespaces = [
   'auth',
   'chat',
   'parent',
+  'practice',
   'tutor',
   'pricing',
   'billing',

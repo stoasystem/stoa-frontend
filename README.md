@@ -86,6 +86,40 @@ Phase 26 docs:
 - `docs/learning-assistant/repair-prompt-rules.md`
 - `docs/learning-assistant/demo-readiness-threshold.md`
 
+## Phase 27 Practice Path Integration
+
+This phase integrates a Duolingo-style practice flow into the STOA learning platform.
+
+Reference:
+
+- https://github.com/sanidhyy/duolingo-clone
+
+Scope:
+
+- Frontend design and integration only
+- Practice overview
+- Subject learning path
+- Lesson page
+- Challenge feedback
+- Hint flow
+- Lesson result page
+- Dashboard practice summary
+- Parent report practice summary
+- Mock API support
+
+We do not copy the full project backend, database, payment system, or visual style.
+
+STOA adapts the idea into a premium education-oriented Practice Path.
+
+Phase 27 docs:
+
+- `docs/practice/duolingo-clone-reference-audit.md`
+- `docs/practice/practice-module-scope.md`
+- `docs/practice/practice-api-contract.md`
+- `docs/practice/practice-ui-guidelines.md`
+- `docs/practice/practice-demo-data.md`
+- `docs/practice/practice-functional-qa.md`
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.

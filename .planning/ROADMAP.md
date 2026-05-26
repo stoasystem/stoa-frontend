@@ -27,16 +27,16 @@
 - ✅ **v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release** - Phases 128-132 (shipped 2026-05-26)
 - ✅ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (shipped 2026-05-26)
 - ✅ **v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing** - Phases 137-140 (shipped 2026-05-26)
-- 🚧 **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (planned)
+- ✅ **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (implemented 2026-05-26)
 
 ## Phases
 
-- [ ] **Phase 141: Reference Audit, Scope, and Practice Tone Lock** - Lock what STOA adapts from the reference repo and what stays excluded.
-- [ ] **Phase 142: Practice Contracts, Mock Data, Service Boundary, and State Model** - Establish typed practice data, demo fallback, query hooks, and deterministic lesson state.
-- [ ] **Phase 143: Student Practice Routes and Core Lesson Flow** - Let students enter Practice Path, complete demo lessons, review results, and revisit mistakes.
-- [ ] **Phase 144: Hint-First Learning Assistant and Teacher Support Handoff** - Connect practice mistakes to guided explanations and teacher escalation without provider leakage.
-- [ ] **Phase 145: Dashboard and Parent Practice Integration** - Surface practice progress as the next student action and as calm parent reporting.
-- [ ] **Phase 146: Localization, Accessibility, Documentation, and Verification** - Finish four-language copy, brand fit, accessibility, docs, README, and verification evidence.
+- [x] **Phase 141: Reference Audit, Scope, and Practice Tone Lock** - Lock what STOA adapts from the reference repo and what stays excluded.
+- [x] **Phase 142: Practice Contracts, Mock Data, Service Boundary, and State Model** - Establish typed practice data, demo fallback, query hooks, and deterministic lesson state.
+- [x] **Phase 143: Student Practice Routes and Core Lesson Flow** - Let students enter Practice Path, complete demo lessons, review results, and revisit mistakes.
+- [x] **Phase 144: Hint-First Learning Assistant and Teacher Support Handoff** - Connect practice mistakes to guided explanations and teacher escalation without provider leakage.
+- [x] **Phase 145: Dashboard and Parent Practice Integration** - Surface practice progress as the next student action and as calm parent reporting.
+- [x] **Phase 146: Localization, Accessibility, Documentation, and Verification** - Finish four-language copy, brand fit, accessibility, docs, README, and verification evidence.
 
 ## Phase Details
 
@@ -49,7 +49,7 @@
   2. Developer can read the scope doc and see that Practice Path is frontend/demo-backed subject practice, not a language-learning clone or production course system.
   3. Designer or implementer can apply Practice UI guidelines that allow restrained progress and feedback while excluding cartoon, shop, leaderboard, gems, and hearts mechanics.
   4. Practice labels use neutral STOA terminology such as Practice Path, attempts, progress points, daily goal, study streak, hints, Learning Assistant explanation, and teacher support.
-**Plans**: TBD
+**Plans**: 141-PLAN.md
 **UI hint**: yes
 
 ### Phase 142: Practice Contracts, Mock Data, Service Boundary, and State Model
@@ -62,7 +62,7 @@
   3. Practice service functions and query/mutation hooks match the documented API contract and can fall back to demo data without page-specific data duplication.
   4. Lesson progression supports answer selection, checking, feedback, retry, hint, continue, completion, and reset through deterministic local state or a reducer.
   5. Practice frontend code calls only STOA service/API boundaries and never model/provider APIs directly.
-**Plans**: TBD
+**Plans**: 142-SUMMARY.md
 
 ### Phase 143: Student Practice Routes and Core Lesson Flow
 **Goal**: Students can navigate to Practice Path, choose a subject path, complete challenge-based lessons, view results, and review recent mistakes.
@@ -74,7 +74,7 @@
   3. Student can open a subject path and understand available, locked, completed, and current lesson states with visible progress.
   4. Student can complete multiple-choice, text/numeric, ordering, or explanation challenges with attempts, checking, restrained feedback, retry, and continue controls.
   5. Student can review lesson results and recent mistakes, then continue practice, retry, request explanation, or return to the dashboard.
-**Plans**: TBD
+**Plans**: 143-SUMMARY.md
 **UI hint**: yes
 
 ### Phase 144: Hint-First Learning Assistant and Teacher Support Handoff
@@ -87,7 +87,7 @@
   3. Learning Assistant explanation copy guides the next reasoning step and avoids giving the final answer first.
   4. Student can access `Ask a teacher` only after repeated confusion, explicit stuck intent, or weak-topic context.
   5. Practice support surfaces do not show `Ask AI`, provider names, model names, prompts, debug fields, or backend internals.
-**Plans**: TBD
+**Plans**: 144-SUMMARY.md
 **UI hint**: yes
 
 ### Phase 145: Dashboard and Parent Practice Integration
@@ -99,7 +99,7 @@
   2. Parent report shows lessons completed this week, topics practiced, mistakes reviewed, practice streak, and recommended next topic.
   3. Parent-facing copy stays supportive and avoids anxiety-inducing language about mistakes or practice needs.
   4. Dashboard and parent summaries stay consistent with the same practice overview and summary data used by Practice Path.
-**Plans**: TBD
+**Plans**: 145-SUMMARY.md
 **UI hint**: yes
 
 ### Phase 146: Localization, Accessibility, Documentation, and Verification
@@ -112,19 +112,19 @@
   3. Practice UI uses STOA premium theme styling with restrained progress, feedback, lesson-node hover, and completion states, without cartoon, shop, gems, or loud celebration patterns.
   4. Practice challenge controls are keyboard accessible, show visible focus states, expose correctness without color alone, and preserve readable button text across viewports.
   5. Practice demo-data docs, functional QA docs, README handoff, build verification, student practice smoke, parent report smoke, and available lint/E2E evidence are recorded.
-**Plans**: TBD
+**Plans**: 146-SUMMARY.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 141. Reference Audit, Scope, and Practice Tone Lock | 0/TBD | Not started | - |
-| 142. Practice Contracts, Mock Data, Service Boundary, and State Model | 0/TBD | Not started | - |
-| 143. Student Practice Routes and Core Lesson Flow | 0/TBD | Not started | - |
-| 144. Hint-First Learning Assistant and Teacher Support Handoff | 0/TBD | Not started | - |
-| 145. Dashboard and Parent Practice Integration | 0/TBD | Not started | - |
-| 146. Localization, Accessibility, Documentation, and Verification | 0/TBD | Not started | - |
+| 141. Reference Audit, Scope, and Practice Tone Lock | 1/1 | Complete | 2026-05-26 |
+| 142. Practice Contracts, Mock Data, Service Boundary, and State Model | 1/1 | Complete | 2026-05-26 |
+| 143. Student Practice Routes and Core Lesson Flow | 1/1 | Complete | 2026-05-26 |
+| 144. Hint-First Learning Assistant and Teacher Support Handoff | 1/1 | Complete | 2026-05-26 |
+| 145. Dashboard and Parent Practice Integration | 1/1 | Complete | 2026-05-26 |
+| 146. Localization, Accessibility, Documentation, and Verification | 1/1 | Complete | 2026-05-26 |
 
 ## Coverage
 
@@ -143,4 +143,4 @@
 
 ## Next Up
 
-Milestone v1.25 is ready for Phase 141 planning.
+Milestone v1.25 implementation is complete. Recommended next milestone: Phase 28 Practice Path QA, Lesson Content Refinement, and Demo Scenario Polishing.

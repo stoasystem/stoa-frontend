@@ -18,6 +18,7 @@ export type AppNavIcon =
   | 'dashboard'
   | 'history'
   | 'profile'
+  | 'practice'
   | 'reports'
   | 'requests'
   | 'settings'
@@ -83,6 +84,16 @@ export const navItems: AppNavItem[] = [
     icon: 'chat',
     mobile: true,
     description: 'Ask questions and request teacher help.',
+  },
+  {
+    label: 'Practice',
+    path: '/practice',
+    role: 'student',
+    priority: 'primary',
+    status: 'core',
+    icon: 'practice',
+    mobile: true,
+    description: 'Short subject lessons and practice review.',
   },
   {
     label: 'Learning History',
@@ -341,6 +352,11 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/support/tickets/:ticketId', pageName: 'SupportTicketDetailPage', role: 'shared', module: 'Support', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'User support ticket detail.' },
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student chat and teacher-help request flow.' },
+  { path: '/practice', pageName: 'PracticeOverviewPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student subject practice overview.' },
+  { path: '/practice/:subjectId', pageName: 'SubjectPathPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Subject learning path.' },
+  { path: '/practice/:subjectId/lessons/:lessonId', pageName: 'LessonPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Practice lesson challenge flow.' },
+  { path: '/practice/:subjectId/lessons/:lessonId/result', pageName: 'LessonResultPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Practice lesson result summary.' },
+  { path: '/practice/mistakes', pageName: 'MistakesReviewPage', role: 'student', module: 'Practice', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Recent practice mistakes review.' },
   { path: '/profile', pageName: 'StudentProfilePage', role: 'student', module: 'Account', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Student profile.' },
   { path: '/learning-history', pageName: 'StudentLearningHistoryPage', role: 'student', module: 'Learning', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Student learning history.' },
   { path: '/parent', pageName: 'ParentDashboardPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Parent overview and child list.' },

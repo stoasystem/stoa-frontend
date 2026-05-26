@@ -11,10 +11,12 @@ import { ParentReportRecommendations } from '@/components/parent/ParentReportRec
 import { ParentReportStats } from '@/components/parent/ParentReportStats'
 import { ParentReportSubjects } from '@/components/parent/ParentReportSubjects'
 import { ParentReportSummaryCard } from '@/components/parent/ParentReportSummaryCard'
+import { ParentPracticeSummaryCard } from '@/components/parent/ParentPracticeSummaryCard'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Button } from '@/components/ui/button'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
+import { usePracticeParentSummaryQuery } from '@/hooks/practice/usePracticeParentSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
@@ -22,6 +24,7 @@ export function ChildReportPage() {
   const { t } = useTranslation('parent')
   const { childId } = useParams()
   const reportQuery = useChildReportQuery(childId)
+  const practiceSummaryQuery = usePracticeParentSummaryQuery(childId)
   const report = reportQuery.data
 
   useEffect(() => {
@@ -69,6 +72,9 @@ export function ChildReportPage() {
           <div className="report-surface space-y-6 rounded-lg border border-border/70 p-4 shadow-[var(--platform-shadow-soft)] sm:p-6">
             <ParentReportSummaryCard report={report} />
             <ParentReportStats stats={report.stats} />
+            {practiceSummaryQuery.data && (
+              <ParentPracticeSummaryCard summary={practiceSummaryQuery.data} />
+            )}
             <ParentReportSubjects subjects={report.topSubjects} weakTopics={report.weakTopics} />
             <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
               <ParentValueCard />
