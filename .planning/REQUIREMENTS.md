@@ -1,84 +1,104 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-26
-**Milestone:** v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with controlled guided Learning Assistant behavior, stable demo backend support, documented API contracts, coherent demo flows, and a clean path to future real backend integration.
+**Milestone:** v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
 
-## v1.24 Requirements
+## v1.25 Requirements
 
-Requirements for Phase 26. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 27. Each requirement maps to exactly one roadmap phase.
 
-### QA Planning and Behavior Rules
+### Reference Audit and Scope
 
-- [x] **QA26-01**: `docs/qa/learning-assistant-functional-qa-plan.md` defines the Learning Assistant functional QA dimensions, test method, P0 failure categories, and verification commands.
-- [x] **RULE26-01**: `docs/learning-assistant/relevance-rules.md` defines what relevant answers must include for core demo questions and what counts as irrelevant or hallucinated output.
-- [x] **RULE26-02**: `docs/learning-assistant/multi-turn-behavior-rules.md` defines context consistency expectations for follow-up questions, repeated confusion, unrelated turns, and simulated unclear uploads.
-- [x] **RULE26-03**: `docs/learning-assistant/repair-prompt-rules.md` defines allowed repair triggers, repair-prompt constraints, and forbidden hard-coded answer fixes.
-- [x] **RULE26-04**: `docs/learning-assistant/demo-readiness-threshold.md` defines P0 behavior failure thresholds, internal-term leakage thresholds, grade/subject scope thresholds, and acceptable known-issue handling.
-- [x] **BUG26-01**: `docs/qa/learning-assistant-bug-reproduction-log.md` provides a reproducible bug log template with bug ID, date, test case, profile, turns, actual/expected response, failure type, provider, fix attempt, status, and regression-test flag.
+- [ ] **REF27-01**: `docs/practice/duolingo-clone-reference-audit.md` documents the `sanidhyy/duolingo-clone` source repo, what STOA learned, what STOA will adapt, what STOA will not copy, and the STOA-specific interpretation.
+- [ ] **SCOPE27-01**: `docs/practice/practice-module-scope.md` defines Practice Path as a frontend/demo-backed STOA learning module, not a language-learning clone or production course system.
+- [ ] **STYLE27-01**: `docs/practice/practice-ui-guidelines.md` defines restrained, premium Practice Path UI rules, including allowed light gamification and excluded cartoon/shop/leaderboard/hearts patterns.
+- [ ] **COPY27-01**: Practice Path visible labels use neutral STOA terminology: Practice, Practice Path, Attempts, Progress points, Daily goal, Study streak, Show hint, Explain this step, and Ask a teacher.
 
-### Regression Data and Test Suite
+### Data Contracts and Mock Support
 
-- [x] **DATA26-01**: `demo-harness/data/multi_turn_test_cases.json` contains at least the eight required multi-turn scenarios: linear equation follow-up, quadratic factoring follow-up, physics speed formula follow-up, repeated confusion, unrelated question after math, direct-answer-only request, unclear upload simulation, and above-grade question.
-- [x] **TEST26-01**: `demo-harness/tests/test_relevance.py` verifies core Learning Assistant answers stay relevant to the student question.
-- [x] **TEST26-02**: `demo-harness/tests/test_grade_scope.py` verifies lower-secondary demo questions do not use advanced concepts such as derivatives, integrals, complex roots, linear algebra, or university notation.
-- [x] **TEST26-03**: `demo-harness/tests/test_subject_scope.py` verifies out-of-subject questions are gently redirected to saved learning scope or professional teacher support.
-- [x] **TEST26-04**: `demo-harness/tests/test_multi_turn_context.py` verifies follow-up turns preserve the same equation, formula, or confusion context where expected.
-- [x] **TEST26-05**: `demo-harness/tests/test_teacher_escalation.py` verifies repeated confusion and teacher requests suggest professional teacher support.
-- [x] **TEST26-06**: `demo-harness/tests/test_internal_term_leakage.py` verifies assistant-visible output does not contain Codex, AI, model, prompt, demo, backend, mock, provider, or system instruction terms.
-- [x] **TEST26-07**: `demo-harness/tests/test_cheating_behavior.py` verifies direct homework-copy requests are redirected to learning steps and do not provide copy-ready final answers first.
-- [x] **TEST26-08**: Existing Phase 25 provider behavior tests continue to pass from the repository root.
+- [ ] **TYPE27-01**: `src/types/practice.ts` defines typed Practice Path contracts for subjects, units, lessons, challenges, progress, answer results, lesson results, mistakes, overview, and parent summaries.
+- [ ] **DATA27-01**: `src/data/mockPractice.ts` contains a Mathematics demo path with Linear equations and Quadratic basics units, including 3-5 challenges per lesson.
+- [ ] **DATA27-02**: `src/data/mockPractice.ts` contains a Physics demo path with Motion lessons for speed/distance/time, units/conversion, and graph interpretation, including 3-5 challenges per lesson.
+- [ ] **API27-01**: `docs/practice/practice-api-contract.md` documents `GET /practice/subjects`, `GET /practice/subjects/:subjectId/path`, `GET /practice/lessons/:lessonId`, `POST /practice/challenges/:challengeId/answer`, and `POST /practice/lessons/:lessonId/complete`.
+- [ ] **API27-02**: `src/services/practice/practiceApi.ts` implements frontend service functions for the documented practice endpoints with mock/demo fallback support.
+- [ ] **QUERY27-01**: `src/services/practice/practiceQueryKeys.ts` and `src/hooks/practice/*` expose query and mutation hooks for subjects, subject paths, lessons, answer submission, lesson completion, mistakes, overview, and summaries.
+- [ ] **STATE27-01**: Lesson challenge progression uses deterministic local state or a reducer for answer selection, check, feedback, retry, hint, continue, complete, and reset transitions.
+- [ ] **MOCK27-01**: Demo/mock support returns consistent practice progress across overview, subject path, lesson result, mistakes review, Student Dashboard, and Parent Report.
 
-### Evaluator, Prompt, and Fallback Fixes
+### Student Practice Flow
 
-- [x] **EVAL26-01**: `demo-harness/harness/evaluate_response.py` exposes focused evaluator helpers for relevance, grade scope, subject scope, no-direct-answer-first, internal terms, teacher escalation need, length, and context consistency.
-- [x] **EVAL26-02**: Response evaluation detects irrelevant or generic answers for core demo questions.
-- [x] **EVAL26-03**: Response evaluation detects direct-answer-first output for homework-style questions.
-- [x] **EVAL26-04**: Response evaluation detects internal-term leakage including Codex, AI, model, prompt, demo, backend, mock, provider, and system instruction.
-- [x] **EVAL26-05**: Response evaluation detects high-risk or cheating requests and requires a learning-oriented refusal/redirect.
-- [x] **EVAL26-06**: Response evaluation can check multi-turn context consistency for the regression scenarios.
-- [x] **PROMPT26-01**: Prompt or repair-prompt rules are updated so repair responses stay concise, relevant, grade-appropriate, step-guided, and free of internal terms.
-- [x] **FALLBACK26-01**: Template fallback responses support relevance, subject-scope, confusion, cheating, and teacher-escalation scenarios without overfitting to a single question.
+- [ ] **ROUTE27-01**: `/practice` is reachable from authenticated student navigation and renders a Practice Overview page.
+- [ ] **OVERVIEW27-01**: Practice Overview displays subjects, recommended path, current progress, daily goal, study streak, and recent weak topics.
+- [ ] **PATH27-01**: `/practice/:subjectId` renders subject learning units with available, locked, and completed lesson states and visible progress.
+- [ ] **LESSON27-01**: `/practice/:subjectId/lessons/:lessonId` renders lesson intro, challenge prompt, attempts, progress bar, answer controls, and completion navigation.
+- [ ] **CHAL27-01**: Multiple-choice challenges support selecting an option, checking the answer, showing feedback, retrying, and continuing.
+- [ ] **CHAL27-02**: Text/numeric input challenges support typed answers, answer checking, feedback, retry, and explanation display.
+- [ ] **CHAL27-03**: Ordering or explanation challenges are available for demo lessons and render without breaking keyboard navigation or layout.
+- [ ] **FEED27-01**: Correct feedback is clear and restrained, while incorrect feedback says `Not quite`, shows a hint option, and allows retry before completion.
+- [ ] **RESULT27-01**: `/practice/:subjectId/lessons/:lessonId/result` shows correct count, total count, time spent, earned progress points, mistakes review, and CTAs for continuing practice, reviewing with the Learning Assistant, and returning to dashboard.
+- [ ] **MISTAKE27-01**: `/practice/mistakes` displays recent mistakes grouped by subject/topic with actions to retry practice or request an explanation.
 
-### Demo Flow Stability and Reporting
+### Learning Assistant and Teacher Support
 
-- [x] **CHAT26-01**: Student chat QA verifies multi-turn message order, loading completion, retry behavior, teacher request duplicate-submit prevention, and no internal fallback/provider information in UI output.
-- [x] **PARENT26-01**: Parent history/report QA verifies student question records and teacher request records display without prompt/provider/debug details.
-- [x] **TUTOR26-01**: Tutor request-detail QA verifies tutor can see student question context, update status, add notes, and avoid prompt/provider/debug details.
-- [x] **LANG26-01**: English behavior smoke verifies guided explanations are calm, short, clear, relevant, and internal-term-free.
-- [x] **LANG26-02**: German behavior smoke verifies responses are clear for lower-secondary students, avoid technical internal terms, and use product-safe Learning Assistant/teacher support language.
-- [x] **LANG26-03**: French and Italian P1 smoke verifies response language correctness and absence of Codex/internal terms.
-- [x] **REPORT26-01**: `docs/qa/learning-assistant-regression-report.md` records passed cases, failed cases, failure types, provider used, fallback count, P0 behavior failures, known issues, and readiness decision.
-- [x] **README26-01**: README documents Phase 26 Learning Assistant functional QA, behavior goals, non-feature scope, and regression test command.
-- [x] **VERIFY26-01**: Final verification runs `npm install` or records why it is skipped, Python harness tests, `npm run build`, and focused student/tutor/parent flow checks.
+- [ ] **HINT27-01**: Incorrect practice answers follow the hint-first sequence: feedback, hint, retry, Learning Assistant explanation, then teacher support if needed.
+- [ ] **ASSIST27-01**: `Explain this step` opens or routes to a Learning Assistant explanation using practice context without saying `Ask AI` or exposing provider/model/debug terms.
+- [ ] **ASSIST27-02**: Learning Assistant explanations from practice mistakes guide the next reasoning step and do not directly give the final answer first.
+- [ ] **TEACH27-01**: `Ask a teacher` is available after repeated confusion, explicit `I still do not understand` intent, or weak-topic context.
+- [ ] **BOUND27-01**: Practice frontend code calls STOA service/API boundaries only and does not call model providers directly.
+
+### Dashboard and Parent Integration
+
+- [ ] **DASH27-01**: Student Dashboard includes a Continue Practice section with recommended lesson, daily goal, study streak, recent mistakes, and a `Continue practice` CTA to `/practice`.
+- [ ] **NAV27-01**: Student navigation includes Dashboard, Chat, Practice, Learning History, and Profile in the appropriate desktop/mobile surfaces.
+- [ ] **PARENT27-01**: Parent report includes practice summary fields for lessons completed this week, topics practiced, mistakes reviewed, practice streak, and recommended next topic.
+- [ ] **PARENT27-02**: Parent-facing practice copy avoids anxiety language and uses supportive phrasing such as `could benefit from more practice`.
+
+### Localization, Accessibility, and Brand Fit
+
+- [ ] **LANG27-01**: English Practice Path P0 copy exists for Practice, Continue practice, Start lesson, Try again, Check answer, Correct, Not quite, Show hint, Explain this step, Ask a teacher, Lesson complete, Review mistakes, Daily goal, and Study streak.
+- [ ] **LANG27-02**: German Practice Path P0 copy uses concise labels such as `Üben`, `Weiter üben`, `Prüfen`, `Hinweis anzeigen`, and `Schritt erklären` without mobile button overflow.
+- [ ] **LANG27-03**: French Practice Path P0 copy includes `Voir un indice` and `Expliquer cette étape` and fits core controls.
+- [ ] **LANG27-04**: Italian Practice Path P0 copy includes `Mostra un suggerimento` and `Spiega questo passaggio` and fits core controls.
+- [ ] **UI27-01**: Practice UI uses STOA premium theme styling with restrained progress, feedback, lesson-node hover, and completion states; it does not use bright cartoon, shop, gems, or loud celebration patterns.
+- [ ] **A11Y27-01**: Practice challenge controls are keyboard accessible, show focus states, expose correct/incorrect state without relying only on color, and preserve readable button text across viewports.
+
+### Documentation and Verification
+
+- [ ] **DOC27-01**: `docs/practice/practice-demo-data.md` documents the Mathematics and Physics demo lessons, challenge types, answer expectations, hints, and explanations.
+- [ ] **QA27-01**: `docs/practice/practice-functional-qa.md` covers the student practice flow, Learning Assistant integration, teacher support, parent report, i18n, accessibility, and build verification checks.
+- [ ] **README27-01**: README includes Phase 27 Practice Path Integration scope, reference repo link, frontend/demo-only boundary, included surfaces, and explicit non-copy/non-backend exclusions.
+- [ ] **VERIFY27-01**: Final verification runs `npm install` or records why it is skipped, `npm run build`, the practice student demo flow, the parent report demo flow, and any available lint/E2E checks.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in the current roadmap.
 
-### Phase 27 Demo Scenario Rehearsal and Feedback Capture
+### Phase 28 Practice Path QA, Content Refinement, and Demo Scenario Polishing
 
-- **SCENARIO27-01**: External demo scenarios are rehearsed for parent, teacher, investor, and partner audiences.
-- **FEEDBACK27-01**: Demo feedback is captured, categorized, and converted into product/backend priority notes.
-- **PRESENT27-01**: Presentation QA verifies account setup, reset, fallback path, and issue capture before external meetings.
+- **CONTENT28-01**: Practice lesson content is reviewed for mathematical and physics accuracy, clarity, and age-appropriate difficulty.
+- **FEEDBACK28-01**: Feedback and hint copy is refined after running full student demo scenarios.
+- **ASSIST28-01**: Learning Assistant behavior from practice mistakes is regression-tested across repeated confusion, direct-answer requests, and subject-scope cases.
+- **PARENT28-01**: Parent report practice language is reviewed for calm, supportive phrasing and demo clarity.
+- **DEMO28-01**: Practice Path demo scenarios are polished for external presentation stability.
 
 ## Out of Scope
 
-Explicitly excluded from v1.24 to prevent scope creep.
+Explicitly excluded from v1.25 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| New frontend pages | Phase 26 stabilizes Learning Assistant behavior, not product surface area. |
-| Broad UI redesign | Existing chat, parent, and tutor surfaces should only receive bug fixes if QA finds issues. |
-| Formal AI backend | Production provider architecture remains future backend work. |
-| Complex agent framework | The existing harness/router/evaluator should be improved before adding framework complexity. |
-| Long-term memory | Multi-turn tests use existing recent context only. |
-| Real knowledge graph | Grade and subject scope remain prompt/evaluator constraints for demo QA. |
-| Production content safety platform | Phase 26 adds functional behavior checks, not a full safety system. |
-| Model fine-tuning | Prompt/evaluator/fallback fixes are sufficient for this milestone. |
-| Multi-model scheduling | Provider routing remains simple and local-demo scoped. |
-| AWS deployment | This milestone is local/demo QA and bug fixing. |
-| Frontend rewriting assistant responses | Learning Assistant behavior should be fixed in the harness, evaluator, prompt, repair, or fallback layers. |
+| Copying the reference repo codebase | Phase 27 adapts mechanisms only; STOA keeps its architecture and product identity. |
+| Next.js App Router migration | STOA already uses React + Vite and should not change framework for this module. |
+| Clerk, Stripe, Neon, Drizzle, Bun, or React Admin integration | These are reference-project implementation choices and are outside STOA frontend/demo scope. |
+| Formal production course database | Phase 27 uses typed contracts, mock data, and demo backend support only. |
+| Complex adaptive learning algorithm | Demo recommendations can be deterministic; true adaptation is future backend/product work. |
+| Shop, gems, leaderboards, mascot-driven rewards, or loud celebration effects | STOA should stay premium, calm, and education-oriented. |
+| Punitive hearts/lives scarcity | Attempts should be neutral practice chances, not monetized or emotionally punitive limits. |
+| Language-learning product structure | STOA Practice Path is subject-based for Mathematics, Physics, and future school topics. |
+| Direct frontend calls to AI/model providers | Learning Assistant behavior remains behind STOA backend/service boundaries. |
+| Production payment-gated practice access | Practice access and billing enforcement are outside this frontend/demo milestone. |
+| Formal teacher marketplace or live teacher chat redesign | Phase 27 only adds practice-context escalation to existing teacher-support patterns. |
 
 ## Traceability
 
@@ -86,44 +106,53 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QA26-01 | Phase 137 | Complete |
-| RULE26-01 | Phase 137 | Complete |
-| RULE26-02 | Phase 137 | Complete |
-| RULE26-03 | Phase 137 | Complete |
-| RULE26-04 | Phase 137 | Complete |
-| BUG26-01 | Phase 137 | Complete |
-| DATA26-01 | Phase 138 | Complete |
-| TEST26-01 | Phase 138 | Complete |
-| TEST26-02 | Phase 138 | Complete |
-| TEST26-03 | Phase 138 | Complete |
-| TEST26-04 | Phase 138 | Complete |
-| TEST26-05 | Phase 138 | Complete |
-| TEST26-06 | Phase 138 | Complete |
-| TEST26-07 | Phase 138 | Complete |
-| TEST26-08 | Phase 138 | Complete |
-| EVAL26-01 | Phase 139 | Complete |
-| EVAL26-02 | Phase 139 | Complete |
-| EVAL26-03 | Phase 139 | Complete |
-| EVAL26-04 | Phase 139 | Complete |
-| EVAL26-05 | Phase 139 | Complete |
-| EVAL26-06 | Phase 139 | Complete |
-| PROMPT26-01 | Phase 139 | Complete |
-| FALLBACK26-01 | Phase 139 | Complete |
-| CHAT26-01 | Phase 140 | Complete |
-| PARENT26-01 | Phase 140 | Complete |
-| TUTOR26-01 | Phase 140 | Complete |
-| LANG26-01 | Phase 140 | Complete |
-| LANG26-02 | Phase 140 | Complete |
-| LANG26-03 | Phase 140 | Complete |
-| REPORT26-01 | Phase 140 | Complete |
-| README26-01 | Phase 140 | Complete |
-| VERIFY26-01 | Phase 140 | Complete |
+| REF27-01 | TBD | Pending |
+| SCOPE27-01 | TBD | Pending |
+| STYLE27-01 | TBD | Pending |
+| COPY27-01 | TBD | Pending |
+| TYPE27-01 | TBD | Pending |
+| DATA27-01 | TBD | Pending |
+| DATA27-02 | TBD | Pending |
+| API27-01 | TBD | Pending |
+| API27-02 | TBD | Pending |
+| QUERY27-01 | TBD | Pending |
+| STATE27-01 | TBD | Pending |
+| MOCK27-01 | TBD | Pending |
+| ROUTE27-01 | TBD | Pending |
+| OVERVIEW27-01 | TBD | Pending |
+| PATH27-01 | TBD | Pending |
+| LESSON27-01 | TBD | Pending |
+| CHAL27-01 | TBD | Pending |
+| CHAL27-02 | TBD | Pending |
+| CHAL27-03 | TBD | Pending |
+| FEED27-01 | TBD | Pending |
+| RESULT27-01 | TBD | Pending |
+| MISTAKE27-01 | TBD | Pending |
+| HINT27-01 | TBD | Pending |
+| ASSIST27-01 | TBD | Pending |
+| ASSIST27-02 | TBD | Pending |
+| TEACH27-01 | TBD | Pending |
+| BOUND27-01 | TBD | Pending |
+| DASH27-01 | TBD | Pending |
+| NAV27-01 | TBD | Pending |
+| PARENT27-01 | TBD | Pending |
+| PARENT27-02 | TBD | Pending |
+| LANG27-01 | TBD | Pending |
+| LANG27-02 | TBD | Pending |
+| LANG27-03 | TBD | Pending |
+| LANG27-04 | TBD | Pending |
+| UI27-01 | TBD | Pending |
+| A11Y27-01 | TBD | Pending |
+| DOC27-01 | TBD | Pending |
+| QA27-01 | TBD | Pending |
+| README27-01 | TBD | Pending |
+| VERIFY27-01 | TBD | Pending |
 
 **Coverage:**
-- v1.24 requirements: 32 total
-- Mapped to phases: 32
-- Unmapped: 0
+- v1.25 requirements: 41 total
+- Mapped to phases: 0
+- Unmapped: 41
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after v1.24 roadmap creation*
+*Last updated: 2026-05-26 after v1.25 requirements definition*
