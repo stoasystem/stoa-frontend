@@ -1,86 +1,105 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-26
-**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, locked release evidence, and a clean Go/No-Go path for public demo release.
+**Milestone:** v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled Learning Assistant behavior, and a clean path to future real backend integration.
 
-## v1.22 Requirements
+## v1.23 Requirements
 
-Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 25. Each requirement maps to exactly one roadmap phase.
 
-### Final Approval and Bug Triage
+### Provider Foundation
 
-- [x] **APPROVAL23-01**: `docs/release/final-approval-changes.md` records each required final approval change with ID, source reviewer, page, issue, required change, priority, decision, and status.
-- [x] **APPROVAL23-02**: Final approval changes explicitly reject new features, non-blocking aesthetic preferences, unrelated roadmap ideas, and future platform functionality.
-- [x] **BUG23-01**: Launch-candidate bugs are reviewed and classified as P0, P1, P2, or P3 using the Phase 22 final bug triage policy.
-- [x] **BUG23-02**: P0 bugs are marked fix-required and cannot be accepted as known issues.
-- [x] **BUG23-03**: P1 bugs are fixed or recorded with an accepted workaround and owner.
-- [x] **BUG23-04**: P2/P3 issues are either fixed only when low-risk or moved to known issues/backlog without expanding Phase 23 scope.
+- [ ] **PROVIDER25-01**: Developers can use a typed Python provider interface with `ProviderRequest`, `ProviderResponse`, and `LearningProvider` so local demo providers are replaceable.
+- [ ] **PROVIDER25-02**: Developers can run a Codex provider adapter that invokes local `codex exec` non-interactively with bounded timeout and captured final text.
+- [ ] **PROVIDER25-03**: The Codex provider adapter uses stdin or an equivalent safe input path so long prompts do not depend on shell quoting.
+- [ ] **PROVIDER25-04**: The Codex provider adapter runs in a local-demo-safe mode such as ephemeral/read-only where feasible and fails clearly when unavailable.
+- [ ] **PROVIDER25-05**: Developers can use a template fallback provider that returns a guided Learning Assistant response when Codex is unavailable or rejected.
+- [ ] **PROVIDER25-06**: Developers can use a provider router that selects the configured provider from environment variables and automatically falls back on provider errors, timeouts, failed checks, or forbidden terms.
+- [ ] **PROVIDER25-07**: Provider logging records provider selection, fallback usage, timeout, and failure category without passwords, tokens, full file contents, or full private chat transcripts.
+- [ ] **PROVIDER25-08**: `.gitignore` excludes local provider logs such as `demo-harness/logs/`.
 
-### Blocker Fixes and Lock Preservation
+### Prompt Harness and Behavior Rules
 
-- [x] **FIX23-01**: Code changes are limited to P0/P1 blockers, required approval changes, or release blockers.
-- [x] **FIX23-02**: Each code change is checked against core demo flow impact, mobile impact, build impact, and risk of new user-facing demo/mock/Codex residue.
-- [x] **LOCK23-01**: Copy lock remains valid after Phase 23 fixes or any allowed copy change is documented as approval/blocker-driven.
-- [x] **LOCK23-02**: Design lock remains valid after Phase 23 fixes or any allowed visual change is documented as approval/blocker-driven.
-- [x] **LOCK23-03**: Translation lock remains valid across English, German, French, and Italian after Phase 23 fixes.
-- [x] **LOCK23-04**: Demo API contract lock remains valid unless a P0 blocker requires an explicit documented exception and retest.
+- [ ] **HARNESS25-01**: The Python harness can build a Learning Assistant prompt from student profile, grade level, registered subjects, conversation subject, recent context, language, and the student question.
+- [ ] **HARNESS25-02**: Prompt templates exist for base Learning Assistant behavior, grade rules, subject rules, and teacher escalation rules.
+- [ ] **HARNESS25-03**: The prompt instructs the assistant to guide understanding before any final answer and to use step-by-step explanations suitable for the student.
+- [ ] **HARNESS25-04**: The prompt injects grade-level constraints so lower-secondary students are not given advanced concepts such as calculus unless the question is explicitly about scope boundaries.
+- [ ] **HARNESS25-05**: The prompt injects subject-scope constraints so questions outside registered subjects are handled gently without pretending to provide full unsupported instruction.
+- [ ] **HARNESS25-06**: The prompt includes teacher escalation guidance for confused, dissatisfied, blocked, or repeated-help-needed students.
+- [ ] **HARNESS25-07**: The prompt forbids user-visible internal terms including Codex, AI, model, prompt, backend, demo, mock, and provider.
+- [ ] **HARNESS25-08**: The harness can perform one repair attempt when a provider response fails behavior checks before using fallback.
 
-### Final Demo Rerun and Smoke Tests
+### Response Quality and Regression Tests
 
-- [x] **RUN23-01**: Demo data reset, demo backend/mock mode, frontend startup, backend `/health`, language switcher, and demo accounts are checked before final run.
-- [x] **RUN23-02**: Full final demo flow is rerun across homepage, student registration/login, chat question, Learning Assistant response, professional teacher support request, tutor workflow, parent report, pricing/billing, contact form, and admin overview.
-- [x] **RUN23-03**: `docs/release/public-demo-final-run.md` records date, commit hash, environment, tester, browser, device, language, flow result, issues found, and Go/No-Go.
-- [x] **SMOKE23-01**: Final multilingual smoke test covers homepage, register, chat, parent report, pricing, contact, and footer in English, German, French, and Italian.
-- [x] **SMOKE23-02**: Final responsive smoke test covers 375px, 430px, 768px, 1024px, and 1440px for homepage, register, chat, parent report, pricing, and contact.
-- [x] **SMOKE23-03**: Final accessibility smoke test covers tab navigation, visible focus, contact/register labels, icon-button labels, dialog focus, color contrast, and h1 sanity.
-- [x] **SMOKE23-04**: `npm run build` passes after all release-candidate fixes.
+- [ ] **RESPONSE25-01**: Response evaluation rejects or repairs answers that expose forbidden internal terms.
+- [ ] **RESPONSE25-02**: Response evaluation rejects or repairs answers that begin with a direct final answer instead of guided explanation.
+- [ ] **RESPONSE25-03**: Response evaluation detects known grade-scope violations in the demo regression set.
+- [ ] **RESPONSE25-04**: Response evaluation detects known subject-scope violations in the demo regression set.
+- [ ] **RESPONSE25-05**: Response evaluation rejects or repairs answers that are excessively long, overly technical, or lack explanatory steps.
+- [ ] **RESPONSE25-06**: `demo-harness/data/demo_question_regression.json` contains at least the eight required regression cases for math, physics, out-of-grade, out-of-subject, follow-up, and teacher escalation behavior.
+- [ ] **RESPONSE25-07**: Behavior tests verify Codex success, Codex failure fallback, timeout handling where feasible, forbidden-term rejection, guided-answer behavior, grade scope, subject scope, and teacher escalation suggestions.
+- [ ] **RESPONSE25-08**: User-visible provider failure text is natural Learning Assistant/support language and never says Codex, model, prompt, backend, demo, mock, or provider failed.
 
-### Public Demo Release Handoff
+### Demo Backend and Frontend Contract
 
-- [x] **HANDOFF23-01**: `docs/release/deployment-handoff.md` documents deployment target, environment variables, API mode, demo backend URL, build command, preview command, rollback instruction, contact person, and known limitations.
-- [x] **HANDOFF23-02**: Deployment handoff recommends public demo release flags with demo accounts, demo badges, and internal debug hidden.
-- [x] **MONITOR23-01**: `docs/release/demo-monitoring-plan.md` documents what to monitor after release, 48-hour check frequency, and pre-presentation smoke timing.
-- [x] **PRESENT23-01**: `docs/release/first-external-presentation-support.md` documents pre-demo preparation, recommended browser/device/accounts, fallback paths, pages to avoid, and feedback collection.
-- [x] **NOTES23-01**: `docs/release/public-demo-release-notes.md` documents release name, date, purpose, flows, roles, languages, internal demo backend note, known limitations, and contact/support info.
-- [x] **NOTES23-02**: External-facing release notes avoid mock, demo backend, fake checkout, and Codex wording.
+- [ ] **BACKEND25-01**: `POST /conversations/{conversationId}/messages` saves the student message, calls the harness, saves the assistant message, and returns the existing `studentMessage` plus `assistantMessage` response shape.
+- [ ] **BACKEND25-02**: The demo backend loads student grade and registered subjects from local demo state before calling the harness.
+- [ ] **BACKEND25-03**: The demo backend passes conversation subject and recent messages to the harness without sending passwords, tokens, or uploaded file contents.
+- [ ] **BACKEND25-04**: `GET /health/provider` reports internal provider readiness, selected provider, fallback provider, and demo mode without exposing prompts or user data.
+- [ ] **BACKEND25-05**: The existing streaming chat endpoint remains compatible with the harness-backed assistant response.
+- [ ] **BACKEND25-06**: Frontend chat services and types remain provider-agnostic and do not add Codex, model, provider, prompt, or debug fields to normal Chat API responses.
+- [ ] **BACKEND25-07**: Existing frontend and backend fallback copy that directly gives answers or mentions demo/provider internals is replaced with guided Learning Assistant language.
 
-### Go / No-Go and Public Release
+### QA, Documentation, and Handoff
 
-- [x] **GONOGO23-01**: `docs/release/go-no-go-decision.md` records Go and No-Go criteria, P0/P1 status, stakeholder approval status, and final decision.
-- [x] **README23-01**: README includes the Phase 23 launch-candidate bug fixing and public demo release section.
-- [x] **RELEASE23-01**: Release tag or release branch plan is recorded and follows bug-fix-only release branch rules.
-- [x] **RELEASE23-02**: Public demo release branch or deployment confirmation is recorded, or exact external blocker is documented.
-- [x] **SIGNOFF23-01**: Stakeholder final sign-off is recorded before public demo release is marked Go.
+- [ ] **QA25-01**: `docs/qa/codex-provider-behavior-qa.md` documents provider readiness, timeout, fallback, forbidden-term, grade-scope, subject-scope, guided-answer, and teacher escalation checks.
+- [ ] **QA25-02**: `docs/backend-integration/learning-provider-handoff.md` documents the demo provider interface, Codex adapter, prompt rules, response checks, teacher escalation rules, frontend expectations, and future production provider requirements.
+- [ ] **QA25-03**: README documents Phase 25 local Codex provider integration, environment variables, local-only boundary, fallback behavior, and the rule that user-facing UI must never mention Codex.
+- [ ] **QA25-04**: A provider readiness checklist exists for demo operators before running an external presentation.
+- [ ] **QA25-05**: Full student flow QA verifies registration/login, chat question, guided answer, follow-up, and professional teacher support request.
+- [ ] **QA25-06**: Full tutor flow QA verifies request list, detail, in-progress status, note, and resolved status.
+- [ ] **QA25-07**: Full parent flow QA verifies child learning history, report, and teacher request record visibility.
+- [ ] **QA25-08**: Full commercial/support/admin flow QA verifies pricing, mock checkout, referral, support/contact, and admin overview are not regressed.
+- [ ] **QA25-09**: Final verification runs the Python harness tests and `npm run build`, or records exact blockers with mitigation.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in the current roadmap.
 
-### Phase 24 Public Demo Feedback and Backend Handoff
+### Phase 26 Demo Reliability and Presentation Readiness
 
-- **FEEDBACK24-01**: Public demo feedback is collected, categorized, and analyzed after external demos.
-- **ITERATION24-01**: Next frontend iteration plan is prioritized from external parent, teacher, investor, and partner feedback.
-- **BACKEND24-01**: Real backend handoff package is prepared from public demo evidence and release gaps.
-- **AWS24-01**: AWS integration handoff package is prepared without implementing complex backend/cloud work in the frontend.
+- **SCRIPT26-01**: Demo scenarios are scripted and resettable for external presentation rehearsals.
+- **RELIABILITY26-01**: End-to-end demo reliability is tested repeatedly under presentation conditions.
+- **RESET26-01**: Demo reset can restore all flows, provider mode, and seed state predictably.
+- **INCIDENT26-01**: Demo incident response and final fallback strategy are documented.
+
+### Future Production Provider
+
+- **PRODPROVIDER-01**: A real backend-owned provider adapter can replace the local Codex CLI adapter without frontend contract changes.
+- **PRODPROVIDER-02**: Production provider integration can use a formal API such as OpenAI Responses API with structured outputs, safety controls, monitoring, and billing owned by the backend.
+- **PRODPROVIDER-03**: Production teacher escalation rules, safety policy, privacy review, and provider observability are defined outside the frontend demo repository.
 
 ## Out of Scope
 
-Explicitly excluded from v1.22 to prevent scope creep.
+Explicitly excluded from v1.23 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| New product features | Phase 23 is release execution and bug fixing only. |
-| New pages or new languages | Public demo release should stabilize existing surfaces. |
-| Product direction changes | Direction was locked by launch-candidate preparation. |
-| Broad copy rewrite | Copy lock remains active; only blocker/approval copy changes are allowed. |
-| Broad visual redesign | Design lock remains active; only blocker/approval visual fixes are allowed. |
-| Navigation refactor | Navigation is release-locked unless a P0/P1 blocker requires a narrow fix. |
-| API contract changes | Demo API contract lock remains active unless a P0 blocker requires an exception. |
-| Complex backend/database work | Production backend architecture belongs to future backend handoff. |
-| AWS deployment implementation | Phase 23 can hand off deployment and confirm release, not build cloud infrastructure. |
-| Real payment processing | Public demo release is not paid production launch. |
-| Production support/CRM/email operations | Contact/support remain demo/API-contract surfaces unless external systems already exist. |
+| Formal AI backend | Phase 25 is local testing/demo provider integration only. |
+| Production model service | Codex CLI is a local demo bridge, not production infrastructure. |
+| Provider billing | Billing belongs to future backend/provider operations. |
+| Complex provider pool | A single configured provider plus fallback is enough for demo reliability. |
+| Production queue | Local synchronous demo flow is sufficient for Phase 25. |
+| Database redesign | Existing local demo persistence should be reused. |
+| Long-term memory | Conversation memory beyond existing local messages is outside this milestone. |
+| Real curriculum knowledge graph | Grade/subject checks are prompt and regression controls, not formal curriculum intelligence. |
+| Full content safety platform | Phase 25 adds simple behavior checks only. |
+| AWS Lambda/API Gateway deployment | Cloud deployment is outside this local demo provider milestone. |
+| Direct frontend calls to Codex or OpenAI | Frontend must remain coupled only to STOA backend APIs. |
+| User-visible provider/debug wording | Codex/model/provider/prompt/backend/demo/mock details are internal only. |
+| Real payment processing | Billing flow remains the existing mock/virtual demo flow. |
+| New product modules or UI redesign | Phase 25 stabilizes provider-backed demo behavior without broad product expansion. |
 
 ## Traceability
 
@@ -88,42 +107,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APPROVAL23-01 | Phase 128 | Done |
-| APPROVAL23-02 | Phase 128 | Done |
-| BUG23-01 | Phase 128 | Done |
-| BUG23-02 | Phase 128 | Done |
-| BUG23-03 | Phase 128 | Done |
-| BUG23-04 | Phase 128 | Done |
-| FIX23-01 | Phase 129 | Done |
-| FIX23-02 | Phase 129 | Done |
-| LOCK23-01 | Phase 129 | Done |
-| LOCK23-02 | Phase 129 | Done |
-| LOCK23-03 | Phase 129 | Done |
-| LOCK23-04 | Phase 129 | Done |
-| RUN23-01 | Phase 130 | Done |
-| RUN23-02 | Phase 130 | Done |
-| RUN23-03 | Phase 130 | Done |
-| SMOKE23-01 | Phase 130 | Done |
-| SMOKE23-02 | Phase 130 | Done |
-| SMOKE23-03 | Phase 130 | Done |
-| SMOKE23-04 | Phase 130 | Done |
-| HANDOFF23-01 | Phase 131 | Done |
-| HANDOFF23-02 | Phase 131 | Done |
-| MONITOR23-01 | Phase 131 | Done |
-| PRESENT23-01 | Phase 131 | Done |
-| NOTES23-01 | Phase 131 | Done |
-| NOTES23-02 | Phase 131 | Done |
-| GONOGO23-01 | Phase 132 | Done |
-| README23-01 | Phase 132 | Done |
-| RELEASE23-01 | Phase 132 | Done |
-| RELEASE23-02 | Phase 132 | Done |
-| SIGNOFF23-01 | Phase 132 | Done |
+| TBD | TBD | Pending |
 
 **Coverage:**
-- v1.22 requirements: 30 total
-- Mapped to phases: 30
-- Unmapped: 0
+- v1.23 requirements: 40 total
+- Mapped to phases: 0
+- Unmapped: 40
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 during v1.22 milestone initialization*
+*Last updated: 2026-05-26 during v1.23 milestone initialization*
