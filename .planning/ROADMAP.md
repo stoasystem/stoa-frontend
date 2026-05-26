@@ -26,28 +26,82 @@
 - ✅ **v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation** - Phases 123-127 (implemented 2026-05-26)
 - ✅ **v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release** - Phases 128-132 (shipped 2026-05-26)
 - ✅ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (shipped 2026-05-26)
+- ◆ **v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing** - Phases 137-140 (planning)
 
 ## Phases
 
-No active milestone. Start the next milestone with `$gsd-new-milestone`.
+### Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold
 
-## Last Shipped Milestone
+**Goal:** Define the Learning Assistant functional QA plan, relevance and multi-turn behavior rules, repair workflow, readiness threshold, and bug reproduction process.
 
-### v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
+**Requirements:** QA26-01, RULE26-01, RULE26-02, RULE26-03, RULE26-04, BUG26-01
 
-Archive:
+**Success criteria:**
 
-- `.planning/milestones/v1.23-ROADMAP.md`
-- `.planning/milestones/v1.23-REQUIREMENTS.md`
-- `.planning/milestones/v1.23-MILESTONE-AUDIT.md`
+1. Functional QA plan documents behavior dimensions, P0 categories, and verification method.
+2. Learning Assistant rule docs cover relevance, multi-turn consistency, repair prompt workflow, and demo readiness thresholds.
+3. Bug reproduction log template supports repeatable tracking from failure to regression test.
+4. Docs explicitly state Phase 26 does not add product features or UI redesign.
 
-Phase artifacts:
+### Phase 138: Multi-Turn Regression Data and Behavior Test Suite
 
-- `.planning/milestones/v1.23-phases/133-harness-provider-foundation-and-codex-adapter/`
-- `.planning/milestones/v1.23-phases/134-prompt-rules-response-checks-and-behavior-regression/`
-- `.planning/milestones/v1.23-phases/135-demo-backend-chat-integration-and-provider-health/`
-- `.planning/milestones/v1.23-phases/136-full-demo-qa-readiness-checklist-readme-and-handoff/`
+**Goal:** Add the multi-turn test data and focused behavior tests that reproduce relevance, grade, subject, context, escalation, internal-term, and cheating scenarios.
 
-Next recommended milestone:
+**Requirements:** DATA26-01, TEST26-01, TEST26-02, TEST26-03, TEST26-04, TEST26-05, TEST26-06, TEST26-07, TEST26-08
 
-- Phase 26: End-to-End Demo Reliability, Scripted Scenarios, and External Presentation Readiness.
+**Success criteria:**
+
+1. Multi-turn regression JSON includes the eight required scenarios with student profiles, turns, and expected behavior.
+2. Focused test modules exist for relevance, grade scope, subject scope, multi-turn context, teacher escalation, internal-term leakage, and cheating behavior.
+3. Existing Phase 25 provider tests continue to run from the repo root.
+4. The test suite produces actionable failure names that map to the bug reproduction log.
+
+### Phase 139: Evaluator, Prompt, Repair, and Fallback Stabilization
+
+**Goal:** Improve the harness evaluator, prompt/repair rules, and fallback behavior so detected Learning Assistant behavior bugs are fixed in the harness layer.
+
+**Requirements:** EVAL26-01, EVAL26-02, EVAL26-03, EVAL26-04, EVAL26-05, EVAL26-06, PROMPT26-01, FALLBACK26-01
+
+**Success criteria:**
+
+1. Evaluator exposes focused helper checks for relevance, grade, subject, direct-answer-first, internal terms, teacher escalation need, length, and context consistency.
+2. Evaluator detects generic/irrelevant answers, direct homework answers, high-risk or cheating requests, internal terms, and multi-turn context loss for regression scenarios.
+3. Repair prompt rules keep responses concise, relevant, grade-appropriate, step-guided, and internal-term-free.
+4. Fallback responses support relevance, subject-scope, confusion, cheating, and teacher-escalation scenarios without single-question hardcoding.
+
+### Phase 140: Demo Flow QA, Regression Report, README, and Final Verification
+
+**Goal:** Verify the Learning Assistant behavior in the demo flow, document regression results, update README, and confirm build/test readiness.
+
+**Requirements:** CHAT26-01, PARENT26-01, TUTOR26-01, LANG26-01, LANG26-02, LANG26-03, REPORT26-01, README26-01, VERIFY26-01
+
+**Success criteria:**
+
+1. Student chat QA covers multi-turn order, loading completion, retry behavior, teacher request duplicate-submit prevention, and no internal fallback/provider output.
+2. Parent and tutor QA confirm records/context/status/note flows remain stable and internal debug/provider data is not shown.
+3. English, German, French, and Italian behavior smoke coverage is documented at the required priority level.
+4. Regression report records pass/fail counts, failure types, provider, fallback count, P0 count, known issues, and readiness decision.
+5. README includes Phase 26 Learning Assistant functional QA instructions and final verification passes or records exact blockers.
+
+## Coverage
+
+| Phase | Requirement Count | Requirements |
+|-------|-------------------|--------------|
+| 137 | 6 | QA26-01, RULE26-01, RULE26-02, RULE26-03, RULE26-04, BUG26-01 |
+| 138 | 9 | DATA26-01, TEST26-01, TEST26-02, TEST26-03, TEST26-04, TEST26-05, TEST26-06, TEST26-07, TEST26-08 |
+| 139 | 8 | EVAL26-01, EVAL26-02, EVAL26-03, EVAL26-04, EVAL26-05, EVAL26-06, PROMPT26-01, FALLBACK26-01 |
+| 140 | 9 | CHAT26-01, PARENT26-01, TUTOR26-01, LANG26-01, LANG26-02, LANG26-03, REPORT26-01, README26-01, VERIFY26-01 |
+
+**Total requirements:** 32
+**Mapped requirements:** 32
+**Unmapped requirements:** 0
+
+## Next Up
+
+**Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold** - Define the behavior QA rules and bug tracking foundation before expanding tests and evaluator logic.
+
+Run:
+
+```bash
+$gsd-plan-phase 137
+```

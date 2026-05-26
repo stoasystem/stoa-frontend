@@ -86,13 +86,44 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TBD | TBD | Pending |
+| QA26-01 | Phase 137 | Pending |
+| RULE26-01 | Phase 137 | Pending |
+| RULE26-02 | Phase 137 | Pending |
+| RULE26-03 | Phase 137 | Pending |
+| RULE26-04 | Phase 137 | Pending |
+| BUG26-01 | Phase 137 | Pending |
+| DATA26-01 | Phase 138 | Pending |
+| TEST26-01 | Phase 138 | Pending |
+| TEST26-02 | Phase 138 | Pending |
+| TEST26-03 | Phase 138 | Pending |
+| TEST26-04 | Phase 138 | Pending |
+| TEST26-05 | Phase 138 | Pending |
+| TEST26-06 | Phase 138 | Pending |
+| TEST26-07 | Phase 138 | Pending |
+| TEST26-08 | Phase 138 | Pending |
+| EVAL26-01 | Phase 139 | Pending |
+| EVAL26-02 | Phase 139 | Pending |
+| EVAL26-03 | Phase 139 | Pending |
+| EVAL26-04 | Phase 139 | Pending |
+| EVAL26-05 | Phase 139 | Pending |
+| EVAL26-06 | Phase 139 | Pending |
+| PROMPT26-01 | Phase 139 | Pending |
+| FALLBACK26-01 | Phase 139 | Pending |
+| CHAT26-01 | Phase 140 | Pending |
+| PARENT26-01 | Phase 140 | Pending |
+| TUTOR26-01 | Phase 140 | Pending |
+| LANG26-01 | Phase 140 | Pending |
+| LANG26-02 | Phase 140 | Pending |
+| LANG26-03 | Phase 140 | Pending |
+| REPORT26-01 | Phase 140 | Pending |
+| README26-01 | Phase 140 | Pending |
+| VERIFY26-01 | Phase 140 | Pending |
 
 **Coverage:**
 - v1.24 requirements: 32 total
-- Mapped to phases: 0
-- Unmapped: 32
+- Mapped to phases: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 during v1.24 milestone initialization*
+*Last updated: 2026-05-26 after v1.24 roadmap creation*

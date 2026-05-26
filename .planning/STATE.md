@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-05-26T15:46:12.084Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 4
   completed_plans: 0
   percent: 0
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.23 is complete and archived. Next work should start with a new milestone.
+**Current focus:** Phase 137: Functional QA Rules, Bug Log, and Readiness Threshold.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 137 - Functional QA Rules, Bug Log, and Readiness Threshold
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.24 started
+Status: Roadmap ready
+Last activity: 2026-05-26 — Milestone v1.24 roadmap created
 
 ## Performance Metrics
 
@@ -221,6 +221,7 @@ Recent decisions affecting current work:
 - Phase 134 added prompt templates, prompt construction, response checks, repair/fallback orchestration, regression data, and harness behavior tests.
 - Phase 135 connected the harness into the FastAPI chat endpoint, added `/health/provider`, preserved frontend response contracts, and replaced direct-answer/internal fallback copy.
 - Phase 136 added provider behavior QA, production-provider handoff docs, README guidance, code-review hardening, and final verification evidence.
+- Milestone v1.24 started as Phase 26, focused on Learning Assistant functional QA, multi-turn behavior testing, evaluator/prompt/fallback fixes, regression reporting, and demo-flow stability without adding product scope.
 
 ### Pending Todos
 
