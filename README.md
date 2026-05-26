@@ -53,6 +53,39 @@ Phase 25 docs:
 - `docs/qa/codex-provider-behavior-qa.md`
 - `docs/backend-integration/learning-provider-handoff.md`
 
+## Phase 26 Learning Assistant Functional QA
+
+This phase tests and stabilizes the Learning Assistant behavior. It does not add product features or redesign the UI.
+
+The goal is to ensure that the Learning Assistant:
+
+- answers relevantly
+- does not give final answers first for homework-style questions
+- guides students step by step
+- respects student grade level
+- respects selected subjects
+- redirects unrelated questions outside the learning profile
+- suggests professional teacher support when appropriate
+- avoids internal terms such as Codex, AI, model, prompt, demo, backend, mock, provider, and system instruction
+- remains stable in multi-turn conversations
+
+Run regression tests:
+
+```bash
+python3 -m unittest discover -s demo-harness/tests
+npm run lint
+npm run build
+```
+
+Phase 26 docs:
+
+- `docs/qa/learning-assistant-functional-qa-plan.md`
+- `docs/qa/learning-assistant-regression-report.md`
+- `docs/learning-assistant/relevance-rules.md`
+- `docs/learning-assistant/multi-turn-behavior-rules.md`
+- `docs/learning-assistant/repair-prompt-rules.md`
+- `docs/learning-assistant/demo-readiness-threshold.md`
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.

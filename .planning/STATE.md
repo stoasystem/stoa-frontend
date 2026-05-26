@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.24
 milestone_name: "Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing"
-status: executing
-last_updated: "2026-05-26T16:18:00.000Z"
+status: verification_complete
+last_updated: "2026-05-26T16:34:00.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Phase 140: Demo Flow QA, Regression Report, README, and Final Verification.
+**Current focus:** Milestone v1.24 audit and archive.
 
 ## Current Position
 
 Phase: 140 - Demo Flow QA, Regression Report, README, and Final Verification
-Plan: Phases 137-139 completed
-Status: Executing Phase 26 autonomous workflow
-Last activity: 2026-05-26 — Phases 138 and 139 added behavior regression tests plus evaluator, repair prompt, and fallback stabilization
+Plan: Complete
+Status: Verification complete
+Last activity: 2026-05-26 — Phase 140 added the regression report, README guidance, and final verification evidence
 
 ## Performance Metrics
 
@@ -225,6 +225,7 @@ Recent decisions affecting current work:
 - Phase 137 added functional QA, relevance, multi-turn, repair prompt, demo readiness threshold, and bug reproduction log documentation.
 - Phase 138 added multi-turn behavior regression data plus focused relevance, grade, subject, context, escalation, internal-term, and cheating tests.
 - Phase 139 strengthened the harness evaluator, repair prompt, and template fallback for Phase 26 behavior scenarios.
+- Phase 140 added the Learning Assistant regression report, README instructions, and final install/harness/backend/frontend/demo-flow verification evidence.
 
 ### Pending Todos
 
@@ -262,6 +263,14 @@ None currently.
 
 ### Verification Notes
 
+- `npm install --ignore-scripts` passed for v1.24 and reported dependencies up to date.
+- `PYTHONPATH=backend backend/.venv/bin/python -m py_compile backend/app/main.py backend/app/seed.py backend/app/reset_demo_data.py` passed for v1.24.
+- Backend TestClient student chat and teacher support smoke passed for v1.24 with template provider and no internal terms in assistant output.
+- Backend TestClient parent summary and tutor request detail/status/note smoke passed for v1.24.
+- Backend TestClient billing, referral, support ticket, and admin overview smoke passed for v1.24.
+- Template fallback EN/DE/FR/IT language smoke passed with no internal terms for v1.24.
+- `npm run lint` passed for v1.24.
+- `npm run build` passed for v1.24 with the existing Node `DEP0205` deprecation warning from tooling.
 - `python3 -m unittest discover -s demo-harness/tests` passed for Phase 138/139 with 23 tests.
 - `npm run build` passed for v1.10.
 - `npm run lint` passed for v1.10.

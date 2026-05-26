@@ -42,15 +42,15 @@ Requirements for Phase 26. Each requirement maps to exactly one roadmap phase.
 
 ### Demo Flow Stability and Reporting
 
-- [ ] **CHAT26-01**: Student chat QA verifies multi-turn message order, loading completion, retry behavior, teacher request duplicate-submit prevention, and no internal fallback/provider information in UI output.
-- [ ] **PARENT26-01**: Parent history/report QA verifies student question records and teacher request records display without prompt/provider/debug details.
-- [ ] **TUTOR26-01**: Tutor request-detail QA verifies tutor can see student question context, update status, add notes, and avoid prompt/provider/debug details.
-- [ ] **LANG26-01**: English behavior smoke verifies guided explanations are calm, short, clear, relevant, and internal-term-free.
-- [ ] **LANG26-02**: German behavior smoke verifies responses are clear for lower-secondary students, avoid technical internal terms, and use product-safe Learning Assistant/teacher support language.
-- [ ] **LANG26-03**: French and Italian P1 smoke verifies response language correctness and absence of Codex/internal terms.
-- [ ] **REPORT26-01**: `docs/qa/learning-assistant-regression-report.md` records passed cases, failed cases, failure types, provider used, fallback count, P0 behavior failures, known issues, and readiness decision.
-- [ ] **README26-01**: README documents Phase 26 Learning Assistant functional QA, behavior goals, non-feature scope, and regression test command.
-- [ ] **VERIFY26-01**: Final verification runs `npm install` or records why it is skipped, Python harness tests, `npm run build`, and focused student/tutor/parent flow checks.
+- [x] **CHAT26-01**: Student chat QA verifies multi-turn message order, loading completion, retry behavior, teacher request duplicate-submit prevention, and no internal fallback/provider information in UI output.
+- [x] **PARENT26-01**: Parent history/report QA verifies student question records and teacher request records display without prompt/provider/debug details.
+- [x] **TUTOR26-01**: Tutor request-detail QA verifies tutor can see student question context, update status, add notes, and avoid prompt/provider/debug details.
+- [x] **LANG26-01**: English behavior smoke verifies guided explanations are calm, short, clear, relevant, and internal-term-free.
+- [x] **LANG26-02**: German behavior smoke verifies responses are clear for lower-secondary students, avoid technical internal terms, and use product-safe Learning Assistant/teacher support language.
+- [x] **LANG26-03**: French and Italian P1 smoke verifies response language correctness and absence of Codex/internal terms.
+- [x] **REPORT26-01**: `docs/qa/learning-assistant-regression-report.md` records passed cases, failed cases, failure types, provider used, fallback count, P0 behavior failures, known issues, and readiness decision.
+- [x] **README26-01**: README documents Phase 26 Learning Assistant functional QA, behavior goals, non-feature scope, and regression test command.
+- [x] **VERIFY26-01**: Final verification runs `npm install` or records why it is skipped, Python harness tests, `npm run build`, and focused student/tutor/parent flow checks.
 
 ## Future Requirements
 
@@ -109,15 +109,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | EVAL26-06 | Phase 139 | Complete |
 | PROMPT26-01 | Phase 139 | Complete |
 | FALLBACK26-01 | Phase 139 | Complete |
-| CHAT26-01 | Phase 140 | Pending |
-| PARENT26-01 | Phase 140 | Pending |
-| TUTOR26-01 | Phase 140 | Pending |
-| LANG26-01 | Phase 140 | Pending |
-| LANG26-02 | Phase 140 | Pending |
-| LANG26-03 | Phase 140 | Pending |
-| REPORT26-01 | Phase 140 | Pending |
-| README26-01 | Phase 140 | Pending |
-| VERIFY26-01 | Phase 140 | Pending |
+| CHAT26-01 | Phase 140 | Complete |
+| PARENT26-01 | Phase 140 | Complete |
+| TUTOR26-01 | Phase 140 | Complete |
+| LANG26-01 | Phase 140 | Complete |
+| LANG26-02 | Phase 140 | Complete |
+| LANG26-03 | Phase 140 | Complete |
+| REPORT26-01 | Phase 140 | Complete |
+| README26-01 | Phase 140 | Complete |
+| VERIFY26-01 | Phase 140 | Complete |
 
 **Coverage:**
 - v1.24 requirements: 32 total

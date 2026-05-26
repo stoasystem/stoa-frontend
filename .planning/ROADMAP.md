@@ -75,7 +75,7 @@
 
 **Status:** Complete.
 
-### Phase 140: Demo Flow QA, Regression Report, README, and Final Verification
+### Phase 140: Demo Flow QA, Regression Report, README, and Final Verification ✅
 
 **Goal:** Verify the Learning Assistant behavior in the demo flow, document regression results, update README, and confirm build/test readiness.
 
@@ -88,6 +88,8 @@
 3. English, German, French, and Italian behavior smoke coverage is documented at the required priority level.
 4. Regression report records pass/fail counts, failure types, provider, fallback count, P0 count, known issues, and readiness decision.
 5. README includes Phase 26 Learning Assistant functional QA instructions and final verification passes or records exact blockers.
+
+**Status:** Complete.
 
 ## Coverage
 
@@ -104,10 +106,4 @@
 
 ## Next Up
 
-**Phase 140: Demo Flow QA, Regression Report, README, and Final Verification** - Verify the Learning Assistant behavior in the demo flow, document regression results, update README, and confirm build/test readiness.
-
-Run:
-
-```bash
-$gsd-plan-phase 140
-```
+Milestone v1.24 is complete and ready for audit/archive.
