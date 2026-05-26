@@ -24,17 +24,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Teacher support shown after repeated confusion with practice context.
 - Dashboard, homepage, navigation, parent report, docs, localization, QA, README, build, and browser smoke.
 
-## Current Milestone: v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
+## Current Milestone: v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement
 
-**Goal:** Refine the Practice Path interaction model and connect it naturally to Learning Chat, teacher support, student dashboard entry points, public-site learning CTAs, and parent learning-activity reporting while keeping the work frontend-design-first and demo-scoped.
+**Goal:** Package the existing Practice Path, Learning Chat, teacher support, and Parent Report surfaces into a focused external demo curriculum story with testing materials, feedback capture, and future curriculum/backend handoff guidance while avoiding new feature expansion.
 
 **Target features:**
-- Research-backed Practice interaction refinements inspired by Duolingo-style flow mechanics without copying visual style, backend structure, punitive hearts, shop/gems, or cartoon reward systems.
-- Lesson start, challenge, feedback, hint, retry, completion, and mistakes review flow polish for the existing equation demo.
-- Practice-to-Learning-Chat handoff with challenge context card, `Explain this step`, `Ask in Learning Chat`, and `Back to lesson` behavior.
-- Teacher support escalation after repeated confusion, carrying practice context without pushing teacher help too early.
-- Student Dashboard, homepage entry points, navigation, and parent report wording reorganized around one learning platform instead of disconnected Practice and Chat modules.
-- Four-language CTA copy, docs, QA checklist, demo script, README handoff, and build/browser smoke verification.
+- Final demo curriculum package for the equation-focused Practice Path.
+- Locked product story connecting Practice, hint-first help, Learning Chat, professional teacher support, and Parent Report visibility.
+- Student, parent, tutor, investor, and stakeholder demo scripts/task sheets for external testing.
+- External testing plan, feedback form, role-specific feedback questions, and evaluation guidance.
+- Parent value framing and integrated learning-report narrative for Practice plus Chat activity.
+- Future real curriculum requirements, future backend integration requirements, next-iteration backlog, README handoff, and demo documentation.
 
 ## Current State
 
@@ -106,7 +106,10 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-(None — v1.27 implementation is complete. Next active scope should be defined by Phase 30.)
+- [ ] Package the existing equation Practice Path into a final demo curriculum experience — v1.28
+- [ ] Define external testing tasks and feedback collection for students, parents, tutors, and stakeholders — v1.28
+- [ ] Refine the product story and demo scripts around Practice, Learning Chat, teacher support, and Parent Report visibility — v1.28
+- [ ] Document future real curriculum and backend integration requirements without implementing new backend scope — v1.28
 
 ### Out of Scope
 
@@ -240,6 +243,10 @@ Current codebase facts:
 - **Phase 29 interaction boundary**: Practice Path refinements should focus on UI flow, route state, mock/demo contracts, visual clarity, and demo reliability. Do not expand course content, add production backend/database work, or turn STOA into a game.
 - **Phase 29 Practice-to-Chat boundary**: Practice may pass challenge context into Learning Chat through frontend route state or mock API contracts, but the frontend must remain provider-agnostic and must not expose model/provider/debug terminology.
 - **Phase 29 gamification boundary**: Adopt smooth progress, immediate feedback, and short-session clarity; avoid punitive hearts, leaderboards, shops, gems, loud celebrations, and streak pressure that distracts from learning.
+- **Phase 30 scope lock**: Phase 30 packages and validates the existing demo story. It must not add new curriculum themes, production backend/database/CMS/payment/teacher scheduling work, or large UI redesign.
+- **Phase 30 demo curriculum lock**: The final demo curriculum remains Mathematics equations for lower-secondary learners: linear equations in one variable, simple quadratic equations, and linear systems in two variables.
+- **Phase 30 external testing boundary**: Testing materials and feedback capture can prepare external review, but they do not implement formal research operations, analytics pipelines, CRM systems, or production data collection.
+- **Phase 30 product story boundary**: Product storytelling should make the Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report flow understandable without exposing mock/demo/backend/provider terminology to external audiences.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -335,6 +342,9 @@ Current codebase facts:
 | Make Practice a Learning Chat entry point | Phase 29 should connect students to guided explanations at the moment they get stuck, instead of treating Practice and Chat as separate products | — Pending |
 | Prefer stable interaction loops over heavier gamification | Research supports immediate feedback and multiple-try hints, while Duolingo-style gamification can distract from learning when rewards become the goal | — Pending |
 | Keep teacher support as escalation, not primary help | Learning Assistant context should come before professional teacher support unless the student repeatedly struggles or explicitly asks for human explanation | — Pending |
+| Keep Phase 30 as demo packaging, not feature expansion | The next value is a clear external product story, testing kit, and curriculum/backend handoff, not more UI surfaces or curriculum breadth | — Pending |
+| Lock the final demo around equations | Equations are familiar to parents, easy to scaffold step by step, and strong for showing hints, guided explanations, and teacher escalation | — Pending |
+| Treat external testing as structured feedback preparation | Phase 30 should prepare task sheets and feedback forms so later testing is consistent, without building a production research platform | — Pending |
 
 ## Evolution
 
@@ -354,4 +364,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after v1.27 milestone start*
+*Last updated: 2026-05-26 after v1.28 milestone start*

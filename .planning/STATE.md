@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.27
-milestone_name: "Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization"
-status: milestone_complete
-last_updated: "2026-05-26T22:55:00Z"
+milestone: v1.28
+milestone_name: "Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement"
+status: planning
+last_updated: "2026-05-26T20:52:00.524Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 158 of 158 (6 of 6 in v1.27)
-Plan: Phase 29 frontend interaction and IA refinement complete
-Status: Milestone complete
-Last activity: 2026-05-26 — Practice interaction, Practice-to-Chat, teacher escalation, learning entry IA, parent activity summary, docs, build, and browser smoke completed.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-26 — Milestone v1.28 started
 
 ## Performance Metrics
 
