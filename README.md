@@ -1527,6 +1527,29 @@ Phase 31 documents:
 - `docs/demo/practice-as-learning-chat-entry-demo.md`
 - `docs/qa/phase31-practice-entry-checklist.md`
 
+## Phase 32 Cross-Locale Language QA and Artifact Cleanup
+
+This phase performs a full language and user-facing copy audit. It improves product trust and language quality without adding new functionality.
+
+Goals:
+
+- Check English, German, French, and Italian copy quality.
+- Ensure meaning is accurate without forcing literal translation.
+- Remove development, demo, mock, Codex, backend, provider, placeholder, and test wording from normal user-facing UI.
+- Check error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy.
+- Verify that long German words, French apostrophes, and Italian CTA lengths do not break layout.
+
+Phase 32 documents:
+
+- `docs/language/global-copy-audit-matrix.md`
+- `docs/language/english-final-review.md`
+- `docs/language/german-final-review.md`
+- `docs/language/french-final-review.md`
+- `docs/language/italian-final-review.md`
+- `docs/language/final-language-qa-report.md`
+- `docs/qa/development-artifact-audit.md`
+- `docs/qa/user-facing-copy-cleanup-checklist.md`
+
 ## Project Status
 
-Phase 19: brand-aligned learning-platform visual refinement based on read-only company homepage design translation, with derived tokens, refined shared primitives, public/auth/app visual alignment, and visual QA evidence.
+Phase 32: cross-locale language QA and development artifact cleanup completed, with four-language copy review, user-facing artifact removal, build verification, and cross-locale smoke evidence.

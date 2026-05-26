@@ -10,16 +10,16 @@
   "studentMessageLabel": "Nachricht des Schülers",
   "assistantMessageLabel": "STOA Nachricht",
   "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
-  "loadFailed": "Gespräche konnten nicht geladen werden.",
-  "conversationLoadFailed": "Dieses Gespräch konnte nicht geladen werden.",
-  "createFailed": "Das Gespräch konnte nicht erstellt werden.",
+  "loadFailed": "Wir konnten deine Lernunterhaltungen gerade nicht laden. Bitte versuche es erneut.",
+  "conversationLoadFailed": "Wir konnten diese Lernunterhaltung gerade nicht öffnen. Bitte versuche es erneut.",
+  "createFailed": "Wir konnten keine neue Lernunterhaltung starten. Bitte versuche es erneut.",
   "starting": "Wird gestartet...",
   "startConversation": "Gespräch starten",
   "quotaReached": "Die Lernnachrichten in diesem Plan sind aufgebraucht.",
   "fileQuotaReached": "Die Datei-Uploads in diesem Plan sind aufgebraucht.",
   "emptyMessage": "Nachricht darf nicht leer sein.",
   "upload": "Hausaufgabendatei hochladen",
-  "uploadFailed": "Datei-Upload fehlgeschlagen.",
+  "uploadFailed": "Wir konnten diese Datei nicht hochladen. Bitte versuche es erneut.",
   "retry": "Erneut versuchen",
   "newConversation": "Neue Unterhaltung",
   "practiceContext": {
@@ -44,7 +44,7 @@
     "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson, wenn du mehr Orientierung brauchst.",
     "cta": "Lehrperson fragen",
     "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
-    "failed": "Die Anfrage an die Lehrperson konnte nicht gesendet werden."
+    "failed": "Wir konnten die Anfrage an die Lehrperson nicht senden. Bitte versuche es erneut."
   },
   "status": {
     "pending": "Wartet auf Lehrperson",

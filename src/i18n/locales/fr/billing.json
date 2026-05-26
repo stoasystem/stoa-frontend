@@ -9,8 +9,8 @@
   "checkoutMode": "Mode de paiement",
   "paymentEnabledBody": "Le paiement est activé. STOA ouvrira un checkout sécurisé lorsqu’une formule sera choisie.",
   "paymentDisabledBody": "La sélection du plan est en préparation. Cette page aide à évaluer la formule adaptée aux familles.",
-  "mockCheckoutEnabled": "La sélection du plan est disponible pour vérification.",
-  "mockCheckoutDisabled": "La sélection du plan est en préparation. Veuillez contacter STOA pour continuer.",
+  "planSelectionReviewEnabled": "La sélection du plan est disponible pour vérification.",
+  "planSelectionReviewDisabled": "La sélection du plan est en préparation. Veuillez contacter STOA pour continuer.",
   "selectedPlan": "Plan sélectionné",
   "planLoading": "Les détails de la formule se chargent.",
   "limitsBody": "Les limites de formule aident les élèves et les familles à comprendre l’accès prévu. Les règles finales sont gérées par les services STOA.",
@@ -20,7 +20,7 @@
   "parentReportReason": "Un plan payant est requis pour les rapports hebdomadaires.",
   "success": "Statut d’abonnement mis à jour.",
   "choosePlan": "Choisir un plan",
-  "mockCheckout": "Sélection du plan",
+  "planSelection": "Sélection du plan",
   "plans": {
     "free_trial": {
       "name": "Essai gratuit",

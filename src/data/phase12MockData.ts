@@ -424,7 +424,7 @@ export const mockAdvancedAnalytics: AdvancedAnalyticsOverview = {
     { label: 'Parent landing', count: 220 },
     { label: 'Pricing viewed', count: 91 },
     { label: 'Checkout started', count: 18 },
-    { label: 'Mock checkout completed', count: 7 },
+    { label: 'Plan selection completed', count: 7 },
   ],
   retentionCohorts: [
     { cohort: 'May pilot', week1: 92, week4: 71, week8: 58 },

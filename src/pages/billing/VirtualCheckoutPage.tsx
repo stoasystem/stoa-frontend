@@ -46,7 +46,7 @@ export function VirtualCheckoutPage() {
       <PageContainer className="p-0">
         <PageHeader
           eyebrow="Plan selection"
-          title="Plan selection preview"
+          title="Review your plan selection"
           description="Review the plan journey without entering payment details."
           actions={<Badge variant="secondary">No card required</Badge>}
         />
@@ -62,19 +62,19 @@ export function VirtualCheckoutPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              This preview is for reviewing the plan journey. Do not enter card numbers.
-              Live payment collection will use a secure hosted checkout.
+              This review step lets you confirm the plan journey. Do not enter card numbers.
+              Payment collection will use a secure hosted checkout.
             </p>
             <div className="flex flex-wrap gap-3">
               <Button
                 type="button"
                 onClick={() => {
                   trackEvent('billing_virtual_checkout_completed', { plan: plan.id })
-                  trackEvent('checkout_mock_completed', { plan: plan.id })
+                  trackEvent('plan_review_completed', { plan: plan.id })
                   navigate(`/billing/checkout/success?plan=${plan.id}`)
                 }}
               >
-                Complete plan preview
+                Complete plan review
               </Button>
               <Button
                 type="button"

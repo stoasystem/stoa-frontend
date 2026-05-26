@@ -44,7 +44,7 @@ export function LoginForm() {
     >
       {showDemoAccounts && (
         <div className="rounded-md border bg-secondary/40 p-3 text-sm">
-          <p className="font-medium">{t('auth:login.demoTitle')}</p>
+          <p className="font-medium">{t('auth:login.reviewAccountTitle')}</p>
           <div className="mt-2 grid gap-2 sm:grid-cols-2">
             {[
               [t('common:roles.student'), 'student@test.com'],

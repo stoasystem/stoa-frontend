@@ -2,6 +2,7 @@
   "hero": {
     "eyebrow": "Guided learning, with teacher support when it is needed",
     "title": "Learn with clarity.",
+    "titleLines": ["Learn with clarity."],
     "subtitle": "STOA helps students ask questions, receive clear explanations, and get professional teacher support when they need more guidance.",
     "secondaryCta": "How it works",
     "bullets": ["Ask in seconds", "Understand the next step", "Teacher support when needed"],
@@ -34,7 +35,7 @@
     ],
     "flow": [
       { "label": "Practice", "detail": "Short equation steps help the student start independently." },
-      { "label": "Hint", "detail": "A calm prompt points to the next useful move." },
+      { "label": "Hint", "detail": "A calm hint points to the next useful move." },
       { "label": "Learning Chat", "detail": "The unclear step opens with context already attached." },
       { "label": "Teacher Support", "detail": "A qualified teacher joins when explanation is still not enough." },
       { "label": "Parent Report", "detail": "Families see the complete learning activity, not isolated tools." }

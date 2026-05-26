@@ -10,16 +10,16 @@
   "studentMessageLabel": "Messaggio dello studente",
   "assistantMessageLabel": "Messaggio STOA",
   "preparing": "L’Assistente all’apprendimento sta preparando una spiegazione...",
-  "loadFailed": "Impossibile caricare le conversazioni.",
-  "conversationLoadFailed": "Impossibile caricare questa conversazione.",
-  "createFailed": "Impossibile creare la conversazione.",
+  "loadFailed": "Non siamo riusciti a caricare le conversazioni di studio. Riprova.",
+  "conversationLoadFailed": "Non siamo riusciti ad aprire questa conversazione di studio. Riprova.",
+  "createFailed": "Non siamo riusciti ad avviare una nuova conversazione di studio. Riprova.",
   "starting": "Avvio...",
   "startConversation": "Avvia conversazione",
   "quotaReached": "Hai usato i messaggi di studio inclusi in questo piano.",
   "fileQuotaReached": "Hai usato i caricamenti file inclusi in questo piano.",
   "emptyMessage": "Il messaggio non può essere vuoto.",
   "upload": "Carica file dei compiti",
-  "uploadFailed": "Caricamento file non riuscito.",
+  "uploadFailed": "Non siamo riusciti a caricare il file. Riprova.",
   "retry": "Riprova",
   "newConversation": "Nuova conversazione",
   "practiceContext": {
@@ -44,7 +44,7 @@
     "description": "Invia questa conversazione a un insegnante qualificato per una guida più chiara.",
     "cta": "Chiedi a un insegnante",
     "submitted": "La tua richiesta è stata inviata a un insegnante.",
-    "failed": "Non è stato possibile inviare la richiesta all’insegnante."
+    "failed": "Non siamo riusciti a inviare la richiesta all’insegnante. Riprova."
   },
   "status": {
     "pending": "In attesa di un insegnante",

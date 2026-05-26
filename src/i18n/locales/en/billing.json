@@ -9,8 +9,8 @@
   "checkoutMode": "Checkout mode",
   "paymentEnabledBody": "Payment is enabled. STOA will open a secure checkout when a plan is selected.",
   "paymentDisabledBody": "Plan selection is being prepared. Use this page to review plan fit with families.",
-  "mockCheckoutEnabled": "Plan selection is available for review.",
-  "mockCheckoutDisabled": "Plan selection is being prepared. Please contact STOA to continue.",
+  "planSelectionReviewEnabled": "Plan selection is available for review.",
+  "planSelectionReviewDisabled": "Plan selection is being prepared. Please contact STOA to continue.",
   "selectedPlan": "Selected plan",
   "planLoading": "Plan details are loading.",
   "limitsBody": "Plan limits help students and families understand expected access. Final access rules are managed by STOA services.",
@@ -20,7 +20,7 @@
   "parentReportReason": "A paid plan is required for weekly reports.",
   "success": "Subscription status updated.",
   "choosePlan": "Choose a plan",
-  "mockCheckout": "Plan selection",
+  "planSelection": "Plan selection",
   "plans": {
     "free_trial": {
       "name": "Free trial",

@@ -22,7 +22,7 @@ export function LessonResultPage() {
         <PageHeader
           eyebrow="Lesson complete"
           title="Review the session"
-          description="A concise summary for the student demo flow."
+          description="A concise summary of the practice session and the steps worth reviewing."
         />
         <LessonResultSummary result={result} />
         {result.mistakes.length > 0 && (

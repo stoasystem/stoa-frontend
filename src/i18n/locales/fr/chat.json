@@ -10,16 +10,16 @@
   "studentMessageLabel": "Message de l’élève",
   "assistantMessageLabel": "Message STOA",
   "preparing": "L’Assistant d’apprentissage prépare une explication...",
-  "loadFailed": "Impossible de charger les conversations.",
-  "conversationLoadFailed": "Impossible de charger cette conversation.",
-  "createFailed": "Impossible de créer la conversation.",
+  "loadFailed": "Nous n’avons pas pu charger tes conversations d’apprentissage pour le moment. Réessaie.",
+  "conversationLoadFailed": "Nous n’avons pas pu ouvrir cette conversation d’apprentissage pour le moment. Réessaie.",
+  "createFailed": "Nous n’avons pas pu démarrer une nouvelle conversation d’apprentissage. Réessaie.",
   "starting": "Démarrage...",
   "startConversation": "Démarrer la conversation",
   "quotaReached": "Les messages d’apprentissage de cette formule ont été utilisés.",
   "fileQuotaReached": "Les téléversements de cette formule ont été utilisés.",
   "emptyMessage": "Le message ne peut pas être vide.",
   "upload": "Téléverser un devoir",
-  "uploadFailed": "Échec du téléversement.",
+  "uploadFailed": "Nous n’avons pas pu téléverser ce fichier. Réessaie.",
   "retry": "Réessayer",
   "newConversation": "Nouvelle conversation",
   "practiceContext": {
@@ -44,7 +44,7 @@
     "description": "Envoie cette conversation à un enseignant qualifié si tu as besoin d’un accompagnement plus clair.",
     "cta": "Demander à un enseignant",
     "submitted": "Votre demande a été envoyée à un enseignant.",
-    "failed": "La demande à l’enseignant n’a pas pu être envoyée."
+    "failed": "Nous n’avons pas pu envoyer la demande à l’enseignant. Réessaie."
   },
   "status": {
     "pending": "En attente d’un enseignant",

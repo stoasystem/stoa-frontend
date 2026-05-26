@@ -32,16 +32,16 @@
 - ✅ **v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization** - Phases 153-158 (implemented 2026-05-26)
 - ✅ **v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement** - Phases 159-164 (shipped 2026-05-26)
 - ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
-- ⏳ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (planned 2026-05-27)
+- ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
 
 ## Phases
 
-- [ ] **Phase 171: Language QA Framework and Artifact Inventory** - Establish the copy matrix, cleanup checklist, audit report structure, and search inventory for user-facing artifacts.
-- [ ] **Phase 172: English and German Copy Accuracy Review** - Review and refine English and German copy for accuracy, tone, terminology, and UI-safe length.
-- [ ] **Phase 173: French and Italian Copy Accuracy Review** - Review and refine French and Italian copy for natural language, apostrophes, CTA length, and education tone.
-- [ ] **Phase 174: Terminology Consistency and Development Artifact Cleanup** - Remove user-facing development language and align cross-locale product terminology.
-- [ ] **Phase 175: Cross-Locale UI Fit and Missing-Key QA** - Verify responsive layout, key leakage, navigation, footer, forms, Practice, Chat, Parent, Tutor, Pricing, Billing, and Contact across locales.
-- [ ] **Phase 176: Final Language QA Report, README, Build, and Demo Verification** - Complete final language QA report, README handoff, build, smoke evidence, and milestone closure.
+- [x] **Phase 171: Language QA Framework and Artifact Inventory** - Establish the copy matrix, cleanup checklist, audit report structure, and search inventory for user-facing artifacts.
+- [x] **Phase 172: English and German Copy Accuracy Review** - Review and refine English and German copy for accuracy, tone, terminology, and UI-safe length.
+- [x] **Phase 173: French and Italian Copy Accuracy Review** - Review and refine French and Italian copy for natural language, apostrophes, CTA length, and education tone.
+- [x] **Phase 174: Terminology Consistency and Development Artifact Cleanup** - Remove user-facing development language and align cross-locale product terminology.
+- [x] **Phase 175: Cross-Locale UI Fit and Missing-Key QA** - Verify responsive layout, key leakage, navigation, footer, forms, Practice, Chat, Parent, Tutor, Pricing, Billing, and Contact across locales.
+- [x] **Phase 176: Final Language QA Report, README, Build, and Demo Verification** - Complete final language QA report, README handoff, build, smoke evidence, and milestone closure.
 
 ## Phase Details
 
@@ -133,12 +133,12 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 171. Language QA Framework and Artifact Inventory | 0/1 | Not Started | — |
-| 172. English and German Copy Accuracy Review | 0/1 | Not Started | — |
-| 173. French and Italian Copy Accuracy Review | 0/1 | Not Started | — |
-| 174. Terminology Consistency and Development Artifact Cleanup | 0/1 | Not Started | — |
-| 175. Cross-Locale UI Fit and Missing-Key QA | 0/1 | Not Started | — |
-| 176. Final Language QA Report, README, Build, and Demo Verification | 0/1 | Not Started | — |
+| 171. Language QA Framework and Artifact Inventory | 1/1 | Complete | 2026-05-27 |
+| 172. English and German Copy Accuracy Review | 1/1 | Complete | 2026-05-27 |
+| 173. French and Italian Copy Accuracy Review | 1/1 | Complete | 2026-05-27 |
+| 174. Terminology Consistency and Development Artifact Cleanup | 1/1 | Complete | 2026-05-27 |
+| 175. Cross-Locale UI Fit and Missing-Key QA | 1/1 | Complete | 2026-05-27 |
+| 176. Final Language QA Report, README, Build, and Demo Verification | 1/1 | Complete | 2026-05-27 |
 
 ## Coverage
 
@@ -157,4 +157,4 @@
 
 ## Next Up
 
-Phase 171: Language QA Framework and Artifact Inventory.
+Phase 32 complete. Next recommended milestone: Phase 33 Real User Testing Preparation and Feedback Operations.

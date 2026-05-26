@@ -14,7 +14,7 @@ export function PracticeOverviewPage() {
         <PageHeader
           eyebrow="Practice Path"
           title="Equation practice"
-          description="A focused demo path for short equation lessons, calm feedback, and guided next steps."
+          description="A focused path for short equation lessons, calm feedback, and guided next steps."
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}

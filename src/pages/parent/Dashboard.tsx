@@ -1,3 +1,3 @@
 export default function ParentDashboard() {
-  return <div>Parent dashboard — TODO</div>
+  return <div>Parent learning overview is available from the parent workspace.</div>
 }

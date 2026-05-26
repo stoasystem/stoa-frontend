@@ -1,5 +1,30 @@
 # Milestones
 
+## v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit (Shipped: 2026-05-27)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `docs/language/final-language-qa-report.md`
+
+### Delivered
+
+- Global four-language copy audit matrix.
+- English, German, French, and Italian final review docs.
+- Development artifact audit and user-facing cleanup checklist.
+- Product-safe replacements for visible Practice demo wording, billing mock/preview wording, legacy TODO route stubs, homepage prompt wording, and abrupt Chat state copy.
+- `AIResponseFeedback` component renamed to `LearningResponseFeedback`.
+- Locale key parity cleanup for homepage `hero.titleLines`.
+- README Phase 32 handoff and planning artifacts.
+
+### Verification
+
+- `npm run build`: passed.
+- Locale key parity: passed across English, German, French, and Italian.
+- French apostrophe scan: passed.
+- High-risk term scan: passed with only the expected internal sanitizer blocklist hit.
+- Browser smoke: passed for 184 route/locale/viewport checks across public, student, parent, tutor, billing, Practice, Chat, Q&A, Contact, Register, Pricing, and Footer-adjacent surfaces.
+
+---
+
 ## v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement (Shipped: 2026-05-26)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

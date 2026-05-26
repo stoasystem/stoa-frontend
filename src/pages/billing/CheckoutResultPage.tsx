@@ -37,8 +37,8 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
       <PageContainer className="p-0">
         <PageHeader
           eyebrow="Checkout"
-          title={success ? 'Plan preview complete' : 'Plan selection canceled'}
-          description="This page confirms the plan-selection outcome before live payment collection is enabled."
+          title={success ? 'Plan review complete' : 'Plan selection canceled'}
+          description="This page confirms the plan-selection outcome before payment collection is enabled."
         />
         <Card>
           <CardHeader>

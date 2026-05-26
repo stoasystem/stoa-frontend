@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils'
 import type { ChatMessage } from '@/types/chat'
-import { AIResponseFeedback } from '@/components/chat/AIResponseFeedback'
+import { LearningResponseFeedback } from '@/components/chat/LearningResponseFeedback'
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
 import { useTranslation } from 'react-i18next'
@@ -105,7 +105,7 @@ export function ChatMessageBubble({
           </div>
         )}
         {message.role === 'assistant' && message.status !== 'streaming' && (
-          <AIResponseFeedback
+          <LearningResponseFeedback
             onRequestTeacher={onRequestTeacher}
             isRequesting={isRequestingTeacher}
             feedback={teacherFeedback}

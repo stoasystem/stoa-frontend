@@ -10,16 +10,16 @@
   "studentMessageLabel": "Student message",
   "assistantMessageLabel": "STOA message",
   "preparing": "The Learning Assistant is preparing an explanation...",
-  "loadFailed": "Failed to load conversations.",
-  "conversationLoadFailed": "Failed to load this conversation.",
-  "createFailed": "Failed to create conversation.",
+  "loadFailed": "We couldn’t load your learning conversations right now. Please try again.",
+  "conversationLoadFailed": "We couldn’t open this learning conversation right now. Please try again.",
+  "createFailed": "We couldn’t start a new learning conversation. Please try again.",
   "starting": "Starting...",
   "startConversation": "Start conversation",
   "quotaReached": "You have used the learning messages in this plan.",
   "fileQuotaReached": "You have used the file uploads in this plan.",
   "emptyMessage": "Message cannot be empty.",
   "upload": "Upload homework file",
-  "uploadFailed": "File upload failed.",
+  "uploadFailed": "We couldn’t upload that file. Please try again.",
   "retry": "Retry",
   "newConversation": "New conversation",
   "practiceContext": {
@@ -44,7 +44,7 @@
     "description": "Send this conversation to a qualified teacher for clearer guidance.",
     "cta": "Ask a teacher",
     "submitted": "Your request has been sent to a teacher.",
-    "failed": "Could not send the teacher request."
+    "failed": "We couldn’t send the teacher request. Please try again."
   },
   "status": {
     "pending": "Waiting for a teacher",

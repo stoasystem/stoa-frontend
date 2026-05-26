@@ -1,3 +1,3 @@
 export default function StudentAsk() {
-  return <div>Ask a question — TODO</div>
+  return <div>Open Learning Chat to ask a homework question.</div>
 }

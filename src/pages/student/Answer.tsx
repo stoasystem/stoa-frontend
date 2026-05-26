@@ -1,3 +1,3 @@
 export default function StudentAnswer() {
-  return <div>Step-by-step answer — TODO</div>
+  return <div>Learning explanations are shown in Learning Chat.</div>
 }

@@ -21,7 +21,7 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
               Linear equations, quadratics, and systems in one focused practice route.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-              The demo path stays intentionally narrow so each short lesson has a clear learning step.
+              The equation path stays intentionally focused so each short lesson has a clear learning step.
             </p>
           </div>
           <div className="grid gap-2 text-sm">

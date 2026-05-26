@@ -13,7 +13,7 @@ export function SubjectPathCard({ subject }: { subject: PracticeSubject }) {
       <CardContent className="p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="brand-section-kicker">Demo path</p>
+            <p className="brand-section-kicker">Practice path</p>
             <h3 className="mt-2 text-xl font-semibold">{subject.name}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{subject.description}</p>
           </div>

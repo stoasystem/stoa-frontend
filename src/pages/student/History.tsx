@@ -1,3 +1,3 @@
 export default function StudentHistory() {
-  return <div>Question history & wrong-question bank — TODO</div>
+  return <div>Learning history is available from the student workspace.</div>
 }

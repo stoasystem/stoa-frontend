@@ -1,6 +1,6 @@
 import { TeacherRequestInlineAction } from '@/components/chat/TeacherRequestInlineAction'
 
-export function AIResponseFeedback({
+export function LearningResponseFeedback({
   onRequestTeacher,
   isRequesting,
   feedback,

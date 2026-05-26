@@ -76,8 +76,8 @@ export function BillingPage() {
               </p>
               <p>
                 {showCheckoutPreview
-                  ? t('billing:mockCheckoutEnabled')
-                  : t('billing:mockCheckoutDisabled')}
+                  ? t('billing:planSelectionReviewEnabled')
+                  : t('billing:planSelectionReviewDisabled')}
               </p>
               <div className="flex flex-wrap gap-3 pt-2">
                 <CheckoutButton plan={selectedPlan} />

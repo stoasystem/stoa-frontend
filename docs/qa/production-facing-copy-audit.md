@@ -63,15 +63,15 @@ rg -n "demo|Demo|mock|Mock|test account|Test account|sample|Sample|staging|devel
 
 ## Current High-Risk Findings
 
-| Area | Finding | Planned phase |
+| Area | Finding | Status |
 |---|---|---|
-| Auth locale copy | `demoTitle` values remain in EN/DE/FR/IT auth locale files. | 104, 105 |
-| Billing locale copy | EN/DE/FR/IT billing and pricing locale files mention demo/mock/virtual checkout. | 104, 105 |
-| Home/admin locale copy | DE/IT home/admin locale strings still mention demo-ready/admin demo operations. | 105 |
-| Route metadata | Route statuses and descriptions include `demo` and `placeholder`; acceptable internally but unsafe if rendered raw. | 104, 105 |
-| Data labels | `Mock checkout completed` appears in analytics fallback data. | 105 |
-| Organization pages | Some P2 route copy describes frontend-only demo surfaces. | 104, 105 |
-| Checkout E2E | Virtual checkout tests depend on demo route behavior. | 104, 107 |
+| Auth locale copy | Saved-account shortcut language previously used `demoTitle`; Phase 32 renamed it to review-account wording and the shortcut remains environment-gated. | Resolved in Phase 32 |
+| Billing locale copy | Plan-selection review keys previously used mock checkout naming; Phase 32 renamed keys and visible copy to plan-selection review wording. | Resolved in Phase 32 |
+| Home/admin locale copy | Visible homepage wording no longer uses demo-ready language; admin demo surfaces remain gated where advanced views are not part of normal UI. | Approved |
+| Route metadata | Route statuses and descriptions include `demo` and `placeholder`; acceptable internally but unsafe if rendered raw. | Internal only |
+| Data labels | Analytics fallback label previously used `Mock checkout completed`; Phase 32 changed the rendered label to `Plan selection completed`. | Resolved in Phase 32 |
+| Organization pages | Some P2 route copy describes gated advanced surfaces. | Gated / future cleanup |
+| Checkout E2E | Plan-selection review tests can still use preview routes internally as long as visible copy remains product-safe. | Approved |
 
 ## Approval Matrix
 

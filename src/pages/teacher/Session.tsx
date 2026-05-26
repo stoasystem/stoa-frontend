@@ -1,3 +1,3 @@
 export default function TeacherSession() {
-  return <div>Teacher takeover session — TODO</div>
+  return <div>Teacher support happens inside the active learning request.</div>
 }

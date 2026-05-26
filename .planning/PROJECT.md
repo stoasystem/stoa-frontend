@@ -10,36 +10,34 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment
+## Latest Shipped Milestone: v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit
 
 **Shipped:** 2026-05-27
 
-**Delivered:** STOA now presents Practice Path as a low-friction learning entry across the homepage, Student Dashboard, Practice flow, Learning Chat context, Parent learning activity, Tutor Request Detail, four-language copy, demo docs, QA checklist, README, and verified build/browser smoke evidence.
-
-**Target features:**
-- Homepage Practice entry section and restrained Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report flow.
-- Student Dashboard Continue Practice and Open Learning Chat entry cards.
-- Practice feedback, explanation, mistake review, and teacher escalation CTA rules.
-- Learning Chat Practice context and Back to lesson return path.
-- Parent Learning Activity summary and Parent Report Practice + Chat framing.
-- Tutor Request Detail Practice context with source, topic, question, answer, attempts, hint state, and explanation state.
-- Four-language Practice-as-entry copy, demo script, QA checklist, README update, and build/browser smoke verification.
-
-## Current Milestone: v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit
-
-**Goal:** Perform a full four-language user-facing copy audit and development-artifact cleanup so STOA reads as a real, professional education product across English, German, French, and Italian without adding new features or changing the product structure.
+**Delivered:** STOA now has a completed four-language copy QA pass, user-facing development artifact cleanup, final language QA documentation, README handoff, passing build, and 184 route/locale/viewport smoke checks.
 
 **Target features:**
 - Global copy audit matrix for public, student, parent, tutor, admin, and shared UI surfaces.
-- English, German, French, and Italian copy accuracy review with meaning consistency but natural local wording.
-- Development artifact audit for user-visible `demo`, `mock`, `test`, `Codex`, `backend`, `provider`, `placeholder`, `TODO`, `Lorem`, and `AI` wording.
-- Error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy cleanup.
-- Cross-locale UI fit checks for German long wording, French apostrophes, Italian CTA length, navbar, footer, contact form, and Practice flow.
-- Final language QA report, per-language review docs, cleanup checklist, README update, build verification, and four-language smoke evidence.
+- English, German, French, and Italian final review docs.
+- Development artifact audit and user-facing cleanup checklist.
+- Product-safe replacements for visible demo/mock/TODO/AI/prompt wording.
+- Friendly Chat and billing state copy.
+- Final language QA report, README update, build verification, and cross-locale smoke evidence.
+
+## Current Milestone: Phase 33 candidate: Real User Testing Preparation and Feedback Operations
+
+**Goal:** Prepare real student, parent, and teacher testing using the cleaned, integrated learning flow from Phase 31 and the language/product-trust baseline from Phase 32.
+
+**Target features:**
+- Define student testing tasks for Practice -> Learning Chat.
+- Define parent testing tasks for Parent Report and learning activity clarity.
+- Define teacher testing tasks for Practice-origin support context.
+- Prepare feedback intake, issue triage, and decision criteria.
+- Decide which surface should be optimized next based on real feedback.
 
 ## Current State
 
-**Latest shipped milestone:** v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment
+**Latest shipped milestone:** v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -108,15 +106,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify Practice Path interaction refinements, Practice-to-Learning-Chat context handoff, delayed teacher escalation, unified dashboard/homepage/parent learning activity framing, four-language labels, docs, build, and browser smoke — v1.27
 - ✓ Developers can use the final equation demo curriculum package, product story scripts, role-specific external testing materials, feedback framework, parent value framing, future handoff requirements, README guidance, audit evidence, and build verification — v1.28
 - ✓ Developers can run and verify Practice as a homepage and student-dashboard entry into Learning Chat, with parent learning activity, tutor request context, four-language copy, docs, README, build, and browser smoke evidence — v1.29
+- ✓ Developers can rely on English, German, French, and Italian copy QA, cleaned user-facing development artifacts, final language QA docs, README guidance, build verification, and 184 route/locale/viewport smoke checks — v1.30
 
 ### Active
 
-- English, German, French, and Italian user-facing copy must be reviewed for accuracy, naturalness, tone, and product trust.
-- Four-language meaning must stay consistent without forcing literal translation.
-- User-facing UI must not expose development, demo, mock, test, Codex, backend, provider, placeholder, TODO, Lorem, or internal documentation language.
-- Error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy must be user-friendly.
-- German long headings, French apostrophes, and Italian CTA lengths must be checked with responsive UI fit.
-- Phase 32 must create language QA docs, artifact audit docs, a final QA report, README guidance, build evidence, and four-language smoke evidence.
+- Phase 33 should prepare external user testing for the integrated Practice -> Learning Chat -> teacher support -> Parent Report flow.
+- Testing should cover student comprehension, parent visibility, teacher request context, feedback intake, and issue triage operations.
 
 ### Out of Scope
 
@@ -365,9 +360,9 @@ Current codebase facts:
 | Keep Phase 31 focused on Practice as entry, not product replacement | Practice should create a natural starting point for students while Learning Chat, professional teacher support, and Parent Report remain the main STOA learning-platform hierarchy | — Pending |
 | Research IA and webpage organization before page changes | Phase 31 needs homepage, dashboard, role navigation, wayfinding, and Q&A decisions grounded in IA and UX research rather than visual preference alone | — Pending |
 | Keep public navigation task-oriented and uncluttered | Practice is primarily a student app capability, so the public site should explain it without adding a top-level public Practice island | — Pending |
-| Make Phase 32 an audit and cleanup pass, not feature work | The product structure is already integrated; the next risk is language trust, translation quality, and visible development residue | — Pending |
-| Skip external research for Phase 32 | The user provided a precise audit scope and the milestone does not introduce new product capabilities requiring ecosystem research | — Pending |
-| Treat user-visible copy as the source of truth for product trust | Developer docs and code can retain technical terms, but visible UI must read like a stable education product | — Pending |
+| Make Phase 32 an audit and cleanup pass, not feature work | The product structure is already integrated; the next risk is language trust, translation quality, and visible development residue | v1.30 Complete |
+| Skip external research for Phase 32 | The user provided a precise audit scope and the milestone does not introduce new product capabilities requiring ecosystem research | v1.30 Complete |
+| Treat user-visible copy as the source of truth for product trust | Developer docs and code can retain technical terms, but visible UI must read like a stable education product | v1.30 Complete |
 
 ## Evolution
 

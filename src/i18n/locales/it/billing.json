@@ -9,8 +9,8 @@
   "checkoutMode": "Modalità checkout",
   "paymentEnabledBody": "Il pagamento è attivato. STOA aprirà un checkout sicuro quando scegli un piano.",
   "paymentDisabledBody": "La scelta del piano è in preparazione. Questa pagina aiuta a valutare il piano adatto alle famiglie.",
-  "mockCheckoutEnabled": "La scelta del piano è disponibile per la verifica.",
-  "mockCheckoutDisabled": "La scelta del piano è in preparazione. Contatta STOA per continuare.",
+  "planSelectionReviewEnabled": "La scelta del piano è disponibile per la verifica.",
+  "planSelectionReviewDisabled": "La scelta del piano è in preparazione. Contatta STOA per continuare.",
   "selectedPlan": "Piano selezionato",
   "planLoading": "I dettagli del piano vengono caricati.",
   "limitsBody": "I limiti del piano aiutano studenti e famiglie a capire l’accesso previsto. Le regole finali sono gestite dai servizi STOA.",
@@ -20,7 +20,7 @@
   "parentReportReason": "Per i report settimanali è necessario un piano a pagamento.",
   "success": "Stato abbonamento aggiornato.",
   "choosePlan": "Scegli un piano",
-  "mockCheckout": "Scelta del piano",
+  "planSelection": "Scelta del piano",
   "plans": {
     "free_trial": {
       "name": "Prova gratuita",

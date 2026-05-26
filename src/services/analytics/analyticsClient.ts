@@ -19,7 +19,7 @@ export type AnalyticsEventName =
   | 'pricing_page_viewed'
   | 'pricing_plan_selected'
   | 'checkout_started'
-  | 'checkout_mock_completed'
+  | 'plan_review_completed'
   | 'billing_page_viewed'
   | 'feature_locked_viewed'
   | 'upgrade_prompt_clicked'
