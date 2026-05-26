@@ -28,13 +28,13 @@ Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
 ### Final Demo Rerun and Smoke Tests
 
-- [ ] **RUN23-01**: Demo data reset, demo backend/mock mode, frontend startup, backend `/health`, language switcher, and demo accounts are checked before final run.
-- [ ] **RUN23-02**: Full final demo flow is rerun across homepage, student registration/login, chat question, Learning Assistant response, professional teacher support request, tutor workflow, parent report, pricing/billing, contact form, and admin overview.
-- [ ] **RUN23-03**: `docs/release/public-demo-final-run.md` records date, commit hash, environment, tester, browser, device, language, flow result, issues found, and Go/No-Go.
-- [ ] **SMOKE23-01**: Final multilingual smoke test covers homepage, register, chat, parent report, pricing, contact, and footer in English, German, French, and Italian.
-- [ ] **SMOKE23-02**: Final responsive smoke test covers 375px, 430px, 768px, 1024px, and 1440px for homepage, register, chat, parent report, pricing, and contact.
-- [ ] **SMOKE23-03**: Final accessibility smoke test covers tab navigation, visible focus, contact/register labels, icon-button labels, dialog focus, color contrast, and h1 sanity.
-- [ ] **SMOKE23-04**: `npm run build` passes after all release-candidate fixes.
+- [x] **RUN23-01**: Demo data reset, demo backend/mock mode, frontend startup, backend `/health`, language switcher, and demo accounts are checked before final run.
+- [x] **RUN23-02**: Full final demo flow is rerun across homepage, student registration/login, chat question, Learning Assistant response, professional teacher support request, tutor workflow, parent report, pricing/billing, contact form, and admin overview.
+- [x] **RUN23-03**: `docs/release/public-demo-final-run.md` records date, commit hash, environment, tester, browser, device, language, flow result, issues found, and Go/No-Go.
+- [x] **SMOKE23-01**: Final multilingual smoke test covers homepage, register, chat, parent report, pricing, contact, and footer in English, German, French, and Italian.
+- [x] **SMOKE23-02**: Final responsive smoke test covers 375px, 430px, 768px, 1024px, and 1440px for homepage, register, chat, parent report, pricing, and contact.
+- [x] **SMOKE23-03**: Final accessibility smoke test covers tab navigation, visible focus, contact/register labels, icon-button labels, dialog focus, color contrast, and h1 sanity.
+- [x] **SMOKE23-04**: `npm run build` passes after all release-candidate fixes.
 
 ### Public Demo Release Handoff
 
@@ -100,13 +100,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOCK23-02 | Phase 129 | Done |
 | LOCK23-03 | Phase 129 | Done |
 | LOCK23-04 | Phase 129 | Done |
-| RUN23-01 | Phase 130 | Pending |
-| RUN23-02 | Phase 130 | Pending |
-| RUN23-03 | Phase 130 | Pending |
-| SMOKE23-01 | Phase 130 | Pending |
-| SMOKE23-02 | Phase 130 | Pending |
-| SMOKE23-03 | Phase 130 | Pending |
-| SMOKE23-04 | Phase 130 | Pending |
+| RUN23-01 | Phase 130 | Done |
+| RUN23-02 | Phase 130 | Done |
+| RUN23-03 | Phase 130 | Done |
+| SMOKE23-01 | Phase 130 | Done |
+| SMOKE23-02 | Phase 130 | Done |
+| SMOKE23-03 | Phase 130 | Done |
+| SMOKE23-04 | Phase 130 | Done |
 | HANDOFF23-01 | Phase 131 | Pending |
 | HANDOFF23-02 | Phase 131 | Pending |
 | MONITOR23-01 | Phase 131 | Pending |
