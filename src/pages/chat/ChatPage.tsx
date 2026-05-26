@@ -188,9 +188,10 @@ export function ChatPage() {
               placeholder={t('placeholder')}
               className="min-h-24 resize-none"
               disabled={createConversationMutation.isPending}
+              aria-label={t('newConversationLabel')}
             />
             {createConversationMutation.isError && (
-              <p className="text-xs text-destructive">
+              <p className="text-xs text-destructive" role="alert">
                 {toUserFacingError(createConversationMutation.error, t('createFailed'))}
               </p>
             )}
@@ -247,7 +248,7 @@ export function ChatPage() {
             />
             {sendError && (
               <div className="px-4 pb-3 md:px-6">
-                <div className="mx-auto max-w-3xl text-xs text-destructive">
+                <div className="mx-auto max-w-3xl text-xs text-destructive" role="alert">
                   {sendError}
                 </div>
               </div>

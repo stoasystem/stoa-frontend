@@ -238,9 +238,9 @@ export function RegisterForm() {
         />
       )}
 
-      {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+      {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">{error}</p>}
       {registerMutation.isError && (
-        <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+        <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
           {toUserFacingError(registerMutation.error, t('auth:register.failed'))}
         </p>
       )}

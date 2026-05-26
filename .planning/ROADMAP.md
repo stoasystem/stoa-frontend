@@ -61,8 +61,8 @@ Phase 21 raises STOA frontend to a release-quality gate without broad business e
 
 #### Phase 120: Accessibility, Keyboard, Screen Reader, and Contrast Hardening
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Audit and improve P0 accessibility, keyboard navigation, screen-reader support, and color contrast across core user surfaces.
 
 **Requirements:** A11Y21-01 through A11Y21-10
@@ -176,6 +176,6 @@ Start with Phase 118. Phase 118 must complete read-only brand detail extraction 
 |-------|-----------|----------------|--------|-----------|
 | 118. Brand Detail Read-Only Audit and Integration Plan | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 0/1 | Planned | — |
+| 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 0/1 | Planned | — |
 | 122. Release Quality Gate, README, and Handoff | v1.20 | 0/1 | Planned | — |

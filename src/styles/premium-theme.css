@@ -66,6 +66,16 @@ body {
   color: hsl(var(--stoa-brand-ink)) !important;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 3px;
+}
+
 .editorial-heading {
   font-family: Georgia, Cambria, "Times New Roman", ui-serif, serif;
   letter-spacing: 0;

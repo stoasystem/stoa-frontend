@@ -75,8 +75,10 @@ export function LoginForm() {
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
           required
+          aria-invalid={Boolean(errors.email)}
+          aria-describedby={errors.email ? 'login-email-error' : undefined}
         />
-        {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+        {errors.email && <p id="login-email-error" className="text-xs text-destructive" role="alert">{errors.email}</p>}
       </div>
       <div className="space-y-2">
         <Label htmlFor="password">{t('auth:register.password')}</Label>
@@ -87,11 +89,13 @@ export function LoginForm() {
           onChange={(event) => setPassword(event.target.value)}
           autoComplete="current-password"
           required
+          aria-invalid={Boolean(errors.password)}
+          aria-describedby={errors.password ? 'login-password-error' : undefined}
         />
-        {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
+        {errors.password && <p id="login-password-error" className="text-xs text-destructive" role="alert">{errors.password}</p>}
       </div>
       {loginMutation.isError && (
-        <p className="text-sm text-destructive">
+        <p className="text-sm text-destructive" role="alert">
           {toUserFacingError(loginMutation.error, t('auth:login.failed'))}
         </p>
       )}

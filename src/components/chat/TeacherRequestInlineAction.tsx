@@ -17,7 +17,7 @@ export function TeacherRequestInlineAction({
     <div className="mt-4 rounded-lg border border-border/70 bg-secondary/40 p-3">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2">
-          <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" />
+          <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" aria-hidden="true" />
           <div className="min-w-0">
             <div className="break-words text-sm font-medium text-foreground">
               {t('teacher.title')}
@@ -33,9 +33,10 @@ export function TeacherRequestInlineAction({
           variant="outline"
           size="sm"
           className="h-auto min-h-9 shrink-0 whitespace-normal py-2 text-center leading-5"
-          onClick={onRequestTeacher}
-          disabled={!onRequestTeacher || isRequesting}
-        >
+            onClick={onRequestTeacher}
+            disabled={!onRequestTeacher || isRequesting}
+            aria-busy={isRequesting}
+          >
           {isRequesting ? t('status.pending') : t('teacher.cta')}
         </Button>
       </div>

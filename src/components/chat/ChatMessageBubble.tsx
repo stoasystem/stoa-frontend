@@ -3,6 +3,7 @@ import type { ChatMessage } from '@/types/chat'
 import { AIResponseFeedback } from '@/components/chat/AIResponseFeedback'
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
+import { useTranslation } from 'react-i18next'
 
 function formatMessageTime(value: string) {
   return new Intl.DateTimeFormat('en', {
@@ -39,6 +40,7 @@ export function ChatMessageBubble({
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
 }) {
+  const { t } = useTranslation('chat')
   const isStudent = message.role === 'student'
   const isSystem = message.role === 'system'
   const roleLabel = getRoleLabel(message)
@@ -55,7 +57,10 @@ export function ChatMessageBubble({
   }
 
   return (
-    <div className={cn('flex w-full', isStudent ? 'justify-end' : 'justify-start')}>
+    <article
+      className={cn('flex w-full', isStudent ? 'justify-end' : 'justify-start')}
+      aria-label={isStudent ? t('studentMessageLabel') : t('assistantMessageLabel')}
+    >
       <div
         className={cn(
           'max-w-[min(80%,42rem)] rounded-lg px-4 py-3 text-sm leading-6 shadow-sm',
@@ -107,6 +112,6 @@ export function ChatMessageBubble({
           />
         )}
       </div>
-    </div>
+    </article>
   )
 }

@@ -107,6 +107,7 @@ export function ChatInput({
             placeholder={t('chat:placeholder')}
             className="min-h-12 resize-none bg-card"
             disabled={disabled || isStreaming || chatLocked}
+            aria-label={t('chat:inputLabel')}
           />
           {isStreaming && onStopStreaming ? (
             <StopGeneratingButton onStop={onStopStreaming} />

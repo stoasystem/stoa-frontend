@@ -78,6 +78,7 @@ export function FileUploadButton({
         multiple
         accept={ACCEPTED_FILE_TYPES.join(',')}
         onChange={handleFileChange}
+        aria-label="Upload homework file"
       />
       <Button
         type="button"
@@ -93,7 +94,7 @@ export function FileUploadButton({
           inputRef.current?.click()
         }}
       >
-        <Upload className="h-4 w-4" />
+        <Upload className="h-4 w-4" aria-hidden="true" />
       </Button>
     </>
   )

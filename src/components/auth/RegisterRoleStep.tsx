@@ -39,7 +39,7 @@ export function RegisterRoleStep({
   const { t } = useTranslation(['auth', 'common'])
 
   return (
-    <div className="grid gap-3 md:grid-cols-3">
+    <div className="grid gap-3 md:grid-cols-3" role="group" aria-label={t('auth:register.roleGroupLabel')}>
       {roleOptions.map((option) => {
         const Icon = option.icon
         const selected = selectedRole === option.role
@@ -53,9 +53,10 @@ export function RegisterRoleStep({
               selected ? 'border-primary shadow-lg' : 'border-border/70',
             )}
             onClick={() => onSelectRole(option.role)}
+            aria-pressed={selected}
           >
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-primary text-primary-foreground">
-              <Icon className="h-5 w-5" />
+              <Icon className="h-5 w-5" aria-hidden="true" />
             </div>
             <h3 className="mt-5 text-lg font-semibold text-foreground">{t(option.titleKey)}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{t(option.descriptionKey)}</p>

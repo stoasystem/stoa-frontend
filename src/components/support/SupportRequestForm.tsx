@@ -127,6 +127,8 @@ export function SupportRequestForm() {
           value={subject}
           onChange={(event) => setSubject(event.target.value)}
           placeholder="Briefly describe the issue"
+          aria-invalid={Boolean(error && !subject.trim())}
+          aria-describedby={error && !subject.trim() ? 'support-request-error' : undefined}
         />
       </div>
 
@@ -137,15 +139,17 @@ export function SupportRequestForm() {
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder="What happened, who was affected, and what did you expect?"
+          aria-invalid={Boolean(error && !message.trim())}
+          aria-describedby={error ? 'support-request-error' : undefined}
         />
-        {error && <p className="text-xs text-destructive">{error}</p>}
+        {error && <p id="support-request-error" className="text-xs text-destructive" role="alert">{error}</p>}
       </div>
 
       <Button type="submit" disabled={submitSupportRequest.isPending}>
         {submitSupportRequest.isPending ? 'Sending...' : 'Send support request'}
       </Button>
       {submitSupportRequest.isError && (
-        <p className="text-sm text-destructive">We could not send your support request right now. Please try again.</p>
+        <p className="text-sm text-destructive" role="alert">We could not send your support request right now. Please try again.</p>
       )}
     </form>
   )
