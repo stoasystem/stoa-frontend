@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.29
-milestone_name: "Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment"
-status: complete
-last_updated: "2026-05-27T00:23:00+02:00"
-last_activity: 2026-05-27 — Milestone v1.29 implementation and verification complete
+milestone: v1.30
+milestone_name: "Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit"
+status: planning
+last_updated: "2026-05-27T00:35:00+02:00"
+last_activity: 2026-05-27 — Milestone v1.30 requirements and roadmap initialized
 progress:
   total_phases: 6
-  completed_phases: 6
+  completed_phases: 0
   total_plans: 6
-  completed_plans: 6
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,38 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.29 Phase 31 is complete. The next planning focus is Phase 32 external testing for the integrated Practice -> Learning Chat -> Parent/Tutor flow.
+**Current focus:** v1.30 Phase 32 audits English, German, French, and Italian user-facing copy, removes visible development artifacts, checks cross-locale UI fit, and documents final language QA without adding product features.
 
 ## Current Position
 
-Phase: Milestone v1.29 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Complete
-Last activity: 2026-05-27 — Practice entry, site layout, parent/tutor context, docs, build, and browser smoke complete
+Status: Defining requirements
+Last activity: 2026-05-27 — Milestone v1.30 requirements and roadmap initialized
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6 of 6
-- Average duration: same-session implementation slice
-- Total execution time: same-session implementation slice
+- Total plans completed this milestone: 0 of 6
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 165 | 1/1 | Complete | same session |
-| 166 | 1/1 | Complete | same session |
-| 167 | 1/1 | Complete | same session |
-| 168 | 1/1 | Complete | same session |
-| 169 | 1/1 | Complete | same session |
-| 170 | 1/1 | Complete | same session |
+| 171 | 0/1 | Not Started | — |
+| 172 | 0/1 | Not Started | — |
+| 173 | 0/1 | Not Started | — |
+| 174 | 0/1 | Not Started | — |
+| 175 | 0/1 | Not Started | — |
+| 176 | 0/1 | Not Started | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 166, 167, 168, 169, 170 complete
-- Trend: Phase 31 implementation complete; ready for Phase 32 external testing
+- Last 5 plans: none in this milestone
+- Trend: Phase 32 initialized; implementation not started
 
 *Updated after each plan completion*
 
@@ -88,10 +88,14 @@ Recent decisions affecting current work:
 - Phase 31 student dashboard now prioritizes Continue Practice and Learning Chat.
 - Phase 31 parent pages use Learning activity to combine Practice, Chat, teacher support, and next focus.
 - Phase 31 tutor requests show Practice context before the transcript when available.
+- v1.30 continues roadmap numbering from Phase 171 after v1.29 ended at Phase 170.
+- Phase 32 is a language quality, copy accuracy, development-artifact cleanup, and UI-fit audit milestone; it must not add product features or new pages.
+- Phase 32 skips external/domain research because the scope is a focused audit of existing user-facing surfaces, not new product capability research.
+- Phase 32 treats user-facing UI as the cleanup target; developer docs, tests, and code identifiers may keep precise technical language where appropriate.
 
 ### Pending Todos
 
-- Start Phase 32 external user testing for the integrated Practice -> Learning Chat -> Parent/Tutor flow.
+- Start Phase 171: Language QA Framework and Artifact Inventory.
 
 ### Quick Tasks Completed
 
@@ -151,4 +155,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Start Phase 171 with `$gsd-plan-phase 171`.

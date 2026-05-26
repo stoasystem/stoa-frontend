@@ -25,15 +25,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Tutor Request Detail Practice context with source, topic, question, answer, attempts, hint state, and explanation state.
 - Four-language Practice-as-entry copy, demo script, QA checklist, README update, and build/browser smoke verification.
 
-## Current Milestone: Awaiting Phase 32
+## Current Milestone: v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit
 
-**Goal:** Define the next milestone for external user testing of the integrated Practice -> Learning Chat -> Parent/Tutor flow.
+**Goal:** Perform a full four-language user-facing copy audit and development-artifact cleanup so STOA reads as a real, professional education product across English, German, French, and Italian without adding new features or changing the product structure.
 
 **Target features:**
-- External student testing for Practice -> Learning Chat.
-- Parent testing for Learning Activity and Parent Report clarity.
-- Tutor testing for Practice-origin request context.
-- Feedback triage and next-priority decision.
+- Global copy audit matrix for public, student, parent, tutor, admin, and shared UI surfaces.
+- English, German, French, and Italian copy accuracy review with meaning consistency but natural local wording.
+- Development artifact audit for user-visible `demo`, `mock`, `test`, `Codex`, `backend`, `provider`, `placeholder`, `TODO`, `Lorem`, and `AI` wording.
+- Error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy cleanup.
+- Cross-locale UI fit checks for German long wording, French apostrophes, Italian CTA length, navbar, footer, contact form, and Practice flow.
+- Final language QA report, per-language review docs, cleanup checklist, README update, build verification, and four-language smoke evidence.
 
 ## Current State
 
@@ -109,7 +111,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- None. v1.29 Phase 31 is complete; the next active scope should be defined by Phase 32 external user testing.
+- English, German, French, and Italian user-facing copy must be reviewed for accuracy, naturalness, tone, and product trust.
+- Four-language meaning must stay consistent without forcing literal translation.
+- User-facing UI must not expose development, demo, mock, test, Codex, backend, provider, placeholder, TODO, Lorem, or internal documentation language.
+- Error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy must be user-friendly.
+- German long headings, French apostrophes, and Italian CTA lengths must be checked with responsive UI fit.
+- Phase 32 must create language QA docs, artifact audit docs, a final QA report, README guidance, build evidence, and four-language smoke evidence.
 
 ### Out of Scope
 
@@ -159,6 +166,8 @@ The project brief for Phase 22 was provided in Chinese and defines final demo pa
 The project brief for Phase 23 was provided in Chinese and defines launch-candidate bug fixing, final approval, and public demo release. Phase 23 explicitly does not expand functionality, product direction, page structure, copy scope, or design direction. It takes the Phase 22 launch candidate as the baseline, fixes only P0/P1 blockers and required final-approval items, reruns full demo and final smoke checks, prepares release handoff/monitoring/presentation docs, records Go/No-Go, and confirms public demo release readiness.
 
 The project brief for Phase 25 was provided in Chinese and defines a local testing/demo provider integration milestone. Phase 24's Learning Assistant behavior-control design is treated as already completed context for this milestone: guided answers should avoid giving final answers first, respect student grade range and registered subjects, trigger professional teacher support when appropriate, and use a Python prompt harness for behavior control. Phase 25 turns that design into a working local demo path by adding a Codex provider adapter behind the demo backend/harness, a template fallback provider, provider health/readiness checks, behavior regression tests, full demo QA, and future production-provider handoff notes.
+
+The project brief for Phase 32 was provided in Chinese and defines a global language quality and development-artifact cleanup milestone. Phase 32 explicitly does not add functionality or change product structure. It audits English, German, French, and Italian user-facing copy, checks for literal translations and UI overflow, removes user-visible development/demo/mock/Codex/backend/provider/placeholder language, verifies friendly state copy, and documents final language QA before real user testing preparation.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -252,6 +261,9 @@ Current codebase facts:
 - **Phase 31 implementation boundary**: Phase 31 may add frontend components, route-state/mock contracts, copy, docs, and QA, but must not add formal backend/database/CMS/payment infrastructure or broad curriculum expansion.
 - **Phase 31 gamification boundary**: Keep progress, hints, and short practice sessions calm and education-centered; do not add shops, gems, hearts, cartoon rewards, leaderboards, or game-first CTAs.
 - **Phase 31 research guidance**: Webpage organization should follow the Phase 31 research note: define IA before navigation, keep public navigation task-oriented, make homepage Practice a concrete example, prioritize role dashboards by next action, and add explicit wayfinding for Practice-to-Chat flows.
+- **Phase 32 scope lock**: Phase 32 is a language QA and development-artifact cleanup milestone only. It must not add new features, new pages, new languages, curriculum expansion, backend/database work, product-structure changes, or broad UI redesign.
+- **Phase 32 user-facing cleanup target**: Forbidden/high-risk terms are prohibited in user-facing UI, but may remain in developer docs, tests, internal code identifiers, and hidden debug infrastructure when technically accurate.
+- **Phase 32 locale quality**: English should remain calm and education-centered, German should be natural and concise, French should use correct apostrophes and clear phrasing, and Italian should be warm, natural, and compact enough for UI.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -353,6 +365,9 @@ Current codebase facts:
 | Keep Phase 31 focused on Practice as entry, not product replacement | Practice should create a natural starting point for students while Learning Chat, professional teacher support, and Parent Report remain the main STOA learning-platform hierarchy | — Pending |
 | Research IA and webpage organization before page changes | Phase 31 needs homepage, dashboard, role navigation, wayfinding, and Q&A decisions grounded in IA and UX research rather than visual preference alone | — Pending |
 | Keep public navigation task-oriented and uncluttered | Practice is primarily a student app capability, so the public site should explain it without adding a top-level public Practice island | — Pending |
+| Make Phase 32 an audit and cleanup pass, not feature work | The product structure is already integrated; the next risk is language trust, translation quality, and visible development residue | — Pending |
+| Skip external research for Phase 32 | The user provided a precise audit scope and the milestone does not introduce new product capabilities requiring ecosystem research | — Pending |
+| Treat user-visible copy as the source of truth for product trust | Developer docs and code can retain technical terms, but visible UI must read like a stable education product | — Pending |
 
 ## Evolution
 
