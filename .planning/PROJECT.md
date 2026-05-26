@@ -10,24 +10,29 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate
+## Latest Shipped Milestone: v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA's learning platform now has adapted footer/contact/logo/contact-form brand details, a localized contact page and frontend/demo API contract, accessibility/keyboard/screen-reader/contrast improvements, cross-browser/mobile/visual/performance QA documentation, release-quality gates, final pre-launch checklist, and README handoff. `/Users/zhdeng/newweb` remained read-only and only served as a factual/style reference.
+**Delivered:** STOA's launch candidate has been converted into a public demo release package with final approval changes, P0/P1 blocker verification, release-lock preservation, final demo rerun evidence, multilingual/responsive/accessibility smoke checks, deployment handoff, monitoring plan, external presentation support, release notes, Go / No-Go decision, release branch, and release tag.
 
 **Target features:**
-- Read-only footer, contact, logo, and contact-form detail study from `/Users/zhdeng/newweb`.
-- Learning-platform footer, logo component, contact page, legal/contact links, and contact API contract.
-- Multilingual footer and contact form copy for English, German, French, and Italian.
-- Accessibility, keyboard, screen-reader, and color-contrast hardening for P0 surfaces.
-- Cross-browser, mobile, visual regression, performance sanity, release-quality gate, README, and pre-launch handoff docs.
+- Final approval change intake and launch-candidate bug triage.
+- Narrow blocker fixes with copy, design, translation, and demo API lock preservation.
+- Final demo rerun, multilingual smoke, responsive smoke, accessibility smoke, and build evidence.
+- Public demo deployment handoff, monitoring plan, presentation support, and release notes.
+- Go / No-Go decision, release branch/tag record, and README public demo release guidance.
 
-## Current Milestone: None
+## Current Milestone: v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
 
-**Last shipped milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release.
+**Goal:** Connect Codex as a local-only demo Learning Assistant provider behind the Python harness/demo backend so the complete STOA demo flow can show controlled guided answers while the frontend continues to call the same Chat API.
 
-Start the next milestone with `$gsd-new-milestone`.
+**Target features:**
+- Backend-internal provider interface, Codex CLI adapter, template fallback provider, provider router, timeout handling, and provider health check.
+- Python prompt harness with student profile context, grade-level rules, subject-scope rules, teacher escalation rules, forbidden internal-term controls, response repair, and fallback.
+- Demo backend chat endpoint integration that preserves the existing frontend Chat API response shape and never exposes provider/debug details to user-facing UI.
+- Codex behavior regression set, provider tests, local runbook/readiness checklist, and QA evidence for guided answers, grade scope, subject scope, fallback, and internal-term cleanup.
+- Full local demo QA across student chat, teacher support, tutor resolution, parent reporting, billing, referral, support/contact, and admin overview.
 
 ## Current State
 
@@ -91,7 +96,7 @@ Start the next milestone with `$gsd-new-milestone`.
 
 ### Active
 
-- Phase 23 should convert the launch candidate into a public demo release by triaging launch-candidate bugs, fixing P0/P1 blockers, completing required final approval changes, rerunning demo and smoke tests, preparing deployment and monitoring handoff docs, recording Go/No-Go, updating README, and confirming release branch/tag/deployment readiness without adding new product functionality.
+- Phase 25 should connect Codex as a local testing/demo Learning Assistant provider inside the Python harness/demo backend, keep the frontend coupled only to the unified Chat API, enforce guided learning behavior with grade and subject boundaries, provide template fallback and provider health checks, verify behavior with regression tests and QA docs, and run the complete STOA demo flow without exposing Codex, model, provider, prompt, backend, demo, or mock details in user-facing UI.
 
 ### Out of Scope
 
@@ -119,6 +124,7 @@ Start the next milestone with `$gsd-new-milestone`.
 - New business functionality, new languages, CMS, automatic translation systems, final legal translation, SEO article translation, backend language preference syncing, and modifying or copying from `/Users/zhdeng/newweb` — outside Phase 20 cross-locale copy and layout refinement scope.
 - Production contact email delivery, CRM integration, complex support operations, anti-spam infrastructure, formal AWS deployment, full legal-compliance finalization, modifying `/Users/zhdeng/newweb`, copying company homepage components/source structure, and large visual redesign — outside Phase 21 release-quality and brand-detail integration scope.
 - New product functionality, homepage redesign, register flow redesign, multilingual system redesign, demo backend rewrite, complex backend/database work, AWS deployment, real payment processing, large UI redesign, production email/CRM/support operations, product-direction changes, new pages/languages, broad copy/design reopening, and navigation rewrites — outside Phase 23 launch-candidate bug fixing and public demo release scope.
+- Formal AI backend, production model service, production provider billing, complex provider pool, production queue, database redesign, long-term memory, real curriculum knowledge graph, content safety platform, AWS Lambda/API Gateway implementation, direct frontend calls to Codex/OpenAI, and user-visible Codex/model/provider/debug wording — outside Phase 25 local demo provider integration scope.
 
 ## Context
 
@@ -137,6 +143,8 @@ The project brief for Phase 21 was provided in Chinese and defines accessibility
 The project brief for Phase 22 was provided in Chinese and defines final demo packaging, stakeholder review, and launch candidate preparation. Phase 22 explicitly does not add new product features. It packages the current STOA frontend into a stable demo/review set with fixed demo accounts, demo data/reset validation, audience-specific scripts, final copy/design/translation/API locks, release notes, known issues, next-stage backlog, launch-candidate approval, final demo run results, README handoff, and release branch rules.
 
 The project brief for Phase 23 was provided in Chinese and defines launch-candidate bug fixing, final approval, and public demo release. Phase 23 explicitly does not expand functionality, product direction, page structure, copy scope, or design direction. It takes the Phase 22 launch candidate as the baseline, fixes only P0/P1 blockers and required final-approval items, reruns full demo and final smoke checks, prepares release handoff/monitoring/presentation docs, records Go/No-Go, and confirms public demo release readiness.
+
+The project brief for Phase 25 was provided in Chinese and defines a local testing/demo provider integration milestone. Phase 24's Learning Assistant behavior-control design is treated as already completed context for this milestone: guided answers should avoid giving final answers first, respect student grade range and registered subjects, trigger professional teacher support when appropriate, and use a Python prompt harness for behavior control. Phase 25 turns that design into a working local demo path by adding a Codex provider adapter behind the demo backend/harness, a template fallback provider, provider health/readiness checks, behavior regression tests, full demo QA, and future production-provider handoff notes.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -169,13 +177,14 @@ Current codebase facts:
 - v1.20 shipped Phase 21 to integrate adapted footer/contact/logo/contact-form details, harden accessibility and keyboard/screen-reader/contrast behavior, document cross-browser/mobile/visual/performance QA, and define release-quality gates.
 - v1.21 shipped Phase 22 to package the current frontend for final demo, stakeholder review, release locks, launch-candidate approval, final demo run, and branch preparation without adding new features.
 - v1.22 starts Phase 23 to convert the launch candidate into a public demo release through bug-fix-only changes, final approval closure, release smoke tests, handoff docs, Go/No-Go, and branch/tag/deployment confirmation.
+- v1.23 starts Phase 25 to connect Codex as a local-only demo Learning Assistant provider behind the Python harness/demo backend while keeping the frontend provider-agnostic and preserving all public demo flows.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 23 is launch-candidate bug fixing, final approval, and public demo release. It must avoid new features, product-direction changes, new pages/languages, broad copy/design/translation reopening, navigation rewrites, complex backend/database/AWS/payment work, production support operations, major visual redesign, and large architecture rewrites.
+- **Scope**: Phase 25 is local testing/demo provider integration. It must avoid formal AI backend work, production model service work, production provider billing, complex provider orchestration, database redesign, AWS deployment, direct frontend provider calls, and user-visible provider/debug terminology.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -205,6 +214,9 @@ Current codebase facts:
 - **Phase 22 scope lock**: Phase 22 prepares demo/review/release artifacts only. New features, broad redesign, backend rewrites, new infrastructure, and real payment/support operations belong in later backlog unless they block the final demo or launch candidate.
 - **Phase 23 bug-fix-only rule**: Every Phase 23 code change must map to a launch-candidate bug, final approval item, or release blocker. P0 must be fixed, P1 must be fixed or accepted with a workaround, P2 is fixed only when low-risk/low-cost, and P3 goes to next-stage backlog.
 - **Phase 23 release-lock preservation**: Copy lock, design lock, translation lock, and demo API contract lock remain active. Changes may not reopen broad copy/design/translation/API scope unless required to resolve a P0/P1 release blocker.
+- **Phase 25 provider boundary**: Codex is an internal local demo provider only. The frontend must continue to call the STOA Chat API and must not receive or display provider-specific fields, model names, prompt text, backend debug data, or internal fallback details.
+- **Phase 25 harness behavior**: The Python harness owns prompt construction, grade-level constraints, subject-scope constraints, no-direct-answer rules, teacher escalation guidance, forbidden internal-term checks, response repair, fallback selection, and provider readiness evidence.
+- **Phase 25 fallback requirement**: Codex timeout, unavailable command, failed behavior checks, or forbidden internal terms must not break the demo; the template fallback should return a natural guided Learning Assistant response and internal logs should record the reason without sensitive data.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -284,6 +296,10 @@ Current codebase facts:
 | Keep Phase 23 bug-fix-only through public demo release | The launch candidate should become a trustworthy public demo by controlling change risk, not by expanding product scope | — Pending |
 | Research release blockers through existing docs and smoke evidence | Bug cleanup should start from Phase 22 locks, known issues, approval checklist, and actual demo-flow evidence before code changes | — Pending |
 | Separate internal and external release notes | Internal notes can mention demo backend/mock API support, while external-facing release communication should not expose mock/demo backend/Codex/fake checkout language | — Pending |
+| Keep Codex behind the demo backend and Python harness | Local Codex use should make the demo feel real without coupling frontend code or user-facing UI to a temporary provider | — Pending |
+| Use `codex exec` as the local demo bridge when available | The installed Codex CLI supports non-interactive scripted output, which is adequate for local demos but not a production AI backend | — Pending |
+| Keep template fallback mandatory for provider failures | Demo reliability matters more than provider purity; fallback prevents timeouts or behavior-check failures from breaking the presentation | — Pending |
+| Treat the OpenAI Responses API as the future production handoff direction | Official guidance recommends Responses for new model integrations, so Phase 25 docs should separate CLI demo bridging from future backend provider implementation | — Pending |
 
 ## Evolution
 
@@ -303,4 +319,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after v1.22 milestone completion*
+*Last updated: 2026-05-26 during v1.23 milestone initialization*

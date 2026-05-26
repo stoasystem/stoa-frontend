@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.22
-milestone_name: "Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release"
-status: Awaiting next milestone
-stopped_at: v1.22 milestone completed and archived
-last_updated: "2026-05-26T14:47:46.754Z"
-last_activity: 2026-05-26 — Milestone v1.22 completed and archived
+milestone: v1.23
+milestone_name: "Phase 25: Local Codex Provider Integration for Complete Demo Flow"
+status: planning
+last_updated: "2026-05-26T15:21:31.172Z"
+last_activity: 2026-05-26
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: Milestone v1.22 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-26 — Milestone v1.22 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-26 — Milestone v1.23 started
 
 ## Performance Metrics
 
