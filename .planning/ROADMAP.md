@@ -37,7 +37,7 @@
 - [x] **Phase 159: Final Demo Curriculum Package** - Lock and document the equation-focused demo curriculum package and its limitations.
 - [x] **Phase 160: Integrated Product Story and Demo Scripts** - Package Practice, Learning Chat, teacher support, and Parent Report into 3, 10, and 15 minute demo narratives.
 - [x] **Phase 161: External Testing Task Sheets and Plan** - Prepare student, parent, tutor, stakeholder, and internal-review testing materials.
-- [ ] **Phase 162: Feedback Collection and Evaluation Framework** - Define structured feedback forms, role-specific questions, severity tags, and follow-up handling.
+- [x] **Phase 162: Feedback Collection and Evaluation Framework** - Define structured feedback forms, role-specific questions, severity tags, and follow-up handling.
 - [ ] **Phase 163: Parent Value Framing and Future Handoff Requirements** - Refine parent-facing value language and document future curriculum/backend/backlog needs.
 - [ ] **Phase 164: README, Demo QA, and Milestone Handoff** - Update README, verify the existing demo flow, run build, and summarize risks and next steps.
 
@@ -135,7 +135,7 @@
 | 159. Final Demo Curriculum Package | 1/1 | Complete | 2026-05-26 |
 | 160. Integrated Product Story and Demo Scripts | 1/1 | Complete | 2026-05-26 |
 | 161. External Testing Task Sheets and Plan | 1/1 | Complete | 2026-05-26 |
-| 162. Feedback Collection and Evaluation Framework | 0/1 | Pending | — |
+| 162. Feedback Collection and Evaluation Framework | 1/1 | Complete | 2026-05-26 |
 | 163. Parent Value Framing and Future Handoff Requirements | 0/1 | Pending | — |
 | 164. README, Demo QA, and Milestone Handoff | 0/1 | Pending | — |
 
