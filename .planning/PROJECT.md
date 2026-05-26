@@ -23,11 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Codex behavior regression set, provider tests, local runbook/readiness checklist, and QA evidence.
 - Future provider handoff notes and README Phase 25 guidance.
 
-## Current Milestone: None
+## Current Milestone: v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing
 
-**Last shipped milestone:** v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow.
+**Goal:** Stabilize the demo Learning Assistant behavior through functional QA, multi-turn tests, evaluator/prompt bug fixes, regression reporting, and full demo-flow checks without adding product features or redesigning UI.
 
-Start the next milestone with `$gsd-new-milestone`.
+**Target features:**
+- Learning Assistant functional QA plan covering relevance, grade scope, subject scope, no-direct-answer behavior, teacher escalation, unsafe/cheating handling, internal-term leakage, and multi-language basics.
+- Multi-turn conversation test cases for math, physics, repeated confusion, unrelated follow-ups, direct-answer requests, unclear upload simulation, and above-grade questions.
+- Expanded Python harness tests for relevance, grade scope, subject scope, multi-turn context, teacher escalation, internal terms, and cheating behavior.
+- Response evaluator and repair-prompt improvements for relevance, context consistency, grade scope, subject scope, direct-answer-first detection, internal-term leakage, length, and safe fallback.
+- Bug reproduction log, regression report, README guidance, and full demo-flow verification across student chat, tutor requests, parent history/report, billing, referral, support/contact, and admin overview.
 
 ## Current State
 
@@ -93,7 +98,7 @@ Start the next milestone with `$gsd-new-milestone`.
 
 ### Active
 
-(None — start the next milestone with `$gsd-new-milestone`.)
+- Phase 26 should stabilize Learning Assistant behavior through functional QA, multi-turn behavior tests, response evaluator improvements, prompt/repair/fallback fixes, regression tests, bug reproduction logs, and demo readiness reports. It must not add new product pages, redesign UI, build a formal AI backend, add a complex agent framework, implement long-term memory, build a knowledge graph, add production content safety infrastructure, fine-tune models, add multi-model scheduling, or deploy AWS infrastructure.
 
 ### Out of Scope
 
@@ -122,6 +127,7 @@ Start the next milestone with `$gsd-new-milestone`.
 - Production contact email delivery, CRM integration, complex support operations, anti-spam infrastructure, formal AWS deployment, full legal-compliance finalization, modifying `/Users/zhdeng/newweb`, copying company homepage components/source structure, and large visual redesign — outside Phase 21 release-quality and brand-detail integration scope.
 - New product functionality, homepage redesign, register flow redesign, multilingual system redesign, demo backend rewrite, complex backend/database work, AWS deployment, real payment processing, large UI redesign, production email/CRM/support operations, product-direction changes, new pages/languages, broad copy/design reopening, and navigation rewrites — outside Phase 23 launch-candidate bug fixing and public demo release scope.
 - Formal AI backend, production model service, production provider billing, complex provider pool, production queue, database redesign, long-term memory, real curriculum knowledge graph, content safety platform, AWS Lambda/API Gateway implementation, direct frontend calls to Codex/OpenAI, and user-visible Codex/model/provider/debug wording — outside Phase 25 local demo provider integration scope.
+- New frontend pages, broad UI redesign, formal AI backend work, complex agent framework, long-term memory, real knowledge graph, production-grade content safety platform, model fine-tuning, multi-model scheduling, AWS deployment, and new product modules — outside Phase 26 Learning Assistant functional QA scope.
 
 ## Context
 
@@ -297,6 +303,9 @@ Current codebase facts:
 | Use `codex exec` as the local demo bridge when available | The installed Codex CLI supports non-interactive scripted output, which is adequate for local demos but not a production AI backend | — Pending |
 | Keep template fallback mandatory for provider failures | Demo reliability matters more than provider purity; fallback prevents timeouts or behavior-check failures from breaking the presentation | — Pending |
 | Treat the OpenAI Responses API as the future production handoff direction | Official guidance recommends Responses for new model integrations, so Phase 25 docs should separate CLI demo bridging from future backend provider implementation | — Pending |
+| Keep Phase 26 focused on Learning Assistant QA instead of feature expansion | The next value is making existing guided answers stable, relevant, scoped, and demo-safe across turns rather than adding pages or backend architecture | — Pending |
+| Treat behavior failures as regression-test candidates | P0 Learning Assistant issues should be captured in a bug log and converted into tests before prompt, evaluator, or fallback fixes are accepted | — Pending |
+| Fix Learning Assistant behavior in the harness, not the frontend | Frontend should display backend Chat API responses; prompt rules, evaluator checks, repair prompts, and fallback templates own answer behavior | — Pending |
 
 ## Evolution
 
@@ -316,4 +325,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 during v1.23 milestone initialization*
+*Last updated: 2026-05-26 during v1.24 milestone initialization*
