@@ -1,5 +1,37 @@
 # Milestones
 
+## v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release (Shipped: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.22-MILESTONE-AUDIT.md`
+**Release branch:** `release/public-demo-2026-05-26`
+**Release tag:** `public-demo-release-2026-05-26`
+
+### Delivered
+
+- Final approval changes and launch-candidate bug triage.
+- Verified homepage copy, logo, header/footer contrast, and local image-asset fixes.
+- Release-lock preservation evidence.
+- Public demo final run evidence.
+- Deployment handoff, monitoring plan, first external presentation support, and release notes.
+- Go / No-Go decision and public demo release confirmation.
+- README Phase 23 public demo release guidance.
+
+### Verification
+
+- `npm run demo:reset`: passed.
+- `npm run demo:backend`: passed.
+- Backend `/health`: passed.
+- Full final demo API flow: passed.
+- Multilingual smoke: 24/24 checks passed.
+- Responsive smoke: 30/30 checks passed.
+- Accessibility smoke: passed.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- External deployment URL remains pending release-owner hosting target.
+
+---
+
 ## v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation (Implemented: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.22
 milestone_name: "Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release"
-status: complete
-last_updated: "2026-05-26T14:58:20Z"
-last_activity: 2026-05-26
+status: Awaiting next milestone
+stopped_at: v1.22 milestone completed and archived
+last_updated: "2026-05-26T14:47:46.754Z"
+last_activity: 2026-05-26 — Milestone v1.22 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -20,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.22 Phase 23 is planning launch-candidate bug fixing, final approval closure, final smoke verification, public demo release handoff, Go/No-Go, and release confirmation.
+**Current focus:** Milestone v1.22 is complete and archived. Next work should start with a new milestone.
 
 ## Current Position
 
-Phase: 132. Go / No-Go, README, and Public Demo Release Confirmation
-Plan: 132
-Status: Milestone v1.22 complete; ready for lifecycle audit/completion
-Last activity: 2026-05-26 — Phase 132 Go / No-Go, README, and release confirmation completed
+Phase: Milestone v1.22 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-26 — Milestone v1.22 completed and archived
 
 ## Performance Metrics
 

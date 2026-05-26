@@ -23,20 +23,15 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Accessibility, keyboard, screen-reader, and color-contrast hardening for P0 surfaces.
 - Cross-browser, mobile, visual regression, performance sanity, release-quality gate, README, and pre-launch handoff docs.
 
-## Current Milestone: v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+## Current Milestone: None
 
-**Goal:** Convert the Phase 22 launch candidate into a stable public demo release by fixing only necessary P0/P1 blockers, required final-approval items, and release-readiness issues.
+**Last shipped milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release.
 
-**Target features:**
-- Launch candidate bug triage, final approval change tracking, and strict P0/P1 fix policy.
-- Bug-fix-only code changes that preserve copy, design, translation, and demo API locks.
-- Full demo-flow rerun plus multilingual, responsive, accessibility, contact, backend, and build smoke checks.
-- Public demo release documents for final run evidence, deployment handoff, monitoring, first external presentation support, release notes, and Go/No-Go decision.
-- README Phase 23 handoff plus release tag, release branch, deployment confirmation, stakeholder sign-off, and public demo release readiness.
+Start the next milestone with `$gsd-new-milestone`.
 
 ## Current State
 
-**Latest shipped milestone:** v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate
+**Latest shipped milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -61,6 +56,8 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 19 brand-aligned visual refinement with read-only company homepage design study, translated STOA brand tokens, platform theme styling, public/auth/app surface visual calibration, visual compatibility QA, UI-SPEC, UI review, remediation pass, and GitHub commit.
 - Phase 20 cross-locale copy refinement with read-only company homepage German style study, EN/DE/FR/IT copy-rule docs, cross-locale copy matrix, refined locale JSON, mobile-short CTA layout hints, cross-locale visual QA, README handoff, milestone audit, and GitHub commits.
 - Phase 21 accessibility and release-quality hardening with adapted footer/contact/logo/contact-form brand details, localized contact form, contact API contract, accessibility/keyboard/screen-reader/contrast docs, cross-browser/mobile/visual/performance QA docs, release-quality gate, final pre-launch checklist, and README handoff.
+- Phase 22 final demo package and launch-candidate preparation with audience demo scripts, locked demo accounts, stakeholder review checklist, release locks, known issues, launch-candidate approval, and final demo run evidence.
+- Phase 23 public demo release package with final approval changes, P0/P1 blocker verification, release-lock preservation, final demo rerun, multilingual/responsive/accessibility smoke evidence, deployment handoff, monitoring plan, external presentation support, release notes, Go / No-Go, release branch, and release tag.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -306,4 +303,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 for v1.22 Phase 23 planning*
+*Last updated: 2026-05-26 after v1.22 milestone completion*
