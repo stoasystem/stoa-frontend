@@ -10,12 +10,12 @@ Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
 ### Final Approval and Bug Triage
 
-- [ ] **APPROVAL23-01**: `docs/release/final-approval-changes.md` records each required final approval change with ID, source reviewer, page, issue, required change, priority, decision, and status.
-- [ ] **APPROVAL23-02**: Final approval changes explicitly reject new features, non-blocking aesthetic preferences, unrelated roadmap ideas, and future platform functionality.
-- [ ] **BUG23-01**: Launch-candidate bugs are reviewed and classified as P0, P1, P2, or P3 using the Phase 22 final bug triage policy.
-- [ ] **BUG23-02**: P0 bugs are marked fix-required and cannot be accepted as known issues.
-- [ ] **BUG23-03**: P1 bugs are fixed or recorded with an accepted workaround and owner.
-- [ ] **BUG23-04**: P2/P3 issues are either fixed only when low-risk or moved to known issues/backlog without expanding Phase 23 scope.
+- [x] **APPROVAL23-01**: `docs/release/final-approval-changes.md` records each required final approval change with ID, source reviewer, page, issue, required change, priority, decision, and status.
+- [x] **APPROVAL23-02**: Final approval changes explicitly reject new features, non-blocking aesthetic preferences, unrelated roadmap ideas, and future platform functionality.
+- [x] **BUG23-01**: Launch-candidate bugs are reviewed and classified as P0, P1, P2, or P3 using the Phase 22 final bug triage policy.
+- [x] **BUG23-02**: P0 bugs are marked fix-required and cannot be accepted as known issues.
+- [x] **BUG23-03**: P1 bugs are fixed or recorded with an accepted workaround and owner.
+- [x] **BUG23-04**: P2/P3 issues are either fixed only when low-risk or moved to known issues/backlog without expanding Phase 23 scope.
 
 ### Blocker Fixes and Lock Preservation
 
@@ -88,12 +88,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| APPROVAL23-01 | Phase 128 | Pending |
-| APPROVAL23-02 | Phase 128 | Pending |
-| BUG23-01 | Phase 128 | Pending |
-| BUG23-02 | Phase 128 | Pending |
-| BUG23-03 | Phase 128 | Pending |
-| BUG23-04 | Phase 128 | Pending |
+| APPROVAL23-01 | Phase 128 | Done |
+| APPROVAL23-02 | Phase 128 | Done |
+| BUG23-01 | Phase 128 | Done |
+| BUG23-02 | Phase 128 | Done |
+| BUG23-03 | Phase 128 | Done |
+| BUG23-04 | Phase 128 | Done |
 | FIX23-01 | Phase 129 | Pending |
 | FIX23-02 | Phase 129 | Pending |
 | LOCK23-01 | Phase 129 | Pending |

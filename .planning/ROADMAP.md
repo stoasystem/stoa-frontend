@@ -34,8 +34,8 @@ Phase 23 converts the Phase 22 launch candidate into a public demo release. It d
 
 #### Phase 128: Final Approval Intake and Launch Candidate Bug Triage
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Capture final approval changes, classify launch-candidate bugs, and define which items are allowed into Phase 23.
 
 **Requirements:** APPROVAL23-01 through APPROVAL23-02; BUG23-01 through BUG23-04
@@ -140,7 +140,7 @@ Start with Phase 128. Phase 128 defines the approved bug/final-approval intake b
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 128. Final Approval Intake and Launch Candidate Bug Triage | v1.22 | 0/1 | Planned | — |
+| 128. Final Approval Intake and Launch Candidate Bug Triage | v1.22 | 1/1 | Complete | 2026-05-26 |
 | 129. Blocker Fixes and Release Lock Preservation | v1.22 | 0/1 | Planned | — |
 | 130. Final Demo Rerun and Smoke Test Evidence | v1.22 | 0/1 | Planned | — |
 | 131. Public Demo Release Handoff Documents | v1.22 | 0/1 | Planned | — |
