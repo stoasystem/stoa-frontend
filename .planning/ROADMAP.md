@@ -45,8 +45,8 @@ Phase 20 refines English, German, French, and Italian product copy across the ST
 
 #### Phase 114: Cross-Locale Copy Rules and Review Matrix
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Define the language-specific rules and review matrix that guide all Phase 20 copy edits.
 
 **Requirements:** RULE20-01 through RULE20-07
@@ -157,7 +157,7 @@ Start with Phase 113. Phase 113 must complete the source-safety and German style
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 113. Source Safety and German Style Study | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 114. Cross-Locale Copy Rules and Review Matrix | v1.19 | 0/1 | Planned | — |
+| 114. Cross-Locale Copy Rules and Review Matrix | v1.19 | 1/1 | Complete | 2026-05-26 |
 | 115. Core Locale Copy Refinement | v1.19 | 0/1 | Planned | — |
 | 116. Locale Layout Adaptation and Component Fit | v1.19 | 0/1 | Planned | — |
 | 117. Cross-Locale Visual QA, README, and Handoff | v1.19 | 0/1 | Planned | — |

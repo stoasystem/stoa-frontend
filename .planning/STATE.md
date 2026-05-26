@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: "Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation"
 status: executing
-last_updated: "2026-05-26T00:32:00.000Z"
+last_updated: "2026-05-26T00:44:00.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 114. Cross-Locale Copy Rules and Review Matrix
+Phase: 115. Core Locale Copy Refinement
 Plan: —
 Status: Ready to plan
-Last activity: 2026-05-26 — Phase 113 completed German source style study and read-only safety documentation.
+Last activity: 2026-05-26 — Phase 114 completed cross-locale copy rules and review matrix.
 
 ## Performance Metrics
 
@@ -198,6 +198,7 @@ Recent decisions affecting current work:
 - Milestone integration audit found late production-facing copy leaks; commit `159edeb` fixed admin diagnostics, support/billing operational copy, checkout plan labels, register/chat/file-upload error paths, and chat fallback response copy before v1.17 archival.
 - Milestone v1.17 audit passed with 43/43 requirements satisfied and no remaining Phase 18 blockers.
 - Phase 113 documented the company homepage German style reference in read-only mode and recorded the pre-existing `/Users/zhdeng/newweb/img/team/.DS_Store` modification as external to Phase 20.
+- Phase 114 added English copy rules, updated German/French/Italian rules, and created the Phase 20 cross-locale copy review matrix.
 
 ### Pending Todos
 

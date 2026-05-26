@@ -74,3 +74,23 @@ For French UI:
 ## Parent and Tutor Copy
 
 Parent copy should be reassuring, not alarmist. Tutor copy should describe qualified teaching support, not replacement or backup.
+
+## Phase 20 Apostrophe and Layout Rules
+
+Use typographic apostrophes consistently in user-facing French copy:
+
+- `d’apprentissage`
+- `l’élève`
+- `l’enfant`
+- `qu’un`
+- `s’il`
+
+JSON strings should use double quotes so French apostrophes do not need awkward escaping. UI checks must confirm apostrophe-heavy labels do not truncate in buttons, cards, chat prompts, form labels, pricing cards, or dialogs.
+
+## Phase 20 Refinement Rules
+
+- Keep titles elegant but short.
+- Prefer one natural sentence over stacked abstract nouns.
+- Avoid forcing English word order into French.
+- Use shorter CTA variants on mobile where a full phrase feels crowded.
+- Keep teacher support professional: `enseignant qualifié` or `accompagnement d’un enseignant`.

@@ -96,3 +96,29 @@ Avoid:
 ## Tutor Copy
 
 Use `Lehrperson` or `qualifizierte Lehrperson` for professional support. Do not call teachers a backup.
+
+## Phase 20 Main Website Style Alignment
+
+Phase 20 uses `/Users/zhdeng/newweb` as a read-only German style reference. The learning platform should adopt the abstract writing qualities, not homepage components or full text blocks.
+
+Adopt:
+
+- short editorial headline rhythm
+- calm, formal, education-centered wording
+- concise CTAs
+- vocabulary such as `Lehrpersonen`, `Lernfortschritt`, `Verständnis`, `Begleitung`, `Förderung`, and `Lernumgebung`
+
+Do not copy:
+
+- homepage layouts, components, or assets
+- long homepage text blocks
+- marketing-page spacing into dense app pages
+
+## Phase 20 German Refinement Rules
+
+- Prefer `Lernende` or `Schülerinnen und Schüler` in broad parent/institution contexts.
+- Prefer shorter labels such as `Schüler`, `Frage`, or `Bericht` only where UI space requires it.
+- Use `Unterstützung durch Lehrpersonen` instead of compound-heavy `Lehrpersonen-Unterstützung`.
+- Keep hero titles as short lines or compact phrases.
+- Split long explanatory sentences rather than shrinking typography globally.
+- Use `Nachhilfe` only when the category meaning is useful; avoid it in premium brand headlines.

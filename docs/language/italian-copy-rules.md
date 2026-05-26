@@ -66,3 +66,22 @@ For Italian UI:
 ## Parent and Tutor Copy
 
 Parent copy should sound supportive and practical. Tutor copy should present qualified teaching support as professional help, not as a fallback system.
+
+## Phase 20 CTA and Layout Rules
+
+Italian CTAs are often longer than English. Buttons should allow comfortable width, but copy should still stay direct.
+
+Preferred full / short pairs:
+
+- `Inizia a studiare` / `Inizia`
+- `Fai una domanda` / `Domanda`
+- `Chiedi a un insegnante` / `Chiedi`
+- `Scegli un piano` / `Scegli`
+
+## Phase 20 Refinement Rules
+
+- Keep copy warm without becoming vague.
+- Use natural Italian word order rather than literal English structure.
+- Avoid long explanation inside card titles.
+- Keep support and billing copy clear and practical.
+- Use shorter labels on mobile when the full CTA crowds the button.
