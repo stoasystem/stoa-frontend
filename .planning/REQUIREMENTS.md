@@ -107,13 +107,52 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TBD | TBD | Pending |
+| PROVIDER25-01 | Phase 133 | Pending |
+| PROVIDER25-02 | Phase 133 | Pending |
+| PROVIDER25-03 | Phase 133 | Pending |
+| PROVIDER25-04 | Phase 133 | Pending |
+| PROVIDER25-05 | Phase 133 | Pending |
+| PROVIDER25-06 | Phase 133 | Pending |
+| PROVIDER25-07 | Phase 133 | Pending |
+| PROVIDER25-08 | Phase 133 | Pending |
+| HARNESS25-01 | Phase 134 | Pending |
+| HARNESS25-02 | Phase 134 | Pending |
+| HARNESS25-03 | Phase 134 | Pending |
+| HARNESS25-04 | Phase 134 | Pending |
+| HARNESS25-05 | Phase 134 | Pending |
+| HARNESS25-06 | Phase 134 | Pending |
+| HARNESS25-07 | Phase 134 | Pending |
+| HARNESS25-08 | Phase 134 | Pending |
+| RESPONSE25-01 | Phase 134 | Pending |
+| RESPONSE25-02 | Phase 134 | Pending |
+| RESPONSE25-03 | Phase 134 | Pending |
+| RESPONSE25-04 | Phase 134 | Pending |
+| RESPONSE25-05 | Phase 134 | Pending |
+| RESPONSE25-06 | Phase 134 | Pending |
+| RESPONSE25-07 | Phase 134 | Pending |
+| RESPONSE25-08 | Phase 134 | Pending |
+| BACKEND25-01 | Phase 135 | Pending |
+| BACKEND25-02 | Phase 135 | Pending |
+| BACKEND25-03 | Phase 135 | Pending |
+| BACKEND25-04 | Phase 135 | Pending |
+| BACKEND25-05 | Phase 135 | Pending |
+| BACKEND25-06 | Phase 135 | Pending |
+| BACKEND25-07 | Phase 135 | Pending |
+| QA25-01 | Phase 136 | Pending |
+| QA25-02 | Phase 136 | Pending |
+| QA25-03 | Phase 136 | Pending |
+| QA25-04 | Phase 136 | Pending |
+| QA25-05 | Phase 136 | Pending |
+| QA25-06 | Phase 136 | Pending |
+| QA25-07 | Phase 136 | Pending |
+| QA25-08 | Phase 136 | Pending |
+| QA25-09 | Phase 136 | Pending |
 
 **Coverage:**
 - v1.23 requirements: 40 total
-- Mapped to phases: 0
-- Unmapped: 40
+- Mapped to phases: 40
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 during v1.23 milestone initialization*
+*Last updated: 2026-05-26 after v1.23 roadmap creation*

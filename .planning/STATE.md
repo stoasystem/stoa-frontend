@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-05-26T15:21:31.172Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 4
   completed_plans: 0
   percent: 0
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.22 is complete and archived. Next work should start with a new milestone.
+**Current focus:** Phase 133: Harness Provider Foundation and Codex Adapter.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 133 - Harness Provider Foundation and Codex Adapter
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.23 started
+Status: Roadmap ready
+Last activity: 2026-05-26 — Milestone v1.23 roadmap created
 
 ## Performance Metrics
 
@@ -215,6 +215,8 @@ Recent decisions affecting current work:
 - Phase 125 created stakeholder review and final copy/design/translation/bug locks.
 - Phase 126 created release notes, known issues, next-stage backlog, and launch-candidate approval checklist.
 - Phase 127 recorded final demo run evidence, updated README, aligned demo backend npm scripts to the local venv, and verified install, reset, backend startup, dev server, lint, build, and core API smoke.
+- Milestone v1.23 started as Phase 25, focused on local Codex provider integration for the demo Learning Assistant behind the Python harness/demo backend.
+- Phase 25 research found that local `codex exec` can be used as a non-interactive demo bridge, while future production provider handoff should target a backend-owned provider such as OpenAI Responses API rather than frontend/provider coupling.
 
 ### Pending Todos
 
