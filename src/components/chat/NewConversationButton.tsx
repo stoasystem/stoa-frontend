@@ -17,7 +17,7 @@ export function NewConversationButton({
       onClick={onCreateConversation}
       disabled={disabled}
     >
-      <MessageSquarePlus className="h-4 w-4" />
+      <MessageSquarePlus className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
     </Button>
   )
 }
