@@ -16,17 +16,18 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
     <label
       className={cn(
         'inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/70 px-3 py-1.5 text-sm text-muted-foreground transition-colors focus-within:border-primary/40 hover:text-foreground',
-        compact && 'px-2 py-1 text-xs',
+        compact && 'gap-1 px-2 py-1 text-xs',
         className,
       )}
     >
-      <Languages className="h-4 w-4" aria-hidden="true" />
+      {!compact && <Languages className="h-4 w-4" aria-hidden="true" />}
       <span className="sr-only">{t('language.label')}</span>
-      {!compact && <span className="hidden sm:inline">{currentLanguage.label}</span>}
-      {compact && <span aria-hidden="true">{currentLanguage.shortLabel}</span>}
       <select
         aria-label={t('language.label')}
-        className="max-w-[8rem] bg-transparent text-inherit outline-none"
+        className={cn(
+          'bg-transparent text-inherit outline-none',
+          compact ? 'max-w-11 font-semibold' : 'max-w-[8rem]',
+        )}
         value={currentLanguage.code}
         onChange={(event) => {
           void i18n.changeLanguage(event.target.value as SupportedLanguage)
@@ -34,7 +35,7 @@ export function LanguageSwitcher({ compact = false, className }: LanguageSwitche
       >
         {languageOptions.map((language) => (
           <option key={language.code} value={language.code}>
-            {language.label}
+            {compact ? language.shortLabel : language.label}
           </option>
         ))}
       </select>

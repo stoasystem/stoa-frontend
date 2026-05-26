@@ -31,8 +31,6 @@ export function StoaLogo({ variant = 'dark', size = 'md', className }: StoaLogoP
       aria-label="STOA"
     >
       <span className="editorial-heading tracking-normal">STOA</span>
-      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
     </span>
   )
 }
-
