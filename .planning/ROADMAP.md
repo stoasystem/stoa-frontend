@@ -28,119 +28,122 @@
 - ✅ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (shipped 2026-05-26)
 - ✅ **v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing** - Phases 137-140 (shipped 2026-05-26)
 - ✅ **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (implemented 2026-05-26)
+- 🚧 **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (planned)
 
 ## Phases
 
-- [x] **Phase 141: Reference Audit, Scope, and Practice Tone Lock** - Lock what STOA adapts from the reference repo and what stays excluded.
-- [x] **Phase 142: Practice Contracts, Mock Data, Service Boundary, and State Model** - Establish typed practice data, demo fallback, query hooks, and deterministic lesson state.
-- [x] **Phase 143: Student Practice Routes and Core Lesson Flow** - Let students enter Practice Path, complete demo lessons, review results, and revisit mistakes.
-- [x] **Phase 144: Hint-First Learning Assistant and Teacher Support Handoff** - Connect practice mistakes to guided explanations and teacher escalation without provider leakage.
-- [x] **Phase 145: Dashboard and Parent Practice Integration** - Surface practice progress as the next student action and as calm parent reporting.
-- [x] **Phase 146: Localization, Accessibility, Documentation, and Verification** - Finish four-language copy, brand fit, accessibility, docs, README, and verification evidence.
+- [ ] **Phase 147: Equation Demo Scope and Path Framing** - Narrow Practice Path demo to a Mathematics equation path and document the frontend/demo boundary.
+- [ ] **Phase 148: Equation Lesson Content and Mock Data** - Design the three equation units and update mock data for lower-secondary lesson progression.
+- [ ] **Phase 149: Challenge Difficulty, Feedback, and Hint Copy Polish** - Make challenges, feedback, hints, mistakes, and results educationally clear.
+- [ ] **Phase 150: Practice Support Behavior QA** - Verify hint-first Learning Assistant and teacher escalation behavior inside Practice.
+- [ ] **Phase 151: Parent Practice Summary and Demo Scenario** - Improve parent-facing practice language and document the 3-5 minute demo route.
+- [ ] **Phase 152: Localization, QA, README, and Final Verification** - Finish four-language labels, content QA, README, build, and smoke evidence.
 
 ## Phase Details
 
-### Phase 141: Reference Audit, Scope, and Practice Tone Lock
-**Goal**: Developers have a clear STOA-specific Practice Path scope, reference boundary, UI tone, and terminology before implementation starts.
-**Depends on**: Phase 140
-**Requirements**: REF27-01, SCOPE27-01, STYLE27-01, COPY27-01
+### Phase 147: Equation Demo Scope and Path Framing
+**Goal**: Practice Path is clearly framed as an equation-only frontend demo for Phase 28.
+**Depends on**: Phase 146
+**Requirements**: SCOPE28-01, SCOPE28-02, SCOPE28-03, SCOPE28-04
 **Success Criteria** (what must be TRUE):
-  1. Developer can read the reference audit and see which learning-path, challenge, feedback, progress, retry, and completion mechanics STOA adapts.
-  2. Developer can read the scope doc and see that Practice Path is frontend/demo-backed subject practice, not a language-learning clone or production course system.
-  3. Designer or implementer can apply Practice UI guidelines that allow restrained progress and feedback while excluding cartoon, shop, leaderboard, gems, and hearts mechanics.
-  4. Practice labels use neutral STOA terminology such as Practice Path, attempts, progress points, daily goal, study streak, hints, Learning Assistant explanation, and teacher support.
-**Plans**: 141-PLAN.md
+  1. Developer can read `equation-practice-path.md` and see that Phase 28 demo content is only Mathematics equations.
+  2. UI/demo copy does not present Physics, geometry, probability, functions, or broad curriculum paths as Phase 28 scope.
+  3. First-screen Practice content makes the equation demo focus obvious.
+  4. Docs clearly state frontend/demo-only boundaries and exclude real backend, database, adaptive learning, and full curriculum work.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 142: Practice Contracts, Mock Data, Service Boundary, and State Model
-**Goal**: Practice Path has a single typed data and service foundation for lessons, progress, answers, mistakes, summaries, and deterministic challenge transitions.
-**Depends on**: Phase 141
-**Requirements**: TYPE27-01, DATA27-01, DATA27-02, API27-01, API27-02, QUERY27-01, STATE27-01, MOCK27-01, BOUND27-01
+### Phase 148: Equation Lesson Content and Mock Data
+**Goal**: The equation path has credible lower-secondary lesson content and deterministic mock data.
+**Depends on**: Phase 147
+**Requirements**: LINEAR28-01, LINEAR28-02, QUAD28-01, QUAD28-02, SYSTEM28-01, SYSTEM28-02, DATA28-01, DATA28-02
 **Success Criteria** (what must be TRUE):
-  1. Developer can import typed Practice Path contracts for subjects, paths, lessons, challenges, answer results, lesson results, mistakes, overview, and parent summaries.
-  2. Mathematics and Physics demo paths expose credible lessons with 3-5 challenges per lesson through one canonical mock data source.
-  3. Practice service functions and query/mutation hooks match the documented API contract and can fall back to demo data without page-specific data duplication.
-  4. Lesson progression supports answer selection, checking, feedback, retry, hint, continue, completion, and reset through deterministic local state or a reducer.
-  5. Practice frontend code calls only STOA service/API boundaries and never model/provider APIs directly.
-**Plans**: 142-SUMMARY.md
-
-### Phase 143: Student Practice Routes and Core Lesson Flow
-**Goal**: Students can navigate to Practice Path, choose a subject path, complete challenge-based lessons, view results, and review recent mistakes.
-**Depends on**: Phase 142
-**Requirements**: ROUTE27-01, OVERVIEW27-01, PATH27-01, LESSON27-01, CHAL27-01, CHAL27-02, CHAL27-03, FEED27-01, RESULT27-01, MISTAKE27-01, NAV27-01
-**Success Criteria** (what must be TRUE):
-  1. Authenticated student navigation exposes Practice alongside Dashboard, Chat, Learning History, and Profile, and `/practice` opens a Practice Overview.
-  2. Student can view Mathematics and Physics subjects, recommended path, progress, daily goal, study streak, and recent weak topics.
-  3. Student can open a subject path and understand available, locked, completed, and current lesson states with visible progress.
-  4. Student can complete multiple-choice, text/numeric, ordering, or explanation challenges with attempts, checking, restrained feedback, retry, and continue controls.
-  5. Student can review lesson results and recent mistakes, then continue practice, retry, request explanation, or return to the dashboard.
-**Plans**: 143-SUMMARY.md
+  1. Unit 1 covers one-step equations, two-step equations, brackets, and word problems.
+  2. Unit 2 covers recognizing quadratics, simple factoring, solving factored quadratics, and checking two solutions without advanced quadratic topics.
+  3. Unit 3 covers systems meaning, substitution, elimination, and checking a solution.
+  4. `mockPractice.ts` exposes the equation units and 3-5 focused challenges per lesson.
+  5. Each challenge has an unambiguous answer and stays within lower-secondary demo difficulty.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 144: Hint-First Learning Assistant and Teacher Support Handoff
-**Goal**: Practice mistakes lead to feedback, hints, Learning Assistant explanations, and teacher support escalation in the right order.
-**Depends on**: Phase 143
-**Requirements**: HINT27-01, ASSIST27-01, ASSIST27-02, TEACH27-01
+### Phase 149: Challenge Difficulty, Feedback, and Hint Copy Polish
+**Goal**: Practice challenges teach the next step clearly without giving away answers or sounding punitive.
+**Depends on**: Phase 148
+**Requirements**: DIFF28-01, DIFF28-02, FEED28-01, FEED28-02, FEED28-03, HINT28-01, MISTAKE28-01, RESULT28-01
 **Success Criteria** (what must be TRUE):
-  1. Student sees incorrect-answer feedback and a hint/retry path before any stronger support action.
-  2. Student can use `Explain this step` from a practice mistake and receive or open a Learning Assistant explanation with practice context.
-  3. Learning Assistant explanation copy guides the next reasoning step and avoids giving the final answer first.
-  4. Student can access `Ask a teacher` only after repeated confusion, explicit stuck intent, or weak-topic context.
-  5. Practice support surfaces do not show `Ask AI`, provider names, model names, prompts, debug fields, or backend internals.
-**Plans**: 144-SUMMARY.md
+  1. Challenge difficulty follows recognition, simple calculation, step selection, full solution, and optional review progression.
+  2. Correct feedback names the useful reasoning step.
+  3. Incorrect feedback is supportive and points to the next operation or idea without revealing the full answer.
+  4. Hints are short, directional, and age-appropriate.
+  5. Mistake review and result copy explain what to practice next without failure language or loud reward language.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 145: Dashboard and Parent Practice Integration
-**Goal**: Practice Path progress appears where students and parents already look for next actions and learning signals.
-**Depends on**: Phase 144
-**Requirements**: DASH27-01, PARENT27-01, PARENT27-02
+### Phase 150: Practice Support Behavior QA
+**Goal**: Practice support preserves hint-first Learning Assistant behavior and teacher escalation boundaries.
+**Depends on**: Phase 149
+**Requirements**: ASSIST28-01, ASSIST28-02, ASSIST28-03, TEACH28-01, BOUND28-01
 **Success Criteria** (what must be TRUE):
-  1. Student Dashboard shows a Continue Practice section with recommended lesson, daily goal, study streak, recent mistakes, and a CTA to `/practice`.
-  2. Parent report shows lessons completed this week, topics practiced, mistakes reviewed, practice streak, and recommended next topic.
-  3. Parent-facing copy stays supportive and avoids anxiety-inducing language about mistakes or practice needs.
-  4. Dashboard and parent summaries stay consistent with the same practice overview and summary data used by Practice Path.
-**Plans**: 145-SUMMARY.md
+  1. `Explain this step` uses current challenge context.
+  2. Practice explanation copy guides the next step before revealing a final answer.
+  3. Repeated incorrect attempts can show more specific support without skipping directly to teacher support.
+  4. `Ask a teacher` appears only after repeated confusion, stuck intent, or weak-topic context.
+  5. Practice frontend code stays behind STOA service/API boundaries and does not call provider APIs.
+**Plans**: TBD
 **UI hint**: yes
 
-### Phase 146: Localization, Accessibility, Documentation, and Verification
-**Goal**: Practice Path is ready for demo use across supported languages, accessible controls, brand-fit UI, documented handoff, and final verification.
-**Depends on**: Phase 145
-**Requirements**: LANG27-01, LANG27-02, LANG27-03, LANG27-04, UI27-01, A11Y27-01, DOC27-01, QA27-01, README27-01, VERIFY27-01
+### Phase 151: Parent Practice Summary and Demo Scenario
+**Goal**: Parents can understand equation practice progress, and the team has a tight 3-5 minute demo route.
+**Depends on**: Phase 150
+**Requirements**: PARENT28-01, PARENT28-02, PARENT28-03, DEMO28-01, DEMO28-02
 **Success Criteria** (what must be TRUE):
-  1. English, German, French, and Italian Practice Path P0 copy exists for all required practice controls, feedback states, lesson completion, mistakes, daily goal, and study streak labels.
-  2. German, French, and Italian core controls fit mobile layouts, including the required German, French, and Italian hint/explanation labels.
-  3. Practice UI uses STOA premium theme styling with restrained progress, feedback, lesson-node hover, and completion states, without cartoon, shop, gems, or loud celebration patterns.
-  4. Practice challenge controls are keyboard accessible, show visible focus states, expose correctness without color alone, and preserve readable button text across viewports.
-  5. Practice demo-data docs, functional QA docs, README handoff, build verification, student practice smoke, parent report smoke, and available lint/E2E evidence are recorded.
-**Plans**: 146-SUMMARY.md
+  1. Parent copy documentation defines supportive wording for current path, completed lessons, topics practiced, mistakes reviewed, and next topic.
+  2. Parent Report practice summary aligns with the equation-only demo data.
+  3. Parent-facing copy avoids failure, weakness, ranking, or anxiety language.
+  4. Demo scenario shows Dashboard -> Practice -> path -> lesson -> correct answer -> incorrect answer -> hint -> explanation -> result -> Parent Report.
+  5. The documented demo route can be completed in 3-5 minutes.
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 152: Localization, QA, README, and Final Verification
+**Goal**: Phase 28 is ready to execute with complete QA, docs, README, and verification expectations.
+**Depends on**: Phase 151
+**Requirements**: LANG28-01, LANG28-02, QA28-01, QA28-02, README28-01, VERIFY28-01
+**Success Criteria** (what must be TRUE):
+  1. English, German, French, and Italian Practice labels exist for core controls and feedback states.
+  2. German, French, and Italian core labels fit the existing mobile control surfaces.
+  3. Content QA covers scope, lesson goals, challenge clarity, answer correctness, hints, feedback, Learning Assistant behavior, and parent copy.
+  4. Final QA includes build, equation lesson smoke, Learning Assistant support smoke, parent report smoke, and demo scenario smoke.
+  5. README documents Phase 28 scope, exclusions, equation topics, and main tasks.
+**Plans**: TBD
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 141. Reference Audit, Scope, and Practice Tone Lock | 1/1 | Complete | 2026-05-26 |
-| 142. Practice Contracts, Mock Data, Service Boundary, and State Model | 1/1 | Complete | 2026-05-26 |
-| 143. Student Practice Routes and Core Lesson Flow | 1/1 | Complete | 2026-05-26 |
-| 144. Hint-First Learning Assistant and Teacher Support Handoff | 1/1 | Complete | 2026-05-26 |
-| 145. Dashboard and Parent Practice Integration | 1/1 | Complete | 2026-05-26 |
-| 146. Localization, Accessibility, Documentation, and Verification | 1/1 | Complete | 2026-05-26 |
+| 147. Equation Demo Scope and Path Framing | 0/TBD | Not started | - |
+| 148. Equation Lesson Content and Mock Data | 0/TBD | Not started | - |
+| 149. Challenge Difficulty, Feedback, and Hint Copy Polish | 0/TBD | Not started | - |
+| 150. Practice Support Behavior QA | 0/TBD | Not started | - |
+| 151. Parent Practice Summary and Demo Scenario | 0/TBD | Not started | - |
+| 152. Localization, QA, README, and Final Verification | 0/TBD | Not started | - |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 141 | 4 | REF27-01, SCOPE27-01, STYLE27-01, COPY27-01 |
-| 142 | 9 | TYPE27-01, DATA27-01, DATA27-02, API27-01, API27-02, QUERY27-01, STATE27-01, MOCK27-01, BOUND27-01 |
-| 143 | 11 | ROUTE27-01, OVERVIEW27-01, PATH27-01, LESSON27-01, CHAL27-01, CHAL27-02, CHAL27-03, FEED27-01, RESULT27-01, MISTAKE27-01, NAV27-01 |
-| 144 | 4 | HINT27-01, ASSIST27-01, ASSIST27-02, TEACH27-01 |
-| 145 | 3 | DASH27-01, PARENT27-01, PARENT27-02 |
-| 146 | 10 | LANG27-01, LANG27-02, LANG27-03, LANG27-04, UI27-01, A11Y27-01, DOC27-01, QA27-01, README27-01, VERIFY27-01 |
+| 147 | 4 | SCOPE28-01, SCOPE28-02, SCOPE28-03, SCOPE28-04 |
+| 148 | 8 | LINEAR28-01, LINEAR28-02, QUAD28-01, QUAD28-02, SYSTEM28-01, SYSTEM28-02, DATA28-01, DATA28-02 |
+| 149 | 8 | DIFF28-01, DIFF28-02, FEED28-01, FEED28-02, FEED28-03, HINT28-01, MISTAKE28-01, RESULT28-01 |
+| 150 | 5 | ASSIST28-01, ASSIST28-02, ASSIST28-03, TEACH28-01, BOUND28-01 |
+| 151 | 5 | PARENT28-01, PARENT28-02, PARENT28-03, DEMO28-01, DEMO28-02 |
+| 152 | 6 | LANG28-01, LANG28-02, QA28-01, QA28-02, README28-01, VERIFY28-01 |
 
-**Total requirements:** 41
-**Mapped requirements:** 41
+**Total requirements:** 36
+**Mapped requirements:** 36
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Milestone v1.25 implementation is complete. Recommended next milestone: Phase 28 Practice Path QA, Lesson Content Refinement, and Demo Scenario Polishing.
+Milestone v1.26 is ready for Phase 147 planning.

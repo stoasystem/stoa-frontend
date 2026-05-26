@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.26
 milestone_name: "Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing"
-status: planning
-last_updated: "2026-05-26T20:03:29.264Z"
+status: ready_to_plan
+last_updated: "2026-05-26T20:18:00Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,38 +20,40 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.25 complete. Recommended next milestone: Phase 28 Practice Path QA, Lesson Content Refinement, and Demo Scenario Polishing.
+**Current focus:** Phase 147 - Equation Demo Scope and Path Framing.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.26 started
+Phase: 147 of 152 (1 of 6 in v1.26)
+Plan: Not planned yet
+Status: Ready to plan
+Last activity: 2026-05-26 — v1.26 roadmap created with 6 phases and 36/36 requirements mapped.
+
+Progress: [----------] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6
-- Average duration: same-session milestone execution
-- Total execution time: same-session milestone execution
+- Total plans completed this milestone: 0
+- Average duration: n/a
+- Total execution time: 0 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 141 | 1/1 | Complete | same session |
-| 142 | 1/1 | Complete | same session |
-| 143 | 1/1 | Complete | same session |
-| 144 | 1/1 | Complete | same session |
-| 145 | 1/1 | Complete | same session |
-| 146 | 1/1 | Complete | same session |
+| 147 | TBD | n/a | n/a |
+| 148 | TBD | n/a | n/a |
+| 149 | TBD | n/a | n/a |
+| 150 | TBD | n/a | n/a |
+| 151 | TBD | n/a | n/a |
+| 152 | TBD | n/a | n/a |
 
 **Recent Trend:**
 
-- Last 5 plans: 142, 143, 144, 145, 146 complete
-- Trend: frontend/demo milestone completed in one autonomous pass
+- Last 5 plans: n/a
+- Trend: n/a
 
 *Updated after each plan completion*
 
@@ -67,15 +69,18 @@ Recent decisions affecting current work:
 - `sanidhyy/duolingo-clone` is mechanism reference material only; STOA must not copy its stack, code, backend structure, shop, hearts, leaderboards, or cartoon style.
 - Practice mistakes use a hint-first flow before Learning Assistant explanation and teacher escalation.
 - Phase 27 remains frontend/demo-backed and provider-agnostic; the frontend calls only STOA service/API boundaries.
+- v1.26 continues roadmap numbering from Phase 147 after v1.25 ended at Phase 146.
+- Phase 28 narrows the Practice demo to Mathematics equations only.
+- Phase 28 work is frontend design/content/demo polish; functionality should be only enough to test and present the UI.
 
 ### Pending Todos
 
-- Phase 28 should refine lesson content quality, hint wording, and demo scenario polish.
+None for v1.26 yet.
 
 ### Blockers/Concerns
 
-- No Phase 27 blocker remains.
 - Parent report browser smoke should be run in isolated mock mode unless the live demo backend has matching parent report permissions.
+- Practice content QA should verify equation correctness and hint quality before demo polish is accepted.
 
 ## Deferred Items
 
@@ -83,9 +88,10 @@ Recent decisions affecting current work:
 |----------|------|--------|-------------|
 | Practice content QA | Full content accuracy and demo scenario polishing | Future Requirements | v1.25 requirements |
 | Learning Assistant regression | Repeated-confusion and direct-answer practice regression suite | Future Requirements | v1.25 requirements |
+| Broad Practice curriculum | Geometry, probability, functions, physics, and large question banks | Future Requirements | v1.26 requirements |
 
 ## Session Continuity
 
-Last session: 2026-05-26 20:35 UTC
-Stopped at: v1.25 Phase 27 implementation complete and verified.
+Last session: 2026-05-26 20:18 UTC
+Stopped at: v1.26 roadmap created; next step is `$gsd-plan-phase 147`.
 Resume file: None
