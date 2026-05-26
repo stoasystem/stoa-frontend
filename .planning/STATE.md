@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.24
-milestone_name: "Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing"
-status: complete
-last_updated: "2026-05-26T16:45:00.000Z"
+milestone: v1.25
+milestone_name: "Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design"
+status: planning
+last_updated: "2026-05-26T19:03:09.971Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 140 - Demo Flow QA, Regression Report, README, and Final Verification
-Plan: Complete
-Status: Milestone complete
-Last activity: 2026-05-26 — v1.24 audit passed and milestone is ready for archival
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-26 — Milestone v1.25 started
 
 ## Performance Metrics
 
@@ -218,6 +218,13 @@ Recent decisions affecting current work:
 - Milestone v1.23 started as Phase 25, focused on local Codex provider integration for the demo Learning Assistant behind the Python harness/demo backend.
 - Phase 25 research found that local `codex exec` can be used as a non-interactive demo bridge, while future production provider handoff should target a backend-owned provider such as OpenAI Responses API rather than frontend/provider coupling.
 - Phase 133 added the provider interface, Codex CLI adapter, template fallback provider, provider router, health metadata, and local provider logging boundary.
+- Quick fix `260526-rs6` improved student dashboard primary button readability by applying the STOA premium primary button treatment to `Open chat` and verifying computed foreground/background styles.
+- Quick fix `260526-rvj` improved app navigation active-state readability by adding a dedicated `platform-nav-active` class with light text/icon color on burgundy background.
+- Quick fix `260526-ry4` added a sticky authenticated top navigation bar to `AppLayout` using role-based primary nav links and a compact user menu variant.
+- Quick fix `260526-s11` made student login always land on `/dashboard`, including when login was reached from the protected `/chat` route.
+- Quick fix `260526-sbd` made the top account menu compact by removing the top role badge and hiding the name until wider desktop screens.
+- Quick fix `260526-se4` changed the authenticated top-left `STOA` link into an explicit localized home button that links to `/`.
+- Quick fix `260526-sh9` made the top account menu show the student name at desktop width while keeping the role badge out of the top bar.
 - Phase 134 added prompt templates, prompt construction, response checks, repair/fallback orchestration, regression data, and harness behavior tests.
 - Phase 135 connected the harness into the FastAPI chat endpoint, added `/health/provider`, preserved frontend response contracts, and replaced direct-answer/internal fallback copy.
 - Phase 136 added provider behavior QA, production-provider handoff docs, README guidance, code-review hardening, and final verification evidence.
@@ -257,6 +264,30 @@ Recent decisions affecting current work:
 | 2026-05-25 | Fix image text matches | `src/components/landing/ParentHero.tsx` |
 | 2026-05-25 | Polish public title typography | `src/styles/premium-theme.css` |
 | 2026-05-25 | Fix Vite large chunk build warning | `vite.config.ts` |
+| 2026-05-26 | Default chat to new conversation | `src/pages/chat/ChatPage.tsx` |
+| 2026-05-26 | Add chat page navigation exits | `src/components/chat/ChatPageNavigation.tsx` |
+| 2026-05-26 | Polish homepage next-step copy | `src/i18n/locales/en/home.json` |
+| 2026-05-26 | Complete teacher support and application flow | `src/pages/landing/TeacherSupportPage.tsx` |
+| 2026-05-26 | Show teacher online status in chat | `src/components/chat/TeacherAvailabilityStatus.tsx` |
+| 2026-05-26 | Refocus parents landing page on child growth | `src/components/landing/ParentGrowthExplainer.tsx` |
+| 2026-05-26 | Link homepage live explanation card to chat | `src/components/home/HomeMagazineImage.tsx` |
+| 2026-05-26 | Link homepage teacher support card to tutors page | `src/components/home/HomeMagazineImage.tsx` |
+| 2026-05-26 | Polish homepage teacher support headline | `src/i18n/locales/en/home.json` |
+| 2026-05-26 | Polish homepage Swiss school trust copy | `src/i18n/locales/en/home.json` |
+| 2026-05-26 | Remove duplicate homepage bottom CTA copy | `src/i18n/locales/en/home.json` |
+| 2026-05-26 | Change public tutors navigation copy to teachers | `src/i18n/locales/en/common.json` |
+| 2026-05-26 | Improve footer language switcher styling | `src/components/common/LanguageSwitcher.tsx` |
+| 2026-05-26 | Clarify registration step label copy | `src/components/auth/RegisterForm.tsx` |
+| 2026-05-26 | Clean up pricing page layout | `src/pages/pricing/PricingPage.tsx` |
+| 2026-05-26 | Update subscription tier definitions and pricing copy | `src/data/phase11MockData.ts` |
+| 2026-05-26 | Clarify parent page mastery progress labels | `src/components/landing/ParentHero.tsx` |
+| 2026-05-26 | Fix student dashboard Open chat button readability | `src/components/dashboard/ContinueLearningCard.tsx` |
+| 2026-05-26 | Fix student dashboard sidebar active navigation readability | `src/layouts/AppLayout.tsx` |
+| 2026-05-26 | Add authenticated dashboard top navigation bar | `src/layouts/AppLayout.tsx` |
+| 2026-05-26 | Make student login redirect to dashboard | `src/hooks/auth/useLoginMutation.ts` |
+| 2026-05-26 | Make dashboard top account menu less crowded | `src/components/common/UserMenu.tsx` |
+| 2026-05-26 | Change dashboard top STOA link to homepage button | `src/layouts/AppLayout.tsx` |
+| 2026-05-26 | Show student name in dashboard top account menu | `src/components/common/UserMenu.tsx` |
 
 ### Blockers/Concerns
 

@@ -25,7 +25,19 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Current Milestone
 
-No active milestone. The recommended next milestone is Phase 27: Demo Scenario Rehearsal, External Presentation QA, and Feedback Capture.
+## Current Milestone: v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design
+
+**Goal:** Add a STOA-branded Practice Path that turns Duolingo-style learning-path mechanics into a subject-based, frontend/demo-backed active practice flow connected to Student Dashboard, Learning Assistant hints, and parent reporting.
+
+**Target features:**
+- Reference audit of `sanidhyy/duolingo-clone`, focused on learning paths, lesson/challenge flow, feedback, progress, streaks, and attempts while explicitly avoiding code/backend/product-structure copying.
+- Practice Path product scope, UI guidelines, API contract, mock data, and functional QA documentation.
+- Subject-based practice overview, subject path, lesson, result, and mistakes-review pages for Mathematics and Physics demo lessons.
+- Challenge components for multiple-choice, text input, ordering, explanation, progress, feedback, hint, retry, lesson summary, daily goal, streak, and recent mistakes.
+- Student Dashboard Continue Practice integration and Parent Report practice summary integration.
+- Hint-first Learning Assistant handoff and teacher-support escalation from practice mistakes without exposing provider-specific implementation details.
+- English, German, French, and Italian Practice Path P0 copy with German/French/Italian button-length constraints.
+- Mock/demo API support for practice subjects, paths, lessons, answer submission, and lesson completion.
 
 ## Current State
 
@@ -93,7 +105,11 @@ No active milestone. The recommended next milestone is Phase 27: Demo Scenario R
 
 ### Active
 
-- No active milestone. Phase 27 is recommended next for demo scenario rehearsal, external presentation QA, and feedback capture.
+- [ ] Build Phase 27 Practice Path as a frontend/demo-backed active learning path, using Duolingo-style mechanisms only as reference material.
+- [ ] Keep Practice Path subject-based for STOA Mathematics and Physics demo lessons, not a language-learning clone.
+- [ ] Connect practice mistakes to hint-first Learning Assistant explanations and teacher-support escalation while preserving frontend/backend/provider boundaries.
+- [ ] Integrate practice progress into Student Dashboard and Parent Report without over-gamified or anxiety-inducing language.
+- [ ] Document scope, API contracts, UI guidelines, demo data, QA, and README handoff for Phase 27.
 
 ### Out of Scope
 
@@ -216,6 +232,11 @@ Current codebase facts:
 - **Phase 25 provider boundary**: Codex is an internal local demo provider only. The frontend must continue to call the STOA Chat API and must not receive or display provider-specific fields, model names, prompt text, backend debug data, or internal fallback details.
 - **Phase 25 harness behavior**: The Python harness owns prompt construction, grade-level constraints, subject-scope constraints, no-direct-answer rules, teacher escalation guidance, forbidden internal-term checks, response repair, fallback selection, and provider readiness evidence.
 - **Phase 25 fallback requirement**: Codex timeout, unavailable command, failed behavior checks, or forbidden internal terms must not break the demo; the template fallback should return a natural guided Learning Assistant response and internal logs should record the reason without sensitive data.
+- **Phase 27 scope**: Practice Path is frontend preparation, page integration, component adaptation, interaction flow, API contract, mock data, and demo backend support only. It must not introduce complex database design, a production course system, payment-gated practice, adaptive-learning algorithms, or formal backend architecture.
+- **Phase 27 reference boundary**: `sanidhyy/duolingo-clone` is a mechanism reference only. STOA may learn from learning paths, lessons, challenge feedback, progress, quests, streaks, attempts, and completion flows, but must not copy its codebase, backend stack, database structure, Clerk/Stripe/Neon/Drizzle integrations, language-learning product structure, shop/gems mechanics, or cartoon visual style.
+- **Phase 27 product positioning**: The primary module name should be `Practice Path`, with light `Learning Quest` language only where useful. STOA remains a premium education platform for subject practice, not a game or language-learning clone.
+- **Phase 27 Learning Assistant boundary**: Practice mistakes should first show feedback, hint, and retry. `Explain this step` may hand off to the Learning Assistant, and `Ask a teacher` may appear after continued confusion; neither flow should directly expose model/provider/debug terminology.
+- **Phase 27 localization**: Practice Path P0 copy must support English, German, French, and Italian. German labels should stay short enough for buttons, including `Üben`, `Weiter üben`, `Prüfen`, `Hinweis anzeigen`, and `Schritt erklären`.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -302,6 +323,9 @@ Current codebase facts:
 | Keep Phase 26 focused on Learning Assistant QA instead of feature expansion | The next value is making existing guided answers stable, relevant, scoped, and demo-safe across turns rather than adding pages or backend architecture | — Pending |
 | Treat behavior failures as regression-test candidates | P0 Learning Assistant issues should be captured in a bug log and converted into tests before prompt, evaluator, or fallback fixes are accepted | — Pending |
 | Fix Learning Assistant behavior in the harness, not the frontend | Frontend should display backend Chat API responses; prompt rules, evaluator checks, repair prompts, and fallback templates own answer behavior | — Pending |
+| Keep Phase 27 as Practice Path, not a Duolingo clone | STOA should adopt useful learning-path mechanics while preserving its subject-based premium education positioning, restrained visual language, and backend simplicity | — Pending |
+| Use attempts instead of punitive hearts | Attempts communicates practice chances in a neutral education tone and avoids over-gamified pressure | — Pending |
+| Make hints the first response to practice mistakes | Students should receive guided support and retry opportunities before full Learning Assistant explanation or teacher escalation | — Pending |
 
 ## Evolution
 
@@ -321,4 +345,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after v1.24 milestone completion*
+*Last updated: 2026-05-26 after v1.25 milestone start*
