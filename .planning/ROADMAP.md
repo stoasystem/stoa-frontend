@@ -80,8 +80,8 @@ Phase 23 converts the Phase 22 launch candidate into a public demo release. It d
 
 #### Phase 131: Public Demo Release Handoff Documents
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Prepare deployment, monitoring, first external presentation, and public demo release notes documents.
 
 **Requirements:** HANDOFF23-01 through HANDOFF23-02; MONITOR23-01; PRESENT23-01; NOTES23-01 through NOTES23-02
@@ -143,5 +143,5 @@ Start with Phase 128. Phase 128 defines the approved bug/final-approval intake b
 | 128. Final Approval Intake and Launch Candidate Bug Triage | v1.22 | 1/1 | Complete | 2026-05-26 |
 | 129. Blocker Fixes and Release Lock Preservation | v1.22 | 1/1 | Complete | 2026-05-26 |
 | 130. Final Demo Rerun and Smoke Test Evidence | v1.22 | 1/1 | Complete | 2026-05-26 |
-| 131. Public Demo Release Handoff Documents | v1.22 | 0/1 | Planned | — |
+| 131. Public Demo Release Handoff Documents | v1.22 | 1/1 | Complete | 2026-05-26 |
 | 132. Go / No-Go, README, and Public Demo Release Confirmation | v1.22 | 0/1 | Planned | — |

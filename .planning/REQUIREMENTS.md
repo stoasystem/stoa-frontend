@@ -38,12 +38,12 @@ Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
 ### Public Demo Release Handoff
 
-- [ ] **HANDOFF23-01**: `docs/release/deployment-handoff.md` documents deployment target, environment variables, API mode, demo backend URL, build command, preview command, rollback instruction, contact person, and known limitations.
-- [ ] **HANDOFF23-02**: Deployment handoff recommends public demo release flags with demo accounts, demo badges, and internal debug hidden.
-- [ ] **MONITOR23-01**: `docs/release/demo-monitoring-plan.md` documents what to monitor after release, 48-hour check frequency, and pre-presentation smoke timing.
-- [ ] **PRESENT23-01**: `docs/release/first-external-presentation-support.md` documents pre-demo preparation, recommended browser/device/accounts, fallback paths, pages to avoid, and feedback collection.
-- [ ] **NOTES23-01**: `docs/release/public-demo-release-notes.md` documents release name, date, purpose, flows, roles, languages, internal demo backend note, known limitations, and contact/support info.
-- [ ] **NOTES23-02**: External-facing release notes avoid mock, demo backend, fake checkout, and Codex wording.
+- [x] **HANDOFF23-01**: `docs/release/deployment-handoff.md` documents deployment target, environment variables, API mode, demo backend URL, build command, preview command, rollback instruction, contact person, and known limitations.
+- [x] **HANDOFF23-02**: Deployment handoff recommends public demo release flags with demo accounts, demo badges, and internal debug hidden.
+- [x] **MONITOR23-01**: `docs/release/demo-monitoring-plan.md` documents what to monitor after release, 48-hour check frequency, and pre-presentation smoke timing.
+- [x] **PRESENT23-01**: `docs/release/first-external-presentation-support.md` documents pre-demo preparation, recommended browser/device/accounts, fallback paths, pages to avoid, and feedback collection.
+- [x] **NOTES23-01**: `docs/release/public-demo-release-notes.md` documents release name, date, purpose, flows, roles, languages, internal demo backend note, known limitations, and contact/support info.
+- [x] **NOTES23-02**: External-facing release notes avoid mock, demo backend, fake checkout, and Codex wording.
 
 ### Go / No-Go and Public Release
 
@@ -107,12 +107,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SMOKE23-02 | Phase 130 | Done |
 | SMOKE23-03 | Phase 130 | Done |
 | SMOKE23-04 | Phase 130 | Done |
-| HANDOFF23-01 | Phase 131 | Pending |
-| HANDOFF23-02 | Phase 131 | Pending |
-| MONITOR23-01 | Phase 131 | Pending |
-| PRESENT23-01 | Phase 131 | Pending |
-| NOTES23-01 | Phase 131 | Pending |
-| NOTES23-02 | Phase 131 | Pending |
+| HANDOFF23-01 | Phase 131 | Done |
+| HANDOFF23-02 | Phase 131 | Done |
+| MONITOR23-01 | Phase 131 | Done |
+| PRESENT23-01 | Phase 131 | Done |
+| NOTES23-01 | Phase 131 | Done |
+| NOTES23-02 | Phase 131 | Done |
 | GONOGO23-01 | Phase 132 | Pending |
 | README23-01 | Phase 132 | Pending |
 | RELEASE23-01 | Phase 132 | Pending |
