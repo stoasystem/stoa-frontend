@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.23
 milestone_name: "Phase 25: Local Codex Provider Integration for Complete Demo Flow"
-status: planning
+status: implemented
 last_updated: "2026-05-26T15:21:31.172Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Phase 133: Harness Provider Foundation and Codex Adapter.
+**Current focus:** Milestone v1.23 implementation complete; audit and completion are next.
 
 ## Current Position
 
-Phase: 133 - Harness Provider Foundation and Codex Adapter
+Phase: 136 - Full Demo QA, Readiness Checklist, README, and Handoff
 Plan: —
-Status: Roadmap ready
-Last activity: 2026-05-26 — Milestone v1.23 roadmap created
+Status: Implementation complete
+Last activity: 2026-05-26 — Milestone v1.23 phases 133-136 implemented and verified
 
 ## Performance Metrics
 
@@ -217,6 +217,10 @@ Recent decisions affecting current work:
 - Phase 127 recorded final demo run evidence, updated README, aligned demo backend npm scripts to the local venv, and verified install, reset, backend startup, dev server, lint, build, and core API smoke.
 - Milestone v1.23 started as Phase 25, focused on local Codex provider integration for the demo Learning Assistant behind the Python harness/demo backend.
 - Phase 25 research found that local `codex exec` can be used as a non-interactive demo bridge, while future production provider handoff should target a backend-owned provider such as OpenAI Responses API rather than frontend/provider coupling.
+- Phase 133 added the provider interface, Codex CLI adapter, template fallback provider, provider router, health metadata, and local provider logging boundary.
+- Phase 134 added prompt templates, prompt construction, response checks, repair/fallback orchestration, regression data, and harness behavior tests.
+- Phase 135 connected the harness into the FastAPI chat endpoint, added `/health/provider`, preserved frontend response contracts, and replaced direct-answer/internal fallback copy.
+- Phase 136 added provider behavior QA, production-provider handoff docs, README guidance, code-review hardening, and final verification evidence.
 
 ### Pending Todos
 

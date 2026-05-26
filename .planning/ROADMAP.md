@@ -25,11 +25,14 @@
 - ✅ **v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate** - Phases 118-122 (implemented 2026-05-26)
 - ✅ **v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation** - Phases 123-127 (implemented 2026-05-26)
 - ✅ **v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release** - Phases 128-132 (shipped 2026-05-26)
-- ◆ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (planning)
+- ✅ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (implemented 2026-05-26)
 
 ## Phases
 
 ### Phase 133: Harness Provider Foundation and Codex Adapter
+
+**Status:** Complete
+**Plans:** 1/1
 
 **Goal:** Establish the local demo provider abstraction, Codex CLI adapter, template fallback, router, logging boundary, and ignored provider logs.
 
@@ -44,6 +47,9 @@
 
 ### Phase 134: Prompt Rules, Response Checks, and Behavior Regression
 
+**Status:** Complete
+**Plans:** 1/1
+
 **Goal:** Build the controlled Learning Assistant prompt harness, response evaluator, repair/fallback behavior, regression data, and behavior tests.
 
 **Requirements:** HARNESS25-01, HARNESS25-02, HARNESS25-03, HARNESS25-04, HARNESS25-05, HARNESS25-06, HARNESS25-07, HARNESS25-08, RESPONSE25-01, RESPONSE25-02, RESPONSE25-03, RESPONSE25-04, RESPONSE25-05, RESPONSE25-06, RESPONSE25-07, RESPONSE25-08
@@ -57,6 +63,9 @@
 
 ### Phase 135: Demo Backend Chat Integration and Provider Health
 
+**Status:** Complete
+**Plans:** 1/1
+
 **Goal:** Connect the harness into the existing FastAPI demo backend while preserving frontend Chat API contracts and existing streaming compatibility.
 
 **Requirements:** BACKEND25-01, BACKEND25-02, BACKEND25-03, BACKEND25-04, BACKEND25-05, BACKEND25-06, BACKEND25-07
@@ -69,6 +78,9 @@
 4. Frontend services/types remain provider-agnostic and fallback copy is guided rather than answer-first or internal.
 
 ### Phase 136: Full Demo QA, Readiness Checklist, README, and Handoff
+
+**Status:** Complete
+**Plans:** 1/1
 
 **Goal:** Verify the complete demo loop with Codex/fallback behavior and document readiness, QA evidence, local runbook, and future production-provider handoff.
 

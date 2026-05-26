@@ -10,58 +10,58 @@ Requirements for Phase 25. Each requirement maps to exactly one roadmap phase.
 
 ### Provider Foundation
 
-- [ ] **PROVIDER25-01**: Developers can use a typed Python provider interface with `ProviderRequest`, `ProviderResponse`, and `LearningProvider` so local demo providers are replaceable.
-- [ ] **PROVIDER25-02**: Developers can run a Codex provider adapter that invokes local `codex exec` non-interactively with bounded timeout and captured final text.
-- [ ] **PROVIDER25-03**: The Codex provider adapter uses stdin or an equivalent safe input path so long prompts do not depend on shell quoting.
-- [ ] **PROVIDER25-04**: The Codex provider adapter runs in a local-demo-safe mode such as ephemeral/read-only where feasible and fails clearly when unavailable.
-- [ ] **PROVIDER25-05**: Developers can use a template fallback provider that returns a guided Learning Assistant response when Codex is unavailable or rejected.
-- [ ] **PROVIDER25-06**: Developers can use a provider router that selects the configured provider from environment variables and automatically falls back on provider errors, timeouts, failed checks, or forbidden terms.
-- [ ] **PROVIDER25-07**: Provider logging records provider selection, fallback usage, timeout, and failure category without passwords, tokens, full file contents, or full private chat transcripts.
-- [ ] **PROVIDER25-08**: `.gitignore` excludes local provider logs such as `demo-harness/logs/`.
+- [x] **PROVIDER25-01**: Developers can use a typed Python provider interface with `ProviderRequest`, `ProviderResponse`, and `LearningProvider` so local demo providers are replaceable.
+- [x] **PROVIDER25-02**: Developers can run a Codex provider adapter that invokes local `codex exec` non-interactively with bounded timeout and captured final text.
+- [x] **PROVIDER25-03**: The Codex provider adapter uses stdin or an equivalent safe input path so long prompts do not depend on shell quoting.
+- [x] **PROVIDER25-04**: The Codex provider adapter runs in a local-demo-safe mode such as ephemeral/read-only where feasible and fails clearly when unavailable.
+- [x] **PROVIDER25-05**: Developers can use a template fallback provider that returns a guided Learning Assistant response when Codex is unavailable or rejected.
+- [x] **PROVIDER25-06**: Developers can use a provider router that selects the configured provider from environment variables and automatically falls back on provider errors, timeouts, failed checks, or forbidden terms.
+- [x] **PROVIDER25-07**: Provider logging records provider selection, fallback usage, timeout, and failure category without passwords, tokens, full file contents, or full private chat transcripts.
+- [x] **PROVIDER25-08**: `.gitignore` excludes local provider logs such as `demo-harness/logs/`.
 
 ### Prompt Harness and Behavior Rules
 
-- [ ] **HARNESS25-01**: The Python harness can build a Learning Assistant prompt from student profile, grade level, registered subjects, conversation subject, recent context, language, and the student question.
-- [ ] **HARNESS25-02**: Prompt templates exist for base Learning Assistant behavior, grade rules, subject rules, and teacher escalation rules.
-- [ ] **HARNESS25-03**: The prompt instructs the assistant to guide understanding before any final answer and to use step-by-step explanations suitable for the student.
-- [ ] **HARNESS25-04**: The prompt injects grade-level constraints so lower-secondary students are not given advanced concepts such as calculus unless the question is explicitly about scope boundaries.
-- [ ] **HARNESS25-05**: The prompt injects subject-scope constraints so questions outside registered subjects are handled gently without pretending to provide full unsupported instruction.
-- [ ] **HARNESS25-06**: The prompt includes teacher escalation guidance for confused, dissatisfied, blocked, or repeated-help-needed students.
-- [ ] **HARNESS25-07**: The prompt forbids user-visible internal terms including Codex, AI, model, prompt, backend, demo, mock, and provider.
-- [ ] **HARNESS25-08**: The harness can perform one repair attempt when a provider response fails behavior checks before using fallback.
+- [x] **HARNESS25-01**: The Python harness can build a Learning Assistant prompt from student profile, grade level, registered subjects, conversation subject, recent context, language, and the student question.
+- [x] **HARNESS25-02**: Prompt templates exist for base Learning Assistant behavior, grade rules, subject rules, and teacher escalation rules.
+- [x] **HARNESS25-03**: The prompt instructs the assistant to guide understanding before any final answer and to use step-by-step explanations suitable for the student.
+- [x] **HARNESS25-04**: The prompt injects grade-level constraints so lower-secondary students are not given advanced concepts such as calculus unless the question is explicitly about scope boundaries.
+- [x] **HARNESS25-05**: The prompt injects subject-scope constraints so questions outside registered subjects are handled gently without pretending to provide full unsupported instruction.
+- [x] **HARNESS25-06**: The prompt includes teacher escalation guidance for confused, dissatisfied, blocked, or repeated-help-needed students.
+- [x] **HARNESS25-07**: The prompt forbids user-visible internal terms including Codex, AI, model, prompt, backend, demo, mock, and provider.
+- [x] **HARNESS25-08**: The harness can perform one repair attempt when a provider response fails behavior checks before using fallback.
 
 ### Response Quality and Regression Tests
 
-- [ ] **RESPONSE25-01**: Response evaluation rejects or repairs answers that expose forbidden internal terms.
-- [ ] **RESPONSE25-02**: Response evaluation rejects or repairs answers that begin with a direct final answer instead of guided explanation.
-- [ ] **RESPONSE25-03**: Response evaluation detects known grade-scope violations in the demo regression set.
-- [ ] **RESPONSE25-04**: Response evaluation detects known subject-scope violations in the demo regression set.
-- [ ] **RESPONSE25-05**: Response evaluation rejects or repairs answers that are excessively long, overly technical, or lack explanatory steps.
-- [ ] **RESPONSE25-06**: `demo-harness/data/demo_question_regression.json` contains at least the eight required regression cases for math, physics, out-of-grade, out-of-subject, follow-up, and teacher escalation behavior.
-- [ ] **RESPONSE25-07**: Behavior tests verify Codex success, Codex failure fallback, timeout handling where feasible, forbidden-term rejection, guided-answer behavior, grade scope, subject scope, and teacher escalation suggestions.
-- [ ] **RESPONSE25-08**: User-visible provider failure text is natural Learning Assistant/support language and never says Codex, model, prompt, backend, demo, mock, or provider failed.
+- [x] **RESPONSE25-01**: Response evaluation rejects or repairs answers that expose forbidden internal terms.
+- [x] **RESPONSE25-02**: Response evaluation rejects or repairs answers that begin with a direct final answer instead of guided explanation.
+- [x] **RESPONSE25-03**: Response evaluation detects known grade-scope violations in the demo regression set.
+- [x] **RESPONSE25-04**: Response evaluation detects known subject-scope violations in the demo regression set.
+- [x] **RESPONSE25-05**: Response evaluation rejects or repairs answers that are excessively long, overly technical, or lack explanatory steps.
+- [x] **RESPONSE25-06**: `demo-harness/data/demo_question_regression.json` contains at least the eight required regression cases for math, physics, out-of-grade, out-of-subject, follow-up, and teacher escalation behavior.
+- [x] **RESPONSE25-07**: Behavior tests verify Codex success, Codex failure fallback, timeout handling where feasible, forbidden-term rejection, guided-answer behavior, grade scope, subject scope, and teacher escalation suggestions.
+- [x] **RESPONSE25-08**: User-visible provider failure text is natural Learning Assistant/support language and never says Codex, model, prompt, backend, demo, mock, or provider failed.
 
 ### Demo Backend and Frontend Contract
 
-- [ ] **BACKEND25-01**: `POST /conversations/{conversationId}/messages` saves the student message, calls the harness, saves the assistant message, and returns the existing `studentMessage` plus `assistantMessage` response shape.
-- [ ] **BACKEND25-02**: The demo backend loads student grade and registered subjects from local demo state before calling the harness.
-- [ ] **BACKEND25-03**: The demo backend passes conversation subject and recent messages to the harness without sending passwords, tokens, or uploaded file contents.
-- [ ] **BACKEND25-04**: `GET /health/provider` reports internal provider readiness, selected provider, fallback provider, and demo mode without exposing prompts or user data.
-- [ ] **BACKEND25-05**: The existing streaming chat endpoint remains compatible with the harness-backed assistant response.
-- [ ] **BACKEND25-06**: Frontend chat services and types remain provider-agnostic and do not add Codex, model, provider, prompt, or debug fields to normal Chat API responses.
-- [ ] **BACKEND25-07**: Existing frontend and backend fallback copy that directly gives answers or mentions demo/provider internals is replaced with guided Learning Assistant language.
+- [x] **BACKEND25-01**: `POST /conversations/{conversationId}/messages` saves the student message, calls the harness, saves the assistant message, and returns the existing `studentMessage` plus `assistantMessage` response shape.
+- [x] **BACKEND25-02**: The demo backend loads student grade and registered subjects from local demo state before calling the harness.
+- [x] **BACKEND25-03**: The demo backend passes conversation subject and recent messages to the harness without sending passwords, tokens, or uploaded file contents.
+- [x] **BACKEND25-04**: `GET /health/provider` reports internal provider readiness, selected provider, fallback provider, and demo mode without exposing prompts or user data.
+- [x] **BACKEND25-05**: The existing streaming chat endpoint remains compatible with the harness-backed assistant response.
+- [x] **BACKEND25-06**: Frontend chat services and types remain provider-agnostic and do not add Codex, model, provider, prompt, or debug fields to normal Chat API responses.
+- [x] **BACKEND25-07**: Existing frontend and backend fallback copy that directly gives answers or mentions demo/provider internals is replaced with guided Learning Assistant language.
 
 ### QA, Documentation, and Handoff
 
-- [ ] **QA25-01**: `docs/qa/codex-provider-behavior-qa.md` documents provider readiness, timeout, fallback, forbidden-term, grade-scope, subject-scope, guided-answer, and teacher escalation checks.
-- [ ] **QA25-02**: `docs/backend-integration/learning-provider-handoff.md` documents the demo provider interface, Codex adapter, prompt rules, response checks, teacher escalation rules, frontend expectations, and future production provider requirements.
-- [ ] **QA25-03**: README documents Phase 25 local Codex provider integration, environment variables, local-only boundary, fallback behavior, and the rule that user-facing UI must never mention Codex.
-- [ ] **QA25-04**: A provider readiness checklist exists for demo operators before running an external presentation.
-- [ ] **QA25-05**: Full student flow QA verifies registration/login, chat question, guided answer, follow-up, and professional teacher support request.
-- [ ] **QA25-06**: Full tutor flow QA verifies request list, detail, in-progress status, note, and resolved status.
-- [ ] **QA25-07**: Full parent flow QA verifies child learning history, report, and teacher request record visibility.
-- [ ] **QA25-08**: Full commercial/support/admin flow QA verifies pricing, mock checkout, referral, support/contact, and admin overview are not regressed.
-- [ ] **QA25-09**: Final verification runs the Python harness tests and `npm run build`, or records exact blockers with mitigation.
+- [x] **QA25-01**: `docs/qa/codex-provider-behavior-qa.md` documents provider readiness, timeout, fallback, forbidden-term, grade-scope, subject-scope, guided-answer, and teacher escalation checks.
+- [x] **QA25-02**: `docs/backend-integration/learning-provider-handoff.md` documents the demo provider interface, Codex adapter, prompt rules, response checks, teacher escalation rules, frontend expectations, and future production provider requirements.
+- [x] **QA25-03**: README documents Phase 25 local Codex provider integration, environment variables, local-only boundary, fallback behavior, and the rule that user-facing UI must never mention Codex.
+- [x] **QA25-04**: A provider readiness checklist exists for demo operators before running an external presentation.
+- [x] **QA25-05**: Full student flow QA verifies registration/login, chat question, guided answer, follow-up, and professional teacher support request.
+- [x] **QA25-06**: Full tutor flow QA verifies request list, detail, in-progress status, note, and resolved status.
+- [x] **QA25-07**: Full parent flow QA verifies child learning history, report, and teacher request record visibility.
+- [x] **QA25-08**: Full commercial/support/admin flow QA verifies pricing, mock checkout, referral, support/contact, and admin overview are not regressed.
+- [x] **QA25-09**: Final verification runs the Python harness tests and `npm run build`, or records exact blockers with mitigation.
 
 ## Future Requirements
 
@@ -107,46 +107,46 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROVIDER25-01 | Phase 133 | Pending |
-| PROVIDER25-02 | Phase 133 | Pending |
-| PROVIDER25-03 | Phase 133 | Pending |
-| PROVIDER25-04 | Phase 133 | Pending |
-| PROVIDER25-05 | Phase 133 | Pending |
-| PROVIDER25-06 | Phase 133 | Pending |
-| PROVIDER25-07 | Phase 133 | Pending |
-| PROVIDER25-08 | Phase 133 | Pending |
-| HARNESS25-01 | Phase 134 | Pending |
-| HARNESS25-02 | Phase 134 | Pending |
-| HARNESS25-03 | Phase 134 | Pending |
-| HARNESS25-04 | Phase 134 | Pending |
-| HARNESS25-05 | Phase 134 | Pending |
-| HARNESS25-06 | Phase 134 | Pending |
-| HARNESS25-07 | Phase 134 | Pending |
-| HARNESS25-08 | Phase 134 | Pending |
-| RESPONSE25-01 | Phase 134 | Pending |
-| RESPONSE25-02 | Phase 134 | Pending |
-| RESPONSE25-03 | Phase 134 | Pending |
-| RESPONSE25-04 | Phase 134 | Pending |
-| RESPONSE25-05 | Phase 134 | Pending |
-| RESPONSE25-06 | Phase 134 | Pending |
-| RESPONSE25-07 | Phase 134 | Pending |
-| RESPONSE25-08 | Phase 134 | Pending |
-| BACKEND25-01 | Phase 135 | Pending |
-| BACKEND25-02 | Phase 135 | Pending |
-| BACKEND25-03 | Phase 135 | Pending |
-| BACKEND25-04 | Phase 135 | Pending |
-| BACKEND25-05 | Phase 135 | Pending |
-| BACKEND25-06 | Phase 135 | Pending |
-| BACKEND25-07 | Phase 135 | Pending |
-| QA25-01 | Phase 136 | Pending |
-| QA25-02 | Phase 136 | Pending |
-| QA25-03 | Phase 136 | Pending |
-| QA25-04 | Phase 136 | Pending |
-| QA25-05 | Phase 136 | Pending |
-| QA25-06 | Phase 136 | Pending |
-| QA25-07 | Phase 136 | Pending |
-| QA25-08 | Phase 136 | Pending |
-| QA25-09 | Phase 136 | Pending |
+| PROVIDER25-01 | Phase 133 | Done |
+| PROVIDER25-02 | Phase 133 | Done |
+| PROVIDER25-03 | Phase 133 | Done |
+| PROVIDER25-04 | Phase 133 | Done |
+| PROVIDER25-05 | Phase 133 | Done |
+| PROVIDER25-06 | Phase 133 | Done |
+| PROVIDER25-07 | Phase 133 | Done |
+| PROVIDER25-08 | Phase 133 | Done |
+| HARNESS25-01 | Phase 134 | Done |
+| HARNESS25-02 | Phase 134 | Done |
+| HARNESS25-03 | Phase 134 | Done |
+| HARNESS25-04 | Phase 134 | Done |
+| HARNESS25-05 | Phase 134 | Done |
+| HARNESS25-06 | Phase 134 | Done |
+| HARNESS25-07 | Phase 134 | Done |
+| HARNESS25-08 | Phase 134 | Done |
+| RESPONSE25-01 | Phase 134 | Done |
+| RESPONSE25-02 | Phase 134 | Done |
+| RESPONSE25-03 | Phase 134 | Done |
+| RESPONSE25-04 | Phase 134 | Done |
+| RESPONSE25-05 | Phase 134 | Done |
+| RESPONSE25-06 | Phase 134 | Done |
+| RESPONSE25-07 | Phase 134 | Done |
+| RESPONSE25-08 | Phase 134 | Done |
+| BACKEND25-01 | Phase 135 | Done |
+| BACKEND25-02 | Phase 135 | Done |
+| BACKEND25-03 | Phase 135 | Done |
+| BACKEND25-04 | Phase 135 | Done |
+| BACKEND25-05 | Phase 135 | Done |
+| BACKEND25-06 | Phase 135 | Done |
+| BACKEND25-07 | Phase 135 | Done |
+| QA25-01 | Phase 136 | Done |
+| QA25-02 | Phase 136 | Done |
+| QA25-03 | Phase 136 | Done |
+| QA25-04 | Phase 136 | Done |
+| QA25-05 | Phase 136 | Done |
+| QA25-06 | Phase 136 | Done |
+| QA25-07 | Phase 136 | Done |
+| QA25-08 | Phase 136 | Done |
+| QA25-09 | Phase 136 | Done |
 
 **Coverage:**
 - v1.23 requirements: 40 total
