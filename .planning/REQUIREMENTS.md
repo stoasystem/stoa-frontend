@@ -126,11 +126,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | FUTURE30-02 | Phase 163 | Complete |
 | FUTURE30-03 | Phase 163 | Complete |
 | FUTURE30-04 | Phase 163 | Complete |
-| DOC30-01 | Phase 164 | Pending |
-| DOC30-02 | Phase 164 | Pending |
-| QA30-01 | Phase 164 | Pending |
-| QA30-02 | Phase 164 | Pending |
-| QA30-03 | Phase 164 | Pending |
+| DOC30-01 | Phase 164 | Complete |
+| DOC30-02 | Phase 164 | Complete |
+| QA30-01 | Phase 164 | Complete |
+| QA30-02 | Phase 164 | Complete |
+| QA30-03 | Phase 164 | Complete |
 
 **Coverage:**
 - v1 requirements: 33 total

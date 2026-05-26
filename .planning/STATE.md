@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.28
 milestone_name: "Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement"
-status: roadmap_ready
+status: milestone_complete
 last_updated: "2026-05-26T21:05:00.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 6
-  completed_plans: 5
-  percent: 83
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 164 of 164 (5 of 6 in v1.28)
-Plan: Phase 163 complete; Phase 164 ready for planning
-Status: Ready to plan Phase 164
-Last activity: 2026-05-26 — Parent value framing and future handoff requirements completed
+Phase: 164 of 164 (6 of 6 in v1.28)
+Plan: Phase 30 final demo curriculum packaging complete
+Status: Milestone complete
+Last activity: 2026-05-26 — README, demo QA, build verification, and milestone handoff completed.
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 5 of 6
+- Total plans completed this milestone: 6 of 6
 - Average duration: same-session documentation slice
 - Total execution time: same-session documentation slice
 
@@ -46,12 +46,12 @@ Last activity: 2026-05-26 — Parent value framing and future handoff requiremen
 | 161 | 1/1 | Complete | same session |
 | 162 | 1/1 | Complete | same session |
 | 163 | 1/1 | Complete | same session |
-| 164 | 0/1 | Pending | — |
+| 164 | 1/1 | Complete | same session |
 
 **Recent Trend:**
 
-- Last 5 plans: 159, 160, 161, 162, 163 complete
-- Trend: documentation package complete through parent value and future handoff
+- Last 5 plans: 160, 161, 162, 163, 164 complete
+- Trend: Phase 30 documentation and demo packaging milestone complete
 
 *Updated after each plan completion*
 
@@ -82,7 +82,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Phase 164 should update README, verify the existing demo story, run build, and prepare final milestone handoff.
+- Phase 31 should rehearse the external demo, collect feedback, and refine the Practice + Chat + Parent story based on real observations.
 
 ### Blockers/Concerns
 

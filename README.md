@@ -163,6 +163,49 @@ The goal is to make the existing equation demo smoother and make Practice a natu
 
 Phase 29 remains frontend design, route state, mock contract, docs, and demo QA only. It does not add a production backend, real adaptive learning, broader curriculum, or game-first reward systems.
 
+## Phase 30 Final Demo Curriculum Packaging and Product Story
+
+This phase packages the existing Practice Path, Learning Chat, teacher support, and Parent Report flow into a final external demo curriculum story.
+
+The final demo curriculum remains focused on equations:
+
+- Linear equations in one variable
+- Quadratic equations
+- Linear systems in two variables
+
+The goal is not to add more functionality or curriculum breadth.
+
+The goal is to make the existing demo clear enough for external students, parents, tutors, stakeholders, and investors to understand:
+
+- Students can practise step by step.
+- Mistakes lead to hints before full explanations.
+- `Explain this step` opens Learning Chat with the practice context.
+- Professional teacher support is available when guided help is not enough.
+- Parents can understand the learning activity through a clear report.
+
+Main deliverables:
+
+- Final equation demo curriculum package
+- Product story and 3/10/15 minute demo scripts
+- Student, parent, tutor, and stakeholder testing task sheets
+- Feedback form and evaluation framework
+- Parent value framing
+- Future curriculum and backend handoff requirements
+- Phase 31 follow-up backlog
+
+Phase 30 remains documentation, demo packaging, external testing preparation, and verification only. It does not add new product surfaces, production backend/database work, a content CMS, formal teacher scheduling, payment systems, adaptive learning, or a broad curriculum library.
+
+Phase 30 docs:
+
+- `docs/curriculum/final-demo-curriculum-package/overview.md`
+- `docs/demo/final-demo-curriculum-package/product-story.md`
+- `docs/demo/final-demo-curriculum-package/integrated-practice-chat-parent-demo-script.md`
+- `docs/testing/external-practice-demo-testing-plan.md`
+- `docs/feedback/practice-demo-feedback-form.md`
+- `docs/parent/practice-chat-parent-value-framing.md`
+- `docs/backend-integration/practice-real-backend-requirements.md`
+- `docs/backlog/phase31-practice-demo-follow-up-backlog.md`
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.

@@ -39,7 +39,7 @@
 - [x] **Phase 161: External Testing Task Sheets and Plan** - Prepare student, parent, tutor, stakeholder, and internal-review testing materials.
 - [x] **Phase 162: Feedback Collection and Evaluation Framework** - Define structured feedback forms, role-specific questions, severity tags, and follow-up handling.
 - [x] **Phase 163: Parent Value Framing and Future Handoff Requirements** - Refine parent-facing value language and document future curriculum/backend/backlog needs.
-- [ ] **Phase 164: README, Demo QA, and Milestone Handoff** - Update README, verify the existing demo flow, run build, and summarize risks and next steps.
+- [x] **Phase 164: README, Demo QA, and Milestone Handoff** - Update README, verify the existing demo flow, run build, and summarize risks and next steps.
 
 ## Phase Details
 
@@ -137,7 +137,7 @@
 | 161. External Testing Task Sheets and Plan | 1/1 | Complete | 2026-05-26 |
 | 162. Feedback Collection and Evaluation Framework | 1/1 | Complete | 2026-05-26 |
 | 163. Parent Value Framing and Future Handoff Requirements | 1/1 | Complete | 2026-05-26 |
-| 164. README, Demo QA, and Milestone Handoff | 0/1 | Pending | — |
+| 164. README, Demo QA, and Milestone Handoff | 1/1 | Complete | 2026-05-26 |
 
 ## Coverage
 
