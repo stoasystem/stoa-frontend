@@ -1,25 +1,25 @@
 {
   "hero": {
-    "eyebrow": "Learning Assistant first, teacher support when needed",
+    "eyebrow": "Guided learning, with teacher support when it helps",
     "title": "Learn with clarity.",
     "subtitle": "STOA helps students ask questions, receive clear explanations, and get professional teacher support when they need more guidance.",
     "secondaryCta": "How it works",
     "bullets": ["Ask in seconds", "Understand the next step", "Teacher support when needed"],
     "imageBadge": "Study room",
     "imageLabel": "Live explanation",
-    "imageTitle": "Start with your question. STOA explains the next step and keeps teacher support in context.",
+    "imageTitle": "Start with your question. STOA explains the next step and keeps teacher support connected.",
     "imagePrompt": "Try: \"Why does subtracting 2 from both sides keep the equation balanced?\""
   },
   "flow": {
     "eyebrow": "How STOA helps students",
     "title": "One clear learning path.",
     "visualLabel": "Learning room",
-    "visualText": "The student stays in one conversation while explanations, teacher support, and parent visibility stay connected.",
+    "visualText": "The learning thread stays in one place, with explanations, teacher support, and parent visibility connected.",
     "steps": [
       { "title": "Ask a question", "description": "Students begin directly in chat with a homework question or uploaded assignment." },
       { "title": "Understand the next step", "description": "The Learning Assistant gives a clear first explanation with the work still visible in context." },
       { "title": "Ask a teacher if needed", "description": "When the answer is not clear enough, a qualified teacher can step into the same thread." },
-      { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-help records without interrupting study." }
+      { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-support records without interrupting study." }
     ]
   },
   "teacher": {
@@ -31,11 +31,11 @@
   },
   "parents": {
     "eyebrow": "Parent visibility",
-    "title": "Parents get the pattern, not another dashboard to manage.",
-    "body": "STOA keeps the student learning path focused while giving parents a calm view of progress, recurring weak topics, and teacher-help moments.",
+    "title": "Parents see the pattern, without another dashboard to manage.",
+    "body": "STOA keeps the student learning path focused while giving parents a calm view of progress, practice areas, and teacher-support moments.",
     "items": [
       { "title": "Recent questions", "description": "See what your child is practicing without interrupting the study session." },
-      { "title": "Weekly reports", "description": "Review strengths, weak topics, and next actions from the learning history." },
+      { "title": "Weekly reports", "description": "Review strengths, practice areas, and next actions from the learning history." },
       { "title": "Support records", "description": "Understand when a teacher was requested and how the request moved forward." }
     ]
   },
@@ -43,7 +43,7 @@
     "items": [
       { "title": "Swiss school context", "description": "Designed around everyday homework questions, grade context, and family visibility." },
       { "title": "Built for real learning routines", "description": "Clear explanations, parent visibility, support requests, referrals, and admin overview stay connected." },
-      { "title": "Ready to grow", "description": "STOA keeps the learning experience clear today while leaving room for future production services." }
+      { "title": "Ready to grow", "description": "STOA keeps the learning experience clear today while leaving room for future services." }
     ]
   },
   "cta": {

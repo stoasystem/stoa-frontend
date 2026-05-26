@@ -1,9 +1,9 @@
 {
   "title": "Lernraum",
-  "emptyTitle": "Starte dein erstes Lerngespräch.",
+  "emptyTitle": "Beginne mit einer Lernfrage.",
   "emptyDescription": "Stelle eine Frage, beschreibe, wo du nicht weiterkommst, oder lade ein Arbeitsblatt hoch.",
   "welcome": "Willkommen bei STOA. Stelle eine Frage oder beschreibe, wo du Unterstützung brauchst.",
-  "placeholder": "Gib hier deine Hausaufgabenfrage ein...",
+  "placeholder": "Schreibe hier deine Lernfrage...",
   "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
   "loadFailed": "Gespräche konnten nicht geladen werden.",
   "conversationLoadFailed": "Dieses Gespräch konnte nicht geladen werden.",
@@ -18,8 +18,8 @@
   "retry": "Erneut versuchen",
   "newConversation": "Neue Unterhaltung",
   "teacher": {
-    "title": "Kann eine Lehrperson das klären?",
-    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson für klarere Orientierung.",
+    "title": "Soll eine Lehrperson helfen?",
+    "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson, wenn du mehr Orientierung brauchst.",
     "cta": "Lehrperson fragen",
     "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
     "failed": "Die Anfrage an die Lehrperson konnte nicht gesendet werden."

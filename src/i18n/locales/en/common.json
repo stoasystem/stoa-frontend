@@ -36,6 +36,7 @@
   },
   "actions": {
     "startLearning": "Start learning",
+    "startLearningShort": "Start",
     "continue": "Continue",
     "back": "Back",
     "createAccount": "Create account",

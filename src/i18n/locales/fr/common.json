@@ -16,7 +16,7 @@
     "forParents": "Pour les parents",
     "privacy": "Confidentialité",
     "terms": "Conditions",
-    "support": "Support",
+    "support": "Aide",
     "dashboard": "Tableau de bord",
     "chat": "Espace d’apprentissage",
     "learningHistory": "Historique",
@@ -30,12 +30,13 @@
     "users": "Élèves",
     "learningActivity": "Activité d’apprentissage",
     "helpRequests": "Demandes enseignant",
-    "supportInbox": "Support",
+    "supportInbox": "Aide",
     "analytics": "Analyses",
     "more": "Plus"
   },
   "actions": {
     "startLearning": "Commencer à apprendre",
+    "startLearningShort": "Commencer",
     "continue": "Continuer",
     "back": "Retour",
     "createAccount": "Créer un compte",

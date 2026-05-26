@@ -1,9 +1,9 @@
 {
-  "title": "Supporto e feedback",
-  "eyebrow": "Supporto pilota",
-  "description": "Questa pagina aiuta a trovare supporto prodotto, spiega quando il supporto dell’insegnante appartiene al percorso di studio e permette di contattare il team STOA.",
-  "viewOnboarding": "Vedi onboarding",
+  "title": "Assistenza e feedback",
+  "eyebrow": "Assistenza STOA",
+  "description": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
+  "viewOnboarding": "Vedi configurazione",
   "contact": "Contatta STOA",
-  "submit": "Invia richiesta di supporto",
-  "submitted": "La tua richiesta di supporto è stata inviata."
+  "submit": "Invia richiesta",
+  "submitted": "La tua richiesta è stata inviata."
 }

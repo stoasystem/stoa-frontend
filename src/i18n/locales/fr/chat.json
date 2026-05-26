@@ -1,9 +1,9 @@
 {
   "title": "Espace d’apprentissage",
-  "emptyTitle": "Commence ta première conversation d’apprentissage.",
+  "emptyTitle": "Pose ta première question d’apprentissage.",
   "emptyDescription": "Pose une question, explique où tu bloques ou téléverse une fiche pour commencer.",
   "welcome": "Bienvenue sur STOA. Commence par poser une question ou expliquer où tu bloques.",
-  "placeholder": "Écris ici ta question sur tes devoirs...",
+  "placeholder": "Écris ta question d’apprentissage...",
   "preparing": "L’Assistant d’apprentissage prépare une explication...",
   "loadFailed": "Impossible de charger les conversations.",
   "conversationLoadFailed": "Impossible de charger cette conversation.",
@@ -18,8 +18,8 @@
   "retry": "Réessayer",
   "newConversation": "Nouvelle conversation",
   "teacher": {
-    "title": "Un enseignant peut-il aider à clarifier ?",
-    "description": "Envoyez cette conversation à un enseignant qualifié pour un accompagnement plus clair.",
+    "title": "Un enseignant peut-il clarifier ce point ?",
+    "description": "Envoie cette conversation à un enseignant qualifié si tu as besoin d’un accompagnement plus clair.",
     "cta": "Demander à un enseignant",
     "submitted": "Votre demande a été envoyée à un enseignant.",
     "failed": "La demande à l’enseignant n’a pas pu être envoyée."

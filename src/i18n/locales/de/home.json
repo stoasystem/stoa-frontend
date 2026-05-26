@@ -1,50 +1,50 @@
 {
   "hero": {
-    "eyebrow": "Erst Lernassistent, bei Bedarf Lehrperson",
+    "eyebrow": "Geführtes Lernen, mit Lehrperson wenn es hilft",
     "title": "Lernen. Fragen. Verstehen.",
     "titleLines": ["Lernen.", "Fragen.", "Verstehen."],
-    "subtitle": "STOA unterstützt Schüler bei Hausaufgaben und Lernfragen – mit klaren Erklärungen und professioneller Unterstützung durch Lehrpersonen, wenn es nötig ist.",
+    "subtitle": "STOA begleitet Lernende bei Hausaufgaben und Lernfragen – mit klaren Erklärungen, ruhiger Struktur und Unterstützung durch Lehrpersonen, wenn mehr Orientierung gebraucht wird.",
     "secondaryCta": "So funktioniert STOA",
-    "bullets": ["Schnell fragen", "Nächsten Schritt verstehen", "Lehrperson bei Bedarf"],
+    "bullets": ["Schnell fragen", "Schritt verstehen", "Lehrperson bei Bedarf"],
     "imageBadge": "Lernraum",
     "imageLabel": "Live-Erklärung",
-    "imageTitle": "Beginne mit deiner Frage. STOA erklärt den nächsten Schritt und hält Lehrpersonen-Unterstützung im Kontext.",
+    "imageTitle": "Beginnen Sie mit einer Frage. STOA erklärt den nächsten Schritt und hält den Kontext für Lehrpersonen bereit.",
     "imagePrompt": "Beispiel: \"Warum bleibt eine Gleichung ausgeglichen, wenn man auf beiden Seiten 2 abzieht?\""
   },
   "flow": {
-    "eyebrow": "Wie STOA Schüler unterstützt",
+    "eyebrow": "Wie STOA Lernen begleitet",
     "title": "Ein klarer Lernweg.",
     "visualLabel": "Lernraum",
-    "visualText": "Der Schüler bleibt in einer Unterhaltung, während Erklärung, Lehrpersonen-Unterstützung und Elternsicht verbunden bleiben.",
+    "visualText": "Der Lernweg bleibt an einem Ort, während Erklärung, Unterstützung durch Lehrpersonen und Elternsicht verbunden bleiben.",
     "steps": [
-      { "title": "Frage stellen", "description": "Schüler starten direkt im Chat mit einer Hausaufgabenfrage oder hochgeladenen Aufgabe." },
+      { "title": "Frage stellen", "description": "Lernende starten direkt im Chat mit einer Hausaufgabenfrage oder hochgeladenen Aufgabe." },
       { "title": "Nächsten Schritt verstehen", "description": "Der Lernassistent gibt eine klare erste Erklärung, während der Kontext sichtbar bleibt." },
       { "title": "Bei Bedarf Lehrperson fragen", "description": "Wenn die Erklärung nicht klar genug ist, kann eine qualifizierte Lehrperson in denselben Verlauf einsteigen." },
-      { "title": "Eltern verfolgen Fortschritt", "description": "Eltern sehen Lernverlauf, Berichte und Lehrpersonen-Anfragen, ohne das Lernen zu unterbrechen." }
+      { "title": "Eltern verfolgen Fortschritt", "description": "Eltern sehen Lernverlauf, Berichte und Anfragen an Lehrpersonen, ohne das Lernen zu unterbrechen." }
     ]
   },
   "teacher": {
     "eyebrow": "Professionelle Unterstützung durch Lehrpersonen",
-    "visualText": "Professionelle Unterstützung durch Lehrpersonen bleibt mit dem Lernmoment verbunden.",
+    "visualText": "Unterstützung durch Lehrpersonen bleibt mit dem Lernmoment verbunden.",
     "title": "Wenn mehr Orientierung nötig ist, ist der Kontext schon da.",
-    "body": "Eine Lehrperson sieht die Unterhaltung, die Frage des Schülers und die vorherige Erklärung. Die Unterstützung beginnt dort, wo Unklarheit entsteht.",
-    "link": "Professionelle Lehrpersonen-Unterstützung"
+    "body": "Eine Lehrperson sieht die Unterhaltung, die Frage und die vorherige Erklärung. Die Unterstützung beginnt dort, wo Unklarheit entsteht.",
+    "link": "Unterstützung durch Lehrpersonen"
   },
   "parents": {
-    "eyebrow": "Elternsichtbarkeit",
-    "title": "Eltern erkennen das Muster, ohne ein weiteres Dashboard zu verwalten.",
-    "body": "STOA hält den Lernweg fokussiert und gibt Eltern einen ruhigen Blick auf Fortschritt, wiederkehrende Schwächen und Lehrpersonenhilfe.",
+    "eyebrow": "Einblick für Eltern",
+    "title": "Eltern sehen, wie das Lernen vorankommt.",
+    "body": "STOA hält den Lernweg fokussiert und gibt Eltern einen ruhigen Blick auf Fortschritt, Übungsthemen und Unterstützung durch Lehrpersonen.",
     "items": [
       { "title": "Aktuelle Fragen", "description": "Sehen, woran Ihr Kind übt, ohne die Lerneinheit zu unterbrechen." },
-      { "title": "Wochenberichte", "description": "Stärken, schwache Themen und nächste Schritte aus dem Lernverlauf prüfen." },
+      { "title": "Wochenberichte", "description": "Stärken, Übungsthemen und nächste Schritte aus dem Lernverlauf prüfen." },
       { "title": "Unterstützungsnachweise", "description": "Verstehen, wann eine Lehrperson gefragt wurde und wie die Anfrage weiterging." }
     ]
   },
   "trust": {
     "items": [
       { "title": "Schweizer Schulkontext", "description": "Ausgerichtet auf Hausaufgaben, Klassenstufe und Familiensichtbarkeit." },
-      { "title": "Für echte Lernroutinen", "description": "Klare Erklärungen, Elternsicht, Support-Anfragen, Empfehlungen und Admin-Übersicht bleiben verbunden." },
-      { "title": "Bereit zu wachsen", "description": "STOA hält das Lernerlebnis heute klar und lässt Raum für künftige Produktionsdienste." }
+      { "title": "Für echte Lernroutinen", "description": "Klare Erklärungen, Elternsicht, Anfragen an Lehrpersonen und Empfehlungen bleiben verbunden." },
+      { "title": "Bereit zu wachsen", "description": "STOA hält das Lernerlebnis heute klar und lässt Raum für künftige Dienste." }
     ]
   },
   "cta": {

@@ -1,9 +1,9 @@
 {
-  "title": "Support und Feedback",
-  "eyebrow": "Pilot-Support",
-  "description": "Diese Seite hilft bei Produktsupport, erklärt Lehrpersonen-Unterstützung im Lernweg und zeigt den Kontakt zum STOA-Team.",
-  "viewOnboarding": "Onboarding ansehen",
+  "title": "Hilfe und Rückmeldung",
+  "eyebrow": "STOA Hilfe",
+  "description": "Hier erhalten Sie Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
+  "viewOnboarding": "Kontoeinrichtung ansehen",
   "contact": "STOA kontaktieren",
-  "submit": "Support-Anfrage senden",
-  "submitted": "Ihre Support-Anfrage wurde gesendet."
+  "submit": "Anfrage senden",
+  "submitted": "Ihre Anfrage wurde gesendet."
 }

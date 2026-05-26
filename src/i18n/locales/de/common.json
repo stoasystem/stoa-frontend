@@ -16,7 +16,7 @@
     "forParents": "Für Eltern",
     "privacy": "Datenschutz",
     "terms": "Bedingungen",
-    "support": "Support",
+    "support": "Hilfe",
     "dashboard": "Übersicht",
     "chat": "Lernchat",
     "learningHistory": "Lernverlauf",
@@ -27,15 +27,16 @@
     "referrals": "Einladungen",
     "requests": "Anfragen",
     "availability": "Verfügbarkeit",
-    "users": "Schüler",
+    "users": "Lernende",
     "learningActivity": "Lernaktivität",
     "helpRequests": "Lehrpersonen-Anfragen",
-    "supportInbox": "Support-Eingang",
+    "supportInbox": "Hilfe-Eingang",
     "analytics": "Analysen",
     "more": "Mehr"
   },
   "actions": {
     "startLearning": "Lernen starten",
+    "startLearningShort": "Starten",
     "continue": "Weiter",
     "back": "Zurück",
     "createAccount": "Konto erstellen",
@@ -50,7 +51,7 @@
     "stop": "Stoppen"
   },
   "roles": {
-    "student": "Schüler",
+    "student": "Schüler/in",
     "parent": "Elternteil",
     "tutor": "Lehrperson",
     "admin": "Admin",

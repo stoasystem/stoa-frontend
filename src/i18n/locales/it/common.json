@@ -16,7 +16,7 @@
     "forParents": "Per genitori",
     "privacy": "Privacy",
     "terms": "Termini",
-    "support": "Supporto",
+    "support": "Assistenza",
     "dashboard": "Panoramica",
     "chat": "Chat di studio",
     "learningHistory": "Cronologia",
@@ -30,12 +30,13 @@
     "users": "Studenti",
     "learningActivity": "Attività di studio",
     "helpRequests": "Richieste insegnante",
-    "supportInbox": "Supporto",
+    "supportInbox": "Assistenza",
     "analytics": "Analisi",
     "more": "Altro"
   },
   "actions": {
     "startLearning": "Inizia a studiare",
+    "startLearningShort": "Inizia",
     "continue": "Continua",
     "back": "Indietro",
     "createAccount": "Crea account",

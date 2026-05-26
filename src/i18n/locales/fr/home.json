@@ -1,24 +1,24 @@
 {
   "hero": {
-    "eyebrow": "Assistant d’apprentissage d’abord, enseignant si nécessaire",
+    "eyebrow": "Apprentissage guidé, avec enseignant si nécessaire",
     "title": "Comprendre avec confiance.",
     "subtitle": "STOA aide les élèves à poser leurs questions, à recevoir des explications claires et à obtenir l’accompagnement d’un enseignant qualifié si nécessaire.",
     "secondaryCta": "Comment ça fonctionne",
     "bullets": ["Poser une question rapidement", "Comprendre l’étape suivante", "Enseignant si nécessaire"],
     "imageBadge": "Espace d’étude",
     "imageLabel": "Explication en direct",
-    "imageTitle": "Commence par ta question. STOA explique l’étape suivante et garde l’accompagnement enseignant dans le contexte.",
+    "imageTitle": "Commence par ta question. STOA explique l’étape suivante et garde le contexte pour l’enseignant.",
     "imagePrompt": "Essai : « Pourquoi soustraire 2 des deux côtés garde-t-il l’équation équilibrée ? »"
   },
   "flow": {
     "eyebrow": "Comment STOA aide les élèves",
     "title": "Un parcours d’apprentissage clair.",
     "visualLabel": "Espace d’apprentissage",
-    "visualText": "L’élève reste dans une seule conversation, avec explications, accompagnement enseignant et visibilité parentale reliés.",
+    "visualText": "Le fil d’apprentissage reste au même endroit, avec les explications, l’accompagnement enseignant et la visibilité parentale reliés.",
     "steps": [
       { "title": "Poser une question", "description": "Les élèves commencent directement dans le chat avec une question ou un devoir téléversé." },
       { "title": "Comprendre l’étape suivante", "description": "L’Assistant d’apprentissage donne une première explication claire, avec le contexte visible." },
-      { "title": "Demander un enseignant si besoin", "description": "Si l’explication n’est pas assez claire, un enseignant qualifié peut rejoindre le même fil." },
+      { "title": "Demander à un enseignant", "description": "Si l’explication n’est pas assez claire, un enseignant qualifié peut rejoindre le même fil." },
       { "title": "Les parents suivent les progrès", "description": "Les parents voient l’historique, les rapports et les demandes d’aide sans interrompre l’étude." }
     ]
   },
@@ -31,19 +31,19 @@
   },
   "parents": {
     "eyebrow": "Visibilité pour les parents",
-    "title": "Les parents voient la progression, sans gérer un tableau de bord de plus.",
-    "body": "STOA garde le parcours de l’élève concentré tout en donnant aux parents une vue claire des progrès, des difficultés récurrentes et des moments d’aide.",
+    "title": "Les parents suivent la progression sans gérer un espace de plus.",
+    "body": "STOA garde le parcours de l’élève concentré tout en donnant aux parents une vue claire des progrès, des sujets à travailler et des moments d’aide.",
     "items": [
       { "title": "Questions récentes", "description": "Voir ce que votre enfant travaille sans interrompre sa séance." },
-      { "title": "Rapports hebdomadaires", "description": "Examiner les forces, les sujets fragiles et les prochaines actions." },
+      { "title": "Rapports hebdomadaires", "description": "Examiner les points forts, les sujets à travailler et les prochaines actions." },
       { "title": "Aide enseignante", "description": "Comprendre quand un enseignant a été demandé et comment la demande a évolué." }
     ]
   },
   "trust": {
     "items": [
       { "title": "Contexte scolaire suisse", "description": "Conçu autour des devoirs quotidiens, du niveau scolaire et de la visibilité familiale." },
-      { "title": "Pensé pour de vraies routines d’apprentissage", "description": "Explications claires, visibilité parentale, demandes de soutien, parrainage et vue admin restent connectés." },
-      { "title": "Prêt à évoluer", "description": "STOA garde l’expérience d’apprentissage claire aujourd’hui tout en laissant de la place aux futurs services de production." }
+      { "title": "Pensé pour de vraies routines d’apprentissage", "description": "Explications claires, visibilité parentale, demandes de soutien et recommandations restent connectées." },
+      { "title": "Prêt à évoluer", "description": "STOA garde l’expérience d’apprentissage claire aujourd’hui tout en laissant de la place aux futurs services." }
     ]
   },
   "cta": {

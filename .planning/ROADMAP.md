@@ -60,8 +60,8 @@ Phase 20 refines English, German, French, and Italian product copy across the ST
 
 #### Phase 115: Core Locale Copy Refinement
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Refine English, German, French, and Italian locale JSON across P0 surfaces without adding product functionality.
 
 **Requirements:** COPY20-01 through COPY20-12
@@ -158,6 +158,6 @@ Start with Phase 113. Phase 113 must complete the source-safety and German style
 |-------|-----------|----------------|--------|-----------|
 | 113. Source Safety and German Style Study | v1.19 | 1/1 | Complete | 2026-05-26 |
 | 114. Cross-Locale Copy Rules and Review Matrix | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 115. Core Locale Copy Refinement | v1.19 | 0/1 | Planned | — |
+| 115. Core Locale Copy Refinement | v1.19 | 1/1 | Complete | 2026-05-26 |
 | 116. Locale Layout Adaptation and Component Fit | v1.19 | 0/1 | Planned | — |
 | 117. Cross-Locale Visual QA, README, and Handoff | v1.19 | 0/1 | Planned | — |

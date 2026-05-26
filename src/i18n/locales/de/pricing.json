@@ -4,9 +4,9 @@
   "description": "Wählen Sie die passende Hausaufgabenunterstützung für Ihre Familie, von geführter Übung bis zu professioneller Unterstützung durch Lehrpersonen.",
   "badge": "Sichere Checkout-Vorschau",
   "supportLevel": "Unterstützung wählen",
-  "supportLevelBody": "Geführtes Üben, Elternberichte und professionelle Lehrpersonen-Unterstützung bleiben in einem Lernweg verbunden.",
-  "valueTitle": "Der Wert für Familien",
-  "valueBody": "STOA verbindet geführte Hausaufgabenhilfe, sichtbare Lernsignale für Eltern und Unterstützung durch Lehrpersonen, damit Schüler weiterkommen und Familien informiert bleiben.",
+  "supportLevelBody": "Geführtes Üben, Elternberichte und Unterstützung durch Lehrpersonen bleiben in einem Lernweg verbunden.",
+  "valueTitle": "Wert für Familien",
+  "valueBody": "STOA verbindet geführte Hausaufgabenhilfe, sichtbare Lernsignale für Eltern und Unterstützung durch Lehrpersonen, damit Lernende weiterkommen und Familien informiert bleiben.",
   "checkoutBody": "Die Planwahl wird vorbereitet. Bitte kontaktieren Sie STOA, um mit einem Plan fortzufahren.",
   "pilotTitle": "Pilotversprechen",
   "pilotBody": "Starten Sie mit einer kostenlosen Probephase, prüfen Sie STOA im Familienalltag und wählen Sie danach einen Plan.",
@@ -19,7 +19,7 @@
       ["Hausaufgaben-Upload", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
       ["Elternbereich", "Vorschau", "—", "Enthalten", "Enthalten"],
       ["Wochenberichte", "Vorschau", "—", "Enthalten", "Enthalten"],
-      ["Lehrperson fragen", "Begrenzt", "—", "—", "Lehrperson-Sitzungen enthalten"]
+      ["Lehrperson fragen", "Begrenzt", "—", "—", "Sitzungen enthalten"]
     ]
   },
   "faqPaymentTitle": "Ist die Zahlung jetzt live?",

@@ -1,9 +1,9 @@
 {
   "title": "Support and feedback",
-  "eyebrow": "Pilot support",
-  "description": "Use this page to find product support, understand when teacher support belongs in the learning flow, and contact the STOA team.",
-  "viewOnboarding": "View onboarding",
+  "eyebrow": "STOA help",
+  "description": "Get help with STOA, understand teacher support in the learning path, and contact the team when you need us.",
+  "viewOnboarding": "View account setup",
   "contact": "Contact STOA",
-  "submit": "Submit support request",
-  "submitted": "Your support request has been submitted."
+  "submit": "Send request",
+  "submitted": "Your request has been sent."
 }

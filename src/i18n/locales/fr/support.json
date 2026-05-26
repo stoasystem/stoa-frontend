@@ -1,9 +1,9 @@
 {
-  "title": "Support et feedback",
-  "eyebrow": "Support pilote",
-  "description": "Cette page aide à trouver le support produit, explique quand l’accompagnement enseignant appartient au parcours d’apprentissage et permet de contacter l’équipe STOA.",
-  "viewOnboarding": "Voir l’onboarding",
+  "title": "Aide et retour",
+  "eyebrow": "Aide STOA",
+  "description": "Obtenez de l’aide avec STOA, comprenez l’accompagnement enseignant dans le parcours d’apprentissage et contactez l’équipe si nécessaire.",
+  "viewOnboarding": "Voir la configuration",
   "contact": "Contacter STOA",
-  "submit": "Envoyer une demande de support",
-  "submitted": "Votre demande de support a été envoyée."
+  "submit": "Envoyer une demande",
+  "submitted": "Votre demande a été envoyée."
 }

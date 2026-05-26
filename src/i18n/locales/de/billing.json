@@ -15,7 +15,7 @@
   "planLoading": "Plandetails werden geladen.",
   "limitsBody": "Planlimits geben Schülern und Familien Orientierung. Die endgültigen Zugangsregeln werden von STOA-Diensten verwaltet.",
   "securityBody": "Gehosteter Checkout ist die bevorzugte Richtung für echte Zahlungen. Der Browser erhält nie Kartendaten oder Zahlungsgeheimnisse.",
-  "teacherUpgradeReason": "Wählen Sie einen Plan mit professioneller Unterstützung durch Lehrpersonen.",
+  "teacherUpgradeReason": "Wählen Sie einen Plan mit Unterstützung durch Lehrpersonen.",
   "fileUploadReason": "Upload-Kontingent erreicht.",
   "parentReportReason": "Für Berichte ist ein Familienplan erforderlich.",
   "success": "Abonnementstatus aktualisiert.",
@@ -42,8 +42,8 @@
     },
     "tutor_supported": {
       "name": "Plan mit Lehrpersonen",
-      "audience": "Familien, die professionelle Lehrpersonen-Unterstützung wünschen, wenn Schüler mehr Orientierung brauchen.",
-      "cta": "Lehrpersonen-Plan wählen",
+      "audience": "Familien, die Unterstützung durch Lehrpersonen wünschen, wenn Lernende mehr Orientierung brauchen.",
+      "cta": "Plan mit Lehrperson wählen",
       "features": ["Alles im Familienplan", "Sitzungen mit Lehrpersonen", "Priorisierte Lernunterstützung"]
     }
   }
