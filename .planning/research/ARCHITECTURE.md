@@ -1,96 +1,84 @@
-# Phase 20 Research: Architecture
+# Phase 22 Research: Architecture
 
-**Milestone:** v1.19 Phase 20
+**Milestone:** v1.21 Phase 22
 
-## Integration Points
+## Primary Integration Points
 
-### Locale Files
-
-Primary write scope:
+Phase 22 is documentation, verification, and launch-candidate process work. The main write scope should be:
 
 ```text
-src/i18n/locales/en/
-src/i18n/locales/de/
-src/i18n/locales/fr/
-src/i18n/locales/it/
+docs/demo/final-demo-package/
+docs/demo/final-demo-run-result.md
+docs/review/stakeholder-review-checklist.md
+docs/release/
+README.md
+.planning/
 ```
 
-Most Phase 20 copy changes should happen in existing namespace JSON files:
+Source code changes should be limited to bug fixes that block demo or launch-candidate readiness.
 
-- `home.json`
-- `auth.json`
-- `chat.json`
-- `parent.json`
-- `pricing.json`
-- `billing.json`
-- `support.json`
-- `common.json`
-- `errors.json`
-- `tutor.json` where needed
+## Demo Package Structure
 
-### Layout Hints
+The final demo package should answer:
 
-Primary layout file:
+- What this demo shows.
+- What it does not show.
+- Which services must be running.
+- Which accounts are used.
+- Which URLs are part of the fixed demo flow.
+- How to reset demo data.
+- How to recover when demo backend, auth, browser, or language switching fails.
+
+Audience scripts should define goal, timing, flow, pages to show, narrative emphasis, and pages to avoid.
+
+## Release Lock Structure
+
+Release docs should separate four concerns:
+
+- Bug triage: P0/P1/P2/P3 classification and fix/workaround rules.
+- Copy lock: surfaces covered and rules for post-lock text changes.
+- Design lock: surfaces covered and rules for post-lock UI changes.
+- Translation lock: supported locales and multilingual consistency requirements.
+- API contract lock: demo backend endpoints and request/response stability rules.
+
+This structure prevents last-minute demo prep from becoming broad product redesign.
+
+## Demo Backend Boundary
+
+The API contract lock should cover:
 
 ```text
-src/lib/localeLayout.ts
+/auth/login
+/auth/register
+/auth/me
+/conversations
+/conversations/:id
+/conversations/:id/messages
+/teacher-help/request
+/tutors/me/help-requests
+/parents/me/children
+/parents/me/children/:childId/report
+/billing/plans
+/billing/subscription
+/billing/usage
+/billing/checkout-session
+/contact/requests
+/support/tickets
+/admin/analytics/overview
+/health
 ```
 
-Existing `HomeHero` already consumes this file. Phase 20 can extend it if a documented UI need appears, but should avoid speculative layout knobs.
+Locking the contract means frontend services, demo backend behavior, and docs must stay aligned if any required change appears.
 
-Candidate additions:
+## Launch Candidate Flow
 
-- CTA size or variant hints beyond current `buttonSize`.
-- Short/long CTA guidance if components need mobile labels.
-- Max-width classes for dense cards or hero actions.
-- Locale-specific wrapping classes for action rows.
+Recommended sequence:
 
-### Components
+1. Create final demo package and scripts.
+2. Lock demo accounts, demo data, reset behavior, and API contract.
+3. Complete stakeholder review checklist and release locks.
+4. Complete release notes, known issues, backlog, and approval checklist.
+5. Run final demo, record result, update README, and prepare `release/launch-candidate-1` or `release/stoa-learning-platform-lc1`.
 
-Likely components to inspect or update:
-
-- `src/components/home/HomeHero.tsx`
-- `src/components/home/HomeCTASection.tsx`
-- `src/layouts/MarketingLayout.tsx`
-- `src/components/auth/RegisterRoleStep.tsx`
-- `src/components/chat/TeacherRequestInlineAction.tsx`
-- `src/components/billing/PlanCard.tsx`
-- `src/components/common/PageHeader.tsx`
-- `src/components/common/LanguageSwitcher.tsx`
-
-Existing safeguards include `min-w-0`, `break-words`, `whitespace-normal`, flexible action rows, and German stacked hero lines. Phase 20 should reuse these patterns.
-
-### Documentation
-
-Required docs:
-
-```text
-docs/language/main-website-german-style-study.md
-docs/language/main-website-german-copy-reference.md
-docs/language/english-copy-rules.md
-docs/language/german-copy-rules.md
-docs/language/french-copy-rules.md
-docs/language/italian-copy-rules.md
-docs/language/cross-locale-copy-review-matrix.md
-docs/language/cross-locale-visual-qa.md
-```
-
-Existing docs can be updated rather than duplicated when they already exist.
-
-## Data Flow
-
-1. Locale JSON provides product copy by namespace.
-2. Components call `t(...)` from `react-i18next`.
-3. `localeLayout.ts` provides language-specific visual hints.
-4. Components combine copy and layout hints to keep page structure stable.
-5. Visual QA checks rendered routes by locale and viewport.
-
-## Build Order
-
-1. Source safety and German style study.
-2. Language rules and copy review matrix.
-3. Locale JSON copy refinement.
-4. Locale layout and component adaptation.
-5. Visual QA documentation and README.
-6. Build/dev verification and source safety recheck.
+The release branch should be created only after build and core demo flow checks pass.
 

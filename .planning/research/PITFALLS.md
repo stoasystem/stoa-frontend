@@ -1,62 +1,75 @@
-# Phase 20 Research: Pitfalls
+# Phase 22 Research: Pitfalls
 
-**Milestone:** v1.19 Phase 20
-
-## Source Safety Pitfalls
-
-- Running formatter, install, build, or cleanup commands inside `/Users/zhdeng/newweb`.
-- Accidentally modifying `.DS_Store` or generated files in the source project.
-- Copying homepage components, CSS, or full paragraphs into the learning platform.
-- Treating the current source status as clean when it has a pre-existing `M img/team/.DS_Store`.
-
-Prevention:
-
-- Use only read commands for `/Users/zhdeng/newweb`.
-- Check `git -C /Users/zhdeng/newweb status --short` before and after work.
-- Document the pre-existing `.DS_Store` change clearly.
-
-## Copy Quality Pitfalls
-
-- German copy becomes literal English with longer sentence structure.
-- German formal/informal address becomes inconsistent.
-- `Schülerinnen und Schüler` is overused in compact UI labels where shorter terms would fit better.
-- `Lehrpersonen-Unterstützung` and other compound forms create heavy UI text.
-- French apostrophes get mixed between straight `'` and typographic `’`.
-- Italian CTA text is natural but too long for buttons.
-- English slips back into SaaS/sales language such as `customers`, `buy now`, or hype claims.
-
-Prevention:
-
-- Use style rules per language before editing JSON.
-- Prefer short German labels and explanatory subtitles.
-- Use typographic apostrophe `’` consistently in French and Italian.
-- Add short CTA variants only where components can consume them.
-- Scan user-facing locale files for banned or risky terminology.
-
-## Layout Pitfalls
-
-- Copy changes pass in JSON but overflow in real UI.
-- German and French labels make nav/action rows wrap awkwardly.
-- Pricing cards become uneven from longer feature text.
-- Register role cards grow too tall on mobile.
-- Chat teacher request action becomes unreadable on narrow screens.
-
-Prevention:
-
-- Keep components flexible with `min-w-0`, `break-words`, `whitespace-normal`, and wrapping action rows.
-- Use `localeLayout.ts` for repeated locale-driven differences.
-- Prefer shorter copy over shrinking type.
-- Run visual checks across target routes, four locales, and widths 375, 430, 768, 1024, and 1440 where feasible.
+**Milestone:** v1.21 Phase 22
 
 ## Scope Pitfalls
 
-- Expanding into new pages or features while refining copy.
-- Attempting final legal/professional translation.
-- Creating a CMS or translation workflow.
-- Rewriting the visual system again after Phase 19.
+- Adding product features while preparing the demo.
+- Reworking the homepage, register flow, language system, or visual direction.
+- Treating unresolved polish feedback as a reason for broad redesign.
+- Adding complex backend, AWS, database, payment, or support infrastructure.
 
 Prevention:
 
-- Requirements should explicitly exclude new functionality, new languages, CMS, and legal-final translation.
-- Roadmap should separate docs/rules, copy edits, layout adaptation, and QA.
+- Requirements must state that Phase 22 does not expand product scope.
+- P0/P1/P2/P3 triage decides what is fixed now versus moved to known issues or backlog.
+- Launch-candidate branch rules allow bug fixes only.
+
+## Demo Reliability Pitfalls
+
+- Demo accounts drift from documented credentials.
+- Reset does not restore expected conversations, reports, requests, support tickets, or admin data.
+- A previous demo changes state and breaks the next demo.
+- Demo scripts include routes that are placeholders or not stable enough for the audience.
+- Demo backend failure has no fallback explanation.
+
+Prevention:
+
+- Document fixed accounts and data expectations.
+- Run reset before final demo and record whether data returns consistently.
+- Scripts should include pages to avoid.
+- Troubleshooting docs should cover backend, auth, language switcher, contact form, and mobile layout failures.
+
+## Review Pitfalls
+
+- Stakeholder review becomes vague feedback with no decision.
+- Investor review focuses on unfinished settings/admin internals.
+- Parent review sees operational jargon instead of trust and visibility.
+- Tutor review implies teachers are being replaced.
+- Admin review exposes unfinished internal details.
+
+Prevention:
+
+- Use role-specific checklists and scripts.
+- Classify review outcome as Approved, Approved with minor fixes, Needs revision, or Blocked.
+- Keep each demo narrative audience-specific.
+
+## Lock Pitfalls
+
+- Copy changes happen in one language only.
+- German headings become long again.
+- French apostrophes or CTA wrapping regress.
+- Design lock is bypassed by last-minute UI tweaks.
+- API contract changes happen without synchronized frontend, demo backend, and docs updates.
+
+Prevention:
+
+- Copy, design, translation, and API locks must define allowed post-lock changes.
+- Four-language checks are required for text changes.
+- Contract changes require demo flow retesting.
+
+## Launch Candidate Pitfalls
+
+- Creating a release branch before build/core demo checks pass.
+- Putting P0 issues into known issues.
+- Accepting P1 issues without a workaround.
+- Release notes overstate production readiness.
+- User-visible demo/mock/provider/Codex wording reappears.
+
+Prevention:
+
+- Launch-candidate approval checklist must gate branch creation.
+- Known issues rules must explicitly exclude P0 issues.
+- Release notes should describe demo/backend mode and limitations plainly.
+- Final scans should include user-visible internal terminology.
 

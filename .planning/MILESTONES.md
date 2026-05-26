@@ -1,5 +1,30 @@
 # Milestones
 
+## v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate (Shipped: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Archive:** `.planning/milestones/v1.20-phases/`
+
+### Delivered
+
+- Read-only footer, contact, logo, and contact-form detail study from `/Users/zhdeng/newweb`, with the source project preserved.
+- Adapted learning-platform footer, STOA logo component, contact information, legal/contact links, and localized contact page.
+- Contact form frontend/demo API contract for `/contact/requests`, with pending, success, error, duplicate-submit, and retry behavior.
+- English, German, French, and Italian footer/contact labels and supporting copy.
+- Accessibility, keyboard navigation, screen-reader, and color-contrast documentation for P0 surfaces.
+- Cross-browser, mobile-device, visual-regression, performance sanity, release-quality gate, final pre-launch checklist, and README handoff documentation.
+
+### Verification
+
+- Build: passed.
+- E2E smoke: passed with deterministic Playwright demo QA mode.
+- Accessibility/keyboard/screen-reader/contrast docs: completed for feasible local coverage.
+- Cross-browser/mobile/visual/performance QA docs: completed with exact limitations recorded where local coverage was reduced.
+- Source safety: `/Users/zhdeng/newweb` was not modified by Phase 21.
+- Remaining handoff gaps: final demo packaging, stakeholder review, launch-candidate release notes, known issues, approval checklist, final demo run, and release branch preparation.
+
+---
+
 ## v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation (Shipped: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

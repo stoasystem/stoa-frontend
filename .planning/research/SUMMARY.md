@@ -1,57 +1,46 @@
-# Phase 20 Research Summary
+# Phase 22 Research Summary
 
-**Milestone:** v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation
+**Milestone:** v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
 **Date:** 2026-05-26
 
-## Stack Additions
+## Conclusion
 
-No new dependencies are needed. Phase 20 should use the existing `react-i18next` locale files, `src/lib/localeLayout.ts`, Tailwind utilities, Phase 19 brand tokens, and Playwright/browser visual QA.
+Phase 22 should be a release-preparation milestone, not a feature milestone. The best path is to package the existing STOA frontend into a stable, repeatable demo and launch-candidate review set: scripts, demo accounts, demo data/reset validation, stakeholder review, release locks, known issues, backlog, approval checklist, final demo run, README update, and launch-candidate branch preparation.
 
-## German Style Findings
+## Stack
 
-Source: `/Users/zhdeng/newweb`, read-only.
+No new dependencies are needed. Use existing React/TypeScript/Vite, npm scripts, demo backend/reset support, Playwright/browser QA, i18n files, and docs structure.
 
-Pre-work source status:
+## Required Deliverables
 
-```text
- M img/team/.DS_Store
-```
-
-This was pre-existing and must remain untouched.
-
-Observed German style:
-
-- Hero rhythm is short, editorial, and split into concise phrases.
-- CTAs are direct and short: `Mehr erfahren`, `Jetzt anmelden`, `Kontakt aufnehmen`.
-- Brand tone is formal, calm, premium, and education-centered.
-- Explanatory text often uses `Schülerinnen und Schüler`, `Lehrpersonen`, `Verständnis`, `Sicherheit`, `Selbstvertrauen`, `Lernfortschritt`, `Begleitung`, `Förderung`, and `Lernumgebung`.
-- `Nachhilfe` is acceptable for service-category clarity, but higher-brand moments lean toward `Lernunterstützung`, `Begleitung`, `Förderung`, and `Lernen`.
-- Longer explanations are placed in paragraphs, while headings and CTAs remain compact.
-
-## Feature Table Stakes
-
-- Document company homepage German style study and copy reference.
-- Create/update English, German, French, and Italian copy rules.
-- Create cross-locale copy review matrix.
-- Create cross-locale visual QA matrix.
-- Refine core locale JSON for homepage, register, chat, parent report, pricing, billing, and support.
-- Update locale layout hints and components only where copy length requires it.
-- Verify build/dev and source read-only safety.
-
-## Watch Outs
-
-- Do not modify `/Users/zhdeng/newweb`.
-- Do not copy homepage components or full text.
-- Do not force literal translation across locales.
-- Do not add new product functionality.
-- Treat copy and layout as a coupled system.
-- Preserve Phase 18 production-facing copy safety and Phase 19 brand visuals.
+- Final demo package under `docs/demo/final-demo-package/`.
+- Audience scripts for investor, parent, student, tutor, and admin demos.
+- Demo account and demo data lock docs.
+- Demo reset, limitations, and troubleshooting docs.
+- Stakeholder review checklist.
+- Final bug triage, copy lock, design lock, translation lock, and demo API contract lock.
+- Release notes, known issues, next-stage backlog, and launch-candidate approval checklist.
+- Final demo run result.
+- README Phase 22 section.
 
 ## Recommended Phase Structure
 
-1. Source Safety and German Style Study.
-2. Cross-Locale Copy Rules and Review Matrix.
-3. Core Locale Copy Refinement.
-4. Locale Layout Adaptation and Component Fit.
-5. Cross-Locale Visual QA, README, and Handoff.
+1. Final Demo Package and Audience Scripts.
+2. Demo Account, Demo Data, Reset, and API Contract Lock.
+3. Stakeholder Review and Final Copy/Design/Translation/Bug Locks.
+4. Release Notes, Known Issues, Backlog, and Approval Checklist.
+5. Final Demo Run, README, and Launch Candidate Branch Preparation.
+
+## Primary Risks
+
+- Demo data drift after reset.
+- Scripts showing unstable or placeholder pages.
+- Stakeholder review producing unclassified feedback.
+- Last-minute feature expansion.
+- Copy/design/translation/API locks not being enforced.
+- Launch candidate branch created before build/core demo checks pass.
+
+## Scope Lock
+
+Phase 22 should not add features, rewrite major pages, rewrite the multilingual system, rebuild the demo backend, add complex backend/database/AWS/payment systems, or perform large UI redesign.
 

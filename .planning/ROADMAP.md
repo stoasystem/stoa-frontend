@@ -23,145 +23,104 @@
 - ✅ **v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation** - Phases 108-112 (implemented 2026-05-26)
 - ✅ **v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation** - Phases 113-117 (implemented 2026-05-26)
 - ✅ **v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate** - Phases 118-122 (implemented 2026-05-26)
+- 🚧 **v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation** - Phases 123-127 (planning)
 
 ## Phases
 
-### Active Milestone: v1.20 Phase 21
+### Active Milestone: v1.21 Phase 22
 
-Phase 21 raises STOA frontend to a release-quality gate without broad business expansion. It adds adapted brand contact details from the company homepage in strict read-only mode, then hardens accessibility, keyboard and screen-reader support, contrast, browser/mobile QA, visual regression, performance sanity, and final pre-launch documentation.
+Phase 22 packages the existing STOA frontend into a stable review and launch-candidate preparation set. It does not add new product functionality. The work fixes the final demo package, audience-specific scripts, demo accounts/data/reset expectations, stakeholder review, release locks, launch-candidate notes, known issues, backlog, approval checklist, final demo run result, README handoff, and release-branch preparation rules.
 
-#### Phase 118: Brand Detail Read-Only Audit and Integration Plan
+#### Phase 123: Final Demo Package and Audience Scripts
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Extract company footer, contact, logo, and contact-form details from `/Users/zhdeng/newweb` in read-only mode and define the learning-platform adaptation boundary.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Create the final demo package and audience-specific demo scripts for formal review, investor demo, parent demo, student demo, tutor demo, admin demo, and internal launch-candidate checks.
 
-**Requirements:** BRAND21-01 through BRAND21-05
-
-**Success Criteria:**
-1. `docs/brand/main-website-brand-details.md` records footer information, contact information, logo usage, contact form structure, and source status.
-2. The doc distinguishes factual information that can be reused from visual/engineering patterns that must be adapted.
-3. Pre-work and post-work `/Users/zhdeng/newweb` status are recorded, including the pre-existing `img/team/.DS_Store` change if present.
-4. No company homepage source files, components, assets, or full page structures are copied into `stoa-frontend`.
-
-#### Phase 119: Footer, Logo, Contact Page, and Contact API Contract
-
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Integrate adapted brand footer details, logo variants, and a multilingual contact form with frontend/demo API contract only.
-
-**Requirements:** BRAND21-06 through BRAND21-10; CONTACT21-01 through CONTACT21-10
+**Requirements:** DEMO22-01 through DEMO22-09
 
 **Success Criteria:**
-1. `StoaLogo`, `AppFooter`, `FooterContactInfo`, and `FooterLegalLinks` exist and fit the learning-platform theme.
-2. Footer contact, legal, and homepage links are localized and accurate.
-3. `/contact` exists with a multilingual contact form for name, email, optional phone, role, topic, message, and preferred language.
-4. `src/services/contact/contactApi.ts` and a mutation hook define and use the `POST /contact/requests` frontend API contract.
-5. Contact form pending, success, error, duplicate-submit, and retry states work without production email or CRM scope.
+1. `docs/demo/final-demo-package/` exists with overview, scripts, limitations, and troubleshooting docs.
+2. Investor, parent, student, tutor, and admin scripts have audience-specific goals, order, timing, narrative emphasis, and pages to avoid.
+3. Demo overview documents service startup, accounts, URLs, recommended sequence, and backend failure handling.
 
-#### Phase 120: Accessibility, Keyboard, Screen Reader, and Contrast Hardening
+#### Phase 124: Demo Account, Demo Data, Reset, and API Contract Lock
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Audit and improve P0 accessibility, keyboard navigation, screen-reader support, and color contrast across core user surfaces.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Lock the final demo accounts, expected demo data, reset behavior, and final demo backend API contract.
 
-**Requirements:** A11Y21-01 through A11Y21-10
+**Requirements:** DATA22-01 through DATA22-08; API22-01 through API22-02
 
 **Success Criteria:**
-1. Accessibility, keyboard, screen-reader, and color-contrast docs exist under `docs/accessibility/`.
-2. P0 routes have coherent headings, labels, accessible names, visible focus states, and readable state announcements where feasible.
-3. Contact, login, register, and chat controls are usable by keyboard and have accessible error/success handling.
-4. Chat message list and teacher-request controls have basic screen-reader-friendly labels.
-5. Contrast findings for text, muted text, buttons, badges, links, forms, logo variants, and footer text are documented and addressed where feasible.
+1. Demo account docs lock `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com` with `password123` for internal demo use only.
+2. Demo data docs define required student, parent, tutor, and admin data after reset.
+3. Reset docs state the command, expected result, repeatability requirements, and failure handling.
+4. API contract lock covers auth, conversations, teacher help, tutor, parent, billing, contact, support, admin, and health endpoints.
 
-#### Phase 121: Cross-Browser, Mobile, Visual Regression, and Performance QA
+#### Phase 125: Stakeholder Review and Final Release Locks
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Establish release-oriented QA evidence for browser/device coverage, visual-regression baselines, E2E smoke, and performance sanity.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Create the stakeholder review checklist and final bug, copy, design, and translation locks.
 
-**Requirements:** QA21-01 through QA21-11
-
-**Success Criteria:**
-1. Cross-browser, mobile-device, visual-regression, and performance sanity docs exist under `docs/qa/`.
-2. QA covers the required browsers/devices where available, and exact limitations are documented when local coverage is reduced.
-3. Initial Playwright screenshot baseline strategy or artifacts exist for core routes and locales.
-4. Core E2E smoke is run or exact environment limitations are documented.
-5. `npm install`, `npm run dev`, and `npm run build` are verified.
-
-#### Phase 122: Release Quality Gate, README, and Handoff
-
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Create the final release-quality gate and pre-launch checklist, update README, and hand off Phase 21 with source-safety and verification evidence.
-
-**Requirements:** RELEASE21-01 through RELEASE21-09
+**Requirements:** REVIEW22-01 through REVIEW22-03; TRIAGE22-01 through TRIAGE22-02; LOCK22-01 through LOCK22-04
 
 **Success Criteria:**
-1. `docs/release/release-quality-gate.md` and `docs/release/final-pre-launch-checklist.md` exist.
-2. Release docs include build, E2E, accessibility, keyboard, contrast, browser, mobile, contact-form, footer/logo, terminology, and four-language gates.
-3. README documents Phase 21 scope, source-safety policy, brand-detail integration, accessibility, QA, and release-gate goals.
-4. Known limitations and follow-up release work are documented.
-5. Post-work `/Users/zhdeng/newweb` status confirms Phase 21 did not modify the source project.
+1. Stakeholder review checklist defines roles, review items, and result classifications.
+2. Bug triage rules classify P0/P1/P2/P3 and define fix, workaround, known-issue, and backlog handling.
+3. Copy, design, and translation locks define covered surfaces and allowed post-lock changes.
+4. Lock docs prevent new feature work, broad redesign, one-language-only changes, internal wording leaks, and unreviewed API contract changes.
+
+#### Phase 126: Release Notes, Known Issues, Backlog, and Approval Checklist
+
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Create launch-candidate release notes, known issues, next-stage backlog, and approval checklist.
+
+**Requirements:** LC22-01 through LC22-02; ISSUE22-01 through ISSUE22-02; BACKLOG22-01; APPROVAL22-01 through APPROVAL22-02
+
+**Success Criteria:**
+1. `release-notes-lc1.md` documents version, date, summary, flows, roles, languages, demo backend mode, limitations, known issues, QA status, and approval status.
+2. `known-issues.md` excludes P0 issues and requires workarounds for P1 issues.
+3. `next-stage-backlog.md` groups deferred work by UI, copy, translation, accessibility, performance, backend, AWS, and product ideas.
+4. `launch-candidate-approval.md` defines the branch-readiness checklist and approval criteria.
+
+#### Phase 127: Final Demo Run, README, and Launch Candidate Branch Preparation
+
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Run and record the final demo, update README, and prepare the launch-candidate branch rules without creating the release branch before approval gates pass.
+
+**Requirements:** RUN22-01 through RUN22-05; README22-01; BRANCH22-01 through BRANCH22-02; SHIP22-01
+
+**Success Criteria:**
+1. `docs/demo/final-demo-run-result.md` records environment, commit hash, tester, flows, result, issues, and decision.
+2. Final demo run covers reset, backend/mock mode, frontend startup, investor/student/tutor/parent/admin flows, contact, support, footer/legal links, language switcher, and mobile homepage/register/chat.
+3. `npm install`, `npm run dev`, and `npm run build` are verified or exact environment limitations are recorded.
+4. README includes the Phase 22 final demo package and launch-candidate section.
+5. Release branch naming and bug-fix-only rules are documented, with branch creation deferred until approval criteria pass.
 
 <details>
-<summary>✅ v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation (Phases 113-117) — SHIPPED 2026-05-26</summary>
+<summary>✅ v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate (Phases 118-122) — SHIPPED 2026-05-26</summary>
 
-- [x] Phase 113: Source Safety and German Style Study (1/1 plan) — completed 2026-05-26
-- [x] Phase 114: Cross-Locale Copy Rules and Review Matrix (1/1 plan) — completed 2026-05-26
-- [x] Phase 115: Core Locale Copy Refinement (1/1 plan) — completed 2026-05-26
-- [x] Phase 116: Locale Layout Adaptation and Component Fit (1/1 plan) — completed 2026-05-26
-- [x] Phase 117: Cross-Locale Visual QA, README, and Handoff (1/1 plan) — completed 2026-05-26
+- [x] Phase 118: Brand Detail Read-Only Audit and Integration Plan (1/1 plan) — completed 2026-05-26
+- [x] Phase 119: Footer, Logo, Contact Page, and Contact API Contract (1/1 plan) — completed 2026-05-26
+- [x] Phase 120: Accessibility, Keyboard, Screen Reader, and Contrast Hardening (1/1 plan) — completed 2026-05-26
+- [x] Phase 121: Cross-Browser, Mobile, Visual Regression, and Performance QA (1/1 plan) — completed 2026-05-26
+- [x] Phase 122: Release Quality Gate, README, and Handoff (1/1 plan) — completed 2026-05-26
 
-Commits:
-- `7e0462f Document German style reference for phase 20`
-- `a581653 Add phase 20 cross-locale copy rules`
-- `bb4f82d Refine phase 20 cross-locale product copy`
-- `e38f5fc Adapt locale CTA layout for phase 20 copy`
-- `7ea638e Complete phase 20 cross-locale QA handoff`
+Archive:
+- `.planning/milestones/v1.20-REQUIREMENTS.md`
+- `.planning/milestones/v1.20-ROADMAP.md`
+- `.planning/milestones/v1.20-phases/`
 
 </details>
 
 <details>
-<summary>✅ v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Phases 108-112) — SHIPPED 2026-05-26</summary>
+<summary>✅ Previous shipped milestones (Phases 1-117)</summary>
 
-- [x] Phase 108: Main Website Read-Only Audit and Design Translation (1/1 plan) — completed 2026-05-26
-- [x] Phase 109: Learning Platform Brand Tokens and Theme Layer (1/1 plan) — completed 2026-05-26
-- [x] Phase 110: Shared Component Visual Refinement (1/1 plan) — completed 2026-05-26
-- [x] Phase 111: Public and Auth Surface Alignment (1/1 plan) — completed 2026-05-26
-- [x] Phase 112: App Page Alignment, Visual QA, README, and Handoff (1/1 plan) — completed 2026-05-26
-
-Commit:
-- `849c439 Align learning platform visuals with STOA brand language`
-
-</details>
-
-<details>
-<summary>✅ v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Phases 103-107) — SHIPPED 2026-05-26</summary>
-
-- [x] Phase 103: Production-Facing Audit and Source Inventory (1/1 plan) — completed 2026-05-26
-- [x] Phase 104: Environment Guards and Demo UI Isolation (1/1 plan) — completed 2026-05-26
-- [x] Phase 105: Production Copy Cleanup and Display Label Mapping (1/1 plan) — completed 2026-05-26
-- [x] Phase 106: State Hardening and Duplicate-Submit Controls (1/1 plan) — completed 2026-05-26
-- [x] Phase 107: Production-Facing QA, README, and Handoff (1/1 plan) — completed 2026-05-26
-
-</details>
-
-<details>
-<summary>✅ v1.16 Phase 17: Locale-Specific Copywriting, Responsive Typography, and Multilingual UI Refinement (Phases 98-102) — SHIPPED 2026-05-25</summary>
-
-- [x] Phase 98: Copy Governance and Scope Lock (1/1 plan) — completed 2026-05-25
-- [x] Phase 99: Title and Layout Infrastructure (1/1 plan) — completed 2026-05-25
-- [x] Phase 100: P0 Locale Copy Rewrite and Terminology Cleanup (1/1 plan) — completed 2026-05-25
-- [x] Phase 101: Responsive Typography and Multilingual Fit Pass (1/1 plan) — completed 2026-05-25
-- [x] Phase 102: QA Evidence, Documentation, and Handoff (1/1 plan) — completed 2026-05-25
-
-</details>
-
-<details>
-<summary>✅ Previous shipped milestones (Phases 1-97)</summary>
-
-Phases 1-97 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, launch-ready legal drafts, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, UTM tracking, platform/organization demos, learning-intelligence demos, curriculum graph UI, weak-point diagnosis UI, monthly parent report, retention UI, partnership onboarding, information architecture, route inventory, role-based navigation, breadcrumbs, page-flow helpers, mobile navigation, final demo flow, stable demo backend support, API mode configuration, real backend readiness, AWS readiness notes, premium homepage/onboarding refinement, inline teacher escalation, EN/DE/FR/IT i18n foundation, language switching, terminology replacement, four-language core surface localization, and multilingual QA.
+Phases 1-117 shipped the STOA frontend foundation, product UI, backend chat integration, streaming/file uploads, authenticated roles, parent/tutor/admin MVP flows, staging/QA, production/pilot readiness, pricing validation, virtual checkout, paid launch frontend, parent acquisition, referrals, tutor availability, support tickets, admin analytics, platform/organization demos, learning-intelligence demos, information architecture, stable demo backend support, premium homepage/onboarding refinement, EN/DE/FR/IT i18n, production-facing cleanup, brand-aligned visuals, and cross-locale copy/layout refinement.
 
 See `.planning/MILESTONES.md` and archived milestone audit files for detailed shipped scope and verification evidence.
 
@@ -170,12 +129,12 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Start with Phase 118. Phase 118 must complete read-only brand detail extraction before footer, logo, and contact implementation.
+Start with Phase 123. Phase 123 establishes the final demo package and scripts before account/data locks, stakeholder review, release notes, and final demo run.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 118. Brand Detail Read-Only Audit and Integration Plan | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 122. Release Quality Gate, README, and Handoff | v1.20 | 1/1 | Complete | 2026-05-26 |
+| 123. Final Demo Package and Audience Scripts | v1.21 | 0/1 | Planned | — |
+| 124. Demo Account, Demo Data, Reset, and API Contract Lock | v1.21 | 0/1 | Planned | — |
+| 125. Stakeholder Review and Final Release Locks | v1.21 | 0/1 | Planned | — |
+| 126. Release Notes, Known Issues, Backlog, and Approval Checklist | v1.21 | 0/1 | Planned | — |
+| 127. Final Demo Run, README, and Launch Candidate Branch Preparation | v1.21 | 0/1 | Planned | — |

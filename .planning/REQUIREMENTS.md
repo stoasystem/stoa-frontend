@@ -1,104 +1,98 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-26
-**Milestone:** v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
+**Milestone:** v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, locked demo accounts/data, stakeholder review evidence, release locks, launch-candidate notes, known issues, and a clean Go/No-Go path for a launch candidate.
 
-## v1.20 Requirements
+## v1.21 Requirements
 
-Requirements for Phase 21. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 22. Each requirement maps to exactly one roadmap phase.
 
-### Brand Detail Source Study
+### Final Demo Package and Audience Scripts
 
-- [ ] **BRAND21-01**: Developers can review `docs/brand/main-website-brand-details.md` to see the footer, contact, logo, and contact-form details observed from `/Users/zhdeng/newweb`.
-- [ ] **BRAND21-02**: The brand detail study records pre-work and post-work `/Users/zhdeng/newweb` status, including the pre-existing `img/team/.DS_Store` modification if it remains present.
-- [ ] **BRAND21-03**: Phase 21 does not write, format, install dependencies, build, delete, move, rename, commit, or otherwise modify files inside `/Users/zhdeng/newweb`.
-- [ ] **BRAND21-04**: No homepage components, CSS files, source assets, or full company-homepage structures are copied into `stoa-frontend`.
-- [ ] **BRAND21-05**: Brand integration docs distinguish reusable factual information from visual patterns that must be adapted for the learning platform.
+- [ ] **DEMO22-01**: `docs/demo/final-demo-package/` exists and contains the final demo package documents.
+- [ ] **DEMO22-02**: `demo-overview.md` explains what the demo shows, what it does not show, recommended duration, recommended order, services to start, accounts to use, key URLs, and backend failure handling.
+- [ ] **DEMO22-03**: `investor-demo-script.md` defines a 10-15 minute investor flow covering product value, student learning, teacher support, parent visibility, pricing, admin visibility, and roadmap explanation.
+- [ ] **DEMO22-04**: `parent-demo-script.md` defines a parent-focused flow centered on trust, immediate learning help, professional teacher support, progress visibility, reports, pricing, and contact.
+- [ ] **DEMO22-05**: `student-demo-script.md` defines a student-focused flow covering login, chat, asking a question, follow-up, teacher request, and learning history.
+- [ ] **DEMO22-06**: `tutor-demo-script.md` defines a tutor-focused flow covering request list, request detail, student context, note, and status update.
+- [ ] **DEMO22-07**: `admin-demo-script.md` defines an admin-focused flow covering overview, analytics summary, teacher help requests, support tickets, and contact requests while avoiding unfinished internals.
+- [ ] **DEMO22-08**: Demo docs identify pages or flows that should not be shown in formal demos.
+- [ ] **DEMO22-09**: Demo troubleshooting docs cover frontend startup, demo backend startup, auth/login, reset, language switcher, contact/support submission, and mobile layout fallback.
 
-### Footer, Logo, and Contact Integration
+### Demo Accounts, Demo Data, Reset, and API Contract Lock
 
-- [ ] **BRAND21-06**: `StoaLogo` provides dark, light, gold, and monochrome variants with size options and accessible text handling.
-- [ ] **BRAND21-07**: The learning platform footer shows STOA name, address, email, phone if available, privacy, terms, contact, and main-homepage link information.
-- [ ] **BRAND21-08**: Footer labels are localized for English, German, French, and Italian while stable company information remains accurate.
-- [ ] **BRAND21-09**: Footer and logo styling follow the learning-platform theme and meet contrast expectations on light and dark surfaces.
-- [ ] **BRAND21-10**: Brand docs cover footer contact integration, logo adaptation, and contact-form adaptation.
-- [ ] **CONTACT21-01**: A `/contact` route exists and presents an adapted learning-platform contact page.
-- [ ] **CONTACT21-02**: Contact form fields include name, email, optional phone, role, topic, message, and preferred language.
-- [ ] **CONTACT21-03**: Contact role options include parent, student, teacher, school/tutoring center, and other.
-- [ ] **CONTACT21-04**: Contact topic options include learning platform, professional teacher support, parent reports, pricing, tutor application, school partnership, technical support, and other.
-- [ ] **CONTACT21-05**: Contact form labels, helper text, validation, success, and error copy are localized for English, German, French, and Italian.
-- [ ] **CONTACT21-06**: `src/services/contact/contactApi.ts` defines the `POST /contact/requests` frontend API contract.
-- [ ] **CONTACT21-07**: A contact mutation hook submits the form and exposes pending, success, and error states.
-- [ ] **CONTACT21-08**: Contact form submission prevents duplicate submits while pending and allows retry after failure.
-- [ ] **CONTACT21-09**: Contact form success message is visible and screen-reader-readable in all four supported languages.
-- [ ] **CONTACT21-10**: Support and relevant public pages link users to `/contact` without adding complex backend or CRM scope.
+- [ ] **DATA22-01**: `demo-accounts.md` locks the student, parent, tutor, and admin demo credentials without exposing them in user-visible UI.
+- [ ] **DATA22-02**: Demo account validation confirms each fixed account can log in and reaches the correct role home.
+- [ ] **DATA22-03**: Student demo data includes at least three conversations, one homework upload example, one teacher-help request, one completed learning history item, and a clear dashboard next action.
+- [ ] **DATA22-04**: Parent demo data includes a linked child, child summary, weekly report, recommendations, and billing/plan state.
+- [ ] **DATA22-05**: Tutor demo data includes pending, in-progress, and resolved requests, availability data, and student context on request detail.
+- [ ] **DATA22-06**: Admin demo data includes usage summary, support tickets, feedback items, teacher help requests, and contact requests.
+- [ ] **DATA22-07**: `demo-data-reset.md` documents the reset command, expected reset result, repeatability expectations, and failure handling.
+- [ ] **DATA22-08**: Reset validation confirms demo accounts and role-linked data remain consistent after reset or documents exact blockers.
+- [ ] **API22-01**: `final-demo-api-contract-lock.md` locks the required demo backend API endpoints and states that request/response shape changes require frontend, demo backend, docs, and demo-flow retesting.
+- [ ] **API22-02**: API contract lock covers auth, conversations, messages, teacher help, tutor requests, parent children/report, billing, contact, support, admin analytics, and health endpoints.
 
-### Accessibility and Keyboard Support
+### Stakeholder Review and Final Locks
 
-- [ ] **A11Y21-01**: `docs/accessibility/accessibility-audit.md` records P0 page accessibility audit results for Homepage, Login, Register, Chat, Parent Dashboard, Parent Report, Tutor Requests, Pricing, Billing, Contact, and Support.
-- [ ] **A11Y21-02**: P0 pages have a coherent heading structure with one primary `h1` per route where feasible.
-- [ ] **A11Y21-03**: Buttons, links, and icon-only controls have accessible names.
-- [ ] **A11Y21-04**: Forms, including login/register/contact, have labels and field-level error associations.
-- [ ] **A11Y21-05**: Loading, success, and error states that matter to users use appropriate live-region or status semantics.
-- [ ] **A11Y21-06**: Chat message lists and teacher-request controls have basic screen-reader-friendly labels.
-- [ ] **A11Y21-07**: `docs/accessibility/keyboard-navigation.md` records keyboard navigation coverage for homepage, login, register, chat, pricing, contact, language switcher, and dialogs/dropdowns.
-- [ ] **A11Y21-08**: Focus states remain visible for navigation, buttons, inputs, selects, dialogs, and contact form controls.
-- [ ] **A11Y21-09**: `docs/accessibility/screen-reader-smoke-test.md` records screen-reader smoke-test expectations and results.
-- [ ] **A11Y21-10**: `docs/accessibility/color-contrast-audit.md` records contrast checks for text, muted text, buttons, badges, links, forms, logo variants, and footer text.
+- [ ] **REVIEW22-01**: `docs/review/stakeholder-review-checklist.md` defines review roles for founder/product owner, frontend developer, design/brand reviewer, tutor/education reviewer, parent-like reviewer, and investor-facing reviewer.
+- [ ] **REVIEW22-02**: Stakeholder review checklist covers product path clarity, visual quality, multilingual quality, development residue, demo stability, contact/footer/logo trust, learning assistant language, teacher-support positioning, parent-report value, and pricing fit.
+- [ ] **REVIEW22-03**: Review result states are defined as Approved, Approved with minor fixes, Needs revision, and Blocked.
+- [ ] **TRIAGE22-01**: `final-bug-triage.md` defines P0, P1, P2, and P3 bug severity rules.
+- [ ] **TRIAGE22-02**: Bug triage rules state P0 must be fixed, P1 should be fixed or have workaround, P2 enters known issues, and P3 enters backlog.
+- [ ] **LOCK22-01**: `final-copy-lock.md` covers homepage, login, register, chat, parent dashboard/report, tutor requests, pricing, billing, contact, footer, error states, and toast messages.
+- [ ] **LOCK22-02**: `final-design-lock.md` covers homepage, auth pages, chat, dashboard, parent report, tutor requests, pricing/billing, contact, footer, and logo usage.
+- [ ] **LOCK22-03**: `final-translation-lock.md` covers English, German, French, and Italian for homepage, register, chat, parent report, tutor requests, pricing, billing, contact, and footer.
+- [ ] **LOCK22-04**: Lock docs prohibit new feature work, large visual changes, one-language-only copy changes, reintroduced user-facing demo/mock/provider wording, and contract changes without retesting.
 
-### Browser, Mobile, Visual, and Performance QA
+### Release Notes, Known Issues, Backlog, and Approval
 
-- [ ] **QA21-01**: `docs/qa/cross-browser-qa.md` defines or records QA for Chrome, Safari, Firefox, Edge, Mobile Safari, iOS Chrome, and Android Chrome.
-- [ ] **QA21-02**: Cross-browser QA covers font rendering, layout spacing, contact form, language switcher, chat input, upload button, dialog/dropdown behavior, logo rendering, and footer layout.
-- [ ] **QA21-03**: `docs/qa/mobile-device-qa.md` defines or records QA for 375px, 390px, 430px, 768px, and 1024px widths.
-- [ ] **QA21-04**: Mobile QA covers homepage, register, chat, parent report, pricing, contact, footer, logo, and four-language behavior.
-- [ ] **QA21-05**: `docs/qa/visual-regression-testing.md` defines an initial Playwright screenshot baseline strategy for core routes and locales.
-- [ ] **QA21-06**: Initial visual-regression baseline artifacts or documented capture commands exist for homepage, login, register, chat, parent, parent report, tutor, pricing, billing, contact, and support.
-- [ ] **QA21-07**: `docs/qa/performance-sanity-check.md` records performance sanity checks for homepage loading, image/logo weight, contact form bundle impact, locale namespace size, chat responsiveness, and screenshot workflow cost.
-- [ ] **QA21-08**: Core E2E smoke coverage is run or exact environment limitations are documented.
-- [ ] **QA21-09**: Verification confirms `npm install` succeeds.
-- [ ] **QA21-10**: Verification confirms `npm run dev` starts successfully or documents exact environment limitations.
-- [ ] **QA21-11**: Verification confirms `npm run build` succeeds.
+- [ ] **LC22-01**: `release-notes-lc1.md` includes version name, release date, summary, main flows, supported roles, supported languages, demo backend mode, known limitations, known issues, QA status, and approval status.
+- [ ] **LC22-02**: Release notes accurately present this launch candidate as a demo/backend-mode frontend product, not a production backend or payment launch.
+- [ ] **ISSUE22-01**: `known-issues.md` records each accepted issue with ID, severity, page, description, workaround, owner, and decision.
+- [ ] **ISSUE22-02**: Known issues rules prohibit P0 issues and require workarounds for P1 issues.
+- [ ] **BACKLOG22-01**: `next-stage-backlog.md` groups deferred work into UI polish, copy improvement, translation improvement, accessibility improvement, performance improvement, backend integration future work, AWS integration future work, and product feature ideas.
+- [ ] **APPROVAL22-01**: `launch-candidate-approval.md` contains the required approval checklist for build, demo flows, roles, contact form, languages, mobile, accessibility, internal wording, footer/contact/logo, stakeholder review, P0 bugs, release notes, known issues, and approval.
+- [ ] **APPROVAL22-02**: Launch-candidate branch criteria require build passed, core demo flow passed, P0 bugs = 0, copy lock complete, design lock complete, translation lock complete, and API contract lock complete.
 
-### Release Quality Gate and Handoff
+### Final Demo Run, README, and Launch Candidate Preparation
 
-- [ ] **RELEASE21-01**: `docs/release/release-quality-gate.md` defines the required pre-release gates for build, E2E, accessibility, keyboard, contrast, browser, mobile, contact form, footer/logo, terminology, and four-language checks.
-- [ ] **RELEASE21-02**: `docs/release/final-pre-launch-checklist.md` provides a checkable final launch-readiness list.
-- [ ] **RELEASE21-03**: Release docs explicitly state that contact form work is frontend/demo-contract only and does not send production email or integrate CRM.
-- [ ] **RELEASE21-04**: Release docs confirm no user-visible `demo`, `mock`, `Codex`, provider, or development wording was introduced.
-- [ ] **RELEASE21-05**: README documents Phase 21 scope, read-only source policy, brand detail integration, accessibility, QA, and release gate goals.
-- [ ] **RELEASE21-06**: Phase 21 docs list known limitations and follow-up work for any browser/device/screen-reader coverage unavailable locally.
-- [ ] **RELEASE21-07**: Post-work source safety check confirms `/Users/zhdeng/newweb` was not modified by Phase 21 work.
-- [ ] **RELEASE21-08**: The milestone audit confirms Phase 21 requirements are satisfied before the milestone is marked complete.
-- [ ] **RELEASE21-09**: GitHub receives clear Phase 21 commits.
+- [ ] **RUN22-01**: `docs/demo/final-demo-run-result.md` records date, environment, commit hash, tester, flows tested, pass/fail result, issues found, and decision.
+- [ ] **RUN22-02**: Final demo run covers reset, demo backend/mock mode, frontend startup, investor flow, student flow, tutor flow, parent flow, admin flow, contact form, support ticket, footer/legal links, language switcher, and mobile homepage/register/chat.
+- [ ] **RUN22-03**: `npm install` succeeds or exact environment limitation is recorded.
+- [ ] **RUN22-04**: `npm run dev` starts or exact environment limitation is recorded.
+- [ ] **RUN22-05**: `npm run build` succeeds.
+- [ ] **README22-01**: README includes the Phase 22 final demo package and launch candidate section from the milestone brief.
+- [ ] **BRANCH22-01**: Release branch preparation uses `release/launch-candidate-1` or `release/stoa-learning-platform-lc1` only after approval criteria pass.
+- [ ] **BRANCH22-02**: Release branch rules state that after branch creation only bug fixes are allowed and new features go to next-stage backlog.
+- [ ] **SHIP22-01**: GitHub receives a clear Phase 22 commit or documented handoff if branch/push is deferred.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in the current roadmap.
 
-### Phase 22 Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
+### Phase 23 Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 
-- **DEMO22-01**: Final demo scripts exist for stakeholder, investor, parent, tutor, and school-review contexts.
-- **LC22-01**: A launch-candidate branch and release-notes package can be prepared from the verified frontend state.
-- **LOCK22-01**: Final copy, design, translation, and bug-triage locks are documented before launch candidate approval.
+- **BUG23-01**: Launch candidate bug fixes are triaged and resolved without feature expansion.
+- **APPROVAL23-01**: Final stakeholder sign-off is completed after launch-candidate fixes.
+- **PUBLIC23-01**: Public demo release preparation, deployment handoff, demo monitoring plan, and first external presentation support are completed.
 
 ## Out of Scope
 
-Explicitly excluded from v1.20 to prevent scope creep.
+Explicitly excluded from v1.21 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Modifying `/Users/zhdeng/newweb` | The company homepage source is read-only for Phase 21. |
-| Copying homepage components or engineering structure | Phase 21 adapts brand details; it does not transplant the company homepage. |
-| Production email sending from contact form | Contact form is frontend UI and demo API contract only. |
-| CRM integration | Too large for release-quality hardening and not needed for frontend validation. |
-| Production anti-spam or abuse prevention system | Requires backend/ops design outside this milestone. |
-| Formal backend support-ticket implementation | Existing demo/support boundaries remain sufficient for this phase. |
-| Formal AWS deployment | Release-quality checks are frontend readiness, not infrastructure launch. |
-| Full legal compliance finalization | Legal-sensitive copy and policies still need professional review. |
-| Large visual redesign | Phase 19 established brand visuals; Phase 21 integrates details and quality gates. |
-| New languages | Phase 21 keeps English, German, French, and Italian only. |
+| New product functionality | Phase 22 packages and locks the existing product for review. |
+| Homepage redesign | Phase 19 and later polish established the current visual direction. |
+| Register flow redesign | Only blocker bug fixes are allowed; no onboarding rebuild. |
+| Multilingual system redesign | Phase 22 locks existing EN/DE/FR/IT translations and checks consistency. |
+| Demo backend rewrite | Reset and API contract should be validated, not rebuilt. |
+| Complex backend or database design | Production backend work remains backend-owned future scope. |
+| AWS deployment | Phase 22 prepares launch candidate artifacts, not infrastructure launch. |
+| Real payment processing | Payment remains hosted/backend-owned future work; demo flows stay explicit. |
+| Large UI redesign | Design lock should prevent major direction changes. |
+| Production email/CRM/support operations | Contact/support remain demo/frontend contract surfaces unless future backend work changes that. |
 
 ## Traceability
 
@@ -106,62 +100,56 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BRAND21-01 | Phase 118 | Pending |
-| BRAND21-02 | Phase 118 | Pending |
-| BRAND21-03 | Phase 118 | Pending |
-| BRAND21-04 | Phase 118 | Pending |
-| BRAND21-05 | Phase 118 | Pending |
-| BRAND21-06 | Phase 119 | Pending |
-| BRAND21-07 | Phase 119 | Pending |
-| BRAND21-08 | Phase 119 | Pending |
-| BRAND21-09 | Phase 119 | Pending |
-| BRAND21-10 | Phase 119 | Pending |
-| CONTACT21-01 | Phase 119 | Pending |
-| CONTACT21-02 | Phase 119 | Pending |
-| CONTACT21-03 | Phase 119 | Pending |
-| CONTACT21-04 | Phase 119 | Pending |
-| CONTACT21-05 | Phase 119 | Pending |
-| CONTACT21-06 | Phase 119 | Pending |
-| CONTACT21-07 | Phase 119 | Pending |
-| CONTACT21-08 | Phase 119 | Pending |
-| CONTACT21-09 | Phase 119 | Pending |
-| CONTACT21-10 | Phase 119 | Pending |
-| A11Y21-01 | Phase 120 | Pending |
-| A11Y21-02 | Phase 120 | Pending |
-| A11Y21-03 | Phase 120 | Pending |
-| A11Y21-04 | Phase 120 | Pending |
-| A11Y21-05 | Phase 120 | Pending |
-| A11Y21-06 | Phase 120 | Pending |
-| A11Y21-07 | Phase 120 | Pending |
-| A11Y21-08 | Phase 120 | Pending |
-| A11Y21-09 | Phase 120 | Pending |
-| A11Y21-10 | Phase 120 | Pending |
-| QA21-01 | Phase 121 | Pending |
-| QA21-02 | Phase 121 | Pending |
-| QA21-03 | Phase 121 | Pending |
-| QA21-04 | Phase 121 | Pending |
-| QA21-05 | Phase 121 | Pending |
-| QA21-06 | Phase 121 | Pending |
-| QA21-07 | Phase 121 | Pending |
-| QA21-08 | Phase 121 | Pending |
-| QA21-09 | Phase 121 | Pending |
-| QA21-10 | Phase 121 | Pending |
-| QA21-11 | Phase 121 | Pending |
-| RELEASE21-01 | Phase 122 | Pending |
-| RELEASE21-02 | Phase 122 | Pending |
-| RELEASE21-03 | Phase 122 | Pending |
-| RELEASE21-04 | Phase 122 | Pending |
-| RELEASE21-05 | Phase 122 | Pending |
-| RELEASE21-06 | Phase 122 | Pending |
-| RELEASE21-07 | Phase 122 | Pending |
-| RELEASE21-08 | Phase 122 | Pending |
-| RELEASE21-09 | Phase 122 | Pending |
+| DEMO22-01 | Phase 123 | Pending |
+| DEMO22-02 | Phase 123 | Pending |
+| DEMO22-03 | Phase 123 | Pending |
+| DEMO22-04 | Phase 123 | Pending |
+| DEMO22-05 | Phase 123 | Pending |
+| DEMO22-06 | Phase 123 | Pending |
+| DEMO22-07 | Phase 123 | Pending |
+| DEMO22-08 | Phase 123 | Pending |
+| DEMO22-09 | Phase 123 | Pending |
+| DATA22-01 | Phase 124 | Pending |
+| DATA22-02 | Phase 124 | Pending |
+| DATA22-03 | Phase 124 | Pending |
+| DATA22-04 | Phase 124 | Pending |
+| DATA22-05 | Phase 124 | Pending |
+| DATA22-06 | Phase 124 | Pending |
+| DATA22-07 | Phase 124 | Pending |
+| DATA22-08 | Phase 124 | Pending |
+| API22-01 | Phase 124 | Pending |
+| API22-02 | Phase 124 | Pending |
+| REVIEW22-01 | Phase 125 | Pending |
+| REVIEW22-02 | Phase 125 | Pending |
+| REVIEW22-03 | Phase 125 | Pending |
+| TRIAGE22-01 | Phase 125 | Pending |
+| TRIAGE22-02 | Phase 125 | Pending |
+| LOCK22-01 | Phase 125 | Pending |
+| LOCK22-02 | Phase 125 | Pending |
+| LOCK22-03 | Phase 125 | Pending |
+| LOCK22-04 | Phase 125 | Pending |
+| LC22-01 | Phase 126 | Pending |
+| LC22-02 | Phase 126 | Pending |
+| ISSUE22-01 | Phase 126 | Pending |
+| ISSUE22-02 | Phase 126 | Pending |
+| BACKLOG22-01 | Phase 126 | Pending |
+| APPROVAL22-01 | Phase 126 | Pending |
+| APPROVAL22-02 | Phase 126 | Pending |
+| RUN22-01 | Phase 127 | Pending |
+| RUN22-02 | Phase 127 | Pending |
+| RUN22-03 | Phase 127 | Pending |
+| RUN22-04 | Phase 127 | Pending |
+| RUN22-05 | Phase 127 | Pending |
+| README22-01 | Phase 127 | Pending |
+| BRANCH22-01 | Phase 127 | Pending |
+| BRANCH22-02 | Phase 127 | Pending |
+| SHIP22-01 | Phase 127 | Pending |
 
 **Coverage:**
-- v1.20 requirements: 50 total
-- Mapped to phases: 50
+- v1.21 requirements: 44 total
+- Mapped to phases: 44
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 during v1.20 milestone initialization*
+*Last updated: 2026-05-26 during v1.21 milestone initialization*

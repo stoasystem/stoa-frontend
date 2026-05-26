@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.20
-milestone_name: "Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate"
-status: implemented
-last_updated: "2026-05-26T01:15:33.000Z"
+milestone: v1.21
+milestone_name: "Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation"
+status: planning
+last_updated: "2026-05-26T12:01:24.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 5
+  completed_phases: 0
   total_plans: 5
-  completed_plans: 5
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.20 Phase 21 is planning accessibility, cross-browser QA, brand detail integration, and release quality gates.
+**Current focus:** Milestone v1.21 Phase 22 is planning final demo packaging, stakeholder review, final release locks, launch-candidate approval, final demo run, and release branch preparation.
 
 ## Current Position
 
-Phase: 122. Release Quality Gate, README, and Handoff
+Phase: 123. Final Demo Package and Audience Scripts
 Plan: —
-Status: Complete
-Last activity: 2026-05-26 — Phase 122 completed release gate docs, README handoff, final build, final E2E, and source-safety verification.
+Status: Planning complete; ready for Phase 123 execution
+Last activity: 2026-05-26 — Milestone v1.21 requirements, research, and roadmap initialized
 
 ## Performance Metrics
 
@@ -208,10 +208,13 @@ Recent decisions affecting current work:
 - Phase 120 added focus-visible coverage, role-selection state, login/register/support/chat alert wiring, chat textarea labels, chat log semantics, and accessibility documentation.
 - Phase 121 configured deterministic Playwright demo QA mode, refreshed stale E2E assertions, verified 12/12 E2E passing, and documented cross-browser, mobile, visual-regression, and performance QA.
 - Phase 122 added release quality gate and final pre-launch checklist, updated README, verified build and E2E, and confirmed `/Users/zhdeng/newweb` source status was unchanged.
+- Milestone v1.21 started as Phase 22, focused on final demo packaging, stakeholder review, final copy/design/translation/API locks, release notes, known issues, launch-candidate approval, final demo run, README handoff, and release branch preparation.
+- Phase 22 research confirmed no new dependencies are needed and the milestone should remain documentation, verification, and process-oriented unless a blocker bug prevents demo or launch-candidate readiness.
 
 ### Pending Todos
 
-- Phase 21 implementation complete. Next recommended milestone: Phase 22 final demo packaging, stakeholder review, and launch candidate preparation.
+- Execute Phase 123: Final Demo Package and Audience Scripts.
+- Keep Phase 22 scope locked: no new product features, broad redesign, demo backend rewrite, AWS work, or real payment/support operations unless required to unblock launch-candidate readiness.
 
 ### Quick Tasks Completed
 

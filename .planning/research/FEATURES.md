@@ -1,69 +1,94 @@
-# Phase 20 Research: Features
+# Phase 22 Research: Features
 
-**Milestone:** v1.19 Phase 20
-**Focus:** Cross-locale copy quality, German style alignment, and multilingual layout adaptation.
+**Milestone:** v1.21 Phase 22
+**Focus:** Final demo packaging, stakeholder review, final locks, and launch-candidate preparation.
 
 ## Table Stakes
 
-### German Style Study
+### Final Demo Package
 
-- Document read-only source path and source safety status.
-- Extract German headline rhythm, CTA style, sentence length, tone, education terms, and formal/informal address patterns from `/Users/zhdeng/newweb`.
-- Convert observations into STOA learning-platform rules, not copied source text.
+The milestone must create a stable demo package under:
 
-Observed company homepage style signals:
+```text
+docs/demo/final-demo-package/
+```
 
-- Short editorial hero lines: `Tief denken. Wahrhaft lernen.`
-- Navigation and CTAs are short: `Angebot`, `Kontakt`, `Mehr erfahren`, `Jetzt anmelden`, `Kontakt aufnehmen`.
-- Tone is calm, formal, and education-service oriented.
-- German frequently uses `Schülerinnen und Schüler` in formal explanatory text, but shorter UI labels use `Lernende`, `Kinder`, `Jugendliche`, or role terms.
-- Education terms include `Lernfortschritt`, `Verständnis`, `Sicherheit`, `Selbstvertrauen`, `Begleitung`, `Unterstützung`, `Lehrpersonen`, `Lernumgebung`, `Förderung`.
-- `Nachhilfe` appears where service category clarity matters, but premium brand sections often prefer broader education wording such as `Förderung`, `Begleitung`, `Lernunterstützung`, and `Lernumgebung`.
+Required files:
 
-### Cross-Locale Copy Rules
+- `demo-overview.md`
+- `investor-demo-script.md`
+- `parent-demo-script.md`
+- `student-demo-script.md`
+- `tutor-demo-script.md`
+- `admin-demo-script.md`
+- `demo-accounts.md`
+- `demo-data-reset.md`
+- `demo-known-limitations.md`
+- `demo-troubleshooting.md`
 
-- English remains calm, precise, education-oriented, and non-salesy.
-- German becomes less direct-translation-like and more aligned with STOA homepage tone.
-- French remains elegant and natural, with correct typographic apostrophes.
-- Italian remains warm, clear, and button-friendly.
-- Literal match is not required; meaning and tone alignment are required.
+The package should make the demo repeatable for investor, parent, student, tutor, admin, and internal review contexts.
 
-### Core Page Copy Refinement
+### Demo Account and Data Lock
 
-P0 surfaces:
+Final demo accounts:
 
-- Homepage.
-- Register/onboarding.
-- Chat.
-- Parent report.
-- Pricing.
-- Billing.
-- Support.
+- Student: `student@test.com` / `password123`
+- Parent: `parent@test.com` / `password123`
+- Tutor: `tutor@test.com` / `password123`
+- Admin: `admin@test.com` / `password123`
 
-P1 surfaces:
+The milestone should validate and document:
 
-- Tutor dashboard/request surfaces.
-- Admin labels where user-facing.
-- Learning history/profile routes where locale files or visible copy apply.
+- Each account can log in.
+- Each account lands in the correct role experience.
+- Student data includes conversations, upload example, teacher-help request, learning history, and next action.
+- Parent data includes linked child, reports, recommendations, and billing/plan state.
+- Tutor data includes pending, in-progress, and resolved requests plus availability/context.
+- Admin data includes usage, support, feedback, teacher help, and contact request visibility.
+- Reset returns the demo to a repeatable state.
 
-### Locale Layout Adaptation
+### Stakeholder Review and Locks
 
-- German long words and long compounds need shorter copy first, then layout support.
-- French apostrophes such as `d’apprentissage`, `l’élève`, and `qu’un` need JSON-safe and rendering-safe handling.
-- Italian CTA strings need width/wrapping support.
-- Mobile/desktop visual QA must include key routes, four locales, and target widths.
+Required docs:
+
+- `docs/review/stakeholder-review-checklist.md`
+- `docs/release/final-bug-triage.md`
+- `docs/release/final-copy-lock.md`
+- `docs/release/final-design-lock.md`
+- `docs/release/final-translation-lock.md`
+- `docs/release/final-demo-api-contract-lock.md`
+
+The review output should classify results as:
+
+- Approved
+- Approved with minor fixes
+- Needs revision
+- Blocked
+
+### Launch Candidate Package
+
+Required docs:
+
+- `docs/release/release-notes-lc1.md`
+- `docs/release/known-issues.md`
+- `docs/release/next-stage-backlog.md`
+- `docs/release/launch-candidate-approval.md`
+- `docs/demo/final-demo-run-result.md`
+
+The launch-candidate path should only proceed when build passes, P0 bugs are zero, core demo flows pass, locks are complete, and known issues are accepted.
 
 ## Differentiators
 
-- Use main website German as a brand-language reference while preserving the learning platform's app identity.
-- Treat language and layout as one system: copy changes must be checked in the UI.
-- Keep the Phase 19 brand visuals stable while improving the text layer.
+- Demo scripts are audience-specific, not generic route inventories.
+- Release locks separate true launch blockers from later backlog work.
+- The final demo run records actual evidence: date, environment, commit hash, tester, flows tested, failures, and decision.
+- Known issues explicitly exclude P0 issues and require workarounds for P1 issues.
 
 ## Anti-Features
 
-- Do not force literal translation.
-- Do not copy long homepage text into the app.
-- Do not create language-specific business logic.
-- Do not introduce feature expansion under the cover of copy refinement.
-- Do not expose `AI`, provider, demo, mock, or development terms in user-facing copy.
+- Do not redesign homepage, register, multilingual system, or demo backend.
+- Do not add complex backend or database design.
+- Do not add production AWS deployment or real payment processing.
+- Do not add new app modules under the label of launch candidate preparation.
+- Do not present unverified demo data as production readiness.
 
