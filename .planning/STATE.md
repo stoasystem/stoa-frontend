@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.20
 milestone_name: "Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate"
 status: planning
-last_updated: "2026-05-26T00:46:27.270Z"
+last_updated: "2026-05-26T03:05:00.000Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-05-26)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.19 Phase 20 is executing cross-locale copy refinement, German style alignment, and multilingual UI layout adaptation.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
+**Current focus:** Milestone v1.20 Phase 21 is planning accessibility, cross-browser QA, brand detail integration, and release quality gates.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 118. Brand Detail Read-Only Audit and Integration Plan
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-26 — Milestone v1.20 started
+Status: Ready to plan
+Last activity: 2026-05-26 — Milestone v1.20 roadmap created
 
 ## Performance Metrics
 
@@ -202,10 +202,11 @@ Recent decisions affecting current work:
 - Phase 115 refined EN/DE/FR/IT homepage, register, chat, parent, pricing/billing, support, and shared CTA copy; locale JSON validation passed.
 - Phase 116 added locale CTA fit hints, short mobile CTA labels, German hero hyphenation, and verified `npm run build`.
 - Phase 117 added cross-locale visual QA documentation, updated README, verified `npm install`, dev server startup, a 32-combination browser smoke, `npm run build`, and unchanged `/Users/zhdeng/newweb` source status.
+- Milestone v1.20 started as Phase 21, focused on accessibility, cross-browser QA, brand detail integration, contact form adaptation, and release quality gates.
 
 ### Pending Todos
 
-- Phase 20 next: accessibility, cross-browser QA, visual regression, mobile device QA, performance sanity, and final release quality gate.
+- Phase 21 next: start Phase 118 with read-only brand detail extraction from `/Users/zhdeng/newweb`.
 
 ### Quick Tasks Completed
 

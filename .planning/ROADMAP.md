@@ -22,87 +22,105 @@
 - ✅ **v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal** - Phases 103-107 (implemented 2026-05-26)
 - ✅ **v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation** - Phases 108-112 (implemented 2026-05-26)
 - ✅ **v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation** - Phases 113-117 (implemented 2026-05-26)
+- 🔄 **v1.20 Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate** - Phases 118-122 (planning 2026-05-26)
 
 ## Phases
 
-### Active Milestone: v1.19 Phase 20
+### Active Milestone: v1.20 Phase 21
 
-Phase 20 refines English, German, French, and Italian product copy across the STOA learning platform while adapting UI layout so each locale reads naturally and remains stable. It continues the Phase 19 source-safety rule: `/Users/zhdeng/newweb` is read-only and may be used only to study German writing style, not as a source to modify or copy.
+Phase 21 raises STOA frontend to a release-quality gate without broad business expansion. It adds adapted brand contact details from the company homepage in strict read-only mode, then hardens accessibility, keyboard and screen-reader support, contrast, browser/mobile QA, visual regression, performance sanity, and final pre-launch documentation.
 
-#### Phase 113: Source Safety and German Style Study
+#### Phase 118: Brand Detail Read-Only Audit and Integration Plan
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Establish the read-only German copy style baseline from the company homepage before changing learning-platform locale files.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Extract company footer, contact, logo, and contact-form details from `/Users/zhdeng/newweb` in read-only mode and define the learning-platform adaptation boundary.
 
-**Requirements:** STYLE20-01 through STYLE20-06
+**Requirements:** BRAND21-01 through BRAND21-05
 
 **Success Criteria:**
-1. `docs/language/main-website-german-style-study.md` documents German headline rhythm, CTA style, sentence length, tone, education wording, and address-form observations.
-2. `docs/language/main-website-german-copy-reference.md` captures abstract style signals and explicitly avoids copying homepage text.
+1. `docs/brand/main-website-brand-details.md` records footer information, contact information, logo usage, contact form structure, and source status.
+2. The doc distinguishes factual information that can be reused from visual/engineering patterns that must be adapted.
 3. Pre-work and post-work `/Users/zhdeng/newweb` status are recorded, including the pre-existing `img/team/.DS_Store` change if present.
-4. No source files, components, CSS, assets, or full text blocks from `/Users/zhdeng/newweb` are copied into `stoa-frontend`.
+4. No company homepage source files, components, assets, or full page structures are copied into `stoa-frontend`.
 
-#### Phase 114: Cross-Locale Copy Rules and Review Matrix
+#### Phase 119: Footer, Logo, Contact Page, and Contact API Contract
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Define the language-specific rules and review matrix that guide all Phase 20 copy edits.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Integrate adapted brand footer details, logo variants, and a multilingual contact form with frontend/demo API contract only.
 
-**Requirements:** RULE20-01 through RULE20-07
-
-**Success Criteria:**
-1. English, German, French, and Italian copy-rule documents exist or are updated for Phase 20.
-2. German rules reflect the company-homepage-inspired style while preserving learning-platform vocabulary.
-3. French rules cover typographic apostrophes and punctuation fit; Italian rules cover CTA length and natural phrasing.
-4. `docs/language/cross-locale-copy-review-matrix.md` records key copy with meaning, tone, literal-match, UI-length, and approval checks.
-5. Phase 18 production-facing terminology safety remains explicit in copy rules.
-
-#### Phase 115: Core Locale Copy Refinement
-
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Refine English, German, French, and Italian locale JSON across P0 surfaces without adding product functionality.
-
-**Requirements:** COPY20-01 through COPY20-12
+**Requirements:** BRAND21-06 through BRAND21-10; CONTACT21-01 through CONTACT21-10
 
 **Success Criteria:**
-1. Homepage, register/onboarding, chat, parent report, pricing, billing, and support copy are refined across all four locales.
-2. German copy avoids direct English sentence structure and uses shorter, calmer education-service phrasing.
-3. French uses consistent typographic apostrophes where applicable.
-4. Italian CTA and support copy remains natural and button-friendly.
-5. English copy remains calm, precise, education-centered, and not SaaS/sales-heavy.
+1. `StoaLogo`, `AppFooter`, `FooterContactInfo`, and `FooterLegalLinks` exist and fit the learning-platform theme.
+2. Footer contact, legal, and homepage links are localized and accurate.
+3. `/contact` exists with a multilingual contact form for name, email, optional phone, role, topic, message, and preferred language.
+4. `src/services/contact/contactApi.ts` and a mutation hook define and use the `POST /contact/requests` frontend API contract.
+5. Contact form pending, success, error, duplicate-submit, and retry states work without production email or CRM scope.
 
-#### Phase 116: Locale Layout Adaptation and Component Fit
+#### Phase 120: Accessibility, Keyboard, Screen Reader, and Contrast Hardening
 
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Adapt locale layout hints and targeted components so refined copy stays stable on mobile and desktop.
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Audit and improve P0 accessibility, keyboard navigation, screen-reader support, and color contrast across core user surfaces.
 
-**Requirements:** LAYOUT20-01 through LAYOUT20-09
-
-**Success Criteria:**
-1. `src/lib/localeLayout.ts` is reviewed and updated only where a concrete locale fit need exists.
-2. German long words and headings do not overflow or create awkward hero/title wrapping.
-3. French apostrophe-heavy strings do not truncate in buttons, cards, navigation, forms, or chat surfaces.
-4. Italian CTA labels fit homepage, register, chat, pricing, billing, and support button contexts.
-5. Navbar, register, pricing/billing, chat, and parent report surfaces remain usable across all four locales.
-
-#### Phase 117: Cross-Locale Visual QA, README, and Handoff
-
-**Status:** Complete
-**Plans:** 1/1
-**Goal:** Complete cross-locale QA, verification, README updates, and source-safety handoff for Phase 20.
-
-**Requirements:** QA20-01 through QA20-11
+**Requirements:** A11Y21-01 through A11Y21-10
 
 **Success Criteria:**
-1. `docs/language/cross-locale-visual-qa.md` records or defines QA across Homepage, Register, Chat, Parent Report, Pricing, and Billing for English, German, French, and Italian.
-2. QA covers target widths 375, 430, 768, 1024, and 1440 where feasible, or documents any reduced evidence set.
-3. QA confirms German long text, French apostrophes, Italian CTAs, and English tone are acceptable.
-4. `npm install`, `npm run dev`, and `npm run build` are verified or exact environment limitations are documented.
-5. README documents Phase 20 scope, read-only source policy, German style alignment, cross-locale copy rules, and layout adaptation goals.
-6. Post-work `/Users/zhdeng/newweb` status confirms Phase 20 did not modify the source project.
+1. Accessibility, keyboard, screen-reader, and color-contrast docs exist under `docs/accessibility/`.
+2. P0 routes have coherent headings, labels, accessible names, visible focus states, and readable state announcements where feasible.
+3. Contact, login, register, and chat controls are usable by keyboard and have accessible error/success handling.
+4. Chat message list and teacher-request controls have basic screen-reader-friendly labels.
+5. Contrast findings for text, muted text, buttons, badges, links, forms, logo variants, and footer text are documented and addressed where feasible.
+
+#### Phase 121: Cross-Browser, Mobile, Visual Regression, and Performance QA
+
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Establish release-oriented QA evidence for browser/device coverage, visual-regression baselines, E2E smoke, and performance sanity.
+
+**Requirements:** QA21-01 through QA21-11
+
+**Success Criteria:**
+1. Cross-browser, mobile-device, visual-regression, and performance sanity docs exist under `docs/qa/`.
+2. QA covers the required browsers/devices where available, and exact limitations are documented when local coverage is reduced.
+3. Initial Playwright screenshot baseline strategy or artifacts exist for core routes and locales.
+4. Core E2E smoke is run or exact environment limitations are documented.
+5. `npm install`, `npm run dev`, and `npm run build` are verified.
+
+#### Phase 122: Release Quality Gate, README, and Handoff
+
+**Status:** Planned
+**Plans:** 0/1
+**Goal:** Create the final release-quality gate and pre-launch checklist, update README, and hand off Phase 21 with source-safety and verification evidence.
+
+**Requirements:** RELEASE21-01 through RELEASE21-09
+
+**Success Criteria:**
+1. `docs/release/release-quality-gate.md` and `docs/release/final-pre-launch-checklist.md` exist.
+2. Release docs include build, E2E, accessibility, keyboard, contrast, browser, mobile, contact-form, footer/logo, terminology, and four-language gates.
+3. README documents Phase 21 scope, source-safety policy, brand-detail integration, accessibility, QA, and release-gate goals.
+4. Known limitations and follow-up release work are documented.
+5. Post-work `/Users/zhdeng/newweb` status confirms Phase 21 did not modify the source project.
+
+<details>
+<summary>✅ v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation (Phases 113-117) — SHIPPED 2026-05-26</summary>
+
+- [x] Phase 113: Source Safety and German Style Study (1/1 plan) — completed 2026-05-26
+- [x] Phase 114: Cross-Locale Copy Rules and Review Matrix (1/1 plan) — completed 2026-05-26
+- [x] Phase 115: Core Locale Copy Refinement (1/1 plan) — completed 2026-05-26
+- [x] Phase 116: Locale Layout Adaptation and Component Fit (1/1 plan) — completed 2026-05-26
+- [x] Phase 117: Cross-Locale Visual QA, README, and Handoff (1/1 plan) — completed 2026-05-26
+
+Commits:
+- `7e0462f Document German style reference for phase 20`
+- `a581653 Add phase 20 cross-locale copy rules`
+- `bb4f82d Refine phase 20 cross-locale product copy`
+- `e38f5fc Adapt locale CTA layout for phase 20 copy`
+- `7ea638e Complete phase 20 cross-locale QA handoff`
+
+</details>
 
 <details>
 <summary>✅ v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Phases 108-112) — SHIPPED 2026-05-26</summary>
@@ -152,12 +170,12 @@ See `.planning/MILESTONES.md` and archived milestone audit files for detailed sh
 ## Progress
 
 **Execution Order:**
-Start with Phase 113. Phase 113 must complete the source-safety and German style study before learning-platform locale copy is rewritten.
+Start with Phase 118. Phase 118 must complete read-only brand detail extraction before footer, logo, and contact implementation.
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 113. Source Safety and German Style Study | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 114. Cross-Locale Copy Rules and Review Matrix | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 115. Core Locale Copy Refinement | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 116. Locale Layout Adaptation and Component Fit | v1.19 | 1/1 | Complete | 2026-05-26 |
-| 117. Cross-Locale Visual QA, README, and Handoff | v1.19 | 1/1 | Complete | 2026-05-26 |
+| 118. Brand Detail Read-Only Audit and Integration Plan | v1.20 | 0/1 | Planned | — |
+| 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 0/1 | Planned | — |
+| 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 0/1 | Planned | — |
+| 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 0/1 | Planned | — |
+| 122. Release Quality Gate, README, and Handoff | v1.20 | 0/1 | Planned | — |
