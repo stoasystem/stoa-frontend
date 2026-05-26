@@ -12,10 +12,10 @@ Phase 128 created the Phase 23 final approval and launch-candidate bug triage co
 
 ## Changed Files
 
-- `.planning/phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-CONTEXT.md`
-- `.planning/phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-PLAN.md`
-- `.planning/phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-SUMMARY.md`
-- `.planning/phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-VERIFICATION.md`
+- `.planning/milestones/v1.22-phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-CONTEXT.md`
+- `.planning/milestones/v1.22-phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-PLAN.md`
+- `.planning/milestones/v1.22-phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-SUMMARY.md`
+- `.planning/milestones/v1.22-phases/128-final-approval-intake-and-launch-candidate-bug-triage/128-VERIFICATION.md`
 - `docs/release/final-approval-changes.md`
 - `.planning/REQUIREMENTS.md`
 - `.planning/ROADMAP.md`

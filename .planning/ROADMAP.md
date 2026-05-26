@@ -42,11 +42,11 @@ Archive:
 
 Phase artifacts:
 
-- `.planning/phases/128-final-approval-intake-and-launch-candidate-bug-triage/`
-- `.planning/phases/129-blocker-fixes-and-release-lock-preservation/`
-- `.planning/phases/130-final-demo-rerun-and-smoke-test-evidence/`
-- `.planning/phases/131-public-demo-release-handoff-documents/`
-- `.planning/phases/132-go-no-go-readme-and-public-demo-release-confirmation/`
+- `.planning/milestones/v1.22-phases/128-final-approval-intake-and-launch-candidate-bug-triage/`
+- `.planning/milestones/v1.22-phases/129-blocker-fixes-and-release-lock-preservation/`
+- `.planning/milestones/v1.22-phases/130-final-demo-rerun-and-smoke-test-evidence/`
+- `.planning/milestones/v1.22-phases/131-public-demo-release-handoff-documents/`
+- `.planning/milestones/v1.22-phases/132-go-no-go-readme-and-public-demo-release-confirmation/`
 
 Release markers:
 
