@@ -37,6 +37,15 @@ export function HomeHero() {
   const title = t('home:hero.title')
   const titleLines = getTitleLines(t('home:hero.titleLines', { returnObjects: true }), title)
   const bullets = t('home:hero.bullets', { returnObjects: true }) as string[]
+  const startLearningLabel =
+    layout.ctaLabelVariant === 'shortOnMobile' ? (
+      <>
+        <span className="sm:hidden">{t('common:actions.startLearningShort')}</span>
+        <span className="hidden sm:inline">{t('common:actions.startLearning')}</span>
+      </>
+    ) : (
+      t('common:actions.startLearning')
+    )
 
   return (
     <section className="mx-auto grid w-full min-w-0 min-h-[calc(100vh-4rem)] max-w-6xl gap-10 px-5 pb-12 pt-12 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:pb-18 lg:pt-18">
@@ -70,10 +79,11 @@ export function HomeHero() {
             className={cn(
               'premium-button-lift premium-primary-button min-h-12 rounded-md px-7 py-3 text-base',
               layout.buttonSize === 'wide' && 'sm:px-8',
+              layout.ctaButtonClassName,
             )}
           >
             <Link to={learningHref}>
-              {t('common:actions.startLearning')}
+              {startLearningLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>

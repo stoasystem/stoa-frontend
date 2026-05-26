@@ -2,6 +2,7 @@ import { isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 
 export type HeroTitleVariant = 'default' | 'stacked'
 export type LocaleButtonSize = 'default' | 'wide'
+export type LocaleCtaLabelVariant = 'default' | 'shortOnMobile'
 
 export type LocaleLayout = {
   heroTitleVariant: HeroTitleVariant
@@ -10,6 +11,8 @@ export type LocaleLayout = {
   heroSubtitleMaxWidthClassName: string
   heroActionClassName: string
   buttonSize: LocaleButtonSize
+  ctaLabelVariant: LocaleCtaLabelVariant
+  ctaButtonClassName: string
 }
 
 export const localeLayout = {
@@ -20,14 +23,18 @@ export const localeLayout = {
     heroSubtitleMaxWidthClassName: 'max-w-2xl',
     heroActionClassName: '',
     buttonSize: 'default',
+    ctaLabelVariant: 'shortOnMobile',
+    ctaButtonClassName: '',
   },
   de: {
     heroTitleVariant: 'stacked',
     heroTitleMaxWidthClassName: 'max-w-[680px]',
-    heroTitleClassName: 'text-5xl sm:text-6xl lg:text-[4.35rem]',
+    heroTitleClassName: 'hyphens-auto text-5xl sm:text-6xl lg:text-[4.35rem]',
     heroSubtitleMaxWidthClassName: 'max-w-3xl',
     heroActionClassName: 'sm:flex-wrap',
     buttonSize: 'wide',
+    ctaLabelVariant: 'shortOnMobile',
+    ctaButtonClassName: 'min-w-[8rem] sm:min-w-[10rem]',
   },
   fr: {
     heroTitleVariant: 'default',
@@ -36,14 +43,18 @@ export const localeLayout = {
     heroSubtitleMaxWidthClassName: 'max-w-3xl',
     heroActionClassName: 'sm:flex-wrap',
     buttonSize: 'wide',
+    ctaLabelVariant: 'shortOnMobile',
+    ctaButtonClassName: 'min-w-[8rem] sm:min-w-[11rem]',
   },
   it: {
     heroTitleVariant: 'default',
     heroTitleMaxWidthClassName: 'max-w-[760px]',
     heroTitleClassName: 'text-5xl sm:text-6xl lg:text-7xl',
     heroSubtitleMaxWidthClassName: 'max-w-3xl',
-    heroActionClassName: '',
-    buttonSize: 'default',
+    heroActionClassName: 'sm:flex-wrap',
+    buttonSize: 'wide',
+    ctaLabelVariant: 'shortOnMobile',
+    ctaButtonClassName: 'min-w-[8rem] sm:min-w-[10rem]',
   },
 } satisfies Record<SupportedLanguage, LocaleLayout>
 

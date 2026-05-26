@@ -2,6 +2,8 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { getLocaleLayout } from '@/lib/localeLayout'
+import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
 function getHref(role?: string | null) {
@@ -13,9 +15,19 @@ function getHref(role?: string | null) {
 }
 
 export function HomeCTASection() {
-  const { t } = useTranslation(['home', 'common'])
+  const { i18n, t } = useTranslation(['home', 'common'])
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const layout = getLocaleLayout(i18n.language)
+  const startLearningLabel =
+    layout.ctaLabelVariant === 'shortOnMobile' ? (
+      <>
+        <span className="sm:hidden">{t('common:actions.startLearningShort')}</span>
+        <span className="hidden sm:inline">{t('common:actions.startLearning')}</span>
+      </>
+    ) : (
+      t('common:actions.startLearning')
+    )
 
   return (
     <section className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-6">
@@ -29,9 +41,17 @@ export function HomeCTASection() {
               {t('home:cta.title')}
             </h2>
           </div>
-          <Button asChild variant="secondary" size="lg" className="premium-button-lift premium-light-button h-12 bg-[hsl(var(--stoa-brand-paper))] px-7 hover:bg-[hsl(var(--stoa-brand-card))]">
+          <Button
+            asChild
+            variant="secondary"
+            size="lg"
+            className={cn(
+              'premium-button-lift premium-light-button h-12 bg-[hsl(var(--stoa-brand-paper))] px-7 hover:bg-[hsl(var(--stoa-brand-card))]',
+              layout.ctaButtonClassName,
+            )}
+          >
             <Link to={getHref(isAuthenticated ? user?.role : null)}>
-              {t('common:actions.startLearning')}
+              {startLearningLabel}
               <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
