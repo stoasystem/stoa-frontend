@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.19
-milestone_name: "Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation"
-status: completed
-last_updated: "2026-05-26T02:48:00.000Z"
+milestone: v1.20
+milestone_name: "Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate"
+status: planning
+last_updated: "2026-05-26T00:46:27.270Z"
 last_activity: 2026-05-26
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 117. Cross-Locale Visual QA, README, and Handoff
-Plan: 117
-Status: Complete
-Last activity: 2026-05-26 — Phase 117 completed README, cross-locale QA, install/dev/build verification, and source-safety handoff.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-26 — Milestone v1.20 started
 
 ## Performance Metrics
 
