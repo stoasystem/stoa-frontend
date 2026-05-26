@@ -8,6 +8,12 @@ from .providers.base import ProviderRequest, ProviderResponse
 from .providers.router import ProviderRouter, configure_provider_logging, LOGGER
 from .providers.template_provider import TemplateProvider
 
+SAFE_FALLBACK_TEXT = (
+    "Let's pause and work through the question one step at a time. "
+    "First, identify what the question is asking and what information you already have. "
+    "If that still feels unclear, you can ask for professional teacher support."
+)
+
 
 @dataclass(frozen=True)
 class LearningAssistantRequest:
@@ -88,6 +94,10 @@ def generate_learning_assistant_response(
 
     fallback = TemplateProvider().generate(provider_request)
     fallback_check = check_response(fallback.text, request)
+    if not fallback_check.ok:
+        LOGGER.error("safe fallback used after fallback check failed reasons=%s", ",".join(fallback_check.failure_reasons))
+        safe_check = check_response(SAFE_FALLBACK_TEXT, request)
+        return LearningAssistantResponse(SAFE_FALLBACK_TEXT, "template", True, safe_check)
     return LearningAssistantResponse(fallback.text, fallback.provider_name, True, fallback_check)
 
 
@@ -101,4 +111,3 @@ def check_response(text: str, request: LearningAssistantRequest) -> ResponseChec
             registered_subjects=request.registered_subjects,
         )
     )
-

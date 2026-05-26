@@ -38,17 +38,21 @@ class ProviderRouter:
         self.fallback_name = fallback_name or os.getenv("STOA_DEMO_PROVIDER_FALLBACK", "template")
 
     def generate(self, request: ProviderRequest) -> ProviderResponse:
-        provider = provider_from_name(self.provider_name)
-        fallback = provider_from_name(self.fallback_name)
         LOGGER.info("provider selected provider=%s fallback=%s", self.provider_name, self.fallback_name)
 
         try:
+            provider = provider_from_name(self.provider_name)
             response = provider.generate(request)
             LOGGER.info("provider success provider=%s", response.provider_name)
             return response
         except Exception as exc:
             reason = exc.__class__.__name__
             LOGGER.warning("provider fallback reason=%s provider=%s", reason, self.provider_name)
+            try:
+                fallback = provider_from_name(self.fallback_name)
+            except Exception:
+                LOGGER.warning("invalid fallback provider configured fallback=%s", self.fallback_name)
+                fallback = TemplateProvider()
             fallback_response = fallback.generate(request)
             return ProviderResponse(
                 text=fallback_response.text,
@@ -58,16 +62,18 @@ class ProviderRouter:
             )
 
     def health(self) -> dict[str, object]:
-        ok = True
-        provider_available = True
+        provider_installed = True
+        provider_callable: bool | str = "not_checked"
+        valid_provider = self.provider_name in {"codex", "template"}
+        valid_fallback = self.fallback_name in {"codex", "template"}
         if self.provider_name == "codex":
-            provider_available = CodexProvider(timeout_seconds=int(os.getenv("STOA_DEMO_PROVIDER_HEALTH_TIMEOUT_SECONDS", "5"))).is_available()
-            ok = provider_available or self.fallback_name == "template"
+            provider_installed = CodexProvider(timeout_seconds=int(os.getenv("STOA_DEMO_PROVIDER_HEALTH_TIMEOUT_SECONDS", "5"))).is_available()
+        ok = valid_provider and valid_fallback and (provider_installed or self.fallback_name == "template")
         return {
             "ok": ok,
             "provider": self.provider_name,
             "fallback": self.fallback_name,
             "mode": "demo",
-            "providerAvailable": provider_available,
+            "providerInstalled": provider_installed,
+            "providerCallable": provider_callable,
         }
-

@@ -18,6 +18,10 @@ class CodexProvider:
     def is_available(self) -> bool:
         return shutil.which("codex") is not None
 
+    def sanitized_env(self) -> dict[str, str]:
+        allowed_keys = ("PATH", "HOME", "CODEX_HOME", "LANG", "LC_ALL", "TMPDIR")
+        return {key: value for key in allowed_keys if (value := os.environ.get(key))}
+
     def generate(self, request: ProviderRequest) -> ProviderResponse:
         if not self.is_available():
             raise RuntimeError("Codex command is unavailable")
@@ -28,6 +32,9 @@ class CodexProvider:
                 "codex",
                 "exec",
                 "--ephemeral",
+                "--ignore-rules",
+                "-C",
+                temp_dir,
                 "--sandbox",
                 "read-only",
                 "--output-last-message",
@@ -42,6 +49,8 @@ class CodexProvider:
                     text=True,
                     timeout=self.timeout_seconds,
                     check=False,
+                    cwd=temp_dir,
+                    env=self.sanitized_env(),
                 )
             except subprocess.TimeoutExpired as exc:
                 raise RuntimeError("Codex provider timed out") from exc
@@ -55,4 +64,3 @@ class CodexProvider:
                 raise RuntimeError("Codex provider returned an empty response")
 
             return ProviderResponse(text=text, provider_name=self.provider_name)
-

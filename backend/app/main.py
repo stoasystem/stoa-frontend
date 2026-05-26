@@ -1124,7 +1124,7 @@ DEMO_BILLING_PLANS = [
         "currency": "CHF",
         "audience": "Families validating fit before committing.",
         "cta": "Start free trial",
-        "features": ["Limited AI questions", "Limited file uploads", "Basic learning history"],
+        "features": ["Limited Learning Assistant questions", "Limited file uploads", "Basic learning history"],
     },
     {
         "id": "student",
@@ -1133,7 +1133,7 @@ DEMO_BILLING_PLANS = [
         "currency": "CHF",
         "audience": "A student who needs consistent homework help.",
         "cta": "Select student",
-        "features": ["AI learning chat", "Homework upload", "Learning history"],
+        "features": ["Learning Assistant chat", "Homework upload", "Learning history"],
     },
     {
         "id": "family",
@@ -1150,7 +1150,7 @@ DEMO_BILLING_PLANS = [
         "name": "Tutor-supported Plan",
         "priceMonthly": 89,
         "currency": "CHF",
-        "audience": "Families who want teacher support when AI is not enough.",
+        "audience": "Families who want teacher support when guided learning is not enough.",
         "cta": "Select tutor support",
         "features": ["Everything in Family", "Human teacher help quota", "Priority support"],
     },

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import json
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from harness.evaluate_response import ResponseCheckInput, evaluate_response
 from harness.providers.router import ProviderRouter
@@ -48,6 +51,28 @@ class CodexProviderBehaviorTests(unittest.TestCase):
         self.assertEqual(response.provider_name, "template")
         self.assertTrue(response.fallback_used)
         self.assertTrue(response.check.ok)
+
+    def test_invalid_provider_configuration_uses_template_fallback(self) -> None:
+        request = LearningAssistantRequest(
+            student_id="student-1",
+            conversation_id="conv-1",
+            question="How do I solve 3x + 5 = 20?",
+            grade_level="Grade 8",
+            registered_subjects=("Mathematics",),
+            subject="Mathematics",
+        )
+
+        response = generate_learning_assistant_response(request, ProviderRouter(provider_name="invalid"))
+
+        self.assertEqual(response.provider_name, "template")
+        self.assertTrue(response.fallback_used)
+        self.assertTrue(response.check.ok)
+
+    def test_provider_health_distinguishes_installed_from_callable(self) -> None:
+        health = ProviderRouter(provider_name="codex").health()
+
+        self.assertIn("providerInstalled", health)
+        self.assertIn("providerCallable", health)
 
     def test_response_check_rejects_forbidden_terms(self) -> None:
         result = evaluate_response(
@@ -116,4 +141,3 @@ class CodexProviderBehaviorTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

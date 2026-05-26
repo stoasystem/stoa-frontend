@@ -9,6 +9,50 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 25 Local Codex Provider Integration
+
+This phase connects Codex as a local demo provider for the Learning Assistant.
+
+This is only for local testing and public demo preparation. It is not the production AI backend.
+
+Goals:
+
+- Use Codex through a Python prompt harness.
+- Keep the frontend calling the same Chat API.
+- Guide students instead of giving final answers first.
+- Respect student grade level and selected subjects.
+- Suggest professional teacher support when needed.
+- Hide Codex, model, provider, prompt, backend, demo, and mock details from user-facing UI.
+- Use a template fallback provider if Codex is unavailable.
+
+Environment:
+
+```bash
+STOA_DEMO_PROVIDER=codex
+STOA_DEMO_PROVIDER_FALLBACK=template
+STOA_DEMO_PROVIDER_TIMEOUT_SECONDS=60
+STOA_DEMO_LANGUAGE_DEFAULT=en
+VITE_API_MODE=demo
+VITE_API_BASE_URL=http://localhost:8000
+VITE_SHOW_INTERNAL_DEBUG=false
+```
+
+Local provider QA:
+
+```bash
+python3 -m unittest discover -s demo-harness/tests
+npm run demo:reset
+npm run demo:backend
+npm run build
+```
+
+User-facing UI must never mention Codex.
+
+Phase 25 docs:
+
+- `docs/qa/codex-provider-behavior-qa.md`
+- `docs/backend-integration/learning-provider-handoff.md`
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.
