@@ -18,6 +18,7 @@ class TemplateProvider:
             )
         elif subject.lower() not in {item.lower() for item in request.registered_subjects} and request.registered_subjects:
             text = (
+                "Let's first check the learning scope. "
                 "This looks outside the subjects saved in your learning profile. "
                 "I can help you connect the question to your current subjects, or you can ask for professional teacher support "
                 "if you need help beyond that scope."
@@ -25,7 +26,7 @@ class TemplateProvider:
         elif any(token in question for token in ("3x + 5", "3x+5", "x^2", "quadratic", "solve")):
             text = (
                 "Let's work through the structure first. "
-                "Start by identifying what operation is being done to the unknown, then undo those operations in reverse order. "
+                "Use one step at a time: start by identifying what operation is being done to the unknown, then undo those operations in reverse order. "
                 "Write each change on both sides of the equation and check whether the result makes the original statement true."
             )
         elif "speed" in question or "distance" in question or "time" in question:
@@ -43,4 +44,3 @@ class TemplateProvider:
             )
 
         return ProviderResponse(text=text, provider_name=self.provider_name, fallback_used=True)
-

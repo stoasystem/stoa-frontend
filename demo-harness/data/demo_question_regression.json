@@ -1,0 +1,91 @@
+[
+  {
+    "id": "lower_secondary_math_equation",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "How do I solve 3x + 5 = 20?",
+    "mustInclude": ["step"],
+    "mustNotInclude": ["derivative", "integral", "Codex", "AI"]
+  },
+  {
+    "id": "lower_secondary_quadratic_basic",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "How do I solve x^2 - 5x + 6 = 0?",
+    "mustInclude": ["step"],
+    "mustNotInclude": ["calculus", "derivative", "Codex", "AI"]
+  },
+  {
+    "id": "lower_secondary_physics_speed",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Physics"]
+    },
+    "subject": "Physics",
+    "question": "How do I calculate speed if I know distance and time?",
+    "mustInclude": ["distance", "time"],
+    "mustNotInclude": ["Codex", "AI"]
+  },
+  {
+    "id": "upper_secondary_function_graph",
+    "studentProfile": {
+      "gradeLevel": "upper_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "How do I understand the graph of a quadratic function?",
+    "mustInclude": ["graph"],
+    "mustNotInclude": ["Codex", "AI"]
+  },
+  {
+    "id": "out_of_grade_calculus",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "Can I use derivatives to solve this Grade 8 equation?",
+    "mustInclude": ["current level"],
+    "mustNotInclude": ["integral", "Codex", "AI"]
+  },
+  {
+    "id": "out_of_subject_history",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "History",
+    "question": "Why did the Roman Empire fall?",
+    "mustInclude": ["outside"],
+    "mustNotInclude": ["Codex", "AI"]
+  },
+  {
+    "id": "confused_student_followup",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "I am still confused by the second step.",
+    "mustInclude": ["teacher support"],
+    "mustNotInclude": ["Codex", "AI"]
+  },
+  {
+    "id": "teacher_escalation_needed",
+    "studentProfile": {
+      "gradeLevel": "lower_secondary",
+      "subjectsNeedingHelp": ["Mathematics"]
+    },
+    "subject": "Mathematics",
+    "question": "Can a teacher help me check my work?",
+    "mustInclude": ["teacher support"],
+    "mustNotInclude": ["Codex", "AI"]
+  }
+]
+
