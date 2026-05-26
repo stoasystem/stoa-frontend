@@ -120,6 +120,29 @@ Phase 27 docs:
 - `docs/practice/practice-demo-data.md`
 - `docs/practice/practice-functional-qa.md`
 
+## Phase 28 Practice Path QA and Equation Demo Content
+
+This phase refines the Practice Path demo content.
+
+For the demo stage, the Practice Path focuses only on equations:
+
+- Linear equations in one variable
+- Quadratic equations
+- Linear systems in two variables
+
+The goal is not to build a full math curriculum yet.
+
+The goal is to create a clear, stable, and educational demo path that shows how STOA can guide students through short practice lessons.
+
+Main tasks:
+
+- Check lesson content quality
+- Adjust challenge difficulty
+- Improve feedback and hint copy
+- Test Learning Assistant behavior inside Practice
+- Improve Parent Report practice summary
+- Polish the demo scenario
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.

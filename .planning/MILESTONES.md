@@ -1,5 +1,49 @@
 # Milestones
 
+## v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing (Shipped: 2026-05-26)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** Phase 28 completed through autonomous build and browser smoke evidence.
+
+### Delivered
+
+- Practice Path demo content narrowed to Mathematics equations only.
+- Equation units for linear equations in one variable, quadratic equations, and linear systems in two variables.
+- Lower-secondary mock lesson set with deterministic multiple-choice, text input, ordering, and explanation challenges.
+- Challenge-specific correct and incorrect feedback with directional, non-answer-revealing hints.
+- Practice overview, subject path, lesson, hint, result, mistake review, and parent summary UI polish using the existing STOA premium design language.
+- Teacher escalation delayed until repeated confusion or repeated hint use.
+- Parent Report practice summary aligned to the equation path with supportive language.
+- Phase 28 docs for equation path, unit lessons, difficulty rules, feedback/hint copy, parent copy, demo scenario, content QA, README guidance, and functional QA.
+
+### Verification
+
+- `npm run build`: passed with the existing Node `DEP0205` deprecation warning from tooling.
+- Browser smoke in isolated mock mode: passed for student login, Practice overview, equation path, two-step equation lesson, correct feedback, incorrect feedback, hint, explanation, quadratic lesson route, system lesson route, mistakes review, parent login, and parent report equation summary.
+- `npm install` was not rerun because no new dependency was added.
+
+---
+
+## v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design (Shipped: 2026-05-26)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+
+### Delivered
+
+- Practice overview, subject path, lesson, result, and mistakes review routes.
+- Practice Path mock data, typed contracts, service functions, query keys, and hooks.
+- Multiple-choice, text input, ordering, explanation, feedback, hint, result, and mistake review components.
+- Hint-first Learning Assistant handoff and teacher-support escalation from practice mistakes.
+- Student Dashboard Continue Practice and Parent Report practice summary integration.
+- English, German, French, and Italian Practice P0 copy, docs, README guidance, and browser smoke evidence.
+
+### Verification
+
+- `npm run build`: passed.
+- Student and parent browser smoke: passed in local mock mode.
+
+---
+
 ## v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing (Shipped: 2026-05-26)
 
 **Phases completed:** 4 phases, 4 plans, 0 tasks

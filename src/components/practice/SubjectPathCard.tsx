@@ -9,11 +9,11 @@ export function SubjectPathCard({ subject }: { subject: PracticeSubject }) {
   const { t } = useTranslation('practice')
 
   return (
-    <Card className="group border-primary/10 bg-card/90 transition-colors hover:border-primary/30">
+    <Card className="group border-primary/10 bg-card/95 shadow-[var(--platform-shadow-soft)] transition-colors hover:border-primary/30">
       <CardContent className="p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <p className="brand-section-kicker">Subject path</p>
+            <p className="brand-section-kicker">Demo path</p>
             <h3 className="mt-2 text-xl font-semibold">{subject.name}</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{subject.description}</p>
           </div>

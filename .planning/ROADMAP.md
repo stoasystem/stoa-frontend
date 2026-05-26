@@ -28,16 +28,16 @@
 - ✅ **v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow** - Phases 133-136 (shipped 2026-05-26)
 - ✅ **v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing** - Phases 137-140 (shipped 2026-05-26)
 - ✅ **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (implemented 2026-05-26)
-- 🚧 **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (planned)
+- ✅ **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (implemented 2026-05-26)
 
 ## Phases
 
-- [ ] **Phase 147: Equation Demo Scope and Path Framing** - Narrow Practice Path demo to a Mathematics equation path and document the frontend/demo boundary.
-- [ ] **Phase 148: Equation Lesson Content and Mock Data** - Design the three equation units and update mock data for lower-secondary lesson progression.
-- [ ] **Phase 149: Challenge Difficulty, Feedback, and Hint Copy Polish** - Make challenges, feedback, hints, mistakes, and results educationally clear.
-- [ ] **Phase 150: Practice Support Behavior QA** - Verify hint-first Learning Assistant and teacher escalation behavior inside Practice.
-- [ ] **Phase 151: Parent Practice Summary and Demo Scenario** - Improve parent-facing practice language and document the 3-5 minute demo route.
-- [ ] **Phase 152: Localization, QA, README, and Final Verification** - Finish four-language labels, content QA, README, build, and smoke evidence.
+- [x] **Phase 147: Equation Demo Scope and Path Framing** - Narrow Practice Path demo to a Mathematics equation path and document the frontend/demo boundary.
+- [x] **Phase 148: Equation Lesson Content and Mock Data** - Design the three equation units and update mock data for lower-secondary lesson progression.
+- [x] **Phase 149: Challenge Difficulty, Feedback, and Hint Copy Polish** - Make challenges, feedback, hints, mistakes, and results educationally clear.
+- [x] **Phase 150: Practice Support Behavior QA** - Verify hint-first Learning Assistant and teacher escalation behavior inside Practice.
+- [x] **Phase 151: Parent Practice Summary and Demo Scenario** - Improve parent-facing practice language and document the 3-5 minute demo route.
+- [x] **Phase 152: Localization, QA, README, and Final Verification** - Finish four-language labels, content QA, README, build, and smoke evidence.
 
 ## Phase Details
 
@@ -50,7 +50,7 @@
   2. UI/demo copy does not present Physics, geometry, probability, functions, or broad curriculum paths as Phase 28 scope.
   3. First-screen Practice content makes the equation demo focus obvious.
   4. Docs clearly state frontend/demo-only boundaries and exclude real backend, database, adaptive learning, and full curriculum work.
-**Plans**: TBD
+**Plans**: 147-PLAN.md
 **UI hint**: yes
 
 ### Phase 148: Equation Lesson Content and Mock Data
@@ -63,7 +63,7 @@
   3. Unit 3 covers systems meaning, substitution, elimination, and checking a solution.
   4. `mockPractice.ts` exposes the equation units and 3-5 focused challenges per lesson.
   5. Each challenge has an unambiguous answer and stays within lower-secondary demo difficulty.
-**Plans**: TBD
+**Plans**: 148-PLAN.md
 **UI hint**: yes
 
 ### Phase 149: Challenge Difficulty, Feedback, and Hint Copy Polish
@@ -76,7 +76,7 @@
   3. Incorrect feedback is supportive and points to the next operation or idea without revealing the full answer.
   4. Hints are short, directional, and age-appropriate.
   5. Mistake review and result copy explain what to practice next without failure language or loud reward language.
-**Plans**: TBD
+**Plans**: 149-PLAN.md
 **UI hint**: yes
 
 ### Phase 150: Practice Support Behavior QA
@@ -89,7 +89,7 @@
   3. Repeated incorrect attempts can show more specific support without skipping directly to teacher support.
   4. `Ask a teacher` appears only after repeated confusion, stuck intent, or weak-topic context.
   5. Practice frontend code stays behind STOA service/API boundaries and does not call provider APIs.
-**Plans**: TBD
+**Plans**: 150-PLAN.md
 **UI hint**: yes
 
 ### Phase 151: Parent Practice Summary and Demo Scenario
@@ -102,7 +102,7 @@
   3. Parent-facing copy avoids failure, weakness, ranking, or anxiety language.
   4. Demo scenario shows Dashboard -> Practice -> path -> lesson -> correct answer -> incorrect answer -> hint -> explanation -> result -> Parent Report.
   5. The documented demo route can be completed in 3-5 minutes.
-**Plans**: TBD
+**Plans**: 151-PLAN.md
 **UI hint**: yes
 
 ### Phase 152: Localization, QA, README, and Final Verification
@@ -115,19 +115,19 @@
   3. Content QA covers scope, lesson goals, challenge clarity, answer correctness, hints, feedback, Learning Assistant behavior, and parent copy.
   4. Final QA includes build, equation lesson smoke, Learning Assistant support smoke, parent report smoke, and demo scenario smoke.
   5. README documents Phase 28 scope, exclusions, equation topics, and main tasks.
-**Plans**: TBD
+**Plans**: 152-PLAN.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 147. Equation Demo Scope and Path Framing | 0/TBD | Not started | - |
-| 148. Equation Lesson Content and Mock Data | 0/TBD | Not started | - |
-| 149. Challenge Difficulty, Feedback, and Hint Copy Polish | 0/TBD | Not started | - |
-| 150. Practice Support Behavior QA | 0/TBD | Not started | - |
-| 151. Parent Practice Summary and Demo Scenario | 0/TBD | Not started | - |
-| 152. Localization, QA, README, and Final Verification | 0/TBD | Not started | - |
+| 147. Equation Demo Scope and Path Framing | 1/1 | Complete | 2026-05-26 |
+| 148. Equation Lesson Content and Mock Data | 1/1 | Complete | 2026-05-26 |
+| 149. Challenge Difficulty, Feedback, and Hint Copy Polish | 1/1 | Complete | 2026-05-26 |
+| 150. Practice Support Behavior QA | 1/1 | Complete | 2026-05-26 |
+| 151. Parent Practice Summary and Demo Scenario | 1/1 | Complete | 2026-05-26 |
+| 152. Localization, QA, README, and Final Verification | 1/1 | Complete | 2026-05-26 |
 
 ## Coverage
 
@@ -146,4 +146,4 @@
 
 ## Next Up
 
-Milestone v1.26 is ready for Phase 147 planning.
+Milestone v1.26 implementation is complete. Recommended next milestone: Phase 29 Practice Path Demo Rehearsal, Parent Value Framing, and Learning Report Integration.

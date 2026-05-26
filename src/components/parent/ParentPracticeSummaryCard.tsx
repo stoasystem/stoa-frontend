@@ -24,6 +24,9 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
         </div>
         <div className="space-y-2 text-sm leading-6">
           <p>
+            <span className="font-medium">Current path:</span> {summary.currentPracticePath}
+          </p>
+          <p>
             <span className="font-medium">Topics practiced:</span> {summary.topicsPracticed.join(', ')}
           </p>
           <p>

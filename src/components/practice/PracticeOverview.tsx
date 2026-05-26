@@ -13,11 +13,35 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
 
   return (
     <div className="space-y-8">
+      <section className="rounded-lg border border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--platform-surface-app))_100%)] p-5 shadow-[var(--platform-shadow-soft)]">
+        <div className="grid gap-5 lg:grid-cols-[1fr_22rem] lg:items-center">
+          <div>
+            <p className="brand-section-kicker">Equation path</p>
+            <h2 className="mt-2 max-w-3xl text-3xl font-semibold leading-tight">
+              Linear equations, quadratics, and systems in one focused practice route.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+              The demo path stays intentionally narrow so each short lesson has a clear learning step.
+            </p>
+          </div>
+          <div className="grid gap-2 text-sm">
+            {['Linear equations', 'Quadratic equations', 'Linear systems'].map((label, index) => (
+              <div
+                className="flex items-center justify-between rounded-md border bg-card/80 px-3 py-2"
+                key={label}
+              >
+                <span className="font-medium text-foreground">{label}</span>
+                <span className="text-xs text-muted-foreground">Unit {index + 1}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       <div className="grid gap-4 md:grid-cols-2">
         <DailyGoalCard {...overview.dailyGoal} />
         <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
       </div>
-      <section className="rounded-lg border border-primary/15 bg-card/80 p-5">
+      <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="brand-section-kicker">{t('continuePractice')}</p>
@@ -34,10 +58,10 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
       </section>
       <section className="space-y-4">
         <div>
-          <p className="brand-section-kicker">Recommended topics</p>
-          <h2 className="mt-2 text-2xl font-semibold">Subject paths</h2>
+          <p className="brand-section-kicker">Recommended path</p>
+          <h2 className="mt-2 text-2xl font-semibold">Mathematics: Equations</h2>
         </div>
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid gap-4">
           {overview.subjects.map((subject) => (
             <SubjectPathCard key={subject.id} subject={subject} />
           ))}

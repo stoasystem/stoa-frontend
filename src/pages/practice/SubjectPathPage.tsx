@@ -21,8 +21,8 @@ export function SubjectPathPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <PageHeader
             className="mb-0"
-            eyebrow="Subject path"
-            title={subject?.name ?? 'Practice path'}
+            eyebrow="Equation path"
+            title={subject?.name ? `${subject.name}: Equations` : 'Practice path'}
             description={subject?.description ?? 'Follow the next available lesson and keep the session short.'}
           />
           <Button asChild variant="outline">

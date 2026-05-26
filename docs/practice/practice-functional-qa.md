@@ -1,13 +1,16 @@
 # Practice Functional QA
 
-Use this checklist for Phase 27 frontend/demo verification.
+Use this checklist for Phase 28 frontend/demo verification.
 
 ## Student Practice Flow
 
 - [ ] Student can open `/practice`.
-- [ ] Student can see Mathematics and Physics subjects.
+- [ ] Student can see the Mathematics equation demo path.
 - [ ] Student can open `/practice/math`.
-- [ ] Student can open `Solving one-step equations`.
+- [ ] Student can open `One-step equations`.
+- [ ] Student can complete a linear equation lesson.
+- [ ] Student can complete a quadratic equation lesson.
+- [ ] Student can complete a linear-system lesson.
 - [ ] Student can answer a multiple-choice challenge.
 - [ ] Correct answer shows restrained success feedback.
 - [ ] Incorrect answer shows "Not quite" feedback and offers a hint.
@@ -22,12 +25,13 @@ Use this checklist for Phase 27 frontend/demo verification.
 - [ ] Incorrect answer provides `Show hint`.
 - [ ] `Explain this step` opens a practice-context explanation surface.
 - [ ] First hint does not expose the full answer.
-- [ ] `Ask a teacher` is available from the lesson support area.
+- [ ] `Ask a teacher` is available after repeated confusion.
 
 ## Dashboard And Parent Surfaces
 
 - [ ] Student dashboard shows Continue Practice.
 - [ ] Student dashboard shows daily goal, study streak, progress points, and recent mistake context.
+- [ ] Parent child report shows current path as equations.
 - [ ] Parent child report shows lessons completed this week.
 - [ ] Parent child report shows topics practiced, mistakes reviewed, practice streak, and recommended next topic.
 - [ ] Parent wording stays supportive and avoids anxiety language.
@@ -40,13 +44,13 @@ Use this checklist for Phase 27 frontend/demo verification.
 - [ ] Italian Practice P0 labels render.
 - [ ] `npm run build` passes.
 
-## Recorded Phase 27 Result
+## Recorded Phase 28 Result
 
 Last verified: 2026-05-26
 
 - `npm run build`: passed.
-- Student smoke: passed in local mock mode.
-- Parent smoke: passed in local mock mode.
+- Student equation smoke: passed in isolated mock mode.
+- Parent smoke: passed in isolated mock mode.
 
 Verification command shape:
 

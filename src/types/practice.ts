@@ -20,6 +20,8 @@ export type PracticeChallenge = {
   correctAnswer: string | string[]
   hint?: string
   explanation?: string
+  correctFeedback?: string
+  incorrectFeedback?: string
   topic: string
   gradeLevel: string
 }
@@ -152,6 +154,7 @@ export type PracticeParentSummary = {
   topicsPracticed: string[]
   mistakesReviewed: number
   practiceStreak: number
+  currentPracticePath: string
   recommendedNextTopic: string
   supportiveNote: string
 }

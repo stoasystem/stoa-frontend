@@ -13,8 +13,8 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
               {mistake.subjectName} · {mistake.topic}
             </p>
             <h3 className="text-lg font-semibold">{mistake.prompt}</h3>
-            <p className="text-sm text-muted-foreground">Your answer: {mistake.studentAnswer}</p>
-            <p className="text-sm">Hint: {mistake.hint}</p>
+            <p className="text-sm text-muted-foreground">Recent answer: {mistake.studentAnswer}</p>
+            <p className="text-sm">Next step to review: {mistake.hint}</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">

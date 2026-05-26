@@ -5,28 +5,31 @@ Practice demo data lives in `src/data/mockPractice.ts` and supports deterministi
 ## Subjects
 
 - Mathematics
-- Physics
 
 ## Mathematics Path
 
-Unit 1: Linear equations
+Phase 28 fixes the visible demo path to equations only.
 
-- Solving one-step equations
-- Solving two-step equations
-- Word problems with equations
+Unit 1: Linear equations in one variable
 
-Unit 2: Quadratic basics
+- One-step equations
+- Two-step equations
+- Equations with brackets
+- Word problems with linear equations
 
-- Factoring simple expressions
-- Solving simple quadratic equations
+Unit 2: Quadratic equations
 
-## Physics Path
+- Recognizing quadratic equations
+- Factoring simple quadratics
+- Solving factored quadratics
+- Checking two solutions
 
-Unit 1: Motion
+Unit 3: Linear systems in two variables
 
-- Speed, distance, and time
-- Units and conversion
-- Simple graph interpretation
+- What is a system of equations?
+- Solving by substitution
+- Solving by elimination
+- Checking the solution
 
 ## Challenge Types
 
@@ -44,3 +47,5 @@ Answer checking is intentionally simple and deterministic. It exists to support 
 The data is not a curriculum database. It does not attempt adaptive sequencing, production progress persistence, teacher assignment logic, or high-stakes grading.
 
 Practice should show students what to do next, give calm feedback, and offer hint-first support when they miss a step.
+
+Physics and unrelated math topics are deferred outside the Phase 28 demo.

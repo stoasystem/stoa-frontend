@@ -39,7 +39,7 @@ export function LessonPage() {
   const lesson = lessonQuery.data
   const challenge = lesson?.challenges[state.currentIndex]
   const canCheck = Boolean(challenge && (Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim()))
-  const teacherHelpVisible = state.incorrectAttempts >= 2 || state.hintsShown > 0
+  const teacherHelpVisible = state.incorrectAttempts >= 2 || state.hintsShown >= 2
 
   const selectedSubjectPath = subjectId ?? lesson?.subjectId ?? 'math'
   const progressCurrent = useMemo(() => (lesson ? state.currentIndex + (state.feedback?.correct ? 1 : 0) : 0), [lesson, state])

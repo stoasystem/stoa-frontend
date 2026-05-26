@@ -22,6 +22,9 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+          This session strengthened one equation step. Review any missed step while the method is still fresh.
+        </p>
         <div className="grid gap-4 sm:grid-cols-4">
           <ResultMetric label="Correct" value={`${result.correctCount}/${result.totalCount}`} />
           <ResultMetric label="Time" value={`${Math.round(result.timeSpentSeconds / 60)} min`} />

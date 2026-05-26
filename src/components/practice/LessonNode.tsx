@@ -11,7 +11,7 @@ export function LessonNode({ lesson }: { lesson: PracticeLesson }) {
   const content = (
     <div
       className={cn(
-        'min-h-[7rem] rounded-lg border p-4 transition-all',
+        'min-h-[8rem] rounded-lg border p-4 transition-all',
         locked
           ? 'border-border/70 bg-muted/40 text-muted-foreground'
           : 'border-primary/15 bg-card/95 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-[var(--platform-shadow-soft)]',
@@ -32,6 +32,7 @@ export function LessonNode({ lesson }: { lesson: PracticeLesson }) {
             {lesson.difficulty} · {lesson.estimatedMinutes} min
           </p>
           <p className="mt-2 text-sm text-muted-foreground">{lesson.topic}</p>
+          <p className="mt-3 text-xs font-medium text-primary">{lesson.challenges.length} focused checks</p>
         </div>
       </div>
     </div>

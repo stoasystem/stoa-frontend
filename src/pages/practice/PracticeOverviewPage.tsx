@@ -13,8 +13,8 @@ export function PracticeOverviewPage() {
       <PageContainer className="space-y-8 p-0">
         <PageHeader
           eyebrow="Practice Path"
-          title="Practice"
-          description="Short subject lessons for steady review, calm feedback, and guided next steps."
+          title="Equation practice"
+          description="A focused demo path for short equation lessons, calm feedback, and guided next steps."
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
