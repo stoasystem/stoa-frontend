@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.21
-milestone_name: "Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation"
-status: complete
-last_updated: "2026-05-26T12:01:24.000Z"
+milestone: v1.22
+milestone_name: "Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release"
+status: planning
+last_updated: "2026-05-26T13:29:05.294Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 5
+  completed_phases: 0
   total_plans: 5
-  completed_plans: 5
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.21 Phase 22 is planning final demo packaging, stakeholder review, final release locks, launch-candidate approval, final demo run, and release branch preparation.
+**Current focus:** Milestone v1.22 Phase 23 is planning launch-candidate bug fixing, final approval closure, final smoke verification, public demo release handoff, Go/No-Go, and release confirmation.
 
 ## Current Position
 
-Phase: 127. Final Demo Run, README, and Launch Candidate Branch Preparation
+Phase: 128. Final Approval Intake and Launch Candidate Bug Triage
 Plan: —
-Status: Phase 22 complete; external stakeholder approval remains a release gate
-Last activity: 2026-05-26 — Milestone v1.21 phases 123-127 completed and final demo run recorded
+Status: Requirements and roadmap defined
+Last activity: 2026-05-26 — Milestone v1.22 requirements and roadmap created
 
 ## Performance Metrics
 
@@ -99,7 +99,7 @@ Recent decisions affecting current work:
 - Milestone v1.5 started from the Phase 6 Authentication, User Roles, and Parent Visibility brief.
 - Phase 21 added auth contracts, auth store, auth API hooks, protected routes, role routes, and auth/error pages.
 - Phase 22 added a local FastAPI + SQLite test backend with seed data and role-filtered API endpoints.
-- Phase 23 added student profile and learning-history services, hooks, pages, and student role routes.
+- Milestone v1.5 Phase 23 added student profile and learning-history services, hooks, pages, and student role routes.
 - Phase 24 added parent dashboard, child summary, child history services/hooks/pages, and parent visibility components.
 - Phase 25 added tutor help-request services/hooks/pages and status update workflow.
 - Phase 26 added role-aware navigation, user menu, role badge, and admin placeholder.

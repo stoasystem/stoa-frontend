@@ -1,75 +1,49 @@
-# Phase 22 Research: Pitfalls
+# Phase 23 Research: Pitfalls
 
-**Milestone:** v1.21 Phase 22
+**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+**Date:** 2026-05-26
 
-## Scope Pitfalls
+## Common Risks
 
-- Adding product features while preparing the demo.
-- Reworking the homepage, register flow, language system, or visual direction.
-- Treating unresolved polish feedback as a reason for broad redesign.
-- Adding complex backend, AWS, database, payment, or support infrastructure.
+### Scope Creep During Bug Fixing
 
-Prevention:
+Release-candidate cleanup can turn into redesign or feature expansion. Prevent this by requiring every change to map to a bug, approval item, or release blocker.
 
-- Requirements must state that Phase 22 does not expand product scope.
-- P0/P1/P2/P3 triage decides what is fixed now versus moved to known issues or backlog.
-- Launch-candidate branch rules allow bug fixes only.
+### Breaking Release Locks
 
-## Demo Reliability Pitfalls
+Small copy or layout fixes can accidentally violate copy, design, translation, or API locks. Prevent this by checking the relevant lock doc after any change.
 
-- Demo accounts drift from documented credentials.
-- Reset does not restore expected conversations, reports, requests, support tickets, or admin data.
-- A previous demo changes state and breaks the next demo.
-- Demo scripts include routes that are placeholders or not stable enough for the audience.
-- Demo backend failure has no fallback explanation.
+### One-Language Fixes
 
-Prevention:
+Fixing only English can leave German/French/Italian inconsistent or broken. Prevent this by treating visible copy and layout changes as cross-locale work.
 
-- Document fixed accounts and data expectations.
-- Run reset before final demo and record whether data returns consistently.
-- Scripts should include pages to avoid.
-- Troubleshooting docs should cover backend, auth, language switcher, contact form, and mobile layout failures.
+### Demo Artifact Leaks
 
-## Review Pitfalls
+Internal language such as demo backend, mock API, fake checkout, or Codex can reappear through errors, docs copied into UI, or fallback labels. Prevent this with targeted scans and manual page review.
 
-- Stakeholder review becomes vague feedback with no decision.
-- Investor review focuses on unfinished settings/admin internals.
-- Parent review sees operational jargon instead of trust and visibility.
-- Tutor review implies teachers are being replaced.
-- Admin review exposes unfinished internal details.
+### Unstable Demo Backend State
 
-Prevention:
+Manual testing can create dirty demo state. Prevent this by resetting demo data before formal final runs and recording reset status.
 
-- Use role-specific checklists and scripts.
-- Classify review outcome as Approved, Approved with minor fixes, Needs revision, or Blocked.
-- Keep each demo narrative audience-specific.
+### Public Demo Mislabeling
 
-## Lock Pitfalls
+Public demo release is not production launch. Prevent this by separating internal and external release notes and documenting known limitations accurately.
 
-- Copy changes happen in one language only.
-- German headings become long again.
-- French apostrophes or CTA wrapping regress.
-- Design lock is bypassed by last-minute UI tweaks.
-- API contract changes happen without synchronized frontend, demo backend, and docs updates.
+### Environment Drift
 
-Prevention:
+Public demo flags can expose demo accounts or debug panels if misconfigured. Prevent this with deployment handoff env-variable checklist.
 
-- Copy, design, translation, and API locks must define allowed post-lock changes.
-- Four-language checks are required for text changes.
-- Contract changes require demo flow retesting.
+### Insufficient Evidence
 
-## Launch Candidate Pitfalls
+A Go decision without flow evidence is weak. Prevent this by recording date, commit hash, environment, tester, browser, device, language, flow results, issues, and Go/No-Go.
 
-- Creating a release branch before build/core demo checks pass.
-- Putting P0 issues into known issues.
-- Accepting P1 issues without a workaround.
-- Release notes overstate production readiness.
-- User-visible demo/mock/provider/Codex wording reappears.
+## Warning Signs
 
-Prevention:
-
-- Launch-candidate approval checklist must gate branch creation.
-- Known issues rules must explicitly exclude P0 issues.
-- Release notes should describe demo/backend mode and limitations plainly.
-- Final scans should include user-visible internal terminology.
+- P0 bug accepted as a known issue.
+- P1 bug has no workaround.
+- A fix touches many unrelated files.
+- New dependencies appear in a bug-fix milestone.
+- Copy/design changes are not tied to a release blocker.
+- Four-language checks are skipped after UI text changes.
+- Contact/logo/footer changes are made without trust/info verification.
 

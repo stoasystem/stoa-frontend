@@ -1,94 +1,57 @@
-# Phase 22 Research: Features
+# Phase 23 Research: Release Features
 
-**Milestone:** v1.21 Phase 22
-**Focus:** Final demo packaging, stakeholder review, final locks, and launch-candidate preparation.
+**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+**Date:** 2026-05-26
+
+Phase 23 is a release execution milestone, not a feature milestone. The "features" are release capabilities and evidence artifacts.
 
 ## Table Stakes
 
-### Final Demo Package
+### Bug Triage and Change Control
 
-The milestone must create a stable demo package under:
+- Launch-candidate bugs are classified P0/P1/P2/P3.
+- Required stakeholder approval changes are recorded with source, page, issue, priority, decision, and status.
+- Every code change maps to a bug, final approval item, or release blocker.
+- P0 is fixed; P1 is fixed or accepted with workaround; P2 is optional only when low-risk; P3 is deferred.
 
-```text
-docs/demo/final-demo-package/
-```
+### Lock Preservation
 
-Required files:
+- Copy lock, design lock, translation lock, and demo API contract lock remain active.
+- Changes are checked for user-facing demo/mock/Codex residue.
+- Four-language copy changes are synchronized where applicable.
+- API shape changes are avoided unless required for a P0 blocker.
 
-- `demo-overview.md`
-- `investor-demo-script.md`
-- `parent-demo-script.md`
-- `student-demo-script.md`
-- `tutor-demo-script.md`
-- `admin-demo-script.md`
-- `demo-accounts.md`
-- `demo-data-reset.md`
-- `demo-known-limitations.md`
-- `demo-troubleshooting.md`
+### Final Verification
 
-The package should make the demo repeatable for investor, parent, student, tutor, admin, and internal review contexts.
+- Full student, tutor, parent, admin, contact, pricing/billing, and homepage paths are rerun.
+- Multilingual smoke checks cover English, German, French, and Italian.
+- Responsive smoke checks cover 375, 430, 768, 1024, and 1440 px widths.
+- Accessibility smoke checks cover tab order, focus, form labels, icon labels, dialog focus, contrast, and h1 sanity.
+- Demo backend health, reset, account login, and core API behavior are verified.
 
-### Demo Account and Data Lock
+### Public Demo Release Handoff
 
-Final demo accounts:
-
-- Student: `student@test.com` / `password123`
-- Parent: `parent@test.com` / `password123`
-- Tutor: `tutor@test.com` / `password123`
-- Admin: `admin@test.com` / `password123`
-
-The milestone should validate and document:
-
-- Each account can log in.
-- Each account lands in the correct role experience.
-- Student data includes conversations, upload example, teacher-help request, learning history, and next action.
-- Parent data includes linked child, reports, recommendations, and billing/plan state.
-- Tutor data includes pending, in-progress, and resolved requests plus availability/context.
-- Admin data includes usage, support, feedback, teacher help, and contact request visibility.
-- Reset returns the demo to a repeatable state.
-
-### Stakeholder Review and Locks
-
-Required docs:
-
-- `docs/review/stakeholder-review-checklist.md`
-- `docs/release/final-bug-triage.md`
-- `docs/release/final-copy-lock.md`
-- `docs/release/final-design-lock.md`
-- `docs/release/final-translation-lock.md`
-- `docs/release/final-demo-api-contract-lock.md`
-
-The review output should classify results as:
-
-- Approved
-- Approved with minor fixes
-- Needs revision
-- Blocked
-
-### Launch Candidate Package
-
-Required docs:
-
-- `docs/release/release-notes-lc1.md`
-- `docs/release/known-issues.md`
-- `docs/release/next-stage-backlog.md`
-- `docs/release/launch-candidate-approval.md`
-- `docs/demo/final-demo-run-result.md`
-
-The launch-candidate path should only proceed when build passes, P0 bugs are zero, core demo flows pass, locks are complete, and known issues are accepted.
+- Public demo final run is recorded.
+- Deployment handoff is documented.
+- Demo monitoring plan is documented.
+- First external presentation support is documented.
+- Public demo release notes separate internal and external language.
+- Go/No-Go decision is recorded.
+- README includes Phase 23 guidance.
 
 ## Differentiators
 
-- Demo scripts are audience-specific, not generic route inventories.
-- Release locks separate true launch blockers from later backlog work.
-- The final demo run records actual evidence: date, environment, commit hash, tester, flows tested, failures, and decision.
-- Known issues explicitly exclude P0 issues and require workarounds for P1 issues.
+- Clear separation between internal release notes and external-facing public demo messaging.
+- Explicit Go/No-Go conditions grounded in P0/P1 status and core flow evidence.
+- Release monitoring plan with 48-hour and pre-presentation checks.
+- First external presentation support with fallback paths for chat/backend/network failures.
 
 ## Anti-Features
 
-- Do not redesign homepage, register, multilingual system, or demo backend.
-- Do not add complex backend or database design.
-- Do not add production AWS deployment or real payment processing.
-- Do not add new app modules under the label of launch candidate preparation.
-- Do not present unverified demo data as production readiness.
+- New product modules.
+- Large visual redesign.
+- Reopened broad copy or translation work.
+- New language support.
+- Real production backend/payment/email/CRM work.
+- Treating public demo release as production launch.
 

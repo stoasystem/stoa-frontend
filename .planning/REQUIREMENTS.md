@@ -1,98 +1,86 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-26
-**Milestone:** v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, locked demo accounts/data, stakeholder review evidence, release locks, launch-candidate notes, known issues, and a clean Go/No-Go path for a launch candidate.
+**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, locked release evidence, and a clean Go/No-Go path for public demo release.
 
-## v1.21 Requirements
+## v1.22 Requirements
 
-Requirements for Phase 22. Each requirement maps to exactly one roadmap phase.
+Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
-### Final Demo Package and Audience Scripts
+### Final Approval and Bug Triage
 
-- [x] **DEMO22-01**: `docs/demo/final-demo-package/` exists and contains the final demo package documents.
-- [x] **DEMO22-02**: `demo-overview.md` explains what the demo shows, what it does not show, recommended duration, recommended order, services to start, accounts to use, key URLs, and backend failure handling.
-- [x] **DEMO22-03**: `investor-demo-script.md` defines a 10-15 minute investor flow covering product value, student learning, teacher support, parent visibility, pricing, admin visibility, and roadmap explanation.
-- [x] **DEMO22-04**: `parent-demo-script.md` defines a parent-focused flow centered on trust, immediate learning help, professional teacher support, progress visibility, reports, pricing, and contact.
-- [x] **DEMO22-05**: `student-demo-script.md` defines a student-focused flow covering login, chat, asking a question, follow-up, teacher request, and learning history.
-- [x] **DEMO22-06**: `tutor-demo-script.md` defines a tutor-focused flow covering request list, request detail, student context, note, and status update.
-- [x] **DEMO22-07**: `admin-demo-script.md` defines an admin-focused flow covering overview, analytics summary, teacher help requests, support tickets, and contact requests while avoiding unfinished internals.
-- [x] **DEMO22-08**: Demo docs identify pages or flows that should not be shown in formal demos.
-- [x] **DEMO22-09**: Demo troubleshooting docs cover frontend startup, demo backend startup, auth/login, reset, language switcher, contact/support submission, and mobile layout fallback.
+- [ ] **APPROVAL23-01**: `docs/release/final-approval-changes.md` records each required final approval change with ID, source reviewer, page, issue, required change, priority, decision, and status.
+- [ ] **APPROVAL23-02**: Final approval changes explicitly reject new features, non-blocking aesthetic preferences, unrelated roadmap ideas, and future platform functionality.
+- [ ] **BUG23-01**: Launch-candidate bugs are reviewed and classified as P0, P1, P2, or P3 using the Phase 22 final bug triage policy.
+- [ ] **BUG23-02**: P0 bugs are marked fix-required and cannot be accepted as known issues.
+- [ ] **BUG23-03**: P1 bugs are fixed or recorded with an accepted workaround and owner.
+- [ ] **BUG23-04**: P2/P3 issues are either fixed only when low-risk or moved to known issues/backlog without expanding Phase 23 scope.
 
-### Demo Accounts, Demo Data, Reset, and API Contract Lock
+### Blocker Fixes and Lock Preservation
 
-- [x] **DATA22-01**: `demo-accounts.md` locks the student, parent, tutor, and admin demo credentials without exposing them in user-visible UI.
-- [x] **DATA22-02**: Demo account validation confirms each fixed account can log in and reaches the correct role home.
-- [x] **DATA22-03**: Student demo data includes at least three conversations, one homework upload example, one teacher-help request, one completed learning history item, and a clear dashboard next action.
-- [x] **DATA22-04**: Parent demo data includes a linked child, child summary, weekly report, recommendations, and billing/plan state.
-- [x] **DATA22-05**: Tutor demo data includes pending, in-progress, and resolved requests, availability data, and student context on request detail.
-- [x] **DATA22-06**: Admin demo data includes usage summary, support tickets, feedback items, teacher help requests, and contact requests.
-- [x] **DATA22-07**: `demo-data-reset.md` documents the reset command, expected reset result, repeatability expectations, and failure handling.
-- [x] **DATA22-08**: Reset validation confirms demo accounts and role-linked data remain consistent after reset or documents exact blockers.
-- [x] **API22-01**: `final-demo-api-contract-lock.md` locks the required demo backend API endpoints and states that request/response shape changes require frontend, demo backend, docs, and demo-flow retesting.
-- [x] **API22-02**: API contract lock covers auth, conversations, messages, teacher help, tutor requests, parent children/report, billing, contact, support, admin analytics, and health endpoints.
+- [ ] **FIX23-01**: Code changes are limited to P0/P1 blockers, required approval changes, or release blockers.
+- [ ] **FIX23-02**: Each code change is checked against core demo flow impact, mobile impact, build impact, and risk of new user-facing demo/mock/Codex residue.
+- [ ] **LOCK23-01**: Copy lock remains valid after Phase 23 fixes or any allowed copy change is documented as approval/blocker-driven.
+- [ ] **LOCK23-02**: Design lock remains valid after Phase 23 fixes or any allowed visual change is documented as approval/blocker-driven.
+- [ ] **LOCK23-03**: Translation lock remains valid across English, German, French, and Italian after Phase 23 fixes.
+- [ ] **LOCK23-04**: Demo API contract lock remains valid unless a P0 blocker requires an explicit documented exception and retest.
 
-### Stakeholder Review and Final Locks
+### Final Demo Rerun and Smoke Tests
 
-- [x] **REVIEW22-01**: `docs/review/stakeholder-review-checklist.md` defines review roles for founder/product owner, frontend developer, design/brand reviewer, tutor/education reviewer, parent-like reviewer, and investor-facing reviewer.
-- [x] **REVIEW22-02**: Stakeholder review checklist covers product path clarity, visual quality, multilingual quality, development residue, demo stability, contact/footer/logo trust, learning assistant language, teacher-support positioning, parent-report value, and pricing fit.
-- [x] **REVIEW22-03**: Review result states are defined as Approved, Approved with minor fixes, Needs revision, and Blocked.
-- [x] **TRIAGE22-01**: `final-bug-triage.md` defines P0, P1, P2, and P3 bug severity rules.
-- [x] **TRIAGE22-02**: Bug triage rules state P0 must be fixed, P1 should be fixed or have workaround, P2 enters known issues, and P3 enters backlog.
-- [x] **LOCK22-01**: `final-copy-lock.md` covers homepage, login, register, chat, parent dashboard/report, tutor requests, pricing, billing, contact, footer, error states, and toast messages.
-- [x] **LOCK22-02**: `final-design-lock.md` covers homepage, auth pages, chat, dashboard, parent report, tutor requests, pricing/billing, contact, footer, and logo usage.
-- [x] **LOCK22-03**: `final-translation-lock.md` covers English, German, French, and Italian for homepage, register, chat, parent report, tutor requests, pricing, billing, contact, and footer.
-- [x] **LOCK22-04**: Lock docs prohibit new feature work, large visual changes, one-language-only copy changes, reintroduced user-facing demo/mock/provider wording, and contract changes without retesting.
+- [ ] **RUN23-01**: Demo data reset, demo backend/mock mode, frontend startup, backend `/health`, language switcher, and demo accounts are checked before final run.
+- [ ] **RUN23-02**: Full final demo flow is rerun across homepage, student registration/login, chat question, Learning Assistant response, professional teacher support request, tutor workflow, parent report, pricing/billing, contact form, and admin overview.
+- [ ] **RUN23-03**: `docs/release/public-demo-final-run.md` records date, commit hash, environment, tester, browser, device, language, flow result, issues found, and Go/No-Go.
+- [ ] **SMOKE23-01**: Final multilingual smoke test covers homepage, register, chat, parent report, pricing, contact, and footer in English, German, French, and Italian.
+- [ ] **SMOKE23-02**: Final responsive smoke test covers 375px, 430px, 768px, 1024px, and 1440px for homepage, register, chat, parent report, pricing, and contact.
+- [ ] **SMOKE23-03**: Final accessibility smoke test covers tab navigation, visible focus, contact/register labels, icon-button labels, dialog focus, color contrast, and h1 sanity.
+- [ ] **SMOKE23-04**: `npm run build` passes after all release-candidate fixes.
 
-### Release Notes, Known Issues, Backlog, and Approval
+### Public Demo Release Handoff
 
-- [x] **LC22-01**: `release-notes-lc1.md` includes version name, release date, summary, main flows, supported roles, supported languages, demo backend mode, known limitations, known issues, QA status, and approval status.
-- [x] **LC22-02**: Release notes accurately present this launch candidate as a demo/backend-mode frontend product, not a production backend or payment launch.
-- [x] **ISSUE22-01**: `known-issues.md` records each accepted issue with ID, severity, page, description, workaround, owner, and decision.
-- [x] **ISSUE22-02**: Known issues rules prohibit P0 issues and require workarounds for P1 issues.
-- [x] **BACKLOG22-01**: `next-stage-backlog.md` groups deferred work into UI polish, copy improvement, translation improvement, accessibility improvement, performance improvement, backend integration future work, AWS integration future work, and product feature ideas.
-- [x] **APPROVAL22-01**: `launch-candidate-approval.md` contains the required approval checklist for build, demo flows, roles, contact form, languages, mobile, accessibility, internal wording, footer/contact/logo, stakeholder review, P0 bugs, release notes, known issues, and approval.
-- [x] **APPROVAL22-02**: Launch-candidate branch criteria require build passed, core demo flow passed, P0 bugs = 0, copy lock complete, design lock complete, translation lock complete, and API contract lock complete.
+- [ ] **HANDOFF23-01**: `docs/release/deployment-handoff.md` documents deployment target, environment variables, API mode, demo backend URL, build command, preview command, rollback instruction, contact person, and known limitations.
+- [ ] **HANDOFF23-02**: Deployment handoff recommends public demo release flags with demo accounts, demo badges, and internal debug hidden.
+- [ ] **MONITOR23-01**: `docs/release/demo-monitoring-plan.md` documents what to monitor after release, 48-hour check frequency, and pre-presentation smoke timing.
+- [ ] **PRESENT23-01**: `docs/release/first-external-presentation-support.md` documents pre-demo preparation, recommended browser/device/accounts, fallback paths, pages to avoid, and feedback collection.
+- [ ] **NOTES23-01**: `docs/release/public-demo-release-notes.md` documents release name, date, purpose, flows, roles, languages, internal demo backend note, known limitations, and contact/support info.
+- [ ] **NOTES23-02**: External-facing release notes avoid mock, demo backend, fake checkout, and Codex wording.
 
-### Final Demo Run, README, and Launch Candidate Preparation
+### Go / No-Go and Public Release
 
-- [x] **RUN22-01**: `docs/demo/final-demo-run-result.md` records date, environment, commit hash, tester, flows tested, pass/fail result, issues found, and decision.
-- [x] **RUN22-02**: Final demo run covers reset, demo backend/mock mode, frontend startup, investor flow, student flow, tutor flow, parent flow, admin flow, contact form, support ticket, footer/legal links, language switcher, and mobile homepage/register/chat.
-- [x] **RUN22-03**: `npm install` succeeds or exact environment limitation is recorded.
-- [x] **RUN22-04**: `npm run dev` starts or exact environment limitation is recorded.
-- [x] **RUN22-05**: `npm run build` succeeds.
-- [x] **README22-01**: README includes the Phase 22 final demo package and launch candidate section from the milestone brief.
-- [x] **BRANCH22-01**: Release branch preparation uses `release/launch-candidate-1` or `release/stoa-learning-platform-lc1` only after approval criteria pass.
-- [x] **BRANCH22-02**: Release branch rules state that after branch creation only bug fixes are allowed and new features go to next-stage backlog.
-- [x] **SHIP22-01**: GitHub receives a clear Phase 22 commit or documented handoff if branch/push is deferred.
+- [ ] **GONOGO23-01**: `docs/release/go-no-go-decision.md` records Go and No-Go criteria, P0/P1 status, stakeholder approval status, and final decision.
+- [ ] **README23-01**: README includes the Phase 23 launch-candidate bug fixing and public demo release section.
+- [ ] **RELEASE23-01**: Release tag or release branch plan is recorded and follows bug-fix-only release branch rules.
+- [ ] **RELEASE23-02**: Public demo release branch or deployment confirmation is recorded, or exact external blocker is documented.
+- [ ] **SIGNOFF23-01**: Stakeholder final sign-off is recorded before public demo release is marked Go.
 
 ## Future Requirements
 
 Deferred to later milestones. Tracked but not in the current roadmap.
 
-### Phase 23 Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+### Phase 24 Public Demo Feedback and Backend Handoff
 
-- **BUG23-01**: Launch candidate bug fixes are triaged and resolved without feature expansion.
-- **APPROVAL23-01**: Final stakeholder sign-off is completed after launch-candidate fixes.
-- **PUBLIC23-01**: Public demo release preparation, deployment handoff, demo monitoring plan, and first external presentation support are completed.
+- **FEEDBACK24-01**: Public demo feedback is collected, categorized, and analyzed after external demos.
+- **ITERATION24-01**: Next frontend iteration plan is prioritized from external parent, teacher, investor, and partner feedback.
+- **BACKEND24-01**: Real backend handoff package is prepared from public demo evidence and release gaps.
+- **AWS24-01**: AWS integration handoff package is prepared without implementing complex backend/cloud work in the frontend.
 
 ## Out of Scope
 
-Explicitly excluded from v1.21 to prevent scope creep.
+Explicitly excluded from v1.22 to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| New product functionality | Phase 22 packages and locks the existing product for review. |
-| Homepage redesign | Phase 19 and later polish established the current visual direction. |
-| Register flow redesign | Only blocker bug fixes are allowed; no onboarding rebuild. |
-| Multilingual system redesign | Phase 22 locks existing EN/DE/FR/IT translations and checks consistency. |
-| Demo backend rewrite | Reset and API contract should be validated, not rebuilt. |
-| Complex backend or database design | Production backend work remains backend-owned future scope. |
-| AWS deployment | Phase 22 prepares launch candidate artifacts, not infrastructure launch. |
-| Real payment processing | Payment remains hosted/backend-owned future work; demo flows stay explicit. |
-| Large UI redesign | Design lock should prevent major direction changes. |
-| Production email/CRM/support operations | Contact/support remain demo/frontend contract surfaces unless future backend work changes that. |
+| New product features | Phase 23 is release execution and bug fixing only. |
+| New pages or new languages | Public demo release should stabilize existing surfaces. |
+| Product direction changes | Direction was locked by launch-candidate preparation. |
+| Broad copy rewrite | Copy lock remains active; only blocker/approval copy changes are allowed. |
+| Broad visual redesign | Design lock remains active; only blocker/approval visual fixes are allowed. |
+| Navigation refactor | Navigation is release-locked unless a P0/P1 blocker requires a narrow fix. |
+| API contract changes | Demo API contract lock remains active unless a P0 blocker requires an exception. |
+| Complex backend/database work | Production backend architecture belongs to future backend handoff. |
+| AWS deployment implementation | Phase 23 can hand off deployment and confirm release, not build cloud infrastructure. |
+| Real payment processing | Public demo release is not paid production launch. |
+| Production support/CRM/email operations | Contact/support remain demo/API-contract surfaces unless external systems already exist. |
 
 ## Traceability
 
@@ -100,56 +88,42 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DEMO22-01 | Phase 123 | Pending |
-| DEMO22-02 | Phase 123 | Pending |
-| DEMO22-03 | Phase 123 | Pending |
-| DEMO22-04 | Phase 123 | Pending |
-| DEMO22-05 | Phase 123 | Pending |
-| DEMO22-06 | Phase 123 | Pending |
-| DEMO22-07 | Phase 123 | Pending |
-| DEMO22-08 | Phase 123 | Pending |
-| DEMO22-09 | Phase 123 | Pending |
-| DATA22-01 | Phase 124 | Pending |
-| DATA22-02 | Phase 124 | Pending |
-| DATA22-03 | Phase 124 | Pending |
-| DATA22-04 | Phase 124 | Pending |
-| DATA22-05 | Phase 124 | Pending |
-| DATA22-06 | Phase 124 | Pending |
-| DATA22-07 | Phase 124 | Pending |
-| DATA22-08 | Phase 124 | Pending |
-| API22-01 | Phase 124 | Pending |
-| API22-02 | Phase 124 | Pending |
-| REVIEW22-01 | Phase 125 | Pending |
-| REVIEW22-02 | Phase 125 | Pending |
-| REVIEW22-03 | Phase 125 | Pending |
-| TRIAGE22-01 | Phase 125 | Pending |
-| TRIAGE22-02 | Phase 125 | Pending |
-| LOCK22-01 | Phase 125 | Pending |
-| LOCK22-02 | Phase 125 | Pending |
-| LOCK22-03 | Phase 125 | Pending |
-| LOCK22-04 | Phase 125 | Pending |
-| LC22-01 | Phase 126 | Pending |
-| LC22-02 | Phase 126 | Pending |
-| ISSUE22-01 | Phase 126 | Pending |
-| ISSUE22-02 | Phase 126 | Pending |
-| BACKLOG22-01 | Phase 126 | Pending |
-| APPROVAL22-01 | Phase 126 | Pending |
-| APPROVAL22-02 | Phase 126 | Pending |
-| RUN22-01 | Phase 127 | Pending |
-| RUN22-02 | Phase 127 | Pending |
-| RUN22-03 | Phase 127 | Pending |
-| RUN22-04 | Phase 127 | Pending |
-| RUN22-05 | Phase 127 | Pending |
-| README22-01 | Phase 127 | Pending |
-| BRANCH22-01 | Phase 127 | Pending |
-| BRANCH22-02 | Phase 127 | Pending |
-| SHIP22-01 | Phase 127 | Pending |
+| APPROVAL23-01 | Phase 128 | Pending |
+| APPROVAL23-02 | Phase 128 | Pending |
+| BUG23-01 | Phase 128 | Pending |
+| BUG23-02 | Phase 128 | Pending |
+| BUG23-03 | Phase 128 | Pending |
+| BUG23-04 | Phase 128 | Pending |
+| FIX23-01 | Phase 129 | Pending |
+| FIX23-02 | Phase 129 | Pending |
+| LOCK23-01 | Phase 129 | Pending |
+| LOCK23-02 | Phase 129 | Pending |
+| LOCK23-03 | Phase 129 | Pending |
+| LOCK23-04 | Phase 129 | Pending |
+| RUN23-01 | Phase 130 | Pending |
+| RUN23-02 | Phase 130 | Pending |
+| RUN23-03 | Phase 130 | Pending |
+| SMOKE23-01 | Phase 130 | Pending |
+| SMOKE23-02 | Phase 130 | Pending |
+| SMOKE23-03 | Phase 130 | Pending |
+| SMOKE23-04 | Phase 130 | Pending |
+| HANDOFF23-01 | Phase 131 | Pending |
+| HANDOFF23-02 | Phase 131 | Pending |
+| MONITOR23-01 | Phase 131 | Pending |
+| PRESENT23-01 | Phase 131 | Pending |
+| NOTES23-01 | Phase 131 | Pending |
+| NOTES23-02 | Phase 131 | Pending |
+| GONOGO23-01 | Phase 132 | Pending |
+| README23-01 | Phase 132 | Pending |
+| RELEASE23-01 | Phase 132 | Pending |
+| RELEASE23-02 | Phase 132 | Pending |
+| SIGNOFF23-01 | Phase 132 | Pending |
 
 **Coverage:**
-- v1.21 requirements: 44 total
-- Mapped to phases: 44
+- v1.22 requirements: 30 total
+- Mapped to phases: 30
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 during v1.21 milestone initialization*
+*Last updated: 2026-05-26 during v1.22 milestone initialization*

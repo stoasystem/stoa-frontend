@@ -23,16 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Accessibility, keyboard, screen-reader, and color-contrast hardening for P0 surfaces.
 - Cross-browser, mobile, visual regression, performance sanity, release-quality gate, README, and pre-launch handoff docs.
 
-## Current Milestone: v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
+## Current Milestone: v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 
-**Goal:** Package the current STOA frontend into a stable final demo and launch-candidate preparation set for stakeholder review, investor demo, parent demo, student demo, tutor demo, admin/operations demo, release locks, final demo run, and Go/No-Go decision.
+**Goal:** Convert the Phase 22 launch candidate into a stable public demo release by fixing only necessary P0/P1 blockers, required final-approval items, and release-readiness issues.
 
 **Target features:**
-- Final demo package and scripts for investor, parent, student, tutor, admin, and internal review contexts.
-- Locked demo accounts, demo data expectations, reset validation, known limitations, and troubleshooting.
-- Stakeholder review checklist and final bug/copy/design/translation/API contract locks.
-- Launch-candidate release notes, known issues, next-stage backlog, approval checklist, and branch rules.
-- Final demo run result, README Phase 22 handoff, and launch-candidate branch preparation after approval gates pass.
+- Launch candidate bug triage, final approval change tracking, and strict P0/P1 fix policy.
+- Bug-fix-only code changes that preserve copy, design, translation, and demo API locks.
+- Full demo-flow rerun plus multilingual, responsive, accessibility, contact, backend, and build smoke checks.
+- Public demo release documents for final run evidence, deployment handoff, monitoring, first external presentation support, release notes, and Go/No-Go decision.
+- README Phase 23 handoff plus release tag, release branch, deployment confirmation, stakeholder sign-off, and public demo release readiness.
 
 ## Current State
 
@@ -94,7 +94,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 22 should package the existing STOA frontend into a stable final demo and launch-candidate preparation set, with final demo scripts, demo account/data/reset/API locks, stakeholder review, release locks, release notes, known issues, backlog, launch-candidate approval, final demo run result, README update, and release branch preparation.
+- Phase 23 should convert the launch candidate into a public demo release by triaging launch-candidate bugs, fixing P0/P1 blockers, completing required final approval changes, rerunning demo and smoke tests, preparing deployment and monitoring handoff docs, recording Go/No-Go, updating README, and confirming release branch/tag/deployment readiness without adding new product functionality.
 
 ### Out of Scope
 
@@ -121,7 +121,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Modifying `/Users/zhdeng/newweb`, copying homepage source files/assets/components, adding product features, changing backend/payment behavior, adding dependencies, or making the learning platform a direct homepage clone — outside Phase 19 brand-aligned visual refinement scope.
 - New business functionality, new languages, CMS, automatic translation systems, final legal translation, SEO article translation, backend language preference syncing, and modifying or copying from `/Users/zhdeng/newweb` — outside Phase 20 cross-locale copy and layout refinement scope.
 - Production contact email delivery, CRM integration, complex support operations, anti-spam infrastructure, formal AWS deployment, full legal-compliance finalization, modifying `/Users/zhdeng/newweb`, copying company homepage components/source structure, and large visual redesign — outside Phase 21 release-quality and brand-detail integration scope.
-- New product functionality, homepage redesign, register flow redesign, multilingual system redesign, demo backend rewrite, complex backend/database work, AWS deployment, real payment processing, large UI redesign, and production email/CRM/support operations — outside Phase 22 final demo packaging and launch-candidate preparation scope.
+- New product functionality, homepage redesign, register flow redesign, multilingual system redesign, demo backend rewrite, complex backend/database work, AWS deployment, real payment processing, large UI redesign, production email/CRM/support operations, product-direction changes, new pages/languages, broad copy/design reopening, and navigation rewrites — outside Phase 23 launch-candidate bug fixing and public demo release scope.
 
 ## Context
 
@@ -138,6 +138,8 @@ The project brief for Phase 20 was provided in Chinese and defines cross-locale 
 The project brief for Phase 21 was provided in Chinese and defines accessibility, cross-browser QA, brand detail integration, and release quality gates. Phase 21 continues the strict read-only policy for `/Users/zhdeng/newweb`, but now extracts footer/contact/logo/contact-form information and adapts it into the learning platform while improving accessibility, keyboard navigation, screen-reader support, contrast, cross-browser/mobile QA, visual regression, performance sanity, and final pre-launch documentation.
 
 The project brief for Phase 22 was provided in Chinese and defines final demo packaging, stakeholder review, and launch candidate preparation. Phase 22 explicitly does not add new product features. It packages the current STOA frontend into a stable demo/review set with fixed demo accounts, demo data/reset validation, audience-specific scripts, final copy/design/translation/API locks, release notes, known issues, next-stage backlog, launch-candidate approval, final demo run results, README handoff, and release branch rules.
+
+The project brief for Phase 23 was provided in Chinese and defines launch-candidate bug fixing, final approval, and public demo release. Phase 23 explicitly does not expand functionality, product direction, page structure, copy scope, or design direction. It takes the Phase 22 launch candidate as the baseline, fixes only P0/P1 blockers and required final-approval items, reruns full demo and final smoke checks, prepares release handoff/monitoring/presentation docs, records Go/No-Go, and confirms public demo release readiness.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -168,14 +170,15 @@ Current codebase facts:
 - v1.18 shipped Phase 19 to translate company homepage brand signals into the learning-platform visual system without modifying or copying `/Users/zhdeng/newweb`.
 - v1.19 shipped Phase 20 to refine English, German, French, and Italian product copy and layout fit with German style alignment from the read-only company homepage reference.
 - v1.20 shipped Phase 21 to integrate adapted footer/contact/logo/contact-form details, harden accessibility and keyboard/screen-reader/contrast behavior, document cross-browser/mobile/visual/performance QA, and define release-quality gates.
-- v1.21 starts Phase 22 to package the current frontend for final demo, stakeholder review, release locks, launch-candidate approval, final demo run, and branch preparation without adding new features.
+- v1.21 shipped Phase 22 to package the current frontend for final demo, stakeholder review, release locks, launch-candidate approval, final demo run, and branch preparation without adding new features.
+- v1.22 starts Phase 23 to convert the launch candidate into a public demo release through bug-fix-only changes, final approval closure, release smoke tests, handoff docs, Go/No-Go, and branch/tag/deployment confirmation.
 - During the testing stage, the backend may use Codex as a temporary AI provider behind its own provider layer. The frontend must not depend on provider-specific APIs or environment variables.
 
 ## Constraints
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 22 is final demo packaging, stakeholder review, release locking, and launch-candidate preparation. It must avoid new product features, homepage/register/multilingual/demo-backend rewrites, complex backend/database/AWS/payment work, production support operations, major visual redesign, and large architecture rewrites.
+- **Scope**: Phase 23 is launch-candidate bug fixing, final approval, and public demo release. It must avoid new features, product-direction changes, new pages/languages, broad copy/design/translation reopening, navigation rewrites, complex backend/database/AWS/payment work, production support operations, major visual redesign, and large architecture rewrites.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -203,6 +206,9 @@ Current codebase facts:
 - **Contact form boundary**: Phase 21 contact form work is frontend UI, i18n, and demo API contract only. It must not imply production email delivery, CRM integration, anti-spam guarantees, or formal support operations.
 - **Release-quality boundary**: Accessibility, browser, mobile, visual regression, and performance checks can document feasible local evidence and known gaps; formal external device-lab coverage remains a future release operation if unavailable locally.
 - **Phase 22 scope lock**: Phase 22 prepares demo/review/release artifacts only. New features, broad redesign, backend rewrites, new infrastructure, and real payment/support operations belong in later backlog unless they block the final demo or launch candidate.
+- **Phase 23 bug-fix-only rule**: Every Phase 23 code change must map to a launch-candidate bug, final approval item, or release blocker. P0 must be fixed, P1 must be fixed or accepted with a workaround, P2 is fixed only when low-risk/low-cost, and P3 goes to next-stage backlog.
+- **Phase 23 release-lock preservation**: Copy lock, design lock, translation lock, and demo API contract lock remain active. Changes may not reopen broad copy/design/translation/API scope unless required to resolve a P0/P1 release blocker.
+- **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
 - **Cross-locale layout**: Copy changes and UI layout changes must be treated together. German long words, French apostrophes, and Italian CTA length need explicit mobile and desktop layout checks.
@@ -278,6 +284,9 @@ Current codebase facts:
 | Keep Phase 22 focused on final demo packaging and launch-candidate preparation | The product surface is mature enough for formal review; the next value is repeatable demo evidence, stakeholder sign-off, release locks, and Go/No-Go clarity rather than additional features | — Pending |
 | Defer launch-candidate branch creation until approval gates pass | A release branch should represent a buildable, demo-verified candidate with P0 bugs at zero and release locks complete | — Pending |
 | Treat known issues and backlog as release tools, not hiding places | P0 issues cannot be accepted as known issues, and P1 issues need workarounds so launch readiness remains explicit | — Pending |
+| Keep Phase 23 bug-fix-only through public demo release | The launch candidate should become a trustworthy public demo by controlling change risk, not by expanding product scope | — Pending |
+| Research release blockers through existing docs and smoke evidence | Bug cleanup should start from Phase 22 locks, known issues, approval checklist, and actual demo-flow evidence before code changes | — Pending |
+| Separate internal and external release notes | Internal notes can mention demo backend/mock API support, while external-facing release communication should not expose mock/demo backend/Codex/fake checkout language | — Pending |
 
 ## Evolution
 
@@ -297,4 +306,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 for v1.21 Phase 22 planning*
+*Last updated: 2026-05-26 for v1.22 Phase 23 planning*

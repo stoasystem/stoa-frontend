@@ -1,53 +1,48 @@
-# Phase 22 Research: Stack
+# Phase 23 Research: Stack and Tooling
 
-**Milestone:** v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
+**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 **Date:** 2026-05-26
 
-## Stack Additions
+## Existing Stack
 
-No new runtime dependencies are needed.
+Phase 23 should not add stack surface. The release candidate already uses:
 
-Phase 22 is a packaging, review, lock, and launch-candidate preparation milestone. It should use the existing project stack:
+- React, TypeScript, Vite, npm.
+- React Router for route surfaces.
+- TanStack Query and Axios for API-backed flows.
+- Zustand for auth/UI state.
+- FastAPI local demo backend for repeatable demo flows.
+- Playwright for E2E and browser smoke checks.
+- Existing i18n with English, German, French, and Italian locale JSON files.
 
-- React + TypeScript + Vite for the current frontend.
-- Existing npm scripts for install, dev server, lint, build, preview, demo backend, reset, and E2E where available.
-- Existing FastAPI/SQLite demo backend support and reset scripts.
-- Existing Playwright configuration and browser QA practices.
-- Existing English, German, French, and Italian locale files.
-- Existing docs structure under `docs/`, `.planning/`, and README.
+## Recommended Stack Changes
 
-## Current Demo Infrastructure
+None.
 
-The frontend already has:
+Bug cleanup should use the existing project tooling:
 
-- Public pages, auth pages, role routes, role navigation, and app layouts.
-- Student chat, teacher-help request, parent dashboard/report, tutor request, billing/pricing, contact, support, and admin demo surfaces.
-- Demo backend API mode and stable API boundaries from prior milestones.
-- Fixed demo-account convention for `student@test.com`, `parent@test.com`, `tutor@test.com`, and `admin@test.com` with `password123`.
-- Demo reset expectations from Phase 14 and later QA work.
+- `npm run build` for TypeScript and production bundle verification.
+- `npm run lint` where bug fixes touch lint-sensitive source.
+- `npm run demo:reset` and `npm run demo:backend` for local demo data/backend checks.
+- `npm run test:e2e` when changes touch route or flow behavior covered by existing E2E smoke tests.
+- Browser/manual checks for visual, responsive, language, and accessibility smoke evidence.
 
-Phase 22 should lock and document these pieces rather than redesigning them.
+## Release Environment Notes
 
-## Tooling Scope
+Public demo release should preserve these environment expectations:
 
-Use existing commands and document their expected role:
-
-- `npm install` for dependency setup.
-- `npm run dev` for local frontend startup.
-- Demo backend startup/reset commands as already defined in `package.json` or backend docs.
-- `npm run build` for launch-candidate build validation.
-- Existing Playwright/browser smoke commands where available.
-
-If a command is unavailable or environment-limited, Phase 22 should record that limitation in final demo run results or known issues instead of adding new tooling.
+- `VITE_API_MODE=demo` or approved public-demo API mode.
+- `VITE_API_BASE_URL` points to the demo backend or approved backend endpoint.
+- `VITE_SHOW_DEMO_ACCOUNTS=false`.
+- `VITE_SHOW_DEMO_BADGES=false`.
+- `VITE_SHOW_INTERNAL_DEBUG=false`.
 
 ## What Not To Add
 
-- No new frontend dependencies.
-- No new product features.
-- No new languages.
-- No new backend architecture, database schema, ORM, AWS infrastructure, or payment system.
-- No large UI redesign.
-- No replacement of the i18n system.
-- No production email/CRM/contact operations.
-- No hidden demo-account disclosure in user-visible UI.
+- No new dependencies for release hygiene unless a P0 blocker cannot be solved without one.
+- No new test framework.
+- No new backend framework.
+- No new translation service.
+- No new UI library.
+- No new monitoring vendor integration in this milestone.
 

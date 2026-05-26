@@ -1,46 +1,36 @@
-# Phase 22 Research Summary
+# Phase 23 Research Summary
 
-**Milestone:** v1.21 Phase 22: Final Demo Packaging, Stakeholder Review, and Launch Candidate Preparation
+**Milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
 **Date:** 2026-05-26
 
-## Conclusion
+## Stack Additions
 
-Phase 22 should be a release-preparation milestone, not a feature milestone. The best path is to package the existing STOA frontend into a stable, repeatable demo and launch-candidate review set: scripts, demo accounts, demo data/reset validation, stakeholder review, release locks, known issues, backlog, approval checklist, final demo run, README update, and launch-candidate branch preparation.
+None. Phase 23 should use the existing React, TypeScript, Vite, npm, Playwright, i18n, and local demo backend tooling.
 
-## Stack
+## Table Stakes
 
-No new dependencies are needed. Use existing React/TypeScript/Vite, npm scripts, demo backend/reset support, Playwright/browser QA, i18n files, and docs structure.
+- Final approval changes are tracked in a structured document.
+- Launch-candidate bugs are classified P0/P1/P2/P3.
+- P0 is fixed; P1 is fixed or accepted with workaround.
+- Copy/design/translation/API locks remain active.
+- Full demo flow is rerun and recorded.
+- Multilingual, responsive, accessibility, backend, contact, and build smoke checks are recorded.
+- Deployment handoff, demo monitoring, first external presentation support, release notes, Go/No-Go, README, and release branch/tag/deployment readiness are prepared.
 
-## Required Deliverables
+## Watch Out For
 
-- Final demo package under `docs/demo/final-demo-package/`.
-- Audience scripts for investor, parent, student, tutor, and admin demos.
-- Demo account and demo data lock docs.
-- Demo reset, limitations, and troubleshooting docs.
-- Stakeholder review checklist.
-- Final bug triage, copy lock, design lock, translation lock, and demo API contract lock.
-- Release notes, known issues, next-stage backlog, and launch-candidate approval checklist.
-- Final demo run result.
-- README Phase 22 section.
+- Scope creep disguised as bug fixing.
+- One-language-only copy fixes.
+- Reintroduced demo/mock/Codex/fake checkout wording in user-facing UI.
+- Environment flags that expose demo accounts, badges, or debug UI.
+- Accepting a P0 as a known issue.
+- Public demo messaging that sounds like production launch.
 
-## Recommended Phase Structure
+## Recommended Phase Shape
 
-1. Final Demo Package and Audience Scripts.
-2. Demo Account, Demo Data, Reset, and API Contract Lock.
-3. Stakeholder Review and Final Copy/Design/Translation/Bug Locks.
-4. Release Notes, Known Issues, Backlog, and Approval Checklist.
-5. Final Demo Run, README, and Launch Candidate Branch Preparation.
-
-## Primary Risks
-
-- Demo data drift after reset.
-- Scripts showing unstable or placeholder pages.
-- Stakeholder review producing unclassified feedback.
-- Last-minute feature expansion.
-- Copy/design/translation/API locks not being enforced.
-- Launch candidate branch created before build/core demo checks pass.
-
-## Scope Lock
-
-Phase 22 should not add features, rewrite major pages, rewrite the multilingual system, rebuild the demo backend, add complex backend/database/AWS/payment systems, or perform large UI redesign.
+1. Final approval and bug triage intake.
+2. Blocker fixes and release-lock preservation.
+3. Final demo rerun and smoke test evidence.
+4. Public demo release handoff docs.
+5. Go/No-Go, README, release branch/tag/deployment confirmation.
 
