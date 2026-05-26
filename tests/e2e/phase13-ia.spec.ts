@@ -17,9 +17,9 @@ test('admin navigation hides advanced demo routes from primary navigation', asyn
 
   const primaryNav = page.getByRole('navigation', { name: 'Primary' })
   await expect(primaryNav.getByRole('link', { name: 'Overview' })).toBeVisible()
-  await expect(primaryNav.getByRole('link', { name: 'Learning Activity' })).toBeVisible()
-  await expect(primaryNav.getByRole('link', { name: 'Help Requests' })).toBeVisible()
-  await expect(primaryNav.getByRole('link', { name: 'Support Inbox' })).toBeVisible()
+  await expect(primaryNav.getByRole('link', { name: 'Learning activity' })).toBeVisible()
+  await expect(primaryNav.getByRole('link', { name: 'Teacher requests' })).toBeVisible()
+  await expect(primaryNav.getByRole('link', { name: 'Support inbox' })).toBeVisible()
   await expect(primaryNav.getByRole('link', { name: 'Advanced Analytics' })).toHaveCount(0)
   await expect(primaryNav.getByRole('link', { name: 'Retention' })).toHaveCount(0)
 })

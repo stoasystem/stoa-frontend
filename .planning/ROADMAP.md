@@ -76,8 +76,8 @@ Phase 21 raises STOA frontend to a release-quality gate without broad business e
 
 #### Phase 121: Cross-Browser, Mobile, Visual Regression, and Performance QA
 
-**Status:** Planned
-**Plans:** 0/1
+**Status:** Complete
+**Plans:** 1/1
 **Goal:** Establish release-oriented QA evidence for browser/device coverage, visual-regression baselines, E2E smoke, and performance sanity.
 
 **Requirements:** QA21-01 through QA21-11
@@ -177,5 +177,5 @@ Start with Phase 118. Phase 118 must complete read-only brand detail extraction 
 | 118. Brand Detail Read-Only Audit and Integration Plan | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 119. Footer, Logo, Contact Page, and Contact API Contract | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 120. Accessibility, Keyboard, Screen Reader, and Contrast Hardening | v1.20 | 1/1 | Complete | 2026-05-26 |
-| 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 0/1 | Planned | — |
+| 121. Cross-Browser, Mobile, Visual Regression, and Performance QA | v1.20 | 1/1 | Complete | 2026-05-26 |
 | 122. Release Quality Gate, README, and Handoff | v1.20 | 0/1 | Planned | — |

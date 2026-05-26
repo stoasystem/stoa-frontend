@@ -16,8 +16,11 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev -- --host 127.0.0.1',
     env: {
+      VITE_API_BASE_URL: 'http://127.0.0.1:65535',
+      VITE_ENABLE_DEMO_API: 'true',
       VITE_ENABLE_MOCK_CHECKOUT: 'true',
       VITE_ENABLE_PAYMENT: 'false',
+      VITE_SHOW_DEMO_SURFACES: 'true',
     },
     url: 'http://127.0.0.1:5173',
     reuseExistingServer: false,

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.20
 milestone_name: "Phase 21: Accessibility, Cross-Browser QA, Brand Detail Integration, and Release Quality Gate"
 status: planning
-last_updated: "2026-05-26T01:06:11.000Z"
+last_updated: "2026-05-26T01:13:10.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26)
 
 ## Current Position
 
-Phase: 121. Cross-Browser, Mobile, Visual Regression, and Performance QA
+Phase: 122. Release Quality Gate, README, and Handoff
 Plan: —
 Status: Ready to plan
-Last activity: 2026-05-26 — Phase 120 completed targeted accessibility, keyboard, screen-reader, and contrast hardening.
+Last activity: 2026-05-26 — Phase 121 completed install/dev/build/E2E verification and QA documentation.
 
 ## Performance Metrics
 
@@ -206,10 +206,11 @@ Recent decisions affecting current work:
 - Phase 118 documented homepage footer/contact/logo/contact-form details from `/Users/zhdeng/newweb` in read-only mode and confirmed only the pre-existing `.DS_Store` source status remains.
 - Phase 119 integrated localized footer contact details, token-based STOA logo, `/contact`, accessible contact form, contact API client/hook, and local backend `/contact/requests` contract.
 - Phase 120 added focus-visible coverage, role-selection state, login/register/support/chat alert wiring, chat textarea labels, chat log semantics, and accessibility documentation.
+- Phase 121 configured deterministic Playwright demo QA mode, refreshed stale E2E assertions, verified 12/12 E2E passing, and documented cross-browser, mobile, visual-regression, and performance QA.
 
 ### Pending Todos
 
-- Phase 21 next: start Phase 121 cross-browser, mobile, visual regression, and performance QA.
+- Phase 21 next: start Phase 122 release quality gate, README, and handoff.
 
 ### Quick Tasks Completed
 
