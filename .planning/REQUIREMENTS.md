@@ -103,11 +103,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CURR30-03 | Phase 159 | Complete |
 | CURR30-04 | Phase 159 | Complete |
 | CURR30-05 | Phase 159 | Complete |
-| STORY30-01 | Phase 160 | Pending |
-| STORY30-02 | Phase 160 | Pending |
-| STORY30-03 | Phase 160 | Pending |
-| STORY30-04 | Phase 160 | Pending |
-| STORY30-05 | Phase 160 | Pending |
+| STORY30-01 | Phase 160 | Complete |
+| STORY30-02 | Phase 160 | Complete |
+| STORY30-03 | Phase 160 | Complete |
+| STORY30-04 | Phase 160 | Complete |
+| STORY30-05 | Phase 160 | Complete |
 | TEST30-01 | Phase 161 | Pending |
 | TEST30-02 | Phase 161 | Pending |
 | TEST30-03 | Phase 161 | Pending |
