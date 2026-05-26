@@ -21,6 +21,7 @@ export function StudentDashboardPage() {
     <DashboardLayout>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
+          eyebrow="Learning space"
           title="Student Dashboard"
           description="Track learning progress, recent questions, weak topics, and teacher feedback."
         />

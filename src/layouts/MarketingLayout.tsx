@@ -9,29 +9,29 @@ export function MarketingHeader() {
   const { t } = useTranslation('common')
 
   return (
-    <header className="sticky top-0 z-30 border-b bg-background/88 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b bg-card/88 backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-6">
-        <Link to="/" className="min-w-0 font-semibold tracking-tight">
+        <Link to="/" className="min-w-0 font-semibold">
           <AppLogo />
         </Link>
         <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
-          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/how-it-works">
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/how-it-works">
             {t('navigation.howItWorks')}
           </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/for-parents">
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/for-parents">
             {t('navigation.parents')}
           </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/teacher-support">
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/teacher-support">
             {t('navigation.tutors')}
           </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/pricing">
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/pricing">
             {t('navigation.pricing')}
           </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-foreground" to="/login">
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/login">
             {t('navigation.login')}
           </Link>
           <LanguageSwitcher compact />
-          <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-full px-4 py-2 whitespace-normal text-center">
+          <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-md px-4 py-2 whitespace-normal text-center">
             <Link to="/login?next=/chat">{t('navigation.startLearning')}</Link>
           </Button>
         </nav>
@@ -44,7 +44,7 @@ export function MarketingFooter() {
   const { t } = useTranslation('common')
 
   return (
-    <footer className="border-t bg-background/88">
+    <footer className="border-t bg-card/88">
       <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-7 text-sm text-muted-foreground">
         <span>{t('brand.platform')}</span>
         <div className="flex min-w-0 flex-wrap gap-4">

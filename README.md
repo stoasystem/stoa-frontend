@@ -181,7 +181,7 @@ Main Phase 15 updates:
 
 - magazine-style homepage with one primary `Start Learning` CTA
 - homepage learning flow replacing the old technology / teacher / parent parallel-card presentation
-- premium UI direction using deep navy, warm ivory, muted sage, and soft gold accents
+- premium UI direction using derived STOA burgundy, warm paper, charcoal, and restrained warm accents
 - role-based registration for Student, Parent, and Tutor
 - student onboarding with school, grade, subjects, and parent link fields
 - parent onboarding with child profile fields
@@ -1043,6 +1043,37 @@ Phase 11 documents:
 - `docs/analytics/operational-dashboard.md`
 - `docs/qa/phase11-manual-qa-checklist.md`
 
+## Phase 19 Brand-Aligned Visual Refinement
+
+This phase aligns the STOA learning platform visually with the company homepage without copying it.
+
+Source project:
+
+```text
+/Users/zhdeng/newweb
+```
+
+Important rule: do not modify anything inside `/Users/zhdeng/newweb`. The homepage project is read-only for this phase.
+
+Main goals:
+
+- Read and understand the company homepage design language.
+- Extract colors, typography, spacing, component style, image style, and visual tone.
+- Translate the design language into learning-platform design rules.
+- Keep the learning platform visually aligned but independent.
+- Adjust design tokens and component styles in the learning platform only.
+
+Implemented Phase 19 artifacts:
+
+- `docs/design/main-website-readonly-audit.md`
+- `docs/design/main-website-design-translation.md`
+- `docs/design/learning-platform-token-adjustment.md`
+- `docs/design/visual-compatibility-qa.md`
+- `src/styles/brand-tokens.css`
+- `src/styles/platform-theme.css`
+
+This phase does not add new product features, new routes, new languages, backend behavior, payment behavior, or copied homepage source.
+
 ## Project Status
 
-Phase 11: frontend-only paid launch, growth funnel, referral, tutor availability, support ticket, admin analytics, UTM tracking, and demo API readiness.
+Phase 19: brand-aligned learning-platform visual refinement based on read-only company homepage design translation, with derived tokens, refined shared primitives, public/auth/app visual alignment, and visual QA evidence.

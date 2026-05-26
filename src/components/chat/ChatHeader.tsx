@@ -12,9 +12,9 @@ export function ChatHeader({ conversation, onCreateConversation }: ChatHeaderPro
   const { t } = useTranslation('chat')
 
   return (
-    <header className="flex min-h-16 items-center justify-between border-b bg-background/95 px-4 py-3 md:px-6">
+    <header className="chat-panel flex min-h-16 items-center justify-between border-b px-4 py-3 md:px-6">
       <div className="min-w-0">
-        <h1 className="truncate text-base font-semibold tracking-tight">
+        <h1 className="truncate text-base font-semibold">
           {conversation?.title ?? t('newConversation')}
         </h1>
         <p className="mt-1 truncate text-sm text-muted-foreground">

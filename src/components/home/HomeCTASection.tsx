@@ -19,17 +19,17 @@ export function HomeCTASection() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-6">
-      <div className="rounded-[1.25rem] bg-[#152238] p-7 text-primary-foreground md:p-10">
+      <div className="rounded-lg bg-[hsl(var(--stoa-brand-charcoal))] p-7 text-primary-foreground md:p-10">
         <div className="grid gap-7 md:grid-cols-[1fr_auto] md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#c2a15a]">
+            <p className="brand-section-kicker text-[hsl(var(--stoa-brand-warm-grey))]">
               {t('home:cta.eyebrow')}
             </p>
             <h2 className="editorial-heading mt-3 max-w-2xl text-4xl font-semibold leading-tight md:text-5xl">
               {t('home:cta.title')}
             </h2>
           </div>
-          <Button asChild variant="secondary" size="lg" className="premium-button-lift premium-light-button h-12 rounded-full bg-[#f7f3ec] px-7 hover:bg-white">
+          <Button asChild variant="secondary" size="lg" className="premium-button-lift premium-light-button h-12 bg-[hsl(var(--stoa-brand-paper))] px-7 hover:bg-[hsl(var(--stoa-brand-card))]">
             <Link to={getHref(isAuthenticated ? user?.role : null)}>
               {t('common:actions.startLearning')}
               <ArrowRight className="h-4 w-4" />

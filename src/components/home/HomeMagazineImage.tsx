@@ -5,32 +5,32 @@ export function HomeMagazineImage() {
   const { t } = useTranslation('home')
 
   return (
-    <div className="premium-reveal-delay relative min-w-0 min-h-[32rem] overflow-hidden rounded-[1.5rem] border border-border/70 bg-[#192433] shadow-[0_30px_90px_hsl(217_45%_15%_/_0.18)]">
+    <div className="premium-reveal-delay brand-image-panel relative min-w-0 min-h-[32rem] overflow-hidden rounded-[1.5rem] border border-border/70">
       <img
         src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80"
         alt="Quiet study table with open books in a library"
         className="absolute inset-0 h-full w-full object-cover opacity-72"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(217_45%_15%_/_0.88),hsl(217_45%_15%_/_0.2)_50%,hsl(40_39%_49%_/_0.45))]" />
-      <div className="absolute left-5 top-5 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-xs font-medium uppercase tracking-[0.16em] text-white/86 backdrop-blur">
+      <div className="brand-image-overlay absolute inset-0" />
+      <div className="absolute left-5 top-5 rounded-full border border-white/20 bg-white/12 px-4 py-2 text-xs font-semibold uppercase text-white/86 backdrop-blur">
         {t('hero.imageBadge')}
       </div>
       <div className="absolute bottom-5 left-5 right-5 grid gap-4 md:grid-cols-[1fr_0.78fr] md:items-end">
-        <div className="rounded-xl border border-white/18 bg-white/88 p-4 text-[#152238] shadow-2xl backdrop-blur">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#7e8f7c]">
+        <div className="rounded-lg border border-white/18 bg-white/88 p-4 text-[hsl(var(--stoa-brand-ink))] shadow-2xl backdrop-blur">
+          <div className="brand-section-kicker flex items-center gap-2">
             <Sparkles className="h-4 w-4" />
             {t('hero.imageLabel')}
           </div>
           <p className="mt-3 text-lg font-semibold leading-6">
             {t('hero.imageTitle')}
           </p>
-          <div className="mt-4 rounded-lg bg-[#f7f3ec] p-3 text-sm leading-6 text-[#445066]">
+          <div className="mt-4 rounded-md bg-[hsl(var(--stoa-brand-paper))] p-3 text-sm leading-6 text-muted-foreground">
             {t('hero.imagePrompt')}
           </div>
         </div>
-        <div className="rounded-xl border border-white/16 bg-[#152238]/88 p-4 text-white shadow-2xl backdrop-blur">
+        <div className="brand-ink-card rounded-lg border border-white/16 p-4 text-white shadow-2xl backdrop-blur">
           <div className="flex items-center gap-2 text-sm font-medium">
-            <MessageCircle className="h-4 w-4 text-[#c2a15a]" />
+            <MessageCircle className="h-4 w-4 text-[hsl(38_42%_72%)]" />
             {t('teacher.eyebrow')}
           </div>
           <p className="mt-2 text-sm leading-6 text-white/75">

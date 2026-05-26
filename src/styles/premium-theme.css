@@ -59,11 +59,11 @@ body {
 }
 
 .premium-light-button {
-  color: #152238 !important;
+  color: hsl(var(--stoa-brand-ink)) !important;
 }
 
 .premium-light-button:hover {
-  color: #152238 !important;
+  color: hsl(var(--stoa-brand-ink)) !important;
 }
 
 .editorial-heading {

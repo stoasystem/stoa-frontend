@@ -9,7 +9,7 @@ export function StudentLearningHistoryPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Learning History</h1>
+          <h1 className="text-2xl font-semibold">Learning History</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Review the learning summaries saved for your account.
           </p>

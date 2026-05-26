@@ -1,8 +1,8 @@
 {
   "title": "Learning space",
-  "emptyTitle": "Ask your first homework question.",
-  "emptyDescription": "The Learning Assistant will prepare a clear explanation. If you need more guidance, ask a teacher in the same conversation.",
-  "welcome": "Welcome to STOA. Ask your first homework question below.",
+  "emptyTitle": "Start your first learning conversation.",
+  "emptyDescription": "Ask a question, describe where you are stuck, or upload a worksheet to begin.",
+  "welcome": "Welcome to STOA. Start by asking a question or describing where you are stuck.",
   "placeholder": "Type your homework question here...",
   "preparing": "The Learning Assistant is preparing an explanation...",
   "loadFailed": "Failed to load conversations.",

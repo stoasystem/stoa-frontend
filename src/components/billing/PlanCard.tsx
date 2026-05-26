@@ -20,7 +20,7 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
     : plan.features
 
   return (
-    <Card className={featured ? 'min-w-0 border-primary shadow-sm' : 'min-w-0'}>
+    <Card className={featured ? 'brand-rule min-w-0 border-primary/45 shadow-[var(--platform-shadow-soft)]' : 'min-w-0'}>
       <CardHeader>
         <div className="flex min-w-0 items-start justify-between gap-3">
           <CardTitle className="min-w-0 break-words text-xl leading-7">
@@ -28,7 +28,7 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
           </CardTitle>
           {plan.recommended && <RecommendedPlanBadge />}
         </div>
-        <p className="text-3xl font-semibold text-foreground">{price}</p>
+        <p className="text-3xl font-semibold text-[hsl(var(--stoa-brand-burgundy))]">{price}</p>
         <p className="text-sm leading-6 text-muted-foreground">
           {t(`plans.${plan.id}.audience`, { defaultValue: plan.audience })}
         </p>

@@ -1,8 +1,8 @@
 {
   "title": "Espace d’apprentissage",
-  "emptyTitle": "Pose ta première question sur tes devoirs.",
-  "emptyDescription": "L’Assistant d’apprentissage prépare une explication claire. Si tu as besoin de plus d’accompagnement, demande à un enseignant dans la même conversation.",
-  "welcome": "Bienvenue sur STOA. Pose ta première question sur tes devoirs ci-dessous.",
+  "emptyTitle": "Commence ta première conversation d’apprentissage.",
+  "emptyDescription": "Pose une question, explique où tu bloques ou téléverse une fiche pour commencer.",
+  "welcome": "Bienvenue sur STOA. Commence par poser une question ou expliquer où tu bloques.",
   "placeholder": "Écris ici ta question sur tes devoirs...",
   "preparing": "L’Assistant d’apprentissage prépare une explication...",
   "loadFailed": "Impossible de charger les conversations.",

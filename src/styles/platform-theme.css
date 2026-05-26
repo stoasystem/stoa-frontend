@@ -1,0 +1,106 @@
+body {
+  background:
+    linear-gradient(180deg, hsl(38 28% 95%) 0%, hsl(42 35% 98%) 42%, hsl(38 22% 94%) 100%);
+}
+
+.premium-shell {
+  background:
+    radial-gradient(circle at 16% 10%, hsl(var(--stoa-brand-burgundy) / 0.1), transparent 22rem),
+    linear-gradient(180deg, hsl(38 28% 95%) 0%, hsl(42 35% 98%) 46%, hsl(38 24% 94%) 100%);
+}
+
+.platform-app-shell {
+  background:
+    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(38 20% 94%) 100%);
+}
+
+.editorial-heading {
+  font-family: "Prata", Georgia, Cambria, "Times New Roman", ui-serif, serif;
+}
+
+.editorial-title-shell::before {
+  background: hsl(var(--stoa-brand-burgundy));
+  border-radius: 0;
+}
+
+.editorial-accent {
+  color: hsl(var(--stoa-brand-burgundy));
+}
+
+.editorial-accent::after {
+  background: hsl(var(--stoa-brand-highlight));
+  border-radius: 0;
+}
+
+.premium-button-lift:hover {
+  box-shadow: 0 14px 34px hsl(var(--stoa-brand-charcoal) / 0.12);
+}
+
+.premium-primary-button {
+  background: hsl(var(--stoa-brand-burgundy)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.premium-primary-button:hover {
+  background: hsl(var(--stoa-brand-charcoal)) !important;
+}
+
+.premium-light-button {
+  color: hsl(var(--stoa-brand-ink)) !important;
+}
+
+.brand-section-kicker {
+  color: hsl(var(--stoa-brand-burgundy));
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.stoa-card {
+  border-color: hsl(var(--platform-border-soft) / 0.82);
+  background:
+    linear-gradient(180deg, hsl(var(--platform-surface-card) / 0.96), hsl(var(--platform-surface-card) / 0.88));
+  box-shadow: var(--platform-shadow-card);
+}
+
+.stoa-card-quiet {
+  box-shadow: none;
+}
+
+.report-surface {
+  background:
+    linear-gradient(135deg, hsl(var(--stoa-brand-card)) 0%, hsl(var(--stoa-brand-burgundy-soft)) 100%);
+}
+
+.chat-workspace {
+  background:
+    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(38 20% 93%) 100%);
+}
+
+.chat-panel {
+  background: hsl(var(--platform-surface-card) / 0.94);
+}
+
+.brand-rule {
+  border-top: 3px solid hsl(var(--stoa-brand-burgundy));
+}
+
+.brand-image-panel {
+  background: hsl(var(--stoa-brand-charcoal));
+  box-shadow: 0 24px 70px hsl(var(--stoa-brand-charcoal) / 0.12);
+}
+
+.brand-image-overlay {
+  background:
+    linear-gradient(135deg, hsl(var(--stoa-brand-charcoal) / 0.84), hsl(var(--stoa-brand-burgundy) / 0.2) 54%, hsl(38 42% 72% / 0.36));
+}
+
+.brand-image-overlay-vertical {
+  background:
+    linear-gradient(180deg, hsl(var(--stoa-brand-charcoal) / 0.12), hsl(var(--stoa-brand-charcoal) / 0.82));
+}
+
+.brand-ink-card {
+  background: hsl(var(--stoa-brand-charcoal) / 0.88);
+}

@@ -67,7 +67,7 @@ export function ChatInput({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="border-t bg-background px-4 py-4 md:px-6">
+    <form onSubmit={handleSubmit} className="chat-panel border-t px-4 py-4 md:px-6">
       <div className="mx-auto max-w-3xl space-y-3">
         {attachments.length > 0 && (
           <div className="grid gap-2 sm:grid-cols-2">
@@ -105,7 +105,7 @@ export function ChatInput({
             value={value}
             onChange={(event) => setValue(event.target.value)}
             placeholder={t('chat:placeholder')}
-            className="min-h-12 resize-none"
+            className="min-h-12 resize-none bg-card"
             disabled={disabled || isStreaming || chatLocked}
           />
           {isStreaming && onStopStreaming ? (

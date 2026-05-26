@@ -7,9 +7,9 @@ export function RegisterPage() {
 
   return (
     <AuthLayout>
-      <section className="rounded-xl border border-border/70 bg-card/90 p-6 shadow-xl md:p-8">
+      <section className="brand-rule rounded-lg border border-border/70 bg-card/90 p-6 shadow-[var(--platform-shadow-soft)] md:p-8">
         <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[hsl(var(--accent))]">
+          <p className="brand-section-kicker">
             {t('register.eyebrow')}
           </p>
           <h1 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground md:text-5xl">

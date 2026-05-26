@@ -34,20 +34,20 @@ export function ParentHero() {
           </Button>
         </div>
       </div>
-      <div className="relative min-h-[27rem] overflow-hidden rounded-xl border border-border/70 bg-[#152238] shadow-[0_24px_70px_hsl(217_45%_15%_/_0.12)]">
+      <div className="brand-image-panel relative min-h-[27rem] overflow-hidden shadow-[0_24px_70px_hsl(var(--stoa-shadow-color)_/_0.12)]">
         <img
           src="https://images.pexels.com/photos/10109025/pexels-photo-10109025.jpeg?auto=compress&cs=tinysrgb&w=1200"
           alt="Smiling child writing homework at a study desk"
           className="absolute inset-0 h-full w-full object-cover opacity-72"
         />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,hsl(217_45%_15%_/_0.1),hsl(217_45%_15%_/_0.82))]" />
-        <div className="absolute bottom-5 left-5 right-5 rounded-xl border border-white/15 bg-white/90 p-4 text-[#152238] shadow-2xl backdrop-blur">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e8f7c]">
+        <div className="brand-image-overlay-vertical absolute inset-0" />
+        <div className="absolute bottom-5 left-5 right-5 rounded-lg border border-white/15 bg-[hsl(var(--stoa-brand-card)_/_0.92)] p-4 text-[hsl(var(--stoa-brand-ink))] shadow-2xl backdrop-blur">
+          <p className="brand-section-kicker text-[hsl(var(--stoa-brand-burgundy))]">
             Growth this week
           </p>
           <div className="mt-3 space-y-2">
             {['Completed 3 focused practice sessions', 'Confidence improving in fractions', 'Next step ready for tomorrow'].map((item) => (
-              <div key={item} className="rounded-md border border-[#ddd6cc] bg-[#f7f3ec] px-3 py-2 text-sm font-medium">
+              <div key={item} className="rounded-md border border-border/70 bg-[hsl(var(--stoa-brand-paper))] px-3 py-2 text-sm font-semibold">
                 {item}
               </div>
             ))}

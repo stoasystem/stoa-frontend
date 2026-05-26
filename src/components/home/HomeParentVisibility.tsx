@@ -12,9 +12,9 @@ export function HomeParentVisibility() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6">
-      <div className="grid gap-8 rounded-[1.25rem] border border-border/70 bg-[#efeae2] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
+      <div className="grid gap-8 rounded-lg border border-border/70 bg-[hsl(var(--stoa-brand-warm-grey))] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[#7e8f7c]">
+          <p className="brand-section-kicker text-[hsl(var(--stoa-brand-burgundy))]">
             {t('parents.eyebrow')}
           </p>
           <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
@@ -23,7 +23,7 @@ export function HomeParentVisibility() {
           <p className="mt-4 text-base leading-8 text-muted-foreground">
             {t('parents.body')}
           </p>
-          <div className="mt-6 overflow-hidden rounded-xl border border-border/70 bg-card shadow-sm">
+          <div className="mt-6 overflow-hidden rounded-lg border border-border/70 bg-card shadow-sm">
             <img
               src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
               alt="Family learning together on a laptop at home"

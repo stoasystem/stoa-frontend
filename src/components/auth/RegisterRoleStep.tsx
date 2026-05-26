@@ -49,7 +49,7 @@ export function RegisterRoleStep({
             key={option.role}
             type="button"
             className={cn(
-              'rounded-xl border bg-card/86 p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:shadow-lg',
+              'rounded-lg border bg-card/86 p-5 text-left transition duration-200 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg',
               selected ? 'border-primary shadow-lg' : 'border-border/70',
             )}
             onClick={() => onSelectRole(option.role)}

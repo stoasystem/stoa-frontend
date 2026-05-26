@@ -66,7 +66,7 @@ export function ChildReportPage() {
         {reportQuery.isLoading && <PageSkeleton rows={4} />}
         {reportQuery.isError && <p className="text-sm text-destructive">{t('loadReportFailed')}</p>}
         {report && (
-          <div className="space-y-6">
+          <div className="report-surface space-y-6 rounded-lg border border-border/70 p-4 shadow-[var(--platform-shadow-soft)] sm:p-6">
             <ParentReportSummaryCard report={report} />
             <ParentReportStats stats={report.stats} />
             <ParentReportSubjects subjects={report.topSubjects} weakTopics={report.weakTopics} />

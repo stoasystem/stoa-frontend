@@ -15,10 +15,10 @@ export function ConversationSidebar({
   onCreateConversation?: () => void
 }) {
   return (
-    <aside className="hidden h-screen w-80 shrink-0 border-r bg-background/95 p-4 md:block">
+    <aside className="chat-panel hidden h-screen w-80 shrink-0 border-r p-4 md:block">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="font-semibold tracking-tight">STOA Chat</div>
+          <div className="font-semibold">STOA Chat</div>
           <div className="text-xs text-muted-foreground">Student learning conversations</div>
         </div>
         <Button

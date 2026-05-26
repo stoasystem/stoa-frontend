@@ -1,8 +1,8 @@
 {
   "title": "Chat di studio",
-  "emptyTitle": "Fai la tua prima domanda sui compiti.",
-  "emptyDescription": "L’Assistente all’apprendimento prepara una spiegazione chiara. Se serve più guida, chiedi a un insegnante nella stessa conversazione.",
-  "welcome": "Benvenuto in STOA. Fai qui sotto la tua prima domanda sui compiti.",
+  "emptyTitle": "Inizia la tua prima conversazione di studio.",
+  "emptyDescription": "Fai una domanda, spiega dove hai difficoltà o carica una scheda per iniziare.",
+  "welcome": "Benvenuto in STOA. Inizia facendo una domanda o spiegando dove hai difficoltà.",
   "placeholder": "Scrivi qui la tua domanda sui compiti...",
   "preparing": "L’Assistente all’apprendimento sta preparando una spiegazione...",
   "loadFailed": "Impossibile caricare le conversazioni.",

@@ -9,14 +9,14 @@ export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
   return (
     <div
       className={cn(
-        'flex overflow-hidden bg-background text-foreground',
+        'chat-workspace flex overflow-hidden text-foreground',
         compact ? 'h-full min-h-0' : 'h-screen',
       )}
       role="status"
       aria-label="Loading chat"
     >
       {!compact && (
-        <aside className="hidden w-80 shrink-0 border-r bg-card p-4 md:block">
+        <aside className="chat-panel hidden w-80 shrink-0 border-r p-4 md:block">
           <div className="mb-5 flex items-center justify-between gap-3">
             <Skeleton className="h-6 w-28" />
             <Skeleton className="h-9 w-9 rounded-md" />
@@ -33,7 +33,7 @@ export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
         </aside>
       )}
       <main className="flex min-w-0 flex-1 flex-col">
-        <div className="border-b bg-card px-4 py-4 md:px-6">
+        <div className="chat-panel border-b px-4 py-4 md:px-6">
           <Skeleton className="h-6 w-48" />
           <Skeleton className="mt-2 h-4 w-32" />
         </div>
@@ -44,7 +44,7 @@ export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
             </div>
           ))}
         </div>
-        <div className="border-t bg-card px-4 py-4 md:px-6">
+        <div className="chat-panel border-t px-4 py-4 md:px-6">
           <Skeleton className="mx-auto h-24 max-w-3xl rounded-lg" />
         </div>
       </main>

@@ -62,8 +62,8 @@ export function ChatMessageBubble({
           isStudent
             ? 'bg-primary text-primary-foreground'
             : message.role === 'teacher'
-              ? 'border border-emerald-200 bg-emerald-50 text-emerald-950'
-              : 'border bg-card text-card-foreground',
+              ? 'border border-primary/20 bg-[hsl(var(--stoa-brand-burgundy-soft))] text-[hsl(var(--stoa-brand-burgundy-strong))]'
+              : 'border border-border/80 bg-card/95 text-card-foreground',
           message.status === 'failed' && 'border-destructive/50',
         )}
       >
@@ -71,7 +71,7 @@ export function ChatMessageBubble({
           <div
             className={cn(
               'mb-1 text-[11px] font-medium',
-              message.role === 'teacher' ? 'text-emerald-700' : 'text-muted-foreground',
+              message.role === 'teacher' ? 'text-[hsl(var(--stoa-brand-burgundy))]' : 'text-muted-foreground',
             )}
           >
             {roleLabel}

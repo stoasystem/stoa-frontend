@@ -64,7 +64,7 @@ export function BillingPage() {
             status={subscription.status}
             currentPeriodEnd={subscription.currentPeriodEnd}
           />
-          <Card>
+          <Card className="brand-rule">
             <CardHeader>
               <CardTitle className="text-base">{t('billing:checkoutMode')}</CardTitle>
             </CardHeader>
@@ -100,7 +100,7 @@ export function BillingPage() {
                 <CardTitle className="text-base">{t('billing:usage')}</CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                Usage details are not available yet. Learning activity will appear here once the account is active.
+                Billing details are not available yet. Learning activity will appear here once the account is active.
               </CardContent>
             </Card>
           )}

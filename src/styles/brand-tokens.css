@@ -1,0 +1,42 @@
+:root {
+  --stoa-brand-burgundy: 352 59% 35%;
+  --stoa-brand-burgundy-strong: 351 59% 23%;
+  --stoa-brand-burgundy-soft: 349 42% 91%;
+  --stoa-brand-charcoal: 24 9% 13%;
+  --stoa-brand-ink: 20 12% 8%;
+  --stoa-brand-warm-grey: 36 35% 90%;
+  --stoa-brand-paper: 36 36% 95%;
+  --stoa-brand-card: 36 45% 98%;
+  --stoa-brand-muted-text: 24 8% 39%;
+  --stoa-brand-border: 29 21% 81%;
+  --stoa-brand-highlight: 352 59% 35% / 0.12;
+
+  --background: var(--stoa-brand-paper);
+  --foreground: var(--stoa-brand-ink);
+  --card: var(--stoa-brand-card);
+  --card-foreground: var(--stoa-brand-ink);
+  --popover: var(--stoa-brand-card);
+  --popover-foreground: var(--stoa-brand-ink);
+  --primary: var(--stoa-brand-burgundy);
+  --primary-foreground: 38 33% 96%;
+  --secondary: var(--stoa-brand-warm-grey);
+  --secondary-foreground: var(--stoa-brand-ink);
+  --muted: var(--stoa-brand-warm-grey);
+  --muted-foreground: var(--stoa-brand-muted-text);
+  --accent: var(--stoa-brand-burgundy);
+  --accent-foreground: 38 33% 96%;
+  --destructive: 358 65% 39%;
+  --destructive-foreground: 38 33% 96%;
+  --border: var(--stoa-brand-border);
+  --input: var(--stoa-brand-border);
+  --ring: var(--stoa-brand-burgundy);
+  --radius: 0.5rem;
+
+  --platform-surface-page: var(--stoa-brand-paper);
+  --platform-surface-app: 36 45% 97%;
+  --platform-surface-card: var(--stoa-brand-card);
+  --platform-surface-strong: var(--stoa-brand-charcoal);
+  --platform-border-soft: var(--stoa-brand-border);
+  --platform-shadow-soft: 0 18px 55px hsl(var(--stoa-brand-charcoal) / 0.08);
+  --platform-shadow-card: 0 10px 28px hsl(var(--stoa-brand-charcoal) / 0.055);
+}

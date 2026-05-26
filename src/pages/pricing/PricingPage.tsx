@@ -41,15 +41,15 @@ export function PricingPage() {
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="overflow-hidden">
-            <div className="relative h-56 bg-[#152238]">
+            <div className="brand-image-panel relative h-56">
               <img
                 src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
                 alt="Family reviewing online learning together at home"
                 className="absolute inset-0 h-full w-full object-cover opacity-76"
               />
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,hsl(217_45%_15%_/_0.72),transparent_58%)]" />
-              <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/15 bg-white/90 p-4 text-[#152238] backdrop-blur">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b08a4a]">
+              <div className="brand-image-overlay absolute inset-0" />
+              <div className="absolute bottom-4 left-4 right-4 rounded-lg border border-white/15 bg-white/90 p-4 text-[hsl(var(--stoa-brand-ink))] backdrop-blur">
+                <p className="brand-section-kicker">
                   {t('supportLevel')}
                 </p>
                 <p className="mt-2 text-sm leading-6">

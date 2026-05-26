@@ -26,7 +26,7 @@ export function ChatMessageList({
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
         {messages.length === 0 ? (
           <div className="flex min-h-64 items-center justify-center">
-            <EmptyState message={`${t('emptyTitle')} ${t('emptyDescription')}`} />
+            <EmptyState title={t('emptyTitle')} description={t('emptyDescription')} />
           </div>
         ) : (
           messages.map((message) => (

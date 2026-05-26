@@ -163,7 +163,7 @@ export function ChatPage() {
 
   if (conversationsQuery.isError) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background text-foreground">
+      <div className="chat-workspace flex h-screen items-center justify-center text-foreground">
         <ErrorState message={t('loadFailed')} />
       </div>
     )
@@ -171,8 +171,8 @@ export function ChatPage() {
 
   if (conversations.length === 0) {
     return (
-      <div className="flex h-screen items-center justify-center bg-background px-4 text-foreground">
-        <div className="w-full max-w-xl rounded-lg border bg-card p-5 shadow-sm">
+      <div className="chat-workspace flex h-screen items-center justify-center px-4 text-foreground">
+        <div className="brand-rule w-full max-w-xl rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
           <EmptyState message={t('welcome')} />
           <form
             className="mt-5 space-y-3"
@@ -208,7 +208,7 @@ export function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background text-foreground">
+    <div className="chat-workspace flex h-screen overflow-hidden text-foreground">
       <ConversationSidebar
         conversations={conversations}
         activeConversationId={activeConversationId ?? ''}

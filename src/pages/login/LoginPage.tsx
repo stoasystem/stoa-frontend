@@ -7,7 +7,7 @@ export function LoginPage() {
 
   return (
     <AuthLayout>
-      <section className="mx-auto max-w-md rounded-xl border border-border/70 bg-card/90 p-6 shadow-xl">
+      <section className="brand-rule mx-auto max-w-md rounded-lg border border-border/70 bg-card/90 p-6 shadow-[var(--platform-shadow-soft)]">
         <h1 className="editorial-heading editorial-title-shell text-4xl font-semibold leading-tight">
           {t('login.title')}
         </h1>

@@ -4,11 +4,11 @@ import type { ParentWeeklyReport } from '@/types/parentReport'
 
 export function ParentReportSummaryCard({ report }: { report: ParentWeeklyReport }) {
   return (
-    <Card>
+    <Card className="border-primary/15 bg-card/90">
       <CardHeader>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <CardTitle className="text-xl">{report.student.name}</CardTitle>
+            <CardTitle className="editorial-heading text-2xl">{report.student.name}</CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">{report.student.grade}</p>
           </div>
           <Badge variant="secondary">{report.period.label}</Badge>

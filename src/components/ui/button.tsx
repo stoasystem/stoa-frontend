@@ -4,15 +4,15 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
 
 const buttonVariants = cva(
-  'inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'bg-primary !text-[#f7f3ec] shadow-sm hover:bg-primary/90 hover:!text-white',
+        default: 'bg-primary text-primary-foreground shadow-sm hover:bg-[hsl(var(--stoa-brand-charcoal))] hover:text-primary-foreground',
         destructive: 'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90',
-        outline: 'border bg-background hover:bg-secondary hover:text-secondary-foreground',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-secondary hover:text-secondary-foreground',
+        outline: 'border border-border/90 bg-card/60 text-foreground hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))]',
+        ghost: 'hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

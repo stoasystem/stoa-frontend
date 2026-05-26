@@ -11,7 +11,7 @@ export function ChildLearningHistoryPage() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Child Learning History</h1>
+          <h1 className="text-2xl font-semibold">Child Learning History</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Parent-visible summaries only. Student chat participation remains student-owned.
           </p>

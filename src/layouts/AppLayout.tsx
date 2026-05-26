@@ -78,7 +78,7 @@ function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: bo
           compact ? 'min-w-0 flex-1 justify-center px-2 py-2 text-xs' : 'px-2 py-1.5',
           isActive
             ? 'bg-primary text-primary-foreground shadow-sm'
-            : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+            : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
         )
       }
       end={item.path === '/'}
@@ -99,10 +99,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const mobileItems = user ? getNavItemsForUserRole(user.role, { mobileOnly: true }).slice(0, 5) : []
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="platform-app-shell min-h-screen text-foreground">
       <div className="flex min-h-screen">
-        <aside className="hidden w-64 flex-col border-r bg-background/90 p-4 md:flex">
-          <Link to="/" className="font-semibold tracking-tight">
+        <aside className="hidden w-64 flex-col border-r bg-card/85 p-4 shadow-[8px_0_30px_rgba(33,33,33,0.04)] md:flex">
+          <Link to="/" className="font-semibold">
             <AppLogo />
           </Link>
           <nav aria-label="Primary" className="mt-6 flex flex-1 flex-col gap-2">
@@ -111,7 +111,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             ))}
             {secondaryItems.length > 0 && (
               <div className="mt-4 border-t pt-4">
-                <p className="mb-2 px-2 text-xs font-medium uppercase tracking-normal text-muted-foreground">
+                <p className="brand-section-kicker mb-2 px-2">
                   {t('navigation.more')}
                 </p>
                 <div className="flex flex-col gap-2">
@@ -145,7 +145,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       {mobileItems.length > 0 && (
         <nav
           aria-label="Mobile primary"
-          className="fixed inset-x-0 bottom-0 z-40 border-t bg-background/95 px-2 py-2 shadow-lg backdrop-blur md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 py-2 shadow-lg backdrop-blur md:hidden"
         >
           <div className="mx-auto flex max-w-md gap-1">
             {mobileItems.map((item) => (

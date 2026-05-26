@@ -1,8 +1,8 @@
 {
   "title": "Lernraum",
-  "emptyTitle": "Stelle deine erste Hausaufgabenfrage.",
-  "emptyDescription": "Der Lernassistent bereitet eine klare Erklärung vor. Wenn du mehr Orientierung brauchst, frage eine Lehrperson im selben Gespräch.",
-  "welcome": "Willkommen bei STOA. Stelle unten deine erste Hausaufgabenfrage.",
+  "emptyTitle": "Starte dein erstes Lerngespräch.",
+  "emptyDescription": "Stelle eine Frage, beschreibe, wo du nicht weiterkommst, oder lade ein Arbeitsblatt hoch.",
+  "welcome": "Willkommen bei STOA. Stelle eine Frage oder beschreibe, wo du Unterstützung brauchst.",
   "placeholder": "Gib hier deine Hausaufgabenfrage ein...",
   "preparing": "Der Lernassistent bereitet eine Erklärung vor...",
   "loadFailed": "Gespräche konnten nicht geladen werden.",

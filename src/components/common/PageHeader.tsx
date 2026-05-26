@@ -26,7 +26,7 @@ export function PageHeader({
         {eyebrow && (
           <p
             className={cn(
-              'text-xs font-medium uppercase tracking-normal text-muted-foreground',
+              'brand-section-kicker',
               eyebrowClassName,
             )}
           >

@@ -32,7 +32,7 @@ export function AdminUsageSummaryCards({ summary }: AdminUsageSummaryCardsProps)
               </CardTitle>
             </CardHeader>
             <CardContent className="p-4 pt-0">
-              <p className="text-2xl font-semibold tracking-tight">{metric.value.toLocaleString()}</p>
+              <p className="text-2xl font-semibold">{metric.value.toLocaleString()}</p>
             </CardContent>
           </Card>
         ))}

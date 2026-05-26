@@ -18,15 +18,15 @@ export function HomeTrustSection() {
             </div>
           ))}
         </div>
-        <div className="relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70 bg-[#152238]">
+        <div className="brand-image-panel relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70">
           <img
             src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=1000&q=80"
             alt="Notebook and study materials on a desk"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />
-          <div className="absolute inset-0 bg-[linear-gradient(130deg,hsl(217_45%_15%_/_0.72),transparent_62%)]" />
-          <div className="absolute bottom-4 left-4 right-4 rounded-xl border border-white/15 bg-white/88 p-4 text-[#152238] backdrop-blur">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#b08a4a]">
+          <div className="brand-image-overlay absolute inset-0" />
+          <div className="absolute bottom-4 left-4 right-4 rounded-lg border border-white/15 bg-white/88 p-4 text-[hsl(var(--stoa-brand-ink))] backdrop-blur">
+            <p className="brand-section-kicker">
               Homework rhythm
             </p>
             <p className="mt-2 text-sm leading-6">
