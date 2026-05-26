@@ -98,11 +98,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CURR30-01 | Phase 159 | Pending |
-| CURR30-02 | Phase 159 | Pending |
-| CURR30-03 | Phase 159 | Pending |
-| CURR30-04 | Phase 159 | Pending |
-| CURR30-05 | Phase 159 | Pending |
+| CURR30-01 | Phase 159 | Complete |
+| CURR30-02 | Phase 159 | Complete |
+| CURR30-03 | Phase 159 | Complete |
+| CURR30-04 | Phase 159 | Complete |
+| CURR30-05 | Phase 159 | Complete |
 | STORY30-01 | Phase 160 | Pending |
 | STORY30-02 | Phase 160 | Pending |
 | STORY30-03 | Phase 160 | Pending |
