@@ -1,5 +1,32 @@
 # Milestones
 
+## v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow (Shipped: 2026-05-26)
+
+**Phases completed:** 4 phases, 4 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.23-MILESTONE-AUDIT.md`
+
+### Delivered
+
+- Local Python Learning Assistant harness with provider interface, Codex CLI adapter, template fallback provider, provider router, timeout handling, and provider logging boundary.
+- Prompt templates and prompt builder with student profile, grade rules, subject-scope rules, no-direct-answer guidance, teacher escalation rules, and forbidden internal-term instructions.
+- Response evaluator with forbidden-term, direct-answer-first, grade-scope, subject-scope, length, and guided-step checks plus repair/fallback handling.
+- Eight-case demo question regression set and harness behavior tests.
+- FastAPI chat endpoint integration that preserves the frontend Chat API shape and stores harness-backed assistant messages.
+- Internal `GET /health/provider` readiness endpoint.
+- Frontend fallback copy and demo backend copy cleanup for guided Learning Assistant language.
+- Provider behavior QA documentation, backend provider handoff notes, README Phase 25 guidance, and code-review hardening.
+
+### Verification
+
+- `python3 -m unittest discover -s demo-harness/tests`: passed.
+- Backend syntax check: passed.
+- Provider health/chat TestClient smoke with `STOA_DEMO_PROVIDER=template`: passed.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- Code-review findings: fixed and documented in Phase 136 review.
+
+---
+
 ## v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release (Shipped: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

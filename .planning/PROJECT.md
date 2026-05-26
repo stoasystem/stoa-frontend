@@ -2,41 +2,36 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, and trustworthy footer/contact/logo details.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, and a controlled local Learning Assistant provider harness for complete demo flows.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, and release-quality gate artifacts.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, and a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+## Latest Shipped Milestone: v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA's launch candidate has been converted into a public demo release package with final approval changes, P0/P1 blocker verification, release-lock preservation, final demo rerun evidence, multilingual/responsive/accessibility smoke checks, deployment handoff, monitoring plan, external presentation support, release notes, Go / No-Go decision, release branch, and release tag.
-
-**Target features:**
-- Final approval change intake and launch-candidate bug triage.
-- Narrow blocker fixes with copy, design, translation, and demo API lock preservation.
-- Final demo rerun, multilingual smoke, responsive smoke, accessibility smoke, and build evidence.
-- Public demo deployment handoff, monitoring plan, presentation support, and release notes.
-- Go / No-Go decision, release branch/tag record, and README public demo release guidance.
-
-## Current Milestone: v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
-
-**Goal:** Connect Codex as a local-only demo Learning Assistant provider behind the Python harness/demo backend so the complete STOA demo flow can show controlled guided answers while the frontend continues to call the same Chat API.
+**Delivered:** STOA's local demo Learning Assistant now has a Python prompt harness, internal Codex CLI adapter, template fallback provider, provider router, response checks, behavior regression tests, FastAPI chat integration, provider health endpoint, QA documentation, and future production-provider handoff notes. The frontend remains provider-agnostic and continues to call the same Chat API.
 
 **Target features:**
 - Backend-internal provider interface, Codex CLI adapter, template fallback provider, provider router, timeout handling, and provider health check.
 - Python prompt harness with student profile context, grade-level rules, subject-scope rules, teacher escalation rules, forbidden internal-term controls, response repair, and fallback.
-- Demo backend chat endpoint integration that preserves the existing frontend Chat API response shape and never exposes provider/debug details to user-facing UI.
-- Codex behavior regression set, provider tests, local runbook/readiness checklist, and QA evidence for guided answers, grade scope, subject scope, fallback, and internal-term cleanup.
-- Full local demo QA across student chat, teacher support, tutor resolution, parent reporting, billing, referral, support/contact, and admin overview.
+- Demo backend chat endpoint integration that preserves the existing frontend Chat API response shape and hides provider/debug details from user-facing UI.
+- Codex behavior regression set, provider tests, local runbook/readiness checklist, and QA evidence.
+- Future provider handoff notes and README Phase 25 guidance.
+
+## Current Milestone: None
+
+**Last shipped milestone:** v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow.
+
+Start the next milestone with `$gsd-new-milestone`.
 
 ## Current State
 
-**Latest shipped milestone:** v1.22 Phase 23: Launch Candidate Bug Fixing, Final Approval, and Public Demo Release
+**Latest shipped milestone:** v1.23 Phase 25: Local Codex Provider Integration for Complete Demo Flow
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -63,6 +58,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 21 accessibility and release-quality hardening with adapted footer/contact/logo/contact-form brand details, localized contact form, contact API contract, accessibility/keyboard/screen-reader/contrast docs, cross-browser/mobile/visual/performance QA docs, release-quality gate, final pre-launch checklist, and README handoff.
 - Phase 22 final demo package and launch-candidate preparation with audience demo scripts, locked demo accounts, stakeholder review checklist, release locks, known issues, launch-candidate approval, and final demo run evidence.
 - Phase 23 public demo release package with final approval changes, P0/P1 blocker verification, release-lock preservation, final demo rerun, multilingual/responsive/accessibility smoke evidence, deployment handoff, monitoring plan, external presentation support, release notes, Go / No-Go, release branch, and release tag.
+- Phase 25 local Learning Assistant provider integration with Python prompt harness, Codex CLI adapter, template fallback, provider router, response checks, behavior regression tests, FastAPI chat integration, provider health endpoint, QA docs, README guidance, and production-provider handoff notes.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -93,10 +89,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify English, German, French, and Italian language support with language switching, local language persistence, glossary/style guidance, and user-facing terminology replacement — v1.15
 - ✓ Developers can run and verify natural locale-specific P0 copy, German stacked hero title rendering, responsive multilingual layout fit, copy review documentation, visual QA evidence, terminology cleanup, and README handoff guidance — v1.16
 - ✓ Developers can run and verify production-facing UI cleanup, demo-only UI guards, display-label mapping, sanitized user-facing errors, duplicate-submit guards, stable empty/error states, QA evidence, and README guidance — v1.17
+- ✓ Developers can run and verify local demo Learning Assistant provider integration with Python prompt harness, internal Codex provider adapter, template fallback, provider health check, response behavior tests, FastAPI chat integration, QA docs, README guidance, and future provider handoff notes — v1.23
 
 ### Active
 
-- Phase 25 should connect Codex as a local testing/demo Learning Assistant provider inside the Python harness/demo backend, keep the frontend coupled only to the unified Chat API, enforce guided learning behavior with grade and subject boundaries, provide template fallback and provider health checks, verify behavior with regression tests and QA docs, and run the complete STOA demo flow without exposing Codex, model, provider, prompt, backend, demo, or mock details in user-facing UI.
+(None — start the next milestone with `$gsd-new-milestone`.)
 
 ### Out of Scope
 

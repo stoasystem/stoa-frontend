@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.23
 milestone_name: "Phase 25: Local Codex Provider Integration for Complete Demo Flow"
-status: implemented
+status: Awaiting next milestone
 last_updated: "2026-05-26T15:21:31.172Z"
-last_activity: 2026-05-26
+last_activity: 2026-05-26 — Milestone v1.23 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.23 implementation complete; audit and completion are next.
+**Current focus:** Milestone v1.23 is complete and archived. Next work should start with a new milestone.
 
 ## Current Position
 
-Phase: 136 - Full Demo QA, Readiness Checklist, README, and Handoff
+Phase: Milestone v1.23 complete
 Plan: —
-Status: Implementation complete
-Last activity: 2026-05-26 — Milestone v1.23 phases 133-136 implemented and verified
+Status: Awaiting next milestone
+Last activity: 2026-05-26 — Milestone v1.23 completed and archived
 
 ## Performance Metrics
 
