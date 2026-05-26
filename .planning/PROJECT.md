@@ -2,43 +2,42 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, and production-facing UI cleanup.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, and brand-aligned visual design translated from the company homepage.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, and responsive multilingual layout QA.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, and STOA-branded visual tokens for public, auth, chat, dashboard, parent report, pricing, and billing surfaces.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, and a clean path to future real backend integration.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, and a clean path to future real backend integration.
 
-## Latest Shipped Milestone: v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
+## Latest Shipped Milestone: v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA's normal user-facing UI was cleaned of development/demo artifacts, guarded so demo-only surfaces stay hidden by default, and hardened across key loading, empty, error, success, and duplicate-submit states without adding new business features.
+**Delivered:** STOA's learning platform was visually aligned with the company homepage design language while preserving a distinct product-app identity. `/Users/zhdeng/newweb` remained read-only and only served as a design reference.
 
 **Target features:**
-- Production-facing copy audit for P0/P1 routes and prohibited user-visible development terms.
-- Environment guards for demo accounts, demo badges, demo routes, checkout preview behavior, and internal debug UI.
-- Display-label mapping and user-facing error sanitization for internal statuses, raw plan IDs, and backend/API errors.
-- Product-safe register/onboarding, login, chat, parent, tutor, pricing, billing, support, and admin copy.
-- Duplicate-submit and state hardening for auth, chat, teacher-help, tutor, support, billing, and checkout flows.
-- README and QA evidence for Phase 18 production-facing cleanup, with Phase 19 accessibility/release-quality work deferred.
+- Read-only design audit and translation of the company homepage style.
+- Learning-platform brand token and platform theme layer derived from STOA burgundy, charcoal, warm paper, and restrained editorial cues.
+- Shared button, card, badge, input, page-header, navigation, chat, pricing, billing, and report style refinement.
+- Homepage, login, register, chat, dashboard, parent report, pricing, and billing visual calibration.
+- UI-SPEC, UI review, remediation of token/typography/copy drift, visual compatibility QA, README updates, and pushed Phase 19 commit.
 
-## Current Milestone: v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation
+## Current Milestone: v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation
 
-**Goal:** Align the STOA learning platform visually with the company homepage design language while keeping the platform independent, app-like, and usable.
+**Goal:** Refine English, German, French, and Italian copy across the STOA learning platform while adapting UI layout so each locale reads naturally, stays on brand, and remains stable on mobile and desktop.
 
 **Target features:**
-- Read-only design audit of `/Users/zhdeng/newweb`, with no writes, formatting, dependency installs, commits, or file moves in that source project.
-- Design translation documentation that extracts company homepage colors, typography, spacing, component style, image style, and brand tone.
-- Learning-platform design-token proposal derived from the homepage without directly copying it.
-- Small-scope visual calibration for homepage, login, register/onboarding, chat, student dashboard, parent dashboard/report, pricing, and billing.
-- Component-level refinement for buttons, cards, badges, form controls, navigation, page headers, chat bubbles, pricing cards, and report cards.
-- Visual compatibility QA proving brand similarity is medium-high, product independence remains high, and English/German/French/Italian/mobile layouts stay stable.
+- Read-only study of `/Users/zhdeng/newweb` German copy style, without modifying, formatting, installing, building, or copying from the source project.
+- German style adaptation guide for STOA learning-platform copy, especially headline rhythm, CTA length, educational wording, and formal brand tone.
+- Cross-locale copy rules for English, German, French, and Italian covering homepage, register/onboarding, chat, parent report, pricing, billing, and support surfaces.
+- Global refinement of locale files so German does not read like English translation, French punctuation and apostrophes render correctly, Italian CTAs fit naturally, and English remains calm and education-oriented.
+- Locale layout adaptation rules for long German words, French apostrophe strings, Italian CTA width, headline wrapping, card height, and mobile/desktop stability.
+- Cross-locale copy review matrix, visual QA matrix, README updates, and build/dev verification.
 
 ## Current State
 
-**Latest shipped milestone:** v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal
+**Latest shipped milestone:** v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -60,6 +59,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 16 multilingual foundations with English, German, French, and Italian i18n, language switching, local language persistence, and user-facing terminology replacement.
 - Phase 17 locale-specific copy refinement with natural four-language P0 copy, German stacked hero title support, typed locale layout hints, copy review matrix, visual QA by locale, terminology cleanup, README guidance, and 200 route/locale/viewport visual checks.
 - Phase 18 production-facing cleanup with guarded demo-only surfaces, internal debug isolation, product-safe visible copy, display-label boundaries, sanitized user-facing errors, pending guards, improved empty/error states, QA evidence, README guidance, and milestone integration audit fixes.
+- Phase 19 brand-aligned visual refinement with read-only company homepage design study, translated STOA brand tokens, platform theme styling, public/auth/app surface visual calibration, visual compatibility QA, UI-SPEC, UI review, remediation pass, and GitHub commit.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -93,7 +93,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 19 should align the STOA learning platform visually with the company homepage design language while keeping `/Users/zhdeng/newweb` strictly read-only, avoiding direct copying, preserving product-app usability, and not expanding product scope.
+- Phase 20 should refine English, German, French, and Italian copy across core STOA learning-platform surfaces while keeping `/Users/zhdeng/newweb` strictly read-only, learning only from the company homepage's German writing style, adapting layout per locale, and avoiding any product feature expansion.
 
 ### Out of Scope
 
@@ -118,6 +118,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Formal production backend development, complex database schema/migrations, production authentication, refresh-token architecture, real payment webhooks, real subscription enforcement, real AI provider orchestration, AWS deployment, production admin backend, and production analytics storage — outside Phase 14 demo backend stabilization scope.
 - New business modules, new languages, formal backend implementation, real payment collection, real teacher verification, AWS deployment, major visual redesign, and large architecture rewrites — outside Phase 18 production-facing cleanup scope.
 - Modifying `/Users/zhdeng/newweb`, copying homepage source files/assets/components, adding product features, changing backend/payment behavior, adding dependencies, or making the learning platform a direct homepage clone — outside Phase 19 brand-aligned visual refinement scope.
+- New business functionality, new languages, CMS, automatic translation systems, final legal translation, SEO article translation, backend language preference syncing, and modifying or copying from `/Users/zhdeng/newweb` — outside Phase 20 cross-locale copy and layout refinement scope.
 
 ## Context
 
@@ -128,6 +129,8 @@ The immediate visible issue is the German homepage hero title `STOA Lernunterst�
 The project brief for Phase 18 was provided in Chinese and defines production-facing cleanup, stability hardening, and demo artifact removal. Phase 18 explicitly does not add product scope. It removes user-visible `demo`, `mock`, `test`, `Codex`, `development`, `sample`, `placeholder`, and internal-rule wording from existing UI, improves loading/error/empty/success states, hides demo-only UI behind environment flags, and keeps demo/backend internals available only to developers.
 
 The project brief for Phase 19 was provided in Chinese and defines brand-aligned visual refinement based on the company homepage source at `/Users/zhdeng/newweb`. That source project is read-only for this milestone. Phase 19 should extract design signals such as burgundy/charcoal/warm-grey color, editorial Prata display typography, Inter UI text, restrained square button treatment, generous public-page spacing, and education photography tone, then translate those signals into a learning-platform design system that feels related but remains independent and app-like.
+
+The project brief for Phase 20 was provided in Chinese and defines cross-locale copy refinement, German style alignment, and multilingual layout adaptation. Phase 20 continues the Phase 19 read-only source policy for `/Users/zhdeng/newweb`, but focuses on language rather than visual redesign: study the company homepage's German writing style, translate those style signals into STOA learning-platform German copy rules, refine English/French/Italian copy globally, and adapt UI layout so German long words, French apostrophes, Italian CTA length, and English education tone all work naturally across core pages.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -161,7 +164,7 @@ Current codebase facts:
 
 - **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
 - **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 18 is production-facing UI cleanup and stability hardening work. It must avoid new business modules, new languages, formal backend implementation, real payment collection, real teacher verification, AWS deployment, major visual redesign, and large architecture rewrites.
+- **Scope**: Phase 20 is cross-locale copy and multilingual layout refinement. It must avoid new business modules, new languages, CMS work, automatic translation systems, formal backend changes, real payment changes, major visual redesign, and large architecture rewrites.
 - **Model providers**: The frontend must call only the STOA backend API; Codex usage during testing belongs behind the backend provider layer.
 - **Local backend**: FastAPI is expected at `http://localhost:8000` during local integration, with frontend dev server at `http://localhost:5173`.
 - **Streaming**: The frontend supports SSE/fetch streaming from the backend and must not call provider-specific streaming APIs directly.
@@ -184,6 +187,8 @@ Current codebase facts:
 - **Language terminology**: User-visible UI copy should avoid presenting `AI` as the primary product concept. Use `Learning Assistant` for first-response learning help and `Professional teacher support` for teacher escalation; technical identifiers and developer docs may still use AI-related implementation terms where appropriate.
 - **Locale-specific copy**: English, German, French, and Italian may use different sentence structures and title component structures when needed for natural reading and stable UI layout, as long as meaning, tone, and brand remain consistent.
 - **German layout**: German hero titles should use short phrases or explicit stacked title lines instead of long translated sentences in large display typography.
+- **Phase 20 source safety**: `/Users/zhdeng/newweb` is read-only. Phase 20 may inspect German copy style there, but must not modify files, run formatter/install/build commands there, copy components, or transplant full homepage text into the learning platform.
+- **Cross-locale layout**: Copy changes and UI layout changes must be treated together. German long words, French apostrophes, and Italian CTA length need explicit mobile and desktop layout checks.
 - **Language persistence**: Phase 16 language choice should persist in the browser through `localStorage` key `stoa_language`; formal cross-device user preference syncing is deferred to a future backend milestone.
 - **API modes**: Frontend API mode must be configurable for `mock`, `demo`, `staging`, and `production`; page components should not hard-code API URLs or demo data internals.
 - **Error format**: Demo backend errors should use a consistent `{ message, code }` response with demo-specific codes so frontend error states remain testable.
@@ -248,6 +253,9 @@ Current codebase facts:
 | Keep Phase 18 focused on production-facing cleanup | Existing surfaces still contain demo and development traces; removing those artifacts improves trust without expanding product scope | — Pending |
 | Hide demo-only UI by default | Demo accounts, debug panels, badges, and internal hints help development but should not appear in normal user-facing paths | — Pending |
 | Map internal status values before rendering | API/demo status strings may contain implementation language and need stable user-facing labels across locales | — Pending |
+| Keep Phase 19 as design translation, not source copying | The company homepage can inform STOA brand language, but the learning platform needs its own product-app identity and must not modify or duplicate `/Users/zhdeng/newweb` | ✓ Good |
+| Keep Phase 20 focused on cross-locale copy and layout | The multilingual infrastructure and brand visuals exist; the next value is making all four languages read naturally and fit reliably without adding product scope | — Pending |
+| Use company homepage German only as a style reference | Phase 20 should learn headline rhythm, tone, and educational wording from the homepage without transplanting whole homepage copy into the learning platform | — Pending |
 
 ## Evolution
 
@@ -267,4 +275,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 for v1.17 Phase 18 planning*
+*Last updated: 2026-05-26 for v1.19 Phase 20 planning*

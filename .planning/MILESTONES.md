@@ -1,5 +1,33 @@
 # Milestones
 
+## v1.18 Phase 19: Brand-Aligned Visual Refinement with Main Website Design Translation (Shipped: 2026-05-26)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Commit:** `849c439 Align learning platform visuals with STOA brand language`
+
+### Delivered
+
+- Read-only design-language study of `/Users/zhdeng/newweb`, with the source project preserved and not modified by STOA frontend work.
+- Phase 19 design translation docs for the company homepage style and the learning-platform adaptation boundary.
+- Derived STOA brand tokens and platform theme styling for burgundy, charcoal, warm paper, card surfaces, borders, shadows, image overlays, and editorial public/auth/report treatments.
+- Shared visual refinement for buttons, cards, badges, inputs, textareas, app/navigation headers, chat bubbles, dashboard cards, pricing cards, billing cards, and parent report surfaces.
+- Homepage, login, register/onboarding, chat, dashboard, parent report, pricing, and billing visual alignment while preserving app usability and product independence.
+- Phase 109 UI-SPEC, UI-SPEC verification, Phase 112 UI review, and remediation of off-contract color, typography, and copy findings.
+- Visual compatibility QA screenshots for homepage, register mobile, pricing, and protected chat auth fallback.
+- README Phase 19 documentation and pushed GitHub commit.
+
+### Verification
+
+- Build: passed.
+- Lint: passed.
+- Install: passed.
+- Dev server: started successfully at `http://127.0.0.1:5173/` for visual QA.
+- Playwright screenshots: captured for homepage, register mobile, pricing, and `/chat` auth fallback.
+- Source safety: `/Users/zhdeng/newweb` was not modified by Phase 19; it still showed the pre-existing `M img/team/.DS_Store` change.
+- Remaining handoff gaps: native cross-locale copy polish, German style alignment, full authenticated route visual QA, accessibility, cross-browser QA, performance sanity, and release quality gate.
+
+---
+
 ## v1.17 Phase 18: Production-Facing Cleanup, Stability Hardening, and Demo Artifact Removal (Shipped: 2026-05-26)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks
