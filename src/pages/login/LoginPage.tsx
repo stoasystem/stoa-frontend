@@ -3,6 +3,8 @@ import { CheckCircle2, MessageCircle, ShieldCheck, TrendingUp, Users } from 'luc
 import { LoginForm } from '@/components/auth/LoginForm'
 import { AuthLayout } from '@/layouts/AuthLayout'
 
+const loginStudyImageUrl = new URL('../../../img/login-study.jpeg', import.meta.url).href
+
 const activityItems = [
   {
     labelKey: 'login.activity.studentLabel',
@@ -29,7 +31,7 @@ export function LoginPage() {
       <section className="mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg border border-border/70 bg-card/92 shadow-[var(--platform-shadow-soft)] md:grid-cols-[1.02fr_0.98fr]">
         <div className="brand-image-panel relative hidden min-h-[36rem] overflow-hidden md:block">
           <img
-            src="https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&w=1200"
+            src={loginStudyImageUrl}
             alt="Student working at a desk with a notebook"
             className="absolute inset-0 h-full w-full object-cover opacity-74"
           />

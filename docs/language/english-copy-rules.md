@@ -22,7 +22,7 @@ Prefer short, confident headings:
 - Learn with clarity.
 - Guided learning support.
 - Progress families can understand.
-- Professional teacher support when it helps.
+- Professional teacher support when it is needed.
 
 Avoid:
 

@@ -10,7 +10,7 @@ export function MarketingHeader() {
   const { t } = useTranslation('common')
 
   return (
-    <header className="sticky top-0 z-30 border-b bg-card/88 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-[hsl(var(--border)/0.9)] bg-[hsl(35_25%_91%/0.96)] shadow-[0_1px_0_hsl(42_35%_98%/0.65)] backdrop-blur">
       <div className="mx-auto flex min-h-16 max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-3 sm:px-6">
         <Link to="/" className="min-w-0 font-semibold">
           <AppLogo />

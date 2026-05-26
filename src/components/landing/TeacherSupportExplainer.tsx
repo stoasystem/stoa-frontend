@@ -1,5 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
+const teacherClassroomImageUrl = new URL('../../../img/teacher-classroom.jpeg', import.meta.url).href
+
 export function TeacherSupportExplainer() {
   return (
     <Card>
@@ -9,7 +11,7 @@ export function TeacherSupportExplainer() {
       <CardContent className="grid gap-6 lg:grid-cols-[0.72fr_1fr] lg:items-center">
         <div className="brand-image-panel relative min-h-64 overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1000&q=80"
+            src={teacherClassroomImageUrl}
             alt="Teacher speaking with students in a classroom"
             className="absolute inset-0 h-full w-full object-cover opacity-78"
           />

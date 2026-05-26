@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next'
 
 const itemIcons = [Eye, BarChart3, ShieldCheck]
 
+const familyLearningImageUrl = new URL('../../../img/family-learning.jpeg', import.meta.url).href
+
 export function HomeParentVisibility() {
   const { t } = useTranslation('home')
   const items = t('parents.items', { returnObjects: true }) as Array<{
@@ -25,7 +27,7 @@ export function HomeParentVisibility() {
           </p>
           <div className="mt-6 overflow-hidden rounded-lg border border-border/70 bg-card shadow-sm">
             <img
-              src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              src={familyLearningImageUrl}
               alt="Family learning together on a laptop at home"
               className="h-56 w-full object-cover"
             />

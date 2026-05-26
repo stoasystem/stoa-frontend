@@ -9,7 +9,7 @@ export function AppFooter() {
   const { t } = useTranslation('common')
 
   return (
-    <footer className="border-t border-border/70 bg-card/88">
+    <footer className="border-t border-[hsl(var(--border)/0.95)] bg-[hsl(35_25%_90%)] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.7)]">
       <div className="mx-auto grid max-w-6xl gap-8 px-5 py-10 sm:px-6 md:grid-cols-[1.15fr_1fr_1fr]">
         <div className="min-w-0 space-y-4">
           <Link to="/" className="inline-flex">
@@ -55,7 +55,7 @@ export function AppFooter() {
         </div>
       </div>
 
-      <div className="border-t border-border/60">
+      <div className="border-t border-[hsl(var(--border)/0.9)] bg-[hsl(35_22%_86%)]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5 text-xs text-muted-foreground sm:px-6">
           <span>{t('footer.copyright')}</span>
           <FooterLegalLinks />

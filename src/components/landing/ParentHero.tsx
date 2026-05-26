@@ -3,6 +3,8 @@ import { ArrowRight, CheckCircle2, MessageCircle, Target, TrendingUp } from 'luc
 import { Button } from '@/components/ui/button'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
+const parentHomeworkImageUrl = new URL('../../../img/parent-homework.jpeg', import.meta.url).href
+
 const parentWeeklySignals = [
   {
     label: 'Questions',
@@ -62,7 +64,7 @@ export function ParentHero() {
       </div>
       <div className="brand-image-panel relative min-h-[31rem] overflow-hidden shadow-[0_24px_70px_hsl(var(--stoa-shadow-color)_/_0.12)]">
         <img
-          src="https://images.pexels.com/photos/10109025/pexels-photo-10109025.jpeg?auto=compress&cs=tinysrgb&w=1200"
+          src={parentHomeworkImageUrl}
           alt="Smiling child writing homework at a study desk"
           className="absolute inset-0 h-full w-full object-cover opacity-72"
         />

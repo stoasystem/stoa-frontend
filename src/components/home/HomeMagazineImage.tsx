@@ -1,13 +1,15 @@
 import { MessageCircle, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+const libraryStudyTableImageUrl = new URL('../../../img/library-study-table.jpeg', import.meta.url).href
+
 export function HomeMagazineImage() {
   const { t } = useTranslation('home')
 
   return (
     <div className="premium-reveal-delay brand-image-panel relative min-w-0 min-h-[32rem] overflow-hidden rounded-[1.5rem] border border-border/70">
       <img
-        src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80"
+        src={libraryStudyTableImageUrl}
         alt="Quiet study table with open books in a library"
         className="absolute inset-0 h-full w-full object-cover opacity-72"
       />

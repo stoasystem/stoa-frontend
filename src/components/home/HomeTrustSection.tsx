@@ -1,5 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
+const studyMaterialsImageUrl = new URL('../../../img/study-materials.jpeg', import.meta.url).href
+
 export function HomeTrustSection() {
   const { t } = useTranslation('home')
   const notes = t('trust.items', { returnObjects: true }) as Array<{
@@ -20,7 +22,7 @@ export function HomeTrustSection() {
         </div>
         <div className="brand-image-panel relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70">
           <img
-            src="https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?auto=format&fit=crop&w=1000&q=80"
+            src={studyMaterialsImageUrl}
             alt="Notebook and study materials on a desk"
             className="absolute inset-0 h-full w-full object-cover opacity-80"
           />

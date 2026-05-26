@@ -1,6 +1,8 @@
 import { GraduationCap, Lightbulb, MessageSquareText, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+const studentLaptopStudyImageUrl = new URL('../../../img/student-laptop-study.jpeg', import.meta.url).href
+
 const stepIcons = [MessageSquareText, Lightbulb, GraduationCap, Users]
 
 export function HomeLearningFlow() {
@@ -23,7 +25,7 @@ export function HomeLearningFlow() {
         </div>
         <div className="brand-image-panel relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70">
           <img
-            src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80"
+            src={studentLaptopStudyImageUrl}
             alt="Student using a laptop while studying at a desk"
             className="absolute inset-0 h-full w-full object-cover opacity-75"
           />

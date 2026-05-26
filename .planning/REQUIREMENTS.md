@@ -19,12 +19,12 @@ Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
 ### Blocker Fixes and Lock Preservation
 
-- [ ] **FIX23-01**: Code changes are limited to P0/P1 blockers, required approval changes, or release blockers.
-- [ ] **FIX23-02**: Each code change is checked against core demo flow impact, mobile impact, build impact, and risk of new user-facing demo/mock/Codex residue.
-- [ ] **LOCK23-01**: Copy lock remains valid after Phase 23 fixes or any allowed copy change is documented as approval/blocker-driven.
-- [ ] **LOCK23-02**: Design lock remains valid after Phase 23 fixes or any allowed visual change is documented as approval/blocker-driven.
-- [ ] **LOCK23-03**: Translation lock remains valid across English, German, French, and Italian after Phase 23 fixes.
-- [ ] **LOCK23-04**: Demo API contract lock remains valid unless a P0 blocker requires an explicit documented exception and retest.
+- [x] **FIX23-01**: Code changes are limited to P0/P1 blockers, required approval changes, or release blockers.
+- [x] **FIX23-02**: Each code change is checked against core demo flow impact, mobile impact, build impact, and risk of new user-facing demo/mock/Codex residue.
+- [x] **LOCK23-01**: Copy lock remains valid after Phase 23 fixes or any allowed copy change is documented as approval/blocker-driven.
+- [x] **LOCK23-02**: Design lock remains valid after Phase 23 fixes or any allowed visual change is documented as approval/blocker-driven.
+- [x] **LOCK23-03**: Translation lock remains valid across English, German, French, and Italian after Phase 23 fixes.
+- [x] **LOCK23-04**: Demo API contract lock remains valid unless a P0 blocker requires an explicit documented exception and retest.
 
 ### Final Demo Rerun and Smoke Tests
 
@@ -94,12 +94,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUG23-02 | Phase 128 | Done |
 | BUG23-03 | Phase 128 | Done |
 | BUG23-04 | Phase 128 | Done |
-| FIX23-01 | Phase 129 | Pending |
-| FIX23-02 | Phase 129 | Pending |
-| LOCK23-01 | Phase 129 | Pending |
-| LOCK23-02 | Phase 129 | Pending |
-| LOCK23-03 | Phase 129 | Pending |
-| LOCK23-04 | Phase 129 | Pending |
+| FIX23-01 | Phase 129 | Done |
+| FIX23-02 | Phase 129 | Done |
+| LOCK23-01 | Phase 129 | Done |
+| LOCK23-02 | Phase 129 | Done |
+| LOCK23-03 | Phase 129 | Done |
+| LOCK23-04 | Phase 129 | Done |
 | RUN23-01 | Phase 130 | Pending |
 | RUN23-02 | Phase 130 | Pending |
 | RUN23-03 | Phase 130 | Pending |

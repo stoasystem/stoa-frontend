@@ -1,5 +1,7 @@
 import { cn } from '@/lib/utils'
 
+const logoUrl = new URL('../../../img/logo2.png', import.meta.url).href
+
 export type StoaLogoProps = {
   variant?: 'dark' | 'light' | 'gold' | 'monochrome'
   size?: 'sm' | 'md' | 'lg'
@@ -7,30 +9,30 @@ export type StoaLogoProps = {
 }
 
 const sizeClassNames = {
-  sm: 'text-xl',
-  md: 'text-2xl',
-  lg: 'text-4xl',
+  sm: 'h-11',
+  md: 'h-14',
+  lg: 'h-20',
 } as const
 
 const variantClassNames = {
-  dark: 'text-[hsl(var(--stoa-brand-charcoal))]',
-  light: 'text-[hsl(var(--stoa-brand-paper))]',
-  gold: 'text-[hsl(var(--accent))]',
-  monochrome: 'text-current',
+  dark: '',
+  light: 'brightness-0 invert',
+  gold: 'sepia saturate-150',
+  monochrome: 'grayscale',
 } as const
 
 export function StoaLogo({ variant = 'dark', size = 'md', className }: StoaLogoProps) {
   return (
-    <span
+    <img
+      src={logoUrl}
+      alt="STOA"
       className={cn(
-        'inline-flex items-baseline gap-2 font-semibold leading-none tracking-[0.08em]',
+        'block w-auto max-w-full shrink-0 object-contain',
         variantClassNames[variant],
         sizeClassNames[size],
         className,
       )}
-      aria-label="STOA"
-    >
-      <span className="editorial-heading tracking-normal">STOA</span>
-    </span>
+      draggable={false}
+    />
   )
 }

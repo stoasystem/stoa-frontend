@@ -13,6 +13,8 @@ import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
 
+const familyLearningImageUrl = new URL('../../../img/family-learning.jpeg', import.meta.url).href
+
 export function PricingPage() {
   const { t } = useTranslation('pricing')
   const navigate = useNavigate()
@@ -43,7 +45,7 @@ export function PricingPage() {
           <Card className="overflow-hidden">
             <div className="brand-image-panel relative h-56">
               <img
-                src="https://images.pexels.com/photos/9240630/pexels-photo-9240630.jpeg?auto=compress&cs=tinysrgb&w=1200"
+                src={familyLearningImageUrl}
                 alt="Family reviewing online learning together at home"
                 className="absolute inset-0 h-full w-full object-cover opacity-76"
               />

@@ -2,6 +2,8 @@ import { ArrowRight, GraduationCap } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
+const teacherStudentSupportImageUrl = new URL('../../../img/teacher-student-support.jpeg', import.meta.url).href
+
 export function HomeTeacherFallback() {
   const { t } = useTranslation('home')
 
@@ -9,7 +11,7 @@ export function HomeTeacherFallback() {
     <section className="mx-auto grid w-full min-w-0 max-w-6xl gap-6 px-5 py-10 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
       <div className="brand-image-panel relative min-w-0 overflow-hidden rounded-lg border border-border/70 text-primary-foreground min-h-[24rem]">
         <img
-          src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80"
+          src={teacherStudentSupportImageUrl}
           alt="Teacher helping a student with schoolwork"
           className="absolute inset-0 h-full w-full object-cover opacity-72"
         />
