@@ -1,7 +1,7 @@
 import { useMemo, useReducer, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, MessageCircle } from 'lucide-react'
+import { ArrowLeft, BookOpenCheck, Clock3, ListChecks, MessageCircle } from 'lucide-react'
 import { ChallengeCard } from '@/components/practice/ChallengeCard'
 import { ChallengeFeedback } from '@/components/practice/ChallengeFeedback'
 import { HintPanel } from '@/components/practice/HintPanel'
@@ -23,6 +23,7 @@ import { usePracticeHintMutation } from '@/hooks/practice/usePracticeHintMutatio
 import { usePracticeTeacherHelpMutation } from '@/hooks/practice/usePracticeTeacherHelpMutation'
 import { useSubmitChallengeAnswerMutation } from '@/hooks/practice/useSubmitChallengeAnswerMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import type { PracticeChatContext, PracticeChallenge } from '@/types/practice'
 
 export function LessonPage() {
   const { t } = useTranslation('practice')
@@ -34,7 +35,8 @@ export function LessonPage() {
   const hintMutation = usePracticeHintMutation()
   const teacherHelpMutation = usePracticeTeacherHelpMutation()
   const [state, dispatch] = useReducer(practiceLessonReducer, initialPracticeLessonState)
-  const [assistantExplanation, setAssistantExplanation] = useState('')
+  const [lessonStarted, setLessonStarted] = useState(false)
+  const [teacherHelpMessage, setTeacherHelpMessage] = useState('')
 
   const lesson = lessonQuery.data
   const challenge = lesson?.challenges[state.currentIndex]
@@ -69,13 +71,32 @@ export function LessonPage() {
     await handleHint()
   }
 
+  function buildPracticeChatContext(targetChallenge: PracticeChallenge): PracticeChatContext {
+    return {
+      source: 'practice',
+      subjectId: lesson?.subjectId ?? selectedSubjectPath,
+      lessonId: lesson?.id ?? lessonId ?? '',
+      challengeId: targetChallenge.id,
+      challengePrompt: targetChallenge.prompt,
+      studentAnswer: formatPracticeAnswer(state.answer),
+      correctAnswer: formatPracticeAnswer(targetChallenge.correctAnswer),
+      topic: targetChallenge.topic,
+      gradeLevel: targetChallenge.gradeLevel,
+      returnTo: `/practice/${lesson?.subjectId ?? selectedSubjectPath}/lessons/${lesson?.id ?? lessonId}`,
+    }
+  }
+
   async function handleExplain() {
-    const hint = await handleHint()
-    setAssistantExplanation(
-      hint
-        ? `Learning Assistant: ${hint.hint} Try the next step yourself before checking the full answer.`
-        : 'Learning Assistant: Start by identifying the operation you can undo first.',
-    )
+    if (!challenge) return
+    if (!hintMutation.data) {
+      await handleHint()
+    }
+    navigate('/chat', {
+      state: {
+        practiceContext: buildPracticeChatContext(challenge),
+        prompt: 'Can you explain this step?',
+      },
+    })
   }
 
   async function handleTeacherHelp() {
@@ -84,16 +105,25 @@ export function LessonPage() {
       subjectId: lesson.subjectId,
       lessonId: lesson.id,
       challengeId: challenge.id,
-      message: `Student is stuck on ${challenge.topic}.`,
+      message: `Student is still stuck on ${challenge.topic}.`,
+      practiceContext: {
+        source: 'practice',
+        subjectId: lesson.subjectId,
+        lessonId: lesson.id,
+        challengeId: challenge.id,
+        topic: challenge.topic,
+        studentAnswer: formatPracticeAnswer(state.answer),
+        attempts: state.incorrectAttempts,
+      },
     })
-    setAssistantExplanation(response.message)
+    setTeacherHelpMessage(response.message)
   }
 
   async function handleContinue() {
     if (!lesson) return
     const hasNext = state.currentIndex < lesson.challenges.length - 1
     if (hasNext) {
-      setAssistantExplanation('')
+      setTeacherHelpMessage('')
       dispatch({ type: 'next', challenges: lesson.challenges })
       return
     }
@@ -159,6 +189,37 @@ export function LessonPage() {
         {lessonQuery.isError && <p className="text-sm text-destructive">Lesson is unavailable.</p>}
 
         {lesson && challenge && (
+          !lessonStarted ? (
+            <section className="grid gap-6 rounded-lg border border-primary/15 bg-card/95 p-5 shadow-[var(--platform-shadow-soft)] lg:grid-cols-[1fr_18rem]">
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] px-3 py-2 text-sm font-semibold text-primary">
+                  <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
+                  Practice Path lesson
+                </div>
+                <div>
+                  <h2 className="text-3xl font-semibold tracking-tight">{lesson.title}</h2>
+                  <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
+                    You will practice one equation skill at a time. Check each answer, use a hint if needed, and ask for a guided explanation only when the next step is still unclear.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <LessonStartSignal icon={ListChecks} label="Checks" value={`${lesson.challenges.length} focused steps`} />
+                  <LessonStartSignal icon={Clock3} label="Estimated time" value={`${lesson.estimatedMinutes} min`} />
+                  <LessonStartSignal icon={MessageCircle} label="Support" value="Hint first, then chat" />
+                </div>
+                <Button onClick={() => setLessonStarted(true)} type="button">
+                  {t('startLesson')}
+                </Button>
+              </div>
+              <aside className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
+                <p className="brand-section-kicker">What you will practice</p>
+                <h3 className="mt-3 text-xl font-semibold">{lesson.topic}</h3>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  The goal is to choose the next useful operation, not to rush to the final answer.
+                </p>
+              </aside>
+            </section>
+          ) : (
           <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
             <div className="space-y-5">
               <LessonProgressBar current={progressCurrent} total={lesson.challenges.length} />
@@ -173,6 +234,7 @@ export function LessonPage() {
                 <ChallengeFeedback
                   onContinue={handleContinue}
                   onHint={handleShowHint}
+                  onExplain={handleExplain}
                   onRetry={() => dispatch({ type: 'retry' })}
                   result={state.feedback}
                 />
@@ -181,18 +243,9 @@ export function LessonPage() {
                 hint={hintMutation.data}
                 onExplain={handleExplain}
                 onTeacherHelp={handleTeacherHelp}
-                teacherHelpMessage={teacherHelpMutation.data?.message}
+                teacherHelpMessage={teacherHelpMessage}
                 teacherHelpVisible={teacherHelpVisible}
               />
-              {assistantExplanation && (
-                <div className="rounded-lg border border-primary/15 bg-[hsl(var(--platform-surface-app))] p-4 text-sm leading-6">
-                  <div className="mb-2 flex items-center gap-2 font-semibold">
-                    <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                    {t('explainStep')}
-                  </div>
-                  {assistantExplanation}
-                </div>
-              )}
             </div>
             <aside className="space-y-4 rounded-lg border bg-card/80 p-5">
               <p className="brand-section-kicker">Lesson focus</p>
@@ -205,8 +258,31 @@ export function LessonPage() {
               </div>
             </aside>
           </div>
+          )
         )}
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+function formatPracticeAnswer(answer: string | string[]) {
+  return Array.isArray(answer) ? answer.join(', ') : answer
+}
+
+function LessonStartSignal({
+  icon: Icon,
+  label,
+  value,
+}: {
+  icon: typeof ListChecks
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
+      <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+      <p className="mt-3 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
+      <p className="mt-1 text-sm font-semibold">{value}</p>
+    </div>
   )
 }

@@ -1,4 +1,4 @@
-import { GraduationCap, Lightbulb, MessageSquareText, Users } from 'lucide-react'
+import { GraduationCap, Lightbulb, MessageSquareText, Route, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
 const studentLaptopStudyImageUrl = new URL('../../../img/student-laptop-study.jpeg', import.meta.url).href
@@ -22,6 +22,12 @@ export function HomeLearningFlow() {
           <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
             {t('flow.title')}
           </h2>
+          <div className="mt-6 flex max-w-xl gap-3 rounded-lg border border-primary/15 bg-card/78 p-4 text-sm leading-6 text-muted-foreground shadow-[var(--platform-shadow-soft)]">
+            <Route className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <p>
+              Students can practice step by step, then ask a question in Learning Chat when a specific step is unclear.
+            </p>
+          </div>
         </div>
         <div className="brand-image-panel relative min-h-64 overflow-hidden rounded-[1.25rem] border border-border/70">
           <img

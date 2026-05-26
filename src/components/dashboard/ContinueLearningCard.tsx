@@ -10,13 +10,13 @@ export function ContinueLearningCard() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Continue learning</CardTitle>
+        <CardTitle className="text-base">Continue Practice</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
         {practiceOverview ? (
           <div className="space-y-3">
             <p>
-              Continue with {practiceOverview.recommendedLesson.title}. Today&apos;s goal is{' '}
+              Current path: Equations. Next lesson: {practiceOverview.recommendedLesson.title}. Today&apos;s goal is{' '}
               {practiceOverview.dailyGoal.label.toLowerCase()}, with a {practiceOverview.studyStreak}
               -day study streak.
             </p>
@@ -34,10 +34,10 @@ export function ContinueLearningCard() {
         )}
         <div className="flex flex-wrap gap-3">
           <Button asChild className="premium-primary-button text-white hover:text-white">
-            <Link to="/practice">Continue practice</Link>
+            <Link to="/practice">Continue Practice</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/chat">Open chat</Link>
+            <Link to="/chat">Ask a question</Link>
           </Button>
           <Button asChild variant="outline">
             <Link to="/learning-history">View history</Link>

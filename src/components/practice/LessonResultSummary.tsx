@@ -3,10 +3,13 @@ import { CheckCircle2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { PracticeLessonResult } from '@/types/practice'
+import type { PracticeChatContext, PracticeLessonResult } from '@/types/practice'
 
 export function LessonResultSummary({ result }: { result: PracticeLessonResult }) {
   const { t } = useTranslation('practice')
+  const reviewContext = result.mistakes[0]
+    ? buildPracticeChatContext(result.mistakes[0])
+    : null
 
   return (
     <Card className="border-primary/15 bg-card/95">
@@ -38,6 +41,19 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
           <Button asChild variant="outline">
             <Link to="/practice/mistakes">{t('reviewMistakes')}</Link>
           </Button>
+          {reviewContext && (
+            <Button asChild variant="outline">
+              <Link
+                to="/chat"
+                state={{
+                  practiceContext: reviewContext,
+                  prompt: 'Can you explain this step?',
+                }}
+              >
+                {t('askLearningChat')}
+              </Link>
+            </Button>
+          )}
           <Button asChild variant="secondary">
             <Link to="/dashboard">Back to dashboard</Link>
           </Button>
@@ -45,6 +61,23 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
       </CardContent>
     </Card>
   )
+}
+
+function buildPracticeChatContext(
+  mistake: PracticeLessonResult['mistakes'][number],
+): PracticeChatContext {
+  return {
+    source: 'practice',
+    subjectId: mistake.subjectId,
+    lessonId: mistake.lessonId,
+    challengeId: mistake.challengeId,
+    challengePrompt: mistake.prompt,
+    studentAnswer: mistake.studentAnswer,
+    correctAnswer: mistake.correctAnswer,
+    topic: mistake.topic,
+    gradeLevel: 'Lower secondary',
+    returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
+  }
 }
 
 function ResultMetric({ label, value }: { label: string; value: string }) {

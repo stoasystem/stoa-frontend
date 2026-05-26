@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
+import { PracticeContextCard } from '@/components/chat/PracticeContextCard'
 import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -16,10 +18,13 @@ import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
 import { toUserFacingError } from '@/lib/userFacingText'
+import type { PracticeChatLocationState } from '@/types/practice'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 export function ChatPage() {
   const { t } = useTranslation('chat')
+  const location = useLocation()
+  const navigate = useNavigate()
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
   const [sendError, setSendError] = useState<string | null>(null)
   const [teacherHelpRequest, setTeacherHelpRequest] = useState<TeacherHelpRequest | null>(null)
@@ -31,23 +36,22 @@ export function ChatPage() {
   } | null>(null)
 
   const conversationsQuery = useConversationsQuery()
+  const practiceState = location.state as PracticeChatLocationState | null
+  const practiceContext = practiceState?.practiceContext
   const conversations = useMemo(
     () => conversationsQuery.data?.items ?? [],
     [conversationsQuery.data],
   )
 
   useEffect(() => {
-    if (conversations.length === 0) {
-      setActiveConversationId(null)
-      return
-    }
+    if (!activeConversationId) return
 
     const activeConversationExists = conversations.some(
       (conversation) => conversation.id === activeConversationId,
     )
 
-    if (!activeConversationId || !activeConversationExists) {
-      setActiveConversationId(conversations[0].id)
+    if (!activeConversationExists) {
+      setActiveConversationId(null)
     }
   }, [activeConversationId, conversations])
 
@@ -62,6 +66,12 @@ export function ChatPage() {
     stopStreaming,
     retryMessage,
   } = useStreamingChat(activeConversationId)
+
+  useEffect(() => {
+    if (!practiceContext) return
+    setActiveConversationId(null)
+    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this step?')
+  }, [practiceContext, practiceState?.prompt])
 
   useEffect(() => {
     setTeacherHelpRequest(null)
@@ -95,7 +105,7 @@ export function ChatPage() {
 
   function handleCreateConversation(message?: string) {
     if (createConversationMutation.isPending) return
-    const initialMessage = message?.trim()
+    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext)
 
     createConversationMutation.mutate(
       {
@@ -117,6 +127,13 @@ export function ChatPage() {
         },
       },
     )
+  }
+
+  function handleStartNewConversation() {
+    setActiveConversationId(null)
+    setTeacherHelpRequest(null)
+    setTeacherHelpError(null)
+    setSendError(null)
   }
 
   function handleSendMessage(payload: {
@@ -169,41 +186,53 @@ export function ChatPage() {
     )
   }
 
+  const newConversationForm = (
+    <div className="w-full max-w-2xl space-y-4">
+      {practiceContext && (
+        <PracticeContextCard
+          context={practiceContext}
+          onBackToLesson={() => navigate(practiceContext.returnTo ?? '/practice')}
+        />
+      )}
+      <div className="brand-rule rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
+        <EmptyState message={practiceContext ? t('practiceContext.welcome') : t('welcome')} />
+        <form
+          className="mt-5 space-y-3"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (createConversationMutation.isPending) return
+            handleCreateConversation(newConversationMessage)
+          }}
+        >
+          <Textarea
+            value={newConversationMessage}
+            onChange={(event) => setNewConversationMessage(event.target.value)}
+            placeholder={practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
+            className="min-h-24 resize-none"
+            disabled={createConversationMutation.isPending}
+            aria-label={t('newConversationLabel')}
+          />
+          {createConversationMutation.isError && (
+            <p className="text-xs text-destructive" role="alert">
+              {toUserFacingError(createConversationMutation.error, t('createFailed'))}
+            </p>
+          )}
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={createConversationMutation.isPending}
+          >
+            {createConversationMutation.isPending ? t('starting') : t('startConversation')}
+          </Button>
+        </form>
+      </div>
+    </div>
+  )
+
   if (conversations.length === 0) {
     return (
       <div className="chat-workspace flex h-screen items-center justify-center px-4 text-foreground">
-        <div className="brand-rule w-full max-w-xl rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
-          <EmptyState message={t('welcome')} />
-          <form
-            className="mt-5 space-y-3"
-            onSubmit={(event) => {
-              event.preventDefault()
-              if (createConversationMutation.isPending) return
-              handleCreateConversation(newConversationMessage)
-            }}
-          >
-            <Textarea
-              value={newConversationMessage}
-              onChange={(event) => setNewConversationMessage(event.target.value)}
-              placeholder={t('placeholder')}
-              className="min-h-24 resize-none"
-              disabled={createConversationMutation.isPending}
-              aria-label={t('newConversationLabel')}
-            />
-            {createConversationMutation.isError && (
-              <p className="text-xs text-destructive" role="alert">
-                {toUserFacingError(createConversationMutation.error, t('createFailed'))}
-              </p>
-            )}
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={createConversationMutation.isPending}
-            >
-              {createConversationMutation.isPending ? t('starting') : t('startConversation')}
-            </Button>
-          </form>
-        </div>
+        {newConversationForm}
       </div>
     )
   }
@@ -214,25 +243,36 @@ export function ChatPage() {
         conversations={conversations}
         activeConversationId={activeConversationId ?? ''}
         onSelectConversation={setActiveConversationId}
-        onCreateConversation={() => handleCreateConversation()}
+        onCreateConversation={handleStartNewConversation}
       />
       <main className="flex min-w-0 flex-1 flex-col">
         <ChatHeader
           conversation={conversationQuery.data ?? null}
-          onCreateConversation={() => handleCreateConversation()}
+          onCreateConversation={handleStartNewConversation}
         />
-        {conversationQuery.isLoading && (
+        {!activeConversationId && (
+          <div className="flex flex-1 items-center justify-center px-4">
+            {newConversationForm}
+          </div>
+        )}
+        {activeConversationId && conversationQuery.isLoading && (
           <div className="flex-1 overflow-hidden">
             <ChatSkeleton compact />
           </div>
         )}
-        {conversationQuery.isError && (
+        {activeConversationId && conversationQuery.isError && (
           <div className="flex flex-1 items-center justify-center">
             <ErrorState message={t('conversationLoadFailed')} />
           </div>
         )}
-        {conversationQuery.data && (
+        {activeConversationId && conversationQuery.data && (
           <>
+            {practiceContext && (
+              <PracticeContextCard
+                context={practiceContext}
+                onBackToLesson={() => navigate(practiceContext.returnTo ?? '/practice')}
+              />
+            )}
             <ChatMessageList
               messages={displayedMessages}
               isAssistantThinking={false}
@@ -265,4 +305,23 @@ export function ChatPage() {
       </main>
     </div>
   )
+}
+
+function buildInitialMessage(
+  message: string,
+  practiceContext: PracticeChatLocationState['practiceContext'],
+) {
+  if (!practiceContext) {
+    return message
+  }
+
+  const question = message || 'Can you explain this step?'
+
+  return [
+    question,
+    '',
+    `Practice topic: ${practiceContext.topic}`,
+    `Practice question: ${practiceContext.challengePrompt}`,
+    practiceContext.studentAnswer ? `My answer: ${practiceContext.studentAnswer}` : '',
+  ].filter(Boolean).join('\n')
 }

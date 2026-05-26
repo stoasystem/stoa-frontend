@@ -22,6 +22,23 @@
   "uploadFailed": "File upload failed.",
   "retry": "Retry",
   "newConversation": "New conversation",
+  "practiceContext": {
+    "title": "You are reviewing a practice step.",
+    "topic": "Topic",
+    "question": "Question",
+    "recentAnswer": "Recent answer",
+    "backToLesson": "Back to lesson",
+    "welcome": "Review this practice step with the Learning Assistant.",
+    "placeholder": "Ask for the next step, not just the final answer..."
+  },
+  "availability": {
+    "checking": "Checking teachers",
+    "online": "Teacher online",
+    "offline": "No teacher online",
+    "onlineDetail": "{{count}} available now",
+    "offlineDetail": "Teacher support will review requests later.",
+    "nextWindow": "Next window {{nextWindow}}"
+  },
   "teacher": {
     "title": "Would a teacher help clarify this?",
     "description": "Send this conversation to a qualified teacher for clearer guidance.",

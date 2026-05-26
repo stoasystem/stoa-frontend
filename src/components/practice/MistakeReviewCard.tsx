@@ -1,9 +1,22 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import type { PracticeMistake } from '@/types/practice'
+import type { PracticeChatContext, PracticeMistake } from '@/types/practice'
 
 export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
+  const practiceContext: PracticeChatContext = {
+    source: 'practice',
+    subjectId: mistake.subjectId,
+    lessonId: mistake.lessonId,
+    challengeId: mistake.challengeId,
+    challengePrompt: mistake.prompt,
+    studentAnswer: mistake.studentAnswer,
+    correctAnswer: mistake.correctAnswer,
+    topic: mistake.topic,
+    gradeLevel: 'Lower secondary',
+    returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
+  }
+
   return (
     <Card className="border-primary/10">
       <CardContent className="p-5">
@@ -21,7 +34,15 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
               <Link to={`/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`}>Retry</Link>
             </Button>
             <Button asChild variant="secondary">
-              <Link to={`/chat?practice=${mistake.challengeId}`}>Explain this step</Link>
+              <Link
+                to="/chat"
+                state={{
+                  practiceContext,
+                  prompt: 'Can you explain this step?',
+                }}
+              >
+                Ask in Learning Chat
+              </Link>
             </Button>
           </div>
         </div>

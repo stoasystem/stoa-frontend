@@ -143,6 +143,26 @@ Main tasks:
 - Improve Parent Report practice summary
 - Polish the demo scenario
 
+## Phase 29 Practice Path Interaction and Learning Entry Flow
+
+This phase refines how the Practice Path fits into the wider STOA learning platform.
+
+The goal is not to add more curriculum content.
+
+The goal is to make the existing equation demo smoother and make Practice a natural entry into Learning Chat:
+
+- Lesson intro before challenges
+- Stable challenge, feedback, hint, retry, and result flow
+- Practice context handoff into Learning Chat
+- Chat context card for practice steps
+- Back to lesson flow
+- Teacher support only after repeated confusion
+- Student Dashboard entry points for Continue Practice and Ask a question
+- Homepage learning entry copy that does not make Practice and Chat compete
+- Parent Report learning activity summary across practice, questions, mistakes, and teacher support
+
+Phase 29 remains frontend design, route state, mock contract, docs, and demo QA only. It does not add a production backend, real adaptive learning, broader curriculum, or game-first reward systems.
+
 ## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
 
 This phase does not add new features.

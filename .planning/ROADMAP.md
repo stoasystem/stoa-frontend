@@ -29,16 +29,16 @@
 - ✅ **v1.24 Phase 26: Learning Assistant Functional QA, Multi-Turn Behavior Testing, and Bug Fixing** - Phases 137-140 (shipped 2026-05-26)
 - ✅ **v1.25 Phase 27: Duolingo-Style Learning Quest Integration and Practice Flow Design** - Phases 141-146 (implemented 2026-05-26)
 - ✅ **v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing** - Phases 147-152 (implemented 2026-05-26)
-- ○ **v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization** - Phases 153-158 (planned)
+- ✅ **v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization** - Phases 153-158 (implemented 2026-05-26)
 
 ## Phases
 
-- [ ] **Phase 153: Practice Interaction Research and Contract Definition** - Convert research into Phase 29 design constraints, docs, and frontend/demo context contracts.
-- [ ] **Phase 154: Practice Lesson Interaction Refinement** - Refine lesson start, challenge, feedback, hint, retry, result, and mistakes review interaction.
-- [ ] **Phase 155: Practice to Learning Chat Transition** - Add challenge-context handoff, Chat context card, and Back to lesson behavior.
-- [ ] **Phase 156: Practice to Teacher Support Escalation** - Add delayed teacher-support escalation and practice context for teacher requests.
-- [ ] **Phase 157: Learning Platform Entry IA and Parent Activity Integration** - Reorganize homepage, Student Dashboard, navigation, and Parent Report framing around unified learning activity.
-- [ ] **Phase 158: Localization, Demo QA, README, and Final Verification** - Add four-language labels, QA docs, integrated demo flow, README update, build, and browser smoke.
+- [x] **Phase 153: Practice Interaction Research and Contract Definition** - Convert research into Phase 29 design constraints, docs, and frontend/demo context contracts.
+- [x] **Phase 154: Practice Lesson Interaction Refinement** - Refine lesson start, challenge, feedback, hint, retry, result, and mistakes review interaction.
+- [x] **Phase 155: Practice to Learning Chat Transition** - Add challenge-context handoff, Chat context card, and Back to lesson behavior.
+- [x] **Phase 156: Practice to Teacher Support Escalation** - Add delayed teacher-support escalation and practice context for teacher requests.
+- [x] **Phase 157: Learning Platform Entry IA and Parent Activity Integration** - Reorganize homepage, Student Dashboard, navigation, and Parent Report framing around unified learning activity.
+- [x] **Phase 158: Localization, Demo QA, README, and Final Verification** - Add four-language labels, QA docs, integrated demo flow, README update, build, and browser smoke.
 
 ## Phase Details
 
@@ -128,12 +128,12 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 153. Practice Interaction Research and Contract Definition | 0/1 | Pending | — |
-| 154. Practice Lesson Interaction Refinement | 0/1 | Pending | — |
-| 155. Practice to Learning Chat Transition | 0/1 | Pending | — |
-| 156. Practice to Teacher Support Escalation | 0/1 | Pending | — |
-| 157. Learning Platform Entry IA and Parent Activity Integration | 0/1 | Pending | — |
-| 158. Localization, Demo QA, README, and Final Verification | 0/1 | Pending | — |
+| 153. Practice Interaction Research and Contract Definition | 1/1 | Complete | 2026-05-26 |
+| 154. Practice Lesson Interaction Refinement | 1/1 | Complete | 2026-05-26 |
+| 155. Practice to Learning Chat Transition | 1/1 | Complete | 2026-05-26 |
+| 156. Practice to Teacher Support Escalation | 1/1 | Complete | 2026-05-26 |
+| 157. Learning Platform Entry IA and Parent Activity Integration | 1/1 | Complete | 2026-05-26 |
+| 158. Localization, Demo QA, README, and Final Verification | 1/1 | Complete | 2026-05-26 |
 
 ## Coverage
 
@@ -152,5 +152,4 @@
 
 ## Next Up
 
-Milestone v1.27 is ready to plan and execute. Recommended next phase: Phase 153 Practice Interaction Research and Contract Definition.
-
+Milestone v1.27 implementation is complete. Recommended next milestone: Phase 30 Final Demo Curriculum Packaging, External Testing, and Product Story Refinement.

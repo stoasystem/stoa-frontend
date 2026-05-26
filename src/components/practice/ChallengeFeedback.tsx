@@ -1,4 +1,4 @@
-import { CheckCircle2, RotateCcw, XCircle } from 'lucide-react'
+import { CheckCircle2, MessageCircle, RotateCcw, XCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import type { PracticeAnswerResult } from '@/types/practice'
@@ -8,11 +8,13 @@ export function ChallengeFeedback({
   onRetry,
   onContinue,
   onHint,
+  onExplain,
 }: {
   result: PracticeAnswerResult
   onRetry: () => void
   onContinue: () => void
   onHint: () => void
+  onExplain?: () => void
 }) {
   const { t } = useTranslation('practice')
   const Icon = result.correct ? CheckCircle2 : XCircle
@@ -39,6 +41,12 @@ export function ChallengeFeedback({
               <Button onClick={onHint} type="button" variant="outline">
                 {t('showHint')}
               </Button>
+              {onExplain && (
+                <Button onClick={onExplain} type="button" variant="outline">
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                  {t('explainStep')}
+                </Button>
+              )}
               <Button onClick={onRetry} type="button" variant="secondary">
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
                 {t('tryAgain')}

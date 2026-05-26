@@ -1,5 +1,31 @@
 # Milestones
 
+## v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization (Shipped: 2026-05-26)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** Phase 29 completed through autonomous build and browser smoke evidence.
+
+### Delivered
+
+- Practice lesson start screen with title, practice goal, estimated time, challenge count, and start action.
+- Stable challenge, feedback, hint, retry, result, and mistakes review interaction refinements.
+- `PracticeChatContext` and `PracticeTeacherRequestContext` frontend/demo contracts.
+- Practice-to-Learning-Chat route-state handoff from lesson, result, and mistakes review surfaces.
+- Chat practice context card with topic, question, recent answer, and Back to lesson.
+- Delayed teacher-support escalation with practice context.
+- Student Dashboard entry framing for Continue Practice and Ask a question.
+- Homepage learning-entry copy connecting practice and questions under one learning path.
+- Parent Report learning activity summary combining questions, practice, mistakes, teacher support, current path, and recommendation.
+- English, German, French, and Italian action labels for Practice-to-Chat, Back to lesson, Ask a question, and teacher escalation copy.
+- Phase 29 docs, README guidance, QA checklist, and integrated demo flow.
+
+### Verification
+
+- `npm run build`: passed with the existing Node `DEP0205` deprecation warning from tooling.
+- Browser smoke: passed for homepage learning entry copy, student login, Dashboard Practice/Chat entries, Practice lesson intro, correct feedback, incorrect feedback, hint, Practice-to-Chat context card, Back to lesson, parent login, and parent learning activity summary.
+
+---
+
 ## v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing (Shipped: 2026-05-26)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

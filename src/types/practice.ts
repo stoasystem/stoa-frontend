@@ -75,6 +75,8 @@ export type PracticeAnswerResult = {
   hint?: string
   nextChallengeId?: string
   attemptsRemaining: number
+  canAskLearningAssistant?: boolean
+  canAskTeacher?: boolean
 }
 
 export type PracticeLessonResult = {
@@ -141,6 +143,7 @@ export type PracticeTeacherHelpRequest = {
   lessonId: string
   challengeId: string
   message: string
+  practiceContext?: PracticeTeacherRequestContext
 }
 
 export type PracticeTeacherHelpResponse = {
@@ -157,4 +160,35 @@ export type PracticeParentSummary = {
   currentPracticePath: string
   recommendedNextTopic: string
   supportiveNote: string
+  questionsAsked?: number
+  teacherSupportRequested?: number
+  learningActivityNote?: string
+}
+
+export type PracticeChatContext = {
+  source: 'practice'
+  subjectId: string
+  lessonId: string
+  challengeId: string
+  challengePrompt: string
+  studentAnswer?: string
+  correctAnswer?: string
+  topic: string
+  gradeLevel: string
+  returnTo?: string
+}
+
+export type PracticeTeacherRequestContext = {
+  source: 'practice'
+  subjectId: string
+  lessonId: string
+  challengeId: string
+  topic: string
+  studentAnswer?: string
+  attempts: number
+}
+
+export type PracticeChatLocationState = {
+  practiceContext?: PracticeChatContext
+  prompt?: string
 }

@@ -22,6 +22,23 @@
   "uploadFailed": "Échec du téléversement.",
   "retry": "Réessayer",
   "newConversation": "Nouvelle conversation",
+  "practiceContext": {
+    "title": "Tu révises une étape d’exercice.",
+    "topic": "Sujet",
+    "question": "Question",
+    "recentAnswer": "Réponse récente",
+    "backToLesson": "Retour à la leçon",
+    "welcome": "Revois cette étape avec l’Assistant d’apprentissage.",
+    "placeholder": "Demande l’étape suivante, pas seulement la réponse finale..."
+  },
+  "availability": {
+    "checking": "Vérification des enseignants",
+    "online": "Enseignant en ligne",
+    "offline": "Aucun enseignant en ligne",
+    "onlineDetail": "{{count}} disponible maintenant",
+    "offlineDetail": "L’équipe enseignante traitera les demandes plus tard.",
+    "nextWindow": "Prochain créneau {{nextWindow}}"
+  },
   "teacher": {
     "title": "Un enseignant peut-il clarifier ce point ?",
     "description": "Envoie cette conversation à un enseignant qualifié si tu as besoin d’un accompagnement plus clair.",

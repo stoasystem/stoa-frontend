@@ -10,19 +10,19 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing
+## Latest Shipped Milestone: v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
 
 **Shipped:** 2026-05-26
 
-**Delivered:** STOA Practice Path now has an equation-only demo route with lower-secondary linear equation, quadratic, and linear-system content; improved challenge feedback and hint copy; refined Practice UI framing; hint-first support behavior; parent-readable equation practice summary; content QA docs; demo scenario docs; README guidance; and verified build/browser smoke coverage.
+**Delivered:** STOA Practice Path now has a smoother lesson start/challenge/feedback/hint/retry/result loop, Practice-to-Learning-Chat context handoff, Chat practice context card, Back to lesson behavior, delayed teacher-support escalation with practice context, reorganized student learning entry points, homepage learning-entry framing, unified parent learning activity summary, four-language action copy, Phase 29 docs, README guidance, and verified build/browser smoke coverage.
 
 **Target features:**
-- Equation-only Practice Path focused on linear equations, quadratic equations, and linear systems.
-- Lower-secondary lesson structure with deterministic mock challenges.
-- Challenge-specific correct/incorrect feedback and non-answer-revealing hints.
-- UI polish for overview, path, lesson, hint, result, mistake, dashboard, and parent summary surfaces.
-- Parent Report equation path summary with supportive wording.
-- Practice content QA, demo scenario documentation, README guidance, and browser smoke evidence.
+- Research-backed Practice interaction refinements adapted from Duolingo-style mechanics without copying its visual/product/backend model.
+- Lesson intro, stable challenge flow, calm feedback, hint-first retry, result summary, and mistakes review actions.
+- Practice-to-Learning-Chat route-state context and Chat practice context card.
+- Back to lesson flow from Chat.
+- Teacher support shown after repeated confusion with practice context.
+- Dashboard, homepage, navigation, parent report, docs, localization, QA, README, build, and browser smoke.
 
 ## Current Milestone: v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
 
@@ -38,7 +38,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ## Current State
 
-**Latest shipped milestone:** v1.26 Phase 28: Practice Path QA, Equation Lesson Design, and Demo Scenario Polishing
+**Latest shipped milestone:** v1.27 Phase 29: Practice Path Interaction Refinement, Learning Platform Entry Flow, and Site Layout Reorganization
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -69,6 +69,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 26 Learning Assistant functional QA with multi-turn regression data, focused behavior tests, evaluator and repair/fallback stabilization, regression report, README guidance, and full demo-flow verification.
 - Phase 27 Practice Path frontend/demo integration with `/practice`, subject path, lesson flow, challenge feedback, hint flow, lesson result, mistakes review, Student Dashboard practice summary, Parent Report practice summary, API contracts, mock data, and four-language Practice copy.
 - Phase 28 Practice Path QA and equation demo polishing with an equation-only Mathematics path, refined lesson content, challenge-specific feedback, hint-first support behavior, parent summary copy, demo scenario docs, content QA, and verified build/browser smoke.
+- Phase 29 Practice Path interaction and learning-entry integration with lesson intro, stable challenge/feedback/hint/retry flow, Practice-to-Learning-Chat context handoff, Chat context card, Back to lesson, delayed teacher escalation, Dashboard/homepage IA polish, unified Parent Report learning activity, docs, localization, build, and browser smoke.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -101,15 +102,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify production-facing UI cleanup, demo-only UI guards, display-label mapping, sanitized user-facing errors, duplicate-submit guards, stable empty/error states, QA evidence, and README guidance — v1.17
 - ✓ Developers can run and verify local demo Learning Assistant provider integration with Python prompt harness, internal Codex provider adapter, template fallback, provider health check, response behavior tests, FastAPI chat integration, QA docs, README guidance, and future provider handoff notes — v1.23
 - ✓ Developers can run and verify Learning Assistant functional QA, multi-turn regression tests, evaluator/prompt/fallback stabilization, regression reporting, and full demo-flow behavior checks — v1.24
+- ✓ Developers can run and verify Practice Path interaction refinements, Practice-to-Learning-Chat context handoff, delayed teacher escalation, unified dashboard/homepage/parent learning activity framing, four-language labels, docs, build, and browser smoke — v1.27
 
 ### Active
 
-- [ ] Improve the existing equation Practice Path interaction flow so lesson start, challenge, feedback, hint, retry, completion, and mistakes review feel stable and smooth.
-- [ ] Make Practice a natural entry point into Learning Chat by carrying challenge context into `Explain this step` / `Ask in Learning Chat` flows and providing a clear `Back to lesson` return path.
-- [ ] Keep teacher escalation tertiary and contextual, appearing only after repeated confusion or explicit stuck intent.
-- [ ] Reorganize Student Dashboard, homepage entry copy, navigation, and parent reporting so Practice and Learning Chat read as one coherent learning platform.
-- [ ] Add four-language copy and QA coverage for Practice-to-Chat, Back to lesson, Ask a question, and teacher support escalation labels.
-- [ ] Document the site layout, student entry map, practice interaction refinements, Practice-to-Chat/teacher flows, integrated demo flow, and Phase 29 QA.
+(None — v1.27 implementation is complete. Next active scope should be defined by Phase 30.)
 
 ### Out of Scope
 

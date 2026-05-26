@@ -22,6 +22,23 @@
   "uploadFailed": "Caricamento file non riuscito.",
   "retry": "Riprova",
   "newConversation": "Nuova conversazione",
+  "practiceContext": {
+    "title": "Stai rivedendo un passaggio di esercizio.",
+    "topic": "Argomento",
+    "question": "Domanda",
+    "recentAnswer": "Risposta recente",
+    "backToLesson": "Torna alla lezione",
+    "welcome": "Rivedi questo passaggio con l’Assistente all’apprendimento.",
+    "placeholder": "Chiedi il passaggio successivo, non solo la risposta finale..."
+  },
+  "availability": {
+    "checking": "Verifica insegnanti",
+    "online": "Insegnante online",
+    "offline": "Nessun insegnante online",
+    "onlineDetail": "{{count}} disponibile ora",
+    "offlineDetail": "Il supporto insegnanti controllerà le richieste più tardi.",
+    "nextWindow": "Prossima finestra {{nextWindow}}"
+  },
   "teacher": {
     "title": "Un insegnante può chiarire questo punto?",
     "description": "Invia questa conversazione a un insegnante qualificato per una guida più chiara.",

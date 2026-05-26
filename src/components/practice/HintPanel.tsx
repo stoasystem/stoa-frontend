@@ -31,13 +31,16 @@ export function HintPanel({
           <div className="flex flex-wrap gap-2 pt-2">
             <Button onClick={onExplain} type="button" variant="outline">
               <MessageCircle className="h-4 w-4" aria-hidden="true" />
-              {t('explainStep')}
+              {t('askLearningChat')}
             </Button>
             {teacherHelpVisible && (
-              <Button onClick={onTeacherHelp} type="button" variant="secondary">
-                <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
-                {t('askTeacher')}
-              </Button>
+              <div className="flex flex-col gap-2 rounded-md border bg-card/70 p-3">
+                <p className="text-sm font-medium">{t('teacherSupportPrompt')}</p>
+                <Button onClick={onTeacherHelp} type="button" variant="secondary">
+                  <UserRoundCheck className="h-4 w-4" aria-hidden="true" />
+                  {t('askTeacher')}
+                </Button>
+              </div>
             )}
           </div>
           {teacherHelpMessage && <p className="text-sm text-muted-foreground">{teacherHelpMessage}</p>}

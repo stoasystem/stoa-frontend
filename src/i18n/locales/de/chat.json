@@ -22,6 +22,23 @@
   "uploadFailed": "Datei-Upload fehlgeschlagen.",
   "retry": "Erneut versuchen",
   "newConversation": "Neue Unterhaltung",
+  "practiceContext": {
+    "title": "Du wiederholst einen Übungsschritt.",
+    "topic": "Thema",
+    "question": "Aufgabe",
+    "recentAnswer": "Letzte Antwort",
+    "backToLesson": "Zurück zur Lektion",
+    "welcome": "Besprich diesen Übungsschritt mit dem Lernassistenten.",
+    "placeholder": "Bitte um den nächsten Schritt, nicht nur um das Ergebnis..."
+  },
+  "availability": {
+    "checking": "Lehrpersonen werden geprüft",
+    "online": "Lehrperson online",
+    "offline": "Keine Lehrperson online",
+    "onlineDetail": "{{count}} jetzt verfügbar",
+    "offlineDetail": "Lehrpersonen prüfen Anfragen später.",
+    "nextWindow": "Nächstes Zeitfenster {{nextWindow}}"
+  },
   "teacher": {
     "title": "Soll eine Lehrperson helfen?",
     "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson, wenn du mehr Orientierung brauchst.",

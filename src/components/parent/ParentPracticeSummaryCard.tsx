@@ -1,4 +1,4 @@
-import { Route } from 'lucide-react'
+import { Activity, Route } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { PracticeParentSummary } from '@/types/practice'
 
@@ -11,17 +11,25 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
             <Route className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <p className="brand-section-kicker">Practice Path</p>
-            <CardTitle className="text-xl">Practice summary</CardTitle>
+            <p className="brand-section-kicker">Learning activity</p>
+            <CardTitle className="text-xl">Practice and questions summary</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-5">
+          <PracticeParentMetric label="Questions asked" value={`${summary.questionsAsked ?? 2}`} />
           <PracticeParentMetric label="Lessons this week" value={`${summary.lessonsCompletedThisWeek}`} />
           <PracticeParentMetric label="Mistakes reviewed" value={`${summary.mistakesReviewed}`} />
           <PracticeParentMetric label="Practice streak" value={`${summary.practiceStreak} days`} />
+          <PracticeParentMetric label="Teacher support" value={`${summary.teacherSupportRequested ?? 1}`} />
         </div>
+        {summary.learningActivityNote && (
+          <div className="flex gap-3 rounded-lg border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6">
+            <Activity className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <p>{summary.learningActivityNote}</p>
+          </div>
+        )}
         <div className="space-y-2 text-sm leading-6">
           <p>
             <span className="font-medium">Current path:</span> {summary.currentPracticePath}

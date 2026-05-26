@@ -23,7 +23,7 @@ export function StudentDashboardPage() {
         <PageHeader
           eyebrow="Learning space"
           title="Student Dashboard"
-          description="Track learning progress, recent questions, weak topics, and teacher feedback."
+          description="Choose the next learning step: continue guided practice, ask a specific question, or review recent activity."
         />
 
         <div className="grid gap-4 md:grid-cols-3">

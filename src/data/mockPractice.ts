@@ -319,6 +319,8 @@ export function submitMockChallengeAnswer(challengeId: string, answer: string | 
     hint: challenge?.hint,
     nextChallengeId,
     attemptsRemaining: correct ? 2 : 1,
+    canAskLearningAssistant: !correct,
+    canAskTeacher: !correct && currentIndex >= 1,
   }
 }
 
@@ -357,6 +359,9 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     currentPracticePath: 'Equations',
     recommendedNextTopic: 'Two-step equations and substitution',
     supportiveNote: 'Anna is currently practicing equations. She is confident with one-step equations and could benefit from more practice with two-step problems and simple systems.',
+    questionsAsked: 2,
+    teacherSupportRequested: 1,
+    learningActivityNote: 'This week combines short equation practice with guided questions when a step was unclear.',
   }
 }
 
