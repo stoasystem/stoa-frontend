@@ -47,11 +47,11 @@ Requirements for Phase 23. Each requirement maps to exactly one roadmap phase.
 
 ### Go / No-Go and Public Release
 
-- [ ] **GONOGO23-01**: `docs/release/go-no-go-decision.md` records Go and No-Go criteria, P0/P1 status, stakeholder approval status, and final decision.
-- [ ] **README23-01**: README includes the Phase 23 launch-candidate bug fixing and public demo release section.
-- [ ] **RELEASE23-01**: Release tag or release branch plan is recorded and follows bug-fix-only release branch rules.
-- [ ] **RELEASE23-02**: Public demo release branch or deployment confirmation is recorded, or exact external blocker is documented.
-- [ ] **SIGNOFF23-01**: Stakeholder final sign-off is recorded before public demo release is marked Go.
+- [x] **GONOGO23-01**: `docs/release/go-no-go-decision.md` records Go and No-Go criteria, P0/P1 status, stakeholder approval status, and final decision.
+- [x] **README23-01**: README includes the Phase 23 launch-candidate bug fixing and public demo release section.
+- [x] **RELEASE23-01**: Release tag or release branch plan is recorded and follows bug-fix-only release branch rules.
+- [x] **RELEASE23-02**: Public demo release branch or deployment confirmation is recorded, or exact external blocker is documented.
+- [x] **SIGNOFF23-01**: Stakeholder final sign-off is recorded before public demo release is marked Go.
 
 ## Future Requirements
 
@@ -113,11 +113,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PRESENT23-01 | Phase 131 | Done |
 | NOTES23-01 | Phase 131 | Done |
 | NOTES23-02 | Phase 131 | Done |
-| GONOGO23-01 | Phase 132 | Pending |
-| README23-01 | Phase 132 | Pending |
-| RELEASE23-01 | Phase 132 | Pending |
-| RELEASE23-02 | Phase 132 | Pending |
-| SIGNOFF23-01 | Phase 132 | Pending |
+| GONOGO23-01 | Phase 132 | Done |
+| README23-01 | Phase 132 | Done |
+| RELEASE23-01 | Phase 132 | Done |
+| RELEASE23-02 | Phase 132 | Done |
+| SIGNOFF23-01 | Phase 132 | Done |
 
 **Coverage:**
 - v1.22 requirements: 30 total

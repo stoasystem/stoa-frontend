@@ -9,6 +9,52 @@ STOA learning platform frontend.
 - Vite
 - npm
 
+## Phase 23 Launch Candidate Bug Fixing and Public Demo Release
+
+This phase does not add new features.
+
+It fixes launch-candidate blockers, completes final approval, and prepares the public demo release.
+
+Main tasks:
+
+- Fix P0 / P1 launch candidate bugs
+- Complete final approval changes
+- Rerun final demo flow
+- Run multilingual smoke test
+- Run responsive smoke test
+- Run accessibility smoke test
+- Prepare deployment handoff
+- Prepare demo monitoring plan
+- Prepare first external presentation support
+- Publish public demo release notes
+- Complete Go / No-Go decision
+
+Rule:
+
+No new feature development is allowed in this phase.
+
+Phase 23 docs:
+
+- `docs/release/final-approval-changes.md`
+- `docs/release/phase-23-lock-preservation.md`
+- `docs/release/public-demo-final-run.md`
+- `docs/release/deployment-handoff.md`
+- `docs/release/demo-monitoring-plan.md`
+- `docs/release/first-external-presentation-support.md`
+- `docs/release/public-demo-release-notes.md`
+- `docs/release/go-no-go-decision.md`
+- `docs/release/public-demo-release-confirmation.md`
+
+Verification:
+
+```bash
+npm run demo:reset
+npm run demo:backend
+npm run dev -- --host 127.0.0.1
+npm run lint
+npm run build
+```
+
 ## Phase 22 Final Demo Package and Launch Candidate
 
 This phase does not add new features.
