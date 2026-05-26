@@ -1,56 +1,96 @@
-# Phase 19 Research: Architecture
+# Phase 20 Research: Architecture
+
+**Milestone:** v1.19 Phase 20
 
 ## Integration Points
 
-The safest architecture is documentation plus token/component refinement:
+### Locale Files
 
-1. Read-only source audit:
-   - `/Users/zhdeng/newweb/css/style.css`
-   - `/Users/zhdeng/newweb/css/default.css`
-   - `/Users/zhdeng/newweb/css/responsive.css`
-   - `/Users/zhdeng/newweb/index.html`
-   - representative image directories under `/Users/zhdeng/newweb/img/`
-2. Learning platform design docs:
-   - `docs/design/*`
-3. Token layer:
-   - Add `src/styles/brand-tokens.css` for translated brand variables.
-   - Add `src/styles/platform-theme.css` for app-specific applications.
-   - Import through `src/index.css`.
-4. Component layer:
-   - Update `Button`, `Card`, `Badge`, inputs, page headers, chat bubbles, pricing/billing cards, and report components through existing abstractions where possible.
-5. Page layer:
-   - Use light scoped classes and existing layout components for homepage/auth/report/app-page refinements.
+Primary write scope:
 
-## Main Website Signals
+```text
+src/i18n/locales/en/
+src/i18n/locales/de/
+src/i18n/locales/fr/
+src/i18n/locales/it/
+```
 
-Observed signals:
+Most Phase 20 copy changes should happen in existing namespace JSON files:
 
-- Typography: `Prata` for display/editorial headings, `Inter` for body and UI copy.
-- Primary brand accent: burgundy `#9D2235`.
-- Charcoal/dark surface: `#212121`.
-- Warm neutral page surface: `#F3F3F3`.
-- Body copy: muted grey `#666`.
-- Main section rhythm: `pt-120 pb-120`.
-- Buttons: uppercase, 14px, 600 weight, 20px vertical padding, mostly square/zero radius, burgundy fill, charcoal hover.
-- Section headers: large editorial serif, often with burgundy highlighted span and pale underline block.
-- Cards/tiles: mixed dark/burgundy/white blocks, modest 10px radius on some surfaces, light shadows.
-- Visual style: education photography, large hero image, image strips, editorial split text, restrained decorative lines/logos.
+- `home.json`
+- `auth.json`
+- `chat.json`
+- `parent.json`
+- `pricing.json`
+- `billing.json`
+- `support.json`
+- `common.json`
+- `errors.json`
+- `tutor.json` where needed
 
-## Learning Platform Adaptation
+### Layout Hints
 
-- Use burgundy as a derived brand accent, not as the only primary action color everywhere.
-- Keep app navigation slightly cooler/darker for usability.
-- Use editorial serif for homepage/auth/report hero headings only.
-- Keep dashboards/chat in clear app typography.
-- Use low-radius or subtly squared surfaces on marketing/auth/report pages; keep app cards controlled and scannable.
-- Reduce bright SaaS blue/teal dominance while preserving clear interactive affordances.
+Primary layout file:
+
+```text
+src/lib/localeLayout.ts
+```
+
+Existing `HomeHero` already consumes this file. Phase 20 can extend it if a documented UI need appears, but should avoid speculative layout knobs.
+
+Candidate additions:
+
+- CTA size or variant hints beyond current `buttonSize`.
+- Short/long CTA guidance if components need mobile labels.
+- Max-width classes for dense cards or hero actions.
+- Locale-specific wrapping classes for action rows.
+
+### Components
+
+Likely components to inspect or update:
+
+- `src/components/home/HomeHero.tsx`
+- `src/components/home/HomeCTASection.tsx`
+- `src/layouts/MarketingLayout.tsx`
+- `src/components/auth/RegisterRoleStep.tsx`
+- `src/components/chat/TeacherRequestInlineAction.tsx`
+- `src/components/billing/PlanCard.tsx`
+- `src/components/common/PageHeader.tsx`
+- `src/components/common/LanguageSwitcher.tsx`
+
+Existing safeguards include `min-w-0`, `break-words`, `whitespace-normal`, flexible action rows, and German stacked hero lines. Phase 20 should reuse these patterns.
+
+### Documentation
+
+Required docs:
+
+```text
+docs/language/main-website-german-style-study.md
+docs/language/main-website-german-copy-reference.md
+docs/language/english-copy-rules.md
+docs/language/german-copy-rules.md
+docs/language/french-copy-rules.md
+docs/language/italian-copy-rules.md
+docs/language/cross-locale-copy-review-matrix.md
+docs/language/cross-locale-visual-qa.md
+```
+
+Existing docs can be updated rather than duplicated when they already exist.
+
+## Data Flow
+
+1. Locale JSON provides product copy by namespace.
+2. Components call `t(...)` from `react-i18next`.
+3. `localeLayout.ts` provides language-specific visual hints.
+4. Components combine copy and layout hints to keep page structure stable.
+5. Visual QA checks rendered routes by locale and viewport.
 
 ## Build Order
 
-1. Document source audit and translation rules.
-2. Add token layer and import it.
-3. Refine core primitives.
-4. Refine P0 public/auth/report pages.
-5. Refine P0 app pages.
-6. Run visual compatibility QA and build.
+1. Source safety and German style study.
+2. Language rules and copy review matrix.
+3. Locale JSON copy refinement.
+4. Locale layout and component adaptation.
+5. Visual QA documentation and README.
+6. Build/dev verification and source safety recheck.
 

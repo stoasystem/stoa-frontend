@@ -1,49 +1,82 @@
-# Phase 19 Research: Stack
+# Phase 20 Research: Stack
 
-## Scope
-
-Phase 19 is a visual refinement milestone. It should not add product features, new frameworks, new languages, or a second design system. The source project `/Users/zhdeng/newweb` is read-only and must not receive dependency installs, formatting, edits, moves, deletes, or commits.
-
-## Source Stack Observed
-
-`/Users/zhdeng/newweb` is a static HTML/CSS/JavaScript website:
-
-- HTML pages such as `index.html`, `programs.html`, `about.html`, and program detail pages.
-- Global CSS in `css/style.css`, `css/default.css`, `css/responsive.css`.
-- JavaScript libraries under `js/` for jQuery, Bootstrap, GSAP, Swiper, menu behavior, animation, and language switching.
-- Image-heavy brand presentation under `img/`.
-- Fonts loaded from Google Fonts in `css/style.css`: `Prata` for headings and `Inter` for body/UI text.
-
-No React, Vite, Tailwind, or shared package relationship with `stoa-frontend` was found.
-
-## Learning Platform Stack Direction
-
-Keep the existing STOA frontend stack:
-
-- React + TypeScript + Vite.
-- Tailwind v4 via `src/index.css`.
-- Existing CSS token files: `src/styles/stoa-theme.css` and `src/styles/premium-theme.css`.
-- Existing shadcn-style primitives in `src/components/ui/`.
-- Existing route/page/component structure.
+**Milestone:** v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation
+**Date:** 2026-05-26
 
 ## Stack Additions
 
-No dependency additions are required for Phase 19.
+No new runtime dependencies are needed.
 
-Recommended implementation files:
+Phase 20 should use the existing frontend stack:
 
-- `docs/design/main-website-readonly-audit.md`
-- `docs/design/main-website-design-translation.md`
-- `docs/design/learning-platform-token-adjustment.md`
-- `docs/design/visual-compatibility-qa.md`
-- `src/styles/brand-tokens.css`
-- `src/styles/platform-theme.css`
+- React + TypeScript + Vite.
+- Existing `i18next` / `react-i18next` locale namespace files.
+- Existing `src/lib/localeLayout.ts` locale layout hints.
+- Existing Tailwind utilities, STOA brand tokens, and `platform-theme.css`.
+- Existing Playwright setup for route/viewport visual checks.
 
-If implementation prefers fewer CSS files, token work may be integrated into `stoa-theme.css` and `premium-theme.css`, but the roadmap should still require documentation of the token proposal.
+## Current Locale Infrastructure
 
-## Stack Risks
+Locale files exist for:
 
-- Do not copy static website CSS into React components. The source CSS is broad, global, and Bootstrap-era; direct import would break Tailwind/app layouts.
-- Do not add jQuery, Bootstrap, GSAP, or Swiper to the learning platform just to mimic the company homepage.
-- Do not rely on web font network loading if the app currently avoids it. If Prata is used, define a safe serif fallback path and keep body UI text system/Inter-like.
+- `en`
+- `de`
+- `fr`
+- `it`
+
+Namespaces currently include:
+
+- `admin`
+- `auth`
+- `billing`
+- `chat`
+- `common`
+- `errors`
+- `home`
+- `parent`
+- `pricing`
+- `support`
+- `tutor`
+
+This is enough for Phase 20. The work should refine existing JSON copy and layout use, not add a translation system.
+
+## Current Layout Infrastructure
+
+`src/lib/localeLayout.ts` already supports:
+
+- Locale-specific hero title variant.
+- German stacked hero title.
+- Per-locale hero max-width classes.
+- Per-locale subtitle width.
+- Per-locale action wrapping.
+- Basic button sizing hints.
+
+Phase 20 should extend this conservatively if needed, for example:
+
+- CTA short/long selection guidance.
+- Button width or wrapping hints.
+- Card/list layout hints for German/French/Italian long text.
+- Text wrapping classes for specific surfaces.
+
+## Read-Only Source
+
+`/Users/zhdeng/newweb` is a static HTML/CSS company homepage project with German and English copy in `js/language-switcher.js` and German fallback text in HTML pages. Phase 20 may inspect it only.
+
+Pre-work source status:
+
+```text
+ M img/team/.DS_Store
+```
+
+This appears to be a pre-existing external change. Phase 20 must not modify it.
+
+## What Not To Add
+
+- No new i18n framework.
+- No CMS.
+- No automatic translation service.
+- No browser-side language preference backend sync.
+- No new UI library.
+- No formatter/build/install commands inside `/Users/zhdeng/newweb`.
+- No copied homepage components or full text blocks.
 

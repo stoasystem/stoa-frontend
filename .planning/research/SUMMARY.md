@@ -1,40 +1,57 @@
-# Phase 19 Research Summary
+# Phase 20 Research Summary
+
+**Milestone:** v1.19 Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation
+**Date:** 2026-05-26
 
 ## Stack Additions
 
-No new runtime dependencies are needed. Phase 19 should use the existing React/Vite/Tailwind/token architecture and add only documentation plus CSS token/theme refinements inside `stoa-frontend`.
+No new dependencies are needed. Phase 20 should use the existing `react-i18next` locale files, `src/lib/localeLayout.ts`, Tailwind utilities, Phase 19 brand tokens, and Playwright/browser visual QA.
 
-## Main Website Design Signals
+## German Style Findings
 
-Source: `/Users/zhdeng/newweb` read-only.
+Source: `/Users/zhdeng/newweb`, read-only.
 
-- Static HTML/CSS site with global CSS and image-led marketing pages.
-- Fonts: `Prata` for headings, `Inter` for body/UI.
-- Core colors: burgundy `#9D2235`, charcoal `#212121`, warm grey `#F3F3F3`, white, muted grey `#666`.
-- Buttons: uppercase, low/square radius, burgundy fill, charcoal/white hover treatment.
-- Section rhythm: large `pt-120 pb-120` marketing spacing.
-- Headings: editorial serif, large display scale, burgundy highlight spans with pale underline blocks.
-- Cards/tiles: education-service blocks in dark, burgundy, and white with moderate padding and light shadows.
-- Imagery: real education photography, hero figure image, gallery strips, and report-like editorial composition.
+Pre-work source status:
 
-## Translation Principle
+```text
+ M img/team/.DS_Store
+```
 
-Same brand family, different product surface.
+This was pre-existing and must remain untouched.
 
-The learning platform should feel related to the main STOA website without becoming a page clone. Homepage, auth, and parent-report pages can borrow more editorial rhythm. Chat and dashboards must stay app-like, readable, and efficient.
+Observed German style:
+
+- Hero rhythm is short, editorial, and split into concise phrases.
+- CTAs are direct and short: `Mehr erfahren`, `Jetzt anmelden`, `Kontakt aufnehmen`.
+- Brand tone is formal, calm, premium, and education-centered.
+- Explanatory text often uses `Schülerinnen und Schüler`, `Lehrpersonen`, `Verständnis`, `Sicherheit`, `Selbstvertrauen`, `Lernfortschritt`, `Begleitung`, `Förderung`, and `Lernumgebung`.
+- `Nachhilfe` is acceptable for service-category clarity, but higher-brand moments lean toward `Lernunterstützung`, `Begleitung`, `Förderung`, and `Lernen`.
+- Longer explanations are placed in paragraphs, while headings and CTAs remain compact.
+
+## Feature Table Stakes
+
+- Document company homepage German style study and copy reference.
+- Create/update English, German, French, and Italian copy rules.
+- Create cross-locale copy review matrix.
+- Create cross-locale visual QA matrix.
+- Refine core locale JSON for homepage, register, chat, parent report, pricing, billing, and support.
+- Update locale layout hints and components only where copy length requires it.
+- Verify build/dev and source read-only safety.
 
 ## Watch Outs
 
-- `/Users/zhdeng/newweb` has a pre-existing modified `img/team/.DS_Store`; do not touch it.
-- Do not copy website CSS, components, or image assets into the learning platform.
-- Keep Phase 17 multilingual layout safeguards.
-- Avoid making dashboards/chat marketing-like.
+- Do not modify `/Users/zhdeng/newweb`.
+- Do not copy homepage components or full text.
+- Do not force literal translation across locales.
+- Do not add new product functionality.
+- Treat copy and layout as a coupled system.
+- Preserve Phase 18 production-facing copy safety and Phase 19 brand visuals.
 
 ## Recommended Phase Structure
 
-1. Read-only audit and design translation documentation.
-2. Design token and theme adjustment.
-3. Shared component refinement.
-4. Public/auth/report page visual alignment.
-5. App page visual alignment and visual compatibility QA.
+1. Source Safety and German Style Study.
+2. Cross-Locale Copy Rules and Review Matrix.
+3. Core Locale Copy Refinement.
+4. Locale Layout Adaptation and Component Fit.
+5. Cross-Locale Visual QA, README, and Handoff.
 

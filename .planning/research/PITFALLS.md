@@ -1,52 +1,62 @@
-# Phase 19 Research: Pitfalls
+# Phase 20 Research: Pitfalls
 
-## Pitfall: Copying the Main Website
+**Milestone:** v1.19 Phase 20
 
-Directly copying `css/style.css` or HTML sections would import a global Bootstrap-era marketing system into a React/Tailwind app. This would break component boundaries and make the learning platform look like a homepage page instead of a product.
+## Source Safety Pitfalls
 
-Prevention:
-
-- Translate design signals into tokens and local component refinements.
-- Keep docs explicit about what not to copy.
-- Do not copy files or components from `/Users/zhdeng/newweb`.
-
-## Pitfall: Losing App Usability
-
-The company homepage uses large editorial sections, 120px vertical rhythm, and image-led marketing composition. Dashboards, chat, billing, and support need faster scanning and denser interaction.
+- Running formatter, install, build, or cleanup commands inside `/Users/zhdeng/newweb`.
+- Accidentally modifying `.DS_Store` or generated files in the source project.
+- Copying homepage components, CSS, or full paragraphs into the learning platform.
+- Treating the current source status as clean when it has a pre-existing `M img/team/.DS_Store`.
 
 Prevention:
 
-- Apply homepage-like rhythm mainly to homepage/auth/report.
-- Keep chat/dashboard typography and spacing practical.
-- Use accents subtly in dense surfaces.
+- Use only read commands for `/Users/zhdeng/newweb`.
+- Check `git -C /Users/zhdeng/newweb status --short` before and after work.
+- Document the pre-existing `.DS_Store` change clearly.
 
-## Pitfall: Overusing Burgundy
+## Copy Quality Pitfalls
 
-The main website leans heavily on `#9D2235`. Applying it everywhere would make statuses and CTAs loud and reduce hierarchy.
-
-Prevention:
-
-- Define derived app tokens such as `brand.primaryApp`, `accent.soft`, and `interactive.primary`.
-- Use burgundy for important accents and selected primary actions, not every state.
-
-## Pitfall: Breaking Phase 17 Multilingual Fit
-
-Typography and spacing changes can reintroduce German/French/Italian overflow.
+- German copy becomes literal English with longer sentence structure.
+- German formal/informal address becomes inconsistent.
+- `Schülerinnen und Schüler` is overused in compact UI labels where shorter terms would fit better.
+- `Lehrpersonen-Unterstützung` and other compound forms create heavy UI text.
+- French apostrophes get mixed between straight `'` and typographic `’`.
+- Italian CTA text is natural but too long for buttons.
+- English slips back into SaaS/sales language such as `customers`, `buy now`, or hype claims.
 
 Prevention:
 
-- Re-test EN/DE/FR/IT on P0 pages.
-- Keep German stacked hero support.
-- Avoid viewport-width font scaling.
-- Preserve `min-w-0`, wrapping, and scroll containment safeguards.
+- Use style rules per language before editing JSON.
+- Prefer short German labels and explanatory subtitles.
+- Use typographic apostrophe `’` consistently in French and Italian.
+- Add short CTA variants only where components can consume them.
+- Scan user-facing locale files for banned or risky terminology.
 
-## Pitfall: Dirty Source Project
+## Layout Pitfalls
 
-The source project must be read-only. Initial check already shows a pre-existing modified `.DS_Store` in `/Users/zhdeng/newweb`.
+- Copy changes pass in JSON but overflow in real UI.
+- German and French labels make nav/action rows wrap awkwardly.
+- Pricing cards become uneven from longer feature text.
+- Register role cards grow too tall on mobile.
+- Chat teacher request action becomes unreadable on narrow screens.
 
 Prevention:
 
-- Do not write to `/Users/zhdeng/newweb`.
-- Record the pre-existing dirty file in the read-only audit.
-- Re-check `git status` after work and distinguish pre-existing state from Phase 19 work.
+- Keep components flexible with `min-w-0`, `break-words`, `whitespace-normal`, and wrapping action rows.
+- Use `localeLayout.ts` for repeated locale-driven differences.
+- Prefer shorter copy over shrinking type.
+- Run visual checks across target routes, four locales, and widths 375, 430, 768, 1024, and 1440 where feasible.
+
+## Scope Pitfalls
+
+- Expanding into new pages or features while refining copy.
+- Attempting final legal/professional translation.
+- Creating a CMS or translation workflow.
+- Rewriting the visual system again after Phase 19.
+
+Prevention:
+
+- Requirements should explicitly exclude new functionality, new languages, CMS, and legal-final translation.
+- Roadmap should separate docs/rules, copy edits, layout adaptation, and QA.
 
