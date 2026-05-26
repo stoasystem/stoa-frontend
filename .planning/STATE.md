@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.19
 milestone_name: "Phase 20: Cross-Locale Copy Refinement, German Style Alignment, and Layout Adaptation"
-status: planning
-last_updated: "2026-05-26T00:18:33.983Z"
+status: executing
+last_updated: "2026-05-26T00:32:00.000Z"
 last_activity: 2026-05-26
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-26)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent demo flows, multilingual Swiss-market language support, natural locale-specific product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.19 Phase 20 is defining requirements for cross-locale copy refinement, German style alignment, and multilingual UI layout adaptation.
+**Current focus:** Milestone v1.19 Phase 20 is executing cross-locale copy refinement, German style alignment, and multilingual UI layout adaptation.
 
 ## Current Position
 
-Phase: 113. Source Safety and German Style Study
+Phase: 114. Cross-Locale Copy Rules and Review Matrix
 Plan: —
 Status: Ready to plan
-Last activity: 2026-05-26 — Milestone v1.19 roadmap created
+Last activity: 2026-05-26 — Phase 113 completed German source style study and read-only safety documentation.
 
 ## Performance Metrics
 
@@ -197,6 +197,7 @@ Recent decisions affecting current work:
 - Phase 107 updated README and QA evidence, ran production-facing copy/raw-status scans, verified build, and confirmed the Vite dev server starts.
 - Milestone integration audit found late production-facing copy leaks; commit `159edeb` fixed admin diagnostics, support/billing operational copy, checkout plan labels, register/chat/file-upload error paths, and chat fallback response copy before v1.17 archival.
 - Milestone v1.17 audit passed with 43/43 requirements satisfied and no remaining Phase 18 blockers.
+- Phase 113 documented the company homepage German style reference in read-only mode and recorded the pre-existing `/Users/zhdeng/newweb/img/team/.DS_Store` modification as external to Phase 20.
 
 ### Pending Todos
 
