@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.34
 milestone_name: "Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening"
 status: Awaiting next milestone
-last_updated: "2026-05-27T20:54:00.000Z"
+last_updated: "2026-05-27T21:03:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
@@ -155,6 +155,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Fix Chat teacher availability status | Browser check on `/login?next=/chat` with student account; `npm run lint`; `npm run build` |
 | 2026-05-27 | Fix Chat AI provider and General scope fallback | Backend harness tests; direct Codex provider smoke; `/chat` browser smoke; `npm run lint`; `npm run build` |
 | 2026-05-27 | Move Practice subject details to independent pages | Browser checks on `/practice`, Mathematics detail, Physics preview, and mobile layout; `npm run lint`; `npm run build` |
+| 2026-05-27 | Clarify referral rewards copy | Browser check on `/referrals`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 
