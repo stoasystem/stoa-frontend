@@ -25,13 +25,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Learning Chat copy that frames explanation as the next support step when Practice is unclear.
 - English, German, French, and Italian roadmap copy, QA docs, README guidance, browser checks, and successful build verification.
 
-## Current Milestone: Planning next milestone
+## Current Milestone: v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
 
-**Goal:** Select the next milestone after the shipped Practice Roadmap UI work.
+**Goal:** Make CI and local developer quality gates reliable by auditing the frontend toolchain, fixing reproducible lint/build/script failures, and documenting the commands that must stay green.
 
 **Target features:**
-- Suggested next milestone: roadmap interaction QA, progress feedback, and parent visibility refinement.
-- Keep Phase 35 shipped artifacts archived under `.planning/milestones/`.
+- Reproduce and fix the GitHub Actions `Frontend CI / build` failure locally.
+- Harden ESLint, TypeScript, Vite, npm scripts, and GitHub Actions configuration so Node/browser files are checked in the correct environment.
+- Audit dependency lockfile, ignored/generated files, and documented commands for drift against CI.
+- Run and record the relevant local quality gates: install parity where feasible, lint, build, and targeted smoke checks.
+- Keep the milestone limited to engineering quality and workflow reliability, not product feature expansion.
 
 ## Current State
 
@@ -113,7 +116,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Next milestone requirements are not yet selected.
+- [ ] CI and local npm quality gates fail only on real code or configuration problems, not environment misclassification.
+- [ ] ESLint, TypeScript, Vite, npm scripts, and GitHub Actions configuration are aligned with the repository's actual Node and browser file boundaries.
+- [ ] Dependency lockfile, ignored/generated files, and documented commands remain consistent with the GitHub Actions workflow.
+- [ ] The known `scripts/vite.mjs` lint failure is fixed and verified through local lint/build commands.
+- [ ] Documentation records the quality-gate expectations and any intentionally deferred checks.
 
 ### Out of Scope
 
@@ -165,6 +172,8 @@ The project brief for Phase 23 was provided in Chinese and defines launch-candid
 The project brief for Phase 25 was provided in Chinese and defines a local testing/demo provider integration milestone. Phase 24's Learning Assistant behavior-control design is treated as already completed context for this milestone: guided answers should avoid giving final answers first, respect student grade range and registered subjects, trigger professional teacher support when appropriate, and use a Python prompt harness for behavior control. Phase 25 turns that design into a working local demo path by adding a Codex provider adapter behind the demo backend/harness, a template fallback provider, provider health/readiness checks, behavior regression tests, full demo QA, and future production-provider handoff notes.
 
 The project brief for Phase 32 was provided in Chinese and defines a global language quality and development-artifact cleanup milestone. Phase 32 explicitly does not add functionality or change product structure. It audits English, German, French, and Italian user-facing copy, checks for literal translations and UI overflow, removes user-visible development/demo/mock/Codex/backend/provider/placeholder language, verifies friendly state copy, and documents final language QA before real user testing preparation.
+
+The project brief for Phase 36 was provided through a CI failure notification and follow-up instruction to comprehensively investigate and fix this class of issue. Phase 36 focuses on engineering quality and workflow reliability: GitHub Actions parity, local npm scripts, lint/build configuration, dependency and ignore hygiene, and documentation of the quality gates. It does not add product features, redesign UI, expand curriculum, or change backend/product behavior except where required to keep developer workflows reliable.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -289,6 +298,10 @@ Current codebase facts:
 - **Commercial validation**: Phase 10 can test pricing and billing intent through visible CTAs, billing interest capture, and virtual checkout completion before real payment collection is enabled.
 - **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
 - **Developer workflow**: The project must be usable through standard npm scripts.
+- **Phase 36 scope**: Phase 36 is an engineering-quality milestone only. It may change CI, lint, build, scripts, dependency metadata, documentation, and narrowly related source configuration, but it must not add product features or broad UI changes.
+- **Phase 36 CI parity**: Local verification should mirror `.github/workflows/frontend-ci.yml` as closely as practical: dependency install parity, `npm run lint`, and `npm run build`.
+- **Phase 36 dependency safety**: New dependencies should be avoided unless a reproducible tooling gap requires them; lockfile and package metadata must remain consistent.
+- **Phase 36 generated-file hygiene**: `node_modules/`, `dist/`, local environment files, test artifacts, and browser reports must remain uncommitted unless explicitly intended as source-controlled documentation.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
 
 ## Key Decisions
@@ -386,6 +399,9 @@ Current codebase facts:
 | Make Practice feel like a learning path, not a question list | Students need to understand current position, completed lessons, next step, locked content, and why continuing matters | — Pending |
 | Keep the roadmap subject-agnostic | Phase 34 established the general Practice hierarchy, so Phase 35 must not regress into an equation-only roadmap implementation | — Pending |
 | Use restrained progression cues instead of cartoon rewards | STOA needs motivation and momentum while preserving a premium, trustworthy education-platform tone | — Pending |
+| Keep Phase 36 focused on engineering quality | The current risk is a failing CI gate and possible local/CI configuration drift, so the milestone should harden developer workflows before more product work | — Pending |
+| Treat CI parity as release reliability | A frontend demo can look complete but still be unsafe to iterate if `npm ci`, lint, or build diverge between local and GitHub Actions | — Pending |
+| Fix tooling boundaries at configuration level first | Node scripts, browser source, test files, and config files need correct ESLint/TypeScript environments instead of one-off suppressions where a shared config can express intent | — Pending |
 
 ## Evolution
 
@@ -405,4 +421,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after v1.33 milestone start*
+*Last updated: 2026-05-27 after v1.34 milestone start*
