@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.31
 milestone_name: "Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization"
-status: planning
-last_updated: "2026-05-27T09:45:00.000Z"
+status: implemented
+last_updated: "2026-05-27T10:05:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 3
-  percent: 75
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 180 next
+Phase: 180 complete
 Plan: 180-PLAN.md
-Status: Phase 179 complete; ready to plan Phase 180
-Last activity: 2026-05-27 — Phase 179 four-language mobile fit and accessibility QA completed and build passed
+Status: Phase 33 implemented
+Last activity: 2026-05-27 — Phase 180 documentation, demo flow, README, browser verification, and build verification completed
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 3 of 4
+- Total plans completed this milestone: 4 of 4
 - Average duration: completed in one autonomous execution pass
 - Total execution time: same session
 
@@ -44,7 +44,7 @@ Last activity: 2026-05-27 — Phase 179 four-language mobile fit and accessibili
 | 177 | 1/1 | Complete | 2026-05-27 |
 | 178 | 1/1 | Complete | 2026-05-27 |
 | 179 | 1/1 | Complete | 2026-05-27 |
-| 180 | 0/1 | Pending | — |
+| 180 | 1/1 | Complete | 2026-05-27 |
 
 **Recent Trend:**
 
@@ -100,10 +100,11 @@ Recent decisions affecting current work:
 - Phase 177 added shared Start Practice route helpers and safe role-owned login next handling.
 - Phase 178 split the homepage Practice entry into focused components and added a concrete equation challenge/path preview.
 - Phase 179 verified EN/DE/FR/IT Practice entry copy across 320, 375, 430, 768, 1024, and 1440 px browser widths and hardened long localized heading wrapping.
+- Phase 180 documented the homepage Practice entry funnel, added the Phase 33 QA checklist, verified unauthenticated Start Practice routing in browser, and passed `npm run build`.
 
 ### Pending Todos
 
-- Plan Phase 180: Demo Flow, Documentation, README, and Build Verification.
+- Start Phase 34: Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
 
 ### Quick Tasks Completed
 

@@ -2,6 +2,44 @@
 
 STOA learning platform frontend.
 
+## Phase 33 Homepage Practice Entry
+
+Phase 33 makes the homepage Practice Game / Practice Path a clearer learning entry without turning STOA into a game-first product.
+
+The homepage now gives students a direct Start Practice action after the Hero. The entry explains that students can begin with a short equation challenge, get hints after mistakes, and open Learning Chat when they need a clearer explanation. The complete product hierarchy remains:
+
+1. Practice helps the student start.
+2. Learning Chat explains unclear steps.
+3. Professional Teacher Support helps when guided explanation is not enough.
+4. Parent Report shows the learning process.
+
+Start Practice routing:
+
+- unauthenticated visitor: `/login?next=/practice`
+- authenticated student: `/practice`
+- authenticated parent: `/parent`
+- authenticated tutor: `/tutor`
+- authenticated admin: `/admin`
+
+Phase 33 verification:
+
+- English, German, French, and Italian Practice entry copy added.
+- Browser layout QA passed at 320, 375, 430, 768, 1024, and 1440 CSS px.
+- German and French CTAs wrap safely on mobile.
+- `npm run build` passes.
+
+Phase 33 docs:
+
+- `docs/home/practice-entry-section.md`
+- `docs/home/homepage-cta-hierarchy.md`
+- `docs/practice/practice-homepage-entry.md`
+- `docs/practice/practice-entry-copy.md`
+- `docs/ia/homepage-learning-entry-map.md`
+- `docs/demo/homepage-to-practice-demo-flow.md`
+- `docs/qa/phase33-homepage-practice-entry-checklist.md`
+
+Phase 34 should test whether students and parents understand the Practice entry, click Start Practice, and understand the Practice-to-Learning-Chat relationship.
+
 ## Tech Stack
 
 - React

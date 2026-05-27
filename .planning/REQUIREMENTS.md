@@ -45,24 +45,24 @@
 
 ### Documentation and Demo Flow
 
-- [ ] **DOC33-01**: `docs/home/practice-entry-section.md` documents the homepage Practice entry section strategy and product hierarchy.
-- [ ] **DOC33-02**: `docs/home/homepage-cta-hierarchy.md` documents `Start Learning`, `Start Practice`, and `How it works` hierarchy.
-- [ ] **DOC33-03**: `docs/practice/practice-homepage-entry.md` documents how the homepage Practice entry connects to `/practice`.
-- [ ] **DOC33-04**: `docs/practice/practice-entry-copy.md` records the four-language Practice entry copy and forbidden wording.
-- [ ] **DOC33-05**: `docs/ia/homepage-learning-entry-map.md` maps Hero, Practice, How STOA Works, Learning Chat, teacher support, and Parent Report.
-- [ ] **DOC33-06**: `docs/demo/homepage-to-practice-demo-flow.md` documents the homepage-to-Practice demo flow for unauthenticated and authenticated users.
-- [ ] **DOC33-07**: README includes a Phase 33 section explaining the Practice homepage entry, route behavior, four-language copy, QA, and build status.
+- [x] **DOC33-01**: `docs/home/practice-entry-section.md` documents the homepage Practice entry section strategy and product hierarchy.
+- [x] **DOC33-02**: `docs/home/homepage-cta-hierarchy.md` documents `Start Learning`, `Start Practice`, and `How it works` hierarchy.
+- [x] **DOC33-03**: `docs/practice/practice-homepage-entry.md` documents how the homepage Practice entry connects to `/practice`.
+- [x] **DOC33-04**: `docs/practice/practice-entry-copy.md` records the four-language Practice entry copy and forbidden wording.
+- [x] **DOC33-05**: `docs/ia/homepage-learning-entry-map.md` maps Hero, Practice, How STOA Works, Learning Chat, teacher support, and Parent Report.
+- [x] **DOC33-06**: `docs/demo/homepage-to-practice-demo-flow.md` documents the homepage-to-Practice demo flow for unauthenticated and authenticated users.
+- [x] **DOC33-07**: README includes a Phase 33 section explaining the Practice homepage entry, route behavior, four-language copy, QA, and build status.
 
 ### QA, Verification, and Handoff
 
-- [ ] **QA33-01**: QA checklist verifies that homepage has a clear Practice Game / Practice Path entry and Start Practice button.
-- [ ] **QA33-02**: QA checklist verifies that users can understand Practice as a short learning entry and not as the whole STOA product.
-- [ ] **QA33-03**: QA checklist verifies unauthenticated, student, parent, tutor, and admin Start Practice routing.
-- [ ] **QA33-04**: QA checklist verifies desktop and mobile Practice entry layout across English, German, French, and Italian.
-- [ ] **QA33-05**: QA checklist verifies Practice -> Learning Chat -> Professional Teacher Support -> Parent Report hierarchy.
-- [ ] **QA33-06**: Homepage-to-Practice demo flow is run or documented with exact manual verification steps.
-- [ ] **QA33-07**: `npm run build` succeeds after Phase 33 changes.
-- [ ] **QA33-08**: Phase 33 handoff records any known gaps for Phase 34 user testing and feedback.
+- [x] **QA33-01**: QA checklist verifies that homepage has a clear Practice Game / Practice Path entry and Start Practice button.
+- [x] **QA33-02**: QA checklist verifies that users can understand Practice as a short learning entry and not as the whole STOA product.
+- [x] **QA33-03**: QA checklist verifies unauthenticated, student, parent, tutor, and admin Start Practice routing.
+- [x] **QA33-04**: QA checklist verifies desktop and mobile Practice entry layout across English, German, French, and Italian.
+- [x] **QA33-05**: QA checklist verifies Practice -> Learning Chat -> Professional Teacher Support -> Parent Report hierarchy.
+- [x] **QA33-06**: Homepage-to-Practice demo flow is run or documented with exact manual verification steps.
+- [x] **QA33-07**: `npm run build` succeeds after Phase 33 changes.
+- [x] **QA33-08**: Phase 33 handoff records any known gaps for Phase 34 user testing and feedback.
 
 ## Future Requirements
 
@@ -126,21 +126,21 @@ Which phases cover which requirements. Updated during roadmap creation.
 | L10N33-06 | Phase 179 | Complete |
 | L10N33-07 | Phase 179 | Complete |
 | L10N33-08 | Phase 179 | Complete |
-| DOC33-01 | Phase 180 | Pending |
-| DOC33-02 | Phase 180 | Pending |
-| DOC33-03 | Phase 180 | Pending |
-| DOC33-04 | Phase 180 | Pending |
-| DOC33-05 | Phase 180 | Pending |
-| DOC33-06 | Phase 180 | Pending |
-| DOC33-07 | Phase 180 | Pending |
-| QA33-01 | Phase 180 | Pending |
-| QA33-02 | Phase 180 | Pending |
-| QA33-03 | Phase 180 | Pending |
-| QA33-04 | Phase 180 | Pending |
-| QA33-05 | Phase 180 | Pending |
-| QA33-06 | Phase 180 | Pending |
-| QA33-07 | Phase 180 | Pending |
-| QA33-08 | Phase 180 | Pending |
+| DOC33-01 | Phase 180 | Complete |
+| DOC33-02 | Phase 180 | Complete |
+| DOC33-03 | Phase 180 | Complete |
+| DOC33-04 | Phase 180 | Complete |
+| DOC33-05 | Phase 180 | Complete |
+| DOC33-06 | Phase 180 | Complete |
+| DOC33-07 | Phase 180 | Complete |
+| QA33-01 | Phase 180 | Complete |
+| QA33-02 | Phase 180 | Complete |
+| QA33-03 | Phase 180 | Complete |
+| QA33-04 | Phase 180 | Complete |
+| QA33-05 | Phase 180 | Complete |
+| QA33-06 | Phase 180 | Complete |
+| QA33-07 | Phase 180 | Complete |
+| QA33-08 | Phase 180 | Complete |
 
 **Coverage:**
 - v1 requirements: 43 total

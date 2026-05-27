@@ -33,14 +33,14 @@
 - ✅ **v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement** - Phases 159-164 (shipped 2026-05-26)
 - ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
-- 🔄 **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (planned 2026-05-27)
+- ✅ **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (implemented 2026-05-27)
 
 ## Phases
 
 - [x] **Phase 177: Start Practice Funnel and Route Contract** - Define and implement the role-aware Start Practice route contract so the homepage CTA sends each user type to the correct destination.
 - [x] **Phase 178: Homepage Practice Entry UI and Preview Components** - Build the clearer Practice entry card, preview, and CTA hierarchy using STOA's premium design language.
 - [x] **Phase 179: Four-Language Mobile Fit and Accessibility QA** - Localize and verify the Practice entry across English, German, French, and Italian with mobile, keyboard, and reduced-motion checks.
-- [ ] **Phase 180: Demo Flow, Documentation, README, and Build Verification** - Document the homepage-to-Practice flow, update QA and README handoff, run demo verification, and confirm `npm run build`.
+- [x] **Phase 180: Demo Flow, Documentation, README, and Build Verification** - Document the homepage-to-Practice flow, update QA and README handoff, run demo verification, and confirm `npm run build`.
 
 ## Phase Details
 
@@ -107,7 +107,7 @@
 | 177. Start Practice Funnel and Route Contract | 1/1 | Complete | 2026-05-27 |
 | 178. Homepage Practice Entry UI and Preview Components | 1/1 | Complete | 2026-05-27 |
 | 179. Four-Language Mobile Fit and Accessibility QA | 1/1 | Complete | 2026-05-27 |
-| 180. Demo Flow, Documentation, README, and Build Verification | 0/1 | Pending | — |
+| 180. Demo Flow, Documentation, README, and Build Verification | 1/1 | Complete | 2026-05-27 |
 
 ## Coverage
 
@@ -124,4 +124,4 @@
 
 ## Next Up
 
-Phase 180: Demo Flow, Documentation, README, and Build Verification.
+Phase 34: Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
