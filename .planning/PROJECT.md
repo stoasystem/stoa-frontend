@@ -10,35 +10,37 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization
+## Latest Shipped Milestone: v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
 
 **Shipped:** 2026-05-27
 
-**Delivered:** STOA now has a clearer homepage Practice entry, role-aware Start Practice routing, four-language Practice entry copy, mobile layout verification, documentation, QA checklist, README handoff, and milestone archive.
+**Delivered:** STOA now has a corrected Practice Path scope, subject/topic-aware Practice architecture, canonical Mathematics / lower secondary / equations demo seed data, generalized Practice copy, route compatibility, documentation, QA evidence, README handoff, and build verification.
 
 **Target features:**
-- Homepage Practice Game / Practice Path entry after Hero.
-- Start Practice CTA routing for unauthenticated visitors, students, parents, tutors, and admins.
-- Practice preview and copy explaining short practice, hints, Learning Chat handoff, teacher support, and parent visibility.
-- English, German, French, and Italian Practice entry copy with mobile fit QA.
-- Homepage Practice entry docs, demo flow, QA checklist, README update, browser verification, build verification, and milestone archive.
+- Practice Path Scope Principle in English and Chinese.
+- Historical docs corrected so equations are framed as demo content, not final Practice Path scope.
+- Subject, grade level, topic, unit, lesson, and challenge hierarchy in Practice types and mock data.
+- Canonical `/practice/:subjectId/:topicId` topic route strategy with compatibility for existing Practice entry points.
+- Generalized homepage, dashboard, Practice, parent, tutor, route, and API-contract wording.
+- Build, route compatibility, four-language copy, and demo-flow verification.
 
-## Current Milestone: v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
+## Current Milestone: v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
 
-**Goal:** Correct Practice Path positioning and implementation so it is clearly a general middle-school and high-school learning challenge system, with equations treated only as the first demo content package.
+**Goal:** Upgrade `/practice` from a normal lesson list into a premium, subject-agnostic roadmap learning path that shows where the student is, what is complete, what comes next, what is locked, and how Practice leads into Learning Chat when a step is unclear.
 
 **Target features:**
-- Define and document the Practice Path Scope Principle in English and Chinese.
-- Correct Phase 28, Phase 30, Phase 31, and Phase 33 docs so equations are described as demo content, not final Practice Path scope.
-- Refactor Practice domain types and mock data toward subject, grade level, topic, unit, lesson, and challenge hierarchy.
-- Keep current equation content as `mathematics / lower_secondary / equations` demo seed data.
-- Generalize Practice UI, dashboard, homepage, parent, tutor, route, and API-contract wording away from equation-only product language.
-- Prefer `/practice/:subjectId/:topicId` and subject/topic-based identifiers over equation-specific routes, components, and data names.
-- Verify build, route compatibility, four-language copy, and demo flow after the scope correction.
+- Add a roadmap-style Practice path for `/practice` and `/practice/:subjectId/:topicId`.
+- Display subject, grade level, topic, unit, lesson, and challenge progression without hard-coding equations as the only path.
+- Render lesson nodes with completed, current, available, locked, and review states.
+- Highlight the current lesson, show a next-lesson CTA, and support review CTAs for completed lessons.
+- Show locked lesson unlock conditions instead of allowing direct start.
+- Keep the current demo roadmap as Mathematics / lower secondary / equations.
+- Connect Practice roadmap messaging to Learning Chat as the explanation path when a lesson step is unclear.
+- Add four-language roadmap copy, QA checklist, docs, README guidance, and build verification.
 
 ## Current State
 
-**Latest shipped milestone:** v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization
+**Latest shipped milestone:** v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -73,6 +75,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 30 final demo curriculum packaging with an equation-focused curriculum package, product story statements, 3/10/15 minute demo scripts, role-specific external testing task sheets, feedback form and evaluation framework, parent value framing, future curriculum/backend handoff requirements, Phase 31 follow-up backlog, README handoff, milestone audit, and build verification.
 - Phase 31 Practice entry integration with homepage Practice framing, student Continue Practice and Learning Chat entry cards, Practice-to-Chat context enrichment, parent Learning Activity summary, Tutor Request Practice context, role navigation alignment, four-language copy, docs, README, build, and browser smoke verification.
 - Phase 33 homepage Practice entry clarification with role-aware Start Practice routing, homepage Practice entry components, four-language Practice entry copy, mobile fit QA, docs, README, browser route verification, build verification, and milestone archive.
+- Phase 34 Practice Path scope correction with the canonical Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge hierarchy, Mathematics / lower secondary / equations demo seed data, subject/topic route compatibility, generalized UI copy, docs, README, route QA, four-language checks, and build verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -113,12 +116,14 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Practice Path must be documented and implemented as a general middle-school and high-school learning challenge system.
-- Equation content must be framed as the first demo content package under Mathematics, lower secondary, equations.
-- Frontend types, routes, components, API contracts, mock data, and UI copy must remain subject-agnostic and topic-agnostic.
-- Historical docs from Phases 28, 30, 31, and 33 must be corrected where wording can imply Practice Path equals equations.
-- Homepage and dashboard copy should say Practice Path / Guided Practice / school topics, with equation language limited to demo previews.
-- The existing equation demo flow must continue to work after scope correction.
+- Practice must show a roadmap-style learning path instead of only a list or card grid.
+- Roadmap data and UI must remain subject-agnostic and topic-agnostic, with equations used only as the current demo content package.
+- Lesson nodes must represent completed, current, available, locked, and review states.
+- Students must be able to continue the current lesson, start available lessons, review completed lessons, and see unlock hints for locked lessons.
+- `/practice` and `/practice/:subjectId/:topicId` must communicate subject, grade level, topic, unit, lesson, and challenge progression clearly.
+- Practice roadmap copy must reinforce that Learning Chat explains unclear steps without turning Practice into a cartoon game.
+- English, German, French, and Italian roadmap copy must be available and fit mobile and desktop layouts.
+- The completed implementation must include docs, QA checklist, README guidance, and successful build verification.
 
 ### Out of Scope
 
@@ -276,6 +281,11 @@ Current codebase facts:
 - **Phase 34 model decision**: Canonical demo seed data uses `subjectId: mathematics`, `gradeLevel: lower_secondary`, and `topicId: equations`; the legacy `math` id may be tolerated only as a compatibility alias.
 - **Phase 34 route decision**: Canonical Practice topic routes use `/practice/:subjectId/:topicId`; subject-only Practice routes remain compatibility paths during migration.
 - **Phase 34 copy decision**: User-facing Practice copy should say school-topic challenges or Practice Path; equation wording belongs only in available-now/current-demo labels or the demo challenge content itself.
+- **Phase 35 Practice roadmap scope**: Phase 35 improves the Practice page's route-map, progression, lesson-node, and CTA experience. It must not add new subjects, large new lesson banks, production backend/database work, adaptive-learning algorithms, reward economies, shops, gems, mascot systems, or game-first visual language.
+- **Phase 35 roadmap data rule**: Roadmap types and demo data should preserve the Practice Path hierarchy: Practice -> Subject -> Grade level -> Topic -> Unit -> Lesson node -> Challenge. Mathematics / lower secondary / equations is the only implemented demo roadmap for this milestone.
+- **Phase 35 node-state rule**: Lesson nodes should support completed, current, available, locked, and review states. Locked nodes should explain the unlock condition instead of starting a lesson.
+- **Phase 35 visual direction**: The roadmap should create a clear sense of progression through stable node spacing, connectors, and current-lesson emphasis while using restrained STOA premium colors rather than high-saturation cartoon-game styling.
+- **Phase 35 Learning Chat relationship**: Roadmap copy should reinforce that Practice is a path into guided explanations; when students get stuck, Learning Chat explains the unclear step.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -383,6 +393,9 @@ Current codebase facts:
 | Make Practice a clearer homepage entry without making STOA game-first | Research supports short challenges, visible progress, hints, and immediate feedback as motivating, but STOA's trust model depends on Learning Chat, teacher support, and Parent Report remaining visible | — Pending |
 | Keep Phase 33 frontend-only and route/copy/UI focused | The funnel problem is homepage clarity and CTA routing, not curriculum depth, backend persistence, or new Learning Assistant capability | — Pending |
 | Use Duolingo-inspired mechanics only as interaction inspiration | STOA can borrow short-session cadence and feedback clarity while avoiding Duolingo brand/visual/reward systems and game-first public language | — Pending |
+| Make Practice feel like a learning path, not a question list | Students need to understand current position, completed lessons, next step, locked content, and why continuing matters | — Pending |
+| Keep the roadmap subject-agnostic | Phase 34 established the general Practice hierarchy, so Phase 35 must not regress into an equation-only roadmap implementation | — Pending |
+| Use restrained progression cues instead of cartoon rewards | STOA needs motivation and momentum while preserving a premium, trustworthy education-platform tone | — Pending |
 
 ## Evolution
 
@@ -402,4 +415,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after v1.31 milestone start*
+*Last updated: 2026-05-27 after v1.33 milestone start*

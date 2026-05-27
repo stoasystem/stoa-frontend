@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.32
-milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
-status: complete
-last_updated: "2026-05-27T13:25:00.000Z"
+milestone: v1.33
+milestone_name: "Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience"
+status: planning
+last_updated: "2026-05-27T15:09:55.641Z"
 last_activity: 2026-05-27
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 5
-  completed_plans: 5
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.32 Phase 34 corrects Practice Path scope and architecture so Practice is a general middle-school/high-school learning challenge system and equations are only the first Mathematics demo content package.
+**Current focus:** v1.33 Phase 35 upgrades Practice into a subject-agnostic roadmap learning path with lesson nodes, progression states, unlock hints, next-lesson CTA, Learning Chat handoff copy, four-language support, docs, QA, and build verification.
 
 ## Current Position
 
-Phase: 185 Practice Scope Regression QA, Documentation Handoff, and Build Verification
-Plan: 185-PLAN.md complete
-Status: v1.32 complete
-Last activity: 2026-05-27 — Phase 185 completed QA, documentation handoff, and build verification
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-27 — Milestone v1.33 started
 
 ## Performance Metrics
 
@@ -112,7 +112,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Next milestone can return to Practice funnel user testing now that scope and architecture are corrected.
+- Define Phase 35 requirements and roadmap for the Practice roadmap UI and lesson progression experience.
 
 ### Quick Tasks Completed
 
@@ -180,4 +180,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Define requirements and roadmap for v1.33 Phase 35.
