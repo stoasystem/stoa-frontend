@@ -1,23 +1,12 @@
-import { useMemo, useState } from 'react'
 import { PracticeOverview } from '@/components/practice/PracticeOverview'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
-import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function PracticeOverviewPage() {
-  const [selectedSubjectId, setSelectedSubjectId] = useState<string>()
   const overviewQuery = usePracticeOverviewQuery()
-  const selectedTopicId = useMemo(() => {
-    if (!selectedSubjectId) return undefined
-    const topic = overviewQuery.data?.topics.find((item) => item.subjectId === selectedSubjectId)
-    if (topic?.status !== 'available') return undefined
-
-    return topic.id
-  }, [overviewQuery.data?.topics, selectedSubjectId])
-  const roadmapQuery = usePracticeRoadmapQuery(selectedSubjectId, selectedTopicId)
 
   return (
     <DashboardLayout>
@@ -29,14 +18,7 @@ export function PracticeOverviewPage() {
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
-        {overviewQuery.data && (
-          <PracticeOverview
-            onSubjectSelect={setSelectedSubjectId}
-            overview={overviewQuery.data}
-            roadmap={roadmapQuery.data}
-            selectedSubjectId={selectedSubjectId}
-          />
-        )}
+        {overviewQuery.data && <PracticeOverview overview={overviewQuery.data} />}
       </PageContainer>
     </DashboardLayout>
   )
