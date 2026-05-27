@@ -6,6 +6,7 @@ import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
 import { ContinuePracticeCard } from '@/components/dashboard/ContinuePracticeCard'
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
+import { StudentPlanAccessSection } from '@/components/dashboard/StudentPlanAccessSection'
 import { TeacherFeedbackCard } from '@/components/dashboard/TeacherFeedbackCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
 import {
@@ -31,6 +32,14 @@ export function StudentDashboardPage() {
           {dashboardStats.map((stat) => (
             <DashboardStatCard key={stat.label} stat={stat} />
           ))}
+        </section>
+
+        <section className="space-y-4">
+          <SectionHeader
+            title="Plan and access"
+            description="Usage quota and family plan visibility for this student account."
+          />
+          <StudentPlanAccessSection />
         </section>
 
         <section className="space-y-4">
