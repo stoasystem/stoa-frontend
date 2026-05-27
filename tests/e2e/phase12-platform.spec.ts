@@ -9,7 +9,7 @@ test('admin can view Phase 12 platform demo routes', async ({ page }) => {
   await expect(page.getByText(/stoa zurich tutoring center/i)).toBeVisible()
 
   await page.goto('/organization/students')
-  await expect(page.getByRole('heading', { name: /^students$/i })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1, name: /^students$/i })).toBeVisible()
   await page.getByRole('link', { name: /open profile/i }).first().click()
   await expect(page.getByRole('heading', { name: /advanced learning profile/i })).toBeVisible()
 

@@ -17,11 +17,11 @@ test('authenticated user can complete and cancel virtual checkout', async ({ pag
   await expect(page.getByRole('heading', { name: 'Subscription', exact: true })).toBeVisible()
   await page.getByRole('button', { name: /start checkout/i }).click()
   await expect(page).toHaveURL(/\/billing\/checkout\/demo\?plan=family/)
-  await expect(page.getByRole('heading', { name: /plan selection preview/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /review your plan selection/i })).toBeVisible()
 
-  await page.getByRole('button', { name: /complete plan preview/i }).click()
+  await page.getByRole('button', { name: /complete plan review/i }).click()
   await expect(page).toHaveURL(/\/billing\/checkout\/success\?plan=family/)
-  await expect(page.getByRole('heading', { name: /plan preview complete/i })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /plan review complete/i })).toBeVisible()
 
   await page.goto('/billing/checkout/demo?plan=family')
   await page.getByRole('button', { name: /cancel checkout/i }).click()

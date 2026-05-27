@@ -26,5 +26,8 @@ export async function loginAs(page: Page, role: keyof typeof demoUsers) {
 }
 
 export async function logout(page: Page) {
-  await page.getByRole('button', { name: /log out/i }).click()
+  await page
+    .getByRole('complementary')
+    .getByRole('button', { name: /log out/i })
+    .click()
 }

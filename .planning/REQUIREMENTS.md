@@ -73,9 +73,9 @@ Deferred to future release. Tracked but not in current roadmap.
 | HYGIENE36-01 | Phase 192 | Complete |
 | HYGIENE36-02 | Phase 192 | Complete |
 | QA36-01 | Phase 193 | Complete |
-| QA36-02 | Phase 193 | Pending |
-| QA36-03 | Phase 193 | Pending |
-| QA36-04 | Phase 193 | Pending |
+| QA36-02 | Phase 193 | Complete |
+| QA36-03 | Phase 193 | Complete |
+| QA36-04 | Phase 193 | Complete |
 | DOC36-01 | Phase 194 | Pending |
 | DOC36-02 | Phase 194 | Pending |
 | DOC36-03 | Phase 194 | Pending |
