@@ -5,9 +5,10 @@
 ## Test Framework
 
 **Runner:**
-- No test runner is currently installed.
-- `package.json` has no `test`, `test:watch`, or `test:coverage` script.
-- No `vitest.config.*`, `jest.config.*`, or `playwright.config.*` file exists.
+- Playwright is installed for browser E2E checks through `@playwright/test`.
+- `package.json` has `test:e2e` and `test:e2e:ui` scripts.
+- No unit test runner, `test`, `test:watch`, or `test:coverage` script is currently configured.
+- `playwright.config.ts` exists and starts the Vite dev server for E2E checks.
 
 **Assertion Library:**
 - None configured.
@@ -15,14 +16,15 @@
 **Run Commands:**
 ```bash
 npm run build   # TypeScript build plus Vite production build
-npm run lint    # ESLint over TS/TSX, but config is currently missing
+npm run lint    # ESLint flat config over repository source and config files
+npm run test:e2e # Playwright E2E checks
 ```
 
 ## Test File Organization
 
 **Location:**
-- No test files exist.
-- No `tests/`, `__tests__/`, or colocated `*.test.ts(x)` pattern is established.
+- E2E tests live under `tests/e2e/`.
+- No colocated unit test pattern is established.
 
 **Naming:**
 - Not established.
@@ -126,8 +128,8 @@ const studentUser = {
   - Query loading/error/success states for API-backed pages.
 
 **E2E Tests:**
-- No E2E framework exists.
-- Good future coverage: student ask flow, answer view, history, parent report, teacher queue/session, admin dashboard.
+- Playwright is configured through `playwright.config.ts`.
+- Current E2E coverage should focus on smoke-level route and demo-flow confidence because product data often depends on mock/demo API configuration.
 
 ## Common Patterns
 
@@ -148,10 +150,11 @@ const studentUser = {
 
 ## Current Verification Gaps
 
-- `npm run build` is likely blocked until required Vite/TypeScript files such as `tsconfig*.json` and `index.html` are added.
-- `npm run lint` is likely blocked until ESLint 9 flat config is added.
-- There are no tests protecting the API client, auth store, route table, or future role-based access behavior.
+- `npm run build` is expected to pass with the checked-in Vite/TypeScript scaffold.
+- `npm run lint` is expected to pass with the checked-in ESLint 9 flat config.
+- Unit tests are still not configured for the API client, auth store, route table, or role-based access behavior.
+- Browser E2E coverage exists, but it should remain targeted to stable smoke flows unless the backend/demo state is controlled.
 
 ---
 *Testing analysis: 2026-05-24*
-*Update when test patterns change*
+*Last updated: 2026-05-27 after Phase 36 tooling audit*

@@ -19,7 +19,7 @@
 
 **Package Manager:**
 - npm is implied by README commands (`npm install`, `npm run dev`).
-- Lockfile: no `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock` is currently present.
+- Lockfile: `package-lock.json` is present and GitHub Actions uses `npm ci`.
 
 ## Frameworks
 
@@ -35,14 +35,15 @@
 - Axios `^1.7.0` - HTTP client wrapper in `src/lib/api.ts`.
 
 **Testing:**
-- No test runner dependency is currently installed.
-- No test files or test scripts are currently present.
+- Playwright is installed through `@playwright/test`.
+- `npm run test:e2e` and `npm run test:e2e:ui` are available for browser E2E checks.
+- No unit test runner is currently configured.
 
 **Build/Dev:**
 - Vite `^6.0.0` - Dev server and bundling.
 - `@vitejs/plugin-react` `^4.3.0` - React plugin configured in `vite.config.ts`.
 - TypeScript `^5.5.0` - Build script runs `tsc -b` before `vite build`.
-- ESLint `^9.0.0` - Lint script exists, but no ESLint config file is currently present in the repo.
+- ESLint `^9.0.0` - Lint script uses `eslint.config.js` with TypeScript and Node-script environment handling.
 
 ## Key Dependencies
 
@@ -71,8 +72,8 @@
 
 **Build:**
 - `vite.config.ts` - Vite React plugin, dev server port `5173`, and `/api` proxy.
-- TypeScript build expects a `tsconfig` project because `npm run build` runs `tsc -b`; no `tsconfig*.json` file is currently present.
-- No `index.html` is currently present, which Vite normally needs as the app HTML entry.
+- TypeScript build uses project references in `tsconfig.json`, with browser source in `tsconfig.app.json` and Node/test/config files in `tsconfig.node.json`.
+- `index.html` is present as the Vite HTML entry.
 
 ## Platform Requirements
 
@@ -88,4 +89,4 @@
 
 ---
 *Stack analysis: 2026-05-24*
-*Update after major dependency changes*
+*Last updated: 2026-05-27 after Phase 36 tooling audit*

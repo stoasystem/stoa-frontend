@@ -35,9 +35,10 @@
 - JSX is currently minimal and unstyled.
 
 **Linting:**
-- `package.json` defines `npm run lint` as `eslint . --ext ts,tsx`.
+- `package.json` defines `npm run lint` as `eslint .`.
 - ESLint `^9.0.0` is installed as a dev dependency.
-- No `eslint.config.*` or `.eslintrc*` file exists, so the lint command is not yet backed by a checked-in config.
+- `eslint.config.js` is checked in and uses ESLint flat config with TypeScript support.
+- Node-executed scripts and root config files receive Node globals through a targeted config block.
 
 ## Import Organization
 
@@ -51,8 +52,8 @@
 - No enforced alphabetical ordering is visible.
 
 **Path Aliases:**
-- No path aliases are configured.
-- Imports use relative paths such as `./stores/authStore`.
+- `@/*` resolves to `src/*` in Vite and `tsconfig.app.json`.
+- Relative imports remain common in nearby modules.
 
 ## Error Handling
 

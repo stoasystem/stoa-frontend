@@ -4,19 +4,11 @@
 
 ## Tech Debt
 
-**Build scaffold is incomplete:**
-- Issue: `package.json` defines `npm run build` as `tsc -b && vite build`, but no `tsconfig*.json` or `index.html` is present.
-- Files: `package.json`, missing `tsconfig.json`, missing `index.html`.
-- Why: The repo appears to be an early frontend skeleton.
-- Impact: Production build is unlikely to work until standard Vite project files are added.
-- Fix approach: Add `tsconfig.json`, `tsconfig.app.json` or equivalent, `index.html`, and any required Vite env type declarations.
-
-**Lint scaffold is incomplete:**
-- Issue: `npm run lint` invokes ESLint, but no ESLint 9 flat config exists.
-- Files: `package.json`, missing `eslint.config.*`.
-- Why: Dependencies and script were added before tool configuration.
-- Impact: Lint command may fail or use no project-specific rules.
-- Fix approach: Add `eslint.config.js` / `eslint.config.mjs` with TypeScript and React rules compatible with ESLint 9.
+**Historical build/lint scaffold concerns are resolved:**
+- Status: `tsconfig.json`, `tsconfig.app.json`, `tsconfig.node.json`, `index.html`, `eslint.config.js`, and `package-lock.json` are now present.
+- Current gate: CI and local quality checks should use `npm ci`, `npm run lint`, and `npm run build`.
+- Remaining risk: configuration drift can still break CI if Node-executed scripts, browser source, and test/config files are not assigned the correct lint/TypeScript environments.
+- Fix approach: keep ESLint/TypeScript environment boundaries explicit and verify CI parity after tooling changes.
 
 **Route pages are placeholders:**
 - Issue: Every role page returns a plain TODO string.
@@ -125,10 +117,10 @@
 - Impact: Lint setup can fail if copied from older projects.
 - Migration plan: Add an ESLint 9 flat config.
 
-**No lockfile:**
-- Risk: Dependency resolution can drift across machines and dates.
-- Impact: Non-reproducible installs and unexpected minor/patch changes.
-- Migration plan: Generate and commit a lockfile for the chosen package manager.
+**Lockfile drift:**
+- Risk: Dependency resolution can drift if `package.json` changes without `package-lock.json`.
+- Impact: CI `npm ci` fails or installs a different dependency graph than local development.
+- Migration plan: keep `package-lock.json` committed and verify dependency parity with `npm ci` or `npm ci --dry-run`.
 
 ## Missing Critical Features
 
