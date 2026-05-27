@@ -9,10 +9,9 @@ export async function getTeacherAvailability() {
     )
     return response.data
   }, {
-    online: true,
-    availableTeachers: 1,
-    nextWindow: 'Today 16:00-19:00',
-    responseTime: 'Usually within a few minutes when a teacher is online.',
+    online: false,
+    availableTeachers: 0,
+    responseTime: 'Teacher support reviews requests when a qualified teacher is available.',
   })
 }
 
