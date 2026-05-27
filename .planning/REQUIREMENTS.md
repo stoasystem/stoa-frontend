@@ -8,15 +8,15 @@
 
 ### Funnel and Routing
 
-- [ ] **NAV33-01**: Visitor can identify a clear homepage `Start Practice` action for the Practice Game / Practice Path entry.
-- [ ] **NAV33-02**: Unauthenticated user who clicks `Start Practice` is routed to `/login?next=/practice`.
-- [ ] **NAV33-03**: Student who is already authenticated and clicks `Start Practice` is routed directly to `/practice`.
-- [ ] **NAV33-04**: Parent who is already authenticated and clicks `Start Practice` is routed to `/parent` instead of the student-only Practice route.
-- [ ] **NAV33-05**: Tutor who is already authenticated and clicks `Start Practice` is routed to `/tutor` instead of the student-only Practice route.
-- [ ] **NAV33-06**: Admin who is already authenticated and clicks `Start Practice` is routed to `/admin` instead of the student-only Practice route.
-- [ ] **NAV33-07**: Student login from `/login?next=/practice` lands on `/practice` when the next path is safe for the student role.
-- [ ] **NAV33-08**: Registration path documentation covers `/register?role=student&next=/practice` and the expected post-registration Practice destination.
-- [ ] **NAV33-09**: A shared navigation helper such as `startPracticeNavigation` or `getStartPracticePath` centralizes Start Practice route decisions.
+- [x] **NAV33-01**: Visitor can identify a clear homepage `Start Practice` action for the Practice Game / Practice Path entry.
+- [x] **NAV33-02**: Unauthenticated user who clicks `Start Practice` is routed to `/login?next=/practice`.
+- [x] **NAV33-03**: Student who is already authenticated and clicks `Start Practice` is routed directly to `/practice`.
+- [x] **NAV33-04**: Parent who is already authenticated and clicks `Start Practice` is routed to `/parent` instead of the student-only Practice route.
+- [x] **NAV33-05**: Tutor who is already authenticated and clicks `Start Practice` is routed to `/tutor` instead of the student-only Practice route.
+- [x] **NAV33-06**: Admin who is already authenticated and clicks `Start Practice` is routed to `/admin` instead of the student-only Practice route.
+- [x] **NAV33-07**: Student login from `/login?next=/practice` lands on `/practice` when the next path is safe for the student role.
+- [x] **NAV33-08**: Registration path documentation covers `/register?role=student&next=/practice` and the expected post-registration Practice destination.
+- [x] **NAV33-09**: A shared navigation helper such as `startPracticeNavigation` or `getStartPracticePath` centralizes Start Practice route decisions.
 
 ### Homepage Practice Entry UI
 
@@ -98,15 +98,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV33-01 | Phase 177 | Pending |
-| NAV33-02 | Phase 177 | Pending |
-| NAV33-03 | Phase 177 | Pending |
-| NAV33-04 | Phase 177 | Pending |
-| NAV33-05 | Phase 177 | Pending |
-| NAV33-06 | Phase 177 | Pending |
-| NAV33-07 | Phase 177 | Pending |
-| NAV33-08 | Phase 177 | Pending |
-| NAV33-09 | Phase 177 | Pending |
+| NAV33-01 | Phase 177 | Complete |
+| NAV33-02 | Phase 177 | Complete |
+| NAV33-03 | Phase 177 | Complete |
+| NAV33-04 | Phase 177 | Complete |
+| NAV33-05 | Phase 177 | Complete |
+| NAV33-06 | Phase 177 | Complete |
+| NAV33-07 | Phase 177 | Complete |
+| NAV33-08 | Phase 177 | Complete |
+| NAV33-09 | Phase 177 | Complete |
 | HOME33-01 | Phase 178 | Pending |
 | HOME33-02 | Phase 178 | Pending |
 | HOME33-03 | Phase 178 | Pending |

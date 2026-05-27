@@ -7,10 +7,10 @@ last_updated: "2026-05-27T09:26:40.680Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 25
 ---
 
 # Project State
@@ -24,24 +24,24 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 177 next
-Plan: 177-PLAN.md
-Status: Roadmap created; ready to plan Phase 177
-Last activity: 2026-05-27 — Milestone v1.31 roadmap created for Phase 33 homepage Practice entry optimization
+Phase: 178 next
+Plan: 178-PLAN.md
+Status: Phase 177 complete; ready to plan Phase 178
+Last activity: 2026-05-27 — Phase 177 Start Practice route contract completed and build passed
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 4
-- Average duration: not started
-- Total execution time: planning in progress
+- Total plans completed this milestone: 1 of 4
+- Average duration: completed in one autonomous execution pass
+- Total execution time: same session
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 177 | 0/1 | Pending | — |
+| 177 | 1/1 | Complete | 2026-05-27 |
 | 178 | 0/1 | Pending | — |
 | 179 | 0/1 | Pending | — |
 | 180 | 0/1 | Pending | — |
@@ -49,7 +49,7 @@ Last activity: 2026-05-27 — Milestone v1.31 roadmap created for Phase 33 homep
 **Recent Trend:**
 
 - Last 5 plans: 172, 173, 174, 175, 176
-- Trend: Phase 33 roadmap initialized; next work starts with Start Practice routing contract
+- Trend: Phase 177 completed; next work builds the homepage Practice entry UI
 
 *Updated after each plan completion*
 
@@ -97,10 +97,11 @@ Recent decisions affecting current work:
 - Phase 33 must not copy Duolingo code, brand, green visual language, mascot cues, XP, streaks, hearts, gems, shops, leaderboards, or game-first user-facing language.
 - Practice remains one learning entry; Learning Chat remains the explanation center, Professional Teacher Support remains escalation, and Parent Report remains visibility.
 - Phase 33 starts with route/auth correctness because incorrect `/login?next=/practice` behavior would invalidate homepage funnel testing.
+- Phase 177 added shared Start Practice route helpers and safe role-owned login next handling.
 
 ### Pending Todos
 
-- Plan Phase 177: Start Practice Funnel and Route Contract.
+- Plan Phase 178: Homepage Practice Entry UI and Preview Components.
 
 ### Quick Tasks Completed
 

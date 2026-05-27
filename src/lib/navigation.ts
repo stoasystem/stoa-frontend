@@ -7,7 +7,7 @@ import {
   type AppRouteRole,
 } from '@/app/router/routeConfig'
 import { canShowDemoNavigation } from '@/lib/demoVisibility'
-import type { UserRole } from '@/types/user'
+import type { User, UserRole } from '@/types/user'
 
 type NavOptions = {
   showDemo?: boolean
@@ -36,6 +36,20 @@ export function getNavItemsForUserRole(role: UserRole, options: NavOptions = {})
 
 export function getHomePathForUserRole(role: UserRole) {
   return roleHomePaths[getRouteRoleForUserRole(role)]
+}
+
+export function getStartPracticePath(user: Pick<User, 'role'> | null | undefined) {
+  if (!user) return '/login?next=/practice'
+  if (user.role === 'student') return '/practice'
+
+  return getHomePathForUserRole(user.role)
+}
+
+export function startPracticeNavigation(
+  user: Pick<User, 'role'> | null | undefined,
+  navigate: (path: string) => void,
+) {
+  navigate(getStartPracticePath(user))
 }
 
 export function isNavItemActive(item: AppNavItem, pathname: string) {

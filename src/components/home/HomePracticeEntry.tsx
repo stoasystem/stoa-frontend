@@ -3,9 +3,14 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { HomePracticeToChatFlow } from '@/components/home/HomePracticeToChatFlow'
 import { Button } from '@/components/ui/button'
+import { getStartPracticePath } from '@/lib/navigation'
+import { useAuthStore } from '@/store/authStore'
 
 export function HomePracticeEntry() {
   const { t } = useTranslation('home')
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const startPracticePath = getStartPracticePath(isAuthenticated ? user : null)
   const signals = t('practiceEntry.signals', { returnObjects: true }) as Array<{
     title: string
     body: string
@@ -26,7 +31,7 @@ export function HomePracticeEntry() {
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Button asChild className="premium-primary-button">
-              <Link to="/login?next=/practice">
+              <Link to={startPracticePath}>
                 {t('practiceEntry.primaryCta')}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>

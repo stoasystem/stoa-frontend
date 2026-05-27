@@ -5,6 +5,49 @@ import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore } from '@/store/authStore'
+import type { UserRole } from '@/types/user'
+
+const roleNextPathPrefixes: Record<UserRole, string[]> = {
+  student: ['/practice', '/chat', '/dashboard', '/learning-history', '/profile'],
+  parent: ['/parent', '/billing', '/referrals', '/contact'],
+  tutor: ['/tutor', '/support'],
+  admin: ['/admin'],
+  organization_admin: ['/organization'],
+  school_teacher: ['/organization'],
+  school_viewer: ['/organization'],
+}
+
+function isSafePath(path: unknown): path is string {
+  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//')
+}
+
+function canUseNextPathForRole(path: string, role: UserRole) {
+  return roleNextPathPrefixes[role].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+}
+
+function getLoginRedirectPath({
+  role,
+  queryNext,
+  from,
+  search,
+}: {
+  role: UserRole
+  queryNext: string | null
+  from: unknown
+  search: string
+}) {
+  const defaultRoute = getDefaultRouteForRole(role)
+
+  if (isSafePath(queryNext) && canUseNextPathForRole(queryNext, role)) {
+    return queryNext
+  }
+
+  if (isSafePath(from) && canUseNextPathForRole(from, role)) {
+    return `${from}${search}`
+  }
+
+  return defaultRoute
+}
 
 export function useLoginMutation() {
   const navigate = useNavigate()
@@ -20,15 +63,12 @@ export function useLoginMutation() {
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''
       const queryNext = new URLSearchParams(location.search).get('next')
-      const defaultRoute = getDefaultRouteForRole(data.user.role)
-      const nextPath =
-        data.user.role === 'student'
-          ? defaultRoute
-          : typeof queryNext === 'string' && queryNext.startsWith('/') && !queryNext.startsWith('//')
-            ? queryNext
-            : typeof from === 'string' && from.startsWith('/') && !from.startsWith('//')
-              ? `${from}${search}`
-              : defaultRoute
+      const nextPath = getLoginRedirectPath({
+        role: data.user.role,
+        queryNext,
+        from,
+        search,
+      })
       navigate(nextPath)
     },
     onError: () => {
