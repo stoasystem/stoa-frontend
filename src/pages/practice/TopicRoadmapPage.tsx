@@ -1,10 +1,8 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpenCheck } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { DailyGoalCard } from '@/components/practice/DailyGoalCard'
 import { MistakeReviewCard } from '@/components/practice/MistakeReviewCard'
 import { PracticeRoadmap } from '@/components/practice/PracticeRoadmap'
-import { StudyStreakCard } from '@/components/practice/StudyStreakCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
@@ -65,10 +63,6 @@ export function TopicRoadmapPage() {
         )}
         {overview && canOpenRoadmap && (
           <div className="space-y-8">
-            <section className="grid gap-4 md:grid-cols-2">
-              <DailyGoalCard {...overview.dailyGoal} />
-              <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
-            </section>
             {roadmapQuery.isLoading && <PageSkeleton rows={4} />}
             {roadmapQuery.isError && <p className="text-sm text-destructive">Practice roadmap is unavailable.</p>}
             {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
