@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The homepage Practice entry lets students begin with a short equation challenge without first understanding every STOA product layer. The entry is intentionally narrow: it starts Practice and then points students toward Learning Chat when they need explanation.
+The homepage Practice entry lets students begin with short challenges in school topics without first understanding every STOA product layer. The current demo path focuses on Mathematics / Equations, but Practice Path itself is not equation-only.
 
 ## Route Flow
 
@@ -28,7 +28,7 @@ Admin -> /admin
 
 ## Learning Flow
 
-1. Student starts a short equation challenge.
+1. Student starts a short practice challenge in the available topic.
 2. Student receives immediate feedback.
 3. Mistake or uncertainty leads to a hint.
 4. Student opens Learning Chat for clearer explanation.
@@ -41,4 +41,4 @@ Admin -> /admin
 - Login allows safe student-owned `next=/practice` redirects.
 - The homepage entry uses localized copy from `src/i18n/locales/*/home.json`.
 - The preview is deliberately short and does not add new curriculum content.
-
+- Equation language belongs in the current demo preview, not in the definition of Practice Path.

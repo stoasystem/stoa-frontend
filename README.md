@@ -6,7 +6,7 @@ STOA learning platform frontend.
 
 Phase 33 makes the homepage Practice Game / Practice Path a clearer learning entry without turning STOA into a game-first product.
 
-The homepage now gives students a direct Start Practice action after the Hero. The entry explains that students can begin with a short equation challenge, get hints after mistakes, and open Learning Chat when they need a clearer explanation. The complete product hierarchy remains:
+The homepage now gives students a direct Start Practice action after the Hero. The entry explains that students can begin with short challenges in school topics, get hints after mistakes, and open Learning Chat when they need a clearer explanation. The current demo preview uses Mathematics / Equations as the first available topic. The complete product hierarchy remains:
 
 1. Practice helps the student start.
 2. Learning Chat explains unclear steps.
@@ -162,13 +162,13 @@ Phase 27 docs:
 
 This phase refines the Practice Path demo content.
 
-For the demo stage, the Practice Path focuses only on equations:
+For the demo stage, the first Practice Path content package focuses on equations:
 
 - Linear equations in one variable
 - Quadratic equations
 - Linear systems in two variables
 
-The goal is not to build a full math curriculum yet.
+The goal is not to define the final Practice Path scope or build a full curriculum yet. Practice Path remains a general middle-school and high-school learning challenge system.
 
 The goal is to create a clear, stable, and educational demo path that shows how STOA can guide students through short practice lessons.
 

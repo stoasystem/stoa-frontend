@@ -1,6 +1,8 @@
 # Practice Interaction Refinement
 
-Phase 29 keeps the equation Practice Path content from Phase 28 and refines the interaction loop.
+Phase 29 keeps the Mathematics / Equations demo content package from Phase 28 and refines the interaction loop.
+
+This phase does not narrow Practice Path to equations. It refines the reusable challenge interaction model with equations as the first demo topic.
 
 ## Design Principles
 

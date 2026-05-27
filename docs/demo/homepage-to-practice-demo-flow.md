@@ -9,8 +9,8 @@ Demonstrate that a visitor can understand and start the Practice Path from the h
 1. Open `/`.
 2. Confirm Hero still presents STOA as a learning support platform, not a game.
 3. Scroll to the Practice Game / Practice Path section after the Hero.
-4. Confirm the section explains short equation practice and Learning Chat help.
-5. Confirm preview topics show one-step equations, quadratic basics, and linear systems.
+4. Confirm the section explains short Practice challenges and Learning Chat help.
+5. Confirm preview labels make Mathematics / Equations clear as the current demo topic.
 6. Click Start Practice.
 7. Confirm the route is `/login?next=/practice`.
 
@@ -20,7 +20,7 @@ Demonstrate that a visitor can understand and start the Practice Path from the h
 2. Open `/`.
 3. Click Start Practice.
 4. Confirm destination is `/practice`.
-5. Start or continue the equation path.
+5. Start or continue the available Mathematics / Equations demo path.
 6. Make or inspect a mistake.
 7. Use the hint before opening Learning Chat.
 8. Open Learning Chat with Practice context.
@@ -47,4 +47,3 @@ Avoid:
 ```text
 STOA is a learning game.
 ```
-

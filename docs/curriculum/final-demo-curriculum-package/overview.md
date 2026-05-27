@@ -2,9 +2,11 @@
 
 This curriculum package explains the final STOA Practice demo used for external conversations with students, parents, tutors, partners, and investors.
 
+It does not define the final Practice Path product scope. Practice Path is designed as a general middle-school and high-school learning challenge system; this package uses equations as the first controlled demo topic.
+
 The demo shows one focused learning experience:
 
-1. A student starts with a short equation Practice lesson.
+1. A student starts with the current Mathematics / Equations demo lesson.
 2. The student answers one question correctly.
 3. The student gets stuck on a later step.
 4. STOA first gives feedback and a hint.
@@ -13,9 +15,9 @@ The demo shows one focused learning experience:
 7. If the student still does not understand, professional teacher support can be requested.
 8. The parent sees the learning activity and next recommendation in the report.
 
-## Why Equations
+## Why Equations For The Demo
 
-Equations are the final demo theme because they are familiar, easy to scaffold, and good for showing step-by-step support.
+Equations are the demo theme because they are familiar, easy to scaffold, and good for showing step-by-step support.
 
 - Students can practise one clear reasoning step at a time.
 - Wrong answers often reveal the exact step that needs explanation.
@@ -28,7 +30,7 @@ Equations are the final demo theme because they are familiar, easy to scaffold, 
 
 Subject: Mathematics
 
-Theme: Equations
+Demo topic: Equations
 
 Grade level: Lower secondary
 
@@ -50,4 +52,4 @@ Parent Report is the visibility layer. It explains what the student practised, w
 
 ## What This Demo Does Not Show
 
-This package does not claim to be a full math curriculum, a production course system, a real adaptive learning model, or a formal backend implementation. It is a final demo curriculum package for a controlled product story.
+This package does not claim to be a full math curriculum, the full Practice Path scope, a production course system, a real adaptive learning model, or a formal backend implementation. It is a final demo curriculum package for a controlled product story.

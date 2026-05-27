@@ -31,7 +31,7 @@ Use this checklist for Phase 28 frontend/demo verification.
 
 - [ ] Student dashboard shows Continue Practice.
 - [ ] Student dashboard shows daily goal, study streak, progress points, and recent mistake context.
-- [ ] Parent child report shows current path as equations.
+- [ ] Parent child report shows current demo topic as Mathematics / Equations without implying Practice is equation-only.
 - [ ] Parent child report shows lessons completed this week.
 - [ ] Parent child report shows topics practiced, mistakes reviewed, practice streak, and recommended next topic.
 - [ ] Parent wording stays supportive and avoids anxiety language.

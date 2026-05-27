@@ -21,7 +21,7 @@ Use when a student wants to start learning without formulating a homework questi
 
 Expected copy:
 
-> Continue your equation practice. Pick up where you left off. If a step is unclear, you can ask for an explanation.
+> Continue your Practice Path. Pick up where you left off in the available school topic. If a step is unclear, you can ask for an explanation.
 
 ### Open Learning Chat
 
@@ -47,9 +47,11 @@ When Practice opens Learning Chat, pass:
 
 - Source: Practice
 - Subject
+- Grade level
+- Topic
+- Unit
 - Lesson
 - Challenge
-- Topic
 - Prompt
 - Student answer
 - Correct answer when available
@@ -67,4 +69,6 @@ Learning Chat should show Back to lesson whenever `returnTo` exists in the Pract
 
 Parent Report should convert the flow into one learning story:
 
-> Your child practised equations and asked for explanations when a step was unclear. This helps show where understanding is already strong and where more practice may help.
+> Your child practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This helps show where understanding is already strong and where more practice may help.
+
+The parent-facing model should stay subject-agnostic. Equations can appear as the current demo topic, but the reporting structure should support future topics such as functions, geometry, physics, chemistry, biology, and other middle-school or high-school knowledge areas.

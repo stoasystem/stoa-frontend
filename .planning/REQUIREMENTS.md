@@ -8,15 +8,15 @@
 
 ### Practice Path Scope Principle
 
-- [ ] **SCOPE34-01**: Documentation states that Practice Path is a general middle-school and high-school learning challenge system.
-- [ ] **SCOPE34-02**: Documentation states that equations are only the first demo content package.
-- [ ] **SCOPE34-03**: Documentation shows the canonical hierarchy: Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
-- [ ] **SCOPE34-04**: Documentation shows the current demo hierarchy: Practice Path -> Mathematics -> Lower Secondary -> Equations -> Linear equations -> Solving two-step equations -> Challenges.
-- [ ] **SCOPE34-05**: Documentation lists future expansion examples for Mathematics, Physics, Chemistry, and Biology without presenting them as implemented content.
-- [ ] **SCOPE34-06**: Phase 28 docs are corrected to say "Equation Demo Content Package for the General Practice Path" rather than defining Practice Path scope.
-- [ ] **SCOPE34-07**: Phase 30 docs are corrected to say the final demo curriculum is equation-focused while the product architecture remains general.
-- [ ] **SCOPE34-08**: Phase 31 and Phase 33 docs are corrected so homepage Practice entry language does not imply Practice Path equals equations.
-- [ ] **SCOPE34-09**: English and Chinese versions of the Practice Path Scope Principle are recorded for future developers.
+- [x] **SCOPE34-01**: Documentation states that Practice Path is a general middle-school and high-school learning challenge system.
+- [x] **SCOPE34-02**: Documentation states that equations are only the first demo content package.
+- [x] **SCOPE34-03**: Documentation shows the canonical hierarchy: Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
+- [x] **SCOPE34-04**: Documentation shows the current demo hierarchy: Practice Path -> Mathematics -> Lower Secondary -> Equations -> Linear equations -> Solving two-step equations -> Challenges.
+- [x] **SCOPE34-05**: Documentation lists future expansion examples for Mathematics, Physics, Chemistry, and Biology without presenting them as implemented content.
+- [x] **SCOPE34-06**: Phase 28 docs are corrected to say "Equation Demo Content Package for the General Practice Path" rather than defining Practice Path scope.
+- [x] **SCOPE34-07**: Phase 30 docs are corrected to say the final demo curriculum is equation-focused while the product architecture remains general.
+- [x] **SCOPE34-08**: Phase 31 and Phase 33 docs are corrected so homepage Practice entry language does not imply Practice Path equals equations.
+- [x] **SCOPE34-09**: English and Chinese versions of the Practice Path Scope Principle are recorded for future developers.
 
 ### Subject-Agnostic Practice Data Model
 
@@ -96,15 +96,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCOPE34-01 | Phase 181 | Pending |
-| SCOPE34-02 | Phase 181 | Pending |
-| SCOPE34-03 | Phase 181 | Pending |
-| SCOPE34-04 | Phase 181 | Pending |
-| SCOPE34-05 | Phase 181 | Pending |
-| SCOPE34-06 | Phase 181 | Pending |
-| SCOPE34-07 | Phase 181 | Pending |
-| SCOPE34-08 | Phase 181 | Pending |
-| SCOPE34-09 | Phase 181 | Pending |
+| SCOPE34-01 | Phase 181 | Complete |
+| SCOPE34-02 | Phase 181 | Complete |
+| SCOPE34-03 | Phase 181 | Complete |
+| SCOPE34-04 | Phase 181 | Complete |
+| SCOPE34-05 | Phase 181 | Complete |
+| SCOPE34-06 | Phase 181 | Complete |
+| SCOPE34-07 | Phase 181 | Complete |
+| SCOPE34-08 | Phase 181 | Complete |
+| SCOPE34-09 | Phase 181 | Complete |
 | MODEL34-01 | Phase 182 | Pending |
 | MODEL34-02 | Phase 182 | Pending |
 | MODEL34-03 | Phase 182 | Pending |

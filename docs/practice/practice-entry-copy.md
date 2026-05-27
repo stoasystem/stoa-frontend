@@ -4,13 +4,13 @@
 
 Title: Practice Game
 
-Body: Start with a short equation challenge. Get hints when you make a mistake, then open Learning Chat when you need a clearer explanation.
+Body: Start with short challenges in school topics. Get hints when you make a mistake, then open Learning Chat when you need a clearer explanation.
 
 CTA: Start Practice
 
 Preview:
 
-- Equation path preview
+- Current demo topic
 - One-step equations
 - Quadratic basics
 - Linear systems
@@ -19,13 +19,13 @@ Preview:
 
 Title: Übungsweg
 
-Body: Starte mit einer kurzen Gleichungsaufgabe. Wenn du nicht weiterkommst, erhältst du einen Hinweis oder kannst den Lernchat öffnen.
+Body: Starte mit kurzen Aufgaben zu Schulthemen. Wenn du nicht weiterkommst, erhältst du einen Hinweis oder kannst den Lernchat öffnen.
 
 CTA: Übung starten
 
 Preview:
 
-- Gleichungen im Überblick
+- Aktuelles Demo-Thema
 - Einfache Gleichungen
 - Grundlagen quadratischer Gleichungen
 - Lineare Gleichungssysteme
@@ -34,13 +34,13 @@ Preview:
 
 Title: Parcours d’entraînement
 
-Body: Commence par un court exercice sur les équations. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.
+Body: Commence par de courts exercices sur les notions scolaires. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.
 
 CTA: Commencer l’entraînement
 
 Preview:
 
-- Aperçu du parcours sur les équations
+- Sujet de démonstration actuel
 - Équations simples
 - Bases des équations quadratiques
 - Systèmes linéaires
@@ -49,13 +49,13 @@ Preview:
 
 Title: Percorso di pratica
 
-Body: Inizia con un breve esercizio sulle equazioni. Se sbagli, ricevi un suggerimento o apri la chat di apprendimento per capire meglio.
+Body: Inizia con brevi esercizi sugli argomenti scolastici. Se sbagli, ricevi un suggerimento o apri la chat di apprendimento per capire meglio.
 
 CTA: Inizia la pratica
 
 Preview:
 
-- Anteprima del percorso sulle equazioni
+- Argomento demo attuale
 - Equazioni semplici
 - Basi delle equazioni quadratiche
 - Sistemi lineari
@@ -73,4 +73,3 @@ Preview:
 - Gems
 - Shops
 - Leaderboards
-

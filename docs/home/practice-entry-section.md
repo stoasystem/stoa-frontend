@@ -30,7 +30,8 @@ Flow:
 
 - The entry should look clickable and more concrete than a plain text section.
 - The card should stay visually below the Hero CTA hierarchy.
-- The preview should show only a short equation path: one-step equations, quadratic basics, and linear systems.
+- The main entry should describe Practice Path as short challenges for school topics.
+- The preview may show the current demo topic: Mathematics / Equations with one-step equations, quadratic basics, and linear systems.
 - The design should use the existing premium STOA theme.
 - Do not use bright game-first styling, mascot cues, XP, streaks, hearts, gems, shops, or leaderboards.
 
@@ -41,3 +42,8 @@ Flow:
 - Preview: `src/components/home/HomePracticePreview.tsx`
 - Routing helper: `src/lib/navigation.ts`
 
+## Scope Principle
+
+Practice Path is general. Equations are the first demo package.
+
+Do not write homepage copy that implies STOA Practice Path equals equations. Use equation language only in demo preview labels or current available content labels.

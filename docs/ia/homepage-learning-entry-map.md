@@ -18,7 +18,7 @@ Practice appears after the Hero as a direct student action.
 Message:
 
 ```text
-Start with a short equation challenge.
+Start with a short school-topic challenge.
 If you get stuck, Learning Chat helps you understand the step.
 ```
 
@@ -37,7 +37,7 @@ This section explains the platform hierarchy:
 
 | Surface | Role in Flow |
 |---------|--------------|
-| `/practice` | Student starts or continues short equation practice |
+| `/practice` | Student starts or continues short guided practice in the available topic |
 | `/chat` | Explanation center when a step is unclear |
 | `/tutor` | Professional support queue with Practice context |
 | `/parent` | Parent visibility over Practice, Chat, and support activity |
@@ -45,4 +45,3 @@ This section explains the platform hierarchy:
 ## IA Rule
 
 Practice should be visible enough to start the learning funnel, but it should not become a top-level public navbar item or the only product story without user-testing evidence.
-

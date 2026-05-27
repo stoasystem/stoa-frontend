@@ -11,6 +11,8 @@ Phase 31 organizes STOA around a clear product hierarchy:
 
 Practice is visible, but it is not the public product identity and does not replace Learning Chat.
 
+Practice Path is a general middle-school and high-school learning challenge system. Equation wording may appear only as the current Mathematics demo content, not as the full Practice Path scope.
+
 ## Public Site
 
 Public navigation should stay focused and not add Practice as a top-level navbar item.
@@ -25,7 +27,7 @@ Public navigation should stay focused and not add Practice as a top-level navbar
 - Login
 - Start learning
 
-Practice appears on the homepage as a concrete learning example and as part of the STOA learning flow. It should not become a standalone public marketing island unless external testing shows that parents and students need a public Practice explainer page.
+Practice appears on the homepage as a concrete learning entry and as part of the STOA learning flow. It should not become a standalone public marketing island unless external testing shows that parents and students need a public Practice explainer page.
 
 ## Homepage Structure
 

@@ -8,7 +8,9 @@ Practice demo data lives in `src/data/mockPractice.ts` and supports deterministi
 
 ## Mathematics Path
 
-Phase 28 fixes the visible demo path to equations only.
+Phase 28 fixes the visible demo package to Mathematics / lower secondary / equations.
+
+This is seed content for the current demo. It is not a statement that Practice Path only supports equations.
 
 Unit 1: Linear equations in one variable
 
@@ -48,4 +50,4 @@ The data is not a curriculum database. It does not attempt adaptive sequencing, 
 
 Practice should show students what to do next, give calm feedback, and offer hint-first support when they miss a step.
 
-Physics and unrelated math topics are deferred outside the Phase 28 demo.
+Physics and other Mathematics topics are future expansion examples outside the current demo package. The data model and UI should remain subject-agnostic and topic-agnostic.

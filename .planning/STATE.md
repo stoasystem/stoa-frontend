@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.32
 milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
-status: planning
-last_updated: "2026-05-27T11:32:04.647Z"
+status: in_progress
+last_updated: "2026-05-27T12:05:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -24,24 +24,24 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-27 — Milestone v1.32 started
+Phase: 182 Subject-Agnostic Practice Domain Model and Mock Data Contract
+Plan: 182-PLAN.md pending
+Status: Phase 181 complete; ready for model and mock-data alignment
+Last activity: 2026-05-27 — Phase 181 completed Practice scope documentation correction
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 5
-- Average duration: not started
-- Total execution time: not started
+- Total plans completed this milestone: 1 of 5
+- Average duration: 1 autonomous phase pass
+- Total execution time: in progress
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 181 | 0/1 | Pending | — |
+| 181 | 1/1 | Complete | 1 pass |
 | 182 | 0/1 | Pending | — |
 | 183 | 0/1 | Pending | — |
 | 184 | 0/1 | Pending | — |
@@ -67,7 +67,7 @@ Recent decisions affecting current work:
 - Practice mistakes use a hint-first flow before Learning Assistant explanation and teacher escalation.
 - Phase 27 remains frontend/demo-backed and provider-agnostic; the frontend calls only STOA service/API boundaries.
 - v1.26 continues roadmap numbering from Phase 147 after v1.25 ended at Phase 146.
-- Phase 28 narrows the Practice demo package to Mathematics equations only; it does not define final Practice Path scope.
+- Phase 28 narrows the first Practice demo content package to Mathematics equations only; it does not define final Practice Path scope.
 - Phase 28 work is frontend design/content/demo polish; functionality should be only enough to test and present the UI.
 - v1.27 continues roadmap numbering from Phase 153 after v1.26 ended at Phase 152.
 - Phase 29 keeps the equation Practice content stable and focuses on interaction smoothness, Practice-to-Learning-Chat entry, teacher escalation timing, dashboard/homepage/parent report IA, docs, and demo flow.
@@ -104,10 +104,11 @@ Recent decisions affecting current work:
 - Phase 180 documented the homepage Practice entry funnel, added the Phase 33 QA checklist, verified unauthenticated Start Practice routing in browser, and passed `npm run build`.
 - v1.32 Phase 34 corrects prior wording that could imply Practice Path equals equations. The intended hierarchy is Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
 - Equation content remains the first demo seed under Mathematics / lower secondary / equations.
+- Phase 181 recorded the Practice Path Scope Principle in English and Chinese and corrected historical docs so equations are framed as the first demo package only.
 
 ### Pending Todos
 
-- Start Phase 181: Practice Path Scope Principle and Historical Documentation Correction.
+- Start Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract.
 
 ### Quick Tasks Completed
 

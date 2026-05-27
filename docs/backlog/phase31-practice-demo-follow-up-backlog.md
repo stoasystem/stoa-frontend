@@ -15,13 +15,13 @@ These are suitable for the next demo-polish milestone if feedback confirms the n
 
 ## Future Curriculum Work
 
-These should wait until the equation demo is validated:
+These should wait until the equation demo content package is validated. The list below describes future topic expansion for the general Practice Path, not a replacement for the subject-agnostic architecture:
 
 - Add more equation lessons.
 - Add functions connected to equations.
 - Add geometry foundations.
 - Add probability/statistics basics.
-- Add physics Practice Path.
+- Add physics topics.
 - Build a curriculum authoring and review workflow.
 
 ## Future Backend Work

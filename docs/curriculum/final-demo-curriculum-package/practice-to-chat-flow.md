@@ -4,7 +4,7 @@ The final demo treats Practice as a natural entry into Learning Chat.
 
 ## Flow
 
-1. Student opens an equation Practice lesson.
+1. Student opens the current Mathematics / Equations demo lesson.
 2. Student answers a challenge incorrectly.
 3. STOA shows calm feedback and a hint.
 4. Student retries or asks for a guided explanation.
@@ -19,16 +19,17 @@ Learning Chat should know:
 
 - Source: Practice
 - Subject: Mathematics
+- Grade level
+- Topic
+- Unit
 - Lesson
 - Challenge prompt
 - Student answer, when available
-- Topic
-- Grade level
 - Return path
 
 ## Demo Message
 
-This flow shows that STOA is useful before and after a student has a clear question. Practice helps reveal the stuck step; Learning Chat explains that step.
+This flow shows that STOA is useful before and after a student has a clear question. Practice helps reveal the stuck step; Learning Chat explains that step. Equations are the current demo topic, not the full Practice Path product scope.
 
 ## Boundary
 

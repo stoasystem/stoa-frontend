@@ -37,7 +37,9 @@ Avoid:
 
 ## Example Summary
 
-`This week, Anna practised equations and asked for help on two-step problems. She is becoming more confident with one-step equations and could benefit from reviewing systems of equations next.`
+`This week, Anna practised the current Mathematics / Equations demo topic and asked for help on two-step problems. She is becoming more confident with one-step equations and could benefit from reviewing systems of equations next.`
+
+For production-facing reports, keep the template subject- and topic-aware rather than equation-specific.
 
 ## Why This Matters
 
