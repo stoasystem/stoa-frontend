@@ -126,6 +126,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Make student login default to Dashboard instead of Learning Chat | Browser checks for `/chat` login fallback and `next=/practice`; `npm run build` |
 | 2026-05-27 | Improve Practice Continue button readability | Browser computed color check on `/practice`; `npm run build` |
 | 2026-05-27 | Rename awkward Two-step equations lesson copy | Browser check on lesson route; `npm run build` |
+| 2026-05-27 | Remove redundant app sidebar footer links | Browser check on lesson route; `npm run build` |
 
 ### Blockers/Concerns
 

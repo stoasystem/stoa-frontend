@@ -155,17 +155,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <FeedbackButton />
             </div>
           )}
-          <div className="mb-3">
-            <LanguageSwitcher compact />
-          </div>
-          <div className="mb-3 flex gap-3 text-xs text-muted-foreground">
-            <Link className="hover:text-foreground" to="/privacy">
-              {t('navigation.privacy')}
-            </Link>
-            <Link className="hover:text-foreground" to="/terms">
-              {t('navigation.terms')}
-            </Link>
-          </div>
           <UserMenu />
         </aside>
         <main className="min-w-0 flex-1 pb-24">
