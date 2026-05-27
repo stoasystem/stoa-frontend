@@ -115,6 +115,15 @@ export const navItems: AppNavItem[] = [
     description: 'Student account and preferences.',
   },
   {
+    label: 'Referrals',
+    path: '/referrals',
+    role: 'student',
+    priority: 'secondary',
+    status: 'core',
+    icon: 'students',
+    description: 'Invite another family or student to STOA.',
+  },
+  {
     label: 'Overview',
     path: '/parent',
     role: 'parent',
