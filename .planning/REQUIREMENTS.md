@@ -20,17 +20,17 @@
 
 ### Homepage Practice Entry UI
 
-- [ ] **HOME33-01**: Homepage includes a high-visibility Practice Game / Practice Path section after Hero and before or inside the broader How STOA Works flow.
-- [ ] **HOME33-02**: Practice entry is visually clearer than a plain explanatory block but does not overpower the Hero or main `Start Learning` CTA.
-- [ ] **HOME33-03**: `HomePracticeEntry` renders the complete homepage Practice entry section using existing STOA premium theme patterns.
-- [ ] **HOME33-04**: `PracticeEntryCard` renders the clickable Practice entry, short explanation, and Start Practice CTA.
-- [ ] **HOME33-05**: `HomePracticePreview` renders a concise equation-path preview without expanding curriculum content.
-- [ ] **HOME33-06**: Practice preview includes the equation path topics: one-step equations, quadratic basics, and linear systems.
-- [ ] **HOME33-07**: Practice entry copy explains that students start with a short equation challenge.
-- [ ] **HOME33-08**: Practice entry copy explains that hints appear before Learning Chat when a student is stuck or makes a mistake.
-- [ ] **HOME33-09**: Practice entry copy preserves the sequence Practice -> Learning Chat -> Professional Teacher Support -> Parent Report.
-- [ ] **HOME33-10**: Practice entry avoids user-facing phrases such as `Duolingo-style`, `AI game`, `Play now`, `gamified AI platform`, XP, streaks, hearts, gems, shops, and leaderboards.
-- [ ] **HOME33-11**: Homepage CTA hierarchy keeps `Start Learning` as the page-level primary CTA, `Start Practice` as a clear entry CTA, and `How it works` as secondary.
+- [x] **HOME33-01**: Homepage includes a high-visibility Practice Game / Practice Path section after Hero and before or inside the broader How STOA Works flow.
+- [x] **HOME33-02**: Practice entry is visually clearer than a plain explanatory block but does not overpower the Hero or main `Start Learning` CTA.
+- [x] **HOME33-03**: `HomePracticeEntry` renders the complete homepage Practice entry section using existing STOA premium theme patterns.
+- [x] **HOME33-04**: `PracticeEntryCard` renders the clickable Practice entry, short explanation, and Start Practice CTA.
+- [x] **HOME33-05**: `HomePracticePreview` renders a concise equation-path preview without expanding curriculum content.
+- [x] **HOME33-06**: Practice preview includes the equation path topics: one-step equations, quadratic basics, and linear systems.
+- [x] **HOME33-07**: Practice entry copy explains that students start with a short equation challenge.
+- [x] **HOME33-08**: Practice entry copy explains that hints appear before Learning Chat when a student is stuck or makes a mistake.
+- [x] **HOME33-09**: Practice entry copy preserves the sequence Practice -> Learning Chat -> Professional Teacher Support -> Parent Report.
+- [x] **HOME33-10**: Practice entry avoids user-facing phrases such as `Duolingo-style`, `AI game`, `Play now`, `gamified AI platform`, XP, streaks, hearts, gems, shops, and leaderboards.
+- [x] **HOME33-11**: Homepage CTA hierarchy keeps `Start Learning` as the page-level primary CTA, `Start Practice` as a clear entry CTA, and `How it works` as secondary.
 
 ### Localization, Copy, and Layout Fit
 
@@ -107,17 +107,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NAV33-07 | Phase 177 | Complete |
 | NAV33-08 | Phase 177 | Complete |
 | NAV33-09 | Phase 177 | Complete |
-| HOME33-01 | Phase 178 | Pending |
-| HOME33-02 | Phase 178 | Pending |
-| HOME33-03 | Phase 178 | Pending |
-| HOME33-04 | Phase 178 | Pending |
-| HOME33-05 | Phase 178 | Pending |
-| HOME33-06 | Phase 178 | Pending |
-| HOME33-07 | Phase 178 | Pending |
-| HOME33-08 | Phase 178 | Pending |
-| HOME33-09 | Phase 178 | Pending |
-| HOME33-10 | Phase 178 | Pending |
-| HOME33-11 | Phase 178 | Pending |
+| HOME33-01 | Phase 178 | Complete |
+| HOME33-02 | Phase 178 | Complete |
+| HOME33-03 | Phase 178 | Complete |
+| HOME33-04 | Phase 178 | Complete |
+| HOME33-05 | Phase 178 | Complete |
+| HOME33-06 | Phase 178 | Complete |
+| HOME33-07 | Phase 178 | Complete |
+| HOME33-08 | Phase 178 | Complete |
+| HOME33-09 | Phase 178 | Complete |
+| HOME33-10 | Phase 178 | Complete |
+| HOME33-11 | Phase 178 | Complete |
 | L10N33-01 | Phase 179 | Pending |
 | L10N33-02 | Phase 179 | Pending |
 | L10N33-03 | Phase 179 | Pending |

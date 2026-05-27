@@ -25,14 +25,28 @@
   },
   "practiceEntry": {
     "eyebrow": "Üben als Einstieg",
-    "title": "Mit Übungen starten. Klar weiterlernen.",
-    "body": "Practice Path gibt Lernenden einen ruhigen Einstieg mit kurzen geführten Übungen. Wenn ein Schritt unklar ist, kann dieselbe Aufgabe mit Frage, Antwort, Versuchen und Lektion direkt im Lernchat geöffnet werden.",
-    "primaryCta": "Lernen starten",
+    "title": "Übungsweg",
+    "body": "Starte mit einer kurzen Gleichungsaufgabe. Wenn du nicht weiterkommst, erhältst du einen Hinweis oder kannst den Lernchat öffnen.",
+    "primaryCta": "Übung starten",
     "secondaryCta": "Übungsweg ansehen",
     "signals": [
       { "title": "Kurze Übungen", "body": "Lernende versuchen zuerst einen fokussierten Gleichungsschritt." },
       { "title": "Erklärung am Knackpunkt", "body": "Der Lernchat öffnet genau den Schritt, ohne dass Lernende neu beginnen." }
     ],
+    "preview": {
+      "label": "Gleichungen im Überblick",
+      "title": "Eine kurze Aufgabe vor der Erklärung",
+      "prompt": "Löse: 2x + 3 = 11",
+      "progress": "Schritt 2 von 5",
+      "hint": "Zuerst erscheint ein Hinweis. Wenn der Schritt unklar bleibt, öffnet sich der Lernchat mit dieser Aufgabe.",
+      "topicsLabel": "Gleichungen im Überblick",
+      "topics": ["Einfache Gleichungen", "Grundlagen quadratischer Gleichungen", "Lineare Gleichungssysteme"],
+      "outcomes": [
+        { "title": "Lernchat", "detail": "Erklärt genau den Schritt, der beim Üben unklar bleibt." },
+        { "title": "Lehrperson", "detail": "Eine qualifizierte Lehrperson hilft, wenn mehr Orientierung nötig ist." },
+        { "title": "Elternbericht", "detail": "Familien sehen die vollständige Lernaktivität." }
+      ]
+    },
     "flow": [
       { "label": "Üben", "detail": "Kurze Gleichungsschritte helfen beim selbstständigen Start." },
       { "label": "Hinweis", "detail": "Ein ruhiger Hinweis zeigt den nächsten sinnvollen Schritt." },

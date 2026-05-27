@@ -7,10 +7,10 @@ last_updated: "2026-05-27T09:26:40.680Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 4
-  completed_plans: 1
-  percent: 25
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 178 next
-Plan: 178-PLAN.md
-Status: Phase 177 complete; ready to plan Phase 178
-Last activity: 2026-05-27 — Phase 177 Start Practice route contract completed and build passed
+Phase: 179 next
+Plan: 179-PLAN.md
+Status: Phase 178 complete; ready to plan Phase 179
+Last activity: 2026-05-27 — Phase 178 homepage Practice entry UI and preview components completed and build passed
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 1 of 4
+- Total plans completed this milestone: 2 of 4
 - Average duration: completed in one autonomous execution pass
 - Total execution time: same session
 
@@ -42,14 +42,14 @@ Last activity: 2026-05-27 — Phase 177 Start Practice route contract completed 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 177 | 1/1 | Complete | 2026-05-27 |
-| 178 | 0/1 | Pending | — |
+| 178 | 1/1 | Complete | 2026-05-27 |
 | 179 | 0/1 | Pending | — |
 | 180 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
 - Last 5 plans: 172, 173, 174, 175, 176
-- Trend: Phase 177 completed; next work builds the homepage Practice entry UI
+- Trend: Phase 178 completed; next work verifies four-language mobile fit and accessibility
 
 *Updated after each plan completion*
 
@@ -98,10 +98,11 @@ Recent decisions affecting current work:
 - Practice remains one learning entry; Learning Chat remains the explanation center, Professional Teacher Support remains escalation, and Parent Report remains visibility.
 - Phase 33 starts with route/auth correctness because incorrect `/login?next=/practice` behavior would invalidate homepage funnel testing.
 - Phase 177 added shared Start Practice route helpers and safe role-owned login next handling.
+- Phase 178 split the homepage Practice entry into focused components and added a concrete equation challenge/path preview.
 
 ### Pending Todos
 
-- Plan Phase 178: Homepage Practice Entry UI and Preview Components.
+- Plan Phase 179: Four-Language Mobile Fit and Accessibility QA.
 
 ### Quick Tasks Completed
 

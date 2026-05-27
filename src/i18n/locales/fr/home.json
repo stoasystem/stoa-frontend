@@ -25,14 +25,28 @@
   },
   "practiceEntry": {
     "eyebrow": "L’entraînement comme point d’entrée",
-    "title": "Commencer par s’entraîner. Continuer avec des explications claires.",
-    "body": "Practice Path offre aux élèves un point de départ calme avec de courts exercices guidés. Lorsqu’une étape n’est pas claire, le même travail peut s’ouvrir dans le chat d’apprentissage avec la question, la réponse, les essais et le contexte de la leçon.",
-    "primaryCta": "Commencer",
+    "title": "Parcours d’entraînement",
+    "body": "Commence par un court exercice sur les équations. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.",
+    "primaryCta": "Commencer l’entraînement",
     "secondaryCta": "Voir le parcours",
     "signals": [
       { "title": "Exercices courts", "body": "L’élève essaie d’abord une étape ciblée d’équation." },
       { "title": "Explication au bon moment", "body": "Le chat d’apprentissage s’ouvre sur l’étape exacte, sans recommencer." }
     ],
+    "preview": {
+      "label": "Aperçu du parcours sur les équations",
+      "title": "Un court exercice avant l’explication",
+      "prompt": "Résous : 2x + 3 = 11",
+      "progress": "Étape 2 sur 5",
+      "hint": "Un indice apparaît d’abord. Si l’étape reste peu claire, le chat d’apprentissage s’ouvre avec ce travail.",
+      "topicsLabel": "Aperçu du parcours sur les équations",
+      "topics": ["Équations simples", "Bases des équations quadratiques", "Systèmes linéaires"],
+      "outcomes": [
+        { "title": "Chat d’apprentissage", "detail": "Explique l’étape exacte qui bloque pendant l’entraînement." },
+        { "title": "Enseignant", "detail": "Un enseignant qualifié aide quand plus de guidage est nécessaire." },
+        { "title": "Rapport parent", "detail": "La famille voit l’activité d’apprentissage complète." }
+      ]
+    },
     "flow": [
       { "label": "S’entraîner", "detail": "De courtes étapes aident l’élève à commencer seul." },
       { "label": "Indice", "detail": "Un indice calme pointe vers la prochaine action utile." },
