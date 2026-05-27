@@ -1,6 +1,8 @@
 import { useEffect, useMemo } from 'react'
+import type { ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { CreditCard, HelpCircle, Settings, type LucideIcon } from 'lucide-react'
 import { BillingStatusAlert } from '@/components/billing/BillingStatusAlert'
 import { BillingSummaryCard } from '@/components/billing/BillingSummaryCard'
 import { CheckoutButton } from '@/components/billing/CheckoutButton'
@@ -66,22 +68,50 @@ export function BillingPage() {
           />
           <Card className="brand-rule">
             <CardHeader>
-              <CardTitle className="text-base">{t('billing:checkoutMode')}</CardTitle>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <CardTitle className="text-base">{t('billing:checkoutMode')}</CardTitle>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    Choose a plan or update family payment settings from one place.
+                  </p>
+                </div>
+                <Badge variant="secondary">{showCheckoutPreview ? 'Review mode' : 'Hosted payment'}</Badge>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                {enablePayment
-                  ? t('billing:paymentEnabledBody')
-                  : t('billing:paymentDisabledBody')}
-              </p>
-              <p>
-                {showCheckoutPreview
-                  ? t('billing:planSelectionReviewEnabled')
-                  : t('billing:planSelectionReviewDisabled')}
-              </p>
-              <div className="flex flex-wrap gap-3 pt-2">
-                <CheckoutButton plan={selectedPlan} />
-                <ManageBillingButton />
+            <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <BillingActionCard
+                  icon={CreditCard}
+                  title={showCheckoutPreview ? 'Review checkout' : 'Start checkout'}
+                  description={
+                    showCheckoutPreview
+                      ? t('billing:planSelectionReviewEnabled')
+                      : t('billing:paymentEnabledBody')
+                  }
+                >
+                  <CheckoutButton plan={selectedPlan} />
+                </BillingActionCard>
+                <BillingActionCard
+                  icon={Settings}
+                  title="Payment settings"
+                  description={
+                    enablePayment
+                      ? 'Update saved payment method and invoice settings.'
+                      : 'Review billing contact and payment setup status before live payments are enabled.'
+                  }
+                >
+                  <ManageBillingButton />
+                </BillingActionCard>
+              </div>
+              <div className="flex flex-col gap-3 rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 gap-3">
+                  <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                  <p className="min-w-0">
+                    {enablePayment
+                      ? 'Need help with a charge or invoice?'
+                      : t('billing:paymentDisabledBody')}
+                  </p>
+                </div>
                 <Button asChild variant="outline">
                   <Link to="/support">{t('common:navigation.support')}</Link>
                 </Button>
@@ -142,5 +172,32 @@ export function BillingPage() {
         </section>
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+function BillingActionCard({
+  icon: Icon,
+  title,
+  description,
+  children,
+}: {
+  icon: LucideIcon
+  title: string
+  description: string
+  children: ReactNode
+}) {
+  return (
+    <div className="flex min-h-44 flex-col rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-4">
+      <div className="flex items-start gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
+          <Icon className="h-4 w-4" aria-hidden="true" />
+        </div>
+        <div className="min-w-0">
+          <p className="font-semibold text-foreground">{title}</p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+        </div>
+      </div>
+      <div className="mt-auto pt-4 [&_button]:w-full [&_a]:w-full">{children}</div>
+    </div>
   )
 }

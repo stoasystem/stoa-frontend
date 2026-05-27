@@ -15,6 +15,7 @@ import { AdvancedAnalyticsPage } from '@/pages/admin/AdvancedAnalyticsPage'
 import { RetentionPage } from '@/pages/admin/RetentionPage'
 import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
+import { PaymentSettingsPage } from '@/pages/billing/PaymentSettingsPage'
 import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
@@ -96,6 +97,7 @@ export function AppRouter() {
         <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/billing" element={<BillingPage />} />
+          <Route path="/billing/payment-settings" element={<PaymentSettingsPage />} />
           <Route path="/billing/checkout/demo" element={<VirtualCheckoutPage />} />
           <Route path="/billing/checkout/success" element={<CheckoutResultPage status="success" />} />
           <Route path="/billing/checkout/cancel" element={<CheckoutResultPage status="cancel" />} />

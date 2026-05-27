@@ -355,6 +355,7 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/onboarding', pageName: 'OnboardingPage', role: 'shared', module: 'Onboarding', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Role onboarding guide.' },
   { path: '/support', pageName: 'SupportPage', role: 'shared', module: 'Support', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Support request entry.' },
   { path: '/billing', pageName: 'BillingPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Billing and subscription overview.' },
+  { path: '/billing/payment-settings', pageName: 'PaymentSettingsPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Payment method, billing contact, invoice, and subscription settings.' },
   { path: '/billing/checkout/demo', pageName: 'VirtualCheckoutPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Virtual checkout demo.' },
   { path: '/billing/checkout/success', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout success result.' },
   { path: '/billing/checkout/cancel', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout cancellation result.' },
