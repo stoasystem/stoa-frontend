@@ -10,8 +10,11 @@ class TemplateProvider:
         subject = request.subject or "this question"
         question = (request.question or "").lower()
         language = (request.language or "en").lower()
-        out_of_scope = subject.lower() not in {item.lower() for item in request.registered_subjects} and bool(
-            request.registered_subjects
+        normalized_subject = subject.strip().lower()
+        out_of_scope = (
+            normalized_subject not in {"", "general", "this question"}
+            and normalized_subject not in {item.strip().lower() for item in request.registered_subjects}
+            and bool(request.registered_subjects)
         )
 
         if out_of_scope:

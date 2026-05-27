@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import json
+import os
 import sys
 import unittest
+from types import SimpleNamespace
 from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from harness.evaluate_response import ResponseCheckInput, evaluate_response
+from harness.providers.base import ProviderRequest
+from harness.providers.codex_provider import CodexProvider
 from harness.providers.router import ProviderRouter
 from harness.run_learning_assistant import LearningAssistantRequest, generate_learning_assistant_response
 
@@ -74,6 +78,37 @@ class CodexProviderBehaviorTests(unittest.TestCase):
         self.assertIn("providerInstalled", health)
         self.assertIn("providerCallable", health)
 
+    def test_default_provider_prefers_codex_with_template_fallback(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            router = ProviderRouter()
+
+        self.assertEqual(router.provider_name, "codex")
+        self.assertEqual(router.fallback_name, "template")
+
+    def test_codex_provider_allows_ephemeral_temp_directory(self) -> None:
+        captured_command: list[str] = []
+
+        def fake_run(command, **kwargs):
+            captured_command.extend(command)
+            return SimpleNamespace(returncode=0, stdout="Short guided answer.", stderr="")
+
+        request = ProviderRequest(
+            prompt="Reply shortly.",
+            language="en",
+            student_id="student-1",
+            conversation_id="conv-1",
+            question="Hi",
+            subject="General",
+            grade_level="Grade 8",
+            registered_subjects=("Mathematics",),
+        )
+
+        with patch("harness.providers.codex_provider.CodexProvider.is_available", return_value=True):
+            with patch("harness.providers.codex_provider.subprocess.run", side_effect=fake_run):
+                CodexProvider().generate(request)
+
+        self.assertIn("--skip-git-repo-check", captured_command)
+
     def test_response_check_rejects_forbidden_terms(self) -> None:
         result = evaluate_response(
             ResponseCheckInput(
@@ -137,6 +172,22 @@ class CodexProviderBehaviorTests(unittest.TestCase):
         self.assertTrue(response.check.ok)
         self.assertIn("outside", response.text.lower())
         self.assertIn("teacher support", response.text.lower())
+
+    def test_general_subject_template_does_not_force_scope_redirect(self) -> None:
+        request = LearningAssistantRequest(
+            student_id="student-1",
+            conversation_id="conv-1",
+            question="Hi",
+            grade_level="Grade 8",
+            registered_subjects=("Mathematics", "Physics"),
+            subject="General",
+        )
+
+        response = generate_learning_assistant_response(request, ProviderRouter(provider_name="template"))
+
+        self.assertTrue(response.check.ok)
+        self.assertNotIn("outside the subjects", response.text.lower())
+        self.assertNotIn("learning profile", response.text.lower())
 
 
 if __name__ == "__main__":

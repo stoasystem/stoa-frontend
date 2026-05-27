@@ -34,7 +34,7 @@ def provider_from_name(name: str) -> LearningProvider:
 class ProviderRouter:
     def __init__(self, provider_name: str | None = None, fallback_name: str | None = None) -> None:
         configure_provider_logging()
-        self.provider_name = provider_name or os.getenv("STOA_DEMO_PROVIDER", "template")
+        self.provider_name = provider_name or os.getenv("STOA_DEMO_PROVIDER", "codex")
         self.fallback_name = fallback_name or os.getenv("STOA_DEMO_PROVIDER_FALLBACK", "template")
 
     def generate(self, request: ProviderRequest) -> ProviderResponse:

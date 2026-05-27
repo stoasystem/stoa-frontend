@@ -298,6 +298,8 @@ def is_out_of_subject(subject: str, registered_subjects: tuple[str, ...]) -> boo
     if not registered_subjects:
         return False
     normalized_subject = subject.strip().lower()
+    if normalized_subject in {"", "general", "this question"}:
+        return False
     return normalized_subject not in {item.strip().lower() for item in registered_subjects}
 
 

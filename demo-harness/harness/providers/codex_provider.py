@@ -35,6 +35,7 @@ class CodexProvider:
                 "--ignore-rules",
                 "-C",
                 temp_dir,
+                "--skip-git-repo-check",
                 "--sandbox",
                 "read-only",
                 "--output-last-message",
