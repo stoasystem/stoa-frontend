@@ -1,5 +1,29 @@
 # Milestones
 
+## v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening (Shipped: 2026-05-27)
+
+**Phases completed:** 4 phases, 4 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.34-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Playwright remains local-only; adding it to GitHub Actions is deferred until runtime cost and demo-state stability are acceptable.
+
+**Key accomplishments:**
+
+- Fixed the reported Frontend CI lint failure by adding Node-environment handling for scripts and root config files in ESLint flat config.
+- Verified install, lint, build, and browser smoke parity locally.
+- Updated stale E2E smoke assertions for current accessible UI labels and heading structure.
+- Updated project ignore rules and codebase map docs to match the current lockfile, TypeScript, ESLint, Playwright, and Vite reality.
+- Added README quality-gate guidance for the authoritative local/CI command sequence.
+
+### Verification
+
+- `npm ci`: passed.
+- `npm ci --dry-run`: passed.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e`: passed, 14/14 tests.
+
+---
+
 ## v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience (Shipped: 2026-05-27)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

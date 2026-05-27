@@ -10,35 +10,30 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
+## Latest Shipped Milestone: v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
 
 **Shipped:** 2026-05-27
 
-**Delivered:** STOA now has a subject-agnostic Practice roadmap experience with lesson nodes, progress summary, completed/current/available/locked states, locked hints, next-lesson CTA, Learning Chat handoff copy, four-language copy, documentation, QA evidence, README handoff, browser verification, and build verification.
+**Delivered:** STOA now has a reliable frontend quality gate after fixing the reported GitHub Actions lint failure class, aligning Node/browser ESLint boundaries, auditing npm/CI/tooling drift, refreshing stale codebase docs, updating E2E smoke assertions, and verifying install, lint, build, and browser smoke commands.
 
 **Target features:**
-- Roadmap-style Practice path for `/practice` and `/practice/:subjectId/:topicId`.
-- Subject, grade level, topic, unit, lesson, and challenge progression without hard-coding equations as the only path.
-- Completed, current, available, locked, and review lesson node states.
-- Current lesson highlight, next-lesson CTA, completed-lesson review entry, and locked lesson unlock hints.
-- Mathematics / lower secondary / equations demo roadmap content.
-- Learning Chat copy that frames explanation as the next support step when Practice is unclear.
-- English, German, French, and Italian roadmap copy, QA docs, README guidance, browser checks, and successful build verification.
+- ESLint flat-config handling for Node-executed scripts and config files.
+- Local and CI command parity for `npm ci`, `npm run lint`, and `npm run build`.
+- Full local verification with `npm ci`, `npm run lint`, `npm run build`, and 14/14 Playwright E2E smoke checks.
+- Updated E2E smoke selectors for current accessible UI copy and labels.
+- Updated ignore rules, README quality-gate guidance, codebase map docs, and milestone audit evidence.
 
-## Current Milestone: v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
+## Current Milestone: Planning next milestone
 
-**Goal:** Make CI and local developer quality gates reliable by auditing the frontend toolchain, fixing reproducible lint/build/script failures, and documenting the commands that must stay green.
+**Goal:** Select the next milestone after the shipped engineering quality and CI reliability work.
 
 **Target features:**
-- Reproduce and fix the GitHub Actions `Frontend CI / build` failure locally.
-- Harden ESLint, TypeScript, Vite, npm scripts, and GitHub Actions configuration so Node/browser files are checked in the correct environment.
-- Audit dependency lockfile, ignored/generated files, and documented commands for drift against CI.
-- Run and record the relevant local quality gates: install parity where feasible, lint, build, and targeted smoke checks.
-- Keep the milestone limited to engineering quality and workflow reliability, not product feature expansion.
+- Suggested next milestone: roadmap interaction QA, progress feedback, and parent visibility refinement.
+- Keep Phase 36 shipped artifacts archived under `.planning/milestones/`.
 
 ## Current State
 
-**Latest shipped milestone:** v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
+**Latest shipped milestone:** v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -113,14 +108,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can rely on English, German, French, and Italian copy QA, cleaned user-facing development artifacts, final language QA docs, README guidance, build verification, and 184 route/locale/viewport smoke checks — v1.30
 - ✓ Developers can run and verify a clear homepage Practice entry, Start Practice routing, four-language Practice entry copy, Practice preview, docs, README, build, browser layout QA, and milestone archive — v1.31
 - ✓ Developers can run and verify a subject-agnostic Practice roadmap with lesson progression states, locked hints, next-lesson CTA, topic route support, four-language copy, docs, README guidance, browser checks, and build verification — v1.33
+- ✓ Developers can run and verify reliable frontend quality gates with CI/local command parity, Node-aware ESLint config, lockfile and ignore hygiene, updated smoke tests, README guidance, and 14/14 Playwright E2E checks — v1.34
 
 ### Active
 
-- [ ] CI and local npm quality gates fail only on real code or configuration problems, not environment misclassification.
-- [ ] ESLint, TypeScript, Vite, npm scripts, and GitHub Actions configuration are aligned with the repository's actual Node and browser file boundaries.
-- [ ] Dependency lockfile, ignored/generated files, and documented commands remain consistent with the GitHub Actions workflow.
-- [ ] The known `scripts/vite.mjs` lint failure is fixed and verified through local lint/build commands.
-- [ ] Documentation records the quality-gate expectations and any intentionally deferred checks.
+- Next milestone requirements are not yet selected.
 
 ### Out of Scope
 
@@ -421,4 +413,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after v1.34 milestone start*
+*Last updated: 2026-05-27 after v1.34 milestone completion*

@@ -911,6 +911,20 @@ Check code quality:
 npm run lint
 ```
 
+### Quality Gates
+
+GitHub Actions runs the frontend gate on Node.js 20:
+
+```bash
+npm ci
+npm run lint
+npm run build
+```
+
+Use the same sequence before pushing changes that affect dependencies, scripts, TypeScript, ESLint, Vite, or CI. `npm run test:e2e` runs the Playwright smoke suite locally; it starts the Vite dev server and may need permission to bind `127.0.0.1:5173` in sandboxed environments.
+
+The lint setup uses ESLint flat config. Browser app source and Node-executed repository scripts/config files have separate environment handling in `eslint.config.js`; prefer updating that config over adding one-off lint suppressions when new script or config files are introduced.
+
 ## Phase 2 Frontend Foundation
 
 This project now includes:
