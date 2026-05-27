@@ -8,63 +8,63 @@
 
 ### Roadmap Experience
 
-- [ ] **ROAD35-01**: Student can open `/practice` and see a roadmap-style Practice path instead of only a normal list or card grid.
-- [ ] **ROAD35-02**: Student can open a topic roadmap at `/practice/:subjectId/:topicId`, including the current demo route for Mathematics / Equations.
-- [ ] **ROAD35-03**: Student can see subject, grade level, topic, unit, lesson, and challenge progression in the Practice roadmap.
-- [ ] **ROAD35-04**: Student can see a progress percentage for the current roadmap topic.
-- [ ] **ROAD35-05**: Student can see the currently recommended next lesson.
-- [ ] **ROAD35-06**: Student can use a continue-next-lesson CTA that opens the current lesson.
-- [ ] **ROAD35-07**: Practice roadmap copy explains that Learning Chat can explain unclear lesson steps.
-- [ ] **ROAD35-08**: The roadmap experience feels like progression while preserving STOA's premium education tone.
+- [x] **ROAD35-01**: Student can open `/practice` and see a roadmap-style Practice path instead of only a normal list or card grid.
+- [x] **ROAD35-02**: Student can open a topic roadmap at `/practice/:subjectId/:topicId`, including the current demo route for Mathematics / Equations.
+- [x] **ROAD35-03**: Student can see subject, grade level, topic, unit, lesson, and challenge progression in the Practice roadmap.
+- [x] **ROAD35-04**: Student can see a progress percentage for the current roadmap topic.
+- [x] **ROAD35-05**: Student can see the currently recommended next lesson.
+- [x] **ROAD35-06**: Student can use a continue-next-lesson CTA that opens the current lesson.
+- [x] **ROAD35-07**: Practice roadmap copy explains that Learning Chat can explain unclear lesson steps.
+- [x] **ROAD35-08**: The roadmap experience feels like progression while preserving STOA's premium education tone.
 
 ### Lesson Node States and Interactions
 
-- [ ] **NODE35-01**: Student can distinguish completed lesson nodes from current, available, locked, and review lesson nodes.
-- [ ] **NODE35-02**: Student can click a completed lesson node and reach a review path or review action.
-- [ ] **NODE35-03**: Student can click the current lesson node and start or continue that lesson.
-- [ ] **NODE35-04**: Student can click an available lesson node and start that lesson.
-- [ ] **NODE35-05**: Student cannot directly start a locked lesson node.
-- [ ] **NODE35-06**: Student can click or focus a locked lesson node and see its unlock condition.
-- [ ] **NODE35-07**: Student can see completed nodes with a clear completion mark.
-- [ ] **NODE35-08**: Student can see the current node visually highlighted without disrupting layout.
-- [ ] **NODE35-09**: Lesson completion can update roadmap state in the mock/demo flow at least enough to show progression.
+- [x] **NODE35-01**: Student can distinguish completed lesson nodes from current, available, locked, and review lesson nodes.
+- [x] **NODE35-02**: Student can click a completed lesson node and reach a review path or review action.
+- [x] **NODE35-03**: Student can click the current lesson node and start or continue that lesson.
+- [x] **NODE35-04**: Student can click an available lesson node and start that lesson.
+- [x] **NODE35-05**: Student cannot directly start a locked lesson node.
+- [x] **NODE35-06**: Student can click or focus a locked lesson node and see its unlock condition.
+- [x] **NODE35-07**: Student can see completed nodes with a clear completion mark.
+- [x] **NODE35-08**: Student can see the current node visually highlighted without disrupting layout.
+- [x] **NODE35-09**: Lesson completion can update roadmap state in the mock/demo flow at least enough to show progression.
 
 ### Roadmap Data and API Contract
 
-- [ ] **DATA35-01**: Practice roadmap types define `RoadmapLessonStatus` with completed, current, available, locked, and review states.
-- [ ] **DATA35-02**: Practice topic data supports subject id, grade level, title, description, progress, and current lesson id.
-- [ ] **DATA35-03**: Practice roadmap data supports subject id, topic id, grade level, progress, current lesson id, units, and lessons.
-- [ ] **DATA35-04**: Practice roadmap unit data supports id, title, description, order, and lesson collection.
-- [ ] **DATA35-05**: Practice roadmap lesson data supports id, title, description, order, status, estimated minutes, and optional unlock condition.
-- [ ] **DATA35-06**: Demo roadmap data uses Mathematics / lower secondary / Equations without hard-coding equations as the only supported Practice topic.
-- [ ] **DATA35-07**: Practice API/service contracts document a future `GET /practice/:subjectId/:topicId/roadmap` shape.
-- [ ] **DATA35-08**: Practice roadmap query or hook code can load the demo roadmap through the existing frontend data layer pattern.
+- [x] **DATA35-01**: Practice roadmap types define `RoadmapLessonStatus` with completed, current, available, locked, and review states.
+- [x] **DATA35-02**: Practice topic data supports subject id, grade level, title, description, progress, and current lesson id.
+- [x] **DATA35-03**: Practice roadmap data supports subject id, topic id, grade level, progress, current lesson id, units, and lessons.
+- [x] **DATA35-04**: Practice roadmap unit data supports id, title, description, order, and lesson collection.
+- [x] **DATA35-05**: Practice roadmap lesson data supports id, title, description, order, status, estimated minutes, and optional unlock condition.
+- [x] **DATA35-06**: Demo roadmap data uses Mathematics / lower secondary / Equations without hard-coding equations as the only supported Practice topic.
+- [x] **DATA35-07**: Practice API/service contracts document a future `GET /practice/:subjectId/:topicId/roadmap` shape.
+- [x] **DATA35-08**: Practice roadmap query or hook code can load the demo roadmap through the existing frontend data layer pattern.
 
 ### Components and Layout
 
-- [ ] **COMP35-01**: `PracticeRoadmap` renders a complete topic roadmap from units and lessons.
-- [ ] **COMP35-02**: `RoadmapUnitSection` renders each unit title, description, and lesson path.
-- [ ] **COMP35-03**: `RoadmapLessonNode` renders lesson status, order, title, estimated time, and action affordance.
-- [ ] **COMP35-04**: `RoadmapConnector` renders stable path connectors between lesson nodes.
-- [ ] **COMP35-05**: `RoadmapProgressHeader` renders topic title, progress summary, and current path context.
-- [ ] **COMP35-06**: `RoadmapUnlockHint` renders the locked lesson unlock explanation.
-- [ ] **COMP35-07**: `ContinueNextLessonCard` renders the next lesson and continue action.
-- [ ] **COMP35-08**: Desktop roadmap layout has a clear path feeling with stable connectors and restrained left/right node offset.
-- [ ] **COMP35-09**: Mobile roadmap layout remains readable with a simpler vertical path.
-- [ ] **COMP35-10**: Long German lesson titles, French apostrophes, and Italian CTA labels do not overflow their containers.
+- [x] **COMP35-01**: `PracticeRoadmap` renders a complete topic roadmap from units and lessons.
+- [x] **COMP35-02**: `RoadmapUnitSection` renders each unit title, description, and lesson path.
+- [x] **COMP35-03**: `RoadmapLessonNode` renders lesson status, order, title, estimated time, and action affordance.
+- [x] **COMP35-04**: `RoadmapConnector` renders stable path connectors between lesson nodes.
+- [x] **COMP35-05**: `RoadmapProgressHeader` renders topic title, progress summary, and current path context.
+- [x] **COMP35-06**: `RoadmapUnlockHint` renders the locked lesson unlock explanation.
+- [x] **COMP35-07**: `ContinueNextLessonCard` renders the next lesson and continue action.
+- [x] **COMP35-08**: Desktop roadmap layout has a clear path feeling with stable connectors and restrained left/right node offset.
+- [x] **COMP35-09**: Mobile roadmap layout remains readable with a simpler vertical path.
+- [x] **COMP35-10**: Long German lesson titles, French apostrophes, and Italian CTA labels do not overflow their containers.
 
 ### Documentation, Localization, and Verification
 
-- [ ] **DOC35-01**: Documentation describes Practice roadmap UI principles and STOA visual direction.
-- [ ] **DOC35-02**: Documentation describes lesson node status rules and click behavior.
-- [ ] **DOC35-03**: Documentation describes mobile roadmap layout rules.
-- [ ] **DOC35-04**: Documentation describes the demo roadmap data and subject-agnostic expansion model.
-- [ ] **DOC35-05**: Documentation includes a roadmap QA checklist covering flow, interaction, visual, localization, and build checks.
-- [ ] **LOC35-01**: English, German, French, and Italian copy exists for roadmap title, current lesson, locked hint, and continue action.
-- [ ] **LOC35-02**: Locale copy supports the Practice roadmap without using game-first, mascot, XP, streak, hearts, gems, shop, or leaderboard language.
-- [ ] **QA35-01**: `npm run build` succeeds after the Practice roadmap implementation.
-- [ ] **QA35-02**: Browser or equivalent UI checks verify `/practice` roadmap, topic roadmap, lesson node clicks, locked hint, continue CTA, desktop layout, and mobile layout.
-- [ ] **QA35-03**: README explains that Practice now includes a roadmap-style learning path and that the current demo uses Mathematics / Equations.
+- [x] **DOC35-01**: Documentation describes Practice roadmap UI principles and STOA visual direction.
+- [x] **DOC35-02**: Documentation describes lesson node status rules and click behavior.
+- [x] **DOC35-03**: Documentation describes mobile roadmap layout rules.
+- [x] **DOC35-04**: Documentation describes the demo roadmap data and subject-agnostic expansion model.
+- [x] **DOC35-05**: Documentation includes a roadmap QA checklist covering flow, interaction, visual, localization, and build checks.
+- [x] **LOC35-01**: English, German, French, and Italian copy exists for roadmap title, current lesson, locked hint, and continue action.
+- [x] **LOC35-02**: Locale copy supports the Practice roadmap without using game-first, mascot, XP, streak, hearts, gems, shop, or leaderboard language.
+- [x] **QA35-01**: `npm run build` succeeds after the Practice roadmap implementation.
+- [x] **QA35-02**: Browser or equivalent UI checks verify `/practice` roadmap, topic roadmap, lesson node clicks, locked hint, continue CTA, desktop layout, and mobile layout.
+- [x] **QA35-03**: README explains that Practice now includes a roadmap-style learning path and that the current demo uses Mathematics / Equations.
 
 ## Future Requirements
 
