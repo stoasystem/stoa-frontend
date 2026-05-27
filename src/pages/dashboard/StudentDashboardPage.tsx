@@ -1,5 +1,6 @@
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { SectionHeader } from '@/components/common/SectionHeader'
 import { AskQuestionCard } from '@/components/dashboard/AskQuestionCard'
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
 import { ContinuePracticeCard } from '@/components/dashboard/ContinuePracticeCard'
@@ -19,33 +20,47 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 export function StudentDashboardPage() {
   return (
     <DashboardLayout>
-      <PageContainer className="space-y-8 p-0">
+      <PageContainer className="space-y-7 p-0">
         <PageHeader
           eyebrow="Learning space"
           title="Student Dashboard"
           description="Choose the next learning step: continue guided practice, ask a specific question, or review recent activity."
         />
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <section aria-label="Learning summary" className="grid grid-cols-3 gap-2 sm:gap-3">
           {dashboardStats.map((stat) => (
             <DashboardStatCard key={stat.label} stat={stat} />
           ))}
-        </div>
+        </section>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <ContinuePracticeCard />
-          <AskQuestionCard />
-        </div>
+        <section className="space-y-4">
+          <SectionHeader
+            title="Next learning step"
+            description="Start with independent practice, then open an explanation when a step is unclear."
+          />
+          <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.18fr)_minmax(22rem,0.82fr)]">
+            <ContinuePracticeCard />
+            <AskQuestionCard />
+          </div>
+        </section>
 
-        <div className="grid gap-6 lg:grid-cols-2">
-          <RecentQuestionsCard questions={recentQuestions} />
-          <WeakTopicsCard topics={weakTopics} />
-        </div>
+        <section className="space-y-4">
+          <SectionHeader
+            title="Learning review"
+            description="Recent activity, progress signals, and teacher guidance in one calmer review area."
+          />
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.05fr)_minmax(20rem,0.95fr)]">
+            <div className="grid gap-5">
+              <RecentQuestionsCard questions={recentQuestions} />
+              <TeacherFeedbackCard feedback={teacherFeedback} />
+            </div>
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <LearningProgressCard progress={learningProgress} />
-          <TeacherFeedbackCard feedback={teacherFeedback} />
-        </div>
+            <div className="grid gap-5">
+              <LearningProgressCard progress={learningProgress} />
+              <WeakTopicsCard topics={weakTopics} />
+            </div>
+          </div>
+        </section>
       </PageContainer>
     </DashboardLayout>
   )

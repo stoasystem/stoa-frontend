@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function AskQuestionCard() {
   return (
-    <Card className="bg-card/90">
+    <Card className="h-full border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
@@ -22,7 +22,7 @@ export function AskQuestionCard() {
           Open Learning Chat for a step-by-step explanation. Use it directly for homework,
           or enter from Practice when a lesson step needs clearer guidance.
         </p>
-        <div className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4 text-sm leading-6">
+        <div className="rounded-md border border-primary/10 bg-[hsl(var(--platform-surface-app))] p-4 text-sm leading-6">
           Practice helps you start. Learning Chat helps you understand the step that is unclear.
         </div>
         <Button asChild variant="outline">

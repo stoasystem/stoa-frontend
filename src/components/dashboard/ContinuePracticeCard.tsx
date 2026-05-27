@@ -11,7 +11,7 @@ export function ContinuePracticeCard() {
   const lesson = practiceOverview?.recommendedLesson
 
   return (
-    <Card className="border-primary/15 bg-card/95">
+    <Card className="h-full border-primary/20 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--stoa-brand-burgundy-soft)_/_0.55)_100%)] shadow-[var(--platform-shadow-soft)]">
       <CardHeader>
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -24,11 +24,11 @@ export function ContinuePracticeCard() {
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        <p className="text-sm leading-6 text-muted-foreground">
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
           Pick up where you left off in the current school topic. If a step is unclear, you can ask for an explanation
           in Learning Chat with the practice context attached.
         </p>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-3">
           <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Next practice challenge'} />
           <PracticeMetric label="Daily goal" value={practiceOverview?.dailyGoal?.label ?? '3 short steps'} />
           <PracticeMetric label="Review" value={`${practiceOverview?.recentMistakes?.length ?? 0} mistakes`} />
@@ -51,9 +51,9 @@ export function ContinuePracticeCard() {
 
 function PracticeMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
+    <div className="min-h-20 rounded-md border border-primary/10 bg-card/70 px-3 py-3 shadow-sm">
       <p className="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm font-semibold text-foreground">{value}</p>
+      <p className="mt-2 text-sm font-semibold leading-5 text-foreground">{value}</p>
     </div>
   )
 }
