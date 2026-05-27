@@ -62,17 +62,17 @@ Deferred to future release. Tracked but not in current roadmap.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CI36-01 | Phase 191 | Pending |
-| CI36-02 | Phase 191 | Pending |
-| CONFIG36-01 | Phase 191 | Pending |
-| CONFIG36-02 | Phase 191 | Pending |
+| CI36-01 | Phase 191 | Complete |
+| CI36-02 | Phase 191 | Complete |
+| CONFIG36-01 | Phase 191 | Complete |
+| CONFIG36-02 | Phase 191 | Complete |
 | CONFIG36-03 | Phase 192 | Pending |
 | CONFIG36-04 | Phase 192 | Pending |
 | SCRIPT36-01 | Phase 192 | Pending |
 | SCRIPT36-02 | Phase 192 | Pending |
 | HYGIENE36-01 | Phase 192 | Pending |
 | HYGIENE36-02 | Phase 192 | Pending |
-| QA36-01 | Phase 193 | Pending |
+| QA36-01 | Phase 193 | Complete |
 | QA36-02 | Phase 193 | Pending |
 | QA36-03 | Phase 193 | Pending |
 | QA36-04 | Phase 193 | Pending |

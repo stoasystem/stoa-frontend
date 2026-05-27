@@ -7,7 +7,7 @@
 
 ## Phases
 
-- [ ] **Phase 191: CI Failure Reproduction and ESLint Environment Fix** - Reproduce the GitHub Actions lint failure locally, fix the Node/browser ESLint boundary, and verify lint/build parity for the known failure.
+- [x] **Phase 191: CI Failure Reproduction and ESLint Environment Fix** - Reproduce the GitHub Actions lint failure locally, fix the Node/browser ESLint boundary, and verify lint/build parity for the known failure.
 - [ ] **Phase 192: Tooling, Script, and Workflow Drift Audit** - Audit npm scripts, GitHub Actions, TypeScript/Vite config, lockfile state, ignore rules, and generated artifacts for drift; fix low-risk issues that would cause repeat CI failures.
 - [ ] **Phase 193: Local Quality Gate Verification and Targeted Smoke Checks** - Run the repository's core quality gates and targeted local smoke checks, record results, and classify any residual risks.
 - [ ] **Phase 194: Documentation, Milestone Audit, and Handoff** - Update developer docs and planning state with the verified workflow, quality-gate expectations, and any intentionally deferred follow-ups.
@@ -74,7 +74,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 191. CI Failure Reproduction and ESLint Environment Fix | 0/1 | Pending | — |
+| 191. CI Failure Reproduction and ESLint Environment Fix | 1/1 | Complete | 2026-05-27 |
 | 192. Tooling, Script, and Workflow Drift Audit | 0/1 | Pending | — |
 | 193. Local Quality Gate Verification and Targeted Smoke Checks | 0/1 | Pending | — |
 | 194. Documentation, Milestone Audit, and Handoff | 0/1 | Pending | — |

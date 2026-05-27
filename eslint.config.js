@@ -8,6 +8,23 @@ export default tseslint.config(
     ignores: ['dist', 'node_modules'],
   },
   {
+    files: [
+      '*.config.{js,ts}',
+      'eslint.config.js',
+      'scripts/**/*.mjs',
+    ],
+    languageOptions: {
+      globals: {
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        Buffer: 'readonly',
+        console: 'readonly',
+        module: 'readonly',
+        process: 'readonly',
+      },
+    },
+  },
+  {
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
