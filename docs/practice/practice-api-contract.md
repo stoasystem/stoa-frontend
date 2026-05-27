@@ -10,26 +10,38 @@ Returns available practice subjects.
 {
   "items": [
     {
-      "id": "math",
+      "id": "mathematics",
       "name": "Mathematics",
-      "description": "Practice equations, functions, and problem solving.",
+      "description": "Short challenges for key mathematics topics.",
+      "gradeLevels": [
+        {
+          "id": "lower_secondary",
+          "label": "Lower secondary",
+          "order": 1
+        }
+      ],
       "progress": 35
     }
   ]
 }
 ```
 
-## GET /practice/subjects/:subjectId/path
+## GET /practice/subjects/:subjectId/topics/:topicId/path
 
-Returns the unit and lesson path for one subject.
+Returns the unit and lesson path for one subject/topic pair. The current demo uses `mathematics` and `equations`.
 
 ```json
 {
-  "subjectId": "math",
+  "subjectId": "mathematics",
+  "gradeLevel": "lower_secondary",
+  "topicId": "equations",
+  "topicTitle": "Equations",
   "units": [
     {
       "id": "unit-linear-equations",
-      "subjectId": "math",
+      "subjectId": "mathematics",
+      "gradeLevel": "lower_secondary",
+      "topicId": "equations",
       "title": "Linear equations",
       "description": "Build confidence with equations step by step.",
       "order": 1,
@@ -43,6 +55,8 @@ Returns the unit and lesson path for one subject.
 ## GET /practice/lessons/:lessonId
 
 Returns a lesson with 3-5 short challenges.
+
+Challenge payloads include `subjectId`, `gradeLevel`, `topicId`, `unitId`, and `lessonId` so Learning Chat, teacher support, and parent reports can preserve the source context.
 
 ## POST /practice/challenges/:challengeId/answer
 
@@ -74,6 +88,9 @@ Response:
 ```json
 {
   "lessonId": "lesson-linear-1",
+  "subjectId": "mathematics",
+  "gradeLevel": "lower_secondary",
+  "topicId": "equations",
   "correctCount": 2,
   "totalCount": 3,
   "progressPoints": 24,
@@ -94,3 +111,7 @@ The frontend also defines demo-facing service calls for:
 - `GET /parents/me/children/:childId/practice-summary`
 
 These are contract placeholders. Phase 27 does not add a production database, adaptive learning engine, payment gate, or teacher workflow redesign.
+
+## Scope Rule
+
+The contract must remain subject-agnostic and topic-agnostic. Equations are demo seed content only; future subjects and topics should fit the same subject -> grade level -> topic -> unit -> lesson -> challenge structure.

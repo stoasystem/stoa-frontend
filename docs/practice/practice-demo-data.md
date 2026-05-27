@@ -12,6 +12,12 @@ Phase 28 fixes the visible demo package to Mathematics / lower secondary / equat
 
 This is seed content for the current demo. It is not a statement that Practice Path only supports equations.
 
+The frontend mock data should expose this package as subject/topic seed data:
+
+```text
+mockPractice.mathematics.lowerSecondary.equations
+```
+
 Unit 1: Linear equations in one variable
 
 - One-step equations

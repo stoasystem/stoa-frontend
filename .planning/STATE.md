@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.32
 milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
 status: in_progress
-last_updated: "2026-05-27T12:05:00.000Z"
+last_updated: "2026-05-27T12:25:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 182 Subject-Agnostic Practice Domain Model and Mock Data Contract
-Plan: 182-PLAN.md pending
-Status: Phase 181 complete; ready for model and mock-data alignment
-Last activity: 2026-05-27 — Phase 181 completed Practice scope documentation correction
+Phase: 183 Practice Routes and Component Architecture Generalization
+Plan: 183-PLAN.md pending
+Status: Phase 182 complete; ready for route and component architecture alignment
+Last activity: 2026-05-27 — Phase 182 completed subject/topic Practice model and mock-data alignment
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 1 of 5
+- Total plans completed this milestone: 2 of 5
 - Average duration: 1 autonomous phase pass
 - Total execution time: in progress
 
@@ -42,7 +42,7 @@ Last activity: 2026-05-27 — Phase 181 completed Practice scope documentation c
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 181 | 1/1 | Complete | 1 pass |
-| 182 | 0/1 | Pending | — |
+| 182 | 1/1 | Complete | 1 pass |
 | 183 | 0/1 | Pending | — |
 | 184 | 0/1 | Pending | — |
 | 185 | 0/1 | Pending | — |
@@ -105,10 +105,11 @@ Recent decisions affecting current work:
 - v1.32 Phase 34 corrects prior wording that could imply Practice Path equals equations. The intended hierarchy is Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
 - Equation content remains the first demo seed under Mathematics / lower secondary / equations.
 - Phase 181 recorded the Practice Path Scope Principle in English and Chinese and corrected historical docs so equations are framed as the first demo package only.
+- Phase 182 added explicit grade/topic/unit metadata to Practice types and mock data, with canonical demo seed data under `mockPractice.mathematics.lowerSecondary.equations`.
 
 ### Pending Todos
 
-- Start Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract.
+- Start Phase 183: Practice Routes and Component Architecture Generalization.
 
 ### Quick Tasks Completed
 

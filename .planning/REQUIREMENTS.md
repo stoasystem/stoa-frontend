@@ -20,15 +20,15 @@
 
 ### Subject-Agnostic Practice Data Model
 
-- [ ] **MODEL34-01**: Practice domain types include subject, grade level, topic, unit, lesson, and challenge concepts.
-- [ ] **MODEL34-02**: Type names do not encode `EquationPath` or equivalent equation-only architecture.
-- [ ] **MODEL34-03**: Practice challenge data includes `subject`, `gradeLevel`, and `topic` metadata.
-- [ ] **MODEL34-04**: Existing equation demo data is represented as Mathematics / lower secondary / equations seed data.
-- [ ] **MODEL34-05**: Mock data structure supports adding future topics without changing component contracts.
-- [ ] **MODEL34-06**: Parent summary and tutor context data can identify the source subject and topic, not only an equation path.
-- [ ] **MODEL34-07**: Existing lesson, hint, answer, result, mistake, parent summary, and teacher-help flows continue to work with the generalized model.
-- [ ] **MODEL34-08**: API contract documentation remains subject-agnostic and topic-agnostic.
-- [ ] **MODEL34-09**: Internal docs explain that the current equation data is demo seed content, not a database schema commitment.
+- [x] **MODEL34-01**: Practice domain types include subject, grade level, topic, unit, lesson, and challenge concepts.
+- [x] **MODEL34-02**: Type names do not encode `EquationPath` or equivalent equation-only architecture.
+- [x] **MODEL34-03**: Practice challenge data includes `subject`, `gradeLevel`, and `topic` metadata.
+- [x] **MODEL34-04**: Existing equation demo data is represented as Mathematics / lower secondary / equations seed data.
+- [x] **MODEL34-05**: Mock data structure supports adding future topics without changing component contracts.
+- [x] **MODEL34-06**: Parent summary and tutor context data can identify the source subject and topic, not only an equation path.
+- [x] **MODEL34-07**: Existing lesson, hint, answer, result, mistake, parent summary, and teacher-help flows continue to work with the generalized model.
+- [x] **MODEL34-08**: API contract documentation remains subject-agnostic and topic-agnostic.
+- [x] **MODEL34-09**: Internal docs explain that the current equation data is demo seed content, not a database schema commitment.
 
 ### Routes and Component Architecture
 
@@ -105,15 +105,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SCOPE34-07 | Phase 181 | Complete |
 | SCOPE34-08 | Phase 181 | Complete |
 | SCOPE34-09 | Phase 181 | Complete |
-| MODEL34-01 | Phase 182 | Pending |
-| MODEL34-02 | Phase 182 | Pending |
-| MODEL34-03 | Phase 182 | Pending |
-| MODEL34-04 | Phase 182 | Pending |
-| MODEL34-05 | Phase 182 | Pending |
-| MODEL34-06 | Phase 182 | Pending |
-| MODEL34-07 | Phase 182 | Pending |
-| MODEL34-08 | Phase 182 | Pending |
-| MODEL34-09 | Phase 182 | Pending |
+| MODEL34-01 | Phase 182 | Complete |
+| MODEL34-02 | Phase 182 | Complete |
+| MODEL34-03 | Phase 182 | Complete |
+| MODEL34-04 | Phase 182 | Complete |
+| MODEL34-05 | Phase 182 | Complete |
+| MODEL34-06 | Phase 182 | Complete |
+| MODEL34-07 | Phase 182 | Complete |
+| MODEL34-08 | Phase 182 | Complete |
+| MODEL34-09 | Phase 182 | Complete |
 | ROUTE34-01 | Phase 183 | Pending |
 | ROUTE34-02 | Phase 183 | Pending |
 | ROUTE34-03 | Phase 183 | Pending |

@@ -2,18 +2,41 @@ export type PracticeSubject = {
   id: string
   name: string
   description: string
+  gradeLevels: PracticeGradeLevel[]
   progress: number
   accent: string
 }
 
+export type PracticeGradeLevel = {
+  id: string
+  label: string
+  order: number
+}
+
+export type PracticeTopicStatus = 'available' | 'coming_later'
 export type PracticeUnitStatus = 'locked' | 'available' | 'completed'
 export type PracticeLessonStatus = 'locked' | 'available' | 'completed'
 export type PracticeLessonDifficulty = 'intro' | 'practice' | 'review'
 export type PracticeChallengeType = 'multiple_choice' | 'text_input' | 'ordering' | 'explanation'
 
+export type PracticeTopic = {
+  id: string
+  subjectId: string
+  gradeLevel: string
+  title: string
+  description: string
+  order: number
+  status: PracticeTopicStatus
+}
+
 export type PracticeChallenge = {
   id: string
   lessonId: string
+  unitId: string
+  subjectId: string
+  gradeLevel: string
+  topicId: string
+  topic: string
   type: PracticeChallengeType
   prompt: string
   options?: string[]
@@ -22,14 +45,14 @@ export type PracticeChallenge = {
   explanation?: string
   correctFeedback?: string
   incorrectFeedback?: string
-  topic: string
-  gradeLevel: string
 }
 
 export type PracticeLesson = {
   id: string
   unitId: string
   subjectId: string
+  gradeLevel: string
+  topicId: string
   title: string
   topic: string
   difficulty: PracticeLessonDifficulty
@@ -41,6 +64,8 @@ export type PracticeLesson = {
 export type LearningUnit = {
   id: string
   subjectId: string
+  gradeLevel: string
+  topicId: string
   title: string
   description: string
   order: number
@@ -50,12 +75,17 @@ export type LearningUnit = {
 
 export type PracticePath = {
   subjectId: string
+  gradeLevel: string
+  topicId: string
+  topicTitle: string
   units: LearningUnit[]
 }
 
 export type PracticeProgress = {
   studentId: string
   subjectId: string
+  gradeLevel: string
+  topicId: string
   completedLessons: string[]
   currentLessonId?: string
   dailyGoalCompleted: boolean
@@ -82,6 +112,8 @@ export type PracticeAnswerResult = {
 export type PracticeLessonResult = {
   lessonId: string
   subjectId: string
+  gradeLevel: string
+  topicId: string
   correctCount: number
   totalCount: number
   progressPoints: number
@@ -94,6 +126,8 @@ export type PracticeMistake = {
   id: string
   subjectId: string
   subjectName: string
+  gradeLevel: string
+  topicId: string
   lessonId: string
   lessonTitle: string
   challengeId: string
@@ -108,6 +142,7 @@ export type PracticeMistake = {
 
 export type PracticeOverview = {
   subjects: PracticeSubject[]
+  topics: PracticeTopic[]
   recommendedLesson: PracticeLesson
   dailyGoal: {
     completed: number
@@ -127,6 +162,8 @@ export type PracticeOverview = {
 
 export type PracticeHintRequest = {
   subjectId: string
+  gradeLevel?: string
+  topicId?: string
   lessonId: string
   challengeId: string
   answer: string | string[]
@@ -140,6 +177,8 @@ export type PracticeHintResponse = {
 
 export type PracticeTeacherHelpRequest = {
   subjectId: string
+  gradeLevel?: string
+  topicId?: string
   lessonId: string
   challengeId: string
   message: string
@@ -157,6 +196,10 @@ export type PracticeParentSummary = {
   topicsPracticed: string[]
   mistakesReviewed: number
   practiceStreak: number
+  currentSubject: string
+  currentGradeLevel: string
+  currentTopic: string
+  currentTopicId: string
   currentPracticePath: string
   recommendedNextTopic: string
   supportiveNote: string
@@ -168,6 +211,9 @@ export type PracticeParentSummary = {
 export type PracticeChatContext = {
   source: 'practice'
   subjectId: string
+  gradeLevel: string
+  topicId: string
+  unitId?: string
   lessonId: string
   challengeId: string
   challengePrompt: string
@@ -177,13 +223,15 @@ export type PracticeChatContext = {
   hintViewed?: boolean
   learningChatExplanationRequested?: boolean
   topic: string
-  gradeLevel: string
   returnTo?: string
 }
 
 export type PracticeTeacherRequestContext = {
   source: 'practice'
   subjectId: string
+  gradeLevel: string
+  topicId: string
+  unitId?: string
   lessonId: string
   challengeId: string
   challengePrompt?: string

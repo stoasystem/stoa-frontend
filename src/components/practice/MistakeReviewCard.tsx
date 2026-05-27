@@ -7,6 +7,8 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
   const practiceContext: PracticeChatContext = {
     source: 'practice',
     subjectId: mistake.subjectId,
+    gradeLevel: mistake.gradeLevel,
+    topicId: mistake.topicId,
     lessonId: mistake.lessonId,
     challengeId: mistake.challengeId,
     challengePrompt: mistake.prompt,
@@ -16,7 +18,6 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
     hintViewed: true,
     learningChatExplanationRequested: true,
     topic: mistake.topic,
-    gradeLevel: 'Lower secondary',
     returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
   }
 

@@ -233,7 +233,10 @@ export const mockTutorHelpRequestDetail: TutorHelpRequestDetail = {
   requestMessage: 'The student requested support after practising this step.',
   practiceContext: {
     source: 'practice',
-    subjectId: 'math',
+    subjectId: 'mathematics',
+    gradeLevel: 'lower_secondary',
+    topicId: 'equations',
+    unitId: 'unit-linear-equations',
     lessonId: 'lesson-linear-2',
     challengeId: 'linear-2-c2',
     challengePrompt: 'Solve 3x + 5 = 20. Write the value of x.',

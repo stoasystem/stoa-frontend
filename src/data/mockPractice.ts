@@ -10,17 +10,43 @@ import type {
   PracticeParentSummary,
   PracticePath,
   PracticeSubject,
+  PracticeTopic,
 } from '@/types/practice'
 
 const now = '2026-05-26T12:00:00Z'
+const demoSubjectId = 'mathematics'
+const legacyMathSubjectId = 'math'
+const demoGradeLevel = 'lower_secondary'
+const demoGradeLevelLabel = 'Lower secondary'
+const demoTopicId = 'equations'
+const demoTopicTitle = 'Equations'
 
 export const practiceSubjects: PracticeSubject[] = [
   {
-    id: 'math',
+    id: demoSubjectId,
     name: 'Mathematics',
-    description: 'Equation practice for linear equations, quadratics, and simple systems.',
+    description: 'Short challenges for key mathematics topics. Available now: the equations demo path.',
+    gradeLevels: [
+      {
+        id: demoGradeLevel,
+        label: demoGradeLevelLabel,
+        order: 1,
+      },
+    ],
     progress: 46,
     accent: 'burgundy',
+  },
+]
+
+export const practiceTopics: PracticeTopic[] = [
+  {
+    id: demoTopicId,
+    subjectId: demoSubjectId,
+    gradeLevel: demoGradeLevel,
+    title: demoTopicTitle,
+    description: 'Demo topic for linear equations, quadratic basics, and linear systems.',
+    order: 1,
+    status: 'available',
   },
 ]
 
@@ -179,24 +205,26 @@ const challenges: Record<string, PracticeChallenge[]> = {
 }
 
 const mathLessons: PracticeLesson[] = [
-  lesson('lesson-linear-1', 'unit-linear-equations', 'math', 'One-step equations', 'One-step equations', 'available', 'intro', 4),
-  lesson('lesson-linear-2', 'unit-linear-equations', 'math', 'Two-step equations', 'Two-step equations', 'available', 'practice', 5),
-  lesson('lesson-linear-3', 'unit-linear-equations', 'math', 'Equations with brackets', 'Equations with brackets', 'available', 'practice', 6),
-  lesson('lesson-linear-4', 'unit-linear-equations', 'math', 'Word problems with linear equations', 'Equation word problems', 'available', 'review', 6),
-  lesson('lesson-quadratic-1', 'unit-quadratic-equations', 'math', 'Recognizing quadratic equations', 'Recognizing quadratic equations', 'available', 'intro', 4),
-  lesson('lesson-quadratic-2', 'unit-quadratic-equations', 'math', 'Factoring simple quadratics', 'Factoring simple quadratics', 'available', 'practice', 6),
-  lesson('lesson-quadratic-3', 'unit-quadratic-equations', 'math', 'Solving factored quadratics', 'Solving factored quadratics', 'available', 'practice', 6),
-  lesson('lesson-quadratic-4', 'unit-quadratic-equations', 'math', 'Checking two solutions', 'Checking quadratic solutions', 'available', 'review', 5),
-  lesson('lesson-system-1', 'unit-linear-systems', 'math', 'What is a system of equations?', 'Systems of equations', 'available', 'intro', 4),
-  lesson('lesson-system-2', 'unit-linear-systems', 'math', 'Solving by substitution', 'Solving by substitution', 'available', 'practice', 6),
-  lesson('lesson-system-3', 'unit-linear-systems', 'math', 'Solving by elimination', 'Solving by elimination', 'available', 'practice', 6),
-  lesson('lesson-system-4', 'unit-linear-systems', 'math', 'Checking the solution', 'Checking system solutions', 'available', 'review', 5),
+  lesson('lesson-linear-1', 'unit-linear-equations', demoSubjectId, 'One-step equations', 'One-step equations', 'available', 'intro', 4),
+  lesson('lesson-linear-2', 'unit-linear-equations', demoSubjectId, 'Two-step equations', 'Two-step equations', 'available', 'practice', 5),
+  lesson('lesson-linear-3', 'unit-linear-equations', demoSubjectId, 'Equations with brackets', 'Equations with brackets', 'available', 'practice', 6),
+  lesson('lesson-linear-4', 'unit-linear-equations', demoSubjectId, 'Word problems with linear equations', 'Equation word problems', 'available', 'review', 6),
+  lesson('lesson-quadratic-1', 'unit-quadratic-equations', demoSubjectId, 'Recognizing quadratic equations', 'Recognizing quadratic equations', 'available', 'intro', 4),
+  lesson('lesson-quadratic-2', 'unit-quadratic-equations', demoSubjectId, 'Factoring simple quadratics', 'Factoring simple quadratics', 'available', 'practice', 6),
+  lesson('lesson-quadratic-3', 'unit-quadratic-equations', demoSubjectId, 'Solving factored quadratics', 'Solving factored quadratics', 'available', 'practice', 6),
+  lesson('lesson-quadratic-4', 'unit-quadratic-equations', demoSubjectId, 'Checking two solutions', 'Checking quadratic solutions', 'available', 'review', 5),
+  lesson('lesson-system-1', 'unit-linear-systems', demoSubjectId, 'What is a system of equations?', 'Systems of equations', 'available', 'intro', 4),
+  lesson('lesson-system-2', 'unit-linear-systems', demoSubjectId, 'Solving by substitution', 'Solving by substitution', 'available', 'practice', 6),
+  lesson('lesson-system-3', 'unit-linear-systems', demoSubjectId, 'Solving by elimination', 'Solving by elimination', 'available', 'practice', 6),
+  lesson('lesson-system-4', 'unit-linear-systems', demoSubjectId, 'Checking the solution', 'Checking system solutions', 'available', 'review', 5),
 ]
 
 export const practiceUnits: LearningUnit[] = [
   {
     id: 'unit-linear-equations',
-    subjectId: 'math',
+    subjectId: demoSubjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     title: 'Linear equations in one variable',
     description: 'Build the habit of balancing both sides while isolating x.',
     order: 1,
@@ -205,7 +233,9 @@ export const practiceUnits: LearningUnit[] = [
   },
   {
     id: 'unit-quadratic-equations',
-    subjectId: 'math',
+    subjectId: demoSubjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     title: 'Quadratic equations',
     description: 'Recognize simple quadratics, factor them, and check both solutions.',
     order: 2,
@@ -214,7 +244,9 @@ export const practiceUnits: LearningUnit[] = [
   },
   {
     id: 'unit-linear-systems',
-    subjectId: 'math',
+    subjectId: demoSubjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     title: 'Linear systems in two variables',
     description: 'Use substitution, elimination, and checking with ordered pairs.',
     order: 3,
@@ -223,11 +255,26 @@ export const practiceUnits: LearningUnit[] = [
   },
 ]
 
+export const mockPractice = {
+  mathematics: {
+    lowerSecondary: {
+      equations: {
+        subject: practiceSubjects[0],
+        topic: practiceTopics[0],
+        units: practiceUnits,
+        lessons: mathLessons,
+      },
+    },
+  },
+}
+
 export const mockPracticeMistakes: PracticeMistake[] = [
   {
     id: 'mistake-1',
-    subjectId: 'math',
+    subjectId: demoSubjectId,
     subjectName: 'Mathematics',
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     lessonId: 'lesson-linear-2',
     lessonTitle: 'Two-step equations',
     challengeId: 'linear-2-c2',
@@ -241,8 +288,10 @@ export const mockPracticeMistakes: PracticeMistake[] = [
   },
   {
     id: 'mistake-2',
-    subjectId: 'math',
+    subjectId: demoSubjectId,
     subjectName: 'Mathematics',
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     lessonId: 'lesson-system-2',
     lessonTitle: 'Solving by substitution',
     challengeId: 'system-2-c3',
@@ -261,11 +310,12 @@ export function getMockPracticeOverview(): PracticeOverview {
 
   return {
     subjects: practiceSubjects,
+    topics: practiceTopics,
     recommendedLesson,
     dailyGoal: {
       completed: 2,
       target: 3,
-      label: '2 of 3 equation practices',
+      label: '2 of 3 practice challenges',
     },
     studyStreak: 5,
     progressPoints: 264,
@@ -288,9 +338,14 @@ export function getMockPracticeOverview(): PracticeOverview {
 }
 
 export function getMockPracticePath(subjectId: string): PracticePath {
+  const resolvedSubjectId = normalizeSubjectId(subjectId)
+
   return {
-    subjectId,
-    units: practiceUnits.filter((unit) => unit.subjectId === subjectId),
+    subjectId: resolvedSubjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
+    topicTitle: demoTopicTitle,
+    units: practiceUnits.filter((unit) => unit.subjectId === resolvedSubjectId && unit.topicId === demoTopicId),
   }
 }
 
@@ -331,6 +386,8 @@ export function completeMockLesson(lessonId: string): PracticeLessonResult {
   return {
     lessonId,
     subjectId: targetLesson.subjectId,
+    gradeLevel: targetLesson.gradeLevel,
+    topicId: targetLesson.topicId,
     correctCount: Math.max(totalCount - 1, 1),
     totalCount,
     progressPoints: totalCount * 8,
@@ -356,12 +413,16 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     topicsPracticed: ['One-step equations', 'Two-step equations', 'Simple systems'],
     mistakesReviewed: 2,
     practiceStreak: 5,
-    currentPracticePath: 'Equations',
+    currentSubject: 'Mathematics',
+    currentGradeLevel: demoGradeLevelLabel,
+    currentTopic: demoTopicTitle,
+    currentTopicId: demoTopicId,
+    currentPracticePath: 'Mathematics / Equations',
     recommendedNextTopic: 'Two-step equations and substitution',
-    supportiveNote: 'Anna practised equations and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
+    supportiveNote: 'Anna practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
     questionsAsked: 2,
     teacherSupportRequested: 1,
-    learningActivityNote: 'This week combines independent equation practice with Learning Chat explanations and one teacher-support moment.',
+    learningActivityNote: 'This week combines independent Practice Path work with Learning Chat explanations and one teacher-support moment.',
   }
 }
 
@@ -431,9 +492,16 @@ function challenge(
   topic: string,
   options?: string[],
 ): PracticeChallenge {
+  const unitId = getLessonUnitId(lessonId)
+
   return {
     id,
     lessonId,
+    unitId,
+    subjectId: demoSubjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
+    topic,
     type,
     prompt,
     options,
@@ -442,8 +510,6 @@ function challenge(
     explanation: correctFeedback,
     correctFeedback,
     incorrectFeedback,
-    topic,
-    gradeLevel: 'Lower secondary',
   }
 }
 
@@ -461,6 +527,8 @@ function lesson(
     id,
     unitId,
     subjectId,
+    gradeLevel: demoGradeLevel,
+    topicId: demoTopicId,
     title,
     topic,
     status,
@@ -468,6 +536,22 @@ function lesson(
     estimatedMinutes,
     challenges: challenges[id],
   }
+}
+
+function normalizeSubjectId(subjectId: string) {
+  return subjectId === legacyMathSubjectId ? demoSubjectId : subjectId
+}
+
+function getLessonUnitId(lessonId: string) {
+  if (lessonId.startsWith('lesson-quadratic')) {
+    return 'unit-quadratic-equations'
+  }
+
+  if (lessonId.startsWith('lesson-system')) {
+    return 'unit-linear-systems'
+  }
+
+  return 'unit-linear-equations'
 }
 
 function answersMatch(

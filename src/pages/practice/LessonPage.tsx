@@ -43,7 +43,7 @@ export function LessonPage() {
   const canCheck = Boolean(challenge && (Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim()))
   const teacherHelpVisible = state.incorrectAttempts >= 2 || state.hintsShown >= 2
 
-  const selectedSubjectPath = subjectId ?? lesson?.subjectId ?? 'math'
+  const selectedSubjectPath = subjectId ?? lesson?.subjectId ?? 'mathematics'
   const progressCurrent = useMemo(() => (lesson ? state.currentIndex + (state.feedback?.correct ? 1 : 0) : 0), [lesson, state])
 
   async function handleCheck() {
@@ -59,6 +59,8 @@ export function LessonPage() {
     if (!challenge || !lesson) return
     const hint = await hintMutation.mutateAsync({
       subjectId: lesson.subjectId,
+      gradeLevel: lesson.gradeLevel,
+      topicId: lesson.topicId,
       lessonId: lesson.id,
       challengeId: challenge.id,
       answer: state.answer,
@@ -75,6 +77,9 @@ export function LessonPage() {
     return {
       source: 'practice',
       subjectId: lesson?.subjectId ?? selectedSubjectPath,
+      gradeLevel: targetChallenge.gradeLevel,
+      topicId: targetChallenge.topicId,
+      unitId: targetChallenge.unitId,
       lessonId: lesson?.id ?? lessonId ?? '',
       challengeId: targetChallenge.id,
       challengePrompt: targetChallenge.prompt,
@@ -84,7 +89,6 @@ export function LessonPage() {
       hintViewed: state.hintsShown > 0 || Boolean(hintMutation.data),
       learningChatExplanationRequested: true,
       topic: targetChallenge.topic,
-      gradeLevel: targetChallenge.gradeLevel,
       returnTo: `/practice/${lesson?.subjectId ?? selectedSubjectPath}/lessons/${lesson?.id ?? lessonId}`,
     }
   }
@@ -106,12 +110,17 @@ export function LessonPage() {
     if (!challenge || !lesson) return
     const response = await teacherHelpMutation.mutateAsync({
       subjectId: lesson.subjectId,
+      gradeLevel: lesson.gradeLevel,
+      topicId: lesson.topicId,
       lessonId: lesson.id,
       challengeId: challenge.id,
       message: `Student is still stuck on ${challenge.topic}.`,
       practiceContext: {
         source: 'practice',
         subjectId: lesson.subjectId,
+        gradeLevel: lesson.gradeLevel,
+        topicId: lesson.topicId,
+        unitId: lesson.unitId,
         lessonId: lesson.id,
         challengeId: challenge.id,
         challengePrompt: challenge.prompt,
