@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
-import { showDemoAccounts } from '@/lib/env'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
 
@@ -16,12 +15,6 @@ export function LoginForm() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const loginMutation = useLoginMutation()
   const loginSchema = createLoginSchema(t)
-
-  function fillDemo(emailAddress: string) {
-    setEmail(emailAddress)
-    setPassword('password123')
-    setErrors({})
-  }
 
   return (
     <form
@@ -42,30 +35,6 @@ export function LoginForm() {
         loginMutation.mutate(result.data)
       }}
     >
-      {showDemoAccounts && (
-        <div className="rounded-md border bg-secondary/40 p-3 text-sm">
-          <p className="font-medium">{t('auth:login.reviewAccountTitle')}</p>
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            {[
-              [t('common:roles.student'), 'student@test.com'],
-              [t('common:roles.parent'), 'parent@test.com'],
-              [t('common:roles.tutor'), 'tutor@test.com'],
-              [t('common:roles.admin'), 'admin@test.com'],
-              [t('common:roles.organization_admin'), 'organization@test.com'],
-            ].map(([label, demoEmail]) => (
-              <Button
-                key={demoEmail}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => fillDemo(demoEmail)}
-              >
-                {label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      )}
       <div className="space-y-2">
         <Label htmlFor="email">{t('auth:register.email')}</Label>
         <Input
