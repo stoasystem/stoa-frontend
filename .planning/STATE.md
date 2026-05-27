@@ -124,6 +124,7 @@ Recent decisions affecting current work:
 | 2026-05-26 | Create independent categorized Q&A page | Browser checks on `/qa` and `/pricing`; `npm run build` |
 | 2026-05-26 | Improve teacher application CTA readability | Browser check on `/teacher-support`; `npm run build` |
 | 2026-05-27 | Make student login default to Dashboard instead of Learning Chat | Browser checks for `/chat` login fallback and `next=/practice`; `npm run build` |
+| 2026-05-27 | Improve Practice Continue button readability | Browser computed color check on `/practice`; `npm run build` |
 
 ### Blockers/Concerns
 
