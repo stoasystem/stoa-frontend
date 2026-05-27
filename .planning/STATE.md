@@ -7,10 +7,10 @@ last_updated: "2026-05-27T15:20:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 1
+  percent: 20
 ---
 
 # Project State
@@ -24,24 +24,24 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 186 Practice Roadmap Data Contract and Demo Roadmap Foundation
+Phase: 187 Roadmap Component System and Lesson Node States
 Plan: —
-Status: Roadmap ready
-Last activity: 2026-05-27 — Milestone v1.33 roadmap created
+Status: Phase 186 complete
+Last activity: 2026-05-27 — Phase 186 completed roadmap data contract and demo foundation
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 5
-- Average duration: —
-- Total execution time: not started
+- Total plans completed this milestone: 1 of 5
+- Average duration: 1 autonomous phase pass
+- Total execution time: in progress
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 186 | 0/1 | Pending | — |
+| 186 | 1/1 | Complete | 1 pass |
 | 187 | 0/1 | Pending | — |
 | 188 | 0/1 | Pending | — |
 | 189 | 0/1 | Pending | — |
@@ -111,10 +111,11 @@ Recent decisions affecting current work:
 - Phase 185 verified build, browser Practice funnel, topic/lesson routes, dashboard copy, and four-language mobile homepage rendering.
 - v1.33 continues roadmap numbering from Phase 186 after v1.32 ended at Phase 185.
 - Phase 35 focuses on Practice roadmap UI, lesson progression states, unlock hints, and Learning Chat handoff copy; it does not add new subjects, a production backend, adaptive learning, or heavy game rewards.
+- Phase 186 added roadmap contracts, demo roadmap data, roadmap service/query support, and mock progression updates.
 
 ### Pending Todos
 
-- Start Phase 186 with `$gsd-plan-phase 186` to implement the roadmap data contract and demo roadmap foundation.
+- Continue with Phase 187 to build the roadmap component system and lesson node states.
 
 ### Quick Tasks Completed
 
@@ -182,4 +183,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Plan Phase 186 with /gsd-plan-phase 186.
+- Continue autonomous execution with Phase 187.

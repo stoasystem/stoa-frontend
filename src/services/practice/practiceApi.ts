@@ -6,6 +6,7 @@ import {
   getMockPracticeOverview,
   getMockPracticeParentSummary,
   getMockPracticePath,
+  getMockPracticeRoadmap,
   practiceSubjects,
   submitMockChallengeAnswer,
 } from '@/data/mockPractice'
@@ -22,6 +23,7 @@ import type {
   PracticeOverview,
   PracticeParentSummary,
   PracticePath,
+  PracticeRoadmap,
   PracticeSubject,
   PracticeTeacherHelpRequest,
   PracticeTeacherHelpResponse,
@@ -63,6 +65,15 @@ export async function getSubjectPath(subjectId: string, topicId?: string) {
     const response = await httpClient.get<PracticePath>(path)
     return response.data
   }, () => getMockPracticePath(subjectId, topicId))
+}
+
+export async function getPracticeRoadmap(subjectId: string, topicId: string) {
+  return withPracticeDemo(async () => {
+    const response = await httpClient.get<PracticeRoadmap>(
+      `/practice/${subjectId}/${topicId}/roadmap`,
+    )
+    return response.data
+  }, () => getMockPracticeRoadmap(subjectId, topicId))
 }
 
 export async function getPracticeLesson(lessonId: string) {

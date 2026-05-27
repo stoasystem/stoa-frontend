@@ -16,6 +16,7 @@ export type PracticeGradeLevel = {
 export type PracticeTopicStatus = 'available' | 'coming_later'
 export type PracticeUnitStatus = 'locked' | 'available' | 'completed'
 export type PracticeLessonStatus = 'locked' | 'available' | 'completed'
+export type RoadmapLessonStatus = 'completed' | 'current' | 'available' | 'locked' | 'review'
 export type PracticeLessonDifficulty = 'intro' | 'practice' | 'review'
 export type PracticeChallengeType = 'multiple_choice' | 'text_input' | 'ordering' | 'explanation'
 
@@ -27,6 +28,51 @@ export type PracticeTopic = {
   description: string
   order: number
   status: PracticeTopicStatus
+  progress?: number
+  currentLessonId?: string
+}
+
+export type PracticeRoadmapTopic = {
+  id: string
+  subjectId: string
+  gradeLevel: string
+  title: string
+  description: string
+  progress: number
+  currentLessonId?: string
+}
+
+export type PracticeRoadmapLesson = {
+  id: string
+  title: string
+  description?: string
+  order: number
+  status: RoadmapLessonStatus
+  estimatedMinutes?: number
+  unlockCondition?: string
+  subjectId: string
+  gradeLevel: string
+  topicId: string
+  unitId: string
+  challengeCount: number
+}
+
+export type PracticeRoadmapUnit = {
+  id: string
+  title: string
+  description: string
+  order: number
+  lessons: PracticeRoadmapLesson[]
+}
+
+export type PracticeRoadmap = {
+  subjectId: string
+  topicId: string
+  gradeLevel: string
+  topic: PracticeRoadmapTopic
+  progress: number
+  currentLessonId?: string
+  units: PracticeRoadmapUnit[]
 }
 
 export type PracticeChallenge = {

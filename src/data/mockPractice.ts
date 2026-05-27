@@ -9,8 +9,12 @@ import type {
   PracticeOverview,
   PracticeParentSummary,
   PracticePath,
+  PracticeRoadmap,
+  PracticeRoadmapLesson,
+  PracticeRoadmapUnit,
   PracticeSubject,
   PracticeTopic,
+  RoadmapLessonStatus,
 } from '@/types/practice'
 
 const now = '2026-05-26T12:00:00Z'
@@ -20,6 +24,18 @@ const demoGradeLevel = 'lower_secondary'
 const demoGradeLevelLabel = 'Lower secondary'
 const demoTopicId = 'equations'
 const demoTopicTitle = 'Equations'
+const initialCompletedRoadmapLessons = ['lesson-linear-1']
+const roadmapLessonOrder = [
+  'lesson-linear-1',
+  'lesson-linear-2',
+  'lesson-linear-3',
+  'lesson-linear-4',
+  'lesson-quadratic-1',
+  'lesson-quadratic-2',
+  'lesson-system-1',
+]
+let completedRoadmapLessons = new Set(initialCompletedRoadmapLessons)
+let currentRoadmapLessonId = 'lesson-linear-2'
 
 export const practiceSubjects: PracticeSubject[] = [
   {
@@ -47,6 +63,8 @@ export const practiceTopics: PracticeTopic[] = [
     description: 'Demo topic for linear equations, quadratic basics, and linear systems.',
     order: 1,
     status: 'available',
+    progress: 35,
+    currentLessonId: currentRoadmapLessonId,
   },
 ]
 
@@ -268,6 +286,32 @@ export const mockPractice = {
   },
 }
 
+export function getMockPracticeRoadmap(subjectId: string, topicId = demoTopicId): PracticeRoadmap {
+  const resolvedSubjectId = normalizeSubjectId(subjectId)
+  const resolvedTopicId = normalizeTopicId(topicId)
+  const roadmapLessons = buildRoadmapLessons(resolvedSubjectId, resolvedTopicId)
+  const completedCount = roadmapLessons.filter((lesson) => lesson.status === 'completed' || lesson.status === 'review').length
+  const progress = Math.round((completedCount / roadmapLessons.length) * 100)
+
+  return {
+    subjectId: resolvedSubjectId,
+    topicId: resolvedTopicId,
+    gradeLevel: demoGradeLevel,
+    topic: {
+      id: resolvedTopicId,
+      subjectId: resolvedSubjectId,
+      gradeLevel: demoGradeLevel,
+      title: demoTopicTitle,
+      description: 'Follow short equation lessons in a calm roadmap before asking Learning Chat for unclear steps.',
+      progress,
+      currentLessonId: currentRoadmapLessonId,
+    },
+    progress,
+    currentLessonId: currentRoadmapLessonId,
+    units: buildRoadmapUnits(resolvedSubjectId, resolvedTopicId),
+  }
+}
+
 export const mockPracticeMistakes: PracticeMistake[] = [
   {
     id: 'mistake-1',
@@ -383,6 +427,7 @@ export function submitMockChallengeAnswer(challengeId: string, answer: string | 
 export function completeMockLesson(lessonId: string): PracticeLessonResult {
   const targetLesson = getMockLesson(lessonId) ?? mathLessons[0]
   const totalCount = targetLesson.challenges.length
+  advanceMockRoadmapProgress(lessonId)
 
   return {
     lessonId,
@@ -395,6 +440,92 @@ export function completeMockLesson(lessonId: string): PracticeLessonResult {
     studyStreak: 6,
     timeSpentSeconds: totalCount * 70,
     mistakes: mockPracticeMistakes.filter((mistake) => mistake.lessonId === lessonId),
+  }
+}
+
+function buildRoadmapUnits(subjectId: string, topicId: string): PracticeRoadmapUnit[] {
+  return [
+    {
+      id: 'unit-linear-equations',
+      title: 'Linear equations',
+      description: 'Build confidence with equations step by step.',
+      order: 1,
+      lessons: roadmapLessonOrder.slice(0, 4).map((lessonId, index) => roadmapLesson(lessonId, subjectId, topicId, index + 1)),
+    },
+    {
+      id: 'unit-quadratic-basics',
+      title: 'Quadratic basics',
+      description: 'Recognize simple quadratic patterns after the linear path is secure.',
+      order: 2,
+      lessons: roadmapLessonOrder.slice(4, 6).map((lessonId, index) => roadmapLesson(lessonId, subjectId, topicId, index + 1)),
+    },
+    {
+      id: 'unit-linear-systems-roadmap',
+      title: 'Linear systems',
+      description: 'Connect two equations once the first roadmap sequence is complete.',
+      order: 3,
+      lessons: roadmapLessonOrder.slice(6).map((lessonId, index) => roadmapLesson(lessonId, subjectId, topicId, index + 1)),
+    },
+  ]
+}
+
+function buildRoadmapLessons(subjectId: string, topicId: string) {
+  return buildRoadmapUnits(subjectId, topicId).flatMap((unit) => unit.lessons)
+}
+
+function roadmapLesson(
+  lessonId: string,
+  subjectId: string,
+  topicId: string,
+  order: number,
+): PracticeRoadmapLesson {
+  const sourceLesson = getMockLesson(lessonId) ?? mathLessons[0]
+  const status = getRoadmapLessonStatus(lessonId)
+
+  return {
+    id: sourceLesson.id,
+    title: sourceLesson.title,
+    description: sourceLesson.topic,
+    order,
+    status,
+    estimatedMinutes: sourceLesson.estimatedMinutes,
+    unlockCondition: status === 'locked' ? 'Complete the previous lesson first.' : undefined,
+    subjectId,
+    gradeLevel: sourceLesson.gradeLevel,
+    topicId,
+    unitId: sourceLesson.unitId,
+    challengeCount: sourceLesson.challenges.length,
+  }
+}
+
+function getRoadmapLessonStatus(lessonId: string): RoadmapLessonStatus {
+  if (completedRoadmapLessons.has(lessonId)) {
+    return lessonId === 'lesson-linear-1' ? 'completed' : 'review'
+  }
+
+  if (lessonId === currentRoadmapLessonId) {
+    return 'current'
+  }
+
+  const currentIndex = roadmapLessonOrder.indexOf(currentRoadmapLessonId)
+  const lessonIndex = roadmapLessonOrder.indexOf(lessonId)
+
+  if (lessonIndex === currentIndex + 1) {
+    return 'available'
+  }
+
+  return 'locked'
+}
+
+function advanceMockRoadmapProgress(lessonId: string) {
+  if (!roadmapLessonOrder.includes(lessonId)) return
+
+  completedRoadmapLessons = new Set([...completedRoadmapLessons, lessonId])
+  const lessonIndex = roadmapLessonOrder.indexOf(lessonId)
+  const nextLessonId = roadmapLessonOrder[lessonIndex + 1]
+
+  if (nextLessonId) {
+    currentRoadmapLessonId = nextLessonId
   }
 }
 
