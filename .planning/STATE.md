@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.33
 milestone_name: "Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience"
 status: planning
-last_updated: "2026-05-27T15:09:55.641Z"
+last_updated: "2026-05-27T15:20:00.000Z"
 last_activity: 2026-05-27
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -24,33 +24,33 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 186 Practice Roadmap Data Contract and Demo Roadmap Foundation
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-27 — Milestone v1.33 started
+Status: Roadmap ready
+Last activity: 2026-05-27 — Milestone v1.33 roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 5 of 5
-- Average duration: 1 autonomous phase pass
-- Total execution time: in progress
+- Total plans completed this milestone: 0 of 5
+- Average duration: —
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 181 | 1/1 | Complete | 1 pass |
-| 182 | 1/1 | Complete | 1 pass |
-| 183 | 1/1 | Complete | 1 pass |
-| 184 | 1/1 | Complete | 1 pass |
-| 185 | 1/1 | Complete | 1 pass |
+| 186 | 0/1 | Pending | — |
+| 187 | 0/1 | Pending | — |
+| 188 | 0/1 | Pending | — |
+| 189 | 0/1 | Pending | — |
+| 190 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 176, 177, 178, 179, 180
-- Trend: Phase 34 is a scope correction before returning to user testing
+- Last 5 completed phases: 181, 182, 183, 184, 185
+- Trend: Phase 35 starts from the completed subject-agnostic Practice architecture and moves into roadmap progression UX.
 
 *Updated after each plan completion*
 
@@ -109,10 +109,12 @@ Recent decisions affecting current work:
 - Phase 183 made `/practice/:subjectId/:topicId` the canonical Practice topic route shape while preserving legacy subject-only routes.
 - Phase 184 updated homepage, dashboard, Practice overview, and parent copy so equation wording appears only as current demo content.
 - Phase 185 verified build, browser Practice funnel, topic/lesson routes, dashboard copy, and four-language mobile homepage rendering.
+- v1.33 continues roadmap numbering from Phase 186 after v1.32 ended at Phase 185.
+- Phase 35 focuses on Practice roadmap UI, lesson progression states, unlock hints, and Learning Chat handoff copy; it does not add new subjects, a production backend, adaptive learning, or heavy game rewards.
 
 ### Pending Todos
 
-- Define Phase 35 requirements and roadmap for the Practice roadmap UI and lesson progression experience.
+- Start Phase 186 with `$gsd-plan-phase 186` to implement the roadmap data contract and demo roadmap foundation.
 
 ### Quick Tasks Completed
 
@@ -180,4 +182,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Define requirements and roadmap for v1.33 Phase 35.
+- Plan Phase 186 with /gsd-plan-phase 186.

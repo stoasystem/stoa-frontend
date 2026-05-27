@@ -98,57 +98,57 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROAD35-01 | TBD | Pending |
-| ROAD35-02 | TBD | Pending |
-| ROAD35-03 | TBD | Pending |
-| ROAD35-04 | TBD | Pending |
-| ROAD35-05 | TBD | Pending |
-| ROAD35-06 | TBD | Pending |
-| ROAD35-07 | TBD | Pending |
-| ROAD35-08 | TBD | Pending |
-| NODE35-01 | TBD | Pending |
-| NODE35-02 | TBD | Pending |
-| NODE35-03 | TBD | Pending |
-| NODE35-04 | TBD | Pending |
-| NODE35-05 | TBD | Pending |
-| NODE35-06 | TBD | Pending |
-| NODE35-07 | TBD | Pending |
-| NODE35-08 | TBD | Pending |
-| NODE35-09 | TBD | Pending |
-| DATA35-01 | TBD | Pending |
-| DATA35-02 | TBD | Pending |
-| DATA35-03 | TBD | Pending |
-| DATA35-04 | TBD | Pending |
-| DATA35-05 | TBD | Pending |
-| DATA35-06 | TBD | Pending |
-| DATA35-07 | TBD | Pending |
-| DATA35-08 | TBD | Pending |
-| COMP35-01 | TBD | Pending |
-| COMP35-02 | TBD | Pending |
-| COMP35-03 | TBD | Pending |
-| COMP35-04 | TBD | Pending |
-| COMP35-05 | TBD | Pending |
-| COMP35-06 | TBD | Pending |
-| COMP35-07 | TBD | Pending |
-| COMP35-08 | TBD | Pending |
-| COMP35-09 | TBD | Pending |
-| COMP35-10 | TBD | Pending |
-| DOC35-01 | TBD | Pending |
-| DOC35-02 | TBD | Pending |
-| DOC35-03 | TBD | Pending |
-| DOC35-04 | TBD | Pending |
-| DOC35-05 | TBD | Pending |
-| LOC35-01 | TBD | Pending |
-| LOC35-02 | TBD | Pending |
-| QA35-01 | TBD | Pending |
-| QA35-02 | TBD | Pending |
-| QA35-03 | TBD | Pending |
+| ROAD35-01 | Phase 188 | Pending |
+| ROAD35-02 | Phase 188 | Pending |
+| ROAD35-03 | Phase 188 | Pending |
+| ROAD35-04 | Phase 188 | Pending |
+| ROAD35-05 | Phase 188 | Pending |
+| ROAD35-06 | Phase 188 | Pending |
+| ROAD35-07 | Phase 188 | Pending |
+| ROAD35-08 | Phase 189 | Pending |
+| NODE35-01 | Phase 187 | Pending |
+| NODE35-02 | Phase 188 | Pending |
+| NODE35-03 | Phase 188 | Pending |
+| NODE35-04 | Phase 188 | Pending |
+| NODE35-05 | Phase 187 | Pending |
+| NODE35-06 | Phase 187 | Pending |
+| NODE35-07 | Phase 187 | Pending |
+| NODE35-08 | Phase 187 | Pending |
+| NODE35-09 | Phase 188 | Pending |
+| DATA35-01 | Phase 186 | Pending |
+| DATA35-02 | Phase 186 | Pending |
+| DATA35-03 | Phase 186 | Pending |
+| DATA35-04 | Phase 186 | Pending |
+| DATA35-05 | Phase 186 | Pending |
+| DATA35-06 | Phase 186 | Pending |
+| DATA35-07 | Phase 186 | Pending |
+| DATA35-08 | Phase 186 | Pending |
+| COMP35-01 | Phase 187 | Pending |
+| COMP35-02 | Phase 187 | Pending |
+| COMP35-03 | Phase 187 | Pending |
+| COMP35-04 | Phase 187 | Pending |
+| COMP35-05 | Phase 187 | Pending |
+| COMP35-06 | Phase 187 | Pending |
+| COMP35-07 | Phase 187 | Pending |
+| COMP35-08 | Phase 189 | Pending |
+| COMP35-09 | Phase 189 | Pending |
+| COMP35-10 | Phase 189 | Pending |
+| DOC35-01 | Phase 189 | Pending |
+| DOC35-02 | Phase 189 | Pending |
+| DOC35-03 | Phase 189 | Pending |
+| DOC35-04 | Phase 186 | Pending |
+| DOC35-05 | Phase 189 | Pending |
+| LOC35-01 | Phase 189 | Pending |
+| LOC35-02 | Phase 189 | Pending |
+| QA35-01 | Phase 190 | Pending |
+| QA35-02 | Phase 190 | Pending |
+| QA35-03 | Phase 190 | Pending |
 
 **Coverage:**
-- v1 requirements: 46 total
-- Mapped to phases: 0
-- Unmapped: 46
+- v1 requirements: 45 total
+- Mapped to phases: 45
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 after v1.33 requirements definition*
+*Last updated: 2026-05-27 after v1.33 roadmap creation*

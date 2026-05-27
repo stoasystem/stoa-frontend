@@ -35,111 +35,112 @@
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
 - ✅ **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (implemented 2026-05-27)
 - ✅ **v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment** - Phases 181-185 (implemented 2026-05-27)
+- 🔄 **v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience** - Phases 186-190 (planned 2026-05-27)
 
 ## Phases
 
-- [x] **Phase 181: Practice Path Scope Principle and Historical Documentation Correction** - Correct product positioning across planning and product docs so Practice Path is general and equations are demo content.
-- [x] **Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract** - Refactor Practice types, mock data, and contracts around subject, grade level, topic, unit, lesson, and challenge hierarchy.
-- [x] **Phase 183: Practice Routes and Component Architecture Generalization** - Align Practice routes, page/component names, and route documentation with subject/topic-based architecture while preserving existing entry behavior.
-- [x] **Phase 184: Generalized Practice UI Copy and Four-Language Localization** - Update homepage, dashboard, Practice, parent, and tutor copy so equation language appears only as current demo content.
-- [x] **Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification** - Verify generalized scope, preserve the equation demo flow, update README/QA/demo docs, and run final build/browser checks.
+- [ ] **Phase 186: Practice Roadmap Data Contract and Demo Roadmap Foundation** - Define roadmap types, demo data, service contract, and query hook foundation for subject-agnostic Practice roadmaps.
+- [ ] **Phase 187: Roadmap Component System and Lesson Node States** - Build reusable roadmap components, lesson nodes, connectors, progress header, unlock hint, and next-lesson card with stable status rendering.
+- [ ] **Phase 188: Practice Roadmap Page Integration and Lesson Progression Flow** - Integrate the roadmap into `/practice` and topic routes, wire available/current/completed/locked click behavior, and support mock progression updates.
+- [ ] **Phase 189: Roadmap Visual Design, Localization, and Documentation** - Polish desktop/mobile roadmap layout, add four-language roadmap copy, and document UI rules, node rules, mobile layout, demo data, and QA.
+- [ ] **Phase 190: Practice Roadmap QA, README Handoff, and Build Verification** - Verify roadmap interaction, localization fit, desktop/mobile layouts, docs, README, and final build.
 
 ## Phase Details
 
-### Phase 181: Practice Path Scope Principle and Historical Documentation Correction
+### Phase 186: Practice Roadmap Data Contract and Demo Roadmap Foundation
 
-**Goal**: Developers understand that Practice Path is a general learning challenge system and equations are only the first demo content package.
-**Depends on**: Phase 180
-**Requirements**: SCOPE34-01, SCOPE34-02, SCOPE34-03, SCOPE34-04, SCOPE34-05, SCOPE34-06, SCOPE34-07, SCOPE34-08, SCOPE34-09
+**Goal**: Practice has a subject-agnostic roadmap data layer for Mathematics / lower secondary / equations demo content without locking the product to equations.
+**Depends on**: Phase 185
+**Requirements**: DATA35-01, DATA35-02, DATA35-03, DATA35-04, DATA35-05, DATA35-06, DATA35-07, DATA35-08, DOC35-04
 **Success Criteria** (what must be TRUE):
-  1. English and Chinese Practice Path Scope Principle docs exist.
-  2. Phase 28 and Phase 30 docs are corrected to demo-package wording.
-  3. Phase 31 and Phase 33 docs no longer imply Practice Path equals equations.
-  4. Documentation shows both the canonical hierarchy and current equation demo hierarchy.
-  5. Future subject examples are documented as expansion examples, not implemented content.
-**Plans**: 181-PLAN.md
+  1. Roadmap types include topic, roadmap, unit, lesson, and lesson status contracts.
+  2. Demo roadmap data represents Mathematics / lower secondary / Equations with multiple units and lesson statuses.
+  3. Future API contract shape for `GET /practice/:subjectId/:topicId/roadmap` is documented or represented in service code.
+  4. A Practice roadmap query/hook can load the demo roadmap through existing frontend patterns.
+  5. Docs explain the demo data and subject-agnostic expansion model.
+**Plans**: 186-PLAN.md
 **UI hint**: no
 
-### Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract
+### Phase 187: Roadmap Component System and Lesson Node States
 
-**Goal**: Practice data structures support future subjects and topics without hard-coding equations as the only learning path.
-**Depends on**: Phase 181
-**Requirements**: MODEL34-01, MODEL34-02, MODEL34-03, MODEL34-04, MODEL34-05, MODEL34-06, MODEL34-07, MODEL34-08, MODEL34-09
+**Goal**: Reusable Practice roadmap components can render lesson nodes, connectors, progress context, unlock hints, and continue cards with clear node states.
+**Depends on**: Phase 186
+**Requirements**: COMP35-01, COMP35-02, COMP35-03, COMP35-04, COMP35-05, COMP35-06, COMP35-07, NODE35-01, NODE35-05, NODE35-06, NODE35-07, NODE35-08
 **Success Criteria** (what must be TRUE):
-  1. Practice types include subject, grade level, topic, unit, lesson, and challenge concepts.
-  2. No type or contract implies an equation-only Practice architecture.
-  3. Existing equation demo data is nested or labeled as Mathematics / lower secondary / equations seed data.
-  4. Parent summary and tutor context can identify subject and topic.
-  5. Existing Practice flows continue to compile against generalized types.
-**Plans**: 182-PLAN.md
-**UI hint**: no
-
-### Phase 183: Practice Routes and Component Architecture Generalization
-
-**Goal**: Practice routes and component architecture express a subject/topic Practice Path rather than an equation-only path.
-**Depends on**: Phase 182
-**Requirements**: ROUTE34-01, ROUTE34-02, ROUTE34-03, ROUTE34-04, ROUTE34-05, ROUTE34-06, ROUTE34-07, ROUTE34-08
-**Success Criteria** (what must be TRUE):
-  1. `/practice` remains the student Practice overview entry.
-  2. Topic-level navigation supports or plans for `/practice/:subjectId/:topicId`.
-  3. Existing links remain compatible or have a documented redirect/migration path.
-  4. Component/page names remain Practice-oriented and subject/topic-oriented.
-  5. Route map and route docs match the generalized Practice architecture.
-**Plans**: 183-PLAN.md
+  1. `PracticeRoadmap` renders a full topic roadmap from units and lessons.
+  2. Unit sections, lesson nodes, connectors, progress header, unlock hint, and continue card components exist.
+  3. Completed, current, available, locked, and review states render distinctly.
+  4. Locked lesson nodes expose unlock-condition UI without starting a lesson.
+  5. The current lesson is visually highlighted without unstable layout shifts.
+**Plans**: 187-PLAN.md
 **UI hint**: yes
 
-### Phase 184: Generalized Practice UI Copy and Four-Language Localization
+### Phase 188: Practice Roadmap Page Integration and Lesson Progression Flow
 
-**Goal**: User-facing Practice copy presents general school-topic challenges, with equations labeled only as the currently available demo topic.
-**Depends on**: Phase 183
-**Requirements**: COPY34-01, COPY34-02, COPY34-03, COPY34-04, COPY34-05, COPY34-06, COPY34-07, COPY34-08
+**Goal**: Students can use the roadmap from `/practice` and the topic page to continue, start, review, and progress through available demo lessons.
+**Depends on**: Phase 187
+**Requirements**: ROAD35-01, ROAD35-02, ROAD35-03, ROAD35-04, ROAD35-05, ROAD35-06, ROAD35-07, NODE35-02, NODE35-03, NODE35-04, NODE35-09
 **Success Criteria** (what must be TRUE):
-  1. Homepage Practice entry uses general Practice Path / Guided Practice language.
-  2. Dashboard and `/practice` copy avoid equation-only product framing.
-  3. Demo preview or current content labels can still say Mathematics / Equations.
-  4. English, German, French, and Italian locale keys remain compatible.
-  5. Mobile layout remains safe for generalized labels.
-**Plans**: 184-PLAN.md
+  1. `/practice` shows roadmap-style Practice path content and a current recommended path.
+  2. `/practice/:subjectId/:topicId` shows a topic roadmap for Mathematics / Equations.
+  3. Students can continue the current lesson, start available lessons, and review completed lessons.
+  4. Mock lesson completion can update the visible roadmap state enough to demonstrate progression.
+  5. Roadmap page copy connects unclear lesson steps to Learning Chat.
+**Plans**: 188-PLAN.md
 **UI hint**: yes
 
-### Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification
+### Phase 189: Roadmap Visual Design, Localization, and Documentation
 
-**Goal**: The corrected Practice scope is verified end-to-end and ready for later user testing.
-**Depends on**: Phase 184
-**Requirements**: QA34-01, QA34-02, QA34-03, QA34-04, QA34-05, QA34-06, QA34-07, QA34-08
+**Goal**: The roadmap feels like a calm STOA learning path on desktop and mobile, with four-language copy and durable documentation.
+**Depends on**: Phase 188
+**Requirements**: ROAD35-08, COMP35-08, COMP35-09, COMP35-10, DOC35-01, DOC35-02, DOC35-03, DOC35-05, LOC35-01, LOC35-02
+**Success Criteria** (what must be TRUE):
+  1. Desktop roadmap has clear progression through stable connectors and restrained node offset.
+  2. Mobile roadmap remains readable as a simpler vertical path.
+  3. Long localized text fits inside roadmap nodes, cards, and CTAs.
+  4. English, German, French, and Italian roadmap labels exist for title, current lesson, locked hint, and continue action.
+  5. Roadmap UI, node status, mobile layout, and QA docs exist.
+**Plans**: 189-PLAN.md
+**UI hint**: yes
+
+### Phase 190: Practice Roadmap QA, README Handoff, and Build Verification
+
+**Goal**: The completed Practice roadmap is verified, documented, and ready for the next milestone's interaction QA and parent-visibility refinement.
+**Depends on**: Phase 189
+**Requirements**: QA35-01, QA35-02, QA35-03
 **Success Criteria** (what must be TRUE):
   1. `npm run build` succeeds.
-  2. Browser checks cover homepage, dashboard, `/practice`, and one lesson route.
-  3. Start Practice still routes unauthenticated visitors to `/login?next=/practice`.
-  4. Four-language generalized Practice copy passes a mobile fit check.
-  5. README, QA checklist, migration note, and handoff docs record the corrected scope and Phase 35 testing path.
-**Plans**: 185-PLAN.md
+  2. UI checks cover `/practice`, topic roadmap, lesson node clicks, locked hint, continue CTA, desktop layout, and mobile layout.
+  3. README explains the roadmap-style Practice path and Mathematics / Equations demo scope.
+  4. QA evidence records completed/current/available/locked states and progression behavior.
+  5. Phase 36 follow-up is documented for roadmap interaction QA, progress feedback, and parent visibility refinement.
+**Plans**: 190-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 181. Practice Path Scope Principle and Historical Documentation Correction | 1/1 | Complete | 2026-05-27 |
-| 182. Subject-Agnostic Practice Domain Model and Mock Data Contract | 1/1 | Complete | 2026-05-27 |
-| 183. Practice Routes and Component Architecture Generalization | 1/1 | Complete | 2026-05-27 |
-| 184. Generalized Practice UI Copy and Four-Language Localization | 1/1 | Complete | 2026-05-27 |
-| 185. Practice Scope Regression QA, Documentation Handoff, and Build Verification | 1/1 | Complete | 2026-05-27 |
+| 186. Practice Roadmap Data Contract and Demo Roadmap Foundation | 0/1 | Pending | — |
+| 187. Roadmap Component System and Lesson Node States | 0/1 | Pending | — |
+| 188. Practice Roadmap Page Integration and Lesson Progression Flow | 0/1 | Pending | — |
+| 189. Roadmap Visual Design, Localization, and Documentation | 0/1 | Pending | — |
+| 190. Practice Roadmap QA, README Handoff, and Build Verification | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 181 | 9 | SCOPE34-01, SCOPE34-02, SCOPE34-03, SCOPE34-04, SCOPE34-05, SCOPE34-06, SCOPE34-07, SCOPE34-08, SCOPE34-09 |
-| 182 | 9 | MODEL34-01, MODEL34-02, MODEL34-03, MODEL34-04, MODEL34-05, MODEL34-06, MODEL34-07, MODEL34-08, MODEL34-09 |
-| 183 | 8 | ROUTE34-01, ROUTE34-02, ROUTE34-03, ROUTE34-04, ROUTE34-05, ROUTE34-06, ROUTE34-07, ROUTE34-08 |
-| 184 | 8 | COPY34-01, COPY34-02, COPY34-03, COPY34-04, COPY34-05, COPY34-06, COPY34-07, COPY34-08 |
-| 185 | 8 | QA34-01, QA34-02, QA34-03, QA34-04, QA34-05, QA34-06, QA34-07, QA34-08 |
+| 186 | 9 | DATA35-01, DATA35-02, DATA35-03, DATA35-04, DATA35-05, DATA35-06, DATA35-07, DATA35-08, DOC35-04 |
+| 187 | 12 | COMP35-01, COMP35-02, COMP35-03, COMP35-04, COMP35-05, COMP35-06, COMP35-07, NODE35-01, NODE35-05, NODE35-06, NODE35-07, NODE35-08 |
+| 188 | 11 | ROAD35-01, ROAD35-02, ROAD35-03, ROAD35-04, ROAD35-05, ROAD35-06, ROAD35-07, NODE35-02, NODE35-03, NODE35-04, NODE35-09 |
+| 189 | 10 | ROAD35-08, COMP35-08, COMP35-09, COMP35-10, DOC35-01, DOC35-02, DOC35-03, DOC35-05, LOC35-01, LOC35-02 |
+| 190 | 3 | QA35-01, QA35-02, QA35-03 |
 
-**Total requirements:** 42
-**Mapped requirements:** 42
+**Total requirements:** 45
+**Mapped requirements:** 45
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Phase 181: Practice Path Scope Principle and Historical Documentation Correction.
+Phase 186: Practice Roadmap Data Contract and Demo Roadmap Foundation.
