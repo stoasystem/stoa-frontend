@@ -26,20 +26,20 @@
   "practiceEntry": {
     "eyebrow": "La pratica come ingresso",
     "title": "Percorso di pratica",
-    "body": "Inizia con un breve esercizio sulle equazioni. Se sbagli, ricevi un suggerimento o apri la chat di apprendimento per capire meglio.",
+    "body": "Inizia con brevi esercizi sugli argomenti scolastici. Se sbagli, ricevi un suggerimento o apri la chat di apprendimento per capire meglio.",
     "primaryCta": "Inizia la pratica",
     "secondaryCta": "Vedi il percorso",
     "signals": [
-      { "title": "Esercizi brevi", "body": "Lo studente prova prima un passaggio mirato di equazione." },
+      { "title": "Esercizi brevi", "body": "Lo studente prova prima un passaggio mirato di pratica." },
       { "title": "Spiegazione nel punto giusto", "body": "La chat di apprendimento si apre sul passaggio esatto, senza ricominciare." }
     ],
     "preview": {
-      "label": "Anteprima del percorso sulle equazioni",
+      "label": "Argomento demo attuale",
       "title": "Un breve esercizio prima della spiegazione",
       "prompt": "Risolvi: 2x + 3 = 11",
       "progress": "Passo 2 di 5",
       "hint": "Prima appare un suggerimento. Se il passaggio resta poco chiaro, la chat di apprendimento si apre con questo lavoro.",
-      "topicsLabel": "Anteprima del percorso sulle equazioni",
+      "topicsLabel": "Disponibile: matematica / equazioni",
       "topics": ["Equazioni semplici", "Basi delle equazioni quadratiche", "Sistemi lineari"],
       "outcomes": [
         { "title": "Chat di apprendimento", "detail": "Spiega il passaggio esatto che non è chiaro durante la pratica." },

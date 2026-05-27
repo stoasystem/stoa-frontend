@@ -25,7 +25,7 @@ export function LearningActivitySummary({
     },
     {
       label: 'Next focus',
-      value: summary?.recommendedNextTopic ?? 'Two-step equations',
+      value: summary?.recommendedNextTopic ?? 'Next practice topic',
       icon: Target,
     },
   ]

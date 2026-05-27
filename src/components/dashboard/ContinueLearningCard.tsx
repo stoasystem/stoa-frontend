@@ -16,7 +16,8 @@ export function ContinueLearningCard() {
         {practiceOverview ? (
           <div className="space-y-3">
             <p>
-              Current path: Equations. Next lesson: {practiceOverview.recommendedLesson.title}. Today&apos;s goal is{' '}
+              Current Practice topic: {practiceOverview.recommendedLesson.topic}. Next lesson:{' '}
+              {practiceOverview.recommendedLesson.title}. Today&apos;s goal is{' '}
               {practiceOverview.dailyGoal.label.toLowerCase()}, with a {practiceOverview.studyStreak}
               -day study streak.
             </p>
@@ -28,7 +29,7 @@ export function ContinueLearningCard() {
           </div>
         ) : (
           <p>
-            Your fastest path is to reopen the last chat, compare the explanation with your class
+            Your fastest path is to start a short Practice challenge, compare the explanation with your class
             notes, then request teacher support if the explanation still feels unclear.
           </p>
         )}

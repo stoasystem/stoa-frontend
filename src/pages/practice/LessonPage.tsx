@@ -223,7 +223,7 @@ export function LessonPage() {
                 <div>
                   <h2 className="text-3xl font-semibold tracking-tight">{lesson.title}</h2>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                    You will practice one equation skill at a time. Check each answer, use a hint if needed, and ask for a guided explanation only when the next step is still unclear.
+                    You will practice one focused skill at a time. Check each answer, use a hint if needed, and ask for a guided explanation only when the next step is still unclear.
                   </p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">

@@ -32,11 +32,11 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
         )}
         <div className="space-y-2 text-sm leading-6">
           <p className="text-muted-foreground">
-            Your child practised equations and asked for explanations when a step was unclear.
+            Your child practised the current school topic and asked for explanations when a step was unclear.
             This helps show where understanding is already strong and where more practice may help.
           </p>
           <p>
-            <span className="font-medium">Current path:</span> {summary.currentPracticePath}
+            <span className="font-medium">Current Practice topic:</span> {summary.currentPracticePath}
           </p>
           <p>
             <span className="font-medium">Topics practiced:</span> {summary.topicsPracticed.join(', ')}

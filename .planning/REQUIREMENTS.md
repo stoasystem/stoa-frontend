@@ -43,14 +43,14 @@
 
 ### UI Copy and Localization
 
-- [ ] **COPY34-01**: Homepage main Practice entry uses general wording such as Practice Path or Guided Practice.
-- [ ] **COPY34-02**: Homepage Practice entry says short challenges for school topics, not only short equation challenges.
-- [ ] **COPY34-03**: Equation language appears only in demo preview or current available content labels.
-- [ ] **COPY34-04**: Student dashboard copy avoids equation-only Practice product framing.
-- [ ] **COPY34-05**: `/practice` page copy distinguishes available demo content from product scope.
-- [ ] **COPY34-06**: English, German, French, and Italian locale files remain key-compatible after copy changes.
-- [ ] **COPY34-07**: German, French, and Italian generalized Practice copy fits mobile buttons and cards.
-- [ ] **COPY34-08**: User-facing copy still avoids Duolingo-style, game-first, XP, streak, heart, gem, shop, and leaderboard language.
+- [x] **COPY34-01**: Homepage main Practice entry uses general wording such as Practice Path or Guided Practice.
+- [x] **COPY34-02**: Homepage Practice entry says short challenges for school topics, not only short equation challenges.
+- [x] **COPY34-03**: Equation language appears only in demo preview or current available content labels.
+- [x] **COPY34-04**: Student dashboard copy avoids equation-only Practice product framing.
+- [x] **COPY34-05**: `/practice` page copy distinguishes available demo content from product scope.
+- [x] **COPY34-06**: English, German, French, and Italian locale files remain key-compatible after copy changes.
+- [x] **COPY34-07**: German, French, and Italian generalized Practice copy fits mobile buttons and cards.
+- [x] **COPY34-08**: User-facing copy still avoids Duolingo-style, game-first, XP, streak, heart, gem, shop, and leaderboard language.
 
 ### QA, Documentation, and Handoff
 
@@ -122,14 +122,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ROUTE34-06 | Phase 183 | Complete |
 | ROUTE34-07 | Phase 183 | Complete |
 | ROUTE34-08 | Phase 183 | Complete |
-| COPY34-01 | Phase 184 | Pending |
-| COPY34-02 | Phase 184 | Pending |
-| COPY34-03 | Phase 184 | Pending |
-| COPY34-04 | Phase 184 | Pending |
-| COPY34-05 | Phase 184 | Pending |
-| COPY34-06 | Phase 184 | Pending |
-| COPY34-07 | Phase 184 | Pending |
-| COPY34-08 | Phase 184 | Pending |
+| COPY34-01 | Phase 184 | Complete |
+| COPY34-02 | Phase 184 | Complete |
+| COPY34-03 | Phase 184 | Complete |
+| COPY34-04 | Phase 184 | Complete |
+| COPY34-05 | Phase 184 | Complete |
+| COPY34-06 | Phase 184 | Complete |
+| COPY34-07 | Phase 184 | Complete |
+| COPY34-08 | Phase 184 | Complete |
 | QA34-01 | Phase 185 | Pending |
 | QA34-02 | Phase 185 | Pending |
 | QA34-03 | Phase 185 | Pending |

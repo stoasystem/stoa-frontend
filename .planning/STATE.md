@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.32
 milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
 status: in_progress
-last_updated: "2026-05-27T12:45:00.000Z"
+last_updated: "2026-05-27T13:05:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 5
-  completed_plans: 3
-  percent: 60
+  completed_plans: 4
+  percent: 80
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 184 Generalized Practice UI Copy and Four-Language Localization
-Plan: 184-PLAN.md pending
-Status: Phase 183 complete; ready for user-facing copy and localization alignment
-Last activity: 2026-05-27 — Phase 183 completed subject/topic Practice route alignment
+Phase: 185 Practice Scope Regression QA, Documentation Handoff, and Build Verification
+Plan: 185-PLAN.md pending
+Status: Phase 184 complete; ready for final QA and handoff
+Last activity: 2026-05-27 — Phase 184 completed generalized Practice copy and localization updates
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 3 of 5
+- Total plans completed this milestone: 4 of 5
 - Average duration: 1 autonomous phase pass
 - Total execution time: in progress
 
@@ -44,7 +44,7 @@ Last activity: 2026-05-27 — Phase 183 completed subject/topic Practice route a
 | 181 | 1/1 | Complete | 1 pass |
 | 182 | 1/1 | Complete | 1 pass |
 | 183 | 1/1 | Complete | 1 pass |
-| 184 | 0/1 | Pending | — |
+| 184 | 1/1 | Complete | 1 pass |
 | 185 | 0/1 | Pending | — |
 
 **Recent Trend:**
@@ -107,10 +107,11 @@ Recent decisions affecting current work:
 - Phase 181 recorded the Practice Path Scope Principle in English and Chinese and corrected historical docs so equations are framed as the first demo package only.
 - Phase 182 added explicit grade/topic/unit metadata to Practice types and mock data, with canonical demo seed data under `mockPractice.mathematics.lowerSecondary.equations`.
 - Phase 183 made `/practice/:subjectId/:topicId` the canonical Practice topic route shape while preserving legacy subject-only routes.
+- Phase 184 updated homepage, dashboard, Practice overview, and parent copy so equation wording appears only as current demo content.
 
 ### Pending Todos
 
-- Start Phase 184: Generalized Practice UI Copy and Four-Language Localization.
+- Start Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification.
 
 ### Quick Tasks Completed
 

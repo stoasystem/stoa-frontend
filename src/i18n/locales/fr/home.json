@@ -26,20 +26,20 @@
   "practiceEntry": {
     "eyebrow": "L’entraînement comme point d’entrée",
     "title": "Parcours d’entraînement",
-    "body": "Commence par un court exercice sur les équations. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.",
+    "body": "Commence par de courts exercices sur les notions scolaires. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.",
     "primaryCta": "Commencer l’entraînement",
     "secondaryCta": "Voir le parcours",
     "signals": [
-      { "title": "Exercices courts", "body": "L’élève essaie d’abord une étape ciblée d’équation." },
+      { "title": "Exercices courts", "body": "L’élève essaie d’abord une étape ciblée d’entraînement." },
       { "title": "Explication au bon moment", "body": "Le chat d’apprentissage s’ouvre sur l’étape exacte, sans recommencer." }
     ],
     "preview": {
-      "label": "Aperçu du parcours sur les équations",
+      "label": "Sujet de démonstration actuel",
       "title": "Un court exercice avant l’explication",
       "prompt": "Résous : 2x + 3 = 11",
       "progress": "Étape 2 sur 5",
       "hint": "Un indice apparaît d’abord. Si l’étape reste peu claire, le chat d’apprentissage s’ouvre avec ce travail.",
-      "topicsLabel": "Aperçu du parcours sur les équations",
+      "topicsLabel": "Disponible : mathématiques / équations",
       "topics": ["Équations simples", "Bases des équations quadratiques", "Systèmes linéaires"],
       "outcomes": [
         { "title": "Chat d’apprentissage", "detail": "Explique l’étape exacte qui bloque pendant l’entraînement." },

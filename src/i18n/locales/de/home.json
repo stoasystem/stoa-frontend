@@ -26,20 +26,20 @@
   "practiceEntry": {
     "eyebrow": "Üben als Einstieg",
     "title": "Übungsweg",
-    "body": "Starte mit einer kurzen Gleichungsaufgabe. Wenn du nicht weiterkommst, erhältst du einen Hinweis oder kannst den Lernchat öffnen.",
+    "body": "Starte mit kurzen Aufgaben zu Schulthemen. Wenn du nicht weiterkommst, erhältst du einen Hinweis oder kannst den Lernchat öffnen.",
     "primaryCta": "Übung starten",
     "secondaryCta": "Übungsweg ansehen",
     "signals": [
-      { "title": "Kurze Übungen", "body": "Lernende versuchen zuerst einen fokussierten Gleichungsschritt." },
+      { "title": "Kurze Übungen", "body": "Lernende versuchen zuerst einen fokussierten Übungsschritt." },
       { "title": "Erklärung am Knackpunkt", "body": "Der Lernchat öffnet genau den Schritt, ohne dass Lernende neu beginnen." }
     ],
     "preview": {
-      "label": "Gleichungen im Überblick",
+      "label": "Aktuelles Demo-Thema",
       "title": "Eine kurze Aufgabe vor der Erklärung",
       "prompt": "Löse: 2x + 3 = 11",
       "progress": "Schritt 2 von 5",
       "hint": "Zuerst erscheint ein Hinweis. Wenn der Schritt unklar bleibt, öffnet sich der Lernchat mit dieser Aufgabe.",
-      "topicsLabel": "Gleichungen im Überblick",
+      "topicsLabel": "Verfügbar: Mathematik / Gleichungen",
       "topics": ["Einfache Gleichungen", "Grundlagen quadratischer Gleichungen", "Lineare Gleichungssysteme"],
       "outcomes": [
         { "title": "Lernchat", "detail": "Erklärt genau den Schritt, der beim Üben unklar bleibt." },
@@ -48,7 +48,7 @@
       ]
     },
     "flow": [
-      { "label": "Üben", "detail": "Kurze Gleichungsschritte helfen beim selbstständigen Start." },
+      { "label": "Üben", "detail": "Kurze Schritte zu Schulthemen helfen beim selbstständigen Start." },
       { "label": "Hinweis", "detail": "Ein ruhiger Hinweis zeigt den nächsten sinnvollen Schritt." },
       { "label": "Lernchat", "detail": "Der unklare Schritt öffnet sich mit Kontext." },
       { "label": "Lehrperson", "detail": "Eine qualifizierte Lehrperson hilft, wenn Erklärung nicht reicht." },

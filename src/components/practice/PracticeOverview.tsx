@@ -18,12 +18,12 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
       <section className="rounded-lg border border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--platform-surface-app))_100%)] p-5 shadow-[var(--platform-shadow-soft)]">
         <div className="grid gap-5 lg:grid-cols-[1fr_22rem] lg:items-center">
           <div>
-            <p className="brand-section-kicker">Equation path</p>
+            <p className="brand-section-kicker">Practice Path</p>
             <h2 className="mt-2 max-w-3xl text-3xl font-semibold leading-tight">
-              Linear equations, quadratics, and systems in one focused practice route.
+              Short challenges help you start with the next school topic.
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-              The equation path stays intentionally focused so each short lesson has a clear learning step.
+              Available now: Mathematics / Equations. Each short lesson keeps one learning step clear.
             </p>
           </div>
           <div className="grid gap-2 text-sm">
@@ -60,8 +60,8 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
       </section>
       <section className="space-y-4">
         <div>
-          <p className="brand-section-kicker">Recommended path</p>
-          <h2 className="mt-2 text-2xl font-semibold">Mathematics: Equations</h2>
+          <p className="brand-section-kicker">Available now</p>
+          <h2 className="mt-2 text-2xl font-semibold">Mathematics / Equations</h2>
         </div>
         <div className="grid gap-4">
           {overview.subjects.map((subject) => (

@@ -19,17 +19,17 @@ export function ContinuePracticeCard() {
           </div>
           <div>
             <p className="brand-section-kicker">Start learning</p>
-            <CardTitle className="text-xl">Continue your equation practice</CardTitle>
+            <CardTitle className="text-xl">Continue your Practice Path</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="text-sm leading-6 text-muted-foreground">
-          Pick up where you left off. If a step is unclear, you can ask for an explanation
+          Pick up where you left off in the current school topic. If a step is unclear, you can ask for an explanation
           in Learning Chat with the practice context attached.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
-          <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Two-step equations'} />
+          <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Next practice challenge'} />
           <PracticeMetric label="Daily goal" value={practiceOverview?.dailyGoal.label ?? '3 short steps'} />
           <PracticeMetric label="Review" value={`${practiceOverview?.recentMistakes.length ?? 2} mistakes`} />
         </div>

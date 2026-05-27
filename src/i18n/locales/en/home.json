@@ -25,21 +25,21 @@
   },
   "practiceEntry": {
     "eyebrow": "Practice as a learning entry",
-    "title": "Practice Game",
-    "body": "Start with a short equation challenge. Get hints when you make a mistake, then open Learning Chat when you need a clearer explanation.",
+    "title": "Practice Path",
+    "body": "Start with short challenges in school topics. Get hints when you make a mistake, then open Learning Chat when you need a clearer explanation.",
     "primaryCta": "Start Practice",
     "secondaryCta": "See how practice works",
     "signals": [
-      { "title": "Short practice lessons", "body": "Students try a focused equation step before asking for a full explanation." },
+      { "title": "Short practice lessons", "body": "Students try a focused practice step before asking for a full explanation." },
       { "title": "Explanation at the stuck point", "body": "Learning Chat opens from the exact step, so the student does not restart." }
     ],
     "preview": {
-      "label": "Equation path preview",
+      "label": "Current demo topic",
       "title": "A short challenge before the explanation",
       "prompt": "Solve: 2x + 3 = 11",
       "progress": "Step 2 of 5",
       "hint": "A hint appears first. If the step is still unclear, Learning Chat opens with this work attached.",
-      "topicsLabel": "Equation path preview",
+      "topicsLabel": "Available now: Mathematics / Equations",
       "topics": ["One-step equations", "Quadratic basics", "Linear systems"],
       "outcomes": [
         { "title": "Learning Chat", "detail": "Explains the exact step when practice is unclear." },
@@ -48,7 +48,7 @@
       ]
     },
     "flow": [
-      { "label": "Practice", "detail": "Small guided equation steps help students begin independently." },
+      { "label": "Practice", "detail": "Small guided school-topic steps help students begin independently." },
       { "label": "Hint", "detail": "If they get stuck, a simple hint suggests what to try next." },
       { "label": "Learning Chat", "detail": "If the step is still unclear, Learning Chat opens with the work attached." },
       { "label": "Teacher Support", "detail": "A qualified teacher joins when the explanation is still not enough." },
