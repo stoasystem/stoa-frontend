@@ -42,7 +42,7 @@
 - [x] **Phase 186: Practice Roadmap Data Contract and Demo Roadmap Foundation** - Define roadmap types, demo data, service contract, and query hook foundation for subject-agnostic Practice roadmaps.
 - [x] **Phase 187: Roadmap Component System and Lesson Node States** - Build reusable roadmap components, lesson nodes, connectors, progress header, unlock hint, and next-lesson card with stable status rendering.
 - [x] **Phase 188: Practice Roadmap Page Integration and Lesson Progression Flow** - Integrate the roadmap into `/practice` and topic routes, wire available/current/completed/locked click behavior, and support mock progression updates.
-- [ ] **Phase 189: Roadmap Visual Design, Localization, and Documentation** - Polish desktop/mobile roadmap layout, add four-language roadmap copy, and document UI rules, node rules, mobile layout, demo data, and QA.
+- [x] **Phase 189: Roadmap Visual Design, Localization, and Documentation** - Polish desktop/mobile roadmap layout, add four-language roadmap copy, and document UI rules, node rules, mobile layout, demo data, and QA.
 - [ ] **Phase 190: Practice Roadmap QA, README Handoff, and Build Verification** - Verify roadmap interaction, localization fit, desktop/mobile layouts, docs, README, and final build.
 
 ## Phase Details
@@ -124,7 +124,7 @@
 | 186. Practice Roadmap Data Contract and Demo Roadmap Foundation | 1/1 | Complete | 2026-05-27 |
 | 187. Roadmap Component System and Lesson Node States | 1/1 | Complete | 2026-05-27 |
 | 188. Practice Roadmap Page Integration and Lesson Progression Flow | 1/1 | Complete | 2026-05-27 |
-| 189. Roadmap Visual Design, Localization, and Documentation | 0/1 | Pending | — |
+| 189. Roadmap Visual Design, Localization, and Documentation | 1/1 | Complete | 2026-05-27 |
 | 190. Practice Roadmap QA, README Handoff, and Build Verification | 0/1 | Pending | — |
 
 ## Coverage

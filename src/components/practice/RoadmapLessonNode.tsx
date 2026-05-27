@@ -1,4 +1,5 @@
 import { CheckCircle2, Lock, PlayCircle, RotateCcw, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import type { RoadmapLessonStatus } from '@/types/practice'
 
@@ -14,14 +15,6 @@ export type RoadmapLessonNodeProps = {
   onClick: () => void
 }
 
-const statusCopy: Record<RoadmapLessonStatus, { label: string; action: string }> = {
-  completed: { label: 'Completed', action: 'Review' },
-  current: { label: 'Current lesson', action: 'Continue' },
-  available: { label: 'Available', action: 'Start' },
-  locked: { label: 'Locked', action: 'Unlock hint' },
-  review: { label: 'Review', action: 'Review' },
-}
-
 export function RoadmapLessonNode({
   lessonId,
   title,
@@ -32,8 +25,9 @@ export function RoadmapLessonNode({
   activeHint,
   onClick,
 }: RoadmapLessonNodeProps) {
+  const { t } = useTranslation('practice')
   const Icon = getStatusIcon(status)
-  const copy = statusCopy[status]
+  const copy = getStatusCopy(status, t)
   const locked = status === 'locked'
 
   return (
@@ -69,7 +63,7 @@ export function RoadmapLessonNode({
             <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
               {copy.label} · Lesson {order}
             </p>
-            <h3 className="mt-1 text-base font-semibold leading-6 text-foreground">{title}</h3>
+            <h3 className="mt-1 break-words text-base font-semibold leading-6 text-foreground">{title}</h3>
           </div>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -79,7 +73,7 @@ export function RoadmapLessonNode({
           </p>
           <span
             className={cn(
-              'inline-flex h-8 items-center justify-center rounded-md border px-3 text-xs font-semibold',
+              'inline-flex min-h-8 items-center justify-center rounded-md border px-3 py-1 text-center text-xs font-semibold leading-4',
               status === 'current'
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input bg-background text-foreground',
@@ -99,4 +93,27 @@ function getStatusIcon(status: RoadmapLessonStatus) {
   if (status === 'locked') return Lock
   if (status === 'review') return RotateCcw
   return PlayCircle
+}
+
+function getStatusCopy(
+  status: RoadmapLessonStatus,
+  t: (key: string) => string,
+) {
+  if (status === 'completed') {
+    return { label: t('roadmap.completed'), action: t('roadmap.review') }
+  }
+
+  if (status === 'current') {
+    return { label: t('roadmap.currentLesson'), action: t('roadmap.continue') }
+  }
+
+  if (status === 'locked') {
+    return { label: t('roadmap.locked'), action: t('roadmap.unlockHintAction') }
+  }
+
+  if (status === 'review') {
+    return { label: t('roadmap.review'), action: t('roadmap.review') }
+  }
+
+  return { label: t('roadmap.available'), action: t('roadmap.start') }
 }

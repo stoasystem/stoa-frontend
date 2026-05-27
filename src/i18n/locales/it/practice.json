@@ -18,5 +18,23 @@
   "lessonComplete": "Lezione completata",
   "reviewMistakes": "Rivedi gli errori",
   "dailyGoal": "Obiettivo giornaliero",
-  "studyStreak": "Serie di studio"
+  "studyStreak": "Serie di studio",
+  "roadmap": {
+    "title": "Il tuo percorso di pratica",
+    "pageDescription": "Segui il tuo percorso di pratica. Completa lezioni brevi e chiedi una spiegazione quando un passaggio non è chiaro.",
+    "currentLesson": "Lezione attuale",
+    "lockedHint": "Completa prima la lezione precedente.",
+    "continue": "Continua la lezione",
+    "completed": "Completata",
+    "available": "Disponibile",
+    "locked": "Bloccata",
+    "review": "Ripassa",
+    "start": "Inizia",
+    "unlockHintAction": "Vedi condizione",
+    "progress": "Progresso",
+    "subject": "Matematica",
+    "gradeLevel": "Scuola secondaria I",
+    "supportCopy": "Prima esercitati. Chiedi una spiegazione quando serve.",
+    "learningChatHint": "La chat di apprendimento può spiegare i passaggi poco chiari durante la lezione."
+  }
 }

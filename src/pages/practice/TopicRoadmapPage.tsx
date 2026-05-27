@@ -1,5 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PracticeRoadmap } from '@/components/practice/PracticeRoadmap'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -15,6 +16,7 @@ import {
 import type { PracticeRoadmapLesson } from '@/types/practice'
 
 export function TopicRoadmapPage() {
+  const { t } = useTranslation('practice')
   const { subjectId, topicId } = useParams()
   const navigate = useNavigate()
   const resolvedSubjectId = subjectId ?? 'mathematics'
@@ -36,7 +38,7 @@ export function TopicRoadmapPage() {
             className="mb-0"
             eyebrow="Practice topic"
             title={roadmap ? `${subject?.name ?? 'Mathematics'}: ${roadmap.topic.title}` : 'Practice roadmap'}
-            description="Follow your practice path. Complete short lessons and ask for an explanation when a step is unclear."
+            description={t('roadmap.pageDescription')}
           />
           <Button asChild variant="outline">
             <Link to="/practice">

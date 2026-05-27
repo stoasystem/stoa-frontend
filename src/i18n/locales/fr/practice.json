@@ -18,5 +18,23 @@
   "lessonComplete": "Leçon terminée",
   "reviewMistakes": "Revoir les erreurs",
   "dailyGoal": "Objectif du jour",
-  "studyStreak": "Série d’étude"
+  "studyStreak": "Série d’étude",
+  "roadmap": {
+    "title": "Ton parcours d’entraînement",
+    "pageDescription": "Suis ton parcours d’entraînement. Termine de courtes leçons et demande une explication lorsqu’une étape n’est pas claire.",
+    "currentLesson": "Leçon en cours",
+    "lockedHint": "Termine d’abord la leçon précédente.",
+    "continue": "Continuer la leçon",
+    "completed": "Terminé",
+    "available": "Disponible",
+    "locked": "Verrouillé",
+    "review": "Réviser",
+    "start": "Commencer",
+    "unlockHintAction": "Voir la condition",
+    "progress": "Progression",
+    "subject": "Mathématiques",
+    "gradeLevel": "Secondaire I",
+    "supportCopy": "Entraîne-toi d’abord. Demande une explication si nécessaire.",
+    "learningChatHint": "Le chat d’apprentissage peut expliquer les étapes peu claires pendant la leçon."
+  }
 }

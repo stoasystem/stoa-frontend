@@ -18,5 +18,23 @@
   "lessonComplete": "Lektion abgeschlossen",
   "reviewMistakes": "Fehler ansehen",
   "dailyGoal": "Tagesziel",
-  "studyStreak": "Lernserie"
+  "studyStreak": "Lernserie",
+  "roadmap": {
+    "title": "Dein Übungsweg",
+    "pageDescription": "Folge deinem Übungsweg. Bearbeite kurze Lektionen und frage nach einer Erklärung, wenn ein Schritt unklar ist.",
+    "currentLesson": "Aktuelle Lektion",
+    "lockedHint": "Schließe zuerst die vorherige Lektion ab.",
+    "continue": "Lektion fortsetzen",
+    "completed": "Abgeschlossen",
+    "available": "Verfügbar",
+    "locked": "Gesperrt",
+    "review": "Wiederholen",
+    "start": "Starten",
+    "unlockHintAction": "Hinweis anzeigen",
+    "progress": "Fortschritt",
+    "subject": "Mathematik",
+    "gradeLevel": "Sekundarstufe I",
+    "supportCopy": "Übe zuerst. Frage nach einer Erklärung, wenn du sie brauchst.",
+    "learningChatHint": "Der Lernchat kann unklare Schritte während der Lektion erklären."
+  }
 }
