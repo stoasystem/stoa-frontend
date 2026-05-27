@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.32
 milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
-status: in_progress
-last_updated: "2026-05-27T13:05:00.000Z"
+status: complete
+last_updated: "2026-05-27T13:25:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -25,15 +25,15 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 ## Current Position
 
 Phase: 185 Practice Scope Regression QA, Documentation Handoff, and Build Verification
-Plan: 185-PLAN.md pending
-Status: Phase 184 complete; ready for final QA and handoff
-Last activity: 2026-05-27 — Phase 184 completed generalized Practice copy and localization updates
+Plan: 185-PLAN.md complete
+Status: v1.32 complete
+Last activity: 2026-05-27 — Phase 185 completed QA, documentation handoff, and build verification
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 5
+- Total plans completed this milestone: 5 of 5
 - Average duration: 1 autonomous phase pass
 - Total execution time: in progress
 
@@ -45,7 +45,7 @@ Last activity: 2026-05-27 — Phase 184 completed generalized Practice copy and 
 | 182 | 1/1 | Complete | 1 pass |
 | 183 | 1/1 | Complete | 1 pass |
 | 184 | 1/1 | Complete | 1 pass |
-| 185 | 0/1 | Pending | — |
+| 185 | 1/1 | Complete | 1 pass |
 
 **Recent Trend:**
 
@@ -108,10 +108,11 @@ Recent decisions affecting current work:
 - Phase 182 added explicit grade/topic/unit metadata to Practice types and mock data, with canonical demo seed data under `mockPractice.mathematics.lowerSecondary.equations`.
 - Phase 183 made `/practice/:subjectId/:topicId` the canonical Practice topic route shape while preserving legacy subject-only routes.
 - Phase 184 updated homepage, dashboard, Practice overview, and parent copy so equation wording appears only as current demo content.
+- Phase 185 verified build, browser Practice funnel, topic/lesson routes, dashboard copy, and four-language mobile homepage rendering.
 
 ### Pending Todos
 
-- Start Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification.
+- Next milestone can return to Practice funnel user testing now that scope and architecture are corrected.
 
 ### Quick Tasks Completed
 

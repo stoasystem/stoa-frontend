@@ -2,7 +2,7 @@
 
 ## Goal
 
-Try the STOA equation practice flow as a student.
+Try the STOA Practice Path flow as a student. The current demo topic is Mathematics / Equations.
 
 This is not a math test. We want to learn whether the product makes the next step clear.
 
@@ -12,7 +12,7 @@ This is not a math test. We want to learn whether the product makes the next ste
 2. Open the Student Dashboard.
 3. Find the next practice action.
 4. Click `Continue Practice`.
-5. Open the Mathematics equation path.
+5. Open the current Mathematics / Equations demo topic.
 6. Start the linear equations lesson.
 7. Answer the first challenge correctly if possible.
 8. On the next challenge, intentionally enter an incorrect answer.

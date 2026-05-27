@@ -45,7 +45,8 @@ Use:
 - Practice Game
 - Practice Path
 - Short practice challenge
-- Equation path preview
+- Current demo topic
+- Mathematics / Equations
 - Start Practice
 
 Avoid:
@@ -55,4 +56,3 @@ Avoid:
 - Play now
 - Gamified platform
 - XP, streaks, hearts, gems, shops, leaderboards
-

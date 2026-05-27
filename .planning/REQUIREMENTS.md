@@ -54,14 +54,14 @@
 
 ### QA, Documentation, and Handoff
 
-- [ ] **QA34-01**: `npm run build` passes after generalized Practice Path changes.
-- [ ] **QA34-02**: Browser checks verify homepage Practice entry, dashboard Practice entry, `/practice`, and a lesson route still work.
-- [ ] **QA34-03**: Browser or static route checks verify Start Practice still routes visitors to `/login?next=/practice`.
-- [ ] **QA34-04**: Four-language copy checks verify the generalized Practice labels render without obvious overflow.
-- [ ] **QA34-05**: Documentation includes a migration note for future subject/topic expansion.
-- [ ] **QA34-06**: README explains the corrected Practice Path scope and the equation demo package distinction.
-- [ ] **QA34-07**: QA checklist confirms no remaining user-facing or developer-facing wording says Practice Path equals equations.
-- [ ] **QA34-08**: Phase 34 handoff records that Phase 35 or later can return to user testing after scope correction is complete.
+- [x] **QA34-01**: `npm run build` passes after generalized Practice Path changes.
+- [x] **QA34-02**: Browser checks verify homepage Practice entry, dashboard Practice entry, `/practice`, and a lesson route still work.
+- [x] **QA34-03**: Browser or static route checks verify Start Practice still routes visitors to `/login?next=/practice`.
+- [x] **QA34-04**: Four-language copy checks verify the generalized Practice labels render without obvious overflow.
+- [x] **QA34-05**: Documentation includes a migration note for future subject/topic expansion.
+- [x] **QA34-06**: README explains the corrected Practice Path scope and the equation demo package distinction.
+- [x] **QA34-07**: QA checklist confirms no remaining user-facing or developer-facing wording says Practice Path equals equations.
+- [x] **QA34-08**: Phase 34 handoff records that Phase 35 or later can return to user testing after scope correction is complete.
 
 ## Future Requirements
 
@@ -130,14 +130,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | COPY34-06 | Phase 184 | Complete |
 | COPY34-07 | Phase 184 | Complete |
 | COPY34-08 | Phase 184 | Complete |
-| QA34-01 | Phase 185 | Pending |
-| QA34-02 | Phase 185 | Pending |
-| QA34-03 | Phase 185 | Pending |
-| QA34-04 | Phase 185 | Pending |
-| QA34-05 | Phase 185 | Pending |
-| QA34-06 | Phase 185 | Pending |
-| QA34-07 | Phase 185 | Pending |
-| QA34-08 | Phase 185 | Pending |
+| QA34-01 | Phase 185 | Complete |
+| QA34-02 | Phase 185 | Complete |
+| QA34-03 | Phase 185 | Complete |
+| QA34-04 | Phase 185 | Complete |
+| QA34-05 | Phase 185 | Complete |
+| QA34-06 | Phase 185 | Complete |
+| QA34-07 | Phase 185 | Complete |
+| QA34-08 | Phase 185 | Complete |
 
 **Coverage:**
 - v1 requirements: 42 total

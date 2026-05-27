@@ -2,6 +2,40 @@
 
 STOA learning platform frontend.
 
+## Phase 34 Practice Path Scope Correction
+
+Phase 34 corrects Practice Path positioning and architecture.
+
+Practice Path is a general middle-school and high-school learning challenge system:
+
+1. Subject
+2. Grade level
+3. Topic
+4. Unit
+5. Lesson
+6. Challenge
+
+The current demo content remains Mathematics / Lower Secondary / Equations. Equations are the first demo content package, not the final Practice Path scope.
+
+Canonical demo identifiers:
+
+- `subjectId: mathematics`
+- `gradeLevel: lower_secondary`
+- `topicId: equations`
+
+Canonical Practice routes:
+
+- `/practice`
+- `/practice/:subjectId/:topicId`
+- `/practice/:subjectId/:topicId/lessons/:lessonId`
+- `/practice/:subjectId/:topicId/lessons/:lessonId/result`
+
+Phase 34 verification:
+
+- `npm run build` passes.
+- Browser QA passed for homepage Start Practice, student login to `/practice`, `/practice/mathematics/equations`, lesson route, dashboard Practice card, and four-language mobile homepage checks.
+- Main Practice copy now says school-topic challenges; Mathematics / Equations appears only as current demo content.
+
 ## Phase 33 Homepage Practice Entry
 
 Phase 33 makes the homepage Practice Game / Practice Path a clearer learning entry without turning STOA into a game-first product.

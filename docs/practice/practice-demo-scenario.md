@@ -23,4 +23,4 @@ STOA is not only for asking questions after a student gets stuck. It can also gu
 
 ## Operator Notes
 
-Use the equation path only. Do not open Physics or unrelated math topics during the Phase 28 demo.
+Use the current Mathematics / Equations demo topic only. Do not open Physics or unrelated math topics during the Phase 28 demo.

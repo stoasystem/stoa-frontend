@@ -34,7 +34,7 @@
 - ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
 - ✅ **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (implemented 2026-05-27)
-- 🔄 **v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment** - Phases 181-185 (planned 2026-05-27)
+- ✅ **v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment** - Phases 181-185 (implemented 2026-05-27)
 
 ## Phases
 
@@ -42,7 +42,7 @@
 - [x] **Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract** - Refactor Practice types, mock data, and contracts around subject, grade level, topic, unit, lesson, and challenge hierarchy.
 - [x] **Phase 183: Practice Routes and Component Architecture Generalization** - Align Practice routes, page/component names, and route documentation with subject/topic-based architecture while preserving existing entry behavior.
 - [x] **Phase 184: Generalized Practice UI Copy and Four-Language Localization** - Update homepage, dashboard, Practice, parent, and tutor copy so equation language appears only as current demo content.
-- [ ] **Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification** - Verify generalized scope, preserve the equation demo flow, update README/QA/demo docs, and run final build/browser checks.
+- [x] **Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification** - Verify generalized scope, preserve the equation demo flow, update README/QA/demo docs, and run final build/browser checks.
 
 ## Phase Details
 
@@ -124,7 +124,7 @@
 | 182. Subject-Agnostic Practice Domain Model and Mock Data Contract | 1/1 | Complete | 2026-05-27 |
 | 183. Practice Routes and Component Architecture Generalization | 1/1 | Complete | 2026-05-27 |
 | 184. Generalized Practice UI Copy and Four-Language Localization | 1/1 | Complete | 2026-05-27 |
-| 185. Practice Scope Regression QA, Documentation Handoff, and Build Verification | 0/1 | Pending | — |
+| 185. Practice Scope Regression QA, Documentation Handoff, and Build Verification | 1/1 | Complete | 2026-05-27 |
 
 ## Coverage
 

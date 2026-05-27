@@ -14,7 +14,7 @@ Use this for quick conversations where the audience needs the product idea, not 
 
 ## Talk Track
 
-`STOA is useful even before a student knows what to ask. The student starts with a short equation practice lesson.`
+`STOA is useful even before a student knows what to ask. The student starts with a short Practice Path lesson in the current Mathematics / Equations demo topic.`
 
 Show the Practice lesson.
 
