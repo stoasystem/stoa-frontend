@@ -13,7 +13,7 @@ The student learns that solving a linear equation means keeping both sides balan
 | Lesson | Core Skill | Representative Challenge |
 |--------|------------|--------------------------|
 | One-step equations | Undo a single addition, subtraction, multiplication, or division | Solve `x + 7 = 12`. |
-| Two-step equations | Remove the constant term, then divide or multiply | Solve `3x + 5 = 20`. |
+| Solving equations in two steps | Remove the constant term, then divide or multiply | Solve `3x + 5 = 20`. |
 | Equations with brackets | Simplify or divide before isolating `x` | Solve `2(x + 3) = 14`. |
 | Word problems with linear equations | Translate a short situation into an equation | A number plus 7 is 12. Find the number. |
 

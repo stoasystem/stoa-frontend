@@ -71,9 +71,9 @@ const challenges: Record<string, PracticeChallenge[]> = {
       '3x',
       '20',
       'x',
-    ], '+5', 'Remove the term that is added after 3x.', 'Correct. Removing +5 first leaves the term with x ready to divide.', 'Not quite. Look at the operation furthest from x.', 'Two-step equations'),
-    input('linear-2-c2', 'lesson-linear-2', 'Solve 3x + 5 = 20. Write the value of x.', '5', 'First remove the +5. Then divide by 3.', 'Correct. Subtracting 5 first gives 3x = 15, then x = 5.', 'Not quite. Try finding 3x before finding x.', 'Two-step equations'),
-    explanation('linear-2-c3', 'lesson-linear-2', 'Why do we divide by 3 after subtracting 5?', 'to leave x by itself', 'After subtracting 5, the equation has 3 times x.', 'Correct. Dividing by 3 undoes multiplication and leaves x by itself.', 'Not quite. Think about what operation undoes multiplying x by 3.', 'Two-step equations'),
+    ], '+5', 'Remove the term that is added after 3x.', 'Correct. Removing +5 first leaves the term with x ready to divide.', 'Not quite. Look at the operation furthest from x.', 'Solving equations in two steps'),
+    input('linear-2-c2', 'lesson-linear-2', 'Solve 3x + 5 = 20. Write the value of x.', '5', 'First remove the +5. Then divide by 3.', 'Correct. Subtracting 5 first gives 3x = 15, then x = 5.', 'Not quite. Try finding 3x before finding x.', 'Solving equations in two steps'),
+    explanation('linear-2-c3', 'lesson-linear-2', 'Why do we divide by 3 after subtracting 5?', 'to leave x by itself', 'After subtracting 5, the equation has 3 times x.', 'Correct. Dividing by 3 undoes multiplication and leaves x by itself.', 'Not quite. Think about what operation undoes multiplying x by 3.', 'Solving equations in two steps'),
   ],
   'lesson-linear-3': [
     mc('linear-3-c1', 'lesson-linear-3', 'Solve 2(x + 3) = 14. What is a good first move?', [
@@ -206,7 +206,7 @@ const challenges: Record<string, PracticeChallenge[]> = {
 
 const mathLessons: PracticeLesson[] = [
   lesson('lesson-linear-1', 'unit-linear-equations', demoSubjectId, 'One-step equations', 'One-step equations', 'available', 'intro', 4),
-  lesson('lesson-linear-2', 'unit-linear-equations', demoSubjectId, 'Two-step equations', 'Two-step equations', 'available', 'practice', 5),
+  lesson('lesson-linear-2', 'unit-linear-equations', demoSubjectId, 'Solving equations in two steps', 'Solving equations in two steps', 'available', 'practice', 5),
   lesson('lesson-linear-3', 'unit-linear-equations', demoSubjectId, 'Equations with brackets', 'Equations with brackets', 'available', 'practice', 6),
   lesson('lesson-linear-4', 'unit-linear-equations', demoSubjectId, 'Word problems with linear equations', 'Equation word problems', 'available', 'review', 6),
   lesson('lesson-quadratic-1', 'unit-quadratic-equations', demoSubjectId, 'Recognizing quadratic equations', 'Recognizing quadratic equations', 'available', 'intro', 4),
@@ -276,9 +276,9 @@ export const mockPracticeMistakes: PracticeMistake[] = [
     gradeLevel: demoGradeLevel,
     topicId: demoTopicId,
     lessonId: 'lesson-linear-2',
-    lessonTitle: 'Two-step equations',
+    lessonTitle: 'Solving equations in two steps',
     challengeId: 'linear-2-c2',
-    topic: 'Two-step equations',
+    topic: 'Solving equations in two steps',
     prompt: 'Solve 3x + 5 = 20. Write the value of x.',
     studentAnswer: '15',
     correctAnswer: '5',
@@ -324,7 +324,7 @@ export function getMockPracticeOverview(): PracticeOverview {
       {
         id: 'weak-practice-1',
         subject: 'Mathematics',
-        topic: 'Two-step equations',
+        topic: 'Solving equations in two steps',
         note: 'Could benefit from one more guided attempt with isolating x.',
       },
       {
@@ -411,7 +411,7 @@ export function getMockPracticeHint(challengeId: string): PracticeHintResponse {
 export function getMockPracticeParentSummary(): PracticeParentSummary {
   return {
     lessonsCompletedThisWeek: 3,
-    topicsPracticed: ['One-step equations', 'Two-step equations', 'Simple systems'],
+    topicsPracticed: ['One-step equations', 'Solving equations in two steps', 'Simple systems'],
     mistakesReviewed: 2,
     practiceStreak: 5,
     currentSubject: 'Mathematics',
@@ -419,7 +419,7 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     currentTopic: demoTopicTitle,
     currentTopicId: demoTopicId,
     currentPracticePath: 'Mathematics / Equations',
-    recommendedNextTopic: 'Two-step equations and substitution',
+    recommendedNextTopic: 'Solving equations in two steps and substitution',
     supportiveNote: 'Anna practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
     questionsAsked: 2,
     teacherSupportRequested: 1,

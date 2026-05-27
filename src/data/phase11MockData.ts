@@ -240,7 +240,7 @@ export const mockTutorHelpRequestDetail: TutorHelpRequestDetail = {
     lessonId: 'lesson-linear-2',
     challengeId: 'linear-2-c2',
     challengePrompt: 'Solve 3x + 5 = 20. Write the value of x.',
-    topic: 'Two-step equations',
+    topic: 'Solving equations in two steps',
     studentAnswer: '6',
     correctAnswer: '5',
     attempts: 2,

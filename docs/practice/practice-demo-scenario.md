@@ -7,7 +7,7 @@ Recommended duration: 3-5 minutes.
 1. Student Dashboard -> Continue Practice.
 2. Practice Overview -> Mathematics: Equations.
 3. Subject Path -> Linear equations in one variable.
-4. Lesson -> Two-step equations.
+4. Lesson -> Solving equations in two steps.
 5. Student answers one challenge correctly.
 6. Student answers the next challenge incorrectly.
 7. Feedback appears with `Not quite`.

@@ -7,7 +7,7 @@ Students understand that solving a linear equation means keeping both sides bala
 ## Lessons
 
 1. One-step equations
-2. Two-step equations
+2. Solving equations in two steps
 3. Equations with brackets
 4. Word problems with linear equations
 

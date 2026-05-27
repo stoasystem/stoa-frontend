@@ -21,7 +21,7 @@ mockPractice.mathematics.lowerSecondary.equations
 Unit 1: Linear equations in one variable
 
 - One-step equations
-- Two-step equations
+- Solving equations in two steps
 - Equations with brackets
 - Word problems with linear equations
 
