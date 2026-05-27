@@ -7,10 +7,10 @@ last_updated: "2026-05-27T15:20:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 5
-  completed_plans: 1
-  percent: 20
+  completed_plans: 2
+  percent: 40
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 187 Roadmap Component System and Lesson Node States
+Phase: 188 Practice Roadmap Page Integration and Lesson Progression Flow
 Plan: —
-Status: Phase 186 complete
-Last activity: 2026-05-27 — Phase 186 completed roadmap data contract and demo foundation
+Status: Phase 187 complete
+Last activity: 2026-05-27 — Phase 187 completed roadmap component system and node states
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 1 of 5
+- Total plans completed this milestone: 2 of 5
 - Average duration: 1 autonomous phase pass
 - Total execution time: in progress
 
@@ -42,7 +42,7 @@ Last activity: 2026-05-27 — Phase 186 completed roadmap data contract and demo
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 186 | 1/1 | Complete | 1 pass |
-| 187 | 0/1 | Pending | — |
+| 187 | 1/1 | Complete | 1 pass |
 | 188 | 0/1 | Pending | — |
 | 189 | 0/1 | Pending | — |
 | 190 | 0/1 | Pending | — |
@@ -112,10 +112,11 @@ Recent decisions affecting current work:
 - v1.33 continues roadmap numbering from Phase 186 after v1.32 ended at Phase 185.
 - Phase 35 focuses on Practice roadmap UI, lesson progression states, unlock hints, and Learning Chat handoff copy; it does not add new subjects, a production backend, adaptive learning, or heavy game rewards.
 - Phase 186 added roadmap contracts, demo roadmap data, roadmap service/query support, and mock progression updates.
+- Phase 187 added the Practice roadmap component system, node state rendering, connectors, progress header, unlock hint, continue card, and UI spec.
 
 ### Pending Todos
 
-- Continue with Phase 187 to build the roadmap component system and lesson node states.
+- Continue with Phase 188 to integrate the roadmap into `/practice` and topic routes.
 
 ### Quick Tasks Completed
 
@@ -183,4 +184,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Continue autonomous execution with Phase 187.
+- Continue autonomous execution with Phase 188.
