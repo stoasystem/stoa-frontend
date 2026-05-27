@@ -141,6 +141,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Focus homepage Practice module on Practice Path content | Browser check on `/`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Remove duplicate homepage flow section | Browser check on `/`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Remove saved review account shortcuts from login | Browser check on `/login?next=/chat`; `npm run lint`; `npm run build` |
+| 2026-05-27 | Generalize login page activity copy | Browser check on `/login?next=/chat`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 
