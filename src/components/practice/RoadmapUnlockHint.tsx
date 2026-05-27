@@ -3,6 +3,9 @@ import { useTranslation } from 'react-i18next'
 
 export function RoadmapUnlockHint({ condition }: { condition: string }) {
   const { t } = useTranslation('practice')
+  const label = condition === 'Complete the previous lesson first.'
+    ? t('roadmap.lockedHint')
+    : condition || t('roadmap.lockedHint')
 
   return (
     <div
@@ -10,7 +13,7 @@ export function RoadmapUnlockHint({ condition }: { condition: string }) {
       role="status"
     >
       <LockKeyhole className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-      <span>{condition || t('roadmap.lockedHint')}</span>
+      <span>{label}</span>
     </div>
   )
 }

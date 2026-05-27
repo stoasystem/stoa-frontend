@@ -2,6 +2,34 @@
 
 STOA learning platform frontend.
 
+## Practice Roadmap UI
+
+The Practice page now includes a roadmap-style learning path.
+
+The roadmap helps students understand:
+
+- where they are
+- what they have completed
+- what lesson comes next
+- which lessons are locked
+- how to continue learning
+
+The current demo uses Mathematics / Equations, but the roadmap is designed to support future subjects and topics. The roadmap should feel like progression, not like a cartoon game.
+
+Key routes:
+
+- `/practice`
+- `/practice/mathematics/equations`
+- `/practice/:subjectId/:topicId/lessons/:lessonId`
+
+Phase 35 verification:
+
+- `npm run build` passes.
+- `/practice` and `/practice/mathematics/equations` show the roadmap path.
+- Lesson nodes support completed, current, available, locked, and review states.
+- Locked nodes show the unlock condition instead of starting the lesson.
+- English, German, French, and Italian roadmap copy is available.
+
 ## Phase 34 Practice Path Scope Correction
 
 Phase 34 corrects Practice Path positioning and architecture.

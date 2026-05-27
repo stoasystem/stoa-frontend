@@ -140,9 +140,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DOC35-05 | Phase 189 | Complete |
 | LOC35-01 | Phase 189 | Complete |
 | LOC35-02 | Phase 189 | Complete |
-| QA35-01 | Phase 190 | Pending |
-| QA35-02 | Phase 190 | Pending |
-| QA35-03 | Phase 190 | Pending |
+| QA35-01 | Phase 190 | Complete |
+| QA35-02 | Phase 190 | Complete |
+| QA35-03 | Phase 190 | Complete |
 
 **Coverage:**
 - v1 requirements: 45 total

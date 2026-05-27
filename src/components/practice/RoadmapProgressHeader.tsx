@@ -22,8 +22,8 @@ export function RoadmapProgressHeader({
             {roadmap.topic.description}
           </p>
           <div className="mt-4 flex flex-wrap gap-2 text-xs font-medium text-muted-foreground">
-            <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">{t('roadmap.subject')}</span>
-            <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">{t('roadmap.gradeLevel')}</span>
+            <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">{formatRoadmapLabel(roadmap.subjectId)}</span>
+            <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">{formatRoadmapLabel(roadmap.gradeLevel)}</span>
             <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">{roadmap.topic.title}</span>
           </div>
         </div>
@@ -44,4 +44,12 @@ export function RoadmapProgressHeader({
       </div>
     </section>
   )
+}
+
+function formatRoadmapLabel(value: string) {
+  return value
+    .split(/[_-]/g)
+    .filter(Boolean)
+    .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+    .join(' ')
 }

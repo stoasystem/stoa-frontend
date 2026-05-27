@@ -35,7 +35,7 @@
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
 - ✅ **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (implemented 2026-05-27)
 - ✅ **v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment** - Phases 181-185 (implemented 2026-05-27)
-- 🔄 **v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience** - Phases 186-190 (planned 2026-05-27)
+- ✅ **v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience** - Phases 186-190 (implemented 2026-05-27)
 
 ## Phases
 
@@ -43,7 +43,7 @@
 - [x] **Phase 187: Roadmap Component System and Lesson Node States** - Build reusable roadmap components, lesson nodes, connectors, progress header, unlock hint, and next-lesson card with stable status rendering.
 - [x] **Phase 188: Practice Roadmap Page Integration and Lesson Progression Flow** - Integrate the roadmap into `/practice` and topic routes, wire available/current/completed/locked click behavior, and support mock progression updates.
 - [x] **Phase 189: Roadmap Visual Design, Localization, and Documentation** - Polish desktop/mobile roadmap layout, add four-language roadmap copy, and document UI rules, node rules, mobile layout, demo data, and QA.
-- [ ] **Phase 190: Practice Roadmap QA, README Handoff, and Build Verification** - Verify roadmap interaction, localization fit, desktop/mobile layouts, docs, README, and final build.
+- [x] **Phase 190: Practice Roadmap QA, README Handoff, and Build Verification** - Verify roadmap interaction, localization fit, desktop/mobile layouts, docs, README, and final build.
 
 ## Phase Details
 
@@ -125,7 +125,7 @@
 | 187. Roadmap Component System and Lesson Node States | 1/1 | Complete | 2026-05-27 |
 | 188. Practice Roadmap Page Integration and Lesson Progression Flow | 1/1 | Complete | 2026-05-27 |
 | 189. Roadmap Visual Design, Localization, and Documentation | 1/1 | Complete | 2026-05-27 |
-| 190. Practice Roadmap QA, README Handoff, and Build Verification | 0/1 | Pending | — |
+| 190. Practice Roadmap QA, README Handoff, and Build Verification | 1/1 | Complete | 2026-05-27 |
 
 ## Coverage
 
@@ -143,4 +143,4 @@
 
 ## Next Up
 
-Phase 186: Practice Roadmap Data Contract and Demo Roadmap Foundation.
+Phase 36 should focus on roadmap interaction QA, progress feedback, and parent visibility refinement.
