@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.34
 milestone_name: "Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening"
 status: Awaiting next milestone
-last_updated: "2026-05-27T21:09:00.000Z"
+last_updated: "2026-05-27T21:18:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
@@ -157,6 +157,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Move Practice subject details to independent pages | Browser checks on `/practice`, Mathematics detail, Physics preview, and mobile layout; `npm run lint`; `npm run build` |
 | 2026-05-27 | Clarify referral rewards copy | Browser check on `/referrals`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Remove repeated goal cards from Practice detail | Browser checks on `/practice/mathematics/equations` and `/practice`; `npm run lint`; `npm run build` |
+| 2026-05-27 | Organize student dashboard categories | Browser checks on `/dashboard` desktop and mobile; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 
