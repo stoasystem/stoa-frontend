@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.30
-milestone_name: "Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit"
-status: complete
-last_updated: "2026-05-27T01:05:00+02:00"
-last_activity: 2026-05-27 — Milestone v1.30 Phase 32 completed with build and cross-locale smoke verification
+milestone: v1.31
+milestone_name: "Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization"
+status: planning
+last_updated: "2026-05-27T09:26:40.680Z"
+last_activity: 2026-05-27
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 6
-  completed_plans: 6
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,38 +20,36 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.30 Phase 32 audits English, German, French, and Italian user-facing copy, removes visible development artifacts, checks cross-locale UI fit, and documents final language QA without adding product features.
+**Current focus:** v1.31 Phase 33 clarifies the homepage Practice entry, Start Practice routing, four-language Practice copy, and the Practice -> Learning Chat -> Professional Teacher Support -> Parent Report funnel without expanding curriculum or complex gamification.
 
 ## Current Position
 
-Phase: 176 complete
-Plan: 176-PLAN.md
-Status: Milestone complete
-Last activity: 2026-05-27 — Phase 32 language QA, artifact cleanup, build, and smoke verification completed
+Phase: 177 next
+Plan: 177-PLAN.md
+Status: Roadmap created; ready to plan Phase 177
+Last activity: 2026-05-27 — Milestone v1.31 roadmap created for Phase 33 homepage Practice entry optimization
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6 of 6
-- Average duration: completed in one autonomous execution pass
-- Total execution time: same session
+- Total plans completed this milestone: 0 of 4
+- Average duration: not started
+- Total execution time: planning in progress
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 171 | 1/1 | Complete | 2026-05-27 |
-| 172 | 1/1 | Complete | 2026-05-27 |
-| 173 | 1/1 | Complete | 2026-05-27 |
-| 174 | 1/1 | Complete | 2026-05-27 |
-| 175 | 1/1 | Complete | 2026-05-27 |
-| 176 | 1/1 | Complete | 2026-05-27 |
+| 177 | 0/1 | Pending | — |
+| 178 | 0/1 | Pending | — |
+| 179 | 0/1 | Pending | — |
+| 180 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
 - Last 5 plans: 172, 173, 174, 175, 176
-- Trend: Phase 32 completed; ready for Phase 33 user-testing preparation
+- Trend: Phase 33 roadmap initialized; next work starts with Start Practice routing contract
 
 *Updated after each plan completion*
 
@@ -94,10 +92,15 @@ Recent decisions affecting current work:
 - Phase 32 treats user-facing UI as the cleanup target; developer docs, tests, and code identifiers may keep precise technical language where appropriate.
 - Phase 32 completed copy and artifact cleanup without adding product features.
 - Phase 32 verification passed `npm run build`, locale key parity, French apostrophe scan, high-risk term scan classification, and 184 Playwright route/locale/viewport smoke checks.
+- v1.31 continues roadmap numbering from Phase 177 after v1.30 ended at Phase 176.
+- Phase 33 uses Duolingo-inspired practice mechanics only as interaction inspiration: short challenges, visible progress, immediate feedback, hints, and contextual explanation.
+- Phase 33 must not copy Duolingo code, brand, green visual language, mascot cues, XP, streaks, hearts, gems, shops, leaderboards, or game-first user-facing language.
+- Practice remains one learning entry; Learning Chat remains the explanation center, Professional Teacher Support remains escalation, and Parent Report remains visibility.
+- Phase 33 starts with route/auth correctness because incorrect `/login?next=/practice` behavior would invalidate homepage funnel testing.
 
 ### Pending Todos
 
-- Start Phase 33: Real User Testing Preparation and Feedback Operations.
+- Plan Phase 177: Start Practice Funnel and Route Contract.
 
 ### Quick Tasks Completed
 

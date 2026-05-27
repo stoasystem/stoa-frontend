@@ -1,108 +1,96 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-27
-**Milestone:** v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA learning platform whose user-facing English, German, French, and Italian copy reads naturally, accurately, and professionally without exposing development artifacts.
+**Milestone:** v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization
+**Core Value:** Developers can run STOA as a credible learning platform where homepage visitors can clearly start a short Practice path, get Learning Chat help when stuck, escalate to professional teacher support when needed, and preserve parent visibility without making STOA look like only a game.
 
 ## v1 Requirements
 
-### Audit Framework and Scope
+### Funnel and Routing
 
-- [x] **AUD32-01**: Team can review `docs/language/global-copy-audit-matrix.md` covering route, component, key, four-language copy, meaning accuracy, tone, UI fit, forbidden terms, approval, and notes.
-- [x] **AUD32-02**: Team can review `docs/qa/development-artifact-audit.md` with search terms, files found, user-facing classification, action taken, and approval.
-- [x] **AUD32-03**: Team can review `docs/qa/user-facing-copy-cleanup-checklist.md` covering language quality, artifact cleanup, UI fit, missing translation keys, and build verification.
-- [x] **AUD32-04**: Audit scope includes public pages, student pages, parent pages, tutor pages, admin/internal-facing product pages, and shared UI components.
-- [x] **AUD32-05**: The milestone explicitly avoids new features, new pages, new languages, course expansion, UI redesign, backend work, database work, and changes to `/Users/zhdeng/newweb`.
+- [ ] **NAV33-01**: Visitor can identify a clear homepage `Start Practice` action for the Practice Game / Practice Path entry.
+- [ ] **NAV33-02**: Unauthenticated user who clicks `Start Practice` is routed to `/login?next=/practice`.
+- [ ] **NAV33-03**: Student who is already authenticated and clicks `Start Practice` is routed directly to `/practice`.
+- [ ] **NAV33-04**: Parent who is already authenticated and clicks `Start Practice` is routed to `/parent` instead of the student-only Practice route.
+- [ ] **NAV33-05**: Tutor who is already authenticated and clicks `Start Practice` is routed to `/tutor` instead of the student-only Practice route.
+- [ ] **NAV33-06**: Admin who is already authenticated and clicks `Start Practice` is routed to `/admin` instead of the student-only Practice route.
+- [ ] **NAV33-07**: Student login from `/login?next=/practice` lands on `/practice` when the next path is safe for the student role.
+- [ ] **NAV33-08**: Registration path documentation covers `/register?role=student&next=/practice` and the expected post-registration Practice destination.
+- [ ] **NAV33-09**: A shared navigation helper such as `startPracticeNavigation` or `getStartPracticePath` centralizes Start Practice route decisions.
 
-### English Copy Review
+### Homepage Practice Entry UI
 
-- [x] **EN32-01**: English user-facing copy is reviewed across public, student, parent, tutor, admin, and shared components.
-- [x] **EN32-02**: English copy avoids overly sales-driven, SaaS-heavy, technical, hype-driven, or pressure-based wording.
-- [x] **EN32-03**: English terms consistently use `Learning Assistant`, `Learning Chat`, `Professional teacher support`, `Practice Path`, and `Parent Report` where appropriate.
-- [x] **EN32-04**: English error, loading, empty, toast, form, navigation, footer, Practice, Chat, Parent Report, Tutor, Pricing, Billing, and Contact copy is user-friendly.
-- [x] **EN32-05**: `docs/language/english-final-review.md` records English review findings, fixes, known gaps, and approval.
+- [ ] **HOME33-01**: Homepage includes a high-visibility Practice Game / Practice Path section after Hero and before or inside the broader How STOA Works flow.
+- [ ] **HOME33-02**: Practice entry is visually clearer than a plain explanatory block but does not overpower the Hero or main `Start Learning` CTA.
+- [ ] **HOME33-03**: `HomePracticeEntry` renders the complete homepage Practice entry section using existing STOA premium theme patterns.
+- [ ] **HOME33-04**: `PracticeEntryCard` renders the clickable Practice entry, short explanation, and Start Practice CTA.
+- [ ] **HOME33-05**: `HomePracticePreview` renders a concise equation-path preview without expanding curriculum content.
+- [ ] **HOME33-06**: Practice preview includes the equation path topics: one-step equations, quadratic basics, and linear systems.
+- [ ] **HOME33-07**: Practice entry copy explains that students start with a short equation challenge.
+- [ ] **HOME33-08**: Practice entry copy explains that hints appear before Learning Chat when a student is stuck or makes a mistake.
+- [ ] **HOME33-09**: Practice entry copy preserves the sequence Practice -> Learning Chat -> Professional Teacher Support -> Parent Report.
+- [ ] **HOME33-10**: Practice entry avoids user-facing phrases such as `Duolingo-style`, `AI game`, `Play now`, `gamified AI platform`, XP, streaks, hearts, gems, shops, and leaderboards.
+- [ ] **HOME33-11**: Homepage CTA hierarchy keeps `Start Learning` as the page-level primary CTA, `Start Practice` as a clear entry CTA, and `How it works` as secondary.
 
-### German Copy Review
+### Localization, Copy, and Layout Fit
 
-- [x] **DE32-01**: German user-facing copy is reviewed across public, student, parent, tutor, admin, and shared components.
-- [x] **DE32-02**: German copy avoids English direct translation, awkward compound words, over-formal phrasing, and overly long title structures.
-- [x] **DE32-03**: German CTA labels and navigation labels remain short enough for mobile and desktop UI.
-- [x] **DE32-04**: German education terminology is natural for Swiss/German-speaking family and school contexts.
-- [x] **DE32-05**: `docs/language/german-final-review.md` records German review findings, fixes, known gaps, and approval.
+- [ ] **L10N33-01**: English Practice entry copy includes `Practice Game`, `Start with a short equation challenge`, and `Start Practice` wording or approved equivalents.
+- [ ] **L10N33-02**: German Practice entry copy includes `Übungsweg`, short equation-practice wording, and `Übung starten` wording or approved equivalents that fit UI.
+- [ ] **L10N33-03**: French Practice entry copy includes `Parcours d’entraînement`, short equation-practice wording, and `Commencer l’entraînement` wording or approved equivalents that fit UI.
+- [ ] **L10N33-04**: Italian Practice entry copy includes `Percorso di pratica`, short equation-practice wording, and `Inizia la pratica` wording or approved equivalents that fit UI.
+- [ ] **L10N33-05**: Practice preview topic labels are localized for English, German, French, and Italian.
+- [ ] **L10N33-06**: German and French Practice entry CTAs wrap or shorten safely on mobile without shrinking typography.
+- [ ] **L10N33-07**: Homepage Practice entry does not create horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
+- [ ] **L10N33-08**: Practice entry hover and reveal effects respect reduced-motion preferences.
 
-### French Copy Review
+### Documentation and Demo Flow
 
-- [x] **FR32-01**: French user-facing copy is reviewed across public, student, parent, tutor, admin, and shared components.
-- [x] **FR32-02**: French copy uses natural phrasing, correct apostrophes, correct contractions, and clear education language.
-- [x] **FR32-03**: French copy avoids overly abstract titles and form/helper text that becomes too long for UI.
-- [x] **FR32-04**: French apostrophes use the typographic `’` consistently in user-facing copy where appropriate.
-- [x] **FR32-05**: `docs/language/french-final-review.md` records French review findings, fixes, known gaps, and approval.
+- [ ] **DOC33-01**: `docs/home/practice-entry-section.md` documents the homepage Practice entry section strategy and product hierarchy.
+- [ ] **DOC33-02**: `docs/home/homepage-cta-hierarchy.md` documents `Start Learning`, `Start Practice`, and `How it works` hierarchy.
+- [ ] **DOC33-03**: `docs/practice/practice-homepage-entry.md` documents how the homepage Practice entry connects to `/practice`.
+- [ ] **DOC33-04**: `docs/practice/practice-entry-copy.md` records the four-language Practice entry copy and forbidden wording.
+- [ ] **DOC33-05**: `docs/ia/homepage-learning-entry-map.md` maps Hero, Practice, How STOA Works, Learning Chat, teacher support, and Parent Report.
+- [ ] **DOC33-06**: `docs/demo/homepage-to-practice-demo-flow.md` documents the homepage-to-Practice demo flow for unauthenticated and authenticated users.
+- [ ] **DOC33-07**: README includes a Phase 33 section explaining the Practice homepage entry, route behavior, four-language copy, QA, and build status.
 
-### Italian Copy Review
+### QA, Verification, and Handoff
 
-- [x] **IT32-01**: Italian user-facing copy is reviewed across public, student, parent, tutor, admin, and shared components.
-- [x] **IT32-02**: Italian copy is warm, clear, natural, and not overly formal or visibly translated from English.
-- [x] **IT32-03**: Italian CTA, form, state, and navigation copy remains short enough for mobile and desktop UI.
-- [x] **IT32-04**: Italian education terminology is consistent across Practice, Chat, parent visibility, and teacher support surfaces.
-- [x] **IT32-05**: `docs/language/italian-final-review.md` records Italian review findings, fixes, known gaps, and approval.
-
-### Terminology and Cross-Locale Meaning
-
-- [x] **TERM32-01**: Four-language copy preserves equivalent meaning without requiring word-for-word translation.
-- [x] **TERM32-02**: Learning Assistant, Professional teacher support, Practice Path, Learning Chat, Parent Report, student, parent, and teacher terms are consistent across locales.
-- [x] **TERM32-03**: Copy does not imply STOA is only a game platform, only a chat tool, or a teacher replacement.
-- [x] **TERM32-04**: Four-language copy avoids misleading differences in product capability, plan limits, teacher approval, payment state, or support expectations.
-- [x] **TERM32-05**: Missing translation key leakage such as raw i18n keys, `undefined`, or `[object Object]` is checked and corrected where found.
-
-### Development Artifact Cleanup
-
-- [x] **ART32-01**: User-facing UI is audited for `demo`, `mock`, `test account`, `Codex`, `backend`, `provider`, `placeholder`, `TODO`, `Lorem`, `AI`, `Artificial Intelligence`, `model`, `prompt`, and similar internal wording.
-- [x] **ART32-02**: User-facing development artifacts are removed or rewritten into product-safe language.
-- [x] **ART32-03**: Legitimate developer-only mentions remain limited to docs, tests, internal code identifiers, or feature-flagged debug surfaces that are hidden by default.
-- [x] **ART32-04**: README, docs, QA checklist, developer notes, and internal implementation language do not leak into user-facing UI.
-- [x] **ART32-05**: Public demo credentials, internal test accounts, and internal operational instructions do not appear in normal user-facing pages.
-
-### UI Fit and Visual Language QA
-
-- [x] **UI32-01**: Four-language UI fit is checked at 375px, 430px, 768px, 1024px, and 1440px for required pages.
-- [x] **UI32-02**: Navbar, footer, contact form, register flow, Practice flow, Learning Chat, Parent Report, Tutor Request Detail, Pricing, Billing, and Contact layouts remain stable across locales.
-- [x] **UI32-03**: German long words and headings do not overflow or create broken layouts.
-- [x] **UI32-04**: French apostrophes and longer text do not create awkward wrapping or punctuation issues.
-- [x] **UI32-05**: Italian CTA and form text fits buttons, cards, and compact mobile surfaces.
-
-### Verification, Reports, and Handoff
-
-- [x] **QA32-01**: `docs/language/final-language-qa-report.md` summarizes scope, pages checked, languages checked, issues found, issues fixed, known issues, per-language summaries, and approval decision.
-- [x] **QA32-02**: README includes a Phase 32 Cross-Locale Language QA and Artifact Cleanup section.
-- [x] **QA32-03**: `npm run build` succeeds after copy and cleanup changes.
-- [x] **QA32-04**: Four-language smoke or visual QA evidence covers Homepage, Register, Practice, Learning Chat, Parent Report, Tutor Request Detail, Pricing, Billing, Contact, and Footer.
-- [x] **QA32-05**: Full demo flow remains coherent after copy cleanup and does not show development artifacts.
+- [ ] **QA33-01**: QA checklist verifies that homepage has a clear Practice Game / Practice Path entry and Start Practice button.
+- [ ] **QA33-02**: QA checklist verifies that users can understand Practice as a short learning entry and not as the whole STOA product.
+- [ ] **QA33-03**: QA checklist verifies unauthenticated, student, parent, tutor, and admin Start Practice routing.
+- [ ] **QA33-04**: QA checklist verifies desktop and mobile Practice entry layout across English, German, French, and Italian.
+- [ ] **QA33-05**: QA checklist verifies Practice -> Learning Chat -> Professional Teacher Support -> Parent Report hierarchy.
+- [ ] **QA33-06**: Homepage-to-Practice demo flow is run or documented with exact manual verification steps.
+- [ ] **QA33-07**: `npm run build` succeeds after Phase 33 changes.
+- [ ] **QA33-08**: Phase 33 handoff records any known gaps for Phase 34 user testing and feedback.
 
 ## Future Requirements
 
-### External User Testing
+### User Testing and Feedback
 
-- **TEST-FUTURE-01**: Run external student testing for Practice -> Learning Chat after language QA passes.
-- **TEST-FUTURE-02**: Run external parent testing for Parent Report and Learning Activity clarity after language QA passes.
-- **TEST-FUTURE-03**: Run external teacher testing for Practice-origin request context after language QA passes.
+- **TEST34-01**: Run student testing to confirm users understand and click the homepage Start Practice entry.
+- **TEST34-02**: Run parent testing to confirm Practice plus Parent Report improves trust without making STOA feel like only a game.
+- **TEST34-03**: Run teacher testing to confirm Practice-origin context helps professional support.
+- **TEST34-04**: Decide whether homepage Practice entry needs further optimization based on external user feedback.
 
-### Localization Operations
+### Analytics and Product Learning
 
-- **L10N-FUTURE-01**: Add a formal translator review workflow before public launch.
-- **L10N-FUTURE-02**: Add automated screenshot comparison per locale if the project adopts a visual regression service.
+- **ANALYTICS-FUTURE-01**: Add privacy-safe events for homepage Start Practice clicks, Practice preview visibility, hint usage, and Practice-to-Learning-Chat handoff if analytics becomes in scope.
+- **ANALYTICS-FUTURE-02**: Add funnel reporting for homepage -> login/register -> Practice activation after product tracking and privacy review.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New product functionality | Phase 32 is a language quality and artifact cleanup milestone only. |
-| New public pages or app routes | The milestone audits and fixes existing surfaces; it does not expand information architecture. |
-| New languages | English, German, French, and Italian are the only Phase 32 languages. |
-| New Practice subjects or curriculum content | Curriculum expansion is outside this language QA pass. |
-| Broad UI redesign | Layout changes are limited to fixing language fit and copy overflow. |
-| Formal backend, database, payment, or provider work | The milestone stays in frontend copy, UI, docs, and QA. |
-| Modifying `/Users/zhdeng/newweb` | Company homepage source remains read-only and out of scope. |
-| Removing technical terms from developer docs/tests/code identifiers | The cleanup target is user-facing UI; technical artifacts can retain precise implementation language. |
+| New Practice subjects | Phase 33 clarifies entry and funnel; it does not expand curriculum. |
+| New Practice lessons or large question bank | Existing equation demo content is enough for the homepage preview and route flow. |
+| Practice internal interaction redesign | Phase 33 focuses on homepage entry, CTA routing, copy, docs, and QA. |
+| Learning Chat rebuild | Learning Chat remains the explanation surface; this phase only clarifies the handoff. |
+| Parent Report redesign | Parent Report remains the visibility layer; this phase only keeps it in the product hierarchy. |
+| Formal backend, database, CMS, payment, or production analytics work | The funnel problem is frontend IA, routing, copy, and QA. |
+| Complex gamification | STOA should use short-session clarity and gentle progress, not XP, streak pressure, hearts, gems, shops, leaderboards, or reward economies. |
+| Duolingo visual or brand imitation | Duolingo is only a mechanism reference; STOA must retain its own premium education brand. |
+| Public top-level Practice navbar item | Practice belongs as a homepage entry and authenticated student action unless future IA evidence says otherwise. |
 
 ## Traceability
 
@@ -110,57 +98,55 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUD32-01 | Phase 171 | Complete |
-| AUD32-02 | Phase 171 | Complete |
-| AUD32-03 | Phase 171 | Complete |
-| AUD32-04 | Phase 171 | Complete |
-| AUD32-05 | Phase 171 | Complete |
-| EN32-01 | Phase 172 | Complete |
-| EN32-02 | Phase 172 | Complete |
-| EN32-03 | Phase 172 | Complete |
-| EN32-04 | Phase 172 | Complete |
-| EN32-05 | Phase 172 | Complete |
-| DE32-01 | Phase 172 | Complete |
-| DE32-02 | Phase 172 | Complete |
-| DE32-03 | Phase 172 | Complete |
-| DE32-04 | Phase 172 | Complete |
-| DE32-05 | Phase 172 | Complete |
-| FR32-01 | Phase 173 | Complete |
-| FR32-02 | Phase 173 | Complete |
-| FR32-03 | Phase 173 | Complete |
-| FR32-04 | Phase 173 | Complete |
-| FR32-05 | Phase 173 | Complete |
-| IT32-01 | Phase 173 | Complete |
-| IT32-02 | Phase 173 | Complete |
-| IT32-03 | Phase 173 | Complete |
-| IT32-04 | Phase 173 | Complete |
-| IT32-05 | Phase 173 | Complete |
-| TERM32-01 | Phase 174 | Complete |
-| TERM32-02 | Phase 174 | Complete |
-| TERM32-03 | Phase 174 | Complete |
-| TERM32-04 | Phase 174 | Complete |
-| TERM32-05 | Phase 174 | Complete |
-| ART32-01 | Phase 174 | Complete |
-| ART32-02 | Phase 174 | Complete |
-| ART32-03 | Phase 174 | Complete |
-| ART32-04 | Phase 174 | Complete |
-| ART32-05 | Phase 174 | Complete |
-| UI32-01 | Phase 175 | Complete |
-| UI32-02 | Phase 175 | Complete |
-| UI32-03 | Phase 175 | Complete |
-| UI32-04 | Phase 175 | Complete |
-| UI32-05 | Phase 175 | Complete |
-| QA32-01 | Phase 176 | Complete |
-| QA32-02 | Phase 176 | Complete |
-| QA32-03 | Phase 176 | Complete |
-| QA32-04 | Phase 176 | Complete |
-| QA32-05 | Phase 176 | Complete |
+| NAV33-01 | Phase 177 | Pending |
+| NAV33-02 | Phase 177 | Pending |
+| NAV33-03 | Phase 177 | Pending |
+| NAV33-04 | Phase 177 | Pending |
+| NAV33-05 | Phase 177 | Pending |
+| NAV33-06 | Phase 177 | Pending |
+| NAV33-07 | Phase 177 | Pending |
+| NAV33-08 | Phase 177 | Pending |
+| NAV33-09 | Phase 177 | Pending |
+| HOME33-01 | Phase 178 | Pending |
+| HOME33-02 | Phase 178 | Pending |
+| HOME33-03 | Phase 178 | Pending |
+| HOME33-04 | Phase 178 | Pending |
+| HOME33-05 | Phase 178 | Pending |
+| HOME33-06 | Phase 178 | Pending |
+| HOME33-07 | Phase 178 | Pending |
+| HOME33-08 | Phase 178 | Pending |
+| HOME33-09 | Phase 178 | Pending |
+| HOME33-10 | Phase 178 | Pending |
+| HOME33-11 | Phase 178 | Pending |
+| L10N33-01 | Phase 179 | Pending |
+| L10N33-02 | Phase 179 | Pending |
+| L10N33-03 | Phase 179 | Pending |
+| L10N33-04 | Phase 179 | Pending |
+| L10N33-05 | Phase 179 | Pending |
+| L10N33-06 | Phase 179 | Pending |
+| L10N33-07 | Phase 179 | Pending |
+| L10N33-08 | Phase 179 | Pending |
+| DOC33-01 | Phase 180 | Pending |
+| DOC33-02 | Phase 180 | Pending |
+| DOC33-03 | Phase 180 | Pending |
+| DOC33-04 | Phase 180 | Pending |
+| DOC33-05 | Phase 180 | Pending |
+| DOC33-06 | Phase 180 | Pending |
+| DOC33-07 | Phase 180 | Pending |
+| QA33-01 | Phase 180 | Pending |
+| QA33-02 | Phase 180 | Pending |
+| QA33-03 | Phase 180 | Pending |
+| QA33-04 | Phase 180 | Pending |
+| QA33-05 | Phase 180 | Pending |
+| QA33-06 | Phase 180 | Pending |
+| QA33-07 | Phase 180 | Pending |
+| QA33-08 | Phase 180 | Pending |
 
 **Coverage:**
-- v1 requirements: 45 total
-- Mapped to phases: 45
+- v1 requirements: 43 total
+- Mapped to phases: 43
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 after Phase 32 milestone initialization*
+*Last updated: 2026-05-27 after Phase 33 milestone initialization*

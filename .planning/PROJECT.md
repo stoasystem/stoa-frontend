@@ -24,16 +24,18 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Friendly Chat and billing state copy.
 - Final language QA report, README update, build verification, and cross-locale smoke evidence.
 
-## Current Milestone: Phase 33 candidate: Real User Testing Preparation and Feedback Operations
+## Current Milestone: v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization
 
-**Goal:** Prepare real student, parent, and teacher testing using the cleaned, integrated learning flow from Phase 31 and the language/product-trust baseline from Phase 32.
+**Goal:** Make the homepage clearly present Practice Game / Practice Path as a low-friction entry into STOA's learning platform, while preserving Learning Chat, Professional Teacher Support, and Parent Report as the full product hierarchy.
 
 **Target features:**
-- Define student testing tasks for Practice -> Learning Chat.
-- Define parent testing tasks for Parent Report and learning activity clarity.
-- Define teacher testing tasks for Practice-origin support context.
-- Prepare feedback intake, issue triage, and decision criteria.
-- Decide which surface should be optimized next based on real feedback.
+- Add a clearer homepage Practice Game / Practice Path entry after Hero and before the broader How STOA Works flow.
+- Turn Practice from explanatory homepage content into a clickable learning entry with a visible Start Practice CTA.
+- Route unauthenticated users to `/login?next=/practice`, authenticated students to `/practice`, and authenticated parent/tutor/admin users to their role home pages.
+- Add Practice Entry Card, Practice Preview, and role-aware Start Practice navigation logic.
+- Add English, German, French, and Italian Practice entry copy that explains short practice, hints, and Learning Chat handoff.
+- Preserve STOA's hierarchy: Practice starts learning, Learning Chat explains stuck steps, Professional Teacher Support escalates unresolved confusion, and Parent Report gives family visibility.
+- Update homepage CTA hierarchy docs, Practice homepage-entry docs, IA map, demo flow, QA checklist, README handoff, and build verification.
 
 ## Current State
 
@@ -110,8 +112,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Phase 33 should prepare external user testing for the integrated Practice -> Learning Chat -> teacher support -> Parent Report flow.
-- Testing should cover student comprehension, parent visibility, teacher request context, feedback intake, and issue triage operations.
+- Phase 33 should make Practice Game / Practice Path an unmistakable homepage entry without making STOA look like only a game.
+- Homepage Start Practice should route correctly for unauthenticated users, students, parents, tutors, and admins.
+- Practice entry copy and preview should make the sequence clear: short practice first, hint when needed, Learning Chat for explanation, teacher support as escalation, Parent Report for visibility.
+- Four-language Practice entry copy should fit mobile and desktop UI without overflow.
+- Documentation, demo flow, QA checklist, README, and build verification should make the homepage-to-Practice funnel ready for follow-up user testing.
 
 ### Out of Scope
 
@@ -259,6 +264,11 @@ Current codebase facts:
 - **Phase 32 scope lock**: Phase 32 is a language QA and development-artifact cleanup milestone only. It must not add new features, new pages, new languages, curriculum expansion, backend/database work, product-structure changes, or broad UI redesign.
 - **Phase 32 user-facing cleanup target**: Forbidden/high-risk terms are prohibited in user-facing UI, but may remain in developer docs, tests, internal code identifiers, and hidden debug infrastructure when technically accurate.
 - **Phase 32 locale quality**: English should remain calm and education-centered, German should be natural and concise, French should use correct apostrophes and clear phrasing, and Italian should be warm, natural, and compact enough for UI.
+- **Phase 33 homepage entry scope**: Phase 33 may refine homepage Practice entry UI, CTA routing, four-language copy, docs, demo flow, and QA evidence, but must not add new Practice subjects, expand curriculum, rebuild Learning Chat, redesign Parent Report, add backend/database work, or introduce complex gamification.
+- **Phase 33 Duolingo inspiration boundary**: Duolingo is a mechanism reference for short practice, visible progress, immediate feedback, and motivation only. STOA must not copy Duolingo code, brand, visual style, mascot cues, green palette, reward economy, streak pressure, hearts, gems, leaderboards, shops, or user-facing "Duolingo-style" wording.
+- **Phase 33 product hierarchy**: Practice is one entry into the learning platform. Learning Chat remains the core explanation surface, Professional Teacher Support remains the escalation layer, and Parent Report remains the visibility layer.
+- **Phase 33 CTA routing**: Homepage Start Practice should send unauthenticated users to `/login?next=/practice`, students to `/practice`, parents to `/parent`, tutors to `/tutor`, admins to `/admin`, and organization roles to their existing organization home.
+- **Phase 33 localization fit**: Practice entry labels and preview copy must be verified in English, German, French, and Italian on mobile and desktop; long German/French CTAs should wrap or shorten safely instead of shrinking typography.
 - **Public demo release boundary**: The public demo release may be externally accessible for investors, parents, teachers, partners, and internal communication support, but it is not a production backend, paid launch, large-scale public opening, final cloud architecture, or full commercial operations system.
 - **Launch-candidate branch rule**: The release branch should be created only after build, core demo flow, P0 bug, copy/design/translation/API lock, and approval checks pass. After creation, it accepts bug fixes only.
 - **Demo account boundary**: Fixed demo credentials may be documented for internal demo operation, but they should not appear in normal user-visible UI.
@@ -363,6 +373,9 @@ Current codebase facts:
 | Make Phase 32 an audit and cleanup pass, not feature work | The product structure is already integrated; the next risk is language trust, translation quality, and visible development residue | v1.30 Complete |
 | Skip external research for Phase 32 | The user provided a precise audit scope and the milestone does not introduce new product capabilities requiring ecosystem research | v1.30 Complete |
 | Treat user-visible copy as the source of truth for product trust | Developer docs and code can retain technical terms, but visible UI must read like a stable education product | v1.30 Complete |
+| Make Practice a clearer homepage entry without making STOA game-first | Research supports short challenges, visible progress, hints, and immediate feedback as motivating, but STOA's trust model depends on Learning Chat, teacher support, and Parent Report remaining visible | — Pending |
+| Keep Phase 33 frontend-only and route/copy/UI focused | The funnel problem is homepage clarity and CTA routing, not curriculum depth, backend persistence, or new Learning Assistant capability | — Pending |
+| Use Duolingo-inspired mechanics only as interaction inspiration | STOA can borrow short-session cadence and feedback clarity while avoiding Duolingo brand/visual/reward systems and game-first public language | — Pending |
 
 ## Evolution
 
@@ -382,4 +395,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after v1.28 milestone completion*
+*Last updated: 2026-05-27 after v1.31 milestone start*

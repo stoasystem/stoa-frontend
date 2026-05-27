@@ -33,128 +33,95 @@
 - ✅ **v1.28 Phase 30: Final Demo Curriculum Packaging, External Testing, and Product Story Refinement** - Phases 159-164 (shipped 2026-05-26)
 - ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
+- 🔄 **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (planned 2026-05-27)
 
 ## Phases
 
-- [x] **Phase 171: Language QA Framework and Artifact Inventory** - Establish the copy matrix, cleanup checklist, audit report structure, and search inventory for user-facing artifacts.
-- [x] **Phase 172: English and German Copy Accuracy Review** - Review and refine English and German copy for accuracy, tone, terminology, and UI-safe length.
-- [x] **Phase 173: French and Italian Copy Accuracy Review** - Review and refine French and Italian copy for natural language, apostrophes, CTA length, and education tone.
-- [x] **Phase 174: Terminology Consistency and Development Artifact Cleanup** - Remove user-facing development language and align cross-locale product terminology.
-- [x] **Phase 175: Cross-Locale UI Fit and Missing-Key QA** - Verify responsive layout, key leakage, navigation, footer, forms, Practice, Chat, Parent, Tutor, Pricing, Billing, and Contact across locales.
-- [x] **Phase 176: Final Language QA Report, README, Build, and Demo Verification** - Complete final language QA report, README handoff, build, smoke evidence, and milestone closure.
+- [ ] **Phase 177: Start Practice Funnel and Route Contract** - Define and implement the role-aware Start Practice route contract so the homepage CTA sends each user type to the correct destination.
+- [ ] **Phase 178: Homepage Practice Entry UI and Preview Components** - Build the clearer Practice entry card, preview, and CTA hierarchy using STOA's premium design language.
+- [ ] **Phase 179: Four-Language Mobile Fit and Accessibility QA** - Localize and verify the Practice entry across English, German, French, and Italian with mobile, keyboard, and reduced-motion checks.
+- [ ] **Phase 180: Demo Flow, Documentation, README, and Build Verification** - Document the homepage-to-Practice flow, update QA and README handoff, run demo verification, and confirm `npm run build`.
 
 ## Phase Details
 
-### Phase 171: Language QA Framework and Artifact Inventory
+### Phase 177: Start Practice Funnel and Route Contract
 
-**Goal**: Phase 32 has a concrete audit framework before copy edits begin.
-**Depends on**: Phase 170
-**Requirements**: AUD32-01, AUD32-02, AUD32-03, AUD32-04, AUD32-05
+**Goal**: Homepage Start Practice has a correct, centralized route contract before UI polish or testing begins.
+**Depends on**: Phase 176
+**Requirements**: NAV33-01, NAV33-02, NAV33-03, NAV33-04, NAV33-05, NAV33-06, NAV33-07, NAV33-08, NAV33-09
 **Success Criteria** (what must be TRUE):
-  1. `docs/language/global-copy-audit-matrix.md` exists with the required audit columns.
-  2. `docs/qa/development-artifact-audit.md` exists and records the search terms and user-facing classification method.
-  3. `docs/qa/user-facing-copy-cleanup-checklist.md` exists and covers language quality, artifact cleanup, UI fit, missing keys, and build.
-  4. The audit scope explicitly includes public, student, parent, tutor, admin/internal-facing product pages, and shared components.
-  5. The milestone boundary states that Phase 32 does not add features, pages, languages, curriculum, backend, database, redesign, or `/Users/zhdeng/newweb` changes.
-**Plans**: 171-PLAN.md
+  1. Homepage Start Practice is defined as a concrete Practice entry action, not only explanatory copy.
+  2. Unauthenticated users are routed to `/login?next=/practice`.
+  3. Authenticated students are routed to `/practice`.
+  4. Authenticated parent, tutor, admin, and organization users are routed to their own role home pages.
+  5. Student login honors safe `next=/practice` behavior, and registration behavior is documented.
+**Plans**: 177-PLAN.md
 **UI hint**: no
 
-### Phase 172: English and German Copy Accuracy Review
+### Phase 178: Homepage Practice Entry UI and Preview Components
 
-**Goal**: English and German user-facing copy becomes calm, accurate, natural, and UI-safe.
-**Depends on**: Phase 171
-**Requirements**: EN32-01, EN32-02, EN32-03, EN32-04, EN32-05, DE32-01, DE32-02, DE32-03, DE32-04, DE32-05
+**Goal**: Homepage users can understand in one glance that Practice is a short learning entry that leads to hints, Learning Chat, teacher support, and parent visibility.
+**Depends on**: Phase 177
+**Requirements**: HOME33-01, HOME33-02, HOME33-03, HOME33-04, HOME33-05, HOME33-06, HOME33-07, HOME33-08, HOME33-09, HOME33-10, HOME33-11
 **Success Criteria** (what must be TRUE):
-  1. English copy is reviewed and corrected across the required surfaces.
-  2. English copy avoids sales-heavy, SaaS-heavy, technical, hype-driven, or pressure-based wording.
-  3. German copy is reviewed and corrected across the required surfaces.
-  4. German copy avoids direct translation, awkward compound words, over-formality, and overly long titles.
-  5. English and German final review docs record findings, fixes, known gaps, and approval.
-**Plans**: 172-PLAN.md
+  1. `HomePracticeEntry`, `PracticeEntryCard`, and `HomePracticePreview` exist and are wired into the homepage.
+  2. The entry appears after Hero and before or inside the broader How STOA Works flow.
+  3. The preview shows a concise equation path with one-step equations, quadratic basics, and linear systems.
+  4. Copy explains short practice, hint-first recovery, and Learning Chat handoff without game-first or Duolingo-facing wording.
+  5. CTA hierarchy keeps `Start Learning` primary, `Start Practice` clear but subordinate, and `How it works` secondary.
+**Plans**: 178-PLAN.md
 **UI hint**: yes
 
-### Phase 173: French and Italian Copy Accuracy Review
+### Phase 179: Four-Language Mobile Fit and Accessibility QA
 
-**Goal**: French and Italian user-facing copy becomes natural, accurate, and stable in compact UI.
-**Depends on**: Phase 172
-**Requirements**: FR32-01, FR32-02, FR32-03, FR32-04, FR32-05, IT32-01, IT32-02, IT32-03, IT32-04, IT32-05
+**Goal**: The Practice entry works across supported locales and viewports without layout, motion, or accessibility regressions.
+**Depends on**: Phase 178
+**Requirements**: L10N33-01, L10N33-02, L10N33-03, L10N33-04, L10N33-05, L10N33-06, L10N33-07, L10N33-08
 **Success Criteria** (what must be TRUE):
-  1. French copy is reviewed and corrected across the required surfaces.
-  2. French apostrophes, contractions, punctuation, and education wording are natural and consistent.
-  3. Italian copy is reviewed and corrected across the required surfaces.
-  4. Italian CTAs, forms, state copy, and navigation labels remain natural and compact.
-  5. French and Italian final review docs record findings, fixes, known gaps, and approval.
-**Plans**: 173-PLAN.md
+  1. English, German, French, and Italian Practice entry copy and preview labels are present.
+  2. German and French CTAs fit or wrap safely on mobile.
+  3. Homepage Practice entry has no horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
+  4. Keyboard focus order remains understandable through the Practice entry actions.
+  5. Hover/reveal motion respects reduced-motion preferences.
+**Plans**: 179-PLAN.md
 **UI hint**: yes
 
-### Phase 174: Terminology Consistency and Development Artifact Cleanup
+### Phase 180: Demo Flow, Documentation, README, and Build Verification
 
-**Goal**: User-facing UI no longer exposes development artifacts and product terminology is consistent across locales.
-**Depends on**: Phase 173
-**Requirements**: TERM32-01, TERM32-02, TERM32-03, TERM32-04, TERM32-05, ART32-01, ART32-02, ART32-03, ART32-04, ART32-05
+**Goal**: Phase 33 is documented, verified, and ready to feed Phase 34 user testing.
+**Depends on**: Phase 179
+**Requirements**: DOC33-01, DOC33-02, DOC33-03, DOC33-04, DOC33-05, DOC33-06, DOC33-07, QA33-01, QA33-02, QA33-03, QA33-04, QA33-05, QA33-06, QA33-07, QA33-08
 **Success Criteria** (what must be TRUE):
-  1. Product terms are aligned across English, German, French, and Italian without forced literal translation.
-  2. Copy does not imply STOA is only a game platform, only a chat tool, or a teacher replacement.
-  3. User-facing UI is searched for the Phase 32 forbidden/high-risk development terms.
-  4. User-facing development artifacts are rewritten into product-safe language or confirmed as non-user-facing.
-  5. Missing translation key leakage, `undefined`, and `[object Object]` risks are checked and addressed where found.
-**Plans**: 174-PLAN.md
-**UI hint**: no
-
-### Phase 175: Cross-Locale UI Fit and Missing-Key QA
-
-**Goal**: Four-language copy fits the existing STOA UI across required routes and viewport widths.
-**Depends on**: Phase 174
-**Requirements**: UI32-01, UI32-02, UI32-03, UI32-04, UI32-05
-**Success Criteria** (what must be TRUE):
-  1. Required pages are checked at 375px, 430px, 768px, 1024px, and 1440px where feasible.
-  2. Navbar, footer, contact form, register flow, Practice flow, Learning Chat, Parent Report, Tutor Request Detail, Pricing, Billing, and Contact remain stable across locales.
-  3. German headings and long words do not overflow or break layout.
-  4. French apostrophes and longer text wrap professionally.
-  5. Italian CTAs and form text fit buttons, cards, and compact mobile surfaces.
-**Plans**: 175-PLAN.md
-**UI hint**: yes
-
-### Phase 176: Final Language QA Report, README, Build, and Demo Verification
-
-**Goal**: Phase 32 is documented, verified, and ready for real user testing preparation.
-**Depends on**: Phase 175
-**Requirements**: QA32-01, QA32-02, QA32-03, QA32-04, QA32-05
-**Success Criteria** (what must be TRUE):
-  1. `docs/language/final-language-qa-report.md` summarizes scope, pages checked, languages checked, issues found/fixed, known issues, per-language summaries, and approval.
-  2. README includes the Phase 32 Cross-Locale Language QA and Artifact Cleanup section.
-  3. `npm run build` succeeds.
-  4. Four-language smoke or visual QA evidence covers the required representative surfaces.
-  5. The full demo flow remains coherent and user-facing UI does not show development artifacts.
-**Plans**: 176-PLAN.md
+  1. Required homepage, Practice, IA, and demo docs exist and describe the Practice entry funnel.
+  2. QA checklist covers Practice entry clarity, routing, layout, four-language fit, and product hierarchy.
+  3. Demo flow records homepage -> Practice behavior for unauthenticated and authenticated users.
+  4. README includes Phase 33 handoff and known Phase 34 follow-up.
+  5. `npm run build` succeeds and any remaining gaps are recorded.
+**Plans**: 180-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 171. Language QA Framework and Artifact Inventory | 1/1 | Complete | 2026-05-27 |
-| 172. English and German Copy Accuracy Review | 1/1 | Complete | 2026-05-27 |
-| 173. French and Italian Copy Accuracy Review | 1/1 | Complete | 2026-05-27 |
-| 174. Terminology Consistency and Development Artifact Cleanup | 1/1 | Complete | 2026-05-27 |
-| 175. Cross-Locale UI Fit and Missing-Key QA | 1/1 | Complete | 2026-05-27 |
-| 176. Final Language QA Report, README, Build, and Demo Verification | 1/1 | Complete | 2026-05-27 |
+| 177. Start Practice Funnel and Route Contract | 0/1 | Pending | — |
+| 178. Homepage Practice Entry UI and Preview Components | 0/1 | Pending | — |
+| 179. Four-Language Mobile Fit and Accessibility QA | 0/1 | Pending | — |
+| 180. Demo Flow, Documentation, README, and Build Verification | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 171 | 5 | AUD32-01, AUD32-02, AUD32-03, AUD32-04, AUD32-05 |
-| 172 | 10 | EN32-01, EN32-02, EN32-03, EN32-04, EN32-05, DE32-01, DE32-02, DE32-03, DE32-04, DE32-05 |
-| 173 | 10 | FR32-01, FR32-02, FR32-03, FR32-04, FR32-05, IT32-01, IT32-02, IT32-03, IT32-04, IT32-05 |
-| 174 | 10 | TERM32-01, TERM32-02, TERM32-03, TERM32-04, TERM32-05, ART32-01, ART32-02, ART32-03, ART32-04, ART32-05 |
-| 175 | 5 | UI32-01, UI32-02, UI32-03, UI32-04, UI32-05 |
-| 176 | 5 | QA32-01, QA32-02, QA32-03, QA32-04, QA32-05 |
+| 177 | 9 | NAV33-01, NAV33-02, NAV33-03, NAV33-04, NAV33-05, NAV33-06, NAV33-07, NAV33-08, NAV33-09 |
+| 178 | 11 | HOME33-01, HOME33-02, HOME33-03, HOME33-04, HOME33-05, HOME33-06, HOME33-07, HOME33-08, HOME33-09, HOME33-10, HOME33-11 |
+| 179 | 8 | L10N33-01, L10N33-02, L10N33-03, L10N33-04, L10N33-05, L10N33-06, L10N33-07, L10N33-08 |
+| 180 | 15 | DOC33-01, DOC33-02, DOC33-03, DOC33-04, DOC33-05, DOC33-06, DOC33-07, QA33-01, QA33-02, QA33-03, QA33-04, QA33-05, QA33-06, QA33-07, QA33-08 |
 
-**Total requirements:** 45
-**Mapped requirements:** 45
+**Total requirements:** 43
+**Mapped requirements:** 43
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Phase 32 complete. Next recommended milestone: Phase 33 Real User Testing Preparation and Feedback Operations.
+Phase 177: Start Practice Funnel and Route Contract.
