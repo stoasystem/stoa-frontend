@@ -13,6 +13,35 @@ const mockStudentProfile: StudentProfile = {
   updatedAt: '2026-05-27T09:00:00Z',
 }
 
+const mockStudentLearningHistory: { items: LearningHistoryItem[] } = {
+  items: [
+    {
+      id: 'history-practice-equations',
+      subject: 'Mathematics',
+      title: 'Practice Path: Solving equations in two steps',
+      summary:
+        'Completed a short Practice Path lesson and checked each operation before moving to the final answer.',
+      createdAt: '2026-05-27T10:30:00Z',
+    },
+    {
+      id: 'history-learning-chat-equations',
+      subject: 'Mathematics',
+      title: 'Learning Chat explanation',
+      summary:
+        'Asked for a clearer explanation after a practice hint was not enough to understand the next step.',
+      createdAt: '2026-05-26T15:20:00Z',
+    },
+    {
+      id: 'history-teacher-support-linear-systems',
+      subject: 'Mathematics',
+      title: 'Teacher support request',
+      summary:
+        'Requested professional teacher support after repeated confusion with substitution in a linear system.',
+      createdAt: '2026-05-25T16:45:00Z',
+    },
+  ],
+}
+
 export async function getStudentProfile() {
   return withDemoFallback(async () => {
     const response = await httpClient.get<StudentProfile>('/students/me/profile')
@@ -32,8 +61,10 @@ export async function updateStudentProfile(payload: Partial<StudentProfile>) {
 }
 
 export async function getStudentLearningHistory() {
-  const response = await httpClient.get<{ items: LearningHistoryItem[] }>(
-    '/students/me/learning-history',
-  )
-  return response.data
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<{ items: LearningHistoryItem[] }>(
+      '/students/me/learning-history',
+    )
+    return response.data
+  }, mockStudentLearningHistory)
 }

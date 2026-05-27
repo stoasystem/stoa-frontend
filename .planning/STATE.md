@@ -129,6 +129,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Remove redundant app sidebar footer links | Browser check on lesson route; `npm run build` |
 | 2026-05-27 | Fix Learning Chat sidebar label capitalization | Browser check on lesson route; `npm run build` |
 | 2026-05-27 | Fix Student Profile mock-mode loading failure | Browser check on `/profile`; `npm run build` |
+| 2026-05-27 | Fix Student Learning History mock-mode loading failure | Browser check on `/learning-history`; `npm run build` |
 
 ### Blockers/Concerns
 
