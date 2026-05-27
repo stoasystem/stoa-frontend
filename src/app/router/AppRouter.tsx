@@ -41,6 +41,7 @@ import { ParentMonthlyReportPage } from '@/pages/parent/ParentMonthlyReportPage'
 import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
+import { ParentReportsPage } from '@/pages/parent/ParentReportsPage'
 import { OrganizationAnalyticsPage } from '@/pages/organization/OrganizationAnalyticsPage'
 import { OrganizationDashboardPage } from '@/pages/organization/OrganizationDashboardPage'
 import { OrganizationReportsPage } from '@/pages/organization/OrganizationReportsPage'
@@ -119,6 +120,7 @@ export function AppRouter() {
           </Route>
           <Route element={<RoleRoute allowedRoles={['parent']} />}>
             <Route path="/parent" element={<ParentDashboardPage />} />
+            <Route path="/parent/reports" element={<ParentReportsPage />} />
             <Route path="/parent/children/:childId" element={<ChildSummaryPage />} />
             <Route path="/parent/children/:childId/report" element={<ChildReportPage />} />
             <Route path="/parent/children/:childId/monthly-report" element={<ParentMonthlyReportPage />} />

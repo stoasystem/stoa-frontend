@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
 import { FeedbackButton } from '@/components/feedback/FeedbackButton'
@@ -71,18 +71,28 @@ const navLabelKeys: Record<string, string> = {
   Users: 'navigation.users',
 }
 
-function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: boolean }) {
+function NavItemLink({
+  item,
+  items,
+  compact = false,
+}: {
+  item: AppNavItem
+  items: AppNavItem[]
+  compact?: boolean
+}) {
   const Icon = navIcons[item.icon]
   const { t } = useTranslation('common')
+  const location = useLocation()
   const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
+  const active = isActiveNavItem(item, items, location.pathname)
 
   return (
     <NavLink
-      className={({ isActive }) =>
+      className={() =>
         cn(
           'flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
           compact ? 'min-w-0 flex-1 justify-center px-2 py-2 text-xs' : 'px-2 py-1.5',
-          isActive
+          active
             ? 'platform-nav-active shadow-sm'
             : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
         )
@@ -96,16 +106,18 @@ function NavItemLink({ item, compact = false }: { item: AppNavItem; compact?: bo
   )
 }
 
-function TopNavItemLink({ item }: { item: AppNavItem }) {
+function TopNavItemLink({ item, items }: { item: AppNavItem; items: AppNavItem[] }) {
   const { t } = useTranslation('common')
+  const location = useLocation()
   const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
+  const active = isActiveNavItem(item, items, location.pathname)
 
   return (
     <NavLink
-      className={({ isActive }) =>
+      className={() =>
         cn(
           'inline-flex min-h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors',
-          isActive
+          active
             ? 'platform-nav-active shadow-sm'
             : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
         )
@@ -135,7 +147,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           </Link>
           <nav aria-label="Primary" className="mt-6 flex flex-1 flex-col gap-2">
             {primaryItems.map((item) => (
-              <NavItemLink item={item} key={`${item.path}-${item.label}`} />
+              <NavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}`} />
             ))}
             {secondaryItems.length > 0 && (
               <div className="mt-4 border-t pt-4">
@@ -144,7 +156,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 </p>
                 <div className="flex flex-col gap-2">
                   {secondaryItems.map((item) => (
-                    <NavItemLink item={item} key={`${item.path}-${item.label}`} />
+                    <NavItemLink item={item} items={items} key={`${item.path}-${item.label}`} />
                   ))}
                 </div>
               </div>
@@ -172,7 +184,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex"
               >
                 {primaryItems.map((item) => (
-                  <TopNavItemLink item={item} key={`${item.path}-${item.label}-top`} />
+                  <TopNavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}-top`} />
                 ))}
               </nav>
               <div className="ml-auto flex shrink-0 items-center gap-3">
@@ -193,12 +205,24 @@ export function AppLayout({ children }: { children: ReactNode }) {
         >
           <div className="mx-auto flex max-w-md gap-1">
             {mobileItems.map((item) => (
-              <NavItemLink compact item={item} key={`${item.path}-${item.label}-mobile`} />
+              <NavItemLink compact item={item} items={mobileItems} key={`${item.path}-${item.label}-mobile`} />
             ))}
           </div>
         </nav>
       )}
       <InternalDebugPanel />
     </div>
+  )
+}
+
+function isActiveNavItem(item: AppNavItem, items: AppNavItem[], pathname: string) {
+  if (pathname === item.path) return true
+  if (!pathname.startsWith(`${item.path}/`)) return false
+
+  return !items.some(
+    (candidate) =>
+      candidate.path !== item.path &&
+      candidate.path.startsWith(`${item.path}/`) &&
+      (pathname === candidate.path || pathname.startsWith(`${candidate.path}/`)),
   )
 }

@@ -126,13 +126,13 @@ export const navItems: AppNavItem[] = [
   },
   {
     label: 'Reports',
-    path: '/parent',
+    path: '/parent/reports',
     role: 'parent',
     priority: 'primary',
     status: 'core',
     icon: 'reports',
     mobile: true,
-    description: 'Enter child reports from the child list.',
+    description: 'Open weekly and monthly child reports.',
   },
   {
     label: 'Billing',
@@ -374,6 +374,7 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/profile', pageName: 'StudentProfilePage', role: 'student', module: 'Account', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Student profile.' },
   { path: '/learning-history', pageName: 'StudentLearningHistoryPage', role: 'student', module: 'Learning', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Student learning history.' },
   { path: '/parent', pageName: 'ParentDashboardPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Parent overview and child list.' },
+  { path: '/parent/reports', pageName: 'ParentReportsPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Parent report hub for weekly and monthly child reports.' },
   { path: '/parent/children/:childId', pageName: 'ChildSummaryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Child summary detail.' },
   { path: '/parent/children/:childId/report', pageName: 'ChildReportPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Weekly child report.' },
   { path: '/parent/children/:childId/monthly-report', pageName: 'ParentMonthlyReportPage', role: 'parent', module: 'Parent', status: 'demo', priority: 'P1', navPriority: 'hidden', purpose: 'Monthly child report demo.' },
