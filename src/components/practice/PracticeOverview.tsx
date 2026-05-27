@@ -1,82 +1,38 @@
-import { ArrowRight, BookOpen, CheckCircle2, Circle } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
+import { BookOpenCheck, ChevronRight } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { SectionHeader } from '@/components/common/SectionHeader'
 import { DailyGoalCard } from '@/components/practice/DailyGoalCard'
 import { MistakeReviewCard } from '@/components/practice/MistakeReviewCard'
 import { PracticeRoadmap } from '@/components/practice/PracticeRoadmap'
 import { StudyStreakCard } from '@/components/practice/StudyStreakCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { getPracticeLessonPath, getPracticeLessonPathFromIds, getPracticeTopicPath } from '@/lib/practiceRoutes'
+import { cn } from '@/lib/utils'
+import { getPracticeLessonPathFromIds } from '@/lib/practiceRoutes'
 import type {
   PracticeOverview as PracticeOverviewData,
   PracticeRoadmap as PracticeRoadmapData,
   PracticeRoadmapLesson,
+  PracticeSubject,
   PracticeTopic,
 } from '@/types/practice'
 
-function TopicCard({ topic, isRecommended }: { topic: PracticeTopic; isRecommended?: boolean }) {
-  const path = getPracticeTopicPath(topic.subjectId, topic.id)
-  const pct = topic.progress ?? 0
-  const isDone = pct === 100
-
-  return (
-    <Card className="group relative border-primary/10 bg-card/95 shadow-[var(--platform-shadow-soft)] transition-all hover:border-primary/30 hover:shadow-md">
-      <CardContent className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 items-start gap-3">
-            <div className="mt-0.5 shrink-0">
-              {isDone
-                ? <CheckCircle2 className="h-5 w-5 text-[hsl(var(--stoa-brand-burgundy))]" />
-                : <Circle className="h-5 w-5 text-muted-foreground/40" />
-              }
-            </div>
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-semibold leading-tight">{topic.title}</h3>
-                {isRecommended && (
-                  <Badge variant="secondary" className="text-[10px]">Up next</Badge>
-                )}
-              </div>
-              <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
-                {topic.description}
-              </p>
-            </div>
-          </div>
-          <Button asChild size="sm" variant={isRecommended ? 'default' : 'outline'} className="shrink-0">
-            <Link to={path}>
-              {isDone ? 'Review' : 'Start'}
-              <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-        <div className="mt-4 space-y-1">
-          <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{pct}% completed</span>
-          </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-[hsl(var(--stoa-brand-burgundy-soft))]">
-            <div
-              className="h-full rounded-full bg-[hsl(var(--stoa-brand-burgundy))] transition-all"
-              style={{ width: `${pct}%` }}
-            />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export function PracticeOverview({
+  onSubjectSelect,
   overview,
   roadmap,
+  selectedSubjectId,
 }: {
+  onSubjectSelect: (subjectId: string) => void
   overview: PracticeOverviewData
   roadmap?: PracticeRoadmapData
+  selectedSubjectId?: string
 }) {
-  const { t } = useTranslation('practice')
   const navigate = useNavigate()
-  const recommendedTopicId = overview.recommendedLesson.topicId
+  const selectedSubject = overview.subjects.find((subject) => subject.id === selectedSubjectId)
+  const selectedTopic = selectedSubject
+    ? overview.topics.find((topic) => topic.subjectId === selectedSubject.id)
+    : undefined
 
   function handleRoadmapLessonClick(lesson: PracticeRoadmapLesson) {
     navigate(getPracticeLessonPathFromIds(lesson.subjectId, lesson.topicId, lesson.id))
@@ -84,97 +40,137 @@ export function PracticeOverview({
 
   return (
     <div className="space-y-8">
-      {/* ── Continue banner ── */}
-      <section className="rounded-lg border border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--platform-surface-app))_100%)] p-5 shadow-[var(--platform-shadow-soft)]">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="brand-section-kicker">{t('continuePractice')}</p>
-            <h2 className="mt-2 text-2xl font-semibold">{overview.recommendedLesson.title}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">{overview.recommendedLesson.topic}</p>
-          </div>
-          <Button asChild size="lg" className="shrink-0">
-            <Link to={getPracticeLessonPath(overview.recommendedLesson)}>
-              {t('continuePractice')}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* ── Stats row ── */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {overview.dailyGoal && <DailyGoalCard {...overview.dailyGoal} />}
-        <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
-      </div>
-
-      {/* ── Roadmap for recommended topic ── */}
-      {roadmap && (
-        <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />
-      )}
-
-      {/* ── All topics ── */}
-      {overview.topics.length > 0 && (
-        <section className="space-y-4">
-          <div>
-            <p className="brand-section-kicker">All topics</p>
-            <h2 className="mt-2 text-2xl font-semibold">ZAP preparation path</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              All {overview.topics.length} topics for the Zentrale Aufnahmeprüfung
-            </p>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {overview.topics.map((topic) => (
-              <TopicCard
-                key={topic.id}
-                topic={topic}
-                isRecommended={topic.id === recommendedTopicId}
+      <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="space-y-4">
+          <SectionHeader
+            title="Choose a subject"
+            description="Start by choosing the school subject you want to practise today."
+          />
+          <div className="grid gap-4">
+            {overview.subjects.map((subject) => (
+              <SubjectSelectionCard
+                isSelected={subject.id === selectedSubjectId}
+                key={subject.id}
+                onSelect={() => onSubjectSelect(subject.id)}
+                subject={subject}
+                topic={overview.topics.find((item) => item.subjectId === subject.id)}
               />
             ))}
           </div>
+        </div>
+        <aside className="space-y-4">
+          <SectionHeader
+            title="Today"
+            description="Keep the practice rhythm visible before choosing a path."
+          />
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+            {overview.dailyGoal && <DailyGoalCard {...overview.dailyGoal} />}
+            <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
+          </div>
+        </aside>
+      </section>
+
+      {!selectedSubject && (
+        <section className="rounded-lg border border-dashed border-primary/25 bg-card/70 p-6 text-center shadow-[var(--platform-shadow-card)]">
+          <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
+            <BookOpenCheck className="h-5 w-5" aria-hidden="true" />
+          </div>
+          <h2 className="mt-4 text-xl font-semibold">Select a subject to open its Practice Path</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+            Path details stay hidden until a subject is selected.
+          </p>
         </section>
       )}
 
-      {/* ── Recent mistakes ── */}
-      {(overview.recentMistakes ?? []).length > 0 && (
+      {selectedSubject && (
+        <section className="space-y-5">
+          <SectionHeader
+            title={`${selectedSubject.name} Practice Path`}
+            description={selectedTopic?.description ?? selectedSubject.description}
+          />
+          {roadmap ? (
+            <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />
+          ) : (
+            <div className="rounded-lg border border-primary/15 bg-card/80 p-5 text-sm text-muted-foreground shadow-[var(--platform-shadow-card)]">
+              Loading the selected subject path...
+            </div>
+          )}
+        </section>
+      )}
+
+      {selectedSubject && (overview.recentMistakes ?? []).length > 0 && (
         <section className="space-y-4">
-          <div>
-            <p className="brand-section-kicker">Recent mistakes</p>
-            <h2 className="mt-2 text-2xl font-semibold">Review while the step is still fresh</h2>
-          </div>
-          {overview.recentMistakes.slice(0, 3).map((mistake) => (
+          <SectionHeader
+            title="Review work"
+            description="Recent mistakes and follow-up practice for the selected learning path."
+          />
+          {(overview.recentMistakes ?? []).slice(0, 2).map((mistake) => (
             <MistakeReviewCard key={mistake.id} mistake={mistake} />
           ))}
         </section>
       )}
-
-      {/* ── Subjects (secondary) ── */}
-      {overview.subjects.length > 0 && overview.topics.length === 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-            <p className="brand-section-kicker">Available subjects</p>
-          </div>
-          <div className="grid gap-4">
-            {overview.subjects.map((subject) => (
-              <Card key={subject.id} className="border-primary/10 bg-card/95 shadow-[var(--platform-shadow-soft)]">
-                <CardContent className="p-5">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <h3 className="text-xl font-semibold">{subject.name}</h3>
-                      <p className="mt-1 text-sm text-muted-foreground">{subject.description}</p>
-                    </div>
-                    <Button asChild variant="outline">
-                      <Link to={getPracticeTopicPath(subject.id)}>
-                        Explore <ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      )}
     </div>
+  )
+}
+
+function SubjectSelectionCard({
+  isSelected,
+  onSelect,
+  subject,
+  topic,
+}: {
+  isSelected: boolean
+  onSelect: () => void
+  subject: PracticeSubject
+  topic?: PracticeTopic
+}) {
+  return (
+    <Card
+      className={cn(
+        'border-primary/10 bg-card/95 shadow-[var(--platform-shadow-soft)] transition-colors',
+        isSelected && 'border-primary/35 bg-[hsl(var(--stoa-brand-burgundy-soft)_/_0.42)]',
+      )}
+    >
+      <CardContent className="p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div className="min-w-0">
+            <p className="brand-section-kicker">Subject</p>
+            <h3 className="mt-2 text-2xl font-semibold leading-tight">{subject.name}</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{subject.description}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              {subject.gradeLevels.map((gradeLevel) => (
+                <span
+                  className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1"
+                  key={gradeLevel.id}
+                >
+                  {gradeLevel.label}
+                </span>
+              ))}
+              {topic && (
+                <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
+                  Current topic: {topic.title}
+                </span>
+              )}
+            </div>
+          </div>
+          <Button
+            className={cn('shrink-0', isSelected && 'premium-primary-button text-white hover:text-white')}
+            onClick={onSelect}
+            type="button"
+            variant={isSelected ? 'default' : 'outline'}
+          >
+            {isSelected ? 'Selected' : 'Select subject'}
+            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
+        <div className="mt-5 h-2 overflow-hidden rounded-full bg-[hsl(var(--stoa-brand-burgundy-soft))]">
+          <div
+            className="h-full rounded-full bg-[hsl(var(--stoa-brand-burgundy))]"
+            style={{ width: `${subject.progress}%` }}
+          />
+        </div>
+        <p className="mt-2 text-xs text-muted-foreground">{subject.progress}% subject progress</p>
+      </CardContent>
+    </Card>
   )
 }

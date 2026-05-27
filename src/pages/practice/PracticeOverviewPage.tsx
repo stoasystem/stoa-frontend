@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import { PracticeOverview } from '@/components/practice/PracticeOverview'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -5,17 +6,16 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { defaultPracticeTopicId } from '@/lib/practiceRoutes'
 
 export function PracticeOverviewPage() {
+  const [selectedSubjectId, setSelectedSubjectId] = useState<string>()
   const overviewQuery = usePracticeOverviewQuery()
-
-  // Dynamically load roadmap for the recommended lesson's topic
-  const recommendedSubject = overviewQuery.data?.recommendedLesson?.subjectId ?? 'mathematics'
-  const recommendedTopic = overviewQuery.data?.recommendedLesson?.topicId ?? ''
-  const roadmapQuery = usePracticeRoadmapQuery(
-    recommendedSubject,
-    recommendedTopic,
-  )
+  const selectedTopicId = useMemo(() => {
+    if (!selectedSubjectId) return undefined
+    return overviewQuery.data?.topics.find((topic) => topic.subjectId === selectedSubjectId)?.id ?? defaultPracticeTopicId
+  }, [overviewQuery.data?.topics, selectedSubjectId])
+  const roadmapQuery = usePracticeRoadmapQuery(selectedSubjectId, selectedTopicId)
 
   return (
     <DashboardLayout>
@@ -29,8 +29,10 @@ export function PracticeOverviewPage() {
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
         {overviewQuery.data && (
           <PracticeOverview
+            onSubjectSelect={setSelectedSubjectId}
             overview={overviewQuery.data}
-            roadmap={recommendedTopic ? roadmapQuery.data : undefined}
+            roadmap={roadmapQuery.data}
+            selectedSubjectId={selectedSubjectId}
           />
         )}
       </PageContainer>
