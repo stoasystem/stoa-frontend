@@ -1,94 +1,96 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-27
-**Milestone:** v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
-**Core Value:** Developers can build and maintain STOA Practice Path as a general middle-school and high-school learning challenge system, while keeping the current Mathematics equations content as the first demo package rather than the final product scope.
+**Milestone:** v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
+**Core Value:** Developers can build and verify a subject-agnostic Practice roadmap experience where students see current position, completed lessons, next steps, locked content, and Learning Chat as the explanation path.
 
 ## v1 Requirements
 
-### Practice Path Scope Principle
+### Roadmap Experience
 
-- [x] **SCOPE34-01**: Documentation states that Practice Path is a general middle-school and high-school learning challenge system.
-- [x] **SCOPE34-02**: Documentation states that equations are only the first demo content package.
-- [x] **SCOPE34-03**: Documentation shows the canonical hierarchy: Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
-- [x] **SCOPE34-04**: Documentation shows the current demo hierarchy: Practice Path -> Mathematics -> Lower Secondary -> Equations -> Linear equations -> Solving two-step equations -> Challenges.
-- [x] **SCOPE34-05**: Documentation lists future expansion examples for Mathematics, Physics, Chemistry, and Biology without presenting them as implemented content.
-- [x] **SCOPE34-06**: Phase 28 docs are corrected to say "Equation Demo Content Package for the General Practice Path" rather than defining Practice Path scope.
-- [x] **SCOPE34-07**: Phase 30 docs are corrected to say the final demo curriculum is equation-focused while the product architecture remains general.
-- [x] **SCOPE34-08**: Phase 31 and Phase 33 docs are corrected so homepage Practice entry language does not imply Practice Path equals equations.
-- [x] **SCOPE34-09**: English and Chinese versions of the Practice Path Scope Principle are recorded for future developers.
+- [ ] **ROAD35-01**: Student can open `/practice` and see a roadmap-style Practice path instead of only a normal list or card grid.
+- [ ] **ROAD35-02**: Student can open a topic roadmap at `/practice/:subjectId/:topicId`, including the current demo route for Mathematics / Equations.
+- [ ] **ROAD35-03**: Student can see subject, grade level, topic, unit, lesson, and challenge progression in the Practice roadmap.
+- [ ] **ROAD35-04**: Student can see a progress percentage for the current roadmap topic.
+- [ ] **ROAD35-05**: Student can see the currently recommended next lesson.
+- [ ] **ROAD35-06**: Student can use a continue-next-lesson CTA that opens the current lesson.
+- [ ] **ROAD35-07**: Practice roadmap copy explains that Learning Chat can explain unclear lesson steps.
+- [ ] **ROAD35-08**: The roadmap experience feels like progression while preserving STOA's premium education tone.
 
-### Subject-Agnostic Practice Data Model
+### Lesson Node States and Interactions
 
-- [x] **MODEL34-01**: Practice domain types include subject, grade level, topic, unit, lesson, and challenge concepts.
-- [x] **MODEL34-02**: Type names do not encode `EquationPath` or equivalent equation-only architecture.
-- [x] **MODEL34-03**: Practice challenge data includes `subject`, `gradeLevel`, and `topic` metadata.
-- [x] **MODEL34-04**: Existing equation demo data is represented as Mathematics / lower secondary / equations seed data.
-- [x] **MODEL34-05**: Mock data structure supports adding future topics without changing component contracts.
-- [x] **MODEL34-06**: Parent summary and tutor context data can identify the source subject and topic, not only an equation path.
-- [x] **MODEL34-07**: Existing lesson, hint, answer, result, mistake, parent summary, and teacher-help flows continue to work with the generalized model.
-- [x] **MODEL34-08**: API contract documentation remains subject-agnostic and topic-agnostic.
-- [x] **MODEL34-09**: Internal docs explain that the current equation data is demo seed content, not a database schema commitment.
+- [ ] **NODE35-01**: Student can distinguish completed lesson nodes from current, available, locked, and review lesson nodes.
+- [ ] **NODE35-02**: Student can click a completed lesson node and reach a review path or review action.
+- [ ] **NODE35-03**: Student can click the current lesson node and start or continue that lesson.
+- [ ] **NODE35-04**: Student can click an available lesson node and start that lesson.
+- [ ] **NODE35-05**: Student cannot directly start a locked lesson node.
+- [ ] **NODE35-06**: Student can click or focus a locked lesson node and see its unlock condition.
+- [ ] **NODE35-07**: Student can see completed nodes with a clear completion mark.
+- [ ] **NODE35-08**: Student can see the current node visually highlighted without disrupting layout.
+- [ ] **NODE35-09**: Lesson completion can update roadmap state in the mock/demo flow at least enough to show progression.
 
-### Routes and Component Architecture
+### Roadmap Data and API Contract
 
-- [x] **ROUTE34-01**: Practice route strategy prefers subject/topic identifiers such as `/practice/:subjectId/:topicId` for topic-level paths.
-- [x] **ROUTE34-02**: Existing `/practice` entry remains the student Practice overview route.
-- [x] **ROUTE34-03**: Existing links remain backward-compatible or are redirected when route shape changes.
-- [x] **ROUTE34-04**: Page and component names avoid equation-only names such as `EquationPracticePage` or `EquationPath`.
-- [x] **ROUTE34-05**: Practice overview can display current available demo content as Mathematics / Equations without claiming that Practice is equation-only.
-- [x] **ROUTE34-06**: Student dashboard Practice cards use subject/topic-based language.
-- [x] **ROUTE34-07**: Parent and tutor Practice context surfaces use subject/topic-based labels.
-- [x] **ROUTE34-08**: Route map and route documentation reflect the generalized Practice path architecture.
+- [ ] **DATA35-01**: Practice roadmap types define `RoadmapLessonStatus` with completed, current, available, locked, and review states.
+- [ ] **DATA35-02**: Practice topic data supports subject id, grade level, title, description, progress, and current lesson id.
+- [ ] **DATA35-03**: Practice roadmap data supports subject id, topic id, grade level, progress, current lesson id, units, and lessons.
+- [ ] **DATA35-04**: Practice roadmap unit data supports id, title, description, order, and lesson collection.
+- [ ] **DATA35-05**: Practice roadmap lesson data supports id, title, description, order, status, estimated minutes, and optional unlock condition.
+- [ ] **DATA35-06**: Demo roadmap data uses Mathematics / lower secondary / Equations without hard-coding equations as the only supported Practice topic.
+- [ ] **DATA35-07**: Practice API/service contracts document a future `GET /practice/:subjectId/:topicId/roadmap` shape.
+- [ ] **DATA35-08**: Practice roadmap query or hook code can load the demo roadmap through the existing frontend data layer pattern.
 
-### UI Copy and Localization
+### Components and Layout
 
-- [x] **COPY34-01**: Homepage main Practice entry uses general wording such as Practice Path or Guided Practice.
-- [x] **COPY34-02**: Homepage Practice entry says short challenges for school topics, not only short equation challenges.
-- [x] **COPY34-03**: Equation language appears only in demo preview or current available content labels.
-- [x] **COPY34-04**: Student dashboard copy avoids equation-only Practice product framing.
-- [x] **COPY34-05**: `/practice` page copy distinguishes available demo content from product scope.
-- [x] **COPY34-06**: English, German, French, and Italian locale files remain key-compatible after copy changes.
-- [x] **COPY34-07**: German, French, and Italian generalized Practice copy fits mobile buttons and cards.
-- [x] **COPY34-08**: User-facing copy still avoids Duolingo-style, game-first, XP, streak, heart, gem, shop, and leaderboard language.
+- [ ] **COMP35-01**: `PracticeRoadmap` renders a complete topic roadmap from units and lessons.
+- [ ] **COMP35-02**: `RoadmapUnitSection` renders each unit title, description, and lesson path.
+- [ ] **COMP35-03**: `RoadmapLessonNode` renders lesson status, order, title, estimated time, and action affordance.
+- [ ] **COMP35-04**: `RoadmapConnector` renders stable path connectors between lesson nodes.
+- [ ] **COMP35-05**: `RoadmapProgressHeader` renders topic title, progress summary, and current path context.
+- [ ] **COMP35-06**: `RoadmapUnlockHint` renders the locked lesson unlock explanation.
+- [ ] **COMP35-07**: `ContinueNextLessonCard` renders the next lesson and continue action.
+- [ ] **COMP35-08**: Desktop roadmap layout has a clear path feeling with stable connectors and restrained left/right node offset.
+- [ ] **COMP35-09**: Mobile roadmap layout remains readable with a simpler vertical path.
+- [ ] **COMP35-10**: Long German lesson titles, French apostrophes, and Italian CTA labels do not overflow their containers.
 
-### QA, Documentation, and Handoff
+### Documentation, Localization, and Verification
 
-- [x] **QA34-01**: `npm run build` passes after generalized Practice Path changes.
-- [x] **QA34-02**: Browser checks verify homepage Practice entry, dashboard Practice entry, `/practice`, and a lesson route still work.
-- [x] **QA34-03**: Browser or static route checks verify Start Practice still routes visitors to `/login?next=/practice`.
-- [x] **QA34-04**: Four-language copy checks verify the generalized Practice labels render without obvious overflow.
-- [x] **QA34-05**: Documentation includes a migration note for future subject/topic expansion.
-- [x] **QA34-06**: README explains the corrected Practice Path scope and the equation demo package distinction.
-- [x] **QA34-07**: QA checklist confirms no remaining user-facing or developer-facing wording says Practice Path equals equations.
-- [x] **QA34-08**: Phase 34 handoff records that Phase 35 or later can return to user testing after scope correction is complete.
+- [ ] **DOC35-01**: Documentation describes Practice roadmap UI principles and STOA visual direction.
+- [ ] **DOC35-02**: Documentation describes lesson node status rules and click behavior.
+- [ ] **DOC35-03**: Documentation describes mobile roadmap layout rules.
+- [ ] **DOC35-04**: Documentation describes the demo roadmap data and subject-agnostic expansion model.
+- [ ] **DOC35-05**: Documentation includes a roadmap QA checklist covering flow, interaction, visual, localization, and build checks.
+- [ ] **LOC35-01**: English, German, French, and Italian copy exists for roadmap title, current lesson, locked hint, and continue action.
+- [ ] **LOC35-02**: Locale copy supports the Practice roadmap without using game-first, mascot, XP, streak, hearts, gems, shop, or leaderboard language.
+- [ ] **QA35-01**: `npm run build` succeeds after the Practice roadmap implementation.
+- [ ] **QA35-02**: Browser or equivalent UI checks verify `/practice` roadmap, topic roadmap, lesson node clicks, locked hint, continue CTA, desktop layout, and mobile layout.
+- [ ] **QA35-03**: README explains that Practice now includes a roadmap-style learning path and that the current demo uses Mathematics / Equations.
 
 ## Future Requirements
 
 ### Curriculum Expansion
 
-- **CURRICULUM-FUTURE-01**: Add additional Mathematics topics such as functions, geometry, fractions, probability, statistics, and trigonometry after the generalized architecture is stable.
-- **CURRICULUM-FUTURE-02**: Add Physics topics such as motion, force, energy, electricity, and waves after content review.
-- **CURRICULUM-FUTURE-03**: Add Chemistry and Biology topics after curriculum design, age-level review, and content QA.
-- **CURRICULUM-FUTURE-04**: Add a real content management or backend curriculum service only after frontend contracts are stable.
+- **CURRICULUM-FUTURE-01**: Add Mathematics topics such as functions, geometry, fractions, probability, statistics, and trigonometry after the roadmap architecture is stable.
+- **CURRICULUM-FUTURE-02**: Add Physics, Chemistry, and Biology roadmap topics after curriculum design and content QA.
+- **CURRICULUM-FUTURE-03**: Add a real curriculum backend or content management service after frontend contracts and demo-roadmap behavior are validated.
 
-### Product Learning
+### Adaptive Learning and Feedback
 
-- **TEST-FUTURE-01**: Resume homepage conversion QA after Practice Path scope is corrected.
-- **TEST-FUTURE-02**: Test whether students understand the Practice Path as a general learning challenge system with the first demo path focused on equations.
+- **ADAPT-FUTURE-01**: Add adaptive lesson recommendation after enough real learner progress data exists.
+- **FEEDBACK-FUTURE-01**: Refine post-completion progress feedback and parent visibility in a follow-up milestone.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Adding new implemented Practice subjects | Phase 34 corrects architecture and positioning; it does not expand curriculum content. |
-| Adding a full curriculum library | The milestone prepares the model and docs for expansion but keeps current content as demo seed data. |
-| Production backend or database schema | Phase 34 is frontend contracts, mock data, routes, copy, docs, and QA. |
-| CMS or content authoring tools | Future content management should follow after subject/topic contracts are stable. |
-| Adaptive learning algorithms | Generalizing scope does not require adaptive sequencing or personalization. |
-| New gamification mechanics | Practice remains calm, education-centered, and not game-first. |
-| Rebuilding Learning Chat, Parent Report, or teacher support | These remain downstream surfaces; Phase 34 only ensures Practice context remains subject/topic-aware. |
-| Removing the equation demo | Equations remain the current demo package and must continue to work. |
+| Adding new implemented subjects | Phase 35 improves the roadmap experience only; equations remain the current demo content package. |
+| Adding a large new lesson bank | The milestone needs enough demo data to prove the roadmap pattern, not broad curriculum coverage. |
+| Production backend or database work | Roadmap data remains mock/demo and frontend-contract based for this milestone. |
+| Adaptive learning algorithms | The roadmap can show a current lesson without complex personalization. |
+| Formal curriculum CMS | Content authoring belongs after the roadmap data contract is stable. |
+| Complex game economy | STOA needs progression, not shops, gems, hearts, leaderboards, streak pressure, or mascot-driven rewards. |
+| Full redesign of Learning Chat, Parent Report, or teacher support | Phase 35 only reinforces their relationship to Practice through copy and navigation. |
+| New payment or feature-gating logic | Locked roadmap lessons are learning progression locks, not subscription locks. |
 
 ## Traceability
 
@@ -96,53 +98,57 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCOPE34-01 | Phase 181 | Complete |
-| SCOPE34-02 | Phase 181 | Complete |
-| SCOPE34-03 | Phase 181 | Complete |
-| SCOPE34-04 | Phase 181 | Complete |
-| SCOPE34-05 | Phase 181 | Complete |
-| SCOPE34-06 | Phase 181 | Complete |
-| SCOPE34-07 | Phase 181 | Complete |
-| SCOPE34-08 | Phase 181 | Complete |
-| SCOPE34-09 | Phase 181 | Complete |
-| MODEL34-01 | Phase 182 | Complete |
-| MODEL34-02 | Phase 182 | Complete |
-| MODEL34-03 | Phase 182 | Complete |
-| MODEL34-04 | Phase 182 | Complete |
-| MODEL34-05 | Phase 182 | Complete |
-| MODEL34-06 | Phase 182 | Complete |
-| MODEL34-07 | Phase 182 | Complete |
-| MODEL34-08 | Phase 182 | Complete |
-| MODEL34-09 | Phase 182 | Complete |
-| ROUTE34-01 | Phase 183 | Complete |
-| ROUTE34-02 | Phase 183 | Complete |
-| ROUTE34-03 | Phase 183 | Complete |
-| ROUTE34-04 | Phase 183 | Complete |
-| ROUTE34-05 | Phase 183 | Complete |
-| ROUTE34-06 | Phase 183 | Complete |
-| ROUTE34-07 | Phase 183 | Complete |
-| ROUTE34-08 | Phase 183 | Complete |
-| COPY34-01 | Phase 184 | Complete |
-| COPY34-02 | Phase 184 | Complete |
-| COPY34-03 | Phase 184 | Complete |
-| COPY34-04 | Phase 184 | Complete |
-| COPY34-05 | Phase 184 | Complete |
-| COPY34-06 | Phase 184 | Complete |
-| COPY34-07 | Phase 184 | Complete |
-| COPY34-08 | Phase 184 | Complete |
-| QA34-01 | Phase 185 | Complete |
-| QA34-02 | Phase 185 | Complete |
-| QA34-03 | Phase 185 | Complete |
-| QA34-04 | Phase 185 | Complete |
-| QA34-05 | Phase 185 | Complete |
-| QA34-06 | Phase 185 | Complete |
-| QA34-07 | Phase 185 | Complete |
-| QA34-08 | Phase 185 | Complete |
+| ROAD35-01 | TBD | Pending |
+| ROAD35-02 | TBD | Pending |
+| ROAD35-03 | TBD | Pending |
+| ROAD35-04 | TBD | Pending |
+| ROAD35-05 | TBD | Pending |
+| ROAD35-06 | TBD | Pending |
+| ROAD35-07 | TBD | Pending |
+| ROAD35-08 | TBD | Pending |
+| NODE35-01 | TBD | Pending |
+| NODE35-02 | TBD | Pending |
+| NODE35-03 | TBD | Pending |
+| NODE35-04 | TBD | Pending |
+| NODE35-05 | TBD | Pending |
+| NODE35-06 | TBD | Pending |
+| NODE35-07 | TBD | Pending |
+| NODE35-08 | TBD | Pending |
+| NODE35-09 | TBD | Pending |
+| DATA35-01 | TBD | Pending |
+| DATA35-02 | TBD | Pending |
+| DATA35-03 | TBD | Pending |
+| DATA35-04 | TBD | Pending |
+| DATA35-05 | TBD | Pending |
+| DATA35-06 | TBD | Pending |
+| DATA35-07 | TBD | Pending |
+| DATA35-08 | TBD | Pending |
+| COMP35-01 | TBD | Pending |
+| COMP35-02 | TBD | Pending |
+| COMP35-03 | TBD | Pending |
+| COMP35-04 | TBD | Pending |
+| COMP35-05 | TBD | Pending |
+| COMP35-06 | TBD | Pending |
+| COMP35-07 | TBD | Pending |
+| COMP35-08 | TBD | Pending |
+| COMP35-09 | TBD | Pending |
+| COMP35-10 | TBD | Pending |
+| DOC35-01 | TBD | Pending |
+| DOC35-02 | TBD | Pending |
+| DOC35-03 | TBD | Pending |
+| DOC35-04 | TBD | Pending |
+| DOC35-05 | TBD | Pending |
+| LOC35-01 | TBD | Pending |
+| LOC35-02 | TBD | Pending |
+| QA35-01 | TBD | Pending |
+| QA35-02 | TBD | Pending |
+| QA35-03 | TBD | Pending |
 
 **Coverage:**
-- v1 requirements: 42 total
-- Mapped to phases: 42
-- Unmapped: 0
+- v1 requirements: 46 total
+- Mapped to phases: 0
+- Unmapped: 46
 
 ---
 *Requirements defined: 2026-05-27*
+*Last updated: 2026-05-27 after v1.33 requirements definition*
