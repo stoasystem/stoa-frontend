@@ -6,14 +6,16 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { defaultPracticeTopicId } from '@/lib/practiceRoutes'
 
 export function PracticeOverviewPage() {
   const [selectedSubjectId, setSelectedSubjectId] = useState<string>()
   const overviewQuery = usePracticeOverviewQuery()
   const selectedTopicId = useMemo(() => {
     if (!selectedSubjectId) return undefined
-    return overviewQuery.data?.topics.find((topic) => topic.subjectId === selectedSubjectId)?.id ?? defaultPracticeTopicId
+    const topic = overviewQuery.data?.topics.find((item) => item.subjectId === selectedSubjectId)
+    if (topic?.status !== 'available') return undefined
+
+    return topic.id
   }, [overviewQuery.data?.topics, selectedSubjectId])
   const roadmapQuery = usePracticeRoadmapQuery(selectedSubjectId, selectedTopicId)
 

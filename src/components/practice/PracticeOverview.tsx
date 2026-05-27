@@ -33,6 +33,7 @@ export function PracticeOverview({
   const selectedTopic = selectedSubject
     ? overview.topics.find((topic) => topic.subjectId === selectedSubject.id)
     : undefined
+  const selectedTopicAvailable = selectedTopic?.status === 'available'
 
   function handleRoadmapLessonClick(lesson: PracticeRoadmapLesson) {
     navigate(getPracticeLessonPathFromIds(lesson.subjectId, lesson.topicId, lesson.id))
@@ -46,10 +47,13 @@ export function PracticeOverview({
             title="Choose a subject"
             description="Start by choosing the school subject you want to practise today."
           />
-          <div className="grid gap-4">
+          <div className="grid gap-4 md:grid-cols-2">
             {overview.subjects.map((subject) => (
               <SubjectSelectionCard
                 isSelected={subject.id === selectedSubjectId}
+                isAvailable={overview.topics.some(
+                  (item) => item.subjectId === subject.id && item.status === 'available',
+                )}
                 key={subject.id}
                 onSelect={() => onSubjectSelect(subject.id)}
                 subject={subject}
@@ -88,7 +92,15 @@ export function PracticeOverview({
             title={`${selectedSubject.name} Practice Path`}
             description={selectedTopic?.description ?? selectedSubject.description}
           />
-          {roadmap ? (
+          {!selectedTopicAvailable ? (
+            <div className="rounded-lg border border-dashed border-primary/25 bg-card/75 p-6 text-sm leading-6 text-muted-foreground shadow-[var(--platform-shadow-card)]">
+              <h3 className="text-lg font-semibold text-foreground">{selectedSubject.name} path is being prepared</h3>
+              <p className="mt-2">
+                This subject is selectable so students can see planned school coverage, but full Practice Path
+                lessons are not open yet. Choose Mathematics to use the available demo path today.
+              </p>
+            </div>
+          ) : roadmap ? (
             <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />
           ) : (
             <div className="rounded-lg border border-primary/15 bg-card/80 p-5 text-sm text-muted-foreground shadow-[var(--platform-shadow-card)]">
@@ -98,7 +110,7 @@ export function PracticeOverview({
         </section>
       )}
 
-      {selectedSubject && (overview.recentMistakes ?? []).length > 0 && (
+      {selectedSubject && selectedTopicAvailable && (overview.recentMistakes ?? []).length > 0 && (
         <section className="space-y-4">
           <SectionHeader
             title="Review work"
@@ -115,11 +127,13 @@ export function PracticeOverview({
 
 function SubjectSelectionCard({
   isSelected,
+  isAvailable,
   onSelect,
   subject,
   topic,
 }: {
   isSelected: boolean
+  isAvailable: boolean
   onSelect: () => void
   subject: PracticeSubject
   topic?: PracticeTopic
@@ -148,7 +162,7 @@ function SubjectSelectionCard({
               ))}
               {topic && (
                 <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
-                  Current topic: {topic.title}
+                  {topic.status === 'available' ? 'Available topic' : 'Coming soon'}: {topic.title}
                 </span>
               )}
             </div>
@@ -159,7 +173,7 @@ function SubjectSelectionCard({
             type="button"
             variant={isSelected ? 'default' : 'outline'}
           >
-            {isSelected ? 'Selected' : 'Select subject'}
+            {isSelected ? 'Selected' : isAvailable ? 'Select subject' : 'Preview subject'}
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>

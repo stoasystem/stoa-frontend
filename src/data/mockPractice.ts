@@ -52,6 +52,48 @@ export const practiceSubjects: PracticeSubject[] = [
     progress: 46,
     accent: 'burgundy',
   },
+  {
+    id: 'physics',
+    name: 'Physics',
+    description: 'Short practice for forces, motion, energy, and school physics topics. Path content is being prepared.',
+    gradeLevels: [
+      {
+        id: demoGradeLevel,
+        label: demoGradeLevelLabel,
+        order: 1,
+      },
+    ],
+    progress: 0,
+    accent: 'blue',
+  },
+  {
+    id: 'chemistry',
+    name: 'Chemistry',
+    description: 'Practice for formulas, reactions, atoms, and lab reasoning. Path content is being prepared.',
+    gradeLevels: [
+      {
+        id: demoGradeLevel,
+        label: demoGradeLevelLabel,
+        order: 1,
+      },
+    ],
+    progress: 0,
+    accent: 'green',
+  },
+  {
+    id: 'english',
+    name: 'English',
+    description: 'Practice for reading, writing, grammar, and class assignments. Path content is being prepared.',
+    gradeLevels: [
+      {
+        id: demoGradeLevel,
+        label: demoGradeLevelLabel,
+        order: 1,
+      },
+    ],
+    progress: 0,
+    accent: 'purple',
+  },
 ]
 
 export const practiceTopics: PracticeTopic[] = [
@@ -65,6 +107,36 @@ export const practiceTopics: PracticeTopic[] = [
     status: 'available',
     progress: 35,
     currentLessonId: currentRoadmapLessonId,
+  },
+  {
+    id: 'forces-motion',
+    subjectId: 'physics',
+    gradeLevel: demoGradeLevel,
+    title: 'Forces and motion',
+    description: 'Coming later: short practice for motion, forces, and simple diagrams.',
+    order: 1,
+    status: 'coming_later',
+    progress: 0,
+  },
+  {
+    id: 'atoms-reactions',
+    subjectId: 'chemistry',
+    gradeLevel: demoGradeLevel,
+    title: 'Atoms and reactions',
+    description: 'Coming later: short practice for particles, formulas, and reactions.',
+    order: 1,
+    status: 'coming_later',
+    progress: 0,
+  },
+  {
+    id: 'reading-writing',
+    subjectId: 'english',
+    gradeLevel: demoGradeLevel,
+    title: 'Reading and writing',
+    description: 'Coming later: short practice for comprehension, grammar, and written answers.',
+    order: 1,
+    status: 'coming_later',
+    progress: 0,
   },
 ]
 
