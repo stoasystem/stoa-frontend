@@ -34,14 +34,14 @@
 
 ### Localization, Copy, and Layout Fit
 
-- [ ] **L10N33-01**: English Practice entry copy includes `Practice Game`, `Start with a short equation challenge`, and `Start Practice` wording or approved equivalents.
-- [ ] **L10N33-02**: German Practice entry copy includes `Übungsweg`, short equation-practice wording, and `Übung starten` wording or approved equivalents that fit UI.
-- [ ] **L10N33-03**: French Practice entry copy includes `Parcours d’entraînement`, short equation-practice wording, and `Commencer l’entraînement` wording or approved equivalents that fit UI.
-- [ ] **L10N33-04**: Italian Practice entry copy includes `Percorso di pratica`, short equation-practice wording, and `Inizia la pratica` wording or approved equivalents that fit UI.
-- [ ] **L10N33-05**: Practice preview topic labels are localized for English, German, French, and Italian.
-- [ ] **L10N33-06**: German and French Practice entry CTAs wrap or shorten safely on mobile without shrinking typography.
-- [ ] **L10N33-07**: Homepage Practice entry does not create horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
-- [ ] **L10N33-08**: Practice entry hover and reveal effects respect reduced-motion preferences.
+- [x] **L10N33-01**: English Practice entry copy includes `Practice Game`, `Start with a short equation challenge`, and `Start Practice` wording or approved equivalents.
+- [x] **L10N33-02**: German Practice entry copy includes `Übungsweg`, short equation-practice wording, and `Übung starten` wording or approved equivalents that fit UI.
+- [x] **L10N33-03**: French Practice entry copy includes `Parcours d’entraînement`, short equation-practice wording, and `Commencer l’entraînement` wording or approved equivalents that fit UI.
+- [x] **L10N33-04**: Italian Practice entry copy includes `Percorso di pratica`, short equation-practice wording, and `Inizia la pratica` wording or approved equivalents that fit UI.
+- [x] **L10N33-05**: Practice preview topic labels are localized for English, German, French, and Italian.
+- [x] **L10N33-06**: German and French Practice entry CTAs wrap or shorten safely on mobile without shrinking typography.
+- [x] **L10N33-07**: Homepage Practice entry does not create horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
+- [x] **L10N33-08**: Practice entry hover and reveal effects respect reduced-motion preferences.
 
 ### Documentation and Demo Flow
 
@@ -118,14 +118,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | HOME33-09 | Phase 178 | Complete |
 | HOME33-10 | Phase 178 | Complete |
 | HOME33-11 | Phase 178 | Complete |
-| L10N33-01 | Phase 179 | Pending |
-| L10N33-02 | Phase 179 | Pending |
-| L10N33-03 | Phase 179 | Pending |
-| L10N33-04 | Phase 179 | Pending |
-| L10N33-05 | Phase 179 | Pending |
-| L10N33-06 | Phase 179 | Pending |
-| L10N33-07 | Phase 179 | Pending |
-| L10N33-08 | Phase 179 | Pending |
+| L10N33-01 | Phase 179 | Complete |
+| L10N33-02 | Phase 179 | Complete |
+| L10N33-03 | Phase 179 | Complete |
+| L10N33-04 | Phase 179 | Complete |
+| L10N33-05 | Phase 179 | Complete |
+| L10N33-06 | Phase 179 | Complete |
+| L10N33-07 | Phase 179 | Complete |
+| L10N33-08 | Phase 179 | Complete |
 | DOC33-01 | Phase 180 | Pending |
 | DOC33-02 | Phase 180 | Pending |
 | DOC33-03 | Phase 180 | Pending |

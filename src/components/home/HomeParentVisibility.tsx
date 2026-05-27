@@ -14,12 +14,12 @@ export function HomeParentVisibility() {
 
   return (
     <section className="mx-auto max-w-6xl px-5 py-12 sm:px-6">
-      <div className="grid gap-8 rounded-lg border border-border/70 bg-[hsl(var(--stoa-brand-warm-grey))] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
-        <div>
+      <div className="grid min-w-0 gap-8 rounded-lg border border-border/70 bg-[hsl(var(--stoa-brand-warm-grey))] p-6 md:grid-cols-[0.9fr_1.1fr] md:p-8">
+        <div className="min-w-0">
           <p className="brand-section-kicker text-[hsl(var(--stoa-brand-burgundy))]">
             {t('parents.eyebrow')}
           </p>
-          <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground">
+          <h2 className="editorial-heading editorial-title-shell mt-5 break-words text-4xl font-semibold leading-tight text-foreground [overflow-wrap:anywhere]">
             {t('parents.title')}
           </h2>
           <p className="mt-4 text-base leading-8 text-muted-foreground">
@@ -33,17 +33,17 @@ export function HomeParentVisibility() {
             />
           </div>
         </div>
-        <div className="grid gap-3">
+        <div className="grid min-w-0 gap-3">
           {items.map((item, index) => {
             const Icon = itemIcons[index] ?? Eye
 
             return (
-              <div key={item.title} className="rounded-lg border border-border/70 bg-card/82 p-4">
+              <div key={item.title} className="min-w-0 rounded-lg border border-border/70 bg-card/82 p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Icon className="h-4 w-4" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-semibold text-foreground">{item.title}</h3>
                     <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.description}</p>
                   </div>

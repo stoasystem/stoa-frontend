@@ -24,7 +24,7 @@ export function PracticeEntryCard({
       <p className="brand-section-kicker text-[hsl(var(--stoa-brand-burgundy))]">
         {eyebrow}
       </p>
-      <h2 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight text-foreground sm:text-5xl">
+      <h2 className="editorial-heading editorial-title-shell mt-5 break-words text-4xl font-semibold leading-tight text-foreground [overflow-wrap:anywhere] sm:text-5xl">
         {title}
       </h2>
       <p className="mt-5 text-base leading-8 text-muted-foreground">

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.31
 milestone_name: "Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization"
 status: planning
-last_updated: "2026-05-27T09:26:40.680Z"
+last_updated: "2026-05-27T09:45:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 4
-  completed_plans: 2
-  percent: 50
+  completed_plans: 3
+  percent: 75
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 179 next
-Plan: 179-PLAN.md
-Status: Phase 178 complete; ready to plan Phase 179
-Last activity: 2026-05-27 — Phase 178 homepage Practice entry UI and preview components completed and build passed
+Phase: 180 next
+Plan: 180-PLAN.md
+Status: Phase 179 complete; ready to plan Phase 180
+Last activity: 2026-05-27 — Phase 179 four-language mobile fit and accessibility QA completed and build passed
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 2 of 4
+- Total plans completed this milestone: 3 of 4
 - Average duration: completed in one autonomous execution pass
 - Total execution time: same session
 
@@ -43,7 +43,7 @@ Last activity: 2026-05-27 — Phase 178 homepage Practice entry UI and preview c
 |-------|-------|-------|----------|
 | 177 | 1/1 | Complete | 2026-05-27 |
 | 178 | 1/1 | Complete | 2026-05-27 |
-| 179 | 0/1 | Pending | — |
+| 179 | 1/1 | Complete | 2026-05-27 |
 | 180 | 0/1 | Pending | — |
 
 **Recent Trend:**
@@ -99,10 +99,11 @@ Recent decisions affecting current work:
 - Phase 33 starts with route/auth correctness because incorrect `/login?next=/practice` behavior would invalidate homepage funnel testing.
 - Phase 177 added shared Start Practice route helpers and safe role-owned login next handling.
 - Phase 178 split the homepage Practice entry into focused components and added a concrete equation challenge/path preview.
+- Phase 179 verified EN/DE/FR/IT Practice entry copy across 320, 375, 430, 768, 1024, and 1440 px browser widths and hardened long localized heading wrapping.
 
 ### Pending Todos
 
-- Plan Phase 179: Four-Language Mobile Fit and Accessibility QA.
+- Plan Phase 180: Demo Flow, Documentation, README, and Build Verification.
 
 ### Quick Tasks Completed
 

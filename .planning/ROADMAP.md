@@ -39,7 +39,7 @@
 
 - [x] **Phase 177: Start Practice Funnel and Route Contract** - Define and implement the role-aware Start Practice route contract so the homepage CTA sends each user type to the correct destination.
 - [x] **Phase 178: Homepage Practice Entry UI and Preview Components** - Build the clearer Practice entry card, preview, and CTA hierarchy using STOA's premium design language.
-- [ ] **Phase 179: Four-Language Mobile Fit and Accessibility QA** - Localize and verify the Practice entry across English, German, French, and Italian with mobile, keyboard, and reduced-motion checks.
+- [x] **Phase 179: Four-Language Mobile Fit and Accessibility QA** - Localize and verify the Practice entry across English, German, French, and Italian with mobile, keyboard, and reduced-motion checks.
 - [ ] **Phase 180: Demo Flow, Documentation, README, and Build Verification** - Document the homepage-to-Practice flow, update QA and README handoff, run demo verification, and confirm `npm run build`.
 
 ## Phase Details
@@ -106,7 +106,7 @@
 |-------|----------------|--------|-----------|
 | 177. Start Practice Funnel and Route Contract | 1/1 | Complete | 2026-05-27 |
 | 178. Homepage Practice Entry UI and Preview Components | 1/1 | Complete | 2026-05-27 |
-| 179. Four-Language Mobile Fit and Accessibility QA | 0/1 | Pending | — |
+| 179. Four-Language Mobile Fit and Accessibility QA | 1/1 | Complete | 2026-05-27 |
 | 180. Demo Flow, Documentation, README, and Build Verification | 0/1 | Pending | — |
 
 ## Coverage
@@ -124,4 +124,4 @@
 
 ## Next Up
 
-Phase 177: Start Practice Funnel and Route Contract.
+Phase 180: Demo Flow, Documentation, README, and Build Verification.
