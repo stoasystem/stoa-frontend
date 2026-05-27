@@ -34,94 +34,112 @@
 - ✅ **v1.29 Phase 31: Practice Game Entry Integration, Homepage Positioning, and Learning Platform Funnel Alignment** - Phases 165-170 (implemented 2026-05-27)
 - ✅ **v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit** - Phases 171-176 (implemented 2026-05-27)
 - ✅ **v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization** - Phases 177-180 (implemented 2026-05-27)
+- 🔄 **v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment** - Phases 181-185 (planned 2026-05-27)
 
 ## Phases
 
-- [x] **Phase 177: Start Practice Funnel and Route Contract** - Define and implement the role-aware Start Practice route contract so the homepage CTA sends each user type to the correct destination.
-- [x] **Phase 178: Homepage Practice Entry UI and Preview Components** - Build the clearer Practice entry card, preview, and CTA hierarchy using STOA's premium design language.
-- [x] **Phase 179: Four-Language Mobile Fit and Accessibility QA** - Localize and verify the Practice entry across English, German, French, and Italian with mobile, keyboard, and reduced-motion checks.
-- [x] **Phase 180: Demo Flow, Documentation, README, and Build Verification** - Document the homepage-to-Practice flow, update QA and README handoff, run demo verification, and confirm `npm run build`.
+- [ ] **Phase 181: Practice Path Scope Principle and Historical Documentation Correction** - Correct product positioning across planning and product docs so Practice Path is general and equations are demo content.
+- [ ] **Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract** - Refactor Practice types, mock data, and contracts around subject, grade level, topic, unit, lesson, and challenge hierarchy.
+- [ ] **Phase 183: Practice Routes and Component Architecture Generalization** - Align Practice routes, page/component names, and route documentation with subject/topic-based architecture while preserving existing entry behavior.
+- [ ] **Phase 184: Generalized Practice UI Copy and Four-Language Localization** - Update homepage, dashboard, Practice, parent, and tutor copy so equation language appears only as current demo content.
+- [ ] **Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification** - Verify generalized scope, preserve the equation demo flow, update README/QA/demo docs, and run final build/browser checks.
 
 ## Phase Details
 
-### Phase 177: Start Practice Funnel and Route Contract
+### Phase 181: Practice Path Scope Principle and Historical Documentation Correction
 
-**Goal**: Homepage Start Practice has a correct, centralized route contract before UI polish or testing begins.
-**Depends on**: Phase 176
-**Requirements**: NAV33-01, NAV33-02, NAV33-03, NAV33-04, NAV33-05, NAV33-06, NAV33-07, NAV33-08, NAV33-09
+**Goal**: Developers understand that Practice Path is a general learning challenge system and equations are only the first demo content package.
+**Depends on**: Phase 180
+**Requirements**: SCOPE34-01, SCOPE34-02, SCOPE34-03, SCOPE34-04, SCOPE34-05, SCOPE34-06, SCOPE34-07, SCOPE34-08, SCOPE34-09
 **Success Criteria** (what must be TRUE):
-  1. Homepage Start Practice is defined as a concrete Practice entry action, not only explanatory copy.
-  2. Unauthenticated users are routed to `/login?next=/practice`.
-  3. Authenticated students are routed to `/practice`.
-  4. Authenticated parent, tutor, admin, and organization users are routed to their own role home pages.
-  5. Student login honors safe `next=/practice` behavior, and registration behavior is documented.
-**Plans**: 177-PLAN.md
+  1. English and Chinese Practice Path Scope Principle docs exist.
+  2. Phase 28 and Phase 30 docs are corrected to demo-package wording.
+  3. Phase 31 and Phase 33 docs no longer imply Practice Path equals equations.
+  4. Documentation shows both the canonical hierarchy and current equation demo hierarchy.
+  5. Future subject examples are documented as expansion examples, not implemented content.
+**Plans**: 181-PLAN.md
 **UI hint**: no
 
-### Phase 178: Homepage Practice Entry UI and Preview Components
+### Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract
 
-**Goal**: Homepage users can understand in one glance that Practice is a short learning entry that leads to hints, Learning Chat, teacher support, and parent visibility.
-**Depends on**: Phase 177
-**Requirements**: HOME33-01, HOME33-02, HOME33-03, HOME33-04, HOME33-05, HOME33-06, HOME33-07, HOME33-08, HOME33-09, HOME33-10, HOME33-11
+**Goal**: Practice data structures support future subjects and topics without hard-coding equations as the only learning path.
+**Depends on**: Phase 181
+**Requirements**: MODEL34-01, MODEL34-02, MODEL34-03, MODEL34-04, MODEL34-05, MODEL34-06, MODEL34-07, MODEL34-08, MODEL34-09
 **Success Criteria** (what must be TRUE):
-  1. `HomePracticeEntry`, `PracticeEntryCard`, and `HomePracticePreview` exist and are wired into the homepage.
-  2. The entry appears after Hero and before or inside the broader How STOA Works flow.
-  3. The preview shows a concise equation path with one-step equations, quadratic basics, and linear systems.
-  4. Copy explains short practice, hint-first recovery, and Learning Chat handoff without game-first or Duolingo-facing wording.
-  5. CTA hierarchy keeps `Start Learning` primary, `Start Practice` clear but subordinate, and `How it works` secondary.
-**Plans**: 178-PLAN.md
+  1. Practice types include subject, grade level, topic, unit, lesson, and challenge concepts.
+  2. No type or contract implies an equation-only Practice architecture.
+  3. Existing equation demo data is nested or labeled as Mathematics / lower secondary / equations seed data.
+  4. Parent summary and tutor context can identify subject and topic.
+  5. Existing Practice flows continue to compile against generalized types.
+**Plans**: 182-PLAN.md
+**UI hint**: no
+
+### Phase 183: Practice Routes and Component Architecture Generalization
+
+**Goal**: Practice routes and component architecture express a subject/topic Practice Path rather than an equation-only path.
+**Depends on**: Phase 182
+**Requirements**: ROUTE34-01, ROUTE34-02, ROUTE34-03, ROUTE34-04, ROUTE34-05, ROUTE34-06, ROUTE34-07, ROUTE34-08
+**Success Criteria** (what must be TRUE):
+  1. `/practice` remains the student Practice overview entry.
+  2. Topic-level navigation supports or plans for `/practice/:subjectId/:topicId`.
+  3. Existing links remain compatible or have a documented redirect/migration path.
+  4. Component/page names remain Practice-oriented and subject/topic-oriented.
+  5. Route map and route docs match the generalized Practice architecture.
+**Plans**: 183-PLAN.md
 **UI hint**: yes
 
-### Phase 179: Four-Language Mobile Fit and Accessibility QA
+### Phase 184: Generalized Practice UI Copy and Four-Language Localization
 
-**Goal**: The Practice entry works across supported locales and viewports without layout, motion, or accessibility regressions.
-**Depends on**: Phase 178
-**Requirements**: L10N33-01, L10N33-02, L10N33-03, L10N33-04, L10N33-05, L10N33-06, L10N33-07, L10N33-08
+**Goal**: User-facing Practice copy presents general school-topic challenges, with equations labeled only as the currently available demo topic.
+**Depends on**: Phase 183
+**Requirements**: COPY34-01, COPY34-02, COPY34-03, COPY34-04, COPY34-05, COPY34-06, COPY34-07, COPY34-08
 **Success Criteria** (what must be TRUE):
-  1. English, German, French, and Italian Practice entry copy and preview labels are present.
-  2. German and French CTAs fit or wrap safely on mobile.
-  3. Homepage Practice entry has no horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
-  4. Keyboard focus order remains understandable through the Practice entry actions.
-  5. Hover/reveal motion respects reduced-motion preferences.
-**Plans**: 179-PLAN.md
+  1. Homepage Practice entry uses general Practice Path / Guided Practice language.
+  2. Dashboard and `/practice` copy avoid equation-only product framing.
+  3. Demo preview or current content labels can still say Mathematics / Equations.
+  4. English, German, French, and Italian locale keys remain compatible.
+  5. Mobile layout remains safe for generalized labels.
+**Plans**: 184-PLAN.md
 **UI hint**: yes
 
-### Phase 180: Demo Flow, Documentation, README, and Build Verification
+### Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification
 
-**Goal**: Phase 33 is documented, verified, and ready to feed Phase 34 user testing.
-**Depends on**: Phase 179
-**Requirements**: DOC33-01, DOC33-02, DOC33-03, DOC33-04, DOC33-05, DOC33-06, DOC33-07, QA33-01, QA33-02, QA33-03, QA33-04, QA33-05, QA33-06, QA33-07, QA33-08
+**Goal**: The corrected Practice scope is verified end-to-end and ready for later user testing.
+**Depends on**: Phase 184
+**Requirements**: QA34-01, QA34-02, QA34-03, QA34-04, QA34-05, QA34-06, QA34-07, QA34-08
 **Success Criteria** (what must be TRUE):
-  1. Required homepage, Practice, IA, and demo docs exist and describe the Practice entry funnel.
-  2. QA checklist covers Practice entry clarity, routing, layout, four-language fit, and product hierarchy.
-  3. Demo flow records homepage -> Practice behavior for unauthenticated and authenticated users.
-  4. README includes Phase 33 handoff and known Phase 34 follow-up.
-  5. `npm run build` succeeds and any remaining gaps are recorded.
-**Plans**: 180-PLAN.md
+  1. `npm run build` succeeds.
+  2. Browser checks cover homepage, dashboard, `/practice`, and one lesson route.
+  3. Start Practice still routes unauthenticated visitors to `/login?next=/practice`.
+  4. Four-language generalized Practice copy passes a mobile fit check.
+  5. README, QA checklist, migration note, and handoff docs record the corrected scope and Phase 35 testing path.
+**Plans**: 185-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 177. Start Practice Funnel and Route Contract | 1/1 | Complete | 2026-05-27 |
-| 178. Homepage Practice Entry UI and Preview Components | 1/1 | Complete | 2026-05-27 |
-| 179. Four-Language Mobile Fit and Accessibility QA | 1/1 | Complete | 2026-05-27 |
-| 180. Demo Flow, Documentation, README, and Build Verification | 1/1 | Complete | 2026-05-27 |
+| 181. Practice Path Scope Principle and Historical Documentation Correction | 0/1 | Pending | — |
+| 182. Subject-Agnostic Practice Domain Model and Mock Data Contract | 0/1 | Pending | — |
+| 183. Practice Routes and Component Architecture Generalization | 0/1 | Pending | — |
+| 184. Generalized Practice UI Copy and Four-Language Localization | 0/1 | Pending | — |
+| 185. Practice Scope Regression QA, Documentation Handoff, and Build Verification | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 177 | 9 | NAV33-01, NAV33-02, NAV33-03, NAV33-04, NAV33-05, NAV33-06, NAV33-07, NAV33-08, NAV33-09 |
-| 178 | 11 | HOME33-01, HOME33-02, HOME33-03, HOME33-04, HOME33-05, HOME33-06, HOME33-07, HOME33-08, HOME33-09, HOME33-10, HOME33-11 |
-| 179 | 8 | L10N33-01, L10N33-02, L10N33-03, L10N33-04, L10N33-05, L10N33-06, L10N33-07, L10N33-08 |
-| 180 | 15 | DOC33-01, DOC33-02, DOC33-03, DOC33-04, DOC33-05, DOC33-06, DOC33-07, QA33-01, QA33-02, QA33-03, QA33-04, QA33-05, QA33-06, QA33-07, QA33-08 |
+| 181 | 9 | SCOPE34-01, SCOPE34-02, SCOPE34-03, SCOPE34-04, SCOPE34-05, SCOPE34-06, SCOPE34-07, SCOPE34-08, SCOPE34-09 |
+| 182 | 9 | MODEL34-01, MODEL34-02, MODEL34-03, MODEL34-04, MODEL34-05, MODEL34-06, MODEL34-07, MODEL34-08, MODEL34-09 |
+| 183 | 8 | ROUTE34-01, ROUTE34-02, ROUTE34-03, ROUTE34-04, ROUTE34-05, ROUTE34-06, ROUTE34-07, ROUTE34-08 |
+| 184 | 8 | COPY34-01, COPY34-02, COPY34-03, COPY34-04, COPY34-05, COPY34-06, COPY34-07, COPY34-08 |
+| 185 | 8 | QA34-01, QA34-02, QA34-03, QA34-04, QA34-05, QA34-06, QA34-07, QA34-08 |
 
-**Total requirements:** 43
-**Mapped requirements:** 43
+**Total requirements:** 42
+**Mapped requirements:** 42
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Phase 34: Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
+Phase 181: Practice Path Scope Principle and Historical Documentation Correction.

@@ -1,96 +1,94 @@
 # Requirements: STOA Frontend
 
 **Defined:** 2026-05-27
-**Milestone:** v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization
-**Core Value:** Developers can run STOA as a credible learning platform where homepage visitors can clearly start a short Practice path, get Learning Chat help when stuck, escalate to professional teacher support when needed, and preserve parent visibility without making STOA look like only a game.
+**Milestone:** v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
+**Core Value:** Developers can build and maintain STOA Practice Path as a general middle-school and high-school learning challenge system, while keeping the current Mathematics equations content as the first demo package rather than the final product scope.
 
 ## v1 Requirements
 
-### Funnel and Routing
+### Practice Path Scope Principle
 
-- [x] **NAV33-01**: Visitor can identify a clear homepage `Start Practice` action for the Practice Game / Practice Path entry.
-- [x] **NAV33-02**: Unauthenticated user who clicks `Start Practice` is routed to `/login?next=/practice`.
-- [x] **NAV33-03**: Student who is already authenticated and clicks `Start Practice` is routed directly to `/practice`.
-- [x] **NAV33-04**: Parent who is already authenticated and clicks `Start Practice` is routed to `/parent` instead of the student-only Practice route.
-- [x] **NAV33-05**: Tutor who is already authenticated and clicks `Start Practice` is routed to `/tutor` instead of the student-only Practice route.
-- [x] **NAV33-06**: Admin who is already authenticated and clicks `Start Practice` is routed to `/admin` instead of the student-only Practice route.
-- [x] **NAV33-07**: Student login from `/login?next=/practice` lands on `/practice` when the next path is safe for the student role.
-- [x] **NAV33-08**: Registration path documentation covers `/register?role=student&next=/practice` and the expected post-registration Practice destination.
-- [x] **NAV33-09**: A shared navigation helper such as `startPracticeNavigation` or `getStartPracticePath` centralizes Start Practice route decisions.
+- [ ] **SCOPE34-01**: Documentation states that Practice Path is a general middle-school and high-school learning challenge system.
+- [ ] **SCOPE34-02**: Documentation states that equations are only the first demo content package.
+- [ ] **SCOPE34-03**: Documentation shows the canonical hierarchy: Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
+- [ ] **SCOPE34-04**: Documentation shows the current demo hierarchy: Practice Path -> Mathematics -> Lower Secondary -> Equations -> Linear equations -> Solving two-step equations -> Challenges.
+- [ ] **SCOPE34-05**: Documentation lists future expansion examples for Mathematics, Physics, Chemistry, and Biology without presenting them as implemented content.
+- [ ] **SCOPE34-06**: Phase 28 docs are corrected to say "Equation Demo Content Package for the General Practice Path" rather than defining Practice Path scope.
+- [ ] **SCOPE34-07**: Phase 30 docs are corrected to say the final demo curriculum is equation-focused while the product architecture remains general.
+- [ ] **SCOPE34-08**: Phase 31 and Phase 33 docs are corrected so homepage Practice entry language does not imply Practice Path equals equations.
+- [ ] **SCOPE34-09**: English and Chinese versions of the Practice Path Scope Principle are recorded for future developers.
 
-### Homepage Practice Entry UI
+### Subject-Agnostic Practice Data Model
 
-- [x] **HOME33-01**: Homepage includes a high-visibility Practice Game / Practice Path section after Hero and before or inside the broader How STOA Works flow.
-- [x] **HOME33-02**: Practice entry is visually clearer than a plain explanatory block but does not overpower the Hero or main `Start Learning` CTA.
-- [x] **HOME33-03**: `HomePracticeEntry` renders the complete homepage Practice entry section using existing STOA premium theme patterns.
-- [x] **HOME33-04**: `PracticeEntryCard` renders the clickable Practice entry, short explanation, and Start Practice CTA.
-- [x] **HOME33-05**: `HomePracticePreview` renders a concise equation-path preview without expanding curriculum content.
-- [x] **HOME33-06**: Practice preview includes the equation path topics: one-step equations, quadratic basics, and linear systems.
-- [x] **HOME33-07**: Practice entry copy explains that students start with a short equation challenge.
-- [x] **HOME33-08**: Practice entry copy explains that hints appear before Learning Chat when a student is stuck or makes a mistake.
-- [x] **HOME33-09**: Practice entry copy preserves the sequence Practice -> Learning Chat -> Professional Teacher Support -> Parent Report.
-- [x] **HOME33-10**: Practice entry avoids user-facing phrases such as `Duolingo-style`, `AI game`, `Play now`, `gamified AI platform`, XP, streaks, hearts, gems, shops, and leaderboards.
-- [x] **HOME33-11**: Homepage CTA hierarchy keeps `Start Learning` as the page-level primary CTA, `Start Practice` as a clear entry CTA, and `How it works` as secondary.
+- [ ] **MODEL34-01**: Practice domain types include subject, grade level, topic, unit, lesson, and challenge concepts.
+- [ ] **MODEL34-02**: Type names do not encode `EquationPath` or equivalent equation-only architecture.
+- [ ] **MODEL34-03**: Practice challenge data includes `subject`, `gradeLevel`, and `topic` metadata.
+- [ ] **MODEL34-04**: Existing equation demo data is represented as Mathematics / lower secondary / equations seed data.
+- [ ] **MODEL34-05**: Mock data structure supports adding future topics without changing component contracts.
+- [ ] **MODEL34-06**: Parent summary and tutor context data can identify the source subject and topic, not only an equation path.
+- [ ] **MODEL34-07**: Existing lesson, hint, answer, result, mistake, parent summary, and teacher-help flows continue to work with the generalized model.
+- [ ] **MODEL34-08**: API contract documentation remains subject-agnostic and topic-agnostic.
+- [ ] **MODEL34-09**: Internal docs explain that the current equation data is demo seed content, not a database schema commitment.
 
-### Localization, Copy, and Layout Fit
+### Routes and Component Architecture
 
-- [x] **L10N33-01**: English Practice entry copy includes `Practice Game`, `Start with a short equation challenge`, and `Start Practice` wording or approved equivalents.
-- [x] **L10N33-02**: German Practice entry copy includes `Übungsweg`, short equation-practice wording, and `Übung starten` wording or approved equivalents that fit UI.
-- [x] **L10N33-03**: French Practice entry copy includes `Parcours d’entraînement`, short equation-practice wording, and `Commencer l’entraînement` wording or approved equivalents that fit UI.
-- [x] **L10N33-04**: Italian Practice entry copy includes `Percorso di pratica`, short equation-practice wording, and `Inizia la pratica` wording or approved equivalents that fit UI.
-- [x] **L10N33-05**: Practice preview topic labels are localized for English, German, French, and Italian.
-- [x] **L10N33-06**: German and French Practice entry CTAs wrap or shorten safely on mobile without shrinking typography.
-- [x] **L10N33-07**: Homepage Practice entry does not create horizontal overflow at 320, 375, 430, 768, 1024, or 1440 CSS px where feasible.
-- [x] **L10N33-08**: Practice entry hover and reveal effects respect reduced-motion preferences.
+- [ ] **ROUTE34-01**: Practice route strategy prefers subject/topic identifiers such as `/practice/:subjectId/:topicId` for topic-level paths.
+- [ ] **ROUTE34-02**: Existing `/practice` entry remains the student Practice overview route.
+- [ ] **ROUTE34-03**: Existing links remain backward-compatible or are redirected when route shape changes.
+- [ ] **ROUTE34-04**: Page and component names avoid equation-only names such as `EquationPracticePage` or `EquationPath`.
+- [ ] **ROUTE34-05**: Practice overview can display current available demo content as Mathematics / Equations without claiming that Practice is equation-only.
+- [ ] **ROUTE34-06**: Student dashboard Practice cards use subject/topic-based language.
+- [ ] **ROUTE34-07**: Parent and tutor Practice context surfaces use subject/topic-based labels.
+- [ ] **ROUTE34-08**: Route map and route documentation reflect the generalized Practice path architecture.
 
-### Documentation and Demo Flow
+### UI Copy and Localization
 
-- [x] **DOC33-01**: `docs/home/practice-entry-section.md` documents the homepage Practice entry section strategy and product hierarchy.
-- [x] **DOC33-02**: `docs/home/homepage-cta-hierarchy.md` documents `Start Learning`, `Start Practice`, and `How it works` hierarchy.
-- [x] **DOC33-03**: `docs/practice/practice-homepage-entry.md` documents how the homepage Practice entry connects to `/practice`.
-- [x] **DOC33-04**: `docs/practice/practice-entry-copy.md` records the four-language Practice entry copy and forbidden wording.
-- [x] **DOC33-05**: `docs/ia/homepage-learning-entry-map.md` maps Hero, Practice, How STOA Works, Learning Chat, teacher support, and Parent Report.
-- [x] **DOC33-06**: `docs/demo/homepage-to-practice-demo-flow.md` documents the homepage-to-Practice demo flow for unauthenticated and authenticated users.
-- [x] **DOC33-07**: README includes a Phase 33 section explaining the Practice homepage entry, route behavior, four-language copy, QA, and build status.
+- [ ] **COPY34-01**: Homepage main Practice entry uses general wording such as Practice Path or Guided Practice.
+- [ ] **COPY34-02**: Homepage Practice entry says short challenges for school topics, not only short equation challenges.
+- [ ] **COPY34-03**: Equation language appears only in demo preview or current available content labels.
+- [ ] **COPY34-04**: Student dashboard copy avoids equation-only Practice product framing.
+- [ ] **COPY34-05**: `/practice` page copy distinguishes available demo content from product scope.
+- [ ] **COPY34-06**: English, German, French, and Italian locale files remain key-compatible after copy changes.
+- [ ] **COPY34-07**: German, French, and Italian generalized Practice copy fits mobile buttons and cards.
+- [ ] **COPY34-08**: User-facing copy still avoids Duolingo-style, game-first, XP, streak, heart, gem, shop, and leaderboard language.
 
-### QA, Verification, and Handoff
+### QA, Documentation, and Handoff
 
-- [x] **QA33-01**: QA checklist verifies that homepage has a clear Practice Game / Practice Path entry and Start Practice button.
-- [x] **QA33-02**: QA checklist verifies that users can understand Practice as a short learning entry and not as the whole STOA product.
-- [x] **QA33-03**: QA checklist verifies unauthenticated, student, parent, tutor, and admin Start Practice routing.
-- [x] **QA33-04**: QA checklist verifies desktop and mobile Practice entry layout across English, German, French, and Italian.
-- [x] **QA33-05**: QA checklist verifies Practice -> Learning Chat -> Professional Teacher Support -> Parent Report hierarchy.
-- [x] **QA33-06**: Homepage-to-Practice demo flow is run or documented with exact manual verification steps.
-- [x] **QA33-07**: `npm run build` succeeds after Phase 33 changes.
-- [x] **QA33-08**: Phase 33 handoff records any known gaps for Phase 34 user testing and feedback.
+- [ ] **QA34-01**: `npm run build` passes after generalized Practice Path changes.
+- [ ] **QA34-02**: Browser checks verify homepage Practice entry, dashboard Practice entry, `/practice`, and a lesson route still work.
+- [ ] **QA34-03**: Browser or static route checks verify Start Practice still routes visitors to `/login?next=/practice`.
+- [ ] **QA34-04**: Four-language copy checks verify the generalized Practice labels render without obvious overflow.
+- [ ] **QA34-05**: Documentation includes a migration note for future subject/topic expansion.
+- [ ] **QA34-06**: README explains the corrected Practice Path scope and the equation demo package distinction.
+- [ ] **QA34-07**: QA checklist confirms no remaining user-facing or developer-facing wording says Practice Path equals equations.
+- [ ] **QA34-08**: Phase 34 handoff records that Phase 35 or later can return to user testing after scope correction is complete.
 
 ## Future Requirements
 
-### User Testing and Feedback
+### Curriculum Expansion
 
-- **TEST34-01**: Run student testing to confirm users understand and click the homepage Start Practice entry.
-- **TEST34-02**: Run parent testing to confirm Practice plus Parent Report improves trust without making STOA feel like only a game.
-- **TEST34-03**: Run teacher testing to confirm Practice-origin context helps professional support.
-- **TEST34-04**: Decide whether homepage Practice entry needs further optimization based on external user feedback.
+- **CURRICULUM-FUTURE-01**: Add additional Mathematics topics such as functions, geometry, fractions, probability, statistics, and trigonometry after the generalized architecture is stable.
+- **CURRICULUM-FUTURE-02**: Add Physics topics such as motion, force, energy, electricity, and waves after content review.
+- **CURRICULUM-FUTURE-03**: Add Chemistry and Biology topics after curriculum design, age-level review, and content QA.
+- **CURRICULUM-FUTURE-04**: Add a real content management or backend curriculum service only after frontend contracts are stable.
 
-### Analytics and Product Learning
+### Product Learning
 
-- **ANALYTICS-FUTURE-01**: Add privacy-safe events for homepage Start Practice clicks, Practice preview visibility, hint usage, and Practice-to-Learning-Chat handoff if analytics becomes in scope.
-- **ANALYTICS-FUTURE-02**: Add funnel reporting for homepage -> login/register -> Practice activation after product tracking and privacy review.
+- **TEST-FUTURE-01**: Resume homepage conversion QA after Practice Path scope is corrected.
+- **TEST-FUTURE-02**: Test whether students understand the Practice Path as a general learning challenge system with the first demo path focused on equations.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New Practice subjects | Phase 33 clarifies entry and funnel; it does not expand curriculum. |
-| New Practice lessons or large question bank | Existing equation demo content is enough for the homepage preview and route flow. |
-| Practice internal interaction redesign | Phase 33 focuses on homepage entry, CTA routing, copy, docs, and QA. |
-| Learning Chat rebuild | Learning Chat remains the explanation surface; this phase only clarifies the handoff. |
-| Parent Report redesign | Parent Report remains the visibility layer; this phase only keeps it in the product hierarchy. |
-| Formal backend, database, CMS, payment, or production analytics work | The funnel problem is frontend IA, routing, copy, and QA. |
-| Complex gamification | STOA should use short-session clarity and gentle progress, not XP, streak pressure, hearts, gems, shops, leaderboards, or reward economies. |
-| Duolingo visual or brand imitation | Duolingo is only a mechanism reference; STOA must retain its own premium education brand. |
-| Public top-level Practice navbar item | Practice belongs as a homepage entry and authenticated student action unless future IA evidence says otherwise. |
+| Adding new implemented Practice subjects | Phase 34 corrects architecture and positioning; it does not expand curriculum content. |
+| Adding a full curriculum library | The milestone prepares the model and docs for expansion but keeps current content as demo seed data. |
+| Production backend or database schema | Phase 34 is frontend contracts, mock data, routes, copy, docs, and QA. |
+| CMS or content authoring tools | Future content management should follow after subject/topic contracts are stable. |
+| Adaptive learning algorithms | Generalizing scope does not require adaptive sequencing or personalization. |
+| New gamification mechanics | Practice remains calm, education-centered, and not game-first. |
+| Rebuilding Learning Chat, Parent Report, or teacher support | These remain downstream surfaces; Phase 34 only ensures Practice context remains subject/topic-aware. |
+| Removing the equation demo | Equations remain the current demo package and must continue to work. |
 
 ## Traceability
 
@@ -98,55 +96,53 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| NAV33-01 | Phase 177 | Complete |
-| NAV33-02 | Phase 177 | Complete |
-| NAV33-03 | Phase 177 | Complete |
-| NAV33-04 | Phase 177 | Complete |
-| NAV33-05 | Phase 177 | Complete |
-| NAV33-06 | Phase 177 | Complete |
-| NAV33-07 | Phase 177 | Complete |
-| NAV33-08 | Phase 177 | Complete |
-| NAV33-09 | Phase 177 | Complete |
-| HOME33-01 | Phase 178 | Complete |
-| HOME33-02 | Phase 178 | Complete |
-| HOME33-03 | Phase 178 | Complete |
-| HOME33-04 | Phase 178 | Complete |
-| HOME33-05 | Phase 178 | Complete |
-| HOME33-06 | Phase 178 | Complete |
-| HOME33-07 | Phase 178 | Complete |
-| HOME33-08 | Phase 178 | Complete |
-| HOME33-09 | Phase 178 | Complete |
-| HOME33-10 | Phase 178 | Complete |
-| HOME33-11 | Phase 178 | Complete |
-| L10N33-01 | Phase 179 | Complete |
-| L10N33-02 | Phase 179 | Complete |
-| L10N33-03 | Phase 179 | Complete |
-| L10N33-04 | Phase 179 | Complete |
-| L10N33-05 | Phase 179 | Complete |
-| L10N33-06 | Phase 179 | Complete |
-| L10N33-07 | Phase 179 | Complete |
-| L10N33-08 | Phase 179 | Complete |
-| DOC33-01 | Phase 180 | Complete |
-| DOC33-02 | Phase 180 | Complete |
-| DOC33-03 | Phase 180 | Complete |
-| DOC33-04 | Phase 180 | Complete |
-| DOC33-05 | Phase 180 | Complete |
-| DOC33-06 | Phase 180 | Complete |
-| DOC33-07 | Phase 180 | Complete |
-| QA33-01 | Phase 180 | Complete |
-| QA33-02 | Phase 180 | Complete |
-| QA33-03 | Phase 180 | Complete |
-| QA33-04 | Phase 180 | Complete |
-| QA33-05 | Phase 180 | Complete |
-| QA33-06 | Phase 180 | Complete |
-| QA33-07 | Phase 180 | Complete |
-| QA33-08 | Phase 180 | Complete |
+| SCOPE34-01 | Phase 181 | Pending |
+| SCOPE34-02 | Phase 181 | Pending |
+| SCOPE34-03 | Phase 181 | Pending |
+| SCOPE34-04 | Phase 181 | Pending |
+| SCOPE34-05 | Phase 181 | Pending |
+| SCOPE34-06 | Phase 181 | Pending |
+| SCOPE34-07 | Phase 181 | Pending |
+| SCOPE34-08 | Phase 181 | Pending |
+| SCOPE34-09 | Phase 181 | Pending |
+| MODEL34-01 | Phase 182 | Pending |
+| MODEL34-02 | Phase 182 | Pending |
+| MODEL34-03 | Phase 182 | Pending |
+| MODEL34-04 | Phase 182 | Pending |
+| MODEL34-05 | Phase 182 | Pending |
+| MODEL34-06 | Phase 182 | Pending |
+| MODEL34-07 | Phase 182 | Pending |
+| MODEL34-08 | Phase 182 | Pending |
+| MODEL34-09 | Phase 182 | Pending |
+| ROUTE34-01 | Phase 183 | Pending |
+| ROUTE34-02 | Phase 183 | Pending |
+| ROUTE34-03 | Phase 183 | Pending |
+| ROUTE34-04 | Phase 183 | Pending |
+| ROUTE34-05 | Phase 183 | Pending |
+| ROUTE34-06 | Phase 183 | Pending |
+| ROUTE34-07 | Phase 183 | Pending |
+| ROUTE34-08 | Phase 183 | Pending |
+| COPY34-01 | Phase 184 | Pending |
+| COPY34-02 | Phase 184 | Pending |
+| COPY34-03 | Phase 184 | Pending |
+| COPY34-04 | Phase 184 | Pending |
+| COPY34-05 | Phase 184 | Pending |
+| COPY34-06 | Phase 184 | Pending |
+| COPY34-07 | Phase 184 | Pending |
+| COPY34-08 | Phase 184 | Pending |
+| QA34-01 | Phase 185 | Pending |
+| QA34-02 | Phase 185 | Pending |
+| QA34-03 | Phase 185 | Pending |
+| QA34-04 | Phase 185 | Pending |
+| QA34-05 | Phase 185 | Pending |
+| QA34-06 | Phase 185 | Pending |
+| QA34-07 | Phase 185 | Pending |
+| QA34-08 | Phase 185 | Pending |
 
 **Coverage:**
-- v1 requirements: 43 total
-- Mapped to phases: 43
+- v1 requirements: 42 total
+- Mapped to phases: 42
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 after Phase 33 milestone initialization*

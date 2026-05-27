@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.31
-milestone_name: "Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization"
-status: Awaiting next milestone
-stopped_at: v1.30 Phase 32 implementation complete and verified.
-last_updated: "2026-05-27T09:58:23.111Z"
-last_activity: 2026-05-27 — Milestone v1.31 completed and archived
+milestone: v1.32
+milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
+status: planning
+last_updated: "2026-05-27T11:32:04.647Z"
+last_activity: 2026-05-27
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -21,36 +20,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Awaiting Phase 34 planning for Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
+**Current focus:** v1.32 Phase 34 corrects Practice Path scope and architecture so Practice is a general middle-school/high-school learning challenge system and equations are only the first Mathematics demo content package.
 
 ## Current Position
 
-Phase: Milestone v1.31 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-05-27 — Milestone v1.31 completed and archived
+Status: Defining requirements
+Last activity: 2026-05-27 — Milestone v1.32 started
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 4
-- Average duration: completed in one autonomous execution pass
-- Total execution time: same session
+- Total plans completed this milestone: 0 of 5
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 177 | 1/1 | Complete | 2026-05-27 |
-| 178 | 1/1 | Complete | 2026-05-27 |
-| 179 | 1/1 | Complete | 2026-05-27 |
-| 180 | 1/1 | Complete | 2026-05-27 |
+| 181 | 0/1 | Pending | — |
+| 182 | 0/1 | Pending | — |
+| 183 | 0/1 | Pending | — |
+| 184 | 0/1 | Pending | — |
+| 185 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 5 plans: 172, 173, 174, 175, 176
-- Trend: Phase 33 completed; next work is Phase 34 user testing and funnel feedback
+- Last 5 plans: 176, 177, 178, 179, 180
+- Trend: Phase 34 is a scope correction before returning to user testing
 
 *Updated after each plan completion*
 
@@ -67,7 +67,7 @@ Recent decisions affecting current work:
 - Practice mistakes use a hint-first flow before Learning Assistant explanation and teacher escalation.
 - Phase 27 remains frontend/demo-backed and provider-agnostic; the frontend calls only STOA service/API boundaries.
 - v1.26 continues roadmap numbering from Phase 147 after v1.25 ended at Phase 146.
-- Phase 28 narrows the Practice demo to Mathematics equations only.
+- Phase 28 narrows the Practice demo package to Mathematics equations only; it does not define final Practice Path scope.
 - Phase 28 work is frontend design/content/demo polish; functionality should be only enough to test and present the UI.
 - v1.27 continues roadmap numbering from Phase 153 after v1.26 ended at Phase 152.
 - Phase 29 keeps the equation Practice content stable and focuses on interaction smoothness, Practice-to-Learning-Chat entry, teacher escalation timing, dashboard/homepage/parent report IA, docs, and demo flow.
@@ -102,10 +102,12 @@ Recent decisions affecting current work:
 - Phase 178 split the homepage Practice entry into focused components and added a concrete equation challenge/path preview.
 - Phase 179 verified EN/DE/FR/IT Practice entry copy across 320, 375, 430, 768, 1024, and 1440 px browser widths and hardened long localized heading wrapping.
 - Phase 180 documented the homepage Practice entry funnel, added the Phase 33 QA checklist, verified unauthenticated Start Practice routing in browser, and passed `npm run build`.
+- v1.32 Phase 34 corrects prior wording that could imply Practice Path equals equations. The intended hierarchy is Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge.
+- Equation content remains the first demo seed under Mathematics / lower secondary / equations.
 
 ### Pending Todos
 
-- Start Phase 34: Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
+- Start Phase 181: Practice Path Scope Principle and Historical Documentation Correction.
 
 ### Quick Tasks Completed
 
