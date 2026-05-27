@@ -26,34 +26,27 @@
   "practiceEntry": {
     "eyebrow": "La pratica come ingresso",
     "title": "Percorso di pratica",
-    "body": "Inizia con brevi esercizi sugli argomenti scolastici. Se sbagli, ricevi un suggerimento o apri la chat di apprendimento per capire meglio.",
+    "body": "Inizia con brevi esercizi sugli argomenti scolastici. Scegli un tema, procedi passo dopo passo e usa i suggerimenti quando compare un errore.",
     "primaryCta": "Inizia la pratica",
     "secondaryCta": "Vedi il percorso",
     "signals": [
-      { "title": "Esercizi brevi", "body": "Lo studente prova prima un passaggio mirato di pratica." },
-      { "title": "Spiegazione nel punto giusto", "body": "La chat di apprendimento si apre sul passaggio esatto, senza ricominciare." }
+      { "title": "Esercizi brevi", "body": "Ogni lezione lavora su una piccola abilità scolastica in una sessione breve." },
+      { "title": "Suggerimenti prima delle risposte", "body": "Un errore mostra prima un aiuto utile, così lo studente può riprovare." }
     ],
     "preview": {
       "label": "Argomento demo attuale",
-      "title": "Un breve esercizio prima della spiegazione",
+      "title": "Un breve percorso sulle equazioni",
       "prompt": "Risolvi: 2x + 3 = 11",
       "progress": "Passo 2 di 5",
-      "hint": "Prima appare un suggerimento. Se il passaggio resta poco chiaro, la chat di apprendimento si apre con questo lavoro.",
+      "hint": "La lezione mostra un esercizio alla volta. Il progresso resta visibile e i suggerimenti guidano il prossimo passo dopo un errore.",
       "topicsLabel": "Disponibile: matematica / equazioni",
       "topics": ["Equazioni semplici", "Basi delle equazioni quadratiche", "Sistemi lineari"],
       "outcomes": [
-        { "title": "Chat di apprendimento", "detail": "Spiega il passaggio esatto che non è chiaro durante la pratica." },
-        { "title": "Insegnante", "detail": "Un insegnante qualificato aiuta quando serve più guida." },
-        { "title": "Report genitori", "detail": "La famiglia vede l’attività di apprendimento completa." }
+        { "title": "Argomenti scolastici", "detail": "La pratica è organizzata per materia, tema, unità e lezione." },
+        { "title": "Lavoro passo dopo passo", "detail": "Gli studenti rispondono a esercizi mirati, non a una lunga scheda." },
+        { "title": "Progresso visibile", "detail": "Lezioni completate, attuali, disponibili e bloccate mostrano cosa fare dopo." }
       ]
-    },
-    "flow": [
-      { "label": "Pratica", "detail": "Brevi passaggi aiutano lo studente a iniziare in autonomia." },
-      { "label": "Suggerimento", "detail": "Un aiuto calmo indica la prossima mossa utile." },
-      { "label": "Chat", "detail": "Il passaggio poco chiaro si apre con il contesto." },
-      { "label": "Insegnante", "detail": "Un insegnante qualificato interviene quando serve più guida." },
-      { "label": "Report", "detail": "La famiglia vede l’attività completa, non strumenti separati." }
-    ]
+    }
   },
   "journey": {
     "eyebrow": "Gerarchia della piattaforma",

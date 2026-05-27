@@ -1,6 +1,5 @@
-import { BookOpenCheck, CheckCircle2, GraduationCap, Lightbulb, MessageSquareText, Route } from 'lucide-react'
+import { BookOpenCheck, CheckCircle2, Lightbulb, ListChecks, Route } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { HomePracticeToChatFlow } from '@/components/home/HomePracticeToChatFlow'
 
 type PracticeSignal = {
   title: string
@@ -21,7 +20,7 @@ type PracticePreviewCopy = {
   }>
 }
 
-const outcomeIcons = [MessageSquareText, GraduationCap, CheckCircle2]
+const outcomeIcons = [BookOpenCheck, ListChecks, CheckCircle2]
 
 export function HomePracticePreview() {
   const { t } = useTranslation('home')
@@ -92,8 +91,6 @@ export function HomePracticePreview() {
           })}
         </div>
       </div>
-
-      <HomePracticeToChatFlow />
     </div>
   )
 }

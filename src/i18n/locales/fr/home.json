@@ -26,34 +26,27 @@
   "practiceEntry": {
     "eyebrow": "L’entraînement comme point d’entrée",
     "title": "Parcours d’entraînement",
-    "body": "Commence par de courts exercices sur les notions scolaires. En cas d’erreur, reçois un indice ou ouvre le chat d’apprentissage pour mieux comprendre.",
+    "body": "Commence par de courts exercices sur les notions scolaires. Choisis un thème, avance étape par étape et utilise les indices quand une erreur apparaît.",
     "primaryCta": "Commencer l’entraînement",
     "secondaryCta": "Voir le parcours",
     "signals": [
-      { "title": "Exercices courts", "body": "L’élève essaie d’abord une étape ciblée d’entraînement." },
-      { "title": "Explication au bon moment", "body": "Le chat d’apprentissage s’ouvre sur l’étape exacte, sans recommencer." }
+      { "title": "Exercices courts", "body": "Chaque leçon travaille une petite compétence scolaire dans une session courte." },
+      { "title": "Indices avant réponses", "body": "Une erreur affiche d’abord un indice utile pour que l’élève réessaie." }
     ],
     "preview": {
       "label": "Sujet de démonstration actuel",
-      "title": "Un court exercice avant l’explication",
+      "title": "Un court parcours sur les équations",
       "prompt": "Résous : 2x + 3 = 11",
       "progress": "Étape 2 sur 5",
-      "hint": "Un indice apparaît d’abord. Si l’étape reste peu claire, le chat d’apprentissage s’ouvre avec ce travail.",
+      "hint": "La leçon affiche un exercice à la fois. La progression reste visible, et les indices guident l’action suivante après une erreur.",
       "topicsLabel": "Disponible : mathématiques / équations",
       "topics": ["Équations simples", "Bases des équations quadratiques", "Systèmes linéaires"],
       "outcomes": [
-        { "title": "Chat d’apprentissage", "detail": "Explique l’étape exacte qui bloque pendant l’entraînement." },
-        { "title": "Enseignant", "detail": "Un enseignant qualifié aide quand plus de guidage est nécessaire." },
-        { "title": "Rapport parent", "detail": "La famille voit l’activité d’apprentissage complète." }
+        { "title": "Notions scolaires", "detail": "L’entraînement est organisé par matière, thème, unité et leçon." },
+        { "title": "Travail étape par étape", "detail": "L’élève répond à des exercices ciblés plutôt qu’à une longue fiche." },
+        { "title": "Progression visible", "detail": "Les leçons terminées, en cours, disponibles et verrouillées indiquent la suite." }
       ]
-    },
-    "flow": [
-      { "label": "S’entraîner", "detail": "De courtes étapes aident l’élève à commencer seul." },
-      { "label": "Indice", "detail": "Un indice calme pointe vers la prochaine action utile." },
-      { "label": "Chat", "detail": "L’étape bloquante s’ouvre avec son contexte." },
-      { "label": "Enseignant", "detail": "Un enseignant qualifié intervient si l’explication ne suffit pas." },
-      { "label": "Rapport parent", "detail": "La famille voit l’activité complète, pas des outils séparés." }
-    ]
+    }
   },
   "journey": {
     "eyebrow": "Hiérarchie de la plateforme",

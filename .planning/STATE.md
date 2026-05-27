@@ -138,6 +138,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Fix Student Profile mock-mode loading failure | Browser check on `/profile`; `npm run build` |
 | 2026-05-27 | Fix Student Learning History mock-mode loading failure | Browser check on `/learning-history`; `npm run build` |
 | 2026-05-27 | Expand How it works step explanations | Browser checks on `/how-it-works` at desktop and mobile widths; `npm run build` |
+| 2026-05-27 | Focus homepage Practice module on Practice Path content | Browser check on `/`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

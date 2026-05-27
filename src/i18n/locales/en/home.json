@@ -26,34 +26,27 @@
   "practiceEntry": {
     "eyebrow": "Practice as a learning entry",
     "title": "Practice Path",
-    "body": "Start with short challenges in school topics. Get hints when you make a mistake, then open Learning Chat when you need a clearer explanation.",
+    "body": "Start with short challenges in school topics. Choose a topic, solve one step at a time, and use hints to keep moving when a mistake appears.",
     "primaryCta": "Start Practice",
     "secondaryCta": "See how practice works",
     "signals": [
-      { "title": "Short practice lessons", "body": "Students try a focused practice step before asking for a full explanation." },
-      { "title": "Explanation at the stuck point", "body": "Learning Chat opens from the exact step, so the student does not restart." }
+      { "title": "Short practice lessons", "body": "Each lesson focuses on a small school-topic skill that can be completed in a short session." },
+      { "title": "Hints before answers", "body": "A mistake shows a useful hint first, so the student can try the next step independently." }
     ],
     "preview": {
       "label": "Current demo topic",
-      "title": "A short challenge before the explanation",
+      "title": "A short equation practice path",
       "prompt": "Solve: 2x + 3 = 11",
       "progress": "Step 2 of 5",
-      "hint": "A hint appears first. If the step is still unclear, Learning Chat opens with this work attached.",
+      "hint": "The lesson shows one challenge at a time. Progress stays visible, and hints guide the next move after a mistake.",
       "topicsLabel": "Available now: Mathematics / Equations",
       "topics": ["One-step equations", "Quadratic basics", "Linear systems"],
       "outcomes": [
-        { "title": "Learning Chat", "detail": "Explains the exact step when practice is unclear." },
-        { "title": "Teacher Support", "detail": "A qualified teacher can help when more guidance is needed." },
-        { "title": "Parent Report", "detail": "Families see the complete learning activity." }
+        { "title": "School topics", "detail": "Practice is organized by subject, topic, unit, and lesson." },
+        { "title": "Step-by-step work", "detail": "Students answer focused challenges instead of facing a long worksheet." },
+        { "title": "Visible progress", "detail": "Completed, current, available, and locked lessons show what to do next." }
       ]
-    },
-    "flow": [
-      { "label": "Practice", "detail": "Small guided school-topic steps help students begin independently." },
-      { "label": "Hint", "detail": "If they get stuck, a simple hint suggests what to try next." },
-      { "label": "Learning Chat", "detail": "If the step is still unclear, Learning Chat opens with the work attached." },
-      { "label": "Teacher Support", "detail": "A qualified teacher joins when the explanation is still not enough." },
-      { "label": "Parent Report", "detail": "Families see the full learning activity, not separate tools." }
-    ]
+    }
   },
   "journey": {
     "eyebrow": "Platform hierarchy",
