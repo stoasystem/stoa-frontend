@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.34
 milestone_name: "Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening"
 status: Awaiting next milestone
-last_updated: "2026-05-27T17:36:28.846Z"
+last_updated: "2026-05-27T18:45:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 4
@@ -146,6 +146,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Reorganize Practice overview subject-first layout | Browser subject-selection check on `/practice` at desktop and mobile widths; `npm run lint`; `npm run build` |
 | 2026-05-27 | Rename Learning Chat navigation label | Browser navigation label check on `/practice` at desktop and mobile widths; `npm run lint`; `npm run build` |
 | 2026-05-27 | Complete student profile account information | Browser check on `/profile` at desktop and mobile widths; `npm run lint`; `npm run build` |
+| 2026-05-27 | Complete tutor profile account information | Browser check on `/tutor/profile` at desktop and mobile widths; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

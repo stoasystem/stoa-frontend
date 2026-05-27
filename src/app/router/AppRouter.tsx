@@ -66,6 +66,7 @@ import { SupportPage } from '@/pages/support/SupportPage'
 import { TutorAvailabilityPage } from '@/pages/tutor/TutorAvailabilityPage'
 import { TutorDashboardPage } from '@/pages/tutor/TutorDashboardPage'
 import { TutorHelpRequestDetailPage } from '@/pages/tutor/TutorHelpRequestDetailPage'
+import { TutorProfilePage } from '@/pages/tutor/TutorProfilePage'
 
 export function AppRouter() {
   return (
@@ -142,6 +143,7 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['tutor']} />}>
             <Route path="/tutor" element={<TutorDashboardPage />} />
             <Route path="/tutor/availability" element={<TutorAvailabilityPage />} />
+            <Route path="/tutor/profile" element={<TutorProfilePage />} />
             <Route path="/tutor/requests/:requestId" element={<TutorHelpRequestDetailPage />} />
           </Route>
           <Route element={<RoleRoute allowedRoles={['admin']} />}>

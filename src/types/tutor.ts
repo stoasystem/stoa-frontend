@@ -47,3 +47,52 @@ export type TutorStats = {
   resolvedToday: number
   averageResponseTimeMinutes: number
 }
+
+export type TutorQualification = {
+  title: string
+  institution?: string
+  verified: boolean
+}
+
+export type TutorPayoutProfile = {
+  method: 'bank_transfer' | 'paypal' | 'not_configured'
+  accountHolder: string
+  bankName?: string
+  maskedIban?: string
+  payoutEmail?: string
+  currency: string
+  settlementCycle: string
+  nextPayoutDate?: string
+  lastPayoutDate?: string
+  contractType: string
+  taxStatus: string
+}
+
+export type TutorComplianceProfile = {
+  credentialReview: 'verified' | 'pending' | 'needs_update'
+  backgroundCheck: 'verified' | 'pending' | 'not_required'
+  termsAcceptedAt?: string
+}
+
+export type TutorProfile = {
+  id: string
+  userId: string
+  name: string
+  email: string
+  phone?: string
+  city?: string
+  country?: string
+  timezone: string
+  accountStatus: 'active' | 'pending_review' | 'paused'
+  verificationStatus: 'verified' | 'pending' | 'needs_update'
+  teachingSummary: string
+  subjects: string[]
+  levels: string[]
+  languages: string[]
+  qualifications: TutorQualification[]
+  availabilitySummary: string
+  payout: TutorPayoutProfile
+  compliance: TutorComplianceProfile
+  createdAt: string
+  updatedAt: string
+}
