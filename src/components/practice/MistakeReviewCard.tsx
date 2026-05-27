@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { getPracticeMistakeLessonPath } from '@/lib/practiceRoutes'
 import type { PracticeChatContext, PracticeMistake } from '@/types/practice'
 
 export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
@@ -18,7 +19,7 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
     hintViewed: true,
     learningChatExplanationRequested: true,
     topic: mistake.topic,
-    returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
+    returnTo: getPracticeMistakeLessonPath(mistake),
   }
 
   return (
@@ -35,7 +36,7 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
           </div>
           <div className="flex flex-wrap gap-2">
             <Button asChild variant="outline">
-              <Link to={`/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`}>Retry</Link>
+              <Link to={getPracticeMistakeLessonPath(mistake)}>Retry</Link>
             </Button>
             <Button asChild variant="secondary">
               <Link

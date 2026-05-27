@@ -6,10 +6,12 @@ import { MistakeReviewCard } from '@/components/practice/MistakeReviewCard'
 import { StudyStreakCard } from '@/components/practice/StudyStreakCard'
 import { SubjectPathCard } from '@/components/practice/SubjectPathCard'
 import { Button } from '@/components/ui/button'
+import { getPracticeLessonPath } from '@/lib/practiceRoutes'
 import type { PracticeOverview as PracticeOverviewData } from '@/types/practice'
 
 export function PracticeOverview({ overview }: { overview: PracticeOverviewData }) {
   const { t } = useTranslation('practice')
+  const recommendedTopic = overview.topics.find((topic) => topic.id === overview.recommendedLesson.topicId)
 
   return (
     <div className="space-y-8">
@@ -49,7 +51,7 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
             <p className="mt-2 text-sm text-muted-foreground">{overview.recommendedLesson.topic}</p>
           </div>
           <Button asChild>
-            <Link to={`/practice/${overview.recommendedLesson.subjectId}/lessons/${overview.recommendedLesson.id}`}>
+            <Link to={getPracticeLessonPath(overview.recommendedLesson)}>
               {t('continuePractice')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
@@ -63,7 +65,7 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
         </div>
         <div className="grid gap-4">
           {overview.subjects.map((subject) => (
-            <SubjectPathCard key={subject.id} subject={subject} />
+            <SubjectPathCard key={subject.id} subject={subject} topic={recommendedTopic} />
           ))}
         </div>
       </section>

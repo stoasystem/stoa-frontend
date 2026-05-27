@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.32
 milestone_name: "Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment"
 status: in_progress
-last_updated: "2026-05-27T12:25:00.000Z"
+last_updated: "2026-05-27T12:45:00.000Z"
 last_activity: 2026-05-27
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 5
-  completed_plans: 2
-  percent: 40
+  completed_plans: 3
+  percent: 60
 ---
 
 # Project State
@@ -24,16 +24,16 @@ See: .planning/PROJECT.md (updated 2026-05-27)
 
 ## Current Position
 
-Phase: 183 Practice Routes and Component Architecture Generalization
-Plan: 183-PLAN.md pending
-Status: Phase 182 complete; ready for route and component architecture alignment
-Last activity: 2026-05-27 — Phase 182 completed subject/topic Practice model and mock-data alignment
+Phase: 184 Generalized Practice UI Copy and Four-Language Localization
+Plan: 184-PLAN.md pending
+Status: Phase 183 complete; ready for user-facing copy and localization alignment
+Last activity: 2026-05-27 — Phase 183 completed subject/topic Practice route alignment
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 2 of 5
+- Total plans completed this milestone: 3 of 5
 - Average duration: 1 autonomous phase pass
 - Total execution time: in progress
 
@@ -43,7 +43,7 @@ Last activity: 2026-05-27 — Phase 182 completed subject/topic Practice model a
 |-------|-------|-------|----------|
 | 181 | 1/1 | Complete | 1 pass |
 | 182 | 1/1 | Complete | 1 pass |
-| 183 | 0/1 | Pending | — |
+| 183 | 1/1 | Complete | 1 pass |
 | 184 | 0/1 | Pending | — |
 | 185 | 0/1 | Pending | — |
 
@@ -106,10 +106,11 @@ Recent decisions affecting current work:
 - Equation content remains the first demo seed under Mathematics / lower secondary / equations.
 - Phase 181 recorded the Practice Path Scope Principle in English and Chinese and corrected historical docs so equations are framed as the first demo package only.
 - Phase 182 added explicit grade/topic/unit metadata to Practice types and mock data, with canonical demo seed data under `mockPractice.mathematics.lowerSecondary.equations`.
+- Phase 183 made `/practice/:subjectId/:topicId` the canonical Practice topic route shape while preserving legacy subject-only routes.
 
 ### Pending Todos
 
-- Start Phase 183: Practice Routes and Component Architecture Generalization.
+- Start Phase 184: Generalized Practice UI Copy and Four-Language Localization.
 
 ### Quick Tasks Completed
 

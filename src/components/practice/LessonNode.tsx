@@ -1,5 +1,6 @@
 import { CheckCircle2, Lock, PlayCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { getPracticeLessonPath } from '@/lib/practiceRoutes'
 import { cn } from '@/lib/utils'
 import type { PracticeLesson } from '@/types/practice'
 
@@ -41,7 +42,7 @@ export function LessonNode({ lesson }: { lesson: PracticeLesson }) {
   if (locked) return content
 
   return (
-    <Link aria-label={`Open ${lesson.title}`} to={`/practice/${lesson.subjectId}/lessons/${lesson.id}`}>
+    <Link aria-label={`Open ${lesson.title}`} to={getPracticeLessonPath(lesson)}>
       {content}
     </Link>
   )

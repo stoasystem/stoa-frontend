@@ -23,11 +23,17 @@ import { usePracticeHintMutation } from '@/hooks/practice/usePracticeHintMutatio
 import { usePracticeTeacherHelpMutation } from '@/hooks/practice/usePracticeTeacherHelpMutation'
 import { useSubmitChallengeAnswerMutation } from '@/hooks/practice/useSubmitChallengeAnswerMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import {
+  getPracticeLessonPath,
+  getPracticeLessonPathFromIds,
+  getPracticeLessonResultPath,
+  getPracticeTopicPath,
+} from '@/lib/practiceRoutes'
 import type { PracticeChatContext, PracticeChallenge } from '@/types/practice'
 
 export function LessonPage() {
   const { t } = useTranslation('practice')
-  const { lessonId, subjectId } = useParams()
+  const { lessonId, subjectId, topicId } = useParams()
   const navigate = useNavigate()
   const lessonQuery = useLessonQuery(lessonId)
   const submitAnswer = useSubmitChallengeAnswerMutation()
@@ -89,7 +95,9 @@ export function LessonPage() {
       hintViewed: state.hintsShown > 0 || Boolean(hintMutation.data),
       learningChatExplanationRequested: true,
       topic: targetChallenge.topic,
-      returnTo: `/practice/${lesson?.subjectId ?? selectedSubjectPath}/lessons/${lesson?.id ?? lessonId}`,
+      returnTo: lesson
+        ? getPracticeLessonPath(lesson)
+        : getPracticeLessonPathFromIds(selectedSubjectPath, topicId, lessonId ?? ''),
     }
   }
 
@@ -145,7 +153,7 @@ export function LessonPage() {
     }
 
     const result = await completeLesson.mutateAsync(lesson.id)
-    navigate(`/practice/${lesson.subjectId}/lessons/${lesson.id}/result`, { state: { result } })
+    navigate(getPracticeLessonResultPath(lesson), { state: { result } })
   }
 
   function renderChallenge() {
@@ -194,7 +202,7 @@ export function LessonPage() {
             description={lesson?.topic ?? 'Complete each step, use hints when needed, and keep going.'}
           />
           <Button asChild variant="outline">
-            <Link to={`/practice/${selectedSubjectPath}`}>
+            <Link to={getPracticeTopicPath(selectedSubjectPath, lesson?.topicId ?? topicId)}>
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Subject path
             </Link>

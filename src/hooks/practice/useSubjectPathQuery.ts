@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { getSubjectPath } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 
-export function useSubjectPathQuery(subjectId: string | undefined) {
+export function useSubjectPathQuery(subjectId: string | undefined, topicId: string | undefined) {
   return useQuery({
-    queryKey: practiceQueryKeys.subjectPath(subjectId ?? ''),
-    queryFn: () => getSubjectPath(subjectId ?? ''),
+    queryKey: practiceQueryKeys.subjectPath(subjectId ?? '', topicId ?? ''),
+    queryFn: () => getSubjectPath(subjectId ?? '', topicId),
     enabled: Boolean(subjectId),
   })
 }

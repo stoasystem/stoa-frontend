@@ -40,7 +40,7 @@
 
 - [x] **Phase 181: Practice Path Scope Principle and Historical Documentation Correction** - Correct product positioning across planning and product docs so Practice Path is general and equations are demo content.
 - [x] **Phase 182: Subject-Agnostic Practice Domain Model and Mock Data Contract** - Refactor Practice types, mock data, and contracts around subject, grade level, topic, unit, lesson, and challenge hierarchy.
-- [ ] **Phase 183: Practice Routes and Component Architecture Generalization** - Align Practice routes, page/component names, and route documentation with subject/topic-based architecture while preserving existing entry behavior.
+- [x] **Phase 183: Practice Routes and Component Architecture Generalization** - Align Practice routes, page/component names, and route documentation with subject/topic-based architecture while preserving existing entry behavior.
 - [ ] **Phase 184: Generalized Practice UI Copy and Four-Language Localization** - Update homepage, dashboard, Practice, parent, and tutor copy so equation language appears only as current demo content.
 - [ ] **Phase 185: Practice Scope Regression QA, Documentation Handoff, and Build Verification** - Verify generalized scope, preserve the equation demo flow, update README/QA/demo docs, and run final build/browser checks.
 
@@ -122,7 +122,7 @@
 |-------|----------------|--------|-----------|
 | 181. Practice Path Scope Principle and Historical Documentation Correction | 1/1 | Complete | 2026-05-27 |
 | 182. Subject-Agnostic Practice Domain Model and Mock Data Contract | 1/1 | Complete | 2026-05-27 |
-| 183. Practice Routes and Component Architecture Generalization | 0/1 | Pending | — |
+| 183. Practice Routes and Component Architecture Generalization | 1/1 | Complete | 2026-05-27 |
 | 184. Generalized Practice UI Copy and Four-Language Localization | 0/1 | Pending | — |
 | 185. Practice Scope Regression QA, Documentation Handoff, and Build Verification | 0/1 | Pending | — |
 

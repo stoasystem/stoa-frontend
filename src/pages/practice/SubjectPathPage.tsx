@@ -8,12 +8,15 @@ import { Button } from '@/components/ui/button'
 import { useSubjectPathQuery } from '@/hooks/practice/useSubjectPathQuery'
 import { usePracticeSubjectsQuery } from '@/hooks/practice/usePracticeSubjectsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { defaultPracticeTopicId } from '@/lib/practiceRoutes'
 
 export function SubjectPathPage() {
-  const { subjectId } = useParams()
-  const pathQuery = useSubjectPathQuery(subjectId)
+  const { subjectId, topicId } = useParams()
+  const resolvedTopicId = topicId ?? defaultPracticeTopicId
+  const pathQuery = useSubjectPathQuery(subjectId, resolvedTopicId)
   const subjectsQuery = usePracticeSubjectsQuery()
-  const subject = subjectsQuery.data?.items.find((item) => item.id === subjectId)
+  const subject = subjectsQuery.data?.items.find((item) => item.id === subjectId || (subjectId === 'math' && item.id === 'mathematics'))
+  const topicTitle = pathQuery.data?.topicTitle ?? 'Practice path'
 
   return (
     <DashboardLayout>
@@ -21,8 +24,8 @@ export function SubjectPathPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <PageHeader
             className="mb-0"
-            eyebrow="Equation path"
-            title={subject?.name ? `${subject.name}: Equations` : 'Practice path'}
+            eyebrow="Practice topic"
+            title={subject?.name ? `${subject.name}: ${topicTitle}` : 'Practice path'}
             description={subject?.description ?? 'Follow the next available lesson and keep the session short.'}
           />
           <Button asChild variant="outline">

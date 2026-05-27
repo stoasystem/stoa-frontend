@@ -106,6 +106,9 @@ export function AppRouter() {
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/practice" element={<PracticeOverviewPage />} />
             <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
+            <Route path="/practice/:subjectId/:topicId" element={<SubjectPathPage />} />
+            <Route path="/practice/:subjectId/:topicId/lessons/:lessonId" element={<LessonPage />} />
+            <Route path="/practice/:subjectId/:topicId/lessons/:lessonId/result" element={<LessonResultPage />} />
             <Route path="/practice/:subjectId" element={<SubjectPathPage />} />
             <Route path="/practice/:subjectId/lessons/:lessonId" element={<LessonPage />} />
             <Route path="/practice/:subjectId/lessons/:lessonId/result" element={<LessonResultPage />} />

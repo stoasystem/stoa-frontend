@@ -32,14 +32,14 @@
 
 ### Routes and Component Architecture
 
-- [ ] **ROUTE34-01**: Practice route strategy prefers subject/topic identifiers such as `/practice/:subjectId/:topicId` for topic-level paths.
-- [ ] **ROUTE34-02**: Existing `/practice` entry remains the student Practice overview route.
-- [ ] **ROUTE34-03**: Existing links remain backward-compatible or are redirected when route shape changes.
-- [ ] **ROUTE34-04**: Page and component names avoid equation-only names such as `EquationPracticePage` or `EquationPath`.
-- [ ] **ROUTE34-05**: Practice overview can display current available demo content as Mathematics / Equations without claiming that Practice is equation-only.
-- [ ] **ROUTE34-06**: Student dashboard Practice cards use subject/topic-based language.
-- [ ] **ROUTE34-07**: Parent and tutor Practice context surfaces use subject/topic-based labels.
-- [ ] **ROUTE34-08**: Route map and route documentation reflect the generalized Practice path architecture.
+- [x] **ROUTE34-01**: Practice route strategy prefers subject/topic identifiers such as `/practice/:subjectId/:topicId` for topic-level paths.
+- [x] **ROUTE34-02**: Existing `/practice` entry remains the student Practice overview route.
+- [x] **ROUTE34-03**: Existing links remain backward-compatible or are redirected when route shape changes.
+- [x] **ROUTE34-04**: Page and component names avoid equation-only names such as `EquationPracticePage` or `EquationPath`.
+- [x] **ROUTE34-05**: Practice overview can display current available demo content as Mathematics / Equations without claiming that Practice is equation-only.
+- [x] **ROUTE34-06**: Student dashboard Practice cards use subject/topic-based language.
+- [x] **ROUTE34-07**: Parent and tutor Practice context surfaces use subject/topic-based labels.
+- [x] **ROUTE34-08**: Route map and route documentation reflect the generalized Practice path architecture.
 
 ### UI Copy and Localization
 
@@ -114,14 +114,14 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MODEL34-07 | Phase 182 | Complete |
 | MODEL34-08 | Phase 182 | Complete |
 | MODEL34-09 | Phase 182 | Complete |
-| ROUTE34-01 | Phase 183 | Pending |
-| ROUTE34-02 | Phase 183 | Pending |
-| ROUTE34-03 | Phase 183 | Pending |
-| ROUTE34-04 | Phase 183 | Pending |
-| ROUTE34-05 | Phase 183 | Pending |
-| ROUTE34-06 | Phase 183 | Pending |
-| ROUTE34-07 | Phase 183 | Pending |
-| ROUTE34-08 | Phase 183 | Pending |
+| ROUTE34-01 | Phase 183 | Complete |
+| ROUTE34-02 | Phase 183 | Complete |
+| ROUTE34-03 | Phase 183 | Complete |
+| ROUTE34-04 | Phase 183 | Complete |
+| ROUTE34-05 | Phase 183 | Complete |
+| ROUTE34-06 | Phase 183 | Complete |
+| ROUTE34-07 | Phase 183 | Complete |
+| ROUTE34-08 | Phase 183 | Complete |
 | COPY34-01 | Phase 184 | Pending |
 | COPY34-02 | Phase 184 | Pending |
 | COPY34-03 | Phase 184 | Pending |

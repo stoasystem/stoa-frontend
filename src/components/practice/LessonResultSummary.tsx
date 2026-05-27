@@ -3,6 +3,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getPracticeMistakeLessonPath, getPracticeResultTopicPath } from '@/lib/practiceRoutes'
 import type { PracticeChatContext, PracticeLessonResult } from '@/types/practice'
 
 export function LessonResultSummary({ result }: { result: PracticeLessonResult }) {
@@ -36,7 +37,7 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
-            <Link to={`/practice/${result.subjectId}`}>{t('continuePractice')}</Link>
+            <Link to={getPracticeResultTopicPath(result)}>{t('continuePractice')}</Link>
           </Button>
           <Button asChild variant="outline">
             <Link to="/practice/mistakes">{t('reviewMistakes')}</Link>
@@ -80,7 +81,7 @@ function buildPracticeChatContext(
     hintViewed: true,
     learningChatExplanationRequested: true,
     topic: mistake.topic,
-    returnTo: `/practice/${mistake.subjectId}/lessons/${mistake.lessonId}`,
+    returnTo: getPracticeMistakeLessonPath(mistake),
   }
 }
 

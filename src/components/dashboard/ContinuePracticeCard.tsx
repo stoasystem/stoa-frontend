@@ -3,6 +3,7 @@ import { ArrowRight, BookOpenCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
+import { getPracticeLessonPath } from '@/lib/practiceRoutes'
 
 export function ContinuePracticeCard() {
   const practiceOverviewQuery = usePracticeOverviewQuery()
@@ -34,7 +35,7 @@ export function ContinuePracticeCard() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild className="premium-primary-button text-white hover:text-white">
-            <Link to={lesson ? `/practice/${lesson.subjectId}/lessons/${lesson.id}` : '/practice'}>
+            <Link to={lesson ? getPracticeLessonPath(lesson) : '/practice'}>
               Continue Practice
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

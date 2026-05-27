@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import type { PracticeSubject } from '@/types/practice'
+import { getPracticeTopicPath } from '@/lib/practiceRoutes'
+import type { PracticeSubject, PracticeTopic } from '@/types/practice'
 
-export function SubjectPathCard({ subject }: { subject: PracticeSubject }) {
+export function SubjectPathCard({ subject, topic }: { subject: PracticeSubject; topic?: PracticeTopic }) {
   const { t } = useTranslation('practice')
+  const topicPath = getPracticeTopicPath(subject.id, topic?.id)
 
   return (
     <Card className="group border-primary/10 bg-card/95 shadow-[var(--platform-shadow-soft)] transition-colors hover:border-primary/30">
@@ -18,7 +20,7 @@ export function SubjectPathCard({ subject }: { subject: PracticeSubject }) {
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{subject.description}</p>
           </div>
           <Button asChild variant="outline" className="shrink-0">
-            <Link to={`/practice/${subject.id}`}>
+            <Link to={topicPath}>
               {t('startLesson')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>

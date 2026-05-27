@@ -55,11 +55,14 @@ export async function getPracticeSubjects() {
   }, { items: practiceSubjects })
 }
 
-export async function getSubjectPath(subjectId: string) {
+export async function getSubjectPath(subjectId: string, topicId?: string) {
   return withPracticeDemo(async () => {
-    const response = await httpClient.get<PracticePath>(`/practice/subjects/${subjectId}/path`)
+    const path = topicId
+      ? `/practice/subjects/${subjectId}/topics/${topicId}/path`
+      : `/practice/subjects/${subjectId}/path`
+    const response = await httpClient.get<PracticePath>(path)
     return response.data
-  }, () => getMockPracticePath(subjectId))
+  }, () => getMockPracticePath(subjectId, topicId))
 }
 
 export async function getPracticeLesson(lessonId: string) {

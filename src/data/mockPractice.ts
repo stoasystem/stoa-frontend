@@ -337,15 +337,16 @@ export function getMockPracticeOverview(): PracticeOverview {
   }
 }
 
-export function getMockPracticePath(subjectId: string): PracticePath {
+export function getMockPracticePath(subjectId: string, topicId = demoTopicId): PracticePath {
   const resolvedSubjectId = normalizeSubjectId(subjectId)
+  const resolvedTopicId = normalizeTopicId(topicId)
 
   return {
     subjectId: resolvedSubjectId,
     gradeLevel: demoGradeLevel,
-    topicId: demoTopicId,
+    topicId: resolvedTopicId,
     topicTitle: demoTopicTitle,
-    units: practiceUnits.filter((unit) => unit.subjectId === resolvedSubjectId && unit.topicId === demoTopicId),
+    units: practiceUnits.filter((unit) => unit.subjectId === resolvedSubjectId && unit.topicId === resolvedTopicId),
   }
 }
 
@@ -540,6 +541,10 @@ function lesson(
 
 function normalizeSubjectId(subjectId: string) {
   return subjectId === legacyMathSubjectId ? demoSubjectId : subjectId
+}
+
+function normalizeTopicId(topicId: string) {
+  return topicId || demoTopicId
 }
 
 function getLessonUnitId(lessonId: string) {
