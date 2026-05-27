@@ -144,6 +144,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Generalize login page activity copy | Browser check on `/login?next=/chat`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Polish student dashboard card layout | Browser check on `/dashboard` at desktop and mobile widths; `npm run lint`; `npm run build` |
 | 2026-05-27 | Reorganize Practice overview subject-first layout | Browser subject-selection check on `/practice` at desktop and mobile widths; `npm run lint`; `npm run build` |
+| 2026-05-27 | Rename Learning Chat navigation label | Browser navigation label check on `/practice` at desktop and mobile widths; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

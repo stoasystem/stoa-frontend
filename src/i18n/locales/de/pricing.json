@@ -15,7 +15,7 @@
     "title": "Planzugang",
     "headers": ["Funktion", "Probephase", "Schüler", "Mit Lehrpersonen", "Familie"],
     "rows": [
-      ["Lernchat", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
+      ["Erklärungen zu Fragen", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
       ["Hausaufgaben-Upload", "Begrenzt", "Enthalten", "Enthalten", "Enthalten"],
       ["Elternbereich", "Enthalten", "Enthalten", "Enthalten", "Enthalten"],
       ["Wochenberichte", "—", "Enthalten", "Enthalten", "Enthalten"],

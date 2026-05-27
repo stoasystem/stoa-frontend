@@ -46,7 +46,7 @@ export function MistakeReviewCard({ mistake }: { mistake: PracticeMistake }) {
                   prompt: 'Can you explain this step?',
                 }}
               >
-                Review with Learning Chat
+                Ask about this step
               </Link>
             </Button>
           </div>

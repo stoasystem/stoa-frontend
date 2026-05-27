@@ -17,7 +17,7 @@ export const pricingPlans: BillingPlan[] = [
     currency: 'CHF',
     audience: 'A focused learner who needs guided homework help.',
     cta: 'Select student',
-    features: ['Learning chat', 'Homework upload', 'Parent dashboard'],
+    features: ['Question explanations', 'Homework upload', 'Parent dashboard'],
   },
   {
     id: 'tutor_supported',

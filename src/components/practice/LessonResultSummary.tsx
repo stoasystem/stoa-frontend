@@ -51,7 +51,7 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
                   prompt: 'Can you explain this step?',
                 }}
               >
-                Review with Learning Chat
+                Ask about this step
               </Link>
             </Button>
           )}

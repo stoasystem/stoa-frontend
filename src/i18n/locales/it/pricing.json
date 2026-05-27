@@ -15,7 +15,7 @@
     "title": "Accesso per piano",
     "headers": ["Funzione", "Prova", "Studente", "Con insegnante", "Famiglia"],
     "rows": [
-      ["Chat di studio", "Limitata", "Inclusa", "Inclusa", "Inclusa"],
+      ["Spiegazioni alle domande", "Limitate", "Incluse", "Incluse", "Incluse"],
       ["Caricamento compiti", "Limitato", "Incluso", "Incluso", "Incluso"],
       ["Area genitori", "Inclusa", "Inclusa", "Inclusa", "Inclusa"],
       ["Report settimanali", "—", "Inclusi", "Inclusi", "Inclusi"],

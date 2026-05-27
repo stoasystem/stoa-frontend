@@ -2,7 +2,7 @@
   "title": "Esercitati",
   "entryMessage": "Inizia con la pratica. Chiedi una spiegazione quando ti blocchi.",
   "continuePractice": "Continua a esercitarti",
-  "openLearningChat": "Apri la chat di apprendimento",
+  "openLearningChat": "Fai una domanda",
   "startLesson": "Inizia",
   "tryAgain": "Riprova",
   "checkAnswer": "Controlla",
@@ -10,7 +10,7 @@
   "notQuite": "Non proprio",
   "showHint": "Mostra un suggerimento",
   "explainStep": "Spiega questo passaggio",
-  "askLearningChat": "Chiedi nella chat",
+  "askLearningChat": "Chiedi su questo passaggio",
   "backToLesson": "Torna alla lezione",
   "askQuestion": "Fai una domanda",
   "askTeacher": "Chiedi a un insegnante",
@@ -35,6 +35,6 @@
     "subject": "Matematica",
     "gradeLevel": "Scuola secondaria I",
     "supportCopy": "Prima esercitati. Chiedi una spiegazione quando serve.",
-    "learningChatHint": "La chat di apprendimento può spiegare i passaggi poco chiari durante la lezione."
+    "learningChatHint": "Fai una domanda quando un passaggio della lezione non è chiaro."
   }
 }

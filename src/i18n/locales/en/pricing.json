@@ -15,7 +15,7 @@
     "title": "Plan access",
     "headers": ["Feature", "Trial", "Student", "Teacher-supported", "Family"],
     "rows": [
-      ["Learning chat", "Limited", "Included", "Included", "Included"],
+      ["Question explanations", "Limited", "Included", "Included", "Included"],
       ["Homework upload", "Limited", "Included", "Included", "Included"],
       ["Parent dashboard", "Included", "Included", "Included", "Included"],
       ["Weekly reports", "—", "Included", "Included", "Included"],

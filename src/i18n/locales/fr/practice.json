@@ -2,7 +2,7 @@
   "title": "S’entraîner",
   "entryMessage": "Commencer par s’entraîner. Demander une explication en cas de blocage.",
   "continuePractice": "Continuer l’entraînement",
-  "openLearningChat": "Ouvrir le chat d’apprentissage",
+  "openLearningChat": "Poser une question",
   "startLesson": "Commencer",
   "tryAgain": "Réessayer",
   "checkAnswer": "Vérifier",
@@ -10,7 +10,7 @@
   "notQuite": "Pas tout à fait",
   "showHint": "Voir un indice",
   "explainStep": "Expliquer cette étape",
-  "askLearningChat": "Demander dans le chat",
+  "askLearningChat": "Demander pour cette étape",
   "backToLesson": "Retour à la leçon",
   "askQuestion": "Poser une question",
   "askTeacher": "Demander à un enseignant",
@@ -35,6 +35,6 @@
     "subject": "Mathématiques",
     "gradeLevel": "Secondaire I",
     "supportCopy": "Entraîne-toi d’abord. Demande une explication si nécessaire.",
-    "learningChatHint": "Le chat d’apprentissage peut expliquer les étapes peu claires pendant la leçon."
+    "learningChatHint": "Pose une question lorsqu’une étape de la leçon n’est pas claire."
   }
 }

@@ -23,7 +23,7 @@ export function PracticeOverviewPage() {
         <PageHeader
           eyebrow="Practice Path"
           title="Guided practice"
-          description="Short challenges for school topics, with hints and Learning Chat ready when a step is unclear."
+          description="Short challenges for school topics, with hints and a place to ask when a step is unclear."
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}

@@ -26,7 +26,7 @@ export function ContinuePracticeCard() {
       <CardContent className="space-y-5">
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
           Pick up where you left off in the current school topic. If a step is unclear, you can ask for an explanation
-          in Learning Chat with the practice context attached.
+          with the practice context attached.
         </p>
         <div className="grid gap-3 md:grid-cols-3">
           <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Next practice challenge'} />

@@ -19,15 +19,15 @@ export function AskQuestionCard() {
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="text-sm leading-6 text-muted-foreground">
-          Open Learning Chat for a step-by-step explanation. Use it directly for homework,
+          Ask for a step-by-step explanation. Use it directly for homework,
           or enter from Practice when a lesson step needs clearer guidance.
         </p>
         <div className="rounded-md border border-primary/10 bg-[hsl(var(--platform-surface-app))] p-4 text-sm leading-6">
-          Practice helps you start. Learning Chat helps you understand the step that is unclear.
+          Practice helps you start. Asking a question helps you understand the step that is unclear.
         </div>
         <Button asChild variant="outline">
           <Link to="/chat">
-            Open Learning Chat
+            Ask a question
             <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </Link>
         </Button>

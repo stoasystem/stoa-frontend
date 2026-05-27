@@ -26,7 +26,7 @@ const mockStudentLearningHistory: { items: LearningHistoryItem[] } = {
     {
       id: 'history-learning-chat-equations',
       subject: 'Mathematics',
-      title: 'Learning Chat explanation',
+      title: 'Question explanation',
       summary:
         'Asked for a clearer explanation after a practice hint was not enough to understand the next step.',
       createdAt: '2026-05-26T15:20:00Z',

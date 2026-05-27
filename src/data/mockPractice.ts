@@ -302,7 +302,7 @@ export function getMockPracticeRoadmap(subjectId: string, topicId = demoTopicId)
       subjectId: resolvedSubjectId,
       gradeLevel: demoGradeLevel,
       title: demoTopicTitle,
-      description: 'Follow short equation lessons in a calm roadmap before asking Learning Chat for unclear steps.',
+      description: 'Follow short equation lessons in a calm roadmap before asking about unclear steps.',
       progress,
       currentLessonId: currentRoadmapLessonId,
     },
@@ -554,7 +554,7 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     supportiveNote: 'Anna practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
     questionsAsked: 2,
     teacherSupportRequested: 1,
-    learningActivityNote: 'This week combines independent Practice Path work with Learning Chat explanations and one teacher-support moment.',
+    learningActivityNote: 'This week combines independent Practice Path work with step-by-step explanations and one teacher-support moment.',
   }
 }
 

@@ -3,7 +3,7 @@ import { ArrowRight, MessageCircle, Route } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const actions = [
-  { label: 'Ask a question', to: '/chat', detail: 'Use Learning Chat for a specific homework step.', icon: MessageCircle },
+  { label: 'Ask a question', to: '/chat', detail: 'Ask for help with a specific homework step.', icon: MessageCircle },
   { label: 'Review recent mistakes', to: '/practice/mistakes', detail: 'Return to practice steps that need one more look.', icon: Route },
   { label: 'View learning history', to: '/learning-history', detail: 'See previous questions, explanations, and progress.', icon: ArrowRight },
 ]

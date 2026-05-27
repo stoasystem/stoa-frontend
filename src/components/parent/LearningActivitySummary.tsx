@@ -45,7 +45,7 @@ export function LearningActivitySummary({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          Practice shows where a student tries independently. Learning Chat shows where
+          Practice shows where a student tries independently. Questions show where
           explanation is needed. Together, they give parents a clearer picture of learning progress.
         </p>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">

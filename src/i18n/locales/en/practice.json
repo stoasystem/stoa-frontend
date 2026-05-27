@@ -2,7 +2,7 @@
   "title": "Practice",
   "entryMessage": "Start with practice. Ask for an explanation when you get stuck.",
   "continuePractice": "Continue practice",
-  "openLearningChat": "Open Learning Chat",
+  "openLearningChat": "Ask a question",
   "startLesson": "Start lesson",
   "tryAgain": "Try again",
   "checkAnswer": "Check answer",
@@ -10,7 +10,7 @@
   "notQuite": "Not quite",
   "showHint": "Show hint",
   "explainStep": "Explain this step",
-  "askLearningChat": "Ask in Learning Chat",
+  "askLearningChat": "Ask about this step",
   "backToLesson": "Back to lesson",
   "askQuestion": "Ask a question",
   "askTeacher": "Ask a teacher",
@@ -35,6 +35,6 @@
     "subject": "Mathematics",
     "gradeLevel": "Lower secondary",
     "supportCopy": "Practise first. Ask for an explanation when needed.",
-    "learningChatHint": "Learning Chat can explain unclear steps during the lesson."
+    "learningChatHint": "Ask a question when a lesson step is unclear."
   }
 }
