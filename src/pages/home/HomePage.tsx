@@ -1,6 +1,5 @@
 import { HomeCTASection } from '@/components/home/HomeCTASection'
 import { HomeHero } from '@/components/home/HomeHero'
-import { HomeLearningJourney } from '@/components/home/HomeLearningJourney'
 import { HomeLearningFlow } from '@/components/home/HomeLearningFlow'
 import { HomeParentVisibility } from '@/components/home/HomeParentVisibility'
 import { HomePracticeEntry } from '@/components/home/HomePracticeEntry'
@@ -14,7 +13,6 @@ export function HomePage() {
       <HomeHero />
       <HomePracticeEntry />
       <HomeLearningFlow />
-      <HomeLearningJourney />
       <HomeTeacherFallback />
       <HomeParentVisibility />
       <HomeTrustSection />

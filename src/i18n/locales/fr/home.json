@@ -48,15 +48,6 @@
       ]
     }
   },
-  "journey": {
-    "eyebrow": "Hiérarchie de la plateforme",
-    "layers": [
-      { "title": "La pratique démarre", "detail": "Un exercice court montre ce que l’élève tente seul." },
-      { "title": "Le chat explique", "detail": "L’étape peu claire devient un fil d’explication ciblé." },
-      { "title": "L’enseignant débloque", "detail": "Le soutien intervient après une confusion répétée ou une demande." },
-      { "title": "Les parents voient", "detail": "Les rapports relient exercices, questions, explications et soutien." }
-    ]
-  },
   "teacher": {
     "eyebrow": "Accompagnement par un enseignant qualifié",
     "visualText": "L’accompagnement d’un enseignant qualifié reste relié au moment d’apprentissage.",

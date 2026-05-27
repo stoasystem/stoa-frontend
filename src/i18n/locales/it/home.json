@@ -48,15 +48,6 @@
       ]
     }
   },
-  "journey": {
-    "eyebrow": "Gerarchia della piattaforma",
-    "layers": [
-      { "title": "La pratica avvia", "detail": "Un esercizio breve mostra cosa lo studente prova da solo." },
-      { "title": "La chat spiega", "detail": "Il passaggio poco chiaro diventa una spiegazione mirata." },
-      { "title": "L’insegnante sblocca", "detail": "Il supporto arriva dopo confusione ripetuta o richiesta." },
-      { "title": "I genitori vedono", "detail": "I report collegano pratica, domande, spiegazioni e supporto." }
-    ]
-  },
   "teacher": {
     "eyebrow": "Supporto di un insegnante qualificato",
     "visualText": "Il supporto di un insegnante qualificato resta collegato al momento di studio.",

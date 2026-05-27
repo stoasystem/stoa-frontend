@@ -48,15 +48,6 @@
       ]
     }
   },
-  "journey": {
-    "eyebrow": "Plattform-Hierarchie",
-    "layers": [
-      { "title": "Üben startet", "detail": "Eine kurze Aufgabe zeigt, was Lernende selbst versuchen." },
-      { "title": "Lernchat erklärt", "detail": "Der unklare Schritt wird zur gezielten Erklärung." },
-      { "title": "Lehrpersonen helfen", "detail": "Professionelle Unterstützung greift bei wiederholter Unklarheit." },
-      { "title": "Eltern sehen Fortschritt", "detail": "Berichte verbinden Übungen, Fragen, Erklärungen und Unterstützung." }
-    ]
-  },
   "teacher": {
     "eyebrow": "Professionelle Unterstützung durch Lehrpersonen",
     "visualText": "Unterstützung durch Lehrpersonen bleibt mit dem Lernmoment verbunden.",

@@ -48,15 +48,6 @@
       ]
     }
   },
-  "journey": {
-    "eyebrow": "Platform hierarchy",
-    "layers": [
-      { "title": "Practice starts learning", "detail": "A short exercise shows what the student can try independently." },
-      { "title": "Learning Chat explains", "detail": "The unclear step becomes a focused explanation thread." },
-      { "title": "Teachers unblock", "detail": "Professional support joins after repeated confusion or a support request." },
-      { "title": "Parents see progress", "detail": "Reports connect practice, questions, explanations, and support moments." }
-    ]
-  },
   "teacher": {
     "eyebrow": "Professional teacher support",
     "visualText": "Professional teacher support stays connected to the learning moment.",
