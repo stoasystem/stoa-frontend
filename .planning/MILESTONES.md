@@ -1,5 +1,27 @@
 # Milestones
 
+## v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization (Shipped: 2026-05-27)
+
+**Phases completed:** 4 phases, 4 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.31-MILESTONE-AUDIT.md`
+**Known deferred items at close:** 21 unrelated pre-existing debug/quick artifacts left untouched in `.planning/STATE.md`.
+
+**Key accomplishments:**
+
+- Added role-aware Start Practice routing for visitors, students, parents, tutors, and admins.
+- Added a clearer homepage Practice Game entry with path preview and Start Practice CTA.
+- Added English, German, French, and Italian Practice entry copy with mobile wrapping hardening.
+- Added homepage Practice entry, CTA hierarchy, Practice copy, IA map, demo flow, and QA documentation.
+
+### Verification
+
+- `npm run build`: passed.
+- Browser route check: unauthenticated Start Practice opens `/login?next=/practice`.
+- Browser layout QA: EN/DE/FR/IT passed at 320, 375, 430, 768, 1024, and 1440 CSS px.
+- Milestone audit: passed with 43/43 requirements satisfied and no critical gaps.
+
+---
+
 ## v1.30 Phase 32: Cross-Locale Language QA, Copy Accuracy Review, and Development Artifact Audit (Shipped: 2026-05-27)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

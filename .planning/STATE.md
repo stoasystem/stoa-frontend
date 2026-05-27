@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.31
 milestone_name: "Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization"
-status: implemented
-last_updated: "2026-05-27T10:05:00.000Z"
-last_activity: 2026-05-27
+status: Awaiting next milestone
+stopped_at: v1.30 Phase 32 implementation complete and verified.
+last_updated: "2026-05-27T09:58:23.111Z"
+last_activity: 2026-05-27 — Milestone v1.31 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** v1.31 Phase 33 clarifies the homepage Practice entry, Start Practice routing, four-language Practice copy, and the Practice -> Learning Chat -> Professional Teacher Support -> Parent Report funnel without expanding curriculum or complex gamification.
+**Current focus:** Awaiting Phase 34 planning for Homepage Conversion QA, Student Entry Testing, and Practice Funnel Feedback.
 
 ## Current Position
 
-Phase: 180 complete
-Plan: 180-PLAN.md
-Status: Phase 33 implemented
-Last activity: 2026-05-27 — Phase 180 documentation, demo flow, README, browser verification, and build verification completed
+Phase: Milestone v1.31 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-27 — Milestone v1.31 completed and archived
 
 ## Performance Metrics
 
@@ -49,7 +50,7 @@ Last activity: 2026-05-27 — Phase 180 documentation, demo flow, README, browse
 **Recent Trend:**
 
 - Last 5 plans: 172, 173, 174, 175, 176
-- Trend: Phase 178 completed; next work verifies four-language mobile fit and accessibility
+- Trend: Phase 33 completed; next work is Phase 34 user testing and funnel feedback
 
 *Updated after each plan completion*
 
@@ -164,4 +165,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Start Phase 33: Real User Testing Preparation and Feedback Operations.
+- Start the next milestone with /gsd-new-milestone
