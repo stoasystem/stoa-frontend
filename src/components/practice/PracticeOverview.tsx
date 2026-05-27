@@ -1,17 +1,33 @@
 import { ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { DailyGoalCard } from '@/components/practice/DailyGoalCard'
 import { MistakeReviewCard } from '@/components/practice/MistakeReviewCard'
+import { PracticeRoadmap } from '@/components/practice/PracticeRoadmap'
 import { StudyStreakCard } from '@/components/practice/StudyStreakCard'
 import { SubjectPathCard } from '@/components/practice/SubjectPathCard'
 import { Button } from '@/components/ui/button'
-import { getPracticeLessonPath } from '@/lib/practiceRoutes'
-import type { PracticeOverview as PracticeOverviewData } from '@/types/practice'
+import { getPracticeLessonPath, getPracticeLessonPathFromIds } from '@/lib/practiceRoutes'
+import type {
+  PracticeOverview as PracticeOverviewData,
+  PracticeRoadmap as PracticeRoadmapData,
+  PracticeRoadmapLesson,
+} from '@/types/practice'
 
-export function PracticeOverview({ overview }: { overview: PracticeOverviewData }) {
+export function PracticeOverview({
+  overview,
+  roadmap,
+}: {
+  overview: PracticeOverviewData
+  roadmap?: PracticeRoadmapData
+}) {
   const { t } = useTranslation('practice')
+  const navigate = useNavigate()
   const recommendedTopic = overview.topics.find((topic) => topic.id === overview.recommendedLesson.topicId)
+
+  function handleRoadmapLessonClick(lesson: PracticeRoadmapLesson) {
+    navigate(getPracticeLessonPathFromIds(lesson.subjectId, lesson.topicId, lesson.id))
+  }
 
   return (
     <div className="space-y-8">
@@ -43,6 +59,7 @@ export function PracticeOverview({ overview }: { overview: PracticeOverviewData 
         <DailyGoalCard {...overview.dailyGoal} />
         <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
       </div>
+      {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
       <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>

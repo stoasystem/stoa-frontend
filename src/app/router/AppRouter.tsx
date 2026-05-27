@@ -55,6 +55,7 @@ import { LessonResultPage } from '@/pages/practice/LessonResultPage'
 import { MistakesReviewPage } from '@/pages/practice/MistakesReviewPage'
 import { PracticeOverviewPage } from '@/pages/practice/PracticeOverviewPage'
 import { SubjectPathPage } from '@/pages/practice/SubjectPathPage'
+import { TopicRoadmapPage } from '@/pages/practice/TopicRoadmapPage'
 import { ReferralsPage } from '@/pages/referrals/ReferralsPage'
 import { StudentProfilePage } from '@/pages/profile/StudentProfilePage'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -106,7 +107,7 @@ export function AppRouter() {
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/practice" element={<PracticeOverviewPage />} />
             <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
-            <Route path="/practice/:subjectId/:topicId" element={<SubjectPathPage />} />
+            <Route path="/practice/:subjectId/:topicId" element={<TopicRoadmapPage />} />
             <Route path="/practice/:subjectId/:topicId/lessons/:lessonId" element={<LessonPage />} />
             <Route path="/practice/:subjectId/:topicId/lessons/:lessonId/result" element={<LessonResultPage />} />
             <Route path="/practice/:subjectId" element={<SubjectPathPage />} />

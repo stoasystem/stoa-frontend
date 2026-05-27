@@ -98,23 +98,23 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROAD35-01 | Phase 188 | Pending |
-| ROAD35-02 | Phase 188 | Pending |
-| ROAD35-03 | Phase 188 | Pending |
-| ROAD35-04 | Phase 188 | Pending |
-| ROAD35-05 | Phase 188 | Pending |
-| ROAD35-06 | Phase 188 | Pending |
-| ROAD35-07 | Phase 188 | Pending |
+| ROAD35-01 | Phase 188 | Complete |
+| ROAD35-02 | Phase 188 | Complete |
+| ROAD35-03 | Phase 188 | Complete |
+| ROAD35-04 | Phase 188 | Complete |
+| ROAD35-05 | Phase 188 | Complete |
+| ROAD35-06 | Phase 188 | Complete |
+| ROAD35-07 | Phase 188 | Complete |
 | ROAD35-08 | Phase 189 | Pending |
 | NODE35-01 | Phase 187 | Complete |
-| NODE35-02 | Phase 188 | Pending |
-| NODE35-03 | Phase 188 | Pending |
-| NODE35-04 | Phase 188 | Pending |
+| NODE35-02 | Phase 188 | Complete |
+| NODE35-03 | Phase 188 | Complete |
+| NODE35-04 | Phase 188 | Complete |
 | NODE35-05 | Phase 187 | Complete |
 | NODE35-06 | Phase 187 | Complete |
 | NODE35-07 | Phase 187 | Complete |
 | NODE35-08 | Phase 187 | Complete |
-| NODE35-09 | Phase 188 | Pending |
+| NODE35-09 | Phase 188 | Complete |
 | DATA35-01 | Phase 186 | Complete |
 | DATA35-02 | Phase 186 | Complete |
 | DATA35-03 | Phase 186 | Complete |

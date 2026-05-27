@@ -3,10 +3,13 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
+import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { defaultPracticeTopicId } from '@/lib/practiceRoutes'
 
 export function PracticeOverviewPage() {
   const overviewQuery = usePracticeOverviewQuery()
+  const roadmapQuery = usePracticeRoadmapQuery('mathematics', defaultPracticeTopicId)
 
   return (
     <DashboardLayout>
@@ -18,7 +21,9 @@ export function PracticeOverviewPage() {
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
-        {overviewQuery.data && <PracticeOverview overview={overviewQuery.data} />}
+        {overviewQuery.data && (
+          <PracticeOverview overview={overviewQuery.data} roadmap={roadmapQuery.data} />
+        )}
       </PageContainer>
     </DashboardLayout>
   )
