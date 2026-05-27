@@ -1,5 +1,27 @@
 # Milestones
 
+## v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience (Shipped: 2026-05-27)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/milestones/v1.33-MILESTONE-AUDIT.md`
+**Known deferred items at close:** 1 unrelated pre-existing debug session left acknowledged in `.planning/STATE.md`.
+
+**Key accomplishments:**
+
+- Added subject-agnostic Practice roadmap contracts, demo roadmap state, service support, and query hook.
+- Added roadmap components for progress header, unit sections, lesson nodes, connectors, locked hints, and next-lesson CTA.
+- Integrated the roadmap into `/practice` and `/practice/:subjectId/:topicId` while preserving compatible Practice routes.
+- Added English, German, French, and Italian roadmap copy plus roadmap UI, status rules, mobile layout, demo data, and QA docs.
+- Verified the roadmap build, desktop/mobile browser behavior, locked hint, continue CTA navigation, topic route, README handoff, and milestone audit.
+
+### Verification
+
+- `npm run build`: passed.
+- Browser smoke: passed for `/practice`, `/practice/mathematics/equations`, locked lesson hint, continue CTA, and mobile readability.
+- Milestone audit: passed with 45/45 requirements, 5/5 phases, 5/5 integration checks, and 6/6 flow checks satisfied.
+
+---
+
 ## v1.31 Phase 33: Homepage Practice Entry Clarification and Learning Platform Funnel Optimization (Shipped: 2026-05-27)
 
 **Phases completed:** 4 phases, 4 plans, 0 tasks

@@ -2,45 +2,40 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, and a frontend/demo-backed Practice Path for active learning.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, and a frontend/demo-backed Practice Path with roadmap progression for active learning.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
+## Latest Shipped Milestone: v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
 
 **Shipped:** 2026-05-27
 
-**Delivered:** STOA now has a corrected Practice Path scope, subject/topic-aware Practice architecture, canonical Mathematics / lower secondary / equations demo seed data, generalized Practice copy, route compatibility, documentation, QA evidence, README handoff, and build verification.
+**Delivered:** STOA now has a subject-agnostic Practice roadmap experience with lesson nodes, progress summary, completed/current/available/locked states, locked hints, next-lesson CTA, Learning Chat handoff copy, four-language copy, documentation, QA evidence, README handoff, browser verification, and build verification.
 
 **Target features:**
-- Practice Path Scope Principle in English and Chinese.
-- Historical docs corrected so equations are framed as demo content, not final Practice Path scope.
-- Subject, grade level, topic, unit, lesson, and challenge hierarchy in Practice types and mock data.
-- Canonical `/practice/:subjectId/:topicId` topic route strategy with compatibility for existing Practice entry points.
-- Generalized homepage, dashboard, Practice, parent, tutor, route, and API-contract wording.
-- Build, route compatibility, four-language copy, and demo-flow verification.
+- Roadmap-style Practice path for `/practice` and `/practice/:subjectId/:topicId`.
+- Subject, grade level, topic, unit, lesson, and challenge progression without hard-coding equations as the only path.
+- Completed, current, available, locked, and review lesson node states.
+- Current lesson highlight, next-lesson CTA, completed-lesson review entry, and locked lesson unlock hints.
+- Mathematics / lower secondary / equations demo roadmap content.
+- Learning Chat copy that frames explanation as the next support step when Practice is unclear.
+- English, German, French, and Italian roadmap copy, QA docs, README guidance, browser checks, and successful build verification.
 
-## Current Milestone: v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
+## Current Milestone: Planning next milestone
 
-**Goal:** Upgrade `/practice` from a normal lesson list into a premium, subject-agnostic roadmap learning path that shows where the student is, what is complete, what comes next, what is locked, and how Practice leads into Learning Chat when a step is unclear.
+**Goal:** Select the next milestone after the shipped Practice Roadmap UI work.
 
 **Target features:**
-- Add a roadmap-style Practice path for `/practice` and `/practice/:subjectId/:topicId`.
-- Display subject, grade level, topic, unit, lesson, and challenge progression without hard-coding equations as the only path.
-- Render lesson nodes with completed, current, available, locked, and review states.
-- Highlight the current lesson, show a next-lesson CTA, and support review CTAs for completed lessons.
-- Show locked lesson unlock conditions instead of allowing direct start.
-- Keep the current demo roadmap as Mathematics / lower secondary / equations.
-- Connect Practice roadmap messaging to Learning Chat as the explanation path when a lesson step is unclear.
-- Add four-language roadmap copy, QA checklist, docs, README guidance, and build verification.
+- Suggested next milestone: roadmap interaction QA, progress feedback, and parent visibility refinement.
+- Keep Phase 35 shipped artifacts archived under `.planning/milestones/`.
 
 ## Current State
 
-**Latest shipped milestone:** v1.32 Phase 34: Practice Path General Scope Correction and Subject-Agnostic Architecture Alignment
+**Latest shipped milestone:** v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -76,6 +71,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 31 Practice entry integration with homepage Practice framing, student Continue Practice and Learning Chat entry cards, Practice-to-Chat context enrichment, parent Learning Activity summary, Tutor Request Practice context, role navigation alignment, four-language copy, docs, README, build, and browser smoke verification.
 - Phase 33 homepage Practice entry clarification with role-aware Start Practice routing, homepage Practice entry components, four-language Practice entry copy, mobile fit QA, docs, README, browser route verification, build verification, and milestone archive.
 - Phase 34 Practice Path scope correction with the canonical Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge hierarchy, Mathematics / lower secondary / equations demo seed data, subject/topic route compatibility, generalized UI copy, docs, README, route QA, four-language checks, and build verification.
+- Phase 35 Practice Roadmap UI with subject-agnostic roadmap data contracts, roadmap components, lesson node states, progress header, locked hints, continue card, `/practice` and topic route integration, four-language copy, roadmap docs, README handoff, browser checks, and build verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -113,17 +109,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify Practice as a homepage and student-dashboard entry into Learning Chat, with parent learning activity, tutor request context, four-language copy, docs, README, build, and browser smoke evidence — v1.29
 - ✓ Developers can rely on English, German, French, and Italian copy QA, cleaned user-facing development artifacts, final language QA docs, README guidance, build verification, and 184 route/locale/viewport smoke checks — v1.30
 - ✓ Developers can run and verify a clear homepage Practice entry, Start Practice routing, four-language Practice entry copy, Practice preview, docs, README, build, browser layout QA, and milestone archive — v1.31
+- ✓ Developers can run and verify a subject-agnostic Practice roadmap with lesson progression states, locked hints, next-lesson CTA, topic route support, four-language copy, docs, README guidance, browser checks, and build verification — v1.33
 
 ### Active
 
-- Practice must show a roadmap-style learning path instead of only a list or card grid.
-- Roadmap data and UI must remain subject-agnostic and topic-agnostic, with equations used only as the current demo content package.
-- Lesson nodes must represent completed, current, available, locked, and review states.
-- Students must be able to continue the current lesson, start available lessons, review completed lessons, and see unlock hints for locked lessons.
-- `/practice` and `/practice/:subjectId/:topicId` must communicate subject, grade level, topic, unit, lesson, and challenge progression clearly.
-- Practice roadmap copy must reinforce that Learning Chat explains unclear steps without turning Practice into a cartoon game.
-- English, German, French, and Italian roadmap copy must be available and fit mobile and desktop layouts.
-- The completed implementation must include docs, QA checklist, README guidance, and successful build verification.
+- Next milestone requirements are not yet selected.
 
 ### Out of Scope
 
