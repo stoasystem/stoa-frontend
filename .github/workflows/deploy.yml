@@ -1,0 +1,80 @@
+name: Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write   # required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Build & Deploy to S3 + CloudFront
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build (production)
+        run: npm run build
+        env:
+          VITE_API_MODE: production
+          VITE_API_URL: https://api.stoaedu.ch
+          VITE_APP_ENV: production
+          VITE_COGNITO_USER_POOL_ID: eu-central-2_Ss93YQzjJ
+          VITE_COGNITO_CLIENT_ID: 5cq57qrgo94ivseotslhajrlh3
+          VITE_ENABLE_MSW: "false"
+          VITE_ENABLE_DEMO_SHORTCUTS: "false"
+          VITE_ENABLE_ANALYTICS: "false"
+          VITE_ENABLE_FEEDBACK: "true"
+          VITE_ENABLE_ERROR_MONITORING: "false"
+          VITE_ENABLE_PAYMENT: "false"
+          VITE_ENABLE_MOCK_CHECKOUT: "false"
+          VITE_ENABLE_PUBLIC_REGISTER: "true"
+          VITE_ENABLE_TEACHER_HELP: "true"
+          VITE_ENABLE_PARENT_REPORT: "true"
+          VITE_ENABLE_DEMO_API: "false"
+          VITE_SHOW_DEMO_ACCOUNTS: "false"
+          VITE_SHOW_DEMO_BADGES: "false"
+          VITE_SHOW_DEMO_SURFACES: "false"
+          VITE_SHOW_INTERNAL_DEBUG: "false"
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::562923011260:role/stoa-github-frontend-deploy
+          aws-region: eu-central-2
+
+      - name: Sync static assets to S3 (long cache)
+        run: |
+          aws s3 sync dist/ s3://stoa-frontend-562923011260/ \
+            --region eu-central-2 \
+            --delete \
+            --exclude "index.html" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Upload index.html (no cache)
+        run: |
+          aws s3 cp dist/index.html s3://stoa-frontend-562923011260/index.html \
+            --region eu-central-2 \
+            --cache-control "no-cache,no-store,must-revalidate"
+
+      - name: Invalidate CloudFront cache
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id E27CVAMQHDMW80 \
+            --paths "/*"
