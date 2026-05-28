@@ -33,7 +33,7 @@ jobs:
         run: npm run build
         env:
           VITE_API_MODE: production
-          VITE_API_URL: https://api.stoaedu.ch
+          VITE_API_BASE_URL: https://api.stoaedu.ch
           VITE_APP_ENV: production
           VITE_COGNITO_USER_POOL_ID: eu-central-2_Ss93YQzjJ
           VITE_COGNITO_CLIENT_ID: 5cq57qrgo94ivseotslhajrlh3
