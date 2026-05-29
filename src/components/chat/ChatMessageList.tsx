@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Lightbulb } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble'
@@ -20,6 +21,12 @@ export function ChatMessageList({
   teacherFeedback?: string | null
 }) {
   const { t } = useTranslation('chat')
+  const bottomRef = useRef<HTMLDivElement>(null)
+
+  // Scroll to bottom whenever messages change or streaming content updates
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   return (
     <div
@@ -54,6 +61,8 @@ export function ChatMessageList({
             </div>
           </div>
         )}
+        {/* Scroll anchor */}
+        <div ref={bottomRef} aria-hidden="true" />
       </div>
     </div>
   )

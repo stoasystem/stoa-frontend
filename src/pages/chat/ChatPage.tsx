@@ -17,6 +17,7 @@ import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversatio
 import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
+import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { PracticeChatLocationState } from '@/types/practice'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
@@ -36,6 +37,7 @@ export function ChatPage() {
   } | null>(null)
 
   const conversationsQuery = useConversationsQuery()
+  const studentProfileQuery = useStudentProfileQuery()
   const practiceState = location.state as PracticeChatLocationState | null
   const practiceContext = practiceState?.practiceContext
   const conversations = useMemo(
@@ -107,11 +109,12 @@ export function ChatPage() {
     if (createConversationMutation.isPending) return
     const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext)
 
+    const profile = studentProfileQuery.data
+    const subject = profile?.primarySubjects?.[0] ?? 'General'
+    const grade = profile?.grade ?? 'Grade 8'
+
     createConversationMutation.mutate(
-      {
-        subject: 'General',
-        grade: 'Grade 8',
-      },
+      { subject, grade },
       {
         onSuccess: (conversation) => {
           setActiveConversationId(conversation.id)
