@@ -30,8 +30,8 @@ export function ContinuePracticeCard() {
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Next practice challenge'} />
-          <PracticeMetric label="Daily goal" value={practiceOverview?.dailyGoal.label ?? '3 short steps'} />
-          <PracticeMetric label="Review" value={`${practiceOverview?.recentMistakes.length ?? 2} mistakes`} />
+          <PracticeMetric label="Daily goal" value={practiceOverview?.dailyGoal?.label ?? '3 short steps'} />
+          <PracticeMetric label="Review" value={`${practiceOverview?.recentMistakes?.length ?? 0} mistakes`} />
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild className="premium-primary-button text-white hover:text-white">

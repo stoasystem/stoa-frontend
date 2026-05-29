@@ -56,7 +56,7 @@ export function PracticeOverview({
         </div>
       </section>
       <div className="grid gap-4 md:grid-cols-2">
-        <DailyGoalCard {...overview.dailyGoal} />
+        {overview.dailyGoal && <DailyGoalCard {...overview.dailyGoal} />}
         <StudyStreakCard points={overview.progressPoints} streak={overview.studyStreak} />
       </div>
       {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
@@ -91,7 +91,7 @@ export function PracticeOverview({
           <p className="brand-section-kicker">Recent mistakes</p>
           <h2 className="mt-2 text-2xl font-semibold">Review while the step is still fresh</h2>
         </div>
-        {overview.recentMistakes.slice(0, 2).map((mistake) => (
+        {(overview.recentMistakes ?? []).slice(0, 2).map((mistake) => (
           <MistakeReviewCard key={mistake.id} mistake={mistake} />
         ))}
       </section>

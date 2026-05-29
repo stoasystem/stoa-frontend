@@ -16,15 +16,15 @@ export function ContinueLearningCard() {
         {practiceOverview ? (
           <div className="space-y-3">
             <p>
-              Current Practice topic: {practiceOverview.recommendedLesson.topic}. Next lesson:{' '}
-              {practiceOverview.recommendedLesson.title}. Today&apos;s goal is{' '}
-              {practiceOverview.dailyGoal.label.toLowerCase()}, with a {practiceOverview.studyStreak}
+              Current Practice topic: {practiceOverview.recommendedLesson?.topic}. Next lesson:{' '}
+              {practiceOverview.recommendedLesson?.title}. Today&apos;s goal is{' '}
+              {practiceOverview.dailyGoal?.label?.toLowerCase() ?? 'practice'}, with a {practiceOverview.studyStreak ?? 0}
               -day study streak.
             </p>
             <div className="grid gap-2 sm:grid-cols-3">
-              <PracticeSignal label="Daily goal" value={practiceOverview.dailyGoal.label} />
-              <PracticeSignal label="Study streak" value={`${practiceOverview.studyStreak} days`} />
-              <PracticeSignal label="Recent mistakes" value={`${practiceOverview.recentMistakes.length} to review`} />
+              <PracticeSignal label="Daily goal" value={practiceOverview.dailyGoal?.label ?? '3 short steps'} />
+              <PracticeSignal label="Study streak" value={`${practiceOverview.studyStreak ?? 0} days`} />
+              <PracticeSignal label="Recent mistakes" value={`${practiceOverview.recentMistakes?.length ?? 0} to review`} />
             </div>
           </div>
         ) : (
