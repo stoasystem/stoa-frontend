@@ -5,11 +5,17 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { defaultPracticeTopicId } from '@/lib/practiceRoutes'
 
 export function PracticeOverviewPage() {
   const overviewQuery = usePracticeOverviewQuery()
-  const roadmapQuery = usePracticeRoadmapQuery('mathematics', defaultPracticeTopicId)
+
+  // Dynamically load roadmap for the recommended lesson's topic
+  const recommendedSubject = overviewQuery.data?.recommendedLesson?.subjectId ?? 'mathematics'
+  const recommendedTopic = overviewQuery.data?.recommendedLesson?.topicId ?? ''
+  const roadmapQuery = usePracticeRoadmapQuery(
+    recommendedSubject,
+    recommendedTopic,
+  )
 
   return (
     <DashboardLayout>
@@ -22,7 +28,10 @@ export function PracticeOverviewPage() {
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
         {overviewQuery.data && (
-          <PracticeOverview overview={overviewQuery.data} roadmap={roadmapQuery.data} />
+          <PracticeOverview
+            overview={overviewQuery.data}
+            roadmap={recommendedTopic ? roadmapQuery.data : undefined}
+          />
         )}
       </PageContainer>
     </DashboardLayout>

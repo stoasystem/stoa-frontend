@@ -60,8 +60,8 @@ export async function getPracticeSubjects() {
 export async function getSubjectPath(subjectId: string, topicId?: string) {
   return withPracticeDemo(async () => {
     const path = topicId
-      ? `/practice/subjects/${subjectId}/topics/${topicId}/path`
-      : `/practice/subjects/${subjectId}/path`
+      ? `/practice/${subjectId}/${topicId}/path`
+      : `/practice/${subjectId}/${topicId ?? 'default'}/path`
     const response = await httpClient.get<PracticePath>(path)
     return response.data
   }, () => getMockPracticePath(subjectId, topicId))

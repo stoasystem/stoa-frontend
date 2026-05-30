@@ -277,6 +277,7 @@ export function ChatPage() {
               />
             )}
             <ChatMessageList
+              key={activeConversationId}
               messages={displayedMessages}
               isAssistantThinking={false}
               onRetryMessage={retryMessage}
