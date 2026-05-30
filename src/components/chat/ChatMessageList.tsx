@@ -24,7 +24,7 @@ export function ChatMessageList({
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(messages.length)
-  const prevLastMessageIdRef = useRef(messages.at(-1)?.id ?? '')
+  const prevLastMessageIdRef = useRef(messages.length > 0 ? messages[messages.length - 1].id : '')
 
   useEffect(() => {
     const container = scrollContainerRef.current
@@ -33,7 +33,7 @@ export function ChatMessageList({
     const prevCount = prevMessageCountRef.current
     const prevLastId = prevLastMessageIdRef.current
     const currentCount = messages.length
-    const currentLastId = messages.at(-1)?.id ?? ''
+    const currentLastId = currentCount > 0 ? messages[currentCount - 1].id : ''
 
     // Determine if this is a brand-new conversation load (first render with messages)
     const isInitialLoad = prevCount === 0 && currentCount > 0
