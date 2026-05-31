@@ -1,11 +1,8 @@
-import { Mail, MapPin, Phone, ShieldCheck } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Mail, MapPin, Phone } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { StoaLogo } from '@/components/common/StoaLogo'
 import { ContactForm } from '@/components/contact/ContactForm'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { stoaContactInfo } from '@/lib/brandContact'
@@ -43,29 +40,6 @@ export function ContactPage() {
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
 
-        <section className="grid gap-6 rounded-lg border border-[hsl(var(--border)/0.85)] bg-[hsl(42_34%_94%)] p-6 shadow-sm md:grid-cols-[0.7fr_1.3fr] md:items-center">
-          <div className="space-y-4">
-            <StoaLogo size="lg" />
-            <p className="brand-section-kicker">{t('brandPanel.kicker')}</p>
-          </div>
-          <div className="space-y-4">
-            <h2 className="editorial-heading text-3xl leading-tight text-foreground">
-              {t('brandPanel.title')}
-            </h2>
-            <p className="max-w-2xl text-sm leading-7 text-muted-foreground">
-              {t('brandPanel.description')}
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Button asChild className="premium-primary-button h-auto min-h-10 whitespace-normal px-4 py-2 text-center">
-                <Link to="/stipendienprogramm">{t('brandPanel.scholarshipCta')}</Link>
-              </Button>
-              <Button asChild variant="outline" className="h-auto min-h-10 whitespace-normal px-4 py-2 text-center">
-                <a href={stoaContactInfo.phoneHref}>{stoaContactInfo.phone}</a>
-              </Button>
-            </div>
-          </div>
-        </section>
-
         <section className="grid gap-4 md:grid-cols-3" aria-label={t('eyebrow')}>
           {contactCards.map((card) => {
             const Icon = card.icon
@@ -94,25 +68,13 @@ export function ContactPage() {
 
         <section className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <div className="space-y-5 rounded-lg border border-border/80 bg-card/60 p-6">
-            <div className="flex h-11 w-11 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-            </div>
             <p className="brand-section-kicker">{t('form.title')}</p>
             <h2 className="editorial-heading text-3xl leading-tight text-foreground">
               {t('form.description')}
             </h2>
             <p className="text-sm leading-6 text-muted-foreground">
-              {t('formContext')}
+              {stoaContactInfo.locations}
             </p>
-            <address className="space-y-2 not-italic text-sm text-muted-foreground">
-              <a className="block font-medium text-foreground hover:text-primary" href={`mailto:${stoaContactInfo.email}`}>
-                {stoaContactInfo.email}
-              </a>
-              <a className="block font-medium text-foreground hover:text-primary" href={stoaContactInfo.phoneHref}>
-                {stoaContactInfo.phone}
-              </a>
-              <p>{stoaContactInfo.locations}</p>
-            </address>
           </div>
 
           <Card>

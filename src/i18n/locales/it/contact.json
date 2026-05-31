@@ -2,12 +2,6 @@
   "eyebrow": "Contatta STOA",
   "title": "Troviamo insieme il prossimo passo.",
   "description": "Scrivici per supporto allo studio, report per genitori, prezzi, candidature come insegnante o collaborazioni con scuole. Il team STOA leggerà la richiesta e risponderà presto.",
-  "brandPanel": {
-    "kicker": "Contatto ufficiale STOA",
-    "title": "Contatta il team dietro il supporto allo studio STOA.",
-    "description": "Usa gli stessi contatti aziendali STOA per domande di studio, richieste di borsa, segnalazioni da scuole, supporto ai genitori e candidature insegnanti.",
-    "scholarshipCta": "Programma borsa"
-  },
   "cards": {
     "email": {
       "title": "Email",
@@ -46,7 +40,6 @@
       "message": "Raccontaci brevemente come STOA può aiutarti."
     }
   },
-  "formContext": "Il modulo segue il modello di contatto STOA: nome, email, telefono, argomento e messaggio. Condividi solo le informazioni necessarie per una prima risposta.",
   "roles": {
     "parent": "Genitore",
     "student": "Studente",
