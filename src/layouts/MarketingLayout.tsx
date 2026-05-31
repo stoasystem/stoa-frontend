@@ -31,6 +31,9 @@ export function MarketingHeader() {
           <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/qa">
             {t('navigation.qa')}
           </Link>
+          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/stipendienprogramm">
+            {t('navigation.scholarship')}
+          </Link>
           <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/contact">
             {t('navigation.contact')}
           </Link>

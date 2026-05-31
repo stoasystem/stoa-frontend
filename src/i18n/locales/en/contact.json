@@ -2,6 +2,12 @@
   "eyebrow": "Contact STOA",
   "title": "Let’s find the right next step.",
   "description": "Send a message about learning support, parent reports, pricing, teacher applications, or school partnerships. The STOA team will review it and reply soon.",
+  "brandPanel": {
+    "kicker": "Official STOA contact",
+    "title": "Reach the team behind STOA learning support.",
+    "description": "Use the same STOA company contact details for learning questions, scholarship requests, school referrals, parent support, and teacher applications.",
+    "scholarshipCta": "Scholarship program"
+  },
   "cards": {
     "email": {
       "title": "Email",
@@ -40,6 +46,7 @@
       "message": "Tell us briefly how STOA can help."
     }
   },
+  "formContext": "The contact form follows the STOA company contact pattern: name, email, phone, topic, and message. Share only the details needed for a first response.",
   "roles": {
     "parent": "Parent",
     "student": "Student",

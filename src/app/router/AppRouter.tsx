@@ -52,6 +52,7 @@ import { TutorAssignmentBoardPage } from '@/pages/organization/TutorAssignmentBo
 import { PartnershipOnboardingPage } from '@/pages/partnership/PartnershipOnboardingPage'
 import { PricingPage } from '@/pages/pricing/PricingPage'
 import { QaPage } from '@/pages/qa/QaPage'
+import { ScholarshipProgramPage } from '@/pages/scholarship/ScholarshipProgramPage'
 import { LessonPage } from '@/pages/practice/LessonPage'
 import { LessonResultPage } from '@/pages/practice/LessonResultPage'
 import { MistakesReviewPage } from '@/pages/practice/MistakesReviewPage'
@@ -81,6 +82,8 @@ export function AppRouter() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/qa" element={<QaPage />} />
+        <Route path="/stipendienprogramm" element={<ScholarshipProgramPage />} />
+        <Route path="/scholarship-program" element={<ScholarshipProgramPage />} />
         <Route path="/for-parents" element={<ForParentsPage />} />
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/ai-homework-help" element={<HowItWorksPage />} />

@@ -2,6 +2,12 @@
   "eyebrow": "Contacter STOA",
   "title": "Trouvons la bonne prochaine étape.",
   "description": "Écrivez-nous au sujet de l’accompagnement pédagogique, des rapports parents, des tarifs, des candidatures d’enseignants ou des partenariats scolaires. L’équipe STOA examinera votre demande et vous répondra prochainement.",
+  "brandPanel": {
+    "kicker": "Contact officiel STOA",
+    "title": "Contactez l’équipe derrière l’accompagnement STOA.",
+    "description": "Utilisez les mêmes coordonnées STOA pour les questions d’apprentissage, les demandes de bourse, les recommandations d’écoles, le soutien aux parents et les candidatures d’enseignants.",
+    "scholarshipCta": "Programme de bourse"
+  },
   "cards": {
     "email": {
       "title": "E-mail",
@@ -40,6 +46,7 @@
       "message": "Indiquez brièvement comment STOA peut vous aider."
     }
   },
+  "formContext": "Le formulaire reprend le modèle de contact STOA : nom, e-mail, téléphone, sujet et message. Partagez seulement les informations nécessaires pour une première réponse.",
   "roles": {
     "parent": "Parent",
     "student": "Élève",

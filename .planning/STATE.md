@@ -158,6 +158,7 @@ Recent decisions affecting current work:
 | 2026-05-27 | Clarify referral rewards copy | Browser check on `/referrals`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Remove repeated goal cards from Practice detail | Browser checks on `/practice/mathematics/equations` and `/practice`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Organize student dashboard categories | Browser checks on `/dashboard` desktop and mobile; `npm run lint`; `npm run build` |
+| 2026-05-31 | Improve scholarship and contact brand details | Browser checks on `/stipendienprogramm` and `/contact`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

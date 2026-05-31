@@ -46,6 +46,9 @@ export function AppFooter() {
             <Link className="hover:text-foreground" to="/qa">
               {t('navigation.qa')}
             </Link>
+            <Link className="hover:text-foreground" to="/stipendienprogramm">
+              {t('navigation.scholarship')}
+            </Link>
             <Link className="hover:text-foreground" to="/support">
               {t('navigation.support')}
             </Link>
