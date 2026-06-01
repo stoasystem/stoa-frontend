@@ -24,8 +24,13 @@ export function LearningActivitySummary({
       icon: GraduationCap,
     },
     {
+      label: 'Question Bank',
+      value: `${summary?.questionBankSetsAttempted ?? 4} sets`,
+      icon: Activity,
+    },
+    {
       label: 'Next focus',
-      value: summary?.recommendedNextTopic ?? 'Next practice topic',
+      value: summary?.questionBankNextFocus ?? summary?.recommendedNextTopic ?? 'Next practice topic',
       icon: Target,
     },
   ]
@@ -45,10 +50,10 @@ export function LearningActivitySummary({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          Practice shows where a student tries independently. Questions show where
-          explanation is needed. Together, they give parents a clearer picture of learning progress.
+          Practice Path shows guided progress. Question Bank shows targeted independent practice.
+          Questions and teacher support show where explanation is needed.
         </p>
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {metrics.map((metric) => {
             const Icon = metric.icon
 

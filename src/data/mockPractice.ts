@@ -626,6 +626,9 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     supportiveNote: 'Anna practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
     questionsAsked: 2,
     teacherSupportRequested: 1,
+    questionBankSetsAttempted: 4,
+    questionBankMistakesReviewed: 3,
+    questionBankNextFocus: 'Linear Equations Basics',
     learningActivityNote: 'This week combines independent Practice Path work with step-by-step explanations and one teacher-support moment.',
   }
 }

@@ -1,0 +1,12 @@
+{
+  "title": "Question Bank",
+  "description": "Practice by subject, topic, and difficulty.",
+  "positioning": "Question Bank is flexible open practice. Practice Path remains the guided learning path.",
+  "actions": {
+    "open": "Open Question Bank",
+    "reviewMistakes": "Review mistakes",
+    "start": "Start",
+    "resume": "Resume",
+    "practiceAgain": "Practice Again"
+  }
+}

@@ -10,33 +10,33 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
+## Latest Shipped Milestone: v2.1 Question Bank UI Design
 
-**Shipped:** 2026-06-01
+**Shipped:** 2026-06-02
 
-**Delivered:** STOA now supports student-level Learning Assistant answer-language preference. Students can choose English, German, French, or Italian in onboarding/profile; the local/demo backend persists the preference; chat generation passes the saved language into the Learning Assistant harness; multilingual fallback behavior and profile-to-chat propagation are covered by regression tests.
+**Delivered:** STOA now includes a frontend/mock-backed Question Bank UI. Students can browse open practice by subject, topic, difficulty, question type, status, saved sets, and mistakes; inspect question sets; complete a low-pressure session; receive immediate feedback; view results; retry mistakes; and hand off a question-bank step to Learning Chat with product-safe context.
 
 **Target features:**
-- Student profile captures and displays a supported answer-language preference.
-- Student onboarding can submit the initial answer-language preference.
-- Local/demo backend profile APIs persist and return `preferredAnswerLanguage`.
-- Learning Assistant chat generation uses the saved student answer language instead of hard-coded English.
-- Regression tests cover English, German, French, and Italian answer-language behavior.
+- Student Question Bank navigation and routes for home, subject, topic, set overview, session, result, mistakes, and saved sets.
+- Typed deterministic mock data, service/query boundaries, and replaceable API surface for future backend work.
+- Open-practice discovery with local search, filters, subject/topic cards, recommended sets, recent practice, and saved sets.
+- Low-pressure session UI with multiple-choice, short-answer, numeric, and step-by-step layouts plus immediate feedback.
+- Question Bank to Learning Chat handoff, parent learning activity framing, tutor context support, four-language namespace, docs, lint/build/browser verification.
 
 ## Current Milestone: v2.1 Question Bank UI Design
 
-**Goal:** Add a complete Question Bank UI module so students can find question sets by subject, topic, difficulty, and status; complete a mock practice session; receive immediate feedback; review mistakes; and understand how Question Bank complements Practice Path and Learning Chat.
+**Goal:** Completed the Question Bank UI module so students can find question sets by subject, topic, difficulty, and status; complete a mock practice session; receive immediate feedback; review mistakes; and understand how Question Bank complements Practice Path and Learning Chat.
 
 **Target features:**
-- `/question-bank`, subject overview, topic question-set listing, question-set overview, question session, result, mistakes review, and saved/recent practice surfaces.
-- Question Bank acts as a flexible exercise library, distinct from Practice Path's guided roadmap progression.
-- Local mock/demo data supports search, filters, question sets, session answers, feedback states, results, and mistakes review.
-- Learning Assistant entry points route from question feedback to Chat with question-bank context while preserving frontend provider boundaries.
-- Parent and tutor UI/docs explain how Question Bank activity relates to Practice Path, Learning Chat, Parent Report, and tutor context.
+- ✓ `/question-bank`, subject overview, topic question-set listing, question-set overview, question session, result, mistakes review, and saved/recent practice surfaces.
+- ✓ Question Bank acts as a flexible exercise library, distinct from Practice Path's guided roadmap progression.
+- ✓ Local mock/demo data supports search, filters, question sets, session answers, feedback states, results, and mistakes review.
+- ✓ Learning Assistant entry points route from question feedback to Chat with question-bank context while preserving frontend provider boundaries.
+- ✓ Parent and tutor UI/docs explain how Question Bank activity relates to Practice Path, Learning Chat, Parent Report, and tutor context.
 
 ## Current State
 
-**Latest shipped milestone:** v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
+**Latest shipped milestone:** v2.1 Question Bank UI Design
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -73,6 +73,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 33 homepage Practice entry clarification with role-aware Start Practice routing, homepage Practice entry components, four-language Practice entry copy, mobile fit QA, docs, README, browser route verification, build verification, and milestone archive.
 - Phase 34 Practice Path scope correction with the canonical Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge hierarchy, Mathematics / lower secondary / equations demo seed data, subject/topic route compatibility, generalized UI copy, docs, README, route QA, four-language checks, and build verification.
 - Phase 35 Practice Roadmap UI with subject-agnostic roadmap data contracts, roadmap components, lesson node states, progress header, locked hints, continue card, `/practice` and topic route integration, four-language copy, roadmap docs, README handoff, browser checks, and build verification.
+- v2.1 Question Bank UI with `/question-bank`, subject/topic question-bank pages, set overview, session answer flow, immediate feedback, result page, mistakes review, saved sets, local search/filtering, typed mock data, service/query boundaries, Question Bank to Learning Chat context, parent/tutor comprehension updates, docs, and verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -113,14 +114,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify a subject-agnostic Practice roadmap with lesson progression states, locked hints, next-lesson CTA, topic route support, four-language copy, docs, README guidance, browser checks, and build verification — v1.33
 - ✓ Developers can run and verify reliable frontend quality gates with CI/local command parity, Node-aware ESLint config, lockfile and ignore hygiene, updated smoke tests, README guidance, and 14/14 Playwright E2E checks — v1.34
 - ✓ Students can set a Learning Assistant answer-language preference, and new guided responses use the saved student profile language across local/demo profile and chat flows — v1.35
+- ✓ Students can use a frontend/mock-backed Question Bank to browse question sets, filter/search open practice, complete a low-pressure session, review feedback/results/mistakes, and hand off unclear question steps to Learning Chat — v2.1
 
 ### Active
 
-- [ ] Students can open a Question Bank module and browse subjects, topics, recommended sets, recent practice, and mistakes review.
-- [ ] Students can filter and search mock question sets by subject, grade/level, topic, difficulty, question type, and completion status.
-- [ ] Students can open a question set overview, start or resume a mock session, answer supported question types, see immediate feedback, and finish the set.
-- [ ] Students can view a result page and enter a mistakes review flow for incorrect or skipped questions.
-- [ ] Question Bank UI clearly complements Practice Path and Learning Chat without becoming a duplicate roadmap or a production exam system.
+- Next milestone requirements are not yet selected.
 
 ### Out of Scope
 
@@ -435,4 +433,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-01 after starting v2.1 Question Bank UI Design milestone*
+*Last updated: 2026-06-02 after v2.1 milestone completion*

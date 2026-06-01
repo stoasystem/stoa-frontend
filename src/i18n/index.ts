@@ -8,6 +8,7 @@ import enAuth from '@/i18n/locales/en/auth.json'
 import enChat from '@/i18n/locales/en/chat.json'
 import enParent from '@/i18n/locales/en/parent.json'
 import enPractice from '@/i18n/locales/en/practice.json'
+import enQuestionBank from '@/i18n/locales/en/questionBank.json'
 import enTutor from '@/i18n/locales/en/tutor.json'
 import enPricing from '@/i18n/locales/en/pricing.json'
 import enBilling from '@/i18n/locales/en/billing.json'
@@ -21,6 +22,7 @@ import deAuth from '@/i18n/locales/de/auth.json'
 import deChat from '@/i18n/locales/de/chat.json'
 import deParent from '@/i18n/locales/de/parent.json'
 import dePractice from '@/i18n/locales/de/practice.json'
+import deQuestionBank from '@/i18n/locales/de/questionBank.json'
 import deTutor from '@/i18n/locales/de/tutor.json'
 import dePricing from '@/i18n/locales/de/pricing.json'
 import deBilling from '@/i18n/locales/de/billing.json'
@@ -34,6 +36,7 @@ import frAuth from '@/i18n/locales/fr/auth.json'
 import frChat from '@/i18n/locales/fr/chat.json'
 import frParent from '@/i18n/locales/fr/parent.json'
 import frPractice from '@/i18n/locales/fr/practice.json'
+import frQuestionBank from '@/i18n/locales/fr/questionBank.json'
 import frTutor from '@/i18n/locales/fr/tutor.json'
 import frPricing from '@/i18n/locales/fr/pricing.json'
 import frBilling from '@/i18n/locales/fr/billing.json'
@@ -47,6 +50,7 @@ import itAuth from '@/i18n/locales/it/auth.json'
 import itChat from '@/i18n/locales/it/chat.json'
 import itParent from '@/i18n/locales/it/parent.json'
 import itPractice from '@/i18n/locales/it/practice.json'
+import itQuestionBank from '@/i18n/locales/it/questionBank.json'
 import itTutor from '@/i18n/locales/it/tutor.json'
 import itPricing from '@/i18n/locales/it/pricing.json'
 import itBilling from '@/i18n/locales/it/billing.json'
@@ -63,6 +67,7 @@ export const resources = {
     chat: enChat,
     parent: enParent,
     practice: enPractice,
+    questionBank: enQuestionBank,
     tutor: enTutor,
     pricing: enPricing,
     billing: enBilling,
@@ -78,6 +83,7 @@ export const resources = {
     chat: deChat,
     parent: deParent,
     practice: dePractice,
+    questionBank: deQuestionBank,
     tutor: deTutor,
     pricing: dePricing,
     billing: deBilling,
@@ -93,6 +99,7 @@ export const resources = {
     chat: frChat,
     parent: frParent,
     practice: frPractice,
+    questionBank: frQuestionBank,
     tutor: frTutor,
     pricing: frPricing,
     billing: frBilling,
@@ -108,6 +115,7 @@ export const resources = {
     chat: itChat,
     parent: itParent,
     practice: itPractice,
+    questionBank: itQuestionBank,
     tutor: itTutor,
     pricing: itPricing,
     billing: itBilling,

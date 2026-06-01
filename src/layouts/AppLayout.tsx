@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import {
   BarChart3,
   BookOpen,
+  LibraryBig,
   CreditCard,
   GraduationCap,
   HelpCircle,
@@ -37,6 +38,7 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   history: History,
   profile: User,
   practice: Route,
+  questionBank: LibraryBig,
   reports: BookOpen,
   requests: TicketCheck,
   settings: Settings,
@@ -60,6 +62,7 @@ const navLabelKeys: Record<string, string> = {
   Overview: 'navigation.overview',
   Profile: 'navigation.profile',
   Practice: 'navigation.practice',
+  'Question Bank': 'navigation.questionBank',
   Referrals: 'navigation.referrals',
   Reports: 'navigation.reports',
   Requests: 'navigation.requests',

@@ -1,5 +1,29 @@
 # Milestones
 
+## v2.1 Question Bank UI Design (Shipped: 2026-06-02)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/v2.1-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Production Question Bank APIs, content management, generated-question workflows, exam-prep mode, paid unlocking, deeper curriculum mapping, video help, and live teacher joining remain future scope.
+
+**Key accomplishments:**
+
+- Added a protected student Question Bank area with home, subject, topic, saved sets, mistakes review, set overview, session, and result routes.
+- Added typed Question Bank contracts, deterministic demo data, replaceable service boundaries, query keys, and TanStack Query hooks.
+- Built discovery, search, filter, question set, answer input, immediate feedback, result, and mistakes-review UI.
+- Integrated Question Bank entry points into student navigation and Dashboard while keeping it distinct from Practice Path roadmap progression.
+- Added Question Bank context handoff into Learning Chat plus parent activity and tutor context summaries.
+- Added English, German, French, and Italian Question Bank copy, README/docs guidance, and GSD planning artifacts.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- Browser route smoke in mock API mode: passed for Question Bank home, subject, topic, set overview, session, result, mistakes review, and saved sets.
+- Browser handoff/mobile smoke in mock API mode: passed for Question Bank session -> Learning Chat context and 390px mobile home layout.
+
+---
+
 ## v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization (Shipped: 2026-06-01)
 
 **Phases completed:** 5 phases, 5 plans, 0 tasks

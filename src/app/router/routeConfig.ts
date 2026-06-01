@@ -19,6 +19,7 @@ export type AppNavIcon =
   | 'history'
   | 'profile'
   | 'practice'
+  | 'questionBank'
   | 'reports'
   | 'requests'
   | 'settings'
@@ -84,6 +85,16 @@ export const navItems: AppNavItem[] = [
     icon: 'practice',
     mobile: true,
     description: 'Short guided lessons that can open a question when a step is unclear.',
+  },
+  {
+    label: 'Question Bank',
+    path: '/question-bank',
+    role: 'student',
+    priority: 'primary',
+    status: 'core',
+    icon: 'questionBank',
+    mobile: true,
+    description: 'Open practice sets by subject, topic, difficulty, and review status.',
   },
   {
     label: 'Ask a question',
@@ -374,6 +385,14 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student question explanation and teacher-help request flow.' },
   { path: '/practice', pageName: 'PracticeOverviewPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student subject practice overview.' },
+  { path: '/question-bank', pageName: 'QuestionBankHomePage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student open practice library overview.' },
+  { path: '/question-bank/:subjectId', pageName: 'SubjectQuestionBankPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Subject-level question-bank overview.' },
+  { path: '/question-bank/:subjectId/:topicId', pageName: 'TopicQuestionBankPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Topic question-set listing with filters.' },
+  { path: '/question-bank/sets/:setId', pageName: 'QuestionSetOverviewPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Question set metadata and start/resume actions.' },
+  { path: '/question-bank/session/:sessionId', pageName: 'QuestionSessionPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Question-bank answer session.' },
+  { path: '/question-bank/session/:sessionId/result', pageName: 'QuestionSetResultPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Question set result and next steps.' },
+  { path: '/question-bank/mistakes', pageName: 'QuestionBankMistakesReviewPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Question-bank mistakes review.' },
+  { path: '/question-bank/saved', pageName: 'SavedQuestionSetsPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Saved question-bank sets.' },
   { path: '/practice/:subjectId/:topicId', pageName: 'SubjectPathPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Subject/topic learning path.' },
   { path: '/practice/:subjectId/:topicId/lessons/:lessonId', pageName: 'LessonPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Practice lesson challenge flow.' },
   { path: '/practice/:subjectId/:topicId/lessons/:lessonId/result', pageName: 'LessonResultPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Practice lesson result summary.' },

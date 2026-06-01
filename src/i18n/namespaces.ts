@@ -5,6 +5,7 @@ export const namespaces = [
   'chat',
   'parent',
   'practice',
+  'questionBank',
   'tutor',
   'pricing',
   'billing',

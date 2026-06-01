@@ -1,0 +1,12 @@
+{
+  "title": "Banque d’exercices",
+  "description": "S’entraîner par matière, thème et niveau de difficulté.",
+  "positioning": "La banque d’exercices sert à s’entraîner librement. Practice Path reste le parcours guidé.",
+  "actions": {
+    "open": "Ouvrir la banque",
+    "reviewMistakes": "Revoir les erreurs",
+    "start": "Commencer",
+    "resume": "Reprendre",
+    "practiceAgain": "S’entraîner encore"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "title": "Banca esercizi",
+  "description": "Esercitati per materia, argomento e difficoltà.",
+  "positioning": "La banca esercizi offre pratica libera. Practice Path resta il percorso guidato.",
+  "actions": {
+    "open": "Apri la banca",
+    "reviewMistakes": "Rivedi gli errori",
+    "start": "Inizia",
+    "resume": "Riprendi",
+    "practiceAgain": "Esercitati di nuovo"
+  }
+}

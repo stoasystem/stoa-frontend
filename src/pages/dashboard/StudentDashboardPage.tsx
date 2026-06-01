@@ -6,6 +6,7 @@ import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
 import { ContinuePracticeCard } from '@/components/dashboard/ContinuePracticeCard'
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
+import { QuestionBankCard } from '@/components/dashboard/QuestionBankCard'
 import { StudentPlanAccessSection } from '@/components/dashboard/StudentPlanAccessSection'
 import { TeacherFeedbackCard } from '@/components/dashboard/TeacherFeedbackCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
@@ -38,6 +39,7 @@ export function StudentDashboardPage() {
             <div className="grid items-stretch gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(18rem,0.9fr)]">
               <ContinuePracticeCard />
               <AskQuestionCard />
+              <QuestionBankCard />
             </div>
             <aside className="rounded-lg border border-border/70 bg-card/80 p-4 shadow-[var(--platform-shadow-card)]">
               <p className="brand-section-kicker">Weekly snapshot</p>

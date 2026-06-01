@@ -252,6 +252,9 @@ export type PracticeParentSummary = {
   questionsAsked?: number
   teacherSupportRequested?: number
   learningActivityNote?: string
+  questionBankSetsAttempted?: number
+  questionBankMistakesReviewed?: number
+  questionBankNextFocus?: string
 }
 
 export type PracticeChatContext = {
@@ -273,7 +276,7 @@ export type PracticeChatContext = {
 }
 
 export type PracticeTeacherRequestContext = {
-  source: 'practice'
+  source: 'practice' | 'question-bank'
   subjectId: string
   gradeLevel: string
   topicId: string

@@ -2,6 +2,15 @@
 
 STOA learning platform frontend.
 
+## Phase v2.1 Question Bank UI
+
+Question Bank adds a student-facing open practice library at `/question-bank`.
+It complements Practice Path rather than replacing it: Practice Path remains the guided roadmap,
+while Question Bank lets students browse and practise by subject, topic, difficulty, status, saved sets, and mistakes.
+
+The current implementation is frontend/mock-backed only. See `docs/question-bank/question-bank-ui.md`
+for routes, verification steps, and backend handoff boundaries.
+
 ## Phase 37 Student Answer Language
 
 Students can now choose a Learning Assistant answer language in their profile. This is separate from the interface language switcher: the interface may be shown in one language, while new Learning Assistant explanations follow the student's saved answer-language preference.

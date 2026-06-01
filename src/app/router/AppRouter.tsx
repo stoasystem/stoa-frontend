@@ -52,6 +52,14 @@ import { TutorAssignmentBoardPage } from '@/pages/organization/TutorAssignmentBo
 import { PartnershipOnboardingPage } from '@/pages/partnership/PartnershipOnboardingPage'
 import { PricingPage } from '@/pages/pricing/PricingPage'
 import { QaPage } from '@/pages/qa/QaPage'
+import { QuestionBankHomePage } from '@/pages/question-bank/QuestionBankHomePage'
+import { QuestionBankMistakesReviewPage } from '@/pages/question-bank/MistakesReviewPage'
+import { QuestionSessionPage } from '@/pages/question-bank/QuestionSessionPage'
+import { QuestionSetOverviewPage } from '@/pages/question-bank/QuestionSetOverviewPage'
+import { QuestionSetResultPage } from '@/pages/question-bank/QuestionSetResultPage'
+import { SavedQuestionSetsPage } from '@/pages/question-bank/SavedQuestionSetsPage'
+import { SubjectQuestionBankPage } from '@/pages/question-bank/SubjectQuestionBankPage'
+import { TopicQuestionBankPage } from '@/pages/question-bank/TopicQuestionBankPage'
 import { LessonPage } from '@/pages/practice/LessonPage'
 import { LessonResultPage } from '@/pages/practice/LessonResultPage'
 import { MistakesReviewPage } from '@/pages/practice/MistakesReviewPage'
@@ -111,6 +119,14 @@ export function AppRouter() {
             <Route path="/chat" element={<ChatPage />} />
             <Route path="/practice" element={<PracticeOverviewPage />} />
             <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
+            <Route path="/question-bank" element={<QuestionBankHomePage />} />
+            <Route path="/question-bank/mistakes" element={<QuestionBankMistakesReviewPage />} />
+            <Route path="/question-bank/saved" element={<SavedQuestionSetsPage />} />
+            <Route path="/question-bank/sets/:setId" element={<QuestionSetOverviewPage />} />
+            <Route path="/question-bank/session/:sessionId" element={<QuestionSessionPage />} />
+            <Route path="/question-bank/session/:sessionId/result" element={<QuestionSetResultPage />} />
+            <Route path="/question-bank/:subjectId/:topicId" element={<TopicQuestionBankPage />} />
+            <Route path="/question-bank/:subjectId" element={<SubjectQuestionBankPage />} />
             <Route path="/practice/:subjectId/:topicId" element={<TopicRoadmapPage />} />
             <Route path="/practice/:subjectId/:topicId/lessons/:lessonId" element={<LessonPage />} />
             <Route path="/practice/:subjectId/:topicId/lessons/:lessonId/result" element={<LessonResultPage />} />

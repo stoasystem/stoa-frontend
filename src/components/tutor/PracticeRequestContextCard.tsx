@@ -15,7 +15,9 @@ export function PracticeRequestContextCard({
             <BookOpenCheck className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <p className="brand-section-kicker">Source: Practice lesson</p>
+            <p className="brand-section-kicker">
+              Source: {context.source === 'question-bank' ? 'Question Bank' : 'Practice lesson'}
+            </p>
             <CardTitle className="text-xl">The student requested support after practising this step.</CardTitle>
           </div>
         </div>
@@ -36,7 +38,7 @@ export function PracticeRequestContextCard({
         <div className="flex gap-2 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6 text-muted-foreground">
           <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
           <p>
-            Practice context helps you see where the student got stuck before joining the request.
+            Learning context helps you see where the student got stuck before joining the request.
           </p>
         </div>
       </CardContent>

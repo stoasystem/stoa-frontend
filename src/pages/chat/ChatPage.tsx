@@ -5,6 +5,7 @@ import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
 import { PracticeContextCard } from '@/components/chat/PracticeContextCard'
+import { QuestionBankContextCard } from '@/components/question-bank/QuestionBankContextCard'
 import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -20,6 +21,7 @@ import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuer
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { PracticeChatLocationState } from '@/types/practice'
+import type { QuestionBankChatLocationState } from '@/types/questionBank'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
 export function ChatPage() {
@@ -38,8 +40,9 @@ export function ChatPage() {
 
   const conversationsQuery = useConversationsQuery()
   const studentProfileQuery = useStudentProfileQuery()
-  const practiceState = location.state as PracticeChatLocationState | null
+  const practiceState = location.state as (PracticeChatLocationState & QuestionBankChatLocationState) | null
   const practiceContext = practiceState?.practiceContext
+  const questionBankContext = practiceState?.questionBankContext
   const conversations = useMemo(
     () => conversationsQuery.data?.items ?? [],
     [conversationsQuery.data],
@@ -76,6 +79,12 @@ export function ChatPage() {
   }, [practiceContext, practiceState?.prompt])
 
   useEffect(() => {
+    if (!questionBankContext) return
+    setActiveConversationId(null)
+    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this Question Bank step?')
+  }, [practiceState?.prompt, questionBankContext])
+
+  useEffect(() => {
     setTeacherHelpRequest(null)
     setTeacherHelpError(null)
   }, [activeConversationId])
@@ -107,7 +116,7 @@ export function ChatPage() {
 
   function handleCreateConversation(message?: string) {
     if (createConversationMutation.isPending) return
-    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext)
+    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext, questionBankContext)
 
     const profile = studentProfileQuery.data
     const subject = profile?.primarySubjects?.[0] ?? 'General'
@@ -197,8 +206,22 @@ export function ChatPage() {
           onBackToLesson={() => navigate(practiceContext.returnTo ?? '/practice')}
         />
       )}
+      {questionBankContext && (
+        <QuestionBankContextCard
+          context={questionBankContext}
+          onBack={() => navigate(questionBankContext.returnTo ?? '/question-bank')}
+        />
+      )}
       <div className="brand-rule rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
-        <EmptyState message={practiceContext ? t('practiceContext.welcome') : t('welcome')} />
+        <EmptyState
+          message={
+            questionBankContext
+              ? 'Review this question step with the Learning Assistant.'
+              : practiceContext
+                ? t('practiceContext.welcome')
+                : t('welcome')
+          }
+        />
         <form
           className="mt-5 space-y-3"
           onSubmit={(event) => {
@@ -210,7 +233,7 @@ export function ChatPage() {
           <Textarea
             value={newConversationMessage}
             onChange={(event) => setNewConversationMessage(event.target.value)}
-            placeholder={practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
+            placeholder={questionBankContext ? 'Ask what is unclear in this question...' : practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
             className="min-h-24 resize-none"
             disabled={createConversationMutation.isPending}
             aria-label={t('newConversationLabel')}
@@ -276,6 +299,12 @@ export function ChatPage() {
                 onBackToLesson={() => navigate(practiceContext.returnTo ?? '/practice')}
               />
             )}
+            {questionBankContext && (
+              <QuestionBankContextCard
+                context={questionBankContext}
+                onBack={() => navigate(questionBankContext.returnTo ?? '/question-bank')}
+              />
+            )}
             <ChatMessageList
               key={activeConversationId}
               messages={displayedMessages}
@@ -314,7 +343,21 @@ export function ChatPage() {
 function buildInitialMessage(
   message: string,
   practiceContext: PracticeChatLocationState['practiceContext'],
+  questionBankContext?: QuestionBankChatLocationState['questionBankContext'],
 ) {
+  if (questionBankContext) {
+    const question = message || 'Can you explain this question step?'
+
+    return [
+      question,
+      '',
+      `Question Bank set: ${questionBankContext.setTitle}`,
+      `Question Bank topic: ${questionBankContext.topic}`,
+      `Question: ${questionBankContext.challengePrompt}`,
+      questionBankContext.studentAnswer ? `My answer: ${questionBankContext.studentAnswer}` : '',
+    ].filter(Boolean).join('\n')
+  }
+
   if (!practiceContext) {
     return message
   }

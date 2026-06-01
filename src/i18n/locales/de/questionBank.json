@@ -1,0 +1,12 @@
+{
+  "title": "Aufgabenbank",
+  "description": "Üben nach Fach, Thema und Schwierigkeit.",
+  "positioning": "Die Aufgabenbank ist freies Üben. Der Practice Path bleibt der geführte Lernweg.",
+  "actions": {
+    "open": "Aufgabenbank öffnen",
+    "reviewMistakes": "Fehler wiederholen",
+    "start": "Starten",
+    "resume": "Fortsetzen",
+    "practiceAgain": "Noch einmal üben"
+  }
+}
