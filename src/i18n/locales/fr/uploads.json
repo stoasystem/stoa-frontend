@@ -1,0 +1,60 @@
+{
+  "actions": {
+    "attachFile": "Joindre un fichier",
+    "takePhoto": "Prendre une photo",
+    "uploadPhoto": "Importer une photo",
+    "uploadQuestion": "Importer une question",
+    "remove": "Retirer",
+    "removeFile": "Retirer {{fileName}}",
+    "retry": "Réessayer",
+    "retryFile": "Réessayer {{fileName}}",
+    "cancel": "Annuler",
+    "askLearningAssistant": "Demander au Learning Assistant"
+  },
+  "status": {
+    "idle": "Prêt",
+    "validating": "Vérification",
+    "uploading": "Importation",
+    "uploaded": "Importé",
+    "failed": "Échec",
+    "rejected": "Refusé"
+  },
+  "errors": {
+    "unsupportedType": "Ce type de fichier n'est pas pris en charge.",
+    "fileTooLarge": "Ce fichier est trop volumineux.",
+    "tooManyFiles": "Tu peux importer jusqu'à {{count}} fichiers.",
+    "uploadFailed": "L'importation a échoué. Réessaie.",
+    "emptyFile": "Ce fichier semble vide.",
+    "waitForUpload": "Attends la fin de l'importation."
+  },
+  "dropzone": {
+    "title": "Dépose les fichiers ici",
+    "description": "Formats pris en charge : JPG, PNG, WEBP, PDF.",
+    "browse": "Choisir des fichiers"
+  },
+  "modal": {
+    "title": "Importer une question",
+    "description": "Prends une photo ou joins un PDF, puis demande au Learning Assistant."
+  },
+  "preview": {
+    "attachedFiles": "Fichiers joints",
+    "image": "Image",
+    "pdf": "PDF",
+    "document": "Document",
+    "unknown": "Fichier",
+    "imageAlt": "Aperçu de {{fileName}}"
+  },
+  "privacy": {
+    "learningOnly": "Importe uniquement des supports d'apprentissage. N'importe pas de documents personnels."
+  },
+  "learning": {
+    "uploadKicker": "Support scolaire",
+    "uploadOwnQuestionTitle": "Tu as ta propre question ?",
+    "uploadOwnQuestionDescription": "Importe une photo ou un PDF et demande au Learning Assistant.",
+    "schoolworkHelpTitle": "Apporte ton exercice",
+    "schoolworkHelpDescription": "Importe une question de l'école et reçois une aide étape par étape."
+  },
+  "chat": {
+    "defaultAttachmentPrompt": "J'ai importé une question scolaire. Aide-moi à la comprendre étape par étape."
+  }
+}

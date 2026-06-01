@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Bookmark, Clock, Search } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { Bookmark, Camera, Clock, Search } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -8,6 +8,9 @@ import { QuestionSetCard } from '@/components/question-bank/QuestionSetCard'
 import { SubjectCard } from '@/components/question-bank/SubjectTopicCards'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { UploadModal } from '@/features/uploads/components/UploadModal'
+import { saveUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
+import type { UploadAttachment } from '@/features/uploads/types/uploads'
 import { useQuestionBankOverviewQuery } from '@/hooks/questionBank/useQuestionBankOverviewQuery'
 import { useQuestionBankSearchQuery } from '@/hooks/questionBank/useQuestionBankSearchQuery'
 import {
@@ -19,7 +22,9 @@ import {
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function QuestionBankHomePage() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
+  const [uploadOpen, setUploadOpen] = useState(false)
   const overviewQuery = useQuestionBankOverviewQuery()
   const searchQuery = useQuestionBankSearchQuery(query)
   const overview = overviewQuery.data
@@ -31,6 +36,19 @@ export function QuestionBankHomePage() {
     return result.topics.length + result.sets.length + result.questions.length
   }, [searchQuery.data])
 
+  function askWithQuestionUpload(attachments: UploadAttachment[]) {
+    const uploadContext = {
+      source: 'question-bank-upload' as const,
+      title: 'Question Bank upload',
+      description: 'Review the uploaded question with the Learning Assistant.',
+      prompt: 'I uploaded a question from my own schoolwork. Please help me understand it step by step.',
+      returnTo: '/question-bank',
+      attachments,
+    }
+    saveUploadHandoff(uploadContext)
+    navigate('/chat?source=question-bank-upload', { state: { uploadContext } })
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="space-y-8 p-0">
@@ -38,6 +56,34 @@ export function QuestionBankHomePage() {
           eyebrow="Question Bank"
           title="Practice by subject, topic, and difficulty."
           description="Use the open exercise library when you want targeted practice outside the guided Practice Path."
+        />
+
+        <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
+                <Camera className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <p className="brand-section-kicker mt-4">Have your own question?</p>
+              <h2 className="mt-2 text-xl font-semibold">Upload a photo or PDF and ask the Learning Assistant.</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                Use this when the question is not already in the Question Bank. It will open a guided Chat request, not an automatic scan.
+              </p>
+            </div>
+            <Button type="button" variant="outline" onClick={() => setUploadOpen(true)}>
+              <Camera className="h-4 w-4" aria-hidden="true" />
+              Upload Question
+            </Button>
+          </div>
+        </section>
+        <UploadModal
+          open={uploadOpen}
+          context="question_bank"
+          title="Upload a question"
+          description="Take a photo or attach a PDF, then ask the Learning Assistant."
+          sourceOptions={{ sourcePage: '/question-bank' }}
+          onOpenChange={setUploadOpen}
+          onComplete={askWithQuestionUpload}
         />
 
         <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-card)]">

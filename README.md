@@ -2,6 +2,22 @@
 
 STOA learning platform frontend.
 
+## Phase v2.2 Photo & File Upload UI
+
+STOA now has a shared upload foundation for learning-context uploads across Learning Chat, Question Bank, and Practice Path.
+
+Students can attach photos or PDFs, use mobile photo capture where supported, see previews and upload states, remove/retry files, and hand uploaded schoolwork to the Learning Assistant. This is a frontend/demo UI foundation only: it does not implement OCR, image recognition, automatic solving, permanent storage, teacher grading, parent review, or admin moderation.
+
+See `docs/uploads/upload-ui-foundation.md` for supported formats, integration points, accessibility notes, and backend handoff boundaries.
+
+Verification:
+
+```bash
+npm run lint
+npm run build
+npm run test:e2e -- uploads.spec.ts
+```
+
 ## Phase v2.1 Question Bank UI
 
 Question Bank adds a student-facing open practice library at `/question-bank`.

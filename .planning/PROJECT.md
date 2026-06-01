@@ -2,42 +2,38 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, and a frontend/demo-backed Practice Path with roadmap progression for active learning.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Question Bank, and a unified learning-context photo/PDF upload UI foundation.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.1 Question Bank UI Design
+## Latest Shipped Milestone: v2.2 Photo & File Upload UI Foundation
 
 **Shipped:** 2026-06-02
 
-**Delivered:** STOA now includes a frontend/mock-backed Question Bank UI. Students can browse open practice by subject, topic, difficulty, question type, status, saved sets, and mistakes; inspect question sets; complete a low-pressure session; receive immediate feedback; view results; retry mistakes; and hand off a question-bank step to Learning Chat with product-safe context.
+**Delivered:** STOA now includes a unified upload foundation for learning-context photos and PDFs. Students can attach files or capture photos in Learning Chat, upload their own Question Bank material, add current-question work from a Question Bank session, and bring Practice schoolwork into Learning Chat with shared previews, validation, status/error states, removal, retry, route/session handoff, and product-safe copy.
 
 **Target features:**
-- Student Question Bank navigation and routes for home, subject, topic, set overview, session, result, mistakes, and saved sets.
-- Typed deterministic mock data, service/query boundaries, and replaceable API surface for future backend work.
-- Open-practice discovery with local search, filters, subject/topic cards, recommended sets, recent practice, and saved sets.
-- Low-pressure session UI with multiple-choice, short-answer, numeric, and step-by-step layouts plus immediate feedback.
-- Question Bank to Learning Chat handoff, parent learning activity framing, tutor context support, four-language namespace, docs, lint/build/browser verification.
+- Reusable `src/features/uploads/` module with typed upload metadata, validation utilities, preview helpers, mock/upload service boundaries, and shared hooks.
+- Shared upload UI for file attach, mobile photo capture, desktop drag-and-drop, attachment preview cards, status badges, error messaging, upload modal, and inline upload panels.
+- Learning Chat composer upload behavior with preview, remove, retry, attachment-aware send, and message-stream attachment rendering.
+- Question Bank home and question-session upload entry points with upload-to-Learning-Chat context.
+- Practice Path schoolwork upload entry that supports Learning Assistant handoff without displacing guided roadmap/lesson flow.
+- Four-language `uploads` localization, accessibility checks, Playwright upload smoke tests, README/docs handoff, and lint/build verification.
 
-## Current Milestone: v2.2 Photo & File Upload UI Foundation
+## Current Milestone: Not selected
 
-**Goal:** Establish a unified learning-context upload UI foundation so students can bring photos and PDFs from real schoolwork into Learning Chat, Question Bank, and Practice Path with clear previews, validation, upload states, errors, and Learning Assistant handoff.
+**Goal:** Select the next milestone from product priorities. Future upload backend/OCR/storage work remains deferred until explicitly scoped.
 
 **Target features:**
-- Add a reusable `src/features/uploads/` module with typed upload metadata, validation utilities, preview helpers, mock/upload service boundaries, and shared hooks.
-- Build shared upload UI for file attach, mobile photo capture, desktop drag-and-drop, attachment preview cards, status badges, error messaging, upload modal, and inline upload panels.
-- Upgrade Chat composer upload behavior so attachments can be previewed, removed, retried, sent with a message, and displayed consistently in the message stream.
-- Add Question Bank upload entry points on the home page and question-session help area, with upload-to-Learning-Chat context.
-- Add a lightweight Practice Path schoolwork upload entry that supports the Learning Assistant without overtaking the guided lesson flow.
-- Add four-language `uploads` localization, accessibility/responsive QA, Playwright upload smoke tests, and documentation.
+- No active milestone features are currently approved.
 
 ## Current State
 
-**Latest shipped milestone:** v2.1 Question Bank UI Design
+**Latest shipped milestone:** v2.2 Photo & File Upload UI Foundation
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -75,6 +71,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 34 Practice Path scope correction with the canonical Practice Path -> Subject -> Grade level -> Topic -> Unit -> Lesson -> Challenge hierarchy, Mathematics / lower secondary / equations demo seed data, subject/topic route compatibility, generalized UI copy, docs, README, route QA, four-language checks, and build verification.
 - Phase 35 Practice Roadmap UI with subject-agnostic roadmap data contracts, roadmap components, lesson node states, progress header, locked hints, continue card, `/practice` and topic route integration, four-language copy, roadmap docs, README handoff, browser checks, and build verification.
 - v2.1 Question Bank UI with `/question-bank`, subject/topic question-bank pages, set overview, session answer flow, immediate feedback, result page, mistakes review, saved sets, local search/filtering, typed mock data, service/query boundaries, Question Bank to Learning Chat context, parent/tutor comprehension updates, docs, and verification.
+- v2.2 Photo & File Upload UI with reusable upload types/services/hooks/components, Chat composer upload integration, Question Bank upload modal/session handoff, Practice schoolwork upload panels, route-state/session-storage handoff, four-language upload copy, docs, and Playwright upload verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -116,12 +113,13 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify reliable frontend quality gates with CI/local command parity, Node-aware ESLint config, lockfile and ignore hygiene, updated smoke tests, README guidance, and 14/14 Playwright E2E checks — v1.34
 - ✓ Students can set a Learning Assistant answer-language preference, and new guided responses use the saved student profile language across local/demo profile and chat flows — v1.35
 - ✓ Students can use a frontend/mock-backed Question Bank to browse question sets, filter/search open practice, complete a low-pressure session, review feedback/results/mistakes, and hand off unclear question steps to Learning Chat — v2.1
+- ✓ Students can upload photos and PDFs as learning material from Chat, Question Bank, and Practice Path through a unified, accessible frontend upload system — v2.2
+- ✓ Upload UI supports mobile camera capture, desktop drag-and-drop, browse fallback, validation, preview, removal, retry, failed/rejected states, and Learning Assistant handoff — v2.2
+- ✓ Upload copy remains product-safe and does not imply OCR, image understanding, automatic solving, permanent storage, encryption guarantees, or teacher/admin review workflows that are not implemented — v2.2
 
 ### Active
 
-- Students can upload photos and PDFs as learning material from Chat, Question Bank, and Practice Path through a unified, accessible frontend upload system — v2.2
-- Upload UI must support mobile camera capture, desktop drag-and-drop, browse fallback, validation, preview, removal, retry, failed/rejected states, and Learning Assistant handoff — v2.2
-- Upload copy must remain product-safe: do not imply OCR, image understanding, automatic solving, permanent storage, encryption guarantees, or teacher/admin review workflows that are not implemented — v2.2
+- No active milestone requirements. Next milestone not selected.
 
 ### Out of Scope
 
@@ -151,6 +149,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - New product functionality, homepage redesign, register flow redesign, multilingual system redesign, demo backend rewrite, complex backend/database work, AWS deployment, real payment processing, large UI redesign, production email/CRM/support operations, product-direction changes, new pages/languages, broad copy/design reopening, and navigation rewrites — outside Phase 23 launch-candidate bug fixing and public demo release scope.
 - Formal AI backend, production model service, production provider billing, complex provider pool, production queue, database redesign, long-term memory, real curriculum knowledge graph, content safety platform, AWS Lambda/API Gateway implementation, direct frontend calls to Codex/OpenAI, and user-visible Codex/model/provider/debug wording — outside Phase 25 local demo provider integration scope.
 - New frontend pages, broad UI redesign, formal AI backend work, complex agent framework, long-term memory, real knowledge graph, production-grade content safety platform, model fine-tuning, multi-model scheduling, AWS deployment, and new product modules — outside Phase 26 Learning Assistant functional QA scope.
+- Production object storage, signed upload URLs, OCR, image understanding, handwriting/formula recognition, automatic problem solving from images, teacher grading, parent file review, admin moderation, video upload, and permanent file-library management — outside v2.2 Photo & File Upload UI Foundation scope.
 
 ## Context
 
@@ -422,9 +421,9 @@ Current codebase facts:
 | Keep answer-language enforcement in backend/harness flow | The frontend can collect preference, but the backend and prompt harness must own response-language instructions so streaming, fallback, and future providers stay consistent | — Pending |
 | Keep Question Bank separate from Practice Path | Question Bank should support open, filterable practice by subject/topic/difficulty, while Practice Path remains the guided roadmap and lesson progression experience | — Pending |
 | Keep v2.1 mock/demo-backed | The milestone needs credible UI and interaction design now, while production item storage, permissions, exam logic, generated questions, and deep curriculum mapping require later backend/product scope | — Pending |
-| Keep uploads context-bound, not library-style | Research shows the strongest fit is tutor/chat or assignment-context upload, so STOA uploads should attach to Chat, Question Bank questions, or Practice schoolwork help rather than become a storage product | — Pending |
-| Reuse a shared upload module | The repo already has Chat upload behavior; v2.2 should consolidate validation, preview, status, and retry into `src/features/uploads/` instead of adding separate page-specific implementations | — Pending |
-| Avoid OCR and instant-solve claims | Camera-solver competitors emphasize recognition, but v2.2 only proves the upload UX and Learning Assistant handoff, so copy must not overpromise unimplemented image understanding | — Pending |
+| Keep uploads context-bound, not library-style | Research shows the strongest fit is tutor/chat or assignment-context upload, so STOA uploads should attach to Chat, Question Bank questions, or Practice schoolwork help rather than become a storage product | v2.2 Complete |
+| Reuse a shared upload module | The repo already has Chat upload behavior; v2.2 should consolidate validation, preview, status, and retry into `src/features/uploads/` instead of adding separate page-specific implementations | v2.2 Complete |
+| Avoid OCR and instant-solve claims | Camera-solver competitors emphasize recognition, but v2.2 only proves the upload UX and Learning Assistant handoff, so copy must not overpromise unimplemented image understanding | v2.2 Complete |
 
 ## Evolution
 
@@ -444,4 +443,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.2 milestone start*
+*Last updated: 2026-06-02 after v2.2 milestone completion*

@@ -67,12 +67,10 @@ export const mockBillingUsage: BillingUsage = {
 
 export const mockFeatureAccess: FeatureAccess = {
   canUseChat: true,
-  canUploadFiles: false,
+  canUploadFiles: true,
   canRequestTeacherHelp: true,
   canViewParentReports: true,
-  reason: {
-    fileUploads: 'File upload quota reached',
-  },
+  reason: {},
 }
 
 export const mockReferralSummary: ReferralSummary = {

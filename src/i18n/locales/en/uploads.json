@@ -1,0 +1,60 @@
+{
+  "actions": {
+    "attachFile": "Attach file",
+    "takePhoto": "Take photo",
+    "uploadPhoto": "Upload photo",
+    "uploadQuestion": "Upload question",
+    "remove": "Remove",
+    "removeFile": "Remove {{fileName}}",
+    "retry": "Retry",
+    "retryFile": "Retry {{fileName}}",
+    "cancel": "Cancel",
+    "askLearningAssistant": "Ask Learning Assistant"
+  },
+  "status": {
+    "idle": "Ready",
+    "validating": "Validating",
+    "uploading": "Uploading",
+    "uploaded": "Uploaded",
+    "failed": "Failed",
+    "rejected": "Rejected"
+  },
+  "errors": {
+    "unsupportedType": "This file type is not supported.",
+    "fileTooLarge": "This file is too large.",
+    "tooManyFiles": "You can upload up to {{count}} files.",
+    "uploadFailed": "The upload failed. Please try again.",
+    "emptyFile": "This file appears to be empty.",
+    "waitForUpload": "Please wait for the upload to finish."
+  },
+  "dropzone": {
+    "title": "Drag and drop files here",
+    "description": "Supported formats: JPG, PNG, WEBP, PDF.",
+    "browse": "Browse files"
+  },
+  "modal": {
+    "title": "Upload a question",
+    "description": "Take a photo or attach a PDF, then ask the Learning Assistant."
+  },
+  "preview": {
+    "attachedFiles": "Attached files",
+    "image": "Image",
+    "pdf": "PDF",
+    "document": "Document",
+    "unknown": "File",
+    "imageAlt": "Preview of {{fileName}}"
+  },
+  "privacy": {
+    "learningOnly": "Please upload learning materials only. Do not upload personal documents."
+  },
+  "learning": {
+    "uploadKicker": "Schoolwork upload",
+    "uploadOwnQuestionTitle": "Have your own question?",
+    "uploadOwnQuestionDescription": "Upload a photo or PDF and ask the Learning Assistant.",
+    "schoolworkHelpTitle": "Bring your own schoolwork",
+    "schoolworkHelpDescription": "Upload a question from school and get step-by-step guidance."
+  },
+  "chat": {
+    "defaultAttachmentPrompt": "I uploaded a schoolwork question. Please help me understand it step by step."
+  }
+}

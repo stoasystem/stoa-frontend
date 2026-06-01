@@ -7,6 +7,9 @@ import { LoadingState } from '@/components/common/LoadingState'
 import { QuestionAnswerInput } from '@/components/question-bank/QuestionAnswerInput'
 import { QuestionFeedbackPanel } from '@/components/question-bank/QuestionFeedbackPanel'
 import { Button } from '@/components/ui/button'
+import { InlineUploadPanel } from '@/features/uploads/components/InlineUploadPanel'
+import { saveUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
+import type { UploadAttachment } from '@/features/uploads/types/uploads'
 import { useQuestionBankSessionQuery } from '@/hooks/questionBank/useQuestionBankSessionQuery'
 import { useSubmitQuestionBankAnswerMutation } from '@/hooks/questionBank/useSubmitQuestionBankAnswerMutation'
 import { getPracticeTopicPath } from '@/lib/practiceRoutes'
@@ -86,6 +89,24 @@ export function QuestionSessionPage() {
     navigate('/chat?source=question-bank&questionId=' + loadedQuestion.id, { state })
   }
 
+  function askLearningAssistantWithUpload(attachments: UploadAttachment[]) {
+    const uploadContext = {
+      source: 'question-session-upload' as const,
+      title: loadedSet.title,
+      description: `Uploaded work for ${loadedQuestion.skill}. The Learning Assistant will use this as context.`,
+      prompt: `I uploaded my work for this Question Bank problem. Please help me understand the next step without just giving me the answer.`,
+      returnTo: `/question-bank/session/${sessionId}`,
+      sessionId,
+      questionId: loadedQuestion.id,
+      attachments,
+    }
+
+    saveUploadHandoff(uploadContext)
+    navigate(`/chat?source=question-bank&sessionId=${sessionId}&questionId=${loadedQuestion.id}`, {
+      state: { uploadContext },
+    })
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
@@ -123,6 +144,17 @@ export function QuestionSessionPage() {
               </Button>
             </div>
             <QuestionFeedbackPanel feedback={feedback} onAskLearningAssistant={askLearningAssistant} onTrySimilar={() => setAnswer('')} />
+            <InlineUploadPanel
+              context="question_session"
+              compact
+              title="Need help with this question?"
+              description="Ask the Learning Assistant or upload your own work for this problem."
+              sourceOptions={{
+                sourcePage: `/question-bank/session/${sessionId}`,
+                sourceEntityId: loadedQuestion.id,
+              }}
+              onAskLearningAssistant={askLearningAssistantWithUpload}
+            />
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/95 p-4">

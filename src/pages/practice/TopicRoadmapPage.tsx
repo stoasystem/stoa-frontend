@@ -9,6 +9,9 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { InlineUploadPanel } from '@/features/uploads/components/InlineUploadPanel'
+import { saveUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
+import type { UploadAttachment } from '@/features/uploads/types/uploads'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 import { usePracticeRoadmapQuery } from '@/hooks/practice/usePracticeRoadmapQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -39,6 +42,19 @@ export function TopicRoadmapPage() {
     navigate(getPracticeLessonPathFromIds(lesson.subjectId, lesson.topicId, lesson.id))
   }
 
+  function askWithPracticeUpload(attachments: UploadAttachment[]) {
+    const uploadContext = {
+      source: 'practice-upload' as const,
+      title: topic ? `${topic.title} schoolwork upload` : 'Practice schoolwork upload',
+      description: 'Bring your own schoolwork into the Learning Assistant.',
+      prompt: 'I uploaded a schoolwork question for Practice Path. Please guide me step by step and help me understand the unclear part.',
+      returnTo: `/practice/${resolvedSubjectId}/${resolvedTopicId}`,
+      attachments,
+    }
+    saveUploadHandoff(uploadContext)
+    navigate('/chat?source=practice-upload', { state: { uploadContext } })
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="space-y-8 p-0">
@@ -66,6 +82,17 @@ export function TopicRoadmapPage() {
             {roadmapQuery.isLoading && <PageSkeleton rows={4} />}
             {roadmapQuery.isError && <p className="text-sm text-destructive">Practice roadmap is unavailable.</p>}
             {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
+            <InlineUploadPanel
+              context="practice_path"
+              title="Have a question from school?"
+              description="Upload a photo or PDF and ask the Learning Assistant while you keep the Practice Path as your guide."
+              sourceOptions={{
+                sourcePage: `/practice/${resolvedSubjectId}/${resolvedTopicId}`,
+                sourceEntityId: resolvedTopicId,
+              }}
+              compact
+              onAskLearningAssistant={askWithPracticeUpload}
+            />
             <section className="space-y-4">
               <SectionHeader
                 title="Review work"

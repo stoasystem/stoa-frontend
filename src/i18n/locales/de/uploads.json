@@ -1,0 +1,60 @@
+{
+  "actions": {
+    "attachFile": "Datei anhängen",
+    "takePhoto": "Foto aufnehmen",
+    "uploadPhoto": "Foto hochladen",
+    "uploadQuestion": "Frage hochladen",
+    "remove": "Entfernen",
+    "removeFile": "{{fileName}} entfernen",
+    "retry": "Erneut versuchen",
+    "retryFile": "{{fileName}} erneut versuchen",
+    "cancel": "Abbrechen",
+    "askLearningAssistant": "Learning Assistant fragen"
+  },
+  "status": {
+    "idle": "Bereit",
+    "validating": "Wird geprüft",
+    "uploading": "Wird hochgeladen",
+    "uploaded": "Hochgeladen",
+    "failed": "Fehlgeschlagen",
+    "rejected": "Abgelehnt"
+  },
+  "errors": {
+    "unsupportedType": "Dieser Dateityp wird nicht unterstützt.",
+    "fileTooLarge": "Diese Datei ist zu groß.",
+    "tooManyFiles": "Du kannst bis zu {{count}} Dateien hochladen.",
+    "uploadFailed": "Der Upload ist fehlgeschlagen. Bitte versuche es erneut.",
+    "emptyFile": "Diese Datei scheint leer zu sein.",
+    "waitForUpload": "Bitte warte, bis der Upload fertig ist."
+  },
+  "dropzone": {
+    "title": "Dateien hier ablegen",
+    "description": "Unterstützte Formate: JPG, PNG, WEBP, PDF.",
+    "browse": "Dateien auswählen"
+  },
+  "modal": {
+    "title": "Frage hochladen",
+    "description": "Nimm ein Foto auf oder hänge ein PDF an. Danach kannst du den Learning Assistant fragen."
+  },
+  "preview": {
+    "attachedFiles": "Angehängte Dateien",
+    "image": "Bild",
+    "pdf": "PDF",
+    "document": "Dokument",
+    "unknown": "Datei",
+    "imageAlt": "Vorschau von {{fileName}}"
+  },
+  "privacy": {
+    "learningOnly": "Bitte lade nur Lernmaterial hoch. Lade keine persönlichen Dokumente hoch."
+  },
+  "learning": {
+    "uploadKicker": "Schulaufgabe hochladen",
+    "uploadOwnQuestionTitle": "Hast du eine eigene Frage?",
+    "uploadOwnQuestionDescription": "Lade ein Foto oder PDF hoch und frage den Learning Assistant.",
+    "schoolworkHelpTitle": "Eigene Schulaufgabe mitbringen",
+    "schoolworkHelpDescription": "Lade eine Frage aus der Schule hoch und erhalte Schritt-für-Schritt-Hilfe."
+  },
+  "chat": {
+    "defaultAttachmentPrompt": "Ich habe eine Schulaufgabe hochgeladen. Bitte hilf mir, sie Schritt für Schritt zu verstehen."
+  }
+}

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: Photo & File Upload UI Foundation
-status: planning
-last_updated: "2026-06-02T00:00:00.000Z"
+status: complete
+last_updated: "2026-06-02T23:59:00.000Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 6
-  completed_phases: 0
+  completed_phases: 6
   total_plans: 6
-  completed_plans: 0
-  percent: 0
+  completed_plans: 6
+  percent: 100
 ---
 
 # Project State
@@ -20,38 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.2 Photo & File Upload UI Foundation is defining requirements and roadmap after upload UI research.
+**Current focus:** Milestone v2.2 Photo & File Upload UI Foundation is implemented, verified, documented, and ready for archive/next milestone selection.
 
 ## Current Position
 
-Phase: 206 Upload Domain Model, Validation, and Service Foundation
-Plan: —
-Status: Requirements and roadmap created; ready to plan Phase 206
-Last activity: 2026-06-02 — Milestone v2.2 started; upload UI research, requirements, and roadmap created
+Phase: 211 Upload Localization, Accessibility, QA, and Handoff Documentation
+Plan: 211
+Status: Milestone complete
+Last activity: 2026-06-02 — Implemented shared upload foundation, Chat/Question Bank/Practice upload flows, four-language upload copy, docs, Playwright upload coverage, lint/build verification, and milestone audit.
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 6
-- Average duration: —
-- Total execution time: planning
+- Total plans completed this milestone: 6 of 6
+- Average duration: same-day autonomous execution
+- Total execution time: 2026-06-02
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 206 | 0/1 | Pending | — |
-| 207 | 0/1 | Pending | — |
-| 208 | 0/1 | Pending | — |
-| 209 | 0/1 | Pending | — |
-| 210 | 0/1 | Pending | — |
-| 211 | 0/1 | Pending | — |
+| 206 | 1/1 | Complete | 2026-06-02 |
+| 207 | 1/1 | Complete | 2026-06-02 |
+| 208 | 1/1 | Complete | 2026-06-02 |
+| 209 | 1/1 | Complete | 2026-06-02 |
+| 210 | 1/1 | Complete | 2026-06-02 |
+| 211 | 1/1 | Complete | 2026-06-02 |
 
 **Recent Trend:**
 
-- Last 6 planned phases: 206, 207, 208, 209, 210, 211
-- Trend: v2.2 is planned around shared upload foundation, shared components, Chat integration, Question Bank handoff, Practice entry, and QA/localization closure.
+- Last 6 completed phases: 206, 207, 208, 209, 210, 211
+- Trend: v2.2 completed a vertical upload UI foundation from reusable contracts through shared components, Chat integration, Question Bank/Practice handoff, localization, docs, and E2E coverage.
 
 *Updated after each plan completion*
 
@@ -123,10 +123,16 @@ Recent decisions affecting current work:
 - v2.2 continues roadmap numbering from Phase 206 after v2.1 ended at Phase 205.
 - Upload UI should be context-bound to learning tasks in Chat, Question Bank, and Practice Path rather than becoming a generic file manager.
 - v2.2 is frontend UI plus mock/demo upload state only; production object storage, OCR, image recognition, AI auto-solving, teacher grading, parent review, and admin moderation are deferred.
+- Phase 206 added shared upload types, validation, file utilities, preview lifecycle helpers, and mock/API-ready upload service boundaries.
+- Phase 207 added accessible upload buttons, photo capture, dropzone, modal, inline panel, status/error UI, and attachment preview cards.
+- Phase 208 moved Learning Chat composer upload behavior onto the shared upload foundation while preserving streaming, retry, and teacher-help behavior.
+- Phase 209 added Question Bank home/session upload entry points and route-state/session-storage upload handoff to Chat.
+- Phase 210 added lightweight Practice upload panels and Practice-source handoff to Chat without displacing roadmap progression.
+- Phase 211 added four-language upload copy, docs, Playwright upload coverage, lint/build verification, and milestone audit closure.
 
 ### Pending Todos
 
-- Define v2.2 requirements and roadmap for Photo & File Upload UI Foundation.
+- Future backend/product work: production object storage, signed upload URLs, scanning/security claims, OCR/image understanding, teacher grading, parent review, admin moderation, and durable file-library behavior remain out of scope until separately planned.
 
 ### Quick Tasks Completed
 

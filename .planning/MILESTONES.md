@@ -1,5 +1,28 @@
 # Milestones
 
+## v2.2 Photo & File Upload UI Foundation (Shipped: 2026-06-02)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/v2.2-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Production object storage, signed upload URLs, OCR/image understanding, handwriting/formula recognition, auto-solving from images, crop/markup tools, teacher grading, parent file review, admin moderation, video upload, and permanent file-library workflows remain future scope.
+
+**Key accomplishments:**
+
+- Added a reusable `src/features/uploads/` module with typed metadata, validation, file utilities, preview lifecycle helpers, upload handoff helpers, service boundaries, and shared hooks.
+- Built shared upload UI for attach, photo capture, drag/drop, browse fallback, preview cards, remove, retry, status badges, errors, modal, and inline panels.
+- Integrated upload into Learning Chat while preserving attachment-aware sends, streaming, retry, lock, and teacher-help behavior.
+- Added contextual Question Bank home/session upload flows and route-state/session-storage handoff into Learning Chat.
+- Added lightweight Practice schoolwork upload panels and Practice-source Learning Chat handoff.
+- Added English, German, French, and Italian upload copy, product-boundary docs, README handoff, and targeted Playwright upload tests.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e -- uploads.spec.ts`: passed, 4/4 tests.
+
+---
+
 ## v2.1 Question Bank UI Design (Shipped: 2026-06-02)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

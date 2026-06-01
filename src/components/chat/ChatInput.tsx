@@ -2,11 +2,16 @@ import { type FormEvent, useState } from 'react'
 import { Send } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
-import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
-import { FileUploadButton } from '@/components/chat/FileUploadButton'
 import { StopGeneratingButton } from '@/components/chat/StopGeneratingButton'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { AttachmentPreviewList } from '@/features/uploads/components/AttachmentPreviewList'
+import { PhotoCaptureButton } from '@/features/uploads/components/PhotoCaptureButton'
+import { UploadButton } from '@/features/uploads/components/UploadButton'
+import { UploadErrorMessage } from '@/features/uploads/components/UploadErrorMessage'
+import { useUploadAttachments } from '@/features/uploads/hooks/useUploadAttachments'
+import { uploadAttachmentToUploadedFile } from '@/features/uploads/utils/uploadAdapters'
+import { chatUploadConfig } from '@/features/uploads/utils/uploadLimits'
 import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
 import { createChatInputSchema } from '@/lib/validation'
 import type { UploadedFile } from '@/types/file'
@@ -30,14 +35,33 @@ export function ChatInput({
   disabled = false,
   conversationId,
 }: ChatInputProps) {
-  const { t } = useTranslation(['chat', 'common'])
+  const { t } = useTranslation(['chat', 'common', 'uploads'])
   const [value, setValue] = useState('')
-  const [attachments, setAttachments] = useState<UploadedFile[]>([])
-  const [uploadError, setUploadError] = useState<string | null>(null)
   const featureAccessQuery = useFeatureAccessQuery()
   const access = featureAccessQuery.data
   const chatLocked = access?.canUseChat === false
   const chatInputSchema = createChatInputSchema(t)
+  const {
+    attachments,
+    errors,
+    isUploading,
+    addFiles,
+    removeAttachment,
+    retryAttachment,
+    clearAttachments,
+  } = useUploadAttachments({
+    context: 'chat',
+    config: chatUploadConfig,
+    sourceOptions: {
+      conversationId,
+      sourcePage: '/chat',
+    },
+  })
+  const uploadedAttachments = attachments.filter((attachment) => attachment.status === 'uploaded')
+  const uploadLockedReason =
+    access?.canUploadFiles === false
+      ? access.reason?.fileUploads ?? t('chat:fileQuotaReached')
+      : undefined
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -48,7 +72,17 @@ export function ChatInput({
       return
     }
 
-    if (attachments.length === 0) {
+    if (uploadLockedReason && attachments.length === 0) {
+      toast.error(uploadLockedReason)
+      return
+    }
+
+    if (isUploading) {
+      toast.error(t('uploads:errors.waitForUpload', 'Please wait for the upload to finish.'))
+      return
+    }
+
+    if (uploadedAttachments.length === 0) {
       const result = chatInputSchema.safeParse({ content: trimmed })
       if (!result.success) {
         toast.error(result.error.flatten().fieldErrors.content?.[0] ?? t('chat:emptyMessage'))
@@ -56,50 +90,55 @@ export function ChatInput({
       }
     }
 
+    const messageContent = trimmed || t(
+      'uploads:chat.defaultAttachmentPrompt',
+      'I uploaded a schoolwork question. Please help me understand it step by step.',
+    )
+    const chatAttachments = uploadedAttachments.map(uploadAttachmentToUploadedFile)
+
     onSendMessage({
-      content: trimmed,
-      attachmentIds: attachments.map((attachment) => attachment.id),
-      attachments,
+      content: messageContent,
+      attachmentIds: chatAttachments.map((attachment) => attachment.id),
+      attachments: chatAttachments,
     })
     setValue('')
-    setAttachments([])
-    setUploadError(null)
+    clearAttachments()
   }
 
   return (
     <form onSubmit={handleSubmit} className="chat-panel border-t px-4 py-4 md:px-6">
       <div className="mx-auto max-w-3xl space-y-3">
-        {attachments.length > 0 && (
-          <div className="grid gap-2 sm:grid-cols-2">
-            {attachments.map((attachment) => (
-              <AttachmentPreview
-                key={attachment.id}
-                attachment={attachment}
-                onRemove={(attachmentId) => {
-                  setAttachments((current) =>
-                    current.filter((item) => item.id !== attachmentId),
-                  )
-                }}
-              />
-            ))}
-          </div>
-        )}
-        {uploadError && <p className="text-xs text-destructive">{uploadError}</p>}
+        <AttachmentPreviewList
+          attachments={attachments}
+          onRemove={removeAttachment}
+          onRetry={(attachmentId) => void retryAttachment(attachmentId)}
+          compact
+        />
+        <UploadErrorMessage errors={errors} />
         <div className="flex gap-3">
-          <FileUploadButton
-            conversationId={conversationId}
-            pendingAttachmentCount={attachments.length}
-            disabled={disabled || isStreaming || !conversationId}
-            lockedReason={
-              access?.canUploadFiles === false
-                ? access.reason?.fileUploads ?? t('chat:fileQuotaReached')
-                : undefined
-            }
-            onUploadComplete={(file) => {
-              setAttachments((current) => [...current, file])
-              setUploadError(null)
+          <UploadButton
+            iconOnly
+            size="icon"
+            disabled={disabled || isStreaming || !conversationId || isUploading}
+            onFilesSelected={(files) => {
+              if (uploadLockedReason) {
+                toast.error(uploadLockedReason)
+                return
+              }
+              void addFiles(files)
             }}
-            onUploadError={setUploadError}
+          />
+          <PhotoCaptureButton
+            iconOnly
+            size="icon"
+            disabled={disabled || isStreaming || !conversationId || isUploading}
+            onPhotoSelected={(file) => {
+              if (uploadLockedReason) {
+                toast.error(uploadLockedReason)
+                return
+              }
+              void addFiles([file])
+            }}
           />
           <Textarea
             value={value}
@@ -116,7 +155,7 @@ export function ChatInput({
               type="submit"
               size="icon"
               aria-label={t('common:actions.send')}
-              disabled={disabled || isStreaming || chatLocked || (!value.trim() && attachments.length === 0)}
+              disabled={disabled || isStreaming || chatLocked || isUploading || (!value.trim() && uploadedAttachments.length === 0)}
             >
               <Send className="h-4 w-4" />
             </Button>

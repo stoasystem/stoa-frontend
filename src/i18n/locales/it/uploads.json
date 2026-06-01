@@ -1,0 +1,60 @@
+{
+  "actions": {
+    "attachFile": "Allega file",
+    "takePhoto": "Scatta foto",
+    "uploadPhoto": "Carica foto",
+    "uploadQuestion": "Carica domanda",
+    "remove": "Rimuovi",
+    "removeFile": "Rimuovi {{fileName}}",
+    "retry": "Riprova",
+    "retryFile": "Riprova {{fileName}}",
+    "cancel": "Annulla",
+    "askLearningAssistant": "Chiedi al Learning Assistant"
+  },
+  "status": {
+    "idle": "Pronto",
+    "validating": "Controllo",
+    "uploading": "Caricamento",
+    "uploaded": "Caricato",
+    "failed": "Non riuscito",
+    "rejected": "Rifiutato"
+  },
+  "errors": {
+    "unsupportedType": "Questo tipo di file non è supportato.",
+    "fileTooLarge": "Questo file è troppo grande.",
+    "tooManyFiles": "Puoi caricare fino a {{count}} file.",
+    "uploadFailed": "Il caricamento non è riuscito. Riprova.",
+    "emptyFile": "Questo file sembra vuoto.",
+    "waitForUpload": "Attendi la fine del caricamento."
+  },
+  "dropzone": {
+    "title": "Trascina qui i file",
+    "description": "Formati supportati: JPG, PNG, WEBP, PDF.",
+    "browse": "Scegli file"
+  },
+  "modal": {
+    "title": "Carica una domanda",
+    "description": "Scatta una foto o allega un PDF, poi chiedi al Learning Assistant."
+  },
+  "preview": {
+    "attachedFiles": "File allegati",
+    "image": "Immagine",
+    "pdf": "PDF",
+    "document": "Documento",
+    "unknown": "File",
+    "imageAlt": "Anteprima di {{fileName}}"
+  },
+  "privacy": {
+    "learningOnly": "Carica solo materiali di studio. Non caricare documenti personali."
+  },
+  "learning": {
+    "uploadKicker": "Compito da scuola",
+    "uploadOwnQuestionTitle": "Hai una tua domanda?",
+    "uploadOwnQuestionDescription": "Carica una foto o un PDF e chiedi al Learning Assistant.",
+    "schoolworkHelpTitle": "Porta il tuo esercizio",
+    "schoolworkHelpDescription": "Carica una domanda da scuola e ricevi una guida passo per passo."
+  },
+  "chat": {
+    "defaultAttachmentPrompt": "Ho caricato una domanda scolastica. Aiutami a capirla passo per passo."
+  }
+}

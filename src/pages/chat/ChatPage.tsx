@@ -12,6 +12,14 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { AttachmentPreviewList } from '@/features/uploads/components/AttachmentPreviewList'
+import { uploadAttachmentToUploadedFile } from '@/features/uploads/utils/uploadAdapters'
+import {
+  clearUploadHandoff,
+  readUploadHandoff,
+  type UploadChatHandoff,
+  type UploadChatLocationState,
+} from '@/features/uploads/utils/uploadHandoff'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
@@ -36,11 +44,13 @@ export function ChatPage() {
   const [queuedInitialMessage, setQueuedInitialMessage] = useState<{
     conversationId: string
     content: string
+    attachments?: ReturnType<typeof uploadAttachmentToUploadedFile>[]
   } | null>(null)
+  const [uploadContext, setUploadContext] = useState<UploadChatHandoff | null>(null)
 
   const conversationsQuery = useConversationsQuery()
   const studentProfileQuery = useStudentProfileQuery()
-  const practiceState = location.state as (PracticeChatLocationState & QuestionBankChatLocationState) | null
+  const practiceState = location.state as (PracticeChatLocationState & QuestionBankChatLocationState & UploadChatLocationState) | null
   const practiceContext = practiceState?.practiceContext
   const questionBankContext = practiceState?.questionBankContext
   const conversations = useMemo(
@@ -71,6 +81,15 @@ export function ChatPage() {
     stopStreaming,
     retryMessage,
   } = useStreamingChat(activeConversationId)
+
+  useEffect(() => {
+    const nextUploadContext = practiceState?.uploadContext ?? readUploadHandoff()
+    if (!nextUploadContext) return
+
+    setUploadContext(nextUploadContext)
+    setActiveConversationId(null)
+    setNewConversationMessage(nextUploadContext.prompt)
+  }, [location.key, practiceState?.uploadContext])
 
   useEffect(() => {
     if (!practiceContext) return
@@ -111,12 +130,17 @@ export function ChatPage() {
 
     const content = queuedInitialMessage.content
     setQueuedInitialMessage(null)
-    void sendStreamingMessage({ content })
+    void sendStreamingMessage({
+      content,
+      attachmentIds: queuedInitialMessage.attachments?.map((attachment) => attachment.id),
+      attachments: queuedInitialMessage.attachments,
+    })
   }, [activeConversationId, conversationQuery.data, queuedInitialMessage, sendStreamingMessage])
 
   function handleCreateConversation(message?: string) {
     if (createConversationMutation.isPending) return
-    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext, questionBankContext)
+    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext, questionBankContext, uploadContext)
+    const initialAttachments = uploadContext?.attachments.map(uploadAttachmentToUploadedFile)
 
     const profile = studentProfileQuery.data
     const subject = profile?.primarySubjects?.[0] ?? 'General'
@@ -131,9 +155,14 @@ export function ChatPage() {
             setQueuedInitialMessage({
               conversationId: conversation.id,
               content: initialMessage,
+              attachments: initialAttachments,
             })
           }
           setNewConversationMessage('')
+          if (uploadContext) {
+            clearUploadHandoff()
+            setUploadContext(null)
+          }
           setTeacherHelpRequest(null)
           setTeacherHelpError(null)
         },
@@ -212,11 +241,19 @@ export function ChatPage() {
           onBack={() => navigate(questionBankContext.returnTo ?? '/question-bank')}
         />
       )}
+      {uploadContext && (
+        <UploadLearningContextCard
+          context={uploadContext}
+          onBack={() => navigate(uploadContext.returnTo ?? '/dashboard')}
+        />
+      )}
       <div className="brand-rule rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
         <EmptyState
           message={
             questionBankContext
               ? 'Review this question step with the Learning Assistant.'
+              : uploadContext
+                ? uploadContext.description
               : practiceContext
                 ? t('practiceContext.welcome')
                 : t('welcome')
@@ -233,7 +270,7 @@ export function ChatPage() {
           <Textarea
             value={newConversationMessage}
             onChange={(event) => setNewConversationMessage(event.target.value)}
-            placeholder={questionBankContext ? 'Ask what is unclear in this question...' : practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
+            placeholder={questionBankContext ? 'Ask what is unclear in this question...' : uploadContext ? 'Tell the Learning Assistant what part is unclear...' : practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
             className="min-h-24 resize-none"
             disabled={createConversationMutation.isPending}
             aria-label={t('newConversationLabel')}
@@ -305,6 +342,12 @@ export function ChatPage() {
                 onBack={() => navigate(questionBankContext.returnTo ?? '/question-bank')}
               />
             )}
+            {uploadContext && (
+              <UploadLearningContextCard
+                context={uploadContext}
+                onBack={() => navigate(uploadContext.returnTo ?? '/dashboard')}
+              />
+            )}
             <ChatMessageList
               key={activeConversationId}
               messages={displayedMessages}
@@ -344,7 +387,21 @@ function buildInitialMessage(
   message: string,
   practiceContext: PracticeChatLocationState['practiceContext'],
   questionBankContext?: QuestionBankChatLocationState['questionBankContext'],
+  uploadContext?: UploadChatHandoff | null,
 ) {
+  if (uploadContext) {
+    return [
+      message || uploadContext.prompt,
+      '',
+      `Upload source: ${uploadContext.title}`,
+      uploadContext.sessionId ? `Question session: ${uploadContext.sessionId}` : '',
+      uploadContext.questionId ? `Question: ${uploadContext.questionId}` : '',
+      uploadContext.attachments.length > 0
+        ? `Attached learning material: ${uploadContext.attachments.map((attachment) => attachment.fileName).join(', ')}`
+        : '',
+    ].filter(Boolean).join('\n')
+  }
+
   if (questionBankContext) {
     const question = message || 'Can you explain this question step?'
 
@@ -373,4 +430,28 @@ function buildInitialMessage(
     typeof practiceContext.attempts === 'number' ? `Attempts: ${practiceContext.attempts}` : '',
     practiceContext.hintViewed ? 'Hint viewed: yes' : '',
   ].filter(Boolean).join('\n')
+}
+
+function UploadLearningContextCard({
+  context,
+  onBack,
+}: {
+  context: UploadChatHandoff
+  onBack: () => void
+}) {
+  return (
+    <section className="mx-auto mt-4 w-full max-w-3xl rounded-lg border border-primary/15 bg-card/95 p-4 shadow-[var(--platform-shadow-soft)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="brand-section-kicker">Uploaded learning material</p>
+          <h2 className="mt-2 text-lg font-semibold">{context.title}</h2>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{context.description}</p>
+        </div>
+        <Button type="button" variant="outline" size="sm" onClick={onBack}>Back</Button>
+      </div>
+      <div className="mt-4">
+        <AttachmentPreviewList attachments={context.attachments} compact />
+      </div>
+    </section>
+  )
 }
