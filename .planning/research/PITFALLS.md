@@ -1,26 +1,60 @@
-# Research: v1.35 Pitfalls
+# Project Research: Pitfalls for v2.1 Question Bank UI Design
 
-## Pitfall: Confusing UI Language and Answer Language
+**Milestone:** v2.1 Question Bank UI Design
+**Date:** 2026-06-01
 
-If the implementation only reads `i18n.language`, a student using an English UI might be unable to receive German Learning Assistant answers. Keep browser UI language and student answer language separate in naming, copy, and contracts.
+## Pitfall 1: Duplicating Practice Path
 
-## Pitfall: Hard-Coded Backend Language
+**Risk:** Question Bank becomes another roadmap/lesson path, confusing students and making the existing Practice Path redundant.
 
-`backend/app/main.py` currently passes `language="en"` into `LearningAssistantRequest`. Updating only frontend profile UI would not change generated answers. The backend chat send path must load and pass the saved profile preference.
+**Prevention:** Keep Question Bank organized around subjects, topics, filters, question sets, and mistakes. Use Practice Path CTAs as related next steps, not embedded roadmap components.
 
-## Pitfall: Partial Fallback Localization
+**Phase to address:** Data/design foundation and browse pages.
 
-The template provider has language branches, but some high-priority branches such as out-of-scope, cheating/direct-answer, repeated confusion, equations, and physics may still return English. Tests should cover fallback responses beyond the generic branch.
+## Pitfall 2: Turning the UI into an Exam System
 
-## Pitfall: Unsupported Language Codes
+**Risk:** Timers, strict scoring, heavy result language, and pass/fail framing make STOA feel like test software instead of a learning platform.
 
-Free-form strings can leak into prompts or produce inconsistent provider behavior. Normalize and validate against `en`, `de`, `fr`, and `it` at both frontend and backend/demo-harness boundaries.
+**Prevention:** Use low-pressure copy, immediate feedback, retry/review actions, and Learning Assistant handoff. Avoid timed exam mode in v2.1.
 
-## Pitfall: Demo Schema Drift
+**Phase to address:** Session and result pages.
 
-SQLite `CREATE TABLE IF NOT EXISTS` will not add columns to an existing local database automatically. The demo backend should include a safe compatibility path for existing `local.db` files, or docs should require reset when the profile schema changes.
+## Pitfall 3: Overbuilding Backend Architecture
 
-## Pitfall: User-Facing Technical Terms
+**Risk:** A UI milestone drifts into item authoring, persistence, permissions, curriculum standards, or production analytics.
 
-Visible copy should say Learning Assistant answer language, response language, or explanation language. Avoid exposing model, provider, prompt, backend, demo, or mock terminology in UI.
+**Prevention:** Keep mock data deterministic, service boundaries replaceable, and docs explicit about future backend work.
 
+**Phase to address:** Foundation and documentation.
+
+## Pitfall 4: Filter UI Becomes Cluttered
+
+**Risk:** Subject, grade, topic, difficulty, type, status, recommendation, and search controls crowd the page, especially on mobile.
+
+**Prevention:** Use progressive disclosure: high-value filters visible, secondary filters grouped, mobile controls collapsed, active filter chips visible, clear all available. VA.gov's search-filter guidance also notes mobile collapse and clear/reset behavior as important for faceted search.
+
+**Phase to address:** Browse and topic pages.
+
+## Pitfall 5: Accessibility Gaps in Interactive Controls
+
+**Risk:** Custom segmented controls, tabs, filter chips, session navigation, feedback announcements, and result updates are hard to use with keyboard or screen readers.
+
+**Prevention:** Prefer native controls where possible, use proper labels, preserve focus after filtering, announce result count/feedback changes with live regions, and verify keyboard order. W3C APG should guide custom widget semantics.
+
+**Phase to address:** Every UI phase, with final QA gate.
+
+## Pitfall 6: Chat Handoff Exposes Internals
+
+**Risk:** Passing question context into Chat leaks query params, model/provider wording, mock identifiers, or implementation names to the student.
+
+**Prevention:** Use provider-agnostic context labels and sanitize visible copy. Keep technical identifiers in route state/service code only.
+
+**Phase to address:** Session/result handoff.
+
+## Pitfall 7: Parent and Tutor Surfaces Stay Siloed
+
+**Risk:** Students get a useful Question Bank, but parents/tutors cannot tell how it fits with Practice Path, Learning Chat, and teacher support.
+
+**Prevention:** Add concise learning-activity summaries and docs in v2.1. Do not build complex analytics; show enough context for comprehension.
+
+**Phase to address:** Comprehension/docs phase.
