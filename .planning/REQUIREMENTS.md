@@ -1,156 +1,179 @@
-# Requirements: STOA Frontend v2.2
+# Requirements: STOA Frontend v2.3
 
-## v2.2 Requirements
+## v2.3 Requirements
 
-### Upload Foundation
+### Live Classroom Foundation
 
-- [x] **UPF-01**: Developers can use a shared `src/features/uploads/` module for upload types, utilities, services, hooks, and components instead of page-specific upload implementations.
-- [x] **UPF-02**: Upload metadata distinguishes upload context, file kind, status, validation errors, source page, and source entity without storing raw `File` objects in global app state.
-- [x] **UPF-03**: Upload validation supports accepted file types, empty files, maximum file size, and maximum file count with reusable error objects.
-- [x] **UPF-04**: Upload utilities classify JPG, PNG, WEBP, and PDF files and format file sizes consistently.
-- [x] **UPF-05**: Upload preview helpers create image preview object URLs and revoke them when attachments are removed or components unmount.
-- [x] **UPF-06**: Upload service functions can upload, retry, and remove attachments through a mock/demo-ready boundary that can later delegate to production file APIs.
+- [ ] **LCF-01**: Developers can use a shared `src/features/live-classroom/` module for live classroom types, mock data, services, hooks, pages, components, and utilities.
+- [ ] **LCF-02**: Classroom session metadata distinguishes role, source, session type, status, schedule times, participants, materials, context, and notes without depending on real video provider state.
+- [ ] **LCF-03**: Mock classroom data includes at least one scheduled upcoming classroom, one instant video help classroom, one completed summary, tutor queue data, participants, messages, materials, and notes.
+- [ ] **LCF-04**: Live classroom services support student home data, session lookup, scheduling, instant video help request, lobby join, room join, room leave, session completion, tutor queue lookup, and note saving through mock/demo-ready async functions.
+- [ ] **LCF-05**: Classroom hooks expose student home, session, scheduling, instant video help, room UI state, tutor queue, and notes behavior through typed APIs that can later delegate to backend services.
+- [ ] **LCF-06**: Classroom UI code keeps a provider-neutral future video adapter boundary and does not call real WebRTC, device stream, or video SDK APIs in v2.3.
 
-### Shared Upload UI
+### Student Classroom Entry and Scheduling
 
-- [x] **UPUI-01**: Students can choose files through a reusable upload button that supports accepted types, multiple selection, disabled state, and accessible labeling.
-- [x] **UPUI-02**: Students can use a dedicated photo capture entry that uses mobile camera capture when available and falls back to image file selection.
-- [x] **UPUI-03**: Desktop students can drag and drop files into a visible drop zone, and keyboard users can use an equivalent Browse files action.
-- [x] **UPUI-04**: Students can see attachment preview cards for image thumbnails, PDFs, and unknown file types with filename, type, size, status, and actions.
-- [x] **UPUI-05**: Students can remove an attachment from a preview list before sending or handing it off.
-- [x] **UPUI-06**: Students can retry failed uploads from the attachment card.
-- [x] **UPUI-07**: Students can see clear status labels for validating, uploading, uploaded, failed, and rejected attachments without relying on color alone.
-- [x] **UPUI-08**: Students can see clear upload error messages for unsupported type, too-large file, too-many files, empty file, upload failure, and unavailable preview.
-- [x] **UPUI-09**: Students can open a reusable upload modal from contextual pages and complete upload actions without losing the page context.
-- [x] **UPUI-10**: Students can use a reusable inline upload panel on learning pages without it visually overtaking the primary learning flow.
+- [ ] **LCS-01**: Students can see an Online Classroom card on the Student Dashboard with either next-session join/detail actions or schedule/instant-help actions.
+- [ ] **LCS-02**: Students can open `/classroom` to see upcoming classroom sessions, instant help guidance, schedule entry, and recent sessions.
+- [ ] **LCS-03**: Students can open `/classroom/schedule` and choose subject, topic, level, language, session type, time slot, and tutor context.
+- [ ] **LCS-04**: Students can attach learning materials during scheduling by reusing v2.2 upload UI rather than a new attachment implementation.
+- [ ] **LCS-05**: Students can submit the schedule form and see a mock scheduled-success state with session details and actions to return home or open the lobby.
+- [ ] **LCS-06**: Student classroom entry copy makes scheduled classroom and instant help distinct, and instant video help is framed as starting from Learning Assistant or tutor text context.
 
-### Chat Integration
+### Lobby and Room Experience
 
-- [x] **UPCHAT-01**: Students can attach supported photos and PDFs from the Learning Chat composer.
-- [x] **UPCHAT-02**: Students can take or select a photo from the Chat composer on mobile-capable browsers.
-- [x] **UPCHAT-03**: Students can preview, remove, and retry Chat attachments before sending a message.
-- [x] **UPCHAT-04**: Students can send a Chat message with uploaded attachment metadata and the message stream displays the attachment cards.
-- [x] **UPCHAT-05**: Chat upload behavior preserves existing streaming, stop generation, retry message, attachment IDs, and teacher-help behavior.
-- [x] **UPCHAT-06**: Chat copy encourages students to include a question or prompt with an upload and does not imply image recognition or automatic solving.
+- [ ] **LCR-01**: Students can open `/classroom/sessions/:sessionId/lobby` and see classroom title, time, tutor profile, session context, attached materials, and readiness state.
+- [ ] **LCR-02**: Lobby device checks expose mock camera, microphone, and speaker controls with keyboard-accessible state changes and clear text labels.
+- [ ] **LCR-03**: Lobby supports ready, not-ready, waiting-for-tutor, tutor-ready, joining, failed-to-join, unavailable, and completed states through visible user-facing UI.
+- [ ] **LCR-04**: Students can join an available classroom from the lobby and navigate to `/classroom/sessions/:sessionId/room`.
+- [ ] **LCR-05**: Classroom room UI contains a top bar, video tile area, learning workspace, side panel, and bottom control bar at desktop widths.
+- [ ] **LCR-06**: Classroom room UI adapts on mobile to a single-column video/workspace layout with panel access through drawer or bottom-sheet behavior rather than a squeezed desktop side panel.
+- [ ] **LCR-07**: Video tiles render honest mock placeholders for tutor and student media state without implying a real live stream is connected.
+- [ ] **LCR-08**: Learning workspace shows shared problem/source context, uploaded materials, and a whiteboard placeholder with tutor-facing mock tools only.
+- [ ] **LCR-09**: Classroom side panel supports Chat, Materials, Notes, and Participants tabs with keyboard-reachable tab controls.
+- [ ] **LCR-10**: Classroom chat panel supports mock student/tutor messages and a send interaction appropriate for live classroom text support.
+- [ ] **LCR-11**: Classroom materials panel reuses v2.2 attachment preview/upload UI and labels uploaded-before-session versus shared-during-session materials.
+- [ ] **LCR-12**: Classroom notes panel shows student-readable notes/next steps and allows tutor-role note editing through local/mock state.
+- [ ] **LCR-13**: Classroom participants panel shows student and tutor identities, roles, camera status, microphone status, and connection status.
+- [ ] **LCR-14**: Classroom controls support mock mute/unmute, camera on/off, share material, whiteboard, chat/panel selection, leave, and tutor-only end session actions.
+- [ ] **LCR-15**: Leave and end-session confirmation dialogs preserve correct role semantics: students leave their own room view, tutors end the session for everyone.
+- [ ] **LCR-16**: Students can complete or leave a classroom and open `/classroom/sessions/:sessionId/summary`.
 
-### Question Bank Integration
+### Chat-to-Video Escalation
 
-- [x] **UPQB-01**: Students can open an Upload Question flow from the Question Bank home page as a secondary CTA.
-- [x] **UPQB-02**: Students can upload a photo or PDF from the Question Bank home upload flow and see preview, validation, remove, retry, and completion states.
-- [x] **UPQB-03**: Students can ask the Learning Assistant from a completed Question Bank upload, with upload context passed to Chat.
-- [x] **UPQB-04**: Students can access upload help from a Question Bank session question without disrupting answer input or feedback controls.
-- [x] **UPQB-05**: Students can upload a photo or PDF for the current question and then ask the Learning Assistant with session ID, question ID, and attachment metadata.
-- [x] **UPQB-06**: Question Bank upload copy stays distinct from Practice Path and avoids exam-system or instant-solver positioning.
+- [ ] **LCCHAT-01**: Learning Chat support state can represent idle, teacher text requested, teacher joining text, teacher text active, video requested, video lobby ready, video active, and video completed.
+- [ ] **LCCHAT-02**: When teacher text help is requested but not active, Chat shows a waiting state that encourages the student to continue with Learning Assistant while waiting.
+- [ ] **LCCHAT-03**: When tutor text help is active, Chat clearly states that a tutor has joined and the Learning Assistant is observing while the tutor helps.
+- [ ] **LCCHAT-04**: When tutor text help is active, students can start a live classroom from Chat through a visible Start video classroom action.
+- [ ] **LCCHAT-05**: Starting video help from Chat creates a mock instant-video classroom session with conversation summary, source conversation ID, current topic, and uploaded material context where available.
+- [ ] **LCCHAT-06**: Chat-to-video escalation navigates students to `/classroom/sessions/:sessionId/lobby?source=chat` and preserves enough context to render lobby/session context.
+- [ ] **LCCHAT-07**: After a classroom completes, Chat can show a lightweight completed-classroom system update or link back to session notes without adding AI-in-classroom behavior.
 
-### Practice Path Integration
+### Tutor Classroom Flow
 
-- [x] **UPPRAC-01**: Students can see a lightweight schoolwork upload entry on Practice Path surfaces without displacing the guided roadmap or lesson CTA.
-- [x] **UPPRAC-02**: Students can upload a photo or PDF from Practice and see preview, validation, remove, retry, and completion states.
-- [x] **UPPRAC-03**: Students can ask the Learning Assistant from a completed Practice upload with Practice source context.
-- [x] **UPPRAC-04**: Practice upload copy frames the flow as bringing schoolwork into step-by-step guidance, not as a generic file upload or game reward.
+- [ ] **LCTUTOR-01**: Tutors can open `/tutor/classroom` to see scheduled sessions, instant video requests, and completed sessions for the day.
+- [ ] **LCTUTOR-02**: Tutor queue cards show session time, student, topic, source, waiting time/status, and actions to review context or join/open lobby.
+- [ ] **LCTUTOR-03**: Tutors can open `/tutor/classroom/sessions/:sessionId/lobby` and review student profile, level, language, topic, source, conversation summary, materials, and recommended focus before joining.
+- [ ] **LCTUTOR-04**: Tutors can enter `/tutor/classroom/sessions/:sessionId/room` using the same classroom shell with tutor-specific controls.
+- [ ] **LCTUTOR-05**: Tutor room controls include end session, save notes, send recommendation, highlight material, mute/camera, material sharing, whiteboard, and notes access where appropriate.
+- [ ] **LCTUTOR-06**: Tutors can save mock classroom notes and recommendations that appear in the classroom summary.
 
-### Handoff, Privacy, and Product Boundaries
+### Parent Visibility and Session Continuity
 
-- [x] **UPCTX-01**: Upload-to-Chat handoff supports route state and a session-storage fallback using lightweight attachment metadata.
-- [x] **UPCTX-02**: Chat can render a context card or starter message for upload handoffs from Question Bank and Practice.
-- [x] **UPCTX-03**: Upload UI includes a lightweight privacy reminder asking students to upload learning materials only and not personal documents.
-- [x] **UPCTX-04**: User-facing upload copy does not claim OCR, handwriting recognition, formula recognition, image understanding, automatic solving, permanent storage, encryption, teacher grading, parent review, or admin moderation.
-- [x] **UPCTX-05**: Upload docs identify future extension points for OCR/image analysis, teacher help, parent reporting, and production storage without implementing them in v2.2.
+- [ ] **LCPAR-01**: Parent surfaces include lightweight classroom visibility for upcoming and recent sessions without adding full parent classroom management.
+- [ ] **LCPAR-02**: Classroom summary shows session topic, tutor, materials, tutor notes, key points, and next steps.
+- [ ] **LCPAR-03**: Summary actions can route students back to Learning Chat, Practice, or Question Bank where relevant.
+- [ ] **LCPAR-04**: Parent-facing classroom copy is informational and does not imply parent observer access, recordings, or attendance controls unless those features exist.
 
-### Localization, Accessibility, and QA
+### Localization, Accessibility, Responsive QA, and Documentation
 
-- [x] **UPQA-01**: English, German, French, and Italian `uploads` localization files cover upload actions, statuses, errors, previews, dropzone copy, privacy copy, and learning-context copy.
-- [x] **UPQA-02**: Upload controls are keyboard reachable and use real buttons or labeled file inputs.
-- [x] **UPQA-03**: Upload errors and status changes are announced through accessible alert/status/live-region behavior.
-- [x] **UPQA-04**: Upload modal focus enters the modal, remains in the modal while open, closes through a visible control, and returns focus to the opener.
-- [x] **UPQA-05**: Attachment remove and retry buttons include the filename in their accessible label.
-- [x] **UPQA-06**: Image previews include meaningful alt text and non-image attachments have clear file-kind labels.
-- [x] **UPQA-07**: Upload panels, modal, dropzone, preview cards, and Chat composer remain usable at mobile and desktop widths in all four supported languages.
-- [x] **UPQA-08**: Playwright coverage verifies Chat attachment preview/remove/send, unsupported type rejection, too-large rejection, Question Bank upload modal, Question Session upload handoff, and keyboard modal flow.
-- [x] **UPQA-09**: `npm run lint` passes after upload implementation.
-- [x] **UPQA-10**: `npm run build` passes after upload implementation.
+- [ ] **LCQA-01**: English, German, French, and Italian `liveClassroom` localization files cover home, schedule, lobby, room, summary, tutor, controls, status, actions, errors, and accessibility labels.
+- [ ] **LCQA-02**: User-facing copy uses classroom/tutor/live support language and avoids generic meeting, AI teacher, real video connection, recording, screen-share, billing, or provider-specific claims.
+- [ ] **LCQA-03**: All classroom icon controls have visible text or accessible labels, and mute/camera/connection states are not communicated by color alone.
+- [ ] **LCQA-04**: Side panel tabs, lobby controls, leave/end dialogs, schedule form controls, and mobile panel controls are keyboard reachable.
+- [ ] **LCQA-05**: Dialogs and mobile panels manage focus correctly and return focus to the triggering control when closed.
+- [ ] **LCQA-06**: Classroom status changes such as tutor joined, waiting, connecting, and completed are announced through accessible status/live-region behavior.
+- [ ] **LCQA-07**: Classroom home, schedule, lobby, room, tutor queue, and summary remain usable at mobile, tablet, and desktop widths.
+- [ ] **LCQA-08**: Documentation explains v2.3 frontend/mock scope, future video-provider adapter boundary, future scheduling backend, future whiteboard, future recording/summary, and future billing handoff.
+- [ ] **LCQA-09**: Playwright coverage verifies Student Dashboard card, classroom home, scheduling, lobby join, room controls/panels, Chat-to-video escalation, tutor queue/lobby/room, and summary.
+- [ ] **LCQA-10**: `npm run lint` passes after live classroom implementation.
+- [ ] **LCQA-11**: `npm run build` passes after live classroom implementation.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Production object storage and signed upload URLs | v2.2 validates frontend upload UX and service contracts before backend storage architecture. |
-| OCR, image understanding, handwriting recognition, and formula recognition | These require AI/backend design and are outside the UI foundation. |
-| Automatic problem solving from an image | STOA should first establish safe upload and Learning Assistant handoff without unsupported solving claims. |
-| Crop, rotate, markup, and scan-cleanup tools | Valuable later, but not required for the first reusable upload foundation. |
-| Office document preview for DOCX/PPTX/XLSX | v2.2 focuses on common learning materials: photos and PDFs. |
-| Teacher grading or annotation of uploaded files | Teacher workflows require separate product scope and backend contracts. |
-| Parent review of uploaded files | Parent file review and retention need privacy/product decisions beyond this milestone. |
-| Admin file moderation dashboard | Moderation workflow is future operational scope. |
-| Video upload or live teacher file sharing | Heavy media support is outside the lightweight learning-material upload flow. |
-| Permanent file library or folder management | v2.2 uploads are context-bound learning aids, not a storage product. |
+| Real WebRTC/video provider integration | v2.3 validates frontend UI and flow before selecting LiveKit, Daily, Twilio, Agora, Zoom SDK, or another provider. |
+| Backend room tokens and provider session creation | Requires backend architecture and provider choice. |
+| Real device camera/microphone preview | Requires browser device permissions and real media stream handling. |
+| Real scheduling availability backend | v2.3 uses mock time slots; production availability needs tutor schedules and conflict handling. |
+| Calendar sync | Requires external calendar/provider integration and privacy decisions. |
+| Real screen sharing | Requires video provider/device APIs and UX/security handling. |
+| Real whiteboard drawing engine | Could use tldraw, Excalidraw, or a provider whiteboard later; v2.3 only reserves UI space. |
+| Recording, transcript, replay, and AI-generated summary | Requires media capture/storage, consent, privacy policy, and backend processing. |
+| Billing, lesson-minute deduction, and package accounting | Live classroom monetization needs product and backend payment scope. |
+| Multi-student group classes and breakout rooms | v2.3 targets one student plus one tutor support flows. |
+| Admin classroom operations dashboard | Admin operations require separate scope beyond student/tutor demo flow. |
+| Parent observer role | Parent visibility is informational only in v2.3. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| Real S3, object storage SDKs, or direct browser-to-storage provider calls | Frontend must stay behind STOA backend/API boundaries. |
-| Real virus scanning or security certification claims | Requires backend/security infrastructure and policy work. |
-| Claims that STOA has read, parsed, recognized, or solved uploaded content | v2.2 does not implement OCR or image understanding. |
-| User-visible model/provider/debug terminology | Learning Assistant remains the product-facing term. |
-| Main-navigation upload center | Upload should remain contextual to learning flows. |
-| Broad redesign of Chat, Question Bank, or Practice | v2.2 adds upload affordances while preserving existing product hierarchy. |
-| New paid gating or upload entitlement logic | Existing plan usage surfaces may remain, but v2.2 is not a billing milestone. |
+| Real WebRTC, Zoom SDK, Twilio, Daily, Agora, LiveKit, or browser media streams | v2.3 is a frontend/mock UI foundation. |
+| Claims that a real live video room is connected | The room uses honest placeholders and mock connection state. |
+| Real tutor matching or scheduling algorithms | Tutor queue and time slots are deterministic mock data. |
+| Real payment, billing, session-minute accounting, or package deduction | Financial behavior is not part of this UI foundation. |
+| Real screen sharing, recording, transcript, or replay | These require backend/media infrastructure and consent design. |
+| Complex whiteboard drawing or math tool engine | v2.3 includes a placeholder and future handoff only. |
+| AI-in-classroom active assistant behavior | The Learning Assistant remains outside the live classroom unless future scope designs it explicitly. |
+| Broad Question Bank or Practice expansion | v2.3 only uses these as context/next-step destinations. |
+| Full parent classroom management | Parent visibility is lightweight and informational. |
+| Admin classroom operations | Admin classroom management is future operational scope. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| UPF-01 | 206 | Complete |
-| UPF-02 | 206 | Complete |
-| UPF-03 | 206 | Complete |
-| UPF-04 | 206 | Complete |
-| UPF-05 | 206 | Complete |
-| UPF-06 | 206 | Complete |
-| UPUI-01 | 207 | Complete |
-| UPUI-02 | 207 | Complete |
-| UPUI-03 | 207 | Complete |
-| UPUI-04 | 207 | Complete |
-| UPUI-05 | 207 | Complete |
-| UPUI-06 | 207 | Complete |
-| UPUI-07 | 207 | Complete |
-| UPUI-08 | 207 | Complete |
-| UPUI-09 | 207 | Complete |
-| UPUI-10 | 207 | Complete |
-| UPCHAT-01 | 208 | Complete |
-| UPCHAT-02 | 208 | Complete |
-| UPCHAT-03 | 208 | Complete |
-| UPCHAT-04 | 208 | Complete |
-| UPCHAT-05 | 208 | Complete |
-| UPCHAT-06 | 208 | Complete |
-| UPQB-01 | 209 | Complete |
-| UPQB-02 | 209 | Complete |
-| UPQB-03 | 209 | Complete |
-| UPQB-04 | 209 | Complete |
-| UPQB-05 | 209 | Complete |
-| UPQB-06 | 209 | Complete |
-| UPPRAC-01 | 210 | Complete |
-| UPPRAC-02 | 210 | Complete |
-| UPPRAC-03 | 210 | Complete |
-| UPPRAC-04 | 210 | Complete |
-| UPCTX-01 | 209 | Complete |
-| UPCTX-02 | 209 | Complete |
-| UPCTX-03 | 211 | Complete |
-| UPCTX-04 | 211 | Complete |
-| UPCTX-05 | 211 | Complete |
-| UPQA-01 | 211 | Complete |
-| UPQA-02 | 207 | Complete |
-| UPQA-03 | 207 | Complete |
-| UPQA-04 | 207 | Complete |
-| UPQA-05 | 207 | Complete |
-| UPQA-06 | 207 | Complete |
-| UPQA-07 | 211 | Complete |
-| UPQA-08 | 211 | Complete |
-| UPQA-09 | 211 | Complete |
-| UPQA-10 | 211 | Complete |
+| LCF-01 | 212 | Pending |
+| LCF-02 | 212 | Pending |
+| LCF-03 | 212 | Pending |
+| LCF-04 | 212 | Pending |
+| LCF-05 | 212 | Pending |
+| LCF-06 | 212 | Pending |
+| LCS-01 | 213 | Pending |
+| LCS-02 | 213 | Pending |
+| LCS-03 | 213 | Pending |
+| LCS-04 | 213 | Pending |
+| LCS-05 | 213 | Pending |
+| LCS-06 | 213 | Pending |
+| LCR-01 | 214 | Pending |
+| LCR-02 | 214 | Pending |
+| LCR-03 | 214 | Pending |
+| LCR-04 | 214 | Pending |
+| LCR-05 | 214 | Pending |
+| LCR-06 | 214 | Pending |
+| LCR-07 | 214 | Pending |
+| LCR-08 | 214 | Pending |
+| LCR-09 | 214 | Pending |
+| LCR-10 | 214 | Pending |
+| LCR-11 | 214 | Pending |
+| LCR-12 | 214 | Pending |
+| LCR-13 | 214 | Pending |
+| LCR-14 | 214 | Pending |
+| LCR-15 | 214 | Pending |
+| LCR-16 | 214 | Pending |
+| LCCHAT-01 | 215 | Pending |
+| LCCHAT-02 | 215 | Pending |
+| LCCHAT-03 | 215 | Pending |
+| LCCHAT-04 | 215 | Pending |
+| LCCHAT-05 | 215 | Pending |
+| LCCHAT-06 | 215 | Pending |
+| LCCHAT-07 | 215 | Pending |
+| LCTUTOR-01 | 216 | Pending |
+| LCTUTOR-02 | 216 | Pending |
+| LCTUTOR-03 | 216 | Pending |
+| LCTUTOR-04 | 216 | Pending |
+| LCTUTOR-05 | 216 | Pending |
+| LCTUTOR-06 | 216 | Pending |
+| LCPAR-01 | 217 | Pending |
+| LCPAR-02 | 217 | Pending |
+| LCPAR-03 | 217 | Pending |
+| LCPAR-04 | 217 | Pending |
+| LCQA-01 | 218 | Pending |
+| LCQA-02 | 218 | Pending |
+| LCQA-03 | 218 | Pending |
+| LCQA-04 | 218 | Pending |
+| LCQA-05 | 218 | Pending |
+| LCQA-06 | 218 | Pending |
+| LCQA-07 | 218 | Pending |
+| LCQA-08 | 218 | Pending |
+| LCQA-09 | 218 | Pending |
+| LCQA-10 | 218 | Pending |
+| LCQA-11 | 218 | Pending |
 
-**Total requirements:** 47
-**Mapped requirements:** 47
+**Total requirements:** 56
+**Mapped requirements:** 56
 **Unmapped requirements:** 0
 
-*Last updated: 2026-06-02 after v2.2 implementation verification*
+*Last updated: 2026-06-02 after v2.3 roadmap creation*
