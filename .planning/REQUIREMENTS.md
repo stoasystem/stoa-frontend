@@ -1,71 +1,111 @@
-# Requirements: STOA Frontend v1.35
+# Requirements: STOA Frontend v2.1
 
 **Defined:** 2026-06-01
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, and a clean path to future real backend integration.
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, premium visual design, and a clean path to future real backend integration.
 
-## v1.35 Requirements
+## v2.1 Requirements
 
-### Student Profile Language Preference
+### Question Bank Navigation and Information Architecture
 
-- [x] **PROF37-01**: Student can view the saved Learning Assistant answer language in the student profile.
-- [x] **PROF37-02**: Student can update the Learning Assistant answer language from the supported English, German, French, and Italian options.
-- [x] **PROF37-03**: Student onboarding can capture an initial Learning Assistant answer language preference.
-- [x] **PROF37-04**: Profile UI copy makes clear that the setting controls Learning Assistant answers, not necessarily the whole browser interface.
+- [ ] **QBIA-01**: Student can access Question Bank from authenticated student navigation near Practice and Learning Chat.
+- [ ] **QBIA-02**: Question Bank routes exist for home, subject overview, topic question-set listing, set overview, session, result, mistakes review, and saved practice.
+- [ ] **QBIA-03**: Question Bank page hierarchy and breadcrumbs make the path from subject to topic to set to session clear.
+- [ ] **QBIA-04**: Question Bank copy clearly frames the module as a flexible exercise library, not a replacement for Practice Path.
+- [ ] **QBIA-05**: Question Bank entry points do not disrupt existing Practice Path, Learning Chat, Learning History, Profile, parent, tutor, or admin routes.
 
-### API and Demo Backend Contract
+### Discovery, Search, and Filters
 
-- [x] **API37-01**: Student profile TypeScript contracts include a supported answer-language field.
-- [x] **API37-02**: Local/demo backend stores the student answer-language preference with the student profile.
-- [x] **API37-03**: `/students/me/profile` returns the saved answer-language preference.
-- [x] **API37-04**: `PATCH /students/me/profile` validates and persists supported answer-language updates.
-- [x] **API37-05**: `/auth/register` persists a student onboarding answer-language preference when provided.
-- [x] **API37-06**: Existing local demo profiles remain usable with a safe default when no answer-language value is stored.
+- [ ] **QBDISC-01**: Student can use the Question Bank home page to see search, continue practice, subject cards, recommended sets, mistakes review, and recent practice.
+- [ ] **QBDISC-02**: Student can search local mock question-bank data by subject, topic, skill, question set, or question prompt.
+- [ ] **QBDISC-03**: Student can open a subject page and see progress, grade/level filters, difficulty filters, topic cards, and recommended sets.
+- [ ] **QBDISC-04**: Student can open a topic page and see topic progress, weak areas, filters, question-set list, and a related Practice Path CTA.
+- [ ] **QBDISC-05**: Topic and subject filters support grade/level, difficulty, question type, and status where relevant.
+- [ ] **QBDISC-06**: Active filters remain visible and can be cleared or reset without leaving the current page.
+- [ ] **QBDISC-07**: Search and filter updates are usable on mobile layouts without crowding the page.
 
-### Learning Assistant Response Language
+### Question Set Overview
 
-- [x] **CHAT37-01**: Chat response generation reads the saved student answer-language preference instead of hard-coding English.
-- [x] **CHAT37-02**: Learning Assistant prompt construction receives the normalized answer-language code for each chat request.
-- [x] **CHAT37-03**: Template fallback can return guided responses in English, German, French, and Italian.
-- [x] **CHAT37-04**: Out-of-scope, teacher-escalation, and direct-answer-safety fallback paths respect the requested answer language.
-- [x] **CHAT37-05**: Frontend chat surfaces remain provider-agnostic and do not expose model, provider, prompt, backend, demo, or mock terminology.
+- [ ] **QBSET-01**: Student can open a question set overview page from a recommended set, topic list, recent practice item, saved set, or mistakes flow.
+- [ ] **QBSET-02**: Question set overview displays title, description, question count, difficulty range, estimated time, subject, level, and status.
+- [ ] **QBSET-03**: Question set overview displays skills covered and a question-type breakdown.
+- [ ] **QBSET-04**: Question set overview displays last-attempt summary when mock attempt history exists.
+- [ ] **QBSET-05**: Question set actions change by status: Start, Resume, Practice Again, or Review.
+- [ ] **QBSET-06**: Question set overview explains that Learning Assistant help is available after questions without making Chat the primary activity.
 
-### QA and Regression Coverage
+### Question Session and Feedback
 
-- [x] **QA37-01**: Python Learning Assistant regression tests verify preferred-language propagation for English, German, French, and Italian.
-- [x] **QA37-02**: Backend/profile tests or smoke checks verify registration, profile read, profile update, and chat response language behavior.
-- [x] **QA37-03**: Frontend verification covers the profile language control and supported option rendering.
-- [x] **QA37-04**: `npm run lint` and `npm run build` pass after the milestone implementation.
-- [x] **QA37-05**: User-facing copy is checked for the existing high-risk internal terms in profile and chat language surfaces.
+- [ ] **QBSESS-01**: Student can start or resume a mock question-bank session from a question set.
+- [ ] **QBSESS-02**: Session page shows set title, question number, progress, prompt, answer input, check/skip actions, feedback panel, Learning Assistant CTA, and previous/next navigation.
+- [ ] **QBSESS-03**: Session UI supports multiple-choice questions.
+- [ ] **QBSESS-04**: Session UI supports short-answer questions.
+- [ ] **QBSESS-05**: Session UI supports numeric-answer questions.
+- [ ] **QBSESS-06**: Session UI supports step-by-step question layout without requiring complex formula editing or real step-level grading.
+- [ ] **QBSESS-07**: Session feedback supports idle, checking, correct, incorrect, partially correct, and skipped states.
+- [ ] **QBSESS-08**: Correct feedback explains the reasoning step in a concise learning tone.
+- [ ] **QBSESS-09**: Incorrect feedback shows the student's answer, correct answer, explanation, Try Similar Question action, and Learning Assistant action.
+- [ ] **QBSESS-10**: Student can review unanswered questions or finish anyway when ending a session with unanswered items.
 
-### Documentation and Handoff
+### Results and Mistakes Review
 
-- [x] **DOC37-01**: README or developer docs explain how to verify answer-language preference locally.
-- [x] **DOC37-02**: API/demo backend contract documentation records the student answer-language field and supported values.
-- [x] **DOC37-03**: Milestone handoff documents clarify that production preference syncing and new language support are deferred.
+- [ ] **QBRES-01**: Student can finish a question set and see a result page for the session.
+- [ ] **QBRES-02**: Result page displays score, time spent, accuracy by topic, incorrect/skipped questions, and recommended next steps.
+- [ ] **QBRES-03**: Result page lets the student retry mistakes.
+- [ ] **QBRES-04**: Result page includes a Continue to Practice Path CTA for the related topic.
+- [ ] **QBRES-05**: Student can open the mistakes review page from Question Bank home, result page, or student dashboard entry.
+- [ ] **QBRES-06**: Mistakes review page displays summary, subject filter, topic filter, difficulty filter, mistake list, and Start Review Session action.
+- [ ] **QBRES-07**: Mistake review session uses the same low-pressure feedback model as normal question sessions.
+
+### Learning Assistant, Parent, and Tutor Context
+
+- [ ] **QBCTX-01**: Learning Assistant CTA from question feedback routes to Chat with provider-agnostic question-bank context.
+- [ ] **QBCTX-02**: Chat surfaces can display question-bank context without exposing mock, demo, backend, prompt, model, or provider terminology.
+- [ ] **QBCTX-03**: Parent-facing learning activity can mention Question Bank attempts, mistakes reviewed, and next focus in a concise product-safe way.
+- [ ] **QBCTX-04**: Tutor-facing context can identify a question-bank source when a student escalates from a question-bank item.
+- [ ] **QBCTX-05**: Documentation explains the relationship between Question Bank, Practice Path, Learning Chat, Professional Teacher Support, and Parent Report.
+
+### Demo Data, Localization, Accessibility, and Verification
+
+- [ ] **QBQA-01**: Question Bank uses typed deterministic mock data for subjects, topics, question sets, questions, sessions, results, saved sets, and mistakes.
+- [ ] **QBQA-02**: Question Bank service and hook boundaries are replaceable by future backend APIs without changing page components substantially.
+- [ ] **QBQA-03**: User-facing Question Bank copy exists for English, German, French, and Italian.
+- [ ] **QBQA-04**: Question Bank interactive controls are keyboard-accessible and have clear labels, focus states, and result/feedback announcements where needed.
+- [ ] **QBQA-05**: Question Bank responsive layout is verified for mobile and desktop.
+- [ ] **QBQA-06**: User-facing Question Bank UI is checked for visible demo/mock/backend/provider/internal terminology.
+- [ ] **QBQA-07**: `npm run lint` and `npm run build` pass after the milestone implementation.
+- [ ] **QBQA-08**: Browser smoke checks cover the home, subject, topic, set overview, session, result, mistakes review, and Chat handoff paths.
 
 ## Future Requirements
 
-### Production Preference Sync
+### Production Question Bank
 
-- **FUT37-01**: Production backend persists answer-language preference across devices and sessions.
-- **FUT37-02**: Parent or guardian can manage a child's answer-language preference when account permissions support it.
-- **FUT37-03**: Historical conversations can optionally be filtered or labeled by answer language.
+- **FUTQB-01**: Production backend stores question-bank subjects, topics, question sets, questions, attempts, results, saved sets, and mistakes.
+- **FUTQB-02**: Admin or curriculum staff can manage question-bank content through a production-safe authoring workflow.
+- **FUTQB-03**: Question Bank supports production permissions and school/organization assignment rules.
+- **FUTQB-04**: Question Bank activity persists across devices and sessions.
+- **FUTQB-05**: Question Bank analytics can power deeper parent, tutor, and organization insights.
 
-### Language Expansion
+### Advanced Practice
 
-- **FUT37-04**: STOA can add new answer languages through a formal localization, content QA, and model-behavior review process.
-- **FUT37-05**: Teacher handoff can include the student's preferred answer language for professional teacher support operations.
+- **FUTQB-06**: AI-assisted or teacher-authored question generation can be introduced through backend-owned content review.
+- **FUTQB-07**: Exam-prep mode can support timed sets, official exam categories, and more formal result reporting.
+- **FUTQB-08**: Image-based or worksheet-derived question entry can support uploaded questions after privacy and backend scope are defined.
+- **FUTQB-09**: Formal curriculum-standard mapping can connect question sets to school standards and learning objectives.
+- **FUTQB-10**: Paid or assigned question-bank unlocking can be introduced after product packaging and backend authorization are defined.
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| New supported languages beyond English, German, French, and Italian | The existing UI/i18n surface supports these four languages; adding more requires separate localization and QA scope. |
-| Automatic translation service | The milestone should use prompt/harness response-language behavior, not introduce translation-provider dependencies. |
-| Production AI provider orchestration | Existing provider boundary remains backend/harness-owned and local/demo-focused. |
-| Formal production database migrations | SQLite changes prove the demo/API contract only; production persistence belongs to a future backend milestone. |
-| Retrofitting historical chat messages into a new language | Existing conversations should remain stable; this milestone affects new responses. |
-| Parent-managed language preference | Useful later, but current scope is student profile ownership. |
+| Production question-bank backend | v2.1 validates UI, IA, and mock interaction flow before backend architecture. |
+| Question authoring/admin UI | Content management is separate from student-facing question-bank discovery and practice. |
+| AI-generated questions | Generated content needs backend-owned review, safety, curriculum, and quality workflow. |
+| Image recognition or uploaded-question parsing | Upload/image intelligence is outside the UI design milestone. |
+| Video help or live teacher joining | v2.1 uses Learning Assistant handoff and existing professional teacher support boundaries only. |
+| Complex timed exam mode | The milestone should feel like low-pressure learning practice, not a formal exam platform. |
+| Production permissions or paid unlocking | Authorization and product packaging require backend/payment scope. |
+| Deep school curriculum-standard mapping | Useful later, but v2.1 only needs lightweight skills/topics metadata. |
+| Complex formula editor | Plain inputs and simple rendered math text are enough for the demo question types. |
+| New supported UI languages | v2.1 uses the existing English, German, French, and Italian localization surface. |
 
 ## Traceability
 
@@ -73,35 +113,60 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PROF37-01 | Phase 195 | Complete |
-| PROF37-02 | Phase 195 | Complete |
-| PROF37-03 | Phase 195 | Complete |
-| PROF37-04 | Phase 195 | Complete |
-| API37-01 | Phase 195 | Complete |
-| API37-02 | Phase 196 | Complete |
-| API37-03 | Phase 196 | Complete |
-| API37-04 | Phase 196 | Complete |
-| API37-05 | Phase 196 | Complete |
-| API37-06 | Phase 196 | Complete |
-| CHAT37-01 | Phase 197 | Complete |
-| CHAT37-02 | Phase 197 | Complete |
-| CHAT37-03 | Phase 197 | Complete |
-| CHAT37-04 | Phase 197 | Complete |
-| CHAT37-05 | Phase 197 | Complete |
-| QA37-01 | Phase 198 | Complete |
-| QA37-02 | Phase 198 | Complete |
-| QA37-03 | Phase 198 | Complete |
-| QA37-04 | Phase 198 | Complete |
-| QA37-05 | Phase 198 | Complete |
-| DOC37-01 | Phase 199 | Complete |
-| DOC37-02 | Phase 199 | Complete |
-| DOC37-03 | Phase 199 | Complete |
+| QBIA-01 | — | Pending |
+| QBIA-02 | — | Pending |
+| QBIA-03 | — | Pending |
+| QBIA-04 | — | Pending |
+| QBIA-05 | — | Pending |
+| QBDISC-01 | — | Pending |
+| QBDISC-02 | — | Pending |
+| QBDISC-03 | — | Pending |
+| QBDISC-04 | — | Pending |
+| QBDISC-05 | — | Pending |
+| QBDISC-06 | — | Pending |
+| QBDISC-07 | — | Pending |
+| QBSET-01 | — | Pending |
+| QBSET-02 | — | Pending |
+| QBSET-03 | — | Pending |
+| QBSET-04 | — | Pending |
+| QBSET-05 | — | Pending |
+| QBSET-06 | — | Pending |
+| QBSESS-01 | — | Pending |
+| QBSESS-02 | — | Pending |
+| QBSESS-03 | — | Pending |
+| QBSESS-04 | — | Pending |
+| QBSESS-05 | — | Pending |
+| QBSESS-06 | — | Pending |
+| QBSESS-07 | — | Pending |
+| QBSESS-08 | — | Pending |
+| QBSESS-09 | — | Pending |
+| QBSESS-10 | — | Pending |
+| QBRES-01 | — | Pending |
+| QBRES-02 | — | Pending |
+| QBRES-03 | — | Pending |
+| QBRES-04 | — | Pending |
+| QBRES-05 | — | Pending |
+| QBRES-06 | — | Pending |
+| QBRES-07 | — | Pending |
+| QBCTX-01 | — | Pending |
+| QBCTX-02 | — | Pending |
+| QBCTX-03 | — | Pending |
+| QBCTX-04 | — | Pending |
+| QBCTX-05 | — | Pending |
+| QBQA-01 | — | Pending |
+| QBQA-02 | — | Pending |
+| QBQA-03 | — | Pending |
+| QBQA-04 | — | Pending |
+| QBQA-05 | — | Pending |
+| QBQA-06 | — | Pending |
+| QBQA-07 | — | Pending |
+| QBQA-08 | — | Pending |
 
 **Coverage:**
-- v1.35 requirements: 23 total
-- Mapped to phases: 23
-- Unmapped: 0
+- v2.1 requirements: 48 total
+- Mapped to phases: 0
+- Unmapped: 48
 
 ---
 *Requirements defined: 2026-06-01*
-*Last updated: 2026-06-01 after v1.35 completion*
+*Last updated: 2026-06-01 after v2.1 research*
