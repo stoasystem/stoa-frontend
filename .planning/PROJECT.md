@@ -23,13 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Updated E2E smoke selectors for current accessible UI copy and labels.
 - Updated ignore rules, README quality-gate guidance, codebase map docs, and milestone audit evidence.
 
-## Current Milestone: Planning next milestone
+## Current Milestone: v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
 
-**Goal:** Select the next milestone after the shipped engineering quality and CI reliability work.
+**Goal:** Students can choose a preferred learning/answer language in their profile, and Learning Assistant responses use that saved student language preference across chat/demo flows.
 
 **Target features:**
-- Suggested next milestone: roadmap interaction QA, progress feedback, and parent visibility refinement.
-- Keep Phase 36 shipped artifacts archived under `.planning/milestones/`.
+- Student profile captures and displays a supported answer language preference.
+- Registration/profile API contracts and the local demo backend persist the student language preference.
+- Learning Assistant prompt/harness and chat backend pass the saved student language into response generation.
+- Template fallback, behavior checks, and regression tests verify English, German, French, and Italian answer-language behavior.
+- Frontend UI, copy, docs, and QA keep browser interface language separate from the student's Learning Assistant answer language.
 
 ## Current State
 
@@ -112,7 +115,10 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Next milestone requirements are not yet selected.
+- [ ] Students can set and review a preferred Learning Assistant answer language in their profile.
+- [ ] The local/demo backend persists the preferred language through registration, profile read/update, and chat message handling.
+- [ ] Learning Assistant prompt construction and fallback behavior use the saved student language preference for generated responses.
+- [ ] English, German, French, and Italian language behavior is covered by focused regression tests, QA evidence, and documentation.
 
 ### Out of Scope
 
@@ -166,6 +172,8 @@ The project brief for Phase 25 was provided in Chinese and defines a local testi
 The project brief for Phase 32 was provided in Chinese and defines a global language quality and development-artifact cleanup milestone. Phase 32 explicitly does not add functionality or change product structure. It audits English, German, French, and Italian user-facing copy, checks for literal translations and UI overflow, removes user-visible development/demo/mock/Codex/backend/provider/placeholder language, verifies friendly state copy, and documents final language QA before real user testing preparation.
 
 The project brief for Phase 36 was provided through a CI failure notification and follow-up instruction to comprehensively investigate and fix this class of issue. Phase 36 focuses on engineering quality and workflow reliability: GitHub Actions parity, local npm scripts, lint/build configuration, dependency and ignore hygiene, and documentation of the quality gates. It does not add product features, redesign UI, expand curriculum, or change backend/product behavior except where required to keep developer workflows reliable.
+
+The project brief for Phase 37 was provided in Chinese and defines student-level Learning Assistant answer-language personalization. Students need a language option in their profile, and the Learning Assistant should answer in the corresponding saved student language. This milestone should preserve the existing four-language UI system while explicitly separating browser/interface language from a student's preferred answer language. It should update frontend profile/registration surfaces, typed contracts, the local demo backend, prompt harness input, template fallback behavior, and regression/QA evidence without adding new languages, production AI provider work, or formal backend architecture.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -294,6 +302,10 @@ Current codebase facts:
 - **Phase 36 CI parity**: Local verification should mirror `.github/workflows/frontend-ci.yml` as closely as practical: dependency install parity, `npm run lint`, and `npm run build`.
 - **Phase 36 dependency safety**: New dependencies should be avoided unless a reproducible tooling gap requires them; lockfile and package metadata must remain consistent.
 - **Phase 36 generated-file hygiene**: `node_modules/`, `dist/`, local environment files, test artifacts, and browser reports must remain uncommitted unless explicitly intended as source-controlled documentation.
+- **Phase 37 language preference scope**: Phase 37 adds a student-level Learning Assistant answer-language preference for the supported English, German, French, and Italian languages only. It must not add new languages, automatic translation services, production model-provider orchestration, or broad UI localization rewrites.
+- **Phase 37 interface-vs-answer-language boundary**: Browser UI language from `stoa_language` and student answer language are related but distinct. The UI may default intelligently, but saved student profile preference should govern Learning Assistant answer language once available.
+- **Phase 37 provider boundary**: The frontend must continue to call STOA backend APIs only. Prompt language rules, provider request metadata, template fallback, behavior checks, and repair/fallback handling belong in the backend/demo harness layer.
+- **Phase 37 demo backend boundary**: SQLite/demo backend changes are for local/demo verification and API-contract proving only; production persistence, migrations, and cross-device preference syncing remain future backend responsibilities.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
 
 ## Key Decisions
@@ -394,6 +406,8 @@ Current codebase facts:
 | Keep Phase 36 focused on engineering quality | The current risk is a failing CI gate and possible local/CI configuration drift, so the milestone should harden developer workflows before more product work | — Pending |
 | Treat CI parity as release reliability | A frontend demo can look complete but still be unsafe to iterate if `npm ci`, lint, or build diverge between local and GitHub Actions | — Pending |
 | Fix tooling boundaries at configuration level first | Node scripts, browser source, test files, and config files need correct ESLint/TypeScript environments instead of one-off suppressions where a shared config can express intent | — Pending |
+| Treat student answer language as profile data | Learning Assistant response language should follow the student being helped, not only the current browser UI language or provider default | — Pending |
+| Keep answer-language enforcement in backend/harness flow | The frontend can collect preference, but the backend and prompt harness must own response-language instructions so streaming, fallback, and future providers stay consistent | — Pending |
 
 ## Evolution
 
@@ -413,4 +427,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 after v1.34 milestone completion*
+*Last updated: 2026-06-01 after starting v1.35 milestone*
