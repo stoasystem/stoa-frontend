@@ -1,82 +1,81 @@
-# Research: v2.2 Upload UI Pitfalls
+# Research: v2.3 Live Classroom Pitfalls
 
-## Product Pitfalls
+## Scope
 
-### Overpromising Recognition
+Research question: what mistakes are common when adding live classroom/video help UI to an education app?
 
-Camera-solver products often promise that the app can solve from the picture. v2.2 must not claim OCR, handwriting recognition, formula recognition, or automatic solving. Copy should say the student can upload learning material and ask the Learning Assistant.
+## Pitfall 1: Building a Generic Meeting Clone
 
-Prevention: require copy review and internal-term/overpromise scan in the final QA phase.
+Meeting products prioritize participants, media controls, and screen sharing. Tutoring products prioritize the learning object: question, worksheet, explanation, whiteboard, notes, and next steps. Lessonspace's positioning around subject-specific tools, whiteboards, documents, and shared notes is the stronger analogy for STOA than a pure meeting room. Source: https://www.thelessonspace.com/
 
-### Upload Becoming a File Center
+Prevention:
 
-If upload UI becomes a generic file manager, it will dilute STOA's learning flow. Upload should remain context-bound: Chat turn, current Question Bank question, or Practice schoolwork help.
+- Make learning workspace a first-class region, not an optional tab.
+- Show context source, problem, materials, and notes in room/lobby/summary.
+- Use classroom/tutor language, not generic meeting language.
 
-Prevention: model `UploadContext`, avoid a visible global upload library, and keep `/uploads/demo` internal only.
+## Pitfall 2: Overpromising Real Video
 
-### Duplicate Upload Implementations
+Twilio and LiveKit docs show real video apps involve rooms, participants, tracks, controls, and often backend token/session work. Daily similarly separates prebuilt UI from custom call primitives. Sources: https://www.twilio.com/docs/video/javascript, https://docs.livekit.io/reference/components/react, https://docs.daily.co/get-started
 
-The repo already has Chat upload code. Adding separate Question Bank and Practice upload logic would create inconsistent validation, preview, and error states.
+Prevention:
 
-Prevention: build shared `src/features/uploads/` components and migrate Chat to them.
+- Use video placeholders and mock connection states.
+- Explicitly document no real WebRTC/video provider integration in v2.3.
+- Avoid copy such as "connected securely", "recording", "screen sharing", or "camera preview live" unless implemented.
 
-## UX Pitfalls
+## Pitfall 3: Weak Lobby and Safety Model
 
-### Drag-and-Drop Only
+Zoom, Teams for Education, and Google Meet research all emphasize host/teacher controls, waiting rooms/lobbies, chat/audio/video moderation, and safe meeting close. Sources: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0059359, https://support.microsoft.com/en-us/teams/education/quick-start/set-up-meeting-roles-and-safety, https://support.google.com/meet/answer/16229038
 
-Desktop drop zones are useful, but drag-and-drop is inaccessible if it lacks a browse button and keyboard flow.
+Prevention:
 
-Prevention: every drop zone includes Browse files; modal and inline panels are keyboard reachable.
+- Add a lobby before the room.
+- Show waiting/unavailable/open states.
+- Give tutor pages context review before room join.
+- Keep student "Leave" separate from tutor "End Session".
 
-### Hidden Status Changes
+## Pitfall 4: Mobile Room Layout Collapse
 
-Upload progress and errors can be visually obvious but inaccessible to screen readers.
+Desktop meeting layouts often rely on a large horizontal canvas plus right panel. On mobile this becomes cramped and inaccessible.
 
-Prevention: use `aria-live`/status/alert treatment for validation, upload, failure, and retry messages.
+Prevention:
 
-### Mobile Camera Assumptions
+- Desktop: video + learning workspace + side panel + bottom controls.
+- Mobile: single-column video/workspace and drawer or bottom-sheet panels.
+- Do not force right-side panels on narrow screens.
 
-`capture="environment"` is a hint, not a guaranteed camera UI. Desktop and some browsers will fall back to file selection.
+## Pitfall 5: Inaccessible Controls
 
-Prevention: label the control as "Take photo" in student-facing copy but treat selected files generically in code.
+Classroom controls are stateful and high-frequency. WAI-ARIA dialog guidance also requires controlled focus behavior for leave/end dialogs. Source: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
 
-### Attachment Preview Memory Leaks
+Prevention:
 
-Object URLs for previews can leak if never revoked.
+- Every icon control has visible text or `aria-label`.
+- Mute/camera state is expressed in text, not color alone.
+- Side panel tabs are keyboard reachable.
+- Leave/end dialogs trap focus and return focus.
+- Status changes use live regions.
 
-Prevention: centralize preview URL management and revoke URLs on removal/unmount.
+## Pitfall 6: Confusing AI, Tutor, and Classroom Roles
 
-## Technical Pitfalls
+If the Learning Assistant remains active while a tutor is teaching, the user may not understand who is helping.
 
-### Storing Raw Files Globally
+Prevention:
 
-Raw `File` objects should not be placed in global state or long-lived route state.
+- Preserve support ladder: Learning Assistant -> tutor text -> live classroom.
+- When tutor text is active, communicate that the Learning Assistant is observing.
+- Do not add AI-in-classroom behavior in v2.3.
 
-Prevention: keep raw files inside upload hook/service flow and pass only `UploadAttachment` metadata across routes.
+## Pitfall 7: Duplicating Upload UI
 
-### Unsupported Large Fixtures
+v2.2 already created upload validation, preview, status, and handoff components.
 
-Oversized upload E2E tests can bloat the repo if committed as binary files.
+Prevention:
 
-Prevention: generate oversized files dynamically in Playwright tests.
+- Reuse `InlineUploadPanel`, `AttachmentPreviewList`, `UploadButton`, and upload metadata adapters.
+- Do not create separate classroom-only attachment cards unless the shared component cannot satisfy the need.
 
-### Backend Boundary Drift
+## Pitfall Conclusion
 
-Using a mock service may accidentally imply production storage or security guarantees.
-
-Prevention: UI copy must avoid permanent-storage and encryption claims; docs should state v2.2 is UI/demo flow only.
-
-## Phase Coverage
-
-- Shared module phase: prevents duplication and File/object URL mistakes.
-- Component phase: prevents inaccessible controls and weak state display.
-- Chat integration phase: prevents regression in existing attachment path.
-- Question Bank/Practice integration phase: prevents upload from becoming detached from learning context.
-- QA/localization phase: catches overpromise copy, mobile fit, keyboard flow, and core upload E2E.
-
-## Sources
-
-- WAI-ARIA dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
-- MDN File API object URL guidance: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
-- MDN capture attribute guidance: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture
-- Khanmigo safety/privacy guidance: https://support.khanacademy.org/hc/en-us/articles/36868912022541-What-kind-of-images-can-I-upload-to-Khanmigo
+The milestone should be judged less by media complexity and more by whether the mock classroom journey feels coherent, learning-specific, accessible, responsive, and future-provider-ready.

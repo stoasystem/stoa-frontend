@@ -1,118 +1,114 @@
-# Research: v2.2 Upload UI Architecture
+# Research: v2.3 Live Classroom Architecture
 
-## Architecture Direction
+## Scope
 
-Use a reusable feature module:
+Research question: how should live classroom UI integrate with the existing STOA frontend architecture?
+
+## Existing Integration Points
+
+- Routing: current app already protects student, parent, tutor, and admin role routes.
+- Chat: Learning Chat already has teacher-help behavior and attachment-aware message flow.
+- Uploads: v2.2 added reusable upload attachments, inline panels, preview cards, and handoff metadata.
+- i18n: four-language namespace registration exists.
+- Services/hooks: existing feature modules use typed services and TanStack Query hooks for mock/demo data.
+- E2E: Playwright route and interaction tests already cover major flows.
+
+## Proposed Feature Module
 
 ```text
-src/features/uploads/
+src/features/live-classroom/
   components/
+  data/
   hooks/
+  pages/
   services/
   types/
   utils/
 ```
 
-This keeps upload behavior consistent across Chat, Question Bank, and Practice while allowing current service boundaries to remain backend-agnostic.
+## Data Flow
 
-## Existing Integration Points
+1. Student Dashboard calls `useStudentClassroomHome`.
+2. `/classroom` uses the same student home service to render upcoming, instant help, schedule, and recent sessions.
+3. `/classroom/schedule` calls `scheduleClassroomSession`, returning a mock scheduled session.
+4. Lobby and room pages call `useClassroomSession(sessionId)`.
+5. `useClassroomRoomState` owns local UI controls: active side panel, microphone/camera mock state, whiteboard visibility, leave dialog, and mobile panel.
+6. Chat escalation calls `requestInstantVideoHelp` with conversation/context/material metadata, then navigates to lobby.
+7. Tutor queue calls `useTutorClassroomQueue`, then tutor lobby/room pages share session components with role-specific actions.
 
-### Chat
+## Route Architecture
 
-Current files:
+Student:
 
-- `src/components/chat/ChatInput.tsx`
-- `src/components/chat/FileUploadButton.tsx`
-- `src/components/chat/AttachmentPreview.tsx`
-- `src/components/chat/ChatMessageBubble.tsx`
-- `src/hooks/chat/useStreamingChat.ts`
-- `src/services/files/fileApi.ts`
-- `src/types/chat.ts`
-- `src/types/file.ts`
+```text
+/classroom
+/classroom/schedule
+/classroom/sessions/:sessionId/lobby
+/classroom/sessions/:sessionId/room
+/classroom/sessions/:sessionId/summary
+```
 
-Recommended approach:
+Tutor:
 
-- Replace per-chat validation and preview components with reusable upload components.
-- Preserve `attachmentIds` and message attachment metadata in `useStreamingChat`.
-- Add a photo capture button and multi-attachment preview list in the composer.
-- Keep existing file API integration when API mode supports uploads, with a mock/demo fallback for page-level upload flows.
+```text
+/tutor/classroom
+/tutor/classroom/sessions/:sessionId/lobby
+/tutor/classroom/sessions/:sessionId/room
+/tutor/classroom/sessions/:sessionId/summary
+```
 
-### Question Bank
+Parent, if included in v2.3, should stay lightweight:
 
-Current files:
+```text
+/parent/classroom
+```
 
-- `src/pages/question-bank/QuestionBankHomePage.tsx`
-- `src/pages/question-bank/QuestionSessionPage.tsx`
-- `src/components/question-bank/QuestionFeedbackPanel.tsx`
-- `src/components/question-bank/QuestionBankContextCard.tsx`
+or only a Parent Dashboard card if route scope grows too large.
 
-Recommended approach:
+## Component Architecture
 
-- Add an inline "Have your own question?" panel on the Question Bank home page.
-- Add a "Need help with this question?" upload area inside the session help/feedback area.
-- Use upload state plus route state/session storage to pass attachments into `/chat?source=question-bank-upload` or `/chat?source=question-bank&questionId=...`.
+Prefer a small set of shared classroom shell components that accept role-specific props:
 
-### Practice
+- `ClassroomRoomShell`
+- `ClassroomTopBar`
+- `ClassroomVideoGrid`
+- `ClassroomLearningWorkspace`
+- `ClassroomSidePanel`
+- `ClassroomControlBar`
+- `ClassroomLeaveDialog`
+- `SessionContextPanel`
+- `ClassroomSummaryPanel`
 
-Current files:
+Student and tutor pages should compose these rather than duplicating layouts.
 
-- `src/pages/practice/PracticeOverviewPage.tsx`
-- `src/pages/practice/TopicRoadmapPage.tsx`
-- `src/pages/practice/LessonPage.tsx`
-- `src/components/practice/PracticeOverview.tsx`
-- `src/components/practice/PracticeToChatCTA.tsx`
+## Future Provider Boundary
 
-Recommended approach:
+The real media provider should be isolated behind a future adapter. Research from Twilio and LiveKit indicates real integrations need room/session state and, in Twilio's case, backend access token creation. Sources: https://www.twilio.com/docs/video/javascript and https://docs.livekit.io/reference/components/react
 
-- Add a lightweight schoolwork upload panel near existing Practice entry/help areas.
-- Do not make upload the dominant Practice CTA.
-- Handoff to Chat with practice context and attachment metadata.
+v2.3 should therefore model:
 
-## Data Model
+- session ID
+- participant list
+- participant media status
+- local device toggles
+- connection status
 
-Define upload-specific metadata independent of raw `File`:
+but not call `getUserMedia`, SDK room joins, or provider APIs.
 
-- `UploadContext`
-- `UploadFileKind`
-- `UploadStatus`
-- `UploadAttachment`
-- `UploadValidationError`
-- `UploadConfig`
+## Build Order
 
-Do not keep raw `File` objects in global stores. Keep `File` only in component/hook scope until upload simulation/API upload returns metadata.
+1. Types, mock data, services, hooks.
+2. Routes and page placeholders.
+3. Student classroom home and dashboard card.
+4. Schedule form.
+5. Student lobby.
+6. Room shell, control bar, and side panels.
+7. Summary page.
+8. Chat escalation.
+9. Tutor queue/lobby/room.
+10. Parent lightweight visibility if still in scope.
+11. i18n, docs, E2E, lint/build.
 
-## Service Strategy
+## Architecture Conclusion
 
-Create `uploadService.ts` with:
-
-- `uploadFiles(files, context, options)`
-- `retryUpload(attachment)`
-- `removeUploadedAttachment(attachmentId)`
-
-The service can delegate to existing `/files` API for Chat or simulate mock uploads for UI flows. For v2.2, the critical contract is returned metadata and state handling, not production storage.
-
-## Handoff Strategy
-
-Use a small bridge:
-
-- Route query identifies source: `source=question-bank-upload`, `source=question-session-upload`, or `source=practice-upload`.
-- Route state carries lightweight `UploadAttachment[]` metadata.
-- Session storage key `stoa.pendingLearningAssistantUpload` can backstop reloads or route-state loss.
-
-## QA Demo Route
-
-An internal `/uploads/demo` route is useful but should not appear in main navigation. It should exercise:
-
-- Upload button
-- Photo capture
-- Dropzone
-- Preview list
-- Rejected state
-- Failed/retry state
-- Keyboard/modal flow
-
-## Sources
-
-- Current repository scan on 2026-06-02.
-- Khanmigo and ChatGPT composer upload patterns from research sources listed in `FEATURES.md`.
-- MDN and WAI-ARIA implementation guidance listed in `STACK.md`.
+The safest architecture is a self-contained `live-classroom` feature module that integrates with Chat, Dashboard, Tutor, Parent, i18n, and Uploads through explicit typed seams. The room UI should be provider-neutral and mock-driven in v2.3.

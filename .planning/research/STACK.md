@@ -1,49 +1,61 @@
-# Research: v2.2 Upload UI Stack
+# Research: v2.3 Live Classroom Stack
 
 ## Scope
 
-Milestone v2.2 adds a reusable Photo & File Upload UI foundation to the existing React + TypeScript + Vite STOA frontend. It should upgrade existing Chat upload behavior and extend the same upload model into Question Bank and Practice Path without adding production storage, OCR, image recognition, or direct model-provider calls.
+Research question: what stack additions or architectural seams are needed for a frontend/mock online classroom and future video-provider integration?
 
-## Current Codebase Fit
+## Current Stack Fit
 
-Existing upload-related code:
+The existing React + TypeScript + Vite app is sufficient for v2.3 because the milestone is UI plus mock/demo state. No real WebRTC SDK should be added yet. The existing patterns already cover the needed foundations:
 
-- `src/components/chat/FileUploadButton.tsx` validates PNG, JPEG, and PDF and uploads through `useFileUploadMutation`.
-- `src/components/chat/AttachmentPreview.tsx` displays current chat attachments.
-- `src/services/files/fileApi.ts` posts `FormData` to `/files` and returns `UploadedFile` metadata.
-- `src/types/file.ts` and `src/types/chat.ts` already define upload/chat attachment metadata.
-- `src/hooks/chat/useStreamingChat.ts` already supports `attachmentIds` and optimistic `attachments`.
+- React Router routes for role-specific student, parent, tutor, and admin surfaces.
+- TanStack Query for mock/service async data.
+- Zustand/local React state for UI-only toggles.
+- Existing upload feature module for classroom materials.
+- Existing i18n setup for English, German, French, and Italian.
+- Existing Playwright E2E for route-level smoke coverage.
 
-Implication: v2.2 should create a reusable upload feature layer around the existing file API and chat attachment conventions rather than duplicating per-page upload logic.
+## Future Video Provider Options
 
-## Browser APIs
+The v2.3 code should preserve a provider-neutral boundary rather than committing to a vendor.
 
-- Use standard `<input type="file">` for selection. MDN documents that file selection can come from a file input or drag and drop, and object URLs can preview local files before upload.
-- Use `accept="image/*"` and `capture="environment"` for camera-first mobile photo capture. MDN notes `capture` works best on mobile and commonly falls back to a normal picker on desktop.
-- Use drag-and-drop only as an enhancement. MDN's file drag-and-drop guidance still requires a defined drop zone and preventing default browser drag behavior.
-- Use `URL.createObjectURL()` for local image preview and `URL.revokeObjectURL()` during cleanup to avoid leaking object URLs.
+| Provider | Research signal | Implication for v2.3 |
+|----------|-----------------|----------------------|
+| LiveKit | Official React components include a ready-made `VideoConference` and lower-level layout/control components. Source: https://docs.livekit.io/reference/components/react/component/videoconference/ | Keep room UI layout independent so a future adapter can mount media tracks inside STOA-designed tiles rather than replacing the whole classroom. |
+| Twilio Video | Official docs describe browser SDK rooms, local media, remote participants, and the need for backend access tokens. Source: https://www.twilio.com/docs/video/javascript | Do not implement provider calls in frontend-only milestone; future real integration needs backend token and room creation endpoints. |
+| Daily | Docs distinguish Prebuilt UI from custom UI through call-object primitives. Source: https://docs.daily.co/get-started and https://docs.daily.co/guides/products/prebuilt/customizing-daily-prebuilt | v2.3 should not depend on a prebuilt generic meeting UI if STOA needs a learning-specific classroom layout. |
 
-## Accessibility APIs
+## Recommended v2.3 Stack Decision
 
-- Upload controls must be reachable as real buttons or labeled inputs.
-- Upload status and errors should be exposed through `aria-live` or alert/status semantics.
-- Upload modal should follow WAI-ARIA dialog focus rules: focus enters the dialog, tab stays inside, Escape closes, and focus returns to the opener.
-- Drag-and-drop must not be the only path; browse buttons are required for keyboard and screen-reader users.
+No new runtime dependency for real-time media. Add only app-native TypeScript contracts and mock services:
 
-## Dependencies
+- `src/features/live-classroom/types/liveClassroom.ts`
+- `src/features/live-classroom/data/liveClassroomMockData.ts`
+- `src/features/live-classroom/services/liveClassroomService.ts`
+- `src/features/live-classroom/hooks/*`
+- `src/features/live-classroom/components/*`
 
-No new runtime dependency is required for v2.2. Existing React, TypeScript, Vite, lucide-react icons, app UI primitives, TanStack Query, and service patterns are enough.
+Reserve a future boundary:
 
-Recommended additions:
+```ts
+type VideoProviderAdapter = {
+  joinRoom: (sessionId: string) => Promise<void>
+  leaveRoom: () => Promise<void>
+  toggleMicrophone: () => Promise<void>
+  toggleCamera: () => Promise<void>
+}
+```
 
-- `src/features/uploads/` for the reusable upload feature module.
-- No heavyweight upload picker package; the scope is small and product-specific.
-- No OCR, image cropper, antivirus, cloud storage SDK, or PDF renderer dependency in this milestone.
+## Accessibility Stack
 
-## Sources
+Use existing UI primitives for dialogs/tabs where possible. WAI-ARIA APG modal dialog guidance requires focus to move into the dialog, Tab/Shift+Tab to remain inside, and focus to return intentionally after close. Source: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
 
-- MDN file input and capture: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
-- MDN capture attribute: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture
-- MDN File API and object URLs: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
-- MDN file drag and drop: https://mdn2.netlify.app/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
-- WAI-ARIA modal dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+## Stack Non-Goals
+
+- No WebRTC SDK.
+- No video SDK dependency.
+- No real device stream.
+- No real recording/transcript stack.
+- No real whiteboard engine.
+- No calendar/scheduling SDK.
+- No billing integration.

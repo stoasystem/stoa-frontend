@@ -1,83 +1,69 @@
-# Research Summary: v2.2 Photo & File Upload UI Foundation
+# Research Summary: v2.3 Live Classroom & Video Help UI Foundation
 
-## Stack Additions
+## Research Complete
 
-No new dependency is recommended. Browser file input, capture, drag/drop, object URLs, existing React state/hooks, existing file API service patterns, and current UI primitives are sufficient.
+Research covered:
 
-Build a reusable feature module:
+- Purpose-built online tutoring classrooms: Lessonspace and Dojo Tutor/Lessonspace guidance.
+- Meeting safety/control patterns: Zoom waiting room, Zoom participant management, Microsoft Teams for Education safety roles, Google Meet host controls.
+- Future video-provider architecture: LiveKit React components, Twilio Video JavaScript SDK, Daily prebuilt/custom split.
+- Accessibility baseline: WAI-ARIA APG modal dialog pattern.
 
-```text
-src/features/uploads/
-```
+## Key Findings
 
-This should wrap existing `src/services/files/fileApi.ts` and replace the Chat-only upload controls with shared upload components.
+### Stack Additions
 
-## Feature Table Stakes
+No real-time video SDK should be added in v2.3. The app should add a provider-neutral `live-classroom` feature module with typed models, mock data, services, hooks, and UI components. Future provider integration should stay behind an adapter because real video platforms bring room state, participant tracks, device APIs, and backend token/session requirements.
 
-- Attachment selection through button/file input.
-- Photo capture entry using `accept="image/*"` and `capture="environment"`.
-- Desktop drag-and-drop with Browse fallback.
-- Image thumbnails and PDF/file cards.
-- Validation for type, size, empty files, and count limits.
-- States for validating, uploading, uploaded, failed, rejected, and removed.
-- Remove and retry per file.
-- Chat composer preview and send-with-attachment support.
-- Question Bank upload CTA and Question Session upload help area.
-- Practice Path schoolwork upload panel.
-- Learning Assistant handoff with upload context.
-- Four-language uploads namespace.
-- Keyboard, screen-reader, and modal focus behavior.
-- Playwright coverage for happy path, rejection, and keyboard modal smoke.
+### Feature Table Stakes
 
-## Design Comparison Takeaways
+v2.3 should include:
 
-- Khanmigo is the closest pattern: upload inside tutor chat, camera option, narrow image support, require a question with the image, and clear privacy/safety guidance.
-- ChatGPT reinforces composer-native attachment flow: files belong to a conversation turn, not a separate file center.
-- Google Classroom reinforces task-bound attachments: file/photo upload is attached to a learning assignment or task.
-- Photomath/camera-solver products show why mobile camera entry matters, but STOA should avoid their "instant solve" promise.
+- Student classroom home and Dashboard card.
+- Schedule classroom flow with mock time slots and context/materials.
+- Lobby with session details, tutor profile, device-check mock controls, context, waiting/unavailable states, and join action.
+- Room UI with video placeholders, learning workspace, side panels, materials, notes, participants, chat, and bottom controls.
+- Classroom summary with notes and next steps.
+- Chat teacher-text-to-video escalation.
+- Tutor classroom queue, tutor lobby, and tutor room.
+- Four-language `liveClassroom` i18n and Playwright smoke tests.
 
-## STOA Design Direction
+### Differentiators
 
-Use the existing STOA design system: calm, premium, education-centered, and low-pressure. The memorable product idea is "bring the real worksheet into the learning conversation." The UI should feel like a small learning action, not a storage or scanner product.
+STOA should not clone a generic meeting product. The classroom should be anchored to learning context: question, conversation, uploaded material, Practice path, Question Bank item, tutor notes, and next steps. The strongest product pattern is "live tutoring workspace" rather than "video call".
 
-Recommended user-facing copy direction:
+### Watch Out For
 
-- "Upload a photo or PDF and ask the Learning Assistant."
-- "Please upload learning materials only. Do not upload personal documents."
-- "I can help with the question you uploaded. Tell me what part is unclear."
-
-Avoid:
-
-- "Instantly solve any problem."
-- "We read your image."
-- "Securely stored forever."
-- "OCR complete."
-
-## Architecture Guidance
-
-- Keep raw `File` objects local to upload hooks/components.
-- Store and route only upload metadata.
-- Add a session-storage fallback for upload-to-Chat handoff.
-- Continue using backend/file API boundaries; frontend must not call storage providers directly.
-- Keep `/uploads/demo` internal and unlinked from main navigation.
-
-## Watch Out For
-
-- Duplicating upload logic across Chat, Question Bank, and Practice.
-- Drag-and-drop without keyboard Browse fallback.
-- Status/error states that are visual only.
-- Unrevoked object URLs.
-- Copy that implies OCR, solving, permanent storage, or security guarantees.
-- Large binary test fixtures.
+- Do not claim real WebRTC, live device media, recording, screen sharing, secure video, or actual provider connectivity.
+- Keep lobby/teacher controls clear; student Leave and tutor End Session are different actions.
+- Keep AI role clear: once tutor text help is active, Learning Assistant is observing unless a future phase explicitly designs in-class AI support.
+- Mobile room layout needs a single-column/drawer pattern, not a squeezed desktop side panel.
+- Reuse v2.2 upload UI for materials.
 
 ## Sources
 
-- Khanmigo image uploads: https://support.khanacademy.org/hc/en-us/articles/36868912022541-What-kind-of-images-can-I-upload-to-Khanmigo
-- ChatGPT files in conversations: https://openai.com/academy/working-with-files/
-- Google Classroom attachments: https://support.google.com/edu/classroom/answer/6020265
-- Photomath camera problem flow: https://support.google.com/photomath/answer/14333327
-- MDN file input: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
-- MDN capture: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture
-- MDN File API: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
-- MDN file drag and drop: https://mdn2.netlify.app/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
-- WAI-ARIA modal dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+- Lessonspace: https://www.thelessonspace.com/
+- Dojo Tutor Lessonspace overview: https://tutor-help.classdojo.com/hc/en-us/articles/42456605197837-Lessonspace-Overview-Tools-for-Tutors
+- Dojo Tutor Lessonspace tools: https://tutor-help.classdojo.com/hc/en-us/articles/42456824965901-Lessonspace-Teaching-Tools
+- Zoom waiting room: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0059359
+- Zoom participant management: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0065566
+- Microsoft Teams for Education meeting roles and safety: https://support.microsoft.com/en-us/teams/education/quick-start/set-up-meeting-roles-and-safety
+- Google Meet host controls: https://support.google.com/meet/answer/16229038
+- Google Classroom video meeting help: https://support.google.com/edu/classroom/answer/9776888
+- LiveKit React components: https://docs.livekit.io/reference/components/react
+- LiveKit VideoConference component: https://docs.livekit.io/reference/components/react/component/videoconference/
+- Twilio Video JavaScript SDK: https://www.twilio.com/docs/video/javascript
+- Daily get started: https://docs.daily.co/get-started
+- WAI-ARIA APG modal dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+
+## Requirement Direction
+
+Requirements should be grouped around:
+
+1. Live classroom foundation contracts.
+2. Student classroom home and scheduling.
+3. Lobby and room experience.
+4. Chat-to-video escalation.
+5. Tutor classroom flow.
+6. Parent visibility, summary, and continuity.
+7. i18n, accessibility, responsive behavior, docs, and QA.
