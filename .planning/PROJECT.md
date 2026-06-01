@@ -24,12 +24,19 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Parent classroom visibility card with informational copy only.
 - Four-language `liveClassroom` namespace, provider-boundary docs, README handoff, and Playwright smoke coverage.
 
-## Current Milestone: None Active
+## Current Milestone: v2.4 UI Copy & Web Design Refinement
 
-**Goal:** Start the next milestone through the GSD new-milestone workflow after research and requirements approval.
+**Goal:** Refine UI copy, page hierarchy, shared states, and cross-module learning experience so Practice Path, Practice Library, Upload a Question, Learning Assistant, Tutor Support, and Online Classroom read as one clear STOA learning platform.
 
 **Target features:**
-- To be defined by the next milestone.
+- Reorganize Student Dashboard learning entry hierarchy around Continue Learning, Today's Practice, Need Help, Live Support, and Recent Activity.
+- Rename student-facing Question Bank surfaces to Practice Library while keeping existing routes and internal module boundaries.
+- Refine Practice Library, question set, question session, result, and mistakes-review copy so practice feels supportive rather than punitive.
+- Refine Upload a Question, attachment, and upload error copy to avoid OCR, scan-and-solve, instant-solution, or AI overclaim wording.
+- Refine Online Classroom home, schedule, lobby, room, summary, and controls so the classroom feels like a learning session with materials and context, not a generic meeting shell.
+- Refine Chat teacher-support states so Tutor Support and Start Live Classroom escalation are clear while the Learning Assistant remains positioned as observing during tutor help.
+- Strengthen tutor and parent surfaces with concise student context, learning support visibility, and product-safe role boundaries.
+- Reuse or extend existing shared UI patterns for page headers, empty/error states, context cards, next-step cards, status/metadata display, i18n keys, responsive QA, and E2E assertions.
 
 ## Current State
 
@@ -125,7 +132,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- None. Next active scope should be defined by the next milestone.
+- Student Dashboard should present the learning journey with clear priority instead of a flat list of modules — v2.4
+- Student-facing Question Bank copy should become Practice Library while preserving existing routes and code boundaries — v2.4
+- Practice Library, question set, question session, result, and mistakes-review pages should use calm, supportive, specific learning copy — v2.4
+- Upload UI should use Upload a Question / Take Photo / Attach File language and avoid implying OCR, AI solving, or image understanding — v2.4
+- Online Classroom UI should emphasize learning context, materials, tutor support, and next steps rather than generic meeting behavior — v2.4
+- Chat teacher-support escalation should clearly describe Tutor Support, Learning Assistant observing, and Start Live Classroom actions — v2.4
+- Tutor surfaces should make student source, topic, context, materials, and suggested focus easy to scan before joining — v2.4
+- Parent surfaces should explain the complete learning support system without giving parent-only classroom controls — v2.4
+- Shared empty, loading, error, status, context, and next-step patterns should provide a clear recovery or next action — v2.4
+- i18n and E2E assertions should reflect the refined product language across questionBank, uploads, liveClassroom, chat, dashboard, tutor, and parent surfaces — v2.4
 
 ### Out of Scope
 
@@ -432,9 +448,12 @@ Current codebase facts:
 | Keep uploads context-bound, not library-style | Research shows the strongest fit is tutor/chat or assignment-context upload, so STOA uploads should attach to Chat, Question Bank questions, or Practice schoolwork help rather than become a storage product | v2.2 Complete |
 | Reuse a shared upload module | The repo already has Chat upload behavior; v2.2 should consolidate validation, preview, status, and retry into `src/features/uploads/` instead of adding separate page-specific implementations | v2.2 Complete |
 | Avoid OCR and instant-solve claims | Camera-solver competitors emphasize recognition, but v2.2 only proves the upload UX and Learning Assistant handoff, so copy must not overpromise unimplemented image understanding | v2.2 Complete |
-| Make classroom learning-specific | v2.3 should adapt video-room patterns around tutoring context, shared problems, materials, notes, and next steps instead of cloning a generic meeting room | — Pending |
-| Keep video provider work deferred | The milestone validates UI and flow before choosing WebRTC, Daily, Twilio, Agora, Zoom SDK, LiveKit, or any other real-time media stack | — Pending |
-| Preserve the support ladder | Learning Chat should remain the first help surface, tutor text help is the next escalation, and live video classroom should appear when deeper synchronous support is needed | — Pending |
+| Make classroom learning-specific | v2.3 should adapt video-room patterns around tutoring context, shared problems, materials, notes, and next steps instead of cloning a generic meeting room | v2.3 Complete |
+| Keep video provider work deferred | The milestone validates UI and flow before choosing WebRTC, Daily, Twilio, Agora, Zoom SDK, LiveKit, or any other real-time media stack | v2.3 Complete |
+| Preserve the support ladder | Learning Chat should remain the first help surface, tutor text help is the next escalation, and live video classroom should appear when deeper synchronous support is needed | v2.3 Complete |
+| Treat v2.4 as refinement, not expansion | The milestone should integrate recently added modules through copy, hierarchy, shared states, and responsive polish without adding large routes, production backend work, OCR, WebRTC, billing, or new visual direction | — Pending |
+| Prefer Practice Library in student UI | Student-facing Question Bank surfaces should read as Practice Library because it is calmer and more learning-oriented, while existing routes and internal module naming can remain `question-bank` | — Pending |
+| Keep support language credible | Upload and classroom copy must avoid OCR, instant solution, AI teacher, human fallback, Zoom, recording, billing, and guaranteed-improvement claims unless those capabilities exist | — Pending |
 
 ## Evolution
 
@@ -454,4 +473,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.3 milestone start*
+*Last updated: 2026-06-02 after v2.4 milestone start*
