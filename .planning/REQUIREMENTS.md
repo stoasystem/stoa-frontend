@@ -1,0 +1,108 @@
+# Requirements: STOA Frontend v1.35
+
+**Defined:** 2026-06-01
+**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, and a clean path to future real backend integration.
+
+## v1.35 Requirements
+
+### Student Profile Language Preference
+
+- [ ] **PROF37-01**: Student can view the saved Learning Assistant answer language in the student profile.
+- [ ] **PROF37-02**: Student can update the Learning Assistant answer language from the supported English, German, French, and Italian options.
+- [ ] **PROF37-03**: Student onboarding can capture an initial Learning Assistant answer language preference.
+- [ ] **PROF37-04**: Profile UI copy makes clear that the setting controls Learning Assistant answers, not necessarily the whole browser interface.
+
+### API and Demo Backend Contract
+
+- [ ] **API37-01**: Student profile TypeScript contracts include a supported answer-language field.
+- [ ] **API37-02**: Local/demo backend stores the student answer-language preference with the student profile.
+- [ ] **API37-03**: `/students/me/profile` returns the saved answer-language preference.
+- [ ] **API37-04**: `PATCH /students/me/profile` validates and persists supported answer-language updates.
+- [ ] **API37-05**: `/auth/register` persists a student onboarding answer-language preference when provided.
+- [ ] **API37-06**: Existing local demo profiles remain usable with a safe default when no answer-language value is stored.
+
+### Learning Assistant Response Language
+
+- [ ] **CHAT37-01**: Chat response generation reads the saved student answer-language preference instead of hard-coding English.
+- [ ] **CHAT37-02**: Learning Assistant prompt construction receives the normalized answer-language code for each chat request.
+- [ ] **CHAT37-03**: Template fallback can return guided responses in English, German, French, and Italian.
+- [ ] **CHAT37-04**: Out-of-scope, teacher-escalation, and direct-answer-safety fallback paths respect the requested answer language.
+- [ ] **CHAT37-05**: Frontend chat surfaces remain provider-agnostic and do not expose model, provider, prompt, backend, demo, or mock terminology.
+
+### QA and Regression Coverage
+
+- [ ] **QA37-01**: Python Learning Assistant regression tests verify preferred-language propagation for English, German, French, and Italian.
+- [ ] **QA37-02**: Backend/profile tests or smoke checks verify registration, profile read, profile update, and chat response language behavior.
+- [ ] **QA37-03**: Frontend verification covers the profile language control and supported option rendering.
+- [ ] **QA37-04**: `npm run lint` and `npm run build` pass after the milestone implementation.
+- [ ] **QA37-05**: User-facing copy is checked for the existing high-risk internal terms in profile and chat language surfaces.
+
+### Documentation and Handoff
+
+- [ ] **DOC37-01**: README or developer docs explain how to verify answer-language preference locally.
+- [ ] **DOC37-02**: API/demo backend contract documentation records the student answer-language field and supported values.
+- [ ] **DOC37-03**: Milestone handoff documents clarify that production preference syncing and new language support are deferred.
+
+## Future Requirements
+
+### Production Preference Sync
+
+- **FUT37-01**: Production backend persists answer-language preference across devices and sessions.
+- **FUT37-02**: Parent or guardian can manage a child's answer-language preference when account permissions support it.
+- **FUT37-03**: Historical conversations can optionally be filtered or labeled by answer language.
+
+### Language Expansion
+
+- **FUT37-04**: STOA can add new answer languages through a formal localization, content QA, and model-behavior review process.
+- **FUT37-05**: Teacher handoff can include the student's preferred answer language for professional teacher support operations.
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| New supported languages beyond English, German, French, and Italian | The existing UI/i18n surface supports these four languages; adding more requires separate localization and QA scope. |
+| Automatic translation service | The milestone should use prompt/harness response-language behavior, not introduce translation-provider dependencies. |
+| Production AI provider orchestration | Existing provider boundary remains backend/harness-owned and local/demo-focused. |
+| Formal production database migrations | SQLite changes prove the demo/API contract only; production persistence belongs to a future backend milestone. |
+| Retrofitting historical chat messages into a new language | Existing conversations should remain stable; this milestone affects new responses. |
+| Parent-managed language preference | Useful later, but current scope is student profile ownership. |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| PROF37-01 | Phase 195 | Pending |
+| PROF37-02 | Phase 195 | Pending |
+| PROF37-03 | Phase 195 | Pending |
+| PROF37-04 | Phase 195 | Pending |
+| API37-01 | Phase 196 | Pending |
+| API37-02 | Phase 196 | Pending |
+| API37-03 | Phase 196 | Pending |
+| API37-04 | Phase 196 | Pending |
+| API37-05 | Phase 196 | Pending |
+| API37-06 | Phase 196 | Pending |
+| CHAT37-01 | Phase 197 | Pending |
+| CHAT37-02 | Phase 197 | Pending |
+| CHAT37-03 | Phase 197 | Pending |
+| CHAT37-04 | Phase 197 | Pending |
+| CHAT37-05 | Phase 197 | Pending |
+| QA37-01 | Phase 198 | Pending |
+| QA37-02 | Phase 198 | Pending |
+| QA37-03 | Phase 198 | Pending |
+| QA37-04 | Phase 198 | Pending |
+| QA37-05 | Phase 198 | Pending |
+| DOC37-01 | Phase 199 | Pending |
+| DOC37-02 | Phase 199 | Pending |
+| DOC37-03 | Phase 199 | Pending |
+
+**Coverage:**
+- v1.35 requirements: 23 total
+- Mapped to phases: 23
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-06-01*
+*Last updated: 2026-06-01 after v1.35 requirements definition*
+
