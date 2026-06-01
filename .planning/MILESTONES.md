@@ -1,5 +1,28 @@
 # Milestones
 
+## v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization (Shipped: 2026-06-01)
+
+**Phases completed:** 5 phases, 5 plans, 0 tasks
+**Audit:** `.planning/v1.35-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Browser smoke through Playwright was attempted but blocked by macOS sandbox permission for Chromium launch. Production preference syncing, parent-managed child answer-language settings, new supported languages, historical conversation translation, and full Playwright CI coverage remain deferred.
+
+**Key accomplishments:**
+
+- Added student profile and onboarding answer-language preference for English, German, French, and Italian.
+- Persisted `preferredAnswerLanguage` through the local/demo backend registration and student profile API contract.
+- Passed the saved student answer language into Learning Assistant chat generation instead of hard-coding English.
+- Expanded template fallback and evaluator support for multilingual guided answer behavior.
+- Added harness and backend regression tests, README guidance, demo API contract docs, and milestone audit evidence.
+
+### Verification
+
+- `python3 -m unittest discover -s demo-harness/tests`: passed, 28 tests.
+- `backend/.venv/bin/python -m unittest discover -s backend/tests`: passed, 1 test.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+
+---
+
 ## v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening (Shipped: 2026-05-27)
 
 **Phases completed:** 4 phases, 4 plans, 0 tasks

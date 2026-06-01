@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from '@/i18n/languages'
+
 export type StudentProfile = {
   id: string
   userId: string
@@ -9,6 +11,7 @@ export type StudentProfile = {
   grade: string
   primarySubjects: string[]
   schoolSystem?: string
+  preferredAnswerLanguage: SupportedLanguage
   guardian?: {
     name: string
     relationship: string

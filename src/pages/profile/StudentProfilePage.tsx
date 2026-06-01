@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CreditCard,
   GraduationCap,
+  Languages,
   Mail,
   Phone,
   ShieldCheck,
@@ -23,6 +24,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { useUpdateStudentProfileMutation } from '@/hooks/student/useUpdateStudentProfileMutation'
+import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { studentProfileSchema } from '@/lib/validation'
 import type { StudentProfile } from '@/types/student'
@@ -30,6 +32,7 @@ import type { StudentProfile } from '@/types/student'
 type ProfileErrors = {
   grade?: string
   primarySubjects?: string
+  preferredAnswerLanguage?: string
 }
 
 const guardianStatusLabel: Record<
@@ -54,6 +57,7 @@ export function StudentProfilePage() {
   const [grade, setGrade] = useState('')
   const [schoolSystem, setSchoolSystem] = useState('')
   const [primarySubjects, setPrimarySubjects] = useState('')
+  const [preferredAnswerLanguage, setPreferredAnswerLanguage] = useState<SupportedLanguage>('en')
   const [errors, setErrors] = useState<ProfileErrors>({})
 
   useEffect(() => {
@@ -61,6 +65,7 @@ export function StudentProfilePage() {
     setGrade(profileQuery.data.grade)
     setSchoolSystem(profileQuery.data.schoolSystem ?? '')
     setPrimarySubjects(profileQuery.data.primarySubjects.join(', '))
+    setPreferredAnswerLanguage(profileQuery.data.preferredAnswerLanguage)
   }, [profileQuery.data])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -73,6 +78,7 @@ export function StudentProfilePage() {
       grade,
       schoolSystem,
       primarySubjects: subjects,
+      preferredAnswerLanguage,
     })
 
     if (!result.success) {
@@ -80,6 +86,7 @@ export function StudentProfilePage() {
       setErrors({
         grade: fieldErrors.grade?.[0],
         primarySubjects: fieldErrors.primarySubjects?.[0],
+        preferredAnswerLanguage: fieldErrors.preferredAnswerLanguage?.[0],
       })
       toast.error('Check the profile fields before saving.')
       return
@@ -121,7 +128,7 @@ export function StudentProfilePage() {
                 className="rounded-lg border border-border/70 bg-card/95 p-5 shadow-[var(--platform-shadow-card)]"
                 onSubmit={handleSubmit}
               >
-                <div className="grid gap-5 lg:grid-cols-3">
+                <div className="grid gap-5 lg:grid-cols-4">
                   <div className="space-y-2">
                     <Label htmlFor="grade">Grade</Label>
                     <Input id="grade" value={grade} onChange={(event) => setGrade(event.target.value)} />
@@ -145,6 +152,27 @@ export function StudentProfilePage() {
                       value={schoolSystem}
                       onChange={(event) => setSchoolSystem(event.target.value)}
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="answer-language">Learning Assistant answer language</Label>
+                    <select
+                      id="answer-language"
+                      className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+                      value={preferredAnswerLanguage}
+                      onChange={(event) => setPreferredAnswerLanguage(event.target.value as SupportedLanguage)}
+                    >
+                      {languageOptions.map((language) => (
+                        <option key={language.code} value={language.code}>
+                          {language.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.preferredAnswerLanguage && (
+                      <p className="text-xs text-destructive">{errors.preferredAnswerLanguage}</p>
+                    )}
+                    <p className="text-xs leading-5 text-muted-foreground">
+                      Used for Learning Assistant explanations.
+                    </p>
                   </div>
                 </div>
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -183,6 +211,11 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
         <ProfileDetail icon={Phone} label="Phone" value={profile.phone ?? 'Not provided'} />
         <ProfileDetail icon={CalendarDays} label="Date of birth" value={formatDate(profile.dateOfBirth)} />
         <ProfileDetail icon={GraduationCap} label="Primary subjects" value={profile.primarySubjects.join(', ')} />
+        <ProfileDetail
+          icon={Languages}
+          label="Answer language"
+          value={formatLanguage(profile.preferredAnswerLanguage)}
+        />
       </CardContent>
     </Card>
   )
@@ -291,4 +324,8 @@ function formatDate(value?: string) {
     day: 'numeric',
     year: 'numeric',
   }).format(new Date(value))
+}
+
+function formatLanguage(languageCode: SupportedLanguage) {
+  return languageOptions.find((language) => language.code === languageCode)?.label ?? 'English'
 }

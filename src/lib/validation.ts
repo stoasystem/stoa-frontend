@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import type { TFunction } from 'i18next'
+import { supportedLanguages } from '@/i18n/languages'
 
 export const userRoleSchema = z.enum([
   'student',
@@ -30,6 +31,7 @@ export const studentProfileSchema = z.object({
   grade: z.string().min(1, 'Grade is required.'),
   primarySubjects: z.array(z.string()).min(1, 'Add at least one subject.'),
   schoolSystem: z.string().optional(),
+  preferredAnswerLanguage: z.enum(supportedLanguages),
 })
 
 export const chatInputSchema = z.object({

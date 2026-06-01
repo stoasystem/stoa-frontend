@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import type { StudentOnboardingProfile } from '@/types/onboarding'
@@ -37,6 +38,22 @@ export function StudentProfileStep({
       <div className="space-y-2">
         <Label htmlFor="student-subjects">{t('register.subjects')}</Label>
         <Input id="student-subjects" value={subjectText} onChange={(event) => onSubjectTextChange(event.target.value)} placeholder="Mathematics, Physics" />
+      </div>
+      <div className="space-y-2 md:col-span-2">
+        <Label htmlFor="student-answer-language">{t('register.answerLanguage')}</Label>
+        <select
+          id="student-answer-language"
+          className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+          value={value.preferredAnswerLanguage}
+          onChange={(event) => onChange({ preferredAnswerLanguage: event.target.value as SupportedLanguage })}
+        >
+          {languageOptions.map((language) => (
+            <option key={language.code} value={language.code}>
+              {language.label}
+            </option>
+          ))}
+        </select>
+        <p className="text-xs leading-5 text-muted-foreground">{t('register.answerLanguageHelp')}</p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="parent-name">{t('register.parentName')}</Label>

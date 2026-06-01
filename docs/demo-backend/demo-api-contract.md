@@ -61,7 +61,9 @@ Response:
 
 ### `POST /auth/register`
 
-Accepts `name`, `email`, `password`, `role`, optional `preferredLanguage`, and an optional role-specific `profile`. Public demo registration supports `student`, `parent`, and `tutor`; admin accounts remain fixed demo accounts.
+Accepts `name`, `email`, `password`, `role`, optional interface `preferredLanguage`, and an optional role-specific `profile`. Public demo registration supports `student`, `parent`, and `tutor`; admin accounts remain fixed demo accounts.
+
+For student registration, `profile.preferredAnswerLanguage` controls the language used for new Learning Assistant explanations. It is separate from the interface language and supports `en`, `de`, `fr`, and `it`.
 
 Student request example:
 
@@ -78,6 +80,7 @@ Student request example:
     "grade": "Grade 8",
     "schoolSystem": "Swiss Gymnasium",
     "subjectsNeedingHelp": ["Mathematics", "Physics"],
+    "preferredAnswerLanguage": "de",
     "parentName": "Michael Keller",
     "parentEmail": "michael@example.com"
   }
@@ -119,6 +122,43 @@ Tutor response can include:
 
 This is not production registration or real identity verification.
 
+## Student Profile
+
+### `GET /students/me/profile`
+
+Returns the current student's learning context. `preferredAnswerLanguage` is the saved Learning Assistant answer language and supports `en`, `de`, `fr`, and `it`.
+
+Response example:
+
+```json
+{
+  "id": "student-profile-1",
+  "userId": "user-student",
+  "name": "Anna Keller",
+  "grade": "Grade 8",
+  "primarySubjects": ["Mathematics", "Physics"],
+  "schoolSystem": "Swiss Gymnasium",
+  "preferredAnswerLanguage": "de",
+  "createdAt": "2026-05-25T12:00:00Z",
+  "updatedAt": "2026-06-01T12:00:00Z"
+}
+```
+
+### `PATCH /students/me/profile`
+
+Updates editable learning-context fields. `preferredAnswerLanguage` is optional; unsupported values return `DEMO_VALIDATION_ERROR`.
+
+Request example:
+
+```json
+{
+  "grade": "Grade 8",
+  "primarySubjects": ["Mathematics", "Physics"],
+  "schoolSystem": "Swiss lower secondary",
+  "preferredAnswerLanguage": "fr"
+}
+```
+
 ### `GET /auth/me`
 
 Reads `Authorization: Bearer <accessToken>` and returns the current user.
@@ -154,7 +194,7 @@ Creates a temporary conversation for the current demo session.
 
 ### `POST /conversations/:conversationId/messages`
 
-Accepts `content` and optional `attachmentIds`, stores a student message, and returns a deterministic assistant demo response.
+Accepts `content` and optional `attachmentIds`, stores a student message, and returns a Learning Assistant response. The local demo backend reads the student's saved `preferredAnswerLanguage` from the profile and passes that language into the response-generation harness.
 
 ### `POST /conversations/:conversationId/messages/stream`
 

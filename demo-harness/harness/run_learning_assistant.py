@@ -8,11 +8,28 @@ from .providers.base import ProviderRequest, ProviderResponse
 from .providers.router import ProviderRouter, configure_provider_logging, LOGGER
 from .providers.template_provider import TemplateProvider
 
-SAFE_FALLBACK_TEXT = (
-    "Let's pause and work through the question one step at a time. "
-    "First, identify what the question is asking and what information you already have. "
-    "If that still feels unclear, you can ask for professional teacher support."
-)
+SAFE_FALLBACK_TEXTS = {
+    "en": (
+        "Let's pause and work through the question one step at a time. "
+        "First, identify what the question is asking and what information you already have. "
+        "If that still feels unclear, you can ask for professional teacher support."
+    ),
+    "de": (
+        "Lass uns kurz innehalten und die Frage Schritt fuer Schritt anschauen. "
+        "Klaere zuerst, was gesucht ist und welche Informationen du schon hast. "
+        "Wenn es weiter unklar bleibt, frage eine Lehrperson um Unterstuetzung."
+    ),
+    "fr": (
+        "Faisons une pause et avancons etape par etape. "
+        "Commence par reperer ce que la question demande et les informations deja donnees. "
+        "Si cela reste confus, demande l'aide d'un enseignant."
+    ),
+    "it": (
+        "Fermiamoci un momento e procediamo passo dopo passo. "
+        "Prima individua che cosa chiede la domanda e quali informazioni hai gia. "
+        "Se resta poco chiaro, chiedi supporto a un insegnante."
+    ),
+}
 
 
 @dataclass(frozen=True)
@@ -96,8 +113,9 @@ def generate_learning_assistant_response(
     fallback_check = check_response(fallback.text, request)
     if not fallback_check.ok:
         LOGGER.error("safe fallback used after fallback check failed reasons=%s", ",".join(fallback_check.failure_reasons))
-        safe_check = check_response(SAFE_FALLBACK_TEXT, request)
-        return LearningAssistantResponse(SAFE_FALLBACK_TEXT, "template", True, safe_check)
+        safe_text = safe_fallback_text(request.language)
+        safe_check = check_response(safe_text, request)
+        return LearningAssistantResponse(safe_text, "template", True, safe_check)
     return LearningAssistantResponse(fallback.text, fallback.provider_name, True, fallback_check)
 
 
@@ -112,3 +130,8 @@ def check_response(text: str, request: LearningAssistantRequest) -> ResponseChec
             recent_messages=tuple(message.content for message in request.recent_messages),
         )
     )
+
+
+def safe_fallback_text(language: str) -> str:
+    normalized = language.strip().lower()
+    return SAFE_FALLBACK_TEXTS.get(normalized, SAFE_FALLBACK_TEXTS["en"])

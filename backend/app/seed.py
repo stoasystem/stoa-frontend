@@ -43,8 +43,8 @@ def insert_seed_data() -> None:
         connection.execute(
             """
             INSERT OR IGNORE INTO student_profiles
-            (id, user_id, grade, school_system, primary_subjects, created_at)
-            VALUES (?, ?, ?, ?, ?, ?)
+            (id, user_id, grade, school_system, primary_subjects, preferred_language, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 "student-profile-1",
@@ -52,6 +52,7 @@ def insert_seed_data() -> None:
                 "Grade 8",
                 "Swiss Gymnasium",
                 json.dumps(["Mathematics", "Physics"]),
+                "en",
                 created_at,
             ),
         )

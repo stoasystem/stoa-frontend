@@ -1,5 +1,6 @@
 import { httpClient } from '@/services/api/httpClient'
 import { withDemoFallback } from '@/services/demo/demoFallback'
+import { isSupportedLanguage } from '@/i18n/languages'
 import type { LearningHistoryItem, StudentProfile } from '@/types/student'
 
 const mockStudentProfile: StudentProfile = {
@@ -13,6 +14,7 @@ const mockStudentProfile: StudentProfile = {
   grade: 'Grade 8',
   primarySubjects: ['Mathematics', 'Physics'],
   schoolSystem: 'Swiss lower secondary',
+  preferredAnswerLanguage: 'en',
   guardian: {
     name: 'Martin Keller',
     relationship: 'Parent',
@@ -90,6 +92,10 @@ export async function getStudentLearningHistory() {
 }
 
 function mergeStudentProfile(profile: StudentProfile): StudentProfile {
+  const preferredAnswerLanguage = isSupportedLanguage(profile.preferredAnswerLanguage)
+    ? profile.preferredAnswerLanguage
+    : mockStudentProfile.preferredAnswerLanguage
+
   return {
     ...mockStudentProfile,
     ...profile,
@@ -97,6 +103,7 @@ function mergeStudentProfile(profile: StudentProfile): StudentProfile {
     phone: profile.phone || mockStudentProfile.phone,
     dateOfBirth: profile.dateOfBirth || mockStudentProfile.dateOfBirth,
     schoolSystem: profile.schoolSystem || mockStudentProfile.schoolSystem,
+    preferredAnswerLanguage,
     guardian: profile.guardian ?? mockStudentProfile.guardian,
     billing: profile.billing ?? mockStudentProfile.billing,
     primarySubjects: profile.primarySubjects?.length ? profile.primarySubjects : mockStudentProfile.primarySubjects,

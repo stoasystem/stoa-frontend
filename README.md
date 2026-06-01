@@ -2,6 +2,35 @@
 
 STOA learning platform frontend.
 
+## Phase 37 Student Answer Language
+
+Students can now choose a Learning Assistant answer language in their profile. This is separate from the interface language switcher: the interface may be shown in one language, while new Learning Assistant explanations follow the student's saved answer-language preference.
+
+Supported answer languages:
+
+- English (`en`)
+- German (`de`)
+- French (`fr`)
+- Italian (`it`)
+
+Relevant surfaces:
+
+- Registration student profile step
+- `/profile` student learning context
+- Local demo backend `student_profiles.preferred_language`
+- Learning Assistant prompt/fallback path
+
+Verification:
+
+```bash
+python3 -m unittest discover -s demo-harness/tests
+backend/.venv/bin/python -m unittest discover -s backend/tests
+npm run lint
+npm run build
+```
+
+Browser smoke note: profile and registration language controls should be checked locally at `/register?role=student` and `/profile` when a browser can launch. In this Codex run, Chromium launch was blocked by macOS sandbox permission while command-level verification passed.
+
 ## Practice Roadmap UI
 
 The Practice page now includes a roadmap-style learning path.

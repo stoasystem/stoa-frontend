@@ -33,6 +33,7 @@ def initialize_database() -> None:
               grade TEXT,
               school_system TEXT,
               primary_subjects TEXT,
+              preferred_language TEXT,
               created_at TEXT NOT NULL,
               updated_at TEXT
             );
@@ -171,3 +172,13 @@ def initialize_database() -> None:
             );
             """
         )
+        ensure_column(connection, "student_profiles", "preferred_language", "TEXT")
+
+
+def ensure_column(connection: sqlite3.Connection, table: str, column: str, definition: str) -> None:
+    columns = {
+        row["name"]
+        for row in connection.execute(f"PRAGMA table_info({table})").fetchall()
+    }
+    if column not in columns:
+        connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")

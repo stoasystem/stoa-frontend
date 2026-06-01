@@ -27,6 +27,8 @@ from harness.providers.router import ProviderRouter
 from harness.run_learning_assistant import LearningAssistantRequest, generate_learning_assistant_response
 
 app = FastAPI(title="STOA Local Test Backend")
+SUPPORTED_RESPONSE_LANGUAGES = {"en", "de", "fr", "it"}
+DEFAULT_RESPONSE_LANGUAGE = "en"
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -57,6 +59,7 @@ class StudentProfileUpdate(BaseModel):
     grade: str | None = None
     primarySubjects: list[str] | None = None
     schoolSystem: str | None = None
+    preferredAnswerLanguage: str | None = None
 
 
 class CreateConversationRequest(BaseModel):
@@ -168,6 +171,22 @@ def env_bool(name: str, default: bool) -> bool:
     if value is None:
         return default
     return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def normalize_response_language(value: object | None) -> str:
+    if not isinstance(value, str):
+        return DEFAULT_RESPONSE_LANGUAGE
+    language = value.strip().lower()
+    return language if language in SUPPORTED_RESPONSE_LANGUAGES else DEFAULT_RESPONSE_LANGUAGE
+
+
+def validate_response_language(value: str | None) -> str | None:
+    if value is None:
+        return None
+    language = value.strip().lower()
+    if language not in SUPPORTED_RESPONSE_LANGUAGES:
+        raise HTTPException(status_code=400, detail="Unsupported answer language")
+    return language
 
 
 def contact_email_config() -> dict[str, str | bool | int]:
@@ -338,10 +357,14 @@ def register(payload: RegisterRequest) -> dict[str, object]:
                 subjects = profile.get("subjectsNeedingHelp")
                 if not isinstance(subjects, list):
                     subjects = []
+                preferred_language = normalize_response_language(
+                    profile.get("preferredAnswerLanguage") or payload.preferredLanguage
+                )
                 connection.execute(
                     """
-                    INSERT INTO student_profiles (id, user_id, grade, school_system, primary_subjects, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO student_profiles
+                    (id, user_id, grade, school_system, primary_subjects, preferred_language, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         f"profile-{uuid.uuid4()}",
@@ -349,6 +372,7 @@ def register(payload: RegisterRequest) -> dict[str, object]:
                         str(profile.get("grade") or "Grade 8"),
                         str(profile.get("schoolSystem") or ""),
                         json.dumps(subjects),
+                        preferred_language,
                         created_at,
                     ),
                 )
@@ -375,8 +399,9 @@ def register(payload: RegisterRequest) -> dict[str, object]:
                 )
                 connection.execute(
                     """
-                    INSERT INTO student_profiles (id, user_id, grade, school_system, primary_subjects, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    INSERT INTO student_profiles
+                    (id, user_id, grade, school_system, primary_subjects, preferred_language, created_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
                         f"profile-{uuid.uuid4()}",
@@ -384,6 +409,7 @@ def register(payload: RegisterRequest) -> dict[str, object]:
                         child_grade,
                         "Demo onboarding",
                         json.dumps(child_subjects),
+                        DEFAULT_RESPONSE_LANGUAGE,
                         created_at,
                     ),
                 )
@@ -585,6 +611,7 @@ def profile_response(row, name: str) -> dict[str, object]:
         "grade": row["grade"] or "",
         "primarySubjects": json.loads(row["primary_subjects"] or "[]"),
         "schoolSystem": row["school_system"] or "",
+        "preferredAnswerLanguage": normalize_response_language(row["preferred_language"]),
         "createdAt": row["created_at"],
         "updatedAt": row["updated_at"],
     }
@@ -605,6 +632,7 @@ def update_student_profile(
     user: dict[str, str] = Depends(require_role("student")),
 ) -> dict[str, object]:
     updated_at = now_iso()
+    preferred_language = validate_response_language(payload.preferredAnswerLanguage)
     with get_connection() as connection:
         connection.execute(
             """
@@ -612,6 +640,7 @@ def update_student_profile(
             SET grade = COALESCE(?, grade),
                 school_system = COALESCE(?, school_system),
                 primary_subjects = COALESCE(?, primary_subjects),
+                preferred_language = COALESCE(?, preferred_language),
                 updated_at = ?
             WHERE user_id = ?
             """,
@@ -619,6 +648,7 @@ def update_student_profile(
                 payload.grade,
                 payload.schoolSystem,
                 json.dumps(payload.primarySubjects) if payload.primarySubjects is not None else None,
+                preferred_language,
                 updated_at,
                 user["id"],
             ),
@@ -781,7 +811,7 @@ def send_message(conversation_id: str, payload: SendMessageRequest, user: dict[s
                 grade_level=(profile["grade"] if profile is not None else conversation["grade"]) or "",
                 registered_subjects=registered_subjects,
                 subject=conversation["subject"] or "General",
-                language="en",
+                language=normalize_response_language(profile["preferred_language"] if profile is not None else None),
                 recent_messages=recent_messages,
                 school_system=(profile["school_system"] if profile is not None else None),
             )

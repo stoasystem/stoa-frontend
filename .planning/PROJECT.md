@@ -10,33 +10,30 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
+## Latest Shipped Milestone: v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
 
-**Shipped:** 2026-05-27
+**Shipped:** 2026-06-01
 
-**Delivered:** STOA now has a reliable frontend quality gate after fixing the reported GitHub Actions lint failure class, aligning Node/browser ESLint boundaries, auditing npm/CI/tooling drift, refreshing stale codebase docs, updating E2E smoke assertions, and verifying install, lint, build, and browser smoke commands.
-
-**Target features:**
-- ESLint flat-config handling for Node-executed scripts and config files.
-- Local and CI command parity for `npm ci`, `npm run lint`, and `npm run build`.
-- Full local verification with `npm ci`, `npm run lint`, `npm run build`, and 14/14 Playwright E2E smoke checks.
-- Updated E2E smoke selectors for current accessible UI copy and labels.
-- Updated ignore rules, README quality-gate guidance, codebase map docs, and milestone audit evidence.
-
-## Current Milestone: v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
-
-**Goal:** Students can choose a preferred learning/answer language in their profile, and Learning Assistant responses use that saved student language preference across chat/demo flows.
+**Delivered:** STOA now supports student-level Learning Assistant answer-language preference. Students can choose English, German, French, or Italian in onboarding/profile; the local/demo backend persists the preference; chat generation passes the saved language into the Learning Assistant harness; multilingual fallback behavior and profile-to-chat propagation are covered by regression tests.
 
 **Target features:**
-- Student profile captures and displays a supported answer language preference.
-- Registration/profile API contracts and the local demo backend persist the student language preference.
-- Learning Assistant prompt/harness and chat backend pass the saved student language into response generation.
-- Template fallback, behavior checks, and regression tests verify English, German, French, and Italian answer-language behavior.
-- Frontend UI, copy, docs, and QA keep browser interface language separate from the student's Learning Assistant answer language.
+- Student profile captures and displays a supported answer-language preference.
+- Student onboarding can submit the initial answer-language preference.
+- Local/demo backend profile APIs persist and return `preferredAnswerLanguage`.
+- Learning Assistant chat generation uses the saved student answer language instead of hard-coded English.
+- Regression tests cover English, German, French, and Italian answer-language behavior.
+
+## Current Milestone: Planning next milestone
+
+**Goal:** Select the next milestone after the shipped student answer-language preference work.
+
+**Target features:**
+- Suggested next milestone: production preference syncing, parent-managed child answer-language settings, Playwright coverage for profile-language flows, or roadmap interaction QA and parent visibility refinement.
+- Keep Phase 37 shipped artifacts under `.planning/phases/` and archive copies under `.planning/milestones/`.
 
 ## Current State
 
-**Latest shipped milestone:** v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening
+**Latest shipped milestone:** v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -112,13 +109,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Developers can run and verify a clear homepage Practice entry, Start Practice routing, four-language Practice entry copy, Practice preview, docs, README, build, browser layout QA, and milestone archive — v1.31
 - ✓ Developers can run and verify a subject-agnostic Practice roadmap with lesson progression states, locked hints, next-lesson CTA, topic route support, four-language copy, docs, README guidance, browser checks, and build verification — v1.33
 - ✓ Developers can run and verify reliable frontend quality gates with CI/local command parity, Node-aware ESLint config, lockfile and ignore hygiene, updated smoke tests, README guidance, and 14/14 Playwright E2E checks — v1.34
+- ✓ Students can set a Learning Assistant answer-language preference, and new guided responses use the saved student profile language across local/demo profile and chat flows — v1.35
 
 ### Active
 
-- [ ] Students can set and review a preferred Learning Assistant answer language in their profile.
-- [ ] The local/demo backend persists the preferred language through registration, profile read/update, and chat message handling.
-- [ ] Learning Assistant prompt construction and fallback behavior use the saved student language preference for generated responses.
-- [ ] English, German, French, and Italian language behavior is covered by focused regression tests, QA evidence, and documentation.
+- Next milestone requirements are not yet selected.
 
 ### Out of Scope
 
@@ -427,4 +422,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-01 after starting v1.35 milestone*
+*Last updated: 2026-06-01 after v1.35 milestone completion*

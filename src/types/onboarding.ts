@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from '@/i18n/languages'
+
 export type RegisterRole = 'student' | 'parent' | 'tutor'
 
 export type StudentOnboardingProfile = {
@@ -6,6 +8,7 @@ export type StudentOnboardingProfile = {
   grade: string
   schoolSystem?: string
   subjectsNeedingHelp: string[]
+  preferredAnswerLanguage: SupportedLanguage
   parentName: string
   parentEmail: string
 }

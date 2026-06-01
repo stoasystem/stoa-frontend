@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
+import { getInitialLanguage, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type {
   ParentOnboardingProfile,
   RegisterPayload,
@@ -28,6 +29,7 @@ const initialStudentProfile: StudentOnboardingProfile = {
   grade: 'Grade 8',
   schoolSystem: 'Swiss Gymnasium',
   subjectsNeedingHelp: ['Mathematics', 'Physics'],
+  preferredAnswerLanguage: 'en',
   parentName: '',
   parentEmail: '',
 }
@@ -69,6 +71,10 @@ function getInitialRole(value: string | null): RegisterRole {
 
 export function RegisterForm() {
   const { t, i18n } = useTranslation(['auth', 'common', 'errors'])
+  const currentLanguage = i18n.resolvedLanguage ?? i18n.language
+  const initialAnswerLanguage: SupportedLanguage = isSupportedLanguage(currentLanguage)
+    ? currentLanguage
+    : getInitialLanguage()
   const [searchParams] = useSearchParams()
   const [step, setStep] = useState<Step>('role')
   const [role, setRole] = useState<RegisterRole>(() => getInitialRole(searchParams.get('role')))
@@ -76,7 +82,10 @@ export function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
-  const [studentProfile, setStudentProfile] = useState<StudentOnboardingProfile>(initialStudentProfile)
+  const [studentProfile, setStudentProfile] = useState<StudentOnboardingProfile>(() => ({
+    ...initialStudentProfile,
+    preferredAnswerLanguage: initialAnswerLanguage,
+  }))
   const [parentProfile, setParentProfile] = useState<ParentOnboardingProfile>(initialParentProfile)
   const [tutorProfile, setTutorProfile] = useState<TutorOnboardingProfile>(initialTutorProfile)
   const [studentSubjects, setStudentSubjects] = useState(initialStudentProfile.subjectsNeedingHelp.join(', '))
