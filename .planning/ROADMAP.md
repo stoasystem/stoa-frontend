@@ -2,96 +2,113 @@
 
 ## Milestones
 
-- ✅ **v1.33 Phase 35: Practice Roadmap UI, Lesson Progression, and Challenge Journey Experience** - Phases 186-190 (shipped 2026-05-27)
-- ⏳ **v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening** - Phases 191-194 (in progress)
+- ✅ **v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening** - Phases 191-194 (shipped 2026-05-27)
+- ⏳ **v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization** - Phases 195-199 (planned)
 
 ## Phases
 
-- [x] **Phase 191: CI Failure Reproduction and ESLint Environment Fix** - Reproduce the GitHub Actions lint failure locally, fix the Node/browser ESLint boundary, and verify lint/build parity for the known failure.
-- [x] **Phase 192: Tooling, Script, and Workflow Drift Audit** - Audit npm scripts, GitHub Actions, TypeScript/Vite config, lockfile state, ignore rules, and generated artifacts for drift; fix low-risk issues that would cause repeat CI failures.
-- [x] **Phase 193: Local Quality Gate Verification and Targeted Smoke Checks** - Run the repository's core quality gates and targeted local smoke checks, record results, and classify any residual risks.
-- [x] **Phase 194: Documentation, Milestone Audit, and Handoff** - Update developer docs and planning state with the verified workflow, quality-gate expectations, and any intentionally deferred follow-ups.
+- [ ] **Phase 195: Student Profile Answer-Language UI and Contract Types** - Add supported answer-language preference to student profile/onboarding contracts and UI.
+- [ ] **Phase 196: Demo Backend Profile Persistence and API Contract** - Persist, validate, and return student answer-language preference through registration and profile endpoints.
+- [ ] **Phase 197: Learning Assistant Language Propagation and Fallback Behavior** - Pass saved student answer language into chat generation, prompt construction, and fallback responses.
+- [ ] **Phase 198: Multilingual Regression, Smoke Checks, and Safety Verification** - Verify language behavior, profile flows, internal-term safety, lint, and build.
+- [ ] **Phase 199: Documentation, Handoff, and Milestone Audit** - Document local verification, API contract, deferred scope, and milestone coverage.
 
 ## Phase Details
 
-### Phase 191: CI Failure Reproduction and ESLint Environment Fix
+### Phase 195: Student Profile Answer-Language UI and Contract Types
 
-**Goal**: The observed `Frontend CI / build` failure is reproduced locally and fixed at the tooling configuration boundary.
-**Depends on**: Phase 190
-**Requirements**: CI36-01, CI36-02, CONFIG36-01, CONFIG36-02, QA36-01
+**Goal**: Students can see, choose, and update the Learning Assistant answer language from the supported language set in frontend profile/onboarding surfaces.
+**Depends on**: Phase 194
+**Requirements**: PROF37-01, PROF37-02, PROF37-03, PROF37-04, API37-01
 **Success Criteria** (what must be TRUE):
-  1. The current CI command sequence is identified from `.github/workflows/frontend-ci.yml`.
-  2. The local lint failure is reproduced before fixing.
-  3. Node-executed scripts such as `scripts/vite.mjs` are linted with the correct Node globals.
-  4. Browser application source remains linted without weakening the general quality gate.
-  5. `npm run lint` and `npm run build` pass after the fix.
-**Plans**: 191-PLAN.md
+  1. `StudentProfile` and onboarding types expose a supported answer-language field.
+  2. Student profile displays the saved Learning Assistant answer language.
+  3. Student profile edit form lets students choose English, German, French, or Italian.
+  4. Student onboarding can provide an initial answer-language preference.
+  5. User-facing copy clearly distinguishes Learning Assistant answer language from the browser interface language.
+**Plans**: 195-PLAN.md
+**UI hint**: yes
+
+### Phase 196: Demo Backend Profile Persistence and API Contract
+
+**Goal**: The local/demo backend persists the answer-language preference and exposes it through stable student profile and registration contracts.
+**Depends on**: Phase 195
+**Requirements**: API37-02, API37-03, API37-04, API37-05, API37-06
+**Success Criteria** (what must be TRUE):
+  1. Demo backend student profile persistence includes a normalized supported answer-language value.
+  2. Existing local demo profiles remain readable with a safe default when no value exists.
+  3. Registration persists a student answer-language preference when provided.
+  4. `GET /students/me/profile` returns the saved preference.
+  5. `PATCH /students/me/profile` validates and persists supported language updates.
+**Plans**: 196-PLAN.md
 **UI hint**: no
 
-### Phase 192: Tooling, Script, and Workflow Drift Audit
+### Phase 197: Learning Assistant Language Propagation and Fallback Behavior
 
-**Goal**: The frontend toolchain is audited for configuration drift that could create more false CI failures or local/CI mismatch.
-**Depends on**: Phase 191
-**Requirements**: SCRIPT36-01, SCRIPT36-02, CONFIG36-03, CONFIG36-04, HYGIENE36-01, HYGIENE36-02
+**Goal**: New Learning Assistant responses use the saved student answer-language preference across the prompt, provider request, and template fallback paths.
+**Depends on**: Phase 196
+**Requirements**: CHAT37-01, CHAT37-02, CHAT37-03, CHAT37-04, CHAT37-05
 **Success Criteria** (what must be TRUE):
-  1. `package.json`, `package-lock.json`, npm scripts, and `.github/workflows/frontend-ci.yml` are checked for command and dependency consistency.
-  2. TypeScript, Vite, ESLint, Playwright, and Node script configuration boundaries are inspected.
-  3. `.gitignore` protects generated artifacts such as `node_modules/`, `dist/`, local env files, and test reports.
-  4. Any low-risk drift found during the audit is fixed.
-  5. Any risky or out-of-scope drift is documented instead of silently changed.
-**Plans**: 192-PLAN.md
+  1. Chat generation reads the saved profile answer language instead of hard-coding English.
+  2. `LearningAssistantRequest.language` receives a normalized supported language code.
+  3. Prompt text continues to include the requested response language.
+  4. Template fallback can respond naturally in English, German, French, and Italian for generic and safety-critical paths.
+  5. Frontend chat UI remains provider-agnostic and avoids internal model/provider/debug terms.
+**Plans**: 197-PLAN.md
 **UI hint**: no
 
-### Phase 193: Local Quality Gate Verification and Targeted Smoke Checks
+### Phase 198: Multilingual Regression, Smoke Checks, and Safety Verification
 
-**Goal**: The repaired workflow is validated through local commands that mirror CI and through targeted smoke checks for the affected developer surfaces.
-**Depends on**: Phase 192
-**Requirements**: QA36-01, QA36-02, QA36-03, QA36-04
+**Goal**: The profile-to-chat language flow is verified through targeted tests, browser checks, copy safety scans, and standard frontend quality gates.
+**Depends on**: Phase 197
+**Requirements**: QA37-01, QA37-02, QA37-03, QA37-04, QA37-05
 **Success Criteria** (what must be TRUE):
-  1. `npm run lint` passes.
-  2. `npm run build` passes.
-  3. Dependency-install parity is checked or explicitly explained if skipped.
-  4. Targeted smoke checks cover the scripts or routes most likely affected by configuration changes.
-  5. Verification evidence is recorded in phase or milestone artifacts.
-**Plans**: 193-PLAN.md
+  1. Python Learning Assistant tests cover English, German, French, and Italian requested answer languages.
+  2. Backend/profile smoke checks cover registration, profile read, profile update, and chat response language propagation.
+  3. Browser smoke checks cover the student profile answer-language control.
+  4. User-facing profile/chat copy is checked for high-risk internal terms.
+  5. `npm run lint` and `npm run build` pass.
+**Plans**: 198-PLAN.md
 **UI hint**: no
 
-### Phase 194: Documentation, Milestone Audit, and Handoff
+### Phase 199: Documentation, Handoff, and Milestone Audit
 
-**Goal**: Developers can understand why CI failed, what was fixed, which commands are authoritative, and what remains deferred.
-**Depends on**: Phase 193
-**Requirements**: DOC36-01, DOC36-02, DOC36-03, QA36-05
+**Goal**: Developers understand how to verify the answer-language feature locally, what API contract changed, and what remains deferred.
+**Depends on**: Phase 198
+**Requirements**: DOC37-01, DOC37-02, DOC37-03
 **Success Criteria** (what must be TRUE):
-  1. README or developer documentation reflects the current CI/local quality-gate workflow.
-  2. Planning artifacts summarize root cause, fix, verification, and deferred follow-ups.
-  3. Requirements traceability maps every v1.34 requirement to one phase.
-  4. Milestone audit confirms all v1.34 requirements are complete or explicitly deferred.
-  5. Repository status is clean except for intentional committed changes.
-**Plans**: 194-PLAN.md
+  1. README or developer docs explain local verification for student answer-language preference.
+  2. API/demo backend contract docs record the field name, supported values, and behavior boundary.
+  3. Handoff notes clarify production preference syncing, new languages, parent-managed preference, and historical-message translation are deferred.
+  4. Requirements traceability maps every v1.35 requirement to exactly one phase.
+  5. Milestone audit confirms planned coverage and next execution step.
+**Plans**: 199-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 191. CI Failure Reproduction and ESLint Environment Fix | 1/1 | Complete | 2026-05-27 |
-| 192. Tooling, Script, and Workflow Drift Audit | 1/1 | Complete | 2026-05-27 |
-| 193. Local Quality Gate Verification and Targeted Smoke Checks | 1/1 | Complete | 2026-05-27 |
-| 194. Documentation, Milestone Audit, and Handoff | 1/1 | Complete | 2026-05-27 |
+| 195. Student Profile Answer-Language UI and Contract Types | 0/1 | Not started | — |
+| 196. Demo Backend Profile Persistence and API Contract | 0/1 | Not started | — |
+| 197. Learning Assistant Language Propagation and Fallback Behavior | 0/1 | Not started | — |
+| 198. Multilingual Regression, Smoke Checks, and Safety Verification | 0/1 | Not started | — |
+| 199. Documentation, Handoff, and Milestone Audit | 0/1 | Not started | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 191 | 5 | CI36-01, CI36-02, CONFIG36-01, CONFIG36-02, QA36-01 |
-| 192 | 6 | SCRIPT36-01, SCRIPT36-02, CONFIG36-03, CONFIG36-04, HYGIENE36-01, HYGIENE36-02 |
-| 193 | 4 | QA36-01, QA36-02, QA36-03, QA36-04 |
-| 194 | 4 | DOC36-01, DOC36-02, DOC36-03, QA36-05 |
+| 195 | 5 | PROF37-01, PROF37-02, PROF37-03, PROF37-04, API37-01 |
+| 196 | 5 | API37-02, API37-03, API37-04, API37-05, API37-06 |
+| 197 | 5 | CHAT37-01, CHAT37-02, CHAT37-03, CHAT37-04, CHAT37-05 |
+| 198 | 5 | QA37-01, QA37-02, QA37-03, QA37-04, QA37-05 |
+| 199 | 3 | DOC37-01, DOC37-02, DOC37-03 |
 
-**Total requirements:** 18
-**Mapped requirements:** 18
+**Total requirements:** 23
+**Mapped requirements:** 23
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Phase 191 should reproduce and fix the CI lint failure before broader workflow audit work continues.
+Phase 195 should add the student profile/onboarding answer-language UI and typed contract before backend persistence and Learning Assistant propagation work begins.

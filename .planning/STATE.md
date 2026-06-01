@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-06-01T21:04:20.564Z"
 last_activity: 2026-06-01
 progress:
-  total_phases: 0
+  total_phases: 5
   completed_phases: 0
-  total_plans: 0
+  total_plans: 5
   completed_plans: 0
   percent: 0
 ---
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-27)
+See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Planning the next milestone after the shipped v1.34 engineering quality milestone.
+**Current focus:** v1.35 plans student answer-language preference for Learning Assistant responses.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 195 — Student Profile Answer-Language UI and Contract Types
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-01 — Milestone v1.35 started
+Status: Roadmap ready
+Last activity: 2026-06-01 — Milestone v1.35 roadmap created
 
 ## Performance Metrics
 
