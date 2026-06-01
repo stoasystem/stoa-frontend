@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.4
 milestone_name: UI Copy & Web Design Refinement
 status: planning
-last_updated: "2026-06-01T23:46:12.317Z"
-last_activity: 2026-06-01
+last_updated: "2026-06-02T00:00:00.000Z"
+last_activity: 2026-06-02
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 6
   completed_plans: 0
   percent: 0
 ---
@@ -20,39 +20,38 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-02)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.3 Live Classroom & Video Help UI Foundation is complete and verified. Next work should start through a fresh GSD milestone.
+**Current focus:** Milestone v2.4 UI Copy & Web Design Refinement has requirements and roadmap ready; autonomous execution starts from Phase 219.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 219 Student Dashboard Learning Hierarchy and CTA Taxonomy
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-01 — Milestone v2.4 started
+Status: Roadmap created; autonomous execution starting
+Last activity: 2026-06-02 — Milestone v2.4 requirements and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 7 of 7
-- Average duration: same-day autonomous execution
-- Total execution time: same-day milestone execution
+- Total plans completed this milestone: 0 of 6
+- Average duration: —
+- Total execution time: planning
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 212 | 1/1 | Complete | 2026-06-02 |
-| 213 | 1/1 | Complete | 2026-06-02 |
-| 214 | 1/1 | Complete | 2026-06-02 |
-| 215 | 1/1 | Complete | 2026-06-02 |
-| 216 | 1/1 | Complete | 2026-06-02 |
-| 217 | 1/1 | Complete | 2026-06-02 |
-| 218 | 1/1 | Complete | 2026-06-02 |
+| 219 | 0/1 | Pending | — |
+| 220 | 0/1 | Pending | — |
+| 221 | 0/1 | Pending | — |
+| 222 | 0/1 | Pending | — |
+| 223 | 0/1 | Pending | — |
+| 224 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 7 planned phases: 212, 213, 214, 215, 216, 217, 218
-- Trend: v2.3 completed provider-neutral live classroom contracts, student scheduling, lobby/room UI, Chat escalation, tutor flow, parent/session continuity, and localization/QA closure.
+- Last 6 planned phases: 219, 220, 221, 222, 223, 224
+- Trend: v2.4 is planned around UI copy, learning hierarchy, Practice Library positioning, upload trust wording, classroom learning context, tutor/parent clarity, shared states, i18n, accessibility, and E2E closure.
 
 *Updated after each plan completion*
 

@@ -2,151 +2,134 @@
 
 ## Milestones
 
-- ✅ **v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening** - Phases 191-194 (shipped 2026-05-27)
 - ✅ **v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization** - Phases 195-199 (shipped 2026-06-01)
 - ✅ **v2.1 Question Bank UI Design** - Phases 200-205 (shipped 2026-06-02)
 - ✅ **v2.2 Photo & File Upload UI Foundation** - Phases 206-211 (shipped 2026-06-02)
 - ✅ **v2.3 Live Classroom & Video Help UI Foundation** - Phases 212-218 (shipped 2026-06-02)
+- ◆ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (planning)
 
 ## Phases
 
-- [x] **Phase 212: Live Classroom Domain Model, Mock Services, and Hooks Foundation** - Create the provider-neutral live classroom feature module with typed session contracts, deterministic mock data, service boundaries, query hooks, and room-state hooks.
-- [x] **Phase 213: Student Classroom Entry, Dashboard Card, and Scheduling Flow** - Add student classroom routes, Dashboard entry, classroom home, schedule form, mock success state, and v2.2 upload-material reuse.
-- [x] **Phase 214: Student Lobby, Classroom Room Shell, Controls, and Learning Workspace** - Build the student lobby and Zoom-like education room UI with video placeholders, learning workspace, side panels, materials, notes, participants, controls, responsive layout, and summary entry.
-- [x] **Phase 215: Learning Chat Teacher-Text to Video Classroom Escalation** - Extend Chat support state so teacher text help can escalate into a mock live classroom lobby with conversation/material context and clear AI-observing copy.
-- [x] **Phase 216: Tutor Classroom Queue, Lobby, Room, and Notes Flow** - Add tutor-facing queue, context review lobby, tutor room controls, note saving, recommendations, and session-ending behavior.
-- [x] **Phase 217: Parent Classroom Visibility, Session Summary, and Learning Continuity** - Add lightweight parent classroom visibility plus classroom summary content and next-step links back to Chat, Practice, and Question Bank.
-- [x] **Phase 218: Live Classroom Localization, Accessibility, Responsive QA, Docs, and E2E** - Add four-language live classroom copy, accessibility/responsive hardening, product-boundary docs, Playwright coverage, lint/build verification, and final handoff.
+- [ ] **Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy** - Reorganize the student dashboard and navigation labels so the learning journey has a clear priority order and consistent action language.
+- [ ] **Phase 220: Practice Library Naming, Structure, Session, Result, and Mistakes Refinement** - Polish Question Bank student-facing copy into Practice Library and refine practice set, session, result, and mistakes review experiences.
+- [ ] **Phase 221: Upload a Question and Chat Tutor Support Copy Refinement** - Polish upload trust wording, attachment states, Chat teacher-support states, and Start Live Classroom escalation copy.
+- [ ] **Phase 222: Online Classroom Learning Context and Summary Refinement** - Refine classroom home, schedule, lobby, room, controls, materials, and summary surfaces around learning context and next steps.
+- [ ] **Phase 223: Tutor Context and Parent Learning Support Refinement** - Strengthen tutor queue/lobby/room context and parent dashboard learning-support visibility without adding new management capabilities.
+- [ ] **Phase 224: Shared States, I18n, Accessibility, E2E, and Handoff Closure** - Consolidate shared empty/error/context/next-step patterns, i18n, high-risk copy audit, accessibility checks, E2E coverage, docs, and final verification.
 
 ## Phase Details
 
-### Phase 212: Live Classroom Domain Model, Mock Services, and Hooks Foundation
+### Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy
 
-**Goal**: Developers have a clean, provider-neutral live classroom foundation that supports student, tutor, parent, and Chat escalation flows without adding real video SDK dependencies.
-**Depends on**: Phase 211
-**Requirements**: LCF-01, LCF-02, LCF-03, LCF-04, LCF-05, LCF-06
-**Success Criteria** (what must be TRUE):
-  1. `src/features/live-classroom/` exists with typed classroom contracts, mock data, services, hooks, and utilities.
-  2. Mock data covers scheduled, instant, active, completed, tutor queue, participants, messages, materials, and notes.
-  3. Services expose async mock boundaries for home, schedule, instant help, session lookup, join/leave/complete, tutor queue, and note saving.
-  4. Hooks expose typed data and room UI state without real WebRTC, device stream, or video SDK calls.
-  5. Future video-provider adapter boundaries are documented in code/docs without being implemented.
-**Plans**: 212-PLAN.md
-**UI hint**: no
-
-### Phase 213: Student Classroom Entry, Dashboard Card, and Scheduling Flow
-
-**Goal**: Students can discover live classroom support from Dashboard, open the classroom home, schedule a mock session, and attach learning material through existing upload UI.
-**Depends on**: Phase 212
-**Requirements**: LCS-01, LCS-02, LCS-03, LCS-04, LCS-05, LCS-06
-**Success Criteria** (what must be TRUE):
-  1. Student Dashboard includes an Online Classroom card with next-session or schedule/instant-help actions.
-  2. `/classroom` shows upcoming sessions, instant help guidance, schedule entry, and recent sessions.
-  3. `/classroom/schedule` supports subject, topic, level, language, session type, time slot, and tutor context selection.
-  4. Scheduling can reuse v2.2 upload components for materials.
-  5. Schedule submission shows a mock scheduled-success state with classroom home and lobby actions.
-**Plans**: 213-PLAN.md
+**Goal**: Students can open Dashboard and immediately understand the next learning action, practice options, help options, live support, and recent activity without seeing an undifferentiated feature grid.
+**Depends on**: Phase 218
+**Requirements**: LEH-01, LEH-02, LEH-03, LEH-04, LEH-05, LEH-06, LEH-07, LEH-08
+**Success Criteria**:
+  1. Student Dashboard is organized into Continue Learning, Today's Practice, Need Help, Live Support, and Recent Activity sections.
+  2. Dashboard has one visually dominant primary learning action and secondary cards do not compete equally.
+  3. Student-facing navigation and dashboard labels use Practice Library instead of Question Bank.
+  4. Mobile Dashboard order prioritizes Continue Learning and Need Help before secondary practice/live-support sections.
+  5. CTA naming follows the v2.4 approved vocabulary for core learning actions.
+**Plans**: 219-PLAN.md
 **UI hint**: yes
 
-### Phase 214: Student Lobby, Classroom Room Shell, Controls, and Learning Workspace
+### Phase 220: Practice Library Naming, Structure, Session, Result, and Mistakes Refinement
 
-**Goal**: Students can prepare in a lobby, enter a credible learning-specific classroom room, use controls and side panels, and reach a summary.
-**Depends on**: Phase 213
-**Requirements**: LCR-01, LCR-02, LCR-03, LCR-04, LCR-05, LCR-06, LCR-07, LCR-08, LCR-09, LCR-10, LCR-11, LCR-12, LCR-13, LCR-14, LCR-15, LCR-16
-**Success Criteria** (what must be TRUE):
-  1. `/classroom/sessions/:sessionId/lobby` shows session, tutor, device check, context, materials, readiness, and join/wait/unavailable states.
-  2. Students can join the room from an available lobby.
-  3. Room desktop layout contains top bar, video tiles, learning workspace, side panel, and bottom controls.
-  4. Room mobile layout avoids a squeezed right panel and uses a narrow-screen panel pattern.
-  5. Video tiles are honest mock placeholders; controls and dialogs have correct student/tutor semantics.
-  6. Chat, Materials, Notes, and Participants panels work with keyboard-reachable controls.
-**Plans**: 214-PLAN.md
+**Goal**: Practice Library reads as a calm open practice resource, while question sets, sessions, results, and mistakes review guide students without punitive or exam-heavy language.
+**Depends on**: Phase 219
+**Requirements**: PLR-01, PLR-02, PLR-03, PLR-04, PLR-05, PLR-06, PLR-07, PLR-08, PLR-09, PLR-10, PLR-11
+**Success Criteria**:
+  1. `/question-bank` student-facing title and key labels read as Practice Library with clear subtitle.
+  2. Practice Library home prioritizes Continue Practice, Find Exercises, Recommended, Review & Improve, and All Subjects.
+  3. Question set cards show concise learning metadata and state-aware Start/Resume/Practice Again/Review Mistakes actions.
+  4. Question session feedback and result copy avoids punitive terms and guides students toward next steps.
+  5. Mistakes review empty and populated states are supportive and include clear actions.
+**Plans**: 220-PLAN.md
 **UI hint**: yes
 
-### Phase 215: Learning Chat Teacher-Text to Video Classroom Escalation
+### Phase 221: Upload a Question and Chat Tutor Support Copy Refinement
 
-**Goal**: Learning Chat can move from teacher text support into a mock video classroom while preserving context and keeping AI/tutor roles clear.
-**Depends on**: Phase 214
-**Requirements**: LCCHAT-01, LCCHAT-02, LCCHAT-03, LCCHAT-04, LCCHAT-05, LCCHAT-06, LCCHAT-07
-**Success Criteria** (what must be TRUE):
-  1. Chat support state includes teacher text and video escalation states.
-  2. Chat waiting and tutor-active states use clear copy.
-  3. When tutor text help is active, Chat can start a live classroom.
-  4. Starting video help creates a mock instant classroom session with conversation/material context.
-  5. Chat navigates to the classroom lobby with source context and avoids AI-in-classroom behavior.
-**Plans**: 215-PLAN.md
+**Goal**: Upload and Chat support copy is trustworthy: students know uploads provide learning context, tutor support is the next escalation, and live classroom starts only when deeper synchronous help is useful.
+**Depends on**: Phase 220
+**Requirements**: UCT-01, UCT-02, UCT-03, UCT-04, UCT-05, UCT-06, UCT-07, UCT-08, UCT-09, UCT-10
+**Success Criteria**:
+  1. Upload UI consistently uses Upload a Question, Take Photo, Attach File/PDF, and Ask Learning Assistant.
+  2. Upload modal and inline upload states show supported formats, size, privacy note, attached files, and recoverable errors.
+  3. Chat attachment display avoids image-reading or solved-problem claims.
+  4. Teacher support states read as Tutor support requested, Tutor joined, Learning Assistant observing, and Start Live Classroom.
+  5. High-risk upload/chat terms such as Photo Solver, instant solve, AI teacher, and human fallback are absent from user-facing UI.
+**Plans**: 221-PLAN.md
 **UI hint**: yes
 
-### Phase 216: Tutor Classroom Queue, Lobby, Room, and Notes Flow
+### Phase 222: Online Classroom Learning Context and Summary Refinement
 
-**Goal**: Tutors can see classroom work, review student context, join a room, use tutor-specific controls, and save mock notes/recommendations.
-**Depends on**: Phase 215
-**Requirements**: LCTUTOR-01, LCTUTOR-02, LCTUTOR-03, LCTUTOR-04, LCTUTOR-05, LCTUTOR-06
-**Success Criteria** (what must be TRUE):
-  1. `/tutor/classroom` shows scheduled sessions, instant requests, and completed sessions.
-  2. Tutor queue cards include time, student, topic, source, waiting/status, and join/review actions.
-  3. Tutor lobby shows student profile, level, language, topic, source, summary, materials, and recommended focus.
-  4. Tutor room shares the classroom shell and adds tutor-specific actions.
-  5. Tutor notes/recommendations save in mock state and appear in the summary.
-**Plans**: 216-PLAN.md
+**Goal**: Online Classroom feels like learning support with context, materials, and next steps, not a generic meeting shell.
+**Depends on**: Phase 221
+**Requirements**: OCR-01, OCR-02, OCR-03, OCR-04, OCR-05, OCR-06, OCR-07, OCR-08, OCR-09, OCR-10, OCR-11, OCR-12
+**Success Criteria**:
+  1. Classroom home explains the AI-first, tutor-text-second, live-classroom-third support ladder.
+  2. Schedule and lobby pages foreground subject, topic, tutor, language, source, materials, and before-join state.
+  3. Room defaults to learning context with Shared Problem, Materials, Notes, Participants, and honest video placeholders.
+  4. Control labels use the approved classroom vocabulary and avoid technical/provider-specific terms.
+  5. Classroom summary focuses on What we reviewed, Materials, Recommended next steps, and Back to Dashboard.
+**Plans**: 222-PLAN.md
 **UI hint**: yes
 
-### Phase 217: Parent Classroom Visibility, Session Summary, and Learning Continuity
+### Phase 223: Tutor Context and Parent Learning Support Refinement
 
-**Goal**: Classroom activity remains visible after the session through summary and lightweight parent surfaces without adding parent management or observer features.
-**Depends on**: Phase 216
-**Requirements**: LCPAR-01, LCPAR-02, LCPAR-03, LCPAR-04
-**Success Criteria** (what must be TRUE):
-  1. Parent dashboard or parent classroom surface shows lightweight upcoming/recent classroom information.
-  2. Classroom summary shows topic, tutor, materials, notes, key points, and next steps.
-  3. Summary actions can return students to Chat, Practice, or Question Bank.
-  4. Parent-facing copy avoids observer, recording, attendance-control, or live-monitoring claims.
-**Plans**: 217-PLAN.md
+**Goal**: Tutors see enough student context before acting, and parents understand STOA's learning support system without receiving student-only controls.
+**Depends on**: Phase 222
+**Requirements**: TPC-01, TPC-02, TPC-03, TPC-04, TPC-05, TPC-06, TPC-07, TPC-08
+**Success Criteria**:
+  1. Tutor queue cards expose student need, source, waiting/status, context, materials, and clear actions.
+  2. Tutor lobby exposes student, level, language, topic, why help is needed, attached materials, and suggested focus.
+  3. Tutor room defaults toward notes-oriented work and keeps Save Notes / End Session semantics clear.
+  4. Parent Dashboard includes lightweight Learning Support visibility across practice, upload, tutor support, and classroom.
+  5. Parent copy avoids observer, recording, attendance, and classroom-control claims.
+**Plans**: 223-PLAN.md
 **UI hint**: yes
 
-### Phase 218: Live Classroom Localization, Accessibility, Responsive QA, Docs, and E2E
+### Phase 224: Shared States, I18n, Accessibility, E2E, and Handoff Closure
 
-**Goal**: Live classroom UI is localized, accessible, product-safe, responsive, documented, and verified through standard frontend gates and E2E coverage.
-**Depends on**: Phase 217
-**Requirements**: LCQA-01, LCQA-02, LCQA-03, LCQA-04, LCQA-05, LCQA-06, LCQA-07, LCQA-08, LCQA-09, LCQA-10, LCQA-11
-**Success Criteria** (what must be TRUE):
-  1. English, German, French, and Italian `liveClassroom` copy covers the main classroom flows and accessibility labels.
-  2. Copy avoids unsupported real-video, provider, AI teacher, recording, screen-share, and billing claims.
-  3. Controls, tabs, dialogs, mobile panels, and status updates meet accessibility requirements.
-  4. Responsive checks cover classroom home, schedule, lobby, room, tutor queue, and summary.
-  5. Playwright tests cover dashboard card, classroom home, scheduling, lobby, room controls/panels, Chat escalation, tutor queue/room, and summary.
+**Goal**: The v2.4 refinement is consistent, localized, accessible, documented, and verified through targeted E2E plus lint/build.
+**Depends on**: Phase 223
+**Requirements**: SQA-01, SQA-02, SQA-03, SQA-04, SQA-05, SQA-06, SQA-07, SQA-08, SQA-09, SQA-10, SQA-11, SQA-12, SQA-13, SQA-14, SQA-15
+**Success Criteria**:
+  1. Shared empty/error/context/next-step/status patterns are reused or extended without duplicating local card styles unnecessarily.
+  2. Refined copy is represented in i18n keys across affected namespaces where practical, with DE/FR/IT initial copy and native-review notes where needed.
+  3. High-risk user-facing terms are audited and removed or justified.
+  4. Touched pages keep unique h1s, accessible controls, recoverable errors, and non-color-only states.
+  5. Playwright verifies Student Dashboard clarity, Practice Library naming, Upload trust wording, Chat-to-classroom wording, Classroom layout, and key empty/error states.
   6. `npm run lint` and `npm run build` pass.
-**Plans**: 218-PLAN.md
+**Plans**: 224-PLAN.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 212. Live Classroom Domain Model, Mock Services, and Hooks Foundation | 1/1 | Complete | 2026-06-02 |
-| 213. Student Classroom Entry, Dashboard Card, and Scheduling Flow | 1/1 | Complete | 2026-06-02 |
-| 214. Student Lobby, Classroom Room Shell, Controls, and Learning Workspace | 1/1 | Complete | 2026-06-02 |
-| 215. Learning Chat Teacher-Text to Video Classroom Escalation | 1/1 | Complete | 2026-06-02 |
-| 216. Tutor Classroom Queue, Lobby, Room, and Notes Flow | 1/1 | Complete | 2026-06-02 |
-| 217. Parent Classroom Visibility, Session Summary, and Learning Continuity | 1/1 | Complete | 2026-06-02 |
-| 218. Live Classroom Localization, Accessibility, Responsive QA, Docs, and E2E | 1/1 | Complete | 2026-06-02 |
+| 219. Student Dashboard Learning Hierarchy and CTA Taxonomy | 0/1 | Pending | — |
+| 220. Practice Library Naming, Structure, Session, Result, and Mistakes Refinement | 0/1 | Pending | — |
+| 221. Upload a Question and Chat Tutor Support Copy Refinement | 0/1 | Pending | — |
+| 222. Online Classroom Learning Context and Summary Refinement | 0/1 | Pending | — |
+| 223. Tutor Context and Parent Learning Support Refinement | 0/1 | Pending | — |
+| 224. Shared States, I18n, Accessibility, E2E, and Handoff Closure | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 212 | 6 | LCF-01, LCF-02, LCF-03, LCF-04, LCF-05, LCF-06 |
-| 213 | 6 | LCS-01, LCS-02, LCS-03, LCS-04, LCS-05, LCS-06 |
-| 214 | 16 | LCR-01, LCR-02, LCR-03, LCR-04, LCR-05, LCR-06, LCR-07, LCR-08, LCR-09, LCR-10, LCR-11, LCR-12, LCR-13, LCR-14, LCR-15, LCR-16 |
-| 215 | 7 | LCCHAT-01, LCCHAT-02, LCCHAT-03, LCCHAT-04, LCCHAT-05, LCCHAT-06, LCCHAT-07 |
-| 216 | 6 | LCTUTOR-01, LCTUTOR-02, LCTUTOR-03, LCTUTOR-04, LCTUTOR-05, LCTUTOR-06 |
-| 217 | 4 | LCPAR-01, LCPAR-02, LCPAR-03, LCPAR-04 |
-| 218 | 11 | LCQA-01, LCQA-02, LCQA-03, LCQA-04, LCQA-05, LCQA-06, LCQA-07, LCQA-08, LCQA-09, LCQA-10, LCQA-11 |
+| 219 | 8 | LEH-01, LEH-02, LEH-03, LEH-04, LEH-05, LEH-06, LEH-07, LEH-08 |
+| 220 | 11 | PLR-01, PLR-02, PLR-03, PLR-04, PLR-05, PLR-06, PLR-07, PLR-08, PLR-09, PLR-10, PLR-11 |
+| 221 | 10 | UCT-01, UCT-02, UCT-03, UCT-04, UCT-05, UCT-06, UCT-07, UCT-08, UCT-09, UCT-10 |
+| 222 | 12 | OCR-01, OCR-02, OCR-03, OCR-04, OCR-05, OCR-06, OCR-07, OCR-08, OCR-09, OCR-10, OCR-11, OCR-12 |
+| 223 | 8 | TPC-01, TPC-02, TPC-03, TPC-04, TPC-05, TPC-06, TPC-07, TPC-08 |
+| 224 | 15 | SQA-01, SQA-02, SQA-03, SQA-04, SQA-05, SQA-06, SQA-07, SQA-08, SQA-09, SQA-10, SQA-11, SQA-12, SQA-13, SQA-14, SQA-15 |
 
-**Total requirements:** 56
-**Mapped requirements:** 56
+**Total requirements:** 64
+**Mapped requirements:** 64
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Milestone v2.3 is complete. Next milestone should start from a fresh research-backed scope.
+**Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy** — Reorganize the student dashboard and navigation labels so the learning journey has a clear priority order and consistent action language.
