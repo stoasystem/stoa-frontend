@@ -24,12 +24,18 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Practice Path schoolwork upload entry that supports Learning Assistant handoff without displacing guided roadmap/lesson flow.
 - Four-language `uploads` localization, accessibility checks, Playwright upload smoke tests, README/docs handoff, and lint/build verification.
 
-## Current Milestone: Not selected
+## Current Milestone: v2.3 Live Classroom & Video Help UI Foundation
 
-**Goal:** Select the next milestone from product priorities. Future upload backend/OCR/storage work remains deferred until explicitly scoped.
+**Goal:** Establish the frontend UI foundation for online classroom and live video help so students can schedule or join mock classroom sessions from Dashboard and escalate from Learning Chat teacher text help into a Zoom-like classroom experience.
 
 **Target features:**
-- No active milestone features are currently approved.
+- Add `src/features/live-classroom/` with typed classroom models, mock data, services, hooks, shared components, and page-level UI.
+- Add student classroom routes for home, scheduling, lobby, room, and summary.
+- Add tutor classroom routes for queue, lobby, room, and summary-oriented context review.
+- Add Student Dashboard Online Classroom entry for upcoming sessions, scheduling, and instant-help routing.
+- Add Learning Chat teacher-text-to-video escalation that creates a mock classroom session and opens the lobby with context.
+- Build a Zoom-like classroom room adapted for learning: video placeholders, learning workspace, shared problem/whiteboard placeholder, side panels, materials, notes, participants, and bottom controls.
+- Reuse v2.2 upload components for classroom materials, add four-language `liveClassroom` localization, document future video-provider handoff, and add Playwright smoke coverage.
 
 ## Current State
 
@@ -119,7 +125,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Next milestone not selected.
+- Students can schedule and enter mock online classroom sessions from Dashboard and classroom routes — v2.3
+- Students can escalate from Learning Chat teacher text help into a mock live video classroom lobby with conversation/material context — v2.3
+- Tutors can view a mock classroom queue and enter tutor lobby/room flows with student context — v2.3
+- Classroom room UI must feel like an education-specific live classroom, not a generic meeting clone: video placeholders, learning workspace, materials, notes, chat, participants, and controls are all required — v2.3
+- v2.3 must remain frontend/mock-only and must not claim real WebRTC, real video provider integration, real scheduling backend, real billing, recording, screen share, or production whiteboard support — v2.3
 
 ### Out of Scope
 
@@ -180,6 +190,8 @@ The project brief for Phase 37 was provided in Chinese and defines student-level
 The project brief for v2.1 was provided in Chinese and defines Question Bank UI Design. Question Bank is an open, flexible exercise library for browsing and practicing question sets by subject, grade, topic, difficulty, question type, and review status. It complements the existing Practice Path, which remains the guided learning roadmap with lesson progression. v2.1 should deliver student-facing Question Bank routes, demo/mock data, local search/filter behavior, question-set overview, answer session, feedback, result, mistakes review, and clear Learning Assistant handoff. It should not build a production question-bank backend, AI-generated questions, image recognition, video help, live teacher joining, complex exam mode, production permissions, paid unlocking, or formal curriculum-standard mapping.
 
 The project brief for v2.2 was provided in Chinese and defines Photo & File Upload UI Foundation. The milestone should make upload a learning-task entry point: students can bring a real worksheet, handwritten problem, screenshot, or PDF into STOA and ask the Learning Assistant for step-by-step help. v2.2 should unify upload components across Chat, Question Bank, and Practice Path; support preview, validation, status, remove, retry, mobile camera capture, desktop drag-and-drop, and four-language copy; and preserve a clear frontend/demo boundary. It should not build production object storage, real OCR, image recognition, handwriting/formula recognition, AI auto-solving, teacher grading, parent file review, admin file moderation, video help, or complex document management.
+
+The project brief for v2.3 was provided in Chinese and defines Live Classroom & Video Help UI Foundation. The milestone should add an education-specific online classroom UI, not a generic meeting product: students can see and schedule upcoming classroom sessions, join a lobby, enter a Zoom-like classroom room, review a summary, and escalate from Learning Chat teacher text help into mock live video help. Tutors can see a classroom queue, review student context, and join tutor room flows. The implementation should be frontend UI plus mock/demo data flow only, with structure reserved for future WebRTC/video provider, scheduling backend, whiteboard, recording, billing, and admin operations work.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -424,6 +436,9 @@ Current codebase facts:
 | Keep uploads context-bound, not library-style | Research shows the strongest fit is tutor/chat or assignment-context upload, so STOA uploads should attach to Chat, Question Bank questions, or Practice schoolwork help rather than become a storage product | v2.2 Complete |
 | Reuse a shared upload module | The repo already has Chat upload behavior; v2.2 should consolidate validation, preview, status, and retry into `src/features/uploads/` instead of adding separate page-specific implementations | v2.2 Complete |
 | Avoid OCR and instant-solve claims | Camera-solver competitors emphasize recognition, but v2.2 only proves the upload UX and Learning Assistant handoff, so copy must not overpromise unimplemented image understanding | v2.2 Complete |
+| Make classroom learning-specific | v2.3 should adapt video-room patterns around tutoring context, shared problems, materials, notes, and next steps instead of cloning a generic meeting room | — Pending |
+| Keep video provider work deferred | The milestone validates UI and flow before choosing WebRTC, Daily, Twilio, Agora, Zoom SDK, LiveKit, or any other real-time media stack | — Pending |
+| Preserve the support ladder | Learning Chat should remain the first help surface, tutor text help is the next escalation, and live video classroom should appear when deeper synchronous support is needed | — Pending |
 
 ## Evolution
 
@@ -443,4 +458,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.2 milestone completion*
+*Last updated: 2026-06-02 after v2.3 milestone start*
