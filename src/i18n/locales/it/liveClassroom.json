@@ -1,0 +1,69 @@
+{
+  "home": {
+    "title": "Classe online",
+    "subtitle": "Supporto dal vivo quando serve un aiuto piu approfondito.",
+    "scheduleSession": "Programma una sessione",
+    "requestInstantHelp": "Richiedi aiuto",
+    "joinLobby": "Apri la lobby"
+  },
+  "schedule": {
+    "title": "Programma una sessione",
+    "subtitle": "Scegli materia, argomento e orario.",
+    "contextLabel": "Che cosa dovrebbe sapere il tutor?",
+    "attachMaterials": "Allega materiali",
+    "success": "Sessione programmata"
+  },
+  "lobby": {
+    "title": "Lobby della classe",
+    "beforeYouJoin": "Prima di entrare",
+    "sessionContext": "Contesto della sessione",
+    "joinClassroom": "Entra in classe",
+    "waitingForTutor": "In attesa del tutor",
+    "notRealVideo": "Questa e una lobby dimostrativa. La vera connessione video sara aggiunta piu avanti."
+  },
+  "room": {
+    "chat": "Chat",
+    "materials": "Materiali",
+    "notes": "Note",
+    "participants": "Partecipanti",
+    "sharedProblem": "Problema condiviso",
+    "whiteboard": "Lavagna",
+    "mockRoom": "Classe dimostrativa"
+  },
+  "summary": {
+    "title": "Riepilogo della sessione",
+    "keyExplanation": "Spiegazione chiave",
+    "nextSteps": "Prossimi passi"
+  },
+  "tutor": {
+    "queueTitle": "Coda classroom",
+    "startingSoon": "Inizia a breve",
+    "instantRequests": "Richieste video immediate",
+    "completedToday": "Completate oggi"
+  },
+  "controls": {
+    "mute": "Disattiva audio",
+    "unmute": "Attiva audio",
+    "startVideo": "Avvia video",
+    "stopVideo": "Ferma video",
+    "shareMaterial": "Condividi materiale",
+    "leave": "Esci",
+    "endSession": "Termina sessione"
+  },
+  "status": {
+    "ready": "Pronto per entrare",
+    "waiting": "In attesa del tutor",
+    "completed": "Classe terminata",
+    "connecting": "Connessione alla classe"
+  },
+  "actions": {
+    "back": "Indietro",
+    "openLobby": "Apri lobby",
+    "viewSummary": "Vedi riepilogo",
+    "backToChat": "Torna al Learning Chat"
+  },
+  "errors": {
+    "loadFailed": "Non e stato possibile caricare questa classe.",
+    "lobbyFailed": "Non e stato possibile aprire questa lobby."
+  }
+}

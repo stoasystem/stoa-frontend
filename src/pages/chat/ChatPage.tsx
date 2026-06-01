@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Video } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ChatHeader } from '@/components/chat/ChatHeader'
@@ -13,6 +14,7 @@ import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { AttachmentPreviewList } from '@/features/uploads/components/AttachmentPreviewList'
+import { useInstantVideoHelp } from '@/features/live-classroom/hooks/useInstantVideoHelp'
 import { uploadAttachmentToUploadedFile } from '@/features/uploads/utils/uploadAdapters'
 import {
   clearUploadHandoff,
@@ -32,6 +34,14 @@ import type { PracticeChatLocationState } from '@/types/practice'
 import type { QuestionBankChatLocationState } from '@/types/questionBank'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
+type TeacherSupportStage =
+  | 'idle'
+  | 'teacher_text_requested'
+  | 'teacher_text_active'
+  | 'video_requested'
+  | 'video_lobby_ready'
+  | 'video_completed'
+
 export function ChatPage() {
   const { t } = useTranslation('chat')
   const location = useLocation()
@@ -40,6 +50,7 @@ export function ChatPage() {
   const [sendError, setSendError] = useState<string | null>(null)
   const [teacherHelpRequest, setTeacherHelpRequest] = useState<TeacherHelpRequest | null>(null)
   const [teacherHelpError, setTeacherHelpError] = useState<string | null>(null)
+  const [teacherSupportStage, setTeacherSupportStage] = useState<TeacherSupportStage>('idle')
   const [newConversationMessage, setNewConversationMessage] = useState('')
   const [queuedInitialMessage, setQueuedInitialMessage] = useState<{
     conversationId: string
@@ -73,6 +84,7 @@ export function ChatPage() {
   const conversationQuery = useConversationQuery(activeConversationId)
   const createConversationMutation = useCreateConversationMutation()
   const teacherHelpMutation = useTeacherHelpMutation()
+  const instantVideoHelpMutation = useInstantVideoHelp()
   const teacherHelpStatusQuery = useTeacherHelpStatusQuery(teacherHelpRequest?.requestId ?? null)
   const {
     localMessages,
@@ -106,6 +118,7 @@ export function ChatPage() {
   useEffect(() => {
     setTeacherHelpRequest(null)
     setTeacherHelpError(null)
+    setTeacherSupportStage('idle')
   }, [activeConversationId])
 
   const displayedMessages = useMemo(() => {
@@ -165,6 +178,7 @@ export function ChatPage() {
           }
           setTeacherHelpRequest(null)
           setTeacherHelpError(null)
+          setTeacherSupportStage('idle')
         },
       },
     )
@@ -174,6 +188,7 @@ export function ChatPage() {
     setActiveConversationId(null)
     setTeacherHelpRequest(null)
     setTeacherHelpError(null)
+    setTeacherSupportStage('idle')
     setSendError(null)
   }
 
@@ -207,9 +222,38 @@ export function ChatPage() {
       {
         onSuccess: (request) => {
           setTeacherHelpRequest(request)
+          setTeacherSupportStage('teacher_text_requested')
         },
         onError: (error) => {
           setTeacherHelpError(toUserFacingError(error, t('teacher.failed')))
+        },
+      },
+    )
+  }
+
+  function handleTeacherTextActive() {
+    setTeacherSupportStage('teacher_text_active')
+  }
+
+  function handleStartVideoClassroom() {
+    if (!activeConversationId || instantVideoHelpMutation.isPending) return
+
+    setTeacherSupportStage('video_requested')
+    instantVideoHelpMutation.mutate(
+      {
+        source: 'teacher_text_help',
+        conversationId: activeConversationId,
+        topicLabel: conversationQuery.data?.subject ?? 'Current question',
+        summary: 'The student requested live video help after tutor text support.',
+      },
+      {
+        onSuccess: (session) => {
+          setTeacherSupportStage('video_lobby_ready')
+          navigate(`/classroom/sessions/${session.id}/lobby?source=chat`)
+        },
+        onError: () => {
+          setTeacherSupportStage('teacher_text_active')
+          setTeacherHelpError('We could not prepare the classroom lobby. Please try again.')
         },
       },
     )
@@ -362,6 +406,15 @@ export function ChatPage() {
                   : null)
               }
             />
+            {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
+              <TeacherVideoEscalationCard
+                stage={teacherSupportStage}
+                teacherName={teacherHelpRequest?.teacherName ?? 'STOA tutor'}
+                isStartingVideo={instantVideoHelpMutation.isPending}
+                onTeacherTextActive={handleTeacherTextActive}
+                onStartVideo={handleStartVideoClassroom}
+              />
+            )}
             {sendError && (
               <div className="px-4 pb-3 md:px-6">
                 <div className="mx-auto max-w-3xl text-xs text-destructive" role="alert">
@@ -380,6 +433,55 @@ export function ChatPage() {
         )}
       </main>
     </div>
+  )
+}
+
+function TeacherVideoEscalationCard({
+  stage,
+  teacherName,
+  isStartingVideo,
+  onTeacherTextActive,
+  onStartVideo,
+}: {
+  stage: TeacherSupportStage
+  teacherName: string
+  isStartingVideo: boolean
+  onTeacherTextActive: () => void
+  onStartVideo: () => void
+}) {
+  const isTextActive = stage === 'teacher_text_active' || stage === 'video_requested' || stage === 'video_lobby_ready'
+
+  return (
+    <section className="px-4 pb-3 md:px-6" aria-live="polite">
+      <div className="mx-auto max-w-3xl rounded-lg border border-primary/15 bg-card p-4 shadow-[var(--platform-shadow-soft)]">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="brand-section-kicker">Teacher support</p>
+            <h2 className="mt-2 text-lg font-semibold">
+              {isTextActive ? `${teacherName} joined by text` : 'Teacher support requested'}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              {isTextActive
+                ? 'The Learning Assistant is now observing while your tutor helps you. Start a live classroom if you still need deeper support.'
+                : 'A tutor will join this conversation when available. You can continue working with the Learning Assistant while waiting.'}
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            {!isTextActive && (
+              <Button type="button" variant="outline" onClick={onTeacherTextActive}>
+                Tutor joined by text
+              </Button>
+            )}
+            {isTextActive && (
+              <Button type="button" onClick={onStartVideo} disabled={isStartingVideo}>
+                <Video className="h-4 w-4" aria-hidden="true" />
+                {isStartingVideo ? 'Preparing lobby...' : 'Start video classroom'}
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 

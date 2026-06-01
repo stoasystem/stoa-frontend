@@ -4,6 +4,7 @@ import { SectionHeader } from '@/components/common/SectionHeader'
 import { AskQuestionCard } from '@/components/dashboard/AskQuestionCard'
 import { DashboardStatCard } from '@/components/dashboard/DashboardStatCard'
 import { ContinuePracticeCard } from '@/components/dashboard/ContinuePracticeCard'
+import { ClassroomDashboardCard } from '@/features/live-classroom/components/ClassroomDashboardCard'
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
 import { QuestionBankCard } from '@/components/dashboard/QuestionBankCard'
@@ -40,6 +41,7 @@ export function StudentDashboardPage() {
               <ContinuePracticeCard />
               <AskQuestionCard />
               <QuestionBankCard />
+              <ClassroomDashboardCard />
             </div>
             <aside className="rounded-lg border border-border/70 bg-card/80 p-4 shadow-[var(--platform-shadow-card)]">
               <p className="brand-section-kicker">Weekly snapshot</p>

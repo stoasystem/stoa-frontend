@@ -1,0 +1,69 @@
+{
+  "home": {
+    "title": "Classe en ligne",
+    "subtitle": "Un soutien en direct quand une question demande plus d'explications.",
+    "scheduleSession": "Planifier une session",
+    "requestInstantHelp": "Demander de l'aide",
+    "joinLobby": "Ouvrir le lobby"
+  },
+  "schedule": {
+    "title": "Planifier une session",
+    "subtitle": "Choisissez la matiere, le sujet et l'heure.",
+    "contextLabel": "Que doit savoir le tuteur ?",
+    "attachMaterials": "Joindre des supports",
+    "success": "Session planifiee"
+  },
+  "lobby": {
+    "title": "Lobby de classe",
+    "beforeYouJoin": "Avant d'entrer",
+    "sessionContext": "Contexte de la session",
+    "joinClassroom": "Entrer en classe",
+    "waitingForTutor": "En attente du tuteur",
+    "notRealVideo": "Ceci est un lobby de demonstration. La vraie connexion video sera ajoutee plus tard."
+  },
+  "room": {
+    "chat": "Chat",
+    "materials": "Supports",
+    "notes": "Notes",
+    "participants": "Participants",
+    "sharedProblem": "Probleme partage",
+    "whiteboard": "Tableau blanc",
+    "mockRoom": "Classe de demonstration"
+  },
+  "summary": {
+    "title": "Resume de la session",
+    "keyExplanation": "Explication cle",
+    "nextSteps": "Prochaines etapes"
+  },
+  "tutor": {
+    "queueTitle": "File des classes",
+    "startingSoon": "Bientot",
+    "instantRequests": "Demandes video immediates",
+    "completedToday": "Terminees aujourd'hui"
+  },
+  "controls": {
+    "mute": "Couper le micro",
+    "unmute": "Activer le micro",
+    "startVideo": "Demarrer la video",
+    "stopVideo": "Arreter la video",
+    "shareMaterial": "Partager un support",
+    "leave": "Quitter",
+    "endSession": "Terminer la session"
+  },
+  "status": {
+    "ready": "Pret a entrer",
+    "waiting": "En attente du tuteur",
+    "completed": "Classe terminee",
+    "connecting": "Connexion a la classe"
+  },
+  "actions": {
+    "back": "Retour",
+    "openLobby": "Ouvrir le lobby",
+    "viewSummary": "Voir le resume",
+    "backToChat": "Retour au Learning Chat"
+  },
+  "errors": {
+    "loadFailed": "Impossible de charger cette classe.",
+    "lobbyFailed": "Impossible d'ouvrir ce lobby."
+  }
+}

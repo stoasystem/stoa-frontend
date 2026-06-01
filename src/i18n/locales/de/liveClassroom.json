@@ -1,0 +1,69 @@
+{
+  "home": {
+    "title": "Online Classroom",
+    "subtitle": "Live-Unterstuetzung, wenn ein Thema mehr Erklaerung braucht.",
+    "scheduleSession": "Session planen",
+    "requestInstantHelp": "Soforthilfe anfragen",
+    "joinLobby": "Lobby oeffnen"
+  },
+  "schedule": {
+    "title": "Classroom Session planen",
+    "subtitle": "Fach, Thema und Zeit auswaehlen.",
+    "contextLabel": "Was sollte der Tutor wissen?",
+    "attachMaterials": "Material anhaengen",
+    "success": "Session geplant"
+  },
+  "lobby": {
+    "title": "Classroom Lobby",
+    "beforeYouJoin": "Vor dem Beitritt",
+    "sessionContext": "Session-Kontext",
+    "joinClassroom": "Classroom beitreten",
+    "waitingForTutor": "Warten auf Tutor",
+    "notRealVideo": "Dies ist eine Mock-Classroom-Lobby. Die echte Videoverbindung folgt spaeter."
+  },
+  "room": {
+    "chat": "Chat",
+    "materials": "Materialien",
+    "notes": "Notizen",
+    "participants": "Teilnehmende",
+    "sharedProblem": "Gemeinsame Aufgabe",
+    "whiteboard": "Whiteboard",
+    "mockRoom": "Mock-Classroom"
+  },
+  "summary": {
+    "title": "Classroom-Zusammenfassung",
+    "keyExplanation": "Wichtige Erklaerung",
+    "nextSteps": "Naechste Schritte"
+  },
+  "tutor": {
+    "queueTitle": "Classroom Queue",
+    "startingSoon": "Beginnt bald",
+    "instantRequests": "Sofortige Videoanfragen",
+    "completedToday": "Heute abgeschlossen"
+  },
+  "controls": {
+    "mute": "Stummschalten",
+    "unmute": "Ton einschalten",
+    "startVideo": "Video starten",
+    "stopVideo": "Video stoppen",
+    "shareMaterial": "Material teilen",
+    "leave": "Verlassen",
+    "endSession": "Session beenden"
+  },
+  "status": {
+    "ready": "Bereit zum Beitritt",
+    "waiting": "Warten auf Tutor",
+    "completed": "Classroom beendet",
+    "connecting": "Verbindung zum Classroom wird vorbereitet"
+  },
+  "actions": {
+    "back": "Zurueck",
+    "openLobby": "Lobby oeffnen",
+    "viewSummary": "Zusammenfassung anzeigen",
+    "backToChat": "Zurueck zum Learning Chat"
+  },
+  "errors": {
+    "loadFailed": "Dieser Classroom konnte nicht geladen werden.",
+    "lobbyFailed": "Diese Classroom-Lobby konnte nicht geoeffnet werden."
+  }
+}

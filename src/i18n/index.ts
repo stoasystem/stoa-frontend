@@ -10,6 +10,7 @@ import enParent from '@/i18n/locales/en/parent.json'
 import enPractice from '@/i18n/locales/en/practice.json'
 import enQuestionBank from '@/i18n/locales/en/questionBank.json'
 import enUploads from '@/i18n/locales/en/uploads.json'
+import enLiveClassroom from '@/i18n/locales/en/liveClassroom.json'
 import enTutor from '@/i18n/locales/en/tutor.json'
 import enPricing from '@/i18n/locales/en/pricing.json'
 import enBilling from '@/i18n/locales/en/billing.json'
@@ -25,6 +26,7 @@ import deParent from '@/i18n/locales/de/parent.json'
 import dePractice from '@/i18n/locales/de/practice.json'
 import deQuestionBank from '@/i18n/locales/de/questionBank.json'
 import deUploads from '@/i18n/locales/de/uploads.json'
+import deLiveClassroom from '@/i18n/locales/de/liveClassroom.json'
 import deTutor from '@/i18n/locales/de/tutor.json'
 import dePricing from '@/i18n/locales/de/pricing.json'
 import deBilling from '@/i18n/locales/de/billing.json'
@@ -40,6 +42,7 @@ import frParent from '@/i18n/locales/fr/parent.json'
 import frPractice from '@/i18n/locales/fr/practice.json'
 import frQuestionBank from '@/i18n/locales/fr/questionBank.json'
 import frUploads from '@/i18n/locales/fr/uploads.json'
+import frLiveClassroom from '@/i18n/locales/fr/liveClassroom.json'
 import frTutor from '@/i18n/locales/fr/tutor.json'
 import frPricing from '@/i18n/locales/fr/pricing.json'
 import frBilling from '@/i18n/locales/fr/billing.json'
@@ -55,6 +58,7 @@ import itParent from '@/i18n/locales/it/parent.json'
 import itPractice from '@/i18n/locales/it/practice.json'
 import itQuestionBank from '@/i18n/locales/it/questionBank.json'
 import itUploads from '@/i18n/locales/it/uploads.json'
+import itLiveClassroom from '@/i18n/locales/it/liveClassroom.json'
 import itTutor from '@/i18n/locales/it/tutor.json'
 import itPricing from '@/i18n/locales/it/pricing.json'
 import itBilling from '@/i18n/locales/it/billing.json'
@@ -73,6 +77,7 @@ export const resources = {
     practice: enPractice,
     questionBank: enQuestionBank,
     uploads: enUploads,
+    liveClassroom: enLiveClassroom,
     tutor: enTutor,
     pricing: enPricing,
     billing: enBilling,
@@ -90,6 +95,7 @@ export const resources = {
     practice: dePractice,
     questionBank: deQuestionBank,
     uploads: deUploads,
+    liveClassroom: deLiveClassroom,
     tutor: deTutor,
     pricing: dePricing,
     billing: deBilling,
@@ -107,6 +113,7 @@ export const resources = {
     practice: frPractice,
     questionBank: frQuestionBank,
     uploads: frUploads,
+    liveClassroom: frLiveClassroom,
     tutor: frTutor,
     pricing: frPricing,
     billing: frBilling,
@@ -124,6 +131,7 @@ export const resources = {
     practice: itPractice,
     questionBank: itQuestionBank,
     uploads: itUploads,
+    liveClassroom: itLiveClassroom,
     tutor: itTutor,
     pricing: itPricing,
     billing: itBilling,

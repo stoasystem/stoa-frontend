@@ -2,6 +2,24 @@
 
 STOA learning platform frontend.
 
+## Phase v2.3 Live Classroom & Video Help UI
+
+STOA now has a frontend/mock-backed Online Classroom foundation for scheduled tutor sessions and teacher-text-to-video escalation.
+
+Students can open `/classroom`, schedule live help with learning materials, review a lobby/device check, enter a mock classroom room, use camera/microphone/whiteboard controls, and review a post-session summary. Learning Chat can escalate from teacher text support into a video classroom lobby. Tutors can review a classroom queue before joining, and parents can see lightweight classroom visibility on the parent dashboard.
+
+This phase is UI and contract foundation only. It does not implement production video streaming, recording, attendance billing, calendar sync, parent observer mode, or production classroom persistence.
+
+See `docs/live-classroom/live-classroom-ui-foundation.md` for routes, provider boundaries, learning-context rules, and QA notes.
+
+Verification:
+
+```bash
+npm run lint
+npm run build
+npm run test:e2e -- live-classroom.spec.ts
+```
+
 ## Phase v2.2 Photo & File Upload UI
 
 STOA now has a shared upload foundation for learning-context uploads across Learning Chat, Question Bank, and Practice Path.

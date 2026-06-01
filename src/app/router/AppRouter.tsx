@@ -20,6 +20,12 @@ import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
 import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
+import { ClassroomLobbyPage } from '@/features/live-classroom/pages/ClassroomLobbyPage'
+import { ClassroomRoomPage } from '@/features/live-classroom/pages/ClassroomRoomPage'
+import { ClassroomSummaryPage } from '@/features/live-classroom/pages/ClassroomSummaryPage'
+import { ScheduleClassroomPage } from '@/features/live-classroom/pages/ScheduleClassroomPage'
+import { StudentClassroomHomePage } from '@/features/live-classroom/pages/StudentClassroomHomePage'
+import { TutorClassroomQueuePage } from '@/features/live-classroom/pages/TutorClassroomQueuePage'
 import { ForbiddenPage } from '@/pages/error/ForbiddenPage'
 import { UnauthorizedPage } from '@/pages/error/UnauthorizedPage'
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
@@ -117,6 +123,11 @@ export function AppRouter() {
           <Route element={<RoleRoute allowedRoles={['student']} />}>
             <Route path="/dashboard" element={<StudentDashboardPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/classroom" element={<StudentClassroomHomePage />} />
+            <Route path="/classroom/schedule" element={<ScheduleClassroomPage />} />
+            <Route path="/classroom/sessions/:sessionId/lobby" element={<ClassroomLobbyPage />} />
+            <Route path="/classroom/sessions/:sessionId/room" element={<ClassroomRoomPage />} />
+            <Route path="/classroom/sessions/:sessionId/summary" element={<ClassroomSummaryPage />} />
             <Route path="/practice" element={<PracticeOverviewPage />} />
             <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
             <Route path="/question-bank" element={<QuestionBankHomePage />} />
@@ -162,6 +173,10 @@ export function AppRouter() {
           </Route>
           <Route element={<RoleRoute allowedRoles={['tutor']} />}>
             <Route path="/tutor" element={<TutorDashboardPage />} />
+            <Route path="/tutor/classroom" element={<TutorClassroomQueuePage />} />
+            <Route path="/tutor/classroom/sessions/:sessionId/lobby" element={<ClassroomLobbyPage tutorMode />} />
+            <Route path="/tutor/classroom/sessions/:sessionId/room" element={<ClassroomRoomPage tutorMode />} />
+            <Route path="/tutor/classroom/sessions/:sessionId/summary" element={<ClassroomSummaryPage tutorMode />} />
             <Route path="/tutor/availability" element={<TutorAvailabilityPage />} />
             <Route path="/tutor/profile" element={<TutorProfilePage />} />
             <Route path="/tutor/requests/:requestId" element={<TutorHelpRequestDetailPage />} />

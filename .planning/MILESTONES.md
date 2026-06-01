@@ -1,5 +1,28 @@
 # Milestones
 
+## v2.3 Live Classroom & Video Help UI Foundation (Shipped: 2026-06-02)
+
+**Phases completed:** 7 phases, 7 plans, 0 tasks
+**Audit:** `.planning/v2.3-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Real WebRTC/video provider integration, backend room tokens, real media preview, production scheduling, tutor matching, notifications, calendar sync, attendance, billing, recording, transcript/replay, screen share, production whiteboard, parent observer mode, and admin classroom operations remain future scope.
+
+**Key accomplishments:**
+
+- Added `src/features/live-classroom/` with typed classroom contracts, deterministic mock data, async services, query keys, hooks, room state, and formatting utilities.
+- Added student Online Classroom dashboard entry, classroom home, scheduling flow with upload-material reuse, lobby, mock room, controls, side panels, learning workspace, and summary.
+- Added Learning Chat teacher-text-to-video escalation into an instant classroom lobby with context-preserving mock session creation.
+- Added tutor classroom queue, lobby, room, summary routes, and tutor dashboard entry.
+- Added parent classroom visibility and product-safe parent copy without observer/recording/attendance claims.
+- Added EN/DE/FR/IT `liveClassroom` namespace files, provider-boundary docs, README handoff, and targeted Playwright coverage.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e -- live-classroom.spec.ts`: passed, 5/5 tests.
+
+---
+
 ## v2.2 Photo & File Upload UI Foundation (Shipped: 2026-06-02)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

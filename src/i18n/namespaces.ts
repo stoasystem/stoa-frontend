@@ -7,6 +7,7 @@ export const namespaces = [
   'practice',
   'questionBank',
   'uploads',
+  'liveClassroom',
   'tutor',
   'pricing',
   'billing',

@@ -2,7 +2,7 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Question Bank, and a unified learning-context photo/PDF upload UI foundation.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Question Bank, a unified learning-context photo/PDF upload UI foundation, and a frontend/mock-backed Online Classroom foundation for scheduled tutor sessions and teacher-text-to-video escalation.
 
 The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
 
@@ -10,36 +10,30 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.2 Photo & File Upload UI Foundation
+## Latest Shipped Milestone: v2.3 Live Classroom & Video Help UI Foundation
 
 **Shipped:** 2026-06-02
 
-**Delivered:** STOA now includes a unified upload foundation for learning-context photos and PDFs. Students can attach files or capture photos in Learning Chat, upload their own Question Bank material, add current-question work from a Question Bank session, and bring Practice schoolwork into Learning Chat with shared previews, validation, status/error states, removal, retry, route/session handoff, and product-safe copy.
+**Delivered:** STOA now includes a frontend/mock-backed Online Classroom foundation. Students can discover live support from Dashboard, schedule classroom sessions with learning materials, prepare in a lobby, enter a mock classroom room, use classroom controls and side panels, escalate from Learning Chat teacher text help into a video classroom lobby, and review session summaries. Tutors can review a classroom queue and enter tutor lobby/room flows. Parents can see lightweight classroom visibility without observer or recording claims.
 
 **Target features:**
-- Reusable `src/features/uploads/` module with typed upload metadata, validation utilities, preview helpers, mock/upload service boundaries, and shared hooks.
-- Shared upload UI for file attach, mobile photo capture, desktop drag-and-drop, attachment preview cards, status badges, error messaging, upload modal, and inline upload panels.
-- Learning Chat composer upload behavior with preview, remove, retry, attachment-aware send, and message-stream attachment rendering.
-- Question Bank home and question-session upload entry points with upload-to-Learning-Chat context.
-- Practice Path schoolwork upload entry that supports Learning Assistant handoff without displacing guided roadmap/lesson flow.
-- Four-language `uploads` localization, accessibility checks, Playwright upload smoke tests, README/docs handoff, and lint/build verification.
+- Reusable `src/features/live-classroom/` module with typed session contracts, mock data, services, query hooks, and room state hooks.
+- Student classroom home, scheduling, lobby, room, controls, learning workspace, side panels, and summary.
+- Learning Chat teacher-text-to-video escalation with context-preserving instant classroom creation.
+- Tutor classroom queue, lobby, room, and summary flows.
+- Parent classroom visibility card with informational copy only.
+- Four-language `liveClassroom` namespace, provider-boundary docs, README handoff, and Playwright smoke coverage.
 
-## Current Milestone: v2.3 Live Classroom & Video Help UI Foundation
+## Current Milestone: None Active
 
-**Goal:** Establish the frontend UI foundation for online classroom and live video help so students can schedule or join mock classroom sessions from Dashboard and escalate from Learning Chat teacher text help into a Zoom-like classroom experience.
+**Goal:** Start the next milestone through the GSD new-milestone workflow after research and requirements approval.
 
 **Target features:**
-- Add `src/features/live-classroom/` with typed classroom models, mock data, services, hooks, shared components, and page-level UI.
-- Add student classroom routes for home, scheduling, lobby, room, and summary.
-- Add tutor classroom routes for queue, lobby, room, and summary-oriented context review.
-- Add Student Dashboard Online Classroom entry for upcoming sessions, scheduling, and instant-help routing.
-- Add Learning Chat teacher-text-to-video escalation that creates a mock classroom session and opens the lobby with context.
-- Build a Zoom-like classroom room adapted for learning: video placeholders, learning workspace, shared problem/whiteboard placeholder, side panels, materials, notes, participants, and bottom controls.
-- Reuse v2.2 upload components for classroom materials, add four-language `liveClassroom` localization, document future video-provider handoff, and add Playwright smoke coverage.
+- To be defined by the next milestone.
 
 ## Current State
 
-**Latest shipped milestone:** v2.2 Photo & File Upload UI Foundation
+**Latest shipped milestone:** v2.3 Live Classroom & Video Help UI Foundation
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -78,6 +72,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Phase 35 Practice Roadmap UI with subject-agnostic roadmap data contracts, roadmap components, lesson node states, progress header, locked hints, continue card, `/practice` and topic route integration, four-language copy, roadmap docs, README handoff, browser checks, and build verification.
 - v2.1 Question Bank UI with `/question-bank`, subject/topic question-bank pages, set overview, session answer flow, immediate feedback, result page, mistakes review, saved sets, local search/filtering, typed mock data, service/query boundaries, Question Bank to Learning Chat context, parent/tutor comprehension updates, docs, and verification.
 - v2.2 Photo & File Upload UI with reusable upload types/services/hooks/components, Chat composer upload integration, Question Bank upload modal/session handoff, Practice schoolwork upload panels, route-state/session-storage handoff, four-language upload copy, docs, and Playwright upload verification.
+- v2.3 Live Classroom UI with classroom domain contracts, mock services/hooks, student classroom home/schedule/lobby/room/summary, Chat teacher-text-to-video escalation, tutor classroom queue/lobby/room/summary, parent classroom visibility, four-language liveClassroom namespace, docs, and Playwright coverage.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -122,14 +117,15 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Students can upload photos and PDFs as learning material from Chat, Question Bank, and Practice Path through a unified, accessible frontend upload system — v2.2
 - ✓ Upload UI supports mobile camera capture, desktop drag-and-drop, browse fallback, validation, preview, removal, retry, failed/rejected states, and Learning Assistant handoff — v2.2
 - ✓ Upload copy remains product-safe and does not imply OCR, image understanding, automatic solving, permanent storage, encryption guarantees, or teacher/admin review workflows that are not implemented — v2.2
+- ✓ Students can schedule and enter mock online classroom sessions from Dashboard and classroom routes — v2.3
+- ✓ Students can escalate from Learning Chat teacher text help into a mock live video classroom lobby with conversation/material context — v2.3
+- ✓ Tutors can view a mock classroom queue and enter tutor lobby/room flows with student context — v2.3
+- ✓ Classroom room UI provides education-specific live classroom structure: video placeholders, learning workspace, materials, notes, chat, participants, and controls — v2.3
+- ✓ v2.3 remains frontend/mock-only and does not claim real WebRTC, real video provider integration, real scheduling backend, real billing, recording, screen share, or production whiteboard support — v2.3
 
 ### Active
 
-- Students can schedule and enter mock online classroom sessions from Dashboard and classroom routes — v2.3
-- Students can escalate from Learning Chat teacher text help into a mock live video classroom lobby with conversation/material context — v2.3
-- Tutors can view a mock classroom queue and enter tutor lobby/room flows with student context — v2.3
-- Classroom room UI must feel like an education-specific live classroom, not a generic meeting clone: video placeholders, learning workspace, materials, notes, chat, participants, and controls are all required — v2.3
-- v2.3 must remain frontend/mock-only and must not claim real WebRTC, real video provider integration, real scheduling backend, real billing, recording, screen share, or production whiteboard support — v2.3
+- None. Next active scope should be defined by the next milestone.
 
 ### Out of Scope
 
