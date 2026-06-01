@@ -23,13 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Learning Assistant chat generation uses the saved student answer language instead of hard-coded English.
 - Regression tests cover English, German, French, and Italian answer-language behavior.
 
-## Current Milestone: Planning next milestone
+## Current Milestone: v2.1 Question Bank UI Design
 
-**Goal:** Select the next milestone after the shipped student answer-language preference work.
+**Goal:** Add a complete Question Bank UI module so students can find question sets by subject, topic, difficulty, and status; complete a mock practice session; receive immediate feedback; review mistakes; and understand how Question Bank complements Practice Path and Learning Chat.
 
 **Target features:**
-- Suggested next milestone: production preference syncing, parent-managed child answer-language settings, Playwright coverage for profile-language flows, or roadmap interaction QA and parent visibility refinement.
-- Keep Phase 37 shipped artifacts under `.planning/phases/` and archive copies under `.planning/milestones/`.
+- `/question-bank`, subject overview, topic question-set listing, question-set overview, question session, result, mistakes review, and saved/recent practice surfaces.
+- Question Bank acts as a flexible exercise library, distinct from Practice Path's guided roadmap progression.
+- Local mock/demo data supports search, filters, question sets, session answers, feedback states, results, and mistakes review.
+- Learning Assistant entry points route from question feedback to Chat with question-bank context while preserving frontend provider boundaries.
+- Parent and tutor UI/docs explain how Question Bank activity relates to Practice Path, Learning Chat, Parent Report, and tutor context.
 
 ## Current State
 
@@ -113,7 +116,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Next milestone requirements are not yet selected.
+- [ ] Students can open a Question Bank module and browse subjects, topics, recommended sets, recent practice, and mistakes review.
+- [ ] Students can filter and search mock question sets by subject, grade/level, topic, difficulty, question type, and completion status.
+- [ ] Students can open a question set overview, start or resume a mock session, answer supported question types, see immediate feedback, and finish the set.
+- [ ] Students can view a result page and enter a mistakes review flow for incorrect or skipped questions.
+- [ ] Question Bank UI clearly complements Practice Path and Learning Chat without becoming a duplicate roadmap or a production exam system.
 
 ### Out of Scope
 
@@ -169,6 +176,8 @@ The project brief for Phase 32 was provided in Chinese and defines a global lang
 The project brief for Phase 36 was provided through a CI failure notification and follow-up instruction to comprehensively investigate and fix this class of issue. Phase 36 focuses on engineering quality and workflow reliability: GitHub Actions parity, local npm scripts, lint/build configuration, dependency and ignore hygiene, and documentation of the quality gates. It does not add product features, redesign UI, expand curriculum, or change backend/product behavior except where required to keep developer workflows reliable.
 
 The project brief for Phase 37 was provided in Chinese and defines student-level Learning Assistant answer-language personalization. Students need a language option in their profile, and the Learning Assistant should answer in the corresponding saved student language. This milestone should preserve the existing four-language UI system while explicitly separating browser/interface language from a student's preferred answer language. It should update frontend profile/registration surfaces, typed contracts, the local demo backend, prompt harness input, template fallback behavior, and regression/QA evidence without adding new languages, production AI provider work, or formal backend architecture.
+
+The project brief for v2.1 was provided in Chinese and defines Question Bank UI Design. Question Bank is an open, flexible exercise library for browsing and practicing question sets by subject, grade, topic, difficulty, question type, and review status. It complements the existing Practice Path, which remains the guided learning roadmap with lesson progression. v2.1 should deliver student-facing Question Bank routes, demo/mock data, local search/filter behavior, question-set overview, answer session, feedback, result, mistakes review, and clear Learning Assistant handoff. It should not build a production question-bank backend, AI-generated questions, image recognition, video help, live teacher joining, complex exam mode, production permissions, paid unlocking, or formal curriculum-standard mapping.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -258,6 +267,8 @@ Current codebase facts:
 - **Phase 30 external testing boundary**: Testing materials and feedback capture can prepare external review, but they do not implement formal research operations, analytics pipelines, CRM systems, or production data collection.
 - **Phase 30 product story boundary**: Product storytelling should make the Practice -> Hint -> Learning Chat -> Teacher Support -> Parent Report flow understandable without exposing mock/demo/backend/provider terminology to external audiences.
 - **Phase 31 positioning boundary**: Practice Path is a low-friction student learning entry, not a replacement for Learning Chat, teacher support, Parent Report, or STOA's broader learning platform positioning.
+- **Question Bank positioning**: v2.1 Question Bank is a flexible exercise library for open practice; it must not duplicate Practice Path's guided roadmap progression or make STOA feel like a generic exam system.
+- **Question Bank implementation boundary**: v2.1 is UI plus demo/mock data flow only; production question-bank backend, AI-generated items, image recognition, video help, live teacher joining, paid unlocking, complex exam mode, production permissions, and formal curriculum-standard mapping are deferred.
 - **Phase 31 public navigation boundary**: Practice should not be added as a top-level public navbar item unless a specific product reason is documented; it belongs primarily in authenticated student navigation and homepage explanation.
 - **Phase 31 implementation boundary**: Phase 31 may add frontend components, route-state/mock contracts, copy, docs, and QA, but must not add formal backend/database/CMS/payment infrastructure or broad curriculum expansion.
 - **Phase 31 gamification boundary**: Keep progress, hints, and short practice sessions calm and education-centered; do not add shops, gems, hearts, cartoon rewards, leaderboards, or game-first CTAs.
@@ -403,6 +414,8 @@ Current codebase facts:
 | Fix tooling boundaries at configuration level first | Node scripts, browser source, test files, and config files need correct ESLint/TypeScript environments instead of one-off suppressions where a shared config can express intent | — Pending |
 | Treat student answer language as profile data | Learning Assistant response language should follow the student being helped, not only the current browser UI language or provider default | — Pending |
 | Keep answer-language enforcement in backend/harness flow | The frontend can collect preference, but the backend and prompt harness must own response-language instructions so streaming, fallback, and future providers stay consistent | — Pending |
+| Keep Question Bank separate from Practice Path | Question Bank should support open, filterable practice by subject/topic/difficulty, while Practice Path remains the guided roadmap and lesson progression experience | — Pending |
+| Keep v2.1 mock/demo-backed | The milestone needs credible UI and interaction design now, while production item storage, permissions, exam logic, generated questions, and deep curriculum mapping require later backend/product scope | — Pending |
 
 ## Evolution
 
@@ -422,4 +435,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-01 after v1.35 milestone completion*
+*Last updated: 2026-06-01 after starting v2.1 Question Bank UI Design milestone*
