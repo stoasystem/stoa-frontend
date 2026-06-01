@@ -15,7 +15,7 @@ export function useCreateCheckoutSessionMutation() {
       }
 
       if (!enablePayment) {
-        throw new Error('Plan selection is being prepared. Please contact STOA to continue.')
+        throw new Error('Contact STOA to continue with a paid plan.')
       }
 
       return createCheckoutSession(plan)

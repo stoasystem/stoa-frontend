@@ -23,7 +23,7 @@ export function PaymentSettingsPage() {
   const subscriptionQuery = useSubscriptionQuery()
   const subscription = subscriptionQuery.data
   const paymentMethod = enablePayment ? 'Visa ending 4242' : 'Payment method not connected yet'
-  const portalStatus = enablePayment ? 'Secure billing portal enabled' : 'Preview mode: billing portal pending'
+  const portalStatus = enablePayment ? 'Secure billing portal enabled' : 'Billing portal not connected yet'
 
   return (
     <DashboardLayout>
@@ -55,7 +55,7 @@ export function PaymentSettingsPage() {
                     Billing owner for the linked student account and parent reports.
                   </CardDescription>
                 </div>
-                <Badge variant="secondary">{enablePayment ? 'Active' : 'Preview'}</Badge>
+                <Badge variant="secondary">{enablePayment ? 'Active' : 'Plan review'}</Badge>
               </div>
             </CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">
@@ -91,11 +91,11 @@ export function PaymentSettingsPage() {
               <p>
                 {enablePayment
                   ? 'Use the secure billing portal to update cards, review invoices, and cancel or change plans.'
-                  : 'This environment is in billing preview mode. STOA can review plan fit here, while live card updates remain disabled until payment setup is enabled.'}
+                  : 'STOA can review plan fit here. Card updates remain unavailable until secure payment setup is connected.'}
               </p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <Button asChild>
-                  <Link to="/billing?plan=family">{showCheckoutPreview ? 'Review checkout' : 'Open checkout'}</Link>
+                  <Link to="/billing?plan=family">{showCheckoutPreview ? 'Review plan' : 'Open checkout'}</Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link to="/support">Contact billing support</Link>

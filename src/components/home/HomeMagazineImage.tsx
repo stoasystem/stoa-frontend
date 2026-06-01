@@ -41,14 +41,17 @@ export function HomeMagazineImage({ learningHref }: HomeMagazineImageProps) {
         </Link>
         <Link
           to="/teacher-support"
-          className="brand-ink-card rounded-lg border border-white/16 p-4 text-white shadow-2xl backdrop-blur transition-transform hover:-translate-y-0.5 hover:border-white/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+          className="rounded-lg border border-white/28 bg-[linear-gradient(180deg,hsl(var(--stoa-brand-charcoal)/0.96),hsl(var(--stoa-brand-ink)/0.9))] p-4 text-white shadow-2xl backdrop-blur-md transition-transform hover:-translate-y-0.5 hover:border-white/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/85 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
           aria-label={t('teacher.link')}
         >
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <MessageCircle className="h-4 w-4 text-[hsl(38_42%_72%)]" />
-            {t('teacher.eyebrow')}
+          <div className="flex items-center gap-2 text-sm font-semibold leading-5 text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/35 bg-white/12">
+              <MessageCircle className="h-3.5 w-3.5 text-[hsl(38_58%_82%)]" aria-hidden="true" />
+            </span>
+            <span className="drop-shadow-sm">{t('teacher.eyebrow')}</span>
           </div>
-          <p className="mt-2 text-sm leading-6 text-white/75">
+          <div className="mt-3 h-px bg-white/18" />
+          <p className="mt-3 text-sm leading-6 text-white/90">
             {t('teacher.body')}
           </p>
         </Link>

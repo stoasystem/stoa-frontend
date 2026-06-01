@@ -34,7 +34,7 @@
       { "title": "Suggerimenti prima delle risposte", "body": "Un errore mostra prima un aiuto utile, così lo studente può riprovare." }
     ],
     "preview": {
-      "label": "Argomento demo attuale",
+      "label": "Argomento di esempio",
       "title": "Un breve percorso sulle equazioni",
       "prompt": "Risolvi: 2x + 3 = 11",
       "progress": "Passo 2 di 5",

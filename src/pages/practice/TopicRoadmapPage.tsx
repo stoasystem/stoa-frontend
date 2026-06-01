@@ -97,13 +97,13 @@ function PreparedSubjectState({
             <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
               <BookOpenCheck className="h-5 w-5" aria-hidden="true" />
             </div>
-            <p className="brand-section-kicker mt-5">Subject preview</p>
+            <p className="brand-section-kicker mt-5">Subject path</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-normal">
-              {subject?.name ?? 'This subject'} path is being prepared
+              {subject?.name ?? 'This subject'} path is not available yet
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              This subject is available to preview in the Practice catalog. Full Practice Path lessons will open
-              after the topic sequence is ready.
+              This subject is listed in the Practice catalog. Full Practice Path lessons will open after the topic
+              sequence is ready.
             </p>
           </div>
           <div className="w-full rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4 text-sm lg:max-w-xs">

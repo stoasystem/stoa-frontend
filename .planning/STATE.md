@@ -158,6 +158,15 @@ Recent decisions affecting current work:
 | 2026-05-27 | Clarify referral rewards copy | Browser check on `/referrals`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Remove repeated goal cards from Practice detail | Browser checks on `/practice/mathematics/equations` and `/practice`; `npm run lint`; `npm run build` |
 | 2026-05-27 | Organize student dashboard categories | Browser checks on `/dashboard` desktop and mobile; `npm run lint`; `npm run build` |
+| 2026-06-01 | Replace pricing placeholder with detailed price structure | Browser check on `/pricing`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Polish compact language dropdown | Browser check on `/login`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Implement contact form email delivery | Backend contact smoke with email disabled; browser render check on `/contact`; `npm run lint`; `npm run build`; Python compile |
+| 2026-06-01 | Remove pricing header checkout badge | Browser check on `/pricing`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Remove checkout preview residue from user-facing copy | Browser check on `/pricing`; targeted source search; `npm run lint`; `npm run build` |
+| 2026-06-01 | Replace compact language native select with custom dropdown | Browser check on `/login`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Remove login secure access kicker | Browser check on `/login`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Improve homepage teacher support card readability | Browser check on `/`; `npm run lint`; `npm run build` |
+| 2026-06-01 | Rename homepage Practice demo label to example topic | Browser check on `/`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

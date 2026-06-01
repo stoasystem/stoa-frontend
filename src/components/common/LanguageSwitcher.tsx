@@ -1,5 +1,6 @@
-import { Languages } from 'lucide-react'
+import { ChevronDown, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { cn } from '@/lib/utils'
 
@@ -55,11 +56,59 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
     )
   }
 
+  if (compact) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className={cn(
+              'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--stoa-brand-burgundy)/0.2)]',
+              className,
+            )}
+            aria-label={t('language.label')}
+          >
+            <span>{currentLanguage.shortLabel}</span>
+            <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className="min-w-20 rounded-lg border-[hsl(var(--stoa-brand-border))] bg-[hsl(var(--stoa-brand-card))] p-1.5 shadow-[0_18px_44px_hsl(var(--stoa-brand-charcoal)/0.16)]"
+        >
+          {languageOptions.map((language) => {
+            const isActive = language.code === currentLanguage.code
+
+            return (
+              <DropdownMenuItem
+                key={language.code}
+                className={cn(
+                  'flex h-8 cursor-pointer items-center justify-between rounded-md px-2.5 text-sm font-semibold uppercase tracking-[0.02em]',
+                  isActive
+                    ? 'bg-[hsl(var(--stoa-brand-burgundy-soft))] text-[hsl(var(--stoa-brand-ink))]'
+                    : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)] hover:text-foreground focus:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)]',
+                )}
+                onSelect={() => {
+                  void i18n.changeLanguage(language.code)
+                }}
+              >
+                <span>{language.shortLabel}</span>
+                {isActive && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
+                )}
+              </DropdownMenuItem>
+            )
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  }
+
   return (
     <label
       className={cn(
         'inline-flex items-center gap-2 rounded-full border border-border/80 bg-card/70 px-3 py-1.5 text-sm text-muted-foreground transition-colors focus-within:border-primary/40 hover:text-foreground',
-        compact && 'gap-1 px-2 py-1 text-xs',
         className,
       )}
     >
@@ -69,7 +118,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
         aria-label={t('language.label')}
         className={cn(
           'bg-transparent text-inherit outline-none',
-          compact ? 'max-w-11 font-semibold' : 'max-w-[8rem]',
+          'max-w-[8rem]',
         )}
         value={currentLanguage.code}
         onChange={(event) => {

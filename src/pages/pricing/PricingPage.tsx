@@ -1,10 +1,9 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CheckCircle2, ClipboardList, ShieldCheck } from 'lucide-react'
+import { CheckCircle2, ReceiptText, ShieldCheck } from 'lucide-react'
 import { FeatureComparison } from '@/components/pricing/FeatureComparison'
 import { PlanCard } from '@/components/billing/PlanCard'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -15,11 +14,21 @@ import type { SubscriptionPlan } from '@/types/billing'
 
 const familyLearningImageUrl = new URL('../../../img/family-learning.jpeg', import.meta.url).href
 
+type PricingStructurePlan = {
+  id: string
+  name: string
+  price: string
+  cadence: string
+  fit: string
+  access: string
+}
+
 export function PricingPage() {
   const { t } = useTranslation('pricing')
   const navigate = useNavigate()
   const plansQuery = useBillingPlansQuery()
   const pricingPlans = plansQuery.data?.items ?? []
+  const pricingStructurePlans = t('priceStructure.plans', { returnObjects: true }) as PricingStructurePlan[]
 
   useEffect(() => {
     trackEvent('pricing_page_viewed')
@@ -37,7 +46,6 @@ export function PricingPage() {
           eyebrow={t('eyebrow')}
           title={t('title')}
           description={t('description')}
-          actions={<Badge variant="secondary">{t('badge')}</Badge>}
           titleClassName="editorial-heading editorial-title-shell text-4xl leading-tight md:text-6xl"
         />
 
@@ -61,10 +69,7 @@ export function PricingPage() {
                 </div>
               </div>
               <div className="p-6 md:p-8">
-                <p className="brand-section-kicker text-[hsl(var(--stoa-brand-burgundy))]">
-                  {t('badge')}
-                </p>
-                <h2 className="mt-3 text-3xl font-semibold leading-tight text-foreground">
+                <h2 className="text-3xl font-semibold leading-tight text-foreground">
                   {t('valueTitle')}
                 </h2>
                 <p className="mt-4 text-sm leading-7 text-muted-foreground md:text-base">
@@ -97,9 +102,37 @@ export function PricingPage() {
               </CardContent>
             </Card>
             <Card className="border-primary/20 bg-[hsl(var(--stoa-brand-burgundy-soft))]">
-              <CardContent className="flex gap-3 p-5 text-sm leading-6 text-foreground">
-                <ClipboardList className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden="true" />
-                <p>{t('checkoutBody')}</p>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-background/80 text-primary">
+                    <ReceiptText className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <div className="min-w-0">
+                    <CardTitle className="text-lg">{t('priceStructure.title')}</CardTitle>
+                    <p className="mt-1 text-sm leading-5 text-muted-foreground">
+                      {t('priceStructure.description')}
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {pricingStructurePlans.map((plan) => (
+                  <div key={plan.id} className="rounded-md border bg-background/75 p-3">
+                    <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                      <p className="font-semibold leading-5 text-foreground">{plan.name}</p>
+                      <p className="text-sm font-semibold text-[hsl(var(--stoa-brand-burgundy))]">
+                        {plan.price}
+                        <span className="font-normal text-muted-foreground"> {plan.cadence}</span>
+                      </p>
+                    </div>
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground">{plan.fit}</p>
+                    <p className="mt-2 text-xs font-medium uppercase leading-4 text-[hsl(var(--stoa-brand-burgundy))]">
+                      {t('priceStructure.accessLabel')}
+                    </p>
+                    <p className="mt-1 text-sm leading-5 text-foreground">{plan.access}</p>
+                  </div>
+                ))}
+                <p className="text-xs leading-5 text-muted-foreground">{t('priceStructure.note')}</p>
               </CardContent>
             </Card>
           </aside>

@@ -34,7 +34,7 @@
       { "title": "Indices avant réponses", "body": "Une erreur affiche d’abord un indice utile pour que l’élève réessaie." }
     ],
     "preview": {
-      "label": "Sujet de démonstration actuel",
+      "label": "Sujet d’exemple",
       "title": "Un court parcours sur les équations",
       "prompt": "Résous : 2x + 3 = 11",
       "progress": "Étape 2 sur 5",

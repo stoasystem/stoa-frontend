@@ -75,14 +75,14 @@ export function BillingPage() {
                     Choose a plan or update family payment settings from one place.
                   </p>
                 </div>
-                <Badge variant="secondary">{showCheckoutPreview ? 'Review mode' : 'Hosted payment'}</Badge>
+                <Badge variant="secondary">{showCheckoutPreview ? 'Plan review' : 'Hosted payment'}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
               <div className="grid gap-3 sm:grid-cols-2">
                 <BillingActionCard
                   icon={CreditCard}
-                  title={showCheckoutPreview ? 'Review checkout' : 'Start checkout'}
+                  title={showCheckoutPreview ? 'Review plan' : 'Start checkout'}
                   description={
                     showCheckoutPreview
                       ? t('billing:planSelectionReviewEnabled')

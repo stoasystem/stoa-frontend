@@ -34,7 +34,7 @@
       { "title": "Hinweise vor Lösungen", "body": "Bei einem Fehler erscheint zuerst ein hilfreicher Hinweis für den nächsten Versuch." }
     ],
     "preview": {
-      "label": "Aktuelles Demo-Thema",
+      "label": "Beispielthema",
       "title": "Ein kurzer Übungsweg zu Gleichungen",
       "prompt": "Löse: 2x + 3 = 11",
       "progress": "Schritt 2 von 5",

@@ -25,7 +25,7 @@ export function InternalDebugPanel() {
           <dd>{demoVisibility.showDemoAccounts ? 'on' : 'off'}</dd>
         </div>
         <div className="flex justify-between gap-3">
-          <dt>Checkout preview</dt>
+          <dt>Plan review</dt>
           <dd>{demoVisibility.showCheckoutPreview ? 'on' : 'off'}</dd>
         </div>
       </dl>

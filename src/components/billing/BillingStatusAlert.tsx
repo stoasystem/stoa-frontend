@@ -10,7 +10,7 @@ export function BillingStatusAlert() {
           ? 'Payment is enabled. STOA will open a secure checkout when a plan is selected.'
           : showCheckoutPreview
             ? 'Plan selection is available for review.'
-            : 'Plan selection is being prepared. Please contact STOA to continue.'}
+            : 'Contact STOA to continue with a paid plan.'}
       </p>
     </div>
   )

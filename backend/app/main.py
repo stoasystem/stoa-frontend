@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+import datetime
 import json
+import os
 import re
 import sys
+import urllib.error
+import urllib.request
 import uuid
 from pathlib import Path
 
@@ -153,6 +157,138 @@ def demo_error_code(status_code: int, detail: object) -> str:
     if status_code == 400:
         return "DEMO_VALIDATION_ERROR"
     return "DEMO_UNSUPPORTED_FLOW"
+
+
+class EmailDeliveryError(RuntimeError):
+    pass
+
+
+def env_bool(name: str, default: bool) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() not in {"0", "false", "no", "off"}
+
+
+def contact_email_config() -> dict[str, str | bool | int]:
+    return {
+        "enabled": env_bool("STOA_CONTACT_EMAIL_ENABLED", True),
+        "auto_reply_enabled": env_bool("STOA_CONTACT_AUTOREPLY_ENABLED", True),
+        "public_key": os.environ.get("STOA_EMAILJS_PUBLIC_KEY", "oT2sDvEzvUw-khq2T"),
+        "service_id": os.environ.get("STOA_EMAILJS_SERVICE_ID", "service_stoa"),
+        "notify_template_id": os.environ.get("STOA_EMAILJS_NOTIFY_TEMPLATE_ID", "template_g6tviz6"),
+        "auto_reply_template_id": os.environ.get("STOA_EMAILJS_AUTOREPLY_TEMPLATE_ID", "template_9i4iphq"),
+        "inbox_email": os.environ.get("STOA_CONTACT_INBOX_EMAIL", "info@stoaedu.ch"),
+        "timeout_seconds": int(os.environ.get("STOA_EMAILJS_TIMEOUT_SECONDS", "10")),
+    }
+
+
+def email_timestamp() -> str:
+    return datetime.datetime.now(datetime.timezone.utc).astimezone().strftime("%d.%m.%Y, %H:%M:%S")
+
+
+def build_contact_mail_body(params: dict[str, str]) -> str:
+    return (
+        "[Deutsch]\n\n"
+        "Sie haben eine neue Anfrage uber das Kontaktformular auf Ihrer Website erhalten:\n\n"
+        f"Name: {params['from_name']}\n"
+        f"E-Mail: {params['from_email']}\n"
+        f"Telefon: {params['phone']}\n"
+        f"Rolle: {params['role']}\n"
+        f"Thema: {params['subject']}\n"
+        f"Sprache: {params['preferred_language']}\n"
+        f"Datum: {params['timestamp']}\n\n"
+        "Nachricht:\n"
+        f"{params['message']}\n\n"
+        "Bitte antworten Sie dem Kunden so bald wie moglich.\n\n\n"
+        "[English]\n\n"
+        "You have received a new inquiry from your website contact form:\n\n"
+        f"Name: {params['from_name']}\n"
+        f"Email: {params['from_email']}\n"
+        f"Phone: {params['phone']}\n"
+        f"Role: {params['role']}\n"
+        f"Topic: {params['subject']}\n"
+        f"Preferred language: {params['preferred_language']}\n"
+        f"Date: {params['timestamp']}\n\n"
+        "Message:\n"
+        f"{params['message']}\n\n"
+        "Please respond to the customer as soon as possible."
+    )
+
+
+def send_emailjs_template(
+    service_id: str,
+    template_id: str,
+    public_key: str,
+    template_params: dict[str, str],
+    timeout_seconds: int,
+) -> None:
+    request_body = json.dumps({
+        "service_id": service_id,
+        "template_id": template_id,
+        "user_id": public_key,
+        "public_key": public_key,
+        "template_params": template_params,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        "https://api.emailjs.com/api/v1.0/email/send",
+        data=request_body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout_seconds) as response:
+            if response.status >= 400:
+                raise EmailDeliveryError(f"EmailJS returned status {response.status}")
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise EmailDeliveryError(f"EmailJS returned status {exc.code}: {detail}") from exc
+    except urllib.error.URLError as exc:
+        raise EmailDeliveryError(f"EmailJS request failed: {exc.reason}") from exc
+    except TimeoutError as exc:
+        raise EmailDeliveryError("EmailJS request timed out") from exc
+
+
+def deliver_contact_emails(payload: ContactRequest, request_id: str) -> dict[str, object]:
+    config = contact_email_config()
+    if not config["enabled"]:
+        return {"enabled": False, "notificationSent": False, "autoReplySent": False}
+
+    inbox_email = str(config["inbox_email"])
+    template_params = {
+        "from_name": payload.name.strip(),
+        "from_email": payload.email.strip(),
+        "phone": (payload.phone or "").strip(),
+        "timestamp": email_timestamp(),
+        "subject": payload.topic,
+        "role": payload.role,
+        "preferred_language": payload.preferredLanguage or "",
+        "message": payload.message.strip(),
+        "request_id": request_id,
+        "reply_to": payload.email.strip(),
+    }
+    template_params["mail_body"] = build_contact_mail_body(template_params)
+
+    send_emailjs_template(
+        str(config["service_id"]),
+        str(config["notify_template_id"]),
+        str(config["public_key"]),
+        {**template_params, "to_email": inbox_email},
+        int(config["timeout_seconds"]),
+    )
+
+    auto_reply_sent = False
+    if config["auto_reply_enabled"] and payload.email.strip().lower() != inbox_email.lower():
+        send_emailjs_template(
+            str(config["service_id"]),
+            str(config["auto_reply_template_id"]),
+            str(config["public_key"]),
+            {**template_params, "to_email": payload.email.strip()},
+            int(config["timeout_seconds"]),
+        )
+        auto_reply_sent = True
+
+    return {"enabled": True, "notificationSent": True, "autoReplySent": auto_reply_sent}
 
 
 @app.exception_handler(HTTPException)
@@ -1315,7 +1451,13 @@ def create_contact_request(payload: ContactRequest) -> dict[str, object]:
     }:
         raise HTTPException(status_code=400, detail="Invalid contact topic")
 
-    return {"ok": True, "requestId": f"contact-request-{uuid.uuid4()}"}
+    request_id = f"contact-request-{uuid.uuid4()}"
+    try:
+        email_delivery = deliver_contact_emails(payload, request_id)
+    except EmailDeliveryError as exc:
+        raise HTTPException(status_code=502, detail=f"Contact email delivery failed: {exc}") from exc
+
+    return {"ok": True, "requestId": request_id, "emailDelivery": email_delivery}
 
 
 @app.get("/support/tickets")

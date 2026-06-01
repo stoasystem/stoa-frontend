@@ -436,6 +436,7 @@ Main updates:
 - `StoaLogo` provides platform-theme logo variants without copying homepage assets.
 - `/contact` provides a multilingual contact form for parents, students, teachers, schools, and other requests.
 - `POST /contact/requests` is documented and supported by the local demo backend contract.
+- Contact email delivery follows the main website EmailJS pattern: STOA receives a notification email and the sender receives an auto-reply. The default service/template IDs match `/Users/zhdeng/newweb/js/ajax-form.js`; override them with `STOA_EMAILJS_PUBLIC_KEY`, `STOA_EMAILJS_SERVICE_ID`, `STOA_EMAILJS_NOTIFY_TEMPLATE_ID`, `STOA_EMAILJS_AUTOREPLY_TEMPLATE_ID`, and `STOA_CONTACT_INBOX_EMAIL`. Use `STOA_CONTACT_EMAIL_ENABLED=false` for backend smoke tests that must not send real email. Frontend-only local testing can fall back to the matching `VITE_CONTACT_EMAILJS_*` variables when the backend is unavailable.
 - Login, register, chat, support, and contact received targeted accessibility hardening.
 - Playwright E2E runs in deterministic frontend demo QA mode and passes 12 smoke tests.
 - Release quality gate and final pre-launch checklist are documented.

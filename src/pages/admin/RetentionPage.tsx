@@ -35,7 +35,7 @@ export function RetentionPage() {
                     <p className="font-medium">{student.name}</p>
                     <p className="text-sm text-muted-foreground">{student.riskReason}</p>
                     <p className="mt-2 text-sm">{student.suggestedAction}</p>
-                    <Button className="mt-3" size="sm" variant="outline" onClick={() => toast.info('Reminder action is being prepared.')}>
+                    <Button className="mt-3" size="sm" variant="outline" onClick={() => toast.info('Reminder sending is not available yet.')}>
                       Send reminder
                     </Button>
                   </div>
@@ -52,7 +52,7 @@ export function RetentionPage() {
                     <p className="font-medium">{family.familyName}</p>
                     <p className="text-sm text-muted-foreground">{family.riskReason}</p>
                     <p className="mt-2 text-sm">{family.suggestedAction}</p>
-                    <Button className="mt-3" size="sm" variant="outline" onClick={() => toast.info('Follow-up task creation is being prepared.')}>
+                    <Button className="mt-3" size="sm" variant="outline" onClick={() => toast.info('Follow-up task creation is not available yet.')}>
                       Create follow-up task
                     </Button>
                   </div>

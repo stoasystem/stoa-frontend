@@ -21,8 +21,8 @@ export function CheckoutResultPage({ status }: { status: 'success' | 'cancel' })
         <PageContainer className="p-0">
           <PageHeader
             eyebrow="Checkout unavailable"
-            title="Plan selection is being prepared"
-            description="Please return to billing or contact STOA to continue."
+            title="Online plan changes are unavailable"
+            description="Return to billing or contact STOA to continue with a paid plan."
           />
           <Button asChild>
             <Link to="/billing">Return to billing</Link>

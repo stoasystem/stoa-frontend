@@ -2,15 +2,53 @@
   "title": "Preise",
   "eyebrow": "Pläne für Familien",
   "description": "Wählen Sie die passende Hausaufgabenunterstützung für Ihre Familie, von geführter Übung bis zu professioneller Unterstützung durch Lehrpersonen.",
-  "badge": "Sichere Checkout-Vorschau",
   "supportLevel": "Unterstützung wählen",
   "supportLevelBody": "Geführtes Üben, Elternberichte und Unterstützung durch Lehrpersonen bleiben in einem Lernweg verbunden.",
   "valueTitle": "Wert für Familien",
   "valueBody": "STOA verbindet geführte Hausaufgabenhilfe, sichtbare Lernsignale für Eltern und Unterstützung durch Lehrpersonen, damit Lernende weiterkommen und Familien informiert bleiben.",
-  "checkoutBody": "Die Planwahl wird vorbereitet. Bitte kontaktieren Sie STOA, um mit einem Plan fortzufahren.",
   "pilotTitle": "Pilotversprechen",
   "pilotBody": "Starten Sie mit einer kostenlosen Probephase, prüfen Sie STOA im Familienalltag und wählen Sie danach einen Plan.",
   "pilotDetail": "Jeder Plan zeigt vor dem Checkout klar, welche Unterstützung Schüler, Eltern und Lehrpersonen erhalten.",
+  "priceStructure": {
+    "title": "Preisstruktur",
+    "description": "Die monatlichen Pläne folgen den Zugangsleveln, die unten unter Planzugang erklärt werden.",
+    "accessLabel": "Abgleich mit Planzugang",
+    "note": "Die finale Checkout-Verfügbarkeit und Abrechnungsbedingungen bestätigt STOA, bevor eine Familie mit einem bezahlten Plan startet.",
+    "plans": [
+      {
+        "id": "free_trial",
+        "name": "Probephase",
+        "price": "CHF 0",
+        "cadence": "Pilotstart",
+        "fit": "Für Familien, die prüfen möchten, ob STOA in ihren Hausaufgabenalltag passt.",
+        "access": "Begrenzte Erklärungen zu Fragen und Hausaufgaben-Uploads, Elternbereich enthalten, keine Wochenberichte oder Lehrpersonen-Q&A."
+      },
+      {
+        "id": "student",
+        "name": "Schülerplan",
+        "price": "CHF 29",
+        "cadence": "pro Monat",
+        "fit": "Für einen Lernenden, der verlässliche geführte Hausaufgabenhilfe braucht.",
+        "access": "Erklärungen zu Fragen, Hausaufgaben-Upload, Elternbereich und Wochenberichte enthalten; Lehrpersonen-Q&A ist nicht enthalten."
+      },
+      {
+        "id": "tutor_supported",
+        "name": "Plan mit Lehrpersonen",
+        "price": "CHF 89",
+        "cadence": "pro Monat",
+        "fit": "Für Familien, die professionelle Hilfe wünschen, wenn Hausaufgabenfragen eskalieren müssen.",
+        "access": "Alles aus Schüler, plus wöchentlich begrenztes Lehrpersonen-Q&A."
+      },
+      {
+        "id": "family",
+        "name": "Familienplan",
+        "price": "CHF 149",
+        "cadence": "pro Monat",
+        "fit": "Für Familien, die das höchste Unterstützungslevel und gemeinsame Nutzung möchten.",
+        "access": "Alle Kernzugänge, 5x mehr Zeit mit Lehrpersonen und gemeinsame Vorteile für bis zu 3 Personen."
+      }
+    ]
+  },
   "comparison": {
     "title": "Planzugang",
     "headers": ["Funktion", "Probephase", "Schüler", "Mit Lehrpersonen", "Familie"],

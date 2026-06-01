@@ -25,8 +25,8 @@ export function VirtualCheckoutPage() {
         <PageContainer className="p-0">
           <PageHeader
             eyebrow="Checkout unavailable"
-            title="Plan selection is being prepared"
-            description="Please return to billing or contact STOA to continue."
+            title="Online plan changes are unavailable"
+            description="Return to billing or contact STOA to continue with a paid plan."
           />
           <Card>
             <CardContent className="space-y-4 p-6 text-sm text-muted-foreground">
@@ -47,7 +47,7 @@ export function VirtualCheckoutPage() {
         <PageHeader
           eyebrow="Plan selection"
           title="Review your plan selection"
-          description="Review the plan journey without entering payment details."
+          description="Confirm the selected plan before moving to hosted payment."
           actions={<Badge variant="secondary">No card required</Badge>}
         />
         <Card>
@@ -62,7 +62,7 @@ export function VirtualCheckoutPage() {
           </CardHeader>
           <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
             <p>
-              This review step lets you confirm the plan journey. Do not enter card numbers.
+              This review step lets you confirm the selected plan. No card details are collected here.
               Payment collection will use a secure hosted checkout.
             </p>
             <div className="flex flex-wrap gap-3">

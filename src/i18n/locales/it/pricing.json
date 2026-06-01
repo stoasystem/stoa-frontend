@@ -2,15 +2,53 @@
   "title": "Prezzi",
   "eyebrow": "Piani per famiglie",
   "description": "Scegli il livello di supporto ai compiti di cui la tua famiglia ha bisogno, dalla pratica guidata al supporto di un insegnante qualificato.",
-  "badge": "Anteprima checkout sicura",
   "supportLevel": "Scegli il livello di supporto",
   "supportLevelBody": "Pratica guidata, report per genitori e supporto di un insegnante qualificato restano nello stesso percorso familiare.",
   "valueTitle": "Il valore per le famiglie",
   "valueBody": "STOA unisce supporto guidato ai compiti, segnali visibili ai genitori e supporto insegnante, così gli studenti avanzano e le famiglie restano informate.",
-  "checkoutBody": "La scelta del piano è in preparazione. Contatta STOA per continuare con un piano.",
   "pilotTitle": "Promessa pilota",
   "pilotBody": "Inizia con una prova gratuita, verifica se STOA si adatta alla routine familiare e poi scegli un piano.",
   "pilotDetail": "Ogni piano chiarisce prima del checkout il livello di supporto per studente, genitori e insegnante.",
+  "priceStructure": {
+    "title": "Struttura dei prezzi",
+    "description": "I piani mensili seguono i livelli di accesso spiegati sotto in Accesso per piano.",
+    "accessLabel": "Confronto con accesso piano",
+    "note": "Disponibilita finale del checkout e termini di fatturazione vengono confermati da STOA prima dell'avvio di un piano a pagamento.",
+    "plans": [
+      {
+        "id": "free_trial",
+        "name": "Prova gratuita",
+        "price": "CHF 0",
+        "cadence": "inizio pilota",
+        "fit": "Per famiglie che vogliono verificare se STOA si adatta alla routine dei compiti.",
+        "access": "Spiegazioni alle domande e caricamento compiti limitati, area genitori inclusa, senza report settimanali o domande a un insegnante."
+      },
+      {
+        "id": "student",
+        "name": "Piano studente",
+        "price": "CHF 29",
+        "cadence": "al mese",
+        "fit": "Per uno studente che ha bisogno di supporto guidato e costante ai compiti.",
+        "access": "Spiegazioni alle domande, caricamento compiti, area genitori e report settimanali inclusi; domande a un insegnante non incluse."
+      },
+      {
+        "id": "tutor_supported",
+        "name": "Piano con insegnante",
+        "price": "CHF 89",
+        "cadence": "al mese",
+        "fit": "Per famiglie che vogliono aiuto professionale quando le domande sui compiti devono essere inoltrate.",
+        "access": "Tutto del piano Studente, piu domande a un insegnante limitate ogni settimana."
+      },
+      {
+        "id": "family",
+        "name": "Piano famiglia",
+        "price": "CHF 149",
+        "cadence": "al mese",
+        "fit": "Per famiglie che vogliono il massimo livello di supporto e accesso condiviso.",
+        "access": "Tutti gli accessi principali, 5x piu tempo insegnante e vantaggi condivisi fino a 3 persone."
+      }
+    ]
+  },
   "comparison": {
     "title": "Accesso per piano",
     "headers": ["Funzione", "Prova", "Studente", "Con insegnante", "Famiglia"],

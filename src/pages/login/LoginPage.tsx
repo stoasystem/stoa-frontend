@@ -70,10 +70,7 @@ export function LoginPage() {
 
         <div className="brand-rule flex min-h-[34rem] flex-col justify-center p-6 sm:p-8">
           <div className="mx-auto w-full max-w-md">
-            <p className="brand-section-kicker">
-              {t('login.secureEyebrow')}
-            </p>
-            <h1 className="editorial-heading editorial-title-shell mt-5 text-4xl font-semibold leading-tight">
+            <h1 className="editorial-heading editorial-title-shell text-4xl font-semibold leading-tight">
               {t('login.title')}
             </h1>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">

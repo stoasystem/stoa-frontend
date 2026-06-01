@@ -34,7 +34,7 @@
       { "title": "Hints before answers", "body": "A mistake shows a useful hint first, so the student can try the next step independently." }
     ],
     "preview": {
-      "label": "Current demo topic",
+      "label": "Example topic",
       "title": "A short equation practice path",
       "prompt": "Solve: 2x + 3 = 11",
       "progress": "Step 2 of 5",

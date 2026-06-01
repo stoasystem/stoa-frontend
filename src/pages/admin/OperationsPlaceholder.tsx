@@ -14,7 +14,7 @@ export function AdminOperationsPlaceholderPage({
         <PageHeader
           eyebrow="Admin operations"
           title={title}
-          description="This operations area is being prepared for a later release."
+          description="This operations area is not available yet."
         />
         <AdminUnavailableCard
           title={`${title} unavailable`}
