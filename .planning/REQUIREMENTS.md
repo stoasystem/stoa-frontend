@@ -1,179 +1,184 @@
-# Requirements: STOA Frontend v2.3
+# Requirements: STOA Frontend v2.4
 
-## v2.3 Requirements
+## v2.4 Requirements
 
-### Live Classroom Foundation
+### Learning Entry Hierarchy
 
-- [x] **LCF-01**: Developers can use a shared `src/features/live-classroom/` module for live classroom types, mock data, services, hooks, pages, components, and utilities.
-- [x] **LCF-02**: Classroom session metadata distinguishes role, source, session type, status, schedule times, participants, materials, context, and notes without depending on real video provider state.
-- [x] **LCF-03**: Mock classroom data includes at least one scheduled upcoming classroom, one instant video help classroom, one completed summary, tutor queue data, participants, messages, materials, and notes.
-- [x] **LCF-04**: Live classroom services support student home data, session lookup, scheduling, instant video help request, lobby join, room join, room leave, session completion, tutor queue lookup, and note saving through mock/demo-ready async functions.
-- [x] **LCF-05**: Classroom hooks expose student home, session, scheduling, instant video help, room UI state, tutor queue, and notes behavior through typed APIs that can later delegate to backend services.
-- [x] **LCF-06**: Classroom UI code keeps a provider-neutral future video adapter boundary and does not call real WebRTC, device stream, or video SDK APIs in v2.3.
+- [ ] **LEH-01**: Student Dashboard presents the main learning flow as prioritized sections instead of a flat feature grid.
+- [ ] **LEH-02**: Student Dashboard primary action is Continue Practice Path / Continue Learning with one clear primary CTA.
+- [ ] **LEH-03**: Student Dashboard separates Today's Practice, Need Help, Live Support, and Recent Activity into scannable sections.
+- [ ] **LEH-04**: Student Dashboard includes Practice Library and Mistakes to Review as practice-oriented actions with supportive copy.
+- [ ] **LEH-05**: Student Dashboard includes Learning Assistant and Upload a Question as help-oriented actions with distinct purposes.
+- [ ] **LEH-06**: Student Dashboard includes Online Classroom and Tutor Support without making them compete visually with the primary learning action.
+- [ ] **LEH-07**: Student navigation and top-level labels use Practice Library where students previously saw Question Bank, while routes may remain `/question-bank`.
+- [ ] **LEH-08**: Mobile Student Dashboard ordering prioritizes Continue Learning, Need Help, Today's Practice, Live Support, and Recent Activity.
 
-### Student Classroom Entry and Scheduling
+### Practice Library Refinement
 
-- [x] **LCS-01**: Students can see an Online Classroom card on the Student Dashboard with either next-session join/detail actions or schedule/instant-help actions.
-- [x] **LCS-02**: Students can open `/classroom` to see upcoming classroom sessions, instant help guidance, schedule entry, and recent sessions.
-- [x] **LCS-03**: Students can open `/classroom/schedule` and choose subject, topic, level, language, session type, time slot, and tutor context.
-- [x] **LCS-04**: Students can attach learning materials during scheduling by reusing v2.2 upload UI rather than a new attachment implementation.
-- [x] **LCS-05**: Students can submit the schedule form and see a mock scheduled-success state with session details and actions to return home or open the lobby.
-- [x] **LCS-06**: Student classroom entry copy makes scheduled classroom and instant help distinct, and instant video help is framed as starting from Learning Assistant or tutor text context.
+- [ ] **PLR-01**: Student-facing Question Bank home title changes to Practice Library with subtitle "Choose exercises by subject, topic, and difficulty."
+- [ ] **PLR-02**: Practice Library home orders content as Continue Practice, Find Exercises, Recommended for You, Review & Improve, and All Subjects.
+- [ ] **PLR-03**: Practice Library recommended and empty states distinguish recommended-to-start from based-on-history recommendations.
+- [ ] **PLR-04**: Question set cards present concise learning metadata: title, description, question count, difficulty, estimated time, skills, and correct primary action.
+- [ ] **PLR-05**: In-progress question set cards show progress and Resume rather than generic Start.
+- [ ] **PLR-06**: Completed question set cards use Practice Again and Review Mistakes instead of punitive copy.
+- [ ] **PLR-07**: Question session pages use calm labels such as Your answer, Check Answer, Skip for Now, Correct, Not quite, Explanation, and Ask Learning Assistant.
+- [ ] **PLR-08**: Question feedback avoids Wrong, Failed, weak student, and other punitive language.
+- [ ] **PLR-09**: Question result pages highlight Score, Accuracy, Time, What went well, Needs review, and Next steps.
+- [ ] **PLR-10**: Mistakes review empty and populated states use No mistakes to review yet, Review questions you missed before, and Start Practice / Review Mistakes actions.
+- [ ] **PLR-11**: Practice Library, session, result, and mistakes pages remain usable on mobile without squeezing sidebars or excessive metadata.
 
-### Lobby and Room Experience
+### Upload And Chat Trust Copy
 
-- [x] **LCR-01**: Students can open `/classroom/sessions/:sessionId/lobby` and see classroom title, time, tutor profile, session context, attached materials, and readiness state.
-- [x] **LCR-02**: Lobby device checks expose mock camera, microphone, and speaker controls with keyboard-accessible state changes and clear text labels.
-- [x] **LCR-03**: Lobby supports ready, not-ready, waiting-for-tutor, tutor-ready, joining, failed-to-join, unavailable, and completed states through visible user-facing UI.
-- [x] **LCR-04**: Students can join an available classroom from the lobby and navigate to `/classroom/sessions/:sessionId/room`.
-- [x] **LCR-05**: Classroom room UI contains a top bar, video tile area, learning workspace, side panel, and bottom control bar at desktop widths.
-- [x] **LCR-06**: Classroom room UI adapts on mobile to a single-column video/workspace layout with panel access through drawer or bottom-sheet behavior rather than a squeezed desktop side panel.
-- [x] **LCR-07**: Video tiles render honest mock placeholders for tutor and student media state without implying a real live stream is connected.
-- [x] **LCR-08**: Learning workspace shows shared problem/source context, uploaded materials, and a whiteboard placeholder with tutor-facing mock tools only.
-- [x] **LCR-09**: Classroom side panel supports Chat, Materials, Notes, and Participants tabs with keyboard-reachable tab controls.
-- [x] **LCR-10**: Classroom chat panel supports mock student/tutor messages and a send interaction appropriate for live classroom text support.
-- [x] **LCR-11**: Classroom materials panel reuses v2.2 attachment preview/upload UI and labels uploaded-before-session versus shared-during-session materials.
-- [x] **LCR-12**: Classroom notes panel shows student-readable notes/next steps and allows tutor-role note editing through local/mock state.
-- [x] **LCR-13**: Classroom participants panel shows student and tutor identities, roles, camera status, microphone status, and connection status.
-- [x] **LCR-14**: Classroom controls support mock mute/unmute, camera on/off, share material, whiteboard, chat/panel selection, leave, and tutor-only end session actions.
-- [x] **LCR-15**: Leave and end-session confirmation dialogs preserve correct role semantics: students leave their own room view, tutors end the session for everyone.
-- [x] **LCR-16**: Students can complete or leave a classroom and open `/classroom/sessions/:sessionId/summary`.
+- [ ] **UCT-01**: Upload entry points consistently use Upload a Question, Take Photo, Attach PDF, and Attach File.
+- [ ] **UCT-02**: Upload UI avoids Photo Solver, AI Solver, Instant Solve, Scan and Solve, and image-recognition claims.
+- [ ] **UCT-03**: Upload modal explains that students can take a photo or attach a PDF from schoolwork and ask the Learning Assistant step by step.
+- [ ] **UCT-04**: Upload modal and inline panels include supported formats, maximum size, attached files, privacy note, and recovery actions.
+- [ ] **UCT-05**: Upload success copy says File ready and Ask Learning Assistant without implying recognition or solving.
+- [ ] **UCT-06**: Upload errors are specific and recoverable for unsupported type, too large, too many files, failed upload, and empty file.
+- [ ] **UCT-07**: Chat attachment display stays concise and avoids claiming the assistant has read or solved uploaded images.
+- [ ] **UCT-08**: Learning Assistant copy remains step-by-step guidance, not AI teacher or perfect answer language.
+- [ ] **UCT-09**: Chat teacher support states cover Tutor support requested, Tutor joined, Learning Assistant observing, Start Live Classroom, and Live classroom completed.
+- [ ] **UCT-10**: Chat and help CTAs consistently use Ask Learning Assistant, Ask a Tutor, and Start Live Classroom.
 
-### Chat-to-Video Escalation
+### Online Classroom Refinement
 
-- [x] **LCCHAT-01**: Learning Chat support state can represent idle, teacher text requested, teacher joining text, teacher text active, video requested, video lobby ready, video active, and video completed.
-- [x] **LCCHAT-02**: When teacher text help is requested but not active, Chat shows a waiting state that encourages the student to continue with Learning Assistant while waiting.
-- [x] **LCCHAT-03**: When tutor text help is active, Chat clearly states that a tutor has joined and the Learning Assistant is observing while the tutor helps.
-- [x] **LCCHAT-04**: When tutor text help is active, students can start a live classroom from Chat through a visible Start video classroom action.
-- [x] **LCCHAT-05**: Starting video help from Chat creates a mock instant-video classroom session with conversation summary, source conversation ID, current topic, and uploaded material context where available.
-- [x] **LCCHAT-06**: Chat-to-video escalation navigates students to `/classroom/sessions/:sessionId/lobby?source=chat` and preserves enough context to render lobby/session context.
-- [x] **LCCHAT-07**: After a classroom completes, Chat can show a lightweight completed-classroom system update or link back to session notes without adding AI-in-classroom behavior.
+- [ ] **OCR-01**: Online Classroom remains the primary visible module name on dashboard, home, schedule, lobby, room, and summary surfaces.
+- [ ] **OCR-02**: Classroom home explains the support ladder: start with Learning Assistant, tutor can join by text, live classroom is for deeper help.
+- [ ] **OCR-03**: Classroom home separates Upcoming Session, Get Help Now, Schedule a Session, and Recent Sessions.
+- [ ] **OCR-04**: Schedule Classroom form presents subject, topic, level, language, session type, time, tutor context, and materials in a clear order.
+- [ ] **OCR-05**: Schedule session type copy explains Quick Help, Standard Session, and Deep Review by use case, not duration alone.
+- [ ] **OCR-06**: Lobby foregrounds correct classroom confirmation: title, time, tutor, languages, topic, source, materials, and before-you-join device state.
+- [ ] **OCR-07**: Lobby waiting/not-open/completed states give clear next steps and avoid implying real provider connection.
+- [ ] **OCR-08**: Classroom room defaults to learning context: shared problem/materials are prominent, video placeholders stay honest, and side panels are clearly labeled.
+- [ ] **OCR-09**: Classroom room control copy uses Mute, Unmute, Start Video, Stop Video, Share Material, Whiteboard, Chat, Notes, Leave, and End Session.
+- [ ] **OCR-10**: Classroom summary emphasizes What we reviewed, Materials, Recommended next steps, View Summary, and Back to Dashboard.
+- [ ] **OCR-11**: Classroom UI avoids user-facing Zoom, meeting, real stream, recording, screen-share, billing, and provider-specific claims.
+- [ ] **OCR-12**: Mobile classroom layout avoids a fixed squeezed right panel and keeps teacher video, shared problem, bottom controls, and panel tabs usable.
 
-### Tutor Classroom Flow
+### Tutor And Parent Context
 
-- [x] **LCTUTOR-01**: Tutors can open `/tutor/classroom` to see scheduled sessions, instant video requests, and completed sessions for the day.
-- [x] **LCTUTOR-02**: Tutor queue cards show session time, student, topic, source, waiting time/status, and actions to review context or join/open lobby.
-- [x] **LCTUTOR-03**: Tutors can open `/tutor/classroom/sessions/:sessionId/lobby` and review student profile, level, language, topic, source, conversation summary, materials, and recommended focus before joining.
-- [x] **LCTUTOR-04**: Tutors can enter `/tutor/classroom/sessions/:sessionId/room` using the same classroom shell with tutor-specific controls.
-- [x] **LCTUTOR-05**: Tutor room controls include end session, save notes, send recommendation, highlight material, mute/camera, material sharing, whiteboard, and notes access where appropriate.
-- [x] **LCTUTOR-06**: Tutors can save mock classroom notes and recommendations that appear in the classroom summary.
+- [ ] **TPC-01**: Tutor Dashboard and queue cards emphasize student need, topic, source, waiting/status, context, materials, and actions.
+- [ ] **TPC-02**: Tutor queue uses Review Context / Open Lobby / Join Classroom labels consistently.
+- [ ] **TPC-03**: Tutor lobby shows student, level, language, topic, why the student needs help, attached materials, and suggested focus.
+- [ ] **TPC-04**: Tutor room defaults to notes-oriented workflow and exposes Save Notes and End Session semantics.
+- [ ] **TPC-05**: Tutor copy is operational and context-rich rather than promotional.
+- [ ] **TPC-06**: Parent Dashboard includes a lightweight Learning Support section summarizing practice, uploaded questions, tutor support, and classroom activity.
+- [ ] **TPC-07**: Parent classroom copy explains that the child joins from the student dashboard and does not expose parent observer or classroom-control claims.
+- [ ] **TPC-08**: Parent surfaces explain STOA as practice, assistant support, tutor support, and classroom support rather than a simple AI chat.
 
-### Parent Visibility and Session Continuity
+### Shared States, I18n, Accessibility, And QA
 
-- [x] **LCPAR-01**: Parent surfaces include lightweight classroom visibility for upcoming and recent sessions without adding full parent classroom management.
-- [x] **LCPAR-02**: Classroom summary shows session topic, tutor, materials, tutor notes, key points, and next steps.
-- [x] **LCPAR-03**: Summary actions can route students back to Learning Chat, Practice, or Question Bank where relevant.
-- [x] **LCPAR-04**: Parent-facing classroom copy is informational and does not imply parent observer access, recordings, or attendance controls unless those features exist.
-
-### Localization, Accessibility, Responsive QA, and Documentation
-
-- [x] **LCQA-01**: English, German, French, and Italian `liveClassroom` localization files cover home, schedule, lobby, room, summary, tutor, controls, status, actions, errors, and accessibility labels.
-- [x] **LCQA-02**: User-facing copy uses classroom/tutor/live support language and avoids generic meeting, AI teacher, real video connection, recording, screen-share, billing, or provider-specific claims.
-- [x] **LCQA-03**: All classroom icon controls have visible text or accessible labels, and mute/camera/connection states are not communicated by color alone.
-- [x] **LCQA-04**: Side panel tabs, lobby controls, leave/end dialogs, schedule form controls, and mobile panel controls are keyboard reachable.
-- [x] **LCQA-05**: Dialogs and mobile panels manage focus correctly and return focus to the triggering control when closed.
-- [x] **LCQA-06**: Classroom status changes such as tutor joined, waiting, connecting, and completed are announced through accessible status/live-region behavior.
-- [x] **LCQA-07**: Classroom home, schedule, lobby, room, tutor queue, and summary remain usable at mobile, tablet, and desktop widths.
-- [x] **LCQA-08**: Documentation explains v2.3 frontend/mock scope, future video-provider adapter boundary, future scheduling backend, future whiteboard, future recording/summary, and future billing handoff.
-- [x] **LCQA-09**: Playwright coverage verifies Student Dashboard card, classroom home, scheduling, lobby join, room controls/panels, Chat-to-video escalation, tutor queue/lobby/room, and summary.
-- [x] **LCQA-10**: `npm run lint` passes after live classroom implementation.
-- [x] **LCQA-11**: `npm run build` passes after live classroom implementation.
+- [ ] **SQA-01**: Existing shared PageHeader, SectionHeader, EmptyState, and ErrorState patterns are reused or extended rather than duplicated.
+- [ ] **SQA-02**: New ContextCard, NextStepCard, StatusPill, or MetadataList patterns are added only where they reduce duplication and clarify cross-module context.
+- [ ] **SQA-03**: Empty states include title, description, and a next action.
+- [ ] **SQA-04**: Error states include title/description where possible and a recovery action such as Try Again, Back to Dashboard, or Back to Practice Library.
+- [ ] **SQA-05**: Loading states include contextual text such as Loading your classroom or Loading practice sets rather than spinner-only UI.
+- [ ] **SQA-06**: CTA naming is consistent across modules: Open Practice Path, Open Practice Library, Review Mistakes, Ask Learning Assistant, Upload a Question, Ask a Tutor, Start Live Classroom, Schedule a Session, Join Lobby, Join Classroom, View Summary, Back to Dashboard.
+- [ ] **SQA-07**: `questionBank`, `uploads`, `liveClassroom`, `chat`, dashboard, tutor, and parent i18n keys cover refined copy without excessive hard-coded English.
+- [ ] **SQA-08**: German, French, and Italian copy remains initial-quality and is marked for native review where needed.
+- [ ] **SQA-09**: Each touched page keeps one unique h1, sensible heading hierarchy, keyboard-reachable CTAs, and clear accessible names for icon/control buttons.
+- [ ] **SQA-10**: Feedback, upload errors, and classroom status changes use role alert or aria-live where appropriate.
+- [ ] **SQA-11**: Correct/incorrect/active/disabled states are not communicated by color alone.
+- [ ] **SQA-12**: High-risk user-facing terms are removed or justified: AI teacher, human fallback, instant solution, perfect answer, failed questions, weak student, scan and solve, guaranteed, Zoom.
+- [ ] **SQA-13**: Playwright coverage verifies Student Dashboard clarity, Practice Library naming, Upload trust wording, Chat-to-classroom wording, Classroom layout, and relevant empty/error states.
+- [ ] **SQA-14**: `npm run lint` passes after the refinement.
+- [ ] **SQA-15**: `npm run build` passes after the refinement.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Real WebRTC/video provider integration | v2.3 validates frontend UI and flow before selecting LiveKit, Daily, Twilio, Agora, Zoom SDK, or another provider. |
-| Backend room tokens and provider session creation | Requires backend architecture and provider choice. |
-| Real device camera/microphone preview | Requires browser device permissions and real media stream handling. |
-| Real scheduling availability backend | v2.3 uses mock time slots; production availability needs tutor schedules and conflict handling. |
-| Calendar sync | Requires external calendar/provider integration and privacy decisions. |
-| Real screen sharing | Requires video provider/device APIs and UX/security handling. |
-| Real whiteboard drawing engine | Could use tldraw, Excalidraw, or a provider whiteboard later; v2.3 only reserves UI space. |
-| Recording, transcript, replay, and AI-generated summary | Requires media capture/storage, consent, privacy policy, and backend processing. |
-| Billing, lesson-minute deduction, and package accounting | Live classroom monetization needs product and backend payment scope. |
-| Multi-student group classes and breakout rooms | v2.3 targets one student plus one tutor support flows. |
-| Admin classroom operations dashboard | Admin operations require separate scope beyond student/tutor demo flow. |
-| Parent observer role | Parent visibility is informational only in v2.3. |
+| Production OCR or image understanding | v2.4 only improves upload trust copy and handoff behavior. |
+| Real WebRTC/video provider integration | v2.4 refines classroom UI wording and layout only. |
+| Real scheduling availability or tutor matching | Requires backend/product architecture outside this refinement milestone. |
+| Full admin classroom operations | v2.4 focuses on student, tutor, and parent clarity. |
+| Full component library redesign | Existing STOA design system remains in place; only shared patterns may be extended. |
+| Native professional translation review | v2.4 can improve and mark German/French/Italian copy, but native review is a later process. |
+| New large routes or business modules | v2.4 is not an expansion milestone. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| Real WebRTC, Zoom SDK, Twilio, Daily, Agora, LiveKit, or browser media streams | v2.3 is a frontend/mock UI foundation. |
-| Claims that a real live video room is connected | The room uses honest placeholders and mock connection state. |
-| Real tutor matching or scheduling algorithms | Tutor queue and time slots are deterministic mock data. |
-| Real payment, billing, session-minute accounting, or package deduction | Financial behavior is not part of this UI foundation. |
-| Real screen sharing, recording, transcript, or replay | These require backend/media infrastructure and consent design. |
-| Complex whiteboard drawing or math tool engine | v2.3 includes a placeholder and future handoff only. |
-| AI-in-classroom active assistant behavior | The Learning Assistant remains outside the live classroom unless future scope designs it explicitly. |
-| Broad Question Bank or Practice expansion | v2.3 only uses these as context/next-step destinations. |
-| Full parent classroom management | Parent visibility is lightweight and informational. |
-| Admin classroom operations | Admin classroom management is future operational scope. |
+| New production backend services | This milestone is UI/copy/experience refinement only. |
+| Real OCR, handwriting recognition, or image solving | Upload remains a context handoff to Learning Assistant. |
+| Real WebRTC, device streams, recording, transcription, screen sharing, or billing | Online Classroom remains frontend/mock-backed. |
+| Major visual redesign, new color system, new typography direction, or animation overhaul | v2.4 must remain consistent with the existing STOA visual system. |
+| Replacing `/question-bank` routes or internal module names | Student copy can say Practice Library while code/routes remain stable. |
+| Punitive scoring or exam-first language | STOA should remain calm, supportive, and learning-centered. |
+| Parent observer mode or parent classroom controls | Parent visibility remains summary-level and informational. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LCF-01 | 212 | Completed |
-| LCF-02 | 212 | Completed |
-| LCF-03 | 212 | Completed |
-| LCF-04 | 212 | Completed |
-| LCF-05 | 212 | Completed |
-| LCF-06 | 212 | Completed |
-| LCS-01 | 213 | Completed |
-| LCS-02 | 213 | Completed |
-| LCS-03 | 213 | Completed |
-| LCS-04 | 213 | Completed |
-| LCS-05 | 213 | Completed |
-| LCS-06 | 213 | Completed |
-| LCR-01 | 214 | Completed |
-| LCR-02 | 214 | Completed |
-| LCR-03 | 214 | Completed |
-| LCR-04 | 214 | Completed |
-| LCR-05 | 214 | Completed |
-| LCR-06 | 214 | Completed |
-| LCR-07 | 214 | Completed |
-| LCR-08 | 214 | Completed |
-| LCR-09 | 214 | Completed |
-| LCR-10 | 214 | Completed |
-| LCR-11 | 214 | Completed |
-| LCR-12 | 214 | Completed |
-| LCR-13 | 214 | Completed |
-| LCR-14 | 214 | Completed |
-| LCR-15 | 214 | Completed |
-| LCR-16 | 214 | Completed |
-| LCCHAT-01 | 215 | Completed |
-| LCCHAT-02 | 215 | Completed |
-| LCCHAT-03 | 215 | Completed |
-| LCCHAT-04 | 215 | Completed |
-| LCCHAT-05 | 215 | Completed |
-| LCCHAT-06 | 215 | Completed |
-| LCCHAT-07 | 215 | Completed |
-| LCTUTOR-01 | 216 | Completed |
-| LCTUTOR-02 | 216 | Completed |
-| LCTUTOR-03 | 216 | Completed |
-| LCTUTOR-04 | 216 | Completed |
-| LCTUTOR-05 | 216 | Completed |
-| LCTUTOR-06 | 216 | Completed |
-| LCPAR-01 | 217 | Completed |
-| LCPAR-02 | 217 | Completed |
-| LCPAR-03 | 217 | Completed |
-| LCPAR-04 | 217 | Completed |
-| LCQA-01 | 218 | Completed |
-| LCQA-02 | 218 | Completed |
-| LCQA-03 | 218 | Completed |
-| LCQA-04 | 218 | Completed |
-| LCQA-05 | 218 | Completed |
-| LCQA-06 | 218 | Completed |
-| LCQA-07 | 218 | Completed |
-| LCQA-08 | 218 | Completed |
-| LCQA-09 | 218 | Completed |
-| LCQA-10 | 218 | Completed |
-| LCQA-11 | 218 | Completed |
+| LEH-01 | 219 | Pending |
+| LEH-02 | 219 | Pending |
+| LEH-03 | 219 | Pending |
+| LEH-04 | 219 | Pending |
+| LEH-05 | 219 | Pending |
+| LEH-06 | 219 | Pending |
+| LEH-07 | 219 | Pending |
+| LEH-08 | 219 | Pending |
+| PLR-01 | 220 | Pending |
+| PLR-02 | 220 | Pending |
+| PLR-03 | 220 | Pending |
+| PLR-04 | 220 | Pending |
+| PLR-05 | 220 | Pending |
+| PLR-06 | 220 | Pending |
+| PLR-07 | 220 | Pending |
+| PLR-08 | 220 | Pending |
+| PLR-09 | 220 | Pending |
+| PLR-10 | 220 | Pending |
+| PLR-11 | 220 | Pending |
+| UCT-01 | 221 | Pending |
+| UCT-02 | 221 | Pending |
+| UCT-03 | 221 | Pending |
+| UCT-04 | 221 | Pending |
+| UCT-05 | 221 | Pending |
+| UCT-06 | 221 | Pending |
+| UCT-07 | 221 | Pending |
+| UCT-08 | 221 | Pending |
+| UCT-09 | 221 | Pending |
+| UCT-10 | 221 | Pending |
+| OCR-01 | 222 | Pending |
+| OCR-02 | 222 | Pending |
+| OCR-03 | 222 | Pending |
+| OCR-04 | 222 | Pending |
+| OCR-05 | 222 | Pending |
+| OCR-06 | 222 | Pending |
+| OCR-07 | 222 | Pending |
+| OCR-08 | 222 | Pending |
+| OCR-09 | 222 | Pending |
+| OCR-10 | 222 | Pending |
+| OCR-11 | 222 | Pending |
+| OCR-12 | 222 | Pending |
+| TPC-01 | 223 | Pending |
+| TPC-02 | 223 | Pending |
+| TPC-03 | 223 | Pending |
+| TPC-04 | 223 | Pending |
+| TPC-05 | 223 | Pending |
+| TPC-06 | 223 | Pending |
+| TPC-07 | 223 | Pending |
+| TPC-08 | 223 | Pending |
+| SQA-01 | 224 | Pending |
+| SQA-02 | 224 | Pending |
+| SQA-03 | 224 | Pending |
+| SQA-04 | 224 | Pending |
+| SQA-05 | 224 | Pending |
+| SQA-06 | 224 | Pending |
+| SQA-07 | 224 | Pending |
+| SQA-08 | 224 | Pending |
+| SQA-09 | 224 | Pending |
+| SQA-10 | 224 | Pending |
+| SQA-11 | 224 | Pending |
+| SQA-12 | 224 | Pending |
+| SQA-13 | 224 | Pending |
+| SQA-14 | 224 | Pending |
+| SQA-15 | 224 | Pending |
 
-**Total requirements:** 56
-**Mapped requirements:** 56
+**Total requirements:** 64
+**Mapped requirements:** 64
 **Unmapped requirements:** 0
 
-*Last updated: 2026-06-02 after v2.3 implementation and verification*
+*Last updated: 2026-06-02 after v2.4 requirements definition*
