@@ -1,172 +1,156 @@
-# Requirements: STOA Frontend v2.1
+# Requirements: STOA Frontend v2.2
 
-**Defined:** 2026-06-01
-**Core Value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, premium visual design, and a clean path to future real backend integration.
+## v2.2 Requirements
 
-## v2.1 Requirements
+### Upload Foundation
 
-### Question Bank Navigation and Information Architecture
+- [ ] **UPF-01**: Developers can use a shared `src/features/uploads/` module for upload types, utilities, services, hooks, and components instead of page-specific upload implementations.
+- [ ] **UPF-02**: Upload metadata distinguishes upload context, file kind, status, validation errors, source page, and source entity without storing raw `File` objects in global app state.
+- [ ] **UPF-03**: Upload validation supports accepted file types, empty files, maximum file size, and maximum file count with reusable error objects.
+- [ ] **UPF-04**: Upload utilities classify JPG, PNG, WEBP, and PDF files and format file sizes consistently.
+- [ ] **UPF-05**: Upload preview helpers create image preview object URLs and revoke them when attachments are removed or components unmount.
+- [ ] **UPF-06**: Upload service functions can upload, retry, and remove attachments through a mock/demo-ready boundary that can later delegate to production file APIs.
 
-- [x] **QBIA-01**: Student can access Question Bank from authenticated student navigation near Practice and Learning Chat.
-- [x] **QBIA-02**: Question Bank routes exist for home, subject overview, topic question-set listing, set overview, session, result, mistakes review, and saved practice.
-- [x] **QBIA-03**: Question Bank page hierarchy and breadcrumbs make the path from subject to topic to set to session clear.
-- [x] **QBIA-04**: Question Bank copy clearly frames the module as a flexible exercise library, not a replacement for Practice Path.
-- [x] **QBIA-05**: Question Bank entry points do not disrupt existing Practice Path, Learning Chat, Learning History, Profile, parent, tutor, or admin routes.
+### Shared Upload UI
 
-### Discovery, Search, and Filters
+- [ ] **UPUI-01**: Students can choose files through a reusable upload button that supports accepted types, multiple selection, disabled state, and accessible labeling.
+- [ ] **UPUI-02**: Students can use a dedicated photo capture entry that uses mobile camera capture when available and falls back to image file selection.
+- [ ] **UPUI-03**: Desktop students can drag and drop files into a visible drop zone, and keyboard users can use an equivalent Browse files action.
+- [ ] **UPUI-04**: Students can see attachment preview cards for image thumbnails, PDFs, and unknown file types with filename, type, size, status, and actions.
+- [ ] **UPUI-05**: Students can remove an attachment from a preview list before sending or handing it off.
+- [ ] **UPUI-06**: Students can retry failed uploads from the attachment card.
+- [ ] **UPUI-07**: Students can see clear status labels for validating, uploading, uploaded, failed, and rejected attachments without relying on color alone.
+- [ ] **UPUI-08**: Students can see clear upload error messages for unsupported type, too-large file, too-many files, empty file, upload failure, and unavailable preview.
+- [ ] **UPUI-09**: Students can open a reusable upload modal from contextual pages and complete upload actions without losing the page context.
+- [ ] **UPUI-10**: Students can use a reusable inline upload panel on learning pages without it visually overtaking the primary learning flow.
 
-- [x] **QBDISC-01**: Student can use the Question Bank home page to see search, continue practice, subject cards, recommended sets, mistakes review, and recent practice.
-- [x] **QBDISC-02**: Student can search local mock question-bank data by subject, topic, skill, question set, or question prompt.
-- [x] **QBDISC-03**: Student can open a subject page and see progress, grade/level filters, difficulty filters, topic cards, and recommended sets.
-- [x] **QBDISC-04**: Student can open a topic page and see topic progress, weak areas, filters, question-set list, and a related Practice Path CTA.
-- [x] **QBDISC-05**: Topic and subject filters support grade/level, difficulty, question type, and status where relevant.
-- [x] **QBDISC-06**: Active filters remain visible and can be cleared or reset without leaving the current page.
-- [x] **QBDISC-07**: Search and filter updates are usable on mobile layouts without crowding the page.
+### Chat Integration
 
-### Question Set Overview
+- [ ] **UPCHAT-01**: Students can attach supported photos and PDFs from the Learning Chat composer.
+- [ ] **UPCHAT-02**: Students can take or select a photo from the Chat composer on mobile-capable browsers.
+- [ ] **UPCHAT-03**: Students can preview, remove, and retry Chat attachments before sending a message.
+- [ ] **UPCHAT-04**: Students can send a Chat message with uploaded attachment metadata and the message stream displays the attachment cards.
+- [ ] **UPCHAT-05**: Chat upload behavior preserves existing streaming, stop generation, retry message, attachment IDs, and teacher-help behavior.
+- [ ] **UPCHAT-06**: Chat copy encourages students to include a question or prompt with an upload and does not imply image recognition or automatic solving.
 
-- [x] **QBSET-01**: Student can open a question set overview page from a recommended set, topic list, recent practice item, saved set, or mistakes flow.
-- [x] **QBSET-02**: Question set overview displays title, description, question count, difficulty range, estimated time, subject, level, and status.
-- [x] **QBSET-03**: Question set overview displays skills covered and a question-type breakdown.
-- [x] **QBSET-04**: Question set overview displays last-attempt summary when mock attempt history exists.
-- [x] **QBSET-05**: Question set actions change by status: Start, Resume, Practice Again, or Review.
-- [x] **QBSET-06**: Question set overview explains that Learning Assistant help is available after questions without making Chat the primary activity.
+### Question Bank Integration
 
-### Question Session and Feedback
+- [ ] **UPQB-01**: Students can open an Upload Question flow from the Question Bank home page as a secondary CTA.
+- [ ] **UPQB-02**: Students can upload a photo or PDF from the Question Bank home upload flow and see preview, validation, remove, retry, and completion states.
+- [ ] **UPQB-03**: Students can ask the Learning Assistant from a completed Question Bank upload, with upload context passed to Chat.
+- [ ] **UPQB-04**: Students can access upload help from a Question Bank session question without disrupting answer input or feedback controls.
+- [ ] **UPQB-05**: Students can upload a photo or PDF for the current question and then ask the Learning Assistant with session ID, question ID, and attachment metadata.
+- [ ] **UPQB-06**: Question Bank upload copy stays distinct from Practice Path and avoids exam-system or instant-solver positioning.
 
-- [x] **QBSESS-01**: Student can start or resume a mock question-bank session from a question set.
-- [x] **QBSESS-02**: Session page shows set title, question number, progress, prompt, answer input, check/skip actions, feedback panel, Learning Assistant CTA, and previous/next navigation.
-- [x] **QBSESS-03**: Session UI supports multiple-choice questions.
-- [x] **QBSESS-04**: Session UI supports short-answer questions.
-- [x] **QBSESS-05**: Session UI supports numeric-answer questions.
-- [x] **QBSESS-06**: Session UI supports step-by-step question layout without requiring complex formula editing or real step-level grading.
-- [x] **QBSESS-07**: Session feedback supports idle, checking, correct, incorrect, partially correct, and skipped states.
-- [x] **QBSESS-08**: Correct feedback explains the reasoning step in a concise learning tone.
-- [x] **QBSESS-09**: Incorrect feedback shows the student's answer, correct answer, explanation, Try Similar Question action, and Learning Assistant action.
-- [x] **QBSESS-10**: Student can review unanswered questions or finish anyway when ending a session with unanswered items.
+### Practice Path Integration
 
-### Results and Mistakes Review
+- [ ] **UPPRAC-01**: Students can see a lightweight schoolwork upload entry on Practice Path surfaces without displacing the guided roadmap or lesson CTA.
+- [ ] **UPPRAC-02**: Students can upload a photo or PDF from Practice and see preview, validation, remove, retry, and completion states.
+- [ ] **UPPRAC-03**: Students can ask the Learning Assistant from a completed Practice upload with Practice source context.
+- [ ] **UPPRAC-04**: Practice upload copy frames the flow as bringing schoolwork into step-by-step guidance, not as a generic file upload or game reward.
 
-- [x] **QBRES-01**: Student can finish a question set and see a result page for the session.
-- [x] **QBRES-02**: Result page displays score, time spent, accuracy by topic, incorrect/skipped questions, and recommended next steps.
-- [x] **QBRES-03**: Result page lets the student retry mistakes.
-- [x] **QBRES-04**: Result page includes a Continue to Practice Path CTA for the related topic.
-- [x] **QBRES-05**: Student can open the mistakes review page from Question Bank home, result page, or student dashboard entry.
-- [x] **QBRES-06**: Mistakes review page displays summary, subject filter, topic filter, difficulty filter, mistake list, and Start Review Session action.
-- [x] **QBRES-07**: Mistake review session uses the same low-pressure feedback model as normal question sessions.
+### Handoff, Privacy, and Product Boundaries
 
-### Learning Assistant, Parent, and Tutor Context
+- [ ] **UPCTX-01**: Upload-to-Chat handoff supports route state and a session-storage fallback using lightweight attachment metadata.
+- [ ] **UPCTX-02**: Chat can render a context card or starter message for upload handoffs from Question Bank and Practice.
+- [ ] **UPCTX-03**: Upload UI includes a lightweight privacy reminder asking students to upload learning materials only and not personal documents.
+- [ ] **UPCTX-04**: User-facing upload copy does not claim OCR, handwriting recognition, formula recognition, image understanding, automatic solving, permanent storage, encryption, teacher grading, parent review, or admin moderation.
+- [ ] **UPCTX-05**: Upload docs identify future extension points for OCR/image analysis, teacher help, parent reporting, and production storage without implementing them in v2.2.
 
-- [x] **QBCTX-01**: Learning Assistant CTA from question feedback routes to Chat with provider-agnostic question-bank context.
-- [x] **QBCTX-02**: Chat surfaces can display question-bank context without exposing mock, demo, backend, prompt, model, or provider terminology.
-- [x] **QBCTX-03**: Parent-facing learning activity can mention Question Bank attempts, mistakes reviewed, and next focus in a concise product-safe way.
-- [x] **QBCTX-04**: Tutor-facing context can identify a question-bank source when a student escalates from a question-bank item.
-- [x] **QBCTX-05**: Documentation explains the relationship between Question Bank, Practice Path, Learning Chat, Professional Teacher Support, and Parent Report.
+### Localization, Accessibility, and QA
 
-### Demo Data, Localization, Accessibility, and Verification
-
-- [x] **QBQA-01**: Question Bank uses typed deterministic mock data for subjects, topics, question sets, questions, sessions, results, saved sets, and mistakes.
-- [x] **QBQA-02**: Question Bank service and hook boundaries are replaceable by future backend APIs without changing page components substantially.
-- [x] **QBQA-03**: User-facing Question Bank copy exists for English, German, French, and Italian.
-- [x] **QBQA-04**: Question Bank interactive controls are keyboard-accessible and have clear labels, focus states, and result/feedback announcements where needed.
-- [x] **QBQA-05**: Question Bank responsive layout is verified for mobile and desktop.
-- [x] **QBQA-06**: User-facing Question Bank UI is checked for visible demo/mock/backend/provider/internal terminology.
-- [x] **QBQA-07**: `npm run lint` and `npm run build` pass after the milestone implementation.
-- [x] **QBQA-08**: Browser smoke checks cover the home, subject, topic, set overview, session, result, mistakes review, and Chat handoff paths.
+- [ ] **UPQA-01**: English, German, French, and Italian `uploads` localization files cover upload actions, statuses, errors, previews, dropzone copy, privacy copy, and learning-context copy.
+- [ ] **UPQA-02**: Upload controls are keyboard reachable and use real buttons or labeled file inputs.
+- [ ] **UPQA-03**: Upload errors and status changes are announced through accessible alert/status/live-region behavior.
+- [ ] **UPQA-04**: Upload modal focus enters the modal, remains in the modal while open, closes through a visible control, and returns focus to the opener.
+- [ ] **UPQA-05**: Attachment remove and retry buttons include the filename in their accessible label.
+- [ ] **UPQA-06**: Image previews include meaningful alt text and non-image attachments have clear file-kind labels.
+- [ ] **UPQA-07**: Upload panels, modal, dropzone, preview cards, and Chat composer remain usable at mobile and desktop widths in all four supported languages.
+- [ ] **UPQA-08**: Playwright coverage verifies Chat attachment preview/remove/send, unsupported type rejection, too-large rejection, Question Bank upload modal, Question Session upload handoff, and keyboard modal flow.
+- [ ] **UPQA-09**: `npm run lint` passes after upload implementation.
+- [ ] **UPQA-10**: `npm run build` passes after upload implementation.
 
 ## Future Requirements
 
-### Production Question Bank
-
-- **FUTQB-01**: Production backend stores question-bank subjects, topics, question sets, questions, attempts, results, saved sets, and mistakes.
-- **FUTQB-02**: Admin or curriculum staff can manage question-bank content through a production-safe authoring workflow.
-- **FUTQB-03**: Question Bank supports production permissions and school/organization assignment rules.
-- **FUTQB-04**: Question Bank activity persists across devices and sessions.
-- **FUTQB-05**: Question Bank analytics can power deeper parent, tutor, and organization insights.
-
-### Advanced Practice
-
-- **FUTQB-06**: AI-assisted or teacher-authored question generation can be introduced through backend-owned content review.
-- **FUTQB-07**: Exam-prep mode can support timed sets, official exam categories, and more formal result reporting.
-- **FUTQB-08**: Image-based or worksheet-derived question entry can support uploaded questions after privacy and backend scope are defined.
-- **FUTQB-09**: Formal curriculum-standard mapping can connect question sets to school standards and learning objectives.
-- **FUTQB-10**: Paid or assigned question-bank unlocking can be introduced after product packaging and backend authorization are defined.
+| Requirement | Reason Deferred |
+|-------------|-----------------|
+| Production object storage and signed upload URLs | v2.2 validates frontend upload UX and service contracts before backend storage architecture. |
+| OCR, image understanding, handwriting recognition, and formula recognition | These require AI/backend design and are outside the UI foundation. |
+| Automatic problem solving from an image | STOA should first establish safe upload and Learning Assistant handoff without unsupported solving claims. |
+| Crop, rotate, markup, and scan-cleanup tools | Valuable later, but not required for the first reusable upload foundation. |
+| Office document preview for DOCX/PPTX/XLSX | v2.2 focuses on common learning materials: photos and PDFs. |
+| Teacher grading or annotation of uploaded files | Teacher workflows require separate product scope and backend contracts. |
+| Parent review of uploaded files | Parent file review and retention need privacy/product decisions beyond this milestone. |
+| Admin file moderation dashboard | Moderation workflow is future operational scope. |
+| Video upload or live teacher file sharing | Heavy media support is outside the lightweight learning-material upload flow. |
+| Permanent file library or folder management | v2.2 uploads are context-bound learning aids, not a storage product. |
 
 ## Out of Scope
 
-| Feature | Reason |
-|---------|--------|
-| Production question-bank backend | v2.1 validates UI, IA, and mock interaction flow before backend architecture. |
-| Question authoring/admin UI | Content management is separate from student-facing question-bank discovery and practice. |
-| AI-generated questions | Generated content needs backend-owned review, safety, curriculum, and quality workflow. |
-| Image recognition or uploaded-question parsing | Upload/image intelligence is outside the UI design milestone. |
-| Video help or live teacher joining | v2.1 uses Learning Assistant handoff and existing professional teacher support boundaries only. |
-| Complex timed exam mode | The milestone should feel like low-pressure learning practice, not a formal exam platform. |
-| Production permissions or paid unlocking | Authorization and product packaging require backend/payment scope. |
-| Deep school curriculum-standard mapping | Useful later, but v2.1 only needs lightweight skills/topics metadata. |
-| Complex formula editor | Plain inputs and simple rendered math text are enough for the demo question types. |
-| New supported UI languages | v2.1 uses the existing English, German, French, and Italian localization surface. |
+| Item | Reason |
+|------|--------|
+| Real S3, object storage SDKs, or direct browser-to-storage provider calls | Frontend must stay behind STOA backend/API boundaries. |
+| Real virus scanning or security certification claims | Requires backend/security infrastructure and policy work. |
+| Claims that STOA has read, parsed, recognized, or solved uploaded content | v2.2 does not implement OCR or image understanding. |
+| User-visible model/provider/debug terminology | Learning Assistant remains the product-facing term. |
+| Main-navigation upload center | Upload should remain contextual to learning flows. |
+| Broad redesign of Chat, Question Bank, or Practice | v2.2 adds upload affordances while preserving existing product hierarchy. |
+| New paid gating or upload entitlement logic | Existing plan usage surfaces may remain, but v2.2 is not a billing milestone. |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QBIA-01 | Phase 201 | Complete |
-| QBIA-02 | Phase 200 | Complete |
-| QBIA-03 | Phase 200 | Complete |
-| QBIA-04 | Phase 200 | Complete |
-| QBIA-05 | Phase 201 | Complete |
-| QBDISC-01 | Phase 201 | Complete |
-| QBDISC-02 | Phase 201 | Complete |
-| QBDISC-03 | Phase 201 | Complete |
-| QBDISC-04 | Phase 201 | Complete |
-| QBDISC-05 | Phase 201 | Complete |
-| QBDISC-06 | Phase 201 | Complete |
-| QBDISC-07 | Phase 201 | Complete |
-| QBSET-01 | Phase 202 | Complete |
-| QBSET-02 | Phase 202 | Complete |
-| QBSET-03 | Phase 202 | Complete |
-| QBSET-04 | Phase 202 | Complete |
-| QBSET-05 | Phase 202 | Complete |
-| QBSET-06 | Phase 202 | Complete |
-| QBSESS-01 | Phase 203 | Complete |
-| QBSESS-02 | Phase 203 | Complete |
-| QBSESS-03 | Phase 203 | Complete |
-| QBSESS-04 | Phase 203 | Complete |
-| QBSESS-05 | Phase 203 | Complete |
-| QBSESS-06 | Phase 203 | Complete |
-| QBSESS-07 | Phase 203 | Complete |
-| QBSESS-08 | Phase 203 | Complete |
-| QBSESS-09 | Phase 203 | Complete |
-| QBSESS-10 | Phase 203 | Complete |
-| QBRES-01 | Phase 204 | Complete |
-| QBRES-02 | Phase 204 | Complete |
-| QBRES-03 | Phase 204 | Complete |
-| QBRES-04 | Phase 204 | Complete |
-| QBRES-05 | Phase 204 | Complete |
-| QBRES-06 | Phase 204 | Complete |
-| QBRES-07 | Phase 204 | Complete |
-| QBCTX-01 | Phase 204 | Complete |
-| QBCTX-02 | Phase 204 | Complete |
-| QBCTX-03 | Phase 204 | Complete |
-| QBCTX-04 | Phase 204 | Complete |
-| QBCTX-05 | Phase 205 | Complete |
-| QBQA-01 | Phase 200 | Complete |
-| QBQA-02 | Phase 200 | Complete |
-| QBQA-03 | Phase 205 | Complete |
-| QBQA-04 | Phase 205 | Complete |
-| QBQA-05 | Phase 205 | Complete |
-| QBQA-06 | Phase 205 | Complete |
-| QBQA-07 | Phase 205 | Complete |
-| QBQA-08 | Phase 205 | Complete |
+| UPF-01 | 206 | Pending |
+| UPF-02 | 206 | Pending |
+| UPF-03 | 206 | Pending |
+| UPF-04 | 206 | Pending |
+| UPF-05 | 206 | Pending |
+| UPF-06 | 206 | Pending |
+| UPUI-01 | 207 | Pending |
+| UPUI-02 | 207 | Pending |
+| UPUI-03 | 207 | Pending |
+| UPUI-04 | 207 | Pending |
+| UPUI-05 | 207 | Pending |
+| UPUI-06 | 207 | Pending |
+| UPUI-07 | 207 | Pending |
+| UPUI-08 | 207 | Pending |
+| UPUI-09 | 207 | Pending |
+| UPUI-10 | 207 | Pending |
+| UPCHAT-01 | 208 | Pending |
+| UPCHAT-02 | 208 | Pending |
+| UPCHAT-03 | 208 | Pending |
+| UPCHAT-04 | 208 | Pending |
+| UPCHAT-05 | 208 | Pending |
+| UPCHAT-06 | 208 | Pending |
+| UPQB-01 | 209 | Pending |
+| UPQB-02 | 209 | Pending |
+| UPQB-03 | 209 | Pending |
+| UPQB-04 | 209 | Pending |
+| UPQB-05 | 209 | Pending |
+| UPQB-06 | 209 | Pending |
+| UPPRAC-01 | 210 | Pending |
+| UPPRAC-02 | 210 | Pending |
+| UPPRAC-03 | 210 | Pending |
+| UPPRAC-04 | 210 | Pending |
+| UPCTX-01 | 209 | Pending |
+| UPCTX-02 | 209 | Pending |
+| UPCTX-03 | 211 | Pending |
+| UPCTX-04 | 211 | Pending |
+| UPCTX-05 | 211 | Pending |
+| UPQA-01 | 211 | Pending |
+| UPQA-02 | 207 | Pending |
+| UPQA-03 | 207 | Pending |
+| UPQA-04 | 207 | Pending |
+| UPQA-05 | 207 | Pending |
+| UPQA-06 | 207 | Pending |
+| UPQA-07 | 211 | Pending |
+| UPQA-08 | 211 | Pending |
+| UPQA-09 | 211 | Pending |
+| UPQA-10 | 211 | Pending |
 
-**Coverage:**
-- v2.1 requirements: 48 total
-- Mapped to phases: 48
-- Unmapped: 0
+**Total requirements:** 47
+**Mapped requirements:** 47
+**Unmapped requirements:** 0
 
----
-*Requirements defined: 2026-06-01*
-*Last updated: 2026-06-02 after v2.1 completion*
+*Last updated: 2026-06-02 after v2.2 requirements definition*

@@ -1,60 +1,82 @@
-# Project Research: Pitfalls for v2.1 Question Bank UI Design
+# Research: v2.2 Upload UI Pitfalls
 
-**Milestone:** v2.1 Question Bank UI Design
-**Date:** 2026-06-01
+## Product Pitfalls
 
-## Pitfall 1: Duplicating Practice Path
+### Overpromising Recognition
 
-**Risk:** Question Bank becomes another roadmap/lesson path, confusing students and making the existing Practice Path redundant.
+Camera-solver products often promise that the app can solve from the picture. v2.2 must not claim OCR, handwriting recognition, formula recognition, or automatic solving. Copy should say the student can upload learning material and ask the Learning Assistant.
 
-**Prevention:** Keep Question Bank organized around subjects, topics, filters, question sets, and mistakes. Use Practice Path CTAs as related next steps, not embedded roadmap components.
+Prevention: require copy review and internal-term/overpromise scan in the final QA phase.
 
-**Phase to address:** Data/design foundation and browse pages.
+### Upload Becoming a File Center
 
-## Pitfall 2: Turning the UI into an Exam System
+If upload UI becomes a generic file manager, it will dilute STOA's learning flow. Upload should remain context-bound: Chat turn, current Question Bank question, or Practice schoolwork help.
 
-**Risk:** Timers, strict scoring, heavy result language, and pass/fail framing make STOA feel like test software instead of a learning platform.
+Prevention: model `UploadContext`, avoid a visible global upload library, and keep `/uploads/demo` internal only.
 
-**Prevention:** Use low-pressure copy, immediate feedback, retry/review actions, and Learning Assistant handoff. Avoid timed exam mode in v2.1.
+### Duplicate Upload Implementations
 
-**Phase to address:** Session and result pages.
+The repo already has Chat upload code. Adding separate Question Bank and Practice upload logic would create inconsistent validation, preview, and error states.
 
-## Pitfall 3: Overbuilding Backend Architecture
+Prevention: build shared `src/features/uploads/` components and migrate Chat to them.
 
-**Risk:** A UI milestone drifts into item authoring, persistence, permissions, curriculum standards, or production analytics.
+## UX Pitfalls
 
-**Prevention:** Keep mock data deterministic, service boundaries replaceable, and docs explicit about future backend work.
+### Drag-and-Drop Only
 
-**Phase to address:** Foundation and documentation.
+Desktop drop zones are useful, but drag-and-drop is inaccessible if it lacks a browse button and keyboard flow.
 
-## Pitfall 4: Filter UI Becomes Cluttered
+Prevention: every drop zone includes Browse files; modal and inline panels are keyboard reachable.
 
-**Risk:** Subject, grade, topic, difficulty, type, status, recommendation, and search controls crowd the page, especially on mobile.
+### Hidden Status Changes
 
-**Prevention:** Use progressive disclosure: high-value filters visible, secondary filters grouped, mobile controls collapsed, active filter chips visible, clear all available. VA.gov's search-filter guidance also notes mobile collapse and clear/reset behavior as important for faceted search.
+Upload progress and errors can be visually obvious but inaccessible to screen readers.
 
-**Phase to address:** Browse and topic pages.
+Prevention: use `aria-live`/status/alert treatment for validation, upload, failure, and retry messages.
 
-## Pitfall 5: Accessibility Gaps in Interactive Controls
+### Mobile Camera Assumptions
 
-**Risk:** Custom segmented controls, tabs, filter chips, session navigation, feedback announcements, and result updates are hard to use with keyboard or screen readers.
+`capture="environment"` is a hint, not a guaranteed camera UI. Desktop and some browsers will fall back to file selection.
 
-**Prevention:** Prefer native controls where possible, use proper labels, preserve focus after filtering, announce result count/feedback changes with live regions, and verify keyboard order. W3C APG should guide custom widget semantics.
+Prevention: label the control as "Take photo" in student-facing copy but treat selected files generically in code.
 
-**Phase to address:** Every UI phase, with final QA gate.
+### Attachment Preview Memory Leaks
 
-## Pitfall 6: Chat Handoff Exposes Internals
+Object URLs for previews can leak if never revoked.
 
-**Risk:** Passing question context into Chat leaks query params, model/provider wording, mock identifiers, or implementation names to the student.
+Prevention: centralize preview URL management and revoke URLs on removal/unmount.
 
-**Prevention:** Use provider-agnostic context labels and sanitize visible copy. Keep technical identifiers in route state/service code only.
+## Technical Pitfalls
 
-**Phase to address:** Session/result handoff.
+### Storing Raw Files Globally
 
-## Pitfall 7: Parent and Tutor Surfaces Stay Siloed
+Raw `File` objects should not be placed in global state or long-lived route state.
 
-**Risk:** Students get a useful Question Bank, but parents/tutors cannot tell how it fits with Practice Path, Learning Chat, and teacher support.
+Prevention: keep raw files inside upload hook/service flow and pass only `UploadAttachment` metadata across routes.
 
-**Prevention:** Add concise learning-activity summaries and docs in v2.1. Do not build complex analytics; show enough context for comprehension.
+### Unsupported Large Fixtures
 
-**Phase to address:** Comprehension/docs phase.
+Oversized upload E2E tests can bloat the repo if committed as binary files.
+
+Prevention: generate oversized files dynamically in Playwright tests.
+
+### Backend Boundary Drift
+
+Using a mock service may accidentally imply production storage or security guarantees.
+
+Prevention: UI copy must avoid permanent-storage and encryption claims; docs should state v2.2 is UI/demo flow only.
+
+## Phase Coverage
+
+- Shared module phase: prevents duplication and File/object URL mistakes.
+- Component phase: prevents inaccessible controls and weak state display.
+- Chat integration phase: prevents regression in existing attachment path.
+- Question Bank/Practice integration phase: prevents upload from becoming detached from learning context.
+- QA/localization phase: catches overpromise copy, mobile fit, keyboard flow, and core upload E2E.
+
+## Sources
+
+- WAI-ARIA dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+- MDN File API object URL guidance: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+- MDN capture attribute guidance: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture
+- Khanmigo safety/privacy guidance: https://support.khanacademy.org/hc/en-us/articles/36868912022541-What-kind-of-images-can-I-upload-to-Khanmigo

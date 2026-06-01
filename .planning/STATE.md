@@ -1,57 +1,57 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: Question Bank UI Design
-status: complete
-last_updated: "2026-06-02T00:35:00.000Z"
+milestone: v2.2
+milestone_name: Photo & File Upload UI Foundation
+status: planning
+last_updated: "2026-06-02T00:00:00.000Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 6
-  completed_phases: 6
+  completed_phases: 0
   total_plans: 6
-  completed_plans: 6
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-01)
+See: .planning/PROJECT.md (updated 2026-06-02)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.1 Question Bank UI Design complete, audited, and archived; next milestone requirements are not yet selected.
+**Current focus:** Milestone v2.2 Photo & File Upload UI Foundation is defining requirements and roadmap after upload UI research.
 
 ## Current Position
 
-Phase: Milestone v2.1 complete
+Phase: 206 Upload Domain Model, Validation, and Service Foundation
 Plan: —
-Status: Complete
-Last activity: 2026-06-02 — Question Bank UI implemented, verified, documented, audited, and archived
+Status: Requirements and roadmap created; ready to plan Phase 206
+Last activity: 2026-06-02 — Milestone v2.2 started; upload UI research, requirements, and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 6 of 6
-- Average duration: 1 autonomous phase pass
-- Total execution time: complete
+- Total plans completed this milestone: 0 of 6
+- Average duration: —
+- Total execution time: planning
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 200 | 1/1 | Complete | 1 pass |
-| 201 | 1/1 | Complete | 1 pass |
-| 202 | 1/1 | Complete | 1 pass |
-| 203 | 1/1 | Complete | 1 pass |
-| 204 | 1/1 | Complete | 1 pass |
-| 205 | 1/1 | Complete | 1 pass |
+| 206 | 0/1 | Pending | — |
+| 207 | 0/1 | Pending | — |
+| 208 | 0/1 | Pending | — |
+| 209 | 0/1 | Pending | — |
+| 210 | 0/1 | Pending | — |
+| 211 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 6 completed phases: 200, 201, 202, 203, 204, 205
-- Trend: v2.1 completed Question Bank foundation, discovery, set overview, session feedback, result/mistake review, context handoff, localization/docs, and verification.
+- Last 6 planned phases: 206, 207, 208, 209, 210, 211
+- Trend: v2.2 is planned around shared upload foundation, shared components, Chat integration, Question Bank handoff, Practice entry, and QA/localization closure.
 
 *Updated after each plan completion*
 
@@ -120,10 +120,13 @@ Recent decisions affecting current work:
 - v2.1 continues roadmap numbering from Phase 200 after v1.35 ended at Phase 199.
 - Question Bank is a flexible exercise library for subject/topic/difficulty practice; it must not duplicate Practice Path's guided roadmap progression.
 - v2.1 is UI plus demo/mock data flow only; production item storage, generated questions, exam mode, paid unlocking, deep curriculum mapping, video help, and live teacher joining are deferred.
+- v2.2 continues roadmap numbering from Phase 206 after v2.1 ended at Phase 205.
+- Upload UI should be context-bound to learning tasks in Chat, Question Bank, and Practice Path rather than becoming a generic file manager.
+- v2.2 is frontend UI plus mock/demo upload state only; production object storage, OCR, image recognition, AI auto-solving, teacher grading, parent review, and admin moderation are deferred.
 
 ### Pending Todos
 
-- Milestone v2.1 complete. Future work can replace mock Question Bank services with production backend APIs, content management, generated-question workflows, exam-prep mode, and deeper parent/tutor analytics.
+- Define v2.2 requirements and roadmap for Photo & File Upload UI Foundation.
 
 ### Quick Tasks Completed
 

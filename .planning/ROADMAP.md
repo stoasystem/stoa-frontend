@@ -5,128 +5,129 @@
 - ✅ **v1.34 Phase 36: Engineering Quality, CI Reliability, and Local Workflow Hardening** - Phases 191-194 (shipped 2026-05-27)
 - ✅ **v1.35 Phase 37: Student Language Preference and Learning Assistant Response Localization** - Phases 195-199 (shipped 2026-06-01)
 - ✅ **v2.1 Question Bank UI Design** - Phases 200-205 (shipped 2026-06-02)
+- ◆ **v2.2 Photo & File Upload UI Foundation** - Phases 206-211 (planning)
 
 ## Phases
 
-- [x] **Phase 200: Question Bank Data Model, Routes, and UI Foundation** - Establish typed mock data, service/query boundaries, route helpers, page shells, and the Question Bank product/design contract.
-- [x] **Phase 201: Question Bank Discovery, Search, Filters, and Navigation** - Add student navigation plus home, subject, and topic discovery surfaces with local search and filters.
-- [x] **Phase 202: Question Set Overview, Metadata, and Start/Resume Actions** - Add set overview pages with skills, type breakdown, status-aware actions, last-attempt summaries, and help framing.
-- [x] **Phase 203: Question Session UI, Answer Inputs, and Feedback Loop** - Add low-pressure question session flow with supported question types, answer checking, feedback states, and session navigation.
-- [x] **Phase 204: Results, Mistakes Review, and Learning Context Handoffs** - Add result and mistakes-review flows plus Chat, parent, and tutor context integration.
-- [x] **Phase 205: Localization, Accessibility, Responsive QA, and Handoff** - Complete four-language copy, accessibility/responsive verification, internal-term scan, docs, and final quality gates.
+- [ ] **Phase 206: Upload Domain Model, Validation, and Service Foundation** - Create the reusable upload feature module with typed metadata, validation, file utilities, preview lifecycle helpers, and mock/API-ready service boundaries.
+- [ ] **Phase 207: Shared Upload Components and Modal Experience** - Build reusable upload buttons, photo capture, dropzone, preview cards, status/error UI, upload modal, and inline panel with accessible interaction states.
+- [ ] **Phase 208: Learning Chat Upload Composer Integration** - Upgrade Chat composer and message rendering to use the shared upload foundation while preserving streaming, attachment IDs, message retry, and teacher-help behavior.
+- [ ] **Phase 209: Question Bank Upload Entry Points and Session Handoff** - Add contextual upload flows to Question Bank home and question sessions, including upload previews and Learning Assistant handoff with question/session context.
+- [ ] **Phase 210: Practice Path Schoolwork Upload Entry and Context Handoff** - Add a lightweight Practice upload entry that supports schoolwork photos/PDFs without displacing the guided Practice Path flow.
+- [ ] **Phase 211: Upload Localization, Accessibility, QA, and Handoff Documentation** - Add four-language upload copy, accessibility hardening, responsive checks, Playwright upload coverage, product-boundary docs, lint/build verification, and final handoff.
 
 ## Phase Details
 
-### Phase 200: Question Bank Data Model, Routes, and UI Foundation
+### Phase 206: Upload Domain Model, Validation, and Service Foundation
 
-**Goal**: Developers have a clean Question Bank foundation with typed deterministic data, replaceable services, protected route structure, and a UI/design contract that keeps Question Bank distinct from Practice Path.
-**Depends on**: Phase 199
-**Requirements**: QBIA-02, QBIA-03, QBIA-04, QBQA-01, QBQA-02
+**Goal**: Developers have a clean, reusable upload module that can support Chat, Question Bank, and Practice without duplicating validation or preview logic.
+**Depends on**: Phase 205
+**Requirements**: UPF-01, UPF-02, UPF-03, UPF-04, UPF-05, UPF-06
 **Success Criteria** (what must be TRUE):
-  1. `src/types/questionBank.ts` defines subjects, topics, sets, questions, sessions, answers, feedback, results, mistakes, and filters.
-  2. `src/data/mockQuestionBank.ts` provides deterministic demo data for all core v2.1 flows.
-  3. `src/services/questionBank/*`, query keys, and hooks expose replaceable API boundaries.
-  4. Protected route definitions and route helpers cover all core Question Bank routes without disrupting existing routes.
-  5. UI/design notes define Question Bank as a flexible exercise library, not a Practice Path roadmap clone.
-**Plans**: 200-PLAN.md
+  1. `src/features/uploads/` exists with types, services, hooks, and utilities matching existing repo conventions.
+  2. Upload metadata includes context, source page/entity, file kind, status, preview URL, uploaded URL, and validation error data.
+  3. Validation consistently rejects unsupported files, empty files, files over 10 MB, and context-specific count overages.
+  4. Image preview object URLs are created and revoked through a centralized helper/hook.
+  5. Upload service functions can upload, retry, and remove attachments with mock/demo behavior and future API delegation points.
+**Plans**: 206-PLAN.md
+**UI hint**: no
+
+### Phase 207: Shared Upload Components and Modal Experience
+
+**Goal**: Students can select, capture, drag/drop, preview, remove, retry, and understand upload states through a consistent shared component set.
+**Depends on**: Phase 206
+**Requirements**: UPUI-01, UPUI-02, UPUI-03, UPUI-04, UPUI-05, UPUI-06, UPUI-07, UPUI-08, UPUI-09, UPUI-10, UPQA-02, UPQA-03, UPQA-04, UPQA-05, UPQA-06
+**Success Criteria** (what must be TRUE):
+  1. Upload button, photo capture button, and dropzone are keyboard reachable and expose clear labels.
+  2. Dropzone supports drag/drop and Browse files fallback.
+  3. Attachment preview cards show image thumbnails or file/PDF cards with filename, type, size, status, remove, and retry actions.
+  4. Status and error messages are visible and announced accessibly.
+  5. Upload modal manages focus correctly and inline upload panel can be embedded without dominating page hierarchy.
+**Plans**: 207-PLAN.md
 **UI hint**: yes
 
-### Phase 201: Question Bank Discovery, Search, Filters, and Navigation
+### Phase 208: Learning Chat Upload Composer Integration
 
-**Goal**: Students can find useful practice through Question Bank home, subject, and topic pages using search, filters, progress cues, and clear navigation.
-**Depends on**: Phase 200
-**Requirements**: QBIA-01, QBIA-05, QBDISC-01, QBDISC-02, QBDISC-03, QBDISC-04, QBDISC-05, QBDISC-06, QBDISC-07
+**Goal**: Chat uses the shared upload system so students can attach learning materials to a Learning Assistant message without regressing streaming chat behavior.
+**Depends on**: Phase 207
+**Requirements**: UPCHAT-01, UPCHAT-02, UPCHAT-03, UPCHAT-04, UPCHAT-05, UPCHAT-06
 **Success Criteria** (what must be TRUE):
-  1. Authenticated student navigation includes Question Bank near Practice and Learning Chat.
-  2. Question Bank home shows search, continue practice, subject cards, recommended sets, mistakes review, and recent practice.
-  3. Subject pages show progress, grade/level filters, difficulty filters, topic cards, and recommended sets.
-  4. Topic pages show progress, weak areas, filters, question-set list, and related Practice Path CTA.
-  5. Search and filters work locally, keep active filters visible, support reset, and remain usable on mobile.
-**Plans**: 201-PLAN.md
+  1. Chat composer supports attach file and take photo actions through shared upload components.
+  2. Students can preview, remove, and retry attachments before sending.
+  3. Sending with attachments passes attachment metadata/IDs into the existing chat send path.
+  4. Chat message bubbles render attachment cards consistently after send.
+  5. Streaming, stop generation, failed-message retry, and teacher-help status continue to work with attachments.
+**Plans**: 208-PLAN.md
 **UI hint**: yes
 
-### Phase 202: Question Set Overview, Metadata, and Start/Resume Actions
+### Phase 209: Question Bank Upload Entry Points and Session Handoff
 
-**Goal**: Students can inspect a question set before starting, understand its scope and history, and choose the correct status-aware action.
-**Depends on**: Phase 201
-**Requirements**: QBSET-01, QBSET-02, QBSET-03, QBSET-04, QBSET-05, QBSET-06
+**Goal**: Question Bank lets students upload their own question or current-question work and hand that context to Learning Chat.
+**Depends on**: Phase 208
+**Requirements**: UPQB-01, UPQB-02, UPQB-03, UPQB-04, UPQB-05, UPQB-06, UPCTX-01, UPCTX-02
 **Success Criteria** (what must be TRUE):
-  1. Question set overview is reachable from recommended sets, topic lists, recent practice, saved sets, and mistakes context.
-  2. Overview displays title, description, question count, difficulty, estimated time, subject, level, and status.
-  3. Skills covered and question-type breakdown are visible and scannable.
-  4. Last-attempt summary appears when mock attempt history exists.
-  5. Actions correctly switch between Start, Resume, Practice Again, and Review, with Learning Assistant help framed as available after questions.
-**Plans**: 202-PLAN.md
+  1. Question Bank home shows a secondary Upload Question CTA that opens upload flow.
+  2. Uploaded Question Bank files show preview, validation, remove, retry, and completion states.
+  3. Completed Question Bank uploads can open Chat with upload context.
+  4. Question Session help area supports upload without interfering with answer input, feedback, or navigation.
+  5. Chat receives question/session/upload metadata through route state with session-storage fallback.
+**Plans**: 209-PLAN.md
 **UI hint**: yes
 
-### Phase 203: Question Session UI, Answer Inputs, and Feedback Loop
+### Phase 210: Practice Path Schoolwork Upload Entry and Context Handoff
 
-**Goal**: Students can complete a mock question-bank session with multiple question types, immediate feedback, low-pressure navigation, and finish safeguards.
-**Depends on**: Phase 202
-**Requirements**: QBSESS-01, QBSESS-02, QBSESS-03, QBSESS-04, QBSESS-05, QBSESS-06, QBSESS-07, QBSESS-08, QBSESS-09, QBSESS-10
+**Goal**: Practice Path gains a lightweight way to bring schoolwork into Learning Chat while keeping guided roadmap/lesson progression primary.
+**Depends on**: Phase 209
+**Requirements**: UPPRAC-01, UPPRAC-02, UPPRAC-03, UPPRAC-04
 **Success Criteria** (what must be TRUE):
-  1. Start/resume creates or loads a mock session and opens the session route.
-  2. Session page shows set title, progress, prompt, answer input, check/skip actions, feedback, Learning Assistant CTA, and previous/next controls.
-  3. Multiple-choice, short-answer, numeric-answer, and step-by-step UI layouts render correctly.
-  4. Feedback supports idle, checking, correct, incorrect, partially correct, and skipped states.
-  5. Correct/incorrect/skipped feedback uses concise learning copy, and finishing with unanswered questions offers review or finish-anyway choices.
-**Plans**: 203-PLAN.md
+  1. Practice surfaces show a compact schoolwork upload panel that does not displace the main Practice CTA.
+  2. Students can upload a photo or PDF from Practice and see the shared preview/status/error states.
+  3. Completed Practice uploads can open Chat with Practice source context.
+  4. Copy frames upload as schoolwork help and avoids generic storage, game reward, or instant-solver language.
+**Plans**: 210-PLAN.md
 **UI hint**: yes
 
-### Phase 204: Results, Mistakes Review, and Learning Context Handoffs
+### Phase 211: Upload Localization, Accessibility, QA, and Handoff Documentation
 
-**Goal**: Students can understand session outcomes, review mistakes, continue into Practice Path, and pass question-bank context into Learning Chat, parent, and tutor surfaces.
-**Depends on**: Phase 203
-**Requirements**: QBRES-01, QBRES-02, QBRES-03, QBRES-04, QBRES-05, QBRES-06, QBRES-07, QBCTX-01, QBCTX-02, QBCTX-03, QBCTX-04
+**Goal**: Upload UI is localized, accessible, product-safe, documented, and verified through standard frontend gates and browser upload tests.
+**Depends on**: Phase 210
+**Requirements**: UPCTX-03, UPCTX-04, UPCTX-05, UPQA-01, UPQA-07, UPQA-08, UPQA-09, UPQA-10
 **Success Criteria** (what must be TRUE):
-  1. Finishing a set opens a result page with score, time, topic accuracy, incorrect/skipped questions, and next steps.
-  2. Result page supports Retry Mistakes and Continue to Practice Path actions.
-  3. Mistakes review page shows summary, subject/topic/difficulty filters, mistake list, and Start Review Session.
-  4. Review sessions reuse the low-pressure feedback model.
-  5. Learning Chat, parent activity, and tutor context can display product-safe question-bank context without internal terminology.
-**Plans**: 204-PLAN.md
-**UI hint**: yes
-
-### Phase 205: Localization, Accessibility, Responsive QA, and Handoff
-
-**Goal**: Question Bank is localized, accessible, responsive, documented, and verified through standard frontend quality gates and browser smoke checks.
-**Depends on**: Phase 204
-**Requirements**: QBCTX-05, QBQA-03, QBQA-04, QBQA-05, QBQA-06, QBQA-07, QBQA-08
-**Success Criteria** (what must be TRUE):
-  1. English, German, French, and Italian Question Bank copy is present and product-safe.
-  2. Documentation explains Question Bank, Practice Path, Learning Chat, Professional Teacher Support, and Parent Report relationships.
-  3. Keyboard access, labels, focus states, result/feedback announcements, and responsive layouts are checked.
-  4. Internal-term scan covers visible Question Bank UI for demo/mock/backend/provider terminology.
-  5. `npm run lint`, `npm run build`, and browser smoke checks pass for home, subject, topic, set overview, session, result, mistakes review, and Chat handoff paths.
-**Plans**: 205-PLAN.md
+  1. English, German, French, and Italian upload copy covers actions, statuses, errors, previews, privacy, and learning-context prompts.
+  2. Upload copy avoids unsupported claims about OCR, image understanding, auto-solving, permanent storage, encryption, teacher grading, parent review, and admin moderation.
+  3. Responsive checks confirm upload panels, modal, preview cards, and Chat composer work at mobile and desktop widths.
+  4. Playwright tests cover Chat upload preview/remove/send, invalid file rejection, Question Bank upload modal, Question Session handoff, and keyboard modal flow.
+  5. README/docs explain v2.2 upload scope, extension points, privacy copy, and future backend handoff.
+  6. `npm run lint` and `npm run build` pass.
+**Plans**: 211-PLAN.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 200. Question Bank Data Model, Routes, and UI Foundation | 1/1 | Complete | 2026-06-02 |
-| 201. Question Bank Discovery, Search, Filters, and Navigation | 1/1 | Complete | 2026-06-02 |
-| 202. Question Set Overview, Metadata, and Start/Resume Actions | 1/1 | Complete | 2026-06-02 |
-| 203. Question Session UI, Answer Inputs, and Feedback Loop | 1/1 | Complete | 2026-06-02 |
-| 204. Results, Mistakes Review, and Learning Context Handoffs | 1/1 | Complete | 2026-06-02 |
-| 205. Localization, Accessibility, Responsive QA, and Handoff | 1/1 | Complete | 2026-06-02 |
+| 206. Upload Domain Model, Validation, and Service Foundation | 0/1 | Pending | — |
+| 207. Shared Upload Components and Modal Experience | 0/1 | Pending | — |
+| 208. Learning Chat Upload Composer Integration | 0/1 | Pending | — |
+| 209. Question Bank Upload Entry Points and Session Handoff | 0/1 | Pending | — |
+| 210. Practice Path Schoolwork Upload Entry and Context Handoff | 0/1 | Pending | — |
+| 211. Upload Localization, Accessibility, QA, and Handoff Documentation | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 200 | 5 | QBIA-02, QBIA-03, QBIA-04, QBQA-01, QBQA-02 |
-| 201 | 9 | QBIA-01, QBIA-05, QBDISC-01, QBDISC-02, QBDISC-03, QBDISC-04, QBDISC-05, QBDISC-06, QBDISC-07 |
-| 202 | 6 | QBSET-01, QBSET-02, QBSET-03, QBSET-04, QBSET-05, QBSET-06 |
-| 203 | 10 | QBSESS-01, QBSESS-02, QBSESS-03, QBSESS-04, QBSESS-05, QBSESS-06, QBSESS-07, QBSESS-08, QBSESS-09, QBSESS-10 |
-| 204 | 11 | QBRES-01, QBRES-02, QBRES-03, QBRES-04, QBRES-05, QBRES-06, QBRES-07, QBCTX-01, QBCTX-02, QBCTX-03, QBCTX-04 |
-| 205 | 7 | QBCTX-05, QBQA-03, QBQA-04, QBQA-05, QBQA-06, QBQA-07, QBQA-08 |
+| 206 | 6 | UPF-01, UPF-02, UPF-03, UPF-04, UPF-05, UPF-06 |
+| 207 | 15 | UPUI-01, UPUI-02, UPUI-03, UPUI-04, UPUI-05, UPUI-06, UPUI-07, UPUI-08, UPUI-09, UPUI-10, UPQA-02, UPQA-03, UPQA-04, UPQA-05, UPQA-06 |
+| 208 | 6 | UPCHAT-01, UPCHAT-02, UPCHAT-03, UPCHAT-04, UPCHAT-05, UPCHAT-06 |
+| 209 | 8 | UPQB-01, UPQB-02, UPQB-03, UPQB-04, UPQB-05, UPQB-06, UPCTX-01, UPCTX-02 |
+| 210 | 4 | UPPRAC-01, UPPRAC-02, UPPRAC-03, UPPRAC-04 |
+| 211 | 8 | UPCTX-03, UPCTX-04, UPCTX-05, UPQA-01, UPQA-07, UPQA-08, UPQA-09, UPQA-10 |
 
-**Total requirements:** 48
-**Mapped requirements:** 48
+**Total requirements:** 47
+**Mapped requirements:** 47
 **Unmapped requirements:** 0
 
 ## Next Up
 
-Milestone v2.1 is complete. Next milestone requirements are not yet selected.
+**Phase 206: Upload Domain Model, Validation, and Service Foundation** — Create the reusable upload module and service contract before UI integration work.

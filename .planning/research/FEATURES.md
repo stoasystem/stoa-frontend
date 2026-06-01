@@ -1,95 +1,76 @@
-# Project Research: Features for v2.1 Question Bank UI Design
+# Research: v2.2 Upload UI Feature Patterns
 
-**Milestone:** v2.1 Question Bank UI Design
-**Date:** 2026-06-01
+## Comparable Product Patterns
 
-## Feature Categories
+### Khanmigo
 
-### Discovery and Browsing
+Khanmigo's image upload flow is directly relevant because it is learning-assistant chat for math/science. The pattern:
 
-**Table stakes**
+- Upload lives inside the tutoring conversation.
+- Paperclip opens image options including file, URL, or camera.
+- The student must include a message/question; image-only submission is not allowed.
+- Supported image types are narrow: PNG and JPEG.
+- Guidance tells students to upload clear learning-relevant images and avoid sensitive/personal content.
+- Uploaded image thumbnails can be opened for a larger view.
+- Privacy is explicit: images are session-scoped and not retained after the chat session.
 
-- Student can open a Question Bank home page from authenticated student navigation.
-- Student can search for subjects, topics, skills, question sets, and individual question prompts in local mock data.
-- Student can browse subject cards and topic cards with set counts, question counts, and progress.
-- Student can see recommended question sets, continue practice, mistakes review, and recent practice on the home page.
+STOA implication: require or strongly encourage prompt text with attachment context in Chat, show thumbnail/file cards, keep copy focused on "help me understand this", and avoid claiming the system can solve from the image during v2.2.
 
-**Differentiators**
+### ChatGPT
 
-- Question Bank copy explicitly distinguishes open practice from guided Practice Path.
-- Cards use learning-relevant metadata instead of generic content-library metadata: level, difficulty, question types, estimated time, skills, status, and weak areas.
+ChatGPT presents upload as part of the composer tools menu: "Add photos or files" rather than as a separate file-management destination. It supports many formats, but the key design pattern is composer-native attachment selection and keeping uploaded files attached to the conversation turn.
 
-### Filtering and Question Set Selection
+STOA implication: Chat upload should live in the composer and show attachment cards before send; Question Bank and Practice should route uploaded learning material into Chat rather than creating a separate file center.
 
-**Table stakes**
+### Google Classroom
 
-- Subject pages filter by grade/level and difficulty.
-- Topic pages filter by difficulty, question type, and status.
-- Active filter state remains visible and can be reset.
-- Question set cards show status-specific actions: Start, Resume, Practice Again, or Review.
+Google Classroom uses assignment/task context rather than generic storage. Students attach existing files, photos, and created materials to a specific work item. Mobile flows commonly expose photo capture and file upload; desktop flows emphasize attach/upload.
 
-**Differentiators**
+STOA implication: every upload should carry a learning context (`chat`, `question_bank`, `question_session`, `practice_path`) so the next action is task-specific: ask the Learning Assistant, attach to this question, or continue Practice.
 
-- Filter design stays compact and scannable, with desktop sidebar/topbar and mobile collapsed controls where appropriate.
-- Weak-area panel helps students choose what to practice without requiring adaptive algorithms.
+### Photomath and Camera-Solver Products
 
-### Question Set Overview
+Camera-solver products emphasize fast camera capture for a math problem, but they often promise recognition or solving. That is intentionally outside v2.2. STOA can learn the entry-point priority: camera-first on mobile and immediate preview, but must not copy the "instant solve" positioning.
 
-**Table stakes**
+STOA implication: use "Upload a photo or PDF and ask the Learning Assistant" rather than "solve any problem instantly".
 
-- Student sees title, description, number of questions, difficulty range, estimated time, subject/level, skills covered, question-type breakdown, and last-attempt summary.
-- Student can start, resume, start again, or review mistakes depending on mock state.
-- The overview page prevents a question set from feeling like a bare list of questions.
+## Table Stakes
 
-**Differentiators**
+- File input and camera capture entry points.
+- Drag-and-drop on desktop plus Browse fallback.
+- Preview cards for images and file cards for PDFs.
+- File type, size, and count validation before upload.
+- Clear states: validating, uploading, uploaded, failed, rejected.
+- Remove and retry controls per attachment.
+- Reusable modal for page-level uploads.
+- Reusable inline panel for contextual learning pages.
+- Chat composer integration with attachment preview before send.
+- Context handoff to Learning Chat from Question Bank and Practice.
+- Localized copy across existing app languages.
+- Accessible error/status announcements and keyboard operation.
 
-- Help note tells students they can ask the Learning Assistant after a question, without turning the whole set into Chat.
+## Differentiators for STOA
 
-### Session and Feedback
+- Treat uploads as "bring real schoolwork into the learning flow", not generic file management.
+- Keep the Learning Assistant as the next step after upload.
+- Use restrained, premium STOA visual language instead of camera-solver hype.
+- Preserve the boundary between Question Bank open practice, Practice Path guided lessons, and Chat explanation.
+- Avoid unsafe promises about OCR, recognition, solving, permanent storage, or security guarantees.
 
-**Table stakes**
+## Anti-Features for v2.2
 
-- Student can answer multiple-choice, short-answer, numeric-answer, and step-by-step UI question types.
-- Session page shows set title, question number, progress, question prompt, answer input, check/skip action, feedback, and previous/next navigation.
-- Feedback states include idle, checking, correct, incorrect, partially correct, and skipped.
-- Last question supports Finish Set and review-unanswered behavior.
+- OCR or image understanding.
+- Cropping and handwriting recognition.
+- Teacher grading workflows.
+- Parent file review.
+- Admin upload moderation backend.
+- Office document preview.
+- Permanent file library.
+- "Instant answer" or "perfect solution" marketing copy.
 
-**Differentiators**
+## Sources
 
-- Low-pressure learning tone rather than exam tone.
-- Incorrect feedback shows the student's answer, correct answer, a short explanation, and a Learning Assistant CTA.
-
-### Results and Mistakes Review
-
-**Table stakes**
-
-- Result page shows score, time spent, accuracy by topic, incorrect/skipped questions, recommended next steps, Retry Mistakes, and Continue to Practice Path.
-- Mistakes page shows summary, subject/topic/difficulty filters, mistake list, and Start Review Session.
-- Mistake review can reuse the question-session shell with a review-mode context.
-
-**Differentiators**
-
-- Results connect Question Bank to Practice Path and Learning Chat as next steps instead of presenting score as the only outcome.
-
-### Parent and Tutor Comprehension
-
-**Table stakes**
-
-- Parent-facing learning activity includes enough Question Bank language to understand practice attempts, mistakes reviewed, and next focus.
-- Tutor request context can identify a question-bank source when a student asks for help from a question.
-- Docs explain the Question Bank / Practice Path / Learning Chat relationship.
-
-**Differentiators**
-
-- Parent/tutor surfaces frame Question Bank as evidence of active practice, not a separate product silo.
-
-## Anti-Features
-
-- Do not add production item authoring or admin management.
-- Do not add AI-generated questions.
-- Do not add image upload or recognition.
-- Do not add video help or live teacher joining.
-- Do not add complex timed exam mode.
-- Do not add paid question-bank locks.
-- Do not add formal school-standard mapping.
-- Do not use visible mock/demo/provider wording in the product UI.
+- Khanmigo image upload support: https://support.khanacademy.org/hc/en-us/articles/36868912022541-What-kind-of-images-can-I-upload-to-Khanmigo
+- OpenAI Academy, ChatGPT files: https://openai.com/academy/working-with-files/
+- Google Classroom Android assignment attachment help: https://support.google.com/edu/classroom/answer/6020265
+- Photomath camera problem flow: https://support.google.com/photomath/answer/14333327

@@ -1,92 +1,118 @@
-# Project Research: Architecture for v2.1 Question Bank UI Design
+# Research: v2.2 Upload UI Architecture
 
-**Milestone:** v2.1 Question Bank UI Design
-**Date:** 2026-06-01
+## Architecture Direction
 
-## Proposed Structure
+Use a reusable feature module:
 
 ```text
-src/types/questionBank.ts
-src/data/mockQuestionBank.ts
-src/services/questionBank/questionBankApi.ts
-src/services/questionBank/questionBankQueryKeys.ts
-src/hooks/questionBank/*
-src/components/question-bank/*
-src/pages/question-bank/*
-src/lib/questionBankRoutes.ts
-src/i18n/locales/{en,de,fr,it}/questionBank.json
+src/features/uploads/
+  components/
+  hooks/
+  services/
+  types/
+  utils/
 ```
 
-## Routes
+This keeps upload behavior consistent across Chat, Question Bank, and Practice while allowing current service boundaries to remain backend-agnostic.
 
-Core v2.1 routes:
+## Existing Integration Points
 
-- `/question-bank`
-- `/question-bank/:subjectId`
-- `/question-bank/:subjectId/:topicId`
-- `/question-bank/sets/:setId`
-- `/question-bank/session/:sessionId`
-- `/question-bank/session/:sessionId/result`
-- `/question-bank/mistakes`
-- `/question-bank/saved`
+### Chat
 
-Future routes can be reserved in docs, not implemented:
+Current files:
 
-- `/question-bank/exam-prep`
-- `/question-bank/recommended`
-- `/question-bank/recent`
+- `src/components/chat/ChatInput.tsx`
+- `src/components/chat/FileUploadButton.tsx`
+- `src/components/chat/AttachmentPreview.tsx`
+- `src/components/chat/ChatMessageBubble.tsx`
+- `src/hooks/chat/useStreamingChat.ts`
+- `src/services/files/fileApi.ts`
+- `src/types/chat.ts`
+- `src/types/file.ts`
+
+Recommended approach:
+
+- Replace per-chat validation and preview components with reusable upload components.
+- Preserve `attachmentIds` and message attachment metadata in `useStreamingChat`.
+- Add a photo capture button and multi-attachment preview list in the composer.
+- Keep existing file API integration when API mode supports uploads, with a mock/demo fallback for page-level upload flows.
+
+### Question Bank
+
+Current files:
+
+- `src/pages/question-bank/QuestionBankHomePage.tsx`
+- `src/pages/question-bank/QuestionSessionPage.tsx`
+- `src/components/question-bank/QuestionFeedbackPanel.tsx`
+- `src/components/question-bank/QuestionBankContextCard.tsx`
+
+Recommended approach:
+
+- Add an inline "Have your own question?" panel on the Question Bank home page.
+- Add a "Need help with this question?" upload area inside the session help/feedback area.
+- Use upload state plus route state/session storage to pass attachments into `/chat?source=question-bank-upload` or `/chat?source=question-bank&questionId=...`.
+
+### Practice
+
+Current files:
+
+- `src/pages/practice/PracticeOverviewPage.tsx`
+- `src/pages/practice/TopicRoadmapPage.tsx`
+- `src/pages/practice/LessonPage.tsx`
+- `src/components/practice/PracticeOverview.tsx`
+- `src/components/practice/PracticeToChatCTA.tsx`
+
+Recommended approach:
+
+- Add a lightweight schoolwork upload panel near existing Practice entry/help areas.
+- Do not make upload the dominant Practice CTA.
+- Handoff to Chat with practice context and attachment metadata.
 
 ## Data Model
 
-Recommended domain types:
+Define upload-specific metadata independent of raw `File`:
 
-- `QuestionBankSubject`
-- `QuestionBankTopic`
-- `QuestionBankSet`
-- `QuestionBankQuestion`
-- `QuestionBankSession`
-- `QuestionBankAnswer`
-- `QuestionBankFeedback`
-- `QuestionBankResult`
-- `QuestionBankMistake`
-- `QuestionBankFilters`
+- `UploadContext`
+- `UploadFileKind`
+- `UploadStatus`
+- `UploadAttachment`
+- `UploadValidationError`
+- `UploadConfig`
 
-Important enums/unions:
+Do not keep raw `File` objects in global stores. Keep `File` only in component/hook scope until upload simulation/API upload returns metadata.
 
-- `QuestionSetStatus = 'not_started' | 'in_progress' | 'completed' | 'review_recommended'`
-- `QuestionType = 'multiple_choice' | 'short_answer' | 'numeric' | 'step_by_step'`
-- `QuestionFeedbackState = 'idle' | 'checking' | 'correct' | 'incorrect' | 'partially_correct' | 'skipped'`
-- `QuestionBankDifficulty = 'easy' | 'medium' | 'hard'`
+## Service Strategy
 
-## Data Flow
+Create `uploadService.ts` with:
 
-1. Pages call question-bank query hooks.
-2. Query hooks call `questionBankApi`.
-3. `questionBankApi` reads deterministic mock data and computes filtered lists/session results.
-4. Session UI keeps active answer state in a reducer.
-5. Finish Set writes mock result into local service state or deterministic in-memory state for the current browser session.
-6. Learning Assistant CTA routes to `/chat?source=question-bank&questionId=...` or uses route state containing a provider-agnostic `QuestionBankChatContext`.
+- `uploadFiles(files, context, options)`
+- `retryUpload(attachment)`
+- `removeUploadedAttachment(attachmentId)`
 
-## Integration Points
+The service can delegate to existing `/files` API for Chat or simulate mock uploads for UI flows. For v2.2, the critical contract is returned metadata and state handling, not production storage.
 
-- **Navigation:** Add Question Bank to authenticated student navigation near Practice and Learning Chat.
-- **Dashboard:** Add a compact entry card or update learning entry cards so Question Bank is visible without crowding the dashboard.
-- **Practice Path:** Add related Practice Path CTA from topic/result pages. Do not embed roadmap UI inside Question Bank.
-- **Chat:** Add a question-bank context card or extend existing practice context handling with a separate source type.
-- **Parent Report:** Add concise activity language: sets attempted, mistakes reviewed, and next topic.
-- **Tutor Context:** Allow teacher-help context to carry question-bank source metadata in future, but keep v2.1 simple if no tutor flow is implemented in the first UI slice.
+## Handoff Strategy
 
-## Build Order
+Use a small bridge:
 
-1. Types, mock data, service/query hooks, and route helpers.
-2. Browse/discovery pages and student navigation.
-3. Question-set overview and session shell.
-4. Feedback, result, mistakes review, and Learning Assistant handoff.
-5. Parent/tutor comprehension, docs, localization, and QA.
+- Route query identifies source: `source=question-bank-upload`, `source=question-session-upload`, or `source=practice-upload`.
+- Route state carries lightweight `UploadAttachment[]` metadata.
+- Session storage key `stoa.pendingLearningAssistantUpload` can backstop reloads or route-state loss.
 
-## Architectural Constraints
+## QA Demo Route
 
-- Keep Question Bank independent enough to replace mock data with backend APIs later.
-- Avoid sharing mutable session state with Practice Path reducers unless the abstraction is genuinely common.
-- Do not rename or disturb Practice Path routes while adding Question Bank.
-- Do not introduce product-visible "demo", "mock", "provider", "AI", or backend terminology.
+An internal `/uploads/demo` route is useful but should not appear in main navigation. It should exercise:
+
+- Upload button
+- Photo capture
+- Dropzone
+- Preview list
+- Rejected state
+- Failed/retry state
+- Keyboard/modal flow
+
+## Sources
+
+- Current repository scan on 2026-06-02.
+- Khanmigo and ChatGPT composer upload patterns from research sources listed in `FEATURES.md`.
+- MDN and WAI-ARIA implementation guidance listed in `STACK.md`.

@@ -1,40 +1,49 @@
-# Project Research: Stack for v2.1 Question Bank UI Design
+# Research: v2.2 Upload UI Stack
 
-**Milestone:** v2.1 Question Bank UI Design
-**Date:** 2026-06-01
+## Scope
 
-## Recommendation
+Milestone v2.2 adds a reusable Photo & File Upload UI foundation to the existing React + TypeScript + Vite STOA frontend. It should upgrade existing Chat upload behavior and extend the same upload model into Question Bank and Practice Path without adding production storage, OCR, image recognition, or direct model-provider calls.
 
-No new runtime dependency is required for v2.1. Build Question Bank with the existing React, TypeScript, Vite, React Router, TanStack Query, shadcn-style UI primitives, Tailwind/theme tokens, mock service patterns, and existing Practice/Chat integration contracts.
+## Current Codebase Fit
 
-## Existing Stack to Reuse
+Existing upload-related code:
 
-- **Routing:** Add protected student routes under the existing router configuration for `/question-bank`, `/question-bank/:subjectId`, `/question-bank/:subjectId/:topicId`, `/question-bank/sets/:setId`, `/question-bank/session/:sessionId`, `/question-bank/session/:sessionId/result`, `/question-bank/mistakes`, and `/question-bank/saved`.
-- **Data access:** Mirror `src/services/practice/*` and `src/hooks/practice/*` with `questionBankApi`, `questionBankQueryKeys`, and query/mutation hooks. v2.1 data can remain in `src/data/mockQuestionBank.ts`.
-- **Types:** Add `src/types/questionBank.ts` for subjects, topics, question sets, question items, sessions, answers, feedback states, results, mistakes, and filters.
-- **UI components:** Reuse `Card`, `Button`, `Badge`, `Tabs`, `Input`, `Textarea`, `Separator`, `PageContainer`, `PageHeader`, `Breadcrumbs`, `EmptyState`, `LoadingState`, and existing app layout primitives.
-- **Learning Assistant handoff:** Reuse the existing Chat route and route-state/query-param approach. v2.1 should pass question-bank context without exposing provider, prompt, model, mock, or backend internals.
-- **Localization:** Add a `questionBank` namespace across English, German, French, and Italian only for user-facing labels and route-level copy introduced by this milestone.
+- `src/components/chat/FileUploadButton.tsx` validates PNG, JPEG, and PDF and uploads through `useFileUploadMutation`.
+- `src/components/chat/AttachmentPreview.tsx` displays current chat attachments.
+- `src/services/files/fileApi.ts` posts `FormData` to `/files` and returns `UploadedFile` metadata.
+- `src/types/file.ts` and `src/types/chat.ts` already define upload/chat attachment metadata.
+- `src/hooks/chat/useStreamingChat.ts` already supports `attachmentIds` and optimistic `attachments`.
 
-## External Research Signals
+Implication: v2.2 should create a reusable upload feature layer around the existing file API and chat attachment conventions rather than duplicating per-page upload logic.
 
-- VA.gov's Search Filter guidance frames faceted search as useful when results have meaningful attributes and more than a short static list; it also calls out active filters, clear/reset behavior, mobile collapse, and accessible result announcements. Source: https://design.va.gov/components/search-filter
-- W3C APG emphasizes keyboard support, accessible names/descriptions, landmarks, and correct widget semantics for interactive patterns. Source: https://www.w3.org/WAI/ARIA/apg/
-- Khan Academy's mastery documentation shows students benefit from seeing question count, time expectation, progress by skill, post-activity result cards, and recommendations after completion. Source: https://support.khanacademy.org/hc/en-us/articles/115002552631-What-are-Course-and-Unit-Mastery
-- IXL practice reporting highlights subject, grade, course, skill, proficiency, question count, and time-practiced dimensions as useful for understanding practice activity. Source: https://blog.ixl.com/2023/11/01/new-student-practice-reports-for-ixl-school-analytics/
-- Duolingo Practice Hub, while not a STOA visual model, is a useful product boundary reference: it is a practice area away from the main learning path where students can target specific modes and revisit mistakes. Source: https://duoplanet.com/duolingo-practice-hub/
+## Browser APIs
 
-## What Not to Add
+- Use standard `<input type="file">` for selection. MDN documents that file selection can come from a file input or drag and drop, and object URLs can preview local files before upload.
+- Use `accept="image/*"` and `capture="environment"` for camera-first mobile photo capture. MDN notes `capture` works best on mobile and commonly falls back to a normal picker on desktop.
+- Use drag-and-drop only as an enhancement. MDN's file drag-and-drop guidance still requires a defined drop zone and preventing default browser drag behavior.
+- Use `URL.createObjectURL()` for local image preview and `URL.revokeObjectURL()` during cleanup to avoid leaking object URLs.
 
-- No formula editor dependency in v2.1. Use plain input/textarea for answers and existing text rendering for simple math expressions.
-- No new state-management library. Query state and local component/session state are enough for mock flows.
-- No production backend client expansion beyond a clean replaceable service boundary.
-- No analytics package. If needed, document future event names without implementing production tracking.
-- No heavy table/grid dependency. Question set cards and lists are sufficient.
+## Accessibility APIs
 
-## Integration Notes
+- Upload controls must be reachable as real buttons or labeled inputs.
+- Upload status and errors should be exposed through `aria-live` or alert/status semantics.
+- Upload modal should follow WAI-ARIA dialog focus rules: focus enters the dialog, tab stays inside, Escape closes, and focus returns to the opener.
+- Drag-and-drop must not be the only path; browse buttons are required for keyboard and screen-reader users.
 
-- Keep filter state local first. URL query params can be reserved but are not required for v2.1.
-- The session flow can use deterministic mock IDs such as `demo-linear-equations-basics`.
-- Store transient answer state in component/reducer logic, similar to the current Practice lesson reducer, not durable Zustand.
-- Keep Question Bank route names and component names distinct from Practice to avoid future coupling.
+## Dependencies
+
+No new runtime dependency is required for v2.2. Existing React, TypeScript, Vite, lucide-react icons, app UI primitives, TanStack Query, and service patterns are enough.
+
+Recommended additions:
+
+- `src/features/uploads/` for the reusable upload feature module.
+- No heavyweight upload picker package; the scope is small and product-specific.
+- No OCR, image cropper, antivirus, cloud storage SDK, or PDF renderer dependency in this milestone.
+
+## Sources
+
+- MDN file input and capture: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file
+- MDN capture attribute: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture
+- MDN File API and object URLs: https://developer.mozilla.org/en-US/docs/Web/API/File_API/Using_files_from_web_applications
+- MDN file drag and drop: https://mdn2.netlify.app/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+- WAI-ARIA modal dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/

@@ -23,16 +23,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Low-pressure session UI with multiple-choice, short-answer, numeric, and step-by-step layouts plus immediate feedback.
 - Question Bank to Learning Chat handoff, parent learning activity framing, tutor context support, four-language namespace, docs, lint/build/browser verification.
 
-## Current Milestone: v2.1 Question Bank UI Design
+## Current Milestone: v2.2 Photo & File Upload UI Foundation
 
-**Goal:** Completed the Question Bank UI module so students can find question sets by subject, topic, difficulty, and status; complete a mock practice session; receive immediate feedback; review mistakes; and understand how Question Bank complements Practice Path and Learning Chat.
+**Goal:** Establish a unified learning-context upload UI foundation so students can bring photos and PDFs from real schoolwork into Learning Chat, Question Bank, and Practice Path with clear previews, validation, upload states, errors, and Learning Assistant handoff.
 
 **Target features:**
-- ✓ `/question-bank`, subject overview, topic question-set listing, question-set overview, question session, result, mistakes review, and saved/recent practice surfaces.
-- ✓ Question Bank acts as a flexible exercise library, distinct from Practice Path's guided roadmap progression.
-- ✓ Local mock/demo data supports search, filters, question sets, session answers, feedback states, results, and mistakes review.
-- ✓ Learning Assistant entry points route from question feedback to Chat with question-bank context while preserving frontend provider boundaries.
-- ✓ Parent and tutor UI/docs explain how Question Bank activity relates to Practice Path, Learning Chat, Parent Report, and tutor context.
+- Add a reusable `src/features/uploads/` module with typed upload metadata, validation utilities, preview helpers, mock/upload service boundaries, and shared hooks.
+- Build shared upload UI for file attach, mobile photo capture, desktop drag-and-drop, attachment preview cards, status badges, error messaging, upload modal, and inline upload panels.
+- Upgrade Chat composer upload behavior so attachments can be previewed, removed, retried, sent with a message, and displayed consistently in the message stream.
+- Add Question Bank upload entry points on the home page and question-session help area, with upload-to-Learning-Chat context.
+- Add a lightweight Practice Path schoolwork upload entry that supports the Learning Assistant without overtaking the guided lesson flow.
+- Add four-language `uploads` localization, accessibility/responsive QA, Playwright upload smoke tests, and documentation.
 
 ## Current State
 
@@ -118,7 +119,9 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- Next milestone requirements are not yet selected.
+- Students can upload photos and PDFs as learning material from Chat, Question Bank, and Practice Path through a unified, accessible frontend upload system — v2.2
+- Upload UI must support mobile camera capture, desktop drag-and-drop, browse fallback, validation, preview, removal, retry, failed/rejected states, and Learning Assistant handoff — v2.2
+- Upload copy must remain product-safe: do not imply OCR, image understanding, automatic solving, permanent storage, encryption guarantees, or teacher/admin review workflows that are not implemented — v2.2
 
 ### Out of Scope
 
@@ -176,6 +179,8 @@ The project brief for Phase 36 was provided through a CI failure notification an
 The project brief for Phase 37 was provided in Chinese and defines student-level Learning Assistant answer-language personalization. Students need a language option in their profile, and the Learning Assistant should answer in the corresponding saved student language. This milestone should preserve the existing four-language UI system while explicitly separating browser/interface language from a student's preferred answer language. It should update frontend profile/registration surfaces, typed contracts, the local demo backend, prompt harness input, template fallback behavior, and regression/QA evidence without adding new languages, production AI provider work, or formal backend architecture.
 
 The project brief for v2.1 was provided in Chinese and defines Question Bank UI Design. Question Bank is an open, flexible exercise library for browsing and practicing question sets by subject, grade, topic, difficulty, question type, and review status. It complements the existing Practice Path, which remains the guided learning roadmap with lesson progression. v2.1 should deliver student-facing Question Bank routes, demo/mock data, local search/filter behavior, question-set overview, answer session, feedback, result, mistakes review, and clear Learning Assistant handoff. It should not build a production question-bank backend, AI-generated questions, image recognition, video help, live teacher joining, complex exam mode, production permissions, paid unlocking, or formal curriculum-standard mapping.
+
+The project brief for v2.2 was provided in Chinese and defines Photo & File Upload UI Foundation. The milestone should make upload a learning-task entry point: students can bring a real worksheet, handwritten problem, screenshot, or PDF into STOA and ask the Learning Assistant for step-by-step help. v2.2 should unify upload components across Chat, Question Bank, and Practice Path; support preview, validation, status, remove, retry, mobile camera capture, desktop drag-and-drop, and four-language copy; and preserve a clear frontend/demo boundary. It should not build production object storage, real OCR, image recognition, handwriting/formula recognition, AI auto-solving, teacher grading, parent file review, admin file moderation, video help, or complex document management.
 
 Recommended baseline technology:
 - React for long-term frontend scalability.
@@ -267,6 +272,9 @@ Current codebase facts:
 - **Phase 31 positioning boundary**: Practice Path is a low-friction student learning entry, not a replacement for Learning Chat, teacher support, Parent Report, or STOA's broader learning platform positioning.
 - **Question Bank positioning**: v2.1 Question Bank is a flexible exercise library for open practice; it must not duplicate Practice Path's guided roadmap progression or make STOA feel like a generic exam system.
 - **Question Bank implementation boundary**: v2.1 is UI plus demo/mock data flow only; production question-bank backend, AI-generated items, image recognition, video help, live teacher joining, paid unlocking, complex exam mode, production permissions, and formal curriculum-standard mapping are deferred.
+- **Upload positioning**: v2.2 upload is a learning-task entry into Chat, Question Bank, and Practice Path, not a generic file manager or permanent file library.
+- **Upload implementation boundary**: v2.2 is frontend UI, validation, preview, mock/demo upload state, and context handoff only; production object storage, OCR, image understanding, virus scanning, teacher grading, parent review, admin moderation, and formal file retention policies remain future backend/product scope.
+- **Upload privacy copy**: User-facing upload UI should ask for learning materials only and avoid unsupported claims about permanent storage, encryption, image reading, or automatic solving.
 - **Phase 31 public navigation boundary**: Practice should not be added as a top-level public navbar item unless a specific product reason is documented; it belongs primarily in authenticated student navigation and homepage explanation.
 - **Phase 31 implementation boundary**: Phase 31 may add frontend components, route-state/mock contracts, copy, docs, and QA, but must not add formal backend/database/CMS/payment infrastructure or broad curriculum expansion.
 - **Phase 31 gamification boundary**: Keep progress, hints, and short practice sessions calm and education-centered; do not add shops, gems, hearts, cartoon rewards, leaderboards, or game-first CTAs.
@@ -414,6 +422,9 @@ Current codebase facts:
 | Keep answer-language enforcement in backend/harness flow | The frontend can collect preference, but the backend and prompt harness must own response-language instructions so streaming, fallback, and future providers stay consistent | — Pending |
 | Keep Question Bank separate from Practice Path | Question Bank should support open, filterable practice by subject/topic/difficulty, while Practice Path remains the guided roadmap and lesson progression experience | — Pending |
 | Keep v2.1 mock/demo-backed | The milestone needs credible UI and interaction design now, while production item storage, permissions, exam logic, generated questions, and deep curriculum mapping require later backend/product scope | — Pending |
+| Keep uploads context-bound, not library-style | Research shows the strongest fit is tutor/chat or assignment-context upload, so STOA uploads should attach to Chat, Question Bank questions, or Practice schoolwork help rather than become a storage product | — Pending |
+| Reuse a shared upload module | The repo already has Chat upload behavior; v2.2 should consolidate validation, preview, status, and retry into `src/features/uploads/` instead of adding separate page-specific implementations | — Pending |
+| Avoid OCR and instant-solve claims | Camera-solver competitors emphasize recognition, but v2.2 only proves the upload UX and Learning Assistant handoff, so copy must not overpromise unimplemented image understanding | — Pending |
 
 ## Evolution
 
@@ -433,4 +444,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.1 milestone completion*
+*Last updated: 2026-06-02 after v2.2 milestone start*
