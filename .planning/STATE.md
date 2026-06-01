@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.1
 milestone_name: Question Bank UI Design
-status: planning
-last_updated: "2026-06-01T21:57:38.372Z"
+status: roadmap_ready
+last_updated: "2026-06-01T22:11:00.000Z"
 last_activity: 2026-06-01
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
-  total_plans: 0
+  total_plans: 6
   completed_plans: 0
   percent: 0
 ---
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v1.35 complete; ready to select the next milestone.
+**Current focus:** Milestone v2.1 Question Bank UI Design roadmap is ready; next step is planning Phase 200.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 200 - Question Bank Data Model, Routes, and UI Foundation
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-01 — Milestone v2.1 started
+Status: Ready for phase planning
+Last activity: 2026-06-01 — Milestone v2.1 requirements and roadmap created
 
 ## Performance Metrics
 
@@ -116,10 +116,13 @@ Recent decisions affecting current work:
 - Phase 188 integrated the roadmap into `/practice`, added `TopicRoadmapPage`, wired canonical topic routes, and connected usable lesson node clicks to existing lesson routes.
 - Phase 189 added EN/DE/FR/IT roadmap copy, localized roadmap labels, mobile/desktop layout documentation, demo data docs, and roadmap QA checklist.
 - Phase 190 verified build, desktop/mobile browser roadmap behavior, locked hint behavior, continue CTA navigation, topic roadmap route, README handoff, and Phase 36 follow-up.
+- v2.1 continues roadmap numbering from Phase 200 after v1.35 ended at Phase 199.
+- Question Bank is a flexible exercise library for subject/topic/difficulty practice; it must not duplicate Practice Path's guided roadmap progression.
+- v2.1 is UI plus demo/mock data flow only; production item storage, generated questions, exam mode, paid unlocking, deep curriculum mapping, video help, and live teacher joining are deferred.
 
 ### Pending Todos
 
-- Phase 37 complete. Next milestone can focus on production preference syncing, parent-managed child language settings, Playwright profile-language coverage, or return to roadmap interaction QA, progress feedback, and parent visibility refinement.
+- Phase 200 should plan the Question Bank data model, routes, service/query boundaries, route helpers, page shells, and UI/design contract.
 
 ### Quick Tasks Completed
 

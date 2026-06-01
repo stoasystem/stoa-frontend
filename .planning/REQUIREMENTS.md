@@ -113,60 +113,60 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| QBIA-01 | — | Pending |
-| QBIA-02 | — | Pending |
-| QBIA-03 | — | Pending |
-| QBIA-04 | — | Pending |
-| QBIA-05 | — | Pending |
-| QBDISC-01 | — | Pending |
-| QBDISC-02 | — | Pending |
-| QBDISC-03 | — | Pending |
-| QBDISC-04 | — | Pending |
-| QBDISC-05 | — | Pending |
-| QBDISC-06 | — | Pending |
-| QBDISC-07 | — | Pending |
-| QBSET-01 | — | Pending |
-| QBSET-02 | — | Pending |
-| QBSET-03 | — | Pending |
-| QBSET-04 | — | Pending |
-| QBSET-05 | — | Pending |
-| QBSET-06 | — | Pending |
-| QBSESS-01 | — | Pending |
-| QBSESS-02 | — | Pending |
-| QBSESS-03 | — | Pending |
-| QBSESS-04 | — | Pending |
-| QBSESS-05 | — | Pending |
-| QBSESS-06 | — | Pending |
-| QBSESS-07 | — | Pending |
-| QBSESS-08 | — | Pending |
-| QBSESS-09 | — | Pending |
-| QBSESS-10 | — | Pending |
-| QBRES-01 | — | Pending |
-| QBRES-02 | — | Pending |
-| QBRES-03 | — | Pending |
-| QBRES-04 | — | Pending |
-| QBRES-05 | — | Pending |
-| QBRES-06 | — | Pending |
-| QBRES-07 | — | Pending |
-| QBCTX-01 | — | Pending |
-| QBCTX-02 | — | Pending |
-| QBCTX-03 | — | Pending |
-| QBCTX-04 | — | Pending |
-| QBCTX-05 | — | Pending |
-| QBQA-01 | — | Pending |
-| QBQA-02 | — | Pending |
-| QBQA-03 | — | Pending |
-| QBQA-04 | — | Pending |
-| QBQA-05 | — | Pending |
-| QBQA-06 | — | Pending |
-| QBQA-07 | — | Pending |
-| QBQA-08 | — | Pending |
+| QBIA-01 | Phase 201 | Pending |
+| QBIA-02 | Phase 200 | Pending |
+| QBIA-03 | Phase 200 | Pending |
+| QBIA-04 | Phase 200 | Pending |
+| QBIA-05 | Phase 201 | Pending |
+| QBDISC-01 | Phase 201 | Pending |
+| QBDISC-02 | Phase 201 | Pending |
+| QBDISC-03 | Phase 201 | Pending |
+| QBDISC-04 | Phase 201 | Pending |
+| QBDISC-05 | Phase 201 | Pending |
+| QBDISC-06 | Phase 201 | Pending |
+| QBDISC-07 | Phase 201 | Pending |
+| QBSET-01 | Phase 202 | Pending |
+| QBSET-02 | Phase 202 | Pending |
+| QBSET-03 | Phase 202 | Pending |
+| QBSET-04 | Phase 202 | Pending |
+| QBSET-05 | Phase 202 | Pending |
+| QBSET-06 | Phase 202 | Pending |
+| QBSESS-01 | Phase 203 | Pending |
+| QBSESS-02 | Phase 203 | Pending |
+| QBSESS-03 | Phase 203 | Pending |
+| QBSESS-04 | Phase 203 | Pending |
+| QBSESS-05 | Phase 203 | Pending |
+| QBSESS-06 | Phase 203 | Pending |
+| QBSESS-07 | Phase 203 | Pending |
+| QBSESS-08 | Phase 203 | Pending |
+| QBSESS-09 | Phase 203 | Pending |
+| QBSESS-10 | Phase 203 | Pending |
+| QBRES-01 | Phase 204 | Pending |
+| QBRES-02 | Phase 204 | Pending |
+| QBRES-03 | Phase 204 | Pending |
+| QBRES-04 | Phase 204 | Pending |
+| QBRES-05 | Phase 204 | Pending |
+| QBRES-06 | Phase 204 | Pending |
+| QBRES-07 | Phase 204 | Pending |
+| QBCTX-01 | Phase 204 | Pending |
+| QBCTX-02 | Phase 204 | Pending |
+| QBCTX-03 | Phase 204 | Pending |
+| QBCTX-04 | Phase 204 | Pending |
+| QBCTX-05 | Phase 205 | Pending |
+| QBQA-01 | Phase 200 | Pending |
+| QBQA-02 | Phase 200 | Pending |
+| QBQA-03 | Phase 205 | Pending |
+| QBQA-04 | Phase 205 | Pending |
+| QBQA-05 | Phase 205 | Pending |
+| QBQA-06 | Phase 205 | Pending |
+| QBQA-07 | Phase 205 | Pending |
+| QBQA-08 | Phase 205 | Pending |
 
 **Coverage:**
 - v2.1 requirements: 48 total
-- Mapped to phases: 0
-- Unmapped: 48
+- Mapped to phases: 48
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-06-01*
-*Last updated: 2026-06-01 after v2.1 research*
+*Last updated: 2026-06-01 after v2.1 roadmap creation*
