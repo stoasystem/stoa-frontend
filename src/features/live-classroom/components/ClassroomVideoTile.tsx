@@ -19,7 +19,7 @@ export function ClassroomVideoTile({ participant }: { participant: ClassroomPart
             <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-primary/10 text-primary">
               {participant.displayName.slice(0, 1)}
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">Mock video placeholder</p>
+            <p className="mt-3 text-sm text-muted-foreground">Camera preview</p>
           </div>
         ) : (
           <div>

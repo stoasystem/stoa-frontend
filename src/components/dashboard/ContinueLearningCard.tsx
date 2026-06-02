@@ -30,7 +30,7 @@ export function ContinueLearningCard() {
         ) : (
           <p>
             Your fastest path is to start a short Practice challenge, compare the explanation with your class
-            notes, then request teacher support if the explanation still feels unclear.
+            notes, then request tutor support if the explanation still feels unclear.
           </p>
         )}
         <div className="flex flex-wrap gap-3">

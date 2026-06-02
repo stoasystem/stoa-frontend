@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -15,11 +15,13 @@ import { formatClassroomTimeRange } from '@/features/live-classroom/utils/format
 
 export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }) {
   const { sessionId } = useParams()
+  const location = useLocation()
   const navigate = useNavigate()
   const sessionQuery = useClassroomSession(sessionId)
   const leaveMutation = useLeaveClassroomRoom(sessionId)
   const completeMutation = useCompleteClassroomSession(sessionId)
-  const roomState = useClassroomRoomState()
+  const initialPanel = location.search.includes('source=chat') ? 'chat' : tutorMode ? 'notes' : 'materials'
+  const roomState = useClassroomRoomState(initialPanel)
   const session = sessionQuery.data
 
   function confirmLeave() {
@@ -53,9 +55,11 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
                       {formatClassroomTimeRange(session)} · Tutor: {session.tutorName ?? 'Tutor'}
                     </p>
                   </div>
-                  <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">
-                    Mock classroom room
-                  </div>
+                  {session.context?.sourceLabel && (
+                    <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">
+                      Source: {session.context.sourceLabel}
+                    </div>
+                  )}
                 </div>
               </header>
 

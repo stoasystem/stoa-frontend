@@ -11,7 +11,7 @@ export function UpgradePromptCard({ source }: { source: string }) {
       </CardHeader>
       <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
         <p>
-          Upgrade after pilot to keep parent reports, learning history, and teacher support
+          Upgrade after pilot to keep parent reports, learning history, and tutor support
           signals available for your family.
         </p>
         <Button asChild>

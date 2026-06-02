@@ -29,7 +29,7 @@ export function UploadButton({
 }: UploadButtonProps) {
   const { t } = useTranslation('uploads')
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const resolvedLabel = label ?? t('actions.attachFile', 'Attach file')
+  const resolvedLabel = label ?? t('actions.attachFile', 'Attach File')
   const captureValue = capture === true ? 'environment' : capture || undefined
 
   return (

@@ -19,7 +19,7 @@
     "sessionContext": "Session Context",
     "joinClassroom": "Join Classroom",
     "waitingForTutor": "Waiting for tutor",
-    "notRealVideo": "This is a mock classroom lobby. Real video connection will be added later."
+    "notRealVideo": "Your classroom is ready. Review the context, then join when you are ready."
   },
   "room": {
     "chat": "Chat",
@@ -38,7 +38,7 @@
   "tutor": {
     "queueTitle": "Classroom Queue",
     "startingSoon": "Starting Soon",
-    "instantRequests": "Instant Video Requests",
+    "instantRequests": "Live Support Requests",
     "completedToday": "Completed Today"
   },
   "controls": {

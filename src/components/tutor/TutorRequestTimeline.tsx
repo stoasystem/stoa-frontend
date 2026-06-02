@@ -4,7 +4,7 @@ export function TutorRequestTimeline({ notes }: { notes: TutorHelpRequestNote[] 
   if (notes.length === 0) {
     return (
       <div className="rounded-md border bg-card p-4 text-sm text-muted-foreground">
-        No teacher notes yet.
+        No tutor notes yet.
       </div>
     )
   }

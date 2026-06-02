@@ -2,11 +2,27 @@
 
 STOA learning platform frontend.
 
-## Phase v2.3 Live Classroom & Video Help UI
+## Phase v2.4 UI Copy & Web Design Refinement
 
-STOA now has a frontend/mock-backed Online Classroom foundation for scheduled tutor sessions and teacher-text-to-video escalation.
+STOA now presents Practice Path, Practice Library, Upload a Question, Learning Assistant, Tutor Support, and Online Classroom as one coherent learning support system.
 
-Students can open `/classroom`, schedule live help with learning materials, review a lobby/device check, enter a mock classroom room, use camera/microphone/whiteboard controls, and review a post-session summary. Learning Chat can escalate from teacher text support into a video classroom lobby. Tutors can review a classroom queue before joining, and parents can see lightweight classroom visibility on the parent dashboard.
+Student Dashboard prioritizes Continue Learning, Need Help, Today's Practice, Live Support, and Recent Activity. Student-facing Question Bank surfaces now read as Practice Library while existing `/question-bank` routes remain stable. Upload and classroom copy avoids OCR, scan-and-solve, instant-solution, AI-teacher, provider, recording, billing, and real-video claims that are not implemented.
+
+See `docs/design/v2.4-ui-copy-refinement.md` for the approved vocabulary, high-risk terms, and handoff guidance.
+
+Verification:
+
+```bash
+npm run lint
+npm run build
+npm run test:e2e -- uploads.spec.ts student-chat.spec.ts live-classroom.spec.ts v2.4-ui-refinement.spec.ts
+```
+
+## Phase v2.3 Live Classroom UI
+
+STOA now has a frontend/mock-backed Online Classroom foundation for scheduled tutor sessions and tutor-support-to-classroom escalation.
+
+Students can open `/classroom`, schedule live help with learning materials, review a lobby/device check, enter an Online Classroom, use classroom controls and side panels, and review a post-session summary. Learning Chat can escalate from tutor support into a live classroom lobby. Tutors can review a classroom queue before joining, and parents can see lightweight classroom visibility on the parent dashboard.
 
 This phase is UI and contract foundation only. It does not implement production video streaming, recording, attendance billing, calendar sync, parent observer mode, or production classroom persistence.
 
@@ -679,9 +695,9 @@ Language behavior:
 User-facing terminology now prefers:
 
 - `Learning Assistant`
-- `Professional teacher support`
+- `Tutor support`
 - `Explanation`
-- `Ask a teacher`
+- `Ask a Tutor`
 - `Choose a plan`
 
 Avoid user-facing copy such as `AI tutor`, `AI answer`, `chatbot`, `human backup`, `teacher backup`, and developer-facing pricing language.
@@ -776,7 +792,7 @@ Main Phase 15 updates:
 - parent onboarding with child profile fields
 - tutor onboarding with teaching profile and mock credential upload
 - chat empty state that sends students straight into asking homework questions
-- inline `Ask a teacher` action below Learning Assistant explanations
+- inline `Ask a Tutor` action below Learning Assistant explanations
 
 Recommended Phase 15 demo path:
 

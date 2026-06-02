@@ -42,7 +42,7 @@ export function StudentClassroomHomePage() {
                     <h2 className="mt-2 text-2xl font-semibold">Book live tutor help</h2>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       Choose a time for a focused classroom session, or start with the Learning Assistant
-                      if you need instant help.
+                      and request tutor support if you need help sooner.
                     </p>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <Button asChild>
@@ -54,7 +54,7 @@ export function StudentClassroomHomePage() {
                       <Button asChild variant="outline">
                         <Link to="/chat?intent=teacher-help">
                           <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                          Request Instant Help
+                          Ask Learning Assistant
                         </Link>
                       </Button>
                     </div>
@@ -67,14 +67,14 @@ export function StudentClassroomHomePage() {
               <section className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
                 <SectionHeader
                   title="Get Help Now"
-                  description="Start with the Learning Assistant, then invite a tutor or enter a live classroom if needed."
+                  description="Start with the Learning Assistant, request tutor support, then enter an Online Classroom if the question needs live help."
                 />
                 <div className="mt-5 flex flex-wrap gap-2">
                   <Button asChild>
-                    <Link to="/chat?intent=teacher-help">Open Learning Assistant</Link>
+                    <Link to="/chat?intent=teacher-help">Ask Learning Assistant</Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link to="/classroom/schedule">Schedule live help</Link>
+                    <Link to="/classroom/schedule">Schedule a Session</Link>
                   </Button>
                 </div>
               </section>

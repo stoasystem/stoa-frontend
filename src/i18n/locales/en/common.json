@@ -3,7 +3,7 @@
     "name": "STOA",
     "platform": "STOA Learning Platform",
     "learningAssistant": "Learning Assistant",
-    "teacherSupport": "Professional teacher support"
+    "teacherSupport": "Tutor support"
   },
   "navigation": {
     "home": "Home",
@@ -23,7 +23,7 @@
     "dashboard": "Dashboard",
     "chat": "Ask a question",
     "practice": "Practice",
-    "questionBank": "Question Bank",
+    "questionBank": "Practice Library",
     "learningHistory": "Learning history",
     "profile": "Profile",
     "overview": "Overview",
@@ -51,7 +51,7 @@
     "register": "Register",
     "choosePlan": "Choose a plan",
     "viewPricing": "View pricing",
-    "askTeacher": "Ask a teacher",
+    "askTeacher": "Ask a Tutor",
     "send": "Send message",
     "stop": "Stop"
   },

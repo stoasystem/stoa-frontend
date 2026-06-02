@@ -23,7 +23,7 @@ export function ParentValueCard({
             </p>
             <p>
               Parent reports turn homework activity into a weekly decision: continue guided support,
-              request teacher support, or review a topic together.
+              request tutor support, or review a topic together.
             </p>
           </>
         )}

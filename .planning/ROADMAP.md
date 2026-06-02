@@ -6,16 +6,16 @@
 - ✅ **v2.1 Question Bank UI Design** - Phases 200-205 (shipped 2026-06-02)
 - ✅ **v2.2 Photo & File Upload UI Foundation** - Phases 206-211 (shipped 2026-06-02)
 - ✅ **v2.3 Live Classroom & Video Help UI Foundation** - Phases 212-218 (shipped 2026-06-02)
-- ◆ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (planning)
+- ✅ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (shipped 2026-06-02)
 
 ## Phases
 
-- [ ] **Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy** - Reorganize the student dashboard and navigation labels so the learning journey has a clear priority order and consistent action language.
-- [ ] **Phase 220: Practice Library Naming, Structure, Session, Result, and Mistakes Refinement** - Polish Question Bank student-facing copy into Practice Library and refine practice set, session, result, and mistakes review experiences.
-- [ ] **Phase 221: Upload a Question and Chat Tutor Support Copy Refinement** - Polish upload trust wording, attachment states, Chat teacher-support states, and Start Live Classroom escalation copy.
-- [ ] **Phase 222: Online Classroom Learning Context and Summary Refinement** - Refine classroom home, schedule, lobby, room, controls, materials, and summary surfaces around learning context and next steps.
-- [ ] **Phase 223: Tutor Context and Parent Learning Support Refinement** - Strengthen tutor queue/lobby/room context and parent dashboard learning-support visibility without adding new management capabilities.
-- [ ] **Phase 224: Shared States, I18n, Accessibility, E2E, and Handoff Closure** - Consolidate shared empty/error/context/next-step patterns, i18n, high-risk copy audit, accessibility checks, E2E coverage, docs, and final verification.
+- [x] **Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy** - Reorganize the student dashboard and navigation labels so the learning journey has a clear priority order and consistent action language.
+- [x] **Phase 220: Practice Library Naming, Structure, Session, Result, and Mistakes Refinement** - Polish Question Bank student-facing copy into Practice Library and refine practice set, session, result, and mistakes review experiences.
+- [x] **Phase 221: Upload a Question and Chat Tutor Support Copy Refinement** - Polish upload trust wording, attachment states, Chat teacher-support states, and Start Live Classroom escalation copy.
+- [x] **Phase 222: Online Classroom Learning Context and Summary Refinement** - Refine classroom home, schedule, lobby, room, controls, materials, and summary surfaces around learning context and next steps.
+- [x] **Phase 223: Tutor Context and Parent Learning Support Refinement** - Strengthen tutor queue/lobby/room context and parent dashboard learning-support visibility without adding new management capabilities.
+- [x] **Phase 224: Shared States, I18n, Accessibility, E2E, and Handoff Closure** - Consolidate shared empty/error/context/next-step patterns, i18n, high-risk copy audit, accessibility checks, E2E coverage, docs, and final verification.
 
 ## Phase Details
 
@@ -108,12 +108,12 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 219. Student Dashboard Learning Hierarchy and CTA Taxonomy | 0/1 | Pending | — |
-| 220. Practice Library Naming, Structure, Session, Result, and Mistakes Refinement | 0/1 | Pending | — |
-| 221. Upload a Question and Chat Tutor Support Copy Refinement | 0/1 | Pending | — |
-| 222. Online Classroom Learning Context and Summary Refinement | 0/1 | Pending | — |
-| 223. Tutor Context and Parent Learning Support Refinement | 0/1 | Pending | — |
-| 224. Shared States, I18n, Accessibility, E2E, and Handoff Closure | 0/1 | Pending | — |
+| 219. Student Dashboard Learning Hierarchy and CTA Taxonomy | 1/1 | Complete | 2026-06-02 |
+| 220. Practice Library Naming, Structure, Session, Result, and Mistakes Refinement | 1/1 | Complete | 2026-06-02 |
+| 221. Upload a Question and Chat Tutor Support Copy Refinement | 1/1 | Complete | 2026-06-02 |
+| 222. Online Classroom Learning Context and Summary Refinement | 1/1 | Complete | 2026-06-02 |
+| 223. Tutor Context and Parent Learning Support Refinement | 1/1 | Complete | 2026-06-02 |
+| 224. Shared States, I18n, Accessibility, E2E, and Handoff Closure | 1/1 | Complete | 2026-06-02 |
 
 ## Coverage
 
@@ -132,4 +132,4 @@
 
 ## Next Up
 
-**Phase 219: Student Dashboard Learning Hierarchy and CTA Taxonomy** — Reorganize the student dashboard and navigation labels so the learning journey has a clear priority order and consistent action language.
+No pending phase. Milestone v2.4 is complete.

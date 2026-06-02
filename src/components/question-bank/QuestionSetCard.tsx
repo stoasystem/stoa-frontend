@@ -91,7 +91,7 @@ export function getActionLabel(status: QuestionSetStatus) {
     not_started: 'Start',
     in_progress: 'Resume',
     completed: 'Practice Again',
-    review_recommended: 'Review',
+    review_recommended: 'Review Mistakes',
   }
   return labels[status]
 }

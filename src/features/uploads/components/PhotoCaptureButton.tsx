@@ -19,7 +19,7 @@ export function PhotoCaptureButton({
   onPhotoSelected,
 }: PhotoCaptureButtonProps) {
   const { t } = useTranslation('uploads')
-  const resolvedLabel = label ?? t('actions.takePhoto', 'Take photo')
+  const resolvedLabel = label ?? t('actions.takePhoto', 'Take Photo')
 
   return (
     <UploadButton

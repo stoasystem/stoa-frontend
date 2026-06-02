@@ -1,9 +1,9 @@
 {
   "actions": {
-    "attachFile": "Attach file",
-    "takePhoto": "Take photo",
+    "attachFile": "Attach File",
+    "takePhoto": "Take Photo",
     "uploadPhoto": "Upload photo",
-    "uploadQuestion": "Upload question",
+    "uploadQuestion": "Upload a Question",
     "remove": "Remove",
     "removeFile": "Remove {{fileName}}",
     "retry": "Retry",
@@ -15,26 +15,26 @@
     "idle": "Ready",
     "validating": "Validating",
     "uploading": "Uploading",
-    "uploaded": "Uploaded",
+    "uploaded": "File ready",
     "failed": "Failed",
     "rejected": "Rejected"
   },
   "errors": {
-    "unsupportedType": "This file type is not supported.",
-    "fileTooLarge": "This file is too large.",
-    "tooManyFiles": "You can upload up to {{count}} files.",
-    "uploadFailed": "The upload failed. Please try again.",
+    "unsupportedType": "This file type is not supported. Please upload JPG, PNG, WEBP, or PDF.",
+    "fileTooLarge": "This file is too large. Maximum file size is 10 MB.",
+    "tooManyFiles": "You can upload up to {{count}} files at a time.",
+    "uploadFailed": "The upload failed. Please check your connection and try again.",
     "emptyFile": "This file appears to be empty.",
     "waitForUpload": "Please wait for the upload to finish."
   },
   "dropzone": {
     "title": "Drag and drop files here",
-    "description": "Supported formats: JPG, PNG, WEBP, PDF.",
+    "description": "Supported formats: JPG, PNG, WEBP, PDF. Maximum file size: 10 MB.",
     "browse": "Browse files"
   },
   "modal": {
-    "title": "Upload a question",
-    "description": "Take a photo or attach a PDF, then ask the Learning Assistant."
+    "title": "Upload a Question",
+    "description": "Take a photo or attach a PDF from your schoolwork. The Learning Assistant can help you understand it step by step."
   },
   "preview": {
     "attachedFiles": "Attached files",
@@ -48,9 +48,9 @@
     "learningOnly": "Please upload learning materials only. Do not upload personal documents."
   },
   "learning": {
-    "uploadKicker": "Schoolwork upload",
-    "uploadOwnQuestionTitle": "Have your own question?",
-    "uploadOwnQuestionDescription": "Upload a photo or PDF and ask the Learning Assistant.",
+    "uploadKicker": "Upload a Question",
+    "uploadOwnQuestionTitle": "Bring your own schoolwork",
+    "uploadOwnQuestionDescription": "Take a photo or attach a PDF from schoolwork. The Learning Assistant can help you understand it step by step.",
     "schoolworkHelpTitle": "Bring your own schoolwork",
     "schoolworkHelpDescription": "Upload a question from school and get step-by-step guidance."
   },

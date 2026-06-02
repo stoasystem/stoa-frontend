@@ -19,12 +19,12 @@ export function LearningActivitySummary({
       icon: MessageCircle,
     },
     {
-      label: 'Teacher support',
+      label: 'Tutor support',
       value: `${summary?.teacherSupportRequested ?? 1}`,
       icon: GraduationCap,
     },
     {
-      label: 'Question Bank',
+      label: 'Practice Library',
       value: `${summary?.questionBankSetsAttempted ?? 4} sets`,
       icon: Activity,
     },
@@ -44,14 +44,14 @@ export function LearningActivitySummary({
           </div>
           <div>
             <p className="brand-section-kicker">Learning activity</p>
-            <CardTitle className="text-xl">Practice and explanations in one view</CardTitle>
+            <CardTitle className="text-xl">Learning support in one view</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          Practice Path shows guided progress. Question Bank shows targeted independent practice.
-          Questions and teacher support show where explanation is needed.
+          Practice Path shows guided progress. Practice Library shows targeted independent practice.
+          Learning Assistant questions, tutor support, and Online Classroom sessions show where explanation is needed.
         </p>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
           {metrics.map((metric) => {

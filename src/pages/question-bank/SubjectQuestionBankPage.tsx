@@ -17,8 +17,8 @@ export function SubjectQuestionBankPage() {
   const subjectQuery = useQuestionBankSubjectQuery(subjectId)
   const [filters, setFilters] = useState<QuestionBankFiltersValue>({ level: 'all', difficulty: 'all' })
 
-  if (subjectQuery.isLoading) return <LoadingState />
-  if (subjectQuery.isError || !subjectQuery.data) return <ErrorState message="Question Bank subject could not be loaded." />
+  if (subjectQuery.isLoading) return <LoadingState message="Loading practice sets..." />
+  if (subjectQuery.isError || !subjectQuery.data) return <ErrorState title="We could not load this subject" message="Please return to the Practice Library and try again." />
 
   const { subject, topics, recommendedSets, progress } = subjectQuery.data
   const filteredTopics = topics.filter((topic) => !filters.level || filters.level === 'all' || topic.levelTags.includes(filters.level))
@@ -27,7 +27,7 @@ export function SubjectQuestionBankPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Question Bank"
+          eyebrow="Practice Library"
           title={subject.title}
           description="Exercises by topic and level. Choose a focused set or browse the topic library."
         />
@@ -38,7 +38,7 @@ export function SubjectQuestionBankPage() {
         </section>
         <QuestionBankFilters value={filters} onChange={setFilters} showQuestionType={false} showStatus={false} />
         <section className="space-y-4">
-          <SectionHeader title="Topics" description="Open a topic to see question sets and weak-area guidance." />
+          <SectionHeader title="Topics" description="Open a topic to see question sets and needs-review guidance." />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredTopics.map((topic) => (
               <TopicCard key={topic.id} topic={topic} />

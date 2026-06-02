@@ -24,7 +24,7 @@ export function TutorClassroomQueuePage() {
         <PageHeader
           eyebrow="Tutor classroom"
           title="Classroom Queue"
-          description="Review scheduled classrooms and instant video requests before joining."
+          description="Review scheduled classrooms and live support requests before joining."
         />
 
         {queueQuery.isLoading && <EmptyState message="Loading classroom queue..." />}
@@ -37,8 +37,8 @@ export function TutorClassroomQueuePage() {
               <SessionList sessions={queue.startingSoon} empty="No scheduled sessions are starting soon." />
             </section>
             <section className="space-y-4">
-              <SectionHeader title="Instant Video Requests" description="Students waiting for deeper live help." />
-              <SessionList sessions={queue.instantRequests} empty="No instant video requests are waiting." instant />
+              <SectionHeader title="Live Support Requests" description="Students waiting for deeper live help." />
+              <SessionList sessions={queue.instantRequests} empty="No live support requests are waiting." instant />
             </section>
             <section className="space-y-4">
               <SectionHeader title="Completed Today" description="Recent sessions with notes and next steps." />
@@ -74,7 +74,7 @@ function SessionList({
             <div>
               <div className="flex items-center gap-2">
                 {instant ? <Video className="h-4 w-4 text-primary" aria-hidden="true" /> : <CalendarClock className="h-4 w-4 text-primary" aria-hidden="true" />}
-                <p className="brand-section-kicker">{instant ? 'Instant request' : 'Classroom session'}</p>
+                <p className="brand-section-kicker">{instant ? 'Live support request' : 'Classroom session'}</p>
               </div>
               <h2 className="mt-2 text-xl font-semibold">{session.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{formatClassroomTimeRange(session)}</p>
@@ -84,6 +84,20 @@ function SessionList({
               {session.context?.summary && (
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{session.context.summary}</p>
               )}
+              <dl className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+                <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-2">
+                  <dt className="font-semibold text-foreground">Source</dt>
+                  <dd className="mt-1">{session.context?.sourceLabel ?? 'Classroom request'}</dd>
+                </div>
+                <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-2">
+                  <dt className="font-semibold text-foreground">Material</dt>
+                  <dd className="mt-1">{session.materials.length > 0 ? `${session.materials.length} attached` : 'No material yet'}</dd>
+                </div>
+                <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-2">
+                  <dt className="font-semibold text-foreground">Suggested focus</dt>
+                  <dd className="mt-1">{session.recommendedFocus ?? 'Review the question step by step.'}</dd>
+                </div>
+              </dl>
             </div>
             <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
               <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm font-medium">
@@ -94,7 +108,7 @@ function SessionList({
                   ? `/tutor/classroom/sessions/${session.id}/summary`
                   : `/tutor/classroom/sessions/${session.id}/lobby`}
                 >
-                  {summary ? 'View Summary' : 'Open Lobby'}
+                  {summary ? 'View Summary' : instant ? 'Review Context' : 'Open Lobby'}
                 </Link>
               </Button>
             </div>

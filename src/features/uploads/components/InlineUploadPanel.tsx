@@ -52,12 +52,12 @@ export function InlineUploadPanel({
           <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
             <Camera className="h-5 w-5" aria-hidden="true" />
           </div>
-          <p className="brand-section-kicker mt-4">{t('learning.uploadKicker', 'Schoolwork upload')}</p>
+          <p className="brand-section-kicker mt-4">{t('learning.uploadKicker', 'Upload a Question')}</p>
           <h2 className={compact ? 'mt-2 text-xl font-semibold' : 'mt-2 text-2xl font-semibold'}>
-            {title ?? t('learning.uploadOwnQuestionTitle', 'Have your own question?')}
+            {title ?? t('learning.uploadOwnQuestionTitle', 'Bring your own schoolwork')}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-            {description ?? t('learning.uploadOwnQuestionDescription', 'Upload a photo or PDF and ask the Learning Assistant.')}
+            {description ?? t('learning.uploadOwnQuestionDescription', 'Take a photo or attach a PDF from schoolwork. The Learning Assistant can help you understand it step by step.')}
           </p>
           <p className="mt-2 text-xs leading-5 text-muted-foreground">
             {t('privacy.learningOnly', 'Please upload learning materials only. Do not upload personal documents.')}

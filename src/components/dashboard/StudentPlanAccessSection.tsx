@@ -54,7 +54,7 @@ export function StudentPlanAccessSection() {
             <div className="flex gap-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
               <p>
-                Plan limits explain how much Learning Chat, file upload, and teacher support access is available
+                Plan limits explain how much Learning Chat, file upload, and tutor support access is available
                 for this student during the current period.
               </p>
             </div>

@@ -17,14 +17,14 @@ export function QuestionBankCard() {
             <LibraryBig className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <p className="brand-section-kicker">Question Bank</p>
-            <CardTitle className="text-xl">Open practice by topic</CardTitle>
+            <p className="brand-section-kicker">Practice Library</p>
+            <CardTitle className="text-xl">Choose exercises by topic</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          Choose a focused set when you want flexible practice outside the guided Practice Path.
+          Choose exercises by subject, topic, and difficulty when you want flexible practice outside the guided Practice Path.
         </p>
         <div className="grid gap-2 sm:grid-cols-3">
           <Metric label="Subjects" value={`${overview?.subjects.length ?? 4}`} />
@@ -33,12 +33,12 @@ export function QuestionBankCard() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild>
-            <Link to="/question-bank">Open Question Bank</Link>
+            <Link to="/question-bank">Open Practice Library</Link>
           </Button>
           <Button asChild variant="outline">
             <Link to={getQuestionBankMistakesPath()}>
               <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              Review mistakes
+              Review Mistakes
             </Link>
           </Button>
         </div>

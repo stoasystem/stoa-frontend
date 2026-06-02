@@ -1,3 +1,3 @@
-export function LoadingState() {
-  return <div className="text-sm text-muted-foreground">Loading...</div>
+export function LoadingState({ message = 'Loading...' }: { message?: string }) {
+  return <div className="text-sm text-muted-foreground" role="status">{message}</div>
 }

@@ -85,7 +85,7 @@ function ClassroomChatPanel({ session }: { session: LiveClassroomSession }) {
 function ClassroomMaterialsPanel({ session }: { session: LiveClassroomSession }) {
   return (
     <section aria-label="Classroom materials" className="space-y-3">
-      <p className="text-sm text-muted-foreground">Uploaded before or shared during the classroom.</p>
+      <p className="text-sm text-muted-foreground">Uploaded before the session or shared during the classroom.</p>
       {session.materials.map((material) => (
         <div key={material.id} className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">
           <p className="text-sm font-medium">{material.title}</p>
@@ -129,6 +129,7 @@ function ClassroomNotesPanel({
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
             aria-label="Tutor notes"
+            placeholder="Review the source, material, and suggested focus before saving notes."
             className="min-h-28"
           />
           <Button type="button" size="sm" onClick={saveNotes} disabled={notesMutation.isPending}>

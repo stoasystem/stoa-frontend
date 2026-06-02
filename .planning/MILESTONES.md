@@ -1,5 +1,30 @@
 # Milestones
 
+## v2.4 UI Copy & Web Design Refinement (Shipped: 2026-06-02)
+
+**Phases completed:** 6 phases, 6 plans, 0 tasks
+**Audit:** `.planning/v2.4-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Production OCR/image understanding, real WebRTC/video provider integration, production scheduling, tutor matching, billing, recording, transcription, screen share, parent observer controls, native translation review, and large visual redesign remain future scope.
+
+**Key accomplishments:**
+
+- Reorganized Student Dashboard into Continue Learning, Need Help, Today's Practice, Live Support, and Recent Activity with clearer CTA taxonomy.
+- Renamed student-facing Question Bank surfaces to Practice Library while preserving existing `/question-bank` routes and internal service boundaries.
+- Refined Practice Library home, question set, session, result, saved-set, and mistakes-review copy toward supportive learning language.
+- Tightened Upload a Question and Learning Chat copy to avoid OCR, scan-and-solve, instant-solution, AI-teacher, or image-reading claims.
+- Refined Chat escalation states to Tutor support requested, Tutor joined, Learning Assistant observing, and Start Live Classroom.
+- Refined Online Classroom home, lobby, room, tutor queue, parent visibility, and summary around learning context, materials, notes, and next steps.
+- Added shared ContextCard and NextStepCard patterns plus expanded EmptyState, ErrorState, and LoadingState support.
+- Added v2.4 Playwright coverage and updated uploads/chat/classroom E2E assertions.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e -- uploads.spec.ts student-chat.spec.ts live-classroom.spec.ts v2.4-ui-refinement.spec.ts`: passed, 14/14 tests.
+
+---
+
 ## v2.3 Live Classroom & Video Help UI Foundation (Shipped: 2026-06-02)
 
 **Phases completed:** 7 phases, 7 plans, 0 tasks

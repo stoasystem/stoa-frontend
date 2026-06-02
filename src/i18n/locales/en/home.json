@@ -19,7 +19,7 @@
     "steps": [
       { "title": "Ask a question", "description": "Students begin directly in chat with a homework question or uploaded assignment." },
       { "title": "Understand the next step", "description": "The Learning Assistant explains the next step clearly, so the student can keep following the work." },
-      { "title": "Ask a teacher if needed", "description": "When the answer is not clear enough, a qualified teacher can step into the same thread." },
+      { "title": "Ask a tutor if needed", "description": "When the answer is not clear enough, a qualified tutor can step into the same thread." },
       { "title": "Parents follow progress", "description": "Parents see learning history, reports, and teacher-support records without interrupting study." }
     ]
   },

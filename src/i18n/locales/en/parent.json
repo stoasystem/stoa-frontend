@@ -1,6 +1,6 @@
 {
   "dashboardTitle": "Parent dashboard",
-  "dashboardDescription": "Follow learning rhythm, recent questions, reports, and moments when teacher support helped.",
+  "dashboardDescription": "Follow learning rhythm, recent questions, reports, and moments when tutor support helped.",
   "loadChildrenFailed": "Failed to load children.",
   "noChildren": "No children are linked to this parent account.",
   "child": "Child",
@@ -13,6 +13,6 @@
   "historyTitle": "Child learning history",
   "growth": "Learning progress",
   "recentQuestions": "Recent questions",
-  "teacherRecords": "Teacher support moments",
+  "teacherRecords": "Tutor support moments",
   "nextAction": "Recommended next action"
 }

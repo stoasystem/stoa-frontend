@@ -16,7 +16,7 @@ export function PracticeRequestContextCard({
           </div>
           <div>
             <p className="brand-section-kicker">
-              Source: {context.source === 'question-bank' ? 'Question Bank' : 'Practice lesson'}
+              Source: {context.source === 'question-bank' ? 'Practice Library' : 'Practice Path'}
             </p>
             <CardTitle className="text-xl">The student requested support after practising this step.</CardTitle>
           </div>

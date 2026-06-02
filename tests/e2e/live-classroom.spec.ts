@@ -15,12 +15,12 @@ test('student can open classroom home and schedule a session with materials', as
   await expect(page.getByRole('heading', { name: /online classroom/i })).toBeVisible()
   await expect(page.getByText(/mathematics support/i).first()).toBeVisible()
 
-  await page.getByRole('link', { name: /schedule live help/i }).click()
+  await page.getByRole('link', { name: /schedule a session/i }).click()
   await expect(page).toHaveURL(/\/classroom\/schedule/)
   await page.getByRole('button', { name: /quick help/i }).click()
   await page.getByRole('button', { name: /tomorrow 10:00/i }).click()
   await page.getByLabel(/what should the tutor know/i).fill('I get stuck when moving terms across the equals sign.')
-  await page.locator('input[aria-label="Attach file"]').last().setInputFiles(sampleImage)
+  await page.locator('input[aria-label="Attach File"]').last().setInputFiles(sampleImage)
   await expect(page.getByText('classroom-question.png').first()).toBeVisible()
 
   await page.getByRole('button', { name: /schedule session/i }).click()
@@ -28,7 +28,7 @@ test('student can open classroom home and schedule a session with materials', as
   await expect(page.getByRole('link', { name: /open lobby/i })).toBeVisible()
 })
 
-test('student can move from lobby into the mock classroom room and summary', async ({ page }) => {
+test('student can move from lobby into the online classroom room and summary', async ({ page }) => {
   await loginAs(page, 'student')
   await page.goto('/classroom/sessions/classroom-linear-equations/lobby')
 
@@ -37,32 +37,32 @@ test('student can move from lobby into the mock classroom room and summary', asy
   await page.getByRole('button', { name: /join classroom/i }).click()
   await expect(page).toHaveURL(/\/classroom\/sessions\/classroom-linear-equations\/room/)
 
-  await expect(page.getByText(/mock classroom room/i)).toBeVisible()
+  await expect(page.getByText(/source: scheduled classroom/i)).toBeVisible()
   await expect(page.getByRole('button', { name: /unmute/i })).toBeVisible()
   await expect(page.getByText(/shared whiteboard/i)).toBeVisible()
   await page.getByRole('button', { name: /leave/i }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   await page.getByRole('button', { name: /leave classroom/i }).click()
   await expect(page).toHaveURL(/\/classroom\/sessions\/classroom-linear-equations\/summary/)
-  await expect(page.getByText(/session notes/i)).toBeVisible()
+  await expect(page.getByText(/live classroom completed/i)).toBeVisible()
 })
 
-test('learning chat can escalate teacher text support into a classroom lobby', async ({ page }) => {
+test('learning chat can escalate tutor support into a classroom lobby', async ({ page }) => {
   await loginAs(page, 'student')
   await page.goto('/chat')
 
-  await page.getByRole('textbox', { name: /first learning question/i }).fill('Can a teacher help me with linear equations?')
+  await page.getByRole('textbox', { name: /first learning question/i }).fill('Can a tutor help me with linear equations?')
   await page.getByRole('button', { name: /start conversation/i }).click()
   await expect(page.getByRole('main').getByText(/linear equations/i).first()).toBeVisible()
 
-  await page.getByRole('button', { name: /ask a teacher/i }).first().click()
-  await expect(page.getByText(/teacher support requested/i)).toBeVisible()
-  await page.getByRole('button', { name: /tutor joined by text/i }).click()
-  await page.getByRole('button', { name: /start video classroom/i }).click()
+  await page.getByRole('button', { name: /ask a tutor/i }).first().click()
+  await expect(page.getByRole('heading', { name: /tutor support requested/i })).toBeVisible()
+  await page.getByRole('button', { name: /^tutor joined$/i }).click()
+  await page.getByRole('button', { name: /start live classroom/i }).click()
 
   await expect(page).toHaveURL(/\/classroom\/sessions\/classroom-instant-/)
   await expect(page.getByRole('heading', { name: /classroom lobby/i })).toBeVisible()
-  await expect(page.getByText(/instant video help/i).first()).toBeVisible()
+  await expect(page.getByText(/live classroom help/i).first()).toBeVisible()
 })
 
 test('tutor can review classroom queue and open a tutor lobby', async ({ page }) => {
@@ -71,9 +71,9 @@ test('tutor can review classroom queue and open a tutor lobby', async ({ page })
   await page.getByRole('link', { name: /open classroom queue/i }).click()
   await expect(page).toHaveURL(/\/tutor\/classroom$/)
   await expect(page.getByRole('heading', { name: /classroom queue/i })).toBeVisible()
-  await expect(page.getByText(/instant video requests/i)).toBeVisible()
+  await expect(page.getByText(/live support requests/i)).toBeVisible()
 
-  await page.getByRole('link', { name: /open lobby/i }).first().click()
+  await page.getByRole('link', { name: /review context|open lobby/i }).first().click()
   await expect(page).toHaveURL(/\/tutor\/classroom\/sessions\/.+\/lobby/)
   await expect(page.getByRole('heading', { name: /prepare for classroom/i })).toBeVisible()
   await expect(page.getByText(/review the context before joining/i)).toBeVisible()

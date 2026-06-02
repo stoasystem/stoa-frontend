@@ -1,9 +1,10 @@
-import { MessageCircle, RotateCcw } from 'lucide-react'
+import { LayoutDashboard, MessageCircle } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { NextStepCard } from '@/components/common/NextStepCard'
 import { Button } from '@/components/ui/button'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { useClassroomSession } from '@/features/live-classroom/hooks/useClassroomSession'
@@ -29,8 +30,8 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
         {session && (
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <section className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
-              <p className="brand-section-kicker">Session Notes</p>
-              <h2 className="mt-2 text-2xl font-semibold">{session.topicLabel ?? session.subjectLabel}</h2>
+              <p className="brand-section-kicker">Live classroom completed</p>
+              <h2 className="mt-2 text-2xl font-semibold">What we reviewed</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
                 {session.notes?.summary ?? 'The tutor will add notes after the session.'}
               </p>
@@ -44,12 +45,19 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-semibold">Next steps</h3>
+                  <h3 className="font-semibold">Recommended next steps</h3>
                   <div className="mt-3 grid gap-2">
                     {(session.notes?.nextSteps ?? []).map((nextStep) => (
-                      <Button key={nextStep.id} asChild variant="outline" size="sm">
-                        <Link to={nextStep.targetUrl ?? '/dashboard'}>{nextStep.label}</Link>
-                      </Button>
+                      <NextStepCard
+                        key={nextStep.id}
+                        title={nextStep.label}
+                        description="Keep the classroom work connected to the next learning action."
+                        action={(
+                          <Button asChild variant="outline" size="sm">
+                            <Link to={nextStep.targetUrl ?? '/dashboard'}>Open</Link>
+                          </Button>
+                        )}
+                      />
                     ))}
                   </div>
                 </div>
@@ -59,13 +67,13 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
                   <Button asChild>
                     <Link to="/chat">
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
-                      Back to Learning Chat
+                      Ask Learning Assistant
                     </Link>
                   </Button>
                   <Button asChild variant="outline">
-                    <Link to="/practice">
-                      <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                      Practice similar questions
+                    <Link to="/dashboard">
+                      <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
+                      Back to Dashboard
                     </Link>
                   </Button>
                 </div>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Play } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { EmptyState } from '@/components/common/EmptyState'
 import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilters'
 import { Button } from '@/components/ui/button'
 import { useQuestionBankMistakesQuery } from '@/hooks/questionBank/useQuestionBankMistakesQuery'
@@ -24,12 +25,12 @@ export function QuestionBankMistakesReviewPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Question Bank"
-          title="Mistakes Review"
-          description="Rework missed or skipped questions from open practice sets."
+          eyebrow="Practice Library"
+          title="Mistakes to Review"
+          description="Review questions you missed before and strengthen your understanding."
         />
         <section className="grid gap-4 sm:grid-cols-3">
-          <Metric label="Mistakes waiting" value={`${mistakes.length}`} />
+          <Metric label="Questions to review" value={`${mistakes.length}`} />
           <Metric label="Subjects" value={`${new Set(mistakes.map((mistake) => mistake.subjectId)).size || 1}`} />
           <Metric label="Review mode" value="Low pressure" />
         </section>
@@ -44,7 +45,7 @@ export function QuestionBankMistakesReviewPage() {
         <section className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="brand-section-kicker">Mistake Question List</p>
+              <p className="brand-section-kicker">Review & Improve</p>
               <h2 className="mt-2 text-xl font-semibold">Review exactly where the answer changed</h2>
             </div>
             <Button asChild>
@@ -55,6 +56,13 @@ export function QuestionBankMistakesReviewPage() {
             </Button>
           </div>
           <div className="mt-5 space-y-3">
+            {mistakes.length === 0 && (
+              <EmptyState
+                title="No mistakes to review yet"
+                description="Once you complete practice sets, missed questions will appear here."
+                action={<Button asChild><Link to="/question-bank">Start Practice</Link></Button>}
+              />
+            )}
             {mistakes.map((mistake) => (
               <article key={mistake.id} className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
                 <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">

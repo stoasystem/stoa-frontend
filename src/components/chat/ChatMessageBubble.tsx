@@ -13,7 +13,7 @@ function formatMessageTime(value: string) {
 }
 
 function getRoleLabel(message: ChatMessage) {
-  if (message.role === 'teacher') return 'Teacher'
+  if (message.role === 'teacher') return 'Tutor'
   if (message.role === 'system') return 'System'
   if (message.role === 'assistant') return 'STOA Learning Assistant'
   return null
@@ -23,7 +23,7 @@ function getStatusLabel(message: ChatMessage) {
   if (message.status === 'sending') return 'Sending'
   if (message.status === 'streaming') return 'Streaming'
   if (message.status === 'stopped') return 'Generation stopped'
-  if (message.status === 'failed') return 'Failed'
+  if (message.status === 'failed') return 'Needs retry'
   return null
 }
 

@@ -39,7 +39,7 @@ export function QuestionBankHomePage() {
   function askWithQuestionUpload(attachments: UploadAttachment[]) {
     const uploadContext = {
       source: 'question-bank-upload' as const,
-      title: 'Question Bank upload',
+      title: 'Upload a Question',
       description: 'Review the uploaded question with the Learning Assistant.',
       prompt: 'I uploaded a question from my own schoolwork. Please help me understand it step by step.',
       returnTo: '/question-bank',
@@ -53,10 +53,27 @@ export function QuestionBankHomePage() {
     <DashboardLayout>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
-          eyebrow="Question Bank"
-          title="Practice by subject, topic, and difficulty."
-          description="Use the open exercise library when you want targeted practice outside the guided Practice Path."
+          eyebrow="Practice Library"
+          title="Practice Library"
+          description="Choose exercises by subject, topic, and difficulty."
         />
+
+        {overview?.continueSet && (
+          <section className="rounded-lg border border-primary/20 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5 shadow-[var(--platform-shadow-card)]">
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="brand-section-kicker">Continue Practice</p>
+                <h2 className="mt-2 text-2xl font-semibold">You started {overview.continueSet.title}</h2>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {overview.continueSet.progress.answered} of {overview.continueSet.progress.total} questions completed · about {overview.continueSet.estimatedMinutes} min
+                </p>
+              </div>
+              <Button asChild>
+                <Link to={getQuestionBankSetPath(overview.continueSet.id)}>Resume</Link>
+              </Button>
+            </div>
+          </section>
+        )}
 
         <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -65,29 +82,30 @@ export function QuestionBankHomePage() {
                 <Camera className="h-5 w-5" aria-hidden="true" />
               </div>
               <p className="brand-section-kicker mt-4">Have your own question?</p>
-              <h2 className="mt-2 text-xl font-semibold">Upload a photo or PDF and ask the Learning Assistant.</h2>
+              <h2 className="mt-2 text-xl font-semibold">Upload a Question</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Use this when the question is not already in the Question Bank. It will open a guided Chat request, not an automatic scan.
+                Take a photo or attach a PDF from your schoolwork. It opens a guided Learning Assistant request, not an automatic scan.
               </p>
             </div>
             <Button type="button" variant="outline" onClick={() => setUploadOpen(true)}>
               <Camera className="h-4 w-4" aria-hidden="true" />
-              Upload Question
+              Upload a Question
             </Button>
           </div>
         </section>
         <UploadModal
           open={uploadOpen}
           context="question_bank"
-          title="Upload a question"
-          description="Take a photo or attach a PDF, then ask the Learning Assistant."
+          title="Upload a Question"
+          description="Take a photo or attach a PDF from your schoolwork. The Learning Assistant can help you understand it step by step."
           sourceOptions={{ sourcePage: '/question-bank' }}
           onOpenChange={setUploadOpen}
           onComplete={askWithQuestionUpload}
         />
 
         <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-card)]">
-          <label htmlFor="question-bank-search" className="text-sm font-semibold">Search questions, topics, or skills</label>
+          <SectionHeader title="Find Exercises" description="Search by topic, skill, or question type, then narrow your practice." />
+          <label htmlFor="question-bank-search" className="sr-only">Search questions, topics, or skills</label>
           <div className="mt-3 flex items-center gap-2 rounded-lg border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <Input
@@ -99,7 +117,7 @@ export function QuestionBankHomePage() {
             />
           </div>
           <p className="mt-2 text-xs text-muted-foreground" aria-live="polite">
-            {hasSearch ? `${searchSummary} result${searchSummary === 1 ? '' : 's'} found` : 'Search uses the local question-bank library.'}
+            {hasSearch ? `${searchSummary} result${searchSummary === 1 ? '' : 's'} found` : 'Search uses the local Practice Library.'}
           </p>
         </section>
 
@@ -126,34 +144,8 @@ export function QuestionBankHomePage() {
           </section>
         )}
 
-        {overview?.continueSet && (
-          <section className="rounded-lg border border-primary/20 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5 shadow-[var(--platform-shadow-card)]">
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-              <div>
-                <p className="brand-section-kicker">Continue Practice</p>
-                <h2 className="mt-2 text-2xl font-semibold">{overview.continueSet.title}</h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {overview.continueSet.progress.answered} / {overview.continueSet.progress.total} completed · {overview.continueSet.estimatedMinutes} min set
-                </p>
-              </div>
-              <Button asChild>
-                <Link to={getQuestionBankSetPath(overview.continueSet.id)}>Resume</Link>
-              </Button>
-            </div>
-          </section>
-        )}
-
         <section className="space-y-4">
-          <SectionHeader title="Subjects" description="Choose a subject, then narrow by topic and level." />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {overview?.subjects.map((subject) => (
-              <SubjectCard key={subject.id} subject={subject} />
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-4">
-          <SectionHeader title="Recommended for you" description="Targeted sets based on current practice activity." />
+          <SectionHeader title={overview?.recentPractice.length ? 'Recommended for You' : 'Recommended to Start'} description={overview?.recentPractice.length ? 'Based on your recent practice.' : 'Begin with these core exercises.'} />
           <div className="grid gap-4 lg:grid-cols-2">
             {overview?.recommendedSets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />
@@ -163,10 +155,10 @@ export function QuestionBankHomePage() {
 
         <section className="grid gap-4 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
           <div className="rounded-lg border border-border/80 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-            <p className="brand-section-kicker">Mistakes to Review</p>
+            <p className="brand-section-kicker">Review & Improve</p>
             <h2 className="mt-2 text-3xl font-semibold">{overview?.mistakesToReview ?? 0}</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Rework the questions that still need another look.
+              Revisit questions you missed before.
             </p>
             <Button asChild className="mt-5 w-full">
               <Link to={getQuestionBankMistakesPath()}>Review Mistakes</Link>
@@ -200,6 +192,15 @@ export function QuestionBankHomePage() {
                 </Link>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <SectionHeader title="All Subjects" description="Choose a subject, then narrow by topic and level." />
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {overview?.subjects.map((subject) => (
+              <SubjectCard key={subject.id} subject={subject} />
+            ))}
           </div>
         </section>
       </PageContainer>

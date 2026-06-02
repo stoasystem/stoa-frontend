@@ -19,7 +19,7 @@ export function ClassroomDashboardCard() {
           <div>
             <p className="brand-section-kicker">Online Classroom</p>
             <CardTitle className="text-xl">
-              {upcoming ? 'Next live support session' : 'Book live tutor help'}
+              {upcoming ? 'Next session' : 'Book live tutor help'}
             </CardTitle>
           </div>
         </div>
@@ -35,7 +35,7 @@ export function ClassroomDashboardCard() {
           </div>
         ) : (
           <p className="text-sm leading-6 text-muted-foreground">
-            Schedule a live classroom when you need deeper help with a question or topic.
+            Book a live session when you need deeper help from a tutor.
           </p>
         )}
         <div className="flex flex-wrap gap-2">
@@ -51,7 +51,7 @@ export function ClassroomDashboardCard() {
             <Link to="/classroom/schedule">Schedule a Session</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/chat?intent=teacher-help">Request Instant Help</Link>
+            <Link to="/chat?intent=teacher-help">Ask a Tutor</Link>
           </Button>
         </div>
       </CardContent>

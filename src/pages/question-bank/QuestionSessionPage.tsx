@@ -32,8 +32,8 @@ export function QuestionSessionPage() {
   const feedback = question ? feedbackByQuestion[question.id] : undefined
   const answeredCount = useMemo(() => Object.keys(feedbackByQuestion).length, [feedbackByQuestion])
 
-  if (sessionQuery.isLoading) return <LoadingState />
-  if (sessionQuery.isError || !setData || !question) return <ErrorState message="Question session could not be loaded." />
+  if (sessionQuery.isLoading) return <LoadingState message="Loading practice questions..." />
+  if (sessionQuery.isError || !setData || !question) return <ErrorState title="We could not load this practice set" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
 
   const loadedSet = setData
   const loadedQuestion = question
@@ -84,7 +84,7 @@ export function QuestionSessionPage() {
         correctAnswer: Array.isArray(loadedQuestion.correctAnswer) ? loadedQuestion.correctAnswer.join(' / ') : loadedQuestion.correctAnswer,
         returnTo: `/question-bank/session/${sessionId}`,
       },
-      prompt: `Can you explain this Question Bank step: ${loadedQuestion.prompt}`,
+      prompt: `Can you explain this Practice Library step: ${loadedQuestion.prompt}`,
     }
     navigate('/chat?source=question-bank&questionId=' + loadedQuestion.id, { state })
   }
@@ -94,7 +94,7 @@ export function QuestionSessionPage() {
       source: 'question-session-upload' as const,
       title: loadedSet.title,
       description: `Uploaded work for ${loadedQuestion.skill}. The Learning Assistant will use this as context.`,
-      prompt: `I uploaded my work for this Question Bank problem. Please help me understand the next step without just giving me the answer.`,
+      prompt: 'I uploaded my work for this Practice Library question. Please help me understand the next step without just giving me the answer.',
       returnTo: `/question-bank/session/${sessionId}`,
       sessionId,
       questionId: loadedQuestion.id,
@@ -117,7 +117,8 @@ export function QuestionSessionPage() {
                 <ArrowLeft className="h-4 w-4" aria-hidden="true" />
                 {loadedSet.title}
               </Link>
-              <h1 className="mt-2 text-2xl font-semibold">Question {currentIndex + 1} of {questions.length}</h1>
+              <h1 className="mt-2 text-2xl font-semibold">{loadedSet.title}</h1>
+              <p className="mt-1 text-sm text-muted-foreground">Question {currentIndex + 1} of {questions.length}</p>
             </div>
             <div className="text-sm text-muted-foreground">{answeredCount} checked · {questions.length - answeredCount} remaining</div>
           </div>
@@ -140,15 +141,15 @@ export function QuestionSessionPage() {
                 Check Answer
               </Button>
               <Button type="button" variant="outline" onClick={skipQuestion} disabled={submitAnswerMutation.isPending}>
-                Skip
+                Skip for Now
               </Button>
             </div>
             <QuestionFeedbackPanel feedback={feedback} onAskLearningAssistant={askLearningAssistant} onTrySimilar={() => setAnswer('')} />
             <InlineUploadPanel
               context="question_session"
               compact
-              title="Need help with this question?"
-              description="Ask the Learning Assistant or upload your own work for this problem."
+              title="Need help?"
+              description="Ask the Learning Assistant for a step-by-step explanation, or upload your own work for this question."
               sourceOptions={{
                 sourcePage: `/question-bank/session/${sessionId}`,
                 sourceEntityId: loadedQuestion.id,
@@ -158,7 +159,7 @@ export function QuestionSessionPage() {
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/95 p-4">
-              <p className="brand-section-kicker">Session Navigation</p>
+              <p className="brand-section-kicker">Practice Navigation</p>
               <div className="mt-4 grid grid-cols-5 gap-2">
                 {questions.map((item, index) => (
                   <button
@@ -174,7 +175,7 @@ export function QuestionSessionPage() {
               </div>
             </div>
             <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-4">
-              <p className="brand-section-kicker">Finish Set</p>
+              <p className="brand-section-kicker">Finish Practice</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 You still have {questions.length - answeredCount} question{questions.length - answeredCount === 1 ? '' : 's'} without feedback.
               </p>

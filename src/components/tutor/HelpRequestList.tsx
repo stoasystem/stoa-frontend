@@ -5,7 +5,7 @@ import type { TutorHelpRequestSummary } from '@/types/tutor'
 
 export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummary[] }) {
   if (requests.length === 0) {
-    return <p className="text-sm text-muted-foreground">No teacher help requests are available.</p>
+    return <p className="text-sm text-muted-foreground">No tutor support requests are available.</p>
   }
 
   return (
@@ -34,6 +34,9 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
                 <time className="mt-2 block text-xs text-muted-foreground">
                   Opened {new Date(request.createdAt).toLocaleString()}
                 </time>
+                <p className="mt-1 break-words text-xs text-muted-foreground">
+                  Source: Learning Assistant conversation
+                </p>
                 <p className="mt-1 break-words text-xs text-muted-foreground">
                   First tutor action:{' '}
                   {request.firstTutorActionAt

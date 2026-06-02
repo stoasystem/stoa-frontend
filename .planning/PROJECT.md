@@ -2,7 +2,7 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Question Bank, a unified learning-context photo/PDF upload UI foundation, and a frontend/mock-backed Online Classroom foundation for scheduled tutor sessions and teacher-text-to-video escalation.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Practice Library, a unified learning-context photo/PDF upload UI foundation, and a frontend/mock-backed Online Classroom foundation with refined tutor-support escalation language.
 
 The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
 
@@ -10,37 +10,23 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.3 Live Classroom & Video Help UI Foundation
+## Latest Shipped Milestone: v2.4 UI Copy & Web Design Refinement
 
 **Shipped:** 2026-06-02
 
-**Delivered:** STOA now includes a frontend/mock-backed Online Classroom foundation. Students can discover live support from Dashboard, schedule classroom sessions with learning materials, prepare in a lobby, enter a mock classroom room, use classroom controls and side panels, escalate from Learning Chat teacher text help into a video classroom lobby, and review session summaries. Tutors can review a classroom queue and enter tutor lobby/room flows. Parents can see lightweight classroom visibility without observer or recording claims.
+**Delivered:** STOA's recently added Practice Path, Practice Library, Upload a Question, Learning Assistant, Tutor Support, and Online Classroom surfaces now read as one coherent learning support system. Student Dashboard hierarchy, Practice Library naming, upload trust copy, tutor-support Chat escalation, Online Classroom context, tutor queue context, parent learning-support visibility, shared states, i18n copy, and targeted E2E coverage were refined without adding new backend, OCR, or WebRTC scope.
 
 **Target features:**
-- Reusable `src/features/live-classroom/` module with typed session contracts, mock data, services, query hooks, and room state hooks.
-- Student classroom home, scheduling, lobby, room, controls, learning workspace, side panels, and summary.
-- Learning Chat teacher-text-to-video escalation with context-preserving instant classroom creation.
-- Tutor classroom queue, lobby, room, and summary flows.
-- Parent classroom visibility card with informational copy only.
-- Four-language `liveClassroom` namespace, provider-boundary docs, README handoff, and Playwright smoke coverage.
-
-## Current Milestone: v2.4 UI Copy & Web Design Refinement
-
-**Goal:** Refine UI copy, page hierarchy, shared states, and cross-module learning experience so Practice Path, Practice Library, Upload a Question, Learning Assistant, Tutor Support, and Online Classroom read as one clear STOA learning platform.
-
-**Target features:**
-- Reorganize Student Dashboard learning entry hierarchy around Continue Learning, Today's Practice, Need Help, Live Support, and Recent Activity.
-- Rename student-facing Question Bank surfaces to Practice Library while keeping existing routes and internal module boundaries.
-- Refine Practice Library, question set, question session, result, and mistakes-review copy so practice feels supportive rather than punitive.
-- Refine Upload a Question, attachment, and upload error copy to avoid OCR, scan-and-solve, instant-solution, or AI overclaim wording.
-- Refine Online Classroom home, schedule, lobby, room, summary, and controls so the classroom feels like a learning session with materials and context, not a generic meeting shell.
-- Refine Chat teacher-support states so Tutor Support and Start Live Classroom escalation are clear while the Learning Assistant remains positioned as observing during tutor help.
-- Strengthen tutor and parent surfaces with concise student context, learning support visibility, and product-safe role boundaries.
-- Reuse or extend existing shared UI patterns for page headers, empty/error states, context cards, next-step cards, status/metadata display, i18n keys, responsive QA, and E2E assertions.
+- Student Dashboard hierarchy and CTA vocabulary.
+- Practice Library naming over existing question-bank routes.
+- Upload a Question trust wording and recoverable attachment states.
+- Tutor Support and Start Live Classroom Chat escalation copy.
+- Online Classroom context, room panels, summary next steps, tutor queue context, and parent visibility.
+- Shared context/next-step/state patterns, v2.4 copy handoff docs, and Playwright regression coverage.
 
 ## Current State
 
-**Latest shipped milestone:** v2.3 Live Classroom & Video Help UI Foundation
+**Latest shipped milestone:** v2.4 UI Copy & Web Design Refinement
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -129,19 +115,20 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Tutors can view a mock classroom queue and enter tutor lobby/room flows with student context — v2.3
 - ✓ Classroom room UI provides education-specific live classroom structure: video placeholders, learning workspace, materials, notes, chat, participants, and controls — v2.3
 - ✓ v2.3 remains frontend/mock-only and does not claim real WebRTC, real video provider integration, real scheduling backend, real billing, recording, screen share, or production whiteboard support — v2.3
+- ✓ Student Dashboard presents the learning journey with clear priority instead of a flat list of modules — v2.4
+- ✓ Student-facing Question Bank copy became Practice Library while preserving existing routes and code boundaries — v2.4
+- ✓ Practice Library, question set, question session, result, and mistakes-review pages use calm, supportive, specific learning copy — v2.4
+- ✓ Upload UI uses Upload a Question / Take Photo / Attach File language and avoids implying OCR, AI solving, or image understanding — v2.4
+- ✓ Online Classroom UI emphasizes learning context, materials, tutor support, and next steps rather than generic meeting behavior — v2.4
+- ✓ Chat teacher-support escalation now describes Tutor Support, Learning Assistant observing, and Start Live Classroom actions — v2.4
+- ✓ Tutor surfaces make student source, topic, context, materials, and suggested focus easy to scan before joining — v2.4
+- ✓ Parent surfaces explain the complete learning support system without giving parent-only classroom controls — v2.4
+- ✓ Shared empty, loading, error, status, context, and next-step patterns provide clearer recovery or next actions — v2.4
+- ✓ i18n and E2E assertions reflect the refined product language across questionBank, uploads, liveClassroom, chat, dashboard, tutor, and parent surfaces — v2.4
 
 ### Active
 
-- Student Dashboard should present the learning journey with clear priority instead of a flat list of modules — v2.4
-- Student-facing Question Bank copy should become Practice Library while preserving existing routes and code boundaries — v2.4
-- Practice Library, question set, question session, result, and mistakes-review pages should use calm, supportive, specific learning copy — v2.4
-- Upload UI should use Upload a Question / Take Photo / Attach File language and avoid implying OCR, AI solving, or image understanding — v2.4
-- Online Classroom UI should emphasize learning context, materials, tutor support, and next steps rather than generic meeting behavior — v2.4
-- Chat teacher-support escalation should clearly describe Tutor Support, Learning Assistant observing, and Start Live Classroom actions — v2.4
-- Tutor surfaces should make student source, topic, context, materials, and suggested focus easy to scan before joining — v2.4
-- Parent surfaces should explain the complete learning support system without giving parent-only classroom controls — v2.4
-- Shared empty, loading, error, status, context, and next-step patterns should provide a clear recovery or next action — v2.4
-- i18n and E2E assertions should reflect the refined product language across questionBank, uploads, liveClassroom, chat, dashboard, tutor, and parent surfaces — v2.4
+- No active milestone requirements. Next milestone should be defined from the next product brief.
 
 ### Out of Scope
 
@@ -451,9 +438,9 @@ Current codebase facts:
 | Make classroom learning-specific | v2.3 should adapt video-room patterns around tutoring context, shared problems, materials, notes, and next steps instead of cloning a generic meeting room | v2.3 Complete |
 | Keep video provider work deferred | The milestone validates UI and flow before choosing WebRTC, Daily, Twilio, Agora, Zoom SDK, LiveKit, or any other real-time media stack | v2.3 Complete |
 | Preserve the support ladder | Learning Chat should remain the first help surface, tutor text help is the next escalation, and live video classroom should appear when deeper synchronous support is needed | v2.3 Complete |
-| Treat v2.4 as refinement, not expansion | The milestone should integrate recently added modules through copy, hierarchy, shared states, and responsive polish without adding large routes, production backend work, OCR, WebRTC, billing, or new visual direction | — Pending |
-| Prefer Practice Library in student UI | Student-facing Question Bank surfaces should read as Practice Library because it is calmer and more learning-oriented, while existing routes and internal module naming can remain `question-bank` | — Pending |
-| Keep support language credible | Upload and classroom copy must avoid OCR, instant solution, AI teacher, human fallback, Zoom, recording, billing, and guaranteed-improvement claims unless those capabilities exist | — Pending |
+| Treat v2.4 as refinement, not expansion | The milestone should integrate recently added modules through copy, hierarchy, shared states, and responsive polish without adding large routes, production backend work, OCR, WebRTC, billing, or new visual direction | v2.4 Complete |
+| Prefer Practice Library in student UI | Student-facing Question Bank surfaces should read as Practice Library because it is calmer and more learning-oriented, while existing routes and internal module naming can remain `question-bank` | v2.4 Complete |
+| Keep support language credible | Upload and classroom copy must avoid OCR, instant solution, AI teacher, human fallback, Zoom, recording, billing, and guaranteed-improvement claims unless those capabilities exist | v2.4 Complete |
 
 ## Evolution
 
@@ -473,4 +460,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.4 milestone start*
+*Last updated: 2026-06-02 after v2.4 implementation and verification*

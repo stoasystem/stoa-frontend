@@ -3,7 +3,7 @@ import type { ClassroomParticipant } from '@/features/live-classroom/types/liveC
 
 export function ClassroomVideoGrid({ participants }: { participants: ClassroomParticipant[] }) {
   return (
-    <section aria-label="Classroom video placeholders" className="grid gap-3 md:grid-cols-2">
+    <section aria-label="Classroom participants" className="grid gap-3 md:grid-cols-2">
       {participants.map((participant) => (
         <ClassroomVideoTile key={participant.id} participant={participant} />
       ))}

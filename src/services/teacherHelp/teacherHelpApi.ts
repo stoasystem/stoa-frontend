@@ -11,7 +11,7 @@ export async function getTeacherAvailability() {
   }, {
     online: false,
     availableTeachers: 0,
-    responseTime: 'Teacher support reviews requests when a qualified teacher is available.',
+    responseTime: 'Tutor support reviews requests when a qualified tutor is available.',
   })
 }
 

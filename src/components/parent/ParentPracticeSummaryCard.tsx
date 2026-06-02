@@ -22,7 +22,7 @@ export function ParentPracticeSummaryCard({ summary }: { summary: PracticeParent
           <PracticeParentMetric label="Lessons this week" value={`${summary.lessonsCompletedThisWeek}`} />
           <PracticeParentMetric label="Mistakes reviewed" value={`${summary.mistakesReviewed}`} />
           <PracticeParentMetric label="Practice streak" value={`${summary.practiceStreak} days`} />
-          <PracticeParentMetric label="Teacher support" value={`${summary.teacherSupportRequested ?? 1}`} />
+          <PracticeParentMetric label="Tutor support" value={`${summary.teacherSupportRequested ?? 1}`} />
         </div>
         {summary.learningActivityNote && (
           <div className="flex gap-3 rounded-lg border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6">

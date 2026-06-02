@@ -14,8 +14,8 @@ export function QuestionSetResultPage() {
   const { sessionId } = useParams()
   const resultQuery = useQuestionBankResultQuery(sessionId)
 
-  if (resultQuery.isLoading) return <LoadingState />
-  if (resultQuery.isError || !resultQuery.data) return <ErrorState message="Question set result could not be loaded." />
+  if (resultQuery.isLoading) return <LoadingState message="Loading practice result..." />
+  if (resultQuery.isError || !resultQuery.data) return <ErrorState title="We could not load this result" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
 
   const result = resultQuery.data
   const accuracy = Math.round((result.score / result.total) * 100)
@@ -25,9 +25,9 @@ export function QuestionSetResultPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Question Bank Result"
-          title="Set complete"
-          description="Use the result to decide whether to review mistakes, ask for an explanation, or continue the guided Practice Path."
+          eyebrow="Practice Complete"
+          title="Practice Complete"
+          description={accuracy < 70 ? 'This set needs another round of practice. Review the questions below, then try a similar set.' : 'Use the result to decide whether to review mistakes, ask for an explanation, or continue the guided Practice Path.'}
         />
         <section className="grid gap-4 md:grid-cols-4">
           <Metric label="Score" value={`${result.score} / ${result.total}`} />
@@ -37,7 +37,7 @@ export function QuestionSetResultPage() {
         </section>
         <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
-            <p className="brand-section-kicker">Accuracy by Topic</p>
+              <p className="brand-section-kicker">What went well</p>
             <div className="mt-4 space-y-3">
               {result.accuracyByTopic.map((topic) => (
                 <div key={topic.topicId}>
@@ -52,7 +52,7 @@ export function QuestionSetResultPage() {
               ))}
             </div>
             <div className="mt-6">
-              <p className="brand-section-kicker">Incorrect Questions</p>
+              <p className="brand-section-kicker">Needs review</p>
               <div className="mt-3 space-y-3">
                 {result.incorrectQuestions.map((mistake) => (
                   <div key={mistake.id} className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">
@@ -65,7 +65,7 @@ export function QuestionSetResultPage() {
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
-              <p className="brand-section-kicker">Recommended Next Steps</p>
+            <p className="brand-section-kicker">Next steps</p>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
                 {result.nextSteps.map((step) => (
                   <li key={step}>- {step}</li>
@@ -75,13 +75,13 @@ export function QuestionSetResultPage() {
                 <Button asChild>
                   <Link to={getQuestionBankMistakesPath()}>
                     <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                    Retry Mistakes
+                    Review Mistakes
                   </Link>
                 </Button>
                 {primaryTopic && (
                   <Button asChild variant="outline">
                     <Link to={getPracticeTopicPath('mathematics', primaryTopic.topicId)}>
-                      Continue to Practice Path
+                      Open Practice Path
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </Button>

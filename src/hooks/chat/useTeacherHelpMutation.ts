@@ -15,7 +15,7 @@ export function useTeacherHelpMutation() {
       toast.success('Teacher help requested')
     },
     onError: () => {
-      toast.error('Failed to request teacher help')
+      toast.error('Could not request tutor support')
     },
   })
 }

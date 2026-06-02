@@ -112,7 +112,7 @@ export function ChatPage() {
   useEffect(() => {
     if (!questionBankContext) return
     setActiveConversationId(null)
-    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this Question Bank step?')
+    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this Practice Library step?')
   }, [practiceState?.prompt, questionBankContext])
 
   useEffect(() => {
@@ -217,7 +217,7 @@ export function ChatPage() {
     teacherHelpMutation.mutate(
       {
         conversationId: activeConversationId,
-        message: 'Student requested help from a teacher.',
+        message: 'Student requested help from a tutor.',
       },
       {
         onSuccess: (request) => {
@@ -244,7 +244,7 @@ export function ChatPage() {
         source: 'teacher_text_help',
         conversationId: activeConversationId,
         topicLabel: conversationQuery.data?.subject ?? 'Current question',
-        summary: 'The student requested live video help after tutor text support.',
+        summary: 'The student requested a live classroom after tutor support.',
       },
       {
         onSuccess: (session) => {
@@ -409,7 +409,6 @@ export function ChatPage() {
             {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
               <TeacherVideoEscalationCard
                 stage={teacherSupportStage}
-                teacherName={teacherHelpRequest?.teacherName ?? 'STOA tutor'}
                 isStartingVideo={instantVideoHelpMutation.isPending}
                 onTeacherTextActive={handleTeacherTextActive}
                 onStartVideo={handleStartVideoClassroom}
@@ -438,13 +437,11 @@ export function ChatPage() {
 
 function TeacherVideoEscalationCard({
   stage,
-  teacherName,
   isStartingVideo,
   onTeacherTextActive,
   onStartVideo,
 }: {
   stage: TeacherSupportStage
-  teacherName: string
   isStartingVideo: boolean
   onTeacherTextActive: () => void
   onStartVideo: () => void
@@ -456,26 +453,26 @@ function TeacherVideoEscalationCard({
       <div className="mx-auto max-w-3xl rounded-lg border border-primary/15 bg-card p-4 shadow-[var(--platform-shadow-soft)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="brand-section-kicker">Teacher support</p>
+            <p className="brand-section-kicker">Tutor support</p>
             <h2 className="mt-2 text-lg font-semibold">
-              {isTextActive ? `${teacherName} joined by text` : 'Teacher support requested'}
+              {isTextActive ? 'Tutor joined' : 'Tutor support requested'}
             </h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {isTextActive
-                ? 'The Learning Assistant is now observing while your tutor helps you. Start a live classroom if you still need deeper support.'
-                : 'A tutor will join this conversation when available. You can continue working with the Learning Assistant while waiting.'}
+                ? 'The Learning Assistant is observing while your tutor helps. Start a live classroom if you still need deeper support.'
+                : 'A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting.'}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
             {!isTextActive && (
               <Button type="button" variant="outline" onClick={onTeacherTextActive}>
-                Tutor joined by text
+                Tutor joined
               </Button>
             )}
             {isTextActive && (
               <Button type="button" onClick={onStartVideo} disabled={isStartingVideo}>
                 <Video className="h-4 w-4" aria-hidden="true" />
-                {isStartingVideo ? 'Preparing lobby...' : 'Start video classroom'}
+                {isStartingVideo ? 'Preparing lobby...' : 'Start Live Classroom'}
               </Button>
             )}
           </div>
@@ -510,8 +507,8 @@ function buildInitialMessage(
     return [
       question,
       '',
-      `Question Bank set: ${questionBankContext.setTitle}`,
-      `Question Bank topic: ${questionBankContext.topic}`,
+      `Practice Library set: ${questionBankContext.setTitle}`,
+      `Practice Library topic: ${questionBankContext.topic}`,
       `Question: ${questionBankContext.challengePrompt}`,
       questionBankContext.studentAnswer ? `My answer: ${questionBankContext.studentAnswer}` : '',
     ].filter(Boolean).join('\n')

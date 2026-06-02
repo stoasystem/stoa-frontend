@@ -26,10 +26,10 @@ export function formatClassroomTimeRange(session: Pick<LiveClassroomSession, 'sc
 
 export function getClassroomSessionTypeLabel(type: ClassroomSessionType) {
   const labels: Record<ClassroomSessionType, string> = {
-    quick_help: 'Quick Help - 15 min',
-    standard_session: 'Standard Session - 30 min',
-    deep_review: 'Deep Review - 60 min',
-    instant_video_help: 'Instant Video Help',
+    quick_help: 'Quick Help',
+    standard_session: 'Standard Session',
+    deep_review: 'Deep Review',
+    instant_video_help: 'Live Classroom Help',
   }
 
   return labels[type]

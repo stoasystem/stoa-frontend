@@ -94,7 +94,7 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
                     ? 'Your tutor will join this classroom soon. You can review the attached question while waiting.'
                     : session.lobbyState === 'completed'
                       ? 'This classroom has ended. You can review the summary.'
-                      : 'This is a mock classroom lobby. Real video connection will be added later.'}
+                      : 'Your classroom is ready. Review the context, then join when you are ready.'}
                 </p>
                 <div className="flex flex-col gap-2">
                   {session.lobbyState === 'completed' ? (

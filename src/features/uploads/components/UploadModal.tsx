@@ -67,6 +67,10 @@ export function UploadModal({
           <p className="rounded-md border border-primary/15 bg-primary/5 p-3 text-xs leading-5 text-muted-foreground">
             {t('privacy.learningOnly', 'Please upload learning materials only. Do not upload personal documents.')}
           </p>
+          <div className="grid gap-2 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-xs leading-5 text-muted-foreground sm:grid-cols-2">
+            <p>{t('dropzone.description', 'Supported formats: JPG, PNG, WEBP, PDF. Maximum file size: 10 MB.')}</p>
+            <p>{t('errors.tooManyFiles', { count: config.maxFiles, defaultValue: 'You can upload up to {{count}} files at a time.' })}</p>
+          </div>
           <div className="flex flex-wrap gap-2">
             <PhotoCaptureButton onPhotoSelected={(file) => void addFiles([file])} disabled={isUploading} />
             <UploadButton onFilesSelected={(files) => void addFiles(files)} disabled={isUploading} />

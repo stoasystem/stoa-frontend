@@ -15,7 +15,7 @@ export function QuestionBankContextCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2 text-sm font-semibold text-primary">
             <LibraryBig className="h-4 w-4" aria-hidden="true" />
-            Question Bank context
+            Practice Library context
           </div>
           <p className="mt-2 text-sm text-muted-foreground">
             {context.setTitle} · <span className="font-medium text-foreground">{context.topic}</span>

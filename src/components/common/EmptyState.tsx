@@ -1,10 +1,13 @@
+import type { ReactNode } from 'react'
+
 type EmptyStateProps = {
   title?: string
   description?: string
   message?: string
+  action?: ReactNode
 }
 
-export function EmptyState({ title, description, message }: EmptyStateProps) {
+export function EmptyState({ title, description, message, action }: EmptyStateProps) {
   const body = description ?? message
 
   return (
@@ -15,6 +18,7 @@ export function EmptyState({ title, description, message }: EmptyStateProps) {
           {body}
         </p>
       )}
+      {action && <div className="mt-4 flex justify-center">{action}</div>}
     </div>
   )
 }

@@ -412,12 +412,12 @@ export function evaluateMockQuestionBankAnswer(
   }
 
   if (!answer || (Array.isArray(answer) && answer.every((part) => !part.trim()))) {
-    return feedback(questionItem, 'skipped', 'Skipped', 'You can come back before finishing the set.', answer)
+    return feedback(questionItem, 'skipped', 'Skipped for now', 'You can come back before finishing the set.', answer)
   }
 
   const correct = answersMatch(answer, questionItem.correctAnswer)
   if (correct) {
-    return feedback(questionItem, 'correct', 'Correct', 'Good work. The reasoning is on track.', answer)
+    return feedback(questionItem, 'correct', 'Correct.', 'You isolated the idea correctly. The reasoning is on track.', answer)
   }
 
   const partial = Array.isArray(answer) && answer.some((part) => part.trim())

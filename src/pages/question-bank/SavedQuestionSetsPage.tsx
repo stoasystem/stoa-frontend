@@ -13,8 +13,8 @@ export function SavedQuestionSetsPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Question Bank"
-          title="Saved Question Sets"
+          eyebrow="Practice Library"
+          title="Saved Practice Sets"
           description="Keep useful open-practice sets close for quick review."
         />
         <section className="space-y-4">

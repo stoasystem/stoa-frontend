@@ -1,7 +1,7 @@
 {
   "title": "Learning space",
   "emptyTitle": "Ask your first learning question.",
-  "emptyDescription": "Describe where you are stuck or upload a worksheet. STOA will prepare a clear explanation and keep teacher support connected if you need it.",
+  "emptyDescription": "Describe where you are stuck or upload a worksheet. The Learning Assistant will guide the next step and keep tutor support connected if you need it.",
   "welcome": "Welcome to STOA. Start by asking a question or describing where you are stuck.",
   "placeholder": "Type your learning question here...",
   "inputLabel": "Learning question",
@@ -32,23 +32,23 @@
     "placeholder": "Ask for the next step, not just the final answer..."
   },
   "availability": {
-    "checking": "Checking teachers",
-    "online": "Teacher online",
-    "offline": "No teacher online",
+    "checking": "Checking tutors",
+    "online": "Tutor online",
+    "offline": "No tutor online",
     "onlineDetail": "{{count}} available now",
-    "offlineDetail": "Teacher support will review requests later.",
+    "offlineDetail": "Tutor support will review requests later.",
     "nextWindow": "Next window {{nextWindow}}"
   },
   "teacher": {
-    "title": "Would a teacher help clarify this?",
-    "description": "Send this conversation to a qualified teacher for clearer guidance.",
-    "cta": "Ask a teacher",
-    "submitted": "Your request has been sent to a teacher.",
-    "failed": "We couldn’t send the teacher request. Please try again."
+    "title": "Would a tutor help clarify this?",
+    "description": "Send this conversation to a tutor for clearer guidance.",
+    "cta": "Ask a Tutor",
+    "submitted": "Tutor support requested.",
+    "failed": "We couldn’t send the tutor request. Please try again."
   },
   "status": {
-    "pending": "Waiting for a teacher",
-    "in_progress": "Teacher is reviewing",
-    "resolved": "Teacher support completed"
+    "pending": "Waiting for a tutor",
+    "in_progress": "Tutor is reviewing",
+    "resolved": "Tutor support completed"
   }
 }

@@ -17,8 +17,10 @@ export function QuestionSetOverviewPage() {
   const setQuery = useQuestionBankSetQuery(setId)
   const createSessionMutation = useCreateQuestionBankSessionMutation()
 
-  if (setQuery.isLoading) return <LoadingState />
-  if (setQuery.isError || !setQuery.data) return <ErrorState message="Question set could not be loaded." />
+  if (setQuery.isLoading) return <LoadingState message="Loading practice set..." />
+  if (setQuery.isError || !setQuery.data) {
+    return <ErrorState title="Practice set unavailable" message="We could not load this practice set." />
+  }
 
   const { set } = setQuery.data
 
@@ -32,7 +34,7 @@ export function QuestionSetOverviewPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Question set"
+          eyebrow="Practice Library"
           title={set.title}
           description={set.description}
         />
@@ -101,7 +103,7 @@ export function QuestionSetOverviewPage() {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 You can ask the Learning Assistant after each question and return to the set when the step is clearer.
               </p>
-              <Badge variant="outline" className="mt-3">Question Bank + Learning Chat</Badge>
+              <Badge variant="outline" className="mt-3">Practice Library + Learning Assistant</Badge>
             </div>
           </aside>
         </section>

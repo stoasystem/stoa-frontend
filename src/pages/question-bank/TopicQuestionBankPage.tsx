@@ -22,8 +22,8 @@ export function TopicQuestionBankPage() {
   })
   const topicQuery = useQuestionBankTopicQuery(subjectId, topicId, filters)
 
-  if (topicQuery.isLoading) return <LoadingState />
-  if (topicQuery.isError || !topicQuery.data) return <ErrorState message="Question Bank topic could not be loaded." />
+  if (topicQuery.isLoading) return <LoadingState message="Loading practice sets..." />
+  if (topicQuery.isError || !topicQuery.data) return <ErrorState title="We could not load this topic" message="Please return to the Practice Library and try again." />
 
   const { subject, topic, sets, weakAreas, progress } = topicQuery.data
 
@@ -31,7 +31,7 @@ export function TopicQuestionBankPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow={`${subject.title} / Question Bank`}
+          eyebrow={`${subject.title} / Practice Library`}
           title={topic.title}
           description={topic.description}
         />
@@ -41,7 +41,7 @@ export function TopicQuestionBankPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Metric label="Completed" value={`${progress.completedSets} / ${progress.totalSets}`} />
               <Metric label="Accuracy" value={`${progress.accuracy}%`} />
-              <Metric label="Weak area" value={topic.weakArea ?? 'Keep practising'} />
+              <Metric label="Needs review" value={topic.weakArea ?? 'Keep practising'} />
             </div>
           </div>
           <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5">
@@ -71,7 +71,7 @@ export function TopicQuestionBankPage() {
           </div>
         </section>
         <section className="rounded-lg border bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-          <p className="brand-section-kicker">Weak areas</p>
+          <p className="brand-section-kicker">Needs review</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {weakAreas.map((area) => (
               <span key={area} className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">

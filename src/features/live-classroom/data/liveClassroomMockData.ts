@@ -108,7 +108,7 @@ export const mockClassroomNotes: ClassroomNotes = {
     },
     {
       id: 'next-question-bank',
-      label: 'Practice similar questions',
+      label: 'Open Practice Library',
       targetType: 'question_set',
       targetUrl: '/question-bank/sets/qb-linear-equations-basics',
     },
@@ -155,7 +155,7 @@ export const mockLiveClassroomSessions: LiveClassroomSession[] = [
   },
   {
     id: 'classroom-instant-video-help',
-    title: 'Instant Video Help',
+    title: 'Live Classroom Help',
     subjectId: 'mathematics',
     subjectLabel: 'Mathematics',
     topicId: 'linear-equations',
@@ -255,19 +255,19 @@ export function getMockStudentClassroomHome(sessions: LiveClassroomSession[]): S
       {
         id: 'quick-help',
         title: 'Quick Help',
-        description: '15 minutes for one focused question.',
+        description: 'For one focused question.',
         sessionType: 'quick_help',
       },
       {
         id: 'standard-session',
         title: 'Standard Session',
-        description: '30 minutes for a homework topic or practice review.',
+        description: 'For homework support or a topic explanation.',
         sessionType: 'standard_session',
       },
       {
         id: 'deep-review',
         title: 'Deep Review',
-        description: '60 minutes for exam preparation or repeated weak spots.',
+        description: 'For exam preparation or a longer review.',
         sessionType: 'deep_review',
       },
     ],

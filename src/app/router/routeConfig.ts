@@ -87,14 +87,14 @@ export const navItems: AppNavItem[] = [
     description: 'Short guided lessons that can open a question when a step is unclear.',
   },
   {
-    label: 'Question Bank',
+    label: 'Practice Library',
     path: '/question-bank',
     role: 'student',
     priority: 'primary',
     status: 'core',
     icon: 'questionBank',
     mobile: true,
-    description: 'Open practice sets by subject, topic, difficulty, and review status.',
+    description: 'Choose exercises by subject, topic, difficulty, and review status.',
   },
   {
     label: 'Ask a question',

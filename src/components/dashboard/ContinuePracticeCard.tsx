@@ -18,15 +18,14 @@ export function ContinuePracticeCard() {
             <BookOpenCheck className="h-5 w-5" aria-hidden="true" />
           </div>
           <div>
-            <p className="brand-section-kicker">Start learning</p>
-            <CardTitle className="text-xl">Continue your Practice Path</CardTitle>
+            <p className="brand-section-kicker">Continue Learning</p>
+            <CardTitle className="text-xl">Continue your learning path</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-          Pick up where you left off in the current school topic. If a step is unclear, you can ask for an explanation
-          with the practice context attached.
+          Follow a guided sequence of lessons and practice activities. If a step is unclear, you can ask for an explanation with the practice context attached.
         </p>
         <div className="grid gap-3 md:grid-cols-3">
           <PracticeMetric label="Next lesson" value={lesson?.title ?? 'Next practice challenge'} />
@@ -36,12 +35,12 @@ export function ContinuePracticeCard() {
         <div className="flex flex-wrap gap-3">
           <Button asChild className="premium-primary-button text-white hover:text-white">
             <Link to={lesson ? getPracticeLessonPath(lesson) : '/practice'}>
-              Continue Practice
+              Continue
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/practice/mistakes">Review mistakes</Link>
+            <Link to="/practice/mistakes">Review Mistakes</Link>
           </Button>
         </div>
       </CardContent>

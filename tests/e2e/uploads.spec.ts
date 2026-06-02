@@ -33,7 +33,7 @@ test('chat upload preview can be removed and sent with a message', async ({ page
   await loginAs(page, 'student')
   await startChatConversation(page)
 
-  const attachInput = page.locator('input[aria-label="Attach file"]').last()
+  const attachInput = page.locator('input[aria-label="Attach File"]').last()
   await attachInput.setInputFiles(sampleImage)
   await expect(page.getByText('sample-question.png').first()).toBeVisible()
 
@@ -52,7 +52,7 @@ test('upload rejects unsupported and oversized files', async ({ page }) => {
   await loginAs(page, 'student')
   await startChatConversation(page)
 
-  const attachInput = page.locator('input[aria-label="Attach file"]').last()
+  const attachInput = page.locator('input[aria-label="Attach File"]').last()
   await attachInput.setInputFiles(unsupportedFile)
   await expect(page.getByText(/not supported/i).first()).toBeVisible()
 
@@ -60,11 +60,11 @@ test('upload rejects unsupported and oversized files', async ({ page }) => {
   await expect(page.getByText(/too large|maximum file size/i).first()).toBeVisible()
 })
 
-test('question bank upload modal opens and supports keyboard close', async ({ page }) => {
+test('practice library upload modal opens and supports keyboard close', async ({ page }) => {
   await loginAs(page, 'student')
   await page.goto('/question-bank')
 
-  await page.getByRole('button', { name: /upload question/i }).click()
+  await page.getByRole('button', { name: /upload a question/i }).click()
   await expect(page.getByRole('dialog', { name: /upload a question/i })).toBeVisible()
 
   await page.keyboard.press('Escape')
@@ -75,7 +75,7 @@ test('question session upload can hand off to learning chat', async ({ page }) =
   await loginAs(page, 'student')
   await page.goto('/question-bank/session/session-linear-equations-basics')
 
-  await page.locator('input[aria-label="Attach file"]').last().setInputFiles(sampleImage)
+  await page.locator('input[aria-label="Attach File"]').last().setInputFiles(sampleImage)
   await expect(page.getByText('sample-question.png').first()).toBeVisible()
 
   await page.getByRole('button', { name: /ask learning assistant/i }).last().click()

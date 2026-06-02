@@ -85,7 +85,7 @@ export async function requestInstantVideoHelp(input: InstantVideoHelpInput) {
 
   const session: LiveClassroomSession = {
     id: `classroom-instant-${Date.now()}`,
-    title: 'Instant Video Help',
+    title: 'Live Classroom Help',
     subjectId: 'mathematics',
     subjectLabel: 'Mathematics',
     topicId: 'linear-equations',
@@ -106,7 +106,7 @@ export async function requestInstantVideoHelp(input: InstantVideoHelpInput) {
     context: {
       sourceConversationId: input.conversationId,
       sourceLabel: input.source === 'teacher_text_help'
-        ? 'Teacher text help'
+        ? 'Tutor support conversation'
         : 'Learning Assistant conversation',
       topicLabel: input.topicLabel,
       summary: input.summary ?? 'The student needs deeper live support.',
