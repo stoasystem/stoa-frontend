@@ -128,34 +128,39 @@ export const mockAdminAnalyticsOverview: AdminAnalyticsOverview = {
 export const mockParentChildren: ParentChild[] = [
   {
     id: 'user-student',
+    userId: 'user-student',
     name: 'Anna Keller',
+    email: 'student@test.com',
     grade: 'Grade 8',
-    primarySubjects: ['Mathematics', 'Physics'],
+    subjects: ['Mathematics', 'Physics'],
+    relationship: 'child',
   },
 ]
 
 export const mockChildLearningSummary: ChildLearningSummary = {
   student: { id: 'user-student', name: 'Anna Keller', grade: 'Grade 8' },
-  stats: [
-    { label: 'Questions asked', value: '24', description: 'This week' },
-    { label: 'Teacher help', value: '3', description: 'Resolved requests' },
-    { label: 'Study streak', value: '5 days', description: 'Active learning' },
-  ],
-  weakTopics: [
-    { id: 'topic-1', subject: 'Mathematics', topic: 'Quadratic equations', level: 'medium' },
-    { id: 'topic-2', subject: 'Physics', topic: 'Forces and motion', level: 'high' },
-  ],
-  recentQuestions: [
+  questionsAskedThisWeek: 24,
+  aiResolvedThisWeek: 21,
+  teacherHelpRequestsThisWeek: 3,
+  practiceLessonsCompletedThisWeek: 5,
+  weakTopics: ['Quadratic equations', 'Forces and motion'],
+  recentActivity: [
     {
       id: 'question-1',
+      type: 'question',
       subject: 'Mathematics',
       title: 'How do I solve x squared equals 9?',
+      summary: 'Reviewed positive and negative roots.',
       createdAt: '2026-05-24T10:00:00Z',
-      status: 'answered_by_ai',
     },
-  ],
-  teacherHelpRecords: [
-    { id: 'help-1', subject: 'Mathematics', status: 'resolved', createdAt: '2026-05-24T11:00:00Z' },
+    {
+      id: 'help-1',
+      type: 'teacher_help',
+      subject: 'Mathematics',
+      title: 'Teacher help requested',
+      summary: 'A teacher reviewed the quadratic equation steps.',
+      createdAt: '2026-05-24T11:00:00Z',
+    },
   ],
 }
 

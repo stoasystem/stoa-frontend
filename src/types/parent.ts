@@ -1,16 +1,19 @@
-import type { DashboardStat, RecentQuestion, WeakTopic } from '@/types/dashboard'
-
 export type ParentChild = {
   id: string
+  userId: string
   name: string
-  grade: string
-  primarySubjects: string[]
+  email: string
+  grade: string | null
+  subjects: string[]
+  relationship: string
 }
 
-export type TeacherHelpRecord = {
+export type ParentChildActivity = {
   id: string
-  subject: string
-  status: 'pending' | 'assigned' | 'in_progress' | 'resolved' | 'cancelled'
+  type: 'question' | 'conversation' | 'teacher_help' | 'practice' | 'practice_mistake' | 'report' | string
+  title: string
+  summary: string
+  subject: string | null
   createdAt: string
 }
 
@@ -18,10 +21,16 @@ export type ChildLearningSummary = {
   student: {
     id: string
     name: string
-    grade: string
+    grade: string | null
   }
-  stats: DashboardStat[]
-  weakTopics: WeakTopic[]
-  recentQuestions: RecentQuestion[]
-  teacherHelpRecords: TeacherHelpRecord[]
+  questionsAskedThisWeek: number
+  aiResolvedThisWeek: number
+  teacherHelpRequestsThisWeek: number
+  practiceLessonsCompletedThisWeek: number
+  weakTopics: string[]
+  recentActivity: ParentChildActivity[]
+}
+
+export type ChildLearningHistoryResponse = {
+  items: ParentChildActivity[]
 }

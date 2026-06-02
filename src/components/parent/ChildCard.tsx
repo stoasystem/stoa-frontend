@@ -15,8 +15,8 @@ export function ChildCard({ child }: { child: ParentChild }) {
       </CardHeader>
       <CardContent className="space-y-4 text-sm text-muted-foreground">
         <div className="space-y-2">
-          <p>{child.grade}</p>
-          <p>{child.primarySubjects.join(', ')}</p>
+          <p>{child.grade ?? 'Grade not set'}</p>
+          <p>{child.subjects.length > 0 ? child.subjects.join(', ') : 'No subjects set'}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button asChild size="sm" variant="outline">

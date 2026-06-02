@@ -7,17 +7,11 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
-import { ParentReportRecommendations } from '@/components/parent/ParentReportRecommendations'
-import { ParentReportStats } from '@/components/parent/ParentReportStats'
-import { ParentReportSubjects } from '@/components/parent/ParentReportSubjects'
-import { ParentReportSummaryCard } from '@/components/parent/ParentReportSummaryCard'
-import { LearningActivitySummary } from '@/components/parent/LearningActivitySummary'
-import { ParentPracticeSummaryCard } from '@/components/parent/ParentPracticeSummaryCard'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
-import { usePracticeParentSummaryQuery } from '@/hooks/practice/usePracticeParentSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
@@ -25,16 +19,16 @@ export function ChildReportPage() {
   const { t } = useTranslation('parent')
   const { childId } = useParams()
   const reportQuery = useChildReportQuery(childId)
-  const practiceSummaryQuery = usePracticeParentSummaryQuery(childId)
-  const report = reportQuery.data
+  const reportState = reportQuery.data
+  const report = reportState?.report
 
   useEffect(() => {
     if (!report) return
 
     trackEvent('parent_report_viewed', {
-      childId: report.student.id,
-      reportId: report.id,
-      periodLabel: report.period.label,
+      childId: report.studentId,
+      reportId: report.reportId,
+      periodLabel: report.weekStart,
     })
   }, [report])
 
@@ -46,7 +40,7 @@ export function ChildReportPage() {
             <Breadcrumbs
               items={[
                 { label: t('dashboardTitle'), to: '/parent' },
-                { label: report?.student.name ?? t('child'), to: childId ? `/parent/children/${childId}` : undefined },
+                { label: childId ?? t('child'), to: childId ? `/parent/children/${childId}` : undefined },
                 { label: t('weeklyReport') },
               ]}
             />
@@ -69,23 +63,96 @@ export function ChildReportPage() {
         </div>
         {reportQuery.isLoading && <PageSkeleton rows={4} />}
         {reportQuery.isError && <p className="text-sm text-destructive">{t('loadReportFailed')}</p>}
-        {report && (
+        {reportState?.status === 'missing' && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">No weekly report yet</CardTitle>
+            </CardHeader>
+            <CardContent className="text-sm leading-6 text-muted-foreground">
+              {reportState.message ?? 'No weekly report is available yet.'}
+            </CardContent>
+          </Card>
+        )}
+        {reportState?.status === 'available' && report && (
           <div className="report-surface space-y-6 rounded-lg border border-border/70 p-4 shadow-[var(--platform-shadow-soft)] sm:p-6">
-            <ParentReportSummaryCard report={report} />
-            <ParentReportStats stats={report.stats} />
-            <LearningActivitySummary summary={practiceSummaryQuery.data} />
-            {practiceSummaryQuery.data && (
-              <ParentPracticeSummaryCard summary={practiceSummaryQuery.data} />
-            )}
-            <ParentReportSubjects subjects={report.topSubjects} weakTopics={report.weakTopics} />
+            <Card className="border-primary/15 bg-card/90">
+              <CardHeader>
+                <CardTitle className="editorial-heading text-2xl">Weekly report</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
+                  <div>
+                    <p className="font-medium text-foreground">Week start</p>
+                    <p>{formatDate(report.weekStart)}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Student ID</p>
+                    <p>{report.studentId}</p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Report ID</p>
+                    <p>{report.reportId}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <div className="grid gap-4 md:grid-cols-3">
+              <ReportMetric label="Usage" value={String(report.usageCount)} description="Recorded learning events" />
+              <ReportMetric label="AI resolved" value={String(report.aiResolved)} description="Questions handled by AI" />
+              <ReportMetric label="Teacher resolved" value={String(report.teacherResolved)} description="Teacher-supported items" />
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Weak knowledge points</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {report.weakKnowledgePoints.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No weak knowledge points were flagged.</p>
+                )}
+                {report.weakKnowledgePoints.map((topic) => (
+                  <p key={topic} className="text-sm">{topic}</p>
+                ))}
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Recommendations</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm leading-6 text-muted-foreground">
+                {report.recommendations || 'No recommendations are available yet.'}
+              </CardContent>
+            </Card>
             <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
               <ParentValueCard />
               <UpgradePromptCard source="parent_report" />
             </div>
-            <ParentReportRecommendations recommendations={report.recommendations} />
           </div>
         )}
       </PageContainer>
     </DashboardLayout>
   )
+}
+
+function ReportMetric({
+  label,
+  value,
+  description,
+}: {
+  label: string
+  value: string
+  description: string
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4">
+        <p className="text-sm text-muted-foreground">{label}</p>
+        <p className="mt-2 text-2xl font-semibold">{value}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  )
+}
+
+function formatDate(value: string) {
+  return new Date(value).toLocaleDateString()
 }

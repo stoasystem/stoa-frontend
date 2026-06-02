@@ -1,3 +1,22 @@
+export type ParentChildReportDetail = {
+  reportId: string
+  parentId: string
+  studentId: string
+  weekStart: string
+  usageCount: number
+  aiResolved: number
+  teacherResolved: number
+  weakKnowledgePoints: string[]
+  recommendations: string
+}
+
+export type ParentChildReportState = {
+  status: 'available' | 'missing'
+  report: ParentChildReportDetail | null
+  message?: string | null
+}
+
+// Legacy rich report types are still used by demo-only monthly/report components.
 export type ParentReportPeriod = {
   label: string
   startDate: string

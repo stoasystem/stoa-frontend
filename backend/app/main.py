@@ -963,7 +963,7 @@ def parent_children(user: dict[str, str] = Depends(require_role("parent"))) -> d
     with get_connection() as connection:
         rows = connection.execute(
             """
-            SELECT u.id, u.name, sp.grade, sp.primary_subjects
+            SELECT u.id, u.name, u.email, sp.grade, sp.primary_subjects
             FROM parent_children pc
             JOIN users u ON u.id = pc.student_user_id
             LEFT JOIN student_profiles sp ON sp.user_id = u.id
@@ -975,9 +975,12 @@ def parent_children(user: dict[str, str] = Depends(require_role("parent"))) -> d
         "items": [
             {
                 "id": row["id"],
+                "userId": row["id"],
                 "name": row["name"],
-                "grade": row["grade"] or "",
-                "primarySubjects": json.loads(row["primary_subjects"] or "[]"),
+                "email": row["email"],
+                "grade": row["grade"],
+                "subjects": json.loads(row["primary_subjects"] or "[]"),
+                "relationship": "child",
             }
             for row in rows
         ]
@@ -1010,6 +1013,10 @@ def child_summary(child_id: str, user: dict[str, str] = Depends(require_role("pa
             "SELECT COUNT(*) AS count FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE c.student_user_id = ? AND m.role = 'student'",
             (child_id,),
         ).fetchone()["count"]
+        ai_resolved_count = connection.execute(
+            "SELECT COUNT(*) AS count FROM messages m JOIN conversations c ON c.id = m.conversation_id WHERE c.student_user_id = ? AND m.role = 'assistant'",
+            (child_id,),
+        ).fetchone()["count"]
         help_rows = connection.execute(
             """
             SELECT thr.id, c.subject, thr.status, thr.created_at
@@ -1024,41 +1031,55 @@ def child_summary(child_id: str, user: dict[str, str] = Depends(require_role("pa
             (child_id,),
         ).fetchall()
     return {
-        "student": {"id": student["id"], "name": student["name"], "grade": student["grade"] or ""},
-        "stats": [
-            {"label": "Questions Asked", "value": str(question_count), "description": "Saved locally"},
-            {"label": "Teacher Help Sessions", "value": str(len(help_rows)), "description": "All time"},
-            {"label": "Active Subjects", "value": str(len({row["subject"] for row in recent_rows})), "description": "Recent"},
-        ],
-        "weakTopics": [
-            {"id": "topic-1", "subject": "Mathematics", "topic": "Quadratic equations", "level": "medium"}
-        ],
-        "recentQuestions": [
+        "student": {"id": student["id"], "name": student["name"], "grade": student["grade"]},
+        "questionsAskedThisWeek": question_count,
+        "aiResolvedThisWeek": ai_resolved_count,
+        "teacherHelpRequestsThisWeek": len(help_rows),
+        "practiceLessonsCompletedThisWeek": len(recent_rows),
+        "weakTopics": ["Quadratic equations"] if question_count else [],
+        "recentActivity": [
             {
                 "id": row["id"],
-                "subject": row["subject"] or "",
+                "type": "conversation",
                 "title": row["title"],
+                "summary": f"Recent {row['subject'] or 'learning'} conversation.",
+                "subject": row["subject"] or "",
                 "createdAt": row["created_at"],
-                "status": "answered_by_ai",
             }
             for row in recent_rows
-        ],
-        "teacherHelpRecords": [
-            {"id": row["id"], "subject": row["subject"] or "", "status": row["status"], "createdAt": row["created_at"]}
-            for row in help_rows
-        ],
+        ] + [
+            {
+                "id": row["id"],
+                "type": "teacher_help",
+                "title": "Teacher help requested",
+                "summary": f"Status: {row['status']}",
+                "subject": row["subject"] or "",
+                "createdAt": row["created_at"],
+            }
+            for row in help_rows[:3]
+        ][:5],
     }
 
 
 @app.get("/parents/me/children/{child_id}/history")
 def child_history(child_id: str, user: dict[str, str] = Depends(require_role("parent"))) -> dict[str, object]:
     ensure_parent_child(user["id"], child_id)
-    return {"items": learning_history_for_student(child_id)}
+    return {
+        "items": [
+            {
+                "id": item["id"],
+                "type": "practice",
+                "title": item["title"],
+                "summary": item["summary"],
+                "subject": item["subject"],
+                "createdAt": item["createdAt"],
+            }
+            for item in learning_history_for_student(child_id)
+        ]
+    }
 
 
-@app.get("/parents/me/children/{child_id}/report")
-def child_report(child_id: str, user: dict[str, str] = Depends(require_role("parent"))) -> dict[str, object]:
-    ensure_parent_child(user["id"], child_id)
+def parent_weekly_report_detail(child_id: str) -> dict[str, object] | None:
     with get_connection() as connection:
         student = connection.execute(
             """
@@ -1081,7 +1102,7 @@ def child_report(child_id: str, user: dict[str, str] = Depends(require_role("par
     if student is None:
         raise HTTPException(status_code=404, detail="Student not found")
     if report is None:
-        raise HTTPException(status_code=404, detail="Report not found")
+        return None
     return {
         "id": report["id"],
         "student": {"id": student["id"], "name": student["name"], "grade": student["grade"] or ""},
@@ -1095,9 +1116,45 @@ def child_report(child_id: str, user: dict[str, str] = Depends(require_role("par
     }
 
 
+@app.get("/parents/me/children/{child_id}/report")
+def child_report(child_id: str, user: dict[str, str] = Depends(require_role("parent"))) -> dict[str, object]:
+    ensure_parent_child(user["id"], child_id)
+    report = parent_weekly_report_detail(child_id)
+    if report is None:
+        return {
+            "status": "missing",
+            "report": None,
+            "message": "No weekly report is available yet.",
+        }
+    stats = report["stats"] if isinstance(report["stats"], list) else []
+    weak_topics = report["weakTopics"] if isinstance(report["weakTopics"], list) else []
+    recommendations = report["recommendations"] if isinstance(report["recommendations"], list) else []
+    usage_match = (
+        re.search(r"\\d+", str(stats[0].get("value", "0"))) if stats and isinstance(stats[0], dict) else None
+    )
+    return {
+        "status": "available",
+        "report": {
+            "reportId": report["id"],
+            "parentId": user["id"],
+            "studentId": child_id,
+            "weekStart": report["period"]["startDate"],
+            "usageCount": int(usage_match.group(0)) if usage_match else 0,
+            "aiResolved": 0,
+            "teacherResolved": 0,
+            "weakKnowledgePoints": [topic["topic"] for topic in weak_topics],
+            "recommendations": " ".join(item["description"] for item in recommendations),
+        },
+        "message": None,
+    }
+
+
 @app.get("/parents/me/children/{child_id}/monthly-report")
 def child_monthly_report(child_id: str, user: dict[str, str] = Depends(require_role("parent"))) -> dict[str, object]:
-    weekly = child_report(child_id, user)
+    ensure_parent_child(user["id"], child_id)
+    weekly = parent_weekly_report_detail(child_id)
+    if weekly is None:
+        raise HTTPException(status_code=404, detail="Report not found")
     return {
         **weekly,
         "id": "parent-monthly-report-anna-demo",

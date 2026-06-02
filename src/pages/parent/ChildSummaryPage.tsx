@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
-import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
@@ -31,7 +30,23 @@ export function ChildSummaryPage() {
           <>
             <ChildSummaryHeader summary={summary} />
             <div className="grid gap-4 md:grid-cols-3">
-              {summary.stats.map((stat) => (
+              {[
+                {
+                  label: 'Questions asked',
+                  value: String(summary.questionsAskedThisWeek),
+                  description: 'This week',
+                },
+                {
+                  label: 'AI resolved',
+                  value: String(summary.aiResolvedThisWeek),
+                  description: 'Answered without teacher help',
+                },
+                {
+                  label: 'Practice completed',
+                  value: String(summary.practiceLessonsCompletedThisWeek),
+                  description: 'Lessons this week',
+                },
+              ].map((stat) => (
                 <Card key={stat.label}>
                   <CardContent className="p-4">
                     <p className="text-sm text-muted-foreground">{stat.label}</p>
@@ -47,36 +62,48 @@ export function ChildSummaryPage() {
                   <CardTitle className="text-lg">Weak topics</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
+                  {summary.weakTopics.length === 0 && (
+                    <p className="text-sm text-muted-foreground">No weak topics were flagged yet.</p>
+                  )}
                   {summary.weakTopics.map((topic) => (
-                    <p key={topic.id} className="text-sm">
-                      {topic.subject}: {topic.topic} ({topic.level})
+                    <p key={topic} className="text-sm">
+                      {topic}
                     </p>
                   ))}
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Recent questions</CardTitle>
+                  <CardTitle className="text-lg">Recent activity</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {summary.recentQuestions.map((question) => (
-                    <p key={question.id} className="text-sm">
-                      {question.subject}: {question.title}
-                    </p>
+                  {summary.recentActivity.length === 0 && (
+                    <p className="text-sm text-muted-foreground">No recent activity is available yet.</p>
+                  )}
+                  {summary.recentActivity.map((activity) => (
+                    <div key={activity.id} className="rounded-md border p-3">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.08em] text-primary">
+                        {activity.type.replace(/_/g, ' ')}
+                      </p>
+                      {activity.subject && (
+                        <p className="mt-1 text-sm text-muted-foreground">{activity.subject}</p>
+                      )}
+                      <p className="mt-2 text-sm leading-6">{activity.summary}</p>
+                    </div>
                   ))}
                 </CardContent>
               </Card>
             </div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Teacher help records</CardTitle>
+                <CardTitle className="text-lg">Teacher help</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-                {summary.teacherHelpRecords.map((record) => (
-                  <p key={record.id} className="text-sm">
-                    {record.subject}: <SafeStatusLabel kind="teacherHelp" value={record.status} />
-                  </p>
-                ))}
+              <CardContent>
+                <p className="text-2xl font-semibold">{summary.teacherHelpRequestsThisWeek}</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Requests or escalations recorded this week.
+                </p>
               </CardContent>
             </Card>
           </>

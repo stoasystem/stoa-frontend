@@ -3,20 +3,16 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ChildCard } from '@/components/parent/ChildCard'
 import { ParentClassroomVisibilityCard } from '@/features/live-classroom/components/ParentClassroomVisibilityCard'
-import { LearningActivitySummary } from '@/components/parent/LearningActivitySummary'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
-import { usePracticeParentSummaryQuery } from '@/hooks/practice/usePracticeParentSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function ParentDashboardPage() {
   const { t } = useTranslation('parent')
   const childrenQuery = useParentChildrenQuery()
   const children = childrenQuery.data?.items ?? []
-  const firstChildId = children[0]?.id ?? 'user-student'
-  const practiceSummaryQuery = usePracticeParentSummaryQuery(firstChildId)
 
   return (
     <DashboardLayout>
@@ -30,7 +26,6 @@ export function ParentDashboardPage() {
           <UpgradePromptCard source="parent_dashboard" />
         </div>
         <ParentClassroomVisibilityCard />
-        <LearningActivitySummary summary={practiceSummaryQuery.data} />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-destructive">{t('loadChildrenFailed')}</p>}
         {childrenQuery.data && children.length === 0 && (

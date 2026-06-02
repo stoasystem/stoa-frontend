@@ -77,7 +77,7 @@ function StudentReportCard({ child }: { child: ParentChild }) {
           <div>
             <CardTitle className="text-xl">{child.name}</CardTitle>
             <CardDescription className="mt-2">
-              {child.grade} · {child.primarySubjects.join(', ')}
+              {child.grade ?? 'Grade not set'} · {child.subjects.join(', ') || 'No subjects set'}
             </CardDescription>
           </div>
           <Button asChild size="sm" variant="outline">
