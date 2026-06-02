@@ -4,7 +4,10 @@ import App from './App'
 import './index.css'
 import '@/i18n'
 
-ReactDOM.createRoot(document.getElementById('root')!).render(
+console.log('[main] React:', typeof React, 'ReactDOM:', typeof ReactDOM, 'createRoot:', typeof ReactDOM?.createRoot)
+const rootEl = document.getElementById('root')
+console.log('[main] root element:', rootEl)
+ReactDOM.createRoot(rootEl!).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
