@@ -99,6 +99,15 @@ test('parent can view child summary and report', async ({ page }) => {
   await expect(page.getByText(/anna made steady progress/i)).toBeVisible()
   await expect(page.getByText(/email sent/i)).toBeVisible()
   await expect(page.getByText(/practice fractions for ten minutes/i)).toBeVisible()
+  await expect(page.getByText(/review one mistake together/i)).toBeVisible()
+  await expect(page.getByText(/review equivalent fractions/i)).toBeVisible()
+  await expect(page.getByText('Completed practice.', { exact: true })).toBeVisible()
+  await expect(page.getByText(/teacher help was requested/i)).toBeVisible()
+  await expect(page.locator('p:text-is("Questions")')).toBeVisible()
+  await expect(page.locator('p:text-is("Practice")')).toBeVisible()
+  await expect(page.locator('p:text-is("Teacher help")')).toBeVisible()
+  await expect(page.locator('p:text-is("Report ID")')).toBeVisible()
+  await expect(page.getByText('report-1')).toBeVisible()
 })
 
 test('parent dashboard renders no-child empty state', async ({ page }) => {
