@@ -180,6 +180,15 @@ Recent decisions affecting current work:
 | 2026-06-01 | Remove login secure access kicker | Browser check on `/login`; `npm run lint`; `npm run build` |
 | 2026-06-01 | Improve homepage teacher support card readability | Browser check on `/`; `npm run lint`; `npm run build` |
 | 2026-06-01 | Rename homepage Practice demo label to example topic | Browser check on `/`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Unify student profile billing display | Browser check on `/profile`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Add Online Classroom navigation | Browser checks on `/profile` and `/classroom`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Replace classroom preset times with calendar and time picker | Browser schedule smoke on `/classroom/schedule`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Add classroom schedule back navigation | Browser check on `/classroom/schedule`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Remove redundant classroom session types card | Browser check on `/classroom`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Move classroom recent sessions into Learning History | Browser checks on `/classroom` and `/learning-history`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Group Learning History by question, classroom, and practice | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Rename Practice Library navigation label to Library | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Move Library recent practice into Learning History | Browser checks on `/question-bank` and `/learning-history`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 

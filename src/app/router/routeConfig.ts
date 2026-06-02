@@ -15,6 +15,7 @@ export type AppNavIcon =
   | 'analytics'
   | 'billing'
   | 'chat'
+  | 'classroom'
   | 'dashboard'
   | 'history'
   | 'profile'
@@ -87,7 +88,7 @@ export const navItems: AppNavItem[] = [
     description: 'Short guided lessons that can open a question when a step is unclear.',
   },
   {
-    label: 'Practice Library',
+    label: 'Library',
     path: '/question-bank',
     role: 'student',
     priority: 'primary',
@@ -105,6 +106,16 @@ export const navItems: AppNavItem[] = [
     icon: 'chat',
     mobile: true,
     description: 'Ask a question, explain unclear steps, and request teacher help.',
+  },
+  {
+    label: 'Online Classroom',
+    path: '/classroom',
+    role: 'student',
+    priority: 'primary',
+    status: 'core',
+    icon: 'classroom',
+    mobile: true,
+    description: 'Schedule live tutor help, join the lobby, and review classroom summaries.',
   },
   {
     label: 'Learning History',
@@ -191,6 +202,16 @@ export const navItems: AppNavItem[] = [
     icon: 'requests',
     mobile: true,
     description: 'Tutor help requests queue.',
+  },
+  {
+    label: 'Classroom Queue',
+    path: '/tutor/classroom',
+    role: 'tutor',
+    priority: 'primary',
+    status: 'core',
+    icon: 'classroom',
+    mobile: true,
+    description: 'Scheduled classrooms and instant live support requests.',
   },
   {
     label: 'Availability',
@@ -384,6 +405,11 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/support/tickets/:ticketId', pageName: 'SupportTicketDetailPage', role: 'shared', module: 'Support', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'User support ticket detail.' },
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student question explanation and teacher-help request flow.' },
+  { path: '/classroom', pageName: 'StudentClassroomHomePage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student live classroom overview and scheduling entry.' },
+  { path: '/classroom/schedule', pageName: 'ScheduleClassroomPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Schedule a live classroom session.' },
+  { path: '/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Student classroom lobby and device check.' },
+  { path: '/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Student live classroom room.' },
+  { path: '/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Student classroom summary and next steps.' },
   { path: '/practice', pageName: 'PracticeOverviewPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student subject practice overview.' },
   { path: '/question-bank', pageName: 'QuestionBankHomePage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student open practice library overview.' },
   { path: '/question-bank/:subjectId', pageName: 'SubjectQuestionBankPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Subject-level question-bank overview.' },
@@ -409,6 +435,10 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/parent/children/:childId/monthly-report', pageName: 'ParentMonthlyReportPage', role: 'parent', module: 'Parent', status: 'demo', priority: 'P1', navPriority: 'hidden', purpose: 'Monthly child report demo.' },
   { path: '/parent/children/:childId/history', pageName: 'ChildLearningHistoryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Child learning history.' },
   { path: '/tutor', pageName: 'TutorDashboardPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor request queue.' },
+  { path: '/tutor/classroom', pageName: 'TutorClassroomQueuePage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor classroom queue and instant live support requests.' },
+  { path: '/tutor/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor classroom lobby and session context.' },
+  { path: '/tutor/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor live classroom room.' },
+  { path: '/tutor/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Tutor classroom summary and notes.' },
   { path: '/tutor/availability', pageName: 'TutorAvailabilityPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor availability.' },
   { path: '/tutor/profile', pageName: 'TutorProfilePage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
   { path: '/tutor/requests/:requestId', pageName: 'TutorHelpRequestDetailPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor request detail and status update.' },

@@ -40,8 +40,10 @@ export async function getClassroomSession(sessionId: string) {
 export async function scheduleClassroomSession(input: ScheduleClassroomInput) {
   await delay(350)
 
-  const scheduledStartAt = new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
-  const scheduledEndAt = new Date(Date.now() + 3.5 * 60 * 60 * 1000).toISOString()
+  const scheduledStartAt = parseScheduledStart(input.timeSlotId)
+  const scheduledEndAt = new Date(
+    new Date(scheduledStartAt).getTime() + getSessionDurationMs(input.type),
+  ).toISOString()
   const session: LiveClassroomSession = {
     id: `classroom-scheduled-${Date.now()}`,
     title: `${input.subjectLabel} Support`,
@@ -78,6 +80,26 @@ export async function scheduleClassroomSession(input: ScheduleClassroomInput) {
 
   sessions = [session, ...sessions]
   return cloneSession(session)
+}
+
+function parseScheduledStart(timeSlotId: string) {
+  const timestamp = Date.parse(timeSlotId)
+  if (Number.isNaN(timestamp)) {
+    return new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString()
+  }
+
+  return new Date(timestamp).toISOString()
+}
+
+function getSessionDurationMs(type: ScheduleClassroomInput['type']) {
+  const minutesByType: Record<ScheduleClassroomInput['type'], number> = {
+    deep_review: 60,
+    instant_video_help: 15,
+    quick_help: 15,
+    standard_session: 30,
+  }
+
+  return minutesByType[type] * 60 * 1000
 }
 
 export async function requestInstantVideoHelp(input: InstantVideoHelpInput) {

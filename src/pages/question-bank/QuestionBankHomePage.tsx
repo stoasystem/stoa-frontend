@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Bookmark, Camera, Clock, Search } from 'lucide-react'
+import { Camera, Search } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -15,7 +15,6 @@ import { useQuestionBankOverviewQuery } from '@/hooks/questionBank/useQuestionBa
 import { useQuestionBankSearchQuery } from '@/hooks/questionBank/useQuestionBankSearchQuery'
 import {
   getQuestionBankMistakesPath,
-  getQuestionBankSavedPath,
   getQuestionBankSetPath,
   getQuestionBankTopicPath,
 } from '@/lib/questionBankRoutes'
@@ -153,46 +152,15 @@ export function QuestionBankHomePage() {
           </div>
         </section>
 
-        <section className="grid gap-4 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div className="rounded-lg border border-border/80 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-            <p className="brand-section-kicker">Review & Improve</p>
-            <h2 className="mt-2 text-3xl font-semibold">{overview?.mistakesToReview ?? 0}</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Revisit questions you missed before.
-            </p>
-            <Button asChild className="mt-5 w-full">
-              <Link to={getQuestionBankMistakesPath()}>Review Mistakes</Link>
-            </Button>
-          </div>
-          <div className="rounded-lg border border-border/80 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <p className="brand-section-kicker">Recent Practice</p>
-                <h2 className="mt-2 text-xl font-semibold">Keep useful sets close</h2>
-              </div>
-              <Button asChild variant="outline" size="sm">
-                <Link to={getQuestionBankSavedPath()}>
-                  <Bookmark className="h-4 w-4" aria-hidden="true" />
-                  Saved
-                </Link>
-              </Button>
-            </div>
-            <div className="mt-4 divide-y">
-              {overview?.recentPractice.map((set) => (
-                <Link
-                  key={set.id}
-                  to={getQuestionBankSetPath(set.id)}
-                  className="flex items-center justify-between gap-3 py-3 text-sm hover:text-primary"
-                >
-                  <span className="font-medium">{set.title}</span>
-                  <span className="flex items-center gap-1 text-muted-foreground">
-                    <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                    {set.lastAttempt ? `${set.lastAttempt.score}/${set.lastAttempt.total}` : `${set.progress.answered}/${set.progress.total}`}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
+        <section className="rounded-lg border border-border/80 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
+          <p className="brand-section-kicker">Review & Improve</p>
+          <h2 className="mt-2 text-3xl font-semibold">{overview?.mistakesToReview ?? 0}</h2>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            Revisit questions you missed before.
+          </p>
+          <Button asChild className="mt-5">
+            <Link to={getQuestionBankMistakesPath()}>Review Mistakes</Link>
+          </Button>
         </section>
 
         <section className="space-y-4">

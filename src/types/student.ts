@@ -38,4 +38,6 @@ export type LearningHistoryItem = {
   title: string
   summary: string
   createdAt: string
+  href?: string
+  sourceLabel?: string
 }

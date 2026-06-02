@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { UpcomingClassroomCard } from '@/features/live-classroom/components/UpcomingClassroomCard'
 import { useStudentClassroomHome } from '@/features/live-classroom/hooks/useStudentClassroomHome'
-import { formatClassroomTimeRange } from '@/features/live-classroom/utils/formatClassroom'
 
 export function StudentClassroomHomePage() {
   const homeQuery = useStudentClassroomHome()
@@ -63,59 +62,18 @@ export function StudentClassroomHomePage() {
               </section>
             )}
 
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)]">
-              <section className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
-                <SectionHeader
-                  title="Get Help Now"
-                  description="Start with the Learning Assistant, request tutor support, then enter an Online Classroom if the question needs live help."
-                />
-                <div className="mt-5 flex flex-wrap gap-2">
-                  <Button asChild>
-                    <Link to="/chat?intent=teacher-help">Ask Learning Assistant</Link>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link to="/classroom/schedule">Schedule a Session</Link>
-                  </Button>
-                </div>
-              </section>
-
-              <section className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
-                <p className="brand-section-kicker">Session types</p>
-                <div className="mt-4 grid gap-3">
-                  {home.recommendedOptions.map((option) => (
-                    <div key={option.id} className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">
-                      <p className="text-sm font-semibold">{option.title}</p>
-                      <p className="mt-1 text-xs leading-5 text-muted-foreground">{option.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-
-            <section className="space-y-4">
+            <section className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
               <SectionHeader
-                title="Recent Sessions"
-                description="Review previous live classroom support and next steps."
+                title="Get Help Now"
+                description="Start with the Learning Assistant, request tutor support, then enter an Online Classroom if the question needs live help."
               />
-              <div className="grid gap-3">
-                {home.recentSessions.length === 0 && (
-                  <EmptyState message="No completed classroom sessions yet." />
-                )}
-                {home.recentSessions.map((session) => (
-                  <Link
-                    key={session.id}
-                    to={`/classroom/sessions/${session.id}/summary`}
-                    className="rounded-lg border bg-card p-4 shadow-[var(--platform-shadow-soft)] transition hover:border-primary/30"
-                  >
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                      <div>
-                        <p className="font-semibold">{session.title}</p>
-                        <p className="text-sm text-muted-foreground">{session.topicLabel ?? session.subjectLabel}</p>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{formatClassroomTimeRange(session)}</p>
-                    </div>
-                  </Link>
-                ))}
+              <div className="mt-5 flex flex-wrap gap-2">
+                <Button asChild>
+                  <Link to="/chat?intent=teacher-help">Ask Learning Assistant</Link>
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/classroom/schedule">Schedule a Session</Link>
+                </Button>
               </div>
             </section>
           </>
