@@ -3,15 +3,38 @@ export type ParentChildReportDetail = {
   parentId: string
   studentId: string
   weekStart: string
+  weekEnd?: string | null
   usageCount: number
   aiResolved: number
   teacherResolved: number
   weakKnowledgePoints: string[]
   recommendations: string
+  recommendationItems: string[]
+  stats: {
+    questionsAsked: number
+    aiResolved: number
+    teacherHelpRequests: number
+    practiceLessonsCompleted: number
+    mistakesLogged: number
+  }
+  summary: string
+  strengths: string[]
+  weakTopics: Array<{
+    topic: string
+    note: string
+  }>
+  teacherNote?: string | null
+  generatedAt?: string | null
+  emailStatus?: string | null
+  reportStatus?: string | null
+  emailErrorClass?: string | null
+  emailErrorMessage?: string | null
+  generationErrorClass?: string | null
+  generationErrorMessage?: string | null
 }
 
 export type ParentChildReportState = {
-  status: 'available' | 'missing'
+  status: 'available' | 'missing' | 'pending' | 'failed'
   report: ParentChildReportDetail | null
   message?: string | null
 }

@@ -5,19 +5,39 @@ const childId = 'user-student'
 
 type ReportState =
   | {
-      status: 'available'
+      status: 'available' | 'pending' | 'failed'
       report: {
         reportId: string
         parentId: string
         studentId: string
         weekStart: string
+        weekEnd?: string | null
         usageCount: number
         aiResolved: number
         teacherResolved: number
         weakKnowledgePoints: string[]
         recommendations: string
+        recommendationItems: string[]
+        stats: {
+          questionsAsked: number
+          aiResolved: number
+          teacherHelpRequests: number
+          practiceLessonsCompleted: number
+          mistakesLogged: number
+        }
+        summary: string
+        strengths: string[]
+        weakTopics: Array<{ topic: string; note: string }>
+        teacherNote?: string | null
+        generatedAt?: string | null
+        emailStatus?: string | null
+        reportStatus?: string | null
+        emailErrorClass?: string | null
+        emailErrorMessage?: string | null
+        generationErrorClass?: string | null
+        generationErrorMessage?: string | null
       }
-      message: null
+      message: string | null
     }
   | {
       status: 'missing'
@@ -76,7 +96,9 @@ test('parent can view child summary and report', async ({ page }) => {
 
   await expect(page).toHaveURL(/\/parent\/children\/user-student\/report/)
   await expect(page.getByRole('heading', { name: /weekly report/i })).toBeVisible()
-  await expect(page.getByText(/week start|no weekly report yet/i)).toBeVisible()
+  await expect(page.getByText(/anna made steady progress/i)).toBeVisible()
+  await expect(page.getByText(/email sent/i)).toBeVisible()
+  await expect(page.getByText(/practice fractions for ten minutes/i)).toBeVisible()
 })
 
 test('parent dashboard renders no-child empty state', async ({ page }) => {
@@ -102,6 +124,44 @@ test('parent report renders missing-report state', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /weekly report/i })).toBeVisible()
   await expect(page.getByText(/no weekly report yet/i)).toBeVisible()
   await expect(page.getByText(/no weekly report is available yet/i)).toBeVisible()
+})
+
+test('parent report renders email-failed generated state', async ({ page }) => {
+  await routeParentChildren(page)
+  await routeParentChildDetails(page, availableReportState('email_failed'))
+
+  await loginAs(page, 'parent')
+  await page.goto(`/parent/children/${childId}/report`)
+
+  await expect(page.getByRole('heading', { name: /weekly report/i })).toBeVisible()
+  await expect(page.getByText(/anna made steady progress/i)).toBeVisible()
+  await expect(page.getByText(/email failed/i)).toBeVisible()
+  await expect(page.getByText(/email delivery did not complete/i)).toBeVisible()
+})
+
+test('parent report renders generation pending state', async ({ page }) => {
+  await routeParentChildren(page)
+  await routeParentChildDetails(page, pendingReportState())
+
+  await loginAs(page, 'parent')
+  await page.goto(`/parent/children/${childId}/report`)
+
+  await expect(page.getByRole('heading', { name: /weekly report/i })).toBeVisible()
+  await expect(page.getByText('Generation pending', { exact: true })).toBeVisible()
+  await expect(page.getByText('Weekly report generation is still in progress.', { exact: true })).toHaveCount(2)
+})
+
+test('parent report renders generation failed state', async ({ page }) => {
+  await routeParentChildren(page)
+  await routeParentChildDetails(page, failedReportState())
+
+  await loginAs(page, 'parent')
+  await page.goto(`/parent/children/${childId}/report`)
+
+  await expect(page.getByRole('heading', { name: /weekly report/i })).toBeVisible()
+  await expect(page.getByText('Generation failed', { exact: true })).toBeVisible()
+  await expect(page.getByText('Weekly report generation failed.', { exact: true })).toHaveCount(2)
+  await expect(page.getByText(/runtimeerror|generation failed raw/i)).toHaveCount(0)
 })
 
 function parentChild() {
@@ -152,7 +212,7 @@ function parentHistory() {
   }
 }
 
-function availableReportState(): ReportState {
+function availableReportState(status: 'email_sent' | 'email_failed' = 'email_sent'): ReportState {
   return {
     status: 'available',
     report: {
@@ -160,12 +220,70 @@ function availableReportState(): ReportState {
       parentId: 'user-parent',
       studentId: childId,
       weekStart: '2026-06-01',
-      usageCount: 3,
-      aiResolved: 2,
+      weekEnd: '2026-06-07',
+      usageCount: 4,
+      aiResolved: 3,
       teacherResolved: 1,
       weakKnowledgePoints: ['fractions'],
-      recommendations: 'Practice fractions for 15 minutes.',
+      recommendations: 'Practice fractions for ten minutes.',
+      recommendationItems: ['Practice fractions for ten minutes.', 'Review one mistake together.'],
+      stats: {
+        questionsAsked: 4,
+        aiResolved: 3,
+        teacherHelpRequests: 1,
+        practiceLessonsCompleted: 2,
+        mistakesLogged: 1,
+      },
+      summary: 'Anna made steady progress this week.',
+      strengths: ['Completed practice.'],
+      weakTopics: [{ topic: 'fractions', note: 'Review equivalent fractions.' }],
+      teacherNote: 'Teacher help was requested.',
+      generatedAt: '2026-06-08T06:00:00+00:00',
+      emailStatus: status === 'email_failed' ? 'failed' : 'sent',
+      reportStatus: status,
+      emailErrorClass: status === 'email_failed' ? 'MessageRejected' : null,
+      emailErrorMessage: status === 'email_failed' ? 'SES rejected recipient' : null,
     },
     message: null,
+  }
+}
+
+function pendingReportState(): ReportState {
+  const state = availableReportState('email_sent')
+  return {
+    status: 'pending',
+    report: {
+      ...state.report!,
+      summary: '',
+      strengths: [],
+      weakTopics: [],
+      recommendationItems: [],
+      recommendations: '',
+      generatedAt: null,
+      emailStatus: 'not_started',
+      reportStatus: 'generation_claimed',
+    },
+    message: 'Weekly report generation is still in progress.',
+  }
+}
+
+function failedReportState(): ReportState {
+  const state = availableReportState('email_sent')
+  return {
+    status: 'failed',
+    report: {
+      ...state.report!,
+      summary: '',
+      strengths: [],
+      weakTopics: [],
+      recommendationItems: [],
+      recommendations: '',
+      generatedAt: null,
+      emailStatus: 'not_started',
+      reportStatus: 'generation_failed',
+      generationErrorClass: 'RuntimeError',
+      generationErrorMessage: null,
+    },
+    message: 'Weekly report generation failed.',
   }
 }
