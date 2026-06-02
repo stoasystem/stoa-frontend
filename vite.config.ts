@@ -16,7 +16,8 @@ export default defineConfig({
           if (
             normalizedId.includes('/react/') ||
             normalizedId.includes('/react-dom/') ||
-            normalizedId.includes('/scheduler/')
+            normalizedId.includes('/scheduler/') ||
+            normalizedId.includes('/@floating-ui/')
           ) {
             return 'vendor-react'
           }
