@@ -1,7 +1,5 @@
 import {
-  History,
   LayoutDashboard,
-  User,
   type LucideIcon,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -21,18 +19,6 @@ const chatNavItems: ChatNavItem[] = [
     labelFallback: 'Dashboard',
     path: '/dashboard',
     Icon: LayoutDashboard,
-  },
-  {
-    labelKey: 'navigation.learningHistory',
-    labelFallback: 'Learning history',
-    path: '/learning-history',
-    Icon: History,
-  },
-  {
-    labelKey: 'navigation.profile',
-    labelFallback: 'Profile',
-    path: '/profile',
-    Icon: User,
   },
 ]
 

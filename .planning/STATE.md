@@ -189,6 +189,7 @@ Recent decisions affecting current work:
 | 2026-06-02 | Group Learning History by question, classroom, and practice | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Rename Practice Library navigation label to Library | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Move Library recent practice into Learning History | Browser checks on `/question-bank` and `/learning-history`; `npm run lint`; `npm run build` |
+| 2026-06-02 | Remove extra Chat page navigation buttons | Browser check on `/chat`; `npm run lint`; `npm run build` |
 
 ### Blockers/Concerns
 
