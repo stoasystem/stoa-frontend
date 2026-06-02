@@ -3,6 +3,28 @@ import { loginAs } from './helpers'
 
 const childId = 'user-student'
 
+type ReportState =
+  | {
+      status: 'available'
+      report: {
+        reportId: string
+        parentId: string
+        studentId: string
+        weekStart: string
+        usageCount: number
+        aiResolved: number
+        teacherResolved: number
+        weakKnowledgePoints: string[]
+        recommendations: string
+      }
+      message: null
+    }
+  | {
+      status: 'missing'
+      report: null
+      message: string
+    }
+
 async function routeParentChildren(page: Page, items = [parentChild()]) {
   await page.route('**/parents/me/children', async (route) => {
     await route.fulfill({
@@ -12,7 +34,7 @@ async function routeParentChildren(page: Page, items = [parentChild()]) {
   })
 }
 
-async function routeParentChildDetails(page: Page, reportState = availableReportState()) {
+async function routeParentChildDetails(page: Page, reportState: ReportState = availableReportState()) {
   await page.route(`**/parents/me/children/${childId}/summary`, async (route) => {
     await route.fulfill({
       contentType: 'application/json',
@@ -130,7 +152,7 @@ function parentHistory() {
   }
 }
 
-function availableReportState() {
+function availableReportState(): ReportState {
   return {
     status: 'available',
     report: {
