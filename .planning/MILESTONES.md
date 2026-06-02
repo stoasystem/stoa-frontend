@@ -1,5 +1,29 @@
 # Milestones
 
+## v2.5 Online Classroom Focused Redesign (Shipped: 2026-06-02)
+
+**Phases completed:** 3 phases, 3 plans, 0 tasks
+**Known deferred items at close:** Real WebRTC/video provider integration, production scheduling, tutor matching, production whiteboard, recording, screen share, transcript, billing, admin classroom operations, and native translation review remain future scope.
+
+**Key accomplishments:**
+
+- Simplified Online Classroom home into one focused live-support surface with compact upcoming-session state.
+- Refactored Schedule Classroom into request, session focus, date/time, context/materials, and sticky session preview.
+- Reworked lobby into a single readiness flow with tutor, device check, context, status, and join/back actions.
+- Redesigned room hierarchy around Shared Problem and Focus Board / Shared Whiteboard, with video as a compact rail.
+- Replaced crowded room controls with compact icon-led accessible actions.
+- Added Learning History handoff to classroom summary and tightened tutor/parent classroom surfaces.
+- Updated live-classroom E2E assertions for the simplified flow.
+
+### Verification
+
+- Browser checks passed for classroom home, schedule, lobby, room, and summary with no horizontal overflow.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e -- live-classroom.spec.ts`: passed, 5/5 tests.
+
+---
+
 ## v2.4 UI Copy & Web Design Refinement (Shipped: 2026-06-02)
 
 **Phases completed:** 6 phases, 6 plans, 0 tasks

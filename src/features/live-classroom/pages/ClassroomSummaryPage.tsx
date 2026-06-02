@@ -1,4 +1,4 @@
-import { LayoutDashboard, MessageCircle } from 'lucide-react'
+import { History, LayoutDashboard, MessageCircle } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -65,6 +65,12 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
               {!tutorMode && (
                 <div className="mt-6 flex flex-wrap gap-2">
                   <Button asChild>
+                    <Link to="/learning-history">
+                      <History className="h-4 w-4" aria-hidden="true" />
+                      Learning History
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline">
                     <Link to="/chat">
                       <MessageCircle className="h-4 w-4" aria-hidden="true" />
                       Ask Learning Assistant

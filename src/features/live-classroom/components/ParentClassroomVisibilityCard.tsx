@@ -25,8 +25,8 @@ export function ParentClassroomVisibilityCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          See lightweight information about upcoming and recent live tutor sessions. Your child joins from
-          the student dashboard. Parent observer, recording, and attendance controls are not part of this view.
+          See upcoming and recent live tutor sessions at a summary level. Your child joins from the
+          student dashboard, and learning reports keep the classroom work connected to practice progress.
         </p>
         {upcoming && (
           <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">

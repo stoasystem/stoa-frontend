@@ -69,14 +69,14 @@ function SessionList({
   return (
     <div className="grid gap-4">
       {sessions.map((session) => (
-        <article key={session.id} className="rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div>
+        <article key={session.id} className="rounded-lg border bg-card p-4 shadow-[var(--platform-shadow-card)]">
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_10rem]">
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
                 {instant ? <Video className="h-4 w-4 text-primary" aria-hidden="true" /> : <CalendarClock className="h-4 w-4 text-primary" aria-hidden="true" />}
                 <p className="brand-section-kicker">{instant ? 'Live support request' : 'Classroom session'}</p>
               </div>
-              <h2 className="mt-2 text-xl font-semibold">{session.title}</h2>
+              <h2 className="mt-2 text-lg font-semibold">{session.title}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{formatClassroomTimeRange(session)}</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 Student: {session.studentName} · Topic: {session.topicLabel ?? session.subjectLabel}
@@ -84,7 +84,7 @@ function SessionList({
               {session.context?.summary && (
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">{session.context.summary}</p>
               )}
-              <dl className="mt-4 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+              <dl className="mt-4 grid gap-2 text-xs text-muted-foreground md:grid-cols-3">
                 <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-2">
                   <dt className="font-semibold text-foreground">Source</dt>
                   <dd className="mt-1">{session.context?.sourceLabel ?? 'Classroom request'}</dd>
@@ -99,7 +99,7 @@ function SessionList({
                 </div>
               </dl>
             </div>
-            <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
+            <div className="flex flex-col gap-2">
               <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm font-medium">
                 {getClassroomStatusLabel(session.status)}
               </span>

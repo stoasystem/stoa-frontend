@@ -27,8 +27,8 @@ export function ClassroomSidePanel({
   tutorMode?: boolean
 }) {
   return (
-    <aside className="rounded-lg border bg-card p-4 shadow-[var(--platform-shadow-card)]">
-      <div role="tablist" aria-label="Classroom panels" className="grid grid-cols-2 gap-2">
+    <aside className="rounded-lg border bg-card p-3 shadow-[var(--platform-shadow-card)]">
+      <div role="tablist" aria-label="Classroom panels" className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -36,7 +36,7 @@ export function ClassroomSidePanel({
             role="tab"
             aria-selected={activePanel === tab.id}
             onClick={() => onPanelChange(tab.id)}
-            className={`rounded-md border px-3 py-2 text-sm font-medium ${
+            className={`rounded-md border px-3 py-2 text-sm font-medium transition ${
               activePanel === tab.id ? 'border-primary bg-primary/5 text-primary' : 'bg-background'
             }`}
           >

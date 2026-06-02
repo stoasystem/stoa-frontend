@@ -2,7 +2,6 @@ import { type ReactNode, useMemo, useState } from 'react'
 import { CalendarCheck, ChevronLeft, ChevronRight, Clock, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
-import { EmptyState } from '@/components/common/EmptyState'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Button } from '@/components/ui/button'
@@ -111,7 +110,7 @@ export function ScheduleClassroomPage() {
         <PageHeader
           eyebrow="Online Classroom"
           title="Schedule a Classroom Session"
-          description="Choose a subject, topic, and time for live tutor support."
+          description="Set the learning focus, choose a time, and add the material your tutor should see first."
           actions={<BackButton label="Back to Online Classroom" to="/classroom" />}
         />
 
@@ -140,29 +139,31 @@ export function ScheduleClassroomPage() {
             </div>
           </section>
         ) : (
-          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
-            <section className="space-y-5 rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
-              <Step title="1. What do you need help with?">
-                <Segmented label="Subject" value={subjectId} options={subjects} onChange={setSubjectId} />
-                <Segmented label="Topic" value={topicId} options={topics} onChange={setTopicId} />
-                <Segmented
-                  label="Level"
-                  value={level}
-                  options={levels.map((item) => ({ id: item, label: item }))}
-                  onChange={setLevel}
-                />
-                <Segmented label="Language" value={language} options={languages} onChange={(value) => setLanguage(value as ClassroomLanguage)} />
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <section className="overflow-hidden rounded-lg border bg-card shadow-[var(--platform-shadow-card)]">
+              <Step title="1. Learning request">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Segmented label="Subject" value={subjectId} options={subjects} onChange={setSubjectId} />
+                  <Segmented label="Topic" value={topicId} options={topics} onChange={setTopicId} />
+                  <Segmented
+                    label="Level"
+                    value={level}
+                    options={levels.map((item) => ({ id: item, label: item }))}
+                    onChange={setLevel}
+                  />
+                  <Segmented label="Language" value={language} options={languages} onChange={(value) => setLanguage(value as ClassroomLanguage)} />
+                </div>
               </Step>
 
-              <Step title="2. Choose session type">
-                <div className="grid gap-3 md:grid-cols-3">
+              <Step title="2. Session focus">
+                <div className="grid gap-2 md:grid-cols-3">
                   {sessionTypes.map((option) => (
                     <button
                       key={option.id}
                       type="button"
                       onClick={() => setType(option.id)}
-                      className={`rounded-lg border p-4 text-left transition ${
-                        type === option.id ? 'border-primary bg-primary/5' : 'bg-[hsl(var(--platform-surface-app))]'
+                      className={`min-h-20 rounded-md border px-3 py-2 text-left transition ${
+                        type === option.id ? 'border-primary bg-primary/5 text-primary' : 'bg-[hsl(var(--platform-surface-app))]'
                       }`}
                     >
                       <span className="text-sm font-semibold">{option.label}</span>
@@ -172,7 +173,7 @@ export function ScheduleClassroomPage() {
                 </div>
               </Step>
 
-              <Step title="3. Choose a time">
+              <Step title="3. Date and time">
                 <ClassroomTimePicker
                   calendarDays={calendarDays}
                   selectedDateKey={selectedDateKey}
@@ -185,7 +186,7 @@ export function ScheduleClassroomPage() {
                 />
               </Step>
 
-              <Step title="4. Add context">
+              <Step title="4. Context and materials">
                 <Textarea
                   value={contextMessage}
                   onChange={(event) => setContextMessage(event.target.value)}
@@ -217,18 +218,9 @@ export function ScheduleClassroomPage() {
                   </div>
                 </div>
               </Step>
-
-              <div className="flex flex-wrap justify-end gap-2 border-t pt-4">
-                <Button asChild variant="outline">
-                  <Link to="/classroom">Cancel</Link>
-                </Button>
-                <Button type="button" onClick={handleSchedule} disabled={scheduleMutation.isPending || isUploading}>
-                  {scheduleMutation.isPending ? 'Scheduling...' : 'Schedule Session'}
-                </Button>
-              </div>
             </section>
 
-            <aside className="space-y-4 rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)]">
+            <aside className="space-y-4 rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-card)] lg:sticky lg:top-24 lg:self-start">
               <div className="rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] p-3 text-primary">
                 <FileText className="h-5 w-5" aria-hidden="true" />
               </div>
@@ -238,12 +230,23 @@ export function ScheduleClassroomPage() {
                 <dl className="mt-4 space-y-3 text-sm">
                   <PreviewRow label="Topic" value={topic.label} />
                   <PreviewRow label="Level" value={level} />
+                  <PreviewRow label="Focus" value={sessionTypes.find((item) => item.id === type)?.label ?? 'Standard Session'} />
                   <PreviewRow label="Time" value={selectedTimeLabel} />
                   <PreviewRow label="Language" value={languages.find((item) => item.id === language)?.label ?? 'English'} />
                   <PreviewRow label="Materials" value={`${uploadedAttachments.length} uploaded`} />
                 </dl>
               </div>
-              <EmptyState message="The tutor sees your topic, context, and uploaded learning materials before joining." />
+              <p className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6 text-muted-foreground">
+                The tutor sees this brief before joining, so keep the question and material focused.
+              </p>
+              <div className="grid gap-2">
+                <Button type="button" onClick={handleSchedule} disabled={scheduleMutation.isPending || isUploading}>
+                  {scheduleMutation.isPending ? 'Scheduling...' : 'Schedule Session'}
+                </Button>
+                <Button asChild variant="outline">
+                  <Link to="/classroom">Cancel</Link>
+                </Button>
+              </div>
             </aside>
           </div>
         )}
@@ -274,7 +277,7 @@ function ClassroomTimePicker({
   const todayKey = toDateKey(new Date())
 
   return (
-    <div className="grid gap-4 rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4 lg:grid-cols-[minmax(0,1fr)_13rem]">
+    <div className="grid gap-4 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 lg:grid-cols-[minmax(0,1fr)_12rem]">
       <section className="min-w-0 rounded-md border bg-card p-3" aria-label="Classroom date">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-sm font-semibold">{formatMonthLabel(visibleMonth)}</h3>
@@ -338,7 +341,7 @@ function ClassroomTimePicker({
           </div>
           <h3 className="text-sm font-semibold">Time</h3>
         </div>
-        <ScrollArea className="mt-3 h-64 rounded-md border bg-[hsl(var(--platform-surface-app))]">
+        <ScrollArea className="mt-3 h-60 rounded-md border bg-[hsl(var(--platform-surface-app))]">
           <div className="space-y-1 p-2">
             {timeOptions.map((time) => {
               const selected = time === selectedTime
@@ -349,7 +352,7 @@ function ClassroomTimePicker({
                   type="button"
                   aria-pressed={selected}
                   onClick={() => onTimeChange(time)}
-                  className={`flex h-11 w-full items-center justify-center rounded-md border text-sm font-semibold transition ${
+                  className={`flex h-10 w-full items-center justify-center rounded-md border text-sm font-semibold transition ${
                     selected
                       ? 'border-primary bg-primary text-primary-foreground shadow-sm'
                       : 'border-transparent bg-card hover:border-primary/35 hover:text-primary'
@@ -371,8 +374,8 @@ function ClassroomTimePicker({
 
 function Step({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="space-y-3 border-b p-5 last:border-b-0 sm:p-6">
+      <h2 className="text-base font-semibold">{title}</h2>
       {children}
     </section>
   )

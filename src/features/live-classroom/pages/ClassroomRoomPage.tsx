@@ -46,38 +46,45 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
 
           {session && (
             <>
-              <header className="rounded-lg border bg-card p-4 shadow-[var(--platform-shadow-card)]">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
+              <header className="rounded-lg border bg-card px-4 py-3 shadow-[var(--platform-shadow-card)]">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="min-w-0">
                     <p className="brand-section-kicker">{tutorMode ? 'Tutor classroom' : 'Online Classroom'}</p>
-                    <h1 className="mt-1 text-2xl font-semibold">{session.title}</h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {formatClassroomTimeRange(session)} · Tutor: {session.tutorName ?? 'Tutor'}
-                    </p>
+                    <h1 className="mt-1 truncate text-xl font-semibold sm:text-2xl">{session.title}</h1>
                   </div>
-                  {session.context?.sourceLabel && (
-                    <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">
-                      Source: {session.context.sourceLabel}
-                    </div>
-                  )}
+                  <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+                    <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
+                      {formatClassroomTimeRange(session)}
+                    </span>
+                    <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
+                      Tutor: {session.tutorName ?? 'Tutor'}
+                    </span>
+                    {session.context?.sourceLabel && (
+                      <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
+                        {session.context.sourceLabel}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </header>
 
-              <main className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
+              <main className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="space-y-4">
-                  <ClassroomVideoGrid participants={session.participants} />
                   <ClassroomLearningWorkspace
                     session={session}
                     tutorMode={tutorMode}
                     whiteboardOpen={roomState.whiteboardOpen}
                   />
+                  <ClassroomSidePanel
+                    session={session}
+                    activePanel={roomState.activePanel}
+                    onPanelChange={roomState.setActivePanel}
+                    tutorMode={tutorMode}
+                  />
                 </div>
-                <ClassroomSidePanel
-                  session={session}
-                  activePanel={roomState.activePanel}
-                  onPanelChange={roomState.setActivePanel}
-                  tutorMode={tutorMode}
-                />
+                <div className="xl:sticky xl:top-24 xl:self-start">
+                  <ClassroomVideoGrid participants={session.participants} />
+                </div>
               </main>
             </>
           )}
