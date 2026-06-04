@@ -1,8 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   bulkResendReportEmails,
+  cancelRecoveryJob,
+  createResendRecoveryJob,
+  getRecoveryJobAuditEvents,
+  getRecoveryJobResults,
+  getRecoveryJobs,
+  getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
+  previewResendRecoveryJob,
   resendReportEmail,
   retryReportGeneration,
   type ReportOperationTarget,
@@ -27,6 +34,41 @@ export function useReportOperationDetailQuery(target: ReportOperationTarget | nu
   })
 }
 
+export function useReportAuditEventsQuery(target: ReportOperationTarget | null) {
+  return useQuery({
+    queryKey: [...adminQueryKeys.reportOperations(), 'audit', target],
+    queryFn: () => getReportAuditEvents(target as ReportOperationTarget),
+    enabled: Boolean(target),
+    retry: false,
+  })
+}
+
+export function useRecoveryJobsQuery() {
+  return useQuery({
+    queryKey: adminQueryKeys.reportRecoveryJobs(),
+    queryFn: getRecoveryJobs,
+    retry: false,
+  })
+}
+
+export function useRecoveryJobResultsQuery(jobId: string | null) {
+  return useQuery({
+    queryKey: [...adminQueryKeys.reportRecoveryJobs(), jobId, 'results'],
+    queryFn: () => getRecoveryJobResults(jobId as string),
+    enabled: Boolean(jobId),
+    retry: false,
+  })
+}
+
+export function useRecoveryJobAuditEventsQuery(jobId: string | null) {
+  return useQuery({
+    queryKey: [...adminQueryKeys.reportRecoveryJobs(), jobId, 'audit'],
+    queryFn: () => getRecoveryJobAuditEvents(jobId as string),
+    enabled: Boolean(jobId),
+    retry: false,
+  })
+}
+
 export function useRetryReportGenerationMutation() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -43,6 +85,31 @@ export function useResendReportEmailMutation() {
     mutationFn: resendReportEmail,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function usePreviewResendRecoveryJobMutation() {
+  return useMutation({ mutationFn: previewResendRecoveryJob })
+}
+
+export function useCreateResendRecoveryJobMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createResendRecoveryJob,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportRecoveryJobs() })
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useCancelRecoveryJobMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: cancelRecoveryJob,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportRecoveryJobs() })
     },
   })
 }

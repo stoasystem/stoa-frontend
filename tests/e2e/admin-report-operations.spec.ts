@@ -71,10 +71,28 @@ const reportTwo = {
   },
 }
 
+const reportAudit = {
+  items: [
+    {
+      event_id: 'audit-1',
+      event_at: '2026-06-04T11:00:00Z',
+      action: 'resend_email',
+      result: 'success',
+      actor: 'admin-1',
+      source: 'admin_api',
+      error_message: null,
+    },
+  ],
+  count: 1,
+  next_token: null,
+  scope: 'report',
+}
+
 test('admin can triage report operations and run selected recovery actions', async ({ page }) => {
   await loginAs(page, 'admin')
 
   const listRequests: string[] = []
+  let jobCreated = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -90,6 +108,9 @@ test('admin can triage report operations and run selected recovery actions', asy
   })
   await page.route('**/admin/reports/parent-1/student-1/2026-06-01/ops', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(reportOne) })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/audit', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(reportAudit) })
   })
   await page.route('**/admin/reports/parent-2/student-2/2026-06-01/ops', async (route) => {
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(reportTwo) })
@@ -132,6 +153,164 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/recovery-jobs/resend-email/preview', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'resend_email',
+        reason: 'Incident email delivery recovery',
+        requested_by: 'admin-1',
+        filters: { status: 'email_failed', week_start: '2026-06-01', parent_id: null, student_id: null },
+        max_targets: 25,
+        scanned_pages: 1,
+        eligible_count: 1,
+        refused_count: 0,
+        missing_count: 0,
+        sample: [
+          {
+            target_id: reportOne.report_id,
+            report_id: reportOne.report_id,
+            parent_id: reportOne.parent_id,
+            student_id: reportOne.student_id,
+            student_name: reportOne.student_name,
+            week_start: reportOne.week_start,
+            status: reportOne.status,
+            email_status: reportOne.email_status,
+            artifacts: { html_available: true, json_available: true },
+            eligibility: 'eligible',
+            refusal_reason: null,
+          },
+        ],
+        preview_token: 'preview-token',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/resend-email', async (route) => {
+    jobCreated = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        job_id: 'job-1',
+        job_type: 'resend_email',
+        status: 'queued',
+        reason: 'Incident email delivery recovery',
+        created_by: 'admin-1',
+        created_at: '2026-06-04T11:05:00Z',
+        updated_at: '2026-06-04T11:05:00Z',
+        filters: { status: 'email_failed', week_start: '2026-06-01' },
+        target_count: 1,
+        pending_count: 1,
+        attempted_count: 0,
+        success_count: 0,
+        refused_count: 0,
+        not_found_count: 0,
+        failed_count: 0,
+        skipped_cancelled_count: 0,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-1/results', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            target_id: reportOne.report_id,
+            report_id: reportOne.report_id,
+            parent_id: reportOne.parent_id,
+            student_id: reportOne.student_id,
+            student_name: reportOne.student_name,
+            week_start: reportOne.week_start,
+            result: 'pending',
+            status: 'email_failed',
+            email_status: 'failed',
+          },
+        ],
+        count: 1,
+        next_token: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-1/audit', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            event_id: 'job-audit-1',
+            event_at: '2026-06-04T11:05:00Z',
+            action: 'create_resend_job',
+            result: 'queued',
+            actor: 'admin-1',
+            source: 'admin_api',
+          },
+        ],
+        count: 1,
+        next_token: null,
+        scope: 'recovery_job',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-1/cancel', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        job_id: 'job-1',
+        job_type: 'resend_email',
+        status: 'cancellation_requested',
+        reason: 'Incident email delivery recovery',
+        created_by: 'admin-1',
+        created_at: '2026-06-04T11:05:00Z',
+        updated_at: '2026-06-04T11:06:00Z',
+        filters: { status: 'email_failed', week_start: '2026-06-01' },
+        target_count: 1,
+        pending_count: 1,
+        attempted_count: 0,
+        success_count: 0,
+        refused_count: 0,
+        not_found_count: 0,
+        failed_count: 0,
+        skipped_cancelled_count: 0,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        count: jobCreated ? 1 : 0,
+        next_token: null,
+        items: jobCreated
+          ? [
+              {
+                job_id: 'job-1',
+                job_type: 'resend_email',
+                status: 'queued',
+                reason: 'Incident email delivery recovery',
+                created_by: 'admin-1',
+                created_at: '2026-06-04T11:05:00Z',
+                updated_at: '2026-06-04T11:05:00Z',
+                filters: { status: 'email_failed', week_start: '2026-06-01' },
+                target_count: 1,
+                pending_count: 1,
+                attempted_count: 0,
+                success_count: 0,
+                refused_count: 0,
+                not_found_count: 0,
+                failed_count: 0,
+                skipped_cancelled_count: 0,
+              },
+            ]
+          : [],
+      }),
+    })
+  })
 
   await page.getByLabel('Primary', { exact: true }).getByRole('link', { name: /report ops/i }).click()
   await expect(page).toHaveURL(/\/admin\/report-operations/)
@@ -154,6 +333,20 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /resend selected/i }).click()
   await expect(page.getByText('Bulk resend results')).toBeVisible()
   await expect(page.getByText('success').last()).toBeVisible()
+
+  await expect(page.getByText('Report audit')).toBeVisible()
+  await expect(page.getByText('resend email')).toBeVisible()
+
+  await page.getByRole('button', { name: /preview async job/i }).click()
+  await expect(page.getByText('Eligible', { exact: true })).toBeVisible()
+  await expect(page.locator('section').filter({ hasText: 'Async resend recovery job' }).getByText('Student One')).toBeVisible()
+  await page.getByRole('button', { name: /start job/i }).click()
+  await expect(page.getByText(/Recovery job queued: job-1/i)).toBeVisible()
+  await expect(page.getByText('Recovery jobs')).toBeVisible()
+  await expect(page.getByText('Incident email delivery recovery').last()).toBeVisible()
+  await expect(page.getByText('Job audit')).toBeVisible()
+  await page.getByRole('button', { name: /^Cancel$/ }).click()
+  await expect(page.getByText(/Cancellation requested/i)).toBeVisible()
 
   const bodyText = await page.locator('body').innerText()
   expect(bodyText).not.toMatch(/weekly-reports\/|json_s3_key|html_s3_key|presignedUrl|https:\/\/s3/i)

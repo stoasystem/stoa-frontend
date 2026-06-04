@@ -1,5 +1,5 @@
 import { type FormEvent, useMemo, useState } from 'react'
-import { Eye, Mail, RefreshCw, RotateCcw, Search, Send } from 'lucide-react'
+import { ClipboardList, Eye, Mail, RefreshCw, RotateCcw, Search, Send, ShieldCheck, XCircle } from 'lucide-react'
 import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -9,6 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   useBulkResendReportEmailsMutation,
+  useCancelRecoveryJobMutation,
+  useCreateResendRecoveryJobMutation,
+  usePreviewResendRecoveryJobMutation,
+  useRecoveryJobAuditEventsQuery,
+  useRecoveryJobResultsQuery,
+  useRecoveryJobsQuery,
+  useReportAuditEventsQuery,
   useReportOperationDetailQuery,
   useReportOperationsQuery,
   useResendReportEmailMutation,
@@ -17,6 +24,10 @@ import {
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type {
   BulkReportResendItemResult,
+  RecoveryJob,
+  RecoveryJobPreviewResponse,
+  RecoveryJobTarget,
+  ReportAuditEvent,
   ReportOperationRow,
   ReportOperationTarget,
   ReportOperationsListFilters,
@@ -54,6 +65,9 @@ export function AdminReportOperationsPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set())
   const [singleActionResult, setSingleActionResult] = useState<string | null>(null)
   const [bulkResults, setBulkResults] = useState<BulkReportResendItemResult[]>([])
+  const [jobReason, setJobReason] = useState('Incident email delivery recovery')
+  const [jobPreview, setJobPreview] = useState<RecoveryJobPreviewResponse | null>(null)
+  const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -64,9 +78,16 @@ export function AdminReportOperationsPage() {
   )
   const reportsQuery = useReportOperationsQuery(activeFilters)
   const detailQuery = useReportOperationDetailQuery(selectedTarget)
+  const reportAuditQuery = useReportAuditEventsQuery(selectedTarget)
+  const jobsQuery = useRecoveryJobsQuery()
+  const jobResultsQuery = useRecoveryJobResultsQuery(selectedJobId)
+  const jobAuditQuery = useRecoveryJobAuditEventsQuery(selectedJobId)
   const retryMutation = useRetryReportGenerationMutation()
   const resendMutation = useResendReportEmailMutation()
   const bulkResendMutation = useBulkResendReportEmailsMutation()
+  const previewJobMutation = usePreviewResendRecoveryJobMutation()
+  const createJobMutation = useCreateResendRecoveryJobMutation()
+  const cancelJobMutation = useCancelRecoveryJobMutation()
 
   const rows = reportsQuery.data?.items ?? []
   const detail = detailQuery.data ?? rows.find((row) => selectedTarget && targetKey(row) === targetKey(selectedTarget))
@@ -87,6 +108,7 @@ export function AdminReportOperationsPage() {
     setTokenHistory([])
     setSelectedKeys(new Set())
     setBulkResults([])
+    setJobPreview(null)
   }
 
   function resetFilters() {
@@ -97,6 +119,7 @@ export function AdminReportOperationsPage() {
     setTokenHistory([])
     setSelectedKeys(new Set())
     setBulkResults([])
+    setJobPreview(null)
   }
 
   function goNextPage() {
@@ -162,6 +185,52 @@ export function AdminReportOperationsPage() {
       onError: (error) => {
         setSingleActionResult(error.message)
       },
+    })
+  }
+
+  function previewAsyncJob() {
+    previewJobMutation.mutate(
+      {
+        reason: jobReason,
+        filters: {
+          status: 'email_failed',
+          week_start: filters.weekStart ?? null,
+          parent_id: filters.parentId ?? null,
+          student_id: filters.studentId ?? null,
+        },
+        max_targets: 25,
+      },
+      {
+        onSuccess: setJobPreview,
+        onError: (error) => setSingleActionResult(error.message),
+      },
+    )
+  }
+
+  function createAsyncJob() {
+    if (!jobPreview) return
+    createJobMutation.mutate(
+      {
+        reason: jobPreview.reason,
+        filters: jobPreview.filters,
+        preview_token: jobPreview.preview_token,
+        max_targets: jobPreview.max_targets,
+      },
+      {
+        onSuccess: (job) => {
+          setSelectedJobId(job.job_id)
+          setJobPreview(null)
+          setSingleActionResult(`Recovery job queued: ${job.job_id}`)
+        },
+        onError: (error) => setSingleActionResult(error.message),
+      },
+    )
+  }
+
+  function cancelSelectedJob(jobId: string) {
+    cancelJobMutation.mutate(jobId, {
+      onSuccess: (job) => setSingleActionResult(`Cancellation requested: ${job.status}`),
+      onError: (error) => setSingleActionResult(error.message),
     })
   }
 
@@ -237,6 +306,17 @@ export function AdminReportOperationsPage() {
             </div>
           </div>
         </form>
+
+        <RecoveryJobControlPanel
+          reason={jobReason}
+          onReasonChange={setJobReason}
+          preview={jobPreview}
+          filters={filters}
+          isPreviewing={previewJobMutation.isPending}
+          isCreating={createJobMutation.isPending}
+          onPreview={previewAsyncJob}
+          onCreate={createAsyncJob}
+        />
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),360px]">
           <section className="min-w-0 space-y-3">
@@ -367,11 +447,23 @@ export function AdminReportOperationsPage() {
             <ReportDetailPanel
               report={detail}
               isLoading={detailQuery.isLoading}
+              auditEvents={reportAuditQuery.data?.items ?? []}
+              auditLoading={reportAuditQuery.isLoading}
               onRetry={retrySelectedReport}
               onResend={resendSelectedReport}
               retryPending={retryMutation.isPending}
               resendPending={resendMutation.isPending}
               actionResult={singleActionResult}
+            />
+            <RecoveryJobsPanel
+              jobs={jobsQuery.data?.items ?? []}
+              isLoading={jobsQuery.isLoading}
+              selectedJobId={selectedJobId}
+              selectedResults={jobResultsQuery.data?.items ?? []}
+              selectedAuditEvents={jobAuditQuery.data?.items ?? []}
+              onSelect={setSelectedJobId}
+              onCancel={cancelSelectedJob}
+              cancelPending={cancelJobMutation.isPending}
             />
             {bulkResults.length > 0 && <BulkResultPanel results={bulkResults} />}
           </aside>
@@ -391,6 +483,8 @@ export function AdminReportOperationsPage() {
 function ReportDetailPanel({
   report,
   isLoading,
+  auditEvents,
+  auditLoading,
   onRetry,
   onResend,
   retryPending,
@@ -399,6 +493,8 @@ function ReportDetailPanel({
 }: {
   report?: ReportOperationRow
   isLoading: boolean
+  auditEvents: ReportAuditEvent[]
+  auditLoading: boolean
   onRetry: () => void
   onResend: () => void
   retryPending: boolean
@@ -474,8 +570,223 @@ function ReportDetailPanel({
             {actionResult}
           </div>
         )}
+        <AuditTimeline
+          title="Report audit"
+          events={auditEvents}
+          isLoading={auditLoading}
+          emptyText="No report audit events yet."
+        />
       </CardContent>
     </Card>
+  )
+}
+
+function RecoveryJobControlPanel({
+  reason,
+  onReasonChange,
+  preview,
+  filters,
+  isPreviewing,
+  isCreating,
+  onPreview,
+  onCreate,
+}: {
+  reason: string
+  onReasonChange: (value: string) => void
+  preview: RecoveryJobPreviewResponse | null
+  filters: ReportOperationsListFilters
+  isPreviewing: boolean
+  isCreating: boolean
+  onPreview: () => void
+  onCreate: () => void
+}) {
+  return (
+    <section className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),340px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Async resend recovery job</h2>
+            <Badge variant="outline">Metadata only</Badge>
+            <Badge variant="outline">Cooperative cancellation</Badge>
+          </div>
+          <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Operator reason
+            <textarea
+              value={reason}
+              onChange={(event) => onReasonChange(event.target.value)}
+              className="min-h-20 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={onPreview} disabled={isPreviewing || reason.trim().length === 0}>
+              <ClipboardList className="h-4 w-4" />
+              Preview async job
+            </Button>
+            <Button type="button" onClick={onCreate} disabled={!preview || isCreating}>
+              <Send className="h-4 w-4" />
+              Start job
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Scope uses current week, parent, and student filters with status fixed to email_failed.
+            {filters.weekStart ? ` Week ${filters.weekStart}.` : ''}
+          </p>
+        </div>
+        <div className="rounded-md border bg-muted/25 p-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
+          {!preview && <p className="text-sm text-muted-foreground">Run a preview before starting an async resend job.</p>}
+          {preview && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-3 gap-2">
+                <MetricPill label="Eligible" value={preview.eligible_count} />
+                <MetricPill label="Refused" value={preview.refused_count} />
+                <MetricPill label="Pages" value={preview.scanned_pages} />
+              </div>
+              <div className="max-h-32 space-y-2 overflow-y-auto pr-1">
+                {preview.sample.map((target) => (
+                  <div key={target.target_id} className="flex items-center justify-between gap-2 rounded-md border bg-card/70 px-2 py-1.5">
+                    <span className="min-w-0 truncate">{target.student_name || target.student_id}</span>
+                    <StatusBadge status={target.eligibility} />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function RecoveryJobsPanel({
+  jobs,
+  isLoading,
+  selectedJobId,
+  selectedResults,
+  selectedAuditEvents,
+  onSelect,
+  onCancel,
+  cancelPending,
+}: {
+  jobs: RecoveryJob[]
+  isLoading: boolean
+  selectedJobId: string | null
+  selectedResults: RecoveryJobTarget[]
+  selectedAuditEvents: ReportAuditEvent[]
+  onSelect: (jobId: string) => void
+  onCancel: (jobId: string) => void
+  cancelPending: boolean
+}) {
+  const selectedJob = jobs.find((job) => job.job_id === selectedJobId) ?? jobs[0]
+  const canCancel = selectedJob && ['queued', 'running', 'cancellation_requested'].includes(selectedJob.status)
+  return (
+    <Card>
+      <CardHeader className="p-4 pb-3">
+        <CardTitle className="text-base">Recovery jobs</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4 p-4 pt-0">
+        {isLoading && <p className="text-sm text-muted-foreground">Loading recovery jobs.</p>}
+        {!isLoading && jobs.length === 0 && <p className="text-sm text-muted-foreground">No async recovery jobs yet.</p>}
+        <div className="space-y-2">
+          {jobs.slice(0, 5).map((job) => (
+            <button
+              key={job.job_id}
+              type="button"
+              onClick={() => onSelect(job.job_id)}
+              className={`w-full rounded-md border px-3 py-2 text-left text-sm transition hover:bg-muted/40 ${job.job_id === selectedJob?.job_id ? 'border-primary/60 bg-muted/35' : ''}`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate font-medium">{job.reason || job.job_id}</span>
+                <StatusBadge status={job.status} />
+              </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {job.success_count}/{job.target_count} sent · {job.failed_count + job.refused_count + job.not_found_count} issues
+              </p>
+            </button>
+          ))}
+        </div>
+        {selectedJob && (
+          <div className="space-y-3 rounded-md border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="truncate text-sm font-semibold">{selectedJob.job_id}</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={!canCancel || cancelPending}
+                onClick={() => onCancel(selectedJob.job_id)}
+              >
+                <XCircle className="h-4 w-4" />
+                Cancel
+              </Button>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <MetricPill label="Pending" value={selectedJob.pending_count} />
+              <MetricPill label="Attempted" value={selectedJob.attempted_count} />
+              <MetricPill label="Skipped" value={selectedJob.skipped_cancelled_count} />
+            </div>
+            <div className="space-y-2">
+              {selectedResults.slice(0, 4).map((target) => (
+                <div key={target.target_id} className="flex items-start justify-between gap-2 rounded-md border px-2 py-1.5 text-xs">
+                  <span className="min-w-0 truncate">{target.student_name || target.student_id || target.target_id}</span>
+                  <StatusBadge status={target.result} />
+                </div>
+              ))}
+            </div>
+            <AuditTimeline
+              title="Job audit"
+              events={selectedAuditEvents}
+              isLoading={false}
+              emptyText="No job audit events yet."
+            />
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function AuditTimeline({
+  title,
+  events,
+  isLoading,
+  emptyText,
+}: {
+  title: string
+  events: ReportAuditEvent[]
+  isLoading: boolean
+  emptyText: string
+}) {
+  return (
+    <div className="rounded-md border p-3">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+      {isLoading && <p className="text-xs text-muted-foreground">Loading audit timeline.</p>}
+      {!isLoading && events.length === 0 && <p className="text-xs text-muted-foreground">{emptyText}</p>}
+      <div className="space-y-2">
+        {events.slice(0, 5).map((event) => (
+          <div key={event.event_id} className="rounded-md bg-muted/35 px-2 py-1.5 text-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium">{event.action.replace(/_/g, ' ')}</span>
+              <StatusBadge status={event.result} />
+            </div>
+            <p className="mt-1 text-muted-foreground">
+              {event.actor || event.source || 'system'} · {formatDate(event.event_at)}
+            </p>
+            {event.error_message && <p className="mt-1 break-words text-muted-foreground">{event.error_message}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function MetricPill({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-md border bg-card/70 px-2 py-1.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-base font-semibold">{value}</p>
+    </div>
   )
 }
 
