@@ -459,6 +459,7 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/admin/usage', pageName: 'AdminUsagePage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Admin usage summary.' },
   { path: '/admin/feedback', pageName: 'AdminFeedbackPage', role: 'admin', module: 'Admin', status: 'duplicate', priority: 'P2', navPriority: 'hidden', purpose: 'Feedback list, overlaps with support inbox.' },
   { path: '/admin/help-requests', pageName: 'AdminHelpRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Admin teacher-help request monitoring.' },
+  { path: '/admin/report-operations', pageName: 'AdminReportOperationsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Weekly report generation and delivery recovery.' },
   { path: '/admin/users', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'secondary', purpose: 'Future user admin placeholder.' },
   { path: '/admin/support', pageName: 'AdminSupportTicketsPage', role: 'admin', module: 'Support', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Admin support inbox.' },
   { path: '/admin/support/:ticketId', pageName: 'AdminSupportTicketDetailPage', role: 'admin', module: 'Support', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Admin support ticket detail.' },

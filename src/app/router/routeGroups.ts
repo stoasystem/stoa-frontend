@@ -58,6 +58,7 @@ export const routeGroups = {
     '/admin/analytics',
     '/admin/usage',
     '/admin/help-requests',
+    '/admin/report-operations',
     '/admin/support',
     '/admin/support/:ticketId',
     '/admin/users',
