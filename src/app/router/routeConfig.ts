@@ -282,6 +282,16 @@ export const navItems: AppNavItem[] = [
     description: 'Teacher-help operations.',
   },
   {
+    label: 'Report Ops',
+    path: '/admin/report-operations',
+    role: 'admin',
+    priority: 'primary',
+    status: 'core',
+    icon: 'reports',
+    mobile: true,
+    description: 'Weekly report generation and delivery recovery.',
+  },
+  {
     label: 'Support Inbox',
     path: '/admin/support',
     role: 'admin',
