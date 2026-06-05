@@ -4,15 +4,18 @@ import {
   cancelRecoveryJob,
   createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
+  createResumeRecoveryJob,
   getRecoveryEvidenceExport,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
+  getRecoveryJobSupportPackage,
   getRecoveryJobs,
   getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
   previewGenerationRetryRecoveryJob,
   previewResendRecoveryJob,
+  previewResumeRecoveryJob,
   resendReportEmail,
   retryReportGeneration,
   type ReportOperationTarget,
@@ -127,6 +130,25 @@ export function useCreateGenerationRetryRecoveryJobMutation() {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
     },
   })
+}
+
+export function usePreviewResumeRecoveryJobMutation() {
+  return useMutation({ mutationFn: previewResumeRecoveryJob })
+}
+
+export function useCreateResumeRecoveryJobMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createResumeRecoveryJob,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportRecoveryJobs() })
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useRecoveryJobSupportPackageMutation() {
+  return useMutation({ mutationFn: getRecoveryJobSupportPackage })
 }
 
 export function useCancelRecoveryJobMutation() {

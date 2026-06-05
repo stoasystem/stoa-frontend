@@ -95,6 +95,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let jobCreated = false
   let generationJobCreated = false
   let generationPreviewStatus: string | null = null
+  let resumeJobCreated = false
+  let resumePreviewResults: string[] = []
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -361,6 +363,157 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/recovery-jobs/job-3/results', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            target_id: 'target-resume-1',
+            report_id: reportTwo.report_id,
+            parent_id: reportTwo.parent_id,
+            student_id: reportTwo.student_id,
+            student_name: reportTwo.student_name,
+            week_start: reportTwo.week_start,
+            result: 'failed',
+            status: 'generation_failed',
+            email_status: 'not_sent',
+            detail: 'provider failed',
+          },
+        ],
+        count: 1,
+        next_token: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-3/audit', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            event_id: 'job-audit-3',
+            event_at: '2026-06-04T11:12:00Z',
+            action: 'complete_retry_generation_job',
+            result: 'completed_with_failures',
+            actor: 'weekly-report-worker',
+            source: 'weekly_report_lambda',
+          },
+        ],
+        count: 1,
+        next_token: null,
+        scope: 'recovery_job',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-3/resume/preview', async (route) => {
+    const body = route.request().postDataJSON() as { results?: string[] }
+    resumePreviewResults = body.results ?? []
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'resume_recovery_job',
+        source_job_id: 'job-3',
+        job_type: 'retry_generation',
+        reason: 'Resume failed recovery targets',
+        requested_by: 'admin-1',
+        result_filters: ['failed', 'refused', 'not_found', 'skipped_cancelled'],
+        max_targets: 25,
+        scanned_targets: 1,
+        eligible_count: 1,
+        refused_count: 0,
+        missing_count: 0,
+        sample: [
+          {
+            target_id: 'target-resume-1',
+            report_id: reportTwo.report_id,
+            parent_id: reportTwo.parent_id,
+            student_id: reportTwo.student_id,
+            student_name: reportTwo.student_name,
+            week_start: reportTwo.week_start,
+            status: 'generation_failed',
+            email_status: 'not_sent',
+            source_result: 'failed',
+            detail: 'provider failed',
+            artifacts: { html_available: false, json_available: false },
+            eligibility: 'eligible',
+            refusal_reason: null,
+          },
+        ],
+        preview_token: 'resume-preview-token',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-3/resume', async (route) => {
+    resumeJobCreated = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        job_id: 'job-4',
+        job_type: 'retry_generation',
+        status: 'queued',
+        reason: 'Resume failed recovery targets',
+        created_by: 'admin-1',
+        created_at: '2026-06-04T11:15:00Z',
+        updated_at: '2026-06-04T11:15:00Z',
+        filters: { source_job_id: 'job-3', result_filters: ['failed'] },
+        source_job_id: 'job-3',
+        resume_result_filters: ['failed', 'refused', 'not_found', 'skipped_cancelled'],
+        target_count: 1,
+        pending_count: 1,
+        attempted_count: 0,
+        success_count: 0,
+        refused_count: 0,
+        not_found_count: 0,
+        failed_count: 0,
+        skipped_cancelled_count: 0,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-3/support-package**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        exported_at: '2026-06-05T08:10:00Z',
+        request_id: 'req-support-1',
+        scope: 'support_package',
+        complete: true,
+        job: {
+          job_id: 'job-3',
+          job_type: 'retry_generation',
+          status: 'completed_with_failures',
+          reason: 'Incident resumable recovery',
+          target_count: 1,
+          pending_count: 0,
+          attempted_count: 1,
+          success_count: 0,
+          refused_count: 0,
+          not_found_count: 0,
+          failed_count: 1,
+          skipped_cancelled_count: 0,
+        },
+        source_job: null,
+        rollup: { target_count: 1, failed_count: 1 },
+        targets: [{ target_id: 'target-resume-1', result: 'failed', source_target_result: 'failed' }],
+        job_audit: [],
+        report_audit: [],
+        operator_note: null,
+        next_tokens: { targets: null, job_audit: null, report_audit: null },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, redacted_operator_note: false },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-4/results', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], count: 0, next_token: null }) })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-4/audit', async (route) => {
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ items: [], count: 0, next_token: null, scope: 'recovery_job' }) })
+  })
   await page.route('**/admin/reports/recovery-jobs/job-1/cancel', async (route) => {
     await route.fulfill({
       status: 200,
@@ -455,9 +608,27 @@ test('admin can triage report operations and run selected recovery actions', asy
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        count: Number(jobCreated) + Number(generationJobCreated),
+        count: 1 + Number(jobCreated) + Number(generationJobCreated) + Number(resumeJobCreated),
         next_token: null,
         items: [
+          {
+            job_id: 'job-3',
+            job_type: 'retry_generation',
+            status: 'completed_with_failures',
+            reason: 'Incident resumable recovery',
+            created_by: 'admin-1',
+            created_at: '2026-06-04T11:12:00Z',
+            updated_at: '2026-06-04T11:13:00Z',
+            filters: { status: 'generation_failed', week_start: '2026-06-01' },
+            target_count: 1,
+            pending_count: 0,
+            attempted_count: 1,
+            success_count: 0,
+            refused_count: 0,
+            not_found_count: 0,
+            failed_count: 1,
+            skipped_cancelled_count: 0,
+          },
           ...(jobCreated
             ? [
                 {
@@ -491,6 +662,30 @@ test('admin can triage report operations and run selected recovery actions', asy
                   created_at: '2026-06-04T11:10:00Z',
                   updated_at: '2026-06-04T11:10:00Z',
                   filters: { status: 'generation_failed', week_start: '2026-06-01' },
+                  target_count: 1,
+                  pending_count: 1,
+                  attempted_count: 0,
+                  success_count: 0,
+                  refused_count: 0,
+                  not_found_count: 0,
+                  failed_count: 0,
+                  skipped_cancelled_count: 0,
+                },
+              ]
+            : []),
+          ...(resumeJobCreated
+            ? [
+                {
+                  job_id: 'job-4',
+                  job_type: 'retry_generation',
+                  status: 'queued',
+                  reason: 'Resume failed recovery targets',
+                  created_by: 'admin-1',
+                  created_at: '2026-06-04T11:15:00Z',
+                  updated_at: '2026-06-04T11:15:00Z',
+                  filters: { source_job_id: 'job-3', result_filters: ['failed'] },
+                  source_job_id: 'job-3',
+                  resume_result_filters: ['failed', 'refused', 'not_found', 'skipped_cancelled'],
                   target_count: 1,
                   pending_count: 1,
                   attempted_count: 0,
@@ -549,7 +744,7 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /export recent jobs/i }).click()
   await expect(page.getByText('"scope": "recent_recovery_jobs"')).toBeVisible()
 
-  await page.getByRole('button', { name: /retry generation/i }).click()
+  await page.getByRole('button', { name: 'Retry generation', exact: true }).click()
   await expect(page.getByText('status fixed to generation_failed')).toBeVisible()
   await page.getByRole('button', { name: /preview async job/i }).click()
   await expect.poll(() => generationPreviewStatus).toBe('generation_failed')
@@ -557,6 +752,17 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /start job/i }).click()
   await expect(page.getByText(/Recovery job queued: job-2/i)).toBeVisible()
   await expect(page.getByText('Incident generation retry recovery').last()).toBeVisible()
+
+  await page.getByRole('button', { name: /incident resumable recovery/i }).click()
+  await expect(page.getByText('complete retry generation job')).toBeVisible()
+  await page.getByRole('button', { name: /support package/i }).click()
+  await expect(page.getByText('Support package exported: job-3')).toBeVisible()
+  await expect(page.getByText('"scope": "support_package"')).toBeVisible()
+  await page.getByRole('button', { name: /preview resume/i }).click()
+  await expect.poll(() => resumePreviewResults).toEqual(['failed', 'refused', 'not_found', 'skipped_cancelled'])
+  await expect(page.getByText('Resume', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /start resume/i }).click()
+  await expect(page.getByText(/Resume job queued: job-4/i)).toBeVisible()
 
   const bodyText = await page.locator('body').innerText()
   expect(bodyText).toContain('Retry generation')

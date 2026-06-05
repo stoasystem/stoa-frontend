@@ -25,12 +25,15 @@ import {
   useCancelRecoveryJobMutation,
   useCreateGenerationRetryRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
+  useCreateResumeRecoveryJobMutation,
   usePreviewGenerationRetryRecoveryJobMutation,
   usePreviewResendRecoveryJobMutation,
+  usePreviewResumeRecoveryJobMutation,
   useRecoveryEvidenceExportMutation,
   useRecoveryJobAuditEventsQuery,
   useRecoveryJobResultsQuery,
   useRecoveryJobsQuery,
+  useRecoveryJobSupportPackageMutation,
   useReportAuditEventsQuery,
   useReportOperationDetailQuery,
   useReportOperationsQuery,
@@ -43,6 +46,8 @@ import type {
   RecoveryEvidenceExport,
   RecoveryJob,
   RecoveryJobPreviewResponse,
+  RecoveryJobResumePreviewResponse,
+  RecoveryJobSupportPackage,
   RecoveryJobTarget,
   RecoveryJobType,
   ReportAuditEvent,
@@ -104,6 +109,10 @@ export function AdminReportOperationsPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [evidenceExport, setEvidenceExport] = useState<RecoveryEvidenceExport | null>(null)
   const [evidenceMessage, setEvidenceMessage] = useState<string | null>(null)
+  const [resumeReason, setResumeReason] = useState('Resume failed recovery targets')
+  const [resumePreview, setResumePreview] = useState<RecoveryJobResumePreviewResponse | null>(null)
+  const [supportPackage, setSupportPackage] = useState<RecoveryJobSupportPackage | null>(null)
+  const [supportMessage, setSupportMessage] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -125,6 +134,9 @@ export function AdminReportOperationsPage() {
   const previewGenerationRetryJobMutation = usePreviewGenerationRetryRecoveryJobMutation()
   const createResendJobMutation = useCreateResendRecoveryJobMutation()
   const createGenerationRetryJobMutation = useCreateGenerationRetryRecoveryJobMutation()
+  const previewResumeJobMutation = usePreviewResumeRecoveryJobMutation()
+  const createResumeJobMutation = useCreateResumeRecoveryJobMutation()
+  const supportPackageMutation = useRecoveryJobSupportPackageMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
 
@@ -285,6 +297,69 @@ export function AdminReportOperationsPage() {
       onSuccess: (job) => setSingleActionResult(`Cancellation requested: ${job.status}`),
       onError: (error) => setSingleActionResult(error.message),
     })
+  }
+
+  function selectRecoveryJob(jobId: string) {
+    setSelectedJobId(jobId)
+    setResumePreview(null)
+    setSupportPackage(null)
+    setSupportMessage(null)
+  }
+
+  function previewResumeJob(jobId: string) {
+    previewResumeJobMutation.mutate(
+      {
+        jobId,
+        reason: resumeReason,
+        results: ['failed', 'refused', 'not_found', 'skipped_cancelled'],
+        max_targets: 25,
+      },
+      {
+        onSuccess: setResumePreview,
+        onError: (error) => setSingleActionResult(error.message),
+      },
+    )
+  }
+
+  function createResumeJob(jobId: string) {
+    if (!resumePreview) return
+    createResumeJobMutation.mutate(
+      {
+        jobId,
+        reason: resumePreview.reason,
+        results: resumePreview.result_filters,
+        preview_token: resumePreview.preview_token,
+        max_targets: resumePreview.max_targets,
+      },
+      {
+        onSuccess: (job) => {
+          setSelectedJobId(job.job_id)
+          setResumePreview(null)
+          setSingleActionResult(`Resume job queued: ${job.job_id}`)
+        },
+        onError: (error) => setSingleActionResult(error.message),
+      },
+    )
+  }
+
+  function exportSupportPackage(jobId: string) {
+    supportPackageMutation.mutate(
+      {
+        jobId,
+        includeTargets: true,
+        includeJobAudit: true,
+        includeReportAudit: false,
+        targetLimit: 50,
+        auditLimit: 50,
+      },
+      {
+        onSuccess: (result) => {
+          setSupportPackage(result)
+          setSupportMessage(`Support package exported: ${result.job.job_id}`)
+        },
+        onError: (error) => setSupportMessage(error.message),
+      },
+    )
   }
 
   function exportSelectedJobEvidence() {
@@ -582,9 +657,20 @@ export function AdminReportOperationsPage() {
               selectedJobId={selectedJobId}
               selectedResults={jobResultsQuery.data?.items ?? []}
               selectedAuditEvents={jobAuditQuery.data?.items ?? []}
-              onSelect={setSelectedJobId}
+              resumeReason={resumeReason}
+              resumePreview={resumePreview}
+              supportPackage={supportPackage}
+              supportMessage={supportMessage}
+              onSelect={selectRecoveryJob}
               onCancel={cancelSelectedJob}
+              onResumeReasonChange={setResumeReason}
+              onPreviewResume={previewResumeJob}
+              onCreateResume={createResumeJob}
+              onExportSupportPackage={exportSupportPackage}
               cancelPending={cancelJobMutation.isPending}
+              resumePreviewPending={previewResumeJobMutation.isPending}
+              resumeCreatePending={createResumeJobMutation.isPending}
+              supportPackagePending={supportPackageMutation.isPending}
             />
             {bulkResults.length > 0 && <BulkResultPanel results={bulkResults} />}
           </aside>
@@ -895,21 +981,45 @@ function RecoveryJobsPanel({
   selectedJobId,
   selectedResults,
   selectedAuditEvents,
+  resumeReason,
+  resumePreview,
+  supportPackage,
+  supportMessage,
   onSelect,
   onCancel,
+  onResumeReasonChange,
+  onPreviewResume,
+  onCreateResume,
+  onExportSupportPackage,
   cancelPending,
+  resumePreviewPending,
+  resumeCreatePending,
+  supportPackagePending,
 }: {
   jobs: RecoveryJob[]
   isLoading: boolean
   selectedJobId: string | null
   selectedResults: RecoveryJobTarget[]
   selectedAuditEvents: ReportAuditEvent[]
+  resumeReason: string
+  resumePreview: RecoveryJobResumePreviewResponse | null
+  supportPackage: RecoveryJobSupportPackage | null
+  supportMessage: string | null
   onSelect: (jobId: string) => void
   onCancel: (jobId: string) => void
+  onResumeReasonChange: (value: string) => void
+  onPreviewResume: (jobId: string) => void
+  onCreateResume: (jobId: string) => void
+  onExportSupportPackage: (jobId: string) => void
   cancelPending: boolean
+  resumePreviewPending: boolean
+  resumeCreatePending: boolean
+  supportPackagePending: boolean
 }) {
   const selectedJob = jobs.find((job) => job.job_id === selectedJobId) ?? jobs[0]
   const canCancel = selectedJob && ['queued', 'running', 'cancellation_requested'].includes(selectedJob.status)
+  const resumableCount = selectedResults.filter((target) => isResumableTargetResult(target.result)).length
+  const canResume = Boolean(selectedJob && resumableCount > 0 && !['queued', 'running', 'cancellation_requested'].includes(selectedJob.status))
   return (
     <Card>
       <CardHeader className="p-4 pb-3">
@@ -962,6 +1072,60 @@ function RecoveryJobsPanel({
               <MetricPill label="Attempted" value={selectedJob.attempted_count} />
               <MetricPill label="Skipped" value={selectedJob.skipped_cancelled_count} />
             </div>
+            <div className="space-y-2 rounded-md border bg-muted/20 p-2">
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={!canResume || resumePreviewPending || resumeReason.trim().length === 0}
+                  onClick={() => onPreviewResume(selectedJob.job_id)}
+                >
+                  <ClipboardList className="h-4 w-4" />
+                  Preview resume
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  disabled={!resumePreview || resumePreview.source_job_id !== selectedJob.job_id || resumeCreatePending}
+                  onClick={() => onCreateResume(selectedJob.job_id)}
+                >
+                  <Send className="h-4 w-4" />
+                  Start resume
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={supportPackagePending}
+                  onClick={() => onExportSupportPackage(selectedJob.job_id)}
+                >
+                  <FileJson className="h-4 w-4" />
+                  Support package
+                </Button>
+              </div>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Resume reason
+                <textarea
+                  value={resumeReason}
+                  onChange={(event) => onResumeReasonChange(event.target.value)}
+                  className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-2 py-1.5 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+                />
+              </label>
+              {resumePreview && resumePreview.source_job_id === selectedJob.job_id && (
+                <div className="grid grid-cols-3 gap-2">
+                  <MetricPill label="Resume" value={resumePreview.eligible_count} />
+                  <MetricPill label="Scanned" value={resumePreview.scanned_targets} />
+                  <MetricPill label="Issues" value={resumableCount} />
+                </div>
+              )}
+              {supportMessage && <p className="text-xs text-muted-foreground">{supportMessage}</p>}
+              {supportPackage && supportPackage.job.job_id === selectedJob.job_id && (
+                <pre className="max-h-40 overflow-auto rounded-md bg-background p-2 text-[11px] leading-relaxed text-muted-foreground">
+                  {JSON.stringify(supportPackage, null, 2)}
+                </pre>
+              )}
+            </div>
             <div className="space-y-2">
               {selectedResults.slice(0, 4).map((target) => (
                 <div key={target.target_id} className="flex items-start justify-between gap-2 rounded-md border px-2 py-1.5 text-xs">
@@ -986,6 +1150,10 @@ function RecoveryJobsPanel({
 function recoveryJobTypeLabel(jobType?: string | null) {
   if (jobType === 'retry_generation') return 'Retry generation'
   return 'Resend email'
+}
+
+function isResumableTargetResult(result?: string | null) {
+  return result === 'failed' || result === 'refused' || result === 'not_found' || result === 'skipped_cancelled'
 }
 
 function AuditTimeline({

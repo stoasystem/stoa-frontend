@@ -233,6 +233,8 @@ export type RecoveryJob = {
   failed_count: number
   skipped_cancelled_count: number
   stop_reason?: string | null
+  source_job_id?: string | null
+  resume_result_filters?: string[] | null
 }
 
 export type RecoveryJobListResponse = {
@@ -255,6 +257,8 @@ export type RecoveryJobTarget = {
   error_class?: string | null
   attempted_at?: string | null
   completed_at?: string | null
+  source_job_id?: string | null
+  source_target_result?: string | null
 }
 
 export type RecoveryJobTargetsResponse = {
@@ -292,6 +296,52 @@ export type RecoveryEvidenceExport = {
   privacy: {
     metadata_only: boolean
     private_artifact_fields_omitted: boolean
+  }
+}
+
+export type RecoveryJobResumePreviewTarget = RecoveryJobPreviewTarget & {
+  source_result?: string | null
+  detail?: string | null
+  error_class?: string | null
+}
+
+export type RecoveryJobResumePreviewResponse = {
+  operation: string
+  source_job_id: string
+  job_type: RecoveryJobType | string
+  reason: string
+  requested_by: string
+  result_filters: string[]
+  max_targets: number
+  scanned_targets: number
+  eligible_count: number
+  refused_count: number
+  missing_count: number
+  sample: RecoveryJobResumePreviewTarget[]
+  preview_token: string
+}
+
+export type RecoveryJobSupportPackage = {
+  exported_at: string
+  request_id?: string | null
+  scope: 'support_package' | string
+  complete: boolean
+  job: RecoveryJob
+  source_job?: RecoveryJob | null
+  rollup: Record<string, number>
+  targets: RecoveryJobTarget[]
+  job_audit: ReportAuditEvent[]
+  report_audit: ReportAuditEvent[]
+  operator_note?: string | null
+  next_tokens: {
+    targets?: string | null
+    job_audit?: string | null
+    report_audit?: string | null
+  }
+  privacy: {
+    metadata_only: boolean
+    private_artifact_fields_omitted: boolean
+    redacted_operator_note?: boolean
   }
 }
 
@@ -435,6 +485,42 @@ export async function createGenerationRetryRecoveryJob(input: {
   return response.data
 }
 
+export async function previewResumeRecoveryJob(input: {
+  jobId: string
+  reason: string
+  results: string[]
+  max_targets?: number
+}) {
+  const response = await httpClient.post<RecoveryJobResumePreviewResponse>(
+    `/admin/reports/recovery-jobs/${input.jobId}/resume/preview`,
+    {
+      reason: input.reason,
+      results: input.results,
+      max_targets: input.max_targets,
+    },
+  )
+  return response.data
+}
+
+export async function createResumeRecoveryJob(input: {
+  jobId: string
+  reason: string
+  results: string[]
+  preview_token: string
+  max_targets?: number
+}) {
+  const response = await httpClient.post<RecoveryJob>(
+    `/admin/reports/recovery-jobs/${input.jobId}/resume`,
+    {
+      reason: input.reason,
+      results: input.results,
+      preview_token: input.preview_token,
+      max_targets: input.max_targets,
+    },
+  )
+  return response.data
+}
+
 export async function getRecoveryJobs() {
   const response = await httpClient.get<RecoveryJobListResponse>('/admin/reports/recovery-jobs')
   return response.data
@@ -471,6 +557,31 @@ export async function getRecoveryEvidenceExport(params: RecoveryEvidenceExportPa
       audit_limit: params.auditLimit,
     },
   })
+  return response.data
+}
+
+export async function getRecoveryJobSupportPackage(input: {
+  jobId: string
+  includeTargets?: boolean
+  includeJobAudit?: boolean
+  includeReportAudit?: boolean
+  targetLimit?: number
+  auditLimit?: number
+  note?: string | null
+}) {
+  const response = await httpClient.get<RecoveryJobSupportPackage>(
+    `/admin/reports/recovery-jobs/${input.jobId}/support-package`,
+    {
+      params: {
+        include_targets: input.includeTargets,
+        include_job_audit: input.includeJobAudit,
+        include_report_audit: input.includeReportAudit,
+        target_limit: input.targetLimit,
+        audit_limit: input.auditLimit,
+        note: input.note || undefined,
+      },
+    },
+  )
   return response.data
 }
 
