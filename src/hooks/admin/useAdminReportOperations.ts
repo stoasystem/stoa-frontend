@@ -3,6 +3,7 @@ import {
   bulkResendReportEmails,
   cancelRecoveryJob,
   createResendRecoveryJob,
+  getRecoveryEvidenceExport,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
   getRecoveryJobs,
@@ -14,6 +15,7 @@ import {
   retryReportGeneration,
   type ReportOperationTarget,
   type ReportOperationsListFilters,
+  type RecoveryEvidenceExportParams,
 } from '@/services/admin/adminApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 
@@ -66,6 +68,12 @@ export function useRecoveryJobAuditEventsQuery(jobId: string | null) {
     queryFn: () => getRecoveryJobAuditEvents(jobId as string),
     enabled: Boolean(jobId),
     retry: false,
+  })
+}
+
+export function useRecoveryEvidenceExportMutation() {
+  return useMutation({
+    mutationFn: (params: RecoveryEvidenceExportParams) => getRecoveryEvidenceExport(params),
   })
 }
 

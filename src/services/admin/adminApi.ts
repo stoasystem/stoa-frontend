@@ -261,6 +261,38 @@ export type RecoveryJobTargetsResponse = {
   next_token?: string | null
 }
 
+export type RecoveryEvidenceExportParams = {
+  jobId?: string | null
+  status?: string | null
+  limit?: number
+  includeTargets?: boolean
+  includeJobAudit?: boolean
+  targetLimit?: number
+  auditLimit?: number
+}
+
+export type RecoveryEvidenceExport = {
+  exported_at: string
+  request_id?: string | null
+  scope: 'recovery_job' | 'recent_recovery_jobs' | string
+  complete: boolean
+  filters: Record<string, unknown>
+  jobs: RecoveryJob[]
+  targets: RecoveryJobTarget[]
+  job_audit: ReportAuditEvent[]
+  report_audit: ReportAuditEvent[]
+  next_tokens: {
+    jobs?: string | null
+    targets?: string | null
+    job_audit?: string | null
+    report_audit?: string | null
+  }
+  privacy: {
+    metadata_only: boolean
+    private_artifact_fields_omitted: boolean
+  }
+}
+
 export async function getAdminUsageSummary() {
   const response = await httpClient.get<AdminUsageSummary>('/admin/usage-summary')
   return response.data
@@ -397,6 +429,21 @@ export async function getRecoveryJobAuditEvents(jobId: string) {
   const response = await httpClient.get<ReportAuditListResponse>(
     `/admin/reports/recovery-jobs/${jobId}/audit`,
   )
+  return response.data
+}
+
+export async function getRecoveryEvidenceExport(params: RecoveryEvidenceExportParams = {}) {
+  const response = await httpClient.get<RecoveryEvidenceExport>('/admin/reports/recovery-evidence', {
+    params: {
+      job_id: params.jobId || undefined,
+      status: params.status || undefined,
+      limit: params.limit,
+      include_targets: params.includeTargets,
+      include_job_audit: params.includeJobAudit,
+      target_limit: params.targetLimit,
+      audit_limit: params.auditLimit,
+    },
+  })
   return response.data
 }
 

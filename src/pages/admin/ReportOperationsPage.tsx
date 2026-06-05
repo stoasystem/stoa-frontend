@@ -1,5 +1,18 @@
 import { type FormEvent, useMemo, useState } from 'react'
-import { ClipboardList, Eye, Mail, RefreshCw, RotateCcw, Search, Send, ShieldCheck, XCircle } from 'lucide-react'
+import {
+  ClipboardList,
+  Copy,
+  Download,
+  Eye,
+  FileJson,
+  Mail,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  Send,
+  ShieldCheck,
+  XCircle,
+} from 'lucide-react'
 import { AdminUnavailableCard } from '@/components/admin/AdminUnavailableCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -12,6 +25,7 @@ import {
   useCancelRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
   usePreviewResendRecoveryJobMutation,
+  useRecoveryEvidenceExportMutation,
   useRecoveryJobAuditEventsQuery,
   useRecoveryJobResultsQuery,
   useRecoveryJobsQuery,
@@ -24,6 +38,7 @@ import {
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type {
   BulkReportResendItemResult,
+  RecoveryEvidenceExport,
   RecoveryJob,
   RecoveryJobPreviewResponse,
   RecoveryJobTarget,
@@ -68,6 +83,8 @@ export function AdminReportOperationsPage() {
   const [jobReason, setJobReason] = useState('Incident email delivery recovery')
   const [jobPreview, setJobPreview] = useState<RecoveryJobPreviewResponse | null>(null)
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
+  const [evidenceExport, setEvidenceExport] = useState<RecoveryEvidenceExport | null>(null)
+  const [evidenceMessage, setEvidenceMessage] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -88,6 +105,7 @@ export function AdminReportOperationsPage() {
   const previewJobMutation = usePreviewResendRecoveryJobMutation()
   const createJobMutation = useCreateResendRecoveryJobMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
+  const evidenceMutation = useRecoveryEvidenceExportMutation()
 
   const rows = reportsQuery.data?.items ?? []
   const detail = detailQuery.data ?? rows.find((row) => selectedTarget && targetKey(row) === targetKey(selectedTarget))
@@ -234,6 +252,60 @@ export function AdminReportOperationsPage() {
     })
   }
 
+  function exportSelectedJobEvidence() {
+    if (!selectedJobId) return
+    evidenceMutation.mutate(
+      {
+        jobId: selectedJobId,
+        includeTargets: true,
+        includeJobAudit: true,
+        targetLimit: 50,
+        auditLimit: 50,
+      },
+      {
+        onSuccess: (result) => {
+          setEvidenceExport(result)
+          setEvidenceMessage(`Exported ${result.jobs.length} job`)
+        },
+        onError: (error) => setEvidenceMessage(error.message),
+      },
+    )
+  }
+
+  function exportRecentEvidence() {
+    evidenceMutation.mutate(
+      {
+        status: filters.status,
+        limit: 25,
+      },
+      {
+        onSuccess: (result) => {
+          setEvidenceExport(result)
+          setEvidenceMessage(`Exported ${result.jobs.length} jobs`)
+        },
+        onError: (error) => setEvidenceMessage(error.message),
+      },
+    )
+  }
+
+  async function copyEvidenceJson() {
+    if (!evidenceExport) return
+    await navigator.clipboard.writeText(JSON.stringify(evidenceExport, null, 2))
+    setEvidenceMessage('Evidence JSON copied')
+  }
+
+  function downloadEvidenceJson() {
+    if (!evidenceExport) return
+    const blob = new Blob([JSON.stringify(evidenceExport, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `stoa-recovery-evidence-${evidenceExport.scope}-${Date.now()}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setEvidenceMessage('Evidence JSON downloaded')
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="p-0" size="wide">
@@ -316,6 +388,17 @@ export function AdminReportOperationsPage() {
           isCreating={createJobMutation.isPending}
           onPreview={previewAsyncJob}
           onCreate={createAsyncJob}
+        />
+
+        <RecoveryEvidencePanel
+          exportData={evidenceExport}
+          selectedJobId={selectedJobId}
+          isExporting={evidenceMutation.isPending}
+          message={evidenceMessage}
+          onExportSelectedJob={exportSelectedJobEvidence}
+          onExportRecent={exportRecentEvidence}
+          onCopy={copyEvidenceJson}
+          onDownload={downloadEvidenceJson}
         />
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),360px]">
@@ -477,6 +560,91 @@ export function AdminReportOperationsPage() {
         )}
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+function RecoveryEvidencePanel({
+  exportData,
+  selectedJobId,
+  isExporting,
+  message,
+  onExportSelectedJob,
+  onExportRecent,
+  onCopy,
+  onDownload,
+}: {
+  exportData: RecoveryEvidenceExport | null
+  selectedJobId: string | null
+  isExporting: boolean
+  message: string | null
+  onExportSelectedJob: () => void
+  onExportRecent: () => void
+  onCopy: () => void
+  onDownload: () => void
+}) {
+  const jsonPreview = exportData ? JSON.stringify(exportData, null, 2) : ''
+  return (
+    <section className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),420px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <FileJson className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Recovery evidence export</h2>
+            <Badge variant="outline">Read only</Badge>
+            <Badge variant="outline">Metadata only</Badge>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onExportSelectedJob}
+              disabled={!selectedJobId || isExporting}
+            >
+              <FileJson className="h-4 w-4" />
+              Export selected job
+            </Button>
+            <Button type="button" variant="outline" onClick={onExportRecent} disabled={isExporting}>
+              <ClipboardList className="h-4 w-4" />
+              Export recent jobs
+            </Button>
+            <Button type="button" variant="outline" onClick={onCopy} disabled={!exportData}>
+              <Copy className="h-4 w-4" />
+              Copy JSON
+            </Button>
+            <Button type="button" variant="outline" onClick={onDownload} disabled={!exportData}>
+              <Download className="h-4 w-4" />
+              Download JSON
+            </Button>
+          </div>
+          {message && <p className="text-xs text-muted-foreground">{message}</p>}
+          {exportData && (
+            <div className="grid gap-2 sm:grid-cols-4">
+              <MetricPill label="Jobs" value={exportData.jobs.length} />
+              <MetricPill label="Targets" value={exportData.targets.length} />
+              <MetricPill label="Audit" value={exportData.job_audit.length + exportData.report_audit.length} />
+              <MetricPill label="Complete" value={exportData.complete ? 1 : 0} />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 rounded-md border bg-muted/25 p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Evidence JSON</p>
+            {exportData?.request_id && (
+              <span className="max-w-[180px] truncate rounded-md border px-2 py-1 text-[10px] text-muted-foreground">
+                {exportData.request_id}
+              </span>
+            )}
+          </div>
+          {exportData ? (
+            <pre className="max-h-56 overflow-auto rounded-md bg-background/80 p-3 text-xs">
+              {jsonPreview}
+            </pre>
+          ) : (
+            <p className="text-sm text-muted-foreground">No evidence export loaded.</p>
+          )}
+        </div>
+      </div>
+    </section>
   )
 }
 
