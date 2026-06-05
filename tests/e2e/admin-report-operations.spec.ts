@@ -97,6 +97,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let generationPreviewStatus: string | null = null
   let resumeJobCreated = false
   let resumePreviewResults: string[] = []
+  let editDraftCreated = false
+  let editDraftApplied = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -130,6 +132,64 @@ test('admin can triage report operations and run selected recovery actions', asy
         operation: 'resend_email',
         operation_result: 'success',
         updated_at: '2026-06-04T11:00:00Z',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/edit-drafts', async (route) => {
+    const body = route.request().postDataJSON() as { proposed_fields?: Record<string, string> }
+    editDraftCreated = body.proposed_fields?.admin_note === 'Reviewed for parent follow-up'
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        draft_id: 'draft-1',
+        report_id: reportOne.report_id,
+        parent_id: reportOne.parent_id,
+        student_id: reportOne.student_id,
+        week_start: reportOne.week_start,
+        source_updated_at: '2026-06-04T10:00:00Z',
+        created_by: 'admin-1',
+        created_at: '2026-06-05T10:00:00Z',
+        updated_at: '2026-06-05T10:00:00Z',
+        reason: 'Admin metadata correction',
+        proposed_fields: { admin_note: 'Reviewed for parent follow-up' },
+        status: 'draft',
+        applied_by: null,
+        applied_at: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/edit-drafts/draft-1/apply', async (route) => {
+    editDraftApplied = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'edit_report',
+        operation_result: 'success',
+        draft: {
+          draft_id: 'draft-1',
+          report_id: reportOne.report_id,
+          parent_id: reportOne.parent_id,
+          student_id: reportOne.student_id,
+          week_start: reportOne.week_start,
+          source_updated_at: '2026-06-04T10:00:00Z',
+          created_by: 'admin-1',
+          created_at: '2026-06-05T10:00:00Z',
+          updated_at: '2026-06-05T10:01:00Z',
+          reason: 'Admin metadata correction',
+          proposed_fields: { admin_note: 'Reviewed for parent follow-up' },
+          status: 'applied',
+          applied_by: 'admin-1',
+          applied_at: '2026-06-05T10:01:00Z',
+        },
+        report: {
+          status: 'email_failed',
+          email_status: 'failed',
+          admin_note: 'Reviewed for parent follow-up',
+          last_operation: 'edit_report',
+          last_operation_result: 'success',
+        },
       }),
     })
   })
@@ -718,6 +778,14 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByRole('button', { name: /^Resend$/ })).toBeEnabled()
   await page.getByRole('button', { name: /^Resend$/ }).click()
   await expect(page.getByText('Resend success: email_sent')).toBeVisible()
+  await expect(page.getByText('Report edit draft')).toBeVisible()
+  await page.getByLabel('Admin note').fill('Reviewed for parent follow-up')
+  await page.getByRole('button', { name: /create draft/i }).click()
+  await expect.poll(() => editDraftCreated).toBe(true)
+  await expect(page.getByText('Draft created: draft-1')).toBeVisible()
+  await page.getByRole('button', { name: /apply draft/i }).click()
+  await expect.poll(() => editDraftApplied).toBe(true)
+  await expect(page.getByText('Edit success: applied')).toBeVisible()
 
   await page.getByLabel(`Select ${reportOne.report_id}`).check()
   await page.getByRole('button', { name: /resend selected/i }).click()

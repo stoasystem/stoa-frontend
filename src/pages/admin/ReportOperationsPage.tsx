@@ -4,6 +4,7 @@ import {
   Copy,
   Download,
   Eye,
+  FilePenLine,
   FileJson,
   Mail,
   RefreshCw,
@@ -22,7 +23,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   useBulkResendReportEmailsMutation,
+  useApplyReportEditDraftMutation,
   useCancelRecoveryJobMutation,
+  useCreateReportEditDraftMutation,
   useCreateGenerationRetryRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
   useCreateResumeRecoveryJobMutation,
@@ -51,6 +54,7 @@ import type {
   RecoveryJobTarget,
   RecoveryJobType,
   ReportAuditEvent,
+  ReportEditDraft,
   ReportOperationRow,
   ReportOperationTarget,
   ReportOperationsListFilters,
@@ -113,6 +117,14 @@ export function AdminReportOperationsPage() {
   const [resumePreview, setResumePreview] = useState<RecoveryJobResumePreviewResponse | null>(null)
   const [supportPackage, setSupportPackage] = useState<RecoveryJobSupportPackage | null>(null)
   const [supportMessage, setSupportMessage] = useState<string | null>(null)
+  const [editReason, setEditReason] = useState('Admin metadata correction')
+  const [editFields, setEditFields] = useState({
+    admin_note: '',
+    editor_summary: '',
+    status_note: '',
+  })
+  const [activeEditDraft, setActiveEditDraft] = useState<ReportEditDraft | null>(null)
+  const [editMessage, setEditMessage] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -139,6 +151,8 @@ export function AdminReportOperationsPage() {
   const supportPackageMutation = useRecoveryJobSupportPackageMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
+  const createEditDraftMutation = useCreateReportEditDraftMutation()
+  const applyEditDraftMutation = useApplyReportEditDraftMutation()
 
   const rows = reportsQuery.data?.items ?? []
   const detail = detailQuery.data ?? rows.find((row) => selectedTarget && targetKey(row) === targetKey(selectedTarget))
@@ -242,6 +256,56 @@ export function AdminReportOperationsPage() {
         setSingleActionResult(error.message)
       },
     })
+  }
+
+  function updateEditField(field: keyof typeof editFields, value: string) {
+    setEditFields((current) => ({ ...current, [field]: value }))
+    setEditMessage(null)
+  }
+
+  function createEditDraft() {
+    if (!detail) return
+    const proposedFields = Object.fromEntries(
+      Object.entries(editFields)
+        .map(([key, value]) => [key, value.trim()])
+        .filter(([, value]) => value.length > 0),
+    ) as Record<string, string>
+    if (Object.keys(proposedFields).length === 0) {
+      setEditMessage('Add at least one edit field')
+      return
+    }
+    createEditDraftMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        reason: editReason,
+        proposed_fields: proposedFields,
+      },
+      {
+        onSuccess: (draftResult) => {
+          setActiveEditDraft(draftResult)
+          setEditMessage(`Draft created: ${draftResult.draft_id}`)
+        },
+        onError: (error) => setEditMessage(error.message),
+      },
+    )
+  }
+
+  function applyEditDraft() {
+    if (!detail || !activeEditDraft) return
+    applyEditDraftMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        draft_id: activeEditDraft.draft_id,
+      },
+      {
+        onSuccess: (result) => {
+          setActiveEditDraft(result.draft)
+          setEditMessage(`Edit ${result.operation_result}: ${result.draft.status}`)
+          void reportAuditQuery.refetch()
+        },
+        onError: (error) => setEditMessage(error.message),
+      },
+    )
   }
 
   function changeJobType(nextJobType: RecoveryJobType) {
@@ -608,6 +672,8 @@ export function AdminReportOperationsPage() {
                             onClick={() => {
                               setSelectedTarget(targetFromReport(row))
                               setSingleActionResult(null)
+                              setActiveEditDraft(null)
+                              setEditMessage(null)
                             }}
                           >
                             <Eye className="h-4 w-4" />
@@ -647,8 +713,18 @@ export function AdminReportOperationsPage() {
               auditLoading={reportAuditQuery.isLoading}
               onRetry={retrySelectedReport}
               onResend={resendSelectedReport}
+              editReason={editReason}
+              editFields={editFields}
+              editDraft={activeEditDraft}
+              editMessage={editMessage}
+              onEditReasonChange={setEditReason}
+              onEditFieldChange={updateEditField}
+              onCreateEditDraft={createEditDraft}
+              onApplyEditDraft={applyEditDraft}
               retryPending={retryMutation.isPending}
               resendPending={resendMutation.isPending}
+              createEditPending={createEditDraftMutation.isPending}
+              applyEditPending={applyEditDraftMutation.isPending}
               actionResult={singleActionResult}
             />
             <RecoveryJobsPanel
@@ -779,8 +855,18 @@ function ReportDetailPanel({
   auditLoading,
   onRetry,
   onResend,
+  editReason,
+  editFields,
+  editDraft,
+  editMessage,
+  onEditReasonChange,
+  onEditFieldChange,
+  onCreateEditDraft,
+  onApplyEditDraft,
   retryPending,
   resendPending,
+  createEditPending,
+  applyEditPending,
   actionResult,
 }: {
   report?: ReportOperationRow
@@ -789,8 +875,18 @@ function ReportDetailPanel({
   auditLoading: boolean
   onRetry: () => void
   onResend: () => void
+  editReason: string
+  editFields: { admin_note: string; editor_summary: string; status_note: string }
+  editDraft: ReportEditDraft | null
+  editMessage: string | null
+  onEditReasonChange: (value: string) => void
+  onEditFieldChange: (field: 'admin_note' | 'editor_summary' | 'status_note', value: string) => void
+  onCreateEditDraft: () => void
+  onApplyEditDraft: () => void
   retryPending: boolean
   resendPending: boolean
+  createEditPending: boolean
+  applyEditPending: boolean
   actionResult: string | null
 }) {
   if (isLoading) {
@@ -862,6 +958,79 @@ function ReportDetailPanel({
             {actionResult}
           </div>
         )}
+        <div className="space-y-3 rounded-md border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <FilePenLine className="h-4 w-4 text-primary" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Report edit draft</p>
+            <Badge variant="outline">Metadata only</Badge>
+          </div>
+          <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Edit reason
+            <textarea
+              value={editReason}
+              onChange={(event) => onEditReasonChange(event.target.value)}
+              className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </label>
+          <div className="grid gap-2">
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Admin note
+              <textarea
+                value={editFields.admin_note}
+                onChange={(event) => onEditFieldChange('admin_note', event.target.value)}
+                className="min-h-14 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Editor summary
+              <textarea
+                value={editFields.editor_summary}
+                onChange={(event) => onEditFieldChange('editor_summary', event.target.value)}
+                className="min-h-14 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Status note
+              <textarea
+                value={editFields.status_note}
+                onChange={(event) => onEditFieldChange('status_note', event.target.value)}
+                className="min-h-14 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCreateEditDraft}
+              disabled={createEditPending || editReason.trim().length === 0}
+            >
+              <ClipboardList className="h-4 w-4" />
+              Create draft
+            </Button>
+            <Button
+              type="button"
+              onClick={onApplyEditDraft}
+              disabled={!editDraft || editDraft.status !== 'draft' || applyEditPending}
+            >
+              <Send className="h-4 w-4" />
+              Apply draft
+            </Button>
+          </div>
+          {editDraft && (
+            <div className="rounded-md border bg-muted/25 px-3 py-2 text-xs text-muted-foreground">
+              <p className="truncate font-medium text-foreground">{editDraft.draft_id}</p>
+              <p>
+                {editDraft.status} · {Object.keys(editDraft.proposed_fields).join(', ')}
+              </p>
+            </div>
+          )}
+          {editMessage && (
+            <div className="rounded-md border bg-muted/35 px-3 py-2 text-xs text-muted-foreground">
+              {editMessage}
+            </div>
+          )}
+        </div>
         <AuditTimeline
           title="Report audit"
           events={auditEvents}

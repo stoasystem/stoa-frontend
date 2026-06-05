@@ -129,6 +129,39 @@ export type ReportOperationMutationResponse = {
   }
 }
 
+export type ReportEditDraft = {
+  draft_id: string
+  report_id: string
+  parent_id?: string | null
+  student_id?: string | null
+  week_start?: string | null
+  source_updated_at?: string | null
+  created_by?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  reason?: string | null
+  proposed_fields: Record<string, string | null>
+  status: string
+  applied_by?: string | null
+  applied_at?: string | null
+}
+
+export type ReportEditDraftInput = ReportOperationTarget & {
+  reason: string
+  proposed_fields: Record<string, string | null>
+}
+
+export type ReportEditApplyInput = ReportOperationTarget & {
+  draft_id: string
+}
+
+export type ReportEditApplyResponse = {
+  operation: string
+  operation_result: string
+  draft: ReportEditDraft
+  report: Record<string, unknown>
+}
+
 export type BulkReportResendItemResult = ReportOperationTarget & {
   result: 'success' | 'refused' | 'not_found' | 'failed' | string
   report_id?: string | null
@@ -425,6 +458,31 @@ export async function bulkResendReportEmails(reports: ReportOperationTarget[]) {
   const response = await httpClient.post<BulkReportResendResponse>('/admin/reports/bulk-resend', {
     reports,
   })
+  return response.data
+}
+
+export async function createReportEditDraft(input: ReportEditDraftInput) {
+  const response = await httpClient.post<ReportEditDraft>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/edit-drafts`,
+    {
+      reason: input.reason,
+      proposed_fields: input.proposed_fields,
+    },
+  )
+  return response.data
+}
+
+export async function getReportEditDraft(input: ReportEditApplyInput) {
+  const response = await httpClient.get<ReportEditDraft>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/edit-drafts/${input.draft_id}`,
+  )
+  return response.data
+}
+
+export async function applyReportEditDraft(input: ReportEditApplyInput) {
+  const response = await httpClient.post<ReportEditApplyResponse>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/edit-drafts/${input.draft_id}/apply`,
+  )
   return response.data
 }
 

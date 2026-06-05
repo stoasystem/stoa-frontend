@@ -2,6 +2,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   bulkResendReportEmails,
   cancelRecoveryJob,
+  applyReportEditDraft,
+  createReportEditDraft,
   createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
   createResumeRecoveryJob,
@@ -18,6 +20,8 @@ import {
   previewResumeRecoveryJob,
   resendReportEmail,
   retryReportGeneration,
+  type ReportEditApplyInput,
+  type ReportEditDraftInput,
   type ReportOperationTarget,
   type ReportOperationsListFilters,
   type RecoveryEvidenceExportParams,
@@ -165,6 +169,26 @@ export function useBulkResendReportEmailsMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: bulkResendReportEmails,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useCreateReportEditDraftMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportEditDraftInput) => createReportEditDraft(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useApplyReportEditDraftMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportEditApplyInput) => applyReportEditDraft(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
     },
