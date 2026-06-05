@@ -93,6 +93,8 @@ test('admin can triage report operations and run selected recovery actions', asy
 
   const listRequests: string[] = []
   let jobCreated = false
+  let generationJobCreated = false
+  let generationPreviewStatus: string | null = null
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -186,6 +188,41 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/recovery-jobs/retry-generation/preview', async (route) => {
+    const body = route.request().postDataJSON() as { filters?: { status?: string } }
+    generationPreviewStatus = body.filters?.status ?? null
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'retry_generation',
+        reason: 'Incident generation retry recovery',
+        requested_by: 'admin-1',
+        filters: { status: 'generation_failed', week_start: '2026-06-01', parent_id: null, student_id: null },
+        max_targets: 25,
+        scanned_pages: 1,
+        eligible_count: 1,
+        refused_count: 0,
+        missing_count: 0,
+        sample: [
+          {
+            target_id: reportTwo.report_id,
+            report_id: reportTwo.report_id,
+            parent_id: reportTwo.parent_id,
+            student_id: reportTwo.student_id,
+            student_name: reportTwo.student_name,
+            week_start: reportTwo.week_start,
+            status: reportTwo.status,
+            email_status: reportTwo.email_status,
+            artifacts: { html_available: false, json_available: false },
+            eligibility: 'eligible',
+            refusal_reason: null,
+          },
+        ],
+        preview_token: 'generation-preview-token',
+      }),
+    })
+  })
   await page.route('**/admin/reports/recovery-jobs/resend-email', async (route) => {
     jobCreated = true
     await route.fulfill({
@@ -200,6 +237,31 @@ test('admin can triage report operations and run selected recovery actions', asy
         created_at: '2026-06-04T11:05:00Z',
         updated_at: '2026-06-04T11:05:00Z',
         filters: { status: 'email_failed', week_start: '2026-06-01' },
+        target_count: 1,
+        pending_count: 1,
+        attempted_count: 0,
+        success_count: 0,
+        refused_count: 0,
+        not_found_count: 0,
+        failed_count: 0,
+        skipped_cancelled_count: 0,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/retry-generation', async (route) => {
+    generationJobCreated = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        job_id: 'job-2',
+        job_type: 'retry_generation',
+        status: 'queued',
+        reason: 'Incident generation retry recovery',
+        created_by: 'admin-1',
+        created_at: '2026-06-04T11:10:00Z',
+        updated_at: '2026-06-04T11:10:00Z',
+        filters: { status: 'generation_failed', week_start: '2026-06-01' },
         target_count: 1,
         pending_count: 1,
         attempted_count: 0,
@@ -244,6 +306,50 @@ test('admin can triage report operations and run selected recovery actions', asy
             event_id: 'job-audit-1',
             event_at: '2026-06-04T11:05:00Z',
             action: 'create_resend_job',
+            result: 'queued',
+            actor: 'admin-1',
+            source: 'admin_api',
+          },
+        ],
+        count: 1,
+        next_token: null,
+        scope: 'recovery_job',
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-2/results', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            target_id: reportTwo.report_id,
+            report_id: reportTwo.report_id,
+            parent_id: reportTwo.parent_id,
+            student_id: reportTwo.student_id,
+            student_name: reportTwo.student_name,
+            week_start: reportTwo.week_start,
+            result: 'pending',
+            status: 'generation_failed',
+            email_status: 'not_sent',
+          },
+        ],
+        count: 1,
+        next_token: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/recovery-jobs/job-2/audit', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        items: [
+          {
+            event_id: 'job-audit-2',
+            event_at: '2026-06-04T11:10:00Z',
+            action: 'create_retry_generation_job',
             result: 'queued',
             actor: 'admin-1',
             source: 'admin_api',
@@ -349,30 +455,54 @@ test('admin can triage report operations and run selected recovery actions', asy
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        count: jobCreated ? 1 : 0,
+        count: Number(jobCreated) + Number(generationJobCreated),
         next_token: null,
-        items: jobCreated
-          ? [
-              {
-                job_id: 'job-1',
-                job_type: 'resend_email',
-                status: 'queued',
-                reason: 'Incident email delivery recovery',
-                created_by: 'admin-1',
-                created_at: '2026-06-04T11:05:00Z',
-                updated_at: '2026-06-04T11:05:00Z',
-                filters: { status: 'email_failed', week_start: '2026-06-01' },
-                target_count: 1,
-                pending_count: 1,
-                attempted_count: 0,
-                success_count: 0,
-                refused_count: 0,
-                not_found_count: 0,
-                failed_count: 0,
-                skipped_cancelled_count: 0,
-              },
-            ]
-          : [],
+        items: [
+          ...(jobCreated
+            ? [
+                {
+                  job_id: 'job-1',
+                  job_type: 'resend_email',
+                  status: 'queued',
+                  reason: 'Incident email delivery recovery',
+                  created_by: 'admin-1',
+                  created_at: '2026-06-04T11:05:00Z',
+                  updated_at: '2026-06-04T11:05:00Z',
+                  filters: { status: 'email_failed', week_start: '2026-06-01' },
+                  target_count: 1,
+                  pending_count: 1,
+                  attempted_count: 0,
+                  success_count: 0,
+                  refused_count: 0,
+                  not_found_count: 0,
+                  failed_count: 0,
+                  skipped_cancelled_count: 0,
+                },
+              ]
+            : []),
+          ...(generationJobCreated
+            ? [
+                {
+                  job_id: 'job-2',
+                  job_type: 'retry_generation',
+                  status: 'queued',
+                  reason: 'Incident generation retry recovery',
+                  created_by: 'admin-1',
+                  created_at: '2026-06-04T11:10:00Z',
+                  updated_at: '2026-06-04T11:10:00Z',
+                  filters: { status: 'generation_failed', week_start: '2026-06-01' },
+                  target_count: 1,
+                  pending_count: 1,
+                  attempted_count: 0,
+                  success_count: 0,
+                  refused_count: 0,
+                  not_found_count: 0,
+                  failed_count: 0,
+                  skipped_cancelled_count: 0,
+                },
+              ]
+            : []),
+        ],
       }),
     })
   })
@@ -400,11 +530,11 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('success').last()).toBeVisible()
 
   await expect(page.getByText('Report audit')).toBeVisible()
-  await expect(page.getByText('resend email')).toBeVisible()
+  await expect(page.getByText('resend email', { exact: true })).toBeVisible()
 
   await page.getByRole('button', { name: /preview async job/i }).click()
   await expect(page.getByText('Eligible', { exact: true })).toBeVisible()
-  await expect(page.locator('section').filter({ hasText: 'Async resend recovery job' }).getByText('Student One')).toBeVisible()
+  await expect(page.locator('section').filter({ hasText: 'Async recovery job' }).getByText('Student One')).toBeVisible()
   await page.getByRole('button', { name: /start job/i }).click()
   await expect(page.getByText(/Recovery job queued: job-1/i)).toBeVisible()
   await expect(page.getByText('Recovery jobs')).toBeVisible()
@@ -419,6 +549,16 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /export recent jobs/i }).click()
   await expect(page.getByText('"scope": "recent_recovery_jobs"')).toBeVisible()
 
+  await page.getByRole('button', { name: /retry generation/i }).click()
+  await expect(page.getByText('status fixed to generation_failed')).toBeVisible()
+  await page.getByRole('button', { name: /preview async job/i }).click()
+  await expect.poll(() => generationPreviewStatus).toBe('generation_failed')
+  await expect(page.locator('section').filter({ hasText: 'Async recovery job' }).getByText('Student Two')).toBeVisible()
+  await page.getByRole('button', { name: /start job/i }).click()
+  await expect(page.getByText(/Recovery job queued: job-2/i)).toBeVisible()
+  await expect(page.getByText('Incident generation retry recovery').last()).toBeVisible()
+
   const bodyText = await page.locator('body').innerText()
+  expect(bodyText).toContain('Retry generation')
   expect(bodyText).not.toMatch(/weekly-reports\/|json_s3_key|html_s3_key|presignedUrl|https:\/\/s3/i)
 })

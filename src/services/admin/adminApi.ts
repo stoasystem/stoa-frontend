@@ -181,6 +181,8 @@ export type RecoveryJobFilters = {
   student_id?: string | null
 }
 
+export type RecoveryJobType = 'resend_email' | 'retry_generation'
+
 export type RecoveryJobPreviewTarget = {
   target_id: string
   report_id?: string | null
@@ -196,7 +198,7 @@ export type RecoveryJobPreviewTarget = {
 }
 
 export type RecoveryJobPreviewResponse = {
-  operation: string
+  operation: RecoveryJobType | string
   reason: string
   requested_by: string
   filters: RecoveryJobFilters
@@ -211,7 +213,7 @@ export type RecoveryJobPreviewResponse = {
 
 export type RecoveryJob = {
   job_id: string
-  job_type: string
+  job_type: RecoveryJobType | string
   status: string
   reason?: string | null
   created_by?: string | null
@@ -395,6 +397,18 @@ export async function previewResendRecoveryJob(input: {
   return response.data
 }
 
+export async function previewGenerationRetryRecoveryJob(input: {
+  reason: string
+  filters: RecoveryJobFilters
+  max_targets?: number
+}) {
+  const response = await httpClient.post<RecoveryJobPreviewResponse>(
+    '/admin/reports/recovery-jobs/retry-generation/preview',
+    input,
+  )
+  return response.data
+}
+
 export async function createResendRecoveryJob(input: {
   reason: string
   filters: RecoveryJobFilters
@@ -403,6 +417,19 @@ export async function createResendRecoveryJob(input: {
 }) {
   const response = await httpClient.post<RecoveryJob>(
     '/admin/reports/recovery-jobs/resend-email',
+    input,
+  )
+  return response.data
+}
+
+export async function createGenerationRetryRecoveryJob(input: {
+  reason: string
+  filters: RecoveryJobFilters
+  preview_token: string
+  max_targets?: number
+}) {
+  const response = await httpClient.post<RecoveryJob>(
+    '/admin/reports/recovery-jobs/retry-generation',
     input,
   )
   return response.data

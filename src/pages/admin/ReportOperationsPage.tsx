@@ -23,7 +23,9 @@ import { Input } from '@/components/ui/input'
 import {
   useBulkResendReportEmailsMutation,
   useCancelRecoveryJobMutation,
+  useCreateGenerationRetryRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
+  usePreviewGenerationRetryRecoveryJobMutation,
   usePreviewResendRecoveryJobMutation,
   useRecoveryEvidenceExportMutation,
   useRecoveryJobAuditEventsQuery,
@@ -42,6 +44,7 @@ import type {
   RecoveryJob,
   RecoveryJobPreviewResponse,
   RecoveryJobTarget,
+  RecoveryJobType,
   ReportAuditEvent,
   ReportOperationRow,
   ReportOperationTarget,
@@ -63,6 +66,21 @@ const statusOptions = [
   { label: 'Generated', value: 'generated' },
 ]
 
+const jobTypeOptions: { label: string; value: RecoveryJobType; reason: string; status: string }[] = [
+  {
+    label: 'Resend email',
+    value: 'resend_email',
+    reason: 'Incident email delivery recovery',
+    status: 'email_failed',
+  },
+  {
+    label: 'Retry generation',
+    value: 'retry_generation',
+    reason: 'Incident generation retry recovery',
+    status: 'generation_failed',
+  },
+]
+
 export function AdminReportOperationsPage() {
   const [draft, setDraft] = useState<FilterDraft>({
     status: 'email_failed',
@@ -80,6 +98,7 @@ export function AdminReportOperationsPage() {
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set())
   const [singleActionResult, setSingleActionResult] = useState<string | null>(null)
   const [bulkResults, setBulkResults] = useState<BulkReportResendItemResult[]>([])
+  const [jobType, setJobType] = useState<RecoveryJobType>('resend_email')
   const [jobReason, setJobReason] = useState('Incident email delivery recovery')
   const [jobPreview, setJobPreview] = useState<RecoveryJobPreviewResponse | null>(null)
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
@@ -102,8 +121,10 @@ export function AdminReportOperationsPage() {
   const retryMutation = useRetryReportGenerationMutation()
   const resendMutation = useResendReportEmailMutation()
   const bulkResendMutation = useBulkResendReportEmailsMutation()
-  const previewJobMutation = usePreviewResendRecoveryJobMutation()
-  const createJobMutation = useCreateResendRecoveryJobMutation()
+  const previewResendJobMutation = usePreviewResendRecoveryJobMutation()
+  const previewGenerationRetryJobMutation = usePreviewGenerationRetryRecoveryJobMutation()
+  const createResendJobMutation = useCreateResendRecoveryJobMutation()
+  const createGenerationRetryJobMutation = useCreateGenerationRetryRecoveryJobMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
 
@@ -112,6 +133,11 @@ export function AdminReportOperationsPage() {
   const selectedBulkTargets = rows
     .filter((row) => selectedKeys.has(targetKey(row)) && row.actions.resend_email.enabled)
     .map(targetFromReport)
+  const jobTypeOption = jobTypeOptions.find((option) => option.value === jobType) ?? jobTypeOptions[0]
+  const activePreviewJobMutation =
+    jobType === 'retry_generation' ? previewGenerationRetryJobMutation : previewResendJobMutation
+  const activeCreateJobMutation =
+    jobType === 'retry_generation' ? createGenerationRetryJobMutation : createResendJobMutation
 
   function applyFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -206,12 +232,21 @@ export function AdminReportOperationsPage() {
     })
   }
 
+  function changeJobType(nextJobType: RecoveryJobType) {
+    setJobType(nextJobType)
+    setJobPreview(null)
+    const nextOption = jobTypeOptions.find((option) => option.value === nextJobType)
+    if (nextOption) {
+      setJobReason(nextOption.reason)
+    }
+  }
+
   function previewAsyncJob() {
-    previewJobMutation.mutate(
+    activePreviewJobMutation.mutate(
       {
         reason: jobReason,
         filters: {
-          status: 'email_failed',
+          status: jobTypeOption.status,
           week_start: filters.weekStart ?? null,
           parent_id: filters.parentId ?? null,
           student_id: filters.studentId ?? null,
@@ -227,7 +262,7 @@ export function AdminReportOperationsPage() {
 
   function createAsyncJob() {
     if (!jobPreview) return
-    createJobMutation.mutate(
+    activeCreateJobMutation.mutate(
       {
         reason: jobPreview.reason,
         filters: jobPreview.filters,
@@ -380,12 +415,15 @@ export function AdminReportOperationsPage() {
         </form>
 
         <RecoveryJobControlPanel
+          jobType={jobType}
+          jobStatus={jobTypeOption.status}
           reason={jobReason}
+          onJobTypeChange={changeJobType}
           onReasonChange={setJobReason}
           preview={jobPreview}
           filters={filters}
-          isPreviewing={previewJobMutation.isPending}
-          isCreating={createJobMutation.isPending}
+          isPreviewing={activePreviewJobMutation.isPending}
+          isCreating={activeCreateJobMutation.isPending}
           onPreview={previewAsyncJob}
           onCreate={createAsyncJob}
         />
@@ -750,7 +788,10 @@ function ReportDetailPanel({
 }
 
 function RecoveryJobControlPanel({
+  jobType,
+  jobStatus,
   reason,
+  onJobTypeChange,
   onReasonChange,
   preview,
   filters,
@@ -759,7 +800,10 @@ function RecoveryJobControlPanel({
   onPreview,
   onCreate,
 }: {
+  jobType: RecoveryJobType
+  jobStatus: string
   reason: string
+  onJobTypeChange: (value: RecoveryJobType) => void
   onReasonChange: (value: string) => void
   preview: RecoveryJobPreviewResponse | null
   filters: ReportOperationsListFilters
@@ -774,9 +818,27 @@ function RecoveryJobControlPanel({
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-semibold">Async resend recovery job</h2>
+            <h2 className="text-sm font-semibold">Async recovery job</h2>
             <Badge variant="outline">Metadata only</Badge>
             <Badge variant="outline">Cooperative cancellation</Badge>
+          </div>
+          <div className="inline-flex rounded-md border bg-muted/25 p-1">
+            {jobTypeOptions.map((option) => (
+              <Button
+                key={option.value}
+                type="button"
+                variant={jobType === option.value ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onJobTypeChange(option.value)}
+              >
+                {option.value === 'retry_generation' ? (
+                  <RotateCcw className="h-4 w-4" />
+                ) : (
+                  <Mail className="h-4 w-4" />
+                )}
+                {option.label}
+              </Button>
+            ))}
           </div>
           <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
             Operator reason
@@ -797,13 +859,13 @@ function RecoveryJobControlPanel({
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">
-            Scope uses current week, parent, and student filters with status fixed to email_failed.
+            Scope uses current week, parent, and student filters with status fixed to {jobStatus}.
             {filters.weekStart ? ` Week ${filters.weekStart}.` : ''}
           </p>
         </div>
         <div className="rounded-md border bg-muted/25 p-3">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Preview</p>
-          {!preview && <p className="text-sm text-muted-foreground">Run a preview before starting an async resend job.</p>}
+          {!preview && <p className="text-sm text-muted-foreground">Run a preview before starting an async job.</p>}
           {preview && (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-3 gap-2">
@@ -857,22 +919,28 @@ function RecoveryJobsPanel({
         {isLoading && <p className="text-sm text-muted-foreground">Loading recovery jobs.</p>}
         {!isLoading && jobs.length === 0 && <p className="text-sm text-muted-foreground">No async recovery jobs yet.</p>}
         <div className="space-y-2">
-          {jobs.slice(0, 5).map((job) => (
-            <button
-              key={job.job_id}
-              type="button"
-              onClick={() => onSelect(job.job_id)}
-              className={`w-full rounded-md border px-3 py-2 text-left text-sm transition hover:bg-muted/40 ${job.job_id === selectedJob?.job_id ? 'border-primary/60 bg-muted/35' : ''}`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-medium">{job.reason || job.job_id}</span>
-                <StatusBadge status={job.status} />
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {job.success_count}/{job.target_count} sent · {job.failed_count + job.refused_count + job.not_found_count} issues
-              </p>
-            </button>
-          ))}
+          {jobs.slice(0, 5).map((job) => {
+            const issueCount = job.failed_count + job.refused_count + job.not_found_count
+            return (
+              <button
+                key={job.job_id}
+                type="button"
+                onClick={() => onSelect(job.job_id)}
+                className={`w-full rounded-md border px-3 py-2 text-left text-sm transition hover:bg-muted/40 ${job.job_id === selectedJob?.job_id ? 'border-primary/60 bg-muted/35' : ''}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate font-medium">{job.reason || job.job_id}</span>
+                  <StatusBadge status={job.status} />
+                </div>
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                  <span>{recoveryJobTypeLabel(job.job_type)}</span>
+                  <span>
+                    {job.success_count}/{job.target_count} succeeded · {issueCount} issues
+                  </span>
+                </p>
+              </button>
+            )
+          })}
         </div>
         {selectedJob && (
           <div className="space-y-3 rounded-md border p-3">
@@ -913,6 +981,11 @@ function RecoveryJobsPanel({
       </CardContent>
     </Card>
   )
+}
+
+function recoveryJobTypeLabel(jobType?: string | null) {
+  if (jobType === 'retry_generation') return 'Retry generation'
+  return 'Resend email'
 }
 
 function AuditTimeline({

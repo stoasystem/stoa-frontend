@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   bulkResendReportEmails,
   cancelRecoveryJob,
+  createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
   getRecoveryEvidenceExport,
   getRecoveryJobAuditEvents,
@@ -10,6 +11,7 @@ import {
   getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
+  previewGenerationRetryRecoveryJob,
   previewResendRecoveryJob,
   resendReportEmail,
   retryReportGeneration,
@@ -101,10 +103,25 @@ export function usePreviewResendRecoveryJobMutation() {
   return useMutation({ mutationFn: previewResendRecoveryJob })
 }
 
+export function usePreviewGenerationRetryRecoveryJobMutation() {
+  return useMutation({ mutationFn: previewGenerationRetryRecoveryJob })
+}
+
 export function useCreateResendRecoveryJobMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: createResendRecoveryJob,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportRecoveryJobs() })
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useCreateGenerationRetryRecoveryJobMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: createGenerationRetryRecoveryJob,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportRecoveryJobs() })
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
