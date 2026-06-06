@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   bulkResendReportEmails,
   cancelRecoveryJob,
+  applyReportArtifactEditPreview,
   applyReportEditDraft,
+  createReportArtifactEditPreview,
   createReportEditDraft,
   createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
@@ -20,6 +22,8 @@ import {
   previewResumeRecoveryJob,
   resendReportEmail,
   retryReportGeneration,
+  type ReportArtifactEditApplyInput,
+  type ReportArtifactEditPreviewInput,
   type ReportEditApplyInput,
   type ReportEditDraftInput,
   type ReportOperationTarget,
@@ -189,6 +193,26 @@ export function useApplyReportEditDraftMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: ReportEditApplyInput) => applyReportEditDraft(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useCreateReportArtifactEditPreviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportArtifactEditPreviewInput) => createReportArtifactEditPreview(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useApplyReportArtifactEditPreviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportArtifactEditApplyInput) => applyReportArtifactEditPreview(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
     },

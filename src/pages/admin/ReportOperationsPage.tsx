@@ -23,8 +23,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   useBulkResendReportEmailsMutation,
+  useApplyReportArtifactEditPreviewMutation,
   useApplyReportEditDraftMutation,
   useCancelRecoveryJobMutation,
+  useCreateReportArtifactEditPreviewMutation,
   useCreateReportEditDraftMutation,
   useCreateGenerationRetryRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
@@ -53,6 +55,7 @@ import type {
   RecoveryJobSupportPackage,
   RecoveryJobTarget,
   RecoveryJobType,
+  ReportArtifactEditPreview,
   ReportAuditEvent,
   ReportEditDraft,
   ReportOperationRow,
@@ -125,6 +128,13 @@ export function AdminReportOperationsPage() {
   })
   const [activeEditDraft, setActiveEditDraft] = useState<ReportEditDraft | null>(null)
   const [editMessage, setEditMessage] = useState<string | null>(null)
+  const [artifactEditReason, setArtifactEditReason] = useState('Parent-safe artifact wording correction')
+  const [artifactEditFields, setArtifactEditFields] = useState({
+    summary: '',
+    recommendations: '',
+  })
+  const [activeArtifactPreview, setActiveArtifactPreview] = useState<ReportArtifactEditPreview | null>(null)
+  const [artifactEditMessage, setArtifactEditMessage] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -153,6 +163,8 @@ export function AdminReportOperationsPage() {
   const evidenceMutation = useRecoveryEvidenceExportMutation()
   const createEditDraftMutation = useCreateReportEditDraftMutation()
   const applyEditDraftMutation = useApplyReportEditDraftMutation()
+  const createArtifactPreviewMutation = useCreateReportArtifactEditPreviewMutation()
+  const applyArtifactPreviewMutation = useApplyReportArtifactEditPreviewMutation()
 
   const rows = reportsQuery.data?.items ?? []
   const detail = detailQuery.data ?? rows.find((row) => selectedTarget && targetKey(row) === targetKey(selectedTarget))
@@ -263,6 +275,11 @@ export function AdminReportOperationsPage() {
     setEditMessage(null)
   }
 
+  function updateArtifactEditField(field: keyof typeof artifactEditFields, value: string) {
+    setArtifactEditFields((current) => ({ ...current, [field]: value }))
+    setArtifactEditMessage(null)
+  }
+
   function createEditDraft() {
     if (!detail) return
     const proposedFields = Object.fromEntries(
@@ -304,6 +321,55 @@ export function AdminReportOperationsPage() {
           void reportAuditQuery.refetch()
         },
         onError: (error) => setEditMessage(error.message),
+      },
+    )
+  }
+
+  function createArtifactEditPreview() {
+    if (!detail) return
+    const proposedFields: Record<string, unknown> = {}
+    const summary = artifactEditFields.summary.trim()
+    const recommendations = artifactEditFields.recommendations
+      .split('\n')
+      .map((item) => item.trim())
+      .filter(Boolean)
+    if (summary.length > 0) proposedFields.summary = summary
+    if (recommendations.length > 0) proposedFields.recommendations = recommendations
+    if (Object.keys(proposedFields).length === 0) {
+      setArtifactEditMessage('Add a summary or recommendation change')
+      return
+    }
+    createArtifactPreviewMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        reason: artifactEditReason,
+        proposed_fields: proposedFields,
+      },
+      {
+        onSuccess: (preview) => {
+          setActiveArtifactPreview(preview)
+          setArtifactEditMessage(`Artifact preview created: ${preview.draft_id}`)
+        },
+        onError: (error) => setArtifactEditMessage(error.message),
+      },
+    )
+  }
+
+  function applyArtifactEditPreview() {
+    if (!detail || !activeArtifactPreview) return
+    applyArtifactPreviewMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        draft_id: activeArtifactPreview.draft_id,
+        reason: artifactEditReason,
+      },
+      {
+        onSuccess: (result) => {
+          setActiveArtifactPreview(result.draft)
+          setArtifactEditMessage(`Artifact edit ${result.operation_result}: ${result.draft.status}`)
+          void reportAuditQuery.refetch()
+        },
+        onError: (error) => setArtifactEditMessage(error.message),
       },
     )
   }
@@ -717,14 +783,24 @@ export function AdminReportOperationsPage() {
               editFields={editFields}
               editDraft={activeEditDraft}
               editMessage={editMessage}
+              artifactEditReason={artifactEditReason}
+              artifactEditFields={artifactEditFields}
+              artifactPreview={activeArtifactPreview}
+              artifactEditMessage={artifactEditMessage}
               onEditReasonChange={setEditReason}
               onEditFieldChange={updateEditField}
+              onArtifactEditReasonChange={setArtifactEditReason}
+              onArtifactEditFieldChange={updateArtifactEditField}
               onCreateEditDraft={createEditDraft}
               onApplyEditDraft={applyEditDraft}
+              onCreateArtifactPreview={createArtifactEditPreview}
+              onApplyArtifactPreview={applyArtifactEditPreview}
               retryPending={retryMutation.isPending}
               resendPending={resendMutation.isPending}
               createEditPending={createEditDraftMutation.isPending}
               applyEditPending={applyEditDraftMutation.isPending}
+              createArtifactPreviewPending={createArtifactPreviewMutation.isPending}
+              applyArtifactPreviewPending={applyArtifactPreviewMutation.isPending}
               actionResult={singleActionResult}
             />
             <RecoveryJobsPanel
@@ -859,14 +935,24 @@ function ReportDetailPanel({
   editFields,
   editDraft,
   editMessage,
+  artifactEditReason,
+  artifactEditFields,
+  artifactPreview,
+  artifactEditMessage,
   onEditReasonChange,
   onEditFieldChange,
+  onArtifactEditReasonChange,
+  onArtifactEditFieldChange,
   onCreateEditDraft,
   onApplyEditDraft,
+  onCreateArtifactPreview,
+  onApplyArtifactPreview,
   retryPending,
   resendPending,
   createEditPending,
   applyEditPending,
+  createArtifactPreviewPending,
+  applyArtifactPreviewPending,
   actionResult,
 }: {
   report?: ReportOperationRow
@@ -879,14 +965,24 @@ function ReportDetailPanel({
   editFields: { admin_note: string; editor_summary: string; status_note: string }
   editDraft: ReportEditDraft | null
   editMessage: string | null
+  artifactEditReason: string
+  artifactEditFields: { summary: string; recommendations: string }
+  artifactPreview: ReportArtifactEditPreview | null
+  artifactEditMessage: string | null
   onEditReasonChange: (value: string) => void
   onEditFieldChange: (field: 'admin_note' | 'editor_summary' | 'status_note', value: string) => void
+  onArtifactEditReasonChange: (value: string) => void
+  onArtifactEditFieldChange: (field: 'summary' | 'recommendations', value: string) => void
   onCreateEditDraft: () => void
   onApplyEditDraft: () => void
+  onCreateArtifactPreview: () => void
+  onApplyArtifactPreview: () => void
   retryPending: boolean
   resendPending: boolean
   createEditPending: boolean
   applyEditPending: boolean
+  createArtifactPreviewPending: boolean
+  applyArtifactPreviewPending: boolean
   actionResult: string | null
 }) {
   if (isLoading) {
@@ -958,6 +1054,77 @@ function ReportDetailPanel({
             {actionResult}
           </div>
         )}
+        <div className="space-y-3 rounded-md border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <FileJson className="h-4 w-4 text-primary" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Artifact edit preview</p>
+            <Badge variant="outline">Versioned apply</Badge>
+          </div>
+          <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Artifact edit reason
+            <textarea
+              value={artifactEditReason}
+              onChange={(event) => onArtifactEditReasonChange(event.target.value)}
+              className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </label>
+          <div className="grid gap-2">
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Artifact summary
+              <textarea
+                value={artifactEditFields.summary}
+                onChange={(event) => onArtifactEditFieldChange('summary', event.target.value)}
+                className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Artifact recommendations
+              <textarea
+                value={artifactEditFields.recommendations}
+                onChange={(event) => onArtifactEditFieldChange('recommendations', event.target.value)}
+                className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCreateArtifactPreview}
+              disabled={createArtifactPreviewPending || artifactEditReason.trim().length === 0 || report.actions.edit_artifact?.enabled === false}
+              title={report.actions.edit_artifact?.reason ?? undefined}
+            >
+              <Eye className="h-4 w-4" />
+              Preview artifact edit
+            </Button>
+            <Button
+              type="button"
+              onClick={onApplyArtifactPreview}
+              disabled={!artifactPreview || artifactPreview.status !== 'draft' || applyArtifactPreviewPending}
+            >
+              <Send className="h-4 w-4" />
+              Apply artifact edit
+            </Button>
+          </div>
+          {artifactPreview && (
+            <div className="space-y-2 rounded-md border bg-muted/25 px-3 py-2 text-xs text-muted-foreground">
+              <p className="truncate font-medium text-foreground">{artifactPreview.draft_id}</p>
+              <div className="grid gap-1">
+                {artifactPreview.diff.map((item) => (
+                  <div key={item.field} className="rounded-md bg-background/70 px-2 py-1">
+                    <span className="font-medium text-foreground">{item.field}</span>
+                    <span> {item.changed ? 'changed' : 'unchanged'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {artifactEditMessage && (
+            <div className="rounded-md border bg-muted/35 px-3 py-2 text-xs text-muted-foreground">
+              {artifactEditMessage}
+            </div>
+          )}
+        </div>
         <div className="space-y-3 rounded-md border p-3">
           <div className="flex flex-wrap items-center gap-2">
             <FilePenLine className="h-4 w-4 text-primary" />

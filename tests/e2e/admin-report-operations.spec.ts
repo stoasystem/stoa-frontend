@@ -99,6 +99,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let resumePreviewResults: string[] = []
   let editDraftCreated = false
   let editDraftApplied = false
+  let artifactPreviewCreated = false
+  let artifactEditApplied = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -188,6 +190,71 @@ test('admin can triage report operations and run selected recovery actions', asy
           email_status: 'failed',
           admin_note: 'Reviewed for parent follow-up',
           last_operation: 'edit_report',
+          last_operation_result: 'success',
+        },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/artifact-edit-previews', async (route) => {
+    const body = route.request().postDataJSON() as { proposed_fields?: Record<string, unknown> }
+    artifactPreviewCreated = body.proposed_fields?.summary === 'Updated parent-facing summary'
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        draft_id: 'artifact-draft-1',
+        report_id: reportOne.report_id,
+        parent_id: reportOne.parent_id,
+        student_id: reportOne.student_id,
+        week_start: reportOne.week_start,
+        source_updated_at: '2026-06-04T10:00:00Z',
+        source_artifact_version_id: null,
+        created_by: 'admin-1',
+        created_at: '2026-06-05T10:02:00Z',
+        updated_at: '2026-06-05T10:02:00Z',
+        reason: 'Parent-safe artifact wording correction',
+        proposed_fields: { summary: 'Updated parent-facing summary' },
+        diff: [{ field: 'summary', before: 'Original summary', after: 'Updated parent-facing summary', changed: true }],
+        status: 'draft',
+        applied_by: null,
+        applied_at: null,
+        artifact_version_id: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/artifact-edit-previews/artifact-draft-1/apply', async (route) => {
+    artifactEditApplied = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'edit_report_artifact',
+        operation_result: 'success',
+        draft: {
+          draft_id: 'artifact-draft-1',
+          report_id: reportOne.report_id,
+          parent_id: reportOne.parent_id,
+          student_id: reportOne.student_id,
+          week_start: reportOne.week_start,
+          source_updated_at: '2026-06-04T10:00:00Z',
+          source_artifact_version_id: null,
+          created_by: 'admin-1',
+          created_at: '2026-06-05T10:02:00Z',
+          updated_at: '2026-06-05T10:03:00Z',
+          reason: 'Parent-safe artifact wording correction',
+          proposed_fields: { summary: 'Updated parent-facing summary' },
+          diff: [{ field: 'summary', before: 'Original summary', after: 'Updated parent-facing summary', changed: true }],
+          status: 'applied',
+          applied_by: 'admin-1',
+          applied_at: '2026-06-05T10:03:00Z',
+          artifact_version_id: 'v20260605T100300Z-safe',
+        },
+        report: {
+          report_id: reportOne.report_id,
+          status: 'email_failed',
+          artifact_version_id: 'v20260605T100300Z-safe',
+          previous_artifact_version_id: null,
+          last_operation: 'edit_report_artifact',
           last_operation_result: 'success',
         },
       }),
@@ -786,6 +853,15 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /apply draft/i }).click()
   await expect.poll(() => editDraftApplied).toBe(true)
   await expect(page.getByText('Edit success: applied')).toBeVisible()
+  await expect(page.getByText('Artifact edit preview')).toBeVisible()
+  await page.getByLabel('Artifact summary').fill('Updated parent-facing summary')
+  await page.getByRole('button', { name: /preview artifact edit/i }).click()
+  await expect.poll(() => artifactPreviewCreated).toBe(true)
+  await expect(page.getByText('Artifact preview created: artifact-draft-1')).toBeVisible()
+  await expect(page.getByText('summary').first()).toBeVisible()
+  await page.getByRole('button', { name: /apply artifact edit/i }).click()
+  await expect.poll(() => artifactEditApplied).toBe(true)
+  await expect(page.getByText('Artifact edit success: applied')).toBeVisible()
 
   await page.getByLabel(`Select ${reportOne.report_id}`).check()
   await page.getByRole('button', { name: /resend selected/i }).click()

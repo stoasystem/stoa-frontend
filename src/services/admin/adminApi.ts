@@ -91,6 +91,7 @@ export type ReportOperationRow = {
   actions: {
     resend_email: ReportOperationActionState
     retry_generation: ReportOperationActionState
+    edit_artifact?: ReportOperationActionState
   }
 }
 
@@ -159,6 +160,50 @@ export type ReportEditApplyResponse = {
   operation: string
   operation_result: string
   draft: ReportEditDraft
+  report: Record<string, unknown>
+}
+
+export type ReportArtifactEditDiffItem = {
+  field: string
+  before?: unknown
+  after?: unknown
+  changed: boolean
+}
+
+export type ReportArtifactEditPreview = {
+  draft_id: string
+  report_id: string
+  parent_id?: string | null
+  student_id?: string | null
+  week_start?: string | null
+  source_updated_at?: string | null
+  source_artifact_version_id?: string | null
+  created_by?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  reason?: string | null
+  proposed_fields: Record<string, unknown>
+  diff: ReportArtifactEditDiffItem[]
+  status: string
+  applied_by?: string | null
+  applied_at?: string | null
+  artifact_version_id?: string | null
+}
+
+export type ReportArtifactEditPreviewInput = ReportOperationTarget & {
+  reason: string
+  proposed_fields: Record<string, unknown>
+}
+
+export type ReportArtifactEditApplyInput = ReportOperationTarget & {
+  draft_id: string
+  reason: string
+}
+
+export type ReportArtifactEditApplyResponse = {
+  operation: string
+  operation_result: string
+  draft: ReportArtifactEditPreview
   report: Record<string, unknown>
 }
 
@@ -482,6 +527,25 @@ export async function getReportEditDraft(input: ReportEditApplyInput) {
 export async function applyReportEditDraft(input: ReportEditApplyInput) {
   const response = await httpClient.post<ReportEditApplyResponse>(
     `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/edit-drafts/${input.draft_id}/apply`,
+  )
+  return response.data
+}
+
+export async function createReportArtifactEditPreview(input: ReportArtifactEditPreviewInput) {
+  const response = await httpClient.post<ReportArtifactEditPreview>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/artifact-edit-previews`,
+    {
+      reason: input.reason,
+      proposed_fields: input.proposed_fields,
+    },
+  )
+  return response.data
+}
+
+export async function applyReportArtifactEditPreview(input: ReportArtifactEditApplyInput) {
+  const response = await httpClient.post<ReportArtifactEditApplyResponse>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/artifact-edit-previews/${input.draft_id}/apply`,
+    { reason: input.reason },
   )
   return response.data
 }
