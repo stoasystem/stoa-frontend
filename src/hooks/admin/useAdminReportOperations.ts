@@ -15,10 +15,12 @@ import {
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
   getRecoveryJobSupportPackage,
+  getReleaseFixtureStatus,
   getRecoveryJobs,
   getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
+  validateReleaseEvidence,
   previewGenerationRetryRecoveryJob,
   previewResendRecoveryJob,
   previewResumeRecoveryJob,
@@ -92,6 +94,14 @@ export function useRecoveryEvidenceExportMutation() {
   return useMutation({
     mutationFn: (params: RecoveryEvidenceExportParams) => getRecoveryEvidenceExport(params),
   })
+}
+
+export function useReleaseEvidenceValidationMutation() {
+  return useMutation({ mutationFn: validateReleaseEvidence })
+}
+
+export function useReleaseFixtureStatusMutation() {
+  return useMutation({ mutationFn: getReleaseFixtureStatus })
 }
 
 export function useRetryReportGenerationMutation() {

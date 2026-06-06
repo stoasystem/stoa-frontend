@@ -107,6 +107,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let artifactEditApplied = false
   let rollbackPreviewCreated = false
   let rollbackApplied = false
+  let releaseEvidenceValidated = false
+  let fixtureStatusRequested = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -801,6 +803,76 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/release-evidence/validate', async (route) => {
+    releaseEvidenceValidated = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        validated_at: '2026-06-06T21:00:00Z',
+        status: 'passed',
+        missing_required_fields: [],
+        schema_errors: [],
+        status_errors: [],
+        fixture_errors: [],
+        privacy: { passed: true, violation_count: 0, violations: [], denylist: ['weekly-reports/'] },
+        bundle: {
+          schema_version: 'v1',
+          milestone: 'v2.3',
+          phase: 65,
+          generated_at: '2026-06-06T21:00:00Z',
+          environment: 'production',
+          backend: { status: 'passed', commit_sha: 'abc123', deploy_run_id: 'backend-run-1' },
+          frontend: { status: 'passed', commit_sha: 'def456', deploy_run_id: 'frontend-run-1' },
+          infra: { status: 'passed', cdk_diff: 'lambda code asset drift only' },
+          api_checks: [{ status: 'passed', request_id: 'req-release-1' }],
+          browser_smoke: { status: 'passed', route: '/admin/report-operations' },
+          privacy: { status: 'passed', violation_count: 0 },
+          quality_gates: [{ status: 'passed', command: 'npm run build' }],
+        },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/release-evidence/fixture-status**', async (route) => {
+    fixtureStatusRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        generated_at: '2026-06-06T21:00:00Z',
+        fixture_name: 'stoa-safe-fixture-v2-2-rollback-2026-06-06',
+        approved: true,
+        status: 'ready',
+        identity: {
+          parent_id: 'safe-fixture-parent-v2-2',
+          student_id: 'safe-fixture-student-v2-2',
+          week_start: '2026-06-01',
+        },
+        artifact_versions: {
+          current: 'original',
+          expected_baseline: 'original',
+          previous: 'v20260606T184730Z-cb0b33d1',
+          created_at: '2026-06-06T18:50:00Z',
+          created_by: 'admin-1',
+        },
+        report: {
+          report_id: 'report-safe-fixture',
+          status: 'email_sent',
+          email_status: 'sent',
+          last_operation: 'rollback_report_artifact',
+          updated_at: '2026-06-06T18:50:00Z',
+        },
+        audit_refs: [{ event_id: 'audit-fixture-1', event_at: '2026-06-06T18:50:00Z', action: 'apply_report_artifact_rollback', result: 'success' }],
+        mutation_refusal: {
+          would_refuse_without_fixture_name: true,
+          would_refuse_without_mutation_mode: true,
+          allowed_when_status: 'ready',
+        },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
   await page.route('**/admin/reports/recovery-jobs', async (route) => {
     await route.fulfill({
       status: 200,
@@ -939,7 +1011,7 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('Artifact rollback preview created: rollback-preview-1')).toBeVisible()
   await expect(page.getByText('v20260605T100300Z-safe')).toBeVisible()
   await expect(page.getByText('original')).toBeVisible()
-  await expect(page.getByText('passed')).toBeVisible()
+  await expect(page.getByText('passed', { exact: true }).last()).toBeVisible()
   await expect(page.getByText('weekly-reports')).toHaveCount(0)
   await expect(page.getByText('source_json_s3_key')).toHaveCount(0)
   await page.getByRole('button', { name: /apply rollback/i }).click()
@@ -970,6 +1042,16 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('"scope": "recovery_job"')).toBeVisible()
   await page.getByRole('button', { name: /export recent jobs/i }).click()
   await expect(page.getByText('"scope": "recent_recovery_jobs"')).toBeVisible()
+  await page.getByRole('button', { name: /validate release evidence/i }).click()
+  await expect.poll(() => releaseEvidenceValidated).toBe(true)
+  await expect(page.getByText('Release evidence validation: passed')).toBeVisible()
+  await expect(page.getByText('req-release-1')).toBeVisible()
+  await expect(page.getByText('abc123')).toBeVisible()
+  await page.getByRole('button', { name: /check fixture status/i }).click()
+  await expect.poll(() => fixtureStatusRequested).toBe(true)
+  await expect(page.getByText('Fixture status: ready')).toBeVisible()
+  await expect(page.getByText('report-safe-fixture')).toBeVisible()
+  await expect(page.getByText('original').first()).toBeVisible()
 
   await page.getByRole('button', { name: 'Retry generation', exact: true }).click()
   await expect(page.getByText('status fixed to generation_failed')).toBeVisible()

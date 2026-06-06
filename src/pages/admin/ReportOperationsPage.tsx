@@ -1,6 +1,7 @@
 import { type FormEvent, useMemo, useState } from 'react'
 import {
   ClipboardList,
+  ClipboardCheck,
   Copy,
   Download,
   Eye,
@@ -37,6 +38,8 @@ import {
   usePreviewResendRecoveryJobMutation,
   usePreviewResumeRecoveryJobMutation,
   useRecoveryEvidenceExportMutation,
+  useReleaseEvidenceValidationMutation,
+  useReleaseFixtureStatusMutation,
   useRecoveryJobAuditEventsQuery,
   useRecoveryJobResultsQuery,
   useRecoveryJobsQuery,
@@ -57,6 +60,8 @@ import type {
   RecoveryJobSupportPackage,
   RecoveryJobTarget,
   RecoveryJobType,
+  ReleaseEvidenceValidationResult,
+  ReleaseFixtureStatus,
   ReportArtifactEditPreview,
   ReportArtifactRollbackPreview,
   ReportAuditEvent,
@@ -96,6 +101,23 @@ const jobTypeOptions: { label: string; value: RecoveryJobType; reason: string; s
   },
 ]
 
+const approvedFixtureName = 'stoa-safe-fixture-v2-2-rollback-2026-06-06'
+
+const defaultReleaseEvidenceBundle = {
+  schema_version: 'v1',
+  milestone: 'v2.3',
+  phase: 65,
+  generated_at: new Date().toISOString(),
+  environment: 'production',
+  backend: { status: 'passed', commit_sha: 'pending-backend-sha', deploy_run_id: 'pending-backend-run' },
+  frontend: { status: 'passed', commit_sha: 'pending-frontend-sha', deploy_run_id: 'pending-frontend-run' },
+  infra: { status: 'passed', cdk_diff: 'pending classification' },
+  api_checks: [{ status: 'passed', request_id: 'pending-api-request-id', note: 'admin-only checks pending' }],
+  browser_smoke: { status: 'passed', route: '/admin/report-operations', note: 'read-only smoke pending' },
+  privacy: { status: 'passed', denylist_checked: true, violation_count: 0 },
+  quality_gates: [{ status: 'passed', command: 'pending', note: 'quality gate pending' }],
+}
+
 export function AdminReportOperationsPage() {
   const [draft, setDraft] = useState<FilterDraft>({
     status: 'email_failed',
@@ -119,6 +141,14 @@ export function AdminReportOperationsPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [evidenceExport, setEvidenceExport] = useState<RecoveryEvidenceExport | null>(null)
   const [evidenceMessage, setEvidenceMessage] = useState<string | null>(null)
+  const [releaseFixtureName, setReleaseFixtureName] = useState(approvedFixtureName)
+  const [releaseEvidenceInput, setReleaseEvidenceInput] = useState(() =>
+    JSON.stringify(defaultReleaseEvidenceBundle, null, 2),
+  )
+  const [releaseEvidenceValidation, setReleaseEvidenceValidation] =
+    useState<ReleaseEvidenceValidationResult | null>(null)
+  const [releaseFixtureStatus, setReleaseFixtureStatus] = useState<ReleaseFixtureStatus | null>(null)
+  const [releaseEvidenceMessage, setReleaseEvidenceMessage] = useState<string | null>(null)
   const [resumeReason, setResumeReason] = useState('Resume failed recovery targets')
   const [resumePreview, setResumePreview] = useState<RecoveryJobResumePreviewResponse | null>(null)
   const [supportPackage, setSupportPackage] = useState<RecoveryJobSupportPackage | null>(null)
@@ -167,6 +197,8 @@ export function AdminReportOperationsPage() {
   const supportPackageMutation = useRecoveryJobSupportPackageMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
+  const releaseEvidenceValidationMutation = useReleaseEvidenceValidationMutation()
+  const releaseFixtureStatusMutation = useReleaseFixtureStatusMutation()
   const createEditDraftMutation = useCreateReportEditDraftMutation()
   const applyEditDraftMutation = useApplyReportEditDraftMutation()
   const createArtifactPreviewMutation = useCreateReportArtifactEditPreviewMutation()
@@ -595,6 +627,41 @@ export function AdminReportOperationsPage() {
     setEvidenceMessage('Evidence JSON downloaded')
   }
 
+  function inspectReleaseFixtureStatus() {
+    releaseFixtureStatusMutation.mutate(
+      { fixtureName: releaseFixtureName },
+      {
+        onSuccess: (result) => {
+          setReleaseFixtureStatus(result)
+          setReleaseEvidenceMessage(`Fixture status: ${result.status}`)
+        },
+        onError: (error) => setReleaseEvidenceMessage(error.message),
+      },
+    )
+  }
+
+  function validateReleaseEvidenceInput() {
+    let parsed: Record<string, unknown>
+    try {
+      const value = JSON.parse(releaseEvidenceInput)
+      if (!value || typeof value !== 'object' || Array.isArray(value)) {
+        setReleaseEvidenceMessage('Release evidence JSON must be an object')
+        return
+      }
+      parsed = value as Record<string, unknown>
+    } catch {
+      setReleaseEvidenceMessage('Release evidence JSON is invalid')
+      return
+    }
+    releaseEvidenceValidationMutation.mutate(parsed, {
+      onSuccess: (result) => {
+        setReleaseEvidenceValidation(result)
+        setReleaseEvidenceMessage(`Release evidence validation: ${result.status}`)
+      },
+      onError: (error) => setReleaseEvidenceMessage(error.message),
+    })
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="p-0" size="wide">
@@ -691,6 +758,20 @@ export function AdminReportOperationsPage() {
           onExportRecent={exportRecentEvidence}
           onCopy={copyEvidenceJson}
           onDownload={downloadEvidenceJson}
+        />
+
+        <ReleaseEvidenceAutomationPanel
+          fixtureName={releaseFixtureName}
+          evidenceInput={releaseEvidenceInput}
+          validation={releaseEvidenceValidation}
+          fixtureStatus={releaseFixtureStatus}
+          message={releaseEvidenceMessage}
+          isValidating={releaseEvidenceValidationMutation.isPending}
+          isLoadingFixture={releaseFixtureStatusMutation.isPending}
+          onFixtureNameChange={setReleaseFixtureName}
+          onEvidenceInputChange={setReleaseEvidenceInput}
+          onValidate={validateReleaseEvidenceInput}
+          onInspectFixture={inspectReleaseFixtureStatus}
         />
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),360px]">
@@ -897,6 +978,179 @@ export function AdminReportOperationsPage() {
         )}
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+function ReleaseEvidenceAutomationPanel({
+  fixtureName,
+  evidenceInput,
+  validation,
+  fixtureStatus,
+  message,
+  isValidating,
+  isLoadingFixture,
+  onFixtureNameChange,
+  onEvidenceInputChange,
+  onValidate,
+  onInspectFixture,
+}: {
+  fixtureName: string
+  evidenceInput: string
+  validation: ReleaseEvidenceValidationResult | null
+  fixtureStatus: ReleaseFixtureStatus | null
+  message: string | null
+  isValidating: boolean
+  isLoadingFixture: boolean
+  onFixtureNameChange: (value: string) => void
+  onEvidenceInputChange: (value: string) => void
+  onValidate: () => void
+  onInspectFixture: () => void
+}) {
+  const bundle = objectValue(validation?.bundle)
+  const backend = objectValue(bundle.backend)
+  const frontend = objectValue(bundle.frontend)
+  const infra = objectValue(bundle.infra)
+  const apiCheck = firstRecord(bundle.api_checks)
+  const browserSmoke = objectValue(bundle.browser_smoke)
+  const validationIssues = validation
+    ? [
+        ...validation.missing_required_fields.map((item) => `Missing: ${item}`),
+        ...validation.schema_errors,
+        ...validation.status_errors,
+        ...validation.fixture_errors,
+      ]
+    : []
+  const privacyIssues =
+    validation?.privacy.violations.map((item) => `${item.path || 'unknown'}: ${item.marker || 'private marker'}`) ?? []
+  const fixturePrivacyIssues =
+    fixtureStatus?.privacy.violations.map((item) => `${item.path || 'unknown'}: ${item.marker || 'private marker'}`) ?? []
+  return (
+    <section className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),420px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <ClipboardCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Release evidence automation</h2>
+            <Badge variant="outline">Read only</Badge>
+            <Badge variant="outline">Fixture safe</Badge>
+          </div>
+          <details className="rounded-md border bg-muted/20 p-3">
+            <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Release bundle JSON
+            </summary>
+            <textarea
+              value={evidenceInput}
+              onChange={(event) => onEvidenceInputChange(event.target.value)}
+              className="mt-3 min-h-36 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 font-mono text-xs normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </details>
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr),minmax(240px,0.45fr)]">
+            <div className="grid gap-2 sm:grid-cols-4">
+              <MetricPill label="Missing" value={validation?.missing_required_fields.length ?? 0} />
+              <MetricPill label="Violations" value={validation?.privacy.violation_count ?? 0} />
+              <MetricPill label="Approved" value={fixtureStatus?.approved ? 1 : 0} />
+              <MetricPill label="Audit refs" value={fixtureStatus?.audit_refs.length ?? 0} />
+            </div>
+            <div className="space-y-3">
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Safe fixture
+                <Input value={fixtureName} onChange={(event) => onFixtureNameChange(event.target.value)} />
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" onClick={onValidate} disabled={isValidating}>
+                  <ShieldCheck className="h-4 w-4" />
+                  Validate release evidence
+                </Button>
+                <Button type="button" variant="outline" onClick={onInspectFixture} disabled={isLoadingFixture}>
+                  <Eye className="h-4 w-4" />
+                  Check fixture status
+                </Button>
+              </div>
+              {message && <p className="text-xs text-muted-foreground">{message}</p>}
+            </div>
+          </div>
+        </div>
+        <div className="min-w-0 rounded-md border bg-muted/25 p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Release status</p>
+            <div className="flex flex-wrap gap-1">
+              {validation && <StatusBadge status={validation.status} />}
+              {fixtureStatus && <StatusBadge status={fixtureStatus.status} />}
+            </div>
+          </div>
+          {validation && (
+            <div className="mb-3 space-y-2">
+              <div className="grid gap-2 text-xs sm:grid-cols-2">
+                <DetailItem label="Backend SHA" value={stringValue(backend.commit_sha)} />
+                <DetailItem label="Backend run" value={stringValue(backend.deploy_run_id)} />
+                <DetailItem label="Frontend SHA" value={stringValue(frontend.commit_sha)} />
+                <DetailItem label="Frontend run" value={stringValue(frontend.deploy_run_id)} />
+                <DetailItem label="CDK diff" value={stringValue(infra.cdk_diff)} />
+                <DetailItem label="API request" value={stringValue(apiCheck.request_id)} />
+                <DetailItem label="Browser route" value={stringValue(browserSmoke.route)} />
+                <DetailItem label="Validated" value={formatDate(validation.validated_at)} />
+              </div>
+              <IssueRows title="Validation issues" items={validationIssues} emptyText="No validation issues." />
+              <IssueRows title="Privacy violations" items={privacyIssues} emptyText="No privacy violations." />
+            </div>
+          )}
+          {fixtureStatus && (
+            <div className="mb-3 grid gap-2 text-xs">
+              <DetailItem label="Fixture" value={fixtureStatus.fixture_name} />
+              <DetailItem label="Current version" value={versionLabel(fixtureStatus.artifact_versions.current)} />
+              <DetailItem label="Expected baseline" value={versionLabel(fixtureStatus.artifact_versions.expected_baseline)} />
+              <DetailItem label="Report" value={fixtureStatus.report.report_id} />
+              <DetailItem label="Fixture privacy" value={fixtureStatus.privacy.passed ? 'passed' : 'failed'} />
+              <DetailItem
+                label="Mutation refusal"
+                value={String(Boolean(fixtureStatus.mutation_refusal.would_refuse_without_mutation_mode))}
+              />
+            </div>
+          )}
+          {fixtureStatus && (
+            <IssueRows title="Fixture privacy issues" items={fixturePrivacyIssues} emptyText="No fixture privacy issues." />
+          )}
+          {!validation && !fixtureStatus && (
+            <p className="text-sm text-muted-foreground">Validate a release evidence bundle to preview redacted output.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function objectValue(value: unknown): Record<string, unknown> {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+  return value as Record<string, unknown>
+}
+
+function firstRecord(value: unknown): Record<string, unknown> {
+  if (!Array.isArray(value)) return {}
+  return objectValue(value[0])
+}
+
+function stringValue(value: unknown): string | null {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return null
+}
+
+function IssueRows({ title, items, emptyText }: { title: string; items: string[]; emptyText: string }) {
+  return (
+    <div className="rounded-md border bg-background/60 p-2">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</p>
+      {items.length === 0 ? (
+        <p className="text-xs text-muted-foreground">{emptyText}</p>
+      ) : (
+        <div className="space-y-1">
+          {items.slice(0, 6).map((item) => (
+            <p key={item} className="break-words rounded-md bg-muted/35 px-2 py-1 text-xs text-muted-foreground">
+              {item}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
   )
 }
 

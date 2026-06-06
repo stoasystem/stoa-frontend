@@ -460,6 +460,58 @@ export type RecoveryJobSupportPackage = {
   }
 }
 
+export type ReleaseEvidenceValidationResult = {
+  schema_version: string
+  validated_at: string
+  status: 'passed' | 'failed' | string
+  missing_required_fields: string[]
+  schema_errors: string[]
+  status_errors: string[]
+  fixture_errors: string[]
+  privacy: {
+    passed: boolean
+    violation_count: number
+    violations: Array<Record<string, string>>
+    denylist?: string[]
+  }
+  bundle: Record<string, unknown>
+}
+
+export type ReleaseFixtureStatus = {
+  generated_at: string
+  fixture_name?: string | null
+  approved: boolean
+  status: 'ready' | 'dirty' | 'missing' | 'disabled' | string
+  identity: {
+    parent_id?: string | null
+    student_id?: string | null
+    week_start?: string | null
+  }
+  artifact_versions: {
+    current?: string | null
+    expected_baseline?: string | null
+    previous?: string | null
+    created_at?: string | null
+    created_by?: string | null
+  }
+  report: {
+    report_id?: string | null
+    status?: string | null
+    email_status?: string | null
+    last_operation?: string | null
+    updated_at?: string | null
+  }
+  audit_refs: Array<Record<string, string | null>>
+  mutation_refusal: Record<string, unknown>
+  privacy: {
+    metadata_only: boolean
+    private_artifact_fields_omitted: boolean
+    passed: boolean
+    violation_count: number
+    violations: Array<Record<string, string>>
+  }
+}
+
 export async function getAdminUsageSummary() {
   const response = await httpClient.get<AdminUsageSummary>('/admin/usage-summary')
   return response.data
@@ -754,6 +806,30 @@ export async function getRecoveryJobSupportPackage(input: {
         target_limit: input.targetLimit,
         audit_limit: input.auditLimit,
         note: input.note || undefined,
+      },
+    },
+  )
+  return response.data
+}
+
+export async function validateReleaseEvidence(bundle: Record<string, unknown>) {
+  const response = await httpClient.post<ReleaseEvidenceValidationResult>(
+    '/admin/reports/release-evidence/validate',
+    bundle,
+  )
+  return response.data
+}
+
+export async function getReleaseFixtureStatus(input: {
+  fixtureName: string
+  expectedArtifactVersion?: string | null
+}) {
+  const response = await httpClient.get<ReleaseFixtureStatus>(
+    '/admin/reports/release-evidence/fixture-status',
+    {
+      params: {
+        fixture_name: input.fixtureName,
+        expected_artifact_version: input.expectedArtifactVersion || undefined,
       },
     },
   )
