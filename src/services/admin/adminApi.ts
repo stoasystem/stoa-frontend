@@ -92,6 +92,7 @@ export type ReportOperationRow = {
     resend_email: ReportOperationActionState
     retry_generation: ReportOperationActionState
     edit_artifact?: ReportOperationActionState
+    rollback_artifact?: ReportOperationActionState
   }
 }
 
@@ -204,6 +205,42 @@ export type ReportArtifactEditApplyResponse = {
   operation: string
   operation_result: string
   draft: ReportArtifactEditPreview
+  report: Record<string, unknown>
+}
+
+export type ReportArtifactRollbackPreview = {
+  preview_id: string
+  report_id: string
+  parent_id?: string | null
+  student_id?: string | null
+  week_start?: string | null
+  source_updated_at?: string | null
+  source_artifact_version_id?: string | null
+  target_artifact_version_id?: string | null
+  created_by?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+  reason?: string | null
+  status: string
+  validation_result: string
+  applied_by?: string | null
+  applied_at?: string | null
+  artifact_version_id?: string | null
+}
+
+export type ReportArtifactRollbackPreviewInput = ReportOperationTarget & {
+  reason: string
+}
+
+export type ReportArtifactRollbackApplyInput = ReportOperationTarget & {
+  preview_id: string
+  reason: string
+}
+
+export type ReportArtifactRollbackApplyResponse = {
+  operation: string
+  operation_result: string
+  preview: ReportArtifactRollbackPreview
   report: Record<string, unknown>
 }
 
@@ -545,6 +582,22 @@ export async function createReportArtifactEditPreview(input: ReportArtifactEditP
 export async function applyReportArtifactEditPreview(input: ReportArtifactEditApplyInput) {
   const response = await httpClient.post<ReportArtifactEditApplyResponse>(
     `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/artifact-edit-previews/${input.draft_id}/apply`,
+    { reason: input.reason },
+  )
+  return response.data
+}
+
+export async function createReportArtifactRollbackPreview(input: ReportArtifactRollbackPreviewInput) {
+  const response = await httpClient.post<ReportArtifactRollbackPreview>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/artifact-rollback-previews`,
+    { reason: input.reason },
+  )
+  return response.data
+}
+
+export async function applyReportArtifactRollbackPreview(input: ReportArtifactRollbackApplyInput) {
+  const response = await httpClient.post<ReportArtifactRollbackApplyResponse>(
+    `/admin/reports/${input.parent_id}/${input.student_id}/${input.week_start}/artifact-rollback-previews/${input.preview_id}/apply`,
     { reason: input.reason },
   )
   return response.data

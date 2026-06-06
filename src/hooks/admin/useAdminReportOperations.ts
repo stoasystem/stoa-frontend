@@ -3,8 +3,10 @@ import {
   bulkResendReportEmails,
   cancelRecoveryJob,
   applyReportArtifactEditPreview,
+  applyReportArtifactRollbackPreview,
   applyReportEditDraft,
   createReportArtifactEditPreview,
+  createReportArtifactRollbackPreview,
   createReportEditDraft,
   createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
@@ -24,6 +26,8 @@ import {
   retryReportGeneration,
   type ReportArtifactEditApplyInput,
   type ReportArtifactEditPreviewInput,
+  type ReportArtifactRollbackApplyInput,
+  type ReportArtifactRollbackPreviewInput,
   type ReportEditApplyInput,
   type ReportEditDraftInput,
   type ReportOperationTarget,
@@ -213,6 +217,26 @@ export function useApplyReportArtifactEditPreviewMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (input: ReportArtifactEditApplyInput) => applyReportArtifactEditPreview(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useCreateReportArtifactRollbackPreviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportArtifactRollbackPreviewInput) => createReportArtifactRollbackPreview(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
+    },
+  })
+}
+
+export function useApplyReportArtifactRollbackPreviewMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: ReportArtifactRollbackApplyInput) => applyReportArtifactRollbackPreview(input),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminQueryKeys.reportOperations() })
     },

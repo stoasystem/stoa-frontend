@@ -24,9 +24,11 @@ import { Input } from '@/components/ui/input'
 import {
   useBulkResendReportEmailsMutation,
   useApplyReportArtifactEditPreviewMutation,
+  useApplyReportArtifactRollbackPreviewMutation,
   useApplyReportEditDraftMutation,
   useCancelRecoveryJobMutation,
   useCreateReportArtifactEditPreviewMutation,
+  useCreateReportArtifactRollbackPreviewMutation,
   useCreateReportEditDraftMutation,
   useCreateGenerationRetryRecoveryJobMutation,
   useCreateResendRecoveryJobMutation,
@@ -56,6 +58,7 @@ import type {
   RecoveryJobTarget,
   RecoveryJobType,
   ReportArtifactEditPreview,
+  ReportArtifactRollbackPreview,
   ReportAuditEvent,
   ReportEditDraft,
   ReportOperationRow,
@@ -135,6 +138,9 @@ export function AdminReportOperationsPage() {
   })
   const [activeArtifactPreview, setActiveArtifactPreview] = useState<ReportArtifactEditPreview | null>(null)
   const [artifactEditMessage, setArtifactEditMessage] = useState<string | null>(null)
+  const [artifactRollbackReason, setArtifactRollbackReason] = useState('Restore previous artifact version')
+  const [activeRollbackPreview, setActiveRollbackPreview] = useState<ReportArtifactRollbackPreview | null>(null)
+  const [artifactRollbackMessage, setArtifactRollbackMessage] = useState<string | null>(null)
 
   const activeFilters = useMemo(
     () => ({
@@ -165,6 +171,8 @@ export function AdminReportOperationsPage() {
   const applyEditDraftMutation = useApplyReportEditDraftMutation()
   const createArtifactPreviewMutation = useCreateReportArtifactEditPreviewMutation()
   const applyArtifactPreviewMutation = useApplyReportArtifactEditPreviewMutation()
+  const createRollbackPreviewMutation = useCreateReportArtifactRollbackPreviewMutation()
+  const applyRollbackPreviewMutation = useApplyReportArtifactRollbackPreviewMutation()
 
   const rows = reportsQuery.data?.items ?? []
   const detail = detailQuery.data ?? rows.find((row) => selectedTarget && targetKey(row) === targetKey(selectedTarget))
@@ -280,6 +288,11 @@ export function AdminReportOperationsPage() {
     setArtifactEditMessage(null)
   }
 
+  function updateArtifactRollbackReason(value: string) {
+    setArtifactRollbackReason(value)
+    setArtifactRollbackMessage(null)
+  }
+
   function createEditDraft() {
     if (!detail) return
     const proposedFields = Object.fromEntries(
@@ -370,6 +383,42 @@ export function AdminReportOperationsPage() {
           void reportAuditQuery.refetch()
         },
         onError: (error) => setArtifactEditMessage(error.message),
+      },
+    )
+  }
+
+  function createArtifactRollbackPreview() {
+    if (!detail) return
+    createRollbackPreviewMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        reason: artifactRollbackReason,
+      },
+      {
+        onSuccess: (preview) => {
+          setActiveRollbackPreview(preview)
+          setArtifactRollbackMessage(`Artifact rollback preview created: ${preview.preview_id}`)
+        },
+        onError: (error) => setArtifactRollbackMessage(error.message),
+      },
+    )
+  }
+
+  function applyArtifactRollbackPreview() {
+    if (!detail || !activeRollbackPreview) return
+    applyRollbackPreviewMutation.mutate(
+      {
+        ...targetFromReport(detail),
+        preview_id: activeRollbackPreview.preview_id,
+        reason: artifactRollbackReason,
+      },
+      {
+        onSuccess: (result) => {
+          setActiveRollbackPreview(result.preview)
+          setArtifactRollbackMessage(`Artifact rollback ${result.operation_result}: ${result.preview.status}`)
+          void reportAuditQuery.refetch()
+        },
+        onError: (error) => setArtifactRollbackMessage(error.message),
       },
     )
   }
@@ -740,6 +789,10 @@ export function AdminReportOperationsPage() {
                               setSingleActionResult(null)
                               setActiveEditDraft(null)
                               setEditMessage(null)
+                              setActiveArtifactPreview(null)
+                              setArtifactEditMessage(null)
+                              setActiveRollbackPreview(null)
+                              setArtifactRollbackMessage(null)
                             }}
                           >
                             <Eye className="h-4 w-4" />
@@ -787,20 +840,28 @@ export function AdminReportOperationsPage() {
               artifactEditFields={artifactEditFields}
               artifactPreview={activeArtifactPreview}
               artifactEditMessage={artifactEditMessage}
+              artifactRollbackReason={artifactRollbackReason}
+              rollbackPreview={activeRollbackPreview}
+              artifactRollbackMessage={artifactRollbackMessage}
               onEditReasonChange={setEditReason}
               onEditFieldChange={updateEditField}
               onArtifactEditReasonChange={setArtifactEditReason}
               onArtifactEditFieldChange={updateArtifactEditField}
+              onArtifactRollbackReasonChange={updateArtifactRollbackReason}
               onCreateEditDraft={createEditDraft}
               onApplyEditDraft={applyEditDraft}
               onCreateArtifactPreview={createArtifactEditPreview}
               onApplyArtifactPreview={applyArtifactEditPreview}
+              onCreateRollbackPreview={createArtifactRollbackPreview}
+              onApplyRollbackPreview={applyArtifactRollbackPreview}
               retryPending={retryMutation.isPending}
               resendPending={resendMutation.isPending}
               createEditPending={createEditDraftMutation.isPending}
               applyEditPending={applyEditDraftMutation.isPending}
               createArtifactPreviewPending={createArtifactPreviewMutation.isPending}
               applyArtifactPreviewPending={applyArtifactPreviewMutation.isPending}
+              createRollbackPreviewPending={createRollbackPreviewMutation.isPending}
+              applyRollbackPreviewPending={applyRollbackPreviewMutation.isPending}
               actionResult={singleActionResult}
             />
             <RecoveryJobsPanel
@@ -939,20 +1000,28 @@ function ReportDetailPanel({
   artifactEditFields,
   artifactPreview,
   artifactEditMessage,
+  artifactRollbackReason,
+  rollbackPreview,
+  artifactRollbackMessage,
   onEditReasonChange,
   onEditFieldChange,
   onArtifactEditReasonChange,
   onArtifactEditFieldChange,
+  onArtifactRollbackReasonChange,
   onCreateEditDraft,
   onApplyEditDraft,
   onCreateArtifactPreview,
   onApplyArtifactPreview,
+  onCreateRollbackPreview,
+  onApplyRollbackPreview,
   retryPending,
   resendPending,
   createEditPending,
   applyEditPending,
   createArtifactPreviewPending,
   applyArtifactPreviewPending,
+  createRollbackPreviewPending,
+  applyRollbackPreviewPending,
   actionResult,
 }: {
   report?: ReportOperationRow
@@ -969,20 +1038,28 @@ function ReportDetailPanel({
   artifactEditFields: { summary: string; recommendations: string }
   artifactPreview: ReportArtifactEditPreview | null
   artifactEditMessage: string | null
+  artifactRollbackReason: string
+  rollbackPreview: ReportArtifactRollbackPreview | null
+  artifactRollbackMessage: string | null
   onEditReasonChange: (value: string) => void
   onEditFieldChange: (field: 'admin_note' | 'editor_summary' | 'status_note', value: string) => void
   onArtifactEditReasonChange: (value: string) => void
   onArtifactEditFieldChange: (field: 'summary' | 'recommendations', value: string) => void
+  onArtifactRollbackReasonChange: (value: string) => void
   onCreateEditDraft: () => void
   onApplyEditDraft: () => void
   onCreateArtifactPreview: () => void
   onApplyArtifactPreview: () => void
+  onCreateRollbackPreview: () => void
+  onApplyRollbackPreview: () => void
   retryPending: boolean
   resendPending: boolean
   createEditPending: boolean
   applyEditPending: boolean
   createArtifactPreviewPending: boolean
   applyArtifactPreviewPending: boolean
+  createRollbackPreviewPending: boolean
+  applyRollbackPreviewPending: boolean
   actionResult: string | null
 }) {
   if (isLoading) {
@@ -1122,6 +1199,62 @@ function ReportDetailPanel({
           {artifactEditMessage && (
             <div className="rounded-md border bg-muted/35 px-3 py-2 text-xs text-muted-foreground">
               {artifactEditMessage}
+            </div>
+          )}
+        </div>
+        <div className="space-y-3 rounded-md border p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <RotateCcw className="h-4 w-4 text-primary" />
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Artifact rollback</p>
+            <Badge variant="outline">Pointer restore</Badge>
+            <Badge variant="outline">Metadata only</Badge>
+          </div>
+          <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Rollback reason
+            <textarea
+              value={artifactRollbackReason}
+              onChange={(event) => onArtifactRollbackReasonChange(event.target.value)}
+              className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </label>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCreateRollbackPreview}
+              disabled={
+                createRollbackPreviewPending ||
+                artifactRollbackReason.trim().length === 0 ||
+                report.actions.rollback_artifact?.enabled === false
+              }
+              title={report.actions.rollback_artifact?.reason ?? undefined}
+            >
+              <Eye className="h-4 w-4" />
+              Preview rollback
+            </Button>
+            <Button
+              type="button"
+              onClick={onApplyRollbackPreview}
+              disabled={!rollbackPreview || rollbackPreview.status !== 'draft' || applyRollbackPreviewPending}
+            >
+              <Send className="h-4 w-4" />
+              Apply rollback
+            </Button>
+          </div>
+          {rollbackPreview && (
+            <div className="space-y-2 rounded-md border bg-muted/25 px-3 py-2 text-xs text-muted-foreground">
+              <p className="truncate font-medium text-foreground">{rollbackPreview.preview_id}</p>
+              <div className="grid gap-1 sm:grid-cols-2">
+                <DetailItem label="Current version" value={versionLabel(rollbackPreview.source_artifact_version_id)} />
+                <DetailItem label="Rollback target" value={versionLabel(rollbackPreview.target_artifact_version_id)} />
+                <DetailItem label="Validation" value={rollbackPreview.validation_result} />
+                <DetailItem label="Status" value={rollbackPreview.status} />
+              </div>
+            </div>
+          )}
+          {artifactRollbackMessage && (
+            <div className="rounded-md border bg-muted/35 px-3 py-2 text-xs text-muted-foreground">
+              {artifactRollbackMessage}
             </div>
           )}
         </div>
@@ -1566,6 +1699,10 @@ function DetailItem({ label, value }: { label: string; value?: string | null }) 
       <p className="mt-1 break-words text-sm">{value || 'Unavailable'}</p>
     </div>
   )
+}
+
+function versionLabel(value?: string | null) {
+  return value || 'original'
 }
 
 function StatusBadge({ status }: { status?: string | null }) {

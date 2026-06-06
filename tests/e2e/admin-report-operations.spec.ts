@@ -33,6 +33,8 @@ const reportOne = {
   actions: {
     resend_email: { enabled: true, reason: null },
     retry_generation: { enabled: false, reason: 'requires generation_failed' },
+    edit_artifact: { enabled: true, reason: null },
+    rollback_artifact: { enabled: true, reason: null },
   },
 }
 
@@ -68,6 +70,8 @@ const reportTwo = {
   actions: {
     resend_email: { enabled: false, reason: 'requires email_failed' },
     retry_generation: { enabled: true, reason: null },
+    edit_artifact: { enabled: false, reason: 'missing artifact metadata' },
+    rollback_artifact: { enabled: false, reason: 'Report is missing rollback artifact metadata' },
   },
 }
 
@@ -101,6 +105,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let editDraftApplied = false
   let artifactPreviewCreated = false
   let artifactEditApplied = false
+  let rollbackPreviewCreated = false
+  let rollbackApplied = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -255,6 +261,71 @@ test('admin can triage report operations and run selected recovery actions', asy
           artifact_version_id: 'v20260605T100300Z-safe',
           previous_artifact_version_id: null,
           last_operation: 'edit_report_artifact',
+          last_operation_result: 'success',
+        },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/artifact-rollback-previews', async (route) => {
+    const body = route.request().postDataJSON() as { reason?: string }
+    rollbackPreviewCreated = body.reason === 'Restore previous artifact version'
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        preview_id: 'rollback-preview-1',
+        report_id: reportOne.report_id,
+        parent_id: reportOne.parent_id,
+        student_id: reportOne.student_id,
+        week_start: reportOne.week_start,
+        source_updated_at: '2026-06-05T10:03:00Z',
+        source_artifact_version_id: 'v20260605T100300Z-safe',
+        target_artifact_version_id: 'original',
+        created_by: 'admin-1',
+        created_at: '2026-06-05T10:04:00Z',
+        updated_at: '2026-06-05T10:04:00Z',
+        reason: 'Restore previous artifact version',
+        status: 'draft',
+        validation_result: 'passed',
+        applied_by: null,
+        applied_at: null,
+        artifact_version_id: null,
+      }),
+    })
+  })
+  await page.route('**/admin/reports/parent-1/student-1/2026-06-01/artifact-rollback-previews/rollback-preview-1/apply', async (route) => {
+    rollbackApplied = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        operation: 'rollback_report_artifact',
+        operation_result: 'success',
+        preview: {
+          preview_id: 'rollback-preview-1',
+          report_id: reportOne.report_id,
+          parent_id: reportOne.parent_id,
+          student_id: reportOne.student_id,
+          week_start: reportOne.week_start,
+          source_updated_at: '2026-06-05T10:03:00Z',
+          source_artifact_version_id: 'v20260605T100300Z-safe',
+          target_artifact_version_id: 'original',
+          created_by: 'admin-1',
+          created_at: '2026-06-05T10:04:00Z',
+          updated_at: '2026-06-05T10:05:00Z',
+          reason: 'Restore previous artifact version',
+          status: 'applied',
+          validation_result: 'passed',
+          applied_by: 'admin-1',
+          applied_at: '2026-06-05T10:05:00Z',
+          artifact_version_id: 'original',
+        },
+        report: {
+          report_id: reportOne.report_id,
+          status: 'email_failed',
+          artifact_version_id: 'original',
+          previous_artifact_version_id: 'v20260605T100300Z-safe',
+          last_operation: 'rollback_report_artifact',
           last_operation_result: 'success',
         },
       }),
@@ -862,6 +933,18 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /apply artifact edit/i }).click()
   await expect.poll(() => artifactEditApplied).toBe(true)
   await expect(page.getByText('Artifact edit success: applied')).toBeVisible()
+  await expect(page.getByText('Artifact rollback')).toBeVisible()
+  await page.getByRole('button', { name: /preview rollback/i }).click()
+  await expect.poll(() => rollbackPreviewCreated).toBe(true)
+  await expect(page.getByText('Artifact rollback preview created: rollback-preview-1')).toBeVisible()
+  await expect(page.getByText('v20260605T100300Z-safe')).toBeVisible()
+  await expect(page.getByText('original')).toBeVisible()
+  await expect(page.getByText('passed')).toBeVisible()
+  await expect(page.getByText('weekly-reports')).toHaveCount(0)
+  await expect(page.getByText('source_json_s3_key')).toHaveCount(0)
+  await page.getByRole('button', { name: /apply rollback/i }).click()
+  await expect.poll(() => rollbackApplied).toBe(true)
+  await expect(page.getByText('Artifact rollback success: applied')).toBeVisible()
 
   await page.getByLabel(`Select ${reportOne.report_id}`).check()
   await page.getByRole('button', { name: /resend selected/i }).click()
