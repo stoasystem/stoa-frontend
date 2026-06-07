@@ -9,10 +9,12 @@ import {
   createReportArtifactRollbackPreview,
   createReportEditDraft,
   createGenerationRetryRecoveryJob,
+  createAuditRetentionManifest,
   createResendRecoveryJob,
   createResumeRecoveryJob,
   createSupportHandoffPackage,
   getRecoveryEvidenceExport,
+  getAuditRetentionStatus,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
   getRecoveryJobSupportPackage,
@@ -37,6 +39,8 @@ import {
   type ReportOperationsListFilters,
   type SupportHandoffPackageInput,
   type RecoveryEvidenceExportParams,
+  type AuditRetentionManifestInput,
+  type AuditRetentionReference,
 } from '@/services/admin/adminApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 
@@ -95,6 +99,18 @@ export function useRecoveryJobAuditEventsQuery(jobId: string | null) {
 export function useRecoveryEvidenceExportMutation() {
   return useMutation({
     mutationFn: (params: RecoveryEvidenceExportParams) => getRecoveryEvidenceExport(params),
+  })
+}
+
+export function useAuditRetentionStatusMutation() {
+  return useMutation({
+    mutationFn: (input: { references: AuditRetentionReference[]; limit?: number }) => getAuditRetentionStatus(input),
+  })
+}
+
+export function useAuditRetentionManifestMutation() {
+  return useMutation({
+    mutationFn: (input: AuditRetentionManifestInput) => createAuditRetentionManifest(input),
   })
 }
 

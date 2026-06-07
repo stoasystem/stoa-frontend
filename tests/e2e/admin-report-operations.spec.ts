@@ -109,6 +109,8 @@ test('admin can triage report operations and run selected recovery actions', asy
   let rollbackApplied = false
   let releaseEvidenceValidated = false
   let fixtureStatusRequested = false
+  let retentionStatusRequested = false
+  let retentionManifestRequested = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -803,6 +805,75 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/audit-retention/status', async (route) => {
+    retentionStatusRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        checked_at: '2026-06-07T12:00:00Z',
+        request_id: 'req-retention-status-1',
+        scope_count: 2,
+        items: [
+          {
+            reference: { scope: 'recovery_job', job_id: 'job-1' },
+            status: 'unsealed',
+            reason: null,
+            counts: { jobs: 1, targets: 1, job_audit: 1 },
+            privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+          },
+          {
+            reference: { scope: 'report', parent_id: reportOne.parent_id, student_id: reportOne.student_id, week_start: reportOne.week_start },
+            status: 'unsealed',
+            reason: null,
+            counts: { reports: 1, report_audit: 1 },
+            privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+          },
+        ],
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/audit-retention/manifest', async (route) => {
+    retentionManifestRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        manifest_id: 'audit-retention-1',
+        generated_at: '2026-06-07T12:01:00Z',
+        generated_by: 'admin-1',
+        reason: 'Seal metadata-only audit evidence',
+        scope: {
+          references: [{ scope: 'recovery_job', job_id: 'job-1' }, { scope: 'report', parent_id: reportOne.parent_id, student_id: reportOne.student_id, week_start: reportOne.week_start }],
+          reference_count: 2,
+        },
+        retention_category: 'incident',
+        retention_clock: { source: 'audit_event_at', started_at: '2026-06-07T12:01:00Z' },
+        items: [
+          {
+            item_id: 'recovery_job-abc123',
+            scope: 'recovery_job',
+            reference: { scope: 'recovery_job', job_id: 'job-1' },
+            status: 'sealed',
+            summary: { scope: 'recovery_job', complete: true },
+            digest: 'sha256:1111111111111111111111111111111111111111111111111111111111111111',
+          },
+        ],
+        verification: {
+          item_count: 1,
+          missing_references: [],
+          skipped_references: [],
+          refusal_reasons: [],
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+          manifest_digest: 'sha256:2222222222222222222222222222222222222222222222222222222222222222',
+        },
+        status: 'sealed',
+      }),
+    })
+  })
   await page.route('**/admin/reports/support-handoff-package', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}')
     const refused = body.destination_mode === 'external_write'
@@ -1078,6 +1149,20 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('"scope": "recovery_job"')).toBeVisible()
   await page.getByRole('button', { name: /export recent jobs/i }).click()
   await expect(page.getByText('"scope": "recent_recovery_jobs"')).toBeVisible()
+  await expect(page.getByText('Audit retention')).toBeVisible()
+  await page.getByRole('button', { name: /check retention status/i }).click()
+  await expect.poll(() => retentionStatusRequested).toBe(true)
+  await expect(page.getByText('Retention status checked: 2 references')).toBeVisible()
+  await expect(page.getByText('req-retention-status-1')).toBeVisible()
+  await page.getByRole('button', { name: /^Generate manifest$/ }).click()
+  await expect.poll(() => retentionManifestRequested).toBe(true)
+  await expect(page.getByText(/Retention manifest sealed: audit-retention-1/i)).toBeVisible()
+  await expect(page.getByText('audit-retention-1', { exact: true })).toBeVisible()
+  await expect(page.getByText('sha256:2222222222222222222222222222222222222222222222222222222222222222', { exact: true })).toBeVisible()
+  await page.getByRole('region', { name: 'Audit retention' }).getByRole('button', { name: /copy manifest/i }).click()
+  await expect(page.getByText('Retention manifest copied')).toBeVisible()
+  await expect(page.getByText('weekly-reports')).toHaveCount(0)
+  await expect(page.getByText('presigned_url')).toHaveCount(0)
   await expect(page.getByText('Support handoff')).toBeVisible()
   await page.getByRole('button', { name: /incident resumable recovery/i }).click()
   await page.getByRole('button', { name: /generate handoff package/i }).click()
@@ -1096,7 +1181,7 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect.poll(() => releaseEvidenceValidated).toBe(true)
   await expect(page.getByText('Release evidence validation: passed')).toBeVisible()
   await expect(page.getByText('req-release-1')).toBeVisible()
-  await expect(page.getByText('abc123')).toBeVisible()
+  await expect(page.getByText('abc123', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: /check fixture status/i }).click()
   await expect.poll(() => fixtureStatusRequested).toBe(true)
   await expect(page.getByText('Fixture status: ready')).toBeVisible()

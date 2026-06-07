@@ -118,6 +118,79 @@ export type ReportOperationTarget = {
   week_start: string
 }
 
+export type AuditRetentionReference = {
+  scope: 'recovery_job' | 'report' | 'support_handoff' | 'release_evidence' | string
+  job_id?: string | null
+  parent_id?: string | null
+  student_id?: string | null
+  week_start?: string | null
+  package_id?: string | null
+  release_evidence?: Record<string, unknown> | null
+}
+
+export type AuditRetentionStatusItem = {
+  reference: AuditRetentionReference
+  status: string
+  reason?: string | null
+  counts: Record<string, number>
+  privacy: {
+    metadata_only: boolean
+    private_artifact_fields_omitted: boolean
+    passed: boolean
+    violation_count: number
+    violations: { path?: string; marker?: string }[]
+  }
+}
+
+export type AuditRetentionStatusResponse = {
+  schema_version: string
+  checked_at: string
+  request_id?: string | null
+  scope_count: number
+  items: AuditRetentionStatusItem[]
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type AuditRetentionManifest = {
+  schema_version: string
+  manifest_id: string
+  generated_at: string
+  generated_by: string
+  reason: string
+  scope: {
+    references: AuditRetentionReference[]
+    reference_count: number
+  }
+  retention_category: string
+  retention_clock: Record<string, string | null>
+  items: {
+    item_id: string
+    scope: string
+    reference: AuditRetentionReference
+    status: string
+    summary: Record<string, unknown>
+    digest: string
+  }[]
+  verification: {
+    item_count: number
+    missing_references: { reference: AuditRetentionReference; reason?: string | null }[]
+    skipped_references: { reference: AuditRetentionReference; reason?: string | null }[]
+    refusal_reasons: string[]
+    privacy: AuditRetentionStatusItem['privacy']
+    manifest_digest?: string | null
+  }
+  status: string
+}
+
+export type AuditRetentionManifestInput = {
+  reason: string
+  references: AuditRetentionReference[]
+  retention_category?: string
+  retention_action?: string
+  target_limit?: number
+  audit_limit?: number
+}
+
 export type ReportOperationMutationResponse = {
   report_id: string
   status: string
@@ -873,6 +946,22 @@ export async function getRecoveryJobSupportPackage(input: {
 export async function createSupportHandoffPackage(input: SupportHandoffPackageInput) {
   const response = await httpClient.post<SupportHandoffPackage>(
     '/admin/reports/support-handoff-package',
+    input,
+  )
+  return response.data
+}
+
+export async function getAuditRetentionStatus(input: { references: AuditRetentionReference[]; limit?: number }) {
+  const response = await httpClient.post<AuditRetentionStatusResponse>(
+    '/admin/reports/audit-retention/status',
+    input,
+  )
+  return response.data
+}
+
+export async function createAuditRetentionManifest(input: AuditRetentionManifestInput) {
+  const response = await httpClient.post<AuditRetentionManifest>(
+    '/admin/reports/audit-retention/manifest',
     input,
   )
   return response.data

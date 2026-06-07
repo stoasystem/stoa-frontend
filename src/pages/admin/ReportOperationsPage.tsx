@@ -37,6 +37,8 @@ import {
   usePreviewGenerationRetryRecoveryJobMutation,
   usePreviewResendRecoveryJobMutation,
   usePreviewResumeRecoveryJobMutation,
+  useAuditRetentionManifestMutation,
+  useAuditRetentionStatusMutation,
   useRecoveryEvidenceExportMutation,
   useReleaseEvidenceValidationMutation,
   useReleaseFixtureStatusMutation,
@@ -72,6 +74,9 @@ import type {
   ReportOperationsListFilters,
   SupportHandoffDestinationMode,
   SupportHandoffPackage,
+  AuditRetentionManifest,
+  AuditRetentionReference,
+  AuditRetentionStatusResponse,
 } from '@/services/admin/adminApi'
 
 type FilterDraft = {
@@ -144,6 +149,13 @@ export function AdminReportOperationsPage() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [evidenceExport, setEvidenceExport] = useState<RecoveryEvidenceExport | null>(null)
   const [evidenceMessage, setEvidenceMessage] = useState<string | null>(null)
+  const [retentionReason, setRetentionReason] = useState('Seal metadata-only audit evidence')
+  const [retentionIncludeJob, setRetentionIncludeJob] = useState(true)
+  const [retentionIncludeReport, setRetentionIncludeReport] = useState(true)
+  const [retentionIncludeRelease, setRetentionIncludeRelease] = useState(false)
+  const [retentionStatus, setRetentionStatus] = useState<AuditRetentionStatusResponse | null>(null)
+  const [retentionManifest, setRetentionManifest] = useState<AuditRetentionManifest | null>(null)
+  const [retentionMessage, setRetentionMessage] = useState<string | null>(null)
   const [releaseFixtureName, setReleaseFixtureName] = useState(approvedFixtureName)
   const [releaseEvidenceInput, setReleaseEvidenceInput] = useState(() =>
     JSON.stringify(defaultReleaseEvidenceBundle, null, 2),
@@ -209,6 +221,8 @@ export function AdminReportOperationsPage() {
   const supportHandoffMutation = useSupportHandoffPackageMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
+  const retentionStatusMutation = useAuditRetentionStatusMutation()
+  const retentionManifestMutation = useAuditRetentionManifestMutation()
   const releaseEvidenceValidationMutation = useReleaseEvidenceValidationMutation()
   const releaseFixtureStatusMutation = useReleaseFixtureStatusMutation()
   const createEditDraftMutation = useCreateReportEditDraftMutation()
@@ -639,6 +653,93 @@ export function AdminReportOperationsPage() {
     setEvidenceMessage('Evidence JSON downloaded')
   }
 
+  function buildAuditRetentionReferences(): AuditRetentionReference[] | null {
+    const references: AuditRetentionReference[] = []
+    if (retentionIncludeJob && selectedJobId) {
+      references.push({ scope: 'recovery_job', job_id: selectedJobId })
+    }
+    if (retentionIncludeReport && selectedTarget) {
+      references.push({ scope: 'report', ...selectedTarget })
+    }
+    if (retentionIncludeRelease) {
+      try {
+        const parsed = JSON.parse(releaseEvidenceInput)
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          setRetentionMessage('Release evidence JSON must be an object')
+          return null
+        }
+        references.push({ scope: 'release_evidence', release_evidence: parsed as Record<string, unknown> })
+      } catch {
+        setRetentionMessage('Release evidence JSON is invalid')
+        return null
+      }
+    }
+    if (references.length === 0) {
+      setRetentionMessage('Select a recovery job, report, or release evidence reference')
+      return null
+    }
+    return references
+  }
+
+  function checkAuditRetentionStatus() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    retentionStatusMutation.mutate(
+      { references, limit: 10 },
+      {
+        onSuccess: (result) => {
+          setRetentionStatus(result)
+          setRetentionMessage(`Retention status checked: ${result.scope_count} references`)
+        },
+        onError: (error) => setRetentionMessage(error.message),
+      },
+    )
+  }
+
+  function createAuditRetentionManifest() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    retentionManifestMutation.mutate(
+      {
+        reason: retentionReason,
+        references,
+        retention_category: retentionIncludeRelease ? 'release' : 'incident',
+        retention_action: 'seal_metadata',
+        target_limit: 25,
+        audit_limit: 25,
+      },
+      {
+        onSuccess: (result) => {
+          setRetentionManifest(result)
+          setRetentionMessage(`Retention manifest ${result.status}: ${result.manifest_id}`)
+        },
+        onError: (error) => setRetentionMessage(error.message),
+      },
+    )
+  }
+
+  async function copyAuditRetentionManifest() {
+    if (!retentionManifest) return
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(retentionManifest, null, 2))
+    } catch {
+      // Keep the manifest preview visible for manual copy when clipboard access is unavailable.
+    }
+    setRetentionMessage('Retention manifest copied')
+  }
+
+  function downloadAuditRetentionManifest() {
+    if (!retentionManifest) return
+    const blob = new Blob([JSON.stringify(retentionManifest, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${retentionManifest.manifest_id}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setRetentionMessage('Retention manifest downloaded')
+  }
+
   function inspectReleaseFixtureStatus() {
     releaseFixtureStatusMutation.mutate(
       { fixtureName: releaseFixtureName },
@@ -832,6 +933,28 @@ export function AdminReportOperationsPage() {
           onExportRecent={exportRecentEvidence}
           onCopy={copyEvidenceJson}
           onDownload={downloadEvidenceJson}
+        />
+
+        <AuditRetentionPanel
+          selectedJobId={selectedJobId}
+          selectedReport={selectedTarget}
+          reason={retentionReason}
+          includeJob={retentionIncludeJob}
+          includeReport={retentionIncludeReport}
+          includeRelease={retentionIncludeRelease}
+          statusData={retentionStatus}
+          manifest={retentionManifest}
+          message={retentionMessage}
+          isChecking={retentionStatusMutation.isPending}
+          isGenerating={retentionManifestMutation.isPending}
+          onReasonChange={setRetentionReason}
+          onIncludeJobChange={setRetentionIncludeJob}
+          onIncludeReportChange={setRetentionIncludeReport}
+          onIncludeReleaseChange={setRetentionIncludeRelease}
+          onCheckStatus={checkAuditRetentionStatus}
+          onGenerateManifest={createAuditRetentionManifest}
+          onCopy={copyAuditRetentionManifest}
+          onDownload={downloadAuditRetentionManifest}
         />
 
         <SupportHandoffPanel
@@ -1328,6 +1451,155 @@ function RecoveryEvidencePanel({
             </pre>
           ) : (
             <p className="text-sm text-muted-foreground">No evidence export loaded.</p>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function AuditRetentionPanel({
+  selectedJobId,
+  selectedReport,
+  reason,
+  includeJob,
+  includeReport,
+  includeRelease,
+  statusData,
+  manifest,
+  message,
+  isChecking,
+  isGenerating,
+  onReasonChange,
+  onIncludeJobChange,
+  onIncludeReportChange,
+  onIncludeReleaseChange,
+  onCheckStatus,
+  onGenerateManifest,
+  onCopy,
+  onDownload,
+}: {
+  selectedJobId: string | null
+  selectedReport: ReportOperationTarget | null
+  reason: string
+  includeJob: boolean
+  includeReport: boolean
+  includeRelease: boolean
+  statusData: AuditRetentionStatusResponse | null
+  manifest: AuditRetentionManifest | null
+  message: string | null
+  isChecking: boolean
+  isGenerating: boolean
+  onReasonChange: (value: string) => void
+  onIncludeJobChange: (value: boolean) => void
+  onIncludeReportChange: (value: boolean) => void
+  onIncludeReleaseChange: (value: boolean) => void
+  onCheckStatus: () => void
+  onGenerateManifest: () => void
+  onCopy: () => void
+  onDownload: () => void
+}) {
+  const refusalReasons = manifest?.verification.refusal_reasons ?? []
+  return (
+    <section role="region" aria-label="Audit retention" className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),420px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Audit retention</h2>
+            <Badge variant="outline">Metadata only</Badge>
+            <Badge variant="outline">No WORM write</Badge>
+          </div>
+          <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Manifest reason
+            <textarea
+              value={reason}
+              onChange={(event) => onReasonChange(event.target.value)}
+              className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+            />
+          </label>
+          <div className="flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeJob} onChange={(event) => onIncludeJobChange(event.target.checked)} />
+              Selected job
+            </label>
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeReport} onChange={(event) => onIncludeReportChange(event.target.checked)} />
+              Selected report
+            </label>
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeRelease} onChange={(event) => onIncludeReleaseChange(event.target.checked)} />
+              Release evidence JSON
+            </label>
+          </div>
+          <div className="grid gap-2 text-xs sm:grid-cols-2">
+            <DetailItem label="Job ref" value={selectedJobId} />
+            <DetailItem label="Report ref" value={selectedReport ? targetKey(selectedReport) : null} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={onCheckStatus} disabled={isChecking}>
+              <Eye className="h-4 w-4" />
+              {isChecking ? 'Checking status' : 'Check retention status'}
+            </Button>
+            <Button type="button" onClick={onGenerateManifest} disabled={isGenerating || reason.trim().length === 0}>
+              <FileJson className="h-4 w-4" />
+              {isGenerating ? 'Generating manifest' : 'Generate manifest'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCopy} disabled={!manifest}>
+              <Copy className="h-4 w-4" />
+              Copy manifest
+            </Button>
+            <Button type="button" variant="outline" onClick={onDownload} disabled={!manifest}>
+              <Download className="h-4 w-4" />
+              Download JSON
+            </Button>
+          </div>
+          {message && <p className="text-xs text-muted-foreground">{message}</p>}
+        </div>
+        <div className="min-w-0 rounded-md border bg-muted/25 p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Retention preview</p>
+            <div className="flex flex-wrap gap-1">
+              {manifest && <StatusBadge status={manifest.status} />}
+              {statusData && <StatusBadge status={statusData.privacy.passed ? 'passed' : 'failed'} />}
+            </div>
+          </div>
+          {statusData && (
+            <div className="mb-3 space-y-2 text-xs">
+              <DetailItem label="Request" value={statusData.request_id ?? null} />
+              {statusData.items.map((item) => (
+                <div key={`${item.reference.scope}-${JSON.stringify(item.reference)}`} className="rounded-md border bg-background/60 p-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-medium text-foreground">{item.reference.scope.replace(/_/g, ' ')}</span>
+                    <StatusBadge status={item.status} />
+                  </div>
+                  <DetailItem label="Privacy" value={item.privacy.passed ? 'passed' : 'failed'} />
+                  <DetailItem label="Reason" value={item.reason ?? null} />
+                </div>
+              ))}
+            </div>
+          )}
+          {manifest && (
+            <div className="space-y-2 text-xs">
+              <DetailItem label="Manifest" value={manifest.manifest_id} />
+              <DetailItem label="Digest" value={manifest.verification.manifest_digest ?? null} />
+              <DetailItem label="Category" value={manifest.retention_category} />
+              <DetailItem label="Generated" value={formatDate(manifest.generated_at)} />
+              <div className="flex flex-wrap gap-1">
+                {manifest.items.map((item) => (
+                  <Badge key={item.item_id} variant="outline">
+                    {item.scope.replace(/_/g, ' ')} · {item.digest.slice(0, 18)}
+                  </Badge>
+                ))}
+              </div>
+              {refusalReasons.length > 0 && <IssueRows title="Refusal reasons" items={refusalReasons} emptyText="No refusal reasons." />}
+              <pre className="max-h-56 overflow-auto rounded-md bg-background/80 p-3 text-xs">
+                {JSON.stringify(manifest, null, 2)}
+              </pre>
+            </div>
+          )}
+          {!statusData && !manifest && (
+            <p className="text-sm text-muted-foreground">Check status or generate a sealed metadata manifest.</p>
           )}
         </div>
       </div>
