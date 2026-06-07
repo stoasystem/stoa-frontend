@@ -18,12 +18,15 @@ import {
   getAuditRetentionStatus,
   getImmutableEvidenceStatus,
   getLegalHoldStatus,
+  getRetentionGovernanceStatus,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
   getRecoveryJobSupportPackage,
   getReleaseFixtureStatus,
   getRecoveryJobs,
   persistImmutableEvidenceManifest,
+  recordLegalHoldReviewMetadata,
+  recordRetentionApprovalMetadata,
   getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
@@ -46,7 +49,9 @@ import {
   type AuditRetentionManifestInput,
   type AuditRetentionReference,
   type ImmutableEvidencePersistInput,
+  type LegalHoldReviewMetadataInput,
   type LegalHoldMetadataInput,
+  type RetentionApprovalMetadataInput,
 } from '@/services/admin/adminApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 
@@ -141,6 +146,25 @@ export function useLegalHoldStatusMutation() {
 export function useLegalHoldMutation() {
   return useMutation({
     mutationFn: (input: LegalHoldMetadataInput) => applyLegalHoldMetadata(input),
+  })
+}
+
+export function useRetentionGovernanceStatusMutation() {
+  return useMutation({
+    mutationFn: (input: { policy_version?: string; references?: AuditRetentionReference[]; limit?: number }) =>
+      getRetentionGovernanceStatus(input),
+  })
+}
+
+export function useRetentionApprovalMutation() {
+  return useMutation({
+    mutationFn: (input: RetentionApprovalMetadataInput) => recordRetentionApprovalMetadata(input),
+  })
+}
+
+export function useLegalHoldReviewMutation() {
+  return useMutation({
+    mutationFn: (input: LegalHoldReviewMetadataInput) => recordLegalHoldReviewMetadata(input),
   })
 }
 

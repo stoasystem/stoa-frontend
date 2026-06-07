@@ -43,8 +43,11 @@ import {
   useImmutableEvidencePersistMutation,
   useImmutableEvidenceStatusMutation,
   useLegalHoldMutation,
+  useLegalHoldReviewMutation,
   useLegalHoldStatusMutation,
   useRecoveryEvidenceExportMutation,
+  useRetentionApprovalMutation,
+  useRetentionGovernanceStatusMutation,
   useReleaseEvidenceValidationMutation,
   useReleaseFixtureStatusMutation,
   useRecoveryJobAuditEventsQuery,
@@ -84,7 +87,10 @@ import type {
   AuditRetentionStatusResponse,
   ImmutableEvidencePersistResponse,
   ImmutableEvidenceStatusResponse,
+  LegalHoldReviewMetadataResponse,
   LegalHoldStatusResponse,
+  RetentionApprovalMetadataResponse,
+  RetentionGovernanceStatusResponse,
 } from '@/services/admin/adminApi'
 
 type FilterDraft = {
@@ -170,6 +176,19 @@ export function AdminReportOperationsPage() {
   const [immutablePersist, setImmutablePersist] = useState<ImmutableEvidencePersistResponse | null>(null)
   const [legalHoldStatus, setLegalHoldStatus] = useState<LegalHoldStatusResponse | null>(null)
   const [immutableMessage, setImmutableMessage] = useState<string | null>(null)
+  const [governancePolicyVersion, setGovernancePolicyVersion] = useState('retention-policy-v1')
+  const [governanceApprovalState, setGovernanceApprovalState] = useState('pending_review')
+  const [governanceOwner, setGovernanceOwner] = useState('report-operations-owner')
+  const [governanceApprover, setGovernanceApprover] = useState('legal-compliance-approver')
+  const [governanceReviewDue, setGovernanceReviewDue] = useState('2027-06-07')
+  const [governanceReason, setGovernanceReason] = useState('Record retention policy review evidence')
+  const [legalHoldReviewReason, setLegalHoldReviewReason] = useState('Review active legal hold metadata')
+  const [legalHoldReviewOwner, setLegalHoldReviewOwner] = useState('report-operations-owner')
+  const [legalHoldReviewer, setLegalHoldReviewer] = useState('legal-compliance-reviewer')
+  const [legalHoldReviewDue, setLegalHoldReviewDue] = useState('2026-07-07')
+  const [governanceStatus, setGovernanceStatus] = useState<RetentionGovernanceStatusResponse | null>(null)
+  const [governanceApproval, setGovernanceApproval] = useState<RetentionApprovalMetadataResponse | null>(null)
+  const [legalHoldReview, setLegalHoldReview] = useState<LegalHoldReviewMetadataResponse | null>(null)
   const [releaseFixtureName, setReleaseFixtureName] = useState(approvedFixtureName)
   const [releaseEvidenceInput, setReleaseEvidenceInput] = useState(() =>
     JSON.stringify(defaultReleaseEvidenceBundle, null, 2),
@@ -241,6 +260,9 @@ export function AdminReportOperationsPage() {
   const immutablePersistMutation = useImmutableEvidencePersistMutation()
   const legalHoldStatusMutation = useLegalHoldStatusMutation()
   const legalHoldMutation = useLegalHoldMutation()
+  const governanceStatusMutation = useRetentionGovernanceStatusMutation()
+  const governanceApprovalMutation = useRetentionApprovalMutation()
+  const legalHoldReviewMutation = useLegalHoldReviewMutation()
   const releaseEvidenceValidationMutation = useReleaseEvidenceValidationMutation()
   const releaseFixtureStatusMutation = useReleaseFixtureStatusMutation()
   const createEditDraftMutation = useCreateReportEditDraftMutation()
@@ -830,8 +852,76 @@ export function AdminReportOperationsPage() {
     )
   }
 
+  function checkRetentionGovernanceStatus() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    governanceStatusMutation.mutate(
+      { policy_version: governancePolicyVersion, references, limit: 10 },
+      {
+        onSuccess: (result) => {
+          setGovernanceStatus(result)
+          setImmutableMessage(`Governance status: ${result.retention_approval.approval_state}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  function recordRetentionApproval() {
+    governanceApprovalMutation.mutate(
+      {
+        policy_version: governancePolicyVersion,
+        retention_mode: 'GOVERNANCE',
+        retention_days: 365,
+        policy_owner: governanceOwner,
+        legal_compliance_approver: governanceApprover,
+        approval_state: governanceApprovalState,
+        reason: governanceReason,
+        next_review_due_at: governanceReviewDue || null,
+        evidence_references: [
+          {
+            type: 'v2.8-object-lock-evidence',
+            retention_mode: 'GOVERNANCE',
+            retention_days: 365,
+          },
+        ],
+      },
+      {
+        onSuccess: (result) => {
+          setGovernanceApproval(result)
+          setImmutableMessage(`Retention approval ${result.status}: ${result.retention_approval.approval_state}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  function recordLegalHoldReview() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    legalHoldReviewMutation.mutate(
+      {
+        reason: legalHoldReviewReason,
+        references,
+        owner: legalHoldReviewOwner,
+        reviewer: legalHoldReviewer,
+        review_cadence: 'monthly',
+        outcome: 'reviewed',
+        next_review_due_at: legalHoldReviewDue || null,
+        break_glass: { used: false },
+      },
+      {
+        onSuccess: (result) => {
+          setLegalHoldReview(result)
+          setImmutableMessage(`Legal hold review: ${result.items[0]?.status ?? 'recorded'}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
   async function copyImmutableEvidenceJson() {
-    const payload = immutablePersist ?? immutableStatus ?? legalHoldStatus
+    const payload = legalHoldReview ?? governanceApproval ?? governanceStatus ?? immutablePersist ?? immutableStatus ?? legalHoldStatus
     if (!payload) return
     try {
       await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
@@ -842,7 +932,7 @@ export function AdminReportOperationsPage() {
   }
 
   function downloadImmutableEvidenceJson() {
-    const payload = immutablePersist ?? immutableStatus ?? legalHoldStatus
+    const payload = legalHoldReview ?? governanceApproval ?? governanceStatus ?? immutablePersist ?? immutableStatus ?? legalHoldStatus
     if (!payload) return
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -1076,20 +1166,47 @@ export function AdminReportOperationsPage() {
           selectedReport={selectedTarget}
           immutableReason={immutableReason}
           legalHoldReason={legalHoldReason}
+          governancePolicyVersion={governancePolicyVersion}
+          governanceApprovalState={governanceApprovalState}
+          governanceOwner={governanceOwner}
+          governanceApprover={governanceApprover}
+          governanceReviewDue={governanceReviewDue}
+          governanceReason={governanceReason}
+          legalHoldReviewReason={legalHoldReviewReason}
+          legalHoldReviewOwner={legalHoldReviewOwner}
+          legalHoldReviewer={legalHoldReviewer}
+          legalHoldReviewDue={legalHoldReviewDue}
           statusData={immutableStatus}
           persistResult={immutablePersist}
           legalHoldData={legalHoldStatus}
+          governanceStatus={governanceStatus}
+          governanceApproval={governanceApproval}
+          legalHoldReview={legalHoldReview}
           message={immutableMessage}
-          isChecking={immutableStatusMutation.isPending || legalHoldStatusMutation.isPending}
+          isChecking={immutableStatusMutation.isPending || legalHoldStatusMutation.isPending || governanceStatusMutation.isPending}
           isPersisting={immutablePersistMutation.isPending}
           isUpdatingHold={legalHoldMutation.isPending}
+          isUpdatingGovernance={governanceApprovalMutation.isPending || legalHoldReviewMutation.isPending}
           onImmutableReasonChange={setImmutableReason}
           onLegalHoldReasonChange={setLegalHoldReason}
+          onGovernancePolicyVersionChange={setGovernancePolicyVersion}
+          onGovernanceApprovalStateChange={setGovernanceApprovalState}
+          onGovernanceOwnerChange={setGovernanceOwner}
+          onGovernanceApproverChange={setGovernanceApprover}
+          onGovernanceReviewDueChange={setGovernanceReviewDue}
+          onGovernanceReasonChange={setGovernanceReason}
+          onLegalHoldReviewReasonChange={setLegalHoldReviewReason}
+          onLegalHoldReviewOwnerChange={setLegalHoldReviewOwner}
+          onLegalHoldReviewerChange={setLegalHoldReviewer}
+          onLegalHoldReviewDueChange={setLegalHoldReviewDue}
           onCheckStatus={checkImmutableEvidenceStatus}
           onPersist={persistImmutableEvidence}
           onCheckLegalHold={checkLegalHoldStatus}
           onApplyHold={() => updateLegalHold('apply')}
           onReleaseHold={() => updateLegalHold('release')}
+          onCheckGovernance={checkRetentionGovernanceStatus}
+          onRecordApproval={recordRetentionApproval}
+          onRecordReview={recordLegalHoldReview}
           onCopy={copyImmutableEvidenceJson}
           onDownload={downloadImmutableEvidenceJson}
         />
@@ -1750,20 +1867,47 @@ function ImmutableEvidencePanel({
   selectedReport,
   immutableReason,
   legalHoldReason,
+  governancePolicyVersion,
+  governanceApprovalState,
+  governanceOwner,
+  governanceApprover,
+  governanceReviewDue,
+  governanceReason,
+  legalHoldReviewReason,
+  legalHoldReviewOwner,
+  legalHoldReviewer,
+  legalHoldReviewDue,
   statusData,
   persistResult,
   legalHoldData,
+  governanceStatus,
+  governanceApproval,
+  legalHoldReview,
   message,
   isChecking,
   isPersisting,
   isUpdatingHold,
+  isUpdatingGovernance,
   onImmutableReasonChange,
   onLegalHoldReasonChange,
+  onGovernancePolicyVersionChange,
+  onGovernanceApprovalStateChange,
+  onGovernanceOwnerChange,
+  onGovernanceApproverChange,
+  onGovernanceReviewDueChange,
+  onGovernanceReasonChange,
+  onLegalHoldReviewReasonChange,
+  onLegalHoldReviewOwnerChange,
+  onLegalHoldReviewerChange,
+  onLegalHoldReviewDueChange,
   onCheckStatus,
   onPersist,
   onCheckLegalHold,
   onApplyHold,
   onReleaseHold,
+  onCheckGovernance,
+  onRecordApproval,
+  onRecordReview,
   onCopy,
   onDownload,
 }: {
@@ -1771,25 +1915,54 @@ function ImmutableEvidencePanel({
   selectedReport: ReportOperationTarget | null
   immutableReason: string
   legalHoldReason: string
+  governancePolicyVersion: string
+  governanceApprovalState: string
+  governanceOwner: string
+  governanceApprover: string
+  governanceReviewDue: string
+  governanceReason: string
+  legalHoldReviewReason: string
+  legalHoldReviewOwner: string
+  legalHoldReviewer: string
+  legalHoldReviewDue: string
   statusData: ImmutableEvidenceStatusResponse | null
   persistResult: ImmutableEvidencePersistResponse | null
   legalHoldData: LegalHoldStatusResponse | null
+  governanceStatus: RetentionGovernanceStatusResponse | null
+  governanceApproval: RetentionApprovalMetadataResponse | null
+  legalHoldReview: LegalHoldReviewMetadataResponse | null
   message: string | null
   isChecking: boolean
   isPersisting: boolean
   isUpdatingHold: boolean
+  isUpdatingGovernance: boolean
   onImmutableReasonChange: (value: string) => void
   onLegalHoldReasonChange: (value: string) => void
+  onGovernancePolicyVersionChange: (value: string) => void
+  onGovernanceApprovalStateChange: (value: string) => void
+  onGovernanceOwnerChange: (value: string) => void
+  onGovernanceApproverChange: (value: string) => void
+  onGovernanceReviewDueChange: (value: string) => void
+  onGovernanceReasonChange: (value: string) => void
+  onLegalHoldReviewReasonChange: (value: string) => void
+  onLegalHoldReviewOwnerChange: (value: string) => void
+  onLegalHoldReviewerChange: (value: string) => void
+  onLegalHoldReviewDueChange: (value: string) => void
   onCheckStatus: () => void
   onPersist: () => void
   onCheckLegalHold: () => void
   onApplyHold: () => void
   onReleaseHold: () => void
+  onCheckGovernance: () => void
+  onRecordApproval: () => void
+  onRecordReview: () => void
   onCopy: () => void
   onDownload: () => void
 }) {
-  const previewPayload = persistResult ?? statusData ?? legalHoldData
+  const previewPayload = legalHoldReview ?? governanceApproval ?? governanceStatus ?? persistResult ?? statusData ?? legalHoldData
   const storage = persistResult?.immutable_storage.storage ?? statusData?.immutable_storage
+  const approval = governanceApproval?.retention_approval ?? governanceStatus?.retention_approval
+  const reviewItems = legalHoldReview?.items ?? governanceStatus?.legal_hold_reviews.items ?? []
   const legalHoldItems = legalHoldData?.items ?? statusData?.legal_hold.items ?? []
   const refusalReasons = persistResult?.verification.refusal_reasons ?? []
   return (
@@ -1823,6 +1996,90 @@ function ImmutableEvidencePanel({
           <div className="grid gap-2 text-xs sm:grid-cols-2">
             <DetailItem label="Job ref" value={selectedJobId} />
             <DetailItem label="Report ref" value={selectedReport ? targetKey(selectedReport) : null} />
+          </div>
+          <div className="rounded-md border bg-muted/20 p-3">
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-semibold">Retention governance</h3>
+              <Badge variant="outline">Approval metadata</Badge>
+              <Badge variant="outline">Review evidence</Badge>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-3">
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Policy version
+                <Input value={governancePolicyVersion} onChange={(event) => onGovernancePolicyVersionChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Approval state
+                <select
+                  value={governanceApprovalState}
+                  onChange={(event) => onGovernanceApprovalStateChange(event.target.value)}
+                  className="h-10 w-full rounded-md border border-border/90 bg-card/75 px-3 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+                >
+                  <option value="pending_review">Pending review</option>
+                  <option value="approved">Approved</option>
+                  <option value="changes_requested">Changes requested</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="expired">Expired</option>
+                </select>
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Review due
+                <Input value={governanceReviewDue} onChange={(event) => onGovernanceReviewDueChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Policy owner
+                <Input value={governanceOwner} onChange={(event) => onGovernanceOwnerChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Approver
+                <Input value={governanceApprover} onChange={(event) => onGovernanceApproverChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Review owner
+                <Input value={legalHoldReviewOwner} onChange={(event) => onLegalHoldReviewOwnerChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+            </div>
+            <div className="mt-3 grid gap-3 lg:grid-cols-3">
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:col-span-2">
+                Approval reason
+                <textarea
+                  value={governanceReason}
+                  onChange={(event) => onGovernanceReasonChange(event.target.value)}
+                  className="min-h-14 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Reviewer
+                <Input value={legalHoldReviewer} onChange={(event) => onLegalHoldReviewerChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground lg:col-span-2">
+                Review reason
+                <textarea
+                  value={legalHoldReviewReason}
+                  onChange={(event) => onLegalHoldReviewReasonChange(event.target.value)}
+                  className="min-h-14 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+                />
+              </label>
+              <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Hold review due
+                <Input value={legalHoldReviewDue} onChange={(event) => onLegalHoldReviewDueChange(event.target.value)} className="normal-case tracking-normal" />
+              </label>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={onCheckGovernance} disabled={isChecking}>
+                <Eye className="h-4 w-4" />
+                Check governance
+              </Button>
+              <Button type="button" onClick={onRecordApproval} disabled={isUpdatingGovernance || governanceReason.trim().length === 0}>
+                <ClipboardCheck className="h-4 w-4" />
+                Record approval
+              </Button>
+              <Button type="button" variant="outline" onClick={onRecordReview} disabled={isUpdatingGovernance || legalHoldReviewReason.trim().length === 0}>
+                <ClipboardList className="h-4 w-4" />
+                Record review
+              </Button>
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" onClick={onCheckStatus} disabled={isChecking}>
@@ -1871,6 +2128,19 @@ function ImmutableEvidencePanel({
                 <DetailItem label="Missing" value={storage.missing.length > 0 ? storage.missing.join(', ') : 'none'} />
               </div>
             )}
+            {approval && (
+              <div className="rounded-md border bg-background/60 p-2">
+                <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-medium text-foreground">Retention approval</span>
+                  <StatusBadge status={approval.approval_state} />
+                </div>
+                <DetailItem label="Policy" value={approval.policy_version} />
+                <DetailItem label="Owner" value={approval.policy_owner ?? null} />
+                <DetailItem label="Approver" value={approval.legal_compliance_approver ?? null} />
+                <DetailItem label="Review due" value={approval.next_review_due_at ?? null} />
+                <DetailItem label="Formal approval" value={approval.formal_approval_recorded ? 'recorded' : 'not recorded'} />
+              </div>
+            )}
             {persistResult && (
               <div className="rounded-md border bg-background/60 p-2">
                 <DetailItem label="Manifest" value={persistResult.manifest_id} />
@@ -1892,6 +2162,25 @@ function ImmutableEvidencePanel({
                     <DetailItem label="Reason" value={item.reason ?? null} />
                   </div>
                 ))}
+              </div>
+            )}
+            {reviewItems.length > 0 && (
+              <div className="space-y-2">
+                {reviewItems.map((item) => {
+                  const reviewStatus = 'review_status' in item ? item.review_status : item.status
+                  return (
+                    <div key={`${item.scope_key}-${item.review_version ?? reviewStatus}`} className="rounded-md border bg-background/60 p-2">
+                      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-medium text-foreground">Legal hold review</span>
+                        <StatusBadge status={reviewStatus} />
+                      </div>
+                      <DetailItem label="Owner" value={item.owner ?? null} />
+                      <DetailItem label="Reviewer" value={item.reviewer ?? null} />
+                      <DetailItem label="Due" value={item.next_review_due_at ?? null} />
+                      <DetailItem label="Version" value={item.review_version ? String(item.review_version) : null} />
+                    </div>
+                  )
+                })}
               </div>
             )}
             {refusalReasons.length > 0 && <IssueRows title="Immutable refusal reasons" items={refusalReasons} emptyText="No refusal reasons." />}

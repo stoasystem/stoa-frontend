@@ -272,6 +272,102 @@ export type LegalHoldMetadataInput = {
   policy_id?: string
 }
 
+export type RetentionApprovalStatus = {
+  approval_id?: string | null
+  policy_version: string
+  approval_state: string
+  retention_mode?: string | null
+  retention_days?: number | null
+  policy_owner?: string | null
+  legal_compliance_approver?: string | null
+  reason?: string | null
+  evidence_references?: Record<string, unknown>[]
+  next_review_due_at?: string | null
+  approval_version?: number | null
+  updated_at?: string | null
+  formal_approval_recorded: boolean
+  technical_object_lock_verified?: boolean
+  broad_compliance_claims_allowed: boolean
+}
+
+export type LegalHoldReviewStatusItem = {
+  reference: AuditRetentionReference
+  scope_key: string
+  legal_hold_status: string
+  review_status: string
+  owner?: string | null
+  reviewer?: string | null
+  review_cadence?: string | null
+  next_review_due_at?: string | null
+  review_version?: number | null
+}
+
+export type RetentionGovernanceStatusResponse = {
+  schema_version: string
+  checked_at: string
+  request_id?: string | null
+  immutable_storage: ImmutableStorageStatus
+  retention_approval: RetentionApprovalStatus
+  legal_hold_reviews: {
+    scope_count: number
+    items: LegalHoldReviewStatusItem[]
+  }
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type RetentionApprovalMetadataInput = {
+  policy_version: string
+  retention_mode: string
+  retention_days: number
+  policy_owner: string
+  legal_compliance_approver: string
+  approval_state: string
+  reason: string
+  evidence_references?: Record<string, unknown>[]
+  next_review_due_at?: string | null
+}
+
+export type RetentionApprovalMetadataResponse = {
+  schema_version: string
+  updated_at: string
+  request_id?: string | null
+  status: string
+  retention_approval: RetentionApprovalStatus
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type LegalHoldReviewMetadataInput = {
+  reason: string
+  references: AuditRetentionReference[]
+  owner: string
+  reviewer: string
+  review_cadence: string
+  outcome?: string
+  next_review_due_at?: string | null
+  break_glass?: Record<string, unknown> | null
+}
+
+export type LegalHoldReviewMetadataResponse = {
+  schema_version: string
+  updated_at: string
+  request_id?: string | null
+  scope_count: number
+  items: {
+    reference: AuditRetentionReference
+    scope_key: string
+    status: string
+    reason?: string | null
+    review_id?: string | null
+    outcome?: string | null
+    owner?: string | null
+    reviewer?: string | null
+    next_review_due_at?: string | null
+    review_version?: number | null
+    privacy?: AuditRetentionStatusItem['privacy']
+  }[]
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
 export type ReportOperationMutationResponse = {
   report_id: string
   status: string
@@ -1075,6 +1171,34 @@ export async function getLegalHoldStatus(input: { references: AuditRetentionRefe
 export async function applyLegalHoldMetadata(input: LegalHoldMetadataInput) {
   const response = await httpClient.post<LegalHoldStatusResponse>(
     '/admin/reports/legal-holds',
+    input,
+  )
+  return response.data
+}
+
+export async function getRetentionGovernanceStatus(input: {
+  policy_version?: string
+  references?: AuditRetentionReference[]
+  limit?: number
+}) {
+  const response = await httpClient.post<RetentionGovernanceStatusResponse>(
+    '/admin/reports/retention-governance/status',
+    input,
+  )
+  return response.data
+}
+
+export async function recordRetentionApprovalMetadata(input: RetentionApprovalMetadataInput) {
+  const response = await httpClient.post<RetentionApprovalMetadataResponse>(
+    '/admin/reports/retention-governance/approval',
+    input,
+  )
+  return response.data
+}
+
+export async function recordLegalHoldReviewMetadata(input: LegalHoldReviewMetadataInput) {
+  const response = await httpClient.post<LegalHoldReviewMetadataResponse>(
+    '/admin/reports/legal-holds/review',
     input,
   )
   return response.data

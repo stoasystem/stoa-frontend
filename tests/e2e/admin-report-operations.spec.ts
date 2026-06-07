@@ -115,6 +115,9 @@ test('admin can triage report operations and run selected recovery actions', asy
   let immutablePersistRequested = false
   let legalHoldStatusRequested = false
   let legalHoldRequested = false
+  let governanceStatusRequested = false
+  let governanceApprovalRequested = false
+  let legalHoldReviewRequested = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -974,6 +977,117 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/retention-governance/status', async (route) => {
+    governanceStatusRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        checked_at: '2026-06-07T12:06:00Z',
+        request_id: 'req-governance-status-1',
+        immutable_storage: {
+          status: 'ready',
+          mode: 'cdk_managed',
+          cdk_managed: true,
+          resource_configured: true,
+          prefix_configured: true,
+          missing: [],
+        },
+        retention_approval: {
+          approval_id: 'retention-approval-1',
+          policy_version: 'retention-policy-v1',
+          approval_state: 'pending_review',
+          retention_mode: 'GOVERNANCE',
+          retention_days: 365,
+          policy_owner: 'report-operations-owner',
+          legal_compliance_approver: 'legal-compliance-approver',
+          reason: 'Record retention policy review evidence',
+          evidence_references: [{ type: 'v2.8-object-lock-evidence', retention_mode: 'GOVERNANCE', retention_days: 365 }],
+          next_review_due_at: '2027-06-07',
+          approval_version: 1,
+          updated_at: '2026-06-07T12:06:00Z',
+          formal_approval_recorded: false,
+          technical_object_lock_verified: true,
+          broad_compliance_claims_allowed: false,
+        },
+        legal_hold_reviews: {
+          scope_count: 1,
+          items: [{
+            reference: { scope: 'recovery_job', job_id: 'job-1' },
+            scope_key: 'scope-1',
+            legal_hold_status: 'active',
+            review_status: 'reviewed',
+            owner: 'report-operations-owner',
+            reviewer: 'legal-compliance-reviewer',
+            review_cadence: 'monthly',
+            next_review_due_at: '2026-07-07',
+            review_version: 1,
+          }],
+        },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/retention-governance/approval', async (route) => {
+    governanceApprovalRequested = true
+    const body = JSON.parse(route.request().postData() || '{}')
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        updated_at: '2026-06-07T12:07:00Z',
+        request_id: 'req-governance-approval-1',
+        status: 'recorded',
+        retention_approval: {
+          approval_id: 'retention-approval-1',
+          policy_version: body.policy_version,
+          approval_state: body.approval_state,
+          retention_mode: body.retention_mode,
+          retention_days: body.retention_days,
+          policy_owner: body.policy_owner,
+          legal_compliance_approver: body.legal_compliance_approver,
+          reason: body.reason,
+          evidence_references: body.evidence_references,
+          next_review_due_at: body.next_review_due_at,
+          approval_version: 2,
+          updated_at: '2026-06-07T12:07:00Z',
+          formal_approval_recorded: body.approval_state === 'approved',
+          technical_object_lock_verified: true,
+          broad_compliance_claims_allowed: false,
+        },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/legal-holds/review', async (route) => {
+    legalHoldReviewRequested = true
+    const body = JSON.parse(route.request().postData() || '{}')
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        updated_at: '2026-06-07T12:08:00Z',
+        request_id: 'req-hold-review-1',
+        scope_count: 1,
+        items: [{
+          reference: { scope: 'recovery_job', job_id: 'job-1' },
+          scope_key: 'scope-1',
+          status: 'recorded',
+          review_id: 'legal-hold-review-1',
+          outcome: body.outcome,
+          owner: body.owner,
+          reviewer: body.reviewer,
+          next_review_due_at: body.next_review_due_at,
+          review_version: 2,
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+        }],
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
   await page.route('**/admin/reports/support-handoff-package', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}')
     const refused = body.destination_mode === 'external_write'
@@ -1279,6 +1393,19 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /^Apply hold$/ }).click()
   await expect.poll(() => legalHoldRequested).toBe(true)
   await expect(page.getByText('Legal hold apply: active')).toBeVisible()
+  await page.getByRole('button', { name: /check governance/i }).click()
+  await expect.poll(() => governanceStatusRequested).toBe(true)
+  await expect(page.getByText('Governance status: pending_review')).toBeVisible()
+  await expect(page.getByText('Retention approval')).toBeVisible()
+  await expect(page.getByText('Formal approval')).toBeVisible()
+  await expect(page.getByText('not recorded')).toBeVisible()
+  await page.getByRole('button', { name: /record approval/i }).click()
+  await expect.poll(() => governanceApprovalRequested).toBe(true)
+  await expect(page.getByText('Retention approval recorded: pending_review')).toBeVisible()
+  await page.getByRole('button', { name: /record review/i }).click()
+  await expect.poll(() => legalHoldReviewRequested).toBe(true)
+  await expect(page.getByText('Legal hold review: recorded')).toBeVisible()
+  await expect(page.getByText('legal-compliance-reviewer', { exact: true })).toBeVisible()
   await page.getByRole('region', { name: 'Immutable evidence' }).getByRole('button', { name: /copy json/i }).click()
   await expect(page.getByText('Immutable evidence JSON copied')).toBeVisible()
   await expect(page.getByText('Support handoff')).toBeVisible()
