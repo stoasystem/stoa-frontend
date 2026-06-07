@@ -1073,7 +1073,7 @@ test('admin can triage report operations and run selected recovery actions', asy
   await page.getByRole('button', { name: /^Cancel$/ }).click()
   await expect(page.getByText(/Cancellation requested/i)).toBeVisible()
   await page.getByRole('button', { name: /export selected job/i }).click()
-  await expect(page.getByText('Evidence JSON')).toBeVisible()
+  await expect(page.getByText('Evidence JSON', { exact: true })).toBeVisible()
   await expect(page.getByText('req-evidence-1', { exact: true })).toBeVisible()
   await expect(page.getByText('"scope": "recovery_job"')).toBeVisible()
   await page.getByRole('button', { name: /export recent jobs/i }).click()

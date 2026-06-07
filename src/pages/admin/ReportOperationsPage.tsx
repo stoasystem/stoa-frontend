@@ -1859,6 +1859,7 @@ function SupportHandoffPanel({
                 variant={destination === option.value ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => onDestinationChange(option.value)}
+                aria-pressed={destination === option.value}
               >
                 {option.value === 'download' ? <Download className="h-4 w-4" /> : <ClipboardList className="h-4 w-4" />}
                 {option.label}
@@ -1890,7 +1891,7 @@ function SupportHandoffPanel({
             </label>
             <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
               <input type="checkbox" checked={includeRelease} onChange={(event) => onIncludeReleaseChange(event.target.checked)} />
-              Release JSON
+              Release evidence JSON
             </label>
             <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
               <input type="checkbox" checked={includeFixture} onChange={(event) => onIncludeFixtureChange(event.target.checked)} />
@@ -1900,7 +1901,7 @@ function SupportHandoffPanel({
           <div className="flex flex-wrap gap-2">
             <Button type="button" onClick={onGenerate} disabled={isGenerating || reason.trim().length === 0}>
               <FileJson className="h-4 w-4" />
-              Generate handoff package
+              {isGenerating ? 'Generating handoff package' : 'Generate handoff package'}
             </Button>
             <Button type="button" variant="outline" onClick={onCopy} disabled={!packageData}>
               <Copy className="h-4 w-4" />
@@ -1915,7 +1916,10 @@ function SupportHandoffPanel({
         </div>
         <div className="rounded-md border bg-muted/25 p-3">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Package preview</p>
-          {!packageData && <p className="text-sm text-muted-foreground">Generate a handoff package for ticket copy or download.</p>}
+          {isGenerating && <p className="text-sm text-muted-foreground">Generating handoff package.</p>}
+          {!isGenerating && !packageData && (
+            <p className="text-sm text-muted-foreground">Generate a handoff package for ticket copy or download.</p>
+          )}
           {packageData && (
             <div className="space-y-3 text-sm">
               <div className="grid grid-cols-3 gap-2">
@@ -1927,25 +1931,38 @@ function SupportHandoffPanel({
                 <DetailItem label="Package" value={packageData.package_id} />
                 <DetailItem label="Destination" value={`${packageData.destination.mode} · ${packageData.destination.status}`} />
                 <DetailItem label="Validation" value={packageData.validation.status} />
+                <DetailItem label="Generated" value={formatDate(packageData.generated_at)} />
                 {selectedJobId && <DetailItem label="Selected job" value={selectedJobId} />}
+                {packageData.download && <DetailItem label="Download" value={packageData.download.filename} />}
+                {packageData.copy && <DetailItem label="Copy format" value={packageData.copy.format} />}
               </div>
               {packageData.destination.refusal_reasons.length > 0 && (
                 <div className="rounded-md border bg-background/70 px-2 py-1.5 text-xs text-muted-foreground">
                   {packageData.destination.refusal_reasons.join('; ')}
                 </div>
               )}
+              {packageData.evidence_references.length > 0 && (
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <p className="font-semibold uppercase tracking-wide">Evidence refs</p>
+                  {packageData.evidence_references.map((reference) => (
+                    <DetailItem key={`${reference.type}-${reference.id}`} label={reference.type.replace(/_/g, ' ')} value={reference.id} />
+                  ))}
+                </div>
+              )}
               {packageData.sections.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {packageData.sections.map((section) => (
                     <Badge key={`${section.type}-${section.status}`} variant="outline">
-                      {section.type.replace(/_/g, ' ')}
+                      {section.type.replace(/_/g, ' ')} · {section.status}
                     </Badge>
                   ))}
                 </div>
               )}
-              <pre className="max-h-40 overflow-auto rounded-md bg-background p-2 text-[11px] leading-relaxed text-muted-foreground">
-                {JSON.stringify(packageData, null, 2)}
-              </pre>
+              {packageData.audit.audit_event_refs.length > 0 && (
+                <div className="rounded-md border bg-background/70 px-2 py-1.5 text-xs text-muted-foreground">
+                  Audit refs: {packageData.audit.audit_event_refs.map((event) => event.event_id).join(', ')}
+                </div>
+              )}
             </div>
           )}
         </div>
