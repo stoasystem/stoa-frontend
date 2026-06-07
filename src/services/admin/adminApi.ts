@@ -191,6 +191,87 @@ export type AuditRetentionManifestInput = {
   audit_limit?: number
 }
 
+export type ImmutableStorageStatus = {
+  status: string
+  mode: string
+  cdk_managed: boolean
+  resource_configured: boolean
+  prefix_configured: boolean
+  missing: string[]
+}
+
+export type LegalHoldStatusItem = {
+  reference: AuditRetentionReference
+  scope_key: string
+  status: string
+  policy_id?: string | null
+  hold_id?: string | null
+  reason?: string | null
+  updated_at?: string | null
+}
+
+export type LegalHoldStatusResponse = {
+  schema_version: string
+  checked_at?: string
+  updated_at?: string
+  request_id?: string | null
+  action?: string
+  scope_count: number
+  items: LegalHoldStatusItem[]
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type ImmutableEvidenceStatusResponse = {
+  schema_version: string
+  checked_at: string
+  request_id?: string | null
+  immutable_storage: ImmutableStorageStatus
+  audit_retention: AuditRetentionStatusResponse
+  legal_hold: LegalHoldStatusResponse
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type ImmutableEvidencePersistInput = {
+  reason: string
+  references: AuditRetentionReference[]
+  retention_category?: string
+  target_limit?: number
+  audit_limit?: number
+}
+
+export type ImmutableEvidencePersistResponse = {
+  schema_version: string
+  manifest_id: string
+  generated_at: string
+  generated_by: string
+  reason: string
+  retention_category: string
+  manifest_status: string
+  manifest_digest?: string | null
+  item_count?: number | null
+  immutable_storage: {
+    status: string
+    reason?: string | null
+    immutable_ref_id?: string | null
+    manifest_id?: string | null
+    manifest_digest?: string | null
+    storage?: ImmutableStorageStatus
+    privacy?: AuditRetentionStatusItem['privacy']
+  }
+  verification: {
+    privacy?: AuditRetentionStatusItem['privacy']
+    refusal_reasons: string[]
+  }
+  privacy: AuditRetentionStatusItem['privacy']
+}
+
+export type LegalHoldMetadataInput = {
+  reason: string
+  references: AuditRetentionReference[]
+  action?: 'apply' | 'release'
+  policy_id?: string
+}
+
 export type ReportOperationMutationResponse = {
   report_id: string
   status: string
@@ -962,6 +1043,38 @@ export async function getAuditRetentionStatus(input: { references: AuditRetentio
 export async function createAuditRetentionManifest(input: AuditRetentionManifestInput) {
   const response = await httpClient.post<AuditRetentionManifest>(
     '/admin/reports/audit-retention/manifest',
+    input,
+  )
+  return response.data
+}
+
+export async function getImmutableEvidenceStatus(input: { references: AuditRetentionReference[]; limit?: number }) {
+  const response = await httpClient.post<ImmutableEvidenceStatusResponse>(
+    '/admin/reports/immutable-evidence/status',
+    input,
+  )
+  return response.data
+}
+
+export async function persistImmutableEvidenceManifest(input: ImmutableEvidencePersistInput) {
+  const response = await httpClient.post<ImmutableEvidencePersistResponse>(
+    '/admin/reports/immutable-evidence/persist',
+    input,
+  )
+  return response.data
+}
+
+export async function getLegalHoldStatus(input: { references: AuditRetentionReference[]; limit?: number }) {
+  const response = await httpClient.post<LegalHoldStatusResponse>(
+    '/admin/reports/legal-holds/status',
+    input,
+  )
+  return response.data
+}
+
+export async function applyLegalHoldMetadata(input: LegalHoldMetadataInput) {
+  const response = await httpClient.post<LegalHoldStatusResponse>(
+    '/admin/reports/legal-holds',
     input,
   )
   return response.data

@@ -7,6 +7,7 @@ import {
   Eye,
   FilePenLine,
   FileJson,
+  LockKeyhole,
   Mail,
   RefreshCw,
   RotateCcw,
@@ -39,6 +40,10 @@ import {
   usePreviewResumeRecoveryJobMutation,
   useAuditRetentionManifestMutation,
   useAuditRetentionStatusMutation,
+  useImmutableEvidencePersistMutation,
+  useImmutableEvidenceStatusMutation,
+  useLegalHoldMutation,
+  useLegalHoldStatusMutation,
   useRecoveryEvidenceExportMutation,
   useReleaseEvidenceValidationMutation,
   useReleaseFixtureStatusMutation,
@@ -77,6 +82,9 @@ import type {
   AuditRetentionManifest,
   AuditRetentionReference,
   AuditRetentionStatusResponse,
+  ImmutableEvidencePersistResponse,
+  ImmutableEvidenceStatusResponse,
+  LegalHoldStatusResponse,
 } from '@/services/admin/adminApi'
 
 type FilterDraft = {
@@ -156,6 +164,12 @@ export function AdminReportOperationsPage() {
   const [retentionStatus, setRetentionStatus] = useState<AuditRetentionStatusResponse | null>(null)
   const [retentionManifest, setRetentionManifest] = useState<AuditRetentionManifest | null>(null)
   const [retentionMessage, setRetentionMessage] = useState<string | null>(null)
+  const [immutableReason, setImmutableReason] = useState('Persist metadata-only immutable evidence')
+  const [legalHoldReason, setLegalHoldReason] = useState('Legal hold for report operations evidence')
+  const [immutableStatus, setImmutableStatus] = useState<ImmutableEvidenceStatusResponse | null>(null)
+  const [immutablePersist, setImmutablePersist] = useState<ImmutableEvidencePersistResponse | null>(null)
+  const [legalHoldStatus, setLegalHoldStatus] = useState<LegalHoldStatusResponse | null>(null)
+  const [immutableMessage, setImmutableMessage] = useState<string | null>(null)
   const [releaseFixtureName, setReleaseFixtureName] = useState(approvedFixtureName)
   const [releaseEvidenceInput, setReleaseEvidenceInput] = useState(() =>
     JSON.stringify(defaultReleaseEvidenceBundle, null, 2),
@@ -223,6 +237,10 @@ export function AdminReportOperationsPage() {
   const evidenceMutation = useRecoveryEvidenceExportMutation()
   const retentionStatusMutation = useAuditRetentionStatusMutation()
   const retentionManifestMutation = useAuditRetentionManifestMutation()
+  const immutableStatusMutation = useImmutableEvidenceStatusMutation()
+  const immutablePersistMutation = useImmutableEvidencePersistMutation()
+  const legalHoldStatusMutation = useLegalHoldStatusMutation()
+  const legalHoldMutation = useLegalHoldMutation()
   const releaseEvidenceValidationMutation = useReleaseEvidenceValidationMutation()
   const releaseFixtureStatusMutation = useReleaseFixtureStatusMutation()
   const createEditDraftMutation = useCreateReportEditDraftMutation()
@@ -740,6 +758,102 @@ export function AdminReportOperationsPage() {
     setRetentionMessage('Retention manifest downloaded')
   }
 
+  function checkImmutableEvidenceStatus() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    immutableStatusMutation.mutate(
+      { references, limit: 10 },
+      {
+        onSuccess: (result) => {
+          setImmutableStatus(result)
+          setLegalHoldStatus(result.legal_hold)
+          setImmutableMessage(`Immutable status: ${result.immutable_storage.status}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  function persistImmutableEvidence() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    immutablePersistMutation.mutate(
+      {
+        reason: immutableReason,
+        references,
+        retention_category: retentionIncludeRelease ? 'release' : 'incident',
+        target_limit: 25,
+        audit_limit: 25,
+      },
+      {
+        onSuccess: (result) => {
+          setImmutablePersist(result)
+          setImmutableMessage(`Immutable persistence ${result.immutable_storage.status}: ${result.manifest_id}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  function checkLegalHoldStatus() {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    legalHoldStatusMutation.mutate(
+      { references, limit: 10 },
+      {
+        onSuccess: (result) => {
+          setLegalHoldStatus(result)
+          setImmutableMessage(`Legal hold status checked: ${result.scope_count} references`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  function updateLegalHold(action: 'apply' | 'release') {
+    const references = buildAuditRetentionReferences()
+    if (!references) return
+    legalHoldMutation.mutate(
+      {
+        reason: legalHoldReason,
+        references,
+        action,
+        policy_id: 'operational-default',
+      },
+      {
+        onSuccess: (result) => {
+          setLegalHoldStatus(result)
+          setImmutableMessage(`Legal hold ${action}: ${result.items[0]?.status ?? 'updated'}`)
+        },
+        onError: (error) => setImmutableMessage(error.message),
+      },
+    )
+  }
+
+  async function copyImmutableEvidenceJson() {
+    const payload = immutablePersist ?? immutableStatus ?? legalHoldStatus
+    if (!payload) return
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2))
+    } catch {
+      // Keep the preview visible for manual copy when clipboard access is unavailable.
+    }
+    setImmutableMessage('Immutable evidence JSON copied')
+  }
+
+  function downloadImmutableEvidenceJson() {
+    const payload = immutablePersist ?? immutableStatus ?? legalHoldStatus
+    if (!payload) return
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `stoa-immutable-evidence-${Date.now()}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setImmutableMessage('Immutable evidence JSON downloaded')
+  }
+
   function inspectReleaseFixtureStatus() {
     releaseFixtureStatusMutation.mutate(
       { fixtureName: releaseFixtureName },
@@ -955,6 +1069,29 @@ export function AdminReportOperationsPage() {
           onGenerateManifest={createAuditRetentionManifest}
           onCopy={copyAuditRetentionManifest}
           onDownload={downloadAuditRetentionManifest}
+        />
+
+        <ImmutableEvidencePanel
+          selectedJobId={selectedJobId}
+          selectedReport={selectedTarget}
+          immutableReason={immutableReason}
+          legalHoldReason={legalHoldReason}
+          statusData={immutableStatus}
+          persistResult={immutablePersist}
+          legalHoldData={legalHoldStatus}
+          message={immutableMessage}
+          isChecking={immutableStatusMutation.isPending || legalHoldStatusMutation.isPending}
+          isPersisting={immutablePersistMutation.isPending}
+          isUpdatingHold={legalHoldMutation.isPending}
+          onImmutableReasonChange={setImmutableReason}
+          onLegalHoldReasonChange={setLegalHoldReason}
+          onCheckStatus={checkImmutableEvidenceStatus}
+          onPersist={persistImmutableEvidence}
+          onCheckLegalHold={checkLegalHoldStatus}
+          onApplyHold={() => updateLegalHold('apply')}
+          onReleaseHold={() => updateLegalHold('release')}
+          onCopy={copyImmutableEvidenceJson}
+          onDownload={downloadImmutableEvidenceJson}
         />
 
         <SupportHandoffPanel
@@ -1601,6 +1738,171 @@ function AuditRetentionPanel({
           {!statusData && !manifest && (
             <p className="text-sm text-muted-foreground">Check status or generate a sealed metadata manifest.</p>
           )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+function ImmutableEvidencePanel({
+  selectedJobId,
+  selectedReport,
+  immutableReason,
+  legalHoldReason,
+  statusData,
+  persistResult,
+  legalHoldData,
+  message,
+  isChecking,
+  isPersisting,
+  isUpdatingHold,
+  onImmutableReasonChange,
+  onLegalHoldReasonChange,
+  onCheckStatus,
+  onPersist,
+  onCheckLegalHold,
+  onApplyHold,
+  onReleaseHold,
+  onCopy,
+  onDownload,
+}: {
+  selectedJobId: string | null
+  selectedReport: ReportOperationTarget | null
+  immutableReason: string
+  legalHoldReason: string
+  statusData: ImmutableEvidenceStatusResponse | null
+  persistResult: ImmutableEvidencePersistResponse | null
+  legalHoldData: LegalHoldStatusResponse | null
+  message: string | null
+  isChecking: boolean
+  isPersisting: boolean
+  isUpdatingHold: boolean
+  onImmutableReasonChange: (value: string) => void
+  onLegalHoldReasonChange: (value: string) => void
+  onCheckStatus: () => void
+  onPersist: () => void
+  onCheckLegalHold: () => void
+  onApplyHold: () => void
+  onReleaseHold: () => void
+  onCopy: () => void
+  onDownload: () => void
+}) {
+  const previewPayload = persistResult ?? statusData ?? legalHoldData
+  const storage = persistResult?.immutable_storage.storage ?? statusData?.immutable_storage
+  const legalHoldItems = legalHoldData?.items ?? statusData?.legal_hold.items ?? []
+  const refusalReasons = persistResult?.verification.refusal_reasons ?? []
+  return (
+    <section role="region" aria-label="Immutable evidence" className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),420px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <LockKeyhole className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Immutable evidence</h2>
+            <Badge variant="outline">CDK gated</Badge>
+            <Badge variant="outline">Legal hold metadata</Badge>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Persistence reason
+              <textarea
+                value={immutableReason}
+                onChange={(event) => onImmutableReasonChange(event.target.value)}
+                className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Legal hold reason
+              <textarea
+                value={legalHoldReason}
+                onChange={(event) => onLegalHoldReasonChange(event.target.value)}
+                className="min-h-16 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+          </div>
+          <div className="grid gap-2 text-xs sm:grid-cols-2">
+            <DetailItem label="Job ref" value={selectedJobId} />
+            <DetailItem label="Report ref" value={selectedReport ? targetKey(selectedReport) : null} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={onCheckStatus} disabled={isChecking}>
+              <Eye className="h-4 w-4" />
+              {isChecking ? 'Checking immutable' : 'Check immutable status'}
+            </Button>
+            <Button type="button" onClick={onPersist} disabled={isPersisting || immutableReason.trim().length === 0}>
+              <FileJson className="h-4 w-4" />
+              {isPersisting ? 'Persisting manifest' : 'Persist manifest'}
+            </Button>
+            <Button type="button" variant="outline" onClick={onCheckLegalHold} disabled={isChecking}>
+              <ShieldCheck className="h-4 w-4" />
+              Check legal hold
+            </Button>
+            <Button type="button" variant="outline" onClick={onApplyHold} disabled={isUpdatingHold || legalHoldReason.trim().length === 0}>
+              Apply hold
+            </Button>
+            <Button type="button" variant="outline" onClick={onReleaseHold} disabled={isUpdatingHold || legalHoldReason.trim().length === 0}>
+              Release hold
+            </Button>
+            <Button type="button" variant="outline" onClick={onCopy} disabled={!previewPayload}>
+              <Copy className="h-4 w-4" />
+              Copy JSON
+            </Button>
+            <Button type="button" variant="outline" onClick={onDownload} disabled={!previewPayload}>
+              <Download className="h-4 w-4" />
+              Download JSON
+            </Button>
+          </div>
+          {message && <p className="text-xs text-muted-foreground">{message}</p>}
+        </div>
+        <div className="min-w-0 rounded-md border bg-muted/25 p-3">
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Immutable preview</p>
+            <div className="flex flex-wrap gap-1">
+              {storage && <StatusBadge status={storage.status} />}
+              {persistResult && <StatusBadge status={persistResult.immutable_storage.status} />}
+            </div>
+          </div>
+          <div className="space-y-2 text-xs">
+            {storage && (
+              <div className="rounded-md border bg-background/60 p-2">
+                <DetailItem label="Storage mode" value={storage.mode} />
+                <DetailItem label="CDK managed" value={storage.cdk_managed ? 'yes' : 'no'} />
+                <DetailItem label="Resource configured" value={storage.resource_configured ? 'yes' : 'no'} />
+                <DetailItem label="Missing" value={storage.missing.length > 0 ? storage.missing.join(', ') : 'none'} />
+              </div>
+            )}
+            {persistResult && (
+              <div className="rounded-md border bg-background/60 p-2">
+                <DetailItem label="Manifest" value={persistResult.manifest_id} />
+                <DetailItem label="Digest" value={persistResult.manifest_digest ?? null} />
+                <DetailItem label="Immutable ref" value={persistResult.immutable_storage.immutable_ref_id ?? null} />
+                <DetailItem label="Reason" value={persistResult.immutable_storage.reason ?? null} />
+              </div>
+            )}
+            {legalHoldItems.length > 0 && (
+              <div className="space-y-2">
+                {legalHoldItems.map((item) => (
+                  <div key={`${item.scope_key}-${item.status}`} className="rounded-md border bg-background/60 p-2">
+                    <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-medium text-foreground">{item.reference.scope.replace(/_/g, ' ')}</span>
+                      <StatusBadge status={item.status} />
+                    </div>
+                    <DetailItem label="Policy" value={item.policy_id ?? null} />
+                    <DetailItem label="Hold" value={item.hold_id ?? null} />
+                    <DetailItem label="Reason" value={item.reason ?? null} />
+                  </div>
+                ))}
+              </div>
+            )}
+            {refusalReasons.length > 0 && <IssueRows title="Immutable refusal reasons" items={refusalReasons} emptyText="No refusal reasons." />}
+            {previewPayload ? (
+              <pre className="max-h-56 overflow-auto rounded-md bg-background/80 p-3 text-xs">
+                {JSON.stringify(previewPayload, null, 2)}
+              </pre>
+            ) : (
+              <p className="text-sm text-muted-foreground">Check immutable status, persist a manifest, or inspect legal hold metadata.</p>
+            )}
+          </div>
         </div>
       </div>
     </section>

@@ -111,6 +111,10 @@ test('admin can triage report operations and run selected recovery actions', asy
   let fixtureStatusRequested = false
   let retentionStatusRequested = false
   let retentionManifestRequested = false
+  let immutableStatusRequested = false
+  let immutablePersistRequested = false
+  let legalHoldStatusRequested = false
+  let legalHoldRequested = false
   await page.route('**/admin/reports/ops**', async (route) => {
     listRequests.push(route.request().url())
     await route.fulfill({
@@ -874,6 +878,102 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/immutable-evidence/status', async (route) => {
+    immutableStatusRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        checked_at: '2026-06-07T12:02:00Z',
+        request_id: 'req-immutable-status-1',
+        immutable_storage: {
+          status: 'not_configured',
+          mode: 'disabled',
+          cdk_managed: false,
+          resource_configured: false,
+          prefix_configured: false,
+          missing: ['immutable_audit_storage_mode'],
+        },
+        audit_retention: {
+          schema_version: 'v1',
+          checked_at: '2026-06-07T12:02:00Z',
+          request_id: 'req-immutable-status-1',
+          scope_count: 1,
+          items: [],
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+        },
+        legal_hold: {
+          schema_version: 'v1',
+          checked_at: '2026-06-07T12:02:00Z',
+          request_id: 'req-immutable-status-1',
+          scope_count: 1,
+          items: [{ reference: { scope: 'recovery_job', job_id: 'job-1' }, scope_key: 'scope-1', status: 'none', policy_id: null, hold_id: null, reason: null, updated_at: null }],
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+        },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/immutable-evidence/persist', async (route) => {
+    immutablePersistRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        manifest_id: 'audit-retention-immutable-1',
+        generated_at: '2026-06-07T12:03:00Z',
+        generated_by: 'admin-1',
+        reason: 'Persist metadata-only immutable evidence',
+        retention_category: 'incident',
+        manifest_status: 'sealed',
+        manifest_digest: 'sha256:3333333333333333333333333333333333333333333333333333333333333333',
+        item_count: 1,
+        immutable_storage: {
+          status: 'not_configured',
+          reason: 'immutable storage is not configured by CDK',
+          storage: { status: 'not_configured', mode: 'disabled', cdk_managed: false, resource_configured: false, prefix_configured: false, missing: ['immutable_audit_storage_mode'] },
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+        },
+        verification: { privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] }, refusal_reasons: [] },
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/legal-holds/status', async (route) => {
+    legalHoldStatusRequested = true
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        checked_at: '2026-06-07T12:04:00Z',
+        request_id: 'req-hold-status-1',
+        scope_count: 1,
+        items: [{ reference: { scope: 'recovery_job', job_id: 'job-1' }, scope_key: 'scope-1', status: 'active', policy_id: 'operational-default', hold_id: 'legal-hold-1', reason: 'Legal hold for report operations evidence', updated_at: '2026-06-07T12:04:00Z' }],
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
+  await page.route('**/admin/reports/legal-holds', async (route) => {
+    legalHoldRequested = true
+    const body = JSON.parse(route.request().postData() || '{}')
+    const status = body.action === 'release' ? 'released' : 'active'
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        updated_at: '2026-06-07T12:05:00Z',
+        request_id: 'req-hold-apply-1',
+        action: body.action || 'apply',
+        scope_count: 1,
+        items: [{ reference: { scope: 'recovery_job', job_id: 'job-1' }, scope_key: 'scope-1', status, policy_id: 'operational-default', hold_id: 'legal-hold-1', reason: body.reason, updated_at: '2026-06-07T12:05:00Z' }],
+        privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+      }),
+    })
+  })
   await page.route('**/admin/reports/support-handoff-package', async (route) => {
     const body = JSON.parse(route.request().postData() || '{}')
     const refused = body.destination_mode === 'external_write'
@@ -1163,6 +1263,24 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('Retention manifest copied')).toBeVisible()
   await expect(page.getByText('weekly-reports')).toHaveCount(0)
   await expect(page.getByText('presigned_url')).toHaveCount(0)
+  await expect(page.getByRole('region', { name: 'Immutable evidence' })).toBeVisible()
+  await page.getByRole('button', { name: /check immutable status/i }).click()
+  await expect.poll(() => immutableStatusRequested).toBe(true)
+  await expect(page.getByText('Immutable status: not_configured')).toBeVisible()
+  await expect(page.getByText('immutable_audit_storage_mode', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /^Persist manifest$/ }).click()
+  await expect.poll(() => immutablePersistRequested).toBe(true)
+  await expect(page.getByText(/Immutable persistence not_configured: audit-retention-immutable-1/i)).toBeVisible()
+  await expect(page.getByText('sha256:3333333333333333333333333333333333333333333333333333333333333333', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /check legal hold/i }).click()
+  await expect.poll(() => legalHoldStatusRequested).toBe(true)
+  await expect(page.getByText('Legal hold status checked: 1 references')).toBeVisible()
+  await expect(page.getByText('legal-hold-1', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: /^Apply hold$/ }).click()
+  await expect.poll(() => legalHoldRequested).toBe(true)
+  await expect(page.getByText('Legal hold apply: active')).toBeVisible()
+  await page.getByRole('region', { name: 'Immutable evidence' }).getByRole('button', { name: /copy json/i }).click()
+  await expect(page.getByText('Immutable evidence JSON copied')).toBeVisible()
   await expect(page.getByText('Support handoff')).toBeVisible()
   await page.getByRole('button', { name: /incident resumable recovery/i }).click()
   await page.getByRole('button', { name: /generate handoff package/i }).click()

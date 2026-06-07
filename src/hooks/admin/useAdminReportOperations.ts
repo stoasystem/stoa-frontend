@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   bulkResendReportEmails,
+  applyLegalHoldMetadata,
   cancelRecoveryJob,
   applyReportArtifactEditPreview,
   applyReportArtifactRollbackPreview,
@@ -15,11 +16,14 @@ import {
   createSupportHandoffPackage,
   getRecoveryEvidenceExport,
   getAuditRetentionStatus,
+  getImmutableEvidenceStatus,
+  getLegalHoldStatus,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
   getRecoveryJobSupportPackage,
   getReleaseFixtureStatus,
   getRecoveryJobs,
+  persistImmutableEvidenceManifest,
   getReportAuditEvents,
   getReportOperationDetail,
   getReportOperations,
@@ -41,6 +45,8 @@ import {
   type RecoveryEvidenceExportParams,
   type AuditRetentionManifestInput,
   type AuditRetentionReference,
+  type ImmutableEvidencePersistInput,
+  type LegalHoldMetadataInput,
 } from '@/services/admin/adminApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 
@@ -111,6 +117,30 @@ export function useAuditRetentionStatusMutation() {
 export function useAuditRetentionManifestMutation() {
   return useMutation({
     mutationFn: (input: AuditRetentionManifestInput) => createAuditRetentionManifest(input),
+  })
+}
+
+export function useImmutableEvidenceStatusMutation() {
+  return useMutation({
+    mutationFn: (input: { references: AuditRetentionReference[]; limit?: number }) => getImmutableEvidenceStatus(input),
+  })
+}
+
+export function useImmutableEvidencePersistMutation() {
+  return useMutation({
+    mutationFn: (input: ImmutableEvidencePersistInput) => persistImmutableEvidenceManifest(input),
+  })
+}
+
+export function useLegalHoldStatusMutation() {
+  return useMutation({
+    mutationFn: (input: { references: AuditRetentionReference[]; limit?: number }) => getLegalHoldStatus(input),
+  })
+}
+
+export function useLegalHoldMutation() {
+  return useMutation({
+    mutationFn: (input: LegalHoldMetadataInput) => applyLegalHoldMetadata(input),
   })
 }
 
