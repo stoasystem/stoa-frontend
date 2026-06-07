@@ -460,6 +460,64 @@ export type RecoveryJobSupportPackage = {
   }
 }
 
+export type SupportHandoffDestinationMode = 'preview' | 'copy' | 'download' | 'external_write'
+
+export type SupportHandoffPackageInput = {
+  reason: string
+  destination_mode: SupportHandoffDestinationMode
+  recovery_job_ids?: string[]
+  include_targets?: boolean
+  include_job_audit?: boolean
+  include_report_audit?: boolean
+  target_limit?: number
+  audit_limit?: number
+  release_evidence?: Record<string, unknown> | null
+  fixture?: {
+    fixture_name: string
+    expected_artifact_version?: string | null
+  } | null
+  operator_note?: string | null
+}
+
+export type SupportHandoffPackage = {
+  schema_version: string
+  package_id: string
+  generated_at: string
+  generated_by: string
+  reason: string
+  destination: {
+    mode: SupportHandoffDestinationMode | string
+    status: 'ready' | 'refused' | string
+    refusal_reasons: string[]
+  }
+  evidence_references: Array<{ type: string; id: string }>
+  sections: Array<{
+    type: string
+    reference?: { type: string; id: string } | null
+    status: string
+    data: Record<string, unknown>
+  }>
+  validation: {
+    status: 'passed' | 'refused' | 'failed' | string
+    failures?: string[]
+    missing_references: Array<{ type: string; id: string }>
+    skipped_sections: Array<{ type: string; reason: string }>
+    privacy: {
+      metadata_only: boolean
+      private_artifact_fields_omitted: boolean
+      passed: boolean
+      violation_count: number
+      violations: Array<Record<string, string>>
+    }
+  }
+  audit: {
+    correlation_id?: string | null
+    audit_event_refs: Array<Record<string, string>>
+  }
+  copy?: { format: 'markdown' | string; text: string }
+  download?: { filename: string; content_type: string }
+}
+
 export type ReleaseEvidenceValidationResult = {
   schema_version: string
   validated_at: string
@@ -808,6 +866,14 @@ export async function getRecoveryJobSupportPackage(input: {
         note: input.note || undefined,
       },
     },
+  )
+  return response.data
+}
+
+export async function createSupportHandoffPackage(input: SupportHandoffPackageInput) {
+  const response = await httpClient.post<SupportHandoffPackage>(
+    '/admin/reports/support-handoff-package',
+    input,
   )
   return response.data
 }

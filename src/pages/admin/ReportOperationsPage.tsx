@@ -44,6 +44,7 @@ import {
   useRecoveryJobResultsQuery,
   useRecoveryJobsQuery,
   useRecoveryJobSupportPackageMutation,
+  useSupportHandoffPackageMutation,
   useReportAuditEventsQuery,
   useReportOperationDetailQuery,
   useReportOperationsQuery,
@@ -69,6 +70,8 @@ import type {
   ReportOperationRow,
   ReportOperationTarget,
   ReportOperationsListFilters,
+  SupportHandoffDestinationMode,
+  SupportHandoffPackage,
 } from '@/services/admin/adminApi'
 
 type FilterDraft = {
@@ -153,6 +156,14 @@ export function AdminReportOperationsPage() {
   const [resumePreview, setResumePreview] = useState<RecoveryJobResumePreviewResponse | null>(null)
   const [supportPackage, setSupportPackage] = useState<RecoveryJobSupportPackage | null>(null)
   const [supportMessage, setSupportMessage] = useState<string | null>(null)
+  const [handoffReason, setHandoffReason] = useState('Support ticket handoff')
+  const [handoffNote, setHandoffNote] = useState('')
+  const [handoffDestination, setHandoffDestination] = useState<SupportHandoffDestinationMode>('preview')
+  const [handoffIncludeJob, setHandoffIncludeJob] = useState(true)
+  const [handoffIncludeRelease, setHandoffIncludeRelease] = useState(false)
+  const [handoffIncludeFixture, setHandoffIncludeFixture] = useState(true)
+  const [handoffPackage, setHandoffPackage] = useState<SupportHandoffPackage | null>(null)
+  const [handoffMessage, setHandoffMessage] = useState<string | null>(null)
   const [editReason, setEditReason] = useState('Admin metadata correction')
   const [editFields, setEditFields] = useState({
     admin_note: '',
@@ -195,6 +206,7 @@ export function AdminReportOperationsPage() {
   const previewResumeJobMutation = usePreviewResumeRecoveryJobMutation()
   const createResumeJobMutation = useCreateResumeRecoveryJobMutation()
   const supportPackageMutation = useRecoveryJobSupportPackageMutation()
+  const supportHandoffMutation = useSupportHandoffPackageMutation()
   const cancelJobMutation = useCancelRecoveryJobMutation()
   const evidenceMutation = useRecoveryEvidenceExportMutation()
   const releaseEvidenceValidationMutation = useReleaseEvidenceValidationMutation()
@@ -640,6 +652,68 @@ export function AdminReportOperationsPage() {
     )
   }
 
+  function createSupportHandoff() {
+    let releaseEvidence: Record<string, unknown> | null = null
+    if (handoffIncludeRelease) {
+      try {
+        const parsed = JSON.parse(releaseEvidenceInput)
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+          setHandoffMessage('Release evidence JSON must be an object')
+          return
+        }
+        releaseEvidence = parsed as Record<string, unknown>
+      } catch {
+        setHandoffMessage('Release evidence JSON is invalid')
+        return
+      }
+    }
+
+    supportHandoffMutation.mutate(
+      {
+        reason: handoffReason,
+        destination_mode: handoffDestination,
+        recovery_job_ids: handoffIncludeJob && selectedJobId ? [selectedJobId] : [],
+        include_targets: true,
+        include_job_audit: true,
+        include_report_audit: false,
+        target_limit: 50,
+        audit_limit: 50,
+        release_evidence: releaseEvidence,
+        fixture: handoffIncludeFixture ? { fixture_name: releaseFixtureName } : null,
+        operator_note: handoffNote.trim() || null,
+      },
+      {
+        onSuccess: (result) => {
+          setHandoffPackage(result)
+          setHandoffMessage(`Support handoff ${result.destination.status}: ${result.package_id}`)
+        },
+        onError: (error) => setHandoffMessage(error.message),
+      },
+    )
+  }
+
+  async function copySupportHandoff() {
+    if (!handoffPackage) return
+    try {
+      await navigator.clipboard.writeText(handoffPackage.copy?.text || JSON.stringify(handoffPackage, null, 2))
+    } catch {
+      // Clipboard can be unavailable in locked-down browser contexts; keep the package visible for manual copy.
+    }
+    setHandoffMessage('Support handoff copied')
+  }
+
+  function downloadSupportHandoff() {
+    if (!handoffPackage) return
+    const blob = new Blob([JSON.stringify(handoffPackage, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = handoffPackage.download?.filename || `stoa-support-handoff-${Date.now()}.json`
+    link.click()
+    URL.revokeObjectURL(url)
+    setHandoffMessage('Support handoff downloaded')
+  }
+
   function validateReleaseEvidenceInput() {
     let parsed: Record<string, unknown>
     try {
@@ -758,6 +832,28 @@ export function AdminReportOperationsPage() {
           onExportRecent={exportRecentEvidence}
           onCopy={copyEvidenceJson}
           onDownload={downloadEvidenceJson}
+        />
+
+        <SupportHandoffPanel
+          selectedJobId={selectedJobId}
+          reason={handoffReason}
+          note={handoffNote}
+          destination={handoffDestination}
+          includeJob={handoffIncludeJob}
+          includeRelease={handoffIncludeRelease}
+          includeFixture={handoffIncludeFixture}
+          packageData={handoffPackage}
+          message={handoffMessage}
+          isGenerating={supportHandoffMutation.isPending}
+          onReasonChange={setHandoffReason}
+          onNoteChange={setHandoffNote}
+          onDestinationChange={setHandoffDestination}
+          onIncludeJobChange={setHandoffIncludeJob}
+          onIncludeReleaseChange={setHandoffIncludeRelease}
+          onIncludeFixtureChange={setHandoffIncludeFixture}
+          onGenerate={createSupportHandoff}
+          onCopy={copySupportHandoff}
+          onDownload={downloadSupportHandoff}
         />
 
         <ReleaseEvidenceAutomationPanel
@@ -1690,6 +1786,166 @@ function RecoveryJobControlPanel({
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function SupportHandoffPanel({
+  selectedJobId,
+  reason,
+  note,
+  destination,
+  includeJob,
+  includeRelease,
+  includeFixture,
+  packageData,
+  message,
+  isGenerating,
+  onReasonChange,
+  onNoteChange,
+  onDestinationChange,
+  onIncludeJobChange,
+  onIncludeReleaseChange,
+  onIncludeFixtureChange,
+  onGenerate,
+  onCopy,
+  onDownload,
+}: {
+  selectedJobId: string | null
+  reason: string
+  note: string
+  destination: SupportHandoffDestinationMode
+  includeJob: boolean
+  includeRelease: boolean
+  includeFixture: boolean
+  packageData: SupportHandoffPackage | null
+  message: string | null
+  isGenerating: boolean
+  onReasonChange: (value: string) => void
+  onNoteChange: (value: string) => void
+  onDestinationChange: (value: SupportHandoffDestinationMode) => void
+  onIncludeJobChange: (value: boolean) => void
+  onIncludeReleaseChange: (value: boolean) => void
+  onIncludeFixtureChange: (value: boolean) => void
+  onGenerate: () => void
+  onCopy: () => void
+  onDownload: () => void
+}) {
+  const destinationOptions: { value: SupportHandoffDestinationMode; label: string }[] = [
+    { value: 'preview', label: 'Preview' },
+    { value: 'copy', label: 'Copy' },
+    { value: 'download', label: 'Download' },
+    { value: 'external_write', label: 'External write' },
+  ]
+  return (
+    <section role="region" aria-label="Support handoff" className="rounded-md border bg-card/70 p-4">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr),360px]">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <ClipboardCheck className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-semibold">Support handoff</h2>
+            <Badge variant="outline">Manual destinations</Badge>
+            <Badge variant="outline">Metadata only</Badge>
+          </div>
+          <div className="inline-flex flex-wrap rounded-md border bg-muted/25 p-1">
+            {destinationOptions.map((option) => (
+              <Button
+                key={option.value}
+                type="button"
+                variant={destination === option.value ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onDestinationChange(option.value)}
+              >
+                {option.value === 'download' ? <Download className="h-4 w-4" /> : <ClipboardList className="h-4 w-4" />}
+                {option.label}
+              </Button>
+            ))}
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Handoff reason
+              <textarea
+                value={reason}
+                onChange={(event) => onReasonChange(event.target.value)}
+                className="min-h-20 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+            <label className="block space-y-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Operator note
+              <textarea
+                value={note}
+                onChange={(event) => onNoteChange(event.target.value)}
+                className="min-h-20 w-full rounded-md border border-border/90 bg-card/75 px-3 py-2 text-sm normal-case tracking-normal text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+              />
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeJob} onChange={(event) => onIncludeJobChange(event.target.checked)} />
+              Selected job
+            </label>
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeRelease} onChange={(event) => onIncludeReleaseChange(event.target.checked)} />
+              Release JSON
+            </label>
+            <label className="inline-flex items-center gap-2 rounded-md border bg-muted/20 px-2 py-1.5">
+              <input type="checkbox" checked={includeFixture} onChange={(event) => onIncludeFixtureChange(event.target.checked)} />
+              Safe fixture
+            </label>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" onClick={onGenerate} disabled={isGenerating || reason.trim().length === 0}>
+              <FileJson className="h-4 w-4" />
+              Generate handoff package
+            </Button>
+            <Button type="button" variant="outline" onClick={onCopy} disabled={!packageData}>
+              <Copy className="h-4 w-4" />
+              Copy package
+            </Button>
+            <Button type="button" variant="outline" onClick={onDownload} disabled={!packageData}>
+              <Download className="h-4 w-4" />
+              Download JSON
+            </Button>
+          </div>
+          {message && <p className="text-xs text-muted-foreground">{message}</p>}
+        </div>
+        <div className="rounded-md border bg-muted/25 p-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Package preview</p>
+          {!packageData && <p className="text-sm text-muted-foreground">Generate a handoff package for ticket copy or download.</p>}
+          {packageData && (
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-3 gap-2">
+                <MetricPill label="Refs" value={packageData.evidence_references.length} />
+                <MetricPill label="Sections" value={packageData.sections.length} />
+                <MetricPill label="Privacy" value={packageData.validation.privacy.passed ? 1 : 0} />
+              </div>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <DetailItem label="Package" value={packageData.package_id} />
+                <DetailItem label="Destination" value={`${packageData.destination.mode} · ${packageData.destination.status}`} />
+                <DetailItem label="Validation" value={packageData.validation.status} />
+                {selectedJobId && <DetailItem label="Selected job" value={selectedJobId} />}
+              </div>
+              {packageData.destination.refusal_reasons.length > 0 && (
+                <div className="rounded-md border bg-background/70 px-2 py-1.5 text-xs text-muted-foreground">
+                  {packageData.destination.refusal_reasons.join('; ')}
+                </div>
+              )}
+              {packageData.sections.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {packageData.sections.map((section) => (
+                    <Badge key={`${section.type}-${section.status}`} variant="outline">
+                      {section.type.replace(/_/g, ' ')}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              <pre className="max-h-40 overflow-auto rounded-md bg-background p-2 text-[11px] leading-relaxed text-muted-foreground">
+                {JSON.stringify(packageData, null, 2)}
+              </pre>
             </div>
           )}
         </div>

@@ -803,6 +803,42 @@ test('admin can triage report operations and run selected recovery actions', asy
       }),
     })
   })
+  await page.route('**/admin/reports/support-handoff-package', async (route) => {
+    const body = JSON.parse(route.request().postData() || '{}')
+    const refused = body.destination_mode === 'external_write'
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        schema_version: 'v1',
+        package_id: refused ? 'support-handoff-refused' : 'support-handoff-1',
+        generated_at: '2026-06-07T10:00:00Z',
+        generated_by: 'admin-1',
+        reason: 'Support ticket handoff',
+        destination: {
+          mode: body.destination_mode || 'preview',
+          status: refused ? 'refused' : 'ready',
+          refusal_reasons: refused ? ['direct external writes require approved connector or secret-backed credential path'] : [],
+        },
+        evidence_references: refused ? [] : [{ type: 'recovery_job', id: 'job-3' }, { type: 'safe_fixture', id: 'stoa-safe-fixture-v2-2-rollback-2026-06-06' }],
+        sections: refused ? [] : [
+          { type: 'recovery_job_support_package', reference: { type: 'recovery_job', id: 'job-3' }, status: 'included', data: { scope: 'support_package' } },
+          { type: 'safe_fixture_status', reference: { type: 'safe_fixture', id: 'stoa-safe-fixture-v2-2-rollback-2026-06-06' }, status: 'ready', data: { status: 'ready' } },
+          { type: 'operator_note', reference: null, status: 'included', data: { note: 'support note' } },
+        ],
+        validation: {
+          status: refused ? 'refused' : 'passed',
+          failures: refused ? ['direct external writes require approved connector or secret-backed credential path'] : [],
+          missing_references: [],
+          skipped_sections: [],
+          privacy: { metadata_only: true, private_artifact_fields_omitted: true, passed: true, violation_count: 0, violations: [] },
+        },
+        audit: { correlation_id: 'req-handoff-1', audit_event_refs: [{ event_id: 'audit-handoff-1', event_at: '2026-06-07T10:00:00Z', action: 'support_handoff_package', result: refused ? 'refused' : 'generated' }] },
+        copy: { format: 'markdown', text: '# Support Handoff Package support-handoff-1' },
+        download: { filename: 'support-handoff-1.json', content_type: 'application/json' },
+      }),
+    })
+  })
   await page.route('**/admin/reports/release-evidence/validate', async (route) => {
     releaseEvidenceValidated = true
     await route.fulfill({
@@ -1042,6 +1078,20 @@ test('admin can triage report operations and run selected recovery actions', asy
   await expect(page.getByText('"scope": "recovery_job"')).toBeVisible()
   await page.getByRole('button', { name: /export recent jobs/i }).click()
   await expect(page.getByText('"scope": "recent_recovery_jobs"')).toBeVisible()
+  await expect(page.getByText('Support handoff')).toBeVisible()
+  await page.getByRole('button', { name: /incident resumable recovery/i }).click()
+  await page.getByRole('button', { name: /generate handoff package/i }).click()
+  await expect(page.getByText(/Support handoff ready: support-handoff-1/i)).toBeVisible()
+  await expect(page.getByText('support-handoff-1', { exact: true })).toBeVisible()
+  await expect(page.getByText('recovery job support package')).toBeVisible()
+  const handoffPanel = page.getByRole('region', { name: 'Support handoff' })
+  await handoffPanel.getByRole('button', { name: /copy package/i }).click()
+  await expect(page.getByText('Support handoff copied')).toBeVisible()
+  await handoffPanel.getByRole('button', { name: 'External write' }).click()
+  await handoffPanel.getByRole('button', { name: /generate handoff package/i }).click()
+  await expect(page.getByText(/Support handoff refused: support-handoff-refused/i)).toBeVisible()
+  await expect(handoffPanel.getByText(/direct external writes require approved connector/i).first()).toBeVisible()
+  await handoffPanel.getByRole('button', { name: 'Preview', exact: true }).click()
   await page.getByRole('button', { name: /validate release evidence/i }).click()
   await expect.poll(() => releaseEvidenceValidated).toBe(true)
   await expect(page.getByText('Release evidence validation: passed')).toBeVisible()

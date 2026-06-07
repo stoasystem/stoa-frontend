@@ -11,6 +11,7 @@ import {
   createGenerationRetryRecoveryJob,
   createResendRecoveryJob,
   createResumeRecoveryJob,
+  createSupportHandoffPackage,
   getRecoveryEvidenceExport,
   getRecoveryJobAuditEvents,
   getRecoveryJobResults,
@@ -34,6 +35,7 @@ import {
   type ReportEditDraftInput,
   type ReportOperationTarget,
   type ReportOperationsListFilters,
+  type SupportHandoffPackageInput,
   type RecoveryEvidenceExportParams,
 } from '@/services/admin/adminApi'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
@@ -171,6 +173,10 @@ export function useCreateResumeRecoveryJobMutation() {
 
 export function useRecoveryJobSupportPackageMutation() {
   return useMutation({ mutationFn: getRecoveryJobSupportPackage })
+}
+
+export function useSupportHandoffPackageMutation() {
+  return useMutation({ mutationFn: (input: SupportHandoffPackageInput) => createSupportHandoffPackage(input) })
 }
 
 export function useCancelRecoveryJobMutation() {
