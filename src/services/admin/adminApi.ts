@@ -1,5 +1,71 @@
 import { httpClient } from '@/services/api/httpClient'
+import { withDemoFallback } from '@/services/demo/demoFallback'
 import type { UserRole } from '@/types/user'
+
+export type AdminTeacherSlaStats = {
+  tracked_questions: number
+  first_reply: {
+    count: number
+    average_seconds: number | null
+    max_seconds: number | null
+  }
+  takeover: {
+    count: number
+    average_seconds: number | null
+    max_seconds: number | null
+  }
+  resolved: {
+    count: number
+    average_seconds: number | null
+    max_seconds: number | null
+  }
+  buckets: {
+    within_target: number
+    at_risk: number
+    breached: number
+    unknown: number
+  }
+  targets: {
+    first_reply_seconds: number
+    first_reply_at_risk_seconds: number
+    takeover_seconds: number
+  }
+}
+
+export type AdminPlatformStats = {
+  total_users: number
+  total_students: number
+  total_parents: number
+  total_teachers: number
+  total_questions: number
+  ai_resolved: number
+  teacher_resolved: number
+  escalated: number
+  teacher_sla: AdminTeacherSlaStats
+}
+
+const mockAdminPlatformStats: AdminPlatformStats = {
+  total_users: 42,
+  total_students: 18,
+  total_parents: 12,
+  total_teachers: 6,
+  total_questions: 128,
+  ai_resolved: 96,
+  teacher_resolved: 19,
+  escalated: 4,
+  teacher_sla: {
+    tracked_questions: 23,
+    first_reply: { count: 19, average_seconds: 1080, max_seconds: 2400 },
+    takeover: { count: 21, average_seconds: 720, max_seconds: 1500 },
+    resolved: { count: 19, average_seconds: 3600, max_seconds: 7200 },
+    buckets: { within_target: 15, at_risk: 2, breached: 2, unknown: 4 },
+    targets: {
+      first_reply_seconds: 1800,
+      first_reply_at_risk_seconds: 1200,
+      takeover_seconds: 900,
+    },
+  },
+}
 
 export type AdminUsageSummary = {
   activeUsers: number
@@ -10,6 +76,13 @@ export type AdminUsageSummary = {
   feedback: number
   billingInterestItems?: number
   generatedAt?: string
+}
+
+export async function getAdminPlatformStats() {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<AdminPlatformStats>('/admin/stats')
+    return response.data
+  }, mockAdminPlatformStats)
 }
 
 export type AdminFeedbackStatus = 'new' | 'reviewed' | 'resolved'

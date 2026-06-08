@@ -224,6 +224,12 @@ export const mockTutorHelpRequests: TutorHelpRequestSummary[] = [
     priority: 'high',
     requestMessage: 'Student needs help checking the solution steps.',
     createdAt: '2026-05-24T11:00:00Z',
+    firstTutorActionAt: '2026-05-24T11:18:00Z',
+    sla: {
+      status: 'within_target',
+      requestToFirstActionMinutes: 18,
+      targetMinutes: 30,
+    },
   },
 ]
 
@@ -234,6 +240,12 @@ export const mockTutorHelpRequestDetail: TutorHelpRequestDetail = {
   subject: 'Mathematics',
   status: 'pending',
   requestMessage: 'The student requested support after practising this step.',
+  firstTutorActionAt: '2026-05-24T11:18:00Z',
+  sla: {
+    status: 'within_target',
+    requestToFirstActionMinutes: 18,
+    targetMinutes: 30,
+  },
   practiceContext: {
     source: 'practice',
     subjectId: 'mathematics',
@@ -268,7 +280,22 @@ export const mockTutorHelpRequestDetail: TutorHelpRequestDetail = {
       status: 'sent',
     },
   ],
-  notes: [],
+  notes: [
+    {
+      id: 'note-rich-1',
+      note: 'Subtract 5 from both sides.\n3x = 15',
+      createdAt: '2026-05-24T11:18:00Z',
+      tutor: { id: 'demo-tutor', name: 'STOA teacher' },
+      responseFormat: 'stoa_teacher_reply_v1',
+      richContent: {
+        version: 1,
+        blocks: [
+          { type: 'paragraph', text: 'Subtract 5 from both sides.' },
+          { type: 'formula', latex: '3x = 15' },
+        ],
+      },
+    },
+  ],
 }
 
 export const mockTutorStats: TutorStats = {

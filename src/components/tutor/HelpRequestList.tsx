@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { HelpRequestStatusBadge } from '@/components/tutor/HelpRequestStatusBadge'
+import { TeacherSlaBadge } from '@/components/tutor/TeacherSlaBadge'
 import { Card, CardContent } from '@/components/ui/card'
 import type { TutorHelpRequestSummary } from '@/types/tutor'
 
@@ -44,7 +45,10 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
                     : 'not recorded'}
                 </p>
               </div>
-              <HelpRequestStatusBadge status={request.status} />
+              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+                <TeacherSlaBadge sla={request.sla} />
+                <HelpRequestStatusBadge status={request.status} />
+              </div>
             </CardContent>
           </Card>
         </Link>

@@ -1,4 +1,5 @@
 import { HelpRequestStatusBadge } from '@/components/tutor/HelpRequestStatusBadge'
+import { TeacherSlaBadge } from '@/components/tutor/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { TutorHelpRequestDetail } from '@/types/tutor'
 
@@ -13,7 +14,10 @@ export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDe
               {request.subject} - {request.student.grade}
             </p>
           </div>
-          <HelpRequestStatusBadge status={request.status} />
+          <div className="flex flex-wrap items-center gap-2">
+            <TeacherSlaBadge sla={request.sla} />
+            <HelpRequestStatusBadge status={request.status} />
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">

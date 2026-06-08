@@ -9,8 +9,8 @@ import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
 import { PracticeRequestContextCard } from '@/components/tutor/PracticeRequestContextCard'
+import { TeacherReplyComposer } from '@/components/tutor/TeacherReplyComposer'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
-import { TutorRequestNoteForm } from '@/components/tutor/TutorRequestNoteForm'
 import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
 import { Button } from '@/components/ui/button'
 import { useAddTutorHelpRequestNoteMutation } from '@/hooks/tutor/useAddTutorHelpRequestNoteMutation'
@@ -96,13 +96,13 @@ export function TutorHelpRequestDetailPage() {
             </div>
             {updateStatus.isError && <p className="text-sm text-destructive">Failed to update status.</p>}
             <SectionHeader
-              title="Tutor notes"
+              title="Teacher reply"
               description="Record the intervention, next step, or follow-up the student needs."
             />
-            <TutorRequestNoteForm
+            <TeacherReplyComposer
               isSubmitting={addNote.isPending}
-              onSubmit={(content, onSuccess) =>
-                requestId && addNote.mutate({ requestId, content }, { onSuccess })
+              onSubmit={(content, richContent, onSuccess) =>
+                requestId && addNote.mutate({ requestId, content, richContent }, { onSuccess })
               }
             />
             <TutorRequestTimeline notes={requestQuery.data.notes ?? []} />

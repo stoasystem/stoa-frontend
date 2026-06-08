@@ -12,6 +12,7 @@ import type {
   TutorHelpRequestSummary,
   TutorProfile,
   TutorStats,
+  TeacherReplyRichContent,
 } from '@/types/tutor'
 
 const mockTutorProfile: TutorProfile = {
@@ -110,14 +111,16 @@ export async function updateTutorHelpRequestStatus({
 export async function addTutorHelpRequestNote({
   requestId,
   content,
+  richContent,
 }: {
   requestId: string
   content: string
+  richContent?: TeacherReplyRichContent
 }) {
   return withDemoFallback(async () => {
     const response = await httpClient.post<TutorHelpRequestNote>(
       `/tutors/me/help-requests/${requestId}/notes`,
-      { content },
+      { content, richContent },
     )
     return response.data
   }, {
@@ -125,6 +128,11 @@ export async function addTutorHelpRequestNote({
     note: content,
     createdAt: new Date().toISOString(),
     tutor: { id: 'demo-tutor', name: 'STOA teacher' },
+    richContent: richContent ?? {
+      version: 1,
+      blocks: [{ type: 'paragraph', text: content }],
+    },
+    responseFormat: 'stoa_teacher_reply_v1',
   })
 }
 

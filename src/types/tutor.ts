@@ -2,6 +2,21 @@ import type { ChatMessage } from '@/types/chat'
 import type { PracticeTeacherRequestContext } from '@/types/practice'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
+export type TeacherReplyBlock =
+  | { type: 'paragraph' | 'heading' | 'ordered_list' | 'unordered_list' | 'quote' | 'code'; text: string }
+  | { type: 'formula'; latex: string }
+
+export type TeacherReplyRichContent = {
+  version: 1
+  blocks: TeacherReplyBlock[]
+}
+
+export type TeacherSlaSnapshot = {
+  status: 'within_target' | 'at_risk' | 'breached' | 'unknown'
+  requestToFirstActionMinutes?: number | null
+  targetMinutes: number
+}
+
 export type TutorHelpRequestSummary = {
   requestId: string
   conversationId: string
@@ -13,6 +28,7 @@ export type TutorHelpRequestSummary = {
   priority?: 'low' | 'medium' | 'high'
   createdAt: string
   firstTutorActionAt?: string
+  sla?: TeacherSlaSnapshot
 }
 
 export type TutorHelpRequestNote = {
@@ -23,6 +39,8 @@ export type TutorHelpRequestNote = {
     id: string
     name: string
   }
+  richContent?: TeacherReplyRichContent
+  responseFormat?: string
 }
 
 export type TutorHelpRequestDetail = {
@@ -40,6 +58,7 @@ export type TutorHelpRequestDetail = {
   messages: ChatMessage[]
   notes?: TutorHelpRequestNote[]
   firstTutorActionAt?: string
+  sla?: TeacherSlaSnapshot
 }
 
 export type TutorStats = {

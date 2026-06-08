@@ -1,3 +1,4 @@
+import { RichTeacherReply } from '@/components/tutor/RichTeacherReply'
 import type { TutorHelpRequestNote } from '@/types/tutor'
 
 export function TutorRequestTimeline({ notes }: { notes: TutorHelpRequestNote[] }) {
@@ -17,7 +18,9 @@ export function TutorRequestTimeline({ notes }: { notes: TutorHelpRequestNote[] 
             <p className="text-sm font-medium">{note.tutor.name}</p>
             <time className="text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString()}</time>
           </div>
-          <p className="mt-3 text-sm leading-6 text-muted-foreground">{note.note}</p>
+          <div className="mt-3">
+            <RichTeacherReply content={note.richContent} fallback={note.note} />
+          </div>
         </article>
       ))}
     </div>

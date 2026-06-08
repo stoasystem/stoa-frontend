@@ -1,11 +1,15 @@
+import { AdminTeacherSlaCard } from '@/components/admin/AdminTeacherSlaCard'
 import { AdminOperationCard } from '@/components/admin/AdminOperationCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useAdminPlatformStatsQuery } from '@/hooks/admin/useAdminPlatformStatsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function AdminDashboardPage() {
+  const platformStatsQuery = useAdminPlatformStatsQuery()
+
   return (
     <DashboardLayout>
       <PageContainer className="p-0">
@@ -41,6 +45,7 @@ export function AdminDashboardPage() {
             </CardContent>
           </Card>
         </div>
+        <AdminTeacherSlaCard stats={platformStatsQuery.data?.teacher_sla} />
         <div className="grid gap-4 md:grid-cols-2">
           <AdminOperationCard
             title="Usage summary"
