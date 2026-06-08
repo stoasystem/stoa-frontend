@@ -1,4 +1,5 @@
 import { AdminTeacherSlaCard } from '@/components/admin/AdminTeacherSlaCard'
+import { AdminOperationalNotificationsCard } from '@/components/admin/AdminOperationalNotificationsCard'
 import { AdminOperationCard } from '@/components/admin/AdminOperationCard'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -46,6 +47,7 @@ export function AdminDashboardPage() {
           </Card>
         </div>
         <AdminTeacherSlaCard stats={platformStatsQuery.data?.teacher_sla} />
+        <AdminOperationalNotificationsCard />
         <div className="grid gap-4 md:grid-cols-2">
           <AdminOperationCard
             title="Usage summary"

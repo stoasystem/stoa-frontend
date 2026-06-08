@@ -4,4 +4,5 @@ export const tutorQueryKeys = {
   stats: () => [...tutorQueryKeys.all, 'stats'] as const,
   helpRequests: () => [...tutorQueryKeys.all, 'help-requests'] as const,
   helpRequestDetail: (requestId: string) => [...tutorQueryKeys.helpRequests(), requestId] as const,
+  assistanceSummary: (questionId: string) => [...tutorQueryKeys.all, 'assistance-summary', questionId] as const,
 }

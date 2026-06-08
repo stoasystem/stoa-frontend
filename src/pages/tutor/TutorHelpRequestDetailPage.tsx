@@ -12,9 +12,11 @@ import { PracticeRequestContextCard } from '@/components/tutor/PracticeRequestCo
 import { TeacherReplyComposer } from '@/components/tutor/TeacherReplyComposer'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
 import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
+import { TeacherAssistanceSummaryCard } from '@/components/tutor/TeacherAssistanceSummaryCard'
 import { Button } from '@/components/ui/button'
 import { useAddTutorHelpRequestNoteMutation } from '@/hooks/tutor/useAddTutorHelpRequestNoteMutation'
 import { useTutorHelpRequestDetailQuery } from '@/hooks/tutor/useTutorHelpRequestDetailQuery'
+import { useTutorAssistanceSummaryQuery } from '@/hooks/tutor/useTutorAssistanceSummaryQuery'
 import { useUpdateTutorHelpRequestMutation } from '@/hooks/tutor/useUpdateTutorHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -28,6 +30,7 @@ export function TutorHelpRequestDetailPage() {
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
   const updateStatus = useUpdateTutorHelpRequestMutation()
   const addNote = useAddTutorHelpRequestNoteMutation()
+  const assistanceQuery = useTutorAssistanceSummaryQuery(requestQuery.data?.requestId)
 
   useEffect(() => {
     if (!requestId) return
@@ -58,6 +61,11 @@ export function TutorHelpRequestDetailPage() {
               <PracticeRequestContextCard context={requestQuery.data.practiceContext} />
             )}
             <HelpRequestDetailCard request={requestQuery.data} />
+            <TeacherAssistanceSummaryCard
+              summary={assistanceQuery.data}
+              isLoading={assistanceQuery.isLoading}
+              isError={assistanceQuery.isError}
+            />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">
                 Resolution note

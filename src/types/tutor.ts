@@ -67,6 +67,20 @@ export type TutorStats = {
   averageResponseTimeMinutes: number
 }
 
+export type TeacherAssistanceSummary = {
+  summaryId: string
+  questionId: string
+  studentId: string
+  subject: string
+  studentContextSummary: string
+  questionSummary: string
+  aiAnswerSummary: string
+  weakTopics: string[]
+  suggestedFocus: string
+  sourceCount: number
+  createdAt: string
+}
+
 export type TutorQualification = {
   title: string
   institution?: string

@@ -13,6 +13,7 @@ import type {
   TutorProfile,
   TutorStats,
   TeacherReplyRichContent,
+  TeacherAssistanceSummary,
 } from '@/types/tutor'
 
 const mockTutorProfile: TutorProfile = {
@@ -141,6 +142,27 @@ export async function getTutorStats() {
     const response = await httpClient.get<TutorStats>('/tutors/me/stats')
     return response.data
   }, mockTutorStats)
+}
+
+export async function getTutorAssistanceSummary(questionId: string) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<TeacherAssistanceSummary>(
+      `/tutors/questions/${questionId}/assistance-summary`,
+    )
+    return response.data
+  }, {
+    summaryId: `assist-${questionId}`,
+    questionId,
+    studentId: 'demo-student',
+    subject: 'Mathematics',
+    studentContextSummary: 'Student has active Mathematics evidence around linear equations and moving terms.',
+    questionSummary: 'Anna is stuck on solving 3x = 15 after moving terms across the equals sign.',
+    aiAnswerSummary: 'The assistant explained isolating x and checking the result.',
+    weakTopics: ['Linear equations', 'Moving terms'],
+    suggestedFocus: 'Clarify the algebra step before giving the final answer.',
+    sourceCount: 4,
+    createdAt: new Date().toISOString(),
+  })
 }
 
 function mergeTutorProfile(profile: TutorProfile): TutorProfile {

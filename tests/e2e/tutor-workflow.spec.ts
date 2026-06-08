@@ -12,6 +12,8 @@ test('tutor can filter and open a help request', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /request detail|anna keller/i })).toBeVisible()
   await expect(page.getByText(/within sla/i).first()).toBeVisible()
   await expect(page.getByText('3x = 15', { exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: /teacher assistance seed/i })).toBeVisible()
+  await expect(page.getByText(/clarify the algebra step/i)).toBeVisible()
 
   await page.getByRole('button', { name: /mark in progress/i }).click()
   await expect(page.getByText(/request status updated/i)).toBeVisible()
@@ -32,4 +34,6 @@ test('admin dashboard exposes aggregate teacher SLA metrics', async ({ page }) =
   await expect(page.getByRole('heading', { name: /teacher sla/i })).toBeVisible()
   await expect(page.getByText(/avg reply/i)).toBeVisible()
   await expect(page.getByText(/breached/i)).toBeVisible()
+  await expect(page.getByRole('heading', { name: /operational notifications/i })).toBeVisible()
+  await expect(page.getByText(/subscription request updated/i)).toBeVisible()
 })

@@ -24,6 +24,7 @@ import { AppLogo } from '@/components/common/AppLogo'
 import { FeedbackButton } from '@/components/feedback/FeedbackButton'
 import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
+import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { UserMenu } from '@/components/common/UserMenu'
 import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
 import { enableFeedback } from '@/lib/env'
@@ -196,6 +197,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 ))}
               </nav>
               <div className="ml-auto flex shrink-0 items-center gap-3">
+                {user && <NotificationCenter />}
                 <LanguageSwitcher compact />
                 <div className="hidden sm:block">
                   <UserMenu variant="top" />
