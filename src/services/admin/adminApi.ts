@@ -1,6 +1,11 @@
 import { httpClient } from '@/services/api/httpClient'
 import { withDemoFallback } from '@/services/demo/demoFallback'
 import type { UserRole } from '@/types/user'
+import type {
+  SubscriptionRequest,
+  SubscriptionRequestFilters,
+  SubscriptionRequestListResponse,
+} from '@/types/subscriptionOperations'
 
 export type AdminTeacherSlaStats = {
   tracked_questions: number
@@ -1616,5 +1621,54 @@ export async function getReleaseFixtureStatus(input: {
 
 export async function cancelRecoveryJob(jobId: string) {
   const response = await httpClient.post<RecoveryJob>(`/admin/reports/recovery-jobs/${jobId}/cancel`)
+  return response.data
+}
+
+export async function getSubscriptionRequests(filters: SubscriptionRequestFilters = {}) {
+  const response = await httpClient.get<SubscriptionRequestListResponse>(
+    '/admin/subscriptions/requests',
+    {
+      params: {
+        status: filters.status || undefined,
+        requested_tier: filters.requestedTier || undefined,
+        parent_id: filters.parentId || undefined,
+        date_from: filters.dateFrom || undefined,
+        date_to: filters.dateTo || undefined,
+        limit: filters.limit,
+      },
+    },
+  )
+  return response.data
+}
+
+export async function getSubscriptionRequest(requestId: string) {
+  const response = await httpClient.get<SubscriptionRequest>(
+    `/admin/subscriptions/requests/${requestId}`,
+  )
+  return response.data
+}
+
+export async function updateSubscriptionRequest(input: {
+  requestId: string
+  status: string
+  adminNote?: string
+  effectiveAt?: string
+}) {
+  const response = await httpClient.patch<SubscriptionRequest>(
+    `/admin/subscriptions/requests/${input.requestId}`,
+    {
+      status: input.status,
+      admin_note: input.adminNote,
+      effective_at: input.effectiveAt,
+    },
+  )
+  return response.data
+}
+
+export async function applySubscriptionRequest(input: { requestId: string; adminNote?: string; effectiveAt?: string }) {
+  const response = await httpClient.post<SubscriptionRequest>(
+    `/admin/subscriptions/requests/${input.requestId}/apply`,
+    { admin_note: input.adminNote, effective_at: input.effectiveAt },
+  )
   return response.data
 }

@@ -12,6 +12,7 @@ import { AdminOperationsPlaceholderPage } from '@/pages/admin/OperationsPlacehol
 import { AdminReportOperationsPage } from '@/pages/admin/ReportOperationsPage'
 import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
 import { AdminSupportTicketsPage } from '@/pages/admin/AdminSupportTicketsPage'
+import { AdminSubscriptionRequestsPage } from '@/pages/admin/AdminSubscriptionRequestsPage'
 import { AdminUsagePage } from '@/pages/admin/Usage'
 import { AdvancedAnalyticsPage } from '@/pages/admin/AdvancedAnalyticsPage'
 import { RetentionPage } from '@/pages/admin/RetentionPage'
@@ -193,6 +194,7 @@ export function AppRouter() {
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
             <Route path="/admin/moderation" element={<AdminModerationPage />} />
             <Route path="/admin/report-operations" element={<AdminReportOperationsPage />} />
+            <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
             <Route
               path="/admin/users"
               element={<AdminOperationsPlaceholderPage title="Users" />}

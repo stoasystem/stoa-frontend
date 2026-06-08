@@ -6,6 +6,7 @@ import { ParentClassroomVisibilityCard } from '@/features/live-classroom/compone
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
+import { ParentSubscriptionOperationsCard } from '@/components/parent/ParentSubscriptionOperationsCard'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
@@ -25,6 +26,7 @@ export function ParentDashboardPage() {
           <ParentValueCard />
           <UpgradePromptCard source="parent_dashboard" />
         </div>
+        <ParentSubscriptionOperationsCard />
         <ParentClassroomVisibilityCard />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-destructive">{t('loadChildrenFailed')}</p>}
