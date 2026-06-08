@@ -3,13 +3,16 @@ import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
+import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useChildLearningProfileQuery } from '@/hooks/parent/useChildLearningProfileQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function ChildSummaryPage() {
   const { childId } = useParams()
   const summaryQuery = useChildLearningSummaryQuery(childId)
+  const learningProfileQuery = useChildLearningProfileQuery(childId)
   const summary = summaryQuery.data
 
   return (
@@ -56,6 +59,13 @@ export function ChildSummaryPage() {
                 </Card>
               ))}
             </div>
+            <LearningProfileSignals
+              title="Subject profile"
+              description="Parent-visible subject signals from questions, practice, and tutor escalation."
+              profile={learningProfileQuery.data}
+              isLoading={learningProfileQuery.isLoading}
+              isError={learningProfileQuery.isError}
+            />
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>

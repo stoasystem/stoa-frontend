@@ -177,64 +177,53 @@ export const mockOrganizationReports: OrganizationReportOverview = {
 }
 
 export const mockLearningProfile: LearningProfile = {
-  student: { id: 'student-anna', name: 'Anna Keller', grade: 'Grade 8' },
-  activeSubjects: ['Mathematics', 'Physics'],
+  studentId: 'student-anna',
+  subjects: [
+    { id: 'math', label: 'Mathematics', rolloutState: 'active' },
+    { id: 'physics', label: 'Physics', rolloutState: 'foundation' },
+    { id: 'german', label: 'German', rolloutState: 'foundation' },
+    { id: 'english', label: 'English', rolloutState: 'foundation' },
+  ],
+  subjectActivity: [
+    {
+      subject: 'math',
+      label: 'Mathematics',
+      rolloutState: 'active',
+      questionCount: 12,
+      aiResolvedCount: 10,
+      teacherEscalationCount: 2,
+      feedbackAverage: 4.3,
+    },
+    {
+      subject: 'physics',
+      label: 'Physics',
+      rolloutState: 'foundation',
+      questionCount: 4,
+      aiResolvedCount: 3,
+      teacherEscalationCount: 1,
+      feedbackAverage: 3.8,
+    },
+  ],
   weakTopics: [
     {
-      id: 'topic-quadratic-word-problems',
-      subject: 'Mathematics',
-      topic: 'Quadratic word problems',
-      level: 'weak',
-      evidenceCount: 6,
-      lastPracticedAt: '2026-06-10T15:00:00Z',
+      subject: 'math',
+      topicId: 'quadratic-word-problems',
+      label: 'Quadratic word problems',
+      count: 6,
+      latestEvidenceAt: '2026-06-10T15:00:00Z',
+      evidenceQuestionIds: ['question-1', 'question-2'],
     },
     {
-      id: 'topic-forces-motion',
-      subject: 'Physics',
-      topic: 'Forces and motion',
-      level: 'developing',
-      evidenceCount: 4,
-      lastPracticedAt: '2026-06-09T17:10:00Z',
+      subject: 'physics',
+      topicId: 'forces-and-motion',
+      label: 'Forces and motion',
+      count: 4,
+      latestEvidenceAt: '2026-06-09T17:10:00Z',
+      evidenceQuestionIds: ['question-3'],
     },
   ],
-  strongTopics: [
-    {
-      id: 'topic-linear-equations',
-      subject: 'Mathematics',
-      topic: 'Linear equations',
-      level: 'strong',
-      evidenceCount: 12,
-      lastPracticedAt: '2026-06-09T15:00:00Z',
-    },
-  ],
-  recentHistory: [
-    {
-      id: 'history-1',
-      title: 'Factoring practice',
-      subject: 'Mathematics',
-      summary: 'Practiced factoring quadratic expressions and checking solution pairs.',
-      createdAt: '2026-06-10T15:30:00Z',
-    },
-  ],
-  usage: {
-    aiMessagesThisMonth: 82,
-    fileUploadsThisMonth: 12,
-    teacherHelpRequestsThisMonth: 3,
-  },
-  teacherHelpHistory: [
-    {
-      id: 'help-1',
-      subject: 'Mathematics',
-      status: 'resolved',
-      summary: 'Tutor clarified how to convert a word problem into an equation.',
-      createdAt: '2026-06-10T16:20:00Z',
-    },
-  ],
-  recommendedActions: [
-    'Practice translating word problems into equations before solving.',
-    'Review factorization patterns with 5 guided examples.',
-    'Ask a tutor if the same setup mistake repeats.',
-  ],
+  strengthTopics: [],
+  updatedAt: '2026-06-10T16:20:00Z',
 }
 
 export const mockLearningDiagnosis: LearningDiagnosis = {

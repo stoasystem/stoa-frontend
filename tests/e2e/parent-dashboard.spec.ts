@@ -67,6 +67,12 @@ async function routeParentChildDetails(page: Page, reportState: ReportState = av
       json: parentHistory(),
     })
   })
+  await page.route(`**/parents/me/children/${childId}/learning-profile`, async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: parentLearningProfile(),
+    })
+  })
   await page.route(`**/parents/me/children/${childId}/report`, async (route) => {
     await route.fulfill({
       contentType: 'application/json',
@@ -218,6 +224,50 @@ function parentHistory() {
         createdAt: '2026-06-02T09:00:00Z',
       },
     ],
+  }
+}
+
+function parentLearningProfile() {
+  return {
+    studentId: childId,
+    subjects: [
+      { id: 'math', label: 'Mathematics', rolloutState: 'active' },
+      { id: 'physics', label: 'Physics', rolloutState: 'foundation' },
+      { id: 'german', label: 'German', rolloutState: 'foundation' },
+      { id: 'english', label: 'English', rolloutState: 'foundation' },
+    ],
+    subjectActivity: [
+      {
+        subject: 'math',
+        label: 'Mathematics',
+        rolloutState: 'active',
+        questionCount: 5,
+        aiResolvedCount: 4,
+        teacherEscalationCount: 1,
+        feedbackAverage: 4.1,
+      },
+      {
+        subject: 'physics',
+        label: 'Physics',
+        rolloutState: 'foundation',
+        questionCount: 2,
+        aiResolvedCount: 1,
+        teacherEscalationCount: 1,
+        feedbackAverage: 3.6,
+      },
+    ],
+    weakTopics: [
+      {
+        subject: 'math',
+        topicId: 'fractions',
+        label: 'Fractions',
+        count: 2,
+        latestEvidenceAt: '2026-06-02T10:00:00Z',
+        evidenceQuestionIds: ['question-1'],
+      },
+    ],
+    strengthTopics: [],
+    updatedAt: '2026-06-02T10:00:00Z',
   }
 }
 

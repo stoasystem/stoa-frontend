@@ -1,4 +1,5 @@
 import { httpClient } from '@/services/api/httpClient'
+import type { LearningProfile } from '@/types/learningProfile'
 import type {
   ChildLearningHistoryResponse,
   ChildLearningSummary,
@@ -25,6 +26,13 @@ export async function getChildLearningSummary(childId: string) {
 export async function getChildLearningHistory(childId: string) {
   const response = await httpClient.get<ChildLearningHistoryResponse>(
     `/parents/me/children/${childId}/history`,
+  )
+  return response.data
+}
+
+export async function getChildLearningProfile(childId: string) {
+  const response = await httpClient.get<LearningProfile>(
+    `/parents/me/children/${childId}/learning-profile`,
   )
   return response.data
 }

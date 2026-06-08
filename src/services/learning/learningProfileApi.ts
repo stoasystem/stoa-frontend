@@ -9,6 +9,6 @@ export async function getLearningProfile(studentId: string) {
     return response.data
   }, {
     ...mockLearningProfile,
-    student: { ...mockLearningProfile.student, id: studentId },
+    studentId,
   })
 }

@@ -12,6 +12,7 @@ import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { AttachmentPreviewList } from '@/features/uploads/components/AttachmentPreviewList'
 import { useInstantVideoHelp } from '@/features/live-classroom/hooks/useInstantVideoHelp'
@@ -31,6 +32,7 @@ import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuer
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { PracticeChatLocationState } from '@/types/practice'
+import { learningSubjectOptions } from '@/types/learningProfile'
 import type { QuestionBankChatLocationState } from '@/types/questionBank'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
@@ -60,6 +62,7 @@ export function ChatPage() {
   const [uploadContext, setUploadContext] = useState<UploadChatHandoff | null>(null)
 
   const conversationsQuery = useConversationsQuery()
+  const [selectedSubjectId, setSelectedSubjectId] = useState(learningSubjectOptions[0].id)
   const studentProfileQuery = useStudentProfileQuery()
   const practiceState = location.state as (PracticeChatLocationState & QuestionBankChatLocationState & UploadChatLocationState) | null
   const practiceContext = practiceState?.practiceContext
@@ -68,6 +71,9 @@ export function ChatPage() {
     () => conversationsQuery.data?.items ?? [],
     [conversationsQuery.data],
   )
+
+  const selectedSubject = learningSubjectOptions.find((subject) => subject.id === selectedSubjectId)
+    ?? learningSubjectOptions[0]
 
   useEffect(() => {
     if (!activeConversationId) return
@@ -102,6 +108,13 @@ export function ChatPage() {
     setActiveConversationId(null)
     setNewConversationMessage(nextUploadContext.prompt)
   }, [location.key, practiceState?.uploadContext])
+
+  useEffect(() => {
+    const preferredSubject = subjectIdFromProfile(studentProfileQuery.data?.primarySubjects?.[0])
+    if (!preferredSubject) return
+
+    setSelectedSubjectId(preferredSubject)
+  }, [studentProfileQuery.data?.primarySubjects])
 
   useEffect(() => {
     if (!practiceContext) return
@@ -156,7 +169,7 @@ export function ChatPage() {
     const initialAttachments = uploadContext?.attachments.map(uploadAttachmentToUploadedFile)
 
     const profile = studentProfileQuery.data
-    const subject = profile?.primarySubjects?.[0] ?? 'General'
+    const subject = selectedSubject.label
     const grade = profile?.grade ?? 'Grade 8'
 
     createConversationMutation.mutate(
@@ -311,6 +324,32 @@ export function ChatPage() {
             handleCreateConversation(newConversationMessage)
           }}
         >
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Subject for this question</p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {learningSubjectOptions.map((subject) => {
+                const selected = subject.id === selectedSubjectId
+                return (
+                  <button
+                    key={subject.id}
+                    type="button"
+                    className={`flex min-h-12 items-center justify-between gap-3 rounded-md border px-3 text-left text-sm transition ${
+                      selected
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border/80 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
+                    }`}
+                    onClick={() => setSelectedSubjectId(subject.id)}
+                    aria-pressed={selected}
+                  >
+                    <span className="font-medium">{subject.label}</span>
+                    <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
+                      {subject.rolloutState === 'active' ? 'Active' : 'Foundation'}
+                    </Badge>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
           <Textarea
             value={newConversationMessage}
             onChange={(event) => setNewConversationMessage(event.target.value)}
@@ -554,4 +593,13 @@ function UploadLearningContextCard({
       </div>
     </section>
   )
+}
+
+function subjectIdFromProfile(subject: string | undefined) {
+  if (!subject) return undefined
+  const normalized = subject.toLowerCase()
+  return learningSubjectOptions.find((option) => (
+    normalized.includes(option.id)
+    || normalized.includes(option.label.toLowerCase())
+  ))?.id
 }

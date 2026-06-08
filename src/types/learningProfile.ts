@@ -1,41 +1,42 @@
-export type LearningTopicLevel = 'weak' | 'developing' | 'stable' | 'strong'
+export type LearningSubjectRolloutState = 'active' | 'foundation'
 
-export type LearningTopic = {
+export type LearningSubjectDefinition = {
   id: string
+  label: string
+  rolloutState: LearningSubjectRolloutState
+}
+
+export type LearningSubjectActivity = {
   subject: string
-  topic: string
-  level: LearningTopicLevel
-  evidenceCount: number
-  lastPracticedAt?: string
+  label: string
+  rolloutState: LearningSubjectRolloutState
+  questionCount: number
+  aiResolvedCount: number
+  teacherEscalationCount: number
+  feedbackAverage: number | null
+}
+
+export type LearningWeakTopic = {
+  subject: string
+  topicId: string
+  label: string
+  count: number
+  latestEvidenceAt?: string | null
+  evidenceQuestionIds: string[]
 }
 
 export type LearningProfile = {
-  student: {
-    id: string
-    name: string
-    grade: string
-  }
-  activeSubjects: string[]
-  weakTopics: LearningTopic[]
-  strongTopics: LearningTopic[]
-  recentHistory: {
-    id: string
-    title: string
-    subject: string
-    summary: string
-    createdAt: string
-  }[]
-  usage: {
-    aiMessagesThisMonth: number
-    fileUploadsThisMonth: number
-    teacherHelpRequestsThisMonth: number
-  }
-  teacherHelpHistory: {
-    id: string
-    subject: string
-    status: 'pending' | 'resolved'
-    summary: string
-    createdAt: string
-  }[]
-  recommendedActions: string[]
+  studentId: string
+  subjects: LearningSubjectDefinition[]
+  subjectActivity: LearningSubjectActivity[]
+  weakTopics: LearningWeakTopic[]
+  strengthTopics: LearningWeakTopic[]
+  updatedAt: string
 }
+
+export const learningSubjectOptions: LearningSubjectDefinition[] = [
+  { id: 'math', label: 'Mathematics', rolloutState: 'active' },
+  { id: 'physics', label: 'Physics', rolloutState: 'foundation' },
+  { id: 'german', label: 'German', rolloutState: 'foundation' },
+  { id: 'english', label: 'English', rolloutState: 'foundation' },
+]

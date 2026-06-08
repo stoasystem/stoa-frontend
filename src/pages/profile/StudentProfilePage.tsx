@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
+import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -23,6 +24,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
+import { useStudentLearningProfileQuery } from '@/hooks/student/useStudentLearningProfileQuery'
 import { useUpdateStudentProfileMutation } from '@/hooks/student/useUpdateStudentProfileMutation'
 import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
@@ -67,6 +69,7 @@ type ProfileBillingSnapshot = {
 export function StudentProfilePage() {
   const profileQuery = useStudentProfileQuery()
   const subscriptionQuery = useSubscriptionQuery()
+  const learningProfileQuery = useStudentLearningProfileQuery(profileQuery.data?.userId)
   const updateProfile = useUpdateStudentProfileMutation()
   const [grade, setGrade] = useState('')
   const [schoolSystem, setSchoolSystem] = useState('')
@@ -201,6 +204,13 @@ export function StudentProfilePage() {
                 </div>
               </form>
             </section>
+            <LearningProfileSignals
+              title="Learning expansion"
+              description="Subject signals from real questions and practice. Foundation subjects show early profile evidence."
+              profile={learningProfileQuery.data}
+              isLoading={learningProfileQuery.isLoading}
+              isError={learningProfileQuery.isError}
+            />
           </>
         )}
       </PageContainer>

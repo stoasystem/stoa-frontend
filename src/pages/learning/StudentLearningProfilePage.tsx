@@ -3,9 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
-import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { LearningProfileHeader } from '@/components/learning/LearningProfileHeader'
-import { RecommendedActionsCard } from '@/components/learning/RecommendedActionsCard'
 import { StrongTopicList } from '@/components/learning/StrongTopicList'
 import { WeakTopicList } from '@/components/learning/WeakTopicList'
 import { Button } from '@/components/ui/button'
@@ -43,7 +41,7 @@ export function StudentLearningProfilePage() {
           items={[
             { label: 'Organization', to: '/organization' },
             { label: 'Students', to: '/organization/students' },
-            { label: profileQuery.data?.student.name ?? 'Learning profile' },
+            { label: profileQuery.data?.studentId ?? 'Learning profile' },
           ]}
         />
         {profileQuery.data && (
@@ -51,39 +49,36 @@ export function StudentLearningProfilePage() {
             <LearningProfileHeader profile={profileQuery.data} />
             <div className="grid gap-4 lg:grid-cols-2">
               <WeakTopicList topics={profileQuery.data.weakTopics} />
-              <StrongTopicList topics={profileQuery.data.strongTopics} />
+              <StrongTopicList topics={profileQuery.data.strengthTopics} />
             </div>
             <div className="grid gap-4 lg:grid-cols-[1fr_1.2fr]">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Recent learning history</CardTitle>
+                  <CardTitle className="text-xl">Subject activity</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {profileQuery.data.recentHistory.map((item) => (
-                    <div key={item.id} className="rounded-md border p-3">
-                      <p className="font-medium">{item.title}</p>
-                      <p className="text-sm text-muted-foreground">{item.summary}</p>
+                  {profileQuery.data.subjectActivity.map((item) => (
+                    <div key={item.subject} className="rounded-md border p-3">
+                      <p className="font-medium">{item.label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.questionCount} questions · {item.aiResolvedCount} AI resolved · {item.teacherEscalationCount} tutor help
+                      </p>
                     </div>
                   ))}
                 </CardContent>
               </Card>
-              <RecommendedActionsCard actions={profileQuery.data.recommendedActions} />
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Teacher help history</CardTitle>
+                  <CardTitle className="text-xl">Profile freshness</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3">
-                  {profileQuery.data.teacherHelpHistory.map((item) => (
-                    <div key={item.id} className="rounded-md border p-3">
-                      <p className="font-medium">{item.subject}</p>
-                      <p className="text-sm text-muted-foreground">{item.summary}</p>
-                      <p className="mt-2 text-sm"><SafeStatusLabel kind="teacherHelp" value={item.status} /></p>
-                    </div>
-                  ))}
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    Updated {new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(profileQuery.data.updatedAt))}.
+                  </p>
                 </CardContent>
               </Card>
+            </div>
+            <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>
                   <CardTitle className="text-xl">Parent report links</CardTitle>
