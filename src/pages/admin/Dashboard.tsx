@@ -63,6 +63,11 @@ export function AdminDashboardPage() {
             to="/admin/help-requests"
           />
           <AdminOperationCard
+            title="Content moderation"
+            description="Review reported questions, assistant answers, and teacher replies."
+            to="/admin/moderation"
+          />
+          <AdminOperationCard
             title="Billing interest"
             description="Review plan interest before real payment collection is enabled."
             to="/admin/billing-interest"

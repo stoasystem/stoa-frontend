@@ -12,6 +12,7 @@ export function ChatMessageList({
   onRequestTeacher,
   isRequestingTeacher,
   teacherFeedback,
+  moderationTargetId,
 }: {
   messages: ChatMessage[]
   isAssistantThinking?: boolean
@@ -19,6 +20,7 @@ export function ChatMessageList({
   onRequestTeacher?: () => void
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
+  moderationTargetId?: string | null
 }) {
   const { t } = useTranslation('chat')
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -81,6 +83,7 @@ export function ChatMessageList({
               onRequestTeacher={onRequestTeacher}
               isRequestingTeacher={isRequestingTeacher}
               teacherFeedback={teacherFeedback}
+              moderationTargetId={moderationTargetId}
             />
           ))
         )}

@@ -405,6 +405,7 @@ export function ChatPage() {
                   ? t('teacher.submitted')
                   : null)
               }
+              moderationTargetId={activeConversationId}
             />
             {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
               <TeacherVideoEscalationCard

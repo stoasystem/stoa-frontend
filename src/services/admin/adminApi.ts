@@ -44,6 +44,162 @@ export type AdminPlatformStats = {
   teacher_sla: AdminTeacherSlaStats
 }
 
+export type ModerationSurface = 'question' | 'ai_answer' | 'teacher_reply'
+export type ModerationReason = 'incorrect_answer' | 'unsafe_content' | 'abuse' | 'privacy' | 'other'
+export type ModerationSeverity = 'low' | 'medium' | 'high'
+export type ModerationCaseStatus = 'open' | 'in_review' | 'actioned' | 'dismissed' | 'closed'
+
+export type ModerationCase = {
+  case_id: string
+  status: ModerationCaseStatus
+  reason: ModerationReason
+  severity: ModerationSeverity
+  surface: ModerationSurface
+  question_id: string
+  student_id?: string | null
+  reporter_id: string
+  reporter_role: string
+  assigned_admin_id?: string | null
+  report_note?: string | null
+  resolution_note?: string | null
+  created_at: string
+  updated_at: string
+  closed_at?: string | null
+  question_context?: {
+    question_id?: string | null
+    student_id?: string | null
+    subject?: string | null
+    status?: string | null
+    content_preview?: string | null
+    ai_answer_preview?: string | null
+    teacher_response_preview?: string | null
+    has_image?: boolean
+  } | null
+  history?: {
+    event_id: string
+    event_type: string
+    actor_id?: string | null
+    actor_role?: string | null
+    created_at?: string | null
+    changes?: Record<string, unknown> | null
+    note?: string | null
+  }[]
+}
+
+export type ModerationCaseListFilters = {
+  status?: ModerationCaseStatus | ''
+  severity?: ModerationSeverity | ''
+  reason?: ModerationReason | ''
+  reporterRole?: string
+  assignee?: string
+  limit?: number
+}
+
+export type ModerationCaseListResponse = {
+  items: ModerationCase[]
+  count: number
+  access_pattern: string
+}
+
+export type ModerationReportInput = {
+  questionId: string
+  surface: ModerationSurface
+  reason: ModerationReason
+  severity: ModerationSeverity
+  note?: string
+}
+
+export type ModerationCaseUpdateInput = {
+  caseId: string
+  status?: ModerationCaseStatus
+  assigned_admin_id?: string
+  resolution_note?: string
+}
+
+export type ModerationCaseNoteInput = {
+  caseId: string
+  note: string
+}
+
+const mockModerationCases: ModerationCase[] = [
+  {
+    case_id: 'mod-demo-1',
+    status: 'open',
+    reason: 'unsafe_content',
+    severity: 'high',
+    surface: 'ai_answer',
+    question_id: 'conv-1',
+    student_id: 'student-1',
+    reporter_id: 'student-1',
+    reporter_role: 'student',
+    assigned_admin_id: null,
+    report_note: 'The answer sounded too absolute and needs review.',
+    resolution_note: null,
+    created_at: '2026-06-08T09:35:00Z',
+    updated_at: '2026-06-08T09:35:00Z',
+    closed_at: null,
+    question_context: {
+      question_id: 'conv-1',
+      student_id: 'student-1',
+      subject: 'Mathematics',
+      status: 'ai_answered',
+      content_preview: 'Can you explain how to solve x^2 - 5x + 6 = 0?',
+      ai_answer_preview: 'We can factor the expression as (x - 2)(x - 3) = 0.',
+      teacher_response_preview: null,
+      has_image: false,
+    },
+    history: [
+      {
+        event_id: 'event-demo-1',
+        event_type: 'reported',
+        actor_id: 'student-1',
+        actor_role: 'student',
+        created_at: '2026-06-08T09:35:00Z',
+        note: 'The answer sounded too absolute and needs review.',
+      },
+    ],
+  },
+  {
+    case_id: 'mod-demo-2',
+    status: 'in_review',
+    reason: 'incorrect_answer',
+    severity: 'medium',
+    surface: 'teacher_reply',
+    question_id: 'teacher-request-1',
+    student_id: 'student-2',
+    reporter_id: 'demo-tutor',
+    reporter_role: 'tutor',
+    assigned_admin_id: 'admin-1',
+    report_note: 'Formula formatting should be checked before closing.',
+    resolution_note: null,
+    created_at: '2026-06-08T08:20:00Z',
+    updated_at: '2026-06-08T09:10:00Z',
+    closed_at: null,
+    question_context: {
+      question_id: 'teacher-request-1',
+      student_id: 'student-2',
+      subject: 'Mathematics',
+      status: 'teacher_active',
+      content_preview: 'I am stuck moving terms across the equals sign.',
+      ai_answer_preview: 'First isolate x by moving constants to the other side.',
+      teacher_response_preview: 'Move 4 to the right side, then divide by 2.',
+      has_image: false,
+    },
+    history: [
+      {
+        event_id: 'event-demo-2',
+        event_type: 'reported',
+        actor_id: 'demo-tutor',
+        actor_role: 'tutor',
+        created_at: '2026-06-08T08:20:00Z',
+        note: 'Formula formatting should be checked before closing.',
+      },
+    ],
+  },
+]
+
+let demoModerationCases = [...mockModerationCases]
+
 const mockAdminPlatformStats: AdminPlatformStats = {
   total_users: 42,
   total_students: 18,
@@ -83,6 +239,163 @@ export async function getAdminPlatformStats() {
     const response = await httpClient.get<AdminPlatformStats>('/admin/stats')
     return response.data
   }, mockAdminPlatformStats)
+}
+
+export async function createModerationReport(input: ModerationReportInput) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<ModerationCase>(
+      `/questions/${input.questionId}/reports`,
+      {
+        surface: input.surface,
+        reason: input.reason,
+        severity: input.severity,
+        note: input.note,
+      },
+    )
+    return response.data
+  }, () => {
+    const now = new Date().toISOString()
+    const created: ModerationCase = {
+      case_id: `mod-demo-${Date.now()}`,
+      status: 'open',
+      reason: input.reason,
+      severity: input.severity,
+      surface: input.surface,
+      question_id: input.questionId,
+      student_id: 'demo-student',
+      reporter_id: 'demo-user',
+      reporter_role: 'student',
+      assigned_admin_id: null,
+      report_note: input.note,
+      resolution_note: null,
+      created_at: now,
+      updated_at: now,
+      closed_at: null,
+      question_context: {
+        question_id: input.questionId,
+        subject: 'Mathematics',
+        status: 'reported',
+        content_preview: 'Reported from the active learning workflow.',
+        ai_answer_preview: input.surface === 'ai_answer' ? 'Assistant response selected for review.' : null,
+        teacher_response_preview: input.surface === 'teacher_reply' ? 'Teacher reply selected for review.' : null,
+        has_image: false,
+      },
+      history: [{
+        event_id: `event-${Date.now()}`,
+        event_type: 'reported',
+        actor_id: 'demo-user',
+        actor_role: 'student',
+        created_at: now,
+        note: input.note,
+      }],
+    }
+    demoModerationCases = [created, ...demoModerationCases]
+    return created
+  })
+}
+
+export async function getModerationCases(filters: ModerationCaseListFilters = {}) {
+  return withDemoFallback(async () => {
+    const params = new URLSearchParams()
+    if (filters.limit) params.set('limit', String(filters.limit))
+    if (filters.status) params.set('status', filters.status)
+    if (filters.severity) params.set('severity', filters.severity)
+    if (filters.reason) params.set('reason', filters.reason)
+    if (filters.reporterRole) params.set('reporter_role', filters.reporterRole)
+    if (filters.assignee) params.set('assignee', filters.assignee)
+    const response = await httpClient.get<ModerationCaseListResponse>(
+      `/admin/moderation/cases${params.toString() ? `?${params.toString()}` : ''}`,
+    )
+    return response.data
+  }, () => {
+    const items = demoModerationCases.filter((item) =>
+      (!filters.status || item.status === filters.status) &&
+      (!filters.severity || item.severity === filters.severity) &&
+      (!filters.reason || item.reason === filters.reason) &&
+      (!filters.reporterRole || item.reporter_role === filters.reporterRole) &&
+      (!filters.assignee || item.assigned_admin_id === filters.assignee),
+    ).slice(0, filters.limit ?? 50)
+    return { items, count: items.length, access_pattern: 'demo_bounded_scan' }
+  })
+}
+
+export async function getModerationCase(caseId: string) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<ModerationCase>(`/admin/moderation/cases/${caseId}`)
+    return response.data
+  }, () => demoModerationCases.find((item) => item.case_id === caseId) ?? demoModerationCases[0])
+}
+
+export async function updateModerationCase(input: ModerationCaseUpdateInput) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.patch<ModerationCase>(
+      `/admin/moderation/cases/${input.caseId}`,
+      {
+        status: input.status,
+        assigned_admin_id: input.assigned_admin_id,
+        resolution_note: input.resolution_note,
+      },
+    )
+    return response.data
+  }, () => {
+    const now = new Date().toISOString()
+    demoModerationCases = demoModerationCases.map((item) =>
+      item.case_id === input.caseId
+        ? {
+            ...item,
+            status: input.status ?? item.status,
+            assigned_admin_id: input.assigned_admin_id ?? item.assigned_admin_id,
+            resolution_note: input.resolution_note ?? item.resolution_note,
+            updated_at: now,
+            closed_at: ['actioned', 'dismissed', 'closed'].includes(input.status ?? '') ? now : item.closed_at,
+            history: [
+              ...(item.history ?? []),
+              {
+                event_id: `event-${Date.now()}`,
+                event_type: 'updated',
+                actor_id: 'admin-1',
+                actor_role: 'admin',
+                created_at: now,
+                note: input.resolution_note,
+              },
+            ],
+          }
+        : item,
+    )
+    return demoModerationCases.find((item) => item.case_id === input.caseId) ?? demoModerationCases[0]
+  })
+}
+
+export async function addModerationCaseNote(input: ModerationCaseNoteInput) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<ModerationCase>(
+      `/admin/moderation/cases/${input.caseId}/notes`,
+      { note: input.note },
+    )
+    return response.data
+  }, () => {
+    const now = new Date().toISOString()
+    demoModerationCases = demoModerationCases.map((item) =>
+      item.case_id === input.caseId
+        ? {
+            ...item,
+            updated_at: now,
+            history: [
+              ...(item.history ?? []),
+              {
+                event_id: `event-${Date.now()}`,
+                event_type: 'note_added',
+                actor_id: 'admin-1',
+                actor_role: 'admin',
+                created_at: now,
+                note: input.note,
+              },
+            ],
+          }
+        : item,
+    )
+    return demoModerationCases.find((item) => item.case_id === input.caseId) ?? demoModerationCases[0]
+  })
 }
 
 export type AdminFeedbackStatus = 'new' | 'reviewed' | 'resolved'

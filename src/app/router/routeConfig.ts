@@ -282,6 +282,16 @@ export const navItems: AppNavItem[] = [
     description: 'Teacher-help operations.',
   },
   {
+    label: 'Moderation',
+    path: '/admin/moderation',
+    role: 'admin',
+    priority: 'primary',
+    status: 'core',
+    icon: 'support',
+    mobile: true,
+    description: 'Reported learning content and internal moderation actions.',
+  },
+  {
     label: 'Report Ops',
     path: '/admin/report-operations',
     role: 'admin',

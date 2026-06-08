@@ -7,6 +7,7 @@ import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
 import { AdminFeedbackPage } from '@/pages/admin/Feedback'
 import { AdminHelpRequestsPage } from '@/pages/admin/HelpRequests'
+import { AdminModerationPage } from '@/pages/admin/AdminModerationPage'
 import { AdminOperationsPlaceholderPage } from '@/pages/admin/OperationsPlaceholder'
 import { AdminReportOperationsPage } from '@/pages/admin/ReportOperationsPage'
 import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
@@ -190,6 +191,7 @@ export function AppRouter() {
             <Route path="/admin/usage" element={<AdminUsagePage />} />
             <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
+            <Route path="/admin/moderation" element={<AdminModerationPage />} />
             <Route path="/admin/report-operations" element={<AdminReportOperationsPage />} />
             <Route
               path="/admin/users"

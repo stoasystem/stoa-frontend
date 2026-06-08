@@ -1,4 +1,5 @@
 import { HelpRequestStatusBadge } from '@/components/tutor/HelpRequestStatusBadge'
+import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/tutor/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { TutorHelpRequestDetail } from '@/types/tutor'
@@ -40,6 +41,23 @@ export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDe
               {message.role === 'assistant' ? 'Learning Assistant explanation' : message.role}
             </p>
             <p className="mt-2 text-sm leading-6">{message.content}</p>
+            {(message.role === 'student' || message.role === 'assistant' || message.role === 'teacher') && (
+              <div className="mt-2 border-t pt-2">
+                <ModerationReportDialog
+                  questionId={request.requestId}
+                  surface={
+                    message.role === 'assistant'
+                      ? 'ai_answer'
+                      : message.role === 'teacher'
+                        ? 'teacher_reply'
+                        : 'question'
+                  }
+                  triggerLabel={message.role === 'student' ? 'Report student content' : 'Report content'}
+                  contextLabel="Send this request context to the internal moderation queue."
+                  defaultReason={message.role === 'assistant' ? 'incorrect_answer' : 'other'}
+                />
+              </div>
+            )}
           </div>
         ))}
       </CardContent>

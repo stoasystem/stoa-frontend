@@ -3,6 +3,7 @@ import type { ChatMessage } from '@/types/chat'
 import { LearningResponseFeedback } from '@/components/chat/LearningResponseFeedback'
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
+import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { useTranslation } from 'react-i18next'
 
 function formatMessageTime(value: string) {
@@ -33,12 +34,14 @@ export function ChatMessageBubble({
   onRequestTeacher,
   isRequestingTeacher,
   teacherFeedback,
+  moderationTargetId,
 }: {
   message: ChatMessage
   onRetry?: (messageId: string) => void
   onRequestTeacher?: () => void
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
+  moderationTargetId?: string | null
 }) {
   const { t } = useTranslation('chat')
   const isStudent = message.role === 'student'
@@ -110,6 +113,17 @@ export function ChatMessageBubble({
             isRequesting={isRequestingTeacher}
             feedback={teacherFeedback}
           />
+        )}
+        {moderationTargetId && message.role === 'assistant' && message.status !== 'streaming' && (
+          <div className="mt-2 border-t pt-2">
+            <ModerationReportDialog
+              questionId={moderationTargetId}
+              surface="ai_answer"
+              triggerLabel="Report answer"
+              contextLabel="Send this assistant response to the internal moderation queue."
+              defaultReason="incorrect_answer"
+            />
+          </div>
         )}
       </div>
     </article>
