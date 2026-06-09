@@ -14,6 +14,10 @@ import type {
   TutorStats,
   TeacherReplyRichContent,
   TeacherAssistanceSummary,
+  AiTeacherDraft,
+  AiTeacherDraftList,
+  CreateExerciseDraftPayload,
+  ReviewAiTeacherDraftPayload,
 } from '@/types/tutor'
 
 const mockTutorProfile: TutorProfile = {
@@ -165,6 +169,76 @@ export async function getTutorAssistanceSummary(questionId: string) {
   })
 }
 
+export async function createAiTeacherSummaryDraft(questionId: string) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<AiTeacherDraft>(
+      `/tutors/questions/${questionId}/ai-tools/summary-draft`,
+      {},
+    )
+    return response.data
+  }, createMockSummaryDraft(questionId))
+}
+
+export async function createAiTeacherExerciseDraft(payload: CreateExerciseDraftPayload) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<AiTeacherDraft>('/tutors/ai-tools/exercise-drafts', payload)
+    return response.data
+  }, createMockExerciseDraft(payload))
+}
+
+export async function getAiTeacherDrafts() {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<AiTeacherDraftList>('/tutors/ai-tools/drafts')
+    return response.data
+  }, { items: [], count: 0 })
+}
+
+export async function getAiTeacherDraft(draftId: string) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.get<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}`)
+    return response.data
+  }, createMockSummaryDraft('help-1', draftId))
+}
+
+export async function regenerateAiTeacherDraft(draftId: string) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}/regenerate`, {})
+    return response.data
+  }, {
+    ...createMockSummaryDraft('help-1', `regen-${draftId}`),
+    previousDraftId: draftId,
+    generatedAt: new Date().toISOString(),
+  })
+}
+
+export async function acceptAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
+  return reviewAiTeacherDraft('accept', payload)
+}
+
+export async function rejectAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
+  return reviewAiTeacherDraft('reject', payload)
+}
+
+export async function archiveAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
+  return reviewAiTeacherDraft('archive', payload)
+}
+
+async function reviewAiTeacherDraft(
+  action: 'accept' | 'reject' | 'archive',
+  { draftId, note }: ReviewAiTeacherDraftPayload,
+) {
+  return withDemoFallback(async () => {
+    const response = await httpClient.post<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}/${action}`, { note })
+    return response.data
+  }, {
+    ...createMockSummaryDraft('help-1', draftId),
+    status: action === 'accept' ? 'accepted' : action === 'reject' ? 'rejected' : 'archived',
+    reviewNote: note,
+    reviewedBy: 'demo-tutor',
+    reviewedAt: new Date().toISOString(),
+  })
+}
+
 function mergeTutorProfile(profile: TutorProfile): TutorProfile {
   return {
     ...mockTutorProfile,
@@ -189,5 +263,74 @@ function mergeTutorProfile(profile: TutorProfile): TutorProfile {
       ...profile.compliance,
     },
     updatedAt: profile.updatedAt || mockTutorProfile.updatedAt,
+  }
+}
+
+function createMockSummaryDraft(questionId: string, draftId = `draft-summary-${questionId}`): AiTeacherDraft {
+  const now = new Date().toISOString()
+  return {
+    draftId,
+    draftType: 'teacher_summary',
+    status: 'draft',
+    studentId: 'user-student',
+    questionId,
+    subject: 'Mathematics',
+    topicIds: ['linear-equations', 'moving-terms'],
+    sessionSummary: 'Anna attempted a two-step linear equation and reached the correct intermediate equation.',
+    misconceptionSummary: 'The likely gap is dividing or checking the final value after isolating 3x.',
+    suggestedTeachingFocus: 'Ask Anna to explain why subtracting 5 gives 3x = 15 before dividing by 3.',
+    draftFollowupExplanation: 'Keep the intervention short and have the student verify by substitution.',
+    sourceContext: { sourceCount: 4, boundedToVisibleRequest: true },
+    promptVersion: 'stoa_ai_teacher_tools_v1',
+    createdBy: 'demo-tutor',
+    createdByRole: 'tutor',
+    createdAt: now,
+    generatedAt: now,
+    updatedAt: now,
+    studentDeliveryStatus: 'not_delivered',
+    difficulty: null,
+    exerciseCount: 0,
+    items: [],
+    answerKey: [],
+    explanations: [],
+  }
+}
+
+function createMockExerciseDraft(payload: CreateExerciseDraftPayload): AiTeacherDraft {
+  const now = new Date().toISOString()
+  const count = Math.max(1, Math.min(payload.exerciseCount, 5))
+  const items = Array.from({ length: count }, (_, index) => ({
+    id: `exercise-${index + 1}`,
+    type: 'short_answer',
+    prompt: `Solve ${index + 2}x + 5 = ${2 * (index + 2) + 5}.`,
+  }))
+  return {
+    draftId: `draft-exercise-${Date.now()}`,
+    draftType: 'practice_exercise',
+    status: 'draft',
+    studentId: payload.studentId,
+    questionId: payload.questionId,
+    subject: payload.subject,
+    topicIds: payload.topicIds,
+    sessionSummary: 'Practice draft based on the current teacher help request.',
+    misconceptionSummary: 'Student needs repeated checks around inverse operations.',
+    suggestedTeachingFocus: 'Use short equations that require one inverse operation at a time.',
+    draftFollowupExplanation: 'Review answers before sharing; this draft is not delivered to the student automatically.',
+    sourceContext: { boundedToVisibleStudent: true },
+    promptVersion: 'stoa_ai_teacher_tools_v1',
+    createdBy: 'demo-tutor',
+    createdByRole: 'tutor',
+    createdAt: now,
+    generatedAt: now,
+    updatedAt: now,
+    studentDeliveryStatus: 'not_delivered',
+    difficulty: payload.difficulty,
+    exerciseCount: count,
+    items,
+    answerKey: items.map((item) => ({ itemId: item.id, answer: 'x = 2' })),
+    explanations: items.map((item) => ({
+      itemId: item.id,
+      explanation: 'Subtract 5 from both sides, then divide by the coefficient of x.',
+    })),
   }
 }

@@ -81,6 +81,77 @@ export type TeacherAssistanceSummary = {
   createdAt: string
 }
 
+export type AiTeacherDraftType = 'teacher_summary' | 'practice_exercise'
+
+export type AiTeacherDraftStatus = 'draft' | 'accepted' | 'rejected' | 'archived'
+
+export type AiTeacherExerciseItem = {
+  id: string
+  type: string
+  prompt: string
+  choices?: string[]
+}
+
+export type AiTeacherAnswerKeyItem = {
+  itemId: string
+  answer: string
+}
+
+export type AiTeacherExplanationItem = {
+  itemId: string
+  explanation: string
+}
+
+export type AiTeacherDraft = {
+  draftId: string
+  draftType: AiTeacherDraftType
+  status: AiTeacherDraftStatus
+  studentId?: string | null
+  questionId?: string | null
+  subject?: string | null
+  topicIds: string[]
+  sessionSummary?: string | null
+  misconceptionSummary?: string | null
+  suggestedTeachingFocus?: string | null
+  draftFollowupExplanation?: string | null
+  sourceContext: Record<string, unknown>
+  promptVersion?: string | null
+  createdBy?: string | null
+  createdByRole?: string | null
+  createdAt?: string | null
+  generatedAt?: string | null
+  updatedAt?: string | null
+  reviewedBy?: string | null
+  reviewedAt?: string | null
+  reviewNote?: string | null
+  previousDraftId?: string | null
+  studentDeliveryStatus: 'not_delivered' | 'delivered'
+  difficulty?: string | null
+  exerciseCount: number
+  items: AiTeacherExerciseItem[]
+  answerKey: AiTeacherAnswerKeyItem[]
+  explanations: AiTeacherExplanationItem[]
+}
+
+export type AiTeacherDraftList = {
+  items: AiTeacherDraft[]
+  count: number
+}
+
+export type CreateExerciseDraftPayload = {
+  studentId: string
+  subject: string
+  topicIds: string[]
+  difficulty: string
+  exerciseCount: number
+  questionId?: string
+}
+
+export type ReviewAiTeacherDraftPayload = {
+  draftId: string
+  note?: string
+}
+
 export type TutorQualification = {
   title: string
   institution?: string

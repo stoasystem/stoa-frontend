@@ -13,6 +13,7 @@ import { TeacherReplyComposer } from '@/components/tutor/TeacherReplyComposer'
 import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleton'
 import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
 import { TeacherAssistanceSummaryCard } from '@/components/tutor/TeacherAssistanceSummaryCard'
+import { AiTeacherToolsPanel } from '@/components/tutor/AiTeacherToolsPanel'
 import { Button } from '@/components/ui/button'
 import { useAddTutorHelpRequestNoteMutation } from '@/hooks/tutor/useAddTutorHelpRequestNoteMutation'
 import { useTutorHelpRequestDetailQuery } from '@/hooks/tutor/useTutorHelpRequestDetailQuery'
@@ -66,6 +67,7 @@ export function TutorHelpRequestDetailPage() {
               isLoading={assistanceQuery.isLoading}
               isError={assistanceQuery.isError}
             />
+            <AiTeacherToolsPanel request={requestQuery.data} />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">
                 Resolution note
