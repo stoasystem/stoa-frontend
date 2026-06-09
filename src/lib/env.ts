@@ -24,6 +24,8 @@ export const enableParentReport = import.meta.env.VITE_ENABLE_PARENT_REPORT !== 
 export const enableReferral = import.meta.env.VITE_ENABLE_REFERRAL !== 'false'
 export const enableSupportTickets = import.meta.env.VITE_ENABLE_SUPPORT_TICKETS !== 'false'
 export const enableDemoApi = import.meta.env.VITE_ENABLE_DEMO_API === 'true'
+export const enableRealtimeNotifications = import.meta.env.VITE_ENABLE_REALTIME_NOTIFICATIONS === 'true'
+export const websocketBaseUrl = import.meta.env.VITE_WEBSOCKET_BASE_URL ?? ''
 export const allowDemoFallback = apiMode === 'mock' || (apiMode === 'demo' && enableDemoApi)
 
 export const showDemoAccounts = !isProductionFacing && (

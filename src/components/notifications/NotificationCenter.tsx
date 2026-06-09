@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Archive, Bell, Check, CircleAlert } from 'lucide-react'
+import { Archive, Bell, Check, CircleAlert, Radio, WifiOff } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -7,14 +7,29 @@ import {
   useMarkNotificationReadMutation,
   useNotificationsQuery,
 } from '@/hooks/notifications/useNotificationsQuery'
+import {
+  type RealtimeNotificationStatus,
+  useRealtimeNotifications,
+} from '@/hooks/notifications/useRealtimeNotifications'
+
+const realtimeLabels: Record<RealtimeNotificationStatus, string> = {
+  disabled: 'Polling',
+  connecting: 'Connecting',
+  live: 'Live',
+  reconnecting: 'Reconnecting',
+  fallback: 'Polling',
+  offline: 'Offline',
+}
 
 export function NotificationCenter() {
   const [open, setOpen] = useState(false)
   const query = useNotificationsQuery()
+  const realtime = useRealtimeNotifications()
   const markRead = useMarkNotificationReadMutation()
   const archive = useArchiveNotificationMutation()
   const items = query.data?.items ?? []
   const unread = items.filter((item) => item.status === 'created').length
+  const RealtimeIcon = realtime.status === 'offline' ? WifiOff : Radio
 
   return (
     <div className="relative">
@@ -36,9 +51,18 @@ export function NotificationCenter() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold">Notifications</p>
-              <p className="text-xs text-muted-foreground">In-product updates, not live push delivery.</p>
+              <p className="text-xs text-muted-foreground">In-product updates with polling fallback.</p>
             </div>
-            <Badge variant="secondary">{unread} unread</Badge>
+            <div className="flex shrink-0 items-center gap-2">
+              <Badge
+                variant={realtime.isLive ? 'default' : 'secondary'}
+                className="inline-flex max-w-32 items-center gap-1 truncate"
+              >
+                <RealtimeIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
+                <span className="truncate">{realtimeLabels[realtime.status]}</span>
+              </Badge>
+              <Badge variant="secondary">{unread} unread</Badge>
+            </div>
           </div>
           <div className="mt-3 max-h-80 space-y-2 overflow-y-auto">
             {query.isLoading && <p className="text-sm text-muted-foreground">Loading notifications...</p>}

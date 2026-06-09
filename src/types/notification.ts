@@ -7,6 +7,7 @@ export type NotificationEventType =
   | 'moderation_case_update'
   | 'subscription_request_update'
   | 'learning_profile_update'
+  | 'system_notice'
 
 export type NotificationEvent = {
   eventId: string
@@ -24,6 +25,23 @@ export type NotificationEvent = {
   metadata: Record<string, unknown>
   actorId?: string | null
   actorRole?: string | null
+  deliveryId?: string | null
+  deliveryAttempt?: number | null
 }
 
 export type NotificationListResponse = { items: NotificationEvent[]; count: number }
+
+export type RealtimeNotificationEnvelope = {
+  eventId?: string
+  eventType?: NotificationEventType | string
+  recipientId?: string | null
+  recipientRole?: string | null
+  targetType?: string | null
+  targetId?: string | null
+  title?: string | null
+  summary?: string | null
+  createdAt?: string | null
+  metadata?: Record<string, unknown> | null
+  deliveryId?: string | null
+  deliveryAttempt?: number | null
+}

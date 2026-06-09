@@ -20,6 +20,8 @@ export default defineConfig({
       VITE_ENABLE_DEMO_API: 'true',
       VITE_ENABLE_MOCK_CHECKOUT: 'true',
       VITE_ENABLE_PAYMENT: 'false',
+      VITE_ENABLE_REALTIME_NOTIFICATIONS: process.env.VITE_ENABLE_REALTIME_NOTIFICATIONS ?? 'false',
+      VITE_WEBSOCKET_BASE_URL: process.env.VITE_WEBSOCKET_BASE_URL ?? '',
       VITE_SHOW_DEMO_SURFACES: 'true',
     },
     url: 'http://127.0.0.1:5173',
