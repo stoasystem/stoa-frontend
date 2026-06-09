@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  createParentCheckoutSession,
   createParentSubscriptionRequest,
   getParentSubscription,
+  getParentSubscriptionBilling,
   getParentSubscriptionRequests,
 } from '@/services/parent/parentApi'
 import { parentQueryKeys } from '@/services/parent/parentQueryKeys'
-import type { CreateSubscriptionRequestInput } from '@/types/subscriptionOperations'
+import type { CreateCheckoutSessionInput, CreateSubscriptionRequestInput } from '@/types/subscriptionOperations'
 
 export function useParentSubscriptionQuery() {
   return useQuery({
@@ -20,6 +22,25 @@ export function useParentSubscriptionRequestsQuery() {
     queryKey: parentQueryKeys.subscriptionRequests(),
     queryFn: getParentSubscriptionRequests,
     retry: false,
+  })
+}
+
+export function useParentSubscriptionBillingQuery() {
+  return useQuery({
+    queryKey: parentQueryKeys.subscriptionBilling(),
+    queryFn: getParentSubscriptionBilling,
+    retry: false,
+  })
+}
+
+export function useCreateParentCheckoutSessionMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (input: CreateCheckoutSessionInput) => createParentCheckoutSession(input),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: parentQueryKeys.subscription() })
+      void queryClient.invalidateQueries({ queryKey: parentQueryKeys.subscriptionBilling() })
+    },
   })
 }
 

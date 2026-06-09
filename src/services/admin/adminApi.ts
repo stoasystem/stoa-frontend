@@ -2,6 +2,8 @@ import { httpClient } from '@/services/api/httpClient'
 import { withDemoFallback } from '@/services/demo/demoFallback'
 import type { UserRole } from '@/types/user'
 import type {
+  SubscriptionBilling,
+  SubscriptionBillingListResponse,
   SubscriptionRequest,
   SubscriptionRequestFilters,
   SubscriptionRequestListResponse,
@@ -1644,6 +1646,33 @@ export async function getSubscriptionRequests(filters: SubscriptionRequestFilter
 export async function getSubscriptionRequest(requestId: string) {
   const response = await httpClient.get<SubscriptionRequest>(
     `/admin/subscriptions/requests/${requestId}`,
+  )
+  return response.data
+}
+
+export async function getSubscriptionBilling(filters: {
+  parentId?: string
+  billingStatus?: string
+  billingProvider?: string
+  limit?: number
+} = {}) {
+  const response = await httpClient.get<SubscriptionBillingListResponse>(
+    '/admin/subscriptions/billing',
+    {
+      params: {
+        parent_id: filters.parentId || undefined,
+        billing_status: filters.billingStatus || undefined,
+        billing_provider: filters.billingProvider || undefined,
+        limit: filters.limit,
+      },
+    },
+  )
+  return response.data
+}
+
+export async function getSubscriptionBillingDetail(parentId: string) {
+  const response = await httpClient.get<SubscriptionBilling>(
+    `/admin/subscriptions/billing/${parentId}`,
   )
   return response.data
 }

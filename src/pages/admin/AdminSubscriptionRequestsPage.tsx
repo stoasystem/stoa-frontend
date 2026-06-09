@@ -1,5 +1,5 @@
 import { type FormEvent, useMemo, useState } from 'react'
-import { ArrowDownCircle, ArrowUpCircle, Search, XCircle } from 'lucide-react'
+import { ArrowDownCircle, ArrowUpCircle, CreditCard, Search, XCircle } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +9,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
   useAdminSubscriptionRequestQuery,
+  useAdminSubscriptionBillingDetailQuery,
+  useAdminSubscriptionBillingQuery,
   useAdminSubscriptionRequestsQuery,
   useApplySubscriptionRequestMutation,
   useUpdateSubscriptionRequestMutation,
@@ -19,6 +21,7 @@ import type {
   SubscriptionRequestFilters,
   SubscriptionRequestStatus,
   SubscriptionTier,
+  SubscriptionBilling,
 } from '@/types/subscriptionOperations'
 
 type FilterDraft = {
@@ -51,12 +54,20 @@ export function AdminSubscriptionRequestsPage() {
   const [adminNote, setAdminNote] = useState('Manual subscription review')
   const [effectiveAt, setEffectiveAt] = useState('')
   const [message, setMessage] = useState<string | null>(null)
+  const [selectedBillingParentId, setSelectedBillingParentId] = useState<string | null>(null)
   const requestsQuery = useAdminSubscriptionRequestsQuery(filters)
   const selectedQuery = useAdminSubscriptionRequestQuery(selectedRequestId)
+  const billingQuery = useAdminSubscriptionBillingQuery({ limit: 50 })
+  const selectedBillingQuery = useAdminSubscriptionBillingDetailQuery(selectedBillingParentId)
   const updateMutation = useUpdateSubscriptionRequestMutation()
   const applyMutation = useApplySubscriptionRequestMutation()
   const rows = requestsQuery.data?.items ?? []
+  const billingRows = billingQuery.data?.items ?? []
   const selectedRequest = selectedQuery.data ?? rows.find((row) => row.requestId === selectedRequestId) ?? rows[0]
+  const selectedBilling =
+    selectedBillingQuery.data ??
+    billingRows.find((row) => row.parentId === selectedBillingParentId) ??
+    billingRows[0]
 
   const queueStats = useMemo(() => {
     const open = rows.filter((row) => ['requested', 'in_review', 'approved'].includes(row.status)).length
@@ -129,7 +140,7 @@ export function AdminSubscriptionRequestsPage() {
         <section className="grid gap-4 md:grid-cols-3">
           <MetricCard label="Open requests" value={queueStats.open} />
           <MetricCard label="Ready to apply" value={queueStats.approved} />
-          <MetricCard label="Closed in view" value={queueStats.terminal} />
+          <MetricCard label="Provider records" value={billingRows.length} />
         </section>
 
         <form onSubmit={applyFilters} className="grid gap-3 rounded-md border border-border/70 bg-card p-4 md:grid-cols-[1fr_1fr_1.2fr_auto]">
@@ -301,6 +312,61 @@ export function AdminSubscriptionRequestsPage() {
             </CardContent>
           </Card>
         </div>
+
+        <Card className="brand-rule">
+          <CardHeader>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <CardTitle className="text-base">Provider billing visibility</CardTitle>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Stripe/TWINT readiness state, webhook event summaries, and manual override context.
+                </p>
+              </div>
+              <Badge variant="outline">Provider-managed vs manual</Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {billingQuery.isError && (
+              <p className="rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
+                Provider billing records are unavailable.
+              </p>
+            )}
+            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.75fr)]">
+              <div className="grid gap-3">
+                {billingQuery.isLoading && <p className="text-sm text-muted-foreground">Loading provider billing...</p>}
+                {!billingQuery.isLoading && billingRows.length === 0 && (
+                  <p className="text-sm text-muted-foreground">No provider billing records are available yet.</p>
+                )}
+                {billingRows.map((billing) => (
+                  <button
+                    key={billing.parentId}
+                    type="button"
+                    onClick={() => setSelectedBillingParentId(billing.parentId)}
+                    className={`w-full rounded-md border p-4 text-left transition hover:bg-muted/50 ${
+                      selectedBilling?.parentId === billing.parentId ? 'border-primary bg-[hsl(var(--stoa-brand-burgundy-soft))]' : 'border-border/70'
+                    }`}
+                  >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="h-4 w-4 text-primary" aria-hidden="true" />
+                          <p className="font-semibold text-foreground">{billing.parentId}</p>
+                        </div>
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {formatTier(billing.subscriptionTier)} / {billing.mode}
+                        </p>
+                      </div>
+                      <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>
+                        {formatStatus(billing.status)}
+                      </Badge>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <ProviderBillingDetail billing={selectedBilling} />
+            </div>
+          </CardContent>
+        </Card>
       </PageContainer>
     </DashboardLayout>
   )
@@ -326,6 +392,52 @@ function DetailItem({ label, value }: { label: string; value: string }) {
   )
 }
 
+function ProviderBillingDetail({ billing }: { billing?: SubscriptionBilling }) {
+  if (!billing) {
+    return (
+      <div className="rounded-md border border-border/70 p-4 text-sm text-muted-foreground">
+        Select a provider billing record to inspect status and recent events.
+      </div>
+    )
+  }
+  return (
+    <div className="rounded-md border border-border/70 p-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="font-semibold text-foreground">{billing.parentId}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {billing.provider ?? 'Manual'} / {billing.mode}
+          </p>
+        </div>
+        <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>{formatStatus(billing.status)}</Badge>
+      </div>
+      <div className="mt-4 grid gap-2 text-sm">
+        <DetailItem label="Provider subscription" value={billing.providerSubscriptionId ?? 'None'} />
+        <DetailItem label="Checkout session" value={billing.checkoutSessionId ?? 'None'} />
+        <DetailItem label="Manual override" value={billing.manualOverrideSource ?? 'None'} />
+        <DetailItem label="Last provider event" value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
+      </div>
+      <div className="mt-4 space-y-2">
+        <p className="text-sm font-semibold text-foreground">Recent billing events</p>
+        {(billing.events ?? []).slice(0, 4).map((event) => (
+          <div key={event.eventId} className="rounded-md border border-border/70 p-3 text-sm">
+            <div className="flex items-center justify-between gap-3">
+              <span className="font-medium text-foreground">{formatStatus(event.eventType)}</span>
+              <span className="text-muted-foreground">{formatDate(event.eventAt)}</span>
+            </div>
+            {event.providerEventId && (
+              <p className="mt-1 text-muted-foreground">{event.providerEventId}</p>
+            )}
+          </div>
+        ))}
+        {(billing.events ?? []).length === 0 && (
+          <p className="text-sm text-muted-foreground">No billing events recorded yet.</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function requestIcon(request: SubscriptionRequest) {
   if (request.requestType === 'upgrade') return <ArrowUpCircle className="h-4 w-4 text-emerald-600" aria-hidden="true" />
   if (request.requestType === 'downgrade') return <ArrowDownCircle className="h-4 w-4 text-amber-600" aria-hidden="true" />
@@ -337,7 +449,7 @@ function formatTier(tier: string) {
 }
 
 function formatStatus(status: string) {
-  return status.replace('_', ' ').replace(/^\w/, (letter) => letter.toUpperCase())
+  return status.replace(/[_.]/g, ' ').replace(/^\w/, (letter: string) => letter.toUpperCase())
 }
 
 function formatRequestType(type: string) {

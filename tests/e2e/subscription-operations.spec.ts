@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { loginAs } from './helpers'
-import type { SubscriptionRequest } from '../../src/types/subscriptionOperations'
+import type { SubscriptionBilling, SubscriptionRequest } from '../../src/types/subscriptionOperations'
 
 const plans = {
   free: {
@@ -29,16 +29,34 @@ const appliedUpgrade = subscriptionRequest('applied')
 
 test('parent can submit a manual subscription request', async ({ page }) => {
   let submittedBody: Record<string, unknown> | null = null
+  let checkoutBody: Record<string, unknown> | null = null
   await routeParentDashboard(page)
   await page.route('**/parents/me/subscription', async (route) => {
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
-        parent_id: 'parent-1',
-        current_tier: 'free',
+        parentId: 'parent-1',
+        currentTier: 'free',
         plans,
-        pending_request: null,
+        pendingRequest: null,
+        billing: subscriptionBilling('none'),
+      }),
+    })
+  })
+  await page.route('**/parents/me/subscription/checkout', async (route) => {
+    checkoutBody = route.request().postDataJSON() as Record<string, unknown>
+    await route.fulfill({
+      status: 201,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        parentId: 'parent-1',
+        checkoutSessionId: 'cs_test_parent',
+        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_parent',
+        provider: 'stripe',
+        mode: 'test',
+        requestedTier: 'premium',
+        billingStatus: 'checkout_pending',
       }),
     })
   })
@@ -59,7 +77,14 @@ test('parent can submit a manual subscription request', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: /subscription operations/i })).toBeVisible()
   await expect(page.getByText(/current plan: free/i)).toBeVisible()
+  await expect(page.getByText(/no provider-managed billing is attached/i)).toBeVisible()
   await page.getByRole('button', { name: /premium/i }).click()
+  await page.getByRole('button', { name: /start checkout/i }).click()
+  await expect.poll(() => checkoutBody).toMatchObject({
+    requested_tier: 'premium',
+  })
+  await expect(page.getByText(/checkout ready: premium/i)).toBeVisible()
+  await expect(page.getByRole('link', { name: /open secure checkout/i })).toBeVisible()
   await page.getByPlaceholder(/add a note/i).fill('Please upgrade for exam prep.')
   await page.getByRole('button', { name: /submit request/i }).click()
 
@@ -82,12 +107,15 @@ test('admin can approve and apply a subscription request', async ({ page }) => {
       applyBody = body
     },
   })
+  await routeAdminSubscriptionBilling(page)
 
   await loginAs(page, 'admin')
   await page.goto('/admin/subscriptions')
 
   await expect(page.getByRole('heading', { name: /subscription requests/i })).toBeVisible()
   await expect(page.getByRole('button', { name: /upgrade to premium parent-1/i })).toBeVisible()
+  await expect(page.getByText(/provider billing visibility/i)).toBeVisible()
+  await expect(page.getByRole('button', { name: /parent-1 premium \/ test/i })).toBeVisible()
 
   await page.getByRole('button', { name: /^approve$/i }).click()
   await expect.poll(() => patchBody).toMatchObject({
@@ -109,6 +137,25 @@ async function routeParentDashboard(page: Page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({ items: [] }),
+    })
+  })
+}
+
+async function routeAdminSubscriptionBilling(page: Page) {
+  await page.route('**/admin/subscriptions/billing**', async (route) => {
+    const url = route.request().url()
+    if (url.endsWith('/parent-1')) {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(subscriptionBilling('active')),
+      })
+      return
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ items: [subscriptionBilling('active')], count: 1 }),
     })
   })
 }
@@ -178,5 +225,45 @@ function subscriptionRequest(status: SubscriptionRequest['status']): Subscriptio
         note: status === 'requested' ? 'Parent submitted request.' : 'Manual subscription review',
       },
     ],
+  }
+}
+
+function subscriptionBilling(status: SubscriptionBilling['status']): SubscriptionBilling {
+  return {
+    parentId: 'parent-1',
+    provider: status === 'none' ? null : 'stripe',
+    mode: status === 'none' ? 'manual' : 'test',
+    status,
+    subscriptionTier: status === 'none' ? 'free' : 'premium',
+    requestedTier: status === 'none' ? null : 'premium',
+    providerCustomerId: status === 'none' ? null : 'cus_test_parent',
+    providerSubscriptionId: status === 'none' ? null : 'sub_test_parent',
+    providerPriceId: status === 'none' ? null : 'price_test_premium',
+    checkoutSessionId: status === 'none' ? null : 'cs_test_parent',
+    checkoutUrl: status === 'none' ? null : 'https://checkout.stripe.com/c/pay/cs_test_parent',
+    currentPeriodStart: null,
+    currentPeriodEnd: null,
+    cancelAtPeriodEnd: false,
+    lastProviderEventId: status === 'none' ? null : 'evt_checkout_completed_1',
+    lastProviderEventType: status === 'none' ? null : 'checkout.session.completed',
+    lastProviderEventAt: status === 'none' ? null : '2026-06-08T09:00:00Z',
+    manualOverrideAt: null,
+    manualOverrideBy: null,
+    manualOverrideSource: null,
+    updatedAt: '2026-06-08T09:00:00Z',
+    events: status === 'none'
+      ? []
+      : [
+          {
+            eventId: 'stripe_evt_checkout_completed_1',
+            eventAt: '2026-06-08T09:00:00Z',
+            eventType: 'checkout.session.completed',
+            provider: 'stripe',
+            providerMode: 'test',
+            billingStatus: 'active',
+            requestedTier: 'premium',
+            providerEventId: 'evt_checkout_completed_1',
+          },
+        ],
   }
 }

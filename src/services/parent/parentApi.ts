@@ -6,8 +6,11 @@ import type {
   ParentChild,
 } from '@/types/parent'
 import type {
+  CheckoutSession,
+  CreateCheckoutSessionInput,
   CreateSubscriptionRequestInput,
   ParentSubscription,
+  SubscriptionBilling,
   SubscriptionRequestListResponse,
 } from '@/types/subscriptionOperations'
 
@@ -39,6 +42,23 @@ export async function getChildLearningProfile(childId: string) {
 
 export async function getParentSubscription() {
   const response = await httpClient.get<ParentSubscription>('/parents/me/subscription')
+  return response.data
+}
+
+export async function createParentCheckoutSession(input: CreateCheckoutSessionInput) {
+  const response = await httpClient.post<CheckoutSession>(
+    '/parents/me/subscription/checkout',
+    {
+      requested_tier: input.requestedTier,
+      success_url: input.successUrl,
+      cancel_url: input.cancelUrl,
+    },
+  )
+  return response.data
+}
+
+export async function getParentSubscriptionBilling() {
+  const response = await httpClient.get<SubscriptionBilling>('/parents/me/subscription/billing')
   return response.data
 }
 

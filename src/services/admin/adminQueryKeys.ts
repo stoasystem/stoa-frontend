@@ -8,4 +8,5 @@ export const adminQueryKeys = {
   reportRecoveryEvidence: () => [...adminQueryKeys.all, 'report-recovery-evidence'] as const,
   moderationCases: () => [...adminQueryKeys.all, 'moderation-cases'] as const,
   subscriptionRequests: () => [...adminQueryKeys.all, 'subscription-requests'] as const,
+  subscriptionBilling: () => [...adminQueryKeys.all, 'subscription-billing'] as const,
 }

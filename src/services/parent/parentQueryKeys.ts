@@ -6,5 +6,6 @@ export const parentQueryKeys = {
   childReport: (childId: string) => [...parentQueryKeys.children(), childId, 'report'] as const,
   childLearningProfile: (childId: string) => [...parentQueryKeys.children(), childId, 'learning-profile'] as const,
   subscription: () => [...parentQueryKeys.all, 'subscription'] as const,
+  subscriptionBilling: () => [...parentQueryKeys.subscription(), 'billing'] as const,
   subscriptionRequests: () => [...parentQueryKeys.subscription(), 'requests'] as const,
 }
