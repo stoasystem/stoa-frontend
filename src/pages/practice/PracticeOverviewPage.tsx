@@ -3,15 +3,20 @@ import { PracticeOverview } from '@/components/practice/PracticeOverview'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
+import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { InlineUploadPanel } from '@/features/uploads/components/InlineUploadPanel'
 import { saveUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import type { UploadAttachment } from '@/features/uploads/types/uploads'
+import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
+import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgressQuery'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function PracticeOverviewPage() {
   const navigate = useNavigate()
   const overviewQuery = usePracticeOverviewQuery()
+  const curriculumQuery = useCurriculumCatalogQuery()
+  const curriculumProgressQuery = useCurriculumProgressQuery()
 
   function askWithPracticeUpload(attachments: UploadAttachment[]) {
     const uploadContext = {
@@ -41,6 +46,13 @@ export function PracticeOverviewPage() {
           sourceOptions={{ sourcePage: '/practice' }}
           compact
           onAskLearningAssistant={askWithPracticeUpload}
+        />
+        <CurriculumRolloutPanel
+          catalog={curriculumQuery.data}
+          progress={curriculumProgressQuery.data}
+          isLoading={curriculumQuery.isLoading || curriculumProgressQuery.isLoading}
+          isError={curriculumQuery.isError || curriculumProgressQuery.isError}
+          contextLabel="Student curriculum"
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}

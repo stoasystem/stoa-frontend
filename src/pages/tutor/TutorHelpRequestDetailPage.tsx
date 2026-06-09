@@ -14,13 +14,16 @@ import { TutorDashboardSkeleton } from '@/components/tutor/TutorDashboardSkeleto
 import { TutorRequestTimeline } from '@/components/tutor/TutorRequestTimeline'
 import { TeacherAssistanceSummaryCard } from '@/components/tutor/TeacherAssistanceSummaryCard'
 import { AiTeacherToolsPanel } from '@/components/tutor/AiTeacherToolsPanel'
+import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Button } from '@/components/ui/button'
+import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useAddTutorHelpRequestNoteMutation } from '@/hooks/tutor/useAddTutorHelpRequestNoteMutation'
 import { useTutorHelpRequestDetailQuery } from '@/hooks/tutor/useTutorHelpRequestDetailQuery'
 import { useTutorAssistanceSummaryQuery } from '@/hooks/tutor/useTutorAssistanceSummaryQuery'
 import { useUpdateTutorHelpRequestMutation } from '@/hooks/tutor/useUpdateTutorHelpRequestMutation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
+import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
@@ -32,6 +35,10 @@ export function TutorHelpRequestDetailPage() {
   const updateStatus = useUpdateTutorHelpRequestMutation()
   const addNote = useAddTutorHelpRequestNoteMutation()
   const assistanceQuery = useTutorAssistanceSummaryQuery(requestQuery.data?.requestId)
+  const curriculumQuery = useCurriculumCatalogQuery({
+    subjectId: normalizeCurriculumSubjectId(requestQuery.data?.subject),
+    includePreview: true,
+  })
 
   useEffect(() => {
     if (!requestId) return
@@ -68,6 +75,14 @@ export function TutorHelpRequestDetailPage() {
               isError={assistanceQuery.isError}
             />
             <AiTeacherToolsPanel request={requestQuery.data} />
+            <CurriculumRolloutPanel
+              title="Curriculum context"
+              description="Teacher-visible curriculum coverage for the current request subject."
+              catalog={curriculumQuery.data}
+              isLoading={curriculumQuery.isLoading}
+              isError={curriculumQuery.isError}
+              contextLabel="Tutor preview"
+            />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">
                 Resolution note

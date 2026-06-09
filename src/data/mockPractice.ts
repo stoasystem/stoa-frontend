@@ -14,6 +14,8 @@ import type {
   PracticeRoadmapUnit,
   PracticeSubject,
   PracticeTopic,
+  CurriculumCatalog,
+  CurriculumProgressSummary,
   RoadmapLessonStatus,
 } from '@/types/practice'
 
@@ -630,6 +632,131 @@ export function getMockPracticeParentSummary(): PracticeParentSummary {
     questionBankMistakesReviewed: 3,
     questionBankNextFocus: 'Linear Equations Basics',
     learningActivityNote: 'This week combines independent Practice Path work with step-by-step explanations and one teacher-support moment.',
+  }
+}
+
+export function getMockCurriculumCatalog(): CurriculumCatalog {
+  return {
+    subjects: [
+      {
+        id: 'math',
+        name: 'Mathematics',
+        description: 'Active curriculum path with equation lessons and exercise bank coverage.',
+        gradeLevels: [demoGradeLevel],
+        language: 'neutral',
+        rolloutState: 'active',
+        order: 1,
+      },
+      {
+        id: 'physics',
+        name: 'Physics',
+        description: 'Forces and motion rollout prepared for teacher-reviewed practice expansion.',
+        gradeLevels: [demoGradeLevel],
+        language: 'neutral',
+        rolloutState: 'active',
+        order: 2,
+      },
+      {
+        id: 'german',
+        name: 'German',
+        description: 'Grammar and reading rollout with language metadata.',
+        gradeLevels: [demoGradeLevel],
+        language: 'de',
+        rolloutState: 'active',
+        order: 3,
+      },
+      {
+        id: 'english',
+        name: 'English',
+        description: 'Reading, writing, and grammar rollout with language metadata.',
+        gradeLevels: [demoGradeLevel],
+        language: 'en',
+        rolloutState: 'active',
+        order: 4,
+      },
+    ],
+    topics: [
+      {
+        id: demoTopicId,
+        subjectId: 'math',
+        gradeLevel: demoGradeLevel,
+        title: demoTopicTitle,
+        description: 'Linear equations, quadratics, and systems.',
+        rolloutState: 'active',
+        order: 1,
+      },
+      {
+        id: 'forces-motion',
+        subjectId: 'physics',
+        gradeLevel: demoGradeLevel,
+        title: 'Forces and motion',
+        description: 'Free-body reasoning and simple motion situations.',
+        rolloutState: 'active',
+        order: 1,
+      },
+      {
+        id: 'cases-and-articles',
+        subjectId: 'german',
+        gradeLevel: demoGradeLevel,
+        title: 'Cases and articles',
+        description: 'Nominative, accusative, and article endings.',
+        rolloutState: 'active',
+        order: 1,
+      },
+      {
+        id: 'reading-writing',
+        subjectId: 'english',
+        gradeLevel: demoGradeLevel,
+        title: 'Reading and writing',
+        description: 'Comprehension, grammar, and structured written answers.',
+        rolloutState: 'active',
+        order: 1,
+      },
+    ],
+    units: practiceUnits.map((unit) => ({
+      id: unit.id,
+      subjectId: unit.subjectId === demoSubjectId ? 'math' : unit.subjectId,
+      gradeLevel: unit.gradeLevel,
+      topicId: unit.topicId,
+      title: unit.title,
+      description: unit.description,
+      rolloutState: 'active',
+      order: unit.order,
+    })),
+    lessons: practiceUnits.flatMap((unit) =>
+      unit.lessons.map((lessonItem) => ({
+        id: lessonItem.id,
+        subjectId: lessonItem.subjectId === demoSubjectId ? 'math' : lessonItem.subjectId,
+        gradeLevel: lessonItem.gradeLevel,
+        unitId: lessonItem.unitId,
+        topicId: lessonItem.topicId,
+        title: lessonItem.title,
+        objective: lessonItem.topic,
+        difficulty: lessonItem.difficulty,
+        estimatedMinutes: lessonItem.estimatedMinutes,
+        rolloutState: 'active' as const,
+        exerciseCount: lessonItem.challenges.length,
+        source: 'practice_backfill',
+      })),
+    ),
+    rolloutSubjects: ['english', 'german', 'math', 'physics'],
+    includePreview: false,
+    source: 'practice_backfill',
+  }
+}
+
+export function getMockCurriculumProgress(studentId = 'user-student', subjectId?: string): CurriculumProgressSummary {
+  return {
+    studentId,
+    subjectId,
+    completedLessons: completedRoadmapLessons.size,
+    completedLessonIds: [...completedRoadmapLessons],
+    mistakeCount: mockPracticeMistakes.length,
+    weakTopics: [
+      { topicId: demoTopicId, count: 2 },
+      { topicId: 'cases-and-articles', count: 1 },
+    ],
+    source: 'practice_progress',
   }
 }
 

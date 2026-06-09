@@ -8,7 +8,7 @@ test('student can view learning expansion signals and choose a subject for a que
   await page.goto('/profile')
 
   await expect(page.getByRole('heading', { name: /learning expansion/i })).toBeVisible()
-  await expect(page.getByText(/physics/i)).toBeVisible()
+  await expect(page.getByText(/physics/i).first()).toBeVisible()
   await expect(page.getByText(/foundation profile support/i).first()).toBeVisible()
   await expect(page.getByText(/newton's laws/i)).toBeVisible()
 
@@ -16,6 +16,11 @@ test('student can view learning expansion signals and choose a subject for a que
   await expect(page.getByText(/subject for this question/i)).toBeVisible()
   await page.getByRole('button', { name: /physics foundation/i }).click()
   await expect(page.getByRole('button', { name: /physics foundation/i })).toHaveAttribute('aria-pressed', 'true')
+
+  await page.goto('/practice')
+  await expect(page.getByRole('heading', { name: /curriculum rollout/i })).toBeVisible()
+  await expect(page.getByText(/math, physics, german, and english rollout/i)).toBeVisible()
+  await expect(page.getByText(/lesson bank sample/i)).toBeVisible()
 })
 
 test('parent can view child subject profile signals', async ({ page }) => {
@@ -28,7 +33,9 @@ test('parent can view child subject profile signals', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /subject profile/i })).toBeVisible()
   await expect(page.getByText(/parent-visible subject signals/i)).toBeVisible()
   await expect(page.getByText('German', { exact: true }).first()).toBeVisible()
-  await expect(page.getByText(/cases and articles/i)).toBeVisible()
+  await expect(page.getByText(/cases and articles/i).first()).toBeVisible()
+  await expect(page.getByRole('heading', { name: /curriculum rollout/i })).toBeVisible()
+  await expect(page.getByText(/parent-visible curriculum coverage/i)).toBeVisible()
 })
 
 async function routeParentChildren(page: Page) {

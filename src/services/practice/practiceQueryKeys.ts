@@ -8,4 +8,8 @@ export const practiceQueryKeys = {
   lessonResult: (lessonId: string) => [...practiceQueryKeys.lesson(lessonId), 'result'] as const,
   mistakes: () => [...practiceQueryKeys.all, 'mistakes'] as const,
   parentSummary: (childId: string) => [...practiceQueryKeys.all, 'parent-summary', childId] as const,
+  curriculumCatalog: (subjectId?: string, gradeLevel?: string, includePreview?: boolean) =>
+    [...practiceQueryKeys.all, 'curriculum-catalog', subjectId ?? 'all', gradeLevel ?? 'all', includePreview ? 'preview' : 'active'] as const,
+  curriculumProgress: (studentId?: string, subjectId?: string) =>
+    [...practiceQueryKeys.all, 'curriculum-progress', studentId ?? 'self', subjectId ?? 'all'] as const,
 }

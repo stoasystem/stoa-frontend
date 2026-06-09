@@ -221,6 +221,91 @@ export type PracticeHintResponse = {
   nextStep: string
 }
 
+export type CurriculumRolloutState = 'seed' | 'draft' | 'reviewed' | 'active' | 'archived'
+
+export type CurriculumSubject = {
+  id: string
+  name: string
+  description: string
+  gradeLevels: string[]
+  language: string
+  rolloutState: CurriculumRolloutState
+  order: number
+}
+
+export type CurriculumTopic = {
+  id: string
+  subjectId: string
+  gradeLevel: string
+  title: string
+  description: string
+  rolloutState: CurriculumRolloutState
+  order: number
+}
+
+export type CurriculumUnit = {
+  id: string
+  subjectId: string
+  gradeLevel: string
+  topicId: string
+  title: string
+  description: string
+  rolloutState: CurriculumRolloutState
+  order: number
+}
+
+export type CurriculumLessonSummary = {
+  id: string
+  subjectId: string
+  gradeLevel: string
+  unitId: string
+  topicId: string
+  title: string
+  objective: string
+  difficulty: string
+  estimatedMinutes: number
+  rolloutState: CurriculumRolloutState
+  exerciseCount: number
+  source: string
+}
+
+export type CurriculumExercise = {
+  id: string
+  lessonId: string
+  subjectId: string
+  topicId: string
+  type: string
+  prompt: string
+  choices?: string[]
+  difficulty: string
+  estimatedMinutes: number
+  skills: string[]
+  rolloutState: CurriculumRolloutState
+  source: string
+  explanation?: string | null
+  answerKey?: string | string[] | null
+}
+
+export type CurriculumCatalog = {
+  subjects: CurriculumSubject[]
+  topics: CurriculumTopic[]
+  units: CurriculumUnit[]
+  lessons: CurriculumLessonSummary[]
+  rolloutSubjects: string[]
+  includePreview: boolean
+  source: string
+}
+
+export type CurriculumProgressSummary = {
+  studentId: string
+  subjectId?: string | null
+  completedLessons: number
+  completedLessonIds: string[]
+  mistakeCount: number
+  weakTopics: Array<{ topicId: string; count: number }>
+  source: string
+}
+
 export type PracticeTeacherHelpRequest = {
   subjectId: string
   gradeLevel?: string

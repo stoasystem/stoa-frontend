@@ -4,7 +4,9 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
 import { ChildSummaryHeader } from '@/components/parent/ChildSummaryHeader'
 import { LearningProfileSignals } from '@/components/learning/LearningProfileSignals'
+import { CurriculumRolloutPanel } from '@/components/practice/CurriculumRolloutPanel'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useChildLearningProfileQuery } from '@/hooks/parent/useChildLearningProfileQuery'
 import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSummaryQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -13,7 +15,9 @@ export function ChildSummaryPage() {
   const { childId } = useParams()
   const summaryQuery = useChildLearningSummaryQuery(childId)
   const learningProfileQuery = useChildLearningProfileQuery(childId)
+  const curriculumQuery = useCurriculumCatalogQuery()
   const summary = summaryQuery.data
+  const weakTopicLabels = learningProfileQuery.data?.weakTopics.map((topic) => topic.label) ?? summary?.weakTopics ?? []
 
   return (
     <DashboardLayout>
@@ -65,6 +69,15 @@ export function ChildSummaryPage() {
               profile={learningProfileQuery.data}
               isLoading={learningProfileQuery.isLoading}
               isError={learningProfileQuery.isError}
+            />
+            <CurriculumRolloutPanel
+              title="Curriculum rollout"
+              description="Parent-visible curriculum coverage and weak-area signals for active subjects."
+              catalog={curriculumQuery.data}
+              isLoading={curriculumQuery.isLoading}
+              isError={curriculumQuery.isError}
+              contextLabel="Parent curriculum view"
+              weakTopicLabels={weakTopicLabels}
             />
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>

@@ -24,6 +24,8 @@ test('tutor can filter and open a help request', async ({ page }) => {
   await expect(page.getByText(/solve 2x/i)).toBeVisible()
   await page.getByRole('button', { name: /^accept$/i }).first().click()
   await expect(page.getByText(/draft accepted/i)).toBeVisible()
+  await expect(page.getByRole('heading', { name: /curriculum context/i })).toBeVisible()
+  await expect(page.getByText(/teacher-visible curriculum coverage/i)).toBeVisible()
 
   await page.getByRole('button', { name: /mark in progress/i }).click()
   await expect(page.getByText(/request status updated/i)).toBeVisible()

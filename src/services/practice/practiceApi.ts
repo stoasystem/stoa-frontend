@@ -7,6 +7,8 @@ import {
   getMockPracticeParentSummary,
   getMockPracticePath,
   getMockPracticeRoadmap,
+  getMockCurriculumCatalog,
+  getMockCurriculumProgress,
   practiceSubjects,
   submitMockChallengeAnswer,
 } from '@/data/mockPractice'
@@ -27,6 +29,8 @@ import type {
   PracticeSubject,
   PracticeTeacherHelpRequest,
   PracticeTeacherHelpResponse,
+  CurriculumCatalog,
+  CurriculumProgressSummary,
 } from '@/types/practice'
 
 const shouldUsePracticeMockFirst = apiMode === 'mock' || (apiMode === 'demo' && !enableDemoApi)
@@ -143,4 +147,81 @@ export async function getPracticeParentSummary(childId: string) {
     )
     return response.data
   }, getMockPracticeParentSummary)
+}
+
+export async function getCurriculumCatalog({
+  subjectId,
+  gradeLevel,
+  includePreview = false,
+}: {
+  subjectId?: string
+  gradeLevel?: string
+  includePreview?: boolean
+} = {}) {
+  return withPracticeDemo(async () => {
+    const response = await httpClient.get<CurriculumCatalog>('/practice/curriculum/catalog', {
+      params: { subjectId, gradeLevel, includePreview },
+    })
+    return response.data
+  }, () => filterMockCurriculumCatalog(getMockCurriculumCatalog(), subjectId, gradeLevel, includePreview))
+}
+
+export async function getCurriculumProgress({
+  studentId,
+  subjectId,
+}: {
+  studentId?: string
+  subjectId?: string
+} = {}) {
+  return withPracticeDemo(async () => {
+    const response = await httpClient.get<CurriculumProgressSummary>('/practice/curriculum/progress', {
+      params: { studentId, subjectId },
+    })
+    return response.data
+  }, () => getMockCurriculumProgress(studentId, subjectId))
+}
+
+function filterMockCurriculumCatalog(
+  catalog: CurriculumCatalog,
+  subjectId?: string,
+  gradeLevel?: string,
+  includePreview = false,
+): CurriculumCatalog {
+  const normalizedSubject = normalizeCurriculumSubjectId(subjectId)
+  return {
+    ...catalog,
+    subjects: catalog.subjects.filter((subject) =>
+      (!normalizedSubject || subject.id === normalizedSubject) &&
+      (!gradeLevel || subject.gradeLevels.includes(gradeLevel)) &&
+      (includePreview || subject.rolloutState === 'active'),
+    ),
+    topics: catalog.topics.filter((topic) =>
+      (!normalizedSubject || topic.subjectId === normalizedSubject) &&
+      (!gradeLevel || topic.gradeLevel === gradeLevel) &&
+      (includePreview || topic.rolloutState === 'active'),
+    ),
+    units: catalog.units.filter((unit) =>
+      (!normalizedSubject || unit.subjectId === normalizedSubject) &&
+      (!gradeLevel || unit.gradeLevel === gradeLevel) &&
+      (includePreview || unit.rolloutState === 'active'),
+    ),
+    lessons: catalog.lessons.filter((lesson) =>
+      (!normalizedSubject || lesson.subjectId === normalizedSubject) &&
+      (!gradeLevel || lesson.gradeLevel === gradeLevel) &&
+      (includePreview || lesson.rolloutState === 'active'),
+    ),
+    includePreview,
+  }
+}
+
+export function normalizeCurriculumSubjectId(subjectId?: string) {
+  const normalized = subjectId?.trim().toLowerCase()
+  if (!normalized) return undefined
+  const aliases: Record<string, string> = {
+    mathematics: 'math',
+    mathematik: 'math',
+    deutsch: 'german',
+    englisch: 'english',
+  }
+  return aliases[normalized] ?? normalized
 }
