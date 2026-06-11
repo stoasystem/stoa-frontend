@@ -2,6 +2,8 @@ import { ChevronDown, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
+import { useUpdateLocalePreferenceMutation } from '@/hooks/auth/useUpdateLocalePreferenceMutation'
+import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
 
 type LanguageSwitcherProps = {
@@ -12,7 +14,16 @@ type LanguageSwitcherProps = {
 
 export function LanguageSwitcher({ compact = false, className, variant = 'select' }: LanguageSwitcherProps) {
   const { i18n, t } = useTranslation('common')
+  const user = useAuthStore((state) => state.user)
+  const updateLocale = useUpdateLocalePreferenceMutation()
   const currentLanguage = languageOptions.find((language) => language.code === i18n.language) ?? languageOptions[0]
+
+  function changeLanguage(language: SupportedLanguage) {
+    void i18n.changeLanguage(language)
+    if (user) {
+      updateLocale.mutate(language)
+    }
+  }
 
   if (variant === 'footer') {
     return (
@@ -43,8 +54,9 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                     : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
                 )}
                 aria-pressed={isActive}
+                disabled={updateLocale.isPending}
                 onClick={() => {
-                  void i18n.changeLanguage(language.code)
+                  changeLanguage(language.code)
                 }}
               >
                 {language.shortLabel}
@@ -90,7 +102,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                     : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)] hover:text-foreground focus:bg-[hsl(var(--stoa-brand-warm-grey)/0.65)]',
                 )}
                 onSelect={() => {
-                  void i18n.changeLanguage(language.code)
+                  changeLanguage(language.code)
                 }}
               >
                 <span>{language.shortLabel}</span>
@@ -120,9 +132,10 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
           'bg-transparent text-inherit outline-none',
           'max-w-[8rem]',
         )}
+        disabled={updateLocale.isPending}
         value={currentLanguage.code}
         onChange={(event) => {
-          void i18n.changeLanguage(event.target.value as SupportedLanguage)
+          changeLanguage(event.target.value as SupportedLanguage)
         }}
       >
         {languageOptions.map((language) => (

@@ -37,10 +37,20 @@ export type User = {
   email: string
   role: UserRole
   preferredLanguage?: string
+  preferredLocale?: string
+  effectiveLocale?: string
+  supportedLocales?: string[]
   subscriptionStatus?: SubscriptionStatus
   plan?: SubscriptionPlan
   subscription?: UserSubscription
   verificationStatus?: 'approved' | 'pending_review'
+}
+
+export type LocalePreferenceResponse = {
+  preferredLocale: string
+  effectiveLocale: string
+  supportedLocales: string[]
+  updatedAt?: string | null
 }
 
 export type AuthResponse = {

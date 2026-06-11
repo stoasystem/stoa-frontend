@@ -1,5 +1,6 @@
 import { httpClient } from '@/services/api/httpClient'
-import type { AuthResponse, User, UserRole } from '@/types/user'
+import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
+import type { AuthResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import type { RegisterPayload } from '@/types/onboarding'
 import { TOKEN_KEY } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
@@ -59,6 +60,23 @@ export async function getCurrentUser() {
   }
 }
 
+export async function updateLocalePreference(preferredLocale: SupportedLanguage) {
+  try {
+    const response = await httpClient.patch<LocalePreferenceResponse>('/auth/me/preferences/locale', {
+      preferredLocale,
+    })
+    return response.data
+  } catch (error) {
+    if (!allowDemoFallback) throw error
+    return {
+      preferredLocale,
+      effectiveLocale: preferredLocale,
+      supportedLocales: ['en', 'de'],
+      updatedAt: new Date().toISOString(),
+    } satisfies LocalePreferenceResponse
+  }
+}
+
 function inferRole(email: string): UserRole {
   if (email.includes('organization')) return 'organization_admin'
   if (email.includes('school.teacher')) return 'school_teacher'
@@ -70,12 +88,22 @@ function inferRole(email: string): UserRole {
 }
 
 function createDemoUser(email: string, role = inferRole(email), name?: string, preferredLanguage?: string): User {
+  const storedLocale = typeof window === 'undefined' ? null : localStorage.getItem(LANGUAGE_STORAGE_KEY)
+  const effectiveLocale = isSupportedLanguage(preferredLanguage)
+    ? preferredLanguage
+    : isSupportedLanguage(storedLocale)
+      ? storedLocale
+      : 'en'
+
   return {
     id: `demo-${role}`,
     name: name || `Demo ${role}`,
     email,
     role,
-    preferredLanguage,
+    preferredLanguage: effectiveLocale,
+    preferredLocale: effectiveLocale,
+    effectiveLocale,
+    supportedLocales: ['en', 'de'],
     subscriptionStatus: 'trial',
     plan: 'free_trial',
   }

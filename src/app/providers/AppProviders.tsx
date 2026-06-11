@@ -16,7 +16,7 @@ export function AppProviders({ children }: AppProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      <Toaster position="top-right" richColors />
+      <Toaster position="top-center" richColors />
     </QueryClientProvider>
   )
 }

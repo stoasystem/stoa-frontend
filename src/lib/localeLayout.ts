@@ -36,26 +36,6 @@ export const localeLayout = {
     ctaLabelVariant: 'shortOnMobile',
     ctaButtonClassName: 'min-w-[8rem] sm:min-w-[10rem]',
   },
-  fr: {
-    heroTitleVariant: 'default',
-    heroTitleMaxWidthClassName: 'max-w-[760px]',
-    heroTitleClassName: 'text-5xl sm:text-6xl lg:text-7xl',
-    heroSubtitleMaxWidthClassName: 'max-w-3xl',
-    heroActionClassName: 'sm:flex-wrap',
-    buttonSize: 'wide',
-    ctaLabelVariant: 'shortOnMobile',
-    ctaButtonClassName: 'min-w-[8rem] sm:min-w-[11rem]',
-  },
-  it: {
-    heroTitleVariant: 'default',
-    heroTitleMaxWidthClassName: 'max-w-[760px]',
-    heroTitleClassName: 'text-5xl sm:text-6xl lg:text-7xl',
-    heroSubtitleMaxWidthClassName: 'max-w-3xl',
-    heroActionClassName: 'sm:flex-wrap',
-    buttonSize: 'wide',
-    ctaLabelVariant: 'shortOnMobile',
-    ctaButtonClassName: 'min-w-[8rem] sm:min-w-[10rem]',
-  },
 } satisfies Record<SupportedLanguage, LocaleLayout>
 
 export function getLocaleLayout(language: string | null | undefined): LocaleLayout {

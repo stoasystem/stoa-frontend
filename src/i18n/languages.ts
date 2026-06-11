@@ -1,6 +1,6 @@
 export const LANGUAGE_STORAGE_KEY = 'stoa_language'
 
-export const supportedLanguages = ['en', 'de', 'fr', 'it'] as const
+export const supportedLanguages = ['en', 'de'] as const
 
 export type SupportedLanguage = (typeof supportedLanguages)[number]
 
@@ -13,8 +13,6 @@ export type LanguageOption = {
 export const languageOptions: LanguageOption[] = [
   { code: 'en', label: 'English', shortLabel: 'EN' },
   { code: 'de', label: 'Deutsch', shortLabel: 'DE' },
-  { code: 'fr', label: 'Français', shortLabel: 'FR' },
-  { code: 'it', label: 'Italiano', shortLabel: 'IT' },
 ]
 
 export function isSupportedLanguage(value: string | null | undefined): value is SupportedLanguage {
