@@ -17,7 +17,7 @@ export function PageActions({
   className,
 }: PageActionsProps) {
   return (
-    <div className={cn('flex flex-wrap items-center gap-2', className)}>
+    <div className={cn('flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end', className)}>
       {tertiary}
       {secondary}
       {danger}

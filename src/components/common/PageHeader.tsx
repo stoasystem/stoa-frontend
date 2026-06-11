@@ -34,7 +34,7 @@ export function PageHeader({
           </p>
         )}
         <div>
-          <h1 className={cn('text-2xl font-semibold text-foreground', titleClassName)}>
+          <h1 className={cn('break-words text-2xl font-semibold text-foreground', titleClassName)}>
             {title}
           </h1>
           {description && (
@@ -44,7 +44,7 @@ export function PageHeader({
           )}
         </div>
       </div>
-      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
+      {actions && <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:shrink-0 sm:justify-end">{actions}</div>}
     </header>
   )
 }

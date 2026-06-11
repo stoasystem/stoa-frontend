@@ -100,7 +100,9 @@ function NavItemLink({
       className={() =>
         cn(
           'flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
-          compact ? 'min-w-0 flex-1 justify-center px-2 py-2 text-xs' : 'px-2 py-1.5',
+          compact
+            ? 'min-w-0 flex-1 flex-col justify-center gap-1 px-1 py-1.5 text-[0.68rem] leading-tight'
+            : 'px-2 py-1.5',
           active
             ? 'platform-nav-active shadow-sm'
             : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
@@ -110,7 +112,7 @@ function NavItemLink({
       to={item.path}
     >
       <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
-      <span className={compact ? 'truncate' : undefined}>{label}</span>
+      <span className={compact ? 'max-w-full truncate' : undefined}>{label}</span>
     </NavLink>
   )
 }
@@ -179,14 +181,14 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <UserMenu />
         </aside>
         <main className="min-w-0 flex-1 pb-24">
-          <header className="sticky top-0 z-30 border-b bg-[hsl(var(--platform-surface-app)_/_0.94)] px-4 py-3 shadow-[0_10px_30px_hsl(var(--stoa-brand-charcoal)_/_0.04)] backdrop-blur md:px-6">
-            <div className="flex min-h-11 items-center gap-3">
+          <header className="sticky top-0 z-30 border-b bg-[hsl(var(--platform-surface-app)_/_0.94)] px-3 py-3 shadow-[0_10px_30px_hsl(var(--stoa-brand-charcoal)_/_0.04)] backdrop-blur sm:px-4 md:px-6">
+            <div className="flex min-h-11 min-w-0 items-center gap-2 sm:gap-3">
               <Link
                 to="/"
-                className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))]"
+                className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-2.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] sm:px-3"
               >
                 <Home className="h-4 w-4" aria-hidden="true" />
-                {t('navigation.home')}
+                <span className="hidden sm:inline">{t('navigation.home')}</span>
               </Link>
               <nav
                 aria-label="App top navigation"
@@ -196,7 +198,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
                   <TopNavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}-top`} />
                 ))}
               </nav>
-              <div className="ml-auto flex shrink-0 items-center gap-3">
+              <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
                 {user && <NotificationCenter />}
                 <LanguageSwitcher compact />
                 <div className="hidden sm:block">
@@ -211,9 +213,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
       {mobileItems.length > 0 && (
         <nav
           aria-label="Mobile primary"
-          className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 py-2 shadow-lg backdrop-blur md:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-lg backdrop-blur md:hidden"
         >
-          <div className="mx-auto flex max-w-md gap-1">
+          <div className="mx-auto flex max-w-lg items-stretch gap-1">
             {mobileItems.map((item) => (
               <NavItemLink compact item={item} items={mobileItems} key={`${item.path}-${item.label}-mobile`} />
             ))}

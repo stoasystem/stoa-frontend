@@ -95,7 +95,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
       <CardContent className="space-y-5">
         <div className="grid gap-4 lg:grid-cols-2">
           <div className="space-y-3 rounded-md border border-border/70 p-3">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
               <div>
                 <p className="text-sm font-medium">Teacher summary draft</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -133,7 +133,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
           </div>
 
           <div className="space-y-3 rounded-md border border-border/70 p-3">
-            <div className="flex items-start justify-between gap-3">
+            <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
               <div>
                 <p className="text-sm font-medium">Exercise draft</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
@@ -228,7 +228,7 @@ function DraftStatus({ draft }: { draft?: AiTeacherDraft }) {
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="grid gap-2 sm:flex sm:flex-wrap">
       <Badge variant={draft.status === 'draft' ? 'secondary' : 'outline'}>{draft.status}</Badge>
       <Badge variant="outline">{draft.studentDeliveryStatus.replace('_', ' ')}</Badge>
     </div>
