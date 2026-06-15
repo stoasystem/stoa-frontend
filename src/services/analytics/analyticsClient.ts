@@ -53,6 +53,7 @@ export type AnalyticsEventName =
   | 'curriculum_graph_viewed'
   | 'curriculum_topic_selected'
   | 'weak_point_diagnosis_viewed'
+  | 'learning_operations_dashboard_viewed'
   | 'tutor_assignment_board_viewed'
   | 'tutor_assignment_suggested_clicked'
   | 'parent_monthly_report_viewed'

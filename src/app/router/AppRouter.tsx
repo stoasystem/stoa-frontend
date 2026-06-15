@@ -40,7 +40,10 @@ import { HowItWorksPage } from '@/pages/landing/HowItWorksPage'
 import { TeacherSupportPage } from '@/pages/landing/TeacherSupportPage'
 import { StudentLearningHistoryPage } from '@/pages/learning-history/StudentLearningHistoryPage'
 import { CurriculumGraphPage } from '@/pages/learning/CurriculumGraphPage'
+import { LearningAutomationConsolePage } from '@/pages/learning/LearningAutomationConsolePage'
+import { LearningOperationsDashboardPage } from '@/pages/learning/LearningOperationsDashboardPage'
 import { StudentLearningProfilePage } from '@/pages/learning/StudentLearningProfilePage'
+import { StudentAssignmentsPage } from '@/pages/learning/StudentAssignmentsPage'
 import { WeakPointDiagnosisPage } from '@/pages/learning/WeakPointDiagnosisPage'
 import { PrivacyPage } from '@/pages/legal/PrivacyPage'
 import { TermsPage } from '@/pages/legal/TermsPage'
@@ -48,6 +51,7 @@ import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { OnboardingPage } from '@/pages/onboarding/OnboardingPage'
 import { ChildLearningHistoryPage } from '@/pages/parent/ChildLearningHistoryPage'
 import { ParentMonthlyReportPage } from '@/pages/parent/ParentMonthlyReportPage'
+import { ParentChildProgressPage } from '@/pages/parent/ParentChildProgressPage'
 import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
@@ -132,6 +136,7 @@ export function AppRouter() {
             <Route path="/classroom/sessions/:sessionId/room" element={<ClassroomRoomPage />} />
             <Route path="/classroom/sessions/:sessionId/summary" element={<ClassroomSummaryPage />} />
             <Route path="/practice" element={<PracticeOverviewPage />} />
+            <Route path="/assignments" element={<StudentAssignmentsPage />} />
             <Route path="/practice/mistakes" element={<MistakesReviewPage />} />
             <Route path="/question-bank" element={<QuestionBankHomePage />} />
             <Route path="/question-bank/mistakes" element={<QuestionBankMistakesReviewPage />} />
@@ -154,6 +159,7 @@ export function AppRouter() {
             <Route path="/parent" element={<ParentDashboardPage />} />
             <Route path="/parent/reports" element={<ParentReportsPage />} />
             <Route path="/parent/children/:childId" element={<ChildSummaryPage />} />
+            <Route path="/parent/children/:childId/progress" element={<ParentChildProgressPage />} />
             <Route path="/parent/children/:childId/report" element={<ChildReportPage />} />
             <Route path="/parent/children/:childId/monthly-report" element={<ParentMonthlyReportPage />} />
             <Route
@@ -167,8 +173,10 @@ export function AppRouter() {
             <Route path="/organization/tutors" element={<DemoSurfaceRoute><OrganizationTutorsPage /></DemoSurfaceRoute>} />
             <Route path="/organization/reports" element={<DemoSurfaceRoute><OrganizationReportsPage /></DemoSurfaceRoute>} />
             <Route path="/organization/analytics" element={<DemoSurfaceRoute><OrganizationAnalyticsPage /></DemoSurfaceRoute>} />
+            <Route path="/organization/learning-operations" element={<LearningOperationsDashboardPage />} />
             <Route path="/organization/tutor-assignment" element={<DemoSurfaceRoute><TutorAssignmentBoardPage /></DemoSurfaceRoute>} />
             <Route path="/organization/students/:studentId/learning-profile" element={<DemoSurfaceRoute><StudentLearningProfilePage /></DemoSurfaceRoute>} />
+            <Route path="/organization/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/students/:studentId/learning-profile" element={<DemoSurfaceRoute><StudentLearningProfilePage /></DemoSurfaceRoute>} />
             <Route path="/students/:studentId/diagnosis" element={<DemoSurfaceRoute><WeakPointDiagnosisPage /></DemoSurfaceRoute>} />
             <Route path="/students/:studentId/curriculum-graph" element={<DemoSurfaceRoute><CurriculumGraphPage /></DemoSurfaceRoute>} />
@@ -181,12 +189,14 @@ export function AppRouter() {
             <Route path="/tutor/classroom/sessions/:sessionId/room" element={<ClassroomRoomPage tutorMode />} />
             <Route path="/tutor/classroom/sessions/:sessionId/summary" element={<ClassroomSummaryPage tutorMode />} />
             <Route path="/tutor/availability" element={<TutorAvailabilityPage />} />
+            <Route path="/tutor/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/tutor/profile" element={<TutorProfilePage />} />
             <Route path="/tutor/requests/:requestId" element={<TutorHelpRequestDetailPage />} />
           </Route>
           <Route element={<RoleRoute allowedRoles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+            <Route path="/admin/learning-operations" element={<LearningOperationsDashboardPage />} />
             <Route path="/admin/advanced-analytics" element={<DemoSurfaceRoute><AdvancedAnalyticsPage /></DemoSurfaceRoute>} />
             <Route path="/admin/retention" element={<DemoSurfaceRoute><RetentionPage /></DemoSurfaceRoute>} />
             <Route path="/admin/usage" element={<AdminUsagePage />} />
@@ -194,6 +204,7 @@ export function AppRouter() {
             <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
             <Route path="/admin/moderation" element={<AdminModerationPage />} />
             <Route path="/admin/report-operations" element={<AdminReportOperationsPage />} />
+            <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
             <Route
               path="/admin/users"
