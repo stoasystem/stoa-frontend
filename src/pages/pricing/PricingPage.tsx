@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { CheckCircle2, ReceiptText, ShieldCheck } from 'lucide-react'
 import { FeatureComparison } from '@/components/pricing/FeatureComparison'
 import { PlanCard } from '@/components/billing/PlanCard'
+import { pricingPlans } from '@/components/pricing/pricingPlans'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
@@ -26,8 +26,6 @@ type PricingStructurePlan = {
 export function PricingPage() {
   const { t } = useTranslation('pricing')
   const navigate = useNavigate()
-  const plansQuery = useBillingPlansQuery()
-  const pricingPlans = plansQuery.data?.items ?? []
   const pricingStructurePlans = t('priceStructure.plans', { returnObjects: true }) as PricingStructurePlan[]
 
   useEffect(() => {
