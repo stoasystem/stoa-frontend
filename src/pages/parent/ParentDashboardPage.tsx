@@ -7,6 +7,7 @@ import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkel
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { ParentSubscriptionOperationsCard } from '@/components/parent/ParentSubscriptionOperationsCard'
+import { ParentAccountOperationsSummaryCard } from '@/components/parent/ParentAccountOperationsSummaryCard'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
@@ -26,6 +27,7 @@ export function ParentDashboardPage() {
           <ParentValueCard />
           <UpgradePromptCard source="parent_dashboard" />
         </div>
+        <ParentAccountOperationsSummaryCard />
         <ParentSubscriptionOperationsCard />
         <ParentClassroomVisibilityCard />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}

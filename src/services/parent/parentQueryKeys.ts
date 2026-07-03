@@ -8,4 +8,5 @@ export const parentQueryKeys = {
   subscription: () => [...parentQueryKeys.all, 'subscription'] as const,
   subscriptionBilling: () => [...parentQueryKeys.subscription(), 'billing'] as const,
   subscriptionRequests: () => [...parentQueryKeys.subscription(), 'requests'] as const,
+  accountOperations: () => [...parentQueryKeys.all, 'account-operations'] as const,
 }

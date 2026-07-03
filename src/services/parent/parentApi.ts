@@ -5,6 +5,7 @@ import type {
   ChildLearningSummary,
   ParentChild,
 } from '@/types/parent'
+import type { ParentAccountOperations } from '@/types/parentAccountOperations'
 import type {
   CheckoutSession,
   CreateCheckoutSessionInput,
@@ -59,6 +60,11 @@ export async function createParentCheckoutSession(input: CreateCheckoutSessionIn
 
 export async function getParentSubscriptionBilling() {
   const response = await httpClient.get<SubscriptionBilling>('/parents/me/subscription/billing')
+  return response.data
+}
+
+export async function getParentAccountOperations() {
+  const response = await httpClient.get<ParentAccountOperations>('/parents/me/account-operations')
   return response.data
 }
 

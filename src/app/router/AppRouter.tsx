@@ -52,6 +52,7 @@ import { NotFoundPage } from '@/pages/not-found/NotFoundPage'
 import { OnboardingPage } from '@/pages/onboarding/OnboardingPage'
 import { ChildLearningHistoryPage } from '@/pages/parent/ChildLearningHistoryPage'
 import { ParentMonthlyReportPage } from '@/pages/parent/ParentMonthlyReportPage'
+import { ParentAccountOperationsPage } from '@/pages/parent/ParentAccountOperationsPage'
 import { ParentChildProgressPage } from '@/pages/parent/ParentChildProgressPage'
 import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
@@ -159,6 +160,7 @@ export function AppRouter() {
           </Route>
           <Route element={<RoleRoute allowedRoles={['parent']} />}>
             <Route path="/parent" element={<ParentDashboardPage />} />
+            <Route path="/parent/account-operations" element={<ParentAccountOperationsPage />} />
             <Route path="/parent/reports" element={<ParentReportsPage />} />
             <Route path="/parent/children/:childId" element={<ChildSummaryPage />} />
             <Route path="/parent/children/:childId/progress" element={<ParentChildProgressPage />} />
