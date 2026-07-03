@@ -3,14 +3,14 @@
 ## Milestones
 
 - ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
-- ◆ **v2.7 Home V2 Visual Direction Design** - Phases 232-235
+- ✅ **v2.7 Home V2 Visual Direction Design** - Phases 232-235 (shipped 2026-07-03)
 
 ## Phases
 
-- [ ] **Phase 232: Premium Visual Thesis And Anti-Pattern Contract** - Define the high-end visual archetype, visual promise, design mood, and hard exclusions for Home V2.
-- [ ] **Phase 233: Home V2 Design System Extension** - Define typography, color, spacing, grid, surface, CTA, and section rhythm rules for Home V2.
-- [ ] **Phase 234: Section Composition, Imagery, And Motion Blueprint** - Translate the IA into section-level layout, image, navigation, CTA, and motion direction.
-- [ ] **Phase 235: Responsive, Accessibility, And Implementation Handoff** - Define mobile collapse, accessibility, performance, localization, and implementation handoff checks.
+- [x] **Phase 232: Premium Visual Thesis And Anti-Pattern Contract** - Define the high-end visual archetype, visual promise, design mood, and hard exclusions for Home V2.
+- [x] **Phase 233: Home V2 Design System Extension** - Define typography, color, spacing, grid, surface, CTA, and section rhythm rules for Home V2.
+- [x] **Phase 234: Section Composition, Imagery, And Motion Blueprint** - Translate the IA into section-level layout, image, navigation, CTA, and motion direction.
+- [x] **Phase 235: Responsive, Accessibility, And Implementation Handoff** - Define mobile collapse, accessibility, performance, localization, and implementation handoff checks.
 
 ## Phase Details
 
@@ -74,10 +74,10 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 232. Premium Visual Thesis And Anti-Pattern Contract | 0/1 | Pending | — |
-| 233. Home V2 Design System Extension | 0/1 | Pending | — |
-| 234. Section Composition, Imagery, And Motion Blueprint | 0/1 | Pending | — |
-| 235. Responsive, Accessibility, And Implementation Handoff | 0/1 | Pending | — |
+| 232. Premium Visual Thesis And Anti-Pattern Contract | 1/1 | Complete | 2026-07-03 |
+| 233. Home V2 Design System Extension | 1/1 | Complete | 2026-07-03 |
+| 234. Section Composition, Imagery, And Motion Blueprint | 1/1 | Complete | 2026-07-03 |
+| 235. Responsive, Accessibility, And Implementation Handoff | 1/1 | Complete | 2026-07-03 |
 
 ## Coverage
 
@@ -94,4 +94,4 @@
 
 ## Next Up
 
-Phase 232: Premium Visual Thesis And Anti-Pattern Contract.
+v2.7 is complete. Next Home V2 milestone should cover image strategy, asset selection/generation, or implementation scaffolding depending on priority.

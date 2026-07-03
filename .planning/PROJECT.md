@@ -10,33 +10,32 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.6 Home V2 Positioning and Information Architecture
+## Latest Shipped Milestone: v2.7 Home V2 Visual Direction Design
 
 **Shipped:** 2026-07-03
 
-**Delivered:** Home V2 now has a locked positioning and information architecture baseline for a separate Swiss-parent-first homepage preview route. The milestone defined audience, promise, CTA direction, old-homepage content disposition, section map, route/namespace recommendations, navigation policy, multilingual guardrails, and downstream handoff requirements without replacing `/` or implementing UI.
+**Delivered:** Home V2 now has a complete premium visual direction contract for the separate Swiss-parent-first homepage preview route. The milestone defined visual thesis, high-end design adaptation, anti-patterns, typography roles, color behavior, spatial rhythm, double-bezel surface rules, section blueprints, image art direction, CTA/navigation treatment, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints without replacing `/` or implementing UI.
 
 **Target features:**
-- Swiss-parent-first homepage narrative with role-specific app boundaries preserved.
-- Explicit old-homepage content disposition: keep, merge, demote, delete, rewrite, or reassess.
-- Separate `/home-v2` route, `home-v2` component namespace, and `homeV2` translation namespace proposal.
-- Natural `Start learning` CTA journey and free-user trial quota semantics documented.
-- English, German, French, and Italian IA guardrails before later visual design, imagery, animation, copywriting, localization, implementation, and QA.
+- High-end visual thesis for Home V2: calm family confidence, editorial restraint, crafted product evidence.
+- STOA-specific adaptation of `high-end-visual-design`: Editorial Luxury plus Editorial Split, double-bezel proof surfaces, macro whitespace, button-in-button primary CTA, and calm transform/opacity motion.
+- Role-based typography, color, spacing, surface, CTA, navigation, and section rhythm rules for the public homepage.
+- Section-level composition, image art direction, and motion blueprint for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- Responsive, accessibility, localization, performance, and implementation handoff guardrails before later Home V2 build milestones.
 
-## Current Milestone: v2.7 Home V2 Visual Direction Design
+## Current Milestone: None Active
 
-**Goal:** Define the Home V2 premium visual direction, design-system extension, imagery rules, layout composition, motion language, and implementation handoff before page code begins.
+**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is image strategy / asset insertion, animation implementation design, copywriting/localization, or React implementation scaffolding.
 
 **Target features:**
-- A high-end visual thesis for Home V2 that translates the v2.6 Swiss-parent IA into a premium education-service experience.
-- A Home V2 design-system extension covering typography roles, color behavior, spacing, surface architecture, CTAs, nav treatment, and section rhythm.
-- A layout, imagery, and motion blueprint for the five Home V2 sections without inserting final assets or implementing route code.
-- Responsive, accessibility, performance, and anti-AI-slop guardrails for later implementation.
-- A self-contained visual direction document that future Home V2 build phases can follow.
+- Preserve current `/` until explicit replacement approval.
+- Keep future Home V2 work separated from student, tutor, parent app, and admin surfaces.
+- Use `docs/home/home-v2-information-architecture.md` and `docs/home/home-v2-visual-direction.md` as source documents.
+- Treat final image sourcing/generation, motion code, localized copy files, React components, and screenshot QA as separate follow-up milestones.
 
 ## Current State
 
-**Latest shipped milestone:** v2.6 Home V2 Positioning and Information Architecture
+**Latest shipped milestone:** v2.7 Home V2 Visual Direction Design
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -139,14 +138,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Classroom lobby and room prioritize a learning workspace with Shared Problem, Focus Board / Shared Whiteboard, materials, compact video rail, tabbed panels, and accessible icon-led controls — v2.5
 - ✓ Classroom summary, tutor queue, parent classroom visibility, browser checks, lint/build, and live-classroom E2E coverage align with the simplified Online Classroom model — v2.5
 - ✓ Home V2 has a Swiss-parent-first positioning contract, current-homepage content inventory, separate route/namespace proposal, CTA journey, multilingual IA guardrails, and implementation handoff baseline — v2.6
+- ✓ Home V2 has a premium visual direction contract covering high-end visual thesis, typography roles, color behavior, spacing, surfaces, CTA/nav treatment, image art direction, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints — v2.7
 
 ### Active
 
-- [ ] Home V2 has a premium visual thesis grounded in Swiss private-school / high-end education service, not generic SaaS or AI-tool styling.
-- [ ] Home V2 design-system rules define typography, color, spacing, surfaces, CTAs, nav treatment, and section rhythm without disrupting app surfaces.
-- [ ] Home V2 layout, imagery, and motion blueprints are documented for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- [ ] Home V2 visual direction includes mobile collapse, accessibility, performance, and implementation handoff rules.
-- [ ] Home V2 visual direction explicitly adapts `high-end-visual-design` while respecting STOA frontend constraints and existing brand tokens.
+- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
 
 ### Out of Scope
 
