@@ -1,5 +1,27 @@
 # Milestones
 
+## v2.7 Home V2 Visual Direction Design (Current)
+
+**Phases planned:** 4 phases, 4 plans, 0 code tasks
+**Status:** Planning
+**Depends on:** v2.6 Home V2 Positioning and Information Architecture
+**Scope:** Define the premium visual direction for the separate Home V2 preview track before React implementation, image insertion, animation coding, final copy, localization files, or replacing `/`.
+
+**Planned outcomes:**
+
+- Translate the v2.6 Swiss-parent-first IA into a high-end visual thesis for STOA.
+- Adapt `high-end-visual-design` craft rules to STOA's education context without generic luxury decoration.
+- Define typography roles, color behavior, spacing, surfaces, CTA treatment, nav treatment, and section rhythm for Home V2.
+- Define section-level composition, imagery expectations, and motion choreography for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- Capture responsive, accessibility, performance, localization, and implementation handoff guardrails for later build milestones.
+
+### Verification Plan
+
+- `git diff --check`
+- GSD roadmap/state analysis after milestone initialization
+
+---
+
 ## v2.6 Home V2 Positioning and Information Architecture (Shipped: 2026-07-03)
 
 **Phases completed:** 4 phases, 4 plans, 0 code tasks

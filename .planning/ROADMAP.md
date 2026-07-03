@@ -2,92 +2,91 @@
 
 ## Milestones
 
-- ✅ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (shipped 2026-06-02)
-- ✅ **v2.5 Online Classroom Focused Redesign** - Phases 225-227 (shipped 2026-06-02)
 - ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
+- ◆ **v2.7 Home V2 Visual Direction Design** - Phases 232-235
 
 ## Phases
 
-- [x] **Phase 228: Home V2 Positioning Contract** - Lock the audience, promise, tone, CTA direction, and anti-positioning rules for the separate Home V2 homepage.
-- [x] **Phase 229: Current Homepage Inventory and New Section Map** - Audit the current homepage and convert its feature-heavy structure into a shorter Swiss-parent learning-thread IA.
-- [x] **Phase 230: Route, Namespace, Navigation, and CTA Journey** - Define the preview route, component/i18n namespaces, public navigation impact, and registration/login handoff.
-- [x] **Phase 231: Localization Guardrails and IA Handoff Closure** - Document multilingual IA risks, German layout constraints, and implementation handoff requirements for later design/build milestones.
+- [ ] **Phase 232: Premium Visual Thesis And Anti-Pattern Contract** - Define the high-end visual archetype, visual promise, design mood, and hard exclusions for Home V2.
+- [ ] **Phase 233: Home V2 Design System Extension** - Define typography, color, spacing, grid, surface, CTA, and section rhythm rules for Home V2.
+- [ ] **Phase 234: Section Composition, Imagery, And Motion Blueprint** - Translate the IA into section-level layout, image, navigation, CTA, and motion direction.
+- [ ] **Phase 235: Responsive, Accessibility, And Implementation Handoff** - Define mobile collapse, accessibility, performance, localization, and implementation handoff checks.
 
 ## Phase Details
 
-### Phase 228: Home V2 Positioning Contract
+### Phase 232: Premium Visual Thesis And Anti-Pattern Contract
 
-**Goal**: The redesign has one primary audience, one public promise, one primary CTA direction, and a clear list of what the homepage must not become.
-**Depends on**: Phase 227
-**Requirements**: HVIA-01, HVIA-02, HVIA-03, HVIA-04
+**Goal**: Home V2 has a clear high-end visual direction that feels like Swiss education service, not generic SaaS or AI spectacle.
+**Depends on**: Phase 231
+**Requirements**: HVD-01, HVD-02, HVD-03, HVD-04
 **Success Criteria**:
-  1. Swiss parents are documented as the homepage's first audience.
-  2. Student, tutor, parent, and admin app pages remain role-specific and are not forced into the homepage audience.
-  3. The positioning avoids AI-tool, homework-solver, and generic SaaS language.
-  4. The CTA direction uses natural learning language such as `Start learning`.
-  5. The 70/30 premium education/product split is usable as a decision filter.
-**Plans**: 228-PLAN.md
+  1. Visual thesis connects directly to the v2.6 Home V2 IA.
+  2. A high-end archetype is selected and adapted to STOA.
+  3. Anti-patterns are explicit enough to block generic redesigns.
+  4. Current `/` and role app surfaces remain separate.
+  5. `high-end-visual-design` guidance is adapted, not copied literally.
+**Plans**: 232-PLAN.md
 **UI hint**: yes
 
-### Phase 229: Current Homepage Inventory and New Section Map
+### Phase 233: Home V2 Design System Extension
 
-**Goal**: The current homepage is fully accounted for, and Home V2 has a concise section order that tells one coherent parent-facing learning story.
-**Depends on**: Phase 228
-**Requirements**: HVIA-05, HVIA-06, HVIA-07, HVIA-08
+**Goal**: Home V2 has visual rules for typography, color, spacing, grid, surfaces, and CTAs before implementation begins.
+**Depends on**: Phase 232
+**Requirements**: HVD-05, HVD-06, HVD-07, HVD-08
 **Success Criteria**:
-  1. Each current homepage section has a keep, merge, demote, delete, or rewrite disposition.
-  2. The new page structure is shorter than the current homepage and avoids equal-weight feature-card overload.
-  3. Practice, Learning Assistant, teacher support, and parent visibility are mapped as one learning thread.
-  4. The IA document names the copy/product claims that Home V2 must avoid.
-  5. The section map is concrete enough for visual and copy milestones to start without re-litigating structure.
-**Plans**: 229-PLAN.md
+  1. Display, heading, body, nav, CTA, caption, and evidence label roles are defined.
+  2. Color behavior extends STOA tokens without becoming one-note.
+  3. Desktop/mobile spacing and grid rules are documented.
+  4. Double-bezel and non-nested-card rules are documented.
+  5. Design system rules are scoped to Home V2 public marketing surfaces.
+**Plans**: 233-PLAN.md
 **UI hint**: yes
 
-### Phase 230: Route, Namespace, Navigation, and CTA Journey
+### Phase 234: Section Composition, Imagery, And Motion Blueprint
 
-**Goal**: Home V2 can be built separately from the current homepage with a documented route, namespace, navigation policy, and CTA-to-registration journey.
-**Depends on**: Phase 229
-**Requirements**: HVIA-09, HVIA-10, HVIA-11, HVIA-12
+**Goal**: Every Home V2 section has a layout, image, CTA/navigation, and motion direction that future implementation can follow.
+**Depends on**: Phase 233
+**Requirements**: HVD-09, HVD-10, HVD-11, HVD-12
 **Success Criteria**:
-  1. The current `/` route remains unchanged during the Home V2 preview period.
-  2. A preview route, component namespace, and translation namespace are documented.
-  3. The `Start learning` journey through login/register and trial quota semantics is mapped.
-  4. Public navigation remains uncluttered and does not turn Practice into a generic marketing nav island.
-  5. Route and namespace decisions are ready for a later implementation milestone.
-**Plans**: 230-PLAN.md
-**UI hint**: no
+  1. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have layout guidance.
+  2. Image roles and crop expectations are documented.
+  3. CTA and nav visual treatment is documented.
+  4. Motion uses transform/opacity and custom cubic-bezier timing.
+  5. Motion rules avoid mobile performance traps.
+**Plans**: 234-PLAN.md
+**UI hint**: yes
 
-### Phase 231: Localization Guardrails and IA Handoff Closure
+### Phase 235: Responsive, Accessibility, And Implementation Handoff
 
-**Goal**: The IA is ready for visual design, image work, animation, copywriting, localization, implementation, and QA without hidden ambiguity.
-**Depends on**: Phase 230
-**Requirements**: HVIA-13, HVIA-14, HVIA-15, HVIA-16
+**Goal**: Later implementation can build Home V2 with clear mobile, accessibility, localization, performance, and QA guardrails.
+**Depends on**: Phase 234
+**Requirements**: HVD-13, HVD-14, HVD-15, HVD-16
 **Success Criteria**:
-  1. English, German, French, and Italian IA risks are documented before final copywriting.
-  2. German long-title and CTA constraints are identified before hero design.
-  3. Later milestones know which artifacts to produce for visual direction, images, animation, copy, localization, build, and QA.
-  4. The final IA document is self-contained and linked from GSD planning state.
+  1. Asymmetric desktop layouts have explicit mobile collapse rules.
+  2. Typography, contrast, tap target, and localized text risks are documented.
+  3. Implementation constraints are clear without writing code in this milestone.
+  4. Visual direction handoff links to the v2.6 IA and future milestone plan.
   5. `git diff --check` passes for documentation changes.
-**Plans**: 231-PLAN.md
+**Plans**: 235-PLAN.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 228. Home V2 Positioning Contract | 1/1 | Complete | 2026-07-03 |
-| 229. Current Homepage Inventory and New Section Map | 1/1 | Complete | 2026-07-03 |
-| 230. Route, Namespace, Navigation, and CTA Journey | 1/1 | Complete | 2026-07-03 |
-| 231. Localization Guardrails and IA Handoff Closure | 1/1 | Complete | 2026-07-03 |
+| 232. Premium Visual Thesis And Anti-Pattern Contract | 0/1 | Pending | — |
+| 233. Home V2 Design System Extension | 0/1 | Pending | — |
+| 234. Section Composition, Imagery, And Motion Blueprint | 0/1 | Pending | — |
+| 235. Responsive, Accessibility, And Implementation Handoff | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 228 | 4 | HVIA-01, HVIA-02, HVIA-03, HVIA-04 |
-| 229 | 4 | HVIA-05, HVIA-06, HVIA-07, HVIA-08 |
-| 230 | 4 | HVIA-09, HVIA-10, HVIA-11, HVIA-12 |
-| 231 | 4 | HVIA-13, HVIA-14, HVIA-15, HVIA-16 |
+| 232 | 4 | HVD-01, HVD-02, HVD-03, HVD-04 |
+| 233 | 4 | HVD-05, HVD-06, HVD-07, HVD-08 |
+| 234 | 4 | HVD-09, HVD-10, HVD-11, HVD-12 |
+| 235 | 4 | HVD-13, HVD-14, HVD-15, HVD-16 |
 
 **Total requirements:** 16
 **Mapped requirements:** 16
@@ -95,4 +94,4 @@
 
 ## Next Up
 
-No pending phase. Milestone v2.6 is complete.
+Phase 232: Premium Visual Thesis And Anti-Pattern Contract.

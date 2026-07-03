@@ -1,86 +1,86 @@
-# Requirements: STOA Frontend v2.6
+# Requirements: STOA Frontend v2.7
 
 **Defined:** 2026-07-03
-**Core Value:** STOA can plan a separate Swiss-parent-first Home V2 homepage with a clear information architecture before visual implementation or production-homepage replacement.
+**Core Value:** STOA can define a premium, Swiss-parent-first Home V2 visual direction before writing page code, choosing final images, or replacing the current homepage.
 
-## v2.6 Requirements
+## v2.7 Requirements
 
-### Positioning
+### Visual Thesis
 
-- [x] **HVIA-01**: Home V2 defines Swiss parents as the primary public homepage audience while preserving student, tutor, parent, and admin app pages as role-specific experiences.
-- [x] **HVIA-02**: Home V2 positioning states STOA as calm, teacher-backed, intelligent learning support for Swiss families instead of an AI homework tool.
-- [x] **HVIA-03**: Home V2 uses a 70% Swiss private-school / high-end education service and 30% modern learning product direction as the IA and copy filter.
-- [x] **HVIA-04**: Home V2 has one primary homepage action expressed in natural learning language, with `Start learning` as the preferred CTA direction.
+- [ ] **HVD-01**: Home V2 has a documented visual thesis that translates v2.6 IA into a premium Swiss education-service experience.
+- [ ] **HVD-02**: Home V2 selects a clear high-end design archetype and explains how it adapts `high-end-visual-design` to STOA.
+- [ ] **HVD-03**: Home V2 visual direction defines what it must avoid: generic SaaS, AI-tool spectacle, one-note beige, dominant purple/blue gradients, decorative orbs, and feature-card clutter.
+- [ ] **HVD-04**: Home V2 visual direction preserves the existing `/` homepage and role app surfaces as separate design contexts.
 
-### Content Architecture
+### Design System Extension
 
-- [x] **HVIA-05**: Every existing homepage section is inventoried and assigned a disposition: keep, merge, demote, delete, or rewrite.
-- [x] **HVIA-06**: Home V2 defines a shorter section order centered on one learning thread rather than equal-weight feature modules.
-- [x] **HVIA-07**: Practice, Learning Assistant, teacher support, and parent visibility are mapped as one coherent family learning story.
-- [x] **HVIA-08**: Homepage content guardrails explicitly prohibit hero-level AI framing, instant-solver claims, generic SaaS structure, and unsupported production claims.
+- [ ] **HVD-05**: Home V2 defines typography roles for display, heading, body, nav, CTA, caption, and product-evidence labels.
+- [ ] **HVD-06**: Home V2 defines color behavior using existing STOA brand signals while avoiding a one-note palette.
+- [ ] **HVD-07**: Home V2 defines spacing, grid, section rhythm, and macro-whitespace rules for desktop and mobile.
+- [ ] **HVD-08**: Home V2 defines surface architecture including double-bezel containers, image frames, evidence panels, and non-nested card rules.
 
-### Route And Journey
+### Composition, Imagery, And Motion
 
-- [x] **HVIA-09**: Home V2 has a route proposal that keeps the current `/` homepage unchanged until explicit switch approval.
-- [x] **HVIA-10**: Home V2 has a component namespace and translation namespace proposal that avoid mixing new redesign code with existing home components.
-- [x] **HVIA-11**: The CTA journey from Home V2 to login/register is documented, including free-user trial quota semantics after registration.
-- [x] **HVIA-12**: Public navigation impact is documented so Home V2 does not add clutter or expose student-only Practice behavior as a generic public nav island.
+- [ ] **HVD-09**: Home V2 defines section-by-section layout composition for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- [ ] **HVD-10**: Home V2 defines image roles, crop ratios, quality criteria, and what existing or future assets must communicate.
+- [ ] **HVD-11**: Home V2 defines CTA and navigation visual treatment, including nested trailing-icon behavior where applicable.
+- [ ] **HVD-12**: Home V2 defines motion choreography using transform/opacity, custom cubic-bezier timing, reveal sequencing, and mobile/performance guardrails.
 
-### Localization And Handoff
+### Handoff And QA
 
-- [x] **HVIA-13**: English, German, French, and Italian IA risks are documented before writing final localized marketing copy.
-- [x] **HVIA-14**: German title and CTA constraints are captured so long wording does not drive unstable hero layouts.
-- [x] **HVIA-15**: The Home V2 IA handoff identifies what later milestones need for visual direction, image selection, animation, copywriting, localization, implementation, and QA.
-- [x] **HVIA-16**: The milestone produces a self-contained information architecture document that future implementation phases can follow.
+- [ ] **HVD-13**: Home V2 visual direction documents responsive collapse rules for asymmetric layouts below tablet widths.
+- [ ] **HVD-14**: Home V2 visual direction documents accessibility and readability checks for premium typography, contrast, tap targets, and localized text length.
+- [ ] **HVD-15**: Home V2 visual direction documents implementation constraints for later React/Tailwind work without creating code in this milestone.
+- [ ] **HVD-16**: The milestone produces a self-contained visual direction document ready for later image strategy, animation, copy, localization, implementation, and visual QA milestones.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Home V2 visual system implementation | This milestone locks positioning and IA first. |
-| Home V2 image insertion or image generation | Asset selection depends on the approved IA and section composition. |
-| Scroll animation, motion choreography, and interaction polish | Motion should follow the final narrative structure rather than lead it. |
-| Home V2 localized copy files in EN/DE/FR/IT | Localization should start after IA and base copy direction are approved. |
-| Browser QA, Playwright screenshots, and visual regression | Meaningful only after route/components exist. |
-| Replacing `/` with Home V2 | Requires explicit later switch decision after review. |
+| Home V2 route/component implementation | v2.7 defines visual direction only. |
+| Final image sourcing, image generation, or asset insertion | Requires separate image strategy and approval. |
+| Scroll animation implementation | Motion rules are defined now; implementation belongs after component scaffolding. |
+| Final EN/DE/FR/IT marketing copy | Copywriting and localization follow visual direction and image choices. |
+| Browser screenshot QA | Meaningful only after Home V2 components exist. |
+| Switching `/` to Home V2 | Requires explicit later switch approval. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| Modifying the current production homepage route `/` | User explicitly asked to preserve the existing webpage and build the new design separately. |
-| Implementing Home V2 React components | v2.6 is positioning and IA, not UI build. |
-| Adding new product capabilities | The homepage can explain existing support loops but must not create backend/product scope. |
-| Changing registration, quota, payment, or auth behavior | CTA handoff is documented only; behavior remains unchanged. |
-| Foregrounding AI or instant-answer language | Conflicts with the agreed intelligent learning platform positioning. |
-| Copying external website code, CSS, components, or assets | Home V2 must remain an original STOA learning-platform design. |
+| Modifying the current homepage route `/` | Home V2 remains a separate preview track. |
+| Implementing React/Tailwind components | This milestone is design direction and documentation. |
+| Adding dependencies or icon/font packages | Actual package choices belong to implementation planning. |
+| Replacing app-surface design rules | Home V2 visual direction is for the public homepage only. |
+| Decorative gradient orbs, large scrolling blur, and one-note beige/purple/blue themes | These conflict with STOA frontend design constraints. |
+| Copying external website code, CSS, components, or assets | Home V2 must be an original STOA design. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HVIA-01 | 228 | Complete |
-| HVIA-02 | 228 | Complete |
-| HVIA-03 | 228 | Complete |
-| HVIA-04 | 228 | Complete |
-| HVIA-05 | 229 | Complete |
-| HVIA-06 | 229 | Complete |
-| HVIA-07 | 229 | Complete |
-| HVIA-08 | 229 | Complete |
-| HVIA-09 | 230 | Complete |
-| HVIA-10 | 230 | Complete |
-| HVIA-11 | 230 | Complete |
-| HVIA-12 | 230 | Complete |
-| HVIA-13 | 231 | Complete |
-| HVIA-14 | 231 | Complete |
-| HVIA-15 | 231 | Complete |
-| HVIA-16 | 231 | Complete |
+| HVD-01 | 232 | Pending |
+| HVD-02 | 232 | Pending |
+| HVD-03 | 232 | Pending |
+| HVD-04 | 232 | Pending |
+| HVD-05 | 233 | Pending |
+| HVD-06 | 233 | Pending |
+| HVD-07 | 233 | Pending |
+| HVD-08 | 233 | Pending |
+| HVD-09 | 234 | Pending |
+| HVD-10 | 234 | Pending |
+| HVD-11 | 234 | Pending |
+| HVD-12 | 234 | Pending |
+| HVD-13 | 235 | Pending |
+| HVD-14 | 235 | Pending |
+| HVD-15 | 235 | Pending |
+| HVD-16 | 235 | Pending |
 
 **Coverage:**
-- v2.6 requirements: 16 total
+- v2.7 requirements: 16 total
 - Mapped to phases: 16
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-03*
-*Last updated: 2026-07-03 after v2.6 autonomous completion*
+*Last updated: 2026-07-03 after v2.7 milestone initialization*

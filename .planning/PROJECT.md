@@ -23,6 +23,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Natural `Start learning` CTA journey and free-user trial quota semantics documented.
 - English, German, French, and Italian IA guardrails before later visual design, imagery, animation, copywriting, localization, implementation, and QA.
 
+## Current Milestone: v2.7 Home V2 Visual Direction Design
+
+**Goal:** Define the Home V2 premium visual direction, design-system extension, imagery rules, layout composition, motion language, and implementation handoff before page code begins.
+
+**Target features:**
+- A high-end visual thesis for Home V2 that translates the v2.6 Swiss-parent IA into a premium education-service experience.
+- A Home V2 design-system extension covering typography roles, color behavior, spacing, surface architecture, CTAs, nav treatment, and section rhythm.
+- A layout, imagery, and motion blueprint for the five Home V2 sections without inserting final assets or implementing route code.
+- Responsive, accessibility, performance, and anti-AI-slop guardrails for later implementation.
+- A self-contained visual direction document that future Home V2 build phases can follow.
+
 ## Current State
 
 **Latest shipped milestone:** v2.6 Home V2 Positioning and Information Architecture
@@ -131,7 +142,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Next milestone should be defined from the next product brief.
+- [ ] Home V2 has a premium visual thesis grounded in Swiss private-school / high-end education service, not generic SaaS or AI-tool styling.
+- [ ] Home V2 design-system rules define typography, color, spacing, surfaces, CTAs, nav treatment, and section rhythm without disrupting app surfaces.
+- [ ] Home V2 layout, imagery, and motion blueprints are documented for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- [ ] Home V2 visual direction includes mobile collapse, accessibility, performance, and implementation handoff rules.
+- [ ] Home V2 visual direction explicitly adapts `high-end-visual-design` while respecting STOA frontend constraints and existing brand tokens.
 
 ### Out of Scope
 
@@ -166,8 +181,13 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Visual implementation, image production, animation implementation, and final copy localization — deferred to later Home V2 redesign milestones after IA is locked.
 - New backend, payment, registration, quota, auth, or role-dashboard behavior — v2.6 maps the journey but does not change product functionality.
 - Hero-level AI positioning, homework-solver claims, guaranteed outcome claims, or teacher-replacement language — outside the agreed Swiss high-end education positioning.
+- Implementing the Home V2 React route, components, localized JSON, final images, or animation code — v2.7 defines visual direction only.
+- Replacing `/`, changing public navigation behavior, or modifying registration/auth/role routing — outside visual direction design.
+- One-note beige/cream, dominant purple/blue gradients, decorative gradient orbs, generic 3-column SaaS grids, nested UI cards, and heavy blur effects — outside the approved Home V2 visual direction.
 
 ## Context
+
+The project brief for v2.7 was provided in Chinese as the next Home V2 redesign milestone: "视觉方向设计". It follows the v2.6 locked Home V2 IA. The user explicitly asked to use the `high-end-visual-design` skill, so v2.7 should translate its premium craft rules into STOA's Swiss-parent education context: macro whitespace, editorial composition, double-bezel surfaces, nested CTA icon treatments, and custom motion curves, while overriding any parts that conflict with STOA frontend constraints such as avoiding decorative gradient orbs, one-note beige palettes, large scrolling backdrop blur, or generic luxury decoration.
 
 The project brief for v2.6 was provided in Chinese after a Home V2 redesign discussion. The current public homepage should be preserved while a separate new design is planned. The agreed target is 70% Swiss private-school / high-end education service and 30% modern learning product. The homepage primary audience is Swiss parents evaluating learning support for their child; student, tutor, parent, and admin functional pages keep their own role-specific audiences. User-facing homepage language should downplay AI and continue using education-centered terms such as intelligent learning platform, Learning Assistant, teacher-backed support, parent visibility, and Start learning.
 
@@ -342,6 +362,8 @@ Current codebase facts:
 - **Home V2 audience boundary**: The public homepage narrative is for Swiss parents first; student, tutor, admin, and parent app surfaces keep their role-specific UX and must not be collapsed into one marketing audience.
 - **Home V2 language boundary**: Homepage copy should not foreground AI, instant solving, guaranteed improvement, or teacher replacement. It should frame STOA as calm, teacher-backed, intelligent learning support for Swiss families.
 - **Home V2 implementation boundary**: v2.6 is positioning and IA only. Visual implementation, image insertion, animation, route code, localization files, and browser QA are later milestones unless explicitly pulled forward.
+- **Home V2 visual direction boundary**: v2.7 defines design rules and blueprints only. It must not implement React route code, add final assets, change `/`, add localized copy files, or run browser visual QA for non-existent components.
+- **High-end visual adaptation**: v2.7 may adopt macro whitespace, editorial split composition, double-bezel surfaces, nested CTA icon treatment, and custom cubic-bezier motion from `high-end-visual-design`, but must reject any guidance that conflicts with project constraints, including decorative gradient orbs, large scrolling blur, generic one-note beige/purple/blue palettes, nested cards, and unsupported icon/font swaps.
 
 ## Key Decisions
 
@@ -460,6 +482,9 @@ Current codebase facts:
 | Make Swiss parents the homepage's first audience | Parents are the primary public buyer/evaluator, while students, tutors, admins, and existing parent app users each keep role-specific pages | — Pending |
 | Use a learning-thread IA instead of feature-card accumulation | The current homepage feels cluttered because features compete equally; Home V2 should present one family learning story from stuck homework to next step, tutor support, and parent visibility | — Pending |
 | Keep AI out of hero-level positioning | The agreed brand direction is an intelligent learning platform with teacher-backed support, not an AI homework tool or instant solver | — Pending |
+| Use high-end visual design as craft input, not a literal template | The skill raises visual craft through editorial composition, double-bezel surfaces, macro whitespace, and motion, but STOA still needs Swiss education restraint and project-specific frontend constraints | — Pending |
+| Prefer Editorial Luxury plus Editorial Split for Home V2 | The Swiss-parent homepage needs calm high-end education credibility with a strong family image/narrative split rather than a dark SaaS or playful product layout | — Pending |
+| Keep Home V2 visual direction separate from app surfaces | Public homepage polish should not leak large hero typography, decorative panels, or cinematic spacing into dense student/tutor/admin workflows | — Pending |
 
 ## Evolution
 
@@ -479,4 +504,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after v2.6 autonomous completion*
+*Last updated: 2026-07-03 after starting v2.7 Home V2 visual direction design*
