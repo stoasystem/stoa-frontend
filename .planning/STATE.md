@@ -1,41 +1,41 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.5
-milestone_name: Online Classroom Focused Redesign
-status: complete
-last_updated: "2026-06-02T00:00:00.000Z"
-last_activity: 2026-06-02
+milestone: v2.6
+milestone_name: Home V2 Positioning and Information Architecture
+status: planning
+last_updated: "2026-07-03T16:52:04.812Z"
+last_activity: 2026-07-03
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 3
-  completed_plans: 3
-  percent: 100
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 4
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-02)
+See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.5 Online Classroom Focused Redesign is implemented and verified.
+**Current focus:** Milestone v2.6 Home V2 Positioning and Information Architecture is in planning, with the current goal of defining a separate Swiss-parent-first homepage route and IA before visual implementation.
 
 ## Current Position
 
-Phase: 227 Summary, Tutor, Parent, QA, and Handoff Closure
-Plan: 227-PLAN.md
-Status: Milestone complete
-Last activity: 2026-06-02 — Implemented and verified v2.5 Online Classroom focused redesign
+Phase: 228 Home V2 Positioning Contract
+Plan: —
+Status: Roadmap defined; ready to plan Phase 228
+Last activity: 2026-07-03 — Defined v2.6 requirements, roadmap, and Home V2 information architecture draft
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 3 of 3
-- Average duration: single autonomous implementation pass
-- Total execution time: implementation and verification completed 2026-06-02
+- Total plans completed this milestone: 0 of 4
+- Average duration: not started
+- Total execution time: milestone planning started 2026-07-03
 
 **By Phase:**
 
@@ -44,11 +44,15 @@ Last activity: 2026-06-02 — Implemented and verified v2.5 Online Classroom foc
 | 225 | 1/1 | Complete | 2026-06-02 |
 | 226 | 1/1 | Complete | 2026-06-02 |
 | 227 | 1/1 | Complete | 2026-06-02 |
+| 228 | 0/1 | Pending | — |
+| 229 | 0/1 | Pending | — |
+| 230 | 0/1 | Pending | — |
+| 231 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 3 planned phases: 225, 226, 227
-- Trend: v2.5 completed Online Classroom entry/scheduling simplification, focused lobby/room workspace redesign, summary/tutor/parent alignment, browser verification, lint/build, and live-classroom E2E coverage.
+- Last 4 planned phases: 228, 229, 230, 231
+- Trend: v2.6 starts a separate Home V2 redesign track with positioning, current-homepage inventory, route/namespace/CTA journey, localization guardrails, and IA handoff before visual implementation.
 
 *Updated after each plan completion*
 
@@ -129,6 +133,7 @@ Recent decisions affecting current work:
 - v2.3 added frontend/mock-backed Online Classroom routes, schedule, lobby, room, summary, Chat escalation, tutor queue, and parent visibility while deferring real WebRTC and production scheduling.
 - v2.4 refined Online Classroom language around learning context, materials, tutor support, and next steps without adding provider/backend scope.
 - v2.5 focused Online Classroom on a simpler learning workspace: compact home/schedule, readiness-oriented lobby, Shared Problem / Focus Board room hierarchy, video rail, tabbed panels, compact controls, Learning History summary handoff, tutor queue tightening, and parent summary-level copy.
+- v2.6 starts the separate Home V2 redesign track. The current `/` homepage remains unchanged while Home V2 is planned as a Swiss-parent-first route with a learning-thread IA, natural `Start learning` CTA direction, role-specific app boundaries, and EN/DE/FR/IT guardrails.
 
 ### Pending Todos
 
@@ -190,6 +195,7 @@ Recent decisions affecting current work:
 | 2026-06-02 | Rename Practice Library navigation label to Library | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-07-03 | Add student conversational entry prototype | Playwright desktop and mobile checks on `/assistant`; `npm run lint`; `npm run build` |
 | 2026-07-03 | Organize frontend design system tokens | Playwright desktop checks on `/`, `/login`, `/pricing`, and `/assistant`; Playwright mobile overflow checks on `/`, `/login`, and `/pricing`; computed font checks for body, heading, navigation, button, and input roles; `npm run lint`; `npm run build` |
+| 2026-07-03 | Plan Home V2 redesign milestones | Detailed docs-only milestone plan in `docs/home/home-v2-redesign-milestones.md`; `git diff --check` |
 | 2026-06-02 | Move Library recent practice into Learning History | Browser checks on `/question-bank` and `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Remove extra Chat page navigation buttons | Browser check on `/chat`; `npm run lint`; `npm run build` |
 

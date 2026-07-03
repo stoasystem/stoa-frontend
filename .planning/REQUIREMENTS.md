@@ -1,77 +1,86 @@
-# Requirements: STOA Frontend v2.5
+# Requirements: STOA Frontend v2.6
 
-**Defined:** 2026-06-02
-**Core Value:** Developers can run STOA locally and test a credible, focused Online Classroom workflow without mistaking it for a generic meeting product.
+**Defined:** 2026-07-03
+**Core Value:** STOA can plan a separate Swiss-parent-first Home V2 homepage with a clear information architecture before visual implementation or production-homepage replacement.
 
-## v2.5 Requirements
+## v2.6 Requirements
 
-### Classroom Entry And Scheduling
+### Positioning
 
-- [x] **OCF-01**: Online Classroom home has one primary action for scheduling live tutor help and one secondary path back to the Learning Assistant.
-- [x] **OCF-02**: Online Classroom home removes duplicate explanatory sections and keeps upcoming-session information compact.
-- [x] **OCF-03**: Schedule Classroom uses a simpler two-column composition: request details, time/materials, and a compact sticky session brief.
-- [x] **OCF-04**: Schedule Classroom time selection stays flexible with calendar and scrollable time choices while reducing visual noise.
-- [x] **OCF-05**: Schedule Classroom session type choices are compact controls, not large repeated cards.
+- [ ] **HVIA-01**: Home V2 defines Swiss parents as the primary public homepage audience while preserving student, tutor, parent, and admin app pages as role-specific experiences.
+- [ ] **HVIA-02**: Home V2 positioning states STOA as calm, teacher-backed, intelligent learning support for Swiss families instead of an AI homework tool.
+- [ ] **HVIA-03**: Home V2 uses a 70% Swiss private-school / high-end education service and 30% modern learning product direction as the IA and copy filter.
+- [ ] **HVIA-04**: Home V2 has one primary homepage action expressed in natural learning language, with `Start learning` as the preferred CTA direction.
 
-### Focused Classroom Workspace
+### Content Architecture
 
-- [x] **OCF-06**: Lobby shows the essential before-join state with tutor, device check, learning context, and a clear back action.
-- [x] **OCF-07**: Classroom room prioritizes a focused learning workspace over a generic meeting layout.
-- [x] **OCF-08**: Classroom room keeps video, shared problem, whiteboard, chat, materials, notes, and participants accessible without showing every panel as equal weight.
-- [x] **OCF-09**: Classroom controls are compact icon-led actions with accessible labels and no crowded text wrapping on mobile.
-- [x] **OCF-10**: Classroom room avoids nested cards, oversized panels, and repeated provider-placeholder explanations.
+- [ ] **HVIA-05**: Every existing homepage section is inventoried and assigned a disposition: keep, merge, demote, delete, or rewrite.
+- [ ] **HVIA-06**: Home V2 defines a shorter section order centered on one learning thread rather than equal-weight feature modules.
+- [ ] **HVIA-07**: Practice, Learning Assistant, teacher support, and parent visibility are mapped as one coherent family learning story.
+- [ ] **HVIA-08**: Homepage content guardrails explicitly prohibit hero-level AI framing, instant-solver claims, generic SaaS structure, and unsupported production claims.
 
-### History, Tutor, Parent, And QA
+### Route And Journey
 
-- [x] **OCF-11**: Classroom summary remains concise and connects completed classroom work to Learning History and next learning actions.
-- [x] **OCF-12**: Tutor classroom queue and room surfaces stay operational, context-first, and visually consistent with the student simplification.
-- [x] **OCF-13**: Parent classroom visibility stays summary-level and avoids observer/control/recording claims.
-- [x] **OCF-14**: The redesigned classroom surfaces work across desktop and mobile without overlapping text or squeezed side panels.
-- [x] **OCF-15**: `npm run lint`, `npm run build`, and browser checks for classroom home, schedule, lobby, room, and summary pass.
+- [ ] **HVIA-09**: Home V2 has a route proposal that keeps the current `/` homepage unchanged until explicit switch approval.
+- [ ] **HVIA-10**: Home V2 has a component namespace and translation namespace proposal that avoid mixing new redesign code with existing home components.
+- [ ] **HVIA-11**: The CTA journey from Home V2 to login/register is documented, including free-user trial quota semantics after registration.
+- [ ] **HVIA-12**: Public navigation impact is documented so Home V2 does not add clutter or expose student-only Practice behavior as a generic public nav island.
+
+### Localization And Handoff
+
+- [ ] **HVIA-13**: English, German, French, and Italian IA risks are documented before writing final localized marketing copy.
+- [ ] **HVIA-14**: German title and CTA constraints are captured so long wording does not drive unstable hero layouts.
+- [ ] **HVIA-15**: The Home V2 IA handoff identifies what later milestones need for visual direction, image selection, animation, copywriting, localization, implementation, and QA.
+- [ ] **HVIA-16**: The milestone produces a self-contained information architecture document that future implementation phases can follow.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Real WebRTC/video provider integration | v2.5 is a frontend UI simplification milestone. |
-| Real tutor availability, calendar sync, and matching | Requires backend/product architecture outside this UI pass. |
-| Production whiteboard, screen share, recording, transcript, or billing | Not needed for focused classroom frontend testing. |
-| Native translation review for redesigned classroom copy | Initial English UI polish is the priority for this pass. |
+| Home V2 visual system implementation | This milestone locks positioning and IA first. |
+| Home V2 image insertion or image generation | Asset selection depends on the approved IA and section composition. |
+| Scroll animation, motion choreography, and interaction polish | Motion should follow the final narrative structure rather than lead it. |
+| Home V2 localized copy files in EN/DE/FR/IT | Localization should start after IA and base copy direction are approved. |
+| Browser QA, Playwright screenshots, and visual regression | Meaningful only after route/components exist. |
+| Replacing `/` with Home V2 | Requires explicit later switch decision after review. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| New classroom backend APIs | The current mock/demo service boundary is sufficient for frontend testing. |
-| New product modules outside Online Classroom | User feedback is specifically about the Online Classroom experience. |
-| Generic video-conferencing feature expansion | STOA classroom should be a learning workspace, not a meeting clone. |
-| Parent observer controls | Parent visibility remains informational only. |
+| Modifying the current production homepage route `/` | User explicitly asked to preserve the existing webpage and build the new design separately. |
+| Implementing Home V2 React components | v2.6 is positioning and IA, not UI build. |
+| Adding new product capabilities | The homepage can explain existing support loops but must not create backend/product scope. |
+| Changing registration, quota, payment, or auth behavior | CTA handoff is documented only; behavior remains unchanged. |
+| Foregrounding AI or instant-answer language | Conflicts with the agreed intelligent learning platform positioning. |
+| Copying external website code, CSS, components, or assets | Home V2 must remain an original STOA learning-platform design. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| OCF-01 | 225 | Complete |
-| OCF-02 | 225 | Complete |
-| OCF-03 | 225 | Complete |
-| OCF-04 | 225 | Complete |
-| OCF-05 | 225 | Complete |
-| OCF-06 | 226 | Complete |
-| OCF-07 | 226 | Complete |
-| OCF-08 | 226 | Complete |
-| OCF-09 | 226 | Complete |
-| OCF-10 | 226 | Complete |
-| OCF-11 | 227 | Complete |
-| OCF-12 | 227 | Complete |
-| OCF-13 | 227 | Complete |
-| OCF-14 | 227 | Complete |
-| OCF-15 | 227 | Complete |
+| HVIA-01 | 228 | Pending |
+| HVIA-02 | 228 | Pending |
+| HVIA-03 | 228 | Pending |
+| HVIA-04 | 228 | Pending |
+| HVIA-05 | 229 | Pending |
+| HVIA-06 | 229 | Pending |
+| HVIA-07 | 229 | Pending |
+| HVIA-08 | 229 | Pending |
+| HVIA-09 | 230 | Pending |
+| HVIA-10 | 230 | Pending |
+| HVIA-11 | 230 | Pending |
+| HVIA-12 | 230 | Pending |
+| HVIA-13 | 231 | Pending |
+| HVIA-14 | 231 | Pending |
+| HVIA-15 | 231 | Pending |
+| HVIA-16 | 231 | Pending |
 
 **Coverage:**
-- v2.5 requirements: 15 total
-- Mapped to phases: 15
+- v2.6 requirements: 16 total
+- Mapped to phases: 16
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-06-02*
-*Last updated: 2026-06-02 after v2.5 implementation and verification*
+*Requirements defined: 2026-07-03*
+*Last updated: 2026-07-03 after v2.6 milestone initialization*

@@ -4,77 +4,95 @@
 
 - ✅ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (shipped 2026-06-02)
 - ✅ **v2.5 Online Classroom Focused Redesign** - Phases 225-227 (shipped 2026-06-02)
+- ◆ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231
 
 ## Phases
 
-- [x] **Phase 225: Classroom Entry and Scheduling Simplification** - Reduce Online Classroom home and schedule friction so students see one clear live-help path and a compact scheduling flow.
-- [x] **Phase 226: Focused Classroom Workspace Redesign** - Rework lobby and room into a learning-first workspace where video, shared problem, whiteboard, chat, materials, and notes have clear hierarchy.
-- [x] **Phase 227: Summary, Tutor, Parent, QA, and Handoff Closure** - Align summary/tutor/parent surfaces with the simplified classroom model and verify the redesigned flow.
+- [ ] **Phase 228: Home V2 Positioning Contract** - Lock the audience, promise, tone, CTA direction, and anti-positioning rules for the separate Home V2 homepage.
+- [ ] **Phase 229: Current Homepage Inventory and New Section Map** - Audit the current homepage and convert its feature-heavy structure into a shorter Swiss-parent learning-thread IA.
+- [ ] **Phase 230: Route, Namespace, Navigation, and CTA Journey** - Define the preview route, component/i18n namespaces, public navigation impact, and registration/login handoff.
+- [ ] **Phase 231: Localization Guardrails and IA Handoff Closure** - Document multilingual IA risks, German layout constraints, and implementation handoff requirements for later design/build milestones.
 
 ## Phase Details
 
-### Phase 225: Classroom Entry and Scheduling Simplification
+### Phase 228: Home V2 Positioning Contract
 
-**Goal**: Students can open Online Classroom, understand the next action, schedule a session, and review the session brief without duplicate cards or form clutter.
-**Depends on**: Phase 224
-**Requirements**: OCF-01, OCF-02, OCF-03, OCF-04, OCF-05
+**Goal**: The redesign has one primary audience, one public promise, one primary CTA direction, and a clear list of what the homepage must not become.
+**Depends on**: Phase 227
+**Requirements**: HVIA-01, HVIA-02, HVIA-03, HVIA-04
 **Success Criteria**:
-  1. Classroom home has one primary schedule action and one secondary Learning Assistant action.
-  2. Duplicate Get Help Now / session-type overview content is removed or merged.
-  3. Schedule page uses a clearer request/time/materials layout with a compact session brief.
-  4. Calendar and scrollable time picker remain available but visually quieter.
-  5. Session type options become compact selectable controls.
-**Plans**: 225-PLAN.md
+  1. Swiss parents are documented as the homepage's first audience.
+  2. Student, tutor, parent, and admin app pages remain role-specific and are not forced into the homepage audience.
+  3. The positioning avoids AI-tool, homework-solver, and generic SaaS language.
+  4. The CTA direction uses natural learning language such as `Start learning`.
+  5. The 70/30 premium education/product split is usable as a decision filter.
+**Plans**: 228-PLAN.md
 **UI hint**: yes
 
-### Phase 226: Focused Classroom Workspace Redesign
+### Phase 229: Current Homepage Inventory and New Section Map
 
-**Goal**: The classroom lobby and room feel like a focused tutoring workspace rather than a generic meeting page.
-**Depends on**: Phase 225
-**Requirements**: OCF-06, OCF-07, OCF-08, OCF-09, OCF-10
+**Goal**: The current homepage is fully accounted for, and Home V2 has a concise section order that tells one coherent parent-facing learning story.
+**Depends on**: Phase 228
+**Requirements**: HVIA-05, HVIA-06, HVIA-07, HVIA-08
 **Success Criteria**:
-  1. Lobby foregrounds tutor, readiness, context, and join/back actions without redundant cards.
-  2. Room header is compact and keeps the learning objective visible.
-  3. Room layout prioritizes shared problem/whiteboard and video while keeping side panels accessible.
-  4. Bottom controls are compact, icon-led, accessible, and mobile-stable.
-  5. Placeholder provider language is reduced to concise product-safe copy.
-**Plans**: 226-PLAN.md
+  1. Each current homepage section has a keep, merge, demote, delete, or rewrite disposition.
+  2. The new page structure is shorter than the current homepage and avoids equal-weight feature-card overload.
+  3. Practice, Learning Assistant, teacher support, and parent visibility are mapped as one learning thread.
+  4. The IA document names the copy/product claims that Home V2 must avoid.
+  5. The section map is concrete enough for visual and copy milestones to start without re-litigating structure.
+**Plans**: 229-PLAN.md
 **UI hint**: yes
 
-### Phase 227: Summary, Tutor, Parent, QA, and Handoff Closure
+### Phase 230: Route, Namespace, Navigation, and CTA Journey
 
-**Goal**: Classroom completion, tutor operations, parent visibility, and verification all align with the simplified Online Classroom experience.
-**Depends on**: Phase 226
-**Requirements**: OCF-11, OCF-12, OCF-13, OCF-14, OCF-15
+**Goal**: Home V2 can be built separately from the current homepage with a documented route, namespace, navigation policy, and CTA-to-registration journey.
+**Depends on**: Phase 229
+**Requirements**: HVIA-09, HVIA-10, HVIA-11, HVIA-12
 **Success Criteria**:
-  1. Summary page is concise and points to Learning History, Learning Assistant, and Dashboard.
-  2. Tutor queue remains context-first while adopting the reduced visual density.
-  3. Parent classroom visibility remains informational and avoids control claims.
-  4. Desktop and mobile browser checks pass for home, schedule, lobby, room, and summary.
-  5. `npm run lint` and `npm run build` pass.
-**Plans**: 227-PLAN.md
+  1. The current `/` route remains unchanged during the Home V2 preview period.
+  2. A preview route, component namespace, and translation namespace are documented.
+  3. The `Start learning` journey through login/register and trial quota semantics is mapped.
+  4. Public navigation remains uncluttered and does not turn Practice into a generic marketing nav island.
+  5. Route and namespace decisions are ready for a later implementation milestone.
+**Plans**: 230-PLAN.md
+**UI hint**: no
+
+### Phase 231: Localization Guardrails and IA Handoff Closure
+
+**Goal**: The IA is ready for visual design, image work, animation, copywriting, localization, implementation, and QA without hidden ambiguity.
+**Depends on**: Phase 230
+**Requirements**: HVIA-13, HVIA-14, HVIA-15, HVIA-16
+**Success Criteria**:
+  1. English, German, French, and Italian IA risks are documented before final copywriting.
+  2. German long-title and CTA constraints are identified before hero design.
+  3. Later milestones know which artifacts to produce for visual direction, images, animation, copy, localization, build, and QA.
+  4. The final IA document is self-contained and linked from GSD planning state.
+  5. `git diff --check` passes for documentation changes.
+**Plans**: 231-PLAN.md
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 225. Classroom Entry and Scheduling Simplification | 1/1 | Complete | 2026-06-02 |
-| 226. Focused Classroom Workspace Redesign | 1/1 | Complete | 2026-06-02 |
-| 227. Summary, Tutor, Parent, QA, and Handoff Closure | 1/1 | Complete | 2026-06-02 |
+| 228. Home V2 Positioning Contract | 0/1 | Pending | — |
+| 229. Current Homepage Inventory and New Section Map | 0/1 | Pending | — |
+| 230. Route, Namespace, Navigation, and CTA Journey | 0/1 | Pending | — |
+| 231. Localization Guardrails and IA Handoff Closure | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 225 | 5 | OCF-01, OCF-02, OCF-03, OCF-04, OCF-05 |
-| 226 | 5 | OCF-06, OCF-07, OCF-08, OCF-09, OCF-10 |
-| 227 | 5 | OCF-11, OCF-12, OCF-13, OCF-14, OCF-15 |
+| 228 | 4 | HVIA-01, HVIA-02, HVIA-03, HVIA-04 |
+| 229 | 4 | HVIA-05, HVIA-06, HVIA-07, HVIA-08 |
+| 230 | 4 | HVIA-09, HVIA-10, HVIA-11, HVIA-12 |
+| 231 | 4 | HVIA-13, HVIA-14, HVIA-15, HVIA-16 |
 
-**Total requirements:** 15
-**Mapped requirements:** 15
+**Total requirements:** 16
+**Mapped requirements:** 16
 **Unmapped requirements:** 0
 
 ## Next Up
 
-No pending phase. Milestone v2.5 is complete.
+Phase 228: Home V2 Positioning Contract.

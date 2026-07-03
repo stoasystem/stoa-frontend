@@ -24,6 +24,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Tutor and parent classroom surface alignment.
 - Browser checks, lint/build, and live-classroom E2E verification.
 
+## Current Milestone: v2.6 Home V2 Positioning and Information Architecture
+
+**Goal:** Define the separate Home V2 homepage positioning, information architecture, routing, CTA journey, and content boundaries before visual production begins.
+
+**Target features:**
+- Swiss-parent-first homepage narrative with students, tutors, admins, and parents handled through role-specific app surfaces.
+- Explicit old-homepage content disposition: keep, merge, demote, delete, or rewrite.
+- Separate route, component namespace, and translation namespace proposal for Home V2 without replacing `/`.
+- CTA and registration/login journey that uses natural learning language such as `Start learning` while preserving free-user trial quota semantics.
+- Multilingual and product-claim guardrails for English, German, French, and Italian before visual design, image insertion, animation, and implementation milestones.
+
 ## Current State
 
 **Latest shipped milestone:** v2.5 Online Classroom Focused Redesign
@@ -131,7 +142,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Next milestone should be defined from the next product brief.
+- [ ] Home V2 has a documented Swiss-parent-first positioning model and one primary homepage action.
+- [ ] Current homepage sections are inventoried and assigned explicit keep, merge, demote, delete, or rewrite dispositions.
+- [ ] Home V2 has an agreed section order, route proposal, component namespace, and translation namespace before UI implementation.
+- [ ] Home V2 CTA and login/register handoff are mapped without changing existing role-specific app pages or the current `/` homepage.
+- [ ] Home V2 copy and IA guardrails avoid hero-level AI language, generic SaaS framing, feature-card overload, and unsupported production claims.
 
 ### Out of Scope
 
@@ -162,8 +177,14 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Formal AI backend, production model service, production provider billing, complex provider pool, production queue, database redesign, long-term memory, real curriculum knowledge graph, content safety platform, AWS Lambda/API Gateway implementation, direct frontend calls to Codex/OpenAI, and user-visible Codex/model/provider/debug wording — outside Phase 25 local demo provider integration scope.
 - New frontend pages, broad UI redesign, formal AI backend work, complex agent framework, long-term memory, real knowledge graph, production-grade content safety platform, model fine-tuning, multi-model scheduling, AWS deployment, and new product modules — outside Phase 26 Learning Assistant functional QA scope.
 - Production object storage, signed upload URLs, OCR, image understanding, handwriting/formula recognition, automatic problem solving from images, teacher grading, parent file review, admin moderation, video upload, and permanent file-library management — outside v2.2 Photo & File Upload UI Foundation scope.
+- Replacing the current production homepage at `/` — v2.6 plans a separate preview route only.
+- Visual implementation, image production, animation implementation, and final copy localization — deferred to later Home V2 redesign milestones after IA is locked.
+- New backend, payment, registration, quota, auth, or role-dashboard behavior — v2.6 maps the journey but does not change product functionality.
+- Hero-level AI positioning, homework-solver claims, guaranteed outcome claims, or teacher-replacement language — outside the agreed Swiss high-end education positioning.
 
 ## Context
+
+The project brief for v2.6 was provided in Chinese after a Home V2 redesign discussion. The current public homepage should be preserved while a separate new design is planned. The agreed target is 70% Swiss private-school / high-end education service and 30% modern learning product. The homepage primary audience is Swiss parents evaluating learning support for their child; student, tutor, parent, and admin functional pages keep their own role-specific audiences. User-facing homepage language should downplay AI and continue using education-centered terms such as intelligent learning platform, Learning Assistant, teacher-backed support, parent visibility, and Start learning.
 
 The project brief for Phase 17 was provided in Chinese and defines locale-specific copywriting, responsive typography, and multilingual UI refinement. Phase 16 established the English, German, French, and Italian i18n foundation, terminology system, glossary, copy style guide, and translation QA checklist. Phase 17 keeps that product surface stable but treats each language as local product copy rather than literal translation: German should be concise and stable, French elegant and clear, Italian natural and warm, and English calm, premium, and education-centered.
 
@@ -332,6 +353,10 @@ Current codebase facts:
 - **Phase 37 provider boundary**: The frontend must continue to call STOA backend APIs only. Prompt language rules, provider request metadata, template fallback, behavior checks, and repair/fallback handling belong in the backend/demo harness layer.
 - **Phase 37 demo backend boundary**: SQLite/demo backend changes are for local/demo verification and API-contract proving only; production persistence, migrations, and cross-device preference syncing remain future backend responsibilities.
 - **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
+- **Home V2 preservation boundary**: v2.6 must keep the current `/` homepage unchanged and define Home V2 as a separate route and namespace until a later explicit switch decision.
+- **Home V2 audience boundary**: The public homepage narrative is for Swiss parents first; student, tutor, admin, and parent app surfaces keep their role-specific UX and must not be collapsed into one marketing audience.
+- **Home V2 language boundary**: Homepage copy should not foreground AI, instant solving, guaranteed improvement, or teacher replacement. It should frame STOA as calm, teacher-backed, intelligent learning support for Swiss families.
+- **Home V2 implementation boundary**: v2.6 is positioning and IA only. Visual implementation, image insertion, animation, route code, localization files, and browser QA are later milestones unless explicitly pulled forward.
 
 ## Key Decisions
 
@@ -446,6 +471,10 @@ Current codebase facts:
 | Keep support language credible | Upload and classroom copy must avoid OCR, instant solution, AI teacher, human fallback, Zoom, recording, billing, and guaranteed-improvement claims unless those capabilities exist | v2.4 Complete |
 | Simplify Online Classroom as a learning workspace | User testing showed the classroom UI was too cluttered; v2.5 should reduce repeated cards and make shared problem, whiteboard, materials, and tutor context the primary experience | v2.5 Complete |
 | Keep v2.5 frontend/mock-only | The redesign validates UI hierarchy and manual testing flow without adding WebRTC, production scheduling, tutor matching, billing, recording, or provider SDK work | v2.5 Complete |
+| Start Home V2 as a separate route | The current homepage should remain stable while the redesigned Swiss-parent homepage is planned, built, reviewed, and later switched only by explicit decision | — Pending |
+| Make Swiss parents the homepage's first audience | Parents are the primary public buyer/evaluator, while students, tutors, admins, and existing parent app users each keep role-specific pages | — Pending |
+| Use a learning-thread IA instead of feature-card accumulation | The current homepage feels cluttered because features compete equally; Home V2 should present one family learning story from stuck homework to next step, tutor support, and parent visibility | — Pending |
+| Keep AI out of hero-level positioning | The agreed brand direction is an intelligent learning platform with teacher-backed support, not an AI homework tool or instant solver | — Pending |
 
 ## Evolution
 
@@ -465,4 +494,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-02 after v2.5 implementation and verification*
+*Last updated: 2026-07-03 after starting v2.6 Home V2 positioning and information architecture*
