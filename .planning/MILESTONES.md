@@ -1,5 +1,29 @@
 # Milestones
 
+## v2.6 Home V2 Positioning and Information Architecture (Shipped: 2026-07-03)
+
+**Phases completed:** 4 phases, 4 plans, 0 code tasks
+**Audit:** `.planning/v2.6-MILESTONE-AUDIT.md`
+**Known deferred items at close:** Home V2 visual design, image sourcing/generation, animation choreography, final copywriting, EN/DE/FR/IT localization files, React implementation, browser screenshots, and replacing `/` remain future scope.
+
+**Key accomplishments:**
+
+- Locked Swiss parents as the primary public homepage audience while preserving role-specific app audiences.
+- Defined STOA's Home V2 promise as calm, teacher-backed intelligent learning support for Swiss families.
+- Inventoried current homepage sections and assigned keep, merge, demote, delete, rewrite, or reassess dispositions.
+- Defined a shorter five-section Home V2 IA: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, Final CTA.
+- Recommended `/home-v2`, `src/components/home-v2/`, `src/pages/home-v2/`, `homeV2`, and optional `img/home-v2/` namespace boundaries.
+- Mapped `Start learning` CTA behavior and documented free-user trial quota semantics without making quota the hero message.
+- Captured English, German, French, and Italian IA guardrails before later copy and design work.
+
+### Verification
+
+- Phase 228-231 verification artifacts passed.
+- Milestone audit passed with 16/16 requirements covered.
+- `git diff --check`: passed.
+
+---
+
 ## v2.5 Online Classroom Focused Redesign (Shipped: 2026-06-02)
 
 **Phases completed:** 3 phases, 3 plans, 0 tasks

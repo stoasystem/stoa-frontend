@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.6
 milestone_name: Home V2 Positioning and Information Architecture
-status: planning
-last_updated: "2026-07-03T16:52:04.812Z"
+status: complete
+last_updated: "2026-07-03T17:15:00.000Z"
 last_activity: 2026-07-03
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.6 Home V2 Positioning and Information Architecture is in planning, with the current goal of defining a separate Swiss-parent-first homepage route and IA before visual implementation.
+**Current focus:** Milestone v2.6 Home V2 Positioning and Information Architecture is complete. Home V2 now has a separate Swiss-parent-first IA baseline before visual implementation.
 
 ## Current Position
 
-Phase: 228 Home V2 Positioning Contract
+Phase: 231 Localization Guardrails and IA Handoff Closure
 Plan: —
-Status: Roadmap defined; ready to plan Phase 228
-Last activity: 2026-07-03 — Defined v2.6 requirements, roadmap, and Home V2 information architecture draft
+Status: Milestone complete
+Last activity: 2026-07-03 — Completed v2.6 Home V2 positioning, IA, route/CTA, localization guardrails, phase verification, and milestone audit
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 4
-- Average duration: not started
-- Total execution time: milestone planning started 2026-07-03
+- Total plans completed this milestone: 4 of 4
+- Average duration: documentation-only autonomous pass
+- Total execution time: milestone planning and execution completed 2026-07-03
 
 **By Phase:**
 
@@ -44,15 +44,15 @@ Last activity: 2026-07-03 — Defined v2.6 requirements, roadmap, and Home V2 in
 | 225 | 1/1 | Complete | 2026-06-02 |
 | 226 | 1/1 | Complete | 2026-06-02 |
 | 227 | 1/1 | Complete | 2026-06-02 |
-| 228 | 0/1 | Pending | — |
-| 229 | 0/1 | Pending | — |
-| 230 | 0/1 | Pending | — |
-| 231 | 0/1 | Pending | — |
+| 228 | 1/1 | Complete | 2026-07-03 |
+| 229 | 1/1 | Complete | 2026-07-03 |
+| 230 | 1/1 | Complete | 2026-07-03 |
+| 231 | 1/1 | Complete | 2026-07-03 |
 
 **Recent Trend:**
 
 - Last 4 planned phases: 228, 229, 230, 231
-- Trend: v2.6 starts a separate Home V2 redesign track with positioning, current-homepage inventory, route/namespace/CTA journey, localization guardrails, and IA handoff before visual implementation.
+- Trend: v2.6 completed the separate Home V2 positioning and IA baseline before visual implementation.
 
 *Updated after each plan completion*
 

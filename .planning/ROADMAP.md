@@ -4,14 +4,14 @@
 
 - ✅ **v2.4 UI Copy & Web Design Refinement** - Phases 219-224 (shipped 2026-06-02)
 - ✅ **v2.5 Online Classroom Focused Redesign** - Phases 225-227 (shipped 2026-06-02)
-- ◆ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231
+- ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
 
 ## Phases
 
-- [ ] **Phase 228: Home V2 Positioning Contract** - Lock the audience, promise, tone, CTA direction, and anti-positioning rules for the separate Home V2 homepage.
-- [ ] **Phase 229: Current Homepage Inventory and New Section Map** - Audit the current homepage and convert its feature-heavy structure into a shorter Swiss-parent learning-thread IA.
-- [ ] **Phase 230: Route, Namespace, Navigation, and CTA Journey** - Define the preview route, component/i18n namespaces, public navigation impact, and registration/login handoff.
-- [ ] **Phase 231: Localization Guardrails and IA Handoff Closure** - Document multilingual IA risks, German layout constraints, and implementation handoff requirements for later design/build milestones.
+- [x] **Phase 228: Home V2 Positioning Contract** - Lock the audience, promise, tone, CTA direction, and anti-positioning rules for the separate Home V2 homepage.
+- [x] **Phase 229: Current Homepage Inventory and New Section Map** - Audit the current homepage and convert its feature-heavy structure into a shorter Swiss-parent learning-thread IA.
+- [x] **Phase 230: Route, Namespace, Navigation, and CTA Journey** - Define the preview route, component/i18n namespaces, public navigation impact, and registration/login handoff.
+- [x] **Phase 231: Localization Guardrails and IA Handoff Closure** - Document multilingual IA risks, German layout constraints, and implementation handoff requirements for later design/build milestones.
 
 ## Phase Details
 
@@ -75,10 +75,10 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 228. Home V2 Positioning Contract | 0/1 | Pending | — |
-| 229. Current Homepage Inventory and New Section Map | 0/1 | Pending | — |
-| 230. Route, Namespace, Navigation, and CTA Journey | 0/1 | Pending | — |
-| 231. Localization Guardrails and IA Handoff Closure | 0/1 | Pending | — |
+| 228. Home V2 Positioning Contract | 1/1 | Complete | 2026-07-03 |
+| 229. Current Homepage Inventory and New Section Map | 1/1 | Complete | 2026-07-03 |
+| 230. Route, Namespace, Navigation, and CTA Journey | 1/1 | Complete | 2026-07-03 |
+| 231. Localization Guardrails and IA Handoff Closure | 1/1 | Complete | 2026-07-03 |
 
 ## Coverage
 
@@ -95,4 +95,4 @@
 
 ## Next Up
 
-Phase 228: Home V2 Positioning Contract.
+No pending phase. Milestone v2.6 is complete.

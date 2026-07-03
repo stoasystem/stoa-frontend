@@ -1,7 +1,7 @@
 # Home V2 Information Architecture
 
 **Date:** 2026-07-03
-**Status:** Draft for v2.6
+**Status:** Locked baseline for v2.6
 **Related plan:** `docs/home/home-v2-redesign-milestones.md`
 
 ## Purpose
@@ -225,13 +225,22 @@ Milestone 5 and 6 need this IA to implement hero and learning-thread animation w
 
 Milestone 8 and 9 need this IA to write and localize final copy.
 
+## v2.6 Phase Completion Map
+
+| Phase | Outcome | Evidence |
+|-------|---------|----------|
+| 228 | Positioning contract locked | Primary/secondary audiences, positioning sentence, tone filter, and anti-positioning rules defined. |
+| 229 | Current homepage inventory and new section map locked | Existing homepage components assigned dispositions and new five-section order defined. |
+| 230 | Route, namespace, navigation, and CTA journey locked | `/home-v2`, `home-v2` component namespace, `homeV2` i18n namespace, and `Start learning` journey mapped. |
+| 231 | Localization guardrails and handoff locked | EN/DE/FR/IT IA risks and downstream milestone handoff documented. |
+
 ## Acceptance Checklist
 
-- [ ] Current `/` homepage remains unchanged.
-- [ ] Home V2 route remains separate during preview.
-- [ ] Primary audience is Swiss parents.
-- [ ] CTA language starts from learning, not a stiff trial or question prompt.
-- [ ] Practice, Learning Assistant, teacher support, and parent visibility are one story.
-- [ ] AI is not the hero concept.
-- [ ] Every old homepage section has a disposition.
-- [ ] EN/DE/FR/IT risks are known before final copy.
+- [x] Current `/` homepage remains unchanged.
+- [x] Home V2 route remains separate during preview.
+- [x] Primary audience is Swiss parents.
+- [x] CTA language starts from learning, not a stiff trial or question prompt.
+- [x] Practice, Learning Assistant, teacher support, and parent visibility are one story.
+- [x] AI is not the hero concept.
+- [x] Every old homepage section has a disposition.
+- [x] EN/DE/FR/IT risks are known before final copy.

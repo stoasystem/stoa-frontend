@@ -10,34 +10,22 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.5 Online Classroom Focused Redesign
+## Latest Shipped Milestone: v2.6 Home V2 Positioning and Information Architecture
 
-**Shipped:** 2026-06-02
+**Shipped:** 2026-07-03
 
-**Delivered:** Online Classroom was redesigned into a simpler focused learning workspace. Classroom home, schedule, lobby, room, summary, tutor queue, parent visibility, and live-classroom E2E coverage were tightened without adding backend, WebRTC, production scheduling, recording, or provider scope.
-
-**Target features:**
-- Simplified classroom home and scheduling flow.
-- Focused lobby and room workspace around shared problem, whiteboard, materials, and compact video.
-- Compact accessible classroom controls.
-- Learning History handoff from classroom summary.
-- Tutor and parent classroom surface alignment.
-- Browser checks, lint/build, and live-classroom E2E verification.
-
-## Current Milestone: v2.6 Home V2 Positioning and Information Architecture
-
-**Goal:** Define the separate Home V2 homepage positioning, information architecture, routing, CTA journey, and content boundaries before visual production begins.
+**Delivered:** Home V2 now has a locked positioning and information architecture baseline for a separate Swiss-parent-first homepage preview route. The milestone defined audience, promise, CTA direction, old-homepage content disposition, section map, route/namespace recommendations, navigation policy, multilingual guardrails, and downstream handoff requirements without replacing `/` or implementing UI.
 
 **Target features:**
-- Swiss-parent-first homepage narrative with students, tutors, admins, and parents handled through role-specific app surfaces.
-- Explicit old-homepage content disposition: keep, merge, demote, delete, or rewrite.
-- Separate route, component namespace, and translation namespace proposal for Home V2 without replacing `/`.
-- CTA and registration/login journey that uses natural learning language such as `Start learning` while preserving free-user trial quota semantics.
-- Multilingual and product-claim guardrails for English, German, French, and Italian before visual design, image insertion, animation, and implementation milestones.
+- Swiss-parent-first homepage narrative with role-specific app boundaries preserved.
+- Explicit old-homepage content disposition: keep, merge, demote, delete, rewrite, or reassess.
+- Separate `/home-v2` route, `home-v2` component namespace, and `homeV2` translation namespace proposal.
+- Natural `Start learning` CTA journey and free-user trial quota semantics documented.
+- English, German, French, and Italian IA guardrails before later visual design, imagery, animation, copywriting, localization, implementation, and QA.
 
 ## Current State
 
-**Latest shipped milestone:** v2.5 Online Classroom Focused Redesign
+**Latest shipped milestone:** v2.6 Home V2 Positioning and Information Architecture
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -139,14 +127,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Online Classroom home and scheduling flow are simplified into a focused live-support entry path with compact request/time/materials structure — v2.5
 - ✓ Classroom lobby and room prioritize a learning workspace with Shared Problem, Focus Board / Shared Whiteboard, materials, compact video rail, tabbed panels, and accessible icon-led controls — v2.5
 - ✓ Classroom summary, tutor queue, parent classroom visibility, browser checks, lint/build, and live-classroom E2E coverage align with the simplified Online Classroom model — v2.5
+- ✓ Home V2 has a Swiss-parent-first positioning contract, current-homepage content inventory, separate route/namespace proposal, CTA journey, multilingual IA guardrails, and implementation handoff baseline — v2.6
 
 ### Active
 
-- [ ] Home V2 has a documented Swiss-parent-first positioning model and one primary homepage action.
-- [ ] Current homepage sections are inventoried and assigned explicit keep, merge, demote, delete, or rewrite dispositions.
-- [ ] Home V2 has an agreed section order, route proposal, component namespace, and translation namespace before UI implementation.
-- [ ] Home V2 CTA and login/register handoff are mapped without changing existing role-specific app pages or the current `/` homepage.
-- [ ] Home V2 copy and IA guardrails avoid hero-level AI language, generic SaaS framing, feature-card overload, and unsupported production claims.
+- No active milestone requirements. Next milestone should be defined from the next product brief.
 
 ### Out of Scope
 
@@ -494,4 +479,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after starting v2.6 Home V2 positioning and information architecture*
+*Last updated: 2026-07-03 after v2.6 autonomous completion*
