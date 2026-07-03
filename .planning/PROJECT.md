@@ -10,33 +10,32 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.7 Home V2 Visual Direction Design
+## Latest Shipped Milestone: v2.8 Home V2 Image And Asset Strategy
 
 **Shipped:** 2026-07-03
 
-**Delivered:** Home V2 now has a complete premium visual direction contract for the separate Swiss-parent-first homepage preview route. The milestone defined visual thesis, high-end design adaptation, anti-patterns, typography roles, color behavior, spatial rhythm, double-bezel surface rules, section blueprints, image art direction, CTA/navigation treatment, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints without replacing `/` or implementing UI.
+**Delivered:** Home V2 now has an image and asset strategy for the separate Swiss-parent-first homepage preview route. The milestone defined source hierarchy, Pexels/iStock/Magnific source notes, license and release-risk screens, AI-use boundaries, section asset briefs, search taxonomy, candidate scoring, rejection criteria, metadata ledger, future storage namespace, crop/optimization expectations, approval gates, and QA handoff rules without downloading final assets, committing binaries, replacing `/`, or implementing UI.
 
 **Target features:**
-- High-end visual thesis for Home V2: calm family confidence, editorial restraint, crafted product evidence.
-- STOA-specific adaptation of `high-end-visual-design`: Editorial Luxury plus Editorial Split, double-bezel proof surfaces, macro whitespace, button-in-button primary CTA, and calm transform/opacity motion.
-- Role-based typography, color, spacing, surface, CTA, navigation, and section rhythm rules for the public homepage.
-- Section-level composition, image art direction, and motion blueprint for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- Responsive, accessibility, localization, performance, and implementation handoff guardrails before later Home V2 build milestones.
+- Real licensed imagery prioritized over AI-generated imagery.
+- Pexels as first-pass free source, iStock as paid approval-gated source, and Magnific as stock/enhancement support rather than default generation.
+- Section-specific asset briefs for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- Search taxonomy, scoring rubric, candidate rejection rules, metadata ledger, and storage/crop/optimization strategy.
+- Approval gates and QA handoff before later asset search, acquisition, insertion, and screenshot milestones.
 
-## Current Milestone: v2.8 Home V2 Image And Asset Strategy
+## Current Milestone: None Active
 
-**Goal:** Define the Home V2 image and asset sourcing strategy before downloading, generating, inserting, or implementing final homepage imagery.
+**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is candidate asset search/shortlist, asset acquisition/insertion, animation implementation, copy/localization, or React implementation scaffolding.
 
 **Target features:**
-- Source hierarchy that prioritizes real licensed photography and stock assets over AI generation.
-- Licensing and attribution rules for Pexels, iStock, Magnific stock, and any similar sources.
-- Search taxonomy and candidate criteria for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA assets.
-- Asset metadata, storage, crop, optimization, and handoff strategy for later Home V2 implementation.
-- Clear decision gates for when AI enhancement or generation is acceptable, with "avoid AI-generated hero imagery" as the default.
+- Preserve current `/` until explicit replacement approval.
+- Keep future Home V2 work separated from student, tutor, parent app, and admin surfaces.
+- Use `docs/home/home-v2-information-architecture.md`, `docs/home/home-v2-visual-direction.md`, and `docs/home/home-v2-image-asset-strategy.md` as source documents.
+- Treat final image downloads/purchases, motion code, localized copy files, React components, and screenshot QA as separate follow-up milestones.
 
 ## Current State
 
-**Latest shipped milestone:** v2.7 Home V2 Visual Direction Design
+**Latest shipped milestone:** v2.8 Home V2 Image And Asset Strategy
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -140,13 +139,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Classroom summary, tutor queue, parent classroom visibility, browser checks, lint/build, and live-classroom E2E coverage align with the simplified Online Classroom model — v2.5
 - ✓ Home V2 has a Swiss-parent-first positioning contract, current-homepage content inventory, separate route/namespace proposal, CTA journey, multilingual IA guardrails, and implementation handoff baseline — v2.6
 - ✓ Home V2 has a premium visual direction contract covering high-end visual thesis, typography roles, color behavior, spacing, surfaces, CTA/nav treatment, image art direction, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints — v2.7
+- ✓ Home V2 has an image and asset strategy covering source hierarchy, Pexels/iStock/Magnific source rules, licensing and release checks, AI-use boundaries, section asset briefs, search taxonomy, candidate scoring, metadata, storage, crop/optimization, approval gates, and QA handoff — v2.8
 
 ### Active
 
-- [ ] Home V2 has a documented image-source policy that prioritizes real, licensed photography and avoids AI generation unless explicitly justified.
-- [ ] Home V2 has a section-by-section asset brief and search taxonomy aligned with the v2.6 IA and v2.7 visual direction.
-- [ ] Home V2 has a licensing, attribution, metadata, and storage strategy for candidate and final assets.
-- [ ] Home V2 has a handoff plan for later asset insertion, responsive crops, optimization, and screenshot QA.
+- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
 
 ### Out of Scope
 
@@ -513,4 +510,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after starting v2.8 Home V2 image and asset strategy*
+*Last updated: 2026-07-03 after completing v2.8 Home V2 image and asset strategy*

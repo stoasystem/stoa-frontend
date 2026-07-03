@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.8
 milestone_name: Home V2 Image And Asset Strategy
-status: planning
-last_updated: "2026-07-03T20:58:13.895Z"
+status: complete
+last_updated: "2026-07-03T21:35:00.000Z"
 last_activity: 2026-07-03
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.8 Home V2 Image And Asset Strategy is in planning. The goal is to define source, licensing, candidate, metadata, and handoff rules before final Home V2 assets are downloaded or implemented.
+**Current focus:** Milestone v2.8 Home V2 Image And Asset Strategy is complete. Home V2 now has source, licensing, candidate, metadata, and handoff rules before final assets are downloaded or implemented.
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-03 — Milestone v2.8 started
+Phase: 239 Asset Handoff, Approval Gates, And QA Readiness
+Plan: 239-PLAN.md
+Status: v2.8 complete; image and asset strategy is ready for later candidate search, acquisition, insertion, and QA milestones
+Last activity: 2026-07-03 — Completed v2.8 Home V2 image and asset strategy and milestone audit
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 4
-- Average duration: not started
-- Total execution time: milestone planning started 2026-07-03
+- Total plans completed this milestone: 4 of 4
+- Average duration: same-day documentation milestone
+- Total execution time: completed 2026-07-03
 
 **By Phase:**
 
@@ -52,15 +52,15 @@ Last activity: 2026-07-03 — Milestone v2.8 started
 | 233 | 1/1 | Complete | 2026-07-03 |
 | 234 | 1/1 | Complete | 2026-07-03 |
 | 235 | 1/1 | Complete | 2026-07-03 |
-| 236 | 0/1 | Pending | — |
-| 237 | 0/1 | Pending | — |
-| 238 | 0/1 | Pending | — |
-| 239 | 0/1 | Pending | — |
+| 236 | 1/1 | Complete | 2026-07-03 |
+| 237 | 1/1 | Complete | 2026-07-03 |
+| 238 | 1/1 | Complete | 2026-07-03 |
+| 239 | 1/1 | Complete | 2026-07-03 |
 
 **Recent Trend:**
 
-- Last 4 planned phases: 236, 237, 238, 239
-- Trend: v2.8 starts image and asset strategy for Home V2, prioritizing real licensed imagery and approval-gated source use before implementation.
+- Last 4 completed phases: 236, 237, 238, 239
+- Trend: v2.8 completed image and asset strategy for Home V2, prioritizing real licensed imagery and approval-gated source use before implementation.
 
 *Updated after each plan completion*
 
@@ -145,6 +145,7 @@ Recent decisions affecting current work:
 - v2.7 starts Home V2 visual direction design. It should use `high-end-visual-design` as craft input while adapting it to STOA constraints: premium editorial composition, double-bezel surfaces, macro whitespace, calm motion, no decorative gradient orbs, no one-note palettes, no route implementation, and no `/` replacement.
 - v2.7 completed the Home V2 visual direction contract. The design direction is Editorial Luxury plus Editorial Split, with double-bezel proof surfaces, role-based typography, paper/charcoal/burgundy/sage/gold/cool-neutral color behavior, `Start learning` CTA treatment, image art direction, calm transform/opacity motion, and responsive/accessibility/localization handoff rules.
 - v2.8 starts Home V2 image and asset strategy. It should prioritize real licensed photography and stock assets, use Pexels as a first-pass free source, treat iStock as paid and approval-gated, treat Magnific as stock/enhancement support rather than default generation, and avoid AI-generated hero imagery unless separately approved.
+- v2.8 completed the Home V2 image and asset strategy contract. It defines source hierarchy, Pexels/iStock/Magnific source notes, license/release/endorsement screens, section asset briefs, multilingual search taxonomy, scoring and rejection criteria, metadata ledger, future storage namespace, crop/optimization expectations, approval gates, and QA handoff.
 
 ### Pending Todos
 

@@ -2,16 +2,16 @@
 
 ## Milestones
 
-- ◆ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239
+- ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
 - ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
 - ✅ **v2.7 Home V2 Visual Direction Design** - Phases 232-235 (shipped 2026-07-03)
 
 ## Phases
 
-- [ ] **Phase 236: Source Policy And Licensing Screen** - Define source hierarchy, source-specific license rules, risk checks, and AI-use boundaries.
-- [ ] **Phase 237: Section Asset Briefs And Search Taxonomy** - Define asset briefs, search language, candidate scoring, and rejection criteria for each Home V2 section.
-- [ ] **Phase 238: Asset Metadata, Storage, And Optimization Strategy** - Define metadata ledger, storage namespace, responsive crop, optimization, and shortlist process.
-- [ ] **Phase 239: Asset Handoff, Approval Gates, And QA Readiness** - Define implementation handoff, approval gates, deferred scope, and QA readiness for later asset insertion.
+- [x] **Phase 236: Source Policy And Licensing Screen** - Define source hierarchy, source-specific license rules, risk checks, and AI-use boundaries.
+- [x] **Phase 237: Section Asset Briefs And Search Taxonomy** - Define asset briefs, search language, candidate scoring, and rejection criteria for each Home V2 section.
+- [x] **Phase 238: Asset Metadata, Storage, And Optimization Strategy** - Define metadata ledger, storage namespace, responsive crop, optimization, and shortlist process.
+- [x] **Phase 239: Asset Handoff, Approval Gates, And QA Readiness** - Define implementation handoff, approval gates, deferred scope, and QA readiness for later asset insertion.
 
 ## Phase Details
 
@@ -72,10 +72,10 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 236. Source Policy And Licensing Screen | 0/1 | Pending | — |
-| 237. Section Asset Briefs And Search Taxonomy | 0/1 | Pending | — |
-| 238. Asset Metadata, Storage, And Optimization Strategy | 0/1 | Pending | — |
-| 239. Asset Handoff, Approval Gates, And QA Readiness | 0/1 | Pending | — |
+| 236. Source Policy And Licensing Screen | 1/1 | Complete | 2026-07-03 |
+| 237. Section Asset Briefs And Search Taxonomy | 1/1 | Complete | 2026-07-03 |
+| 238. Asset Metadata, Storage, And Optimization Strategy | 1/1 | Complete | 2026-07-03 |
+| 239. Asset Handoff, Approval Gates, And QA Readiness | 1/1 | Complete | 2026-07-03 |
 
 ## Coverage
 
@@ -92,4 +92,4 @@
 
 ## Next Up
 
-Phase 236: Source Policy And Licensing Screen.
+v2.8 is complete. Next Home V2 milestone should cover candidate asset search/shortlist, asset acquisition/insertion, or implementation scaffolding depending on priority.

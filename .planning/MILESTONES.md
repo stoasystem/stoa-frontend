@@ -1,13 +1,14 @@
 # Milestones
 
-## v2.8 Home V2 Image And Asset Strategy (Current)
+## v2.8 Home V2 Image And Asset Strategy (Shipped: 2026-07-03)
 
-**Phases planned:** 4 phases, 4 plans, 0 code tasks
-**Status:** Planning
+**Phases completed:** 4 phases, 4 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/v2.8-MILESTONE-AUDIT.md`
 **Depends on:** v2.7 Home V2 Visual Direction Design
-**Scope:** Define image sourcing, licensing, candidate selection, asset metadata, crop/optimization, and implementation handoff strategy for the separate Home V2 preview track before downloading final assets or changing code.
+**Known deferred items at close:** Actual source search execution, final asset shortlist approval, paid asset purchase, image download, binary asset commit, React implementation, localized copy, browser screenshot QA, and replacing `/` remain future scope.
 
-**Planned outcomes:**
+**Key accomplishments:**
 
 - Prioritize real licensed photography and stock assets over AI-generated imagery.
 - Establish source and license rules for Pexels, iStock, Magnific stock, and similar sources.
@@ -17,8 +18,9 @@
 
 ### Verification Plan
 
-- `git diff --check`
-- GSD roadmap/state analysis after milestone initialization
+- Phase 236-239 verification artifacts passed.
+- Milestone audit passed with 16/16 requirements covered.
+- `git diff --check`: passed.
 
 ---
 
