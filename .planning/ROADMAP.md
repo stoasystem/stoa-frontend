@@ -2,91 +2,89 @@
 
 ## Milestones
 
+- ◆ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239
 - ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
 - ✅ **v2.7 Home V2 Visual Direction Design** - Phases 232-235 (shipped 2026-07-03)
 
 ## Phases
 
-- [x] **Phase 232: Premium Visual Thesis And Anti-Pattern Contract** - Define the high-end visual archetype, visual promise, design mood, and hard exclusions for Home V2.
-- [x] **Phase 233: Home V2 Design System Extension** - Define typography, color, spacing, grid, surface, CTA, and section rhythm rules for Home V2.
-- [x] **Phase 234: Section Composition, Imagery, And Motion Blueprint** - Translate the IA into section-level layout, image, navigation, CTA, and motion direction.
-- [x] **Phase 235: Responsive, Accessibility, And Implementation Handoff** - Define mobile collapse, accessibility, performance, localization, and implementation handoff checks.
+- [ ] **Phase 236: Source Policy And Licensing Screen** - Define source hierarchy, source-specific license rules, risk checks, and AI-use boundaries.
+- [ ] **Phase 237: Section Asset Briefs And Search Taxonomy** - Define asset briefs, search language, candidate scoring, and rejection criteria for each Home V2 section.
+- [ ] **Phase 238: Asset Metadata, Storage, And Optimization Strategy** - Define metadata ledger, storage namespace, responsive crop, optimization, and shortlist process.
+- [ ] **Phase 239: Asset Handoff, Approval Gates, And QA Readiness** - Define implementation handoff, approval gates, deferred scope, and QA readiness for later asset insertion.
 
 ## Phase Details
 
-### Phase 232: Premium Visual Thesis And Anti-Pattern Contract
+### Phase 236: Source Policy And Licensing Screen
 
-**Goal**: Home V2 has a clear high-end visual direction that feels like Swiss education service, not generic SaaS or AI spectacle.
-**Depends on**: Phase 231
-**Requirements**: HVD-01, HVD-02, HVD-03, HVD-04
+**Goal**: Home V2 has a clear source and licensing policy that prioritizes real licensed imagery and avoids AI generation by default.
+**Depends on**: Phase 235
+**Requirements**: IMG-01, IMG-02, IMG-03, IMG-04
 **Success Criteria**:
-  1. Visual thesis connects directly to the v2.6 Home V2 IA.
-  2. A high-end archetype is selected and adapted to STOA.
-  3. Anti-patterns are explicit enough to block generic redesigns.
-  4. Current `/` and role app surfaces remain separate.
-  5. `high-end-visual-design` guidance is adapted, not copied literally.
-**Plans**: 232-PLAN.md
+  1. Pexels, iStock, Magnific, and similar sources have source-specific usage notes.
+  2. Free, paid, stock, AI-assisted, and approval-gated sources are distinguished.
+  3. Licensing, attribution, release, endorsement, and trademark risks are documented.
+  4. AI generation is defined as last-resort scope, not the default.
+**Plans**: 236-PLAN.md
+**UI hint**: no
+
+### Phase 237: Section Asset Briefs And Search Taxonomy
+
+**Goal**: Every Home V2 section has a precise asset brief, search taxonomy, candidate scoring criteria, and rejection rules.
+**Depends on**: Phase 236
+**Requirements**: IMG-05, IMG-06, IMG-07, IMG-08
+**Success Criteria**:
+  1. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have asset briefs.
+  2. Search terms cover Swiss-parent, family-learning, high-end education, teacher support, and progress-proof imagery.
+  3. Candidate scoring balances authenticity, Swiss fit, premium tone, crop flexibility, diversity, and non-stock feel.
+  4. Rejection criteria block AI-looking, staged, surveillance, negative, or unsupported-outcome imagery.
+**Plans**: 237-PLAN.md
 **UI hint**: yes
 
-### Phase 233: Home V2 Design System Extension
+### Phase 238: Asset Metadata, Storage, And Optimization Strategy
 
-**Goal**: Home V2 has visual rules for typography, color, spacing, grid, surfaces, and CTAs before implementation begins.
-**Depends on**: Phase 232
-**Requirements**: HVD-05, HVD-06, HVD-07, HVD-08
+**Goal**: Future asset insertion can use a repeatable metadata, storage, crop, optimization, and shortlist process.
+**Depends on**: Phase 237
+**Requirements**: IMG-09, IMG-10, IMG-11, IMG-12
 **Success Criteria**:
-  1. Display, heading, body, nav, CTA, caption, and evidence label roles are defined.
-  2. Color behavior extends STOA tokens without becoming one-note.
-  3. Desktop/mobile spacing and grid rules are documented.
-  4. Double-bezel and non-nested-card rules are documented.
-  5. Design system rules are scoped to Home V2 public marketing surfaces.
-**Plans**: 233-PLAN.md
-**UI hint**: yes
+  1. Candidate assets have a metadata ledger format.
+  2. Future local files have a Home V2 namespace and naming convention.
+  3. Crop ratios and responsive image expectations are documented.
+  4. Shortlist work can proceed without committing final binaries in this milestone.
+**Plans**: 238-PLAN.md
+**UI hint**: no
 
-### Phase 234: Section Composition, Imagery, And Motion Blueprint
+### Phase 239: Asset Handoff, Approval Gates, And QA Readiness
 
-**Goal**: Every Home V2 section has a layout, image, CTA/navigation, and motion direction that future implementation can follow.
-**Depends on**: Phase 233
-**Requirements**: HVD-09, HVD-10, HVD-11, HVD-12
+**Goal**: Later Home V2 implementation can insert approved assets with clear approval, alt text, responsive variant, and visual QA gates.
+**Depends on**: Phase 238
+**Requirements**: IMG-13, IMG-14, IMG-15, IMG-16
 **Success Criteria**:
-  1. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have layout guidance.
-  2. Image roles and crop expectations are documented.
-  3. CTA and nav visual treatment is documented.
-  4. Motion uses transform/opacity and custom cubic-bezier timing.
-  5. Motion rules avoid mobile performance traps.
-**Plans**: 234-PLAN.md
-**UI hint**: yes
-
-### Phase 235: Responsive, Accessibility, And Implementation Handoff
-
-**Goal**: Later implementation can build Home V2 with clear mobile, accessibility, localization, performance, and QA guardrails.
-**Depends on**: Phase 234
-**Requirements**: HVD-13, HVD-14, HVD-15, HVD-16
-**Success Criteria**:
-  1. Asymmetric desktop layouts have explicit mobile collapse rules.
-  2. Typography, contrast, tap target, and localized text risks are documented.
-  3. Implementation constraints are clear without writing code in this milestone.
-  4. Visual direction handoff links to the v2.6 IA and future milestone plan.
+  1. Handoff includes alt text intent, responsive variant needs, and implementation checklist.
+  2. Paid assets, identifiable people, AI-edited assets, and hero imagery have approval gates.
+  3. Current `/`, React components, localized JSON, and asset imports remain unchanged.
+  4. The image and asset strategy document is self-contained.
   5. `git diff --check` passes for documentation changes.
-**Plans**: 235-PLAN.md
-**UI hint**: yes
+**Plans**: 239-PLAN.md
+**UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 232. Premium Visual Thesis And Anti-Pattern Contract | 1/1 | Complete | 2026-07-03 |
-| 233. Home V2 Design System Extension | 1/1 | Complete | 2026-07-03 |
-| 234. Section Composition, Imagery, And Motion Blueprint | 1/1 | Complete | 2026-07-03 |
-| 235. Responsive, Accessibility, And Implementation Handoff | 1/1 | Complete | 2026-07-03 |
+| 236. Source Policy And Licensing Screen | 0/1 | Pending | — |
+| 237. Section Asset Briefs And Search Taxonomy | 0/1 | Pending | — |
+| 238. Asset Metadata, Storage, And Optimization Strategy | 0/1 | Pending | — |
+| 239. Asset Handoff, Approval Gates, And QA Readiness | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 232 | 4 | HVD-01, HVD-02, HVD-03, HVD-04 |
-| 233 | 4 | HVD-05, HVD-06, HVD-07, HVD-08 |
-| 234 | 4 | HVD-09, HVD-10, HVD-11, HVD-12 |
-| 235 | 4 | HVD-13, HVD-14, HVD-15, HVD-16 |
+| 236 | 4 | IMG-01, IMG-02, IMG-03, IMG-04 |
+| 237 | 4 | IMG-05, IMG-06, IMG-07, IMG-08 |
+| 238 | 4 | IMG-09, IMG-10, IMG-11, IMG-12 |
+| 239 | 4 | IMG-13, IMG-14, IMG-15, IMG-16 |
 
 **Total requirements:** 16
 **Mapped requirements:** 16
@@ -94,4 +92,4 @@
 
 ## Next Up
 
-v2.7 is complete. Next Home V2 milestone should cover image strategy, asset selection/generation, or implementation scaffolding depending on priority.
+Phase 236: Source Policy And Licensing Screen.

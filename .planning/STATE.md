@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.7
-milestone_name: Home V2 Visual Direction Design
-status: complete
-last_updated: "2026-07-03T21:15:00.000Z"
+milestone: v2.8
+milestone_name: Home V2 Image And Asset Strategy
+status: planning
+last_updated: "2026-07-03T20:58:13.895Z"
 last_activity: 2026-07-03
 progress:
   total_phases: 4
-  completed_phases: 4
+  completed_phases: 0
   total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,22 +20,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-03)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v2.7 Home V2 Visual Direction Design is complete. The v2.6 IA is now translated into a premium visual direction before page implementation.
+**Current focus:** Milestone v2.8 Home V2 Image And Asset Strategy is in planning. The goal is to define source, licensing, candidate, metadata, and handoff rules before final Home V2 assets are downloaded or implemented.
 
 ## Current Position
 
-Phase: 235 Responsive, Accessibility, And Implementation Handoff
-Plan: 235-PLAN.md
-Status: v2.7 complete; visual direction is ready for later image, animation, copy, localization, implementation, and QA milestones
-Last activity: 2026-07-03 — Completed v2.7 Home V2 visual direction design and milestone audit
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-03 — Milestone v2.8 started
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 4
-- Average duration: same-day documentation milestone
-- Total execution time: completed 2026-07-03
+- Total plans completed this milestone: 0 of 4
+- Average duration: not started
+- Total execution time: milestone planning started 2026-07-03
 
 **By Phase:**
 
@@ -52,11 +52,15 @@ Last activity: 2026-07-03 — Completed v2.7 Home V2 visual direction design and
 | 233 | 1/1 | Complete | 2026-07-03 |
 | 234 | 1/1 | Complete | 2026-07-03 |
 | 235 | 1/1 | Complete | 2026-07-03 |
+| 236 | 0/1 | Pending | — |
+| 237 | 0/1 | Pending | — |
+| 238 | 0/1 | Pending | — |
+| 239 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 4 completed phases: 232, 233, 234, 235
-- Trend: v2.7 completed visual direction design for Home V2, adapting high-end visual craft into STOA's Swiss-parent education context before implementation.
+- Last 4 planned phases: 236, 237, 238, 239
+- Trend: v2.8 starts image and asset strategy for Home V2, prioritizing real licensed imagery and approval-gated source use before implementation.
 
 *Updated after each plan completion*
 
@@ -140,6 +144,7 @@ Recent decisions affecting current work:
 - v2.6 starts the separate Home V2 redesign track. The current `/` homepage remains unchanged while Home V2 is planned as a Swiss-parent-first route with a learning-thread IA, natural `Start learning` CTA direction, role-specific app boundaries, and EN/DE/FR/IT guardrails.
 - v2.7 starts Home V2 visual direction design. It should use `high-end-visual-design` as craft input while adapting it to STOA constraints: premium editorial composition, double-bezel surfaces, macro whitespace, calm motion, no decorative gradient orbs, no one-note palettes, no route implementation, and no `/` replacement.
 - v2.7 completed the Home V2 visual direction contract. The design direction is Editorial Luxury plus Editorial Split, with double-bezel proof surfaces, role-based typography, paper/charcoal/burgundy/sage/gold/cool-neutral color behavior, `Start learning` CTA treatment, image art direction, calm transform/opacity motion, and responsive/accessibility/localization handoff rules.
+- v2.8 starts Home V2 image and asset strategy. It should prioritize real licensed photography and stock assets, use Pexels as a first-pass free source, treat iStock as paid and approval-gated, treat Magnific as stock/enhancement support rather than default generation, and avoid AI-generated hero imagery unless separately approved.
 
 ### Pending Todos
 

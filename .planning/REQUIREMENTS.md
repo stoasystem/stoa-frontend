@@ -1,47 +1,47 @@
-# Requirements: STOA Frontend v2.7
+# Requirements: STOA Frontend v2.8
 
 **Defined:** 2026-07-03
-**Core Value:** STOA can define a premium, Swiss-parent-first Home V2 visual direction before writing page code, choosing final images, or replacing the current homepage.
+**Core Value:** STOA can choose Home V2 image and asset sources with real-photo authenticity, clear licensing, Swiss-parent fit, and implementation-ready metadata before downloading final assets or changing the homepage.
 
-## v2.7 Requirements
+## v2.8 Requirements
 
-### Visual Thesis
+### Source Policy
 
-- [x] **HVD-01**: Home V2 has a documented visual thesis that translates v2.6 IA into a premium Swiss education-service experience.
-- [x] **HVD-02**: Home V2 selects a clear high-end design archetype and explains how it adapts `high-end-visual-design` to STOA.
-- [x] **HVD-03**: Home V2 visual direction defines what it must avoid: generic SaaS, AI-tool spectacle, one-note beige, dominant purple/blue gradients, decorative orbs, and feature-card clutter.
-- [x] **HVD-04**: Home V2 visual direction preserves the existing `/` homepage and role app surfaces as separate design contexts.
+- [ ] **IMG-01**: Home V2 has a documented source hierarchy that prioritizes real licensed photography and stock assets over AI-generated imagery.
+- [ ] **IMG-02**: Home V2 has source-specific rules for Pexels, iStock, Magnific stock, and similar sources, including whether each source is free, paid, AI-assisted, or approval-gated.
+- [ ] **IMG-03**: Home V2 has explicit licensing, attribution, model/property-release, endorsement, and trademark-risk checks for every candidate asset.
+- [ ] **IMG-04**: Home V2 defines when AI upscaling, editing, or generation is allowed, with AI generation treated as a last resort rather than default.
 
-### Design System Extension
+### Asset Briefs And Search
 
-- [x] **HVD-05**: Home V2 defines typography roles for display, heading, body, nav, CTA, caption, and product-evidence labels.
-- [x] **HVD-06**: Home V2 defines color behavior using existing STOA brand signals while avoiding a one-note palette.
-- [x] **HVD-07**: Home V2 defines spacing, grid, section rhythm, and macro-whitespace rules for desktop and mobile.
-- [x] **HVD-08**: Home V2 defines surface architecture including double-bezel containers, image frames, evidence panels, and non-nested card rules.
+- [ ] **IMG-05**: Home V2 defines section-specific asset briefs for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- [ ] **IMG-06**: Home V2 defines search taxonomy and keyword families for Swiss-parent, high-end education, family homework, teacher support, and learning-progress imagery.
+- [ ] **IMG-07**: Home V2 defines candidate scoring criteria for authenticity, Swiss relevance, premium education tone, crop flexibility, diversity, age appropriateness, and non-stocky feel.
+- [ ] **IMG-08**: Home V2 defines what visual content must be rejected, including AI-looking faces, staged stock cliches, surveillance framing, negative child portrayal, and unsupported outcome claims.
 
-### Composition, Imagery, And Motion
+### Asset Operations
 
-- [x] **HVD-09**: Home V2 defines section-by-section layout composition for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- [x] **HVD-10**: Home V2 defines image roles, crop ratios, quality criteria, and what existing or future assets must communicate.
-- [x] **HVD-11**: Home V2 defines CTA and navigation visual treatment, including nested trailing-icon behavior where applicable.
-- [x] **HVD-12**: Home V2 defines motion choreography using transform/opacity, custom cubic-bezier timing, reveal sequencing, and mobile/performance guardrails.
+- [ ] **IMG-09**: Home V2 defines an asset metadata ledger format with source URL, license, creator/source, release risk, AI/enhancement status, candidate role, and approval state.
+- [ ] **IMG-10**: Home V2 defines storage and naming conventions for future local assets under a Home V2 namespace.
+- [ ] **IMG-11**: Home V2 defines crop, aspect-ratio, responsive image, and optimization expectations for later implementation.
+- [ ] **IMG-12**: Home V2 defines a candidate shortlist process without committing final binaries in this milestone.
 
 ### Handoff And QA
 
-- [x] **HVD-13**: Home V2 visual direction documents responsive collapse rules for asymmetric layouts below tablet widths.
-- [x] **HVD-14**: Home V2 visual direction documents accessibility and readability checks for premium typography, contrast, tap targets, and localized text length.
-- [x] **HVD-15**: Home V2 visual direction documents implementation constraints for later React/Tailwind work without creating code in this milestone.
-- [x] **HVD-16**: The milestone produces a self-contained visual direction document ready for later image strategy, animation, copy, localization, implementation, and visual QA milestones.
+- [ ] **IMG-13**: Home V2 defines handoff rules for later image insertion, including alt text intent, responsive variants, and visual QA checkpoints.
+- [ ] **IMG-14**: Home V2 defines approval gates for paid assets, identifiable people, AI-edited assets, and homepage hero imagery.
+- [ ] **IMG-15**: Home V2 keeps current `/` unchanged and does not implement React components, localized JSON, or asset imports in this milestone.
+- [ ] **IMG-16**: The milestone produces a self-contained image and asset strategy document ready for later asset acquisition and implementation milestones.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Home V2 route/component implementation | v2.7 defines visual direction only. |
-| Final image sourcing, image generation, or asset insertion | Requires separate image strategy and approval. |
-| Scroll animation implementation | Motion rules are defined now; implementation belongs after component scaffolding. |
-| Final EN/DE/FR/IT marketing copy | Copywriting and localization follow visual direction and image choices. |
-| Browser screenshot QA | Meaningful only after Home V2 components exist. |
+| Downloading or purchasing final assets | Requires candidate approval and budget/source confirmation. |
+| Committing binary image files | Belongs to the implementation or asset insertion milestone after strategy approval. |
+| React image implementation | Requires Home V2 component scaffolding. |
+| Final alt text and localized image-adjacent copy | Belongs to copy/localization and implementation milestones. |
+| Browser screenshot QA | Meaningful only after Home V2 components and assets exist. |
 | Switching `/` to Home V2 | Requires explicit later switch approval. |
 
 ## Out of Scope
@@ -49,38 +49,39 @@
 | Item | Reason |
 |------|--------|
 | Modifying the current homepage route `/` | Home V2 remains a separate preview track. |
-| Implementing React/Tailwind components | This milestone is design direction and documentation. |
-| Adding dependencies or icon/font packages | Actual package choices belong to implementation planning. |
-| Replacing app-surface design rules | Home V2 visual direction is for the public homepage only. |
-| Decorative gradient orbs, large scrolling blur, and one-note beige/purple/blue themes | These conflict with STOA frontend design constraints. |
-| Copying external website code, CSS, components, or assets | Home V2 must be an original STOA design. |
+| Downloading, purchasing, or committing final image files | This milestone defines strategy and candidate rules only. |
+| Treating iStock as free | iStock is a paid licensed source. |
+| Using AI generation as the default hero source | User requested avoiding AI generation where possible. |
+| Copying website assets without license review | Every asset needs source and license metadata before use. |
+| Claiming model/property release safety without verification | Identifiable people and locations require explicit risk notes. |
+| Implementing React/Tailwind components | Asset insertion belongs to a later build milestone. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| HVD-01 | 232 | Complete |
-| HVD-02 | 232 | Complete |
-| HVD-03 | 232 | Complete |
-| HVD-04 | 232 | Complete |
-| HVD-05 | 233 | Complete |
-| HVD-06 | 233 | Complete |
-| HVD-07 | 233 | Complete |
-| HVD-08 | 233 | Complete |
-| HVD-09 | 234 | Complete |
-| HVD-10 | 234 | Complete |
-| HVD-11 | 234 | Complete |
-| HVD-12 | 234 | Complete |
-| HVD-13 | 235 | Complete |
-| HVD-14 | 235 | Complete |
-| HVD-15 | 235 | Complete |
-| HVD-16 | 235 | Complete |
+| IMG-01 | 236 | Pending |
+| IMG-02 | 236 | Pending |
+| IMG-03 | 236 | Pending |
+| IMG-04 | 236 | Pending |
+| IMG-05 | 237 | Pending |
+| IMG-06 | 237 | Pending |
+| IMG-07 | 237 | Pending |
+| IMG-08 | 237 | Pending |
+| IMG-09 | 238 | Pending |
+| IMG-10 | 238 | Pending |
+| IMG-11 | 238 | Pending |
+| IMG-12 | 238 | Pending |
+| IMG-13 | 239 | Pending |
+| IMG-14 | 239 | Pending |
+| IMG-15 | 239 | Pending |
+| IMG-16 | 239 | Pending |
 
 **Coverage:**
-- v2.7 requirements: 16 total
+- v2.8 requirements: 16 total
 - Mapped to phases: 16
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-03*
-*Last updated: 2026-07-03 after v2.7 milestone completion*
+*Last updated: 2026-07-03 after v2.8 milestone initialization*

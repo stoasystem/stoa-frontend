@@ -23,15 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Section-level composition, image art direction, and motion blueprint for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
 - Responsive, accessibility, localization, performance, and implementation handoff guardrails before later Home V2 build milestones.
 
-## Current Milestone: None Active
+## Current Milestone: v2.8 Home V2 Image And Asset Strategy
 
-**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is image strategy / asset insertion, animation implementation design, copywriting/localization, or React implementation scaffolding.
+**Goal:** Define the Home V2 image and asset sourcing strategy before downloading, generating, inserting, or implementing final homepage imagery.
 
 **Target features:**
-- Preserve current `/` until explicit replacement approval.
-- Keep future Home V2 work separated from student, tutor, parent app, and admin surfaces.
-- Use `docs/home/home-v2-information-architecture.md` and `docs/home/home-v2-visual-direction.md` as source documents.
-- Treat final image sourcing/generation, motion code, localized copy files, React components, and screenshot QA as separate follow-up milestones.
+- Source hierarchy that prioritizes real licensed photography and stock assets over AI generation.
+- Licensing and attribution rules for Pexels, iStock, Magnific stock, and any similar sources.
+- Search taxonomy and candidate criteria for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA assets.
+- Asset metadata, storage, crop, optimization, and handoff strategy for later Home V2 implementation.
+- Clear decision gates for when AI enhancement or generation is acceptable, with "avoid AI-generated hero imagery" as the default.
 
 ## Current State
 
@@ -142,7 +143,10 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
+- [ ] Home V2 has a documented image-source policy that prioritizes real, licensed photography and avoids AI generation unless explicitly justified.
+- [ ] Home V2 has a section-by-section asset brief and search taxonomy aligned with the v2.6 IA and v2.7 visual direction.
+- [ ] Home V2 has a licensing, attribution, metadata, and storage strategy for candidate and final assets.
+- [ ] Home V2 has a handoff plan for later asset insertion, responsive crops, optimization, and screenshot QA.
 
 ### Out of Scope
 
@@ -180,8 +184,14 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - Implementing the Home V2 React route, components, localized JSON, final images, or animation code — v2.7 defines visual direction only.
 - Replacing `/`, changing public navigation behavior, or modifying registration/auth/role routing — outside visual direction design.
 - One-note beige/cream, dominant purple/blue gradients, decorative gradient orbs, generic 3-column SaaS grids, nested UI cards, and heavy blur effects — outside the approved Home V2 visual direction.
+- Downloading final assets, committing binary image files, or inserting images into React components — v2.8 defines source strategy and candidate criteria only.
+- Treating iStock as a free image source — iStock is a paid licensed stock source and must be budget/approval gated.
+- Using Magnific AI generation as the default image source — v2.8 prioritizes real licensed imagery; AI is limited to last-resort or enhancement use with explicit disclosure in metadata.
+- Using identifiable children/families in contexts that imply endorsement, negative portrayal, surveillance, or unsupported educational outcomes — Home V2 must remain trust-safe.
 
 ## Context
+
+The project brief for v2.8 was provided in Chinese as "图片与素材策略". The user supplied candidate sources: Magnific, Pexels, and iStock, and explicitly said to avoid AI generation as much as possible. Current source findings: Pexels offers free photo/video use with attribution not required but has restrictions around endorsement, offensive portrayal, resale, redistribution, and trademarks; iStock is a paid licensing source with standard/extended license types and AI Generator content as a separate subscription path; Magnific is now a broader AI creative platform with stock assets and AI tools, so it should be treated as stock/enhancement support rather than the default source for generated hero imagery.
 
 The project brief for v2.7 was provided in Chinese as the next Home V2 redesign milestone: "视觉方向设计". It follows the v2.6 locked Home V2 IA. The user explicitly asked to use the `high-end-visual-design` skill, so v2.7 should translate its premium craft rules into STOA's Swiss-parent education context: macro whitespace, editorial composition, double-bezel surfaces, nested CTA icon treatments, and custom motion curves, while overriding any parts that conflict with STOA frontend constraints such as avoiding decorative gradient orbs, one-note beige palettes, large scrolling backdrop blur, or generic luxury decoration.
 
@@ -358,6 +368,9 @@ Current codebase facts:
 - **Home V2 audience boundary**: The public homepage narrative is for Swiss parents first; student, tutor, admin, and parent app surfaces keep their role-specific UX and must not be collapsed into one marketing audience.
 - **Home V2 language boundary**: Homepage copy should not foreground AI, instant solving, guaranteed improvement, or teacher replacement. It should frame STOA as calm, teacher-backed, intelligent learning support for Swiss families.
 - **Home V2 implementation boundary**: v2.6 is positioning and IA only. Visual implementation, image insertion, animation, route code, localization files, and browser QA are later milestones unless explicitly pulled forward.
+- **Home V2 asset-source boundary**: v2.8 defines image and asset strategy only. It may evaluate sources, define search briefs, and document candidate criteria, but it must not commit final image binaries, insert assets into code, or replace the current `/` homepage.
+- **Home V2 AI-image boundary**: v2.8 should avoid AI-generated assets by default. AI generation may be considered only as a last resort for non-identifiable abstract/product-support imagery, and AI upscaling/enhancement must be recorded in asset metadata.
+- **Home V2 licensing boundary**: Every candidate asset needs source URL, license type, creator/source name when available, model/property-release risk notes, permitted use notes, and final approval status before implementation.
 - **Home V2 visual direction boundary**: v2.7 defines design rules and blueprints only. It must not implement React route code, add final assets, change `/`, add localized copy files, or run browser visual QA for non-existent components.
 - **High-end visual adaptation**: v2.7 may adopt macro whitespace, editorial split composition, double-bezel surfaces, nested CTA icon treatment, and custom cubic-bezier motion from `high-end-visual-design`, but must reject any guidance that conflicts with project constraints, including decorative gradient orbs, large scrolling blur, generic one-note beige/purple/blue palettes, nested cards, and unsupported icon/font swaps.
 
@@ -500,4 +513,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after starting v2.7 Home V2 visual direction design*
+*Last updated: 2026-07-03 after starting v2.8 Home V2 image and asset strategy*

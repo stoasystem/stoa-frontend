@@ -1,5 +1,27 @@
 # Milestones
 
+## v2.8 Home V2 Image And Asset Strategy (Current)
+
+**Phases planned:** 4 phases, 4 plans, 0 code tasks
+**Status:** Planning
+**Depends on:** v2.7 Home V2 Visual Direction Design
+**Scope:** Define image sourcing, licensing, candidate selection, asset metadata, crop/optimization, and implementation handoff strategy for the separate Home V2 preview track before downloading final assets or changing code.
+
+**Planned outcomes:**
+
+- Prioritize real licensed photography and stock assets over AI-generated imagery.
+- Establish source and license rules for Pexels, iStock, Magnific stock, and similar sources.
+- Define section-specific asset briefs for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- Define search taxonomy, candidate scoring, metadata ledger fields, crop ratios, storage namespace, and approval gates.
+- Prepare later Home V2 implementation to insert optimized, licensed assets without reopening visual direction.
+
+### Verification Plan
+
+- `git diff --check`
+- GSD roadmap/state analysis after milestone initialization
+
+---
+
 ## v2.7 Home V2 Visual Direction Design (Shipped: 2026-07-03)
 
 **Phases completed:** 4 phases, 4 plans, 0 code tasks
