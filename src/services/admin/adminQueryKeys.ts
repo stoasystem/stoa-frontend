@@ -9,4 +9,5 @@ export const adminQueryKeys = {
   moderationCases: () => [...adminQueryKeys.all, 'moderation-cases'] as const,
   subscriptionRequests: () => [...adminQueryKeys.all, 'subscription-requests'] as const,
   subscriptionBilling: () => [...adminQueryKeys.all, 'subscription-billing'] as const,
+  accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? '', day ?? ''] as const,
 }

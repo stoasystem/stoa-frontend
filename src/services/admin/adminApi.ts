@@ -1,6 +1,7 @@
 import { httpClient } from '@/services/api/httpClient'
 import { withDemoFallback } from '@/services/demo/demoFallback'
 import type { UserRole } from '@/types/user'
+import type { AdminAccountOperations } from '@/types/adminAccountOperations'
 import type {
   SubscriptionBilling,
   SubscriptionBillingListResponse,
@@ -1673,6 +1674,14 @@ export async function getSubscriptionBilling(filters: {
 export async function getSubscriptionBillingDetail(parentId: string) {
   const response = await httpClient.get<SubscriptionBilling>(
     `/admin/subscriptions/billing/${parentId}`,
+  )
+  return response.data
+}
+
+export async function getAdminParentAccountOperations(parentId: string, day?: string) {
+  const response = await httpClient.get<AdminAccountOperations>(
+    `/admin/account-operations/parents/${parentId}`,
+    { params: { day: day || undefined } },
   )
   return response.data
 }

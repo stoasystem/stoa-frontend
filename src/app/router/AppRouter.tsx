@@ -4,6 +4,7 @@ import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
 import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage'
+import { AdminAccountOperationsPage } from '@/pages/admin/AdminAccountOperationsPage'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
 import { AdminFeedbackPage } from '@/pages/admin/Feedback'
 import { AdminHelpRequestsPage } from '@/pages/admin/HelpRequests'
@@ -210,6 +211,7 @@ export function AppRouter() {
             <Route path="/admin/report-operations" element={<AdminReportOperationsPage />} />
             <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
+            <Route path="/admin/account-operations" element={<AdminAccountOperationsPage />} />
             <Route
               path="/admin/users"
               element={<AdminOperationsPlaceholderPage title="Users" />}

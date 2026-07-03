@@ -74,6 +74,11 @@ export function AdminDashboardPage() {
             description="Review plan interest before real payment collection is enabled."
             to="/admin/billing-interest"
           />
+          <AdminOperationCard
+            title="Account operations"
+            description="Inspect one parent account across verification, billing, child access, entitlement, and usage state."
+            to="/admin/account-operations"
+          />
         </div>
       </PageContainer>
     </DashboardLayout>

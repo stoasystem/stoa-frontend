@@ -1,5 +1,6 @@
 import { type FormEvent, useMemo, useState } from 'react'
 import { ArrowDownCircle, ArrowUpCircle, CreditCard, Search, XCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -252,6 +253,11 @@ export function AdminSubscriptionRequestsPage() {
                     <DetailItem label="Current tier" value={formatTier(selectedRequest.currentTier)} />
                     <DetailItem label="Created" value={formatDate(selectedRequest.createdAt)} />
                   </div>
+                  <Button asChild variant="outline">
+                    <Link to={`/admin/account-operations?parentId=${encodeURIComponent(selectedRequest.parentId)}`}>
+                      Inspect account operations
+                    </Link>
+                  </Button>
                   {selectedRequest.parentNote && (
                     <div className="rounded-md border border-border/70 p-3 text-sm text-muted-foreground">
                       {selectedRequest.parentNote}
@@ -411,6 +417,11 @@ function ProviderBillingDetail({ billing }: { billing?: SubscriptionBilling }) {
         </div>
         <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>{formatStatus(billing.status)}</Badge>
       </div>
+      <Button asChild variant="outline" className="mt-4 w-full justify-start">
+        <Link to={`/admin/account-operations?parentId=${encodeURIComponent(billing.parentId)}`}>
+          Inspect account operations
+        </Link>
+      </Button>
       <div className="mt-4 grid gap-2 text-sm">
         <DetailItem label="Provider subscription" value={billing.providerSubscriptionId ?? 'None'} />
         <DetailItem label="Checkout session" value={billing.checkoutSessionId ?? 'None'} />
