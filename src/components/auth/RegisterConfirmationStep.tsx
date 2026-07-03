@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle2, Clock3 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { EmailVerificationPanel } from '@/components/auth/EmailVerificationPanel'
 import { Button } from '@/components/ui/button'
 import type { AuthResponse } from '@/types/user'
 
@@ -15,6 +16,17 @@ export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {
   const { t } = useTranslation(['auth', 'common'])
   const tutorPending = data.verificationStatus === 'pending_review'
   const Icon = tutorPending ? Clock3 : CheckCircle2
+
+  if (!tutorPending && (data.emailVerificationRequired || data.onboardingStatus === 'email_verification_required')) {
+    return (
+      <EmailVerificationPanel
+        email={data.user.email}
+        role={data.user.role}
+        source="register"
+        initialStatus={data.emailVerificationStatus ?? data.user.emailVerificationStatus}
+      />
+    )
+  }
 
   if (tutorPending) {
     return (

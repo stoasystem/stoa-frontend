@@ -1,6 +1,6 @@
-import { httpClient } from '@/services/api/httpClient'
+import { ApiError, httpClient } from '@/services/api/httpClient'
 import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
-import type { AuthResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
+import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import type { RegisterPayload } from '@/types/onboarding'
 import { TOKEN_KEY } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
@@ -8,6 +8,15 @@ import { allowDemoFallback } from '@/lib/env'
 export type LoginRequest = {
   email: string
   password: string
+}
+
+export type EmailVerificationRequest = {
+  email: string
+  role?: UserRole
+}
+
+export type EmailVerificationConfirmRequest = EmailVerificationRequest & {
+  confirmationCode: string
 }
 
 export type RegisterRequest = RegisterPayload | {
@@ -33,6 +42,7 @@ export async function login(payload: LoginRequest) {
     const response = await httpClient.post<AuthResponse>('/auth/login', payload)
     return response.data
   } catch (error) {
+    if (isEmailVerificationRequiredError(error)) throw error
     if (!allowDemoFallback) throw error
     return createDemoAuthResponse(payload.email)
   }
@@ -46,6 +56,24 @@ export async function register(payload: RegisterRequest) {
     if (!allowDemoFallback) throw error
     return createDemoAuthResponse(payload.email, payload.role, payload.name, payload.preferredLanguage)
   }
+}
+
+export async function resendEmailVerification(payload: EmailVerificationRequest) {
+  const response = await httpClient.post<EmailVerificationResponse>('/auth/email-verification/resend', payload)
+  return response.data
+}
+
+export async function confirmEmailVerification(payload: EmailVerificationConfirmRequest) {
+  const response = await httpClient.post<EmailVerificationResponse>('/auth/email-verification/confirm', payload)
+  return response.data
+}
+
+export function isEmailVerificationRequiredError(error: unknown) {
+  return error instanceof ApiError && error.status === 403 && error.code === 'email_verification_required'
+}
+
+export function isVerificationRateLimitedError(error: unknown) {
+  return error instanceof ApiError && error.status === 429
 }
 
 export async function getCurrentUser() {

@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { EmailVerificationPanel } from '@/components/auth/EmailVerificationPanel'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
+import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
 
 export function LoginForm() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
@@ -15,6 +17,7 @@ export function LoginForm() {
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const loginMutation = useLoginMutation()
   const loginSchema = createLoginSchema(t)
+  const verificationBlocked = loginMutation.isError && isEmailVerificationRequiredError(loginMutation.error)
 
   return (
     <form
@@ -63,7 +66,10 @@ export function LoginForm() {
         />
         {errors.password && <p id="login-password-error" className="text-xs text-destructive" role="alert">{errors.password}</p>}
       </div>
-      {loginMutation.isError && (
+      {verificationBlocked && (
+        <EmailVerificationPanel email={email} source="login" />
+      )}
+      {loginMutation.isError && !verificationBlocked && (
         <p className="text-sm text-destructive" role="alert">
           {toUserFacingError(loginMutation.error, t('auth:login.failed'))}
         </p>

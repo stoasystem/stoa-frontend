@@ -44,7 +44,26 @@ export type User = {
   plan?: SubscriptionPlan
   subscription?: UserSubscription
   verificationStatus?: 'approved' | 'pending_review'
+  emailVerificationStatus?: EmailVerificationStatus
+  emailVerificationRequired?: boolean
+  accountActivationStatus?: AccountActivationStatus
 }
+
+export type EmailVerificationStatus =
+  | 'registered'
+  | 'unverified'
+  | 'pending_verification'
+  | 'verified'
+  | 'expired_verification'
+  | 'resend_limited'
+  | 'blocked'
+  | 'admin_marked_verified'
+
+export type AccountActivationStatus =
+  | 'active'
+  | 'pending_email_verification'
+  | 'limited_onboarding'
+  | 'blocked'
 
 export type LocalePreferenceResponse = {
   preferredLocale: string
@@ -56,7 +75,19 @@ export type LocalePreferenceResponse = {
 export type AuthResponse = {
   accessToken: string
   user: User
-  onboardingStatus?: 'completed' | 'pending_review'
+  onboardingStatus?: 'completed' | 'pending_review' | 'email_verification_required'
   parentLinked?: boolean
   verificationStatus?: 'pending_review'
+  emailVerificationStatus?: EmailVerificationStatus
+  emailVerificationRequired?: boolean
+  accountActivationStatus?: AccountActivationStatus
+}
+
+export type EmailVerificationResponse = {
+  status: 'accepted' | 'sent' | 'already_requested' | 'already_verified' | 'confirmed'
+  emailVerificationStatus: EmailVerificationStatus
+  emailVerificationRequired: boolean
+  accountActivationStatus: AccountActivationStatus
+  resendAllowed: boolean
+  delivery?: Record<string, unknown> | null
 }

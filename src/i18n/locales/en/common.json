@@ -50,6 +50,8 @@
     "creatingAccount": "Creating account...",
     "signIn": "Sign in",
     "signingIn": "Signing in...",
+    "saving": "Saving...",
+    "sending": "Sending...",
     "register": "Register",
     "choosePlan": "Choose a plan",
     "viewPricing": "View pricing",

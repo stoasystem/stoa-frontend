@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
-import { login, type LoginRequest } from '@/services/auth/authApi'
+import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
@@ -71,8 +71,8 @@ export function useLoginMutation() {
       })
       navigate(nextPath)
     },
-    onError: () => {
-      toast.error('Login failed')
+    onError: (error) => {
+      toast.error(isEmailVerificationRequiredError(error) ? 'Verify your email before signing in' : 'Login failed')
     },
   })
 }
