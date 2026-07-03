@@ -10,32 +10,32 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v2.8 Home V2 Image And Asset Strategy
+## Latest Shipped Milestone: v3.1 Home V2 Candidate Image Search And Shortlist
 
 **Shipped:** 2026-07-03
 
-**Delivered:** Home V2 now has an image and asset strategy for the separate Swiss-parent-first homepage preview route. The milestone defined source hierarchy, Pexels/iStock/Magnific source notes, license and release-risk screens, AI-use boundaries, section asset briefs, search taxonomy, candidate scoring, rejection criteria, metadata ledger, future storage namespace, crop/optimization expectations, approval gates, and QA handoff rules without downloading final assets, committing binaries, replacing `/`, or implementing UI.
+**Delivered:** Home V2 now has a concrete candidate image shortlist for the separate Swiss-parent-first homepage preview route. The milestone searched Pexels candidates, downloaded 7 traceable free JPEG candidates into `img/home-v2/candidates/pexels/`, created `docs/home/home-v2-image-shortlist.md`, created `docs/home/home-v2-asset-ledger.csv`, scored candidates against the v2.7 high-end visual direction, identified a first-pass Hero candidate, and kept iStock/Magnific, paid purchases, final crop optimization, React implementation, localization, screenshot QA, and `/` replacement out of scope.
 
 **Target features:**
-- Real licensed imagery prioritized over AI-generated imagery.
-- Pexels as first-pass free source, iStock as paid approval-gated source, and Magnific as stock/enhancement support rather than default generation.
-- Section-specific asset briefs for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- Search taxonomy, scoring rubric, candidate rejection rules, metadata ledger, and storage/crop/optimization strategy.
-- Approval gates and QA handoff before later asset search, acquisition, insertion, and screenshot milestones.
+- Downloaded Pexels candidates are stored under a Home V2 candidate namespace.
+- Every local candidate has source, license, creator/vendor, score, role, approval state, AI/enhancement status, and risk metadata.
+- Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA have recommended or backup asset choices.
+- iStock remains paid and approval-gated; Magnific remains workflow/source-gated.
+- Current `/`, React components, localization files, and routing remain unchanged.
 
 ## Current Milestone: None Active
 
-**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is candidate asset search/shortlist, asset acquisition/insertion, animation implementation, copy/localization, or React implementation scaffolding.
+**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is final asset selection, crop/optimization, Home V2 route/component implementation, animation implementation, copy/localization, or screenshot QA.
 
 **Target features:**
 - Preserve current `/` until explicit replacement approval.
 - Keep future Home V2 work separated from student, tutor, parent app, and admin surfaces.
-- Use `docs/home/home-v2-information-architecture.md`, `docs/home/home-v2-visual-direction.md`, and `docs/home/home-v2-image-asset-strategy.md` as source documents.
-- Treat final image downloads/purchases, motion code, localized copy files, React components, and screenshot QA as separate follow-up milestones.
+- Use `docs/home/home-v2-information-architecture.md`, `docs/home/home-v2-visual-direction.md`, `docs/home/home-v2-image-asset-strategy.md`, and `docs/home/home-v2-image-shortlist.md` as source documents.
+- Treat iStock purchases, final crop optimization, localized copy files, React components, and screenshot QA as separate follow-up milestones.
 
 ## Current State
 
-**Latest shipped milestone:** v2.8 Home V2 Image And Asset Strategy
+**Latest shipped milestone:** v3.1 Home V2 Candidate Image Search And Shortlist
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.

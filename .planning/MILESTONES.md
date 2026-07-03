@@ -1,5 +1,30 @@
 # Milestones
 
+## v3.1 Home V2 Candidate Image Search And Shortlist (Shipped: 2026-07-03)
+
+**Phases completed:** 4 phases, 4 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/v3.1-MILESTONE-AUDIT.md`
+**Depends on:** v2.8 Home V2 Image And Asset Strategy
+**Known deferred items at close:** iStock purchase, Magnific account/API use, final crop optimization, WebP/AVIF variants, alt text localization, React Home V2 implementation, screenshot QA, and replacing `/` remain future scope.
+
+**Key accomplishments:**
+
+- Searched and shortlisted Home V2 candidate imagery against the v2.8 source strategy.
+- Downloaded 7 traceable Pexels JPEG candidates into `img/home-v2/candidates/pexels/`.
+- Created a metadata ledger with local paths, source URLs, license URLs, creators/vendors, roles, scores, AI status, approval state, and risk notes.
+- Applied the v2.7 high-end visual direction to select a first-pass Hero candidate and supporting section candidates.
+- Kept paid/source-gated iStock and Magnific paths approval-gated and did not modify current `/`, React code, routing, or localization files.
+
+### Verification
+
+- Phase 240-243 verification artifacts passed.
+- Milestone audit passed with 16/16 requirements covered.
+- Downloaded image file checks passed for JPEG type and dimensions.
+- `git diff --check`: passed.
+
+---
+
 ## v2.8 Home V2 Image And Asset Strategy (Shipped: 2026-07-03)
 
 **Phases completed:** 4 phases, 4 plans, 0 code tasks

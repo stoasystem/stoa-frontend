@@ -2,89 +2,90 @@
 
 ## Milestones
 
+- ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
 - ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
-- ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
 - ✅ **v2.7 Home V2 Visual Direction Design** - Phases 232-235 (shipped 2026-07-03)
+- ✅ **v2.6 Home V2 Positioning and Information Architecture** - Phases 228-231 (shipped 2026-07-03)
 
 ## Phases
 
-- [x] **Phase 236: Source Policy And Licensing Screen** - Define source hierarchy, source-specific license rules, risk checks, and AI-use boundaries.
-- [x] **Phase 237: Section Asset Briefs And Search Taxonomy** - Define asset briefs, search language, candidate scoring, and rejection criteria for each Home V2 section.
-- [x] **Phase 238: Asset Metadata, Storage, And Optimization Strategy** - Define metadata ledger, storage namespace, responsive crop, optimization, and shortlist process.
-- [x] **Phase 239: Asset Handoff, Approval Gates, And QA Readiness** - Define implementation handoff, approval gates, deferred scope, and QA readiness for later asset insertion.
+- [x] **Phase 240: Search Source Screen And Candidate Pool** - Search candidate sources, apply license/source screening, and assemble the first Home V2 candidate pool.
+- [x] **Phase 241: High-End Visual Scoring And Shortlist** - Score candidates against v2.7 high-end visual direction and select section-level shortlist recommendations.
+- [x] **Phase 242: Download Metadata And Local Asset Ledger** - Download suitable free candidates, verify files, and record complete metadata.
+- [x] **Phase 243: Handoff QA And Next Asset Insertion Plan** - Close the shortlist milestone with handoff, QA notes, and next-scope boundaries.
 
 ## Phase Details
 
-### Phase 236: Source Policy And Licensing Screen
+### Phase 240: Search Source Screen And Candidate Pool
 
-**Goal**: Home V2 has a clear source and licensing policy that prioritizes real licensed imagery and avoids AI generation by default.
-**Depends on**: Phase 235
-**Requirements**: IMG-01, IMG-02, IMG-03, IMG-04
+**Goal**: Home V2 has a searched, source-screened candidate pool for each section.
+**Depends on**: Phase 239
+**Requirements**: ASSET-01, ASSET-02, ASSET-03, ASSET-04
 **Success Criteria**:
-  1. Pexels, iStock, Magnific, and similar sources have source-specific usage notes.
-  2. Free, paid, stock, AI-assisted, and approval-gated sources are distinguished.
-  3. Licensing, attribution, release, endorsement, and trademark risks are documented.
-  4. AI generation is defined as last-resort scope, not the default.
-**Plans**: 236-PLAN.md
+  1. Pexels candidate search produces section-relevant free candidates.
+  2. iStock and Magnific remain documented as approval-gated or account-gated sources.
+  3. Candidate records include source URL, creator/vendor, source type, and licensing status.
+  4. No ambiguous, AI-looking, watermarked, or paid assets are downloaded as final-ready assets.
+**Plans**: 240-PLAN.md
 **UI hint**: no
 
-### Phase 237: Section Asset Briefs And Search Taxonomy
+### Phase 241: High-End Visual Scoring And Shortlist
 
-**Goal**: Every Home V2 section has a precise asset brief, search taxonomy, candidate scoring criteria, and rejection rules.
-**Depends on**: Phase 236
-**Requirements**: IMG-05, IMG-06, IMG-07, IMG-08
+**Goal**: Candidate images are scored through the Home V2 premium visual contract before local use.
+**Depends on**: Phase 240
+**Requirements**: ASSET-05, ASSET-06, ASSET-07, ASSET-08
 **Success Criteria**:
-  1. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have asset briefs.
-  2. Search terms cover Swiss-parent, family-learning, high-end education, teacher support, and progress-proof imagery.
-  3. Candidate scoring balances authenticity, Swiss fit, premium tone, crop flexibility, diversity, and non-stock feel.
-  4. Rejection criteria block AI-looking, staged, surveillance, negative, or unsupported-outcome imagery.
-**Plans**: 237-PLAN.md
+  1. Each candidate has authenticity, Swiss-parent fit, learning relevance, crop flexibility, diversity/age fit, brand fit, and risk scores.
+  2. Selected candidates support Editorial Luxury and Editorial Split without generic AI or SaaS feeling.
+  3. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have recommended or backup assets.
+  4. Deferred or rejected candidates include a reason.
+**Plans**: 241-PLAN.md
 **UI hint**: yes
 
-### Phase 238: Asset Metadata, Storage, And Optimization Strategy
+### Phase 242: Download Metadata And Local Asset Ledger
 
-**Goal**: Future asset insertion can use a repeatable metadata, storage, crop, optimization, and shortlist process.
-**Depends on**: Phase 237
-**Requirements**: IMG-09, IMG-10, IMG-11, IMG-12
+**Goal**: Suitable free assets are downloaded into a traceable Home V2 candidate namespace.
+**Depends on**: Phase 241
+**Requirements**: ASSET-09, ASSET-10, ASSET-11, ASSET-12
 **Success Criteria**:
-  1. Candidate assets have a metadata ledger format.
-  2. Future local files have a Home V2 namespace and naming convention.
-  3. Crop ratios and responsive image expectations are documented.
-  4. Shortlist work can proceed without committing final binaries in this milestone.
-**Plans**: 238-PLAN.md
+  1. Downloaded Pexels candidates are stored under `img/home-v2/candidates/pexels/`.
+  2. Local filenames include source and asset IDs.
+  3. Metadata ledger maps every local file back to source and license information.
+  4. File type, dimensions, and repository status are verified.
+**Plans**: 242-PLAN.md
 **UI hint**: no
 
-### Phase 239: Asset Handoff, Approval Gates, And QA Readiness
+### Phase 243: Handoff QA And Next Asset Insertion Plan
 
-**Goal**: Later Home V2 implementation can insert approved assets with clear approval, alt text, responsive variant, and visual QA gates.
-**Depends on**: Phase 238
-**Requirements**: IMG-13, IMG-14, IMG-15, IMG-16
+**Goal**: The shortlist is ready for a later Home V2 implementation milestone.
+**Depends on**: Phase 242
+**Requirements**: ASSET-13, ASSET-14, ASSET-15, ASSET-16
 **Success Criteria**:
-  1. Handoff includes alt text intent, responsive variant needs, and implementation checklist.
-  2. Paid assets, identifiable people, AI-edited assets, and hero imagery have approval gates.
-  3. Current `/`, React components, localized JSON, and asset imports remain unchanged.
-  4. The image and asset strategy document is self-contained.
-  5. `git diff --check` passes for documentation changes.
-**Plans**: 239-PLAN.md
+  1. `docs/home/home-v2-image-shortlist.md` is self-contained.
+  2. Paid/source-gated candidates are separated from downloaded candidates.
+  3. Current `/`, React code, routes, and localization files remain unchanged.
+  4. Next milestone can crop/optimize/insert assets without reopening source strategy.
+  5. `git diff --check` passes.
+**Plans**: 243-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 236. Source Policy And Licensing Screen | 1/1 | Complete | 2026-07-03 |
-| 237. Section Asset Briefs And Search Taxonomy | 1/1 | Complete | 2026-07-03 |
-| 238. Asset Metadata, Storage, And Optimization Strategy | 1/1 | Complete | 2026-07-03 |
-| 239. Asset Handoff, Approval Gates, And QA Readiness | 1/1 | Complete | 2026-07-03 |
+| 240. Search Source Screen And Candidate Pool | 1/1 | Complete | 2026-07-03 |
+| 241. High-End Visual Scoring And Shortlist | 1/1 | Complete | 2026-07-03 |
+| 242. Download Metadata And Local Asset Ledger | 1/1 | Complete | 2026-07-03 |
+| 243. Handoff QA And Next Asset Insertion Plan | 1/1 | Complete | 2026-07-03 |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 236 | 4 | IMG-01, IMG-02, IMG-03, IMG-04 |
-| 237 | 4 | IMG-05, IMG-06, IMG-07, IMG-08 |
-| 238 | 4 | IMG-09, IMG-10, IMG-11, IMG-12 |
-| 239 | 4 | IMG-13, IMG-14, IMG-15, IMG-16 |
+| 240 | 4 | ASSET-01, ASSET-02, ASSET-03, ASSET-04 |
+| 241 | 4 | ASSET-05, ASSET-06, ASSET-07, ASSET-08 |
+| 242 | 4 | ASSET-09, ASSET-10, ASSET-11, ASSET-12 |
+| 243 | 4 | ASSET-13, ASSET-14, ASSET-15, ASSET-16 |
 
 **Total requirements:** 16
 **Mapped requirements:** 16
@@ -92,4 +93,4 @@
 
 ## Next Up
 
-v2.8 is complete. Next Home V2 milestone should cover candidate asset search/shortlist, asset acquisition/insertion, or implementation scaffolding depending on priority.
+v3.1 is complete. Next Home V2 milestone should choose final assets, crop and optimize responsive variants, insert them into the `/home-v2` implementation, and run screenshot QA before any `/` switch decision.

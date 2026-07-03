@@ -1,87 +1,86 @@
-# Requirements: STOA Frontend v2.8
+# Requirements: STOA Frontend v3.1
 
 **Defined:** 2026-07-03
-**Core Value:** STOA can choose Home V2 image and asset sources with real-photo authenticity, clear licensing, Swiss-parent fit, and implementation-ready metadata before downloading final assets or changing the homepage.
+**Core Value:** STOA can move from image strategy to a concrete Home V2 candidate pool with licensed, high-end, traceable assets that can later be inserted into the separate `/home-v2` preview route.
 
-## v2.8 Requirements
+## v3.1 Requirements
 
-### Source Policy
+### Search And Source Screening
 
-- [x] **IMG-01**: Home V2 has a documented source hierarchy that prioritizes real licensed photography and stock assets over AI-generated imagery.
-- [x] **IMG-02**: Home V2 has source-specific rules for Pexels, iStock, Magnific stock, and similar sources, including whether each source is free, paid, AI-assisted, or approval-gated.
-- [x] **IMG-03**: Home V2 has explicit licensing, attribution, model/property-release, endorsement, and trademark-risk checks for every candidate asset.
-- [x] **IMG-04**: Home V2 defines when AI upscaling, editing, or generation is allowed, with AI generation treated as a last resort rather than default.
+- [x] **ASSET-01**: Home V2 has a searched candidate pool for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- [x] **ASSET-02**: Every candidate records source type, source URL, download URL when applicable, creator/vendor, and search context.
+- [x] **ASSET-03**: Free-source candidates are screened against Pexels license constraints, including endorsement, negative portrayal, redistribution, trademark, and public website use.
+- [x] **ASSET-04**: Paid or ambiguous sources remain approval-gated and are not downloaded unless license, purchase, and final-use rights are clear.
 
-### Asset Briefs And Search
+### Visual Scoring And Shortlist
 
-- [x] **IMG-05**: Home V2 defines section-specific asset briefs for Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- [x] **IMG-06**: Home V2 defines search taxonomy and keyword families for Swiss-parent, high-end education, family homework, teacher support, and learning-progress imagery.
-- [x] **IMG-07**: Home V2 defines candidate scoring criteria for authenticity, Swiss relevance, premium education tone, crop flexibility, diversity, age appropriateness, and non-stocky feel.
-- [x] **IMG-08**: Home V2 defines what visual content must be rejected, including AI-looking faces, staged stock cliches, surveillance framing, negative child portrayal, and unsupported outcome claims.
+- [x] **ASSET-05**: Every shortlisted asset is scored for authenticity, Swiss-parent fit, learning relevance, crop flexibility, diversity/age fit, brand fit, and risk.
+- [x] **ASSET-06**: The shortlist applies the v2.7 high-end visual direction: Editorial Luxury, Editorial Split, double-bezel image framing, calm family learning, and 70/30 education/product balance.
+- [x] **ASSET-07**: Each Home V2 section has a recommended primary or backup candidate with notes on crop and visual role.
+- [x] **ASSET-08**: Rejected or deferred candidates have a clear reason, such as weak Swiss fit, staged stock feel, AI/Canva adjacency, paid-watermark restriction, or brand/endorsement risk.
 
-### Asset Operations
+### Download And Metadata
 
-- [x] **IMG-09**: Home V2 defines an asset metadata ledger format with source URL, license, creator/source, release risk, AI/enhancement status, candidate role, and approval state.
-- [x] **IMG-10**: Home V2 defines storage and naming conventions for future local assets under a Home V2 namespace.
-- [x] **IMG-11**: Home V2 defines crop, aspect-ratio, responsive image, and optimization expectations for later implementation.
-- [x] **IMG-12**: Home V2 defines a candidate shortlist process without committing final binaries in this milestone.
+- [x] **ASSET-09**: Suitable free, traceable candidates are downloaded into a Home V2 candidate namespace.
+- [x] **ASSET-10**: Downloaded files are stored separately from current homepage assets and use descriptive names including source and asset ID.
+- [x] **ASSET-11**: A metadata ledger captures local path, source page, license URL, creator/vendor, section role, approval state, AI/enhancement state, and risk notes.
+- [x] **ASSET-12**: Downloaded candidate files are verified for image type, dimensions, and basic repository hygiene before commit.
 
-### Handoff And QA
+### Handoff And Next Scope
 
-- [x] **IMG-13**: Home V2 defines handoff rules for later image insertion, including alt text intent, responsive variants, and visual QA checkpoints.
-- [x] **IMG-14**: Home V2 defines approval gates for paid assets, identifiable people, AI-edited assets, and homepage hero imagery.
-- [x] **IMG-15**: Home V2 keeps current `/` unchanged and does not implement React components, localized JSON, or asset imports in this milestone.
-- [x] **IMG-16**: The milestone produces a self-contained image and asset strategy document ready for later asset acquisition and implementation milestones.
+- [x] **ASSET-13**: The milestone produces a Home V2 image shortlist document ready for later asset insertion.
+- [x] **ASSET-14**: The handoff distinguishes local downloadable candidates from paid/source-gated candidates.
+- [x] **ASSET-15**: Current `/`, React components, localized JSON, routing, and production homepage behavior remain unchanged.
+- [x] **ASSET-16**: The next milestone can choose final assets, crop/optimize variants, add alt text, and implement Home V2 without reopening source strategy.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Downloading or purchasing final assets | Requires candidate approval and budget/source confirmation. |
-| Committing binary image files | Belongs to the implementation or asset insertion milestone after strategy approval. |
-| React image implementation | Requires Home V2 component scaffolding. |
-| Final alt text and localized image-adjacent copy | Belongs to copy/localization and implementation milestones. |
-| Browser screenshot QA | Meaningful only after Home V2 components and assets exist. |
-| Switching `/` to Home V2 | Requires explicit later switch approval. |
+| Buying iStock assets | Requires explicit budget and purchase approval. |
+| Using Magnific stock/API assets | Requires account access and clearer stock/provenance workflow. |
+| Final crop variants and WebP/AVIF generation | Belongs to the asset insertion or implementation milestone. |
+| React Home V2 implementation | Requires component scaffolding and visual QA. |
+| Final localized alt text and adjacent copy | Belongs to copy/localization and implementation. |
+| Switching `/` to Home V2 | Requires explicit later approval after route, assets, copy, and screenshots are reviewed. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| Modifying the current homepage route `/` | Home V2 remains a separate preview track. |
-| Downloading, purchasing, or committing final image files | This milestone defines strategy and candidate rules only. |
-| Treating iStock as free | iStock is a paid licensed source. |
-| Using AI generation as the default hero source | User requested avoiding AI generation where possible. |
-| Copying website assets without license review | Every asset needs source and license metadata before use. |
-| Claiming model/property release safety without verification | Identifiable people and locations require explicit risk notes. |
-| Implementing React/Tailwind components | Asset insertion belongs to a later build milestone. |
+| Replacing the current homepage route `/` | v3.1 collects assets only. |
+| Building Home V2 React components | This milestone is candidate search and shortlist. |
+| Purchasing paid stock | iStock and other paid assets require explicit approval. |
+| Downloading iStock watermarked comps for public/final use | iStock limits watermarked content to test/sample layout use only. |
+| Using AI-generated family/child hero imagery | User prefers avoiding AI generation, and family/child AI imagery is high trust-risk. |
+| Claiming model or property release safety beyond source license notes | Release confidence needs source/platform confirmation before final public use. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| IMG-01 | 236 | Complete |
-| IMG-02 | 236 | Complete |
-| IMG-03 | 236 | Complete |
-| IMG-04 | 236 | Complete |
-| IMG-05 | 237 | Complete |
-| IMG-06 | 237 | Complete |
-| IMG-07 | 237 | Complete |
-| IMG-08 | 237 | Complete |
-| IMG-09 | 238 | Complete |
-| IMG-10 | 238 | Complete |
-| IMG-11 | 238 | Complete |
-| IMG-12 | 238 | Complete |
-| IMG-13 | 239 | Complete |
-| IMG-14 | 239 | Complete |
-| IMG-15 | 239 | Complete |
-| IMG-16 | 239 | Complete |
+| ASSET-01 | 240 | Complete |
+| ASSET-02 | 240 | Complete |
+| ASSET-03 | 240 | Complete |
+| ASSET-04 | 240 | Complete |
+| ASSET-05 | 241 | Complete |
+| ASSET-06 | 241 | Complete |
+| ASSET-07 | 241 | Complete |
+| ASSET-08 | 241 | Complete |
+| ASSET-09 | 242 | Complete |
+| ASSET-10 | 242 | Complete |
+| ASSET-11 | 242 | Complete |
+| ASSET-12 | 242 | Complete |
+| ASSET-13 | 243 | Complete |
+| ASSET-14 | 243 | Complete |
+| ASSET-15 | 243 | Complete |
+| ASSET-16 | 243 | Complete |
 
 **Coverage:**
-- v2.8 requirements: 16 total
+- v3.1 requirements: 16 total
 - Mapped to phases: 16
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-07-03*
-*Last updated: 2026-07-03 after v2.8 milestone completion*
+*Last updated: 2026-07-03 after v3.1 candidate image search and shortlist execution*
