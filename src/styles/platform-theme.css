@@ -1,17 +1,16 @@
 body {
   background:
-    linear-gradient(180deg, hsl(38 28% 95%) 0%, hsl(42 35% 98%) 42%, hsl(38 22% 94%) 100%);
+    linear-gradient(180deg, hsl(var(--platform-surface-page)) 0%, hsl(42 32% 98%) 42%, hsl(99 16% 92%) 100%);
 }
 
 .premium-shell {
   background:
-    radial-gradient(circle at 16% 10%, hsl(var(--stoa-brand-burgundy) / 0.1), transparent 22rem),
-    linear-gradient(180deg, hsl(38 28% 95%) 0%, hsl(42 35% 98%) 46%, hsl(38 24% 94%) 100%);
+    linear-gradient(180deg, hsl(var(--platform-surface-page)) 0%, hsl(42 34% 98%) 52%, hsl(99 16% 92%) 100%);
 }
 
 .platform-app-shell {
   background:
-    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(38 20% 94%) 100%);
+    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(101 13% 92%) 100%);
 }
 
 .platform-nav-active {
@@ -29,7 +28,14 @@ body {
 }
 
 .editorial-heading {
-  font-family: "Prata", Georgia, Cambria, "Times New Roman", ui-serif, serif;
+  font-family: var(--font-display);
+  letter-spacing: 0;
+  text-wrap: balance;
+}
+
+.editorial-title-shell {
+  position: relative;
+  isolation: isolate;
 }
 
 .editorial-title-shell::before {
@@ -46,7 +52,17 @@ body {
   border-radius: 0;
 }
 
+.hero-title-stacked .editorial-accent {
+  display: block;
+  max-width: max-content;
+}
+
+.hero-title-stacked .editorial-accent + .editorial-accent {
+  margin-top: 0.04em;
+}
+
 .premium-button-lift:hover {
+  transform: translateY(-1px);
   box-shadow: 0 14px 34px hsl(var(--stoa-brand-charcoal) / 0.12);
 }
 
@@ -63,7 +79,12 @@ body {
   color: hsl(var(--stoa-brand-ink)) !important;
 }
 
+.premium-light-button:hover {
+  color: hsl(var(--stoa-brand-ink)) !important;
+}
+
 .brand-section-kicker {
+  font-family: var(--font-nav);
   color: hsl(var(--stoa-brand-burgundy));
   font-size: 0.75rem;
   font-weight: 600;
@@ -89,7 +110,7 @@ body {
 
 .chat-workspace {
   background:
-    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(38 20% 93%) 100%);
+    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(101 12% 92%) 100%);
 }
 
 .chat-panel {

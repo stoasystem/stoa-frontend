@@ -34,11 +34,11 @@ export function PageHeader({
           </p>
         )}
         <div>
-          <h1 className={cn('break-words text-2xl font-semibold text-foreground', titleClassName)}>
+          <h1 className={cn('stoa-type-heading break-words text-2xl font-semibold text-foreground', titleClassName)}>
             {title}
           </h1>
           {description && (
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+            <p className="stoa-type-body mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
               {description}
             </p>
           )}

@@ -23,6 +23,7 @@ import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
 import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
+import { StudentAssistantEntryPage } from '@/pages/assistant/StudentAssistantEntryPage'
 import { ClassroomLobbyPage } from '@/features/live-classroom/pages/ClassroomLobbyPage'
 import { ClassroomRoomPage } from '@/features/live-classroom/pages/ClassroomRoomPage'
 import { ClassroomSummaryPage } from '@/features/live-classroom/pages/ClassroomSummaryPage'
@@ -116,6 +117,7 @@ export function AppRouter() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         <Route path="/forbidden" element={<ForbiddenPage />} />
+        <Route path="/assistant" element={<StudentAssistantEntryPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/billing/payment-settings" element={<PaymentSettingsPage />} />

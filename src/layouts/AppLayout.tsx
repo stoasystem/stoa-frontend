@@ -99,7 +99,7 @@ function NavItemLink({
     <NavLink
       className={() =>
         cn(
-          'flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
+          'stoa-type-nav flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
           compact
             ? 'min-w-0 flex-1 flex-col justify-center gap-1 px-1 py-1.5 text-[0.68rem] leading-tight'
             : 'px-2 py-1.5',
@@ -127,7 +127,7 @@ function TopNavItemLink({ item, items }: { item: AppNavItem; items: AppNavItem[]
     <NavLink
       className={() =>
         cn(
-          'inline-flex min-h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors',
+          'stoa-type-nav inline-flex min-h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors',
           active
             ? 'platform-nav-active shadow-sm'
             : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
@@ -185,7 +185,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
             <div className="flex min-h-11 min-w-0 items-center gap-2 sm:gap-3">
               <Link
                 to="/"
-                className="inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-2.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] sm:px-3"
+                className="stoa-type-nav inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-2.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] sm:px-3"
               >
                 <Home className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">{t('navigation.home')}</span>

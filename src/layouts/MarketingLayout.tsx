@@ -15,7 +15,7 @@ export function MarketingHeader() {
         <Link to="/" className="min-w-0 font-semibold">
           <AppLogo />
         </Link>
-        <nav className="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
+        <nav className="stoa-type-nav flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
           <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/how-it-works">
             {t('navigation.howItWorks')}
           </Link>

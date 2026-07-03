@@ -188,6 +188,8 @@ Recent decisions affecting current work:
 | 2026-06-02 | Move classroom recent sessions into Learning History | Browser checks on `/classroom` and `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Group Learning History by question, classroom, and practice | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Rename Practice Library navigation label to Library | Browser check on `/learning-history`; `npm run lint`; `npm run build` |
+| 2026-07-03 | Add student conversational entry prototype | Playwright desktop and mobile checks on `/assistant`; `npm run lint`; `npm run build` |
+| 2026-07-03 | Organize frontend design system tokens | Playwright desktop checks on `/`, `/login`, `/pricing`, and `/assistant`; Playwright mobile overflow checks on `/`, `/login`, and `/pricing`; computed font checks for body, heading, navigation, button, and input roles; `npm run lint`; `npm run build` |
 | 2026-06-02 | Move Library recent practice into Learning History | Browser checks on `/question-bank` and `/learning-history`; `npm run lint`; `npm run build` |
 | 2026-06-02 | Remove extra Chat page navigation buttons | Browser check on `/chat`; `npm run lint`; `npm run build` |
 

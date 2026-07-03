@@ -45,22 +45,91 @@ body {
   min-height: 100vh;
   color: hsl(var(--foreground));
   background: hsl(var(--background));
-  font-family:
-    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-button,
+:where(h1, h2, h3, h4, h5, h6) {
+  font-family: var(--font-heading);
+  letter-spacing: 0;
+}
+
+:where(p, li, dt, dd) {
+  font-family: var(--font-body);
+}
+
+:where(nav, nav a) {
+  font-family: var(--font-nav);
+}
+
+::selection {
+  color: hsl(var(--primary-foreground));
+  background: hsl(var(--stoa-brand-burgundy) / 0.86);
+}
+
+button {
+  font-family: var(--font-button);
+  font-size: inherit;
+  line-height: inherit;
+}
+
 input,
 textarea,
-select {
-  font: inherit;
+select,
+label {
+  font-family: var(--font-label);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.stoa-type-body {
+  font-family: var(--font-body);
+}
+
+.stoa-type-heading {
+  font-family: var(--font-heading);
+  letter-spacing: 0;
+}
+
+.stoa-type-display {
+  font-family: var(--font-display);
+  letter-spacing: 0;
+}
+
+.stoa-type-nav {
+  font-family: var(--font-nav);
+}
+
+.stoa-type-button {
+  font-family: var(--font-button);
+}
+
+.stoa-type-input {
+  font-family: var(--font-input);
+}
+
+.stoa-type-label {
+  font-family: var(--font-label);
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }

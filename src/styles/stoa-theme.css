@@ -1,30 +1,9 @@
 :root {
-  --background: 210 24% 98%;
-  --foreground: 216 29% 13%;
-  --card: 0 0% 100%;
-  --card-foreground: 216 29% 13%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 216 29% 13%;
-  --primary: 220 76% 52%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 214 24% 92%;
-  --secondary-foreground: 216 29% 13%;
-  --muted: 214 24% 92%;
-  --muted-foreground: 216 12% 44%;
-  --accent: 178 62% 38%;
-  --accent-foreground: 0 0% 100%;
-  --destructive: 0 74% 45%;
-  --destructive-foreground: 0 0% 100%;
-  --border: 214 20% 84%;
-  --input: 214 20% 84%;
-  --ring: 220 76% 52%;
-  --radius: 0.5rem;
-
-  --stoa-brand-primary: 220 76% 52%;
-  --stoa-brand-secondary: 214 24% 92%;
-  --stoa-brand-accent: 178 62% 38%;
-  --stoa-surface: 0 0% 100%;
-  --stoa-surface-muted: 210 24% 98%;
-  --stoa-text-main: 216 29% 13%;
-  --stoa-text-muted: 216 12% 44%;
+  --stoa-brand-primary: var(--stoa-brand-burgundy);
+  --stoa-brand-secondary: var(--stoa-brand-warm-grey);
+  --stoa-brand-accent: var(--stoa-brand-sage);
+  --stoa-surface: var(--stoa-brand-card);
+  --stoa-surface-muted: var(--platform-surface-app);
+  --stoa-text-main: var(--stoa-brand-ink);
+  --stoa-text-muted: var(--stoa-brand-muted-text);
 }
