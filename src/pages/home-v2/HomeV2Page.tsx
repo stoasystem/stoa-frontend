@@ -2,6 +2,7 @@ import { HomeV2FinalCta } from '@/components/home-v2/HomeV2FinalCta'
 import { HomeV2Hero } from '@/components/home-v2/HomeV2Hero'
 import { HomeV2LearningThread } from '@/components/home-v2/HomeV2LearningThread'
 import { HomeV2ParentConfidence } from '@/components/home-v2/HomeV2ParentConfidence'
+import { HomeV2PremiumHeader } from '@/components/home-v2/HomeV2PremiumHeader'
 import { HomeV2TrustLayer } from '@/components/home-v2/HomeV2TrustLayer'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { useAuthStore } from '@/store/authStore'
@@ -20,8 +21,9 @@ export function HomeV2Page() {
   const learningHref = getLearningHref(isAuthenticated ? user?.role : null)
 
   return (
-    <MarketingLayout>
-      <div className="bg-[linear-gradient(180deg,hsl(var(--stoa-brand-paper))_0%,hsl(var(--stoa-brand-card))_42%,hsl(var(--stoa-brand-paper))_100%)]">
+    <MarketingLayout hideHeader>
+      <div className="home-v2-premium">
+        <HomeV2PremiumHeader learningHref={learningHref} />
         <HomeV2Hero learningHref={learningHref} />
         <HomeV2LearningThread />
         <HomeV2ParentConfidence />

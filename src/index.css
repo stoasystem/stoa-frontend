@@ -3,6 +3,7 @@
 @import "./styles/premium-theme.css";
 @import "./styles/brand-tokens.css";
 @import "./styles/platform-theme.css";
+@import "./styles/home-v2-premium.css";
 
 @theme {
   --color-background: hsl(var(--background));

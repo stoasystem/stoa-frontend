@@ -51,10 +51,10 @@ export function MarketingFooter() {
   return <AppFooter />
 }
 
-export function MarketingLayout({ children }: { children: ReactNode }) {
+export function MarketingLayout({ children, hideHeader = false }: { children: ReactNode; hideHeader?: boolean }) {
   return (
     <div className="premium-shell min-h-screen text-foreground">
-      <MarketingHeader />
+      {hideHeader ? null : <MarketingHeader />}
       <main>{children}</main>
       <MarketingFooter />
     </div>

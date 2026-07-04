@@ -1,13 +1,13 @@
 {
   "hero": {
-    "eyebrow": "Anteprima Home V2",
-    "title": "Supporto allo studio piu calmo a casa.",
-    "subtitle": "Una struttura pensata per genitori in Svizzera: un compito difficile diventa un prossimo passo chiaro, con supporto docente quando serve.",
+    "eyebrow": "Studio in famiglia in Svizzera",
+    "title": "Supporto calmo quando i compiti si fermano.",
+    "subtitle": "STOA aiuta lo studente a trasformare un compito poco chiaro nel prossimo passo, con supporto docente abbastanza vicino da dare fiducia ai genitori.",
     "primaryCta": "Inizia a studiare",
     "secondaryCta": "Scopri come funziona",
     "proofLabel": "Percorso di apprendimento",
     "visualTitle": "Un momento di studio tranquillo, poi un passo piu chiaro.",
-    "visualBody": "Questo riquadro riserva spazio per immagini e prove prodotto future, senza trattare le immagini candidate come finali.",
+    "visualBody": "Il primo segnale non e la velocita. E un ritmo di studio piu calmo al tavolo.",
     "proofItems": [
       "Lo studente parte da un vero compito scolastico",
       "Il Learning Assistant guida il prossimo passo",
@@ -17,7 +17,7 @@
   "learningThread": {
     "eyebrow": "Percorso",
     "title": "Dal blocco alla comprensione.",
-    "subtitle": "Home V2 deve sembrare una storia di apprendimento, non una lista di funzioni equivalenti.",
+    "subtitle": "La pagina segue un momento di studio in famiglia, dalla domanda al prossimo passo piu sicuro.",
     "beats": [
       {
         "title": "Nasce una domanda reale",
@@ -41,7 +41,7 @@
     "eyebrow": "Fiducia per i genitori",
     "title": "Vedere l'apprendimento senza prenderne il controllo.",
     "body": "La pagina deve mostrare cosa cambia a casa: meno incertezza, un ritmo piu chiaro e supporto senza trasformare i genitori in tutor.",
-    "visualLabel": "Vista genitore placeholder",
+    "visualLabel": "Vista genitore",
     "points": [
       "Su cosa ha lavorato oggi lo studente",
       "Dove e servito supporto",
@@ -51,7 +51,7 @@
   "trustLayer": {
     "eyebrow": "Fiducia svizzera",
     "title": "Per decisioni educative serie.",
-    "body": "La struttura mantiene sobri i segnali di fiducia e lascia spazio a immagini, lingue e prove future.",
+    "body": "Il livello di fiducia resta sobrio e compatto, con segnali pensati per decisioni educative serie.",
     "items": [
       {
         "title": "Genitori svizzeri prima di tutto",
@@ -70,7 +70,7 @@
   "finalCta": {
     "eyebrow": "Inizia a studiare",
     "title": "Un ingresso piu calmo nella prossima sessione di studio.",
-    "body": "Questa chiamata all'azione chiude la pagina senza aprire una nuova storia visiva.",
+    "body": "Inizia con una sessione di studio focalizzata e un percorso chiaro verso il supporto quando il prossimo passo non e evidente.",
     "primaryCta": "Inizia a studiare",
     "secondaryCta": "Per i genitori"
   }

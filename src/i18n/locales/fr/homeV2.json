@@ -1,13 +1,13 @@
 {
   "hero": {
-    "eyebrow": "Apercu Home V2",
-    "title": "Un soutien scolaire plus calme a la maison.",
-    "subtitle": "Une structure de page pensee pour les parents en Suisse: une tache difficile devient une prochaine etape claire, avec un soutien enseignant si necessaire.",
+    "eyebrow": "Apprentissage familial en Suisse",
+    "title": "Un soutien calme quand les devoirs bloquent.",
+    "subtitle": "STOA aide l'eleve a transformer une tache confuse en prochaine etape claire, avec un soutien enseignant assez proche pour rassurer les parents.",
     "primaryCta": "Commencer",
     "secondaryCta": "Voir le fonctionnement",
     "proofLabel": "Fil d'apprentissage",
     "visualTitle": "Un moment d'etude calme, puis une etape plus claire.",
-    "visualBody": "Ce cadre reserve l'image familiale ou scolaire et les preuves produit sans traiter les images candidates comme finales.",
+    "visualBody": "Le premier signal n'est pas la vitesse. C'est un rythme d'apprentissage plus calme a la table.",
     "proofItems": [
       "L'eleve part d'une vraie tache scolaire",
       "Le Learning Assistant guide la prochaine etape",
@@ -17,7 +17,7 @@
   "learningThread": {
     "eyebrow": "Fil d'apprentissage",
     "title": "Du blocage a la comprehension.",
-    "subtitle": "Home V2 doit raconter un parcours d'apprentissage, pas une liste de fonctions equivalentes.",
+    "subtitle": "La page suit un moment d'apprentissage familial, de la question au prochain pas plus confiant.",
     "beats": [
       {
         "title": "Une vraie question apparait",
@@ -41,7 +41,7 @@
     "eyebrow": "Confiance des parents",
     "title": "Voir l'apprentissage sans tout prendre en main.",
     "body": "La page doit montrer ce qui change a la maison: moins d'incertitude, un rythme plus lisible et un soutien sans transformer les parents en tuteurs.",
-    "visualLabel": "Vue parent placeholder",
+    "visualLabel": "Vue parent",
     "points": [
       "Ce que l'enfant a travaille aujourd'hui",
       "La ou il a eu besoin de soutien",
@@ -51,7 +51,7 @@
   "trustLayer": {
     "eyebrow": "Confiance suisse",
     "title": "Pour des decisions educatives serieuses.",
-    "body": "La structure garde les signaux de confiance sobres et reserve l'espace pour les images, les langues et les preuves futures.",
+    "body": "La couche de confiance reste sobre et compacte, avec des preuves pour des decisions educatives serieuses.",
     "items": [
       {
         "title": "Parents suisses d'abord",
@@ -70,7 +70,7 @@
   "finalCta": {
     "eyebrow": "Commencer",
     "title": "Une entree plus calme dans la prochaine session d'etude.",
-    "body": "Cet appel a l'action conclut la page sans ouvrir une nouvelle histoire visuelle.",
+    "body": "Commencez par une session d'etude concentree, avec un chemin clair vers le soutien quand la prochaine etape n'est pas evidente.",
     "primaryCta": "Commencer",
     "secondaryCta": "Pour les parents"
   }

@@ -1,13 +1,13 @@
 {
   "hero": {
-    "eyebrow": "Home V2 preview",
-    "title": "Learning support that feels calm at home.",
-    "subtitle": "A Swiss-parent first homepage skeleton for showing how a stuck school task becomes a clear next step, with teacher-backed support when needed.",
+    "eyebrow": "Swiss family learning",
+    "title": "Calm support for the moment homework stops.",
+    "subtitle": "STOA helps a student move from an unclear school task to a focused next step, with teacher-backed support close enough for parents to trust.",
     "primaryCta": "Start learning",
     "secondaryCta": "See how it works",
     "proofLabel": "Family learning thread",
     "visualTitle": "A calm study moment, then a clearer next step.",
-    "visualBody": "This frame reserves the later family or study image and product evidence surface without treating candidate imagery as final.",
+    "visualBody": "The first signal is not speed. It is a calmer learning rhythm at the table.",
     "proofItems": [
       "Student starts from the real school task",
       "Learning Assistant guides the next step",
@@ -17,7 +17,7 @@
   "learningThread": {
     "eyebrow": "Learning thread",
     "title": "One route from stuck to understood.",
-    "subtitle": "Home V2 should read as one learning story instead of a catalogue of equal features.",
+    "subtitle": "The page follows one family learning moment, from the question to the next confident step.",
     "beats": [
       {
         "title": "A real question appears",
@@ -41,7 +41,7 @@
     "eyebrow": "Parent confidence",
     "title": "Visible learning without parent takeover.",
     "body": "The page should help parents feel what changes at home: less uncertainty, a clearer rhythm, and support that does not turn them into the tutor.",
-    "visualLabel": "Parent view placeholder",
+    "visualLabel": "Parent view",
     "points": [
       "What the child worked on today",
       "Where support was needed",
@@ -51,7 +51,7 @@
   "trustLayer": {
     "eyebrow": "Swiss trust layer",
     "title": "Built for serious family education decisions.",
-    "body": "The skeleton keeps trust signals compact and restrained while reserving room for later imagery, multilingual copy, and proof details.",
+    "body": "The trust layer stays compact and restrained, with proof points that support serious family education decisions.",
     "items": [
       {
         "title": "Swiss-parent first",
@@ -70,7 +70,7 @@
   "finalCta": {
     "eyebrow": "Start learning",
     "title": "A quieter way to begin the next study session.",
-    "body": "This final call to action closes the preview route without introducing a new visual story.",
+    "body": "Begin with a focused study session and a clear route to support when the next step is not obvious.",
     "primaryCta": "Start learning",
     "secondaryCta": "For parents"
   }
