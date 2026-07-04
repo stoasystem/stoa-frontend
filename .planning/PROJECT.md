@@ -14,24 +14,26 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 **Shipped:** 2026-07-03
 
-**Delivered:** Home V2 now has a concrete candidate image shortlist for the separate Swiss-parent-first homepage preview route. The milestone searched Pexels candidates, downloaded 7 traceable free JPEG candidates into `img/home-v2/candidates/pexels/`, created `docs/home/home-v2-image-shortlist.md`, created `docs/home/home-v2-asset-ledger.csv`, scored candidates against the v2.7 high-end visual direction, identified a first-pass Hero candidate, and kept iStock/Magnific, paid purchases, final crop optimization, React implementation, localization, screenshot QA, and `/` replacement out of scope.
+**Delivered:** Home V2 now has a concrete candidate image shortlist for the separate Swiss-parent-first homepage preview route. The milestone searched free candidate sources, downloaded traceable Pexels and Unsplash JPEG candidates under `img/home-v2/candidates/`, created `docs/home/home-v2-image-shortlist.md`, created `docs/home/home-v2-asset-ledger.csv`, scored candidates against the v2.7 high-end visual direction, refreshed the pool for Swiss-market audience fit, identified a first-pass Hero candidate, and kept iStock/Magnific, paid purchases, final crop optimization, React implementation, localization, screenshot QA, and `/` replacement out of scope.
 
 **Target features:**
-- Downloaded Pexels candidates are stored under a Home V2 candidate namespace.
+- Downloaded Pexels/Unsplash candidates are stored under a Home V2 candidate namespace.
 - Every local candidate has source, license, creator/vendor, score, role, approval state, AI/enhancement status, and risk metadata.
 - Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA have recommended or backup asset choices.
 - iStock remains paid and approval-gated; Magnific remains workflow/source-gated.
 - Current `/`, React components, localization files, and routing remain unchanged.
 
-## Current Milestone: None Active
+## Current Milestone: v4.0 新版路由与组件骨架
 
-**Goal:** Start the next Home V2 milestone when ready. Recommended next scope is final asset selection, crop/optimization, Home V2 route/component implementation, animation implementation, copy/localization, or screenshot QA.
+**Goal:** Create a separate, previewable Home V2 route and component skeleton that proves the new Swiss-parent homepage structure without replacing the current `/` homepage.
 
 **Target features:**
-- Preserve current `/` until explicit replacement approval.
-- Keep future Home V2 work separated from student, tutor, parent app, and admin surfaces.
-- Use `docs/home/home-v2-information-architecture.md`, `docs/home/home-v2-visual-direction.md`, `docs/home/home-v2-image-asset-strategy.md`, and `docs/home/home-v2-image-shortlist.md` as source documents.
-- Treat iStock purchases, final crop optimization, localized copy files, React components, and screenshot QA as separate follow-up milestones.
+- Add an isolated `/home-v2` preview route while preserving the current `/` homepage.
+- Add a Home V2 component namespace, expected under `src/components/home-v2/`, with section-level components and composition boundaries.
+- Build a previewable skeleton, not just empty shells: section order, layout rhythm, responsive container behavior, placeholder media/proof surfaces, and CTA placement should be visible.
+- Follow the locked Home V2 IA sections: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
+- Use existing Home V2 planning docs as implementation input: IA, visual direction, asset strategy, and Swiss-market image shortlist.
+- Keep final image optimization, full animation choreography, final four-language copy, screenshot QA, and replacing `/` as later explicit milestones.
 
 ## Current State
 
@@ -143,7 +145,10 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
+- [ ] Home V2 has an isolated preview route that does not replace or regress the current `/` homepage.
+- [ ] Home V2 has a component skeleton and namespace that later asset, animation, copy, and QA milestones can extend without reopening IA decisions.
+- [ ] The preview route renders the agreed five-section Swiss-parent homepage structure with real layout rhythm and placeholder-safe content.
+- [ ] The skeleton respects the v2.7 visual direction constraints without implementing final visual polish, final localized copy, or full animation.
 
 ### Out of Scope
 
@@ -189,6 +194,8 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 ## Context
 
 The project brief for v2.8 was provided in Chinese as "图片与素材策略". The user supplied candidate sources: Magnific, Pexels, and iStock, and explicitly said to avoid AI generation as much as possible. Current source findings: Pexels offers free photo/video use with attribution not required but has restrictions around endorsement, offensive portrayal, resale, redistribution, and trademarks; iStock is a paid licensing source with standard/extended license types and AI Generator content as a separate subscription path; Magnific is now a broader AI creative platform with stock assets and AI tools, so it should be treated as stock/enhancement support rather than the default source for generated hero imagery.
+
+The project brief for v4.0 was provided in Chinese as "v4新版路由与组件骨架". The user chose a previewable skeleton depth rather than empty shells or a near-final page, chose to run research before requirements and roadmap, and chose version `v4.0`. This milestone starts Home V2 implementation by adding a separate preview route and component architecture while preserving current `/`. It should produce enough visible structure to validate the section rhythm and component boundaries, but it should not absorb final image optimization, full animation, finalized multilingual copy, or homepage switch-over.
 
 The project brief for v2.7 was provided in Chinese as the next Home V2 redesign milestone: "视觉方向设计". It follows the v2.6 locked Home V2 IA. The user explicitly asked to use the `high-end-visual-design` skill, so v2.7 should translate its premium craft rules into STOA's Swiss-parent education context: macro whitespace, editorial composition, double-bezel surfaces, nested CTA icon treatments, and custom motion curves, while overriding any parts that conflict with STOA frontend constraints such as avoiding decorative gradient orbs, one-note beige palettes, large scrolling backdrop blur, or generic luxury decoration.
 
@@ -491,6 +498,8 @@ Current codebase facts:
 | Use high-end visual design as craft input, not a literal template | The skill raises visual craft through editorial composition, double-bezel surfaces, macro whitespace, and motion, but STOA still needs Swiss education restraint and project-specific frontend constraints | — Pending |
 | Prefer Editorial Luxury plus Editorial Split for Home V2 | The Swiss-parent homepage needs calm high-end education credibility with a strong family image/narrative split rather than a dark SaaS or playful product layout | — Pending |
 | Keep Home V2 visual direction separate from app surfaces | Public homepage polish should not leak large hero typography, decorative panels, or cinematic spacing into dense student/tutor/admin workflows | — Pending |
+| Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | — Pending |
+| Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | — Pending |
 
 ## Evolution
 
@@ -510,4 +519,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-03 after completing v2.8 Home V2 image and asset strategy*
+*Last updated: 2026-07-04 after starting v4.0 Home V2 route and component skeleton*

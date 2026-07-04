@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v3.1
-milestone_name: Home V2 Candidate Image Search And Shortlist
-status: complete
-last_updated: "2026-07-04T00:00:00.000Z"
+milestone: v4.0
+milestone_name: 新版路由与组件骨架
+status: planning
+last_updated: "2026-07-04T11:25:13.209Z"
 last_activity: 2026-07-04
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-03)
+See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v3.1 Home V2 Candidate Image Search And Shortlist is complete, with a 2026-07-04 Swiss-market refresh. Home V2 now has a downloaded, traceable, free Pexels/Unsplash candidate set plus metadata and high-end visual scoring for later implementation.
+**Current focus:** Milestone v4.0 新版路由与组件骨架 is in planning. The milestone will create an isolated, previewable `/home-v2` route and Home V2 component skeleton while keeping the current `/` homepage unchanged.
 
 ## Current Position
 
-Phase: 243 Handoff QA And Next Asset Insertion Plan
-Plan: 243-PLAN.md
-Status: v3.1 complete; Swiss-market image refresh complete; image shortlist is ready for final selection, crop/optimization, and `/home-v2` implementation in a later milestone
-Last activity: 2026-07-04 — Refreshed Home V2 candidate images for Swiss-market fit, removed mismatch candidates, added Unsplash candidates, and updated ledger/shortlist
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-07-04 — Milestone v4.0 started
 
 ## Performance Metrics
 
