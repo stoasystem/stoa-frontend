@@ -292,6 +292,15 @@ export const navItems: AppNavItem[] = [
     description: 'Reported learning content and internal moderation actions.',
   },
   {
+    label: 'Curriculum',
+    path: '/admin/curriculum',
+    role: 'admin',
+    priority: 'primary',
+    status: 'core',
+    icon: 'practice',
+    description: 'Curriculum authoring, review, migration, and evidence console.',
+  },
+  {
     label: 'Subscriptions',
     path: '/admin/subscriptions',
     role: 'admin',
@@ -480,6 +489,7 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/admin/help-requests', pageName: 'AdminHelpRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Admin teacher-help request monitoring.' },
   { path: '/admin/report-operations', pageName: 'AdminReportOperationsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Weekly report generation and delivery recovery.' },
   { path: '/admin/users', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'secondary', purpose: 'Future user admin placeholder.' },
+  { path: '/admin/curriculum', pageName: 'AdminCurriculumPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Curriculum editor, review, migration, and evidence console.' },
   { path: '/admin/subscriptions', pageName: 'AdminSubscriptionRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Manual subscription request queue and tier application.' },
   { path: '/admin/support', pageName: 'AdminSupportTicketsPage', role: 'admin', module: 'Support', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Admin support inbox.' },
   { path: '/admin/support/:ticketId', pageName: 'AdminSupportTicketDetailPage', role: 'admin', module: 'Support', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Admin support ticket detail.' },

@@ -10,4 +10,10 @@ export const adminQueryKeys = {
   subscriptionRequests: () => [...adminQueryKeys.all, 'subscription-requests'] as const,
   subscriptionBilling: () => [...adminQueryKeys.all, 'subscription-billing'] as const,
   accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? '', day ?? ''] as const,
+  curriculumWorklist: (status?: string) => [...adminQueryKeys.all, 'curriculum', 'worklist', status ?? ''] as const,
+  curriculumPreview: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'preview', publicLessonId, versionId] as const,
+  curriculumValidation: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'validation', publicLessonId, versionId] as const,
+  curriculumAudit: (publicLessonId: string) => [...adminQueryKeys.all, 'curriculum', 'audit', publicLessonId] as const,
+  curriculumDiff: (publicLessonId: string, fromVersionId: string, toVersionId: string) => [...adminQueryKeys.all, 'curriculum', 'diff', publicLessonId, fromVersionId, toVersionId] as const,
+  curriculumMigrationEvidence: (migrationId: string) => [...adminQueryKeys.all, 'curriculum', 'migration', migrationId] as const,
 }

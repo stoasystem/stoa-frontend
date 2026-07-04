@@ -6,6 +6,7 @@ import { RoleRoute } from '@/app/router/RoleRoute'
 import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage'
 import { AdminAccountOperationsPage } from '@/pages/admin/AdminAccountOperationsPage'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
+import { AdminCurriculumPage } from '@/pages/admin/AdminCurriculumPage'
 import { AdminFeedbackPage } from '@/pages/admin/Feedback'
 import { AdminHelpRequestsPage } from '@/pages/admin/HelpRequests'
 import { AdminModerationPage } from '@/pages/admin/AdminModerationPage'
@@ -213,6 +214,7 @@ export function AppRouter() {
             <Route path="/admin/report-operations" element={<AdminReportOperationsPage />} />
             <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
+            <Route path="/admin/curriculum" element={<AdminCurriculumPage />} />
             <Route path="/admin/account-operations" element={<AdminAccountOperationsPage />} />
             <Route
               path="/admin/users"
