@@ -9,7 +9,11 @@ export function HomeV2Hero({ learningHref }: { learningHref: string }) {
   const proofItems = t('hero.proofItems', { returnObjects: true }) as string[]
 
   return (
-    <section className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl gap-10 px-5 pb-14 pt-12 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:pb-18 lg:pt-18">
+    <section
+      id="home-v2-hero"
+      data-testid="home-v2-hero"
+      className="mx-auto grid min-h-[calc(100vh-7rem)] w-full max-w-6xl gap-10 px-5 pb-10 pt-12 sm:px-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center lg:pb-12 lg:pt-16"
+    >
       <div className="min-w-0">
         <p className="stoa-type-label text-sm font-semibold uppercase tracking-[0.18em] text-[hsl(var(--stoa-brand-burgundy))]">
           {t('hero.eyebrow')}
@@ -36,9 +40,9 @@ export function HomeV2Hero({ learningHref }: { learningHref: string }) {
         </div>
       </div>
 
-      <HomeV2VisualFrame label={t('hero.proofLabel')}>
-        <div className="grid min-h-[28rem] content-between gap-6 p-6">
-          <div className="rounded-2xl bg-[hsl(var(--stoa-brand-warm-grey))] p-6">
+      <HomeV2VisualFrame label={t('hero.proofLabel')} contentClassName="lg:aspect-[4/5]">
+        <div className="grid h-full min-h-[28rem] content-between gap-6 p-6">
+          <div className="aspect-[4/3] rounded-2xl border border-border/60 bg-[hsl(var(--stoa-brand-warm-grey))] p-6">
             <p className="text-sm font-semibold text-foreground">{t('hero.visualTitle')}</p>
             <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">{t('hero.visualBody')}</p>
           </div>

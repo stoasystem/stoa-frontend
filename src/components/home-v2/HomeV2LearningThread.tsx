@@ -11,7 +11,11 @@ export function HomeV2LearningThread() {
   const beats = t('learningThread.beats', { returnObjects: true }) as LearningBeat[]
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
+    <section
+      id="home-v2-learning-thread"
+      data-testid="home-v2-learning-thread"
+      className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[0.75fr_1.25fr] lg:items-start"
+    >
       <div className="max-w-xl">
         <p className="stoa-type-label text-sm font-semibold uppercase tracking-[0.18em] text-[hsl(var(--stoa-brand-burgundy))]">
           {t('learningThread.eyebrow')}
@@ -22,7 +26,7 @@ export function HomeV2LearningThread() {
         <p className="mt-5 text-lg leading-8 text-muted-foreground">{t('learningThread.subtitle')}</p>
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 lg:pt-8">
         {beats.map((beat, index) => (
           <HomeV2VisualFrame key={beat.title} label={`0${index + 1}`}>
             <div className="grid gap-2 p-6 sm:grid-cols-[8rem_1fr] sm:items-center">

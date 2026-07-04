@@ -10,7 +10,11 @@ export function HomeV2TrustLayer() {
   const items = t('trustLayer.items', { returnObjects: true }) as TrustItem[]
 
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 sm:px-6">
+    <section
+      id="home-v2-trust-layer"
+      data-testid="home-v2-trust-layer"
+      className="mx-auto max-w-6xl px-5 py-20 sm:px-6"
+    >
       <div className="border-y border-border/70 py-12">
         <div className="max-w-2xl">
           <p className="stoa-type-label text-sm font-semibold uppercase tracking-[0.18em] text-[hsl(var(--stoa-brand-burgundy))]">

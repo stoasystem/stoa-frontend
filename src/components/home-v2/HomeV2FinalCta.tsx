@@ -7,7 +7,11 @@ export function HomeV2FinalCta({ learningHref }: { learningHref: string }) {
   const { t } = useTranslation('homeV2')
 
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 sm:px-6">
+    <section
+      id="home-v2-final-cta"
+      data-testid="home-v2-final-cta"
+      className="mx-auto max-w-6xl px-5 py-20 sm:px-6"
+    >
       <div className="rounded-[2rem] border border-border/70 bg-[hsl(var(--stoa-brand-charcoal))] px-6 py-12 text-[hsl(var(--stoa-brand-paper))] sm:px-10 lg:px-14">
         <p className="stoa-type-label text-sm font-semibold uppercase tracking-[0.18em] text-[hsl(var(--stoa-brand-gold))]">
           {t('finalCta.eyebrow')}

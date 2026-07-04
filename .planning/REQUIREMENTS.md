@@ -70,9 +70,9 @@
 | I18N-01 | 245 | Complete |
 | I18N-02 | 245 | Complete |
 | I18N-03 | 245 | Complete |
-| LAYOUT-01 | 246 | Pending |
-| LAYOUT-02 | 246 | Pending |
-| LAYOUT-03 | 246 | Pending |
+| LAYOUT-01 | 246 | Complete |
+| LAYOUT-02 | 246 | Complete |
+| LAYOUT-03 | 246 | Complete |
 | BOUND-01 | 247 | Pending |
 | VERIFY-01 | 247 | Pending |
 | VERIFY-02 | 247 | Pending |

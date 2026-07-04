@@ -21,11 +21,13 @@ export function HomeV2Page() {
 
   return (
     <MarketingLayout>
-      <HomeV2Hero learningHref={learningHref} />
-      <HomeV2LearningThread />
-      <HomeV2ParentConfidence />
-      <HomeV2TrustLayer />
-      <HomeV2FinalCta learningHref={learningHref} />
+      <div className="bg-[linear-gradient(180deg,hsl(var(--stoa-brand-paper))_0%,hsl(var(--stoa-brand-card))_42%,hsl(var(--stoa-brand-paper))_100%)]">
+        <HomeV2Hero learningHref={learningHref} />
+        <HomeV2LearningThread />
+        <HomeV2ParentConfidence />
+        <HomeV2TrustLayer />
+        <HomeV2FinalCta learningHref={learningHref} />
+      </div>
     </MarketingLayout>
   )
 }

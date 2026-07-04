@@ -6,8 +6,12 @@ export function HomeV2ParentConfidence() {
   const points = t('parentConfidence.points', { returnObjects: true }) as string[]
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-      <HomeV2VisualFrame label={t('parentConfidence.visualLabel')}>
+    <section
+      id="home-v2-parent-confidence"
+      data-testid="home-v2-parent-confidence"
+      className="mx-auto grid max-w-6xl gap-10 px-5 py-20 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center"
+    >
+      <HomeV2VisualFrame label={t('parentConfidence.visualLabel')} contentClassName="sm:aspect-[5/4]">
         <div className="grid gap-4 p-6">
           {points.map((point) => (
             <div key={point} className="rounded-2xl border border-border/70 bg-background/75 p-5 text-sm leading-6 text-muted-foreground">
