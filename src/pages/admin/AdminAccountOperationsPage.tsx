@@ -141,6 +141,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
 function BillingEvidence({ data }: { data: AdminAccountOperations }) {
   const billing = data.billing
   const events = billing.events ?? []
+  const supportEvidence = billing.supportEvidence
   return (
     <Card className="brand-rule">
       <CardHeader>
@@ -162,6 +163,9 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
           <DetailItem label="Last event" value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
           <DetailItem label="Manual override" value={billing.manualOverrideSource ?? 'None'} />
           <DetailItem label="Cancel at period end" value={billing.cancelAtPeriodEnd ? 'Yes' : 'No'} />
+          {supportEvidence && <DetailItem label="Support action" value={evidenceValue(supportEvidence, 'dunning', 'supportAction')} />}
+          {supportEvidence && <DetailItem label="Duplicate events" value={evidenceValue(supportEvidence, 'reconciliation', 'duplicateEvents')} />}
+          {supportEvidence && <DetailItem label="Stale ignored" value={evidenceValue(supportEvidence, 'reconciliation', 'staleIgnoredEvents')} />}
         </div>
         <div className="space-y-3">
           <p className="text-sm font-semibold text-foreground">Recent billing events</p>
@@ -275,6 +279,7 @@ function BillingEventRow({ event }: { event: SubscriptionBillingEvent }) {
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
         <p className="text-muted-foreground">Status: {formatStatus(event.billingStatus)}</p>
         <p className="truncate text-muted-foreground">Provider event: {event.providerEventId ?? 'None'}</p>
+        <p className="text-muted-foreground">Processing: {formatStatus(event.processingResult)}</p>
       </div>
     </div>
   )
@@ -316,6 +321,20 @@ function ErrorPanel({ error }: { error: Error | null }) {
 function formatPeriod(start?: string | null, end?: string | null) {
   if (!start && !end) return 'None'
   return `${start ? formatDate(start) : 'Unknown'} - ${end ? formatDate(end) : 'Unknown'}`
+}
+
+function evidenceValue(evidence: Record<string, unknown>, section: string, field: string) {
+  const sectionValue = evidence[section]
+  if (!sectionValue || typeof sectionValue !== 'object') return 'None'
+  return formatEvidenceValue((sectionValue as Record<string, unknown>)[field])
+}
+
+function formatEvidenceValue(value: unknown) {
+  if (value === null || value === undefined || value === '') return 'None'
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'string') return formatStatus(value)
+  return 'Available'
 }
 
 function formatDate(value: string) {

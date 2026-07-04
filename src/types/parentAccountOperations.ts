@@ -45,6 +45,7 @@ export type AccountOperationsBilling = {
   dunning?: Record<string, unknown>
   refund?: Record<string, unknown>
   accountingHandoff?: Record<string, unknown>
+  supportEvidence?: Record<string, unknown>
 }
 
 export type AccountOperationsUsage = {

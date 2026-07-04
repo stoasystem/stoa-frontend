@@ -65,6 +65,9 @@ export type SubscriptionBillingEvent = {
   billingStatus?: SubscriptionBillingStatus | string | null
   requestedTier?: SubscriptionTier | null
   providerEventId?: string | null
+  providerEventAt?: string | null
+  processingResult?: string | null
+  idempotencyStatus?: string | null
 }
 
 export type SubscriptionBilling = {
@@ -90,6 +93,7 @@ export type SubscriptionBilling = {
   manualOverrideSource?: string | null
   updatedAt?: string | null
   events?: SubscriptionBillingEvent[]
+  supportEvidence?: Record<string, unknown>
 }
 
 export type EffectiveEntitlement = {

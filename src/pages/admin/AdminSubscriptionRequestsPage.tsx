@@ -406,6 +406,7 @@ function ProviderBillingDetail({ billing }: { billing?: SubscriptionBilling }) {
       </div>
     )
   }
+  const supportEvidence = billing.supportEvidence
   return (
     <div className="rounded-md border border-border/70 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -428,6 +429,13 @@ function ProviderBillingDetail({ billing }: { billing?: SubscriptionBilling }) {
         <DetailItem label="Manual override" value={billing.manualOverrideSource ?? 'None'} />
         <DetailItem label="Last provider event" value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
       </div>
+      {supportEvidence && (
+        <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
+          <DetailItem label="Support action" value={evidenceValue(supportEvidence, 'dunning', 'supportAction')} />
+          <DetailItem label="Duplicate events" value={evidenceValue(supportEvidence, 'reconciliation', 'duplicateEvents')} />
+          <DetailItem label="Stale ignored" value={evidenceValue(supportEvidence, 'reconciliation', 'staleIgnoredEvents')} />
+        </div>
+      )}
       <div className="mt-4 space-y-2">
         <p className="text-sm font-semibold text-foreground">Recent billing events</p>
         {(billing.events ?? []).slice(0, 4).map((event) => (
@@ -438,6 +446,9 @@ function ProviderBillingDetail({ billing }: { billing?: SubscriptionBilling }) {
             </div>
             {event.providerEventId && (
               <p className="mt-1 text-muted-foreground">{event.providerEventId}</p>
+            )}
+            {event.processingResult && (
+              <Badge variant="outline" className="mt-2">{formatStatus(event.processingResult)}</Badge>
             )}
           </div>
         ))}
@@ -467,6 +478,20 @@ function formatRequestType(type: string) {
   if (type === 'upgrade') return 'Upgrade'
   if (type === 'downgrade') return 'Downgrade'
   return 'Cancel'
+}
+
+function evidenceValue(evidence: Record<string, unknown>, section: string, field: string) {
+  const sectionValue = evidence[section]
+  if (!sectionValue || typeof sectionValue !== 'object') return 'None'
+  return formatEvidenceValue((sectionValue as Record<string, unknown>)[field])
+}
+
+function formatEvidenceValue(value: unknown) {
+  if (value === null || value === undefined || value === '') return 'None'
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+  if (typeof value === 'number') return String(value)
+  if (typeof value === 'string') return formatStatus(value)
+  return 'Available'
 }
 
 function formatDate(value: string) {
