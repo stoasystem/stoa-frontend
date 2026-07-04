@@ -73,9 +73,9 @@
 | LAYOUT-01 | 246 | Complete |
 | LAYOUT-02 | 246 | Complete |
 | LAYOUT-03 | 246 | Complete |
-| BOUND-01 | 247 | Pending |
-| VERIFY-01 | 247 | Pending |
-| VERIFY-02 | 247 | Pending |
+| BOUND-01 | 247 | Complete |
+| VERIFY-01 | 247 | Complete |
+| VERIFY-02 | 247 | Complete |
 
 **Coverage:**
 - v4.0 requirements: 15 total
