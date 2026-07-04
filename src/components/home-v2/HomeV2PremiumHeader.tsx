@@ -3,16 +3,14 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
 import { cn } from '@/lib/utils'
-import { HomeV2Cta } from '@/components/home-v2/HomeV2Cta'
 
 const navItems = [
-  { key: 'navigation.howItWorks', to: '/how-it-works' },
   { key: 'navigation.parents', to: '/for-parents' },
   { key: 'navigation.tutors', to: '/teacher-support' },
   { key: 'navigation.pricing', to: '/pricing' },
 ]
 
-export function HomeV2PremiumHeader({ learningHref }: { learningHref: string }) {
+export function HomeV2PremiumHeader() {
   const { t } = useTranslation('common')
   const [isOpen, setIsOpen] = useState(false)
 
@@ -30,11 +28,12 @@ export function HomeV2PremiumHeader({ learningHref }: { learningHref: string }) 
               </Link>
             ))}
           </nav>
-          <div className="hidden lg:block">
-            <HomeV2Cta to={learningHref} tone="dark" className="min-h-11 py-1 pl-5 text-[13px]">
-              {t('navigation.startLearning')}
-            </HomeV2Cta>
-          </div>
+          <Link
+            to="/login"
+            className="home-v2-magnetic mr-1 hidden min-h-11 items-center rounded-full bg-[hsl(var(--home-v2-paper)/0.72)] px-5 text-[13px] font-semibold text-[hsl(var(--home-v2-ink)/0.76)] shadow-[inset_0_1px_0_hsl(0_0%_100%/0.72)] ring-1 ring-[hsl(var(--home-v2-line)/0.62)] hover:text-[hsl(var(--home-v2-burgundy))] lg:inline-flex"
+          >
+            {t('navigation.login')}
+          </Link>
           <button
             type="button"
             className="relative mr-1 flex h-11 w-11 items-center justify-center rounded-full bg-[hsl(var(--home-v2-ink))] text-[hsl(var(--home-v2-paper))] lg:hidden"
@@ -79,9 +78,13 @@ export function HomeV2PremiumHeader({ learningHref }: { learningHref: string }) 
               {t(item.key)}
             </Link>
           ))}
-          <HomeV2Cta to={learningHref} tone="light" className="mt-4 w-max" >
-            {t('navigation.startLearning')}
-          </HomeV2Cta>
+          <Link
+            to="/login"
+            className="home-v2-magnetic mt-5 inline-flex min-h-12 w-max items-center rounded-full bg-[hsl(var(--home-v2-paper))] px-6 text-sm font-semibold text-[hsl(var(--home-v2-ink))]"
+            onClick={() => setIsOpen(false)}
+          >
+            {t('navigation.login')}
+          </Link>
         </div>
       </div>
     </>

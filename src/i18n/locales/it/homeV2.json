@@ -1,18 +1,13 @@
 {
   "hero": {
     "eyebrow": "Studio in famiglia in Svizzera",
-    "title": "Supporto calmo quando i compiti si fermano.",
-    "subtitle": "STOA aiuta lo studente a trasformare un compito poco chiaro nel prossimo passo, con supporto docente abbastanza vicino da dare fiducia ai genitori.",
+    "title": "Studiare con calma.",
+    "subtitle": "Quando i compiti si bloccano, STOA aiuta tuo figlio a trovare il prossimo passo e mantiene il supporto docente vicino abbastanza da dare fiducia ai genitori.",
     "primaryCta": "Inizia a studiare",
-    "secondaryCta": "Scopri come funziona",
-    "proofLabel": "Percorso di apprendimento",
-    "visualTitle": "Un momento di studio tranquillo, poi un passo piu chiaro.",
-    "visualBody": "Il primo segnale non e la velocita. E un ritmo di studio piu calmo al tavolo.",
-    "proofItems": [
-      "Lo studente parte da un vero compito scolastico",
-      "Il Learning Assistant guida il prossimo passo",
-      "Il supporto docente resta visibile"
-    ]
+    "secondaryCta": "Per i genitori",
+    "proofLabel": "Stato dello studio",
+    "proofTitle": "Prossimo passo chiaro",
+    "proofBody": "Il supporto docente resta disponibile quando una domanda richiede piu di un suggerimento."
   },
   "learningThread": {
     "eyebrow": "Percorso",

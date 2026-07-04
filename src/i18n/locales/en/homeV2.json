@@ -1,18 +1,13 @@
 {
   "hero": {
     "eyebrow": "Swiss family learning",
-    "title": "Calm support for the moment homework stops.",
-    "subtitle": "STOA helps a student move from an unclear school task to a focused next step, with teacher-backed support close enough for parents to trust.",
+    "title": "Learn with calm.",
+    "subtitle": "When homework stops, STOA helps your child find the next step and keeps teacher-backed support close enough for parents to trust.",
     "primaryCta": "Start learning",
-    "secondaryCta": "See how it works",
-    "proofLabel": "Family learning thread",
-    "visualTitle": "A calm study moment, then a clearer next step.",
-    "visualBody": "The first signal is not speed. It is a calmer learning rhythm at the table.",
-    "proofItems": [
-      "Student starts from the real school task",
-      "Learning Assistant guides the next step",
-      "Teacher-backed support remains visible"
-    ]
+    "secondaryCta": "For parents",
+    "proofLabel": "Learning status",
+    "proofTitle": "Next step clear",
+    "proofBody": "Teacher-backed support stays available when the question needs more than a hint."
   },
   "learningThread": {
     "eyebrow": "Learning thread",

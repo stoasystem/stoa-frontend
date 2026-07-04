@@ -23,7 +23,7 @@ export function HomeV2Page() {
   return (
     <MarketingLayout hideHeader>
       <div className="home-v2-premium">
-        <HomeV2PremiumHeader learningHref={learningHref} />
+        <HomeV2PremiumHeader />
         <HomeV2Hero learningHref={learningHref} />
         <HomeV2LearningThread />
         <HomeV2ParentConfidence />

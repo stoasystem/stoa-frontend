@@ -1,18 +1,13 @@
 {
   "hero": {
     "eyebrow": "Apprentissage familial en Suisse",
-    "title": "Un soutien calme quand les devoirs bloquent.",
-    "subtitle": "STOA aide l'eleve a transformer une tache confuse en prochaine etape claire, avec un soutien enseignant assez proche pour rassurer les parents.",
+    "title": "Apprendre avec calme.",
+    "subtitle": "Quand les devoirs bloquent, STOA aide votre enfant a trouver la prochaine etape et garde le soutien enseignant assez proche pour rassurer les parents.",
     "primaryCta": "Commencer",
-    "secondaryCta": "Voir le fonctionnement",
-    "proofLabel": "Fil d'apprentissage",
-    "visualTitle": "Un moment d'etude calme, puis une etape plus claire.",
-    "visualBody": "Le premier signal n'est pas la vitesse. C'est un rythme d'apprentissage plus calme a la table.",
-    "proofItems": [
-      "L'eleve part d'une vraie tache scolaire",
-      "Le Learning Assistant guide la prochaine etape",
-      "Le soutien enseignant reste visible"
-    ]
+    "secondaryCta": "Pour les parents",
+    "proofLabel": "Etat d'apprentissage",
+    "proofTitle": "Prochaine etape claire",
+    "proofBody": "Le soutien enseignant reste disponible quand une question demande plus qu'un indice."
   },
   "learningThread": {
     "eyebrow": "Fil d'apprentissage",

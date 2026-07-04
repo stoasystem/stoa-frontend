@@ -1,18 +1,13 @@
 {
   "hero": {
     "eyebrow": "Lernen in Schweizer Familien",
-    "title": "Ruhige Unterstuetzung, wenn Hausaufgaben stocken.",
-    "subtitle": "STOA hilft Schuelern, aus einer unklaren Schulaufgabe den naechsten Lernschritt zu machen, mit Lehrpersonen nah genug fuer Vertrauen.",
+    "title": "Ruhig weiterlernen.",
+    "subtitle": "Wenn Hausaufgaben stocken, hilft STOA Ihrem Kind beim naechsten Schritt und haelt Lehrpersonen nah genug fuer Vertrauen.",
     "primaryCta": "Lernen starten",
-    "secondaryCta": "So funktioniert es",
-    "proofLabel": "Lernweg der Familie",
-    "visualTitle": "Ein ruhiger Lernmoment, dann ein klarer naechster Schritt.",
-    "visualBody": "Das erste Signal ist nicht Tempo. Es ist ein ruhigerer Lernrhythmus am Tisch.",
-    "proofItems": [
-      "Schueler starten mit der echten Schulaufgabe",
-      "Der Learning Assistant fuehrt zum naechsten Schritt",
-      "Lehrpersonen bleiben als Unterstuetzung sichtbar"
-    ]
+    "secondaryCta": "Fuer Eltern",
+    "proofLabel": "Lernstatus",
+    "proofTitle": "Naechster Schritt klar",
+    "proofBody": "Lehrpersonen bleiben verfuegbar, wenn eine Frage mehr braucht als einen Hinweis."
   },
   "learningThread": {
     "eyebrow": "Lernfaden",
