@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: 新版路由与组件骨架
-status: planning
-last_updated: "2026-07-04T11:25:13.209Z"
-last_activity: 2026-07-04
+status: Awaiting next milestone
+last_updated: "2026-07-04T18:36:24.970Z"
+last_activity: 2026-07-04 — Milestone v4.0 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-04)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v4.0 新版路由与组件骨架 is in planning. The milestone will create an isolated, previewable `/home-v2` route and Home V2 component skeleton while keeping the current `/` homepage unchanged.
+**Current focus:** Milestone v4.0 新版路由与组件骨架 is complete. Home V2 now has an isolated `/home-v2` preview route, component namespace, provisional `homeV2` i18n skeleton, previewable layout, focused E2E smoke coverage, and handoff documentation while keeping the current `/` homepage unchanged.
 
 ## Current Position
 
-Phase: 247 Boundaries Verification And Handoff
-Plan: 247-PLAN.md
-Status: v4.0 phases complete; ready for milestone audit and completion
-Last activity: 2026-07-04 — Completed Phase 247 verification and handoff
+Phase: Milestone v4.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-04 — Milestone v4.0 completed and archived
 
 ## Performance Metrics
 
@@ -48,7 +48,7 @@ Last activity: 2026-07-04 — Completed Phase 247 verification and handoff
 
 **Recent Trend:**
 
-- Last 4 completed phases: 240, 241, 242, 243
+- Last 4 completed phases: 244, 245, 246, 247
 - Trend: v4.0 completed the isolated `/home-v2` route, section component namespace, provisional `homeV2` i18n skeleton, previewable visual layout, verification, and handoff.
 
 *Updated after each plan completion*
@@ -68,6 +68,8 @@ Recent decisions affecting current work:
 - PEX-8121121 is the best free Hero candidate found. PEX-9240631 was removed from local candidates because the creator/vendor name creates education-brand adjacency.
 - 2026-07-04 Swiss-market refresh: Asian-family mismatch candidates were removed from the active Home V2 pool because the homepage is aimed at Swiss parents. Swiss/European family context or face-light educational detail is now required for main homepage imagery.
 - Free stock is now acceptable for prototype work, but still not strong enough for final high-end Swiss private-education Hero positioning. Paid iStock or commissioned Swiss/European education photography remains recommended before public switch-over.
+- v4.0 completed the isolated `/home-v2` preview route and Home V2 namespace while preserving the current `/` homepage.
+- v4.0 keeps final asset insertion, motion choreography, final copy/localization, screenshot QA, and switching `/` as separate future milestones.
 
 ### Quick Tasks Completed
 
@@ -77,7 +79,7 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Future Home V2 implementation work: final asset selection, crop variants, image optimization, WebP/AVIF generation, localized alt text, React route/component implementation, animation choreography, screenshot QA, and `/` switch approval remain out of scope until separately planned.
+- Future Home V2 implementation work: final asset selection, crop variants, image optimization, WebP/AVIF generation, localized alt text, animation choreography, screenshot QA, and `/` switch approval remain out of scope until separately planned.
 
 ### Blockers/Concerns
 
@@ -90,5 +92,12 @@ Recent decisions affecting current work:
 |----------|------|--------|
 | paid_assets | iStock purchase and final license approval | deferred |
 | asset_pipeline | crop/optimization/WebP variants | deferred |
-| implementation | `/home-v2` React route and components | deferred |
+| implementation | final Home V2 asset insertion into the preview route | deferred |
+| motion | full Home V2 animation choreography | deferred |
+| copy | final EN/DE/FR/IT homepage copywriting | deferred |
+| switch_over | replacing `/` with Home V2 | deferred |
 | qa | browser screenshot QA with final assets | deferred |
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

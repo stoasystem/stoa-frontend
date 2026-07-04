@@ -1,5 +1,31 @@
 # Milestones
 
+## v4.0 新版路由与组件骨架 (Shipped: 2026-07-04)
+
+**Phases completed:** 4 phases, 4 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v4.0-MILESTONE-AUDIT.md`
+**Depends on:** v3.1 Home V2 Candidate Image Search And Shortlist
+**Known deferred items at close:** final image crop/optimization, WebP/AVIF variants, paid/commissioned Hero photography, full motion choreography, final EN/DE/FR/IT copywriting, screenshot/visual regression approval, and replacing `/` remain future scope.
+
+**Key accomplishments:**
+
+- Added isolated `/home-v2` public preview route while preserving `/`.
+- Added `src/pages/home-v2/HomeV2Page.tsx` and `src/components/home-v2/` section namespace.
+- Added provisional `homeV2` i18n namespace and EN/DE/FR/IT copy files.
+- Built previewable five-section skeleton: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, Final CTA.
+- Added route/component handoff documentation and focused Playwright smoke coverage.
+
+### Verification
+
+- Phase 244-247 verification artifacts passed.
+- Milestone audit passed with 15/15 requirements covered.
+- `npm run lint`: passed.
+- `npm run build`: passed.
+- `npm run test:e2e -- home-v2.spec.ts`: passed, 2/2 tests.
+
+---
+
 ## v3.1 Home V2 Candidate Image Search And Shortlist (Shipped: 2026-07-03)
 
 **Phases completed:** 4 phases, 4 plans, 0 code tasks

@@ -2,42 +2,40 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Practice Library, a unified learning-context photo/PDF upload UI foundation, and a frontend/mock-backed Online Classroom foundation with refined tutor-support escalation language.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Practice Library, a unified learning-context photo/PDF upload UI foundation, a frontend/mock-backed Online Classroom foundation with refined tutor-support escalation language, and an isolated Home V2 preview route/component skeleton for the Swiss-parent homepage redesign track.
 
-The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, and a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context.
+The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context, and a separate `/home-v2` public preview route with Home V2 section components and provisional multilingual copy plumbing.
 
 ## Core Value
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v3.1 Home V2 Candidate Image Search And Shortlist
+## Latest Shipped Milestone: v4.0 新版路由与组件骨架
 
-**Shipped:** 2026-07-03
+**Shipped:** 2026-07-04
 
-**Delivered:** Home V2 now has a concrete candidate image shortlist for the separate Swiss-parent-first homepage preview route. The milestone searched free candidate sources, downloaded traceable Pexels and Unsplash JPEG candidates under `img/home-v2/candidates/`, created `docs/home/home-v2-image-shortlist.md`, created `docs/home/home-v2-asset-ledger.csv`, scored candidates against the v2.7 high-end visual direction, refreshed the pool for Swiss-market audience fit, identified a first-pass Hero candidate, and kept iStock/Magnific, paid purchases, final crop optimization, React implementation, localization, screenshot QA, and `/` replacement out of scope.
-
-**Target features:**
-- Downloaded Pexels/Unsplash candidates are stored under a Home V2 candidate namespace.
-- Every local candidate has source, license, creator/vendor, score, role, approval state, AI/enhancement status, and risk metadata.
-- Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA have recommended or backup asset choices.
-- iStock remains paid and approval-gated; Magnific remains workflow/source-gated.
-- Current `/`, React components, localization files, and routing remain unchanged.
-
-## Current Milestone: v4.0 新版路由与组件骨架
-
-**Goal:** Create a separate, previewable Home V2 route and component skeleton that proves the new Swiss-parent homepage structure without replacing the current `/` homepage.
+**Delivered:** Home V2 now has an isolated, previewable `/home-v2` route and component skeleton that proves the Swiss-parent homepage structure without replacing the current `/` homepage. The milestone added `src/pages/home-v2/HomeV2Page.tsx`, a `src/components/home-v2/` section namespace, provisional `homeV2` i18n resources, a previewable five-section layout, focused Playwright smoke coverage, and route/component handoff documentation. Final image optimization, full animation choreography, final four-language copy, screenshot QA, and replacing `/` remain out of scope.
 
 **Target features:**
-- Add an isolated `/home-v2` preview route while preserving the current `/` homepage.
-- Add a Home V2 component namespace, expected under `src/components/home-v2/`, with section-level components and composition boundaries.
-- Build a previewable skeleton, not just empty shells: section order, layout rhythm, responsive container behavior, placeholder media/proof surfaces, and CTA placement should be visible.
-- Follow the locked Home V2 IA sections: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-- Use existing Home V2 planning docs as implementation input: IA, visual direction, asset strategy, and Swiss-market image shortlist.
-- Keep final image optimization, full animation choreography, final four-language copy, screenshot QA, and replacing `/` as later explicit milestones.
+- `/home-v2` renders as a public preview route while `/` remains unchanged.
+- Home V2 composition lives under `src/pages/home-v2/` and `src/components/home-v2/`.
+- Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA render with visible layout rhythm and placeholder visual/proof surfaces.
+- `homeV2` is registered in i18n and has provisional EN/DE/FR/IT resources.
+- Final assets, motion, copywriting, visual regression approval, and `/` switch-over remain later explicit milestones.
+
+## Current Milestone: None Active
+
+**Goal:** v4.0 is complete. Recommended next scope is final asset insertion and optimization, motion choreography, final Home V2 copy/localization, screenshot QA, or explicit `/` switch-over approval.
+
+**Target features:**
+- Preserve current `/` until explicit replacement approval.
+- Keep `/home-v2` as the preview route for Home V2 follow-up milestones.
+- Use `docs/home/home-v2-route-component-handoff.md`, v2.6 IA, v2.7 visual direction, v2.8 asset strategy, and v3.1 image shortlist as inputs.
+- Treat final images, motion, copy, screenshots, and `/` replacement as separate follow-up milestones.
 
 ## Current State
 
-**Latest shipped milestone:** v3.1 Home V2 Candidate Image Search And Shortlist
+**Latest shipped milestone:** v4.0 新版路由与组件骨架
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -77,6 +75,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - v2.1 Question Bank UI with `/question-bank`, subject/topic question-bank pages, set overview, session answer flow, immediate feedback, result page, mistakes review, saved sets, local search/filtering, typed mock data, service/query boundaries, Question Bank to Learning Chat context, parent/tutor comprehension updates, docs, and verification.
 - v2.2 Photo & File Upload UI with reusable upload types/services/hooks/components, Chat composer upload integration, Question Bank upload modal/session handoff, Practice schoolwork upload panels, route-state/session-storage handoff, four-language upload copy, docs, and Playwright upload verification.
 - v2.3 Live Classroom UI with classroom domain contracts, mock services/hooks, student classroom home/schedule/lobby/room/summary, Chat teacher-text-to-video escalation, tutor classroom queue/lobby/room/summary, parent classroom visibility, four-language liveClassroom namespace, docs, and Playwright coverage.
+- v4.0 Home V2 preview route and component skeleton with isolated `/home-v2`, preserved `/`, Home V2 section components, provisional `homeV2` i18n resources, route smoke coverage, and implementation handoff.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -142,13 +141,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 has a Swiss-parent-first positioning contract, current-homepage content inventory, separate route/namespace proposal, CTA journey, multilingual IA guardrails, and implementation handoff baseline — v2.6
 - ✓ Home V2 has a premium visual direction contract covering high-end visual thesis, typography roles, color behavior, spacing, surfaces, CTA/nav treatment, image art direction, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints — v2.7
 - ✓ Home V2 has an image and asset strategy covering source hierarchy, Pexels/iStock/Magnific source rules, licensing and release checks, AI-use boundaries, section asset briefs, search taxonomy, candidate scoring, metadata, storage, crop/optimization, approval gates, and QA handoff — v2.8
+- ✓ Home V2 has an isolated public preview route, preserved `/` homepage, component namespace, provisional `homeV2` i18n skeleton, previewable five-section layout, route smoke tests, and implementation handoff — v4.0
 
 ### Active
 
-- [ ] Home V2 has an isolated preview route that does not replace or regress the current `/` homepage.
-- [ ] Home V2 has a component skeleton and namespace that later asset, animation, copy, and QA milestones can extend without reopening IA decisions.
-- [ ] The preview route renders the agreed five-section Swiss-parent homepage structure with real layout rhythm and placeholder-safe content.
-- [ ] The skeleton respects the v2.7 visual direction constraints without implementing final visual polish, final localized copy, or full animation.
+- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
 
 ### Out of Scope
 
@@ -196,6 +193,8 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 The project brief for v2.8 was provided in Chinese as "图片与素材策略". The user supplied candidate sources: Magnific, Pexels, and iStock, and explicitly said to avoid AI generation as much as possible. Current source findings: Pexels offers free photo/video use with attribution not required but has restrictions around endorsement, offensive portrayal, resale, redistribution, and trademarks; iStock is a paid licensing source with standard/extended license types and AI Generator content as a separate subscription path; Magnific is now a broader AI creative platform with stock assets and AI tools, so it should be treated as stock/enhancement support rather than the default source for generated hero imagery.
 
 The project brief for v4.0 was provided in Chinese as "v4新版路由与组件骨架". The user chose a previewable skeleton depth rather than empty shells or a near-final page, chose to run research before requirements and roadmap, and chose version `v4.0`. This milestone starts Home V2 implementation by adding a separate preview route and component architecture while preserving current `/`. It should produce enough visible structure to validate the section rhythm and component boundaries, but it should not absorb final image optimization, full animation, finalized multilingual copy, or homepage switch-over.
+
+v4.0 was completed on 2026-07-04. The current implementation provides `/home-v2`, `src/pages/home-v2/HomeV2Page.tsx`, `src/components/home-v2/`, provisional EN/DE/FR/IT `homeV2` resources, route smoke tests, and `docs/home/home-v2-route-component-handoff.md`. The current `/` homepage remains unchanged. Final asset insertion, motion choreography, final copy/localization, screenshot QA, and switching `/` remain future explicit milestones.
 
 The project brief for v2.7 was provided in Chinese as the next Home V2 redesign milestone: "视觉方向设计". It follows the v2.6 locked Home V2 IA. The user explicitly asked to use the `high-end-visual-design` skill, so v2.7 should translate its premium craft rules into STOA's Swiss-parent education context: macro whitespace, editorial composition, double-bezel surfaces, nested CTA icon treatments, and custom motion curves, while overriding any parts that conflict with STOA frontend constraints such as avoiding decorative gradient orbs, one-note beige palettes, large scrolling backdrop blur, or generic luxury decoration.
 
@@ -377,6 +376,7 @@ Current codebase facts:
 - **Home V2 licensing boundary**: Every candidate asset needs source URL, license type, creator/source name when available, model/property-release risk notes, permitted use notes, and final approval status before implementation.
 - **Home V2 visual direction boundary**: v2.7 defines design rules and blueprints only. It must not implement React route code, add final assets, change `/`, add localized copy files, or run browser visual QA for non-existent components.
 - **High-end visual adaptation**: v2.7 may adopt macro whitespace, editorial split composition, double-bezel surfaces, nested CTA icon treatment, and custom cubic-bezier motion from `high-end-visual-design`, but must reject any guidance that conflicts with project constraints, including decorative gradient orbs, large scrolling blur, generic one-note beige/purple/blue palettes, nested cards, and unsupported icon/font swaps.
+- **Home V2 v4.0 implementation boundary**: v4.0 adds only the isolated `/home-v2` route, component skeleton, provisional i18n resources, route smoke coverage, and handoff documentation. It must not replace `/`, treat candidate assets as final, add full animation choreography, finalize localized copy, or claim screenshot/visual approval.
 
 ## Key Decisions
 
@@ -498,8 +498,8 @@ Current codebase facts:
 | Use high-end visual design as craft input, not a literal template | The skill raises visual craft through editorial composition, double-bezel surfaces, macro whitespace, and motion, but STOA still needs Swiss education restraint and project-specific frontend constraints | — Pending |
 | Prefer Editorial Luxury plus Editorial Split for Home V2 | The Swiss-parent homepage needs calm high-end education credibility with a strong family image/narrative split rather than a dark SaaS or playful product layout | — Pending |
 | Keep Home V2 visual direction separate from app surfaces | Public homepage polish should not leak large hero typography, decorative panels, or cinematic spacing into dense student/tutor/admin workflows | — Pending |
-| Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | — Pending |
-| Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | — Pending |
+| Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | v4.0 Complete |
+| Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | v4.0 Complete |
 
 ## Evolution
 
@@ -519,4 +519,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-04 after starting v4.0 Home V2 route and component skeleton*
+*Last updated: 2026-07-04 after completing v4.0 Home V2 route and component skeleton*
