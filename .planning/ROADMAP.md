@@ -2,6 +2,7 @@
 
 ## Milestones
 
+- ◆ **v4.0 新版路由与组件骨架** - Phases 244-247 (planning)
 - ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
 - ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
 - ✅ **v2.7 Home V2 Visual Direction Design** - Phases 232-235 (shipped 2026-07-03)
@@ -9,88 +10,94 @@
 
 ## Phases
 
-- [x] **Phase 240: Search Source Screen And Candidate Pool** - Search candidate sources, apply license/source screening, and assemble the first Home V2 candidate pool.
-- [x] **Phase 241: High-End Visual Scoring And Shortlist** - Score candidates against v2.7 high-end visual direction and select section-level shortlist recommendations.
-- [x] **Phase 242: Download Metadata And Local Asset Ledger** - Download suitable free candidates, verify files, and record complete metadata.
-- [x] **Phase 243: Handoff QA And Next Asset Insertion Plan** - Close the shortlist milestone with handoff, QA notes, and next-scope boundaries.
+- [ ] **Phase 244: Home V2 Route And Public Inventory** - Add the isolated `/home-v2` public preview route while preserving the current `/` homepage and route inventory.
+- [ ] **Phase 245: Home V2 Component Namespace And i18n Skeleton** - Create the Home V2 page/component namespace and provisional `homeV2` i18n resources.
+- [ ] **Phase 246: Preview Layout And Visual Skeleton** - Build the previewable five-section layout with responsive rhythm and placeholder-safe proof surfaces.
+- [ ] **Phase 247: Boundaries Verification And Handoff** - Verify lint/build, document deferred work, and close v4.0 with route/component handoff.
 
 ## Phase Details
 
-### Phase 240: Search Source Screen And Candidate Pool
+### Phase 244: Home V2 Route And Public Inventory
 
-**Goal**: Home V2 has a searched, source-screened candidate pool for each section.
-**Depends on**: Phase 239
-**Requirements**: ASSET-01, ASSET-02, ASSET-03, ASSET-04
+**Goal**: Home V2 has a public preview route that is reachable without changing the existing homepage.
+**Depends on**: Phase 243
+**Requirements**: ROUTE-01, ROUTE-02, ROUTE-03
 **Success Criteria**:
-  1. Pexels candidate search produces section-relevant free candidates.
-  2. iStock and Magnific remain documented as approval-gated or account-gated sources.
-  3. Candidate records include source URL, creator/vendor, source type, and licensing status.
-  4. No ambiguous, AI-looking, watermarked, or paid assets are downloaded as final-ready assets.
-**Plans**: 240-PLAN.md
-**UI hint**: no
-
-### Phase 241: High-End Visual Scoring And Shortlist
-
-**Goal**: Candidate images are scored through the Home V2 premium visual contract before local use.
-**Depends on**: Phase 240
-**Requirements**: ASSET-05, ASSET-06, ASSET-07, ASSET-08
-**Success Criteria**:
-  1. Each candidate has authenticity, Swiss-parent fit, learning relevance, crop flexibility, diversity/age fit, brand fit, and risk scores.
-  2. Selected candidates support Editorial Luxury and Editorial Split without generic AI or SaaS feeling.
-  3. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA each have recommended or backup assets.
-  4. Deferred or rejected candidates include a reason.
-**Plans**: 241-PLAN.md
+  1. `/home-v2` renders through `AppRouter` as a public route.
+  2. `/` still renders the existing `HomePage` and current homepage component tree.
+  3. `routeGroups.public` includes `/home-v2`.
+  4. No auth, registration, quota, protected-route, or role-dashboard behavior changes are introduced.
+**Plans**: 244-PLAN.md
 **UI hint**: yes
 
-### Phase 242: Download Metadata And Local Asset Ledger
+### Phase 245: Home V2 Component Namespace And i18n Skeleton
 
-**Goal**: Suitable free assets are downloaded into a traceable Home V2 candidate namespace.
-**Depends on**: Phase 241
-**Requirements**: ASSET-09, ASSET-10, ASSET-11, ASSET-12
+**Goal**: Home V2 has an isolated page/component namespace and provisional multilingual copy plumbing.
+**Depends on**: Phase 244
+**Requirements**: SKEL-01, SKEL-02, SKEL-03, I18N-01, I18N-02, I18N-03
 **Success Criteria**:
-  1. Downloaded Pexels candidates are stored under `img/home-v2/candidates/pexels/`.
-  2. Local filenames include source and asset IDs.
-  3. Metadata ledger maps every local file back to source and license information.
-  4. File type, dimensions, and repository status are verified.
-**Plans**: 242-PLAN.md
-**UI hint**: no
+  1. `src/pages/home-v2/HomeV2Page.tsx` exists and owns the Home V2 page composition.
+  2. `src/components/home-v2/` contains section-level Home V2 components.
+  3. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA all render.
+  4. `homeV2` is registered in the i18n namespace list and resource setup.
+  5. EN/DE/FR/IT provisional `homeV2.json` resources exist and visible skeleton copy reads from them.
+**Plans**: 245-PLAN.md
+**UI hint**: yes
 
-### Phase 243: Handoff QA And Next Asset Insertion Plan
+### Phase 246: Preview Layout And Visual Skeleton
 
-**Goal**: The shortlist is ready for a later Home V2 implementation milestone.
-**Depends on**: Phase 242
-**Requirements**: ASSET-13, ASSET-14, ASSET-15, ASSET-16
+**Goal**: The `/home-v2` route becomes a previewable skeleton with real section rhythm and responsive layout.
+**Depends on**: Phase 245
+**Requirements**: LAYOUT-01, LAYOUT-02, LAYOUT-03
 **Success Criteria**:
-  1. `docs/home/home-v2-image-shortlist.md` is self-contained.
-  2. Paid/source-gated candidates are separated from downloaded candidates.
-  3. Current `/`, React code, routes, and localization files remain unchanged.
-  4. Next milestone can crop/optimize/insert assets without reopening source strategy.
-  5. `git diff --check` passes.
-**Plans**: 243-PLAN.md
+  1. The page has visible layout rhythm, CTA placement, and placeholder media/proof surfaces.
+  2. Hero uses an editorial split on desktop and a stable single-column mobile fallback.
+  3. The five-section scroll narrative reads as one learning thread, not a generic feature-card grid.
+  4. The skeleton avoids decorative gradient orbs, AI-forward hero language, nested page-section cards, and one-note palette behavior.
+  5. Placeholder visual frames reserve later asset/proof slots without treating candidate images as final assets.
+**Plans**: 246-PLAN.md
+**UI hint**: yes
+
+### Phase 247: Boundaries Verification And Handoff
+
+**Goal**: v4.0 is verified and handed off as a route/component skeleton milestone, with later implementation work clearly deferred.
+**Depends on**: Phase 246
+**Requirements**: BOUND-01, VERIFY-01, VERIFY-02
+**Success Criteria**:
+  1. v4.0 explicitly excludes final image optimization, full animation choreography, final copywriting, screenshot QA, and `/` switch-over.
+  2. `npm run lint` passes.
+  3. `npm run build` passes.
+  4. Documentation records route/component decisions, verification results, and deferred follow-up milestones.
+  5. Current `/` remains unchanged after implementation verification.
+**Plans**: 247-PLAN.md
 **UI hint**: no
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 240. Search Source Screen And Candidate Pool | 1/1 | Complete | 2026-07-03 |
-| 241. High-End Visual Scoring And Shortlist | 1/1 | Complete | 2026-07-03 |
-| 242. Download Metadata And Local Asset Ledger | 1/1 | Complete | 2026-07-03 |
-| 243. Handoff QA And Next Asset Insertion Plan | 1/1 | Complete | 2026-07-03 |
+| 244. Home V2 Route And Public Inventory | 0/1 | Pending | — |
+| 245. Home V2 Component Namespace And i18n Skeleton | 0/1 | Pending | — |
+| 246. Preview Layout And Visual Skeleton | 0/1 | Pending | — |
+| 247. Boundaries Verification And Handoff | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 240 | 4 | ASSET-01, ASSET-02, ASSET-03, ASSET-04 |
-| 241 | 4 | ASSET-05, ASSET-06, ASSET-07, ASSET-08 |
-| 242 | 4 | ASSET-09, ASSET-10, ASSET-11, ASSET-12 |
-| 243 | 4 | ASSET-13, ASSET-14, ASSET-15, ASSET-16 |
+| 244 | 3 | ROUTE-01, ROUTE-02, ROUTE-03 |
+| 245 | 6 | SKEL-01, SKEL-02, SKEL-03, I18N-01, I18N-02, I18N-03 |
+| 246 | 3 | LAYOUT-01, LAYOUT-02, LAYOUT-03 |
+| 247 | 3 | BOUND-01, VERIFY-01, VERIFY-02 |
 
-**Total requirements:** 16
-**Mapped requirements:** 16
+**Total requirements:** 15
+**Mapped requirements:** 15
 **Unmapped requirements:** 0
 
 ## Next Up
 
-v3.1 is complete. Next Home V2 milestone should choose final assets, crop and optimize responsive variants, insert them into the `/home-v2` implementation, and run screenshot QA before any `/` switch decision.
+Phase 244 should plan the route and public inventory changes first:
+
+```text
+$gsd-plan-phase 244
+```

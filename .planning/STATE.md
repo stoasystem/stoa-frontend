@@ -6,9 +6,9 @@ status: planning
 last_updated: "2026-07-04T11:25:13.209Z"
 last_activity: 2026-07-04
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
-  total_plans: 0
+  total_plans: 4
   completed_plans: 0
   percent: 0
 ---
@@ -24,32 +24,32 @@ See: .planning/PROJECT.md (updated 2026-07-04)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-07-04 — Milestone v4.0 started
+Phase: 244 Home V2 Route And Public Inventory
+Plan: 244-PLAN.md
+Status: Roadmap ready; waiting for phase planning
+Last activity: 2026-07-04 — Milestone v4.0 roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 4
-- Average duration: same-day image search and documentation milestone
-- Total execution time: completed 2026-07-03
+- Total plans completed this milestone: 0 of 4
+- Average duration: not started
+- Total execution time: in planning
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 240 | 1/1 | Complete | 2026-07-03 |
-| 241 | 1/1 | Complete | 2026-07-03 |
-| 242 | 1/1 | Complete | 2026-07-03 |
-| 243 | 1/1 | Complete | 2026-07-03 |
+| 244 | 0/1 | Pending | — |
+| 245 | 0/1 | Pending | — |
+| 246 | 0/1 | Pending | — |
+| 247 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
 - Last 4 completed phases: 240, 241, 242, 243
-- Trend: v3.1 completed actual Home V2 candidate search and then refined the pool for Swiss-market fit with free, traceable Pexels/Unsplash assets while keeping paid/source-gated assets out of the repo.
+- Trend: v4.0 starts the Home V2 implementation chain with isolated route, component skeleton, i18n skeleton, preview layout, and verification phases.
 
 *Updated after each plan completion*
 
