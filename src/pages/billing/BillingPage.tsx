@@ -36,11 +36,7 @@ export function BillingPage() {
   const usageQuery = useBillingUsageQuery()
   const featureAccessQuery = useFeatureAccessQuery()
   const subscriptionQuery = useSubscriptionQuery()
-  const subscription = subscriptionQuery.data ?? {
-    plan: 'free_trial' as SubscriptionPlan,
-    status: 'trial' as const,
-    currentPeriodEnd: '2026-06-30T00:00:00Z',
-  }
+  const subscription = subscriptionQuery.data
   const plan = useMemo(
     () => plansQuery.data?.items.find((item) => item.id === selectedPlan),
     [plansQuery.data?.items, selectedPlan],
@@ -61,11 +57,24 @@ export function BillingPage() {
         />
 
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-          <BillingSummaryCard
-            plan={subscription.plan}
-            status={subscription.status}
-            currentPeriodEnd={subscription.currentPeriodEnd}
-          />
+          {subscription ? (
+            <BillingSummaryCard
+              plan={subscription.plan}
+              status={subscription.status}
+              currentPeriodEnd={subscription.currentPeriodEnd}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">{t('billing:subscription')}</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm leading-6 text-muted-foreground">
+                {subscriptionQuery.isError
+                  ? 'Billing details are not available yet. Please try again later or contact support.'
+                  : t('billing:planLoading')}
+              </CardContent>
+            </Card>
+          )}
           <Card className="brand-rule">
             <CardHeader>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

@@ -92,12 +92,31 @@ export type SubscriptionBilling = {
   events?: SubscriptionBillingEvent[]
 }
 
+export type EffectiveEntitlement = {
+  studentId: string
+  parentId?: string | null
+  effectivePlan: SubscriptionTier
+  source: string
+  limits?: {
+    dailyAiQuestionLimit?: number
+  }
+  billingState?: string | null
+  period?: {
+    start?: string | null
+    end?: string | null
+    cancelAtPeriodEnd?: boolean
+  }
+  blockingReason?: string | null
+  supportExplanation?: string | null
+}
+
 export type ParentSubscription = {
   parentId: string
   currentTier: SubscriptionTier
   plans: Record<SubscriptionTier, SubscriptionPlanBenefits>
   pendingRequest?: SubscriptionRequest | null
   billing?: SubscriptionBilling
+  effectiveEntitlements?: EffectiveEntitlement[]
 }
 
 export type CreateSubscriptionRequestInput = {
