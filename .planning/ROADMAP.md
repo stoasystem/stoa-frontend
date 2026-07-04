@@ -10,7 +10,7 @@
 
 ## Phases
 
-- [ ] **Phase 244: Home V2 Route And Public Inventory** - Add the isolated `/home-v2` public preview route while preserving the current `/` homepage and route inventory.
+- [x] **Phase 244: Home V2 Route And Public Inventory** - Add the isolated `/home-v2` public preview route while preserving the current `/` homepage and route inventory.
 - [ ] **Phase 245: Home V2 Component Namespace And i18n Skeleton** - Create the Home V2 page/component namespace and provisional `homeV2` i18n resources.
 - [ ] **Phase 246: Preview Layout And Visual Skeleton** - Build the previewable five-section layout with responsive rhythm and placeholder-safe proof surfaces.
 - [ ] **Phase 247: Boundaries Verification And Handoff** - Verify lint/build, document deferred work, and close v4.0 with route/component handoff.
@@ -76,7 +76,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 244. Home V2 Route And Public Inventory | 0/1 | Pending | — |
+| 244. Home V2 Route And Public Inventory | 1/1 | Complete | 2026-07-04 |
 | 245. Home V2 Component Namespace And i18n Skeleton | 0/1 | Pending | — |
 | 246. Preview Layout And Visual Skeleton | 0/1 | Pending | — |
 | 247. Boundaries Verification And Handoff | 0/1 | Pending | — |
@@ -99,5 +99,5 @@
 Phase 244 should plan the route and public inventory changes first:
 
 ```text
-$gsd-plan-phase 244
+$gsd-plan-phase 245
 ```

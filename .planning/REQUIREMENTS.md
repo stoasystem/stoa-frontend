@@ -61,9 +61,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROUTE-01 | 244 | Pending |
-| ROUTE-02 | 244 | Pending |
-| ROUTE-03 | 244 | Pending |
+| ROUTE-01 | 244 | Complete |
+| ROUTE-02 | 244 | Complete |
+| ROUTE-03 | 244 | Complete |
 | SKEL-01 | 245 | Pending |
 | SKEL-02 | 245 | Pending |
 | SKEL-03 | 245 | Pending |

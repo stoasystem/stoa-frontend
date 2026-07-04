@@ -35,6 +35,7 @@ import { ForbiddenPage } from '@/pages/error/ForbiddenPage'
 import { UnauthorizedPage } from '@/pages/error/UnauthorizedPage'
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 import { HomePage } from '@/pages/home/HomePage'
+import { HomeV2Page } from '@/pages/home-v2/HomeV2Page'
 import { ForParentsPage } from '@/pages/landing/ForParentsPage'
 import { ForSchoolsPage } from '@/pages/landing/ForSchoolsPage'
 import { ForTutoringCentersPage } from '@/pages/landing/ForTutoringCentersPage'
@@ -100,6 +101,7 @@ export function AppRouter() {
       <AuthBootstrap />
       <Routes>
         <Route path="/" element={<HomePage />} />
+        <Route path="/home-v2" element={<HomeV2Page />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
