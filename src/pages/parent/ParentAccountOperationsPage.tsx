@@ -3,6 +3,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import { describeIssueCode, formatStatus, supportStateTone } from '@/components/parent/accountOperationsView'
 import { useParentAccountOperationsQuery } from '@/hooks/parent/useParentAccountOperationsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -68,6 +69,8 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
         <AccountFactCard title="Linked children" value={String(data.children.length)} detail={data.children.length === 0 ? 'No child account linked' : 'Child account access visible'} />
       </div>
 
+      <VerificationRecoveryEvidence parent={data.parent} children={data.children} />
+
       {data.children.length === 0 ? (
         <Card>
           <CardContent className="p-5 text-sm text-muted-foreground">
@@ -109,7 +112,7 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
   const usageLabel = usage ? `${usage.consumed}/${usage.limit} used` : 'Usage unavailable'
   return (
     <Card>
-      <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(4,minmax(8rem,0.7fr))]">
+      <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(5,minmax(8rem,0.7fr))]">
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
             <UserRound className="h-5 w-5" aria-hidden="true" />
@@ -121,6 +124,7 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
         </div>
         <ChildMetric label="Binding" value={formatStatus(child.binding.status)} />
         <ChildMetric label="Verification" value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
+        <ChildMetric label="Recovery" value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
         <ChildMetric label="Plan" value={formatStatus(child.entitlement?.effectivePlan)} />
         <ChildMetric label="Usage" value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>

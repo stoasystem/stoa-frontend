@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { describeIssueCode, formatStatus, supportStateTone } from '@/components/parent/accountOperationsView'
+import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -116,6 +117,8 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
         <FactCard title="Usage rows" value={String(data.usage.length)} detail={data.usage.some((item) => item.unreconciled) ? 'Reconciliation pending' : 'Usage matched'} />
       </div>
 
+      <VerificationRecoveryEvidence parent={data.parent} children={data.children} admin />
+
       <BillingEvidence data={data} />
 
       <section className="space-y-3">
@@ -184,7 +187,7 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
   const usageLabel = usage ? `${usage.consumed}/${usage.limit} used` : 'Usage unavailable'
   return (
     <Card>
-      <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(4,minmax(8rem,0.7fr))]">
+      <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(5,minmax(8rem,0.7fr))]">
         <div className="flex min-w-0 items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
             <UserRound className="h-5 w-5" aria-hidden="true" />
@@ -196,6 +199,7 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
         </div>
         <ChildMetric label="Binding" value={formatStatus(child.binding.status)} />
         <ChildMetric label="Verification" value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
+        <ChildMetric label="Recovery" value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
         <ChildMetric label="Plan" value={formatStatus(child.entitlement?.effectivePlan)} />
         <ChildMetric label="Usage" value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>

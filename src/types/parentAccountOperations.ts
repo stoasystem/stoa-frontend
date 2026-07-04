@@ -16,6 +16,8 @@ export type AccountOperationsVerification = {
   emailVerificationLastResendAt?: string | null
   emailVerificationResendCount?: number
   resendAllowed?: boolean
+  supportRecoveryState?: string | null
+  supportAction?: string | null
 }
 
 export type AccountOperationsProfile = {
