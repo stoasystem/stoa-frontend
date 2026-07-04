@@ -1,69 +1,72 @@
-# Research Summary: v2.3 Live Classroom & Video Help UI Foundation
+# Project Research Summary: v4.0 Home V2 Skeleton
 
-## Research Complete
+**Date:** 2026-07-04
+**Milestone:** v4.0 新版路由与组件骨架
 
-Research covered:
+## Stack Additions
 
-- Purpose-built online tutoring classrooms: Lessonspace and Dojo Tutor/Lessonspace guidance.
-- Meeting safety/control patterns: Zoom waiting room, Zoom participant management, Microsoft Teams for Education safety roles, Google Meet host controls.
-- Future video-provider architecture: LiveKit React components, Twilio Video JavaScript SDK, Daily prebuilt/custom split.
-- Accessibility baseline: WAI-ARIA APG modal dialog pattern.
+No new dependencies are recommended.
 
-## Key Findings
+Use the existing stack:
 
-### Stack Additions
+- React 19
+- React Router DOM v7 declarative routing
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- react-i18next
+- existing UI primitives and global brand/theme tokens
 
-No real-time video SDK should be added in v2.3. The app should add a provider-neutral `live-classroom` feature module with typed models, mock data, services, hooks, and UI components. Future provider integration should stay behind an adapter because real video platforms bring room state, participant tracks, device APIs, and backend token/session requirements.
+Official docs confirm the current route style is appropriate for adding `/home-v2`, Vite can later import optimized assets into the build graph, and React `lazy`/`Suspense` are available if Home V2 later needs route-level splitting.
 
-### Feature Table Stakes
+Sources:
 
-v2.3 should include:
+- https://reactrouter.com/start/declarative/routing
+- https://vite.dev/guide/assets.html
+- https://react.dev/reference/react/lazy
+- https://react.dev/reference/react/Suspense
 
-- Student classroom home and Dashboard card.
-- Schedule classroom flow with mock time slots and context/materials.
-- Lobby with session details, tutor profile, device-check mock controls, context, waiting/unavailable states, and join action.
-- Room UI with video placeholders, learning workspace, side panels, materials, notes, participants, chat, and bottom controls.
-- Classroom summary with notes and next steps.
-- Chat teacher-text-to-video escalation.
-- Tutor classroom queue, tutor lobby, and tutor room.
-- Four-language `liveClassroom` i18n and Playwright smoke tests.
+## Table Stakes
 
-### Differentiators
+- Add public `/home-v2` route without changing `/`.
+- Add `src/pages/home-v2/HomeV2Page.tsx`.
+- Add isolated `src/components/home-v2/` section components.
+- Render five locked IA sections: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, Final CTA.
+- Make the skeleton previewable: real layout rhythm, placeholder media/proof surfaces, CTA placement, responsive behavior.
+- Add `homeV2` i18n namespace with provisional EN/DE/FR/IT resources.
+- Update route inventory through `routeGroups.public`.
 
-STOA should not clone a generic meeting product. The classroom should be anchored to learning context: question, conversation, uploaded material, Practice path, Question Bank item, tutor notes, and next steps. The strongest product pattern is "live tutoring workspace" rather than "video call".
+## Architecture Direction
 
-### Watch Out For
+Preferred file shape:
 
-- Do not claim real WebRTC, live device media, recording, screen sharing, secure video, or actual provider connectivity.
-- Keep lobby/teacher controls clear; student Leave and tutor End Session are different actions.
-- Keep AI role clear: once tutor text help is active, Learning Assistant is observing unless a future phase explicitly designs in-class AI support.
-- Mobile room layout needs a single-column/drawer pattern, not a squeezed desktop side panel.
-- Reuse v2.2 upload UI for materials.
+```text
+src/pages/home-v2/HomeV2Page.tsx
+src/components/home-v2/HomeV2Hero.tsx
+src/components/home-v2/HomeV2LearningThread.tsx
+src/components/home-v2/HomeV2ParentConfidence.tsx
+src/components/home-v2/HomeV2TrustLayer.tsx
+src/components/home-v2/HomeV2FinalCta.tsx
+src/components/home-v2/HomeV2VisualFrame.tsx
+src/i18n/locales/*/homeV2.json
+```
 
-## Sources
+`MarketingLayout` can be reused for the preview route if it does not block the Home V2 visual contract. Current `src/components/home/` should remain untouched.
 
-- Lessonspace: https://www.thelessonspace.com/
-- Dojo Tutor Lessonspace overview: https://tutor-help.classdojo.com/hc/en-us/articles/42456605197837-Lessonspace-Overview-Tools-for-Tutors
-- Dojo Tutor Lessonspace tools: https://tutor-help.classdojo.com/hc/en-us/articles/42456824965901-Lessonspace-Teaching-Tools
-- Zoom waiting room: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0059359
-- Zoom participant management: https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0065566
-- Microsoft Teams for Education meeting roles and safety: https://support.microsoft.com/en-us/teams/education/quick-start/set-up-meeting-roles-and-safety
-- Google Meet host controls: https://support.google.com/meet/answer/16229038
-- Google Classroom video meeting help: https://support.google.com/edu/classroom/answer/9776888
-- LiveKit React components: https://docs.livekit.io/reference/components/react
-- LiveKit VideoConference component: https://docs.livekit.io/reference/components/react/component/videoconference/
-- Twilio Video JavaScript SDK: https://www.twilio.com/docs/video/javascript
-- Daily get started: https://docs.daily.co/get-started
-- WAI-ARIA APG modal dialog pattern: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
+## Watch Out For
 
-## Requirement Direction
+- Do not replace `/`.
+- Do not make an empty shell; user selected a previewable skeleton.
+- Do not implement final images, full animation, final copy, screenshot QA, or homepage switch-over in v4.0.
+- Do not hard-code English text.
+- Do not treat candidate images as final optimized assets.
+- Do not let dense app card patterns or generic SaaS grids define Home V2.
+- Do not reintroduce AI-forward or instant-solver homepage language.
 
-Requirements should be grouped around:
+## Recommended Requirement Categories
 
-1. Live classroom foundation contracts.
-2. Student classroom home and scheduling.
-3. Lobby and room experience.
-4. Chat-to-video escalation.
-5. Tutor classroom flow.
-6. Parent visibility, summary, and continuity.
-7. i18n, accessibility, responsive behavior, docs, and QA.
+- Routing
+- Component Skeleton
+- Preview Layout
+- i18n
+- Boundaries And Verification
