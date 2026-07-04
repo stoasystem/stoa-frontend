@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "eyebrow": "Home V2 preview",
+    "title": "Learning support that feels calm at home.",
+    "subtitle": "A Swiss-parent first homepage skeleton for showing how a stuck school task becomes a clear next step, with teacher-backed support when needed.",
+    "primaryCta": "Start learning",
+    "secondaryCta": "See how it works",
+    "proofLabel": "Family learning thread",
+    "visualTitle": "A calm study moment, then a clearer next step.",
+    "visualBody": "This frame reserves the later family or study image and product evidence surface without treating candidate imagery as final.",
+    "proofItems": [
+      "Student starts from the real school task",
+      "Learning Assistant guides the next step",
+      "Teacher-backed support remains visible"
+    ]
+  },
+  "learningThread": {
+    "eyebrow": "Learning thread",
+    "title": "One route from stuck to understood.",
+    "subtitle": "Home V2 should read as one learning story instead of a catalogue of equal features.",
+    "beats": [
+      {
+        "title": "A real question appears",
+        "body": "The student brings the confusing step from homework, practice, or a school worksheet."
+      },
+      {
+        "title": "The next step becomes clear",
+        "body": "STOA keeps the explanation focused on learning, not on instant answers."
+      },
+      {
+        "title": "Teacher support stays nearby",
+        "body": "When a student needs more help, professional support remains part of the system."
+      },
+      {
+        "title": "Parents see the pattern",
+        "body": "Parents understand progress and focus areas without taking over the homework."
+      }
+    ]
+  },
+  "parentConfidence": {
+    "eyebrow": "Parent confidence",
+    "title": "Visible learning without parent takeover.",
+    "body": "The page should help parents feel what changes at home: less uncertainty, a clearer rhythm, and support that does not turn them into the tutor.",
+    "visualLabel": "Parent view placeholder",
+    "points": [
+      "What the child worked on today",
+      "Where support was needed",
+      "What the next learning focus should be"
+    ]
+  },
+  "trustLayer": {
+    "eyebrow": "Swiss trust layer",
+    "title": "Built for serious family education decisions.",
+    "body": "The skeleton keeps trust signals compact and restrained while reserving room for later imagery, multilingual copy, and proof details.",
+    "items": [
+      {
+        "title": "Swiss-parent first",
+        "body": "The homepage speaks first to parents evaluating daily learning support."
+      },
+      {
+        "title": "Teacher-backed",
+        "body": "Support language stays credible and avoids teacher-replacement claims."
+      },
+      {
+        "title": "Multilingual ready",
+        "body": "Copy is already separated for later English, German, French, and Italian refinement."
+      }
+    ]
+  },
+  "finalCta": {
+    "eyebrow": "Start learning",
+    "title": "A quieter way to begin the next study session.",
+    "body": "This final call to action closes the preview route without introducing a new visual story.",
+    "primaryCta": "Start learning",
+    "secondaryCta": "For parents"
+  }
+}

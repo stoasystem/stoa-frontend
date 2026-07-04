@@ -4,6 +4,7 @@ import { getInitialLanguage, LANGUAGE_STORAGE_KEY, type SupportedLanguage } from
 import { namespaces } from '@/i18n/namespaces'
 import enCommon from '@/i18n/locales/en/common.json'
 import enHome from '@/i18n/locales/en/home.json'
+import enHomeV2 from '@/i18n/locales/en/homeV2.json'
 import enAuth from '@/i18n/locales/en/auth.json'
 import enChat from '@/i18n/locales/en/chat.json'
 import enParent from '@/i18n/locales/en/parent.json'
@@ -20,6 +21,7 @@ import enAdmin from '@/i18n/locales/en/admin.json'
 import enErrors from '@/i18n/locales/en/errors.json'
 import deCommon from '@/i18n/locales/de/common.json'
 import deHome from '@/i18n/locales/de/home.json'
+import deHomeV2 from '@/i18n/locales/de/homeV2.json'
 import deAuth from '@/i18n/locales/de/auth.json'
 import deChat from '@/i18n/locales/de/chat.json'
 import deParent from '@/i18n/locales/de/parent.json'
@@ -39,6 +41,7 @@ export const resources = {
   en: {
     common: enCommon,
     home: enHome,
+    homeV2: enHomeV2,
     auth: enAuth,
     chat: enChat,
     parent: enParent,
@@ -57,6 +60,7 @@ export const resources = {
   de: {
     common: deCommon,
     home: deHome,
+    homeV2: deHomeV2,
     auth: deAuth,
     chat: deChat,
     parent: deParent,

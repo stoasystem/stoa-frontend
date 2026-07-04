@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "eyebrow": "Home V2 Vorschau",
+    "title": "Lernunterstuetzung, die zu Hause ruhig wirkt.",
+    "subtitle": "Ein Seitenaufbau fuer Schweizer Eltern: Aus einer schwierigen Schulaufgabe wird ein klarer naechster Lernschritt, mit Lehrpersonen im Hintergrund.",
+    "primaryCta": "Lernen starten",
+    "secondaryCta": "So funktioniert es",
+    "proofLabel": "Lernweg der Familie",
+    "visualTitle": "Ein ruhiger Lernmoment, dann ein klarer naechster Schritt.",
+    "visualBody": "Dieser Rahmen reserviert spaetere Familien- oder Lernbilder und Produkthinweise, ohne Kandidatenbilder als final zu behandeln.",
+    "proofItems": [
+      "Schueler starten mit der echten Schulaufgabe",
+      "Der Learning Assistant fuehrt zum naechsten Schritt",
+      "Lehrpersonen bleiben als Unterstuetzung sichtbar"
+    ]
+  },
+  "learningThread": {
+    "eyebrow": "Lernfaden",
+    "title": "Vom Haengenbleiben zum Verstehen.",
+    "subtitle": "Home V2 soll wie eine Lernhandlung wirken, nicht wie eine Sammlung gleich grosser Funktionen.",
+    "beats": [
+      {
+        "title": "Eine echte Frage entsteht",
+        "body": "Der Schueler bringt den unklaren Schritt aus Hausaufgabe, Uebung oder Arbeitsblatt mit."
+      },
+      {
+        "title": "Der naechste Schritt wird klar",
+        "body": "STOA bleibt beim Lernen und vermeidet den Eindruck schneller Fertigloesungen."
+      },
+      {
+        "title": "Lehrpersonen bleiben nah",
+        "body": "Wenn mehr Hilfe noetig ist, bleibt professionelle Unterstuetzung Teil des Systems."
+      },
+      {
+        "title": "Eltern sehen das Muster",
+        "body": "Eltern verstehen Fortschritt und Fokus, ohne die Hausaufgaben zu uebernehmen."
+      }
+    ]
+  },
+  "parentConfidence": {
+    "eyebrow": "Sicherheit fuer Eltern",
+    "title": "Lernen sehen, ohne selbst Tutor zu werden.",
+    "body": "Die Seite soll zeigen, was sich zu Hause veraendert: weniger Unsicherheit, ein klarerer Rhythmus und Unterstuetzung ohne Druck auf die Eltern.",
+    "visualLabel": "Elternansicht Platzhalter",
+    "points": [
+      "Woran das Kind heute gearbeitet hat",
+      "Wo Unterstuetzung noetig war",
+      "Welcher Fokus als Naechstes sinnvoll ist"
+    ]
+  },
+  "trustLayer": {
+    "eyebrow": "Vertrauen in der Schweiz",
+    "title": "Fuer ernsthafte Bildungsentscheidungen von Familien.",
+    "body": "Der Aufbau haelt Vertrauenssignale kompakt und reserviert Raum fuer spaetere Bilder, Mehrsprachigkeit und Nachweise.",
+    "items": [
+      {
+        "title": "Schweizer Eltern zuerst",
+        "body": "Die Startseite spricht zuerst Eltern an, die taegliche Lernunterstuetzung pruefen."
+      },
+      {
+        "title": "Mit Lehrpersonen im Hintergrund",
+        "body": "Die Sprache bleibt glaubwuerdig und vermeidet Lehrerersatz-Versprechen."
+      },
+      {
+        "title": "Mehrsprachig vorbereitet",
+        "body": "Texte sind fuer spaetere deutsche, englische, franzoesische und italienische Verfeinerung getrennt."
+      }
+    ]
+  },
+  "finalCta": {
+    "eyebrow": "Lernen starten",
+    "title": "Ein ruhigerer Einstieg in die naechste Lerneinheit.",
+    "body": "Dieser Abschluss fuehrt zur Handlung, ohne eine neue visuelle Geschichte zu eroeffnen.",
+    "primaryCta": "Lernen starten",
+    "secondaryCta": "Fuer Eltern"
+  }
+}

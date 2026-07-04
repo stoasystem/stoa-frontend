@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "eyebrow": "Apercu Home V2",
+    "title": "Un soutien scolaire plus calme a la maison.",
+    "subtitle": "Une structure de page pensee pour les parents en Suisse: une tache difficile devient une prochaine etape claire, avec un soutien enseignant si necessaire.",
+    "primaryCta": "Commencer",
+    "secondaryCta": "Voir le fonctionnement",
+    "proofLabel": "Fil d'apprentissage",
+    "visualTitle": "Un moment d'etude calme, puis une etape plus claire.",
+    "visualBody": "Ce cadre reserve l'image familiale ou scolaire et les preuves produit sans traiter les images candidates comme finales.",
+    "proofItems": [
+      "L'eleve part d'une vraie tache scolaire",
+      "Le Learning Assistant guide la prochaine etape",
+      "Le soutien enseignant reste visible"
+    ]
+  },
+  "learningThread": {
+    "eyebrow": "Fil d'apprentissage",
+    "title": "Du blocage a la comprehension.",
+    "subtitle": "Home V2 doit raconter un parcours d'apprentissage, pas une liste de fonctions equivalentes.",
+    "beats": [
+      {
+        "title": "Une vraie question apparait",
+        "body": "L'eleve apporte l'etape confuse d'un devoir, d'un exercice ou d'une fiche scolaire."
+      },
+      {
+        "title": "La prochaine etape devient claire",
+        "body": "STOA garde l'explication centree sur l'apprentissage, pas sur une reponse instantanee."
+      },
+      {
+        "title": "Le soutien enseignant reste proche",
+        "body": "Quand l'eleve a besoin de plus d'aide, le soutien professionnel reste dans le systeme."
+      },
+      {
+        "title": "Les parents voient le fil",
+        "body": "Les parents comprennent les progres et les points d'attention sans faire les devoirs a la place de l'enfant."
+      }
+    ]
+  },
+  "parentConfidence": {
+    "eyebrow": "Confiance des parents",
+    "title": "Voir l'apprentissage sans tout prendre en main.",
+    "body": "La page doit montrer ce qui change a la maison: moins d'incertitude, un rythme plus lisible et un soutien sans transformer les parents en tuteurs.",
+    "visualLabel": "Vue parent placeholder",
+    "points": [
+      "Ce que l'enfant a travaille aujourd'hui",
+      "La ou il a eu besoin de soutien",
+      "Le prochain point de progression"
+    ]
+  },
+  "trustLayer": {
+    "eyebrow": "Confiance suisse",
+    "title": "Pour des decisions educatives serieuses.",
+    "body": "La structure garde les signaux de confiance sobres et reserve l'espace pour les images, les langues et les preuves futures.",
+    "items": [
+      {
+        "title": "Parents suisses d'abord",
+        "body": "La page s'adresse d'abord aux parents qui evaluent un soutien quotidien."
+      },
+      {
+        "title": "Soutien enseignant",
+        "body": "Le langage reste credible et evite les promesses de remplacement du professeur."
+      },
+      {
+        "title": "Pret pour plusieurs langues",
+        "body": "Les textes sont separes pour une future revision en anglais, allemand, francais et italien."
+      }
+    ]
+  },
+  "finalCta": {
+    "eyebrow": "Commencer",
+    "title": "Une entree plus calme dans la prochaine session d'etude.",
+    "body": "Cet appel a l'action conclut la page sans ouvrir une nouvelle histoire visuelle.",
+    "primaryCta": "Commencer",
+    "secondaryCta": "Pour les parents"
+  }
+}

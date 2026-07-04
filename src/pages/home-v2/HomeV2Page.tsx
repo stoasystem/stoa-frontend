@@ -1,19 +1,31 @@
+import { HomeV2FinalCta } from '@/components/home-v2/HomeV2FinalCta'
+import { HomeV2Hero } from '@/components/home-v2/HomeV2Hero'
+import { HomeV2LearningThread } from '@/components/home-v2/HomeV2LearningThread'
+import { HomeV2ParentConfidence } from '@/components/home-v2/HomeV2ParentConfidence'
+import { HomeV2TrustLayer } from '@/components/home-v2/HomeV2TrustLayer'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
+import { useAuthStore } from '@/store/authStore'
+
+function getLearningHref(role?: string | null) {
+  if (role === 'student') return '/practice'
+  if (role === 'parent') return '/parent'
+  if (role === 'tutor') return '/tutor'
+  if (role === 'admin') return '/admin'
+  return '/register?next=/practice'
+}
 
 export function HomeV2Page() {
+  const user = useAuthStore((state) => state.user)
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const learningHref = getLearningHref(isAuthenticated ? user?.role : null)
+
   return (
     <MarketingLayout>
-      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col justify-center px-5 py-20 sm:px-6">
-        <p className="stoa-type-label text-sm font-semibold uppercase tracking-[0.18em] text-[hsl(var(--stoa-brand-burgundy))]">
-          Home V2 preview
-        </p>
-        <h1 className="stoa-type-display mt-5 max-w-4xl text-5xl font-semibold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
-          STOA learning support for Swiss families.
-        </h1>
-        <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-          This isolated preview route will host the new Swiss-parent homepage skeleton before any current homepage switch-over.
-        </p>
-      </section>
+      <HomeV2Hero learningHref={learningHref} />
+      <HomeV2LearningThread />
+      <HomeV2ParentConfidence />
+      <HomeV2TrustLayer />
+      <HomeV2FinalCta learningHref={learningHref} />
     </MarketingLayout>
   )
 }

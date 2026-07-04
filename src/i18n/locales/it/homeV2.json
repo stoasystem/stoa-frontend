@@ -1,0 +1,77 @@
+{
+  "hero": {
+    "eyebrow": "Anteprima Home V2",
+    "title": "Supporto allo studio piu calmo a casa.",
+    "subtitle": "Una struttura pensata per genitori in Svizzera: un compito difficile diventa un prossimo passo chiaro, con supporto docente quando serve.",
+    "primaryCta": "Inizia a studiare",
+    "secondaryCta": "Scopri come funziona",
+    "proofLabel": "Percorso di apprendimento",
+    "visualTitle": "Un momento di studio tranquillo, poi un passo piu chiaro.",
+    "visualBody": "Questo riquadro riserva spazio per immagini e prove prodotto future, senza trattare le immagini candidate come finali.",
+    "proofItems": [
+      "Lo studente parte da un vero compito scolastico",
+      "Il Learning Assistant guida il prossimo passo",
+      "Il supporto docente resta visibile"
+    ]
+  },
+  "learningThread": {
+    "eyebrow": "Percorso",
+    "title": "Dal blocco alla comprensione.",
+    "subtitle": "Home V2 deve sembrare una storia di apprendimento, non una lista di funzioni equivalenti.",
+    "beats": [
+      {
+        "title": "Nasce una domanda reale",
+        "body": "Lo studente porta il passaggio poco chiaro da un compito, un esercizio o una scheda."
+      },
+      {
+        "title": "Il prossimo passo diventa chiaro",
+        "body": "STOA mantiene la spiegazione centrata sull'apprendimento, non sulla risposta istantanea."
+      },
+      {
+        "title": "Il supporto docente resta vicino",
+        "body": "Quando serve piu aiuto, il supporto professionale resta parte del sistema."
+      },
+      {
+        "title": "I genitori vedono il percorso",
+        "body": "I genitori capiscono progressi e punti di attenzione senza sostituirsi allo studente."
+      }
+    ]
+  },
+  "parentConfidence": {
+    "eyebrow": "Fiducia per i genitori",
+    "title": "Vedere l'apprendimento senza prenderne il controllo.",
+    "body": "La pagina deve mostrare cosa cambia a casa: meno incertezza, un ritmo piu chiaro e supporto senza trasformare i genitori in tutor.",
+    "visualLabel": "Vista genitore placeholder",
+    "points": [
+      "Su cosa ha lavorato oggi lo studente",
+      "Dove e servito supporto",
+      "Quale sara il prossimo focus"
+    ]
+  },
+  "trustLayer": {
+    "eyebrow": "Fiducia svizzera",
+    "title": "Per decisioni educative serie.",
+    "body": "La struttura mantiene sobri i segnali di fiducia e lascia spazio a immagini, lingue e prove future.",
+    "items": [
+      {
+        "title": "Genitori svizzeri prima di tutto",
+        "body": "La pagina parla prima ai genitori che valutano supporto quotidiano allo studio."
+      },
+      {
+        "title": "Con supporto docente",
+        "body": "Il linguaggio resta credibile ed evita promesse di sostituzione dell'insegnante."
+      },
+      {
+        "title": "Pronta per piu lingue",
+        "body": "I testi sono separati per futura revisione in inglese, tedesco, francese e italiano."
+      }
+    ]
+  },
+  "finalCta": {
+    "eyebrow": "Inizia a studiare",
+    "title": "Un ingresso piu calmo nella prossima sessione di studio.",
+    "body": "Questa chiamata all'azione chiude la pagina senza aprire una nuova storia visiva.",
+    "primaryCta": "Inizia a studiare",
+    "secondaryCta": "Per i genitori"
+  }
+}
