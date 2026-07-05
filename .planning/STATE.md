@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: 新版路由与组件骨架
 status: Awaiting next milestone
 last_updated: "2026-07-04T18:36:24.970Z"
-last_activity: 2026-07-05 — Softened Home V2 Learning Thread animation to breathing light
+last_activity: 2026-07-05 — Completed quick task 260705-lgd: Show registration password requirements when password is noncompliant
 progress:
   total_phases: 4
   completed_phases: 4
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |
 | 2026-07-05 | Home V2 Learning Thread breathing light | Removed scanning sweep, rail glint, and rotating halo effects; kept only a slow soft active spark and halo breath. |
 | 2026-07-05 | Home V2 narrow Hero image fix | Capped the Hero image panel below desktop, switched narrow screens to a shorter editorial landscape ratio, and preserved the tall desktop Hero composition. |
 | 2026-07-05 | Home V2 desktop nav visibility | Converted Parents/Teachers/Pricing into a clearer segmented pill cluster with 16px text, stronger ink contrast, larger hit areas, and refined hover/focus states. |
