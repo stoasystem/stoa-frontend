@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: 新版路由与组件骨架
 status: Awaiting next milestone
 last_updated: "2026-07-04T18:36:24.970Z"
-last_activity: 2026-07-04 — Milestone v4.0 completed and archived
+last_activity: 2026-07-05 — Completed Home V2 Learning Thread scroll animation quick task
 progress:
   total_phases: 4
   completed_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-07-04)
 Phase: Milestone v4.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-04 — Milestone v4.0 completed and archived
+Last activity: 2026-07-05 — Completed Home V2 Learning Thread scroll animation quick task
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Home V2 Learning Thread animation | Added scroll-driven active beat tracking, progressive lit thread rail, warm active/completed node states, restrained ambient glow, mobile single-column behavior, and reduced-motion handling. |
 | 2026-07-05 | Home V2 Hero refinement | Simplified Hero to a short brand headline, single main image, one proof panel, parent secondary CTA, and nav Login pill after grill-me clarification. |
 | 2026-07-05 | Home V2 premium visual redesign | Rebuilt `/home-v2` visual direction with floating nav, layered imagery, scroll reveal, pill CTA system, compressed preview assets, and family-facing copy while preserving `/`. |
 | 2026-07-04 | Home V2 Swiss-market image refresh | Removed mismatch candidates, added Unsplash alternatives, and updated shortlist/ledger/state. |
@@ -97,7 +98,7 @@ Recent decisions affecting current work:
 | paid_assets | iStock purchase and final license approval | deferred |
 | asset_pipeline | crop/optimization/WebP variants | deferred |
 | implementation | final Home V2 asset insertion into the preview route | deferred |
-| motion | full Home V2 animation choreography | deferred |
+| motion | Learning Thread animation implemented; remaining section-level choreography deferred | partial |
 | copy | final EN/DE/FR/IT homepage copywriting | deferred |
 | switch_over | replacing `/` with Home V2 | deferred |
 | qa | browser screenshot QA with final assets | deferred |
