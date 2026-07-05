@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v4.0
 milestone_name: 新版路由与组件骨架
 status: Awaiting next milestone
-last_updated: "2026-07-04T18:36:24.970Z"
-last_activity: 2026-07-05 — Completed quick task 260705-lgd: Show registration password requirements when password is noncompliant
+last_updated: "2026-07-05T14:41:28Z"
+last_activity: 2026-07-05 — Completed quick task 260705-n4u: Email verification Unauthorized fix
 progress:
   total_phases: 4
   completed_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-07-04)
 Phase: Milestone v4.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-05 — Softened Home V2 Learning Thread animation to breathing light
+Last activity: 2026-07-05 — Fixed email verification Unauthorized caused by stale auth tokens on public verification requests
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Email verification Unauthorized fix | Kept public auth endpoints free of stale bearer tokens, mapped 401 verification failures to recovery copy, and verified the stale-token login/resend/confirm flow with auth e2e coverage. |
 | 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |
 | 2026-07-05 | Home V2 Learning Thread breathing light | Removed scanning sweep, rail glint, and rotating halo effects; kept only a slow soft active spark and halo breath. |
 | 2026-07-05 | Home V2 narrow Hero image fix | Capped the Hero image panel below desktop, switched narrow screens to a shorter editorial landscape ratio, and preserved the tall desktop Hero composition. |
