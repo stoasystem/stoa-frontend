@@ -45,11 +45,15 @@ export function RegisterAccountStep({
         <Input
           id="password"
           type="password"
+          aria-describedby="password-requirements"
           value={password}
           onChange={(event) => onChange({ password: event.target.value })}
           autoComplete="new-password"
           required
         />
+        <p id="password-requirements" className="text-sm text-muted-foreground">
+          {t('errors:passwordRequirements')}
+        </p>
       </div>
       <div className="rounded-lg border border-border/70 bg-secondary/40 p-3">
         <label className="flex gap-3 text-sm leading-6">

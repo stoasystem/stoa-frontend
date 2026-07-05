@@ -9,6 +9,7 @@ import { StudentProfileStep } from '@/components/auth/StudentProfileStep'
 import { TutorProfileStep } from '@/components/auth/TutorProfileStep'
 import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
+import { isCompliantPassword } from '@/lib/validation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
 import { getInitialLanguage, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
@@ -121,7 +122,7 @@ export function RegisterForm() {
   function validateCurrentStep() {
     if (step === 'account') {
       if (!name.trim() || !email.trim() || !password.trim()) return t('errors:required')
-      if (password.length < 8) return t('errors:passwordTooShort')
+      if (!isCompliantPassword(password)) return t('errors:passwordRequirements')
       if (!acceptedTerms) return t('errors:acceptTerms')
     }
 
@@ -192,6 +193,12 @@ export function RegisterForm() {
     })
   }
 
+  const registrationError = registerMutation.isError
+    ? toUserFacingError(registerMutation.error, t('auth:register.failed'))
+    : null
+  const registrationErrorMessage =
+    registrationError === 'Password does not meet requirements' ? t('errors:passwordRequirements') : registrationError
+
   if (step === 'done' && registerMutation.data) {
     return <RegisterConfirmationStep data={registerMutation.data} />
   }
@@ -253,7 +260,7 @@ export function RegisterForm() {
       {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">{error}</p>}
       {registerMutation.isError && (
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-          {toUserFacingError(registerMutation.error, t('auth:register.failed'))}
+          {registrationErrorMessage}
         </p>
       )}
 

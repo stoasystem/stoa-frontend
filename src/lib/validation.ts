@@ -17,10 +17,20 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 })
 
+export function isCompliantPassword(password: string) {
+  return (
+    password.length >= 8 &&
+    /[a-z]/.test(password) &&
+    /[A-Z]/.test(password) &&
+    /\d/.test(password) &&
+    /[^A-Za-z0-9]/.test(password)
+  )
+}
+
 export const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters.'),
   email: z.string().email('Enter a valid email address.'),
-  password: z.string().min(8, 'Password must be at least 8 characters.'),
+  password: z.string().refine(isCompliantPassword, 'Password must meet the requirements.'),
   role: userRoleSchema,
   acceptedTerms: z.literal(true, {
     message: 'Accept the privacy policy and terms to continue.',

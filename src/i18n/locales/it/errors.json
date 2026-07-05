@@ -3,6 +3,7 @@
   "invalidEmail": "Inserisci un indirizzo email valido.",
   "passwordRequired": "La password è obbligatoria.",
   "passwordTooShort": "La password deve contenere almeno 8 caratteri.",
+  "passwordRequirements": "La password deve contenere almeno 8 caratteri e includere lettere maiuscole e minuscole, un numero e un simbolo.",
   "nameTooShort": "Il nome deve contenere almeno 2 caratteri.",
   "acceptTerms": "Accetta privacy e termini per continuare.",
   "gradeRequired": "La classe è obbligatoria.",

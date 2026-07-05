@@ -65,9 +65,10 @@ test('registration pending verification shows code and resend actions', async ({
 
   await page.goto('/register')
   await page.getByRole('button', { name: /continue/i }).click()
+  await expect(page.getByText(/include uppercase and lowercase letters, a number, and a symbol/i)).toBeVisible()
   await page.getByLabel('Name').fill('Student New')
   await page.getByLabel('Email').fill('new-student@example.com')
-  await page.getByLabel('Password').fill('password123')
+  await page.getByLabel('Password').fill('ValidPass123!')
   await page.getByLabel(/privacy policy and terms/i).check()
   await page.getByRole('button', { name: /continue/i }).click()
   await page.getByLabel('Parent name').fill('Parent New')
