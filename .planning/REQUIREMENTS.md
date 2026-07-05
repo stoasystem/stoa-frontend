@@ -1,87 +1,56 @@
-# Requirements: STOA Frontend v4.0
+# Requirements: STOA Frontend v6.1
 
-**Defined:** 2026-07-04
-**Core Value:** STOA can add an isolated, previewable Home V2 route and component skeleton that proves the Swiss-parent homepage structure without replacing the current `/` homepage.
+**Defined:** 2026-07-05
+**Core Value:** STOA's Home V2 Parent Confidence section should make Swiss parents feel calmly informed without suggesting anxious homework takeover, surveillance, or feature-dashboard monitoring.
 
-## v4.0 Requirements
+## v6.1 Requirements
 
-### Routing
+### Parent Confidence
 
-- [x] **ROUTE-01**: `/home-v2` renders as a public preview route.
-- [x] **ROUTE-02**: The current `/` homepage remains unchanged.
-- [x] **ROUTE-03**: `/home-v2` is added to the public route inventory.
-
-### Component Skeleton
-
-- [x] **SKEL-01**: `HomeV2Page` exists under `src/pages/home-v2/`.
-- [x] **SKEL-02**: Home V2 section components exist under `src/components/home-v2/`.
-- [x] **SKEL-03**: The five locked Home V2 sections render: Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA.
-
-### Preview Layout
-
-- [x] **LAYOUT-01**: The skeleton is previewable, with visible layout rhythm, CTA placement, and placeholder visual/proof surfaces.
-- [x] **LAYOUT-02**: The Hero uses an editorial split on desktop and a stable single-column mobile fallback.
-- [x] **LAYOUT-03**: The route respects v2.7 visual constraints by avoiding generic SaaS grids, decorative gradient orbs, nested card-heavy page sections, and AI-forward hero positioning.
-
-### i18n
-
-- [x] **I18N-01**: A `homeV2` i18n namespace is added to the frontend i18n configuration.
-- [x] **I18N-02**: English, German, French, and Italian provisional `homeV2.json` locale files exist.
-- [x] **I18N-03**: Visible Home V2 skeleton copy uses i18n resources instead of hard-coded English strings.
-
-### Boundaries And Verification
-
-- [x] **BOUND-01**: v4.0 excludes final image optimization, full animation choreography, final copywriting, screenshot QA, and `/` switch-over.
-- [x] **VERIFY-01**: Build and lint verification cover the new Home V2 route and skeleton.
-- [x] **VERIFY-02**: Documentation records the v4.0 implementation handoff and deferred items.
+- [ ] **PC-01**: Parents can understand the section's emotional promise: they can stay close to the learning rhythm without taking over the child's homework.
+- [ ] **PC-02**: Parents can see a warm family-learning composition that feels concrete and reassuring without becoming a generic full-bleed stock block.
+- [ ] **PC-03**: Parents see one restrained progress-note/proof surface instead of a stack of dashboard-like feature pills.
+- [ ] **PC-04**: Parents read short, non-technical copy that communicates relief, calm proximity, and trust in the next learning step.
+- [ ] **PC-05**: The Parent Confidence layout remains controlled and legible at desktop, narrow/tablet, and mobile widths.
+- [ ] **PC-06**: The redesign is verified with lint, build, Home V2 E2E, and browser/screenshot smoke checks for the Parent Confidence section.
 
 ## Future Requirements
 
 | Requirement | Reason Deferred |
 |-------------|-----------------|
-| Final Home V2 image crop/optimization and WebP/AVIF variants | Requires final asset approval and a dedicated asset implementation pass. |
-| Full Home V2 animation choreography | Needs the route skeleton first, then motion design and browser performance QA. |
-| Final EN/DE/FR/IT homepage copywriting | Needs route and section structure first; final copy should be its own reviewable milestone. |
-| Screenshot and visual regression QA | Should run after the preview route has implemented layout and assets stable enough to inspect. |
-| Switching `/` to Home V2 | Requires explicit later approval after route, assets, copy, localization, animation, and QA are complete. |
-| Paid or commissioned Swiss Hero photography | Requires budget/source approval and final-use license review. |
+| Home V2 Trust And Assurance image-led redesign | Planned separately as v6.2 so Parent Confidence and Trust can have distinct emotional roles. |
+| Final paid or commissioned Swiss/European photography | Requires separate source approval, licensing review, and possible budget decision. |
+| Replacing `/` with Home V2 | Requires later explicit approval after assets, copy, motion, localization, and screenshot QA are complete. |
+| Final EN/DE/FR/IT homepage-wide copy pass | v6.1 only updates copy required for Parent Confidence. |
+| Full-page Home V2 animation choreography | v6.1 may preserve existing motion but does not own full page-level choreography. |
 
 ## Out of Scope
 
 | Item | Reason |
 |------|--------|
-| Replacing the current homepage route `/` | v4.0 creates an isolated preview route only. |
-| Refactoring the current `src/components/home/` implementation | Home V2 should be isolated so the current homepage remains stable. |
-| Adding new backend, auth, registration, quota, payment, or role-dashboard behavior | The milestone is frontend route/component skeleton work only. |
-| Treating candidate images as final production assets | Candidate images remain unoptimized and not final-approved. |
-| Hero-level AI, instant-solver, OCR, guaranteed-improvement, or teacher-replacement claims | These conflict with the agreed Swiss high-end education positioning and current product capabilities. |
-| Adding a new animation or image-processing dependency | Research found no new dependency is required for the skeleton milestone. |
+| Replacing the public homepage route `/` | v6.1 works only inside the existing `/home-v2` preview route. |
+| Backend, auth, registration, quota, payment, or role-dashboard behavior | The milestone is a public homepage section redesign only. |
+| New product claims about guaranteed improvement or instant outcomes | These conflict with STOA's credible education positioning. |
+| Surveillance, monitoring, or control-oriented parent language | The agreed message is calm parental reassurance, not supervision. |
+| Multi-pill feature overlays or dense SaaS dashboard UI | The section should show a family state and one quiet proof note. |
+| Final paid asset purchase or commissioned shoot | Asset sourcing remains gated outside this implementation milestone. |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ROUTE-01 | 244 | Complete |
-| ROUTE-02 | 244 | Complete |
-| ROUTE-03 | 244 | Complete |
-| SKEL-01 | 245 | Complete |
-| SKEL-02 | 245 | Complete |
-| SKEL-03 | 245 | Complete |
-| I18N-01 | 245 | Complete |
-| I18N-02 | 245 | Complete |
-| I18N-03 | 245 | Complete |
-| LAYOUT-01 | 246 | Complete |
-| LAYOUT-02 | 246 | Complete |
-| LAYOUT-03 | 246 | Complete |
-| BOUND-01 | 247 | Complete |
-| VERIFY-01 | 247 | Complete |
-| VERIFY-02 | 247 | Complete |
+| PC-01 | 248 | Pending |
+| PC-02 | 249 | Pending |
+| PC-03 | 249 | Pending |
+| PC-04 | 250 | Pending |
+| PC-05 | 251 | Pending |
+| PC-06 | 251 | Pending |
 
 **Coverage:**
-- v4.0 requirements: 15 total
-- Mapped to phases: 15
+- v6.1 requirements: 6 total
+- Mapped to phases: 6
 - Unmapped: 0
 
 ---
-*Requirements defined: 2026-07-04*
-*Last updated: 2026-07-04 after v4.0 requirements definition*
+*Requirements defined: 2026-07-05*
+*Last updated: 2026-07-05 after starting v6.1 Parent Confidence redesign*

@@ -10,11 +10,14 @@
 **Depends on:** v6.1 Home V2 Parent Confidence Redesign
 **Scope:** Redesign Trust into a warm, artistic, image-led assurance section with a precision principle list. Avoid generic feature cards, repeated "Swiss" labeling, and loud privacy marketing.
 
-### v6.1 Home V2 Parent Confidence Redesign (Planned)
+### v6.1 Home V2 Parent Confidence Redesign (Active)
 
-**Status:** Planned
-**Requirements:** `.planning/milestones/v6.1-REQUIREMENTS.md`
-**Roadmap:** `.planning/milestones/v6.1-ROADMAP.md`
+**Status:** Active
+**Active requirements:** `.planning/REQUIREMENTS.md`
+**Active roadmap:** `.planning/ROADMAP.md`
+**Source requirements:** `.planning/milestones/v6.1-REQUIREMENTS.md`
+**Source roadmap:** `.planning/milestones/v6.1-ROADMAP.md`
+**Phases:** 248-251
 **Depends on:** v4.0 Home V2 route/component skeleton and current `/home-v2` preview implementation
 **Scope:** Redesign Parent Confidence around parent emotional relief: staying close without anxiously taking over homework. Replace multi-pill feature overlays with one restrained progress note/proof surface.
 

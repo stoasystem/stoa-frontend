@@ -3,7 +3,7 @@
 ## Milestones
 
 - ⏳ **v6.2 Home V2 Trust And Assurance Redesign** - Planned
-- ⏳ **v6.1 Home V2 Parent Confidence Redesign** - Planned
+- 🔄 **v6.1 Home V2 Parent Confidence Redesign** - Active, Phases 248-251
 - ✅ **v4.0 新版路由与组件骨架** - Phases 244-247 (shipped 2026-07-04)
 - ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
 - ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
@@ -12,90 +12,88 @@
 
 ## Phases
 
-- [x] **Phase 244: Home V2 Route And Public Inventory** - Add the isolated `/home-v2` public preview route while preserving the current `/` homepage and route inventory.
-- [x] **Phase 245: Home V2 Component Namespace And i18n Skeleton** - Create the Home V2 page/component namespace and provisional `homeV2` i18n resources.
-- [x] **Phase 246: Preview Layout And Visual Skeleton** - Build the previewable five-section layout with responsive rhythm and placeholder-safe proof surfaces.
-- [x] **Phase 247: Boundaries Verification And Handoff** - Verify lint/build, document deferred work, and close v4.0 with route/component handoff.
+- [ ] **Phase 248: Parent Confidence Audit And Copy Contract** - Lock the parent-facing emotional promise and remove dashboard-like wording before implementation.
+- [ ] **Phase 249: Parent Confidence Visual Structure** - Define the warm image-plus-note composition, responsive proportions, and proof surface behavior.
+- [ ] **Phase 250: Parent Confidence Implementation** - Update the Home V2 Parent Confidence component, scoped styles, and required EN/DE/FR/IT copy.
+- [ ] **Phase 251: Parent Confidence Verification And Polish** - Run quality gates, inspect desktop/tablet/mobile layouts, and fix visual density or responsive issues.
 
 ## Phase Details
 
-### Phase 244: Home V2 Route And Public Inventory
+### Phase 248: Parent Confidence Audit And Copy Contract
 
-**Goal**: Home V2 has a public preview route that is reachable without changing the existing homepage.
-**Depends on**: Phase 243
-**Requirements**: ROUTE-01, ROUTE-02, ROUTE-03
+**Goal**: The section has a clear emotional contract: parents stay close without anxiously taking over homework.
+**Depends on**: Phase 247
+**Requirements**: PC-01
 **Success Criteria**:
-  1. `/home-v2` renders through `AppRouter` as a public route.
-  2. `/` still renders the existing `HomePage` and current homepage component tree.
-  3. `routeGroups.public` includes `/home-v2`.
-  4. No auth, registration, quota, protected-route, or role-dashboard behavior changes are introduced.
-**Plans**: 244-PLAN.md
+  1. Current `HomeV2ParentConfidence` layout, overlays, image use, and copy are audited.
+  2. Dashboard-like, monitoring-heavy, AI-forward, or feature-list wording is identified for removal or softening.
+  3. Final title/body/proof-note direction is defined before component edits.
+  4. EN/DE/FR/IT copy changes keep the same semantic promise rather than literal translation.
+**Plans**: 248-PLAN.md
 **UI hint**: yes
 
-### Phase 245: Home V2 Component Namespace And i18n Skeleton
+### Phase 249: Parent Confidence Visual Structure
 
-**Goal**: Home V2 has an isolated page/component namespace and provisional multilingual copy plumbing.
-**Depends on**: Phase 244
-**Requirements**: SKEL-01, SKEL-02, SKEL-03, I18N-01, I18N-02, I18N-03
+**Goal**: The section has a premium image-plus-note composition instead of a multi-pill feature overlay.
+**Depends on**: Phase 248
+**Requirements**: PC-02, PC-03
 **Success Criteria**:
-  1. `src/pages/home-v2/HomeV2Page.tsx` exists and owns the Home V2 page composition.
-  2. `src/components/home-v2/` contains section-level Home V2 components.
-  3. Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA all render.
-  4. `homeV2` is registered in the i18n namespace list and resource setup.
-  5. EN/DE/FR/IT provisional `homeV2.json` resources exist and visible skeleton copy reads from them.
-**Plans**: 245-PLAN.md
+  1. The image treatment feels warm and family-oriented without implying surveillance or parent control.
+  2. One restrained progress-note/proof surface replaces the current pill stack.
+  3. Desktop, narrow/tablet, and mobile layout proportions are defined before styling.
+  4. Existing Home V2 double-bezel depth is preserved without nested-card clutter.
+**Plans**: 249-PLAN.md
 **UI hint**: yes
 
-### Phase 246: Preview Layout And Visual Skeleton
+### Phase 250: Parent Confidence Implementation
 
-**Goal**: The `/home-v2` route becomes a previewable skeleton with real section rhythm and responsive layout.
-**Depends on**: Phase 245
-**Requirements**: LAYOUT-01, LAYOUT-02, LAYOUT-03
+**Goal**: `/home-v2` renders the redesigned Parent Confidence section with scoped code changes.
+**Depends on**: Phase 249
+**Requirements**: PC-04
 **Success Criteria**:
-  1. The page has visible layout rhythm, CTA placement, and placeholder media/proof surfaces.
-  2. Hero uses an editorial split on desktop and a stable single-column mobile fallback.
-  3. The five-section scroll narrative reads as one learning thread, not a generic feature-card grid.
-  4. The skeleton avoids decorative gradient orbs, AI-forward hero language, nested page-section cards, and one-note palette behavior.
-  5. Placeholder visual frames reserve later asset/proof slots without treating candidate images as final assets.
-**Plans**: 246-PLAN.md
+  1. `HomeV2ParentConfidence.tsx` reflects the new parent reassurance hierarchy.
+  2. `home-v2-premium.css` changes are scoped to the section and do not destabilize other Home V2 sections.
+  3. EN/DE/FR/IT `homeV2` copy is updated only where v6.1 requires it.
+  4. The current `/` homepage remains unchanged.
+**Plans**: 250-PLAN.md
 **UI hint**: yes
 
-### Phase 247: Boundaries Verification And Handoff
+### Phase 251: Parent Confidence Verification And Polish
 
-**Goal**: v4.0 is verified and handed off as a route/component skeleton milestone, with later implementation work clearly deferred.
-**Depends on**: Phase 246
-**Requirements**: BOUND-01, VERIFY-01, VERIFY-02
+**Goal**: The redesigned section passes technical gates and visual inspection across target viewports.
+**Depends on**: Phase 250
+**Requirements**: PC-05, PC-06
 **Success Criteria**:
-  1. v4.0 explicitly excludes final image optimization, full animation choreography, final copywriting, screenshot QA, and `/` switch-over.
-  2. `npm run lint` passes.
-  3. `npm run build` passes.
-  4. Documentation records route/component decisions, verification results, and deferred follow-up milestones.
-  5. Current `/` remains unchanged after implementation verification.
-**Plans**: 247-PLAN.md
-**UI hint**: no
+  1. `npm run lint` passes.
+  2. `npm run build` passes.
+  3. `npm run test:e2e -- home-v2.spec.ts` passes.
+  4. Desktop around 1440px, narrow/tablet around 900px, and mobile around 390px browser/screenshot checks show no incoherent overlap, image dominance, or text crowding.
+  5. Verification notes capture any remaining deferred asset/copy risks.
+**Plans**: 251-PLAN.md
+**UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 244. Home V2 Route And Public Inventory | 1/1 | Complete | 2026-07-04 |
-| 245. Home V2 Component Namespace And i18n Skeleton | 1/1 | Complete | 2026-07-04 |
-| 246. Preview Layout And Visual Skeleton | 1/1 | Complete | 2026-07-04 |
-| 247. Boundaries Verification And Handoff | 1/1 | Complete | 2026-07-04 |
+| 248. Parent Confidence Audit And Copy Contract | 0/1 | Pending | — |
+| 249. Parent Confidence Visual Structure | 0/1 | Pending | — |
+| 250. Parent Confidence Implementation | 0/1 | Pending | — |
+| 251. Parent Confidence Verification And Polish | 0/1 | Pending | — |
 
 ## Coverage
 
 | Phase | Requirement Count | Requirements |
 |-------|-------------------|--------------|
-| 244 | 3 | ROUTE-01, ROUTE-02, ROUTE-03 |
-| 245 | 6 | SKEL-01, SKEL-02, SKEL-03, I18N-01, I18N-02, I18N-03 |
-| 246 | 3 | LAYOUT-01, LAYOUT-02, LAYOUT-03 |
-| 247 | 3 | BOUND-01, VERIFY-01, VERIFY-02 |
+| 248 | 1 | PC-01 |
+| 249 | 2 | PC-02, PC-03 |
+| 250 | 1 | PC-04 |
+| 251 | 2 | PC-05, PC-06 |
 
-**Total requirements:** 15
-**Mapped requirements:** 15
+**Total requirements:** 6
+**Mapped requirements:** 6
 **Unmapped requirements:** 0
 
 ## Next Up
 
-v6.1 is the next recommended Home V2 milestone: redesign Parent Confidence around parental reassurance without anxious intervention. v6.2 should follow with the image-led Trust/Assurance redesign once the Parent Confidence contrast is established.
+Start Phase 248 to audit the current Parent Confidence section and lock the copy contract before visual/code implementation.

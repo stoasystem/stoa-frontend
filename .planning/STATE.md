@@ -1,55 +1,55 @@
 ---
 gsd_state_version: 1.0
-milestone: v4.0
-milestone_name: 新版路由与组件骨架
-status: Awaiting next milestone
-last_updated: "2026-07-05T14:41:28Z"
-last_activity: 2026-07-05 — Planned Home V2 v6.1 Parent Confidence and v6.2 Trust/Assurance milestones
+milestone: v6.1
+milestone_name: Home V2 Parent Confidence Redesign
+status: planning
+last_updated: "2026-07-05T17:01:57Z"
+last_activity: 2026-07-05 — v6.1 requirements and roadmap created for Home V2 Parent Confidence redesign
 progress:
   total_phases: 4
-  completed_phases: 4
+  completed_phases: 0
   total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-04)
+See: .planning/PROJECT.md (updated 2026-07-05)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v4.0 新版路由与组件骨架 is complete. Home V2 now has an isolated `/home-v2` preview route, component namespace, provisional `homeV2` i18n skeleton, previewable layout, focused E2E smoke coverage, and handoff documentation while keeping the current `/` homepage unchanged.
+**Current focus:** Milestone v6.1 Home V2 Parent Confidence Redesign is active. The work should make the Parent Confidence section feel like calm parent reassurance rather than a feature dashboard: parents stay close to the learning rhythm without anxiously taking over homework.
 
 ## Current Position
 
-Phase: Milestone v4.0 complete
+Phase: 248 — Parent Confidence Audit And Copy Contract
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-05 — Planned Home V2 v6.1 Parent Confidence and v6.2 Trust/Assurance milestones
+Status: Ready for phase planning
+Last activity: 2026-07-05 — v6.1 requirements and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 4
-- Average duration: same-day route/component skeleton execution
-- Total execution time: completed 2026-07-04
+- Total plans completed this milestone: 0 of 4
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 244 | 1/1 | Complete | 2026-07-04 |
-| 245 | 1/1 | Complete | 2026-07-04 |
-| 246 | 1/1 | Complete | 2026-07-04 |
-| 247 | 1/1 | Complete | 2026-07-04 |
+| 248 | 0/1 | Pending | — |
+| 249 | 0/1 | Pending | — |
+| 250 | 0/1 | Pending | — |
+| 251 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 4 completed phases: 244, 245, 246, 247
-- Trend: v4.0 completed the isolated `/home-v2` route, section component namespace, provisional `homeV2` i18n skeleton, previewable visual layout, verification, and handoff.
+- Last 4 planned phases: 248, 249, 250, 251
+- Trend: v6.1 starts from Home V2's existing preview route and focuses narrowly on Parent Confidence emotional reassurance, visual structure, implementation, and verification.
 
 *Updated after each plan completion*
 
@@ -72,6 +72,7 @@ Recent decisions affecting current work:
 - v4.0 keeps final asset insertion, motion choreography, final copy/localization, screenshot QA, and switching `/` as separate future milestones.
 - 2026-07-05 Home V2 visual feedback: the first skeleton still felt too close to the current homepage, so `/home-v2` was reworked toward an Editorial Luxury plus Z-Axis Cascade direction with scoped visual tokens, floating island navigation, layered image/proof surfaces, pill CTAs, and scroll reveal behavior.
 - 2026-07-05 Home V2 Hero grilling: Hero direction was narrowed to short brand headline, one main family-learning image, one minimal proof panel, Start learning plus For parents CTAs, and a low-noise but easy-to-find Login entry in the floating nav.
+- 2026-07-05 v6.1 starts Parent Confidence as an emotional reassurance section: parents stay close without anxious intervention, and the section should use one quiet progress note rather than feature pills or dashboard language.
 
 ### Quick Tasks Completed
 
@@ -114,4 +115,4 @@ Recent decisions affecting current work:
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Start Phase 248 with /gsd-plan-phase 248

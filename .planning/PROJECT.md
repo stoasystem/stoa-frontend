@@ -23,15 +23,16 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - `homeV2` is registered in i18n and has provisional EN/DE/FR/IT resources.
 - Final assets, motion, copywriting, visual regression approval, and `/` switch-over remain later explicit milestones.
 
-## Current Milestone: None Active
+## Current Milestone: v6.1 Home V2 Parent Confidence Redesign
 
-**Goal:** v4.0 is complete. Recommended next scope is final asset insertion and optimization, motion choreography, final Home V2 copy/localization, screenshot QA, or explicit `/` switch-over approval.
+**Goal:** Redesign the Home V2 Parent Confidence section so Swiss parents feel calmly informed and close to the learning rhythm without anxiously taking over homework.
 
 **Target features:**
 - Preserve current `/` until explicit replacement approval.
-- Keep `/home-v2` as the preview route for Home V2 follow-up milestones.
-- Use `docs/home/home-v2-route-component-handoff.md`, v2.6 IA, v2.7 visual direction, v2.8 asset strategy, and v3.1 image shortlist as inputs.
-- Treat final images, motion, copy, screenshots, and `/` replacement as separate follow-up milestones.
+- Keep `/home-v2` as the isolated preview route for Parent Confidence work.
+- Replace the current multi-pill feature overlay with one restrained parent-facing progress note/proof surface.
+- Use warmer family-learning composition and short parent-first copy instead of dashboard, monitoring, or feature-list language.
+- Preserve EN/DE/FR/IT `homeV2` plumbing and update only the copy needed for this section.
 
 ## Current State
 
@@ -145,7 +146,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- No active milestone requirements. Start the next Home V2 milestone with `$gsd-new-milestone` when ready.
+- [ ] **PC-01**: Parents can understand the section's emotional promise: they can stay close to the learning rhythm without taking over the child's homework.
+- [ ] **PC-02**: Parents can see a warm family-learning composition that feels concrete and reassuring without becoming a generic full-bleed stock block.
+- [ ] **PC-03**: Parents see one restrained progress-note/proof surface instead of a stack of dashboard-like feature pills.
+- [ ] **PC-04**: Parents read short, non-technical copy that communicates relief, calm proximity, and trust in the next learning step.
+- [ ] **PC-05**: The Parent Confidence layout remains controlled and legible at desktop, narrow/tablet, and mobile widths.
+- [ ] **PC-06**: The redesign is verified with lint, build, Home V2 E2E, and browser/screenshot smoke checks for the Parent Confidence section.
 
 ### Out of Scope
 
@@ -500,6 +506,7 @@ Current codebase facts:
 | Keep Home V2 visual direction separate from app surfaces | Public homepage polish should not leak large hero typography, decorative panels, or cinematic spacing into dense student/tutor/admin workflows | — Pending |
 | Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | v4.0 Complete |
 | Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | v4.0 Complete |
+| Make Parent Confidence an emotional reassurance section | The section should express parents staying close without anxious intervention, so v6.1 should reduce dashboard language and replace feature pills with one quiet progress note | v6.1 Pending |
 
 ## Evolution
 
@@ -519,4 +526,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-04 after completing v4.0 Home V2 route and component skeleton*
+*Last updated: 2026-07-05 after starting v6.1 Home V2 Parent Confidence redesign*
