@@ -10,6 +10,12 @@ type LearningBeat = {
   body: string
 }
 
+function getBeatLayoutClass(index: number) {
+  if (index === 0) return 'md:col-span-4'
+  if (index === 3) return 'md:col-span-4 md:col-start-3'
+  return 'md:col-span-3'
+}
+
 export function HomeV2LearningThread() {
   const { t } = useTranslation('homeV2')
   const beats = t('learningThread.beats', { returnObjects: true }) as LearningBeat[]
@@ -96,7 +102,7 @@ export function HomeV2LearningThread() {
                 'home-v2-thread-item',
                 index <= activeBeatIndex && 'is-complete',
                 index === activeBeatIndex && 'is-active',
-                index === 0 || index === 3 ? 'md:col-span-4' : 'md:col-span-3',
+                getBeatLayoutClass(index),
               )}
             >
               <article
