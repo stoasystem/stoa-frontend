@@ -62,6 +62,8 @@ export type AccountOperationsUsage = {
   entitlementSource?: string | null
   billingState?: string | null
   reconciliation?: Record<string, unknown>
+  supportAction?: string | null
+  explanation?: string | null
   partial?: boolean
   stale?: boolean
   unreconciled?: boolean

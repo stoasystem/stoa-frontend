@@ -233,6 +233,12 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
               </div>
               <p className="mt-4 text-2xl font-semibold text-foreground">{item.remaining} remaining</p>
               <p className="mt-1 text-sm text-muted-foreground">{item.consumed} of {item.limit} used</p>
+              {item.supportAction && (
+                <p className="mt-3 text-sm font-medium text-foreground">Support: {formatStatus(item.supportAction)}</p>
+              )}
+              {item.explanation && (
+                <p className="mt-1 text-sm text-muted-foreground">{item.explanation}</p>
+              )}
             </CardContent>
           </Card>
         ))}
