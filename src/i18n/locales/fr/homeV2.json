@@ -1,78 +1,78 @@
 {
   "hero": {
-    "eyebrow": "Apprentissage familial en Suisse",
-    "title": "Apprendre avec calme.",
-    "subtitle": "Quand les devoirs bloquent, STOA aide votre enfant a trouver la prochaine etape et garde le soutien enseignant assez proche pour rassurer les parents.",
+    "eyebrow": "Apprendre en famille",
+    "title": "Commencer par la question.",
+    "subtitle": "STOA aide votre enfant a travailler l'etape suivante, avec un soutien enseignant quand il est necessaire.",
     "primaryCta": "Commencer",
     "secondaryCta": "Pour les parents",
     "proofLabel": "Etat d'apprentissage",
     "proofTitle": "Prochaine etape claire",
-    "proofBody": "Le soutien enseignant reste disponible quand une question demande plus qu'un indice."
+    "proofBody": "Un enseignant peut intervenir quand un indice ne suffit plus."
   },
   "learningThread": {
     "eyebrow": "Fil d'apprentissage",
-    "title": "Du blocage a la comprehension.",
-    "subtitle": "La page suit un moment d'apprentissage familial, de la question au prochain pas plus confiant.",
+    "title": "La prochaine etape devient claire.",
+    "subtitle": "Une question peut passer du premier doute au bon niveau de soutien.",
     "beats": [
       {
-        "title": "Une vraie question apparait",
-        "body": "L'eleve apporte l'etape confuse d'un devoir, d'un exercice ou d'une fiche scolaire."
+        "title": "Une question apparait.",
+        "body": "Commencez par la partie qui ne fait plus sens."
       },
       {
-        "title": "La prochaine etape devient claire",
-        "body": "STOA garde l'explication centree sur l'apprentissage, pas sur une reponse instantanee."
+        "title": "L'etape suivante prend forme.",
+        "body": "Un indice aide le travail a continuer sans donner la reponse."
       },
       {
-        "title": "Le soutien enseignant reste proche",
-        "body": "Quand l'eleve a besoin de plus d'aide, le soutien professionnel reste dans le systeme."
+        "title": "Un enseignant peut intervenir.",
+        "body": "Certaines questions demandent plus qu'un indice. STOA laisse cette place."
       },
       {
-        "title": "Les parents voient le fil",
-        "body": "Les parents comprennent les progres et les points d'attention sans faire les devoirs a la place de l'enfant."
+        "title": "L'apprentissage devient plus clair a la maison.",
+        "body": "Les parents voient ce qui a ete travaille, ou le soutien a aide et ce qui vient ensuite."
       }
     ]
   },
   "parentConfidence": {
     "eyebrow": "Confiance des parents",
-    "title": "Assez pres pour faire confiance. Assez loin pour laisser apprendre.",
-    "body": "Une courte note donne aux parents le rythme de la semaine, sans les placer au-dessus de chaque etape.",
-    "visualLabel": "Rythme familial",
+    "title": "Une vision plus claire de l'apprentissage.",
+    "body": "Voyez ce que votre enfant travaille, ou le soutien a aide et ce qui est pret pour la prochaine session.",
+    "visualLabel": "Note d'apprentissage",
     "note": {
-      "eyebrow": "Note de la semaine",
-      "title": "Plus calme a la maison",
-      "body": "Votre enfant a demande de l'aide au bon moment. Les fractions restent le point de travail de la prochaine seance."
+      "eyebrow": "Cette semaine",
+      "title": "Les fractions sont au centre",
+      "body": "Votre enfant a travaille les fractions equivalentes et a utilise le soutien quand la methode est devenue moins claire."
     }
   },
   "trustLayer": {
     "eyebrow": "Assurance par le service",
-    "title": "Rassurer sans intervenir.",
-    "body": "STOA donne aux parents le fil de la semaine, pendant que l'enfant garde l'espace pour avancer.",
+    "title": "Un soutien avec le sens de la mesure.",
+    "body": "Un indice quand il aide. Un enseignant quand cela compte. Aucune promesse que l'apprentissage doive etre presse.",
     "visualLabel": "Signal discret",
     "caption": "Un signal d'apprentissage, pas une fenetre en direct.",
     "principles": [
       {
-        "title": "Le bon contexte",
-        "body": "Les parents voient ce qui avance, ce qui demande encore de l'entrainement et ou le soutien a aide."
+        "title": "Le travail reste educatif",
+        "body": "Le soutien indique l'etape suivante, pas un raccourci autour de l'apprentissage."
       },
       {
-        "title": "Des limites claires",
-        "body": "L'enfant garde le travail. STOA garde l'etape suivante calme et concentree."
+        "title": "L'enfant garde le travail",
+        "body": "STOA peut guider le moment sans retirer la question."
       },
       {
-        "title": "Un progres facile a discuter",
-        "body": "Un rythme court aide la conversation a la maison sans rouvrir chaque reponse."
+        "title": "Un enseignant quand cela compte",
+        "body": "Quand une question a besoin d'une personne, le chemin vers le soutien enseignant fait partie de l'experience."
       },
       {
         "title": "Pas de grandes promesses",
-        "body": "Le service reste prudent: soutien, entrainement et aide enseignante quand cela compte."
+        "body": "Le progres reste une question de pratique, de soutien et de temps avec la matiere."
       }
     ],
-    "footnote": "Le respect passe par le comportement du produit: moins d'affirmations, des limites plus claires et une conversation plus calme."
+    "footnote": "L'assurance vient du comportement du service: assez clair pour les parents, assez ouvert pour apprendre."
   },
   "finalCta": {
     "eyebrow": "Commencer",
-    "title": "Une entree plus calme dans la prochaine session d'etude.",
-    "body": "Commencez par une session d'etude concentree, avec un chemin clair vers le soutien quand la prochaine etape n'est pas evidente.",
+    "title": "Commencer par la question devant vous.",
+    "body": "Une question suffit pour commencer.",
     "primaryCta": "Commencer",
     "secondaryCta": "Pour les parents"
   }

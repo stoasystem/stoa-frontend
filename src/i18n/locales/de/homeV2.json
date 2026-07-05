@@ -1,78 +1,78 @@
 {
   "hero": {
-    "eyebrow": "Lernen in Schweizer Familien",
-    "title": "Ruhig weiterlernen.",
-    "subtitle": "Wenn Hausaufgaben stocken, hilft STOA Ihrem Kind beim naechsten Schritt und haelt Lehrpersonen nah genug fuer Vertrauen.",
+    "eyebrow": "Lernen in der Familie",
+    "title": "Beginnen Sie mit der Frage.",
+    "subtitle": "STOA hilft Ihrem Kind, den naechsten Schritt zu erarbeiten, mit Lehrpersonenhilfe, wenn sie gebraucht wird.",
     "primaryCta": "Lernen starten",
     "secondaryCta": "Fuer Eltern",
     "proofLabel": "Lernstatus",
     "proofTitle": "Naechster Schritt klar",
-    "proofBody": "Lehrpersonen bleiben verfuegbar, wenn eine Frage mehr braucht als einen Hinweis."
+    "proofBody": "Eine Lehrperson kann uebernehmen, wenn ein Hinweis nicht reicht."
   },
   "learningThread": {
     "eyebrow": "Lernfaden",
-    "title": "Vom Haengenbleiben zum Verstehen.",
-    "subtitle": "Die Seite folgt einem Lernmoment in der Familie, von der Frage bis zum naechsten sicheren Schritt.",
+    "title": "Der naechste Schritt wird klar.",
+    "subtitle": "Eine Frage kann vom ersten unsicheren Moment zur passenden Unterstuetzung fuehren.",
     "beats": [
       {
-        "title": "Eine echte Frage entsteht",
-        "body": "Der Schueler bringt den unklaren Schritt aus Hausaufgabe, Uebung oder Arbeitsblatt mit."
+        "title": "Eine Frage entsteht.",
+        "body": "Beginnen Sie dort, wo etwas nicht mehr einleuchtet."
       },
       {
-        "title": "Der naechste Schritt wird klar",
-        "body": "STOA bleibt beim Lernen und vermeidet den Eindruck schneller Fertigloesungen."
+        "title": "Der naechste Schritt nimmt Form an.",
+        "body": "Ein Hinweis hilft weiter, ohne die Antwort vorwegzunehmen."
       },
       {
-        "title": "Lehrpersonen bleiben nah",
-        "body": "Wenn mehr Hilfe noetig ist, bleibt professionelle Unterstuetzung Teil des Systems."
+        "title": "Eine Lehrperson kann helfen.",
+        "body": "Manche Fragen brauchen mehr als einen Hinweis. STOA laesst dafuer Raum."
       },
       {
-        "title": "Eltern sehen das Muster",
-        "body": "Eltern verstehen Fortschritt und Fokus, ohne die Hausaufgaben zu uebernehmen."
+        "title": "Lernen wird zu Hause klarer.",
+        "body": "Eltern sehen, was geuebt wurde, wo Unterstuetzung geholfen hat und was als Naechstes kommt."
       }
     ]
   },
   "parentConfidence": {
     "eyebrow": "Sicherheit fuer Eltern",
-    "title": "Nah genug fuer Vertrauen. Frei genug zum Lernen.",
-    "body": "Eine kurze Notiz zeigt den Wochenrhythmus, damit Eltern informiert bleiben, ohne jeden Schritt zu begleiten.",
-    "visualLabel": "Familienrhythmus",
+    "title": "Ein klarerer Blick auf das Lernen.",
+    "body": "Sehen Sie, woran Ihr Kind arbeitet, wo Unterstuetzung geholfen hat und was fuer die naechste Lerneinheit bereit ist.",
+    "visualLabel": "Lernnotiz",
     "note": {
-      "eyebrow": "Wochennotiz",
-      "title": "Ruhiger zu Hause",
-      "body": "Ihr Kind hat im richtigen Moment Hilfe geholt. Brueche bleiben der Fokus der naechsten Lerneinheit."
+      "eyebrow": "Diese Woche",
+      "title": "Brueche stehen im Fokus",
+      "body": "Ihr Kind hat gleichwertige Brueche geuebt und Unterstuetzung genutzt, als die Methode unklar wurde."
     }
   },
   "trustLayer": {
     "eyebrow": "Sicherheit im Ablauf",
-    "title": "Zuversicht ohne Danebensitzen.",
-    "body": "STOA zeigt Eltern den Wochenrhythmus, waehrend Kinder genug Raum behalten, den naechsten Schritt selbst zu schaffen.",
+    "title": "Unterstuetzung mit Augenmass.",
+    "body": "Ein Hinweis, wenn er hilft. Eine Lehrperson, wenn es zaehlt. Kein Versprechen, dass Lernen beschleunigt werden muss.",
     "visualLabel": "Leises Signal",
     "caption": "Ein Lernsignal, kein Live-Fenster.",
     "principles": [
       {
-        "title": "Nur der nuetzliche Kontext",
-        "body": "Eltern sehen, was vorankommt, was Uebung braucht und wo Unterstuetzung geholfen hat."
+        "title": "Die Arbeit bleibt Lernen",
+        "body": "Unterstuetzung zeigt den naechsten Schritt, nicht die Abkuerzung am Lernen vorbei."
       },
       {
-        "title": "Klare Grenzen",
-        "body": "Das Kind behaelt die Arbeit. STOA haelt den naechsten Schritt ruhig und fokussiert."
+        "title": "Das Kind behaelt die Arbeit",
+        "body": "STOA kann den Moment fuehren, ohne die Frage wegzunehmen."
       },
       {
-        "title": "Besprechbarer Fortschritt",
-        "body": "Ein kurzer Rhythmus macht Gespraeche zu Hause leichter, ohne jede Antwort neu zu pruefen."
+        "title": "Eine Lehrperson, wenn es zaehlt",
+        "body": "Wenn eine Frage einen Menschen braucht, gehoert der Weg zur Lehrpersonenhilfe dazu."
       },
       {
         "title": "Keine grossen Versprechen",
-        "body": "Der Service bleibt sorgfaeltig: Unterstuetzung, Uebung und Lehrpersonenhilfe, wenn sie zaehlt."
+        "body": "Fortschritt bleibt Uebung, Unterstuetzung und Zeit mit dem Stoff."
       }
     ],
-    "footnote": "Respekt zeigt sich im Verhalten des Produkts: weniger Behauptung, klarere Grenzen und ruhigere Gespraeche zu Hause."
+    "footnote": "Sicherheit entsteht durch das Verhalten des Dienstes: klar genug fuer Eltern, weit genug fuer Lernen."
   },
   "finalCta": {
     "eyebrow": "Lernen starten",
-    "title": "Ein ruhigerer Einstieg in die naechste Lerneinheit.",
-    "body": "Beginnen Sie mit einer fokussierten Lerneinheit und einem klaren Weg zu Unterstuetzung, wenn der naechste Schritt nicht sichtbar ist.",
+    "title": "Beginnen Sie mit der Frage, die gerade da ist.",
+    "body": "Eine Frage reicht, um anzufangen.",
     "primaryCta": "Lernen starten",
     "secondaryCta": "Fuer Eltern"
   }

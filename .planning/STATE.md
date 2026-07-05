@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v6.2
 milestone_name: Home V2 Trust And Assurance Redesign
 status: complete
-last_updated: "2026-07-05T19:22:06Z"
-last_activity: 2026-07-05 — v6.2 Trust/Assurance redesign completed and verified
+last_updated: "2026-07-05T21:12:45Z"
+last_activity: 2026-07-05 — /home-v2 homepage copy rewritten around Start with the question narrative
 progress:
   total_phases: 5
   completed_phases: 5
@@ -81,6 +81,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Home V2 homepage copy rewrite | Rewrote EN/DE/FR/IT `/home-v2` copy around "Start with the question", teacher support as system backbone, clearer parent learning view, and proportional support; verified JSON, copy discipline, lint, build, E2E, and screenshots. |
 | 2026-07-05 | Home V2 Parent Confidence and Trust milestone split | Created v6.1 Parent Confidence redesign and v6.2 Trust/Assurance redesign requirements/roadmaps from grill-me decisions. |
 | 2026-07-05 | Home V2 Parent Confidence redesign | Replaced dashboard-like pills with one calm weekly note, updated EN/DE/FR/IT copy, verified desktop/tablet/mobile screenshots, lint, build, and Home V2 E2E. |
 | 2026-07-05 | Home V2 Trust/Assurance redesign | Replaced Trust feature cards with one warm image, fine-line assurance principles, restrained four-language copy, scoped Trust styling, screenshots, lint, build, and Home V2 E2E. |

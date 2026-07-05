@@ -1,78 +1,78 @@
 {
   "hero": {
-    "eyebrow": "Studio in famiglia in Svizzera",
-    "title": "Studiare con calma.",
-    "subtitle": "Quando i compiti si bloccano, STOA aiuta tuo figlio a trovare il prossimo passo e mantiene il supporto docente vicino abbastanza da dare fiducia ai genitori.",
+    "eyebrow": "Studio in famiglia",
+    "title": "Inizia dalla domanda.",
+    "subtitle": "STOA aiuta tuo figlio a lavorare sul passo successivo, con supporto docente quando serve.",
     "primaryCta": "Inizia a studiare",
     "secondaryCta": "Per i genitori",
     "proofLabel": "Stato dello studio",
     "proofTitle": "Prossimo passo chiaro",
-    "proofBody": "Il supporto docente resta disponibile quando una domanda richiede piu di un suggerimento."
+    "proofBody": "Un docente puo intervenire quando un suggerimento non basta."
   },
   "learningThread": {
-    "eyebrow": "Percorso",
-    "title": "Dal blocco alla comprensione.",
-    "subtitle": "La pagina segue un momento di studio in famiglia, dalla domanda al prossimo passo piu sicuro.",
+    "eyebrow": "Percorso di studio",
+    "title": "Il prossimo passo diventa chiaro.",
+    "subtitle": "Una domanda puo passare dal primo dubbio al tipo giusto di supporto.",
     "beats": [
       {
-        "title": "Nasce una domanda reale",
-        "body": "Lo studente porta il passaggio poco chiaro da un compito, un esercizio o una scheda."
+        "title": "Appare una domanda.",
+        "body": "Inizia dalla parte che non ha piu senso."
       },
       {
-        "title": "Il prossimo passo diventa chiaro",
-        "body": "STOA mantiene la spiegazione centrata sull'apprendimento, non sulla risposta istantanea."
+        "title": "Il passo successivo prende forma.",
+        "body": "Un suggerimento aiuta il lavoro a continuare senza dare via la risposta."
       },
       {
-        "title": "Il supporto docente resta vicino",
-        "body": "Quando serve piu aiuto, il supporto professionale resta parte del sistema."
+        "title": "Un docente puo intervenire.",
+        "body": "Alcune domande richiedono piu di un suggerimento. STOA lascia spazio a questo."
       },
       {
-        "title": "I genitori vedono il percorso",
-        "body": "I genitori capiscono progressi e punti di attenzione senza sostituirsi allo studente."
+        "title": "Lo studio diventa piu chiaro a casa.",
+        "body": "I genitori vedono cosa e stato praticato, dove il supporto ha aiutato e cosa viene dopo."
       }
     ]
   },
   "parentConfidence": {
     "eyebrow": "Fiducia per i genitori",
-    "title": "Abbastanza vicini per fidarsi. Abbastanza lontani per lasciare imparare.",
-    "body": "Una breve nota mostra ai genitori il ritmo della settimana, senza farli intervenire in ogni passaggio.",
-    "visualLabel": "Ritmo familiare",
+    "title": "Una visione piu chiara dello studio.",
+    "body": "Vedi su cosa sta lavorando tuo figlio, dove il supporto ha aiutato e cosa e pronto per la prossima sessione.",
+    "visualLabel": "Nota di studio",
     "note": {
-      "eyebrow": "Nota settimanale",
-      "title": "Piu calma a casa",
-      "body": "Tuo figlio ha chiesto aiuto al momento giusto. Le frazioni restano il focus della prossima sessione."
+      "eyebrow": "Questa settimana",
+      "title": "Le frazioni sono al centro",
+      "body": "Tuo figlio ha praticato le frazioni equivalenti e ha usato il supporto quando il metodo e diventato meno chiaro."
     }
   },
   "trustLayer": {
     "eyebrow": "Affidabilita nel servizio",
-    "title": "Serenita senza stare addosso.",
-    "body": "STOA mostra ai genitori il ritmo della settimana, mentre lo studente conserva lo spazio per arrivare al passo successivo.",
+    "title": "Supporto, con senso della misura.",
+    "body": "Un suggerimento quando aiuta. Un docente quando conta. Nessuna promessa che lo studio debba essere affrettato.",
     "visualLabel": "Segnale discreto",
     "caption": "Un segnale di apprendimento, non una finestra in diretta.",
     "principles": [
       {
-        "title": "Il contesto utile",
-        "body": "I genitori vedono cosa procede, cosa richiede pratica e dove il supporto e intervenuto."
+        "title": "Il lavoro resta educativo",
+        "body": "Il supporto indica il passo successivo, non una scorciatoia intorno allo studio."
       },
       {
-        "title": "Confini chiari",
-        "body": "Lo studente conserva il lavoro. STOA mantiene calmo e focalizzato il passo successivo."
+        "title": "Lo studente conserva il lavoro",
+        "body": "STOA puo guidare il momento senza togliere la domanda."
       },
       {
-        "title": "Progressi da discutere",
-        "body": "Un ritmo breve rende piu semplice parlarne a casa senza riaprire ogni risposta."
+        "title": "Un docente quando conta",
+        "body": "Quando una domanda richiede una persona, il percorso verso il supporto docente fa parte dell'esperienza."
       },
       {
         "title": "Niente promesse gonfiate",
-        "body": "Il servizio resta attento: supporto, pratica e aiuto dei docenti quando serve davvero."
+        "body": "Il progresso resta pratica, supporto e tempo con il materiale."
       }
     ],
-    "footnote": "Il rispetto si vede nel comportamento del prodotto: meno affermazioni, confini piu chiari e conversazioni piu tranquille a casa."
+    "footnote": "L'affidabilita nasce dal comportamento del servizio: abbastanza chiaro per i genitori, abbastanza ampio per imparare."
   },
   "finalCta": {
     "eyebrow": "Inizia a studiare",
-    "title": "Un ingresso piu calmo nella prossima sessione di studio.",
-    "body": "Inizia con una sessione di studio focalizzata e un percorso chiaro verso il supporto quando il prossimo passo non e evidente.",
+    "title": "Inizia dalla domanda davanti a te.",
+    "body": "Una domanda basta per iniziare.",
     "primaryCta": "Inizia a studiare",
     "secondaryCta": "Per i genitori"
   }
