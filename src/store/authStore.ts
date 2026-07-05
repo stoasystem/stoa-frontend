@@ -6,6 +6,36 @@ export type { UserRole }
 
 export const TOKEN_KEY = 'stoa_access_token'
 
+const validRoles: UserRole[] = [
+  'student',
+  'parent',
+  'tutor',
+  'admin',
+  'organization_admin',
+  'school_teacher',
+  'school_viewer',
+]
+
+const roleAliases: Record<string, UserRole> = {
+  teacher: 'tutor',
+  teachers: 'tutor',
+  students: 'student',
+  parents: 'parent',
+  admins: 'admin',
+}
+
+export function normalizeUserRole(role: unknown): UserRole {
+  const value = String(role || '').trim().toLowerCase()
+  const alias = roleAliases[value]
+  if (alias) return alias
+  if (validRoles.includes(value as UserRole)) return value as UserRole
+  return 'student'
+}
+
+function normalizeCurrentUser(user: CurrentUser): CurrentUser {
+  return { ...user, role: normalizeUserRole(user.role) }
+}
+
 const getStoredToken = () =>
   typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY)
 
@@ -28,10 +58,10 @@ export const useAuthStore = create<AuthState>((set) => {
     isAuthenticated: Boolean(storedToken),
     setAuth: (user, accessToken) => {
       localStorage.setItem(TOKEN_KEY, accessToken)
-      set({ user, accessToken, isAuthenticated: true })
+      set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
-      set({ user, isAuthenticated: true })
+      set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
       localStorage.removeItem(TOKEN_KEY)
