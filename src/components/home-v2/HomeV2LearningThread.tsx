@@ -77,7 +77,7 @@ export function HomeV2LearningThread() {
     <section
       id="home-v2-learning-thread"
       data-testid="home-v2-learning-thread"
-      className="mx-auto grid max-w-7xl gap-12 px-4 py-24 sm:px-6 md:px-8 md:py-32 lg:grid-cols-[0.72fr_1.28fr] lg:items-start"
+      className="mx-auto grid max-w-7xl scroll-mt-36 gap-12 px-4 py-24 sm:px-6 md:scroll-mt-40 md:px-8 md:py-32 lg:grid-cols-[0.72fr_1.28fr] lg:items-start"
     >
       <HomeV2Reveal className="max-w-xl lg:sticky lg:top-32">
         <p className="inline-flex rounded-full bg-[hsl(var(--home-v2-sage)/0.09)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-sage))] ring-1 ring-[hsl(var(--home-v2-sage)/0.16)]">

@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.2
-milestone_name: Home V2 Trust And Assurance Redesign
+milestone: v6.3
+milestone_name: Home V2 Final Visual QA And Image Readiness
 status: complete
-last_updated: "2026-07-05T21:12:45Z"
-last_activity: 2026-07-05 — /home-v2 homepage copy rewritten around Start with the question narrative
+last_updated: "2026-07-06T01:02:00+02:00"
+last_activity: 2026-07-06 — v6.3 Home V2 Final Visual QA And Image Readiness completed
 progress:
   total_phases: 5
   completed_phases: 5
@@ -17,40 +17,40 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-05)
+See: .planning/PROJECT.md (updated 2026-07-06)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.2 Home V2 Trust And Assurance Redesign is complete. The Trust section now uses a warm image-led assurance layout with precise principles, Apple-like restraint, and no repeated "Swiss" or loud privacy marketing.
+**Current focus:** Milestone v6.3 Home V2 Final Visual QA And Image Readiness is complete. Home V2 is ready to prepare switch-over after final asset approval, but `/` remains unchanged and final Hero/Parent photography remains a separate decision.
 
 ## Current Position
 
-Phase: 256 — Trust Verification And Visual QA
-Plan: 256-PLAN.md
+Phase: 261 — Cross-Locale Verification And Readiness Handoff
+Plan: 261-PLAN.md
 Status: Complete
-Last activity: 2026-07-05 — v6.2 Trust/Assurance completed with lint, build, Home V2 E2E, copy discipline, and screenshot QA
+Last activity: 2026-07-06 — v6.3 completed with readiness report
 
 ## Performance Metrics
 
 **Velocity:**
 
 - Total plans completed this milestone: 5 of 5
-- Average duration: same-day design/implementation cycle
-- Total execution time: 2026-07-05
+- Average duration: same-day design/implementation/verification pass
+- Total execution time: 2026-07-06 onward
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 252 | 1/1 | Complete | 2026-07-05 |
-| 253 | 1/1 | Complete | 2026-07-05 |
-| 254 | 1/1 | Complete | 2026-07-05 |
-| 255 | 1/1 | Complete | 2026-07-05 |
-| 256 | 1/1 | Complete | 2026-07-05 |
+| 257 | 1/1 | Complete | 2026-07-06 |
+| 258 | 1/1 | Complete | 2026-07-06 |
+| 259 | 1/1 | Complete | 2026-07-06 |
+| 260 | 1/1 | Complete | 2026-07-06 |
+| 261 | 1/1 | Complete | 2026-07-06 |
 
 **Recent Trend:**
 
 - Last 5 completed phases: 252, 253, 254, 255, 256
-- Trend: v6.2 completed the Trust/Assurance arc from art direction through implementation and verification.
+- Trend: v6.3 completed final visual QA, asset readiness, scoped visual polish, restrained motion direction, and readiness handoff for `/home-v2`.
 
 *Updated after each plan completion*
 
@@ -76,6 +76,16 @@ Recent decisions affecting current work:
 - 2026-07-05 v6.1 starts Parent Confidence as an emotional reassurance section: parents stay close without anxious intervention, and the section should use one quiet progress note rather than feature pills or dashboard language.
 - 2026-07-05 v6.2 starts Trust/Assurance as an image-led editorial assurance section: trust should feel built into restraint, boundaries, and visual order rather than repeated "Swiss" or privacy slogans.
 - 2026-07-05 v6.2 completed Trust/Assurance with one warm learning-detail image, four fine-line principles, restrained EN/DE/FR/IT copy, scoped Trust styling, and Home V2 E2E coverage.
+- 2026-07-06 v6.3 starts Home V2 final visual QA and image readiness. The top acceptance standard is that a Swiss middle-to-upper-income parent can scan `/home-v2` on mobile for 30 seconds and perceive a calm, credible, refined education product rather than an AI tool page.
+- 2026-07-06 v6.3 should include purpose-led collection of photography, non-face AI detail imagery, texture/light material, fine-line/icon language, and Apple WWDC/product-keynote motion references.
+- 2026-07-06 v6.3 allows AI-generated assets only for non-identifiable, non-front-face high-end light, texture, desk, hand, line, or abstract learning details; people/family hero imagery should prioritize real traceable licensed photography.
+- 2026-07-06 v6.3 may download and commit source-clear assets intended for `/home-v2` preview or the formal candidate pool. Paid assets remain link-only unless separately purchased and approved.
+- 2026-07-06 Apple can be used as a composition and motion reference: cinematic scroll, large image/whitespace rhythm, careful reveal, light, materiality, and chapter-like pacing. Do not copy Apple assets, logos, product visuals, or exact frames.
+- 2026-07-06 Phase 257 completed full-page and section-level `/home-v2` visual QA. Main findings: overall direction is credible, reveal initial state creates blank full-page captures, Hero/Parent imagery is preview-safe but not final-public strong, Trust is the strongest current reference, and FR/IT Home V2 copy exists but is not runtime-enabled.
+- 2026-07-06 Phase 258 completed purpose-led asset collection. Current Hero remains the best free preview candidate; Parent Confidence is the highest-priority future image replacement; Trust is the strongest visual benchmark; AI is approved only for non-identifiable detail/texture; Apple references are link-only motion/composition references.
+- 2026-07-06 Phase 259 made Home V2 reveal content visible by default, added scroll-margin to Learning Thread and Final CTA, and softened Parent Confidence image treatment. Full-page mobile screenshots now capture all sections instead of blank middle content.
+- 2026-07-06 Phase 260 documented cinematic motion direction and added a subtle Final CTA material breathing light with reduced-motion coverage and no new dependency.
+- 2026-07-06 Phase 261 completed lint, build, Home V2 E2E, final screenshots, and readiness report. Readiness judgment: ready to prepare switch-over after final asset approval, but do not replace `/` yet.
 
 ### Quick Tasks Completed
 
@@ -121,4 +131,4 @@ Recent decisions affecting current work:
 
 ## Operator Next Steps
 
-- v6.2 is complete. Recommended next milestone: final Home V2 image/photography replacement and full-page visual QA before any `/` switch decision.
+- v6.3 is complete. Recommended next milestone: final Hero/Parent photography approval or v6.4 homepage switch-over preparation. Do not replace `/` until final assets, SEO/routing, old-home preservation, monitoring, and rollback are planned.

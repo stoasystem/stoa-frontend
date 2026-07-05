@@ -10,27 +10,27 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v6.2 Home V2 Trust And Assurance Redesign
+## Latest Shipped Milestone: v6.3 Home V2 Final Visual QA And Image Readiness
 
-**Shipped:** 2026-07-05
+**Shipped:** 2026-07-06
 
-**Delivered:** Home V2 Trust/Assurance now communicates confidence through restraint, boundaries, and visual order rather than repeated "Swiss" labeling or loud privacy claims. The section uses one warm learning-detail image, four fine-line assurance principles, restrained EN/DE/FR/IT copy, scoped Trust styling, responsive screenshot review, and Home V2 E2E coverage while preserving the current `/` homepage.
-
-**Target features:**
-- Trust/Assurance no longer reads as a generic feature-card block.
-- One quiet image surface carries warmth without implying endorsement or supervision.
-- Four principles explain enough context, clear boundaries, discussable progress, and no inflated promises.
-- EN/DE/FR/IT `homeV2` copy preserves the same restrained assurance meaning.
-- Current `/` remains unchanged; final photography and public switch-over remain future scope.
-
-## Current Milestone: None Active After v6.2
-
-**Goal:** No active milestone is currently open after v6.2 completion.
+**Delivered:** Home V2 now has full-page visual QA, purpose-led asset readiness documentation, scoped visual polish, restrained cinematic motion direction, final verification evidence, and a readiness judgment. The page is ready to prepare switch-over after final asset approval, but the current `/` homepage remains unchanged.
 
 **Target features:**
-- Review `/home-v2` as a whole after Hero, Learning Thread, Parent Confidence, and Trust/Assurance improvements.
-- Decide whether to run a final image/photography milestone before public switch-over.
+- `/home-v2` was audited as one full Swiss-parent cinematic homepage.
+- v6.3 asset briefs and shortlist distinguish real photography, non-face AI detail opportunities, paid-stock link-only candidates, and Apple motion/design references.
+- Home V2 reveal content now remains visible by default, fixing blank full-page screenshot and delayed-observer risk.
+- Parent Confidence image treatment is quieter, Learning Thread/Final CTA scroll targeting is improved, and Final CTA has restrained material motion.
+- Current `/` remains unchanged; final Hero/Parent photography and public switch-over remain future scope.
+
+## Current Milestone: None Active After v6.3
+
+**Goal:** No active milestone is currently open after v6.3 completion.
+
+**Target features:**
+- Decide whether the next milestone should focus on final Hero/Parent photography approval or homepage switch-over preparation.
 - Preserve current `/` until explicit replacement approval.
+- Keep final paid/commissioned assets, FR/IT runtime enablement, SEO, and rollback planning out of scope until separately planned.
 
 ## Current State
 
@@ -145,10 +145,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 has an isolated public preview route, preserved `/` homepage, component namespace, provisional `homeV2` i18n skeleton, previewable five-section layout, route smoke tests, and implementation handoff — v4.0
 - ✓ Home V2 Parent Confidence communicates calm parental reassurance with one restrained weekly note, four-language copy, scoped visual polish, responsive screenshot review, and Home V2 E2E coverage — v6.1
 - ✓ Home V2 Trust/Assurance communicates confidence through restraint, boundaries, one warm image, four fine-line principles, restrained four-language copy, scoped visual polish, responsive screenshot review, and Home V2 E2E coverage — v6.2
+- ✓ Home V2 has full-page visual QA, purpose-led asset readiness documentation, reveal robustness, scoped visual polish, restrained motion direction, and a readiness handoff while preserving `/` — v6.3
 
 ### Active
 
-- None currently. v6.2 completed on 2026-07-05.
+- None currently. v6.3 completed on 2026-07-06.
 
 ### Out of Scope
 
@@ -524,4 +525,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-05 after completing v6.2 Home V2 Trust And Assurance redesign*
+*Last updated: 2026-07-06 after completing v6.3 Home V2 Final Visual QA And Image Readiness*

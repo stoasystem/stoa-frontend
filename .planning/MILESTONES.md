@@ -1,5 +1,31 @@
 # Milestones
 
+## v6.3 Home V2 Final Visual QA And Image Readiness (Shipped: 2026-07-06)
+
+**Phases completed:** 5 phases, 5 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.3-MILESTONE-AUDIT.md`
+**Depends on:** v6.2 Home V2 Trust And Assurance Redesign
+**Known deferred items at close:** final Hero/Parent paid or commissioned photography, runtime FR/IT enablement, rendered FR/IT visual QA, and public `/` switch-over remain future scope.
+
+**Key accomplishments:**
+
+- Audited `/home-v2` as a full Swiss-parent cinematic homepage across desktop, tablet, mobile, and EN/DE runtime language states.
+- Created v6.3 asset briefs and shortlist/ledger covering real photography, non-face AI detail opportunities, paid-stock link-only candidates, and Apple motion/design references.
+- Fixed the blank full-page screenshot/reveal robustness issue by making Home V2 reveal content visible by default.
+- Added scroll-margin polish to Home V2 target sections and softened the Parent Confidence image treatment.
+- Documented Apple-like cinematic motion direction and added a subtle Final CTA material breathing light with reduced-motion coverage.
+- Produced readiness judgment: ready to prepare switch-over after final asset approval, but `/` was not replaced.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed with existing Vite chunk size warning.
+- `npm run test:e2e -- home-v2.spec.ts`: passed, 2/2 tests.
+- Final screenshots: `/private/tmp/stoa-home-v2-v6-3/261/en-desktop-full.png`, `/private/tmp/stoa-home-v2-v6-3/261/en-mobile-full.png`, `/private/tmp/stoa-home-v2-v6-3/261/de-mobile-full.png`.
+
+---
+
 ## v6.2 Home V2 Trust And Assurance Redesign (Shipped: 2026-07-05)
 
 **Phases completed:** 5 phases, 5 plans, 0 code tasks

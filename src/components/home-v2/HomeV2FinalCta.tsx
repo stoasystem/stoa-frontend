@@ -10,12 +10,12 @@ export function HomeV2FinalCta({ learningHref }: { learningHref: string }) {
     <section
       id="home-v2-final-cta"
       data-testid="home-v2-final-cta"
-      className="mx-auto max-w-7xl px-4 py-24 sm:px-6 md:px-8 md:py-36"
+      className="mx-auto max-w-7xl scroll-mt-36 px-4 py-24 sm:px-6 md:scroll-mt-40 md:px-8 md:py-36"
     >
       <HomeV2Reveal>
         <div className="rounded-[2.5rem] bg-[hsl(var(--home-v2-ink)/0.06)] p-2 shadow-[0_42px_120px_hsl(var(--home-v2-ink)/0.2)] ring-1 ring-[hsl(var(--home-v2-line)/0.52)]">
-          <div className="overflow-hidden rounded-[calc(2.5rem-0.5rem)] bg-[hsl(var(--home-v2-espresso))] px-7 py-14 text-[hsl(var(--home-v2-paper))] shadow-[inset_0_1px_0_hsl(0_0%_100%/0.12)] sm:px-12 lg:px-16 lg:py-20">
-            <div className="grid gap-10 lg:grid-cols-[1fr_0.54fr] lg:items-end">
+          <div className="home-v2-final-panel overflow-hidden rounded-[calc(2.5rem-0.5rem)] bg-[hsl(var(--home-v2-espresso))] px-7 py-14 text-[hsl(var(--home-v2-paper))] shadow-[inset_0_1px_0_hsl(0_0%_100%/0.12)] sm:px-12 lg:px-16 lg:py-20">
+            <div className="relative z-10 grid gap-10 lg:grid-cols-[1fr_0.54fr] lg:items-end">
               <div>
                 <p className="inline-flex rounded-full bg-white/8 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-gold))] ring-1 ring-white/12">
                   {t('finalCta.eyebrow')}
@@ -35,8 +35,8 @@ export function HomeV2FinalCta({ learningHref }: { learningHref: string }) {
                 </Link>
               </div>
             </div>
-            <div className="mt-16 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--home-v2-paper)/0.28),transparent)]" />
-            <p className="mt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-paper)/0.42)]">
+            <div className="relative z-10 mt-16 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--home-v2-paper)/0.28),transparent)]" />
+            <p className="relative z-10 mt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-paper)/0.42)]">
               Zurich rhythm / teacher-backed learning / parent clarity
             </p>
           </div>
