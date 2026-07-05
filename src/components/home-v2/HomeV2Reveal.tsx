@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 
 export function HomeV2Reveal({
@@ -12,6 +12,7 @@ export function HomeV2Reveal({
   delay?: number
 }) {
   const ref = useRef<HTMLDivElement | null>(null)
+  const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
     const node = ref.current
@@ -20,7 +21,7 @@ export function HomeV2Reveal({
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry?.isIntersecting) return
-        node.classList.add('is-visible')
+        setIsVisible(true)
         observer.unobserve(node)
       },
       { rootMargin: '0px 0px -6% 0px', threshold: 0.08 },
@@ -32,7 +33,7 @@ export function HomeV2Reveal({
   }, [])
 
   return (
-    <div ref={ref} className={cn('home-v2-reveal', className)} style={{ transitionDelay: `${delay}ms` }}>
+    <div ref={ref} className={cn('home-v2-reveal', isVisible && 'is-visible', className)} style={{ transitionDelay: `${delay}ms` }}>
       {children}
     </div>
   )
