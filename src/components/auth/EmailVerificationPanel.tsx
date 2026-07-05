@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   confirmEmailVerification,
+  isUnauthorizedError,
   isVerificationRateLimitedError,
   resendEmailVerification,
 } from '@/services/auth/authApi'
@@ -33,6 +34,7 @@ function verificationMessageKey(response: EmailVerificationResponse | undefined)
 
 function getErrorCopy(error: unknown, fallback: string) {
   const message = toUserFacingError(error, fallback)
+  if (isUnauthorizedError(error)) return 'verification.unauthorized'
   if (isVerificationRateLimitedError(error)) return 'verification.rateLimited'
   if (/expired/i.test(message)) return 'verification.expired'
   if (/invalid/i.test(message)) return 'verification.invalid'

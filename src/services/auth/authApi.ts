@@ -76,6 +76,10 @@ export function isVerificationRateLimitedError(error: unknown) {
   return error instanceof ApiError && error.status === 429
 }
 
+export function isUnauthorizedError(error: unknown) {
+  return error instanceof ApiError && error.status === 401
+}
+
 export async function getCurrentUser() {
   try {
     const response = await httpClient.get<User>('/auth/me')

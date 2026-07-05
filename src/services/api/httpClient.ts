@@ -23,10 +23,33 @@ export const httpClient = axios.create({
   },
 })
 
+const PUBLIC_AUTH_PATHS = new Set([
+  '/auth/forgot-password',
+  '/auth/login',
+  '/auth/login-code/confirm',
+  '/auth/login-code/request',
+  '/auth/register',
+  '/auth/reset-password',
+  '/auth/email-verification/confirm',
+  '/auth/email-verification/resend',
+])
+
+function isPublicAuthPath(url?: string) {
+  if (!url) return false
+
+  try {
+    return PUBLIC_AUTH_PATHS.has(new URL(url, apiBaseUrl).pathname)
+  } catch {
+    return PUBLIC_AUTH_PATHS.has(url.split('?')[0])
+  }
+}
+
 httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)
 
-  if (token) {
+  if (isPublicAuthPath(config.url)) {
+    delete config.headers.Authorization
+  } else if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
 

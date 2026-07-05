@@ -82,7 +82,15 @@ test('registration pending verification shows code and resend actions', async ({
 })
 
 test('login blocked by email verification supports resend and confirm', async ({ page }) => {
+  let loginAuthorization: string | undefined
+  let resendAuthorization: string | undefined
+  let confirmAuthorization: string | undefined
+
+  await page.addInitScript(() => {
+    window.localStorage.setItem('stoa_access_token', 'stale-token')
+  })
   await page.route('**/auth/login', async (route) => {
+    loginAuthorization = route.request().headers().authorization
     await route.fulfill({
       status: 403,
       contentType: 'application/json',
@@ -97,6 +105,7 @@ test('login blocked by email verification supports resend and confirm', async ({
     })
   })
   await page.route('**/auth/email-verification/resend', async (route) => {
+    resendAuthorization = route.request().headers().authorization
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -110,6 +119,7 @@ test('login blocked by email verification supports resend and confirm', async ({
     })
   })
   await page.route('**/auth/email-verification/confirm', async (route) => {
+    confirmAuthorization = route.request().headers().authorization
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
@@ -128,12 +138,15 @@ test('login blocked by email verification supports resend and confirm', async ({
   await page.getByLabel('Password').fill('password123')
   await page.getByRole('button', { name: /sign in/i }).click()
 
+  expect(loginAuthorization).toBeUndefined()
   await expect(page.getByRole('heading', { name: /verify your email/i })).toBeVisible()
   await expect(page.getByText(/required before sign-in/i)).toBeVisible()
   await page.getByRole('button', { name: /send code again/i }).click()
+  expect(resendAuthorization).toBeUndefined()
   await expect(page.getByText(/already requested recently/i)).toBeVisible()
   await page.getByLabel('Verification code').fill('123456')
   await page.getByRole('button', { name: /verify email/i }).click()
+  expect(confirmAuthorization).toBeUndefined()
   await expect(page.getByRole('heading', { name: /email verified/i })).toBeVisible()
   await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible()
 })
