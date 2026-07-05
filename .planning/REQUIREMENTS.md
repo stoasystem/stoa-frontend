@@ -7,13 +7,13 @@
 
 ### Trust And Assurance
 
-- [ ] **TA-01**: Parents can understand trust through STOA's service behavior rather than slogans: enough context, clear boundaries, calm progress, and no inflated promises.
-- [ ] **TA-02**: The section has one high-quality warm image direction that feels artistic, intimate, and European/Swiss-compatible without direct endorsement, surveillance, or stock tutoring poses.
-- [ ] **TA-03**: Parents see a precision principle list with 3-4 restrained rows, fine dividers, numbering, and whitespace instead of generic feature cards.
-- [ ] **TA-04**: The copy is calm and minimal, avoiding repeated "Swiss", loud privacy claims, compliance theater, surveillance framing, and instant-improvement promises.
-- [ ] **TA-05**: The Trust/Assurance layout remains composed and legible across desktop, narrow/tablet, and mobile widths.
-- [ ] **TA-06**: The redesign is verified with lint, build, Home V2 E2E, copy discipline checks, and browser/screenshot smoke for Trust/Assurance.
-- [ ] **TA-07**: The approved Trust/Assurance direction is implemented in `/home-v2` with scoped component, style, i18n, and image changes while preserving `/`.
+- [x] **TA-01**: Parents can understand trust through STOA's service behavior rather than slogans: enough context, clear boundaries, calm progress, and no inflated promises.
+- [x] **TA-02**: The section has one high-quality warm image direction that feels artistic, intimate, and European/Swiss-compatible without direct endorsement, surveillance, or stock tutoring poses.
+- [x] **TA-03**: Parents see a precision principle list with 3-4 restrained rows, fine dividers, numbering, and whitespace instead of generic feature cards.
+- [x] **TA-04**: The copy is calm and minimal, avoiding repeated "Swiss", loud privacy claims, compliance theater, surveillance framing, and instant-improvement promises.
+- [x] **TA-05**: The Trust/Assurance layout remains composed and legible across desktop, narrow/tablet, and mobile widths.
+- [x] **TA-06**: The redesign is verified with lint, build, Home V2 E2E, copy discipline checks, and browser/screenshot smoke for Trust/Assurance.
+- [x] **TA-07**: The approved Trust/Assurance direction is implemented in `/home-v2` with scoped component, style, i18n, and image changes while preserving `/`.
 
 ## Future Requirements
 
@@ -40,13 +40,13 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TA-02 | 252 | Pending |
-| TA-01 | 253 | Pending |
-| TA-04 | 253 | Pending |
-| TA-03 | 254 | Pending |
-| TA-05 | 254 | Pending |
-| TA-07 | 255 | Pending |
-| TA-06 | 256 | Pending |
+| TA-02 | 252 | Complete |
+| TA-01 | 253 | Complete |
+| TA-04 | 253 | Complete |
+| TA-03 | 254 | Complete |
+| TA-05 | 254 | Complete |
+| TA-07 | 255 | Complete |
+| TA-06 | 256 | Complete |
 
 **Coverage:**
 - v6.2 requirements: 7 total
@@ -55,4 +55,4 @@
 
 ---
 *Requirements defined: 2026-07-05*
-*Last updated: 2026-07-05 after starting v6.2 Trust/Assurance redesign*
+*Last updated: 2026-07-05 after completing v6.2 Trust/Assurance redesign*

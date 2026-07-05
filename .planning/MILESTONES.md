@@ -1,17 +1,27 @@
 # Milestones
 
-## Planned Home V2 Milestones
+## v6.2 Home V2 Trust And Assurance Redesign (Shipped: 2026-07-05)
 
-### v6.2 Home V2 Trust And Assurance Redesign (Active)
-
-**Status:** Active
-**Active requirements:** `.planning/REQUIREMENTS.md`
-**Active roadmap:** `.planning/ROADMAP.md`
-**Source requirements:** `.planning/milestones/v6.2-REQUIREMENTS.md`
-**Source roadmap:** `.planning/milestones/v6.2-ROADMAP.md`
-**Phases:** 252-256
+**Phases completed:** 5 phases, 5 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.2-MILESTONE-AUDIT.md`
 **Depends on:** v6.1 Home V2 Parent Confidence Redesign
-**Scope:** Redesign Trust into a warm, artistic, image-led assurance section with a precision principle list. Avoid generic feature cards, repeated "Swiss" labeling, and loud privacy marketing.
+**Known deferred items at close:** final paid/commissioned Trust photography, public `/` replacement, full homepage copy pass, and visual regression automation remain future scope.
+
+**Key accomplishments:**
+
+- Replaced the previous Trust feature-card grid with one image-led editorial assurance section.
+- Removed repeated "Swiss trust" language and loud privacy/compliance-style claims from the section.
+- Added four fine-line assurance principles: enough context, clear boundaries, discussable progress, and no inflated promises.
+- Updated English, German, French, and Italian `homeV2` Trust copy.
+- Added scoped Trust styling, mobile-first ordering, a restrained caption light, and Home V2 E2E assertions.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed with existing Vite chunk size warning.
+- `npm run test:e2e -- home-v2.spec.ts`: passed, 2/2 tests.
+- Responsive screenshots: `/private/tmp/stoa-home-v2-v6-2/trust-desktop.png`, `/private/tmp/stoa-home-v2-v6-2/trust-narrow.png`, `/private/tmp/stoa-home-v2-v6-2/trust-mobile.png`.
 
 ---
 

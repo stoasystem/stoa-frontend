@@ -44,23 +44,30 @@
     }
   },
   "trustLayer": {
-    "eyebrow": "Vertrauen in der Schweiz",
-    "title": "Fuer ernsthafte Bildungsentscheidungen von Familien.",
-    "body": "Die Vertrauensebene bleibt kompakt und zurueckhaltend, mit Nachweisen fuer ernsthafte Bildungsentscheidungen.",
-    "items": [
+    "eyebrow": "Sicherheit im Ablauf",
+    "title": "Zuversicht ohne Danebensitzen.",
+    "body": "STOA zeigt Eltern den Wochenrhythmus, waehrend Kinder genug Raum behalten, den naechsten Schritt selbst zu schaffen.",
+    "visualLabel": "Leises Signal",
+    "caption": "Ein Lernsignal, kein Live-Fenster.",
+    "principles": [
       {
-        "title": "Schweizer Eltern zuerst",
-        "body": "Die Startseite spricht zuerst Eltern an, die taegliche Lernunterstuetzung pruefen."
+        "title": "Nur der nuetzliche Kontext",
+        "body": "Eltern sehen, was vorankommt, was Uebung braucht und wo Unterstuetzung geholfen hat."
       },
       {
-        "title": "Mit Lehrpersonen im Hintergrund",
-        "body": "Die Sprache bleibt glaubwuerdig und vermeidet Lehrerersatz-Versprechen."
+        "title": "Klare Grenzen",
+        "body": "Das Kind behaelt die Arbeit. STOA haelt den naechsten Schritt ruhig und fokussiert."
       },
       {
-        "title": "Mehrsprachig vorbereitet",
-        "body": "Texte sind fuer spaetere deutsche, englische, franzoesische und italienische Verfeinerung getrennt."
+        "title": "Besprechbarer Fortschritt",
+        "body": "Ein kurzer Rhythmus macht Gespraeche zu Hause leichter, ohne jede Antwort neu zu pruefen."
+      },
+      {
+        "title": "Keine grossen Versprechen",
+        "body": "Der Service bleibt sorgfaeltig: Unterstuetzung, Uebung und Lehrpersonenhilfe, wenn sie zaehlt."
       }
-    ]
+    ],
+    "footnote": "Respekt zeigt sich im Verhalten des Produkts: weniger Behauptung, klarere Grenzen und ruhigere Gespraeche zu Hause."
   },
   "finalCta": {
     "eyebrow": "Lernen starten",

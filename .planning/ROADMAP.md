@@ -2,7 +2,7 @@
 
 ## Milestones
 
-- 🔄 **v6.2 Home V2 Trust And Assurance Redesign** - Active, Phases 252-256
+- ✅ **v6.2 Home V2 Trust And Assurance Redesign** - Phases 252-256 (shipped 2026-07-05)
 - ✅ **v6.1 Home V2 Parent Confidence Redesign** - Phases 248-251 (shipped 2026-07-05)
 - ✅ **v4.0 新版路由与组件骨架** - Phases 244-247 (shipped 2026-07-04)
 - ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
@@ -12,11 +12,11 @@
 
 ## Phases
 
-- [ ] **Phase 252: Trust Art Direction And Asset Decision** - Lock the Trust image direction and decide whether the existing placeholder pool is sufficient.
-- [ ] **Phase 253: Trust Assurance Copy Contract** - Define the title, body, and assurance principles without slogan-heavy privacy or Swiss repetition.
-- [ ] **Phase 254: Trust Visual Structure Redesign** - Replace the feature-card grid with image-led editorial assurance and fine-line principles.
-- [ ] **Phase 255: Trust Assurance Implementation** - Update `HomeV2TrustLayer`, scoped styling, EN/DE/FR/IT copy, and approved placeholder/final image.
-- [ ] **Phase 256: Trust Verification And Visual QA** - Run technical gates, screenshot QA, and claim/image discipline checks.
+- [x] **Phase 252: Trust Art Direction And Asset Decision** - Lock the Trust image direction and decide whether the existing placeholder pool is sufficient.
+- [x] **Phase 253: Trust Assurance Copy Contract** - Define the title, body, and assurance principles without slogan-heavy privacy or Swiss repetition.
+- [x] **Phase 254: Trust Visual Structure Redesign** - Replace the feature-card grid with image-led editorial assurance and fine-line principles.
+- [x] **Phase 255: Trust Assurance Implementation** - Update `HomeV2TrustLayer`, scoped styling, EN/DE/FR/IT copy, and approved placeholder/final image.
+- [x] **Phase 256: Trust Verification And Visual QA** - Run technical gates, screenshot QA, and claim/image discipline checks.
 
 ## Phase Details
 
@@ -90,11 +90,11 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 252. Trust Art Direction And Asset Decision | 0/1 | Pending | — |
-| 253. Trust Assurance Copy Contract | 0/1 | Pending | — |
-| 254. Trust Visual Structure Redesign | 0/1 | Pending | — |
-| 255. Trust Assurance Implementation | 0/1 | Pending | — |
-| 256. Trust Verification And Visual QA | 0/1 | Pending | — |
+| 252. Trust Art Direction And Asset Decision | 1/1 | Complete | 2026-07-05 |
+| 253. Trust Assurance Copy Contract | 1/1 | Complete | 2026-07-05 |
+| 254. Trust Visual Structure Redesign | 1/1 | Complete | 2026-07-05 |
+| 255. Trust Assurance Implementation | 1/1 | Complete | 2026-07-05 |
+| 256. Trust Verification And Visual QA | 1/1 | Complete | 2026-07-05 |
 
 ## Coverage
 
@@ -112,4 +112,4 @@
 
 ## Next Up
 
-Start Phase 252 to lock the Trust/Assurance image art direction and placeholder/final asset decision before layout implementation.
+v6.2 is complete. Trust/Assurance now uses an image-led editorial assurance layout with fine-line principles, restrained four-language copy, and verification evidence.

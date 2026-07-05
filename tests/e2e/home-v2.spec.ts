@@ -9,6 +9,8 @@ test('home v2 preview route renders the isolated section skeleton', async ({ pag
   await expect(page.getByTestId('home-v2-parent-note')).toBeVisible()
   await expect(page.getByText('Calmer at home')).toBeVisible()
   await expect(page.getByTestId('home-v2-trust-layer')).toBeVisible()
+  await expect(page.getByText('Confidence without hovering.')).toBeVisible()
+  await expect(page.getByTestId('home-v2-trust-principles')).toContainText('Clear boundaries')
   await expect(page.getByTestId('home-v2-final-cta')).toBeVisible()
   await expect(page.getByRole('link', { name: /start learning|lernen starten/i }).first()).toBeVisible()
 })

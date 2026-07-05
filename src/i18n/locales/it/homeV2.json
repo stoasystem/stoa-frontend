@@ -44,23 +44,30 @@
     }
   },
   "trustLayer": {
-    "eyebrow": "Fiducia svizzera",
-    "title": "Per decisioni educative serie.",
-    "body": "Il livello di fiducia resta sobrio e compatto, con segnali pensati per decisioni educative serie.",
-    "items": [
+    "eyebrow": "Affidabilita nel servizio",
+    "title": "Serenita senza stare addosso.",
+    "body": "STOA mostra ai genitori il ritmo della settimana, mentre lo studente conserva lo spazio per arrivare al passo successivo.",
+    "visualLabel": "Segnale discreto",
+    "caption": "Un segnale di apprendimento, non una finestra in diretta.",
+    "principles": [
       {
-        "title": "Genitori svizzeri prima di tutto",
-        "body": "La pagina parla prima ai genitori che valutano supporto quotidiano allo studio."
+        "title": "Il contesto utile",
+        "body": "I genitori vedono cosa procede, cosa richiede pratica e dove il supporto e intervenuto."
       },
       {
-        "title": "Con supporto docente",
-        "body": "Il linguaggio resta credibile ed evita promesse di sostituzione dell'insegnante."
+        "title": "Confini chiari",
+        "body": "Lo studente conserva il lavoro. STOA mantiene calmo e focalizzato il passo successivo."
       },
       {
-        "title": "Pronta per piu lingue",
-        "body": "I testi sono separati per futura revisione in inglese, tedesco, francese e italiano."
+        "title": "Progressi da discutere",
+        "body": "Un ritmo breve rende piu semplice parlarne a casa senza riaprire ogni risposta."
+      },
+      {
+        "title": "Niente promesse gonfiate",
+        "body": "Il servizio resta attento: supporto, pratica e aiuto dei docenti quando serve davvero."
       }
-    ]
+    ],
+    "footnote": "Il rispetto si vede nel comportamento del prodotto: meno affermazioni, confini piu chiari e conversazioni piu tranquille a casa."
   },
   "finalCta": {
     "eyebrow": "Inizia a studiare",

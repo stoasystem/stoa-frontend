@@ -44,23 +44,30 @@
     }
   },
   "trustLayer": {
-    "eyebrow": "Swiss trust layer",
-    "title": "Built for serious family education decisions.",
-    "body": "The trust layer stays compact and restrained, with proof points that support serious family education decisions.",
-    "items": [
+    "eyebrow": "Assurance by design",
+    "title": "Confidence without hovering.",
+    "body": "STOA gives parents the shape of the week, while students keep the room to work through the next step.",
+    "visualLabel": "Quiet evidence",
+    "caption": "A learning signal, not a live feed.",
+    "principles": [
       {
-        "title": "Swiss-parent first",
-        "body": "The homepage speaks first to parents evaluating daily learning support."
+        "title": "Enough context",
+        "body": "Parents see what is moving, what still needs practice, and where support stepped in."
       },
       {
-        "title": "Teacher-backed",
-        "body": "Support language stays credible and avoids teacher-replacement claims."
+        "title": "Clear boundaries",
+        "body": "The child keeps the work. STOA keeps the next step focused and calm."
       },
       {
-        "title": "Multilingual ready",
-        "body": "Copy is already separated for later English, German, French, and Italian refinement."
+        "title": "Discussable progress",
+        "body": "A short rhythm makes it easier to talk at home without reopening every answer."
+      },
+      {
+        "title": "No inflated promises",
+        "body": "The service stays careful: support, practice, and teacher-backed help when it matters."
       }
-    ]
+    ],
+    "footnote": "Respect is carried by the product behavior: fewer claims, clearer boundaries, and a calmer home conversation."
   },
   "finalCta": {
     "eyebrow": "Start learning",

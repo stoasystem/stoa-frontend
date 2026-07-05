@@ -44,23 +44,30 @@
     }
   },
   "trustLayer": {
-    "eyebrow": "Confiance suisse",
-    "title": "Pour des decisions educatives serieuses.",
-    "body": "La couche de confiance reste sobre et compacte, avec des preuves pour des decisions educatives serieuses.",
-    "items": [
+    "eyebrow": "Assurance par le service",
+    "title": "Rassurer sans intervenir.",
+    "body": "STOA donne aux parents le fil de la semaine, pendant que l'enfant garde l'espace pour avancer.",
+    "visualLabel": "Signal discret",
+    "caption": "Un signal d'apprentissage, pas une fenetre en direct.",
+    "principles": [
       {
-        "title": "Parents suisses d'abord",
-        "body": "La page s'adresse d'abord aux parents qui evaluent un soutien quotidien."
+        "title": "Le bon contexte",
+        "body": "Les parents voient ce qui avance, ce qui demande encore de l'entrainement et ou le soutien a aide."
       },
       {
-        "title": "Soutien enseignant",
-        "body": "Le langage reste credible et evite les promesses de remplacement du professeur."
+        "title": "Des limites claires",
+        "body": "L'enfant garde le travail. STOA garde l'etape suivante calme et concentree."
       },
       {
-        "title": "Pret pour plusieurs langues",
-        "body": "Les textes sont separes pour une future revision en anglais, allemand, francais et italien."
+        "title": "Un progres facile a discuter",
+        "body": "Un rythme court aide la conversation a la maison sans rouvrir chaque reponse."
+      },
+      {
+        "title": "Pas de grandes promesses",
+        "body": "Le service reste prudent: soutien, entrainement et aide enseignante quand cela compte."
       }
-    ]
+    ],
+    "footnote": "Le respect passe par le comportement du produit: moins d'affirmations, des limites plus claires et une conversation plus calme."
   },
   "finalCta": {
     "eyebrow": "Commencer",

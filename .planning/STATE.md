@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v6.2
 milestone_name: Home V2 Trust And Assurance Redesign
-status: planning
-last_updated: "2026-07-05T17:30:15Z"
-last_activity: 2026-07-05 — v6.2 requirements and roadmap created for Home V2 Trust/Assurance redesign
+status: complete
+last_updated: "2026-07-05T19:22:06Z"
+last_activity: 2026-07-05 — v6.2 Trust/Assurance redesign completed and verified
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 5
   total_plans: 5
-  completed_plans: 0
-  percent: 0
+  completed_plans: 5
+  percent: 100
 ---
 
 # Project State
@@ -20,37 +20,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-05)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.2 Home V2 Trust And Assurance Redesign is active. The work should turn the Trust section into a warm image-led assurance section with precise principles, Apple-like restraint, and no repeated "Swiss" or loud privacy marketing.
+**Current focus:** Milestone v6.2 Home V2 Trust And Assurance Redesign is complete. The Trust section now uses a warm image-led assurance layout with precise principles, Apple-like restraint, and no repeated "Swiss" or loud privacy marketing.
 
 ## Current Position
 
-Phase: 252 — Trust Art Direction And Asset Decision
-Plan: —
-Status: Ready for phase planning
-Last activity: 2026-07-05 — v6.2 requirements and roadmap created
+Phase: 256 — Trust Verification And Visual QA
+Plan: 256-PLAN.md
+Status: Complete
+Last activity: 2026-07-05 — v6.2 Trust/Assurance completed with lint, build, Home V2 E2E, copy discipline, and screenshot QA
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 5
-- Average duration: not started
-- Total execution time: not started
+- Total plans completed this milestone: 5 of 5
+- Average duration: same-day design/implementation cycle
+- Total execution time: 2026-07-05
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 252 | 0/1 | Pending | — |
-| 253 | 0/1 | Pending | — |
-| 254 | 0/1 | Pending | — |
-| 255 | 0/1 | Pending | — |
-| 256 | 0/1 | Pending | — |
+| 252 | 1/1 | Complete | 2026-07-05 |
+| 253 | 1/1 | Complete | 2026-07-05 |
+| 254 | 1/1 | Complete | 2026-07-05 |
+| 255 | 1/1 | Complete | 2026-07-05 |
+| 256 | 1/1 | Complete | 2026-07-05 |
 
 **Recent Trend:**
 
-- Last 5 planned phases: 252, 253, 254, 255, 256
-- Trend: v6.2 starts from the completed Parent Confidence contrast baseline and focuses on Trust/Assurance art direction, copy, editorial structure, implementation, and verification.
+- Last 5 completed phases: 252, 253, 254, 255, 256
+- Trend: v6.2 completed the Trust/Assurance arc from art direction through implementation and verification.
 
 *Updated after each plan completion*
 
@@ -75,6 +75,7 @@ Recent decisions affecting current work:
 - 2026-07-05 Home V2 Hero grilling: Hero direction was narrowed to short brand headline, one main family-learning image, one minimal proof panel, Start learning plus For parents CTAs, and a low-noise but easy-to-find Login entry in the floating nav.
 - 2026-07-05 v6.1 starts Parent Confidence as an emotional reassurance section: parents stay close without anxious intervention, and the section should use one quiet progress note rather than feature pills or dashboard language.
 - 2026-07-05 v6.2 starts Trust/Assurance as an image-led editorial assurance section: trust should feel built into restraint, boundaries, and visual order rather than repeated "Swiss" or privacy slogans.
+- 2026-07-05 v6.2 completed Trust/Assurance with one warm learning-detail image, four fine-line principles, restrained EN/DE/FR/IT copy, scoped Trust styling, and Home V2 E2E coverage.
 
 ### Quick Tasks Completed
 
@@ -82,6 +83,7 @@ Recent decisions affecting current work:
 |------|------|---------|
 | 2026-07-05 | Home V2 Parent Confidence and Trust milestone split | Created v6.1 Parent Confidence redesign and v6.2 Trust/Assurance redesign requirements/roadmaps from grill-me decisions. |
 | 2026-07-05 | Home V2 Parent Confidence redesign | Replaced dashboard-like pills with one calm weekly note, updated EN/DE/FR/IT copy, verified desktop/tablet/mobile screenshots, lint, build, and Home V2 E2E. |
+| 2026-07-05 | Home V2 Trust/Assurance redesign | Replaced Trust feature cards with one warm image, fine-line assurance principles, restrained four-language copy, scoped Trust styling, screenshots, lint, build, and Home V2 E2E. |
 | 2026-07-05 | Home V2 Learning Thread card alternation | Moved beat 04 to the right-side grid position on desktop/tablet layouts while keeping mobile single-column behavior. |
 | 2026-07-05 | Email verification Unauthorized fix | Kept public auth endpoints free of stale bearer tokens, mapped 401 verification failures to recovery copy, and verified the stale-token login/resend/confirm flow with auth e2e coverage. |
 | 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |
@@ -97,11 +99,11 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Future Home V2 implementation work: final asset selection, crop variants, image optimization, WebP/AVIF generation, localized alt text, animation choreography, screenshot QA, and `/` switch approval remain out of scope until separately planned.
+- Future Home V2 implementation work: final paid/commissioned photography, crop variants, image optimization, WebP/AVIF generation, full-page motion choreography, visual regression, and `/` switch approval remain out of scope until separately planned.
 
 ### Blockers/Concerns
 
-- Free Pexels/Unsplash candidates are suitable for prototype/preview but may not fully express Swiss private-school tone. A paid iStock or commissioned search may still be needed for the final public Hero.
+- Free Pexels/Unsplash candidates and current preview images are suitable for prototype/preview but may not fully express Swiss private-school tone. A paid iStock or commissioned search may still be needed for final public Hero and Trust photography.
 - Identifiable people appear in the downloaded candidates. Public use must avoid implying endorsement, negative portrayal, surveillance, or guaranteed educational outcomes.
 
 ## Deferred Items
@@ -110,12 +112,12 @@ Recent decisions affecting current work:
 |----------|------|--------|
 | paid_assets | iStock purchase and final license approval | deferred |
 | asset_pipeline | crop/optimization/WebP variants | deferred |
-| implementation | final Home V2 asset insertion into the preview route | deferred |
+| implementation | Home V2 preview asset insertion | partial |
 | motion | Learning Thread animation implemented; remaining section-level choreography deferred | partial |
 | copy | final EN/DE/FR/IT homepage copywriting | deferred |
 | switch_over | replacing `/` with Home V2 | deferred |
-| qa | browser screenshot QA with final assets | deferred |
+| qa | browser screenshot QA with prototype assets | partial |
 
 ## Operator Next Steps
 
-- Start Phase 252 with /gsd-plan-phase 252
+- v6.2 is complete. Recommended next milestone: final Home V2 image/photography replacement and full-page visual QA before any `/` switch decision.
