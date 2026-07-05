@@ -80,7 +80,7 @@ export function HomeV2PremiumHeader() {
           ))}
           <Link
             to="/login"
-            className="home-v2-magnetic mt-5 inline-flex min-h-12 w-max items-center rounded-full bg-[hsl(var(--home-v2-paper))] px-6 text-sm font-semibold text-[hsl(var(--home-v2-ink))]"
+            className="home-v2-mobile-login home-v2-magnetic mt-5 inline-flex min-h-12 w-max items-center justify-center rounded-full bg-[hsl(var(--home-v2-paper))] px-6 text-sm font-semibold"
             onClick={() => setIsOpen(false)}
           >
             {t('navigation.login')}

@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: 新版路由与组件骨架
 status: Awaiting next milestone
 last_updated: "2026-07-04T18:36:24.970Z"
-last_activity: 2026-07-05 — Completed Home V2 Learning Thread scroll animation quick task
+last_activity: 2026-07-05 — Fixed Home V2 mobile login button visibility
 progress:
   total_phases: 4
   completed_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-07-04)
 Phase: Milestone v4.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-05 — Completed Home V2 Learning Thread scroll animation quick task
+Last activity: 2026-07-05 — Fixed Home V2 mobile login button visibility
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Home V2 mobile login button fix | Fixed the mobile menu Login pill by giving it scoped ink text color instead of inheriting the overlay paper color. |
 | 2026-07-05 | Home V2 Learning Thread animation | Added scroll-driven active beat tracking, progressive lit thread rail, warm active/completed node states, restrained ambient glow, mobile single-column behavior, and reduced-motion handling. |
 | 2026-07-05 | Home V2 Hero refinement | Simplified Hero to a short brand headline, single main image, one proof panel, parent secondary CTA, and nav Login pill after grill-me clarification. |
 | 2026-07-05 | Home V2 premium visual redesign | Rebuilt `/home-v2` visual direction with floating nav, layered imagery, scroll reveal, pill CTA system, compressed preview assets, and family-facing copy while preserving `/`. |
