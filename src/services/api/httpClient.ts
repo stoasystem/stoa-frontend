@@ -68,14 +68,6 @@ httpClient.interceptors.response.use(
       }
     }
 
-    if (
-      status === 403 &&
-      window.location.pathname !== '/login' &&
-      window.location.pathname !== '/forbidden'
-    ) {
-      window.location.assign('/forbidden')
-    }
-
     const detail = error.response?.data?.detail ?? error.response?.data?.message
     const message = typeof detail === 'object' && detail !== null && 'message' in detail
       ? String(detail.message)
