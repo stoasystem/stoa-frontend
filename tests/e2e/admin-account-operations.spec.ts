@@ -11,8 +11,8 @@ test('admin can inspect ready parent account operations', async ({ page }) => {
 
   await expect(page.getByRole('heading', { name: /parent support console/i })).toBeVisible()
   await expect(page.getByRole('heading', { name: /^ready$/i })).toBeVisible()
-  await expect(page.getByText('Parent One')).toBeVisible()
-  await expect(page.getByText('Anna Keller')).toBeVisible()
+  await expect(page.getByText('Parent One', { exact: true })).toBeVisible()
+  await expect(page.getByText('Anna Keller').first()).toBeVisible()
   await expect(page.getByText(/invoice paid/i).first()).toBeVisible()
   await expect(page.getByText('Matched', { exact: true })).toBeVisible()
   await expect(page.getByText(/15 remaining/i)).toBeVisible()
@@ -74,7 +74,7 @@ test('admin can hand off from subscriptions to account operations', async ({ pag
 
   await expect(page).toHaveURL(/\/admin\/account-operations\?parentId=parent-1/)
   await expect(page.getByRole('heading', { name: /parent support console/i })).toBeVisible()
-  await expect(page.getByText('Parent One')).toBeVisible()
+  await expect(page.getByText('Parent One', { exact: true })).toBeVisible()
 })
 
 async function routeAdminAccountOperations(page: Page, data: AdminAccountOperations) {

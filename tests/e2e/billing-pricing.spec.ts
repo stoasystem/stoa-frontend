@@ -16,7 +16,7 @@ test('authenticated user can complete and cancel virtual checkout', async ({ pag
   await loginAs(page, 'student')
 
   await page.goto('/billing?plan=family')
-  await expect(page.getByRole('heading', { name: 'Subscription', exact: true })).toBeVisible()
+  await expect(page.locator('h1').filter({ hasText: /^Subscription$/ })).toBeVisible()
   await page.getByRole('button', { name: /start checkout/i }).click()
   await expect(page).toHaveURL(/\/billing\/checkout\/demo\?plan=family/)
   await expect(page.getByRole('heading', { name: /review your plan selection/i })).toBeVisible()
