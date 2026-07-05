@@ -2,11 +2,14 @@
 
 ## Planned Home V2 Milestones
 
-### v6.2 Home V2 Trust And Assurance Redesign (Planned)
+### v6.2 Home V2 Trust And Assurance Redesign (Active)
 
-**Status:** Planned
-**Requirements:** `.planning/milestones/v6.2-REQUIREMENTS.md`
-**Roadmap:** `.planning/milestones/v6.2-ROADMAP.md`
+**Status:** Active
+**Active requirements:** `.planning/REQUIREMENTS.md`
+**Active roadmap:** `.planning/ROADMAP.md`
+**Source requirements:** `.planning/milestones/v6.2-REQUIREMENTS.md`
+**Source roadmap:** `.planning/milestones/v6.2-ROADMAP.md`
+**Phases:** 252-256
 **Depends on:** v6.1 Home V2 Parent Confidence Redesign
 **Scope:** Redesign Trust into a warm, artistic, image-led assurance section with a precision principle list. Avoid generic feature cards, repeated "Swiss" labeling, and loud privacy marketing.
 

@@ -23,19 +23,20 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - EN/DE/FR/IT `homeV2` copy preserves the same parent-reassurance promise.
 - Current `/` remains unchanged; Trust/Assurance remains planned as v6.2.
 
-## Current Milestone: None Active
+## Current Milestone: v6.2 Home V2 Trust And Assurance Redesign
 
-**Goal:** v6.1 is complete. Recommended next scope is v6.2 Home V2 Trust And Assurance Redesign.
+**Goal:** Redesign the Home V2 Trust/Assurance section into a warm, artistic, image-led assurance section that communicates restraint, family respect, and reliability without repeatedly saying "Swiss" or turning privacy into a loud selling point.
 
 **Target features:**
 - Preserve current `/` until explicit replacement approval.
-- Keep `/home-v2` as the isolated preview route for Home V2 follow-up work.
+- Keep `/home-v2` as the isolated preview route for Trust/Assurance work.
 - Use v6.1 Parent Confidence as the contrast baseline for v6.2 Trust/Assurance.
-- Redesign Trust/Assurance as an image-led, warm, Apple-like assurance section without repeating "Swiss" or shouting privacy.
+- Replace the current feature-card trust grid with one artistic image direction and a precision principle list.
+- Use calm assurance copy that implies respect and boundaries without slogan-heavy privacy or compliance language.
 
 ## Current State
 
-**Latest shipped milestone:** v4.0 新版路由与组件骨架
+**Latest shipped milestone:** v6.1 Home V2 Parent Confidence Redesign
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -143,10 +144,17 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 has a premium visual direction contract covering high-end visual thesis, typography roles, color behavior, spacing, surfaces, CTA/nav treatment, image art direction, motion choreography, responsive/accessibility/localization guardrails, and implementation handoff constraints — v2.7
 - ✓ Home V2 has an image and asset strategy covering source hierarchy, Pexels/iStock/Magnific source rules, licensing and release checks, AI-use boundaries, section asset briefs, search taxonomy, candidate scoring, metadata, storage, crop/optimization, approval gates, and QA handoff — v2.8
 - ✓ Home V2 has an isolated public preview route, preserved `/` homepage, component namespace, provisional `homeV2` i18n skeleton, previewable five-section layout, route smoke tests, and implementation handoff — v4.0
+- ✓ Home V2 Parent Confidence communicates calm parental reassurance with one restrained weekly note, four-language copy, scoped visual polish, responsive screenshot review, and Home V2 E2E coverage — v6.1
 
 ### Active
 
-- No active milestone requirements. v6.2 Trust/Assurance redesign is the next planned Home V2 milestone.
+- [ ] **TA-01**: Parents can understand trust through STOA's service behavior rather than slogans: enough context, clear boundaries, calm progress, and no inflated promises.
+- [ ] **TA-02**: The section has one high-quality warm image direction that feels artistic, intimate, and European/Swiss-compatible without direct endorsement, surveillance, or stock tutoring poses.
+- [ ] **TA-03**: Parents see a precision principle list with 3-4 restrained rows, fine dividers, numbering, and whitespace instead of generic feature cards.
+- [ ] **TA-04**: The copy is calm and minimal, avoiding repeated "Swiss", loud privacy claims, compliance theater, surveillance framing, and instant-improvement promises.
+- [ ] **TA-05**: The Trust/Assurance layout remains composed and legible across desktop, narrow/tablet, and mobile widths.
+- [ ] **TA-06**: The redesign is verified with lint, build, Home V2 E2E, copy discipline checks, and browser/screenshot smoke for Trust/Assurance.
+- [ ] **TA-07**: The approved Trust/Assurance direction is implemented in `/home-v2` with scoped component, style, i18n, and image changes while preserving `/`.
 
 ### Out of Scope
 
@@ -502,6 +510,7 @@ Current codebase facts:
 | Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | v4.0 Complete |
 | Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | v4.0 Complete |
 | Make Parent Confidence an emotional reassurance section | The section should express parents staying close without anxious intervention, so v6.1 reduced dashboard language and replaced feature pills with one quiet weekly note | v6.1 Complete |
+| Make Trust feel built-in rather than claimed | v6.2 should express assurance through restraint, visual order, and service boundaries instead of repeating "Swiss", privacy, or compliance slogans | v6.2 Pending |
 
 ## Evolution
 
@@ -521,4 +530,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-05 after completing v6.1 Home V2 Parent Confidence redesign*
+*Last updated: 2026-07-05 after starting v6.2 Home V2 Trust And Assurance redesign*

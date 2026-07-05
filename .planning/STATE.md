@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.1
-milestone_name: Home V2 Parent Confidence Redesign
-status: Complete
-last_updated: "2026-07-05T17:24:00Z"
-last_activity: 2026-07-05 — Completed v6.1 Home V2 Parent Confidence redesign
+milestone: v6.2
+milestone_name: Home V2 Trust And Assurance Redesign
+status: planning
+last_updated: "2026-07-05T17:30:15Z"
+last_activity: 2026-07-05 — v6.2 requirements and roadmap created for Home V2 Trust/Assurance redesign
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  total_phases: 5
+  completed_phases: 0
+  total_plans: 5
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -20,36 +20,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-05)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.1 Home V2 Parent Confidence Redesign is complete. Parent Confidence now reads as calm parent reassurance rather than a feature dashboard, with one quiet weekly note and responsive visual checks across desktop, tablet, and mobile.
+**Current focus:** Milestone v6.2 Home V2 Trust And Assurance Redesign is active. The work should turn the Trust section into a warm image-led assurance section with precise principles, Apple-like restraint, and no repeated "Swiss" or loud privacy marketing.
 
 ## Current Position
 
-Phase: Milestone v6.1 complete
+Phase: 252 — Trust Art Direction And Asset Decision
 Plan: —
-Status: Complete
-Last activity: 2026-07-05 — Completed v6.1 Home V2 Parent Confidence redesign
+Status: Ready for phase planning
+Last activity: 2026-07-05 — v6.2 requirements and roadmap created
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 4 of 4
-- Average duration: same-day Parent Confidence redesign execution
-- Total execution time: completed 2026-07-05
+- Total plans completed this milestone: 0 of 5
+- Average duration: not started
+- Total execution time: not started
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 248 | 1/1 | Complete | 2026-07-05 |
-| 249 | 1/1 | Complete | 2026-07-05 |
-| 250 | 1/1 | Complete | 2026-07-05 |
-| 251 | 1/1 | Complete | 2026-07-05 |
+| 252 | 0/1 | Pending | — |
+| 253 | 0/1 | Pending | — |
+| 254 | 0/1 | Pending | — |
+| 255 | 0/1 | Pending | — |
+| 256 | 0/1 | Pending | — |
 
 **Recent Trend:**
 
-- Last 4 completed phases: 248, 249, 250, 251
-- Trend: v6.1 completed the Parent Confidence audit, visual structure, implementation, responsive polish, and verification while preserving `/`.
+- Last 5 planned phases: 252, 253, 254, 255, 256
+- Trend: v6.2 starts from the completed Parent Confidence contrast baseline and focuses on Trust/Assurance art direction, copy, editorial structure, implementation, and verification.
 
 *Updated after each plan completion*
 
@@ -73,6 +74,7 @@ Recent decisions affecting current work:
 - 2026-07-05 Home V2 visual feedback: the first skeleton still felt too close to the current homepage, so `/home-v2` was reworked toward an Editorial Luxury plus Z-Axis Cascade direction with scoped visual tokens, floating island navigation, layered image/proof surfaces, pill CTAs, and scroll reveal behavior.
 - 2026-07-05 Home V2 Hero grilling: Hero direction was narrowed to short brand headline, one main family-learning image, one minimal proof panel, Start learning plus For parents CTAs, and a low-noise but easy-to-find Login entry in the floating nav.
 - 2026-07-05 v6.1 starts Parent Confidence as an emotional reassurance section: parents stay close without anxious intervention, and the section should use one quiet progress note rather than feature pills or dashboard language.
+- 2026-07-05 v6.2 starts Trust/Assurance as an image-led editorial assurance section: trust should feel built into restraint, boundaries, and visual order rather than repeated "Swiss" or privacy slogans.
 
 ### Quick Tasks Completed
 
@@ -116,4 +118,4 @@ Recent decisions affecting current work:
 
 ## Operator Next Steps
 
-- Start v6.2 Trust/Assurance redesign when ready.
+- Start Phase 252 with /gsd-plan-phase 252
