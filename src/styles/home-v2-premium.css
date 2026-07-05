@@ -59,15 +59,40 @@
     filter 980ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+.home-v2-nav-cluster {
+  background:
+    linear-gradient(180deg, hsl(var(--home-v2-paper) / 0.5), hsl(var(--home-v2-line) / 0.2));
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.74),
+    inset 0 0 0 1px hsl(var(--home-v2-line) / 0.32);
+}
+
 .home-v2-nav-link {
+  color: hsl(var(--home-v2-ink) / 0.82);
+  text-decoration: none;
   transition:
+    background-color 620ms cubic-bezier(0.32, 0.72, 0, 1),
+    box-shadow 620ms cubic-bezier(0.32, 0.72, 0, 1),
     color 620ms cubic-bezier(0.32, 0.72, 0, 1),
     transform 620ms cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .home-v2-nav-link:hover {
   color: hsl(var(--home-v2-burgundy));
+  background-color: hsl(var(--home-v2-porcelain) / 0.82);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.86),
+    0 12px 26px hsl(var(--home-v2-ink) / 0.08);
   transform: translateY(-1px);
+}
+
+.home-v2-nav-link:focus-visible {
+  outline: none;
+  color: hsl(var(--home-v2-burgundy));
+  background-color: hsl(var(--home-v2-porcelain) / 0.9);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.86),
+    0 0 0 0.2rem hsl(var(--home-v2-gold) / 0.18);
 }
 
 .home-v2-mobile-login {

@@ -21,9 +21,9 @@ export function HomeV2PremiumHeader() {
           <Link to="/" className="ml-3 min-w-0">
             <AppLogo />
           </Link>
-          <nav className="hidden items-center gap-7 px-3 text-[13px] font-medium text-[hsl(var(--home-v2-ink)/0.62)] lg:flex">
+          <nav className="home-v2-nav-cluster hidden items-center gap-1.5 rounded-full px-1.5 py-1 lg:flex">
             {navItems.map((item) => (
-              <Link key={item.to} to={item.to} className="home-v2-nav-link whitespace-nowrap">
+              <Link key={item.to} to={item.to} className="home-v2-nav-link inline-flex min-h-12 items-center rounded-full px-6 text-base font-semibold">
                 {t(item.key)}
               </Link>
             ))}
