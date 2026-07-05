@@ -23,7 +23,7 @@ export function isCompliantPassword(password: string) {
     /[a-z]/.test(password) &&
     /[A-Z]/.test(password) &&
     /\d/.test(password) &&
-    /[^A-Za-z0-9]/.test(password)
+    /[!@#$%^&*]/.test(password)
   )
 }
 
