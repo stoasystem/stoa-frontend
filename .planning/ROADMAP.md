@@ -3,7 +3,7 @@
 ## Milestones
 
 - ⏳ **v6.2 Home V2 Trust And Assurance Redesign** - Planned
-- 🔄 **v6.1 Home V2 Parent Confidence Redesign** - Active, Phases 248-251
+- ✅ **v6.1 Home V2 Parent Confidence Redesign** - Phases 248-251 (shipped 2026-07-05)
 - ✅ **v4.0 新版路由与组件骨架** - Phases 244-247 (shipped 2026-07-04)
 - ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
 - ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
@@ -12,10 +12,10 @@
 
 ## Phases
 
-- [ ] **Phase 248: Parent Confidence Audit And Copy Contract** - Lock the parent-facing emotional promise and remove dashboard-like wording before implementation.
-- [ ] **Phase 249: Parent Confidence Visual Structure** - Define the warm image-plus-note composition, responsive proportions, and proof surface behavior.
-- [ ] **Phase 250: Parent Confidence Implementation** - Update the Home V2 Parent Confidence component, scoped styles, and required EN/DE/FR/IT copy.
-- [ ] **Phase 251: Parent Confidence Verification And Polish** - Run quality gates, inspect desktop/tablet/mobile layouts, and fix visual density or responsive issues.
+- [x] **Phase 248: Parent Confidence Audit And Copy Contract** - Lock the parent-facing emotional promise and remove dashboard-like wording before implementation.
+- [x] **Phase 249: Parent Confidence Visual Structure** - Define the warm image-plus-note composition, responsive proportions, and proof surface behavior.
+- [x] **Phase 250: Parent Confidence Implementation** - Update the Home V2 Parent Confidence component, scoped styles, and required EN/DE/FR/IT copy.
+- [x] **Phase 251: Parent Confidence Verification And Polish** - Run quality gates, inspect desktop/tablet/mobile layouts, and fix visual density or responsive issues.
 
 ## Phase Details
 
@@ -76,10 +76,10 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 248. Parent Confidence Audit And Copy Contract | 0/1 | Pending | — |
-| 249. Parent Confidence Visual Structure | 0/1 | Pending | — |
-| 250. Parent Confidence Implementation | 0/1 | Pending | — |
-| 251. Parent Confidence Verification And Polish | 0/1 | Pending | — |
+| 248. Parent Confidence Audit And Copy Contract | 1/1 | Complete | 2026-07-05 |
+| 249. Parent Confidence Visual Structure | 1/1 | Complete | 2026-07-05 |
+| 250. Parent Confidence Implementation | 1/1 | Complete | 2026-07-05 |
+| 251. Parent Confidence Verification And Polish | 1/1 | Complete | 2026-07-05 |
 
 ## Coverage
 
@@ -96,4 +96,4 @@
 
 ## Next Up
 
-Start Phase 248 to audit the current Parent Confidence section and lock the copy contract before visual/code implementation.
+v6.1 is complete. v6.2 should follow with the image-led Trust/Assurance redesign once approved.

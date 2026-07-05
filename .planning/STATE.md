@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v6.1
 milestone_name: Home V2 Parent Confidence Redesign
-status: planning
-last_updated: "2026-07-05T17:01:57Z"
-last_activity: 2026-07-05 — v6.1 requirements and roadmap created for Home V2 Parent Confidence redesign
+status: Complete
+last_updated: "2026-07-05T17:24:00Z"
+last_activity: 2026-07-05 — Completed v6.1 Home V2 Parent Confidence redesign
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 4
   total_plans: 4
-  completed_plans: 0
-  percent: 0
+  completed_plans: 4
+  percent: 100
 ---
 
 # Project State
@@ -20,36 +20,36 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-05)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.1 Home V2 Parent Confidence Redesign is active. The work should make the Parent Confidence section feel like calm parent reassurance rather than a feature dashboard: parents stay close to the learning rhythm without anxiously taking over homework.
+**Current focus:** Milestone v6.1 Home V2 Parent Confidence Redesign is complete. Parent Confidence now reads as calm parent reassurance rather than a feature dashboard, with one quiet weekly note and responsive visual checks across desktop, tablet, and mobile.
 
 ## Current Position
 
-Phase: 248 — Parent Confidence Audit And Copy Contract
+Phase: Milestone v6.1 complete
 Plan: —
-Status: Ready for phase planning
-Last activity: 2026-07-05 — v6.1 requirements and roadmap created
+Status: Complete
+Last activity: 2026-07-05 — Completed v6.1 Home V2 Parent Confidence redesign
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed this milestone: 0 of 4
-- Average duration: not started
-- Total execution time: not started
+- Total plans completed this milestone: 4 of 4
+- Average duration: same-day Parent Confidence redesign execution
+- Total execution time: completed 2026-07-05
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 248 | 0/1 | Pending | — |
-| 249 | 0/1 | Pending | — |
-| 250 | 0/1 | Pending | — |
-| 251 | 0/1 | Pending | — |
+| 248 | 1/1 | Complete | 2026-07-05 |
+| 249 | 1/1 | Complete | 2026-07-05 |
+| 250 | 1/1 | Complete | 2026-07-05 |
+| 251 | 1/1 | Complete | 2026-07-05 |
 
 **Recent Trend:**
 
-- Last 4 planned phases: 248, 249, 250, 251
-- Trend: v6.1 starts from Home V2's existing preview route and focuses narrowly on Parent Confidence emotional reassurance, visual structure, implementation, and verification.
+- Last 4 completed phases: 248, 249, 250, 251
+- Trend: v6.1 completed the Parent Confidence audit, visual structure, implementation, responsive polish, and verification while preserving `/`.
 
 *Updated after each plan completion*
 
@@ -79,6 +79,7 @@ Recent decisions affecting current work:
 | Date | Task | Outcome |
 |------|------|---------|
 | 2026-07-05 | Home V2 Parent Confidence and Trust milestone split | Created v6.1 Parent Confidence redesign and v6.2 Trust/Assurance redesign requirements/roadmaps from grill-me decisions. |
+| 2026-07-05 | Home V2 Parent Confidence redesign | Replaced dashboard-like pills with one calm weekly note, updated EN/DE/FR/IT copy, verified desktop/tablet/mobile screenshots, lint, build, and Home V2 E2E. |
 | 2026-07-05 | Home V2 Learning Thread card alternation | Moved beat 04 to the right-side grid position on desktop/tablet layouts while keeping mobile single-column behavior. |
 | 2026-07-05 | Email verification Unauthorized fix | Kept public auth endpoints free of stale bearer tokens, mapped 401 verification failures to recovery copy, and verified the stale-token login/resend/confirm flow with auth e2e coverage. |
 | 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |
@@ -115,4 +116,4 @@ Recent decisions affecting current work:
 
 ## Operator Next Steps
 
-- Start Phase 248 with /gsd-plan-phase 248
+- Start v6.2 Trust/Assurance redesign when ready.

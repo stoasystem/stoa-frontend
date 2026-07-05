@@ -10,18 +10,29 @@
 **Depends on:** v6.1 Home V2 Parent Confidence Redesign
 **Scope:** Redesign Trust into a warm, artistic, image-led assurance section with a precision principle list. Avoid generic feature cards, repeated "Swiss" labeling, and loud privacy marketing.
 
-### v6.1 Home V2 Parent Confidence Redesign (Active)
-
-**Status:** Active
-**Active requirements:** `.planning/REQUIREMENTS.md`
-**Active roadmap:** `.planning/ROADMAP.md`
-**Source requirements:** `.planning/milestones/v6.1-REQUIREMENTS.md`
-**Source roadmap:** `.planning/milestones/v6.1-ROADMAP.md`
-**Phases:** 248-251
-**Depends on:** v4.0 Home V2 route/component skeleton and current `/home-v2` preview implementation
-**Scope:** Redesign Parent Confidence around parent emotional relief: staying close without anxiously taking over homework. Replace multi-pill feature overlays with one restrained progress note/proof surface.
-
 ---
+
+## v6.1 Home V2 Parent Confidence Redesign (Shipped: 2026-07-05)
+
+**Phases completed:** 4 phases, 4 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.1-MILESTONE-AUDIT.md`
+**Depends on:** v4.0 Home V2 route/component skeleton and current `/home-v2` preview implementation
+**Known deferred items at close:** final paid/commissioned photography, full homepage copy pass, full-page motion choreography, Trust/Assurance redesign, visual regression suite, and replacing `/` remain future scope.
+
+**Key accomplishments:**
+
+- Reframed Parent Confidence around parent emotional relief rather than product-dashboard visibility.
+- Replaced the multi-pill overlay with one restrained weekly note proof surface.
+- Updated English, German, French, and Italian `homeV2` copy for the section.
+- Added scoped Home V2 parent-note styling, mobile top spacing, and reduced-motion handling.
+- Added Home V2 E2E assertion for the new parent note and verified desktop/tablet/mobile screenshots.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed with existing Vite chunk size warning.
+- `npm run test:e2e -- home-v2.spec.ts`: passed, 2/2 tests.
 
 ## v4.0 新版路由与组件骨架 (Shipped: 2026-07-04)
 

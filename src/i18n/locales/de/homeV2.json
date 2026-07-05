@@ -34,14 +34,14 @@
   },
   "parentConfidence": {
     "eyebrow": "Sicherheit fuer Eltern",
-    "title": "Lernen sehen, ohne selbst Tutor zu werden.",
-    "body": "Die Seite soll zeigen, was sich zu Hause veraendert: weniger Unsicherheit, ein klarerer Rhythmus und Unterstuetzung ohne Druck auf die Eltern.",
-    "visualLabel": "Elternansicht",
-    "points": [
-      "Woran das Kind heute gearbeitet hat",
-      "Wo Unterstuetzung noetig war",
-      "Welcher Fokus als Naechstes sinnvoll ist"
-    ]
+    "title": "Nah genug fuer Vertrauen. Frei genug zum Lernen.",
+    "body": "Eine kurze Notiz zeigt den Wochenrhythmus, damit Eltern informiert bleiben, ohne jeden Schritt zu begleiten.",
+    "visualLabel": "Familienrhythmus",
+    "note": {
+      "eyebrow": "Wochennotiz",
+      "title": "Ruhiger zu Hause",
+      "body": "Ihr Kind hat im richtigen Moment Hilfe geholt. Brueche bleiben der Fokus der naechsten Lerneinheit."
+    }
   },
   "trustLayer": {
     "eyebrow": "Vertrauen in der Schweiz",

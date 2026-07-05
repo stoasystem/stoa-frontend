@@ -34,14 +34,14 @@
   },
   "parentConfidence": {
     "eyebrow": "Confiance des parents",
-    "title": "Voir l'apprentissage sans tout prendre en main.",
-    "body": "La page doit montrer ce qui change a la maison: moins d'incertitude, un rythme plus lisible et un soutien sans transformer les parents en tuteurs.",
-    "visualLabel": "Vue parent",
-    "points": [
-      "Ce que l'enfant a travaille aujourd'hui",
-      "La ou il a eu besoin de soutien",
-      "Le prochain point de progression"
-    ]
+    "title": "Assez pres pour faire confiance. Assez loin pour laisser apprendre.",
+    "body": "Une courte note donne aux parents le rythme de la semaine, sans les placer au-dessus de chaque etape.",
+    "visualLabel": "Rythme familial",
+    "note": {
+      "eyebrow": "Note de la semaine",
+      "title": "Plus calme a la maison",
+      "body": "Votre enfant a demande de l'aide au bon moment. Les fractions restent le point de travail de la prochaine seance."
+    }
   },
   "trustLayer": {
     "eyebrow": "Confiance suisse",

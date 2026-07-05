@@ -34,14 +34,14 @@
   },
   "parentConfidence": {
     "eyebrow": "Parent confidence",
-    "title": "Visible learning without parent takeover.",
-    "body": "The page should help parents feel what changes at home: less uncertainty, a clearer rhythm, and support that does not turn them into the tutor.",
-    "visualLabel": "Parent view",
-    "points": [
-      "What the child worked on today",
-      "Where support was needed",
-      "What the next learning focus should be"
-    ]
+    "title": "Close enough to trust. Far enough to let them learn.",
+    "body": "A short note gives parents the rhythm of the week, so they can feel informed without sitting over every step.",
+    "visualLabel": "Family rhythm",
+    "note": {
+      "eyebrow": "Weekly note",
+      "title": "Calmer at home",
+      "body": "Your child asked for help at the right moment. Fractions stay the focus for the next study session."
+    }
   },
   "trustLayer": {
     "eyebrow": "Swiss trust layer",

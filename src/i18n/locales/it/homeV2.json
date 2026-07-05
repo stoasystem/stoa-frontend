@@ -34,14 +34,14 @@
   },
   "parentConfidence": {
     "eyebrow": "Fiducia per i genitori",
-    "title": "Vedere l'apprendimento senza prenderne il controllo.",
-    "body": "La pagina deve mostrare cosa cambia a casa: meno incertezza, un ritmo piu chiaro e supporto senza trasformare i genitori in tutor.",
-    "visualLabel": "Vista genitore",
-    "points": [
-      "Su cosa ha lavorato oggi lo studente",
-      "Dove e servito supporto",
-      "Quale sara il prossimo focus"
-    ]
+    "title": "Abbastanza vicini per fidarsi. Abbastanza lontani per lasciare imparare.",
+    "body": "Una breve nota mostra ai genitori il ritmo della settimana, senza farli intervenire in ogni passaggio.",
+    "visualLabel": "Ritmo familiare",
+    "note": {
+      "eyebrow": "Nota settimanale",
+      "title": "Piu calma a casa",
+      "body": "Tuo figlio ha chiesto aiuto al momento giusto. Le frazioni restano il focus della prossima sessione."
+    }
   },
   "trustLayer": {
     "eyebrow": "Fiducia svizzera",

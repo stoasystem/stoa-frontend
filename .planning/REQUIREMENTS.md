@@ -7,12 +7,12 @@
 
 ### Parent Confidence
 
-- [ ] **PC-01**: Parents can understand the section's emotional promise: they can stay close to the learning rhythm without taking over the child's homework.
-- [ ] **PC-02**: Parents can see a warm family-learning composition that feels concrete and reassuring without becoming a generic full-bleed stock block.
-- [ ] **PC-03**: Parents see one restrained progress-note/proof surface instead of a stack of dashboard-like feature pills.
-- [ ] **PC-04**: Parents read short, non-technical copy that communicates relief, calm proximity, and trust in the next learning step.
-- [ ] **PC-05**: The Parent Confidence layout remains controlled and legible at desktop, narrow/tablet, and mobile widths.
-- [ ] **PC-06**: The redesign is verified with lint, build, Home V2 E2E, and browser/screenshot smoke checks for the Parent Confidence section.
+- [x] **PC-01**: Parents can understand the section's emotional promise: they can stay close to the learning rhythm without taking over the child's homework.
+- [x] **PC-02**: Parents can see a warm family-learning composition that feels concrete and reassuring without becoming a generic full-bleed stock block.
+- [x] **PC-03**: Parents see one restrained progress-note/proof surface instead of a stack of dashboard-like feature pills.
+- [x] **PC-04**: Parents read short, non-technical copy that communicates relief, calm proximity, and trust in the next learning step.
+- [x] **PC-05**: The Parent Confidence layout remains controlled and legible at desktop, narrow/tablet, and mobile widths.
+- [x] **PC-06**: The redesign is verified with lint, build, Home V2 E2E, and browser/screenshot smoke checks for the Parent Confidence section.
 
 ## Future Requirements
 
@@ -39,12 +39,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PC-01 | 248 | Pending |
-| PC-02 | 249 | Pending |
-| PC-03 | 249 | Pending |
-| PC-04 | 250 | Pending |
-| PC-05 | 251 | Pending |
-| PC-06 | 251 | Pending |
+| PC-01 | 248 | Complete |
+| PC-02 | 249 | Complete |
+| PC-03 | 249 | Complete |
+| PC-04 | 250 | Complete |
+| PC-05 | 251 | Complete |
+| PC-06 | 251 | Complete |
 
 **Coverage:**
 - v6.1 requirements: 6 total
@@ -53,4 +53,4 @@
 
 ---
 *Requirements defined: 2026-07-05*
-*Last updated: 2026-07-05 after starting v6.1 Parent Confidence redesign*
+*Last updated: 2026-07-05 after completing v6.1 Parent Confidence redesign*

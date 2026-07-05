@@ -10,29 +10,28 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v4.0 新版路由与组件骨架
+## Latest Shipped Milestone: v6.1 Home V2 Parent Confidence Redesign
 
-**Shipped:** 2026-07-04
+**Shipped:** 2026-07-05
 
-**Delivered:** Home V2 now has an isolated, previewable `/home-v2` route and component skeleton that proves the Swiss-parent homepage structure without replacing the current `/` homepage. The milestone added `src/pages/home-v2/HomeV2Page.tsx`, a `src/components/home-v2/` section namespace, provisional `homeV2` i18n resources, a previewable five-section layout, focused Playwright smoke coverage, and route/component handoff documentation. Final image optimization, full animation choreography, final four-language copy, screenshot QA, and replacing `/` remain out of scope.
+**Delivered:** Home V2 Parent Confidence now communicates calm parental reassurance rather than dashboard-style monitoring. The section uses one warm family-learning visual plus a single restrained weekly note, short parent-first EN/DE/FR/IT copy, scoped Home V2 styling, focused E2E coverage, and desktop/tablet/mobile screenshot review while preserving the current `/` homepage.
 
 **Target features:**
-- `/home-v2` renders as a public preview route while `/` remains unchanged.
-- Home V2 composition lives under `src/pages/home-v2/` and `src/components/home-v2/`.
-- Hero, Learning Thread, Parent Confidence, Swiss Trust Layer, and Final CTA render with visible layout rhythm and placeholder visual/proof surfaces.
-- `homeV2` is registered in i18n and has provisional EN/DE/FR/IT resources.
-- Final assets, motion, copywriting, visual regression approval, and `/` switch-over remain later explicit milestones.
+- Parent Confidence explains that parents can stay close without anxiously taking over homework.
+- One quiet weekly note replaces the previous multi-pill feature overlay.
+- The image and note remain constrained across desktop, tablet, and mobile.
+- EN/DE/FR/IT `homeV2` copy preserves the same parent-reassurance promise.
+- Current `/` remains unchanged; Trust/Assurance remains planned as v6.2.
 
-## Current Milestone: v6.1 Home V2 Parent Confidence Redesign
+## Current Milestone: None Active
 
-**Goal:** Redesign the Home V2 Parent Confidence section so Swiss parents feel calmly informed and close to the learning rhythm without anxiously taking over homework.
+**Goal:** v6.1 is complete. Recommended next scope is v6.2 Home V2 Trust And Assurance Redesign.
 
 **Target features:**
 - Preserve current `/` until explicit replacement approval.
-- Keep `/home-v2` as the isolated preview route for Parent Confidence work.
-- Replace the current multi-pill feature overlay with one restrained parent-facing progress note/proof surface.
-- Use warmer family-learning composition and short parent-first copy instead of dashboard, monitoring, or feature-list language.
-- Preserve EN/DE/FR/IT `homeV2` plumbing and update only the copy needed for this section.
+- Keep `/home-v2` as the isolated preview route for Home V2 follow-up work.
+- Use v6.1 Parent Confidence as the contrast baseline for v6.2 Trust/Assurance.
+- Redesign Trust/Assurance as an image-led, warm, Apple-like assurance section without repeating "Swiss" or shouting privacy.
 
 ## Current State
 
@@ -77,6 +76,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - v2.2 Photo & File Upload UI with reusable upload types/services/hooks/components, Chat composer upload integration, Question Bank upload modal/session handoff, Practice schoolwork upload panels, route-state/session-storage handoff, four-language upload copy, docs, and Playwright upload verification.
 - v2.3 Live Classroom UI with classroom domain contracts, mock services/hooks, student classroom home/schedule/lobby/room/summary, Chat teacher-text-to-video escalation, tutor classroom queue/lobby/room/summary, parent classroom visibility, four-language liveClassroom namespace, docs, and Playwright coverage.
 - v4.0 Home V2 preview route and component skeleton with isolated `/home-v2`, preserved `/`, Home V2 section components, provisional `homeV2` i18n resources, route smoke coverage, and implementation handoff.
+- v6.1 Home V2 Parent Confidence redesign with one calm weekly note, parent-first four-language copy, scoped visual polish, responsive screenshot review, and Home V2 E2E coverage.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -146,12 +146,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 
 ### Active
 
-- [ ] **PC-01**: Parents can understand the section's emotional promise: they can stay close to the learning rhythm without taking over the child's homework.
-- [ ] **PC-02**: Parents can see a warm family-learning composition that feels concrete and reassuring without becoming a generic full-bleed stock block.
-- [ ] **PC-03**: Parents see one restrained progress-note/proof surface instead of a stack of dashboard-like feature pills.
-- [ ] **PC-04**: Parents read short, non-technical copy that communicates relief, calm proximity, and trust in the next learning step.
-- [ ] **PC-05**: The Parent Confidence layout remains controlled and legible at desktop, narrow/tablet, and mobile widths.
-- [ ] **PC-06**: The redesign is verified with lint, build, Home V2 E2E, and browser/screenshot smoke checks for the Parent Confidence section.
+- No active milestone requirements. v6.2 Trust/Assurance redesign is the next planned Home V2 milestone.
 
 ### Out of Scope
 
@@ -506,7 +501,7 @@ Current codebase facts:
 | Keep Home V2 visual direction separate from app surfaces | Public homepage polish should not leak large hero typography, decorative panels, or cinematic spacing into dense student/tutor/admin workflows | — Pending |
 | Build Home V2 as a previewable skeleton before final polish | The next implementation risk is route/component architecture and layout rhythm, while final images, animation, localized copy, screenshots, and homepage replacement need separate approval gates | v4.0 Complete |
 | Keep `/home-v2` isolated from `/` | The current homepage remains the stable public surface until the new page has implementation, asset, animation, copy, localization, and QA approval | v4.0 Complete |
-| Make Parent Confidence an emotional reassurance section | The section should express parents staying close without anxious intervention, so v6.1 should reduce dashboard language and replace feature pills with one quiet progress note | v6.1 Pending |
+| Make Parent Confidence an emotional reassurance section | The section should express parents staying close without anxious intervention, so v6.1 reduced dashboard language and replaced feature pills with one quiet weekly note | v6.1 Complete |
 
 ## Evolution
 
@@ -526,4 +521,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-05 after starting v6.1 Home V2 Parent Confidence redesign*
+*Last updated: 2026-07-05 after completing v6.1 Home V2 Parent Confidence redesign*
