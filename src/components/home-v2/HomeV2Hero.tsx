@@ -36,9 +36,9 @@ export function HomeV2Hero({ learningHref }: { learningHref: string }) {
         </div>
       </HomeV2Reveal>
 
-      <HomeV2Reveal delay={160}>
-        <HomeV2VisualFrame contentClassName="aspect-[4/5] md:aspect-[5/6] lg:aspect-[6/7]">
-          <div className="relative h-full min-h-[30rem] overflow-hidden">
+      <HomeV2Reveal delay={160} className="mx-auto w-full max-w-[44rem] lg:max-w-none">
+        <HomeV2VisualFrame contentClassName="aspect-[16/11] sm:aspect-[16/10] lg:aspect-[6/7]">
+          <div className="relative h-full min-h-[22rem] overflow-hidden sm:min-h-[26rem] lg:min-h-[30rem]">
             <img
               src={heroImageUrl}
               alt=""
