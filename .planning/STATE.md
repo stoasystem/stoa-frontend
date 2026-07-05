@@ -4,7 +4,7 @@ milestone: v4.0
 milestone_name: 新版路由与组件骨架
 status: Awaiting next milestone
 last_updated: "2026-07-05T14:41:28Z"
-last_activity: 2026-07-05 — Moved Home V2 Learning Thread card 04 to the right
+last_activity: 2026-07-05 — Planned Home V2 v6.1 Parent Confidence and v6.2 Trust/Assurance milestones
 progress:
   total_phases: 4
   completed_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-07-04)
 Phase: Milestone v4.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-07-05 — Moved Home V2 Learning Thread card 04 to the right
+Last activity: 2026-07-05 — Planned Home V2 v6.1 Parent Confidence and v6.2 Trust/Assurance milestones
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Recent decisions affecting current work:
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-05 | Home V2 Parent Confidence and Trust milestone split | Created v6.1 Parent Confidence redesign and v6.2 Trust/Assurance redesign requirements/roadmaps from grill-me decisions. |
 | 2026-07-05 | Home V2 Learning Thread card alternation | Moved beat 04 to the right-side grid position on desktop/tablet layouts while keeping mobile single-column behavior. |
 | 2026-07-05 | Email verification Unauthorized fix | Kept public auth endpoints free of stale bearer tokens, mapped 401 verification failures to recovery copy, and verified the stale-token login/resend/confirm flow with auth e2e coverage. |
 | 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |

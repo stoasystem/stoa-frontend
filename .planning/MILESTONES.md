@@ -1,5 +1,25 @@
 # Milestones
 
+## Planned Home V2 Milestones
+
+### v6.2 Home V2 Trust And Assurance Redesign (Planned)
+
+**Status:** Planned
+**Requirements:** `.planning/milestones/v6.2-REQUIREMENTS.md`
+**Roadmap:** `.planning/milestones/v6.2-ROADMAP.md`
+**Depends on:** v6.1 Home V2 Parent Confidence Redesign
+**Scope:** Redesign Trust into a warm, artistic, image-led assurance section with a precision principle list. Avoid generic feature cards, repeated "Swiss" labeling, and loud privacy marketing.
+
+### v6.1 Home V2 Parent Confidence Redesign (Planned)
+
+**Status:** Planned
+**Requirements:** `.planning/milestones/v6.1-REQUIREMENTS.md`
+**Roadmap:** `.planning/milestones/v6.1-ROADMAP.md`
+**Depends on:** v4.0 Home V2 route/component skeleton and current `/home-v2` preview implementation
+**Scope:** Redesign Parent Confidence around parent emotional relief: staying close without anxiously taking over homework. Replace multi-pill feature overlays with one restrained progress note/proof surface.
+
+---
+
 ## v4.0 新版路由与组件骨架 (Shipped: 2026-07-04)
 
 **Phases completed:** 4 phases, 4 plans, 0 code tasks

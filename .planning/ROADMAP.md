@@ -2,6 +2,8 @@
 
 ## Milestones
 
+- ⏳ **v6.2 Home V2 Trust And Assurance Redesign** - Planned
+- ⏳ **v6.1 Home V2 Parent Confidence Redesign** - Planned
 - ✅ **v4.0 新版路由与组件骨架** - Phases 244-247 (shipped 2026-07-04)
 - ✅ **v3.1 Home V2 Candidate Image Search And Shortlist** - Phases 240-243 (shipped 2026-07-03)
 - ✅ **v2.8 Home V2 Image And Asset Strategy** - Phases 236-239 (shipped 2026-07-03)
@@ -96,4 +98,4 @@
 
 ## Next Up
 
-v4.0 is complete. The next Home V2 milestone should choose one explicit scope: final asset insertion and optimization, motion choreography, final copy/localization, screenshot QA, or approved `/` switch-over.
+v6.1 is the next recommended Home V2 milestone: redesign Parent Confidence around parental reassurance without anxious intervention. v6.2 should follow with the image-led Trust/Assurance redesign once the Parent Confidence contrast is established.
