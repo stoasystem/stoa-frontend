@@ -10,26 +10,25 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v6.5 Home V2 Final Photography Procurement Pack
+## Latest Shipped Milestone: v6.6 Home V2 V6 Completion Handoff
 
 **Shipped:** 2026-07-06
 
-**Delivered:** Home V2 now has an executable final photography procurement package: paid-stock purchase path, commissioned shoot brief, license/release guardrails, final Hero and Parent Confidence art direction, paid-stock review template, approval workflow, and future implementation checklist. Current preview images remain unchanged and the current `/` homepage remains unchanged.
+**Delivered:** Home V2 v6 is complete as a preview/design/procurement track. The project now has a v6 completion report, runtime snapshot, readiness register, switch-over gate, and v7 next-program brief. Current preview images remain unchanged and the current `/` homepage remains unchanged.
 
 **Target features:**
-- Paid stock, commissioned photography, and temporary-public approval paths are separated.
-- License/release checks are documented before any public use.
-- Final Hero and Parent Confidence art direction is ready for stock review or photographer briefing.
-- Paid-stock search routes and review CSV template are available.
-- Commissioned shoot package defines shot list, wardrobe, location, props, releases, usage rights, and delivery specs.
-- Future implementation checklist is defined.
+- v6.1-v6.5 outcomes are summarized and closed.
+- Current `/home-v2` runtime route, components, images, locales, and tests are recorded.
+- Preview-approved and final-public-approved asset states are separated.
+- Switch-over gates are explicit: final assets, locale readiness, SEO/routing, QA, rollback, monitoring, and explicit approval.
+- v7/next-program brief is defined.
 - Preserve current `/` until explicit replacement approval.
 
 ## Current Milestone: None
 
 ## Current State
 
-**Latest shipped milestone:** v6.5 Home V2 Final Photography Procurement Pack
+**Latest shipped milestone:** v6.6 Home V2 V6 Completion Handoff
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -143,10 +142,11 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 has full-page visual QA, purpose-led asset readiness documentation, reveal robustness, scoped visual polish, restrained motion direction, and a readiness handoff while preserving `/` — v6.3
 - ✓ Home V2 has a final Hero and Parent Confidence photography approval handoff: current images are preview-approved but not final-public approved, paid/commissioned sourcing is recommended, and `/` remains unchanged — v6.4
 - ✓ Home V2 has a final photography procurement package with paid-stock review, commissioned shoot brief, license/release guardrails, approval workflow, and implementation handoff while preserving current images and `/` — v6.5
+- ✓ Home V2 v6 is closed with completion report, runtime snapshot, readiness register, switch-over gate, v7 next-program brief, and no `/` replacement — v6.6
 
 ### Active
 
-- [ ] Next Home V2 work should be paid-stock purchase review, commissioned shoot execution, or final asset implementation after approved final files exist.
+- [ ] v6 is complete. Next Home V2 work should start as v7 or an explicitly named final-asset/switch-over program.
 
 ### Out of Scope
 
@@ -522,4 +522,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-06 after completing v6.5 Home V2 Final Photography Procurement Pack*
+*Last updated: 2026-07-06 after completing v6 Home V2 closure*

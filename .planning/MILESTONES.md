@@ -1,5 +1,31 @@
 # Milestones
 
+## v6.6 Home V2 V6 Completion Handoff (Shipped: 2026-07-06)
+
+**Phases completed:** 5 phases, 5 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.6-MILESTONE-AUDIT.md`
+**Depends on:** v6.5 Home V2 Final Photography Procurement Pack
+**Known deferred items at close:** final public photography acquisition/implementation, runtime FR/IT enablement, SEO/routing/rollback, and public `/` switch-over remain future v7 or switch-over scope.
+
+**Key accomplishments:**
+
+- Closed the v6 Home V2 track as a preview/design/procurement program.
+- Produced a final v6 completion report summarizing v6.1-v6.5.
+- Recorded current `/home-v2` runtime route, components, images, locales, and test coverage.
+- Consolidated asset readiness and final-public approval states.
+- Defined switch-over gates before `/home-v2` can replace `/`.
+- Produced a v7 next-program brief.
+
+### Verification
+
+- `roadmap.analyze`: required before commit.
+- `git diff --check`: required before commit.
+- No runtime code or image binary changes were made.
+- Current `/` remains unchanged.
+
+---
+
 ## v6.5 Home V2 Final Photography Procurement Pack (Shipped: 2026-07-06)
 
 **Phases completed:** 5 phases, 5 plans, 0 code tasks
