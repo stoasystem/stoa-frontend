@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.4
-milestone_name: Home V2 Final Hero Parent Photography Approval
+milestone: v6.5
+milestone_name: Home V2 Final Photography Procurement Pack
 status: complete
-last_updated: "2026-07-06T12:48:00+02:00"
-last_activity: 2026-07-06 — v6.4 Home V2 Final Hero Parent Photography Approval completed
+last_updated: "2026-07-06T13:20:00+02:00"
+last_activity: 2026-07-06 — v6.5 Home V2 Final Photography Procurement Pack completed
 progress:
   total_phases: 5
   completed_phases: 5
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-06)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.4 Home V2 Final Hero Parent Photography Approval is complete. Current `/home-v2` images are approved for preview only, not final public homepage use; paid/commissioned sourcing is recommended before switch-over preparation.
+**Current focus:** Milestone v6.5 Home V2 Final Photography Procurement Pack is complete. Home V2 now has the procurement, paid-stock review, commissioned shoot, approval, and implementation-handoff documentation needed to solve final public photography without weakening the page with generic stock.
 
 ## Current Position
 
 Phase: None
 Plan: None
-Status: v6.4 complete
-Last activity: 2026-07-06 — Final photography handoff completed; `/` unchanged
+Status: v6.5 complete
+Last activity: 2026-07-06 — Procurement package completed; `/home-v2` preview assets and `/` unchanged
 
 ## Performance Metrics
 
@@ -35,22 +35,22 @@ Last activity: 2026-07-06 — Final photography handoff completed; `/` unchanged
 
 - Total plans completed this milestone: 5 of 5
 - Average duration: same-day documentation/decision milestone
-- Total execution time: 2026-07-06 onward
+- Total execution time: 2026-07-06
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 262 | 1/1 | Complete | same day |
-| 263 | 1/1 | Complete | same day |
-| 264 | 1/1 | Complete | same day |
-| 265 | 1/1 | Complete | same day |
-| 266 | 1/1 | Complete | same day |
+| 267 | 1/1 | Complete | same day |
+| 268 | 1/1 | Complete | same day |
+| 269 | 1/1 | Complete | same day |
+| 270 | 1/1 | Complete | same day |
+| 271 | 1/1 | Complete | same day |
 
 **Recent Trend:**
 
-- Last 5 completed phases: 262, 263, 264, 265, 266
-- Trend: v6.4 deliberately blocks switch-over preparation on final photography approval rather than weakening the homepage with merely acceptable free stock.
+- Last 5 completed phases: 267, 268, 269, 270, 271
+- Trend: v6.5 turns the v6.4 image-quality blocker into a concrete procurement and production package while preserving current preview assets and blocking premature switch-over.
 
 *Updated after each plan completion*
 
@@ -58,78 +58,41 @@ Last activity: 2026-07-06 — Final photography handoff completed; `/` unchanged
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
 - v2.6 starts the separate Home V2 redesign track. The current `/` homepage remains unchanged while Home V2 is planned as a Swiss-parent-first route with a learning-thread IA, natural `Start learning` CTA direction, role-specific app boundaries, and EN/DE/FR/IT guardrails.
 - v2.7 completed the Home V2 visual direction contract. The design direction is Editorial Luxury plus Editorial Split, with double-bezel proof surfaces, role-based typography, paper/charcoal/burgundy/sage/gold/cool-neutral color behavior, `Start learning` CTA treatment, image art direction, calm transform/opacity motion, and responsive/accessibility/localization handoff rules.
 - v2.8 completed the Home V2 image and asset strategy contract. It defines source hierarchy, Pexels/iStock/Magnific source notes, license/release/endorsement screens, section asset briefs, multilingual search taxonomy, scoring and rejection criteria, metadata ledger, future storage namespace, crop/optimization expectations, approval gates, and QA handoff.
-- v3.1 allows downloading suitable free, license-clear, traceable candidates when source, license, creator/vendor, AI status, role, and risk metadata are recorded.
-- v3.1 now keeps a refreshed Pexels/Unsplash candidate set. iStock remains paid and purchase-gated; Magnific remains stock/API/workflow-gated because it mixes licensed stock access and AI creative tooling.
-- PEX-8121121 is the best free Hero candidate found. PEX-9240631 was removed from local candidates because the creator/vendor name creates education-brand adjacency.
-- 2026-07-04 Swiss-market refresh: Asian-family mismatch candidates were removed from the active Home V2 pool because the homepage is aimed at Swiss parents. Swiss/European family context or face-light educational detail is now required for main homepage imagery.
-- Free stock is now acceptable for prototype work, but still not strong enough for final high-end Swiss private-education Hero positioning. Paid iStock or commissioned Swiss/European education photography remains recommended before public switch-over.
-- v4.0 completed the isolated `/home-v2` preview route and Home V2 namespace while preserving the current `/` homepage.
-- v4.0 keeps final asset insertion, motion choreography, final copy/localization, screenshot QA, and switching `/` as separate future milestones.
-- 2026-07-05 Home V2 visual feedback: the first skeleton still felt too close to the current homepage, so `/home-v2` was reworked toward an Editorial Luxury plus Z-Axis Cascade direction with scoped visual tokens, floating island navigation, layered image/proof surfaces, pill CTAs, and scroll reveal behavior.
-- 2026-07-05 Home V2 Hero grilling: Hero direction was narrowed to short brand headline, one main family-learning image, one minimal proof panel, Start learning plus For parents CTAs, and a low-noise but easy-to-find Login entry in the floating nav.
-- 2026-07-05 v6.1 starts Parent Confidence as an emotional reassurance section: parents stay close without anxious intervention, and the section should use one quiet progress note rather than feature pills or dashboard language.
-- 2026-07-05 v6.2 starts Trust/Assurance as an image-led editorial assurance section: trust should feel built into restraint, boundaries, and visual order rather than repeated "Swiss" or privacy slogans.
-- 2026-07-05 v6.2 completed Trust/Assurance with one warm learning-detail image, four fine-line principles, restrained EN/DE/FR/IT copy, scoped Trust styling, and Home V2 E2E coverage.
-- 2026-07-06 v6.3 starts Home V2 final visual QA and image readiness. The top acceptance standard is that a Swiss middle-to-upper-income parent can scan `/home-v2` on mobile for 30 seconds and perceive a calm, credible, refined education product rather than an AI tool page.
-- 2026-07-06 v6.3 should include purpose-led collection of photography, non-face AI detail imagery, texture/light material, fine-line/icon language, and Apple WWDC/product-keynote motion references.
-- 2026-07-06 v6.3 allows AI-generated assets only for non-identifiable, non-front-face high-end light, texture, desk, hand, line, or abstract learning details; people/family hero imagery should prioritize real traceable licensed photography.
-- 2026-07-06 v6.3 may download and commit source-clear assets intended for `/home-v2` preview or the formal candidate pool. Paid assets remain link-only unless separately purchased and approved.
-- 2026-07-06 Apple can be used as a composition and motion reference: cinematic scroll, large image/whitespace rhythm, careful reveal, light, materiality, and chapter-like pacing. Do not copy Apple assets, logos, product visuals, or exact frames.
-- 2026-07-06 Phase 257 completed full-page and section-level `/home-v2` visual QA. Main findings: overall direction is credible, reveal initial state creates blank full-page captures, Hero/Parent imagery is preview-safe but not final-public strong, Trust is the strongest current reference, and FR/IT Home V2 copy exists but is not runtime-enabled.
-- 2026-07-06 Phase 258 completed purpose-led asset collection. Current Hero remains the best free preview candidate; Parent Confidence is the highest-priority future image replacement; Trust is the strongest visual benchmark; AI is approved only for non-identifiable detail/texture; Apple references are link-only motion/composition references.
-- 2026-07-06 Phase 259 made Home V2 reveal content visible by default, added scroll-margin to Learning Thread and Final CTA, and softened Parent Confidence image treatment. Full-page mobile screenshots now capture all sections instead of blank middle content.
-- 2026-07-06 Phase 260 documented cinematic motion direction and added a subtle Final CTA material breathing light with reduced-motion coverage and no new dependency.
-- 2026-07-06 Phase 261 completed lint, build, Home V2 E2E, final screenshots, and readiness report. Readiness judgment: ready to prepare switch-over after final asset approval, but do not replace `/` yet.
-- 2026-07-06 v6.4 completed final Hero/Parent photography approval. Current images are preview-approved only, not final-public approved. No replacement was implemented because free-source candidates did not clearly improve the page; paid iStock/Getty review or commissioned Swiss/European photography is recommended before switch-over preparation.
+- v6.3 completed Home V2 final visual QA and image readiness. Readiness judgment: ready to prepare switch-over after final asset approval, but do not replace `/` yet.
+- v6.4 completed final Hero/Parent photography approval. Current images are preview-approved only, not final-public approved. No replacement was implemented because free-source candidates did not clearly improve the page; paid iStock/Getty review or commissioned Swiss/European photography is recommended before switch-over preparation.
+- v6.5 completed final photography procurement preparation. The next concrete step is paid-stock purchase review, commissioned shoot execution, or explicit temporary-public approval of current preview assets.
 
 ### Quick Tasks Completed
 
 | Date | Task | Outcome |
 |------|------|---------|
-| 2026-07-05 | Home V2 homepage copy rewrite | Rewrote EN/DE/FR/IT `/home-v2` copy around "Start with the question", teacher support as system backbone, clearer parent learning view, and proportional support; verified JSON, copy discipline, lint, build, E2E, and screenshots. |
-| 2026-07-05 | Home V2 Parent Confidence and Trust milestone split | Created v6.1 Parent Confidence redesign and v6.2 Trust/Assurance redesign requirements/roadmaps from grill-me decisions. |
-| 2026-07-05 | Home V2 Parent Confidence redesign | Replaced dashboard-like pills with one calm weekly note, updated EN/DE/FR/IT copy, verified desktop/tablet/mobile screenshots, lint, build, and Home V2 E2E. |
-| 2026-07-05 | Home V2 Trust/Assurance redesign | Replaced Trust feature cards with one warm image, fine-line assurance principles, restrained four-language copy, scoped Trust styling, screenshots, lint, build, and Home V2 E2E. |
-| 2026-07-05 | Home V2 Learning Thread card alternation | Moved beat 04 to the right-side grid position on desktop/tablet layouts while keeping mobile single-column behavior. |
-| 2026-07-05 | Email verification Unauthorized fix | Kept public auth endpoints free of stale bearer tokens, mapped 401 verification failures to recovery copy, and verified the stale-token login/resend/confirm flow with auth e2e coverage. |
-| 2026-07-05 | Registration password requirements guidance | Added visible password rules, matched frontend validation to the policy, mapped backend password-policy errors to concrete guidance, and verified auth e2e plus lint. |
-| 2026-07-05 | Home V2 Learning Thread breathing light | Removed scanning sweep, rail glint, and rotating halo effects; kept only a slow soft active spark and halo breath. |
-| 2026-07-05 | Home V2 narrow Hero image fix | Capped the Hero image panel below desktop, switched narrow screens to a shorter editorial landscape ratio, and preserved the tall desktop Hero composition. |
-| 2026-07-05 | Home V2 desktop nav visibility | Converted Parents/Teachers/Pricing into a clearer segmented pill cluster with 16px text, stronger ink contrast, larger hit areas, and refined hover/focus states. |
-| 2026-07-05 | Home V2 Learning Thread motion polish | Strengthened the active-card spark breathing, added a rotating halo layer, card light sweep, lit-line glint, and reduced-motion handling. |
-| 2026-07-05 | Home V2 mobile login button fix | Fixed the mobile menu Login pill by giving it scoped ink text color instead of inheriting the overlay paper color. |
-| 2026-07-05 | Home V2 Learning Thread animation | Added scroll-driven active beat tracking, progressive lit thread rail, warm active/completed node states, restrained ambient glow, mobile single-column behavior, and reduced-motion handling. |
-| 2026-07-05 | Home V2 Hero refinement | Simplified Hero to a short brand headline, single main image, one proof panel, parent secondary CTA, and nav Login pill after grill-me clarification. |
-| 2026-07-05 | Home V2 premium visual redesign | Rebuilt `/home-v2` visual direction with floating nav, layered imagery, scroll reveal, pill CTA system, compressed preview assets, and family-facing copy while preserving `/`. |
-| 2026-07-04 | Home V2 Swiss-market image refresh | Removed mismatch candidates, added Unsplash alternatives, and updated shortlist/ledger/state. |
+| 2026-07-06 | Home V2 final photography procurement pack | Created procurement strategy, final art direction, paid-stock review guide/template, commissioned shoot package, and approval workflow. |
+| 2026-07-06 | Home V2 final photography approval | Current Hero/Parent images kept as preview-only; final public approval deferred to paid/commissioned imagery. |
+| 2026-07-06 | Home V2 final visual QA and image readiness | Completed final QA, reveal robustness, motion polish, and readiness handoff while preserving `/`. |
 
 ### Pending Todos
 
-- Future Home V2 implementation work: final paid/commissioned photography, crop variants, image optimization, WebP/AVIF generation, full-page motion choreography, visual regression, and `/` switch approval remain out of scope until separately planned.
+- Future Home V2 implementation work: purchase or commission final photography, receive approved files, crop/optimize variants, generate WebP/AVIF, update `/home-v2` image imports, run visual QA, then plan `/` switch-over separately.
 
 ### Blockers/Concerns
 
-- Free Pexels/Unsplash candidates and current preview images are suitable for prototype/preview but are not approved as final public Hero/Parent photography. A paid iStock/Getty review or commissioned search is recommended for final public use.
-- Identifiable people appear in the downloaded candidates. Public use must avoid implying endorsement, negative portrayal, surveillance, or guaranteed educational outcomes.
+- No final public Hero/Parent photography file exists yet.
+- Paid assets require explicit purchase approval.
+- Commissioned photography requires vendor/model/location coordination and releases outside the repo.
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
 | paid_assets | iStock/Getty purchase and final license approval | deferred |
+| commissioned_assets | Swiss/European family-learning shoot | deferred |
 | asset_pipeline | crop/optimization/WebP variants | deferred |
-| implementation | Home V2 preview asset insertion | partial |
-| motion | Learning Thread animation implemented; remaining section-level choreography deferred | partial |
-| copy | final EN/DE/FR/IT homepage copywriting | deferred |
+| implementation | final Home V2 asset insertion | deferred |
 | switch_over | replacing `/` with Home V2 | deferred |
-| qa | browser screenshot QA with prototype assets | partial |
 
 ## Operator Next Steps
 
-- v6.4 is complete. Recommended next milestone: paid/commissioned final Hero and Parent photography procurement, or a separate switch-over preparation milestone only after explicit asset approval. Do not replace `/` yet.
+- v6.5 is complete. Recommended next milestone: either paid-stock candidate purchase review, commissioned photography production, or final asset implementation only after approved final files exist. Do not replace `/` yet.

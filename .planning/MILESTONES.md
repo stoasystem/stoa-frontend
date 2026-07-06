@@ -1,5 +1,31 @@
 # Milestones
 
+## v6.5 Home V2 Final Photography Procurement Pack (Shipped: 2026-07-06)
+
+**Phases completed:** 5 phases, 5 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.5-MILESTONE-AUDIT.md`
+**Depends on:** v6.4 Home V2 Final Hero Parent Photography Approval
+**Known deferred items at close:** actual paid-stock purchase, commissioned shoot execution, final image optimization, final image implementation, and public `/` switch-over remain future scope.
+
+**Key accomplishments:**
+
+- Defined the procurement decision path: paid stock, commissioned photography, or explicit temporary-public approval of current preview images.
+- Created license/release guardrails for iStock/Getty, Pexels/Unsplash, commissioned work, and AI-generated non-face details.
+- Created final Hero and Parent Confidence photography art direction.
+- Created paid stock search routes, query variants, scoring guide, and review CSV template.
+- Created a commissioned shoot package with shot list, wardrobe, location, props, releases, usage rights, and delivery specs.
+- Created the final approval workflow and future implementation checklist.
+
+### Verification
+
+- `roadmap.analyze`: required before commit.
+- `git diff --check`: required before commit.
+- No runtime code or image binary changes were made.
+- No paid/watermarked asset was committed.
+
+---
+
 ## v6.4 Home V2 Final Hero Parent Photography Approval (Shipped: 2026-07-06)
 
 **Phases completed:** 5 phases, 5 plans, 0 code tasks
