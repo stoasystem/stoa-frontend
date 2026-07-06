@@ -1,5 +1,31 @@
 # Milestones
 
+## v6.4 Home V2 Final Hero Parent Photography Approval (Shipped: 2026-07-06)
+
+**Phases completed:** 5 phases, 5 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v6.4-MILESTONE-AUDIT.md`
+**Depends on:** v6.3 Home V2 Final Visual QA And Image Readiness
+**Known deferred items at close:** paid iStock/Getty purchase, commissioned Swiss/European photography, final image optimization, and public `/` switch-over remain future scope.
+
+**Key accomplishments:**
+
+- Defined final Hero and Parent Confidence photography acceptance contracts.
+- Ran a targeted source review across the existing Pexels/Unsplash candidate pool, accessible Unsplash search routes, and link-only iStock paid routes.
+- Created a v6.4 candidate ledger with source, license, AI, fit, crop, endorsement, and decision notes.
+- Evaluated current and backup candidates against real `/home-v2` Hero and Parent frames.
+- Decided not to replace current preview images because no free candidate clearly improved final-public quality.
+- Produced a final handoff: current images are preview-approved, not final-public approved; `/` should not be replaced yet.
+
+### Verification
+
+- Documentation and ledger verification passed.
+- No runtime code or image binary changes were made.
+- No paid/watermarked asset was committed.
+- `git diff --check`: run before commit.
+
+---
+
 ## v6.3 Home V2 Final Visual QA And Image Readiness (Shipped: 2026-07-06)
 
 **Phases completed:** 5 phases, 5 plans, 0 code tasks

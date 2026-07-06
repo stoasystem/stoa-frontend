@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v6.3
-milestone_name: Home V2 Final Visual QA And Image Readiness
+milestone: v6.4
+milestone_name: Home V2 Final Hero Parent Photography Approval
 status: complete
-last_updated: "2026-07-06T01:02:00+02:00"
-last_activity: 2026-07-06 — v6.3 Home V2 Final Visual QA And Image Readiness completed
+last_updated: "2026-07-06T12:48:00+02:00"
+last_activity: 2026-07-06 — v6.4 Home V2 Final Hero Parent Photography Approval completed
 progress:
   total_phases: 5
   completed_phases: 5
@@ -20,37 +20,37 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-06)
 
 **Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language product copy, premium visual design, and a clean path to future real backend integration.
-**Current focus:** Milestone v6.3 Home V2 Final Visual QA And Image Readiness is complete. Home V2 is ready to prepare switch-over after final asset approval, but `/` remains unchanged and final Hero/Parent photography remains a separate decision.
+**Current focus:** Milestone v6.4 Home V2 Final Hero Parent Photography Approval is complete. Current `/home-v2` images are approved for preview only, not final public homepage use; paid/commissioned sourcing is recommended before switch-over preparation.
 
 ## Current Position
 
-Phase: 261 — Cross-Locale Verification And Readiness Handoff
-Plan: 261-PLAN.md
-Status: Complete
-Last activity: 2026-07-06 — v6.3 completed with readiness report
+Phase: None
+Plan: None
+Status: v6.4 complete
+Last activity: 2026-07-06 — Final photography handoff completed; `/` unchanged
 
 ## Performance Metrics
 
 **Velocity:**
 
 - Total plans completed this milestone: 5 of 5
-- Average duration: same-day design/implementation/verification pass
+- Average duration: same-day documentation/decision milestone
 - Total execution time: 2026-07-06 onward
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 257 | 1/1 | Complete | 2026-07-06 |
-| 258 | 1/1 | Complete | 2026-07-06 |
-| 259 | 1/1 | Complete | 2026-07-06 |
-| 260 | 1/1 | Complete | 2026-07-06 |
-| 261 | 1/1 | Complete | 2026-07-06 |
+| 262 | 1/1 | Complete | same day |
+| 263 | 1/1 | Complete | same day |
+| 264 | 1/1 | Complete | same day |
+| 265 | 1/1 | Complete | same day |
+| 266 | 1/1 | Complete | same day |
 
 **Recent Trend:**
 
-- Last 5 completed phases: 252, 253, 254, 255, 256
-- Trend: v6.3 completed final visual QA, asset readiness, scoped visual polish, restrained motion direction, and readiness handoff for `/home-v2`.
+- Last 5 completed phases: 262, 263, 264, 265, 266
+- Trend: v6.4 deliberately blocks switch-over preparation on final photography approval rather than weakening the homepage with merely acceptable free stock.
 
 *Updated after each plan completion*
 
@@ -86,6 +86,7 @@ Recent decisions affecting current work:
 - 2026-07-06 Phase 259 made Home V2 reveal content visible by default, added scroll-margin to Learning Thread and Final CTA, and softened Parent Confidence image treatment. Full-page mobile screenshots now capture all sections instead of blank middle content.
 - 2026-07-06 Phase 260 documented cinematic motion direction and added a subtle Final CTA material breathing light with reduced-motion coverage and no new dependency.
 - 2026-07-06 Phase 261 completed lint, build, Home V2 E2E, final screenshots, and readiness report. Readiness judgment: ready to prepare switch-over after final asset approval, but do not replace `/` yet.
+- 2026-07-06 v6.4 completed final Hero/Parent photography approval. Current images are preview-approved only, not final-public approved. No replacement was implemented because free-source candidates did not clearly improve the page; paid iStock/Getty review or commissioned Swiss/European photography is recommended before switch-over preparation.
 
 ### Quick Tasks Completed
 
@@ -114,14 +115,14 @@ Recent decisions affecting current work:
 
 ### Blockers/Concerns
 
-- Free Pexels/Unsplash candidates and current preview images are suitable for prototype/preview but may not fully express Swiss private-school tone. A paid iStock or commissioned search may still be needed for final public Hero and Trust photography.
+- Free Pexels/Unsplash candidates and current preview images are suitable for prototype/preview but are not approved as final public Hero/Parent photography. A paid iStock/Getty review or commissioned search is recommended for final public use.
 - Identifiable people appear in the downloaded candidates. Public use must avoid implying endorsement, negative portrayal, surveillance, or guaranteed educational outcomes.
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
-| paid_assets | iStock purchase and final license approval | deferred |
+| paid_assets | iStock/Getty purchase and final license approval | deferred |
 | asset_pipeline | crop/optimization/WebP variants | deferred |
 | implementation | Home V2 preview asset insertion | partial |
 | motion | Learning Thread animation implemented; remaining section-level choreography deferred | partial |
@@ -131,4 +132,4 @@ Recent decisions affecting current work:
 
 ## Operator Next Steps
 
-- v6.3 is complete. Recommended next milestone: final Hero/Parent photography approval or v6.4 homepage switch-over preparation. Do not replace `/` until final assets, SEO/routing, old-home preservation, monitoring, and rollback are planned.
+- v6.4 is complete. Recommended next milestone: paid/commissioned final Hero and Parent photography procurement, or a separate switch-over preparation milestone only after explicit asset approval. Do not replace `/` yet.
