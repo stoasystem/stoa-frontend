@@ -206,7 +206,7 @@
   max-width: min(100%, 12.4ch);
   overflow-wrap: normal;
   word-break: normal;
-  hyphens: auto;
+  hyphens: none;
   text-wrap: balance;
   font-size: clamp(3.85rem, 15vw, 4.55rem);
 }
@@ -222,10 +222,11 @@
 
 .home-v2-hero-frame {
   aspect-ratio: 16 / 11;
+  min-height: clamp(19rem, 44vw, 30rem);
 }
 
 .home-v2-hero-visual {
-  min-height: clamp(19rem, 44vw, 30rem);
+  min-height: inherit;
 }
 
 @media (min-width: 640px) {
@@ -763,10 +764,11 @@
 
   .home-v2-hero-frame {
     aspect-ratio: 4 / 5;
+    min-height: clamp(22rem, 92vw, 25rem);
   }
 
   .home-v2-hero-visual {
-    min-height: clamp(22rem, 92vw, 25rem);
+    min-height: inherit;
   }
 
   .home-v2-hero-visual img {
