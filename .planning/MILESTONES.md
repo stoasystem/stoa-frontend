@@ -1,5 +1,36 @@
 # Milestones
 
+## v8 Home V2 Visual QA And Switch Decision (Shipped: 2026-07-07)
+
+**Phases completed:** 7 phases, 7 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v8-MILESTONE-AUDIT.md`
+**Depends on:** v7 Full-Site Multilingual Adaptation Execution
+**Known deferred items at close:** final-public Hero/Parent imagery approval, FR mobile overflow fix, mobile Hero rhythm cleanup, legal-page public presentation cleanup, Home V2 SEO/routing/canonical/sitemap plan, old-home preservation, and rollback plan.
+
+**Key accomplishments:**
+
+- Initialized v8 as a no-code-change QA and decision milestone.
+- Captured `/home-v2` EN/DE/FR/IT desktop and mobile screenshots under `/private/tmp/stoa-home-v2-v8/`.
+- Captured current `/` EN desktop/mobile comparison screenshots.
+- Captured mobile menu open screenshots for Login and language-control review.
+- Ran layout audit and legal render audit with Playwright.
+- Produced screenshot matrix, visual QA switch decision, and Go/No-Go register.
+- Decided `/home-v2` is the stronger future homepage direction, but route replacement is No-Go now.
+- Created a v9 remediation backlog covering final imagery, FR mobile overflow, legal presentation, SEO/routing, and rollback readiness.
+
+### Verification
+
+- `roadmap.analyze`: passed, 7/7 phases complete.
+- `git diff --check`: passed.
+- Playwright screenshot capture: passed, 10 required screenshots plus 2 mobile menu screenshots.
+- Layout audit: completed; found FR mobile horizontal overflow.
+- Legal render audit: completed; `/privacy` and `/terms` render in EN/DE/FR/IT.
+- No runtime code changes were made.
+- Raw screenshots were not committed.
+
+---
+
 ## v7 Full-Site Multilingual Adaptation Execution (Shipped: 2026-07-07)
 
 **Phases completed:** 7 phases, 7 plans, 0 code tasks

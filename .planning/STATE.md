@@ -1,10 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: v7
-milestone_name: Full-Site Multilingual Adaptation Execution
+milestone: v8
+milestone_name: Home V2 Visual QA And Switch Decision
 status: complete
-last_updated: "2026-07-07T12:30:00+02:00"
-last_activity: 2026-07-07 - v7 multilingual execution completed
+last_updated: "2026-07-07T14:55:00+02:00"
+last_activity: 2026-07-07 - v8 visual QA completed with switch-over No-Go decision
 progress:
   total_phases: 7
   completed_phases: 7
@@ -19,15 +19,15 @@ progress:
 
 See: .planning/PROJECT.md (updated 2026-07-07)
 
-**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language runtime product copy, premium visual design, localized legal candidate pages, and a clean path to future legal review or Home V2 switch-over.
-**Current focus:** v7 is complete. Runtime languages are EN/DE/FR/IT, Home V2 has premium desktop/mobile language controls, `/privacy` and `/terms` are localized lawyer-review candidate pages, current `/` remains unchanged, `/home-v2` remains preview, and Romansh remains acknowledged but deferred.
+**Core value:** Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, stable demo backend support, documented API contracts, controlled guided Learning Assistant behavior, four-language runtime product copy, premium visual design, localized legal draft pages, and a clean Go/No-Go path for Home V2 switch-over planning.
+**Current focus:** v8 is complete. `/home-v2` is confirmed as the stronger visual direction, but switch-over is No-Go until v9 remediation fixes final image approval, FR mobile overflow, mobile Hero rhythm, legal-page presentation, SEO/routing, and rollback readiness. Current `/` remains unchanged.
 
 ## Current Position
 
 Phase: None
 Plan: None
-Status: v7 complete
-Last activity: 2026-07-07 - completed runtime FR/IT enablement, Home V2 language controls, legal localization, copy QA docs, and verification
+Status: v8 complete
+Last activity: 2026-07-07 - completed v8 screenshot-backed visual QA and switch decision
 
 ## Performance Metrics
 
@@ -41,18 +41,18 @@ Last activity: 2026-07-07 - completed runtime FR/IT enablement, Home V2 language
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 284 | 1/1 | Complete | same day |
-| 285 | 1/1 | Complete | same day |
-| 286 | 1/1 | Complete | same day |
-| 287 | 1/1 | Complete | same day |
-| 288 | 1/1 | Complete | same day |
-| 289 | 1/1 | Complete | same day |
-| 290 | 1/1 | Complete | same day |
+| 291 | 1/1 | Complete | same day |
+| 292 | 1/1 | Complete | same day |
+| 293 | 1/1 | Complete | same day |
+| 294 | 1/1 | Complete | same day |
+| 295 | 1/1 | Complete | same day |
+| 296 | 1/1 | Complete | same day |
+| 297 | 1/1 | Complete | same day |
 
 **Recent Trend:**
 
-- Last 7 completed phases: 284, 285, 286, 287, 288, 289, 290
-- Trend: v7 executed the multilingual runtime and QA track; future work should be legal review, full screenshot QA, or a separate Home V2 switch-over program.
+- Last 7 completed phases: 291, 292, 293, 294, 295, 296, 297
+- Trend: v8 completed screenshot-backed Home V2 QA and produced a No-Go switch decision with a v9 remediation backlog.
 
 *Updated after each plan completion*
 
@@ -60,43 +60,63 @@ Last activity: 2026-07-07 - completed runtime FR/IT enablement, Home V2 language
 
 ### Decisions
 
-- Launch runtime languages are EN/DE/FR/IT.
-- Romansh is acknowledged and intentionally deferred.
-- Home V2 uses a premium inline desktop language control and mobile menu chips.
-- Shared app language switcher inherits the four launch languages.
-- `/privacy` and `/terms` are localized candidate legal pages and require legal review before public reliance.
-- Current `/` remains unchanged.
-- `/home-v2` remains preview.
+- `/home-v2` is the primary QA object.
+- Current `/` is comparison-only and must not be replaced in v8.
+- v8 does not modify frontend code, replace images, rewrite major copy, or submit screenshots.
+- Raw screenshots are stored under `/private/tmp/stoa-home-v2-v8/`.
+- QA must include real browser screenshots and human design review.
+- Visual review prioritizes design quality first, content quality second, launch risk third.
+- Final-public image readiness is a hard Go/No-Go gate.
+- Legal pages should be complete, readable drafts for internal testing and lawyer review; page copy should not repeatedly declare unfinished/legal-ready status.
+- Legal review pending blocks final public launch, but does not block visual QA assessment itself.
+- v8 may conclude visual Go but switch-over No-Go.
+- All fix work discovered in v8 is deferred to v9.
+
+### Hard No-Go Conditions
+
+- Hero or Parent Confidence main image is not acceptable for final-public use.
+- EN/DE/FR/IT desktop or mobile layout has major overflow, overlap, broken wrapping, or poor crop.
+- Mobile first impression is clearly not premium.
+- Navigation, Login, or language controls are unclear or hard to use.
+- Motion is visually disruptive, unreadable, blank, or too strong.
+- `/privacy` or `/terms` is not a complete draft suitable for internal testing and lawyer review.
+- SEO, routing, or rollback readiness is unclear enough to make switch-over unsafe.
+- Current `/` is still a stronger public entry than `/home-v2`.
 
 ### Quick Tasks Completed
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-07 | v8 grill-me preparation | Confirmed QA-only boundary, screenshot evidence rules, legal draft expectations, switch readiness appendix, and v9 remediation policy. |
+| 2026-07-07 | v8 visual QA execution | Captured screenshot matrix, reviewed visual quality, legal drafts, SEO/routing/rollback readiness, and produced No-Go switch decision plus v9 backlog. |
 | 2026-07-07 | v7 multilingual execution | Added FR/IT runtime registration, Home V2 language controls, localized legal pages, QA docs, legal source notes, E2E coverage, and verification. |
-| 2026-07-07 | v7 multilingual planning | Created requirements, roadmap, language policy, glossary, tone rules, route QA matrix, legal research plan, and v7.1-v7.7 roadmap. |
 | 2026-07-06 | Home V2 v6 completion handoff | Created completion report, runtime snapshot, readiness register, switch-over gate, and v7 next-program brief. |
 
 ### Pending Todos
 
-- Run full route screenshot QA before broad public launch or Home V2 switch-over.
-- Send legal candidate pages and docs for qualified legal review.
-- Decide separately whether `/home-v2` should ever replace `/`.
+- Run v9 final issue cleanup from `docs/home-v2/v8-go-no-go-register.md`.
+- Keep raw screenshots in `/private/tmp/stoa-home-v2-v8/` while this local QA evidence is needed.
+- Do not replace `/` until v9 is complete and a separate switch-over stage is explicitly approved.
 
 ### Blockers/Concerns
 
-- Legal pages are candidate drafts only; legal entity, address, processor list, retention schedule, payment provider, age/guardian policy, refund terms, governing law, and legal review remain unresolved.
-- Runtime Romansh is not implemented.
-- Full screenshot QA across all P0/P1 routes remains recommended.
+- Final-public Hero and Parent Confidence photography remain preview-approved rather than final-public approved.
+- FR mobile has horizontal overflow and blocks switch-over.
+- Legal page presentation is complete-draft usable but visibly lawyer-review/draft framed.
+- SEO, route metadata, canonical/sitemap, and Home V2-specific rollback plan are incomplete.
+- Legal entity, address, processor list, retention schedule, payment provider, age/guardian policy, refund terms, governing law, and legal review remain unresolved.
+- Runtime Romansh is not implemented and remains intentionally deferred.
 
 ## Deferred Items
 
 | Category | Item | Status |
 |----------|------|--------|
-| legal | Lawyer approval of Privacy/Terms | deferred to external legal review |
-| qa | Full P0/P1 screenshot matrix | recommended before broad launch |
+| remediation | v9 final issue cleanup | next recommended milestone |
+| legal | qualified counsel review | required before final public reliance |
+| switch_over | replacing `/` with `/home-v2` | deferred to separate explicit stage |
+| screenshots | committing QA screenshots | not allowed in v8 |
 | romansh | Runtime Romansh support | acknowledged and deferred |
-| switch_over | replacing `/` with Home V2 | out of scope until explicit approval |
 
 ## Operator Next Steps
 
-- Review the localized `/privacy` and `/terms` copy with counsel and run full EN/DE/FR/IT screenshot QA before any broad launch decision.
+- Start v9 final issue cleanup from `docs/home-v2/v8-go-no-go-register.md`.

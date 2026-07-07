@@ -10,26 +10,28 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, runtime English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, localized legal candidate pages, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v7 Full-Site Multilingual Adaptation Execution
+## Latest Shipped Milestone: v8 Home V2 Visual QA And Switch Decision
 
 **Shipped:** 2026-07-07
 
-**Delivered:** v7 completed full-site runtime multilingual adaptation. The project now supports EN/DE/FR/IT at runtime, registers FR/IT locale resources, exposes four launch languages through the shared switcher, adds premium Home V2 desktop/mobile language controls, localizes `/privacy` and `/terms` through a lawyer-review `legal` namespace, removes visible Online Classroom mock/demo wording, and records copy QA, legal source notes, and release handoff. Current `/` remains unchanged and `/home-v2` remains a preview route.
+**Delivered:** v8 completed the screenshot-backed Home V2 visual QA and switch decision. `/home-v2` is confirmed as the stronger future homepage direction, with a more premium Swiss-parent visual language than the current `/`, but route replacement is No-Go until v9 remediation addresses final-public imagery, FR mobile overflow, mobile Hero rhythm, legal-page public presentation, SEO/routing/canonical/sitemap planning, old-home preservation, and rollback readiness. Current `/` remains unchanged and `/home-v2` remains a preview route.
 
 **Target features:**
-- EN/DE/FR/IT are launch runtime languages.
-- FR/IT resources are registered in runtime i18n.
-- Shared and Home V2 language controls support all four launch languages.
-- `/privacy` and `/terms` are localized lawyer-review candidate pages.
-- Legal source notes, unknown facts, and translation status are documented.
-- i18n key parity, value scan, lint, build, and targeted E2E verification pass.
+- `/home-v2` EN/DE/FR/IT desktop and mobile screenshots captured outside the repository.
+- Current `/` EN desktop/mobile comparison screenshots captured outside the repository.
+- Visual QA decision, screenshot matrix, and Go/No-Go register are documented.
+- Legal draft completeness and public-page presentation risk are documented.
+- SEO/routing/rollback readiness gaps are documented.
+- v9 remediation backlog is ready.
 - Preserve current `/`; do not switch `/home-v2` to `/` in this track.
 
 ## Current Milestone: None
 
+v8 is complete. The next recommended milestone is v9 final issue cleanup using `docs/home-v2/v8-go-no-go-register.md` as the backlog source.
+
 ## Current State
 
-**Latest shipped milestone:** v7 Full-Site Multilingual Adaptation Execution
+**Latest shipped milestone:** v8 Home V2 Visual QA And Switch Decision
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -74,6 +76,7 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - v6.2 Home V2 Trust/Assurance redesign with one warm learning-detail image, fine-line assurance principles, restrained four-language copy, scoped Trust styling, responsive screenshot review, and Home V2 E2E coverage.
 - v7.0 full-site multilingual adaptation planning with EN/DE/FR/IT runtime scope, Romansh language-policy deferral, glossary/tone/quality rules, Home V2 and shared language-control plan, route QA matrix, legal/privacy/terms research plan, and v7.1-v7.7 execution roadmap.
 - v7 full-site multilingual execution with EN/DE/FR/IT runtime registration, shared switcher and premium Home V2 language controls, localized Privacy/Terms candidate legal pages, Online Classroom copy cleanup, legal source notes, copy QA report, release handoff, and verification.
+- v8 Home V2 visual QA and switch decision with EN/DE/FR/IT screenshot matrix, current `/` comparison, layout audit, legal render audit, Go/No-Go register, final No-Go switch decision, and v9 remediation backlog.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -148,10 +151,13 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 v6 is closed with completion report, runtime snapshot, readiness register, switch-over gate, v7 next-program brief, and no `/` replacement — v6.6
 - ✓ Full-site multilingual adaptation is planned with EN/DE/FR/IT scope, Romansh deferral, glossary/tone/QA/legal research docs, and v7.1-v7.7 roadmap — v7.0
 - ✓ Full-site multilingual adaptation is executed with EN/DE/FR/IT runtime support, Home V2 language controls, localized legal candidate pages, copy QA docs, and verification — v7
+- ✓ Home V2 visual QA and switch decision is complete with screenshot evidence, legal draft review, SEO/routing/rollback assessment, No-Go switch verdict, and v9 remediation backlog — v8
 
 ### Active
 
-- [ ] Review localized legal candidate pages with qualified counsel and run full route screenshot QA before broad launch or any `/home-v2` switch-over decision.
+- [ ] Complete v9 final issue cleanup from `docs/home-v2/v8-go-no-go-register.md`.
+- [ ] Review localized legal candidate pages with qualified counsel before broad public reliance.
+- [ ] Do not replace `/` with `/home-v2` until final imagery, FR mobile layout, legal presentation, SEO/routing, and rollback readiness are resolved.
 
 ### Out of Scope
 
