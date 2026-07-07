@@ -1,22 +1,27 @@
+.home-v2-shell,
 .home-v2-premium {
-  --home-v2-ink: 22 16% 9%;
-  --home-v2-paper: 42 42% 96%;
-  --home-v2-porcelain: 44 44% 99%;
-  --home-v2-espresso: 24 18% 15%;
-  --home-v2-burgundy: 352 58% 31%;
-  --home-v2-sage: 94 13% 38%;
-  --home-v2-gold: 42 42% 48%;
-  --home-v2-line: 33 22% 76%;
+  --home-v2-ink: 220 18% 10%;
+  --home-v2-paper: 205 30% 96%;
+  --home-v2-porcelain: 195 38% 99%;
+  --home-v2-espresso: 212 16% 14%;
+  --home-v2-burgundy: 354 52% 30%;
+  --home-v2-sage: 168 13% 36%;
+  --home-v2-gold: 39 34% 48%;
+  --home-v2-line: 204 20% 78%;
   --home-v2-display:
     "PP Editorial New", "Canela", "Cormorant Garamond", Georgia, ui-serif, serif;
   --home-v2-text:
     "Plus Jakarta Sans", "Geist", "Avenir Next", ui-sans-serif, system-ui, sans-serif;
+}
 
+.home-v2-premium {
   position: relative;
   isolation: isolate;
   color: hsl(var(--home-v2-ink));
   background:
-    linear-gradient(180deg, hsl(var(--home-v2-paper)) 0%, hsl(46 34% 91%) 52%, hsl(39 36% 96%) 100%);
+    radial-gradient(ellipse at 18% 0%, hsl(176 28% 88% / 0.56), transparent 38rem),
+    radial-gradient(ellipse at 82% 18%, hsl(220 24% 91% / 0.72), transparent 42rem),
+    linear-gradient(180deg, hsl(200 40% 98%) 0%, hsl(205 28% 95%) 48%, hsl(195 32% 98%) 100%);
   font-family: var(--home-v2-text);
 }
 
@@ -28,10 +33,21 @@
   content: "";
   opacity: 0.035;
   background-image:
-    linear-gradient(90deg, hsl(var(--home-v2-ink) / 0.5) 1px, transparent 1px),
-    linear-gradient(0deg, hsl(var(--home-v2-ink) / 0.34) 1px, transparent 1px);
+    linear-gradient(90deg, hsl(var(--home-v2-ink) / 0.42) 1px, transparent 1px),
+    linear-gradient(0deg, hsl(var(--home-v2-sage) / 0.36) 1px, transparent 1px);
   background-size: 3px 3px;
   mix-blend-mode: multiply;
+}
+
+.home-v2-premium::after {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(115deg, transparent 0%, hsl(0 0% 100% / 0.34) 38%, transparent 68%),
+    linear-gradient(180deg, hsl(190 22% 100% / 0.42), transparent 26%);
 }
 
 .home-v2-display {
@@ -41,6 +57,11 @@
 
 .home-v2-text {
   font-family: var(--home-v2-text);
+}
+
+.home-v2-shell {
+  background:
+    linear-gradient(180deg, hsl(200 40% 98%), hsl(205 28% 95%) 72%, hsl(195 32% 97%));
 }
 
 .home-v2-reveal {
@@ -61,7 +82,7 @@
 
 .home-v2-nav-cluster {
   background:
-    linear-gradient(180deg, hsl(var(--home-v2-paper) / 0.5), hsl(var(--home-v2-line) / 0.2));
+    linear-gradient(180deg, hsl(var(--home-v2-porcelain) / 0.74), hsl(var(--home-v2-line) / 0.18));
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.74),
     inset 0 0 0 1px hsl(var(--home-v2-line) / 0.32);
@@ -116,7 +137,7 @@
   border: 1px solid hsl(var(--home-v2-line) / 0.46);
   border-radius: 999px;
   background:
-    linear-gradient(180deg, hsl(var(--home-v2-porcelain) / 0.68), hsl(var(--home-v2-paper) / 0.36));
+    linear-gradient(180deg, hsl(var(--home-v2-porcelain) / 0.78), hsl(var(--home-v2-paper) / 0.44));
   box-shadow:
     inset 0 1px 0 hsl(0 0% 100% / 0.64),
     0 12px 28px hsl(var(--home-v2-ink) / 0.06);

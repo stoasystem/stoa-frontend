@@ -78,6 +78,7 @@ Last activity: 2026-07-07 - v9 completed
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-07 | Home V2 color palette redesign | Replaced generic beige with a cooler porcelain/mist-grey Home V2 palette, scoped footer styling to Home V2, verified lint/build and desktop/mobile preview screenshots. |
 | 2026-07-07 | v9 final issue cleanup | Fixed Home V2 responsive blockers, cleaned legal page presentation, added metadata, documented temporary image approval and switch-over plan, verified with screenshots/audits/lint/build/E2E. |
 | 2026-07-07 | v8 visual QA execution | Captured screenshot matrix, reviewed visual quality, legal drafts, SEO/routing/rollback readiness, and produced No-Go switch decision plus v9 backlog. |
 | 2026-07-07 | v7 multilingual execution | Added FR/IT runtime registration, Home V2 language controls, localized legal pages, QA docs, legal source notes, E2E coverage, and verification. |

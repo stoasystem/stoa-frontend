@@ -22,7 +22,19 @@ export function HomeV2Page() {
   const learningHref = getLearningHref(isAuthenticated ? user?.role : null)
 
   return (
-    <MarketingLayout hideHeader>
+    <MarketingLayout
+      hideHeader
+      className="home-v2-shell"
+      footerStyle={{
+        borderColor: 'hsl(var(--home-v2-line) / 0.62)',
+        background: 'linear-gradient(180deg, hsl(var(--home-v2-paper) / 0.92), hsl(204 24% 91%))',
+        boxShadow: 'inset 0 1px 0 hsl(0 0% 100% / 0.76), 0 -28px 72px hsl(var(--home-v2-ink) / 0.04)',
+      }}
+      footerBottomStyle={{
+        borderColor: 'hsl(var(--home-v2-line) / 0.56)',
+        background: 'hsl(205 22% 88%)',
+      }}
+    >
       <Seo
         title="STOA | Guided learning support"
         description="STOA helps students move from questions to clearer next steps, with teacher-backed learning support and parent visibility."

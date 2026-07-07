@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react'
+import type { CSSProperties } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
 import { AppFooter } from '@/components/common/AppFooter'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 export function MarketingHeader() {
   const { t } = useTranslation('common')
@@ -47,16 +49,47 @@ export function MarketingHeader() {
   )
 }
 
-export function MarketingFooter() {
-  return <AppFooter />
+export function MarketingFooter({
+  className,
+  style,
+  bottomClassName,
+  bottomStyle,
+}: {
+  className?: string
+  style?: CSSProperties
+  bottomClassName?: string
+  bottomStyle?: CSSProperties
+}) {
+  return <AppFooter className={className} style={style} bottomClassName={bottomClassName} bottomStyle={bottomStyle} />
 }
 
-export function MarketingLayout({ children, hideHeader = false }: { children: ReactNode; hideHeader?: boolean }) {
+export function MarketingLayout({
+  children,
+  hideHeader = false,
+  className,
+  footerClassName,
+  footerStyle,
+  footerBottomClassName,
+  footerBottomStyle,
+}: {
+  children: ReactNode
+  hideHeader?: boolean
+  className?: string
+  footerClassName?: string
+  footerStyle?: CSSProperties
+  footerBottomClassName?: string
+  footerBottomStyle?: CSSProperties
+}) {
   return (
-    <div className="premium-shell min-h-screen text-foreground">
+    <div className={cn('premium-shell min-h-screen text-foreground', className)}>
       {hideHeader ? null : <MarketingHeader />}
       <main>{children}</main>
-      <MarketingFooter />
+      <MarketingFooter
+        className={footerClassName}
+        style={footerStyle}
+        bottomClassName={footerBottomClassName}
+        bottomStyle={footerBottomStyle}
+      />
     </div>
   )
 }
