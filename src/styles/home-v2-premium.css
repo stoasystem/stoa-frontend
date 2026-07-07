@@ -31,12 +31,19 @@
   z-index: 20;
   pointer-events: none;
   content: "";
-  opacity: 0.035;
+  opacity: 0.18;
   background-image:
-    linear-gradient(90deg, hsl(var(--home-v2-ink) / 0.42) 1px, transparent 1px),
-    linear-gradient(0deg, hsl(var(--home-v2-sage) / 0.36) 1px, transparent 1px);
-  background-size: 3px 3px;
+    repeating-linear-gradient(112deg, transparent 0 25px, hsl(var(--home-v2-ink) / 0.022) 25px 26px, transparent 26px 52px),
+    repeating-linear-gradient(28deg, transparent 0 42px, hsl(var(--home-v2-sage) / 0.018) 42px 43px, transparent 43px 86px),
+    repeating-linear-gradient(90deg, hsl(0 0% 100% / 0.018) 0 1px, transparent 1px 8px),
+    radial-gradient(circle at 50% 0%, hsl(var(--home-v2-ink) / 0.012), transparent 44rem);
+  background-size:
+    22rem 22rem,
+    30rem 30rem,
+    0.72rem 0.72rem,
+    100% 100%;
   mix-blend-mode: multiply;
+  mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 86%, transparent 100%);
 }
 
 .home-v2-premium::after {
