@@ -106,6 +106,85 @@
   color: hsl(var(--home-v2-burgundy));
 }
 
+.home-v2-language-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.125rem;
+  min-height: 2.75rem;
+  padding: 0.25rem;
+  border: 1px solid hsl(var(--home-v2-line) / 0.46);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, hsl(var(--home-v2-porcelain) / 0.68), hsl(var(--home-v2-paper) / 0.36));
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.64),
+    0 12px 28px hsl(var(--home-v2-ink) / 0.06);
+}
+
+.home-v2-language-button {
+  min-width: 2.35rem;
+  min-height: 2.15rem;
+  border-radius: 999px;
+  color: hsl(var(--home-v2-ink) / 0.58);
+  font-family: var(--home-v2-text);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition:
+    color 260ms ease,
+    background-color 260ms ease,
+    box-shadow 260ms ease;
+}
+
+.home-v2-language-button:hover,
+.home-v2-language-button:focus-visible {
+  color: hsl(var(--home-v2-burgundy));
+  outline: none;
+}
+
+.home-v2-language-button.is-active {
+  color: hsl(var(--home-v2-ink));
+  background: hsl(var(--home-v2-porcelain) / 0.82);
+  box-shadow:
+    inset 0 1px 0 hsl(0 0% 100% / 0.72),
+    0 10px 24px hsl(var(--home-v2-ink) / 0.08);
+}
+
+.home-v2-mobile-language-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid hsl(var(--home-v2-paper) / 0.16);
+}
+
+.home-v2-mobile-language-chip {
+  min-width: 3.15rem;
+  min-height: 2.75rem;
+  border: 1px solid hsl(var(--home-v2-paper) / 0.18);
+  border-radius: 999px;
+  color: hsl(var(--home-v2-paper) / 0.68);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  transition:
+    color 260ms ease,
+    border-color 260ms ease,
+    background-color 260ms ease;
+}
+
+.home-v2-mobile-language-chip.is-active {
+  border-color: hsl(var(--home-v2-gold) / 0.48);
+  color: hsl(var(--home-v2-paper));
+  background: hsl(var(--home-v2-paper) / 0.08);
+}
+
+.home-v2-mobile-language-chip:focus-visible {
+  outline: 2px solid hsl(var(--home-v2-gold) / 0.42);
+  outline-offset: 3px;
+}
+
 .home-v2-magnetic {
   transition:
     color 720ms cubic-bezier(0.32, 0.72, 0, 1),

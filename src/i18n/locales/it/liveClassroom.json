@@ -19,7 +19,7 @@
     "sessionContext": "Contesto della sessione",
     "joinClassroom": "Entra in classe",
     "waitingForTutor": "In attesa del tutor",
-    "notRealVideo": "Questa e una lobby dimostrativa. La vera connessione video sara aggiunta piu avanti."
+    "notRealVideo": "La classe e pronta. Rivedi il contesto, poi entra quando sei pronto."
   },
   "room": {
     "chat": "Chat",
@@ -28,7 +28,7 @@
     "participants": "Partecipanti",
     "sharedProblem": "Problema condiviso",
     "whiteboard": "Lavagna",
-    "mockRoom": "Classe dimostrativa"
+    "mockRoom": "Spazio classe"
   },
   "summary": {
     "title": "Riepilogo della sessione",

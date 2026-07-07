@@ -1,0 +1,56 @@
+{
+  "privacy": {
+    "eyebrow": "Lawyer-review draft",
+    "title": "Privacy Policy",
+    "description": "Candidate wording for STOA data handling. Legal review remains required before broad public launch.",
+    "sections": {
+      "dataWeCollect": {
+        "title": "Data we collect",
+        "body": "STOA may collect account data, role, contact details, student learning activity, questions, uploaded homework metadata, support requests, feedback, analytics events, and frontend error reports."
+      },
+      "studentLearning": {
+        "title": "Student learning data",
+        "body": "Learning data can include recent questions, conversation metadata, weak topics, teacher-support requests, report summaries, and progress signals used to support the student and inform parents."
+      },
+      "visibility": {
+        "title": "Parent and teacher visibility",
+        "body": "Parents can see learning summaries, reports, focus areas, and teacher involvement. Teachers can see the context needed to answer a help request, including the relevant question and prior explanation."
+      },
+      "useRetention": {
+        "title": "Use, retention, and deletion",
+        "body": "Data is used to operate STOA, provide learning support, prepare reports, handle support, monitor reliability, and improve the service. Retention periods and deletion workflows require final operational confirmation."
+      },
+      "thirdParties": {
+        "title": "Service partners",
+        "body": "Hosting, authentication, analytics, monitoring, payment, and support partners may process limited data under appropriate service agreements. The final processor list requires legal review."
+      }
+    }
+  },
+  "terms": {
+    "eyebrow": "Lawyer-review draft",
+    "title": "Terms",
+    "description": "Candidate wording for STOA usage, learning support boundaries, subscriptions, and acceptable use.",
+    "sections": {
+      "learningSupport": {
+        "title": "Learning support",
+        "body": "STOA supports learning with explanations, practice, and access to teacher-backed help. It does not replace school instruction, parent judgment, or professional educational decisions."
+      },
+      "accuracy": {
+        "title": "Explanations and outcomes",
+        "body": "Learning explanations can be incomplete or incorrect. STOA does not guarantee grades, exam results, or specific outcomes. Important work should be checked by the student, parent, teacher, or tutor."
+      },
+      "acceptableUse": {
+        "title": "Acceptable use",
+        "body": "Users must not upload illegal, unsafe, highly sensitive, or unrelated content. Homework uploads should be limited to material needed for learning support."
+      },
+      "subscriptions": {
+        "title": "Trials and subscriptions",
+        "body": "Free trials, quotas, subscriptions, cancellations, refunds, and payment workflows require final commercial and legal confirmation before public reliance."
+      },
+      "serviceChanges": {
+        "title": "Service changes",
+        "body": "STOA may change, pause, or terminate access where needed to protect students, data, reliability, and support quality. Contact support for questions or account requests."
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "privacy": {
+    "eyebrow": "Projet pour revue juridique",
+    "title": "Politique de confidentialite",
+    "description": "Texte candidat sur le traitement des donnees par STOA. Une revue juridique reste necessaire avant une diffusion publique large.",
+    "sections": {
+      "dataWeCollect": {
+        "title": "Donnees collectees",
+        "body": "STOA peut traiter les donnees de compte, le role, les coordonnees, l'activite d'apprentissage, les questions, les metadonnees de supports scolaires importes, les demandes d'assistance, les retours, les evenements d'analyse et les rapports d'erreur du frontend."
+      },
+      "studentLearning": {
+        "title": "Donnees d'apprentissage",
+        "body": "Les donnees d'apprentissage peuvent comprendre les questions recentes, les metadonnees de conversation, les points a travailler, les demandes d'appui enseignant, les resumes de rapport et les signaux de progres utilises pour soutenir l'eleve et informer les parents."
+      },
+      "visibility": {
+        "title": "Visibilite pour les parents et les enseignants",
+        "body": "Les parents peuvent voir des resumes d'apprentissage, des rapports, des axes de travail et l'intervention d'un enseignant. Les enseignants voient le contexte necessaire pour repondre a une demande d'aide."
+      },
+      "useRetention": {
+        "title": "Utilisation, conservation et suppression",
+        "body": "Les donnees servent a exploiter STOA, fournir le soutien d'apprentissage, preparer les rapports, traiter l'assistance, surveiller la fiabilite et ameliorer le service. Les durees de conservation et les processus de suppression doivent etre confirmes."
+      },
+      "thirdParties": {
+        "title": "Prestataires",
+        "body": "Les prestataires d'hebergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des donnees limitees dans le cadre d'accords appropries. La liste finale des sous-traitants doit etre revue juridiquement."
+      }
+    }
+  },
+  "terms": {
+    "eyebrow": "Projet pour revue juridique",
+    "title": "Conditions",
+    "description": "Texte candidat sur l'utilisation de STOA, les limites du soutien d'apprentissage, les abonnements et les usages autorises.",
+    "sections": {
+      "learningSupport": {
+        "title": "Soutien d'apprentissage",
+        "body": "STOA soutient l'apprentissage avec des explications, de la pratique et un acces a un appui enseignant. STOA ne remplace pas l'enseignement scolaire, le jugement des parents ni les decisions educatives professionnelles."
+      },
+      "accuracy": {
+        "title": "Explications et resultats",
+        "body": "Les explications d'apprentissage peuvent etre incompletes ou incorrectes. STOA ne garantit ni notes, ni resultats d'examen, ni resultats particuliers. Les travaux importants doivent etre verifies par l'eleve, un parent, un enseignant ou un tuteur."
+      },
+      "acceptableUse": {
+        "title": "Utilisation autorisee",
+        "body": "Les utilisateurs ne doivent pas importer de contenu illegal, dangereux, tres sensible ou sans lien avec l'apprentissage. Les supports importes doivent rester limites a ce qui est necessaire au soutien d'apprentissage."
+      },
+      "subscriptions": {
+        "title": "Essais et abonnements",
+        "body": "Les essais gratuits, quotas, abonnements, annulations, remboursements et parcours de paiement doivent etre confirmes commercialement et juridiquement avant toute confiance publique."
+      },
+      "serviceChanges": {
+        "title": "Evolution du service",
+        "body": "STOA peut modifier, suspendre ou resilier l'acces lorsque cela est necessaire pour proteger les eleves, les donnees, la fiabilite et la qualite du soutien. Contactez l'assistance pour toute question ou demande liee au compte."
+      }
+    }
+  }
+}

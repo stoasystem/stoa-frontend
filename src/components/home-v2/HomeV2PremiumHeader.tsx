@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
+import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -11,8 +12,13 @@ const navItems = [
 ]
 
 export function HomeV2PremiumHeader() {
-  const { t } = useTranslation('common')
+  const { i18n, t } = useTranslation('common')
   const [isOpen, setIsOpen] = useState(false)
+  const currentLanguage = languageOptions.find((language) => language.code === i18n.language) ?? languageOptions[0]
+
+  function changeLanguage(language: SupportedLanguage) {
+    void i18n.changeLanguage(language)
+  }
 
   return (
     <>
@@ -28,12 +34,31 @@ export function HomeV2PremiumHeader() {
               </Link>
             ))}
           </nav>
-          <Link
-            to="/login"
-            className="home-v2-magnetic mr-1 hidden min-h-11 items-center rounded-full bg-[hsl(var(--home-v2-paper)/0.72)] px-5 text-[13px] font-semibold text-[hsl(var(--home-v2-ink)/0.76)] shadow-[inset_0_1px_0_hsl(0_0%_100%/0.72)] ring-1 ring-[hsl(var(--home-v2-line)/0.62)] hover:text-[hsl(var(--home-v2-burgundy))] lg:inline-flex"
-          >
-            {t('navigation.login')}
-          </Link>
+          <div className="hidden items-center gap-2 lg:flex">
+            <div className="home-v2-language-control" role="group" aria-label={t('language.label')}>
+              {languageOptions.map((language) => {
+                const isActive = language.code === currentLanguage.code
+
+                return (
+                  <button
+                    key={language.code}
+                    type="button"
+                    className={cn('home-v2-language-button', isActive && 'is-active')}
+                    aria-pressed={isActive}
+                    onClick={() => changeLanguage(language.code)}
+                  >
+                    {language.shortLabel}
+                  </button>
+                )
+              })}
+            </div>
+            <Link
+              to="/login"
+              className="home-v2-magnetic mr-1 hidden min-h-11 items-center rounded-full bg-[hsl(var(--home-v2-paper)/0.72)] px-5 text-[13px] font-semibold text-[hsl(var(--home-v2-ink)/0.76)] shadow-[inset_0_1px_0_hsl(0_0%_100%/0.72)] ring-1 ring-[hsl(var(--home-v2-line)/0.62)] hover:text-[hsl(var(--home-v2-burgundy))] lg:inline-flex"
+            >
+              {t('navigation.login')}
+            </Link>
+          </div>
           <button
             type="button"
             className="relative mr-1 flex h-11 w-11 items-center justify-center rounded-full bg-[hsl(var(--home-v2-ink))] text-[hsl(var(--home-v2-paper))] lg:hidden"
@@ -85,6 +110,23 @@ export function HomeV2PremiumHeader() {
           >
             {t('navigation.login')}
           </Link>
+          <div className="home-v2-mobile-language-control" role="group" aria-label={t('language.label')}>
+            {languageOptions.map((language) => {
+              const isActive = language.code === currentLanguage.code
+
+              return (
+                <button
+                  key={language.code}
+                  type="button"
+                  className={cn('home-v2-mobile-language-chip', isActive && 'is-active')}
+                  aria-pressed={isActive}
+                  onClick={() => changeLanguage(language.code)}
+                >
+                  {language.shortLabel}
+                </button>
+              )
+            })}
+          </div>
         </div>
       </div>
     </>

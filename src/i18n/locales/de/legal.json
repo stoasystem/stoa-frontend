@@ -1,0 +1,56 @@
+{
+  "privacy": {
+    "eyebrow": "Entwurf fuer Rechtspruefung",
+    "title": "Datenschutzerklaerung",
+    "description": "Vorlaeufige Formulierung zur Datenverarbeitung bei STOA. Vor einer breiten oeffentlichen Nutzung ist eine rechtliche Pruefung erforderlich.",
+    "sections": {
+      "dataWeCollect": {
+        "title": "Welche Daten wir erheben",
+        "body": "STOA kann Kontodaten, Rolle, Kontaktdaten, Lernaktivitaeten, Fragen, Metadaten hochgeladener Schulmaterialien, Supportanfragen, Feedback, Analyseereignisse und Fehlerberichte der Frontend-Anwendung verarbeiten."
+      },
+      "studentLearning": {
+        "title": "Lerndaten von Schuelerinnen und Schuelern",
+        "body": "Lerndaten koennen letzte Fragen, Konversationsmetadaten, Fokusbereiche, Anfragen an Lehrpersonen, Berichtszusammenfassungen und Fortschrittssignale umfassen, die den Schueler unterstuetzen und Eltern informieren."
+      },
+      "visibility": {
+        "title": "Sichtbarkeit fuer Eltern und Lehrpersonen",
+        "body": "Eltern koennen Lernzusammenfassungen, Berichte, Fokusbereiche und Beteiligung von Lehrpersonen sehen. Lehrpersonen sehen den Kontext, der fuer eine Hilfeanfrage notwendig ist."
+      },
+      "useRetention": {
+        "title": "Nutzung, Aufbewahrung und Loeschung",
+        "body": "Daten werden verwendet, um STOA zu betreiben, Lernunterstuetzung bereitzustellen, Berichte vorzubereiten, Support zu leisten, Zuverlaessigkeit zu ueberwachen und den Dienst zu verbessern. Aufbewahrungsfristen und Loeschprozesse muessen final bestaetigt werden."
+      },
+      "thirdParties": {
+        "title": "Dienstleister",
+        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister koennen begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten. Die finale Liste der Auftragsbearbeiter erfordert rechtliche Pruefung."
+      }
+    }
+  },
+  "terms": {
+    "eyebrow": "Entwurf fuer Rechtspruefung",
+    "title": "Nutzungsbedingungen",
+    "description": "Vorlaeufige Formulierung zu Nutzung, Grenzen der Lernunterstuetzung, Abonnements und zulaessiger Nutzung von STOA.",
+    "sections": {
+      "learningSupport": {
+        "title": "Lernunterstuetzung",
+        "body": "STOA unterstuetzt Lernen mit Erklaerungen, Uebung und Zugang zu von Lehrpersonen begleitetem Support. STOA ersetzt weder Schulunterricht noch elterliche Entscheidungen oder professionelle Bildungsentscheidungen."
+      },
+      "accuracy": {
+        "title": "Erklaerungen und Ergebnisse",
+        "body": "Lernerklaerungen koennen unvollstaendig oder fehlerhaft sein. STOA garantiert keine Noten, Pruefungsergebnisse oder bestimmten Lernerfolge. Wichtige Arbeiten sollten durch Schueler, Eltern, Lehrperson oder Tutor geprueft werden."
+      },
+      "acceptableUse": {
+        "title": "Zulaessige Nutzung",
+        "body": "Nutzer duerfen keine illegalen, unsicheren, besonders sensiblen oder sachfremden Inhalte hochladen. Hausaufgaben-Uploads sollten auf Material beschraenkt bleiben, das fuer die Lernunterstuetzung notwendig ist."
+      },
+      "subscriptions": {
+        "title": "Testphasen und Abonnements",
+        "body": "Kostenlose Testphasen, Kontingente, Abonnements, Kuendigungen, Rueckerstattungen und Zahlungsablaeufe muessen vor oeffentlicher Verlaesslichkeit kommerziell und rechtlich final bestaetigt werden."
+      },
+      "serviceChanges": {
+        "title": "Aenderungen des Dienstes",
+        "body": "STOA kann den Zugang aendern, pausieren oder beenden, wenn dies zum Schutz von Schuelern, Daten, Zuverlaessigkeit und Supportqualitaet erforderlich ist. Bei Fragen oder Kontoanliegen wenden Sie sich an den Support."
+      }
+    }
+  }
+}

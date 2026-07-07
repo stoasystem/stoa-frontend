@@ -1,0 +1,56 @@
+{
+  "privacy": {
+    "eyebrow": "Bozza per revisione legale",
+    "title": "Informativa sulla privacy",
+    "description": "Testo candidato sul trattamento dei dati da parte di STOA. Prima di un lancio pubblico ampio resta necessaria una revisione legale.",
+    "sections": {
+      "dataWeCollect": {
+        "title": "Dati raccolti",
+        "body": "STOA puo trattare dati dell'account, ruolo, dati di contatto, attivita di apprendimento, domande, metadati dei materiali scolastici caricati, richieste di supporto, feedback, eventi analitici e report di errore del frontend."
+      },
+      "studentLearning": {
+        "title": "Dati di apprendimento",
+        "body": "I dati di apprendimento possono includere domande recenti, metadati delle conversazioni, aree di attenzione, richieste di supporto docente, riepiloghi dei report e segnali di progresso usati per sostenere lo studente e informare i genitori."
+      },
+      "visibility": {
+        "title": "Visibilita per genitori e insegnanti",
+        "body": "I genitori possono vedere riepiloghi di apprendimento, report, aree di attenzione e interventi degli insegnanti. Gli insegnanti vedono il contesto necessario per rispondere a una richiesta di aiuto."
+      },
+      "useRetention": {
+        "title": "Uso, conservazione e cancellazione",
+        "body": "I dati sono usati per gestire STOA, fornire supporto all'apprendimento, preparare report, gestire l'assistenza, monitorare l'affidabilita e migliorare il servizio. Periodi di conservazione e processi di cancellazione richiedono conferma finale."
+      },
+      "thirdParties": {
+        "title": "Fornitori di servizi",
+        "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio, pagamento e assistenza possono trattare dati limitati secondo accordi appropriati. L'elenco finale dei responsabili richiede revisione legale."
+      }
+    }
+  },
+  "terms": {
+    "eyebrow": "Bozza per revisione legale",
+    "title": "Termini",
+    "description": "Testo candidato su uso di STOA, limiti del supporto all'apprendimento, abbonamenti e uso consentito.",
+    "sections": {
+      "learningSupport": {
+        "title": "Supporto all'apprendimento",
+        "body": "STOA sostiene l'apprendimento con spiegazioni, pratica e accesso a supporto docente. STOA non sostituisce l'insegnamento scolastico, il giudizio dei genitori o decisioni educative professionali."
+      },
+      "accuracy": {
+        "title": "Spiegazioni e risultati",
+        "body": "Le spiegazioni di apprendimento possono essere incomplete o errate. STOA non garantisce voti, risultati d'esame o risultati specifici. I lavori importanti dovrebbero essere verificati dallo studente, da un genitore, da un insegnante o da un tutor."
+      },
+      "acceptableUse": {
+        "title": "Uso consentito",
+        "body": "Gli utenti non devono caricare contenuti illegali, non sicuri, molto sensibili o non pertinenti. I caricamenti scolastici dovrebbero limitarsi al materiale necessario per il supporto all'apprendimento."
+      },
+      "subscriptions": {
+        "title": "Prove e abbonamenti",
+        "body": "Prove gratuite, quote, abbonamenti, cancellazioni, rimborsi e flussi di pagamento richiedono conferma commerciale e legale finale prima di poter essere usati come base pubblica."
+      },
+      "serviceChanges": {
+        "title": "Modifiche al servizio",
+        "body": "STOA puo modificare, sospendere o terminare l'accesso quando necessario per proteggere studenti, dati, affidabilita e qualita del supporto. Contatta l'assistenza per domande o richieste sull'account."
+      }
+    }
+  }
+}

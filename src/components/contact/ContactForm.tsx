@@ -233,9 +233,11 @@ function Field({
   )
 }
 
-const languageNameKeyByCode: Record<SupportedLanguage, 'english' | 'german'> = {
+const languageNameKeyByCode: Record<SupportedLanguage, 'english' | 'german' | 'french' | 'italian'> = {
   en: 'english',
   de: 'german',
+  fr: 'french',
+  it: 'italian',
 }
 
 const selectClassName = cn(

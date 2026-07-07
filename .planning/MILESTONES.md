@@ -1,5 +1,63 @@
 # Milestones
 
+## v7 Full-Site Multilingual Adaptation Execution (Shipped: 2026-07-07)
+
+**Phases completed:** 7 phases, 7 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v7-MILESTONE-AUDIT.md`
+**Depends on:** v7.0 Full-Site Multilingual Adaptation Planning
+**Known deferred items at close:** runtime Romansh support, final legal approval, full route screenshot matrix, and public `/home-v2` switch-over remain future scope.
+
+**Key accomplishments:**
+
+- Expanded runtime language support from EN/DE to EN/DE/FR/IT.
+- Registered FR/IT resources and the new `legal` namespace.
+- Added premium Home V2 desktop segmented language control.
+- Added Home V2 mobile language chips inside the expanded menu.
+- Localized `/privacy` and `/terms` as lawyer-review candidate pages.
+- Removed visible Online Classroom mock/demo wording from locale values.
+- Created legal source notes, candidate draft status docs, copy QA report, and release handoff.
+- Verified lint, build, targeted E2E, JSON key parity, and user-facing value scan.
+
+### Verification
+
+- `npm run lint`: passed.
+- `npm run build`: passed with existing Vite chunk-size warning.
+- `npm run test:e2e -- home-v2.spec.ts localization-preferences.spec.ts`: passed, 5/5 tests.
+- EN/DE/FR/IT JSON key parity script: passed.
+- User-facing locale value scan: passed.
+
+---
+
+## v7.0 Full-Site Multilingual Adaptation Planning (Shipped: 2026-07-07)
+
+**Phases completed:** 7 phases, 7 plans, 0 code tasks
+**Status:** Complete
+**Audit:** `.planning/milestones/v7.0-MILESTONE-AUDIT.md`
+**Depends on:** v6.6 Home V2 V6 Completion Handoff
+**Known deferred items at close:** FR/IT runtime enablement, route-level copy QA, Home V2 language-control implementation, legal/privacy/terms drafting, final cross-locale visual QA, runtime Romansh support, and public `/` switch-over remain future scope.
+
+**Key accomplishments:**
+
+- Defined v7 as full-site multilingual adaptation across public, auth, student, parent, tutor/teacher, admin, billing, support, and legal surfaces.
+- Confirmed English, German, French, and Italian as launch runtime languages.
+- Acknowledged Romansh as part of the Swiss language landscape and deferred runtime support intentionally.
+- Created initial EN/DE/FR/IT glossary and forbidden-term guidance.
+- Defined role-based tone rules and P0/P1/P2 translation quality tiers.
+- Planned FR/IT runtime enablement and premium Home V2 language controls.
+- Created route-based multilingual QA matrix.
+- Added a dedicated legal/privacy/terms research plan for lawyer-review candidate drafts.
+- Split v7 into v7.1 through v7.7 execution milestones.
+
+### Verification
+
+- `roadmap.analyze`: required before commit.
+- `git diff --check`: required before commit.
+- Documentation-only milestone; no runtime code changes were made.
+- Current `/` remains unchanged.
+
+---
+
 ## v6.6 Home V2 V6 Completion Handoff (Shipped: 2026-07-06)
 
 **Phases completed:** 5 phases, 5 plans, 0 code tasks

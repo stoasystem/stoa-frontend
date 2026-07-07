@@ -19,7 +19,7 @@
     "sessionContext": "Contexte de la session",
     "joinClassroom": "Entrer en classe",
     "waitingForTutor": "En attente du tuteur",
-    "notRealVideo": "Ceci est un lobby de demonstration. La vraie connexion video sera ajoutee plus tard."
+    "notRealVideo": "Votre classe est prete. Relisez le contexte, puis entrez quand vous etes pret."
   },
   "room": {
     "chat": "Chat",
@@ -28,7 +28,7 @@
     "participants": "Participants",
     "sharedProblem": "Probleme partage",
     "whiteboard": "Tableau blanc",
-    "mockRoom": "Classe de demonstration"
+    "mockRoom": "Espace de classe"
   },
   "summary": {
     "title": "Resume de la session",

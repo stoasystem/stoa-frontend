@@ -2,33 +2,34 @@
 
 ## What This Is
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Practice Library, a unified learning-context photo/PDF upload UI foundation, a frontend/mock-backed Online Classroom foundation with refined tutor-support escalation language, and an isolated Home V2 preview route/component skeleton for the Swiss-parent homepage redesign track.
+STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The project now has a stable development foundation, visible product UI, backend-integrated student chat, authenticated role surfaces, MVP polish, local test backend support, staging deployment readiness, QA coverage, early user feedback workflow, production-like pilot launch readiness, launch-ready commercial validation UI, early paid growth/operations demo surfaces, platform-level organization/learning-intelligence demos, coherent role-based information architecture, stable demo backend/API support, premium onboarding, four-language i18n, locale-specific product copy refinement, production-facing UI cleanup, brand-aligned visual design translated from the company homepage, mature cross-locale copy/layout quality, accessibility/release-quality gates, trustworthy footer/contact/logo details, a controlled local Learning Assistant provider harness for complete demo flows, a frontend/demo-backed Practice Path with roadmap progression for active learning, a frontend/mock-backed Practice Library, a unified learning-context photo/PDF upload UI foundation, a frontend/mock-backed Online Classroom foundation with refined tutor-support escalation language, an isolated Home V2 preview route/component skeleton for the Swiss-parent homepage redesign track, and completed v7 full-site multilingual runtime adaptation covering EN/DE/FR/IT, Home V2 language controls, localized legal candidate pages, Romansh language-policy deferral, route QA, and legal/privacy research.
 
 The app includes a STOA core product UI with a backend-driven student chat workspace, conversation list, message flow, teacher-help request path, streaming assistant responses, homework file uploads, contextual photo/PDF upload flows, authenticated role boundaries, student/parent/tutor role surfaces, parent reporting, tutor workflow polish, a local SQLite-backed test backend, CI/E2E checks, staging documentation, monitoring/logging, support, privacy, backup, pricing validation, virtual checkout, launch artifacts, parent acquisition pages, referral/invitation flow, usage quota display, feature gating UI, tutor availability, support ticket UI, admin operational analytics, UTM tracking, clearer demo-backend boundaries, organization dashboards, advanced learning profile pages, curriculum graph UI, weak-point diagnosis UI, parent monthly reporting, retention surfaces, partnership onboarding, route inventory, role-based navigation, breadcrumbs, demo-flow documentation, stable demo backend APIs, API mode configuration, backend integration readiness documentation, language switching, localized P0 copy, responsive multilingual layout QA, STOA-branded visual tokens for public/auth/app surfaces, cross-locale copy/layout adaptation for English, German, French, and Italian, accessibility/readiness docs, contact form contract, release-quality gate artifacts, a Python prompt harness with local Codex/template provider routing for controlled Learning Assistant demo behavior, a Practice Path module with subject paths, roadmap progression, lesson challenges, feedback, hints, results, mistakes review, homepage entry framing, dashboard entry cards, Practice-to-Learning-Chat context, parent learning activity, and tutor Practice request context, and a separate `/home-v2` public preview route with Home V2 section components and provisional multilingual copy plumbing.
 
 ## Core Value
 
-Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, natural English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, and a clean Go/No-Go path for future real backend integration and public demo release.
+Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, runtime English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, localized legal candidate pages, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v6.6 Home V2 V6 Completion Handoff
+## Latest Shipped Milestone: v7 Full-Site Multilingual Adaptation Execution
 
-**Shipped:** 2026-07-06
+**Shipped:** 2026-07-07
 
-**Delivered:** Home V2 v6 is complete as a preview/design/procurement track. The project now has a v6 completion report, runtime snapshot, readiness register, switch-over gate, and v7 next-program brief. Current preview images remain unchanged and the current `/` homepage remains unchanged.
+**Delivered:** v7 completed full-site runtime multilingual adaptation. The project now supports EN/DE/FR/IT at runtime, registers FR/IT locale resources, exposes four launch languages through the shared switcher, adds premium Home V2 desktop/mobile language controls, localizes `/privacy` and `/terms` through a lawyer-review `legal` namespace, removes visible Online Classroom mock/demo wording, and records copy QA, legal source notes, and release handoff. Current `/` remains unchanged and `/home-v2` remains a preview route.
 
 **Target features:**
-- v6.1-v6.5 outcomes are summarized and closed.
-- Current `/home-v2` runtime route, components, images, locales, and tests are recorded.
-- Preview-approved and final-public-approved asset states are separated.
-- Switch-over gates are explicit: final assets, locale readiness, SEO/routing, QA, rollback, monitoring, and explicit approval.
-- v7/next-program brief is defined.
-- Preserve current `/` until explicit replacement approval.
+- EN/DE/FR/IT are launch runtime languages.
+- FR/IT resources are registered in runtime i18n.
+- Shared and Home V2 language controls support all four launch languages.
+- `/privacy` and `/terms` are localized lawyer-review candidate pages.
+- Legal source notes, unknown facts, and translation status are documented.
+- i18n key parity, value scan, lint, build, and targeted E2E verification pass.
+- Preserve current `/`; do not switch `/home-v2` to `/` in this track.
 
 ## Current Milestone: None
 
 ## Current State
 
-**Latest shipped milestone:** v6.6 Home V2 V6 Completion Handoff
+**Latest shipped milestone:** v7 Full-Site Multilingual Adaptation Execution
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -71,6 +72,8 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - v4.0 Home V2 preview route and component skeleton with isolated `/home-v2`, preserved `/`, Home V2 section components, provisional `homeV2` i18n resources, route smoke coverage, and implementation handoff.
 - v6.1 Home V2 Parent Confidence redesign with one calm weekly note, parent-first four-language copy, scoped visual polish, responsive screenshot review, and Home V2 E2E coverage.
 - v6.2 Home V2 Trust/Assurance redesign with one warm learning-detail image, fine-line assurance principles, restrained four-language copy, scoped Trust styling, responsive screenshot review, and Home V2 E2E coverage.
+- v7.0 full-site multilingual adaptation planning with EN/DE/FR/IT runtime scope, Romansh language-policy deferral, glossary/tone/quality rules, Home V2 and shared language-control plan, route QA matrix, legal/privacy/terms research plan, and v7.1-v7.7 execution roadmap.
+- v7 full-site multilingual execution with EN/DE/FR/IT runtime registration, shared switcher and premium Home V2 language controls, localized Privacy/Terms candidate legal pages, Online Classroom copy cleanup, legal source notes, copy QA report, release handoff, and verification.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
@@ -143,10 +146,12 @@ Developers can clone `stoa-frontend`, run the npm scripts, and use a credible ST
 - ✓ Home V2 has a final Hero and Parent Confidence photography approval handoff: current images are preview-approved but not final-public approved, paid/commissioned sourcing is recommended, and `/` remains unchanged — v6.4
 - ✓ Home V2 has a final photography procurement package with paid-stock review, commissioned shoot brief, license/release guardrails, approval workflow, and implementation handoff while preserving current images and `/` — v6.5
 - ✓ Home V2 v6 is closed with completion report, runtime snapshot, readiness register, switch-over gate, v7 next-program brief, and no `/` replacement — v6.6
+- ✓ Full-site multilingual adaptation is planned with EN/DE/FR/IT scope, Romansh deferral, glossary/tone/QA/legal research docs, and v7.1-v7.7 roadmap — v7.0
+- ✓ Full-site multilingual adaptation is executed with EN/DE/FR/IT runtime support, Home V2 language controls, localized legal candidate pages, copy QA docs, and verification — v7
 
 ### Active
 
-- [ ] v6 is complete. Next Home V2 work should start as v7 or an explicitly named final-asset/switch-over program.
+- [ ] Review localized legal candidate pages with qualified counsel and run full route screenshot QA before broad launch or any `/home-v2` switch-over decision.
 
 ### Out of Scope
 

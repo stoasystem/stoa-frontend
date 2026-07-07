@@ -1,49 +1,31 @@
+import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 
-const sections = [
-  {
-    title: 'Data we collect',
-    body: 'STOA may collect account data, role, contact details, student learning activity, questions, uploaded homework metadata, support requests, feedback, analytics events, and frontend error reports.',
-  },
-  {
-    title: 'Student learning data',
-    body: 'Learning data can include recent questions, conversation metadata, weak topics, teacher-help requests, report summaries, and progress signals used to support the student and inform parents.',
-  },
-  {
-    title: 'Parent and tutor visibility',
-    body: 'Parents can see child learning summaries, reports, weak topics, and teacher involvement. Teachers can see the student context needed to answer a help request, including the relevant question and prior explanation.',
-  },
-  {
-    title: 'Use, retention, and deletion',
-    body: 'Data is used to operate STOA, improve learning support, provide reports, handle support, monitor reliability, and prepare launch operations. Retention and deletion requests should be sent through support until self-service controls exist.',
-  },
-  {
-    title: 'Learning technology and third parties',
-    body: 'Learning technology, hosting, analytics, monitoring, and payment partners may process limited data under appropriate service agreements. STOA does not ask families to share secrets or payment credentials in support messages.',
-  },
-]
+const sectionKeys = ['dataWeCollect', 'studentLearning', 'visibility', 'useRetention', 'thirdParties'] as const
 
 export function PrivacyPage() {
+  const { t } = useTranslation('legal')
+
   return (
     <MarketingLayout>
       <PageContainer>
         <PageHeader
-          eyebrow="Launch draft"
-          title="Privacy Policy"
-          description="Launch-ready frontend draft for STOA data handling. Final legal review remains required before broad public launch."
+          eyebrow={t('privacy.eyebrow')}
+          title={t('privacy.title')}
+          description={t('privacy.description')}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
-          {sections.map((section) => (
-            <Card key={section.title}>
+          {sectionKeys.map((sectionKey) => (
+            <Card key={sectionKey}>
               <CardHeader>
-                <CardTitle className="text-base">{section.title}</CardTitle>
+                <CardTitle className="text-base">{t(`privacy.sections.${sectionKey}.title`)}</CardTitle>
               </CardHeader>
               <CardContent className="text-sm leading-6 text-muted-foreground">
-                {section.body}
+                {t(`privacy.sections.${sectionKey}.body`)}
               </CardContent>
             </Card>
           ))}
