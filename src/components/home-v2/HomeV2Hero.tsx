@@ -13,13 +13,13 @@ export function HomeV2Hero({ learningHref }: { learningHref: string }) {
     <section
       id="home-v2-hero"
       data-testid="home-v2-hero"
-      className="mx-auto grid w-full max-w-7xl gap-12 px-4 pb-16 pt-32 sm:px-6 md:px-8 md:pb-20 md:pt-36 lg:min-h-[100dvh] lg:grid-cols-[0.86fr_1.04fr] lg:items-center"
+      className="home-v2-hero mx-auto grid w-full max-w-7xl gap-12 px-4 pb-16 pt-32 sm:px-6 md:px-8 md:pb-20 md:pt-36 lg:min-h-[100dvh] lg:grid-cols-[0.86fr_1.04fr] lg:items-center"
     >
       <HomeV2Reveal className="min-w-0">
         <p className="inline-flex rounded-full bg-[hsl(var(--home-v2-burgundy)/0.08)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-burgundy))] ring-1 ring-[hsl(var(--home-v2-burgundy)/0.14)]">
           {t('hero.eyebrow')}
         </p>
-        <h1 className="home-v2-display mt-7 max-w-xl text-[4.7rem] font-medium leading-[0.86] text-[hsl(var(--home-v2-ink))] sm:text-[6.4rem] lg:text-[7.6rem]">
+        <h1 className="home-v2-hero-title home-v2-display mt-7 max-w-xl text-[4.7rem] font-medium leading-[0.86] text-[hsl(var(--home-v2-ink))] sm:text-[6.4rem] lg:text-[7.6rem]">
           {t('hero.title')}
         </h1>
         <p className="mt-8 max-w-lg text-lg leading-8 text-[hsl(var(--home-v2-ink)/0.66)] sm:text-xl">
@@ -36,16 +36,16 @@ export function HomeV2Hero({ learningHref }: { learningHref: string }) {
         </div>
       </HomeV2Reveal>
 
-      <HomeV2Reveal delay={160} className="mx-auto w-full max-w-[44rem] lg:max-w-none">
-        <HomeV2VisualFrame contentClassName="aspect-[16/11] sm:aspect-[16/10] lg:aspect-[6/7]">
-          <div className="relative h-full min-h-[22rem] overflow-hidden sm:min-h-[26rem] lg:min-h-[30rem]">
+      <HomeV2Reveal delay={160} className="home-v2-hero-visual-wrap mx-auto w-full max-w-[44rem] lg:max-w-none">
+        <HomeV2VisualFrame contentClassName="home-v2-hero-frame aspect-[16/11] sm:aspect-[16/10] lg:aspect-[6/7]">
+          <div className="home-v2-hero-visual relative h-full min-h-[22rem] overflow-hidden sm:min-h-[26rem] lg:min-h-[30rem]">
             <img
               src={heroImageUrl}
               alt=""
               className="home-v2-image-tone h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,hsl(var(--home-v2-ink)/0.18))]" />
-            <div className="absolute bottom-5 left-5 right-5 rounded-[1.5rem] bg-[hsl(var(--home-v2-porcelain)/0.9)] p-5 shadow-[0_18px_46px_hsl(var(--home-v2-ink)/0.16)] ring-1 ring-white/70 md:bottom-7 md:left-7 md:right-auto md:max-w-sm md:p-6">
+            <div className="home-v2-hero-proof absolute bottom-5 left-5 right-5 rounded-[1.5rem] bg-[hsl(var(--home-v2-porcelain)/0.9)] p-5 shadow-[0_18px_46px_hsl(var(--home-v2-ink)/0.16)] ring-1 ring-white/70 md:bottom-7 md:left-7 md:right-auto md:max-w-sm md:p-6">
               <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-[hsl(var(--home-v2-burgundy))]">
                 {t('hero.proofLabel')}
               </p>

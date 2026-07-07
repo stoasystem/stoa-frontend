@@ -1,8 +1,8 @@
 {
   "privacy": {
-    "eyebrow": "Lawyer-review draft",
+    "eyebrow": "Privacy",
     "title": "Privacy Policy",
-    "description": "Candidate wording for STOA data handling. Legal review remains required before broad public launch.",
+    "description": "How STOA handles account, learning, support, and service data.",
     "sections": {
       "dataWeCollect": {
         "title": "Data we collect",
@@ -18,18 +18,18 @@
       },
       "useRetention": {
         "title": "Use, retention, and deletion",
-        "body": "Data is used to operate STOA, provide learning support, prepare reports, handle support, monitor reliability, and improve the service. Retention periods and deletion workflows require final operational confirmation."
+        "body": "Data is used to operate STOA, provide learning support, prepare reports, handle support, monitor reliability, and improve the service. Retention and deletion requests are handled according to STOA's operational policy and applicable law."
       },
       "thirdParties": {
         "title": "Service partners",
-        "body": "Hosting, authentication, analytics, monitoring, payment, and support partners may process limited data under appropriate service agreements. The final processor list requires legal review."
+        "body": "Hosting, authentication, analytics, monitoring, payment, and support partners may process limited data under appropriate service agreements."
       }
     }
   },
   "terms": {
-    "eyebrow": "Lawyer-review draft",
+    "eyebrow": "Terms",
     "title": "Terms",
-    "description": "Candidate wording for STOA usage, learning support boundaries, subscriptions, and acceptable use.",
+    "description": "The conditions for using STOA learning support, subscriptions, and service access.",
     "sections": {
       "learningSupport": {
         "title": "Learning support",
@@ -45,7 +45,7 @@
       },
       "subscriptions": {
         "title": "Trials and subscriptions",
-        "body": "Free trials, quotas, subscriptions, cancellations, refunds, and payment workflows require final commercial and legal confirmation before public reliance."
+        "body": "Free trials, quotas, subscriptions, cancellations, refunds, and payment workflows are shown at sign-up, checkout, or account management where applicable."
       },
       "serviceChanges": {
         "title": "Service changes",

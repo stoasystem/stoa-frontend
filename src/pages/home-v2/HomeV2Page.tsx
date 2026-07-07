@@ -4,6 +4,7 @@ import { HomeV2LearningThread } from '@/components/home-v2/HomeV2LearningThread'
 import { HomeV2ParentConfidence } from '@/components/home-v2/HomeV2ParentConfidence'
 import { HomeV2PremiumHeader } from '@/components/home-v2/HomeV2PremiumHeader'
 import { HomeV2TrustLayer } from '@/components/home-v2/HomeV2TrustLayer'
+import { Seo } from '@/components/common/Seo'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { useAuthStore } from '@/store/authStore'
 
@@ -22,6 +23,10 @@ export function HomeV2Page() {
 
   return (
     <MarketingLayout hideHeader>
+      <Seo
+        title="STOA | Guided learning support"
+        description="STOA helps students move from questions to clearer next steps, with teacher-backed learning support and parent visibility."
+      />
       <div className="home-v2-premium">
         <HomeV2PremiumHeader />
         <HomeV2Hero learningHref={learningHref} />

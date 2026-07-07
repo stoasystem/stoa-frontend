@@ -1,8 +1,8 @@
 {
   "privacy": {
-    "eyebrow": "Entwurf fuer Rechtspruefung",
+    "eyebrow": "Datenschutz",
     "title": "Datenschutzerklaerung",
-    "description": "Vorlaeufige Formulierung zur Datenverarbeitung bei STOA. Vor einer breiten oeffentlichen Nutzung ist eine rechtliche Pruefung erforderlich.",
+    "description": "Wie STOA Konto-, Lern-, Support- und Servicedaten verarbeitet.",
     "sections": {
       "dataWeCollect": {
         "title": "Welche Daten wir erheben",
@@ -18,18 +18,18 @@
       },
       "useRetention": {
         "title": "Nutzung, Aufbewahrung und Loeschung",
-        "body": "Daten werden verwendet, um STOA zu betreiben, Lernunterstuetzung bereitzustellen, Berichte vorzubereiten, Support zu leisten, Zuverlaessigkeit zu ueberwachen und den Dienst zu verbessern. Aufbewahrungsfristen und Loeschprozesse muessen final bestaetigt werden."
+        "body": "Daten werden verwendet, um STOA zu betreiben, Lernunterstuetzung bereitzustellen, Berichte vorzubereiten, Support zu leisten, Zuverlaessigkeit zu ueberwachen und den Dienst zu verbessern. Aufbewahrung und Loeschanfragen werden gemaess der operativen STOA-Richtlinie und anwendbarem Recht behandelt."
       },
       "thirdParties": {
         "title": "Dienstleister",
-        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister koennen begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten. Die finale Liste der Auftragsbearbeiter erfordert rechtliche Pruefung."
+        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister koennen begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
       }
     }
   },
   "terms": {
-    "eyebrow": "Entwurf fuer Rechtspruefung",
+    "eyebrow": "Bedingungen",
     "title": "Nutzungsbedingungen",
-    "description": "Vorlaeufige Formulierung zu Nutzung, Grenzen der Lernunterstuetzung, Abonnements und zulaessiger Nutzung von STOA.",
+    "description": "Die Bedingungen fuer die Nutzung von STOA Lernunterstuetzung, Abonnements und Servicezugang.",
     "sections": {
       "learningSupport": {
         "title": "Lernunterstuetzung",
@@ -45,7 +45,7 @@
       },
       "subscriptions": {
         "title": "Testphasen und Abonnements",
-        "body": "Kostenlose Testphasen, Kontingente, Abonnements, Kuendigungen, Rueckerstattungen und Zahlungsablaeufe muessen vor oeffentlicher Verlaesslichkeit kommerziell und rechtlich final bestaetigt werden."
+        "body": "Kostenlose Testphasen, Kontingente, Abonnements, Kuendigungen, Rueckerstattungen und Zahlungsablaeufe werden je nach Fall bei Registrierung, Checkout oder Kontoverwaltung angezeigt."
       },
       "serviceChanges": {
         "title": "Aenderungen des Dienstes",

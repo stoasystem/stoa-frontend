@@ -1,8 +1,8 @@
 {
   "privacy": {
-    "eyebrow": "Projet pour revue juridique",
+    "eyebrow": "Confidentialite",
     "title": "Politique de confidentialite",
-    "description": "Texte candidat sur le traitement des donnees par STOA. Une revue juridique reste necessaire avant une diffusion publique large.",
+    "description": "La maniere dont STOA traite les donnees de compte, d'apprentissage, d'assistance et de service.",
     "sections": {
       "dataWeCollect": {
         "title": "Donnees collectees",
@@ -18,18 +18,18 @@
       },
       "useRetention": {
         "title": "Utilisation, conservation et suppression",
-        "body": "Les donnees servent a exploiter STOA, fournir le soutien d'apprentissage, preparer les rapports, traiter l'assistance, surveiller la fiabilite et ameliorer le service. Les durees de conservation et les processus de suppression doivent etre confirmes."
+        "body": "Les donnees servent a exploiter STOA, fournir le soutien d'apprentissage, preparer les rapports, traiter l'assistance, surveiller la fiabilite et ameliorer le service. La conservation et les demandes de suppression sont traitees selon la politique operationnelle de STOA et le droit applicable."
       },
       "thirdParties": {
         "title": "Prestataires",
-        "body": "Les prestataires d'hebergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des donnees limitees dans le cadre d'accords appropries. La liste finale des sous-traitants doit etre revue juridiquement."
+        "body": "Les prestataires d'hebergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des donnees limitees dans le cadre d'accords appropries."
       }
     }
   },
   "terms": {
-    "eyebrow": "Projet pour revue juridique",
+    "eyebrow": "Conditions",
     "title": "Conditions",
-    "description": "Texte candidat sur l'utilisation de STOA, les limites du soutien d'apprentissage, les abonnements et les usages autorises.",
+    "description": "Les conditions d'utilisation du soutien d'apprentissage STOA, des abonnements et de l'acces au service.",
     "sections": {
       "learningSupport": {
         "title": "Soutien d'apprentissage",
@@ -45,7 +45,7 @@
       },
       "subscriptions": {
         "title": "Essais et abonnements",
-        "body": "Les essais gratuits, quotas, abonnements, annulations, remboursements et parcours de paiement doivent etre confirmes commercialement et juridiquement avant toute confiance publique."
+        "body": "Les essais gratuits, quotas, abonnements, annulations, remboursements et parcours de paiement sont presentes, le cas echeant, lors de l'inscription, du paiement ou dans la gestion du compte."
       },
       "serviceChanges": {
         "title": "Evolution du service",

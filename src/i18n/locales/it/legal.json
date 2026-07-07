@@ -1,8 +1,8 @@
 {
   "privacy": {
-    "eyebrow": "Bozza per revisione legale",
+    "eyebrow": "Privacy",
     "title": "Informativa sulla privacy",
-    "description": "Testo candidato sul trattamento dei dati da parte di STOA. Prima di un lancio pubblico ampio resta necessaria una revisione legale.",
+    "description": "Come STOA tratta i dati di account, apprendimento, assistenza e servizio.",
     "sections": {
       "dataWeCollect": {
         "title": "Dati raccolti",
@@ -18,18 +18,18 @@
       },
       "useRetention": {
         "title": "Uso, conservazione e cancellazione",
-        "body": "I dati sono usati per gestire STOA, fornire supporto all'apprendimento, preparare report, gestire l'assistenza, monitorare l'affidabilita e migliorare il servizio. Periodi di conservazione e processi di cancellazione richiedono conferma finale."
+        "body": "I dati sono usati per gestire STOA, fornire supporto all'apprendimento, preparare report, gestire l'assistenza, monitorare l'affidabilita e migliorare il servizio. Conservazione e richieste di cancellazione sono gestite secondo la policy operativa di STOA e la legge applicabile."
       },
       "thirdParties": {
         "title": "Fornitori di servizi",
-        "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio, pagamento e assistenza possono trattare dati limitati secondo accordi appropriati. L'elenco finale dei responsabili richiede revisione legale."
+        "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio, pagamento e assistenza possono trattare dati limitati secondo accordi appropriati."
       }
     }
   },
   "terms": {
-    "eyebrow": "Bozza per revisione legale",
+    "eyebrow": "Termini",
     "title": "Termini",
-    "description": "Testo candidato su uso di STOA, limiti del supporto all'apprendimento, abbonamenti e uso consentito.",
+    "description": "Le condizioni per usare il supporto all'apprendimento, gli abbonamenti e l'accesso al servizio STOA.",
     "sections": {
       "learningSupport": {
         "title": "Supporto all'apprendimento",
@@ -45,7 +45,7 @@
       },
       "subscriptions": {
         "title": "Prove e abbonamenti",
-        "body": "Prove gratuite, quote, abbonamenti, cancellazioni, rimborsi e flussi di pagamento richiedono conferma commerciale e legale finale prima di poter essere usati come base pubblica."
+        "body": "Prove gratuite, quote, abbonamenti, cancellazioni, rimborsi e flussi di pagamento sono mostrati, ove applicabile, durante registrazione, checkout o gestione dell'account."
       },
       "serviceChanges": {
         "title": "Modifiche al servizio",

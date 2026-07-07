@@ -1,76 +1,69 @@
-# Requirements: v8 Home V2 Visual QA And Switch Decision
+# Requirements: v9 Home V2 Final Issue Cleanup
 
 ## Core Value
 
-v8 must give a defensible, screenshot-backed decision on whether `/home-v2` is ready to enter switch-over planning. It must not modify the product, submit QA screenshots, or replace the current `/` homepage.
+v9 must clear the concrete blockers found in v8 so `/home-v2` can move from visual preview to switch-over planning. It must fix layout and presentation issues, document image approval status, add basic SEO metadata, preserve the current `/` route, and verify the result with browser evidence.
 
 ## Requirements
 
-### Scope And Evidence
+### Scope And Acceptance
 
-- [ ] **SCOPE-01**: `/home-v2` is the primary QA object; current `/` is comparison-only.
-- [ ] **SCOPE-02**: v8 produces a report and decision only; code fixes and design changes are deferred to v9.
-- [ ] **SCOPE-03**: Raw screenshots are stored under `/private/tmp/stoa-home-v2-v8/` and are not committed.
-- [ ] **SCOPE-04**: v8 does not replace `/home-v2` with `/` and does not launch publicly.
+- [x] **SCOPE-01**: Keep the current `/` homepage unchanged.
+- [x] **SCOPE-02**: Treat `/home-v2` as the cleanup target and future switch-over candidate only.
+- [x] **SCOPE-03**: Use `docs/home-v2/v8-go-no-go-register.md` as the v9 backlog source.
+- [x] **SCOPE-04**: Produce a clear v9 acceptance contract and final readiness decision.
 
-### Screenshot QA
+### Responsive And Visual Fixes
 
-- [ ] **SHOT-01**: Capture `/home-v2` full-page screenshots for EN/DE/FR/IT on desktop.
-- [ ] **SHOT-02**: Capture `/home-v2` full-page screenshots for EN/DE/FR/IT on mobile.
-- [ ] **SHOT-03**: Capture current `/` comparison screenshots on desktop and mobile.
-- [ ] **SHOT-04**: Record viewport, route, language, file path, and pass/fail notes for every screenshot.
+- [x] **LAYOUT-01**: Fix FR mobile horizontal overflow caused by long Hero copy.
+- [x] **LAYOUT-02**: Improve FR/IT long-title fit on desktop and mobile.
+- [x] **LAYOUT-03**: Reduce mobile Hero image dominance while keeping the premium photography frame.
+- [x] **LAYOUT-04**: Check final CTA overflow and long-copy resilience.
+- [x] **LAYOUT-05**: Make Home V2 desktop navigation labels more visible without redesigning the header.
 
-### Visual Quality
+### Legal Page Presentation
 
-- [ ] **VISUAL-01**: Evaluate `/home-v2` against the agreed thesis: Swiss private-school / high-end education service 70%, modern learning product 30%.
-- [ ] **VISUAL-02**: Review Hero, Parent Confidence, Learning Thread, Trust, final CTA, navigation, Login, and language controls.
-- [ ] **VISUAL-03**: Treat final-public image readiness as a hard Go/No-Go gate.
-- [ ] **VISUAL-04**: Review motion for warmth, restraint, readability, and reduced-motion safety.
+- [x] **LEGAL-01**: Remove visible page-facing draft / lawyer-review / candidate framing from `/privacy` and `/terms`.
+- [x] **LEGAL-02**: Keep legal pages as complete internal-test drafts without claiming legal finality.
+- [x] **LEGAL-03**: Preserve unresolved legal facts in internal documentation instead of public page copy.
+- [x] **LEGAL-04**: Verify legal pages render in EN/DE/FR/IT.
 
-### Cross-Locale Content And Layout
+### SEO, Routing, And Switch Planning
 
-- [ ] **LOCALE-01**: Check EN/DE/FR/IT layout for overflow, overlap, awkward wrapping, and mobile crop failures.
-- [ ] **LOCALE-02**: Review copy tone for Apple-like confidence, restraint, clarity, and absence of AI-heavy claims.
-- [ ] **LOCALE-03**: Verify navigation, Login, and language controls remain easy to find in every language.
+- [x] **SEO-01**: Replace the generic `STOA Frontend` document title with product-appropriate default metadata.
+- [x] **SEO-02**: Add route-level title/meta support for `/home-v2`, `/privacy`, and `/terms`.
+- [x] **SEO-03**: Document canonical, sitemap, old-home preservation, and rollback requirements for a future switch-over.
+- [x] **SEO-04**: Do not switch `/home-v2` to `/` in v9.
 
-### Legal Draft Readiness
+### Image Approval
 
-- [ ] **LEGAL-01**: Verify `/privacy` and `/terms` are complete, readable drafts suitable for internal testing and lawyer review.
-- [ ] **LEGAL-02**: Avoid page-level claims that the legal pages are final, legal-ready, or visibly unfinished placeholders.
-- [ ] **LEGAL-03**: Identify unresolved legal facts separately in internal QA notes, not as disruptive public-page copy.
-- [ ] **LEGAL-04**: Treat incomplete legal drafts as a launch-risk blocker, not as the main visual QA axis.
+- [x] **ASSET-01**: Record current Hero and Parent Confidence images as `temporary-public-approved`, not final-public-approved.
+- [x] **ASSET-02**: Keep final paid/commissioned imagery as a later requirement before broad public marketing.
+- [x] **ASSET-03**: Do not add paid previews, watermarked images, or new unlicensed binaries.
 
-### Switch Readiness
+### Verification
 
-- [ ] **SWITCH-01**: Check title/meta/canonical/sitemap readiness needed before any future `/home-v2` switch-over.
-- [ ] **SWITCH-02**: Check old-homepage preservation and rollback path.
-- [ ] **SWITCH-03**: Check basic analytics/monitoring and post-switch verification needs.
-- [ ] **SWITCH-04**: Produce a switch-over readiness appendix separate from the visual verdict.
-
-### Decision And Handoff
-
-- [ ] **DECISION-01**: Produce a Go / Conditional Go / No-Go decision.
-- [ ] **DECISION-02**: If No-Go or Conditional Go, create a precise v9 remediation backlog with evidence, severity, and suggested treatment.
-- [ ] **DECISION-03**: Separate visual readiness from final public launch readiness.
-- [ ] **DECISION-04**: Preserve current `/` until a later explicit switch-over phase.
+- [x] **VERIFY-01**: Re-run screenshot/layout QA for `/home-v2` in EN/DE/FR/IT desktop and mobile.
+- [x] **VERIFY-02**: Re-run legal render checks for `/privacy` and `/terms` in EN/DE/FR/IT.
+- [x] **VERIFY-03**: Run lint, build, and Home V2 relevant E2E checks.
+- [x] **VERIFY-04**: Store raw screenshots and machine evidence under `/private/tmp/stoa-home-v2-v9/`, not the repository.
 
 ## Out Of Scope
 
-- Runtime code fixes.
-- Major copy rewriting.
-- Image replacement, optimization, or new asset downloads.
-- Screenshot binary commits.
-- Legal advice or final legal approval.
-- Public launch or route replacement.
+- Replacing `/` with `/home-v2`.
+- Final legal advice or lawyer sign-off.
+- Buying stock assets or commissioning photography.
+- Reworking the Home V2 information architecture.
+- Adding runtime Romansh support.
+- Committing screenshot binaries.
 
 ## Traceability
 
 | Requirement | Phase |
 |-------------|-------|
-| SCOPE-01, SCOPE-02, SCOPE-03, SCOPE-04 | 291 |
-| SHOT-01, SHOT-02, SHOT-03, SHOT-04 | 292 |
-| VISUAL-01, VISUAL-02, VISUAL-03, VISUAL-04 | 293 |
-| LOCALE-01, LOCALE-02, LOCALE-03 | 294 |
-| LEGAL-01, LEGAL-02, LEGAL-03, LEGAL-04 | 295 |
-| SWITCH-01, SWITCH-02, SWITCH-03, SWITCH-04 | 296 |
-| DECISION-01, DECISION-02, DECISION-03, DECISION-04 | 297 |
+| SCOPE-01, SCOPE-02, SCOPE-03, SCOPE-04 | 298 |
+| LAYOUT-01, LAYOUT-02, LAYOUT-03, LAYOUT-04, LAYOUT-05 | 299 |
+| LEGAL-01, LEGAL-02, LEGAL-03, LEGAL-04 | 300 |
+| SEO-01, SEO-02, SEO-03, SEO-04, ASSET-01, ASSET-02, ASSET-03 | 301 |
+| VERIFY-01, VERIFY-02, VERIFY-03, VERIFY-04 | 302 |
+| SCOPE-04 | 303 |

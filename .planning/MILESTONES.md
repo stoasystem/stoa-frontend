@@ -1,5 +1,38 @@
 # Milestones
 
+## v9 Home V2 Final Issue Cleanup (Shipped: 2026-07-07)
+
+**Phases completed:** 6 phases, 6 plans, code and documentation cleanup
+**Status:** Complete
+**Audit:** `.planning/milestones/v9-MILESTONE-AUDIT.md`
+**Depends on:** v8 Home V2 Visual QA And Switch Decision
+**Known deferred items at close:** public route switch, final photography procurement, qualified legal review, production canonical/sitemap/language alternate policy, monitoring checklist, and rollback execution plan.
+
+**Key accomplishments:**
+
+- Fixed the v8 FR mobile horizontal overflow blocker.
+- Improved FR/IT long Hero title behavior without mid-word breaks.
+- Reduced mobile Hero image dominance so the photo reads as a controlled frame.
+- Increased desktop Home V2 nav label visibility.
+- Removed visible draft/review/candidate framing from `/privacy` and `/terms` page copy in EN/DE/FR/IT.
+- Added default product metadata and route-level metadata for `/home-v2`, `/privacy`, and `/terms`.
+- Recorded current Home V2 images as temporary-public-approved for preview and switch-over planning, not final-public-approved.
+- Documented future route switch, canonical, sitemap, old-home preservation, and rollback plan.
+- Captured v9 screenshots and audit JSON outside the repository under `/private/tmp/stoa-home-v2-v9/`.
+- Decided `/home-v2` is ready for switch-over planning, not public replacement of `/`.
+
+### Verification
+
+- `git diff --check`: passed.
+- `npm run lint`: passed.
+- `npm run build`: passed with existing Vite chunk-size warning.
+- `npm run test:e2e -- home-v2.spec.ts localization-preferences.spec.ts`: passed, 5/5 tests.
+- Browser layout audit: passed for EN/DE/FR/IT desktop and mobile.
+- Legal render audit: passed for EN/DE/FR/IT `/privacy` and `/terms`.
+- Raw screenshots were not committed.
+
+---
+
 ## v8 Home V2 Visual QA And Switch Decision (Shipped: 2026-07-07)
 
 **Phases completed:** 7 phases, 7 plans, 0 code tasks

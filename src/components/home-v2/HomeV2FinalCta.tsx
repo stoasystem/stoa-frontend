@@ -20,7 +20,7 @@ export function HomeV2FinalCta({ learningHref }: { learningHref: string }) {
                 <p className="inline-flex rounded-full bg-white/8 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-gold))] ring-1 ring-white/12">
                   {t('finalCta.eyebrow')}
                 </p>
-                <h2 className="home-v2-display mt-7 max-w-4xl text-5xl font-medium leading-[0.9] sm:text-7xl">
+                <h2 className="home-v2-final-title home-v2-display mt-7 max-w-4xl text-5xl font-medium leading-[0.9] sm:text-7xl">
                   {t('finalCta.title')}
                 </h2>
                 <p className="mt-7 max-w-2xl text-base leading-8 text-[hsl(var(--home-v2-paper)/0.68)]">{t('finalCta.body')}</p>
@@ -36,7 +36,7 @@ export function HomeV2FinalCta({ learningHref }: { learningHref: string }) {
               </div>
             </div>
             <div className="relative z-10 mt-16 h-px bg-[linear-gradient(90deg,transparent,hsl(var(--home-v2-paper)/0.28),transparent)]" />
-            <p className="relative z-10 mt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-paper)/0.42)]">
+            <p className="home-v2-final-signature relative z-10 mt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-paper)/0.42)]">
               Zurich rhythm / teacher-backed learning / parent clarity
             </p>
           </div>

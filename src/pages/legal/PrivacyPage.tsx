@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { Seo } from '@/components/common/Seo'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 
@@ -11,6 +12,7 @@ export function PrivacyPage() {
 
   return (
     <MarketingLayout>
+      <Seo title={`${t('privacy.title')} | STOA`} description={t('privacy.description')} />
       <PageContainer>
         <PageHeader
           eyebrow={t('privacy.eyebrow')}

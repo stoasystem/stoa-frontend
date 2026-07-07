@@ -68,7 +68,8 @@
 }
 
 .home-v2-nav-link {
-  color: hsl(var(--home-v2-ink) / 0.82);
+  color: hsl(var(--home-v2-ink) / 0.9);
+  font-size: 1.06rem;
   text-decoration: none;
   transition:
     background-color 620ms cubic-bezier(0.32, 0.72, 0, 1),
@@ -125,9 +126,9 @@
   min-width: 2.35rem;
   min-height: 2.15rem;
   border-radius: 999px;
-  color: hsl(var(--home-v2-ink) / 0.58);
+  color: hsl(var(--home-v2-ink) / 0.66);
   font-family: var(--home-v2-text);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   transition:
@@ -199,6 +200,46 @@
 
 .home-v2-image-tone {
   filter: saturate(0.86) contrast(0.96);
+}
+
+.home-v2-hero-title {
+  max-width: min(100%, 12.4ch);
+  overflow-wrap: normal;
+  word-break: normal;
+  hyphens: auto;
+  text-wrap: balance;
+  font-size: clamp(3.85rem, 15vw, 4.55rem);
+}
+
+.home-v2-final-title {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.home-v2-final-signature {
+  overflow-wrap: anywhere;
+}
+
+.home-v2-hero-frame {
+  aspect-ratio: 16 / 11;
+}
+
+.home-v2-hero-visual {
+  min-height: clamp(19rem, 44vw, 30rem);
+}
+
+@media (min-width: 640px) {
+  .home-v2-hero-title {
+    max-width: min(100%, 12.8ch);
+    font-size: clamp(5.45rem, 11.5vw, 6.15rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .home-v2-hero-title {
+    max-width: 12.8ch;
+    font-size: clamp(5.9rem, 6.25vw, 7.05rem);
+  }
 }
 
 .home-v2-parent-frame {
@@ -704,6 +745,61 @@
 }
 
 @media (max-width: 767px) {
+  .home-v2-hero {
+    gap: 2.25rem;
+    padding-top: 7.35rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .home-v2-hero-title {
+    max-width: min(100%, 11.8ch);
+    font-size: clamp(3.05rem, 12.4vw, 3.75rem);
+    line-height: 0.92;
+  }
+
+  .home-v2-hero-visual-wrap {
+    max-width: min(100%, 25rem);
+  }
+
+  .home-v2-hero-frame {
+    aspect-ratio: 4 / 5;
+  }
+
+  .home-v2-hero-visual {
+    min-height: clamp(22rem, 92vw, 25rem);
+  }
+
+  .home-v2-hero-visual img {
+    object-position: 48% 48%;
+  }
+
+  .home-v2-hero-proof {
+    bottom: 1rem;
+    left: 1rem;
+    right: 1rem;
+    border-radius: 1.25rem;
+    padding: 1rem;
+  }
+
+  .home-v2-hero-proof .home-v2-display {
+    font-size: 1.7rem;
+  }
+
+  .home-v2-hero-proof p:last-child {
+    margin-top: 0.65rem;
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .home-v2-final-title {
+    font-size: clamp(2.75rem, 13.5vw, 3.75rem);
+  }
+
+  .home-v2-final-signature {
+    letter-spacing: 0.14em;
+    line-height: 1.8;
+  }
+
   .home-v2-parent-frame {
     min-height: 30rem;
   }

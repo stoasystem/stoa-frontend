@@ -10,28 +10,28 @@ The app includes a STOA core product UI with a backend-driven student chat works
 
 Developers can clone `stoa-frontend`, run the npm scripts, and use a credible STOA education platform workflow with authenticated role boundaries, clear role-based navigation, stable demo backend support, documented API contracts, coherent final demo flows, controlled guided Learning Assistant behavior, runtime English/German/French/Italian product copy, production-facing user language, brand-aligned visual design, cross-locale layout stability, accessibility/release-quality gates, trustworthy contact/brand details, stakeholder review evidence, release locks, launch-candidate notes, localized legal candidate pages, and a clean Go/No-Go path for future real backend integration and public demo release.
 
-## Latest Shipped Milestone: v8 Home V2 Visual QA And Switch Decision
+## Latest Shipped Milestone: v9 Home V2 Final Issue Cleanup
 
 **Shipped:** 2026-07-07
 
-**Delivered:** v8 completed the screenshot-backed Home V2 visual QA and switch decision. `/home-v2` is confirmed as the stronger future homepage direction, with a more premium Swiss-parent visual language than the current `/`, but route replacement is No-Go until v9 remediation addresses final-public imagery, FR mobile overflow, mobile Hero rhythm, legal-page public presentation, SEO/routing/canonical/sitemap planning, old-home preservation, and rollback readiness. Current `/` remains unchanged and `/home-v2` remains a preview route.
+**Delivered:** v9 cleared the concrete v8 blockers enough for `/home-v2` to enter switch-over planning. It fixed the FR mobile overflow issue, improved long-title fit, reduced mobile Hero image dominance, made Home V2 navigation labels more visible, removed visible legal draft/review framing from `/privacy` and `/terms`, added default and route-level metadata, documented temporary image approval, and created a future route-switch/canonical/sitemap/rollback plan. Current `/` remains unchanged and `/home-v2` remains a preview route.
 
 **Target features:**
-- `/home-v2` EN/DE/FR/IT desktop and mobile screenshots captured outside the repository.
-- Current `/` EN desktop/mobile comparison screenshots captured outside the repository.
-- Visual QA decision, screenshot matrix, and Go/No-Go register are documented.
-- Legal draft completeness and public-page presentation risk are documented.
-- SEO/routing/rollback readiness gaps are documented.
-- v9 remediation backlog is ready.
-- Preserve current `/`; do not switch `/home-v2` to `/` in this track.
+- `/home-v2` EN/DE/FR/IT desktop and mobile screenshots captured outside the repository under `/private/tmp/stoa-home-v2-v9/`.
+- Layout audit confirms no body-level overflow for EN/DE/FR/IT desktop or mobile.
+- `/privacy` and `/terms` render in EN/DE/FR/IT without visible draft/review/candidate page framing.
+- Home V2 and legal routes set route-specific metadata.
+- Current images are temporary-public-approved for preview and planning, not final-public-approved.
+- Future switch-over plan documents canonical, sitemap, old-home preservation, and rollback requirements.
+- Final v9 decision: ready for switch-over planning; do not switch `/home-v2` to `/` in v9.
 
 ## Current Milestone: None
 
-v8 is complete. The next recommended milestone is v9 final issue cleanup using `docs/home-v2/v8-go-no-go-register.md` as the backlog source.
+v9 is complete. The next recommended milestone is a dedicated switch-over planning stage only if the owner explicitly approves preparing `/home-v2` to replace `/`.
 
 ## Current State
 
-**Latest shipped milestone:** v8 Home V2 Visual QA And Switch Decision
+**Latest shipped milestone:** v9 Home V2 Final Issue Cleanup
 
 **Delivered product surface:**
 - `/chat` mock product UI with conversation sidebar, active message list, message bubbles, chat input, upload placeholder, AI thinking state, delayed mock response, and teacher-help placeholder.
@@ -77,6 +77,7 @@ v8 is complete. The next recommended milestone is v9 final issue cleanup using `
 - v7.0 full-site multilingual adaptation planning with EN/DE/FR/IT runtime scope, Romansh language-policy deferral, glossary/tone/quality rules, Home V2 and shared language-control plan, route QA matrix, legal/privacy/terms research plan, and v7.1-v7.7 execution roadmap.
 - v7 full-site multilingual execution with EN/DE/FR/IT runtime registration, shared switcher and premium Home V2 language controls, localized Privacy/Terms candidate legal pages, Online Classroom copy cleanup, legal source notes, copy QA report, release handoff, and verification.
 - v8 Home V2 visual QA and switch decision with EN/DE/FR/IT screenshot matrix, current `/` comparison, layout audit, legal render audit, Go/No-Go register, final No-Go switch decision, and v9 remediation backlog.
+- v9 Home V2 final issue cleanup with responsive FR/IT Hero fit, mobile Hero frame tuning, nav visibility improvement, legal page presentation cleanup, route metadata, temporary image approval record, switch-over/rollback plan, v9 screenshot/layout/legal audits, and final readiness for switch-over planning.
 - Mock chat/dashboard contracts and data under `src/types/` and `src/data/`.
 - README documentation for Phase 3 Core Product UI.
 
