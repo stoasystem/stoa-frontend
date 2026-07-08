@@ -27,48 +27,48 @@
 
 .home-v2-premium::before {
   position: fixed;
-  inset: -14vmax;
+  inset: -26vmax;
   z-index: 20;
   pointer-events: none;
   content: "";
   opacity: 0.56;
   background-image:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='720' viewBox='0 0 960 720'%3E%3Cg fill='none' stroke='%2315181e' stroke-opacity='.115' stroke-width='.8'%3E%3Cpath d='M-80 176 C 96 108 222 204 386 142 S 666 92 1040 178'/%3E%3Cpath d='M-88 258 C 104 194 236 294 398 232 S 692 178 1048 268'/%3E%3Cpath d='M-76 344 C 124 286 264 384 434 318 S 706 266 1030 356'/%3E%3Cpath d='M94 -72 C 172 98 106 236 206 394 S 324 572 246 792'/%3E%3Cpath d='M742 -86 C 650 104 746 260 646 424 S 548 592 624 792'/%3E%3C/g%3E%3Cg fill='none' stroke='%23506863' stroke-opacity='.105' stroke-width='.65'%3E%3Cpath d='M78 586 C 214 520 304 610 438 552 S 682 492 886 586'/%3E%3Cpath d='M176 72 C 306 16 416 92 552 46 S 742 28 930 94'/%3E%3Cpath d='M342 664 C 416 562 538 562 608 664 S 748 768 828 628'/%3E%3C/g%3E%3C/svg%3E"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1180' viewBox='0 0 1600 1180'%3E%3Cg fill='none' stroke='%2315181e' stroke-linecap='round'%3E%3Cpath stroke-opacity='.118' stroke-width='1.05' d='M-150 395 C 92 282 230 350 412 252 C 598 150 742 206 938 118 C 1126 34 1288 58 1740 -86'/%3E%3Cpath stroke-opacity='.108' stroke-width='.95' d='M-160 590 C 86 488 274 548 480 420 C 686 292 852 392 1074 252 C 1268 130 1458 176 1738 18'/%3E%3Cpath stroke-opacity='.096' stroke-width='.82' d='M-126 776 C 142 668 348 734 568 592 C 786 452 978 540 1200 396 C 1394 270 1514 294 1718 170'/%3E%3C/g%3E%3Cg fill='none' stroke='%23506863' stroke-linecap='round'%3E%3Cpath stroke-opacity='.092' stroke-width='.72' d='M70 -112 C 246 138 174 312 346 520 C 486 690 480 842 370 1272'/%3E%3Cpath stroke-opacity='.086' stroke-width='.68' d='M1250 -140 C 1110 116 1198 300 1032 510 C 870 716 922 894 1038 1292'/%3E%3Cpath stroke-opacity='.08' stroke-width='.62' d='M-130 988 C 154 870 378 946 640 802 C 908 656 1092 724 1342 586 C 1502 498 1632 492 1742 432'/%3E%3C/g%3E%3C/svg%3E"),
     repeating-linear-gradient(92deg, hsl(var(--home-v2-ink) / 0.027) 0 1px, transparent 1px 9px),
     repeating-linear-gradient(2deg, transparent 0 29px, hsl(var(--home-v2-sage) / 0.022) 29px 30px, transparent 30px 76px),
     radial-gradient(ellipse at 18% 8%, hsl(var(--home-v2-sage) / 0.055), transparent 34rem);
   background-size:
-    58rem 43.5rem,
+    112rem 82.6rem,
     0.62rem 0.62rem,
     24rem 24rem,
     100% 100%;
   background-position:
-    -7rem -5rem,
+    50% 3rem,
     0 0,
     0 0,
     0 0;
   background-repeat:
-    repeat,
+    no-repeat,
     repeat,
     repeat,
     no-repeat;
   mix-blend-mode: multiply;
   mask-image: linear-gradient(180deg, transparent 0%, black 8%, black 90%, transparent 100%);
-  transform: translate3d(-1.4vmax, -0.8vmax, 0) scale(1.04);
+  transform: translate3d(-6.4vmax, -1.8vmax, 0) rotate(-0.12deg) scale(1.07);
   transform-origin: 50% 18%;
   will-change: transform;
 }
 
 .home-v2-premium::after {
   position: fixed;
-  inset: -10vmax;
+  inset: -18vmax;
   z-index: -1;
   pointer-events: none;
   content: "";
   background:
     linear-gradient(115deg, transparent 0%, hsl(0 0% 100% / 0.34) 38%, transparent 68%),
     linear-gradient(180deg, hsl(190 22% 100% / 0.42), transparent 26%);
-  transform: translate3d(0, 0, 0) scale(1.02);
+  transform: translate3d(1.2vmax, -1vmax, 0) rotate(0.12deg) scale(1.035);
   transform-origin: 50% 0%;
   will-change: transform;
 }
@@ -91,29 +91,41 @@
 
 @keyframes home-v2-watermark-flow {
   0% {
-    transform: translate3d(-1.4vmax, -0.8vmax, 0) scale(1.04);
+    transform: translate3d(-6.4vmax, -1.8vmax, 0) rotate(-0.12deg) scale(1.07);
   }
 
-  45% {
-    transform: translate3d(1.2vmax, -5.2vmax, 0) scale(1.05);
+  22% {
+    transform: translate3d(1.8vmax, -5.4vmax, 0) rotate(0.06deg) scale(1.075);
+  }
+
+  48% {
+    transform: translate3d(5.8vmax, -11.8vmax, 0) rotate(0.14deg) scale(1.078);
+  }
+
+  74% {
+    transform: translate3d(2.6vmax, -18.4vmax, 0) rotate(0.02deg) scale(1.074);
   }
 
   100% {
-    transform: translate3d(-0.8vmax, -9.4vmax, 0) scale(1.045);
+    transform: translate3d(-3.2vmax, -26.8vmax, 0) rotate(-0.1deg) scale(1.07);
   }
 }
 
 @keyframes home-v2-light-field-flow {
   0% {
-    transform: translate3d(0, 0, 0) scale(1.02);
+    transform: translate3d(1.2vmax, -1vmax, 0) rotate(0.12deg) scale(1.035);
   }
 
-  48% {
-    transform: translate3d(-1.2vmax, 3.2vmax, 0) scale(1.025);
+  36% {
+    transform: translate3d(-2.8vmax, 4.8vmax, 0) rotate(-0.1deg) scale(1.042);
+  }
+
+  68% {
+    transform: translate3d(2.4vmax, 9.2vmax, 0) rotate(0.08deg) scale(1.038);
   }
 
   100% {
-    transform: translate3d(1.4vmax, 5.8vmax, 0) scale(1.02);
+    transform: translate3d(-1.4vmax, 14.8vmax, 0) rotate(-0.08deg) scale(1.036);
   }
 }
 

@@ -78,6 +78,7 @@ Last activity: 2026-07-07 - v9 completed
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-08 | Home V2 stronger guided stream background flow | Increased the scroll-driven background drift amplitude and changed the path from straight diagonal movement into a guided stream-like meander, then verified lint, build, transform deltas, and overflow. |
 | 2026-07-08 | Home V2 scroll-responsive flowing background | Added transform-only CSS scroll-timeline drift to the engraved watermark and light field layers, with reduced-motion handling and desktop/mobile preview checks. |
 | 2026-07-08 | Home V2 engraved watermark texture | Replaced the diagonal paper-like background texture with a custom SVG watermark and fine fiber layers, then verified lint, build, desktop/mobile screenshots, and desktop overflow. |
 | 2026-07-08 | Home V2 watermark visibility tuning | Increased the subtle watermark texture contrast while preserving a non-grid premium material feel, then verified lint, build, preview screenshots, and desktop overflow. |
