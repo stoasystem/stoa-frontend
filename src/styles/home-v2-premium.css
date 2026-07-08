@@ -27,7 +27,7 @@
 
 .home-v2-premium::before {
   position: fixed;
-  inset: 0;
+  inset: -14vmax;
   z-index: 20;
   pointer-events: none;
   content: "";
@@ -54,17 +54,67 @@
     no-repeat;
   mix-blend-mode: multiply;
   mask-image: linear-gradient(180deg, transparent 0%, black 8%, black 90%, transparent 100%);
+  transform: translate3d(-1.4vmax, -0.8vmax, 0) scale(1.04);
+  transform-origin: 50% 18%;
+  will-change: transform;
 }
 
 .home-v2-premium::after {
   position: fixed;
-  inset: 0;
+  inset: -10vmax;
   z-index: -1;
   pointer-events: none;
   content: "";
   background:
     linear-gradient(115deg, transparent 0%, hsl(0 0% 100% / 0.34) 38%, transparent 68%),
     linear-gradient(180deg, hsl(190 22% 100% / 0.42), transparent 26%);
+  transform: translate3d(0, 0, 0) scale(1.02);
+  transform-origin: 50% 0%;
+  will-change: transform;
+}
+
+@supports (animation-timeline: scroll()) {
+  .home-v2-premium::before {
+    animation: home-v2-watermark-flow both;
+    animation-timeline: scroll(root block);
+    animation-range: 0% 100%;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .home-v2-premium::after {
+    animation: home-v2-light-field-flow both;
+    animation-timeline: scroll(root block);
+    animation-range: 0% 100%;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+}
+
+@keyframes home-v2-watermark-flow {
+  0% {
+    transform: translate3d(-1.4vmax, -0.8vmax, 0) scale(1.04);
+  }
+
+  45% {
+    transform: translate3d(1.2vmax, -5.2vmax, 0) scale(1.05);
+  }
+
+  100% {
+    transform: translate3d(-0.8vmax, -9.4vmax, 0) scale(1.045);
+  }
+}
+
+@keyframes home-v2-light-field-flow {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.02);
+  }
+
+  48% {
+    transform: translate3d(-1.2vmax, 3.2vmax, 0) scale(1.025);
+  }
+
+  100% {
+    transform: translate3d(1.4vmax, 5.8vmax, 0) scale(1.02);
+  }
 }
 
 .home-v2-display {
@@ -873,6 +923,8 @@
 @media (prefers-reduced-motion: reduce) {
   .home-v2-reveal,
   .home-v2-reveal.is-visible,
+  .home-v2-premium::before,
+  .home-v2-premium::after,
   .home-v2-nav-link,
   .home-v2-magnetic,
   .home-v2-thread-fill,
