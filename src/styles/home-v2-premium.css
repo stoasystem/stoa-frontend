@@ -31,26 +31,18 @@
   z-index: 20;
   pointer-events: none;
   content: "";
-  opacity: 0.56;
+  opacity: 0.64;
   background-image:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1180' viewBox='0 0 1600 1180'%3E%3Cg fill='none' stroke='%2315181e' stroke-linecap='round'%3E%3Cpath stroke-opacity='.118' stroke-width='1.05' d='M-150 395 C 92 282 230 350 412 252 C 598 150 742 206 938 118 C 1126 34 1288 58 1740 -86'/%3E%3Cpath stroke-opacity='.108' stroke-width='.95' d='M-160 590 C 86 488 274 548 480 420 C 686 292 852 392 1074 252 C 1268 130 1458 176 1738 18'/%3E%3Cpath stroke-opacity='.096' stroke-width='.82' d='M-126 776 C 142 668 348 734 568 592 C 786 452 978 540 1200 396 C 1394 270 1514 294 1718 170'/%3E%3C/g%3E%3Cg fill='none' stroke='%23506863' stroke-linecap='round'%3E%3Cpath stroke-opacity='.092' stroke-width='.72' d='M70 -112 C 246 138 174 312 346 520 C 486 690 480 842 370 1272'/%3E%3Cpath stroke-opacity='.086' stroke-width='.68' d='M1250 -140 C 1110 116 1198 300 1032 510 C 870 716 922 894 1038 1292'/%3E%3Cpath stroke-opacity='.08' stroke-width='.62' d='M-130 988 C 154 870 378 946 640 802 C 908 656 1092 724 1342 586 C 1502 498 1632 492 1742 432'/%3E%3C/g%3E%3C/svg%3E"),
-    repeating-linear-gradient(92deg, hsl(var(--home-v2-ink) / 0.027) 0 1px, transparent 1px 9px),
-    repeating-linear-gradient(2deg, transparent 0 29px, hsl(var(--home-v2-sage) / 0.022) 29px 30px, transparent 30px 76px),
     radial-gradient(ellipse at 18% 8%, hsl(var(--home-v2-sage) / 0.055), transparent 34rem);
   background-size:
     112rem 82.6rem,
-    0.62rem 0.62rem,
-    24rem 24rem,
     100% 100%;
   background-position:
     50% 3rem,
-    0 0,
-    0 0,
     0 0;
   background-repeat:
     no-repeat,
-    repeat,
-    repeat,
     no-repeat;
   mix-blend-mode: multiply;
   mask-image: linear-gradient(180deg, transparent 0%, black 8%, black 90%, transparent 100%);
