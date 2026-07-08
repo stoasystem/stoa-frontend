@@ -11,7 +11,7 @@ export function HomeV2ParentConfidence() {
     <section
       id="home-v2-parent-confidence"
       data-testid="home-v2-parent-confidence"
-      className="mx-auto grid max-w-7xl scroll-mt-36 gap-12 px-4 pb-24 pt-40 sm:px-6 md:px-8 md:scroll-mt-40 md:py-32 lg:grid-cols-[0.86fr_1.04fr] lg:items-center"
+      className="mx-auto grid max-w-7xl scroll-mt-36 gap-10 px-4 pb-20 pt-16 sm:px-6 md:px-8 md:scroll-mt-40 md:pb-28 md:pt-20 lg:grid-cols-[0.86fr_1.04fr] lg:items-center"
     >
       <HomeV2Reveal className="lg:pr-8">
         <p className="inline-flex rounded-full bg-[hsl(var(--home-v2-burgundy)/0.08)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-[hsl(var(--home-v2-burgundy))] ring-1 ring-[hsl(var(--home-v2-burgundy)/0.14)]">

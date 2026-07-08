@@ -17,9 +17,9 @@ export function HomeV2TrustLayer() {
     <section
       id="home-v2-trust-layer"
       data-testid="home-v2-trust-layer"
-      className="mx-auto max-w-7xl scroll-mt-32 px-4 py-24 sm:px-6 md:scroll-mt-40 md:px-8 md:py-36"
+      className="mx-auto max-w-7xl scroll-mt-32 px-4 py-20 sm:px-6 md:scroll-mt-40 md:px-8 md:py-28"
     >
-      <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center xl:gap-20">
+      <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center xl:gap-16">
         <HomeV2Reveal className="order-2 lg:order-1">
           <HomeV2VisualFrame label={t('trustLayer.visualLabel')} contentClassName="home-v2-trust-frame">
             <div className="home-v2-trust-visual">
