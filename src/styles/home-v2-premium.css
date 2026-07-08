@@ -31,17 +31,17 @@
   z-index: 20;
   pointer-events: none;
   content: "";
-  opacity: 0.18;
+  opacity: 0.34;
   background-image:
-    repeating-linear-gradient(112deg, transparent 0 25px, hsl(var(--home-v2-ink) / 0.022) 25px 26px, transparent 26px 52px),
-    repeating-linear-gradient(28deg, transparent 0 42px, hsl(var(--home-v2-sage) / 0.018) 42px 43px, transparent 43px 86px),
-    repeating-linear-gradient(90deg, hsl(0 0% 100% / 0.018) 0 1px, transparent 1px 8px),
-    radial-gradient(circle at 50% 0%, hsl(var(--home-v2-ink) / 0.012), transparent 44rem);
+    repeating-linear-gradient(112deg, transparent 0 23px, hsl(var(--home-v2-ink) / 0.052) 23px 24px, transparent 24px 48px),
+    repeating-linear-gradient(28deg, transparent 0 40px, hsl(var(--home-v2-sage) / 0.036) 40px 41px, transparent 41px 82px),
+    repeating-linear-gradient(90deg, hsl(var(--home-v2-ink) / 0.018) 0 1px, transparent 1px 8px),
+    linear-gradient(155deg, transparent 0%, hsl(var(--home-v2-ink) / 0.026) 46%, transparent 66%);
   background-size:
-    22rem 22rem,
-    30rem 30rem,
+    18rem 18rem,
+    26rem 26rem,
     0.72rem 0.72rem,
-    100% 100%;
+    46rem 46rem;
   mix-blend-mode: multiply;
   mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 86%, transparent 100%);
 }

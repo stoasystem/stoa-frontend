@@ -78,6 +78,7 @@ Last activity: 2026-07-07 - v9 completed
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-07-08 | Home V2 watermark visibility tuning | Increased the subtle watermark texture contrast while preserving a non-grid premium material feel, then verified lint, build, preview screenshots, and desktop overflow. |
 | 2026-07-07 | Home V2 subtle watermark texture | Replaced the fine grid overlay with a low-opacity paper/fabric watermark texture, verified lint/build and desktop/mobile preview screenshots. |
 | 2026-07-07 | Home V2 color palette redesign | Replaced generic beige with a cooler porcelain/mist-grey Home V2 palette, scoped footer styling to Home V2, verified lint/build and desktop/mobile preview screenshots. |
 | 2026-07-07 | v9 final issue cleanup | Fixed Home V2 responsive blockers, cleaned legal page presentation, added metadata, documented temporary image approval and switch-over plan, verified with screenshots/audits/lint/build/E2E. |
