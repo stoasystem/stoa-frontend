@@ -31,19 +31,29 @@
   z-index: 20;
   pointer-events: none;
   content: "";
-  opacity: 0.34;
+  opacity: 0.56;
   background-image:
-    repeating-linear-gradient(112deg, transparent 0 23px, hsl(var(--home-v2-ink) / 0.052) 23px 24px, transparent 24px 48px),
-    repeating-linear-gradient(28deg, transparent 0 40px, hsl(var(--home-v2-sage) / 0.036) 40px 41px, transparent 41px 82px),
-    repeating-linear-gradient(90deg, hsl(var(--home-v2-ink) / 0.018) 0 1px, transparent 1px 8px),
-    linear-gradient(155deg, transparent 0%, hsl(var(--home-v2-ink) / 0.026) 46%, transparent 66%);
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='960' height='720' viewBox='0 0 960 720'%3E%3Cg fill='none' stroke='%2315181e' stroke-opacity='.115' stroke-width='.8'%3E%3Cpath d='M-80 176 C 96 108 222 204 386 142 S 666 92 1040 178'/%3E%3Cpath d='M-88 258 C 104 194 236 294 398 232 S 692 178 1048 268'/%3E%3Cpath d='M-76 344 C 124 286 264 384 434 318 S 706 266 1030 356'/%3E%3Cpath d='M94 -72 C 172 98 106 236 206 394 S 324 572 246 792'/%3E%3Cpath d='M742 -86 C 650 104 746 260 646 424 S 548 592 624 792'/%3E%3C/g%3E%3Cg fill='none' stroke='%23506863' stroke-opacity='.105' stroke-width='.65'%3E%3Cpath d='M78 586 C 214 520 304 610 438 552 S 682 492 886 586'/%3E%3Cpath d='M176 72 C 306 16 416 92 552 46 S 742 28 930 94'/%3E%3Cpath d='M342 664 C 416 562 538 562 608 664 S 748 768 828 628'/%3E%3C/g%3E%3C/svg%3E"),
+    repeating-linear-gradient(92deg, hsl(var(--home-v2-ink) / 0.027) 0 1px, transparent 1px 9px),
+    repeating-linear-gradient(2deg, transparent 0 29px, hsl(var(--home-v2-sage) / 0.022) 29px 30px, transparent 30px 76px),
+    radial-gradient(ellipse at 18% 8%, hsl(var(--home-v2-sage) / 0.055), transparent 34rem);
   background-size:
-    18rem 18rem,
-    26rem 26rem,
-    0.72rem 0.72rem,
-    46rem 46rem;
+    58rem 43.5rem,
+    0.62rem 0.62rem,
+    24rem 24rem,
+    100% 100%;
+  background-position:
+    -7rem -5rem,
+    0 0,
+    0 0,
+    0 0;
+  background-repeat:
+    repeat,
+    repeat,
+    repeat,
+    no-repeat;
   mix-blend-mode: multiply;
-  mask-image: linear-gradient(180deg, transparent 0%, black 10%, black 86%, transparent 100%);
+  mask-image: linear-gradient(180deg, transparent 0%, black 8%, black 90%, transparent 100%);
 }
 
 .home-v2-premium::after {
