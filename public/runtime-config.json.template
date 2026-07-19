@@ -1,0 +1,35 @@
+{
+  "schema": "stoa.web.runtime-config.v1",
+  "environment": "staging",
+  "release": {
+    "releaseId": "1111111111111111111111111111111111111111111111111111111111111111",
+    "manifestSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "frontendArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "backendArtifactSha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "web": {
+    "origin": "https://staging.stoaedu.ch"
+  },
+  "api": {
+    "origin": "https://api-staging.stoaedu.ch"
+  },
+  "auth": {
+    "mode": "backend-api"
+  },
+  "realtime": {
+    "enabled": true,
+    "endpoint": "wss://api-staging.stoaedu.ch/realtime"
+  },
+  "features": {
+    "analytics": false,
+    "errorMonitoring": false,
+    "feedback": true,
+    "parentReports": true,
+    "payments": false,
+    "publicRegistration": true,
+    "realtimeNotifications": true,
+    "referrals": true,
+    "supportTickets": true,
+    "teacherHelp": true
+  }
+}

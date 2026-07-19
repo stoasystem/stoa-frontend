@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
+import { Buffer } from 'node:buffer'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { fileURLToPath } from 'node:url'
+import { TextEncoder } from 'node:util'
 import ts from 'typescript'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
@@ -62,13 +64,22 @@ function validConfig() {
   }
 }
 
+function headerBag(values) {
+  const normalized = new Map(
+    Object.entries(values).map(([key, value]) => [key.toLowerCase(), value]),
+  )
+  return {
+    get: (name) => normalized.get(name.toLowerCase()) ?? null,
+  }
+}
+
 function responseFor(body, overrides = {}) {
   return {
     ok: true,
     status: 200,
     redirected: false,
     url: 'https://staging.stoaedu.ch/runtime-config.json',
-    headers: new Headers({
+    headers: headerBag({
       'content-length': String(new TextEncoder().encode(body).byteLength),
       'content-type': 'application/json',
     }),
@@ -88,6 +99,7 @@ test('template and schema expose one closed backend-api Web contract', async () 
   assert.equal(schema.properties.release.additionalProperties, false)
   assert.equal(schema.properties.web.additionalProperties, false)
   assert.equal(schema.properties.api.additionalProperties, false)
+  assert.deepEqual(schema.properties.environment.enum, ['staging', 'staging-pilot', 'production'])
   assert.deepEqual(schema.required, [
     'schema', 'environment', 'release', 'web', 'api', 'auth', 'realtime', 'features',
   ])
@@ -111,6 +123,7 @@ test('valid configuration is canonical, digest-bound, and deeply frozen', async 
   const digest = await runtime.digestRuntimeConfig(config)
   const parsed = await runtime.validateRuntimeConfig(config, {
     expectedDigest: digest,
+    expectedRelease: { ...config.release },
     expectedEnvironment: 'staging',
     expectedWebOrigin: 'https://staging.stoaedu.ch',
   })
@@ -138,7 +151,13 @@ test('closed validation rejects unknown, secret-shaped, unsafe, mismatched, and 
     ['unsafe Web origin', (value) => { value.web.origin = 'http://staging.stoaedu.ch' }],
     ['origin credentials', (value) => { value.api.origin = 'https://user:pass@api.stoaedu.ch' }],
     ['origin query', (value) => { value.api.origin = 'https://api-staging.stoaedu.ch?token=x' }],
+    ['origin fragment', (value) => { value.api.origin = 'https://api-staging.stoaedu.ch#token' }],
     ['origin path', (value) => { value.api.origin = 'https://api-staging.stoaedu.ch/v1' }],
+    ['development environment', (value) => { value.environment = 'local' }],
+    ['JWT value', (value) => { value.release.releaseId = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.signature' }],
+    ['Bearer value', (value) => { value.release.manifestSha256 = 'Bearer abc.def.ghi' }],
+    ['AWS key value', (value) => { value.release.frontendArtifactSha256 = 'AKIA1234567890ABCDEF' }],
+    ['provider key value', (value) => { value.release.backendArtifactSha256 = 'sk-abcdefghijklmnopqrstuvwxyz' }],
     ['environment mismatch', (value) => { value.environment = 'production' }],
     ['Web origin mismatch', (value) => { value.web.origin = 'https://other.stoaedu.ch' }],
     ['release identity mismatch', (value) => { value.release.releaseId = 'latest' }],
@@ -150,10 +169,12 @@ test('closed validation rejects unknown, secret-shaped, unsafe, mismatched, and 
 
   for (const [name, mutate] of cases) {
     const value = validConfig()
+    const expectedRelease = { ...value.release }
     mutate(value)
     await assert.rejects(
       runtime.validateRuntimeConfig(value, {
         expectedDigest: sha('a'),
+        expectedRelease,
         expectedEnvironment: 'staging',
         expectedWebOrigin: 'https://staging.stoaedu.ch',
       }),
@@ -168,11 +189,52 @@ test('digest mismatch fails closed', async () => {
   await assert.rejects(
     runtime.validateRuntimeConfig(validConfig(), {
       expectedDigest: sha('f'),
+      expectedRelease: validConfig().release,
       expectedEnvironment: 'staging',
       expectedWebOrigin: 'https://staging.stoaedu.ch',
     }),
     (error) => error.name === 'RuntimeConfigError' && error.code === 'runtime_config_digest_mismatch',
   )
+})
+
+test('release identities are independently bound from the whole-document digest', async () => {
+  const runtime = await loadRuntimeConfigModule()
+  const config = validConfig()
+  const digest = await runtime.digestRuntimeConfig(config)
+  for (const key of Object.keys(config.release)) {
+    const expectedRelease = { ...config.release, [key]: sha('f') }
+    await assert.rejects(runtime.validateRuntimeConfig(validConfig(), {
+      expectedDigest: digest,
+      expectedRelease,
+      expectedEnvironment: 'staging',
+      expectedWebOrigin: 'https://staging.stoaedu.ch',
+    }), { name: 'RuntimeConfigError' }, key)
+  }
+})
+
+test('disabled realtime requires a null endpoint and matching feature flag', async () => {
+  const runtime = await loadRuntimeConfigModule()
+  const config = validConfig()
+  config.realtime = { enabled: false, endpoint: null }
+  config.features.realtimeNotifications = false
+  const digest = await runtime.digestRuntimeConfig(config)
+  const parsed = await runtime.validateRuntimeConfig(config, {
+    expectedDigest: digest,
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'staging',
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  })
+  assert.equal(parsed.realtime.endpoint, null)
+
+  const invalid = validConfig()
+  invalid.realtime.enabled = false
+  invalid.features.realtimeNotifications = false
+  await assert.rejects(runtime.validateRuntimeConfig(invalid, {
+    expectedDigest: await runtime.digestRuntimeConfig(invalid),
+    expectedRelease: { ...invalid.release },
+    expectedEnvironment: 'staging',
+    expectedWebOrigin: 'https://staging.stoaedu.ch',
+  }), { name: 'RuntimeConfigError' })
 })
 
 test('loader fetches a same-origin bounded document without credentials, cache, or redirects', async () => {
@@ -185,6 +247,7 @@ test('loader fetches a same-origin bounded document without credentials, cache, 
     configUrl: '/runtime-config.json',
     webOrigin: 'https://staging.stoaedu.ch',
     expectedDigest: digest,
+    expectedRelease: { ...config.release },
     expectedEnvironment: 'staging',
     fetchImpl: async (...args) => {
       calls.push(args)
@@ -212,6 +275,7 @@ test('loader rejects cross-origin paths, redirects, wrong media, and documents o
   const base = {
     webOrigin: 'https://staging.stoaedu.ch',
     expectedDigest: digest,
+    expectedRelease: { ...config.release },
     expectedEnvironment: 'staging',
   }
 
@@ -226,7 +290,7 @@ test('loader rejects cross-origin paths, redirects, wrong media, and documents o
   }), { name: 'RuntimeConfigError' })
   await assert.rejects(runtime.loadRuntimeConfig({
     ...base,
-    fetchImpl: async () => responseFor(body, { headers: new Headers({ 'content-type': 'text/html' }) }),
+    fetchImpl: async () => responseFor(body, { headers: headerBag({ 'content-type': 'text/html' }) }),
   }), { name: 'RuntimeConfigError' })
   await assert.rejects(runtime.loadRuntimeConfig({
     ...base,
@@ -263,6 +327,7 @@ test('registry publishes only validated state and clears failed initialization',
   await assert.rejects(runtime.initializeRuntimeConfig({
     webOrigin: 'https://staging.stoaedu.ch',
     expectedDigest: sha('e'),
+    expectedRelease: { ...config.release },
     expectedEnvironment: 'staging',
     fetchImpl: async () => responseFor(body),
   }))
@@ -271,9 +336,35 @@ test('registry publishes only validated state and clears failed initialization',
   const loaded = await runtime.initializeRuntimeConfig({
     webOrigin: 'https://staging.stoaedu.ch',
     expectedDigest: digest,
+    expectedRelease: { ...config.release },
     expectedEnvironment: 'staging',
     fetchImpl: async () => responseFor(body),
   })
+  assert.equal(runtime.getRuntimeConfig(), loaded)
+
+  await assert.rejects(runtime.initializeRuntimeConfig({
+    webOrigin: 'https://staging.stoaedu.ch',
+    expectedDigest: sha('e'),
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'staging',
+    fetchImpl: async () => responseFor(body),
+  }))
+  assert.equal(runtime.getRuntimeConfig(), loaded)
+
+  const replacement = validConfig()
+  replacement.release = {
+    releaseId: sha('5'),
+    manifestSha256: sha('6'),
+    frontendArtifactSha256: sha('7'),
+    backendArtifactSha256: sha('8'),
+  }
+  await assert.rejects(runtime.initializeRuntimeConfig({
+    webOrigin: 'https://staging.stoaedu.ch',
+    expectedDigest: await runtime.digestRuntimeConfig(replacement),
+    expectedRelease: { ...replacement.release },
+    expectedEnvironment: 'staging',
+    fetchImpl: async () => responseFor(JSON.stringify(replacement)),
+  }))
   assert.equal(runtime.getRuntimeConfig(), loaded)
   runtime.resetRuntimeConfigForTests()
 })

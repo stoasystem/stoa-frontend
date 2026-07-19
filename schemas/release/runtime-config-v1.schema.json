@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stoaedu.ch/schemas/release/runtime-config-v1.schema.json",
+  "title": "STOA Web runtime configuration v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "environment",
+    "release",
+    "web",
+    "api",
+    "auth",
+    "realtime",
+    "features"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stoa.web.runtime-config.v1"
+    },
+    "environment": {
+      "enum": ["staging", "staging-pilot", "production"]
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "releaseId",
+        "manifestSha256",
+        "frontendArtifactSha256",
+        "backendArtifactSha256"
+      ],
+      "properties": {
+        "releaseId": { "$ref": "#/$defs/sha256" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "frontendArtifactSha256": { "$ref": "#/$defs/sha256" },
+        "backendArtifactSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "web": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin"],
+      "properties": {
+        "origin": { "$ref": "#/$defs/webOrigin" }
+      }
+    },
+    "api": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["origin"],
+      "properties": {
+        "origin": { "$ref": "#/$defs/apiOrigin" }
+      }
+    },
+    "auth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": { "const": "backend-api" }
+      }
+    },
+    "realtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "endpoint"],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "endpoint": {}
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "enabled": { "const": true } },
+            "required": ["enabled"]
+          },
+          "then": {
+            "properties": {
+              "endpoint": { "$ref": "#/$defs/realtimeEndpoint" }
+            }
+          },
+          "else": {
+            "properties": {
+              "endpoint": { "type": "null" }
+            }
+          }
+        }
+      ]
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "analytics",
+        "errorMonitoring",
+        "feedback",
+        "parentReports",
+        "payments",
+        "publicRegistration",
+        "realtimeNotifications",
+        "referrals",
+        "supportTickets",
+        "teacherHelp"
+      ],
+      "properties": {
+        "analytics": { "type": "boolean" },
+        "errorMonitoring": { "type": "boolean" },
+        "feedback": { "type": "boolean" },
+        "parentReports": { "type": "boolean" },
+        "payments": { "type": "boolean" },
+        "publicRegistration": { "type": "boolean" },
+        "realtimeNotifications": { "type": "boolean" },
+        "referrals": { "type": "boolean" },
+        "supportTickets": { "type": "boolean" },
+        "teacherHelp": { "type": "boolean" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "webOrigin": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(?::[0-9]+)?$"
+    },
+    "apiOrigin": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(?::[0-9]+)?$"
+    },
+    "realtimeEndpoint": {
+      "type": "string",
+      "pattern": "^wss://[A-Za-z0-9.-]+(?::[0-9]+)?/realtime$"
+    }
+  }
+}
