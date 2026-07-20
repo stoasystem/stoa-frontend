@@ -2,9 +2,19 @@ import assert from 'node:assert/strict'
 import { Buffer } from 'node:buffer'
 import { spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
-import { readFile } from 'node:fs/promises'
+import {
+  chmod,
+  lstat,
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  symlink,
+  writeFile,
+} from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
+import process from 'node:process'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
 
@@ -12,7 +22,9 @@ import {
   STEP_DEFINITIONS,
   ReleaseVerificationError,
   buildCommandEnvironment,
+  invalidateWebGateOutput,
   parseCli,
+  publishWebGateReceipt,
   validatePackageManifest,
   validateWebGateReceipt,
   verifyWebRelease,
@@ -230,7 +242,7 @@ test('default CLI rejects a shared output parent before inspecting source', () =
     path.join(repoRoot, 'scripts/verify-release.mjs'),
     'verify',
     '--output',
-    path.join(os.tmpdir(), `stoa-web-shared-${randomUUID()}.json`),
+    path.join('/tmp', `stoa-web-shared-${randomUUID()}.json`),
   ], {
     cwd: repoRoot,
     encoding: 'utf8',
@@ -244,6 +256,55 @@ test('default CLI rejects a shared output parent before inspecting source', () =
 
   assert.equal(result.status, 2)
   assert.match(result.stderr, /OUTPUT_PARENT_UNSAFE/)
+})
+
+test('private output publication replaces stale bytes with one canonical 0600 receipt', async () => {
+  const state = harness()
+  const receipt = await verifyWebRelease({
+    outputPath: externalOutput,
+    repoRoot: '/snapshot/stoa-frontend',
+    operations: state.operations,
+  })
+  const parent = await mkdtemp(path.join(os.tmpdir(), 'stoa-web-output-'))
+  const output = path.join(parent, 'receipt.json')
+  try {
+    await writeFile(output, 'stale receipt', { mode: 0o600 })
+    await invalidateWebGateOutput(output, repoRoot)
+    await publishWebGateReceipt(output, receipt, repoRoot)
+
+    const metadata = await lstat(output)
+    const serialized = await readFile(output, 'utf8')
+    const parsed = JSON.parse(serialized)
+    assert.equal(metadata.isFile(), true)
+    assert.equal(metadata.isSymbolicLink(), false)
+    assert.equal(metadata.nlink, 1)
+    assert.equal(metadata.mode & 0o777, 0o600)
+    assert.equal(serialized, `${JSON.stringify(parsed)}\n`)
+    assert.equal(validateWebGateReceipt(parsed), parsed)
+  } finally {
+    await rm(parent, { force: true, recursive: true })
+  }
+})
+
+test('output publication rejects symlinked or non-private parents', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'stoa-web-parent-'))
+  const privateParent = path.join(root, 'private')
+  const linkedParent = path.join(root, 'linked')
+  try {
+    await mkdir(privateParent, { mode: 0o700 })
+    await symlink(privateParent, linkedParent, 'dir')
+    await expectPolicyFailure(
+      invalidateWebGateOutput(path.join(linkedParent, 'receipt.json'), repoRoot),
+      'OUTPUT_PARENT_UNSAFE',
+    )
+    await chmod(privateParent, 0o755)
+    await expectPolicyFailure(
+      invalidateWebGateOutput(path.join(privateParent, 'receipt.json'), repoRoot),
+      'OUTPUT_PARENT_UNSAFE',
+    )
+  } finally {
+    await rm(root, { force: true, recursive: true })
+  }
 })
 
 test('command environment is deterministic and drops ambient execution and build configuration', () => {
@@ -330,6 +391,19 @@ test('the locked install cannot add a local node, npm, or npx runtime shim', asy
   }), 'RUNTIME_SHIM_PRESENT')
 
   assert.deepEqual(state.calls.map(({ id }) => id), ['frontend-locked-install'])
+  assert.equal(state.published.length, 0)
+})
+
+test('the locked install must create an ordinary node_modules directory', async () => {
+  const states = executionCheckouts()
+  states[3] = checkout()
+  const state = harness({ checkoutStates: states })
+
+  await expectPolicyFailure(verifyWebRelease({
+    outputPath: externalOutput,
+    repoRoot: '/snapshot/stoa-frontend',
+    operations: state.operations,
+  }), 'NODE_MODULES_INVALID')
   assert.equal(state.published.length, 0)
 })
 
@@ -451,6 +525,18 @@ test('initial source capture and final source/artifact brackets reject torn stat
     }],
     ['ARTIFACT_DRIFT', {
       artifactStates: [artifact(), artifact({ treeSha256: sha('8') })],
+    }],
+    ['SOURCE_TREE_DRIFT', (() => {
+      const states = executionCheckouts()
+      states[12] = checkout({
+        nodeModules: 'directory',
+        dist: 'directory',
+        sourceTreeSha256: sha('8'),
+      })
+      return { checkoutStates: states }
+    })()],
+    ['ARTIFACT_DRIFT', {
+      artifactStates: [artifact(), artifact(), artifact({ treeSha256: sha('8') })],
     }],
   ]
 

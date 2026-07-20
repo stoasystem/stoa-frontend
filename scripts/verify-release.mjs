@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process'
 import { Buffer } from 'node:buffer'
 import { createHash, randomBytes } from 'node:crypto'
+import { constants as fsConstants } from 'node:fs'
 import {
   lstat,
   mkdir,
@@ -18,6 +19,7 @@ import os from 'node:os'
 import path from 'node:path'
 import process from 'node:process'
 import { clearTimeout, setTimeout } from 'node:timers'
+import { TextDecoder } from 'node:util'
 import { fileURLToPath } from 'node:url'
 
 const SCRIPT_PATH = fileURLToPath(import.meta.url)
@@ -25,10 +27,11 @@ const DEFAULT_REPO_ROOT = path.resolve(path.dirname(SCRIPT_PATH), '..')
 const SHA256_PATTERN = /^[0-9a-f]{64}$/
 const VERSION_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+$/
 const MAX_COMMAND_OUTPUT_BYTES = 16 * 1024 * 1024
+const MAX_RECEIPT_BYTES = 1024 * 1024
+const MAX_TREE_FILE_BYTES = 64 * 1024 * 1024
 const COMMAND_TIMEOUT_MS = 15 * 60 * 1000
 const EXCLUDED_SOURCE_ROOTS = new Set(['.git', 'dist', 'node_modules'])
 const ALTERNATE_LOCKS = Object.freeze([
-  '.npmrc',
   '.pnpmfile.cjs',
   '.yarnrc',
   '.yarnrc.yml',
@@ -210,28 +213,56 @@ async function pathKind(target) {
   }
 }
 
-async function readIdentity(target, { missingCode, invalidCode }) {
-  let metadata
+function metadataKind(metadata) {
+  if (metadata.isSymbolicLink()) return 'symlink'
+  if (metadata.isDirectory()) return 'directory'
+  if (metadata.isFile()) return 'file'
+  return 'other'
+}
+
+async function readStableRegularFile(target, expectedMetadata, failureCode) {
+  let handle
   try {
-    metadata = await lstat(target)
+    handle = await open(
+      target,
+      fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW | fsConstants.O_NONBLOCK,
+    )
+    const before = await handle.stat()
+    if (
+      !before.isFile()
+      || before.dev !== expectedMetadata.dev
+      || before.ino !== expectedMetadata.ino
+      || before.size < 0
+      || before.size > MAX_TREE_FILE_BYTES
+    ) fail(failureCode)
+    const content = await handle.readFile()
+    const after = await handle.stat()
+    if (
+      content.length !== before.size
+      || after.dev !== before.dev
+      || after.ino !== before.ino
+      || after.mode !== before.mode
+      || after.size !== before.size
+      || after.mtimeMs !== before.mtimeMs
+      || after.ctimeMs !== before.ctimeMs
+    ) fail(failureCode)
+    return { content, metadata: after }
   } catch (error) {
-    if (error?.code === 'ENOENT') {
-      if (missingCode === null) return null
-      fail(missingCode)
-    }
-    fail(invalidCode)
+    if (error instanceof ReleaseVerificationError) throw error
+    fail(failureCode)
+  } finally {
+    if (handle) await handle.close().catch(() => {})
   }
-  if (!metadata.isFile() || metadata.isSymbolicLink()) fail(invalidCode)
-  const bytes = await readFile(target)
-  if (bytes.length === 0) fail(invalidCode)
-  return { bytes: bytes.length, sha256: sha256(bytes) }
 }
 
 function compareNames(left, right) {
   return Buffer.compare(Buffer.from(left), Buffer.from(right))
 }
 
-async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifact = false } = {}) {
+async function hashRegularTree(
+  root,
+  { captureCheckout = false, excludeSourceRoots = false, inspectArtifact = false } = {},
+) {
   const rootMetadata = await lstat(root).catch((error) => {
     if (error?.code === 'ENOENT') return null
     fail(inspectArtifact ? 'ARTIFACT_INSPECTION_FAILED' : 'SOURCE_INSPECTION_FAILED')
@@ -247,6 +278,13 @@ async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifa
   const digest = createHash('sha256')
   const sourceMaps = []
   const forbiddenMatches = []
+  const alternateLocks = []
+  const nativeRoots = []
+  let dist = 'absent'
+  let nodeModules = 'absent'
+  let packageJson = null
+  let packageLock = null
+  let projectNpmrc = 'absent'
   let files = 0
   let bytes = 0
 
@@ -261,7 +299,6 @@ async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifa
       if (name.includes('\0') || name.includes('/') || name.includes('\\')) {
         fail(inspectArtifact ? 'ARTIFACT_INVALID' : 'SOURCE_INSPECTION_FAILED')
       }
-      if (excludeSourceRoots && prefix === '' && EXCLUDED_SOURCE_ROOTS.has(name)) continue
       const relative = prefix === '' ? name : `${prefix}/${name}`
       const absolute = path.join(directory, name)
       let metadata
@@ -270,6 +307,16 @@ async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifa
       } catch {
         fail(inspectArtifact ? 'ARTIFACT_INSPECTION_FAILED' : 'SOURCE_INSPECTION_FAILED')
       }
+      if (captureCheckout && prefix === '') {
+        const kind = metadataKind(metadata)
+        const foldedName = name.toLowerCase()
+        if (foldedName === '.npmrc') projectNpmrc = kind
+        if (ALTERNATE_LOCKS.includes(foldedName)) alternateLocks.push(name)
+        if (NATIVE_ROOTS.includes(foldedName)) nativeRoots.push(name)
+        if (name === 'dist') dist = kind
+        if (name === 'node_modules') nodeModules = kind
+      }
+      if (excludeSourceRoots && prefix === '' && EXCLUDED_SOURCE_ROOTS.has(name)) continue
       if (metadata.isSymbolicLink()) {
         fail(inspectArtifact ? 'ARTIFACT_INVALID' : 'SOURCE_SYMLINK_PRESENT')
       }
@@ -281,14 +328,30 @@ async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifa
       if (!metadata.isFile()) {
         fail(inspectArtifact ? 'ARTIFACT_INVALID' : 'SOURCE_ENTRY_INVALID')
       }
-      const content = await readFile(absolute).catch(() => {
-        fail(inspectArtifact ? 'ARTIFACT_INSPECTION_FAILED' : 'SOURCE_INSPECTION_FAILED')
-      })
-      const executable = (metadata.mode & 0o111) === 0 ? '0' : '1'
+      const stable = await readStableRegularFile(
+        absolute,
+        metadata,
+        inspectArtifact ? 'ARTIFACT_INSPECTION_FAILED' : 'SOURCE_INSPECTION_FAILED',
+      )
+      const { content } = stable
+      const executable = (stable.metadata.mode & 0o111) === 0 ? '0' : '1'
       digest.update(`file\0${relative}\0${executable}\0${content.length}\0`)
       digest.update(content)
       files += 1
       bytes += content.length
+
+      if (captureCheckout && prefix === '' && name === 'package.json') {
+        packageJson = { bytes: content.length, sha256: sha256(content) }
+        try {
+          validatePackageManifest(JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(content)))
+        } catch (error) {
+          if (error instanceof ReleaseVerificationError) throw error
+          fail('PACKAGE_JSON_INVALID')
+        }
+      }
+      if (captureCheckout && prefix === '' && name === 'package-lock.json') {
+        packageLock = { bytes: content.length, sha256: sha256(content) }
+      }
 
       if (inspectArtifact) {
         if (/\.map$/i.test(relative) || /sourceMappingURL\s*=/i.test(content.toString('latin1'))) {
@@ -303,46 +366,43 @@ async function hashRegularTree(root, { excludeSourceRoots = false, inspectArtifa
   }
 
   await visit(root, '')
-  return {
+  const result = {
     bytes,
     files,
     forbiddenMatches,
     sourceMaps,
     treeSha256: digest.digest('hex'),
   }
+  if (captureCheckout) {
+    return {
+      ...result,
+      alternateLocks,
+      dist,
+      nativeRoots,
+      nodeModules,
+      packageJson,
+      packageLock,
+      projectNpmrc,
+    }
+  }
+  return result
 }
 
 async function inspectCheckout(repoRoot) {
-  const alternateLocks = []
-  for (const name of ALTERNATE_LOCKS) {
-    if (await pathKind(path.join(repoRoot, name)) !== 'absent') alternateLocks.push(name)
-  }
-  const nativeRoots = []
-  for (const name of NATIVE_ROOTS) {
-    if (await pathKind(path.join(repoRoot, name)) !== 'absent') nativeRoots.push(name)
-  }
-  const packageJson = await readIdentity(path.join(repoRoot, 'package.json'), {
-    invalidCode: 'PACKAGE_JSON_INVALID',
-    missingCode: 'PACKAGE_JSON_MISSING',
+  const source = await hashRegularTree(repoRoot, {
+    captureCheckout: true,
+    excludeSourceRoots: true,
   })
-  try {
-    validatePackageManifest(JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8')))
-  } catch (error) {
-    if (error instanceof ReleaseVerificationError) throw error
-    fail('PACKAGE_JSON_INVALID')
-  }
-  const packageLock = await readIdentity(path.join(repoRoot, 'package-lock.json'), {
-    invalidCode: 'PACKAGE_LOCK_INVALID',
-    missingCode: null,
-  })
-  const source = await hashRegularTree(repoRoot, { excludeSourceRoots: true })
+  if (source.packageJson === null) fail('PACKAGE_JSON_MISSING')
   return {
-    alternateLocks,
-    dist: await pathKind(path.join(repoRoot, 'dist')),
-    nativeRoots,
-    nodeModules: await pathKind(path.join(repoRoot, 'node_modules')),
-    packageJson,
-    packageLock,
+    alternateLocks: source.alternateLocks,
+    dist: source.dist,
+    nativeRoots: source.nativeRoots,
+    nodeModules: source.nodeModules,
+    packageJson: source.packageJson,
+    packageLock: source.packageLock,
+    projectNpmrc: source.projectNpmrc,
+    runtimeShims: await inspectRuntimeShims(repoRoot),
     sourceTreeSha256: source.treeSha256,
   }
 }
@@ -442,20 +502,56 @@ function runNpmCommand({ distribution, environment, repoRoot, step }) {
   })
 }
 
-async function validateExternalOutput(outputPath, repoRoot) {
+async function inspectOutputParent(outputPath, repoRoot) {
   const normalized = assertExternalOutputPath(outputPath, repoRoot)
+  const parent = path.dirname(normalized)
   let realRoot
   let realParent
+  let metadata
   try {
-    [realRoot, realParent] = await Promise.all([
+    [realRoot, realParent, metadata] = await Promise.all([
       realpath(repoRoot),
-      realpath(path.dirname(normalized)),
+      realpath(parent),
+      lstat(parent),
     ])
   } catch {
     fail('OUTPUT_PARENT_INVALID')
   }
   if (isWithin(realRoot, realParent)) fail('OUTPUT_PATH_INTERNAL')
-  return normalized
+  if (
+    !metadata.isDirectory()
+    || metadata.isSymbolicLink()
+    || typeof process.getuid !== 'function'
+    || metadata.uid !== process.getuid()
+    || (metadata.mode & 0o777) !== 0o700
+  ) fail('OUTPUT_PARENT_UNSAFE')
+  return {
+    dev: metadata.dev,
+    ino: metadata.ino,
+    mode: metadata.mode & 0o777,
+    normalized: path.join(realParent, path.basename(normalized)),
+    parent: realParent,
+    uid: metadata.uid,
+  }
+}
+
+function sameOutputParent(left, right) {
+  return Boolean(
+    left
+    && right
+    && left.dev === right.dev
+    && left.ino === right.ino
+    && left.mode === right.mode
+    && left.normalized === right.normalized
+    && left.parent === right.parent
+    && left.uid === right.uid
+  )
+}
+
+async function requireStableOutputParent(outputPath, repoRoot, expected) {
+  const current = await inspectOutputParent(outputPath, repoRoot)
+  if (!sameOutputParent(current, expected)) fail('OUTPUT_PARENT_CHANGED')
+  return current
 }
 
 async function ensurePrivateEmptyConfig(target) {
@@ -486,7 +582,8 @@ async function ensurePrivateEmptyConfig(target) {
 }
 
 async function invalidateOutput(outputPath, repoRoot) {
-  const normalized = await validateExternalOutput(outputPath, repoRoot)
+  const parent = await inspectOutputParent(outputPath, repoRoot)
+  const { normalized } = parent
   const kind = await pathKind(normalized)
   if (kind === 'directory' || kind === 'other') fail('OUTPUT_PATH_INVALID')
   if (kind !== 'absent') {
@@ -496,27 +593,71 @@ async function invalidateOutput(outputPath, repoRoot) {
       fail('OUTPUT_INVALIDATION_FAILED')
     }
   }
+  await requireStableOutputParent(outputPath, repoRoot, parent)
 }
 
 async function publishReceipt(outputPath, receipt, repoRoot) {
-  const normalized = await validateExternalOutput(outputPath, repoRoot)
+  const parentIdentity = await inspectOutputParent(outputPath, repoRoot)
+  const { normalized, parent } = parentIdentity
+  const receiptBytes = Buffer.from(`${canonicalize(receipt)}\n`, 'utf8')
+  if (receiptBytes.length === 0 || receiptBytes.length > MAX_RECEIPT_BYTES) {
+    fail('OUTPUT_PUBLICATION_FAILED')
+  }
   const temporary = path.join(
-    path.dirname(normalized),
+    parent,
     `.${path.basename(normalized)}.${process.pid}.${randomBytes(12).toString('hex')}.tmp`,
   )
   let handle
+  let published = false
   try {
     handle = await open(temporary, 'wx', 0o600)
-    await handle.writeFile(`${canonicalize(receipt)}\n`, 'utf8')
+    await handle.chmod(0o600)
+    await requireStableOutputParent(outputPath, repoRoot, parentIdentity)
+    await handle.writeFile(receiptBytes)
     await handle.sync()
     await handle.close()
     handle = null
+    await requireStableOutputParent(outputPath, repoRoot, parentIdentity)
     await rename(temporary, normalized)
+    published = true
+    await requireStableOutputParent(outputPath, repoRoot, parentIdentity)
+
+    const finalMetadata = await lstat(normalized)
+    if (
+      !finalMetadata.isFile()
+      || finalMetadata.isSymbolicLink()
+      || finalMetadata.nlink !== 1
+      || (finalMetadata.mode & 0o777) !== 0o600
+      || finalMetadata.size !== receiptBytes.length
+    ) fail('OUTPUT_PUBLICATION_FAILED')
+    const finalFile = await readStableRegularFile(
+      normalized,
+      finalMetadata,
+      'OUTPUT_PUBLICATION_FAILED',
+    )
+    if (!finalFile.content.equals(receiptBytes)) fail('OUTPUT_PUBLICATION_FAILED')
+
+    const directoryHandle = await open(
+      parent,
+      fsConstants.O_RDONLY | fsConstants.O_DIRECTORY,
+    )
+    try {
+      await directoryHandle.sync()
+    } finally {
+      await directoryHandle.close()
+    }
+    await requireStableOutputParent(outputPath, repoRoot, parentIdentity)
   } catch {
     if (handle) await handle.close().catch(() => {})
     await unlink(temporary).catch(() => {})
+    if (published) await unlink(normalized).catch(() => {})
     fail('OUTPUT_PUBLICATION_FAILED')
   }
+}
+
+export {
+  invalidateOutput as invalidateWebGateOutput,
+  publishReceipt as publishWebGateReceipt,
 }
 
 function createDefaultOperations(repoRoot) {
@@ -552,21 +693,13 @@ function createDefaultOperations(repoRoot) {
     cleanup: async () => {
       if (tempRootPromise) await rm(await tempRootPromise, { force: true, recursive: true })
     },
-    hashSourceTree: async () => (
-      await hashRegularTree(repoRoot, { excludeSourceRoots: true })
-    ).treeSha256,
     inspectArtifact: async () => ({
       path: 'dist',
       ...await hashRegularTree(path.join(repoRoot, 'dist'), { inspectArtifact: true }),
     }),
     inspectCheckout: async () => inspectCheckout(repoRoot),
-    inspectRuntimeShims: async () => inspectRuntimeShims(repoRoot),
     invalidateOutput: async (outputPath) => invalidateOutput(outputPath, repoRoot),
     publishReceipt: async (outputPath, receipt) => publishReceipt(outputPath, receipt, repoRoot),
-    readPackageLockIdentity: async () => readIdentity(path.join(repoRoot, 'package-lock.json'), {
-      invalidCode: 'PACKAGE_LOCK_INVALID',
-      missingCode: null,
-    }),
     runCommand: async (step) => {
       const { active, environment } = await commandContext()
       return runNpmCommand({ distribution: active, environment, repoRoot, step })
@@ -590,8 +723,8 @@ function assertExactKeys(value, expected, code = 'RECEIPT_INVALID') {
   if (actual.length !== wanted.length || actual.some((key, index) => key !== wanted[index])) fail(code)
 }
 
-function assertSha(value) {
-  if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) fail('RECEIPT_INVALID')
+function assertSha(value, code = 'RECEIPT_INVALID') {
+  if (typeof value !== 'string' || !SHA256_PATTERN.test(value)) fail(code)
 }
 
 function assertIdentity(value) {
@@ -705,7 +838,7 @@ function validateRuntimeShims(value) {
   if (value.length !== 0) fail('RUNTIME_SHIM_PRESENT')
 }
 
-function validateCheckout(checkout) {
+function validateCheckout(checkout, { expectedDist, expectedNodeModules }) {
   assertExactKeys(checkout, [
     'alternateLocks',
     'dist',
@@ -713,18 +846,82 @@ function validateCheckout(checkout) {
     'nodeModules',
     'packageJson',
     'packageLock',
+    'projectNpmrc',
+    'runtimeShims',
     'sourceTreeSha256',
   ], 'CHECKOUT_INVALID')
-  if (checkout.nodeModules !== 'absent') fail('NODE_MODULES_PRESENT')
-  if (checkout.dist !== 'absent') fail('DIST_PRESENT')
+  if (checkout.nodeModules !== expectedNodeModules) {
+    fail(expectedNodeModules === 'absent' ? 'NODE_MODULES_PRESENT' : 'NODE_MODULES_INVALID')
+  }
+  if (checkout.dist !== expectedDist) {
+    fail(expectedDist === 'absent' ? 'DIST_PRESENT' : 'DIST_INVALID')
+  }
   if (!Array.isArray(checkout.alternateLocks)) fail('CHECKOUT_INVALID')
   if (checkout.alternateLocks.length !== 0) fail('ALTERNATE_LOCK_PRESENT')
   if (!Array.isArray(checkout.nativeRoots)) fail('CHECKOUT_INVALID')
   if (checkout.nativeRoots.length !== 0) fail('NATIVE_SOURCE_PRESENT')
+  if (checkout.projectNpmrc !== 'absent') fail('PROJECT_NPMRC_PRESENT')
+  validateRuntimeShims(checkout.runtimeShims)
   assertIdentity(checkout.packageJson)
   if (checkout.packageLock === null) fail('PACKAGE_LOCK_MISSING')
   assertIdentity(checkout.packageLock)
   assertSha(checkout.sourceTreeSha256)
+}
+
+function immutableCheckoutProjection(checkout) {
+  return {
+    alternateLocks: checkout.alternateLocks,
+    nativeRoots: checkout.nativeRoots,
+    packageJson: checkout.packageJson,
+    packageLock: checkout.packageLock,
+    projectNpmrc: checkout.projectNpmrc,
+    sourceTreeSha256: checkout.sourceTreeSha256,
+  }
+}
+
+function validateCaptureAgainstBaseline(
+  checkout,
+  baseline,
+  { expectedDist, expectedNodeModules },
+) {
+  validateCheckout(checkout, { expectedDist, expectedNodeModules })
+  if (!sameIdentity(checkout.packageLock, baseline.packageLock)) fail('PACKAGE_LOCK_DRIFT')
+  if (checkout.sourceTreeSha256 !== baseline.sourceTreeSha256) fail('SOURCE_TREE_DRIFT')
+  if (
+    canonicalize(immutableCheckoutProjection(checkout))
+    !== canonicalize(immutableCheckoutProjection(baseline))
+  ) fail('CHECKOUT_DRIFT')
+  return checkout
+}
+
+function validateInspectedArtifact(value) {
+  assertExactKeys(value, [
+    'bytes',
+    'files',
+    'forbiddenMatches',
+    'path',
+    'sourceMaps',
+    'treeSha256',
+  ], 'ARTIFACT_INVALID')
+  if (
+    value.path !== 'dist'
+    || !Number.isInteger(value.files)
+    || value.files < 1
+    || !Number.isInteger(value.bytes)
+    || value.bytes < 1
+  ) fail('ARTIFACT_INVALID')
+  assertSha(value.treeSha256, 'ARTIFACT_INVALID')
+  if (!Array.isArray(value.sourceMaps) || value.sourceMaps.some((item) => typeof item !== 'string')) {
+    fail('ARTIFACT_INVALID')
+  }
+  if (!Array.isArray(value.forbiddenMatches)) fail('ARTIFACT_INVALID')
+  for (const match of value.forbiddenMatches) {
+    assertExactKeys(match, ['path', 'rule'], 'ARTIFACT_INVALID')
+    if (typeof match.path !== 'string' || typeof match.rule !== 'string') fail('ARTIFACT_INVALID')
+  }
+  if (value.sourceMaps.length !== 0) fail('SOURCE_MAP_PRESENT')
+  if (value.forbiddenMatches.length !== 0) fail('FORBIDDEN_BUILD_CONFIGURATION')
+  return value
 }
 
 function sameIdentity(left, right) {
@@ -768,28 +965,48 @@ export async function verifyWebRelease({
     await activeOperations.invalidateOutput(normalizedOutput)
     const runtime = await activeOperations.runtimeIdentity()
     validateRuntime(runtime)
+    const initialState = { expectedDist: 'absent', expectedNodeModules: 'absent' }
     const checkout = await activeOperations.inspectCheckout()
-    validateCheckout(checkout)
+    validateCheckout(checkout, initialState)
+    const confirmedCheckout = await activeOperations.inspectCheckout()
+    validateCheckout(confirmedCheckout, initialState)
+    if (canonicalize(checkout) !== canonicalize(confirmedCheckout)) fail('CHECKOUT_DRIFT')
 
     const steps = []
-    for (const step of STEP_DEFINITIONS) {
-      validateRuntimeShims(await activeOperations.inspectRuntimeShims())
+    let artifactBaseline = null
+    for (const [index, step] of STEP_DEFINITIONS.entries()) {
+      const beforeState = {
+        expectedNodeModules: index === 0 ? 'absent' : 'directory',
+        expectedDist: index < 4 ? 'absent' : 'directory',
+      }
+      validateCaptureAgainstBaseline(
+        await activeOperations.inspectCheckout(),
+        checkout,
+        beforeState,
+      )
       const result = await activeOperations.runCommand(step)
-      validateRuntimeShims(await activeOperations.inspectRuntimeShims())
       steps.push(commandReceipt(step, result))
-      const currentLock = await activeOperations.readPackageLockIdentity()
-      if (!sameIdentity(checkout.packageLock, currentLock)) fail('PACKAGE_LOCK_DRIFT')
+      const afterState = {
+        expectedNodeModules: 'directory',
+        expectedDist: index < 3 ? 'absent' : 'directory',
+      }
+      validateCaptureAgainstBaseline(
+        await activeOperations.inspectCheckout(),
+        checkout,
+        afterState,
+      )
+      if (step.id === 'frontend-build') {
+        artifactBaseline = validateInspectedArtifact(await activeOperations.inspectArtifact())
+      }
+      if (step.id === 'web-release-contracts') {
+        const contractArtifact = validateInspectedArtifact(await activeOperations.inspectArtifact())
+        if (
+          artifactBaseline === null
+          || canonicalize(contractArtifact) !== canonicalize(artifactBaseline)
+        ) fail('ARTIFACT_DRIFT')
+      }
     }
-
-    const finalSource = await activeOperations.hashSourceTree()
-    if (finalSource !== checkout.sourceTreeSha256) fail('SOURCE_TREE_DRIFT')
-    const inspectedArtifact = await activeOperations.inspectArtifact()
-    if (!inspectedArtifact || !Array.isArray(inspectedArtifact.sourceMaps)) {
-      fail('ARTIFACT_INVALID')
-    }
-    if (inspectedArtifact.sourceMaps.length !== 0) fail('SOURCE_MAP_PRESENT')
-    if (!Array.isArray(inspectedArtifact.forbiddenMatches)) fail('ARTIFACT_INVALID')
-    if (inspectedArtifact.forbiddenMatches.length !== 0) fail('FORBIDDEN_BUILD_CONFIGURATION')
+    if (artifactBaseline === null) fail('ARTIFACT_MISSING')
 
     const body = {
       schema: 'stoa.web.gate-run.v1',
@@ -802,9 +1019,9 @@ export async function verifyWebRelease({
       },
       artifact: {
         path: 'dist',
-        files: inspectedArtifact.files,
-        bytes: inspectedArtifact.bytes,
-        treeSha256: inspectedArtifact.treeSha256,
+        files: artifactBaseline.files,
+        bytes: artifactBaseline.bytes,
+        treeSha256: artifactBaseline.treeSha256,
       },
       steps,
       counts: {
@@ -825,6 +1042,15 @@ export async function verifyWebRelease({
     if (activeOperations.cleanup) {
       await activeOperations.cleanup()
       cleaned = true
+    }
+    validateCaptureAgainstBaseline(
+      await activeOperations.inspectCheckout(),
+      checkout,
+      { expectedDist: 'directory', expectedNodeModules: 'directory' },
+    )
+    const publicationArtifact = validateInspectedArtifact(await activeOperations.inspectArtifact())
+    if (canonicalize(publicationArtifact) !== canonicalize(artifactBaseline)) {
+      fail('ARTIFACT_DRIFT')
     }
     await activeOperations.publishReceipt(normalizedOutput, receipt)
     return receipt
