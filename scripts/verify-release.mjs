@@ -173,6 +173,7 @@ export function buildCommandEnvironment({
     TMPDIR: path.join(tempRoot, 'tmp'),
     TZ: 'UTC',
     npm_config_cache: path.join(tempRoot, 'npm-cache'),
+    npm_config_script_shell: '/bin/sh',
   }
 }
 
