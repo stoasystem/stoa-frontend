@@ -168,6 +168,8 @@ test('reviewed package scripts cannot be replaced by npx, lifecycle wrappers, or
   const mutations = [
     (value) => { value.scripts.lint = 'npx eslint .' },
     (value) => { value.scripts.prebuild = 'node /tmp/attacker.mjs' },
+    (value) => { value.scripts['preverify:release'] = 'node /tmp/attacker.mjs' },
+    (value) => { value.scripts['postverify:release'] = 'node /tmp/attacker.mjs' },
     (value) => { value.scripts['test:release'] = 'node --test tests/release/*.test.mjs' },
     (value) => { value.packageManager = 'pnpm@10.0.0' },
     (value) => { value.workspaces = ['mobile'] },
