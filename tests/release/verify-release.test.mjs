@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { Buffer } from 'node:buffer'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import test from 'node:test'
@@ -7,7 +8,9 @@ import { fileURLToPath } from 'node:url'
 import {
   STEP_DEFINITIONS,
   ReleaseVerificationError,
+  buildCommandEnvironment,
   parseCli,
+  validatePackageManifest,
   validateWebGateReceipt,
   verifyWebRelease,
 } from '../../scripts/verify-release.mjs'
@@ -15,6 +18,7 @@ import {
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const externalOutput = '/tmp/stoa-web-gate-run.json'
 const sha = (character) => character.repeat(64)
+const clone = (value) => JSON.parse(JSON.stringify(value))
 
 function checkout(overrides = {}) {
   return {
@@ -62,7 +66,7 @@ function harness(overrides = {}) {
     readPackageLockIdentity: async () => finalLock,
     hashSourceTree: async () => finalSource,
     runCommand: async (step) => {
-      calls.push(structuredClone(step))
+      calls.push(clone(step))
       return commandResults.get(step.id) ?? {
         exitCode: 0,
         stdout: Buffer.from(`private stdout from ${step.id}`),
@@ -71,7 +75,7 @@ function harness(overrides = {}) {
     },
     inspectArtifact: async () => overrides.artifact ?? artifact(),
     invalidateOutput: async () => { invalidations += 1 },
-    publishReceipt: async (_output, receipt) => { published.push(structuredClone(receipt)) },
+    publishReceipt: async (_output, receipt) => { published.push(clone(receipt)) },
   }
 
   return {
@@ -109,7 +113,18 @@ test('package scripts and schema define one closed five-step Web gate', async ()
   ].join(' '))
   assert.equal(packageJson.scripts['verify:release'], 'node ./scripts/verify-release.mjs verify')
   assert.deepEqual(STEP_DEFINITIONS, [
-    { id: 'frontend-locked-install', argv: ['npm', 'ci', '--no-audit'] },
+    {
+      id: 'frontend-locked-install',
+      argv: [
+        'npm',
+        'ci',
+        '--ignore-scripts',
+        '--no-audit',
+        '--no-fund',
+        '--include=dev',
+        '--package-lock=true',
+      ],
+    },
     { id: 'frontend-eslint', argv: ['npm', 'run', 'lint'] },
     { id: 'frontend-typecheck', argv: ['npm', 'run', 'typecheck'] },
     { id: 'frontend-build', argv: ['npm', 'run', 'build'] },
@@ -119,6 +134,7 @@ test('package scripts and schema define one closed five-step Web gate', async ()
   assert.equal(schema.additionalProperties, false)
   assert.equal(schema.properties.schema.const, 'stoa.web.gate-run.v1')
   assert.equal(schema.properties.status.const, 'PASS')
+  assert.ok(schema.required.includes('receiptSha256'))
   assert.deepEqual(
     schema.properties.steps.prefixItems.map((item) => item.properties.id.const),
     [
@@ -129,10 +145,37 @@ test('package scripts and schema define one closed five-step Web gate', async ()
       'web-release-contracts',
     ],
   )
+  assert.deepEqual(
+    schema.properties.steps.prefixItems.map((item) => {
+      const argvSchema = item.properties.argv.$ref
+        ? schema.$defs[item.properties.argv.$ref.split('/').at(-1)]
+        : item.properties.argv
+      return argvSchema.prefixItems.map(({ const: value }) => value)
+    }),
+    STEP_DEFINITIONS.map(({ argv }) => [...argv]),
+  )
   assert.equal(schema.properties.steps.items, false)
   assert.equal(schema.properties.production.additionalProperties, false)
   for (const value of Object.values(schema.properties.production.properties)) {
     assert.equal(value.const, 'NOT RUN')
+  }
+})
+
+test('reviewed package scripts cannot be replaced by npx, lifecycle wrappers, or workspaces', async () => {
+  const manifest = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
+  assert.equal(validatePackageManifest(manifest), manifest)
+
+  const mutations = [
+    (value) => { value.scripts.lint = 'npx eslint .' },
+    (value) => { value.scripts.prebuild = 'node /tmp/attacker.mjs' },
+    (value) => { value.scripts['test:release'] = 'node --test tests/release/*.test.mjs' },
+    (value) => { value.packageManager = 'pnpm@10.0.0' },
+    (value) => { value.workspaces = ['mobile'] },
+  ]
+  for (const mutate of mutations) {
+    const value = clone(manifest)
+    mutate(value)
+    assert.throws(() => validatePackageManifest(value), ReleaseVerificationError)
   }
 })
 
@@ -155,6 +198,48 @@ test('CLI accepts only verify with one absolute source-external output', () => {
   }
 })
 
+test('command environment is deterministic and drops ambient execution and build configuration', () => {
+  const environment = buildCommandEnvironment({
+    ambient: {
+      AWS_SECRET_ACCESS_KEY: 'secret',
+      INIT_CWD: '/tmp/attacker-cwd',
+      LD_PRELOAD: '/tmp/attacker.so',
+      NODE_ENV: 'production',
+      NODE_OPTIONS: '--require=/tmp/attacker.cjs',
+      NODE_PATH: '/tmp/attacker-modules',
+      NPM_CONFIG_USERCONFIG: '/tmp/attacker.npmrc',
+      npm_lifecycle_event: 'postinstall',
+      npm_config_globalconfig: '/tmp/global-attacker.npmrc',
+      VITE_CONTACT_PROVIDER_KEY: 'secret',
+      VITE_ENABLE_FRONTEND_MONITORING: 'true',
+    },
+    nodeBinDirectory: '/node-20/bin',
+    repoRoot: '/snapshot/stoa-frontend',
+    tempRoot: '/tmp/stoa-web-run',
+  })
+
+  assert.deepEqual(environment, {
+    CI: 'true',
+    HOME: '/tmp/stoa-web-run/home',
+    LANG: 'C',
+    LC_ALL: 'C',
+    NPM_CONFIG_GLOBALCONFIG: '/dev/null',
+    NPM_CONFIG_USERCONFIG: '/dev/null',
+    NO_COLOR: '1',
+    PATH: [
+      '/snapshot/stoa-frontend/node_modules/.bin',
+      '/node-20/bin',
+    ].join(path.delimiter),
+    TMPDIR: '/tmp/stoa-web-run/tmp',
+    TZ: 'UTC',
+    npm_config_cache: '/tmp/stoa-web-run/npm-cache',
+  })
+  assert.doesNotMatch(
+    JSON.stringify(environment),
+    /secret|attacker|VITE_|AWS_|NODE_ENV|NODE_OPTIONS|NODE_PATH|PRELOAD|lifecycle|INIT_CWD/,
+  )
+})
+
 test('the verifier runs only the exact ordered local Web commands', async () => {
   const state = harness()
   const receipt = await verifyWebRelease({
@@ -173,6 +258,7 @@ test('the verifier runs only the exact ordered local Web commands', async () => 
     rollback: 'NOT RUN',
   })
   assert.equal(receipt.status, 'PASS')
+  assert.match(receipt.receiptSha256, /^[0-9a-f]{64}$/)
   assert.equal(state.invalidations, 1)
   assert.equal(state.published.length, 1)
   assert.deepEqual(state.published[0], receipt)
@@ -203,6 +289,23 @@ test('receipt stores output hashes and counts without diagnostics or environment
     ])
   }
   assert.equal(validateWebGateReceipt(receipt), receipt)
+})
+
+test('whole-receipt digest rejects tampering with otherwise valid bound evidence', async () => {
+  const state = harness()
+  const receipt = await verifyWebRelease({
+    outputPath: externalOutput,
+    repoRoot: '/snapshot/stoa-frontend',
+    operations: state.operations,
+  })
+  const tampered = clone(receipt)
+  tampered.artifact.treeSha256 = sha('f')
+
+  assert.throws(
+    () => validateWebGateReceipt(tampered),
+    (error) => error instanceof ReleaseVerificationError
+      && error.code === 'RECEIPT_DIGEST_MISMATCH',
+  )
 })
 
 test('wrong runtime, warm trees, alternate locks, and native roots fail before execution', async () => {
@@ -305,7 +408,7 @@ test('closed receipt validation rejects unknown, omitted, reordered, and synthet
   ]
 
   for (const mutate of mutations) {
-    const value = structuredClone(receipt)
+    const value = clone(receipt)
     mutate(value)
     assert.throws(() => validateWebGateReceipt(value), ReleaseVerificationError)
   }

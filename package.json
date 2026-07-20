@@ -9,7 +9,10 @@
     "demo:reset": "cd backend && PYTHONPATH=. .venv/bin/python -m app.reset_demo_data",
     "build": "tsc -b && node ./scripts/vite.mjs build",
     "preview": "node ./scripts/vite.mjs preview",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc -b",
+    "test:release": "node --test tests/release/contact-backend-only.test.mjs tests/release/runtime-config.test.mjs tests/release/runtime-env-projection.test.mjs tests/release/runtime-monitoring-flag.test.mjs tests/release/runtime-startup-barrier.test.mjs tests/release/served-release.test.mjs",
+    "verify:release": "node ./scripts/verify-release.mjs verify",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
