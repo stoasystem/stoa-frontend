@@ -1,0 +1,22 @@
+{
+  "schema": "stoa.web.served-release.v1",
+  "environment": "staging",
+  "release": {
+    "releaseId": "1111111111111111111111111111111111111111111111111111111111111111",
+    "manifestSha256": "2222222222222222222222222222222222222222222222222222222222222222",
+    "frontendArtifactSha256": "3333333333333333333333333333333333333333333333333333333333333333",
+    "backendArtifactSha256": "4444444444444444444444444444444444444444444444444444444444444444"
+  },
+  "runtimeConfig": {
+    "key": "runtime-config.json",
+    "versionId": "runtime-version_A1b2c3d4",
+    "url": "https://staging.stoaedu.ch/runtime-config.json",
+    "sha256": "5555555555555555555555555555555555555555555555555555555555555555"
+  },
+  "webEntry": {
+    "key": "index.html",
+    "versionId": "web-version_E5f6g7h8",
+    "url": "https://staging.stoaedu.ch/index.html",
+    "sha256": "6666666666666666666666666666666666666666666666666666666666666666"
+  }
+}

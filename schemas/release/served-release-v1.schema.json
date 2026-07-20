@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://stoaedu.ch/schemas/release/served-release-v1.schema.json",
+  "title": "STOA Web served release v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "environment",
+    "release",
+    "runtimeConfig",
+    "webEntry"
+  ],
+  "properties": {
+    "schema": {
+      "const": "stoa.web.served-release.v1"
+    },
+    "environment": {
+      "enum": ["staging", "staging-pilot", "production"]
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "releaseId",
+        "manifestSha256",
+        "frontendArtifactSha256",
+        "backendArtifactSha256"
+      ],
+      "properties": {
+        "releaseId": { "$ref": "#/$defs/sha256" },
+        "manifestSha256": { "$ref": "#/$defs/sha256" },
+        "frontendArtifactSha256": { "$ref": "#/$defs/sha256" },
+        "backendArtifactSha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "runtimeConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "versionId", "url", "sha256"],
+      "properties": {
+        "key": { "const": "runtime-config.json" },
+        "versionId": { "$ref": "#/$defs/versionId" },
+        "url": { "$ref": "#/$defs/runtimeConfigUrl" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    },
+    "webEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "versionId", "url", "sha256"],
+      "properties": {
+        "key": { "const": "index.html" },
+        "versionId": { "$ref": "#/$defs/versionId" },
+        "url": { "$ref": "#/$defs/webEntryUrl" },
+        "sha256": { "$ref": "#/$defs/sha256" }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "versionId": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 1024,
+      "pattern": "^[A-Za-z0-9._~+/-]+$",
+      "not": {
+        "enum": ["latest", "main", "master", "develop", "development", "staging", "staging-pilot", "production", "null"]
+      }
+    },
+    "runtimeConfigUrl": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(?::[0-9]+)?/runtime-config\\.json$"
+    },
+    "webEntryUrl": {
+      "type": "string",
+      "pattern": "^https://[A-Za-z0-9.-]+(?::[0-9]+)?/index\\.html$"
+    }
+  }
+}
