@@ -1,4 +1,5 @@
-import { appEnv, isDevelopment } from '@/lib/env'
+import { appEnv } from '@/lib/env'
+import { getRuntimeConfig } from '@/lib/runtimeConfig'
 import { httpClient } from '@/services/api/httpClient'
 import { logger } from '@/services/logging'
 
@@ -31,17 +32,11 @@ const JWT_PATTERN = /\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g
 const BEARER_PATTERN = /bearer\s+[A-Za-z0-9._~+/=-]+/gi
 
 function isMonitoringEnabled() {
-  const explicitValue = import.meta.env.VITE_ENABLE_FRONTEND_MONITORING
-
-  if (explicitValue === 'true') {
-    return true
-  }
-
-  if (explicitValue === 'false') {
+  try {
+    return getRuntimeConfig().features.errorMonitoring
+  } catch {
     return false
   }
-
-  return !isDevelopment
 }
 
 function buildErrorId() {

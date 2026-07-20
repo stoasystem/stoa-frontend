@@ -149,12 +149,12 @@ test('runtime-enabled reports preserve token and private-text redaction and payl
     `Error: authorization: Bearer ${token}`,
     ...Array.from(
       { length: 12 },
-      (_, index) => `    at safeFrame${index} (https://staging.stoaedu.ch/app.js?token=${token}${'x'.repeat(320)})`,
+      (_, index) => `    at safeFrame${index} (https://staging.stoaedu.ch/app.js?cache=${token}${'x'.repeat(320)})`,
     ),
   ].join('\n')
   const componentStack = Array.from(
     { length: 12 },
-    (_, index) => `    in SafeComponent${index} (https://staging.stoaedu.ch/component.js?secret=${index}${'y'.repeat(320)})`,
+    (_, index) => `    in SafeComponent${index} (https://staging.stoaedu.ch/component.js?trace=${index}${'y'.repeat(320)})`,
   ).join('\n')
   const harness = await monitoringHarness({ errorMonitoring: true })
   try {
