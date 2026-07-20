@@ -233,6 +233,7 @@ test('command environment is deterministic and drops ambient execution and build
     TMPDIR: '/tmp/stoa-web-run/tmp',
     TZ: 'UTC',
     npm_config_cache: '/tmp/stoa-web-run/npm-cache',
+    npm_config_script_shell: '/bin/sh',
   })
   assert.doesNotMatch(
     JSON.stringify(environment),
