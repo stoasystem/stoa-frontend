@@ -54,6 +54,11 @@ function harness(overrides = {}) {
   const finalSource = overrides.finalSource ?? initial.sourceTreeSha256
   const commandResults = overrides.commandResults ?? new Map()
   const runtimeShimStates = [...(overrides.runtimeShimStates ?? [])]
+  const checkoutStates = [...(overrides.checkoutStates ?? [initial])]
+  const lockStates = [...(overrides.lockStates ?? [finalLock])]
+  const sourceStates = [...(overrides.sourceStates ?? [finalSource])]
+  const artifactStates = [...(overrides.artifactStates ?? [overrides.artifact ?? artifact()])]
+  const nextState = (states) => states.length > 1 ? states.shift() : states[0]
 
   const operations = {
     runtimeIdentity: async () => ({
@@ -63,9 +68,9 @@ function harness(overrides = {}) {
       arch: 'arm64',
       ...(overrides.runtime ?? {}),
     }),
-    inspectCheckout: async () => initial,
-    readPackageLockIdentity: async () => finalLock,
-    hashSourceTree: async () => finalSource,
+    inspectCheckout: async () => nextState(checkoutStates),
+    readPackageLockIdentity: async () => nextState(lockStates),
+    hashSourceTree: async () => nextState(sourceStates),
     inspectRuntimeShims: async () => runtimeShimStates.shift() ?? [],
     runCommand: async (step) => {
       calls.push(clone(step))
@@ -75,7 +80,7 @@ function harness(overrides = {}) {
         stderr: Buffer.alloc(0),
       }
     },
-    inspectArtifact: async () => overrides.artifact ?? artifact(),
+    inspectArtifact: async () => nextState(artifactStates),
     invalidateOutput: async () => { invalidations += 1 },
     publishReceipt: async (_output, receipt) => { published.push(clone(receipt)) },
   }
@@ -339,6 +344,7 @@ test('wrong runtime, warm trees, alternate locks, and native roots fail before e
     ['DIST_PRESENT', { checkout: checkout({ dist: 'directory' }) }],
     ['ALTERNATE_LOCK_PRESENT', { checkout: checkout({ alternateLocks: ['pnpm-lock.yaml'] }) }],
     ['NATIVE_SOURCE_PRESENT', { checkout: checkout({ nativeRoots: ['ios'] }) }],
+    ['PROJECT_NPMRC_PRESENT', { checkout: checkout({ projectNpmrc: 'file' }) }],
   ]
 
   for (const [code, options] of cases) {
@@ -361,6 +367,30 @@ test('missing or drifting committed inputs fail closed without publication', asy
       finalLock: { bytes: 201, sha256: sha('9') },
     }],
     ['SOURCE_TREE_DRIFT', { finalSource: sha('8') }],
+  ]
+
+  for (const [code, options] of cases) {
+    const state = harness(options)
+    await expectPolicyFailure(verifyWebRelease({
+      outputPath: externalOutput,
+      repoRoot: '/snapshot/stoa-frontend',
+      operations: state.operations,
+    }), code)
+    assert.equal(state.published.length, 0, code)
+  }
+})
+
+test('initial source capture and final source/artifact brackets reject torn state', async () => {
+  const cases = [
+    ['CHECKOUT_DRIFT', {
+      checkoutStates: [checkout(), checkout({ packageJson: { bytes: 101, sha256: sha('8') } })],
+    }],
+    ['SOURCE_TREE_DRIFT', {
+      sourceStates: [sha('3'), sha('8')],
+    }],
+    ['ARTIFACT_DRIFT', {
+      artifactStates: [artifact(), artifact({ treeSha256: sha('8') })],
+    }],
   ]
 
   for (const [code, options] of cases) {
