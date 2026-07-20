@@ -538,6 +538,24 @@ test('initial source capture and final source/artifact brackets reject torn stat
     ['ARTIFACT_DRIFT', {
       artifactStates: [artifact(), artifact(), artifact({ treeSha256: sha('8') })],
     }],
+    ['SOURCE_TREE_DRIFT', {
+      checkoutStates: [
+        ...executionCheckouts(),
+        checkout({
+          nodeModules: 'directory',
+          dist: 'directory',
+          sourceTreeSha256: sha('8'),
+        }),
+      ],
+    }],
+    ['ARTIFACT_DRIFT', {
+      artifactStates: [
+        artifact(),
+        artifact(),
+        artifact(),
+        artifact({ treeSha256: sha('8') }),
+      ],
+    }],
   ]
 
   for (const [code, options] of cases) {
