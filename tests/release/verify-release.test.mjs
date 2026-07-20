@@ -223,8 +223,8 @@ test('command environment is deterministic and drops ambient execution and build
     HOME: '/tmp/stoa-web-run/home',
     LANG: 'C',
     LC_ALL: 'C',
-    NPM_CONFIG_GLOBALCONFIG: '/dev/null',
-    NPM_CONFIG_USERCONFIG: '/dev/null',
+    NPM_CONFIG_GLOBALCONFIG: '/tmp/stoa-web-run/npm-globalrc',
+    NPM_CONFIG_USERCONFIG: '/tmp/stoa-web-run/npm-userrc',
     NO_COLOR: '1',
     PATH: [
       '/snapshot/stoa-frontend/node_modules/.bin',
@@ -237,6 +237,11 @@ test('command environment is deterministic and drops ambient execution and build
   assert.doesNotMatch(
     JSON.stringify(environment),
     /secret|attacker|VITE_|AWS_|NODE_ENV|NODE_OPTIONS|NODE_PATH|PRELOAD|lifecycle|INIT_CWD/,
+  )
+  assert.notEqual(
+    environment.NPM_CONFIG_GLOBALCONFIG,
+    environment.NPM_CONFIG_USERCONFIG,
+    'npm rejects loading one path as both the global and user config',
   )
 })
 
