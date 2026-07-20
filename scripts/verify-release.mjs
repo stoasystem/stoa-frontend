@@ -47,6 +47,7 @@ const NATIVE_ROOTS = Object.freeze([
   'native',
   'src-native',
 ])
+const RUNTIME_SHIM_NAMES = Object.freeze(['node', 'npm', 'npx'])
 const FORBIDDEN_ARTIFACT_RULES = Object.freeze([
   ['VITE_CONTACT_', /VITE_CONTACT_/i],
   ['VITE_ENABLE_FRONTEND_MONITORING', /VITE_ENABLE_FRONTEND_MONITORING/i],
@@ -169,7 +170,7 @@ export function buildCommandEnvironment({
     NPM_CONFIG_GLOBALCONFIG: path.join(tempRoot, 'npm-globalrc'),
     NPM_CONFIG_USERCONFIG: path.join(tempRoot, 'npm-userrc'),
     NO_COLOR: '1',
-    PATH: [path.join(repoRoot, 'node_modules', '.bin'), nodeBinDirectory].join(path.delimiter),
+    PATH: [nodeBinDirectory, path.join(repoRoot, 'node_modules', '.bin')].join(path.delimiter),
     TMPDIR: path.join(tempRoot, 'tmp'),
     TZ: 'UTC',
     npm_config_cache: path.join(tempRoot, 'npm-cache'),
@@ -344,6 +345,16 @@ async function inspectCheckout(repoRoot) {
     packageLock,
     sourceTreeSha256: source.treeSha256,
   }
+}
+
+async function inspectRuntimeShims(repoRoot) {
+  const present = []
+  for (const name of RUNTIME_SHIM_NAMES) {
+    if (await pathKind(path.join(repoRoot, 'node_modules', '.bin', name)) !== 'absent') {
+      present.push(name)
+    }
+  }
+  return present
 }
 
 async function resolveActiveDistribution() {
@@ -549,6 +560,7 @@ function createDefaultOperations(repoRoot) {
       ...await hashRegularTree(path.join(repoRoot, 'dist'), { inspectArtifact: true }),
     }),
     inspectCheckout: async () => inspectCheckout(repoRoot),
+    inspectRuntimeShims: async () => inspectRuntimeShims(repoRoot),
     invalidateOutput: async (outputPath) => invalidateOutput(outputPath, repoRoot),
     publishReceipt: async (outputPath, receipt) => publishReceipt(outputPath, receipt, repoRoot),
     readPackageLockIdentity: async () => readIdentity(path.join(repoRoot, 'package-lock.json'), {
@@ -686,6 +698,13 @@ function validateRuntime(runtime) {
   }
 }
 
+function validateRuntimeShims(value) {
+  if (!Array.isArray(value) || value.some((name) => !RUNTIME_SHIM_NAMES.includes(name))) {
+    fail('RUNTIME_SHIM_STATE_INVALID')
+  }
+  if (value.length !== 0) fail('RUNTIME_SHIM_PRESENT')
+}
+
 function validateCheckout(checkout) {
   assertExactKeys(checkout, [
     'alternateLocks',
@@ -754,7 +773,9 @@ export async function verifyWebRelease({
 
     const steps = []
     for (const step of STEP_DEFINITIONS) {
+      validateRuntimeShims(await activeOperations.inspectRuntimeShims())
       const result = await activeOperations.runCommand(step)
+      validateRuntimeShims(await activeOperations.inspectRuntimeShims())
       steps.push(commandReceipt(step, result))
       const currentLock = await activeOperations.readPackageLockIdentity()
       if (!sameIdentity(checkout.packageLock, currentLock)) fail('PACKAGE_LOCK_DRIFT')
