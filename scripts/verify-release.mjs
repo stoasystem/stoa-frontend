@@ -1052,6 +1052,17 @@ export async function verifyWebRelease({
     if (canonicalize(publicationArtifact) !== canonicalize(artifactBaseline)) {
       fail('ARTIFACT_DRIFT')
     }
+    validateCaptureAgainstBaseline(
+      await activeOperations.inspectCheckout(),
+      checkout,
+      { expectedDist: 'directory', expectedNodeModules: 'directory' },
+    )
+    const confirmedPublicationArtifact = validateInspectedArtifact(
+      await activeOperations.inspectArtifact(),
+    )
+    if (canonicalize(confirmedPublicationArtifact) !== canonicalize(artifactBaseline)) {
+      fail('ARTIFACT_DRIFT')
+    }
     await activeOperations.publishReceipt(normalizedOutput, receipt)
     return receipt
   } catch (error) {
