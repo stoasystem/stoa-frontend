@@ -53,6 +53,7 @@ function harness(overrides = {}) {
   const finalLock = overrides.finalLock ?? initial.packageLock
   const finalSource = overrides.finalSource ?? initial.sourceTreeSha256
   const commandResults = overrides.commandResults ?? new Map()
+  const runtimeShimStates = [...(overrides.runtimeShimStates ?? [])]
 
   const operations = {
     runtimeIdentity: async () => ({
@@ -65,6 +66,7 @@ function harness(overrides = {}) {
     inspectCheckout: async () => initial,
     readPackageLockIdentity: async () => finalLock,
     hashSourceTree: async () => finalSource,
+    inspectRuntimeShims: async () => runtimeShimStates.shift() ?? [],
     runCommand: async (step) => {
       calls.push(clone(step))
       return commandResults.get(step.id) ?? {
@@ -229,8 +231,8 @@ test('command environment is deterministic and drops ambient execution and build
     NPM_CONFIG_USERCONFIG: '/tmp/stoa-web-run/npm-userrc',
     NO_COLOR: '1',
     PATH: [
-      '/snapshot/stoa-frontend/node_modules/.bin',
       '/node-20/bin',
+      '/snapshot/stoa-frontend/node_modules/.bin',
     ].join(path.delimiter),
     TMPDIR: '/tmp/stoa-web-run/tmp',
     TZ: 'UTC',
@@ -270,6 +272,19 @@ test('the verifier runs only the exact ordered local Web commands', async () => 
   assert.equal(state.invalidations, 1)
   assert.equal(state.published.length, 1)
   assert.deepEqual(state.published[0], receipt)
+})
+
+test('the locked install cannot add a local node, npm, or npx runtime shim', async () => {
+  const state = harness({ runtimeShimStates: [[], ['node']] })
+
+  await expectPolicyFailure(verifyWebRelease({
+    outputPath: externalOutput,
+    repoRoot: '/snapshot/stoa-frontend',
+    operations: state.operations,
+  }), 'RUNTIME_SHIM_PRESENT')
+
+  assert.deepEqual(state.calls.map(({ id }) => id), ['frontend-locked-install'])
+  assert.equal(state.published.length, 0)
 })
 
 test('receipt stores output hashes and counts without diagnostics or environment values', async () => {
