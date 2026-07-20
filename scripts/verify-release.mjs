@@ -187,7 +187,7 @@ export function validatePackageManifest(manifest) {
   for (const [name, expected] of Object.entries(REQUIRED_PACKAGE_SCRIPTS)) {
     if (manifest.scripts[name] !== expected) fail('PACKAGE_SCRIPT_DRIFT')
   }
-  for (const name of ['lint', 'typecheck', 'build', 'test:release']) {
+  for (const name of ['lint', 'typecheck', 'build', 'test:release', 'verify:release']) {
     if (`pre${name}` in manifest.scripts || `post${name}` in manifest.scripts) {
       fail('PACKAGE_SCRIPT_DRIFT')
     }
