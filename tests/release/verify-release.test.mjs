@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict'
 import { Buffer } from 'node:buffer'
+import { spawnSync } from 'node:child_process'
+import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
+import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
 import { fileURLToPath } from 'node:url'
@@ -28,9 +31,29 @@ function checkout(overrides = {}) {
     nativeRoots: [],
     packageJson: { bytes: 100, sha256: sha('1') },
     packageLock: { bytes: 200, sha256: sha('2') },
+    projectNpmrc: 'absent',
+    runtimeShims: [],
     sourceTreeSha256: sha('3'),
     ...overrides,
   }
+}
+
+function executionCheckouts() {
+  return [
+    checkout(),
+    checkout(),
+    checkout(),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory' }),
+    checkout({ nodeModules: 'directory', dist: 'directory' }),
+    checkout({ nodeModules: 'directory', dist: 'directory' }),
+    checkout({ nodeModules: 'directory', dist: 'directory' }),
+    checkout({ nodeModules: 'directory', dist: 'directory' }),
+  ]
 }
 
 function artifact(overrides = {}) {
@@ -50,13 +73,11 @@ function harness(overrides = {}) {
   const published = []
   let invalidations = 0
   const initial = overrides.checkout ?? checkout()
-  const finalLock = overrides.finalLock ?? initial.packageLock
-  const finalSource = overrides.finalSource ?? initial.sourceTreeSha256
   const commandResults = overrides.commandResults ?? new Map()
-  const runtimeShimStates = [...(overrides.runtimeShimStates ?? [])]
-  const checkoutStates = [...(overrides.checkoutStates ?? [initial])]
-  const lockStates = [...(overrides.lockStates ?? [finalLock])]
-  const sourceStates = [...(overrides.sourceStates ?? [finalSource])]
+  const checkoutStates = [...(
+    overrides.checkoutStates
+    ?? (overrides.checkout ? [initial] : executionCheckouts())
+  )]
   const artifactStates = [...(overrides.artifactStates ?? [overrides.artifact ?? artifact()])]
   const nextState = (states) => states.length > 1 ? states.shift() : states[0]
 
@@ -69,9 +90,6 @@ function harness(overrides = {}) {
       ...(overrides.runtime ?? {}),
     }),
     inspectCheckout: async () => nextState(checkoutStates),
-    readPackageLockIdentity: async () => nextState(lockStates),
-    hashSourceTree: async () => nextState(sourceStates),
-    inspectRuntimeShims: async () => runtimeShimStates.shift() ?? [],
     runCommand: async (step) => {
       calls.push(clone(step))
       return commandResults.get(step.id) ?? {
@@ -207,6 +225,27 @@ test('CLI accepts only verify with one absolute source-external output', () => {
   }
 })
 
+test('default CLI rejects a shared output parent before inspecting source', () => {
+  const result = spawnSync(process.execPath, [
+    path.join(repoRoot, 'scripts/verify-release.mjs'),
+    'verify',
+    '--output',
+    path.join(os.tmpdir(), `stoa-web-shared-${randomUUID()}.json`),
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+    env: {
+      LANG: 'C',
+      LC_ALL: 'C',
+      PATH: path.dirname(process.execPath),
+      TZ: 'UTC',
+    },
+  })
+
+  assert.equal(result.status, 2)
+  assert.match(result.stderr, /OUTPUT_PARENT_UNSAFE/)
+})
+
 test('command environment is deterministic and drops ambient execution and build configuration', () => {
   const environment = buildCommandEnvironment({
     ambient: {
@@ -280,7 +319,9 @@ test('the verifier runs only the exact ordered local Web commands', async () => 
 })
 
 test('the locked install cannot add a local node, npm, or npx runtime shim', async () => {
-  const state = harness({ runtimeShimStates: [[], ['node']] })
+  const states = executionCheckouts()
+  states[3] = checkout({ nodeModules: 'directory', runtimeShims: ['node'] })
+  const state = harness({ checkoutStates: states })
 
   await expectPolicyFailure(verifyWebRelease({
     outputPath: externalOutput,
@@ -364,9 +405,24 @@ test('missing or drifting committed inputs fail closed without publication', asy
   const cases = [
     ['PACKAGE_LOCK_MISSING', { checkout: checkout({ packageLock: null }) }],
     ['PACKAGE_LOCK_DRIFT', {
-      finalLock: { bytes: 201, sha256: sha('9') },
+      checkoutStates: [
+        checkout(),
+        checkout(),
+        checkout(),
+        checkout({
+          nodeModules: 'directory',
+          packageLock: { bytes: 201, sha256: sha('9') },
+        }),
+      ],
     }],
-    ['SOURCE_TREE_DRIFT', { finalSource: sha('8') }],
+    ['SOURCE_TREE_DRIFT', {
+      checkoutStates: [
+        checkout(),
+        checkout(),
+        checkout(),
+        checkout({ nodeModules: 'directory', sourceTreeSha256: sha('8') }),
+      ],
+    }],
   ]
 
   for (const [code, options] of cases) {
@@ -386,7 +442,12 @@ test('initial source capture and final source/artifact brackets reject torn stat
       checkoutStates: [checkout(), checkout({ packageJson: { bytes: 101, sha256: sha('8') } })],
     }],
     ['SOURCE_TREE_DRIFT', {
-      sourceStates: [sha('3'), sha('8')],
+      checkoutStates: [
+        checkout(),
+        checkout(),
+        checkout(),
+        checkout({ nodeModules: 'directory', sourceTreeSha256: sha('8') }),
+      ],
     }],
     ['ARTIFACT_DRIFT', {
       artifactStates: [artifact(), artifact({ treeSha256: sha('8') })],
