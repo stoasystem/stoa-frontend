@@ -1,37 +1,37 @@
-import { DEFAULT_API_BASE_URL } from '@/lib/constants'
+import { getRuntimeConfig } from '@/lib/runtimeConfig'
 
 export type ApiMode = 'mock' | 'demo' | 'staging' | 'production'
 export type AppEnv = 'development' | 'staging' | 'staging-pilot' | 'production'
 
-export const appEnv = (import.meta.env.VITE_APP_ENV ?? 'development') as AppEnv
-export const apiMode = (import.meta.env.VITE_API_MODE ?? 'demo') as ApiMode
-export const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
-export const enableMSW = import.meta.env.VITE_ENABLE_MSW === 'true'
+const runtimeConfig = getRuntimeConfig()
 
-export const isDevelopment = appEnv === 'development'
-export const isStaging = appEnv === 'staging' || appEnv === 'staging-pilot'
-export const isProduction = appEnv === 'production'
-export const isProductionFacing = isProduction || appEnv === 'staging-pilot'
+export const appEnv: AppEnv = runtimeConfig.environment
+export const apiMode: ApiMode = appEnv === 'production' ? 'production' : 'staging'
+export const apiBaseUrl: string = runtimeConfig.api.origin
+export const enableMSW: boolean = false
 
-export const enableDemoShortcuts = import.meta.env.VITE_ENABLE_DEMO_SHORTCUTS === 'true'
-export const enableAnalytics = import.meta.env.VITE_ENABLE_ANALYTICS === 'true'
-export const enableFeedback = import.meta.env.VITE_ENABLE_FEEDBACK === 'true'
-export const enablePayment = import.meta.env.VITE_ENABLE_PAYMENT === 'true'
-export const enableMockCheckout = import.meta.env.VITE_ENABLE_MOCK_CHECKOUT === 'true'
-export const enablePublicRegister = import.meta.env.VITE_ENABLE_PUBLIC_REGISTER === 'true'
-export const enableTeacherHelp = import.meta.env.VITE_ENABLE_TEACHER_HELP !== 'false'
-export const enableParentReport = import.meta.env.VITE_ENABLE_PARENT_REPORT !== 'false'
-export const enableReferral = import.meta.env.VITE_ENABLE_REFERRAL !== 'false'
-export const enableSupportTickets = import.meta.env.VITE_ENABLE_SUPPORT_TICKETS !== 'false'
-export const enableDemoApi = import.meta.env.VITE_ENABLE_DEMO_API === 'true'
-export const enableRealtimeNotifications = import.meta.env.VITE_ENABLE_REALTIME_NOTIFICATIONS === 'true'
-export const websocketBaseUrl = import.meta.env.VITE_WEBSOCKET_BASE_URL ?? ''
-export const allowDemoFallback = apiMode === 'mock' || (apiMode === 'demo' && enableDemoApi)
+export const isDevelopment: boolean = false
+export const isStaging: boolean = appEnv === 'staging' || appEnv === 'staging-pilot'
+export const isProduction: boolean = appEnv === 'production'
+export const isProductionFacing: boolean = isProduction || appEnv === 'staging-pilot'
 
-export const showDemoAccounts = !isProductionFacing && (
-  import.meta.env.VITE_SHOW_DEMO_ACCOUNTS === 'true' || enableDemoShortcuts
-)
-export const showDemoBadges = !isProductionFacing && import.meta.env.VITE_SHOW_DEMO_BADGES === 'true'
-export const showInternalDebug = isDevelopment && import.meta.env.VITE_SHOW_INTERNAL_DEBUG === 'true'
-export const showDemoSurfaces = !isProductionFacing && import.meta.env.VITE_SHOW_DEMO_SURFACES === 'true'
-export const showCheckoutPreview = !isProductionFacing && enableMockCheckout
+export const enableDemoShortcuts: boolean = false
+export const enableAnalytics: boolean = runtimeConfig.features.analytics
+export const enableFeedback: boolean = runtimeConfig.features.feedback
+export const enablePayment: boolean = runtimeConfig.features.payments
+export const enableMockCheckout: boolean = false
+export const enablePublicRegister: boolean = runtimeConfig.features.publicRegistration
+export const enableTeacherHelp: boolean = runtimeConfig.features.teacherHelp
+export const enableParentReport: boolean = runtimeConfig.features.parentReports
+export const enableReferral: boolean = runtimeConfig.features.referrals
+export const enableSupportTickets: boolean = runtimeConfig.features.supportTickets
+export const enableDemoApi: boolean = false
+export const enableRealtimeNotifications: boolean = runtimeConfig.features.realtimeNotifications
+export const websocketBaseUrl: string = runtimeConfig.realtime.endpoint ?? ''
+export const allowDemoFallback: boolean = false
+
+export const showDemoAccounts: boolean = false
+export const showDemoBadges: boolean = false
+export const showInternalDebug: boolean = false
+export const showDemoSurfaces: boolean = false
+export const showCheckoutPreview: boolean = false
