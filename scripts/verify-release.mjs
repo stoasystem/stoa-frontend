@@ -166,8 +166,8 @@ export function buildCommandEnvironment({
     HOME: path.join(tempRoot, 'home'),
     LANG: 'C',
     LC_ALL: 'C',
-    NPM_CONFIG_GLOBALCONFIG: '/dev/null',
-    NPM_CONFIG_USERCONFIG: '/dev/null',
+    NPM_CONFIG_GLOBALCONFIG: path.join(tempRoot, 'npm-globalrc'),
+    NPM_CONFIG_USERCONFIG: path.join(tempRoot, 'npm-userrc'),
     NO_COLOR: '1',
     PATH: [path.join(repoRoot, 'node_modules', '.bin'), nodeBinDirectory].join(path.delimiter),
     TMPDIR: path.join(tempRoot, 'tmp'),
@@ -446,6 +446,33 @@ async function validateExternalOutput(outputPath, repoRoot) {
   return normalized
 }
 
+async function ensurePrivateEmptyConfig(target) {
+  let handle
+  try {
+    handle = await open(target, 'wx', 0o600)
+    await handle.chmod(0o600)
+    await handle.sync()
+    await handle.close()
+    handle = null
+  } catch (error) {
+    if (handle) await handle.close().catch(() => {})
+    if (error?.code !== 'EEXIST') fail('NPM_CONFIG_INVALID')
+  }
+
+  let metadata
+  try {
+    metadata = await lstat(target)
+  } catch {
+    fail('NPM_CONFIG_INVALID')
+  }
+  if (
+    !metadata.isFile()
+    || metadata.isSymbolicLink()
+    || metadata.size !== 0
+    || (metadata.mode & 0o777) !== 0o600
+  ) fail('NPM_CONFIG_INVALID')
+}
+
 async function invalidateOutput(outputPath, repoRoot) {
   const normalized = await validateExternalOutput(outputPath, repoRoot)
   const kind = await pathKind(normalized)
@@ -497,6 +524,8 @@ function createDefaultOperations(repoRoot) {
       mkdir(path.join(temporary, 'home'), { recursive: true, mode: 0o700 }),
       mkdir(path.join(temporary, 'npm-cache'), { recursive: true, mode: 0o700 }),
       mkdir(path.join(temporary, 'tmp'), { recursive: true, mode: 0o700 }),
+      ensurePrivateEmptyConfig(path.join(temporary, 'npm-globalrc')),
+      ensurePrivateEmptyConfig(path.join(temporary, 'npm-userrc')),
     ])
     return {
       active,
