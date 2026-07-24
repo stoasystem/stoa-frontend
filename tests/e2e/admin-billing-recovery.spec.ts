@@ -1,9 +1,10 @@
+import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page, type Request } from '@playwright/test'
-import { loginAs } from './helpers'
 
 const CHECKOUT_REF = 'chk_public_01J2Y8Q1H9R4A7B6C5D3E2F1G0'
 const PARENT_ID = 'parent-billing-1'
+const WEB_ORIGIN = 'https://staging.stoaedu.ch'
 const DIGEST_A = 'a'.repeat(64)
 const DIGEST_B = 'b'.repeat(64)
 const FORBIDDEN_CANARIES = [
@@ -13,15 +14,22 @@ const FORBIDDEN_CANARIES = [
   'https://checkout.stripe.com/private-session',
 ]
 
+test.beforeEach(async ({ page }) => {
+  await routeReleaseRuntime(page)
+  await installAdminSession(page)
+  await routeAdminShell(page)
+})
+
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
 test('authorized admin sees exact redacted billing recovery evidence', async ({ page }) => {
   const browserLogs: string[] = []
   page.on('console', (message) => browserLogs.push(message.text()))
   await routeBillingDetail(page, billingDetail())
 
-  await loginAs(page, 'admin')
-  await page.goto(
-    `/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`,
-  )
+  await page.goto(`${WEB_ORIGIN}/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`)
 
   await expect(page.getByRole('heading', { name: /billing recovery evidence/i })).toBeVisible()
   await expect(page.getByText(PARENT_ID, { exact: true }).first()).toBeVisible()
@@ -29,7 +37,7 @@ test('authorized admin sees exact redacted billing recovery evidence', async ({ 
   await expect(page.getByText('Active', { exact: true }).first()).toBeVisible()
   await expect(page.getByText('…safe42', { exact: true })).toBeVisible()
   await expect(page.getByText('150,000 input / 25,000 output')).toBeVisible()
-  await expect(page.getByText(DIGEST_B, { exact: true })).toBeVisible()
+  await expect(page.getByText(`Model digest: ${DIGEST_B}`, { exact: true })).toBeVisible()
   await expect(page.getByText(/visa ending in 4242/i)).toBeVisible()
 
   const renderedAndStored = await page.evaluate(() => [
@@ -82,12 +90,9 @@ test('support recheck uses the same checkout reference, an empty body, and refre
     })
   })
 
-  await loginAs(page, 'admin')
-  await page.goto(
-    `/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`,
-  )
+  await page.goto(`${WEB_ORIGIN}/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`)
 
-  await expect(page.getByText(/provider read unavailable/i)).toBeVisible()
+  await expect(page.getByText('Provider read unavailable', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: /recheck original checkout/i }).click()
   await expect(page.getByText(/billing operation is active/i)).toBeVisible()
 
@@ -118,10 +123,7 @@ test('wrong capability denies detail and exposes no recheck action', async ({ pa
     })
   })
 
-  await loginAs(page, 'admin')
-  await page.goto(
-    `/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`,
-  )
+  await page.goto(`${WEB_ORIGIN}/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`)
 
   await expect(page.getByRole('alert')).toContainText(/billing evidence access is denied/i)
   await expect(page.getByRole('button', { name: /recheck original checkout/i })).toHaveCount(0)
@@ -144,10 +146,7 @@ test('expired admin session returns to login without exposing a recheck action',
     })
   })
 
-  await loginAs(page, 'admin')
-  await page.goto(
-    `/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`,
-  )
+  await page.goto(`${WEB_ORIGIN}/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`)
 
   await expect(page).toHaveURL(/\/login$/)
   expect(providerRecheckCalls).toBe(0)
@@ -187,10 +186,7 @@ test('provider dependency and recheck contention are explicit support states', a
     await route.fulfill({ contentType: 'application/json', json: billingDetail('support_needed') })
   })
 
-  await loginAs(page, 'admin')
-  await page.goto(
-    `/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`,
-  )
+  await page.goto(`${WEB_ORIGIN}/admin/account-operations?parentId=${PARENT_ID}&checkoutRef=${CHECKOUT_REF}`)
 
   await expect(page.getByRole('alert')).toContainText(/billing provider is temporarily unavailable/i)
   await page.reload()
@@ -288,4 +284,174 @@ function billingDetail(lifecycleState: 'active' | 'support_needed' = 'active') {
       reconciliationLeaseGeneration: lifecycleState === 'active' ? 9 : 8,
     },
   }
+}
+
+async function installAdminSession(page: Page) {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('stoa_access_token', 'e2e-admin-token')
+  })
+}
+
+async function routeAdminShell(page: Page) {
+  await page.route(/\/auth\/me$/, async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        id: 'admin-billing-support',
+        name: 'Billing Support',
+        email: 'billing-support@test.com',
+        role: 'admin',
+        effectiveLocale: 'en',
+      },
+    })
+  })
+  await page.route(/\/admin\/account-operations\/parents\//, async (route) => {
+    await route.fulfill({
+      contentType: 'application/json',
+      json: {
+        parentId: PARENT_ID,
+        parent: {
+          userId: PARENT_ID,
+          email: 'parent@test.com',
+          name: 'Parent Billing',
+          role: 'parent',
+          verification: {
+            emailVerificationStatus: 'verified',
+            emailVerificationRequired: false,
+            accountActivationStatus: 'active',
+          },
+        },
+        billing: {
+          status: 'active',
+          mode: 'test',
+          provider: 'stripe',
+          subscriptionTier: 'family',
+          requestedTier: 'family',
+          cancelAtPeriodEnd: false,
+          events: [],
+        },
+        children: [],
+        usage: [],
+        supportState: { state: 'ready', blockers: [], warnings: [] },
+      },
+    })
+  })
+}
+
+async function routeReleaseRuntime(page: Page) {
+  const release = {
+    releaseId: '1'.repeat(64),
+    manifestSha256: '2'.repeat(64),
+    frontendArtifactSha256: '3'.repeat(64),
+    backendArtifactSha256: '4'.repeat(64),
+  }
+  const runtimeConfig = {
+    schema: 'stoa.web.runtime-config.v1',
+    environment: 'staging',
+    release,
+    web: { origin: WEB_ORIGIN },
+    api: { origin: 'https://api-staging.stoaedu.ch' },
+    auth: { mode: 'backend-api' },
+    realtime: { enabled: false, endpoint: null },
+    features: {
+      analytics: false,
+      errorMonitoring: false,
+      feedback: false,
+      parentReports: true,
+      payments: false,
+      publicRegistration: false,
+      realtimeNotifications: false,
+      referrals: false,
+      supportTickets: true,
+      teacherHelp: true,
+    },
+  }
+  const runtimeDigest = createHash('sha256')
+    .update(canonicalize(runtimeConfig))
+    .digest('hex')
+
+  await page.route(`${WEB_ORIGIN}/**`, async (route) => {
+    const url = new URL(route.request().url())
+    if (url.pathname === '/served-release.json') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: {
+          schema: 'stoa.web.served-release.v1',
+          environment: 'staging',
+          release,
+          runtimeConfig: {
+            key: 'runtime-config.json',
+            versionId: 'runtime-version_A1b2c3d4',
+            url: `${WEB_ORIGIN}/runtime-config.json`,
+            sha256: runtimeDigest,
+          },
+          webEntry: {
+            key: 'index.html',
+            versionId: 'web-version_E5f6g7h8',
+            url: `${WEB_ORIGIN}/index.html`,
+            sha256: '6'.repeat(64),
+          },
+        },
+      })
+      return
+    }
+    if (url.pathname === '/runtime-config.json') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        json: runtimeConfig,
+      })
+      return
+    }
+    const response = await fetchLocalAsset(
+      route,
+      `http://127.0.0.1:5173${url.pathname}${url.search}`,
+    )
+    const headers = Object.fromEntries(
+      Object.entries(response.headers).filter(
+        ([name]) => name !== 'content-encoding' && name !== 'content-length',
+      ),
+    )
+    await route.fulfill({
+      status: response.status,
+      headers,
+      body: response.body,
+    })
+  })
+}
+
+async function fetchLocalAsset(
+  route: Parameters<Parameters<Page['route']>[1]>[0],
+  url: string,
+) {
+  let lastError: unknown
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const response = await route.fetch({
+        url,
+        headers: {
+          accept: route.request().headers().accept ?? '*/*',
+          'user-agent': route.request().headers()['user-agent'],
+        },
+      })
+      return {
+        status: response.status(),
+        headers: response.headers(),
+        body: await response.body(),
+      }
+    } catch (error) {
+      lastError = error
+      await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)))
+    }
+  }
+  throw lastError
+}
+
+function canonicalize(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value)
+  if (Array.isArray(value)) return `[${value.map(canonicalize).join(',')}]`
+  const record = value as Record<string, unknown>
+  return `{${Object.keys(record).sort().map((key) =>
+    `${JSON.stringify(key)}:${canonicalize(record[key])}`).join(',')}}`
 }

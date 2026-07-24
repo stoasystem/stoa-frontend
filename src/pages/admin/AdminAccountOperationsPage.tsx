@@ -1,5 +1,5 @@
 import { type FormEvent, useState } from 'react'
-import { AlertTriangle, CheckCircle2, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -11,7 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ApiError } from '@/services/api/httpClient'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
+import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import type { AdminBillingOperationDetail } from '@/services/admin/adminApi'
 import type { AdminAccountOperations } from '@/types/adminAccountOperations'
 import type { AccountOperationsChild, AccountOperationsUsage } from '@/types/parentAccountOperations'
 import type { SubscriptionBillingEvent } from '@/types/subscriptionOperations'
@@ -20,17 +22,22 @@ export function AdminAccountOperationsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const parentId = searchParams.get('parentId')?.trim() ?? ''
   const day = searchParams.get('day')?.trim() ?? ''
+  const checkoutRef = searchParams.get('checkoutRef')?.trim() ?? ''
   const [draftParentId, setDraftParentId] = useState(parentId)
   const [draftDay, setDraftDay] = useState(day)
+  const [draftCheckoutRef, setDraftCheckoutRef] = useState(checkoutRef)
   const query = useAdminParentAccountOperationsQuery(parentId, day || undefined)
+  const billingOperation = useAdminBillingOperation(parentId, checkoutRef)
 
   function submitLookup(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const nextParentId = draftParentId.trim()
     const nextDay = draftDay.trim()
+    const nextCheckoutRef = draftCheckoutRef.trim()
     const next = new URLSearchParams()
     if (nextParentId) next.set('parentId', nextParentId)
     if (nextDay) next.set('day', nextDay)
+    if (nextCheckoutRef) next.set('checkoutRef', nextCheckoutRef)
     setSearchParams(next)
   }
 
@@ -44,7 +51,7 @@ export function AdminAccountOperationsPage() {
           actions={<Button asChild variant="outline"><Link to="/admin/subscriptions">Subscription queue</Link></Button>}
         />
 
-        <form onSubmit={submitLookup} className="grid gap-3 rounded-md border border-border/70 bg-card p-4 md:grid-cols-[minmax(0,1fr)_12rem_auto]">
+        <form onSubmit={submitLookup} className="grid gap-3 rounded-md border border-border/70 bg-card p-4 lg:grid-cols-[minmax(0,0.8fr)_12rem_minmax(0,1.2fr)_auto]">
           <label className="space-y-2 text-sm font-medium text-foreground">
             Parent ID
             <Input
@@ -61,6 +68,14 @@ export function AdminAccountOperationsPage() {
               placeholder="2026-07-03"
             />
           </label>
+          <label className="space-y-2 text-sm font-medium text-foreground">
+            Checkout reference
+            <Input
+              value={draftCheckoutRef}
+              onChange={(event) => setDraftCheckoutRef(event.target.value)}
+              placeholder="chk_public_…"
+            />
+          </label>
           <Button type="submit" className="self-end">
             <Search className="mr-2 h-4 w-4" aria-hidden="true" />
             Inspect
@@ -71,8 +86,258 @@ export function AdminAccountOperationsPage() {
         {parentId && query.isLoading && <LoadingPanel />}
         {parentId && query.isError && <ErrorPanel error={query.error} />}
         {query.data && <AdminAccountOperationsDetail data={query.data} />}
+
+        {parentId && checkoutRef && billingOperation.query.isLoading && <BillingRecoveryLoading />}
+        {parentId && checkoutRef && billingOperation.query.isError && (
+          <BillingRecoveryError error={billingOperation.query.error} operation="read" />
+        )}
+        {billingOperation.query.data && (
+          <BillingRecoveryDetail
+            data={billingOperation.query.data}
+            rechecking={billingOperation.recheck.isPending}
+            recheckError={billingOperation.recheck.error}
+            onRecheck={() => billingOperation.recheck.mutate()}
+          />
+        )}
       </PageContainer>
     </DashboardLayout>
+  )
+}
+
+function BillingRecoveryDetail({
+  data,
+  rechecking,
+  recheckError,
+  onRecheck,
+}: {
+  data: AdminBillingOperationDetail
+  rechecking: boolean
+  recheckError: Error | null
+  onRecheck: () => void
+}) {
+  const reconciliation = data.reconciliation
+  const supportNeeded = reconciliation.lifecycleState === 'support_needed'
+  const active = reconciliation.lifecycleState === 'active'
+  const effectivePlan = active && Object.keys(data.grantVersion).length > 0
+    ? formatStatus(data.targetPlan)
+    : 'Pending convergence'
+
+  return (
+    <section className="space-y-4" aria-labelledby="billing-recovery-title">
+      <Card className="brand-rule">
+        <CardHeader>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="brand-section-kicker">Read-only support</p>
+              <CardTitle id="billing-recovery-title" className="mt-2 text-xl">
+                Billing recovery evidence
+              </CardTitle>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Inspect redacted evidence and recheck only this original checkout command.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={rechecking}
+              onClick={onRecheck}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${rechecking ? 'animate-spin' : ''}`} aria-hidden="true" />
+              {rechecking ? 'Rechecking…' : 'Recheck original checkout'}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <div
+            className={`rounded-md border p-4 ${
+              supportNeeded
+                ? 'border-amber-300 bg-amber-50 text-amber-900'
+                : active
+                  ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
+                  : 'border-border bg-muted/40 text-foreground'
+            }`}
+            role="status"
+          >
+            <p className="font-semibold">
+              {active
+                ? 'Billing operation is active.'
+                : supportNeeded
+                  ? `Support needed: ${formatStatus(reconciliation.failureCode)}.`
+                  : `Billing operation is ${formatStatus(reconciliation.lifecycleState)}.`}
+            </p>
+            <p className="mt-1 text-sm">
+              Safe action: {formatStatus(reconciliation.safeAction)} · Lease generation{' '}
+              {reconciliation.reconciliationLeaseGeneration}
+            </p>
+          </div>
+
+          {recheckError && <BillingRecoveryError error={recheckError} operation="recheck" />}
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <DetailItem label="Parent" value={data.parentId} />
+            <DetailItem label="Target plan" value={formatStatus(data.targetPlan)} />
+            <DetailItem label="Effective plan" value={effectivePlan} />
+            <DetailItem
+              label="Stripe session suffix"
+              value={reconciliation.providerSessionSuffix ? `…${reconciliation.providerSessionSuffix}` : 'No session recorded'}
+            />
+            <DetailItem label="Command state" value={formatStatus(data.commandLifecycle.state)} />
+            <DetailItem label="Provider effect" value={formatStatus(data.commandLifecycle.providerEffectStatus)} />
+            <DetailItem label="Created" value={formatDate(data.commandLifecycle.createdAt)} />
+            <DetailItem label="Updated" value={formatDate(data.commandLifecycle.updatedAt)} />
+            <DetailItem label="Last rechecked" value={formatDate(reconciliation.lastRecheckedAt)} />
+            <DetailItem label="Failure code" value={formatStatus(reconciliation.failureCode)} />
+          </div>
+
+          <div>
+            <h3 className="text-base font-semibold text-foreground">Beneficiaries and versions</h3>
+            <div className="mt-3 grid gap-3">
+              {data.beneficiaryIds.map((beneficiaryId) => (
+                <div key={beneficiaryId} className="grid gap-2 rounded-md border border-border/70 p-3 sm:grid-cols-3">
+                  <p className="font-medium text-foreground">{beneficiaryId}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Grant version {data.grantVersion[beneficiaryId] ?? 'Pending'}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Allowance version {data.allowanceVersion[beneficiaryId] ?? 'Pending'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <BillingFactEvidence data={data} />
+          <ProviderUsageEvidence data={data} />
+          <PaymentReminderEvidence data={data} />
+        </CardContent>
+      </Card>
+    </section>
+  )
+}
+
+function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  return (
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Authoritative billing facts</h3>
+      {data.factLifecycle.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">No authoritative billing facts recorded.</p>
+      ) : (
+        <div className="mt-3 grid gap-3">
+          {data.factLifecycle.map((fact) => (
+            <div key={`${fact.kind}-${fact.factVersion}`} className="rounded-md border border-border/70 p-3 text-sm">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <p className="font-medium text-foreground">{formatStatus(fact.kind)}</p>
+                <p className="text-muted-foreground">{formatDate(fact.observedAt)}</p>
+              </div>
+              <div className="mt-2 grid gap-1 text-muted-foreground lg:grid-cols-2">
+                <p>Fact version {fact.factVersion}</p>
+                <p>Signed test-mode evidence</p>
+                <p className="break-all">Event digest: {fact.providerEventIdDigest}</p>
+                <p className="break-all">Object digest: {fact.providerObjectIdDigest}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  return (
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Provider usage evidence</h3>
+      {data.providerUsageEvidence.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">No provider usage evidence recorded.</p>
+      ) : (
+        <div className="mt-3 grid gap-3">
+          {data.providerUsageEvidence.map((evidence) => (
+            <div
+              key={`${evidence.beneficiaryId}-${evidence.correlationDigest}`}
+              className="rounded-md border border-border/70 p-3 text-sm"
+            >
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <p className="font-medium text-foreground">{evidence.beneficiaryId}</p>
+                <p className="text-muted-foreground">{formatDate(evidence.observedAt)}</p>
+              </div>
+              <p className="mt-2 font-medium text-foreground">
+                {formatCount(evidence.inputTokens)} input / {formatCount(evidence.outputTokens)} output
+              </p>
+              <div className="mt-2 grid gap-1 break-all text-muted-foreground">
+                <p>Model digest: {evidence.modelIdDigest}</p>
+                <p>Request digest: {evidence.providerRequestIdDigest}</p>
+                <p>Correlation digest: {evidence.correlationDigest}</p>
+                <p>Provider cost retained: {evidence.providerCostRetained ? 'Yes' : 'No'}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PaymentReminderEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  const reminder = data.paymentReminder
+  return (
+    <div>
+      <h3 className="text-base font-semibold text-foreground">Payment reminder</h3>
+      {reminder ? (
+        <div className="mt-3 grid gap-3 rounded-md border border-border/70 p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+          <p className="font-medium text-foreground">
+            {formatStatus(reminder.brand)} ending in {reminder.last4}
+          </p>
+          <p className="text-muted-foreground">
+            Expires {String(reminder.expiryMonth).padStart(2, '0')}/{reminder.expiryYear}
+          </p>
+          <p className="text-muted-foreground">Reminder {formatStatus(reminder.status)}</p>
+          <p className="text-muted-foreground">{formatDate(reminder.reminderAt)}</p>
+        </div>
+      ) : (
+        <p className="mt-2 text-sm text-muted-foreground">No payment reminder recorded.</p>
+      )}
+    </div>
+  )
+}
+
+function BillingRecoveryLoading() {
+  return (
+    <Card aria-busy="true" aria-label="Loading billing recovery evidence">
+      <CardContent className="space-y-3 p-5">
+        <div className="h-4 w-48 rounded bg-muted" />
+        <div className="h-4 w-full max-w-2xl rounded bg-muted" />
+        <div className="h-4 w-2/3 rounded bg-muted" />
+      </CardContent>
+    </Card>
+  )
+}
+
+function BillingRecoveryError({
+  error,
+  operation,
+}: {
+  error: Error | null
+  operation: 'read' | 'recheck'
+}) {
+  const status = error instanceof ApiError ? error.status : undefined
+  let message = operation === 'recheck'
+    ? 'Billing recheck failed. Contact support with the checkout reference.'
+    : 'Billing recovery evidence could not be loaded.'
+
+  if (status === 403) {
+    message = 'Billing evidence access is denied. The billing support capability is required.'
+  } else if (status === 409 || status === 423 || status === 429) {
+    message = 'Billing recheck is already in progress. Wait briefly and retry this same checkout.'
+  } else if (status === 503) {
+    message = 'Billing provider is temporarily unavailable. Keep this checkout reference and retry later.'
+  } else if (status === 404) {
+    message = 'Billing checkout was not found for this parent.'
+  }
+
+  return (
+    <div className="rounded-md border border-destructive/40 bg-destructive/5 p-4 text-sm text-destructive" role="alert">
+      {message}
+    </div>
   )
 }
 
@@ -351,4 +616,8 @@ function formatDate(value: string) {
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
   return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
+}
+
+function formatCount(value: number) {
+  return new Intl.NumberFormat('en').format(value)
 }

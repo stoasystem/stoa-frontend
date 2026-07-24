@@ -1710,3 +1710,105 @@ export async function applySubscriptionRequest(input: { requestId: string; admin
   )
   return response.data
 }
+
+export type AdminBillingPlan = 'student' | 'teacher_supported' | 'family'
+
+export type AdminBillingCommandLifecycle = {
+  state: string
+  providerEffectStatus: string
+  createdAt: string
+  updatedAt: string
+}
+
+export type AdminBillingFactLifecycle = {
+  kind:
+    | 'checkout_session_completed'
+    | 'checkout_session_expired'
+    | 'invoice_paid'
+    | 'invoice_payment_failed'
+    | 'subscription_active'
+    | 'subscription_inactive'
+  factVersion: number
+  providerEventIdDigest: string
+  providerObjectIdDigest: string
+  signatureVerified: true
+  providerLivemode: false
+  observedAt: string
+}
+
+export type AdminProviderUsageEvidence = {
+  beneficiaryId: string
+  correlationDigest: string
+  providerRequestIdDigest: string
+  modelIdDigest: string
+  inputTokens: number
+  outputTokens: number
+  providerCostRetained: boolean
+  observedAt: string
+}
+
+export type AdminPaymentReminderEvidence = {
+  brand: string
+  last4: string
+  expiryMonth: number
+  expiryYear: number
+  reminderAt: string
+  status: 'pending' | 'notified'
+}
+
+export type AdminBillingReconciliation = {
+  lifecycleState: string
+  lastRecheckedAt: string
+  safeAction: string
+  failureCode: string
+  providerSessionSuffix?: string | null
+  reconciliationLeaseGeneration: number
+}
+
+export type AdminBillingOperationDetail = {
+  checkoutRef: string
+  parentId: string
+  targetPlan: AdminBillingPlan
+  beneficiaryIds: string[]
+  commandLifecycle: AdminBillingCommandLifecycle
+  factLifecycle: AdminBillingFactLifecycle[]
+  grantVersion: Record<string, number>
+  allowanceVersion: Record<string, number>
+  providerUsageEvidence: AdminProviderUsageEvidence[]
+  paymentReminder?: AdminPaymentReminderEvidence | null
+  reconciliation: AdminBillingReconciliation
+}
+
+export type AdminBillingRecheckResult = {
+  checkoutRef: string
+  parentId: string
+  targetPlan: AdminBillingPlan
+  beneficiaryIds: string[]
+  createdAt: string
+  updatedAt: string
+  commandState: string
+  providerEffectStatus: string
+  lifecycleState: string
+  lastRecheckedAt: string
+  safeAction: string
+  failureCode: string
+  providerSessionSuffix?: string | null
+  reconciliationLeaseGeneration: number
+}
+
+export async function getAdminBillingOperation(checkoutRef: string, parentId: string) {
+  const response = await httpClient.get<AdminBillingOperationDetail>(
+    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}`,
+    { params: { parentId, detail: true } },
+  )
+  return response.data
+}
+
+export async function recheckAdminBillingOperation(checkoutRef: string, parentId: string) {
+  const response = await httpClient.post<AdminBillingRecheckResult>(
+    `/admin/billing/checkouts/${encodeURIComponent(checkoutRef)}/recheck`,
+    {},
+    { params: { parentId } },
+  )
+  return response.data
+}
