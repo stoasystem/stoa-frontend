@@ -35,7 +35,7 @@ test('begins with friendly confirming and renders active only from authoritative
     await route.fulfill({ status: 500, json: { detail: 'must not create' } })
   })
   await routeCheckoutStatus(page, async (route) => {
-    await new Promise((resolve) => setTimeout(resolve, 300))
+    await new Promise((resolve) => setTimeout(resolve, 1_500))
     await route.fulfill({
       contentType: 'application/json',
       json: checkoutStatus({
@@ -104,11 +104,11 @@ test('bounded confirming recovery rechecks only the same reference and never cre
       json: checkoutStatus({ outcome: 'confirming' }),
     })
   })
-  await page.route(`${webOrigin}/parents/me/subscription/checkout`, async (route) => {
+  await page.route(/\/parents\/me\/subscription\/checkout$/, async (route) => {
     createCalls += 1
     await route.fulfill({ status: 500, json: { detail: 'must not create' } })
   })
-  await page.route(`${webOrigin}${statusPath}/recheck`, async (route) => {
+  await page.route(new RegExp(`${statusPath}/recheck$`), async (route) => {
     rechecks.push(route.request())
     await route.fulfill({
       contentType: 'application/json',
@@ -127,7 +127,7 @@ test('bounded confirming recovery rechecks only the same reference and never cre
   await expect(page.getByRole('heading', { name: '需要帮助' })).toBeVisible()
   expect(rechecks).toHaveLength(1)
   expect(rechecks[0].method()).toBe('POST')
-  expect(rechecks[0].url()).toEndWith(`${statusPath}/recheck`)
+  expect(rechecks[0].url()).toMatch(new RegExp(`${statusPath}/recheck$`))
   expect(await rechecks[0].postDataJSON()).toEqual({})
   expect(createCalls).toBe(0)
 })
@@ -215,7 +215,7 @@ async function routeCheckoutStatus(
   page: Page,
   handler: Parameters<Page['route']>[1],
 ) {
-  await page.route(`${webOrigin}${statusPath}`, handler)
+  await page.route(new RegExp(`${statusPath}$`), handler)
 }
 
 async function routeReleaseRuntime(page: Page) {
