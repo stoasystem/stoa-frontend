@@ -1,18 +1,74 @@
 import { httpClient } from '@/services/api/httpClient'
-import {
-  mockBillingPlans,
-} from '@/data/phase11MockData'
-import { getStoredUTM } from '@/lib/utm'
-import type { FeatureAccess, Subscription, SubscriptionPlan } from '@/types/billing'
-import type { ParentSubscription, SubscriptionBilling, SubscriptionTier } from '@/types/subscriptionOperations'
+import { pricingPlans } from '@/components/pricing/pricingPlans'
+import type {
+  BillingSafeAction,
+  CheckoutCommandState,
+  CheckoutPublicOutcome,
+  FeatureAccess,
+  PurchasableSubscriptionPlan,
+  Subscription,
+  SubscriptionPlan,
+} from '@/types/billing'
+import type { ParentSubscription, SubscriptionTier } from '@/types/subscriptionOperations'
 
-export async function getBillingPlans() {
-  return { items: mockBillingPlans }
+export const CHECKOUT_OPERATION_STORAGE_KEY = 'stoa.billing.checkout.v1'
+
+export type CheckoutOperationStore = {
+  idempotencyKey: string
+  checkoutRef?: string
 }
 
-export async function getSubscription() {
-  const response = await httpClient.get<ParentSubscription>('/parents/me/subscription')
-  return mapParentSubscription(response.data)
+export type CheckoutSelection = {
+  plan: PurchasableSubscriptionPlan
+  beneficiaryIds: string[]
+}
+
+export type CheckoutCreateResponse = {
+  checkoutRef: string
+  commandState: CheckoutCommandState
+  checkoutSessionId: string
+  checkoutUrl: string
+  safeActions: BillingSafeAction[]
+  targetPlan: PurchasableSubscriptionPlan
+  beneficiaries: string[]
+}
+
+export type CheckoutStatusResponse = {
+  checkoutRef: string
+  outcome: CheckoutPublicOutcome
+  newCheckoutAllowed: boolean
+  safeActions: BillingSafeAction[]
+  targetPlan: PurchasableSubscriptionPlan
+  beneficiaries: string[]
+  effectivePlan: PurchasableSubscriptionPlan | null
+  lastRecheckedAt: string
+}
+
+export type CheckoutSupersedeResponse = {
+  checkoutRef: string | null
+  commandState: CheckoutCommandState
+  publicOutcome?: CheckoutPublicOutcome | null
+  checkoutSessionId?: string | null
+  checkoutUrl?: string | null
+  safeActions: BillingSafeAction[]
+  targetPlan?: PurchasableSubscriptionPlan | null
+  beneficiaries?: string[]
+}
+
+export async function getBillingPlans() {
+  return { items: pricingPlans }
+}
+
+export async function getSubscription(): Promise<Subscription> {
+  const response = await httpClient.get<{
+    effectivePlan: SubscriptionPlan
+    status: string
+  }>('/parents/me/subscription/billing')
+  return {
+    plan: response.data.effectivePlan,
+    status: billingStatusToSubscriptionStatus({ status: response.data.status }),
+    currentPeriodEnd: undefined,
+  }
 }
 
 export async function getBillingUsage() {
@@ -25,32 +81,142 @@ export async function getFeatureAccess() {
   return mapFeatureAccess(response.data)
 }
 
-export async function createCheckoutSession(plan: SubscriptionPlan) {
-  const requestedTier = planToTier(plan)
-  if (requestedTier === 'free') {
-    throw new Error('Checkout is only available for paid plans.')
+export function getCheckoutOperation(): CheckoutOperationStore | null {
+  if (typeof window === 'undefined') return null
+  const stored = window.sessionStorage.getItem(CHECKOUT_OPERATION_STORAGE_KEY)
+  if (!stored) return null
+  try {
+    const value: unknown = JSON.parse(stored)
+    if (value === null || typeof value !== 'object' || Array.isArray(value)) return null
+    const record = value as Record<string, unknown>
+    if (typeof record.idempotencyKey !== 'string' || record.idempotencyKey.length < 8) return null
+    if (record.checkoutRef !== undefined && typeof record.checkoutRef !== 'string') return null
+    return {
+      idempotencyKey: record.idempotencyKey,
+      ...(record.checkoutRef ? { checkoutRef: record.checkoutRef } : {}),
+    }
+  } catch {
+    return null
   }
-  const response = await httpClient.post<{ checkoutUrl: string }>(
+}
+
+export function getOrCreateCheckoutOperation(): CheckoutOperationStore {
+  const current = getCheckoutOperation()
+  if (current) return current
+  const operation = { idempotencyKey: crypto.randomUUID() }
+  storeCheckoutOperation(operation)
+  return operation
+}
+
+export function clearTerminalCheckoutOperation(checkoutRef?: string): void {
+  if (typeof window === 'undefined') return
+  const current = getCheckoutOperation()
+  if (!checkoutRef || current?.checkoutRef === checkoutRef) {
+    window.sessionStorage.removeItem(CHECKOUT_OPERATION_STORAGE_KEY)
+  }
+}
+
+export async function createCheckoutSession(selection: CheckoutSelection) {
+  const operation = getOrCreateCheckoutOperation()
+  if (operation.checkoutRef) {
+    throw new Error('A checkout is already in progress.')
+  }
+  const response = await httpClient.post<CheckoutCreateResponse>(
     '/parents/me/subscription/checkout',
     {
-      requested_tier: requestedTier,
-      success_url: `${window.location.origin}/billing/checkout/success?plan=${plan}`,
-      cancel_url: `${window.location.origin}/billing/checkout/cancel?plan=${plan}`,
-      utm: getStoredUTM(),
+      plan: selection.plan,
+      beneficiaryIds: normalizedBeneficiaries(selection.beneficiaryIds),
     },
+    {
+      headers: { 'Idempotency-Key': operation.idempotencyKey },
+    },
+  )
+  storeCheckoutOperation({
+    idempotencyKey: operation.idempotencyKey,
+    checkoutRef: response.data.checkoutRef,
+  })
+  return response.data
+}
+
+export async function getCheckoutCommand(checkoutRef: string) {
+  const response = await httpClient.get<CheckoutStatusResponse>(
+    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}`,
   )
   return response.data
 }
 
-function mapParentSubscription(subscription: ParentSubscription): Subscription {
-  const billing = subscription.billing
-  const entitlement = firstEntitlement(subscription)
-  const plan = tierToPlan(entitlement?.effectivePlan ?? billing?.subscriptionTier ?? subscription.currentTier)
-  return {
-    plan,
-    status: billingStatusToSubscriptionStatus(billing),
-    currentPeriodEnd: billing?.currentPeriodEnd ?? entitlement?.period?.end ?? undefined,
+export async function recheckCheckoutCommand(checkoutRef: string) {
+  const response = await httpClient.post<CheckoutStatusResponse>(
+    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}/recheck`,
+    {},
+  )
+  return response.data
+}
+
+export async function supersedeCheckoutCommand(
+  checkoutRef: string,
+  selection: CheckoutSelection,
+) {
+  const current = getCheckoutOperation()
+  if (current?.checkoutRef !== checkoutRef) {
+    throw new Error('The retained checkout reference has changed.')
   }
+  const successorKey = await successorIdempotencyKey(
+    current.idempotencyKey,
+    selection,
+  )
+  const response = await httpClient.post<CheckoutSupersedeResponse>(
+    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}/supersede`,
+    {
+      confirmed: true,
+      plan: selection.plan,
+      beneficiaryIds: normalizedBeneficiaries(selection.beneficiaryIds),
+    },
+    {
+      headers: { 'Idempotency-Key': successorKey },
+    },
+  )
+  if (response.data.checkoutRef) {
+    storeCheckoutOperation({
+      idempotencyKey: successorKey,
+      checkoutRef: response.data.checkoutRef,
+    })
+  }
+  return response.data
+}
+
+function storeCheckoutOperation(operation: CheckoutOperationStore): void {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.setItem(
+    CHECKOUT_OPERATION_STORAGE_KEY,
+    JSON.stringify({
+      idempotencyKey: operation.idempotencyKey,
+      ...(operation.checkoutRef ? { checkoutRef: operation.checkoutRef } : {}),
+    }),
+  )
+}
+
+function normalizedBeneficiaries(beneficiaryIds: string[]) {
+  return [...new Set(beneficiaryIds)].sort()
+}
+
+async function successorIdempotencyKey(
+  currentKey: string,
+  selection: CheckoutSelection,
+) {
+  const intent = JSON.stringify({
+    currentKey,
+    plan: selection.plan,
+    beneficiaryIds: normalizedBeneficiaries(selection.beneficiaryIds),
+  })
+  const digest = await crypto.subtle.digest(
+    'SHA-256',
+    new TextEncoder().encode(intent),
+  )
+  return Array.from(
+    new Uint8Array(digest),
+    (byte) => byte.toString(16).padStart(2, '0'),
+  ).join('')
 }
 
 function mapBillingUsage(subscription: ParentSubscription) {
@@ -95,24 +261,14 @@ function firstEntitlement(subscription: ParentSubscription) {
   return subscription.effectiveEntitlements?.[0]
 }
 
-function billingStatusToSubscriptionStatus(billing?: SubscriptionBilling): Subscription['status'] {
+function billingStatusToSubscriptionStatus(
+  billing?: { status: string },
+): Subscription['status'] {
   if (!billing) return 'trial'
   if (billing.status === 'active' || billing.status === 'manual_override') return 'active'
   if (billing.status === 'checkout_pending') return 'trial'
   if (billing.status === 'canceled') return 'expired'
   return 'inactive'
-}
-
-function tierToPlan(tier: SubscriptionTier): SubscriptionPlan {
-  if (tier === 'premium') return 'teacher_supported'
-  if (tier === 'standard') return 'family'
-  return 'free_trial'
-}
-
-function planToTier(plan: SubscriptionPlan): SubscriptionTier {
-  if (plan === 'teacher_supported') return 'premium'
-  if (plan === 'student' || plan === 'family') return 'standard'
-  return 'free'
 }
 
 function planLimit(tier: SubscriptionTier) {

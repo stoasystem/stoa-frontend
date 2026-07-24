@@ -10,6 +10,10 @@ test.beforeEach(async ({ page }) => {
   await routeBillingShell(page)
 })
 
+test.afterEach(async ({ page }) => {
+  await page.unrouteAll({ behavior: 'ignoreErrors' })
+})
+
 test('repeat click and refresh retain one logical checkout key and reference', async ({ page }) => {
   const creates: Request[] = []
 
@@ -47,11 +51,11 @@ test('repeat click and refresh retain one logical checkout key and reference', a
   const idempotencyKey = request.headers()['idempotency-key']
   expect(idempotencyKey).toBeTruthy()
 
-  const storedBeforeRefresh = await readStoredOperation(page)
-  expect(storedBeforeRefresh).toEqual({
+  await expect.poll(() => readStoredOperation(page)).toEqual({
     idempotencyKey,
     checkoutRef: 'checkout-ref-1',
   })
+  const storedBeforeRefresh = await readStoredOperation(page)
 
   await page.reload()
   await expect(page.getByTestId('checkout-open-command')).toBeVisible()
@@ -93,7 +97,7 @@ test('client timeout retry reuses the same logical key', async ({ page }) => {
   await expect.poll(() => keys.length).toBe(2)
   expect(keys[0]).toBeTruthy()
   expect(keys[1]).toBe(keys[0])
-  expect(await readStoredOperation(page)).toEqual({
+  await expect.poll(() => readStoredOperation(page)).toEqual({
     idempotencyKey: keys[0],
     checkoutRef: 'checkout-ref-retried',
   })
@@ -173,7 +177,7 @@ test('changed pending intent requires confirmation and supersedes only after con
   })
   expect(request.headers()['idempotency-key']).toBeTruthy()
   expect(request.headers()['idempotency-key']).not.toBe('original-logical-key')
-  expect(await readStoredOperation(page)).toEqual({
+  await expect.poll(() => readStoredOperation(page)).toEqual({
     idempotencyKey: request.headers()['idempotency-key'],
     checkoutRef: 'checkout-ref-successor',
   })
@@ -300,11 +304,48 @@ async function routeReleaseRuntime(page: Page) {
       })
       return
     }
-    const response = await route.fetch({
-      url: `http://127.0.0.1:5173${url.pathname}${url.search}`,
+    const response = await fetchLocalAsset(
+      route,
+      `http://127.0.0.1:5173${url.pathname}${url.search}`,
+    )
+    const headers = Object.fromEntries(
+      Object.entries(response.headers).filter(
+        ([name]) => name !== 'content-encoding' && name !== 'content-length',
+      ),
+    )
+    await route.fulfill({
+      status: response.status,
+      headers,
+      body: response.body,
     })
-    await route.fulfill({ response })
   })
+}
+
+async function fetchLocalAsset(
+  route: Parameters<Parameters<Page['route']>[1]>[0],
+  url: string,
+) {
+  let lastError: unknown
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const response = await route.fetch({
+        url,
+        headers: {
+          accept: route.request().headers().accept ?? '*/*',
+          'user-agent': route.request().headers()['user-agent'],
+        },
+      })
+      return {
+        status: response.status(),
+        headers: response.headers(),
+        body: await response.body(),
+      }
+    } catch (error) {
+      lastError = error
+      await new Promise((resolve) => setTimeout(resolve, 50 * (attempt + 1)))
+    }
+  }
+  throw lastError
 }
 
 async function installParentAuth(page: Page) {
@@ -385,7 +426,9 @@ async function installStoredOperation(
 ) {
   await page.addInitScript(
     ([key, operation]) => {
-      window.sessionStorage.setItem(key, JSON.stringify(operation))
+      if (window.sessionStorage.getItem(key) === null) {
+        window.sessionStorage.setItem(key, JSON.stringify(operation))
+      }
     },
     [operationStorageKey, value] as const,
   )

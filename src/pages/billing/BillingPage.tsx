@@ -1,11 +1,10 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CreditCard, HelpCircle, Settings, type LucideIcon } from 'lucide-react'
 import { BillingStatusAlert } from '@/components/billing/BillingStatusAlert'
 import { BillingSummaryCard } from '@/components/billing/BillingSummaryCard'
-import { CheckoutButton } from '@/components/billing/CheckoutButton'
 import { LockedFeatureCard } from '@/components/billing/LockedFeatureCard'
 import { ManageBillingButton } from '@/components/billing/ManageBillingButton'
 import { PlanUsageCard } from '@/components/billing/PlanUsageCard'
@@ -17,11 +16,12 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
 import { useBillingUsageQuery } from '@/hooks/billing/useBillingUsageQuery'
 import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
+import { useCreateCheckoutSessionMutation } from '@/hooks/billing/useCreateCheckoutSessionMutation'
 import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
-import { enablePayment, showCheckoutPreview } from '@/lib/env'
+import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { SubscriptionPlan } from '@/types/billing'
+import type { PurchasableSubscriptionPlan, SubscriptionPlan } from '@/types/billing'
 
 function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
   return ['free_trial', 'student', 'teacher_supported', 'family'].includes(plan ?? '')
@@ -36,6 +36,10 @@ export function BillingPage() {
   const usageQuery = useBillingUsageQuery()
   const featureAccessQuery = useFeatureAccessQuery()
   const subscriptionQuery = useSubscriptionQuery()
+  const childrenQuery = useParentChildrenQuery()
+  const checkout = useCreateCheckoutSessionMutation()
+  const [selectedBeneficiaryIds, setSelectedBeneficiaryIds] = useState<string[]>([])
+  const [confirmSupersession, setConfirmSupersession] = useState(false)
   const subscription = subscriptionQuery.data
   const plan = useMemo(
     () => plansQuery.data?.items.find((item) => item.id === selectedPlan),
@@ -46,6 +50,60 @@ export function BillingPage() {
     trackEvent('billing_page_viewed', { selectedPlan })
   }, [selectedPlan])
 
+  useEffect(() => {
+    setSelectedBeneficiaryIds([])
+    setConfirmSupersession(false)
+  }, [selectedPlan])
+
+  const selectionValid = isValidBeneficiarySelection(selectedPlan, selectedBeneficiaryIds)
+  const pendingCommand = checkout.commandQuery.data
+  const selectionDiffers = Boolean(
+    pendingCommand &&
+    selectionValid &&
+    (
+      pendingCommand.targetPlan !== selectedPlan ||
+      !sameBeneficiaries(pendingCommand.beneficiaries, selectedBeneficiaryIds)
+    )
+  )
+  const openCommand = Boolean(checkout.operation?.checkoutRef && !pendingCommand?.newCheckoutAllowed)
+  const createLabel = checkout.isError ? 'Retry checkout' : 'Start checkout'
+
+  function toggleBeneficiary(beneficiaryId: string) {
+    setSelectedBeneficiaryIds((current) =>
+      current.includes(beneficiaryId)
+        ? current.filter((value) => value !== beneficiaryId)
+        : [...current, beneficiaryId],
+    )
+  }
+
+  function submitCheckout() {
+    if (!selectionValid || selectedPlan === 'free_trial') return
+    const selection = {
+      plan: selectedPlan as PurchasableSubscriptionPlan,
+      beneficiaryIds: selectedBeneficiaryIds,
+    }
+    if (openCommand) {
+      if (selectionDiffers) setConfirmSupersession(true)
+      return
+    }
+    checkout.mutate(selection)
+  }
+
+  function confirmCheckoutChange() {
+    if (
+      !checkout.operation?.checkoutRef ||
+      selectedPlan === 'free_trial' ||
+      !selectionValid
+    ) return
+    checkout.supersedeMutation.mutate({
+      checkoutRef: checkout.operation.checkoutRef,
+      selection: {
+        plan: selectedPlan,
+        beneficiaryIds: selectedBeneficiaryIds,
+      },
+    })
+  }
+
   return (
     <DashboardLayout>
       <PageContainer className="p-0">
@@ -53,7 +111,7 @@ export function BillingPage() {
           eyebrow={t('billing:title')}
           title={t('billing:subscription')}
           description={t('billing:description')}
-          actions={<Badge variant="secondary">{enablePayment ? t('billing:paymentEnabled') : t('billing:paymentDisabled')}</Badge>}
+          actions={<Badge variant="secondary">Server-confirmed checkout</Badge>}
         />
 
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
@@ -84,30 +142,103 @@ export function BillingPage() {
                     Choose a plan or update family payment settings from one place.
                   </p>
                 </div>
-                <Badge variant="secondary">{showCheckoutPreview ? 'Plan review' : 'Hosted payment'}</Badge>
+                <Badge variant="secondary">Hosted payment</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
               <div className="grid gap-3 sm:grid-cols-2">
                 <BillingActionCard
                   icon={CreditCard}
-                  title={showCheckoutPreview ? 'Review plan' : 'Start checkout'}
-                  description={
-                    showCheckoutPreview
-                      ? t('billing:planSelectionReviewEnabled')
-                      : t('billing:paymentEnabledBody')
-                  }
+                  title="Start checkout"
+                  description={t('billing:paymentEnabledBody')}
                 >
-                  <CheckoutButton plan={selectedPlan} />
+                  <div className="space-y-3">
+                    <fieldset className="space-y-2" data-testid="checkout-beneficiaries">
+                      <legend className="text-sm font-medium text-foreground">
+                        Select beneficiaries
+                      </legend>
+                      {childrenQuery.data?.items.map((child) => (
+                        <label
+                          key={child.id}
+                          className="flex items-center gap-2 text-sm text-foreground"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedBeneficiaryIds.includes(child.id)}
+                            onChange={() => toggleBeneficiary(child.id)}
+                          />
+                          {child.name}
+                        </label>
+                      ))}
+                      {childrenQuery.isError && (
+                        <p className="text-sm text-destructive">
+                          Beneficiaries are unavailable. Please try again.
+                        </p>
+                      )}
+                    </fieldset>
+                    {openCommand && (
+                      <p
+                        className="text-sm text-muted-foreground"
+                        data-testid="checkout-open-command"
+                      >
+                        A checkout is already in progress for{' '}
+                        {pendingCommand?.targetPlan.replace(/_/g, ' ') ?? 'the retained selection'}.
+                      </p>
+                    )}
+                    <Button
+                      type="button"
+                      onClick={submitCheckout}
+                      disabled={
+                        checkout.isPending ||
+                        checkout.supersedeMutation.isPending ||
+                        !selectionValid ||
+                        (openCommand && !selectionDiffers)
+                      }
+                    >
+                      {checkout.isPending
+                        ? 'Starting checkout'
+                        : selectedPlan === 'free_trial'
+                          ? 'Free trial does not require checkout'
+                          : !selectionValid
+                            ? beneficiaryRequirement(selectedPlan)
+                            : openCommand && selectionDiffers
+                              ? 'Change pending checkout'
+                              : createLabel}
+                    </Button>
+                    {(checkout.error || checkout.supersedeMutation.error) && (
+                      <p className="text-sm text-destructive" data-testid="checkout-error">
+                        {(checkout.error ?? checkout.supersedeMutation.error)?.message}
+                      </p>
+                    )}
+                    {confirmSupersession && (
+                      <div
+                        className="space-y-3 rounded-md border border-primary/30 p-3"
+                        data-testid="checkout-supersession-confirmation"
+                      >
+                        <p className="text-sm text-foreground">
+                          Replace the pending {pendingCommand?.targetPlan.replace(/_/g, ' ')} checkout
+                          with this plan and beneficiary selection?
+                        </p>
+                        <div className="flex flex-col gap-2 sm:flex-row">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => setConfirmSupersession(false)}
+                          >
+                            Keep original checkout
+                          </Button>
+                          <Button type="button" onClick={confirmCheckoutChange}>
+                            Confirm plan change
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </BillingActionCard>
                 <BillingActionCard
                   icon={Settings}
                   title="Payment settings"
-                  description={
-                    enablePayment
-                      ? 'Update saved payment method and invoice settings.'
-                      : 'Review billing contact and payment setup status before live payments are enabled.'
-                  }
+                  description="Update saved payment method and invoice settings."
                 >
                   <ManageBillingButton />
                 </BillingActionCard>
@@ -116,9 +247,7 @@ export function BillingPage() {
                 <div className="flex min-w-0 gap-3">
                   <HelpCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                   <p className="min-w-0">
-                    {enablePayment
-                      ? 'Need help with a charge or invoice?'
-                      : t('billing:paymentDisabledBody')}
+                    Need help with a charge or invoice?
                   </p>
                 </div>
                 <Button asChild variant="outline">
@@ -182,6 +311,27 @@ export function BillingPage() {
       </PageContainer>
     </DashboardLayout>
   )
+}
+
+function isValidBeneficiarySelection(
+  plan: SubscriptionPlan,
+  beneficiaryIds: string[],
+) {
+  const uniqueCount = new Set(beneficiaryIds).size
+  if (uniqueCount !== beneficiaryIds.length) return false
+  if (plan === 'free_trial') return false
+  if (plan === 'family') return uniqueCount >= 1 && uniqueCount <= 3
+  return uniqueCount === 1
+}
+
+function sameBeneficiaries(left: string[], right: string[]) {
+  return [...left].sort().join('\u0000') === [...right].sort().join('\u0000')
+}
+
+function beneficiaryRequirement(plan: SubscriptionPlan) {
+  if (plan === 'free_trial') return 'Free trial does not require checkout'
+  if (plan === 'family') return 'Select 1 to 3 beneficiaries'
+  return 'Select exactly one beneficiary'
 }
 
 function BillingActionCard({

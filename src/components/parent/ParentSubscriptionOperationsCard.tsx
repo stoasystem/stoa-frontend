@@ -1,17 +1,16 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, Clock3, CreditCard, ExternalLink, XCircle } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { CheckCircle2, Clock3, XCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import {
-  useCreateParentCheckoutSessionMutation,
   useCreateParentSubscriptionRequestMutation,
   useParentSubscriptionQuery,
   useParentSubscriptionRequestsQuery,
 } from '@/hooks/parent/useParentSubscriptionOperations'
 import type {
-  CheckoutSession,
   SubscriptionBilling,
   SubscriptionPlanBenefits,
   SubscriptionRequest,
@@ -31,11 +30,9 @@ export function ParentSubscriptionOperationsCard() {
   const subscriptionQuery = useParentSubscriptionQuery()
   const requestsQuery = useParentSubscriptionRequestsQuery()
   const createRequestMutation = useCreateParentSubscriptionRequestMutation()
-  const createCheckoutMutation = useCreateParentCheckoutSessionMutation()
   const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('standard')
   const [note, setNote] = useState('')
   const [message, setMessage] = useState<string | null>(null)
-  const [checkoutSession, setCheckoutSession] = useState<CheckoutSession | null>(null)
 
   const subscription = subscriptionQuery.data
   const currentTier = subscription?.currentTier ?? 'free'
@@ -65,25 +62,6 @@ export function ParentSubscriptionOperationsCard() {
         onError: (error) => {
           setMessage(error.message)
         },
-      },
-    )
-  }
-
-  function startCheckout() {
-    setMessage(null)
-    setCheckoutSession(null)
-    createCheckoutMutation.mutate(
-      {
-        requestedTier: selectedTier,
-        successUrl: `${window.location.origin}/billing/checkout/success?plan=${selectedTier}`,
-        cancelUrl: `${window.location.origin}/billing/checkout/cancel?plan=${selectedTier}`,
-      },
-      {
-        onSuccess: (session) => {
-          setCheckoutSession(session)
-          setMessage(`Checkout ready: ${formatTier(session.requestedTier)} (${session.mode} mode).`)
-        },
-        onError: (error) => setMessage(error.message),
       },
     )
   }
@@ -120,7 +98,7 @@ export function ParentSubscriptionOperationsCard() {
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
-        <ProviderBillingStatus billing={billing} checkoutSession={checkoutSession} />
+        <ProviderBillingStatus billing={billing} />
         {pendingRequest && <PendingRequest request={pendingRequest} />}
         <div className="grid gap-3 md:grid-cols-3">
           {plans && tierOrder.map((tier) => (
@@ -158,13 +136,8 @@ export function ParentSubscriptionOperationsCard() {
               >
                 Submit request
               </Button>
-              <Button
-                type="button"
-                onClick={startCheckout}
-                disabled={selectedTier === 'free' || selectedTier === currentTier || createCheckoutMutation.isPending}
-              >
-                <CreditCard className="mr-2 h-4 w-4" aria-hidden="true" />
-                Start checkout
+              <Button asChild>
+                <Link to="/billing">Open secure billing</Link>
               </Button>
             </div>
           </div>
@@ -178,10 +151,8 @@ export function ParentSubscriptionOperationsCard() {
 
 function ProviderBillingStatus({
   billing,
-  checkoutSession,
 }: {
   billing?: SubscriptionBilling
-  checkoutSession: CheckoutSession | null
 }) {
   const status = billing?.status ?? 'none'
   return (
@@ -200,16 +171,6 @@ function ProviderBillingStatus({
         <BillingFact label="Managed tier" value={formatTier(billing?.subscriptionTier ?? 'free')} />
         <BillingFact label="Last event" value={billing?.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
       </div>
-      {(checkoutSession?.checkoutUrl || billing?.checkoutUrl) && (
-        <a
-          href={checkoutSession?.checkoutUrl ?? billing?.checkoutUrl ?? '#'}
-          className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary"
-          rel="noreferrer"
-        >
-          Open secure checkout
-          <ExternalLink className="h-4 w-4" aria-hidden="true" />
-        </a>
-      )}
     </div>
   )
 }
