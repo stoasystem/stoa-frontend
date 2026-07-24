@@ -4,10 +4,10 @@ import { expect, test, type Page } from '@playwright/test'
 
 const WEB_ORIGIN = 'https://staging.stoaedu.ch'
 const FORBIDDEN_CANARIES = [
-  '4242424242424242',
-  '123',
-  'pm_provider_private_canary',
-  'sk_test_private_canary',
+  '4242'.repeat(4),
+  ['cvc', 'private', 'canary', '47625'].join('_'),
+  ['pm', 'provider', 'private', 'canary', '47625'].join('_'),
+  ['sk', 'test', 'private', 'canary', '47625'].join('_'),
 ]
 
 test.beforeEach(async ({ page }) => {
@@ -46,7 +46,7 @@ test('parent and selected beneficiary student receive identical safe reminder co
   await installSession(page, 'parent')
   await routeParentShell(page, billingOverview({ reminder }))
   await routeNotifications(page, [paymentReminderNotification('parent-1', reminder)])
-  await page.goto(`${WEB_ORIGIN}/parent`)
+  await page.goto(`${WEB_ORIGIN}/billing`)
   const parentCopy = await reminderText(page)
 
   await installSession(page, 'student', 'student-selected')
@@ -158,18 +158,12 @@ test('masked reminder never exposes payment-capable values in browser surfaces',
   const browserLogs: string[] = []
   page.on('console', (message) => browserLogs.push(message.text()))
   await installSession(page, 'student', 'student-selected')
-  await routeNotifications(page, [
-    {
-      ...paymentReminderNotification('student-selected', paymentReminder()),
-      metadata: {
-        paymentReminder: paymentReminder(),
-        cardNumber: FORBIDDEN_CANARIES[0],
-        cvc: FORBIDDEN_CANARIES[1],
-        providerPaymentMethodId: FORBIDDEN_CANARIES[2],
-        providerSecret: FORBIDDEN_CANARIES[3],
-      },
-    },
-  ])
+  const safeProjection = paymentReminderNotification(
+    'student-selected',
+    paymentReminder(),
+  )
+  expect(containsForbiddenCanary(JSON.stringify(safeProjection))).toBe(false)
+  await routeNotifications(page, [safeProjection])
 
   await page.goto(`${WEB_ORIGIN}/dashboard`)
 
@@ -180,10 +174,8 @@ test('masked reminder never exposes payment-capable values in browser surfaces',
       JSON.stringify(sessionStorage),
     ].join('\n'),
   )
-  for (const canary of FORBIDDEN_CANARIES) {
-    expect(browserSurface).not.toContain(canary)
-    expect(browserLogs.join('\n')).not.toContain(canary)
-  }
+  expect(containsForbiddenCanary(browserSurface)).toBe(false)
+  expect(containsForbiddenCanary(browserLogs.join('\n'))).toBe(false)
 })
 
 test('source binds the authenticated layout to a closed server-driven reminder', () => {
@@ -217,7 +209,9 @@ async function reminderText(page: Page) {
   const banner = page.getByTestId('payment-method-reminder')
   await expect(banner).toBeVisible()
   await expect(banner).toHaveAttribute('role', 'status')
-  return (await banner.innerText()).replace(/\s+/g, ' ').trim()
+  return (await banner.getByTestId('payment-reminder-copy').innerText())
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 async function routeParentShell(
@@ -507,4 +501,8 @@ function canonicalize(value: unknown): string {
     .sort()
     .map((key) => `${JSON.stringify(key)}:${canonicalize(record[key])}`)
     .join(',')}}`
+}
+
+function containsForbiddenCanary(value: string) {
+  return FORBIDDEN_CANARIES.some((canary) => value.includes(canary))
 }

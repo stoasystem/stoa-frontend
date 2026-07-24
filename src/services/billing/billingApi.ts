@@ -1,6 +1,7 @@
 import { httpClient } from '@/services/api/httpClient'
 import { pricingPlans } from '@/components/pricing/pricingPlans'
 import type {
+  BillingOverview,
   BillingSafeAction,
   CheckoutCommandState,
   CheckoutPublicOutcome,
@@ -9,7 +10,7 @@ import type {
   Subscription,
   SubscriptionPlan,
 } from '@/types/billing'
-import type { ParentSubscription, SubscriptionTier } from '@/types/subscriptionOperations'
+import type { ParentSubscription } from '@/types/subscriptionOperations'
 
 export const CHECKOUT_OPERATION_STORAGE_KEY = 'stoa.billing.checkout.v1'
 
@@ -72,8 +73,10 @@ export async function getSubscription(): Promise<Subscription> {
 }
 
 export async function getBillingUsage() {
-  const response = await httpClient.get<ParentSubscription>('/parents/me/subscription')
-  return mapBillingUsage(response.data)
+  const response = await httpClient.get<BillingOverview>(
+    '/parents/me/subscription/billing',
+  )
+  return response.data
 }
 
 export async function getFeatureAccess() {
@@ -219,24 +222,6 @@ async function successorIdempotencyKey(
   ).join('')
 }
 
-function mapBillingUsage(subscription: ParentSubscription) {
-  const entitlement = firstEntitlement(subscription)
-  const limit = entitlement?.limits?.dailyAiQuestionLimit ?? planLimit(subscription.currentTier)
-  const now = new Date()
-  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-  const periodEnd = entitlement?.period?.end ?? new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString()
-  return {
-    periodStart,
-    periodEnd,
-    aiMessagesUsed: 0,
-    aiMessagesLimit: limit,
-    fileUploadsUsed: 0,
-    fileUploadsLimit: entitlement?.effectivePlan === 'premium' ? 50 : entitlement?.effectivePlan === 'standard' ? 10 : 0,
-    teacherHelpUsed: 0,
-    teacherHelpLimit: entitlement?.effectivePlan === 'premium' ? 20 : entitlement?.effectivePlan === 'standard' ? 5 : 0,
-  }
-}
-
 function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
   const entitlement = firstEntitlement(subscription)
   const plan = entitlement?.effectivePlan ?? subscription.currentTier
@@ -269,10 +254,4 @@ function billingStatusToSubscriptionStatus(
   if (billing.status === 'checkout_pending') return 'trial'
   if (billing.status === 'canceled') return 'expired'
   return 'inactive'
-}
-
-function planLimit(tier: SubscriptionTier) {
-  if (tier === 'premium') return 100
-  if (tier === 'standard') return 30
-  return 5
 }

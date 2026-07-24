@@ -136,6 +136,56 @@ export type PaymentReminder = {
   remindAt?: string
   expiresAt?: string
   updatedAt?: string
+  delivery?: {
+    inApp: 'active'
+    email: 'sent' | 'ineligible' | 'failed'
+  }
+}
+
+export type BillingAllowanceWindow = {
+  weekIdentity: string
+  timezone: 'Europe/Zurich'
+  utcStart: string
+  utcEnd: string
+  localStart: string
+  localEnd: string
+}
+
+export type BillingOverview = {
+  parentId: string
+  effectivePlan: SubscriptionPlan
+  beneficiaries: {
+    studentId: string
+    effectivePlan: Exclude<SubscriptionPlan, 'free_trial'>
+  }[]
+  allowanceWindow: BillingAllowanceWindow | null
+  inputRemaining: Record<string, number>
+  outputRemaining: Record<string, number>
+  inputPercentUsed: Record<string, number>
+  outputPercentUsed: Record<string, number>
+  teacherCasesRemaining: {
+    scope: 'none' | 'per_beneficiary' | 'shared_family'
+    remaining: number | null
+    limit: number
+    byBeneficiary: Record<string, number>
+  }
+  paymentReminder: PaymentReminder | {
+    brand: string
+    last4: string
+    expiryMonth: number
+    expiryYear: number
+    reminderAt: string
+    status: 'pending' | 'notified'
+  } | null
+  supportActions: (
+    | 'start_checkout'
+    | 'view_billing'
+    | 'go_home'
+    | 'contact_support'
+  )[]
+  status: string
+  subscriptionTier: string
+  paymentMethodType: 'card' | 'twint' | null
 }
 
 export type FeatureAccess = {

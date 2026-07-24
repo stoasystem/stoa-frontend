@@ -7,11 +7,13 @@ import {
 } from '@/services/notifications/notificationApi'
 import { notificationQueryKeys } from '@/services/notifications/notificationQueryKeys'
 
-export function useNotificationsQuery() {
+export function useNotificationsQuery(enabled = true) {
   return useQuery({
     queryKey: notificationQueryKeys.list(),
     queryFn: getNotifications,
     staleTime: 30_000,
+    enabled,
+    retry: false,
   })
 }
 
