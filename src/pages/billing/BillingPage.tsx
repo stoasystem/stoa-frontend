@@ -24,7 +24,7 @@ import { trackEvent } from '@/services/analytics/analyticsClient'
 import type { SubscriptionPlan } from '@/types/billing'
 
 function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
-  return ['free_trial', 'student', 'family', 'tutor_supported'].includes(plan ?? '')
+  return ['free_trial', 'student', 'teacher_supported', 'family'].includes(plan ?? '')
 }
 
 export function BillingPage() {

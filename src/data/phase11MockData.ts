@@ -1,5 +1,5 @@
 import type { AdminAnalyticsOverview } from '@/types/adminAnalytics'
-import type { BillingPlan, BillingUsage, FeatureAccess, Subscription } from '@/types/billing'
+import type { BillingPlan, FeatureAccess, Subscription } from '@/types/billing'
 import type { ReferralSummary } from '@/types/referral'
 import type { SupportTicket } from '@/types/supportTicket'
 import type { TutorAvailability } from '@/types/tutorAvailability'
@@ -14,6 +14,7 @@ export const mockBillingPlans: BillingPlan[] = [
     name: 'Free Trial',
     priceMonthly: 0,
     currency: 'CHF',
+    purchasable: false,
     audience: 'Families trying STOA before choosing a plan.',
     cta: 'Start free trial',
     features: ['Guided learning questions', 'Parent dashboard', 'Basic learning history'],
@@ -23,15 +24,17 @@ export const mockBillingPlans: BillingPlan[] = [
     name: 'Student Plan',
     priceMonthly: 29,
     currency: 'CHF',
+    purchasable: true,
     audience: 'A student who needs consistent homework help.',
     cta: 'Select student',
     features: ['Learning space', 'Homework upload', 'Parent dashboard'],
   },
   {
-    id: 'tutor_supported',
+    id: 'teacher_supported',
     name: 'Teacher-supported Plan',
     priceMonthly: 89,
     currency: 'CHF',
+    purchasable: true,
     audience: 'Families who want limited weekly teacher Q&A.',
     cta: 'Select teacher support',
     features: ['Everything in Student', 'Weekly parent report', 'Limited weekly teacher Q&A'],
@@ -41,6 +44,7 @@ export const mockBillingPlans: BillingPlan[] = [
     name: 'Family Plan',
     priceMonthly: 149,
     currency: 'CHF',
+    purchasable: true,
     recommended: true,
     audience: 'Families who want the highest support level and shared access.',
     cta: 'Select family',
@@ -54,7 +58,7 @@ export const mockSubscription: Subscription = {
   currentPeriodEnd: '2026-06-30T00:00:00Z',
 }
 
-export const mockBillingUsage: BillingUsage = {
+export const mockBillingUsage = {
   periodStart: '2026-06-01T00:00:00Z',
   periodEnd: '2026-06-30T00:00:00Z',
   aiMessagesUsed: 82,

@@ -34,7 +34,7 @@
       "cta": "Choose student",
       "features": ["Learning space", "Homework upload", "Parent dashboard"]
     },
-    "tutor_supported": {
+    "teacher_supported": {
       "name": "Teacher-supported plan",
       "audience": "Families who want limited weekly teacher Q&A.",
       "cta": "Choose teacher support",

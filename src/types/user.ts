@@ -12,10 +12,8 @@ export type SubscriptionStatus = 'trial' | 'active' | 'inactive' | 'expired'
 export type SubscriptionPlan =
   | 'free_trial'
   | 'student'
+  | 'teacher_supported'
   | 'family'
-  | 'tutor_supported'
-
-export type LegacySubscriptionPlan = 'pilot' | 'school' | 'enterprise'
 
 export type BillingStatus =
   | 'not_configured'
@@ -26,7 +24,7 @@ export type BillingStatus =
   | 'canceled'
 
 export type UserSubscription = {
-  plan: SubscriptionPlan | LegacySubscriptionPlan
+  plan: SubscriptionPlan
   status: BillingStatus
   currentPeriodEndsAt?: string
 }

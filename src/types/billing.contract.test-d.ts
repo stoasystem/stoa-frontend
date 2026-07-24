@@ -8,6 +8,7 @@ import type {
   PaymentReminder,
   SubscriptionPlan,
 } from '@/types/billing'
+import { pricingPlans } from '@/components/pricing/pricingPlans'
 
 type Equal<Left, Right> =
   (<Value>() => Value extends Left ? 1 : 2) extends
@@ -23,6 +24,12 @@ export type CanonicalSubscriptionPlans = Expect<
 
 export type CanonicalCheckoutOutcomes = Expect<
   Equal<CheckoutPublicOutcome, 'confirming' | 'active' | 'not_completed' | 'support_needed'>
+>
+
+export type PricingCatalogHasFourEntries = Expect<Equal<typeof pricingPlans['length'], 4>>
+
+export type PricingCatalogCoversCanonicalPlans = Expect<
+  Equal<(typeof pricingPlans)[number]['id'], SubscriptionPlan>
 >
 
 export const freeTrialPlan: BillingPlan = {
@@ -114,4 +121,16 @@ export const forbiddenPaymentMethod: MaskedPaymentMethod = {
   ...maskedPaymentMethod,
   // @ts-expect-error payment-capable card data is forbidden
   cvc: '123',
+}
+
+export const forbiddenFullCard: MaskedPaymentMethod = {
+  ...maskedPaymentMethod,
+  // @ts-expect-error full card data is forbidden
+  cardNumber: '4242424242424242',
+}
+
+export const forbiddenProviderSecret: MaskedPaymentMethod = {
+  ...maskedPaymentMethod,
+  // @ts-expect-error provider secrets are forbidden
+  providerSecret: 'secret',
 }

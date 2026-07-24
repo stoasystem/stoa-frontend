@@ -34,7 +34,7 @@
       "cta": "Schüler-Plan wählen",
       "features": ["Lernraum", "Hausaufgaben-Upload", "Elternbereich"]
     },
-    "tutor_supported": {
+    "teacher_supported": {
       "name": "Plan mit Lehrpersonen",
       "audience": "Familien, die wöchentlich begrenzte Lehrpersonenhilfe möchten.",
       "cta": "Plan mit Lehrperson wählen",

@@ -38,8 +38,8 @@ const subscriptionStatusLabels: LabelMap = {
 const subscriptionPlanLabels: LabelMap = {
   free_trial: 'Free trial',
   student: 'Student plan',
+  teacher_supported: 'Teacher-supported plan',
   family: 'Family plan',
-  tutor_supported: 'Teacher-supported plan',
 }
 
 const fileStatusLabels: LabelMap = {

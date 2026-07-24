@@ -3,7 +3,7 @@ import {
   mockBillingPlans,
 } from '@/data/phase11MockData'
 import { getStoredUTM } from '@/lib/utm'
-import type { BillingUsage, FeatureAccess, Subscription, SubscriptionPlan } from '@/types/billing'
+import type { FeatureAccess, Subscription, SubscriptionPlan } from '@/types/billing'
 import type { ParentSubscription, SubscriptionBilling, SubscriptionTier } from '@/types/subscriptionOperations'
 
 export async function getBillingPlans() {
@@ -53,7 +53,7 @@ function mapParentSubscription(subscription: ParentSubscription): Subscription {
   }
 }
 
-function mapBillingUsage(subscription: ParentSubscription): BillingUsage {
+function mapBillingUsage(subscription: ParentSubscription) {
   const entitlement = firstEntitlement(subscription)
   const limit = entitlement?.limits?.dailyAiQuestionLimit ?? planLimit(subscription.currentTier)
   const now = new Date()
@@ -104,13 +104,13 @@ function billingStatusToSubscriptionStatus(billing?: SubscriptionBilling): Subsc
 }
 
 function tierToPlan(tier: SubscriptionTier): SubscriptionPlan {
-  if (tier === 'premium') return 'tutor_supported'
+  if (tier === 'premium') return 'teacher_supported'
   if (tier === 'standard') return 'family'
   return 'free_trial'
 }
 
 function planToTier(plan: SubscriptionPlan): SubscriptionTier {
-  if (plan === 'tutor_supported') return 'premium'
+  if (plan === 'teacher_supported') return 'premium'
   if (plan === 'student' || plan === 'family') return 'standard'
   return 'free'
 }

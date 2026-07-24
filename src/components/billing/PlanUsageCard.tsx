@@ -1,5 +1,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import type { BillingUsage } from '@/types/billing'
+
+type LegacyBillingUsage = {
+  periodStart: string
+  periodEnd: string
+  aiMessagesUsed: number
+  aiMessagesLimit: number
+  fileUploadsUsed: number
+  fileUploadsLimit: number
+  teacherHelpUsed: number
+  teacherHelpLimit: number
+}
 
 function UsageRow({ label, used, limit }: { label: string; used: number; limit: number }) {
   const percent = Math.min(100, Math.round((used / limit) * 100))
@@ -19,7 +29,7 @@ function UsageRow({ label, used, limit }: { label: string; used: number; limit: 
   )
 }
 
-export function PlanUsageCard({ usage }: { usage: BillingUsage }) {
+export function PlanUsageCard({ usage }: { usage: LegacyBillingUsage }) {
   return (
     <Card>
       <CardHeader>

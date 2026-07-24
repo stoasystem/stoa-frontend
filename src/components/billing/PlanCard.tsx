@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { RecommendedPlanBadge } from '@/components/pricing/RecommendedPlanBadge'
-import type { BillingPlan, SubscriptionPlan } from '@/types/billing'
+import type { BillingPlan, PurchasableSubscriptionPlan } from '@/types/billing'
 
 type PlanCardProps = {
   plan: BillingPlan
   featured?: boolean
-  onSelect?: (plan: SubscriptionPlan) => void
+  onSelect?: (plan: PurchasableSubscriptionPlan) => void
 }
 
 export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
@@ -48,7 +48,10 @@ export function PlanCard({ plan, featured, onSelect }: PlanCardProps) {
           type="button"
           className="h-auto min-h-10 w-full whitespace-normal py-2 text-center leading-5"
           variant={featured ? 'default' : 'outline'}
-          onClick={() => onSelect?.(plan.id)}
+          disabled={!plan.purchasable}
+          onClick={() => {
+            if (plan.purchasable) onSelect?.(plan.id)
+          }}
         >
           {t(`plans.${plan.id}.cta`, { defaultValue: plan.cta })}
         </Button>

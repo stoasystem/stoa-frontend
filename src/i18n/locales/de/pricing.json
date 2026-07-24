@@ -32,7 +32,7 @@
         "access": "Erklärungen zu Fragen, Hausaufgaben-Upload, Elternbereich und Wochenberichte enthalten; Lehrpersonen-Q&A ist nicht enthalten."
       },
       {
-        "id": "tutor_supported",
+        "id": "teacher_supported",
         "name": "Plan mit Lehrpersonen",
         "price": "CHF 89",
         "cadence": "pro Monat",

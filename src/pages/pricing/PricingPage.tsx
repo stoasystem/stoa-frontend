@@ -10,7 +10,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { SubscriptionPlan } from '@/types/billing'
+import type { PurchasableSubscriptionPlan } from '@/types/billing'
 
 const familyLearningImageUrl = new URL('../../../img/family-learning.jpeg', import.meta.url).href
 
@@ -32,7 +32,7 @@ export function PricingPage() {
     trackEvent('pricing_page_viewed')
   }, [])
 
-  function selectPlan(plan: SubscriptionPlan) {
+  function selectPlan(plan: PurchasableSubscriptionPlan) {
     trackEvent('pricing_plan_selected', { plan })
     navigate(`/billing?plan=${plan}`)
   }
@@ -142,7 +142,7 @@ export function PricingPage() {
               key={plan.id}
               plan={plan}
               featured={plan.recommended}
-              onSelect={selectPlan}
+              onSelect={plan.purchasable ? selectPlan : undefined}
             />
           ))}
         </section>

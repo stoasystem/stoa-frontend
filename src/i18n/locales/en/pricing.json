@@ -32,7 +32,7 @@
         "access": "Question explanations, homework upload, parent dashboard, and weekly reports included; teacher Q&A is not included."
       },
       {
-        "id": "tutor_supported",
+        "id": "teacher_supported",
         "name": "Teacher-supported plan",
         "price": "CHF 89",
         "cadence": "per month",

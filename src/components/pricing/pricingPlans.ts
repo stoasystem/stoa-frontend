@@ -1,11 +1,13 @@
 import type { BillingPlan } from '@/types/billing'
 
-export const pricingPlans: BillingPlan[] = [
+export const pricingPlans = [
   {
     id: 'free_trial',
     name: 'Free Trial',
     priceMonthly: 0,
     currency: 'CHF',
+    purchasable: false,
+    recommended: false,
     audience: 'Families validating fit during pilot.',
     cta: 'Start free trial',
     features: ['Limited learning questions', 'Parent dashboard', 'Basic learning history'],
@@ -15,15 +17,19 @@ export const pricingPlans: BillingPlan[] = [
     name: 'Student Plan',
     priceMonthly: 29,
     currency: 'CHF',
+    purchasable: true,
+    recommended: false,
     audience: 'A focused learner who needs guided homework help.',
     cta: 'Select student',
     features: ['Question explanations', 'Homework upload', 'Parent dashboard'],
   },
   {
-    id: 'tutor_supported',
+    id: 'teacher_supported',
     name: 'Teacher-supported Plan',
     priceMonthly: 89,
     currency: 'CHF',
+    purchasable: true,
+    recommended: false,
     audience: 'Families who want limited weekly teacher Q&A.',
     cta: 'Select teacher support',
     features: ['Everything in Student', 'Weekly parent report', 'Limited weekly teacher Q&A'],
@@ -33,9 +39,10 @@ export const pricingPlans: BillingPlan[] = [
     name: 'Family Plan',
     priceMonthly: 149,
     currency: 'CHF',
+    purchasable: true,
     recommended: true,
     audience: 'Families who want the highest support level and shared access.',
     cta: 'Select family',
     features: ['Everything in Teacher-supported', '5x more teacher Q&A time', 'Shared benefits for up to 3 people'],
   },
-]
+] satisfies [BillingPlan, BillingPlan, BillingPlan, BillingPlan]
