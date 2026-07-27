@@ -20,7 +20,7 @@ export const pricingPlans: BillingPlan[] = [
     features: ['Question explanations', 'Homework upload', 'Parent dashboard'],
   },
   {
-    id: 'tutor_supported',
+    id: 'teacher_supported',
     name: 'Teacher-supported Plan',
     priceMonthly: 89,
     currency: 'CHF',

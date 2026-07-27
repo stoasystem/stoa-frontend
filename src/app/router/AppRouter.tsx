@@ -15,13 +15,13 @@ import { AdminReportOperationsPage } from '@/pages/admin/ReportOperationsPage'
 import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
 import { AdminSupportTicketsPage } from '@/pages/admin/AdminSupportTicketsPage'
 import { AdminSubscriptionRequestsPage } from '@/pages/admin/AdminSubscriptionRequestsPage'
+import { AdminBillingCheckoutPage } from '@/pages/admin/AdminBillingCheckoutPage'
 import { AdminUsagePage } from '@/pages/admin/Usage'
 import { AdvancedAnalyticsPage } from '@/pages/admin/AdvancedAnalyticsPage'
 import { RetentionPage } from '@/pages/admin/RetentionPage'
 import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
 import { PaymentSettingsPage } from '@/pages/billing/PaymentSettingsPage'
-import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ChatPage } from '@/pages/chat/ChatPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
 import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
@@ -126,11 +126,7 @@ export function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/billing/payment-settings" element={<PaymentSettingsPage />} />
-          <Route path="/billing/checkout/demo" element={<VirtualCheckoutPage />} />
-          <Route path="/billing/checkout/success" element={<CheckoutResultPage status="success" />} />
-          <Route path="/billing/checkout/cancel" element={<CheckoutResultPage status="cancel" />} />
-          <Route path="/billing/success" element={<CheckoutResultPage status="success" />} />
-          <Route path="/billing/cancelled" element={<CheckoutResultPage status="cancel" />} />
+          <Route path="/billing/checkout/result" element={<CheckoutResultPage />} />
           <Route path="/referrals" element={<ReferralsPage />} />
           <Route path="/support/tickets" element={<SupportTicketsPage />} />
           <Route path="/support/tickets/:ticketId" element={<SupportTicketDetailPage />} />
@@ -232,6 +228,10 @@ export function AppRouter() {
                   title="Billing interest"
                 />
               }
+            />
+            <Route
+              path="/admin/billing/checkout-recovery"
+              element={<AdminBillingCheckoutPage />}
             />
             <Route
               path="/admin/system"

@@ -21,7 +21,9 @@ import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
 import { enablePayment, showCheckoutPreview } from '@/lib/env'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { SubscriptionPlan } from '@/types/billing'
+import type { PurchasablePlan, SubscriptionPlan } from '@/types/billing'
+
+const PURCHASABLE_PLANS: SubscriptionPlan[] = ['student', 'teacher_supported', 'family']
 
 function isSubscriptionPlan(plan: string | null): plan is SubscriptionPlan {
   return ['free_trial', 'student', 'family', 'tutor_supported'].includes(plan ?? '')
@@ -31,7 +33,10 @@ export function BillingPage() {
   const { t } = useTranslation(['billing', 'common'])
   const [searchParams] = useSearchParams()
   const requestedPlan = searchParams.get('plan')
-  const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
+  const rawPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
+  const selectedPlan: PurchasablePlan = PURCHASABLE_PLANS.includes(rawPlan)
+    ? (rawPlan as PurchasablePlan)
+    : 'family'
   const plansQuery = useBillingPlansQuery()
   const usageQuery = useBillingUsageQuery()
   const featureAccessQuery = useFeatureAccessQuery()

@@ -13,6 +13,7 @@ export type SubscriptionPlan =
   | 'free_trial'
   | 'student'
   | 'family'
+  | 'teacher_supported'
   | 'tutor_supported'
 
 export type LegacySubscriptionPlan = 'pilot' | 'school' | 'enterprise'

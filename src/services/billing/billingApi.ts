@@ -1,13 +1,18 @@
 import { httpClient } from '@/services/api/httpClient'
-import {
-  mockBillingPlans,
-} from '@/data/phase11MockData'
-import { getStoredUTM } from '@/lib/utm'
-import type { BillingUsage, FeatureAccess, Subscription, SubscriptionPlan } from '@/types/billing'
+import type {
+  BillingUsage,
+  CheckoutCommandResponse,
+  CheckoutStatusResponse,
+  FeatureAccess,
+  PurchasablePlan,
+  Subscription,
+} from '@/types/billing'
 import type { ParentSubscription, SubscriptionBilling, SubscriptionTier } from '@/types/subscriptionOperations'
+import type { SubscriptionPlan } from '@/types/user'
 
 export async function getBillingPlans() {
-  return { items: mockBillingPlans }
+  const { pricingPlans } = await import('@/components/pricing/pricingPlans')
+  return { items: pricingPlans }
 }
 
 export async function getSubscription() {
@@ -25,22 +30,51 @@ export async function getFeatureAccess() {
   return mapFeatureAccess(response.data)
 }
 
-export async function createCheckoutSession(plan: SubscriptionPlan) {
-  const requestedTier = planToTier(plan)
-  if (requestedTier === 'free') {
-    throw new Error('Checkout is only available for paid plans.')
-  }
-  const response = await httpClient.post<{ checkoutUrl: string }>(
+/**
+ * Create or resume a durable sandbox checkout command.
+ * The Idempotency-Key prevents double-charges on retry.
+ * beneficiaryIds must contain the student(s) who benefit from the plan.
+ */
+export async function createCheckoutSession(
+  plan: PurchasablePlan,
+  beneficiaryIds: string[],
+  idempotencyKey: string,
+): Promise<CheckoutCommandResponse> {
+  const response = await httpClient.post<CheckoutCommandResponse>(
     '/parents/me/subscription/checkout',
     {
-      requested_tier: requestedTier,
-      success_url: `${window.location.origin}/billing/checkout/success?plan=${plan}`,
-      cancel_url: `${window.location.origin}/billing/checkout/cancel?plan=${plan}`,
-      utm: getStoredUTM(),
+      plan,
+      beneficiaryIds,
+    },
+    {
+      headers: { 'Idempotency-Key': idempotencyKey },
     },
   )
   return response.data
 }
+
+/**
+ * Poll the authoritative status of an existing checkout command.
+ */
+export async function getCheckoutStatus(checkoutRef: string): Promise<CheckoutStatusResponse> {
+  const response = await httpClient.get<CheckoutStatusResponse>(
+    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}`,
+  )
+  return response.data
+}
+
+/**
+ * Trigger a provider-side reconciliation and return the updated status.
+ */
+export async function recheckCheckout(checkoutRef: string): Promise<CheckoutStatusResponse> {
+  const response = await httpClient.post<CheckoutStatusResponse>(
+    `/parents/me/subscription/checkout/${encodeURIComponent(checkoutRef)}/recheck`,
+    {},
+  )
+  return response.data
+}
+
+// ─── mapping helpers ──────────────────────────────────────────────────────────
 
 function mapParentSubscription(subscription: ParentSubscription): Subscription {
   const billing = subscription.billing
@@ -58,16 +92,19 @@ function mapBillingUsage(subscription: ParentSubscription): BillingUsage {
   const limit = entitlement?.limits?.dailyAiQuestionLimit ?? planLimit(subscription.currentTier)
   const now = new Date()
   const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-  const periodEnd = entitlement?.period?.end ?? new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString()
+  const periodEnd =
+    entitlement?.period?.end ?? new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString()
   return {
     periodStart,
     periodEnd,
     aiMessagesUsed: 0,
     aiMessagesLimit: limit,
     fileUploadsUsed: 0,
-    fileUploadsLimit: entitlement?.effectivePlan === 'premium' ? 50 : entitlement?.effectivePlan === 'standard' ? 10 : 0,
+    fileUploadsLimit:
+      entitlement?.effectivePlan === 'premium' ? 50 : entitlement?.effectivePlan === 'standard' ? 10 : 0,
     teacherHelpUsed: 0,
-    teacherHelpLimit: entitlement?.effectivePlan === 'premium' ? 20 : entitlement?.effectivePlan === 'standard' ? 5 : 0,
+    teacherHelpLimit:
+      entitlement?.effectivePlan === 'premium' ? 20 : entitlement?.effectivePlan === 'standard' ? 5 : 0,
   }
 }
 
@@ -75,7 +112,10 @@ function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
   const entitlement = firstEntitlement(subscription)
   const plan = entitlement?.effectivePlan ?? subscription.currentTier
   const billing = subscription.billing
-  const blocked = Boolean(entitlement?.blockingReason || ['payment_failed', 'past_due', 'canceled'].includes(billing?.status ?? ''))
+  const blocked = Boolean(
+    entitlement?.blockingReason ||
+      ['payment_failed', 'past_due', 'canceled'].includes(billing?.status ?? ''),
+  )
   return {
     canUseChat: !blocked,
     canUploadFiles: !blocked && plan !== 'free',
@@ -83,9 +123,15 @@ function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
     canViewParentReports: !blocked && plan !== 'free',
     reason: blocked
       ? {
-          teacherHelp: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
-          fileUploads: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
-          parentReports: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
+          teacherHelp:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
+          fileUploads:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
+          parentReports:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
         }
       : undefined,
   }
@@ -104,15 +150,9 @@ function billingStatusToSubscriptionStatus(billing?: SubscriptionBilling): Subsc
 }
 
 function tierToPlan(tier: SubscriptionTier): SubscriptionPlan {
-  if (tier === 'premium') return 'tutor_supported'
+  if (tier === 'premium') return 'teacher_supported'
   if (tier === 'standard') return 'family'
   return 'free_trial'
-}
-
-function planToTier(plan: SubscriptionPlan): SubscriptionTier {
-  if (plan === 'tutor_supported') return 'premium'
-  if (plan === 'student' || plan === 'family') return 'standard'
-  return 'free'
 }
 
 function planLimit(tier: SubscriptionTier) {
