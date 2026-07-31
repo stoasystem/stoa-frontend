@@ -1,0 +1,147 @@
+name: Frontend Staging Eligibility
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend_sha:
+        description: Exact backend commit SHA containing the receipted transaction
+        required: true
+        type: string
+      frontend_sha:
+        description: Exact frontend commit SHA
+        required: true
+        type: string
+      transaction_path:
+        description: Exact staging transaction receipt path below receipts/staging
+        required: true
+        type: string
+      transaction_sha256:
+        description: SHA-256 of the exact staging transaction receipt bytes
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  UV_PYTHON_DOWNLOADS: never
+
+jobs:
+  verify:
+    name: Verify exact frontend release identities
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Validate immutable source and receipt identities
+        shell: bash
+        env:
+          BACKEND_SHA: ${{ inputs.backend_sha }}
+          FRONTEND_SHA: ${{ inputs.frontend_sha }}
+          TRANSACTION_PATH: ${{ inputs.transaction_path }}
+          TRANSACTION_SHA256: ${{ inputs.transaction_sha256 }}
+          WORKFLOW_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          sha_pattern='^[0-9a-f]{40}$'
+          digest_pattern='^[0-9a-f]{64}$'
+          for sha in "$BACKEND_SHA" "$FRONTEND_SHA" "$WORKFLOW_SHA"; do
+            [[ "$sha" =~ $sha_pattern ]] || exit 1
+          done
+          [[ "$FRONTEND_SHA" == "$WORKFLOW_SHA" ]] || exit 1
+          [[ "$TRANSACTION_SHA256" =~ $digest_pattern ]] || exit 1
+          [[ "$TRANSACTION_PATH" =~ ^receipts/staging/[A-Za-z0-9][A-Za-z0-9._/-]{0,240}\.json$ ]] || exit 1
+          [[ "$TRANSACTION_PATH" != *".."* ]] || exit 1
+
+      - name: Check out backend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: stoasystem/stoa-backend
+          ref: ${{ inputs.backend_sha }}
+          path: stoa-backend
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: stoasystem/stoa-frontend
+          ref: ${{ inputs.frontend_sha }}
+          path: stoa-frontend
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: 3.12.13
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        with:
+          version: 0.11.16
+          enable-cache: false
+
+      - name: Verify checkout identities
+        shell: bash
+        env:
+          BACKEND_SHA: ${{ inputs.backend_sha }}
+          FRONTEND_SHA: ${{ inputs.frontend_sha }}
+        run: |
+          set -euo pipefail
+          test "$(git -C "$GITHUB_WORKSPACE/stoa-backend" rev-parse HEAD)" = "$BACKEND_SHA"
+          test "$(git -C "$GITHUB_WORKSPACE/stoa-frontend" rev-parse HEAD)" = "$FRONTEND_SHA"
+
+      - name: Create private delivery evidence directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          evidence_dir="$(mktemp -d "$RUNNER_TEMP/stoa-frontend-delivery.XXXXXX")"
+          chmod 0700 "$evidence_dir"
+          test "$(stat -c %a "$evidence_dir")" = "700"
+          printf 'EVIDENCE_DIR=%s\n' "$evidence_dir" >> "$GITHUB_ENV"
+
+      - name: Validate the canonical staging transaction
+        working-directory: stoa-backend
+        shell: bash
+        env:
+          TRANSACTION_PATH: ${{ inputs.transaction_path }}
+          TRANSACTION_SHA256: ${{ inputs.transaction_sha256 }}
+        run: |
+          set -euo pipefail
+          transaction="$GITHUB_WORKSPACE/stoa-backend/$TRANSACTION_PATH"
+          test -f "$transaction"
+          test ! -L "$transaction"
+          test "$(sha256sum "$transaction" | cut -d " " -f 1)" = "$TRANSACTION_SHA256"
+          python scripts/release_gate.py delivery-validate \
+            --transaction "$transaction" \
+            --output "$EVIDENCE_DIR/delivery-validation.json"
+
+  staging:
+    name: Protected staging eligibility boundary
+    needs: [verify]
+    environment: staging
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Retain backend-owned staging authority boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' 'staging-authority=backend-owned'
+
+  production_not_run:
+    name: Record production operations as not run
+    needs: [verify]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Emit exact production obligations
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s\n' \
+            'production-infrastructure=NOT RUN' \
+            'production-deploy=NOT RUN' \
+            'production-smoke=NOT RUN' \
+            'production-rollback=NOT RUN'
