@@ -226,7 +226,10 @@ function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
   const entitlement = firstEntitlement(subscription)
   const plan = entitlement?.effectivePlan ?? subscription.currentTier
   const billing = subscription.billing
-  const blocked = Boolean(entitlement?.blockingReason || ['payment_failed', 'past_due', 'canceled'].includes(billing?.status ?? ''))
+  const blocked = Boolean(
+    entitlement?.blockingReason ||
+      ['payment_failed', 'past_due', 'canceled'].includes(billing?.status ?? ''),
+  )
   return {
     canUseChat: !blocked,
     canUploadFiles: !blocked && plan !== 'free',
@@ -234,9 +237,15 @@ function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
     canViewParentReports: !blocked && plan !== 'free',
     reason: blocked
       ? {
-          teacherHelp: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
-          fileUploads: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
-          parentReports: entitlement?.supportExplanation ?? 'Billing needs attention before this feature is available.',
+          teacherHelp:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
+          fileUploads:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
+          parentReports:
+            entitlement?.supportExplanation ??
+            'Billing needs attention before this feature is available.',
         }
       : undefined,
   }

@@ -195,3 +195,27 @@ export type FeatureAccess = {
   canViewParentReports: boolean
   reason?: Record<string, string>
 }
+
+/** Outcome states returned by the backend checkout status API. */
+export type CheckoutOutcome = 'confirming' | 'active' | 'not_completed' | 'support_needed'
+
+export type CheckoutCommandResponse = {
+  checkoutRef: string
+  commandState: string
+  checkoutSessionId: string
+  checkoutUrl: string
+  safeActions: string[]
+  targetPlan: PurchasablePlan
+  beneficiaries: string[]
+}
+
+export type CheckoutStatusResponse = {
+  checkoutRef: string
+  outcome: CheckoutOutcome
+  newCheckoutAllowed: boolean
+  safeActions: string[]
+  targetPlan: PurchasablePlan
+  beneficiaries: string[]
+  effectivePlan: PurchasablePlan | null
+  lastRecheckedAt: string
+}

@@ -15,6 +15,7 @@ import { AdminReportOperationsPage } from '@/pages/admin/ReportOperationsPage'
 import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
 import { AdminSupportTicketsPage } from '@/pages/admin/AdminSupportTicketsPage'
 import { AdminSubscriptionRequestsPage } from '@/pages/admin/AdminSubscriptionRequestsPage'
+import { AdminBillingCheckoutPage } from '@/pages/admin/AdminBillingCheckoutPage'
 import { AdminUsagePage } from '@/pages/admin/Usage'
 import { AdvancedAnalyticsPage } from '@/pages/admin/AdvancedAnalyticsPage'
 import { RetentionPage } from '@/pages/admin/RetentionPage'
@@ -227,6 +228,10 @@ export function AppRouter() {
                   title="Billing interest"
                 />
               }
+            />
+            <Route
+              path="/admin/billing/checkout-recovery"
+              element={<AdminBillingCheckoutPage />}
             />
             <Route
               path="/admin/system"
