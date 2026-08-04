@@ -1,14 +1,12 @@
 import { Button } from '@/components/ui/button'
 import { useCreateCheckoutSessionMutation } from '@/hooks/billing/useCreateCheckoutSessionMutation'
-import type { PurchasablePlan } from '@/types/billing'
+import type { SubscriptionPlan } from '@/types/user'
 
 export function UpgradeButton({
   plan,
-  beneficiaryIds = [],
   children = 'Upgrade',
 }: {
-  plan: PurchasablePlan
-  beneficiaryIds?: string[]
+  plan: SubscriptionPlan
   children?: string
 }) {
   const checkoutMutation = useCreateCheckoutSessionMutation()
@@ -19,7 +17,7 @@ export function UpgradeButton({
       disabled={checkoutMutation.isPending}
       onClick={() => {
         if (checkoutMutation.isPending) return
-        checkoutMutation.mutate({ plan, beneficiaryIds })
+        checkoutMutation.mutate(plan)
       }}
     >
       {checkoutMutation.isPending ? 'Starting checkout...' : children}

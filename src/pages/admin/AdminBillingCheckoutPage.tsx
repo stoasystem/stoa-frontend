@@ -10,9 +10,9 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { getAdminCheckoutDetail, recheckAdminCheckout } from '@/services/admin/adminBillingApi'
-import type { CheckoutOutcome } from '@/types/billing'
+import type { CheckoutPublicOutcome } from '@/types/billing'
 
-function outcomeBadge(outcome: CheckoutOutcome) {
+function outcomeBadge(outcome: CheckoutPublicOutcome) {
   switch (outcome) {
     case 'active':
       return (

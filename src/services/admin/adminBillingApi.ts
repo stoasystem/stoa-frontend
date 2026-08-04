@@ -1,5 +1,5 @@
 import { httpClient } from '@/services/api/httpClient'
-import type { CheckoutStatusResponse } from '@/types/billing'
+import type { CheckoutStatusResponse } from '@/services/billing/billingApi'
 
 export type AdminCheckoutDetail = CheckoutStatusResponse & {
   billingState?: string

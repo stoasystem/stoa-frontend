@@ -1,17 +1,9 @@
 import { CreditCard } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCreateCheckoutSessionMutation } from '@/hooks/billing/useCreateCheckoutSessionMutation'
-import type { PurchasablePlan } from '@/types/billing'
+import type { SubscriptionPlan } from '@/types/billing'
 
-export function CheckoutButton({
-  plan,
-  beneficiaryIds = [],
-  label = 'Start checkout',
-}: {
-  plan: PurchasablePlan
-  beneficiaryIds?: string[]
-  label?: string
-}) {
+export function CheckoutButton({ plan, label = 'Start checkout' }: { plan: SubscriptionPlan; label?: string }) {
   const checkoutMutation = useCreateCheckoutSessionMutation()
 
   return (
@@ -20,7 +12,7 @@ export function CheckoutButton({
       disabled={checkoutMutation.isPending}
       onClick={() => {
         if (checkoutMutation.isPending) return
-        checkoutMutation.mutate({ plan, beneficiaryIds })
+        checkoutMutation.mutate(plan)
       }}
       className="gap-2"
     >

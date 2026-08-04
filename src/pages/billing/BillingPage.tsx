@@ -31,10 +31,7 @@ export function BillingPage() {
   const { t } = useTranslation(['billing', 'common'])
   const [searchParams] = useSearchParams()
   const requestedPlan = searchParams.get('plan')
-  const rawPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
-  const selectedPlan: PurchasablePlan = PURCHASABLE_PLANS.includes(rawPlan)
-    ? (rawPlan as PurchasablePlan)
-    : 'family'
+  const selectedPlan = isSubscriptionPlan(requestedPlan) ? requestedPlan : 'family'
   const plansQuery = useBillingPlansQuery()
   const usageQuery = useBillingUsageQuery()
   const featureAccessQuery = useFeatureAccessQuery()

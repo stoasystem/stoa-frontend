@@ -10,18 +10,7 @@ import {
   type CheckoutSelection,
 } from '@/services/billing/billingApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { PurchasablePlan } from '@/types/billing'
-
-function generateIdempotencyKey(): string {
-  const array = new Uint8Array(18)
-  crypto.getRandomValues(array)
-  return Array.from(array, (b) => b.toString(16).padStart(2, '0')).join('')
-}
-
-export type CreateCheckoutInput = {
-  plan: PurchasablePlan
-  beneficiaryIds: string[]
-}
+import type { SubscriptionPlan } from '@/types/billing'
 
 export const checkoutIdentityHeader = 'Idempotency-Key' as const
 
