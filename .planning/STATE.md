@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v9
 milestone_name: Home V2 Final Issue Cleanup
 status: complete
-last_updated: "2026-07-07T19:40:00+02:00"
-last_activity: 2026-07-07
+last_updated: "2026-08-04T09:45:52+02:00"
+last_activity: 2026-08-04
 progress:
   total_phases: 6
   completed_phases: 6
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-07-07)
 Phase: 303 Final Readiness Decision
 Plan: 303-PLAN.md
 Status: Complete
-Last activity: 2026-07-07 - v9 completed
+Last activity: 2026-08-04 - Completed quick task 260804-dex: merge codex branch into main and synchronize stoa-infra with GitHub
 
 ## Performance Metrics
 
@@ -78,6 +78,7 @@ Last activity: 2026-07-07 - v9 completed
 
 | Date | Task | Outcome |
 |------|------|---------|
+| 2026-08-04 | Merge codex branch into main and synchronize stoa-infra with GitHub | Merged both divergent histories without force-pushing, preserved the durable checkout and immutable-alias contracts, and verified frontend lint/build/release tests plus 12 infra topology tests. |
 | 2026-07-08 | Home V2 background contrast and section spacing | Strengthened the SVG background flow overlay and tightened Learning Thread, Parent Confidence, and Trust section spacing, then verified lint, build, CSS sampling, layout sampling, and overflow. |
 | 2026-07-08 | Home V2 background flow visibility fix | Removed repeated linear texture layers that read as static vertical lines, leaving the SVG guide-line flow and verifying lint, build, CSS sampling, scroll transform changes, and overflow. |
 | 2026-07-08 | Home V2 stronger guided stream background flow | Increased the scroll-driven background drift amplitude and changed the path from straight diagonal movement into a guided stream-like meander, then verified lint, build, transform deltas, and overflow. |
