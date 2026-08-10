@@ -117,17 +117,52 @@ const identityHandlers = [
 // ── Adaptive learning handlers ────────────────────────────────────────────
 
 const learningHandlers = [
+  // Shape mirrors adaptive_learning_service._memory_response (camelCase).
   http.get(`${BASE}/students/me/memory`, () =>
     HttpResponse.json({
-      snapshots: [
-        { student_id: 'mock-user', subject: 'math', topic_id: 'fractions', weak_topics: ['fractions'], struggling_concepts: ['fractions'], mastered_concepts: [], strengths: [], count: 4, confidence: 'low' },
-        { student_id: 'mock-user', subject: 'math', topic_id: 'quadratic_equations', weak_topics: ['quadratic_equations'], struggling_concepts: [], mastered_concepts: [], strengths: [], count: 2, confidence: 'medium' },
-        { student_id: 'mock-user', subject: 'german', topic_id: 'grammar_dative', weak_topics: ['grammar_dative'], struggling_concepts: [], mastered_concepts: [], strengths: [], count: 3, confidence: 'low' },
+      studentId: 'mock-user',
+      roleView: 'student',
+      subjects: [{ id: 'math', label: 'Mathematics', rolloutState: 'active' }],
+      weakTopics: [
+        { subject: 'math', topicId: 'fractions', label: 'Fractions', count: 5, latestEvidenceAt: null, evidenceQuestionIds: [] },
+        { subject: 'math', topicId: 'quadratic_equations', label: 'Quadratic equations', count: 2, latestEvidenceAt: null, evidenceQuestionIds: [] },
+        { subject: 'german', topicId: 'grammar_dative', label: 'Dative case', count: 3, latestEvidenceAt: null, evidenceQuestionIds: [] },
       ],
-      generated_snapshots: [],
-      stored_snapshots: [],
-      profile: {},
-      recommendations: [],
+      strengthTopics: [],
+      memorySnapshots: [],
+      recommendations: [
+        {
+          candidateId: 'remediation:math:fractions',
+          type: 'remediation',
+          sourceType: 'memory_snapshot',
+          sourceId: 'math:fractions',
+          subject: 'math',
+          topicId: 'fractions',
+          label: 'Review fractions',
+          rationale: 'You asked 5 questions about fractions in the last two weeks.',
+          confidence: 'high',
+          freshness: { status: 'fresh', lastEvidenceAt: null, source: 'adaptive_sequencing' },
+          reviewRequired: true,
+          reviewFlags: [],
+        },
+        {
+          candidateId: 'remediation:german:grammar_dative',
+          type: 'remediation',
+          sourceType: 'memory_snapshot',
+          sourceId: 'german:grammar_dative',
+          subject: 'german',
+          topicId: 'grammar_dative',
+          label: 'Practise the dative case',
+          rationale: 'Recent mistakes cluster around dative endings.',
+          confidence: 'medium',
+          freshness: { status: 'fresh', lastEvidenceAt: null, source: 'adaptive_sequencing' },
+          reviewRequired: true,
+          reviewFlags: [],
+        },
+      ],
+      sequencingSummary: {},
+      freshness: {},
+      updatedAt: new Date().toISOString(),
     })
   ),
   http.get(`${BASE}/learning/memory`, () =>

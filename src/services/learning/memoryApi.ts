@@ -1,29 +1,42 @@
 import { httpClient } from '@/services/api/httpClient'
 
-export interface MemorySnapshot {
-  student_id: string
+/** A topic the student has repeatedly struggled with. */
+export interface MemoryWeakTopic {
   subject: string
-  topic_id: string
-  weak_topics: string[]
-  struggling_concepts: string[]
-  mastered_concepts: string[]
-  strengths: string[]
+  topicId: string
+  label: string
   count: number
-  confidence?: string
-  last_seen_at?: string
+  latestEvidenceAt: string | null
+  evidenceQuestionIds: string[]
+}
+
+/** A ranked next-practice suggestion produced by the sequencing engine. */
+export interface MemoryRecommendation {
+  candidateId: string
+  type: string
+  sourceType: string
+  sourceId: string
+  subject: string
+  topicId: string
+  label: string
+  rationale: string
+  confidence: 'high' | 'medium' | 'low'
+  freshness: { status: string; lastEvidenceAt: string | null; source: string }
+  reviewRequired: boolean
+  reviewFlags: string[]
 }
 
 export interface MemorySummaryResponse {
-  snapshots: MemorySnapshot[]
-  generated_snapshots: MemorySnapshot[]
-  stored_snapshots: MemorySnapshot[]
-  profile: Record<string, unknown>
-  recommendations: Array<{
-    topic_id: string
-    subject: string
-    confidence?: string
-    reason?: string
-  }>
+  studentId: string
+  roleView: string
+  subjects: Array<{ id: string; label: string; rolloutState: string }>
+  weakTopics: MemoryWeakTopic[]
+  strengthTopics: unknown[]
+  memorySnapshots: unknown[]
+  recommendations: MemoryRecommendation[]
+  sequencingSummary: Record<string, unknown>
+  freshness: Record<string, unknown>
+  updatedAt: string
 }
 
 export async function getMyMemorySummary(subject?: string): Promise<MemorySummaryResponse> {

@@ -1,6 +1,6 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
+import { Skeleton } from '@/components/common/Skeleton'
 import { AlertCircle } from 'lucide-react'
 import type { WeakTopic } from '@/types/dashboard'
 

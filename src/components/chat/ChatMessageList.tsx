@@ -2,8 +2,22 @@ import { useEffect, useRef } from 'react'
 import { Lightbulb } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble'
+import { FollowUpSuggestions } from '@/components/chat/FollowUpSuggestions'
 import { EmptyState } from '@/components/common/EmptyState'
 import type { ChatMessage } from '@/types/chat'
+
+/**
+ * Index of the last assistant message that finished generating, or -1.
+ * Follow-up chips are only offered under that message.
+ */
+function lastCompletedAssistantIndex(messages: ChatMessage[]): number {
+  for (let i = messages.length - 1; i >= 0; i -= 1) {
+    const message = messages[i]
+    if (message.role !== 'assistant') continue
+    return message.status === 'streaming' || message.status === 'failed' ? -1 : i
+  }
+  return -1
+}
 
 export function ChatMessageList({
   messages,
@@ -13,6 +27,8 @@ export function ChatMessageList({
   isRequestingTeacher,
   teacherFeedback,
   moderationTargetId,
+  onFollowUp,
+  isFollowUpDisabled,
 }: {
   messages: ChatMessage[]
   isAssistantThinking?: boolean
@@ -21,8 +37,11 @@ export function ChatMessageList({
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
   moderationTargetId?: string | null
+  onFollowUp?: (prompt: string) => void
+  isFollowUpDisabled?: boolean
 }) {
   const { t } = useTranslation('chat')
+  const followUpAnchorIndex = lastCompletedAssistantIndex(messages)
   const bottomRef = useRef<HTMLDivElement>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const prevMessageCountRef = useRef(messages.length)
@@ -75,16 +94,20 @@ export function ChatMessageList({
             <EmptyState title={t('emptyTitle')} description={t('emptyDescription')} />
           </div>
         ) : (
-          messages.map((message) => (
-            <ChatMessageBubble
-              key={message.id}
-              message={message}
-              onRetry={onRetryMessage}
-              onRequestTeacher={onRequestTeacher}
-              isRequestingTeacher={isRequestingTeacher}
-              teacherFeedback={teacherFeedback}
-              moderationTargetId={moderationTargetId}
-            />
+          messages.map((message, index) => (
+            <div key={message.id}>
+              <ChatMessageBubble
+                message={message}
+                onRetry={onRetryMessage}
+                onRequestTeacher={onRequestTeacher}
+                isRequestingTeacher={isRequestingTeacher}
+                teacherFeedback={teacherFeedback}
+                moderationTargetId={moderationTargetId}
+              />
+              {onFollowUp && index === followUpAnchorIndex && (
+                <FollowUpSuggestions onSelect={onFollowUp} disabled={isFollowUpDisabled} />
+              )}
+            </div>
           ))
         )}
         {isAssistantThinking && (

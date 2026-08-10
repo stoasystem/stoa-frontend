@@ -10,6 +10,7 @@ import { ClassroomDashboardCard } from '@/features/live-classroom/components/Cla
 import { LearningProgressCard } from '@/components/dashboard/LearningProgressCard'
 import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
 import { QuestionBankCard } from '@/components/dashboard/QuestionBankCard'
+import { RecommendedPracticeCard } from '@/components/dashboard/RecommendedPracticeCard'
 import { StudentPlanAccessSection } from '@/components/dashboard/StudentPlanAccessSection'
 import { TeacherFeedbackCard } from '@/components/dashboard/TeacherFeedbackCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
@@ -22,11 +23,13 @@ import {
   recentQuestions,
   teacherFeedback,
 } from '@/data/mockDashboard'
-import { useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
+import { useRecommendationsQuery, useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function StudentDashboardPage() {
+  // Both hooks share one query key, so this is a single network request.
   const weakTopicsQuery = useWeakTopicsQuery()
+  const recommendationsQuery = useRecommendationsQuery()
   return (
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
@@ -70,6 +73,11 @@ export function StudentDashboardPage() {
             title="Today's Practice"
             description="Choose targeted exercises or review questions you missed before."
           />
+          <RecommendedPracticeCard
+            recommendations={recommendationsQuery.recommendations}
+            isLoading={recommendationsQuery.isLoading}
+            isError={recommendationsQuery.isError}
+          />
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <QuestionBankCard />
             <MistakesReviewCard />
@@ -105,7 +113,7 @@ export function StudentDashboardPage() {
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
                 <LearningProgressCard progress={learningProgress} />
                 <WeakTopicsCard
-                  topics={weakTopicsQuery.data ?? []}
+                  topics={weakTopicsQuery.topics}
                   isLoading={weakTopicsQuery.isLoading}
                   isError={weakTopicsQuery.isError}
                 />

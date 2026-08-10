@@ -223,6 +223,13 @@ export function ChatPage() {
     void sendStreamingMessage(payload)
   }
 
+  function handleFollowUp(prompt: string) {
+    if (!activeConversationId || isStreaming) return
+
+    setSendError(null)
+    void sendStreamingMessage({ content: prompt })
+  }
+
   function handleRequestTeacherHelp() {
     if (!activeConversationId || teacherHelpMutation.isPending) return
 
@@ -445,6 +452,8 @@ export function ChatPage() {
                   : null)
               }
               moderationTargetId={activeConversationId}
+              onFollowUp={handleFollowUp}
+              isFollowUpDisabled={isStreaming}
             />
             {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
               <TeacherVideoEscalationCard
