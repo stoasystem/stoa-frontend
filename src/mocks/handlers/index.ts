@@ -1,13 +1,10 @@
 /**
- * MSW request handlers for local development.
+ * MSW request handlers mirroring the most frequently used API routes.
  *
- * These mock the most frequently used API routes so the frontend can
- * be developed and demoed without a live backend.  The stubs are
- * intentionally minimal — they return just enough shape for the UI to
- * render without crashing.
- *
- * ⚠  NEVER import this file in production code.  It is only referenced
- *    from src/mocks/browser.ts which is only loaded when VITE_ENABLE_MSW=true.
+ * Consumed by the vitest suite (see tests/mswServer.ts). They are deliberately
+ * not wired into the browser bundle: main.tsx and src/lib/env.ts must take all
+ * runtime truth from runtime-config.json, and a build-time mock switch there
+ * breaks the release gate in tests/release/runtime-startup-barrier.test.mjs.
  */
 import { http, HttpResponse } from 'msw'
 

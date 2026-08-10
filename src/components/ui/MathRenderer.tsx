@@ -45,6 +45,18 @@ export function parseSegments(text: string): MathSegment[] {
   return segments
 }
 
+const HTML_ENTITIES: Record<string, string> = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, (char) => HTML_ENTITIES[char])
+}
+
 function renderKatex(expression: string, displayMode: boolean): string {
   try {
     return katex.renderToString(expression, {
@@ -53,7 +65,9 @@ function renderKatex(expression: string, displayMode: boolean): string {
       strict: 'warn',
     })
   } catch {
-    return `<span class="math-error">${expression}</span>`
+    // This string is fed to dangerouslySetInnerHTML, and the expression comes
+    // from model output, so it must be escaped before being shown verbatim.
+    return `<span class="math-error">${escapeHtml(expression)}</span>`
   }
 }
 
