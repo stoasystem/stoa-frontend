@@ -4,6 +4,7 @@ import { LearningResponseFeedback } from '@/components/chat/LearningResponseFeed
 import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { useTranslation } from 'react-i18next'
 
 function formatMessageTime(value: string) {
@@ -85,7 +86,11 @@ export function ChatMessageBubble({
             {roleLabel}
           </div>
         )}
-        <div className="whitespace-pre-wrap break-words">{message.content}</div>
+        <div className="whitespace-pre-wrap break-words">
+          {message.role === 'assistant'
+            ? <MathRenderer>{message.content}</MathRenderer>
+            : message.content}
+        </div>
         {message.attachments && message.attachments.length > 0 && (
           <div className="mt-3 grid gap-2">
             {message.attachments.map((attachment) => (

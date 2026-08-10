@@ -8,7 +8,8 @@ const runtimeConfig = getRuntimeConfig()
 export const appEnv: AppEnv = runtimeConfig.environment
 export const apiMode: ApiMode = appEnv === 'production' ? 'production' : 'staging'
 export const apiBaseUrl: string = runtimeConfig.api.origin
-export const enableMSW: boolean = false
+export const enableMSW: boolean =
+  import.meta.env?.VITE_ENABLE_MSW === 'true'
 
 export const isDevelopment: boolean = false
 export const isStaging: boolean = appEnv === 'staging' || appEnv === 'staging-pilot'
