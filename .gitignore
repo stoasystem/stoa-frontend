@@ -18,3 +18,6 @@ backend/uploads/
 backend/__pycache__/
 backend/app/__pycache__/
 demo-harness/logs/
+
+# 规划文件（本地归档，不进入代码库）
+.planning/

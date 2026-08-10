@@ -1,7 +1,6 @@
 export const routeGroups = {
   public: [
     '/',
-    '/home-v2',
     '/login',
     '/register',
     '/forgot-password',

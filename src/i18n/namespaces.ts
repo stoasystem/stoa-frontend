@@ -1,6 +1,5 @@
 export const namespaces = [
   'common',
-  'home',
   'homeV2',
   'auth',
   'chat',

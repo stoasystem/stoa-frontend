@@ -3,7 +3,6 @@ import { initReactI18next } from 'react-i18next'
 import { getInitialLanguage, LANGUAGE_STORAGE_KEY, type SupportedLanguage } from '@/i18n/languages'
 import { namespaces } from '@/i18n/namespaces'
 import enCommon from '@/i18n/locales/en/common.json'
-import enHome from '@/i18n/locales/en/home.json'
 import enHomeV2 from '@/i18n/locales/en/homeV2.json'
 import enAuth from '@/i18n/locales/en/auth.json'
 import enChat from '@/i18n/locales/en/chat.json'
@@ -21,7 +20,6 @@ import enLegal from '@/i18n/locales/en/legal.json'
 import enAdmin from '@/i18n/locales/en/admin.json'
 import enErrors from '@/i18n/locales/en/errors.json'
 import deCommon from '@/i18n/locales/de/common.json'
-import deHome from '@/i18n/locales/de/home.json'
 import deHomeV2 from '@/i18n/locales/de/homeV2.json'
 import deAuth from '@/i18n/locales/de/auth.json'
 import deChat from '@/i18n/locales/de/chat.json'
@@ -39,7 +37,6 @@ import deLegal from '@/i18n/locales/de/legal.json'
 import deAdmin from '@/i18n/locales/de/admin.json'
 import deErrors from '@/i18n/locales/de/errors.json'
 import frCommon from '@/i18n/locales/fr/common.json'
-import frHome from '@/i18n/locales/fr/home.json'
 import frHomeV2 from '@/i18n/locales/fr/homeV2.json'
 import frAuth from '@/i18n/locales/fr/auth.json'
 import frChat from '@/i18n/locales/fr/chat.json'
@@ -57,7 +54,6 @@ import frLegal from '@/i18n/locales/fr/legal.json'
 import frAdmin from '@/i18n/locales/fr/admin.json'
 import frErrors from '@/i18n/locales/fr/errors.json'
 import itCommon from '@/i18n/locales/it/common.json'
-import itHome from '@/i18n/locales/it/home.json'
 import itHomeV2 from '@/i18n/locales/it/homeV2.json'
 import itAuth from '@/i18n/locales/it/auth.json'
 import itChat from '@/i18n/locales/it/chat.json'
@@ -78,7 +74,6 @@ import itErrors from '@/i18n/locales/it/errors.json'
 export const resources = {
   en: {
     common: enCommon,
-    home: enHome,
     homeV2: enHomeV2,
     auth: enAuth,
     chat: enChat,
@@ -98,7 +93,6 @@ export const resources = {
   },
   de: {
     common: deCommon,
-    home: deHome,
     homeV2: deHomeV2,
     auth: deAuth,
     chat: deChat,
@@ -118,7 +112,6 @@ export const resources = {
   },
   fr: {
     common: frCommon,
-    home: frHome,
     homeV2: frHomeV2,
     auth: frAuth,
     chat: frChat,
@@ -138,7 +131,6 @@ export const resources = {
   },
   it: {
     common: itCommon,
-    home: itHome,
     homeV2: itHomeV2,
     auth: itAuth,
     chat: itChat,
