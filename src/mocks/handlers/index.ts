@@ -117,6 +117,19 @@ const identityHandlers = [
 // ── Adaptive learning handlers ────────────────────────────────────────────
 
 const learningHandlers = [
+  http.get(`${BASE}/students/me/memory`, () =>
+    HttpResponse.json({
+      snapshots: [
+        { student_id: 'mock-user', subject: 'math', topic_id: 'fractions', weak_topics: ['fractions'], struggling_concepts: ['fractions'], mastered_concepts: [], strengths: [], count: 4, confidence: 'low' },
+        { student_id: 'mock-user', subject: 'math', topic_id: 'quadratic_equations', weak_topics: ['quadratic_equations'], struggling_concepts: [], mastered_concepts: [], strengths: [], count: 2, confidence: 'medium' },
+        { student_id: 'mock-user', subject: 'german', topic_id: 'grammar_dative', weak_topics: ['grammar_dative'], struggling_concepts: [], mastered_concepts: [], strengths: [], count: 3, confidence: 'low' },
+      ],
+      generated_snapshots: [],
+      stored_snapshots: [],
+      profile: {},
+      recommendations: [],
+    })
+  ),
   http.get(`${BASE}/learning/memory`, () =>
     HttpResponse.json({ snapshots: [], profile: {} })
   ),

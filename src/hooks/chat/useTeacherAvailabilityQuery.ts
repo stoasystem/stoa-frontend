@@ -8,5 +8,7 @@ export function useTeacherAvailabilityQuery() {
     queryFn: getTeacherAvailability,
     staleTime: 60_000,
     refetchInterval: 60_000,
+    // Don't poll while the tab is hidden — availability isn't time-critical
+    refetchIntervalInBackground: false,
   })
 }

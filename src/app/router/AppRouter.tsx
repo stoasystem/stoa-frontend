@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
@@ -22,9 +23,8 @@ import { RetentionPage } from '@/pages/admin/RetentionPage'
 import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
 import { PaymentSettingsPage } from '@/pages/billing/PaymentSettingsPage'
-import { ChatPage } from '@/pages/chat/ChatPage'
+import { VirtualCheckoutPage } from '@/pages/billing/VirtualCheckoutPage'
 import { ContactPage } from '@/pages/contact/ContactPage'
-import { StudentDashboardPage } from '@/pages/dashboard/StudentDashboardPage'
 import { StudentAssistantEntryPage } from '@/pages/assistant/StudentAssistantEntryPage'
 import { ClassroomLobbyPage } from '@/features/live-classroom/pages/ClassroomLobbyPage'
 import { ClassroomRoomPage } from '@/features/live-classroom/pages/ClassroomRoomPage'
@@ -35,7 +35,6 @@ import { TutorClassroomQueuePage } from '@/features/live-classroom/pages/TutorCl
 import { ForbiddenPage } from '@/pages/error/ForbiddenPage'
 import { UnauthorizedPage } from '@/pages/error/UnauthorizedPage'
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
-import { HomePage } from '@/pages/home/HomePage'
 import { HomeV2Page } from '@/pages/home-v2/HomeV2Page'
 import { ForParentsPage } from '@/pages/landing/ForParentsPage'
 import { ForSchoolsPage } from '@/pages/landing/ForSchoolsPage'
@@ -95,14 +94,24 @@ import { TutorAvailabilityPage } from '@/pages/tutor/TutorAvailabilityPage'
 import { TutorDashboardPage } from '@/pages/tutor/TutorDashboardPage'
 import { TutorHelpRequestDetailPage } from '@/pages/tutor/TutorHelpRequestDetailPage'
 import { TutorProfilePage } from '@/pages/tutor/TutorProfilePage'
+import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
+import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton'
+
+// Heavy pages are code-split so the initial bundle stays small.
+// Each has a matching skeleton fallback so users see a layout instantly.
+const ChatPage = lazy(() =>
+  import('@/pages/chat/ChatPage').then((m) => ({ default: m.ChatPage }))
+)
+const StudentDashboardPage = lazy(() =>
+  import('@/pages/dashboard/StudentDashboardPage').then((m) => ({ default: m.StudentDashboardPage }))
+)
 
 export function AppRouter() {
   return (
     <BrowserRouter>
       <AuthBootstrap />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/home-v2" element={<HomeV2Page />} />
+        <Route path="/" element={<HomeV2Page />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -127,12 +136,27 @@ export function AppRouter() {
           <Route path="/billing" element={<BillingPage />} />
           <Route path="/billing/payment-settings" element={<PaymentSettingsPage />} />
           <Route path="/billing/checkout/result" element={<CheckoutResultPage />} />
+          <Route path="/billing/checkout/demo" element={<VirtualCheckoutPage />} />
           <Route path="/referrals" element={<ReferralsPage />} />
           <Route path="/support/tickets" element={<SupportTicketsPage />} />
           <Route path="/support/tickets/:ticketId" element={<SupportTicketDetailPage />} />
           <Route element={<RoleRoute allowedRoles={['student']} />}>
-            <Route path="/dashboard" element={<StudentDashboardPage />} />
-            <Route path="/chat" element={<ChatPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <Suspense fallback={<DashboardSkeleton />}>
+                  <StudentDashboardPage />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <Suspense fallback={<ChatSkeleton />}>
+                  <ChatPage />
+                </Suspense>
+              }
+            />
             <Route path="/classroom" element={<StudentClassroomHomePage />} />
             <Route path="/classroom/schedule" element={<ScheduleClassroomPage />} />
             <Route path="/classroom/sessions/:sessionId/lobby" element={<ClassroomLobbyPage />} />

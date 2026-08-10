@@ -21,11 +21,12 @@ import {
   learningProgress,
   recentQuestions,
   teacherFeedback,
-  weakTopics,
 } from '@/data/mockDashboard'
+import { useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function StudentDashboardPage() {
+  const weakTopicsQuery = useWeakTopicsQuery()
   return (
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
@@ -103,7 +104,11 @@ export function StudentDashboardPage() {
             <TabsContent value="progress" className="mt-0">
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
                 <LearningProgressCard progress={learningProgress} />
-                <WeakTopicsCard topics={weakTopics} />
+                <WeakTopicsCard
+                  topics={weakTopicsQuery.data ?? []}
+                  isLoading={weakTopicsQuery.isLoading}
+                  isError={weakTopicsQuery.isError}
+                />
               </div>
             </TabsContent>
             <TabsContent value="support" className="mt-0">

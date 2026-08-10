@@ -23,10 +23,19 @@ function getRoleLabel(message: ChatMessage) {
 
 function getStatusLabel(message: ChatMessage) {
   if (message.status === 'sending') return 'Sending'
-  if (message.status === 'streaming') return 'Streaming'
   if (message.status === 'stopped') return 'Generation stopped'
   if (message.status === 'failed') return 'Needs retry'
   return null
+}
+
+/** Blinking text cursor shown at the end of streaming assistant messages. */
+function StreamingCursor() {
+  return (
+    <span
+      aria-hidden="true"
+      className="ml-0.5 inline-block h-[1em] w-[2px] translate-y-[1px] animate-[blink_1s_step-end_infinite] rounded-[1px] bg-current align-baseline opacity-80"
+    />
+  )
 }
 
 export function ChatMessageBubble({
@@ -47,6 +56,7 @@ export function ChatMessageBubble({
   const { t } = useTranslation('chat')
   const isStudent = message.role === 'student'
   const isSystem = message.role === 'system'
+  const isStreaming = message.status === 'streaming'
   const roleLabel = getRoleLabel(message)
   const statusLabel = getStatusLabel(message)
 
@@ -87,9 +97,18 @@ export function ChatMessageBubble({
           </div>
         )}
         <div className="whitespace-pre-wrap break-words">
-          {message.role === 'assistant'
-            ? <MathRenderer>{message.content}</MathRenderer>
-            : message.content}
+          {message.role === 'assistant' ? (
+            <>
+              {message.content
+                ? <MathRenderer>{message.content}</MathRenderer>
+                : isStreaming
+                  ? <span className="text-muted-foreground/60 text-xs italic">Thinking…</span>
+                  : null}
+              {isStreaming && <StreamingCursor />}
+            </>
+          ) : (
+            message.content
+          )}
         </div>
         {message.attachments && message.attachments.length > 0 && (
           <div className="mt-3 grid gap-2">
@@ -112,14 +131,14 @@ export function ChatMessageBubble({
             <RetryMessageButton onRetry={() => onRetry(message.id)} />
           </div>
         )}
-        {message.role === 'assistant' && message.status !== 'streaming' && (
+        {message.role === 'assistant' && !isStreaming && (
           <LearningResponseFeedback
             onRequestTeacher={onRequestTeacher}
             isRequesting={isRequestingTeacher}
             feedback={teacherFeedback}
           />
         )}
-        {moderationTargetId && message.role === 'assistant' && message.status !== 'streaming' && (
+        {moderationTargetId && message.role === 'assistant' && !isStreaming && (
           <div className="mt-2 border-t pt-2">
             <ModerationReportDialog
               questionId={moderationTargetId}
