@@ -1,6 +1,6 @@
 import type { SupportedLanguage } from '@/i18n/languages'
 
-export type RegisterRole = 'student' | 'parent' | 'tutor'
+export type RegisterRole = 'student' | 'parent' | 'teacher'
 
 export type StudentOnboardingProfile = {
   age: number

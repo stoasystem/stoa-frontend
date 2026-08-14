@@ -18,7 +18,7 @@ const mockNotifications: NotificationEvent[] = [
     archivedAt: null,
     metadata: { subject: 'Mathematics' },
     actorId: 'demo-tutor',
-    actorRole: 'tutor',
+    actorRole: 'teacher',
   },
   {
     eventId: 'notif-demo-subscription',

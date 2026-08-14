@@ -95,7 +95,8 @@ export function MathRenderer({ children, className }: MathRendererProps) {
           <span
             key={i}
             className={seg.type === 'block' ? 'math-block' : 'math-inline'}
-            // eslint-disable-next-line react/no-danger
+            // Safe only because renderKatex returns KaTeX-generated markup, and HTML-escapes
+            // the raw expression on its parse-failure path. Do not pass unescaped input here.
             dangerouslySetInnerHTML={{
               __html: renderKatex(seg.value, seg.type === 'block'),
             }}

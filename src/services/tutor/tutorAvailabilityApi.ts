@@ -7,14 +7,14 @@ let demoAvailability = mockTutorAvailability
 
 export async function getTutorAvailability() {
   return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorAvailability>('/tutors/me/availability')
+    const response = await httpClient.get<TutorAvailability>('/teachers/me/availability')
     return response.data
   }, demoAvailability)
 }
 
 export async function updateTutorAvailability(payload: TutorAvailability) {
   return withDemoFallback(async () => {
-    const response = await httpClient.patch<TutorAvailability>('/tutors/me/availability', payload)
+    const response = await httpClient.patch<TutorAvailability>('/teachers/me/availability', payload)
     return response.data
   }, () => {
     demoAvailability = payload

@@ -114,7 +114,7 @@ function inferRole(email: string): UserRole {
   if (email.includes('school.teacher')) return 'school_teacher'
   if (email.includes('school.viewer')) return 'school_viewer'
   if (email.includes('parent')) return 'parent'
-  if (email.includes('tutor') || email.includes('teacher')) return 'tutor'
+  if (email.includes('tutor') || email.includes('teacher')) return 'teacher'
   if (email.includes('admin')) return 'admin'
   return 'student'
 }
@@ -152,7 +152,7 @@ function createDemoAuthResponse(email: string, role = inferRole(email), name?: s
     response.parentLinked = true
   }
 
-  if (role === 'tutor') {
+  if (role === 'teacher') {
     response.onboardingStatus = 'pending_review'
     response.verificationStatus = 'pending_review'
   }

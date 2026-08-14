@@ -4,7 +4,7 @@ export type AppRouteRole =
   | 'public'
   | 'student'
   | 'parent'
-  | 'tutor'
+  | 'teacher'
   | 'admin'
   | 'organization'
   | 'shared'
@@ -53,7 +53,7 @@ export type AppRouteMeta = {
 export const roleHomePaths: Record<Exclude<AppRouteRole, 'public' | 'shared'>, string> = {
   student: '/dashboard',
   parent: '/parent',
-  tutor: '/tutor',
+  teacher: '/tutor',
   admin: '/admin',
   organization: '/organization',
 }
@@ -196,7 +196,7 @@ export const navItems: AppNavItem[] = [
   {
     label: 'Requests',
     path: '/tutor',
-    role: 'tutor',
+    role: 'teacher',
     priority: 'primary',
     status: 'core',
     icon: 'requests',
@@ -206,7 +206,7 @@ export const navItems: AppNavItem[] = [
   {
     label: 'Classroom Queue',
     path: '/tutor/classroom',
-    role: 'tutor',
+    role: 'teacher',
     priority: 'primary',
     status: 'core',
     icon: 'classroom',
@@ -216,7 +216,7 @@ export const navItems: AppNavItem[] = [
   {
     label: 'Availability',
     path: '/tutor/availability',
-    role: 'tutor',
+    role: 'teacher',
     priority: 'primary',
     status: 'core',
     icon: 'settings',
@@ -226,7 +226,7 @@ export const navItems: AppNavItem[] = [
   {
     label: 'Profile',
     path: '/tutor/profile',
-    role: 'tutor',
+    role: 'teacher',
     priority: 'primary',
     status: 'core',
     icon: 'profile',
@@ -236,7 +236,7 @@ export const navItems: AppNavItem[] = [
   {
     label: 'Support',
     path: '/support',
-    role: 'tutor',
+    role: 'teacher',
     priority: 'secondary',
     status: 'core',
     icon: 'support',
@@ -472,14 +472,14 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/parent/children/:childId/report', pageName: 'ChildReportPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Weekly child report.' },
   { path: '/parent/children/:childId/monthly-report', pageName: 'ParentMonthlyReportPage', role: 'parent', module: 'Parent', status: 'demo', priority: 'P1', navPriority: 'hidden', purpose: 'Monthly child report demo.' },
   { path: '/parent/children/:childId/history', pageName: 'ChildLearningHistoryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Child learning history.' },
-  { path: '/tutor', pageName: 'TutorDashboardPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor request queue.' },
-  { path: '/tutor/classroom', pageName: 'TutorClassroomQueuePage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor classroom queue and instant live support requests.' },
-  { path: '/tutor/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor classroom lobby and session context.' },
-  { path: '/tutor/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor live classroom room.' },
-  { path: '/tutor/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'tutor', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Tutor classroom summary and notes.' },
-  { path: '/tutor/availability', pageName: 'TutorAvailabilityPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor availability.' },
-  { path: '/tutor/profile', pageName: 'TutorProfilePage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
-  { path: '/tutor/requests/:requestId', pageName: 'TutorHelpRequestDetailPage', role: 'tutor', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor request detail and status update.' },
+  { path: '/tutor', pageName: 'TutorDashboardPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor request queue.' },
+  { path: '/tutor/classroom', pageName: 'TutorClassroomQueuePage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor classroom queue and instant live support requests.' },
+  { path: '/tutor/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor classroom lobby and session context.' },
+  { path: '/tutor/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor live classroom room.' },
+  { path: '/tutor/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Tutor classroom summary and notes.' },
+  { path: '/tutor/availability', pageName: 'TutorAvailabilityPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor availability.' },
+  { path: '/tutor/profile', pageName: 'TutorProfilePage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
+  { path: '/tutor/requests/:requestId', pageName: 'TutorHelpRequestDetailPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor request detail and status update.' },
   { path: '/admin', pageName: 'AdminDashboardPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Admin operations overview.' },
   { path: '/admin/analytics', pageName: 'AdminAnalyticsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Admin analytics overview.' },
   { path: '/admin/advanced-analytics', pageName: 'AdvancedAnalyticsPage', role: 'admin', module: 'Analytics', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Advanced analytics demo.' },

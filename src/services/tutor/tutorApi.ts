@@ -70,9 +70,11 @@ const mockTutorProfile: TutorProfile = {
   updatedAt: '2026-05-27T11:00:00Z',
 }
 
+// Backend gap: /teachers/me/profile is not implemented, so /tutor/profile still fails
+// against a real API. Prefixed for consistency only; needs a backend endpoint to work.
 export async function getTutorProfile() {
   return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorProfile>('/tutors/me/profile')
+    const response = await httpClient.get<TutorProfile>('/teachers/me/profile')
     return mergeTutorProfile(response.data)
   }, mockTutorProfile)
 }
@@ -80,7 +82,7 @@ export async function getTutorProfile() {
 export async function getTutorHelpRequests() {
   return withDemoFallback(async () => {
     const response = await httpClient.get<{ items: TutorHelpRequestSummary[] }>(
-      '/tutors/me/help-requests',
+      '/teachers/me/help-requests',
     )
     return response.data
   }, { items: mockTutorHelpRequests })
@@ -89,7 +91,7 @@ export async function getTutorHelpRequests() {
 export async function getTutorHelpRequestDetail(requestId: string) {
   return withDemoFallback(async () => {
     const response = await httpClient.get<TutorHelpRequestDetail>(
-      `/tutors/me/help-requests/${requestId}`,
+      `/teachers/me/help-requests/${requestId}`,
     )
     return response.data
   }, { ...mockTutorHelpRequestDetail, requestId })
@@ -106,7 +108,7 @@ export async function updateTutorHelpRequestStatus({
 }) {
   return withDemoFallback(async () => {
     const response = await httpClient.patch<TutorHelpRequestSummary>(
-      `/tutors/me/help-requests/${requestId}`,
+      `/teachers/me/help-requests/${requestId}`,
       { status, resolutionNote },
     )
     return response.data
@@ -124,7 +126,7 @@ export async function addTutorHelpRequestNote({
 }) {
   return withDemoFallback(async () => {
     const response = await httpClient.post<TutorHelpRequestNote>(
-      `/tutors/me/help-requests/${requestId}/notes`,
+      `/teachers/me/help-requests/${requestId}/notes`,
       { content, richContent },
     )
     return response.data
@@ -143,7 +145,7 @@ export async function addTutorHelpRequestNote({
 
 export async function getTutorStats() {
   return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorStats>('/tutors/me/stats')
+    const response = await httpClient.get<TutorStats>('/teachers/me/stats')
     return response.data
   }, mockTutorStats)
 }
@@ -151,7 +153,7 @@ export async function getTutorStats() {
 export async function getTutorAssistanceSummary(questionId: string) {
   return withDemoFallback(async () => {
     const response = await httpClient.get<TeacherAssistanceSummary>(
-      `/tutors/questions/${questionId}/assistance-summary`,
+      `/teachers/questions/${questionId}/assistance-summary`,
     )
     return response.data
   }, {
@@ -172,7 +174,7 @@ export async function getTutorAssistanceSummary(questionId: string) {
 export async function createAiTeacherSummaryDraft(questionId: string) {
   return withDemoFallback(async () => {
     const response = await httpClient.post<AiTeacherDraft>(
-      `/tutors/questions/${questionId}/ai-tools/summary-draft`,
+      `/teachers/questions/${questionId}/ai-tools/summary-draft`,
       {},
     )
     return response.data
@@ -181,28 +183,28 @@ export async function createAiTeacherSummaryDraft(questionId: string) {
 
 export async function createAiTeacherExerciseDraft(payload: CreateExerciseDraftPayload) {
   return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>('/tutors/ai-tools/exercise-drafts', payload)
+    const response = await httpClient.post<AiTeacherDraft>('/teachers/ai-tools/exercise-drafts', payload)
     return response.data
   }, createMockExerciseDraft(payload))
 }
 
 export async function getAiTeacherDrafts() {
   return withDemoFallback(async () => {
-    const response = await httpClient.get<AiTeacherDraftList>('/tutors/ai-tools/drafts')
+    const response = await httpClient.get<AiTeacherDraftList>('/teachers/ai-tools/drafts')
     return response.data
   }, { items: [], count: 0 })
 }
 
 export async function getAiTeacherDraft(draftId: string) {
   return withDemoFallback(async () => {
-    const response = await httpClient.get<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}`)
+    const response = await httpClient.get<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}`)
     return response.data
   }, createMockSummaryDraft('help-1', draftId))
 }
 
 export async function regenerateAiTeacherDraft(draftId: string) {
   return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}/regenerate`, {})
+    const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/regenerate`, {})
     return response.data
   }, {
     ...createMockSummaryDraft('help-1', `regen-${draftId}`),
@@ -228,7 +230,7 @@ async function reviewAiTeacherDraft(
   { draftId, note }: ReviewAiTeacherDraftPayload,
 ) {
   return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>(`/tutors/ai-tools/drafts/${draftId}/${action}`, { note })
+    const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/${action}`, { note })
     return response.data
   }, {
     ...createMockSummaryDraft('help-1', draftId),
@@ -283,7 +285,7 @@ function createMockSummaryDraft(questionId: string, draftId = `draft-summary-${q
     sourceContext: { sourceCount: 4, boundedToVisibleRequest: true },
     promptVersion: 'stoa_ai_teacher_tools_v1',
     createdBy: 'demo-tutor',
-    createdByRole: 'tutor',
+    createdByRole: 'teacher',
     createdAt: now,
     generatedAt: now,
     updatedAt: now,
@@ -319,7 +321,7 @@ function createMockExerciseDraft(payload: CreateExerciseDraftPayload): AiTeacher
     sourceContext: { boundedToVisibleStudent: true },
     promptVersion: 'stoa_ai_teacher_tools_v1',
     createdBy: 'demo-tutor',
-    createdByRole: 'tutor',
+    createdByRole: 'teacher',
     createdAt: now,
     generatedAt: now,
     updatedAt: now,

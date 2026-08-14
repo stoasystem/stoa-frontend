@@ -9,16 +9,20 @@ export const TOKEN_KEY = 'stoa_access_token'
 const validRoles: UserRole[] = [
   'student',
   'parent',
-  'tutor',
+  'teacher',
   'admin',
   'organization_admin',
   'school_teacher',
   'school_viewer',
 ]
 
+// Maps Cognito group names and the legacy `tutor` value onto the canonical role the
+// backend emits. `tutor` must stay accepted so sessions stored before the rename
+// keep resolving instead of silently falling back to `student`.
 const roleAliases: Record<string, UserRole> = {
-  teacher: 'tutor',
-  teachers: 'tutor',
+  tutor: 'teacher',
+  tutors: 'teacher',
+  teachers: 'teacher',
   students: 'student',
   parents: 'parent',
   admins: 'admin',

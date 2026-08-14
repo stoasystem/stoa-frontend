@@ -17,7 +17,7 @@ export function AdminUsageSummaryCards({ summary }: AdminUsageSummaryCardsProps)
   const roles = [
     { label: 'Students', value: summary.roleCounts.student },
     { label: 'Parents', value: summary.roleCounts.parent },
-    { label: 'Tutors', value: summary.roleCounts.tutor },
+    { label: 'Teachers', value: summary.roleCounts.teacher },
     { label: 'Admins', value: summary.roleCounts.admin },
   ]
 

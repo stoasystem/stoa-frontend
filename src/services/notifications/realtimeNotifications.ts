@@ -100,7 +100,6 @@ function extractEnvelope(raw: unknown): RealtimeNotificationEnvelope | null {
 }
 
 function roleChannels(role: User['role']) {
-  if (role === 'tutor') return ['role:tutor', 'role:teacher']
   if (role === 'school_teacher') return ['role:school_teacher', 'role:teacher']
   return [`role:${role}`]
 }

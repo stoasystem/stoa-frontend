@@ -17,7 +17,7 @@ const roleOptions = [
     icon: Users,
   },
   {
-    role: 'tutor',
+    role: 'teacher',
     titleKey: 'common:roles.tutor',
     descriptionKey: 'auth:register.tutorHelp',
     icon: GraduationCap,

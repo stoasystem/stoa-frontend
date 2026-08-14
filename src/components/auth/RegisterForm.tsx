@@ -66,7 +66,9 @@ function getStepNumber(step: Step) {
 }
 
 function getInitialRole(value: string | null): RegisterRole {
-  if (value === 'parent' || value === 'tutor') return value
+  if (value === 'parent') return 'parent'
+  // `tutor` stays accepted so existing ?role=tutor links keep landing on the right step.
+  if (value === 'teacher' || value === 'tutor') return 'teacher'
   return 'student'
 }
 
@@ -136,7 +138,7 @@ export function RegisterForm() {
         if (!parentProfile.childName.trim() || !parentProfile.childGrade.trim()) return t('errors:childRequired')
         if (splitSubjects(parentSubjects).length === 0) return t('errors:subjectRequired')
       }
-      if (role === 'tutor') {
+      if (role === 'teacher') {
         if (splitSubjects(tutorSubjects).length === 0) return t('errors:teachingSubjectRequired')
         if (!tutorProfile.educationBackground.trim()) return t('errors:educationRequired')
         if (!tutorProfile.introduction.trim()) return t('errors:introductionRequired')
@@ -242,7 +244,7 @@ export function RegisterForm() {
         />
       )}
 
-      {step === 'profile' && role === 'tutor' && (
+      {step === 'profile' && role === 'teacher' && (
         <TutorProfileStep
           value={tutorProfile}
           subjectText={tutorSubjects}

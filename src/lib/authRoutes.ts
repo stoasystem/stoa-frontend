@@ -6,7 +6,7 @@ export function getDefaultRouteForRole(role: UserRole) {
       return '/dashboard'
     case 'parent':
       return '/parent'
-    case 'tutor':
+    case 'teacher':
       return '/tutor'
     case 'admin':
       return '/admin'

@@ -7,11 +7,12 @@ import { HomeV2TrustLayer } from '@/components/home-v2/HomeV2TrustLayer'
 import { Seo } from '@/components/common/Seo'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { useAuthStore } from '@/store/authStore'
+import type { UserRole } from '@/types/user'
 
-function getLearningHref(role?: string | null) {
+function getLearningHref(role?: UserRole | null) {
   if (role === 'student') return '/practice'
   if (role === 'parent') return '/parent'
-  if (role === 'tutor') return '/tutor'
+  if (role === 'teacher') return '/tutor'
   if (role === 'admin') return '/admin'
   return '/register?next=/practice'
 }

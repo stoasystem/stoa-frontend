@@ -210,7 +210,7 @@ export function AppRouter() {
             <Route path="/students/:studentId/curriculum-graph" element={<DemoSurfaceRoute><CurriculumGraphPage /></DemoSurfaceRoute>} />
             <Route path="/curriculum-graph" element={<DemoSurfaceRoute><CurriculumGraphPage /></DemoSurfaceRoute>} />
           </Route>
-          <Route element={<RoleRoute allowedRoles={['tutor']} />}>
+          <Route element={<RoleRoute allowedRoles={['teacher']} />}>
             <Route path="/tutor" element={<TutorDashboardPage />} />
             <Route path="/tutor/classroom" element={<TutorClassroomQueuePage />} />
             <Route path="/tutor/classroom/sessions/:sessionId/lobby" element={<ClassroomLobbyPage tutorMode />} />

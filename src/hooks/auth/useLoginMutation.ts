@@ -10,7 +10,7 @@ import type { UserRole } from '@/types/user'
 const roleNextPathPrefixes: Record<UserRole, string[]> = {
   student: ['/assistant', '/practice', '/dashboard', '/chat', '/learning-history', '/profile', '/referrals'],
   parent: ['/parent', '/billing', '/referrals', '/contact'],
-  tutor: ['/tutor', '/support'],
+  teacher: ['/tutor', '/support'],
   admin: ['/admin'],
   organization_admin: ['/organization'],
   school_teacher: ['/organization'],
