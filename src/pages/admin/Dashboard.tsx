@@ -79,6 +79,11 @@ export function AdminDashboardPage() {
             description="Inspect one parent account across verification, billing, child access, entitlement, and usage state."
             to="/admin/account-operations"
           />
+          <AdminOperationCard
+            title="Teacher applications"
+            description="Review teacher applications and send activation invitations."
+            to="/admin/teacher-applications"
+          />
         </div>
       </PageContainer>
     </DashboardLayout>

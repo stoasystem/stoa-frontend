@@ -34,20 +34,30 @@ const PUBLIC_AUTH_PATHS = new Set([
   '/auth/email-verification/resend',
 ])
 
-function isPublicAuthPath(url?: string) {
-  if (!url) return false
-
+function requestPath(url?: string) {
+  if (!url) return ''
   try {
-    return PUBLIC_AUTH_PATHS.has(new URL(url, apiBaseUrl).pathname)
+    return new URL(url, apiBaseUrl).pathname
   } catch {
-    return PUBLIC_AUTH_PATHS.has(url.split('?')[0])
+    return url.split('?')[0]
   }
+}
+
+function isPublicAuthPath(url?: string, method?: string) {
+  const path = requestPath(url)
+  if (PUBLIC_AUTH_PATHS.has(path)) return true
+
+  const verb = (method || 'get').toLowerCase()
+  if (path === '/teacher-applications' && verb === 'post') return true
+  if (path === '/teacher-applications/activation/claim' && verb === 'post') return true
+  if (/^\/teacher-applications\/[^/]+\/status$/.test(path) && verb === 'get') return true
+  return false
 }
 
 httpClient.interceptors.request.use((config) => {
   const token = localStorage.getItem(TOKEN_KEY)
 
-  if (isPublicAuthPath(config.url)) {
+  if (isPublicAuthPath(config.url, config.method)) {
     delete config.headers.Authorization
   } else if (token) {
     config.headers.Authorization = `Bearer ${token}`

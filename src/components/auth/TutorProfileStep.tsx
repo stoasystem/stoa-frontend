@@ -9,6 +9,7 @@ export function TutorProfileStep({
   value,
   subjectText,
   uploadedFiles,
+  showCredentials = false,
   onChange,
   onSubjectTextChange,
   onUploaded,
@@ -17,6 +18,7 @@ export function TutorProfileStep({
   value: TutorOnboardingProfile
   subjectText: string
   uploadedFiles: TutorCredentialUploadType[]
+  showCredentials?: boolean
   onChange: (values: Partial<TutorOnboardingProfile>) => void
   onSubjectTextChange: (value: string) => void
   onUploaded: (file: TutorCredentialUploadType) => void
@@ -44,7 +46,9 @@ export function TutorProfileStep({
         <Label htmlFor="tutor-intro">{t('register.introduction')}</Label>
         <Textarea id="tutor-intro" value={value.introduction} onChange={(event) => onChange({ introduction: event.target.value })} className="min-h-28 resize-none" />
       </div>
-      <TutorCredentialUpload files={uploadedFiles} onUploaded={onUploaded} onError={onUploadError} />
+      {showCredentials && (
+        <TutorCredentialUpload files={uploadedFiles} onUploaded={onUploaded} onError={onUploadError} />
+      )}
     </div>
   )
 }

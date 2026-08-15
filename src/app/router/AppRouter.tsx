@@ -89,6 +89,8 @@ import { LoginPage } from '@/pages/login/LoginPage'
 import { SupportTicketDetailPage } from '@/pages/support/SupportTicketDetailPage'
 import { SupportTicketsPage } from '@/pages/support/SupportTicketsPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
+import { TeacherActivatePage } from '@/pages/auth/TeacherActivatePage'
+import { AdminTeacherApplicationsPage } from '@/pages/admin/AdminTeacherApplicationsPage'
 import { SupportPage } from '@/pages/support/SupportPage'
 import { TutorAvailabilityPage } from '@/pages/tutor/TutorAvailabilityPage'
 import { TutorDashboardPage } from '@/pages/tutor/TutorDashboardPage'
@@ -114,6 +116,7 @@ export function AppRouter() {
         <Route path="/" element={<HomeV2Page />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/teacher-activate" element={<TeacherActivatePage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/qa" element={<QaPage />} />
@@ -236,6 +239,7 @@ export function AppRouter() {
             <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
             <Route path="/admin/curriculum" element={<AdminCurriculumPage />} />
             <Route path="/admin/account-operations" element={<AdminAccountOperationsPage />} />
+            <Route path="/admin/teacher-applications" element={<AdminTeacherApplicationsPage />} />
             <Route
               path="/admin/users"
               element={<AdminOperationsPlaceholderPage title="Users" />}

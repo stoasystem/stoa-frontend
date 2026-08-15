@@ -8,17 +8,22 @@ export function RegisterAccountStep({
   email,
   password,
   acceptedTerms,
+  hidePassword = false,
+  emailOwnershipConfirmed,
   onChange,
 }: {
   name: string
   email: string
   password: string
   acceptedTerms: boolean
+  hidePassword?: boolean
+  emailOwnershipConfirmed?: boolean
   onChange: (values: Partial<{
     name: string
     email: string
     password: string
     acceptedTerms: boolean
+    emailOwnershipConfirmed: boolean
   }>) => void
 }) {
   const { t } = useTranslation(['auth', 'common'])
@@ -40,21 +45,39 @@ export function RegisterAccountStep({
           required
         />
       </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">{t('auth:register.password')}</Label>
-        <Input
-          id="password"
-          type="password"
-          aria-describedby="password-requirements"
-          value={password}
-          onChange={(event) => onChange({ password: event.target.value })}
-          autoComplete="new-password"
-          required
-        />
-        <p id="password-requirements" className="text-sm text-muted-foreground">
-          {t('errors:passwordRequirements')}
-        </p>
-      </div>
+      {!hidePassword && (
+        <div className="space-y-2">
+          <Label htmlFor="password">{t('auth:register.password')}</Label>
+          <Input
+            id="password"
+            type="password"
+            aria-describedby="password-requirements"
+            value={password}
+            onChange={(event) => onChange({ password: event.target.value })}
+            autoComplete="new-password"
+            required
+          />
+          <p id="password-requirements" className="text-sm text-muted-foreground">
+            {t('errors:passwordRequirements')}
+          </p>
+        </div>
+      )}
+      {hidePassword && (
+        <p className="text-sm text-muted-foreground">{t('auth:register.teacherAccountHelp')}</p>
+      )}
+      {emailOwnershipConfirmed !== undefined && (
+        <div className="rounded-lg border border-border/70 bg-secondary/40 p-3">
+          <label className="flex gap-3 text-sm leading-6">
+            <input
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border"
+              checked={emailOwnershipConfirmed}
+              onChange={(event) => onChange({ emailOwnershipConfirmed: event.target.checked })}
+            />
+            <span>{t('auth:register.confirmEmailOwnership')}</span>
+          </label>
+        </div>
+      )}
       <div className="rounded-lg border border-border/70 bg-secondary/40 p-3">
         <label className="flex gap-3 text-sm leading-6">
           <input

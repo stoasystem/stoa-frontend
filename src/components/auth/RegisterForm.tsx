@@ -3,15 +3,18 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { RegisterAccountStep } from '@/components/auth/RegisterAccountStep'
 import { RegisterConfirmationStep } from '@/components/auth/RegisterConfirmationStep'
+import { TeacherApplicationSubmitted } from '@/components/auth/TeacherApplicationSubmitted'
 import { ParentProfileStep } from '@/components/auth/ParentProfileStep'
 import { RegisterRoleStep } from '@/components/auth/RegisterRoleStep'
 import { StudentProfileStep } from '@/components/auth/StudentProfileStep'
 import { TutorProfileStep } from '@/components/auth/TutorProfileStep'
 import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
+import { useSubmitTeacherApplicationMutation } from '@/hooks/teacher/useTeacherApplication'
 import { isCompliantPassword } from '@/lib/validation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
+import { buildTeacherStatement } from '@/services/teacher/teacherApplicationApi'
 import { getInitialLanguage, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type {
   ParentOnboardingProfile,
@@ -85,6 +88,7 @@ export function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [acceptedTerms, setAcceptedTerms] = useState(false)
+  const [emailOwnershipConfirmed, setEmailOwnershipConfirmed] = useState(false)
   const [studentProfile, setStudentProfile] = useState<StudentOnboardingProfile>(() => ({
     ...initialStudentProfile,
     preferredAnswerLanguage: initialAnswerLanguage,
@@ -97,6 +101,7 @@ export function RegisterForm() {
   const [credentialFiles, setCredentialFiles] = useState<TutorCredentialUpload[]>([])
   const [error, setError] = useState<string | null>(null)
   const registerMutation = useRegisterMutation({ redirect: false })
+  const teacherApplicationMutation = useSubmitTeacherApplicationMutation()
 
   const stepNumber = getStepNumber(step)
   const canGoBack = step === 'account' || step === 'profile'
@@ -123,8 +128,12 @@ export function RegisterForm() {
 
   function validateCurrentStep() {
     if (step === 'account') {
-      if (!name.trim() || !email.trim() || !password.trim()) return t('errors:required')
-      if (!isCompliantPassword(password)) return t('errors:passwordRequirements')
+      if (!name.trim() || !email.trim()) return t('errors:required')
+      if (role !== 'teacher') {
+        if (!password.trim()) return t('errors:required')
+        if (!isCompliantPassword(password)) return t('errors:passwordRequirements')
+      }
+      if (role === 'teacher' && !emailOwnershipConfirmed) return t('auth:register.confirmEmailOwnership')
       if (!acceptedTerms) return t('errors:acceptTerms')
     }
 
@@ -142,7 +151,6 @@ export function RegisterForm() {
         if (splitSubjects(tutorSubjects).length === 0) return t('errors:teachingSubjectRequired')
         if (!tutorProfile.educationBackground.trim()) return t('errors:educationRequired')
         if (!tutorProfile.introduction.trim()) return t('errors:introductionRequired')
-        if (credentialFiles.length === 0) return t('errors:credentialRequired')
       }
     }
 
@@ -168,10 +176,29 @@ export function RegisterForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (registerMutation.isPending) return
+    if (registerMutation.isPending || teacherApplicationMutation.isPending) return
     const validationError = validateCurrentStep()
     if (validationError) {
       setError(validationError)
+      return
+    }
+
+    setError(null)
+    if (role === 'teacher') {
+      teacherApplicationMutation.mutate(
+        {
+          email: email.trim(),
+          emailVerified: true,
+          fullName: name.trim(),
+          subjects: splitSubjects(tutorSubjects),
+          statement: buildTeacherStatement({
+            introduction: tutorProfile.introduction,
+            educationBackground: tutorProfile.educationBackground,
+            yearsOfExperience: tutorProfile.yearsOfExperience,
+          }),
+        },
+        { onSuccess: () => setStep('done') },
+      )
       return
     }
 
@@ -189,7 +216,6 @@ export function RegisterForm() {
       utm: getStoredUTM(),
     }
 
-    setError(null)
     registerMutation.mutate(payload, {
       onSuccess: () => setStep('done'),
     })
@@ -197,9 +223,16 @@ export function RegisterForm() {
 
   const registrationError = registerMutation.isError
     ? toUserFacingError(registerMutation.error, t('auth:register.failed'))
-    : null
+    : teacherApplicationMutation.isError
+      ? toUserFacingError(teacherApplicationMutation.error, t('auth:register.applicationFailed'))
+      : null
   const registrationErrorMessage =
     registrationError === 'Password does not meet requirements' ? t('errors:passwordRequirements') : registrationError
+  const submitting = registerMutation.isPending || teacherApplicationMutation.isPending
+
+  if (step === 'done' && teacherApplicationMutation.data) {
+    return <TeacherApplicationSubmitted application={teacherApplicationMutation.data} />
+  }
 
   if (step === 'done' && registerMutation.data) {
     return <RegisterConfirmationStep data={registerMutation.data} />
@@ -217,11 +250,14 @@ export function RegisterForm() {
           email={email}
           password={password}
           acceptedTerms={acceptedTerms}
+          hidePassword={role === 'teacher'}
+          emailOwnershipConfirmed={role === 'teacher' ? emailOwnershipConfirmed : undefined}
           onChange={(values) => {
             if (values.name !== undefined) setName(values.name)
             if (values.email !== undefined) setEmail(values.email)
             if (values.password !== undefined) setPassword(values.password)
             if (values.acceptedTerms !== undefined) setAcceptedTerms(values.acceptedTerms)
+            if (values.emailOwnershipConfirmed !== undefined) setEmailOwnershipConfirmed(values.emailOwnershipConfirmed)
           }}
         />
       )}
@@ -260,7 +296,7 @@ export function RegisterForm() {
       )}
 
       {error && <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">{error}</p>}
-      {registerMutation.isError && (
+      {registrationErrorMessage && (
         <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
           {registrationErrorMessage}
         </p>
@@ -277,8 +313,12 @@ export function RegisterForm() {
           </Link>
         )}
         {step === 'profile' ? (
-          <Button type="submit" disabled={registerMutation.isPending}>
-            {registerMutation.isPending ? t('common:actions.creatingAccount') : t('common:actions.createAccount')}
+          <Button type="submit" disabled={submitting}>
+            {submitting
+              ? t('common:actions.creatingAccount')
+              : role === 'teacher'
+                ? t('auth:register.applyCta')
+                : t('common:actions.createAccount')}
           </Button>
         ) : (
           <Button type="button" onClick={handleNext}>

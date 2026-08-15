@@ -5,7 +5,7 @@ import { supportedLanguages } from '@/i18n/languages'
 export const userRoleSchema = z.enum([
   'student',
   'parent',
-  'tutor',
+  'teacher',
   'admin',
   'organization_admin',
   'school_teacher',
