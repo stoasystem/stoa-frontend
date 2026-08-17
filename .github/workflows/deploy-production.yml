@@ -1,0 +1,94 @@
+name: Deploy Frontend to Production
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Lint, typecheck, and test gate
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Release contract tests
+        run: npm run test:release
+
+      - name: Publisher tests
+        run: node --test tests/release/publish-web-release.test.mjs
+
+  deploy:
+    name: Build and publish the served release
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Check out backend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: stoasystem/stoa-backend
+          path: stoa-backend
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Build
+        run: npm run build
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: arn:aws:iam::562923011260:role/stoa-github-frontend-deploy
+          aws-region: eu-central-2
+
+      - name: Publish served release
+        run: |
+          set -euo pipefail
+          backend_artifact_sha256="$(
+            git -C stoa-backend rev-parse HEAD | sha256sum | awk '{print $1}'
+          )"
+          node scripts/publish-web-release.mjs \
+            --dist dist \
+            --backend-artifact-sha256 "$backend_artifact_sha256"
