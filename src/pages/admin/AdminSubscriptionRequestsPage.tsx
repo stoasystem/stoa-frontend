@@ -43,9 +43,10 @@ const statusOptions: { label: string; value: SubscriptionRequestStatus | '' }[] 
 
 const tierOptions: { label: string; value: SubscriptionTier | '' }[] = [
   { label: 'Any tier', value: '' },
-  { label: 'Free', value: 'free' },
-  { label: 'Standard', value: 'standard' },
-  { label: 'Premium', value: 'premium' },
+  { label: 'Free Trial', value: 'free_trial' },
+  { label: 'Student', value: 'student' },
+  { label: 'Teacher-supported', value: 'teacher_supported' },
+  { label: 'Family', value: 'family' },
 ]
 
 export function AdminSubscriptionRequestsPage() {

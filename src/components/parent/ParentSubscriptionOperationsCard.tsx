@@ -18,30 +18,31 @@ import type {
   SubscriptionTier,
 } from '@/types/subscriptionOperations'
 
-const tierOrder: SubscriptionTier[] = ['free', 'standard', 'premium']
+const tierOrder: SubscriptionTier[] = ['free_trial', 'student', 'teacher_supported', 'family']
 
 const tierTone: Record<SubscriptionTier, string> = {
-  free: 'border-border/70 bg-card',
-  standard: 'border-primary/30 bg-[hsl(var(--stoa-brand-burgundy-soft))]',
-  premium: 'border-amber-400/50 bg-amber-50/80',
+  free_trial: 'border-border/70 bg-card',
+  student: 'border-primary/30 bg-[hsl(var(--stoa-brand-burgundy-soft))]',
+  teacher_supported: 'border-amber-400/50 bg-amber-50/80',
+  family: 'border-emerald-400/50 bg-emerald-50/80',
 }
 
 export function ParentSubscriptionOperationsCard() {
   const subscriptionQuery = useParentSubscriptionQuery()
   const requestsQuery = useParentSubscriptionRequestsQuery()
   const createRequestMutation = useCreateParentSubscriptionRequestMutation()
-  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('standard')
+  const [selectedTier, setSelectedTier] = useState<SubscriptionTier>('student')
   const [note, setNote] = useState('')
   const [message, setMessage] = useState<string | null>(null)
 
   const subscription = subscriptionQuery.data
-  const currentTier = subscription?.currentTier ?? 'free'
+  const currentTier = subscription?.currentTier ?? 'free_trial'
   const plans = subscription?.plans
   const pendingRequest = subscription?.pendingRequest
   const billing = subscription?.billing
   const recentRequests = requestsQuery.data?.items ?? []
   const requestType = useMemo<SubscriptionRequestType>(() => {
-    if (selectedTier === 'free') return 'cancel'
+    if (selectedTier === 'free_trial') return 'cancel'
     if (tierOrder.indexOf(selectedTier) > tierOrder.indexOf(currentTier)) return 'upgrade'
     return 'downgrade'
   }, [currentTier, selectedTier])
@@ -101,17 +102,21 @@ export function ParentSubscriptionOperationsCard() {
         <ProviderBillingStatus billing={billing} />
         {pendingRequest && <PendingRequest request={pendingRequest} />}
         <div className="grid gap-3 md:grid-cols-3">
-          {plans && tierOrder.map((tier) => (
-            <PlanOption
-              key={tier}
-              tier={tier}
-              benefits={plans[tier]}
-              currentTier={currentTier}
-              selected={selectedTier === tier}
-              disabled={Boolean(pendingRequest) || tier === currentTier}
-              onSelect={() => setSelectedTier(tier)}
-            />
-          ))}
+          {plans && tierOrder.map((tier) => {
+            const benefits = plans[tier]
+            if (!benefits) return null
+            return (
+              <PlanOption
+                key={tier}
+                tier={tier}
+                benefits={benefits}
+                currentTier={currentTier}
+                selected={selectedTier === tier}
+                disabled={Boolean(pendingRequest) || tier === currentTier}
+                onSelect={() => setSelectedTier(tier)}
+              />
+            )
+          })}
         </div>
         <div className="space-y-3">
           <Textarea
@@ -168,7 +173,7 @@ function ProviderBillingStatus({
       </div>
       <div className="mt-4 grid gap-2 text-sm sm:grid-cols-3">
         <BillingFact label="Mode" value={billing?.mode ?? 'manual'} />
-        <BillingFact label="Managed tier" value={formatTier(billing?.subscriptionTier ?? 'free')} />
+        <BillingFact label="Managed tier" value={formatTier(billing?.subscriptionTier ?? 'free_trial')} />
         <BillingFact label="Last event" value={billing?.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
       </div>
     </div>
@@ -296,8 +301,8 @@ function formatDate(value: string) {
 }
 
 function billingStatusCopy(status: string, billing?: SubscriptionBilling) {
-  if (status === 'active') return `Provider-managed ${formatTier(billing?.subscriptionTier ?? 'free')} subscription is active.`
-  if (status === 'checkout_pending') return `Checkout is pending for ${formatTier(billing?.requestedTier ?? 'standard')}.`
+  if (status === 'active') return `Provider-managed ${formatTier(billing?.subscriptionTier ?? 'free_trial')} subscription is active.`
+  if (status === 'checkout_pending') return `Checkout is pending for ${formatTier(billing?.requestedTier ?? 'student')}.`
   if (status === 'payment_failed' || status === 'past_due') return 'Payment needs attention before the provider-managed subscription is healthy.'
   if (status === 'manual_override') return 'A STOA admin applied this plan manually; provider events will not override it automatically.'
   if (status === 'canceled') return 'Provider-managed subscription is canceled.'

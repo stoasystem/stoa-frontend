@@ -232,9 +232,9 @@ function mapFeatureAccess(subscription: ParentSubscription): FeatureAccess {
   )
   return {
     canUseChat: !blocked,
-    canUploadFiles: !blocked && plan !== 'free',
-    canRequestTeacherHelp: !blocked && plan !== 'free',
-    canViewParentReports: !blocked && plan !== 'free',
+    canUploadFiles: !blocked && plan !== 'free_trial',
+    canRequestTeacherHelp: !blocked && plan !== 'free_trial',
+    canViewParentReports: !blocked && plan !== 'free_trial',
     reason: blocked
       ? {
           teacherHelp:

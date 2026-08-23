@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'standard' | 'premium'
+export type SubscriptionTier = 'free_trial' | 'student' | 'teacher_supported' | 'family'
 
 export type SubscriptionRequestType = 'upgrade' | 'downgrade' | 'cancel'
 
@@ -117,7 +117,7 @@ export type EffectiveEntitlement = {
 export type ParentSubscription = {
   parentId: string
   currentTier: SubscriptionTier
-  plans: Record<SubscriptionTier, SubscriptionPlanBenefits>
+  plans: Partial<Record<SubscriptionTier, SubscriptionPlanBenefits>>
   pendingRequest?: SubscriptionRequest | null
   billing?: SubscriptionBilling
   effectiveEntitlements?: EffectiveEntitlement[]

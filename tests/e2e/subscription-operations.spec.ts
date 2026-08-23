@@ -3,23 +3,29 @@ import { loginAs } from './helpers'
 import type { SubscriptionBilling, SubscriptionRequest } from '../../src/types/subscriptionOperations'
 
 const plans = {
-  free: {
-    label: 'Free',
+  free_trial: {
+    label: 'Free Trial',
     dailyAiQuestionLimit: 5,
     teacherSupport: 'none',
     weeklyReport: 'none',
   },
-  standard: {
-    label: 'Standard',
+  student: {
+    label: 'Student',
     dailyAiQuestionLimit: 30,
-    teacherSupport: 'standard',
-    weeklyReport: 'summary',
+    teacherSupport: 'text_support',
+    weeklyReport: 'enabled',
   },
-  premium: {
-    label: 'Premium',
+  teacher_supported: {
+    label: 'Teacher-supported',
     dailyAiQuestionLimit: 100,
-    teacherSupport: 'priority',
-    weeklyReport: 'detailed',
+    teacherSupport: 'priority_support',
+    weeklyReport: 'enhanced',
+  },
+  family: {
+    label: 'Family',
+    dailyAiQuestionLimit: 100,
+    teacherSupport: 'priority_support',
+    weeklyReport: 'enhanced',
   },
 }
 
@@ -37,7 +43,7 @@ test('parent can submit a manual subscription request', async ({ page }) => {
       contentType: 'application/json',
       body: JSON.stringify({
         parentId: 'parent-1',
-        currentTier: 'free',
+        currentTier: 'free_trial',
         plans,
         pendingRequest: null,
         billing: subscriptionBilling('none'),
@@ -55,7 +61,7 @@ test('parent can submit a manual subscription request', async ({ page }) => {
         checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_test_parent',
         provider: 'stripe',
         mode: 'test',
-        requestedTier: 'premium',
+        requestedTier: 'teacher_supported',
         billingStatus: 'checkout_pending',
       }),
     })
@@ -81,7 +87,7 @@ test('parent can submit a manual subscription request', async ({ page }) => {
   await page.getByRole('button', { name: /premium/i }).click()
   await page.getByRole('button', { name: /start checkout/i }).click()
   await expect.poll(() => checkoutBody).toMatchObject({
-    requested_tier: 'premium',
+    requested_tier: 'teacher_supported',
   })
   await expect(page.getByText(/checkout ready: premium/i)).toBeVisible()
   await expect(page.getByRole('link', { name: /open secure checkout/i })).toBeVisible()
@@ -90,7 +96,7 @@ test('parent can submit a manual subscription request', async ({ page }) => {
 
   await expect.poll(() => submittedBody).toMatchObject({
     request_type: 'upgrade',
-    requested_tier: 'premium',
+    requested_tier: 'teacher_supported',
     parent_note: 'Please upgrade for exam prep.',
   })
   await expect(page.getByText(/request requested: premium/i)).toBeVisible()
@@ -203,8 +209,8 @@ function subscriptionRequest(status: SubscriptionRequest['status']): Subscriptio
     requestId: 'request-1',
     parentId: 'parent-1',
     studentId: null,
-    currentTier: 'free',
-    requestedTier: 'premium',
+    currentTier: 'free_trial',
+    requestedTier: 'teacher_supported',
     requestType: 'upgrade',
     status,
     source: 'parent_portal',
@@ -234,8 +240,8 @@ function subscriptionBilling(status: SubscriptionBilling['status']): Subscriptio
     provider: status === 'none' ? null : 'stripe',
     mode: status === 'none' ? 'manual' : 'test',
     status,
-    subscriptionTier: status === 'none' ? 'free' : 'premium',
-    requestedTier: status === 'none' ? null : 'premium',
+    subscriptionTier: status === 'none' ? 'free_trial' : 'teacher_supported',
+    requestedTier: status === 'none' ? null : 'teacher_supported',
     providerCustomerId: status === 'none' ? null : 'cus_test_parent',
     providerSubscriptionId: status === 'none' ? null : 'sub_test_parent',
     providerPriceId: status === 'none' ? null : 'price_test_premium',
@@ -261,7 +267,7 @@ function subscriptionBilling(status: SubscriptionBilling['status']): Subscriptio
             provider: 'stripe',
             providerMode: 'test',
             billingStatus: 'active',
-            requestedTier: 'premium',
+            requestedTier: 'teacher_supported',
             providerEventId: 'evt_checkout_completed_1',
           },
         ],
