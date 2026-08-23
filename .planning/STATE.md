@@ -90,6 +90,7 @@ Last activity: 2026-08-04 - Completed quick task 260804-dex: merge codex branch 
 | 2026-07-07 | v9 final issue cleanup | Fixed Home V2 responsive blockers, cleaned legal page presentation, added metadata, documented temporary image approval and switch-over plan, verified with screenshots/audits/lint/build/E2E. |
 | 2026-07-07 | v8 visual QA execution | Captured screenshot matrix, reviewed visual quality, legal drafts, SEO/routing/rollback readiness, and produced No-Go switch decision plus v9 backlog. |
 | 2026-07-07 | v7 multilingual execution | Added FR/IT runtime registration, Home V2 language controls, localized legal pages, QA docs, legal source notes, E2E coverage, and verification. |
+| 2026-08-23 | Document the current Home V2 design for collaborators | Added a source-linked collaborator design brief that records the current root route, visual system, narrative, motion, localisation, assets, and launch-boundary notes. |
 
 ### Pending Todos
 
