@@ -41,6 +41,8 @@ export interface MemorySummaryResponse {
 
 export async function getMyMemorySummary(subject?: string): Promise<MemorySummaryResponse> {
   const params = subject ? { subject } : undefined
-  const response = await httpClient.get<MemorySummaryResponse>('/students/me/memory', { params })
+  const response = await httpClient.get<MemorySummaryResponse>('/adaptive/students/me/memory', {
+    params,
+  })
   return response.data
 }
