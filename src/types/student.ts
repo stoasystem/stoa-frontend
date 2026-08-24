@@ -5,31 +5,13 @@ export type StudentProfile = {
   userId: string
   name: string
   email: string
-  phone?: string
-  dateOfBirth?: string
-  minor?: boolean
   grade: string
   primarySubjects: string[]
   schoolSystem?: string
   preferredAnswerLanguage: SupportedLanguage
-  guardian?: {
-    name: string
-    relationship: string
-    email: string
-    phone?: string
-    accountStatus: 'linked' | 'invited' | 'not_linked'
-  }
-  billing?: {
-    planName: string
-    status: 'trial' | 'active' | 'past_due' | 'inactive'
-    payerName: string
-    payerRole: 'parent' | 'student' | 'organization'
-    billingEmail: string
-    paymentMethod: string
-    nextBillingDate?: string
-  }
-  createdAt?: string
-  updatedAt?: string
+  guardianStatus: 'linked' | 'not_linked'
+  createdAt: string
+  updatedAt: string
 }
 
 export type LearningHistoryItem = {

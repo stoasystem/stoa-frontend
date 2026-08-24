@@ -323,26 +323,6 @@ export type PracticeTeacherHelpResponse = {
   teacherName: string | null
 }
 
-export type PracticeParentSummary = {
-  lessonsCompletedThisWeek: number
-  topicsPracticed: string[]
-  mistakesReviewed: number
-  practiceStreak: number
-  currentSubject: string
-  currentGradeLevel: string
-  currentTopic: string
-  currentTopicId: string
-  currentPracticePath: string
-  recommendedNextTopic: string
-  supportiveNote: string
-  questionsAsked?: number
-  teacherSupportRequested?: number
-  learningActivityNote?: string
-  questionBankSetsAttempted?: number
-  questionBankMistakesReviewed?: number
-  questionBankNextFocus?: string
-}
-
 export type PracticeChatContext = {
   source: 'practice'
   subjectId: string

@@ -7,7 +7,6 @@ import type {
   PracticeLessonResult,
   PracticeMistake,
   PracticeOverview,
-  PracticeParentSummary,
   PracticePath,
   PracticeRoadmap,
   PracticeRoadmapLesson,
@@ -610,28 +609,6 @@ export function getMockPracticeHint(challengeId: string): PracticeHintResponse {
     title: 'Focus on the next step',
     hint: challenge?.hint ?? 'Look for the operation you can undo first.',
     nextStep: 'Try one more answer after applying the hint. If the step is still unclear, ask for a guided explanation.',
-  }
-}
-
-export function getMockPracticeParentSummary(): PracticeParentSummary {
-  return {
-    lessonsCompletedThisWeek: 3,
-    topicsPracticed: ['One-step equations', 'Solving equations in two steps', 'Simple systems'],
-    mistakesReviewed: 2,
-    practiceStreak: 5,
-    currentSubject: 'Mathematics',
-    currentGradeLevel: demoGradeLevelLabel,
-    currentTopic: demoTopicTitle,
-    currentTopicId: demoTopicId,
-    currentPracticePath: 'Mathematics / Equations',
-    recommendedNextTopic: 'Solving equations in two steps and substitution',
-    supportiveNote: 'Anna practised the current Mathematics / Equations demo topic and asked for explanations when a step was unclear. This shows where understanding is already strong and where more practice may help.',
-    questionsAsked: 2,
-    teacherSupportRequested: 1,
-    questionBankSetsAttempted: 4,
-    questionBankMistakesReviewed: 3,
-    questionBankNextFocus: 'Linear Equations Basics',
-    learningActivityNote: 'This week combines independent Practice Path work with step-by-step explanations and one teacher-support moment.',
   }
 }
 

@@ -7,7 +7,6 @@ import {
   GraduationCap,
   Languages,
   Mail,
-  Phone,
   ShieldCheck,
   UserRound,
   UsersRound,
@@ -18,7 +17,6 @@ import { LearningProfileSignals } from '@/components/learning/LearningProfileSig
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { SectionHeader } from '@/components/common/SectionHeader'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -40,29 +38,14 @@ type ProfileErrors = {
   preferredAnswerLanguage?: string
 }
 
-const guardianStatusLabel: Record<
-  NonNullable<StudentProfile['guardian']>['accountStatus'],
-  string
-> = {
+const guardianStatusLabel: Record<StudentProfile['guardianStatus'], string> = {
   linked: 'Linked',
-  invited: 'Invitation sent',
   not_linked: 'Not linked',
-}
-
-const billingStatusLabel: Record<NonNullable<StudentProfile['billing']>['status'], string> = {
-  active: 'Active',
-  inactive: 'Inactive',
-  past_due: 'Payment needed',
-  trial: 'Trial',
 }
 
 type ProfileBillingSnapshot = {
   planName: string
   statusLabel: string
-  payerName: string
-  payerRole: NonNullable<StudentProfile['billing']>['payerRole']
-  billingEmail: string
-  paymentMethod: string
   nextBillingDate?: string
 }
 
@@ -114,9 +97,7 @@ export function StudentProfilePage() {
   }
 
   const profile = profileQuery.data
-  const billing = profile
-    ? getProfileBillingSnapshot(profile, subscriptionQuery.data, subscriptionQuery.isPending)
-    : undefined
+  const billing = getProfileBillingSnapshot(subscriptionQuery.data, subscriptionQuery.isPending)
 
   return (
     <DashboardLayout>
@@ -230,13 +211,10 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
               {profile.grade} · {profile.schoolSystem ?? 'School system not set'}
             </CardDescription>
           </div>
-          {profile.minor && <Badge variant="secondary">Minor account</Badge>}
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         <ProfileDetail icon={Mail} label="Email" value={profile.email} />
-        <ProfileDetail icon={Phone} label="Phone" value={profile.phone ?? 'Not provided'} />
-        <ProfileDetail icon={CalendarDays} label="Date of birth" value={formatDate(profile.dateOfBirth)} />
         <ProfileDetail icon={GraduationCap} label="Primary subjects" value={profile.primarySubjects.join(', ')} />
         <ProfileDetail
           icon={Languages}
@@ -266,7 +244,7 @@ function AccountStatusCard({
         <ProfileDetail
           icon={UsersRound}
           label="Parent account"
-          value={profile.guardian ? guardianStatusLabel[profile.guardian.accountStatus] : 'Not linked'}
+          value={guardianStatusLabel[profile.guardianStatus]}
         />
         <ProfileDetail icon={ShieldCheck} label="Billing status" value={billing?.statusLabel ?? 'Not set'} />
         <ProfileDetail icon={CalendarDays} label="Last updated" value={formatDate(profile.updatedAt)} />
@@ -276,22 +254,17 @@ function AccountStatusCard({
 }
 
 function GuardianCard({ profile }: { profile: StudentProfile }) {
-  const guardian = profile.guardian
-
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
         <CardTitle className="text-base">Parent or guardian</CardTitle>
         <CardDescription>Required for minor students and family progress visibility.</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {guardian ? (
-          <>
-            <ProfileDetail icon={UsersRound} label="Name" value={guardian.name} />
-            <ProfileDetail icon={ShieldCheck} label="Relationship" value={guardian.relationship} />
-            <ProfileDetail icon={Mail} label="Email" value={guardian.email} />
-            <ProfileDetail icon={Phone} label="Phone" value={guardian.phone ?? 'Not provided'} />
-          </>
+      <CardContent>
+        {profile.guardianStatus === 'linked' ? (
+          <p className="text-sm text-muted-foreground">
+            A parent account is linked and can follow this student's progress.
+          </p>
         ) : (
           <p className="text-sm text-muted-foreground">No parent or guardian account is linked yet.</p>
         )}
@@ -304,21 +277,18 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Payment and plan</CardTitle>
-        <CardDescription>Shows who manages payment for this student account.</CardDescription>
+        <CardTitle className="text-base">Plan</CardTitle>
+        <CardDescription>The subscription this student account is covered by.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {billing ? (
           <>
             <ProfileDetail icon={CreditCard} label="Plan" value={billing.planName} />
             <ProfileDetail icon={ShieldCheck} label="Status" value={billing.statusLabel} />
-            <ProfileDetail icon={UsersRound} label="Paid by" value={`${billing.payerName} (${billing.payerRole})`} />
-            <ProfileDetail icon={Mail} label="Billing email" value={billing.billingEmail} />
-            <ProfileDetail icon={CreditCard} label="Payment method" value={billing.paymentMethod} />
-            <ProfileDetail icon={CalendarDays} label="Next billing date" value={formatDate(billing.nextBillingDate)} />
+            <ProfileDetail icon={CalendarDays} label="Renews" value={formatDate(billing.nextBillingDate)} />
           </>
         ) : (
-          <p className="text-sm text-muted-foreground">No payment method is attached to this student account.</p>
+          <p className="text-sm text-muted-foreground">No subscription is attached to this account.</p>
         )}
       </CardContent>
     </Card>
@@ -326,29 +296,16 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
 }
 
 function getProfileBillingSnapshot(
-  profile: StudentProfile,
   subscription: Subscription | undefined,
   subscriptionPending: boolean,
 ): ProfileBillingSnapshot | undefined {
-  if (!profile.billing) return undefined
-
   if (subscriptionPending) {
-    return {
-      ...profile.billing,
-      planName: 'Loading...',
-      statusLabel: 'Loading...',
-    }
+    return { planName: 'Loading...', statusLabel: 'Loading...' }
   }
 
-  if (!subscription) {
-    return {
-      ...profile.billing,
-      statusLabel: billingStatusLabel[profile.billing.status],
-    }
-  }
+  if (!subscription) return undefined
 
   return {
-    ...profile.billing,
     planName: getSubscriptionPlanLabel(subscription.plan),
     statusLabel: getSubscriptionStatusLabel(subscription.status),
     nextBillingDate: subscription.currentPeriodEnd,

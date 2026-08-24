@@ -12,7 +12,6 @@ import type {
   PracticeLesson,
   PracticeLessonResult,
   PracticeOverview,
-  PracticeParentSummary,
   PracticePath,
   PracticeRoadmap,
   PracticeSubject,
@@ -107,13 +106,6 @@ function describePracticeContext(payload: PracticeTeacherHelpRequest) {
   if (context?.studentAnswer) lines.push(`Meine Antwort: ${context.studentAnswer}`)
   if (context?.attempts) lines.push(`Versuche: ${context.attempts}`)
   return lines.join('\n')
-}
-
-export async function getPracticeParentSummary(childId: string) {
-  const response = await httpClient.get<PracticeParentSummary>(
-    `/parents/me/children/${childId}/practice-summary`,
-  )
-  return response.data
 }
 
 export async function getCurriculumCatalog({
