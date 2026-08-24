@@ -2,6 +2,25 @@
 
 STOA learning platform frontend.
 
+## Signing in
+
+The deployed environment is https://stoaedu.ch, backed by the API at
+https://api.stoaedu.ch. These four accounts exist there and share one password,
+`StoaTest2026!`:
+
+| Role    | Email                       |
+| ------- | --------------------------- |
+| Student | `student@test.stoaedu.ch`   |
+| Parent  | `parent@test.stoaedu.ch`    |
+| Teacher | `teacher@test.stoaedu.ch`   |
+| Admin   | `admin@test.stoaedu.ch`     |
+
+Teachers and admins sign in through their own portal, not the student form.
+
+The `*@test.com / password123` accounts named further down this file belong to a
+demo backend that no longer exists; those sections are kept as a record of past
+phases and are not runnable.
+
 ## Phase v2.4 UI Copy & Web Design Refinement
 
 STOA now presents Practice Path, Practice Library, Upload a Question, Learning Assistant, Tutor Support, and Online Classroom as one coherent learning support system.
@@ -229,8 +248,6 @@ Local provider QA:
 
 ```bash
 python3 -m unittest discover -s demo-harness/tests
-npm run demo:reset
-npm run demo:backend
 npm run build
 ```
 
@@ -433,8 +450,6 @@ Phase 23 docs:
 Verification:
 
 ```bash
-npm run demo:reset
-npm run demo:backend
 npm run dev -- --host 127.0.0.1
 npm run lint
 npm run build
@@ -497,8 +512,6 @@ Verification:
 
 ```bash
 npm install --ignore-scripts
-npm run demo:reset
-npm run demo:backend
 npm run dev -- --host 127.0.0.1
 npm run lint
 npm run build
@@ -847,18 +860,6 @@ Demo accounts:
 - `parent@test.com / password123`
 - `tutor@test.com / password123`
 - `admin@test.com / password123`
-
-Run demo backend:
-
-```bash
-npm run demo:backend
-```
-
-Reset demo data:
-
-```bash
-npm run demo:reset
-```
 
 Phase 14 docs:
 
