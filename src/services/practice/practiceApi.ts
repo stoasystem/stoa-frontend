@@ -82,14 +82,15 @@ export async function requestPracticeTeacherHelp(
 ): Promise<PracticeTeacherHelpResponse> {
   // Practice help joins the same escalation lane as chat so the student and the
   // teacher continue in one thread instead of a separate practice-only channel.
+  // The conversation is opened without an initial message: the student asked for
+  // a person, so there is no reason to spend an AI turn first.
   const conversation = await createConversation({
     subject: payload.subjectId,
     grade: payload.gradeLevel ?? '',
-    initialMessage: describePracticeContext(payload),
   })
   const request = await createTeacherHelpRequest({
     conversationId: conversation.id,
-    message: payload.message,
+    message: describePracticeContext(payload),
   })
   return {
     requestId: request.requestId,
