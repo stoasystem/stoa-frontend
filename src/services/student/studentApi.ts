@@ -1,7 +1,7 @@
 import { httpClient } from '@/services/api/httpClient'
-import { withDemoFallback } from '@/services/demo/demoFallback'
+
 import { isSupportedLanguage } from '@/i18n/languages'
-import { learningSubjectOptions, type LearningProfile } from '@/types/learningProfile'
+import { type LearningProfile } from '@/types/learningProfile'
 import type { LearningHistoryItem, StudentProfile } from '@/types/student'
 
 const mockStudentProfile: StudentProfile = {
@@ -36,104 +36,26 @@ const mockStudentProfile: StudentProfile = {
   updatedAt: '2026-05-27T09:00:00Z',
 }
 
-const mockStudentLearningHistory: { items: LearningHistoryItem[] } = {
-  items: [
-    {
-      id: 'history-practice-equations',
-      subject: 'Mathematics',
-      title: 'Practice Path: Solving equations in two steps',
-      summary:
-        'Completed a short Practice Path lesson and checked each operation before moving to the final answer.',
-      createdAt: '2026-05-27T10:30:00Z',
-    },
-    {
-      id: 'history-learning-chat-equations',
-      subject: 'Mathematics',
-      title: 'Question explanation',
-      summary:
-        'Asked for a clearer explanation after a practice hint was not enough to understand the next step.',
-      createdAt: '2026-05-26T15:20:00Z',
-    },
-    {
-      id: 'history-teacher-support-linear-systems',
-      subject: 'Mathematics',
-      title: 'Teacher support request',
-      summary:
-        'Requested professional teacher support after repeated confusion with substitution in a linear system.',
-      createdAt: '2026-05-25T16:45:00Z',
-    },
-  ],
-}
-
-const mockStudentLearningProfile: LearningProfile = {
-  studentId: 'demo-student',
-  subjects: learningSubjectOptions,
-  subjectActivity: [
-    {
-      subject: 'math',
-      label: 'Mathematics',
-      rolloutState: 'active',
-      questionCount: 9,
-      aiResolvedCount: 7,
-      teacherEscalationCount: 2,
-      feedbackAverage: 4.2,
-    },
-    {
-      subject: 'physics',
-      label: 'Physics',
-      rolloutState: 'foundation',
-      questionCount: 3,
-      aiResolvedCount: 2,
-      teacherEscalationCount: 1,
-      feedbackAverage: 3.7,
-    },
-  ],
-  weakTopics: [
-    {
-      subject: 'physics',
-      topicId: 'newtons-laws',
-      label: "Newton's laws",
-      count: 2,
-      latestEvidenceAt: '2026-06-04T12:00:00Z',
-      evidenceQuestionIds: ['question-physics-1', 'question-physics-2'],
-    },
-  ],
-  strengthTopics: [],
-  updatedAt: '2026-06-04T12:00:00Z',
-}
-
 export async function getStudentProfile() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<StudentProfile>('/students/me/profile')
-    return mergeStudentProfile(response.data)
-  }, mockStudentProfile)
+  const response = await httpClient.get<StudentProfile>('/students/me/profile')
+  return mergeStudentProfile(response.data)
 }
 
 export async function updateStudentProfile(payload: Partial<StudentProfile>) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.patch<StudentProfile>('/students/me/profile', payload)
-    return mergeStudentProfile(response.data)
-  }, () => ({
-    ...mockStudentProfile,
-    ...payload,
-    updatedAt: new Date().toISOString(),
-  }))
+  const response = await httpClient.patch<StudentProfile>('/students/me/profile', payload)
+  return mergeStudentProfile(response.data)
 }
 
 export async function getStudentLearningHistory() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<{ items: LearningHistoryItem[] }>(
-      '/students/me/learning-history',
-    )
-    return response.data
-  }, mockStudentLearningHistory)
+  const response = await httpClient.get<{ items: LearningHistoryItem[] }>(
+    '/students/me/learning-history',
+  )
+  return response.data
 }
 
 export async function getStudentLearningProfile(studentId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<LearningProfile>(`/students/${studentId}/learning-profile`)
-    return response.data
-  }, mockStudentLearningProfile)
+  const response = await httpClient.get<LearningProfile>(`/students/${studentId}/learning-profile`)
+  return response.data
 }
 
 function mergeStudentProfile(profile: StudentProfile): StudentProfile {

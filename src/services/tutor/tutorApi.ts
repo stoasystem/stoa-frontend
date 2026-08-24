@@ -1,10 +1,5 @@
 import { httpClient } from '@/services/api/httpClient'
-import {
-  mockTutorHelpRequestDetail,
-  mockTutorHelpRequests,
-  mockTutorStats,
-} from '@/data/phase11MockData'
-import { withDemoFallback } from '@/services/demo/demoFallback'
+
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 import type {
   TutorHelpRequestDetail,
@@ -73,28 +68,22 @@ const mockTutorProfile: TutorProfile = {
 // Backend gap: /teachers/me/profile is not implemented, so /tutor/profile still fails
 // against a real API. Prefixed for consistency only; needs a backend endpoint to work.
 export async function getTutorProfile() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorProfile>('/teachers/me/profile')
-    return mergeTutorProfile(response.data)
-  }, mockTutorProfile)
+  const response = await httpClient.get<TutorProfile>('/teachers/me/profile')
+  return mergeTutorProfile(response.data)
 }
 
 export async function getTutorHelpRequests() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<{ items: TutorHelpRequestSummary[] }>(
-      '/teachers/me/help-requests',
-    )
-    return response.data
-  }, { items: mockTutorHelpRequests })
+  const response = await httpClient.get<{ items: TutorHelpRequestSummary[] }>(
+    '/teachers/me/help-requests',
+  )
+  return response.data
 }
 
 export async function getTutorHelpRequestDetail(requestId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorHelpRequestDetail>(
-      `/teachers/me/help-requests/${requestId}`,
-    )
-    return response.data
-  }, { ...mockTutorHelpRequestDetail, requestId })
+  const response = await httpClient.get<TutorHelpRequestDetail>(
+    `/teachers/me/help-requests/${requestId}`,
+  )
+  return response.data
 }
 
 export async function updateTutorHelpRequestStatus({
@@ -106,13 +95,11 @@ export async function updateTutorHelpRequestStatus({
   status: TeacherHelpStatus
   resolutionNote?: string
 }) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.patch<TutorHelpRequestSummary>(
-      `/teachers/me/help-requests/${requestId}`,
-      { status, resolutionNote },
-    )
-    return response.data
-  }, { ...mockTutorHelpRequests[0], requestId, status })
+  const response = await httpClient.patch<TutorHelpRequestSummary>(
+    `/teachers/me/help-requests/${requestId}`,
+    { status, resolutionNote },
+  )
+  return response.data
 }
 
 export async function addTutorHelpRequestNote({
@@ -124,93 +111,51 @@ export async function addTutorHelpRequestNote({
   content: string
   richContent?: TeacherReplyRichContent
 }) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.post<TutorHelpRequestNote>(
-      `/teachers/me/help-requests/${requestId}/notes`,
-      { content, richContent },
-    )
-    return response.data
-  }, {
-    id: `note-${Date.now()}`,
-    note: content,
-    createdAt: new Date().toISOString(),
-    tutor: { id: 'demo-tutor', name: 'STOA teacher' },
-    richContent: richContent ?? {
-      version: 1,
-      blocks: [{ type: 'paragraph', text: content }],
-    },
-    responseFormat: 'stoa_teacher_reply_v1',
-  })
+  const response = await httpClient.post<TutorHelpRequestNote>(
+    `/teachers/me/help-requests/${requestId}/notes`,
+    { content, richContent },
+  )
+  return response.data
 }
 
 export async function getTutorStats() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<TutorStats>('/teachers/me/stats')
-    return response.data
-  }, mockTutorStats)
+  const response = await httpClient.get<TutorStats>('/teachers/me/stats')
+  return response.data
 }
 
 export async function getTutorAssistanceSummary(questionId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<TeacherAssistanceSummary>(
-      `/teachers/questions/${questionId}/assistance-summary`,
-    )
-    return response.data
-  }, {
-    summaryId: `assist-${questionId}`,
-    questionId,
-    studentId: 'demo-student',
-    subject: 'Mathematics',
-    studentContextSummary: 'Student has active Mathematics evidence around linear equations and moving terms.',
-    questionSummary: 'Anna is stuck on solving 3x = 15 after moving terms across the equals sign.',
-    aiAnswerSummary: 'The assistant explained isolating x and checking the result.',
-    weakTopics: ['Linear equations', 'Moving terms'],
-    suggestedFocus: 'Clarify the algebra step before giving the final answer.',
-    sourceCount: 4,
-    createdAt: new Date().toISOString(),
-  })
+  const response = await httpClient.get<TeacherAssistanceSummary>(
+    `/teachers/questions/${questionId}/assistance-summary`,
+  )
+  return response.data
 }
 
 export async function createAiTeacherSummaryDraft(questionId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>(
-      `/teachers/questions/${questionId}/ai-tools/summary-draft`,
-      {},
-    )
-    return response.data
-  }, createMockSummaryDraft(questionId))
+  const response = await httpClient.post<AiTeacherDraft>(
+    `/teachers/questions/${questionId}/ai-tools/summary-draft`,
+    {},
+  )
+  return response.data
 }
 
 export async function createAiTeacherExerciseDraft(payload: CreateExerciseDraftPayload) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>('/teachers/ai-tools/exercise-drafts', payload)
-    return response.data
-  }, createMockExerciseDraft(payload))
+  const response = await httpClient.post<AiTeacherDraft>('/teachers/ai-tools/exercise-drafts', payload)
+  return response.data
 }
 
 export async function getAiTeacherDrafts() {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<AiTeacherDraftList>('/teachers/ai-tools/drafts')
-    return response.data
-  }, { items: [], count: 0 })
+  const response = await httpClient.get<AiTeacherDraftList>('/teachers/ai-tools/drafts')
+  return response.data
 }
 
 export async function getAiTeacherDraft(draftId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.get<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}`)
-    return response.data
-  }, createMockSummaryDraft('help-1', draftId))
+  const response = await httpClient.get<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}`)
+  return response.data
 }
 
 export async function regenerateAiTeacherDraft(draftId: string) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/regenerate`, {})
-    return response.data
-  }, {
-    ...createMockSummaryDraft('help-1', `regen-${draftId}`),
-    previousDraftId: draftId,
-    generatedAt: new Date().toISOString(),
-  })
+  const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/regenerate`, {})
+  return response.data
 }
 
 export async function acceptAiTeacherDraft(payload: ReviewAiTeacherDraftPayload) {
@@ -229,16 +174,8 @@ async function reviewAiTeacherDraft(
   action: 'accept' | 'reject' | 'archive',
   { draftId, note }: ReviewAiTeacherDraftPayload,
 ) {
-  return withDemoFallback(async () => {
-    const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/${action}`, { note })
-    return response.data
-  }, {
-    ...createMockSummaryDraft('help-1', draftId),
-    status: action === 'accept' ? 'accepted' : action === 'reject' ? 'rejected' : 'archived',
-    reviewNote: note,
-    reviewedBy: 'demo-tutor',
-    reviewedAt: new Date().toISOString(),
-  })
+  const response = await httpClient.post<AiTeacherDraft>(`/teachers/ai-tools/drafts/${draftId}/${action}`, { note })
+  return response.data
 }
 
 function mergeTutorProfile(profile: TutorProfile): TutorProfile {
@@ -268,71 +205,3 @@ function mergeTutorProfile(profile: TutorProfile): TutorProfile {
   }
 }
 
-function createMockSummaryDraft(questionId: string, draftId = `draft-summary-${questionId}`): AiTeacherDraft {
-  const now = new Date().toISOString()
-  return {
-    draftId,
-    draftType: 'teacher_summary',
-    status: 'draft',
-    studentId: 'user-student',
-    questionId,
-    subject: 'Mathematics',
-    topicIds: ['linear-equations', 'moving-terms'],
-    sessionSummary: 'Anna attempted a two-step linear equation and reached the correct intermediate equation.',
-    misconceptionSummary: 'The likely gap is dividing or checking the final value after isolating 3x.',
-    suggestedTeachingFocus: 'Ask Anna to explain why subtracting 5 gives 3x = 15 before dividing by 3.',
-    draftFollowupExplanation: 'Keep the intervention short and have the student verify by substitution.',
-    sourceContext: { sourceCount: 4, boundedToVisibleRequest: true },
-    promptVersion: 'stoa_ai_teacher_tools_v1',
-    createdBy: 'demo-tutor',
-    createdByRole: 'teacher',
-    createdAt: now,
-    generatedAt: now,
-    updatedAt: now,
-    studentDeliveryStatus: 'not_delivered',
-    difficulty: null,
-    exerciseCount: 0,
-    items: [],
-    answerKey: [],
-    explanations: [],
-  }
-}
-
-function createMockExerciseDraft(payload: CreateExerciseDraftPayload): AiTeacherDraft {
-  const now = new Date().toISOString()
-  const count = Math.max(1, Math.min(payload.exerciseCount, 5))
-  const items = Array.from({ length: count }, (_, index) => ({
-    id: `exercise-${index + 1}`,
-    type: 'short_answer',
-    prompt: `Solve ${index + 2}x + 5 = ${2 * (index + 2) + 5}.`,
-  }))
-  return {
-    draftId: `draft-exercise-${Date.now()}`,
-    draftType: 'practice_exercise',
-    status: 'draft',
-    studentId: payload.studentId,
-    questionId: payload.questionId,
-    subject: payload.subject,
-    topicIds: payload.topicIds,
-    sessionSummary: 'Practice draft based on the current teacher help request.',
-    misconceptionSummary: 'Student needs repeated checks around inverse operations.',
-    suggestedTeachingFocus: 'Use short equations that require one inverse operation at a time.',
-    draftFollowupExplanation: 'Review answers before sharing; this draft is not delivered to the student automatically.',
-    sourceContext: { boundedToVisibleStudent: true },
-    promptVersion: 'stoa_ai_teacher_tools_v1',
-    createdBy: 'demo-tutor',
-    createdByRole: 'teacher',
-    createdAt: now,
-    generatedAt: now,
-    updatedAt: now,
-    studentDeliveryStatus: 'not_delivered',
-    difficulty: payload.difficulty,
-    exerciseCount: count,
-    items,
-    answerKey: items.map((item) => ({ itemId: item.id, answer: 'x = 2' })),
-    explanations: items.map((item) => ({
-      itemId: item.id,
-      explanation: 'Subtract 5 from both sides, then divide by the coefficient of x.',
-    })),
-  }
-}

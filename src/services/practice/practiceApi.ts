@@ -1,20 +1,7 @@
-import {
-  completeMockLesson,
-  getMockLesson,
-  getMockMistakes,
-  getMockPracticeHint,
-  getMockPracticeOverview,
-  getMockPracticeParentSummary,
-  getMockPracticePath,
-  getMockPracticeRoadmap,
-  getMockCurriculumCatalog,
-  getMockCurriculumProgress,
-  practiceSubjects,
-  submitMockChallengeAnswer,
-} from '@/data/mockPractice'
-import { apiMode, enableDemoApi } from '@/lib/env'
+import { getMockMistakes } from '@/data/mockPractice'
+
 import { httpClient } from '@/services/api/httpClient'
-import { withDemoFallback } from '@/services/demo/demoFallback'
+
 import type {
   PracticeAnswerRequest,
   PracticeAnswerResult,
@@ -33,120 +20,74 @@ import type {
   CurriculumProgressSummary,
 } from '@/types/practice'
 
-const shouldUsePracticeMockFirst = apiMode === 'mock' || (apiMode === 'demo' && !enableDemoApi)
-
-function resolveFallback<T>(fallback: T | (() => T)) {
-  return typeof fallback === 'function' ? (fallback as () => T)() : fallback
-}
-
-async function withPracticeDemo<T>(request: () => Promise<T>, fallback: T | (() => T)) {
-  if (shouldUsePracticeMockFirst) {
-    return resolveFallback(fallback)
-  }
-
-  return withDemoFallback(request, fallback)
-}
-
 export async function getPracticeOverview() {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<PracticeOverview>('/practice/overview')
-    return response.data
-  }, getMockPracticeOverview)
+  const response = await httpClient.get<PracticeOverview>('/practice/overview')
+  return response.data
 }
 
 export async function getPracticeSubjects() {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<{ items: PracticeSubject[] }>('/practice/subjects')
-    return response.data
-  }, { items: practiceSubjects })
+  const response = await httpClient.get<{ items: PracticeSubject[] }>('/practice/subjects')
+  return response.data
 }
 
 export async function getSubjectPath(subjectId: string, topicId?: string) {
-  return withPracticeDemo(async () => {
-    const path = topicId
-      ? `/practice/${subjectId}/${topicId}/path`
-      : `/practice/${subjectId}/${topicId ?? 'default'}/path`
-    const response = await httpClient.get<PracticePath>(path)
-    return response.data
-  }, () => getMockPracticePath(subjectId, topicId))
+  const path = topicId
+    ? `/practice/${subjectId}/${topicId}/path`
+    : `/practice/${subjectId}/${topicId ?? 'default'}/path`
+  const response = await httpClient.get<PracticePath>(path)
+  return response.data
 }
 
 export async function getPracticeRoadmap(subjectId: string, topicId: string) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<PracticeRoadmap>(
-      `/practice/${subjectId}/${topicId}/roadmap`,
-    )
-    return response.data
-  }, () => getMockPracticeRoadmap(subjectId, topicId))
+  const response = await httpClient.get<PracticeRoadmap>(
+    `/practice/${subjectId}/${topicId}/roadmap`,
+  )
+  return response.data
 }
 
 export async function getPracticeLesson(lessonId: string) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<PracticeLesson>(`/practice/lessons/${lessonId}`)
-    return response.data
-  }, () => {
-    const lesson = getMockLesson(lessonId)
-    if (!lesson) {
-      throw new Error(`Practice lesson not found: ${lessonId}`)
-    }
-    return lesson
-  })
+  const response = await httpClient.get<PracticeLesson>(`/practice/lessons/${lessonId}`)
+  return response.data
 }
 
 export async function submitChallengeAnswer(challengeId: string, payload: PracticeAnswerRequest) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.post<PracticeAnswerResult>(
-      `/practice/challenges/${challengeId}/answer`,
-      payload,
-    )
-    return response.data
-  }, () => submitMockChallengeAnswer(challengeId, payload.answer))
+  const response = await httpClient.post<PracticeAnswerResult>(
+    `/practice/challenges/${challengeId}/answer`,
+    payload,
+  )
+  return response.data
 }
 
 export async function completePracticeLesson(lessonId: string) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.post<PracticeLessonResult>(
-      `/practice/lessons/${lessonId}/complete`,
-    )
-    return response.data
-  }, () => completeMockLesson(lessonId))
+  const response = await httpClient.post<PracticeLessonResult>(
+    `/practice/lessons/${lessonId}/complete`,
+  )
+  return response.data
 }
 
 export async function getPracticeMistakes() {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<ReturnType<typeof getMockMistakes>>('/practice/mistakes')
-    return response.data
-  }, getMockMistakes)
+  const response = await httpClient.get<ReturnType<typeof getMockMistakes>>('/practice/mistakes')
+  return response.data
 }
 
 export async function getPracticeHint(payload: PracticeHintRequest) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.post<PracticeHintResponse>('/practice/hints', payload)
-    return response.data
-  }, () => getMockPracticeHint(payload.challengeId))
+  const response = await httpClient.post<PracticeHintResponse>('/practice/hints', payload)
+  return response.data
 }
 
 export async function requestPracticeTeacherHelp(payload: PracticeTeacherHelpRequest) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.post<PracticeTeacherHelpResponse>(
-      '/practice/teacher-help',
-      payload,
-    )
-    return response.data
-  }, {
-    requestId: `practice-help-${payload.challengeId}`,
-    status: 'ready',
-    message: 'A teacher can review this practice step with the student.',
-  })
+  const response = await httpClient.post<PracticeTeacherHelpResponse>(
+    '/practice/teacher-help',
+    payload,
+  )
+  return response.data
 }
 
 export async function getPracticeParentSummary(childId: string) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<PracticeParentSummary>(
-      `/parents/me/children/${childId}/practice-summary`,
-    )
-    return response.data
-  }, getMockPracticeParentSummary)
+  const response = await httpClient.get<PracticeParentSummary>(
+    `/parents/me/children/${childId}/practice-summary`,
+  )
+  return response.data
 }
 
 export async function getCurriculumCatalog({
@@ -158,12 +99,10 @@ export async function getCurriculumCatalog({
   gradeLevel?: string
   includePreview?: boolean
 } = {}) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<CurriculumCatalog>('/practice/curriculum/catalog', {
-      params: { subjectId, gradeLevel, includePreview },
-    })
-    return response.data
-  }, () => filterMockCurriculumCatalog(getMockCurriculumCatalog(), subjectId, gradeLevel, includePreview))
+  const response = await httpClient.get<CurriculumCatalog>('/practice/curriculum/catalog', {
+    params: { subjectId, gradeLevel, includePreview },
+  })
+  return response.data
 }
 
 export async function getCurriculumProgress({
@@ -173,45 +112,10 @@ export async function getCurriculumProgress({
   studentId?: string
   subjectId?: string
 } = {}) {
-  return withPracticeDemo(async () => {
-    const response = await httpClient.get<CurriculumProgressSummary>('/practice/curriculum/progress', {
-      params: { studentId, subjectId },
-    })
-    return response.data
-  }, () => getMockCurriculumProgress(studentId, subjectId))
-}
-
-function filterMockCurriculumCatalog(
-  catalog: CurriculumCatalog,
-  subjectId?: string,
-  gradeLevel?: string,
-  includePreview = false,
-): CurriculumCatalog {
-  const normalizedSubject = normalizeCurriculumSubjectId(subjectId)
-  return {
-    ...catalog,
-    subjects: catalog.subjects.filter((subject) =>
-      (!normalizedSubject || subject.id === normalizedSubject) &&
-      (!gradeLevel || subject.gradeLevels.includes(gradeLevel)) &&
-      (includePreview || subject.rolloutState === 'active'),
-    ),
-    topics: catalog.topics.filter((topic) =>
-      (!normalizedSubject || topic.subjectId === normalizedSubject) &&
-      (!gradeLevel || topic.gradeLevel === gradeLevel) &&
-      (includePreview || topic.rolloutState === 'active'),
-    ),
-    units: catalog.units.filter((unit) =>
-      (!normalizedSubject || unit.subjectId === normalizedSubject) &&
-      (!gradeLevel || unit.gradeLevel === gradeLevel) &&
-      (includePreview || unit.rolloutState === 'active'),
-    ),
-    lessons: catalog.lessons.filter((lesson) =>
-      (!normalizedSubject || lesson.subjectId === normalizedSubject) &&
-      (!gradeLevel || lesson.gradeLevel === gradeLevel) &&
-      (includePreview || lesson.rolloutState === 'active'),
-    ),
-    includePreview,
-  }
+  const response = await httpClient.get<CurriculumProgressSummary>('/practice/curriculum/progress', {
+    params: { studentId, subjectId },
+  })
+  return response.data
 }
 
 export function normalizeCurriculumSubjectId(subjectId?: string) {
