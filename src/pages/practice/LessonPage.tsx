@@ -140,7 +140,11 @@ export function LessonPage() {
         learningChatExplanationRequested: Boolean(hintMutation.data),
       },
     })
-    setTeacherHelpMessage(response.message)
+    setTeacherHelpMessage(
+      response.teacherName
+        ? t('teacherHelpAssigned', { teacher: response.teacherName })
+        : t('teacherHelpQueued'),
+    )
   }
 
   async function handleContinue() {

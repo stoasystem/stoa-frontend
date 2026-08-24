@@ -1,6 +1,8 @@
 import { getMockMistakes } from '@/data/mockPractice'
 
 import { httpClient } from '@/services/api/httpClient'
+import { createConversation } from '@/services/chat/chatApi'
+import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 import type {
   PracticeAnswerRequest,
@@ -75,12 +77,35 @@ export async function getPracticeHint(payload: PracticeHintRequest) {
   return response.data
 }
 
-export async function requestPracticeTeacherHelp(payload: PracticeTeacherHelpRequest) {
-  const response = await httpClient.post<PracticeTeacherHelpResponse>(
-    '/practice/teacher-help',
-    payload,
-  )
-  return response.data
+export async function requestPracticeTeacherHelp(
+  payload: PracticeTeacherHelpRequest,
+): Promise<PracticeTeacherHelpResponse> {
+  // Practice help joins the same escalation lane as chat so the student and the
+  // teacher continue in one thread instead of a separate practice-only channel.
+  const conversation = await createConversation({
+    subject: payload.subjectId,
+    grade: payload.gradeLevel ?? '',
+    initialMessage: describePracticeContext(payload),
+  })
+  const request = await createTeacherHelpRequest({
+    conversationId: conversation.id,
+    message: payload.message,
+  })
+  return {
+    requestId: request.requestId,
+    conversationId: conversation.id,
+    status: request.status,
+    teacherName: request.teacherName ?? null,
+  }
+}
+
+function describePracticeContext(payload: PracticeTeacherHelpRequest) {
+  const context = payload.practiceContext
+  const lines = [payload.message]
+  if (context?.challengePrompt) lines.push(`Aufgabe: ${context.challengePrompt}`)
+  if (context?.studentAnswer) lines.push(`Meine Antwort: ${context.studentAnswer}`)
+  if (context?.attempts) lines.push(`Versuche: ${context.attempts}`)
+  return lines.join('\n')
 }
 
 export async function getPracticeParentSummary(childId: string) {

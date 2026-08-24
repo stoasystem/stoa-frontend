@@ -318,8 +318,9 @@ export type PracticeTeacherHelpRequest = {
 
 export type PracticeTeacherHelpResponse = {
   requestId: string
-  status: 'ready'
-  message: string
+  conversationId: string
+  status: string
+  teacherName: string | null
 }
 
 export type PracticeParentSummary = {

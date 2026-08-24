@@ -36,5 +36,7 @@
     "gradeLevel": "Lower secondary",
     "supportCopy": "Practise first. Ask for an explanation when needed.",
     "learningChatHint": "Ask a question when a lesson step is unclear."
-  }
+  },
+  "teacherHelpAssigned": "{{teacher}} is looking at your question.",
+  "teacherHelpQueued": "Your question is queued for the next available teacher."
 }

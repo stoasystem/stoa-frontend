@@ -36,5 +36,7 @@
     "gradeLevel": "Secondaire I",
     "supportCopy": "Entraîne-toi d’abord. Demande une explication si nécessaire.",
     "learningChatHint": "Pose une question lorsqu’une étape de la leçon n’est pas claire."
-  }
+  },
+  "teacherHelpAssigned": "{{teacher}} examine ta question.",
+  "teacherHelpQueued": "Ta question attend le prochain enseignant disponible."
 }

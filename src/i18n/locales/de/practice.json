@@ -36,5 +36,7 @@
     "gradeLevel": "Sekundarstufe I",
     "supportCopy": "Übe zuerst. Frage nach einer Erklärung, wenn du sie brauchst.",
     "learningChatHint": "Stelle eine Frage, wenn ein Schritt in der Lektion unklar ist."
-  }
+  },
+  "teacherHelpAssigned": "{{teacher}} sieht sich deine Aufgabe an.",
+  "teacherHelpQueued": "Deine Frage wartet auf die nächste verfügbare Lehrperson."
 }

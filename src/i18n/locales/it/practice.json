@@ -36,5 +36,7 @@
     "gradeLevel": "Scuola secondaria I",
     "supportCopy": "Prima esercitati. Chiedi una spiegazione quando serve.",
     "learningChatHint": "Fai una domanda quando un passaggio della lezione non è chiaro."
-  }
+  },
+  "teacherHelpAssigned": "{{teacher}} sta guardando la tua domanda.",
+  "teacherHelpQueued": "La tua domanda è in attesa del prossimo insegnante disponibile."
 }
