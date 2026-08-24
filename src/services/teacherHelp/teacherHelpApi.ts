@@ -20,9 +20,9 @@ export async function createTeacherHelpRequest(payload: {
   return response.data
 }
 
-export async function getTeacherHelpRequest(requestId: string) {
+export async function getTeacherHelpRequest(conversationId: string) {
   const response = await httpClient.get<TeacherHelpRequest>(
-    `/teacher-help/request/${requestId}`,
+    `/teacher-help/conversations/${conversationId}/request`,
   )
   return response.data
 }

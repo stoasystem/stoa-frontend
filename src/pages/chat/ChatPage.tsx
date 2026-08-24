@@ -91,7 +91,9 @@ export function ChatPage() {
   const createConversationMutation = useCreateConversationMutation()
   const teacherHelpMutation = useTeacherHelpMutation()
   const instantVideoHelpMutation = useInstantVideoHelp()
-  const teacherHelpStatusQuery = useTeacherHelpStatusQuery(teacherHelpRequest?.requestId ?? null)
+  const teacherHelpStatusQuery = useTeacherHelpStatusQuery(
+    teacherHelpRequest?.conversationId ?? null,
+  )
   const {
     localMessages,
     isStreaming,

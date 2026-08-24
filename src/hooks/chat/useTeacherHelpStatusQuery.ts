@@ -8,11 +8,11 @@ const ACTIVE_STATUSES = new Set(['assigned', 'in_progress'])
 /** Pending status — teacher hasn't responded yet, lower priority. */
 const WAITING_STATUSES = new Set(['pending'])
 
-export function useTeacherHelpStatusQuery(requestId: string | null) {
+export function useTeacherHelpStatusQuery(conversationId: string | null) {
   return useQuery({
-    queryKey: chatQueryKeys.teacherHelpRequest(requestId ?? ''),
-    queryFn: () => getTeacherHelpRequest(requestId ?? ''),
-    enabled: Boolean(requestId),
+    queryKey: chatQueryKeys.teacherHelpRequest(conversationId ?? ''),
+    queryFn: () => getTeacherHelpRequest(conversationId ?? ''),
+    enabled: Boolean(conversationId),
     refetchInterval: (query) => {
       const status = query.state.data?.status
       if (!status) return false

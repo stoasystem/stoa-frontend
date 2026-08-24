@@ -78,11 +78,28 @@ try {
   process.exit(2)
 }
 
+// A call can interpolate a value the backend spells out as separate routes, as in
+// `drafts/${id}/${action}` against `/accept`, `/reject` and `/archive`. Such a
+// segment matches a literal one so those calls are not reported as missing.
+function matchesBackendRoute(callPath, method) {
+  const callSegments = callPath.split('/')
+  for (const [backendPath, methods] of backend) {
+    if (!methods.has(method)) continue
+    const backendSegments = backendPath.split('/')
+    if (backendSegments.length !== callSegments.length) continue
+    const compatible = callSegments.every(
+      (segment, index) =>
+        segment === backendSegments[index] || segment === '{}' || backendSegments[index] === '{}',
+    )
+    if (compatible) return true
+  }
+  return false
+}
+
 const calls = collectCalls()
 const missing = new Map()
 for (const call of calls) {
-  const methods = backend.get(normalise(call.path))
-  if (methods?.has(call.method)) continue
+  if (matchesBackendRoute(normalise(call.path), call.method)) continue
   if (!missing.has(call.file)) missing.set(call.file, [])
   missing.get(call.file).push(`${call.method} ${call.path}`)
 }
