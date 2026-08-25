@@ -12,7 +12,6 @@ export const routeGroups = {
     '/teacher-support',
     '/for-schools',
     '/for-tutoring-centers',
-    '/partnership/onboarding',
     '/privacy',
     '/terms',
     '/support',
@@ -26,9 +25,6 @@ export const routeGroups = {
     '/billing/checkout/cancel',
     '/billing/success',
     '/billing/cancelled',
-    '/referrals',
-    '/support/tickets',
-    '/support/tickets/:ticketId',
     '/onboarding',
   ],
   student: [
@@ -44,7 +40,6 @@ export const routeGroups = {
     '/parent/children/:childId/monthly-report',
     '/parent/children/:childId/history',
     '/billing',
-    '/referrals',
     '/support',
   ],
   tutor: [
@@ -55,14 +50,8 @@ export const routeGroups = {
   ],
   admin: [
     '/admin',
-    '/admin/analytics',
-    '/admin/usage',
-    '/admin/help-requests',
     '/admin/report-operations',
-    '/admin/support',
-    '/admin/support/:ticketId',
     '/admin/users',
-    '/admin/feedback',
     '/admin/billing-interest',
     '/admin/system',
   ],
@@ -85,7 +74,6 @@ export const routeGroups = {
     '/parent/children/:childId/monthly-report',
     '/for-schools',
     '/for-tutoring-centers',
-    '/partnership/onboarding',
   ],
 } as const
 

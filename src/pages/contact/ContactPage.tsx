@@ -1,6 +1,5 @@
 import { Mail, MapPin, Phone } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { ContactForm } from '@/components/contact/ContactForm'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -77,14 +76,6 @@ export function ContactPage() {
             </p>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">{t('form.title')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ContactForm />
-            </CardContent>
-          </Card>
         </section>
       </PageContainer>
     </MarketingLayout>

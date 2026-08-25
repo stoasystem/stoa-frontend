@@ -21,7 +21,6 @@ import type {
   RegisterPayload,
   RegisterRole,
   StudentOnboardingProfile,
-  TutorCredentialUpload,
   TutorOnboardingProfile,
 } from '@/types/onboarding'
 
@@ -98,7 +97,6 @@ export function RegisterForm() {
   const [studentSubjects, setStudentSubjects] = useState(initialStudentProfile.subjectsNeedingHelp.join(', '))
   const [parentSubjects, setParentSubjects] = useState(initialParentProfile.subjectsNeedingHelp.join(', '))
   const [tutorSubjects, setTutorSubjects] = useState(initialTutorProfile.subjects.join(', '))
-  const [credentialFiles, setCredentialFiles] = useState<TutorCredentialUpload[]>([])
   const [error, setError] = useState<string | null>(null)
   const registerMutation = useRegisterMutation({ redirect: false })
   const teacherApplicationMutation = useSubmitTeacherApplicationMutation()
@@ -122,9 +120,8 @@ export function RegisterForm() {
     return {
       ...tutorProfile,
       subjects: splitSubjects(tutorSubjects),
-      credentialFileIds: credentialFiles.map((file) => file.id),
     }
-  }, [credentialFiles, parentProfile, parentSubjects, role, studentProfile, studentSubjects, tutorProfile, tutorSubjects])
+  }, [parentProfile, parentSubjects, role, studentProfile, studentSubjects, tutorProfile, tutorSubjects])
 
   function validateCurrentStep() {
     if (step === 'account') {
@@ -284,14 +281,8 @@ export function RegisterForm() {
         <TutorProfileStep
           value={tutorProfile}
           subjectText={tutorSubjects}
-          uploadedFiles={credentialFiles}
           onChange={(values) => setTutorProfile((current) => ({ ...current, ...values }))}
           onSubjectTextChange={setTutorSubjects}
-          onUploaded={(file) => {
-            setCredentialFiles((current) => [...current, file])
-            setError(null)
-          }}
-          onUploadError={setError}
         />
       )}
 

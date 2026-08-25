@@ -13,7 +13,7 @@ export function ForSchoolsPage() {
           eyebrow="For schools"
           title="School partnership conversations"
           description="Evaluate organization dashboards, student learning profiles, and parent report examples for a future school rollout."
-          actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
+          actions={<Button asChild><Link to="/contact">Talk to us about a pilot</Link></Button>}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <Card>

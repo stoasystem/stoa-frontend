@@ -29,15 +29,10 @@ test('admin can view Phase 12 platform demo routes', async ({ page }) => {
   await expect(page.getByRole('heading', { name: /retention operations/i })).toBeVisible()
 })
 
-test('parent can view monthly report and public partnership onboarding is reachable', async ({ page }) => {
+test('parent can view monthly report', async ({ page }) => {
   await loginAs(page, 'parent')
 
   await page.goto('/parent/children/student-anna/monthly-report')
   await expect(page.getByRole('heading', { name: /monthly learning report/i })).toBeVisible()
   await expect(page.getByText(/june 2026/i)).toBeVisible()
-
-  await page.goto('/partnership/onboarding')
-  await expect(page.getByRole('heading', { name: /pilot onboarding/i })).toBeVisible()
-  await page.getByRole('button', { name: /submit interest/i }).click()
-  await expect(page.getByText(/interest submitted/i)).toBeVisible()
 })

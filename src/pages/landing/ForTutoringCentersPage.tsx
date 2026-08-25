@@ -13,7 +13,7 @@ export function ForTutoringCentersPage() {
           eyebrow="For tutoring centers"
           title="Learning support plus teacher operations"
           description="A front-end path for partner discussions. Payroll, matching algorithms, scheduling enforcement, and CRM remain out of scope."
-          actions={<Button asChild><Link to="/partnership/onboarding">Start pilot interest</Link></Button>}
+          actions={<Button asChild><Link to="/contact">Talk to us about a pilot</Link></Button>}
           titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <Card>

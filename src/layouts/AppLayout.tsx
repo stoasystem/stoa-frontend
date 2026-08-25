@@ -21,13 +21,11 @@ import {
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AppLogo } from '@/components/common/AppLogo'
-import { FeedbackButton } from '@/components/feedback/FeedbackButton'
 import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { UserMenu } from '@/components/common/UserMenu'
 import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
-import { enableFeedback } from '@/lib/env'
 import { cn } from '@/lib/utils'
 import { getNavItemsForUserRole } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
@@ -69,7 +67,6 @@ const navLabelKeys: Record<string, string> = {
   Profile: 'navigation.profile',
   Practice: 'navigation.practice',
   'Question Bank': 'navigation.questionBank',
-  Referrals: 'navigation.referrals',
   Reports: 'navigation.reports',
   Requests: 'navigation.requests',
   Retention: 'navigation.analytics',
@@ -173,11 +170,6 @@ export function AppLayout({ children }: { children: ReactNode }) {
               </div>
             )}
           </nav>
-          {enableFeedback && (
-            <div className="mb-3">
-              <FeedbackButton />
-            </div>
-          )}
           <UserMenu />
         </aside>
         <main className="min-w-0 flex-1 pb-24">

@@ -2,27 +2,18 @@ import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { TutorCredentialUpload } from '@/components/auth/TutorCredentialUpload'
-import type { TutorCredentialUpload as TutorCredentialUploadType, TutorOnboardingProfile } from '@/types/onboarding'
+import type { TutorOnboardingProfile } from '@/types/onboarding'
 
 export function TutorProfileStep({
   value,
   subjectText,
-  uploadedFiles,
-  showCredentials = false,
   onChange,
   onSubjectTextChange,
-  onUploaded,
-  onUploadError,
 }: {
   value: TutorOnboardingProfile
   subjectText: string
-  uploadedFiles: TutorCredentialUploadType[]
-  showCredentials?: boolean
   onChange: (values: Partial<TutorOnboardingProfile>) => void
   onSubjectTextChange: (value: string) => void
-  onUploaded: (file: TutorCredentialUploadType) => void
-  onUploadError: (message: string) => void
 }) {
   const { t } = useTranslation('auth')
 
@@ -46,9 +37,6 @@ export function TutorProfileStep({
         <Label htmlFor="tutor-intro">{t('register.introduction')}</Label>
         <Textarea id="tutor-intro" value={value.introduction} onChange={(event) => onChange({ introduction: event.target.value })} className="min-h-28 resize-none" />
       </div>
-      {showCredentials && (
-        <TutorCredentialUpload files={uploadedFiles} onUploaded={onUploaded} onError={onUploadError} />
-      )}
     </div>
   )
 }

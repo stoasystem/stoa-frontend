@@ -50,21 +50,6 @@ export function AdminDashboardPage() {
         <AdminOperationalNotificationsCard />
         <div className="grid gap-4 md:grid-cols-2">
           <AdminOperationCard
-            title="Usage summary"
-            description="Review active users, role counts, messages, help requests, uploads, and feedback totals."
-            to="/admin/usage"
-          />
-          <AdminOperationCard
-            title="Feedback triage"
-            description="Review pilot feedback items without adding full support workflow controls."
-            to="/admin/feedback"
-          />
-          <AdminOperationCard
-            title="Help requests"
-            description="Monitor teacher-help request volume and launch-time service status."
-            to="/admin/help-requests"
-          />
-          <AdminOperationCard
             title="Content moderation"
             description="Review reported questions, assistant answers, and teacher replies."
             to="/admin/moderation"

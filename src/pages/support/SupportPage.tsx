@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SupportInfoSection } from '@/components/support/SupportInfoSection'
-import { SupportRequestForm } from '@/components/support/SupportRequestForm'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -108,14 +107,6 @@ export function SupportPage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">{t('support:submit')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <SupportRequestForm />
-            </CardContent>
-          </Card>
         </section>
       </PageContainer>
     </MarketingLayout>

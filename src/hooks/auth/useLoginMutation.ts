@@ -8,8 +8,8 @@ import { useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 
 const roleNextPathPrefixes: Record<UserRole, string[]> = {
-  student: ['/assistant', '/practice', '/dashboard', '/chat', '/learning-history', '/profile', '/referrals'],
-  parent: ['/parent', '/billing', '/referrals', '/contact'],
+  student: ['/assistant', '/practice', '/dashboard', '/chat', '/learning-history', '/profile'],
+  parent: ['/parent', '/billing', '/contact'],
   teacher: ['/tutor', '/support', '/teacher-activate'],
   admin: ['/admin'],
   organization_admin: ['/organization'],

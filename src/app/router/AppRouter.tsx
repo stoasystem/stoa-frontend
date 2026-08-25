@@ -4,19 +4,13 @@ import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
-import { AdminAnalyticsPage } from '@/pages/admin/AdminAnalyticsPage'
 import { AdminAccountOperationsPage } from '@/pages/admin/AdminAccountOperationsPage'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
 import { AdminCurriculumPage } from '@/pages/admin/AdminCurriculumPage'
-import { AdminFeedbackPage } from '@/pages/admin/Feedback'
-import { AdminHelpRequestsPage } from '@/pages/admin/HelpRequests'
 import { AdminModerationPage } from '@/pages/admin/AdminModerationPage'
 import { AdminOperationsPlaceholderPage } from '@/pages/admin/OperationsPlaceholder'
-import { AdminSupportTicketDetailPage } from '@/pages/admin/AdminSupportTicketDetailPage'
-import { AdminSupportTicketsPage } from '@/pages/admin/AdminSupportTicketsPage'
 import { AdminSubscriptionRequestsPage } from '@/pages/admin/AdminSubscriptionRequestsPage'
 import { AdminBillingCheckoutPage } from '@/pages/admin/AdminBillingCheckoutPage'
-import { AdminUsagePage } from '@/pages/admin/Usage'
 import { BillingPage } from '@/pages/billing/BillingPage'
 import { CheckoutResultPage } from '@/pages/billing/CheckoutResultPage'
 import { PaymentSettingsPage } from '@/pages/billing/PaymentSettingsPage'
@@ -54,7 +48,6 @@ import { ChildReportPage } from '@/pages/parent/ChildReportPage'
 import { ChildSummaryPage } from '@/pages/parent/ChildSummaryPage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
 import { ParentReportsPage } from '@/pages/parent/ParentReportsPage'
-import { PartnershipOnboardingPage } from '@/pages/partnership/PartnershipOnboardingPage'
 import { PricingPage } from '@/pages/pricing/PricingPage'
 import { QaPage } from '@/pages/qa/QaPage'
 import { QuestionBankHomePage } from '@/pages/question-bank/QuestionBankHomePage'
@@ -71,11 +64,8 @@ import { MistakesReviewPage } from '@/pages/practice/MistakesReviewPage'
 import { PracticeOverviewPage } from '@/pages/practice/PracticeOverviewPage'
 import { SubjectPathPage } from '@/pages/practice/SubjectPathPage'
 import { TopicRoadmapPage } from '@/pages/practice/TopicRoadmapPage'
-import { ReferralsPage } from '@/pages/referrals/ReferralsPage'
 import { StudentProfilePage } from '@/pages/profile/StudentProfilePage'
 import { LoginPage } from '@/pages/login/LoginPage'
-import { SupportTicketDetailPage } from '@/pages/support/SupportTicketDetailPage'
-import { SupportTicketsPage } from '@/pages/support/SupportTicketsPage'
 import { RegisterPage } from '@/pages/auth/RegisterPage'
 import { TeacherActivatePage } from '@/pages/auth/TeacherActivatePage'
 import { AdminTeacherApplicationsPage } from '@/pages/admin/AdminTeacherApplicationsPage'
@@ -114,7 +104,6 @@ export function AppRouter() {
         <Route path="/teacher-support" element={<TeacherSupportPage />} />
         <Route path="/for-schools" element={<ForSchoolsPage />} />
         <Route path="/for-tutoring-centers" element={<ForTutoringCentersPage />} />
-        <Route path="/partnership/onboarding" element={<PartnershipOnboardingPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/onboarding" element={<OnboardingPage />} />
@@ -128,9 +117,6 @@ export function AppRouter() {
           <Route path="/billing/payment-settings" element={<PaymentSettingsPage />} />
           <Route path="/billing/checkout/result" element={<CheckoutResultPage />} />
           <Route path="/billing/checkout/demo" element={<VirtualCheckoutPage />} />
-          <Route path="/referrals" element={<ReferralsPage />} />
-          <Route path="/support/tickets" element={<SupportTicketsPage />} />
-          <Route path="/support/tickets/:ticketId" element={<SupportTicketDetailPage />} />
           <Route element={<RoleRoute allowedRoles={['student']} />}>
             <Route
               path="/dashboard"
@@ -204,11 +190,7 @@ export function AppRouter() {
           </Route>
           <Route element={<RoleRoute allowedRoles={['admin']} />}>
             <Route path="/admin" element={<AdminDashboardPage />} />
-            <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
             <Route path="/admin/learning-operations" element={<LearningOperationsDashboardPage />} />
-            <Route path="/admin/usage" element={<AdminUsagePage />} />
-            <Route path="/admin/feedback" element={<AdminFeedbackPage />} />
-            <Route path="/admin/help-requests" element={<AdminHelpRequestsPage />} />
             <Route path="/admin/moderation" element={<AdminModerationPage />} />
             <Route path="/admin/learning-automation" element={<LearningAutomationConsolePage />} />
             <Route path="/admin/subscriptions" element={<AdminSubscriptionRequestsPage />} />
@@ -219,11 +201,6 @@ export function AppRouter() {
               path="/admin/users"
               element={<AdminOperationsPlaceholderPage title="Users" />}
             />
-            <Route
-              path="/admin/support"
-              element={<AdminSupportTicketsPage />}
-            />
-            <Route path="/admin/support/:ticketId" element={<AdminSupportTicketDetailPage />} />
             <Route
               path="/admin/billing-interest"
               element={

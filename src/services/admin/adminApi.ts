@@ -687,44 +687,8 @@ export type AdminUsageSummary = {
   generatedAt?: string
 }
 
-export async function getAdminUsageSummary() {
-  const response = await httpClient.get<AdminUsageSummary>('/admin/usage-summary')
-  return response.data
-}
-
-export async function getAdminFeedbackList() {
-  const response = await httpClient.get<AdminFeedbackListResponse>('/admin/feedback')
-  return response.data
-}
-
-export async function getAdminHelpRequests() {
-  const response = await httpClient.get<{ items: AdminHelpRequestItem[] }>(
-    '/admin/help-requests',
-  )
-  return response.data
-}
-
 export async function getAdminUsers() {
   const response = await httpClient.get<{ items: AdminUserItem[] }>('/admin/users')
-  return response.data
-}
-
-export async function getAdminSupportRequests() {
-  const response = await httpClient.get<{ items: AdminSupportRequestItem[] }>(
-    '/admin/support-requests',
-  )
-  return response.data
-}
-
-export async function getAdminBillingInterest() {
-  const response = await httpClient.get<{ items: AdminBillingInterestItem[] }>(
-    '/admin/billing-interest',
-  )
-  return response.data
-}
-
-export async function getAdminSystemStatus() {
-  const response = await httpClient.get<AdminSystemStatus>('/admin/system-status')
   return response.data
 }
 
