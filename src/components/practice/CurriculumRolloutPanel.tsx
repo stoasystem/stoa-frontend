@@ -74,7 +74,8 @@ export function CurriculumRolloutPanel({
                           <div>
                             <p className="text-sm font-semibold">{subject.name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
-                              {subject.gradeLevels.join(', ') || 'All active grades'}
+                              {subject.gradeLevels.map((level) => level.label).join(', ') ||
+                                'All active grades'}
                             </p>
                           </div>
                           <Badge variant="outline">{subject.rolloutState}</Badge>

@@ -1,4 +1,3 @@
-import { getMockMistakes } from '@/data/mockPractice'
 
 import { httpClient } from '@/services/api/httpClient'
 import { createConversation } from '@/services/chat/chatApi'
@@ -11,6 +10,7 @@ import type {
   PracticeHintResponse,
   PracticeLesson,
   PracticeLessonResult,
+  PracticeMistake,
   PracticeOverview,
   PracticePath,
   PracticeRoadmap,
@@ -67,7 +67,7 @@ export async function completePracticeLesson(lessonId: string) {
 }
 
 export async function getPracticeMistakes() {
-  const response = await httpClient.get<ReturnType<typeof getMockMistakes>>('/practice/mistakes')
+  const response = await httpClient.get<{ items: PracticeMistake[] }>('/practice/mistakes')
   return response.data
 }
 

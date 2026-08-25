@@ -227,7 +227,7 @@ export type CurriculumSubject = {
   id: string
   name: string
   description: string
-  gradeLevels: string[]
+  gradeLevels: PracticeGradeLevel[]
   language: string
   rolloutState: CurriculumRolloutState
   order: number
