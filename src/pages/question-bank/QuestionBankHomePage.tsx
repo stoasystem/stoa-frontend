@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Camera, Search } from 'lucide-react'
+import { Camera, Flame, Search } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -56,6 +56,36 @@ export function QuestionBankHomePage() {
           title="Practice Library"
           description="Choose exercises by subject, topic, and difficulty."
         />
+
+        {overview && (
+          <section className="flex flex-col gap-3 rounded-lg border border-border/70 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)] sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
+                <Flame className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <div>
+                <p className="text-2xl font-semibold">
+                  {overview.studyStreak} {overview.studyStreak === 1 ? 'day' : 'days'}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {overview.studyStreak === 0
+                    ? 'Finish a set today to start a streak.'
+                    : overview.practisedToday
+                      ? 'Practised today. Come back tomorrow to keep it going.'
+                      : 'Finish a set today to keep your streak.'}
+                </p>
+              </div>
+            </div>
+            {overview.mistakesToReview > 0 && (
+              <Button asChild variant="outline">
+                <Link to={getQuestionBankMistakesPath()}>
+                  Review {overview.mistakesToReview} mistake
+                  {overview.mistakesToReview === 1 ? '' : 's'}
+                </Link>
+              </Button>
+            )}
+          </section>
+        )}
 
         {overview?.continueSet && (
           <section className="rounded-lg border border-primary/20 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5 shadow-[var(--platform-shadow-card)]">

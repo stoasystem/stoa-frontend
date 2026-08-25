@@ -160,6 +160,8 @@ export type QuestionBankFilters = {
 }
 
 export type QuestionBankOverview = {
+  studyStreak: number
+  practisedToday: boolean
   subjects: QuestionBankSubject[]
   recommendedSets: QuestionBankSet[]
   recentPractice: QuestionBankSet[]

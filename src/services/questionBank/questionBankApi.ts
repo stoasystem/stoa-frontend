@@ -52,6 +52,8 @@ type CurriculumCatalogResponse = {
 type CurriculumProgress = {
   completedLessonIds: string[]
   mistakeCount: number
+  studyStreak?: number
+  practisedToday?: boolean
   weakTopics: Array<{ topicId?: string; label?: string } | string>
 }
 
@@ -205,6 +207,8 @@ export async function getQuestionBankOverview(): Promise<QuestionBankOverview> {
   const sets = curriculum.lessons.map((lesson) => buildSet(lesson, curriculum))
   const unfinished = sets.filter((set) => set.status !== 'completed')
   return {
+    studyStreak: curriculum.progress.studyStreak ?? 0,
+    practisedToday: curriculum.progress.practisedToday ?? false,
     subjects: curriculum.subjects.map((subject) => buildSubject(subject, curriculum)),
     recommendedSets: unfinished.slice(0, 4),
     recentPractice: sets.filter((set) => set.status === 'completed').slice(0, 4),
