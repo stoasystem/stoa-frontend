@@ -4,8 +4,11 @@ STOA learning platform frontend.
 
 ## Signing in
 
-The deployed environment is https://stoaedu.ch, backed by the API at
-https://api.stoaedu.ch. These four accounts exist there and share one password,
+The app is deployed at https://app.stoaedu.ch, backed by the API at
+https://api.stoaedu.ch. The apex, https://stoaedu.ch, is a separate static
+marketing site and does not serve this app.
+
+These four accounts exist in the deployed environment and share one password,
 `StoaTest2026!`:
 
 | Role    | Email                       |
