@@ -36,6 +36,12 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: API contract guard
+        run: |
+          curl -fsSL -o /tmp/route-inventory.json \
+            https://raw.githubusercontent.com/stoasystem/stoa-backend/main/docs/security/route-authorization-inventory.json
+          npm run check:api-contract -- --inventory /tmp/route-inventory.json
+
       - name: Unit tests
         run: npm test
 
