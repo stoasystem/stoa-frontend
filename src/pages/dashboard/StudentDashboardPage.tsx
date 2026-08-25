@@ -12,24 +12,65 @@ import { RecentQuestionsCard } from '@/components/dashboard/RecentQuestionsCard'
 import { QuestionBankCard } from '@/components/dashboard/QuestionBankCard'
 import { RecommendedPracticeCard } from '@/components/dashboard/RecommendedPracticeCard'
 import { StudentPlanAccessSection } from '@/components/dashboard/StudentPlanAccessSection'
-import { TeacherFeedbackCard } from '@/components/dashboard/TeacherFeedbackCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import {
-  dashboardStats,
-  learningProgress,
-  recentQuestions,
-  teacherFeedback,
-} from '@/data/mockDashboard'
+import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
+import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgressQuery'
+import { useStudentLearningHistoryQuery } from '@/hooks/student/useStudentLearningHistoryQuery'
 import { useRecommendationsQuery, useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import type { DashboardStat, LearningProgress, RecentQuestion } from '@/types/dashboard'
 
 export function StudentDashboardPage() {
   // Both hooks share one query key, so this is a single network request.
   const weakTopicsQuery = useWeakTopicsQuery()
   const recommendationsQuery = useRecommendationsQuery()
+  const progressQuery = useCurriculumProgressQuery()
+  const historyQuery = useStudentLearningHistoryQuery()
+
+  const progress = progressQuery.data
+  const historyItems = historyQuery.data?.items ?? []
+  const catalogQuery = useCurriculumCatalogQuery()
+  const recentQuestions: RecentQuestion[] = historyItems.slice(0, 5).map((item) => ({
+    id: item.id,
+    subject: item.subject,
+    title: item.summary || item.title,
+    createdAt: item.createdAt,
+    status: item.title === 'Teacher help requested' ? 'teacher_helped' : 'answered_by_ai',
+  }))
+  const totalLessons = catalogQuery.data?.lessons.length ?? 0
+  const learningProgress: LearningProgress[] =
+    totalLessons === 0
+      ? []
+      : [
+          {
+            id: 'lessons',
+            subject: catalogQuery.data?.subjects[0]?.name ?? 'Practice',
+            completed: progress?.completedLessons ?? 0,
+            target: totalLessons,
+            description: 'Lessons completed in the Practice Path and Library',
+          },
+        ]
+  const weeklySnapshot: DashboardStat[] = [
+    {
+      label: 'Study streak',
+      value: `${progress?.studyStreak ?? 0} ${progress?.studyStreak === 1 ? 'day' : 'days'}`,
+      description: progress?.practisedToday ? 'Practised today' : 'Not practised today yet',
+    },
+    {
+      label: 'Lessons completed',
+      value: `${progress?.completedLessons ?? 0}`,
+      description: 'Across the Practice Path and Library',
+    },
+    {
+      label: 'Mistakes to review',
+      value: `${progress?.mistakeCount ?? 0}`,
+      description: 'Questions worth another look',
+    },
+  ]
+
   return (
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
@@ -49,7 +90,7 @@ export function StudentDashboardPage() {
             <aside className="rounded-lg border border-border/70 bg-card/80 p-4 shadow-[var(--platform-shadow-card)]">
               <p className="brand-section-kicker">Weekly snapshot</p>
               <div className="mt-4 grid gap-3">
-                {dashboardStats.map((stat) => (
+                {weeklySnapshot.map((stat) => (
                   <DashboardStatCard key={stat.label} stat={stat} />
                 ))}
               </div>
@@ -98,13 +139,12 @@ export function StudentDashboardPage() {
         <section className="space-y-4">
           <SectionHeader
             title="Recent Activity"
-            description="Review recent questions, subject progress, and tutor guidance."
+            description="Review recent questions and subject progress."
           />
           <Tabs defaultValue="questions" className="space-y-4">
-            <TabsList className="grid h-auto w-full grid-cols-3 sm:w-auto">
+            <TabsList className="grid h-auto w-full grid-cols-2 sm:w-auto">
               <TabsTrigger value="questions">Questions</TabsTrigger>
               <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="support">Tutor</TabsTrigger>
             </TabsList>
             <TabsContent value="questions" className="mt-0">
               <RecentQuestionsCard questions={recentQuestions} />
@@ -118,9 +158,6 @@ export function StudentDashboardPage() {
                   isError={weakTopicsQuery.isError}
                 />
               </div>
-            </TabsContent>
-            <TabsContent value="support" className="mt-0">
-              <TeacherFeedbackCard feedback={teacherFeedback} />
             </TabsContent>
           </Tabs>
         </section>

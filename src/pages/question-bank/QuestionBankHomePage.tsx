@@ -146,7 +146,7 @@ export function QuestionBankHomePage() {
             />
           </div>
           <p className="mt-2 text-xs text-muted-foreground" aria-live="polite">
-            {hasSearch ? `${searchSummary} result${searchSummary === 1 ? '' : 's'} found` : 'Search uses the local Practice Library.'}
+            {hasSearch ? `${searchSummary} result${searchSummary === 1 ? '' : 's'} found` : 'Search the exercises in your curriculum.'}
           </p>
         </section>
 
