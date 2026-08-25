@@ -11,11 +11,12 @@ import { InlineUploadPanel } from '@/features/uploads/components/InlineUploadPan
 import { saveUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import type { UploadAttachment } from '@/features/uploads/types/uploads'
 import { useQuestionBankSessionQuery } from '@/hooks/questionBank/useQuestionBankSessionQuery'
+import { useCompleteQuestionBankSetMutation } from '@/hooks/questionBank/useCompleteQuestionBankSetMutation'
 import { useSubmitQuestionBankAnswerMutation } from '@/hooks/questionBank/useSubmitQuestionBankAnswerMutation'
 import { getPracticeTopicPath } from '@/lib/practiceRoutes'
 import { getQuestionBankResultPath, getQuestionBankSetPath } from '@/lib/questionBankRoutes'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import type { QuestionBankChatLocationState, QuestionBankFeedback } from '@/types/questionBank'
+import type { QuestionBankChatLocationState, QuestionBankFeedback, QuestionBankResult } from '@/types/questionBank'
 
 export function QuestionSessionPage() {
   const { sessionId } = useParams()
@@ -31,6 +32,7 @@ export function QuestionSessionPage() {
   const question = questions[currentIndex]
   const feedback = question ? feedbackByQuestion[question.id] : undefined
   const answeredCount = useMemo(() => Object.keys(feedbackByQuestion).length, [feedbackByQuestion])
+  const finishSetMutation = useCompleteQuestionBankSetMutation()
 
   if (sessionQuery.isLoading) return <LoadingState message="Loading practice questions..." />
   if (sessionQuery.isError || !setData || !question) return <ErrorState title="We could not load this practice set" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
@@ -39,6 +41,48 @@ export function QuestionSessionPage() {
   const loadedQuestion = question
 
   const progress = Math.round(((currentIndex + 1) / questions.length) * 100)
+  const everyQuestionChecked = answeredCount === questions.length
+
+  function finishSet() {
+    const checked = questions.map((item) => feedbackByQuestion[item.id]).filter(Boolean)
+    const incorrect = questions.filter(
+      (item) => feedbackByQuestion[item.id]?.state === 'incorrect',
+    )
+    const result: QuestionBankResult = {
+      sessionId: sessionId ?? loadedSet.id,
+      setId: loadedSet.id,
+      score: checked.filter((item) => item.state === 'correct').length,
+      total: questions.length,
+      timeSpentMinutes: loadedSet.estimatedMinutes,
+      accuracyByTopic: [],
+      incorrectQuestions: incorrect.map((item) => ({
+        id: item.id,
+        questionId: item.id,
+        setId: loadedSet.id,
+        setTitle: loadedSet.title,
+        subjectId: item.subjectId,
+        subjectTitle: item.subjectId,
+        topicId: item.topicId,
+        topicTitle: item.topicId,
+        difficulty: item.difficulty,
+        prompt: item.prompt,
+        studentAnswer: String(feedbackByQuestion[item.id]?.studentAnswer ?? ''),
+        correctAnswer: String(feedbackByQuestion[item.id]?.correctAnswer ?? ''),
+        explanation: feedbackByQuestion[item.id]?.explanation ?? '',
+        reviewed: false,
+        createdAt: new Date().toISOString(),
+      })),
+      skippedQuestions: [],
+      nextSteps: incorrect.length
+        ? ['Review the questions you missed.', 'Ask the Learning Assistant about the ones still unclear.']
+        : ['Continue with the next set in this topic.'],
+    }
+    finishSetMutation.mutate(loadedSet.id, {
+      onSettled: () => {
+        navigate(getQuestionBankResultPath(sessionId ?? loadedSet.id), { state: { result } })
+      },
+    })
+  }
 
   function checkAnswer() {
     if (!loadedQuestion) return
@@ -143,6 +187,11 @@ export function QuestionSessionPage() {
               <Button type="button" variant="outline" onClick={skipQuestion} disabled={submitAnswerMutation.isPending}>
                 Skip for Now
               </Button>
+              {everyQuestionChecked && (
+                <Button type="button" variant="secondary" onClick={finishSet} disabled={finishSetMutation.isPending}>
+                  {finishSetMutation.isPending ? 'Finishing...' : 'Finish set'}
+                </Button>
+              )}
             </div>
             <QuestionFeedbackPanel feedback={feedback} onAskLearningAssistant={askLearningAssistant} onTrySimilar={() => setAnswer('')} />
             <InlineUploadPanel

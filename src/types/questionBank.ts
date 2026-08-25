@@ -44,7 +44,9 @@ export type QuestionBankQuestion = {
   type: QuestionBankQuestionType
   prompt: string
   options?: string[]
-  correctAnswer: string | string[]
+  // Answers are evaluated on the server and never sent to the browser; the
+  // right answer arrives with the feedback for a submitted attempt.
+  correctAnswer?: string | string[]
   studentAnswer?: string | string[]
   explanation: string
   hint?: string

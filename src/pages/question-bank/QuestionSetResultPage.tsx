@@ -1,23 +1,37 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { ArrowRight, RotateCcw } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { ErrorState } from '@/components/common/ErrorState'
-import { LoadingState } from '@/components/common/LoadingState'
 import { Button } from '@/components/ui/button'
-import { useQuestionBankResultQuery } from '@/hooks/questionBank/useQuestionBankResultQuery'
 import { getPracticeTopicPath } from '@/lib/practiceRoutes'
 import { getQuestionBankMistakesPath, getQuestionBankSessionPath } from '@/lib/questionBankRoutes'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import type { QuestionBankResult } from '@/types/questionBank'
 
 export function QuestionSetResultPage() {
   const { sessionId } = useParams()
-  const resultQuery = useQuestionBankResultQuery(sessionId)
+  const location = useLocation()
+  // A finished set is not stored anywhere, so the tally arrives from the
+  // session that produced it rather than being reconstructed or invented.
+  const result = (location.state as { result?: QuestionBankResult } | null)?.result ?? null
 
-  if (resultQuery.isLoading) return <LoadingState message="Loading practice result..." />
-  if (resultQuery.isError || !resultQuery.data) return <ErrorState title="We could not load this result" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
+  if (result === null) {
+    return (
+      <DashboardLayout>
+        <PageContainer className="space-y-6 p-0">
+          <PageHeader
+            eyebrow="Practice Complete"
+            title="No finished set to show"
+            description="This page summarises a set right after you finish it."
+          />
+          <Button asChild>
+            <Link to="/question-bank">Back to Practice Library</Link>
+          </Button>
+        </PageContainer>
+      </DashboardLayout>
+    )
+  }
 
-  const result = resultQuery.data
   const accuracy = Math.round((result.score / result.total) * 100)
   const primaryTopic = result.accuracyByTopic[0]
 
