@@ -30,11 +30,8 @@ export function ConversationListItem({
         <div className="truncate text-sm font-medium">{conversation.title}</div>
         <div className="shrink-0 text-xs text-muted-foreground">{formatUpdatedAt(conversation.updatedAt)}</div>
       </div>
-      <div className="mt-1 text-xs text-muted-foreground">
-        {conversation.subject} · {conversation.grade}
-      </div>
       {conversation.lastMessagePreview && (
-        <div className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">
+        <div className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">
           {conversation.lastMessagePreview}
         </div>
       )}

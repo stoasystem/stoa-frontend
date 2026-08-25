@@ -39,7 +39,15 @@
     "helpRequests": "Demandes enseignant",
     "supportInbox": "Aide",
     "analytics": "Analyses",
-    "more": "Plus"
+    "more": "Plus",
+    "short": {
+      "chat": "Question",
+      "onlineClassroom": "Classe",
+      "learningHistory": "Historique",
+      "questionBank": "Biblio",
+      "practice": "Exercices",
+      "dashboard": "Accueil"
+    }
   },
   "actions": {
     "startLearning": "Commencer à apprendre",

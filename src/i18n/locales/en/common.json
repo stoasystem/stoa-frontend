@@ -39,7 +39,15 @@
     "helpRequests": "Teacher requests",
     "supportInbox": "Support inbox",
     "analytics": "Analytics",
-    "more": "More"
+    "more": "More",
+    "short": {
+      "chat": "Ask",
+      "onlineClassroom": "Classroom",
+      "learningHistory": "History",
+      "questionBank": "Library",
+      "practice": "Practice",
+      "dashboard": "Home"
+    }
   },
   "actions": {
     "startLearning": "Start learning",

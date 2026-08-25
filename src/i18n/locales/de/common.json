@@ -39,7 +39,15 @@
     "helpRequests": "Lehrpersonen-Anfragen",
     "supportInbox": "Hilfe-Eingang",
     "analytics": "Analysen",
-    "more": "Mehr"
+    "more": "Mehr",
+    "short": {
+      "chat": "Fragen",
+      "onlineClassroom": "Klassenraum",
+      "learningHistory": "Verlauf",
+      "questionBank": "Bibliothek",
+      "practice": "Üben",
+      "dashboard": "Start"
+    }
   },
   "actions": {
     "startLearning": "Lernen starten",

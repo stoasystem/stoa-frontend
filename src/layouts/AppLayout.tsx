@@ -89,7 +89,12 @@ function NavItemLink({
   const Icon = navIcons[item.icon]
   const { t } = useTranslation('common')
   const location = useLocation()
-  const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
+  const labelKey = navLabelKeys[item.label] ?? item.label
+  const fullLabel = t(labelKey, { defaultValue: item.label })
+  // Five tabs share a phone's width, where the full labels are cut mid-word.
+  const label = compact
+    ? t(labelKey.replace('navigation.', 'navigation.short.'), { defaultValue: fullLabel })
+    : fullLabel
   const active = isActiveNavItem(item, items, location.pathname)
 
   return (
@@ -109,7 +114,12 @@ function NavItemLink({
       to={item.path}
     >
       <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
-      <span className={compact ? 'max-w-full truncate' : undefined}>{label}</span>
+      <span
+        className={compact ? 'max-w-full truncate' : undefined}
+        title={compact && label !== fullLabel ? fullLabel : undefined}
+      >
+        {label}
+      </span>
     </NavLink>
   )
 }
