@@ -115,6 +115,32 @@ describe('a question that has come back', () => {
     expect(screen.getByRole('button', { name: /try it again/i })).toBeInTheDocument()
   })
 
+  it('keeps the explanation back until the student has found the answer', async () => {
+    // The explanation states the answer, so showing it beside "try again"
+    // would hand over the retry.
+    mockedDue.mockResolvedValue({
+      items: [card()],
+      dueCount: 1,
+      generatedAt: '',
+    })
+    mockedAnswer.mockResolvedValue({
+      challengeId: 'brueche-l1-c1',
+      correct: false,
+      feedback: 'Leider falsch.',
+      explanation: '1/2 + 1/4 = 3/4.',
+      attemptsRemaining: 1,
+    })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('button', { name: '2/6' }))
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    await waitFor(() => expect(screen.getByText('Leider falsch.')).toBeInTheDocument())
+    expect(screen.queryByText('1/2 + 1/4 = 3/4.')).not.toBeInTheDocument()
+  })
+
   it('says so plainly when nothing is waiting', async () => {
     mockedDue.mockResolvedValue({ items: [], dueCount: 0, generatedAt: '' })
     renderSession()

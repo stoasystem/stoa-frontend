@@ -135,7 +135,9 @@ function ReviewFeedback({
         )}
         {result.feedback}
       </p>
-      {result.explanation ? (
+      {/* The explanation states the answer, so it is held back until the
+          student has found it; the feedback above points the way instead. */}
+      {result.correct && result.explanation ? (
         <p className="text-sm leading-6 text-muted-foreground">{result.explanation}</p>
       ) : null}
       {result.correct ? (
