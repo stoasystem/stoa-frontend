@@ -9,15 +9,18 @@ import { ArrowRight, Flame } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgressQuery'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
+import { useReviewSummaryQuery } from '@/hooks/practice/useReviewQueries'
 import { getPracticeLessonPath } from '@/lib/practiceRoutes'
 
 export function TodayStrip() {
   const progressQuery = useCurriculumProgressQuery()
   const overviewQuery = usePracticeOverviewQuery()
 
+  const reviewQuery = useReviewSummaryQuery()
+
   const streak = progressQuery.data?.studyStreak ?? 0
   const lesson = overviewQuery.data?.recommendedLesson
-  const mistakes = overviewQuery.data?.recentMistakes?.length ?? 0
+  const due = reviewQuery.data?.dueCount ?? 0
 
   if (progressQuery.isLoading && overviewQuery.isLoading) {
     return null
@@ -37,10 +40,10 @@ export function TodayStrip() {
           </Link>
         </Button>
       ) : null}
-      {mistakes > 0 ? (
+      {due > 0 ? (
         <Button asChild size="sm" variant="ghost" className="h-8 px-2 text-sm">
           <Link to="/learn/mistakes">
-            Review {mistakes === 1 ? '1 mistake' : `${mistakes} mistakes`}
+            Review {due === 1 ? '1 question' : `${due} questions`}
           </Link>
         </Button>
       ) : null}

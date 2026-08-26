@@ -4,6 +4,8 @@ import { createConversation } from '@/services/chat/chatApi'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 import type {
+  ReviewDueResponse,
+  ReviewSummary,
   PracticeAnswerRequest,
   PracticeAnswerResult,
   PracticeHintRequest,
@@ -63,6 +65,16 @@ export async function completePracticeLesson(lessonId: string) {
   const response = await httpClient.post<PracticeLessonResult>(
     `/practice/lessons/${lessonId}/complete`,
   )
+  return response.data
+}
+
+export async function getDueReview() {
+  const response = await httpClient.get<ReviewDueResponse>('/practice/review/due')
+  return response.data
+}
+
+export async function getReviewSummary() {
+  const response = await httpClient.get<ReviewSummary>('/practice/review/summary')
   return response.data
 }
 

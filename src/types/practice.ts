@@ -364,3 +364,28 @@ export type PracticeChatLocationState = {
   practiceContext?: PracticeChatContext
   prompt?: string
 }
+
+export type ReviewCard = {
+  challengeId: string
+  lessonId: string
+  subjectId: string
+  topicId: string
+  prompt: string
+  options: string[]
+  type: string
+  dueAt: string
+  lapses: number
+  reps: number
+}
+
+export type ReviewDueResponse = {
+  items: ReviewCard[]
+  dueCount: number
+  generatedAt: string
+}
+
+export type ReviewSummary = {
+  dueCount: number
+  scheduledCount: number
+  nextDueAt: string
+}

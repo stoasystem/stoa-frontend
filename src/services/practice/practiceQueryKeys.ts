@@ -11,4 +11,6 @@ export const practiceQueryKeys = {
     [...practiceQueryKeys.all, 'curriculum-catalog', subjectId ?? 'all', gradeLevel ?? 'all', includePreview ? 'preview' : 'active'] as const,
   curriculumProgress: (studentId?: string, subjectId?: string) =>
     [...practiceQueryKeys.all, 'curriculum-progress', studentId ?? 'self', subjectId ?? 'all'] as const,
+  reviewDue: () => [...practiceQueryKeys.all, 'review-due'] as const,
+  reviewSummary: () => [...practiceQueryKeys.all, 'review-summary'] as const,
 }

@@ -1,89 +1,42 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Play } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { EmptyState } from '@/components/common/EmptyState'
-import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilters'
-import { Button } from '@/components/ui/button'
-import { useQuestionBankMistakesQuery } from '@/hooks/questionBank/useQuestionBankMistakesQuery'
-import { getQuestionBankSetPath, getQuestionBankSessionPath } from '@/lib/questionBankRoutes'
-import type { QuestionBankFilters as QuestionBankFiltersValue } from '@/types/questionBank'
+import { ReviewSession } from '@/components/practice/ReviewSession'
+import { useReviewSummaryQuery } from '@/hooks/practice/useReviewQueries'
 
 export function MistakesTab() {
-  const [filters, setFilters] = useState<QuestionBankFiltersValue>({
-    subjectId: 'all',
-    topicId: 'all',
-    difficulty: 'all',
-  })
-  const mistakesQuery = useQuestionBankMistakesQuery(filters)
-  const mistakes = mistakesQuery.data ?? []
-  const firstSetId = mistakes[0]?.setId ?? 'linear-equations-basics'
+  const summaryQuery = useReviewSummaryQuery()
+  const summary = summaryQuery.data
 
   return (
-    <>
-      <PageContainer className="space-y-7 p-0">
-        <PageHeader
-          eyebrow="Practice Library"
-          title="Mistakes to Review"
-          description="Review questions you missed before and strengthen your understanding."
-        />
-        <section className="grid gap-4 sm:grid-cols-3">
-          <Metric label="Questions to review" value={`${mistakes.length}`} />
-          <Metric label="Subjects" value={`${new Set(mistakes.map((mistake) => mistake.subjectId)).size || 1}`} />
-          <Metric label="Review mode" value="Low pressure" />
-        </section>
-        <QuestionBankFilters
-          value={filters}
-          onChange={setFilters}
-          showLevel={false}
-          showDifficulty
-          showQuestionType={false}
-          showStatus={false}
-        />
-        <section className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="brand-section-kicker">Review & Improve</p>
-              <h2 className="mt-2 text-xl font-semibold">Review exactly where the answer changed</h2>
-            </div>
-            <Button asChild>
-              <Link to={getQuestionBankSessionPath(`review-${firstSetId}`)}>
-                <Play className="h-4 w-4" aria-hidden="true" />
-                Start Review Session
-              </Link>
-            </Button>
-          </div>
-          <div className="mt-5 space-y-3">
-            {mistakes.length === 0 && (
-              <EmptyState
-                title="No mistakes to review yet"
-                description="Once you complete practice sets, missed questions will appear here."
-                action={<Button asChild><Link to="/question-bank">Start Practice</Link></Button>}
-              />
-            )}
-            {mistakes.map((mistake) => (
-              <article key={mistake.id} className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
-                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
-                      {mistake.subjectTitle} / {mistake.topicTitle}
-                    </p>
-                    <h3 className="mt-2 text-base font-semibold">{mistake.prompt}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">Your answer: {mistake.studentAnswer}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">Correct answer: {mistake.correctAnswer}</p>
-                  </div>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to={getQuestionBankSetPath(mistake.setId)}>Open Set</Link>
-                  </Button>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      </PageContainer>
-    </>
+    <PageContainer className="space-y-7 p-0">
+      <PageHeader
+        eyebrow="Review"
+        title="Questions coming back"
+        description="Questions return just before they would be forgotten. Getting one right sends it further away; missing it brings it back."
+      />
+      <section className="grid gap-4 sm:grid-cols-3">
+        <Metric label="Due now" value={`${summary?.dueCount ?? 0}`} />
+        <Metric label="Being tracked" value={`${summary?.scheduledCount ?? 0}`} />
+        <Metric label="Next one" value={formatNextDue(summary?.nextDueAt)} />
+      </section>
+      <ReviewSession />
+    </PageContainer>
   )
+}
+
+function formatNextDue(dueAt: string | undefined) {
+  if (!dueAt) {
+    return '—'
+  }
+  const due = new Date(dueAt)
+  if (Number.isNaN(due.getTime())) {
+    return '—'
+  }
+  const days = Math.round((due.getTime() - Date.now()) / 86_400_000)
+  if (days <= 0) {
+    return 'Today'
+  }
+  return days === 1 ? 'Tomorrow' : `In ${days} days`
 }
 
 function Metric({ label, value }: { label: string; value: string }) {
@@ -94,4 +47,3 @@ function Metric({ label, value }: { label: string; value: string }) {
     </div>
   )
 }
-
