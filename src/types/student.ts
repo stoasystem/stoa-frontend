@@ -23,3 +23,13 @@ export type LearningHistoryItem = {
   href?: string
   sourceLabel?: string
 }
+
+export type StudentEntitlement = {
+  effectivePlan: string
+  newUsageAllowed: boolean
+  teacherSupportIncluded: boolean
+  dailyAiQuestionLimit?: number | null
+  dailyChatMessageLimit?: number | null
+  freeTrialActive: boolean
+  freeTrialEndsAt?: string | null
+}

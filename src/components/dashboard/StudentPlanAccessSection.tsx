@@ -1,36 +1,49 @@
 import { CreditCard, ShieldCheck } from 'lucide-react'
-import { PlanUsageCard } from '@/components/billing/PlanUsageCard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { useBillingPlansQuery } from '@/hooks/billing/useBillingPlansQuery'
-import { useBillingUsageQuery } from '@/hooks/billing/useBillingUsageQuery'
-import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
+import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
 import type { SubscriptionPlan } from '@/types/billing'
 
+function formatLimit(value: number | null | undefined) {
+  return typeof value === 'number' ? `${value} per day` : 'Not limited'
+}
+
 export function StudentPlanAccessSection() {
-  const usageQuery = useBillingUsageQuery()
-  const plansQuery = useBillingPlansQuery()
-  const subscriptionQuery = useSubscriptionQuery()
-  const subscriptionPlan = subscriptionQuery.data?.plan
-  const selectedPlanId: SubscriptionPlan = subscriptionPlan && subscriptionPlan !== 'free_trial'
-    ? subscriptionPlan
-    : 'family'
-  const selectedPlan = plansQuery.data?.items.find((plan) => plan.id === selectedPlanId)
+  // A student's plan comes from a parent's billing, which only a parent may
+  // read. This asks the student's own entitlement instead.
+  const entitlementQuery = useStudentEntitlementQuery()
+  const entitlement = entitlementQuery.data
 
   return (
     <section className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      {usageQuery.data ? (
-        <PlanUsageCard usage={usageQuery.data} />
-      ) : (
-        <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
-          <CardHeader>
-            <CardTitle className="text-base">Usage quota</CardTitle>
-          </CardHeader>
-          <CardContent className="text-sm leading-6 text-muted-foreground">
-            Usage quota will appear here once learning activity is available.
-          </CardContent>
-        </Card>
-      )}
+      <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
+        <CardHeader>
+          <CardTitle className="text-base">What your plan allows</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
+          {entitlement ? (
+            <>
+              <Detail label="Questions" value={formatLimit(entitlement.dailyAiQuestionLimit)} />
+              <Detail label="Chat messages" value={formatLimit(entitlement.dailyChatMessageLimit)} />
+              {entitlement.freeTrialActive && (
+                <Detail
+                  label="Free trial"
+                  value={
+                    entitlement.freeTrialEndsAt
+                      ? `Ends ${new Intl.DateTimeFormat('en', {
+                          month: 'short',
+                          day: 'numeric',
+                        }).format(new Date(entitlement.freeTrialEndsAt))}`
+                      : 'Active'
+                  }
+                />
+              )}
+            </>
+          ) : (
+            <p>Your plan limits will appear here.</p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
         <CardHeader>
@@ -40,31 +53,40 @@ export function StudentPlanAccessSection() {
             </div>
             <div>
               <p className="brand-section-kicker">Family access</p>
-              <CardTitle className="text-xl">Selected plan</CardTitle>
+              <CardTitle className="text-xl">
+                {entitlement
+                  ? getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan)
+                  : 'Your plan'}
+              </CardTitle>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
-          <p>
-            {selectedPlan
-              ? `${selectedPlan.name}: ${selectedPlan.currency} ${selectedPlan.priceMonthly}/mo. ${selectedPlan.audience}`
-              : `${getSubscriptionPlanLabel(selectedPlanId)} details are loading.`}
-          </p>
           <div className="rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-4">
             <div className="flex gap-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
               <p>
-                Plan limits explain how much Learning Chat, file upload, and tutor support access is available
-                for this student during the current period.
+                {entitlement?.newUsageAllowed === false
+                  ? 'New questions are paused on this plan. Ask a parent to review the family plan.'
+                  : 'This plan covers the questions, practice, and teacher support shown above.'}
               </p>
             </div>
           </div>
           <p>
-            Payment details stay with the parent billing account. Students can see learning access, but do not manage
-            card details or invoices.
+            Payment details stay with the parent billing account. You can see your learning access here,
+            but card details and invoices are managed by a parent.
           </p>
         </CardContent>
       </Card>
     </section>
+  )
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-3">
+      <span className="text-xs font-semibold uppercase tracking-[0.08em]">{label}</span>
+      <span className="text-sm font-semibold text-foreground">{value}</span>
+    </div>
   )
 }

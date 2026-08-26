@@ -12,7 +12,7 @@ import { UploadErrorMessage } from '@/features/uploads/components/UploadErrorMes
 import { useUploadAttachments } from '@/features/uploads/hooks/useUploadAttachments'
 import { uploadAttachmentToUploadedFile } from '@/features/uploads/utils/uploadAdapters'
 import { chatUploadConfig } from '@/features/uploads/utils/uploadLimits'
-import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
+import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { createChatInputSchema } from '@/lib/validation'
 import type { UploadedFile } from '@/types/file'
 
@@ -37,9 +37,8 @@ export function ChatInput({
 }: ChatInputProps) {
   const { t } = useTranslation(['chat', 'common', 'uploads'])
   const [value, setValue] = useState('')
-  const featureAccessQuery = useFeatureAccessQuery()
-  const access = featureAccessQuery.data
-  const chatLocked = access?.canUseChat === false
+  const entitlementQuery = useStudentEntitlementQuery()
+  const chatLocked = entitlementQuery.data?.newUsageAllowed === false
   const chatInputSchema = createChatInputSchema(t)
   const {
     attachments,
@@ -58,17 +57,15 @@ export function ChatInput({
     },
   })
   const uploadedAttachments = attachments.filter((attachment) => attachment.status === 'uploaded')
-  const uploadLockedReason =
-    access?.canUploadFiles === false
-      ? access.reason?.fileUploads ?? t('chat:fileQuotaReached')
-      : undefined
+  // Upload limits are enforced when the upload is issued, not gated here.
+  const uploadLockedReason = undefined
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const trimmed = value.trim()
     if (disabled || isStreaming || chatLocked) {
-      if (chatLocked) toast.error(access?.reason?.chat ?? t('chat:quotaReached'))
+      if (chatLocked) toast.error(t('chat:quotaReached'))
       return
     }
 

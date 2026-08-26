@@ -2,7 +2,7 @@ import { GraduationCap } from 'lucide-react'
 import { UpgradeRequiredDialog } from '@/components/billing/UpgradeRequiredDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { useFeatureAccessQuery } from '@/hooks/billing/useFeatureAccessQuery'
+import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 
 type TeacherEscalationCardProps = {
   onRequestTeacher?: () => void
@@ -17,8 +17,8 @@ export function TeacherEscalationCard({
   feedback,
   feedbackTone = 'success',
 }: TeacherEscalationCardProps) {
-  const featureAccessQuery = useFeatureAccessQuery()
-  const teacherHelpLocked = featureAccessQuery.data?.canRequestTeacherHelp === false
+  const entitlementQuery = useStudentEntitlementQuery()
+  const teacherHelpLocked = entitlementQuery.data?.teacherSupportIncluded === false
   const requestButton = (
     <Button
       className="shrink-0"
@@ -59,7 +59,7 @@ export function TeacherEscalationCard({
           </div>
           {teacherHelpLocked ? (
             <UpgradeRequiredDialog
-              reason={featureAccessQuery.data?.reason?.teacherHelp ?? 'Teacher help quota reached.'}
+              reason={'Teacher support is not part of your current plan.'}
             >
               {requestButton}
             </UpgradeRequiredDialog>

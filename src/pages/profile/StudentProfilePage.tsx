@@ -24,13 +24,13 @@ import { Label } from '@/components/ui/label'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { useStudentLearningProfileQuery } from '@/hooks/student/useStudentLearningProfileQuery'
 import { useUpdateStudentProfileMutation } from '@/hooks/student/useUpdateStudentProfileMutation'
-import { useSubscriptionQuery } from '@/hooks/billing/useSubscriptionQuery'
+import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { getSubscriptionPlanLabel, getSubscriptionStatusLabel } from '@/lib/displayLabels'
+import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
 import { studentProfileSchema } from '@/lib/validation'
-import type { Subscription } from '@/types/billing'
-import type { StudentProfile } from '@/types/student'
+import type { SubscriptionPlan } from '@/types/billing'
+import type { StudentEntitlement, StudentProfile } from '@/types/student'
 
 type ProfileErrors = {
   grade?: string
@@ -51,7 +51,7 @@ type ProfileBillingSnapshot = {
 
 export function StudentProfilePage() {
   const profileQuery = useStudentProfileQuery()
-  const subscriptionQuery = useSubscriptionQuery()
+  const entitlementQuery = useStudentEntitlementQuery()
   const learningProfileQuery = useStudentLearningProfileQuery(profileQuery.data?.userId)
   const updateProfile = useUpdateStudentProfileMutation()
   const [grade, setGrade] = useState('')
@@ -97,7 +97,7 @@ export function StudentProfilePage() {
   }
 
   const profile = profileQuery.data
-  const billing = getProfileBillingSnapshot(subscriptionQuery.data, subscriptionQuery.isPending)
+  const billing = getProfileBillingSnapshot(entitlementQuery.data, entitlementQuery.isPending)
 
   return (
     <DashboardLayout>
@@ -285,7 +285,7 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
           <>
             <ProfileDetail icon={CreditCard} label="Plan" value={billing.planName} />
             <ProfileDetail icon={ShieldCheck} label="Status" value={billing.statusLabel} />
-            <ProfileDetail icon={CalendarDays} label="Renews" value={formatDate(billing.nextBillingDate)} />
+            <ProfileDetail icon={CalendarDays} label="Free trial ends" value={formatDate(billing.nextBillingDate)} />
           </>
         ) : (
           <p className="text-sm text-muted-foreground">No subscription is attached to this account.</p>
@@ -296,19 +296,19 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
 }
 
 function getProfileBillingSnapshot(
-  subscription: Subscription | undefined,
-  subscriptionPending: boolean,
+  entitlement: StudentEntitlement | undefined,
+  pending: boolean,
 ): ProfileBillingSnapshot | undefined {
-  if (subscriptionPending) {
+  if (pending) {
     return { planName: 'Loading...', statusLabel: 'Loading...' }
   }
 
-  if (!subscription) return undefined
+  if (!entitlement) return undefined
 
   return {
-    planName: getSubscriptionPlanLabel(subscription.plan),
-    statusLabel: getSubscriptionStatusLabel(subscription.status),
-    nextBillingDate: subscription.currentPeriodEnd,
+    planName: getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan),
+    statusLabel: entitlement.newUsageAllowed ? 'Active' : 'Paused',
+    nextBillingDate: entitlement.freeTrialEndsAt ?? undefined,
   }
 }
 

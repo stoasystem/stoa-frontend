@@ -11,7 +11,8 @@ import type {
 } from '@/types/billing'
 import type { NotificationEvent } from '@/types/notification'
 
-const REMINDER_ROLES = new Set(['parent', 'student'])
+// Only a parent can read billing or act on a payment reminder.
+const REMINDER_ROLES = new Set(['parent'])
 
 export function PaymentMethodReminderBanner() {
   const user = useAuthStore((state) => state.user)
