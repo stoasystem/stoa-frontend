@@ -3,7 +3,7 @@
  * integration and the dangerouslySetInnerHTML path rather than a copy of
  * the parsing logic.
  */
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { MathRenderer, parseSegments } from '@/components/ui/MathRenderer'
 
@@ -50,15 +50,16 @@ describe('MathRenderer rendering', () => {
     expect(screen.getByText('Solve for x')).toBeInTheDocument()
   })
 
-  it('produces KaTeX markup for a valid formula', () => {
+  it('produces KaTeX markup for a valid formula', async () => {
+    // KaTeX loads the first time a formula appears.
     const { container } = render(<MathRenderer>{'value is $x^2$'}</MathRenderer>)
-    expect(container.querySelector('.katex')).not.toBeNull()
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
     expect(container.querySelector('.math-inline')).not.toBeNull()
   })
 
-  it('marks block formulas with display mode', () => {
+  it('marks block formulas with display mode', async () => {
     const { container } = render(<MathRenderer>{'$$\\int_0^1 x dx$$'}</MathRenderer>)
-    expect(container.querySelector('.math-block')).not.toBeNull()
+    await waitFor(() => expect(container.querySelector('.math-block')).not.toBeNull())
     expect(container.querySelector('.katex-display')).not.toBeNull()
   })
 
@@ -68,9 +69,9 @@ describe('MathRenderer rendering', () => {
     expect(container.textContent).toContain('after')
   })
 
-  it('degrades to a marked span when the formula is malformed', () => {
+  it('degrades to a marked span when the formula is malformed', async () => {
     const { container } = render(<MathRenderer>{'$\\frac{{{$'}</MathRenderer>)
-    expect(container.querySelector('.math-error')).not.toBeNull()
+    await waitFor(() => expect(container.querySelector('.math-error')).not.toBeNull())
   })
 })
 

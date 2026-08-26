@@ -5,9 +5,22 @@
  * Falls back to plain text when KaTeX is unavailable or the expression
  * is malformed, so the chat experience is never broken by a bad formula.
  */
-import React from 'react'
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
+import React, { useEffect, useState } from 'react'
+
+type Katex = { renderToString: (tex: string, options?: Record<string, unknown>) => string }
+
+// KaTeX and its stylesheet are a third of the shared bundle, and most screens
+// never show a formula, so they load the first time one appears.
+let katexPromise: Promise<Katex> | null = null
+
+function loadKatex(): Promise<Katex> {
+  if (!katexPromise) {
+    katexPromise = import('./katexLoader').then(
+      (module) => module.default as unknown as Katex,
+    )
+  }
+  return katexPromise
+}
 
 export type MathSegment =
   | { type: 'text'; value: string }
@@ -57,7 +70,7 @@ function escapeHtml(value: string): string {
   return value.replace(/[&<>"']/g, (char) => HTML_ENTITIES[char])
 }
 
-function renderKatex(expression: string, displayMode: boolean): string {
+function renderKatex(katex: Katex, expression: string, displayMode: boolean): string {
   try {
     return katex.renderToString(expression, {
       displayMode,
@@ -77,11 +90,25 @@ interface MathRendererProps {
 }
 
 export function MathRenderer({ children, className }: MathRendererProps) {
+  const segments = children ? parseSegments(children) : []
+  const hasMath = segments.some((segment) => segment.type !== 'text')
+  const [katex, setKatex] = useState<Katex | null>(null)
+
+  useEffect(() => {
+    if (!hasMath || katex) return
+    let cancelled = false
+    void loadKatex().then((loaded) => {
+      if (!cancelled) setKatex(loaded)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [hasMath, katex])
+
   if (!children) return null
 
-  const segments = parseSegments(children)
-
-  if (segments.length === 1 && segments[0].type === 'text') {
+  // Until it loads, and if it never does, the expression is shown as written.
+  if (!hasMath || !katex) {
     return <span className={className}>{children}</span>
   }
 
@@ -98,7 +125,7 @@ export function MathRenderer({ children, className }: MathRendererProps) {
             // Safe only because renderKatex returns KaTeX-generated markup, and HTML-escapes
             // the raw expression on its parse-failure path. Do not pass unescaped input here.
             dangerouslySetInnerHTML={{
-              __html: renderKatex(seg.value, seg.type === 'block'),
+              __html: renderKatex(katex, seg.value, seg.type === 'block'),
             }}
           />
         )

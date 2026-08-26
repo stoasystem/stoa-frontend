@@ -2,7 +2,7 @@
  * Renders the real ChatMessageBubble to verify how AI output is presented:
  * math rendering, the streaming placeholder, and the blinking cursor.
  */
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble'
 import type { ChatMessage } from '@/types/chat'
@@ -28,11 +28,12 @@ describe('assistant message content', () => {
     expect(screen.getByText('Here is the answer.')).toBeInTheDocument()
   })
 
-  it('renders LaTeX in AI output through KaTeX', () => {
+  it('renders LaTeX in AI output through KaTeX', async () => {
+    // KaTeX loads the first time a formula appears.
     const { container } = render(
       <ChatMessageBubble message={message({ content: 'so $x^2$ follows' })} />,
     )
-    expect(container.querySelector('.katex')).not.toBeNull()
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
   })
 
   it('renders student messages as plain text without math processing', () => {

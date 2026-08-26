@@ -13,6 +13,11 @@ export default defineConfig({
 
           const normalizedId = id.replaceAll('\\', '/')
 
+          // Naming a chunk here overrides where a dynamic import would place a
+          // dependency. KaTeX is loaded on demand, so it is left unnamed and
+          // travels with the screen that needs it.
+          if (normalizedId.includes('/katex/')) return undefined
+
           if (
             normalizedId.includes('/react/') ||
             normalizedId.includes('/react-dom/') ||
