@@ -5,6 +5,9 @@ import type { ChatStreamEvent } from '@/types/chat'
 export type StreamMessagePayload = {
   content: string
   attachmentIds?: string[]
+  // The backend requires this to make a retry safe; without it the request is
+  // rejected before the message is ever read.
+  idempotencyKey: string
 }
 
 export async function streamConversationMessage({

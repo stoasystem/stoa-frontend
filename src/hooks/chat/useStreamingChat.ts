@@ -11,10 +11,13 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent } from '@/types/chat'
 
 type LocalChatMessage = ChatMessage & {
-  retryPayload?: StreamMessagePayload
+  // A retry is a new attempt and gets its own key.
+  retryPayload?: Omit<StreamMessagePayload, 'idempotencyKey'>
 }
 
-type SendStreamingMessagePayload = StreamMessagePayload & {
+// The idempotency key belongs to the attempt, which this hook owns, so callers
+// do not supply one.
+type SendStreamingMessagePayload = Omit<StreamMessagePayload, 'idempotencyKey'> & {
   attachments?: ChatAttachment[]
 }
 
@@ -201,6 +204,7 @@ export function useStreamingChat(conversationId: string | null) {
           payload: {
             content: trimmed,
             attachmentIds,
+            idempotencyKey: studentMessageId,
           },
           signal: controller.signal,
           onEvent: (event) => {
