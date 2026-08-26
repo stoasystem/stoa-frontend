@@ -329,7 +329,7 @@ export const navItems: AppNavItem[] = [
 ]
 
 export const routeMetadata: AppRouteMeta[] = [
-  { path: '/', pageName: 'HomeV2Page', role: 'public', module: 'Public', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'App entry and STOA overview.' },
+  { path: '/', pageName: 'EntryPage', role: 'public', module: 'Public', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'App entry and STOA overview.' },
   { path: '/login', pageName: 'LoginPage', role: 'public', module: 'Auth', status: 'core', priority: 'P0', navPriority: 'secondary', purpose: 'User sign-in.' },
   { path: '/register', pageName: 'RegisterPage', role: 'public', module: 'Auth', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'New account registration.' },
   { path: '/forgot-password', pageName: 'ForgotPasswordPage', role: 'public', module: 'Auth', status: 'placeholder', priority: 'P2', navPriority: 'hidden', purpose: 'Future password recovery surface.' },

@@ -112,9 +112,6 @@ const ForgotPasswordPage = lazy(() =>
     default: m.ForgotPasswordPage,
   })),
 );
-const HomeV2Page = lazy(() =>
-  import("@/pages/home-v2/HomeV2Page").then((m) => ({ default: m.HomeV2Page })),
-);
 const ForParentsPage = lazy(() =>
   import("@/pages/landing/ForParentsPage").then((m) => ({
     default: m.ForParentsPage,
@@ -274,6 +271,9 @@ const StudentProfilePage = lazy(() =>
     default: m.StudentProfilePage,
   })),
 );
+const EntryPage = lazy(() =>
+  import("@/pages/entry/EntryPage").then((m) => ({ default: m.EntryPage })),
+);
 const LoginPage = lazy(() =>
   import("@/pages/login/LoginPage").then((m) => ({ default: m.LoginPage })),
 );
@@ -335,7 +335,7 @@ export function AppRouter() {
           The two routes with their own skeleton keep it. */}
       <Suspense fallback={<PageSkeleton rows={4} />}>
         <Routes>
-          <Route path="/" element={<HomeV2Page />} />
+          <Route path="/" element={<EntryPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/teacher-activate" element={<TeacherActivatePage />} />

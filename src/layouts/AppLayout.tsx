@@ -26,6 +26,7 @@ import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { UserMenu } from '@/components/common/UserMenu'
 import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
+import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { cn } from '@/lib/utils'
 import { getNavItemsForUserRole } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
@@ -156,12 +157,13 @@ export function AppLayout({ children }: { children: ReactNode }) {
   const primaryItems = items.filter((item) => item.priority === 'primary')
   const secondaryItems = items.filter((item) => item.priority === 'secondary')
   const mobileItems = user ? getNavItemsForUserRole(user.role, { mobileOnly: true }).slice(0, 5) : []
+  const homePath = user ? getDefaultRouteForRole(user.role) : '/'
 
   return (
     <div className="platform-app-shell min-h-screen text-foreground">
       <div className="flex min-h-screen">
         <aside className="hidden w-64 flex-col border-r bg-card/85 p-4 shadow-[8px_0_30px_rgba(33,33,33,0.04)] md:flex">
-          <Link to="/" className="font-semibold">
+          <Link to={homePath} className="font-semibold">
             <AppLogo />
           </Link>
           <nav aria-label="Primary" className="mt-6 flex flex-1 flex-col gap-2">
@@ -187,7 +189,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-30 border-b bg-[hsl(var(--platform-surface-app)_/_0.94)] px-3 py-3 shadow-[0_10px_30px_hsl(var(--stoa-brand-charcoal)_/_0.04)] backdrop-blur sm:px-4 md:px-6">
             <div className="flex min-h-11 min-w-0 items-center gap-2 sm:gap-3">
               <Link
-                to="/"
+                to={homePath}
                 className="stoa-type-nav inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-2.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] sm:px-3"
               >
                 <Home className="h-4 w-4" aria-hidden="true" />
