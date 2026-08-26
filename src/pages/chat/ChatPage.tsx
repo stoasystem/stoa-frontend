@@ -311,7 +311,7 @@ export function ChatPage() {
       {uploadContext && (
         <UploadLearningContextCard
           context={uploadContext}
-          onBack={() => navigate(uploadContext.returnTo ?? '/dashboard')}
+          onBack={() => navigate(uploadContext.returnTo ?? '/chat')}
         />
       )}
       <div className="brand-rule rounded-lg border bg-card p-5 shadow-[var(--platform-shadow-soft)]">
@@ -439,7 +439,7 @@ export function ChatPage() {
             {uploadContext && (
               <UploadLearningContextCard
                 context={uploadContext}
-                onBack={() => navigate(uploadContext.returnTo ?? '/dashboard')}
+                onBack={() => navigate(uploadContext.returnTo ?? '/chat')}
               />
             )}
             <ChatMessageList

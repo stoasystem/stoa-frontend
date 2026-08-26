@@ -56,7 +56,7 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
             </Button>
           )}
           <Button asChild variant="secondary">
-            <Link to="/dashboard">Back to dashboard</Link>
+            <Link to="/learn/path">Back to practice</Link>
           </Button>
         </div>
       </CardContent>

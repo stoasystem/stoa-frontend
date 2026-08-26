@@ -1,7 +1,4 @@
-import {
-  LayoutDashboard,
-  type LucideIcon,
-} from 'lucide-react'
+import { GraduationCap, type LucideIcon } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -15,10 +12,10 @@ type ChatNavItem = {
 
 const chatNavItems: ChatNavItem[] = [
   {
-    labelKey: 'navigation.dashboard',
-    labelFallback: 'Dashboard',
-    path: '/dashboard',
-    Icon: LayoutDashboard,
+    labelKey: 'navigation.learn',
+    labelFallback: 'Learn',
+    path: '/learn',
+    Icon: GraduationCap,
   },
 ]
 

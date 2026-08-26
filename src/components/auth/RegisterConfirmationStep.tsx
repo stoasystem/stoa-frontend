@@ -9,7 +9,7 @@ function getContinueHref(data: AuthResponse) {
   if (data.user.role === 'student') return '/chat'
   if (data.user.role === 'parent') return '/parent'
   if (data.user.role === 'teacher') return '/tutor'
-  return '/dashboard'
+  return '/chat'
 }
 
 export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {

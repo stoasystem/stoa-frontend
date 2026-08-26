@@ -67,11 +67,6 @@ const ContactPage = lazy(() =>
     default: m.ContactPage,
   })),
 );
-const StudentAssistantEntryPage = lazy(() =>
-  import("@/pages/assistant/StudentAssistantEntryPage").then((m) => ({
-    default: m.StudentAssistantEntryPage,
-  })),
-);
 const ClassroomLobbyPage = lazy(() =>
   import("@/features/live-classroom/pages/ClassroomLobbyPage").then((m) => ({
     default: m.ClassroomLobbyPage,
@@ -363,7 +358,7 @@ export function AppRouter() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/forbidden" element={<ForbiddenPage />} />
-          <Route path="/assistant" element={<StudentAssistantEntryPage />} />
+          <Route path="/assistant" element={<Navigate replace to="/chat" />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/billing" element={<BillingPage />} />
             <Route

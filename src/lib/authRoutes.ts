@@ -3,7 +3,7 @@ import type { UserRole } from '@/types/user'
 export function getDefaultRouteForRole(role: UserRole) {
   switch (role) {
     case 'student':
-      return '/dashboard'
+      return '/chat'
     case 'parent':
       return '/parent'
     case 'teacher':
@@ -15,7 +15,7 @@ export function getDefaultRouteForRole(role: UserRole) {
     case 'school_viewer':
       return '/organization'
     default:
-      return '/dashboard'
+      return '/chat'
   }
 }
 

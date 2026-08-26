@@ -28,10 +28,9 @@ export const routeGroups = {
     '/onboarding',
   ],
   student: [
-    '/dashboard',
     '/chat',
+    '/learn',
     '/profile',
-    '/learning-history',
   ],
   parent: [
     '/parent',
