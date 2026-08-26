@@ -274,9 +274,6 @@ const StudentProfilePage = lazy(() =>
 const EntryPage = lazy(() =>
   import("@/pages/entry/EntryPage").then((m) => ({ default: m.EntryPage })),
 );
-const LoginPage = lazy(() =>
-  import("@/pages/login/LoginPage").then((m) => ({ default: m.LoginPage })),
-);
 const RegisterPage = lazy(() =>
   import("@/pages/auth/RegisterPage").then((m) => ({
     default: m.RegisterPage,
@@ -336,7 +333,7 @@ export function AppRouter() {
       <Suspense fallback={<PageSkeleton rows={4} />}>
         <Routes>
           <Route path="/" element={<EntryPage />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<EntryPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/teacher-activate" element={<TeacherActivatePage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />

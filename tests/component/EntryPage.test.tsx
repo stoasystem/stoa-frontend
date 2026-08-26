@@ -63,6 +63,25 @@ describe('arriving at the app domain', () => {
     expect(screen.queryByRole('form', { name: 'sign in' })).not.toBeInTheDocument()
   })
 
+  it('does not ask someone already signed in to sign in again', () => {
+    // /login and the root answer the same way, so a stale bookmark or a
+    // redirect left over from an expired session lands in the app.
+    signedInAs('student')
+
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/login']}>
+          <Routes>
+            <Route path="/login" element={<EntryPage />} />
+            <Route path="/chat" element={<p>the student app</p>} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+
+    expect(screen.getByText('the student app')).toBeInTheDocument()
+  })
+
   it('takes a parent and a teacher to theirs', () => {
     signedInAs('parent')
     const parent = renderAt()
