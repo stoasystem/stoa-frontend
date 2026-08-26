@@ -62,11 +62,6 @@ const VirtualCheckoutPage = lazy(() =>
     default: m.VirtualCheckoutPage,
   })),
 );
-const ContactPage = lazy(() =>
-  import("@/pages/contact/ContactPage").then((m) => ({
-    default: m.ContactPage,
-  })),
-);
 const ClassroomLobbyPage = lazy(() =>
   import("@/features/live-classroom/pages/ClassroomLobbyPage").then((m) => ({
     default: m.ClassroomLobbyPage,
@@ -110,31 +105,6 @@ const UnauthorizedPage = lazy(() =>
 const ForgotPasswordPage = lazy(() =>
   import("@/pages/auth/ForgotPasswordPage").then((m) => ({
     default: m.ForgotPasswordPage,
-  })),
-);
-const ForParentsPage = lazy(() =>
-  import("@/pages/landing/ForParentsPage").then((m) => ({
-    default: m.ForParentsPage,
-  })),
-);
-const ForSchoolsPage = lazy(() =>
-  import("@/pages/landing/ForSchoolsPage").then((m) => ({
-    default: m.ForSchoolsPage,
-  })),
-);
-const ForTutoringCentersPage = lazy(() =>
-  import("@/pages/landing/ForTutoringCentersPage").then((m) => ({
-    default: m.ForTutoringCentersPage,
-  })),
-);
-const HowItWorksPage = lazy(() =>
-  import("@/pages/landing/HowItWorksPage").then((m) => ({
-    default: m.HowItWorksPage,
-  })),
-);
-const TeacherSupportPage = lazy(() =>
-  import("@/pages/landing/TeacherSupportPage").then((m) => ({
-    default: m.TeacherSupportPage,
   })),
 );
 const LearningAutomationConsolePage = lazy(() =>
@@ -207,14 +177,6 @@ const ParentReportsPage = lazy(() =>
   import("@/pages/parent/ParentReportsPage").then((m) => ({
     default: m.ParentReportsPage,
   })),
-);
-const PricingPage = lazy(() =>
-  import("@/pages/pricing/PricingPage").then((m) => ({
-    default: m.PricingPage,
-  })),
-);
-const QaPage = lazy(() =>
-  import("@/pages/qa/QaPage").then((m) => ({ default: m.QaPage })),
 );
 const QuestionSessionPage = lazy(() =>
   import("@/pages/question-bank/QuestionSessionPage").then((m) => ({
@@ -337,22 +299,10 @@ export function AppRouter() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/teacher-activate" element={<TeacherActivatePage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/qa" element={<QaPage />} />
-          <Route path="/for-parents" element={<ForParentsPage />} />
-          <Route path="/how-it-works" element={<HowItWorksPage />} />
-          <Route path="/ai-homework-help" element={<HowItWorksPage />} />
-          <Route path="/teacher-support" element={<TeacherSupportPage />} />
-          <Route path="/for-schools" element={<ForSchoolsPage />} />
-          <Route
-            path="/for-tutoring-centers"
-            element={<ForTutoringCentersPage />}
-          />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
           <Route path="/support" element={<SupportPage />} />
-          <Route path="/contact" element={<ContactPage />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="/forbidden" element={<ForbiddenPage />} />
           <Route path="/assistant" element={<Navigate replace to="/chat" />} />

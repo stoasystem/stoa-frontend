@@ -18,27 +18,6 @@ export function MarketingHeader() {
           <AppLogo />
         </Link>
         <nav className="stoa-type-nav flex min-w-0 flex-1 flex-wrap items-center justify-end gap-x-4 gap-y-2 text-sm text-muted-foreground">
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/how-it-works">
-            {t('navigation.howItWorks')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/for-parents">
-            {t('navigation.parents')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/teacher-support">
-            {t('navigation.tutors')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/pricing">
-            {t('navigation.pricing')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/qa">
-            {t('navigation.qa')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/contact">
-            {t('navigation.contact')}
-          </Link>
-          <Link className="whitespace-nowrap transition-colors hover:text-[hsl(var(--stoa-brand-burgundy))]" to="/login">
-            {t('navigation.login')}
-          </Link>
           <LanguageSwitcher compact />
           <Button asChild size="sm" className="premium-button-lift premium-primary-button h-auto min-h-9 rounded-md px-4 py-2 whitespace-normal text-center">
             <Link to="/login?next=/chat">{t('navigation.startLearning')}</Link>

@@ -49,27 +49,12 @@ export function AppFooter({
             {t('footer.platform')}
           </h2>
           <div className="grid gap-2 text-sm text-muted-foreground">
-            <Link className="hover:text-foreground" to="/how-it-works">
-              {t('navigation.howItWorks')}
-            </Link>
-            <Link className="hover:text-foreground" to="/for-parents">
-              {t('navigation.forParents')}
-            </Link>
-            <Link className="hover:text-foreground" to="/teacher-support">
-              {t('navigation.forTutors')}
-            </Link>
-            <Link className="hover:text-foreground" to="/pricing">
-              {t('navigation.pricing')}
-            </Link>
-            <Link className="hover:text-foreground" to="/qa">
-              {t('navigation.qa')}
-            </Link>
             <Link className="hover:text-foreground" to="/support">
               {t('navigation.support')}
             </Link>
-            <Link className="hover:text-foreground" to="/contact">
-              {t('navigation.contact')}
-            </Link>
+            <a className="hover:text-foreground" href="https://stoaedu.ch">
+              {t('navigation.about')}
+            </a>
           </div>
         </div>
       </div>

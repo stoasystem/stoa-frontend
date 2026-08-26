@@ -35,7 +35,7 @@ export function useRegisterMutation(options: { redirect?: boolean } = {}) {
       }
       if (options.redirect !== false) {
         if (data.verificationStatus === 'pending_review') {
-          navigate('/teacher-support')
+          navigate('/login')
           return
         }
         if (emailVerificationRequired) return

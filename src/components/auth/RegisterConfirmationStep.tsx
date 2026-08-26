@@ -58,13 +58,7 @@ export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {
           </div>
         </div>
         <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-          <Button asChild className="premium-button-lift rounded-full">
-            <Link to="/teacher-support">
-              {t('auth:register.teacherSupportCta')}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild className="rounded-full" variant="outline">
+                    <Button asChild className="rounded-full" variant="outline">
             <Link to="/login">
               {t('auth:register.signInAfterApproval')}
             </Link>

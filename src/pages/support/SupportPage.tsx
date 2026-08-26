@@ -62,7 +62,7 @@ export function SupportPage() {
           actions={
             <>
               <Button variant="outline" asChild>
-                <Link to="/contact">{t('common:navigation.contact')}</Link>
+                <a href="mailto:info@stoaedu.ch">{t('common:navigation.contact')}</a>
               </Button>
               <Button variant="outline" asChild>
                 <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
@@ -102,7 +102,7 @@ export function SupportPage() {
                 partnerships, use the contact page.
               </p>
               <Button asChild variant="outline" size="sm">
-                <Link to="/contact">{t('common:navigation.contact')}</Link>
+                <a href="mailto:info@stoaedu.ch">{t('common:navigation.contact')}</a>
               </Button>
             </CardContent>
           </Card>

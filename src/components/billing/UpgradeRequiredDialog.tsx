@@ -28,7 +28,7 @@ export function UpgradeRequiredDialog({ children, reason }: { children: ReactNod
               trackEvent('upgrade_prompt_clicked', { reason })
             }}
           >
-            <Link to="/pricing">Compare plans</Link>
+            <Link to="/billing">Compare plans</Link>
           </Button>
         </DialogFooter>
       </DialogContent>

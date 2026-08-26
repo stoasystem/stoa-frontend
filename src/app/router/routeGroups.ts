@@ -4,14 +4,6 @@ export const routeGroups = {
     '/login',
     '/register',
     '/forgot-password',
-    '/pricing',
-    '/qa',
-    '/for-parents',
-    '/how-it-works',
-    '/ai-homework-help',
-    '/teacher-support',
-    '/for-schools',
-    '/for-tutoring-centers',
     '/privacy',
     '/terms',
     '/support',
@@ -71,8 +63,6 @@ export const routeGroups = {
     '/students/:studentId/curriculum-graph',
     '/curriculum-graph',
     '/parent/children/:childId/monthly-report',
-    '/for-schools',
-    '/for-tutoring-centers',
   ],
 } as const
 

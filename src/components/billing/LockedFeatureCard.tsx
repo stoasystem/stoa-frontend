@@ -27,7 +27,7 @@ export function LockedFeatureCard({ feature, reason }: { feature: string; reason
             trackEvent('upgrade_prompt_clicked', { feature })
           }}
         >
-          <Link to="/pricing">View plans</Link>
+          <Link to="/billing">View plans</Link>
         </Button>
       </CardContent>
     </Card>

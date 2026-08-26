@@ -1,4 +1,4 @@
-import { ArrowRight, Clock3 } from 'lucide-react'
+import { Clock3 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -47,13 +47,7 @@ export function TeacherApplicationSubmitted({
         </div>
       </div>
       <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-        <Button asChild className="premium-button-lift rounded-full">
-          <Link to="/teacher-support">
-            {t('auth:register.teacherSupportCta')}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-        <Button asChild className="rounded-full" variant="outline">
+                <Button asChild className="rounded-full" variant="outline">
           <Link to="/login">{t('auth:register.waitForInvitation')}</Link>
         </Button>
       </div>

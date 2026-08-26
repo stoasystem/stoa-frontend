@@ -13,9 +13,6 @@ export function FooterLegalLinks() {
       <Link className="hover:text-foreground" to="/terms">
         {t('navigation.terms')}
       </Link>
-      <Link className="hover:text-foreground" to="/contact">
-        {t('footer.contact')}
-      </Link>
       <a className="hover:text-foreground" href={stoaContactInfo.homepageUrl}>
         {t('footer.backToHomepage')}
       </a>

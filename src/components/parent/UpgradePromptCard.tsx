@@ -16,7 +16,7 @@ export function UpgradePromptCard({ source }: { source: string }) {
         </p>
         <Button asChild>
           <Link
-            to="/pricing"
+            to="/billing"
             onClick={() => trackEvent('parent_upgrade_cta_clicked', { source })}
           >
             Compare family plans
