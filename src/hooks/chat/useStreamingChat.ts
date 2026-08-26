@@ -182,10 +182,13 @@ export function useStreamingChat(conversationId: string | null) {
 
       // The request that generates the answer holds its connection until the
       // answer is whole, so the steps are read back on a second connection.
+      // Progress is held per conversation, so steps written before this
+      // question belong to the previous answer.
+      const askedAt = new Date().toISOString()
       const progressTimer = window.setInterval(() => {
         void getGenerationProgress(conversationId, controller.signal)
-          .then((steps) => {
-            if (steps.length === 0) return
+          .then(({ steps, updatedAt }) => {
+            if (steps.length === 0 || updatedAt < askedAt) return
             setLocalMessages((messages) =>
               messages.map((message) =>
                 message.id === (activeAssistantMessageIdRef.current ?? assistantMessageId) &&

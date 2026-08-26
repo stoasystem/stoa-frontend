@@ -123,9 +123,10 @@ function parseStreamEvent(raw: string): ChatStreamEvent | null {
 
 /** Read the steps of an answer still being written. */
 export async function getGenerationProgress(conversationId: string, signal?: AbortSignal) {
-  const response = await httpClient.get<{ conversationId: string; steps: string[] }>(
-    `/conversations/${conversationId}/generation`,
-    { signal },
-  )
-  return response.data.steps
+  const response = await httpClient.get<{
+    conversationId: string
+    steps: string[]
+    updatedAt: string
+  }>(`/conversations/${conversationId}/generation`, { signal })
+  return response.data
 }
