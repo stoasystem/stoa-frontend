@@ -46,8 +46,10 @@
       "learningHistory": "Cronologia",
       "questionBank": "Biblioteca",
       "practice": "Esercizi",
-      "dashboard": "Home"
-    }
+      "dashboard": "Home",
+      "learn": "Impara"
+    },
+    "learn": "Impara"
   },
   "actions": {
     "startLearning": "Inizia a studiare",

@@ -68,34 +68,14 @@ export function getRouteRoleForUserRole(role: UserRole): Exclude<AppRouteRole, '
 
 export const navItems: AppNavItem[] = [
   {
-    label: 'Dashboard',
-    path: '/dashboard',
-    role: 'student',
-    priority: 'primary',
-    status: 'core',
-    icon: 'dashboard',
-    mobile: true,
-    description: 'Learning overview and next action.',
-  },
-  {
-    label: 'Practice',
-    path: '/practice',
-    role: 'student',
-    priority: 'primary',
-    status: 'core',
-    icon: 'practice',
-    mobile: true,
-    description: 'Short guided lessons that can open a question when a step is unclear.',
-  },
-  {
-    label: 'Library',
-    path: '/question-bank',
+    label: 'Learn',
+    path: '/learn',
     role: 'student',
     priority: 'primary',
     status: 'core',
     icon: 'questionBank',
     mobile: true,
-    description: 'Choose exercises by subject, topic, difficulty, and review status.',
+    description: 'Exercises, the guided path, and your mistakes.',
   },
   {
     label: 'Ask a question',
@@ -106,25 +86,6 @@ export const navItems: AppNavItem[] = [
     icon: 'chat',
     mobile: true,
     description: 'Ask a question, explain unclear steps, and request teacher help.',
-  },
-  {
-    label: 'Online Classroom',
-    path: '/classroom',
-    role: 'student',
-    priority: 'primary',
-    status: 'core',
-    icon: 'classroom',
-    mobile: true,
-    description: 'Schedule live tutor help, join the lobby, and review classroom summaries.',
-  },
-  {
-    label: 'Learning History',
-    path: '/learning-history',
-    role: 'student',
-    priority: 'primary',
-    status: 'core',
-    icon: 'history',
-    description: 'Past questions and learning records.',
   },
   {
     label: 'Profile',
@@ -438,3 +399,4 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/organization/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Organization-scoped learning profile.' },
   { path: '/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Advanced learning profile direct route.' },
 ]
+

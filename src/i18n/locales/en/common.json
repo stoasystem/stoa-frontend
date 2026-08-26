@@ -46,8 +46,10 @@
       "learningHistory": "History",
       "questionBank": "Library",
       "practice": "Practice",
-      "dashboard": "Home"
-    }
+      "dashboard": "Home",
+      "learn": "Learn"
+    },
+    "learn": "Learn"
   },
   "actions": {
     "startLearning": "Start learning",

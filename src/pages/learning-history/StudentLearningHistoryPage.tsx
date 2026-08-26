@@ -1,52 +1,59 @@
+import { RecommendedPracticeCard } from '@/components/dashboard/RecommendedPracticeCard'
+import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
+import { useRecommendationsQuery, useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { ChildLearningHistoryList } from '@/components/parent/ChildLearningHistoryList'
 import { SectionHeader } from '@/components/common/SectionHeader'
-import { useStudentClassroomHome } from '@/features/live-classroom/hooks/useStudentClassroomHome'
 import { useQuestionBankOverviewQuery } from '@/hooks/questionBank/useQuestionBankOverviewQuery'
 import { useStudentLearningHistoryQuery } from '@/hooks/student/useStudentLearningHistoryQuery'
 import { getQuestionBankSetPath } from '@/lib/questionBankRoutes'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankSet } from '@/types/questionBank'
 import type { LearningHistoryItem } from '@/types/student'
 
-export function StudentLearningHistoryPage() {
+export function ProgressTab() {
+  const weakTopicsQuery = useWeakTopicsQuery()
+  const recommendationsQuery = useRecommendationsQuery()
   const historyQuery = useStudentLearningHistoryQuery()
-  const classroomQuery = useStudentClassroomHome()
   const questionBankOverviewQuery = useQuestionBankOverviewQuery()
   const items = [
     ...(historyQuery.data?.items ?? []),
-    ...getClassroomHistoryItems(classroomQuery.data?.recentSessions ?? []),
     ...getQuestionBankHistoryItems(questionBankOverviewQuery.data?.recentPractice ?? []),
   ].sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime())
   const groupedItems = groupLearningHistoryItems(items)
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
+        {/* What to work on next, before the record of what was already done. */}
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+          <RecommendedPracticeCard
+            recommendations={recommendationsQuery.recommendations}
+            isLoading={recommendationsQuery.isLoading}
+            isError={recommendationsQuery.isError}
+          />
+          <WeakTopicsCard
+            topics={weakTopicsQuery.topics}
+            isLoading={weakTopicsQuery.isLoading}
+            isError={weakTopicsQuery.isError}
+          />
+        </div>
         <div>
           <h1 className="text-2xl font-semibold">Learning History</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Review the learning summaries saved for your account.
           </p>
         </div>
-        {(historyQuery.isLoading || classroomQuery.isLoading || questionBankOverviewQuery.isLoading) && (
+        {(historyQuery.isLoading || questionBankOverviewQuery.isLoading) && (
           <p className="text-sm text-muted-foreground">Loading history...</p>
         )}
-        {(historyQuery.isError || classroomQuery.isError || questionBankOverviewQuery.isError) && (
+        {(historyQuery.isError || questionBankOverviewQuery.isError) && (
           <p className="text-sm text-destructive">Failed to load history.</p>
         )}
-        {historyQuery.data && classroomQuery.data && questionBankOverviewQuery.data && (
+        {historyQuery.data && questionBankOverviewQuery.data && (
           <div className="space-y-7">
             <LearningHistorySection
               title="Question history"
               description="Questions, explanations, and Learning Assistant support records."
               emptyMessage="No question history is available yet."
               items={groupedItems.questions}
-            />
-            <LearningHistorySection
-              title="Online classroom history"
-              description="Completed live classroom sessions and their summaries."
-              emptyMessage="No completed classroom sessions are available yet."
-              items={groupedItems.classrooms}
             />
             <LearningHistorySection
               title="Practice history"
@@ -56,8 +63,7 @@ export function StudentLearningHistoryPage() {
             />
           </div>
         )}
-      </div>
-    </DashboardLayout>
+    </div>
   )
 }
 
@@ -80,19 +86,6 @@ function LearningHistorySection({
   )
 }
 
-function getClassroomHistoryItems(
-  sessions: NonNullable<ReturnType<typeof useStudentClassroomHome>['data']>['recentSessions'],
-): LearningHistoryItem[] {
-  return sessions.map((session) => ({
-    id: `classroom-history-${session.id}`,
-    subject: session.topicLabel ?? session.subjectLabel,
-    title: session.title,
-    summary: session.notes?.summary ?? session.context?.summary ?? 'Completed an Online Classroom session.',
-    createdAt: session.endedAt ?? session.scheduledEndAt ?? session.scheduledStartAt ?? new Date().toISOString(),
-    href: `/classroom/sessions/${session.id}/summary`,
-    sourceLabel: 'Online Classroom',
-  }))
-}
 
 function getQuestionBankHistoryItems(sets: QuestionBankSet[]): LearningHistoryItem[] {
   return sets.map((set) => ({

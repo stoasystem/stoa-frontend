@@ -10,9 +10,8 @@ import type { UploadAttachment } from '@/features/uploads/types/uploads'
 import { useCurriculumCatalogQuery } from '@/hooks/practice/useCurriculumCatalogQuery'
 import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgressQuery'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
 
-export function PracticeOverviewPage() {
+export function PracticePathTab() {
   const navigate = useNavigate()
   const overviewQuery = usePracticeOverviewQuery()
   const curriculumQuery = useCurriculumCatalogQuery()
@@ -32,7 +31,7 @@ export function PracticeOverviewPage() {
   }
 
   return (
-    <DashboardLayout>
+    <>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
           eyebrow="Practice Path"
@@ -58,6 +57,7 @@ export function PracticeOverviewPage() {
         {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
         {overviewQuery.data && <PracticeOverview overview={overviewQuery.data} />}
       </PageContainer>
-    </DashboardLayout>
+    </>
   )
 }
+

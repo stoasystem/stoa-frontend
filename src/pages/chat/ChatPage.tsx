@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Video } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { TodayStrip } from '@/components/chat/TodayStrip'
 import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { ChatMessageList } from '@/components/chat/ChatMessageList'
@@ -406,7 +407,8 @@ export function ChatPage() {
           onCreateConversation={handleStartNewConversation}
         />
         {!activeConversationId && (
-          <div className="flex flex-1 items-center justify-center px-4">
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+            <TodayStrip />
             {newConversationForm}
           </div>
         )}

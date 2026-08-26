@@ -46,8 +46,10 @@
       "learningHistory": "Historique",
       "questionBank": "Biblio",
       "practice": "Exercices",
-      "dashboard": "Accueil"
-    }
+      "dashboard": "Accueil",
+      "learn": "Apprendre"
+    },
+    "learn": "Apprendre"
   },
   "actions": {
     "startLearning": "Commencer à apprendre",

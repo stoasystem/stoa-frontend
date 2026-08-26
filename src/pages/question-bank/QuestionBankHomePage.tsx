@@ -18,9 +18,8 @@ import {
   getQuestionBankSetPath,
   getQuestionBankTopicPath,
 } from '@/lib/questionBankRoutes'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
 
-export function QuestionBankHomePage() {
+export function LibraryTab() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [uploadOpen, setUploadOpen] = useState(false)
@@ -49,7 +48,7 @@ export function QuestionBankHomePage() {
   }
 
   return (
-    <DashboardLayout>
+    <>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
           eyebrow="Practice Library"
@@ -202,7 +201,7 @@ export function QuestionBankHomePage() {
           </div>
         </section>
       </PageContainer>
-    </DashboardLayout>
+    </>
   )
 }
 
@@ -223,3 +222,4 @@ function ResultLink({ to, title, detail }: { to: string; title: string; detail: 
     </Link>
   )
 }
+

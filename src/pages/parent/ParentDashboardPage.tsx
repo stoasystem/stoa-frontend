@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ChildCard } from '@/components/parent/ChildCard'
-import { ParentClassroomVisibilityCard } from '@/features/live-classroom/components/ParentClassroomVisibilityCard'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
@@ -29,7 +28,6 @@ export function ParentDashboardPage() {
         </div>
         <ParentAccountOperationsSummaryCard />
         <ParentSubscriptionOperationsCard />
-        <ParentClassroomVisibilityCard />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-destructive">{t('loadChildrenFailed')}</p>}
         {childrenQuery.data && children.length === 0 && (

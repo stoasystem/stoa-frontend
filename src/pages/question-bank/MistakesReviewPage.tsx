@@ -8,10 +8,9 @@ import { QuestionBankFilters } from '@/components/question-bank/QuestionBankFilt
 import { Button } from '@/components/ui/button'
 import { useQuestionBankMistakesQuery } from '@/hooks/questionBank/useQuestionBankMistakesQuery'
 import { getQuestionBankSetPath, getQuestionBankSessionPath } from '@/lib/questionBankRoutes'
-import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankFilters as QuestionBankFiltersValue } from '@/types/questionBank'
 
-export function QuestionBankMistakesReviewPage() {
+export function MistakesTab() {
   const [filters, setFilters] = useState<QuestionBankFiltersValue>({
     subjectId: 'all',
     topicId: 'all',
@@ -22,7 +21,7 @@ export function QuestionBankMistakesReviewPage() {
   const firstSetId = mistakes[0]?.setId ?? 'linear-equations-basics'
 
   return (
-    <DashboardLayout>
+    <>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
           eyebrow="Practice Library"
@@ -83,7 +82,7 @@ export function QuestionBankMistakesReviewPage() {
           </div>
         </section>
       </PageContainer>
-    </DashboardLayout>
+    </>
   )
 }
 
@@ -95,3 +94,4 @@ function Metric({ label, value }: { label: string; value: string }) {
     </div>
   )
 }
+

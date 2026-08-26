@@ -61,6 +61,7 @@ const navLabelKeys: Record<string, string> = {
   'Help Requests': 'navigation.helpRequests',
   'Learning Activity': 'navigation.learningActivity',
   'Learning History': 'navigation.learningHistory',
+  Learn: 'navigation.learn',
   Library: 'navigation.questionBank',
   Overview: 'navigation.overview',
   'Online Classroom': 'navigation.onlineClassroom',

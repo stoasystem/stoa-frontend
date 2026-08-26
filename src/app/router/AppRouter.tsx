@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { AuthBootstrap } from "@/app/router/AuthBootstrap";
@@ -6,7 +6,6 @@ import { DemoSurfaceRoute } from "@/app/router/DemoSurfaceRoute";
 import { ProtectedRoute } from "@/app/router/ProtectedRoute";
 import { RoleRoute } from "@/app/router/RoleRoute";
 import { ChatSkeleton } from "@/components/chat/ChatSkeleton";
-import { DashboardSkeleton } from "@/components/dashboard/DashboardSkeleton";
 
 const AdminAccountOperationsPage = lazy(() =>
   import("@/pages/admin/AdminAccountOperationsPage").then((m) => ({
@@ -146,11 +145,6 @@ const TeacherSupportPage = lazy(() =>
     default: m.TeacherSupportPage,
   })),
 );
-const StudentLearningHistoryPage = lazy(() =>
-  import("@/pages/learning-history/StudentLearningHistoryPage").then((m) => ({
-    default: m.StudentLearningHistoryPage,
-  })),
-);
 const LearningAutomationConsolePage = lazy(() =>
   import("@/pages/learning/LearningAutomationConsolePage").then((m) => ({
     default: m.LearningAutomationConsolePage,
@@ -230,16 +224,6 @@ const PricingPage = lazy(() =>
 const QaPage = lazy(() =>
   import("@/pages/qa/QaPage").then((m) => ({ default: m.QaPage })),
 );
-const QuestionBankHomePage = lazy(() =>
-  import("@/pages/question-bank/QuestionBankHomePage").then((m) => ({
-    default: m.QuestionBankHomePage,
-  })),
-);
-const QuestionBankMistakesReviewPage = lazy(() =>
-  import("@/pages/question-bank/MistakesReviewPage").then((m) => ({
-    default: m.QuestionBankMistakesReviewPage,
-  })),
-);
 const QuestionSessionPage = lazy(() =>
   import("@/pages/question-bank/QuestionSessionPage").then((m) => ({
     default: m.QuestionSessionPage,
@@ -278,16 +262,6 @@ const LessonPage = lazy(() =>
 const LessonResultPage = lazy(() =>
   import("@/pages/practice/LessonResultPage").then((m) => ({
     default: m.LessonResultPage,
-  })),
-);
-const MistakesReviewPage = lazy(() =>
-  import("@/pages/practice/MistakesReviewPage").then((m) => ({
-    default: m.MistakesReviewPage,
-  })),
-);
-const PracticeOverviewPage = lazy(() =>
-  import("@/pages/practice/PracticeOverviewPage").then((m) => ({
-    default: m.PracticeOverviewPage,
   })),
 );
 const SubjectPathPage = lazy(() =>
@@ -351,13 +325,11 @@ const TutorProfilePage = lazy(() =>
 
 // Heavy pages are code-split so the initial bundle stays small.
 // Each has a matching skeleton fallback so users see a layout instantly.
+const LearnPage = lazy(() =>
+  import("@/pages/learn/LearnPage").then((m) => ({ default: m.LearnPage })),
+);
 const ChatPage = lazy(() =>
   import("@/pages/chat/ChatPage").then((m) => ({ default: m.ChatPage })),
-);
-const StudentDashboardPage = lazy(() =>
-  import("@/pages/dashboard/StudentDashboardPage").then((m) => ({
-    default: m.StudentDashboardPage,
-  })),
 );
 
 export function AppRouter() {
@@ -407,14 +379,9 @@ export function AppRouter() {
               element={<VirtualCheckoutPage />}
             />
             <Route element={<RoleRoute allowedRoles={["student"]} />}>
-              <Route
-                path="/dashboard"
-                element={
-                  <Suspense fallback={<DashboardSkeleton />}>
-                    <StudentDashboardPage />
-                  </Suspense>
-                }
-              />
+              {/* The day now starts in the conversation, with the streak and
+                  the unfinished lesson carried into it. */}
+              <Route path="/dashboard" element={<Navigate replace to="/chat" />} />
               <Route
                 path="/chat"
                 element={
@@ -440,16 +407,26 @@ export function AppRouter() {
                 path="/classroom/sessions/:sessionId/summary"
                 element={<ClassroomSummaryPage />}
               />
-              <Route path="/practice" element={<PracticeOverviewPage />} />
+              {/* One place to practise. The old entries still resolve so
+                  links and bookmarks keep working. */}
+              <Route path="/learn" element={<LearnPage />} />
+              <Route path="/learn/:tab" element={<LearnPage />} />
+              <Route
+                path="/practice"
+                element={<Navigate replace to="/learn/path" />}
+              />
               <Route path="/assignments" element={<StudentAssignmentsPage />} />
               <Route
                 path="/practice/mistakes"
-                element={<MistakesReviewPage />}
+                element={<Navigate replace to="/learn/mistakes" />}
               />
-              <Route path="/question-bank" element={<QuestionBankHomePage />} />
+              <Route
+                path="/question-bank"
+                element={<Navigate replace to="/learn" />}
+              />
               <Route
                 path="/question-bank/mistakes"
-                element={<QuestionBankMistakesReviewPage />}
+                element={<Navigate replace to="/learn/mistakes" />}
               />
               <Route
                 path="/question-bank/saved"
@@ -502,8 +479,8 @@ export function AppRouter() {
               <Route path="/profile" element={<StudentProfilePage />} />
               <Route
                 path="/learning-history"
-                element={<StudentLearningHistoryPage />}
-              />
+                element={<Navigate replace to="/learn/progress" />}
+                />
             </Route>
             <Route element={<RoleRoute allowedRoles={["parent"]} />}>
               <Route path="/parent" element={<ParentDashboardPage />} />
