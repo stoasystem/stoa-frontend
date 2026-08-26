@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
+  getGenerationProgress,
   streamConversationMessage,
   type StreamMessagePayload,
 } from '@/services/chat/chatStreamApi'
@@ -176,6 +177,24 @@ export function useStreamingChat(conversationId: string | null) {
       })
       trackEvent('chat_response_started', { conversationId })
 
+      // The request that generates the answer holds its connection until the
+      // answer is whole, so the steps are read back on a second connection.
+      const progressTimer = window.setInterval(() => {
+        void getGenerationProgress(conversationId, controller.signal)
+          .then((steps) => {
+            if (steps.length === 0) return
+            setLocalMessages((messages) =>
+              messages.map((message) =>
+                message.id === (activeAssistantMessageIdRef.current ?? assistantMessageId) &&
+                message.status === 'streaming'
+                  ? { ...message, content: steps.join('\n\n') }
+                  : message,
+              ),
+            )
+          })
+          .catch(() => undefined)
+      }, 1000)
+
       try {
         await streamConversationMessage({
           conversationId,
@@ -194,12 +213,14 @@ export function useStreamingChat(conversationId: string | null) {
           },
         })
 
+        window.clearInterval(progressTimer)
         await invalidateConversation()
         trackEvent('chat_response_completed', { conversationId })
         if (!localStorage.getItem('stoa_access_token')?.startsWith('demo:')) {
           setLocalMessages([])
         }
       } catch (error) {
+        window.clearInterval(progressTimer)
         if (controller.signal.aborted && stoppedByUserRef.current) {
           setLocalMessages((messages) =>
             messages.map((message) =>

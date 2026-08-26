@@ -1,3 +1,4 @@
+import { httpClient } from '@/services/api/httpClient'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import type { ChatStreamEvent } from '@/types/chat'
 
@@ -115,4 +116,13 @@ function parseStreamEvent(raw: string): ChatStreamEvent | null {
     type,
     ...data,
   } as ChatStreamEvent
+}
+
+/** Read the steps of an answer still being written. */
+export async function getGenerationProgress(conversationId: string, signal?: AbortSignal) {
+  const response = await httpClient.get<{ conversationId: string; steps: string[] }>(
+    `/conversations/${conversationId}/generation`,
+    { signal },
+  )
+  return response.data.steps
 }
