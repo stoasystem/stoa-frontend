@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { PageSkeleton } from "@/components/common/PageSkeleton";
 import { AuthBootstrap } from "@/app/router/AuthBootstrap";
+import { RoleSwitcher } from "@/components/dev/RoleSwitcher";
 import { DemoSurfaceRoute } from "@/app/router/DemoSurfaceRoute";
 import { ProtectedRoute } from "@/app/router/ProtectedRoute";
 import { RoleRoute } from "@/app/router/RoleRoute";
@@ -290,6 +291,7 @@ export function AppRouter() {
   return (
     <BrowserRouter>
       <AuthBootstrap />
+      <RoleSwitcher />
       {/* Every page is loaded on demand, so one boundary covers them all.
           The two routes with their own skeleton keep it. */}
       <Suspense fallback={<PageSkeleton rows={4} />}>

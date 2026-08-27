@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { pinTabToSession, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
 export type CurrentUser = User
@@ -40,8 +41,12 @@ function normalizeCurrentUser(user: CurrentUser): CurrentUser {
   return { ...user, role: normalizeUserRole(user.role) }
 }
 
-const getStoredToken = () =>
-  typeof window === 'undefined' ? null : localStorage.getItem(TOKEN_KEY)
+// A tab that has picked a role holds its own token, so several roles can be
+// open at once. Everyone else reads the shared one and behaves as before.
+const getStoredToken = () => {
+  if (typeof window === 'undefined') return null
+  return tabToken() ?? localStorage.getItem(TOKEN_KEY)
+}
 
 type AuthState = {
   user: CurrentUser | null
@@ -61,13 +66,20 @@ export const useAuthStore = create<AuthState>((set) => {
     accessToken: storedToken,
     isAuthenticated: Boolean(storedToken),
     setAuth: (user, accessToken) => {
-      localStorage.setItem(TOKEN_KEY, accessToken)
+      if (tabToken()) {
+        pinTabToSession(accessToken)
+      } else {
+        localStorage.setItem(TOKEN_KEY, accessToken)
+      }
       set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('stoa_tab_access_token')
+      }
       localStorage.removeItem(TOKEN_KEY)
       set({ user: null, accessToken: null, isAuthenticated: false })
     },
