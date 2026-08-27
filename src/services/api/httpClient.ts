@@ -1,3 +1,4 @@
+import { tabToken } from '@/lib/devSessions'
 import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
@@ -55,7 +56,9 @@ function isPublicAuthPath(url?: string, method?: string) {
 }
 
 httpClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY)
+  // A tab holding its own role must send that role's token, not the one
+  // the rest of the browser shares.
+  const token = tabToken() ?? localStorage.getItem(TOKEN_KEY)
 
   if (isPublicAuthPath(config.url, config.method)) {
     delete config.headers.Authorization

@@ -125,3 +125,47 @@ describe('switching between the test roles', () => {
     expect(isTestAccount(undefined)).toBe(false)
   })
 })
+
+describe('a tab holding its own role', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+  })
+
+  it('sends its own token, not the one the browser shares', async () => {
+    // Without this the tab asks the server who it is using the previous
+    // role's token, and the answer puts it straight back.
+    localStorage.setItem('stoa_access_token', 'the-shared-one')
+    pinTabToSession('this-tab-only')
+
+    const { httpClient } = await import('@/services/api/httpClient')
+    const handlers = (httpClient.interceptors.request as never as {
+      handlers: { fulfilled: (config: unknown) => { headers: Record<string, string> } }[]
+    }).handlers
+
+    const config = handlers[0].fulfilled({
+      url: '/students/me/profile',
+      method: 'get',
+      headers: {},
+    })
+
+    expect(config.headers.Authorization).toBe('Bearer this-tab-only')
+  })
+
+  it('sends the shared token when the tab has picked nothing', async () => {
+    localStorage.setItem('stoa_access_token', 'the-shared-one')
+
+    const { httpClient } = await import('@/services/api/httpClient')
+    const handlers = (httpClient.interceptors.request as never as {
+      handlers: { fulfilled: (config: unknown) => { headers: Record<string, string> } }[]
+    }).handlers
+
+    const config = handlers[0].fulfilled({
+      url: '/students/me/profile',
+      method: 'get',
+      headers: {},
+    })
+
+    expect(config.headers.Authorization).toBe('Bearer the-shared-one')
+  })
+})
