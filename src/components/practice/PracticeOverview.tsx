@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -18,13 +19,14 @@ export function PracticeOverview({
 }: {
   overview: PracticeOverviewData
 }) {
+  const { t } = useTranslation('practice')
   return (
     <div className="space-y-8">
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-4">
           <SectionHeader
             title="Choose a subject"
-            description="Start by choosing the school subject you want to practise today."
+            description={t('path.chooseSubject')}
           />
           <div className="grid gap-4 md:grid-cols-2">
             {overview.subjects.map((subject) => (
@@ -42,7 +44,7 @@ export function PracticeOverview({
         <aside className="space-y-4">
           <SectionHeader
             title="Today"
-            description="Keep the practice rhythm visible before choosing a path."
+            description={t('path.rhythm')}
           />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
             {overview.dailyGoal && <DailyGoalCard {...overview.dailyGoal} />}

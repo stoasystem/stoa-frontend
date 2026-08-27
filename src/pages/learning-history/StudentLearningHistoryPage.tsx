@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { RecommendedPracticeCard } from '@/components/dashboard/RecommendedPracticeCard'
 import { WeakTopicsCard } from '@/components/dashboard/WeakTopicsCard'
 import { useRecommendationsQuery, useWeakTopicsQuery } from '@/hooks/learning/useWeakTopicsQuery'
@@ -10,6 +11,7 @@ import type { QuestionBankSet } from '@/types/questionBank'
 import type { LearningHistoryItem } from '@/types/student'
 
 export function ProgressTab() {
+  const { t } = useTranslation('practice')
   const weakTopicsQuery = useWeakTopicsQuery()
   const recommendationsQuery = useRecommendationsQuery()
   const historyQuery = useStudentLearningHistoryQuery()
@@ -36,29 +38,29 @@ export function ProgressTab() {
           />
         </div>
         <div>
-          <h1 className="text-2xl font-semibold">Learning History</h1>
+          <h1 className="text-2xl font-semibold">{t('progress.historyTitle')}</h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Review the learning summaries saved for your account.
+            {t('progress.historyBody')}
           </p>
         </div>
         {(historyQuery.isLoading || questionBankOverviewQuery.isLoading) && (
-          <p className="text-sm text-muted-foreground">Loading history...</p>
+          <p className="text-sm text-muted-foreground">{t('progress.loadingHistory')}</p>
         )}
         {(historyQuery.isError || questionBankOverviewQuery.isError) && (
-          <p className="text-sm text-destructive">Failed to load history.</p>
+          <p className="text-sm text-destructive">{t('progress.historyFailed')}</p>
         )}
         {historyQuery.data && questionBankOverviewQuery.data && (
           <div className="space-y-7">
             <LearningHistorySection
-              title="Question history"
-              description="Questions, explanations, and Learning Assistant support records."
-              emptyMessage="No question history is available yet."
+              title={t('progress.questionHistory')}
+              description={t('progress.questionHistoryBody')}
+              emptyMessage={t('progress.questionHistoryEmpty')}
               items={groupedItems.questions}
             />
             <LearningHistorySection
-              title="Practice history"
-              description="Practice Path and Practice Library learning records."
-              emptyMessage="No practice history is available yet."
+              title={t('progress.practiceHistory')}
+              description={t('progress.practiceHistoryBody')}
+              emptyMessage={t('progress.practiceHistoryEmpty')}
               items={groupedItems.practice}
             />
           </div>

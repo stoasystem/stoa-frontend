@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { RecentQuestion } from '@/types/dashboard'
@@ -16,11 +17,12 @@ function formatQuestionDate(value: string) {
 }
 
 export function RecentQuestionsCard({ questions }: { questions: RecentQuestion[] }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
         <CardTitle className="text-base">Recent Questions</CardTitle>
-        <CardDescription>Questions and explanations from the latest study sessions.</CardDescription>
+        <CardDescription>{t('progress.recentQuestions')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {questions.map((question) => (

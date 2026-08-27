@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Gauge, HelpCircle } from 'lucide-react'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
@@ -19,6 +20,7 @@ export function LearningProfileSignals({
   isLoading,
   isError,
 }: LearningProfileSignalsProps) {
+  const { t: tPractice } = useTranslation('practice')
   const activity = profile?.subjectActivity ?? []
   const weakTopics = profile?.weakTopics ?? []
 
@@ -51,7 +53,7 @@ export function LearningProfileSignals({
                         </p>
                       </div>
                       <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
-                        {subject.rolloutState === 'active' ? 'Active' : 'Foundation'}
+                        {subject.rolloutState === 'active' ? tPractice('progress.subjectActive') : tPractice('progress.subjectFoundation')}
                       </Badge>
                     </div>
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { HelpCircle, Play, RotateCcw } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -12,14 +13,15 @@ import { getQuestionBankMistakesPath, getQuestionBankSessionPath } from '@/lib/q
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function QuestionSetOverviewPage() {
+  const { t } = useTranslation('practice')
   const { setId } = useParams()
   const navigate = useNavigate()
   const setQuery = useQuestionBankSetQuery(setId)
   const createSessionMutation = useCreateQuestionBankSessionMutation()
 
-  if (setQuery.isLoading) return <LoadingState message="Loading practice set..." />
+  if (setQuery.isLoading) return <LoadingState message={t('library.loadingSet')} />
   if (setQuery.isError || !setQuery.data) {
-    return <ErrorState title="Practice set unavailable" message="We could not load this practice set." />
+    return <ErrorState title={t('library.setUnavailable')} message={t('library.setFailed')} />
   }
 
   const { set } = setQuery.data

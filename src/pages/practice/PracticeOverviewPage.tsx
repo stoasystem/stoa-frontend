@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { PracticeOverview } from '@/components/practice/PracticeOverview'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -12,6 +13,7 @@ import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgre
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 
 export function PracticePathTab() {
+  const { t } = useTranslation('practice')
   const navigate = useNavigate()
   const overviewQuery = usePracticeOverviewQuery()
   const curriculumQuery = useCurriculumCatalogQuery()
@@ -36,11 +38,11 @@ export function PracticePathTab() {
         <PageHeader
           eyebrow="Practice Path"
           title="Guided practice"
-          description="Short challenges for school topics, with hints and a place to ask when a step is unclear."
+          description={t('path.subtitle')}
         />
         <InlineUploadPanel
           context="practice_path"
-          title="Bring your own schoolwork"
+          title={t('path.bringWork')}
           description="Upload a question from school and ask the Learning Assistant for step-by-step guidance."
           sourceOptions={{ sourcePage: '/practice' }}
           compact

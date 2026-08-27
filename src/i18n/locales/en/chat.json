@@ -50,5 +50,6 @@
     "pending": "Waiting for a tutor",
     "in_progress": "Tutor is reviewing",
     "resolved": "Tutor support completed"
-  }
+  },
+  "subjectForQuestion": "Subject for this question"
 }

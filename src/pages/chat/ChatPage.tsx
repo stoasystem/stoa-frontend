@@ -46,6 +46,7 @@ type TeacherSupportStage =
   | 'video_completed'
 
 export function ChatPage() {
+  const { t: tPractice } = useTranslation('practice')
   const { t } = useTranslation('chat')
   const location = useLocation()
   const navigate = useNavigate()
@@ -335,7 +336,7 @@ export function ChatPage() {
           }}
         >
           <div className="space-y-2">
-            <p className="text-sm font-medium">Subject for this question</p>
+            <p className="text-sm font-medium">{t('subjectForQuestion')}</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {learningSubjectOptions.map((subject) => {
                 const selected = subject.id === selectedSubjectId
@@ -353,7 +354,7 @@ export function ChatPage() {
                   >
                     <span className="font-medium">{subject.label}</span>
                     <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
-                      {subject.rolloutState === 'active' ? 'Active' : 'Foundation'}
+                      {subject.rolloutState === 'active' ? tPractice('progress.subjectActive') : tPractice('progress.subjectFoundation')}
                     </Badge>
                   </button>
                 )

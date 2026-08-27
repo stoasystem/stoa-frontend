@@ -15,7 +15,8 @@
     "test:watch": "vitest --config vitest.config.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "check:api-contract": "node ./scripts/check-api-contract.mjs"
+    "check:api-contract": "node ./scripts/check-api-contract.mjs",
+    "check:untranslated": "node ./scripts/check-untranslated.mjs"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

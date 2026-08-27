@@ -72,5 +72,61 @@
     "continueLesson": "Continue {{title}}",
     "reviewCount_one": "Review {{count}} question",
     "reviewCount_other": "Review {{count}} questions"
+  },
+  "progress": {
+    "recommendedToday": "Recommended for Today",
+    "recommendedBody": "Practice picked from the topics you have been asking about most.",
+    "startPractice": "Start practice",
+    "weakTopics": "Weak Topics",
+    "weakTopicsBody": "Topics that need attention in the next study cycle.",
+    "historyTitle": "Learning History",
+    "historyBody": "Review the learning summaries saved for your account.",
+    "questionHistory": "Question history",
+    "questionHistoryBody": "Questions, explanations, and Learning Assistant support records.",
+    "questionHistoryEmpty": "No question history is available yet.",
+    "practiceHistory": "Practice history",
+    "practiceHistoryBody": "Practice Path and Practice Library learning records.",
+    "practiceHistoryEmpty": "No practice history is available yet.",
+    "loadingHistory": "Loading history...",
+    "historyFailed": "Failed to load history.",
+    "subjectActive": "Active",
+    "subjectFoundation": "Foundation",
+    "recentQuestions": "Questions and explanations from the latest study sessions.",
+    "recommendationsUnavailable": "Recommendations are unavailable right now.",
+    "planLimits": "Your plan limits will appear here.",
+    "weakTopicsFailed": "Could not load weak topics. Check back later."
+  },
+  "library": {
+    "subtitle": "Choose exercises by subject, topic, and difficulty.",
+    "searchHint": "Search by topic, skill, or question type, then narrow your practice.",
+    "loadingQuestions": "Loading practice questions...",
+    "loadingSet": "Loading practice set...",
+    "setUnavailable": "Practice set unavailable",
+    "noFinishedSet": "No finished set to show",
+    "resultHint": "This page summarises a set right after you finish it.",
+    "savedHint": "Keep useful open-practice sets close for quick review.",
+    "loadingSets": "Loading practice sets...",
+    "subjectFailed": "We could not load this subject",
+    "topicFailed": "We could not load this topic",
+    "subjectSubtitle": "Exercises by topic and level. Choose a focused set or browse the topics.",
+    "nextSets": "Good next sets for this subject.",
+    "setFailed": "We could not load this practice set.",
+    "returnHint": "Please return to the Practice Library and try again."
+  },
+  "path": {
+    "subtitle": "Short challenges for school topics, with hints and a place to ask when a step is unclear.",
+    "bringWork": "Bring your own schoolwork",
+    "roadmapHint": "Recent mistakes and follow-up practice for this learning path.",
+    "chooseSubject": "Start by choosing the school subject you want to practise today.",
+    "rhythm": "Keep the practice rhythm visible before choosing a path.",
+    "reviewSession": "Review the session",
+    "writeAnswer": "Write your answer"
+  },
+  "profile": {
+    "editableFields": "These fields can be edited by the student or family when school context changes.",
+    "subjectSignals": "Subject signals from real questions and practice. Foundation subjects show early profile evidence.",
+    "guardianRequired": "Required for minor students and family progress visibility.",
+    "subscriptionCover": "The subscription this student account is covered by.",
+    "trialEnds": "Free trial ends"
   }
 }

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { CreditCard, ShieldCheck } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
@@ -9,6 +10,7 @@ function formatLimit(value: number | null | undefined) {
 }
 
 export function StudentPlanAccessSection() {
+  const { t } = useTranslation('practice')
   // A student's plan comes from a parent's billing, which only a parent may
   // read. This asks the student's own entitlement instead.
   const entitlementQuery = useStudentEntitlementQuery()
@@ -40,7 +42,7 @@ export function StudentPlanAccessSection() {
               )}
             </>
           ) : (
-            <p>Your plan limits will appear here.</p>
+            <p>{t('progress.planLimits')}</p>
           )}
         </CardContent>
       </Card>

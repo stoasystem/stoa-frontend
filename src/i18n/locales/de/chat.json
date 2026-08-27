@@ -50,5 +50,6 @@
     "pending": "Wartet auf Lehrperson",
     "in_progress": "Lehrperson prüft",
     "resolved": "Unterstützung abgeschlossen"
-  }
+  },
+  "subjectForQuestion": "Fach für diese Frage"
 }

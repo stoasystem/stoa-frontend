@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { AlertCircle, ArrowRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
@@ -46,6 +47,7 @@ export function RecommendedPracticeCard({
   isLoading,
   isError,
 }: RecommendedPracticeCardProps) {
+  const { t } = useTranslation('practice')
   if (isLoading) return <RecommendedPracticeSkeleton />
 
   return (
@@ -53,17 +55,17 @@ export function RecommendedPracticeCard({
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Sparkles className="h-4 w-4 text-[hsl(var(--stoa-brand-burgundy))]" />
-          Recommended for Today
+          {t('progress.recommendedToday')}
         </CardTitle>
         <CardDescription>
-          Practice picked from the topics you have been asking about most.
+          {t('progress.recommendedBody')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {isError && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>Recommendations are unavailable right now.</span>
+            <span>{t('progress.recommendationsUnavailable')}</span>
           </div>
         )}
 
@@ -94,7 +96,7 @@ export function RecommendedPracticeCard({
 
             <Button asChild size="sm" variant="outline" className="mt-3">
               <Link to={`/question-bank/${rec.subject}/${rec.topicId}`}>
-                Start practice
+                {t('progress.startPractice')}
                 <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
               </Link>
             </Button>

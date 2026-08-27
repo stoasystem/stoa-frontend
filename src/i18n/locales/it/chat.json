@@ -50,5 +50,6 @@
     "pending": "In attesa di un insegnante",
     "in_progress": "L’insegnante sta esaminando",
     "resolved": "Supporto insegnante completato"
-  }
+  },
+  "subjectForQuestion": "Materia di questa domanda"
 }

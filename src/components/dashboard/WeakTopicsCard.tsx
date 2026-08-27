@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/common/Skeleton'
@@ -42,19 +43,20 @@ interface WeakTopicsCardProps {
 }
 
 export function WeakTopicsCard({ topics, isLoading, isError }: WeakTopicsCardProps) {
+  const { t } = useTranslation('practice')
   if (isLoading) return <WeakTopicsCardSkeleton />
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Weak Topics</CardTitle>
-        <CardDescription>Topics that need attention in the next study cycle.</CardDescription>
+        <CardTitle className="text-base">{t('progress.weakTopics')}</CardTitle>
+        <CardDescription>{t('progress.weakTopicsBody')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {isError && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>Could not load weak topics. Check back later.</span>
+            <span>{t('progress.weakTopicsFailed')}</span>
           </div>
         )}
         {!isError && topics.length === 0 && (

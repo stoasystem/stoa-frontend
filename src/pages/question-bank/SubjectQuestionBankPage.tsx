@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -13,12 +14,13 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankFilters as QuestionBankFiltersValue } from '@/types/questionBank'
 
 export function SubjectQuestionBankPage() {
+  const { t } = useTranslation('practice')
   const { subjectId } = useParams()
   const subjectQuery = useQuestionBankSubjectQuery(subjectId)
   const [filters, setFilters] = useState<QuestionBankFiltersValue>({ level: 'all', difficulty: 'all' })
 
-  if (subjectQuery.isLoading) return <LoadingState message="Loading practice sets..." />
-  if (subjectQuery.isError || !subjectQuery.data) return <ErrorState title="We could not load this subject" message="Please return to the Practice Library and try again." />
+  if (subjectQuery.isLoading) return <LoadingState message={t('library.loadingSets')} />
+  if (subjectQuery.isError || !subjectQuery.data) return <ErrorState title={t('library.subjectFailed')} message={t('library.returnHint')} />
 
   const { subject, topics, recommendedSets, progress } = subjectQuery.data
   const filteredTopics = topics.filter((topic) => !filters.level || filters.level === 'all' || topic.levelTags.includes(filters.level))
@@ -29,7 +31,7 @@ export function SubjectQuestionBankPage() {
         <PageHeader
           eyebrow="Practice Library"
           title={subject.title}
-          description="Exercises by topic and level. Choose a focused set or browse the topic library."
+          description={t('library.subjectSubtitle')}
         />
         <section className="grid gap-3 sm:grid-cols-3">
           <Metric label="Sets completed" value={`${progress.completedSets}`} />
@@ -46,7 +48,7 @@ export function SubjectQuestionBankPage() {
           </div>
         </section>
         <section className="space-y-4">
-          <SectionHeader title="Recommended sets" description="Good next sets for this subject." />
+          <SectionHeader title="Recommended sets" description={t('library.nextSets')} />
           <div className="grid gap-4 lg:grid-cols-2">
             {recommendedSets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />

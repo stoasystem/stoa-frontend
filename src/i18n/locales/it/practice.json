@@ -72,5 +72,61 @@
     "continueLesson": "Continua {{title}}",
     "reviewCount_one": "Rivedi {{count}} domanda",
     "reviewCount_other": "Rivedi {{count}} domande"
+  },
+  "progress": {
+    "recommendedToday": "Consigliato per oggi",
+    "recommendedBody": "Esercizi scelti tra gli argomenti su cui fai più domande.",
+    "startPractice": "Inizia l’esercizio",
+    "weakTopics": "Argomenti deboli",
+    "weakTopicsBody": "Argomenti da rivedere nella prossima sessione di studio.",
+    "historyTitle": "Cronologia di apprendimento",
+    "historyBody": "I riepiloghi di apprendimento salvati per il tuo account.",
+    "questionHistory": "Domande",
+    "questionHistoryBody": "Domande, spiegazioni e supporto dell’assistente di apprendimento.",
+    "questionHistoryEmpty": "Nessuna cronologia delle domande al momento.",
+    "practiceHistory": "Esercizi",
+    "practiceHistoryBody": "Registrazioni dal percorso guidato e dalla biblioteca di esercizi.",
+    "practiceHistoryEmpty": "Nessuna cronologia degli esercizi al momento.",
+    "loadingHistory": "Caricamento della cronologia …",
+    "historyFailed": "Non è stato possibile caricare la cronologia.",
+    "subjectActive": "Attivo",
+    "subjectFoundation": "Base",
+    "recentQuestions": "Domande e spiegazioni dalle ultime sessioni.",
+    "recommendationsUnavailable": "I consigli non sono disponibili al momento.",
+    "planLimits": "I limiti del tuo piano appariranno qui.",
+    "weakTopicsFailed": "Non è stato possibile caricare gli argomenti deboli. Riprova più tardi."
+  },
+  "library": {
+    "subtitle": "Scegli gli esercizi per materia, argomento e difficoltà.",
+    "searchHint": "Cerca per argomento, abilità o tipo di domanda, poi restringi la pratica.",
+    "loadingQuestions": "Caricamento delle domande …",
+    "loadingSet": "Caricamento della serie …",
+    "setUnavailable": "Serie non disponibile",
+    "noFinishedSet": "Nessuna serie completata da mostrare",
+    "resultHint": "Questa pagina riassume una serie subito dopo averla completata.",
+    "savedHint": "Tieni a portata le serie utili per un ripasso veloce.",
+    "loadingSets": "Caricamento delle serie …",
+    "subjectFailed": "Non è stato possibile caricare questa materia",
+    "topicFailed": "Non è stato possibile caricare questo argomento",
+    "subjectSubtitle": "Esercizi per argomento e livello. Scegli una serie mirata o sfoglia gli argomenti.",
+    "nextSets": "Prossime serie consigliate per questa materia.",
+    "setFailed": "Non è stato possibile caricare questa serie.",
+    "returnHint": "Torna alla biblioteca di esercizi e riprova."
+  },
+  "path": {
+    "subtitle": "Brevi esercizi sugli argomenti scolastici, con suggerimenti e un posto dove chiedere aiuto.",
+    "bringWork": "Porta i tuoi compiti",
+    "roadmapHint": "Errori recenti ed esercizi di ripasso per questo percorso.",
+    "chooseSubject": "Inizia scegliendo la materia che vuoi esercitare oggi.",
+    "rhythm": "Tieni d’occhio il ritmo prima di scegliere un percorso.",
+    "reviewSession": "Rivedi la sessione",
+    "writeAnswer": "Scrivi la tua risposta"
+  },
+  "profile": {
+    "editableFields": "Questi campi possono essere modificati dallo studente o dalla famiglia se cambia il contesto scolastico.",
+    "subjectSignals": "Segnali per materia da domande ed esercizi reali. Le materie di base mostrano i primi indizi.",
+    "guardianRequired": "Necessario per studenti minorenni e per la visibilità familiare dei progressi.",
+    "subscriptionCover": "L’abbonamento che copre questo account studente.",
+    "trialEnds": "La prova gratuita termina"
   }
 }

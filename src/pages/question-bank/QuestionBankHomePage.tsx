@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Camera, Flame, Search } from 'lucide-react'
@@ -20,6 +21,7 @@ import {
 } from '@/lib/questionBankRoutes'
 
 export function LibraryTab() {
+  const { t } = useTranslation('practice')
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [uploadOpen, setUploadOpen] = useState(false)
@@ -53,7 +55,7 @@ export function LibraryTab() {
         <PageHeader
           eyebrow="Practice Library"
           title="Practice Library"
-          description="Choose exercises by subject, topic, and difficulty."
+          description={t('library.subtitle')}
         />
 
         {overview && (
@@ -132,7 +134,7 @@ export function LibraryTab() {
         />
 
         <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-card)]">
-          <SectionHeader title="Find Exercises" description="Search by topic, skill, or question type, then narrow your practice." />
+          <SectionHeader title="Find Exercises" description={t('library.searchHint')} />
           <label htmlFor="question-bank-search" className="sr-only">Search questions, topics, or skills</label>
           <div className="mt-3 flex items-center gap-2 rounded-lg border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />

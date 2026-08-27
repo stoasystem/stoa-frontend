@@ -72,5 +72,61 @@
     "continueLesson": "{{title}} fortsetzen",
     "reviewCount_one": "{{count}} Frage wiederholen",
     "reviewCount_other": "{{count}} Fragen wiederholen"
+  },
+  "progress": {
+    "recommendedToday": "Heute empfohlen",
+    "recommendedBody": "Übungen aus den Themen, nach denen du am häufigsten gefragt hast.",
+    "startPractice": "Übung starten",
+    "weakTopics": "Schwache Themen",
+    "weakTopicsBody": "Themen, die im nächsten Lernabschnitt Aufmerksamkeit brauchen.",
+    "historyTitle": "Lernverlauf",
+    "historyBody": "Die für dein Konto gespeicherten Lernzusammenfassungen.",
+    "questionHistory": "Fragen",
+    "questionHistoryBody": "Fragen, Erklärungen und Unterstützung durch den Lernassistenten.",
+    "questionHistoryEmpty": "Noch kein Fragenverlauf vorhanden.",
+    "practiceHistory": "Übungen",
+    "practiceHistoryBody": "Aufzeichnungen aus Lernpfad und Übungsbibliothek.",
+    "practiceHistoryEmpty": "Noch kein Übungsverlauf vorhanden.",
+    "loadingHistory": "Verlauf wird geladen …",
+    "historyFailed": "Der Verlauf konnte nicht geladen werden.",
+    "subjectActive": "Aktiv",
+    "subjectFoundation": "Grundlage",
+    "recentQuestions": "Fragen und Erklärungen aus den letzten Lernsitzungen.",
+    "recommendationsUnavailable": "Empfehlungen sind gerade nicht verfügbar.",
+    "planLimits": "Die Grenzen deines Tarifs erscheinen hier.",
+    "weakTopicsFailed": "Schwache Themen konnten nicht geladen werden. Bitte später erneut versuchen."
+  },
+  "library": {
+    "subtitle": "Wähle Übungen nach Fach, Thema und Schwierigkeit.",
+    "searchHint": "Suche nach Thema, Fähigkeit oder Aufgabentyp und grenze deine Übung ein.",
+    "loadingQuestions": "Übungsfragen werden geladen …",
+    "loadingSet": "Übungsset wird geladen …",
+    "setUnavailable": "Übungsset nicht verfügbar",
+    "noFinishedSet": "Kein abgeschlossenes Set vorhanden",
+    "resultHint": "Diese Seite fasst ein Set direkt nach dem Abschluss zusammen.",
+    "savedHint": "Nützliche Übungssets für die schnelle Wiederholung griffbereit halten.",
+    "loadingSets": "Übungssets werden geladen …",
+    "subjectFailed": "Dieses Fach konnte nicht geladen werden",
+    "topicFailed": "Dieses Thema konnte nicht geladen werden",
+    "subjectSubtitle": "Übungen nach Thema und Niveau. Wähle ein gezieltes Set oder sieh dir die Themen an.",
+    "nextSets": "Passende nächste Sets für dieses Fach.",
+    "setFailed": "Dieses Übungsset konnte nicht geladen werden.",
+    "returnHint": "Bitte zurück zur Übungsbibliothek gehen und es erneut versuchen."
+  },
+  "path": {
+    "subtitle": "Kurze Aufgaben zu Schulthemen, mit Hinweisen und einer Stelle zum Nachfragen, wenn ein Schritt unklar ist.",
+    "bringWork": "Eigene Schulaufgaben mitbringen",
+    "roadmapHint": "Letzte Fehler und Anschlussübungen zu diesem Lernpfad.",
+    "chooseSubject": "Wähle zuerst das Schulfach, das du heute üben möchtest.",
+    "rhythm": "Den Übungsrhythmus im Blick behalten, bevor du einen Pfad wählst.",
+    "reviewSession": "Sitzung ansehen",
+    "writeAnswer": "Antwort eingeben"
+  },
+  "profile": {
+    "editableFields": "Diese Angaben können von Schüler:in oder Familie geändert werden, wenn sich der Schulkontext ändert.",
+    "subjectSignals": "Fachsignale aus echten Fragen und Übungen. Grundlagenfächer zeigen frühe Hinweise im Profil.",
+    "guardianRequired": "Erforderlich für minderjährige Schüler:innen und die Einsicht der Familie in den Fortschritt.",
+    "subscriptionCover": "Das Abonnement, das dieses Schülerkonto abdeckt.",
+    "trialEnds": "Testphase endet"
   }
 }

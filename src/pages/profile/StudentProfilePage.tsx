@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { toast } from 'sonner'
@@ -50,6 +51,7 @@ type ProfileBillingSnapshot = {
 }
 
 export function StudentProfilePage() {
+  const { t } = useTranslation('practice')
   const profileQuery = useStudentProfileQuery()
   const entitlementQuery = useStudentEntitlementQuery()
   const learningProfileQuery = useStudentLearningProfileQuery(profileQuery.data?.userId)
@@ -123,7 +125,7 @@ export function StudentProfilePage() {
             <section className="space-y-4">
               <SectionHeader
                 title="Learning context"
-                description="These fields can be edited by the student or family when school context changes."
+                description={t('profile.editableFields')}
               />
               <form
                 className="rounded-lg border border-border/70 bg-card/95 p-5 shadow-[var(--platform-shadow-card)]"
@@ -187,7 +189,7 @@ export function StudentProfilePage() {
             </section>
             <LearningProfileSignals
               title="Learning expansion"
-              description="Subject signals from real questions and practice. Foundation subjects show early profile evidence."
+              description={t('profile.subjectSignals')}
               profile={learningProfileQuery.data}
               isLoading={learningProfileQuery.isLoading}
               isError={learningProfileQuery.isError}
@@ -254,11 +256,12 @@ function AccountStatusCard({
 }
 
 function GuardianCard({ profile }: { profile: StudentProfile }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
         <CardTitle className="text-base">Parent or guardian</CardTitle>
-        <CardDescription>Required for minor students and family progress visibility.</CardDescription>
+        <CardDescription>{t('profile.guardianRequired')}</CardDescription>
       </CardHeader>
       <CardContent>
         {profile.guardianStatus === 'linked' ? (
@@ -274,18 +277,19 @@ function GuardianCard({ profile }: { profile: StudentProfile }) {
 }
 
 function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
         <CardTitle className="text-base">Plan</CardTitle>
-        <CardDescription>The subscription this student account is covered by.</CardDescription>
+        <CardDescription>{t('profile.subscriptionCover')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {billing ? (
           <>
             <ProfileDetail icon={CreditCard} label="Plan" value={billing.planName} />
             <ProfileDetail icon={ShieldCheck} label="Status" value={billing.statusLabel} />
-            <ProfileDetail icon={CalendarDays} label="Free trial ends" value={formatDate(billing.nextBillingDate)} />
+            <ProfileDetail icon={CalendarDays} label={t('profile.trialEnds')} value={formatDate(billing.nextBillingDate)} />
           </>
         ) : (
           <p className="text-sm text-muted-foreground">No subscription is attached to this account.</p>

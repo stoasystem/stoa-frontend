@@ -96,7 +96,7 @@ export function TopicRoadmapPage() {
             <section className="space-y-4">
               <SectionHeader
                 title="Review work"
-                description="Recent mistakes and follow-up practice for this learning path."
+                description={t('path.roadmapHint')}
               />
               {overview.recentMistakes.slice(0, 2).map((mistake) => (
                 <MistakeReviewCard key={mistake.id} mistake={mistake} />

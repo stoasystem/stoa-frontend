@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { SectionHeader } from '@/components/common/SectionHeader'
@@ -6,6 +7,7 @@ import { useQuestionBankSavedSetsQuery } from '@/hooks/questionBank/useQuestionB
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function SavedQuestionSetsPage() {
+  const { t } = useTranslation('practice')
   const savedQuery = useQuestionBankSavedSetsQuery()
   const sets = savedQuery.data ?? []
 
@@ -15,7 +17,7 @@ export function SavedQuestionSetsPage() {
         <PageHeader
           eyebrow="Practice Library"
           title="Saved Practice Sets"
-          description="Keep useful open-practice sets close for quick review."
+          description={t('library.savedHint')}
         />
         <section className="space-y-4">
           <SectionHeader title="Saved sets" description={`${sets.length} set${sets.length === 1 ? '' : 's'} saved for later practice.`} />

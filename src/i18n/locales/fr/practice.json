@@ -72,5 +72,61 @@
     "continueLesson": "Continuer {{title}}",
     "reviewCount_one": "Revoir {{count}} question",
     "reviewCount_other": "Revoir {{count}} questions"
+  },
+  "progress": {
+    "recommendedToday": "Recommandé aujourd’hui",
+    "recommendedBody": "Des exercices choisis parmi les sujets sur lesquels tu poses le plus de questions.",
+    "startPractice": "Commencer l’exercice",
+    "weakTopics": "Points faibles",
+    "weakTopicsBody": "Les sujets à travailler lors de la prochaine session.",
+    "historyTitle": "Historique d’apprentissage",
+    "historyBody": "Les résumés d’apprentissage enregistrés pour ton compte.",
+    "questionHistory": "Questions",
+    "questionHistoryBody": "Questions, explications et aide de l’assistant d’apprentissage.",
+    "questionHistoryEmpty": "Aucun historique de questions pour le moment.",
+    "practiceHistory": "Exercices",
+    "practiceHistoryBody": "Enregistrements du parcours guidé et de la bibliothèque d’exercices.",
+    "practiceHistoryEmpty": "Aucun historique d’exercices pour le moment.",
+    "loadingHistory": "Chargement de l’historique …",
+    "historyFailed": "L’historique n’a pas pu être chargé.",
+    "subjectActive": "Actif",
+    "subjectFoundation": "Base",
+    "recentQuestions": "Questions et explications des dernières sessions.",
+    "recommendationsUnavailable": "Les recommandations ne sont pas disponibles pour le moment.",
+    "planLimits": "Les limites de ton offre apparaîtront ici.",
+    "weakTopicsFailed": "Impossible de charger les points faibles. Réessaie plus tard."
+  },
+  "library": {
+    "subtitle": "Choisis des exercices par matière, sujet et difficulté.",
+    "searchHint": "Cherche par sujet, compétence ou type de question, puis affine ta pratique.",
+    "loadingQuestions": "Chargement des questions …",
+    "loadingSet": "Chargement de la série …",
+    "setUnavailable": "Série indisponible",
+    "noFinishedSet": "Aucune série terminée à afficher",
+    "resultHint": "Cette page résume une série juste après l’avoir terminée.",
+    "savedHint": "Garde les séries utiles à portée pour une révision rapide.",
+    "loadingSets": "Chargement des séries …",
+    "subjectFailed": "Cette matière n’a pas pu être chargée",
+    "topicFailed": "Ce sujet n’a pas pu être chargé",
+    "subjectSubtitle": "Exercices par sujet et niveau. Choisis une série ciblée ou parcours les sujets.",
+    "nextSets": "Séries à faire ensuite dans cette matière.",
+    "setFailed": "Cette série n’a pas pu être chargée.",
+    "returnHint": "Retourne à la bibliothèque d’exercices et réessaie."
+  },
+  "path": {
+    "subtitle": "De courts exercices sur les sujets scolaires, avec des indices et un endroit où demander de l’aide.",
+    "bringWork": "Apporte tes propres devoirs",
+    "roadmapHint": "Erreurs récentes et exercices de suivi pour ce parcours.",
+    "chooseSubject": "Commence par choisir la matière que tu veux travailler aujourd’hui.",
+    "rhythm": "Garde ton rythme visible avant de choisir un parcours.",
+    "reviewSession": "Revoir la session",
+    "writeAnswer": "Écris ta réponse"
+  },
+  "profile": {
+    "editableFields": "Ces champs peuvent être modifiés par l’élève ou la famille si le contexte scolaire change.",
+    "subjectSignals": "Signaux par matière issus des questions et exercices réels. Les matières de base montrent les premiers indices.",
+    "guardianRequired": "Requis pour les élèves mineurs et le suivi familial.",
+    "subscriptionCover": "L’abonnement qui couvre ce compte élève.",
+    "trialEnds": "Fin de l’essai gratuit"
   }
 }

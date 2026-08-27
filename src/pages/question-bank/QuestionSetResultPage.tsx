@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { ArrowRight, RotateCcw } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -9,6 +10,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankResult } from '@/types/questionBank'
 
 export function QuestionSetResultPage() {
+  const { t } = useTranslation('practice')
   const { sessionId } = useParams()
   const location = useLocation()
   // A finished set is not stored anywhere, so the tally arrives from the
@@ -21,8 +23,8 @@ export function QuestionSetResultPage() {
         <PageContainer className="space-y-6 p-0">
           <PageHeader
             eyebrow="Practice Complete"
-            title="No finished set to show"
-            description="This page summarises a set right after you finish it."
+            title={t('library.noFinishedSet')}
+            description={t('library.resultHint')}
           />
           <Button asChild>
             <Link to="/question-bank">Back to Practice Library</Link>

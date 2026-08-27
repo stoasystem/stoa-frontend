@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Check, Flag } from 'lucide-react'
@@ -19,6 +20,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankChatLocationState, QuestionBankFeedback, QuestionBankResult } from '@/types/questionBank'
 
 export function QuestionSessionPage() {
+  const { t } = useTranslation('practice')
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const sessionQuery = useQuestionBankSessionQuery(sessionId)
@@ -34,7 +36,7 @@ export function QuestionSessionPage() {
   const answeredCount = useMemo(() => Object.keys(feedbackByQuestion).length, [feedbackByQuestion])
   const finishSetMutation = useCompleteQuestionBankSetMutation()
 
-  if (sessionQuery.isLoading) return <LoadingState message="Loading practice questions..." />
+  if (sessionQuery.isLoading) return <LoadingState message={t('library.loadingQuestions')} />
   if (sessionQuery.isError || !setData || !question) return <ErrorState title="We could not load this practice set" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
 
   const loadedSet = setData

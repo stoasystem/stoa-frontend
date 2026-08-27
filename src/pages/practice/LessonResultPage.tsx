@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useMemo } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { LessonResultSummary } from '@/components/practice/LessonResultSummary'
@@ -9,6 +10,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { PracticeLessonResult } from '@/types/practice'
 
 export function LessonResultPage() {
+  const { t } = useTranslation('practice')
   const location = useLocation()
   const result = useMemo(() => {
     const state = location.state as { result?: PracticeLessonResult } | null
@@ -20,7 +22,7 @@ export function LessonResultPage() {
       <PageContainer className="space-y-8 p-0">
         <PageHeader
           eyebrow="Lesson complete"
-          title="Review the session"
+          title={t('path.reviewSession')}
           description="A concise summary of the practice session and the steps worth reviewing."
         />
         {result === null ? (

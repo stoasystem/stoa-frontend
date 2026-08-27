@@ -50,5 +50,6 @@
     "pending": "En attente d’un enseignant",
     "in_progress": "L’enseignant examine",
     "resolved": "Aide enseignante terminée"
-  }
+  },
+  "subjectForQuestion": "Matière de cette question"
 }

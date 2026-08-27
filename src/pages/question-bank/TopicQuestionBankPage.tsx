@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -14,6 +15,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { QuestionBankFilters as QuestionBankFiltersValue } from '@/types/questionBank'
 
 export function TopicQuestionBankPage() {
+  const { t } = useTranslation('practice')
   const { subjectId, topicId } = useParams()
   const [filters, setFilters] = useState<QuestionBankFiltersValue>({
     difficulty: 'all',
@@ -22,8 +24,8 @@ export function TopicQuestionBankPage() {
   })
   const topicQuery = useQuestionBankTopicQuery(subjectId, topicId, filters)
 
-  if (topicQuery.isLoading) return <LoadingState message="Loading practice sets..." />
-  if (topicQuery.isError || !topicQuery.data) return <ErrorState title="We could not load this topic" message="Please return to the Practice Library and try again." />
+  if (topicQuery.isLoading) return <LoadingState message={t('library.loadingSets')} />
+  if (topicQuery.isError || !topicQuery.data) return <ErrorState title={t('library.topicFailed')} message={t('library.returnHint')} />
 
   const { subject, topic, sets, weakAreas, progress } = topicQuery.data
 
