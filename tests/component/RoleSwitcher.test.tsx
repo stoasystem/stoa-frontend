@@ -106,6 +106,17 @@ describe('switching between the test roles', () => {
     expect(useAuthStore.getState().accessToken).toBe('the-shared-one')
   })
 
+  it('sends each role to its own home rather than through the root', async () => {
+    // Going through the root reloads before the role is known, which lands on
+    // the forbidden page.
+    const { getDefaultRouteForRole } = await import('@/lib/authRoutes')
+
+    expect(getDefaultRouteForRole('parent')).toBe('/parent')
+    expect(getDefaultRouteForRole('teacher')).toBe('/tutor')
+    expect(getDefaultRouteForRole('admin')).toBe('/admin')
+    expect(getDefaultRouteForRole('student')).toBe('/chat')
+  })
+
   it('recognises which addresses are test accounts', () => {
     expect(isTestAccount('admin@test.stoaedu.ch')).toBe(true)
     expect(isTestAccount('AGENT@TEST.STOAEDU.CH')).toBe(true)

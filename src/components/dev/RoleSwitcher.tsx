@@ -23,6 +23,7 @@ import {
   rememberSession,
   type DevSession,
 } from '@/lib/devSessions'
+import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { useAuthStore } from '@/store/authStore'
 
 export function RoleSwitcher() {
@@ -50,7 +51,9 @@ export function RoleSwitcher() {
     )
     // The previous role's answers are not this role's answers.
     void queryClient.clear()
-    window.location.assign('/')
+    // Straight to where this role belongs. Going through the root reloads
+    // before the role is known and lands on the forbidden page.
+    window.location.assign(getDefaultRouteForRole(session.role as never))
   }
 
   async function addRole(event: React.FormEvent) {
