@@ -38,5 +38,39 @@
     "learningChatHint": "Fai una domanda quando un passaggio della lezione non è chiaro."
   },
   "teacherHelpAssigned": "{{teacher}} sta guardando la tua domanda.",
-  "teacherHelpQueued": "La tua domanda è in attesa del prossimo insegnante disponibile."
+  "teacherHelpQueued": "La tua domanda è in attesa del prossimo insegnante disponibile.",
+  "review": {
+    "tabs": {
+      "exercises": "Esercizi",
+      "path": "Percorso guidato",
+      "mistakes": "Ripasso",
+      "progress": "Progressi"
+    },
+    "eyebrow": "Ripasso",
+    "title": "Le domande che tornano",
+    "description": "Le domande tornano poco prima di essere dimenticate. Una risposta giusta le allontana, una sbagliata le riporta indietro.",
+    "dueNow": "Da rivedere",
+    "tracked": "Monitorate",
+    "nextOne": "Prossima",
+    "today": "Oggi",
+    "tomorrow": "Domani",
+    "inDays": "Tra {{count}} giorni",
+    "none": "—",
+    "loading": "Cerco le domande da rivedere …",
+    "loadFailed": "Non è stato possibile caricare il tuo ripasso.",
+    "emptyTitle": "Per ora non c’è nulla da rivedere",
+    "emptyBody": "Le domande a cui rispondi tornano quando è il momento. Fai una lezione e appariranno qui.",
+    "due_one": "{{count}} domanda da rivedere",
+    "due_other": "{{count}} domande da rivedere",
+    "missed_one": "sbagliata una volta",
+    "missed_other": "sbagliata {{count}} volte",
+    "checking": "Verifica in corso …",
+    "answerFailed": "Non è stato possibile registrare la risposta. Riprova.",
+    "comesBackLater": "Questa tornerà più avanti, più in là dell’ultima volta.",
+    "streak_one": "{{count}} giorno di fila",
+    "streak_other": "{{count}} giorni di fila",
+    "continueLesson": "Continua {{title}}",
+    "reviewCount_one": "Rivedi {{count}} domanda",
+    "reviewCount_other": "Rivedi {{count}} domande"
+  }
 }

@@ -38,5 +38,39 @@
     "learningChatHint": "Ask a question when a lesson step is unclear."
   },
   "teacherHelpAssigned": "{{teacher}} is looking at your question.",
-  "teacherHelpQueued": "Your question is queued for the next available teacher."
+  "teacherHelpQueued": "Your question is queued for the next available teacher.",
+  "review": {
+    "tabs": {
+      "exercises": "Exercises",
+      "path": "Guided path",
+      "mistakes": "Mistakes",
+      "progress": "Progress"
+    },
+    "eyebrow": "Review",
+    "title": "Questions coming back",
+    "description": "Questions return just before they would be forgotten. Getting one right sends it further away; missing it brings it back.",
+    "dueNow": "Due now",
+    "tracked": "Being tracked",
+    "nextOne": "Next one",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "inDays": "In {{count}} days",
+    "none": "—",
+    "loading": "Looking for what is due...",
+    "loadFailed": "Your review list could not be loaded.",
+    "emptyTitle": "Nothing to review right now",
+    "emptyBody": "Questions you answer come back when they are due. Practise a lesson and they will show up here.",
+    "due_one": "{{count}} question is due",
+    "due_other": "{{count}} questions are due",
+    "missed_one": "missed once",
+    "missed_other": "missed {{count}} times",
+    "checking": "Checking...",
+    "answerFailed": "That answer could not be recorded. Try again.",
+    "comesBackLater": "This one will come back later, further out than last time.",
+    "streak_one": "{{count}} day streak",
+    "streak_other": "{{count}} day streak",
+    "continueLesson": "Continue {{title}}",
+    "reviewCount_one": "Review {{count}} question",
+    "reviewCount_other": "Review {{count}} questions"
+  }
 }

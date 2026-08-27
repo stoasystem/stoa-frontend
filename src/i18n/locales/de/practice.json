@@ -38,5 +38,39 @@
     "learningChatHint": "Stelle eine Frage, wenn ein Schritt in der Lektion unklar ist."
   },
   "teacherHelpAssigned": "{{teacher}} sieht sich deine Aufgabe an.",
-  "teacherHelpQueued": "Deine Frage wartet auf die nächste verfügbare Lehrperson."
+  "teacherHelpQueued": "Deine Frage wartet auf die nächste verfügbare Lehrperson.",
+  "review": {
+    "tabs": {
+      "exercises": "Übungen",
+      "path": "Lernpfad",
+      "mistakes": "Wiederholen",
+      "progress": "Fortschritt"
+    },
+    "eyebrow": "Wiederholung",
+    "title": "Fragen, die zurückkommen",
+    "description": "Fragen kehren zurück, kurz bevor sie vergessen würden. Eine richtige Antwort schiebt sie weiter hinaus, eine falsche holt sie zurück.",
+    "dueNow": "Jetzt fällig",
+    "tracked": "Geplant",
+    "nextOne": "Nächste",
+    "today": "Heute",
+    "tomorrow": "Morgen",
+    "inDays": "In {{count}} Tagen",
+    "none": "—",
+    "loading": "Fällige Fragen werden gesucht …",
+    "loadFailed": "Deine Wiederholungen konnten nicht geladen werden.",
+    "emptyTitle": "Im Moment gibt es nichts zu wiederholen",
+    "emptyBody": "Beantwortete Fragen kommen zurück, wenn sie fällig sind. Übe eine Lektion, dann erscheinen sie hier.",
+    "due_one": "{{count}} Frage ist fällig",
+    "due_other": "{{count}} Fragen sind fällig",
+    "missed_one": "einmal falsch",
+    "missed_other": "{{count}}-mal falsch",
+    "checking": "Wird geprüft …",
+    "answerFailed": "Die Antwort konnte nicht gespeichert werden. Bitte noch einmal versuchen.",
+    "comesBackLater": "Diese Frage kommt später wieder – später als beim letzten Mal.",
+    "streak_one": "{{count}} Tag in Folge",
+    "streak_other": "{{count}} Tage in Folge",
+    "continueLesson": "{{title}} fortsetzen",
+    "reviewCount_one": "{{count}} Frage wiederholen",
+    "reviewCount_other": "{{count}} Fragen wiederholen"
+  }
 }

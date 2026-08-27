@@ -7,6 +7,7 @@
  */
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import { Check, RotateCcw, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,22 +18,23 @@ import { useDueReviewQuery } from '@/hooks/practice/useReviewQueries'
 import type { PracticeAnswerResult, ReviewCard } from '@/types/practice'
 
 export function ReviewSession() {
+  const { t } = useTranslation('practice')
   const dueQuery = useDueReviewQuery()
   const cards = dueQuery.data?.items ?? []
 
   if (dueQuery.isLoading) {
-    return <p className="text-sm text-muted-foreground">Looking for what is due...</p>
+    return <p className="text-sm text-muted-foreground">{t('review.loading')}</p>
   }
 
   if (dueQuery.isError) {
-    return <p className="text-sm text-destructive">Your review list could not be loaded.</p>
+    return <p className="text-sm text-destructive">{t('review.loadFailed')}</p>
   }
 
   if (cards.length === 0) {
     return (
       <EmptyState
-        title="Nothing to review right now"
-        description="Questions you answer come back when they are due. Practise a lesson and they will show up here."
+        title={t('review.emptyTitle')}
+        description={t('review.emptyBody')}
       />
     )
   }
@@ -40,7 +42,7 @@ export function ReviewSession() {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        {cards.length === 1 ? '1 question is due' : `${cards.length} questions are due`}
+        {t('review.due', { count: cards.length })}
       </p>
       {cards.map((card) => (
         <ReviewQuestion key={card.challengeId} card={card} />
@@ -50,6 +52,7 @@ export function ReviewSession() {
 }
 
 function ReviewQuestion({ card }: { card: ReviewCard }) {
+  const { t } = useTranslation('practice')
   const queryClient = useQueryClient()
   const [selected, setSelected] = useState<string | null>(null)
   const [result, setResult] = useState<PracticeAnswerResult | null>(null)
@@ -72,7 +75,7 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
           <p className="text-base font-medium leading-6 text-foreground">{card.prompt}</p>
           {card.lapses > 0 ? (
             <span className="whitespace-nowrap rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
-              missed {card.lapses === 1 ? 'once' : `${card.lapses} times`}
+              {t('review.missed', { count: card.lapses })}
             </span>
           ) : null}
         </div>
@@ -106,12 +109,12 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
             disabled={!selected || answer.isPending}
             onClick={() => selected && answer.mutate(selected)}
           >
-            {answer.isPending ? 'Checking...' : 'Check answer'}
+            {answer.isPending ? t('review.checking') : t('checkAnswer')}
           </Button>
         )}
 
         {answer.isError ? (
-          <p className="text-sm text-destructive">That answer could not be recorded. Try again.</p>
+          <p className="text-sm text-destructive">{t('review.answerFailed')}</p>
         ) : null}
       </CardContent>
     </Card>
@@ -125,6 +128,8 @@ function ReviewFeedback({
   result: PracticeAnswerResult
   onAgain: () => void
 }) {
+  const { t } = useTranslation('practice')
+
   return (
     <div className="space-y-3 rounded-md border border-border/70 bg-muted/40 p-3">
       <p className="flex items-center gap-2 text-sm font-semibold">
@@ -142,12 +147,12 @@ function ReviewFeedback({
       ) : null}
       {result.correct ? (
         <p className="text-xs text-muted-foreground">
-          This one will come back later, further out than last time.
+          {t('review.comesBackLater')}
         </p>
       ) : (
         <Button type="button" variant="outline" size="sm" onClick={onAgain}>
           <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
-          Try it again
+          {t('tryAgain')}
         </Button>
       )}
     </div>

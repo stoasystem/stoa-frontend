@@ -6,6 +6,7 @@
  * revisiting beside them.
  */
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { PracticePathTab } from '@/pages/practice/PracticeOverviewPage'
@@ -21,6 +22,7 @@ function isLearnTab(value: string | undefined): value is LearnTab {
 }
 
 export function LearnPage() {
+  const { t } = useTranslation('practice')
   const { tab } = useParams()
   const navigate = useNavigate()
   const active: LearnTab = isLearnTab(tab) ? tab : 'library'
@@ -33,10 +35,10 @@ export function LearnPage() {
         className="space-y-6"
       >
         <TabsList className="grid h-auto w-full grid-cols-4 sm:w-auto">
-          <TabsTrigger value="library">Exercises</TabsTrigger>
-          <TabsTrigger value="path">Guided path</TabsTrigger>
-          <TabsTrigger value="mistakes">Mistakes</TabsTrigger>
-          <TabsTrigger value="progress">Progress</TabsTrigger>
+          <TabsTrigger value="library">{t('review.tabs.exercises')}</TabsTrigger>
+          <TabsTrigger value="path">{t('review.tabs.path')}</TabsTrigger>
+          <TabsTrigger value="mistakes">{t('review.tabs.mistakes')}</TabsTrigger>
+          <TabsTrigger value="progress">{t('review.tabs.progress')}</TabsTrigger>
         </TabsList>
         <TabsContent value="library" className="mt-0">
           <LibraryTab />

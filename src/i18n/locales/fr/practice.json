@@ -38,5 +38,39 @@
     "learningChatHint": "Pose une question lorsqu’une étape de la leçon n’est pas claire."
   },
   "teacherHelpAssigned": "{{teacher}} examine ta question.",
-  "teacherHelpQueued": "Ta question attend le prochain enseignant disponible."
+  "teacherHelpQueued": "Ta question attend le prochain enseignant disponible.",
+  "review": {
+    "tabs": {
+      "exercises": "Exercices",
+      "path": "Parcours guidé",
+      "mistakes": "Révisions",
+      "progress": "Progrès"
+    },
+    "eyebrow": "Révision",
+    "title": "Les questions qui reviennent",
+    "description": "Les questions reviennent juste avant d’être oubliées. Une bonne réponse les éloigne, une erreur les ramène.",
+    "dueNow": "À revoir",
+    "tracked": "Suivies",
+    "nextOne": "Prochaine",
+    "today": "Aujourd’hui",
+    "tomorrow": "Demain",
+    "inDays": "Dans {{count}} jours",
+    "none": "—",
+    "loading": "Recherche des questions à revoir …",
+    "loadFailed": "Tes révisions n’ont pas pu être chargées.",
+    "emptyTitle": "Rien à revoir pour le moment",
+    "emptyBody": "Les questions auxquelles tu réponds reviennent quand c’est le moment. Fais une leçon et elles apparaîtront ici.",
+    "due_one": "{{count}} question à revoir",
+    "due_other": "{{count}} questions à revoir",
+    "missed_one": "ratée une fois",
+    "missed_other": "ratée {{count}} fois",
+    "checking": "Vérification …",
+    "answerFailed": "Cette réponse n’a pas pu être enregistrée. Réessaie.",
+    "comesBackLater": "Celle-ci reviendra plus tard, plus loin que la dernière fois.",
+    "streak_one": "{{count}} jour d’affilée",
+    "streak_other": "{{count}} jours d’affilée",
+    "continueLesson": "Continuer {{title}}",
+    "reviewCount_one": "Revoir {{count}} question",
+    "reviewCount_other": "Revoir {{count}} questions"
+  }
 }

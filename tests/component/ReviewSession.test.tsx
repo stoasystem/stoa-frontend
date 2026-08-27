@@ -8,6 +8,38 @@ import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+// Translated through the real English file, so these assert what a student
+// reads rather than the key that produced it.
+vi.mock('react-i18next', async () => {
+  const practice = (await import('@/i18n/locales/en/practice.json')).default as Record<
+    string,
+    unknown
+  >
+
+  function lookup(key: string): string {
+    const value = key
+      .split('.')
+      .reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], practice)
+    return typeof value === 'string' ? value : key
+  }
+
+  return {
+    useTranslation: () => ({
+      t: (key: string, options?: Record<string, unknown>) => {
+        const count = options?.count
+        const plural =
+          typeof count === 'number' ? lookup(`${key}_${count === 1 ? 'one' : 'other'}`) : key
+        const template = typeof count === 'number' && !plural.startsWith(key) ? plural : lookup(key)
+        return Object.entries(options ?? {}).reduce(
+          (text, [name, value]) => text.split(`{{${name}}}`).join(String(value)),
+          template,
+        )
+      },
+      i18n: { language: 'en' },
+    }),
+  }
+})
+
 vi.mock('@/services/practice/practiceApi', () => ({
   getDueReview: vi.fn(),
   getReviewSummary: vi.fn(),
@@ -112,7 +144,7 @@ describe('a question that has come back', () => {
     await user.click(screen.getByRole('button', { name: 'Check answer' }))
 
     await waitFor(() => expect(screen.getByText('Leider falsch.')).toBeInTheDocument())
-    expect(screen.getByRole('button', { name: /try it again/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /try again/i })).toBeInTheDocument()
   })
 
   it('keeps the explanation back until the student has found the answer', async () => {
