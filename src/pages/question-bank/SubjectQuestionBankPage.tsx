@@ -29,18 +29,18 @@ export function SubjectQuestionBankPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Practice Library"
+          eyebrow={t('ui.practiceLibrary')}
           title={subject.title}
           description={t('library.subjectSubtitle')}
         />
         <section className="grid gap-3 sm:grid-cols-3">
-          <Metric label="Sets completed" value={`${progress.completedSets}`} />
-          <Metric label="Questions answered" value={`${progress.answeredQuestions}`} />
+          <Metric label={t('ui.setsCompleted')} value={`${progress.completedSets}`} />
+          <Metric label={t('ui.questionsAnswered')} value={`${progress.answeredQuestions}`} />
           <Metric label="Accuracy" value={`${progress.accuracy}%`} />
         </section>
         <QuestionBankFilters value={filters} onChange={setFilters} showQuestionType={false} showStatus={false} />
         <section className="space-y-4">
-          <SectionHeader title="Topics" description="Open a topic to see question sets and needs-review guidance." />
+          <SectionHeader title="Topics" description={t('ui.openTopicHint')} />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredTopics.map((topic) => (
               <TopicCard key={topic.id} topic={topic} />
@@ -48,7 +48,7 @@ export function SubjectQuestionBankPage() {
           </div>
         </section>
         <section className="space-y-4">
-          <SectionHeader title="Recommended sets" description={t('library.nextSets')} />
+          <SectionHeader title={t('ui.recommendedSets')} description={t('library.nextSets')} />
           <div className="grid gap-4 lg:grid-cols-2">
             {recommendedSets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />

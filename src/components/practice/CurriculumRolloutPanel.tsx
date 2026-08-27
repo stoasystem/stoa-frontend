@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Layers3, ListChecks, Signal } from 'lucide-react'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +26,7 @@ export function CurriculumRolloutPanel({
   contextLabel = 'Curriculum',
   weakTopicLabels = [],
 }: Props) {
+  const { t } = useTranslation('practice')
   const activeSubjects = catalog?.subjects.filter((subject) => subject.rolloutState === 'active') ?? []
   const activeLessons = catalog?.lessons.filter((lesson) => lesson.rolloutState === 'active') ?? []
   const totalExercises = activeLessons.reduce((sum, lesson) => sum + lesson.exerciseCount, 0)
@@ -58,7 +60,7 @@ export function CurriculumRolloutPanel({
               </div>
 
               <div className="grid gap-3 md:grid-cols-4">
-                <RolloutMetric icon={BookOpenCheck} label="Active subjects" value={String(activeSubjects.length)} />
+                <RolloutMetric icon={BookOpenCheck} label={t('ui.activeSubjects')} value={String(activeSubjects.length)} />
                 <RolloutMetric icon={Layers3} label="Units" value={String(catalog.units.length)} />
                 <RolloutMetric icon={ListChecks} label="Lessons" value={String(activeLessons.length)} />
                 <RolloutMetric icon={Signal} label="Exercises" value={String(totalExercises)} />

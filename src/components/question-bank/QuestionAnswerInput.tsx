@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
@@ -13,6 +14,7 @@ export function QuestionAnswerInput({
   value: string | string[]
   onChange: (value: string | string[]) => void
 }) {
+  const { t } = useTranslation('practice')
   if (question.type === 'multiple_choice') {
     const selected = typeof value === 'string' ? value : ''
     return (
@@ -64,7 +66,7 @@ export function QuestionAnswerInput({
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="question-bank-answer">Your answer</Label>
+      <Label htmlFor="question-bank-answer">{t('ui.yourAnswer')}</Label>
       <Input
         id="question-bank-answer"
         value={typeof value === 'string' ? value : value.join(' ')}

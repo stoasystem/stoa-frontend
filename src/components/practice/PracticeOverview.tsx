@@ -25,7 +25,7 @@ export function PracticeOverview({
       <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-4">
           <SectionHeader
-            title="Choose a subject"
+            title={t('ui.chooseSubject')}
             description={t('path.chooseSubject')}
           />
           <div className="grid gap-4 md:grid-cols-2">

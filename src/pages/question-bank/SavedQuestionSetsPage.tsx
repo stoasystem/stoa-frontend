@@ -15,12 +15,12 @@ export function SavedQuestionSetsPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Practice Library"
-          title="Saved Practice Sets"
+          eyebrow={t('ui.practiceLibrary')}
+          title={t('ui.savedSets')}
           description={t('library.savedHint')}
         />
         <section className="space-y-4">
-          <SectionHeader title="Saved sets" description={`${sets.length} set${sets.length === 1 ? '' : 's'} saved for later practice.`} />
+          <SectionHeader title={t('ui.savedSetsShort')} description={`${sets.length} set${sets.length === 1 ? '' : 's'} saved for later practice.`} />
           <div className="grid gap-4 lg:grid-cols-2">
             {sets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />

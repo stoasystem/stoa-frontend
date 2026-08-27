@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -59,6 +60,7 @@ export function QuestionBankFilters({
   showQuestionType?: boolean
   showStatus?: boolean
 }) {
+  const { t } = useTranslation('practice')
   const activeCount = [value.level, value.difficulty, value.questionType, value.status].filter(
     (filter) => filter && filter !== 'all',
   ).length
@@ -105,7 +107,7 @@ export function QuestionBankFilters({
         )}
         {showQuestionType && (
           <FilterGroup
-            label="Question type"
+            label={t('ui.questionType')}
             value={value.questionType ?? 'all'}
             options={typeOptions}
             onChange={(questionType) => patchFilter({ questionType })}

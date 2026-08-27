@@ -36,7 +36,7 @@ export function QuestionSetOverviewPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Practice Library"
+          eyebrow={t('ui.practiceLibrary')}
           title={set.title}
           description={set.description}
         />

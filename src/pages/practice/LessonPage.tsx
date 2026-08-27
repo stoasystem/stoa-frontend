@@ -201,7 +201,7 @@ export function LessonPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <PageHeader
             className="mb-0"
-            eyebrow="Practice lesson"
+            eyebrow={t('ui.practiceLesson')}
             title={lesson?.title ?? 'Lesson'}
             description={lesson?.topic ?? 'Complete each step, use hints when needed, and keep going.'}
           />
@@ -232,8 +232,8 @@ export function LessonPage() {
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
                   <LessonStartSignal icon={ListChecks} label="Checks" value={`${lesson.challenges.length} focused steps`} />
-                  <LessonStartSignal icon={Clock3} label="Estimated time" value={`${lesson.estimatedMinutes} min`} />
-                  <LessonStartSignal icon={MessageCircle} label="Support" value="Hint first, then chat" />
+                  <LessonStartSignal icon={Clock3} label={t('ui.estimatedTime')} value={`${lesson.estimatedMinutes} min`} />
+                  <LessonStartSignal icon={MessageCircle} label="Support" value={t('ui.hintFirst')} />
                 </div>
                 <Button onClick={() => setLessonStarted(true)} type="button">
                   {t('startLesson')}

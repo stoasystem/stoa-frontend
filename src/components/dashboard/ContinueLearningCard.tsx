@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 
 export function ContinueLearningCard() {
+  const { t } = useTranslation('practice')
   const practiceOverviewQuery = usePracticeOverviewQuery()
   const practiceOverview = practiceOverviewQuery.data
 
@@ -22,9 +24,9 @@ export function ContinueLearningCard() {
               -day study streak.
             </p>
             <div className="grid gap-2 sm:grid-cols-3">
-              <PracticeSignal label="Daily goal" value={practiceOverview.dailyGoal?.label ?? '3 short steps'} />
-              <PracticeSignal label="Study streak" value={`${practiceOverview.studyStreak ?? 0} days`} />
-              <PracticeSignal label="Recent mistakes" value={`${practiceOverview.recentMistakes?.length ?? 0} to review`} />
+              <PracticeSignal label={t('ui.dailyGoal')} value={practiceOverview.dailyGoal?.label ?? '3 short steps'} />
+              <PracticeSignal label={t('ui.studyStreak')} value={`${practiceOverview.studyStreak ?? 0} days`} />
+              <PracticeSignal label={t('ui.recentMistakes')} value={`${practiceOverview.recentMistakes?.length ?? 0} to review`} />
             </div>
           </div>
         ) : (

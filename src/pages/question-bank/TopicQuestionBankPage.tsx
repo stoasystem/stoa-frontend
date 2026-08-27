@@ -43,7 +43,7 @@ export function TopicQuestionBankPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Metric label="Completed" value={`${progress.completedSets} / ${progress.totalSets}`} />
               <Metric label="Accuracy" value={`${progress.accuracy}%`} />
-              <Metric label="Needs review" value={topic.weakArea ?? 'Keep practising'} />
+              <Metric label={t('ui.needsReview')} value={topic.weakArea ?? 'Keep practising'} />
             </div>
           </div>
           <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5">
@@ -65,7 +65,7 @@ export function TopicQuestionBankPage() {
           showStatus
         />
         <section className="space-y-4">
-          <SectionHeader title="Question sets" description={`${sets.length} set${sets.length === 1 ? '' : 's'} match the current filters.`} />
+          <SectionHeader title={t('ui.questionSets')} description={`${sets.length} set${sets.length === 1 ? '' : 's'} match the current filters.`} />
           <div className="grid gap-4 lg:grid-cols-2">
             {sets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />
@@ -73,7 +73,7 @@ export function TopicQuestionBankPage() {
           </div>
         </section>
         <section className="rounded-lg border bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-          <p className="brand-section-kicker">Needs review</p>
+          <p className="brand-section-kicker">{t('ui.needsReview')}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {weakAreas.map((area) => (
               <span key={area} className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">

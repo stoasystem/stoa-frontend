@@ -105,7 +105,7 @@ export function StudentProfilePage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          title="Student Profile"
+          title={t('profile.title')}
           description="Account, family, billing, and learning context used to keep STOA support accurate."
         />
         {profileQuery.isLoading && <PageSkeleton rows={4} />}
@@ -124,7 +124,7 @@ export function StudentProfilePage() {
 
             <section className="space-y-4">
               <SectionHeader
-                title="Learning context"
+                title={t('profile.learningContext')}
                 description={t('profile.editableFields')}
               />
               <form
@@ -138,7 +138,7 @@ export function StudentProfilePage() {
                     {errors.grade && <p className="text-xs text-destructive">{errors.grade}</p>}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="subjects">Primary subjects</Label>
+                    <Label htmlFor="subjects">{t('profile.primarySubjects')}</Label>
                     <Input
                       id="subjects"
                       value={primarySubjects}
@@ -149,7 +149,7 @@ export function StudentProfilePage() {
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="school-system">School system</Label>
+                    <Label htmlFor="school-system">{t('profile.schoolSystem')}</Label>
                     <Input
                       id="school-system"
                       value={schoolSystem}
@@ -157,7 +157,7 @@ export function StudentProfilePage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="answer-language">Learning Assistant answer language</Label>
+                    <Label htmlFor="answer-language">{t('profile.answerLanguageLong')}</Label>
                     <select
                       id="answer-language"
                       className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
@@ -188,7 +188,7 @@ export function StudentProfilePage() {
               </form>
             </section>
             <LearningProfileSignals
-              title="Learning expansion"
+              title={t('profile.learningExpansion')}
               description={t('profile.subjectSignals')}
               profile={learningProfileQuery.data}
               isLoading={learningProfileQuery.isLoading}
@@ -202,6 +202,7 @@ export function StudentProfilePage() {
 }
 
 function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--stoa-brand-burgundy-soft)_/_0.42)_100%)] shadow-[var(--platform-shadow-soft)]">
       <CardHeader>
@@ -217,10 +218,10 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         <ProfileDetail icon={Mail} label="Email" value={profile.email} />
-        <ProfileDetail icon={GraduationCap} label="Primary subjects" value={profile.primarySubjects.join(', ')} />
+        <ProfileDetail icon={GraduationCap} label={t('profile.primarySubjects')} value={profile.primarySubjects.join(', ')} />
         <ProfileDetail
           icon={Languages}
-          label="Answer language"
+          label={t('profile.answerLanguage')}
           value={formatLanguage(profile.preferredAnswerLanguage)}
         />
       </CardContent>
@@ -235,6 +236,7 @@ function AccountStatusCard({
   profile: StudentProfile
   billing?: ProfileBillingSnapshot
 }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
@@ -242,14 +244,14 @@ function AccountStatusCard({
         <CardDescription>Access, family binding, and latest profile update.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <ProfileDetail icon={UserRound} label="Student ID" value={profile.userId} />
+        <ProfileDetail icon={UserRound} label={t('profile.studentId')} value={profile.userId} />
         <ProfileDetail
           icon={UsersRound}
-          label="Parent account"
+          label={t('profile.parentAccount')}
           value={guardianStatusLabel[profile.guardianStatus]}
         />
-        <ProfileDetail icon={ShieldCheck} label="Billing status" value={billing?.statusLabel ?? 'Not set'} />
-        <ProfileDetail icon={CalendarDays} label="Last updated" value={formatDate(profile.updatedAt)} />
+        <ProfileDetail icon={ShieldCheck} label={t('profile.billingStatus')} value={billing?.statusLabel ?? 'Not set'} />
+        <ProfileDetail icon={CalendarDays} label={t('profile.lastUpdated')} value={formatDate(profile.updatedAt)} />
       </CardContent>
     </Card>
   )
@@ -260,7 +262,7 @@ function GuardianCard({ profile }: { profile: StudentProfile }) {
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Parent or guardian</CardTitle>
+        <CardTitle className="text-base">{t('profile.guardian')}</CardTitle>
         <CardDescription>{t('profile.guardianRequired')}</CardDescription>
       </CardHeader>
       <CardContent>

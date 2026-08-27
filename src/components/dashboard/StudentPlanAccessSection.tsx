@@ -26,10 +26,10 @@ export function StudentPlanAccessSection() {
           {entitlement ? (
             <>
               <Detail label="Questions" value={formatLimit(entitlement.dailyAiQuestionLimit)} />
-              <Detail label="Chat messages" value={formatLimit(entitlement.dailyChatMessageLimit)} />
+              <Detail label={t('ui.chatMessages')} value={formatLimit(entitlement.dailyChatMessageLimit)} />
               {entitlement.freeTrialActive && (
                 <Detail
-                  label="Free trial"
+                  label={t('ui.freeTrial')}
                   value={
                     entitlement.freeTrialEndsAt
                       ? `Ends ${new Intl.DateTimeFormat('en', {

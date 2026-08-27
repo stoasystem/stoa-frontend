@@ -53,8 +53,8 @@ export function LibraryTab() {
     <>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
-          eyebrow="Practice Library"
-          title="Practice Library"
+          eyebrow={t('ui.practiceLibrary')}
+          title={t('ui.practiceLibrary')}
           description={t('library.subtitle')}
         />
 
@@ -112,29 +112,29 @@ export function LibraryTab() {
                 <Camera className="h-5 w-5" aria-hidden="true" />
               </div>
               <p className="brand-section-kicker mt-4">Have your own question?</p>
-              <h2 className="mt-2 text-xl font-semibold">Upload a Question</h2>
+              <h2 className="mt-2 text-xl font-semibold">{t('ui.uploadQuestion')}</h2>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Take a photo or attach a PDF from your schoolwork. It opens a guided Learning Assistant request, not an automatic scan.
               </p>
             </div>
             <Button type="button" variant="outline" onClick={() => setUploadOpen(true)}>
               <Camera className="h-4 w-4" aria-hidden="true" />
-              Upload a Question
+              {t('ui.uploadQuestion')}
             </Button>
           </div>
         </section>
         <UploadModal
           open={uploadOpen}
           context="question_bank"
-          title="Upload a Question"
-          description="Take a photo or attach a PDF from your schoolwork. The Learning Assistant can help you understand it step by step."
+          title={t('ui.uploadQuestion')}
+          description={t('ui.uploadBody2')}
           sourceOptions={{ sourcePage: '/question-bank' }}
           onOpenChange={setUploadOpen}
           onComplete={askWithQuestionUpload}
         />
 
         <section className="rounded-lg border border-primary/15 bg-card/90 p-5 shadow-[var(--platform-shadow-card)]">
-          <SectionHeader title="Find Exercises" description={t('library.searchHint')} />
+          <SectionHeader title={t('ui.findExercises')} description={t('library.searchHint')} />
           <label htmlFor="question-bank-search" className="sr-only">Search questions, topics, or skills</label>
           <div className="mt-3 flex items-center gap-2 rounded-lg border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
@@ -142,7 +142,7 @@ export function LibraryTab() {
               id="question-bank-search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Try equation, fractions, speed, or angles"
+              placeholder={t('ui.searchPlaceholder')}
               className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
             />
           </div>
@@ -153,14 +153,14 @@ export function LibraryTab() {
 
         {hasSearch && searchQuery.data && (
           <section className="space-y-4">
-            <SectionHeader title={`Search results for "${query}"`} description="Open a topic, question set, or source set from the local library." />
+            <SectionHeader title={`Search results for "${query}"`} description={t('ui.openFromLibrary')} />
             <div className="grid gap-4 lg:grid-cols-3">
               <SearchColumn title="Topics">
                 {searchQuery.data.topics.map((topic) => (
                   <ResultLink key={topic.id} to={getQuestionBankTopicPath(topic.subjectId, topic.id)} title={topic.title} detail={topic.description} />
                 ))}
               </SearchColumn>
-              <SearchColumn title="Question sets">
+              <SearchColumn title={t('ui.questionSets')}>
                 {searchQuery.data.sets.map((set) => (
                   <ResultLink key={set.id} to={getQuestionBankSetPath(set.id)} title={set.title} detail={`${set.questionCount} questions · ${set.difficultyRange}`} />
                 ))}
@@ -195,7 +195,7 @@ export function LibraryTab() {
         </section>
 
         <section className="space-y-4">
-          <SectionHeader title="All Subjects" description="Choose a subject, then narrow by topic and level." />
+          <SectionHeader title={t('ui.allSubjects')} description={t('ui.chooseSubjectHint')} />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {overview?.subjects.map((subject) => (
               <SubjectCard key={subject.id} subject={subject} />

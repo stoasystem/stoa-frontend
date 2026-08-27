@@ -36,14 +36,14 @@ export function PracticePathTab() {
     <>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
-          eyebrow="Practice Path"
-          title="Guided practice"
+          eyebrow={t('ui.practicePath')}
+          title={t('ui.guidedPractice')}
           description={t('path.subtitle')}
         />
         <InlineUploadPanel
           context="practice_path"
           title={t('path.bringWork')}
-          description="Upload a question from school and ask the Learning Assistant for step-by-step guidance."
+          description={t('ui.uploadGuided')}
           sourceOptions={{ sourcePage: '/practice' }}
           compact
           onAskLearningAssistant={askWithPracticeUpload}

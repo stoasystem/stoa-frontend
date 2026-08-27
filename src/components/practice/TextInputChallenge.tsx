@@ -14,7 +14,7 @@ export function TextInputChallenge({
   const { t } = useTranslation('practice')
   return (
     <div className="space-y-2">
-      <Label htmlFor="practice-answer">Your answer</Label>
+      <Label htmlFor="practice-answer">{t('ui.yourAnswer')}</Label>
       <Input
         disabled={disabled}
         id="practice-answer"

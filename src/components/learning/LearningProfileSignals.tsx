@@ -64,7 +64,7 @@ export function LearningProfileSignals({
                       />
                       <SignalMetric
                         icon={HelpCircle}
-                        label="Tutor help"
+                        label={tPractice('ui.tutorHelp')}
                         value={String(subjectActivity?.teacherEscalationCount ?? 0)}
                       />
                     </div>

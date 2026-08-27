@@ -21,7 +21,7 @@ export function LessonResultPage() {
     <DashboardLayout>
       <PageContainer className="space-y-8 p-0">
         <PageHeader
-          eyebrow="Lesson complete"
+          eyebrow={t('ui.lessonComplete')}
           title={t('path.reviewSession')}
           description="A concise summary of the practice session and the steps worth reviewing."
         />

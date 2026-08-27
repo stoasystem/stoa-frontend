@@ -61,7 +61,7 @@ export function TopicRoadmapPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <PageHeader
             className="mb-0"
-            eyebrow="Practice subject"
+            eyebrow={t('ui.practiceSubject')}
             title={subject ? `${subject.name} Practice Path` : 'Practice Path'}
             description={topic?.description ?? subject?.description ?? t('roadmap.pageDescription')}
           />
@@ -84,8 +84,8 @@ export function TopicRoadmapPage() {
             {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
             <InlineUploadPanel
               context="practice_path"
-              title="Have a question from school?"
-              description="Upload a photo or PDF and ask the Learning Assistant while you keep the Practice Path as your guide."
+              title={t('ui.haveQuestion')}
+              description={t('ui.uploadWhilePractising2')}
               sourceOptions={{
                 sourcePage: `/practice/${resolvedSubjectId}/${resolvedTopicId}`,
                 sourceEntityId: resolvedTopicId,
@@ -95,7 +95,7 @@ export function TopicRoadmapPage() {
             />
             <section className="space-y-4">
               <SectionHeader
-                title="Review work"
+                title={t('ui.reviewWork')}
                 description={t('path.roadmapHint')}
               />
               {overview.recentMistakes.slice(0, 2).map((mistake) => (

@@ -22,7 +22,7 @@ export function QuestionSetResultPage() {
       <DashboardLayout>
         <PageContainer className="space-y-6 p-0">
           <PageHeader
-            eyebrow="Practice Complete"
+            eyebrow={t('ui.practiceComplete')}
             title={t('library.noFinishedSet')}
             description={t('library.resultHint')}
           />
@@ -41,15 +41,15 @@ export function QuestionSetResultPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Practice Complete"
-          title="Practice Complete"
+          eyebrow={t('ui.practiceComplete')}
+          title={t('ui.practiceComplete')}
           description={accuracy < 70 ? 'This set needs another round of practice. Review the questions below, then try a similar set.' : 'Use the result to decide whether to review mistakes, ask for an explanation, or continue the guided Practice Path.'}
         />
         <section className="grid gap-4 md:grid-cols-4">
           <Metric label="Score" value={`${result.score} / ${result.total}`} />
           <Metric label="Accuracy" value={`${accuracy}%`} />
-          <Metric label="Time spent" value={`${result.timeSpentMinutes} min`} />
-          <Metric label="Needs review" value={`${result.incorrectQuestions.length + result.skippedQuestions.length}`} />
+          <Metric label={t('ui.timeSpent')} value={`${result.timeSpentMinutes} min`} />
+          <Metric label={t('ui.needsReview')} value={`${result.incorrectQuestions.length + result.skippedQuestions.length}`} />
         </section>
         <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
@@ -68,7 +68,7 @@ export function QuestionSetResultPage() {
               ))}
             </div>
             <div className="mt-6">
-              <p className="brand-section-kicker">Needs review</p>
+              <p className="brand-section-kicker">{t('ui.needsReview')}</p>
               <div className="mt-3 space-y-3">
                 {result.incorrectQuestions.map((mistake) => (
                   <div key={mistake.id} className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">

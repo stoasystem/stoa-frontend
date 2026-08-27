@@ -20,7 +20,13 @@ const ROOTS = [
   'src/components/practice',
   'src/components/question-bank',
   'src/components/dashboard',
+  'src/components/learning',
+  'src/components/common',
 ]
+
+// Anything a screen puts words into.
+const TEXT_PROPS =
+  'title|description|label|placeholder|message|emptyMessage|eyebrow|subtitle|heading|cta|actionLabel|emptyTitle|caption|hint|tooltip|value'
 
 // Words that are the same in the languages we ship, or are not prose.
 const ALLOW = /^(STOA|OK|Email|E-Mail|PDF|AI|KaTeX|ID|URL|CHF)$/i
@@ -50,10 +56,12 @@ for (const root of ROOTS) {
       if (/^\s*(\/\/|\*|\/\*)/.test(line)) return
       if (/(className|import |from '|aria-|data-|key=|href=|to=)/.test(line)) return
 
-      // Prose between tags, or a prose-looking string prop.
-      const between = line.match(/>\s*([A-Z][a-z]+(?: [a-z]{2,}){2,}[^<>{}]*)</)
-      const prop = line.match(/\b(?:title|description|label|placeholder|message|emptyMessage)="([A-Z][a-z]+(?: [a-z]{2,}){2,}[^"]*)"/)
-      const found = between?.[1] ?? prop?.[1]
+      // Words between tags, or words handed to a prop that renders them.
+      // Two words is enough: "Review Mistakes" reads as English too.
+      const between = line.match(/>\s*([A-Z][A-Za-z']+(?: [A-Za-z'][A-Za-z']*)+[^<>{}]*)</)
+      const prop = new RegExp(`\\b(?:${TEXT_PROPS})="([A-Z][A-Za-z']+(?: [A-Za-z'][A-Za-z']*)+[^"]*)"`)
+      const propMatch = line.match(prop)
+      const found = between?.[1] ?? propMatch?.[1]
       if (!found || ALLOW.test(found.trim())) return
       findings.push({ file, line: index + 1, text: found.trim().slice(0, 68) })
     })

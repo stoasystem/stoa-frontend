@@ -199,8 +199,8 @@ export function QuestionSessionPage() {
             <InlineUploadPanel
               context="question_session"
               compact
-              title="Need help?"
-              description="Ask the Learning Assistant for a step-by-step explanation, or upload your own work for this question."
+              title={t('ui.needHelp')}
+              description={t('ui.askAssistant2')}
               sourceOptions={{
                 sourcePage: `/question-bank/session/${sessionId}`,
                 sourceEntityId: loadedQuestion.id,
