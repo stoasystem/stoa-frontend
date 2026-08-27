@@ -28,7 +28,6 @@ import { useAuthStore } from '@/store/authStore'
 
 export function RoleSwitcher() {
   const user = useAuthStore((state) => state.user)
-  const setAuth = useAuthStore((state) => state.setAuth)
   const queryClient = useQueryClient()
 
   const [open, setOpen] = useState(false)
@@ -45,14 +44,11 @@ export function RoleSwitcher() {
 
   function adopt(session: DevSession) {
     pinTabToSession(session.accessToken)
-    setAuth(
-      { id: session.email, email: session.email, name: session.name, role: session.role } as never,
-      session.accessToken,
-    )
     // The previous role's answers are not this role's answers.
     void queryClient.clear()
-    // Straight to where this role belongs. Going through the root reloads
-    // before the role is known and lands on the forbidden page.
+    // Nothing else changes here. Telling the store about the new role while
+    // the old role's page is still mounted lets its route guard reject the
+    // new one and land on the forbidden page before the load begins.
     window.location.assign(getDefaultRouteForRole(session.role as never))
   }
 

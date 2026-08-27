@@ -106,6 +106,33 @@ describe('switching between the test roles', () => {
     expect(useAuthStore.getState().accessToken).toBe('the-shared-one')
   })
 
+  it('leaves the page alone until the load, so no guard can reject the new role', async () => {
+    // Telling the store about the new role while the old role's page is still
+    // mounted lets its route guard land on the forbidden page first.
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, href: 'https://app.stoaedu.ch/chat' },
+      writable: true,
+    })
+    rememberSession({
+      email: 'parent@test.stoaedu.ch',
+      role: 'parent',
+      name: 'Demo Parent',
+      accessToken: 'parent-token',
+    })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    expect(assign).toHaveBeenCalledWith('/parent')
+    // The store is untouched; the reload establishes the role.
+    expect(useAuthStore.getState().user?.email).toBe('student@test.stoaedu.ch')
+    expect(sessionStorage.getItem('stoa_tab_access_token')).toBe('parent-token')
+  })
+
   it('sends each role to its own home rather than through the root', async () => {
     // Going through the root reloads before the role is known, which lands on
     // the forbidden page.
