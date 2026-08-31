@@ -1,240 +1,78 @@
-<!-- GSD:project-start source:PROJECT.md -->
-## Project
+# stoa-frontend
 
-**STOA Frontend**
+STOA 学习平台前端，React 19 + TypeScript + Vite 的 SPA。生产环境
+https://app.stoaedu.ch ，后端 https://api.stoaedu.ch 。
 
-STOA Frontend is the React + TypeScript + Vite frontend for the STOA learning platform. The immediate project goal is to establish a clean, standard, maintainable frontend foundation that developers can clone, install, run locally, build, and use as the base for later STOA product features.
+## 权威文档在别处
 
-The current repository already contains an early React/Vite shell with role route stubs, Cognito/Amplify configuration, an Axios API client, TanStack Query provider setup, and Zustand stores. The first planned milestone is to reconcile that repository with a stable Phase 1 frontend foundation: a minimal STOA initialization page, complete Vite scaffold, clear README, correct ignore rules, and verified local dev/build commands.
+这份文件只讲本仓的操作要点。产品需求、架构、API、数据模型、当前进度一律以
+`stoasystem/stoa-docs` 为准：`PRD.md` → `HLD.md` → `PLAN.md` → `ADR.md` →
+`DEPLOYMENT.md`，技术债清单见 `PROJECT_SLIM_PLAN.md`。多仓协作的纪律写在工作区根目录的
+`CLAUDE.md` 里。**动代码前先读那边，不要只读这一份。**
 
-**Core Value:** Developers can clone `stoa-frontend`, run `npm install` and `npm run dev`, and see a working STOA frontend foundation at `http://localhost:5173/`.
+## 技术栈（以 package.json 为准）
 
-### Constraints
+```
+React 19 · TypeScript 5.5 · Vite 6 · Zustand 5 · TanStack Query 5
+react-router-dom 7 · i18next 26（de / en / fr / it 四语）
+测试：Vitest 4 · Playwright 1.60 · node:test（release 契约）
+```
 
-- **Tech stack**: React, TypeScript, Vite, npm — specified by the Phase 1 project brief.
-- **Runtime**: Node.js 20 LTS or newer LTS is recommended for local development.
-- **Scope**: Phase 1 must avoid business feature implementation and focus on runnable foundation only.
-- **Repository hygiene**: `node_modules/`, `dist/`, and local env files must not be committed.
-- **Developer workflow**: The project must be usable through standard npm scripts.
-- **GitHub**: The intended remote is `https://github.com/stoasystem/stoa-frontend`, but remote setup depends on repository access and should be verified before push.
-<!-- GSD:project-end -->
+不使用 aws-amplify。旧文档里写的「AWS Amplify JS」已经不成立，仓里没有这个依赖，
+源码也没有任何引用；Cognito 走后端。
 
-<!-- GSD:stack-start source:codebase/STACK.md -->
-## Technology Stack
+## 常用命令
 
-## Languages
-- TypeScript 5.5 - Application source files under `src/`, Vite config in `vite.config.ts`, and React components.
-- TSX - React route components and app entry points.
-- JavaScript runtime semantics through ESM (`"type": "module"` in `package.json`).
-## Runtime
-- Browser runtime - The application is a client-side React SPA.
-- Node.js - Required for local development, TypeScript compilation, Vite dev server, and production build. No explicit Node version is pinned in `package.json`.
-- npm is implied by README commands (`npm install`, `npm run dev`).
-- Lockfile: no `package-lock.json`, `pnpm-lock.yaml`, or `yarn.lock` is currently present.
-## Frameworks
-- React `^19.0.0` - UI framework.
-- React DOM `^19.0.0` - Browser rendering via `ReactDOM.createRoot` in `src/main.tsx`.
-- React Router DOM `^7.0.0` - Client-side routing in `src/App.tsx`.
-- AWS Amplify `^6.4.0` - Cognito auth configuration and auth session access.
-- Zustand `^5.0.0` - Client state stores in `src/stores/authStore.ts` and `src/stores/questionStore.ts`.
-- TanStack React Query `^5.40.0` - Query client provider in `src/main.tsx`; no feature queries are implemented yet.
-- Axios `^1.7.0` - HTTP client wrapper in `src/lib/api.ts`.
-- No test runner dependency is currently installed.
-- No test files or test scripts are currently present.
-- Vite `^6.0.0` - Dev server and bundling.
-- `@vitejs/plugin-react` `^4.3.0` - React plugin configured in `vite.config.ts`.
-- TypeScript `^5.5.0` - Build script runs `tsc -b` before `vite build`.
-- ESLint `^9.0.0` - Lint script exists, but no ESLint config file is currently present in the repo.
-## Key Dependencies
-- `react` / `react-dom` - All page rendering.
-- `react-router-dom` - Route table for student, parent, teacher, and admin areas.
-- `aws-amplify` - Cognito configuration, token retrieval, and sign-out on 401 responses.
-- `axios` - Central API client with JWT request interceptor.
-- `@tanstack/react-query` - Intended server-state cache and retry behavior.
-- `zustand` - Global auth and question-flow state.
-- Vite dev server proxies `/api` to `http://localhost:8000` in `vite.config.ts`.
-- Runtime API base URL comes from `VITE_API_URL`, falling back to `/api`.
-## Configuration
-- Environment variables are read through `import.meta.env`.
-- Required variables documented in `README.md`:
-- `.env`, `.env.*`, and `*.local` are gitignored.
-- README references `.env.example`, but no `.env.example` file exists currently.
-- `vite.config.ts` - Vite React plugin, dev server port `5173`, and `/api` proxy.
-- TypeScript build expects a `tsconfig` project because `npm run build` runs `tsc -b`; no `tsconfig*.json` file is currently present.
-- No `index.html` is currently present, which Vite normally needs as the app HTML entry.
-## Platform Requirements
-- Any OS capable of running Node.js and npm.
-- Local backend expected at `http://localhost:8000` when using the Vite proxy.
-- Cognito user pool and app client values are required for real authentication flows.
-- Static SPA artifact generated by Vite once missing build config and HTML entry are added.
-- Deployment target is not defined in the repo.
-- Backend API and Cognito are external dependencies.
-<!-- GSD:stack-end -->
+```bash
+npm install
+npm run dev          # scripts/vite.mjs 包了一层，不要直接 vite
+npm run lint         # eslint . --max-warnings=0，零容忍
+npm run typecheck    # tsc -b
+npm test             # vitest run
+npm run test:e2e     # playwright
+npm run build        # tsc -b && vite build
+```
 
-<!-- GSD:conventions-start source:CONVENTIONS.md -->
-## Conventions
+两个守卫脚本在 CI 里会跑，本地改动相关区域时也该跑：
 
-## Naming Patterns
-- Page components use PascalCase `.tsx` files: `src/pages/student/Home.tsx`, `src/pages/parent/Dashboard.tsx`.
-- Store modules use camelCase with `Store` suffix: `src/stores/authStore.ts`, `src/stores/questionStore.ts`.
-- Shared client modules use short camelCase names: `src/lib/api.ts`, `src/lib/amplify.ts`.
-- No test file naming pattern is established yet.
-- React components use PascalCase function names matching the default export intent: `StudentHome`, `TeacherQueue`.
-- Store setters use `setX` names: `setUser`, `setPendingImageKey`.
-- No async feature functions are implemented yet beyond interceptors.
-- camelCase for local variables: `queryClient`, `amplifyConfig`, `pendingImageKey`.
-- No constants naming convention beyond exported `amplifyConfig`.
-- No private marker convention exists.
-- Interfaces use PascalCase: `User`, `AuthState`, `QuestionState`.
-- String-literal unions are used for role and subscription tier values in `src/stores/authStore.ts`.
-- No enum pattern exists.
-## Code Style
-- Existing files use 2-space indentation.
-- Existing imports and strings use single quotes.
-- Semicolons are omitted.
-- Trailing commas appear in multiline calls/objects.
-- JSX is currently minimal and unstyled.
-- `package.json` defines `npm run lint` as `eslint . --ext ts,tsx`.
-- ESLint `^9.0.0` is installed as a dev dependency.
-- No `eslint.config.*` or `.eslintrc*` file exists, so the lint command is not yet backed by a checked-in config.
-## Import Organization
-- No blank lines between import groups in current files.
-- No enforced alphabetical ordering is visible.
-- No path aliases are configured.
-- Imports use relative paths such as `./stores/authStore`.
-## Error Handling
-- API request auth lookup failures are swallowed in `src/lib/api.ts` to allow public requests.
-- API response 401 errors trigger global sign-out and browser redirect to `/login`.
-- All other Axios errors are rethrown with `Promise.reject(error)`.
-- No custom error types exist.
-- No domain-level error result pattern exists.
-- No feature pages currently render loading or error states.
-## Logging
-- No logging framework is present.
-- No `console.log` usage was found in `src/`.
-- No logging pattern has been established yet.
-## Comments
-- Comments are sparse and currently used for route grouping and API interceptor intent.
-- Examples:
-- No JSDoc or TSDoc usage exists.
-- Page placeholder text contains `TODO`, but no code comments use `TODO`.
-## Function Design
-- Current modules are small and single-purpose.
-- Route components are one-line placeholders.
-- Store setters accept typed values directly.
-- No complex parameter patterns exist.
-- React page components return JSX directly.
-- Zustand stores return object literals from `create`.
-- Interceptors return modified config or reject errors.
-## Module Design
-- React page components use default exports.
-- Stores use named exports (`useAuthStore`, `useQuestionStore`).
-- `src/lib/api.ts` default-exports the Axios instance.
-- `src/lib/amplify.ts` named-exports `amplifyConfig`.
-- No `index.ts` barrel files are used.
-- Use Zustand for durable cross-route client state.
-- Use TanStack Query for server data once API-backed pages are implemented.
-- Avoid duplicating server data into Zustand unless it is needed outside query lifecycles.
-<!-- GSD:conventions-end -->
+```bash
+npm run check:api-contract   # 比对后端 main 的 route-authorization-inventory.json
+npm run check:untranslated   # 未翻译文案的棘轮，基线在 scripts/untranslated-baseline.json
+```
 
-<!-- GSD:architecture-start source:ARCHITECTURE.md -->
-## Architecture
+## push 即部署
 
-## Pattern Overview
-- Browser-rendered Vite app with React Router route definitions.
-- Role areas are separated by URL prefix: student, parent, teacher, and admin.
-- AWS Amplify is configured globally for Cognito auth.
-- Axios API client centralizes token injection and 401 sign-out behavior.
-- Most user-facing pages are placeholders; core domain workflows are not implemented yet.
-## Layers
-- Purpose: Configure global providers and render the app.
-- Contains: React root creation, BrowserRouter, QueryClientProvider, Amplify setup.
-- Location: `src/main.tsx`.
-- Depends on: `@tanstack/react-query`, `react-router-dom`, `aws-amplify`, `src/lib/amplify.ts`.
-- Used by: Browser entry point.
-- Purpose: Map URL paths to role-specific pages.
-- Contains: Route table and default redirect.
-- Location: `src/App.tsx`.
-- Depends on: route components under `src/pages/**`.
-- Used by: `src/main.tsx`.
-- Purpose: Represent role-specific screens.
-- Contains: React components under `src/pages/student`, `src/pages/parent`, `src/pages/teacher`, and `src/pages/admin`.
-- Depends on: currently no shared UI or API modules; each page returns placeholder content.
-- Used by: `src/App.tsx` routes.
-- Purpose: Configure API and auth clients.
-- Contains: `src/lib/api.ts` and `src/lib/amplify.ts`.
-- Depends on: Axios and AWS Amplify auth APIs.
-- Used by: future feature pages and hooks.
-- Purpose: Hold lightweight global browser state.
-- Contains: Zustand stores in `src/stores/authStore.ts` and `src/stores/questionStore.ts`.
-- Depends on: `zustand`.
-- Used by: `src/App.tsx` currently reads auth state; question store is not yet used.
-## Data Flow
-- Server state is intended to flow through TanStack Query, but no queries exist yet.
-- Auth state is manually set through `useAuthStore`; no hydration path is implemented yet.
-- Question image handoff state is stored as `pendingImageKey` in `useQuestionStore`.
-## Key Abstractions
-- Purpose: One route component per major role workflow.
-- Examples: `src/pages/student/Ask.tsx`, `src/pages/teacher/Queue.tsx`, `src/pages/admin/Dashboard.tsx`.
-- Pattern: Default-exported function component.
-- Purpose: Centralize backend URL, timeout, JWT injection, and auth failure handling.
-- Example: `src/lib/api.ts`.
-- Pattern: Axios singleton instance.
-- Purpose: Keep current user identity, role, and subscription tier available to UI.
-- Example: `src/stores/authStore.ts`.
-- Pattern: Zustand store with `user` and `setUser`.
-- Purpose: Isolate Cognito environment mapping.
-- Example: `src/lib/amplify.ts`.
-- Pattern: exported configuration object consumed during app bootstrap.
-## Entry Points
-- Location: `src/main.tsx`.
-- Triggers: Browser loads the Vite bundle.
-- Responsibilities: Configure Amplify, create QueryClient, mount React providers and routes.
-- Location: `src/App.tsx`.
-- Triggers: Browser navigation through React Router.
-- Responsibilities: Route selection and default redirect.
-- Location: `src/lib/api.ts`.
-- Triggers: Any future API call through the exported Axios instance.
-- Responsibilities: Base URL selection, timeout, auth header injection, 401 sign-out.
-## Error Handling
-- API request interceptor ignores `fetchAuthSession()` failures and lets requests proceed as unauthenticated.
-- API response interceptor handles HTTP 401 globally by signing out and redirecting to `/login`.
-- Feature-level error rendering is not implemented.
-- No React error boundary exists.
-## Cross-Cutting Concerns
-- No logging framework or app-level logging conventions exist.
-- No schema validation library or form validation layer is present.
-- Cognito is configured through Amplify.
-- No route guards currently enforce role or login checks.
-- `src/App.tsx` reads `user` but does not use it to protect routes.
-- No CSS files, component library, or design system exists in the current repo.
-- Page components return raw placeholder `<div>` elements.
-<!-- GSD:architecture-end -->
+`main` 分支 push 会触发 `.github/workflows/deploy-production.yml`，先过一道门
+（lint → typecheck → API 契约 → 翻译守卫 → 单测 → release 契约 → publisher 测试），
+过了才 build 并发布到 S3 + CloudFront。**没有预发环境，提交前想清楚。**
 
-<!-- GSD:skills-start source:skills/ -->
-## Project Skills
+API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取路由清单。所以涉及
+接口变更时，先推后端再推前端，否则这道门会拦下来。
 
-No project skills found. Add skills to any of: `.claude/skills/`, `.agents/skills/`, `.cursor/skills/`, `.github/skills/`, or `.codex/skills/` with a `SKILL.md` index file.
-<!-- GSD:skills-end -->
+## 目录约定
 
-<!-- GSD:workflow-start source:GSD defaults -->
-## GSD Workflow Enforcement
+```
+src/app        应用装配与 provider
+src/pages      路由页面
+src/layouts    布局骨架
+src/features   按领域切分的功能模块（uploads 等）
+src/components 跨页复用组件
+src/hooks      按领域分组的 hooks
+src/services   API 客户端与外部服务
+src/store      Zustand store —— 只有这一个，写新状态放这里
+src/i18n       四语言 locale 资源
+tests/         unit · component · e2e · release
+```
 
-Before using Edit, Write, or other file-changing tools, start work through a GSD command so planning artifacts and execution context stay in sync.
+## 还没清理干净的地方
 
-Use these entry points:
-- `/gsd-quick` for small fixes, doc updates, and ad-hoc tasks
-- `/gsd-debug` for investigation and bug fixing
-- `/gsd-execute-phase` for planned phase work
+改到这些区域时先确认状态，别在废弃分支上加功能：
 
-Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
-<!-- GSD:workflow-end -->
+- `backend/` —— SQLite 的 demo 后端（含 `local.db`），与真正的 `stoa-backend` 并存，
+  是契约漂移的来源。**新功能一律写 `stoa-backend`，不要往这里加东西。**
+- `.planning/` —— GSD 工具留下的 1051 个文件，占仓库一半以上，最后改动 2026-08-15。
+- `docs/` —— 273 个入库文件，最后改动 2026-07-07，与 `stoa-docs` 职责重叠。
+- `vercel.json` —— 部署实际走 S3 + CloudFront，这个文件是历史遗留。
+- 未挂路由的旧版 student / teacher / parent 页面，以及双首页、双 Mistakes 页实验。
 
-
-
-<!-- GSD:profile-start -->
-## Developer Profile
-
-> Profile not yet configured. Run `/gsd-profile-user` to generate your developer profile.
-> This section is managed by `generate-claude-profile` -- do not edit manually.
-<!-- GSD:profile-end -->
+`src/stores/`（与 `src/store/` 并存的那个空壳）已经删除，旧文档若还提到它，是旧文档过时。
