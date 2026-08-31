@@ -155,5 +155,29 @@
       "reviewed": "Examiné",
       "resolved": "Résolu"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
+    "unread": "{{count}} non lue(s)",
+    "loading": "Chargement des notifications...",
+    "unavailable": "Les notifications ne sont pas disponibles.",
+    "empty": "Aucune notification pour l’instant.",
+    "markRead": "Marquer comme lue",
+    "archive": "Archiver",
+    "openLabel": "Notifications",
+    "openLabelUnread": "Notifications, {{count}} non lue(s)",
+    "connection": {
+      "live": "À jour",
+      "connecting": "Connexion",
+      "reconnecting": "Reconnexion",
+      "checking": "Recherche de nouveautés",
+      "offline": "Hors ligne"
+    },
+    "itemStatus": {
+      "created": "Nouveau",
+      "read": "Lu",
+      "archived": "Archivé"
+    }
   }
 }

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
+import { markLoginSubmitted } from '@/lib/loginTiming'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
 import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
@@ -35,6 +36,7 @@ export function LoginForm() {
           return
         }
         setErrors({})
+        markLoginSubmitted()
         loginMutation.mutate(result.data)
       }}
     >
@@ -74,9 +76,19 @@ export function LoginForm() {
           {toUserFacingError(loginMutation.error, t('auth:login.failed'))}
         </p>
       )}
-      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+      <Button
+        type="submit"
+        className="w-full"
+        disabled={loginMutation.isPending}
+        aria-busy={loginMutation.isPending}
+      >
         {loginMutation.isPending ? t('common:actions.signingIn') : t('common:actions.signIn')}
       </Button>
+      {/* The wait to a usable page is seconds long; say so rather than
+          leaving a disabled button as the only sign of progress. */}
+      <p className="min-h-5 text-center text-xs text-muted-foreground" role="status" aria-live="polite">
+        {loginMutation.isPending ? t('auth:login.signingInStatus') : ''}
+      </p>
       <p className="text-center text-sm text-muted-foreground">
         {t('auth:login.needAccount')}{' '}
         <Link className="font-medium text-foreground underline" to="/register">

@@ -155,5 +155,29 @@
       "reviewed": "Rivisto",
       "resolved": "Risolto"
     }
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "subtitle": "Novità sulle tue domande, sugli esercizi e sulle richieste agli insegnanti.",
+    "unread": "{{count}} da leggere",
+    "loading": "Caricamento delle notifiche...",
+    "unavailable": "Le notifiche non sono disponibili.",
+    "empty": "Ancora nessuna notifica.",
+    "markRead": "Segna come letta",
+    "archive": "Archivia",
+    "openLabel": "Notifiche",
+    "openLabelUnread": "Notifiche, {{count}} da leggere",
+    "connection": {
+      "live": "Aggiornato",
+      "connecting": "Connessione in corso",
+      "reconnecting": "Riconnessione in corso",
+      "checking": "Controllo aggiornamenti",
+      "offline": "Offline"
+    },
+    "itemStatus": {
+      "created": "Nuova",
+      "read": "Letta",
+      "archived": "Archiviata"
+    }
   }
 }

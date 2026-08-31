@@ -44,6 +44,7 @@ export function ChatMessageBubble({
   onRequestTeacher,
   isRequestingTeacher,
   teacherFeedback,
+  teacherFeedbackTone,
   moderationTargetId,
 }: {
   message: ChatMessage
@@ -51,6 +52,7 @@ export function ChatMessageBubble({
   onRequestTeacher?: () => void
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
+  teacherFeedbackTone?: 'info' | 'error'
   moderationTargetId?: string | null
 }) {
   const { t } = useTranslation('chat')
@@ -136,6 +138,7 @@ export function ChatMessageBubble({
             onRequestTeacher={onRequestTeacher}
             isRequesting={isRequestingTeacher}
             feedback={teacherFeedback}
+            feedbackTone={teacherFeedbackTone}
           />
         )}
         {moderationTargetId && message.role === 'assistant' && !isStreaming && (

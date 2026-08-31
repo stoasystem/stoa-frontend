@@ -5,6 +5,7 @@
  * entries onto the same content. They are tabs here, with the mistakes worth
  * revisiting beside them.
  */
+import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -13,6 +14,7 @@ import { PracticePathTab } from '@/pages/practice/PracticeOverviewPage'
 import { LibraryTab } from '@/pages/question-bank/QuestionBankHomePage'
 import { ProgressTab } from '@/pages/learning-history/StudentLearningHistoryPage'
 import { MistakesTab } from '@/pages/question-bank/MistakesReviewPage'
+import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 
 const TABS = ['library', 'path', 'mistakes', 'progress'] as const
 type LearnTab = (typeof TABS)[number]
@@ -26,6 +28,11 @@ export function LearnPage() {
   const { tab } = useParams()
   const navigate = useNavigate()
   const active: LearnTab = isLearnTab(tab) ? tab : 'library'
+
+  // Closes the sign-in timing when a student is redirected straight to Learn.
+  useEffect(() => {
+    markLoginFirstScreenReady('/learn')
+  }, [])
 
   return (
     <DashboardLayout>

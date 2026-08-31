@@ -1,3 +1,4 @@
+import { Camera } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { UploadButton } from '@/features/uploads/components/UploadButton'
 
@@ -31,6 +32,7 @@ export function PhotoCaptureButton({
       variant={variant}
       size={size}
       iconOnly={iconOnly}
+      icon={Camera}
       onFilesSelected={(files) => {
         const file = files[0]
         if (file) onPhotoSelected(file)

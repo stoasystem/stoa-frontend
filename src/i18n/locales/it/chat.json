@@ -44,12 +44,25 @@
     "description": "Invia questa conversazione a un insegnante qualificato per una guida più chiara.",
     "cta": "Chiedi a un insegnante",
     "submitted": "La tua richiesta è stata inviata a un insegnante.",
-    "failed": "Non siamo riusciti a inviare la richiesta all’insegnante. Riprova."
+    "failed": "Non siamo riusciti a inviare la richiesta all’insegnante. Riprova.",
+    "requested": "La tua richiesta è stata inviata a un insegnante.",
+    "retry": "Riprova",
+    "errors": {
+      "planDenied": "Il supporto dell’insegnante non è incluso nel piano attuale. Un genitore può aggiungerlo dalla pagina del piano.",
+      "allowanceExhausted": "Le richieste di questa settimana sono esaurite. Torneranno disponibili la prossima settimana.",
+      "alreadyOpen": "Per questa conversazione c’è già una richiesta aperta.",
+      "temporary": "Il supporto dell’insegnante è occupato in questo momento. Riprova tra poco.",
+      "generic": "Non siamo riusciti a inviare la richiesta all’insegnante. Riprova."
+    }
   },
   "status": {
     "pending": "In attesa di un insegnante",
     "in_progress": "L’insegnante sta esaminando",
     "resolved": "Supporto insegnante completato"
   },
-  "subjectForQuestion": "Materia di questa domanda"
+  "subjectForQuestion": "Materia di questa domanda",
+  "conversations": "Conversazioni",
+  "conversationsSubtitle": "Le tue conversazioni di apprendimento",
+  "backToConversations": "Torna alle conversazioni",
+  "newConversationReady": "Pronto per una nuova domanda."
 }

@@ -126,30 +126,6 @@ function NavItemLink({
   )
 }
 
-function TopNavItemLink({ item, items }: { item: AppNavItem; items: AppNavItem[] }) {
-  const { t } = useTranslation('common')
-  const location = useLocation()
-  const label = t(navLabelKeys[item.label] ?? item.label, { defaultValue: item.label })
-  const active = isActiveNavItem(item, items, location.pathname)
-
-  return (
-    <NavLink
-      className={() =>
-        cn(
-          'stoa-type-nav inline-flex min-h-9 items-center justify-center rounded-md px-3 py-2 text-sm font-semibold transition-colors',
-          active
-            ? 'platform-nav-active shadow-sm'
-            : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
-        )
-      }
-      end={item.path === '/'}
-      to={item.path}
-    >
-      {label}
-    </NavLink>
-  )
-}
-
 export function AppLayout({ children }: { children: ReactNode }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
@@ -195,14 +171,9 @@ export function AppLayout({ children }: { children: ReactNode }) {
                 <Home className="h-4 w-4" aria-hidden="true" />
                 <span className="hidden sm:inline">{t('navigation.home')}</span>
               </Link>
-              <nav
-                aria-label="App top navigation"
-                className="hidden min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex"
-              >
-                {primaryItems.map((item) => (
-                  <TopNavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}-top`} />
-                ))}
-              </nav>
+              {/* The sidebar carries the primary navigation on this breakpoint
+                  and the bottom bar carries it below `md`. A second copy here
+                  only competed with it over which one showed the current page. */}
               <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
                 {user && <NotificationCenter />}
                 <LanguageSwitcher compact />

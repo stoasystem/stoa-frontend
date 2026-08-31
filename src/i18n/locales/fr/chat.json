@@ -44,12 +44,25 @@
     "description": "Envoie cette conversation à un enseignant qualifié si tu as besoin d’un accompagnement plus clair.",
     "cta": "Demander à un enseignant",
     "submitted": "Votre demande a été envoyée à un enseignant.",
-    "failed": "Nous n’avons pas pu envoyer la demande à l’enseignant. Réessaie."
+    "failed": "Nous n’avons pas pu envoyer la demande à l’enseignant. Réessaie.",
+    "requested": "Ta demande a été envoyée à un enseignant.",
+    "retry": "Réessayer",
+    "errors": {
+      "planDenied": "L’accompagnement par un enseignant ne fait pas partie de la formule actuelle. Un parent peut l’ajouter depuis la page de la formule.",
+      "allowanceExhausted": "Les demandes d’enseignant de cette semaine sont épuisées. Elles reviennent la semaine prochaine.",
+      "alreadyOpen": "Une demande d’enseignant est déjà ouverte pour cette conversation.",
+      "temporary": "L’accompagnement par un enseignant est occupé pour le moment. Réessaie dans un instant.",
+      "generic": "Nous n’avons pas pu envoyer la demande à l’enseignant. Réessaie."
+    }
   },
   "status": {
     "pending": "En attente d’un enseignant",
     "in_progress": "L’enseignant examine",
     "resolved": "Aide enseignante terminée"
   },
-  "subjectForQuestion": "Matière de cette question"
+  "subjectForQuestion": "Matière de cette question",
+  "conversations": "Conversations",
+  "conversationsSubtitle": "Tes conversations d’apprentissage",
+  "backToConversations": "Retour aux conversations",
+  "newConversationReady": "Prêt pour une nouvelle question."
 }

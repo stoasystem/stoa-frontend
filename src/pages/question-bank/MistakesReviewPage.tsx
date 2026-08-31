@@ -17,9 +17,21 @@ export function MistakesTab() {
         description={t('review.description')}
       />
       <section className="grid gap-4 sm:grid-cols-3">
-        <Metric label={t('review.dueNow')} value={`${summary?.dueCount ?? 0}`} />
-        <Metric label={t('review.tracked')} value={`${summary?.scheduledCount ?? 0}`} />
-        <Metric label={t('review.nextOne')} value={formatNextDue(summary?.nextDueAt, t)} />
+        <Metric
+          label={t('review.dueNow')}
+          value={`${summary?.dueCount ?? 0}`}
+          hint={t('review.dueNowHint')}
+        />
+        <Metric
+          label={t('review.tracked')}
+          value={`${summary?.scheduledCount ?? 0}`}
+          hint={t('review.trackedHint')}
+        />
+        <Metric
+          label={t('review.nextOne')}
+          value={formatNextDue(summary?.nextDueAt, t)}
+          hint={t('review.nextOneHint')}
+        />
       </section>
       <ReviewSession />
     </PageContainer>
@@ -41,11 +53,13 @@ function formatNextDue(dueAt: string | undefined, t: (key: string, options?: Rec
   return days === 1 ? t('review.tomorrow') : t('review.inDays', { count: days })
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({ label, value, hint }: { label: string; value: string; hint: string }) {
   return (
     <div className="rounded-lg border bg-card/90 p-4 shadow-[var(--platform-shadow-soft)]">
       <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{label}</p>
       <p className="mt-2 text-xl font-semibold">{value}</p>
+      {/* A number, and a dash in particular, says nothing on its own. */}
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{hint}</p>
     </div>
   )
 }

@@ -1,7 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
+import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore } from '@/store/authStore'
@@ -52,14 +54,16 @@ function getLoginRedirectPath({
 export function useLoginMutation() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { t } = useTranslation('auth')
   const setAuth = useAuthStore((state) => state.setAuth)
 
   return useMutation({
     mutationFn: (payload: LoginRequest) => login(payload),
     onSuccess: (data) => {
       setAuth(data.user, data.accessToken)
+      markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
-      toast.success('Signed in')
+      toast.success(t('login.signedIn'))
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''
       const queryNext = new URLSearchParams(location.search).get('next')
@@ -72,7 +76,11 @@ export function useLoginMutation() {
       navigate(nextPath)
     },
     onError: (error) => {
-      toast.error(isEmailVerificationRequiredError(error) ? 'Verify your email before signing in' : 'Login failed')
+      toast.error(
+        isEmailVerificationRequiredError(error)
+          ? t('login.verifyFirst')
+          : t('login.failed'),
+      )
     },
   })
 }

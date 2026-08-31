@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Video } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -9,6 +9,7 @@ import { ChatMessageList } from '@/components/chat/ChatMessageList'
 import { PracticeContextCard } from '@/components/chat/PracticeContextCard'
 import { QuestionBankContextCard } from '@/components/question-bank/QuestionBankContextCard'
 import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
+import { ConversationListItem } from '@/components/chat/ConversationListItem'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -31,7 +32,10 @@ import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
+import { markLoginFirstScreenReady } from '@/lib/loginTiming'
+import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
+import type { ConversationSummary } from '@/types/chat'
 import type { PracticeChatLocationState } from '@/types/practice'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import type { QuestionBankChatLocationState } from '@/types/questionBank'
@@ -62,6 +66,7 @@ export function ChatPage() {
     attachments?: ReturnType<typeof uploadAttachmentToUploadedFile>[]
   } | null>(null)
   const [uploadContext, setUploadContext] = useState<UploadChatHandoff | null>(null)
+  const newConversationRef = useRef<HTMLTextAreaElement>(null)
 
   const conversationsQuery = useConversationsQuery()
   const [selectedSubjectId, setSelectedSubjectId] = useState(learningSubjectOptions[0].id)
@@ -76,6 +81,12 @@ export function ChatPage() {
 
   const selectedSubject = learningSubjectOptions.find((subject) => subject.id === selectedSubjectId)
     ?? learningSubjectOptions[0]
+
+  // Where the wait after signing in actually ends, for the student who lands here.
+  useEffect(() => {
+    if (conversationsQuery.isLoading) return
+    markLoginFirstScreenReady('/chat')
+  }, [conversationsQuery.isLoading])
 
   useEffect(() => {
     if (!activeConversationId) return
@@ -207,6 +218,17 @@ export function ChatPage() {
     setTeacherHelpError(null)
     setTeacherSupportStage('idle')
     setSendError(null)
+    // The composer is already on screen whenever no conversation is open, so
+    // clearing state the student could not see left the button looking dead.
+    // Dropping the carried-over context and taking the cursor is the visible
+    // answer to the click.
+    setNewConversationMessage('')
+    clearUploadHandoff()
+    setUploadContext(null)
+    if (location.state) {
+      navigate('/chat', { replace: true, state: null })
+    }
+    window.requestAnimationFrame(() => newConversationRef.current?.focus())
   }
 
   function handleSendMessage(payload: {
@@ -249,7 +271,7 @@ export function ChatPage() {
           setTeacherSupportStage('teacher_text_requested')
         },
         onError: (error) => {
-          setTeacherHelpError(toUserFacingError(error, t('teacher.failed')))
+          setTeacherHelpError(t(teacherHelpErrorKey(error)))
         },
       },
     )
@@ -289,7 +311,7 @@ export function ChatPage() {
 
   if (conversationsQuery.isError) {
     return (
-      <div className="chat-workspace flex h-screen items-center justify-center text-foreground">
+      <div className="chat-workspace flex h-[100dvh] items-center justify-center text-foreground">
         <ErrorState message={t('loadFailed')} />
       </div>
     )
@@ -362,6 +384,7 @@ export function ChatPage() {
             </div>
           </div>
           <Textarea
+            ref={newConversationRef}
             value={newConversationMessage}
             onChange={(event) => setNewConversationMessage(event.target.value)}
             placeholder={questionBankContext ? 'Ask what is unclear in this question...' : uploadContext ? 'Tell the Learning Assistant what part is unclear...' : practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
@@ -388,29 +411,36 @@ export function ChatPage() {
 
   if (conversations.length === 0) {
     return (
-      <div className="chat-workspace flex h-screen items-center justify-center px-4 text-foreground">
+      <div className="chat-workspace flex h-[100dvh] items-center justify-center px-4 text-foreground">
         {newConversationForm}
       </div>
     )
   }
 
   return (
-    <div className="chat-workspace flex h-screen overflow-hidden text-foreground">
+    <div className="chat-workspace flex h-[100dvh] overflow-hidden text-foreground">
       <ConversationSidebar
         conversations={conversations}
         activeConversationId={activeConversationId ?? ''}
         onSelectConversation={setActiveConversationId}
         onCreateConversation={handleStartNewConversation}
       />
-      <main className="flex min-w-0 flex-1 flex-col">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         <ChatHeader
           conversation={conversationQuery.data ?? null}
           onCreateConversation={handleStartNewConversation}
+          onBackToConversations={
+            activeConversationId ? () => setActiveConversationId(null) : undefined
+          }
         />
         {!activeConversationId && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4">
+          <div className="flex min-h-0 flex-1 flex-col items-center gap-6 overflow-y-auto px-4 py-6">
             <TodayStrip />
             {newConversationForm}
+            <MobileConversationList
+              conversations={conversations}
+              onSelectConversation={setActiveConversationId}
+            />
           </div>
         )}
         {activeConversationId && conversationQuery.isLoading && (
@@ -456,6 +486,7 @@ export function ChatPage() {
                   ? t('teacher.submitted')
                   : null)
               }
+              teacherFeedbackTone={teacherHelpError ? 'error' : 'info'}
               moderationTargetId={activeConversationId}
               onFollowUp={handleFollowUp}
               isFollowUpDisabled={isStreaming}
@@ -486,6 +517,38 @@ export function ChatPage() {
         )}
       </main>
     </div>
+  )
+}
+
+/**
+ * The conversation list, for the widths where the sidebar is not rendered.
+ *
+ * Below `md` the sidebar is hidden, so a student who opened a conversation had
+ * no way back to the others except the browser's own back button.
+ */
+function MobileConversationList({
+  conversations,
+  onSelectConversation,
+}: {
+  conversations: ConversationSummary[]
+  onSelectConversation: (id: string) => void
+}) {
+  const { t } = useTranslation('chat')
+
+  if (conversations.length === 0) return null
+
+  return (
+    <section className="w-full max-w-2xl space-y-2 md:hidden">
+      <h2 className="text-sm font-semibold">{t('conversations')}</h2>
+      {conversations.map((conversation) => (
+        <ConversationListItem
+          key={conversation.id}
+          conversation={conversation}
+          active={false}
+          onClick={() => onSelectConversation(conversation.id)}
+        />
+      ))}
+    </section>
   )
 }
 

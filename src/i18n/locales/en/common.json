@@ -155,5 +155,29 @@
       "reviewed": "Reviewed",
       "resolved": "Resolved"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Updates about your questions, practice, and tutor requests.",
+    "unread": "{{count}} unread",
+    "loading": "Loading notifications...",
+    "unavailable": "Notifications are unavailable.",
+    "empty": "No notifications yet.",
+    "markRead": "Mark read",
+    "archive": "Archive",
+    "openLabel": "Notifications",
+    "openLabelUnread": "Notifications, {{count}} unread",
+    "connection": {
+      "live": "Up to date",
+      "connecting": "Connecting",
+      "reconnecting": "Reconnecting",
+      "checking": "Checking for updates",
+      "offline": "Offline"
+    },
+    "itemStatus": {
+      "created": "New",
+      "read": "Read",
+      "archived": "Archived"
+    }
   }
 }

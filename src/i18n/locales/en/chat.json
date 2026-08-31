@@ -44,12 +44,25 @@
     "description": "Send this conversation to a tutor for clearer guidance.",
     "cta": "Ask a Tutor",
     "submitted": "Tutor support requested.",
-    "failed": "We couldn’t send the tutor request. Please try again."
+    "failed": "We couldn’t send the tutor request. Please try again.",
+    "requested": "Your tutor request was sent.",
+    "retry": "Try again",
+    "errors": {
+      "planDenied": "Tutor support is not part of the current plan. A parent can add it from the plan page.",
+      "allowanceExhausted": "This week's tutor requests are used up. They become available again next week.",
+      "alreadyOpen": "A tutor request for this conversation is already open.",
+      "temporary": "Tutor support is busy right now. Please try again in a moment.",
+      "generic": "We couldn’t send the tutor request. Please try again."
+    }
   },
   "status": {
     "pending": "Waiting for a tutor",
     "in_progress": "Tutor is reviewing",
     "resolved": "Tutor support completed"
   },
-  "subjectForQuestion": "Subject for this question"
+  "subjectForQuestion": "Subject for this question",
+  "conversations": "Conversations",
+  "conversationsSubtitle": "Your learning conversations",
+  "backToConversations": "Back to conversations",
+  "newConversationReady": "Ready for a new question."
 }

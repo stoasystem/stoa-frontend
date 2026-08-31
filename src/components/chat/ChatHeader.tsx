@@ -1,4 +1,4 @@
-import { MessageSquarePlus } from 'lucide-react'
+import { ArrowLeft, MessageSquarePlus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ChatPageNavigation } from '@/components/chat/ChatPageNavigation'
 import { TeacherAvailabilityStatus } from '@/components/chat/TeacherAvailabilityStatus'
@@ -8,13 +8,31 @@ import type { Conversation } from '@/types/chat'
 type ChatHeaderProps = {
   conversation: Conversation | null
   onCreateConversation?: () => void
+  /** Offered where the conversation list is not on screen beside the thread. */
+  onBackToConversations?: () => void
 }
 
-export function ChatHeader({ conversation, onCreateConversation }: ChatHeaderProps) {
+export function ChatHeader({
+  conversation,
+  onCreateConversation,
+  onBackToConversations,
+}: ChatHeaderProps) {
   const { t } = useTranslation('chat')
 
   return (
     <header className="chat-panel flex min-h-16 items-center justify-between border-b px-4 py-3 md:px-6">
+      {onBackToConversations && (
+        <Button
+          className="mr-2 shrink-0 md:hidden"
+          size="icon"
+          variant="ghost"
+          aria-label={t('backToConversations')}
+          title={t('backToConversations')}
+          onClick={onBackToConversations}
+        >
+          <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+        </Button>
+      )}
       <div className="min-w-0 flex-1 pr-3">
         <h1 className="truncate text-base font-semibold">
           {conversation?.title ?? t('newConversation')}

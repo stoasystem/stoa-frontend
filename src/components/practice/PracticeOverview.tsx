@@ -43,7 +43,7 @@ export function PracticeOverview({
         </div>
         <aside className="space-y-4">
           <SectionHeader
-            title="Today"
+            title={t('learn.today')}
             description={t('path.rhythm')}
           />
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
@@ -65,6 +65,7 @@ function SubjectSelectionCard({
   subject: PracticeSubject
   topic?: PracticeTopic
 }) {
+  const { t } = useTranslation('practice')
   const subjectPath = getPracticeTopicPath(subject.id, topic?.id)
 
   return (
@@ -75,11 +76,18 @@ function SubjectSelectionCard({
       )}
     >
       <CardContent className="p-5">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4">
           <div className="min-w-0">
-            <p className="brand-section-kicker">Subject</p>
-            <h3 className="mt-2 text-2xl font-semibold leading-tight">{subject.name}</h3>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{subject.description}</p>
+            <p className="brand-section-kicker">{t('learn.subjectKicker')}</p>
+            <h3 className="mt-2 hyphens-auto break-words text-2xl font-semibold leading-tight">
+              {subject.name}
+            </h3>
+            <p
+              className="mt-2 line-clamp-3 max-w-2xl text-sm leading-6 text-muted-foreground"
+              title={subject.description}
+            >
+              {subject.description}
+            </p>
             <div className="mt-4 flex flex-wrap gap-2 text-xs text-muted-foreground">
               {subject.gradeLevels.map((gradeLevel) => (
                 <span
@@ -90,19 +98,25 @@ function SubjectSelectionCard({
                 </span>
               ))}
               {topic && (
-                <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
-                  {topic.status === 'available' ? 'Available topic' : 'Coming soon'}: {topic.title}
+                <span className="max-w-full break-words rounded-md border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
+                  {topic.status === 'available'
+                    ? t('learn.topicAvailable')
+                    : t('learn.topicComingSoon')}
+                  : {topic.title}
                 </span>
               )}
             </div>
           </div>
           <Button
             asChild
-            className={cn('shrink-0', isAvailable && 'premium-primary-button text-white hover:text-white')}
+            className={cn(
+              'w-full shrink-0 sm:w-auto sm:self-start',
+              isAvailable && 'premium-primary-button text-white hover:text-white',
+            )}
             variant={isAvailable ? 'default' : 'outline'}
           >
             <Link to={subjectPath}>
-              {isAvailable ? 'Open subject' : 'View subject'}
+              {isAvailable ? t('learn.openSubject') : t('learn.viewSubject')}
               <ChevronRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </Button>
@@ -113,7 +127,9 @@ function SubjectSelectionCard({
             style={{ width: `${subject.progress}%` }}
           />
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">{subject.progress}% subject progress</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t('learn.subjectProgress', { percent: subject.progress })}
+        </p>
       </CardContent>
     </Card>
   )

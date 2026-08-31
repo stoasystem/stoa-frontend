@@ -6,12 +6,15 @@ export function TeacherRequestInlineAction({
   onRequestTeacher,
   isRequesting,
   feedback,
+  feedbackTone = 'info',
 }: {
   onRequestTeacher?: () => void
   isRequesting?: boolean
   feedback?: string | null
+  feedbackTone?: 'info' | 'error'
 }) {
   const { t } = useTranslation('chat')
+  const failed = feedbackTone === 'error'
 
   return (
     <div className="mt-4 rounded-lg border border-border/70 bg-secondary/40 p-3">
@@ -25,7 +28,18 @@ export function TeacherRequestInlineAction({
             <p className="mt-1 break-words text-xs leading-5 text-muted-foreground">
               {t('teacher.description')}
             </p>
-            {feedback && <p className="mt-2 text-xs text-[hsl(var(--accent))]">{feedback}</p>}
+            {feedback && (
+              <p
+                className={
+                  failed
+                    ? 'mt-2 break-words text-xs leading-5 text-destructive'
+                    : 'mt-2 break-words text-xs leading-5 text-[hsl(var(--accent))]'
+                }
+                role={failed ? 'alert' : undefined}
+              >
+                {feedback}
+              </p>
+            )}
           </div>
         </div>
         <Button
@@ -37,7 +51,7 @@ export function TeacherRequestInlineAction({
             disabled={!onRequestTeacher || isRequesting}
             aria-busy={isRequesting}
           >
-          {isRequesting ? t('status.pending') : t('teacher.cta')}
+          {isRequesting ? t('status.pending') : failed ? t('teacher.retry') : t('teacher.cta')}
         </Button>
       </div>
     </div>

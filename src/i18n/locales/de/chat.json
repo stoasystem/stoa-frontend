@@ -44,12 +44,25 @@
     "description": "Sende diese Unterhaltung an eine qualifizierte Lehrperson, wenn du mehr Orientierung brauchst.",
     "cta": "Lehrperson fragen",
     "submitted": "Deine Anfrage wurde an eine Lehrperson gesendet.",
-    "failed": "Wir konnten die Anfrage an die Lehrperson nicht senden. Bitte versuche es erneut."
+    "failed": "Wir konnten die Anfrage an die Lehrperson nicht senden. Bitte versuche es erneut.",
+    "requested": "Deine Anfrage an eine Lehrperson wurde gesendet.",
+    "retry": "Erneut versuchen",
+    "errors": {
+      "planDenied": "Lehrpersonen-Unterstützung gehört nicht zum aktuellen Abo. Ein Elternteil kann sie auf der Aboseite hinzufügen.",
+      "allowanceExhausted": "Die Anfragen an Lehrpersonen für diese Woche sind aufgebraucht. Nächste Woche stehen wieder welche zur Verfügung.",
+      "alreadyOpen": "Für diese Unterhaltung ist bereits eine Anfrage offen.",
+      "temporary": "Die Lehrpersonen-Unterstützung ist gerade ausgelastet. Bitte versuche es gleich noch einmal.",
+      "generic": "Wir konnten die Anfrage an die Lehrperson nicht senden. Bitte versuche es erneut."
+    }
   },
   "status": {
     "pending": "Wartet auf Lehrperson",
     "in_progress": "Lehrperson prüft",
     "resolved": "Unterstützung abgeschlossen"
   },
-  "subjectForQuestion": "Fach für diese Frage"
+  "subjectForQuestion": "Fach für diese Frage",
+  "conversations": "Unterhaltungen",
+  "conversationsSubtitle": "Deine Lernunterhaltungen",
+  "backToConversations": "Zurück zu den Unterhaltungen",
+  "newConversationReady": "Bereit für eine neue Frage."
 }

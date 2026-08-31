@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { Paperclip } from 'lucide-react'
+import { Paperclip, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { getAcceptedUploadInputValue } from '@/features/uploads/utils/uploadLimits'
@@ -13,6 +13,8 @@ type UploadButtonProps = {
   variant?: React.ComponentProps<typeof Button>['variant']
   size?: React.ComponentProps<typeof Button>['size']
   iconOnly?: boolean
+  /** Mark shown on the button. Attaching and photographing are different acts. */
+  icon?: LucideIcon
   onFilesSelected: (files: File[]) => void
 }
 
@@ -25,6 +27,7 @@ export function UploadButton({
   variant = 'outline',
   size,
   iconOnly = false,
+  icon: Icon = Paperclip,
   onFilesSelected,
 }: UploadButtonProps) {
   const { t } = useTranslation('uploads')
@@ -57,7 +60,7 @@ export function UploadButton({
         aria-label={resolvedLabel}
         onClick={() => inputRef.current?.click()}
       >
-        <Paperclip className="h-4 w-4" aria-hidden="true" />
+        <Icon className="h-4 w-4" aria-hidden="true" />
         {!iconOnly && <span>{resolvedLabel}</span>}
       </Button>
     </>

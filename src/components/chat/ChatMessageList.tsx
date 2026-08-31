@@ -26,6 +26,7 @@ export function ChatMessageList({
   onRequestTeacher,
   isRequestingTeacher,
   teacherFeedback,
+  teacherFeedbackTone,
   moderationTargetId,
   onFollowUp,
   isFollowUpDisabled,
@@ -36,6 +37,7 @@ export function ChatMessageList({
   onRequestTeacher?: () => void
   isRequestingTeacher?: boolean
   teacherFeedback?: string | null
+  teacherFeedbackTone?: 'info' | 'error'
   moderationTargetId?: string | null
   onFollowUp?: (prompt: string) => void
   isFollowUpDisabled?: boolean
@@ -102,6 +104,7 @@ export function ChatMessageList({
                 onRequestTeacher={onRequestTeacher}
                 isRequestingTeacher={isRequestingTeacher}
                 teacherFeedback={teacherFeedback}
+                teacherFeedbackTone={teacherFeedbackTone}
                 moderationTargetId={moderationTargetId}
               />
               {onFollowUp && index === followUpAnchorIndex && (

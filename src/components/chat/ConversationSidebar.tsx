@@ -1,4 +1,5 @@
 import { MessageSquarePlus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { ChatPageNavigation } from '@/components/chat/ChatPageNavigation'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
@@ -15,17 +16,20 @@ export function ConversationSidebar({
   onSelectConversation: (id: string) => void
   onCreateConversation?: () => void
 }) {
+  const { t } = useTranslation('chat')
+
   return (
-    <aside className="chat-panel hidden h-screen w-80 shrink-0 border-r p-4 md:block">
+    <aside className="chat-panel hidden h-full w-80 shrink-0 overflow-y-auto border-r p-4 md:block">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <div className="font-semibold">STOA Chat</div>
-          <div className="text-xs text-muted-foreground">Student learning conversations</div>
+          <div className="font-semibold">{t('conversations')}</div>
+          <div className="text-xs text-muted-foreground">{t('conversationsSubtitle')}</div>
         </div>
         <Button
           size="icon"
           variant="outline"
-          aria-label="New conversation"
+          aria-label={t('newConversation')}
+          title={t('newConversation')}
           onClick={onCreateConversation}
           disabled={!onCreateConversation}
         >

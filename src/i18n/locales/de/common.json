@@ -155,5 +155,29 @@
       "reviewed": "Geprüft",
       "resolved": "Gelöst"
     }
+  },
+  "notifications": {
+    "title": "Mitteilungen",
+    "subtitle": "Neues zu deinen Fragen, Übungen und Anfragen an Lehrpersonen.",
+    "unread": "{{count}} ungelesen",
+    "loading": "Mitteilungen werden geladen ...",
+    "unavailable": "Mitteilungen sind nicht verfügbar.",
+    "empty": "Noch keine Mitteilungen.",
+    "markRead": "Als gelesen markieren",
+    "archive": "Archivieren",
+    "openLabel": "Mitteilungen",
+    "openLabelUnread": "Mitteilungen, {{count}} ungelesen",
+    "connection": {
+      "live": "Aktuell",
+      "connecting": "Verbindung wird aufgebaut",
+      "reconnecting": "Verbindung wird wiederhergestellt",
+      "checking": "Sucht nach Neuem",
+      "offline": "Offline"
+    },
+    "itemStatus": {
+      "created": "Neu",
+      "read": "Gelesen",
+      "archived": "Archiviert"
+    }
   }
 }
