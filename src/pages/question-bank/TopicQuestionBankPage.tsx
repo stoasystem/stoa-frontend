@@ -43,7 +43,7 @@ export function TopicQuestionBankPage() {
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
               <Metric label="Completed" value={`${progress.completedSets} / ${progress.totalSets}`} />
               <Metric label="Accuracy" value={`${progress.accuracy}%`} />
-              <Metric label={t('ui.needsReview')} value={topic.weakArea ?? 'Keep practising'} />
+              <Metric label={t('ui.needsReview')} value={topic.weakArea ?? t('ui.keepPractising')} />
             </div>
           </div>
           <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5">

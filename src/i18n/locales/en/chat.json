@@ -61,6 +61,12 @@
     "resolved": "Tutor support completed"
   },
   "subjectForQuestion": "Subject for this question",
+  "subjects": {
+    "math": "Mathematics",
+    "physics": "Physics",
+    "german": "German",
+    "english": "English"
+  },
   "conversations": "Conversations",
   "conversationsSubtitle": "Your learning conversations",
   "backToConversations": "Back to conversations",

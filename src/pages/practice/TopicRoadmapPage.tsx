@@ -22,7 +22,7 @@ import {
 import type { PracticeSubject, PracticeTopic, PracticeRoadmapLesson } from '@/types/practice'
 
 export function TopicRoadmapPage() {
-  const { t } = useTranslation('practice')
+  const { t } = useTranslation(['practice', 'uploads'])
   const { subjectId, topicId } = useParams()
   const navigate = useNavigate()
   const resolvedSubjectId = subjectId ?? 'mathematics'
@@ -45,9 +45,9 @@ export function TopicRoadmapPage() {
   function askWithPracticeUpload(attachments: UploadAttachment[]) {
     const uploadContext = {
       source: 'practice-upload' as const,
-      title: topic ? `${topic.title} schoolwork upload` : 'Practice schoolwork upload',
-      description: 'Bring your own schoolwork into the Learning Assistant.',
-      prompt: 'I uploaded a schoolwork question for Practice Path. Please guide me step by step and help me understand the unclear part.',
+      title: t('uploads:learning.uploadOwnQuestionTitle'),
+      description: t('uploads:learning.uploadOwnQuestionDescription'),
+      prompt: t('uploads:chat.defaultAttachmentPrompt'),
       returnTo: `/practice/${resolvedSubjectId}/${resolvedTopicId}`,
       attachments,
     }
@@ -62,25 +62,25 @@ export function TopicRoadmapPage() {
           <PageHeader
             className="mb-0"
             eyebrow={t('ui.practiceSubject')}
-            title={subject ? `${subject.name} Practice Path` : 'Practice Path'}
+            title={subject ? t('ui.practicePathWithSubject', { subject: subject.name }) : t('ui.practicePath')}
             description={topic?.description ?? subject?.description ?? t('roadmap.pageDescription')}
           />
           <Button asChild variant="outline">
             <Link to="/practice">
               <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Subjects
+              {t('ui.subjectsLink')}
             </Link>
           </Button>
         </div>
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
-        {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
+        {overviewQuery.isError && <p className="text-sm text-destructive">{t('ui.practiceOverviewUnavailable')}</p>}
         {overview && !canOpenRoadmap && (
           <PreparedSubjectState subject={subject} topic={topic} />
         )}
         {overview && canOpenRoadmap && (
           <div className="space-y-8">
             {roadmapQuery.isLoading && <PageSkeleton rows={4} />}
-            {roadmapQuery.isError && <p className="text-sm text-destructive">Practice roadmap is unavailable.</p>}
+            {roadmapQuery.isError && <p className="text-sm text-destructive">{t('ui.roadmapUnavailable')}</p>}
             {roadmap && <PracticeRoadmap onLessonClick={handleRoadmapLessonClick} roadmap={roadmap} />}
             <InlineUploadPanel
               context="practice_path"
@@ -116,6 +116,7 @@ function PreparedSubjectState({
   subject?: PracticeSubject
   topic?: PracticeTopic
 }) {
+  const { t } = useTranslation('practice')
   return (
     <Card className="border-dashed border-primary/25 bg-card/85 shadow-[var(--platform-shadow-card)]">
       <CardContent className="p-6 md:p-8">
@@ -124,24 +125,23 @@ function PreparedSubjectState({
             <div className="flex h-11 w-11 items-center justify-center rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] text-primary">
               <BookOpenCheck className="h-5 w-5" aria-hidden="true" />
             </div>
-            <p className="brand-section-kicker mt-5">Subject path</p>
+            <p className="brand-section-kicker mt-5">{t('ui.subjectPathKicker')}</p>
             <h2 className="mt-2 text-3xl font-semibold tracking-normal">
-              {subject?.name ?? 'This subject'} path is not available yet
+              {t('ui.subjectPathNotAvailable', { subject: subject?.name ?? t('ui.subjectsLink') })}
             </h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              This subject is listed in the Practice catalog. Full Practice Path lessons will open after the topic
-              sequence is ready.
+              {t('ui.subjectPathNotAvailableBody')}
             </p>
           </div>
           <div className="w-full rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4 text-sm lg:max-w-xs">
-            <p className="font-medium text-foreground">{topic?.title ?? 'Topic not selected'}</p>
+            <p className="font-medium text-foreground">{topic?.title ?? t('ui.topicNotSelected')}</p>
             <p className="mt-2 leading-6 text-muted-foreground">
-              {topic?.description ?? subject?.description ?? 'Choose another subject to continue practice today.'}
+              {topic?.description ?? subject?.description ?? t('ui.chooseAnotherSubject')}
             </p>
           </div>
         </div>
         <Button asChild className="mt-6" variant="outline">
-          <Link to="/practice">Back to subjects</Link>
+          <Link to="/practice">{t('ui.backToSubjects')}</Link>
         </Button>
       </CardContent>
     </Card>

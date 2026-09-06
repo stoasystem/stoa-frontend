@@ -61,6 +61,12 @@
     "resolved": "Unterstützung abgeschlossen"
   },
   "subjectForQuestion": "Fach für diese Frage",
+  "subjects": {
+    "math": "Mathematik",
+    "physics": "Physik",
+    "german": "Deutsch",
+    "english": "Englisch"
+  },
   "conversations": "Unterhaltungen",
   "conversationsSubtitle": "Deine Lernunterhaltungen",
   "backToConversations": "Zurück zu den Unterhaltungen",

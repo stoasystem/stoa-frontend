@@ -61,6 +61,12 @@
     "resolved": "Supporto insegnante completato"
   },
   "subjectForQuestion": "Materia di questa domanda",
+  "subjects": {
+    "math": "Matematica",
+    "physics": "Fisica",
+    "german": "Tedesco",
+    "english": "Inglese"
+  },
   "conversations": "Conversazioni",
   "conversationsSubtitle": "Le tue conversazioni di apprendimento",
   "backToConversations": "Torna alle conversazioni",

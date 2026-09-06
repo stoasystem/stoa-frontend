@@ -13,7 +13,7 @@ import { useCurriculumProgressQuery } from '@/hooks/practice/useCurriculumProgre
 import { usePracticeOverviewQuery } from '@/hooks/practice/usePracticeOverviewQuery'
 
 export function PracticePathTab() {
-  const { t } = useTranslation('practice')
+  const { t } = useTranslation(['practice', 'uploads'])
   const navigate = useNavigate()
   const overviewQuery = usePracticeOverviewQuery()
   const curriculumQuery = useCurriculumCatalogQuery()
@@ -22,9 +22,9 @@ export function PracticePathTab() {
   function askWithPracticeUpload(attachments: UploadAttachment[]) {
     const uploadContext = {
       source: 'practice-upload' as const,
-      title: 'Practice schoolwork upload',
-      description: 'Bring your own schoolwork into the Learning Assistant.',
-      prompt: 'I uploaded a schoolwork question. Please guide me step by step and help me understand the unclear part.',
+      title: t('uploads:learning.uploadOwnQuestionTitle'),
+      description: t('uploads:learning.uploadOwnQuestionDescription'),
+      prompt: t('uploads:chat.defaultAttachmentPrompt'),
       returnTo: '/practice',
       attachments,
     }

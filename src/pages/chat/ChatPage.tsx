@@ -184,7 +184,7 @@ export function ChatPage() {
     const initialAttachments = uploadContext?.attachments.map(uploadAttachmentToUploadedFile)
 
     const profile = studentProfileQuery.data
-    const subject = selectedSubject.label
+    const subject = selectedSubject.id
     const grade = profile?.grade ?? 'Grade 8'
 
     createConversationMutation.mutate(
@@ -374,7 +374,7 @@ export function ChatPage() {
                     onClick={() => setSelectedSubjectId(subject.id)}
                     aria-pressed={selected}
                   >
-                    <span className="font-medium">{subject.label}</span>
+                    <span className="font-medium">{t(subject.labelKey)}</span>
                     <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
                       {subject.rolloutState === 'active' ? tPractice('progress.subjectActive') : tPractice('progress.subjectFoundation')}
                     </Badge>
@@ -675,8 +675,5 @@ function UploadLearningContextCard({
 function subjectIdFromProfile(subject: string | undefined) {
   if (!subject) return undefined
   const normalized = subject.toLowerCase()
-  return learningSubjectOptions.find((option) => (
-    normalized.includes(option.id)
-    || normalized.includes(option.label.toLowerCase())
-  ))?.id
+  return learningSubjectOptions.find((option) => normalized.includes(option.id))?.id
 }

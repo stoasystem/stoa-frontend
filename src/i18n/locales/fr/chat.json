@@ -61,6 +61,12 @@
     "resolved": "Aide enseignante terminée"
   },
   "subjectForQuestion": "Matière de cette question",
+  "subjects": {
+    "math": "Mathématiques",
+    "physics": "Physique",
+    "german": "Allemand",
+    "english": "Anglais"
+  },
   "conversations": "Conversations",
   "conversationsSubtitle": "Tes conversations d’apprentissage",
   "backToConversations": "Retour aux conversations",

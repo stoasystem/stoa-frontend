@@ -2,7 +2,7 @@ export type LearningSubjectRolloutState = 'active' | 'foundation'
 
 export type LearningSubjectDefinition = {
   id: string
-  label: string
+  labelKey: string
   rolloutState: LearningSubjectRolloutState
 }
 
@@ -35,8 +35,8 @@ export type LearningProfile = {
 }
 
 export const learningSubjectOptions: LearningSubjectDefinition[] = [
-  { id: 'math', label: 'Mathematics', rolloutState: 'active' },
-  { id: 'physics', label: 'Physics', rolloutState: 'foundation' },
-  { id: 'german', label: 'German', rolloutState: 'foundation' },
-  { id: 'english', label: 'English', rolloutState: 'foundation' },
+  { id: 'math', labelKey: 'subjects.math', rolloutState: 'active' },
+  { id: 'physics', labelKey: 'subjects.physics', rolloutState: 'foundation' },
+  { id: 'german', labelKey: 'subjects.german', rolloutState: 'foundation' },
+  { id: 'english', labelKey: 'subjects.english', rolloutState: 'foundation' },
 ]

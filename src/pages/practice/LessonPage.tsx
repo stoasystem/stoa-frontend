@@ -214,7 +214,7 @@ export function LessonPage() {
         </div>
 
         {lessonQuery.isLoading && <PageSkeleton rows={4} />}
-        {lessonQuery.isError && <p className="text-sm text-destructive">Lesson is unavailable.</p>}
+        {lessonQuery.isError && <p className="text-sm text-destructive">{t('ui.lessonUnavailable')}</p>}
 
         {lesson && challenge && (
           !lessonStarted ? (
@@ -222,28 +222,28 @@ export function LessonPage() {
               <div className="space-y-5">
                 <div className="inline-flex items-center gap-2 rounded-md bg-[hsl(var(--stoa-brand-burgundy-soft))] px-3 py-2 text-sm font-semibold text-primary">
                   <BookOpenCheck className="h-4 w-4" aria-hidden="true" />
-                  Practice Path lesson
+                  {t('ui.practicePathLessonKicker')}
                 </div>
                 <div>
                   <h2 className="text-3xl font-semibold tracking-tight">{lesson.title}</h2>
                   <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-                    You will practice one focused skill at a time. Check each answer, use a hint if needed, and ask for a guided explanation only when the next step is still unclear.
+                    {t('ui.lessonIntroBody')}
                   </p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <LessonStartSignal icon={ListChecks} label="Checks" value={`${lesson.challenges.length} focused steps`} />
+                  <LessonStartSignal icon={ListChecks} label={t('ui.checksLabel')} value={t('ui.focusedStepsValue', { count: lesson.challenges.length })} />
                   <LessonStartSignal icon={Clock3} label={t('ui.estimatedTime')} value={`${lesson.estimatedMinutes} min`} />
-                  <LessonStartSignal icon={MessageCircle} label="Support" value={t('ui.hintFirst')} />
+                  <LessonStartSignal icon={MessageCircle} label={t('ui.supportLabel')} value={t('ui.hintFirst')} />
                 </div>
                 <Button onClick={() => setLessonStarted(true)} type="button">
                   {t('startLesson')}
                 </Button>
               </div>
               <aside className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
-                <p className="brand-section-kicker">What you will practice</p>
+                <p className="brand-section-kicker">{t('ui.whatYouWillPractice')}</p>
                 <h3 className="mt-3 text-xl font-semibold">{lesson.topic}</h3>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  The goal is to choose the next useful operation, not to rush to the final answer.
+                  {t('ui.lessonGoalBody')}
                 </p>
               </aside>
             </section>
@@ -256,7 +256,7 @@ export function LessonPage() {
                 <Button disabled={!canCheck || submitAnswer.isPending || Boolean(state.feedback)} onClick={handleCheck} type="button">
                   {t('checkAnswer')}
                 </Button>
-                <p className="text-sm text-muted-foreground">Attempts are practice chances, not penalties.</p>
+                <p className="text-sm text-muted-foreground">{t('ui.attemptsArePracticeChances')}</p>
               </div>
               {state.feedback && (
                 <ChallengeFeedback
@@ -276,13 +276,13 @@ export function LessonPage() {
               />
             </div>
             <aside className="space-y-4 rounded-lg border bg-card/80 p-5">
-              <p className="brand-section-kicker">Lesson focus</p>
+              <p className="brand-section-kicker">{t('ui.lessonFocusKicker')}</p>
               <h2 className="text-xl font-semibold">{lesson.topic}</h2>
               <p className="text-sm leading-6 text-muted-foreground">
-                Work through one step at a time. If a mistake appears, use the hint before asking for a fuller explanation.
+                {t('ui.lessonFocusBody')}
               </p>
               <div className="rounded-md bg-muted/50 p-3 text-sm">
-                Attempts left: {state.feedback?.attemptsRemaining ?? 2}
+                {t('ui.attemptsLeft', { count: state.feedback?.attemptsRemaining ?? 2 })}
               </div>
             </aside>
           </div>

@@ -21,6 +21,15 @@ export function isSupportedLanguage(value: string | null | undefined): value is 
   return supportedLanguages.includes(value as SupportedLanguage)
 }
 
+export function resolveUserLanguage(user: {
+  effectiveLocale?: string
+  preferredLocale?: string
+  preferredLanguage?: string
+}): SupportedLanguage | undefined {
+  const locale = user.effectiveLocale ?? user.preferredLocale ?? user.preferredLanguage
+  return isSupportedLanguage(locale) ? locale : undefined
+}
+
 export function getInitialLanguage(): SupportedLanguage {
   if (typeof window === 'undefined') return 'en'
 

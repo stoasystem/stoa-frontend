@@ -1,9 +1,13 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import i18n from '@/i18n'
+import { resolveUserLanguage } from '@/i18n/languages'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
+import { getConversations } from '@/services/chat/chatApi'
+import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore } from '@/store/authStore'
@@ -56,6 +60,7 @@ export function useLoginMutation() {
   const location = useLocation()
   const { t } = useTranslation('auth')
   const setAuth = useAuthStore((state) => state.setAuth)
+  const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (payload: LoginRequest) => login(payload),
@@ -64,6 +69,11 @@ export function useLoginMutation() {
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       toast.success(t('login.signedIn'))
+      // 登录时就切语言，避免等 /auth/me 才切换造成闪烁
+      const locale = resolveUserLanguage(data.user)
+      if (locale && i18n.language !== locale) {
+        void i18n.changeLanguage(locale)
+      }
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''
       const queryNext = new URLSearchParams(location.search).get('next')
@@ -73,6 +83,15 @@ export function useLoginMutation() {
         from,
         search,
       })
+      // ChatPage waits on this query before it counts as usable (BUG-008);
+      // firing it here overlaps that round trip with the route transition
+      // instead of waiting for the page to mount first.
+      if (data.user.role === 'student') {
+        void queryClient.prefetchQuery({
+          queryKey: chatQueryKeys.conversations(),
+          queryFn: getConversations,
+        })
+      }
       navigate(nextPath)
     },
     onError: (error) => {
