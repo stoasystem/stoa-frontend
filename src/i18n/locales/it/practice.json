@@ -116,7 +116,9 @@
     "subjectSubtitle": "Esercizi per argomento e livello. Scegli una serie mirata o sfoglia gli argomenti.",
     "nextSets": "Prossime serie consigliate per questa materia.",
     "setFailed": "Non è stato possibile caricare questa serie.",
-    "returnHint": "Torna alla biblioteca di esercizi e riprova."
+    "returnHint": "Torna alla biblioteca di esercizi e riprova.",
+    "setsMatchFilters_one": "{{count}} esercizio corrisponde ai filtri attuali.",
+    "setsMatchFilters_other": "{{count}} esercizi corrispondono ai filtri attuali."
   },
   "path": {
     "subtitle": "Brevi esercizi sugli argomenti scolastici, con suggerimenti e un posto dove chiedere aiuto.",
@@ -169,6 +171,11 @@
     "uploadWhilePractising": "Carica una foto o un PDF e chiedi all’assistente mentre continui a esercitarti.",
     "reviewWork": "Rivedi il lavoro",
     "practiceLibrary": "Biblioteca di esercizi",
+    "practiceLibraryEyebrow": "{{subject}} / Biblioteca di esercizi",
+    "topicProgress": "I tuoi progressi",
+    "relatedPathTitle": "Percorso di apprendimento correlato",
+    "relatedPathBody": "Segui il Percorso di pratica guidato per progredire lezione dopo lezione su questo argomento.",
+    "openPracticePath": "Apri il percorso di pratica",
     "uploadQuestion": "Carica un esercizio",
     "uploadBody": "Scatta una foto o allega un PDF dei compiti. L’assistente ti guida passo passo.",
     "findExercises": "Trova esercizi",

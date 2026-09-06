@@ -33,26 +33,26 @@ export function TopicQuestionBankPage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow={`${subject.title} / Practice Library`}
+          eyebrow={t('ui.practiceLibraryEyebrow', { subject: subject.title })}
           title={topic.title}
           description={topic.description}
         />
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <div className="rounded-lg border bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-            <p className="brand-section-kicker">Your Progress</p>
+            <p className="brand-section-kicker">{t('ui.topicProgress')}</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <Metric label="Completed" value={`${progress.completedSets} / ${progress.totalSets}`} />
-              <Metric label="Accuracy" value={`${progress.accuracy}%`} />
+              <Metric label={t('ui.completed')} value={`${progress.completedSets} / ${progress.totalSets}`} />
+              <Metric label={t('learn.metricAccuracy')} value={`${progress.accuracy}%`} />
               <Metric label={t('ui.needsReview')} value={topic.weakArea ?? t('ui.keepPractising')} />
             </div>
           </div>
           <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5">
-            <p className="brand-section-kicker">Related Learning Path</p>
+            <p className="brand-section-kicker">{t('ui.relatedPathTitle')}</p>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Follow the guided Practice Path when you want lesson progression for this topic.
+              {t('ui.relatedPathBody')}
             </p>
             <Button asChild variant="outline" className="mt-4 w-full">
-              <Link to={getPracticeTopicPath(subject.id, topic.id)}>Open Practice Path</Link>
+              <Link to={getPracticeTopicPath(subject.id, topic.id)}>{t('ui.openPracticePath')}</Link>
             </Button>
           </div>
         </section>
@@ -65,7 +65,7 @@ export function TopicQuestionBankPage() {
           showStatus
         />
         <section className="space-y-4">
-          <SectionHeader title={t('ui.questionSets')} description={`${sets.length} set${sets.length === 1 ? '' : 's'} match the current filters.`} />
+          <SectionHeader title={t('ui.questionSets')} description={t('library.setsMatchFilters', { count: sets.length })} />
           <div className="grid gap-4 lg:grid-cols-2">
             {sets.map((set) => (
               <QuestionSetCard key={set.id} set={set} />

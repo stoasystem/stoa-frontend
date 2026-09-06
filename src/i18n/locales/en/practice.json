@@ -116,7 +116,9 @@
     "subjectSubtitle": "Exercises by topic and level. Choose a focused set or browse the topics.",
     "nextSets": "Good next sets for this subject.",
     "setFailed": "We could not load this practice set.",
-    "returnHint": "Please return to the Practice Library and try again."
+    "returnHint": "Please return to the Practice Library and try again.",
+    "setsMatchFilters_one": "{{count}} set matches the current filters.",
+    "setsMatchFilters_other": "{{count}} sets match the current filters."
   },
   "path": {
     "subtitle": "Short challenges for school topics, with hints and a place to ask when a step is unclear.",
@@ -169,6 +171,11 @@
     "uploadWhilePractising": "Upload a photo or PDF and ask the Learning Assistant while you keep practising.",
     "reviewWork": "Review work",
     "practiceLibrary": "Practice Library",
+    "practiceLibraryEyebrow": "{{subject}} / Practice Library",
+    "topicProgress": "Your Progress",
+    "relatedPathTitle": "Related Learning Path",
+    "relatedPathBody": "Follow the guided Practice Path when you want lesson progression for this topic.",
+    "openPracticePath": "Open Practice Path",
     "uploadQuestion": "Upload a Question",
     "uploadBody": "Take a photo or attach a PDF from your schoolwork. The Learning Assistant guides you step by step.",
     "findExercises": "Find Exercises",

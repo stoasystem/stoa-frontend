@@ -116,7 +116,9 @@
     "subjectSubtitle": "Übungen nach Thema und Niveau. Wähle ein gezieltes Set oder sieh dir die Themen an.",
     "nextSets": "Passende nächste Sets für dieses Fach.",
     "setFailed": "Dieses Übungsset konnte nicht geladen werden.",
-    "returnHint": "Bitte zurück zur Übungsbibliothek gehen und es erneut versuchen."
+    "returnHint": "Bitte zurück zur Übungsbibliothek gehen und es erneut versuchen.",
+    "setsMatchFilters_one": "{{count}} Set passt zu den aktuellen Filtern.",
+    "setsMatchFilters_other": "{{count}} Sets passen zu den aktuellen Filtern."
   },
   "path": {
     "subtitle": "Kurze Aufgaben zu Schulthemen, mit Hinweisen und einer Stelle zum Nachfragen, wenn ein Schritt unklar ist.",
@@ -169,6 +171,11 @@
     "uploadWhilePractising": "Lade ein Foto oder PDF hoch und frag den Lernassistenten, während du weiterübst.",
     "reviewWork": "Arbeit ansehen",
     "practiceLibrary": "Übungsbibliothek",
+    "practiceLibraryEyebrow": "{{subject}} / Übungsbibliothek",
+    "topicProgress": "Dein Fortschritt",
+    "relatedPathTitle": "Verwandter Lernpfad",
+    "relatedPathBody": "Folge dem geführten Übungspfad, wenn du für dieses Thema eine Lektionsabfolge möchtest.",
+    "openPracticePath": "Übungspfad öffnen",
     "uploadQuestion": "Aufgabe hochladen",
     "uploadBody": "Fotografiere deine Schulaufgabe oder hänge ein PDF an. Der Lernassistent führt dich Schritt für Schritt.",
     "findExercises": "Übungen finden",

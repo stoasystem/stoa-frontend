@@ -64,15 +64,15 @@ export function useLoginMutation() {
 
   return useMutation({
     mutationFn: (payload: LoginRequest) => login(payload),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       setAuth(data.user, data.accessToken)
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       toast.success(t('login.signedIn'))
-      // 登录时就切语言，避免等 /auth/me 才切换造成闪烁
+      // 切完语言再跳转，避免路由已经渲染但语言还没切换完成的闪烁
       const locale = resolveUserLanguage(data.user)
       if (locale && i18n.language !== locale) {
-        void i18n.changeLanguage(locale)
+        await i18n.changeLanguage(locale)
       }
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''

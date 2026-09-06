@@ -116,7 +116,9 @@
     "subjectSubtitle": "Exercices par sujet et niveau. Choisis une série ciblée ou parcours les sujets.",
     "nextSets": "Séries à faire ensuite dans cette matière.",
     "setFailed": "Cette série n’a pas pu être chargée.",
-    "returnHint": "Retourne à la bibliothèque d’exercices et réessaie."
+    "returnHint": "Retourne à la bibliothèque d’exercices et réessaie.",
+    "setsMatchFilters_one": "{{count}} exercice correspond aux filtres actuels.",
+    "setsMatchFilters_other": "{{count}} exercices correspondent aux filtres actuels."
   },
   "path": {
     "subtitle": "De courts exercices sur les sujets scolaires, avec des indices et un endroit où demander de l’aide.",
@@ -169,6 +171,11 @@
     "uploadWhilePractising": "Téléverse une photo ou un PDF et interroge l’assistant tout en continuant.",
     "reviewWork": "Revoir le travail",
     "practiceLibrary": "Bibliothèque d’exercices",
+    "practiceLibraryEyebrow": "{{subject}} / Bibliothèque d’exercices",
+    "topicProgress": "Ta progression",
+    "relatedPathTitle": "Parcours d’apprentissage associé",
+    "relatedPathBody": "Suis le Parcours d’entraînement guidé pour progresser leçon par leçon sur ce thème.",
+    "openPracticePath": "Ouvrir le parcours d’entraînement",
     "uploadQuestion": "Téléverser un exercice",
     "uploadBody": "Prends une photo ou joins un PDF de tes devoirs. L’assistant te guide pas à pas.",
     "findExercises": "Trouver des exercices",
