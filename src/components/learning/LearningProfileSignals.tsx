@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Gauge, HelpCircle } from 'lucide-react'
+import i18n from '@/i18n'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
@@ -21,6 +22,7 @@ export function LearningProfileSignals({
   isError,
 }: LearningProfileSignalsProps) {
   const { t: tPractice } = useTranslation('practice')
+  const { t: tChat } = useTranslation('chat')
   const activity = profile?.subjectActivity ?? []
   const weakTopics = profile?.weakTopics ?? []
 
@@ -47,7 +49,7 @@ export function LearningProfileSignals({
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-medium">{subject.label}</p>
+                        <p className="text-sm font-medium">{tChat(subject.labelKey)}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
                           {formatRolloutState(subject.rolloutState)}
                         </p>
@@ -156,7 +158,8 @@ function formatFeedback(value: number | null | undefined) {
 }
 
 function formatSubjectLabel(profile: LearningProfile, subjectId: string) {
-  return profile.subjects.find((subject) => subject.id === subjectId)?.label ?? subjectId
+  const subject = profile.subjects.find((item) => item.id === subjectId)
+  return subject ? i18n.t(subject.labelKey, { ns: 'chat' }) : subjectId
 }
 
 function formatDate(value: string) {

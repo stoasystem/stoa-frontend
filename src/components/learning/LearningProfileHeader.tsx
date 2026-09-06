@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import type { LearningProfile } from '@/types/learningProfile'
 
 export function LearningProfileHeader({ profile }: { profile: LearningProfile }) {
+  const { t } = useTranslation('chat')
   const totals = profile.subjectActivity.reduce(
     (acc, subject) => ({
       questionCount: acc.questionCount + subject.questionCount,
@@ -18,7 +20,7 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
           <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">Student learning profile</p>
           <h2 className="mt-2 text-2xl font-semibold">{profile.studentId}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {profile.subjects.map((subject) => subject.label).join(', ')}
+            {profile.subjects.map((subject) => t(subject.labelKey)).join(', ')}
           </p>
         </div>
         <div className="grid grid-cols-3 gap-3 text-sm">
