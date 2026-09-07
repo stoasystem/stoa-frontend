@@ -34,12 +34,12 @@ export function PracticeContextCard({
           <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
             {typeof context.attempts === 'number' && (
               <span className="rounded-full border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
-                Attempts: {context.attempts}
+                {t('practiceContext.attempts', { attempts: context.attempts })}
               </span>
             )}
             {context.hintViewed && (
               <span className="rounded-full border bg-[hsl(var(--platform-surface-app))] px-2.5 py-1">
-                Hint viewed
+                {t('practiceContext.hintViewed')}
               </span>
             )}
           </div>

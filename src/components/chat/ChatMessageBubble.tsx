@@ -5,26 +5,20 @@ import { AttachmentPreview } from '@/components/chat/AttachmentPreview'
 import { RetryMessageButton } from '@/components/chat/RetryMessageButton'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { formatTimeOfDay } from '@/lib/formatDateTime'
 import { useTranslation } from 'react-i18next'
 
-function formatMessageTime(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value))
-}
-
-function getRoleLabel(message: ChatMessage) {
-  if (message.role === 'teacher') return 'Tutor'
-  if (message.role === 'system') return 'System'
-  if (message.role === 'assistant') return 'STOA Learning Assistant'
+function roleLabelKey(message: ChatMessage) {
+  if (message.role === 'teacher') return 'roles.tutor'
+  if (message.role === 'system') return 'roles.system'
+  if (message.role === 'assistant') return 'roles.assistant'
   return null
 }
 
-function getStatusLabel(message: ChatMessage) {
-  if (message.status === 'sending') return 'Sending'
-  if (message.status === 'stopped') return 'Generation stopped'
-  if (message.status === 'failed') return 'Needs retry'
+function statusLabelKey(message: ChatMessage) {
+  if (message.status === 'sending') return 'messageStatus.sending'
+  if (message.status === 'stopped') return 'messageStatus.stopped'
+  if (message.status === 'failed') return 'messageStatus.failed'
   return null
 }
 
@@ -59,8 +53,8 @@ export function ChatMessageBubble({
   const isStudent = message.role === 'student'
   const isSystem = message.role === 'system'
   const isStreaming = message.status === 'streaming'
-  const roleLabel = getRoleLabel(message)
-  const statusLabel = getStatusLabel(message)
+  const roleKey = roleLabelKey(message)
+  const statusKey = statusLabelKey(message)
 
   if (isSystem) {
     return (
@@ -88,14 +82,14 @@ export function ChatMessageBubble({
           message.status === 'failed' && 'border-destructive/50',
         )}
       >
-        {roleLabel && (
+        {roleKey && (
           <div
             className={cn(
               'mb-1 text-[11px] font-medium',
               message.role === 'teacher' ? 'text-[hsl(var(--stoa-brand-burgundy))]' : 'text-muted-foreground',
             )}
           >
-            {roleLabel}
+            {t(roleKey)}
           </div>
         )}
         <div className="whitespace-pre-wrap break-words">
@@ -104,7 +98,7 @@ export function ChatMessageBubble({
               {message.content
                 ? <MathRenderer>{message.content}</MathRenderer>
                 : isStreaming
-                  ? <span className="text-muted-foreground/60 text-xs italic">Thinking…</span>
+                  ? <span className="text-muted-foreground/60 text-xs italic">{t('thinking')}</span>
                   : null}
               {isStreaming && <StreamingCursor />}
             </>
@@ -125,8 +119,8 @@ export function ChatMessageBubble({
             isStudent ? 'text-primary-foreground/75' : 'text-muted-foreground',
           )}
         >
-          <span>{formatMessageTime(message.createdAt)}</span>
-          {statusLabel && <span>{statusLabel}</span>}
+          <span>{formatTimeOfDay(message.createdAt)}</span>
+          {statusKey && <span>{t(statusKey)}</span>}
         </div>
         {message.status === 'failed' && isStudent && onRetry && (
           <div className="mt-3">
@@ -146,8 +140,8 @@ export function ChatMessageBubble({
             <ModerationReportDialog
               questionId={moderationTargetId}
               surface="ai_answer"
-              triggerLabel="Report answer"
-              contextLabel="Send this assistant response to the internal moderation queue."
+              triggerLabel={t('report.trigger')}
+              contextLabel={t('report.context')}
               defaultReason="incorrect_answer"
             />
           </div>

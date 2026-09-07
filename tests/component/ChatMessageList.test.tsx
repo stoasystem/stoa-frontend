@@ -9,9 +9,7 @@ import { ChatMessageList } from '@/components/chat/ChatMessageList'
 import type { ChatMessage } from '@/types/chat'
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string, options?: { defaultValue?: string }) => options?.defaultValue ?? key,
-  }),
+  useTranslation: () => ({ t: (key: string) => key }),
 }))
 
 function msg(id: string, role: ChatMessage['role'], status = 'completed'): ChatMessage {
@@ -24,7 +22,8 @@ function msg(id: string, role: ChatMessage['role'], status = 'completed'): ChatM
   } as ChatMessage
 }
 
-const FOLLOW_UP = "I don't understand one of the steps"
+// The mocked `t` echoes the key, so this is what the first chip renders as.
+const FOLLOW_UP = 'followUp.explainStep'
 
 describe('follow-up suggestions', () => {
   it('are offered after a completed assistant answer', () => {

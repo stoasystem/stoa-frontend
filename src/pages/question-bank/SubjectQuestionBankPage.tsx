@@ -36,11 +36,11 @@ export function SubjectQuestionBankPage() {
         <section className="grid gap-3 sm:grid-cols-3">
           <Metric label={t('ui.setsCompleted')} value={`${progress.completedSets}`} />
           <Metric label={t('ui.questionsAnswered')} value={`${progress.answeredQuestions}`} />
-          <Metric label="Accuracy" value={`${progress.accuracy}%`} />
+          <Metric label={t('ui.accuracy')} value={`${progress.accuracy}%`} />
         </section>
         <QuestionBankFilters value={filters} onChange={setFilters} showQuestionType={false} showStatus={false} />
         <section className="space-y-4">
-          <SectionHeader title="Topics" description={t('ui.openTopicHint')} />
+          <SectionHeader title={t('ui.topics')} description={t('ui.openTopicHint')} />
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {filteredTopics.map((topic) => (
               <TopicCard key={topic.id} topic={topic} />

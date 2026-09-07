@@ -2,14 +2,17 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 
 /**
- * i18n keys for the canned follow-up prompts. The English text in
- * `fallback` is used when the chat namespace has not been translated yet.
+ * The canned follow-up prompts.
+ *
+ * These carried inline English fallbacks against keys that were never added to
+ * any locale, so the chips — and the message sent when one was pressed — stayed
+ * English in every language. The keys exist now, so the text is the translation.
  */
 const SUGGESTIONS = [
-  { key: 'followUp.explainStep', fallback: "I don't understand one of the steps" },
-  { key: 'followUp.simpler', fallback: 'Can you explain it more simply?' },
-  { key: 'followUp.similar', fallback: 'Give me a similar exercise' },
-  { key: 'followUp.why', fallback: 'Why does this work?' },
+  'followUp.explainStep',
+  'followUp.simpler',
+  'followUp.similar',
+  'followUp.why',
 ] as const
 
 export function FollowUpSuggestions({
@@ -22,9 +25,9 @@ export function FollowUpSuggestions({
   const { t } = useTranslation('chat')
 
   return (
-    <div className="mt-3 flex flex-wrap gap-2" aria-label={t('followUp.label', { defaultValue: 'Follow-up suggestions' })}>
-      {SUGGESTIONS.map(({ key, fallback }) => {
-        const label = t(key, { defaultValue: fallback })
+    <div className="mt-3 flex flex-wrap gap-2" aria-label={t('followUp.label')}>
+      {SUGGESTIONS.map((key) => {
+        const label = t(key)
         return (
           <Button
             key={key}

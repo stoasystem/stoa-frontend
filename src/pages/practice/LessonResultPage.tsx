@@ -23,16 +23,13 @@ export function LessonResultPage() {
         <PageHeader
           eyebrow={t('ui.lessonComplete')}
           title={t('path.reviewSession')}
-          description="A concise summary of the practice session and the steps worth reviewing."
+          description={t('lessonResult.pageDescription')}
         />
         {result === null ? (
           <div className="space-y-4 rounded-lg border border-border/70 bg-card/95 p-6">
-            <p className="text-sm text-muted-foreground">
-              This summary is shown right after you finish a lesson, and there is no finished
-              lesson to show yet.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('lessonResult.noResult')}</p>
             <Button asChild>
-              <Link to="/practice">Go to practice</Link>
+              <Link to="/practice">{t('lessonResult.goToPractice')}</Link>
             </Button>
           </div>
         ) : (
@@ -41,8 +38,10 @@ export function LessonResultPage() {
             {result.mistakes.length > 0 && (
               <section className="space-y-4">
                 <div>
-                  <p className="brand-section-kicker">Mistakes review</p>
-                  <h2 className="mt-2 text-2xl font-semibold">Worth one more look</h2>
+                  <p className="brand-section-kicker">{t('lessonResult.mistakesKicker')}</p>
+                  <h2 className="mt-2 text-2xl font-semibold">
+                    {t('lessonResult.mistakesTitle')}
+                  </h2>
                 </div>
                 {result.mistakes.map((mistake) => (
                   <MistakeReviewCard key={mistake.id} mistake={mistake} />

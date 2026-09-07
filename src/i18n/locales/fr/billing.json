@@ -26,25 +26,41 @@
       "name": "Essai gratuit",
       "audience": "Familles qui souhaitent essayer STOA avant de choisir une formule.",
       "cta": "Commencer l’essai",
-      "features": ["Questions guidées", "Espace parents", "Historique simple"]
+      "features": [
+        "Questions guidées",
+        "Espace parents",
+        "Historique simple"
+      ]
     },
     "student": {
       "name": "Formule élève",
       "audience": "Un élève qui a besoin d’un soutien régulier pour les devoirs.",
       "cta": "Choisir élève",
-      "features": ["Espace d’apprentissage", "Téléversement de devoirs", "Espace parents"]
+      "features": [
+        "Espace d’apprentissage",
+        "Téléversement de devoirs",
+        "Espace parents"
+      ]
     },
-    "tutor_supported": {
+    "teacher_supported": {
       "name": "Formule avec enseignant",
       "audience": "Familles qui souhaitent des questions hebdomadaires limitées à un enseignant.",
       "cta": "Choisir enseignant",
-      "features": ["Tout dans Élève", "Rapport hebdomadaire", "Questions enseignant limitées chaque semaine"]
+      "features": [
+        "Tout dans Élève",
+        "Rapport hebdomadaire",
+        "Questions enseignant limitées chaque semaine"
+      ]
     },
     "family": {
       "name": "Formule famille",
       "audience": "Familles qui veulent le niveau de soutien le plus élevé et un accès partagé.",
       "cta": "Choisir famille",
-      "features": ["Tout dans Avec enseignant", "5x plus de temps enseignant", "Avantages partagés jusqu’à 3 personnes"]
+      "features": [
+        "Tout dans Avec enseignant",
+        "5x plus de temps enseignant",
+        "Avantages partagés jusqu’à 3 personnes"
+      ]
     }
   }
 }

@@ -51,7 +51,9 @@
     },
     "learn": "Lernen",
     "about": "Über STOA",
-    "studentNavigationLabel": "Schülernavigation"
+    "studentNavigationLabel": "Schülernavigation",
+    "primary": "Hauptnavigation",
+    "mobilePrimary": "Hauptnavigation mobil"
   },
   "actions": {
     "startLearning": "Lernen starten",
@@ -69,7 +71,9 @@
     "viewPricing": "Preise ansehen",
     "askTeacher": "Lehrperson fragen",
     "send": "Nachricht senden",
-    "stop": "Stoppen"
+    "stop": "Stoppen",
+    "logOut": "Abmelden",
+    "tryAgain": "Erneut versuchen"
   },
   "roles": {
     "student": "Schüler/in",
@@ -180,5 +184,15 @@
       "read": "Gelesen",
       "archived": "Archiviert"
     }
-  }
+  },
+  "a11y": {
+    "loadingPage": "Seite wird geladen",
+    "loadingDashboard": "Übersicht wird geladen",
+    "breadcrumb": "Navigationspfad"
+  },
+  "errorBoundary": {
+    "title": "Etwas ist schiefgelaufen",
+    "body": "Bitte versuche es erneut oder lade die Seite neu."
+  },
+  "nextStep": "Empfohlener nächster Schritt"
 }

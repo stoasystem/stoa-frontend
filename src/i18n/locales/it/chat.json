@@ -29,7 +29,9 @@
     "recentAnswer": "Risposta recente",
     "backToLesson": "Torna alla lezione",
     "welcome": "Rivedi questo passaggio con l’Assistente all’apprendimento.",
-    "placeholder": "Chiedi il passaggio successivo, non solo la risposta finale..."
+    "placeholder": "Chiedi il passaggio successivo, non solo la risposta finale...",
+    "attempts": "Tentativi: {{attempts}}",
+    "hintViewed": "Suggerimento consultato"
   },
   "availability": {
     "checking": "Verifica insegnanti",
@@ -82,5 +84,64 @@
     "requesting": "Richiesta in corso...",
     "requestTeacher": "Richiedi insegnante",
     "planRestricted": "Il supporto dell'insegnante non fa parte del tuo piano attuale."
+  },
+  "roles": {
+    "tutor": "Tutor",
+    "system": "Sistema",
+    "assistant": "Assistente di apprendimento STOA"
+  },
+  "messageStatus": {
+    "sending": "Invio in corso",
+    "stopped": "Generazione interrotta",
+    "failed": "Da riprovare"
+  },
+  "thinking": "Sto pensando…",
+  "report": {
+    "trigger": "Segnala la risposta",
+    "context": "Invia questa risposta dell’assistente alla coda di moderazione interna."
+  },
+  "questionBankContext": {
+    "welcome": "Rivedi questo passaggio dell’esercizio con l’assistente di apprendimento.",
+    "placeholder": "Chiedi che cosa non è chiaro in questo esercizio..."
+  },
+  "uploadContext": {
+    "placeholder": "Indica all’assistente di apprendimento quale parte non è chiara..."
+  },
+  "defaultPrompt": {
+    "practice": "Puoi spiegare questo passaggio?",
+    "questionBank": "Puoi spiegare questo passaggio della biblioteca di esercizi?",
+    "questionStep": "Puoi spiegare questo passaggio dell’esercizio?"
+  },
+  "tutorEscalation": {
+    "requestedTitle": "Supporto del tutor richiesto",
+    "requestedBody": "Un tutor si unirà a questa conversazione appena sarà disponibile. Nel frattempo puoi continuare con l’assistente di apprendimento.",
+    "joinedTitle": "Il tutor è entrato",
+    "joinedBody": "L’assistente di apprendimento osserva mentre il tutor ti aiuta. Avvia un’aula dal vivo se ti serve un supporto più approfondito.",
+    "confirmJoined": "Il tutor è entrato",
+    "startClassroom": "Avvia l’aula dal vivo",
+    "preparingLobby": "Preparazione della sala...",
+    "lobbyFailed": "Non è stato possibile preparare la sala dell’aula. Riprova."
+  },
+  "contextLines": {
+    "uploadSource": "Origine del caricamento: {{title}}",
+    "questionSession": "Sessione di esercizi: {{sessionId}}",
+    "questionId": "Esercizio: {{questionId}}",
+    "attachedMaterial": "Materiale di apprendimento allegato: {{files}}",
+    "librarySet": "Serie della biblioteca di esercizi: {{title}}",
+    "libraryTopic": "Argomento della biblioteca di esercizi: {{topic}}",
+    "question": "Esercizio: {{prompt}}",
+    "myAnswer": "La mia risposta: {{answer}}",
+    "practiceTopic": "Argomento di pratica: {{topic}}",
+    "practiceQuestion": "Esercizio di pratica: {{prompt}}",
+    "attempts": "Tentativi: {{attempts}}",
+    "hintViewed": "Suggerimento consultato: sì"
+  },
+  "currentQuestion": "Esercizio in corso",
+  "followUp": {
+    "label": "Suggerimenti per continuare",
+    "explainStep": "Non capisco uno dei passaggi",
+    "simpler": "Puoi spiegarlo in modo più semplice?",
+    "similar": "Dammi un esercizio simile",
+    "why": "Perché funziona così?"
   }
 }

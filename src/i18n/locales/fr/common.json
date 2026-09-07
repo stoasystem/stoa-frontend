@@ -51,7 +51,9 @@
     },
     "learn": "Apprendre",
     "about": "À propos de STOA",
-    "studentNavigationLabel": "Navigation de l'élève"
+    "studentNavigationLabel": "Navigation de l'élève",
+    "primary": "Navigation principale",
+    "mobilePrimary": "Navigation principale mobile"
   },
   "actions": {
     "startLearning": "Commencer à apprendre",
@@ -69,7 +71,9 @@
     "viewPricing": "Voir les tarifs",
     "askTeacher": "Demander à un enseignant",
     "send": "Envoyer le message",
-    "stop": "Arrêter"
+    "stop": "Arrêter",
+    "logOut": "Se déconnecter",
+    "tryAgain": "Réessayer"
   },
   "roles": {
     "student": "Élève",
@@ -137,7 +141,7 @@
       "free_trial": "Essai gratuit",
       "student": "Formule élève",
       "family": "Formule famille",
-      "tutor_supported": "Formule avec enseignant"
+      "teacher_supported": "Formule avec enseignant"
     },
     "file": {
       "uploaded": "Téléversé",
@@ -180,5 +184,15 @@
       "read": "Lu",
       "archived": "Archivé"
     }
-  }
+  },
+  "a11y": {
+    "loadingPage": "Chargement de la page",
+    "loadingDashboard": "Chargement du tableau de bord",
+    "breadcrumb": "Fil d’Ariane"
+  },
+  "errorBoundary": {
+    "title": "Une erreur est survenue",
+    "body": "Réessaie ou recharge la page."
+  },
+  "nextStep": "Prochaine étape recommandée"
 }

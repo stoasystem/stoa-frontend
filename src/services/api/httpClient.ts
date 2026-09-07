@@ -1,6 +1,7 @@
 import { tabToken } from '@/lib/devSessions'
 import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
+import { activeLanguage } from '@/i18n/languages'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 
 export class ApiError extends Error {
@@ -35,6 +36,15 @@ const PUBLIC_AUTH_PATHS = new Set([
   '/auth/email-verification/resend',
 ])
 
+/**
+ * The language the screen is rendered in, for `Accept-Language`.
+ *
+ * Curriculum titles, question history and assistant answers are chosen
+ * server-side, and used to be chosen from the stored profile preference. That
+ * lags a language switch by a round trip, so the first refetch after the switch
+ * still came back in the old language. Sending it on the request removes the
+ * lag entirely.
+ */
 function requestPath(url?: string) {
   if (!url) return ''
   try {
@@ -59,6 +69,8 @@ httpClient.interceptors.request.use((config) => {
   // A tab holding its own role must send that role's token, not the one
   // the rest of the browser shares.
   const token = tabToken() ?? localStorage.getItem(TOKEN_KEY)
+
+  config.headers['Accept-Language'] = activeLanguage()
 
   if (isPublicAuthPath(config.url, config.method)) {
     delete config.headers.Authorization

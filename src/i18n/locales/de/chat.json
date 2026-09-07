@@ -29,7 +29,9 @@
     "recentAnswer": "Letzte Antwort",
     "backToLesson": "Zurück zur Lektion",
     "welcome": "Besprich diesen Übungsschritt mit dem Lernassistenten.",
-    "placeholder": "Bitte um den nächsten Schritt, nicht nur um das Ergebnis..."
+    "placeholder": "Bitte um den nächsten Schritt, nicht nur um das Ergebnis...",
+    "attempts": "Versuche: {{attempts}}",
+    "hintViewed": "Tipp angesehen"
   },
   "availability": {
     "checking": "Lehrpersonen werden geprüft",
@@ -82,5 +84,64 @@
     "requesting": "Wird angefragt...",
     "requestTeacher": "Lehrperson anfragen",
     "planRestricted": "Unterstützung durch eine Lehrperson ist nicht Teil deines aktuellen Plans."
+  },
+  "roles": {
+    "tutor": "Tutor",
+    "system": "System",
+    "assistant": "STOA Lernassistent"
+  },
+  "messageStatus": {
+    "sending": "Wird gesendet",
+    "stopped": "Generierung gestoppt",
+    "failed": "Erneut versuchen"
+  },
+  "thinking": "Denkt nach …",
+  "report": {
+    "trigger": "Antwort melden",
+    "context": "Diese Antwort des Assistenten an die interne Moderationsprüfung senden."
+  },
+  "questionBankContext": {
+    "welcome": "Sieh diesen Aufgabenschritt gemeinsam mit dem Lernassistenten durch.",
+    "placeholder": "Frag, was an dieser Aufgabe unklar ist ..."
+  },
+  "uploadContext": {
+    "placeholder": "Sag dem Lernassistenten, welcher Teil unklar ist ..."
+  },
+  "defaultPrompt": {
+    "practice": "Kannst du diesen Schritt erklären?",
+    "questionBank": "Kannst du diesen Schritt aus der Übungsbibliothek erklären?",
+    "questionStep": "Kannst du diesen Aufgabenschritt erklären?"
+  },
+  "tutorEscalation": {
+    "requestedTitle": "Tutor-Unterstützung angefragt",
+    "requestedBody": "Ein Tutor tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten.",
+    "joinedTitle": "Tutor ist beigetreten",
+    "joinedBody": "Der Lernassistent beobachtet mit, während dein Tutor hilft. Starte ein Live-Klassenzimmer, wenn du noch mehr Unterstützung brauchst.",
+    "confirmJoined": "Tutor ist beigetreten",
+    "startClassroom": "Live-Klassenzimmer starten",
+    "preparingLobby": "Lobby wird vorbereitet ...",
+    "lobbyFailed": "Wir konnten die Klassenzimmer-Lobby nicht vorbereiten. Bitte versuche es erneut."
+  },
+  "contextLines": {
+    "uploadSource": "Quelle des Uploads: {{title}}",
+    "questionSession": "Aufgabensitzung: {{sessionId}}",
+    "questionId": "Aufgabe: {{questionId}}",
+    "attachedMaterial": "Angehängtes Lernmaterial: {{files}}",
+    "librarySet": "Set der Übungsbibliothek: {{title}}",
+    "libraryTopic": "Thema der Übungsbibliothek: {{topic}}",
+    "question": "Aufgabe: {{prompt}}",
+    "myAnswer": "Meine Antwort: {{answer}}",
+    "practiceTopic": "Übungsthema: {{topic}}",
+    "practiceQuestion": "Übungsaufgabe: {{prompt}}",
+    "attempts": "Versuche: {{attempts}}",
+    "hintViewed": "Tipp angesehen: ja"
+  },
+  "currentQuestion": "Aktuelle Aufgabe",
+  "followUp": {
+    "label": "Vorschläge für Rückfragen",
+    "explainStep": "Einen der Schritte verstehe ich nicht",
+    "simpler": "Kannst du das einfacher erklären?",
+    "similar": "Gib mir eine ähnliche Aufgabe",
+    "why": "Warum funktioniert das?"
   }
 }

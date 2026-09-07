@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -15,35 +16,49 @@ type FilterOption<T extends string> = {
   label: string
 }
 
-const levelOptions: FilterOption<QuestionBankLevel | 'all'>[] = [
-  { value: 'all', label: 'All levels' },
-  { value: 'lower-secondary', label: 'Lower Secondary' },
-  { value: 'upper-secondary', label: 'Upper Secondary' },
-  { value: 'exam-prep', label: 'Exam Prep' },
-]
+// The labels were literal English here, so the filter chips stayed English on a
+// translated page. They are built per render from the active language instead.
+function levelOptions(t: TFunction<'practice'>): FilterOption<QuestionBankLevel | 'all'>[] {
+  return [
+    { value: 'all', label: t('filters.allLevels') },
+    { value: 'lower-secondary', label: t('filters.levelLowerSecondary') },
+    { value: 'upper-secondary', label: t('filters.levelUpperSecondary') },
+    { value: 'exam-prep', label: t('filters.levelExamPrep') },
+  ]
+}
 
-const difficultyOptions: FilterOption<QuestionBankDifficulty | 'all'>[] = [
-  { value: 'all', label: 'All difficulty' },
-  { value: 'easy', label: 'Easy' },
-  { value: 'medium', label: 'Medium' },
-  { value: 'hard', label: 'Hard' },
-]
+function difficultyOptions(
+  t: TFunction<'practice'>,
+): FilterOption<QuestionBankDifficulty | 'all'>[] {
+  return [
+    { value: 'all', label: t('filters.allDifficulty') },
+    { value: 'easy', label: t('filters.easy') },
+    { value: 'medium', label: t('filters.medium') },
+    { value: 'hard', label: t('filters.hard') },
+  ]
+}
 
-const typeOptions: FilterOption<QuestionBankQuestionType | 'all'>[] = [
-  { value: 'all', label: 'All types' },
-  { value: 'multiple_choice', label: 'Multiple choice' },
-  { value: 'short_answer', label: 'Short answer' },
-  { value: 'numeric', label: 'Numeric' },
-  { value: 'step_by_step', label: 'Step by step' },
-]
+function typeOptions(
+  t: TFunction<'practice'>,
+): FilterOption<QuestionBankQuestionType | 'all'>[] {
+  return [
+    { value: 'all', label: t('filters.allTypes') },
+    { value: 'multiple_choice', label: t('questionType.multiple_choice') },
+    { value: 'short_answer', label: t('questionType.short_answer') },
+    { value: 'numeric', label: t('questionType.numeric') },
+    { value: 'step_by_step', label: t('questionType.step_by_step') },
+  ]
+}
 
-const statusOptions: FilterOption<QuestionSetStatus | 'all'>[] = [
-  { value: 'all', label: 'All status' },
-  { value: 'not_started', label: 'Not started' },
-  { value: 'in_progress', label: 'In progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'review_recommended', label: 'Review' },
-]
+function statusOptions(t: TFunction<'practice'>): FilterOption<QuestionSetStatus | 'all'>[] {
+  return [
+    { value: 'all', label: t('filters.allStatus') },
+    { value: 'not_started', label: t('set.status.not_started') },
+    { value: 'in_progress', label: t('set.status.in_progress') },
+    { value: 'completed', label: t('set.status.completed') },
+    { value: 'review_recommended', label: t('filters.statusReview') },
+  ]
+}
 
 export function QuestionBankFilters({
   value,
@@ -73,8 +88,8 @@ export function QuestionBankFilters({
     <div className="rounded-lg border border-border/80 bg-card/80 p-4 shadow-[var(--platform-shadow-soft)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="brand-section-kicker">Filters</p>
-          <p className="mt-1 text-sm text-muted-foreground">Narrow the library without leaving this page.</p>
+          <p className="brand-section-kicker">{t('filters.title')}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{t('filters.subtitle')}</p>
         </div>
         {activeCount > 0 && (
           <Button
@@ -84,24 +99,24 @@ export function QuestionBankFilters({
             onClick={() => onChange({ level: 'all', difficulty: 'all', questionType: 'all', status: 'all' })}
           >
             <X className="h-4 w-4" aria-hidden="true" />
-            Clear
+            {t('filters.clear')}
           </Button>
         )}
       </div>
       <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {showLevel && (
           <FilterGroup
-            label="Grade / Level"
+            label={t('filters.levelLabel')}
             value={value.level ?? 'all'}
-            options={levelOptions}
+            options={levelOptions(t)}
             onChange={(level) => patchFilter({ level })}
           />
         )}
         {showDifficulty && (
           <FilterGroup
-            label="Difficulty"
+            label={t('filters.difficultyLabel')}
             value={value.difficulty ?? 'all'}
-            options={difficultyOptions}
+            options={difficultyOptions(t)}
             onChange={(difficulty) => patchFilter({ difficulty })}
           />
         )}
@@ -109,15 +124,15 @@ export function QuestionBankFilters({
           <FilterGroup
             label={t('ui.questionType')}
             value={value.questionType ?? 'all'}
-            options={typeOptions}
+            options={typeOptions(t)}
             onChange={(questionType) => patchFilter({ questionType })}
           />
         )}
         {showStatus && (
           <FilterGroup
-            label="Status"
+            label={t('filters.statusLabel')}
             value={value.status ?? 'all'}
-            options={statusOptions}
+            options={statusOptions(t)}
             onChange={(status) => patchFilter({ status })}
           />
         )}

@@ -43,13 +43,16 @@ export function QuestionSetOverviewPage() {
         <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="space-y-5 rounded-lg border bg-card/90 p-5 shadow-[var(--platform-shadow-card)]">
             <div className="grid gap-3 sm:grid-cols-4">
-              <Meta label="Questions" value={`${set.questionCount}`} />
-              <Meta label="Difficulty" value={set.difficultyRange} />
-              <Meta label="Time" value={`${set.estimatedMinutes} min`} />
-              <Meta label="Level" value={set.level.replace('-', ' ')} />
+              <Meta label={t('set.metricQuestions')} value={`${set.questionCount}`} />
+              <Meta label={t('ui.difficulty')} value={set.difficultyRange} />
+              <Meta
+                label={t('set.metricTime')}
+                value={t('set.minutes', { minutes: set.estimatedMinutes })}
+              />
+              <Meta label={t('ui.level')} value={set.level.replace('-', ' ')} />
             </div>
             <div>
-              <p className="brand-section-kicker">Skills Covered</p>
+              <p className="brand-section-kicker">{t('setOverview.skillsCovered')}</p>
               <ul className="mt-3 grid gap-2 sm:grid-cols-2">
                 {set.skills.map((skill) => (
                   <li key={skill} className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">
@@ -59,11 +62,11 @@ export function QuestionSetOverviewPage() {
               </ul>
             </div>
             <div>
-              <p className="brand-section-kicker">Question Types</p>
+              <p className="brand-section-kicker">{t('setOverview.questionTypes')}</p>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
                 {set.typeBreakdown.map((item) => (
                   <div key={item.type} className="flex items-center justify-between rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm">
-                    <span>{item.type.replace(/_/g, ' ')}</span>
+                    <span>{t(`questionType.${item.type}`, { defaultValue: item.type })}</span>
                     <span className="font-semibold">{item.count}</span>
                   </div>
                 ))}
@@ -72,26 +75,38 @@ export function QuestionSetOverviewPage() {
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/90 p-5 shadow-[var(--platform-shadow-soft)]">
-              <p className="brand-section-kicker">Your Last Attempt</p>
+              <p className="brand-section-kicker">{t('setOverview.lastAttempt')}</p>
               {set.lastAttempt ? (
                 <div className="mt-4 space-y-3">
-                  <Meta label="Score" value={`${set.lastAttempt.score} / ${set.lastAttempt.total}`} />
-                  <Meta label="Time" value={`${set.lastAttempt.timeSpentMinutes} min`} />
-                  <Meta label="Mistakes" value={`${set.lastAttempt.mistakes}`} />
+                  <Meta
+                    label={t('ui.score')}
+                    value={`${set.lastAttempt.score} / ${set.lastAttempt.total}`}
+                  />
+                  <Meta
+                    label={t('set.metricTime')}
+                    value={t('set.minutes', { minutes: set.lastAttempt.timeSpentMinutes })}
+                  />
+                  <Meta label={t('ui.mistakes')} value={`${set.lastAttempt.mistakes}`} />
                 </div>
               ) : (
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">No attempt recorded yet. Start with a short, focused practice set.</p>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  {t('setOverview.noAttempt')}
+                </p>
               )}
               <div className="mt-5 flex flex-col gap-2">
                 <Button type="button" onClick={startSession} disabled={createSessionMutation.isPending}>
                   <Play className="h-4 w-4" aria-hidden="true" />
-                  {set.status === 'in_progress' ? 'Resume Practice' : set.status === 'completed' ? 'Practice Again' : 'Start Practice'}
+                  {set.status === 'in_progress'
+                    ? t('setOverview.resume')
+                    : set.status === 'completed'
+                      ? t('setOverview.again')
+                      : t('setOverview.start')}
                 </Button>
                 {set.status === 'completed' || set.status === 'review_recommended' ? (
                   <Button asChild variant="outline">
                     <Link to={getQuestionBankMistakesPath()}>
                       <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                      Review Mistakes
+                      {t('setOverview.reviewMistakes')}
                     </Link>
                   </Button>
                 ) : null}
@@ -100,12 +115,14 @@ export function QuestionSetOverviewPage() {
             <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-primary">
                 <HelpCircle className="h-4 w-4" aria-hidden="true" />
-                Need help while practising?
+                {t('setOverview.needHelpTitle')}
               </div>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                You can ask the Learning Assistant after each question and return to the set when the step is clearer.
+                {t('setOverview.needHelpBody')}
               </p>
-              <Badge variant="outline" className="mt-3">Practice Library + Learning Assistant</Badge>
+              <Badge variant="outline" className="mt-3">
+                {t('setOverview.needHelpBadge')}
+              </Badge>
             </div>
           </aside>
         </section>

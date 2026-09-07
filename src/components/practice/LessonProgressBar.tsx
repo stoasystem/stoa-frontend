@@ -1,10 +1,13 @@
+import { useTranslation } from 'react-i18next'
+
 export function LessonProgressBar({ current, total }: { current: number; total: number }) {
+  const { t } = useTranslation('practice')
   const percent = total > 0 ? Math.round((current / total) * 100) : 0
 
   return (
-    <div aria-label={`Lesson progress ${current} of ${total}`} className="space-y-2">
+    <div aria-label={t('lessonResult.progressLabel', { current, total })} className="space-y-2">
       <div className="flex items-center justify-between text-xs font-medium text-muted-foreground">
-        <span>Progress</span>
+        <span>{t('lessonResult.progress')}</span>
         <span>
           {current}/{total}
         </span>

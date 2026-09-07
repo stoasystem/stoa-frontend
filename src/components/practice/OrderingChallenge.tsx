@@ -1,4 +1,5 @@
 import { ArrowDownUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 
 export function OrderingChallenge({
@@ -12,6 +13,8 @@ export function OrderingChallenge({
   onChange: (value: string[]) => void
   disabled?: boolean
 }) {
+  const { t } = useTranslation('practice')
+
   function move(option: string) {
     if (disabled) return
     if (selected.includes(option)) {
@@ -24,7 +27,7 @@ export function OrderingChallenge({
   return (
     <div className="grid gap-4 lg:grid-cols-2">
       <div className="space-y-2">
-        <p className="text-sm font-medium">Available steps</p>
+        <p className="text-sm font-medium">{t('ordering.available')}</p>
         {options.map((option) => (
           <Button
             className="h-auto min-h-11 w-full justify-start whitespace-normal text-left"
@@ -40,9 +43,11 @@ export function OrderingChallenge({
         ))}
       </div>
       <div className="space-y-2">
-        <p className="text-sm font-medium">Selected order</p>
+        <p className="text-sm font-medium">{t('ordering.selected')}</p>
         <ol className="min-h-36 space-y-2 rounded-lg border border-dashed p-3 text-sm">
-          {selected.length === 0 && <li className="text-muted-foreground">Choose steps in order.</li>}
+          {selected.length === 0 && (
+            <li className="text-muted-foreground">{t('ordering.empty')}</li>
+          )}
           {selected.map((option, index) => (
             <li className="rounded-md bg-muted/60 px-3 py-2" key={option}>
               {index + 1}. {option}

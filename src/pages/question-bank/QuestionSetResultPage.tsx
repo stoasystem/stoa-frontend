@@ -27,7 +27,7 @@ export function QuestionSetResultPage() {
             description={t('library.resultHint')}
           />
           <Button asChild>
-            <Link to="/question-bank">Back to Practice Library</Link>
+            <Link to="/question-bank">{t('session.backToLibrary')}</Link>
           </Button>
         </PageContainer>
       </DashboardLayout>
@@ -43,17 +43,22 @@ export function QuestionSetResultPage() {
         <PageHeader
           eyebrow={t('ui.practiceComplete')}
           title={t('ui.practiceComplete')}
-          description={accuracy < 70 ? 'This set needs another round of practice. Review the questions below, then try a similar set.' : 'Use the result to decide whether to review mistakes, ask for an explanation, or continue the guided Practice Path.'}
+          description={
+            accuracy < 70 ? t('result.lowAccuracyBody') : t('result.goodAccuracyBody')
+          }
         />
         <section className="grid gap-4 md:grid-cols-4">
-          <Metric label="Score" value={`${result.score} / ${result.total}`} />
-          <Metric label="Accuracy" value={`${accuracy}%`} />
-          <Metric label={t('ui.timeSpent')} value={`${result.timeSpentMinutes} min`} />
+          <Metric label={t('ui.score')} value={`${result.score} / ${result.total}`} />
+          <Metric label={t('ui.accuracy')} value={`${accuracy}%`} />
+          <Metric
+            label={t('ui.timeSpent')}
+            value={t('set.minutes', { minutes: result.timeSpentMinutes })}
+          />
           <Metric label={t('ui.needsReview')} value={`${result.incorrectQuestions.length + result.skippedQuestions.length}`} />
         </section>
         <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
-              <p className="brand-section-kicker">What went well</p>
+              <p className="brand-section-kicker">{t('result.whatWentWell')}</p>
             <div className="mt-4 space-y-3">
               {result.accuracyByTopic.map((topic) => (
                 <div key={topic.topicId}>
@@ -73,7 +78,9 @@ export function QuestionSetResultPage() {
                 {result.incorrectQuestions.map((mistake) => (
                   <div key={mistake.id} className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">
                     <p className="text-sm font-semibold">{mistake.prompt}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">Correct answer: {mistake.correctAnswer}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {t('result.correctAnswer', { answer: mistake.correctAnswer })}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -81,7 +88,7 @@ export function QuestionSetResultPage() {
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/95 p-5 shadow-[var(--platform-shadow-soft)]">
-            <p className="brand-section-kicker">Next steps</p>
+            <p className="brand-section-kicker">{t('result.nextSteps')}</p>
               <ul className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
                 {result.nextSteps.map((step) => (
                   <li key={step}>- {step}</li>
@@ -91,19 +98,19 @@ export function QuestionSetResultPage() {
                 <Button asChild>
                   <Link to={getQuestionBankMistakesPath()}>
                     <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                    Review Mistakes
+                    {t('result.reviewMistakes')}
                   </Link>
                 </Button>
                 {primaryTopic && (
                   <Button asChild variant="outline">
                     <Link to={getPracticeTopicPath('mathematics', primaryTopic.topicId)}>
-                      Open Practice Path
+                      {t('result.openPath')}
                       <ArrowRight className="h-4 w-4" aria-hidden="true" />
                     </Link>
                   </Button>
                 )}
                 <Button asChild variant="outline">
-                  <Link to={getQuestionBankSessionPath(sessionId ?? '')}>Practice Again</Link>
+                  <Link to={getQuestionBankSessionPath(sessionId ?? '')}>{t('result.again')}</Link>
                 </Button>
               </div>
             </div>

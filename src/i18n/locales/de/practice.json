@@ -99,7 +99,26 @@
     "planLimits": "Die Grenzen deines Tarifs erscheinen hier.",
     "weakTopicsFailed": "Schwache Themen konnten nicht geladen werden. Bitte später erneut versuchen.",
     "weakTopicReason": "Die jüngsten Lernsignale weisen dieses Thema als nächsten Übungsschwerpunkt aus.",
-    "questionAsked": "Frage gestellt"
+    "questionAsked": "Frage gestellt",
+    "history": {
+      "sources": {
+        "questions": "Fragen",
+        "practice_path": "Lernpfad",
+        "practice_library": "Übungsbibliothek",
+        "classroom": "Klassenraum"
+      },
+      "kinds": {
+        "question_asked": "Frage gestellt",
+        "question_answered": "Frage beantwortet",
+        "teacher_help": "Lehrerhilfe angefragt",
+        "practice_lesson": "Lektion im Lernpfad",
+        "library_set": "Aufgabenset der Übungsbibliothek"
+      },
+      "librarySubject": "Übungsbibliothek",
+      "libraryCompleted": "{{score}} von {{total}} Aufgaben in {{minutes}} Minuten gelöst.",
+      "libraryInProgress": "{{answered}} von {{total}} Aufgaben beantwortet. Setze dieses Set in der Übungsbibliothek fort.",
+      "empty": "Es ist noch kein Lernverlauf vorhanden."
+    }
   },
   "library": {
     "subtitle": "Wähle Übungen nach Fach, Thema und Schwierigkeit.",
@@ -146,7 +165,34 @@
     "parentAccount": "Elternkonto",
     "billingStatus": "Abrechnungsstatus",
     "lastUpdated": "Zuletzt aktualisiert",
-    "guardian": "Eltern oder Erziehungsberechtigte"
+    "guardian": "Eltern oder Erziehungsberechtigte",
+    "description": "Konto-, Familien-, Abrechnungs- und Lernkontext, damit die STOA-Unterstützung stimmt.",
+    "loadFailed": "Profil konnte nicht geladen werden.",
+    "saveFailed": "Profil konnte nicht gespeichert werden.",
+    "saved": "Profil gespeichert.",
+    "accountKicker": "Schülerkonto",
+    "accountStatus": "Kontostatus",
+    "accountStatusBody": "Zugang, Familienverknüpfung und letzte Profilaktualisierung.",
+    "noParentLinked": "Es ist noch kein Eltern- oder Erziehungsberechtigtenkonto verknüpft.",
+    "noSubscription": "Diesem Konto ist kein Abo zugeordnet.",
+    "notProvided": "Nicht angegeben",
+    "saveLearningContext": "Lernkontext speichern",
+    "schoolSystemNotSet": "Schulsystem nicht gesetzt",
+    "notSet": "Nicht gesetzt",
+    "guardianLinked": "Ein Elternkonto ist verknüpft und kann den Fortschritt dieses Schülers verfolgen.",
+    "plan": "Abo",
+    "planStatus": "Status",
+    "guardianStatus": {
+      "linked": "Verknüpft",
+      "not_linked": "Nicht verknüpft"
+    },
+    "weakTopicEvidence": "Belege für schwache Themen",
+    "noWeakTopics": "Für schwache Themen liegen noch nicht genügend Belege vor.",
+    "signals": "{{count}} Signale",
+    "freshness": "Aktualität des Profils",
+    "freshnessBody": "Am {{date}} aus Fragen, Tutor-Eskalationen und Übungsbelegen aktualisiert.",
+    "feedback": "Rückmeldung",
+    "email": "E-Mail"
   },
   "ui": {
     "practiceLesson": "Übungslektion",
@@ -220,7 +266,14 @@
     "uploadWhilePractising2": "Lade ein Foto oder PDF hoch und frag den Lernassistenten, während dich der Lernpfad weiter führt.",
     "uploadBody2": "Fotografiere deine Schulaufgabe oder hänge ein PDF an. Der Lernassistent hilft dir, sie Schritt für Schritt zu verstehen.",
     "chooseSubjectHint": "Wähle ein Fach und grenze dann nach Thema und Niveau ein.",
-    "askAssistant2": "Lass dir vom Lernassistenten Schritt für Schritt erklären oder lade deine eigene Lösung zu dieser Aufgabe hoch."
+    "askAssistant2": "Lass dir vom Lernassistenten Schritt für Schritt erklären oder lade deine eigene Lösung zu dieser Aufgabe hoch.",
+    "completed": "Abgeschlossen",
+    "accuracy": "Trefferquote",
+    "topics": "Themen",
+    "score": "Ergebnis",
+    "mistakes": "Fehler",
+    "difficulty": "Schwierigkeit",
+    "level": "Niveau"
   },
   "learn": {
     "streakDays_one": "{{count}} Tag",
@@ -298,5 +351,202 @@
     "lessonBankSample": "Beispiel aus der Lektionsbank",
     "exerciseCount_one": "{{count}} Aufgabe",
     "exerciseCount_other": "{{count}} Aufgaben"
+  },
+  "set": {
+    "saved": "Gespeichert",
+    "metricQuestions": "Aufgaben",
+    "metricTime": "Zeit",
+    "metricLevel": "Niveau",
+    "minutes": "{{minutes}} Min.",
+    "answered": "{{answered}} / {{total}} beantwortet",
+    "status": {
+      "not_started": "Nicht begonnen",
+      "in_progress": "In Arbeit",
+      "completed": "Abgeschlossen",
+      "review_recommended": "Wiederholung empfohlen"
+    },
+    "action": {
+      "not_started": "Starten",
+      "in_progress": "Fortsetzen",
+      "completed": "Erneut üben",
+      "review_recommended": "Fehler ansehen"
+    }
+  },
+  "questionType": {
+    "multiple_choice": "Multiple Choice",
+    "short_answer": "Kurzantwort",
+    "numeric": "Zahlenwert",
+    "step_by_step": "Schritt für Schritt",
+    "ordering": "Reihenfolge"
+  },
+  "setOverview": {
+    "skillsCovered": "Behandelte Fähigkeiten",
+    "questionTypes": "Aufgabentypen",
+    "lastAttempt": "Dein letzter Versuch",
+    "noAttempt": "Noch kein Versuch erfasst. Fang mit einem kurzen, gezielten Übungsset an.",
+    "start": "Übung starten",
+    "resume": "Übung fortsetzen",
+    "again": "Erneut üben",
+    "reviewMistakes": "Fehler ansehen",
+    "needHelpTitle": "Brauchst du beim Üben Hilfe?",
+    "needHelpBody": "Du kannst nach jeder Aufgabe den Lernassistenten fragen und zum Set zurückkehren, sobald der Schritt klarer ist.",
+    "needHelpBadge": "Übungsbibliothek + Lernassistent"
+  },
+  "session": {
+    "loadFailedTitle": "Wir konnten dieses Übungsset nicht laden",
+    "loadFailedBody": "Kehre bitte zur Übungsbibliothek zurück und versuche es erneut.",
+    "backToLibrary": "Zurück zur Übungsbibliothek",
+    "questionOf": "Aufgabe {{current}} von {{total}}",
+    "checkedRemaining": "{{checked}} geprüft · {{remaining}} offen",
+    "progressLabel": "Fortschritt der Sitzung {{percent}} %",
+    "checkAnswer": "Antwort prüfen",
+    "skipForNow": "Vorerst überspringen",
+    "finishing": "Wird abgeschlossen ...",
+    "finishSet": "Set abschliessen",
+    "navigation": "Übungsnavigation",
+    "openQuestion": "Aufgabe {{number}} öffnen",
+    "finishPractice": "Übung abschliessen",
+    "withoutFeedback_one": "Zu {{count}} Aufgabe hast du noch keine Rückmeldung.",
+    "withoutFeedback_other": "Zu {{count}} Aufgaben hast du noch keine Rückmeldung.",
+    "reviewUnanswered": "Offene Aufgaben ansehen",
+    "finishAnyway": "Trotzdem abschliessen",
+    "relatedPath": "Passender Lernpfad",
+    "askPrompt": "Kannst du diesen Schritt aus der Übungsbibliothek erklären: {{prompt}}",
+    "uploadDescription": "Hochgeladene Arbeit zu {{skill}}. Der Lernassistent nutzt das als Kontext.",
+    "uploadPrompt": "Ich habe meine Lösung zu dieser Aufgabe aus der Übungsbibliothek hochgeladen. Hilf mir bitte, den nächsten Schritt zu verstehen, ohne mir einfach die Antwort zu geben.",
+    "nextStepReviewMissed": "Sieh dir die Aufgaben an, die du nicht richtig hattest.",
+    "nextStepAskAssistant": "Frag den Lernassistenten zu den Aufgaben, die noch unklar sind.",
+    "nextStepContinue": "Mach mit dem nächsten Set in diesem Thema weiter."
+  },
+  "result": {
+    "lowAccuracyBody": "Dieses Set braucht noch eine Übungsrunde. Sieh dir die Aufgaben unten an und probiere dann ein ähnliches Set.",
+    "goodAccuracyBody": "Entscheide anhand des Ergebnisses, ob du Fehler ansiehst, eine Erklärung anfragst oder im geführten Lernpfad weitermachst.",
+    "whatWentWell": "Das lief gut",
+    "correctAnswer": "Richtige Antwort: {{answer}}",
+    "nextSteps": "Nächste Schritte",
+    "reviewMistakes": "Fehler ansehen",
+    "openPath": "Lernpfad öffnen",
+    "again": "Erneut üben"
+  },
+  "lessonResult": {
+    "progressLabel": "Lektionsfortschritt {{current}} von {{total}}",
+    "progress": "Fortschritt",
+    "summaryTitle": "Übungsübersicht",
+    "summaryBody": "Sieh dir die schwierigen Schritte an, solange die Methode noch frisch ist.",
+    "correct": "Richtig",
+    "time": "Zeit",
+    "points": "Punkte",
+    "streak": "Serie",
+    "streakDays": "{{count}} Tage",
+    "askAboutStep": "Zu diesem Schritt fragen",
+    "backToPractice": "Zurück zum Üben",
+    "pageDescription": "Eine kurze Übersicht der Übungseinheit und der Schritte, die eine Wiederholung lohnen.",
+    "noResult": "Diese Übersicht erscheint direkt nach einer abgeschlossenen Lektion – und es gibt noch keine abgeschlossene Lektion.",
+    "goToPractice": "Zum Üben",
+    "mistakesKicker": "Fehlerbesprechung",
+    "mistakesTitle": "Einen zweiten Blick wert",
+    "pathProgress": "{{percent}} % des Pfads geschafft"
+  },
+  "teacherSupportCta": {
+    "title": "Dieser Schritt braucht vielleicht eine klarere Erklärung.",
+    "body": "Frag einen Tutor, nachdem du den Tipp und eine Schritt-für-Schritt-Erklärung ausprobiert hast.",
+    "action": "Tutor fragen"
+  },
+  "answerInput": {
+    "chooseOne": "Wähle eine Antwort",
+    "step": "Schritt {{number}}",
+    "finalAnswer": "Endergebnis",
+    "numberPlaceholder": "Zahl eingeben",
+    "textPlaceholder": "Schreibe deine Antwort"
+  },
+  "feedback": {
+    "waiting": "Prüfe deine Antwort, wenn du bereit bist. Die Rückmeldung erscheint hier, bevor du weitergehst.",
+    "yourAnswer": "Deine Antwort: ",
+    "correctAnswer": "Richtige Antwort: ",
+    "explanation": "Erklärung",
+    "trySimilar": "Ähnliche Aufgabe probieren",
+    "askAssistant": "Lernassistenten fragen"
+  },
+  "filters": {
+    "title": "Filter",
+    "subtitle": "Grenze die Bibliothek ein, ohne die Seite zu verlassen.",
+    "clear": "Zurücksetzen",
+    "levelLabel": "Klasse / Niveau",
+    "difficultyLabel": "Schwierigkeit",
+    "typeLabel": "Aufgabentyp",
+    "statusLabel": "Status",
+    "allLevels": "Alle Niveaus",
+    "allDifficulty": "Alle Schwierigkeiten",
+    "allTypes": "Alle Typen",
+    "allStatus": "Alle Status",
+    "levelLowerSecondary": "Sekundarstufe I",
+    "levelUpperSecondary": "Sekundarstufe II",
+    "levelExamPrep": "Prüfungsvorbereitung",
+    "easy": "Leicht",
+    "medium": "Mittel",
+    "hard": "Schwer",
+    "statusReview": "Wiederholen"
+  },
+  "ordering": {
+    "available": "Verfügbare Schritte",
+    "selected": "Gewählte Reihenfolge",
+    "empty": "Wähle die Schritte in der richtigen Reihenfolge."
+  },
+  "dashboard": {
+    "recentQuestions": "Letzte Fragen",
+    "questionStatus": {
+      "answered_by_ai": "Erklärt",
+      "teacher_helped": "Lehrperson half",
+      "pending": "Offen"
+    },
+    "entryPoints": "Einstiege ins Lernen",
+    "entries": {
+      "askLabel": "Eine Frage stellen",
+      "askDetail": "Frag nach Hilfe zu einem bestimmten Hausaufgabenschritt.",
+      "mistakesLabel": "Letzte Fehler ansehen",
+      "mistakesDetail": "Gehe zu Übungsschritten zurück, die einen zweiten Blick brauchen.",
+      "historyLabel": "Lernverlauf ansehen",
+      "historyDetail": "Sieh frühere Fragen, Erklärungen und Fortschritte."
+    },
+    "planTitle": "Was dein Abo erlaubt",
+    "familyAccess": "Familienzugang",
+    "plan": {
+      "perDay": "{{count}} pro Tag",
+      "notLimited": "Unbegrenzt",
+      "trialEnds": "Endet am {{date}}",
+      "trialActive": "Aktiv",
+      "yourPlan": "Dein Abo",
+      "usagePaused": "Neue Fragen sind in diesem Abo pausiert. Bitte einen Elternteil, das Familienabo zu prüfen.",
+      "usageCovered": "Dieses Abo umfasst die oben gezeigten Fragen, Übungen und Lehrerunterstützung.",
+      "billingNote": "Die Zahlungsdaten liegen beim Eltern-Abrechnungskonto. Du siehst hier deinen Lernzugang; Kartendaten und Rechnungen verwaltet ein Elternteil."
+    }
+  },
+  "assignments": {
+    "eyebrow": "Üben",
+    "title": "Meine Aufgaben",
+    "description": "Verstehe, welche Übung zugewiesen wurde, worauf sie zielt und was als Nächstes zu tun ist.",
+    "loading": "Deine Aufgaben werden geladen ...",
+    "failed": "Aufgaben konnten nicht geladen werden",
+    "empty": "Derzeit warten keine geprüften Aufgaben.",
+    "source": "Quelle",
+    "target": "Ziel",
+    "due": "Fällig",
+    "noDueDate": "Kein Fälligkeitsdatum",
+    "subjectPending": "Fach offen",
+    "topicPending": "Thema offen",
+    "whyThisAppeared": "Warum das hier erscheint",
+    "defaultRationale": "Diese Übung wurde aus geprüften Lernsignalen ausgewählt, damit deine nächste Arbeit fokussiert bleibt.",
+    "sources": {
+      "automation": "Automatisch erstellte Übung",
+      "ai_draft": "Von Tutoren geprüfte KI-Übung",
+      "curriculum_exercise": "Übung aus dem Lehrplan",
+      "reviewed": "Geprüfte Übung"
+    },
+    "nextAction": {
+      "completed": "Rückmeldung ansehen",
+      "started": "Übung fortsetzen",
+      "skipped": "Frag deinen Tutor, was du als Nächstes probieren sollst",
+      "default": "Übung starten"
+    }
   }
 }

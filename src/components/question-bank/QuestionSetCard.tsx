@@ -1,5 +1,7 @@
 import { ArrowRight, Bookmark, Clock, ListChecks } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { getQuestionBankSetPath } from '@/lib/questionBankRoutes'
@@ -13,16 +15,19 @@ export function QuestionSetCard({
   set: QuestionBankSet
   compact?: boolean
 }) {
+  const { t } = useTranslation('practice')
+  const percentComplete = Math.round((set.progress.answered / set.progress.total) * 100)
+
   return (
     <article className="group rounded-lg border border-border/80 bg-card/90 p-5 shadow-[var(--platform-shadow-soft)] transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[var(--platform-shadow-card)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={statusVariant(set.status)}>{getStatusLabel(set.status)}</Badge>
+            <Badge variant={statusVariant(set.status)}>{t(`set.status.${set.status}`)}</Badge>
             {set.saved && (
               <span className="inline-flex items-center gap-1 rounded-md border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] px-2 py-0.5 text-xs font-semibold text-primary">
                 <Bookmark className="h-3.5 w-3.5" aria-hidden="true" />
-                Saved
+                {t('set.saved')}
               </span>
             )}
           </div>
@@ -31,19 +36,29 @@ export function QuestionSetCard({
         </div>
       </div>
       <div className={cn('mt-4 grid gap-3 text-sm', compact ? 'grid-cols-2' : 'sm:grid-cols-3')}>
-        <SetMetric icon={ListChecks} label="Questions" value={`${set.questionCount}`} />
-        <SetMetric icon={Clock} label="Time" value={`${set.estimatedMinutes} min`} />
-        <SetMetric label="Level" value={set.difficultyRange} />
+        <SetMetric
+          icon={ListChecks}
+          label={t('set.metricQuestions')}
+          value={`${set.questionCount}`}
+        />
+        <SetMetric
+          icon={Clock}
+          label={t('set.metricTime')}
+          value={t('set.minutes', { minutes: set.estimatedMinutes })}
+        />
+        <SetMetric label={t('set.metricLevel')} value={set.difficultyRange} />
       </div>
       <div className="mt-4">
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{set.progress.answered} / {set.progress.total} answered</span>
-          <span>{Math.round((set.progress.answered / set.progress.total) * 100)}%</span>
+          <span>
+            {t('set.answered', { answered: set.progress.answered, total: set.progress.total })}
+          </span>
+          <span>{percentComplete}%</span>
         </div>
         <div className="mt-2 h-2 rounded-full bg-muted">
           <div
             className="h-full rounded-full bg-primary"
-            style={{ width: `${Math.round((set.progress.answered / set.progress.total) * 100)}%` }}
+            style={{ width: `${percentComplete}%` }}
           />
         </div>
       </div>
@@ -58,7 +73,7 @@ export function QuestionSetCard({
       )}
       <Button asChild className="mt-5 w-full">
         <Link to={getQuestionBankSetPath(set.id)}>
-          {getActionLabel(set.status)}
+          {getActionLabel(set.status, t)}
           <ArrowRight className="h-4 w-4" aria-hidden="true" />
         </Link>
       </Button>
@@ -86,24 +101,8 @@ function SetMetric({
   )
 }
 
-export function getActionLabel(status: QuestionSetStatus) {
-  const labels: Record<QuestionSetStatus, string> = {
-    not_started: 'Start',
-    in_progress: 'Resume',
-    completed: 'Practice Again',
-    review_recommended: 'Review Mistakes',
-  }
-  return labels[status]
-}
-
-function getStatusLabel(status: QuestionSetStatus) {
-  const labels: Record<QuestionSetStatus, string> = {
-    not_started: 'Not started',
-    in_progress: 'In progress',
-    completed: 'Completed',
-    review_recommended: 'Review recommended',
-  }
-  return labels[status]
+export function getActionLabel(status: QuestionSetStatus, t: TFunction<'practice'>) {
+  return t(`set.action.${status}`)
 }
 
 function statusVariant(status: QuestionSetStatus) {

@@ -14,6 +14,16 @@ export type StudentProfile = {
   updatedAt: string
 }
 
+/** Where a history row came from, and what happened in it. */
+export type LearningHistorySource = 'questions' | 'practice_path' | 'practice_library' | 'classroom'
+
+export type LearningHistoryKind =
+  | 'question_asked'
+  | 'question_answered'
+  | 'teacher_help'
+  | 'practice_lesson'
+  | 'library_set'
+
 export type LearningHistoryItem = {
   id: string
   subject: string
@@ -21,7 +31,12 @@ export type LearningHistoryItem = {
   summary: string
   createdAt: string
   href?: string
+  // `title` and `sourceLabel` are the server's English fallbacks. `kind` and
+  // `source` are the machine-readable pair the UI renders from, so the row
+  // reads in the student's language and grouping does not depend on wording.
   sourceLabel?: string
+  kind?: LearningHistoryKind
+  source?: LearningHistorySource
 }
 
 export type StudentEntitlement = {

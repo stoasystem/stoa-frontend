@@ -1,10 +1,12 @@
 import { LogOut, UserCircle } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { RoleBadge } from '@/components/common/RoleBadge'
 import { Button } from '@/components/ui/button'
 import { useAuthStore } from '@/store/authStore'
 
 export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' }) {
+  const { t } = useTranslation('common')
   const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
   const clearAuth = useAuthStore((state) => state.clearAuth)
@@ -26,7 +28,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           variant="ghost"
           size="icon"
           className="h-8 w-8 rounded-full"
-          aria-label="Log out"
+          aria-label={t('actions.logOut')}
           onClick={() => {
             clearAuth()
             navigate('/login')
@@ -51,7 +53,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
         type="button"
         variant="ghost"
         size="icon"
-        aria-label="Log out"
+        aria-label={t('actions.logOut')}
         onClick={() => {
           clearAuth()
           navigate('/login')

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { TFunction } from 'i18next'
 import { Video } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -134,13 +135,13 @@ export function ChatPage() {
   useEffect(() => {
     if (!practiceContext) return
     setActiveConversationId(null)
-    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this step?')
+    setNewConversationMessage(practiceState?.prompt ?? t('defaultPrompt.practice'))
   }, [practiceContext, practiceState?.prompt])
 
   useEffect(() => {
     if (!questionBankContext) return
     setActiveConversationId(null)
-    setNewConversationMessage(practiceState?.prompt ?? 'Can you explain this Practice Library step?')
+    setNewConversationMessage(practiceState?.prompt ?? t('defaultPrompt.questionBank'))
   }, [practiceState?.prompt, questionBankContext])
 
   useEffect(() => {
@@ -180,7 +181,13 @@ export function ChatPage() {
 
   function handleCreateConversation(message?: string) {
     if (createConversationMutation.isPending) return
-    const initialMessage = buildInitialMessage(message?.trim() ?? '', practiceContext, questionBankContext, uploadContext)
+    const initialMessage = buildInitialMessage(
+      t,
+      message?.trim() ?? '',
+      practiceContext,
+      questionBankContext,
+      uploadContext,
+    )
     const initialAttachments = uploadContext?.attachments.map(uploadAttachmentToUploadedFile)
 
     const profile = studentProfileQuery.data
@@ -289,7 +296,7 @@ export function ChatPage() {
       {
         source: 'teacher_text_help',
         conversationId: activeConversationId,
-        topicLabel: conversationQuery.data?.subject ?? 'Current question',
+        topicLabel: conversationQuery.data?.subject ?? t('currentQuestion'),
         summary: 'The student requested a live classroom after tutor support.',
       },
       {
@@ -299,7 +306,7 @@ export function ChatPage() {
         },
         onError: () => {
           setTeacherSupportStage('teacher_text_active')
-          setTeacherHelpError('We could not prepare the classroom lobby. Please try again.')
+          setTeacherHelpError(t('tutorEscalation.lobbyFailed'))
         },
       },
     )
@@ -341,7 +348,7 @@ export function ChatPage() {
         <EmptyState
           message={
             questionBankContext
-              ? 'Review this question step with the Learning Assistant.'
+              ? t('questionBankContext.welcome')
               : uploadContext
                 ? uploadContext.description
               : practiceContext
@@ -387,7 +394,15 @@ export function ChatPage() {
             ref={newConversationRef}
             value={newConversationMessage}
             onChange={(event) => setNewConversationMessage(event.target.value)}
-            placeholder={questionBankContext ? 'Ask what is unclear in this question...' : uploadContext ? 'Tell the Learning Assistant what part is unclear...' : practiceContext ? t('practiceContext.placeholder') : t('placeholder')}
+            placeholder={
+              questionBankContext
+                ? t('questionBankContext.placeholder')
+                : uploadContext
+                  ? t('uploadContext.placeholder')
+                  : practiceContext
+                    ? t('practiceContext.placeholder')
+                    : t('placeholder')
+            }
             className="min-h-24 resize-none"
             disabled={createConversationMutation.isPending}
             aria-label={t('newConversationLabel')}
@@ -573,24 +588,28 @@ function TeacherVideoEscalationCard({
           <div>
             <p className="brand-section-kicker">{t('tutorSupport')}</p>
             <h2 className="mt-2 text-lg font-semibold">
-              {isTextActive ? 'Tutor joined' : 'Tutor support requested'}
+              {isTextActive
+                ? t('tutorEscalation.joinedTitle')
+                : t('tutorEscalation.requestedTitle')}
             </h2>
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
               {isTextActive
-                ? 'The Learning Assistant is observing while your tutor helps. Start a live classroom if you still need deeper support.'
-                : 'A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting.'}
+                ? t('tutorEscalation.joinedBody')
+                : t('tutorEscalation.requestedBody')}
             </p>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
             {!isTextActive && (
               <Button type="button" variant="outline" onClick={onTeacherTextActive}>
-                Tutor joined
+                {t('tutorEscalation.confirmJoined')}
               </Button>
             )}
             {isTextActive && (
               <Button type="button" onClick={onStartVideo} disabled={isStartingVideo}>
                 <Video className="h-4 w-4" aria-hidden="true" />
-                {isStartingVideo ? 'Preparing lobby...' : 'Start Live Classroom'}
+                {isStartingVideo
+                  ? t('tutorEscalation.preparingLobby')
+                  : t('tutorEscalation.startClassroom')}
               </Button>
             )}
           </div>
@@ -600,7 +619,15 @@ function TeacherVideoEscalationCard({
   )
 }
 
+/**
+ * The first message, with the context the student came in with attached.
+ *
+ * This text is shown back as the student's own message bubble, so the context
+ * lines are written in the language they are reading the app in — they used to
+ * be English labels sitting under German or French prose.
+ */
 function buildInitialMessage(
+  t: TFunction<'chat'>,
   message: string,
   practiceContext: PracticeChatLocationState['practiceContext'],
   questionBankContext?: QuestionBankChatLocationState['questionBankContext'],
@@ -610,25 +637,31 @@ function buildInitialMessage(
     return [
       message || uploadContext.prompt,
       '',
-      `Upload source: ${uploadContext.title}`,
-      uploadContext.sessionId ? `Question session: ${uploadContext.sessionId}` : '',
-      uploadContext.questionId ? `Question: ${uploadContext.questionId}` : '',
+      t('contextLines.uploadSource', { title: uploadContext.title }),
+      uploadContext.sessionId
+        ? t('contextLines.questionSession', { sessionId: uploadContext.sessionId })
+        : '',
+      uploadContext.questionId
+        ? t('contextLines.questionId', { questionId: uploadContext.questionId })
+        : '',
       uploadContext.attachments.length > 0
-        ? `Attached learning material: ${uploadContext.attachments.map((attachment) => attachment.fileName).join(', ')}`
+        ? t('contextLines.attachedMaterial', {
+            files: uploadContext.attachments.map((attachment) => attachment.fileName).join(', '),
+          })
         : '',
     ].filter(Boolean).join('\n')
   }
 
   if (questionBankContext) {
-    const question = message || 'Can you explain this question step?'
-
     return [
-      question,
+      message || t('defaultPrompt.questionStep'),
       '',
-      `Practice Library set: ${questionBankContext.setTitle}`,
-      `Practice Library topic: ${questionBankContext.topic}`,
-      `Question: ${questionBankContext.challengePrompt}`,
-      questionBankContext.studentAnswer ? `My answer: ${questionBankContext.studentAnswer}` : '',
+      t('contextLines.librarySet', { title: questionBankContext.setTitle }),
+      t('contextLines.libraryTopic', { topic: questionBankContext.topic }),
+      t('contextLines.question', { prompt: questionBankContext.challengePrompt }),
+      questionBankContext.studentAnswer
+        ? t('contextLines.myAnswer', { answer: questionBankContext.studentAnswer })
+        : '',
     ].filter(Boolean).join('\n')
   }
 
@@ -636,16 +669,18 @@ function buildInitialMessage(
     return message
   }
 
-  const question = message || 'Can you explain this step?'
-
   return [
-    question,
+    message || t('defaultPrompt.practice'),
     '',
-    `Practice topic: ${practiceContext.topic}`,
-    `Practice question: ${practiceContext.challengePrompt}`,
-    practiceContext.studentAnswer ? `My answer: ${practiceContext.studentAnswer}` : '',
-    typeof practiceContext.attempts === 'number' ? `Attempts: ${practiceContext.attempts}` : '',
-    practiceContext.hintViewed ? 'Hint viewed: yes' : '',
+    t('contextLines.practiceTopic', { topic: practiceContext.topic }),
+    t('contextLines.practiceQuestion', { prompt: practiceContext.challengePrompt }),
+    practiceContext.studentAnswer
+      ? t('contextLines.myAnswer', { answer: practiceContext.studentAnswer })
+      : '',
+    typeof practiceContext.attempts === 'number'
+      ? t('contextLines.attempts', { attempts: practiceContext.attempts })
+      : '',
+    practiceContext.hintViewed ? t('contextLines.hintViewed') : '',
   ].filter(Boolean).join('\n')
 }
 

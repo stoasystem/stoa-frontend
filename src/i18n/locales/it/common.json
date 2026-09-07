@@ -51,7 +51,9 @@
     },
     "learn": "Impara",
     "about": "Chi è STOA",
-    "studentNavigationLabel": "Navigazione dello studente"
+    "studentNavigationLabel": "Navigazione dello studente",
+    "primary": "Navigazione principale",
+    "mobilePrimary": "Navigazione principale mobile"
   },
   "actions": {
     "startLearning": "Inizia a studiare",
@@ -69,7 +71,9 @@
     "viewPricing": "Vedi i prezzi",
     "askTeacher": "Chiedi a un insegnante",
     "send": "Invia messaggio",
-    "stop": "Ferma"
+    "stop": "Ferma",
+    "logOut": "Esci",
+    "tryAgain": "Riprova"
   },
   "roles": {
     "student": "Studente",
@@ -137,7 +141,7 @@
       "free_trial": "Prova gratuita",
       "student": "Piano studente",
       "family": "Piano famiglia",
-      "tutor_supported": "Piano con insegnante"
+      "teacher_supported": "Piano con insegnante"
     },
     "file": {
       "uploaded": "Caricato",
@@ -180,5 +184,15 @@
       "read": "Letta",
       "archived": "Archiviata"
     }
-  }
+  },
+  "a11y": {
+    "loadingPage": "Caricamento della pagina",
+    "loadingDashboard": "Caricamento della panoramica",
+    "breadcrumb": "Percorso di navigazione"
+  },
+  "errorBoundary": {
+    "title": "Qualcosa è andato storto",
+    "body": "Riprova o ricarica la pagina."
+  },
+  "nextStep": "Prossimo passo consigliato"
 }

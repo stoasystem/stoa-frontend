@@ -37,7 +37,19 @@ export function QuestionSessionPage() {
   const finishSetMutation = useCompleteQuestionBankSetMutation()
 
   if (sessionQuery.isLoading) return <LoadingState message={t('library.loadingQuestions')} />
-  if (sessionQuery.isError || !setData || !question) return <ErrorState title="We could not load this practice set" message="Please return to the Practice Library and try again." action={<Button asChild variant="outline"><Link to="/question-bank">Back to Practice Library</Link></Button>} />
+  if (sessionQuery.isError || !setData || !question) {
+    return (
+      <ErrorState
+        title={t('session.loadFailedTitle')}
+        message={t('session.loadFailedBody')}
+        action={
+          <Button asChild variant="outline">
+            <Link to="/question-bank">{t('session.backToLibrary')}</Link>
+          </Button>
+        }
+      />
+    )
+  }
 
   const loadedSet = setData
   const loadedQuestion = question
@@ -76,8 +88,8 @@ export function QuestionSessionPage() {
       })),
       skippedQuestions: [],
       nextSteps: incorrect.length
-        ? ['Review the questions you missed.', 'Ask the Learning Assistant about the ones still unclear.']
-        : ['Continue with the next set in this topic.'],
+        ? [t('session.nextStepReviewMissed'), t('session.nextStepAskAssistant')]
+        : [t('session.nextStepContinue')],
     }
     finishSetMutation.mutate(loadedSet.id, {
       onSettled: () => {
@@ -130,7 +142,7 @@ export function QuestionSessionPage() {
         correctAnswer: Array.isArray(loadedQuestion.correctAnswer) ? loadedQuestion.correctAnswer.join(' / ') : loadedQuestion.correctAnswer,
         returnTo: `/question-bank/session/${sessionId}`,
       },
-      prompt: `Can you explain this Practice Library step: ${loadedQuestion.prompt}`,
+      prompt: t('session.askPrompt', { prompt: loadedQuestion.prompt }),
     }
     navigate('/chat?source=question-bank&questionId=' + loadedQuestion.id, { state })
   }
@@ -139,8 +151,8 @@ export function QuestionSessionPage() {
     const uploadContext = {
       source: 'question-session-upload' as const,
       title: loadedSet.title,
-      description: `Uploaded work for ${loadedQuestion.skill}. The Learning Assistant will use this as context.`,
-      prompt: 'I uploaded my work for this Practice Library question. Please help me understand the next step without just giving me the answer.',
+      description: t('session.uploadDescription', { skill: loadedQuestion.skill }),
+      prompt: t('session.uploadPrompt'),
       returnTo: `/question-bank/session/${sessionId}`,
       sessionId,
       questionId: loadedQuestion.id,
@@ -164,11 +176,21 @@ export function QuestionSessionPage() {
                 {loadedSet.title}
               </Link>
               <h1 className="mt-2 text-2xl font-semibold">{loadedSet.title}</h1>
-              <p className="mt-1 text-sm text-muted-foreground">Question {currentIndex + 1} of {questions.length}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('session.questionOf', { current: currentIndex + 1, total: questions.length })}
+              </p>
             </div>
-            <div className="text-sm text-muted-foreground">{answeredCount} checked · {questions.length - answeredCount} remaining</div>
+            <div className="text-sm text-muted-foreground">
+              {t('session.checkedRemaining', {
+                checked: answeredCount,
+                remaining: questions.length - answeredCount,
+              })}
+            </div>
           </div>
-          <div className="mt-4 h-2 rounded-full bg-muted" aria-label={`Session progress ${progress}%`}>
+          <div
+            className="mt-4 h-2 rounded-full bg-muted"
+            aria-label={t('session.progressLabel', { percent: progress })}
+          >
             <div className="h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
           </div>
         </section>
@@ -178,20 +200,24 @@ export function QuestionSessionPage() {
             <div>
               <p className="brand-section-kicker">{loadedQuestion.skill}</p>
               <h2 className="mt-3 text-2xl font-semibold leading-tight">{loadedQuestion.prompt}</h2>
-              <p className="mt-2 text-sm capitalize text-muted-foreground">{loadedQuestion.type.replace(/_/g, ' ')} · {loadedQuestion.difficulty}</p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t(`questionType.${loadedQuestion.type}`, { defaultValue: loadedQuestion.type })}
+                {' · '}
+                {loadedQuestion.difficulty}
+              </p>
             </div>
             <QuestionAnswerInput question={loadedQuestion} value={answer} onChange={setAnswer} />
             <div className="flex flex-wrap gap-2">
               <Button type="button" onClick={checkAnswer} disabled={submitAnswerMutation.isPending}>
                 <Check className="h-4 w-4" aria-hidden="true" />
-                Check Answer
+                {t('session.checkAnswer')}
               </Button>
               <Button type="button" variant="outline" onClick={skipQuestion} disabled={submitAnswerMutation.isPending}>
-                Skip for Now
+                {t('session.skipForNow')}
               </Button>
               {everyQuestionChecked && (
                 <Button type="button" variant="secondary" onClick={finishSet} disabled={finishSetMutation.isPending}>
-                  {finishSetMutation.isPending ? 'Finishing...' : 'Finish set'}
+                  {finishSetMutation.isPending ? t('session.finishing') : t('session.finishSet')}
                 </Button>
               )}
             </div>
@@ -210,7 +236,7 @@ export function QuestionSessionPage() {
           </div>
           <aside className="space-y-4">
             <div className="rounded-lg border bg-card/95 p-4">
-              <p className="brand-section-kicker">Practice Navigation</p>
+              <p className="brand-section-kicker">{t('session.navigation')}</p>
               <div className="mt-4 grid grid-cols-5 gap-2">
                 {questions.map((item, index) => (
                   <button
@@ -218,7 +244,7 @@ export function QuestionSessionPage() {
                     type="button"
                     onClick={() => goTo(index)}
                     className={`rounded-md border px-3 py-2 text-sm font-semibold ${index === currentIndex ? 'border-primary bg-primary text-primary-foreground' : feedbackByQuestion[item.id] ? 'border-primary/30 bg-[hsl(var(--stoa-brand-burgundy-soft))]' : 'bg-card'}`}
-                    aria-label={`Open question ${index + 1}`}
+                    aria-label={t('session.openQuestion', { number: index + 1 })}
                   >
                     {index + 1}
                   </button>
@@ -226,27 +252,29 @@ export function QuestionSessionPage() {
               </div>
             </div>
             <div className="rounded-lg border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-4">
-              <p className="brand-section-kicker">Finish Practice</p>
+              <p className="brand-section-kicker">{t('session.finishPractice')}</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                You still have {questions.length - answeredCount} question{questions.length - answeredCount === 1 ? '' : 's'} without feedback.
+                {t('session.withoutFeedback', { count: questions.length - answeredCount })}
               </p>
               <div className="mt-4 flex flex-col gap-2">
                 {answeredCount < questions.length && (
                   <Button type="button" variant="outline" onClick={() => goTo(questions.findIndex((item) => !feedbackByQuestion[item.id]))}>
                     <Flag className="h-4 w-4" aria-hidden="true" />
-                    Review Unanswered
+                    {t('session.reviewUnanswered')}
                   </Button>
                 )}
                 <Button asChild>
                   <Link to={getQuestionBankResultPath(sessionId ?? 'session-linear-equations-basics')}>
-                    Finish Anyway
+                    {t('session.finishAnyway')}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>
               </div>
             </div>
             <Button asChild variant="outline" className="w-full">
-              <Link to={getPracticeTopicPath(loadedSet.subjectId, loadedSet.topicId)}>Related Practice Path</Link>
+              <Link to={getPracticeTopicPath(loadedSet.subjectId, loadedSet.topicId)}>
+                {t('session.relatedPath')}
+              </Link>
             </Button>
           </aside>
         </section>

@@ -1,4 +1,5 @@
 import { CheckCircle2, HelpCircle, RotateCcw, XCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import type { QuestionBankFeedback } from '@/types/questionBank'
 
@@ -11,10 +12,12 @@ export function QuestionFeedbackPanel({
   onAskLearningAssistant: () => void
   onTrySimilar?: () => void
 }) {
+  const { t } = useTranslation('practice')
+
   if (!feedback) {
     return (
       <div className="rounded-lg border border-dashed bg-card/70 p-5 text-sm text-muted-foreground">
-        Check your answer when you are ready. Feedback appears here before you move on.
+        {t('feedback.waiting')}
       </div>
     )
   }
@@ -35,17 +38,21 @@ export function QuestionFeedbackPanel({
       </div>
       {feedback.studentAnswer && feedback.state !== 'correct' && (
         <p className="mt-4 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm">
-          Your answer: <span className="font-semibold">{answerToText(feedback.studentAnswer)}</span>
+          {t('feedback.yourAnswer')}
+          <span className="font-semibold">{answerToText(feedback.studentAnswer)}</span>
         </p>
       )}
       {feedback.state !== 'correct' && feedback.correctAnswer && (
         <p className="mt-3 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm">
-          Correct answer: <span className="font-semibold">{answerToText(feedback.correctAnswer)}</span>
+          {t('feedback.correctAnswer')}
+          <span className="font-semibold">{answerToText(feedback.correctAnswer)}</span>
         </p>
       )}
       {feedback.explanation && (
         <div className="mt-4 rounded-md border border-primary/15 bg-[hsl(var(--stoa-brand-burgundy-soft))] p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">Explanation</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.08em] text-primary">
+            {t('feedback.explanation')}
+          </p>
           <p className="mt-2 text-sm leading-6">{feedback.explanation}</p>
         </div>
       )}
@@ -53,12 +60,12 @@ export function QuestionFeedbackPanel({
         {feedback.state !== 'correct' && onTrySimilar && (
           <Button type="button" variant="outline" onClick={onTrySimilar}>
             <RotateCcw className="h-4 w-4" aria-hidden="true" />
-            Try Similar Question
+            {t('feedback.trySimilar')}
           </Button>
         )}
         <Button type="button" variant="outline" onClick={onAskLearningAssistant}>
           <HelpCircle className="h-4 w-4" aria-hidden="true" />
-          Ask Learning Assistant
+          {t('feedback.askAssistant')}
         </Button>
       </div>
     </section>

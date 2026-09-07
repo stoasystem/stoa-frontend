@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useTranslation } from 'react-i18next'
 import { getCurriculumCatalog } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 
@@ -12,9 +11,8 @@ export function useCurriculumCatalogQuery({
   gradeLevel?: string
   includePreview?: boolean
 } = {}) {
-  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: practiceQueryKeys.curriculumCatalog(subjectId, gradeLevel, includePreview, i18n.language),
+    queryKey: practiceQueryKeys.curriculumCatalog(subjectId, gradeLevel, includePreview),
     queryFn: () => getCurriculumCatalog({ subjectId, gradeLevel, includePreview }),
   })
 }

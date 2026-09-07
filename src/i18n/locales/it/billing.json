@@ -26,25 +26,41 @@
       "name": "Prova gratuita",
       "audience": "Famiglie che vogliono provare STOA prima di scegliere un piano.",
       "cta": "Inizia prova",
-      "features": ["Domande guidate", "Area genitori", "Cronologia semplice"]
+      "features": [
+        "Domande guidate",
+        "Area genitori",
+        "Cronologia semplice"
+      ]
     },
     "student": {
       "name": "Piano studente",
       "audience": "Uno studente che ha bisogno di supporto costante nei compiti.",
       "cta": "Scegli studente",
-      "features": ["Spazio di studio", "Caricamento compiti", "Area genitori"]
+      "features": [
+        "Spazio di studio",
+        "Caricamento compiti",
+        "Area genitori"
+      ]
     },
-    "tutor_supported": {
+    "teacher_supported": {
       "name": "Piano con insegnante",
       "audience": "Famiglie che vogliono domande settimanali limitate a un insegnante.",
       "cta": "Scegli insegnante",
-      "features": ["Tutto in Studente", "Report settimanale", "Domande insegnante limitate ogni settimana"]
+      "features": [
+        "Tutto in Studente",
+        "Report settimanale",
+        "Domande insegnante limitate ogni settimana"
+      ]
     },
     "family": {
       "name": "Piano famiglia",
       "audience": "Famiglie che vogliono il livello di supporto più alto e accesso condiviso.",
       "cta": "Scegli famiglia",
-      "features": ["Tutto in Con insegnante", "5x più tempo insegnante", "Vantaggi condivisi fino a 3 persone"]
+      "features": [
+        "Tutto in Con insegnante",
+        "5x più tempo insegnante",
+        "Vantaggi condivisi fino a 3 persone"
+      ]
     }
   }
 }

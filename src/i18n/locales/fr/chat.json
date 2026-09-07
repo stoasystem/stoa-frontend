@@ -29,7 +29,9 @@
     "recentAnswer": "Réponse récente",
     "backToLesson": "Retour à la leçon",
     "welcome": "Revois cette étape avec l’Assistant d’apprentissage.",
-    "placeholder": "Demande l’étape suivante, pas seulement la réponse finale..."
+    "placeholder": "Demande l’étape suivante, pas seulement la réponse finale...",
+    "attempts": "Tentatives : {{attempts}}",
+    "hintViewed": "Indice consulté"
   },
   "availability": {
     "checking": "Vérification des enseignants",
@@ -82,5 +84,64 @@
     "requesting": "Demande en cours...",
     "requestTeacher": "Demander un enseignant",
     "planRestricted": "L'aide enseignante ne fait pas partie de votre offre actuelle."
+  },
+  "roles": {
+    "tutor": "Tuteur",
+    "system": "Système",
+    "assistant": "Assistant d’apprentissage STOA"
+  },
+  "messageStatus": {
+    "sending": "Envoi en cours",
+    "stopped": "Génération arrêtée",
+    "failed": "Nouvelle tentative requise"
+  },
+  "thinking": "Réflexion…",
+  "report": {
+    "trigger": "Signaler la réponse",
+    "context": "Envoyer cette réponse de l’assistant à la file de modération interne."
+  },
+  "questionBankContext": {
+    "welcome": "Revois cette étape de l’exercice avec l’assistant d’apprentissage.",
+    "placeholder": "Demande ce qui n’est pas clair dans cet exercice..."
+  },
+  "uploadContext": {
+    "placeholder": "Indique à l’assistant d’apprentissage quelle partie n’est pas claire..."
+  },
+  "defaultPrompt": {
+    "practice": "Peux-tu expliquer cette étape ?",
+    "questionBank": "Peux-tu expliquer cette étape de la bibliothèque d’exercices ?",
+    "questionStep": "Peux-tu expliquer cette étape de l’exercice ?"
+  },
+  "tutorEscalation": {
+    "requestedTitle": "Aide d’un tuteur demandée",
+    "requestedBody": "Un tuteur rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant.",
+    "joinedTitle": "Le tuteur a rejoint",
+    "joinedBody": "L’assistant d’apprentissage observe pendant que ton tuteur t’aide. Lance une classe en direct s’il te faut un accompagnement plus poussé.",
+    "confirmJoined": "Le tuteur a rejoint",
+    "startClassroom": "Lancer la classe en direct",
+    "preparingLobby": "Préparation du salon...",
+    "lobbyFailed": "Nous n’avons pas pu préparer le salon de la classe. Merci de réessayer."
+  },
+  "contextLines": {
+    "uploadSource": "Source du téléversement : {{title}}",
+    "questionSession": "Séance d’exercices : {{sessionId}}",
+    "questionId": "Exercice : {{questionId}}",
+    "attachedMaterial": "Matériel d’apprentissage joint : {{files}}",
+    "librarySet": "Série de la bibliothèque d’exercices : {{title}}",
+    "libraryTopic": "Thème de la bibliothèque d’exercices : {{topic}}",
+    "question": "Exercice : {{prompt}}",
+    "myAnswer": "Ma réponse : {{answer}}",
+    "practiceTopic": "Thème de la pratique : {{topic}}",
+    "practiceQuestion": "Exercice de pratique : {{prompt}}",
+    "attempts": "Tentatives : {{attempts}}",
+    "hintViewed": "Indice consulté : oui"
+  },
+  "currentQuestion": "Exercice en cours",
+  "followUp": {
+    "label": "Suggestions de questions",
+    "explainStep": "Je ne comprends pas une des étapes",
+    "simpler": "Peux-tu l’expliquer plus simplement ?",
+    "similar": "Donne-moi un exercice similaire",
+    "why": "Pourquoi est-ce que cela marche ?"
   }
 }

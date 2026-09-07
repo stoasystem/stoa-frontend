@@ -29,7 +29,9 @@
     "recentAnswer": "Recent answer",
     "backToLesson": "Back to lesson",
     "welcome": "Review this practice step with the Learning Assistant.",
-    "placeholder": "Ask for the next step, not just the final answer..."
+    "placeholder": "Ask for the next step, not just the final answer...",
+    "attempts": "Attempts: {{attempts}}",
+    "hintViewed": "Hint viewed"
   },
   "availability": {
     "checking": "Checking tutors",
@@ -82,5 +84,64 @@
     "requesting": "Requesting...",
     "requestTeacher": "Request teacher",
     "planRestricted": "Teacher support is not part of your current plan."
+  },
+  "roles": {
+    "tutor": "Tutor",
+    "system": "System",
+    "assistant": "STOA Learning Assistant"
+  },
+  "messageStatus": {
+    "sending": "Sending",
+    "stopped": "Generation stopped",
+    "failed": "Needs retry"
+  },
+  "thinking": "Thinking…",
+  "report": {
+    "trigger": "Report answer",
+    "context": "Send this assistant response to the internal moderation queue."
+  },
+  "questionBankContext": {
+    "welcome": "Review this question step with the Learning Assistant.",
+    "placeholder": "Ask what is unclear in this question..."
+  },
+  "uploadContext": {
+    "placeholder": "Tell the Learning Assistant what part is unclear..."
+  },
+  "defaultPrompt": {
+    "practice": "Can you explain this step?",
+    "questionBank": "Can you explain this Practice Library step?",
+    "questionStep": "Can you explain this question step?"
+  },
+  "tutorEscalation": {
+    "requestedTitle": "Tutor support requested",
+    "requestedBody": "A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting.",
+    "joinedTitle": "Tutor joined",
+    "joinedBody": "The Learning Assistant is observing while your tutor helps. Start a live classroom if you still need deeper support.",
+    "confirmJoined": "Tutor joined",
+    "startClassroom": "Start Live Classroom",
+    "preparingLobby": "Preparing lobby...",
+    "lobbyFailed": "We couldn’t prepare the classroom lobby. Please try again."
+  },
+  "contextLines": {
+    "uploadSource": "Upload source: {{title}}",
+    "questionSession": "Question session: {{sessionId}}",
+    "questionId": "Question: {{questionId}}",
+    "attachedMaterial": "Attached learning material: {{files}}",
+    "librarySet": "Practice Library set: {{title}}",
+    "libraryTopic": "Practice Library topic: {{topic}}",
+    "question": "Question: {{prompt}}",
+    "myAnswer": "My answer: {{answer}}",
+    "practiceTopic": "Practice topic: {{topic}}",
+    "practiceQuestion": "Practice question: {{prompt}}",
+    "attempts": "Attempts: {{attempts}}",
+    "hintViewed": "Hint viewed: yes"
+  },
+  "currentQuestion": "Current question",
+  "followUp": {
+    "label": "Follow-up suggestions",
+    "explainStep": "I don’t understand one of the steps",
+    "simpler": "Can you explain it more simply?",
+    "similar": "Give me a similar exercise",
+    "why": "Why does this work?"
   }
 }

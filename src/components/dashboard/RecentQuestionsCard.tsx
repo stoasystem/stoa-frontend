@@ -1,27 +1,15 @@
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { RecentQuestion } from '@/types/dashboard'
-
-const statusLabel: Record<RecentQuestion['status'], string> = {
-  answered_by_ai: 'Explained',
-  teacher_helped: 'Teacher helped',
-  pending: 'Pending',
-}
-
-function formatQuestionDate(value: string) {
-  return new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(value))
-}
 
 export function RecentQuestionsCard({ questions }: { questions: RecentQuestion[] }) {
   const { t } = useTranslation('practice')
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Recent Questions</CardTitle>
+        <CardTitle className="text-base">{t('dashboard.recentQuestions')}</CardTitle>
         <CardDescription>{t('progress.recentQuestions')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -33,11 +21,11 @@ export function RecentQuestionsCard({ questions }: { questions: RecentQuestion[]
             <div className="min-w-0">
               <div className="text-sm font-medium leading-5">{question.title}</div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {question.subject} · {formatQuestionDate(question.createdAt)}
+                {question.subject} · {formatDayAndMonth(question.createdAt)}
               </div>
             </div>
             <Badge className="shrink-0" variant="secondary">
-              {statusLabel[question.status]}
+              {t(`dashboard.questionStatus.${question.status}`)}
             </Badge>
           </div>
         ))}

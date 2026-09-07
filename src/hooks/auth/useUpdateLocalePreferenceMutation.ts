@@ -3,8 +3,6 @@ import { queryClient } from '@/app/query/queryClient'
 import { updateLocalePreference } from '@/services/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
 import type { SupportedLanguage } from '@/i18n/languages'
-import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
-import { questionBankQueryKeys } from '@/services/questionBank/questionBankQueryKeys'
 
 export function useUpdateLocalePreferenceMutation() {
   const setUser = useAuthStore((state) => state.setUser)
@@ -23,12 +21,12 @@ export function useUpdateLocalePreferenceMutation() {
         })
       }
       void queryClient.invalidateQueries({ queryKey: ['auth', 'me'] })
-      // The locale switch lands on the backend after this call resolves, so the
-      // query-key change from i18n.changeLanguage() may have already refetched
-      // curriculum content against the still-old persisted locale. Invalidate
-      // once more now that the new locale is actually saved.
-      void queryClient.invalidateQueries({ queryKey: practiceQueryKeys.all })
-      void queryClient.invalidateQueries({ queryKey: questionBankQueryKeys.all })
+      // Content is no longer refetched here. Requests carry Accept-Language, so
+      // the refetch that i18n.changeLanguage() already triggered came back in
+      // the new language; invalidating again only replayed every curriculum
+      // query a second time and left the screen on skeletons for both rounds.
+      // This call now only persists the preference for the student's next
+      // session and their other devices.
     },
   })
 }

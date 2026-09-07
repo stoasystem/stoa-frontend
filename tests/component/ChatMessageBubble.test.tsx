@@ -48,12 +48,12 @@ describe('assistant message content', () => {
 describe('streaming state', () => {
   it('shows a thinking placeholder before the first token arrives', () => {
     render(<ChatMessageBubble message={message({ content: '', status: 'streaming' })} />)
-    expect(screen.getByText('Thinking…')).toBeInTheDocument()
+    expect(screen.getByText('thinking')).toBeInTheDocument()
   })
 
   it('replaces the placeholder once content starts arriving', () => {
     render(<ChatMessageBubble message={message({ content: 'Partial', status: 'streaming' })} />)
-    expect(screen.queryByText('Thinking…')).toBeNull()
+    expect(screen.queryByText('thinking')).toBeNull()
     expect(screen.getByText('Partial')).toBeInTheDocument()
   })
 
@@ -74,7 +74,7 @@ describe('streaming state', () => {
   it('hides the cursor on an empty completed message', () => {
     const { container } = render(<ChatMessageBubble message={message({ content: '' })} />)
     expect(container.querySelector('[class*="animate-[blink"]')).toBeNull()
-    expect(screen.queryByText('Thinking…')).toBeNull()
+    expect(screen.queryByText('thinking')).toBeNull()
   })
 })
 

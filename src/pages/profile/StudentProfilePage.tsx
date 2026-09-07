@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
@@ -29,6 +30,7 @@ import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlemen
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
+import { formatDate as formatDateWithYear } from '@/lib/formatDateTime'
 import { studentProfileSchema } from '@/lib/validation'
 import type { SubscriptionPlan } from '@/types/billing'
 import type { StudentEntitlement, StudentProfile } from '@/types/student'
@@ -39,11 +41,6 @@ type ProfileErrors = {
   preferredAnswerLanguage?: string
 }
 
-const guardianStatusLabel: Record<StudentProfile['guardianStatus'], string> = {
-  linked: 'Linked',
-  not_linked: 'Not linked',
-}
-
 type ProfileBillingSnapshot = {
   planName: string
   statusLabel: string
@@ -52,6 +49,7 @@ type ProfileBillingSnapshot = {
 
 export function StudentProfilePage() {
   const { t } = useTranslation('practice')
+  const { t: tCommon } = useTranslation('common')
   const profileQuery = useStudentProfileQuery()
   const entitlementQuery = useStudentEntitlementQuery()
   const learningProfileQuery = useStudentLearningProfileQuery(profileQuery.data?.userId)
@@ -106,10 +104,12 @@ export function StudentProfilePage() {
       <PageContainer className="space-y-7 p-0">
         <PageHeader
           title={t('profile.title')}
-          description="Account, family, billing, and learning context used to keep STOA support accurate."
+          description={t('profile.description')}
         />
         {profileQuery.isLoading && <PageSkeleton rows={4} />}
-        {profileQuery.isError && <p className="text-sm text-destructive">Failed to load profile.</p>}
+        {profileQuery.isError && (
+          <p className="text-sm text-destructive">{t('profile.loadFailed')}</p>
+        )}
         {profile && (
           <>
             <section className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -180,10 +180,16 @@ export function StudentProfilePage() {
                 </div>
                 <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Button type="submit" disabled={updateProfile.isPending}>
-                    {updateProfile.isPending ? 'Saving...' : 'Save learning context'}
+                    {updateProfile.isPending
+                      ? tCommon('actions.saving')
+                      : t('profile.saveLearningContext')}
                   </Button>
-                  {updateProfile.isError && <p className="text-sm text-destructive">Failed to save profile.</p>}
-                  {updateProfile.isSuccess && <p className="text-sm text-muted-foreground">Profile saved.</p>}
+                  {updateProfile.isError && (
+                    <p className="text-sm text-destructive">{t('profile.saveFailed')}</p>
+                  )}
+                  {updateProfile.isSuccess && (
+                    <p className="text-sm text-muted-foreground">{t('profile.saved')}</p>
+                  )}
                 </div>
               </form>
             </section>
@@ -208,16 +214,16 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
       <CardHeader>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="brand-section-kicker">Student account</p>
+            <p className="brand-section-kicker">{t('profile.accountKicker')}</p>
             <CardTitle className="mt-2 text-3xl">{profile.name}</CardTitle>
             <CardDescription className="mt-2">
-              {profile.grade} · {profile.schoolSystem ?? 'School system not set'}
+              {profile.grade} · {profile.schoolSystem ?? t('profile.schoolSystemNotSet')}
             </CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
-        <ProfileDetail icon={Mail} label="Email" value={profile.email} />
+        <ProfileDetail icon={Mail} label={t('profile.email')} value={profile.email} />
         <ProfileDetail icon={GraduationCap} label={t('profile.primarySubjects')} value={profile.primarySubjects.join(', ')} />
         <ProfileDetail
           icon={Languages}
@@ -240,18 +246,22 @@ function AccountStatusCard({
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Account status</CardTitle>
-        <CardDescription>Access, family binding, and latest profile update.</CardDescription>
+        <CardTitle className="text-base">{t('profile.accountStatus')}</CardTitle>
+        <CardDescription>{t('profile.accountStatusBody')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <ProfileDetail icon={UserRound} label={t('profile.studentId')} value={profile.userId} />
         <ProfileDetail
           icon={UsersRound}
           label={t('profile.parentAccount')}
-          value={guardianStatusLabel[profile.guardianStatus]}
+          value={t(`profile.guardianStatus.${profile.guardianStatus}`)}
         />
-        <ProfileDetail icon={ShieldCheck} label={t('profile.billingStatus')} value={billing?.statusLabel ?? 'Not set'} />
-        <ProfileDetail icon={CalendarDays} label={t('profile.lastUpdated')} value={formatDate(profile.updatedAt)} />
+        <ProfileDetail
+          icon={ShieldCheck}
+          label={t('profile.billingStatus')}
+          value={billing?.statusLabel ?? t('profile.notSet')}
+        />
+        <ProfileDetail icon={CalendarDays} label={t('profile.lastUpdated')} value={formatDate(profile.updatedAt, t)} />
       </CardContent>
     </Card>
   )
@@ -267,11 +277,9 @@ function GuardianCard({ profile }: { profile: StudentProfile }) {
       </CardHeader>
       <CardContent>
         {profile.guardianStatus === 'linked' ? (
-          <p className="text-sm text-muted-foreground">
-            A parent account is linked and can follow this student's progress.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('profile.guardianLinked')}</p>
         ) : (
-          <p className="text-sm text-muted-foreground">No parent or guardian account is linked yet.</p>
+          <p className="text-sm text-muted-foreground">{t('profile.noParentLinked')}</p>
         )}
       </CardContent>
     </Card>
@@ -283,18 +291,22 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Plan</CardTitle>
+        <CardTitle className="text-base">{t('profile.plan')}</CardTitle>
         <CardDescription>{t('profile.subscriptionCover')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         {billing ? (
           <>
-            <ProfileDetail icon={CreditCard} label="Plan" value={billing.planName} />
-            <ProfileDetail icon={ShieldCheck} label="Status" value={billing.statusLabel} />
-            <ProfileDetail icon={CalendarDays} label={t('profile.trialEnds')} value={formatDate(billing.nextBillingDate)} />
+            <ProfileDetail icon={CreditCard} label={t('profile.plan')} value={billing.planName} />
+            <ProfileDetail
+              icon={ShieldCheck}
+              label={t('profile.planStatus')}
+              value={billing.statusLabel}
+            />
+            <ProfileDetail icon={CalendarDays} label={t('profile.trialEnds')} value={formatDate(billing.nextBillingDate, t)} />
           </>
         ) : (
-          <p className="text-sm text-muted-foreground">No subscription is attached to this account.</p>
+          <p className="text-sm text-muted-foreground">{t('profile.noSubscription')}</p>
         )}
       </CardContent>
     </Card>
@@ -340,14 +352,9 @@ function ProfileDetail({
   )
 }
 
-function formatDate(value?: string) {
-  if (!value) return 'Not provided'
-
-  return new Intl.DateTimeFormat('en', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  }).format(new Date(value))
+function formatDate(value: string | undefined, t: TFunction<'practice'>) {
+  if (!value) return t('profile.notProvided')
+  return formatDateWithYear(value)
 }
 
 function formatLanguage(languageCode: SupportedLanguage) {

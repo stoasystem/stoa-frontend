@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/common/Skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 
 export function DashboardSkeleton() {
+  const { t } = useTranslation('common')
+
   return (
-    <div className="space-y-8" role="status" aria-label="Loading dashboard">
+    <div className="space-y-8" role="status" aria-label={t('a11y.loadingDashboard')}>
       <div className="space-y-3">
         <Skeleton className="h-7 w-56" />
         <Skeleton className="h-4 w-full max-w-2xl" />
@@ -32,7 +35,7 @@ export function DashboardSkeleton() {
         <Skeleton className="h-72 rounded-lg" />
         <Skeleton className="h-72 rounded-lg" />
       </div>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{t('status.loading')}</span>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { httpClient } from '@/services/api/httpClient'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
+import { activeLanguage } from '@/i18n/languages'
 import type { ChatStreamEvent } from '@/types/chat'
 
 export type StreamMessagePayload = {
@@ -31,6 +32,9 @@ export async function streamConversationMessage({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          // This request bypasses httpClient, so it carries the reader's
+          // language itself — the assistant answers in it.
+          'Accept-Language': activeLanguage(),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify(payload),

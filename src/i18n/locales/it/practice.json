@@ -99,7 +99,26 @@
     "planLimits": "I limiti del tuo piano appariranno qui.",
     "weakTopicsFailed": "Non è stato possibile caricare gli argomenti deboli. Riprova più tardi.",
     "weakTopicReason": "I segnali recenti indicano questo argomento come prossimo punto da recuperare.",
-    "questionAsked": "Domanda posta"
+    "questionAsked": "Domanda posta",
+    "history": {
+      "sources": {
+        "questions": "Domande",
+        "practice_path": "Percorso guidato",
+        "practice_library": "Biblioteca di esercizi",
+        "classroom": "Classe"
+      },
+      "kinds": {
+        "question_asked": "Domanda posta",
+        "question_answered": "Domanda con risposta",
+        "teacher_help": "Aiuto dell’insegnante richiesto",
+        "practice_lesson": "Lezione del percorso guidato",
+        "library_set": "Serie della biblioteca di esercizi"
+      },
+      "librarySubject": "Biblioteca di esercizi",
+      "libraryCompleted": "{{score}} esercizi su {{total}} completati in {{minutes}} minuti.",
+      "libraryInProgress": "{{answered}} esercizi su {{total}} svolti. Riprendi questa serie dalla biblioteca di esercizi.",
+      "empty": "Non è ancora disponibile alcuna cronologia di apprendimento."
+    }
   },
   "library": {
     "subtitle": "Scegli gli esercizi per materia, argomento e difficoltà.",
@@ -146,7 +165,34 @@
     "parentAccount": "Account genitore",
     "billingStatus": "Stato di fatturazione",
     "lastUpdated": "Ultimo aggiornamento",
-    "guardian": "Genitore o tutore"
+    "guardian": "Genitore o tutore",
+    "description": "Contesto di account, famiglia, fatturazione e apprendimento usato per mantenere accurato il supporto STOA.",
+    "loadFailed": "Caricamento del profilo non riuscito.",
+    "saveFailed": "Salvataggio del profilo non riuscito.",
+    "saved": "Profilo salvato.",
+    "accountKicker": "Account studente",
+    "accountStatus": "Stato dell’account",
+    "accountStatusBody": "Accesso, collegamento familiare e ultimo aggiornamento del profilo.",
+    "noParentLinked": "Non è ancora collegato alcun account di un genitore o tutore.",
+    "noSubscription": "A questo account non è associato alcun abbonamento.",
+    "notProvided": "Non indicato",
+    "saveLearningContext": "Salva il contesto di apprendimento",
+    "schoolSystemNotSet": "Sistema scolastico non impostato",
+    "notSet": "Non impostato",
+    "guardianLinked": "Un account genitore è collegato e può seguire i progressi di questo studente.",
+    "plan": "Piano",
+    "planStatus": "Stato",
+    "guardianStatus": {
+      "linked": "Collegato",
+      "not_linked": "Non collegato"
+    },
+    "weakTopicEvidence": "Indizi sugli argomenti deboli",
+    "noWeakTopics": "Nessun argomento debole ha ancora indizi sufficienti.",
+    "signals": "{{count}} segnali",
+    "freshness": "Aggiornamento del profilo",
+    "freshnessBody": "Aggiornato il {{date}} da domande, escalation ai tutor e prove di esercitazione.",
+    "feedback": "Riscontro",
+    "email": "E-mail"
   },
   "ui": {
     "practiceLesson": "Lezione di esercizi",
@@ -220,7 +266,14 @@
     "uploadWhilePractising2": "Carica una foto o un PDF e chiedi all’assistente mentre segui il percorso guidato.",
     "uploadBody2": "Scatta una foto o allega un PDF dei compiti. L’assistente ti aiuta a capirli passo passo.",
     "chooseSubjectHint": "Scegli una materia, poi restringi per argomento e livello.",
-    "askAssistant2": "Chiedi all’assistente una spiegazione passo passo o carica il tuo lavoro per questa domanda."
+    "askAssistant2": "Chiedi all’assistente una spiegazione passo passo o carica il tuo lavoro per questa domanda.",
+    "completed": "Completati",
+    "accuracy": "Precisione",
+    "topics": "Argomenti",
+    "score": "Punteggio",
+    "mistakes": "Errori",
+    "difficulty": "Difficoltà",
+    "level": "Livello"
   },
   "learn": {
     "streakDays_one": "{{count}} giorno",
@@ -298,5 +351,202 @@
     "lessonBankSample": "Esempio dalla banca lezioni",
     "exerciseCount_one": "{{count}} esercizio",
     "exerciseCount_other": "{{count}} esercizi"
+  },
+  "set": {
+    "saved": "Salvato",
+    "metricQuestions": "Esercizi",
+    "metricTime": "Durata",
+    "metricLevel": "Livello",
+    "minutes": "{{minutes}} min",
+    "answered": "{{answered}} / {{total}} svolti",
+    "status": {
+      "not_started": "Non iniziato",
+      "in_progress": "In corso",
+      "completed": "Completato",
+      "review_recommended": "Ripasso consigliato"
+    },
+    "action": {
+      "not_started": "Inizia",
+      "in_progress": "Riprendi",
+      "completed": "Esercitati di nuovo",
+      "review_recommended": "Rivedi gli errori"
+    }
+  },
+  "questionType": {
+    "multiple_choice": "Scelta multipla",
+    "short_answer": "Risposta breve",
+    "numeric": "Valore numerico",
+    "step_by_step": "Passo per passo",
+    "ordering": "Riordinamento"
+  },
+  "setOverview": {
+    "skillsCovered": "Competenze trattate",
+    "questionTypes": "Tipi di esercizio",
+    "lastAttempt": "Il tuo ultimo tentativo",
+    "noAttempt": "Nessun tentativo registrato. Inizia con una serie breve e mirata.",
+    "start": "Inizia a esercitarti",
+    "resume": "Riprendi l’esercitazione",
+    "again": "Esercitati di nuovo",
+    "reviewMistakes": "Rivedi gli errori",
+    "needHelpTitle": "Ti serve aiuto mentre ti eserciti?",
+    "needHelpBody": "Puoi chiedere all’assistente di apprendimento dopo ogni esercizio e tornare alla serie appena il passaggio è più chiaro.",
+    "needHelpBadge": "Biblioteca di esercizi + assistente di apprendimento"
+  },
+  "session": {
+    "loadFailedTitle": "Non è stato possibile caricare questa serie di esercizi",
+    "loadFailedBody": "Torna alla biblioteca di esercizi e riprova.",
+    "backToLibrary": "Torna alla biblioteca di esercizi",
+    "questionOf": "Esercizio {{current}} di {{total}}",
+    "checkedRemaining": "{{checked}} verificati · {{remaining}} rimanenti",
+    "progressLabel": "Avanzamento della sessione {{percent}} %",
+    "checkAnswer": "Verifica la risposta",
+    "skipForNow": "Salta per ora",
+    "finishing": "Completamento...",
+    "finishSet": "Concludi la serie",
+    "navigation": "Navigazione degli esercizi",
+    "openQuestion": "Apri l’esercizio {{number}}",
+    "finishPractice": "Concludi l’esercitazione",
+    "withoutFeedback_one": "Ti resta {{count}} esercizio senza riscontro.",
+    "withoutFeedback_other": "Ti restano {{count}} esercizi senza riscontro.",
+    "reviewUnanswered": "Rivedi gli esercizi senza risposta",
+    "finishAnyway": "Concludi comunque",
+    "relatedPath": "Percorso guidato collegato",
+    "askPrompt": "Puoi spiegare questo passaggio della biblioteca di esercizi: {{prompt}}",
+    "uploadDescription": "Lavoro caricato per {{skill}}. L’assistente di apprendimento lo userà come contesto.",
+    "uploadPrompt": "Ho caricato il mio lavoro per questo esercizio della biblioteca. Aiutami a capire il passaggio successivo senza darmi direttamente la risposta.",
+    "nextStepReviewMissed": "Rivedi gli esercizi che hai sbagliato.",
+    "nextStepAskAssistant": "Chiedi all’assistente di apprendimento quelli ancora poco chiari.",
+    "nextStepContinue": "Continua con la serie successiva di questo argomento."
+  },
+  "result": {
+    "lowAccuracyBody": "Questa serie richiede un altro giro di esercizi. Rivedi gli esercizi qui sotto, poi prova una serie simile.",
+    "goodAccuracyBody": "Usa il risultato per decidere se rivedere gli errori, chiedere una spiegazione o continuare il percorso guidato.",
+    "whatWentWell": "Cosa è andato bene",
+    "correctAnswer": "Risposta corretta: {{answer}}",
+    "nextSteps": "Prossimi passi",
+    "reviewMistakes": "Rivedi gli errori",
+    "openPath": "Apri il percorso guidato",
+    "again": "Esercitati di nuovo"
+  },
+  "lessonResult": {
+    "progressLabel": "Avanzamento della lezione {{current}} di {{total}}",
+    "progress": "Avanzamento",
+    "summaryTitle": "Riepilogo dell’esercitazione",
+    "summaryBody": "Rivedi i passaggi difficili finché il metodo è ancora fresco.",
+    "correct": "Corretti",
+    "time": "Durata",
+    "points": "Punti",
+    "streak": "Serie",
+    "streakDays": "{{count}} giorni",
+    "askAboutStep": "Chiedi su questo passaggio",
+    "backToPractice": "Torna all’esercitazione",
+    "pageDescription": "Un riepilogo sintetico della sessione e dei passaggi che vale la pena rivedere.",
+    "noResult": "Questo riepilogo appare subito dopo una lezione completata, e non c’è ancora nessuna lezione completata da mostrare.",
+    "goToPractice": "Vai all’esercitazione",
+    "mistakesKicker": "Ripasso degli errori",
+    "mistakesTitle": "Vale un altro sguardo",
+    "pathProgress": "{{percent}} % del percorso completato"
+  },
+  "teacherSupportCta": {
+    "title": "Questo passaggio forse ha bisogno di una spiegazione più chiara.",
+    "body": "Chiedi a un tutor dopo aver provato il suggerimento e una spiegazione passo per passo.",
+    "action": "Chiedi a un tutor"
+  },
+  "answerInput": {
+    "chooseOne": "Scegli una risposta",
+    "step": "Passaggio {{number}}",
+    "finalAnswer": "Risposta finale",
+    "numberPlaceholder": "Inserisci un numero",
+    "textPlaceholder": "Scrivi la tua risposta"
+  },
+  "feedback": {
+    "waiting": "Verifica la risposta quando sei pronto. Il riscontro appare qui prima che tu prosegua.",
+    "yourAnswer": "La tua risposta: ",
+    "correctAnswer": "Risposta corretta: ",
+    "explanation": "Spiegazione",
+    "trySimilar": "Prova un esercizio simile",
+    "askAssistant": "Chiedi all’assistente di apprendimento"
+  },
+  "filters": {
+    "title": "Filtri",
+    "subtitle": "Restringi la biblioteca senza lasciare questa pagina.",
+    "clear": "Azzera",
+    "levelLabel": "Classe / Livello",
+    "difficultyLabel": "Difficoltà",
+    "typeLabel": "Tipo di esercizio",
+    "statusLabel": "Stato",
+    "allLevels": "Tutti i livelli",
+    "allDifficulty": "Tutte le difficoltà",
+    "allTypes": "Tutti i tipi",
+    "allStatus": "Tutti gli stati",
+    "levelLowerSecondary": "Secondaria I",
+    "levelUpperSecondary": "Secondaria II",
+    "levelExamPrep": "Preparazione all’esame",
+    "easy": "Facile",
+    "medium": "Medio",
+    "hard": "Difficile",
+    "statusReview": "Da rivedere"
+  },
+  "ordering": {
+    "available": "Passaggi disponibili",
+    "selected": "Ordine scelto",
+    "empty": "Scegli i passaggi in ordine."
+  },
+  "dashboard": {
+    "recentQuestions": "Domande recenti",
+    "questionStatus": {
+      "answered_by_ai": "Spiegata",
+      "teacher_helped": "Aiutata da un insegnante",
+      "pending": "In attesa"
+    },
+    "entryPoints": "Punti di accesso all’apprendimento",
+    "entries": {
+      "askLabel": "Fai una domanda",
+      "askDetail": "Chiedi aiuto su un passaggio preciso dei compiti.",
+      "mistakesLabel": "Rivedi gli errori recenti",
+      "mistakesDetail": "Torna ai passaggi di esercizio che meritano un altro sguardo.",
+      "historyLabel": "Vedi la cronologia di apprendimento",
+      "historyDetail": "Consulta domande, spiegazioni e progressi precedenti."
+    },
+    "planTitle": "Cosa consente il tuo piano",
+    "familyAccess": "Accesso famiglia",
+    "plan": {
+      "perDay": "{{count}} al giorno",
+      "notLimited": "Senza limite",
+      "trialEnds": "Termina il {{date}}",
+      "trialActive": "Attivo",
+      "yourPlan": "Il tuo piano",
+      "usagePaused": "Le nuove domande sono in pausa con questo piano. Chiedi a un genitore di rivedere il piano famiglia.",
+      "usageCovered": "Questo piano copre le domande, gli esercizi e il supporto degli insegnanti mostrati sopra.",
+      "billingNote": "I dati di pagamento restano sul conto di fatturazione del genitore. Qui vedi il tuo accesso all’apprendimento, ma i dati della carta e le fatture sono gestiti da un genitore."
+    }
+  },
+  "assignments": {
+    "eyebrow": "Esercitazione",
+    "title": "I miei compiti",
+    "description": "Capisci quale esercitazione è stata assegnata, a cosa mira e cosa fare poi.",
+    "loading": "Caricamento dei tuoi compiti...",
+    "failed": "Caricamento dei compiti non riuscito",
+    "empty": "Al momento non ci sono compiti verificati in attesa.",
+    "source": "Origine",
+    "target": "Obiettivo",
+    "due": "Scadenza",
+    "noDueDate": "Nessuna scadenza",
+    "subjectPending": "Materia da definire",
+    "topicPending": "argomento da definire",
+    "whyThisAppeared": "Perché compare questo",
+    "defaultRationale": "Questa esercitazione è stata scelta da segnali di apprendimento verificati, così il tuo prossimo lavoro resta mirato.",
+    "sources": {
+      "automation": "Esercitazione creata automaticamente",
+      "ai_draft": "Esercitazione IA verificata da un tutor",
+      "curriculum_exercise": "Esercitazione del programma",
+      "reviewed": "Esercitazione verificata"
+    },
+    "nextAction": {
+      "completed": "Vedi il riscontro",
+      "started": "Riprendi l’esercitazione",
+      "skipped": "Chiedi al tuo tutor cosa provare adesso",
+      "default": "Inizia l’esercitazione"
+    }
   }
 }

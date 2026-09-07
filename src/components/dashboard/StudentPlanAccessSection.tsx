@@ -1,12 +1,16 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { CreditCard, ShieldCheck } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
+import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { SubscriptionPlan } from '@/types/billing'
 
-function formatLimit(value: number | null | undefined) {
-  return typeof value === 'number' ? `${value} per day` : 'Not limited'
+function formatLimit(value: number | null | undefined, t: TFunction<'practice'>) {
+  return typeof value === 'number'
+    ? t('dashboard.plan.perDay', { count: value })
+    : t('dashboard.plan.notLimited')
 }
 
 export function StudentPlanAccessSection() {
@@ -20,23 +24,28 @@ export function StudentPlanAccessSection() {
     <section className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
       <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
         <CardHeader>
-          <CardTitle className="text-base">What your plan allows</CardTitle>
+          <CardTitle className="text-base">{t('dashboard.planTitle')}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
           {entitlement ? (
             <>
-              <Detail label="Questions" value={formatLimit(entitlement.dailyAiQuestionLimit)} />
-              <Detail label={t('ui.chatMessages')} value={formatLimit(entitlement.dailyChatMessageLimit)} />
+              <Detail
+                label={t('set.metricQuestions')}
+                value={formatLimit(entitlement.dailyAiQuestionLimit, t)}
+              />
+              <Detail
+                label={t('ui.chatMessages')}
+                value={formatLimit(entitlement.dailyChatMessageLimit, t)}
+              />
               {entitlement.freeTrialActive && (
                 <Detail
                   label={t('ui.freeTrial')}
                   value={
                     entitlement.freeTrialEndsAt
-                      ? `Ends ${new Intl.DateTimeFormat('en', {
-                          month: 'short',
-                          day: 'numeric',
-                        }).format(new Date(entitlement.freeTrialEndsAt))}`
-                      : 'Active'
+                      ? t('dashboard.plan.trialEnds', {
+                          date: formatDayAndMonth(entitlement.freeTrialEndsAt),
+                        })
+                      : t('dashboard.plan.trialActive')
                   }
                 />
               )}
@@ -54,11 +63,11 @@ export function StudentPlanAccessSection() {
               <CreditCard className="h-5 w-5" aria-hidden="true" />
             </div>
             <div>
-              <p className="brand-section-kicker">Family access</p>
+              <p className="brand-section-kicker">{t('dashboard.familyAccess')}</p>
               <CardTitle className="text-xl">
                 {entitlement
                   ? getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan)
-                  : 'Your plan'}
+                  : t('dashboard.plan.yourPlan')}
               </CardTitle>
             </div>
           </div>
@@ -69,15 +78,12 @@ export function StudentPlanAccessSection() {
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
               <p>
                 {entitlement?.newUsageAllowed === false
-                  ? 'New questions are paused on this plan. Ask a parent to review the family plan.'
-                  : 'This plan covers the questions, practice, and teacher support shown above.'}
+                  ? t('dashboard.plan.usagePaused')
+                  : t('dashboard.plan.usageCovered')}
               </p>
             </div>
           </div>
-          <p>
-            Payment details stay with the parent billing account. You can see your learning access here,
-            but card details and invoices are managed by a parent.
-          </p>
+          <p>{t('dashboard.plan.billingNote')}</p>
         </CardContent>
       </Card>
     </section>

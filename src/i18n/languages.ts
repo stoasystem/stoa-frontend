@@ -30,7 +30,15 @@ export function resolveUserLanguage(user: {
   return isSupportedLanguage(locale) ? locale : undefined
 }
 
-export function getInitialLanguage(): SupportedLanguage {
+/**
+ * The language the app is being read in right now.
+ *
+ * Read from storage rather than from the i18n instance, so modules that only
+ * need to label a request — the HTTP clients, which every screen imports —
+ * do not have to pull in i18next and its initialisation. `languageChanged`
+ * writes this key synchronously (see i18n/index.ts), so it stays current.
+ */
+export function activeLanguage(): SupportedLanguage {
   if (typeof window === 'undefined') return 'en'
 
   const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY)
@@ -40,4 +48,9 @@ export function getInitialLanguage(): SupportedLanguage {
   if (isSupportedLanguage(browserLanguage)) return browserLanguage
 
   return 'en'
+}
+
+/** The language to start i18next in. Same resolution as activeLanguage(). */
+export function getInitialLanguage(): SupportedLanguage {
+  return activeLanguage()
 }

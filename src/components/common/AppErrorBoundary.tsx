@@ -1,18 +1,21 @@
 import { ErrorBoundary } from 'react-error-boundary'
 import type { ErrorInfo, ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { reportFrontendError } from '@/services/monitoring'
 
 function ErrorFallback({ resetErrorBoundary }: { resetErrorBoundary: () => void }) {
+  const { t } = useTranslation('common')
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold">Something went wrong</h1>
+        <h1 className="text-xl font-semibold">{t('errorBoundary.title')}</h1>
         <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          Please try again or reload the page.
+          {t('errorBoundary.body')}
         </p>
         <Button className="mt-4" onClick={resetErrorBoundary}>
-          Try again
+          {t('actions.tryAgain')}
         </Button>
       </div>
     </div>

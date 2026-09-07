@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatDateTime } from '@/lib/formatDateTime'
 import type { ParentChildActivity } from '@/types/parent'
 
 type HistoryListItem = Omit<ParentChildActivity, 'type' | 'subject'> & {
@@ -10,13 +12,16 @@ type HistoryListItem = Omit<ParentChildActivity, 'type' | 'subject'> & {
 
 export function ChildLearningHistoryList({
   items,
-  emptyMessage = 'No learning history is available yet.',
+  emptyMessage,
 }: {
   items: HistoryListItem[]
   emptyMessage?: string
 }) {
+  const { t } = useTranslation('practice')
+  const empty = emptyMessage ?? t('progress.history.empty')
+
   if (items.length === 0) {
-    return <p className="text-sm text-muted-foreground">{emptyMessage}</p>
+    return <p className="text-sm text-muted-foreground">{empty}</p>
   }
 
   return (
@@ -27,14 +32,14 @@ export function ChildLearningHistoryList({
             <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <h2 className="font-medium">{item.title}</h2>
-                {item.type && (
+                {(item.sourceLabel || item.type) && (
                   <p className="mt-1 text-xs font-semibold uppercase tracking-[0.08em] text-primary">
-                    {formatActivityType(item.type)}
+                    {item.sourceLabel ?? formatActivityType(item.type ?? '')}
                   </p>
                 )}
               </div>
               <span className="text-xs text-muted-foreground">
-                {new Date(item.createdAt).toLocaleString()}
+                {formatDateTime(item.createdAt)}
               </span>
             </div>
             {item.subject && <p className="mt-1 text-sm text-muted-foreground">{item.subject}</p>}

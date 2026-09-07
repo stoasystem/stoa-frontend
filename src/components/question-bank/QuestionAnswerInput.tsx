@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
@@ -19,7 +20,7 @@ export function QuestionAnswerInput({
     const selected = typeof value === 'string' ? value : ''
     return (
       <fieldset className="space-y-3">
-        <legend className="text-sm font-semibold">Choose one answer</legend>
+        <legend className="text-sm font-semibold">{t('answerInput.chooseOne')}</legend>
         {question.options?.map((option) => (
           <button
             key={option}
@@ -45,7 +46,7 @@ export function QuestionAnswerInput({
     const parts = Array.isArray(value) ? value : ['', '', '']
     return (
       <div className="space-y-4">
-        {['Step 1', 'Step 2', 'Final answer'].map((label, index) => (
+        {stepLabels(t).map((label, index) => (
           <div key={label} className="space-y-2">
             <Label htmlFor={`question-step-${index}`}>{label}</Label>
             <Textarea
@@ -72,8 +73,21 @@ export function QuestionAnswerInput({
         value={typeof value === 'string' ? value : value.join(' ')}
         onChange={(event) => onChange(event.target.value)}
         inputMode={question.type === 'numeric' ? 'decimal' : 'text'}
-        placeholder={question.type === 'numeric' ? 'Enter a number' : 'Write your answer'}
+        placeholder={
+          question.type === 'numeric'
+            ? t('answerInput.numberPlaceholder')
+            : t('answerInput.textPlaceholder')
+        }
       />
     </div>
   )
+}
+
+/** Two working steps and the answer, the shape a step-by-step question takes. */
+function stepLabels(t: TFunction<'practice'>) {
+  return [
+    t('answerInput.step', { number: 1 }),
+    t('answerInput.step', { number: 2 }),
+    t('answerInput.finalAnswer'),
+  ]
 }

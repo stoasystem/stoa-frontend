@@ -8,6 +8,7 @@ import type { PracticeChatContext, PracticeLessonResult } from '@/types/practice
 
 export function LessonResultSummary({ result }: { result: PracticeLessonResult }) {
   const { t } = useTranslation('practice')
+  const { t: tChat } = useTranslation('chat')
   const reviewContext = result.mistakes[0]
     ? buildPracticeChatContext(result.mistakes[0])
     : null
@@ -21,19 +22,28 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
           </div>
           <div>
             <p className="brand-section-kicker">{t('lessonComplete')}</p>
-            <CardTitle className="text-3xl">Practice summary</CardTitle>
+            <CardTitle className="text-3xl">{t('lessonResult.summaryTitle')}</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-          Review the steps you found difficult while the method is still fresh.
+          {t('lessonResult.summaryBody')}
         </p>
         <div className="grid gap-4 sm:grid-cols-4">
-          <ResultMetric label="Correct" value={`${result.correctCount}/${result.totalCount}`} />
-          <ResultMetric label="Time" value={`${Math.round(result.timeSpentSeconds / 60)} min`} />
-          <ResultMetric label="Points" value={`+${result.progressPoints}`} />
-          <ResultMetric label="Streak" value={`${result.studyStreak} days`} />
+          <ResultMetric
+            label={t('lessonResult.correct')}
+            value={`${result.correctCount}/${result.totalCount}`}
+          />
+          <ResultMetric
+            label={t('lessonResult.time')}
+            value={t('set.minutes', { minutes: Math.round(result.timeSpentSeconds / 60) })}
+          />
+          <ResultMetric label={t('lessonResult.points')} value={`+${result.progressPoints}`} />
+          <ResultMetric
+            label={t('lessonResult.streak')}
+            value={t('lessonResult.streakDays', { count: result.studyStreak })}
+          />
         </div>
         <div className="flex flex-wrap gap-3">
           <Button asChild>
@@ -48,15 +58,15 @@ export function LessonResultSummary({ result }: { result: PracticeLessonResult }
                 to="/chat"
                 state={{
                   practiceContext: reviewContext,
-                  prompt: 'Can you explain this step?',
+                  prompt: tChat('defaultPrompt.practice'),
                 }}
               >
-                Ask about this step
+                {t('lessonResult.askAboutStep')}
               </Link>
             </Button>
           )}
           <Button asChild variant="secondary">
-            <Link to="/learn/path">Back to practice</Link>
+            <Link to="/learn/path">{t('lessonResult.backToPractice')}</Link>
           </Button>
         </div>
       </CardContent>

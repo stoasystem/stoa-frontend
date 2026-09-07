@@ -19,8 +19,11 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
   const currentLanguage = languageOptions.find((language) => language.code === i18n.language) ?? languageOptions[0]
 
   function changeLanguage(language: SupportedLanguage) {
+    if (language === i18n.language) return
     void i18n.changeLanguage(language)
     if (user) {
+      // Fire and forget: the screen is already in the new language, and the
+      // write only records the preference for next time.
       updateLocale.mutate(language)
     }
   }
@@ -54,7 +57,6 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                     : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
                 )}
                 aria-pressed={isActive}
-                disabled={updateLocale.isPending}
                 onClick={() => {
                   changeLanguage(language.code)
                 }}
@@ -135,7 +137,6 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
           'notranslate bg-transparent text-inherit outline-none',
           'max-w-[8rem]',
         )}
-        disabled={updateLocale.isPending}
         value={currentLanguage.code}
         onChange={(event) => {
           changeLanguage(event.target.value as SupportedLanguage)

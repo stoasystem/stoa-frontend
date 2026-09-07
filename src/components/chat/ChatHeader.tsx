@@ -38,7 +38,10 @@ export function ChatHeader({
           {conversation?.title ?? t('newConversation')}
         </h1>
         <p className="mt-1 truncate text-sm text-muted-foreground">
-          {conversation ? `${conversation.subject} · ${conversation.grade}` : t('emptyTitle')}
+          {conversation
+            ? // The stored subject is an id like `math`; unknown ids show as-is.
+              `${t(`subjects.${conversation.subject}`, { defaultValue: conversation.subject })} · ${conversation.grade}`
+            : t('emptyTitle')}
         </p>
       </div>
       <div className="flex shrink-0 items-center gap-2">

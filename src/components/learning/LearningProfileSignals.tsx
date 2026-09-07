@@ -4,6 +4,7 @@ import i18n from '@/i18n'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { LearningProfile } from '@/types/learningProfile'
 
 type LearningProfileSignalsProps = {
@@ -61,7 +62,7 @@ export function LearningProfileSignals({
                     <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
                       <SignalMetric
                         icon={BookOpenCheck}
-                        label="Questions"
+                        label={tPractice('set.metricQuestions')}
                         value={String(subjectActivity?.questionCount ?? 0)}
                       />
                       <SignalMetric
@@ -73,7 +74,7 @@ export function LearningProfileSignals({
                     <div className="mt-3">
                       <SignalMetric
                         icon={Gauge}
-                        label="Feedback"
+                        label={tPractice('profile.feedback')}
                         value={formatFeedback(subjectActivity?.feedbackAverage)}
                       />
                     </div>
@@ -88,11 +89,13 @@ export function LearningProfileSignals({
               <CardContent className="p-4">
                 <div className="flex items-center gap-2">
                   <CircleAlert className="h-4 w-4 text-primary" aria-hidden="true" />
-                  <h3 className="text-sm font-semibold">Weak topic evidence</h3>
+                  <h3 className="text-sm font-semibold">
+                    {tPractice('profile.weakTopicEvidence')}
+                  </h3>
                 </div>
                 {weakTopics.length === 0 ? (
                   <p className="mt-3 text-sm text-muted-foreground">
-                    No weak topics have enough evidence yet.
+                    {tPractice('profile.noWeakTopics')}
                   </p>
                 ) : (
                   <div className="mt-3 divide-y divide-border/70">
@@ -103,10 +106,14 @@ export function LearningProfileSignals({
                             <p className="text-sm font-medium">{topic.label}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
                               {formatSubjectLabel(profile, topic.subject)}
-                              {topic.latestEvidenceAt ? ` · ${formatDate(topic.latestEvidenceAt)}` : ''}
+                              {topic.latestEvidenceAt
+                                ? ` · ${formatDayAndMonth(topic.latestEvidenceAt)}`
+                                : ''}
                             </p>
                           </div>
-                          <Badge variant="outline">{topic.count} signals</Badge>
+                          <Badge variant="outline">
+                            {tPractice('profile.signals', { count: topic.count })}
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -116,9 +123,11 @@ export function LearningProfileSignals({
             </Card>
             <Card className="border-border/70">
               <CardContent className="p-4">
-                <p className="text-sm font-semibold">Profile freshness</p>
+                <p className="text-sm font-semibold">{tPractice('profile.freshness')}</p>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Updated {formatDate(profile.updatedAt)} from questions, tutor escalation, and practice evidence.
+                  {tPractice('profile.freshnessBody', {
+                    date: formatDayAndMonth(profile.updatedAt),
+                  })}
                 </p>
               </CardContent>
             </Card>
@@ -162,6 +171,4 @@ function formatSubjectLabel(profile: LearningProfile, subjectId: string) {
   return subject ? i18n.t(subject.labelKey, { ns: 'chat' }) : subjectId
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(value))
-}
+

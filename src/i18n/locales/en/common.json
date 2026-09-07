@@ -51,7 +51,9 @@
     },
     "learn": "Learn",
     "about": "About STOA",
-    "studentNavigationLabel": "Student navigation"
+    "studentNavigationLabel": "Student navigation",
+    "primary": "Primary",
+    "mobilePrimary": "Mobile primary"
   },
   "actions": {
     "startLearning": "Start learning",
@@ -69,7 +71,9 @@
     "viewPricing": "View pricing",
     "askTeacher": "Ask a Tutor",
     "send": "Send message",
-    "stop": "Stop"
+    "stop": "Stop",
+    "logOut": "Log out",
+    "tryAgain": "Try again"
   },
   "roles": {
     "student": "Student",
@@ -180,5 +184,15 @@
       "read": "Read",
       "archived": "Archived"
     }
-  }
+  },
+  "a11y": {
+    "loadingPage": "Loading page",
+    "loadingDashboard": "Loading dashboard",
+    "breadcrumb": "Breadcrumb"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "body": "Please try again or reload the page."
+  },
+  "nextStep": "Recommended next step"
 }

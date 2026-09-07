@@ -99,7 +99,26 @@
     "planLimits": "Your plan limits will appear here.",
     "weakTopicsFailed": "Could not load weak topics. Check back later.",
     "weakTopicReason": "Recent learning evidence points to this topic as the next reviewed remediation area.",
-    "questionAsked": "Question asked"
+    "questionAsked": "Question asked",
+    "history": {
+      "sources": {
+        "questions": "Questions",
+        "practice_path": "Practice Path",
+        "practice_library": "Practice Library",
+        "classroom": "Classroom"
+      },
+      "kinds": {
+        "question_asked": "Question asked",
+        "question_answered": "Question answered",
+        "teacher_help": "Teacher help requested",
+        "practice_lesson": "Practice Path lesson",
+        "library_set": "Practice Library set"
+      },
+      "librarySubject": "Practice Library",
+      "libraryCompleted": "Completed {{score}} of {{total}} questions in {{minutes}} minutes.",
+      "libraryInProgress": "Answered {{answered}} of {{total}} questions. Continue this set from the Practice Library.",
+      "empty": "No learning history is available yet."
+    }
   },
   "library": {
     "subtitle": "Choose exercises by subject, topic, and difficulty.",
@@ -146,7 +165,34 @@
     "parentAccount": "Parent account",
     "billingStatus": "Billing status",
     "lastUpdated": "Last updated",
-    "guardian": "Parent or guardian"
+    "guardian": "Parent or guardian",
+    "description": "Account, family, billing, and learning context used to keep STOA support accurate.",
+    "loadFailed": "Failed to load profile.",
+    "saveFailed": "Failed to save profile.",
+    "saved": "Profile saved.",
+    "accountKicker": "Student account",
+    "accountStatus": "Account status",
+    "accountStatusBody": "Access, family binding, and latest profile update.",
+    "noParentLinked": "No parent or guardian account is linked yet.",
+    "noSubscription": "No subscription is attached to this account.",
+    "notProvided": "Not provided",
+    "saveLearningContext": "Save learning context",
+    "schoolSystemNotSet": "School system not set",
+    "notSet": "Not set",
+    "guardianLinked": "A parent account is linked and can follow this student's progress.",
+    "plan": "Plan",
+    "planStatus": "Status",
+    "guardianStatus": {
+      "linked": "Linked",
+      "not_linked": "Not linked"
+    },
+    "weakTopicEvidence": "Weak topic evidence",
+    "noWeakTopics": "No weak topics have enough evidence yet.",
+    "signals": "{{count}} signals",
+    "freshness": "Profile freshness",
+    "freshnessBody": "Updated {{date}} from questions, tutor escalation, and practice evidence.",
+    "feedback": "Feedback",
+    "email": "Email"
   },
   "ui": {
     "practiceLesson": "Practice lesson",
@@ -220,7 +266,14 @@
     "uploadWhilePractising2": "Upload a photo or PDF and ask the Learning Assistant while you keep the Practice Path as your guide.",
     "uploadBody2": "Take a photo or attach a PDF from your schoolwork. The Learning Assistant can help you understand it step by step.",
     "chooseSubjectHint": "Choose a subject, then narrow by topic and level.",
-    "askAssistant2": "Ask the Learning Assistant for a step-by-step explanation, or upload your own work for this question."
+    "askAssistant2": "Ask the Learning Assistant for a step-by-step explanation, or upload your own work for this question.",
+    "completed": "Completed",
+    "accuracy": "Accuracy",
+    "topics": "Topics",
+    "score": "Score",
+    "mistakes": "Mistakes",
+    "difficulty": "Difficulty",
+    "level": "Level"
   },
   "learn": {
     "streakDays_one": "{{count}} day",
@@ -298,5 +351,202 @@
     "lessonBankSample": "Lesson bank sample",
     "exerciseCount_one": "{{count}} exercise",
     "exerciseCount_other": "{{count}} exercises"
+  },
+  "set": {
+    "saved": "Saved",
+    "metricQuestions": "Questions",
+    "metricTime": "Time",
+    "metricLevel": "Level",
+    "minutes": "{{minutes}} min",
+    "answered": "{{answered}} / {{total}} answered",
+    "status": {
+      "not_started": "Not started",
+      "in_progress": "In progress",
+      "completed": "Completed",
+      "review_recommended": "Review recommended"
+    },
+    "action": {
+      "not_started": "Start",
+      "in_progress": "Resume",
+      "completed": "Practice again",
+      "review_recommended": "Review mistakes"
+    }
+  },
+  "questionType": {
+    "multiple_choice": "Multiple choice",
+    "short_answer": "Short answer",
+    "numeric": "Numeric",
+    "step_by_step": "Step by step",
+    "ordering": "Ordering"
+  },
+  "setOverview": {
+    "skillsCovered": "Skills covered",
+    "questionTypes": "Question types",
+    "lastAttempt": "Your last attempt",
+    "noAttempt": "No attempt recorded yet. Start with a short, focused practice set.",
+    "start": "Start practice",
+    "resume": "Resume practice",
+    "again": "Practice again",
+    "reviewMistakes": "Review mistakes",
+    "needHelpTitle": "Need help while practising?",
+    "needHelpBody": "You can ask the Learning Assistant after each question and return to the set when the step is clearer.",
+    "needHelpBadge": "Practice Library + Learning Assistant"
+  },
+  "session": {
+    "loadFailedTitle": "We could not load this practice set",
+    "loadFailedBody": "Please return to the Practice Library and try again.",
+    "backToLibrary": "Back to the Practice Library",
+    "questionOf": "Question {{current}} of {{total}}",
+    "checkedRemaining": "{{checked}} checked · {{remaining}} remaining",
+    "progressLabel": "Session progress {{percent}}%",
+    "checkAnswer": "Check answer",
+    "skipForNow": "Skip for now",
+    "finishing": "Finishing...",
+    "finishSet": "Finish set",
+    "navigation": "Practice navigation",
+    "openQuestion": "Open question {{number}}",
+    "finishPractice": "Finish practice",
+    "withoutFeedback_one": "You still have {{count}} question without feedback.",
+    "withoutFeedback_other": "You still have {{count}} questions without feedback.",
+    "reviewUnanswered": "Review unanswered",
+    "finishAnyway": "Finish anyway",
+    "relatedPath": "Related Practice Path",
+    "askPrompt": "Can you explain this Practice Library step: {{prompt}}",
+    "uploadDescription": "Uploaded work for {{skill}}. The Learning Assistant will use this as context.",
+    "uploadPrompt": "I uploaded my work for this Practice Library question. Please help me understand the next step without just giving me the answer.",
+    "nextStepReviewMissed": "Review the questions you missed.",
+    "nextStepAskAssistant": "Ask the Learning Assistant about the ones still unclear.",
+    "nextStepContinue": "Continue with the next set in this topic."
+  },
+  "result": {
+    "lowAccuracyBody": "This set needs another round of practice. Review the questions below, then try a similar set.",
+    "goodAccuracyBody": "Use the result to decide whether to review mistakes, ask for an explanation, or continue the guided Practice Path.",
+    "whatWentWell": "What went well",
+    "correctAnswer": "Correct answer: {{answer}}",
+    "nextSteps": "Next steps",
+    "reviewMistakes": "Review mistakes",
+    "openPath": "Open Practice Path",
+    "again": "Practice again"
+  },
+  "lessonResult": {
+    "progressLabel": "Lesson progress {{current}} of {{total}}",
+    "progress": "Progress",
+    "summaryTitle": "Practice summary",
+    "summaryBody": "Review the steps you found difficult while the method is still fresh.",
+    "correct": "Correct",
+    "time": "Time",
+    "points": "Points",
+    "streak": "Streak",
+    "streakDays": "{{count}} days",
+    "askAboutStep": "Ask about this step",
+    "backToPractice": "Back to practice",
+    "pageDescription": "A concise summary of the practice session and the steps worth reviewing.",
+    "noResult": "This summary is shown right after you finish a lesson, and there is no finished lesson to show yet.",
+    "goToPractice": "Go to practice",
+    "mistakesKicker": "Mistakes review",
+    "mistakesTitle": "Worth one more look",
+    "pathProgress": "{{percent}}% path progress"
+  },
+  "teacherSupportCta": {
+    "title": "This step may need a clearer explanation.",
+    "body": "Ask a tutor after trying the hint and a step-by-step explanation.",
+    "action": "Ask a Tutor"
+  },
+  "answerInput": {
+    "chooseOne": "Choose one answer",
+    "step": "Step {{number}}",
+    "finalAnswer": "Final answer",
+    "numberPlaceholder": "Enter a number",
+    "textPlaceholder": "Write your answer"
+  },
+  "feedback": {
+    "waiting": "Check your answer when you are ready. Feedback appears here before you move on.",
+    "yourAnswer": "Your answer: ",
+    "correctAnswer": "Correct answer: ",
+    "explanation": "Explanation",
+    "trySimilar": "Try a similar question",
+    "askAssistant": "Ask the Learning Assistant"
+  },
+  "filters": {
+    "title": "Filters",
+    "subtitle": "Narrow the library without leaving this page.",
+    "clear": "Clear",
+    "levelLabel": "Grade / Level",
+    "difficultyLabel": "Difficulty",
+    "typeLabel": "Question type",
+    "statusLabel": "Status",
+    "allLevels": "All levels",
+    "allDifficulty": "All difficulty",
+    "allTypes": "All types",
+    "allStatus": "All status",
+    "levelLowerSecondary": "Lower secondary",
+    "levelUpperSecondary": "Upper secondary",
+    "levelExamPrep": "Exam prep",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "statusReview": "Review"
+  },
+  "ordering": {
+    "available": "Available steps",
+    "selected": "Selected order",
+    "empty": "Choose steps in order."
+  },
+  "dashboard": {
+    "recentQuestions": "Recent questions",
+    "questionStatus": {
+      "answered_by_ai": "Explained",
+      "teacher_helped": "Teacher helped",
+      "pending": "Pending"
+    },
+    "entryPoints": "Learning entry points",
+    "entries": {
+      "askLabel": "Ask a question",
+      "askDetail": "Ask for help with a specific homework step.",
+      "mistakesLabel": "Review recent mistakes",
+      "mistakesDetail": "Return to practice steps that need one more look.",
+      "historyLabel": "View learning history",
+      "historyDetail": "See previous questions, explanations, and progress."
+    },
+    "planTitle": "What your plan allows",
+    "familyAccess": "Family access",
+    "plan": {
+      "perDay": "{{count}} per day",
+      "notLimited": "Not limited",
+      "trialEnds": "Ends {{date}}",
+      "trialActive": "Active",
+      "yourPlan": "Your plan",
+      "usagePaused": "New questions are paused on this plan. Ask a parent to review the family plan.",
+      "usageCovered": "This plan covers the questions, practice, and teacher support shown above.",
+      "billingNote": "Payment details stay with the parent billing account. You can see your learning access here, but card details and invoices are managed by a parent."
+    }
+  },
+  "assignments": {
+    "eyebrow": "Practice",
+    "title": "My assignments",
+    "description": "Understand what practice was assigned, what it targets, and what to do next.",
+    "loading": "Loading your assignments...",
+    "failed": "Assignments failed",
+    "empty": "No reviewed assignments are waiting right now.",
+    "source": "Source",
+    "target": "Target",
+    "due": "Due",
+    "noDueDate": "No due date",
+    "subjectPending": "Subject pending",
+    "topicPending": "topic pending",
+    "whyThisAppeared": "Why this appeared",
+    "defaultRationale": "This practice was selected from reviewed learning signals so your next work stays focused.",
+    "sources": {
+      "automation": "Automation-created practice",
+      "ai_draft": "Tutor-reviewed AI practice",
+      "curriculum_exercise": "Curriculum practice",
+      "reviewed": "Reviewed practice"
+    },
+    "nextAction": {
+      "completed": "Review feedback",
+      "started": "Continue practice",
+      "skipped": "Ask your tutor what to try next",
+      "default": "Start practice"
+    }
   }
 }

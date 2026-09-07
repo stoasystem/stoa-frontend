@@ -142,7 +142,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
           <Link to={homePath} className="font-semibold">
             <AppLogo />
           </Link>
-          <nav aria-label="Primary" className="mt-6 flex flex-1 flex-col gap-2">
+          <nav aria-label={t('navigation.primary')} className="mt-6 flex flex-1 flex-col gap-2">
             {primaryItems.map((item) => (
               <NavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}`} />
             ))}
@@ -188,7 +188,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
       </div>
       {mobileItems.length > 0 && (
         <nav
-          aria-label="Mobile primary"
+          aria-label={t('navigation.mobilePrimary')}
           className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-lg backdrop-blur md:hidden"
         >
           <div className="mx-auto flex max-w-lg items-stretch gap-1">
