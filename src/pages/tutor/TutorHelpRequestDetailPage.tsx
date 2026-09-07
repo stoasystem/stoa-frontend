@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -29,6 +30,7 @@ import type { TeacherHelpStatus } from '@/types/teacherHelp'
 const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 
 export function TutorHelpRequestDetailPage() {
+  const { t } = useTranslation('practice')
   const { requestId } = useParams()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
@@ -76,12 +78,12 @@ export function TutorHelpRequestDetailPage() {
             />
             <AiTeacherToolsPanel request={requestQuery.data} />
             <CurriculumRolloutPanel
-              title="Curriculum context"
-              description="Teacher-visible curriculum coverage for the current request subject."
+              title={t('curriculumRollout.tutorTitle')}
+              description={t('curriculumRollout.tutorDescription')}
               catalog={curriculumQuery.data}
               isLoading={curriculumQuery.isLoading}
               isError={curriculumQuery.isError}
-              contextLabel="Tutor preview"
+              contextLabel={t('curriculumRollout.tutorContext')}
             />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">

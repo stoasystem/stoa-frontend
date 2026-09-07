@@ -30,7 +30,7 @@ export function ChatPageNavigation({
 
   return (
     <nav
-      aria-label="Student navigation"
+      aria-label={t('navigation.studentNavigationLabel')}
       className={cn(
         compact ? 'flex items-center gap-1' : 'grid gap-2',
         className,

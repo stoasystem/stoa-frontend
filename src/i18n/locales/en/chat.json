@@ -70,5 +70,17 @@
   "conversations": "Conversations",
   "conversationsSubtitle": "Your learning conversations",
   "backToConversations": "Back to conversations",
-  "newConversationReady": "Ready for a new question."
+  "newConversationReady": "Ready for a new question.",
+  "stopGenerating": "Stop generation",
+  "loadingChat": "Loading chat",
+  "tutorSupport": "Tutor support",
+  "uploadedMaterial": "Uploaded learning material",
+  "back": "Back",
+  "needHelpFromTeacher": "Need help from a teacher?",
+  "escalation": {
+    "prompt": "Request tutor support when the explanation is not clear enough.",
+    "requesting": "Requesting...",
+    "requestTeacher": "Request teacher",
+    "planRestricted": "Teacher support is not part of your current plan."
+  }
 }

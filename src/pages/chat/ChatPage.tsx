@@ -563,6 +563,7 @@ function TeacherVideoEscalationCard({
   onTeacherTextActive: () => void
   onStartVideo: () => void
 }) {
+  const { t } = useTranslation('chat')
   const isTextActive = stage === 'teacher_text_active' || stage === 'video_requested' || stage === 'video_lobby_ready'
 
   return (
@@ -570,7 +571,7 @@ function TeacherVideoEscalationCard({
       <div className="mx-auto max-w-3xl rounded-lg border border-primary/15 bg-card p-4 shadow-[var(--platform-shadow-soft)]">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="brand-section-kicker">Tutor support</p>
+            <p className="brand-section-kicker">{t('tutorSupport')}</p>
             <h2 className="mt-2 text-lg font-semibold">
               {isTextActive ? 'Tutor joined' : 'Tutor support requested'}
             </h2>
@@ -655,15 +656,16 @@ function UploadLearningContextCard({
   context: UploadChatHandoff
   onBack: () => void
 }) {
+  const { t } = useTranslation('chat')
   return (
     <section className="mx-auto mt-4 w-full max-w-3xl rounded-lg border border-primary/15 bg-card/95 p-4 shadow-[var(--platform-shadow-soft)]">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="brand-section-kicker">Uploaded learning material</p>
+          <p className="brand-section-kicker">{t('uploadedMaterial')}</p>
           <h2 className="mt-2 text-lg font-semibold">{context.title}</h2>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{context.description}</p>
         </div>
-        <Button type="button" variant="outline" size="sm" onClick={onBack}>Back</Button>
+        <Button type="button" variant="outline" size="sm" onClick={onBack}>{t('back')}</Button>
       </div>
       <div className="mt-4">
         <AttachmentPreviewList attachments={context.attachments} compact />

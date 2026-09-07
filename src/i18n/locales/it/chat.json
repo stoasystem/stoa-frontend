@@ -70,5 +70,17 @@
   "conversations": "Conversazioni",
   "conversationsSubtitle": "Le tue conversazioni di apprendimento",
   "backToConversations": "Torna alle conversazioni",
-  "newConversationReady": "Pronto per una nuova domanda."
+  "newConversationReady": "Pronto per una nuova domanda.",
+  "stopGenerating": "Interrompi generazione",
+  "loadingChat": "Caricamento della chat",
+  "tutorSupport": "Supporto insegnante",
+  "uploadedMaterial": "Materiale didattico caricato",
+  "back": "Indietro",
+  "needHelpFromTeacher": "Hai bisogno dell'aiuto di un insegnante?",
+  "escalation": {
+    "prompt": "Richiedi il supporto di un insegnante quando la spiegazione non è abbastanza chiara.",
+    "requesting": "Richiesta in corso...",
+    "requestTeacher": "Richiedi insegnante",
+    "planRestricted": "Il supporto dell'insegnante non fa parte del tuo piano attuale."
+  }
 }

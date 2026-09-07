@@ -70,5 +70,17 @@
   "conversations": "Conversations",
   "conversationsSubtitle": "Tes conversations d’apprentissage",
   "backToConversations": "Retour aux conversations",
-  "newConversationReady": "Prêt pour une nouvelle question."
+  "newConversationReady": "Prêt pour une nouvelle question.",
+  "stopGenerating": "Arrêter la génération",
+  "loadingChat": "Chargement du chat",
+  "tutorSupport": "Aide enseignante",
+  "uploadedMaterial": "Document pédagogique déposé",
+  "back": "Retour",
+  "needHelpFromTeacher": "Besoin de l'aide d'un enseignant ?",
+  "escalation": {
+    "prompt": "Demandez l'aide d'un enseignant lorsque l'explication n'est pas assez claire.",
+    "requesting": "Demande en cours...",
+    "requestTeacher": "Demander un enseignant",
+    "planRestricted": "L'aide enseignante ne fait pas partie de votre offre actuelle."
+  }
 }

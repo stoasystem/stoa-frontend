@@ -271,5 +271,32 @@
     "metricDone": "faits",
     "open": "Ouvrir",
     "topicKicker": "Thème"
+  },
+  "curriculumRollout": {
+    "title": "Déploiement du programme",
+    "description": "Couverture active du programme, profondeur de la banque de leçons et signaux de progression.",
+    "parentTitle": "Déploiement du programme",
+    "parentDescription": "Couverture du programme et signaux de points faibles visibles par les parents pour les matières actives.",
+    "parentContext": "Vue parent du programme",
+    "tutorTitle": "Contexte du programme",
+    "tutorDescription": "Couverture du programme visible par l'enseignant pour la matière de la demande en cours.",
+    "tutorContext": "Aperçu tuteur",
+    "studentContext": "Programme",
+    "loading": "Chargement de la couverture du programme...",
+    "error": "La couverture du programme n'est pas disponible pour le moment.",
+    "heading": "Déploiement en mathématiques, physique, allemand et anglais",
+    "subheading": "Le contenu actif est affiché dans les parcours normaux des élèves. Le contenu en brouillon, relu ou archivé reste masqué, sauf aperçu par un enseignant ou un administrateur autorisé.",
+    "units": "Unités",
+    "lessons": "Leçons",
+    "exercises": "Exercices",
+    "rolloutSubjects": "Matières déployées",
+    "allActiveGrades": "Tous les niveaux actifs",
+    "progressSignals": "Signaux de progression",
+    "completedLessons": "Leçons terminées",
+    "weakAreas": "Points faibles du programme",
+    "noWeakAreaEvidence": "Aucun point faible identifié pour l'instant.",
+    "lessonBankSample": "Aperçu de la banque de leçons",
+    "exerciseCount_one": "{{count}} exercice",
+    "exerciseCount_other": "{{count}} exercices"
   }
 }

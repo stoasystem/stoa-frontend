@@ -59,7 +59,9 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                   changeLanguage(language.code)
                 }}
               >
-                {language.shortLabel}
+                <span translate="no" className="notranslate">
+                  {language.shortLabel}
+                </span>
               </button>
             )
           })}
@@ -80,7 +82,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
             )}
             aria-label={t('language.label')}
           >
-            <span>{currentLanguage.shortLabel}</span>
+            <span translate="no" className="notranslate">{currentLanguage.shortLabel}</span>
             <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
@@ -105,7 +107,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                   changeLanguage(language.code)
                 }}
               >
-                <span>{language.shortLabel}</span>
+                <span translate="no" className="notranslate">{language.shortLabel}</span>
                 {isActive && (
                   <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--stoa-brand-burgundy))]" aria-hidden="true" />
                 )}
@@ -128,8 +130,9 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
       <span className="sr-only">{t('language.label')}</span>
       <select
         aria-label={t('language.label')}
+        translate="no"
         className={cn(
-          'bg-transparent text-inherit outline-none',
+          'notranslate bg-transparent text-inherit outline-none',
           'max-w-[8rem]',
         )}
         disabled={updateLocale.isPending}

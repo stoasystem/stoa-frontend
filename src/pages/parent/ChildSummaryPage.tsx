@@ -1,4 +1,5 @@
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
@@ -12,6 +13,7 @@ import { useChildLearningSummaryQuery } from '@/hooks/parent/useChildLearningSum
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function ChildSummaryPage() {
+  const { t } = useTranslation('practice')
   const { childId } = useParams()
   const summaryQuery = useChildLearningSummaryQuery(childId)
   const learningProfileQuery = useChildLearningProfileQuery(childId)
@@ -71,12 +73,12 @@ export function ChildSummaryPage() {
               isError={learningProfileQuery.isError}
             />
             <CurriculumRolloutPanel
-              title="Curriculum rollout"
-              description="Parent-visible curriculum coverage and weak-area signals for active subjects."
+              title={t('curriculumRollout.parentTitle')}
+              description={t('curriculumRollout.parentDescription')}
               catalog={curriculumQuery.data}
               isLoading={curriculumQuery.isLoading}
               isError={curriculumQuery.isError}
-              contextLabel="Parent curriculum view"
+              contextLabel={t('curriculumRollout.parentContext')}
               weakTopicLabels={weakTopicLabels}
             />
             <div className="grid gap-4 lg:grid-cols-2">

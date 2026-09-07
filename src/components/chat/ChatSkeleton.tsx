@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/common/Skeleton'
 import { cn } from '@/lib/utils'
 
@@ -6,6 +7,7 @@ type ChatSkeletonProps = {
 }
 
 export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
+  const { t } = useTranslation('chat')
   return (
     <div
       className={cn(
@@ -13,7 +15,7 @@ export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
         compact ? 'h-full min-h-0' : 'h-screen',
       )}
       role="status"
-      aria-label="Loading chat"
+      aria-label={t('loadingChat')}
     >
       {!compact && (
         <aside className="chat-panel hidden w-80 shrink-0 border-r p-4 md:block">
@@ -48,7 +50,7 @@ export function ChatSkeleton({ compact = false }: ChatSkeletonProps) {
           <Skeleton className="mx-auto h-24 max-w-3xl rounded-lg" />
         </div>
       </main>
-      <span className="sr-only">Loading...</span>
+      <span className="sr-only">{t('loadingChat')}</span>
     </div>
   )
 }

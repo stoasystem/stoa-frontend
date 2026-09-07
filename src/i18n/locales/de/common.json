@@ -50,7 +50,8 @@
       "learn": "Lernen"
     },
     "learn": "Lernen",
-    "about": "Über STOA"
+    "about": "Über STOA",
+    "studentNavigationLabel": "Schülernavigation"
   },
   "actions": {
     "startLearning": "Lernen starten",

@@ -271,5 +271,32 @@
     "metricDone": "completati",
     "open": "Apri",
     "topicKicker": "Argomento"
+  },
+  "curriculumRollout": {
+    "title": "Attivazione del curriculum",
+    "description": "Copertura attiva del curriculum, ampiezza della banca lezioni e segnali di progresso.",
+    "parentTitle": "Attivazione del curriculum",
+    "parentDescription": "Copertura del curriculum visibile ai genitori e segnali sulle aree deboli per le materie attive.",
+    "parentContext": "Vista curriculum per i genitori",
+    "tutorTitle": "Contesto del curriculum",
+    "tutorDescription": "Copertura del curriculum visibile all'insegnante per la materia della richiesta corrente.",
+    "tutorContext": "Anteprima tutor",
+    "studentContext": "Curriculum",
+    "loading": "Caricamento della copertura del curriculum...",
+    "error": "La copertura del curriculum non è disponibile al momento.",
+    "heading": "Attivazione per matematica, fisica, tedesco e inglese",
+    "subheading": "I contenuti attivi vengono mostrati nei normali percorsi degli studenti. I contenuti in bozza, revisionati o archiviati restano nascosti, salvo anteprima da parte di un insegnante o amministratore autorizzato.",
+    "units": "Unità",
+    "lessons": "Lezioni",
+    "exercises": "Esercizi",
+    "rolloutSubjects": "Materie attivate",
+    "allActiveGrades": "Tutte le classi attive",
+    "progressSignals": "Segnali di progresso",
+    "completedLessons": "Lezioni completate",
+    "weakAreas": "Aree deboli del curriculum",
+    "noWeakAreaEvidence": "Nessuna evidenza di aree deboli per ora.",
+    "lessonBankSample": "Esempio dalla banca lezioni",
+    "exerciseCount_one": "{{count}} esercizio",
+    "exerciseCount_other": "{{count}} esercizi"
   }
 }

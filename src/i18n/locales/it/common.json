@@ -50,7 +50,8 @@
       "learn": "Impara"
     },
     "learn": "Impara",
-    "about": "Chi è STOA"
+    "about": "Chi è STOA",
+    "studentNavigationLabel": "Navigazione dello studente"
   },
   "actions": {
     "startLearning": "Inizia a studiare",

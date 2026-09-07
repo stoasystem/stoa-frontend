@@ -17,13 +17,13 @@ type Props = {
 }
 
 export function CurriculumRolloutPanel({
-  title = 'Curriculum rollout',
-  description = 'Active curriculum coverage, lesson bank depth, and progress signals.',
+  title,
+  description,
   catalog,
   progress,
   isLoading,
   isError,
-  contextLabel = 'Curriculum',
+  contextLabel,
   weakTopicLabels = [],
 }: Props) {
   const { t } = useTranslation('practice')
@@ -36,24 +36,27 @@ export function CurriculumRolloutPanel({
 
   return (
     <section className="space-y-4">
-      <SectionHeader title={title} description={description} />
+      <SectionHeader
+        title={title ?? t('curriculumRollout.title')}
+        description={description ?? t('curriculumRollout.description')}
+      />
       <Card className="border-primary/15 bg-card/95">
         <CardContent className="space-y-5 p-5">
-          {isLoading && <p className="text-sm text-muted-foreground">Loading curriculum coverage...</p>}
+          {isLoading && <p className="text-sm text-muted-foreground">{t('curriculumRollout.loading')}</p>}
           {isError && (
             <p className="flex items-center gap-2 text-sm text-destructive">
               <CircleAlert className="h-4 w-4" aria-hidden="true" />
-              Curriculum coverage is unavailable right now.
+              {t('curriculumRollout.error')}
             </p>
           )}
           {!isLoading && !isError && catalog && (
             <>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <p className="brand-section-kicker">{contextLabel}</p>
-                  <p className="mt-2 text-lg font-semibold">Math, physics, German, and English rollout</p>
+                  <p className="brand-section-kicker">{contextLabel ?? t('curriculumRollout.studentContext')}</p>
+                  <p className="mt-2 text-lg font-semibold">{t('curriculumRollout.heading')}</p>
                   <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-                    Active content is shown in normal student flows. Draft, reviewed, and archived content remains hidden unless an authorized teacher or admin previews it.
+                    {t('curriculumRollout.subheading')}
                   </p>
                 </div>
                 <Badge variant="secondary">{catalog.source.replace(/_/g, ' ')}</Badge>
@@ -61,14 +64,14 @@ export function CurriculumRolloutPanel({
 
               <div className="grid gap-3 md:grid-cols-4">
                 <RolloutMetric icon={BookOpenCheck} label={t('ui.activeSubjects')} value={String(activeSubjects.length)} />
-                <RolloutMetric icon={Layers3} label="Units" value={String(catalog.units.length)} />
-                <RolloutMetric icon={ListChecks} label="Lessons" value={String(activeLessons.length)} />
-                <RolloutMetric icon={Signal} label="Exercises" value={String(totalExercises)} />
+                <RolloutMetric icon={Layers3} label={t('curriculumRollout.units')} value={String(catalog.units.length)} />
+                <RolloutMetric icon={ListChecks} label={t('curriculumRollout.lessons')} value={String(activeLessons.length)} />
+                <RolloutMetric icon={Signal} label={t('curriculumRollout.exercises')} value={String(totalExercises)} />
               </div>
 
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
                 <div className="space-y-3">
-                  <p className="text-sm font-medium">Rollout subjects</p>
+                  <p className="text-sm font-medium">{t('curriculumRollout.rolloutSubjects')}</p>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {activeSubjects.map((subject) => (
                       <div key={subject.id} className="rounded-md border border-border/70 p-3">
@@ -77,7 +80,7 @@ export function CurriculumRolloutPanel({
                             <p className="text-sm font-semibold">{subject.name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
                               {subject.gradeLevels.map((level) => level.label).join(', ') ||
-                                'All active grades'}
+                                t('curriculumRollout.allActiveGrades')}
                             </p>
                           </div>
                           <Badge variant="outline">{subject.rolloutState}</Badge>
@@ -88,15 +91,15 @@ export function CurriculumRolloutPanel({
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-sm font-medium">Progress signals</p>
+                  <p className="text-sm font-medium">{t('curriculumRollout.progressSignals')}</p>
                   <div className="rounded-md border border-border/70 p-3">
-                    <p className="text-xs text-muted-foreground">Completed lessons</p>
+                    <p className="text-xs text-muted-foreground">{t('curriculumRollout.completedLessons')}</p>
                     <p className="mt-1 text-xl font-semibold">{progress?.completedLessons ?? 0}</p>
                   </div>
                   <div className="rounded-md border border-border/70 p-3">
-                    <p className="text-xs text-muted-foreground">Weak curriculum areas</p>
+                    <p className="text-xs text-muted-foreground">{t('curriculumRollout.weakAreas')}</p>
                     {visibleWeakTopics.length === 0 ? (
-                      <p className="mt-1 text-sm text-muted-foreground">No weak area evidence yet.</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{t('curriculumRollout.noWeakAreaEvidence')}</p>
                     ) : (
                       <div className="mt-2 flex flex-wrap gap-2">
                         {visibleWeakTopics.slice(0, 4).map((topic) => (
@@ -110,7 +113,7 @@ export function CurriculumRolloutPanel({
 
               {activeLessons.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium">Lesson bank sample</p>
+                  <p className="text-sm font-medium">{t('curriculumRollout.lessonBankSample')}</p>
                   <div className="divide-y divide-border/70 rounded-md border border-border/70">
                     {activeLessons.slice(0, 5).map((lesson) => (
                       <div key={lesson.id} className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:justify-between">
@@ -120,7 +123,9 @@ export function CurriculumRolloutPanel({
                             {lesson.subjectId} / {lesson.topicId} / {lesson.estimatedMinutes} min
                           </p>
                         </div>
-                        <Badge variant="secondary">{lesson.exerciseCount} exercises</Badge>
+                        <Badge variant="secondary">
+                          {t('curriculumRollout.exerciseCount', { count: lesson.exerciseCount })}
+                        </Badge>
                       </div>
                     ))}
                   </div>

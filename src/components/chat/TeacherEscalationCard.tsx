@@ -1,4 +1,5 @@
 import { GraduationCap } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { UpgradeRequiredDialog } from '@/components/billing/UpgradeRequiredDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -17,6 +18,7 @@ export function TeacherEscalationCard({
   feedback,
   feedbackTone = 'success',
 }: TeacherEscalationCardProps) {
+  const { t } = useTranslation('chat')
   const entitlementQuery = useStudentEntitlementQuery()
   const teacherHelpLocked = entitlementQuery.data?.teacherSupportIncluded === false
   const requestButton = (
@@ -27,7 +29,7 @@ export function TeacherEscalationCard({
       onClick={onRequestTeacher}
       disabled={isRequesting || (!onRequestTeacher && !teacherHelpLocked)}
     >
-      {isRequesting ? 'Requesting...' : 'Request teacher'}
+      {isRequesting ? t('escalation.requesting') : t('escalation.requestTeacher')}
     </Button>
   )
 
@@ -40,9 +42,9 @@ export function TeacherEscalationCard({
               <GraduationCap className="h-4 w-4" />
             </div>
             <div>
-              <div className="font-medium">Need help from a teacher?</div>
+              <div className="font-medium">{t('needHelpFromTeacher')}</div>
               <p className="mt-1 text-muted-foreground">
-                Request tutor support when the explanation is not clear enough.
+                {t('escalation.prompt')}
               </p>
               {feedback && (
                 <p
@@ -59,7 +61,7 @@ export function TeacherEscalationCard({
           </div>
           {teacherHelpLocked ? (
             <UpgradeRequiredDialog
-              reason={'Teacher support is not part of your current plan.'}
+              reason={t('escalation.planRestricted')}
             >
               {requestButton}
             </UpgradeRequiredDialog>

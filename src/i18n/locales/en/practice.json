@@ -271,5 +271,32 @@
     "metricDone": "done",
     "open": "Open",
     "topicKicker": "Topic"
+  },
+  "curriculumRollout": {
+    "title": "Curriculum rollout",
+    "description": "Active curriculum coverage, lesson bank depth, and progress signals.",
+    "parentTitle": "Curriculum rollout",
+    "parentDescription": "Parent-visible curriculum coverage and weak-area signals for active subjects.",
+    "parentContext": "Parent curriculum view",
+    "tutorTitle": "Curriculum context",
+    "tutorDescription": "Teacher-visible curriculum coverage for the current request subject.",
+    "tutorContext": "Tutor preview",
+    "studentContext": "Curriculum",
+    "loading": "Loading curriculum coverage...",
+    "error": "Curriculum coverage is unavailable right now.",
+    "heading": "Math, physics, German, and English rollout",
+    "subheading": "Active content is shown in normal student flows. Draft, reviewed, and archived content remains hidden unless an authorized teacher or admin previews it.",
+    "units": "Units",
+    "lessons": "Lessons",
+    "exercises": "Exercises",
+    "rolloutSubjects": "Rollout subjects",
+    "allActiveGrades": "All active grades",
+    "progressSignals": "Progress signals",
+    "completedLessons": "Completed lessons",
+    "weakAreas": "Weak curriculum areas",
+    "noWeakAreaEvidence": "No weak area evidence yet.",
+    "lessonBankSample": "Lesson bank sample",
+    "exerciseCount_one": "{{count}} exercise",
+    "exerciseCount_other": "{{count}} exercises"
   }
 }

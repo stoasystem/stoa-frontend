@@ -70,5 +70,17 @@
   "conversations": "Unterhaltungen",
   "conversationsSubtitle": "Deine Lernunterhaltungen",
   "backToConversations": "Zurück zu den Unterhaltungen",
-  "newConversationReady": "Bereit für eine neue Frage."
+  "newConversationReady": "Bereit für eine neue Frage.",
+  "stopGenerating": "Erstellung stoppen",
+  "loadingChat": "Chat wird geladen",
+  "tutorSupport": "Tutor-Unterstützung",
+  "uploadedMaterial": "Hochgeladenes Lernmaterial",
+  "back": "Zurück",
+  "needHelpFromTeacher": "Brauchst du Hilfe von einer Lehrperson?",
+  "escalation": {
+    "prompt": "Fordere Unterstützung durch eine Lehrperson an, wenn die Erklärung nicht ausreicht.",
+    "requesting": "Wird angefragt...",
+    "requestTeacher": "Lehrperson anfragen",
+    "planRestricted": "Unterstützung durch eine Lehrperson ist nicht Teil deines aktuellen Plans."
+  }
 }

@@ -271,5 +271,32 @@
     "metricDone": "erledigt",
     "open": "Öffnen",
     "topicKicker": "Thema"
+  },
+  "curriculumRollout": {
+    "title": "Lehrplan-Rollout",
+    "description": "Aktive Lehrplanabdeckung, Umfang der Aufgabenbank und Fortschrittssignale.",
+    "parentTitle": "Lehrplan-Rollout",
+    "parentDescription": "Für Eltern sichtbare Lehrplanabdeckung und Signale zu Schwachstellen für aktive Fächer.",
+    "parentContext": "Elternansicht Lehrplan",
+    "tutorTitle": "Lehrplan-Kontext",
+    "tutorDescription": "Für Lehrkräfte sichtbare Lehrplanabdeckung für das aktuelle Anfragefach.",
+    "tutorContext": "Tutor-Vorschau",
+    "studentContext": "Lehrplan",
+    "loading": "Lehrplanabdeckung wird geladen...",
+    "error": "Lehrplanabdeckung ist derzeit nicht verfügbar.",
+    "heading": "Rollout für Mathematik, Physik, Deutsch und Englisch",
+    "subheading": "Aktive Inhalte werden im normalen Schülerablauf angezeigt. Entwürfe, geprüfte und archivierte Inhalte bleiben verborgen, sofern nicht eine autorisierte Lehrkraft oder ein Admin sie in der Vorschau ansieht.",
+    "units": "Einheiten",
+    "lessons": "Lektionen",
+    "exercises": "Aufgaben",
+    "rolloutSubjects": "Rollout-Fächer",
+    "allActiveGrades": "Alle aktiven Klassenstufen",
+    "progressSignals": "Fortschrittssignale",
+    "completedLessons": "Abgeschlossene Lektionen",
+    "weakAreas": "Schwache Lehrplanbereiche",
+    "noWeakAreaEvidence": "Noch keine Hinweise auf Schwachstellen.",
+    "lessonBankSample": "Beispiel aus der Lektionsbank",
+    "exerciseCount_one": "{{count}} Aufgabe",
+    "exerciseCount_other": "{{count}} Aufgaben"
   }
 }

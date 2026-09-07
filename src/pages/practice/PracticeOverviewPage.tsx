@@ -53,10 +53,9 @@ export function PracticePathTab() {
           progress={curriculumProgressQuery.data}
           isLoading={curriculumQuery.isLoading || curriculumProgressQuery.isLoading}
           isError={curriculumQuery.isError || curriculumProgressQuery.isError}
-          contextLabel="Student curriculum"
         />
         {overviewQuery.isLoading && <PageSkeleton rows={4} />}
-        {overviewQuery.isError && <p className="text-sm text-destructive">Practice is unavailable right now.</p>}
+        {overviewQuery.isError && <p className="text-sm text-destructive">{t('ui.practiceOverviewUnavailable')}</p>}
         {overviewQuery.data && <PracticeOverview overview={overviewQuery.data} />}
       </PageContainer>
     </>
