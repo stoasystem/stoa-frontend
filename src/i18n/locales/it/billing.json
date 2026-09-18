@@ -21,6 +21,12 @@
   "success": "Stato abbonamento aggiornato.",
   "choosePlan": "Scegli un piano",
   "planSelection": "Scelta del piano",
+  "summary": {
+    "title": "Abbonamento attuale",
+    "planBody": "Il tuo piano mostra il supporto allo studio attualmente disponibile per questo account.",
+    "currentPeriod": "Periodo attuale",
+    "noPeriod": "Nessun periodo di fatturazione restituito finora."
+  },
   "plans": {
     "free_trial": {
       "name": "Prova gratuita",

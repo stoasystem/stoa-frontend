@@ -21,6 +21,12 @@
   "success": "Abonnementstatus aktualisiert.",
   "choosePlan": "Plan wählen",
   "planSelection": "Planwahl",
+  "summary": {
+    "title": "Aktuelles Abo",
+    "planBody": "Dein Plan zeigt die Lernunterstützung, die diesem Konto derzeit zur Verfügung steht.",
+    "currentPeriod": "Aktueller Zeitraum",
+    "noPeriod": "Es wurde noch kein Abrechnungszeitraum zurückgegeben."
+  },
   "plans": {
     "free_trial": {
       "name": "Kostenlose Probephase",

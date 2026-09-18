@@ -118,6 +118,28 @@
       "libraryCompleted": "{{score}} von {{total}} Aufgaben in {{minutes}} Minuten gelöst.",
       "libraryInProgress": "{{answered}} von {{total}} Aufgaben beantwortet. Setze dieses Set in der Übungsbibliothek fort.",
       "empty": "Es ist noch kein Lernverlauf vorhanden."
+    },
+    "recommendationsEmpty": "Noch keine Empfehlung. Stelle ein paar Fragen, dann erscheinen hier Vorschläge.",
+    "weakTopicsEmpty": "Noch keine Schwachstellen erkannt — stell weiter Fragen!",
+    "priority": {
+      "high": "Hoch",
+      "medium": "Mittel",
+      "low": "Niedrig"
+    },
+    "topicNames": {
+      "brueche": "Brüche",
+      "gleichungen": "Gleichungen",
+      "geometrie": "Geometrie",
+      "prozentrechnung": "Prozentrechnung",
+      "textaufgaben": "Textaufgaben"
+    },
+    "rationale": {
+      "curriculumExercise": "Für dieses schwache Thema gibt es eine geprüfte Lehrplanaufgabe.",
+      "reviewedDraft": "Ein von Lehrpersonen geprüfter KI-Übungsentwurf passt zu diesem Lernbedarf.",
+      "continuation": "Mach mit einer kurzen geprüften Übung weiter, damit das Gelernte frisch bleibt.",
+      "assignedCurriculum": "Aus einer geprüften Lehrplanaufgabe zugewiesen.",
+      "assignedDraft": "Aus einem von Lehrpersonen geprüften KI-Aufgabenentwurf zugewiesen.",
+      "signals": "Die Empfehlungen beruhen auf aktuellen Lern- und Aufgabensignalen."
     }
   },
   "library": {
@@ -192,7 +214,10 @@
     "freshness": "Aktualität des Profils",
     "freshnessBody": "Am {{date}} aus Fragen, Tutor-Eskalationen und Übungsbelegen aktualisiert.",
     "feedback": "Rückmeldung",
-    "email": "E-Mail"
+    "email": "E-Mail",
+    "usageActive": "Aktiv",
+    "usagePaused": "Pausiert",
+    "checkFields": "Prüfe die Profilfelder vor dem Speichern."
   },
   "ui": {
     "practiceLesson": "Übungslektion",

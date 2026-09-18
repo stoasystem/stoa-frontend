@@ -69,6 +69,11 @@
     "german": "German",
     "english": "English"
   },
+  "subjectSelected": "Selected",
+  "subjectRollout": {
+    "active": "Full support",
+    "foundation": "Basic support"
+  },
   "conversations": "Conversations",
   "conversationsSubtitle": "Your learning conversations",
   "backToConversations": "Back to conversations",
@@ -143,5 +148,6 @@
     "simpler": "Can you explain it more simply?",
     "similar": "Give me a similar exercise",
     "why": "Why does this work?"
-  }
+  },
+  "duplicateReopened": "You already asked this. Here is that conversation."
 }

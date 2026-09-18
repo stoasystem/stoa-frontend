@@ -21,6 +21,12 @@
   "success": "Subscription status updated.",
   "choosePlan": "Choose a plan",
   "planSelection": "Plan selection",
+  "summary": {
+    "title": "Current subscription",
+    "planBody": "Your plan shows the learning support currently available for this account.",
+    "currentPeriod": "Current period",
+    "noPeriod": "No billing period returned yet."
+  },
   "plans": {
     "free_trial": {
       "name": "Free trial",

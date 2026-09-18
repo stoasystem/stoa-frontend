@@ -5,6 +5,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/common/Skeleton'
+import {
+  getCurriculumTopicLabel,
+  getRecommendationRationale,
+  getSubjectLabel,
+} from '@/lib/displayLabels'
 import type { MemoryRecommendation } from '@/services/learning/memoryApi'
 
 const confidenceVariant: Record<
@@ -70,9 +75,7 @@ export function RecommendedPracticeCard({
         )}
 
         {!isError && recommendations.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            Nothing to recommend yet. Ask a few questions and suggestions will appear here.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('progress.recommendationsEmpty')}</p>
         )}
 
         {recommendations.map((rec) => (
@@ -82,16 +85,22 @@ export function RecommendedPracticeCard({
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-sm font-medium capitalize leading-5">{rec.label}</div>
-                <div className="mt-1 text-xs capitalize text-muted-foreground">{rec.subject}</div>
+                <div className="text-sm font-medium leading-5">
+                  {getCurriculumTopicLabel(rec.label, t)}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {getSubjectLabel(rec.subject, t)}
+                </div>
               </div>
-              <Badge className="shrink-0 capitalize" variant={confidenceVariant[rec.confidence]}>
-                {rec.confidence}
+              <Badge className="shrink-0" variant={confidenceVariant[rec.confidence]}>
+                {t(`progress.priority.${rec.confidence}`)}
               </Badge>
             </div>
 
             {rec.rationale && (
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">{rec.rationale}</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {getRecommendationRationale(rec.rationale, t)}
+              </p>
             )}
 
             <Button asChild size="sm" variant="outline" className="mt-3">

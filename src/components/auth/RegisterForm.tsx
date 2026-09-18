@@ -1,4 +1,4 @@
-import { type FormEvent, useMemo, useState } from 'react'
+import { type FormEvent, useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { RegisterAccountStep } from '@/components/auth/RegisterAccountStep'
@@ -11,7 +11,7 @@ import { TutorProfileStep } from '@/components/auth/TutorProfileStep'
 import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
 import { useSubmitTeacherApplicationMutation } from '@/hooks/teacher/useTeacherApplication'
-import { isCompliantPassword } from '@/lib/validation'
+import { MAX_AGE, MIN_AGE, isAdultAge, isCompliantPassword, isValidAge, isValidEmail } from '@/lib/validation'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { getStoredReferralCode, getStoredUTM } from '@/lib/utm'
 import { buildTeacherStatement } from '@/services/teacher/teacherApplicationApi'
@@ -24,7 +24,33 @@ import type {
   TutorOnboardingProfile,
 } from '@/types/onboarding'
 
-type Step = 'role' | 'account' | 'profile' | 'done'
+export type RegisterStep = 'role' | 'account' | 'profile' | 'done'
+
+type Step = RegisterStep
+
+type FieldErrors = Partial<
+  Record<
+    | 'name'
+    | 'email'
+    | 'password'
+    | 'acceptedTerms'
+    | 'emailOwnershipConfirmed'
+    | 'age'
+    | 'school'
+    | 'grade'
+    | 'subjects'
+    | 'parentName'
+    | 'parentEmail'
+    | 'childName'
+    | 'childAge'
+    | 'childGrade'
+    | 'childSubjects'
+    | 'teachingSubjects'
+    | 'educationBackground'
+    | 'introduction',
+    string
+  >
+>
 
 const initialStudentProfile: StudentOnboardingProfile = {
   age: 14,
@@ -74,7 +100,7 @@ function getInitialRole(value: string | null): RegisterRole {
   return 'student'
 }
 
-export function RegisterForm() {
+export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterStep, role: RegisterRole) => void } = {}) {
   const { t, i18n } = useTranslation(['auth', 'common', 'errors'])
   const currentLanguage = i18n.resolvedLanguage ?? i18n.language
   const initialAnswerLanguage: SupportedLanguage = isSupportedLanguage(currentLanguage)
@@ -98,11 +124,16 @@ export function RegisterForm() {
   const [parentSubjects, setParentSubjects] = useState(initialParentProfile.subjectsNeedingHelp.join(', '))
   const [tutorSubjects, setTutorSubjects] = useState(initialTutorProfile.subjects.join(', '))
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const registerMutation = useRegisterMutation({ redirect: false })
   const teacherApplicationMutation = useSubmitTeacherApplicationMutation()
 
   const stepNumber = getStepNumber(step)
   const canGoBack = step === 'account' || step === 'profile'
+
+  useEffect(() => {
+    onStepChange?.(step, role)
+  }, [onStepChange, role, step])
 
   const profile = useMemo(() => {
     if (role === 'student') {
@@ -123,50 +154,70 @@ export function RegisterForm() {
     }
   }, [parentProfile, parentSubjects, role, studentProfile, studentSubjects, tutorProfile, tutorSubjects])
 
-  function validateCurrentStep() {
+  function validateCurrentStep(): FieldErrors {
+    const errors: FieldErrors = {}
+
     if (step === 'account') {
-      if (!name.trim() || !email.trim()) return t('errors:required')
+      if (!name.trim()) errors.name = t('errors:nameRequired')
+      if (!email.trim()) errors.email = t('errors:emailRequired')
+      else if (!isValidEmail(email)) errors.email = t('errors:invalidEmail')
       if (role !== 'teacher') {
-        if (!password.trim()) return t('errors:required')
-        if (!isCompliantPassword(password)) return t('errors:passwordRequirements')
+        if (!password.trim()) errors.password = t('errors:passwordRequired')
+        else if (!isCompliantPassword(password)) errors.password = t('errors:passwordRequirements')
       }
-      if (role === 'teacher' && !emailOwnershipConfirmed) return t('auth:register.confirmEmailOwnership')
-      if (!acceptedTerms) return t('errors:acceptTerms')
+      if (role === 'teacher' && !emailOwnershipConfirmed) {
+        errors.emailOwnershipConfirmed = t('errors:confirmEmailOwnershipRequired')
+      }
+      if (!acceptedTerms) errors.acceptedTerms = t('errors:acceptTerms')
     }
 
     if (step === 'profile') {
       if (role === 'student') {
-        if (!studentProfile.school.trim() || !studentProfile.grade.trim()) return t('errors:schoolGradeRequired')
-        if (!studentProfile.parentName.trim() || !studentProfile.parentEmail.trim()) return t('errors:parentRequired')
-        if (splitSubjects(studentSubjects).length === 0) return t('errors:subjectRequired')
+        if (!isValidAge(studentProfile.age)) errors.age = t('errors:ageInvalid', { min: MIN_AGE, max: MAX_AGE })
+        if (!studentProfile.school.trim()) errors.school = t('errors:schoolRequired')
+        if (!studentProfile.grade.trim()) errors.grade = t('errors:gradeRequired')
+        if (!isAdultAge(studentProfile.age)) {
+          if (!studentProfile.parentName.trim()) errors.parentName = t('errors:parentNameRequired')
+          if (!studentProfile.parentEmail.trim()) errors.parentEmail = t('errors:parentEmailRequired')
+        }
+        if (studentProfile.parentEmail.trim() && !isValidEmail(studentProfile.parentEmail)) {
+          errors.parentEmail = t('errors:invalidEmail')
+        }
+        if (splitSubjects(studentSubjects).length === 0) errors.subjects = t('errors:subjectRequired')
       }
       if (role === 'parent') {
-        if (!parentProfile.childName.trim() || !parentProfile.childGrade.trim()) return t('errors:childRequired')
-        if (splitSubjects(parentSubjects).length === 0) return t('errors:subjectRequired')
+        if (!parentProfile.childName.trim()) errors.childName = t('errors:childNameRequired')
+        if (!parentProfile.childGrade.trim()) errors.childGrade = t('errors:childGradeRequired')
+        if (!isValidAge(parentProfile.childAge)) errors.childAge = t('errors:ageInvalid', { min: MIN_AGE, max: MAX_AGE })
+        if (splitSubjects(parentSubjects).length === 0) errors.childSubjects = t('errors:subjectRequired')
       }
       if (role === 'teacher') {
-        if (splitSubjects(tutorSubjects).length === 0) return t('errors:teachingSubjectRequired')
-        if (!tutorProfile.educationBackground.trim()) return t('errors:educationRequired')
-        if (!tutorProfile.introduction.trim()) return t('errors:introductionRequired')
+        if (splitSubjects(tutorSubjects).length === 0) errors.teachingSubjects = t('errors:teachingSubjectRequired')
+        if (!tutorProfile.educationBackground.trim()) errors.educationBackground = t('errors:educationRequired')
+        if (!tutorProfile.introduction.trim()) errors.introduction = t('errors:introductionRequired')
       }
     }
 
-    return null
+    return errors
+  }
+
+  function applyValidation() {
+    const errors = validateCurrentStep()
+    setFieldErrors(errors)
+    const hasError = Object.keys(errors).length > 0
+    setError(hasError ? t('errors:fixHighlightedFields') : null)
+    return !hasError
   }
 
   function handleNext() {
-    const validationError = validateCurrentStep()
-    if (validationError) {
-      setError(validationError)
-      return
-    }
-    setError(null)
+    if (!applyValidation()) return
     if (step === 'role') setStep('account')
     if (step === 'account') setStep('profile')
   }
 
   function handleBack() {
     setError(null)
+    setFieldErrors({})
     if (step === 'profile') setStep('account')
     if (step === 'account') setStep('role')
   }
@@ -174,13 +225,8 @@ export function RegisterForm() {
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (registerMutation.isPending || teacherApplicationMutation.isPending) return
-    const validationError = validateCurrentStep()
-    if (validationError) {
-      setError(validationError)
-      return
-    }
+    if (!applyValidation()) return
 
-    setError(null)
     if (role === 'teacher') {
       teacherApplicationMutation.mutate(
         {
@@ -218,8 +264,13 @@ export function RegisterForm() {
     })
   }
 
+  // The server marks the issues a person should read with a stable code; the
+  // English prose beside it is only the fallback.
+  const backendMessage = (code: string) =>
+    t(`errors:backend.${code}`, { defaultValue: '' })
+
   const registrationError = registerMutation.isError
-    ? toUserFacingError(registerMutation.error, t('auth:register.failed'))
+    ? toUserFacingError(registerMutation.error, t('auth:register.failed'), backendMessage)
     : teacherApplicationMutation.isError
       ? toUserFacingError(teacherApplicationMutation.error, t('auth:register.applicationFailed'))
       : null
@@ -236,7 +287,9 @@ export function RegisterForm() {
   }
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    // Same reason as the sign-in form: the browser's required-field prompts
+    // follow its own language, so the wizard's per-field checks answer instead.
+    <form className="space-y-6" noValidate onSubmit={handleSubmit}>
       <p className="text-sm text-muted-foreground">{t('auth:register.step', { step: stepNumber })}</p>
 
       {step === 'role' && <RegisterRoleStep selectedRole={role} onSelectRole={setRole} />}
@@ -247,6 +300,7 @@ export function RegisterForm() {
           email={email}
           password={password}
           acceptedTerms={acceptedTerms}
+          errors={fieldErrors}
           hidePassword={role === 'teacher'}
           emailOwnershipConfirmed={role === 'teacher' ? emailOwnershipConfirmed : undefined}
           onChange={(values) => {
@@ -263,6 +317,7 @@ export function RegisterForm() {
         <StudentProfileStep
           value={studentProfile}
           subjectText={studentSubjects}
+          errors={fieldErrors}
           onChange={(values) => setStudentProfile((current) => ({ ...current, ...values }))}
           onSubjectTextChange={setStudentSubjects}
         />
@@ -272,6 +327,12 @@ export function RegisterForm() {
         <ParentProfileStep
           value={parentProfile}
           subjectText={parentSubjects}
+          errors={{
+            childName: fieldErrors.childName,
+            childAge: fieldErrors.childAge,
+            childGrade: fieldErrors.childGrade,
+            subjects: fieldErrors.childSubjects,
+          }}
           onChange={(values) => setParentProfile((current) => ({ ...current, ...values }))}
           onSubjectTextChange={setParentSubjects}
         />
@@ -281,6 +342,11 @@ export function RegisterForm() {
         <TutorProfileStep
           value={tutorProfile}
           subjectText={tutorSubjects}
+          errors={{
+            subjects: fieldErrors.teachingSubjects,
+            educationBackground: fieldErrors.educationBackground,
+            introduction: fieldErrors.introduction,
+          }}
           onChange={(values) => setTutorProfile((current) => ({ ...current, ...values }))}
           onSubjectTextChange={setTutorSubjects}
         />
@@ -299,7 +365,10 @@ export function RegisterForm() {
             {t('common:actions.back')}
           </Button>
         ) : (
-          <Link className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline" to="/login">
+          <Link
+            className="self-center text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary/80"
+            to="/login"
+          >
             {t('auth:register.alreadyRegistered')}
           </Link>
         )}

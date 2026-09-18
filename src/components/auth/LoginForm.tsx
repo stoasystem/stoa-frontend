@@ -23,6 +23,10 @@ export function LoginForm() {
   return (
     <form
       className="space-y-4"
+      // The browser's own required-field prompts follow its language, not the
+      // one chosen here, so the form's own checks answer instead. `required`
+      // stays on the fields for assistive technology.
+      noValidate
       onSubmit={(event) => {
         event.preventDefault()
         if (loginMutation.isPending) return
@@ -67,6 +71,11 @@ export function LoginForm() {
           aria-describedby={errors.password ? 'login-password-error' : undefined}
         />
         {errors.password && <p id="login-password-error" className="text-xs text-destructive" role="alert">{errors.password}</p>}
+        <p className="text-right text-xs">
+          <Link className="text-muted-foreground underline hover:text-foreground" to="/forgot-password">
+            {t('auth:login.forgotPassword')}
+          </Link>
+        </p>
       </div>
       {verificationBlocked && (
         <EmailVerificationPanel email={email} source="login" />
@@ -91,7 +100,7 @@ export function LoginForm() {
       </p>
       <p className="text-center text-sm text-muted-foreground">
         {t('auth:login.needAccount')}{' '}
-        <Link className="font-medium text-foreground underline" to="/register">
+        <Link className="font-semibold text-primary underline underline-offset-4 hover:text-primary/80" to="/register">
           {t('common:actions.register')}
         </Link>
       </p>

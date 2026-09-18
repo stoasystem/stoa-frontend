@@ -18,5 +18,19 @@
   "teachingSubjectRequired": "Add at least one teaching subject.",
   "educationRequired": "Education background is required.",
   "introductionRequired": "Short introduction is required.",
-  "credentialRequired": "Upload at least one credential document."
+  "credentialRequired": "Upload at least one credential document.",
+  "nameRequired": "Name is required.",
+  "emailRequired": "Email is required.",
+  "ageInvalid": "Enter a whole number between {{min}} and {{max}}.",
+  "schoolRequired": "School is required.",
+  "parentNameRequired": "Parent name is required for students under 18.",
+  "parentEmailRequired": "Parent email is required for students under 18.",
+  "childNameRequired": "Child name is required.",
+  "childGradeRequired": "Child grade is required.",
+  "confirmEmailOwnershipRequired": "Confirm that you can receive email at this address.",
+  "fixHighlightedFields": "Please correct the highlighted fields.",
+  "backend": {
+    "age_out_of_range": "Enter an age between 1 and 120.",
+    "parent_contact_required": "A parent's name and email are required for students under 18."
+  }
 }

@@ -4,6 +4,128 @@
   "description": "Ricevi aiuto con STOA, capisci il supporto dell’insegnante nel percorso di studio e contatta il team quando serve.",
   "viewOnboarding": "Vedi configurazione",
   "contact": "Contatta STOA",
+  "contactSubject": "Richiesta di assistenza STOA",
   "submit": "Invia richiesta",
-  "submitted": "La tua richiesta è stata inviata."
+  "submitted": "La tua richiesta è stata inviata.",
+  "tags": {
+    "faq": "Domande frequenti",
+    "problems": "Segnala un problema",
+    "teacherHelp": "Aiuto dell’insegnante",
+    "contact": "Contattaci"
+  },
+  "sections": {
+    "faq": {
+      "title": "Domande frequenti",
+      "items": [
+        "Gli studenti iniziano dalla Chat per domande sui compiti, spiegazioni e schede caricate.",
+        "I genitori usano la dashboard genitori e i report per seguire i progressi e i punti deboli.",
+        "Gli insegnanti rispondono alle richieste di aiuto degli studenti dalla dashboard insegnanti."
+      ]
+    },
+    "problems": {
+      "title": "Segnala un problema",
+      "items": [
+        "Segnalaci pagine che non funzionano, dati mancanti, schermate poco chiare o qualsiasi cosa ti blocchi.",
+        "Indica la pagina in cui ti trovavi, che cosa ti aspettavi e che cosa è successo invece.",
+        "Non inviare mai password, codici di accesso o trascrizioni complete della chat in un messaggio di assistenza."
+      ]
+    },
+    "teacherHelp": {
+      "title": "Aiuto dell’insegnante o assistenza?",
+      "items": [
+        "Chiedi l’aiuto di un insegnante quando una domanda di studio nata in Chat deve essere vista da una persona.",
+        "Contatta l’assistenza quando il tuo account, l’accesso, un report o l’app stessa non funzionano.",
+        "Lo stato di una richiesta all’insegnante resta in Chat; tutto il resto riguarda l’assistenza."
+      ]
+    },
+    "expectations": {
+      "title": "Che cosa offre STOA",
+      "items": [
+        "STOA punta su un aiuto allo studio affidabile e facile da seguire, e le nuove funzioni arrivano passo dopo passo.",
+        "Se qualcosa sembra incompleto o poco chiaro, scrivici: il tuo messaggio ci aiuta a decidere che cosa migliorare.",
+        "Se un problema sta bloccando una lezione in corso, scrivilo nel messaggio così lo guardiamo per primo."
+      ]
+    }
+  },
+  "contactCard": {
+    "requestText": "Scrivici per problemi di accesso, errori, domande su un report o qualsiasi dubbio.",
+    "generalText": "Lo stesso indirizzo vale per domande generali su STOA, supporto ai genitori, candidature degli insegnanti e collaborazioni con le scuole.",
+    "emailLabel": "Indirizzo e-mail"
+  },
+  "onboarding": {
+    "eyebrow": "Per iniziare",
+    "title": "Per iniziare con STOA",
+    "description": "Una guida breve per studenti, genitori e insegnanti che usano STOA per la prima volta.",
+    "needHelp": "Ti serve aiuto?",
+    "badges": {
+      "audience": "Per i nuovi utenti",
+      "student": "Studente",
+      "parent": "Genitore",
+      "tutor": "Insegnante"
+    },
+    "expectations": {
+      "title": "Che cosa aspettarsi",
+      "items": [
+        "STOA spiega i compiti passo dopo passo e un insegnante vero interviene quando la spiegazione non basta.",
+        "Se una pagina non mostra i dati, sembra sbagliata o non funziona, segnalalo all’assistenza e la controlleremo.",
+        "Ogni messaggio arriva al team STOA e il tuo feedback guida i prossimi miglioramenti."
+      ]
+    },
+    "roles": {
+      "student": {
+        "title": "Avvio per studenti",
+        "audience": "Per gli studenti che iniziano con STOA",
+        "steps": [
+          {
+            "title": "Conferma classe e materie",
+            "description": "Tieni aggiornati classe e materie attive nel profilo, così STOA spiega al livello giusto."
+          },
+          {
+            "title": "Inizia dalla Chat",
+            "description": "Apri la Chat quando hai una domanda sui compiti, un concetto poco chiaro o una scheda da caricare."
+          },
+          {
+            "title": "Chiedi un insegnante quando ti blocchi",
+            "description": "Richiedi l’aiuto di un insegnante dalla Chat se una spiegazione resta poco chiara o vuoi una verifica umana."
+          }
+        ]
+      },
+      "parent": {
+        "title": "Vista dei genitori",
+        "audience": "Per i genitori che seguono il figlio",
+        "steps": [
+          {
+            "title": "Apri la dashboard del figlio",
+            "description": "La dashboard genitori mostra ogni profilo, le attività recenti e i segnali di apprendimento in un colpo d’occhio."
+          },
+          {
+            "title": "Consulta i report",
+            "description": "I report mostrano progressi, punti forti, punti deboli e supporto consigliato, senza mostrare per impostazione predefinita i contenuti privati della chat."
+          },
+          {
+            "title": "Usa l’assistenza per i problemi di accesso",
+            "description": "Se manca un figlio, un report sembra vecchio o l’accesso non funziona, inviaci una richiesta di assistenza."
+          }
+        ]
+      },
+      "tutor": {
+        "title": "Flusso per gli insegnanti",
+        "audience": "Per gli insegnanti che rispondono alle richieste",
+        "steps": [
+          {
+            "title": "Tieni d’occhio l’elenco richieste",
+            "description": "La dashboard insegnanti elenca le richieste aperte, in corso e risolte che attendono una risposta umana."
+          },
+          {
+            "title": "Apri una richiesta",
+            "description": "Apri una richiesta per vedere la domanda nel suo contesto, aggiungere note e scegliere lo stato successivo."
+          },
+          {
+            "title": "Mantieni aggiornato lo stato",
+            "description": "Porta le richieste da aperta a in corso e poi a risolta, così gli studenti vedono a che punto sono."
+          }
+        ]
+      }
+    }
+  }
 }

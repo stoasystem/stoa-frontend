@@ -1,55 +1,55 @@
 {
   "privacy": {
     "eyebrow": "Datenschutz",
-    "title": "Datenschutzerklaerung",
+    "title": "Datenschutzerklärung",
     "description": "Wie STOA Konto-, Lern-, Support- und Servicedaten verarbeitet.",
     "sections": {
       "dataWeCollect": {
         "title": "Welche Daten wir erheben",
-        "body": "STOA kann Kontodaten, Rolle, Kontaktdaten, Lernaktivitaeten, Fragen, Metadaten hochgeladener Schulmaterialien, Supportanfragen, Feedback, Analyseereignisse und Fehlerberichte der Frontend-Anwendung verarbeiten."
+        "body": "STOA kann Kontodaten, Rolle, Kontaktdaten, Lernaktivitäten, Fragen, Metadaten hochgeladener Schulmaterialien, Supportanfragen, Feedback, Analyseereignisse und Fehlerberichte der Frontend-Anwendung verarbeiten."
       },
       "studentLearning": {
-        "title": "Lerndaten von Schuelerinnen und Schuelern",
-        "body": "Lerndaten koennen letzte Fragen, Konversationsmetadaten, Fokusbereiche, Anfragen an Lehrpersonen, Berichtszusammenfassungen und Fortschrittssignale umfassen, die den Schueler unterstuetzen und Eltern informieren."
+        "title": "Lerndaten von Schülerinnen und Schülern",
+        "body": "Lerndaten können letzte Fragen, Konversationsmetadaten, Fokusbereiche, Anfragen an Lehrpersonen, Berichtszusammenfassungen und Fortschrittssignale umfassen, die den Schüler unterstützen und Eltern informieren."
       },
       "visibility": {
-        "title": "Sichtbarkeit fuer Eltern und Lehrpersonen",
-        "body": "Eltern koennen Lernzusammenfassungen, Berichte, Fokusbereiche und Beteiligung von Lehrpersonen sehen. Lehrpersonen sehen den Kontext, der fuer eine Hilfeanfrage notwendig ist."
+        "title": "Sichtbarkeit für Eltern und Lehrpersonen",
+        "body": "Eltern können Lernzusammenfassungen, Berichte, Fokusbereiche und Beteiligung von Lehrpersonen sehen. Lehrpersonen sehen den Kontext, der für eine Hilfeanfrage notwendig ist."
       },
       "useRetention": {
-        "title": "Nutzung, Aufbewahrung und Loeschung",
-        "body": "Daten werden verwendet, um STOA zu betreiben, Lernunterstuetzung bereitzustellen, Berichte vorzubereiten, Support zu leisten, Zuverlaessigkeit zu ueberwachen und den Dienst zu verbessern. Aufbewahrung und Loeschanfragen werden gemaess der operativen STOA-Richtlinie und anwendbarem Recht behandelt."
+        "title": "Nutzung, Aufbewahrung und Löschung",
+        "body": "Daten werden verwendet, um STOA zu betreiben, Lernunterstützung bereitzustellen, Berichte vorzubereiten, Support zu leisten, Zuverlässigkeit zu überwachen und den Dienst zu verbessern. Aufbewahrung und Löschanfragen werden gemäß der operativen STOA-Richtlinie und anwendbarem Recht behandelt."
       },
       "thirdParties": {
         "title": "Dienstleister",
-        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister koennen begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
+        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister können begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
       }
     }
   },
   "terms": {
     "eyebrow": "Bedingungen",
     "title": "Nutzungsbedingungen",
-    "description": "Die Bedingungen fuer die Nutzung von STOA Lernunterstuetzung, Abonnements und Servicezugang.",
+    "description": "Die Bedingungen für die Nutzung von STOA Lernunterstützung, Abonnements und Servicezugang.",
     "sections": {
       "learningSupport": {
-        "title": "Lernunterstuetzung",
-        "body": "STOA unterstuetzt Lernen mit Erklaerungen, Uebung und Zugang zu von Lehrpersonen begleitetem Support. STOA ersetzt weder Schulunterricht noch elterliche Entscheidungen oder professionelle Bildungsentscheidungen."
+        "title": "Lernunterstützung",
+        "body": "STOA unterstützt Lernen mit Erklärungen, Übung und Zugang zu von Lehrpersonen begleitetem Support. STOA ersetzt weder Schulunterricht noch elterliche Entscheidungen oder professionelle Bildungsentscheidungen."
       },
       "accuracy": {
-        "title": "Erklaerungen und Ergebnisse",
-        "body": "Lernerklaerungen koennen unvollstaendig oder fehlerhaft sein. STOA garantiert keine Noten, Pruefungsergebnisse oder bestimmten Lernerfolge. Wichtige Arbeiten sollten durch Schueler, Eltern, Lehrperson oder Tutor geprueft werden."
+        "title": "Erklärungen und Ergebnisse",
+        "body": "Lernerklärungen können unvollständig oder fehlerhaft sein. STOA garantiert keine Noten, Prüfungsergebnisse oder bestimmten Lernerfolge. Wichtige Arbeiten sollten durch Schüler, Eltern, Lehrperson oder Tutor geprüft werden."
       },
       "acceptableUse": {
-        "title": "Zulaessige Nutzung",
-        "body": "Nutzer duerfen keine illegalen, unsicheren, besonders sensiblen oder sachfremden Inhalte hochladen. Hausaufgaben-Uploads sollten auf Material beschraenkt bleiben, das fuer die Lernunterstuetzung notwendig ist."
+        "title": "Zulässige Nutzung",
+        "body": "Nutzer dürfen keine illegalen, unsicheren, besonders sensiblen oder sachfremden Inhalte hochladen. Hausaufgaben-Uploads sollten auf Material beschränkt bleiben, das für die Lernunterstützung notwendig ist."
       },
       "subscriptions": {
         "title": "Testphasen und Abonnements",
-        "body": "Kostenlose Testphasen, Kontingente, Abonnements, Kuendigungen, Rueckerstattungen und Zahlungsablaeufe werden je nach Fall bei Registrierung, Checkout oder Kontoverwaltung angezeigt."
+        "body": "Kostenlose Testphasen, Kontingente, Abonnements, Kündigungen, Rückerstattungen und Zahlungsabläufe werden je nach Fall bei Registrierung, Checkout oder Kontoverwaltung angezeigt."
       },
       "serviceChanges": {
-        "title": "Aenderungen des Dienstes",
-        "body": "STOA kann den Zugang aendern, pausieren oder beenden, wenn dies zum Schutz von Schuelern, Daten, Zuverlaessigkeit und Supportqualitaet erforderlich ist. Bei Fragen oder Kontoanliegen wenden Sie sich an den Support."
+        "title": "Änderungen des Dienstes",
+        "body": "STOA kann den Zugang ändern, pausieren oder beenden, wenn dies zum Schutz von Schülern, Daten, Zuverlässigkeit und Supportqualität erforderlich ist. Bei Fragen oder Kontoanliegen wenden Sie sich an den Support."
       }
     }
   }

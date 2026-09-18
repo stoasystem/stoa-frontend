@@ -1,4 +1,4 @@
-import { tabToken } from '@/lib/devSessions'
+import { releaseTab, tabToken } from '@/lib/devSessions'
 import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
@@ -87,7 +87,14 @@ httpClient.interceptors.response.use(
     const status = error.response?.status
 
     if (status === 401) {
-      useAuthStore.getState().clearAuth()
+      // A tab pinned to one test role fails on that role's own token. Dropping
+      // the pin is enough; clearing here would take the session the rest of the
+      // browser shares down with it, which is not what expired.
+      if (tabToken()) {
+        releaseTab()
+      } else {
+        useAuthStore.getState().clearAuth()
+      }
       if (window.location.pathname !== '/login') {
         window.location.assign('/login')
       }

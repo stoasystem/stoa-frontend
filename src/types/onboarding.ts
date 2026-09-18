@@ -3,7 +3,7 @@ import type { SupportedLanguage } from '@/i18n/languages'
 export type RegisterRole = 'student' | 'parent' | 'teacher'
 
 export type StudentOnboardingProfile = {
-  age: number
+  age: number | null
   school: string
   grade: string
   schoolSystem?: string
@@ -15,7 +15,7 @@ export type StudentOnboardingProfile = {
 
 export type ParentOnboardingProfile = {
   childName: string
-  childAge?: number
+  childAge?: number | null
   childGrade: string
   childSchool?: string
   subjectsNeedingHelp: string[]

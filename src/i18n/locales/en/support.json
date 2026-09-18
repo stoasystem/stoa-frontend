@@ -4,6 +4,128 @@
   "description": "Get help with STOA, understand teacher support in the learning path, and contact the team when you need us.",
   "viewOnboarding": "View account setup",
   "contact": "Contact STOA",
+  "contactSubject": "STOA support request",
   "submit": "Send request",
-  "submitted": "Your request has been sent."
+  "submitted": "Your request has been sent.",
+  "tags": {
+    "faq": "FAQ",
+    "problems": "Report a problem",
+    "teacherHelp": "Teacher help",
+    "contact": "Contact us"
+  },
+  "sections": {
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        "Students start in Chat for homework questions, explanations, and uploaded worksheets.",
+        "Parents use the parent dashboard and the child reports to follow progress and weak areas.",
+        "Teachers use the teacher dashboard to answer help requests from students."
+      ]
+    },
+    "problems": {
+      "title": "Report a problem",
+      "items": [
+        "Tell us about broken pages, missing data, confusing screens, or anything that stops you from working.",
+        "Include the page you were on, what you expected, and what happened instead.",
+        "Never send passwords, access codes, or complete chat transcripts in a support message."
+      ]
+    },
+    "teacherHelp": {
+      "title": "Teacher help or support?",
+      "items": [
+        "Ask for teacher help when a student needs a real teacher to look at a learning question from Chat.",
+        "Contact support when your account, your access, a report, or the app itself is not working.",
+        "The status of a teacher help request stays in Chat; everything else belongs in support."
+      ]
+    },
+    "expectations": {
+      "title": "What to expect from STOA",
+      "items": [
+        "STOA focuses on learning help that is reliable and easy to follow, and new features arrive step by step.",
+        "If something looks unfinished or unclear, tell us: your message helps us decide what to improve next.",
+        "If a problem is blocking a lesson right now, say so in your message so we can look at it first."
+      ]
+    }
+  },
+  "contactCard": {
+    "requestText": "Write to us about access problems, errors, questions about a report, or anything you are unsure about.",
+    "generalText": "The same address works for general questions about STOA, parent support, teacher applications, and school partnerships.",
+    "emailLabel": "Email address"
+  },
+  "onboarding": {
+    "eyebrow": "Getting started",
+    "title": "Getting started with STOA",
+    "description": "A short guide for students, parents, and teachers using STOA for the first time.",
+    "needHelp": "Need help?",
+    "badges": {
+      "audience": "For new users",
+      "student": "Student",
+      "parent": "Parent",
+      "tutor": "Teacher"
+    },
+    "expectations": {
+      "title": "What to expect",
+      "items": [
+        "STOA explains homework step by step, and a real teacher can step in when an explanation is not enough.",
+        "If a page is missing data, looks wrong, or does not work, report it through support and we will look into it.",
+        "Every message reaches the STOA team, and your feedback shapes what we improve next."
+      ]
+    },
+    "roles": {
+      "student": {
+        "title": "Student setup",
+        "audience": "For students starting with STOA",
+        "steps": [
+          {
+            "title": "Confirm grade and subjects",
+            "description": "Keep your grade level and active subjects up to date in your profile so STOA explains things at the right level."
+          },
+          {
+            "title": "Start in Chat",
+            "description": "Open Chat when you have a homework question, a concept you do not understand, or a worksheet to upload."
+          },
+          {
+            "title": "Ask for a teacher when you are stuck",
+            "description": "Request teacher help from Chat when an explanation is unclear or you want a teacher to review the question."
+          }
+        ]
+      },
+      "parent": {
+        "title": "Parent view",
+        "audience": "For parents following their child",
+        "steps": [
+          {
+            "title": "Open the child dashboard",
+            "description": "The parent dashboard shows every child profile, recent activity, and learning signals at a glance."
+          },
+          {
+            "title": "Review the reports",
+            "description": "Child reports show progress, strengths, weak areas, and recommended support, without showing private chat content by default."
+          },
+          {
+            "title": "Use support for access problems",
+            "description": "If a child is missing, a report looks out of date, or you cannot sign in, send us a support request."
+          }
+        ]
+      },
+      "tutor": {
+        "title": "Teacher workflow",
+        "audience": "For teachers answering help requests",
+        "steps": [
+          {
+            "title": "Watch the request list",
+            "description": "The teacher dashboard lists open, in-progress, and resolved student requests waiting for a human answer."
+          },
+          {
+            "title": "Open a request",
+            "description": "Open a request to see the student question in context, add notes, and choose the next status."
+          },
+          {
+            "title": "Keep the status current",
+            "description": "Move requests through open, in progress, and resolved so students can see how their request is going."
+          }
+        ]
+      }
+    }
+  }
 }

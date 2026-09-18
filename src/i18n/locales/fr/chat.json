@@ -69,6 +69,11 @@
     "german": "Allemand",
     "english": "Anglais"
   },
+  "subjectSelected": "Sélectionné",
+  "subjectRollout": {
+    "active": "Prise en charge complète",
+    "foundation": "Prise en charge de base"
+  },
   "conversations": "Conversations",
   "conversationsSubtitle": "Tes conversations d’apprentissage",
   "backToConversations": "Retour aux conversations",
@@ -143,5 +148,6 @@
     "simpler": "Peux-tu l’expliquer plus simplement ?",
     "similar": "Donne-moi un exercice similaire",
     "why": "Pourquoi est-ce que cela marche ?"
-  }
+  },
+  "duplicateReopened": "Tu as déjà posé cette question. Voici la conversation correspondante."
 }

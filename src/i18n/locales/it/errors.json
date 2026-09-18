@@ -18,5 +18,19 @@
   "teachingSubjectRequired": "Aggiungi almeno una materia insegnata.",
   "educationRequired": "La formazione è obbligatoria.",
   "introductionRequired": "La breve presentazione è obbligatoria.",
-  "credentialRequired": "Carica almeno un documento di qualifica."
+  "credentialRequired": "Carica almeno un documento di qualifica.",
+  "nameRequired": "Il nome è obbligatorio.",
+  "emailRequired": "L’indirizzo e-mail è obbligatorio.",
+  "ageInvalid": "Inserisci un numero intero tra {{min}} e {{max}}.",
+  "schoolRequired": "La scuola è obbligatoria.",
+  "parentNameRequired": "Il nome di un genitore è obbligatorio per gli studenti sotto i 18 anni.",
+  "parentEmailRequired": "L’e-mail di un genitore è obbligatoria per gli studenti sotto i 18 anni.",
+  "childNameRequired": "Il nome del figlio è obbligatorio.",
+  "childGradeRequired": "La classe del figlio è obbligatoria.",
+  "confirmEmailOwnershipRequired": "Conferma di poter ricevere e-mail a questo indirizzo.",
+  "fixHighlightedFields": "Correggi i campi evidenziati.",
+  "backend": {
+    "age_out_of_range": "Inserisci un’età compresa tra 1 e 120.",
+    "parent_contact_required": "Per gli studenti sotto i 18 anni sono richiesti nome ed e-mail di un genitore."
+  }
 }

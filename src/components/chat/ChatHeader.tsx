@@ -1,6 +1,10 @@
 import { ArrowLeft, MessageSquarePlus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { ChatPageNavigation } from '@/components/chat/ChatPageNavigation'
+import {
+  conversationDisplayTitle,
+  subjectDisplayLabel,
+} from '@/components/chat/conversationTitle'
 import { TeacherAvailabilityStatus } from '@/components/chat/TeacherAvailabilityStatus'
 import { Button } from '@/components/ui/button'
 import type { Conversation } from '@/types/chat'
@@ -35,12 +39,11 @@ export function ChatHeader({
       )}
       <div className="min-w-0 flex-1 pr-3">
         <h1 className="truncate text-base font-semibold">
-          {conversation?.title ?? t('newConversation')}
+          {conversation ? conversationDisplayTitle(conversation, t) : t('newConversation')}
         </h1>
         <p className="mt-1 truncate text-sm text-muted-foreground">
           {conversation
-            ? // The stored subject is an id like `math`; unknown ids show as-is.
-              `${t(`subjects.${conversation.subject}`, { defaultValue: conversation.subject })} · ${conversation.grade}`
+            ? `${subjectDisplayLabel(conversation.subject, t)} · ${conversation.grade}`
             : t('emptyTitle')}
         </p>
       </div>

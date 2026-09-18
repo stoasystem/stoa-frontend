@@ -1,55 +1,55 @@
 {
   "privacy": {
-    "eyebrow": "Confidentialite",
-    "title": "Politique de confidentialite",
-    "description": "La maniere dont STOA traite les donnees de compte, d'apprentissage, d'assistance et de service.",
+    "eyebrow": "Confidentialité",
+    "title": "Politique de confidentialité",
+    "description": "La manière dont STOA traite les données de compte, d'apprentissage, d'assistance et de service.",
     "sections": {
       "dataWeCollect": {
-        "title": "Donnees collectees",
-        "body": "STOA peut traiter les donnees de compte, le role, les coordonnees, l'activite d'apprentissage, les questions, les metadonnees de supports scolaires importes, les demandes d'assistance, les retours, les evenements d'analyse et les rapports d'erreur du frontend."
+        "title": "Données collectées",
+        "body": "STOA peut traiter les données de compte, le rôle, les coordonnées, l'activité d'apprentissage, les questions, les métadonnées de supports scolaires importés, les demandes d'assistance, les retours, les événements d'analyse et les rapports d'erreur du frontend."
       },
       "studentLearning": {
-        "title": "Donnees d'apprentissage",
-        "body": "Les donnees d'apprentissage peuvent comprendre les questions recentes, les metadonnees de conversation, les points a travailler, les demandes d'appui enseignant, les resumes de rapport et les signaux de progres utilises pour soutenir l'eleve et informer les parents."
+        "title": "Données d'apprentissage",
+        "body": "Les données d'apprentissage peuvent comprendre les questions récentes, les métadonnées de conversation, les points à travailler, les demandes d'appui enseignant, les résumés de rapport et les signaux de progrès utilisés pour soutenir l'élève et informer les parents."
       },
       "visibility": {
-        "title": "Visibilite pour les parents et les enseignants",
-        "body": "Les parents peuvent voir des resumes d'apprentissage, des rapports, des axes de travail et l'intervention d'un enseignant. Les enseignants voient le contexte necessaire pour repondre a une demande d'aide."
+        "title": "Visibilité pour les parents et les enseignants",
+        "body": "Les parents peuvent voir des résumés d'apprentissage, des rapports, des axes de travail et l'intervention d'un enseignant. Les enseignants voient le contexte nécessaire pour répondre à une demande d'aide."
       },
       "useRetention": {
         "title": "Utilisation, conservation et suppression",
-        "body": "Les donnees servent a exploiter STOA, fournir le soutien d'apprentissage, preparer les rapports, traiter l'assistance, surveiller la fiabilite et ameliorer le service. La conservation et les demandes de suppression sont traitees selon la politique operationnelle de STOA et le droit applicable."
+        "body": "Les données servent à exploiter STOA, fournir le soutien d'apprentissage, préparer les rapports, traiter l'assistance, surveiller la fiabilité et améliorer le service. La conservation et les demandes de suppression sont traitées selon la politique opérationnelle de STOA et le droit applicable."
       },
       "thirdParties": {
         "title": "Prestataires",
-        "body": "Les prestataires d'hebergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des donnees limitees dans le cadre d'accords appropries."
+        "body": "Les prestataires d'hébergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des données limitées dans le cadre d'accords appropriés."
       }
     }
   },
   "terms": {
     "eyebrow": "Conditions",
     "title": "Conditions",
-    "description": "Les conditions d'utilisation du soutien d'apprentissage STOA, des abonnements et de l'acces au service.",
+    "description": "Les conditions d'utilisation du soutien d'apprentissage STOA, des abonnements et de l'accès au service.",
     "sections": {
       "learningSupport": {
         "title": "Soutien d'apprentissage",
-        "body": "STOA soutient l'apprentissage avec des explications, de la pratique et un acces a un appui enseignant. STOA ne remplace pas l'enseignement scolaire, le jugement des parents ni les decisions educatives professionnelles."
+        "body": "STOA soutient l'apprentissage avec des explications, de la pratique et un accès à un appui enseignant. STOA ne remplace pas l'enseignement scolaire, le jugement des parents ni les décisions éducatives professionnelles."
       },
       "accuracy": {
-        "title": "Explications et resultats",
-        "body": "Les explications d'apprentissage peuvent etre incompletes ou incorrectes. STOA ne garantit ni notes, ni resultats d'examen, ni resultats particuliers. Les travaux importants doivent etre verifies par l'eleve, un parent, un enseignant ou un tuteur."
+        "title": "Explications et résultats",
+        "body": "Les explications d'apprentissage peuvent être incomplètes ou incorrectes. STOA ne garantit ni notes, ni résultats d'examen, ni résultats particuliers. Les travaux importants doivent être vérifiés par l'élève, un parent, un enseignant ou un tuteur."
       },
       "acceptableUse": {
-        "title": "Utilisation autorisee",
-        "body": "Les utilisateurs ne doivent pas importer de contenu illegal, dangereux, tres sensible ou sans lien avec l'apprentissage. Les supports importes doivent rester limites a ce qui est necessaire au soutien d'apprentissage."
+        "title": "Utilisation autorisée",
+        "body": "Les utilisateurs ne doivent pas importer de contenu illégal, dangereux, très sensible ou sans lien avec l'apprentissage. Les supports importés doivent rester limités à ce qui est nécessaire au soutien d'apprentissage."
       },
       "subscriptions": {
         "title": "Essais et abonnements",
-        "body": "Les essais gratuits, quotas, abonnements, annulations, remboursements et parcours de paiement sont presentes, le cas echeant, lors de l'inscription, du paiement ou dans la gestion du compte."
+        "body": "Les essais gratuits, quotas, abonnements, annulations, remboursements et parcours de paiement sont présentés, le cas échéant, lors de l'inscription, du paiement ou dans la gestion du compte."
       },
       "serviceChanges": {
-        "title": "Evolution du service",
-        "body": "STOA peut modifier, suspendre ou resilier l'acces lorsque cela est necessaire pour proteger les eleves, les donnees, la fiabilite et la qualite du soutien. Contactez l'assistance pour toute question ou demande liee au compte."
+        "title": "Évolution du service",
+        "body": "STOA peut modifier, suspendre ou résilier l'accès lorsque cela est nécessaire pour protéger les élèves, les données, la fiabilité et la qualité du soutien. Contactez l'assistance pour toute question ou demande liée au compte."
       }
     }
   }

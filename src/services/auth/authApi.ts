@@ -19,6 +19,21 @@ export type EmailVerificationConfirmRequest = EmailVerificationRequest & {
   confirmationCode: string
 }
 
+export type ForgotPasswordRequest = {
+  email: string
+}
+
+export type ResetPasswordRequest = {
+  email: string
+  confirmationCode: string
+  newPassword: string
+}
+
+// The backend answers both recovery routes with a status only, never with account existence.
+export type PasswordResetResponse = {
+  status: 'accepted' | 'confirmed'
+}
+
 export type RegisterRequest = RegisterPayload | {
   name: string
   email: string
@@ -65,6 +80,16 @@ export async function resendEmailVerification(payload: EmailVerificationRequest)
 
 export async function confirmEmailVerification(payload: EmailVerificationConfirmRequest) {
   const response = await httpClient.post<EmailVerificationResponse>('/auth/email-verification/confirm', payload)
+  return response.data
+}
+
+export async function requestPasswordReset(payload: ForgotPasswordRequest) {
+  const response = await httpClient.post<PasswordResetResponse>('/auth/forgot-password', payload)
+  return response.data
+}
+
+export async function resetPassword(payload: ResetPasswordRequest) {
+  const response = await httpClient.post<PasswordResetResponse>('/auth/reset-password', payload)
   return response.data
 }
 

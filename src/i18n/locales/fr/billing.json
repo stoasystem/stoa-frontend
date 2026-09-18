@@ -21,6 +21,12 @@
   "success": "Statut d’abonnement mis à jour.",
   "choosePlan": "Choisir un plan",
   "planSelection": "Sélection du plan",
+  "summary": {
+    "title": "Abonnement actuel",
+    "planBody": "Votre formule indique l'accompagnement disponible pour ce compte.",
+    "currentPeriod": "Période actuelle",
+    "noPeriod": "Aucune période de facturation n'a encore été renvoyée."
+  },
   "plans": {
     "free_trial": {
       "name": "Essai gratuit",

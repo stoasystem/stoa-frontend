@@ -18,5 +18,19 @@
   "teachingSubjectRequired": "Fügen Sie mindestens ein Unterrichtsfach hinzu.",
   "educationRequired": "Ausbildung ist erforderlich.",
   "introductionRequired": "Kurze Vorstellung ist erforderlich.",
-  "credentialRequired": "Laden Sie mindestens einen Nachweis hoch."
+  "credentialRequired": "Laden Sie mindestens einen Nachweis hoch.",
+  "nameRequired": "Name ist erforderlich.",
+  "emailRequired": "E-Mail-Adresse ist erforderlich.",
+  "ageInvalid": "Geben Sie eine ganze Zahl zwischen {{min}} und {{max}} ein.",
+  "schoolRequired": "Schule ist erforderlich.",
+  "parentNameRequired": "Der Name eines Elternteils ist für Lernende unter 18 Jahren erforderlich.",
+  "parentEmailRequired": "Die E-Mail-Adresse eines Elternteils ist für Lernende unter 18 Jahren erforderlich.",
+  "childNameRequired": "Der Name des Kindes ist erforderlich.",
+  "childGradeRequired": "Die Klasse des Kindes ist erforderlich.",
+  "confirmEmailOwnershipRequired": "Bestätigen Sie, dass Sie E-Mails an dieser Adresse empfangen können.",
+  "fixHighlightedFields": "Bitte korrigieren Sie die markierten Felder.",
+  "backend": {
+    "age_out_of_range": "Gib ein Alter zwischen 1 und 120 ein.",
+    "parent_contact_required": "Für Schülerinnen und Schüler unter 18 sind Name und E-Mail eines Elternteils erforderlich."
+  }
 }

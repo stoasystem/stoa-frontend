@@ -4,6 +4,128 @@
   "description": "Hier erhalten Sie Hilfe zu STOA, zur Unterstützung durch Lehrpersonen und zum Kontakt mit dem STOA-Team.",
   "viewOnboarding": "Kontoeinrichtung ansehen",
   "contact": "STOA kontaktieren",
+  "contactSubject": "STOA Supportanfrage",
   "submit": "Anfrage senden",
-  "submitted": "Ihre Anfrage wurde gesendet."
+  "submitted": "Ihre Anfrage wurde gesendet.",
+  "tags": {
+    "faq": "Häufige Fragen",
+    "problems": "Problem melden",
+    "teacherHelp": "Hilfe der Lehrperson",
+    "contact": "Kontakt"
+  },
+  "sections": {
+    "faq": {
+      "title": "Häufige Fragen",
+      "items": [
+        "Schülerinnen und Schüler beginnen im Chat mit Hausaufgabenfragen, Erklärungen und hochgeladenen Arbeitsblättern.",
+        "Eltern nutzen das Elterndashboard und die Kinderberichte, um Fortschritt und Schwächen zu verfolgen.",
+        "Lehrpersonen beantworten Hilfeanfragen von Schülerinnen und Schülern über das Lehrpersonen-Dashboard."
+      ]
+    },
+    "problems": {
+      "title": "Problem melden",
+      "items": [
+        "Melden Sie uns fehlerhafte Seiten, fehlende Daten, unklare Ansichten oder alles, was Sie beim Arbeiten blockiert.",
+        "Nennen Sie die Seite, auf der Sie waren, was Sie erwartet haben und was stattdessen passiert ist.",
+        "Senden Sie niemals Passwörter, Zugangscodes oder vollständige Chatverläufe in einer Supportnachricht."
+      ]
+    },
+    "teacherHelp": {
+      "title": "Hilfe der Lehrperson oder Support?",
+      "items": [
+        "Fordern Sie die Hilfe einer Lehrperson an, wenn eine Lernfrage aus dem Chat von einem Menschen angeschaut werden soll.",
+        "Wenden Sie sich an den Support, wenn Ihr Konto, Ihr Zugang, ein Bericht oder die App selbst nicht funktioniert.",
+        "Der Status einer Anfrage an die Lehrperson bleibt im Chat; alles andere gehört zum Support."
+      ]
+    },
+    "expectations": {
+      "title": "Was Sie von STOA erwarten können",
+      "items": [
+        "STOA setzt auf zuverlässige und gut verständliche Lernhilfe, neue Funktionen kommen Schritt für Schritt dazu.",
+        "Wenn etwas unfertig oder unklar wirkt, schreiben Sie uns: Ihre Rückmeldung zeigt uns, was als Nächstes besser werden soll.",
+        "Wenn ein Problem gerade eine Lernstunde blockiert, schreiben Sie das dazu, damit wir uns zuerst darum kümmern."
+      ]
+    }
+  },
+  "contactCard": {
+    "requestText": "Schreiben Sie uns bei Zugangsproblemen, Fehlern, Fragen zu einem Bericht oder wenn Sie bei etwas unsicher sind.",
+    "generalText": "Dieselbe Adresse gilt für allgemeine Fragen zu STOA, Elternunterstützung, Bewerbungen von Lehrpersonen und Schulpartnerschaften.",
+    "emailLabel": "E-Mail-Adresse"
+  },
+  "onboarding": {
+    "eyebrow": "Erste Schritte",
+    "title": "Erste Schritte mit STOA",
+    "description": "Eine kurze Anleitung für Schülerinnen und Schüler, Eltern und Lehrpersonen, die STOA zum ersten Mal nutzen.",
+    "needHelp": "Brauchen Sie Hilfe?",
+    "badges": {
+      "audience": "Für neue Nutzerinnen und Nutzer",
+      "student": "Schüler/in",
+      "parent": "Elternteil",
+      "tutor": "Lehrperson"
+    },
+    "expectations": {
+      "title": "Was Sie erwartet",
+      "items": [
+        "STOA erklärt Hausaufgaben Schritt für Schritt, und eine echte Lehrperson übernimmt, wenn eine Erklärung nicht ausreicht.",
+        "Wenn auf einer Seite Daten fehlen, etwas falsch aussieht oder nicht funktioniert, melden Sie es über den Support, wir schauen es uns an.",
+        "Jede Nachricht erreicht das STOA-Team, und Ihre Rückmeldung bestimmt mit, was wir als Nächstes verbessern."
+      ]
+    },
+    "roles": {
+      "student": {
+        "title": "Einstieg für Schülerinnen und Schüler",
+        "audience": "Für Lernende, die mit STOA starten",
+        "steps": [
+          {
+            "title": "Klasse und Fächer bestätigen",
+            "description": "Halten Sie Klassenstufe und aktive Fächer im Profil aktuell, damit STOA auf dem richtigen Niveau erklärt."
+          },
+          {
+            "title": "Im Chat beginnen",
+            "description": "Öffnen Sie den Chat bei einer Hausaufgabenfrage, einem unklaren Thema oder einem Arbeitsblatt zum Hochladen."
+          },
+          {
+            "title": "Bei Blockaden eine Lehrperson holen",
+            "description": "Fordern Sie im Chat die Hilfe einer Lehrperson an, wenn eine Erklärung unklar bleibt oder jemand die Frage prüfen soll."
+          }
+        ]
+      },
+      "parent": {
+        "title": "Ansicht für Eltern",
+        "audience": "Für Eltern, die ihr Kind begleiten",
+        "steps": [
+          {
+            "title": "Das Kinderdashboard öffnen",
+            "description": "Das Elterndashboard zeigt jedes Kinderprofil, die letzten Aktivitäten und Lernsignale auf einen Blick."
+          },
+          {
+            "title": "Berichte durchsehen",
+            "description": "Kinderberichte zeigen Fortschritt, Stärken, Schwächen und empfohlene Unterstützung, ohne private Chatinhalte standardmässig offenzulegen."
+          },
+          {
+            "title": "Bei Zugangsproblemen den Support nutzen",
+            "description": "Wenn ein Kind fehlt, ein Bericht veraltet wirkt oder die Anmeldung nicht klappt, senden Sie uns eine Supportanfrage."
+          }
+        ]
+      },
+      "tutor": {
+        "title": "Ablauf für Lehrpersonen",
+        "audience": "Für Lehrpersonen, die Hilfeanfragen beantworten",
+        "steps": [
+          {
+            "title": "Die Anfrageliste im Blick behalten",
+            "description": "Das Lehrpersonen-Dashboard listet offene, laufende und erledigte Anfragen, die eine menschliche Antwort brauchen."
+          },
+          {
+            "title": "Eine Anfrage öffnen",
+            "description": "Öffnen Sie eine Anfrage, um die Frage im Zusammenhang zu sehen, Notizen zu ergänzen und den nächsten Status zu wählen."
+          },
+          {
+            "title": "Den Status aktuell halten",
+            "description": "Führen Sie Anfragen von offen über in Arbeit bis erledigt, damit Lernende den Stand ihrer Anfrage sehen."
+          }
+        ]
+      }
+    }
+  }
 }

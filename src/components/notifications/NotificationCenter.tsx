@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Archive, Bell, Check, CircleAlert, Radio, WifiOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +25,7 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
 export function NotificationCenter() {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
+  const shell = useRef<HTMLDivElement>(null)
   const query = useNotificationsQuery()
   const realtime = useRealtimeNotifications()
   const markRead = useMarkNotificationReadMutation()
@@ -33,8 +34,28 @@ export function NotificationCenter() {
   const unread = items.filter((item) => item.status === 'created').length
   const RealtimeIcon = realtime.status === 'offline' ? WifiOff : Radio
 
+  // A panel anchored to the bell closes the way every other one does: a click
+  // outside it, or Escape.
+  useEffect(() => {
+    if (!open) return
+
+    function onPointerDown(event: PointerEvent) {
+      if (!shell.current?.contains(event.target as Node)) setOpen(false)
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setOpen(false)
+    }
+
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
   return (
-    <div className="relative">
+    <div className="relative" ref={shell}>
       <Button
         type="button"
         variant="ghost"
@@ -54,18 +75,20 @@ export function NotificationCenter() {
       </Button>
       {open && (
         <div className="absolute right-0 top-11 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)]">
-          <div className="flex items-center justify-between gap-3">
-            <div>
+          <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+            <div className="min-w-40 flex-1">
               <p className="text-sm font-semibold">{t('notifications.title')}</p>
               <p className="text-xs text-muted-foreground">{t('notifications.subtitle')}</p>
             </div>
-            <div className="flex shrink-0 items-center gap-2">
+            {/* German says the same thing in half again the width, so these
+                wrap rather than sit on a fixed one and cut the word off. */}
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant={realtime.isLive ? 'default' : 'secondary'}
-                className="inline-flex max-w-32 items-center gap-1 truncate"
+                className="inline-flex items-center gap-1 text-left"
               >
                 <RealtimeIcon className="h-3 w-3 shrink-0" aria-hidden="true" />
-                <span className="truncate">{t(connectionKeys[realtime.status])}</span>
+                <span>{t(connectionKeys[realtime.status])}</span>
               </Badge>
               <Badge variant="secondary">{t('notifications.unread', { count: unread })}</Badge>
             </div>

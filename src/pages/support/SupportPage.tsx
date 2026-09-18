@@ -8,48 +8,23 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
+import { buildContactMailtoHref, stoaContactInfo } from '@/lib/brandContact'
 
-const sections = [
-  {
-    title: 'FAQ',
-    icon: HelpCircle,
-    items: [
-      'Students should start with Chat for homework questions, explanations, and supported file uploads.',
-      'Parents can use the parent dashboard and child reports to review learning progress and weak areas.',
-      'Tutors should use the tutor dashboard for human help requests instead of handling requests outside STOA.',
-    ],
-  },
-  {
-    title: 'Bug feedback',
-    icon: Bug,
-    items: [
-      'Report broken pages, missing data, confusing states, or anything that blocks a pilot task.',
-      'Include the page, role, expected result, actual result, and whether the issue is blocking a student session.',
-      'Do not paste passwords, tokens, full private chat transcripts, or file contents into support messages.',
-    ],
-  },
-  {
-    title: 'Teacher help vs support',
-    icon: GraduationCap,
-    items: [
-      'Use teacher help when a student needs a tutor to review a learning question from Chat.',
-      'Use support when the product, account, report, access, or pilot workflow itself is not working.',
-      'Tutor request status belongs in the tutor workflow; operational issues belong in support.',
-    ],
-  },
-  {
-    title: 'Pilot expectations',
-    icon: TimerReset,
-    items: [
-      'The pilot prioritizes reliability, clear learning support, and fast issue discovery over complete feature breadth.',
-      'Some flows may use lightweight operations while the team validates demand and support volume.',
-      'High-impact issues affecting live learning sessions should be marked high or urgent in the form.',
-    ],
-  },
-]
+const sectionKeys = [
+  { key: 'faq', icon: HelpCircle },
+  { key: 'problems', icon: Bug },
+  { key: 'teacherHelp', icon: GraduationCap },
+  { key: 'expectations', icon: TimerReset },
+] as const
+
+const tagKeys = ['faq', 'problems', 'teacherHelp', 'contact'] as const
 
 export function SupportPage() {
   const { t } = useTranslation(['support', 'common'])
+  const contactHref = buildContactMailtoHref(t('support:contactSubject'))
+
+  const toItems = (value: unknown) =>
+    Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 
   return (
     <MarketingLayout>
@@ -62,7 +37,9 @@ export function SupportPage() {
           actions={
             <>
               <Button variant="outline" asChild>
-                <a href="mailto:info@stoaedu.ch">{t('common:navigation.contact')}</a>
+                <a href={contactHref} target="_blank" rel="noopener noreferrer">
+                  {t('common:navigation.contact')}
+                </a>
               </Button>
               <Button variant="outline" asChild>
                 <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
@@ -72,15 +49,21 @@ export function SupportPage() {
         />
 
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary">FAQ</Badge>
-          <Badge variant="secondary">Bug feedback</Badge>
-          <Badge variant="secondary">Teacher-help distinction</Badge>
-          <Badge variant="secondary">Contact path</Badge>
+          {tagKeys.map((key) => (
+            <Badge key={key} variant="secondary">
+              {t(`support:tags.${key}`)}
+            </Badge>
+          ))}
         </div>
 
         <section className="grid gap-6 lg:grid-cols-2">
-          {sections.map((section) => (
-            <SupportInfoSection key={section.title} {...section} />
+          {sectionKeys.map(({ key, icon }) => (
+            <SupportInfoSection
+              key={key}
+              title={t(`support:sections.${key}.title`)}
+              icon={icon}
+              items={toItems(t(`support:sections.${key}.items`, { returnObjects: true }))}
+            />
           ))}
         </section>
 
@@ -93,16 +76,25 @@ export function SupportPage() {
               <CardTitle className="text-xl">{t('support:contact')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 text-sm leading-6 text-muted-foreground">
+              <p>{t('support:contactCard.requestText')}</p>
+              <p>{t('support:contactCard.generalText')}</p>
               <p>
-                Send a support request for access, bugs, report questions, or workflow confusion.
-                The request is routed through the STOA support queue.
-              </p>
-              <p>
-                For general questions about STOA, parent support, teacher applications, or school
-                partnerships, use the contact page.
+                <span className="font-medium text-foreground">
+                  {t('support:contactCard.emailLabel')}:
+                </span>{' '}
+                <a
+                  className="hover:text-foreground"
+                  href={contactHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {stoaContactInfo.email}
+                </a>
               </p>
               <Button asChild variant="outline" size="sm">
-                <a href="mailto:info@stoaedu.ch">{t('common:navigation.contact')}</a>
+                <a href={contactHref} target="_blank" rel="noopener noreferrer">
+                  {t('common:navigation.contact')}
+                </a>
               </Button>
             </CardContent>
           </Card>

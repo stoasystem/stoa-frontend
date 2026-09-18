@@ -75,6 +75,76 @@ describe('MathRenderer rendering', () => {
   })
 })
 
+describe('MathRenderer markdown emphasis', () => {
+  it('renders **bold** as a strong element without the asterisks', () => {
+    const { container } = render(<MathRenderer>{'**Hint:** keep going'}</MathRenderer>)
+    expect(container.querySelector('strong')?.textContent).toBe('Hint:')
+    expect(container.textContent).toBe('Hint: keep going')
+  })
+
+  it('emphasises prose beside a formula and leaves the formula untouched', async () => {
+    const { container } = render(
+      <MathRenderer>{'the **unit** is $\\frac{m}{s^2}$ here'}</MathRenderer>,
+    )
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelector('strong')?.textContent).toBe('unit')
+    expect(container.querySelector('.math-inline')?.querySelector('strong')).toBeNull()
+  })
+
+  it('hands the formula to katex with its own asterisks intact', async () => {
+    // Asserting only that the formula holds no <strong> passes just as well
+    // when the formula itself has been mangled, so this reads its content.
+    const { container } = render(<MathRenderer>{'the **unit** is $a ** b$ here'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelector('strong')?.textContent).toBe('unit')
+    expect(container.querySelector('.math-inline')?.textContent).toContain('\u2217\u2217')
+  })
+
+  it('emphasises a run that opens before a formula and closes after it', async () => {
+    // How an assistant writes most of its maths. Matching emphasis inside each
+    // text run separately never paired these, so the asterisks were shown.
+    const { container } = render(
+      <MathRenderer>{'**Die Einheit ist $m/s^2$ hier**'}</MathRenderer>,
+    )
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    const strong = container.querySelector('strong')
+    expect(strong).not.toBeNull()
+    expect(strong?.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent).not.toContain('**')
+  })
+
+  it('emphasises a formula standing on its own', async () => {
+    const { container } = render(<MathRenderer>{'**$x$**'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelector('strong')?.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.textContent).not.toContain('**')
+  })
+
+  it('treats asterisks with no space around them as emphasis, as markdown does', () => {
+    // CommonMark reads 2**3**4 as 2<strong>3</strong>4, and so does this. The
+    // spaced form below is the one that means exponentiation, and it is safe.
+    const { container } = render(<MathRenderer>{'2**3**4'}</MathRenderer>)
+    expect(container.querySelector('strong')?.textContent).toBe('3')
+  })
+
+  it('leaves asterisks used as operators alone', () => {
+    const { container } = render(<MathRenderer>{'2 ** 3 ** 4'}</MathRenderer>)
+    expect(container.querySelector('strong')).toBeNull()
+    expect(container.textContent).toBe('2 ** 3 ** 4')
+  })
+
+  it('escapes markup carried inside an emphasised run', () => {
+    const { container } = render(
+      <MathRenderer>{'**<img src=x onerror="window.__xss3=1">**'}</MathRenderer>,
+    )
+    expect(container.querySelector('img')).toBeNull()
+    expect((window as unknown as { __xss3?: number }).__xss3).toBeUndefined()
+    expect(container.querySelector('strong')?.textContent).toBe(
+      '<img src=x onerror="window.__xss3=1">',
+    )
+  })
+})
+
 describe('MathRenderer escaping', () => {
   // AI output is not trusted markup. A malformed formula takes the fallback
   // branch, which must not be able to inject nodes into the document.

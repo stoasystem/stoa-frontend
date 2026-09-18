@@ -118,6 +118,28 @@
       "libraryCompleted": "Completed {{score}} of {{total}} questions in {{minutes}} minutes.",
       "libraryInProgress": "Answered {{answered}} of {{total}} questions. Continue this set from the Practice Library.",
       "empty": "No learning history is available yet."
+    },
+    "recommendationsEmpty": "Nothing to recommend yet. Ask a few questions and suggestions will appear here.",
+    "weakTopicsEmpty": "No weak topics detected yet — keep asking questions!",
+    "priority": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "topicNames": {
+      "brueche": "Fractions",
+      "gleichungen": "Equations",
+      "geometrie": "Geometry",
+      "prozentrechnung": "Percentages and ratios",
+      "textaufgaben": "Word problems"
+    },
+    "rationale": {
+      "curriculumExercise": "A reviewed curriculum exercise is available for this weak topic.",
+      "reviewedDraft": "A teacher-reviewed AI practice draft matches this learning need.",
+      "continuation": "Continue with one short reviewed practice item to keep learning memory fresh.",
+      "assignedCurriculum": "Assigned from a reviewed curriculum exercise.",
+      "assignedDraft": "Assigned from a teacher-reviewed AI exercise draft.",
+      "signals": "Recommendations are based on recent learning and assignment signals."
     }
   },
   "library": {
@@ -192,7 +214,10 @@
     "freshness": "Profile freshness",
     "freshnessBody": "Updated {{date}} from questions, tutor escalation, and practice evidence.",
     "feedback": "Feedback",
-    "email": "Email"
+    "email": "Email",
+    "usageActive": "Active",
+    "usagePaused": "Paused",
+    "checkFields": "Check the profile fields before saving."
   },
   "ui": {
     "practiceLesson": "Practice lesson",

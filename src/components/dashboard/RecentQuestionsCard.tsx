@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSubjectLabel } from '@/lib/displayLabels'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { RecentQuestion } from '@/types/dashboard'
 
@@ -21,7 +22,7 @@ export function RecentQuestionsCard({ questions }: { questions: RecentQuestion[]
             <div className="min-w-0">
               <div className="text-sm font-medium leading-5">{question.title}</div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {question.subject} · {formatDayAndMonth(question.createdAt)}
+                {getSubjectLabel(question.subject, t)} · {formatDayAndMonth(question.createdAt)}
               </div>
             </div>
             <Badge className="shrink-0" variant="secondary">

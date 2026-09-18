@@ -66,7 +66,7 @@ export function StudentPlanAccessSection() {
               <p className="brand-section-kicker">{t('dashboard.familyAccess')}</p>
               <CardTitle className="text-xl">
                 {entitlement
-                  ? getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan)
+                  ? getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan, t)
                   : t('dashboard.plan.yourPlan')}
               </CardTitle>
             </div>

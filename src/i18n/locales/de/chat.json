@@ -69,6 +69,11 @@
     "german": "Deutsch",
     "english": "Englisch"
   },
+  "subjectSelected": "Ausgewählt",
+  "subjectRollout": {
+    "active": "Volle Unterstützung",
+    "foundation": "Basis-Unterstützung"
+  },
   "conversations": "Unterhaltungen",
   "conversationsSubtitle": "Deine Lernunterhaltungen",
   "backToConversations": "Zurück zu den Unterhaltungen",
@@ -143,5 +148,6 @@
     "simpler": "Kannst du das einfacher erklären?",
     "similar": "Gib mir eine ähnliche Aufgabe",
     "why": "Warum funktioniert das?"
-  }
+  },
+  "duplicateReopened": "Das hast du schon gefragt. Hier ist das Gespräch dazu."
 }

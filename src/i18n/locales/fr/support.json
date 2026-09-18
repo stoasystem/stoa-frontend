@@ -4,6 +4,128 @@
   "description": "Obtenez de l’aide avec STOA, comprenez l’accompagnement enseignant dans le parcours d’apprentissage et contactez l’équipe si nécessaire.",
   "viewOnboarding": "Voir la configuration",
   "contact": "Contacter STOA",
+  "contactSubject": "Demande d’assistance STOA",
   "submit": "Envoyer une demande",
-  "submitted": "Votre demande a été envoyée."
+  "submitted": "Votre demande a été envoyée.",
+  "tags": {
+    "faq": "Questions fréquentes",
+    "problems": "Signaler un problème",
+    "teacherHelp": "Aide de l’enseignant",
+    "contact": "Nous contacter"
+  },
+  "sections": {
+    "faq": {
+      "title": "Questions fréquentes",
+      "items": [
+        "Les élèves commencent dans le Chat pour leurs questions de devoirs, les explications et les fiches importées.",
+        "Les parents utilisent le tableau de bord parent et les rapports pour suivre les progrès et les points faibles.",
+        "Les enseignants répondent aux demandes d’aide des élèves depuis le tableau de bord enseignant."
+      ]
+    },
+    "problems": {
+      "title": "Signaler un problème",
+      "items": [
+        "Signalez-nous les pages cassées, les données manquantes, les écrans confus ou tout ce qui vous empêche de travailler.",
+        "Indiquez la page où vous étiez, ce que vous attendiez et ce qui s’est passé à la place.",
+        "N’envoyez jamais de mots de passe, de codes d’accès ou de transcriptions de chat complètes dans un message d’assistance."
+      ]
+    },
+    "teacherHelp": {
+      "title": "Aide de l’enseignant ou assistance ?",
+      "items": [
+        "Demandez l’aide d’un enseignant lorsqu’une question d’apprentissage du Chat doit être revue par une personne.",
+        "Contactez l’assistance lorsque votre compte, votre accès, un rapport ou l’application elle-même ne fonctionne pas.",
+        "Le suivi d’une demande d’aide reste dans le Chat ; tout le reste relève de l’assistance."
+      ]
+    },
+    "expectations": {
+      "title": "Ce que STOA vous apporte",
+      "items": [
+        "STOA privilégie une aide à l’apprentissage fiable et facile à suivre ; les nouvelles fonctions arrivent progressivement.",
+        "Si quelque chose semble inachevé ou peu clair, écrivez-nous : votre message nous aide à choisir la prochaine amélioration.",
+        "Si un problème bloque un cours en ce moment, précisez-le dans votre message pour que nous le traitions en priorité."
+      ]
+    }
+  },
+  "contactCard": {
+    "requestText": "Écrivez-nous en cas de problème d’accès, d’erreur, de question sur un rapport ou de doute quelconque.",
+    "generalText": "La même adresse répond aux questions générales sur STOA, au soutien aux parents, aux candidatures d’enseignants et aux partenariats scolaires.",
+    "emailLabel": "Adresse e-mail"
+  },
+  "onboarding": {
+    "eyebrow": "Premiers pas",
+    "title": "Premiers pas avec STOA",
+    "description": "Un guide court pour les élèves, les parents et les enseignants qui utilisent STOA pour la première fois.",
+    "needHelp": "Besoin d’aide ?",
+    "badges": {
+      "audience": "Pour les nouveaux utilisateurs",
+      "student": "Élève",
+      "parent": "Parent",
+      "tutor": "Enseignant"
+    },
+    "expectations": {
+      "title": "À quoi s’attendre",
+      "items": [
+        "STOA explique les devoirs étape par étape, et un véritable enseignant prend le relais quand une explication ne suffit pas.",
+        "Si une page manque de données, paraît erronée ou ne fonctionne pas, signalez-le à l’assistance et nous l’examinerons.",
+        "Chaque message parvient à l’équipe STOA, et vos retours orientent nos prochaines améliorations."
+      ]
+    },
+    "roles": {
+      "student": {
+        "title": "Démarrage pour les élèves",
+        "audience": "Pour les élèves qui débutent avec STOA",
+        "steps": [
+          {
+            "title": "Confirmer le niveau et les matières",
+            "description": "Gardez votre niveau scolaire et vos matières actives à jour dans votre profil pour que STOA explique au bon niveau."
+          },
+          {
+            "title": "Commencer dans le Chat",
+            "description": "Ouvrez le Chat pour une question de devoirs, une notion mal comprise ou une fiche à importer."
+          },
+          {
+            "title": "Demander un enseignant en cas de blocage",
+            "description": "Demandez l’aide d’un enseignant depuis le Chat si une explication reste floue ou si vous voulez un regard humain."
+          }
+        ]
+      },
+      "parent": {
+        "title": "Vue des parents",
+        "audience": "Pour les parents qui suivent leur enfant",
+        "steps": [
+          {
+            "title": "Ouvrir le tableau de bord enfant",
+            "description": "Le tableau de bord parent présente chaque profil d’enfant, l’activité récente et les signaux d’apprentissage en un coup d’œil."
+          },
+          {
+            "title": "Consulter les rapports",
+            "description": "Les rapports montrent les progrès, les points forts, les points faibles et l’aide recommandée, sans exposer par défaut le contenu privé du chat."
+          },
+          {
+            "title": "Utiliser l’assistance en cas de problème d’accès",
+            "description": "Si un enfant n’apparaît pas, si un rapport semble périmé ou si la connexion échoue, envoyez-nous une demande d’assistance."
+          }
+        ]
+      },
+      "tutor": {
+        "title": "Déroulé pour les enseignants",
+        "audience": "Pour les enseignants qui répondent aux demandes d’aide",
+        "steps": [
+          {
+            "title": "Surveiller la liste des demandes",
+            "description": "Le tableau de bord enseignant liste les demandes ouvertes, en cours et résolues qui attendent une réponse humaine."
+          },
+          {
+            "title": "Ouvrir une demande",
+            "description": "Ouvrez une demande pour voir la question dans son contexte, ajouter des notes et choisir le statut suivant."
+          },
+          {
+            "title": "Tenir le statut à jour",
+            "description": "Faites passer les demandes d’ouvert à en cours puis à résolu pour que les élèves suivent l’avancement."
+          }
+        ]
+      }
+    }
+  }
 }

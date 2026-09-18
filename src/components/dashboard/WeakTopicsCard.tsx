@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/common/Skeleton'
 import { AlertCircle } from 'lucide-react'
+import { getCurriculumTopicLabel, getSubjectLabel } from '@/lib/displayLabels'
 import type { WeakTopic } from '@/types/dashboard'
 
 const levelVariant: Record<WeakTopic['level'], 'default' | 'secondary' | 'outline'> = {
@@ -60,9 +61,7 @@ export function WeakTopicsCard({ topics, isLoading, isError }: WeakTopicsCardPro
           </div>
         )}
         {!isError && topics.length === 0 && (
-          <p className="text-sm text-muted-foreground">
-            No weak topics detected yet — keep asking questions!
-          </p>
+          <p className="text-sm text-muted-foreground">{t('progress.weakTopicsEmpty')}</p>
         )}
         {topics.map((topic) => (
           <div
@@ -70,11 +69,15 @@ export function WeakTopicsCard({ topics, isLoading, isError }: WeakTopicsCardPro
             className="flex items-start justify-between gap-4 rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-4"
           >
             <div className="min-w-0">
-              <div className="text-sm font-medium capitalize leading-5">{topic.topic}</div>
-              <div className="mt-1 text-xs capitalize text-muted-foreground">{topic.subject}</div>
+              <div className="text-sm font-medium leading-5">
+                {getCurriculumTopicLabel(topic.topic, t)}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {getSubjectLabel(topic.subject, t)}
+              </div>
             </div>
-            <Badge className="shrink-0 capitalize" variant={levelVariant[topic.level]}>
-              {topic.level}
+            <Badge className="shrink-0" variant={levelVariant[topic.level]}>
+              {t(`progress.priority.${topic.level}`)}
             </Badge>
           </div>
         ))}

@@ -67,6 +67,45 @@ export function forgetSession(email: string): DevSession[] {
   return next
 }
 
+/** Live, refused, or no answer — a failed check is not the same as a dead session. */
+export type SessionLiveness = 'live' | 'refused' | 'unknown'
+
+const LIVENESS_TIMEOUT_MS = 8000
+
+/**
+ * Does the server still accept this session?
+ *
+ * Tokens are issued for an hour and none of them is renewed here, so a session
+ * held overnight is dead. Asked outside the shared client on purpose: that
+ * client answers a 401 by clearing the browser's session, which is exactly
+ * what checking beforehand is meant to avoid.
+ *
+ * Only an actual refusal reports `refused`. Being offline, a 500, or a request
+ * that never comes back all report `unknown`, because the caller deletes the
+ * stored token on a refusal and the token cannot be recovered afterwards.
+ */
+export async function sessionLiveness(
+  accessToken: string,
+  apiOrigin: string,
+): Promise<SessionLiveness> {
+  const abort = new AbortController()
+  const timer = setTimeout(() => abort.abort(), LIVENESS_TIMEOUT_MS)
+
+  try {
+    const response = await fetch(`${apiOrigin}/auth/me`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+      signal: abort.signal,
+    })
+    if (response.ok) return 'live'
+    if (response.status === 401 || response.status === 403) return 'refused'
+    return 'unknown'
+  } catch {
+    return 'unknown'
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /** Pin this tab to one session, leaving other tabs on whatever they hold. */
 export function pinTabToSession(accessToken: string): void {
   sessionStorage.setItem(TAB_TOKEN_KEY, accessToken)

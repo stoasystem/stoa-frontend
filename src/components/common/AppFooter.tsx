@@ -49,12 +49,11 @@ export function AppFooter({
             {t('footer.platform')}
           </h2>
           <div className="grid gap-2 text-sm text-muted-foreground">
+            {/* The marketing site is already linked from the bar below, and
+                there is no about page of our own to send this one to. */}
             <Link className="hover:text-foreground" to="/support">
               {t('navigation.support')}
             </Link>
-            <a className="hover:text-foreground" href="https://stoaedu.ch">
-              {t('navigation.about')}
-            </a>
           </div>
         </div>
       </div>

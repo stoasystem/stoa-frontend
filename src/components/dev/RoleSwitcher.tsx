@@ -6,12 +6,12 @@
  * leaves the first alone, so a parent's view and their child's can be read
  * side by side.
  *
- * Only offered to the test accounts. Nobody who registers sees it, and no
- * password is stored: what is kept is the session the server already issued.
+ * Only offered to the test accounts, and never in a production-facing build.
+ * Nobody who registers sees it, and no password is stored: what is kept is the
+ * session the server already issued.
  */
 import { useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
-import { ChevronDown, LogIn, Plus, Users, X } from 'lucide-react'
+import { LogIn, Plus, Users, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { login } from '@/services/auth/authApi'
@@ -21,14 +21,15 @@ import {
   pinTabToSession,
   readSessions,
   rememberSession,
+  sessionLiveness,
   type DevSession,
 } from '@/lib/devSessions'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
+import { apiBaseUrl, isProductionFacing } from '@/lib/env'
 import { useAuthStore } from '@/store/authStore'
 
 export function RoleSwitcher() {
   const user = useAuthStore((state) => state.user)
-  const queryClient = useQueryClient()
 
   const [open, setOpen] = useState(false)
   const [sessions, setSessions] = useState<DevSession[]>(() => readSessions())
@@ -38,17 +39,35 @@ export function RoleSwitcher() {
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState('')
 
-  if (!isTestAccount(user?.email)) {
+  if (isProductionFacing || !isTestAccount(user?.email)) {
     return null
   }
 
-  function adopt(session: DevSession) {
+  async function adopt(session: DevSession) {
+    setProblem('')
+    setBusy(true)
+    // The stored token is issued for an hour and nothing here renews it. A
+    // stale one reaching any request lands on the 401 handler, which signs the
+    // whole browser out, so it is checked before this tab adopts it.
+    const liveness = await sessionLiveness(session.accessToken, apiBaseUrl)
+    if (liveness === 'refused') {
+      setSessions(forgetSession(session.email))
+      setProblem('That session has expired. Add the role again.')
+      setBusy(false)
+      return
+    }
+    // Only a refusal means the token is gone. A check that could not be made
+    // keeps the stored session, because it cannot be recovered once dropped.
+    if (liveness === 'unknown') {
+      setProblem('Could not reach the server. The role is still held; try again.')
+      setBusy(false)
+      return
+    }
     pinTabToSession(session.accessToken)
-    // The previous role's answers are not this role's answers.
-    void queryClient.clear()
     // Nothing else changes here. Telling the store about the new role while
     // the old role's page is still mounted lets its route guard reject the
-    // new one and land on the forbidden page before the load begins.
+    // new one and land on the forbidden page before the load begins. The
+    // reload drops the previous role's answers with the rest of the cache.
     window.location.assign(getDefaultRouteForRole(session.role as never))
   }
 
@@ -100,7 +119,8 @@ export function RoleSwitcher() {
                   variant={session.email === user?.email ? 'default' : 'outline'}
                   size="sm"
                   className="h-8 flex-1 justify-start text-xs"
-                  onClick={() => adopt(session)}
+                  disabled={busy}
+                  onClick={() => void adopt(session)}
                 >
                   {session.role} · {session.email.split('@')[0]}
                 </Button>
@@ -121,6 +141,8 @@ export function RoleSwitcher() {
               </p>
             ) : null}
           </div>
+
+          {problem && !adding ? <p className="mt-2 text-xs text-destructive">{problem}</p> : null}
 
           {adding ? (
             <form className="mt-3 grid gap-2" onSubmit={addRole}>
@@ -169,10 +191,18 @@ export function RoleSwitcher() {
           )}
         </div>
       ) : (
-        <Button size="sm" variant="outline" className="h-9 shadow-lg" onClick={() => setOpen(true)}>
+        // Closed it is a dot half tucked off the edge rather than a labelled
+        // badge: anchored over the page, the badge sat on top of buttons and
+        // captions. Pointing at it brings it back out.
+        <Button
+          size="sm"
+          variant="outline"
+          className="h-9 w-9 translate-x-[45%] rounded-full p-0 opacity-50 shadow-lg transition-all hover:translate-x-0 hover:opacity-100 focus-visible:translate-x-0 focus-visible:opacity-100"
+          aria-label={`Testing as ${user?.role}`}
+          title={`Testing as ${user?.role}`}
+          onClick={() => setOpen(true)}
+        >
           <Users className="h-4 w-4" aria-hidden="true" />
-          {user?.role}
-          <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
         </Button>
       )}
     </div>

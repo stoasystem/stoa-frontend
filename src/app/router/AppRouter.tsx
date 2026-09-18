@@ -108,6 +108,11 @@ const ForgotPasswordPage = lazy(() =>
     default: m.ForgotPasswordPage,
   })),
 );
+const ResetPasswordPage = lazy(() =>
+  import("@/pages/auth/ResetPasswordPage").then((m) => ({
+    default: m.ResetPasswordPage,
+  })),
+);
 const LearningAutomationConsolePage = lazy(() =>
   import("@/pages/learning/LearningAutomationConsolePage").then((m) => ({
     default: m.LearningAutomationConsolePage,
@@ -301,6 +306,7 @@ export function AppRouter() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/teacher-activate" element={<TeacherActivatePage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />

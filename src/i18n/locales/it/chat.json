@@ -69,6 +69,11 @@
     "german": "Tedesco",
     "english": "Inglese"
   },
+  "subjectSelected": "Selezionato",
+  "subjectRollout": {
+    "active": "Supporto completo",
+    "foundation": "Supporto di base"
+  },
   "conversations": "Conversazioni",
   "conversationsSubtitle": "Le tue conversazioni di apprendimento",
   "backToConversations": "Torna alle conversazioni",
@@ -143,5 +148,6 @@
     "simpler": "Puoi spiegarlo in modo più semplice?",
     "similar": "Dammi un esercizio simile",
     "why": "Perché funziona così?"
-  }
+  },
+  "duplicateReopened": "L’hai già chiesto. Ecco la conversazione corrispondente."
 }

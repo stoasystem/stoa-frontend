@@ -118,6 +118,28 @@
       "libraryCompleted": "{{score}} exercices sur {{total}} terminés en {{minutes}} minutes.",
       "libraryInProgress": "{{answered}} exercices sur {{total}} traités. Reprends cette série dans la bibliothèque d’exercices.",
       "empty": "Aucun historique d’apprentissage n’est encore disponible."
+    },
+    "recommendationsEmpty": "Aucune recommandation pour l'instant. Pose quelques questions et des suggestions apparaîtront ici.",
+    "weakTopicsEmpty": "Aucun point faible détecté pour le moment — continue à poser des questions !",
+    "priority": {
+      "high": "Élevée",
+      "medium": "Moyenne",
+      "low": "Faible"
+    },
+    "topicNames": {
+      "brueche": "Fractions",
+      "gleichungen": "Équations",
+      "geometrie": "Géométrie",
+      "prozentrechnung": "Pourcentages et proportions",
+      "textaufgaben": "Problèmes concrets"
+    },
+    "rationale": {
+      "curriculumExercise": "Un exercice du programme validé est disponible pour ce point faible.",
+      "reviewedDraft": "Un brouillon d'exercice IA validé par un enseignant correspond à ce besoin.",
+      "continuation": "Continue avec un court exercice validé pour garder les acquis frais.",
+      "assignedCurriculum": "Attribué à partir d'un exercice du programme validé.",
+      "assignedDraft": "Attribué à partir d'un brouillon d'exercice IA validé par un enseignant.",
+      "signals": "Les recommandations s'appuient sur les signaux récents d'apprentissage et de devoirs."
     }
   },
   "library": {
@@ -192,7 +214,10 @@
     "freshness": "Fraîcheur du profil",
     "freshnessBody": "Mis à jour le {{date}} à partir des questions, des escalades vers un tuteur et des preuves de pratique.",
     "feedback": "Retour",
-    "email": "E-mail"
+    "email": "E-mail",
+    "usageActive": "Actif",
+    "usagePaused": "En pause",
+    "checkFields": "Vérifie les champs du profil avant d'enregistrer."
   },
   "ui": {
     "practiceLesson": "Leçon d’exercices",

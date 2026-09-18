@@ -118,6 +118,28 @@
       "libraryCompleted": "{{score}} esercizi su {{total}} completati in {{minutes}} minuti.",
       "libraryInProgress": "{{answered}} esercizi su {{total}} svolti. Riprendi questa serie dalla biblioteca di esercizi.",
       "empty": "Non è ancora disponibile alcuna cronologia di apprendimento."
+    },
+    "recommendationsEmpty": "Ancora nessun suggerimento. Fai qualche domanda e qui compariranno dei consigli.",
+    "weakTopicsEmpty": "Nessun punto debole rilevato per ora — continua a fare domande!",
+    "priority": {
+      "high": "Alta",
+      "medium": "Media",
+      "low": "Bassa"
+    },
+    "topicNames": {
+      "brueche": "Frazioni",
+      "gleichungen": "Equazioni",
+      "geometrie": "Geometria",
+      "prozentrechnung": "Percentuali e proporzioni",
+      "textaufgaben": "Problemi con testo"
+    },
+    "rationale": {
+      "curriculumExercise": "Per questo punto debole è disponibile un esercizio del programma verificato.",
+      "reviewedDraft": "Una bozza di esercizio IA verificata da un insegnante corrisponde a questa esigenza.",
+      "continuation": "Continua con un breve esercizio verificato per mantenere fresco quanto appreso.",
+      "assignedCurriculum": "Assegnato da un esercizio del programma verificato.",
+      "assignedDraft": "Assegnato da una bozza di esercizio IA verificata da un insegnante.",
+      "signals": "I suggerimenti si basano sui segnali recenti di studio e di compiti."
     }
   },
   "library": {
@@ -192,7 +214,10 @@
     "freshness": "Aggiornamento del profilo",
     "freshnessBody": "Aggiornato il {{date}} da domande, escalation ai tutor e prove di esercitazione.",
     "feedback": "Riscontro",
-    "email": "E-mail"
+    "email": "E-mail",
+    "usageActive": "Attivo",
+    "usagePaused": "In pausa",
+    "checkFields": "Controlla i campi del profilo prima di salvare."
   },
   "ui": {
     "practiceLesson": "Lezione di esercizi",

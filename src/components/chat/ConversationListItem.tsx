@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next'
+import { conversationDisplayTitle } from '@/components/chat/conversationTitle'
 import { cn } from '@/lib/utils'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
 import type { ConversationSummary } from '@/types/chat'
@@ -12,9 +13,9 @@ export function ConversationListItem({
   active: boolean
   onClick: () => void
 }) {
-  // Subscribes to i18n so the date beside the title re-renders in the new
+  // Subscribes to i18n so the title and the date beside it re-render in the new
   // language when the student switches it.
-  useTranslation('chat')
+  const { t } = useTranslation('chat')
 
   return (
     <button
@@ -26,7 +27,7 @@ export function ConversationListItem({
       )}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="truncate text-sm font-medium">{conversation.title}</div>
+        <div className="truncate text-sm font-medium">{conversationDisplayTitle(conversation, t)}</div>
         <div className="shrink-0 text-xs text-muted-foreground">{formatDayAndMonth(conversation.updatedAt)}</div>
       </div>
       {conversation.lastMessagePreview && (

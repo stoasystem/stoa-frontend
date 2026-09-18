@@ -29,7 +29,7 @@ import { useUpdateStudentProfileMutation } from '@/hooks/student/useUpdateStuden
 import { useStudentEntitlementQuery } from '@/hooks/student/useStudentEntitlementQuery'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
-import { getSubscriptionPlanLabel } from '@/lib/displayLabels'
+import { getSubjectLabel, getSubscriptionPlanLabel } from '@/lib/displayLabels'
 import { formatDate as formatDateWithYear } from '@/lib/formatDateTime'
 import { studentProfileSchema } from '@/lib/validation'
 import type { SubscriptionPlan } from '@/types/billing'
@@ -88,7 +88,7 @@ export function StudentProfilePage() {
         primarySubjects: fieldErrors.primarySubjects?.[0],
         preferredAnswerLanguage: fieldErrors.preferredAnswerLanguage?.[0],
       })
-      toast.error('Check the profile fields before saving.')
+      toast.error(t('profile.checkFields'))
       return
     }
 
@@ -97,7 +97,7 @@ export function StudentProfilePage() {
   }
 
   const profile = profileQuery.data
-  const billing = getProfileBillingSnapshot(entitlementQuery.data, entitlementQuery.isPending)
+  const billing = getProfileBillingSnapshot(entitlementQuery.data, entitlementQuery.isPending, t)
 
   return (
     <DashboardLayout>
@@ -224,7 +224,14 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         <ProfileDetail icon={Mail} label={t('profile.email')} value={profile.email} />
-        <ProfileDetail icon={GraduationCap} label={t('profile.primarySubjects')} value={profile.primarySubjects.join(', ')} />
+        <ProfileDetail
+          icon={GraduationCap}
+          label={t('profile.primarySubjects')}
+          value={
+            profile.primarySubjects.map((subject) => getSubjectLabel(subject, t)).join(', ') ||
+            t('profile.notSet')
+          }
+        />
         <ProfileDetail
           icon={Languages}
           label={t('profile.answerLanguage')}
@@ -316,16 +323,20 @@ function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
 function getProfileBillingSnapshot(
   entitlement: StudentEntitlement | undefined,
   pending: boolean,
+  t: TFunction<'practice'>,
 ): ProfileBillingSnapshot | undefined {
   if (pending) {
-    return { planName: 'Loading...', statusLabel: 'Loading...' }
+    const loading = t('common:status.loading')
+    return { planName: loading, statusLabel: loading }
   }
 
   if (!entitlement) return undefined
 
   return {
-    planName: getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan),
-    statusLabel: entitlement.newUsageAllowed ? 'Active' : 'Paused',
+    planName: getSubscriptionPlanLabel(entitlement.effectivePlan as SubscriptionPlan, t),
+    statusLabel: entitlement.newUsageAllowed
+      ? t('profile.usageActive')
+      : t('profile.usagePaused'),
     nextBillingDate: entitlement.freeTrialEndsAt ?? undefined,
   }
 }

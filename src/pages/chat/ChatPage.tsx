@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
-import { Video } from 'lucide-react'
+import { Check, Video } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { TodayStrip } from '@/components/chat/TodayStrip'
 import { ChatHeader } from '@/components/chat/ChatHeader'
 import { ChatInput } from '@/components/chat/ChatInput'
@@ -50,8 +51,10 @@ type TeacherSupportStage =
   | 'video_lobby_ready'
   | 'video_completed'
 
+/** How long the same opening question is treated as a repeat of the one just sent. */
+const DUPLICATE_CONVERSATION_WINDOW_MS = 60_000
+
 export function ChatPage() {
-  const { t: tPractice } = useTranslation('practice')
   const { t } = useTranslation('chat')
   const location = useLocation()
   const navigate = useNavigate()
@@ -67,7 +70,9 @@ export function ChatPage() {
     attachments?: ReturnType<typeof uploadAttachmentToUploadedFile>[]
   } | null>(null)
   const [uploadContext, setUploadContext] = useState<UploadChatHandoff | null>(null)
+  const [newConversationError, setNewConversationError] = useState<string | null>(null)
   const newConversationRef = useRef<HTMLTextAreaElement>(null)
+  const lastCreatedRef = useRef<{ key: string; conversationId: string; at: number } | null>(null)
 
   const conversationsQuery = useConversationsQuery()
   const [selectedSubjectId, setSelectedSubjectId] = useState(learningSubjectOptions[0].id)
@@ -82,6 +87,11 @@ export function ChatPage() {
 
   const selectedSubject = learningSubjectOptions.find((subject) => subject.id === selectedSubjectId)
     ?? learningSubjectOptions[0]
+
+  // A carried-in context supplies the opening message itself, so an empty box is
+  // legitimate there and only there.
+  const hasCarriedContext = Boolean(practiceContext || questionBankContext || uploadContext)
+  const canStartConversation = hasCarriedContext || newConversationMessage.trim().length > 0
 
   // Where the wait after signing in actually ends, for the student who lands here.
   useEffect(() => {
@@ -181,9 +191,18 @@ export function ChatPage() {
 
   function handleCreateConversation(message?: string) {
     if (createConversationMutation.isPending) return
+    const trimmedMessage = message?.trim() ?? ''
+    // An empty box with no carried context used to create a titled conversation
+    // that never received a message.
+    if (!trimmedMessage && !hasCarriedContext) {
+      setNewConversationError(t('emptyMessage'))
+      newConversationRef.current?.focus()
+      return
+    }
+    setNewConversationError(null)
     const initialMessage = buildInitialMessage(
       t,
-      message?.trim() ?? '',
+      trimmedMessage,
       practiceContext,
       questionBankContext,
       uploadContext,
@@ -194,10 +213,33 @@ export function ChatPage() {
     const subject = selectedSubject.id
     const grade = profile?.grade ?? 'Grade 8'
 
+    // Repeating the same question within the window reopens the conversation it
+    // already started instead of stacking another identical entry on the list.
+    const duplicateKey = `${subject} ${initialMessage}`
+    const recent = lastCreatedRef.current
+    if (
+      recent &&
+      recent.key === duplicateKey &&
+      Date.now() - recent.at < DUPLICATE_CONVERSATION_WINDOW_MS &&
+      conversations.some((conversation) => conversation.id === recent.conversationId)
+    ) {
+      setActiveConversationId(recent.conversationId)
+      setNewConversationMessage('')
+      // Saying so, because a student who repeats a question is usually one who
+      // thinks the first attempt never went through.
+      toast.info(t('duplicateReopened'))
+      return
+    }
+
     createConversationMutation.mutate(
       { subject, grade },
       {
         onSuccess: (conversation) => {
+          lastCreatedRef.current = {
+            key: duplicateKey,
+            conversationId: conversation.id,
+            at: Date.now(),
+          }
           setActiveConversationId(conversation.id)
           if (initialMessage) {
             setQueuedInitialMessage({
@@ -230,6 +272,7 @@ export function ChatPage() {
     // Dropping the carried-over context and taking the cursor is the visible
     // answer to the click.
     setNewConversationMessage('')
+    setNewConversationError(null)
     clearUploadHandoff()
     setUploadContext(null)
     if (location.state) {
@@ -375,15 +418,27 @@ export function ChatPage() {
                     type="button"
                     className={`flex min-h-12 items-center justify-between gap-3 rounded-md border px-3 text-left text-sm transition ${
                       selected
-                        ? 'border-primary bg-primary/10 text-foreground'
+                        ? 'border-primary bg-primary/15 text-foreground shadow-sm ring-2 ring-primary/60'
                         : 'border-border/80 bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground'
                     }`}
                     onClick={() => setSelectedSubjectId(subject.id)}
                     aria-pressed={selected}
                   >
-                    <span className="font-medium">{t(subject.labelKey)}</span>
-                    <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
-                      {subject.rolloutState === 'active' ? tPractice('progress.subjectActive') : tPractice('progress.subjectFoundation')}
+                    <span className="flex min-w-0 items-center gap-2">
+                      {selected && (
+                        <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                      )}
+                      <span className={`truncate ${selected ? 'font-semibold' : 'font-medium'}`}>
+                        {t(subject.labelKey)}
+                      </span>
+                      {selected && <span className="sr-only">{t('subjectSelected')}</span>}
+                    </span>
+                    {/* Coverage of the subject, which is not the same thing as the
+                        subject the student just picked. */}
+                    <Badge variant="outline" className="shrink-0 font-normal">
+                      {subject.rolloutState === 'active'
+                        ? t('subjectRollout.active')
+                        : t('subjectRollout.foundation')}
                     </Badge>
                   </button>
                 )
@@ -393,7 +448,10 @@ export function ChatPage() {
           <Textarea
             ref={newConversationRef}
             value={newConversationMessage}
-            onChange={(event) => setNewConversationMessage(event.target.value)}
+            onChange={(event) => {
+              setNewConversationMessage(event.target.value)
+              if (newConversationError) setNewConversationError(null)
+            }}
             placeholder={
               questionBankContext
                 ? t('questionBankContext.placeholder')
@@ -407,6 +465,11 @@ export function ChatPage() {
             disabled={createConversationMutation.isPending}
             aria-label={t('newConversationLabel')}
           />
+          {newConversationError && (
+            <p className="text-xs text-destructive" role="alert">
+              {newConversationError}
+            </p>
+          )}
           {createConversationMutation.isError && (
             <p className="text-xs text-destructive" role="alert">
               {toUserFacingError(createConversationMutation.error, t('createFailed'))}
@@ -415,7 +478,7 @@ export function ChatPage() {
           <Button
             type="submit"
             className="w-full"
-            disabled={createConversationMutation.isPending}
+            disabled={createConversationMutation.isPending || !canStartConversation}
           >
             {createConversationMutation.isPending ? t('starting') : t('startConversation')}
           </Button>
