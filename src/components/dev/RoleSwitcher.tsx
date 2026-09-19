@@ -6,9 +6,11 @@
  * leaves the first alone, so a parent's view and their child's can be read
  * side by side.
  *
- * Only offered to the test accounts, and never in a production-facing build.
- * Nobody who registers sees it, and no password is stored: what is kept is the
- * session the server already issued.
+ * Offered to the test accounts, and on a production-facing build only to a
+ * browser that asked for it with `?roleswitcher=on`. The accounts under test
+ * live on the deployed site, so hiding it there would hide it everywhere that
+ * matters; asking for it per browser keeps it away from everyone else.
+ * No password is stored: what is kept is the session the server already issued.
  */
 import { useState } from 'react'
 import { LogIn, Plus, Users, X } from 'lucide-react'
@@ -16,8 +18,11 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { login } from '@/services/auth/authApi'
 import {
+  accountMayBeHeld,
+  adoptSwitcherOptInFromUrl,
   forgetSession,
   isTestAccount,
+  switcherEnabledHere,
   pinTabToSession,
   readSessions,
   rememberSession,
@@ -31,6 +36,11 @@ import { useAuthStore } from '@/store/authStore'
 export function RoleSwitcher() {
   const user = useAuthStore((state) => state.user)
 
+  // Runs once per mount, before the guard below reads the answer.
+  const [enabledHere] = useState(() => {
+    adoptSwitcherOptInFromUrl()
+    return switcherEnabledHere()
+  })
   const [open, setOpen] = useState(false)
   const [sessions, setSessions] = useState<DevSession[]>(() => readSessions())
   const [adding, setAdding] = useState(false)
@@ -39,7 +49,12 @@ export function RoleSwitcher() {
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState('')
 
-  if (isProductionFacing || !isTestAccount(user?.email)) {
+  // The production gate stays for everyone who has not opted in: the switcher
+  // holds other accounts' tokens in this origin's storage, and on a build real
+  // people use that turns one site-wide flaw into several accounts at once.
+  // Opting in is per browser and deliberate, so it moves nobody but the tester.
+  if (!user) return null
+  if (!enabledHere && (isProductionFacing || !isTestAccount(user.email))) {
     return null
   }
 
@@ -74,8 +89,10 @@ export function RoleSwitcher() {
   async function addRole(event: React.FormEvent) {
     event.preventDefault()
     setProblem('')
-    if (!isTestAccount(email)) {
-      setProblem('Only @test.stoaedu.ch accounts can be held here.')
+    if (!accountMayBeHeld(email)) {
+      setProblem(
+        'Only @test.stoaedu.ch accounts can be held here. Open ?roleswitcher=on to hold others.',
+      )
       return
     }
     setBusy(true)

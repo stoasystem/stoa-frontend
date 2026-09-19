@@ -12,6 +12,7 @@ vi.mock('@/services/auth/authApi', () => ({ login: vi.fn() }))
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
 import {
   isTestAccount,
+  switcherEnabledHere,
   pinTabToSession,
   readSessions,
   rememberSession,
@@ -324,5 +325,85 @@ describe('a tab holding its own role', () => {
     expect(localStorage.getItem('stoa_access_token')).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(assign).toHaveBeenCalledWith('/login')
+  })
+})
+
+
+describe('the per-browser opt-in', () => {
+  /**
+   * Earlier tests in this file replace window.location with a stub that only
+   * carries assign, and nothing puts it back, so a test that reads the address
+   * has to bring its own. This one is backed by a URL and lets replaceState
+   * move it, which is the part of the browser the opt-in actually uses.
+   */
+  function atUrl(path: string) {
+    const url = new URL(path, 'http://localhost/')
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      value: {
+        get href() {
+          return url.toString()
+        },
+        get search() {
+          return url.search
+        },
+        assign: vi.fn(),
+      },
+    })
+    vi.spyOn(window.history, 'replaceState').mockImplementation((_state, _title, next) => {
+      const moved = new URL(String(next), 'http://localhost/')
+      url.pathname = moved.pathname
+      url.search = moved.search
+    })
+  }
+
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+    useAuthStore.setState({ user: null, isAuthenticated: false } as never)
+    atUrl('/')
+  })
+
+  it('is off until this browser asks for it', () => {
+    expect(switcherEnabledHere()).toBe(false)
+  })
+
+  it('offers the switcher to an ordinary address once this browser asked', () => {
+    // The accounts an administrator opens carry ordinary addresses, so the
+    // domain rule would otherwise mean the real accounts cannot be tested.
+    atUrl('/?roleswitcher=on')
+    signedInAs('someone@stoaedu.ch', 'admin')
+
+    renderSwitcher()
+
+    expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+  })
+
+  it('still hides it from an ordinary address in a browser that never asked', () => {
+    signedInAs('someone@stoaedu.ch', 'admin')
+
+    renderSwitcher()
+
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
+  })
+
+  it('takes the request back out of the address so no link carries it', () => {
+    atUrl('/parent?roleswitcher=on&keep=1')
+    signedInAs('someone@stoaedu.ch', 'parent')
+
+    renderSwitcher()
+
+    expect(window.location.search).toBe('?keep=1')
+    expect(switcherEnabledHere()).toBe(true)
+  })
+
+  it('can be turned back off by the same route', () => {
+    localStorage.setItem('stoa_role_switcher', 'on')
+    atUrl('/?roleswitcher=off')
+    signedInAs('someone@stoaedu.ch')
+
+    renderSwitcher()
+
+    expect(switcherEnabledHere()).toBe(false)
   })
 })

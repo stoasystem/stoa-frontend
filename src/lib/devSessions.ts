@@ -19,6 +19,60 @@ const SESSIONS_KEY = 'stoa_dev_sessions'
 /** Accounts the switcher is offered to. Anyone else never sees it. */
 const TEST_ACCOUNT_PATTERN = /@test\.stoaedu\.ch$/i
 
+const OPT_IN_KEY = 'stoa_role_switcher'
+const OPT_IN_PARAM = 'roleswitcher'
+
+/**
+ * Whether this one browser has deliberately turned the switcher on.
+ *
+ * The switcher stays hidden on a production-facing build because that is where
+ * real people are, not because the test accounts stop needing it there. The
+ * accounts exist on the deployed site, so testing anywhere else tests a
+ * different system. This opt-in is what separates "someone is using the
+ * product" from "someone is testing it": stored per browser, never inferred,
+ * never carried by a session, an account or a link.
+ */
+export function switcherEnabledHere(): boolean {
+  if (typeof window === 'undefined') return false
+  try {
+    return window.localStorage.getItem(OPT_IN_KEY) === 'on'
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Read `?roleswitcher=on|off`, act on it, then take it back out of the address
+ * so it is not carried into a link, a bookmark or a screenshot.
+ */
+export function adoptSwitcherOptInFromUrl(): void {
+  if (typeof window === 'undefined') return
+  try {
+    const url = new URL(window.location.href)
+    const asked = url.searchParams.get(OPT_IN_PARAM)
+    if (asked !== 'on' && asked !== 'off') return
+    if (asked === 'on') window.localStorage.setItem(OPT_IN_KEY, 'on')
+    else window.localStorage.removeItem(OPT_IN_KEY)
+    url.searchParams.delete(OPT_IN_PARAM)
+    window.history.replaceState({}, '', url.toString())
+  } catch {
+    // Blocked storage or an unparseable URL leaves the opt-in as it was, which
+    // is the safe side of this decision.
+  }
+}
+
+/**
+ * Whether a session for this address may be held in this browser.
+ *
+ * The domain rule remains the default, so nothing changes for a browser that
+ * never opted in. Once one has, that rule would only mean the accounts an
+ * administrator actually opened cannot be tested, since those carry ordinary
+ * addresses.
+ */
+export function accountMayBeHeld(email: string | undefined | null): boolean {
+  return switcherEnabledHere() || isTestAccount(email)
+}
+
 export type DevSession = {
   email: string
   role: string
@@ -40,7 +94,7 @@ export function readSessions(): DevSession[] {
       (entry): entry is DevSession =>
         typeof entry?.email === 'string' &&
         typeof entry?.accessToken === 'string' &&
-        isTestAccount(entry.email),
+        accountMayBeHeld(entry.email),
     )
   } catch {
     return []
@@ -48,7 +102,7 @@ export function readSessions(): DevSession[] {
 }
 
 export function rememberSession(session: Omit<DevSession, 'savedAt'>): DevSession[] {
-  if (!isTestAccount(session.email)) {
+  if (!accountMayBeHeld(session.email)) {
     return readSessions()
   }
   const others = readSessions().filter(
