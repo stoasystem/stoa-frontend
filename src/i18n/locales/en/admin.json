@@ -66,7 +66,14 @@
       "archived": "Archive"
     },
     "reasonTitle": "Reason for the next action",
-    "reasonRequired": "Enter a reason first: every account change is recorded."
+    "reasonRequired": "Enter a reason first: every account change is recorded.",
+    "errors": {
+      "account_peer_admin_password_reset_forbidden": "An administrator cannot reset another administrator's password. That account has to be reset from AWS.",
+      "account_last_active_admin": "This is the only administrator still active. Activate another one before changing this account.",
+      "account_self_deactivation_forbidden": "You cannot deactivate your own account.",
+      "account_state_invalid": "This account is not in a state that allows the change.",
+      "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one."
+    }
   },
   "activation": {
     "eyebrow": "Account invitation",

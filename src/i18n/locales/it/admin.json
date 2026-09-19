@@ -66,7 +66,14 @@
       "archived": "Archivia"
     },
     "reasonTitle": "Motivo della prossima azione",
-    "reasonRequired": "Indica prima un motivo: ogni modifica dell'account viene registrata."
+    "reasonRequired": "Indica prima un motivo: ogni modifica dell'account viene registrata.",
+    "errors": {
+      "account_peer_admin_password_reset_forbidden": "Un'amministrazione non può reimpostare la password di un'altra amministrazione. Quell'account va reimpostato da AWS.",
+      "account_last_active_admin": "Questa è l'unica amministrazione ancora attiva. Attivane un'altra prima di modificare questo account.",
+      "account_self_deactivation_forbidden": "Non puoi disattivare il tuo account.",
+      "account_state_invalid": "Questo account non è in uno stato che consenta la modifica.",
+      "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo."
+    }
   },
   "activation": {
     "eyebrow": "Invito all'account",

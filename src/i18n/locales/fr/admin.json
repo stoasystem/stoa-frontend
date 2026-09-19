@@ -66,7 +66,14 @@
       "archived": "Archiver"
     },
     "reasonTitle": "Motif de la prochaine action",
-    "reasonRequired": "Indiquez d'abord un motif : chaque modification de compte est consignée."
+    "reasonRequired": "Indiquez d'abord un motif : chaque modification de compte est consignée.",
+    "errors": {
+      "account_peer_admin_password_reset_forbidden": "Une administration ne peut pas réinitialiser le mot de passe d’une autre administration. Ce compte doit être réinitialisé depuis AWS.",
+      "account_last_active_admin": "C’est la seule administration encore active. Activez-en une autre avant de modifier ce compte.",
+      "account_self_deactivation_forbidden": "Vous ne pouvez pas désactiver votre propre compte.",
+      "account_state_invalid": "Ce compte n’est pas dans un état qui autorise cette modification.",
+      "invitation_not_reissuable": "Cette invitation a déjà été remplacée ou révoquée. Envoyez-en une nouvelle."
+    }
   },
   "activation": {
     "eyebrow": "Invitation de compte",

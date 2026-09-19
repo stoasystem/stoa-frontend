@@ -13,6 +13,12 @@ import {
   resetAccountPassword,
 } from '@/services/admin/accountsApi'
 
+import { ApiError } from '@/services/api/httpClient'
+import deAdmin from '@/i18n/locales/de/admin.json'
+import enAdmin from '@/i18n/locales/en/admin.json'
+import frAdmin from '@/i18n/locales/fr/admin.json'
+import itAdmin from '@/i18n/locales/it/admin.json'
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => key,
@@ -240,5 +246,61 @@ describe('invitation activation page', () => {
     expect(screen.getByText('admin:activation.missingToken')).toBeTruthy()
     expect(screen.queryByText('admin:activation.submit')).toBeNull()
     expect(mockedClaim).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('what the console says when a guard refuses', () => {
+  it('names the rule that refused instead of falling back to a generic failure', async () => {
+    // The guards on this page refuse with a code, not prose. Without a phrase
+    // for the code every refusal reads the same and the operator learns
+    // nothing about what to do next.
+    mockedReset.mockRejectedValue(
+      new ApiError('Conflict', {
+        status: 409,
+        code: 'account_peer_admin_password_reset_forbidden',
+      }),
+    )
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), 'support call 4711')
+    await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('accounts.errors.account_peer_admin_password_reset_forbidden'),
+      ).toBeTruthy(),
+    )
+    expect(screen.queryByText('accounts.passwordResetFailed')).toBeNull()
+  })
+
+  it('still falls back when the refusal carries no code', async () => {
+    mockedReset.mockRejectedValue(new ApiError('Bad Gateway', { status: 502 }))
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.type(screen.getByLabelText('accounts.reasonPrompt'), 'support call 4711')
+    await userEvent.click(screen.getAllByText('accounts.resetPassword')[0])
+
+    // What matters is that nothing invents a phrase key out of an absent code;
+    // which wording the generic path settles on is toUserFacingError's business.
+    await waitFor(() => expect(mockedReset).toHaveBeenCalled())
+    expect(screen.queryByText(/^accounts\.errors\./)).toBeNull()
+  })
+
+  it('carries a phrase for every refusal code in all four languages', () => {
+    // The console is outside what check-untranslated scans, so nothing else
+    // would notice a code that only ever reads in English.
+    const english: Record<string, string> = enAdmin.accounts.errors
+    const codes = Object.keys(english)
+    expect(codes.length).toBeGreaterThan(0)
+    for (const bundle of [deAdmin, frAdmin, itAdmin]) {
+      const translated: Record<string, string> = bundle.accounts.errors
+      expect(Object.keys(translated)).toEqual(codes)
+      for (const code of codes) {
+        expect(translated[code]).not.toBe(english[code])
+      }
+    }
   })
 })

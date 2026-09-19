@@ -66,7 +66,14 @@
       "archived": "Archivieren"
     },
     "reasonTitle": "Grund für die nächste Aktion",
-    "reasonRequired": "Geben Sie zuerst einen Grund an: jede Kontoänderung wird festgehalten."
+    "reasonRequired": "Geben Sie zuerst einen Grund an: jede Kontoänderung wird festgehalten.",
+    "errors": {
+      "account_peer_admin_password_reset_forbidden": "Eine Administration kann das Passwort einer anderen Administration nicht zurücksetzen. Dieses Konto muss über AWS zurückgesetzt werden.",
+      "account_last_active_admin": "Dies ist die einzige noch aktive Administration. Aktivieren Sie zuerst eine weitere.",
+      "account_self_deactivation_forbidden": "Sie können Ihr eigenes Konto nicht deaktivieren.",
+      "account_state_invalid": "Dieses Konto befindet sich nicht in einem Zustand, der die Änderung zulässt.",
+      "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue."
+    }
   },
   "activation": {
     "eyebrow": "Kontoeinladung",

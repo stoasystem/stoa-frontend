@@ -16,6 +16,7 @@ import {
 } from '@/hooks/admin/useAdminAccounts'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { ApiError } from '@/services/api/httpClient'
 import type { AccountRole, AccountRow, AccountStatus } from '@/services/admin/accountsApi'
 
 const ROLES: AccountRole[] = ['student', 'teacher', 'parent', 'admin']
@@ -72,9 +73,25 @@ export function AdminAccountsPage() {
           )
           if (!result.invitationDelivered) setSecret(result.activationToken)
         },
-        onError: (error) => setNotice(toUserFacingError(error, t('accounts.inviteFailed'))),
+        onError: (error) => setNotice(refusal(error, t('accounts.inviteFailed'))),
       },
     )
+  }
+
+  /**
+   * Say which rule refused, when the backend named one.
+   *
+   * The guards on this page refuse with a code rather than prose — the last
+   * active administrator, an administrator's password, an invitation already
+   * replaced. Without a phrase for the code every one of them reads as the same
+   * generic failure, which tells the operator nothing about what to do next.
+   */
+  function refusal(error: unknown, fallback: string) {
+    const code = error instanceof ApiError ? error.code : undefined
+    if (!code) return toUserFacingError(error, fallback)
+    return t(`accounts.errors.${code}`, {
+      defaultValue: toUserFacingError(error, fallback),
+    })
   }
 
   function assign() {
@@ -87,7 +104,7 @@ export function AdminAccountsPage() {
           setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
           setSecret(result.initialPassword)
         },
-        onError: (error) => setNotice(toUserFacingError(error, t('accounts.assignFailed'))),
+        onError: (error) => setNotice(refusal(error, t('accounts.assignFailed'))),
       },
     )
   }
@@ -109,7 +126,7 @@ export function AdminAccountsPage() {
               : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
           )
         },
-        onError: (error) => setNotice(toUserFacingError(error, t('accounts.reissueFailed'))),
+        onError: (error) => setNotice(refusal(error, t('accounts.reissueFailed'))),
       },
     )
   }
@@ -128,7 +145,7 @@ export function AdminAccountsPage() {
           setNotice(t('accounts.passwordReset'))
           setSecret(result.temporaryPassword)
         },
-        onError: (error) => setNotice(toUserFacingError(error, t('accounts.passwordResetFailed'))),
+        onError: (error) => setNotice(refusal(error, t('accounts.passwordResetFailed'))),
       },
     )
   }
@@ -144,7 +161,7 @@ export function AdminAccountsPage() {
       { userId: row.userId, status: next as Exclude<AccountStatus, 'invited'>, reason: reason.trim() },
       {
         onSuccess: () => setNotice(t('accounts.statusChanged', { status: t(`accounts.status.${next}`) })),
-        onError: (error) => setNotice(toUserFacingError(error, t('accounts.statusFailed'))),
+        onError: (error) => setNotice(refusal(error, t('accounts.statusFailed'))),
       },
     )
   }
