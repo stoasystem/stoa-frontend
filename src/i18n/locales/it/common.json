@@ -73,6 +73,7 @@
     "send": "Invia messaggio",
     "stop": "Ferma",
     "logOut": "Esci",
+    "changePassword": "Cambia password",
     "tryAgain": "Riprova"
   },
   "roles": {

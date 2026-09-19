@@ -45,6 +45,10 @@ export type User = {
   emailVerificationStatus?: EmailVerificationStatus
   emailVerificationRequired?: boolean
   accountActivationStatus?: AccountActivationStatus
+  // Raised by an administrator password reset. While it is true the backend
+  // refuses every route but the password change, so the app sends the account
+  // straight there.
+  mustChangePassword?: boolean
 }
 
 export type EmailVerificationStatus =

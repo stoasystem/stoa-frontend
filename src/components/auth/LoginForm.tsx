@@ -71,10 +71,11 @@ export function LoginForm() {
           aria-describedby={errors.password ? 'login-password-error' : undefined}
         />
         {errors.password && <p id="login-password-error" className="text-xs text-destructive" role="alert">{errors.password}</p>}
-        <p className="text-right text-xs">
-          <Link className="text-muted-foreground underline hover:text-foreground" to="/forgot-password">
-            {t('auth:login.forgotPassword')}
-          </Link>
+        {/* There is no self-service recovery any more: a forgotten password is
+            reset by an administrator. Signed in, a password is changed under
+            /settings/password. */}
+        <p className="text-right text-xs text-muted-foreground">
+          {t('auth:login.forgotPassword')}
         </p>
       </div>
       {verificationBlocked && (
@@ -101,7 +102,7 @@ export function LoginForm() {
       <p className="text-center text-sm text-muted-foreground">
         {t('auth:login.needAccount')}{' '}
         <Link className="font-semibold text-primary underline underline-offset-4 hover:text-primary/80" to="/register">
-          {t('common:actions.register')}
+          {t('auth:login.howToGetAccount')}
         </Link>
       </p>
     </form>

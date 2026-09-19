@@ -19,19 +19,24 @@ export type EmailVerificationConfirmRequest = EmailVerificationRequest & {
   confirmationCode: string
 }
 
-export type ForgotPasswordRequest = {
-  email: string
+export type PasswordChangeRequest = {
+  currentPassword: string
 }
 
-export type ResetPasswordRequest = {
-  email: string
-  confirmationCode: string
+export type PasswordChangeConfirmRequest = PasswordChangeRequest & {
+  code: string
   newPassword: string
 }
 
-// The backend answers both recovery routes with a status only, never with account existence.
-export type PasswordResetResponse = {
-  status: 'accepted' | 'confirmed'
+// The address is masked by the backend; the code itself never comes back here.
+export type PasswordChangeRequestResponse = {
+  status: 'sent'
+  maskedRecipient: string
+  expiresAt: number
+}
+
+export type PasswordChangeConfirmResponse = {
+  status: 'changed'
 }
 
 export type RegisterRequest = RegisterPayload | {
@@ -63,14 +68,12 @@ export async function login(payload: LoginRequest) {
   }
 }
 
+// Public registration is closed: the backend answers 410 and there is no route
+// left that reaches this. It stays only so the unused legacy form still builds,
+// and it no longer falls back to a demo session.
 export async function register(payload: RegisterRequest) {
-  try {
-    const response = await httpClient.post<AuthResponse>('/auth/register', payload)
-    return response.data
-  } catch (error) {
-    if (!allowDemoFallback) throw error
-    return createDemoAuthResponse(payload.email, payload.role, payload.name, payload.preferredLanguage)
-  }
+  const response = await httpClient.post<AuthResponse>('/auth/register', payload)
+  return response.data
 }
 
 export async function resendEmailVerification(payload: EmailVerificationRequest) {
@@ -83,13 +86,19 @@ export async function confirmEmailVerification(payload: EmailVerificationConfirm
   return response.data
 }
 
-export async function requestPasswordReset(payload: ForgotPasswordRequest) {
-  const response = await httpClient.post<PasswordResetResponse>('/auth/forgot-password', payload)
+export async function requestPasswordChange(payload: PasswordChangeRequest) {
+  const response = await httpClient.post<PasswordChangeRequestResponse>(
+    '/auth/password-change/request',
+    payload,
+  )
   return response.data
 }
 
-export async function resetPassword(payload: ResetPasswordRequest) {
-  const response = await httpClient.post<PasswordResetResponse>('/auth/reset-password', payload)
+export async function confirmPasswordChange(payload: PasswordChangeConfirmRequest) {
+  const response = await httpClient.post<PasswordChangeConfirmResponse>(
+    '/auth/password-change/confirm',
+    payload,
+  )
   return response.data
 }
 

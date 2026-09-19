@@ -1,5 +1,8 @@
 import type { UserRole } from '@/types/user'
 
+// The one screen an account under a forced password change can still use.
+export const CHANGE_PASSWORD_PATH = '/settings/password'
+
 export function getDefaultRouteForRole(role: UserRole) {
   switch (role) {
     case 'student':

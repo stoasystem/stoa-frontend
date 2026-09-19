@@ -1,9 +1,15 @@
-import { LogOut, UserCircle } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { KeyRound, LogOut, UserCircle } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { RoleBadge } from '@/components/common/RoleBadge'
 import { Button } from '@/components/ui/button'
+// The self-service password change gets its entry here rather than in `navItems`:
+// that model filters by exact role and has no shared bucket, so one entry beside
+// the account identity reaches every role without four duplicated copies and
+// without competing for the five slots in the mobile bar.
+import { CHANGE_PASSWORD_PATH } from '@/lib/authRoutes'
 import { useAuthStore } from '@/store/authStore'
+
 
 export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' }) {
   const { t } = useTranslation('common')
@@ -24,6 +30,17 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           {user.name}
         </span>
         <Button
+          asChild
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-full"
+          aria-label={t('actions.changePassword')}
+        >
+          <Link to={CHANGE_PASSWORD_PATH}>
+            <KeyRound className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </Button>
+        <Button
           type="button"
           variant="ghost"
           size="icon"
@@ -41,25 +58,38 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
   }
 
   return (
-    <div className="flex items-center gap-3 border-t pt-4">
-      <div className="flex min-w-0 flex-1 items-center gap-2">
-        <UserCircle className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-        <div className="min-w-0">
-          <p className="truncate text-sm font-medium">{user.name}</p>
-          <RoleBadge role={user.role} />
+    <div className="space-y-2 border-t pt-4">
+      <div className="flex items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          <UserCircle className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-medium">{user.name}</p>
+            <RoleBadge role={user.role} />
+          </div>
         </div>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label={t('actions.logOut')}
+          onClick={() => {
+            clearAuth()
+            navigate('/login')
+          }}
+        >
+          <LogOut className="h-4 w-4" aria-hidden="true" />
+        </Button>
       </div>
       <Button
-        type="button"
+        asChild
         variant="ghost"
-        size="icon"
-        aria-label={t('actions.logOut')}
-        onClick={() => {
-          clearAuth()
-          navigate('/login')
-        }}
+        size="sm"
+        className="w-full justify-start gap-2 px-2 text-muted-foreground"
       >
-        <LogOut className="h-4 w-4" aria-hidden="true" />
+        <Link to={CHANGE_PASSWORD_PATH}>
+          <KeyRound className="h-4 w-4" aria-hidden="true" />
+          {t('actions.changePassword')}
+        </Link>
       </Button>
     </div>
   )

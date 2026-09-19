@@ -73,6 +73,7 @@
     "send": "Nachricht senden",
     "stop": "Stoppen",
     "logOut": "Abmelden",
+    "changePassword": "Passwort ändern",
     "tryAgain": "Erneut versuchen"
   },
   "roles": {

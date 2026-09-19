@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
-import { getDefaultRouteForRole } from '@/lib/authRoutes'
+import { CHANGE_PASSWORD_PATH, getDefaultRouteForRole } from '@/lib/authRoutes'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -73,6 +73,13 @@ export function useLoginMutation() {
       const locale = resolveUserLanguage(data.user)
       if (locale && i18n.language !== locale) {
         await i18n.changeLanguage(locale)
+      }
+      // An administrator reset leaves nothing else reachable, so the role's home
+      // would only bounce off ProtectedRoute. Go straight to the one screen that
+      // works, and skip the prefetch that would only be refused.
+      if (data.user.mustChangePassword) {
+        navigate(CHANGE_PASSWORD_PATH, { replace: true })
+        return
       }
       const from = location.state?.from?.pathname
       const search = location.state?.from?.search ?? ''

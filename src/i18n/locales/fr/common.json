@@ -73,6 +73,7 @@
     "send": "Envoyer le message",
     "stop": "Arrêter",
     "logOut": "Se déconnecter",
+    "changePassword": "Modifier le mot de passe",
     "tryAgain": "Réessayer"
   },
   "roles": {

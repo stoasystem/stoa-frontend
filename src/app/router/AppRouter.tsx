@@ -103,14 +103,9 @@ const UnauthorizedPage = lazy(() =>
     default: m.UnauthorizedPage,
   })),
 );
-const ForgotPasswordPage = lazy(() =>
-  import("@/pages/auth/ForgotPasswordPage").then((m) => ({
-    default: m.ForgotPasswordPage,
-  })),
-);
-const ResetPasswordPage = lazy(() =>
-  import("@/pages/auth/ResetPasswordPage").then((m) => ({
-    default: m.ResetPasswordPage,
+const ChangePasswordPage = lazy(() =>
+  import("@/pages/auth/ChangePasswordPage").then((m) => ({
+    default: m.ChangePasswordPage,
   })),
 );
 const LearningAutomationConsolePage = lazy(() =>
@@ -257,6 +252,16 @@ const AdminTeacherApplicationsPage = lazy(() =>
     default: m.AdminTeacherApplicationsPage,
   })),
 );
+const AdminAccountsPage = lazy(() =>
+  import("@/pages/admin/AdminAccountsPage").then((m) => ({
+    default: m.AdminAccountsPage,
+  })),
+);
+const ActivateAccountPage = lazy(() =>
+  import("@/pages/auth/ActivateAccountPage").then((m) => ({
+    default: m.ActivateAccountPage,
+  })),
+);
 const SupportPage = lazy(() =>
   import("@/pages/support/SupportPage").then((m) => ({
     default: m.SupportPage,
@@ -305,8 +310,7 @@ export function AppRouter() {
           <Route path="/login" element={<EntryPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/teacher-activate" element={<TeacherActivatePage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/activate" element={<ActivateAccountPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="/onboarding" element={<OnboardingPage />} />
@@ -315,6 +319,7 @@ export function AppRouter() {
           <Route path="/forbidden" element={<ForbiddenPage />} />
           <Route path="/assistant" element={<Navigate replace to="/chat" />} />
           <Route element={<ProtectedRoute />}>
+            <Route path="/settings/password" element={<ChangePasswordPage />} />
             <Route path="/billing" element={<BillingPage />} />
             <Route
               path="/billing/payment-settings"
@@ -555,10 +560,7 @@ export function AppRouter() {
                 path="/admin/teacher-applications"
                 element={<AdminTeacherApplicationsPage />}
               />
-              <Route
-                path="/admin/users"
-                element={<AdminOperationsPlaceholderPage title="Users" />}
-              />
+              <Route path="/admin/users" element={<AdminAccountsPage />} />
               <Route
                 path="/admin/billing-interest"
                 element={
