@@ -30,7 +30,7 @@ import {
   type DevSession,
 } from '@/lib/devSessions'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
-import { apiBaseUrl, isProductionFacing } from '@/lib/env'
+import { apiBaseUrl } from '@/lib/env'
 import { useAuthStore } from '@/store/authStore'
 
 export function RoleSwitcher() {
@@ -49,12 +49,11 @@ export function RoleSwitcher() {
   const [busy, setBusy] = useState(false)
   const [problem, setProblem] = useState('')
 
-  // The production gate stays for everyone who has not opted in: the switcher
-  // holds other accounts' tokens in this origin's storage, and on a build real
-  // people use that turns one site-wide flaw into several accounts at once.
-  // Opting in is per browser and deliberate, so it moves nobody but the tester.
+  // An address outside the test domain needs the opt-in, because for those the
+  // stored sessions are somebody's real ones. Inside it, no gate: the domain
+  // already says what the account is for.
   if (!user) return null
-  if (!enabledHere && (isProductionFacing || !isTestAccount(user.email))) {
+  if (!enabledHere && !isTestAccount(user.email)) {
     return null
   }
 

@@ -407,3 +407,48 @@ describe('the per-browser opt-in', () => {
     expect(switcherEnabledHere()).toBe(false)
   })
 })
+
+
+describe('what decides whether the switcher is offered', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+    useAuthStore.setState({ user: null, isAuthenticated: false } as never)
+  })
+
+  it('offers it to a test-domain account with nothing else asked for', () => {
+    // The accounts under test live on the deployed site. Requiring a step
+    // before the switcher appeared there hid it in the one place it is for.
+    signedInAs('admin@test.stoaedu.ch', 'admin')
+
+    renderSwitcher()
+
+    expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+  })
+
+  it('offers it to every one of the roles under test', () => {
+    for (const [email, role] of [
+      ['admin@test.stoaedu.ch', 'admin'],
+      ['teacher@test.stoaedu.ch', 'teacher'],
+      ['parent@test.stoaedu.ch', 'parent'],
+      ['student@test.stoaedu.ch', 'student'],
+      ['agent@test.stoaedu.ch', 'student'],
+    ] as const) {
+      localStorage.clear()
+      signedInAs(email, role)
+      const view = renderSwitcher()
+      expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+      view.unmount()
+    }
+  })
+
+  it('withholds it from an address outside the test domain', () => {
+    // Negative control. This is the boundary now that the build no longer is:
+    // for a real address the sessions this keeps would be somebody's real ones.
+    signedInAs('a.real.parent@gmail.com', 'parent')
+
+    renderSwitcher()
+
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
+  })
+})
