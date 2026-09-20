@@ -345,7 +345,6 @@ describe('card 014: a dead button explains itself', () => {
     await userEvent.click(screen.getByText('accounts.assign'))
     const dialog = await screen.findByRole('dialog')
 
-    expect(within(dialog).getByText('accounts.roleFieldsHint.student')).toBeTruthy()
     expect(within(dialog).getAllByText('accounts.requiredTag').length).toBeGreaterThan(0)
     expect(within(dialog).getAllByText('accounts.optionalTag').length).toBeGreaterThan(0)
 
@@ -387,7 +386,6 @@ describe('card 014: a dead button explains itself', () => {
       'nameHint',
       'dateOfBirthStudentHint',
       'blockedPrefix',
-      'createExplainer',
       'inviteExplainer',
       'assignExplainer',
       'assignDialogTitle',
@@ -403,8 +401,8 @@ describe('card 014: a dead button explains itself', () => {
       }
     }
     for (const bundle of [deAdmin, frAdmin, itAdmin]) {
-      expect(Object.keys(bundle.accounts.roleFieldsHint)).toEqual(
-        Object.keys(enAdmin.accounts.roleFieldsHint),
+      expect(Object.keys(bundle.accounts.fieldIssues)).toEqual(
+        Object.keys(enAdmin.accounts.fieldIssues),
       )
       expect(Object.keys(bundle.accounts.roleSingular)).toEqual(
         Object.keys(enAdmin.accounts.roleSingular),
@@ -557,5 +555,54 @@ describe('card 008 phrases exist in all four languages', () => {
         Object.keys(enAdmin.activation.errors),
       )
     }
+  })
+})
+
+describe('card 014: a refusal has to be visible where the form is', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockedList.mockResolvedValue(ACCOUNTS)
+  })
+
+  it('prints what the server refused with inside the dialog, and keeps it open', async () => {
+    // The bug this exists for: the dialog covers the page, so a message set on
+    // the page behind it is invisible. A real refusal then looks exactly like a
+    // button that does nothing, which is what was reported.
+    mockedAssign.mockRejectedValue(
+      new ApiError('Conflict', { status: 409, code: 'account_exists' }),
+    )
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.click(screen.getByText('accounts.assign'))
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.type(within(dialog).getByLabelText('accounts.emailLabel'), 'taken@stoa.test')
+    await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))
+
+    await waitFor(() => expect(mockedAssign).toHaveBeenCalled())
+    const alert = await within(await screen.findByRole('dialog')).findByRole('alert')
+    expect(alert.textContent).toContain('accounts.errors.account_exists')
+    expect(screen.queryByRole('dialog')).toBeTruthy()
+  })
+
+  it('clears a stale refusal when the form is opened again', async () => {
+    mockedAssign.mockRejectedValue(
+      new ApiError('Conflict', { status: 409, code: 'account_exists' }),
+    )
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.click(screen.getByText('accounts.assign'))
+    let dialog = await screen.findByRole('dialog')
+    await userEvent.type(within(dialog).getByLabelText('accounts.emailLabel'), 'taken@stoa.test')
+    await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))
+    await waitFor(() => expect(within(dialog).queryByRole('alert')).toBeTruthy())
+
+    await userEvent.click(within(dialog).getByText('accounts.cancel'))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await userEvent.click(screen.getByText('accounts.assign'))
+    dialog = await screen.findByRole('dialog')
+
+    expect(within(dialog).queryByRole('alert')).toBeNull()
   })
 })

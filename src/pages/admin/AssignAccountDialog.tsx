@@ -17,6 +17,8 @@ type Props = {
   open: boolean
   initial: AccountDraft
   pending: boolean
+  /** What the server refused with, if it refused. */
+  error: string | null
   onOpenChange: (open: boolean) => void
   onSubmit: (draft: AccountDraft) => void
 }
@@ -25,10 +27,21 @@ type Props = {
  * Card 014: "assign directly" opens the registration form it always implied.
  *
  * The administrator fills in everything the invitee would have filled in, so
- * the form has to show the whole list, mark what is required for the role at
- * hand, and say that the password comes back once and only once.
+ * the form shows the whole list and says that the password comes back once.
+ *
+ * A refusal is rendered here, inside the dialog. It used to be set on the page
+ * underneath, which stays open behind the overlay -- so a server that answered
+ * "this address already has a teacher account" looked exactly like a button
+ * that did nothing at all.
  */
-export function AssignAccountDialog({ open, initial, pending, onOpenChange, onSubmit }: Props) {
+export function AssignAccountDialog({
+  open,
+  initial,
+  pending,
+  error,
+  onOpenChange,
+  onSubmit,
+}: Props) {
   const { t } = useTranslation('admin')
   const [draft, setDraft] = useState<AccountDraft>(initial)
   const [touched, setTouched] = useState<Partial<Record<keyof AccountDraft, boolean>>>({})
@@ -56,9 +69,6 @@ export function AssignAccountDialog({ open, initial, pending, onOpenChange, onSu
         </DialogHeader>
 
         <p className="text-xs text-muted-foreground">{t('accounts.requiredLegend')}</p>
-        <p className="text-xs text-muted-foreground">
-          {t(`accounts.roleFieldsHint.${draft.role}`)}
-        </p>
 
         <form
           className="flex flex-wrap items-start gap-3"
@@ -78,6 +88,12 @@ export function AssignAccountDialog({ open, initial, pending, onOpenChange, onSu
           />
 
           <BlockedReason id="assign-blocked" reasons={reasons} />
+
+          {error ? (
+            <p role="alert" className="w-full text-sm text-destructive">
+              {error}
+            </p>
+          ) : null}
 
           <DialogFooter className="w-full gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

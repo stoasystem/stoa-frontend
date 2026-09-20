@@ -55,6 +55,7 @@ export function AdminAccountsPage() {
   })
   const [touched, setTouched] = useState<Partial<Record<keyof AccountDraft, boolean>>>({})
   const [assignOpen, setAssignOpen] = useState(false)
+  const [assignError, setAssignError] = useState<string | null>(null)
   const [reason, setReason] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
@@ -78,7 +79,9 @@ export function AdminAccountsPage() {
   const inviteIssues = accountDraftIssues(draft)
   const inviteBlocking = blockingIssues(draft)
   const inviteReasons = inviteBlocking.map((issue) => t(`accounts.fieldIssues.${issue}`))
-  const inviteTooltip = inviteBlocking.length > 0 ? inviteReasons.join(' · ') : undefined
+  // Blocked: say what is missing. Ready: say what the button will do.
+  const inviteTooltip =
+    inviteBlocking.length > 0 ? inviteReasons.join(' · ') : t('accounts.inviteExplainer')
 
   function invite() {
     if (inviteBlocking.length > 0) return
@@ -123,6 +126,7 @@ export function AdminAccountsPage() {
     if (blockingIssues(filled).length > 0) return
     setNotice(null)
     setSecret(null)
+    setAssignError(null)
     assignMutation.mutate(accountDraftPayload(filled), {
       onSuccess: (result) => {
         setAssignOpen(false)
@@ -130,8 +134,11 @@ export function AdminAccountsPage() {
         setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
         setSecret(result.initialPassword)
       },
+      // The dialog stays open on a refusal, and it sits over the page, so the
+      // answer has to be rendered inside it. Put on the page behind, a real
+      // refusal is indistinguishable from a button that did nothing.
       onError: (error) =>
-        setNotice(
+        setAssignError(
           refusal(error, t('accounts.assignFailed'), {
             role: t(`accounts.roleSingular.${filled.role}`),
           }),
@@ -211,7 +218,6 @@ export function AdminAccountsPage() {
             <CardTitle>{t('accounts.createTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-wrap items-start gap-3">
-            <p className="w-full text-sm text-muted-foreground">{t('accounts.createExplainer')}</p>
             <p className="w-full text-xs text-muted-foreground">{t('accounts.requiredLegend')}</p>
 
             <AccountDraftFields
@@ -237,7 +243,6 @@ export function AdminAccountsPage() {
                   {t('accounts.invite')}
                 </Button>
               </span>
-              <span className="text-xs text-muted-foreground">{t('accounts.inviteExplainer')}</span>
             </div>
 
             <div className="flex w-full flex-wrap items-center gap-3">
@@ -246,10 +251,10 @@ export function AdminAccountsPage() {
                 variant="outline"
                 onClick={() => setAssignOpen(true)}
                 disabled={assignMutation.isPending}
+                title={t('accounts.assignExplainer')}
               >
                 {t('accounts.assign')}
               </Button>
-              <span className="text-xs text-muted-foreground">{t('accounts.assignExplainer')}</span>
             </div>
           </CardContent>
         </Card>
@@ -258,7 +263,11 @@ export function AdminAccountsPage() {
           open={assignOpen}
           initial={draft}
           pending={assignMutation.isPending}
-          onOpenChange={setAssignOpen}
+          error={assignError}
+          onOpenChange={(open) => {
+            setAssignError(null)
+            setAssignOpen(open)
+          }}
           onSubmit={assign}
         />
 

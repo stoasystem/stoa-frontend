@@ -83,16 +83,15 @@
     },
     "requiredTag": "obbligatorio",
     "optionalTag": "facoltativo",
-    "requiredLegend": "I campi contrassegnati con * sono obbligatori.",
-    "emailHint": "Deve contenere una @ e restare sotto i 320 caratteri. Maiuscole e minuscole indicano lo stesso indirizzo.",
+    "requiredLegend": "* obbligatorio",
+    "emailHint": "Deve contenere una @. Maiuscole e minuscole sono equivalenti.",
     "nameHint": "Facoltativo. Al massimo 120 caratteri.",
-    "dateOfBirthStudentHint": "Facoltativa, ma determina se lo studente è considerato minorenne. Meglio lasciarla vuota che indovinarla.",
+    "dateOfBirthStudentHint": "Facoltativo. Determina se la persona è minorenne — meglio lasciare vuoto che indovinare.",
     "blockedPrefix": "Non ancora inviabile:",
-    "createExplainer": "Due modi per aprire un account: inviare un invito, e la persona sceglie da sé la password, oppure assegnare direttamente, e compili tu tutto.",
-    "inviteExplainer": "Invia un link di registrazione. L’account resta invitato finché la persona non sceglie una password.",
-    "assignExplainer": "Apre il modulo di registrazione completo. L’account viene creato attivo e ricevi una password monouso da consegnare.",
+    "inviteExplainer": "Invia un link di registrazione; la persona sceglie la propria password.",
+    "assignExplainer": "Compili tutto tu e ricevi una password monouso da consegnare.",
     "assignDialogTitle": "Assegna un account direttamente",
-    "assignDialogDescription": "Compila quello che la persona avrebbe compilato da sé. L’account viene creato attivo e la password iniziale viene mostrata una sola volta: la persona dovrà cambiarla al primo accesso.",
+    "assignDialogDescription": "L’account viene creato attivo. La password iniziale è mostrata una sola volta e va cambiata al primo accesso.",
     "assignDialogSubmit": "Crea l’account",
     "cancel": "Annulla",
     "fieldIssues": {
@@ -102,12 +101,6 @@
       "email_too_long": "Questo indirizzo e-mail supera i 320 caratteri.",
       "name_too_long": "Il nome completo supera i 120 caratteri.",
       "date_of_birth_invalid": "La data di nascita deve essere una data passata reale nel formato AAAA-MM-GG."
-    },
-    "roleFieldsHint": {
-      "student": "Studente: ruolo ed e-mail sono obbligatori. Il nome completo è facoltativo; la data di nascita è facoltativa ma determina se l’account è considerato minorenne.",
-      "teacher": "Insegnante: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi.",
-      "parent": "Genitore: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi.",
-      "admin": "Amministratore: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi."
     },
     "roleSingular": {
       "student": "studente",

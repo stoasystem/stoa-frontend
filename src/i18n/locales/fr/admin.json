@@ -83,16 +83,15 @@
     },
     "requiredTag": "obligatoire",
     "optionalTag": "facultatif",
-    "requiredLegend": "Les champs marqués d’un * sont obligatoires.",
-    "emailHint": "Doit contenir un @ et rester sous 320 caractères. Majuscules et minuscules désignent la même adresse.",
+    "requiredLegend": "* obligatoire",
+    "emailHint": "Doit contenir un @. Majuscules et minuscules sont équivalentes.",
     "nameHint": "Facultatif. 120 caractères au maximum.",
-    "dateOfBirthStudentHint": "Facultative, mais elle détermine si l’élève est considéré comme mineur. Mieux vaut la laisser vide que de la deviner.",
+    "dateOfBirthStudentHint": "Facultatif. Détermine si la personne est mineure — mieux vaut laisser vide que deviner.",
     "blockedPrefix": "Pas encore envoyable :",
-    "createExplainer": "Deux façons d’ouvrir un compte : envoyer une invitation, et la personne choisit son mot de passe, ou attribuer directement, et vous remplissez tout vous-même.",
-    "inviteExplainer": "Envoie un lien d’inscription. Le compte reste invité jusqu’à ce que la personne choisisse un mot de passe.",
-    "assignExplainer": "Ouvre le formulaire d’inscription complet. Le compte est créé actif et vous recevez un mot de passe à usage unique à transmettre.",
+    "inviteExplainer": "Envoie un lien d’inscription ; la personne choisit son mot de passe.",
+    "assignExplainer": "Vous remplissez tout et recevez un mot de passe à usage unique à transmettre.",
     "assignDialogTitle": "Attribuer un compte directement",
-    "assignDialogDescription": "Remplissez ce que la personne aurait rempli elle-même. Le compte est créé actif, et le mot de passe initial n’est affiché qu’une seule fois : la personne devra le changer à la première connexion.",
+    "assignDialogDescription": "Le compte est créé actif. Le mot de passe initial n’est affiché qu’une fois et devra être changé à la première connexion.",
     "assignDialogSubmit": "Créer le compte",
     "cancel": "Annuler",
     "fieldIssues": {
@@ -102,12 +101,6 @@
       "email_too_long": "Cette adresse e-mail dépasse 320 caractères.",
       "name_too_long": "Le nom complet dépasse 120 caractères.",
       "date_of_birth_invalid": "La date de naissance doit être une date passée réelle au format AAAA-MM-JJ."
-    },
-    "roleFieldsHint": {
-      "student": "Élève : le rôle et l’e-mail sont obligatoires. Le nom complet est facultatif ; la date de naissance est facultative mais détermine si le compte est considéré comme mineur.",
-      "teacher": "Enseignant : le rôle et l’e-mail sont obligatoires. Le nom complet et la date de naissance sont facultatifs.",
-      "parent": "Parent : le rôle et l’e-mail sont obligatoires. Le nom complet et la date de naissance sont facultatifs.",
-      "admin": "Administrateur : le rôle et l’e-mail sont obligatoires. Le nom complet et la date de naissance sont facultatifs."
     },
     "roleSingular": {
       "student": "élève",

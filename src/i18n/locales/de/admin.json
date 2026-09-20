@@ -83,16 +83,15 @@
     },
     "requiredTag": "Pflichtfeld",
     "optionalTag": "optional",
-    "requiredLegend": "Mit * markierte Felder sind Pflichtfelder.",
-    "emailHint": "Muss ein @ enthalten und unter 320 Zeichen bleiben. Gross- und Kleinschreibung gelten als dieselbe Adresse.",
+    "requiredLegend": "* Pflichtfeld",
+    "emailHint": "Muss ein @ enthalten. Gross- und Kleinschreibung spielt keine Rolle.",
     "nameHint": "Optional. Höchstens 120 Zeichen.",
-    "dateOfBirthStudentHint": "Optional, bestimmt aber, ob die Schülerin oder der Schüler als minderjährig gilt. Lieber leer lassen als raten.",
+    "dateOfBirthStudentHint": "Optional. Bestimmt, ob die Person als minderjährig gilt — lieber leer lassen als raten.",
     "blockedPrefix": "Noch nicht absendbar:",
-    "createExplainer": "Zwei Wege, ein Konto zu eröffnen: eine Einladung senden, dann wählt die Person ihr Passwort selbst, oder direkt zuweisen, dann füllen Sie alles selbst aus.",
-    "inviteExplainer": "Sendet einen Registrierungslink. Das Konto bleibt eingeladen, bis die Person ein Passwort setzt.",
-    "assignExplainer": "Öffnet das vollständige Registrierungsformular. Das Konto wird aktiv eröffnet und Sie erhalten ein einmaliges Passwort zur Weitergabe.",
+    "inviteExplainer": "Sendet einen Registrierungslink; die Person setzt ihr Passwort selbst.",
+    "assignExplainer": "Sie füllen alles aus und erhalten ein einmaliges Passwort zur Weitergabe.",
     "assignDialogTitle": "Konto direkt zuweisen",
-    "assignDialogDescription": "Füllen Sie aus, was die Person sonst selbst ausgefüllt hätte. Das Konto wird aktiv eröffnet, und das Startpasswort wird nur einmal angezeigt: die Person muss es bei der ersten Anmeldung ändern.",
+    "assignDialogDescription": "Das Konto wird aktiv eröffnet. Das Startpasswort wird nur einmal angezeigt und muss bei der ersten Anmeldung geändert werden.",
     "assignDialogSubmit": "Konto eröffnen",
     "cancel": "Abbrechen",
     "fieldIssues": {
@@ -102,12 +101,6 @@
       "email_too_long": "Diese E-Mail-Adresse ist länger als 320 Zeichen.",
       "name_too_long": "Der vollständige Name ist länger als 120 Zeichen.",
       "date_of_birth_invalid": "Das Geburtsdatum muss ein echtes Datum in der Vergangenheit im Format JJJJ-MM-TT sein."
-    },
-    "roleFieldsHint": {
-      "student": "Schüler/in: Rolle und E-Mail sind Pflicht. Der vollständige Name ist optional; das Geburtsdatum ist optional, bestimmt aber, ob das Konto als minderjährig gilt.",
-      "teacher": "Lehrperson: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional.",
-      "parent": "Elternteil: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional.",
-      "admin": "Administration: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional."
     },
     "roleSingular": {
       "student": "Schüler/in",

@@ -14,26 +14,40 @@ type FieldProps = {
 }
 
 /**
- * Card 014: a field says up front whether it is required, and names its own
- * refusal underneath. A red ring with no sentence teaches nobody anything.
+ * Card 014: a field says whether it is required and names its own refusal.
+ *
+ * The rule itself waits under the pointer rather than sitting on the page: a
+ * form where every field carries a sentence is a form nobody reads. What may
+ * not hide is a refusal, so errors stay printed. Screen readers get the rule
+ * either way, through a visually hidden copy the input points at.
  */
 export function AccountFormField({ id, label, required, hint, error, children }: FieldProps) {
   const { t } = useTranslation('admin')
   return (
     <div className="flex min-w-[14rem] flex-col gap-1 text-sm">
       <span className="flex items-center gap-1">
-        <label htmlFor={id}>{label}</label>
+        <label
+          htmlFor={id}
+          title={hint}
+          className={hint ? 'cursor-help underline decoration-dotted underline-offset-4' : undefined}
+        >
+          {label}
+        </label>
         {required ? (
-          <span className="text-destructive" aria-hidden="true">
-            *
+          <span className="text-destructive" title={t('accounts.requiredTag')}>
+            <span aria-hidden="true">*</span>
+            <span className="sr-only">{t('accounts.requiredTag')}</span>
           </span>
-        ) : null}
-        <span className="text-xs text-muted-foreground">
-          {required ? t('accounts.requiredTag') : t('accounts.optionalTag')}
-        </span>
+        ) : (
+          <span className="sr-only">{t('accounts.optionalTag')}</span>
+        )}
       </span>
       {children}
-      {hint ? <span className="text-xs text-muted-foreground">{hint}</span> : null}
+      {hint ? (
+        <span id={`${id}-hint`} className="sr-only">
+          {hint}
+        </span>
+      ) : null}
       {error ? (
         <span id={`${id}-error`} className="text-xs text-destructive">
           {error}
@@ -41,6 +55,12 @@ export function AccountFormField({ id, label, required, hint, error, children }:
       ) : null}
     </div>
   )
+}
+
+/** Both the rule and the refusal, for the input's `aria-describedby`. */
+function describedBy(id: string, hint: string | undefined, error: string | undefined) {
+  const parts = [hint ? `${id}-hint` : null, error ? `${id}-error` : null].filter(Boolean)
+  return parts.length > 0 ? parts.join(' ') : undefined
 }
 
 type FieldsProps = {
@@ -72,6 +92,10 @@ export function AccountDraftFields({
   const emailError = errorFor('email', draft.email)
   const nameError = errorFor('fullName', draft.fullName)
   const dateError = errorFor('dateOfBirth', draft.dateOfBirth)
+  const dateHint =
+    draft.role === 'student'
+      ? t('accounts.dateOfBirthStudentHint')
+      : t('accounts.dateOfBirthHint')
 
   return (
     <>
@@ -104,7 +128,7 @@ export function AccountDraftFields({
           required
           aria-required="true"
           aria-invalid={emailError ? true : undefined}
-          aria-describedby={emailError ? `${idPrefix}-email-error` : undefined}
+          aria-describedby={describedBy(`${idPrefix}-email`, t('accounts.emailHint'), emailError)}
           value={draft.email}
           onBlur={() => onTouch('email')}
           onChange={(event) => onChange({ email: event.target.value })}
@@ -121,7 +145,7 @@ export function AccountDraftFields({
         <Input
           id={`${idPrefix}-name`}
           aria-invalid={nameError ? true : undefined}
-          aria-describedby={nameError ? `${idPrefix}-name-error` : undefined}
+          aria-describedby={describedBy(`${idPrefix}-name`, t('accounts.nameHint'), nameError)}
           value={draft.fullName}
           onBlur={() => onTouch('fullName')}
           onChange={(event) => onChange({ fullName: event.target.value })}
@@ -132,18 +156,14 @@ export function AccountDraftFields({
         id={`${idPrefix}-dob`}
         label={t('accounts.dateOfBirthLabel')}
         required={false}
-        hint={
-          draft.role === 'student'
-            ? t('accounts.dateOfBirthStudentHint')
-            : t('accounts.dateOfBirthHint')
-        }
+        hint={dateHint}
         error={dateError}
       >
         <Input
           id={`${idPrefix}-dob`}
           type="date"
           aria-invalid={dateError ? true : undefined}
-          aria-describedby={dateError ? `${idPrefix}-dob-error` : undefined}
+          aria-describedby={describedBy(`${idPrefix}-dob`, dateHint, dateError)}
           value={draft.dateOfBirth}
           onBlur={() => onTouch('dateOfBirth')}
           onChange={(event) => onChange({ dateOfBirth: event.target.value })}
