@@ -22,14 +22,14 @@
       },
       "thirdParties": {
         "title": "Service partners",
-        "body": "Hosting, authentication, analytics, monitoring, payment, and support partners may process limited data under appropriate service agreements."
+        "body": "Hosting, authentication, analytics, monitoring, and support partners may process limited data under appropriate service agreements."
       }
     }
   },
   "terms": {
     "eyebrow": "Terms",
     "title": "Terms",
-    "description": "The conditions for using STOA learning support, subscriptions, and service access.",
+    "description": "The conditions for using STOA learning support and service access.",
     "sections": {
       "learningSupport": {
         "title": "Learning support",

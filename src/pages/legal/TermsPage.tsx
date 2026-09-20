@@ -5,7 +5,13 @@ import { Seo } from '@/components/common/Seo'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 
-const sectionKeys = ['learningSupport', 'accuracy', 'acceptableUse', 'subscriptions', 'serviceChanges'] as const
+/* Card 007: the subscriptions section is withdrawn while billing is frozen.
+ * Its copy is kept in `legal.json` in all four languages; only its place in
+ * this list is taken out, the same way the billing routes are withdrawn in
+ * `AppRouter.tsx`. To unfreeze, put 'subscriptions' back before
+ * 'serviceChanges'.
+ */
+const sectionKeys = ['learningSupport', 'accuracy', 'acceptableUse', 'serviceChanges'] as const
 
 export function TermsPage() {
   const { t } = useTranslation('legal')

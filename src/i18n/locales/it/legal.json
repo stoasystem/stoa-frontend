@@ -22,14 +22,14 @@
       },
       "thirdParties": {
         "title": "Fornitori di servizi",
-        "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio, pagamento e assistenza possono trattare dati limitati secondo accordi appropriati."
+        "body": "Fornitori di hosting, autenticazione, analisi, monitoraggio e assistenza possono trattare dati limitati secondo accordi appropriati."
       }
     }
   },
   "terms": {
     "eyebrow": "Termini",
     "title": "Termini",
-    "description": "Le condizioni per usare il supporto all'apprendimento, gli abbonamenti e l'accesso al servizio STOA.",
+    "description": "Le condizioni per usare il supporto all'apprendimento e l'accesso al servizio STOA.",
     "sections": {
       "learningSupport": {
         "title": "Supporto all'apprendimento",

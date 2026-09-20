@@ -22,14 +22,14 @@
       },
       "thirdParties": {
         "title": "Dienstleister",
-        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring-, Zahlungs- und Supportdienstleister können begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
+        "body": "Hosting-, Authentifizierungs-, Analyse-, Monitoring- und Supportdienstleister können begrenzte Daten im Rahmen geeigneter Vereinbarungen verarbeiten."
       }
     }
   },
   "terms": {
     "eyebrow": "Bedingungen",
     "title": "Nutzungsbedingungen",
-    "description": "Die Bedingungen für die Nutzung von STOA Lernunterstützung, Abonnements und Servicezugang.",
+    "description": "Die Bedingungen für die Nutzung von STOA Lernunterstützung und Servicezugang.",
     "sections": {
       "learningSupport": {
         "title": "Lernunterstützung",

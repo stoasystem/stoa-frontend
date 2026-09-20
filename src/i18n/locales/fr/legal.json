@@ -22,14 +22,14 @@
       },
       "thirdParties": {
         "title": "Prestataires",
-        "body": "Les prestataires d'hébergement, d'authentification, d'analyse, de supervision, de paiement et d'assistance peuvent traiter des données limitées dans le cadre d'accords appropriés."
+        "body": "Les prestataires d'hébergement, d'authentification, d'analyse, de supervision et d'assistance peuvent traiter des données limitées dans le cadre d'accords appropriés."
       }
     }
   },
   "terms": {
     "eyebrow": "Conditions",
     "title": "Conditions",
-    "description": "Les conditions d'utilisation du soutien d'apprentissage STOA, des abonnements et de l'accès au service.",
+    "description": "Les conditions d'utilisation du soutien d'apprentissage STOA et de l'accès au service.",
     "sections": {
       "learningSupport": {
         "title": "Soutien d'apprentissage",
