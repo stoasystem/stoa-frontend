@@ -8,6 +8,8 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
@@ -17,21 +19,8 @@ import { useTutorProfileQuery } from '@/hooks/tutor/useTutorProfileQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { TutorProfile } from '@/types/tutor'
 
-const accountStatusLabel: Record<string, string> = {
-  active: 'Active',
-  paused: 'Paused',
-  pending_review: 'Pending review',
-}
-
-const availabilityLabel: Record<string, string> = {
-  available: 'Available for students',
-  busy: 'Currently busy',
-  unavailable: 'Not accepting students',
-}
-
-const weekdayLabel = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-
 export function TutorProfilePage() {
+  const { t } = useTranslation('tutor')
   const profileQuery = useTutorProfileQuery()
   const profile = profileQuery.data
 
@@ -39,13 +28,13 @@ export function TutorProfilePage() {
     <DashboardLayout>
       <PageContainer className="space-y-7 p-0">
         <PageHeader
-          eyebrow="Teacher account"
-          title="Teacher Profile"
-          description="Your account details and the teaching coverage students are matched against."
+          eyebrow={t('profile.eyebrow')}
+          title={t('profile.title')}
+          description={t('profile.description')}
         />
         {profileQuery.isLoading && <PageSkeleton rows={4} />}
         {profileQuery.isError && (
-          <p className="text-sm text-destructive">Failed to load teacher profile.</p>
+          <p className="text-sm text-destructive">{t('profile.loadFailed')}</p>
         )}
         {profile && (
           <section className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -60,73 +49,85 @@ export function TutorProfilePage() {
 }
 
 function IdentityCard({ profile }: { profile: TutorProfile }) {
+  const { t } = useTranslation('tutor')
+
   return (
     <Card className="border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--stoa-brand-burgundy-soft)_/_0.42)_100%)] shadow-[var(--platform-shadow-soft)]">
       <CardHeader>
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="brand-section-kicker">Teacher account</p>
+            <p className="brand-section-kicker">{t('profile.eyebrow')}</p>
             <CardTitle className="mt-2 text-3xl">{profile.name}</CardTitle>
           </div>
           <Badge variant="secondary">
-            {availabilityLabel[profile.availabilityStatus] ?? profile.availabilityStatus}
+            {t(`profile.availabilityStatus.${profile.availabilityStatus}`, {
+              defaultValue: profile.availabilityStatus,
+            })}
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
-        <ProfileDetail icon={Mail} label="Email" value={profile.email} />
-        <ProfileDetail icon={UserRound} label="Teacher ID" value={profile.userId} />
+        <ProfileDetail icon={Mail} label={t('profile.email')} value={profile.email} />
+        <ProfileDetail icon={UserRound} label={t('profile.teacherId')} value={profile.userId} />
       </CardContent>
     </Card>
   )
 }
 
 function StatusCard({ profile }: { profile: TutorProfile }) {
+  const { t, i18n } = useTranslation('tutor')
+
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
-        <CardTitle className="text-base">Account status</CardTitle>
-        <CardDescription>Operational state and latest profile update.</CardDescription>
+        <CardTitle className="text-base">{t('profile.statusTitle')}</CardTitle>
+        <CardDescription>{t('profile.statusDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
         <ProfileDetail
           icon={ShieldCheck}
-          label="Status"
-          value={accountStatusLabel[profile.accountStatus] ?? profile.accountStatus}
+          label={t('profile.statusLabel')}
+          value={t(`profile.accountStatus.${profile.accountStatus}`, {
+            defaultValue: profile.accountStatus,
+          })}
         />
         <ProfileDetail
           icon={Users}
-          label="Concurrent students"
+          label={t('profile.concurrentStudents')}
           value={
             profile.maxActiveSessions == null
-              ? 'Not set'
-              : `Up to ${profile.maxActiveSessions} at a time`
+              ? t('profile.concurrentNotSet')
+              : t('profile.concurrentValue', { count: profile.maxActiveSessions })
           }
         />
-        <ProfileDetail icon={CalendarDays} label="Last updated" value={formatDate(profile.updatedAt)} />
+        <ProfileDetail
+          icon={CalendarDays}
+          label={t('profile.lastUpdated')}
+          value={formatDate(profile.updatedAt, i18n.language, t)}
+        />
       </CardContent>
     </Card>
   )
 }
 
 function CoverageCard({ profile }: { profile: TutorProfile }) {
+  const { t, i18n } = useTranslation('tutor')
+
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)] lg:col-span-2">
       <CardHeader>
-        <CardTitle className="text-base">Teaching coverage</CardTitle>
-        <CardDescription>What students are routed to you for, and when.</CardDescription>
+        <CardTitle className="text-base">{t('profile.coverageTitle')}</CardTitle>
+        <CardDescription>{t('profile.coverageDescription')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
-            Subjects
+            {t('profile.subjects')}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
             {profile.subjects.length === 0 && (
-              <p className="text-sm text-muted-foreground">
-                No subjects set yet, so no students can be routed to you.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('profile.noSubjects')}</p>
             )}
             {profile.subjects.map((subject) => (
               <Badge className="max-w-full break-words" variant="outline" key={subject}>
@@ -138,19 +139,18 @@ function CoverageCard({ profile }: { profile: TutorProfile }) {
         <div className="rounded-md border border-border/70 bg-[hsl(var(--platform-surface-app))] p-3">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">
             <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
-            Weekly availability
+            {t('profile.weeklyAvailability')}
           </div>
           <div className="mt-3 space-y-2">
             {profile.weeklyAvailability.length === 0 && (
-              <p className="text-sm text-muted-foreground">No weekly hours set.</p>
+              <p className="text-sm text-muted-foreground">{t('profile.noWeeklyHours')}</p>
             )}
             {profile.weeklyAvailability.map((slot) => (
               <p
                 className="text-sm font-semibold text-foreground"
                 key={`${slot.dayOfWeek}-${slot.startTime}-${slot.endTime}`}
               >
-                {weekdayLabel[Number(slot.dayOfWeek)] ?? slot.dayOfWeek} · {slot.startTime}–
-                {slot.endTime}
+                {formatWeekday(slot.dayOfWeek, i18n.language)} · {slot.startTime}–{slot.endTime}
               </p>
             ))}
           </div>
@@ -182,12 +182,22 @@ function ProfileDetail({
   )
 }
 
-function formatDate(value?: string) {
-  if (!value) return 'Not provided'
+function formatDate(value: string | undefined, language: string, t: TFunction) {
+  if (!value) return t('profile.notProvided')
 
-  return new Intl.DateTimeFormat('en', {
+  return new Intl.DateTimeFormat(language, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   }).format(new Date(value))
+}
+
+// 2024-01-07 is a Sunday, so day 0 lands on it.
+function formatWeekday(dayOfWeek: number | string, language: string) {
+  const day = Number(dayOfWeek)
+  if (!Number.isInteger(day) || day < 0 || day > 6) return String(dayOfWeek)
+
+  return new Intl.DateTimeFormat(language, { weekday: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2024, 0, 7 + day)),
+  )
 }

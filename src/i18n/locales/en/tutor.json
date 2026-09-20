@@ -6,5 +6,61 @@
   "detailTitle": "Request detail",
   "markInProgress": "Start review",
   "markResolved": "Mark resolved",
-  "notes": "Teacher notes"
+  "notes": "Teacher notes",
+  "availability": {
+    "eyebrow": "Tutor operations",
+    "title": "Availability",
+    "description": "Set availability and subjects so support requests can be routed clearly."
+  },
+  "classroom": {
+    "kicker": "Online Classroom",
+    "title": "Live classroom queue",
+    "description": "Review scheduled classroom sessions and instant video requests with student context.",
+    "open": "Open Classroom Queue"
+  },
+  "detail": {
+    "title": "Help Request",
+    "description": "Review the student's context and record the tutor follow-up.",
+    "backLabel": "Requests",
+    "breadcrumbRoot": "Tutor",
+    "breadcrumbFallback": "Request detail",
+    "loadFailed": "Failed to load request.",
+    "resolutionNote": "Resolution note",
+    "resolutionNotePlaceholder": "Required before marking resolved.",
+    "updateFailed": "Failed to update status.",
+    "replyTitle": "Teacher reply",
+    "replyDescription": "Record the intervention, next step, or follow-up the student needs."
+  },
+  "profile": {
+    "eyebrow": "Teacher account",
+    "title": "Teacher Profile",
+    "description": "Your account details and the teaching coverage students are matched against.",
+    "loadFailed": "Failed to load teacher profile.",
+    "email": "Email",
+    "teacherId": "Teacher ID",
+    "statusTitle": "Account status",
+    "statusDescription": "Operational state and latest profile update.",
+    "statusLabel": "Status",
+    "concurrentStudents": "Concurrent students",
+    "concurrentNotSet": "Not set",
+    "concurrentValue": "Up to {{count}} at a time",
+    "lastUpdated": "Last updated",
+    "notProvided": "Not provided",
+    "coverageTitle": "Teaching coverage",
+    "coverageDescription": "What students are routed to you for, and when.",
+    "subjects": "Subjects",
+    "noSubjects": "No subjects set yet, so no students can be routed to you.",
+    "weeklyAvailability": "Weekly availability",
+    "noWeeklyHours": "No weekly hours set.",
+    "accountStatus": {
+      "active": "Active",
+      "paused": "Paused",
+      "pending_review": "Pending review"
+    },
+    "availabilityStatus": {
+      "available": "Available for students",
+      "busy": "Currently busy",
+      "unavailable": "Not accepting students"
+    }
+  }
 }

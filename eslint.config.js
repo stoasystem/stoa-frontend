@@ -5,7 +5,9 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ['dist', 'node_modules', 'backend'],
+    // '.claude' holds agent worktrees: whole copies of this repository, whose
+    // scripts lint as if they were ours and fail the gate on somebody else's file.
+    ignores: ['dist', 'node_modules', 'backend', '.claude'],
   },
   {
     files: [

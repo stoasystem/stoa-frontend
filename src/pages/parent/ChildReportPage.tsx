@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -67,10 +68,10 @@ export function ChildReportPage() {
         {reportState?.status === 'missing' && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">No weekly report yet</CardTitle>
+              <CardTitle className="text-lg">{t('report.noReportTitle')}</CardTitle>
             </CardHeader>
             <CardContent className="text-sm leading-6 text-muted-foreground">
-              {reportState.message ?? 'No weekly report is available yet.'}
+              {reportState.message ?? t('report.noReportBody')}
             </CardContent>
           </Card>
         )}
@@ -80,18 +81,18 @@ export function ChildReportPage() {
               <CardHeader>
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <CardTitle className="editorial-heading text-2xl">Weekly report</CardTitle>
+                    <CardTitle className="editorial-heading text-2xl">{t('weeklyReport')}</CardTitle>
                     <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                      {report.summary || reportState.message || 'Report details are being prepared.'}
+                      {report.summary || reportState.message || t('report.summaryFallback')}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant={reportState.status === 'failed' ? 'destructive' : reportState.status === 'pending' ? 'outline' : 'secondary'}>
-                      {formatReportStatus(report.reportStatus, reportState.status)}
+                      {formatReportStatus(report.reportStatus, reportState.status, t)}
                     </Badge>
                     {report.emailStatus && (
                       <Badge variant={report.emailStatus === 'failed' ? 'destructive' : 'outline'}>
-                        Email {formatEmailStatus(report.emailStatus)}
+                        {t('report.emailBadge', { status: formatEmailStatus(report.emailStatus, t) })}
                       </Badge>
                     )}
                   </div>
@@ -100,32 +101,32 @@ export function ChildReportPage() {
               <CardContent className="space-y-4">
                 <div className="grid gap-3 text-sm text-muted-foreground sm:grid-cols-3">
                   <div>
-                    <p className="font-medium text-foreground">Week</p>
+                    <p className="font-medium text-foreground">{t('report.week')}</p>
                     <p>{formatWeekRange(report.weekStart, report.weekEnd)}</p>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Generated</p>
-                    <p>{report.generatedAt ? formatDateTime(report.generatedAt) : 'Pending'}</p>
+                    <p className="font-medium text-foreground">{t('report.generated')}</p>
+                    <p>{report.generatedAt ? formatDateTime(report.generatedAt) : t('report.generatedPending')}</p>
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Report ID</p>
+                    <p className="font-medium text-foreground">{t('report.reportId')}</p>
                     <p className="break-all">{report.reportId}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             <div className="grid gap-4 md:grid-cols-3">
-              <ReportMetric label="Questions" value={String(report.stats?.questionsAsked ?? report.usageCount)} description="Asked this report week" />
-              <ReportMetric label="Practice" value={String(report.stats?.practiceLessonsCompleted ?? 0)} description="Completed practice lessons" />
-              <ReportMetric label="Teacher help" value={String(report.stats?.teacherHelpRequests ?? report.teacherResolved)} description="Support requests recorded" />
+              <ReportMetric label={t('report.questions')} value={String(report.stats?.questionsAsked ?? report.usageCount)} description={t('report.questionsDescription')} />
+              <ReportMetric label={t('report.practice')} value={String(report.stats?.practiceLessonsCompleted ?? 0)} description={t('report.practiceDescription')} />
+              <ReportMetric label={t('report.teacherHelp')} value={String(report.stats?.teacherHelpRequests ?? report.teacherResolved)} description={t('report.teacherHelpDescription')} />
             </div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Weak topics</CardTitle>
+                <CardTitle className="text-lg">{t('report.weakTopics')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {getWeakTopics(report).length === 0 && (
-                  <p className="text-sm text-muted-foreground">No weak topics were flagged.</p>
+                  <p className="text-sm text-muted-foreground">{t('report.noWeakTopics')}</p>
                 )}
                 {getWeakTopics(report).map((topic) => (
                   <div key={topic.topic} className="rounded-md border p-3">
@@ -137,11 +138,11 @@ export function ChildReportPage() {
             </Card>
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Recommendations</CardTitle>
+                <CardTitle className="text-lg">{t('report.recommendations')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {getRecommendations(report).length === 0 && (
-                  <p className="text-sm text-muted-foreground">No recommendations are available yet.</p>
+                  <p className="text-sm text-muted-foreground">{t('report.noRecommendations')}</p>
                 )}
                 {getRecommendations(report).map((recommendation) => (
                   <p key={recommendation} className="rounded-md border p-3 text-sm leading-6 text-muted-foreground">
@@ -153,7 +154,7 @@ export function ChildReportPage() {
             {((report.strengths ?? []).length > 0 || report.teacherNote || reportState.status === 'pending' || reportState.status === 'failed' || report.emailStatus === 'failed') && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Report notes</CardTitle>
+                  <CardTitle className="text-lg">{t('report.notesTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
                   {(report.strengths ?? []).map((strength) => (
@@ -161,13 +162,13 @@ export function ChildReportPage() {
                   ))}
                   {report.teacherNote && <p>{report.teacherNote}</p>}
                   {report.emailStatus === 'failed' && (
-                    <p>The report is available here, but the email delivery did not complete.</p>
+                    <p>{t('report.emailFailedNote')}</p>
                   )}
                   {reportState.status === 'pending' && (
-                    <p>{reportState.message || 'Weekly report generation is still in progress.'}</p>
+                    <p>{reportState.message || t('report.pendingNote')}</p>
                   )}
                   {reportState.status === 'failed' && (
-                    <p>{reportState.message || 'Report generation failed.'}</p>
+                    <p>{reportState.message || t('report.failedNote')}</p>
                   )}
                 </CardContent>
               </Card>
@@ -212,19 +213,23 @@ function formatWeekRange(start: string, end?: string | null) {
   return end ? `${formatDate(start)} - ${formatDate(end)}` : formatDate(start)
 }
 
-function formatReportStatus(status: string | null | undefined, stateStatus: string) {
-  if (stateStatus === 'failed') return 'Generation failed'
-  if (stateStatus === 'pending') return 'Generation pending'
-  if (status === 'email_failed') return 'Generated'
-  if (status === 'email_sent') return 'Generated'
-  if (status === 'generated') return 'Generated'
-  return 'Report available'
+function formatReportStatus(
+  status: string | null | undefined,
+  stateStatus: string,
+  t: TFunction,
+) {
+  if (stateStatus === 'failed') return t('report.status.failed')
+  if (stateStatus === 'pending') return t('report.status.pending')
+  if (status === 'email_failed') return t('report.status.generated')
+  if (status === 'email_sent') return t('report.status.generated')
+  if (status === 'generated') return t('report.status.generated')
+  return t('report.status.available')
 }
 
-function formatEmailStatus(status: string) {
-  if (status === 'sent') return 'sent'
-  if (status === 'failed') return 'failed'
-  if (status === 'pending') return 'pending'
+function formatEmailStatus(status: string, t: TFunction) {
+  if (status === 'sent') return t('report.emailStatus.sent')
+  if (status === 'failed') return t('report.emailStatus.failed')
+  if (status === 'pending') return t('report.emailStatus.pending')
   return status.replace(/_/g, ' ')
 }
 

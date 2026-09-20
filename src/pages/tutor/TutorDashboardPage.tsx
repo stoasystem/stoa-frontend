@@ -46,17 +46,17 @@ export function TutorDashboardPage() {
                     <Video className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="brand-section-kicker">Online Classroom</p>
-                    <CardTitle className="text-xl">Live classroom queue</CardTitle>
+                    <p className="brand-section-kicker">{t('classroom.kicker')}</p>
+                    <CardTitle className="text-xl">{t('classroom.title')}</CardTitle>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm leading-6 text-muted-foreground">
-                  Review scheduled classroom sessions and instant video requests with student context.
+                  {t('classroom.description')}
                 </p>
                 <Button asChild>
-                  <Link to="/tutor/classroom">Open Classroom Queue</Link>
+                  <Link to="/tutor/classroom">{t('classroom.open')}</Link>
                 </Button>
               </CardContent>
             </Card>

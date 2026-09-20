@@ -1,4 +1,5 @@
 import { AlertTriangle, CheckCircle2, ShieldAlert, UserRound } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -10,15 +11,16 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { AccountOperationsChild, AccountOperationsUsage, ParentAccountOperations } from '@/types/parentAccountOperations'
 
 export function ParentAccountOperationsPage() {
+  const { t } = useTranslation('parent')
   const query = useParentAccountOperationsQuery()
 
   return (
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
         <PageHeader
-          eyebrow="Account operations"
-          title="Family account status"
-          description="Review billing, child access, verification, and usage state without exposing private learning content."
+          eyebrow={t('accountOps.eyebrow')}
+          title={t('accountOps.title')}
+          description={t('accountOps.description')}
         />
 
         {query.isLoading && <LoadingPanel />}
@@ -30,6 +32,7 @@ export function ParentAccountOperationsPage() {
 }
 
 function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
+  const { t } = useTranslation('parent')
   const state = data.supportState.state
   const Icon = state === 'blocked' ? ShieldAlert : state === 'attention' ? AlertTriangle : CheckCircle2
   const issues = [...data.supportState.blockers, ...data.supportState.warnings]
@@ -41,16 +44,16 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
           <div className="flex items-start gap-3">
             <Icon className="mt-1 h-6 w-6 shrink-0" aria-hidden="true" />
             <div>
-              <p className="brand-section-kicker">Support state</p>
+              <p className="brand-section-kicker">{t('accountOps.supportState')}</p>
               <h2 className="mt-2 text-2xl font-semibold text-foreground">{formatStatus(state)}</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                {state === 'ready'
-                  ? 'The parent account is operational.'
-                  : 'Review these account items before relying on account operations status.'}
+                {state === 'ready' ? t('accountOps.ready') : t('accountOps.attention')}
               </p>
             </div>
           </div>
-          <Badge variant={state === 'ready' ? 'secondary' : 'outline'}>{issues.length} issue{issues.length === 1 ? '' : 's'}</Badge>
+          <Badge variant={state === 'ready' ? 'secondary' : 'outline'}>
+            {t('accountOps.issueCount', { count: issues.length })}
+          </Badge>
         </div>
         {issues.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
@@ -64,9 +67,25 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
       </section>
 
       <div className="grid gap-4 lg:grid-cols-3">
-        <AccountFactCard title="Parent verification" value={formatStatus(data.parent.verification?.emailVerificationStatus)} detail={data.parent.email} />
-        <AccountFactCard title="Billing" value={formatStatus(data.billing.status)} detail={`${formatStatus(data.billing.subscriptionTier)} plan`} />
-        <AccountFactCard title="Linked children" value={String(data.children.length)} detail={data.children.length === 0 ? 'No child account linked' : 'Child account access visible'} />
+        <AccountFactCard
+          title={t('accountOps.parentVerification')}
+          value={formatStatus(data.parent.verification?.emailVerificationStatus)}
+          detail={data.parent.email}
+        />
+        <AccountFactCard
+          title={t('accountOps.billing')}
+          value={formatStatus(data.billing.status)}
+          detail={t('accountOps.billingDetail', { tier: formatStatus(data.billing.subscriptionTier) })}
+        />
+        <AccountFactCard
+          title={t('accountOps.linkedChildren')}
+          value={String(data.children.length)}
+          detail={
+            data.children.length === 0
+              ? t('accountOps.noChildLinked')
+              : t('accountOps.childAccessVisible')
+          }
+        />
       </div>
 
       <VerificationRecoveryEvidence parent={data.parent} children={data.children} />
@@ -74,12 +93,12 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
       {data.children.length === 0 ? (
         <Card>
           <CardContent className="p-5 text-sm text-muted-foreground">
-            No child account is linked yet. Account operations will show usage and entitlement details after a child account is connected.
+            {t('accountOps.noChildLinkedYet')}
           </CardContent>
         </Card>
       ) : (
         <section className="space-y-3">
-          <h2 className="text-xl font-semibold text-foreground">Child account operations</h2>
+          <h2 className="text-xl font-semibold text-foreground">{t('accountOps.childOperations')}</h2>
           <div className="grid gap-3">
             {data.children.map((child) => (
               <ChildOperationsRow key={child.studentId} child={child} />
@@ -108,8 +127,11 @@ function AccountFactCard({ title, value, detail }: { title: string; value: strin
 }
 
 function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
+  const { t } = useTranslation('parent')
   const usage = child.usage
-  const usageLabel = usage ? `${usage.consumed}/${usage.limit} used` : 'Usage unavailable'
+  const usageLabel = usage
+    ? t('accountOps.usageUsed', { consumed: usage.consumed, limit: usage.limit })
+    : t('accountOps.usageUnavailable')
   return (
     <Card>
       <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(5,minmax(8rem,0.7fr))]">
@@ -122,11 +144,11 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
             <p className="truncate text-sm text-muted-foreground">{child.profile.email}</p>
           </div>
         </div>
-        <ChildMetric label="Binding" value={formatStatus(child.binding.status)} />
-        <ChildMetric label="Verification" value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
-        <ChildMetric label="Recovery" value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
-        <ChildMetric label="Plan" value={formatStatus(child.entitlement?.effectivePlan)} />
-        <ChildMetric label="Usage" value={usageLabel} muted={Boolean(usage?.unreconciled)} />
+        <ChildMetric label={t('accountOps.binding')} value={formatStatus(child.binding.status)} />
+        <ChildMetric label={t('accountOps.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
+        <ChildMetric label={t('accountOps.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
+        <ChildMetric label={t('accountOps.plan')} value={formatStatus(child.entitlement?.effectivePlan)} />
+        <ChildMetric label={t('accountOps.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>
     </Card>
   )
@@ -142,16 +164,18 @@ function ChildMetric({ label, value, muted }: { label: string; value: string; mu
 }
 
 function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
+  const { t } = useTranslation('parent')
+
   if (usage.length === 0) {
     return (
       <Card>
-        <CardContent className="p-5 text-sm text-muted-foreground">No usage summary is available yet.</CardContent>
+        <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOps.noUsage')}</CardContent>
       </Card>
     )
   }
   return (
     <section className="space-y-3">
-      <h2 className="text-xl font-semibold text-foreground">Usage summary</h2>
+      <h2 className="text-xl font-semibold text-foreground">{t('accountOps.usageSummary')}</h2>
       <div className="grid gap-3 md:grid-cols-2">
         {usage.map((item) => (
           <Card key={`${item.studentId}-${item.quotaPeriod}-${item.action}`}>
@@ -162,13 +186,19 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
                   <p className="mt-1 text-sm text-muted-foreground">{item.quotaPeriod}</p>
                 </div>
                 <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
-                  {item.unreconciled ? 'Reconciling' : 'Matched'}
+                  {item.unreconciled ? t('accountOps.reconciling') : t('accountOps.matched')}
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-semibold text-foreground">{item.remaining} remaining</p>
-              <p className="mt-1 text-sm text-muted-foreground">{item.consumed} of {item.limit} used</p>
+              <p className="mt-4 text-2xl font-semibold text-foreground">
+                {t('accountOps.remaining', { count: item.remaining })}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('accountOps.consumedOfLimit', { consumed: item.consumed, limit: item.limit })}
+              </p>
               {item.supportAction && (
-                <p className="mt-3 text-sm font-medium text-foreground">Support: {formatStatus(item.supportAction)}</p>
+                <p className="mt-3 text-sm font-medium text-foreground">
+                  {t('accountOps.support', { action: formatStatus(item.supportAction) })}
+                </p>
               )}
               {item.explanation && (
                 <p className="mt-1 text-sm text-muted-foreground">{item.explanation}</p>
@@ -194,10 +224,12 @@ function LoadingPanel() {
 }
 
 function ErrorPanel() {
+  const { t } = useTranslation('parent')
+
   return (
     <Card>
       <CardContent className="p-5 text-sm text-destructive" role="alert">
-        Account operations are unavailable. Please try again later.
+        {t('accountOps.loadFailed')}
       </CardContent>
     </Card>
   )

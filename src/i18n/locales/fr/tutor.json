@@ -6,5 +6,61 @@
   "detailTitle": "Détail de la demande",
   "markInProgress": "Commencer l’examen",
   "markResolved": "Marquer résolu",
-  "notes": "Notes de l’enseignant"
+  "notes": "Notes de l’enseignant",
+  "availability": {
+    "eyebrow": "Espace enseignant",
+    "title": "Disponibilité",
+    "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement."
+  },
+  "classroom": {
+    "kicker": "Online Classroom",
+    "title": "File classroom",
+    "description": "Examinez les sessions classroom planifiées et les demandes vidéo instantanées avec le contexte de l’élève.",
+    "open": "Ouvrir la file classroom"
+  },
+  "detail": {
+    "title": "Demande d’aide",
+    "description": "Examinez le contexte de l’élève et consignez le suivi enseignant.",
+    "backLabel": "Demandes",
+    "breadcrumbRoot": "Enseignant",
+    "breadcrumbFallback": "Détail de la demande",
+    "loadFailed": "Impossible de charger la demande.",
+    "resolutionNote": "Note de résolution",
+    "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
+    "updateFailed": "Impossible de mettre à jour le statut.",
+    "replyTitle": "Réponse de l’enseignant",
+    "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin."
+  },
+  "profile": {
+    "eyebrow": "Compte enseignant",
+    "title": "Profil enseignant",
+    "description": "Vos informations de compte et la couverture pédagogique selon laquelle les élèves vous sont attribués.",
+    "loadFailed": "Impossible de charger le profil enseignant.",
+    "email": "E-mail",
+    "teacherId": "Identifiant enseignant",
+    "statusTitle": "Statut du compte",
+    "statusDescription": "État opérationnel et dernière mise à jour du profil.",
+    "statusLabel": "Statut",
+    "concurrentStudents": "Élèves simultanés",
+    "concurrentNotSet": "Non défini",
+    "concurrentValue": "Jusqu’à {{count}} à la fois",
+    "lastUpdated": "Dernière mise à jour",
+    "notProvided": "Non renseigné",
+    "coverageTitle": "Couverture pédagogique",
+    "coverageDescription": "Pour quoi les élèves vous sont adressés, et quand.",
+    "subjects": "Matières",
+    "noSubjects": "Aucune matière définie pour l’instant, aucun élève ne peut donc vous être adressé.",
+    "weeklyAvailability": "Disponibilité hebdomadaire",
+    "noWeeklyHours": "Aucun horaire hebdomadaire défini.",
+    "accountStatus": {
+      "active": "Actif",
+      "paused": "En pause",
+      "pending_review": "Examen en attente"
+    },
+    "availabilityStatus": {
+      "available": "Disponible pour les élèves",
+      "busy": "Actuellement occupé",
+      "unavailable": "N’accepte pas d’élèves"
+    }
+  }
 }

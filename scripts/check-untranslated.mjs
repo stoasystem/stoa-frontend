@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 /**
- * Find sentences a student would read that were never translated.
+ * Find sentences a signed-in user would read that were never translated.
  *
  * The review screens shipped in English to a German-speaking country because
  * nothing was watching. This looks for English prose rendered directly in the
- * screens a signed-in student sees, rather than trusting a sweep by eye.
+ * screens a signed-in user sees, rather than trusting a sweep by eye.
+ *
+ * The tutor, parent and admin screens were outside ROOTS until card 002, so
+ * their hard-coded English was invisible to this check the whole time.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
@@ -22,6 +25,9 @@ const ROOTS = [
   'src/components/dashboard',
   'src/components/learning',
   'src/components/common',
+  'src/pages/tutor',
+  'src/pages/parent',
+  'src/pages/admin',
 ]
 
 // Anything a screen puts words into.
@@ -89,11 +95,11 @@ function readBaseline() {
 }
 
 if (findings.length === 0) {
-  console.log('every sentence in the student screens comes from a translation')
+  console.log('every sentence in the signed-in screens comes from a translation')
   process.exit(0)
 }
 
-console.log(`${findings.length} untranslated sentence(s) in the student screens (baseline ${BASELINE}):\n`)
+console.log(`${findings.length} untranslated sentence(s) in the signed-in screens (baseline ${BASELINE}):\n`)
 for (const { file, line, text } of findings) {
   console.log(`  ${file}:${line}\n    ${text}`)
 }

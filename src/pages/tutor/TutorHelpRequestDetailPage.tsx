@@ -6,7 +6,6 @@ import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
-import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { SectionHeader } from '@/components/common/SectionHeader'
 import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
 import { PracticeRequestContextCard } from '@/components/tutor/PracticeRequestContextCard'
@@ -28,9 +27,14 @@ import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
+const statusActionKey: Record<string, string> = {
+  in_progress: 'markInProgress',
+  resolved: 'markResolved',
+}
 
 export function TutorHelpRequestDetailPage() {
   const { t } = useTranslation('practice')
+  const { t: tTutor } = useTranslation('tutor')
   const { requestId } = useParams()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
@@ -51,20 +55,20 @@ export function TutorHelpRequestDetailPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <PageHeader
-          title="Help Request"
-          description="Review the student's context and record the tutor follow-up."
-          actions={<PageActions secondary={<BackButton label="Requests" to="/tutor" />} />}
+          title={tTutor('detail.title')}
+          description={tTutor('detail.description')}
+          actions={<PageActions secondary={<BackButton label={tTutor('detail.backLabel')} to="/tutor" />} />}
         />
         <Breadcrumbs
           className="mb-6"
           items={[
-            { label: 'Tutor', to: '/tutor' },
-            { label: 'Requests', to: '/tutor' },
-            { label: requestQuery.data?.student.name ?? 'Request detail' },
+            { label: tTutor('detail.breadcrumbRoot'), to: '/tutor' },
+            { label: tTutor('detail.backLabel'), to: '/tutor' },
+            { label: requestQuery.data?.student.name ?? tTutor('detail.breadcrumbFallback') },
           ]}
         />
         {requestQuery.isLoading && <TutorDashboardSkeleton showHeader={false} />}
-        {requestQuery.isError && <p className="text-sm text-destructive">Failed to load request.</p>}
+        {requestQuery.isError && <p className="text-sm text-destructive">{tTutor('detail.loadFailed')}</p>}
         {requestQuery.data && (
           <div className="space-y-6">
             {requestQuery.data.practiceContext && (
@@ -87,14 +91,14 @@ export function TutorHelpRequestDetailPage() {
             />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">
-                Resolution note
+                {tTutor('detail.resolutionNote')}
               </label>
               <textarea
                 id="resolution-note"
                 className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 value={resolutionNote}
                 onChange={(event) => setResolutionNote(event.target.value)}
-                placeholder="Required before marking resolved."
+                placeholder={tTutor('detail.resolutionNotePlaceholder')}
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -117,14 +121,14 @@ export function TutorHelpRequestDetailPage() {
                     })
                   }
                 >
-                  Mark <SafeStatusLabel kind="teacherHelp" value={status} />
+                  {tTutor(statusActionKey[status] ?? 'markResolved')}
                 </Button>
               ))}
             </div>
-            {updateStatus.isError && <p className="text-sm text-destructive">Failed to update status.</p>}
+            {updateStatus.isError && <p className="text-sm text-destructive">{tTutor('detail.updateFailed')}</p>}
             <SectionHeader
-              title="Teacher reply"
-              description="Record the intervention, next step, or follow-up the student needs."
+              title={tTutor('detail.replyTitle')}
+              description={tTutor('detail.replyDescription')}
             />
             <TeacherReplyComposer
               isSubmitting={addNote.isPending}

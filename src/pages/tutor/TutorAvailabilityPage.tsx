@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import { TutorAvailabilityEditor } from '@/components/tutor/TutorAvailabilityEditor'
 import { TutorAvailabilitySummary } from '@/components/tutor/TutorAvailabilitySummary'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -8,6 +9,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function TutorAvailabilityPage() {
+  const { t } = useTranslation('tutor')
   const availabilityQuery = useTutorAvailabilityQuery()
 
   useEffect(() => {
@@ -18,9 +20,9 @@ export function TutorAvailabilityPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <PageHeader
-          eyebrow="Tutor operations"
-          title="Availability"
-          description="Set availability and subjects so support requests can be routed clearly."
+          eyebrow={t('availability.eyebrow')}
+          title={t('availability.title')}
+          description={t('availability.description')}
         />
         {availabilityQuery.data && (
           <div className="grid gap-6 lg:grid-cols-[1fr_22rem]">

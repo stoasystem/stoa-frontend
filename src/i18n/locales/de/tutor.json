@@ -6,5 +6,61 @@
   "detailTitle": "Anfragedetails",
   "markInProgress": "Prüfung starten",
   "markResolved": "Als gelöst markieren",
-  "notes": "Notizen der Lehrperson"
+  "notes": "Notizen der Lehrperson",
+  "availability": {
+    "eyebrow": "Lehrpersonen-Bereich",
+    "title": "Verfügbarkeit",
+    "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können."
+  },
+  "classroom": {
+    "kicker": "Online Classroom",
+    "title": "Classroom-Warteschlange",
+    "description": "Prüfen Sie geplante Classroom-Sitzungen und spontane Videoanfragen mit dem Kontext der Lernenden.",
+    "open": "Classroom-Warteschlange öffnen"
+  },
+  "detail": {
+    "title": "Hilfeanfrage",
+    "description": "Prüfen Sie den Kontext der Lernenden und halten Sie die Nachbetreuung fest.",
+    "backLabel": "Anfragen",
+    "breadcrumbRoot": "Lehrperson",
+    "breadcrumbFallback": "Anfragedetails",
+    "loadFailed": "Anfrage konnte nicht geladen werden.",
+    "resolutionNote": "Abschlussnotiz",
+    "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
+    "updateFailed": "Status konnte nicht aktualisiert werden.",
+    "replyTitle": "Antwort der Lehrperson",
+    "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen."
+  },
+  "profile": {
+    "eyebrow": "Lehrpersonen-Konto",
+    "title": "Lehrpersonen-Profil",
+    "description": "Ihre Kontodaten und die Unterrichtsabdeckung, nach der Lernende zugeordnet werden.",
+    "loadFailed": "Lehrpersonen-Profil konnte nicht geladen werden.",
+    "email": "E-Mail",
+    "teacherId": "Lehrpersonen-ID",
+    "statusTitle": "Kontostatus",
+    "statusDescription": "Betriebszustand und letzte Profilaktualisierung.",
+    "statusLabel": "Status",
+    "concurrentStudents": "Gleichzeitige Lernende",
+    "concurrentNotSet": "Nicht festgelegt",
+    "concurrentValue": "Bis zu {{count}} gleichzeitig",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "notProvided": "Nicht angegeben",
+    "coverageTitle": "Unterrichtsabdeckung",
+    "coverageDescription": "Wofür Lernende zu Ihnen geleitet werden und wann.",
+    "subjects": "Fächer",
+    "noSubjects": "Noch keine Fächer festgelegt, daher können keine Lernenden zu Ihnen geleitet werden.",
+    "weeklyAvailability": "Wöchentliche Verfügbarkeit",
+    "noWeeklyHours": "Keine Wochenzeiten festgelegt.",
+    "accountStatus": {
+      "active": "Aktiv",
+      "paused": "Pausiert",
+      "pending_review": "Prüfung ausstehend"
+    },
+    "availabilityStatus": {
+      "available": "Verfügbar für Lernende",
+      "busy": "Zurzeit ausgelastet",
+      "unavailable": "Nimmt keine Lernenden an"
+    }
+  }
 }

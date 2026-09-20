@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { BarChart3, CalendarDays, FileText, UsersRound, type LucideIcon } from 'lucide-react'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -11,6 +12,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { ParentChild } from '@/types/parent'
 
 export function ParentReportsPage() {
+  const { t } = useTranslation('parent')
   const childrenQuery = useParentChildrenQuery()
   const children = childrenQuery.data?.items ?? []
 
@@ -18,43 +20,43 @@ export function ParentReportsPage() {
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
         <PageHeader
-          eyebrow="Parent reports"
-          title="Reports"
-          description="Choose a child report and review weekly progress, monthly trends, weak topics, and teacher-support activity."
+          eyebrow={t('reports.eyebrow')}
+          title={t('reports.title')}
+          description={t('reports.description')}
         />
 
         <section className="grid gap-4 md:grid-cols-3">
           <ReportMetricCard
             icon={UsersRound}
-            label="Children"
+            label={t('reports.children')}
             value={String(children.length)}
-            description="Linked student accounts"
+            description={t('reports.childrenDescription')}
           />
           <ReportMetricCard
             icon={FileText}
-            label="Weekly reports"
-            value="Ready"
-            description="Short progress and next-action view"
+            label={t('reports.weeklyReports')}
+            value={t('reports.weeklyReportsValue')}
+            description={t('reports.weeklyReportsDescription')}
           />
           <ReportMetricCard
             icon={BarChart3}
-            label="Monthly trends"
-            value="Available"
-            description="Broader subject and support patterns"
+            label={t('reports.monthlyTrends')}
+            value={t('reports.monthlyTrendsValue')}
+            description={t('reports.monthlyTrendsDescription')}
           />
         </section>
 
         <section className="space-y-4">
           <SectionHeader
-            title="Student reports"
-            description="Open the report that matches the time horizon you want to review."
+            title={t('reports.studentReports')}
+            description={t('reports.studentReportsDescription')}
           />
           {childrenQuery.isLoading && <PageSkeleton rows={3} />}
-          {childrenQuery.isError && <p className="text-sm text-destructive">Failed to load children.</p>}
+          {childrenQuery.isError && <p className="text-sm text-destructive">{t('loadChildrenFailed')}</p>}
           {childrenQuery.data && children.length === 0 && (
             <Card>
               <CardContent className="p-5 text-sm text-muted-foreground">
-                No linked student accounts are available yet.
+                {t('reports.noChildren')}
               </CardContent>
             </Card>
           )}
@@ -70,6 +72,8 @@ export function ParentReportsPage() {
 }
 
 function StudentReportCard({ child }: { child: ParentChild }) {
+  const { t } = useTranslation('parent')
+
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
       <CardHeader>
@@ -77,25 +81,25 @@ function StudentReportCard({ child }: { child: ParentChild }) {
           <div>
             <CardTitle className="text-xl">{child.name}</CardTitle>
             <CardDescription className="mt-2">
-              {child.grade ?? 'Grade not set'} · {child.subjects.join(', ') || 'No subjects set'}
+              {child.grade ?? t('reports.gradeNotSet')} · {child.subjects.join(', ') || t('reports.noSubjects')}
             </CardDescription>
           </div>
           <Button asChild size="sm" variant="outline">
-            <Link to={`/parent/children/${child.id}`}>Summary</Link>
+            <Link to={`/parent/children/${child.id}`}>{t('reports.summary')}</Link>
           </Button>
         </div>
       </CardHeader>
       <CardContent className="grid gap-3 sm:grid-cols-2">
         <ReportLinkCard
           icon={FileText}
-          title="Weekly report"
-          description="Recent questions, weak topics, teacher support, and the next parent action."
+          title={t('weeklyReport')}
+          description={t('reports.weeklyLinkDescription')}
           to={`/parent/children/${child.id}/report`}
         />
         <ReportLinkCard
           icon={CalendarDays}
-          title="Monthly report"
-          description="Subject trends, recurring weak points, and longer-term support patterns."
+          title={t('monthlyReport')}
+          description={t('reports.monthlyLinkDescription')}
           to={`/parent/children/${child.id}/monthly-report`}
         />
       </CardContent>

@@ -6,5 +6,61 @@
   "detailTitle": "Dettaglio richiesta",
   "markInProgress": "Inizia revisione",
   "markResolved": "Segna risolta",
-  "notes": "Note dell’insegnante"
+  "notes": "Note dell’insegnante",
+  "availability": {
+    "eyebrow": "Area insegnante",
+    "title": "Disponibilità",
+    "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza."
+  },
+  "classroom": {
+    "kicker": "Online Classroom",
+    "title": "Coda classroom",
+    "description": "Rivedi le sessioni classroom pianificate e le richieste video immediate con il contesto dello studente.",
+    "open": "Apri la coda classroom"
+  },
+  "detail": {
+    "title": "Richiesta di aiuto",
+    "description": "Rivedi il contesto dello studente e registra il follow-up dell’insegnante.",
+    "backLabel": "Richieste",
+    "breadcrumbRoot": "Insegnante",
+    "breadcrumbFallback": "Dettaglio richiesta",
+    "loadFailed": "Impossibile caricare la richiesta.",
+    "resolutionNote": "Nota di risoluzione",
+    "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
+    "updateFailed": "Impossibile aggiornare lo stato.",
+    "replyTitle": "Risposta dell’insegnante",
+    "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno."
+  },
+  "profile": {
+    "eyebrow": "Account insegnante",
+    "title": "Profilo insegnante",
+    "description": "I dati del tuo account e la copertura didattica in base alla quale ti vengono assegnati gli studenti.",
+    "loadFailed": "Impossibile caricare il profilo insegnante.",
+    "email": "Email",
+    "teacherId": "ID insegnante",
+    "statusTitle": "Stato account",
+    "statusDescription": "Stato operativo e ultimo aggiornamento del profilo.",
+    "statusLabel": "Stato",
+    "concurrentStudents": "Studenti in parallelo",
+    "concurrentNotSet": "Non impostato",
+    "concurrentValue": "Fino a {{count}} alla volta",
+    "lastUpdated": "Ultimo aggiornamento",
+    "notProvided": "Non indicato",
+    "coverageTitle": "Copertura didattica",
+    "coverageDescription": "Per cosa ti vengono indirizzati gli studenti e quando.",
+    "subjects": "Materie",
+    "noSubjects": "Nessuna materia impostata, quindi nessuno studente può esserti assegnato.",
+    "weeklyAvailability": "Disponibilità settimanale",
+    "noWeeklyHours": "Nessun orario settimanale impostato.",
+    "accountStatus": {
+      "active": "Attivo",
+      "paused": "In pausa",
+      "pending_review": "Revisione in attesa"
+    },
+    "availabilityStatus": {
+      "available": "Disponibile per gli studenti",
+      "busy": "Al momento occupato",
+      "unavailable": "Non accetta studenti"
+    }
+  }
 }

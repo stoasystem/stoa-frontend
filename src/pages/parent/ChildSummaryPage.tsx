@@ -14,6 +14,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function ChildSummaryPage() {
   const { t } = useTranslation('practice')
+  const { t: tParent } = useTranslation('parent')
   const { childId } = useParams()
   const summaryQuery = useChildLearningSummaryQuery(childId)
   const learningProfileQuery = useChildLearningProfileQuery(childId)
@@ -27,33 +28,33 @@ export function ChildSummaryPage() {
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Breadcrumbs
             items={[
-              { label: 'Parent', to: '/parent' },
-              { label: summary?.student.name ?? 'Child summary' },
+              { label: tParent('summary.breadcrumbRoot'), to: '/parent' },
+              { label: summary?.student.name ?? tParent('childSummary') },
             ]}
           />
-          <PageActions secondary={<BackButton label="Parent overview" to="/parent" />} />
+          <PageActions secondary={<BackButton label={tParent('summary.backLabel')} to="/parent" />} />
         </div>
-        {summaryQuery.isLoading && <p className="text-sm text-muted-foreground">Loading child summary...</p>}
-        {summaryQuery.isError && <p className="text-sm text-destructive">Failed to load child summary.</p>}
+        {summaryQuery.isLoading && <p className="text-sm text-muted-foreground">{tParent('summary.loading')}</p>}
+        {summaryQuery.isError && <p className="text-sm text-destructive">{tParent('summary.loadFailed')}</p>}
         {summary && (
           <>
             <ChildSummaryHeader summary={summary} />
             <div className="grid gap-4 md:grid-cols-3">
               {[
                 {
-                  label: 'Questions asked',
+                  label: tParent('summary.questionsAsked'),
                   value: String(summary.questionsAskedThisWeek),
-                  description: 'This week',
+                  description: tParent('summary.questionsAskedDescription'),
                 },
                 {
-                  label: 'AI resolved',
+                  label: tParent('summary.aiResolved'),
                   value: String(summary.aiResolvedThisWeek),
-                  description: 'Answered without teacher help',
+                  description: tParent('summary.aiResolvedDescription'),
                 },
                 {
-                  label: 'Practice completed',
+                  label: tParent('summary.practiceCompleted'),
                   value: String(summary.practiceLessonsCompletedThisWeek),
-                  description: 'Lessons this week',
+                  description: tParent('summary.practiceCompletedDescription'),
                 },
               ].map((stat) => (
                 <Card key={stat.label}>
@@ -66,8 +67,8 @@ export function ChildSummaryPage() {
               ))}
             </div>
             <LearningProfileSignals
-              title="Subject profile"
-              description="Parent-visible subject signals from questions, practice, and tutor escalation."
+              title={tParent('summary.subjectProfile')}
+              description={tParent('summary.subjectProfileDescription')}
               profile={learningProfileQuery.data}
               isLoading={learningProfileQuery.isLoading}
               isError={learningProfileQuery.isError}
@@ -84,11 +85,11 @@ export function ChildSummaryPage() {
             <div className="grid gap-4 lg:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Weak topics</CardTitle>
+                  <CardTitle className="text-lg">{tParent('summary.weakTopics')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {summary.weakTopics.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No weak topics were flagged yet.</p>
+                    <p className="text-sm text-muted-foreground">{tParent('summary.noWeakTopics')}</p>
                   )}
                   {summary.weakTopics.map((topic) => (
                     <p key={topic} className="text-sm">
@@ -99,11 +100,11 @@ export function ChildSummaryPage() {
               </Card>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Recent activity</CardTitle>
+                  <CardTitle className="text-lg">{tParent('summary.recentActivity')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {summary.recentActivity.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No recent activity is available yet.</p>
+                    <p className="text-sm text-muted-foreground">{tParent('summary.noRecentActivity')}</p>
                   )}
                   {summary.recentActivity.map((activity) => (
                     <div key={activity.id} className="rounded-md border p-3">
@@ -122,12 +123,12 @@ export function ChildSummaryPage() {
             </div>
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Teacher help</CardTitle>
+                <CardTitle className="text-lg">{tParent('summary.teacherHelp')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-2xl font-semibold">{summary.teacherHelpRequestsThisWeek}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Requests or escalations recorded this week.
+                  {tParent('summary.teacherHelpDescription')}
                 </p>
               </CardContent>
             </Card>
