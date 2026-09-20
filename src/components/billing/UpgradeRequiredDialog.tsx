@@ -1,16 +1,12 @@
-import { Link } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function UpgradeRequiredDialog({ children, reason }: { children: ReactNode; reason: string }) {
   return (
@@ -18,19 +14,13 @@ export function UpgradeRequiredDialog({ children, reason }: { children: ReactNod
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upgrade required</DialogTitle>
+          {/* Card 007: payments and billing are frozen. The dialog still
+              explains why the feature is closed; the "Compare plans" link and
+              its upgrade tracking event are withdrawn, because there is no
+              billing page left to send anyone to. */}
+          <DialogTitle>Not available on this account</DialogTitle>
           <DialogDescription>{reason}</DialogDescription>
         </DialogHeader>
-        <DialogFooter>
-          <Button
-            asChild
-            onClick={() => {
-              trackEvent('upgrade_prompt_clicked', { reason })
-            }}
-          >
-            <Link to="/billing">Compare plans</Link>
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

@@ -18,6 +18,8 @@ export type AccountRow = {
   email?: string
   role: UserRole
   accountStatus: AccountStatus
+  /** Derived server-side from the stored date of birth, which is never sent here. */
+  isMinor: boolean
   createdAt: string
   lastLoginAt: string
   linkedAccounts: AccountLink[]
@@ -95,12 +97,14 @@ export async function inviteAccount(input: {
   role: AccountRole
   email: string
   fullName?: string
+  dateOfBirth?: string
   locale?: string
 }) {
   const response = await httpClient.post<AccountInvitationResponse>('/admin/users/invitations', {
     role: input.role,
     email: input.email,
     fullName: input.fullName ?? '',
+    dateOfBirth: input.dateOfBirth || undefined,
     locale: input.locale,
   })
   return response.data
@@ -110,11 +114,13 @@ export async function assignAccount(input: {
   role: AccountRole
   email: string
   fullName?: string
+  dateOfBirth?: string
 }) {
   const response = await httpClient.post<AccountAssignmentResponse>('/admin/users', {
     role: input.role,
     email: input.email,
     fullName: input.fullName ?? '',
+    dateOfBirth: input.dateOfBirth || undefined,
   })
   return response.data
 }
@@ -189,10 +195,17 @@ export type InvitationClaimResponse = {
 }
 
 /** Public counterpart of the invitation command: unauthenticated and rate limited. */
-export async function claimInvitation(input: { token: string; password: string }) {
+export async function claimInvitation(input: {
+  token: string
+  password: string
+  dateOfBirth?: string
+}) {
   const response = await httpClient.post<InvitationClaimResponse>('/auth/invitations/claim', {
     token: input.token,
     password: input.password,
+    // Only sent when supplied: an invitation that already carries a date of
+    // birth keeps the one the administrator recorded.
+    dateOfBirth: input.dateOfBirth || undefined,
   })
   return response.data
 }

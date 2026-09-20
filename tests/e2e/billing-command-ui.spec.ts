@@ -1,3 +1,14 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk are no longer
+ * registered, so every expectation here describes a screen that cannot be
+ * reached. Skipped rather than deleted: when billing comes back this is the
+ * record of what it used to do, and a deleted file is a record nobody finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and reading each of
+ * these again — some describe screens that were already broken before the
+ * freeze.
+ */
 import { createHash } from 'node:crypto'
 import { expect, test, type Page, type Request } from '@playwright/test'
 
@@ -14,7 +25,7 @@ test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' })
 })
 
-test('repeat click and refresh retain one logical checkout key and reference', async ({ page }) => {
+test.skip('repeat click and refresh retain one logical checkout key and reference', async ({ page }) => {
   const creates: Request[] = []
 
   await page.route(/\/parents\/me\/subscription\/checkout$/, async (route) => {
@@ -63,7 +74,7 @@ test('repeat click and refresh retain one logical checkout key and reference', a
   expect(creates).toHaveLength(1)
 })
 
-test('client timeout retry reuses the same logical key', async ({ page }) => {
+test.skip('client timeout retry reuses the same logical key', async ({ page }) => {
   const keys: string[] = []
   let attempt = 0
 
@@ -103,7 +114,7 @@ test('client timeout retry reuses the same logical key', async ({ page }) => {
   })
 })
 
-test('free trial and invalid beneficiary counts cannot create checkout', async ({ page }) => {
+test.skip('free trial and invalid beneficiary counts cannot create checkout', async ({ page }) => {
   let createCount = 0
   await page.route(/\/parents\/me\/subscription\/checkout$/, async (route) => {
     createCount += 1
@@ -123,7 +134,7 @@ test('free trial and invalid beneficiary counts cannot create checkout', async (
   expect(createCount).toBe(0)
 })
 
-test('changed pending intent requires confirmation and supersedes only after confirm', async ({ page }) => {
+test.skip('changed pending intent requires confirmation and supersedes only after confirm', async ({ page }) => {
   await installStoredOperation(page, {
     idempotencyKey: 'original-logical-key',
     checkoutRef: 'checkout-ref-original',
@@ -183,7 +194,7 @@ test('changed pending intent requires confirmation and supersedes only after con
   })
 })
 
-test('backend failure cannot become demo, virtual, or static checkout success', async ({ page }) => {
+test.skip('backend failure cannot become demo, virtual, or static checkout success', async ({ page }) => {
   let createCount = 0
   await page.route(/\/parents\/me\/subscription\/checkout$/, async (route) => {
     createCount += 1

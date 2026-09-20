@@ -40,6 +40,9 @@ export function AdminAccountsPage() {
   const [newRole, setNewRole] = useState<AccountRole>('student')
   const [newEmail, setNewEmail] = useState('')
   const [newName, setNewName] = useState('')
+  // Card 008: a date, not an age. An age goes stale; the date lets the server
+  // recompute "is this a minor today" at every decision.
+  const [newDateOfBirth, setNewDateOfBirth] = useState('')
   const [reason, setReason] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
@@ -63,7 +66,12 @@ export function AdminAccountsPage() {
     setNotice(null)
     setSecret(null)
     inviteMutation.mutate(
-      { role: newRole, email: newEmail.trim(), fullName: newName.trim() },
+      {
+        role: newRole,
+        email: newEmail.trim(),
+        fullName: newName.trim(),
+        dateOfBirth: newDateOfBirth.trim(),
+      },
       {
         onSuccess: (result) => {
           setNotice(
@@ -98,7 +106,12 @@ export function AdminAccountsPage() {
     setNotice(null)
     setSecret(null)
     assignMutation.mutate(
-      { role: newRole, email: newEmail.trim(), fullName: newName.trim() },
+      {
+        role: newRole,
+        email: newEmail.trim(),
+        fullName: newName.trim(),
+        dateOfBirth: newDateOfBirth.trim(),
+      },
       {
         onSuccess: (result) => {
           setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
@@ -203,6 +216,17 @@ export function AdminAccountsPage() {
               {t('accounts.nameLabel')}
               <Input value={newName} onChange={(event) => setNewName(event.target.value)} />
             </label>
+            <div className="flex flex-col gap-1 text-sm">
+              <label className="flex flex-col gap-1">
+                {t('accounts.dateOfBirthLabel')}
+                <Input
+                  type="date"
+                  value={newDateOfBirth}
+                  onChange={(event) => setNewDateOfBirth(event.target.value)}
+                />
+              </label>
+              <span className="text-xs text-muted-foreground">{t('accounts.dateOfBirthHint')}</span>
+            </div>
             <Button type="button" onClick={invite} disabled={!newEmail.trim() || inviteMutation.isPending}>
               {t('accounts.invite')}
             </Button>
@@ -308,6 +332,7 @@ export function AdminAccountsPage() {
                       <th className="p-2">{t('accounts.columnEmail')}</th>
                       <th className="p-2">{t('accounts.columnRole')}</th>
                       <th className="p-2">{t('accounts.columnStatus')}</th>
+                      <th className="p-2">{t('accounts.columnMinor')}</th>
                       <th className="p-2">{t('accounts.columnCreatedAt')}</th>
                       <th className="p-2">{t('accounts.columnLastLogin')}</th>
                       <th className="p-2">{t('accounts.columnLinked')}</th>
@@ -322,6 +347,13 @@ export function AdminAccountsPage() {
                         <td className="p-2">{row.email || '—'}</td>
                         <td className="p-2">{t(`accounts.role.${row.role}`)}</td>
                         <td className="p-2">{t(`accounts.status.${row.accountStatus}`)}</td>
+                        <td className="p-2">
+                          {row.isMinor ? (
+                            <Badge variant="secondary">{t('accounts.minorYes')}</Badge>
+                          ) : (
+                            t('accounts.minorNo')
+                          )}
+                        </td>
                         <td className="p-2">{row.createdAt || '—'}</td>
                         <td className="p-2">{row.lastLoginAt || '—'}</td>
                         <td className="p-2">

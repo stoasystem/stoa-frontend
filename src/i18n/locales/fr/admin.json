@@ -15,6 +15,8 @@
     "statusLabel": "Statut",
     "emailLabel": "E-mail",
     "nameLabel": "Nom complet",
+    "dateOfBirthLabel": "Date de naissance",
+    "dateOfBirthHint": "Facultatif. Détermine si le compte est considéré comme mineur.",
     "keywordLabel": "Nom, e-mail ou numéro",
     "createdFromLabel": "Créé à partir du",
     "createdToLabel": "Créé jusqu'au",
@@ -44,10 +46,13 @@
     "columnEmail": "E-mail",
     "columnRole": "Rôle",
     "columnStatus": "Statut",
+    "columnMinor": "Mineur",
     "columnCreatedAt": "Créé le",
     "columnLastLogin": "Dernière connexion",
     "columnLinked": "Comptes liés",
     "columnActions": "Actions",
+    "minorYes": "Mineur",
+    "minorNo": "Majeur",
     "role": {
       "student": "Élèves",
       "teacher": "Enseignants",
@@ -72,7 +77,8 @@
       "account_last_active_admin": "C’est la seule administration encore active. Activez-en une autre avant de modifier ce compte.",
       "account_self_deactivation_forbidden": "Vous ne pouvez pas désactiver votre propre compte.",
       "account_state_invalid": "Ce compte n’est pas dans un état qui autorise cette modification.",
-      "invitation_not_reissuable": "Cette invitation a déjà été remplacée ou révoquée. Envoyez-en une nouvelle."
+      "invitation_not_reissuable": "Cette invitation a déjà été remplacée ou révoquée. Envoyez-en une nouvelle.",
+      "date_of_birth_invalid": "Cette date de naissance n'est pas une date passée valide. Indiquez le jour, le mois et l'année de naissance."
     }
   },
   "activation": {
@@ -80,6 +86,8 @@
     "title": "Activez votre compte",
     "body": "Cette invitation ouvre votre compte STOA. Choisissez un mot de passe, puis connectez-vous.",
     "confirmPassword": "Confirmer le mot de passe",
+    "dateOfBirth": "Date de naissance",
+    "dateOfBirthHint": "Facultatif. Laissez vide si votre école l'a déjà enregistrée.",
     "submit": "Activer le compte",
     "success": "Votre compte est actif. Connectez-vous pour commencer.",
     "signIn": "Se connecter",
@@ -91,7 +99,8 @@
       "invitation_expired": "Cette invitation a expiré. Demandez-en une nouvelle à l'administration.",
       "auth_request_rate_limited": "Trop de tentatives. Attendez quelques minutes avant de réessayer.",
       "account_exists": "Un compte existe déjà pour cet e-mail. Connectez-vous plutôt.",
-      "password_rejected": "Ce mot de passe a été refusé. Choisissez un mot de passe plus fort."
+      "password_rejected": "Ce mot de passe a été refusé. Choisissez un mot de passe plus fort.",
+      "date_of_birth_invalid": "Cette date de naissance n'est pas une date passée valide. Indiquez le jour, le mois et l'année de naissance."
     }
   }
 }

@@ -1,3 +1,14 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk are no longer
+ * registered, so every expectation here describes a screen that cannot be
+ * reached. Skipped rather than deleted: when billing comes back this is the
+ * record of what it used to do, and a deleted file is a record nobody finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and reading each of
+ * these again — some describe screens that were already broken before the
+ * freeze.
+ */
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { expect, test, type Page } from '@playwright/test'
@@ -18,7 +29,7 @@ test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' })
 })
 
-test('parent allowance renders exact server percentages, remaining values, and Zurich week', async ({ page }) => {
+test.skip('parent allowance renders exact server percentages, remaining values, and Zurich week', async ({ page }) => {
   await installSession(page, 'parent')
   await routeParentShell(page, billingOverview())
   await routeNotifications(page, [])
@@ -40,7 +51,7 @@ test('parent allowance renders exact server percentages, remaining values, and Z
   await expect(page.getByText(/learning messages|file uploads|daily/i)).toHaveCount(0)
 })
 
-test('parent and selected beneficiary student receive identical safe reminder copy', async ({ page }) => {
+test.skip('parent and selected beneficiary student receive identical safe reminder copy', async ({ page }) => {
   const reminder = paymentReminder()
 
   await installSession(page, 'parent')
@@ -68,7 +79,7 @@ test('parent and selected beneficiary student receive identical safe reminder co
   ).toHaveCount(0)
 })
 
-test('student outside the backend recipient projection sees no family reminder', async ({ page }) => {
+test.skip('student outside the backend recipient projection sees no family reminder', async ({ page }) => {
   await installSession(page, 'student', 'student-unselected')
   await routeNotifications(page, [])
 
@@ -77,7 +88,7 @@ test('student outside the backend recipient projection sees no family reminder',
   await expect(page.getByTestId('payment-method-reminder')).toHaveCount(0)
 })
 
-test('in-app-only and email failure remain explicit without changing billing state', async ({ page }) => {
+test.skip('in-app-only and email failure remain explicit without changing billing state', async ({ page }) => {
   await installSession(page, 'student', 'student-selected')
   await routeNotifications(page, [
     paymentReminderNotification(
@@ -105,7 +116,7 @@ test('in-app-only and email failure remain explicit without changing billing sta
   await expect(banner).toContainText('Active')
 })
 
-test('resolved reminder clears and a backend replacement becomes the only banner', async ({ page }) => {
+test.skip('resolved reminder clears and a backend replacement becomes the only banner', async ({ page }) => {
   await installSession(page, 'student', 'student-selected')
   await routeNotifications(page, [
     paymentReminderNotification(
@@ -129,7 +140,7 @@ test('resolved reminder clears and a backend replacement becomes the only banner
   await expect(banner).not.toContainText('ending in 4242')
 })
 
-test('reminder loading and failure states are non-blocking and explicit', async ({ page }) => {
+test.skip('reminder loading and failure states are non-blocking and explicit', async ({ page }) => {
   await installSession(page, 'student', 'student-selected')
   await page.route('**/notifications', async (route) => {
     await new Promise((resolve) => setTimeout(resolve, 250))
@@ -154,7 +165,7 @@ test('reminder loading and failure states are non-blocking and explicit', async 
   await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible()
 })
 
-test('masked reminder never exposes payment-capable values in browser surfaces', async ({ page }) => {
+test.skip('masked reminder never exposes payment-capable values in browser surfaces', async ({ page }) => {
   const browserLogs: string[] = []
   page.on('console', (message) => browserLogs.push(message.text()))
   await installSession(page, 'student', 'student-selected')
@@ -178,7 +189,7 @@ test('masked reminder never exposes payment-capable values in browser surfaces',
   expect(containsForbiddenCanary(browserLogs.join('\n'))).toBe(false)
 })
 
-test('source binds the authenticated layout to a closed server-driven reminder', () => {
+test.skip('source binds the authenticated layout to a closed server-driven reminder', () => {
   const layoutSource = readFileSync(
     new URL('../../src/layouts/DashboardLayout.tsx', import.meta.url),
     'utf8',

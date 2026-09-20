@@ -1,3 +1,16 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk — /billing,
+ * /billing/checkout/*, /admin/subscriptions, /pricing — are no longer
+ * registered, so every expectation here now describes a screen that cannot be
+ * reached. They are skipped rather than deleted: when billing comes back, this
+ * is the record of what it used to do, and a deleted file is a record nobody
+ * finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and then reading
+ * each of these again — some described screens that were already broken before
+ * the freeze (/pricing was never registered at all).
+ */
 import { createHash } from 'node:crypto'
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -27,7 +40,7 @@ const secretCanaries = {
   webhookSecret: 'whsec_phase476_preflight_secret_canary',
 }
 
-test('validates the configured sandbox before the acceptance project starts', async ({ browserName }, testInfo) => {
+test.skip('validates the configured sandbox before the acceptance project starts', async ({ browserName }, testInfo) => {
   expect(browserName).toBe('chromium')
   const result = spawnSync(process.execPath, [preflightScript], {
     cwd: frontendRoot,
@@ -46,7 +59,7 @@ test('validates the configured sandbox before the acceptance project starts', as
 })
 
 test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
-  test('accepts complete test-mode metadata and emits only digested coordinates', () => {
+  test.skip('accepts complete test-mode metadata and emits only digested coordinates', () => {
     const result = runPreflight()
 
     expect(result.status, result.stderr).toBe(0)
@@ -108,7 +121,7 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
     ['screenshot capture', { STOA_PLAYWRIGHT_SCREENSHOT: 'only-on-failure' }],
     ['missing provider access', { STOA_STRIPE_PROVIDER_ACCESS_VERIFIED: 'false' }],
   ] as const) {
-    test(`rejects ${name}`, () => {
+    test.skip(`rejects ${name}`, () => {
       const result = runPreflight(override)
 
       expect(result.status).not.toBe(0)
@@ -120,7 +133,7 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
   }
 
   for (const objectType of ['price', 'checkout.session', 'invoice', 'subscription', 'event'] as const) {
-    test(`rejects live ${objectType} evidence`, () => {
+    test.skip(`rejects live ${objectType} evidence`, () => {
       const metadata = sandboxMetadata()
       const target = metadata.objects.find((entry) => entry.type === objectType)
       if (!target) throw new Error(`missing fixture for ${objectType}`)
@@ -135,7 +148,7 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
     })
   }
 
-  test('rejects a missing configured test Price', () => {
+  test.skip('rejects a missing configured test Price', () => {
     const metadata = sandboxMetadata()
     metadata.objects = metadata.objects.filter(
       (entry) => entry.id !== secretCanaries.prices.teacher_supported,
@@ -147,7 +160,7 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
     expect(result.receiptExists).toBe(false)
   })
 
-  test('rejects a mismatched event destination version', () => {
+  test.skip('rejects a mismatched event destination version', () => {
     const metadata = sandboxMetadata()
     metadata.eventDestination.apiVersion = '2024-06-20'
 
@@ -157,9 +170,9 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
     expect(result.receiptExists).toBe(false)
   })
 
-  test('rejects acceptance source that intercepts or fulfills browser routes', () => {
+  test.skip('rejects acceptance source that intercepts or fulfills browser routes', () => {
     const result = runPreflight({}, sandboxMetadata(), `
-      test('forbidden mock', async ({ page }) => {
+      test.skip('forbidden mock', async ({ page }) => {
         await page.route('**/checkout', (route) => route.fulfill({ status: 200 }))
       })
     `)
@@ -168,7 +181,7 @@ test.describe('Phase 476 Stripe sandbox preflight negative controls', () => {
     expect(result.receiptExists).toBe(false)
   })
 
-  test('defines a separate fail-closed stripe-sandbox Playwright project', () => {
+  test.skip('defines a separate fail-closed stripe-sandbox Playwright project', () => {
     const source = readFileSync(playwrightConfig, 'utf8')
 
     expect(source).toContain("name: 'stripe-sandbox'")

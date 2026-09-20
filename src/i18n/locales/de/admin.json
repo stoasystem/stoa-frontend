@@ -15,6 +15,8 @@
     "statusLabel": "Status",
     "emailLabel": "E-Mail",
     "nameLabel": "Vollständiger Name",
+    "dateOfBirthLabel": "Geburtsdatum",
+    "dateOfBirthHint": "Optional. Bestimmt, ob das Konto als minderjährig gilt.",
     "keywordLabel": "Name, E-Mail oder Nummer",
     "createdFromLabel": "Erstellt ab",
     "createdToLabel": "Erstellt bis",
@@ -44,10 +46,13 @@
     "columnEmail": "E-Mail",
     "columnRole": "Rolle",
     "columnStatus": "Status",
+    "columnMinor": "Minderjährig",
     "columnCreatedAt": "Erstellt",
     "columnLastLogin": "Letzte Anmeldung",
     "columnLinked": "Verknüpfte Konten",
     "columnActions": "Aktionen",
+    "minorYes": "Minderjährig",
+    "minorNo": "Volljährig",
     "role": {
       "student": "Schülerinnen und Schüler",
       "teacher": "Lehrpersonen",
@@ -72,7 +77,8 @@
       "account_last_active_admin": "Dies ist die einzige noch aktive Administration. Aktivieren Sie zuerst eine weitere.",
       "account_self_deactivation_forbidden": "Sie können Ihr eigenes Konto nicht deaktivieren.",
       "account_state_invalid": "Dieses Konto befindet sich nicht in einem Zustand, der die Änderung zulässt.",
-      "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue."
+      "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue.",
+      "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben."
     }
   },
   "activation": {
@@ -80,6 +86,8 @@
     "title": "Konto freischalten",
     "body": "Diese Einladung eröffnet Ihr STOA-Konto. Wählen Sie ein Passwort und melden Sie sich anschliessend an.",
     "confirmPassword": "Passwort bestätigen",
+    "dateOfBirth": "Geburtsdatum",
+    "dateOfBirthHint": "Optional. Leer lassen, wenn Ihre Schule es bereits erfasst hat.",
     "submit": "Konto freischalten",
     "success": "Ihr Konto ist aktiv. Melden Sie sich an, um zu starten.",
     "signIn": "Anmelden",
@@ -91,7 +99,8 @@
       "invitation_expired": "Diese Einladung ist abgelaufen. Bitten Sie die Administration um eine neue.",
       "auth_request_rate_limited": "Zu viele Versuche. Warten Sie einige Minuten, bevor Sie es erneut versuchen.",
       "account_exists": "Für diese E-Mail besteht bereits ein Konto. Melden Sie sich stattdessen an.",
-      "password_rejected": "Dieses Passwort wurde abgelehnt. Wählen Sie ein stärkeres Passwort."
+      "password_rejected": "Dieses Passwort wurde abgelehnt. Wählen Sie ein stärkeres Passwort.",
+      "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben."
     }
   }
 }

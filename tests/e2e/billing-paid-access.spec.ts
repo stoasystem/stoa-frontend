@@ -1,3 +1,14 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk are no longer
+ * registered, so every expectation here describes a screen that cannot be
+ * reached. Skipped rather than deleted: when billing comes back this is the
+ * record of what it used to do, and a deleted file is a record nobody finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and reading each of
+ * these again — some describe screens that were already broken before the
+ * freeze.
+ */
 import { createHash } from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { readFileSync, writeFileSync } from 'node:fs'
@@ -9,7 +20,7 @@ type JsonObject = Record<string, unknown>
 const frontendRoot = resolve(new URL('../..', import.meta.url).pathname)
 const testCardNumber = '4242424242424242'
 
-test('phase476 real hosted checkout converges signed facts and role projections exactly once', async ({
+test.skip('phase476 real hosted checkout converges signed facts and role projections exactly once', async ({
   page,
 }, testInfo) => {
   expect(testInfo.project.name).toBe('stripe-sandbox')

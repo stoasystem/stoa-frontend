@@ -7,7 +7,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { AdminAccountsPage } from '@/pages/admin/AdminAccountsPage'
 import { ActivateAccountPage } from '@/pages/auth/ActivateAccountPage'
 import {
+  assignAccount,
   claimInvitation,
+  inviteAccount,
   listAccounts,
   reissueInvitation,
   resetAccountPassword,
@@ -47,6 +49,8 @@ const mockedList = vi.mocked(listAccounts)
 const mockedReset = vi.mocked(resetAccountPassword)
 const mockedReissue = vi.mocked(reissueInvitation)
 const mockedClaim = vi.mocked(claimInvitation)
+const mockedInvite = vi.mocked(inviteAccount)
+const mockedAssign = vi.mocked(assignAccount)
 
 function wrapper(initial: string) {
   return function Wrapper({ children }: { children: ReactNode }) {
@@ -73,6 +77,7 @@ const ACCOUNTS = {
       email: 'parent-a@stoa.test',
       role: 'parent' as const,
       accountStatus: 'active' as const,
+      isMinor: false,
       createdAt: '2026-03-01T09:00:00+00:00',
       lastLoginAt: '',
       linkedAccounts: [{ userId: 'student-b', accountNumber: 'S26-0001', status: 'active' }],
@@ -84,6 +89,7 @@ const ACCOUNTS = {
       email: 'student-b@stoa.test',
       role: 'student' as const,
       accountStatus: 'suspended' as const,
+      isMinor: true,
       createdAt: '2026-03-02T09:00:00+00:00',
       lastLoginAt: '2026-03-05T09:00:00+00:00',
       linkedAccounts: [{ userId: 'parent-a', accountNumber: 'P26-0001', status: 'active' }],
@@ -95,6 +101,7 @@ const ACCOUNTS = {
       email: 'teacher-c@stoa.test',
       role: 'teacher' as const,
       accountStatus: 'archived' as const,
+      isMinor: false,
       createdAt: '2026-03-03T09:00:00+00:00',
       lastLoginAt: '',
       linkedAccounts: [],
@@ -107,6 +114,8 @@ describe('admin accounts console', () => {
     mockedList.mockReset()
     mockedReset.mockReset()
     mockedReissue.mockReset()
+    mockedInvite.mockReset()
+    mockedAssign.mockReset()
     mockedList.mockResolvedValue(ACCOUNTS)
   })
 
@@ -164,6 +173,7 @@ describe('admin accounts console', () => {
       email: 'invited@stoa.test',
       role: 'student' as const,
       accountStatus: 'invited' as const,
+      isMinor: false,
       createdAt: '2026-03-04T09:00:00+00:00',
       lastLoginAt: '',
       linkedAccounts: [],
@@ -191,6 +201,54 @@ describe('admin accounts console', () => {
     expect(mockedReissue.mock.calls[0][0].invitationId).not.toBe(invited.userId)
   })
 
+  it('sends the date of birth with both ways of opening an account', async () => {
+    // Card 008: a date, not an age. Both openings have to carry it, or one of
+    // them quietly produces accounts the minor rule can only guess about.
+    mockedInvite.mockResolvedValue({
+      userId: 'student_new',
+      role: 'student',
+      accountNumber: 'S26-0011',
+      email: 'new@stoa.test',
+      accountStatus: 'invited',
+      invitationId: 'accountinvite_1',
+      activationToken: 'tok',
+      expiresAt: '2026-03-07T09:00:00+00:00',
+      invitationDelivered: true,
+    })
+    mockedAssign.mockResolvedValue({
+      userId: 'student_new2',
+      role: 'student',
+      accountNumber: 'S26-0012',
+      email: 'new@stoa.test',
+      accountStatus: 'active',
+      initialPassword: 'Initial12345678',
+    })
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.type(screen.getByLabelText('accounts.emailLabel'), 'new@stoa.test')
+    await userEvent.type(screen.getByLabelText('accounts.dateOfBirthLabel'), '2012-05-06')
+    await userEvent.click(screen.getByText('accounts.invite'))
+
+    await waitFor(() => expect(mockedInvite).toHaveBeenCalled())
+    expect(mockedInvite.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
+
+    await userEvent.click(screen.getByText('accounts.assign'))
+    await waitFor(() => expect(mockedAssign).toHaveBeenCalled())
+    expect(mockedAssign.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
+  })
+
+  it('marks the minor rows and leaves the adult rows unmarked', async () => {
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    expect(screen.getByText('Student B').closest('tr')?.textContent).toContain(
+      'accounts.minorYes',
+    )
+    expect(screen.getByText('Parent A').closest('tr')?.textContent).toContain('accounts.minorNo')
+    expect(screen.getAllByText('accounts.columnMinor').length).toBeGreaterThan(0)
+  })
+
   it('leaves the resend button unusable when the list carried no invitation id', async () => {
     const orphan = {
       userId: 'student_9c01',
@@ -199,6 +257,7 @@ describe('admin accounts console', () => {
       email: 'orphan@stoa.test',
       role: 'student' as const,
       accountStatus: 'invited' as const,
+      isMinor: false,
       createdAt: '2026-03-04T09:00:00+00:00',
       lastLoginAt: '',
       linkedAccounts: [],
@@ -236,8 +295,27 @@ describe('invitation activation page', () => {
     expect(mockedClaim.mock.calls[0][0]).toEqual({
       token: 'abcdef1234567890',
       password: 'Startpass1!',
+      dateOfBirth: '',
     })
     await waitFor(() => expect(screen.getByText('admin:activation.success')).toBeTruthy())
+  })
+
+  it('passes on a date of birth the invitee fills in', async () => {
+    mockedClaim.mockResolvedValue({
+      status: 'active',
+      userId: 'student-b',
+      role: 'student',
+      accountNumber: 'S26-0001',
+    })
+    render(<ActivateAccountPage />, { wrapper: wrapper('/activate?token=abcdef1234567890') })
+
+    await userEvent.type(screen.getByLabelText('auth:register.password'), 'Startpass1!')
+    await userEvent.type(screen.getByLabelText('admin:activation.confirmPassword'), 'Startpass1!')
+    await userEvent.type(screen.getByLabelText('admin:activation.dateOfBirth'), '2012-05-06')
+    await userEvent.click(screen.getByText('admin:activation.submit'))
+
+    await waitFor(() => expect(mockedClaim).toHaveBeenCalled())
+    expect(mockedClaim.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
   })
 
   it('refuses to submit without a token in the link', async () => {
@@ -301,6 +379,37 @@ describe('what the console says when a guard refuses', () => {
       for (const code of codes) {
         expect(translated[code]).not.toBe(english[code])
       }
+    }
+  })
+})
+
+describe('card 008 phrases exist in all four languages', () => {
+  it('names the date of birth and the minor marker everywhere', () => {
+    // The admin console is in check-untranslated's blind spot, so a label that
+    // only ever reads in English would go unnoticed.
+    const keys = [
+      ['accounts', 'dateOfBirthLabel'],
+      ['accounts', 'dateOfBirthHint'],
+      ['accounts', 'columnMinor'],
+      ['accounts', 'minorYes'],
+      ['accounts', 'minorNo'],
+      ['activation', 'dateOfBirth'],
+      ['activation', 'dateOfBirthHint'],
+    ] as const
+    for (const [section, key] of keys) {
+      for (const bundle of [enAdmin, deAdmin, frAdmin, itAdmin]) {
+        const value = (bundle as unknown as Record<string, Record<string, string>>)[
+          section
+        ][key]
+        expect(typeof value).toBe('string')
+        expect(value.length).toBeGreaterThan(0)
+      }
+    }
+    expect(enAdmin.activation.errors.date_of_birth_invalid).toBeTruthy()
+    for (const bundle of [deAdmin, frAdmin, itAdmin]) {
+      expect(Object.keys(bundle.activation.errors)).toEqual(
+        Object.keys(enAdmin.activation.errors),
+      )
     }
   })
 })

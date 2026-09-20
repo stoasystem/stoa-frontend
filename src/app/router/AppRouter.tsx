@@ -33,6 +33,19 @@ const AdminOperationsPlaceholderPage = lazy(() =>
     default: m.AdminOperationsPlaceholderPage,
   })),
 );
+/* Card 007: payments and billing are frozen.
+ *
+ * STOA is assignment-only, so nothing is sold and no page may show a price, a
+ * plan to buy or a billing entry. The page files under `src/pages/billing/`
+ * and the admin billing pages are deliberately kept -- only their route
+ * registrations are withdrawn here, so the pages are unreachable rather than
+ * deleted. The backend answers every paid route with 410 `billing_frozen`.
+ *
+ * To unfreeze: restore the lazy imports and the `<Route>` blocks below, put
+ * the navigation entries back in `routeConfig.ts`, and flip
+ * `BILLING_AND_SUBSCRIPTION_ENABLED` in `stoa-backend/src/stoa/routers/billing.py`.
+ */
+/*
 const AdminSubscriptionRequestsPage = lazy(() =>
   import("@/pages/admin/AdminSubscriptionRequestsPage").then((m) => ({
     default: m.AdminSubscriptionRequestsPage,
@@ -63,6 +76,7 @@ const VirtualCheckoutPage = lazy(() =>
     default: m.VirtualCheckoutPage,
   })),
 );
+*/
 const ClassroomLobbyPage = lazy(() =>
   import("@/features/live-classroom/pages/ClassroomLobbyPage").then((m) => ({
     default: m.ClassroomLobbyPage,
@@ -320,6 +334,9 @@ export function AppRouter() {
           <Route path="/assistant" element={<Navigate replace to="/chat" />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/settings/password" element={<ChangePasswordPage />} />
+            {/* Card 007: the paid surface is frozen; these pages stay in the
+                tree but are not routed. See the note above the lazy imports. */}
+            {/*
             <Route path="/billing" element={<BillingPage />} />
             <Route
               path="/billing/payment-settings"
@@ -333,6 +350,7 @@ export function AppRouter() {
               path="/billing/checkout/demo"
               element={<VirtualCheckoutPage />}
             />
+            */}
             <Route element={<RoleRoute allowedRoles={["student"]} />}>
               {/* The day now starts in the conversation, with the streak and
                   the unfinished lesson carried into it. */}
@@ -544,10 +562,13 @@ export function AppRouter() {
                 path="/admin/learning-automation"
                 element={<LearningAutomationConsolePage />}
               />
+              {/* Card 007: frozen. */}
+              {/*
               <Route
                 path="/admin/subscriptions"
                 element={<AdminSubscriptionRequestsPage />}
               />
+              */}
               <Route
                 path="/admin/curriculum"
                 element={<AdminCurriculumPage />}
@@ -561,6 +582,8 @@ export function AppRouter() {
                 element={<AdminTeacherApplicationsPage />}
               />
               <Route path="/admin/users" element={<AdminAccountsPage />} />
+              {/* Card 007: frozen. */}
+              {/*
               <Route
                 path="/admin/billing-interest"
                 element={
@@ -571,6 +594,7 @@ export function AppRouter() {
                 path="/admin/billing/checkout-recovery"
                 element={<AdminBillingCheckoutPage />}
               />
+              */}
               <Route
                 path="/admin/system"
                 element={

@@ -4,8 +4,10 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { ChildCard } from '@/components/parent/ChildCard'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
-import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
-import { ParentSubscriptionOperationsCard } from '@/components/parent/ParentSubscriptionOperationsCard'
+// Card 007: payments and billing are frozen; the upgrade prompt and the
+// subscription operations card are withdrawn. Both components are kept.
+// import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
+// import { ParentSubscriptionOperationsCard } from '@/components/parent/ParentSubscriptionOperationsCard'
 import { ParentAccountOperationsSummaryCard } from '@/components/parent/ParentAccountOperationsSummaryCard'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -22,12 +24,8 @@ export function ParentDashboardPage() {
           title={t('dashboardTitle')}
           description={t('dashboardDescription')}
         />
-        <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
-          <ParentValueCard />
-          <UpgradePromptCard source="parent_dashboard" />
-        </div>
+        <ParentValueCard />
         <ParentAccountOperationsSummaryCard />
-        <ParentSubscriptionOperationsCard />
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-destructive">{t('loadChildrenFailed')}</p>}
         {childrenQuery.data && children.length === 0 && (

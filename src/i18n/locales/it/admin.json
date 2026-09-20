@@ -15,6 +15,8 @@
     "statusLabel": "Stato",
     "emailLabel": "E-mail",
     "nameLabel": "Nome completo",
+    "dateOfBirthLabel": "Data di nascita",
+    "dateOfBirthHint": "Facoltativo. Determina se l’account è considerato minorenne.",
     "keywordLabel": "Nome, e-mail o numero",
     "createdFromLabel": "Creato dal",
     "createdToLabel": "Creato fino al",
@@ -44,10 +46,13 @@
     "columnEmail": "E-mail",
     "columnRole": "Ruolo",
     "columnStatus": "Stato",
+    "columnMinor": "Minorenne",
     "columnCreatedAt": "Creato",
     "columnLastLogin": "Ultimo accesso",
     "columnLinked": "Account collegati",
     "columnActions": "Azioni",
+    "minorYes": "Minorenne",
+    "minorNo": "Maggiorenne",
     "role": {
       "student": "Studenti",
       "teacher": "Insegnanti",
@@ -72,7 +77,8 @@
       "account_last_active_admin": "Questa è l'unica amministrazione ancora attiva. Attivane un'altra prima di modificare questo account.",
       "account_self_deactivation_forbidden": "Non puoi disattivare il tuo account.",
       "account_state_invalid": "Questo account non è in uno stato che consenta la modifica.",
-      "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo."
+      "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo.",
+      "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita."
     }
   },
   "activation": {
@@ -80,6 +86,8 @@
     "title": "Attiva il tuo account",
     "body": "Questo invito apre il tuo account STOA. Scegli una password e poi accedi.",
     "confirmPassword": "Conferma la password",
+    "dateOfBirth": "Data di nascita",
+    "dateOfBirthHint": "Facoltativo. Lascia vuoto se la tua scuola l’ha già registrata.",
     "submit": "Attiva l'account",
     "success": "Il tuo account è attivo. Accedi per iniziare.",
     "signIn": "Accedi",
@@ -91,7 +99,8 @@
       "invitation_expired": "Questo invito è scaduto. Chiedi all'amministrazione di inviarne uno nuovo.",
       "auth_request_rate_limited": "Troppi tentativi. Attendi qualche minuto prima di riprovare.",
       "account_exists": "Esiste già un account per questa e-mail. Accedi invece.",
-      "password_rejected": "Questa password è stata rifiutata. Scegline una più forte."
+      "password_rejected": "Questa password è stata rifiutata. Scegline una più forte.",
+      "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita."
     }
   }
 }

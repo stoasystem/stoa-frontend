@@ -8,7 +8,7 @@ import { PageActions } from '@/components/common/PageActions'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
-import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
+// Card 007 (frozen): import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -172,10 +172,7 @@ export function ChildReportPage() {
                 </CardContent>
               </Card>
             )}
-            <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
-              <ParentValueCard />
-              <UpgradePromptCard source="parent_report" />
-            </div>
+            <ParentValueCard />
           </div>
         )}
       </PageContainer>

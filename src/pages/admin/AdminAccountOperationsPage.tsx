@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { AlertTriangle, CheckCircle2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { describeIssueCode, formatStatus, supportStateTone } from '@/components/parent/accountOperationsView'
@@ -44,11 +44,13 @@ export function AdminAccountOperationsPage() {
   return (
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
+        {/* Card 007: payments and billing are frozen, so the subscription
+            queue is unrouted and its action link is withdrawn:
+            actions={<Button asChild variant="outline"><Link to="/admin/subscriptions">Subscription queue</Link></Button>} */}
         <PageHeader
           eyebrow="Account operations"
           title="Parent support console"
           description="Inspect verification, billing, child access, entitlement, and usage state for one parent account."
-          actions={<Button asChild variant="outline"><Link to="/admin/subscriptions">Subscription queue</Link></Button>}
         />
 
         <form onSubmit={submitLookup} className="grid gap-3 rounded-md border border-border/70 bg-card p-4 lg:grid-cols-[minmax(0,0.8fr)_12rem_minmax(0,1.2fr)_auto]">

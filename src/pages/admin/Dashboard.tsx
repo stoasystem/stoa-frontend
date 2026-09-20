@@ -54,11 +54,13 @@ export function AdminDashboardPage() {
             description="Review reported questions, assistant answers, and teacher replies."
             to="/admin/moderation"
           />
+          {/* Card 007 (frozen):
           <AdminOperationCard
             title="Billing interest"
             description="Review plan interest before real payment collection is enabled."
             to="/admin/billing-interest"
           />
+          */}
           <AdminOperationCard
             title="Account operations"
             description="Inspect one parent account across verification, billing, child access, entitlement, and usage state."

@@ -15,6 +15,8 @@
     "statusLabel": "Status",
     "emailLabel": "Email",
     "nameLabel": "Full name",
+    "dateOfBirthLabel": "Date of birth",
+    "dateOfBirthHint": "Optional. Determines whether the account counts as a minor.",
     "keywordLabel": "Name, email or number",
     "createdFromLabel": "Created from",
     "createdToLabel": "Created to",
@@ -44,10 +46,13 @@
     "columnEmail": "Email",
     "columnRole": "Role",
     "columnStatus": "Status",
+    "columnMinor": "Minor",
     "columnCreatedAt": "Created",
     "columnLastLogin": "Last sign-in",
     "columnLinked": "Linked accounts",
     "columnActions": "Actions",
+    "minorYes": "Minor",
+    "minorNo": "Adult",
     "role": {
       "student": "Students",
       "teacher": "Teachers",
@@ -72,7 +77,8 @@
       "account_last_active_admin": "This is the only administrator still active. Activate another one before changing this account.",
       "account_self_deactivation_forbidden": "You cannot deactivate your own account.",
       "account_state_invalid": "This account is not in a state that allows the change.",
-      "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one."
+      "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one.",
+      "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth."
     }
   },
   "activation": {
@@ -80,6 +86,8 @@
     "title": "Activate your account",
     "body": "This invitation opens your STOA account. Choose a password, then sign in.",
     "confirmPassword": "Confirm password",
+    "dateOfBirth": "Date of birth",
+    "dateOfBirthHint": "Optional. Leave empty if your school has already recorded it.",
     "submit": "Activate account",
     "success": "Your account is active. Sign in to get started.",
     "signIn": "Sign in",
@@ -91,7 +99,8 @@
       "invitation_expired": "This invitation has expired. Ask an administrator to send a new one.",
       "auth_request_rate_limited": "Too many attempts. Wait a few minutes before trying again.",
       "account_exists": "An account already exists for this email. Sign in instead.",
-      "password_rejected": "This password was rejected. Choose a stronger password."
+      "password_rejected": "This password was rejected. Choose a stronger password.",
+      "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth."
     }
   }
 }

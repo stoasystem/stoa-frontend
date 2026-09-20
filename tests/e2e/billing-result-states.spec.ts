@@ -1,3 +1,14 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk are no longer
+ * registered, so every expectation here describes a screen that cannot be
+ * reached. Skipped rather than deleted: when billing comes back this is the
+ * record of what it used to do, and a deleted file is a record nobody finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and reading each of
+ * these again — some describe screens that were already broken before the
+ * freeze.
+ */
 import { createHash } from 'node:crypto'
 import { expect, test, type Page, type Request } from '@playwright/test'
 
@@ -28,7 +39,7 @@ test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' })
 })
 
-test('begins with friendly confirming and renders active only from authoritative status', async ({ page }) => {
+test.skip('begins with friendly confirming and renders active only from authoritative status', async ({ page }) => {
   let createCalls = 0
   await page.route(/\/parents\/me\/subscription\/checkout$/, async (route) => {
     createCalls += 1
@@ -68,7 +79,7 @@ test('begins with friendly confirming and renders active only from authoritative
   expect(createCalls).toBe(0)
 })
 
-test('polls only while confirming and stops after a terminal not-completed outcome', async ({ page }) => {
+test.skip('polls only while confirming and stops after a terminal not-completed outcome', async ({ page }) => {
   let statusCalls = 0
   await routeCheckoutStatus(page, async (route) => {
     statusCalls += 1
@@ -93,7 +104,7 @@ test('polls only while confirming and stops after a terminal not-completed outco
   await expect(page.getByRole('link', { name: '返回账单' })).toBeVisible()
 })
 
-test('bounded confirming recovery rechecks only the same reference and never creates', async ({ page }) => {
+test.skip('bounded confirming recovery rechecks only the same reference and never creates', async ({ page }) => {
   const rechecks: Request[] = []
   let statusCalls = 0
   let createCalls = 0
@@ -144,7 +155,7 @@ for (const scenario of [
     liveCopy: '请联系 STOA 支持',
   },
 ]) {
-  test(`renders the authoritative ${scenario.outcome} terminal state accessibly`, async ({ page }) => {
+  test.skip(`renders the authoritative ${scenario.outcome} terminal state accessibly`, async ({ page }) => {
     await routeCheckoutStatus(page, async (route) => {
       await route.fulfill({
         contentType: 'application/json',
@@ -166,7 +177,7 @@ for (const scenario of [
   })
 }
 
-test('missing, foreign, failed, and unknown references fail closed without URL proof', async ({ page }) => {
+test.skip('missing, foreign, failed, and unknown references fail closed without URL proof', async ({ page }) => {
   await page.goto(`${webOrigin}/billing/checkout/result?plan=family&status=success`)
   await expect(page.getByRole('heading', { name: '需要帮助' })).toBeVisible()
   await expect(page.getByRole('heading', { name: '付款已确认' })).toHaveCount(0)

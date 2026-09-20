@@ -117,6 +117,10 @@ export const navItems: AppNavItem[] = [
     mobile: true,
     description: 'Open weekly and monthly child reports.',
   },
+  // Card 007: payments and billing are frozen; the parent billing entry is
+  // withdrawn from navigation. Kept here so the unfreeze is a revert, not a
+  // rewrite. See `stoa-backend/src/stoa/routers/billing.py`.
+  /*
   {
     label: 'Billing',
     path: '/billing',
@@ -127,6 +131,7 @@ export const navItems: AppNavItem[] = [
     mobile: true,
     description: 'Plan and billing state.',
   },
+  */
   {
     label: 'Requests',
     path: '/tutor',
@@ -214,6 +219,8 @@ export const navItems: AppNavItem[] = [
     icon: 'practice',
     description: 'Curriculum authoring, review, migration, and evidence console.',
   },
+  // Card 007: frozen.
+  /*
   {
     label: 'Subscriptions',
     path: '/admin/subscriptions',
@@ -223,6 +230,7 @@ export const navItems: AppNavItem[] = [
     icon: 'billing',
     description: 'Manual subscription request queue and tier application.',
   },
+  */
   {
     label: 'Teacher applications',
     path: '/admin/teacher-applications',
@@ -328,11 +336,11 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/terms', pageName: 'TermsPage', role: 'public', module: 'Legal', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Terms placeholder.' },
   { path: '/onboarding', pageName: 'OnboardingPage', role: 'shared', module: 'Onboarding', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Role onboarding guide.' },
   { path: '/support', pageName: 'SupportPage', role: 'shared', module: 'Support', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Support request entry.' },
-  { path: '/billing', pageName: 'BillingPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Billing and subscription overview.' },
-  { path: '/billing/payment-settings', pageName: 'PaymentSettingsPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Payment method, billing contact, invoice, and subscription settings.' },
-  { path: '/billing/checkout/demo', pageName: 'VirtualCheckoutPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Virtual checkout demo.' },
-  { path: '/billing/checkout/success', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout success result.' },
-  { path: '/billing/checkout/cancel', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout cancellation result.' },
+  // Card 007 (frozen): { path: '/billing', pageName: 'BillingPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'secondary', purpose: 'Billing and subscription overview.' },
+  // Card 007 (frozen): { path: '/billing/payment-settings', pageName: 'PaymentSettingsPage', role: 'shared', module: 'Billing', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Payment method, billing contact, invoice, and subscription settings.' },
+  // Card 007 (frozen): { path: '/billing/checkout/demo', pageName: 'VirtualCheckoutPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Virtual checkout demo.' },
+  // Card 007 (frozen): { path: '/billing/checkout/success', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout success result.' },
+  // Card 007 (frozen): { path: '/billing/checkout/cancel', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout cancellation result.' },
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student question explanation and teacher-help request flow.' },
   { path: '/classroom', pageName: 'StudentClassroomHomePage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student live classroom overview and scheduling entry.' },
@@ -374,11 +382,11 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/admin', pageName: 'AdminDashboardPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Admin operations overview.' },
   { path: '/admin/users', pageName: 'AdminAccountsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Account console: invite, assign, reset password, suspend and archive.' },
   { path: '/admin/curriculum', pageName: 'AdminCurriculumPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Curriculum editor, review, migration, and evidence console.' },
-  { path: '/admin/subscriptions', pageName: 'AdminSubscriptionRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Manual subscription request queue and tier application.' },
+  // Card 007 (frozen): { path: '/admin/subscriptions', pageName: 'AdminSubscriptionRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Manual subscription request queue and tier application.' },
   { path: '/admin/teacher-applications', pageName: 'AdminTeacherApplicationsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Teacher application review and invitation.' },
   { path: '/teacher-activate', pageName: 'TeacherActivatePage', role: 'public', module: 'Auth', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Teacher invitation claim and account activation.' },
   { path: '/activate', pageName: 'ActivateAccountPage', role: 'public', module: 'Auth', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Role-neutral invitation claim and account activation.' },
-  { path: '/admin/billing-interest', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'hidden', purpose: 'Future billing interest admin placeholder.' },
+  // Card 007 (frozen): { path: '/admin/billing-interest', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'hidden', purpose: 'Future billing interest admin placeholder.' },
   { path: '/admin/system', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'hidden', purpose: 'Future system status admin placeholder.' },
   { path: '/organization/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Organization-scoped learning profile.' },
   { path: '/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Advanced learning profile direct route.' },

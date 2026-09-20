@@ -16,6 +16,9 @@ export function ActivateAccountPage() {
   const token = (searchParams.get('token') || '').trim()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  // Only reaches the server when the invitation did not already carry one; an
+  // administrator's record always wins over a self-declared date.
+  const [dateOfBirth, setDateOfBirth] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
   const claimMutation = useClaimInvitationMutation()
 
@@ -34,7 +37,7 @@ export function ActivateAccountPage() {
       return
     }
     setFormError(null)
-    claimMutation.mutate({ token, password })
+    claimMutation.mutate({ token, password, dateOfBirth: dateOfBirth.trim() })
   }
 
   return (
@@ -87,6 +90,19 @@ export function ActivateAccountPage() {
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="activation-date-of-birth">{t('admin:activation.dateOfBirth')}</Label>
+              <Input
+                id="activation-date-of-birth"
+                type="date"
+                autoComplete="bday"
+                value={dateOfBirth}
+                onChange={(event) => setDateOfBirth(event.target.value)}
+              />
+              <p className="text-sm text-muted-foreground">
+                {t('admin:activation.dateOfBirthHint')}
+              </p>
             </div>
             <Button type="submit" disabled={claimMutation.isPending}>
               {claimMutation.isPending

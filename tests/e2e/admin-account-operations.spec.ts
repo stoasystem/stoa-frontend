@@ -62,7 +62,10 @@ test('admin account operations handles API error', async ({ page }) => {
   await expect(page.getByRole('alert')).toContainText(/admin account operations are unavailable/i)
 })
 
-test('admin can hand off from subscriptions to account operations', async ({ page }) => {
+// Frozen with the paid surface (card 007): /admin/subscriptions is no longer a
+// registered route, so this hand-off has no starting point. The rest of this
+// file still walks /admin/account-operations, which was not frozen.
+test.skip('admin can hand off from subscriptions to account operations', async ({ page }) => {
   await routeAdminSubscriptions(page)
   await routeAdminAccountOperations(page, readyAccountOperations())
 

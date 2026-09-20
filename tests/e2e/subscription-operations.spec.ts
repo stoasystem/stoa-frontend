@@ -1,3 +1,16 @@
+/**
+ * Frozen with the paid surface (card 007). The routes these walk — /billing,
+ * /billing/checkout/*, /admin/subscriptions, /pricing — are no longer
+ * registered, so every expectation here now describes a screen that cannot be
+ * reached. They are skipped rather than deleted: when billing comes back, this
+ * is the record of what it used to do, and a deleted file is a record nobody
+ * finds.
+ *
+ * Unfreezing means turning `BILLING_AND_SUBSCRIPTION_ENABLED` back on in the
+ * backend, restoring the route registrations in AppRouter, and then reading
+ * each of these again — some described screens that were already broken before
+ * the freeze (/pricing was never registered at all).
+ */
 import { expect, test, type Page } from '@playwright/test'
 import { loginAs } from './helpers'
 import type { SubscriptionBilling, SubscriptionRequest } from '../../src/types/subscriptionOperations'
@@ -33,7 +46,7 @@ const requestedUpgrade = subscriptionRequest('requested')
 const approvedUpgrade = subscriptionRequest('approved')
 const appliedUpgrade = subscriptionRequest('applied')
 
-test('parent can submit a manual subscription request', async ({ page }) => {
+test.skip('parent can submit a manual subscription request', async ({ page }) => {
   let submittedBody: Record<string, unknown> | null = null
   let checkoutBody: Record<string, unknown> | null = null
   await routeParentDashboard(page)
@@ -102,7 +115,7 @@ test('parent can submit a manual subscription request', async ({ page }) => {
   await expect(page.getByText(/request requested: premium/i)).toBeVisible()
 })
 
-test('admin can approve and apply a subscription request', async ({ page }) => {
+test.skip('admin can approve and apply a subscription request', async ({ page }) => {
   let patchBody: Record<string, unknown> | null = null
   let applyBody: Record<string, unknown> | null = null
   await routeAdminSubscriptionRequests(page, {
