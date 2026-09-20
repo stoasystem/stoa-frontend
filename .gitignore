@@ -21,3 +21,6 @@ demo-harness/logs/
 
 # 规划文件（本地归档，不进入代码库）
 .planning/
+
+# agent 工作树，不入库
+.claude/
