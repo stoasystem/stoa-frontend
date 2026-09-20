@@ -78,7 +78,42 @@
       "account_self_deactivation_forbidden": "Non puoi disattivare il tuo account.",
       "account_state_invalid": "Questo account non è in uno stato che consenta la modifica.",
       "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo.",
-      "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita."
+      "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita.",
+      "account_exists": "Questo indirizzo e-mail ha già un account {{role}}. Lo stesso indirizzo può avere un account per ruolo, ma non due con lo stesso ruolo."
+    },
+    "requiredTag": "obbligatorio",
+    "optionalTag": "facoltativo",
+    "requiredLegend": "I campi contrassegnati con * sono obbligatori.",
+    "emailHint": "Deve contenere una @ e restare sotto i 320 caratteri. Maiuscole e minuscole indicano lo stesso indirizzo.",
+    "nameHint": "Facoltativo. Al massimo 120 caratteri.",
+    "dateOfBirthStudentHint": "Facoltativa, ma determina se lo studente è considerato minorenne. Meglio lasciarla vuota che indovinarla.",
+    "blockedPrefix": "Non ancora inviabile:",
+    "createExplainer": "Due modi per aprire un account: inviare un invito, e la persona sceglie da sé la password, oppure assegnare direttamente, e compili tu tutto.",
+    "inviteExplainer": "Invia un link di registrazione. L’account resta invitato finché la persona non sceglie una password.",
+    "assignExplainer": "Apre il modulo di registrazione completo. L’account viene creato attivo e ricevi una password monouso da consegnare.",
+    "assignDialogTitle": "Assegna un account direttamente",
+    "assignDialogDescription": "Compila quello che la persona avrebbe compilato da sé. L’account viene creato attivo e la password iniziale viene mostrata una sola volta: la persona dovrà cambiarla al primo accesso.",
+    "assignDialogSubmit": "Crea l’account",
+    "cancel": "Annulla",
+    "fieldIssues": {
+      "role_required": "Scegli un ruolo: studente, insegnante, genitore o amministratore.",
+      "email_required": "Indica un indirizzo e-mail.",
+      "email_invalid": "Questo non è un indirizzo e-mail: deve contenere una @.",
+      "email_too_long": "Questo indirizzo e-mail supera i 320 caratteri.",
+      "name_too_long": "Il nome completo supera i 120 caratteri.",
+      "date_of_birth_invalid": "La data di nascita deve essere una data passata reale nel formato AAAA-MM-GG."
+    },
+    "roleFieldsHint": {
+      "student": "Studente: ruolo ed e-mail sono obbligatori. Il nome completo è facoltativo; la data di nascita è facoltativa ma determina se l’account è considerato minorenne.",
+      "teacher": "Insegnante: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi.",
+      "parent": "Genitore: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi.",
+      "admin": "Amministratore: ruolo ed e-mail sono obbligatori. Nome completo e data di nascita sono facoltativi."
+    },
+    "roleSingular": {
+      "student": "studente",
+      "teacher": "insegnante",
+      "parent": "genitore",
+      "admin": "amministratore"
     }
   },
   "activation": {

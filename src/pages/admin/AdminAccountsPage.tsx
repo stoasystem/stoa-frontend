@@ -16,6 +16,14 @@ import {
 } from '@/hooks/admin/useAdminAccounts'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
+import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
+import { AssignAccountDialog } from '@/pages/admin/AssignAccountDialog'
+import type { AccountDraft } from '@/pages/admin/accountFormRules'
+import {
+  accountDraftIssues,
+  accountDraftPayload,
+  blockingIssues,
+} from '@/pages/admin/accountFormRules'
 import { ApiError } from '@/services/api/httpClient'
 import type { AccountRole, AccountRow, AccountStatus } from '@/services/admin/accountsApi'
 
@@ -37,12 +45,16 @@ export function AdminAccountsPage() {
   const [keyword, setKeyword] = useState('')
   const [createdFrom, setCreatedFrom] = useState('')
   const [createdTo, setCreatedTo] = useState('')
-  const [newRole, setNewRole] = useState<AccountRole>('student')
-  const [newEmail, setNewEmail] = useState('')
-  const [newName, setNewName] = useState('')
   // Card 008: a date, not an age. An age goes stale; the date lets the server
   // recompute "is this a minor today" at every decision.
-  const [newDateOfBirth, setNewDateOfBirth] = useState('')
+  const [draft, setDraft] = useState<AccountDraft>({
+    role: 'student',
+    email: '',
+    fullName: '',
+    dateOfBirth: '',
+  })
+  const [touched, setTouched] = useState<Partial<Record<keyof AccountDraft, boolean>>>({})
+  const [assignOpen, setAssignOpen] = useState(false)
   const [reason, setReason] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
@@ -62,28 +74,32 @@ export function AdminAccountsPage() {
   const groups = accountsQuery.data?.groups ?? {}
   const grouped = ROLES.map((item) => ({ role: item, rows: rows.filter((row) => row.role === item) }))
 
+  // Card 014: the button that cannot be pressed has to name what is missing.
+  const inviteIssues = accountDraftIssues(draft)
+  const inviteBlocking = blockingIssues(draft)
+  const inviteReasons = inviteBlocking.map((issue) => t(`accounts.fieldIssues.${issue}`))
+  const inviteTooltip = inviteBlocking.length > 0 ? inviteReasons.join(' · ') : undefined
+
   function invite() {
+    if (inviteBlocking.length > 0) return
     setNotice(null)
     setSecret(null)
-    inviteMutation.mutate(
-      {
-        role: newRole,
-        email: newEmail.trim(),
-        fullName: newName.trim(),
-        dateOfBirth: newDateOfBirth.trim(),
+    inviteMutation.mutate(accountDraftPayload(draft), {
+      onSuccess: (result) => {
+        setNotice(
+          result.invitationDelivered
+            ? t('accounts.inviteSent', { accountNumber: result.accountNumber })
+            : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
+        )
+        if (!result.invitationDelivered) setSecret(result.activationToken)
       },
-      {
-        onSuccess: (result) => {
-          setNotice(
-            result.invitationDelivered
-              ? t('accounts.inviteSent', { accountNumber: result.accountNumber })
-              : t('accounts.inviteNotDelivered', { accountNumber: result.accountNumber }),
-          )
-          if (!result.invitationDelivered) setSecret(result.activationToken)
-        },
-        onError: (error) => setNotice(refusal(error, t('accounts.inviteFailed'))),
-      },
-    )
+      onError: (error) =>
+        setNotice(
+          refusal(error, t('accounts.inviteFailed'), {
+            role: t(`accounts.roleSingular.${draft.role}`),
+          }),
+        ),
+    })
   }
 
   /**
@@ -94,32 +110,33 @@ export function AdminAccountsPage() {
    * replaced. Without a phrase for the code every one of them reads as the same
    * generic failure, which tells the operator nothing about what to do next.
    */
-  function refusal(error: unknown, fallback: string) {
+  function refusal(error: unknown, fallback: string, params?: Record<string, string>) {
     const code = error instanceof ApiError ? error.code : undefined
     if (!code) return toUserFacingError(error, fallback)
     return t(`accounts.errors.${code}`, {
       defaultValue: toUserFacingError(error, fallback),
+      ...params,
     })
   }
 
-  function assign() {
+  function assign(filled: AccountDraft) {
+    if (blockingIssues(filled).length > 0) return
     setNotice(null)
     setSecret(null)
-    assignMutation.mutate(
-      {
-        role: newRole,
-        email: newEmail.trim(),
-        fullName: newName.trim(),
-        dateOfBirth: newDateOfBirth.trim(),
+    assignMutation.mutate(accountDraftPayload(filled), {
+      onSuccess: (result) => {
+        setAssignOpen(false)
+        setDraft(filled)
+        setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
+        setSecret(result.initialPassword)
       },
-      {
-        onSuccess: (result) => {
-          setNotice(t('accounts.assigned', { accountNumber: result.accountNumber }))
-          setSecret(result.initialPassword)
-        },
-        onError: (error) => setNotice(refusal(error, t('accounts.assignFailed'))),
-      },
-    )
+      onError: (error) =>
+        setNotice(
+          refusal(error, t('accounts.assignFailed'), {
+            role: t(`accounts.roleSingular.${filled.role}`),
+          }),
+        ),
+    })
   }
 
   function resend(row: AccountRow) {
@@ -193,53 +210,57 @@ export function AdminAccountsPage() {
           <CardHeader>
             <CardTitle>{t('accounts.createTitle')}</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-wrap items-end gap-3">
-            <label className="flex flex-col gap-1 text-sm">
-              {t('accounts.roleLabel')}
-              <select
-                className="h-9 rounded-md border px-2"
-                value={newRole}
-                onChange={(event) => setNewRole(event.target.value as AccountRole)}
-              >
-                {ROLES.map((item) => (
-                  <option key={item} value={item}>
-                    {t(`accounts.role.${item}`)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              {t('accounts.emailLabel')}
-              <Input value={newEmail} onChange={(event) => setNewEmail(event.target.value)} />
-            </label>
-            <label className="flex flex-col gap-1 text-sm">
-              {t('accounts.nameLabel')}
-              <Input value={newName} onChange={(event) => setNewName(event.target.value)} />
-            </label>
-            <div className="flex flex-col gap-1 text-sm">
-              <label className="flex flex-col gap-1">
-                {t('accounts.dateOfBirthLabel')}
-                <Input
-                  type="date"
-                  value={newDateOfBirth}
-                  onChange={(event) => setNewDateOfBirth(event.target.value)}
-                />
-              </label>
-              <span className="text-xs text-muted-foreground">{t('accounts.dateOfBirthHint')}</span>
+          <CardContent className="flex flex-wrap items-start gap-3">
+            <p className="w-full text-sm text-muted-foreground">{t('accounts.createExplainer')}</p>
+            <p className="w-full text-xs text-muted-foreground">{t('accounts.requiredLegend')}</p>
+
+            <AccountDraftFields
+              idPrefix="create"
+              draft={draft}
+              issues={inviteIssues}
+              touched={touched}
+              onChange={(patch) => setDraft((current) => ({ ...current, ...patch }))}
+              onTouch={(field) => setTouched((current) => ({ ...current, [field]: true }))}
+            />
+
+            <BlockedReason id="invite-blocked" reasons={inviteReasons} />
+
+            <div className="flex w-full flex-wrap items-center gap-3">
+              <span title={inviteTooltip}>
+                <Button
+                  type="button"
+                  onClick={invite}
+                  title={inviteTooltip}
+                  aria-describedby={inviteBlocking.length > 0 ? 'invite-blocked' : undefined}
+                  disabled={inviteBlocking.length > 0 || inviteMutation.isPending}
+                >
+                  {t('accounts.invite')}
+                </Button>
+              </span>
+              <span className="text-xs text-muted-foreground">{t('accounts.inviteExplainer')}</span>
             </div>
-            <Button type="button" onClick={invite} disabled={!newEmail.trim() || inviteMutation.isPending}>
-              {t('accounts.invite')}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={assign}
-              disabled={!newEmail.trim() || assignMutation.isPending}
-            >
-              {t('accounts.assign')}
-            </Button>
+
+            <div className="flex w-full flex-wrap items-center gap-3">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAssignOpen(true)}
+                disabled={assignMutation.isPending}
+              >
+                {t('accounts.assign')}
+              </Button>
+              <span className="text-xs text-muted-foreground">{t('accounts.assignExplainer')}</span>
+            </div>
           </CardContent>
         </Card>
+
+        <AssignAccountDialog
+          open={assignOpen}
+          initial={draft}
+          pending={assignMutation.isPending}
+          onOpenChange={setAssignOpen}
+          onSubmit={assign}
+        />
 
         <Card className="mb-4">
           <CardHeader>

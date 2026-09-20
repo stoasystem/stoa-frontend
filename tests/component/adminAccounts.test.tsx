@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
@@ -233,7 +233,11 @@ describe('admin accounts console', () => {
     await waitFor(() => expect(mockedInvite).toHaveBeenCalled())
     expect(mockedInvite.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
 
+    // Card 014: assigning directly now opens the registration form, seeded
+    // from what was already typed into the card.
     await userEvent.click(screen.getByText('accounts.assign'))
+    const dialog = await screen.findByRole('dialog')
+    await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))
     await waitFor(() => expect(mockedAssign).toHaveBeenCalled())
     expect(mockedAssign.mock.calls[0][0].dateOfBirth).toBe('2012-05-06')
   })
@@ -270,6 +274,148 @@ describe('admin accounts console', () => {
     expect(button?.hasAttribute('disabled')).toBe(true)
     await userEvent.click(screen.getByText('accounts.resendInvite'))
     expect(mockedReissue).not.toHaveBeenCalled()
+  })
+})
+
+describe('card 014: a dead button explains itself', () => {
+  beforeEach(() => {
+    mockedList.mockReset()
+    mockedAssign.mockReset()
+    mockedInvite.mockReset()
+    mockedList.mockResolvedValue(ACCOUNTS)
+  })
+
+  it('names the missing field instead of only greying the invitation out', async () => {
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    const button = screen.getByText('accounts.invite').closest('button')
+    expect(button?.hasAttribute('disabled')).toBe(true)
+    // The tooltip is the floor, not the ceiling: the same sentence stays on
+    // screen, because a disabled control swallows hover in most browsers.
+    expect(button?.getAttribute('title')).toContain('accounts.fieldIssues.email_required')
+    expect(screen.getAllByText(/accounts\.fieldIssues\.email_required/).length).toBeGreaterThan(0)
+  })
+
+  it('says an address without an @ is not an address, while it is being typed', async () => {
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.type(screen.getByLabelText('accounts.emailLabel'), 'no-at-sign')
+
+    expect(screen.getAllByText(/accounts\.fieldIssues\.email_invalid/).length).toBeGreaterThan(0)
+    expect(screen.getByText('accounts.invite').closest('button')?.hasAttribute('disabled')).toBe(
+      true,
+    )
+    expect(mockedInvite).not.toHaveBeenCalled()
+  })
+
+  it('refuses a date of birth that is not a past day', async () => {
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.type(screen.getByLabelText('accounts.emailLabel'), 'new@stoa.test')
+    await userEvent.type(screen.getByLabelText('accounts.dateOfBirthLabel'), '2999-01-01')
+
+    expect(
+      screen.getAllByText(/accounts\.fieldIssues\.date_of_birth_invalid/).length,
+    ).toBeGreaterThan(0)
+    const button = screen.getByText('accounts.invite').closest('button')
+    expect(button?.hasAttribute('disabled')).toBe(true)
+    expect(button?.getAttribute('title')).toContain('accounts.fieldIssues.date_of_birth_invalid')
+  })
+
+  it('opens a registration form for assigning directly and leaves an unknown birthday unsent', async () => {
+    mockedAssign.mockResolvedValue({
+      userId: 'teacher_new',
+      role: 'teacher',
+      accountNumber: 'T26-0022',
+      email: 'direct@stoa.test',
+      accountStatus: 'active',
+      initialPassword: 'Initial12345678',
+    })
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    // The card's own button is never dead: it opens the form rather than
+    // refusing to react.
+    expect(screen.getByText('accounts.assign').closest('button')?.hasAttribute('disabled')).toBe(
+      false,
+    )
+    await userEvent.click(screen.getByText('accounts.assign'))
+    const dialog = await screen.findByRole('dialog')
+
+    expect(within(dialog).getByText('accounts.roleFieldsHint.student')).toBeTruthy()
+    expect(within(dialog).getAllByText('accounts.requiredTag').length).toBeGreaterThan(0)
+    expect(within(dialog).getAllByText('accounts.optionalTag').length).toBeGreaterThan(0)
+
+    const submit = within(dialog).getByText('accounts.assignDialogSubmit').closest('button')
+    expect(submit?.hasAttribute('disabled')).toBe(true)
+    expect(submit?.getAttribute('title')).toContain('accounts.fieldIssues.email_required')
+
+    await userEvent.type(within(dialog).getByLabelText('accounts.emailLabel'), 'direct@stoa.test')
+    await userEvent.click(within(dialog).getByText('accounts.assignDialogSubmit'))
+
+    await waitFor(() => expect(mockedAssign).toHaveBeenCalled())
+    // An unknown date of birth has to stay unknown: an empty string would read
+    // as an answer the administrator never gave.
+    expect(mockedAssign.mock.calls[0][0].dateOfBirth).toBeUndefined()
+    expect(mockedAssign.mock.calls[0][0].email).toBe('direct@stoa.test')
+  })
+
+  it('carries a phrase for every field refusal in all four languages', () => {
+    const english: Record<string, string> = enAdmin.accounts.fieldIssues
+    const codes = Object.keys(english)
+    expect(codes.length).toBeGreaterThan(0)
+    for (const bundle of [deAdmin, frAdmin, itAdmin]) {
+      const translated: Record<string, string> = bundle.accounts.fieldIssues
+      expect(Object.keys(translated)).toEqual(codes)
+      for (const code of codes) {
+        expect(translated[code]).not.toBe(english[code])
+      }
+    }
+  })
+
+  it('carries the card 014 phrases in all four languages', () => {
+    // The admin console sits outside check-untranslated's roots, so nothing
+    // else would notice a sentence that only ever reads in English.
+    const keys = [
+      'requiredTag',
+      'optionalTag',
+      'requiredLegend',
+      'emailHint',
+      'nameHint',
+      'dateOfBirthStudentHint',
+      'blockedPrefix',
+      'createExplainer',
+      'inviteExplainer',
+      'assignExplainer',
+      'assignDialogTitle',
+      'assignDialogDescription',
+      'assignDialogSubmit',
+      'cancel',
+    ] as const
+    for (const key of keys) {
+      for (const bundle of [enAdmin, deAdmin, frAdmin, itAdmin]) {
+        const value = (bundle.accounts as unknown as Record<string, string>)[key]
+        expect(typeof value).toBe('string')
+        expect(value.length).toBeGreaterThan(0)
+      }
+    }
+    for (const bundle of [deAdmin, frAdmin, itAdmin]) {
+      expect(Object.keys(bundle.accounts.roleFieldsHint)).toEqual(
+        Object.keys(enAdmin.accounts.roleFieldsHint),
+      )
+      expect(Object.keys(bundle.accounts.roleSingular)).toEqual(
+        Object.keys(enAdmin.accounts.roleSingular),
+      )
+      expect(bundle.accounts.errors.account_exists).toBeTruthy()
+    }
+    // The duplicate is (email, role), not email: the phrase has to name the
+    // role or it teaches the operator the wrong rule.
+    for (const bundle of [enAdmin, deAdmin, frAdmin, itAdmin]) {
+      expect(bundle.accounts.errors.account_exists).toContain('{{role}}')
+    }
   })
 })
 

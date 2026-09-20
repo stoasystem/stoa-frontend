@@ -78,7 +78,42 @@
       "account_self_deactivation_forbidden": "You cannot deactivate your own account.",
       "account_state_invalid": "This account is not in a state that allows the change.",
       "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one.",
-      "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth."
+      "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth.",
+      "account_exists": "This email address already has a {{role}} account. The same address may hold one account per role, but not two of the same role."
+    },
+    "requiredTag": "required",
+    "optionalTag": "optional",
+    "requiredLegend": "Fields marked * are required.",
+    "emailHint": "Has to contain @ and stay under 320 characters. Upper and lower case count as the same address.",
+    "nameHint": "Optional. At most 120 characters.",
+    "dateOfBirthStudentHint": "Optional, but it decides whether the student counts as a minor. Leave it empty rather than guessing.",
+    "blockedPrefix": "Not ready to send:",
+    "createExplainer": "Two ways to open an account: send an invitation and the person sets their own password, or assign directly and you fill everything in yourself.",
+    "inviteExplainer": "Sends a registration link. The account stays invited until the person sets a password.",
+    "assignExplainer": "Opens the full registration form. The account is created active and you receive a one-time password to pass on.",
+    "assignDialogTitle": "Assign an account directly",
+    "assignDialogDescription": "Fill in what the person would have filled in themselves. The account is created active, and the initial password is shown once and never again: the person has to change it at the first sign-in.",
+    "assignDialogSubmit": "Create the account",
+    "cancel": "Cancel",
+    "fieldIssues": {
+      "role_required": "Choose a role: student, teacher, parent or administrator.",
+      "email_required": "Enter an email address.",
+      "email_invalid": "This is not an email address: it has to contain @.",
+      "email_too_long": "This email address is longer than 320 characters.",
+      "name_too_long": "The full name is longer than 120 characters.",
+      "date_of_birth_invalid": "The date of birth has to be a real past date in the form YYYY-MM-DD."
+    },
+    "roleFieldsHint": {
+      "student": "Student: role and email are required. Full name is optional; the date of birth is optional but decides whether the account counts as a minor.",
+      "teacher": "Teacher: role and email are required. Full name and date of birth are optional.",
+      "parent": "Parent: role and email are required. Full name and date of birth are optional.",
+      "admin": "Administrator: role and email are required. Full name and date of birth are optional."
+    },
+    "roleSingular": {
+      "student": "student",
+      "teacher": "teacher",
+      "parent": "parent",
+      "admin": "administrator"
     }
   },
   "activation": {

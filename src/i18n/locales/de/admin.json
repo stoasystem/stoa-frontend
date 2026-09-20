@@ -78,7 +78,42 @@
       "account_self_deactivation_forbidden": "Sie können Ihr eigenes Konto nicht deaktivieren.",
       "account_state_invalid": "Dieses Konto befindet sich nicht in einem Zustand, der die Änderung zulässt.",
       "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue.",
-      "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben."
+      "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben.",
+      "account_exists": "Diese E-Mail-Adresse hat bereits ein Konto mit dieser Rolle ({{role}}). Dieselbe Adresse darf ein Konto pro Rolle haben, aber nicht zwei mit derselben Rolle."
+    },
+    "requiredTag": "Pflichtfeld",
+    "optionalTag": "optional",
+    "requiredLegend": "Mit * markierte Felder sind Pflichtfelder.",
+    "emailHint": "Muss ein @ enthalten und unter 320 Zeichen bleiben. Gross- und Kleinschreibung gelten als dieselbe Adresse.",
+    "nameHint": "Optional. Höchstens 120 Zeichen.",
+    "dateOfBirthStudentHint": "Optional, bestimmt aber, ob die Schülerin oder der Schüler als minderjährig gilt. Lieber leer lassen als raten.",
+    "blockedPrefix": "Noch nicht absendbar:",
+    "createExplainer": "Zwei Wege, ein Konto zu eröffnen: eine Einladung senden, dann wählt die Person ihr Passwort selbst, oder direkt zuweisen, dann füllen Sie alles selbst aus.",
+    "inviteExplainer": "Sendet einen Registrierungslink. Das Konto bleibt eingeladen, bis die Person ein Passwort setzt.",
+    "assignExplainer": "Öffnet das vollständige Registrierungsformular. Das Konto wird aktiv eröffnet und Sie erhalten ein einmaliges Passwort zur Weitergabe.",
+    "assignDialogTitle": "Konto direkt zuweisen",
+    "assignDialogDescription": "Füllen Sie aus, was die Person sonst selbst ausgefüllt hätte. Das Konto wird aktiv eröffnet, und das Startpasswort wird nur einmal angezeigt: die Person muss es bei der ersten Anmeldung ändern.",
+    "assignDialogSubmit": "Konto eröffnen",
+    "cancel": "Abbrechen",
+    "fieldIssues": {
+      "role_required": "Wählen Sie eine Rolle: Schüler/in, Lehrperson, Elternteil oder Administration.",
+      "email_required": "Geben Sie eine E-Mail-Adresse an.",
+      "email_invalid": "Das ist keine E-Mail-Adresse: sie muss ein @ enthalten.",
+      "email_too_long": "Diese E-Mail-Adresse ist länger als 320 Zeichen.",
+      "name_too_long": "Der vollständige Name ist länger als 120 Zeichen.",
+      "date_of_birth_invalid": "Das Geburtsdatum muss ein echtes Datum in der Vergangenheit im Format JJJJ-MM-TT sein."
+    },
+    "roleFieldsHint": {
+      "student": "Schüler/in: Rolle und E-Mail sind Pflicht. Der vollständige Name ist optional; das Geburtsdatum ist optional, bestimmt aber, ob das Konto als minderjährig gilt.",
+      "teacher": "Lehrperson: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional.",
+      "parent": "Elternteil: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional.",
+      "admin": "Administration: Rolle und E-Mail sind Pflicht. Vollständiger Name und Geburtsdatum sind optional."
+    },
+    "roleSingular": {
+      "student": "Schüler/in",
+      "teacher": "Lehrperson",
+      "parent": "Elternteil",
+      "admin": "Administration"
     }
   },
   "activation": {
