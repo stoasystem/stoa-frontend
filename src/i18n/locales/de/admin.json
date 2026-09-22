@@ -63,7 +63,8 @@
       "invited": "Eingeladen",
       "active": "Aktiv",
       "suspended": "Gesperrt",
-      "archived": "Archiviert"
+      "archived": "Archiviert",
+      "provisioning_failed": "Einrichtung fehlgeschlagen"
     },
     "moveTo": {
       "active": "Reaktivieren",
@@ -107,7 +108,8 @@
       "teacher": "Lehrperson",
       "parent": "Elternteil",
       "admin": "Administration"
-    }
+    },
+    "minorUnknown": "Nicht erfasst"
   },
   "activation": {
     "eyebrow": "Kontoeinladung",

@@ -20,6 +20,8 @@ export type AccountRow = {
   accountStatus: AccountStatus
   /** Derived server-side from the stored date of birth, which is never sent here. */
   isMinor: boolean
+  /** Whether a date of birth is on file at all; false means nobody ever said. */
+  minorKnown?: boolean
   createdAt: string
   lastLoginAt: string
   linkedAccounts: AccountLink[]

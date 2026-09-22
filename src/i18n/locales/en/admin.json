@@ -63,7 +63,8 @@
       "invited": "Invited",
       "active": "Active",
       "suspended": "Suspended",
-      "archived": "Archived"
+      "archived": "Archived",
+      "provisioning_failed": "Provisioning failed"
     },
     "moveTo": {
       "active": "Reactivate",
@@ -107,7 +108,8 @@
       "teacher": "teacher",
       "parent": "parent",
       "admin": "administrator"
-    }
+    },
+    "minorUnknown": "Not on file"
   },
   "activation": {
     "eyebrow": "Account invitation",

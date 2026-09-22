@@ -378,7 +378,15 @@ export function AdminAccountsPage() {
                         <td className="p-2">{t(`accounts.role.${row.role}`)}</td>
                         <td className="p-2">{t(`accounts.status.${row.accountStatus}`)}</td>
                         <td className="p-2">
-                          {row.isMinor ? (
+                          {row.minorKnown === false ? (
+                            // `isMinor` answers "minor" when no birthday is on
+                            // file, which is right for a protection decision and
+                            // wrong as a statement about the person. Without one
+                            // the console says so instead of picking a side.
+                            <span className="text-muted-foreground">
+                              {t('accounts.minorUnknown')}
+                            </span>
+                          ) : row.isMinor ? (
                             <Badge variant="secondary">{t('accounts.minorYes')}</Badge>
                           ) : (
                             t('accounts.minorNo')

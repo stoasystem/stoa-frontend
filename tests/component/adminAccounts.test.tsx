@@ -253,6 +253,34 @@ describe('admin accounts console', () => {
     expect(screen.getAllByText('accounts.columnMinor').length).toBeGreaterThan(0)
   })
 
+  it('says a birthday nobody supplied is unknown, not minor', async () => {
+    // `isMinor` is fail-closed, so every account with no date of birth answers
+    // "minor". Production has no birthdays at all, and the console was calling
+    // its own administrators minors. The judgement is still the safe one; what
+    // the column may not do is pass it off as something somebody told us.
+    const unknown = {
+      userId: 'admin_7f20',
+      accountNumber: 'A26-0002',
+      name: 'Admin Unknown',
+      email: 'admin.unknown@stoa.test',
+      role: 'admin' as const,
+      accountStatus: 'active' as const,
+      createdAt: '2026-09-01T00:00:00+00:00',
+      lastLoginAt: '',
+      linkedAccounts: [],
+      isMinor: true,
+      minorKnown: false,
+    }
+    mockedList.mockResolvedValue({ ...ACCOUNTS, items: [...ACCOUNTS.items, unknown] })
+
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Admin Unknown')).toBeTruthy())
+
+    const row = screen.getByText('Admin Unknown').closest('tr')?.textContent
+    expect(row).toContain('accounts.minorUnknown')
+    expect(row).not.toContain('accounts.minorYes')
+  })
+
   it('leaves the resend button unusable when the list carried no invitation id', async () => {
     const orphan = {
       userId: 'student_9c01',
@@ -537,6 +565,7 @@ describe('card 008 phrases exist in all four languages', () => {
       ['accounts', 'columnMinor'],
       ['accounts', 'minorYes'],
       ['accounts', 'minorNo'],
+      ['accounts', 'minorUnknown'],
       ['activation', 'dateOfBirth'],
       ['activation', 'dateOfBirthHint'],
     ] as const
