@@ -67,3 +67,4 @@ describe('card 007: the paid surface is not reachable from the app', () => {
     expect(paid).toEqual([])
   })
 })
+

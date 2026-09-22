@@ -21,7 +21,8 @@ export function ParentAccountOperationsSummaryCard() {
           <div>
             <CardTitle className="text-base">Account operations</CardTitle>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Billing, child access, verification, and usage status in one place.
+              {/* Card 007: billing is frozen and named nowhere a family can read. */}
+              Child access, verification, and usage status in one place.
             </p>
           </div>
           <Badge variant={state === 'ready' ? 'secondary' : 'outline'}>{formatStatus(state)}</Badge>

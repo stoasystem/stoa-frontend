@@ -119,7 +119,8 @@ export function StudentProfilePage() {
 
             <section className="grid gap-5 lg:grid-cols-2">
               <GuardianCard profile={profile} />
-              <BillingCard billing={billing} />
+              {/* Card 007: frozen. `BillingCard` below is kept, not deleted.
+                * To unfreeze: render it here again with `billing={billing}`. */}
             </section>
 
             <section className="space-y-4">
@@ -244,6 +245,10 @@ function ProfileIdentityCard({ profile }: { profile: StudentProfile }) {
 
 function AccountStatusCard({
   profile,
+  // Card 007: frozen. Kept so the card below still type-checks against the
+  // real snapshot shape; a frozen surface that stops compiling has rotted by
+  // the time anyone unfreezes it.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   billing,
 }: {
   profile: StudentProfile
@@ -263,11 +268,9 @@ function AccountStatusCard({
           label={t('profile.parentAccount')}
           value={t(`profile.guardianStatus.${profile.guardianStatus}`)}
         />
-        <ProfileDetail
-          icon={ShieldCheck}
-          label={t('profile.billingStatus')}
-          value={billing?.statusLabel ?? t('profile.notSet')}
-        />
+        {/* Card 007: frozen. To unfreeze, restore the billing status row:
+          * <ProfileDetail icon={ShieldCheck} label={t('profile.billingStatus')}
+          *   value={billing?.statusLabel ?? t('profile.notSet')} /> */}
         <ProfileDetail icon={CalendarDays} label={t('profile.lastUpdated')} value={formatDate(profile.updatedAt, t)} />
       </CardContent>
     </Card>
@@ -293,6 +296,10 @@ function GuardianCard({ profile }: { profile: StudentProfile }) {
   )
 }
 
+// Card 007: frozen, not deleted. Nothing renders this while payments are off.
+// To unfreeze: render it in the guardian section and restore the billing status
+// row in `AccountStatusCard`.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function BillingCard({ billing }: { billing?: ProfileBillingSnapshot }) {
   const { t } = useTranslation('practice')
   return (

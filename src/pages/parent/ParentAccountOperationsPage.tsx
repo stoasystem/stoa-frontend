@@ -72,11 +72,10 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
           value={formatStatus(data.parent.verification?.emailVerificationStatus)}
           detail={data.parent.email}
         />
-        <AccountFactCard
-          title={t('accountOps.billing')}
-          value={formatStatus(data.billing.status)}
-          detail={t('accountOps.billingDetail', { tier: formatStatus(data.billing.subscriptionTier) })}
-        />
+        {/* Card 007: frozen. To unfreeze, restore the billing fact card:
+          * <AccountFactCard title={t('accountOps.billing')}
+          *   value={formatStatus(data.billing.status)}
+          *   detail={t('accountOps.billingDetail', { tier: formatStatus(data.billing.subscriptionTier) })} /> */}
         <AccountFactCard
           title={t('accountOps.linkedChildren')}
           value={String(data.children.length)}
@@ -147,7 +146,9 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
         <ChildMetric label={t('accountOps.binding')} value={formatStatus(child.binding.status)} />
         <ChildMetric label={t('accountOps.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
         <ChildMetric label={t('accountOps.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
-        <ChildMetric label={t('accountOps.plan')} value={formatStatus(child.entitlement?.effectivePlan)} />
+        {/* Card 007: frozen. To unfreeze, restore the plan metric:
+          * <ChildMetric label={t('accountOps.plan')}
+          *   value={formatStatus(child.entitlement?.effectivePlan)} /> */}
         <ChildMetric label={t('accountOps.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>
     </Card>
