@@ -4,8 +4,39 @@ import {
 } from '@/lib/servedRelease'
 import { initializeRuntimeConfig } from '@/lib/runtimeConfig'
 
-export const STARTUP_FAILURE_MESSAGE =
-  '应用暂时无法启动，请刷新重试；问题持续请联系支持。'
+/**
+ * What a person sees when the application cannot start.
+ *
+ * This renders before i18next exists, so it cannot be a translation key - which
+ * is how it came to be one fixed string in a language this platform does not
+ * serve. A German family reading a Chinese sentence learns nothing from it. The
+ * language is picked from the browser here, the same four the platform serves,
+ * and English is the fallback.
+ *
+ * Every one of these says the same thing and nothing more: it did not start,
+ * reload, and if it keeps happening ask support. No address, no identifier, no
+ * word about what failed.
+ */
+const STARTUP_FAILURE_MESSAGES = {
+  de: 'Die Anwendung kann im Moment nicht starten. Bitte laden Sie die Seite neu; wenn es weiterhin nicht klappt, wenden Sie sich an den Support.',
+  en: 'The application cannot start right now. Please reload the page; if it keeps happening, contact support.',
+  fr: 'L’application ne peut pas démarrer pour le moment. Veuillez recharger la page ; si cela persiste, contactez le support.',
+  it: 'L’applicazione non riesce ad avviarsi al momento. Ricarica la pagina; se il problema persiste, contatta il supporto.',
+} as const
+
+export type StartupFailureLanguage = keyof typeof STARTUP_FAILURE_MESSAGES
+
+export function startupFailureMessage(language?: string): string {
+  const code = (language ?? browserLanguage()).slice(0, 2).toLowerCase()
+  return code in STARTUP_FAILURE_MESSAGES
+    ? STARTUP_FAILURE_MESSAGES[code as StartupFailureLanguage]
+    : STARTUP_FAILURE_MESSAGES.en
+}
+
+function browserLanguage(): string {
+  const candidate = (globalThis as { navigator?: { language?: unknown } }).navigator?.language
+  return typeof candidate === 'string' ? candidate : 'en'
+}
 
 const DEFAULT_STARTUP_TIMEOUT_MS = 10_000
 const MAX_STARTUP_TIMEOUT_MS = 30_000
@@ -112,9 +143,12 @@ export function startWebApplication(options: WebStartupOptions): Promise<boolean
   })
 }
 
-export function renderStartupFailure(target: StartupFailureTarget | null): void {
+export function renderStartupFailure(
+  target: StartupFailureTarget | null,
+  language?: string,
+): void {
   if (target === null) return
-  target.textContent = STARTUP_FAILURE_MESSAGE
+  target.textContent = startupFailureMessage(language)
   target.setAttribute('role', 'alert')
   target.setAttribute('aria-live', 'assertive')
 }

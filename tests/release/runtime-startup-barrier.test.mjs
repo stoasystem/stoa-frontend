@@ -260,18 +260,38 @@ test('a completed startup cannot be repeated or replace installed configuration'
 })
 
 test('failure renderer exposes only one fixed friendly actionable message', async () => {
+  // The message used to be one fixed sentence in Chinese, which this platform
+  // does not serve: a German family reading it learned nothing. It renders
+  // before i18next exists, so it cannot be a key - it is four sentences chosen
+  // by browser language instead. What must not change is what each of them
+  // says: no address, no identifier, and no word about what failed.
   const delegate = baseDelegate()
   const harness = await loadBootstrap(delegate)
-  const target = fakeFailureTarget()
   try {
-    harness.module.renderStartupFailure(target)
-    assert.equal(
-      target.textContent,
-      '应用暂时无法启动，请刷新重试；问题持续请联系支持。',
+    for (const language of ['de', 'en', 'fr', 'it']) {
+      const target = fakeFailureTarget()
+      harness.module.renderStartupFailure(target, language)
+      assert.equal(typeof target.textContent, 'string')
+      assert.ok(target.textContent.length > 20, `${language} message is too short to be useful`)
+      assert.equal(target.attributes.get('role'), 'alert')
+      assert.equal(target.attributes.get('aria-live'), 'assertive')
+      assert.doesNotMatch(target.textContent, /https?:|[0-9a-f]{32,}|error|digest|credential/i)
+    }
+
+    // Four distinct sentences, so a missing translation cannot pass as one.
+    const rendered = new Set(
+      ['de', 'en', 'fr', 'it'].map((language) => {
+        const target = fakeFailureTarget()
+        harness.module.renderStartupFailure(target, language)
+        return target.textContent
+      }),
     )
-    assert.equal(target.attributes.get('role'), 'alert')
-    assert.equal(target.attributes.get('aria-live'), 'assertive')
-    assert.doesNotMatch(target.textContent, /https?:|[0-9a-f]{32,}|error|digest|credential/i)
+    assert.equal(rendered.size, 4)
+
+    // A language the platform does not serve still gets a message.
+    const unknown = fakeFailureTarget()
+    harness.module.renderStartupFailure(unknown, 'ja')
+    assert.match(unknown.textContent, /cannot start/i)
   } finally {
     harness.cleanup()
   }

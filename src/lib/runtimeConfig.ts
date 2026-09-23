@@ -499,6 +499,55 @@ export function getRuntimeConfig(): Readonly<RuntimeConfig> {
   return registeredRuntimeConfig
 }
 
+/**
+ * The config a dev server runs on, assembled from its own environment.
+ *
+ * A served build proves which release it is by digest: the descriptor names the
+ * config, the config is checked against it, and only then does the application
+ * mount. A dev server has no release to prove, so it had no config either, and
+ * `npm run dev` ended at `runtime_config_uninitialized` - which is the command
+ * the repository's own instructions tell a developer to start with.
+ *
+ * Nothing verified reaches this: it is called only from the branch Vite removes
+ * from a build, it refuses to run if a config is already registered, and the
+ * environment it registers is `staging`, so nothing can read it as production.
+ */
+export function registerDevelopmentRuntimeConfig(
+  apiOrigin: string,
+  webOrigin: string,
+): Readonly<RuntimeConfig> {
+  if (registeredRuntimeConfig !== undefined) return registeredRuntimeConfig
+  const zeros = '0'.repeat(64)
+  registeredRuntimeConfig = Object.freeze({
+    schema: 'stoa.web.runtime-config.v1',
+    environment: 'staging',
+    release: {
+      releaseId: zeros,
+      manifestSha256: zeros,
+      frontendArtifactSha256: zeros,
+      backendArtifactSha256: zeros,
+    },
+    web: { origin: webOrigin },
+    api: { origin: apiOrigin },
+    auth: { mode: 'backend-api' },
+    realtime: { enabled: false, endpoint: null },
+    features: {
+      analytics: false,
+      errorMonitoring: false,
+      feedback: true,
+      parentReports: true,
+      // Frozen by card 007, and a dev server must not be the one place it is not.
+      payments: false,
+      publicRegistration: false,
+      realtimeNotifications: false,
+      referrals: false,
+      supportTickets: true,
+      teacherHelp: true,
+    },
+  } as const)
+  return registeredRuntimeConfig
+}
+
 export function resetRuntimeConfigForTests(): void {
   registeredRuntimeConfig = undefined
 }
