@@ -68,3 +68,58 @@ describe('card 007: the paid surface is not reachable from the app', () => {
   })
 })
 
+
+
+// Card 020: the online classroom is withdrawn for a different reason and needs
+// the same kind of guard. It has no backend: `liveClassroomService` answers
+// every call from an array in the browser tab, sessions vanish on reload, and
+// each one names a student "Anna Meier" and a tutor "Anna Keller". Nine routes
+// and a primary navigation entry were registered against it, so a signed-in
+// student could book a lesson that was never going to happen.
+//
+// The judge is the same shape as card 007's: not "those nine were removed",
+// which agrees with itself the moment somebody adds a tenth, but "no classroom
+// path is registered and no classroom entry is offered".
+
+const CLASSROOM_PATH = /(^|\/)classroom(\/|$)/i
+
+describe('card 020: the online classroom is not reachable while it has no backend', () => {
+  it('registers no classroom route', () => {
+    const live = registeredPaths(readFileSync(ROUTER_SOURCE, 'utf8')).filter((p) =>
+      CLASSROOM_PATH.test(p),
+    )
+
+    expect(live).toEqual([])
+  })
+
+  it('notices a classroom route that somebody registers again', () => {
+    // Negative control, so the check above cannot go quiet.
+    const poisoned = `${readFileSync(ROUTER_SOURCE, 'utf8')}
+      <Route path="/classroom" element={<StudentClassroomHomePage />} />`
+
+    expect(registeredPaths(poisoned).filter((p) => CLASSROOM_PATH.test(p))).toEqual([
+      '/classroom',
+    ])
+  })
+
+  it('keeps the pages, so this is a withdrawal and not a deletion', () => {
+    // Second negative control. If the files were gone, the two checks above
+    // would pass for a reason nobody chose, and unfreezing would mean rewriting
+    // the feature rather than restoring nine lines.
+    const source = readFileSync(ROUTER_SOURCE, 'utf8')
+
+    expect(source).toContain('live-classroom/pages/StudentClassroomHomePage')
+    expect(registeredPaths(source).filter((p) => CLASSROOM_PATH.test(p))).toEqual([])
+  })
+
+  it('offers no classroom entry in navigation or the page list', () => {
+    const offered = [
+      ...navItems.filter(
+        (item) => CLASSROOM_PATH.test(item.path) || /classroom/i.test(item.label),
+      ),
+      ...routeMetadata.filter((meta) => CLASSROOM_PATH.test(meta.path)),
+    ]
+
+    expect(offered).toEqual([])
+  })
+})
