@@ -77,6 +77,21 @@ const VirtualCheckoutPage = lazy(() =>
   })),
 );
 */
+/* Card 020: the online classroom has no backend, so it shows nobody anything real.
+ *
+ * `liveClassroomService` answers every call from an array in the browser tab:
+ * sessions vanish on reload, and every one of them names a student "Anna Meier"
+ * and a tutor "Anna Keller". There is no classroom route in the backend at all.
+ * Until then a signed-in student could open "Online Classroom" from the primary
+ * navigation and book a lesson that was never going to happen.
+ *
+ * The pages, the service and the mock data are all kept -- only the route
+ * registrations are withdrawn here, the same way card 007 withdrew the paid
+ * surface. To bring it back: restore the six lazy imports and the nine
+ * `<Route>` blocks below, restore the two entries in `routeConfig.ts`, and
+ * restore the tutor dashboard link -- after `liveClassroomService` calls a real
+ * API.
+ *
 const ClassroomLobbyPage = lazy(() =>
   import("@/features/live-classroom/pages/ClassroomLobbyPage").then((m) => ({
     default: m.ClassroomLobbyPage,
@@ -107,6 +122,7 @@ const TutorClassroomQueuePage = lazy(() =>
     (m) => ({ default: m.TutorClassroomQueuePage }),
   ),
 );
+*/
 const ForbiddenPage = lazy(() =>
   import("@/pages/error/ForbiddenPage").then((m) => ({
     default: m.ForbiddenPage,
@@ -363,23 +379,25 @@ export function AppRouter() {
                   </Suspense>
                 }
               />
-              <Route path="/classroom" element={<StudentClassroomHomePage />} />
-              <Route
-                path="/classroom/schedule"
-                element={<ScheduleClassroomPage />}
-              />
-              <Route
-                path="/classroom/sessions/:sessionId/lobby"
-                element={<ClassroomLobbyPage />}
-              />
-              <Route
-                path="/classroom/sessions/:sessionId/room"
-                element={<ClassroomRoomPage />}
-              />
-              <Route
-                path="/classroom/sessions/:sessionId/summary"
-                element={<ClassroomSummaryPage />}
-              />
+              {/* Card 020: withdrawn until the classroom has a backend.
+                <Route path="/classroom" element={<StudentClassroomHomePage />} />
+                <Route
+                  path="/classroom/schedule"
+                  element={<ScheduleClassroomPage />}
+                />
+                <Route
+                  path="/classroom/sessions/:sessionId/lobby"
+                  element={<ClassroomLobbyPage />}
+                />
+                <Route
+                  path="/classroom/sessions/:sessionId/room"
+                  element={<ClassroomRoomPage />}
+                />
+                <Route
+                  path="/classroom/sessions/:sessionId/summary"
+                  element={<ClassroomSummaryPage />}
+                />
+              */}
               {/* One place to practise. The old entries still resolve so
                   links and bookmarks keep working. */}
               <Route path="/learn" element={<LearnPage />} />
@@ -518,22 +536,24 @@ export function AppRouter() {
             </Route>
             <Route element={<RoleRoute allowedRoles={["teacher"]} />}>
               <Route path="/tutor" element={<TutorDashboardPage />} />
-              <Route
-                path="/tutor/classroom"
-                element={<TutorClassroomQueuePage />}
-              />
-              <Route
-                path="/tutor/classroom/sessions/:sessionId/lobby"
-                element={<ClassroomLobbyPage tutorMode />}
-              />
-              <Route
-                path="/tutor/classroom/sessions/:sessionId/room"
-                element={<ClassroomRoomPage tutorMode />}
-              />
-              <Route
-                path="/tutor/classroom/sessions/:sessionId/summary"
-                element={<ClassroomSummaryPage tutorMode />}
-              />
+              {/* Card 020: withdrawn until the classroom has a backend.
+                <Route
+                  path="/tutor/classroom"
+                  element={<TutorClassroomQueuePage />}
+                />
+                <Route
+                  path="/tutor/classroom/sessions/:sessionId/lobby"
+                  element={<ClassroomLobbyPage tutorMode />}
+                />
+                <Route
+                  path="/tutor/classroom/sessions/:sessionId/room"
+                  element={<ClassroomRoomPage tutorMode />}
+                />
+                <Route
+                  path="/tutor/classroom/sessions/:sessionId/summary"
+                  element={<ClassroomSummaryPage tutorMode />}
+                />
+              */}
               <Route
                 path="/tutor/availability"
                 element={<TutorAvailabilityPage />}

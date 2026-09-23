@@ -80,7 +80,8 @@
       "account_state_invalid": "Dieses Konto befindet sich nicht in einem Zustand, der die Änderung zulässt.",
       "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue.",
       "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben.",
-      "account_exists": "Diese E-Mail-Adresse hat bereits ein Konto mit dieser Rolle ({{role}}). Dieselbe Adresse darf ein Konto pro Rolle haben, aber nicht zwei mit derselben Rolle."
+      "account_exists": "Diese E-Mail-Adresse hat bereits ein Konto mit dieser Rolle ({{role}}). Dieselbe Adresse darf ein Konto pro Rolle haben, aber nicht zwei mit derselben Rolle.",
+      "action_not_allowed": "Ihnen fehlt die Berechtigung, Konten aufzulisten. Bitten Sie eine Administration um die Berechtigung zur Kontosuche."
     },
     "requiredTag": "Pflichtfeld",
     "optionalTag": "optional",

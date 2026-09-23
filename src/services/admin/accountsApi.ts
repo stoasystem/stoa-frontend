@@ -80,7 +80,10 @@ export type AccountStatusResponse = {
   previousStatus: AccountStatus
 }
 
-export async function listAccounts(filters: AccountListFilters = {}) {
+/** Requests behind one call to `listAccounts`, so a heavy table cannot hang it. */
+const MAX_ACCOUNT_PAGES = 20
+
+async function accountPage(filters: AccountListFilters, cursor?: string) {
   const response = await httpClient.get<AccountListResponse>('/admin/users', {
     params: {
       role: filters.role || undefined,
@@ -88,11 +91,43 @@ export async function listAccounts(filters: AccountListFilters = {}) {
       q: filters.q || undefined,
       created_from: filters.createdFrom || undefined,
       created_to: filters.createdTo || undefined,
-      cursor: filters.cursor || undefined,
+      cursor: cursor || filters.cursor || undefined,
       limit: filters.limit || undefined,
     },
   })
   return response.data
+}
+
+/**
+ * Every account, not the first page of them.
+ *
+ * The endpoint answers from a table scan, so a page is rows read rather than
+ * accounts found, and it hands back a continuation key whenever it stopped
+ * early. This console has no pagination: it groups whatever it is given and
+ * says how many are in each group. Reading one page and stopping meant the
+ * numbers were wrong and some accounts were simply absent - on a table where
+ * audit rows outnumber profiles, the administrator's own account was on page
+ * two and nowhere on screen.
+ */
+export async function listAccounts(filters: AccountListFilters = {}) {
+  const first = await accountPage(filters)
+  // An explicit cursor asks for one page and means it.
+  if (filters.cursor || !first.nextCursor) return first
+
+  const items = [...first.items]
+  const groups: Record<string, number> = { ...first.groups }
+  let cursor: string | null = first.nextCursor
+
+  for (let page = 1; page < MAX_ACCOUNT_PAGES && cursor; page += 1) {
+    const next: AccountListResponse = await accountPage(filters, cursor)
+    items.push(...next.items)
+    for (const [role, count] of Object.entries(next.groups)) {
+      groups[role] = (groups[role] ?? 0) + count
+    }
+    cursor = next.nextCursor
+  }
+
+  return { items, count: items.length, groups, nextCursor: cursor }
 }
 
 export async function inviteAccount(input: {

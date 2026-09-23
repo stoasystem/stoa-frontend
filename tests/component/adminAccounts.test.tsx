@@ -500,7 +500,58 @@ describe('invitation activation page', () => {
 })
 
 
+describe('a list that could not be read is not a list of nothing', () => {
+  beforeEach(() => {
+    mockedList.mockReset()
+    mockedReset.mockReset()
+    mockedReissue.mockReset()
+    mockedInvite.mockReset()
+    mockedAssign.mockReset()
+    mockedList.mockResolvedValue(ACCOUNTS)
+  })
+
+  it('refuses to draw four empty groups when the list request was refused', async () => {
+    // An administrator without the lookup capability saw one grey line -
+    // "You cannot perform this action." - above four cards reading "Students
+    // 0", "Teachers 0", "Parents 0", "Administrators 0" and "No accounts in
+    // this group". That reads as an answer, and it is the answer to a question
+    // the server never got to. The owner reported it as the database being
+    // down.
+    mockedList.mockRejectedValue(
+      new ApiError('Forbidden', { status: 403, code: 'action_not_allowed' }),
+    )
+
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+
+    const alert = await screen.findByRole('alert')
+    expect(alert.textContent).toContain('accounts.errors.action_not_allowed')
+    expect(screen.queryByText('accounts.empty')).toBeNull()
+    // The group heading, not the role names in the two dropdowns.
+    expect(screen.queryByText(/accounts\.role\.student\s*·/)).toBeNull()
+  })
+
+  it('still draws the groups when the list was read and happens to be empty', async () => {
+    // Negative control. "Nothing to show" is a real answer and has to keep
+    // looking like one, or the fix above just hides the page.
+    mockedList.mockResolvedValue({ count: 0, groups: {}, nextCursor: null, items: [] })
+
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+
+    await waitFor(() => expect(screen.getAllByText('accounts.empty').length).toBe(4))
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
+})
+
 describe('what the console says when a guard refuses', () => {
+  beforeEach(() => {
+    mockedList.mockReset()
+    mockedReset.mockReset()
+    mockedReissue.mockReset()
+    mockedInvite.mockReset()
+    mockedAssign.mockReset()
+    mockedList.mockResolvedValue(ACCOUNTS)
+  })
+
   it('names the rule that refused instead of falling back to a generic failure', async () => {
     // The guards on this page refuse with a code, not prose. Without a phrase
     // for the code every refusal reads the same and the operator learns

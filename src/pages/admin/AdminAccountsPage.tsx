@@ -339,11 +339,22 @@ export function AdminAccountsPage() {
             {t('accounts.readOnceHint')} {secret}
           </p>
         ) : null}
+        {/* A list that could not be read is not a list of nothing.
+          * The refusal used to print as one grey line above four cards each
+          * saying "0" and "no accounts in this group", which reads as an answer:
+          * an administrator who lacked the capability to list accounts was told,
+          * in effect, that the platform had none. The groups only render once
+          * the list has actually been read. */}
         {accountsQuery.isError ? (
-          <p className="mb-3 text-sm">{toUserFacingError(accountsQuery.error, t('accounts.loadFailed'))}</p>
+          <p
+            role="alert"
+            className="mb-3 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive"
+          >
+            {refusal(accountsQuery.error, t('accounts.loadFailed'))}
+          </p>
         ) : null}
 
-        {grouped.map((group) => (
+        {accountsQuery.isError ? null : grouped.map((group) => (
           <Card key={group.role} className="mb-4">
             <CardHeader>
               <CardTitle>

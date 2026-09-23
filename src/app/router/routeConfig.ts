@@ -142,6 +142,7 @@ export const navItems: AppNavItem[] = [
     mobile: true,
     description: 'Tutor help requests queue.',
   },
+  /* Card 020: withdrawn until the classroom has a backend.
   {
     label: 'Classroom Queue',
     path: '/tutor/classroom',
@@ -152,6 +153,7 @@ export const navItems: AppNavItem[] = [
     mobile: true,
     description: 'Scheduled classrooms and instant live support requests.',
   },
+  */
   {
     label: 'Availability',
     path: '/tutor/availability',
@@ -343,11 +345,21 @@ export const routeMetadata: AppRouteMeta[] = [
   // Card 007 (frozen): { path: '/billing/checkout/cancel', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout cancellation result.' },
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student question explanation and teacher-help request flow.' },
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom', pageName: 'StudentClassroomHomePage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student live classroom overview and scheduling entry.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom/schedule', pageName: 'ScheduleClassroomPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Schedule a live classroom session.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Student classroom lobby and device check.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Student live classroom room.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Student classroom summary and next steps.' },
+  */
   { path: '/practice', pageName: 'PracticeOverviewPage', role: 'student', module: 'Practice', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student subject practice overview.' },
   { path: '/question-bank', pageName: 'QuestionBankHomePage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student open practice library overview.' },
   { path: '/question-bank/:subjectId', pageName: 'SubjectQuestionBankPage', role: 'student', module: 'Question Bank', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Subject-level question-bank overview.' },
@@ -372,10 +384,18 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/parent/children/:childId/report', pageName: 'ChildReportPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Weekly child report.' },
   { path: '/parent/children/:childId/history', pageName: 'ChildLearningHistoryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Child learning history.' },
   { path: '/tutor', pageName: 'TutorDashboardPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor request queue.' },
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/tutor/classroom', pageName: 'TutorClassroomQueuePage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor classroom queue and instant live support requests.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/tutor/classroom/sessions/:sessionId/lobby', pageName: 'ClassroomLobbyPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor classroom lobby and session context.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/tutor/classroom/sessions/:sessionId/room', pageName: 'ClassroomRoomPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor live classroom room.' },
+  */
+  /* Card 020: withdrawn until the classroom has a backend.
   { path: '/tutor/classroom/sessions/:sessionId/summary', pageName: 'ClassroomSummaryPage', role: 'teacher', module: 'Online Classroom', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Tutor classroom summary and notes.' },
+  */
   { path: '/tutor/availability', pageName: 'TutorAvailabilityPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor availability.' },
   { path: '/tutor/profile', pageName: 'TutorProfilePage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
   { path: '/tutor/requests/:requestId', pageName: 'TutorHelpRequestDetailPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor request detail and status update.' },

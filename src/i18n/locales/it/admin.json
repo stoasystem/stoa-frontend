@@ -80,7 +80,8 @@
       "account_state_invalid": "Questo account non è in uno stato che consenta la modifica.",
       "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo.",
       "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita.",
-      "account_exists": "Questo indirizzo e-mail ha già un account {{role}}. Lo stesso indirizzo può avere un account per ruolo, ma non due con lo stesso ruolo."
+      "account_exists": "Questo indirizzo e-mail ha già un account {{role}}. Lo stesso indirizzo può avere un account per ruolo, ma non due con lo stesso ruolo.",
+      "action_not_allowed": "Non hai l’autorizzazione per elencare gli account. Chiedi a un’amministrazione il permesso di ricerca account."
     },
     "requiredTag": "obbligatorio",
     "optionalTag": "facoltativo",

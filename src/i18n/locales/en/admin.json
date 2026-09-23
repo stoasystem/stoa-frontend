@@ -80,7 +80,8 @@
       "account_state_invalid": "This account is not in a state that allows the change.",
       "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one.",
       "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth.",
-      "account_exists": "This email address already has a {{role}} account. The same address may hold one account per role, but not two of the same role."
+      "account_exists": "This email address already has a {{role}} account. The same address may hold one account per role, but not two of the same role.",
+      "action_not_allowed": "You do not have permission to list accounts. Ask an administrator for the account-lookup capability."
     },
     "requiredTag": "required",
     "optionalTag": "optional",

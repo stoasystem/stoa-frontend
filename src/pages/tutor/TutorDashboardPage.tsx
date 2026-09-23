@@ -1,6 +1,4 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import { Video } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -11,8 +9,12 @@ import {
   TutorRequestFilters,
   type TutorRequestFilter,
 } from '@/components/tutor/TutorRequestFilters'
+/* Card 020: used only by the classroom queue card, withdrawn below.
+import { Link } from 'react-router-dom'
+import { Video } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+*/
 import { useTutorHelpRequestsQuery } from '@/hooks/tutor/useTutorHelpRequestsQuery'
 import { useTutorStatsQuery } from '@/hooks/tutor/useTutorStatsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -39,6 +41,7 @@ export function TutorDashboardPage() {
         {requestsQuery.isError && <p className="text-sm text-destructive">{t('loadRequestsFailed')}</p>}
         {requestsQuery.data && (
           <div className="space-y-4">
+            {/* Card 020: the classroom queue is withdrawn until it has a backend.
             <Card className="border-primary/15 bg-card/95">
               <CardHeader>
                 <div className="flex items-start gap-3">
@@ -60,6 +63,7 @@ export function TutorDashboardPage() {
                 </Button>
               </CardContent>
             </Card>
+            */}
             <TutorStatsCards stats={statsQuery.data} />
             <TutorRequestFilters value={filter} onChange={setFilter} />
             <HelpRequestList requests={filteredRequests} />
