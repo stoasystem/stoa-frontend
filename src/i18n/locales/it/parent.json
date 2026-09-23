@@ -147,5 +147,10 @@
     "summary": "Riepilogo",
     "weeklyLinkDescription": "Domande recenti, argomenti deboli, supporto degli insegnanti e prossima azione per i genitori.",
     "monthlyLinkDescription": "Tendenze per materia, punti deboli ricorrenti e modelli di supporto a lungo termine."
+  },
+  "valueCard": {
+    "title": "Perché è importante",
+    "body1": "STOA mostra ai genitori se l’apprendimento sta davvero avvenendo: domande recenti, argomenti deboli, coinvolgimento dell’insegnante e il prossimo passo concreto.",
+    "body2": "I rapporti per i genitori trasformano l’attività dei compiti in una decisione settimanale: proseguire il supporto guidato, richiedere il supporto di un insegnante o ripassare un argomento insieme."
   }
 }

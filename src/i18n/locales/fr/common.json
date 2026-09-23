@@ -83,7 +83,8 @@
     "admin": "Admin",
     "organization_admin": "Admin organisation",
     "school_teacher": "Enseignant scolaire",
-    "school_viewer": "Observateur scolaire"
+    "school_viewer": "Observateur scolaire",
+    "teacher": "Enseignant"
   },
   "language": {
     "label": "Langue",

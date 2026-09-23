@@ -83,7 +83,8 @@
     "admin": "Admin",
     "organization_admin": "Organization admin",
     "school_teacher": "School teacher",
-    "school_viewer": "School viewer"
+    "school_viewer": "School viewer",
+    "teacher": "Teacher"
   },
   "language": {
     "label": "Language",

@@ -147,5 +147,10 @@
     "summary": "Summary",
     "weeklyLinkDescription": "Recent questions, weak topics, teacher support, and the next parent action.",
     "monthlyLinkDescription": "Subject trends, recurring weak points, and longer-term support patterns."
+  },
+  "valueCard": {
+    "title": "Why this matters",
+    "body1": "STOA helps parents see whether learning is actually happening: recent questions, weak topics, teacher involvement, and the next practical action.",
+    "body2": "Parent reports turn homework activity into a weekly decision: continue guided support, request tutor support, or review a topic together."
   }
 }

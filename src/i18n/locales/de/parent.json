@@ -147,5 +147,10 @@
     "summary": "Übersicht",
     "weeklyLinkDescription": "Aktuelle Fragen, schwache Themen, Unterstützung durch Lehrpersonen und der nächste Schritt für Eltern.",
     "monthlyLinkDescription": "Fachtrends, wiederkehrende Schwachstellen und längerfristige Unterstützungsmuster."
+  },
+  "valueCard": {
+    "title": "Warum das zählt",
+    "body1": "STOA zeigt Eltern, ob tatsächlich gelernt wird: aktuelle Fragen, schwache Themen, Beteiligung der Lehrperson und der nächste praktische Schritt.",
+    "body2": "Elternberichte machen aus der Hausaufgabenaktivität eine wöchentliche Entscheidung: begleitete Unterstützung fortsetzen, Lehrpersonen-Unterstützung anfordern oder ein Thema gemeinsam wiederholen."
   }
 }

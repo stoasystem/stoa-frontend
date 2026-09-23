@@ -83,7 +83,8 @@
     "admin": "Admin",
     "organization_admin": "Organisationsadmin",
     "school_teacher": "Schullehrperson",
-    "school_viewer": "Schulansicht"
+    "school_viewer": "Schulansicht",
+    "teacher": "Lehrperson"
   },
   "language": {
     "label": "Sprache",
