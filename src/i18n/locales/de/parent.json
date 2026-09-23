@@ -78,7 +78,7 @@
   "accountOps": {
     "eyebrow": "Kontoverwaltung",
     "title": "Status des Familienkontos",
-    "description": "Prüfen Sie Abrechnung, Kinderzugang, Verifizierung und Nutzung, ohne private Lerninhalte offenzulegen.",
+    "description": "Prüfen Sie Kinderzugang, Verifizierung und Nutzung, ohne private Lerninhalte offenzulegen.",
     "supportState": "Betreuungsstatus",
     "ready": "Das Elternkonto ist betriebsbereit.",
     "attention": "Prüfen Sie diese Kontopunkte, bevor Sie sich auf den Status der Kontoverwaltung verlassen.",

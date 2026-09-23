@@ -78,7 +78,7 @@
   "accountOps": {
     "eyebrow": "Account operations",
     "title": "Family account status",
-    "description": "Review billing, child access, verification, and usage state without exposing private learning content.",
+    "description": "Review child access, verification, and usage state without exposing private learning content.",
     "supportState": "Support state",
     "ready": "The parent account is operational.",
     "attention": "Review these account items before relying on account operations status.",

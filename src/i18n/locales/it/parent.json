@@ -78,7 +78,7 @@
   "accountOps": {
     "eyebrow": "Gestione account",
     "title": "Stato dell’account famiglia",
-    "description": "Controlla fatturazione, accesso dei figli, verifica e utilizzo senza esporre i contenuti di apprendimento privati.",
+    "description": "Controlla l’accesso dei figli, la verifica e l’utilizzo senza esporre contenuti di apprendimento privati.",
     "supportState": "Stato del supporto",
     "ready": "L’account genitore è operativo.",
     "attention": "Controlla queste voci dell’account prima di fare affidamento sullo stato della gestione account.",

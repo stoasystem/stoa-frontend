@@ -78,7 +78,7 @@
   "accountOps": {
     "eyebrow": "Gestion du compte",
     "title": "Statut du compte famille",
-    "description": "Consultez la facturation, l’accès des enfants, la vérification et l’utilisation sans exposer le contenu d’apprentissage privé.",
+    "description": "Vérifiez l’accès des enfants, la vérification et l’utilisation sans exposer le contenu d’apprentissage privé.",
     "supportState": "État d’assistance",
     "ready": "Le compte parent est opérationnel.",
     "attention": "Vérifiez ces éléments du compte avant de vous fier à l’état de la gestion du compte.",
