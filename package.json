@@ -13,10 +13,9 @@
     "verify:release": "node ./scripts/verify-release.mjs verify",
     "test": "vitest run --config vitest.config.ts",
     "test:watch": "vitest --config vitest.config.ts",
-    "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
     "check:api-contract": "node ./scripts/check-api-contract.mjs",
-    "check:untranslated": "node ./scripts/check-untranslated.mjs"
+    "check:untranslated": "node ./scripts/check-untranslated.mjs",
+    "test:smoke": "playwright test --config=playwright.smoke.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",

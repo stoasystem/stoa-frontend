@@ -29,7 +29,7 @@ npm run dev          # scripts/vite.mjs 包了一层，不要直接 vite
 npm run lint         # eslint . --max-warnings=0，零容忍
 npm run typecheck    # tsc -b
 npm test             # vitest run
-npm run test:e2e     # playwright
+npm run test:smoke   # playwright，打真部署，需要 STOA_SMOKE_PASSWORD
 npm run build        # tsc -b && vite build
 ```
 
@@ -61,7 +61,7 @@ src/hooks      按领域分组的 hooks
 src/services   API 客户端与外部服务
 src/store      Zustand store —— 只有这一个，写新状态放这里
 src/i18n       四语言 locale 资源
-tests/         unit · component · e2e · release
+tests/         unit · component · smoke（真部署）· release
 ```
 
 ## 还没清理干净的地方
