@@ -215,7 +215,11 @@ export function ChatPage() {
 
     // Repeating the same question within the window reopens the conversation it
     // already started instead of stacking another identical entry on the list.
-    const duplicateKey = `${subject} ${initialMessage}`
+    // The separator is written as an escape on purpose. A raw NUL byte here
+    // made `file(1)` call this whole 779-line file `data`, and BSD grep
+    // silently skips a file it thinks is binary - without printing so much
+    // as a zero. Every search of this repo came back a false negative.
+    const duplicateKey = `${subject}\u0000${initialMessage}`
     const recent = lastCreatedRef.current
     if (
       recent &&
