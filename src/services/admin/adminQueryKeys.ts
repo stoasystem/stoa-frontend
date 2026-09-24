@@ -11,6 +11,7 @@ export const adminQueryKeys = {
   subscriptionBilling: () => [...adminQueryKeys.all, 'subscription-billing'] as const,
   accountsAll: () => [...adminQueryKeys.all, 'accounts'] as const,
   accounts: (filters: Record<string, unknown>) => [...adminQueryKeys.all, 'accounts', filters] as const,
+  teacherSupportAllowance: (studentId: string) => [...adminQueryKeys.all, 'teacher-support-allowance', studentId] as const,
   accountOperations: (parentId?: string, day?: string) => [...adminQueryKeys.all, 'account-operations', parentId ?? '', day ?? ''] as const,
   curriculumWorklist: (status?: string) => [...adminQueryKeys.all, 'curriculum', 'worklist', status ?? ''] as const,
   curriculumPreview: (publicLessonId: string, versionId: string) => [...adminQueryKeys.all, 'curriculum', 'preview', publicLessonId, versionId] as const,

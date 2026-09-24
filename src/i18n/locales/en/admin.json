@@ -81,7 +81,9 @@
       "invitation_not_reissuable": "This invitation was already replaced or revoked. Send a new one.",
       "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth.",
       "account_exists": "This email address already has a {{role}} account. The same address may hold one account per role, but not two of the same role.",
-      "action_not_allowed": "You do not have permission to list accounts. Ask an administrator for the account-lookup capability."
+      "action_not_allowed": "You do not have permission to list accounts. Ask an administrator for the account-lookup capability.",
+      "account_not_a_student": "Only a student account has a weekly teacher-support figure.",
+      "allowance_version_conflict": "Another administrator changed this figure while you were editing it. Reopen it to see the current one."
     },
     "requiredTag": "required",
     "optionalTag": "optional",
@@ -110,7 +112,21 @@
       "parent": "parent",
       "admin": "administrator"
     },
-    "minorUnknown": "Not on file"
+    "minorUnknown": "Not on file",
+    "teacherSupport": {
+      "open": "Teacher support",
+      "weeklyCases": "Cases per week",
+      "assignedDefault": "Currently {{count}} a week, the figure every student has.",
+      "setByAdministrator": "Currently {{count}} a week, set by an administrator.",
+      "save": "Save",
+      "close": "Close",
+      "saved": "Saved: {{count}} cases a week.",
+      "loading": "Reading the current figure…",
+      "loadFailed": "The current figure could not be read.",
+      "saveFailed": "The figure could not be saved.",
+      "outOfRange": "Enter a whole number between 0 and {{maximum}}.",
+      "zeroWarning": "Zero turns teacher support off for this student entirely — they will be told to contact an administrator, not that they have used this week up."
+    }
   },
   "activation": {
     "eyebrow": "Account invitation",

@@ -7,8 +7,10 @@ import {
   inviteAccount,
   listAccounts,
   reissueInvitation,
+  readTeacherSupportAllowance,
   resetAccountPassword,
   revokeInvitation,
+  setTeacherSupportAllowance,
   updateAccountProfile,
   type AccountListFilters,
 } from '@/services/admin/accountsApi'
@@ -62,6 +64,27 @@ export function useUpdateAccountProfileMutation() {
 
 export function useAssignParentLinkMutation() {
   return useAccountMutation(assignParentLink)
+}
+
+export function useTeacherSupportAllowanceQuery(studentId: string | null) {
+  return useQuery({
+    queryKey: adminQueryKeys.teacherSupportAllowance(studentId ?? ''),
+    queryFn: () => readTeacherSupportAllowance(studentId as string),
+    enabled: Boolean(studentId),
+    retry: false,
+  })
+}
+
+export function useSetTeacherSupportAllowanceMutation() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: setTeacherSupportAllowance,
+    onSuccess: (_result, input) => {
+      void queryClient.invalidateQueries({
+        queryKey: adminQueryKeys.teacherSupportAllowance(input.studentId),
+      })
+    },
+  })
 }
 
 export function useClaimInvitationMutation() {

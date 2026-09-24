@@ -81,7 +81,9 @@
       "invitation_not_reissuable": "Diese Einladung wurde bereits ersetzt oder zurückgezogen. Senden Sie eine neue.",
       "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben.",
       "account_exists": "Diese E-Mail-Adresse hat bereits ein Konto mit dieser Rolle ({{role}}). Dieselbe Adresse darf ein Konto pro Rolle haben, aber nicht zwei mit derselben Rolle.",
-      "action_not_allowed": "Ihnen fehlt die Berechtigung, Konten aufzulisten. Bitten Sie eine Administration um die Berechtigung zur Kontosuche."
+      "action_not_allowed": "Ihnen fehlt die Berechtigung, Konten aufzulisten. Bitten Sie eine Administration um die Berechtigung zur Kontosuche.",
+      "account_not_a_student": "Nur ein Schülerkonto hat einen wöchentlichen Wert für Lehrerunterstützung.",
+      "allowance_version_conflict": "Eine andere Person hat diesen Wert während Ihrer Bearbeitung geändert. Öffnen Sie ihn erneut, um den aktuellen zu sehen."
     },
     "requiredTag": "Pflichtfeld",
     "optionalTag": "optional",
@@ -110,7 +112,21 @@
       "parent": "Elternteil",
       "admin": "Administration"
     },
-    "minorUnknown": "Nicht erfasst"
+    "minorUnknown": "Nicht erfasst",
+    "teacherSupport": {
+      "open": "Lehrerunterstützung",
+      "weeklyCases": "Fälle pro Woche",
+      "assignedDefault": "Derzeit {{count}} pro Woche, der Wert, den jede Schülerin und jeder Schüler hat.",
+      "setByAdministrator": "Derzeit {{count}} pro Woche, von einer Administratorin oder einem Administrator gesetzt.",
+      "save": "Speichern",
+      "close": "Schliessen",
+      "saved": "Gespeichert: {{count}} Fälle pro Woche.",
+      "loading": "Aktueller Wert wird gelesen…",
+      "loadFailed": "Der aktuelle Wert konnte nicht gelesen werden.",
+      "saveFailed": "Der Wert konnte nicht gespeichert werden.",
+      "outOfRange": "Geben Sie eine ganze Zahl zwischen 0 und {{maximum}} ein.",
+      "zeroWarning": "Null schaltet die Lehrerunterstützung für diese Person vollständig ab — ihr wird gesagt, sie solle sich an die Administration wenden, nicht, dass die Woche aufgebraucht sei."
+    }
   },
   "activation": {
     "eyebrow": "Kontoeinladung",

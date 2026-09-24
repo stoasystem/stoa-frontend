@@ -81,7 +81,9 @@
       "invitation_not_reissuable": "Questo invito è già stato sostituito o revocato. Inviane uno nuovo.",
       "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita.",
       "account_exists": "Questo indirizzo e-mail ha già un account {{role}}. Lo stesso indirizzo può avere un account per ruolo, ma non due con lo stesso ruolo.",
-      "action_not_allowed": "Non hai l’autorizzazione per elencare gli account. Chiedi a un’amministrazione il permesso di ricerca account."
+      "action_not_allowed": "Non hai l’autorizzazione per elencare gli account. Chiedi a un’amministrazione il permesso di ricerca account.",
+      "account_not_a_student": "Solo un account studente ha un numero settimanale di supporto dell'insegnante.",
+      "allowance_version_conflict": "Un altro amministratore ha modificato questo numero mentre lo stavi modificando. Riaprilo per vedere quello attuale."
     },
     "requiredTag": "obbligatorio",
     "optionalTag": "facoltativo",
@@ -110,7 +112,21 @@
       "parent": "genitore",
       "admin": "amministratore"
     },
-    "minorUnknown": "Non indicato"
+    "minorUnknown": "Non indicato",
+    "teacherSupport": {
+      "open": "Supporto dell'insegnante",
+      "weeklyCases": "Casi a settimana",
+      "assignedDefault": "Attualmente {{count}} a settimana, il numero di cui dispone ogni studente.",
+      "setByAdministrator": "Attualmente {{count}} a settimana, impostato da un amministratore.",
+      "save": "Salva",
+      "close": "Chiudi",
+      "saved": "Salvato: {{count}} casi a settimana.",
+      "loading": "Lettura del numero attuale…",
+      "loadFailed": "Non è stato possibile leggere il numero attuale.",
+      "saveFailed": "Non è stato possibile salvare il numero.",
+      "outOfRange": "Inserisci un numero intero tra 0 e {{maximum}}.",
+      "zeroWarning": "Zero disattiva completamente il supporto dell'insegnante per questo studente: gli verrà detto di contattare un amministratore, non che la settimana è esaurita."
+    }
   },
   "activation": {
     "eyebrow": "Invito all'account",

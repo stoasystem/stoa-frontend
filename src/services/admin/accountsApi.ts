@@ -224,6 +224,34 @@ export async function assignParentLink(input: {
   return response.data
 }
 
+export type TeacherSupportAllowance = {
+  studentId: string
+  weeklyCases: number
+  /** `default` when nobody has set one, `administrator` once somebody has. */
+  source: 'default' | 'administrator'
+  default: number
+  maximum: number
+}
+
+export async function readTeacherSupportAllowance(studentId: string) {
+  const response = await httpClient.get<TeacherSupportAllowance>(
+    `/admin/teacher-support/allowances/${studentId}`,
+  )
+  return response.data
+}
+
+export async function setTeacherSupportAllowance(input: {
+  studentId: string
+  weeklyCases: number
+  reason: string
+}) {
+  const response = await httpClient.put<TeacherSupportAllowance & { stateVersion: number }>(
+    `/admin/teacher-support/allowances/${input.studentId}`,
+    { weekly_cases: input.weeklyCases, reason: input.reason },
+  )
+  return response.data
+}
+
 export type InvitationClaimResponse = {
   status: string
   userId: string

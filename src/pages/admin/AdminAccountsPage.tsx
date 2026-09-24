@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -18,6 +18,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { AccountDraftFields, BlockedReason } from '@/pages/admin/AccountFormFields'
 import { AssignAccountDialog } from '@/pages/admin/AssignAccountDialog'
+import { TeacherSupportAllowanceEditor } from '@/pages/admin/TeacherSupportAllowanceEditor'
 import type { AccountDraft } from '@/pages/admin/accountFormRules'
 import {
   accountDraftIssues,
@@ -59,6 +60,7 @@ export function AdminAccountsPage() {
   const [reason, setReason] = useState('')
   const [notice, setNotice] = useState<string | null>(null)
   const [secret, setSecret] = useState<string | null>(null)
+  const [allowanceFor, setAllowanceFor] = useState<string | null>(null)
 
   const filters = useMemo(
     () => ({ role, status, q: keyword, createdFrom, createdTo }),
@@ -382,7 +384,8 @@ export function AdminAccountsPage() {
                   </thead>
                   <tbody>
                     {group.rows.map((row) => (
-                      <tr key={row.userId} className="border-t">
+                      <Fragment key={row.userId}>
+                      <tr className="border-t">
                         <td className="p-2 font-mono">{row.accountNumber || '—'}</td>
                         <td className="p-2">{row.name || '—'}</td>
                         <td className="p-2">{row.email || '—'}</td>
@@ -439,9 +442,37 @@ export function AdminAccountsPage() {
                                 {t(`accounts.moveTo.${next}`)}
                               </Button>
                             ))}
+                            {row.role === 'student' ? (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="outline"
+                                onClick={() =>
+                                  setAllowanceFor(allowanceFor === row.userId ? null : row.userId)
+                                }
+                              >
+                                {t('accounts.teacherSupport.open')}
+                              </Button>
+                            ) : null}
                           </div>
                         </td>
                       </tr>
+                      {/* Under the row it belongs to rather than in a dialog:
+                        * the figure is one line of this student's row, and a
+                        * dialog over the list hides which student it was
+                        * opened for. */}
+                      {allowanceFor === row.userId ? (
+                        <tr className="border-t bg-muted/30">
+                          <td className="p-2" colSpan={10}>
+                            <TeacherSupportAllowanceEditor
+                              studentId={row.userId}
+                              reason={reason}
+                              onClose={() => setAllowanceFor(null)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                      </Fragment>
                     ))}
                   </tbody>
                 </table>
