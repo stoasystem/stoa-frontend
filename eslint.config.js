@@ -7,7 +7,10 @@ export default tseslint.config(
   {
     // '.claude' holds agent worktrees: whole copies of this repository, whose
     // scripts lint as if they were ours and fail the gate on somebody else's file.
-    ignores: ['dist', 'node_modules', 'backend', '.claude'],
+    // `tests/e2e` holds no suite any more (card 024). The one file left is a
+    // source the Phase 476 sandbox evidence chain digests, kept because deleting
+    // it breaks that chain - not something to run, type-check or lint.
+    ignores: ['dist', 'node_modules', 'backend', '.claude', 'tests/e2e'],
   },
   {
     files: [
