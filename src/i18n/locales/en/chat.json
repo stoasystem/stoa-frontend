@@ -50,7 +50,7 @@
     "requested": "Your tutor request was sent.",
     "retry": "Try again",
     "errors": {
-      "planDenied": "Tutor support is not part of the current plan. A parent can add it from the plan page.",
+      "planDenied": "Teacher support is not switched on for this account yet. A STOA administrator can add it.",
       "allowanceExhausted": "This week's tutor requests are used up. They become available again next week.",
       "alreadyOpen": "A tutor request for this conversation is already open.",
       "temporary": "Tutor support is busy right now. Please try again in a moment.",

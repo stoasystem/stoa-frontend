@@ -16,7 +16,19 @@ import itParent from '@/i18n/locales/it/parent.json'
 // billing, child access…" in English and "Prüfen Sie Abrechnung…" in German,
 // after the billing cell above it had already been withdrawn.
 
-const BUNDLES = { de: deParent, en: enParent, fr: frParent, it: itParent }
+import deChat from '@/i18n/locales/de/chat.json'
+import enChat from '@/i18n/locales/en/chat.json'
+import frChat from '@/i18n/locales/fr/chat.json'
+import itChat from '@/i18n/locales/it/chat.json'
+
+// Both namespaces, because a key is only as safe as the phrase behind it and
+// the pages here draw on `parent` while the chat refusals draw on `chat`.
+const BUNDLES = {
+  de: { ...deParent, ...deChat },
+  en: { ...enParent, ...enChat },
+  fr: { ...frParent, ...frChat },
+  it: { ...itParent, ...itChat },
+}
 
 // Every language this platform serves, so a German word cannot hide behind an
 // English vocabulary. Two shapes, because one does not fit both jobs:
@@ -41,6 +53,13 @@ const PAGES = [
   'src/pages/parent/ChildReportPage.tsx',
 ]
 
+// Not a page: a map from a refusal code to the phrase the student is shown. It
+// told a student that teacher support "is not part of the current plan" and
+// that "a parent can add it from the plan page" - a price, a plan, and a page
+// that was withdrawn, on a live chat screen. It is reached from a page, so it
+// is read the same way.
+const COPY_MAPS = ['src/lib/teacherHelpErrors.ts']
+
 /** Strip block and line comments, so a withdrawn key does not count. */
 function withoutComments(source: string): string {
   return source
@@ -52,7 +71,11 @@ function withoutComments(source: string): string {
 /** Translation keys the page still renders. */
 function renderedKeys(relative: string): string[] {
   const source = withoutComments(readFileSync(path.resolve(__dirname, '../..', relative), 'utf8'))
-  return [...new Set([...source.matchAll(/\bt\(\s*['"`]([A-Za-z][\w.]*)['"`]/g)].map((m) => m[1]))]
+  const called = [...source.matchAll(/\bt\(\s*['"`]([A-Za-z][\w.]*)['"`]/g)].map((m) => m[1])
+  // A map from a code to a key writes the key as a plain string, and the page
+  // that reads the map shows whatever is behind it.
+  const mapped = [...source.matchAll(/['"`]([a-z][\w]*(?:\.[\w]+){1,4})['"`]/g)].map((m) => m[1])
+  return [...new Set([...called, ...mapped])]
 }
 
 function phrase(bundle: unknown, key: string): string | undefined {
@@ -65,7 +88,7 @@ function phrase(bundle: unknown, key: string): string | undefined {
 }
 
 describe('card 007: nothing a family reads names what it would cost', () => {
-  it.each(PAGES)('%s renders no paid phrase in any language', (relative) => {
+  it.each([...PAGES, ...COPY_MAPS])('%s renders no paid phrase in any language', (relative) => {
     const offending: string[] = []
     for (const key of renderedKeys(relative)) {
       for (const [lang, bundle] of Object.entries(BUNDLES)) {

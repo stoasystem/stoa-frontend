@@ -50,7 +50,7 @@
     "requested": "La tua richiesta è stata inviata a un insegnante.",
     "retry": "Riprova",
     "errors": {
-      "planDenied": "Il supporto dell’insegnante non è incluso nel piano attuale. Un genitore può aggiungerlo dalla pagina del piano.",
+      "planDenied": "Il supporto dell’insegnante non è ancora attivo per questo account. Un’amministrazione STOA può aggiungerlo.",
       "allowanceExhausted": "Le richieste di questa settimana sono esaurite. Torneranno disponibili la prossima settimana.",
       "alreadyOpen": "Per questa conversazione c’è già una richiesta aperta.",
       "temporary": "Il supporto dell’insegnante è occupato in questo momento. Riprova tra poco.",

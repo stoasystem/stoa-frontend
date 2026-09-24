@@ -50,7 +50,7 @@
     "requested": "Deine Anfrage an eine Lehrperson wurde gesendet.",
     "retry": "Erneut versuchen",
     "errors": {
-      "planDenied": "Lehrpersonen-Unterstützung gehört nicht zum aktuellen Abo. Ein Elternteil kann sie auf der Aboseite hinzufügen.",
+      "planDenied": "Lehrpersonen-Unterstützung ist für dieses Konto noch nicht freigeschaltet. Die STOA-Administration kann sie hinzufügen.",
       "allowanceExhausted": "Die Anfragen an Lehrpersonen für diese Woche sind aufgebraucht. Nächste Woche stehen wieder welche zur Verfügung.",
       "alreadyOpen": "Für diese Unterhaltung ist bereits eine Anfrage offen.",
       "temporary": "Die Lehrpersonen-Unterstützung ist gerade ausgelastet. Bitte versuche es gleich noch einmal.",

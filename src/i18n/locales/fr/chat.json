@@ -50,7 +50,7 @@
     "requested": "Ta demande a été envoyée à un enseignant.",
     "retry": "Réessayer",
     "errors": {
-      "planDenied": "L’accompagnement par un enseignant ne fait pas partie de la formule actuelle. Un parent peut l’ajouter depuis la page de la formule.",
+      "planDenied": "L’accompagnement par un enseignant n’est pas encore activé pour ce compte. Une administration STOA peut l’ajouter.",
       "allowanceExhausted": "Les demandes d’enseignant de cette semaine sont épuisées. Elles reviennent la semaine prochaine.",
       "alreadyOpen": "Une demande d’enseignant est déjà ouverte pour cette conversation.",
       "temporary": "L’accompagnement par un enseignant est occupé pour le moment. Réessaie dans un instant.",
