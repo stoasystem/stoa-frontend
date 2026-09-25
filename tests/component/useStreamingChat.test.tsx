@@ -304,10 +304,16 @@ describe('where the message stands', () => {
     act(() => {
       void result.current.sendStreamingMessage({ content: 'Was ist 2 + 2?' })
     })
+    // Still waiting while the backend's 300-second lease could still be held:
+    // a retry then would only find the command busy.
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(300_000)
+      await vi.advanceTimersByTimeAsync(330_000)
     })
+    expect(result.current.isStreaming).toBe(true)
 
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(70_000)
+    })
     await waitFor(() => expect(result.current.isStreaming).toBe(false))
     const failed = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'student')
     expect(failed).toBeDefined()

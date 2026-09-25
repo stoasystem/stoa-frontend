@@ -19,9 +19,10 @@ export type GenerationOutcome =
 // Quick at first, when most answers land, then every few seconds.
 const POLL_DELAYS_MS = [1000, 1000, 1000, 2000, 2000, 3000]
 const POLL_STEADY_MS = 5000
-// Past the generation worker's three-minute limit, so an answer that is still
-// being written is not given up on.
-const GENERATION_WAIT_LIMIT_MS = 240_000
+// Past the backend's 300-second lease on an attempt, with room for one more
+// read: until then the answer may still come, and a retry would only find the
+// attempt busy. That also covers the worker's three-minute limit.
+const GENERATION_WAIT_LIMIT_MS = 360_000
 const MAX_CONSECUTIVE_READ_FAILURES = 5
 
 function wait(ms: number, signal: AbortSignal) {
