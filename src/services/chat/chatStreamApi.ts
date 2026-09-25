@@ -1,4 +1,4 @@
-import { httpClient } from '@/services/api/httpClient'
+import { ApiError, httpClient } from '@/services/api/httpClient'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import type { ChatStreamEvent } from '@/types/chat'
@@ -11,6 +11,13 @@ export type StreamMessagePayload = {
   idempotencyKey: string
 }
 
+/**
+ * How the send request ended: the answer came back on it (`streamed`), or the
+ * request only stored the message and the answer arrives later (`accepted`),
+ * which `/generation` reports. A failed request throws.
+ */
+export type StreamOutcome = 'streamed' | 'accepted'
+
 export async function streamConversationMessage({
   conversationId,
   payload,
@@ -21,7 +28,7 @@ export async function streamConversationMessage({
   payload: StreamMessagePayload
   signal?: AbortSignal
   onEvent: (event: ChatStreamEvent) => void
-}) {
+}): Promise<StreamOutcome> {
   const token = localStorage.getItem('stoa_access_token')
   let response: Response
 
@@ -46,15 +53,20 @@ export async function streamConversationMessage({
       throw error
     }
     await emitDemoStream({ payload, onEvent })
-    return
+    return 'streamed'
   }
 
   if (!response.ok) {
     if (!allowDemoFallback) {
-      throw new Error(`Streaming request failed with status ${response.status}`)
+      throw await streamRequestError(response)
     }
     await emitDemoStream({ payload, onEvent })
-    return
+    return 'streamed'
+  }
+
+  // Stored, answer to follow: nothing to read from this response.
+  if (response.status === 202) {
+    return 'accepted'
   }
 
   if (!response.body) {
@@ -64,11 +76,16 @@ export async function streamConversationMessage({
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
+  let done = false
+  const receive = (event: ChatStreamEvent) => {
+    if (event.type === 'message_done') done = true
+    onEvent(event)
+  }
 
   while (true) {
-    const { done, value } = await reader.read()
+    const { done: ended, value } = await reader.read()
 
-    if (done) break
+    if (ended) break
 
     buffer += decoder.decode(value, { stream: true })
     const parts = buffer.split('\n\n')
@@ -76,7 +93,7 @@ export async function streamConversationMessage({
 
     for (const part of parts) {
       const event = parseStreamEvent(part)
-      if (event) onEvent(event)
+      if (event) receive(event)
     }
   }
 
@@ -84,8 +101,31 @@ export async function streamConversationMessage({
 
   if (buffer.trim()) {
     const event = parseStreamEvent(buffer)
-    if (event) onEvent(event)
+    if (event) receive(event)
   }
+  // A stream that ended without its answer leaves the answer to `/generation`.
+  return done ? 'streamed' : 'accepted'
+}
+
+/** The refusal as `httpClient` would report it: the server's message and code. */
+async function streamRequestError(response: Response) {
+  const fallback = `Streaming request failed with status ${response.status}`
+  let detail: unknown
+  try {
+    const body = (await response.json()) as { detail?: unknown }
+    detail = body?.detail
+  } catch {
+    detail = undefined
+  }
+  const record = typeof detail === 'object' && detail !== null ? (detail as Record<string, unknown>) : null
+  return new ApiError(
+    typeof record?.message === 'string' ? record.message : typeof detail === 'string' ? detail : fallback,
+    {
+      status: response.status,
+      detail,
+      code: typeof record?.code === 'string' ? record.code : undefined,
+    },
+  )
 }
 
 async function emitDemoStream({
@@ -125,12 +165,33 @@ function parseStreamEvent(raw: string): ChatStreamEvent | null {
   } as ChatStreamEvent
 }
 
-/** Read the steps of an answer still being written. */
-export async function getGenerationProgress(conversationId: string, signal?: AbortSignal) {
-  const response = await httpClient.get<{
-    conversationId: string
-    steps: string[]
-    updatedAt: string
-  }>(`/conversations/${conversationId}/generation`, { signal })
+export type GenerationStatus = 'message_committed' | 'ai_running' | 'completed' | 'failed'
+
+/**
+ * The steps of an answer still being written and, when the message's
+ * idempotency key is given, where that message's command stands. A `failed`
+ * command that is `retryable` may be sent again with the same key.
+ */
+export type GenerationState = {
+  conversationId: string
+  steps: string[]
+  updatedAt: string
+  commandId?: string | null
+  status?: GenerationStatus | null
+  attempt?: number | null
+  assistantMessageId?: string | null
+  failureCategory?: string | null
+  retryable?: boolean | null
+}
+
+export async function getGenerationProgress(
+  conversationId: string,
+  signal?: AbortSignal,
+  idempotencyKey?: string,
+) {
+  const response = await httpClient.get<GenerationState>(
+    `/conversations/${conversationId}/generation`,
+    { signal, params: idempotencyKey ? { idempotencyKey } : undefined },
+  )
   return response.data
 }

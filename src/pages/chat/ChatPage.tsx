@@ -30,7 +30,7 @@ import {
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
-import { useStreamingChat } from '@/hooks/chat/useStreamingChat'
+import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -160,15 +160,10 @@ export function ChatPage() {
     setTeacherSupportStage('idle')
   }, [activeConversationId])
 
-  const displayedMessages = useMemo(() => {
-    const backendMessages = conversationQuery.data?.messages ?? []
-    const backendMessageIds = new Set(backendMessages.map((message) => message.id))
-
-    return [
-      ...backendMessages,
-      ...localMessages.filter((message) => !backendMessageIds.has(message.id)),
-    ]
-  }, [conversationQuery.data?.messages, localMessages])
+  const displayedMessages = useMemo(
+    () => mergeWithServerMessages(conversationQuery.data?.messages ?? [], localMessages),
+    [conversationQuery.data?.messages, localMessages],
+  )
 
   useEffect(() => {
     if (
