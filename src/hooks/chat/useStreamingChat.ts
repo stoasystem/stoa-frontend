@@ -269,16 +269,17 @@ export function useStreamingChat(conversationId: string | null) {
         askedAt: pending.askedAt,
         signal: pollController.signal,
         requestDone: !send,
-        onSteps: (steps) =>
-          owns() &&
+        onSteps: (steps) => {
+          if (!owns()) return
+          const writingId = activeAssistantMessageIdRef.current ?? assistantMessageId
           setLocalMessages((messages) =>
             messages.map((message) =>
-              message.id === (activeAssistantMessageIdRef.current ?? assistantMessageId) &&
-              message.status === 'streaming'
+              message.id === writingId && message.status === 'streaming'
                 ? { ...message, content: steps.join('\n\n') }
                 : message,
             ),
-          ),
+          )
+        },
       })
 
       let outcome: GenerationOutcome | null = null
@@ -311,13 +312,16 @@ export function useStreamingChat(conversationId: string | null) {
       }
       pollController.abort()
       if (!owns()) return
+      // Read now: the updaters below run when React renders, after the refs
+      // have been cleared for the next attempt.
+      const settledAssistantId = activeAssistantMessageIdRef.current ?? assistantMessageId
 
       try {
         if (stoppedByUserRef.current) {
           writePending(conversationId, null)
           setLocalMessages((messages) =>
             messages.map((message) =>
-              message.id === activeAssistantMessageIdRef.current
+              message.id === settledAssistantId
                 ? { ...message, status: 'stopped' }
                 : message.id === studentMessageId
                   ? { ...message, status: 'completed' }
@@ -351,7 +355,7 @@ export function useStreamingChat(conversationId: string | null) {
             if (message.id === studentMessageId) {
               return { ...message, status: 'failed', retryPayload }
             }
-            if (message.id === activeAssistantMessageIdRef.current) {
+            if (message.id === settledAssistantId) {
               return {
                 ...message,
                 content: message.content || getErrorMessage(requestError),
