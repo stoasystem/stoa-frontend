@@ -1,0 +1,27 @@
+{
+  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs. kind: text >= 4.5, large >= 3, ui >= 3. These are today's brand-tokens.css pairs that the UI renders; card B-01 adds the student tokens and their pairs. Not listed on purpose: --border/--input against --card or --background (1.48:1 and 1.43:1), which B-01 splits into a decorative --line and a state-bearing --line-strong; --platform-accent and --platform-warning as text, which no component renders.",
+  "pairs": [
+    { "fg": "--foreground", "bg": "--background", "kind": "text" },
+    { "fg": "--foreground", "bg": "--card", "kind": "text" },
+    { "fg": "--card-foreground", "bg": "--card", "kind": "text" },
+    { "fg": "--popover-foreground", "bg": "--popover", "kind": "text" },
+    { "fg": "--foreground", "bg": "--platform-surface-app", "kind": "text" },
+    { "fg": "--primary-foreground", "bg": "--primary", "kind": "text" },
+    { "fg": "--primary-foreground", "bg": "--stoa-brand-charcoal", "kind": "text" },
+    { "fg": "--secondary-foreground", "bg": "--secondary", "kind": "text" },
+    { "fg": "--accent-foreground", "bg": "--accent", "kind": "text" },
+    { "fg": "--destructive-foreground", "bg": "--destructive", "kind": "text" },
+    { "fg": "--muted-foreground", "bg": "--background", "kind": "text" },
+    { "fg": "--muted-foreground", "bg": "--card", "kind": "text" },
+    { "fg": "--muted-foreground", "bg": "--muted", "kind": "text" },
+    { "fg": "--muted-foreground", "bg": "--platform-surface-app", "kind": "text" },
+    { "fg": "--primary", "bg": "--background", "kind": "text" },
+    { "fg": "--primary", "bg": "--card", "kind": "text" },
+    { "fg": "--primary", "bg": "--stoa-brand-burgundy-soft", "kind": "text" },
+    { "fg": "--destructive", "bg": "--background", "kind": "text" },
+    { "fg": "--destructive", "bg": "--card", "kind": "text" },
+    { "fg": "--stoa-brand-charcoal", "bg": "--platform-accent-soft", "kind": "text" },
+    { "fg": "--ring", "bg": "--background", "kind": "ui" },
+    { "fg": "--ring", "bg": "--card", "kind": "ui" }
+  ]
+}

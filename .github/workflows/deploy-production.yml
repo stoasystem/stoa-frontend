@@ -45,6 +45,9 @@ jobs:
       - name: Translation guard
         run: npm run check:untranslated
 
+      - name: Contrast guard
+        run: npm run check:contrast
+
       - name: Unit tests
         run: npm test
 
