@@ -25,9 +25,12 @@ export const httpClient = axios.create({
   },
 })
 
+export const LOGOUT_PATH = '/auth/logout'
+
 const PUBLIC_AUTH_PATHS = new Set([
   '/auth/forgot-password',
   '/auth/login',
+  LOGOUT_PATH,
   '/auth/login-code/confirm',
   '/auth/login-code/request',
   '/auth/register',
@@ -86,7 +89,10 @@ httpClient.interceptors.response.use(
   (error) => {
     const status = error.response?.status
 
-    if (status === 401) {
+    // Logging out with a token that already expired or was revoked answers
+    // 401. That session is over either way, and the caller finishes signing
+    // out itself; clearing and reloading here as well would race it.
+    if (status === 401 && requestPath(error.config?.url) !== LOGOUT_PATH) {
       // A tab pinned to one test role fails on that role's own token. Dropping
       // the pin is enough; clearing here would take the session the rest of the
       // browser shares down with it, which is not what expired.

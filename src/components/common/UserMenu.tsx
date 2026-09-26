@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 // the account identity reaches every role without four duplicated copies and
 // without competing for the five slots in the mobile bar.
 import { CHANGE_PASSWORD_PATH } from '@/lib/authRoutes'
+import { logout } from '@/services/auth/authApi'
+import { logger } from '@/services/logging/logger'
 import { useAuthStore } from '@/store/authStore'
 
 
@@ -18,6 +20,20 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
   const clearAuth = useAuthStore((state) => state.clearAuth)
 
   if (!user) return null
+
+  // The backend is told first, so the token it revokes is still the one in
+  // hand. A failed call must not keep anyone signed in on this device.
+  const signOut = async () => {
+    try {
+      await logout()
+    } catch (error) {
+      logger.warn('Backend logout failed; signing out locally', {
+        errorName: error instanceof Error ? error.name : 'UnknownError',
+      })
+    }
+    clearAuth()
+    navigate('/login')
+  }
 
   if (variant === 'top') {
     return (
@@ -46,10 +62,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           size="icon"
           className="h-8 w-8 rounded-full"
           aria-label={t('actions.logOut')}
-          onClick={() => {
-            clearAuth()
-            navigate('/login')
-          }}
+          onClick={() => void signOut()}
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
         </Button>
@@ -72,10 +85,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           variant="ghost"
           size="icon"
           aria-label={t('actions.logOut')}
-          onClick={() => {
-            clearAuth()
-            navigate('/login')
-          }}
+          onClick={() => void signOut()}
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
         </Button>

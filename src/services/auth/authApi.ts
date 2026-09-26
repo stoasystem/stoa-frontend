@@ -1,7 +1,8 @@
-import { ApiError, httpClient } from '@/services/api/httpClient'
+import { ApiError, LOGOUT_PATH, httpClient } from '@/services/api/httpClient'
 import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import type { RegisterPayload } from '@/types/onboarding'
+import { tabToken } from '@/lib/devSessions'
 import { TOKEN_KEY } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
 
@@ -66,6 +67,17 @@ export async function login(payload: LoginRequest) {
     if (!allowDemoFallback) throw error
     return createDemoAuthResponse(payload.email)
   }
+}
+
+// Signing out here alone leaves the access token working until it expires: the
+// backend records its own cut-off on this call (stoasystem/stoa-backend#5),
+// then signs Cognito out. The token is the one every other request from this
+// tab sends - a tab pinned to one role holds its own - and it travels in the
+// body, which is all the endpoint reads.
+export async function logout() {
+  const accessToken = tabToken() ?? localStorage.getItem(TOKEN_KEY)
+  if (!accessToken) return
+  await httpClient.post(LOGOUT_PATH, { access_token: accessToken })
 }
 
 // Public registration is closed: the backend answers 410 and there is no route
