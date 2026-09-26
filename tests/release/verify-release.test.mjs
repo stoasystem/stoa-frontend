@@ -147,6 +147,8 @@ test('package scripts and schema define one closed five-step Web gate', async ()
     'tests/release/runtime-monitoring-flag.test.mjs',
     'tests/release/runtime-startup-barrier.test.mjs',
     'tests/release/served-release.test.mjs',
+    'tests/release/sandbox-evidence-sources-present.test.mjs',
+    'tests/release/verify-release.test.mjs',
   ].join(' '))
   assert.equal(packageJson.scripts['verify:release'], 'node ./scripts/verify-release.mjs verify')
   assert.deepEqual(STEP_DEFINITIONS, [
