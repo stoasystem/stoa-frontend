@@ -33,6 +33,10 @@ npm run test:smoke   # playwright，打真部署，需要 STOA_SMOKE_PASSWORD
 npm run build        # tsc -b && vite build
 ```
 
+冒烟不在 CI 里，部署之后由发布的人手动跑；什么时候必须跑、跑哪些条目，见
+[stoa-backend#27 决议的「频率」一节](https://github.com/stoasystem/stoa-backend/issues/27#issuecomment-5846611751)。
+怎么跑、哪些 AI 回答要人工确认，写在 `tests/smoke/01-preflight.spec.ts` 开头。
+
 两个守卫脚本在 CI 里会跑，本地改动相关区域时也该跑：
 
 ```bash
