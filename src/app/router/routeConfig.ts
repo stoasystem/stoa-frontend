@@ -242,6 +242,14 @@ export const navItems: AppNavItem[] = [
     icon: 'tutors',
     description: 'Review teacher applications and send activation invitations.',
   },
+  // Card 039: these eight led to pages that ca9a045 deleted because their
+  // backend never existed (the organization console, the tutor assignment
+  // board, advanced analytics, retention). Hidden and demo, so production never
+  // showed them, but switching demo surfaces on turned each into a NotFoundPage
+  // link. Withdrawn, not deleted: the organization group is kept but must not
+  // appear in the frontend. The pages come back from `ca9a045^` together with
+  // their routes, and a backend to call.
+  /*
   {
     label: 'Advanced Analytics',
     path: '/admin/advanced-analytics',
@@ -317,6 +325,7 @@ export const navItems: AppNavItem[] = [
     icon: 'tutors',
     description: 'Advanced tutor assignment board.',
   },
+  */
 ]
 
 export const routeMetadata: AppRouteMeta[] = [
@@ -335,6 +344,9 @@ export const routeMetadata: AppRouteMeta[] = [
   // Card 007 (frozen): { path: '/billing/checkout/cancel', pageName: 'CheckoutResultPage', role: 'shared', module: 'Billing', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Checkout cancellation result.' },
   { path: '/dashboard', pageName: 'StudentDashboardPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student learning overview.' },
   { path: '/chat', pageName: 'ChatPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student question explanation and teacher-help request flow.' },
+  { path: '/learn', pageName: 'LearnPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'One place to practise: exercises, the guided path and mistakes as tabs.' },
+  { path: '/learn/:tab', pageName: 'LearnPage', role: 'student', module: 'Learning', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'A tab of the learn page at its own address; the old practice and question-bank entries redirect here.' },
+  { path: '/assignments', pageName: 'StudentAssignmentsPage', role: 'student', module: 'Learning', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Practice assignments set for the student.' },
   /* Card 020: withdrawn until the classroom has a backend.
   { path: '/classroom', pageName: 'StudentClassroomHomePage', role: 'student', module: 'Online Classroom', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Student live classroom overview and scheduling entry.' },
   */
@@ -370,7 +382,9 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/learning-history', pageName: 'StudentLearningHistoryPage', role: 'student', module: 'Learning', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Student learning history.' },
   { path: '/parent', pageName: 'ParentDashboardPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Parent overview and child list.' },
   { path: '/parent/reports', pageName: 'ParentReportsPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Parent report hub for weekly and monthly child reports.' },
+  { path: '/parent/account-operations', pageName: 'ParentAccountOperationsPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Parent account facts: verification and linked children. Reached from the dashboard summary card.' },
   { path: '/parent/children/:childId', pageName: 'ChildSummaryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Child summary detail.' },
+  { path: '/parent/children/:childId/progress', pageName: 'ParentChildProgressPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Child practice progress.' },
   { path: '/parent/children/:childId/report', pageName: 'ChildReportPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Weekly child report.' },
   { path: '/parent/children/:childId/history', pageName: 'ChildLearningHistoryPage', role: 'parent', module: 'Parent', status: 'core', priority: 'P1', navPriority: 'hidden', purpose: 'Child learning history.' },
   { path: '/tutor', pageName: 'TutorDashboardPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Tutor request queue.' },
@@ -388,10 +402,15 @@ export const routeMetadata: AppRouteMeta[] = [
   */
   { path: '/tutor/availability', pageName: 'TutorAvailabilityPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor availability.' },
   { path: '/tutor/profile', pageName: 'TutorProfilePage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
+  { path: '/tutor/learning-automation', pageName: 'LearningAutomationConsolePage', role: 'teacher', module: 'Learning Operations', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Preview and approve practice assignment batches for a student.' },
   { path: '/tutor/requests/:requestId', pageName: 'TutorHelpRequestDetailPage', role: 'teacher', module: 'Tutor', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Tutor request detail and status update.' },
   { path: '/admin', pageName: 'AdminDashboardPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P0', navPriority: 'primary', purpose: 'Admin operations overview.' },
   { path: '/admin/users', pageName: 'AdminAccountsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Account console: invite, assign, reset password, suspend and archive.' },
   { path: '/admin/curriculum', pageName: 'AdminCurriculumPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Curriculum editor, review, migration, and evidence console.' },
+  { path: '/admin/moderation', pageName: 'AdminModerationPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Reported learning content and internal moderation actions.' },
+  { path: '/admin/account-operations', pageName: 'AdminAccountOperationsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Parent support console, reached from the admin overview.' },
+  { path: '/admin/learning-operations', pageName: 'LearningOperationsDashboardPage', role: 'admin', module: 'Learning Operations', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Curriculum analytics and warehouse export readiness.' },
+  { path: '/admin/learning-automation', pageName: 'LearningAutomationConsolePage', role: 'admin', module: 'Learning Operations', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Preview and approve practice assignment batches for a student.' },
   // Card 007 (frozen): { path: '/admin/subscriptions', pageName: 'AdminSubscriptionRequestsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Manual subscription request queue and tier application.' },
   { path: '/admin/teacher-applications', pageName: 'AdminTeacherApplicationsPage', role: 'admin', module: 'Admin', status: 'core', priority: 'P1', navPriority: 'primary', purpose: 'Teacher application review and invitation.' },
   { path: '/teacher-activate', pageName: 'TeacherActivatePage', role: 'public', module: 'Auth', status: 'core', priority: 'P0', navPriority: 'hidden', purpose: 'Teacher invitation claim and account activation.' },
@@ -400,5 +419,19 @@ export const routeMetadata: AppRouteMeta[] = [
   { path: '/admin/system', pageName: 'AdminOperationsPlaceholderPage', role: 'admin', module: 'Admin', status: 'placeholder', priority: 'P3', navPriority: 'hidden', purpose: 'Future system status admin placeholder.' },
   { path: '/organization/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Organization-scoped learning profile.' },
   { path: '/students/:studentId/learning-profile', pageName: 'StudentLearningProfilePage', role: 'organization', module: 'Learning Intelligence', status: 'demo', priority: 'P2', navPriority: 'hidden', purpose: 'Advanced learning profile direct route.' },
+  { path: '/organization/learning-operations', pageName: 'LearningOperationsDashboardPage', role: 'organization', module: 'Learning Operations', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Curriculum analytics and warehouse export readiness; the router also admits administrators.' },
+  { path: '/organization/learning-automation', pageName: 'LearningAutomationConsolePage', role: 'organization', module: 'Learning Operations', status: 'core', priority: 'P2', navPriority: 'hidden', purpose: 'Preview and approve practice assignment batches; the router also admits administrators.' },
 ]
+
+/**
+ * Paths `AppRouter` registers that are deliberately not in `routeMetadata`,
+ * each with the reason. Everything else the router registers must be listed
+ * above; `tests/component/routeRegistry.test.ts` holds the three tables to that.
+ */
+export const routesWithoutMetadata: Readonly<Record<string, string>> = {
+  '*': 'Catch-all: renders NotFoundPage for every path nobody registered.',
+  '/unauthorized': 'Error page ("sign in to continue"); nothing in the app sends anyone there today, a signed-out user is sent to /login.',
+  '/forbidden': 'Error page RoleRoute sends a user to when their role is not allowed; not a destination of its own.',
+  '/assistant': 'Redirect to /chat, kept so old links still land; it renders no page.',
+}
 
