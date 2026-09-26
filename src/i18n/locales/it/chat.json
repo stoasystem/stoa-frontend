@@ -63,6 +63,7 @@
     "resolved": "Supporto insegnante completato"
   },
   "subjectForQuestion": "Materia di questa domanda",
+  "gradeMissingHint": "Indica il tuo anno scolastico nel profilo: le spiegazioni saranno più adatte a te.",
   "subjects": {
     "math": "Matematica",
     "physics": "Fisica",

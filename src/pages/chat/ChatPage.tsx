@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
 import { Check, Video } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { TodayStrip } from '@/components/chat/TodayStrip'
@@ -34,6 +34,7 @@ import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStrea
 import { useTeacherHelpMutation } from '@/hooks/chat/useTeacherHelpMutation'
 import { useTeacherHelpStatusQuery } from '@/hooks/chat/useTeacherHelpStatusQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
+import { conversationGrade } from '@/lib/conversationGrade'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
@@ -206,7 +207,7 @@ export function ChatPage() {
 
     const profile = studentProfileQuery.data
     const subject = selectedSubject.id
-    const grade = profile?.grade ?? 'Grade 8'
+    const grade = conversationGrade(profile?.grade)
 
     // Repeating the same question within the window reopens the conversation it
     // already started instead of stacking another identical entry on the list.
@@ -444,6 +445,13 @@ export function ChatPage() {
               })}
             </div>
           </div>
+          {studentProfileQuery.data && !conversationGrade(studentProfileQuery.data.grade) && (
+            <p className="text-xs text-muted-foreground">
+              <Link to="/profile" className="underline underline-offset-2">
+                {t('gradeMissingHint')}
+              </Link>
+            </p>
+          )}
           <Textarea
             ref={newConversationRef}
             value={newConversationMessage}

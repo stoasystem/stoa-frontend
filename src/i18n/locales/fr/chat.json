@@ -63,6 +63,7 @@
     "resolved": "Aide enseignante terminée"
   },
   "subjectForQuestion": "Matière de cette question",
+  "gradeMissingHint": "Indique ton année scolaire dans ton profil : les explications seront mieux adaptées.",
   "subjects": {
     "math": "Mathématiques",
     "physics": "Physique",

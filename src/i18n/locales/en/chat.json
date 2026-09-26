@@ -63,6 +63,7 @@
     "resolved": "Tutor support completed"
   },
   "subjectForQuestion": "Subject for this question",
+  "gradeMissingHint": "Add your year group to your profile and explanations will fit you better.",
   "subjects": {
     "math": "Mathematics",
     "physics": "Physics",

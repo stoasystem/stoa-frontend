@@ -63,6 +63,7 @@
     "resolved": "Unterstützung abgeschlossen"
   },
   "subjectForQuestion": "Fach für diese Frage",
+  "gradeMissingHint": "Trage deine Klassenstufe im Profil ein, dann passen die Erklärungen besser zu dir.",
   "subjects": {
     "math": "Mathematik",
     "physics": "Physik",
