@@ -13,6 +13,7 @@ import {
   canonicalize,
   digestCanonical,
   hashFileTree,
+  PRODUCTION_DEFAULTS,
   publishWebRelease,
   sha256Hex,
 } from '../../scripts/publish-web-release.mjs'
@@ -20,15 +21,18 @@ import {
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..')
 const sha = (character) => character.repeat(64)
 
-async function loadRuntimeDigest() {
+async function loadRuntimeModule() {
   const source = await readFile(path.join(repoRoot, 'src/lib/runtimeConfig.ts'), 'utf8')
   const compiled = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.ES2022, target: ts.ScriptTarget.ES2020 },
     fileName: 'runtimeConfig.ts',
   })
   const url = `data:text/javascript;base64,${Buffer.from(compiled.outputText).toString('base64')}`
-  const runtime = await import(url)
-  return runtime.digestRuntimeConfig
+  return import(url)
+}
+
+async function loadRuntimeDigest() {
+  return (await loadRuntimeModule()).digestRuntimeConfig
 }
 
 test('publisher digest matches the Web client canonical digest', async () => {
@@ -59,6 +63,32 @@ test('publisher digest matches the Web client canonical digest', async () => {
   assert.equal(await digestRuntimeConfig(config), digestCanonical(config))
   assert.equal(config.realtime.endpoint, 'wss://api.stoaedu.ch/realtime')
   assert.equal(config.web.origin, 'https://app.stoaedu.ch')
+})
+
+test('production publishes no realtime endpoint until the WebSocket exists', async () => {
+  // Card 029 [D-03]: /realtime answers 400, so production must not advertise it.
+  const runtime = await loadRuntimeModule()
+  const release = buildReleaseIdentities({
+    frontendArtifactSha256: sha('3'),
+    backendArtifactSha256: sha('4'),
+    environment: 'production',
+  })
+  const config = buildRuntimeConfig({
+    release,
+    environment: PRODUCTION_DEFAULTS.environment,
+    webOrigin: PRODUCTION_DEFAULTS.webOrigin,
+    apiOrigin: PRODUCTION_DEFAULTS.apiOrigin,
+    features: PRODUCTION_DEFAULTS.features,
+  })
+  assert.deepEqual(config.realtime, { enabled: false, endpoint: null })
+  assert.equal(config.features.realtimeNotifications, false)
+  const parsed = await runtime.validateRuntimeConfig(config, {
+    expectedDigest: digestCanonical(config),
+    expectedRelease: { ...config.release },
+    expectedEnvironment: 'production',
+    expectedWebOrigin: PRODUCTION_DEFAULTS.webOrigin,
+  })
+  assert.equal(parsed.realtime.endpoint, null)
 })
 
 test('publish uploads hashed assets, then the pointer documents, and refuses an unversioned bucket', async () => {

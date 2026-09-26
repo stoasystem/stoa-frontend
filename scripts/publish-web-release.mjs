@@ -41,7 +41,11 @@ export const PRODUCTION_DEFAULTS = Object.freeze({
     parentReports: true,
     payments: false,
     publicRegistration: true,
-    realtimeNotifications: true,
+    // Card 029 [D-03]: off until card 107 [D-09] deploys the API Gateway
+    // WebSocket. /realtime answers 400 today, so `true` sent every teacher
+    // browser into endless reconnects. Turn it back on in the same change that
+    // ships the endpoint.
+    realtimeNotifications: false,
     referrals: true,
     supportTickets: true,
     teacherHelp: true,
