@@ -243,16 +243,6 @@ export const navItems: AppNavItem[] = [
     description: 'Review teacher applications and send activation invitations.',
   },
   {
-    label: 'Report Ops',
-    path: '/admin/report-operations',
-    role: 'admin',
-    priority: 'primary',
-    status: 'core',
-    icon: 'reports',
-    mobile: true,
-    description: 'Weekly report generation and delivery recovery.',
-  },
-  {
     label: 'Advanced Analytics',
     path: '/admin/advanced-analytics',
     role: 'admin',
