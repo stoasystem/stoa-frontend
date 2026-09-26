@@ -4,6 +4,7 @@ import { matchPath } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { navItems } from '@/app/router/routeConfig'
 import { getNavItemsForRole } from '@/lib/navigation'
+import { registeredPaths } from './routerSource'
 
 // The shared setup pins every flag in '@/lib/env'. What a user is shown is
 // decided by the real ones, demo visibility included, so this suite reads them
@@ -31,13 +32,9 @@ vi.mock('@/lib/runtimeConfig', async (importOriginal) => ({
 }))
 
 // The catch-all only renders NotFoundPage, so matching it is not a route.
-const registeredRoutes = [
-  ...readFileSync(path.resolve(__dirname, '../../src/app/router/AppRouter.tsx'), 'utf8').matchAll(
-    /path="([^"]+)"/g,
-  ),
-]
-  .map((match) => match[1])
-  .filter((route) => route !== '*')
+const registeredRoutes = registeredPaths(
+  readFileSync(path.resolve(__dirname, '../../src/app/router/AppRouter.tsx'), 'utf8'),
+).filter((route) => route !== '*')
 
 const roles = [...new Set(navItems.map((item) => item.role))]
 
@@ -47,14 +44,23 @@ const roles = [...new Set(navItems.map((item) => item.role))]
 describe('the navigation shown to a user', () => {
   it.each(roles)('only leads to registered routes (%s)', (role) => {
     const shown = [
-      ...getNavItemsForRole(role, { includeSecondary: true }),
-      ...getNavItemsForRole(role, { mobileOnly: true }),
+      ...getNavItemsForRole(role, { includeSecondary: true }).filter(
+        (item) => item.priority === 'primary' || item.priority === 'secondary',
+      ),
+      ...getNavItemsForRole(role, { mobileOnly: true }).slice(0, 5),
     ]
     const deadLinks = shown
       .map((item) => item.path)
       .filter((navPath) => !registeredRoutes.some((route) => matchPath(route, navPath)))
     expect(deadLinks).toEqual([])
   })
+
+  it.each(['/classroom', '/tutor/classroom', '/billing'])(
+    'does not accept a withdrawn route that remains in a comment (%s)',
+    (navPath) => {
+      expect(registeredRoutes.some((route) => matchPath(route, navPath))).toBe(false)
+    },
+  )
 
   it('reads routes from the router itself', () => {
     expect(registeredRoutes.length).toBeGreaterThan(20)

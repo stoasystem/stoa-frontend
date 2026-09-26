@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { navItems, routeMetadata } from '@/app/router/routeConfig'
+import { registeredPaths } from './routerSource'
 
 // Card 007: payments and billing are frozen, so the running app must not offer
 // a way in. The judge is not "these four routes were deleted" -- that agrees
@@ -12,18 +13,6 @@ const PAID_VOCABULARY =
   /billing|subscription|checkout|stripe|refund|payment|invoice|price|pricing|plan|purchase|charge|coupon|discount|paywall|wallet/i
 
 const ROUTER_SOURCE = path.resolve(__dirname, '../../src/app/router/AppRouter.tsx')
-
-/** Strip block and line comments so a commented-out route does not count. */
-function withoutComments(source: string): string {
-  return source
-    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '')
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/^\s*\/\/.*$/gm, '')
-}
-
-function registeredPaths(source: string): string[] {
-  return [...withoutComments(source).matchAll(/path="([^"]+)"/g)].map((m) => m[1])
-}
 
 describe('card 007: the paid surface is not reachable from the app', () => {
   it('registers no paid route', () => {
