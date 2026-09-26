@@ -76,3 +76,13 @@ tests/         unit · component · smoke（真部署）· release
 - 未挂路由的旧版 student / teacher / parent 页面，以及双首页、双 Mistakes 页实验。
 
 `src/stores/`（与 `src/store/` 并存的那个空壳）已经删除，旧文档若还提到它，是旧文档过时。
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues via the `gh` CLI (stoasystem/stoa-frontend). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
