@@ -28,6 +28,24 @@ function compileTypeScript(source, fileName) {
   return compiled.outputText
 }
 
+// A .replace() that matches nothing changes nothing and says nothing, so a
+// harness rewrite that stopped applying would look like one that still does.
+// Two had: after 3f49286 moved env.ts onto runtimeConfig, the
+// DEFAULT_API_BASE_URL rewrite never matched again, and the import.meta.env
+// one matched again only between 032c7b2 and 996de48, two hours on 2026-08-10
+// (card 034, stoasystem/stoa-backend#32). The replacement is passed through a
+// function so a `$&` or `$1` in it is inserted as written.
+function mustReplace(source, pattern, replacement) {
+  if (source.search(pattern) === -1) {
+    throw new Error(`harness rewrite matched nothing: ${pattern}`)
+  }
+  const replaced = source.replace(pattern, () => replacement)
+  if (replaced === source) {
+    throw new Error(`harness rewrite changed nothing: ${pattern}`)
+  }
+  return replaced
+}
+
 function moduleUrl(source, label) {
   moduleSequence += 1
   return `data:text/javascript;base64,${Buffer.from(source).toString('base64')}#${label}-${moduleSequence}`
@@ -41,16 +59,12 @@ async function projectionHarness() {
     'runtime-config',
   )
   const runtime = await import(runtimeUrl)
-  const testableProjection = projectionSource
-    .replace(
-      /import \{ DEFAULT_API_BASE_URL \} from ['"]@\/lib\/constants['"]/,
-      "const DEFAULT_API_BASE_URL = 'http://localhost:8000'",
-    )
-    .replace(
-      /from ['"]@\/lib\/runtimeConfig['"]/,
-      `from ${JSON.stringify(runtimeUrl)}`,
-    )
-    .replaceAll('import.meta.env', '({})')
+  // env.ts imports getRuntimeConfig; point it at the module compiled above.
+  const testableProjection = mustReplace(
+    projectionSource,
+    /from ['"]@\/lib\/runtimeConfig['"]/,
+    `from ${JSON.stringify(runtimeUrl)}`,
+  )
   const projectionOutput = compileTypeScript(testableProjection, projectionPath)
 
   return {
@@ -306,4 +320,19 @@ test('mock, demo, MSW, debug, checkout preview, and fallback surfaces remain dis
   }
   assert.notEqual(projection.apiMode, 'mock')
   assert.notEqual(projection.apiMode, 'demo')
+})
+
+test('a harness rewrite that does not apply fails, and one that does is inserted as written', () => {
+  const source = "import { x } from '@/lib/runtimeConfig'"
+  const live = /from ['"]@\/lib\/runtimeConfig['"]/
+  assert.throws(
+    () => mustReplace(source, /from ['"]@\/lib\/constants['"]/, 'y'),
+    /harness rewrite matched nothing/,
+  )
+  assert.throws(
+    () => mustReplace(source, live, "from '@/lib/runtimeConfig'"),
+    /harness rewrite changed nothing/,
+  )
+  assert.equal(mustReplace(source, live, "from 'z'"), "import { x } from 'z'")
+  assert.equal(mustReplace(source, live, "from '$&'"), "import { x } from '$&'")
 })
