@@ -123,10 +123,7 @@
     "requestedBody": "Un tuteur rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant.",
     "joinedTitle": "Le tuteur a rejoint",
     "joinedBody": "L’assistant d’apprentissage observe pendant que ton tuteur t’aide. Lance une classe en direct s’il te faut un accompagnement plus poussé.",
-    "confirmJoined": "Le tuteur a rejoint",
-    "startClassroom": "Lancer la classe en direct",
-    "preparingLobby": "Préparation du salon...",
-    "lobbyFailed": "Nous n’avons pas pu préparer le salon de la classe. Merci de réessayer."
+    "confirmJoined": "Le tuteur a rejoint"
   },
   "contextLines": {
     "uploadSource": "Source du téléversement : {{title}}",
@@ -142,7 +139,6 @@
     "attempts": "Tentatives : {{attempts}}",
     "hintViewed": "Indice consulté : oui"
   },
-  "currentQuestion": "Exercice en cours",
   "followUp": {
     "label": "Suggestions de questions",
     "explainStep": "Je ne comprends pas une des étapes",

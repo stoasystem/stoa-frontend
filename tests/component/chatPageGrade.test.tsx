@@ -49,9 +49,6 @@ vi.mock('@/hooks/chat/useTeacherHelpMutation', () => ({
 vi.mock('@/hooks/chat/useTeacherHelpStatusQuery', () => ({
   useTeacherHelpStatusQuery: () => ({ data: undefined }),
 }))
-vi.mock('@/features/live-classroom/hooks/useInstantVideoHelp', () => ({
-  useInstantVideoHelp: () => ({ mutate: vi.fn(), isPending: false }),
-}))
 
 async function startConversation() {
   render(

@@ -1,4 +1,4 @@
 {
-  "count": 175,
+  "count": 174,
   "note": "Screens still carrying English. This may only go down. Card 002 opened the gate on tutor, parent and admin (25 -> 255) and cleared tutor and parent (255 -> 175). What is left: 150 in src/pages/admin, of which 33 sit on the Card 007 frozen subscription and checkout pages and stay here on purpose -- translating them would write paid vocabulary into all four locale bundles. The other 117 admin findings and the 25 original student findings are debt to work down."
 }

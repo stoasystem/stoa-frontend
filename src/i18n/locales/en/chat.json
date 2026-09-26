@@ -123,10 +123,7 @@
     "requestedBody": "A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting.",
     "joinedTitle": "Tutor joined",
     "joinedBody": "The Learning Assistant is observing while your tutor helps. Start a live classroom if you still need deeper support.",
-    "confirmJoined": "Tutor joined",
-    "startClassroom": "Start Live Classroom",
-    "preparingLobby": "Preparing lobby...",
-    "lobbyFailed": "We couldn’t prepare the classroom lobby. Please try again."
+    "confirmJoined": "Tutor joined"
   },
   "contextLines": {
     "uploadSource": "Upload source: {{title}}",
@@ -142,7 +139,6 @@
     "attempts": "Attempts: {{attempts}}",
     "hintViewed": "Hint viewed: yes"
   },
-  "currentQuestion": "Current question",
   "followUp": {
     "label": "Follow-up suggestions",
     "explainStep": "I don’t understand one of the steps",

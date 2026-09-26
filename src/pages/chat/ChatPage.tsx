@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { TFunction } from 'i18next'
-import { Check, Video } from 'lucide-react'
+import { Check } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -19,7 +19,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Textarea } from '@/components/ui/textarea'
 import { AttachmentPreviewList } from '@/features/uploads/components/AttachmentPreviewList'
-import { useInstantVideoHelp } from '@/features/live-classroom/hooks/useInstantVideoHelp'
 import { uploadAttachmentToUploadedFile } from '@/features/uploads/utils/uploadAdapters'
 import {
   clearUploadHandoff,
@@ -48,9 +47,6 @@ type TeacherSupportStage =
   | 'idle'
   | 'teacher_text_requested'
   | 'teacher_text_active'
-  | 'video_requested'
-  | 'video_lobby_ready'
-  | 'video_completed'
 
 /** How long the same opening question is treated as a repeat of the one just sent. */
 const DUPLICATE_CONVERSATION_WINDOW_MS = 60_000
@@ -115,7 +111,6 @@ export function ChatPage() {
   const conversationQuery = useConversationQuery(activeConversationId)
   const createConversationMutation = useCreateConversationMutation()
   const teacherHelpMutation = useTeacherHelpMutation()
-  const instantVideoHelpMutation = useInstantVideoHelp()
   const teacherHelpStatusQuery = useTeacherHelpStatusQuery(
     teacherHelpRequest?.conversationId ?? null,
   )
@@ -329,30 +324,6 @@ export function ChatPage() {
 
   function handleTeacherTextActive() {
     setTeacherSupportStage('teacher_text_active')
-  }
-
-  function handleStartVideoClassroom() {
-    if (!activeConversationId || instantVideoHelpMutation.isPending) return
-
-    setTeacherSupportStage('video_requested')
-    instantVideoHelpMutation.mutate(
-      {
-        source: 'teacher_text_help',
-        conversationId: activeConversationId,
-        topicLabel: conversationQuery.data?.subject ?? t('currentQuestion'),
-        summary: 'The student requested a live classroom after tutor support.',
-      },
-      {
-        onSuccess: (session) => {
-          setTeacherSupportStage('video_lobby_ready')
-          navigate(`/classroom/sessions/${session.id}/lobby?source=chat`)
-        },
-        onError: () => {
-          setTeacherSupportStage('teacher_text_active')
-          setTeacherHelpError(t('tutorEscalation.lobbyFailed'))
-        },
-      },
-    )
   }
 
   if (conversationsQuery.isLoading) {
@@ -577,11 +548,9 @@ export function ChatPage() {
               isFollowUpDisabled={isStreaming}
             />
             {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
-              <TeacherVideoEscalationCard
+              <TeacherTextSupportCard
                 stage={teacherSupportStage}
-                isStartingVideo={instantVideoHelpMutation.isPending}
                 onTeacherTextActive={handleTeacherTextActive}
-                onStartVideo={handleStartVideoClassroom}
               />
             )}
             {sendError && (
@@ -637,19 +606,18 @@ function MobileConversationList({
   )
 }
 
-function TeacherVideoEscalationCard({
+// Text support only. Card 020 withdrew live video lessons, which have no
+// backend, and the button that opened one from here led to a page that no
+// longer exists (stoasystem/stoa-backend#29).
+function TeacherTextSupportCard({
   stage,
-  isStartingVideo,
   onTeacherTextActive,
-  onStartVideo,
 }: {
   stage: TeacherSupportStage
-  isStartingVideo: boolean
   onTeacherTextActive: () => void
-  onStartVideo: () => void
 }) {
   const { t } = useTranslation('chat')
-  const isTextActive = stage === 'teacher_text_active' || stage === 'video_requested' || stage === 'video_lobby_ready'
+  const isTextActive = stage === 'teacher_text_active'
 
   return (
     <section className="px-4 pb-3 md:px-6" aria-live="polite">
@@ -672,14 +640,6 @@ function TeacherVideoEscalationCard({
             {!isTextActive && (
               <Button type="button" variant="outline" onClick={onTeacherTextActive}>
                 {t('tutorEscalation.confirmJoined')}
-              </Button>
-            )}
-            {isTextActive && (
-              <Button type="button" onClick={onStartVideo} disabled={isStartingVideo}>
-                <Video className="h-4 w-4" aria-hidden="true" />
-                {isStartingVideo
-                  ? t('tutorEscalation.preparingLobby')
-                  : t('tutorEscalation.startClassroom')}
               </Button>
             )}
           </div>

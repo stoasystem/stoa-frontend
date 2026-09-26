@@ -123,10 +123,7 @@
     "requestedBody": "Ein Tutor tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten.",
     "joinedTitle": "Tutor ist beigetreten",
     "joinedBody": "Der Lernassistent beobachtet mit, während dein Tutor hilft. Starte ein Live-Klassenzimmer, wenn du noch mehr Unterstützung brauchst.",
-    "confirmJoined": "Tutor ist beigetreten",
-    "startClassroom": "Live-Klassenzimmer starten",
-    "preparingLobby": "Lobby wird vorbereitet ...",
-    "lobbyFailed": "Wir konnten die Klassenzimmer-Lobby nicht vorbereiten. Bitte versuche es erneut."
+    "confirmJoined": "Tutor ist beigetreten"
   },
   "contextLines": {
     "uploadSource": "Quelle des Uploads: {{title}}",
@@ -142,7 +139,6 @@
     "attempts": "Versuche: {{attempts}}",
     "hintViewed": "Tipp angesehen: ja"
   },
-  "currentQuestion": "Aktuelle Aufgabe",
   "followUp": {
     "label": "Vorschläge für Rückfragen",
     "explainStep": "Einen der Schritte verstehe ich nicht",

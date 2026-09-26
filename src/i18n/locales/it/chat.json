@@ -123,10 +123,7 @@
     "requestedBody": "Un tutor si unirà a questa conversazione appena sarà disponibile. Nel frattempo puoi continuare con l’assistente di apprendimento.",
     "joinedTitle": "Il tutor è entrato",
     "joinedBody": "L’assistente di apprendimento osserva mentre il tutor ti aiuta. Avvia un’aula dal vivo se ti serve un supporto più approfondito.",
-    "confirmJoined": "Il tutor è entrato",
-    "startClassroom": "Avvia l’aula dal vivo",
-    "preparingLobby": "Preparazione della sala...",
-    "lobbyFailed": "Non è stato possibile preparare la sala dell’aula. Riprova."
+    "confirmJoined": "Il tutor è entrato"
   },
   "contextLines": {
     "uploadSource": "Origine del caricamento: {{title}}",
@@ -142,7 +139,6 @@
     "attempts": "Tentativi: {{attempts}}",
     "hintViewed": "Suggerimento consultato: sì"
   },
-  "currentQuestion": "Esercizio in corso",
   "followUp": {
     "label": "Suggerimenti per continuare",
     "explainStep": "Non capisco uno dei passaggi",
