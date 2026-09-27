@@ -8,13 +8,21 @@ export class ApiError extends Error {
   status?: number
   detail?: unknown
   code?: string
+  // Axios's own code for how the request failed (ETIMEDOUT, ERR_NETWORK, ...).
+  // `code` above is the backend's; without this a timeout and a dropped
+  // connection look the same once they reach the caller.
+  transportCode?: string
 
-  constructor(message: string, options: { status?: number; detail?: unknown; code?: string } = {}) {
+  constructor(
+    message: string,
+    options: { status?: number; detail?: unknown; code?: string; transportCode?: string } = {},
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = options.status
     this.detail = options.detail
     this.code = options.code
+    this.transportCode = options.transportCode
   }
 }
 
@@ -116,6 +124,8 @@ httpClient.interceptors.response.use(
       ? String(detail.code)
       : undefined
 
-    return Promise.reject(new ApiError(message, { status, detail, code }))
+    const transportCode = typeof error.code === 'string' ? error.code : undefined
+
+    return Promise.reject(new ApiError(message, { status, detail, code, transportCode }))
   },
 )
