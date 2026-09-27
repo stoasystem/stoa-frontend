@@ -23,8 +23,8 @@ gh pr create --base redesign/planet
   `redesign/planet` 本身就是一个分支，git 不允许再有 `redesign/planet/<票号>`，推送会被拒。
 - `--no-track` 不能省：不加的话，新分支的上游会是 `origin/redesign/planet`。这时直接 `git push` 会失败，
   git 给出的提示是推到 `HEAD:redesign/planet`，照做就会绕过门禁、直接写进集成分支。
-- PR 只回自己方案的集成分支，不跨方案，不直接指向 `main`。PR 一开始就选对 base：
-  开好以后再改 base，门禁不会自动重跑，要再推一次提交才会跑。
+- PR 只回自己方案的集成分支，不跨方案，不直接指向 `main`。PR 一开始就选对 base；
+  开好以后再改 base 也会重新跑门禁（工作流监听了 `edited` 事件）。
 - 任务分支不部署，只跑 PR 门禁；只有两条集成分支本身可以发预览（#28）。
 
 ## 门禁
