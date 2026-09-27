@@ -6,6 +6,9 @@ name: Redesign Branch Gate
 
 on:
   pull_request:
+    # edited is included so retargeting an open PR onto an integration branch
+    # starts a run instead of waiting for the next push.
+    types: [opened, synchronize, reopened, edited]
     branches:
       - redesign/planet
       - redesign/cute
