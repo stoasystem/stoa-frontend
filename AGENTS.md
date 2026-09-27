@@ -49,6 +49,9 @@ npm run check:untranslated   # 未翻译文案的棘轮，基线在 scripts/untr
 API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取路由清单。所以涉及
 接口变更时，先推后端再推前端，否则这道门会拦下来。
 
+改版在集成分支 `redesign/planet` / `redesign/cute` 上进行，不直接进 `main`，
+分支命名与门禁见 `docs/agents/redesign-branches.md`。
+
 ## 目录约定
 
 ```
