@@ -152,3 +152,6 @@ export function renderStartupFailure(
   target.setAttribute('role', 'alert')
   target.setAttribute('aria-live', 'assertive')
 }
+
+// Poison for #16: this must fail the redesign gate at Lint. Never merge.
+const redesignGatePoison = 1
