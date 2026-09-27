@@ -1,5 +1,5 @@
 import { KeyRound, LogOut, UserCircle } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { RoleBadge } from '@/components/common/RoleBadge'
 import { Button } from '@/components/ui/button'
@@ -8,32 +8,16 @@ import { Button } from '@/components/ui/button'
 // the account identity reaches every role without four duplicated copies and
 // without competing for the five slots in the mobile bar.
 import { CHANGE_PASSWORD_PATH } from '@/lib/authRoutes'
-import { logout } from '@/services/auth/authApi'
-import { logger } from '@/services/logging/logger'
+import { useSignOut } from '@/hooks/auth/useSignOut'
 import { useAuthStore } from '@/store/authStore'
 
 
 export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' }) {
   const { t } = useTranslation('common')
-  const navigate = useNavigate()
   const user = useAuthStore((state) => state.user)
-  const clearAuth = useAuthStore((state) => state.clearAuth)
+  const signOut = useSignOut()
 
   if (!user) return null
-
-  // The backend is told first, so the token it revokes is still the one in
-  // hand. A failed call must not keep anyone signed in on this device.
-  const signOut = async () => {
-    try {
-      await logout()
-    } catch (error) {
-      logger.warn('Backend logout failed; signing out locally', {
-        errorName: error instanceof Error ? error.name : 'UnknownError',
-      })
-    }
-    clearAuth()
-    navigate('/login')
-  }
 
   if (variant === 'top') {
     return (
