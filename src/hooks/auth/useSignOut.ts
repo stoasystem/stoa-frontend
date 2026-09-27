@@ -5,7 +5,7 @@ import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { forgetSessionHolding, tabToken } from '@/lib/devSessions'
 import { logout, type LogoutOutcome } from '@/services/auth/authApi'
 import { logger } from '@/services/logging/logger'
-import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
+import { TOKEN_KEY, trackPendingLogout, useAuthStore } from '@/store/authStore'
 
 function logOutcome(outcome: LogoutOutcome) {
   if (outcome.kind === 'ok') {
@@ -57,11 +57,16 @@ export function useSignOut() {
     // this person's prompt and attachments already in the composer.
     clearUploadHandoff()
     if (accessToken) forgetSessionHolding(accessToken)
+    // Register before navigation unmounts this menu. The login mutation waits
+    // for completion or the request's 8 s timeout; server work may outlive it.
+    const pending = trackPendingLogout(
+      accessToken ? logout(accessToken).then(logOutcome) : Promise.resolve(),
+    )
     // Replacing the entry keeps Back from reopening the page just left.
     navigate('/login', { replace: true })
 
     try {
-      if (accessToken) logOutcome(await logout(accessToken))
+      await pending
     } finally {
       runningRef.current = false
       setIsSigningOut(false)

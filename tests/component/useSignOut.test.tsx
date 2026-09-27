@@ -208,15 +208,25 @@ describe('useSignOut', () => {
   })
 
   it('has cleared this device and left for /login before the backend answers', async () => {
-    const bodies = answerLogout('hang')
+    const late = gate()
+    const bodies: unknown[] = []
+    mswServer.use(http.post('https://api.test/auth/logout', async ({ request }) => {
+      bodies.push(await request.json())
+      await late.opened
+      return new HttpResponse(null, { status: 204 })
+    }))
     const { result } = renderSignedIn()
+    let pending!: Promise<void>
+    act(() => { pending = result.current.signOut() })
 
-    act(() => void result.current.signOut())
-
-    expectSignedOutHere()
-    expect(result.current.pathname).toBe('/login')
-    await waitFor(() => expect(bodies).toEqual([{ access_token: 'shared-token' }]))
-    expect(result.current.isSigningOut).toBe(true)
+    try {
+      expectSignedOutHere()
+      expect(result.current.pathname).toBe('/login')
+      await waitFor(() => expect(bodies).toEqual([{ access_token: 'shared-token' }]))
+      expect(result.current.isSigningOut).toBe(true)
+    } finally {
+      await act(async () => { late.open(); await pending })
+    }
   })
 
   it('gives up on a backend that hangs after 8 seconds, logging a timeout', async () => {
