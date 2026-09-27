@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>planet render bench</title>
+<!--
+  Standalone micro-benchmark for the "planet" home screen (issue #10).
+  Not wired into the app. Open directly in a browser or run research/planet-bench/run.mjs.
+
+  Query parameters
+    mode = svg-filter | svg-filter-front | svg-sprite | svg-sprite-front   (CSS breathe animation per point)
+         | svg-js         (sprite glow, front only, breathe driven from JS: no per-point CSS animation)
+         | svg-groupblur  (front only, JS breathe, ONE feGaussianBlur on the whole glow layer instead of one per point)
+         | canvas2d | webgl
+    n    = number of points (default 1000)
+    rot  = 1 (default) rotate the sphere every frame, 0 = idle (only the CSS/JS breathe)
+    secs = measurement window in seconds (default 4)
+
+  Every mode draws the same scene: N points on a Fibonacci sphere, orthographic
+  projection, a glow halo + a four-point star per point, a "breathe" animation
+  (scale 1 -> 1.25, opacity 1 -> 0.7, 3 s, per-point phase). Only the front
+  hemisphere is visible. The "-front" SVG variants remove back-hemisphere nodes
+  from the DOM (display:none) instead of leaving them drawn under the sphere.
+-->
+<style>
+  html, body { margin: 0; background: #0A1020; color: #ddd; font: 12px system-ui; }
+  #stage { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
+  svg, canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  #hud { position: absolute; top: 8px; left: 8px; z-index: 2; white-space: pre; pointer-events: none; }
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.25); opacity: 0.7; }
+  }
+  .pt > g { animation: breathe 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .pt.back { display: none; }
+  .pt.js > g { animation: none; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<div id="hud"></div>
+<script>
+(function () {
+  const q = new URLSearchParams(location.search)
+  const mode = q.get('mode') || 'svg-filter'
+  const N = parseInt(q.get('n') || '1000', 10)
+  const rotate = q.get('rot') !== '0'
+  const secs = parseFloat(q.get('secs') || '4')
+  const stage = document.getElementById('stage')
+  const hud = document.getElementById('hud')
+  const W = stage.clientWidth, H = stage.clientHeight
+  const R = Math.min(W, H) * 0.42
+  const cx = W / 2, cy = H / 2
+  const GLOW_R = 9      // halo radius in CSS px
+  const STAR_R = 3.2    // star outer radius
+  const BLUR = 3        // feGaussianBlur stdDeviation
+
+  // Fibonacci sphere: unit vectors (x, y, z)
+  const pts = new Float32Array(N * 3)
+  const phase = new Float32Array(N)
+  const golden = Math.PI * (3 - Math.sqrt(5))
+  for (let i = 0; i < N; i++) {
+    const y = 1 - (i / (N - 1)) * 2
+    const r = Math.sqrt(1 - y * y)
+    const t = golden * i
+    pts[i * 3] = Math.cos(t) * r
+    pts[i * 3 + 1] = y
+    pts[i * 3 + 2] = Math.sin(t) * r
+    phase[i] = (i * 0.37) % 3
+  }
+
+  // Rotation about the Y axis, then orthographic projection: (x*cos + z*sin, y, -x*sin + z*cos)
+  function project(angle, out) {
+    const c = Math.cos(angle), s = Math.sin(angle)
+    for (let i = 0; i < N; i++) {
+      const x = pts[i * 3], y = pts[i * 3 + 1], z = pts[i * 3 + 2]
+      out[i * 3] = cx + (x * c + z * s) * R
+      out[i * 3 + 1] = cy - y * R
+      out[i * 3 + 2] = -x * s + z * c   // depth, >0 is the front hemisphere
+    }
+  }
+  const proj = new Float32Array(N * 3)
+  const starPath = (function () {
+    const o = STAR_R, i = STAR_R * 0.35
+    return `M0,${-o} L${i},${-i} L${o},0 L${i},${i} L0,${o} L${-i},${i} L${-o},0 L${-i},${-i} Z`
+  })()
+
+  let draw // (angle, t) => void
+
+  // ---------------------------------------------------------------- SVG
+  if (mode.startsWith('svg')) {
+    const jsBreathe = mode === 'svg-js' || mode === 'svg-groupblur'
+    const groupBlur = mode === 'svg-groupblur'
+    const useFilter = mode.startsWith('svg-filter')
+    const frontOnly = mode.endsWith('-front') || jsBreathe
+    const svgNS = 'http://www.w3.org/2000/svg'
+    const svg = document.createElementNS(svgNS, 'svg')
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`)
+    svg.innerHTML = `
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="${BLUR}" />
+        </filter>
+        <radialGradient id="halo">
+          <stop offset="0" stop-color="#F2C572" stop-opacity="0.9" />
+          <stop offset="0.45" stop-color="#F2C572" stop-opacity="0.35" />
+          <stop offset="1" stop-color="#F2C572" stop-opacity="0" />
+        </radialGradient>
+        <symbol id="haloSym" viewBox="-${GLOW_R} -${GLOW_R} ${GLOW_R * 2} ${GLOW_R * 2}">
+          <circle r="${GLOW_R}" fill="url(#halo)" />
+        </symbol>
+      </defs>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="#141C38" />
+      <g id="glowLayer" ${groupBlur ? 'filter="url(#glow)"' : ''}></g>
+      <g id="pts"></g>`
+    stage.appendChild(svg)
+    const layer = svg.querySelector('#pts')
+    const glowLayer = svg.querySelector('#glowLayer')
+    const nodes = new Array(N)
+    const glows = groupBlur ? new Array(N) : null
+    const frag = document.createDocumentFragment()
+    const gfrag = document.createDocumentFragment()
+    for (let i = 0; i < N; i++) {
+      const g = document.createElementNS(svgNS, 'g')
+      g.setAttribute('class', 'pt')
+      const inner = document.createElementNS(svgNS, 'g')
+      if (!jsBreathe) inner.style.animationDelay = `-${phase[i]}s`
+      if (groupBlur) {
+        // glow lives in the single filtered layer; the star stays sharp in #pts
+        const c = document.createElementNS(svgNS, 'circle')
+        c.setAttribute('r', String(GLOW_R * 0.55))
+        c.setAttribute('fill', '#F2C572')
+        c.setAttribute('opacity', '0.8')
+        gfrag.appendChild(c)
+        glows[i] = c
+      } else if (useFilter) {
+        const c = document.createElementNS(svgNS, 'circle')
+        c.setAttribute('r', String(GLOW_R * 0.55))
+        c.setAttribute('fill', '#F2C572')
+        c.setAttribute('opacity', '0.8')
+        c.setAttribute('filter', 'url(#glow)')
+        inner.appendChild(c)
+      } else if (!groupBlur) {
+        const u = document.createElementNS(svgNS, 'use')
+        u.setAttribute('href', '#haloSym')
+        u.setAttribute('x', String(-GLOW_R)); u.setAttribute('y', String(-GLOW_R))
+        u.setAttribute('width', String(GLOW_R * 2)); u.setAttribute('height', String(GLOW_R * 2))
+        inner.appendChild(u)
+      }
+      const p = document.createElementNS(svgNS, 'path')
+      p.setAttribute('d', starPath)
+      p.setAttribute('fill', '#FFF4D6')
+      inner.appendChild(p)
+      g.appendChild(inner)
+      frag.appendChild(g)
+      nodes[i] = g
+    }
+    layer.appendChild(frag)
+    if (groupBlur) glowLayer.appendChild(gfrag)
+    if (jsBreathe) { for (const g of nodes) g.classList.add('js') }
+    const back = new Uint8Array(N)
+    draw = function (angle, t) {
+      project(angle, proj)
+      for (let i = 0; i < N; i++) {
+        const g = nodes[i]
+        const isBack = proj[i * 3 + 2] < 0
+        if (frontOnly && back[i] !== (isBack ? 1 : 0)) {
+          back[i] = isBack ? 1 : 0
+          g.classList.toggle('back', isBack)
+          if (groupBlur) glows[i].setAttribute('display', isBack ? 'none' : '')
+        }
+        if (frontOnly && isBack) continue
+        const x = proj[i * 3].toFixed(1), y = proj[i * 3 + 1].toFixed(1)
+        if (jsBreathe) {
+          const b = 0.5 - 0.5 * Math.cos(((t + phase[i]) / 3) * Math.PI * 2)
+          const k = (1 + 0.25 * b).toFixed(3)
+          g.setAttribute('transform', `translate(${x} ${y}) scale(${k})`)
+          g.setAttribute('opacity', (1 - 0.3 * b).toFixed(2))
+          if (groupBlur) glows[i].setAttribute('transform', `translate(${x} ${y}) scale(${k})`)
+        } else {
+          g.setAttribute('transform', `translate(${x} ${y})`)
+        }
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------- Canvas 2D
+  if (mode === 'canvas2d') {
+    const dpr = window.devicePixelRatio || 1
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr)
+    stage.appendChild(canvas)
+    const ctx = canvas.getContext('2d')
+    // Pre-rendered sprite: halo (radial gradient) + star, drawn once at 2x the max scale.
+    const S = Math.ceil(GLOW_R * 1.25 * 2 * dpr) + 2
+    const sprite = document.createElement('canvas')
+    sprite.width = sprite.height = S
+    const sc = sprite.getContext('2d')
+    sc.scale(dpr, dpr)
+    const half = S / 2 / dpr
+    const grad = sc.createRadialGradient(half, half, 0, half, half, GLOW_R * 1.25)
+    grad.addColorStop(0, 'rgba(242,197,114,0.9)')
+    grad.addColorStop(0.45, 'rgba(242,197,114,0.35)')
+    grad.addColorStop(1, 'rgba(242,197,114,0)')
+    sc.fillStyle = grad
+    sc.fillRect(0, 0, half * 2, half * 2)
+    sc.translate(half, half)
+    sc.fillStyle = '#FFF4D6'
+    sc.fill(new Path2D(starPath.replace(/[-\d.]+/g, (m) => String(parseFloat(m) * 1.25))))
+    draw = function (angle, t) {
+      project(angle, proj)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      ctx.clearRect(0, 0, W, H)
+      ctx.fillStyle = '#141C38'
+      ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill()
+      const size = S / dpr
+      for (let i = 0; i < N; i++) {
+        if (proj[i * 3 + 2] < 0) continue
+        const b = 0.5 - 0.5 * Math.cos(((t + phase[i]) / 3) * Math.PI * 2) // 0..1
+        const k = (1 + 0.25 * b) / 1.25
+        ctx.globalAlpha = 1 - 0.3 * b
+        const s = size * k
+        ctx.drawImage(sprite, proj[i * 3] - s / 2, proj[i * 3 + 1] - s / 2, s, s)
+      }
+      ctx.globalAlpha = 1
+    }
+  }
+
+  // ---------------------------------------------------------------- WebGL (raw, gl.POINTS)
+  if (mode === 'webgl') {
+    const dpr = window.devicePixelRatio || 1
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr)
+    stage.appendChild(canvas)
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: true, premultipliedAlpha: true })
+    if (!gl) throw new Error('no webgl')
+    const vs = `
+      attribute vec3 aPos; attribute float aPhase;
+      uniform float uAngle, uT, uR, uDpr; uniform vec2 uCenter, uSize;
+      varying float vB; varying float vDepth;
+      void main() {
+        float c = cos(uAngle), s = sin(uAngle);
+        vec3 p = vec3(aPos.x * c + aPos.z * s, aPos.y, -aPos.x * s + aPos.z * c);
+        vDepth = p.z;
+        vec2 px = vec2(uCenter.x + p.x * uR, uCenter.y - p.y * uR);
+        vec2 clip = (px / uSize) * 2.0 - 1.0;
+        gl_Position = vec4(clip.x, -clip.y, 0.0, 1.0);
+        float b = 0.5 - 0.5 * cos((uT + aPhase) / 3.0 * 6.2831853);
+        vB = b;
+        gl_PointSize = ${GLOW_R * 2}.0 * (1.0 + 0.25 * b) * uDpr;
+      }`
+    const fs = `
+      precision mediump float; varying float vB; varying float vDepth;
+      void main() {
+        if (vDepth < 0.0) discard;
+        vec2 d = gl_PointCoord - 0.5;
+        float r = length(d) * 2.0;
+        float halo = smoothstep(1.0, 0.0, r) * 0.45;
+        // four-point star: |x|^0.5 + |y|^0.5 < k
+        float star = 1.0 - smoothstep(0.30, 0.36, sqrt(abs(d.x)) + sqrt(abs(d.y)));
+        float a = (halo + star) * (1.0 - 0.3 * vB);
+        gl_FragColor = vec4(vec3(0.95, 0.77, 0.45) * a + vec3(1.0, 0.96, 0.84) * star * a, a);
+      }`
+    function sh(type, src) {
+      const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s)
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s))
+      return s
+    }
+    const prog = gl.createProgram()
+    gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fs))
+    gl.linkProgram(prog); gl.useProgram(prog)
+    const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf)
+    gl.bufferData(gl.ARRAY_BUFFER, pts, gl.STATIC_DRAW)
+    const aPos = gl.getAttribLocation(prog, 'aPos'); gl.enableVertexAttribArray(aPos)
+    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0)
+    const pbuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, pbuf)
+    gl.bufferData(gl.ARRAY_BUFFER, phase, gl.STATIC_DRAW)
+    const aPhase = gl.getAttribLocation(prog, 'aPhase'); gl.enableVertexAttribArray(aPhase)
+    gl.vertexAttribPointer(aPhase, 1, gl.FLOAT, false, 0, 0)
+    const u = (n) => gl.getUniformLocation(prog, n)
+    gl.uniform1f(u('uR'), R); gl.uniform1f(u('uDpr'), dpr)
+    gl.uniform2f(u('uCenter'), cx, cy); gl.uniform2f(u('uSize'), W, H)
+    gl.viewport(0, 0, canvas.width, canvas.height)
+    gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA)
+    gl.clearColor(0.078, 0.11, 0.22, 1)
+    const range = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE)
+    window.__pointSizeRange = Array.from(range)
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info')
+    window.__glRenderer = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER)
+    draw = function (angle, t) {
+      gl.clear(gl.COLOR_BUFFER_BIT)
+      gl.uniform1f(u('uAngle'), angle); gl.uniform1f(u('uT'), t)
+      gl.drawArrays(gl.POINTS, 0, N)
+    }
+  }
+
+  if (!draw) throw new Error('unknown mode ' + mode)
+
+  // ---------------------------------------------------------------- measurement
+  const frames = []
+  let last = performance.now(), start = last, angle = 0
+  const WARM = 1000
+  const result = new Promise((resolve) => {
+    function tick(now) {
+      const dt = now - last; last = now
+      const t = (now - start) / 1000
+      if (rotate) angle += 0.4 * dt / 1000          // ~23 deg/s, like a slow inertial spin
+      draw(angle, t)
+      if (now - start > WARM) frames.push(dt)
+      if (now - start > WARM + secs * 1000) {
+        frames.sort((a, b) => a - b)
+        const sum = frames.reduce((a, b) => a + b, 0)
+        const p = (k) => frames[Math.min(frames.length - 1, Math.floor(frames.length * k))]
+        const r = {
+          mode, n: N, rotate, dpr: window.devicePixelRatio, w: W, h: H,
+          frames: frames.length, meanMs: +(sum / frames.length).toFixed(2),
+          fps: +((frames.length * 1000) / sum).toFixed(1),
+          p50Ms: +p(0.5).toFixed(2), p95Ms: +p(0.95).toFixed(2), maxMs: +frames[frames.length - 1].toFixed(2),
+          longFrames: frames.filter((f) => f > 50).length,
+          jsHeapMB: performance.memory ? +(performance.memory.usedJSHeapSize / 1048576).toFixed(1) : null,
+          pointSizeRange: window.__pointSizeRange || null,
+          glRenderer: window.__glRenderer || null,
+        }
+        hud.textContent = JSON.stringify(r, null, 1)
+        resolve(r)
+        return
+      }
+      hud.textContent = `${mode} n=${N} ${(1000 / dt).toFixed(0)} fps`
+      requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  window.__bench = result
+})()
+</script>
+</body>
+</html>
