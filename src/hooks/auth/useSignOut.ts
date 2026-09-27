@@ -48,10 +48,10 @@ export function useSignOut() {
 
     clearAuth()
     // Query keys do not name the user, so whoever signs in next on this tab
-    // would be served this person's answers. Cancelled first so a fetch still
-    // in flight is dropped rather than written back once the cache is empty;
-    // a mutation still in flight is stopped by the client's own guard.
-    void queryClient.cancelQueries()
+    // would be served this person's answers. Clearing destroys each query, which
+    // also cancels a fetch still in flight, so its answer is dropped rather than
+    // written back; a mutation still in flight is stopped by the client's own
+    // guard.
     queryClient.clear()
     // Left in the tab, the upload hand-off opens the next student's chat with
     // this person's prompt and attachments already in the composer.

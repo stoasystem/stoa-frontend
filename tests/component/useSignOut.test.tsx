@@ -3,6 +3,7 @@ import { act, renderHook, waitFor } from '@testing-library/react'
 import { delay, http, HttpResponse } from 'msw'
 import type { ReactNode } from 'react'
 import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
+import { AxiosError } from 'axios'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { queryClient } from '@/app/query/queryClient'
 import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHandoff'
@@ -249,6 +250,31 @@ describe('useSignOut', () => {
     expect(result.current.isSigningOut).toBe(false)
     expectSignedOutHere()
     expectLeftForLogin(result)
+  })
+
+  it('logs a timeout as a timeout on the XHR path the browser takes', async () => {
+    // The fetch adapter above always says ETIMEDOUT. The XHR adapter production
+    // uses says so only when asked, and ECONNABORTED otherwise
+    // (axios/lib/adapters/xhr.js, request.ontimeout). This stand-in answers the
+    // way it does, so dropping the request's clarifyTimeoutError shows up here.
+    vi.spyOn(httpClient.defaults, 'adapter', 'get').mockReturnValue((config) =>
+      Promise.reject(
+        new AxiosError(
+          `timeout of ${config.timeout}ms exceeded`,
+          config.transitional?.clarifyTimeoutError ? AxiosError.ETIMEDOUT : AxiosError.ECONNABORTED,
+          config,
+        ),
+      ),
+    )
+    const warn = vi.spyOn(logger, 'warn')
+    const { result } = renderSignedIn()
+
+    await act(() => result.current.signOut())
+
+    expect(warn).toHaveBeenCalledExactlyOnceWith('Backend logout not confirmed; signed out locally', {
+      outcome: 'timeout',
+    })
+    expectSignedOutHere()
   })
 
   it.each([
