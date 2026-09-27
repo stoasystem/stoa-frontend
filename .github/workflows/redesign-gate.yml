@@ -1,0 +1,76 @@
+name: Redesign Branch Gate
+
+# Runs on every pull request into a redesign integration branch. It only
+# checks; it never builds a release for anyone, holds no secrets and talks to
+# no cloud account. Publishing a preview lives in its own workflow (#28).
+
+on:
+  pull_request:
+    branches:
+      - redesign/planet
+      - redesign/cute
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: redesign-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Redesign gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: API contract guard
+        run: |
+          curl -fsSL -o /tmp/route-inventory.json \
+            https://raw.githubusercontent.com/stoasystem/stoa-backend/main/docs/security/route-authorization-inventory.json
+          npm run check:api-contract -- --inventory /tmp/route-inventory.json
+
+      - name: Translation guard
+        run: npm run check:untranslated
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Release contract tests
+        run: npm run test:release
+
+      - name: Publisher tests
+        run: node --test tests/release/publish-web-release.test.mjs
+
+      - name: Build
+        run: npm run build
+
+      # ---- PLACEHOLDER: dist e2e -------------------------------------------
+      # Playwright e2e against the locally built dist joins the gate here once
+      # stoasystem/stoa-frontend#29 lands (202 -> terminal state -> refresh
+      # recovery, with real runtime-config / served-release assembly).
+      # Until then this gate does NOT cover end-to-end behaviour.
+      #
+      # - name: Dist e2e
+      #   run: npm run test:e2e:dist
+      # ----------------------------------------------------------------------
