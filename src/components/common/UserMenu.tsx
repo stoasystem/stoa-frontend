@@ -15,7 +15,7 @@ import { useAuthStore } from '@/store/authStore'
 export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
-  const signOut = useSignOut()
+  const { signOut, isSigningOut } = useSignOut()
 
   if (!user) return null
 
@@ -46,6 +46,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           size="icon"
           className="h-8 w-8 rounded-full"
           aria-label={t('actions.logOut')}
+          disabled={isSigningOut}
           onClick={() => void signOut()}
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />
@@ -69,6 +70,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
           variant="ghost"
           size="icon"
           aria-label={t('actions.logOut')}
+          disabled={isSigningOut}
           onClick={() => void signOut()}
         >
           <LogOut className="h-4 w-4" aria-hidden="true" />

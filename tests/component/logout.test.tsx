@@ -1,10 +1,12 @@
-import { render, screen } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserMenu } from '@/components/common/UserMenu'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { logger } from '@/services/logging/logger'
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
@@ -42,19 +44,25 @@ function renderSignedIn(variant: 'sidebar' | 'top' = 'sidebar') {
     clearAuth,
   })
   render(
-    <MemoryRouter initialEntries={['/tutor']}>
-      <Routes>
-        <Route path="/tutor" element={<UserMenu variant={variant} />} />
-        <Route path="/login" element={<p>login page</p>} />
-      </Routes>
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/tutor']}>
+        <Routes>
+          <Route path="/tutor" element={<UserMenu variant={variant} />} />
+          <Route path="/login" element={<p>login page</p>} />
+        </Routes>
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
   return { clearAuth }
 }
 
+// The menu signs out here and leaves first, then tells the backend without
+// waiting for it; this waits until the backend's answer has been handled too.
 async function logOut() {
+  const handled = [vi.spyOn(logger, 'info'), vi.spyOn(logger, 'warn')]
   await userEvent.click(screen.getByRole('button', { name: 'actions.logOut' }))
   expect(await screen.findByText('login page')).toBeInTheDocument()
+  await waitFor(() => expect(handled.some((spy) => spy.mock.calls.length > 0)).toBe(true))
 }
 
 function expectSignedOutHere() {
@@ -71,6 +79,7 @@ describe('logging out', () => {
   afterEach(() => {
     mswServer.resetHandlers()
     useAuthStore.setState({ clearAuth: storeClearAuth })
+    vi.restoreAllMocks()
   })
   afterAll(() => mswServer.close())
   beforeEach(() => {
@@ -79,7 +88,7 @@ describe('logging out', () => {
   })
 
   it.each(['sidebar', 'top'] as const)(
-    'sends the token in the body of POST /auth/logout, then signs out here (%s menu)',
+    'signs out here and sends the token it held in the body of POST /auth/logout (%s menu)',
     async (variant) => {
       const seen = answerLogout(204)
       renderSignedIn(variant)
