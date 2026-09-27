@@ -11,8 +11,8 @@
     "typecheck": "tsc -b",
     "test:release": "node --test tests/release/contact-backend-only.test.mjs tests/release/runtime-config.test.mjs tests/release/runtime-env-projection.test.mjs tests/release/runtime-monitoring-flag.test.mjs tests/release/runtime-startup-barrier.test.mjs tests/release/served-release.test.mjs tests/release/sandbox-evidence-sources-present.test.mjs",
     "verify:release": "node ./scripts/verify-release.mjs verify",
-    "test": "vitest run --config vitest.config.ts",
-    "test:watch": "vitest --config vitest.config.ts",
+    "test": "NODE_OPTIONS=--no-experimental-webstorage vitest run --config vitest.config.ts",
+    "test:watch": "NODE_OPTIONS=--no-experimental-webstorage vitest --config vitest.config.ts",
     "check:api-contract": "node ./scripts/check-api-contract.mjs",
     "check:untranslated": "node ./scripts/check-untranslated.mjs",
     "test:smoke": "playwright test --config=playwright.smoke.config.ts"
