@@ -122,6 +122,50 @@ function signOutButtonsShownAt(width: number) {
     .filter((button) => shownAt(button, width) && !button.hasAttribute('disabled'))
 }
 
+const originalMatchMedia = window.matchMedia
+
+// Since #18 the shell has one sign-out, in the avatar menu, and chooses its
+// phone or desktop bar with matchMedia; so the width is emulated there too.
+function emulateWidth(width: number) {
+  window.matchMedia = ((query: string) => {
+    const min = query.match(/min-width:\s*(\d+)px/)
+    const max = query.match(/max-width:\s*(\d+)px/)
+    const matches = (!min || width >= Number(min[1])) && (!max || width <= Number(max[1]))
+    return {
+      matches,
+      media: query,
+      onchange: null,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      addListener: () => {},
+      removeListener: () => {},
+      dispatchEvent: () => false,
+    }
+  }) as typeof window.matchMedia
+}
+
+function accountTriggersShownAt(width: number) {
+  return screen
+    .getAllByRole('button', { name: 'accountMenu.open' })
+    .filter((button) => shownAt(button, width) && !button.hasAttribute('disabled'))
+}
+
+function signOutItemsShownAt(width: number) {
+  return screen
+    .queryAllByRole('menuitem', { name: 'actions.logOut' })
+    .filter((item) => shownAt(item, width) && item.getAttribute('aria-disabled') !== 'true')
+}
+
+/** Opens the avatar menu the way a person would, and returns its sign-out. */
+async function openAccountMenuAt(width: number) {
+  const triggers = accountTriggersShownAt(width)
+  expect(triggers, `no account menu to open at ${width}px`).toHaveLength(1)
+  await userEvent.click(triggers[0])
+  const items = signOutItemsShownAt(width)
+  expect(items, `no sign-out in the account menu at ${width}px`).toHaveLength(1)
+  return items[0]
+}
+
 function renderSignedIn(role: UserRole, path: string, page: ReactNode) {
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Ada Lovelace', email: 'ada@example.com', role } as CurrentUser,
@@ -136,7 +180,8 @@ function renderSignedIn(role: UserRole, path: string, page: ReactNode) {
   )
 }
 
-function renderShellAs(role: UserRole) {
+function renderShellAs(role: UserRole, width: number) {
+  emulateWidth(width)
   renderSignedIn(
     role,
     getDefaultRouteForRole(role),
@@ -169,10 +214,14 @@ const ROLES: UserRole[] = ['student', 'parent', 'teacher', 'admin']
 
 // Below 640px both sign-out buttons used to be hidden, the sidebar's below
 // `md` and the top bar's below `sm`, so a phone could not sign out at all
-// (stoasystem/stoa-frontend#2).
+// (stoasystem/stoa-frontend#2). Since #18 the shell's only sign-out is in the
+// avatar menu; this still holds that it can be reached, and used, at each width.
 describe('signing out on a narrow screen', () => {
   beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
-  afterEach(() => mswServer.resetHandlers())
+  afterEach(() => {
+    mswServer.resetHandlers()
+    window.matchMedia = originalMatchMedia
+  })
   afterAll(() => mswServer.close())
   beforeEach(() => {
     // Nothing on these screens needs data to lay out; every other call is refused.
@@ -183,12 +232,10 @@ describe('signing out on a narrow screen', () => {
 
   describe.each([375, 632])('at %ipx', (width) => {
     it.each(ROLES)('offers a %s a visible sign-out that uses the shared sign-out', async (role) => {
-      renderShellAs(role)
+      renderShellAs(role, width)
 
-      const shown = signOutButtonsShownAt(width)
-      expect(shown, `no sign-out a ${role} can see at ${width}px`).toHaveLength(1)
-
-      await userEvent.click(shown[0])
+      const signOutItem = await openAccountMenuAt(width)
+      await userEvent.click(signOutItem)
       expect(signOut).toHaveBeenCalledOnce()
     })
   })
@@ -207,10 +254,14 @@ describe('signing out on a narrow screen', () => {
     })
   })
 
-  // Desktop keeps what it had: one sign-out in the sidebar, one in the top bar.
-  it.each(ROLES)('leaves a %s both desktop sign-outs at 1280px', (role) => {
-    renderShellAs(role)
+  // Since #18 the desktop has the same single sign-out as the phone: behind the
+  // avatar, with no second copy in a sidebar or loose in the bar.
+  it.each(ROLES)('gives a %s exactly one sign-out at 1280px, behind the avatar', async (role) => {
+    renderShellAs(role, 1280)
 
-    expect(signOutButtonsShownAt(1280)).toHaveLength(2)
+    expect(screen.queryAllByRole('button', { name: 'actions.logOut' })).toHaveLength(0)
+    const signOutItem = await openAccountMenuAt(1280)
+    await userEvent.click(signOutItem)
+    expect(signOut).toHaveBeenCalledOnce()
   })
 })

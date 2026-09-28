@@ -1,9 +1,8 @@
 import { ChevronDown, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
 import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
-import { useUpdateLocalePreferenceMutation } from '@/hooks/auth/useUpdateLocalePreferenceMutation'
-import { useAuthStore } from '@/store/authStore'
 import { cn } from '@/lib/utils'
 
 type LanguageSwitcherProps = {
@@ -13,20 +12,9 @@ type LanguageSwitcherProps = {
 }
 
 export function LanguageSwitcher({ compact = false, className, variant = 'select' }: LanguageSwitcherProps) {
-  const { i18n, t } = useTranslation('common')
-  const user = useAuthStore((state) => state.user)
-  const updateLocale = useUpdateLocalePreferenceMutation()
-  const currentLanguage = languageOptions.find((language) => language.code === i18n.language) ?? languageOptions[0]
-
-  function changeLanguage(language: SupportedLanguage) {
-    if (language === i18n.language) return
-    void i18n.changeLanguage(language)
-    if (user) {
-      // Fire and forget: the screen is already in the new language, and the
-      // write only records the preference for next time.
-      updateLocale.mutate(language)
-    }
-  }
+  const { t } = useTranslation('common')
+  const { current, changeLanguage } = useChangeLanguage()
+  const currentLanguage = languageOptions.find((language) => language.code === current) ?? languageOptions[0]
 
   if (variant === 'footer') {
     return (

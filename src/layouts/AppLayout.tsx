@@ -2,13 +2,12 @@ import type { ReactNode } from 'react'
 import {
   BarChart3,
   BookOpen,
-  LibraryBig,
   CreditCard,
   GraduationCap,
   HelpCircle,
   History,
-  Home,
   LayoutDashboard,
+  LibraryBig,
   MessageCircle,
   Route,
   Settings,
@@ -18,17 +17,17 @@ import {
   Video,
   type LucideIcon,
 } from 'lucide-react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { AppLogo } from '@/components/common/AppLogo'
-import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
-import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
-import { NotificationCenter } from '@/components/notifications/NotificationCenter'
-import { UserMenu } from '@/components/common/UserMenu'
+import { useLocation } from 'react-router-dom'
 import type { AppNavIcon } from '@/app/router/routeManifest'
+import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
+import { activeNavIndex, shellNavigationFor } from '@/components/shell/shellNavigation'
+import { SourceList } from '@/components/shell/SourceList'
+import { TopBar } from '@/components/shell/TopBar'
+import { SOURCE_LIST_QUERY, WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
+import type { AppNavItem } from '@/lib/navigation'
 import { cn } from '@/lib/utils'
-import { getNavItemsForUserRole, type AppNavItem } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
 
 const navIcons: Record<AppNavIcon, LucideIcon> = {
@@ -49,140 +48,66 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   tutors: GraduationCap,
 }
 
-function NavItemLink({
-  item,
-  items,
-  compact = false,
-}: {
-  item: AppNavItem
-  items: AppNavItem[]
-  compact?: boolean
-}) {
-  const Icon = navIcons[item.icon]
+export type AppSurface = 'light' | 'sky'
+
+/*
+ * The app shell (#18; #13 points 5 and 6). A 56 top bar with the logo, the
+ * bell and the avatar, for every role; no sidebar and no bottom tab bar. A
+ * teacher or parent gets their pages as a segmented control, an administrator
+ * a source list. Everything the account needs (profile, language, password,
+ * help, sign-out) is behind the avatar, at every width.
+ *
+ * `surface="sky"` paints the page area as the dark sky (the planet, the stage)
+ * and scopes the sky tokens to it; the bar stays light, as every board draws it.
+ */
+export function AppLayout({ children, surface = 'light' }: { children: ReactNode; surface?: AppSurface }) {
   const { t } = useTranslation('common')
   const location = useLocation()
-  // The manifest names the key; an entry without one shows its English label.
-  const labelKey = item.labelKey ?? item.label
-  const fullLabel = t(labelKey, { defaultValue: item.label })
-  // Five tabs share a phone's width, where the full labels are cut mid-word.
-  const label = compact
-    ? t(labelKey.replace('navigation.', 'navigation.short.'), { defaultValue: fullLabel })
-    : fullLabel
-  const active = isActiveNavItem(item, items, location.pathname)
-
-  return (
-    <NavLink
-      className={() =>
-        cn(
-          'stoa-type-nav flex items-center gap-2 rounded-md text-sm font-medium transition-colors',
-          compact
-            ? 'min-w-0 flex-1 flex-col justify-center gap-1 px-1 py-1.5 text-[0.68rem] leading-tight'
-            : 'px-2 py-1.5',
-          active
-            ? 'platform-nav-active shadow-sm'
-            : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
-        )
-      }
-      end={item.path === '/'}
-      to={item.path}
-    >
-      <Icon aria-hidden="true" className={compact ? 'h-4 w-4 shrink-0' : 'h-4 w-4'} />
-      <span
-        className={compact ? 'max-w-full truncate' : undefined}
-        title={compact && label !== fullLabel ? fullLabel : undefined}
-      >
-        {label}
-      </span>
-    </NavLink>
-  )
-}
-
-export function AppLayout({ children }: { children: ReactNode }) {
-  const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
-  const items = user ? getNavItemsForUserRole(user.role, { includeSecondary: true }) : []
-  const primaryItems = items.filter((item) => item.priority === 'primary')
-  const secondaryItems = items.filter((item) => item.priority === 'secondary')
-  const mobileItems = user ? getNavItemsForUserRole(user.role, { mobileOnly: true }).slice(0, 5) : []
+  const wide = useMediaQuery(WIDE_QUERY)
+  const roomForSourceList = useMediaQuery(SOURCE_LIST_QUERY)
   const homePath = user ? getDefaultRouteForRole(user.role) : '/'
+  const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
+  const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
+  const activeIndex = activeNavIndex(items, location.pathname)
+  const label = (item: AppNavItem) => t(item.labelKey ?? item.label, { defaultValue: item.label })
+
+  const page = (
+    <main
+      data-surface={surface === 'sky' ? 'sky' : undefined}
+      className={cn('min-w-0 flex-1', surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink')}
+    >
+      {/* Placement: page padding 36 top and 48 at the sides; 8 and 16 on a phone. */}
+      <div className={cn(wide ? 'px-12 pt-9 pb-12' : 'px-4 pt-2 pb-8')}>{children}</div>
+    </main>
+  )
 
   return (
-    <div className="platform-app-shell min-h-screen text-foreground">
-      <div className="flex min-h-screen">
-        <aside className="hidden w-64 flex-col border-r bg-card/85 p-4 shadow-[8px_0_30px_rgba(33,33,33,0.04)] md:flex">
-          <Link to={homePath} className="font-semibold">
-            <AppLogo />
-          </Link>
-          <nav aria-label={t('navigation.primary')} className="mt-6 flex flex-1 flex-col gap-2">
-            {primaryItems.map((item) => (
-              <NavItemLink item={item} items={primaryItems} key={`${item.path}-${item.label}`} />
-            ))}
-            {secondaryItems.length > 0 && (
-              <div className="mt-4 border-t pt-4">
-                <p className="brand-section-kicker mb-2 px-2">
-                  {t('navigation.more')}
-                </p>
-                <div className="flex flex-col gap-2">
-                  {secondaryItems.map((item) => (
-                    <NavItemLink item={item} items={items} key={`${item.path}-${item.label}`} />
-                  ))}
-                </div>
-              </div>
-            )}
-          </nav>
-          <UserMenu />
-        </aside>
-        <main className="min-w-0 flex-1 pb-24">
-          <header className="sticky top-0 z-30 border-b bg-[hsl(var(--platform-surface-app)_/_0.94)] px-3 py-3 shadow-[0_10px_30px_hsl(var(--stoa-brand-charcoal)_/_0.04)] backdrop-blur sm:px-4 md:px-6">
-            <div className="flex min-h-11 min-w-0 items-center gap-2 sm:gap-3">
-              <Link
-                to={homePath}
-                className="stoa-type-nav inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md border border-border/80 bg-card/60 px-2.5 py-2 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] sm:px-3"
-              >
-                <Home className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">{t('navigation.home')}</span>
-              </Link>
-              {/* The sidebar carries the primary navigation on this breakpoint
-                  and the bottom bar carries it below `md`. A second copy here
-                  only competed with it over which one showed the current page. */}
-              <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
-                {user && <NotificationCenter />}
-                <LanguageSwitcher compact />
-                {/* Shown at every width: below `md` the sidebar and its account
-                    menu are gone, so this is the only way to sign out on a phone
-                    (stoasystem/stoa-frontend#2). The name gives way below `sm`. */}
-                <UserMenu variant="top" />
-              </div>
-            </div>
-          </header>
-          <div className="p-4 md:p-6">{children}</div>
-        </main>
-      </div>
-      {mobileItems.length > 0 && (
-        <nav
-          aria-label={t('navigation.mobilePrimary')}
-          className="fixed inset-x-0 bottom-0 z-40 border-t bg-card/95 px-2 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] shadow-lg backdrop-blur md:hidden"
-        >
-          <div className="mx-auto flex max-w-lg items-stretch gap-1">
-            {mobileItems.map((item) => (
-              <NavItemLink compact item={item} items={mobileItems} key={`${item.path}-${item.label}-mobile`} />
-            ))}
-          </div>
-        </nav>
+    <div className="flex min-h-screen flex-col bg-ground text-ink">
+      <TopBar
+        homePath={homePath}
+        wide={wide}
+        signedIn={Boolean(user)}
+        segments={
+          navigation.kind === 'segmented'
+            ? navigation.items.map((item) => ({ to: item.path, label: label(item) }))
+            : undefined
+        }
+        activeIndex={activeIndex}
+      />
+      {navigation.kind === 'sourceList' ? (
+        <div className={cn('flex flex-1', roomForSourceList ? 'flex-row' : 'flex-col')}>
+          <SourceList
+            wide={roomForSourceList}
+            activeIndex={activeIndex}
+            items={navigation.items.map((item) => ({ to: item.path, label: label(item), icon: navIcons[item.icon] }))}
+          />
+          {page}
+        </div>
+      ) : (
+        <div className="flex flex-1">{page}</div>
       )}
       <InternalDebugPanel />
     </div>
-  )
-}
-
-function isActiveNavItem(item: AppNavItem, items: AppNavItem[], pathname: string) {
-  if (pathname === item.path) return true
-  if (!pathname.startsWith(`${item.path}/`)) return false
-
-  return !items.some(
-    (candidate) =>
-      candidate.path !== item.path &&
-      candidate.path.startsWith(`${item.path}/`) &&
-      (pathname === candidate.path || pathname.startsWith(`${candidate.path}/`)),
   )
 }

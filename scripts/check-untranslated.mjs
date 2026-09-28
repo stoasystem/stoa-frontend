@@ -33,6 +33,10 @@ const ROOTS = [
   'src/pages/chapter',
   'src/pages/ask',
   'src/pages/me',
+  // The redesign's base components and app shell (#18).
+  'src/components/base',
+  'src/components/shell',
+  'src/layouts',
 ]
 
 // Anything a screen puts words into.
