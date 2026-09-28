@@ -56,8 +56,24 @@ describe('a /chat link that names a conversation opens it in Ask', () => {
     expect(openAs('student', '/assistant?conversationId=c-7')).toMatchObject({ pathname: '/ask/c-7' })
   })
 
-  it('keeps an id that needs escaping in one path segment', () => {
-    expect(openAs('student', '/chat?conversationId=a%2Fb').pathname).toBe('/ask/a%2Fb')
+  it.each([
+    ['/chat/..'],
+    ['/chat/%2E%2E'],
+    ['/chat/%2e'],
+    ['/chat?conversationId=..'],
+    ['/chat?conversationId=%2E%2E'],
+    ['/chat?conversationId=.'],
+    ['/chat?conversationId=a%2Fb'],
+    ['/chat?conversationId=%3Cscript%3E'],
+    ['/assistant?conversationId=..'],
+  ])('treats %s as naming no conversation and opens plain /ask', (from) => {
+    // `/ask/..` would resolve to the parent and land on `/`.
+    expect(openAs('student', from)).toMatchObject({ pathname: '/ask', page: 'AskPage' })
+  })
+
+  it('accepts the UUIDs the backend issues', () => {
+    const id = '3f2b8c1e-9d4a-4b7e-8a61-0c5d2e7f9a13'
+    expect(openAs('student', `/chat/${id}`).pathname).toBe(`/ask/${id}`)
   })
 
   it('opens plain /ask when the id is empty', () => {

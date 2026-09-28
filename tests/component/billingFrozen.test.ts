@@ -9,9 +9,10 @@ import { navItems } from '@/lib/navigation'
 // with itself the moment somebody adds a fifth. It reads the route manifest
 // the router is generated from and refuses any paid path it finds there.
 
-// `plans?\b` rather than `plan`: the student's `/planet` is not a price plan.
+// `plan(?!et)` rather than `plan`: the student's `/planet` is not a price plan,
+// but PlansPage, ChoosePlanPage and planUpgrade still are.
 const PAID_VOCABULARY =
-  /billing|subscription|checkout|stripe|refund|payment|invoice|price|pricing|plans?\b|purchase|charge|coupon|discount|paywall|wallet/i
+  /billing|subscription|checkout|stripe|refund|payment|invoice|price|pricing|plan(?!et)|purchase|charge|coupon|discount|paywall|wallet/i
 
 const MANIFEST_SOURCE = path.resolve(__dirname, '../../src/app/router/routeManifest.ts')
 
@@ -30,6 +31,14 @@ describe('card 007: the paid surface is not reachable from the app', () => {
     const poisoned = registered([...pageRoutes, { path: '/billing' }])
 
     expect(poisoned.filter((p) => PAID_VOCABULARY.test(p))).toEqual(['/billing'])
+  })
+
+  it('still knows a price plan when it sees one, next to the planet', () => {
+    // Negative control for the `/planet` exception: it must not blind the
+    // check to the plan pages it exists to catch.
+    const names = ['PlansPage', 'ChoosePlanPage', 'UpgradePlanPage', 'planUpgrade', '/plans', '/plan']
+    expect(names.filter((name) => !PAID_VOCABULARY.test(name))).toEqual([])
+    expect(['/planet/:subjectId', 'PlanetHomePage'].filter((name) => PAID_VOCABULARY.test(name))).toEqual([])
   })
 
   it('does not count a route that is only present as a comment', () => {

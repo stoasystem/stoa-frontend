@@ -20,10 +20,45 @@ import {
   type RouteAccess,
 } from '@/app/router/routeManifest'
 import { useAuthStore } from '@/store/authStore'
+import type { UserRole } from '@/types/user'
 
-function accessKey(access: RouteAccess): string {
-  if (access.kind === 'roles') return `roles:${access.roles.join(',')}`
-  return access.kind
+/*
+ * Each of these fails closed: an `access` whose kind is not one of the three
+ * (a typo that got past the types, a cast) throws while the router is built,
+ * rather than quietly falling through to "any signed-in account".
+ */
+function unknownAccess(access: never): never {
+  throw new Error(`route manifest: unknown access ${JSON.stringify(access)}`)
+}
+
+export function accessKey(access: RouteAccess): string {
+  switch (access.kind) {
+    case 'public':
+    case 'signedIn':
+      return access.kind
+    case 'roles':
+      return `roles:${access.roles.join(',')}`
+    default:
+      return unknownAccess(access)
+  }
+}
+
+/** Whether the signed-in account (if any) may open a route with `access`. */
+export function isAdmitted(
+  access: RouteAccess,
+  user: { role: UserRole } | null,
+  isAuthenticated: boolean,
+): boolean {
+  switch (access.kind) {
+    case 'public':
+      return true
+    case 'signedIn':
+      return isAuthenticated && user !== null
+    case 'roles':
+      return isAuthenticated && user !== null && access.roles.includes(user.role)
+    default:
+      return unknownAccess(access)
+  }
 }
 
 /** Where a legacy link lands, with its context carried when the entry asks. */
@@ -79,43 +114,48 @@ function RoleScopedRedirect({
 function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: ReactNode }) {
   const user = useAuthStore((state) => state.user)
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const admitted =
-    isAuthenticated &&
-    user !== null &&
-    (access.kind !== 'roles' || access.roles.includes(user.role))
 
-  return admitted ? <Outlet /> : refused
+  return isAdmitted(access, user, isAuthenticated) ? <Outlet /> : refused
 }
 
-function pageElement(route: PageRoute): ReactNode {
+function pageElement(route: PageRoute, redirects: readonly LegacyRedirect[]): ReactNode {
   const Page = route.page
   const props = route.titleKey ? { ...route.props, titleKey: route.titleKey } : route.props
   const page = <Page {...props} />
   const shown = route.demoSurface ? <DemoSurfaceRoute>{page}</DemoSurfaceRoute> : page
-  const redirect = legacyRedirects.find(
+  const redirect = redirects.find(
     (candidate) => candidate.from === route.path && candidate.onlyFor,
   )
   return redirect ? <RoleScopedRedirect redirect={redirect}>{shown}</RoleScopedRedirect> : shown
 }
 
 function guarded(access: RouteAccess, key: string, children: ReactNode[]): ReactNode {
-  if (access.kind === 'public') return children
-  const inner =
-    access.kind === 'roles' ? (
-      <Route element={<RoleRoute allowedRoles={[...access.roles]} />} key={`${key}:role`}>
-        {children}
-      </Route>
-    ) : (
-      children
-    )
-  return (
-    <Route element={<ProtectedRoute />} key={key}>
-      {inner}
-    </Route>
-  )
+  switch (access.kind) {
+    case 'public':
+      return children
+    case 'signedIn':
+      return (
+        <Route element={<ProtectedRoute />} key={key}>
+          {children}
+        </Route>
+      )
+    case 'roles':
+      return (
+        <Route element={<ProtectedRoute />} key={key}>
+          <Route element={<RoleRoute allowedRoles={[...access.roles]} />} key={`${key}:role`}>
+            {children}
+          </Route>
+        </Route>
+      )
+    default:
+      return unknownAccess(access)
+  }
 }
 
-function buildRoutes(): ReactNode[] {
+export function buildRoutes(
+  pages: readonly PageRoute[] = pageRoutes,
+  redirects: readonly LegacyRedirect[] = legacyRedirects,
+): ReactNode[] {
   const groups = new Map<string, { access: RouteAccess; children: ReactNode[] }>()
   const group = (access: RouteAccess) => {
     const key = accessKey(access)
@@ -128,7 +168,7 @@ function buildRoutes(): ReactNode[] {
   }
   const topLevel: ReactNode[] = []
 
-  for (const route of pageRoutes) {
+  for (const route of pages) {
     if (route.refusedPage) {
       const Refused = route.refusedPage
       topLevel.push(
@@ -138,18 +178,18 @@ function buildRoutes(): ReactNode[] {
           path={route.path}
         >
           {guarded(route.access, `refused:${route.path}:guard`, [
-            <Route element={pageElement(route)} index key={route.path} />,
+            <Route element={pageElement(route, redirects)} index key={route.path} />,
           ])}
         </Route>,
       )
       continue
     }
     group(route.access).push(
-      <Route element={pageElement(route)} key={route.path} path={route.path} />,
+      <Route element={pageElement(route, redirects)} key={route.path} path={route.path} />,
     )
   }
 
-  for (const redirect of legacyRedirects) {
+  for (const redirect of redirects) {
     // A role-scoped redirect rides on the page at the same path.
     if (redirect.onlyFor) continue
     group(redirect.access).push(

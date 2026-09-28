@@ -2725,5 +2725,188 @@
       "mobile": []
     }
   },
-  "_about_nav": "Per area: desktop = [path, label, priority, icon, mobile, the translation key AppLayout looked the label up by]; mobile = the bottom bar's paths."
+  "_about_nav": "Per area: desktop = [path, label, priority, icon, mobile, the translation key AppLayout looked the label up by]; mobile = the bottom bar's paths.",
+  "_about_student": "What a student got before #45 on every old path that is not the student's own: not behind a student-only guard, and not one #45 changes for students on purpose (/, /assistant, /settings/password). Read off AppRouter.tsx at origin/redesign/planet e363be5 the same way as 'outcomes'.",
+  "studentOutcomes": [
+    {
+      "path": "/login",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/register",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/teacher-activate",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/activate",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/privacy",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/terms",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/onboarding",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/support",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/unauthorized",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/forbidden",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    }
+  ]
 }

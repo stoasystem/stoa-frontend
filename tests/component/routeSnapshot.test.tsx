@@ -2,7 +2,8 @@
  * #45 reshapes the student routes only. For everybody else -- signed out,
  * parent, teacher, administrator, the organisation roles -- every path the
  * router registered before #45 must end exactly where it ended then: same
- * address, same page, same refusal. The fixture was read off the hand-written
+ * address, same page, same refusal. And a student is still refused on every
+ * path that was not the student's. The fixture was read off the hand-written
  * router at origin/redesign/planet e363be5; this renders the generated one.
  */
 import { describe, expect, it, vi } from 'vitest'
@@ -34,6 +35,23 @@ describe('non-student routes are unchanged by the route manifest', () => {
           ? []
           : [{ path: recorded.path, before: `${recorded.pathname} ${recorded.page}`, now: `${now.pathname} ${now.page}` }]
       })
+
+    expect(changed).toEqual([])
+  })
+
+  it('refuses a student everywhere that is not the student\'s own, as before', () => {
+    // A student admitted to a teacher, parent, admin or organisation route
+    // would pass every check above: they only look at the other viewers.
+    const recorded = before.studentOutcomes as Omit<Recorded, 'viewer'>[]
+    expect(recorded.length).toBeGreaterThan(30)
+
+    const changed = recorded.flatMap((entry) => {
+      const now = openAs('student', entry.path)
+      const same = now.pathname === entry.pathname && now.page === entry.page
+      return same
+        ? []
+        : [{ path: entry.path, before: `${entry.pathname} ${entry.page}`, now: `${now.pathname} ${now.page}` }]
+    })
 
     expect(changed).toEqual([])
   })

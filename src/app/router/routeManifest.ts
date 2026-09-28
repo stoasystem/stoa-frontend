@@ -411,10 +411,18 @@ export const pageRoutes: readonly PageRoute[] = [
 // Legacy redirects (#13 point 2): no old student link ends on a 404.
 // ---------------------------------------------------------------------------
 
+/*
+ * What a conversation id looks like: the backend issues UUIDs; letters,
+ * digits, `-` and `_` cover those and anything shorter a test uses. Anything
+ * else -- `.`, `..` (which a router resolves to the parent, so `/ask/..` would
+ * land on `/`), a slash, an escape -- is treated as no id at all.
+ */
+const CONVERSATION_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/
+
 /** `/ask`, or `/ask/<id>` when the old link named a conversation. */
-function askPathFor(conversationId: string | null | undefined): string {
-  const id = conversationId?.trim()
-  return id ? `${ASK_PATH}/${encodeURIComponent(id)}` : ASK_PATH
+export function askPathFor(conversationId: string | null | undefined): string {
+  const id = conversationId?.trim() ?? ''
+  return CONVERSATION_ID.test(id) ? `${ASK_PATH}/${id}` : ASK_PATH
 }
 
 /*
@@ -443,5 +451,6 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   { from: '/assistant', to: toAsk, access: PUBLIC, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },
   // Teachers, parents and administrators keep the page here.
+  // This branch must not reach main until /me has the password form (#46).
   { from: CHANGE_PASSWORD_PATH, to: '/me', access: SIGNED_IN, onlyFor: ['student'], decision: '#13 §2' },
 ]

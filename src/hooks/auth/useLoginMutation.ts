@@ -29,8 +29,11 @@ function isSafePath(path: unknown): path is string {
   return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//')
 }
 
-function canUseNextPathForRole(path: string, role: UserRole) {
-  return roleNextPathPrefixes[role].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
+export function canUseNextPathForRole(path: string, role: UserRole) {
+  // `/` admits only itself: as a prefix it would admit every path.
+  return roleNextPathPrefixes[role].some((prefix) =>
+    prefix === '/' ? path === '/' : path === prefix || path.startsWith(`${prefix}/`),
+  )
 }
 
 function getLoginRedirectPath({
