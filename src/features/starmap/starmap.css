@@ -57,3 +57,36 @@
   outline: var(--focus-ring-width, 2px) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset, 2px);
 }
+
+/*
+ * A nebula's link: nothing to see until it has keyboard focus, then a name
+ * pill on glass by its own nebula (placed by nebulaFocusSpot), clear of the
+ * page's controls.
+ */
+.starmap-nebula-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  width: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+.starmap-nebula-link:focus,
+.starmap-nebula-link:focus-visible {
+  width: auto;
+  overflow: visible;
+  clip-path: none;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--sky-glass);
+  color: var(--on-sky-text);
+  font-size: 15px;
+  font-weight: 600;
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset, 2px);
+}

@@ -1,8 +1,9 @@
 /**
  * The canvas's colours against the sky (review of #71). `check:contrast`
  * rates token pairs in CSS; what the canvas composites -- white at some
- * alpha over the sky, or over a nebula's haze -- it cannot see, so the same
- * WCAG arithmetic runs here on the real tokens and the renderer's own alphas.
+ * alpha over the sky, or over nebula haze -- it cannot see, so the same WCAG
+ * arithmetic runs here on the real tokens and the renderer's and engine's
+ * own alphas, against the sky and against stacked haze.
  *
  *   text (names, legend)        4.5:1
  *   lines and a locked star     3:1 (they carry meaning / are controls)
@@ -10,6 +11,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { NEBULA_LABEL_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
 import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
 import { linkWeight } from '@/features/starmap/model/links'
@@ -55,16 +57,29 @@ const body = token('--on-sky-text-body')
 const caption = token('--on-sky-text-caption')
 const lit = token('--lit')
 const glass = token('--sky-glass')
-/** The brightest haze a nebula can have: the atmosphere at its core, and full warmth. */
-const haze = over(lit, over(token('--atmosphere'), sky, HAZE.core), HAZE.warmthBase + HAZE.warmthLit)
+/** One nebula's brightest haze: the atmosphere at its core, and full warmth (every star lit). */
+const oneHaze = over(lit, over(token('--atmosphere'), sky, HAZE.core), HAZE.warmthBase + HAZE.warmthLit)
+/**
+ * The realistic worst case: that core with a neighbour's halo laid over it.
+ * Nebulae never overlap (the layout keeps their discs apart, tested in
+ * starmapLayout), and a tile reaches 1.3 radii, so a neighbour's haze over
+ * this core is its outer ring, at most its mid stop -- taken whole here.
+ */
+const haze = over(token('--atmosphere'), oneHaze, HAZE.mid)
 const white: RGBA = [255, 255, 255, 1]
 
 describe('names on the canvas keep 4.5:1', () => {
-  it('nebula names, drawn over a sky outline, and over the brightest haze', () => {
-    const name = over(body, sky, INK.nebulaName.alpha)
-    expect(contrast(name, sky)).toBeGreaterThanOrEqual(4.5)
-    expect(contrast(over(body, haze, INK.nebulaName.alpha), haze)).toBeGreaterThanOrEqual(4.5)
+  it('nebula names, drawn over a sky outline, and over stacked haze, in every layer that shows them', () => {
+    const weakest = Math.min(...Object.values(NEBULA_LABEL_ALPHA).filter((alpha) => alpha > 0)) * INK.nebulaName.alpha
+    expect(weakest).toBeCloseTo(0.8, 9)
+    expect(contrast(over(body, sky, weakest), sky)).toBeGreaterThanOrEqual(4.5)
+    expect(contrast(over(body, haze, weakest), haze)).toBeGreaterThanOrEqual(4.5)
     expect(INK.nebulaName.outline).toBeGreaterThanOrEqual(2)
+  })
+
+  it('stacked haze is brighter than one nebula alone (the check is not vacuous)', () => {
+    expect(contrast(white, haze)).toBeLessThan(contrast(white, oneHaze))
+    expect(contrast(white, oneHaze)).toBeLessThan(contrast(white, sky))
   })
 
   it('star names, the faintest (a locked star) included', () => {
@@ -88,11 +103,12 @@ describe('lines and locked stars keep 3:1', () => {
     expect(contrast(over(text, sky, alpha), sky)).toBeGreaterThanOrEqual(3)
   })
 
-  it('prerequisite lines inside a nebula, over its haze', () => {
+  it('prerequisite lines inside a nebula, and the weakest line between nebulae, over stacked haze', () => {
+    expect(contrast(over(text, haze, Math.max(INK.linkMinAlpha, linkWeight(1).alpha)), haze)).toBeGreaterThanOrEqual(3)
     expect(contrast(over(text, haze, INK.innerLinkAlpha), haze)).toBeGreaterThanOrEqual(3)
   })
 
-  it('a locked star’s ring, on the sky and on the brightest haze', () => {
+  it('a locked star’s ring, on the sky and on stacked haze', () => {
     expect(contrast(over(text, sky, LOCKED_RING_ALPHA), sky)).toBeGreaterThanOrEqual(3)
     expect(contrast(over(text, haze, LOCKED_RING_ALPHA), haze)).toBeGreaterThanOrEqual(3)
   })

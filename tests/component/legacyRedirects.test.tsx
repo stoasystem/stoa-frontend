@@ -66,8 +66,15 @@ describe('an old /planet link cannot leave /map (decoded once, plain ids only)',
     ['/planet/math', '/map/math'],
     ['/planet/math/fractions/u-1', '/map/math/fractions/u-1'],
     ['/planet/math/u.1', '/map/math/u.1'],
+    ['/Planet/math', '/map/math'],
+    ['/PLANET/math/fractions', '/map/math/fractions'],
+    ['/Planet/%2e%2e', '/'],
   ])('%s -> %s', (from, to) => {
     expect(mapPathForLegacyPlanet(from)).toBe(to)
+  })
+
+  it('matches /Planet in any case, as the router does', () => {
+    expect(openAs('student', '/Planet/math')).toMatchObject({ pathname: '/map/math', page: 'MapSubjectPage' })
   })
 
   it.each(['/planet/%2e%2e', '/planet/%252e%252e', '/planet/a%2Fb', '/planet/%5C'])('the router sends %s home', (from) => {

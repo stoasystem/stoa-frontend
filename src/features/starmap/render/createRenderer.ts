@@ -18,7 +18,7 @@ export const RENDERERS: Record<RendererKind, RendererFactory | null> = {
 export function createNullRenderer(): StarMapRenderer {
   return {
     kind: 'canvas2d',
-    stats: { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0 },
+    stats: { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 },
     resize() {},
     setTheme() {},
     setData() {},

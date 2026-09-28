@@ -257,6 +257,24 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     for (const name of offScreen) expect(counter.texts.some((t) => t.text === name)).toBe(false)
   })
 
+  it('rings the nebula whose link has keyboard focus, and brings it into the focus region', () => {
+    const renderer = realRenderer()
+    const { clock, engine } = engineWith(renderer, map500, true)
+    const first = renderer.frames[renderer.frames.length - 1]
+    const far = first.sharpness.findIndex((s) => s === 0)
+    engine.setFocusNebula(far)
+    clock.advance(300)
+    expect(renderer.stats.highlightNebula).toBe(far)
+    const frame = renderer.frames[renderer.frames.length - 1]
+    expect(frame.sharpness[far]).toBe(1)
+    const fx = W * engine.currentView.fx
+    const fy = H * engine.currentView.fy
+    expect(Math.hypot(frame.nebulaX[far] - fx, frame.nebulaY[far] - fy)).toBeLessThan(1)
+    engine.setFocusNebula(-1)
+    clock.advance(20)
+    expect(renderer.stats.highlightNebula).toBe(-1)
+  })
+
   it('never blurs per frame: no filter is ever set on the canvas', () => {
     const renderer = realRenderer()
     const { clock } = engineWith(renderer, map500, false)

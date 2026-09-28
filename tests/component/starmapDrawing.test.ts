@@ -9,10 +9,11 @@ import { dotBlendFor, orient, orientationFor, StarMapEngine } from '@/features/s
 import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { scatterStars } from '@/features/starmap/layout/layout'
 import { aroundDisc, boxHitsSegment, placeLabel, splitByCircles } from '@/features/starmap/render/labels'
+import { nebulaFocusSpot, NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
 import { fakeClock, recordingRenderer, THEME } from './starmapHarness'
 
 describe('placing a name', () => {
-  const viewport = { width: 800, height: 600 }
+  const viewport = { x0: 0, y0: 0, x1: 800, y1: 600 }
 
   it('prefers just below its own disc', () => {
     const box = placeLabel(aroundDisc(400, 300, 50, 80, 16, 4), { boxes: [], circles: [], segments: [] }, viewport)
@@ -31,7 +32,13 @@ describe('placing a name', () => {
   it('is left out rather than put somewhere else, or off the screen', () => {
     const everywhere = aroundDisc(400, 300, 50, 80, 16, 4)
     expect(placeLabel(everywhere, { boxes: everywhere, circles: [], segments: [] }, viewport)).toBeNull()
-    expect(placeLabel(aroundDisc(50, 20, 15, 80, 16, 4), { boxes: [], circles: [], segments: [] }, { width: 100, height: 40 })).toBeNull()
+    expect(placeLabel(aroundDisc(50, 20, 15, 80, 16, 4), { boxes: [], circles: [], segments: [] }, { x0: 0, y0: 0, x1: 100, y1: 40 })).toBeNull()
+  })
+
+  it('moves to the side clear of a control band instead of dropping the name', () => {
+    // A band covers everything below y = 360: "below the disc" is out, "above" is chosen.
+    const band = { x0: 0, y0: 0, x1: 800, y1: 360 }
+    expect(placeLabel(aroundDisc(400, 300, 50, 80, 16, 4), { boxes: [], circles: [], segments: [] }, band)?.y1).toBe(246)
   })
 
   it('finds a segment that crosses a box, and one that misses it', () => {
@@ -132,6 +139,24 @@ describe('stars in a nebula', () => {
         for (let j = i + 1; j < stars.length; j += 1) closest = Math.min(closest, Math.hypot(stars[i][0] - stars[j][0], stars[i][1] - stars[j][1]))
       }
       expect(closest).toBeGreaterThan(spacing * 0.5)
+    }
+  })
+})
+
+describe('a focused nebula link', () => {
+  const viewport = { width: 1280, height: 776 }
+  const bands = { top: 76, bottom: 164 }
+  const inside = (spot: { y: number }) => spot.y >= bands.top && spot.y + NEBULA_FOCUS_HEIGHT <= viewport.height - bands.bottom
+
+  it('shows its name just below the nebula when there is room', () => {
+    expect(nebulaFocusSpot({ x: 640, y: 300, r: 60 }, viewport, bands)).toEqual({ x: 640, y: 368 })
+  })
+
+  it('goes above a nebula near the legend, and never into a control band', () => {
+    const low = nebulaFocusSpot({ x: 300, y: 560, r: 60 }, viewport, bands)
+    expect(low.y).toBe(560 - 60 - 8 - NEBULA_FOCUS_HEIGHT)
+    for (const y of [0, 80, 300, 600, 700, 900]) {
+      for (const r of [10, 80, 400]) expect(inside(nebulaFocusSpot({ x: 50, y, r }, viewport, bands))).toBe(true)
     }
   })
 })

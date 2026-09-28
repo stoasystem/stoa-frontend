@@ -70,7 +70,7 @@ export type RecordingRenderer = StarMapRenderer & { frames: RecordedFrame[]; sna
 export function recordingRenderer(): RecordingRenderer {
   const renderer: RecordingRenderer = {
     kind: 'canvas2d',
-    stats: { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0 },
+    stats: { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 },
     frames: [],
     snapshots: 0,
     ratios: [],

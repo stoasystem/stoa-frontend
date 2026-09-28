@@ -51,20 +51,22 @@ export type Obstacles = {
 /**
  * The first free box among `candidates` (in order of preference): none may
  * overlap a placed name, and the least in the way of cores and lines wins.
- * A candidate that runs off the viewport does not count. `null`: leave the
+ * A candidate outside `area` does not count, so a name near a control band
+ * moves to the side of its nebula that is clear of it. `null`: leave the
  * name out.
  */
 export function placeLabel(
   candidates: readonly Box[],
   obstacles: Obstacles,
-  viewport: { width: number; height: number },
+  /** Where a name may go: the viewport less the bands the page keeps for its controls. */
+  area: Box,
   /** Extra cost for a candidate, e.g. for sitting nearer another nebula than its own. */
   extraCost: (box: Box) => number = () => 0,
 ): Box | null {
   let best: Box | null = null
   let bestCost = Number.POSITIVE_INFINITY
   candidates.forEach((box, order) => {
-    if (box.x0 < 0 || box.y0 < 0 || box.x1 > viewport.width || box.y1 > viewport.height) return
+    if (box.x0 < area.x0 || box.y0 < area.y0 || box.x1 > area.x1 || box.y1 > area.y1) return
     if (obstacles.boxes.some((placed) => boxesOverlap(box, placed))) return
     let cost = order * 0.5
     for (const circle of obstacles.circles) if (boxHitsCircle(box, circle)) cost += 10

@@ -9,7 +9,8 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { StarMapView } from '@/features/starmap/components/StarMapView'
+import { controlBands, StarMapView } from '@/features/starmap/components/StarMapView'
+import { NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
 import { starMapFixture, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import i18n from '@/i18n'
@@ -99,12 +100,44 @@ describe('the parallel DOM', () => {
     expect(screen.getByRole('link', { name: 'Geometry, 0 of 2 lit, related to Algebra' })).toBeInTheDocument()
   })
 
-  it('on the whole map, Tab goes nebula by nebula; the stars are read but not tabbed through', () => {
+  it('on the whole map, Tab goes nebula by nebula and to the recommended star; the other stars are read, not tabbed through', () => {
     const { container } = showMap()
-    for (const link of starLinks(container)) expect(link).toHaveAttribute('tabindex', '-1')
+    for (const link of starLinks(container)) {
+      if (link.dataset.unit === 'u-3') expect(link).not.toHaveAttribute('tabindex')
+      else expect(link).toHaveAttribute('tabindex', '-1')
+    }
     const nav = screen.getByRole('navigation', { name: 'Star map: Mathematics' })
     const tabbable = within(nav).getAllByRole('link').filter((link) => link.getAttribute('tabindex') !== '-1')
-    expect(tabbable.map((link) => link.getAttribute('href'))).toEqual(['/map/math/numbers', '/map/math/algebra', '/map/math/geometry', '/map/math/data'])
+    expect(tabbable.map((link) => link.getAttribute('href'))).toEqual([
+      '/map/math/numbers',
+      '/map/math/numbers/u-3', // Decimals, the recommended star
+      '/map/math/algebra',
+      '/map/math/geometry',
+      '/map/math/data',
+    ])
+  })
+
+  it('shows a focused nebula link by its nebula, clear of the page controls, and rings the nebula on the canvas', () => {
+    const { clock, renderer, container } = showMap({ layer: 'map' }, 500)
+    const bands = controlBands(true)
+    const links = [...container.querySelectorAll<HTMLAnchorElement>('a[data-nebula-link]')]
+    expect(links.length).toBeGreaterThan(5)
+    for (const [index, link] of links.entries()) {
+      act(() => {
+        link.focus()
+        clock.advance(600)
+      })
+      const frame = renderer.last()
+      expect(frame.highlightNebula).toBe(index)
+      expect(frame.sharpness[index]).toBe(1)
+      const top = Number(link.dataset.focusTop)
+      expect(top).toBeGreaterThanOrEqual(bands.top)
+      expect(top + NEBULA_FOCUS_HEIGHT).toBeLessThanOrEqual(776 - bands.bottom)
+      act(() => {
+        link.blur()
+        clock.advance(20)
+      })
+    }
   })
 
   it('inside a nebula, its stars are the next Tab stops', () => {

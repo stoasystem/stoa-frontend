@@ -16,6 +16,7 @@ import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/featu
 import type { SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import {
   baseScale,
+  clampView,
   overviewView,
   panBy,
   transformOf,
@@ -49,6 +50,9 @@ export const animationFrameScheduler: FrameScheduler = {
 /** A star on screen now, for the parallel DOM. `index` is its keyboard position. */
 export type VisibleStar = { index: number; x: number; y: number }
 
+/** A nebula's disc on screen now, CSS px, for placing its link's focus indicator. */
+export type NebulaDiscOnScreen = { x: number; y: number; r: number }
+
 export type StarMapEngineOptions = {
   renderer: StarMapRenderer
   theme: StarMapTheme
@@ -58,7 +62,7 @@ export type StarMapEngineOptions = {
   /** The student asked for another layer: a tap, a pinch, the wheel. */
   onRequestTarget?: (target: LayerTarget) => void
   /** The stars on screen changed, and how big they are drawn; sent when the map is at rest. */
-  onVisibleChange?: (stars: VisibleStar[], glyphSize: number) => void
+  onVisibleChange?: (stars: VisibleStar[], glyphSize: number, nebulae: NebulaDiscOnScreen[]) => void
   /** The first frame with the map on it has been drawn. */
   onFirstFrame?: () => void
 }
@@ -104,6 +108,9 @@ function layoutChecksum(map: StarMap): string {
   for (const star of map.stars) sum = (sum * 31 + Math.round(star.x * 1e5) * 7 + Math.round(star.y * 1e5)) % 2147483647
   return sum.toString(36)
 }
+
+/** How strongly nebula names are drawn in each layer: dimmer around a chosen nebula, gone behind a star's card. */
+export const NEBULA_LABEL_ALPHA: Record<MapLayer, number> = { map: 1, nebula: 0.8, star: 0 }
 
 const TAP_SLOP = 5
 const WHEEL_STEP = 120
@@ -156,6 +163,7 @@ export class StarMapEngine {
   private pinch: { distance: number; fired: boolean } | null = null
   private wheel = { accumulated: 0, lastIntentAt: Number.NEGATIVE_INFINITY }
   private focusStar = -1
+  private focusNebula = -1
 
   private visibleKey = ''
   private emittedOnce = false
@@ -335,6 +343,50 @@ export class StarMapEngine {
     if (index === this.focusStar) return
     this.focusStar = index
     this.invalidate()
+  }
+
+  /**
+   * Keyboard focus moved onto a nebula's link (or off, with -1). The nebula
+   * is picked out on the canvas and drawn sharp; if it is not already in the
+   * focus region, the map pans to put it there (a crossfade under reduced
+   * motion), so neither the nebula nor its link's focus indicator sits under
+   * the page's controls (WCAG 2.4.11).
+   */
+  setFocusNebula(index: number): void {
+    if (index === this.focusNebula) return
+    this.focusNebula = index
+    if (index >= 0 && this.scene && this.target.layer !== 'star' && this.viewport.width > 0) {
+      const nebula = this.scene.nebulae[index]
+      const t = transformOf(this.view, this.viewport, this.bounds)
+      const sx = t.ox + nebula.x * t.scale
+      const sy = t.oy + nebula.y * t.scale
+      const fx = this.viewport.width * this.view.fx
+      const fy = this.viewport.height * this.view.fy
+      const band = focusBand(this.viewport.width, this.viewport.height)
+      if (Math.hypot(sx - fx, sy - fy) > band.inner) {
+        const to = clampView({ ...this.view, cx: nebula.x, cy: nebula.y }, this.bounds)
+        this.panTo(to)
+      }
+    }
+    this.invalidate()
+  }
+
+  /** Move the view without changing layer: a short flight, or a crossfade under reduced motion. */
+  private panTo(to: View): void {
+    this.inertia.stop()
+    const layer = this.target.layer
+    const now = this.now()
+    if (!this.drewFirstFrame || this.policy.layerTransition === 'crossfade') {
+      if (this.drewFirstFrame) {
+        this.renderer.snapshot()
+        this.transition = { kind: 'crossfade', startedAt: now, durationMs: this.policy.layerMs, from: layer, to: layer }
+      }
+      this.view = to
+    } else {
+      const flight = interpolateView(this.view, to, Math.min(this.viewport.width, this.viewport.height), baseScale(this.viewport, this.bounds))
+      this.transition = { kind: 'zoom', startedAt: now, durationMs: this.policy.layerMs, flight, from: layer, to: layer }
+    }
+    this.positionsStale = true
   }
 
   // ---- gestures ---------------------------------------------------------
@@ -583,7 +635,13 @@ export class StarMapEngine {
     const band = focusBand(width, height)
     const target = this.target
     const chosen =
-      target.layer === 'map' ? (this.focusStar >= 0 ? scene.nebula[this.focusStar] : -1) : (this.nebulaIndex.get(target.nebulaId) ?? -1)
+      target.layer === 'map'
+        ? this.focusNebula >= 0
+          ? this.focusNebula
+          : this.focusStar >= 0
+            ? scene.nebula[this.focusStar]
+            : -1
+        : (this.nebulaIndex.get(target.nebulaId) ?? -1)
     for (let n = 0; n < scene.nebulae.length; n += 1) {
       const nebula = scene.nebulae[n]
       this.nebulaX[n] = t.ox + nebula.x * t.scale
@@ -643,7 +701,7 @@ export class StarMapEngine {
     const named = (layer: MapLayer) => (layer === 'map' ? 0 : 1)
     const starLabelAlpha =
       named(to) === named(from) ? named(to) : named(to) === 1 ? Math.max(0, (progress - 0.6) / 0.4) : Math.max(0, 1 - progress / 0.4)
-    const nebulaLabels = (layer: MapLayer) => (layer === 'map' ? 1 : layer === 'nebula' ? 0.8 : 0)
+    const nebulaLabels = (layer: MapLayer) => NEBULA_LABEL_ALPHA[layer]
     const dimOf = (layer: MapLayer) => (layer === 'star' ? STAR_LAYER_DIM : 1)
     const target = this.target
     const focusStar =
@@ -670,6 +728,7 @@ export class StarMapEngine {
       innerLinkAlpha: starLabelAlpha,
       chosenNebula: chosen,
       focusStar,
+      highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: lerp(dimOf(from), dimOf(to)),
       showSkills: glyphSize >= 30,
       crossfade,
@@ -708,6 +767,8 @@ export class StarMapEngine {
     this.emittedOnce = true
     this.visibleKey = key
     this.positionsStale = false
-    listener(list, this.glyphSize)
+    const nebulae: NebulaDiscOnScreen[] = []
+    for (let n = 0; n < this.nebulaX.length; n += 1) nebulae.push({ x: this.nebulaX[n], y: this.nebulaY[n], r: this.nebulaR[n] })
+    listener(list, this.glyphSize, nebulae)
   }
 }

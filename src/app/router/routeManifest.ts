@@ -452,7 +452,8 @@ const toAsk = ({ params, search }: LegacyRedirectInput) =>
 const MAP_SEGMENT = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,127}$/
 
 export function mapPathForLegacyPlanet(pathname: string | undefined): string {
-  const match = /^\/planet(\/.*)?$/.exec(pathname ?? '')
+  // Case-insensitive, as React Router matches `/planet/*`: `/Planet/math` lands here too.
+  const match = /^\/planet(\/.*)?$/i.exec(pathname ?? '')
   if (!match) return '/'
   const raw = (match[1] ?? '').split('/').filter((segment) => segment !== '')
   if (raw.length === 0 || raw.length > 3) return '/'

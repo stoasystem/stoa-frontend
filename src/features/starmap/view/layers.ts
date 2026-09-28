@@ -160,3 +160,30 @@ export function sameTarget(a: LayerTarget, b: LayerTarget): boolean {
   if (a.layer === 'nebula') return a.nebulaId === (b as typeof a).nebulaId
   return a.nebulaId === (b as typeof a).nebulaId && a.unitId === (b as typeof a).unitId
 }
+
+/** The height of a nebula link's focus indicator (its name pill), CSS px. */
+export const NEBULA_FOCUS_HEIGHT = 36
+
+/**
+ * Where a focused nebula link shows its name (WCAG 2.4.11: a focus indicator
+ * the page's own controls never cover): just below the nebula, else just
+ * above it, else across its middle -- always inside the band between the
+ * page's controls, and horizontally clamped clear of the edges. `x` is the
+ * pill's centre, `y` its top.
+ */
+export function nebulaFocusSpot(
+  disc: { x: number; y: number; r: number },
+  viewport: { width: number; height: number },
+  bands: { top: number; bottom: number },
+): { x: number; y: number } {
+  const top = bands.top + 4
+  const bottom = viewport.height - bands.bottom - 4 - NEBULA_FOCUS_HEIGHT
+  const below = disc.y + disc.r + 8
+  const above = disc.y - disc.r - 8 - NEBULA_FOCUS_HEIGHT
+  const y = below <= bottom ? below : above >= top ? above : disc.y - NEBULA_FOCUS_HEIGHT / 2
+  const margin = Math.min(140, viewport.width / 2)
+  return {
+    x: Math.max(margin, Math.min(viewport.width - margin, disc.x)),
+    y: Math.max(top, Math.min(bottom, y)),
+  }
+}

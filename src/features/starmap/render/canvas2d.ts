@@ -161,7 +161,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let data: SceneData | null = null
   let sprites: { small: Sprite[]; large: Sprite[]; dots: HTMLCanvasElement[] } | null = null
   let snapshotCanvas: HTMLCanvasElement | null = null
-  const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0 }
+  const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
     const pixelsPerUnit = (largestBox * Math.max(2, dpr) * 1.14) / cut.box
@@ -350,6 +350,21 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       }
       stats.tilePaints = tiles.paints
 
+      // The nebula whose link has keyboard focus: a ring in the focus colour.
+      if (frame.highlightNebula >= 0 && frame.highlightNebula < nebulaCount) {
+        const n = frame.highlightNebula
+        ctx.globalAlpha = 1
+        ctx.strokeStyle = colours.lit
+        ctx.lineWidth = 2
+        ctx.setLineDash([])
+        ctx.beginPath()
+        ctx.arc(nebulaX[n], nebulaY[n], nebulaR[n] * 1.05 + 4, 0, Math.PI * 2)
+        ctx.stroke()
+        stats.highlightNebula = n
+      } else {
+        stats.highlightNebula = -1
+      }
+
       // Lines between nebulae, from rim to rim, faded where they cross a third nebula.
       const segments: Segment[] = []
       const cores: Circle[] = []
@@ -523,11 +538,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // Names. Each stays by its own nebula or star; a name with no free
       // place is left out, and one whose nebula is off screen is not drawn.
       const placed: Box[] = []
-      // Names stay out of the bands the page keeps for its own controls.
-      const labelTop = viewport.top ?? 0
-      const labelBottom = height - (viewport.bottom ?? 0)
-      const inBand = (box: Box) => box.y0 >= labelTop && box.y1 <= labelBottom
-      const viewportBox = { width, height }
+      // Names stay out of the bands the page keeps for its own controls: the
+      // placer only considers spots inside this area.
+      const labelArea: Box = { x0: 0, y0: viewport.top ?? 0, x1: width, y1: height - (viewport.bottom ?? 0) }
 
       // Star names in the chosen nebula first: they are what the layer is for.
       if (frame.starLabelAlpha > 0.01 && frame.chosenNebula >= 0) {
@@ -548,9 +561,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const box = placeLabel(
             aroundDisc(x[i], y[i], own, w, 17, 3),
             { boxes: placed, circles: stars.filter((c) => c.x !== x[i] || c.y !== y[i]), segments: [] },
-            viewportBox,
+            labelArea,
           )
-          if (!box || !inBand(box)) continue
+          if (!box) continue
           // A star's name may not sit on another star at all.
           if (stars.some((c) => (c.x !== x[i] || c.y !== y[i]) && boxHitsCircle(box, c))) continue
           placed.push(box)
@@ -576,7 +589,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const box = placeLabel(
             aroundDisc(nebulaX[n], nebulaY[n], nebulaR[n] * 0.95, w, 16, 4),
             { boxes: placed, circles: cores.filter((_, m) => m !== n), segments },
-            viewportBox,
+            labelArea,
             // A name that reads as belonging to a neighbour is worse than one a little out of the way.
             (candidate) => {
               const cx = (candidate.x0 + candidate.x1) / 2
@@ -588,7 +601,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
               return 0
             },
           )
-          if (!box || !inBand(box)) continue
+          if (!box) continue
           placed.push(box)
           ctx.globalAlpha = frame.nebulaLabelAlpha * INK.nebulaName.alpha * nebulaDim(n)
           outlinedText(text, (box.x0 + box.x1) / 2, box.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)

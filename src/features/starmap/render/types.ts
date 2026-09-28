@@ -108,6 +108,8 @@ export type SceneFrame = {
   chosenNebula: number
   /** The star picked out (keyboard focus, the star layer), or -1. */
   focusStar: number
+  /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */
+  highlightNebula: number
   /** Everything but the focus star fades to this (the star layer). */
   dim: number
   /** Skill dots beside the stars (large enough glyphs only). */
@@ -125,6 +127,8 @@ export type RenderStats = {
   tileDraws: number
   /** Tiles (re)painted since the renderer was made. */
   tilePaints: number
+  /** The nebula drawn with a focus ring in the last frame, or -1. */
+  highlightNebula: number
 }
 
 export interface StarMapRenderer {
