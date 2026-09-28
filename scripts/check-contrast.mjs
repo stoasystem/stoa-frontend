@@ -21,6 +21,7 @@
 
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
+import { findForeignDefinitions } from './contrast-guard.mjs';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -256,8 +257,7 @@ function checkUnreadBlocks(tokens, blocks, used) {
 // style) that declares one would override it on screen while the gate went on
 // rating the token file's value. So every source under src/ and the entry HTML
 // is read for a declaration of a token the pairs use, directly or through
-// their var() chains: a CSS declaration `--x:`, a Tailwind arbitrary property
-// `[--x:`, an object key `'--x':` or `['--x' as string]:`, or `setProperty('--x'`.
+// their var() chains; scripts/contrast-guard.mjs says which forms count.
 const SCANNED_ROOTS = ['src', 'index.html'];
 const SCANNED_EXTENSIONS = new Set(['.css', '.ts', '.tsx', '.html']);
 
@@ -271,36 +271,6 @@ function sourceFiles(path) {
   }
   if (stat.isFile()) return SCANNED_EXTENSIONS.has(extname(absolute)) ? [absolute] : [];
   return readdirSync(absolute).flatMap((entry) => sourceFiles(relative(ROOT, join(absolute, entry))));
-}
-
-const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-function findForeignDefinitions(source, extension, tokens) {
-  const text =
-    extension === '.css'
-      ? source.replace(/\/\*[\s\S]*?\*\//g, '')
-      : extension === '.html'
-        ? source.replace(/<!--[\s\S]*?-->/g, '')
-        : source;
-  const found = [];
-  for (const token of tokens) {
-    const name = escapeRegExp(token);
-    const patterns = [
-      new RegExp(`\\[${name}\\s*:`),
-      new RegExp(`['"\`]${name}['"\`]\\s*:`),
-      new RegExp(`setProperty\\(\\s*['"\`]${name}['"\`]`),
-      new RegExp(`\\[\\s*['"\`]${name}['"\`][^\\]\\n]*\\]\\s*:`),
-    ];
-    if (extension === '.css' || extension === '.html') {
-      patterns.push(new RegExp(`(^|[\\s;{])${name}\\s*:`, 'm'));
-    }
-    const hit = patterns.find((pattern) => pattern.test(text));
-    if (hit) {
-      const index = text.search(hit);
-      found.push({ token, line: text.slice(0, index).split('\n').length });
-    }
-  }
-  return found;
 }
 
 function checkForeignDefinitions(tokens, used) {

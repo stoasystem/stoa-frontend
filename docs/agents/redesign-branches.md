@@ -56,7 +56,8 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
   读 `:root` + `[data-surface="sky"]`；深色 token 只在带这个属性的元素内部存在。两个主题读同一组块、或者某个
   没被任何主题读的块定义了 pairs 用到的 token、或者 token 文件里有嵌套规则，都 exit 2；`src/` 下任何别的
   `.css` / `.ts` / `.tsx` / `.html`（以及根目录 `index.html`）只要声明了 pairs 用到的 token（含 var() 链上经过的），
-  也 exit 2，因为那样屏幕上显示的就不是门禁评的值。
+  也 exit 2，因为那样屏幕上显示的就不是门禁评的值（识别哪些写法见 `scripts/contrast-guard.mjs`，
+  每种写法在 `tests/component/contrastGuard.test.ts` 里都有投毒用例）。
   `"gate": false` 的对只打印读数、不拦；它的 `why` 必须引用票号（`#n`），每个主题至少留一对受门禁，豁免的对一旦
   达标就 exit 1，要求删掉豁免。现在只剩 `--on-sky-text-muted`（仅限禁用、不可交互控件的标签）一对豁免。
   旧页面用的 `--stoa-brand-*`、`--platform-*` 等旧名在 `src/styles/legacy-bridge.css` 里映射到新 token，门禁不读
