@@ -6,6 +6,7 @@ import {
   subjectDisplayLabel,
 } from '@/components/chat/conversationTitle'
 import { TeacherAvailabilityStatus } from '@/components/chat/TeacherAvailabilityStatus'
+import { UserMenu } from '@/components/common/UserMenu'
 import { Button } from '@/components/ui/button'
 import type { Conversation } from '@/types/chat'
 
@@ -47,7 +48,7 @@ export function ChatHeader({
             : t('emptyTitle')}
         </p>
       </div>
-      <div className="flex shrink-0 items-center gap-2">
+      <div className="flex min-w-0 items-center gap-2">
         <TeacherAvailabilityStatus />
         <div className="flex items-center gap-1 md:hidden">
           <ChatPageNavigation compact />
@@ -61,6 +62,10 @@ export function ChatHeader({
             <MessageSquarePlus className="h-5 w-5 shrink-0" strokeWidth={2.25} aria-hidden="true" />
           </Button>
         </div>
+        {/* The chat has no app shell, so its account pill lives here, at every
+            width (stoasystem/stoa-frontend#2). On a phone it keeps only
+            sign-out, and the teacher status truncates to make room. */}
+        <UserMenu variant="top" crowded />
       </div>
     </header>
   )

@@ -25,7 +25,7 @@ export function TeacherAvailabilityStatus() {
   return (
     <div
       className={cn(
-        'flex min-h-10 max-w-[13rem] items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs shadow-sm sm:max-w-none sm:px-3',
+        'flex min-h-10 min-w-0 max-w-[13rem] items-center gap-2 rounded-md border px-2.5 py-1.5 text-xs shadow-sm sm:max-w-none sm:px-3',
         isOnline
           ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
           : 'border-border bg-card text-muted-foreground',
