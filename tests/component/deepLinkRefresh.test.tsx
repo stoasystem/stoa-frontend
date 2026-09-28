@@ -57,7 +57,6 @@ describe('a deep link refreshed in the browser', () => {
   it.each([
     ['/planet/math/fractions/u-7', 'Knowledge point', ['math', 'fractions', 'u-7']],
     ['/chapter/u-7/l-3', 'Lesson', ['u-7', 'l-3']],
-    ['/ask/c-42', 'Ask', ['c-42']],
   ])('reopens %s once the account is back', async (path, title, params) => {
     refreshAt(path)
 
@@ -65,6 +64,15 @@ describe('a deep link refreshed in the browser', () => {
     expect(window.location.pathname).toBe(path)
     const shown = screen.getByTestId('route-params').textContent ?? ''
     for (const value of params) expect(shown).toContain(value)
+  })
+
+  it('reopens /ask/c-42 on that conversation once the account is back', async () => {
+    refreshAt('/ask/c-42')
+
+    // Ask opens over the home planet, on the conversation the path names (#49).
+    expect(await screen.findByRole('heading', { name: 'Your planet' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/ask/c-42')
+    expect(document.querySelector('[data-ask-surface]')?.getAttribute('data-ask-conversation')).toBe('c-42')
   })
 
   it('reopens /me in the reader’s language', async () => {

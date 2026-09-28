@@ -120,10 +120,7 @@
   },
   "tutorEscalation": {
     "requestedTitle": "Tutor support requested",
-    "requestedBody": "A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting.",
-    "joinedTitle": "Tutor joined",
-    "joinedBody": "The Learning Assistant is observing while your tutor helps. Start a live classroom if you still need deeper support.",
-    "confirmJoined": "Tutor joined"
+    "requestedBody": "A tutor will join this conversation when available. You can continue with the Learning Assistant while waiting."
   },
   "contextLines": {
     "uploadSource": "Upload source: {{title}}",
@@ -146,5 +143,78 @@
     "similar": "Give me a similar exercise",
     "why": "Why does this work?"
   },
-  "duplicateReopened": "You already asked this. Here is that conversation."
+  "duplicateReopened": "You already asked this. Here is that conversation.",
+  "ask": {
+    "title": "Ask",
+    "close": "Close",
+    "back": "All conversations",
+    "listSubtitle": "Your conversations",
+    "composerLabel": "Your question",
+    "placeholder": "Message…",
+    "dockedPlaceholder": "Ask about anything on the planet…",
+    "dockedPlaceholderPhone": "Ask anything…",
+    "grabber": "Drag down to close",
+    "list": {
+      "label": "Conversations",
+      "loading": "Loading your conversations…",
+      "failed": "Your conversations could not be loaded.",
+      "retry": "Try again",
+      "untitled": "New conversation"
+    },
+    "empty": {
+      "title": "Ask anything",
+      "suggestionsLabel": "Suggested questions",
+      "point": "Explain {{point}} to me",
+      "check": "How can I check my answer myself?",
+      "practice": "Give me a practice question"
+    },
+    "thread": {
+      "label": "Messages",
+      "loading": "Loading the conversation…",
+      "failed": "This conversation could not be loaded.",
+      "retry": "Try again",
+      "you": "You",
+      "assistant": "STOA assistant",
+      "teacherFallback": "Teacher",
+      "thinking": "Thinking…",
+      "notSent": "Not sent",
+      "sendAgain": "Send again",
+      "stopped": "Stopped",
+      "stop": "Stop",
+      "starting": "Starting the conversation…",
+      "startFailed": "The conversation could not be started. Try again."
+    },
+    "presence": {
+      "online_one": "{{count}} teacher online",
+      "online_other": "{{count}} teachers online",
+      "offline": "Teachers offline"
+    },
+    "help": {
+      "request": "Ask a teacher",
+      "requesting": "Asking a teacher…",
+      "offline": "Teachers are not online right now. When they are back, they will reply here.",
+      "cardLabel": "Teacher support",
+      "status": {
+        "pending": "Waiting",
+        "assigned": "Assigned",
+        "in_progress": "In progress",
+        "resolved": "Resolved",
+        "cancelled": "Cancelled"
+      },
+      "title": {
+        "pending": "Teacher support requested",
+        "assigned": "{{name}} will join this conversation",
+        "in_progress": "{{name}} is helping you",
+        "resolved": "Teacher support has ended",
+        "cancelled": "Teacher support was cancelled"
+      },
+      "body": {
+        "pending": "A teacher will reply in this conversation. Keep going in the meantime.",
+        "assigned": "Their reply will appear in this conversation.",
+        "in_progress": "Their replies appear in this conversation.",
+        "resolved": "Need more help? Ask a teacher again under any answer.",
+        "cancelled": "Need more help? Ask a teacher again under any answer."
+      }
+    }
+  }
 }
