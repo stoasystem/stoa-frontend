@@ -8,7 +8,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { Suspense } from 'react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
@@ -23,7 +23,7 @@ import { mswServer } from '../mswServer'
 
 const copy = enAuth.changePassword
 
-type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[] }
+type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[]; log: string[] }
 
 const DEFAULT_MATRIX = {
   admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
@@ -40,7 +40,7 @@ function backend({
   request?: () => Response
   confirm?: () => Response
 } = {}): Seen {
-  const seen: Seen = { request: [], confirm: [], preferences: [] }
+  const seen: Seen = { request: [], confirm: [], preferences: [], log: [] }
   let matrix: Record<string, unknown> = structuredClone(DEFAULT_MATRIX)
   const preferencesBody = () => ({
     userId: 'u-1',
@@ -51,11 +51,17 @@ function backend({
   })
   mswServer.use(
     http.get('https://api.test/notifications', () => HttpResponse.json({ items: [], count: 0 })),
-    http.get('https://api.test/notifications/preferences', () => HttpResponse.json(preferencesBody())),
+    http.get('https://api.test/notifications/preferences', () => {
+      seen.log.push('read')
+      return HttpResponse.json(preferencesBody())
+    }),
     http.patch('https://api.test/notifications/preferences', async ({ request: req }) => {
       const body = (await req.json()) as { preferences: Record<string, unknown> }
+      seen.log.push('write')
       seen.preferences.push(body)
+      await delay(40)
       matrix = body.preferences
+      seen.log.push('written')
       return HttpResponse.json(preferencesBody())
     }),
     http.post('https://api.test/auth/password-change/request', async ({ request: req }) => {
@@ -70,6 +76,7 @@ function backend({
   return seen
 }
 
+let client: QueryClient
 let pathname = ''
 let go: (to: string) => void = () => {}
 function LocationProbe() {
@@ -90,7 +97,7 @@ function openAt(path: string, role: UserRole = 'student', options: { mustChangeP
     accessToken: 'token',
     isAuthenticated: true,
   })
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
+  client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
@@ -208,10 +215,45 @@ describe('changing the password on /me', () => {
     expect(screen.queryByRole('alert')).toBeNull()
     expect(pathname).toBe('/me')
 
-    // And the second change is a full one: current password again, a new code.
-    await completeChange(user, 'New!Pass123')
+    // Nothing of the first change is left in the second step either.
+    await sendCode(user, 'New!Pass123')
+    expect(await screen.findByLabelText(copy.codeLabel)).toHaveValue('')
+    expect(screen.getByLabelText(copy.newPasswordLabel)).toHaveValue('')
+    expect(screen.getByLabelText(copy.confirmPasswordLabel)).toHaveValue('')
+
+    await user.type(screen.getByLabelText(copy.codeLabel), '654321')
+    await user.type(screen.getByLabelText(copy.newPasswordLabel), 'Third!Pass123')
+    await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'Third!Pass123')
+    await user.click(screen.getByRole('button', { name: copy.submit }))
+    expect(await screen.findByText(copy.successBody)).toBeInTheDocument()
+
     expect(seen.request).toEqual([{ currentPassword: 'Old!Pass123' }, { currentPassword: 'New!Pass123' }])
-    expect(seen.confirm).toHaveLength(2)
+    expect(seen.confirm).toEqual([
+      { currentPassword: 'Old!Pass123', code: '123456', newPassword: 'New!Pass123' },
+      { currentPassword: 'New!Pass123', code: '654321', newPassword: 'Third!Pass123' },
+    ])
+  })
+
+  // A mutation keeps what it was called with; for these that is passwords.
+  it('keeps no password in the query client once "Change it again" has reset the form', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/me')
+    await completeChange(user, 'Old!Pass123')
+
+    await user.click(screen.getByRole('button', { name: enCommon.me.password.again }))
+    await screen.findByLabelText(copy.currentPasswordLabel)
+
+    await waitFor(() => {
+      const held = client
+        .getMutationCache()
+        .getAll()
+        .map((mutation) => JSON.stringify(mutation.state.variables ?? null))
+      expect(held.filter((variables) => /Pass123|123456/.test(variables))).toEqual([])
+    })
+    // And an empty first step asks for the password again rather than resending one.
+    await user.click(screen.getByRole('button', { name: copy.sendCodeCta }))
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
   })
 
   it('says so when the current password is wrong, and asks for no code', async () => {
@@ -324,11 +366,15 @@ describe('the forced change after an administrator reset', () => {
 const otherStudent = (id: string, mustChangePassword = false) =>
   ({ id, name: 'Noah Keller', email: 'noah@example.com', role: 'student', mustChangePassword }) as CurrentUser
 
-async function completeChange(user: ReturnType<typeof userEvent.setup>, current = 'Temp!Pass123') {
+async function completeChange(
+  user: ReturnType<typeof userEvent.setup>,
+  current = 'Temp!Pass123',
+  { code = '123456', next = 'New!Pass123' }: { code?: string; next?: string } = {},
+) {
   await sendCode(user, current)
-  await user.type(await screen.findByLabelText(copy.codeLabel), '123456')
-  await user.type(screen.getByLabelText(copy.newPasswordLabel), 'New!Pass123')
-  await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'New!Pass123')
+  await user.type(await screen.findByLabelText(copy.codeLabel), code)
+  await user.type(screen.getByLabelText(copy.newPasswordLabel), next)
+  await user.type(screen.getByLabelText(copy.confirmPasswordLabel), next)
   await user.click(screen.getByRole('button', { name: copy.submit }))
   expect(await screen.findByText(copy.successBody)).toBeInTheDocument()
 }
@@ -382,6 +428,46 @@ describe('the page a forced change stays on', () => {
     act(() => useAuthStore.setState({ user: otherStudent('u-3'), accessToken: 't3', isAuthenticated: true }))
 
     await waitFor(() => expect(pathname).toBe('/me'))
+  })
+})
+
+const setUserFields = (patch: Record<string, unknown>) =>
+  act(() => useAuthStore.setState({ user: { ...(useAuthStore.getState().user as CurrentUser), ...patch } as CurrentUser }))
+
+describe('a forced change the account data moves under', () => {
+  it('stays forced when a refetched account arrives without its id', async () => {
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    expect(await screen.findByText(copy.forcedTitle)).toBeInTheDocument()
+
+    setUserFields({ id: undefined })
+    for (const to of ['/me', '/', '/ask']) {
+      act(() => go(to))
+      await waitFor(() => expect(pathname).toBe('/settings/password'))
+    }
+    expect(screen.getByText(copy.forcedTitle)).toBeInTheDocument()
+  })
+
+  it('is forced again when a late /auth/me raises the flag after the change', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    await completeChange(user)
+
+    setUserFields({ mustChangePassword: true })
+    act(() => go('/'))
+    await waitFor(() => expect(pathname).toBe('/settings/password'))
+  })
+
+  it('keeps another forced student swapped in on the page', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    await completeChange(user)
+
+    act(() => useAuthStore.setState({ user: otherStudent('u-9', true) }))
+    act(() => go('/me'))
+    await waitFor(() => expect(pathname).toBe('/settings/password'))
   })
 })
 
@@ -481,6 +567,39 @@ describe('notification preferences on /me', () => {
         teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
       },
     })
+  })
+
+  it('writes one toggle after another, each built from its own fresh read', async () => {
+    const seen = backend()
+    openAt('/me')
+    const toggle = await screen.findByRole('switch', {
+      name: enCommon.me.notifications.categories.teacher_responses.title,
+    })
+    seen.log.length = 0
+
+    // Two toggles in the same tick, before the switch can disable itself.
+    act(() => {
+      toggle.click()
+      toggle.click()
+    })
+
+    await waitFor(() => expect(seen.log).toHaveLength(6))
+    expect(seen.log).toEqual(['read', 'write', 'written', 'read', 'write', 'written'])
+  })
+
+  it('writes nothing when the fresh read fails', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+    const toggle = await screen.findByRole('switch', {
+      name: enCommon.me.notifications.categories.teacher_responses.title,
+    })
+    mswServer.use(http.get('https://api.test/notifications/preferences', () => new HttpResponse(null, { status: 500 })))
+
+    await user.click(toggle)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(enCommon.me.notifications.saveFailed)
+    expect(seen.preferences).toEqual([])
   })
 
   it('says so when the change is refused', async () => {

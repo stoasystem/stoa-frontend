@@ -24,6 +24,9 @@ export function useNotificationPreferencesQuery() {
 export function useUpdateNotificationPreferencesMutation() {
   const queryClient = useQueryClient()
   return useMutation({
+    // One write at a time: a second toggle waits for the first to land and
+    // then builds from its own fresh read, so neither undoes the other.
+    scope: { id: 'notification-preferences' },
     mutationFn: async (change: (matrix: NotificationPreferenceMatrix) => NotificationPreferenceMatrix) => {
       const current = await queryClient.fetchQuery({
         queryKey: notificationQueryKeys.preferences(),

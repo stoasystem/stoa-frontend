@@ -30,8 +30,12 @@ export function usePasswordChange() {
   const [maskedRecipient, setMaskedRecipient] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
 
+  // A mutation keeps its variables -- here, passwords -- in the query
+  // client's cache until it is collected; gcTime 0 collects it as soon as
+  // nothing shows it any more (after reset(), or leaving the page).
   const requestMutation = useMutation({
     mutationFn: requestPasswordChange,
+    gcTime: 0,
     onSuccess: (data) => {
       setMaskedRecipient(data.maskedRecipient)
       setStep('enterCode')
@@ -40,6 +44,7 @@ export function usePasswordChange() {
 
   const confirmMutation = useMutation({
     mutationFn: confirmPasswordChange,
+    gcTime: 0,
     onSuccess: () => {
       setStep('done')
       // The obligation is discharged on the server; clearing it here is what
