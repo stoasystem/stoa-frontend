@@ -1,16 +1,25 @@
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { CircleAlert } from 'lucide-react'
 import { EmailVerificationPanel } from '@/components/auth/EmailVerificationPanel'
-import { Button } from '@/components/ui/button'
+import { skyErrorClass, skyFieldProps, skyInputClass, skyInvalidInputClass, skyLabelClass } from '@/components/auth/skyFields'
+import { Button } from '@/components/base/Button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { cn } from '@/lib/utils'
 import { useLoginMutation } from '@/hooks/auth/useLoginMutation'
 import { markLoginSubmitted } from '@/lib/loginTiming'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { createLoginSchema } from '@/lib/validation'
 import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
 
+/*
+ * The sign-in form. It is drawn for the sky (#53): LoginPage is a
+ * `data-surface="sky"` surface, and the classes here read the sky tokens,
+ * which exist only inside one. What it does -- validation, the request, the
+ * verification hand-off, the errors -- is unchanged from before the redesign.
+ */
 export function LoginForm() {
   const { t } = useTranslation(['auth', 'common', 'errors'])
   const [email, setEmail] = useState('')
@@ -22,7 +31,7 @@ export function LoginForm() {
 
   return (
     <form
-      className="space-y-4"
+      className="space-y-5"
       // The browser's own required-field prompts follow its language, not the
       // one chosen here, so the form's own checks answer instead. `required`
       // stays on the fields for assistive technology.
@@ -45,7 +54,7 @@ export function LoginForm() {
       }}
     >
       <div className="space-y-2">
-        <Label htmlFor="email">{t('auth:register.email')}</Label>
+        <Label htmlFor="email" className={skyLabelClass}>{t('auth:register.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -55,11 +64,13 @@ export function LoginForm() {
           required
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'login-email-error' : undefined}
+          className={cn(skyInputClass, errors.email && skyInvalidInputClass)}
+          {...skyFieldProps}
         />
-        {errors.email && <p id="login-email-error" className="text-xs text-destructive" role="alert">{errors.email}</p>}
+        {errors.email && <FieldAlert id="login-email-error">{errors.email}</FieldAlert>}
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">{t('auth:register.password')}</Label>
+        <Label htmlFor="password" className={skyLabelClass}>{t('auth:register.password')}</Label>
         <Input
           id="password"
           type="password"
@@ -69,26 +80,28 @@ export function LoginForm() {
           required
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'login-password-error' : undefined}
+          className={cn(skyInputClass, errors.password && skyInvalidInputClass)}
+          {...skyFieldProps}
         />
-        {errors.password && <p id="login-password-error" className="text-xs text-destructive" role="alert">{errors.password}</p>}
+        {errors.password && <FieldAlert id="login-password-error">{errors.password}</FieldAlert>}
         {/* There is no self-service recovery any more: a forgotten password is
             reset by an administrator. Signed in, a password is changed under
             /settings/password. */}
-        <p className="text-right text-xs text-muted-foreground">
+        <p className="pt-1 text-[12px] leading-[1.35] text-[color:var(--on-sky-text-caption)]">
           {t('auth:login.forgotPassword')}
         </p>
       </div>
       {verificationBlocked && (
-        <EmailVerificationPanel email={email} source="login" />
+        <EmailVerificationPanel email={email} source="login" surface="sky" />
       )}
       {loginMutation.isError && !verificationBlocked && (
-        <p className="text-sm text-destructive" role="alert">
-          {toUserFacingError(loginMutation.error, t('auth:login.failed'))}
-        </p>
+        <FieldAlert>{toUserFacingError(loginMutation.error, t('auth:login.failed'))}</FieldAlert>
       )}
       <Button
         type="submit"
-        className="w-full"
+        variant="onSky"
+        size="large"
+        fullWidth
         disabled={loginMutation.isPending}
         aria-busy={loginMutation.isPending}
       >
@@ -96,15 +109,26 @@ export function LoginForm() {
       </Button>
       {/* The wait to a usable page is seconds long; say so rather than
           leaving a disabled button as the only sign of progress. */}
-      <p className="min-h-5 text-center text-xs text-muted-foreground" role="status" aria-live="polite">
+      <p className="-mt-2 min-h-5 text-center text-[12px] leading-[1.35] text-[color:var(--on-sky-text-caption)]" role="status" aria-live="polite">
         {loginMutation.isPending ? t('auth:login.signingInStatus') : ''}
       </p>
-      <p className="text-center text-sm text-muted-foreground">
+      <p className="text-[15px] leading-[1.35] text-[color:var(--on-sky-text-body)]">
         {t('auth:login.needAccount')}{' '}
-        <Link className="font-semibold text-primary underline underline-offset-4 hover:text-primary/80" to="/register">
+        {/* Coloured and underlined by index.css (`data-sky-link`). */}
+        <Link className="font-semibold" data-sky-link="inline" to="/register">
           {t('auth:login.howToGetAccount')}
         </Link>
       </p>
     </form>
+  )
+}
+
+/** An error on the sky: white, with a glyph, never red (skyFields.ts). */
+function FieldAlert({ id, children }: { id?: string; children: ReactNode }) {
+  return (
+    <p id={id} className={skyErrorClass} role="alert">
+      <CircleAlert aria-hidden="true" size={16} strokeWidth={1.6} className="mt-px shrink-0" />
+      <span>{children}</span>
+    </p>
   )
 }

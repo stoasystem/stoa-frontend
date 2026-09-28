@@ -202,6 +202,85 @@ canvas {
   outline: none;
 }
 
+/*
+ * Lines on the sky (#53). The `*` rule above is unlayered, so it outranks
+ * every Tailwind border colour and would draw them all --hairline, near white
+ * on the sky. Sky elements say what their line is instead: a divider
+ * (`data-sky-rule`, glass border white 12%) or a text field's underline
+ * (`data-sky-field`, gated at 3:1), which turns white when the field has
+ * focus or is invalid.
+ */
+[data-surface="sky"] [data-sky-rule] {
+  border-color: var(--sky-glass-border);
+}
+
+[data-surface="sky"] [data-sky-field] {
+  border-color: var(--on-sky-field-rule);
+}
+
+[data-surface="sky"] [data-sky-field]:focus-visible,
+[data-surface="sky"] [data-sky-field][aria-invalid="true"] {
+  border-color: var(--on-sky-text);
+}
+
+/*
+ * Links on the sky (#53), for the same reason: the unlayered `a` rule above
+ * (colour inherit, no underline) outranks the Tailwind classes. A link inside
+ * a sentence is white and underlined, so it never rests on colour alone
+ * (WCAG 1.4.1); a quiet link (the footer) is caption white and turns white
+ * on hover.
+ */
+[data-surface="sky"] a[data-sky-link="inline"] {
+  color: var(--on-sky-text);
+  text-decoration: underline;
+  text-decoration-color: var(--on-sky-field-rule);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+[data-surface="sky"] a[data-sky-link="inline"]:hover {
+  text-decoration-color: var(--on-sky-text);
+}
+
+[data-surface="sky"] a[data-sky-link="quiet"] {
+  color: var(--on-sky-text-caption);
+}
+
+[data-surface="sky"] a[data-sky-link="quiet"]:hover {
+  color: var(--on-sky-text);
+}
+
+/* A base Button drawn as a link (`asChild`) on the sky keeps its label colour. */
+[data-surface="sky"] a[data-variant="onSky"] {
+  color: var(--on-sky-button-text);
+}
+
+[data-surface="sky"] a[data-variant="onSkyPlain"] {
+  color: var(--on-sky-plain);
+}
+
+/*
+ * Lit points breathe: the one ambient rhythm (Motion and states: 2.8-4.2 s,
+ * ease-in-out, scale 1 -> 1.14, opacity .82 -> 1). Reduced motion: the stars
+ * hold still. First used by the sign-in page's nebula (#53).
+ */
+@keyframes sky-breathe {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.14); }
+}
+
+.sky-breathe {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sky-breathe var(--breathe-duration, 3.2s) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky-breathe {
+    animation: none;
+  }
+}
+
 /* ── Streaming cursor blink animation ─────────────────────────────────── */
 @keyframes blink {
   0%, 100% { opacity: 1; }

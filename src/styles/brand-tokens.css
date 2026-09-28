@@ -177,6 +177,13 @@
   --on-sky-text-muted: rgba(255, 255, 255, 0.35);
   --on-sky-plain: rgba(255, 255, 255, 0.85);    /* Placement: plain button on dark, "plain white 85%" */
   --on-sky-selected: rgba(255, 255, 255, 0.10); /* Motion and states: selected row on dark */
+  /*
+   * Not on the canvas: no board draws a text field on the sky (the composer
+   * floats over it as a white card). The sign-in page (#53) takes candidate
+   * 04's underlined fields, and the rule is what tells a field from the sky,
+   * so it needs 3:1 there (WCAG 1.4.11), on --sky and on --sky-glass.
+   */
+  --on-sky-field-rule: rgba(255, 255, 255, 0.45);
 
   /* Motion and states: the focus ring on dark is 2 px star-gold. */
   --focus-ring: var(--lit);

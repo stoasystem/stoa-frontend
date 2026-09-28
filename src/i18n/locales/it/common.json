@@ -90,6 +90,7 @@
   },
   "language": {
     "label": "Lingua",
+    "current": "Lingua: {{language}} ({{code}})",
     "english": "English",
     "german": "Deutsch",
     "french": "Français",

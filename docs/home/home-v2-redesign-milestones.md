@@ -203,7 +203,6 @@ Existing local assets:
 - `img/teacher-student-support.jpeg`
 - `img/study-materials.jpeg`
 - `img/library-study-table.jpeg`
-- `img/login-study.jpeg`
 - `img/teacher-classroom.jpeg`
 
 Likely current best candidates:

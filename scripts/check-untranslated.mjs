@@ -39,6 +39,9 @@ const ROOTS = [
   'src/components/base',
   'src/components/shell',
   'src/layouts',
+  // The sign-in page on the sky (#53). src/components/auth (its form) is not
+  // listed yet: registration's steps there still carry 6 English strings.
+  'src/pages/login',
   // Ask: the panel, the sheet and the docked composer (#49).
   'src/features/ask',
   // The account page, the bell and Help (#46).

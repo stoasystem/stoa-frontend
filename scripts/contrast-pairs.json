@@ -29,6 +29,7 @@
     { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "ui", "use": "focus ring" },
     { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "ui", "use": "focus ring on cards" },
     { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "ui", "use": "selected answer border" },
+    { "theme": "light", "fg": "--accent", "bg": "--fill", "kind": "ui", "use": "focus ring inside a highlighted menu item: account menu, language list (#53)" },
     { "theme": "light", "fg": "--green", "bg": "--surface", "kind": "ui", "use": "online dot" },
     { "theme": "light", "fg": "--star", "bg": "--surface", "kind": "ui", "use": "streak / lit icon on cards" },
     { "theme": "light", "fg": "--star", "bg": "--ground", "kind": "ui", "use": "streak / lit icon on the page" },
@@ -55,6 +56,11 @@
     { "theme": "dark", "fg": "--lit", "bg": "--sky-2", "kind": "ui", "use": "focus ring on raised dark surfaces" },
     { "theme": "dark", "fg": "--lit", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "focus ring on glass cards" },
     { "theme": "dark", "fg": "--lit", "bg": "--node-fill", "kind": "ui", "use": "ring of a hollow node" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sphere-0", "kind": "ui", "use": "lit point on the sphere highlight" }
+    { "theme": "dark", "fg": "--lit", "bg": "--sphere-0", "kind": "ui", "use": "lit point on the sphere highlight" },
+    { "theme": "dark", "fg": "--on-sky-plain", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "plain button in a glass card: resend the verification code (#53)" },
+    { "theme": "dark", "fg": "--on-sky-field-rule", "bg": "--sky", "kind": "ui", "use": "text field underline on the sign-in page (#53)" },
+    { "theme": "dark", "fg": "--on-sky-field-rule", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "text field underline in the email verification card (#53)" },
+    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky", "kind": "ui", "use": "invalid field underline, error glyph on the sign-in page (#53)" },
+    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "invalid field underline, error glyph in the verification card (#53)" }
   ]
 }
