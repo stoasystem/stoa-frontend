@@ -20,7 +20,7 @@ export function TeacherRequestInlineAction({
     <div className="mt-4 rounded-lg border border-border/70 bg-secondary/40 p-3">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-start gap-2">
-          <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" aria-hidden="true" />
+          <GraduationCap className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
           <div className="min-w-0">
             <div className="break-words text-sm font-medium text-foreground">
               {t('teacher.title')}
@@ -33,7 +33,7 @@ export function TeacherRequestInlineAction({
                 className={
                   failed
                     ? 'mt-2 break-words text-xs leading-5 text-destructive'
-                    : 'mt-2 break-words text-xs leading-5 text-[hsl(var(--accent))]'
+                    : 'mt-2 break-words text-xs leading-5 text-accent'
                 }
                 role={failed ? 'alert' : undefined}
               >

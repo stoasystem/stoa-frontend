@@ -1,16 +1,9 @@
-body {
-  background:
-    linear-gradient(180deg, hsl(var(--platform-surface-page)) 0%, hsl(42 32% 98%) 42%, hsl(99 16% 92%) 100%);
-}
-
+/*
+ * Pre-redesign page classes. The canvas has no gradients ("Hairlines instead of
+ * shadows. Air instead of boxes."), so every surface here is flat (#18).
+ */
 .premium-shell {
-  background:
-    linear-gradient(180deg, hsl(var(--platform-surface-page)) 0%, hsl(42 34% 98%) 52%, hsl(99 16% 92%) 100%);
-}
-
-.platform-app-shell {
-  background:
-    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(101 13% 92%) 100%);
+  background: var(--ground);
 }
 
 .platform-nav-active {
@@ -62,8 +55,7 @@ body {
 }
 
 .premium-button-lift:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 14px 34px hsl(var(--stoa-brand-charcoal) / 0.12);
+  background-color: var(--accent-pressed);
 }
 
 .premium-primary-button {
@@ -72,7 +64,7 @@ body {
 }
 
 .premium-primary-button:hover {
-  background: hsl(var(--stoa-brand-charcoal)) !important;
+  background: var(--accent-pressed) !important;
 }
 
 .premium-light-button {
@@ -93,10 +85,9 @@ body {
 }
 
 .stoa-card {
-  border-color: hsl(var(--platform-border-soft) / 0.82);
-  background:
-    linear-gradient(180deg, hsl(var(--platform-surface-card) / 0.96), hsl(var(--platform-surface-card) / 0.88));
-  box-shadow: var(--platform-shadow-card);
+  border-color: var(--card-border);
+  background: var(--surface);
+  box-shadow: none;
 }
 
 .stoa-card-quiet {
@@ -104,13 +95,11 @@ body {
 }
 
 .report-surface {
-  background:
-    linear-gradient(135deg, hsl(var(--stoa-brand-card)) 0%, hsl(var(--stoa-brand-burgundy-soft)) 100%);
+  background: var(--surface);
 }
 
 .chat-workspace {
-  background:
-    linear-gradient(180deg, hsl(var(--platform-surface-app)) 0%, hsl(101 12% 92%) 100%);
+  background: var(--ground);
 }
 
 .chat-panel {
@@ -122,18 +111,15 @@ body {
 }
 
 .brand-image-panel {
-  background: hsl(var(--stoa-brand-charcoal));
-  box-shadow: 0 24px 70px hsl(var(--stoa-brand-charcoal) / 0.12);
+  background: var(--ink);
 }
 
 .brand-image-overlay {
-  background:
-    linear-gradient(135deg, hsl(var(--stoa-brand-charcoal) / 0.84), hsl(var(--stoa-brand-burgundy) / 0.2) 54%, hsl(38 42% 72% / 0.36));
+  background: hsl(var(--legacy-ink) / 0.72);
 }
 
 .brand-image-overlay-vertical {
-  background:
-    linear-gradient(180deg, hsl(var(--stoa-brand-charcoal) / 0.12), hsl(var(--stoa-brand-charcoal) / 0.82));
+  background: hsl(var(--legacy-ink) / 0.6);
 }
 
 .brand-ink-card {

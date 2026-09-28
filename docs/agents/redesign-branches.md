@@ -51,13 +51,17 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
   `src/services`，放在 `src/features/planet` 之类的目录里就不会被检查。
 - `workflow_dispatch` 暂时用不了：GitHub 只允许手动触发默认分支上的工作流。
 - 对比度门禁（`check:contrast`）只评 `scripts/contrast-pairs.json` 里声明的前景/背景对，token 从该文件
-  `tokens.file` 指向的那一个文件读。在 [#18](https://github.com/stoasystem/stoa-frontend/issues/18) 落地前它指向
-  `design/tokens.css`（画布 Tokens 页的誊本，应用不引用），所以**评的是画布值，不是线上样式**；#18 把
-  `tokens.file` 改成 `src/styles/brand-tokens.css` 并删掉誊本。`tokens.themes` 写每个主题读哪些块：
-  两个主题读同一组块、或者某个没被任何主题读的块定义了 pairs 用到的 token、或者 token 文件里有嵌套规则，
-  都 exit 2（誊本里深色 token 单放在 `[data-theme="dark"]` 块，选择器由 #18 定）。
-  `"gate": false` 的对只打印读数、不拦，那是画布值本身不达标、留给 #18 定的开放问题；它的 `why` 必须引用
-  票号（`#n`），每个主题至少留一对受门禁，豁免的对一旦达标就 exit 1，要求删掉豁免。JSX 里的内联颜色它看不到。
+  `tokens.file` 指向的那一个文件读，自 [#18](https://github.com/stoasystem/stoa-frontend/issues/18) 起就是
+  应用真正引用的 `src/styles/brand-tokens.css`。浅色主题读 `:root`，深色（「天空」表面：星球、练习舞台、登录页）
+  读 `:root` + `[data-surface="sky"]`；深色 token 只在带这个属性的元素内部存在。两个主题读同一组块、或者某个
+  没被任何主题读的块定义了 pairs 用到的 token、或者 token 文件里有嵌套规则，都 exit 2；`src/` 下任何别的
+  `.css` / `.ts` / `.tsx` / `.html`（以及根目录 `index.html`）只要声明了 pairs 用到的 token（含 var() 链上经过的），
+  也 exit 2，因为那样屏幕上显示的就不是门禁评的值（识别哪些写法见 `scripts/contrast-guard.mjs`，
+  每种写法在 `tests/component/contrastGuard.test.ts` 里都有投毒用例）。
+  `"gate": false` 的对只打印读数、不拦；它的 `why` 必须引用票号（`#n`），每个主题至少留一对受门禁，豁免的对一旦
+  达标就 exit 1，要求删掉豁免。现在只剩 `--on-sky-text-muted`（仅限禁用、不可交互控件的标签）一对豁免。
+  旧页面用的 `--stoa-brand-*`、`--platform-*` 等旧名在 `src/styles/legacy-bridge.css` 里映射到新 token，门禁不读
+  那个文件，它也不许定义画布 token 名。JSX 里的内联颜色门禁看不到。
 
 ## 翻译守卫：新目录要登记
 

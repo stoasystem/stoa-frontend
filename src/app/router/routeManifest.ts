@@ -218,7 +218,8 @@ const CheckoutResultPage = lazyPage('CheckoutResultPage', () => import('@/pages/
 const PaymentSettingsPage = lazyPage('PaymentSettingsPage', () => import('@/pages/billing/PaymentSettingsPage'))
 const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/pages/billing/VirtualCheckoutPage'))
 
-  { path: '/billing', access: SIGNED_IN, page: BillingPage, nav: [{ area: 'parent', label: 'Billing', labelKey: 'navigation.billing', priority: 'primary', icon: 'billing', mobile: true }], meta: { module: 'Billing', status: 'core', purpose: 'Plan and billing state.' } },
+  // No `nav`: a parent reaches billing from the avatar menu, between Help and Sign out (#13, #46).
+  { path: '/billing', access: SIGNED_IN, page: BillingPage, meta: { module: 'Billing', status: 'core', purpose: 'Plan and billing state.' } },
   { path: '/billing/payment-settings', access: SIGNED_IN, page: PaymentSettingsPage, meta: { module: 'Billing', status: 'core', purpose: 'Payment method and billing contact.' } },
   { path: '/billing/checkout/result', access: SIGNED_IN, page: CheckoutResultPage, meta: { module: 'Billing', status: 'demo', purpose: 'Checkout result.' } },
   { path: '/billing/checkout/demo', access: SIGNED_IN, page: VirtualCheckoutPage, meta: { module: 'Billing', status: 'demo', purpose: 'Virtual checkout demo.' } },
@@ -257,7 +258,6 @@ export const pageRoutes: readonly PageRoute[] = [
     page: PlanetHomePage,
     refusedPage: EntryPage,
     titleKey: 'studentRoutes.home.title',
-    nav: [{ area: 'student', label: 'Learn', labelKey: 'navigation.learn', priority: 'primary', icon: 'questionBank', mobile: true, description: 'The planet of the subject last opened.' }],
     meta: { module: 'Planet', status: 'placeholder', purpose: 'Student: the default subject planet. Everyone else: sign-in, or the way to their own home.' },
   },
   { path: '/login', access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
@@ -287,6 +287,9 @@ export const pageRoutes: readonly PageRoute[] = [
   },
 
   // ---- student -----------------------------------------------------------
+  // No student route carries a `nav` entry: the student's bar holds only the
+  // logo, the bell and the avatar (#13 point 5). The planet is the navigation;
+  // /me is reached from the avatar menu, /ask from the composer.
   { path: '/planet/:subjectId', access: STUDENT, page: PlanetSubjectPage, titleKey: 'studentRoutes.planet.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A subject planet.' } },
   { path: '/planet/:subjectId/:topicId', access: STUDENT, page: PlanetTopicPage, titleKey: 'studentRoutes.region.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A region (topic) of a planet.' } },
   { path: '/planet/:subjectId/:topicId/:unitId', access: STUDENT, page: PlanetUnitPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A knowledge point (unit) of a region.' } },
@@ -297,7 +300,6 @@ export const pageRoutes: readonly PageRoute[] = [
     access: STUDENT,
     page: AskPage,
     titleKey: 'studentRoutes.ask.title',
-    nav: [{ area: 'student', label: 'Ask a question', labelKey: 'navigation.chat', priority: 'primary', icon: 'chat', mobile: true, description: 'Ask a question, explain unclear steps, and request teacher help.' }],
     meta: { module: 'Ask', status: 'placeholder', purpose: 'Ask: the planet with a side panel on a desktop, a full-screen sheet on a phone.' },
   },
   { path: '/ask/:conversationId', access: STUDENT, page: AskPage, titleKey: 'studentRoutes.ask.title', meta: { module: 'Ask', status: 'placeholder', purpose: 'One Ask conversation.' } },
@@ -306,7 +308,6 @@ export const pageRoutes: readonly PageRoute[] = [
     access: STUDENT,
     page: MePage,
     titleKey: 'studentRoutes.me.title',
-    nav: [{ area: 'student', label: 'Profile', labelKey: 'navigation.profile', priority: 'primary', icon: 'profile', mobile: true, description: 'Profile, language, notifications and password.' }],
     meta: { module: 'Account', status: 'placeholder', purpose: 'Student account: profile, language, notification preferences, password.' },
   },
   // Kept, but out of navigation: reached from the bell (#13 point 3).

@@ -5,6 +5,8 @@ const logoUrl = new URL('../../../img/logo2.png', import.meta.url).href
 export type StoaLogoProps = {
   variant?: 'dark' | 'light' | 'gold' | 'monochrome'
   size?: 'sm' | 'md' | 'lg'
+  /** An exact height in px, as the bars take it (Sizes: logo 30, phone 26). Overrides `size`. */
+  height?: number
   className?: string
 }
 
@@ -21,7 +23,7 @@ const variantClassNames = {
   monochrome: 'grayscale',
 } as const
 
-export function StoaLogo({ variant = 'dark', size = 'md', className }: StoaLogoProps) {
+export function StoaLogo({ variant = 'dark', size = 'md', height, className }: StoaLogoProps) {
   return (
     <img
       src={logoUrl}
@@ -29,9 +31,10 @@ export function StoaLogo({ variant = 'dark', size = 'md', className }: StoaLogoP
       className={cn(
         'block w-auto max-w-full shrink-0 object-contain',
         variantClassNames[variant],
-        sizeClassNames[size],
+        height === undefined && sizeClassNames[size],
         className,
       )}
+      style={height === undefined ? undefined : { height }}
       draggable={false}
     />
   )

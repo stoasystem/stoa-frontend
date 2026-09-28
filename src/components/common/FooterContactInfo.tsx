@@ -8,14 +8,14 @@ export function FooterContactInfo() {
   return (
     <address className="space-y-3 not-italic text-sm leading-6 text-muted-foreground">
       <div className="flex gap-3">
-        <MapPin className="mt-1 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" aria-hidden="true" />
+        <MapPin className="mt-1 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
           <div className="font-semibold text-foreground">{t('footer.address')}</div>
           <div>{stoaContactInfo.locations}</div>
         </div>
       </div>
       <div className="flex gap-3">
-        <Mail className="mt-1 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" aria-hidden="true" />
+        <Mail className="mt-1 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
           <div className="font-semibold text-foreground">{t('footer.email')}</div>
           <a className="hover:text-foreground" href={`mailto:${stoaContactInfo.email}`}>
@@ -24,7 +24,7 @@ export function FooterContactInfo() {
         </div>
       </div>
       <div className="flex gap-3">
-        <Phone className="mt-1 h-4 w-4 shrink-0 text-[hsl(var(--accent))]" aria-hidden="true" />
+        <Phone className="mt-1 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
         <div>
           <div className="font-semibold text-foreground">{t('footer.phone')}</div>
           <a className="hover:text-foreground" href={stoaContactInfo.phoneHref}>

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Archive, Bell, Check, CircleAlert, Radio, WifiOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { IconButton } from '@/components/base/IconButton'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -22,7 +23,7 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   offline: 'notifications.connection.offline',
 }
 
-export function NotificationCenter() {
+export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
@@ -56,23 +57,24 @@ export function NotificationCenter() {
 
   return (
     <div className="relative" ref={shell}>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="relative"
-        aria-label={
+      {/* Sizes board: the bell in the bar is a 36 icon button with a 22 glyph. */}
+      <IconButton
+        icon={Bell}
+        size={36}
+        hitSize={hitSize}
+        label={
           unread
             ? t('notifications.openLabelUnread', { count: unread })
             : t('notifications.openLabel')
         }
+        aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-      >
-        <Bell className="h-4 w-4" aria-hidden="true" />
-        {unread > 0 && (
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-        )}
-      </Button>
+        badge={
+          unread > 0 ? (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+          ) : undefined
+        }
+      />
       {open && (
         <div className="absolute right-0 top-11 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)]">
           <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
