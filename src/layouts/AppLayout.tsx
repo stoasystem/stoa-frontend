@@ -148,9 +148,10 @@ export function AppLayout({ children }: { children: ReactNode }) {
               <div className="ml-auto flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
                 {user && <NotificationCenter />}
                 <LanguageSwitcher compact />
-                <div className="hidden sm:block">
-                  <UserMenu variant="top" />
-                </div>
+                {/* Shown at every width: below `md` the sidebar and its account
+                    menu are gone, so this is the only way to sign out on a phone
+                    (stoasystem/stoa-frontend#2). The name gives way below `sm`. */}
+                <UserMenu variant="top" />
               </div>
             </div>
           </header>
