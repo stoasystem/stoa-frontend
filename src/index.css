@@ -262,7 +262,7 @@ canvas {
 /*
  * Lit points breathe: the one ambient rhythm (Motion and states: 2.8-4.2 s,
  * ease-in-out, scale 1 -> 1.14, opacity .82 -> 1). Reduced motion: the stars
- * hold still. First used by the sign-in page's planet (#53).
+ * hold still. First used by the sign-in page's nebula (#53).
  */
 @keyframes sky-breathe {
   0%, 100% { opacity: 0.82; transform: scale(1); }

@@ -7,7 +7,7 @@ import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { StoaLogo } from '@/components/common/StoaLogo'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { stoaContactInfo } from '@/lib/brandContact'
-import { LoginPlanet } from '@/pages/login/LoginPlanet'
+import { LoginNebula } from '@/pages/login/LoginNebula'
 
 /*
  * The sign-in page (#53): candidate 04, "the night observatory", redrawn with
@@ -16,9 +16,10 @@ import { LoginPlanet } from '@/pages/login/LoginPlanet'
  * canvas's four strengths, the white button, a star-gold focus ring, nothing
  * burgundy (the logo is drawn white) and nothing red.
  *
- * Desktop: the form flush left, a small planet on the right where the
- * candidate drew its orbit diagram, with the caption under a hairline.
- * Phone: the form first, the planet small beside the caption below it.
+ * Desktop: the form flush left, a small nebula on the right where the
+ * candidate drew its orbit diagram (#72: the star map replaced the planet),
+ * with the caption under a hairline. Phone: the form first, the nebula
+ * small beside the caption below it.
  *
  * Signing in itself is LoginForm's, unchanged; this page only places it.
  */
@@ -104,12 +105,12 @@ export function LoginPage() {
 
         <div data-sky-rule="" className="flex max-w-[420px] items-center gap-5 border-t pt-6 md:max-w-none md:flex-col md:items-stretch md:gap-0 md:border-t-0 md:pt-0">
           {/* A width, not a max-width: index.css caps every svg at 100% unlayered. */}
-          <LoginPlanet className="w-[104px] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
+          <LoginNebula className="w-[104px] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
           <p
             data-sky-rule=""
             className="m-0 text-[17px] leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
           >
-            {t('auth:login.planetCaption')}
+            {t('auth:login.skyCaption')}
           </p>
         </div>
       </main>

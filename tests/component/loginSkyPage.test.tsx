@@ -71,7 +71,7 @@ afterEach(() => {
 })
 
 describe('the sign-in page', () => {
-  it('is one sky surface holding the heading, the form and the planet', () => {
+  it('is one sky surface holding the heading, the form and the nebula', () => {
     const { container } = renderLogin()
 
     const sky = container.firstElementChild as HTMLElement
@@ -79,11 +79,14 @@ describe('the sign-in page', () => {
     expect(container.querySelectorAll('[data-surface]')).toHaveLength(1)
     expect(within(sky).getByRole('heading', { level: 1, name: enAuth.login.title })).toBeInTheDocument()
     expect(sky.querySelector('form')).not.toBeNull()
-    // The planet is decoration: drawn, and hidden from assistive technology.
-    const planet = sky.querySelector('[data-login-planet]')
-    expect(planet).not.toBeNull()
-    expect(planet).toHaveAttribute('aria-hidden', 'true')
-    expect(within(sky).getByText(enAuth.login.planetCaption)).toBeInTheDocument()
+    // The nebula is decoration: drawn, and hidden from assistive technology.
+    const nebula = sky.querySelector('[data-login-nebula]')
+    expect(nebula).not.toBeNull()
+    expect(nebula).toHaveAttribute('aria-hidden', 'true')
+    // Its glow is baked into gradients: no blur filter to redraw while the stars breathe.
+    expect(nebula?.querySelector('filter')).toBeNull()
+    expect(nebula?.querySelectorAll('.sky-breathe').length).toBeGreaterThan(0)
+    expect(within(sky).getByText(enAuth.login.skyCaption)).toBeInTheDocument()
   })
 
   it('keeps each field labelled, with the hints browsers and password managers read', () => {
@@ -141,7 +144,7 @@ describe('the sign-in page', () => {
     expect(screen.getByText(auth.login.eyebrow)).toBeInTheDocument()
     expect(screen.getByText(auth.login.subtitle)).toBeInTheDocument()
     expect(screen.getByText(auth.login.audience)).toBeInTheDocument()
-    expect(screen.getByText(auth.login.planetCaption)).toBeInTheDocument()
+    expect(screen.getByText(auth.login.skyCaption)).toBeInTheDocument()
     expect(screen.getByLabelText(auth.register.email)).toHaveAttribute('id', 'email')
     expect(screen.getByLabelText(auth.register.password)).toHaveAttribute('id', 'password')
   })
