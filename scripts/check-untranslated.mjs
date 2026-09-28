@@ -37,6 +37,11 @@ const ROOTS = [
   'src/components/base',
   'src/components/shell',
   'src/layouts',
+  // The account page, the bell and Help (#46).
+  'src/features/account',
+  'src/components/notifications',
+  'src/pages/support',
+  'src/pages/auth',
 ]
 
 // Anything a screen puts words into.

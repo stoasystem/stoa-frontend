@@ -65,10 +65,17 @@ describe('the route manifest', () => {
         '/chapter/:unitId/:lessonId',
         '/ask',
         '/ask/:conversationId',
-        '/me',
         '/assignments',
       ]),
     )
+  })
+
+  it('opens /me to students, administrators and the organisation roles (#46)', () => {
+    const me = pageRoutes.find((route) => route.path === '/me')
+    expect(me?.access).toEqual({
+      kind: 'roles',
+      roles: ['student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer'],
+    })
   })
 
   it('keeps /assignments out of navigation', () => {

@@ -146,6 +146,7 @@ const PARENT = only('parent')
 const TEACHER = only('teacher')
 const ADMIN = only('admin')
 const ORGANIZATION = only('admin', 'organization_admin', 'school_teacher', 'school_viewer')
+const ME_ACCESS = only('student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer')
 
 // ---------------------------------------------------------------------------
 // Pages
@@ -283,7 +284,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: CHANGE_PASSWORD_PATH,
     access: SIGNED_IN,
     page: ChangePasswordPage,
-    meta: { module: 'Auth', status: 'core', purpose: 'Self-service password change, reached from the account menu. Students are sent to /me (see legacyRedirects), except under a forced change.' },
+    meta: { module: 'Auth', status: 'core', purpose: 'Self-service password change for teachers and parents, and the forced change for every role. Students are sent to /me (see legacyRedirects), except under a forced change.' },
   },
 
   // ---- student -----------------------------------------------------------
@@ -304,11 +305,13 @@ export const pageRoutes: readonly PageRoute[] = [
   },
   { path: '/ask/:conversationId', access: STUDENT, page: AskPage, titleKey: 'studentRoutes.ask.title', meta: { module: 'Ask', status: 'placeholder', purpose: 'One Ask conversation.' } },
   {
+    // Also the profile page of administrators and the organisation roles,
+    // who have no other (#46); teachers and parents keep their own.
     path: '/me',
-    access: STUDENT,
+    access: ME_ACCESS,
     page: MePage,
     titleKey: 'studentRoutes.me.title',
-    meta: { module: 'Account', status: 'placeholder', purpose: 'Student account: profile, language, notification preferences, password.' },
+    meta: { module: 'Account', status: 'core', purpose: 'Account page: profile, language, notification preferences, password change.' },
   },
   // Kept, but out of navigation: reached from the bell (#13 point 3).
   { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
@@ -451,7 +454,7 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   // Always public: it used to forward to /chat before any guard ran.
   { from: '/assistant', to: toAsk, access: PUBLIC, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },
-  // Teachers, parents and administrators keep the page here.
-  // This branch must not reach main until /me has the password form (#46).
+  // Students change their password on /me (#46); everyone else keeps the page
+  // here, and so does any account under a forced change (RoleScopedRedirect).
   { from: CHANGE_PASSWORD_PATH, to: '/me', access: SIGNED_IN, onlyFor: ['student'], decision: '#13 §2' },
 ]

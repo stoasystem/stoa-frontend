@@ -13,37 +13,45 @@ import { CHANGE_PASSWORD_PATH, pageRoutes, type AppNavArea } from '@/app/router/
 
 export const HELP_PATH = '/support'
 
+/** The anchor on /me that holds the password change. */
+export const PASSWORD_SECTION_ID = 'password'
+const ME_PASSWORD = `/me#${PASSWORD_SECTION_ID}`
+
 /*
- * Profile per role. The student's is /me (#46 builds it). A teacher has
- * /tutor/profile; a parent's account page is the account-operations page.
- * Administrators and the organisation roles have no profile page yet, so the
- * item is shown but cannot be chosen.
+ * Profile per role. The student's is /me. A teacher has /tutor/profile; a
+ * parent's account page is the account-operations page. Administrators and
+ * the organisation roles have no profile page of their own, so theirs is /me
+ * too (#46), which the manifest opens to them.
  */
 const PROFILE_PATHS: Record<AppNavArea, string | null> = {
   student: '/me',
   teacher: '/tutor/profile',
   parent: '/parent/account-operations',
-  admin: null,
-  organization: null,
+  admin: '/me',
+  organization: '/me',
 }
 
-// Students change their password on /me (#13 point 2); /settings/password
-// sends them there too, except under a forced change.
+/*
+ * Whoever has /me changes the password there (#13 point 2, #46); the menu
+ * opens the page at its password section. Teachers and parents keep
+ * /settings/password. /settings/password still sends a student to /me, except
+ * under a forced change, which only ever happens there.
+ */
 const PASSWORD_PATHS: Record<AppNavArea, string> = {
-  student: '/me',
+  student: ME_PASSWORD,
   teacher: CHANGE_PASSWORD_PATH,
   parent: CHANGE_PASSWORD_PATH,
-  admin: CHANGE_PASSWORD_PATH,
-  organization: CHANGE_PASSWORD_PATH,
+  admin: ME_PASSWORD,
+  organization: ME_PASSWORD,
 }
 
 export type AccountMenuExtra = { key: string; labelKey: string; to: string }
 
 /*
- * Billing and payments: the item opens /billing. /billing/payment-settings is
- * reached from inside that page, not as a second menu item; when #46 brings
- * billing back it decides whether the page links there or the item becomes a
- * submenu. Neither route may carry a `nav` entry in the manifest.
+ * Billing and payments: one item, opening /billing. /billing/payment-settings
+ * is not a second item and not a submenu: the billing page links to it (its
+ * "Manage billing" button), so the menu keeps its one extra row (decided in
+ * #46). Neither route may carry a `nav` entry in the manifest.
  */
 const EXTRAS: Record<AppNavArea, readonly AccountMenuExtra[]> = {
   student: [],
@@ -53,9 +61,16 @@ const EXTRAS: Record<AppNavArea, readonly AccountMenuExtra[]> = {
   organization: [],
 }
 
+/** A link's path without its `#section`, which the router never sees. */
+export function pathOf(to: string): string {
+  const hash = to.indexOf('#')
+  return hash === -1 ? to : to.slice(0, hash)
+}
+
 /** Whether the router answers `path` with a page of its own (not the catch-all). */
 export function isRegisteredPage(path: string): boolean {
-  return pageRoutes.some((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, path) !== null)
+  const pathname = pathOf(path)
+  return pageRoutes.some((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, pathname) !== null)
 }
 
 export type AccountMenuTargets = {

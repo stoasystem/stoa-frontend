@@ -1,0 +1,336 @@
+/**
+ * `/me`, the account page (#46): profile, language, notification preferences
+ * and the password change, inside the app shell. The password change is the
+ * same flow as /settings/password (same calls, same checks, same messages);
+ * these drive it through the real API layer against a mocked backend, and
+ * the real router, so the forced change is seen to route as before.
+ */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render, screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
+import { Suspense } from 'react'
+import { I18nextProvider } from 'react-i18next'
+import { MemoryRouter, useLocation } from 'react-router-dom'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { AppRoutes } from '@/app/router/AppRoutes'
+import i18n from '@/i18n'
+import enAuth from '@/i18n/locales/en/auth.json'
+import enCommon from '@/i18n/locales/en/common.json'
+import { type CurrentUser, useAuthStore } from '@/store/authStore'
+import type { UserRole } from '@/types/user'
+import { mswServer } from '../mswServer'
+
+const copy = enAuth.changePassword
+
+type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[] }
+
+const DEFAULT_MATRIX = {
+  admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
+  assignments: { in_app: true, realtime: true, email_digest: false, push: false },
+  learning_updates: { in_app: true, realtime: true, email_digest: false, push: true },
+  teacher_responses: { in_app: true, realtime: true, email_digest: true, push: false },
+  weekly_reports: { in_app: true, realtime: true, email_digest: false, push: false },
+}
+
+function backend({
+  request = () => HttpResponse.json({ status: 'sent', maskedRecipient: 'l******@example.com', expiresAt: 1_790_000_000 }),
+  confirm = () => HttpResponse.json({ status: 'changed' }),
+}: {
+  request?: () => Response
+  confirm?: () => Response
+} = {}): Seen {
+  const seen: Seen = { request: [], confirm: [], preferences: [] }
+  let matrix: Record<string, unknown> = structuredClone(DEFAULT_MATRIX)
+  const preferencesBody = () => ({
+    userId: 'u-1',
+    preferences: matrix,
+    supportedCategories: Object.keys(DEFAULT_MATRIX),
+    supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+    updatedAt: null,
+  })
+  mswServer.use(
+    http.get('https://api.test/notifications', () => HttpResponse.json({ items: [], count: 0 })),
+    http.get('https://api.test/notifications/preferences', () => HttpResponse.json(preferencesBody())),
+    http.patch('https://api.test/notifications/preferences', async ({ request: req }) => {
+      const body = (await req.json()) as { preferences: Record<string, unknown> }
+      seen.preferences.push(body)
+      matrix = body.preferences
+      return HttpResponse.json(preferencesBody())
+    }),
+    http.post('https://api.test/auth/password-change/request', async ({ request: req }) => {
+      seen.request.push(await req.json())
+      return request()
+    }),
+    http.post('https://api.test/auth/password-change/confirm', async ({ request: req }) => {
+      seen.confirm.push(await req.json())
+      return confirm()
+    }),
+  )
+  return seen
+}
+
+let pathname = ''
+function LocationProbe() {
+  pathname = useLocation().pathname
+  return null
+}
+
+function openAt(path: string, role: UserRole = 'student', options: { mustChangePassword?: boolean } = {}) {
+  useAuthStore.setState({
+    user: {
+      id: 'u-1',
+      name: 'Lina Meier',
+      email: 'lina@example.com',
+      role,
+      mustChangePassword: options.mustChangePassword ?? false,
+    } as CurrentUser,
+    accessToken: 'token',
+    isAuthenticated: true,
+  })
+  const client = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } })
+  render(
+    <I18nextProvider i18n={i18n}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[path]}>
+          <Suspense fallback={null}>
+            <AppRoutes />
+          </Suspense>
+          <LocationProbe />
+        </MemoryRouter>
+      </QueryClientProvider>
+    </I18nextProvider>,
+  )
+}
+
+async function sendCode(user: ReturnType<typeof userEvent.setup>, current = 'Old!Pass123') {
+  await user.type(await screen.findByLabelText(copy.currentPasswordLabel), current)
+  await user.click(screen.getByRole('button', { name: copy.sendCodeCta }))
+}
+
+beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+beforeEach(async () => {
+  await i18n.changeLanguage('en')
+})
+afterEach(() => {
+  mswServer.resetHandlers()
+  useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
+})
+afterAll(() => mswServer.close())
+
+describe('/me', () => {
+  it('shows the profile, the language, the notification switch and the password form inside the shell', async () => {
+    backend()
+    openAt('/me')
+
+    expect(await screen.findByRole('heading', { level: 1, name: enCommon.studentRoutes.me.title })).toBeInTheDocument()
+    expect(document.querySelector('[data-top-bar]')).not.toBeNull()
+    expect(screen.getByRole('button', { name: enCommon.accountMenu.open })).toBeInTheDocument()
+
+    // Read-only: no endpoint edits them.
+    expect(screen.getAllByText('lina@example.com').length).toBeGreaterThan(0)
+    expect(screen.queryByRole('textbox', { name: enCommon.me.profile.email })).toBeNull()
+
+    const languages = screen.getByRole('radiogroup', { name: enCommon.me.language.heading })
+    expect(within(languages).getAllByRole('radio')).toHaveLength(4)
+    expect(within(languages).getByRole('radio', { name: 'English' })).toBeChecked()
+
+    expect(
+      await screen.findByRole('switch', { name: enCommon.me.notifications.categories.teacher_responses.title }),
+    ).toBeChecked()
+
+    const password = screen.getByRole('region', { name: enCommon.me.password.heading })
+    expect(within(password).getByLabelText(copy.currentPasswordLabel)).toHaveAttribute('type', 'password')
+    expect(within(password).getByRole('button', { name: copy.sendCodeCta })).toBeInTheDocument()
+  })
+
+  it('shows an administrator the page without the student notification switch', async () => {
+    backend()
+    openAt('/me', 'admin')
+
+    expect(await screen.findByLabelText(copy.currentPasswordLabel)).toBeInTheDocument()
+    expect(screen.queryByRole('switch')).toBeNull()
+  })
+
+  it('switches the language from the list', async () => {
+    const user = userEvent.setup()
+    backend()
+    mswServer.use(
+      http.patch('https://api.test/auth/me/preferences/locale', () =>
+        HttpResponse.json({ preferredLocale: 'de', effectiveLocale: 'de', supportedLocales: ['de', 'en', 'fr', 'it'] }),
+      ),
+    )
+    openAt('/me')
+
+    await user.click(await screen.findByRole('radio', { name: 'Deutsch' }))
+
+    await waitFor(() => expect(i18n.language).toBe('de'))
+    expect(await screen.findByRole('radio', { name: 'Deutsch' })).toBeChecked()
+  })
+})
+
+describe('changing the password on /me', () => {
+  it('walks current password, emailed code and new password, then says it is done', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+
+    await sendCode(user)
+    expect(await screen.findByText(copy.sentBody.replace('{{email}}', 'l******@example.com'))).toBeInTheDocument()
+    expect(seen.request).toEqual([{ currentPassword: 'Old!Pass123' }])
+
+    await user.type(screen.getByLabelText(copy.codeLabel), '123456')
+    await user.type(screen.getByLabelText(copy.newPasswordLabel), 'New!Pass123')
+    await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'New!Pass123')
+    await user.click(screen.getByRole('button', { name: copy.submit }))
+
+    expect(await screen.findByText(copy.successBody)).toBeInTheDocument()
+    expect(seen.confirm).toEqual([{ currentPassword: 'Old!Pass123', code: '123456', newPassword: 'New!Pass123' }])
+    // Still signed in, still on /me: Cognito's change_password revokes nothing.
+    expect(useAuthStore.getState().isAuthenticated).toBe(true)
+    expect(pathname).toBe('/me')
+  })
+
+  it('says so when the current password is wrong, and asks for no code', async () => {
+    const user = userEvent.setup()
+    backend({
+      request: () =>
+        HttpResponse.json(
+          { detail: { code: 'password_change_credentials_invalid', message: 'Check the current password and try again.' } },
+          { status: 400 },
+        ),
+    })
+    openAt('/me')
+
+    await sendCode(user, 'Wrong!Pass1')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.password_change_credentials_invalid)
+    expect(screen.queryByLabelText(copy.codeLabel)).toBeNull()
+    // A 400, not a 401: the session is fine and the visitor stays signed in.
+    expect(useAuthStore.getState().isAuthenticated).toBe(true)
+  })
+
+  it('falls back to the general message when the server fails', async () => {
+    const user = userEvent.setup()
+    backend({ request: () => new HttpResponse(null, { status: 500 }) })
+    openAt('/me')
+
+    await sendCode(user)
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(copy.failed)
+    expect(screen.queryByLabelText(copy.codeLabel)).toBeNull()
+  })
+
+  it('reports a failed confirmation and keeps the code step open', async () => {
+    const user = userEvent.setup()
+    backend({
+      confirm: () =>
+        HttpResponse.json({ detail: { code: 'password_change_verification_failed', message: 'x' } }, { status: 400 }),
+    })
+    openAt('/me')
+
+    await sendCode(user)
+    await user.type(await screen.findByLabelText(copy.codeLabel), '000000')
+    await user.type(screen.getByLabelText(copy.newPasswordLabel), 'New!Pass123')
+    await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'New!Pass123')
+    await user.click(screen.getByRole('button', { name: copy.submit }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(copy.errors.password_change_verification_failed)
+    expect(screen.getByLabelText(copy.codeLabel)).toBeInTheDocument()
+  })
+
+  it('checks the new password before calling the backend, as /settings/password does', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+
+    await sendCode(user)
+    await user.type(await screen.findByLabelText(copy.codeLabel), '123456')
+    await user.type(screen.getByLabelText(copy.newPasswordLabel), 'weakpass')
+    await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'weakpass')
+    await user.click(screen.getByRole('button', { name: copy.submit }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/./)
+    expect(seen.confirm).toEqual([])
+  })
+
+  it('is where the avatar menu’s "Change password" leads a student', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/me')
+
+    await user.click(await screen.findByRole('button', { name: enCommon.accountMenu.open }))
+    await user.click(await screen.findByRole('menuitem', { name: enCommon.actions.changePassword }))
+
+    await waitFor(() => expect(screen.getByRole('heading', { name: enCommon.me.password.heading })).toHaveFocus())
+    expect(pathname).toBe('/me')
+  })
+})
+
+describe('the forced change after an administrator reset', () => {
+  it('still takes a reset student from /me to /settings/password, with no way out', async () => {
+    backend()
+    openAt('/me', 'student', { mustChangePassword: true })
+
+    expect(await screen.findByText(copy.forcedTitle)).toBeInTheDocument()
+    expect(pathname).toBe('/settings/password')
+    expect(screen.queryByRole('link', { name: enCommon.actions.back })).toBeNull()
+  })
+
+  it('releases the student once the change goes through', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+
+    await sendCode(user, 'Temp!Pass123')
+    await user.type(await screen.findByLabelText(copy.codeLabel), '123456')
+    await user.type(screen.getByLabelText(copy.newPasswordLabel), 'New!Pass123')
+    await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'New!Pass123')
+    await user.click(screen.getByRole('button', { name: copy.submit }))
+
+    expect(await screen.findByText(copy.successBody)).toBeInTheDocument()
+    await waitFor(() => expect(useAuthStore.getState().user?.mustChangePassword).toBe(false))
+    // Clearing the flag does not bounce the page to /me mid-sentence: the
+    // student reads that it worked, then carries on home.
+    expect(pathname).toBe('/settings/password')
+    await user.click(screen.getByRole('link', { name: enCommon.actions.continue }))
+    await waitFor(() => expect(pathname).toBe('/'))
+  })
+})
+
+describe('notification preferences on /me', () => {
+  it('turns teacher replies off in the bell and live, and sends the whole matrix back', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+
+    const toggle = await screen.findByRole('switch', {
+      name: enCommon.me.notifications.categories.teacher_responses.title,
+    })
+    await user.click(toggle)
+
+    await waitFor(() => expect(seen.preferences).toHaveLength(1))
+    // The backend rebuilds the matrix from its defaults and the body, so every
+    // other category and channel must be sent as it was.
+    expect(seen.preferences[0]).toEqual({
+      preferences: {
+        ...DEFAULT_MATRIX,
+        teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
+      },
+    })
+    await waitFor(() => expect(toggle).not.toBeChecked())
+  })
+
+  it('says so when the change is refused', async () => {
+    const user = userEvent.setup()
+    backend()
+    mswServer.use(http.patch('https://api.test/notifications/preferences', () => new HttpResponse(null, { status: 500 })))
+    openAt('/me')
+
+    await user.click(
+      await screen.findByRole('switch', { name: enCommon.me.notifications.categories.teacher_responses.title }),
+    )
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(enCommon.me.notifications.saveFailed)
+  })
+})
