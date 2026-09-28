@@ -45,7 +45,7 @@
     { "theme": "dark", "fg": "--on-sky-button-text", "bg": "--on-sky-button", "kind": "text", "use": "filled button on dark" },
     { "theme": "dark", "fg": "--on-sky-plain", "bg": "--sky", "kind": "text", "use": "plain button on dark" },
     { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "large", "use": "lit moment numbers (title 1)" },
-    { "theme": "dark", "fg": "--on-sky-text-muted", "bg": "--sky", "kind": "text", "use": "muted text on the sky", "gate": false, "why": "inactive text only: locked and disabled items, which WCAG 1.4.3 exempts; never for readable content (user 2026-09-28, #17, #18)" },
+    { "theme": "dark", "fg": "--on-sky-text-muted", "bg": "--sky", "kind": "text", "use": "muted text on the sky", "gate": false, "why": "inactive text only: labels of disabled, non-interactive controls, which WCAG 1.4.3 exempts; never for anything clickable (a tappable locked node is not exempt) or text meant to be read (user 2026-09-28, #17, #18)" },
     { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "ui", "use": "focus ring, selected answer border" },
     { "theme": "dark", "fg": "--lit", "bg": "--sky-2", "kind": "ui", "use": "focus ring on raised dark surfaces" },
     { "theme": "dark", "fg": "--lit", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "focus ring on glass cards" },
