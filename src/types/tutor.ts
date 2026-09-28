@@ -35,11 +35,13 @@ export type TutorHelpRequestNote = {
   id: string
   note: string
   createdAt: string
-  tutor: {
+  // The API names the author `teacher` (backend `TeacherNoteOut`).
+  teacher: {
     id: string
     name: string
   }
-  richContent?: TeacherReplyRichContent
+  // `null` for a plain-text reply.
+  richContent?: TeacherReplyRichContent | null
   responseFormat?: string
 }
 
