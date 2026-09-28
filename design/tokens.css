@@ -20,7 +20,7 @@
 :root {
   /* Light surfaces */
   --ink: #1D1D1F;
-  --secondary: #6E6E73;
+  --secondary: #68686D;  /* canvas #6E6E73, darkened to clear 4.5 on --fill and --sidebar (user 2026-09-28, #17) */
   --tertiary: #AEAEB2; /* chevrons, dividers: never text */
   --ground: #F5F5F7;
   --surface: #FFFFFF;
@@ -31,8 +31,8 @@
   --accent: #1F2E5C;
   --accent-pressed: #14204A;
   --accent-tint: #E9EEF9;
-  --star: #C48A1C;
-  --green: #2E7D4F;
+  --star: #BB831A;  /* canvas #C48A1C, darkened to clear 3:1 on --ground (user 2026-09-28, #17) */
+  --green: #2D7B4E;  /* canvas #2E7D4F, darkened to clear 4.5 on --green-tint (user 2026-09-28, #17) */
   --gold: #7A5410;
   --red: #C4283A;
 
@@ -64,7 +64,7 @@
    * Not named on the Tokens board. The canvas draws these colours in the pairs
    * the gate rates, so they need a name here; #18 confirms or renames them.
    */
-  --on-sky-button-text: #0A1020;     /* Tokens: "--on-sky-button #FFFFFF / text #0A1020"; Placement says "navy text" */
+  --on-sky-button-text: #0A1020;     /* Tokens: "--on-sky-button #FFFFFF / text #0A1020". Placement says "navy text"; the Tokens board wins (user 2026-09-28, #17) */
   --on-sky-text: #FFFFFF;            /* Tokens: --on-sky-text "white 100 / 75 / 65 / 35" = title / body / caption / muted */
   --on-sky-text-body: rgba(255, 255, 255, 0.75);
   --on-sky-text-caption: rgba(255, 255, 255, 0.65);
