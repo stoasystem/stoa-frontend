@@ -6,8 +6,8 @@
 
 | 方案 | 集成分支 | 预览主机名 |
 | --- | --- | --- |
-| A | `redesign/planet` | `app.stoaedu-planet.ch` |
-| B | `redesign/cute` | `app.stoaedu-cute.ch` |
+| A | `redesign/planet` | `app-planet.stoaedu.ch` |
+| B | `redesign/cute`（暂缓，尚未建） | 暂缓；重启时照此命名，如 `app-cute.stoaedu.ch` |
 
 ## 一张票据一条分支
 
