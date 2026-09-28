@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
@@ -51,10 +52,13 @@ vi.mock('@/hooks/chat/useTeacherHelpStatusQuery', () => ({
 }))
 
 async function startConversation() {
+  // The page's account pill signs out through the query client, as in the app.
   render(
-    <MemoryRouter initialEntries={['/chat']}>
-      <ChatPage />
-    </MemoryRouter>,
+    <QueryClientProvider client={new QueryClient()}>
+      <MemoryRouter initialEntries={['/chat']}>
+        <ChatPage />
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
   await userEvent.type(screen.getByLabelText('newConversationLabel'), 'Was ist eine Ableitung?')
   await userEvent.click(screen.getByRole('button', { name: 'startConversation' }))
