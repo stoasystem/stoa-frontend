@@ -26,9 +26,7 @@ const RHO2 = 2
 const RHO4 = 4
 const EPSILON2 = 1e-12
 
-const cosh = (x: number) => ((x = Math.exp(x)) + 1 / x) / 2
-const sinh = (x: number) => ((x = Math.exp(x)) - 1 / x) / 2
-const tanh = (x: number) => ((x = Math.exp(2 * x)) - 1) / (x + 1)
+const { cosh, sinh, tanh } = Math
 
 /**
  * The view at `t` in [0, 1] between two views (the caller applies easing).

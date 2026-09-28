@@ -10,13 +10,14 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { controlBands, StarMapView } from '@/features/starmap/components/StarMapView'
-import { NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
+import { nebulaFocusSpot, NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
 import { starMapFixture, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+import type { StarMap } from '@/features/starmap/model/starMap'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import i18n from '@/i18n'
 import { fakeClock, recordingRenderer } from './starmapHarness'
 
-function showMap(target: LayerTarget = { layer: 'map' }, size: FixtureSize = 10) {
+function showMap(target: LayerTarget = { layer: 'map' }, size: FixtureSize = 10, map: StarMap = starMapFixture(size)) {
   const clock = fakeClock()
   const renderer = recordingRenderer()
   const onNavigate = vi.fn()
@@ -24,7 +25,7 @@ function showMap(target: LayerTarget = { layer: 'map' }, size: FixtureSize = 10)
     <I18nextProvider i18n={i18n}>
       <MemoryRouter>
         <div data-surface="sky" className="flex">
-          <StarMapView map={starMapFixture(size)} target={target} onNavigate={onNavigate} scheduler={clock} createRendererFor={() => renderer} />
+          <StarMapView map={map} target={target} onNavigate={onNavigate} scheduler={clock} createRendererFor={() => renderer} />
         </div>
       </MemoryRouter>
     </I18nextProvider>,
@@ -115,6 +116,40 @@ describe('the parallel DOM', () => {
       '/map/math/geometry',
       '/map/math/data',
     ])
+  })
+
+  it('moves the focus pill with its nebula when focusing pans the map (normal motion, nothing breathing)', () => {
+    // No recommended star, so no breathing frame can come along later and
+    // mask a stale last frame of the pan.
+    const quiet: StarMap = { ...starMapFixture(10), stars: starMapFixture(10).stars.map((star) => ({ ...star, recommendation: null })) }
+    const { clock, renderer, container } = showMap({ layer: 'nebula', nebulaId: 'algebra' }, 10, quiet)
+    const link = container.querySelector<HTMLAnchorElement>('a[data-nebula-link="geometry"]')!
+    act(() => {
+      link.focus()
+      clock.advance(600)
+    })
+    const frame = renderer.last()
+    const n = 2 // geometry, in nebula order
+    expect(frame.highlightNebula).toBe(n)
+    // The pill is where nebulaFocusSpot puts it for the nebula as drawn now, not before the pan.
+    const expected = nebulaFocusSpot(
+      { x: frame.nebulaX[n], y: frame.nebulaY[n], r: frame.nebulaR[n] },
+      { width: 1280, height: 776 },
+      controlBands(true),
+    )
+    expect(Math.abs(Number(link.dataset.focusTop) - expected.y)).toBeLessThan(1)
+    const pill = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(link.style.transform)!
+    expect(Math.abs(Number(pill[1]) - expected.x)).toBeLessThan(1)
+    // ...and that spot is by the nebula: at most a pill's height beyond its disc, horizontally over it.
+    expect(Math.abs(expected.x - frame.nebulaX[n])).toBeLessThan(Math.max(frame.nebulaR[n], 1))
+    // And every star link sits on its star as drawn now.
+    for (const star of starLinks(container)) {
+      const index = Number(star.dataset.index)
+      const size = Number.parseFloat(star.style.width)
+      const match = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(star.style.transform)!
+      expect(Math.abs(Number(match[1]) + size / 2 - frame.x[index])).toBeLessThan(1)
+      expect(Math.abs(Number(match[2]) + size / 2 - frame.y[index])).toBeLessThan(1)
+    }
   })
 
   it('shows a focused nebula link by its nebula, clear of the page controls, and rings the nebula on the canvas', () => {

@@ -275,6 +275,45 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(renderer.stats.highlightNebula).toBe(-1)
   })
 
+  it('hands the parallel DOM the final positions when a focus pan ends, with nothing breathing on screen', () => {
+    // Audit of #71: at /map/math/algebra, focusing Geometry panned the canvas
+    // but the DOM kept the pre-pan positions, because the flight's last frame
+    // was treated as moving and no later frame came (the recommended star,
+    // in Numbers, is off screen).
+    const map = starMapFixture(10)
+    const recording = recordingRenderer()
+    let discs: { x: number; y: number; r: number }[] = []
+    let stars: { index: number; x: number; y: number }[] = []
+    const clock = fakeClock()
+    const engine = new StarMapEngine({
+      renderer: recording,
+      theme: THEME,
+      reducedMotion: false,
+      scheduler: clock,
+      now: clock.now,
+      onVisibleChange: (visible, _glyph, nebulae) => {
+        stars = visible
+        discs = nebulae
+      },
+    })
+    engine.setViewport(W, H, 2, { top: 76, bottom: 164 })
+    engine.setData(map, { layer: 'nebula', nebulaId: 'algebra' })
+    clock.advance(20)
+    for (const [n, nebula] of orderedNebulae(map).entries()) {
+      engine.setFocusNebula(n)
+      clock.advance(600)
+      const frame = recording.last()
+      expect(Math.hypot(discs[n].x - frame.nebulaX[n], discs[n].y - frame.nebulaY[n]), nebula.name).toBeLessThan(1)
+      for (const star of stars) {
+        expect(Math.abs(star.x - frame.x[star.index])).toBeLessThan(1)
+        expect(Math.abs(star.y - frame.y[star.index])).toBeLessThan(1)
+      }
+      engine.setFocusNebula(-1)
+      clock.advance(20)
+    }
+    engine.destroy()
+  })
+
   it('never blurs per frame: no filter is ever set on the canvas', () => {
     const renderer = realRenderer()
     const { clock } = engineWith(renderer, map500, false)

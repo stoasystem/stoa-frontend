@@ -40,11 +40,14 @@ import {
 export type FrameScheduler = {
   request(callback: (now: number) => void): number
   cancel(handle: number): void
+  /** The clock the frame timestamps come from; `performance.now` for animation frames. */
+  now?: () => number
 }
 
 export const animationFrameScheduler: FrameScheduler = {
   request: (callback) => requestAnimationFrame(callback),
   cancel: (handle) => cancelAnimationFrame(handle),
+  now: () => performance.now(),
 }
 
 /** A star on screen now, for the parallel DOM. `index` is its keyboard position. */
@@ -173,7 +176,9 @@ export class StarMapEngine {
     this.options = options
     this.renderer = options.renderer
     this.scheduler = options.scheduler ?? animationFrameScheduler
-    this.now = options.now ?? (() => performance.now())
+    // Transitions start on this clock and frames arrive on the scheduler's:
+    // they must be one clock, or a flight never gets past its first frame.
+    this.now = options.now ?? this.scheduler.now ?? (() => performance.now())
     this.policy = motionPolicy(options.reducedMotion)
     this.renderer.setTheme(options.theme)
   }
@@ -606,7 +611,10 @@ export class StarMapEngine {
       from = this.transition.from
       if (this.transition.kind === 'zoom') {
         this.view = this.transition.flight(easeStandard(t))
-        moving = true
+        // The flight's last frame is a frame at rest: the parallel DOM (and a
+        // focused nebula's name pill) must get these final positions now,
+        // since nothing else may ask for another frame.
+        moving = t < 1
       } else {
         crossfade = 1 - t
       }

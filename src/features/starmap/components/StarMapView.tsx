@@ -356,206 +356,214 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
     ) : null
 
   return (
-    <div
-      ref={stageRef}
-      className="relative min-h-[320px] flex-1 touch-none overflow-hidden select-none"
-      data-starmap-stage
-      data-layer={target.layer}
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerCancel}
-      onKeyDown={onKeyDown}
-    >
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+    // The map fills its container whatever the container's display: the frame
+    // takes the parent's height (a flex column's remaining space, or a block
+    // with a definite height, such as #66's Ask page area) and the stage sits
+    // absolutely inside it, so it is never left at its 320 px minimum. The
+    // stage's own size is what the engine measures.
+    <div data-starmap-frame className="relative h-full min-h-[320px] w-full flex-1">
+      <div
+        ref={stageRef}
+        className="absolute inset-0 touch-none overflow-hidden select-none"
+        data-starmap-stage
+        data-layer={target.layer}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onKeyDown={onKeyDown}
+      >
+        <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
 
-      {/* Top: where you are, the subject switcher (#72 point 7), and the tally. */}
-      {wide ? (
-        <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-5 grid grid-cols-[1fr_auto_1fr] items-start gap-4">
-          <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
-          <div className="pointer-events-auto">{switcher}</div>
-          <div
-            className="pointer-events-auto flex items-center gap-5 justify-self-end rounded-[12px] border border-solid bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-[20px]"
-            // index.css sets an unlayered `* { border-color }`, which beats a utility class.
-            style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
-          >
-            <span className="inline-flex items-center gap-1.5 font-semibold text-on-sky">
-              <span aria-hidden="true" className="inline-block size-2 rounded-full bg-lit" />
-              {t('summary.lit', { lit: map.summary.lit, total: map.summary.total })}
-            </span>
-            <span className="text-[color:var(--on-sky-text-body)]">{t('summary.streak', { count: map.summary.streakDays })}</span>
-            <span className="text-[color:var(--on-sky-text-body)]">
-              {t('summary.score', { count: map.summary.score, formatted: numberFormat.format(map.summary.score) })}
-            </span>
-          </div>
-        </div>
-      ) : (
-        <div data-starmap-overlay className="absolute inset-x-4 top-2 flex flex-col items-start gap-1">
-          {switcher}
-          {whereYouAre}
-        </div>
-      )}
-
-      {/* The parallel DOM: one link per star on screen, blurred or not. */}
-      {target.layer !== 'star' && (
-        <nav aria-label={t('stage.label', { subject: map.subject.name })} className="pointer-events-none absolute inset-0">
-          <h2 className="sr-only">{t('stage.nebulae')}</h2>
-          <ul className="m-0 list-none p-0">
-            {nebulae.map((nebula, nebulaIndex) => {
-              const inNebula = visibleByNebula.get(nebula.topicId) ?? []
-              const isCurrent = currentNebula?.topicId === nebula.topicId
-              const disc = visible.nebulae[nebulaIndex]
-              const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide)) : null
-              return (
-                <li key={nebula.topicId} data-nebula={nebula.topicId}>
-                  {isCurrent ? (
-                    <span className="sr-only">{nebulaText(nebula)}</span>
-                  ) : (
-                    <Link
-                      to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
-                      className="starmap-nebula-link"
-                      data-nebula-link={nebula.topicId}
-                      // Shown on focus as a name pill by its own nebula, inside the band
-                      // between the page's controls, never under the legend (WCAG 2.4.11).
-                      style={spot ? { transform: `translate(${spot.x}px, ${spot.y}px) translateX(-50%)`, height: NEBULA_FOCUS_HEIGHT } : undefined}
-                      data-focus-top={spot?.y}
-                      onFocus={() => focusNebula(nebulaIndex)}
-                      onBlur={() => focusNebula(-1)}
-                    >
-                      <span aria-hidden="true">{nebula.name}</span>
-                      <span className="sr-only">{nebulaText(nebula)}</span>
-                    </Link>
-                  )}
-                  {inNebula.length > 0 && (
-                    <ul className="m-0 list-none p-0">
-                      {inNebula.map((entry) => {
-                        const star = stars[entry.index]
-                        const to: LayerTarget = { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId }
-                        // Tab reaches a star once its nebula is open; on the whole map, Tab
-                        // goes nebula by nebula (and to the recommended star), and a screen
-                        // reader still reads every star.
-                        // The recommended star stays a Tab stop everywhere: it is the way in.
-                        const tabbable = isCurrent || Boolean(star.recommendation)
-                        return (
-                          <li key={star.unitId}>
-                            {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
-                            <a
-                              href={pathForTarget(subjectId, to)}
-                              className="starmap-link"
-                              data-unit={star.unitId}
-                              tabIndex={tabbable ? undefined : -1}
-                              style={{
-                                width: size,
-                                height: size,
-                                transform: `translate(${entry.x - size / 2}px, ${entry.y - size / 2}px)`,
-                              }}
-                              onClick={(event) => {
-                                if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
-                                event.preventDefault()
-                                navigateRef.current(to)
-                              }}
-                              onFocus={() => focusStar(entry.index)}
-                              onBlur={() => focusStar(-1)}
-                            >
-                              <span className="sr-only">{starLabel(t, star)}</span>
-                            </a>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-      )}
-
-      {stars.length === 0 && (
-        <p className="absolute inset-x-4 top-1/2 m-0 -translate-y-1/2 text-center text-[15px] text-[color:var(--on-sky-text-body)]">
-          {t('empty')}
-        </p>
-      )}
-
-      {currentStar && currentNebula && (
-        <div data-starmap-overlay>
-          <StarCard map={map} star={currentStar} nebula={currentNebula} wide={wide} reducedMotion={reducedMotion} />
-        </div>
-      )}
-
-      {/* What the glyphs mean (wide screens, whole map). */}
-      {wide && target.layer === 'map' && stars.length > 0 && (
-        <div
-          data-starmap-overlay
-          className="absolute bottom-6 left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
-          // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
-          style={{
-            background: 'var(--sky-glass)',
-            borderColor: 'var(--sky-glass-border)',
-            backdropFilter: 'blur(var(--sky-glass-blur))',
-            WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
-          }}
-        >
-          <h2 className="sr-only">{t('legend.label')}</h2>
-          <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
-            {LEARNING_STATES.map((state) => (
-              <li key={state} className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-                <StarGlyph state={state} size={18} progress={0.6} />
-                {t(`state.${state}`)}
-              </li>
-            ))}
-            <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-              <StarGlyph state="ready" size={18} recommended />
-              {t('marker.recommended')}
-            </li>
-            <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-              <StarGlyph state="lit" size={18} reviewDue />
-              {t('legend.reviewDue')}
-            </li>
-          </ul>
-          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('legend.hint')}</p>
-        </div>
-      )}
-
-      {/* Zoom in and out (canvas board: a glass pair, bottom right). */}
-      {stars.length > 0 && (
-        <div
-          data-starmap-overlay
-          role="group"
-          aria-label={t('zoom.group')}
-          className={cn(
-            'absolute flex flex-col gap-0.5 rounded-[11px] border border-solid bg-white/10 p-[3px] backdrop-blur-[20px]',
-            wide ? 'bottom-6 right-6' : target.layer === 'star' ? 'right-4 top-2' : 'bottom-4 right-4',
-          )}
-          style={{ borderColor: 'rgba(255, 255, 255, 0.10)' }}
-        >
-          {(['in', 'out'] as const).map((direction) => (
-            <button
-              key={direction}
-              type="button"
-              aria-label={t(`zoom.${direction}`)}
-              title={t(`zoom.${direction}`)}
-              disabled={direction === 'in' ? target.layer === 'star' : target.layer === 'map'}
-              onClick={() => engineRef.current?.step(direction)}
-              className={cn(
-                'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)]',
-                'hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent',
-                wide ? 'size-8' : 'size-11',
-              )}
+        {/* Top: where you are, the subject switcher (#72 point 7), and the tally. */}
+        {wide ? (
+          <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-5 grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+            <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
+            <div className="pointer-events-auto">{switcher}</div>
+            <div
+              className="pointer-events-auto flex items-center gap-5 justify-self-end rounded-[12px] border border-solid bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-[20px]"
+              // index.css sets an unlayered `* { border-color }`, which beats a utility class.
+              style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
             >
-              {direction === 'in' ? (
-                <Plus size={18} strokeWidth={1.6} aria-hidden="true" />
-              ) : (
-                <Minus size={18} strokeWidth={1.6} aria-hidden="true" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
+              <span className="inline-flex items-center gap-1.5 font-semibold text-on-sky">
+                <span aria-hidden="true" className="inline-block size-2 rounded-full bg-lit" />
+                {t('summary.lit', { lit: map.summary.lit, total: map.summary.total })}
+              </span>
+              <span className="text-[color:var(--on-sky-text-body)]">{t('summary.streak', { count: map.summary.streakDays })}</span>
+              <span className="text-[color:var(--on-sky-text-body)]">
+                {t('summary.score', { count: map.summary.score, formatted: numberFormat.format(map.summary.score) })}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <div data-starmap-overlay className="absolute inset-x-4 top-2 flex flex-col items-start gap-1">
+            {switcher}
+            {whereYouAre}
+          </div>
+        )}
 
-      <p role="status" aria-live="polite" className="sr-only">
-        {announcement}
-      </p>
+        {/* The parallel DOM: one link per star on screen, blurred or not. */}
+        {target.layer !== 'star' && (
+          <nav aria-label={t('stage.label', { subject: map.subject.name })} className="pointer-events-none absolute inset-0">
+            <h2 className="sr-only">{t('stage.nebulae')}</h2>
+            <ul className="m-0 list-none p-0">
+              {nebulae.map((nebula, nebulaIndex) => {
+                const inNebula = visibleByNebula.get(nebula.topicId) ?? []
+                const isCurrent = currentNebula?.topicId === nebula.topicId
+                const disc = visible.nebulae[nebulaIndex]
+                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide)) : null
+                return (
+                  <li key={nebula.topicId} data-nebula={nebula.topicId}>
+                    {isCurrent ? (
+                      <span className="sr-only">{nebulaText(nebula)}</span>
+                    ) : (
+                      <Link
+                        to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
+                        className="starmap-nebula-link"
+                        data-nebula-link={nebula.topicId}
+                        // Shown on focus as a name pill by its own nebula, inside the band
+                        // between the page's controls, never under the legend (WCAG 2.4.11).
+                        style={spot ? { transform: `translate(${spot.x}px, ${spot.y}px) translateX(-50%)`, height: NEBULA_FOCUS_HEIGHT } : undefined}
+                        data-focus-top={spot?.y}
+                        onFocus={() => focusNebula(nebulaIndex)}
+                        onBlur={() => focusNebula(-1)}
+                      >
+                        <span aria-hidden="true">{nebula.name}</span>
+                        <span className="sr-only">{nebulaText(nebula)}</span>
+                      </Link>
+                    )}
+                    {inNebula.length > 0 && (
+                      <ul className="m-0 list-none p-0">
+                        {inNebula.map((entry) => {
+                          const star = stars[entry.index]
+                          const to: LayerTarget = { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId }
+                          // Tab reaches a star once its nebula is open; on the whole map, Tab
+                          // goes nebula by nebula (and to the recommended star), and a screen
+                          // reader still reads every star.
+                          // The recommended star stays a Tab stop everywhere: it is the way in.
+                          const tabbable = isCurrent || Boolean(star.recommendation)
+                          return (
+                            <li key={star.unitId}>
+                              {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
+                              <a
+                                href={pathForTarget(subjectId, to)}
+                                className="starmap-link"
+                                data-unit={star.unitId}
+                                data-index={entry.index}
+                                tabIndex={tabbable ? undefined : -1}
+                                style={{
+                                  width: size,
+                                  height: size,
+                                  transform: `translate(${entry.x - size / 2}px, ${entry.y - size / 2}px)`,
+                                }}
+                                onClick={(event) => {
+                                  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
+                                  event.preventDefault()
+                                  navigateRef.current(to)
+                                }}
+                                onFocus={() => focusStar(entry.index)}
+                                onBlur={() => focusStar(-1)}
+                              >
+                                <span className="sr-only">{starLabel(t, star)}</span>
+                              </a>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+        )}
+
+        {stars.length === 0 && (
+          <p className="absolute inset-x-4 top-1/2 m-0 -translate-y-1/2 text-center text-[15px] text-[color:var(--on-sky-text-body)]">
+            {t('empty')}
+          </p>
+        )}
+
+        {currentStar && currentNebula && (
+          <div data-starmap-overlay>
+            <StarCard map={map} star={currentStar} nebula={currentNebula} wide={wide} reducedMotion={reducedMotion} />
+          </div>
+        )}
+
+        {/* What the glyphs mean (wide screens, whole map). */}
+        {wide && target.layer === 'map' && stars.length > 0 && (
+          <div
+            data-starmap-overlay
+            className="absolute bottom-6 left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
+            // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
+            style={{
+              background: 'var(--sky-glass)',
+              borderColor: 'var(--sky-glass-border)',
+              backdropFilter: 'blur(var(--sky-glass-blur))',
+              WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
+            }}
+          >
+            <h2 className="sr-only">{t('legend.label')}</h2>
+            <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
+              {LEARNING_STATES.map((state) => (
+                <li key={state} className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+                  <StarGlyph state={state} size={18} progress={0.6} />
+                  {t(`state.${state}`)}
+                </li>
+              ))}
+              <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+                <StarGlyph state="ready" size={18} recommended />
+                {t('marker.recommended')}
+              </li>
+              <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+                <StarGlyph state="lit" size={18} reviewDue />
+                {t('legend.reviewDue')}
+              </li>
+            </ul>
+            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('legend.hint')}</p>
+          </div>
+        )}
+
+        {/* Zoom in and out (canvas board: a glass pair, bottom right). */}
+        {stars.length > 0 && (
+          <div
+            data-starmap-overlay
+            role="group"
+            aria-label={t('zoom.group')}
+            className={cn(
+              'absolute flex flex-col gap-0.5 rounded-[11px] border border-solid bg-white/10 p-[3px] backdrop-blur-[20px]',
+              wide ? 'bottom-6 right-6' : target.layer === 'star' ? 'right-4 top-2' : 'bottom-4 right-4',
+            )}
+            style={{ borderColor: 'rgba(255, 255, 255, 0.10)' }}
+          >
+            {(['in', 'out'] as const).map((direction) => (
+              <button
+                key={direction}
+                type="button"
+                aria-label={t(`zoom.${direction}`)}
+                title={t(`zoom.${direction}`)}
+                disabled={direction === 'in' ? target.layer === 'star' : target.layer === 'map'}
+                onClick={() => engineRef.current?.step(direction)}
+                className={cn(
+                  'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)]',
+                  'hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:opacity-40 disabled:hover:bg-transparent',
+                  wide ? 'size-8' : 'size-11',
+                )}
+              >
+                {direction === 'in' ? (
+                  <Plus size={18} strokeWidth={1.6} aria-hidden="true" />
+                ) : (
+                  <Minus size={18} strokeWidth={1.6} aria-hidden="true" />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <p role="status" aria-live="polite" className="sr-only">
+          {announcement}
+        </p>
+      </div>
     </div>
   )
 }
