@@ -14,6 +14,7 @@ import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
+import { UserMenu } from '@/components/common/UserMenu'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -332,8 +333,11 @@ export function ChatPage() {
 
   if (conversationsQuery.isError) {
     return (
-      <div className="chat-workspace flex h-[100dvh] items-center justify-center text-foreground">
-        <ErrorState message={t('loadFailed')} />
+      <div className="chat-workspace flex h-[100dvh] flex-col text-foreground">
+        <StandaloneAccountBar />
+        <div className="flex min-h-0 flex-1 items-center justify-center">
+          <ErrorState message={t('loadFailed')} />
+        </div>
       </div>
     )
   }
@@ -467,8 +471,11 @@ export function ChatPage() {
 
   if (conversations.length === 0) {
     return (
-      <div className="chat-workspace flex h-[100dvh] items-center justify-center px-4 text-foreground">
-        {newConversationForm}
+      <div className="chat-workspace flex h-[100dvh] flex-col text-foreground">
+        <StandaloneAccountBar />
+        <div className="flex min-h-0 flex-1 items-center justify-center overflow-y-auto px-4">
+          {newConversationForm}
+        </div>
       </div>
     )
   }
@@ -570,6 +577,19 @@ export function ChatPage() {
           </>
         )}
       </main>
+    </div>
+  )
+}
+
+/**
+ * The account pill for the states that render no ChatHeader: without it a
+ * student with no conversation yet, or whose list failed to load, could not
+ * sign out (stoasystem/stoa-frontend#2).
+ */
+function StandaloneAccountBar() {
+  return (
+    <div className="flex shrink-0 justify-end px-4 pt-3 md:px-6">
+      <UserMenu variant="top" />
     </div>
   )
 }

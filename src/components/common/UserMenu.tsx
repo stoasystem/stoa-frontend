@@ -9,10 +9,18 @@ import { Button } from '@/components/ui/button'
 // without competing for the five slots in the mobile bar.
 import { CHANGE_PASSWORD_PATH } from '@/lib/authRoutes'
 import { useSignOut } from '@/hooks/auth/useSignOut'
+import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
 
-export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' }) {
+export function UserMenu({
+  variant = 'sidebar',
+  crowded = false,
+}: {
+  variant?: 'sidebar' | 'top'
+  /** For a bar with no room to spare on a phone: below `sm` only sign-out stays. */
+  crowded?: boolean
+}) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
   const { signOut, isSigningOut } = useSignOut()
@@ -25,15 +33,18 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
         className="flex items-center gap-1 rounded-full border bg-card/70 px-1.5 py-1"
         aria-label={`${user.name} account`}
       >
-        <UserCircle className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <span className="max-w-32 truncate px-1 text-sm font-medium text-foreground">
+        <UserCircle
+          className={cn('h-5 w-5 shrink-0 text-muted-foreground', crowded && 'hidden sm:block')}
+          aria-hidden="true"
+        />
+        <span className="hidden max-w-32 truncate px-1 text-sm font-medium text-foreground sm:block">
           {user.name}
         </span>
         <Button
           asChild
           variant="ghost"
           size="icon"
-          className="h-8 w-8 rounded-full"
+          className={cn('h-8 w-8 rounded-full', crowded && 'hidden sm:inline-flex')}
           aria-label={t('actions.changePassword')}
         >
           <Link to={CHANGE_PASSWORD_PATH}>
