@@ -6,12 +6,12 @@
  * the real router, so the forced change is seen to route as before.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { Suspense } from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { MemoryRouter, useLocation } from 'react-router-dom'
+import { MemoryRouter, useLocation, useNavigate } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { AppRoutes } from '@/app/router/AppRoutes'
 import i18n from '@/i18n'
@@ -71,8 +71,10 @@ function backend({
 }
 
 let pathname = ''
+let go: (to: string) => void = () => {}
 function LocationProbe() {
   pathname = useLocation().pathname
+  go = useNavigate()
   return null
 }
 
@@ -295,6 +297,111 @@ describe('the forced change after an administrator reset', () => {
     expect(pathname).toBe('/settings/password')
     await user.click(screen.getByRole('link', { name: enCommon.actions.continue }))
     await waitFor(() => expect(pathname).toBe('/'))
+  })
+})
+
+const otherStudent = (id: string, mustChangePassword = false) =>
+  ({ id, name: 'Noah Keller', email: 'noah@example.com', role: 'student', mustChangePassword }) as CurrentUser
+
+async function completeChange(user: ReturnType<typeof userEvent.setup>, current = 'Temp!Pass123') {
+  await sendCode(user, current)
+  await user.type(await screen.findByLabelText(copy.codeLabel), '123456')
+  await user.type(screen.getByLabelText(copy.newPasswordLabel), 'New!Pass123')
+  await user.type(screen.getByLabelText(copy.confirmPasswordLabel), 'New!Pass123')
+  await user.click(screen.getByRole('button', { name: copy.submit }))
+  expect(await screen.findByText(copy.successBody)).toBeInTheDocument()
+}
+
+// What the page stays for after a forced change must not outlive that
+// change, that page or that account (#68 audit).
+describe('the page a forced change stays on', () => {
+  it('lets a reset student go nowhere else before the change is done', async () => {
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    expect(await screen.findByText(copy.forcedTitle)).toBeInTheDocument()
+
+    for (const to of ['/', '/me', '/ask', '/assignments', '/settings/password?x=1']) {
+      act(() => go(to))
+      await waitFor(() => expect(pathname).toBe('/settings/password'))
+    }
+  })
+
+  it('forwards to /me again once the student has left and comes back', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    await completeChange(user)
+
+    act(() => go('/'))
+    await waitFor(() => expect(pathname).toBe('/'))
+    act(() => go('/settings/password'))
+    await waitFor(() => expect(pathname).toBe('/me'))
+  })
+
+  it('is gone after signing out and another student signing in', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    await completeChange(user)
+
+    act(() => useAuthStore.getState().clearAuth())
+    await waitFor(() => expect(pathname).toBe('/login'))
+    act(() => useAuthStore.setState({ user: otherStudent('u-2'), accessToken: 't2', isAuthenticated: true }))
+    act(() => go('/settings/password'))
+    await waitFor(() => expect(pathname).toBe('/me'))
+  })
+
+  it('does not hold another account swapped into the store on the page', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/settings/password', 'student', { mustChangePassword: true })
+    await completeChange(user)
+    expect(pathname).toBe('/settings/password')
+
+    act(() => useAuthStore.setState({ user: otherStudent('u-3'), accessToken: 't3', isAuthenticated: true }))
+
+    await waitFor(() => expect(pathname).toBe('/me'))
+  })
+})
+
+describe('the password fields on /me', () => {
+  it('ask the browser for the right kind of password, and carry no name to leak into a URL', async () => {
+    const user = userEvent.setup()
+    backend()
+    openAt('/me')
+
+    const current = await screen.findByLabelText(copy.currentPasswordLabel)
+    expect(current).toHaveAttribute('type', 'password')
+    expect(current).toHaveAttribute('autocomplete', 'current-password')
+    expect(current).not.toHaveAttribute('name')
+    // A password manager's paste reaches the field.
+    await user.click(current)
+    await user.paste('Pasted!Pass1')
+    expect(current).toHaveValue('Pasted!Pass1')
+    await user.click(screen.getByRole('button', { name: copy.sendCodeCta }))
+
+    const fresh = await screen.findByLabelText(copy.newPasswordLabel)
+    const confirm = screen.getByLabelText(copy.confirmPasswordLabel)
+    const code = screen.getByLabelText(copy.codeLabel)
+    expect(fresh).toHaveAttribute('autocomplete', 'new-password')
+    expect(confirm).toHaveAttribute('autocomplete', 'new-password')
+    expect(code).toHaveAttribute('autocomplete', 'one-time-code')
+    for (const field of [fresh, confirm, code]) expect(field).not.toHaveAttribute('name')
+    expect(pathname).toBe('/me')
+    expect(window.location.href).not.toContain('Pasted')
+  })
+
+  it('go back to the first step on "request a new code" without submitting the second', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+
+    await sendCode(user)
+    await screen.findByLabelText(copy.codeLabel)
+    await user.click(screen.getByRole('button', { name: copy.requestNewCode }))
+
+    expect(seen.confirm).toEqual([])
+    expect(await screen.findByLabelText(copy.currentPasswordLabel)).toBeInTheDocument()
   })
 })
 

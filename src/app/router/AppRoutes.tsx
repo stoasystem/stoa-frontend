@@ -104,9 +104,13 @@ function RoleScopedRedirect({
   const applies = Boolean(user && redirect.onlyFor?.includes(user.role))
   const forcedNow = Boolean(user?.mustChangePassword) && location.pathname === CHANGE_PASSWORD_PATH
   // Remembered from an earlier render (React's "adjust state while
-  // rendering"), so the render that clears the flag still finds it.
-  const [wasForced, setWasForced] = useState(false)
-  if (forcedNow && !wasForced) setWasForced(true)
+  // rendering"), so the render that clears the flag still finds it. It is
+  // kept for the account that was forced: a different account in the store,
+  // swapped in without leaving the page, gets no benefit of it.
+  const [forcedFor, setForcedFor] = useState<string | null>(null)
+  const userId = user?.id ?? null
+  if (forcedNow && userId !== null && forcedFor !== userId) setForcedFor(userId)
+  const wasForced = forcedFor !== null && forcedFor === userId
 
   if (applies && !forcedNow && !wasForced) return <Navigate replace to={to} state={state} />
   return children
