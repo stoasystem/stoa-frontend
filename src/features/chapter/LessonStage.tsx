@@ -10,7 +10,7 @@
  * Hint plain at far right"; on a phone the primary is full width and docked).
  * Ask sits beside it as a light window and knows the exercise on screen.
  */
-import { Check, ChevronLeft, Lightbulb, Sparkles } from 'lucide-react'
+import { Check, ChevronLeft, Lightbulb, Lock, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -45,21 +45,41 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   const chapterQuery = useChapter(unitId)
   const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
   const lesson = lessonQuery.data
+  // A lesson from another unit is not this chapter's: a link that pairs them
+  // finds nothing, as a chapter not in the catalog does.
+  const inUnit = lesson !== undefined && (!unitId || lesson.unitId === unitId)
+  // Whether the chapter says it is locked. Until the chapter is read the stage
+  // waits rather than flash an exercise it may take back; if the chapter
+  // cannot be read the stage opens, and the backend still decides.
+  const status = chapter?.lessons.find((item) => item.id === lesson?.id)?.status
+  const notice: StageNoticeKind | null = lessonQuery.isLoading
+    ? 'loading'
+    : lessonQuery.isError
+      ? 'failed'
+      : !lesson || !inUnit
+        ? 'missing'
+        : chapterQuery.status === 'loading'
+          ? 'loading'
+          : status === 'locked'
+            ? 'locked'
+            : null
   // Keyed by lesson: moving on to the next lesson starts a fresh run.
   return (
     <AppLayout bleed>
-      {lesson ? (
+      {lesson && notice === null ? (
         <LessonRunStage key={lesson.id} lesson={lesson} unitId={unitId ?? lesson.unitId} chapter={chapter} />
       ) : (
         <div data-surface="sky" className="flex min-h-0 flex-1 flex-col items-start gap-3 bg-sky p-6 text-on-sky">
-          <StageNotice unitId={unitId} loading={lessonQuery.isLoading} failed={lessonQuery.isError} retry={() => void lessonQuery.refetch()} />
+          <StageNotice unitId={unitId} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
         </div>
       )}
     </AppLayout>
   )
 }
 
-function StageNotice({ unitId, loading, failed, retry }: { unitId?: string; loading: boolean; failed: boolean; retry: () => void }) {
+type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
+
+function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -69,11 +89,11 @@ function StageNotice({ unitId, loading, failed, retry }: { unitId?: string; load
           {t('stage.backToLessons')}
         </Link>
       )}
-      {loading ? (
+      {kind === 'loading' ? (
         <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
           {t('stage.loading')}
         </p>
-      ) : failed ? (
+      ) : kind === 'failed' ? (
         <>
           <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
             {t('stage.failed')}
@@ -82,6 +102,14 @@ function StageNotice({ unitId, loading, failed, retry }: { unitId?: string; load
             {t('stage.retry')}
           </Button>
         </>
+      ) : kind === 'locked' ? (
+        <div data-stage-locked className="flex flex-col items-start gap-1">
+          <h1 className="m-0 inline-flex items-center gap-2 text-[22px] font-semibold text-on-sky">
+            <Lock size={20} strokeWidth={ICON.stroke} aria-hidden="true" />
+            {t('stage.locked.title')}
+          </h1>
+          <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
+        </div>
       ) : (
         <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
           {t('stage.missing')}
@@ -96,7 +124,6 @@ function LessonRunStage({ lesson, unitId, chapter }: { lesson: PracticeLesson; u
   const run = useLessonRun(lesson)
   const side = useMediaQuery(STAGE_SIDE_QUERY)
   const host = useRef<HTMLDivElement>(null)
-  const told = useRef(new Map<string, string>())
   const { challenge } = run
 
   // TEXT FALLBACK (#56): what Ask is told about the exercise on screen. #56
@@ -105,7 +132,6 @@ function LessonRunStage({ lesson, unitId, chapter }: { lesson: PracticeLesson; u
     () =>
       challenge && !run.finished
         ? {
-            told: told.current,
             context: {
               unitId,
               lessonId: lesson.id,

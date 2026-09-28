@@ -63,6 +63,10 @@
     "failed": "La leçon n’a pas pu être chargée.",
     "retry": "Réessayer",
     "missing": "Cette leçon est introuvable.",
+    "locked": {
+      "title": "Cette leçon est verrouillée",
+      "body": "Termine d’abord les leçons qui la précèdent dans ce chapitre."
+    },
     "empty": "Cette leçon n’a pas encore d’exercices."
   },
   "quote": {

@@ -14,20 +14,21 @@
  *   reduced motion.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen, within } from '@testing-library/react'
+import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { describePracticeContext, markPracticeContextTold, withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
+import { describePracticeContext, withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
 import { jumpFrameAt, JUMP, JUMP_MS } from '@/features/chapter/jump'
+import { chipTop } from '@/features/chapter/QuoteSelection'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import i18n from '@/i18n'
 import { ChapterPage, LessonStagePage } from '@/pages/chapter/ChapterPages'
 import { ApiError } from '@/services/api/httpClient'
 import { createConversation, getConversation, getConversations } from '@/services/chat/chatApi'
-import { getGenerationProgress } from '@/services/chat/chatStreamApi'
+import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 import {
   completePracticeLesson,
   getCurriculumCatalog,
@@ -164,7 +165,10 @@ const challenge = (id: string, rest: Partial<PracticeLesson['challenges'][number
   topic: 'Solve for x.',
   type: 'multiple_choice' as const,
   prompt: '3x + 5 = 20',
-  correctAnswer: '',
+  // What only the backend's check should know: none of it goes to Ask.
+  correctAnswer: 'x = 5',
+  hint: 'Subtract 5 from both sides first.',
+  explanation: 'Take 5 away, then divide by 3.',
   ...rest,
 })
 
@@ -181,11 +185,36 @@ const lesson: PracticeLesson = {
   estimatedMinutes: 10,
   challenges: [
     challenge('ch-1', { options: ['x = 3', 'x = 5', 'x = 15', 'x = 25'] }),
-    challenge('ch-2', { type: 'text_input', topic: 'Divide.', prompt: 'What is 12 ÷ 4?' }),
+    challenge('ch-2', {
+      type: 'text_input',
+      topic: 'Divide.',
+      prompt: 'What is 12 ÷ 4?',
+      correctAnswer: '3',
+      hint: 'How many 4s make 12?',
+      explanation: 'Four threes are twelve.',
+    }),
   ],
 }
 
 const RIGHT: Record<string, string> = { 'ch-1': 'x = 5', 'ch-2': '3' }
+
+/** None of what the exercise keeps from the student may leave in a message. */
+function expectNoAnswerKey(sent: string) {
+  const first = lesson.challenges[0]
+  expect(sent).not.toContain(`${first.correctAnswer}`)
+  expect(sent).not.toContain(first.hint)
+  expect(sent).not.toContain(first.explanation)
+}
+
+const emptyThread = (id: string) =>
+  ({
+    id,
+    title: 'Balancing',
+    subject: 'math',
+    grade: '8',
+    updatedAt: '2026-09-28T10:00:00.000Z',
+    messages: [],
+  }) as Awaited<ReturnType<typeof getConversation>>
 
 // ---------------------------------------------------------------------------
 // Harness
@@ -408,6 +437,55 @@ describe('the practice stage', () => {
   })
 })
 
+describe('a lesson the chapter does not open', () => {
+  const lockedRoadmap = () => {
+    const served = roadmap()
+    served.units[0].lessons = served.units[0].lessons.map((item) =>
+      item.id === 'l-2' ? { ...item, status: 'locked' as const } : item,
+    )
+    return served
+  }
+
+  it('says a locked lesson is locked, with the way back to its chapter, instead of the exercise', async () => {
+    vi.mocked(getPracticeRoadmap).mockImplementation(async () => lockedRoadmap())
+    open('/chapter/u-5/l-2')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
+    expect(screen.getByText('Finish the lessons before it in this chapter first.')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
+  })
+
+  it('shows no exercise while the chapter is still saying whether the lesson is open', async () => {
+    let answer: (value: PracticeRoadmap) => void = () => {}
+    vi.mocked(getPracticeRoadmap).mockImplementation(() => new Promise((resolve) => (answer = resolve)))
+    open('/chapter/u-5/l-2')
+
+    await waitFor(() => expect(getPracticeRoadmap).toHaveBeenCalled())
+    await waitFor(() => expect(getPracticeLesson).toHaveBeenCalled())
+    // The lesson is in; the chapter is not.
+    await act(async () => {
+      await Promise.resolve()
+    })
+    expect(screen.getByText('Loading the lesson…')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+
+    await act(async () => answer(lockedRoadmap()))
+    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+  })
+
+  it('finds nothing for a lesson of another unit under this chapter', async () => {
+    vi.mocked(getPracticeLesson).mockResolvedValue({ ...lesson, id: 'l-9', unitId: 'u-6' })
+    open('/chapter/u-5/l-9')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('This lesson could not be found.')
+    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
+    expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
+  })
+})
+
 describe('Ask beside the stage', () => {
   it('sits beside the exercise on a wide screen and tells a new conversation which exercise is on screen', async () => {
     vi.mocked(createConversation).mockResolvedValue({
@@ -440,6 +518,7 @@ describe('Ask beside the stage', () => {
 
     expect(createConversation).toHaveBeenCalledTimes(1)
     const sent = vi.mocked(createConversation).mock.calls[0][0].initialMessage ?? ''
+    expectNoAnswerKey(sent)
     // TEXT FALLBACK (#56): the question first, then the exercise in words.
     expect(sent.split('\n')).toEqual([
       'Why is it not 3?',
@@ -475,7 +554,9 @@ describe('Ask beside the stage', () => {
 
     field.focus()
     await userEvent.type(field, 'elp{Enter}')
-    expect(vi.mocked(createConversation).mock.calls[0][0].initialMessage).toContain('Practice question: 3x + 5 = 20')
+    const sent = vi.mocked(createConversation).mock.calls[0][0].initialMessage ?? ''
+    expect(sent).toContain('Practice question: 3x + 5 = 20')
+    expectNoAnswerKey(sent)
 
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('dialog', { name: 'Ask' })).not.toBeInTheDocument()
@@ -486,19 +567,124 @@ describe('Ask beside the stage', () => {
   it('tells a conversation again only when what is on screen has changed', () => {
     const t = i18n.getFixedT('en', 'chat')
     const practice: AskPractice = {
-      told: new Map(),
       context: { unitId: 'u-5', lessonId: 'l-2', challengeId: 'ch-1', topic: 'Solve for x.', prompt: '3x + 5 = 20', attempts: 0, hintViewed: false },
     }
-    expect(withPracticeContext(t, practice, 'c1', 'Why?')).toBe(describePracticeContext(t, practice.context, 'Why?'))
-    markPracticeContextTold(practice, 'c1')
-    expect(withPracticeContext(t, practice, 'c1', 'And now?')).toBe('And now?')
+    const first = withPracticeContext(t, practice, 'c1', 'Why?')
+    expect(first.content).toBe(describePracticeContext(t, practice.context, 'Why?'))
+    // Not told until the message went out.
+    expect(withPracticeContext(t, practice, 'c1', 'Why?').content).toContain('Practice question')
+    first.told('c1')
+    expect(withPracticeContext(t, practice, 'c1', 'And now?').content).toBe('And now?')
     // Another conversation has not been told.
-    expect(withPracticeContext(t, practice, 'c2', 'Why?')).toContain('Practice question: 3x + 5 = 20')
+    expect(withPracticeContext(t, practice, 'c2', 'Why?').content).toContain('Practice question: 3x + 5 = 20')
     // Another answer on the same exercise is news.
     practice.context = { ...practice.context, answer: 'x = 5', attempts: 1 }
-    expect(withPracticeContext(t, practice, 'c1', 'Better?')).toContain('My answer: x = 5')
+    expect(withPracticeContext(t, practice, 'c1', 'Better?').content).toContain('My answer: x = 5')
     // Without a stage there is nothing to tell.
-    expect(withPracticeContext(t, undefined, null, 'Hi')).toBe('Hi')
+    expect(withPracticeContext(t, undefined, null, 'Hi').content).toBe('Hi')
+  })
+
+  describe('in a conversation already open', () => {
+    const streamMock = () => vi.mocked(streamConversationMessage)
+    const sentAt = (index: number) => streamMock().mock.calls[index][0].payload
+    const ask = async (panel: HTMLElement, question: string) => {
+      await userEvent.type(within(panel).getByRole('textbox', { name: 'Your question' }), `${question}{Enter}`)
+    }
+    // The answer is in (or the send has failed) once Stop has gone.
+    const settled = (panel: HTMLElement, calls: number) =>
+      waitFor(
+        () => {
+          expect(streamMock()).toHaveBeenCalledTimes(calls)
+          expect(within(panel).queryByRole('button', { name: 'Stop' })).not.toBeInTheDocument()
+        },
+        { timeout: 5000 },
+      )
+
+    beforeEach(() => {
+      useAskStore.setState({ ownerId: 'u-1', open: false, conversationId: 'c1', draft: '' })
+      vi.mocked(getConversation).mockResolvedValue(emptyThread('c1'))
+    })
+
+    it('tells it once, and again only after the exercise on screen changed', async () => {
+      streamMock().mockResolvedValue('streamed')
+      open('/chapter/u-5/l-2')
+      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+      const panel = await findAskPanel()
+
+      await ask(panel, 'Why subtract?')
+      await settled(panel, 1)
+      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
+      expectNoAnswerKey(sentAt(0).content)
+
+      // Nothing on screen changed: the question alone.
+      await ask(panel, 'And then?')
+      await settled(panel, 2)
+      expect(sentAt(1).content).toBe('And then?')
+
+      // Another answer down: told again, with it.
+      await userEvent.click(screen.getByRole('radio', { name: /x = 3/ }))
+      await ask(panel, 'Is this right?')
+      await settled(panel, 3)
+      expect(sentAt(2).content).toContain('My answer: x = 3')
+      expectNoAnswerKey(sentAt(2).content)
+
+      // Another exercise: told again.
+      await userEvent.click(screen.getByRole('radio', { name: /x = 5/ }))
+      await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+      await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
+      await screen.findByRole('heading', { level: 2, name: 'What is 12 ÷ 4?' })
+      await ask(panel, 'How do I divide?')
+      await settled(panel, 4)
+      expect(sentAt(3).content).toContain('Practice question: What is 12 ÷ 4?')
+    })
+
+    it('counts a message that failed as not told, and sends it again as it was', async () => {
+      // The first send and the retry fail before the server has them.
+      streamMock()
+        .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        .mockRejectedValueOnce(new TypeError('Failed to fetch'))
+        .mockResolvedValue('streamed')
+      vi.mocked(getGenerationProgress).mockRejectedValue(
+        new ApiError('not found', { status: 404, code: 'message_command_not_found' }),
+      )
+      open('/chapter/u-5/l-2')
+      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+      const panel = await findAskPanel()
+
+      await ask(panel, 'Why subtract?')
+      await settled(panel, 1)
+      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
+      await userEvent.click(await within(panel).findByRole('button', { name: 'Send again' }, { timeout: 5000 }))
+
+      // Sent again, it is the same message: same words, same key.
+      await settled(panel, 2)
+      expect(sentAt(1).content).toBe(sentAt(0).content)
+      expect(sentAt(1).idempotencyKey).toBe(sentAt(0).idempotencyKey)
+      expect(await within(panel).findByRole('button', { name: 'Send again' }, { timeout: 5000 })).toBeInTheDocument()
+
+      // Neither got through, so a new question instead carries the context.
+      await ask(panel, 'Where do I start?')
+      await settled(panel, 3)
+      expect(sentAt(2).content).toContain('Where do I start?')
+      expect(sentAt(2).content).toContain('Practice question: 3x + 5 = 20')
+    })
+
+    it('does not tell the same conversation the same thing again after the stage remounts', async () => {
+      streamMock().mockResolvedValue('streamed')
+      const first = open('/chapter/u-5/l-2')
+      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+      await ask(await findAskPanel(), 'Why subtract?')
+      await settled(askPanel(), 1)
+      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
+      first.clear()
+      cleanup()
+
+      open('/chapter/u-5/l-2')
+      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+      await ask(await findAskPanel(), 'And then?')
+      await settled(askPanel(), 2)
+      expect(sentAt(1).content).toBe('And then?')
+    })
   })
 })
 
@@ -545,6 +731,24 @@ describe('「问这段」, ask about this', () => {
     // The student's own message is not a source.
     select(within(askPanel()).getByText('Why subtract 5?'))
     expect(screen.queryByRole('group', { name: 'Ask about the selected text' })).not.toBeInTheDocument()
+  })
+})
+
+describe('where 「问这段」 sits', () => {
+  // A three-line answer, 100 px to 180 px, with other messages 12 px above and below.
+  const block = { top: 100, bottom: 180 }
+
+  it('stays inside the passage it is about, off the messages beside it', () => {
+    // First line chosen: no room above inside the answer, so below it.
+    expect(chipTop({ top: 110, bottom: 132 }, block)).toBe(136)
+    // Last line chosen: above it.
+    expect(chipTop({ top: 150, bottom: 172 }, block)).toBe(110)
+    // First two lines chosen: no clear room, so over the selection's lower edge, inside the answer.
+    expect(chipTop({ top: 110, bottom: 150 }, block)).toBe(144)
+    // All of it chosen: outside, above, where there is room.
+    expect(chipTop({ top: 100, bottom: 180 }, block)).toBe(60)
+    // ...and below at the top of the window.
+    expect(chipTop({ top: 20, bottom: 60 }, { top: 20, bottom: 60 })).toBe(64)
   })
 })
 
@@ -603,6 +807,32 @@ describe('the jump from a star', () => {
     await vi.waitFor(() => expect(screen.getByTestId('where').dataset.state).toBe('null'))
     await vi.waitFor(() => expect(document.querySelector('[data-jump-canvas]')).toBeNull(), { timeout: 2000 })
     expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+  })
+
+  it('covers the chapter from the first paint, before any animation frame', async () => {
+    const fillRect = vi.fn()
+    const context = new Proxy(
+      {},
+      {
+        get: (_target, name) =>
+          name === 'fillRect'
+            ? fillRect
+            : name === 'createRadialGradient'
+              ? () => ({ addColorStop: () => {} })
+              : typeof name === 'string'
+                ? vi.fn()
+                : undefined,
+      },
+    )
+    vi.mocked(HTMLCanvasElement.prototype.getContext).mockReturnValue(context as unknown as CanvasRenderingContext2D)
+    // No animation frame ever runs.
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation(() => 1)
+    open({ pathname: '/chapter/u-5', state: { jump: { x: 200, y: 300 } } })
+
+    expect(document.querySelector('[data-jump-canvas]')).not.toBeNull()
+    // The sky veil of frame 0 is already drawn over the whole window.
+    expect(fillRect).toHaveBeenCalledWith(0, 0, window.innerWidth, window.innerHeight)
+    await screen.findByRole('heading', { level: 1, name: 'Linear equations' })
   })
 
   it('becomes a crossfade under reduced motion, with nothing drawn', async () => {

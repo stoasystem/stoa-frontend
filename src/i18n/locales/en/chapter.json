@@ -63,6 +63,10 @@
     "failed": "The lesson could not be loaded.",
     "retry": "Try again",
     "missing": "This lesson could not be found.",
+    "locked": {
+      "title": "This lesson is locked",
+      "body": "Finish the lessons before it in this chapter first."
+    },
     "empty": "This lesson has no exercises yet."
   },
   "quote": {

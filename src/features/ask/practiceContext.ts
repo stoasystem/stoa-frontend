@@ -34,14 +34,9 @@ export type AskPracticeContext = {
   hintViewed: boolean
 }
 
-/**
- * The practice context for one Ask panel, and the conversations it has
- * already been told in. Held by the stage, so it outlives the phone sheet.
- */
+/** The practice context for one Ask panel: the exercise on screen. */
 export type AskPractice = {
   context: AskPracticeContext
-  /** Conversation id -> the `practiceContextKey` it was last told. */
-  told: Map<string, string>
 }
 
 /**
@@ -50,6 +45,58 @@ export type AskPractice = {
  */
 export function practiceContextKey(context: AskPracticeContext) {
   return [context.challengeId, context.answer ?? '', context.attempts, context.hintViewed ? 1 : 0].join('\u0001')
+}
+
+/*
+ * Which conversation was last told what, by conversation id, in session
+ * storage: the stage remounting (another lesson, a reload) does not tell the
+ * same conversation the same thing twice. Only a hash of the key is kept, so
+ * the student's answer is not written to storage; signing out clears it all.
+ * Without storage it lives in memory for the page's life.
+ */
+export const PRACTICE_TOLD_KEY_PREFIX = 'stoa_ask_practice_told:'
+const toldInMemory = new Map<string, string>()
+
+function hashKey(key: string) {
+  // FNV-1a, 32 bit: enough to tell one screen from the next.
+  let hash = 0x811c9dc5
+  for (let index = 0; index < key.length; index += 1) {
+    hash ^= key.charCodeAt(index)
+    hash = Math.imul(hash, 0x01000193)
+  }
+  return (hash >>> 0).toString(36)
+}
+
+function readTold(conversationId: string): string | null {
+  try {
+    return sessionStorage.getItem(PRACTICE_TOLD_KEY_PREFIX + conversationId)
+  } catch {
+    return toldInMemory.get(conversationId) ?? null
+  }
+}
+
+function writeTold(conversationId: string, hashed: string) {
+  toldInMemory.set(conversationId, hashed)
+  try {
+    sessionStorage.setItem(PRACTICE_TOLD_KEY_PREFIX + conversationId, hashed)
+  } catch {
+    // Kept in memory above.
+  }
+}
+
+/** Signing out: whoever signs in next starts with nothing told. */
+export function clearPracticeContextTold() {
+  toldInMemory.clear()
+  try {
+    const keys: string[] = []
+    for (let index = 0; index < sessionStorage.length; index += 1) {
+      const key = sessionStorage.key(index)
+      if (key?.startsWith(PRACTICE_TOLD_KEY_PREFIX)) keys.push(key)
+    }
+    for (const key of keys) sessionStorage.removeItem(key)
+  } catch {
+    // Without storage nothing was kept.
+  }
 }
 
 /** TEXT FALLBACK (#56): the student's question, then the exercise as lines of text. */
@@ -71,20 +118,20 @@ export function describePracticeContext(t: TFunction<'chat'>, context: AskPracti
  * The message to send: the question alone when `conversationId` has already
  * been told about what is on screen, otherwise with the context in front.
  * A new conversation (`conversationId` null) is always told.
+ *
+ * `told` records the telling. Call it only once the message has gone out:
+ * a message that failed has told nobody, so the next question tells again.
+ * It records what was on screen when the message was written, not later.
  */
 export function withPracticeContext(
   t: TFunction<'chat'>,
   practice: AskPractice | undefined,
   conversationId: string | null,
   question: string,
-) {
-  if (!practice) return question
-  const key = practiceContextKey(practice.context)
-  if (conversationId && practice.told.get(conversationId) === key) return question
-  return describePracticeContext(t, practice.context, question)
-}
-
-/** Remember that `conversationId` now knows what is on screen. */
-export function markPracticeContextTold(practice: AskPractice | undefined, conversationId: string) {
-  if (practice) practice.told.set(conversationId, practiceContextKey(practice.context))
+): { content: string; told: (conversationId: string) => void } {
+  if (!practice) return { content: question, told: () => {} }
+  const hashed = hashKey(practiceContextKey(practice.context))
+  const told = (id: string) => writeTold(id, hashed)
+  if (conversationId && readTold(conversationId) === hashed) return { content: question, told }
+  return { content: describePracticeContext(t, practice.context, question), told }
 }

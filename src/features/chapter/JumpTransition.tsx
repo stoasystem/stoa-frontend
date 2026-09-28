@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   drawJumpFrame,
@@ -45,7 +45,9 @@ export function JumpTransition({ children }: { children: ReactNode }) {
     navigate({ pathname: location.pathname, search: location.search }, { replace: true, state: null })
   }, [origin, navigate, location.pathname, location.search])
 
-  useEffect(() => {
+  // Before the first paint, so the canvas is never seen empty: the chapter
+  // under it must not show for a frame before the jump covers it.
+  useLayoutEffect(() => {
     if (!playing || reducedMotion || !origin) return
     const element = canvas.current
     const context = element?.getContext?.('2d') ?? null
@@ -60,6 +62,9 @@ export function JumpTransition({ children }: { children: ReactNode }) {
     element.height = Math.round(height * ratio)
     context.scale(ratio, ratio)
     const colors = colorsFrom(element)
+    // Frame 0 now, not on the first animation frame: the sky veil is up
+    // before the browser paints.
+    drawJumpFrame(context, jumpFrameAt(0), origin, { width, height }, colors)
     let frame = 0
     let start: number | null = null
     const step = (now: number) => {

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { clearPracticeContextTold } from '@/features/ask/practiceContext'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
 import { forgetSessionHolding, tabToken } from '@/lib/devSessions'
@@ -62,6 +63,7 @@ export function useSignOut() {
     // question still waiting for its answer (#49).
     resetAsk()
     clearPendingMessages()
+    clearPracticeContextTold()
     if (accessToken) forgetSessionHolding(accessToken)
     // Register before navigation unmounts this menu. The login mutation waits
     // for completion or the request's 8 s timeout; server work may outlive it.

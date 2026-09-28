@@ -10,7 +10,7 @@ import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
-import { markPracticeContextTold, withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
+import { withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
@@ -102,7 +102,7 @@ export function AskPanel({
   function startConversation(content: string) {
     if (creatingRef.current || createConversation.isPending) return
     // TEXT FALLBACK (#56): the exercise on screen rides in the first message.
-    const initialMessage = withPracticeContext(t, practice, null, content)
+    const { content: initialMessage, told } = withPracticeContext(t, practice, null, content)
     creatingRef.current = true
     askedAtRef.current = new Date().toISOString()
     // Sent is sent: the question leaves the composer now, so closing Ask while
@@ -113,7 +113,7 @@ export function AskPanel({
       .mutateAsync({ subject, grade: conversationGrade(profile?.grade), initialMessage })
       .then(
         (created) => {
-          markPracticeContextTold(practice, created.id)
+          told(created.id)
           // Opened only in the panel that asked; a closed Ask stays closed.
           if (mounted.current) select(created.id)
         },
@@ -136,10 +136,15 @@ export function AskPanel({
     }
     if (isStreaming) return
     setDraft('')
-    // TEXT FALLBACK (#56): told again only when the exercise on screen changed.
-    const message = withPracticeContext(t, practice, conversationId, content)
-    markPracticeContextTold(practice, conversationId)
-    void sendStreamingMessage({ content: message })
+    // TEXT FALLBACK (#56): told again only when the exercise on screen changed,
+    // and counted as told only once the message went out. One that failed is
+    // sent again as it was (same words, same key); a new question instead
+    // carries the context itself.
+    const id = conversationId
+    const { content: message, told } = withPracticeContext(t, practice, id, content)
+    void sendStreamingMessage({ content: message }).then((delivered) => {
+      if (delivered) told(id)
+    })
   }
 
   const conversationTitle = conversation ? conversationDisplayTitle(conversation, t) : ''

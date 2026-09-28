@@ -62,22 +62,27 @@ export function lessonAfter(chapter: Chapter, lessonId: string): ChapterLesson |
 
 export function useChapter(unitId: string | undefined): ChapterQuery {
   const catalogQuery = useCurriculumCatalogQuery()
-  const unit = catalogQuery.data?.units.find((candidate) => candidate.id === unitId)
+  const catalog = catalogQuery.data
+  const unit = catalog?.units.find((candidate) => candidate.id === unitId)
   const roadmapQuery = usePracticeRoadmapQuery(unit?.subjectId, unit?.topicId)
   const roadmap = roadmapQuery.data
+  // The parts each query is read for, not the query objects: those are new
+  // on every render, which would rebuild the chapter every time.
+  const { isLoading: catalogLoading, isError: catalogFailed, refetch: refetchCatalog } = catalogQuery
+  const { isLoading: roadmapLoading, isError: roadmapFailed, refetch: refetchRoadmap } = roadmapQuery
 
   return useMemo<ChapterQuery>(() => {
     if (!unitId) return { status: 'missing' }
-    if (catalogQuery.isLoading) return { status: 'loading' }
-    if (catalogQuery.isError) return { status: 'error', retry: () => void catalogQuery.refetch() }
+    if (catalogLoading) return { status: 'loading' }
+    if (catalogFailed) return { status: 'error', retry: () => void refetchCatalog() }
     if (!unit) return { status: 'missing' }
-    if (roadmapQuery.isLoading) return { status: 'loading' }
-    if (roadmapQuery.isError || !roadmap) return { status: 'error', retry: () => void roadmapQuery.refetch() }
+    if (roadmapLoading) return { status: 'loading' }
+    if (roadmapFailed || !roadmap) return { status: 'error', retry: () => void refetchRoadmap() }
     const roadmapUnit = roadmap.units.find((candidate) => candidate.id === unitId)
     if (!roadmapUnit) return { status: 'missing' }
 
     const counts = new Map(
-      (catalogQuery.data?.lessons ?? [])
+      (catalog?.lessons ?? [])
         .filter((lesson) => lesson.unitId === unitId)
         .map((lesson) => [lesson.id, lesson.exerciseCount] as const),
     )
@@ -104,7 +109,7 @@ export function useChapter(unitId: string | undefined): ChapterQuery {
         nextLessonId: nextLessonOf(lessons),
       },
     }
-  }, [unitId, unit, catalogQuery, roadmapQuery, roadmap])
+  }, [unitId, unit, catalog, catalogLoading, catalogFailed, refetchCatalog, roadmap, roadmapLoading, roadmapFailed, refetchRoadmap])
 }
 
 /** `/chapter/:unitId` and `/chapter/:unitId/:lessonId`, each segment encoded once. */
