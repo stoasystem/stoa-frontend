@@ -26,7 +26,7 @@ export function UserMenu({ variant = 'sidebar' }: { variant?: 'sidebar' | 'top' 
         aria-label={`${user.name} account`}
       >
         <UserCircle className="h-5 w-5 shrink-0 text-muted-foreground" aria-hidden="true" />
-        <span className="max-w-32 truncate px-1 text-sm font-medium text-foreground">
+        <span className="hidden max-w-32 truncate px-1 text-sm font-medium text-foreground sm:block">
           {user.name}
         </span>
         <Button
