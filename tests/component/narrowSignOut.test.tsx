@@ -1,10 +1,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
+import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppLayout } from '@/layouts/AppLayout'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
+import { ChatPage } from '@/pages/chat/ChatPage'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 import { mswServer } from '../mswServer'
@@ -14,6 +17,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string) => key,
     i18n: { resolvedLanguage: 'en', language: 'en', changeLanguage: vi.fn() },
   }),
+  Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
 }))
 
 // The layout must reach the one shared sign-out, not a copy of it; what that
@@ -21,6 +25,54 @@ vi.mock('react-i18next', () => ({
 const { signOut } = vi.hoisted(() => ({ signOut: vi.fn(async () => {}) }))
 vi.mock('@/hooks/auth/useSignOut', () => ({
   useSignOut: () => ({ signOut, isSigningOut: false }),
+}))
+
+// The student lands on /chat, which renders no AppLayout of its own.
+const conversation = {
+  id: 'conv-1',
+  subject: 'math',
+  grade: 'Grade 6',
+  title: 'Brüche',
+  createdAt: '2026-09-26T10:00:00Z',
+  updatedAt: '2026-09-26T10:01:00Z',
+  messageCount: 1,
+}
+const chat = vi.hoisted(() => ({ conversations: [] as unknown[], listFailed: false }))
+vi.mock('@/hooks/chat/useConversationsQuery', () => ({
+  useConversationsQuery: () =>
+    chat.listFailed
+      ? { data: undefined, isLoading: false, isError: true }
+      : { data: { items: chat.conversations }, isLoading: false, isError: false },
+}))
+vi.mock('@/hooks/chat/useConversationQuery', () => ({
+  useConversationQuery: (id: string | null) => ({
+    data: id
+      ? { ...conversation, messages: [{ id: 'm-1', role: 'user', content: 'Wie addiere ich Brüche?', createdAt: '2026-09-26T10:00:00Z' }] }
+      : undefined,
+    isLoading: false,
+  }),
+}))
+vi.mock('@/hooks/student/useStudentProfileQuery', () => ({
+  useStudentProfileQuery: () => ({ data: { grade: 'Grade 6', primarySubjects: [] }, isLoading: false }),
+}))
+vi.mock('@/hooks/chat/useCreateConversationMutation', () => ({
+  useCreateConversationMutation: () => ({ mutate: vi.fn(), isPending: false, isError: false }),
+}))
+vi.mock('@/hooks/chat/useStreamingChat', () => ({
+  useStreamingChat: () => ({
+    localMessages: [],
+    isStreaming: false,
+    sendStreamingMessage: vi.fn(),
+    stopStreaming: vi.fn(),
+    retryMessage: vi.fn(),
+  }),
+  mergeWithServerMessages: (messages: unknown[]) => messages,
+}))
+vi.mock('@/hooks/chat/useTeacherHelpMutation', () => ({
+  useTeacherHelpMutation: () => ({ mutate: vi.fn(), isPending: false }),
+}))
+vi.mock('@/hooks/chat/useTeacherHelpStatusQuery', () => ({
+  useTeacherHelpStatusQuery: () => ({ data: undefined }),
 }))
 
 // jsdom applies no stylesheet, so "visible at 375px" is read off the Tailwind
@@ -70,7 +122,7 @@ function signOutButtonsShownAt(width: number) {
     .filter((button) => shownAt(button, width) && !button.hasAttribute('disabled'))
 }
 
-function renderShellAs(role: UserRole) {
+function renderSignedIn(role: UserRole, path: string, page: ReactNode) {
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Ada Lovelace', email: 'ada@example.com', role } as CurrentUser,
     accessToken: 'token',
@@ -79,14 +131,39 @@ function renderShellAs(role: UserRole) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={[getDefaultRouteForRole(role)]}>
-        <AppLayout>
-          <p>page</p>
-        </AppLayout>
-      </MemoryRouter>
+      <MemoryRouter initialEntries={[path]}>{page}</MemoryRouter>
     </QueryClientProvider>,
   )
 }
+
+function renderShellAs(role: UserRole) {
+  renderSignedIn(
+    role,
+    getDefaultRouteForRole(role),
+    <AppLayout>
+      <p>page</p>
+    </AppLayout>,
+  )
+}
+
+type ChatState = 'no conversation yet' | 'the conversation list' | 'an open conversation' | 'a list that failed to load'
+
+async function renderChatShowing(state: ChatState) {
+  chat.listFailed = state === 'a list that failed to load'
+  chat.conversations = state === 'no conversation yet' ? [] : [conversation]
+  renderSignedIn('student', '/chat', <ChatPage />)
+  if (state === 'an open conversation') {
+    await userEvent.click(screen.getAllByRole('button', { name: /Brüche/ })[0])
+    expect(await screen.findByText('Wie addiere ich Brüche?')).toBeInTheDocument()
+  }
+}
+
+const CHAT_STATES: ChatState[] = [
+  'no conversation yet',
+  'the conversation list',
+  'an open conversation',
+  'a list that failed to load',
+]
 
 const ROLES: UserRole[] = ['student', 'parent', 'teacher', 'admin']
 
@@ -94,10 +171,12 @@ const ROLES: UserRole[] = ['student', 'parent', 'teacher', 'admin']
 // `md` and the top bar's below `sm`, so a phone could not sign out at all
 // (stoasystem/stoa-frontend#2).
 describe('signing out on a narrow screen', () => {
-  beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }))
+  beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
   afterEach(() => mswServer.resetHandlers())
   afterAll(() => mswServer.close())
   beforeEach(() => {
+    // Nothing on these screens needs data to lay out; every other call is refused.
+    mswServer.use(http.all('https://api.test/*', () => HttpResponse.json({}, { status: 404 })))
     signOut.mockClear()
     useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
   })
@@ -108,6 +187,20 @@ describe('signing out on a narrow screen', () => {
 
       const shown = signOutButtonsShownAt(width)
       expect(shown, `no sign-out a ${role} can see at ${width}px`).toHaveLength(1)
+
+      await userEvent.click(shown[0])
+      expect(signOut).toHaveBeenCalledOnce()
+    })
+  })
+
+  // The chat has no app shell, and before #20 no sign-out at any width; with
+  // no conversation, or a list that failed, it had no header either.
+  describe.each([375, 632, 1280])('on /chat at %ipx', (width) => {
+    it.each(CHAT_STATES)('offers a student showing %s a visible sign-out', async (state) => {
+      await renderChatShowing(state)
+
+      const shown = signOutButtonsShownAt(width)
+      expect(shown, `no sign-out on /chat (${state}) at ${width}px`).toHaveLength(1)
 
       await userEvent.click(shown[0])
       expect(signOut).toHaveBeenCalledOnce()
