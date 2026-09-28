@@ -53,7 +53,9 @@
     "about": "About STOA",
     "studentNavigationLabel": "Student navigation",
     "primary": "Primary",
-    "mobilePrimary": "Mobile primary"
+    "mobilePrimary": "Mobile primary",
+    "logoHome": "STOA home",
+    "administration": "Administration"
   },
   "actions": {
     "startLearning": "Start learning",
@@ -226,5 +228,14 @@
     "me": {
       "title": "Your account"
     }
+  },
+  "accountMenu": {
+    "open": "Account",
+    "help": "Help and support",
+    "billing": "Billing and payments"
+  },
+  "composer": {
+    "attach": "Add a photo or file",
+    "send": "Send"
   }
 }
