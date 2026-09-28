@@ -82,8 +82,8 @@ export function canvasPixelRatio(): number {
  * subject switcher and where-you-are line above; the legend (wide) or the zoom
  * buttons (phone) below. The whole map fits between them.
  */
-export function controlBands(wide: boolean): { top: number; bottom: number } {
-  return wide ? { top: 76, bottom: 164 } : { top: 112, bottom: 72 }
+export function controlBands(wide: boolean, bottomInset = 0): { top: number; bottom: number } {
+  return wide ? { top: 76, bottom: 164 + bottomInset } : { top: 112, bottom: 72 + bottomInset }
 }
 
 /** A link's box: the glyph, but never under 32 px, so the focus ring can be seen. */
@@ -105,7 +105,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
     glyph: 12,
     nebulae: [],
   })
-  const [stageSize, setStageSize] = useState({ width: 0, height: 0 })
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0, bottomInset: 0 })
   const [wide, setWide] = useState(true)
   const [announcement, setAnnouncement] = useState('')
 
@@ -159,9 +159,10 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
     const measure = () => {
       const rect = stage.getBoundingClientRect()
       const isWideNow = isWide({ width: rect.width, height: rect.height })
-      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow))
+      const bottomInset = parseFloat(getComputedStyle(stage).getPropertyValue('--page-bottom-inset')) || 0
+      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow, bottomInset))
       setWide(isWideNow)
-      setStageSize({ width: Math.round(rect.width), height: Math.round(rect.height) })
+      setStageSize({ width: Math.round(rect.width), height: Math.round(rect.height), bottomInset })
     }
     measure()
     const observer = new ResizeObserver(measure)
@@ -411,7 +412,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
                 const inNebula = visibleByNebula.get(nebula.topicId) ?? []
                 const isCurrent = currentNebula?.topicId === nebula.topicId
                 const disc = visible.nebulae[nebulaIndex]
-                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide)) : null
+                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide, stageSize.bottomInset)) : null
                 return (
                   <li key={nebula.topicId} data-nebula={nebula.topicId}>
                     {isCurrent ? (
@@ -494,7 +495,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
         {wide && target.layer === 'map' && stars.length > 0 && (
           <div
             data-starmap-overlay
-            className="absolute bottom-6 left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
+            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
             // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
             style={{
               background: 'var(--sky-glass)',
@@ -532,7 +533,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
             aria-label={t('zoom.group')}
             className={cn(
               'absolute flex flex-col gap-0.5 rounded-[11px] border border-solid bg-white/10 p-[3px] backdrop-blur-[20px]',
-              wide ? 'bottom-6 right-6' : target.layer === 'star' ? 'right-4 top-2' : 'bottom-4 right-4',
+              wide ? 'bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] right-6' : target.layer === 'star' ? 'right-4 top-2' : 'bottom-[calc(1rem+var(--page-bottom-inset,0px))] right-4',
             )}
             style={{ borderColor: 'rgba(255, 255, 255, 0.10)' }}
           >

@@ -52,7 +52,7 @@ export function StarCard({
       aria-labelledby="starmap-star-title"
       className={cn(
         'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border p-[18px] text-on-sky',
-        wide ? 'right-12 top-1/2 w-[340px] -translate-y-1/2' : 'inset-x-4 bottom-4',
+        wide ? 'right-12 top-1/2 w-[340px] -translate-y-1/2' : 'inset-x-4 bottom-[calc(1rem+var(--page-bottom-inset,0px))]',
       )}
       style={{
         background: 'var(--sky-glass)',
