@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest'
 import { isAdmitted } from '@/app/router/AppRoutes'
 import { legacyRedirects, pageRoutes, type RouteAccess } from '@/app/router/routeManifest'
-import { canUseNextPathForRole, roleNextPathPrefixes } from '@/lib/authRoutes'
+import { canUseNextPathForRole, getPostLoginPath, roleNextPathPrefixes } from '@/lib/authRoutes'
 
 describe('the paths a student may be returned to after sign-in', () => {
   it.each([
@@ -65,5 +65,40 @@ describe("the student's sign-in prefixes and the route manifest", () => {
       .map((entry) => entry.path)
       .filter((path) => !roleNextPathPrefixes.student.includes(firstSegment(path)))
     expect(uncovered).toEqual([])
+  })
+})
+
+describe('where getPostLoginPath sends a signed-in visitor', () => {
+  const student = { role: 'student' as const }
+  const sentAwayFrom = (from: { pathname: string; search?: string; hash?: string }) => ({
+    search: '',
+    state: { from },
+  })
+
+  // The page ProtectedRoute sent the visitor away from is checked as the whole
+  // address it rebuilds, not by its pathname alone: a forged search or hash
+  // cannot walk a permitted pathname off the site or out of the role.
+  it.each([
+    [{ pathname: '/map', search: '/../\\evil.example' }],
+    [{ pathname: '/me', hash: '/../../admin' }],
+  ])("goes to the role's home when state.from is forged as %o", (from) => {
+    const destination = getPostLoginPath(student, sentAwayFrom(from))
+
+    expect(destination).toBe('/')
+    expect(new URL(destination, window.location.origin).origin).toBe(window.location.origin)
+  })
+
+  it("returns to state.from with its query and hash", () => {
+    expect(getPostLoginPath(student, sentAwayFrom({ pathname: '/me', search: '?ok=1', hash: '#h' }))).toBe(
+      '/me?ok=1#h',
+    )
+  })
+
+  it('sends a reset account to the password change before a valid ?next= or state.from', () => {
+    const location = { search: '?next=/me', state: { from: { pathname: '/map/math' } } }
+
+    // Both would be followed for an account that is not under a forced change.
+    expect(getPostLoginPath(student, location)).toBe('/me')
+    expect(getPostLoginPath({ ...student, mustChangePassword: true }, location)).toBe('/settings/password')
   })
 })

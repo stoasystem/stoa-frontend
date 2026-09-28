@@ -76,8 +76,8 @@ function serve(user: User) {
   )
 }
 
-function openAt(url: string) {
-  window.history.replaceState(null, '', url)
+function openAt(url: string, state: unknown = null) {
+  window.history.replaceState(state, '', url)
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
@@ -232,6 +232,36 @@ describe('signing in from /login', () => {
 
     await expectToLandOn('/', 'student home')
     expect(window.location.host).toBe('localhost:3000')
+  })
+
+  // ProtectedRoute's state.from lives in history.state, where anything with
+  // access to the page can write it; the rebuilt address is checked whole.
+  function openLoginSentAwayFrom(from: { pathname: string; search?: string; hash?: string }) {
+    openAt('/login', { usr: { from }, key: 'forged', idx: 0 })
+  }
+
+  it.each([
+    [{ pathname: '/map', search: '/../\\evil.example' }],
+    [{ pathname: '/me', hash: '/../../admin' }],
+  ])("goes to the role's home when state.from is forged as %o", async (from) => {
+    serve(account('student'))
+    openLoginSentAwayFrom(from)
+
+    await signIn()
+
+    await expectToLandOn('/', 'student home')
+    expect(window.location.host).toBe('localhost:3000')
+  })
+
+  it('returns to state.from with its query and hash', async () => {
+    serve(account('student'))
+    openLoginSentAwayFrom({ pathname: '/me', search: '?ok=1', hash: '#h' })
+
+    await signIn()
+
+    await expectToLandOn('/me', 'student account')
+    expect(window.location.search).toBe('?ok=1')
+    expect(window.location.hash).toBe('#h')
   })
 
   it('sends a reset account to the password change first, whatever ?next= says', async () => {
