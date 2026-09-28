@@ -196,5 +196,35 @@
     "title": "Une erreur est survenue",
     "body": "Réessaie ou recharge la page."
   },
-  "nextStep": "Prochaine étape recommandée"
+  "nextStep": "Prochaine étape recommandée",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Bientôt disponible",
+      "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même."
+    },
+    "home": {
+      "title": "Ta planète"
+    },
+    "planet": {
+      "title": "Planète de la matière"
+    },
+    "region": {
+      "title": "Région"
+    },
+    "unit": {
+      "title": "Point de connaissance"
+    },
+    "chapter": {
+      "title": "Chapitre"
+    },
+    "lesson": {
+      "title": "Leçon"
+    },
+    "ask": {
+      "title": "Question"
+    },
+    "me": {
+      "title": "Ton compte"
+    }
+  }
 }

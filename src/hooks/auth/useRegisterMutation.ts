@@ -39,7 +39,7 @@ export function useRegisterMutation(options: { redirect?: boolean } = {}) {
           return
         }
         if (emailVerificationRequired) return
-        navigate(data.user.role === 'student' ? '/chat' : getDefaultRouteForRole(data.user.role))
+        navigate(getDefaultRouteForRole(data.user.role))
       }
     },
     onError: () => {

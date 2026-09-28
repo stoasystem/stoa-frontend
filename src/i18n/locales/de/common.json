@@ -196,5 +196,35 @@
     "title": "Etwas ist schiefgelaufen",
     "body": "Bitte versuche es erneut oder lade die Seite neu."
   },
-  "nextStep": "Empfohlener nächster Schritt"
+  "nextStep": "Empfohlener nächster Schritt",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Bald verfügbar",
+      "body": "Diese Ansicht wird gerade neu gebaut. Der Link funktioniert schon und bleibt gleich."
+    },
+    "home": {
+      "title": "Dein Planet"
+    },
+    "planet": {
+      "title": "Fachplanet"
+    },
+    "region": {
+      "title": "Region"
+    },
+    "unit": {
+      "title": "Wissenspunkt"
+    },
+    "chapter": {
+      "title": "Kapitel"
+    },
+    "lesson": {
+      "title": "Lektion"
+    },
+    "ask": {
+      "title": "Fragen"
+    },
+    "me": {
+      "title": "Dein Konto"
+    }
+  }
 }

@@ -196,5 +196,35 @@
     "title": "Qualcosa è andato storto",
     "body": "Riprova o ricarica la pagina."
   },
-  "nextStep": "Prossimo passo consigliato"
+  "nextStep": "Prossimo passo consigliato",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Presto disponibile",
+      "body": "Questa schermata è in fase di rifacimento. Il link funziona già e resterà lo stesso."
+    },
+    "home": {
+      "title": "Il tuo pianeta"
+    },
+    "planet": {
+      "title": "Pianeta della materia"
+    },
+    "region": {
+      "title": "Regione"
+    },
+    "unit": {
+      "title": "Punto di conoscenza"
+    },
+    "chapter": {
+      "title": "Capitolo"
+    },
+    "lesson": {
+      "title": "Lezione"
+    },
+    "ask": {
+      "title": "Domanda"
+    },
+    "me": {
+      "title": "Il tuo account"
+    }
+  }
 }
