@@ -6,14 +6,14 @@ import { describe, expect, it } from 'vitest'
 import { canUseNextPathForRole } from '@/hooks/auth/useLoginMutation'
 
 describe('the paths a student may be returned to after sign-in', () => {
-  it.each(['/', '/planet/math', '/chapter/u-1/l-1', '/ask/c-1', '/me', '/assignments', '/chat'])(
+  it.each(['/', '/map/math', '/planet/math', '/chapter/u-1/l-1', '/ask/c-1', '/me', '/assignments', '/chat'])(
     'include %s',
     (path) => {
       expect(canUseNextPathForRole(path, 'student')).toBe(true)
     },
   )
 
-  it.each(['/tutor', '/admin/users', '/parent', '/billing', '//evil.example', '/planetarium'])(
+  it.each(['/tutor', '/admin/users', '/parent', '/billing', '//evil.example', '/planetarium', '/mapping'])(
     'exclude %s',
     (path) => {
       expect(canUseNextPathForRole(path, 'student')).toBe(false)

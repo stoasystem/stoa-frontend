@@ -29,10 +29,12 @@ const ROOTS = [
   'src/pages/parent',
   'src/pages/admin',
   // The planet redesign's student screens (#45).
-  'src/pages/planet',
+  'src/pages/map',
   'src/pages/chapter',
   'src/pages/ask',
   'src/pages/me',
+  // The star map: canvas, parallel DOM, the star card and the subject switcher (#47, #72).
+  'src/features/starmap',
   // The redesign's base components and app shell (#18).
   'src/components/base',
   'src/components/shell',

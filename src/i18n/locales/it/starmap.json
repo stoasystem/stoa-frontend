@@ -1,0 +1,69 @@
+{
+  "stage": {
+    "label": "Mappa stellare: {{subject}}",
+    "nebulae": "Nebulose"
+  },
+  "summary": {
+    "lit": "{{lit}} su {{total}} accese",
+    "streak_one": "{{count}} giorno di fila",
+    "streak_other": "{{count}} giorni di fila",
+    "score_one": "{{formatted}} punto",
+    "score_other": "{{formatted}} punti"
+  },
+  "state": {
+    "lit": "Accesa",
+    "in_progress": "In corso",
+    "ready": "Pronta per iniziare",
+    "locked": "Bloccata"
+  },
+  "marker": {
+    "recommended": "Suggerita come prossima",
+    "reviewDue_one": "{{count}} scheda da ripassare",
+    "reviewDue_other": "{{count}} schede da ripassare"
+  },
+  "legend": {
+    "label": "Cosa significano le stelle",
+    "reviewDue": "Da ripassare",
+    "hint": "Trascina per muoverti sulla mappa. Scorri, pizzica o usa + e − per avvicinarti a una nebulosa; scegli una stella per vederne il capitolo."
+  },
+  "star": {
+    "progress": "{{percent}}% delle lezioni svolte",
+    "lessons": "{{done}} lezioni svolte su {{total}}",
+    "unmet_one": "Tutte le lezioni svolte: ancora {{count}} esercizio da risolvere correttamente",
+    "unmet_other": "Tutte le lezioni svolte: ancora {{count}} esercizi da risolvere correttamente",
+    "unmetPartial_one": "Ancora {{count}} esercizio da risolvere correttamente",
+    "unmetPartial_other": "Ancora {{count}} esercizi da risolvere correttamente",
+    "nextLesson": "Prossima lezione: {{title}}",
+    "skills": "Abilità",
+    "skillLit": "{{name}}, accesa",
+    "skillDark": "{{name}}, non ancora accesa",
+    "prerequisites": "Da accendere prima",
+    "start": "Inizia",
+    "continue": "Continua",
+    "open": "Apri il capitolo",
+    "inNebula": "{{nebula}} · {{state}}"
+  },
+  "nebula": {
+    "link": "{{nebula}}, {{lit}} su {{total}} accese",
+    "related": "{{base}}, collegata a {{list}}"
+  },
+  "nav": {
+    "map": "Mappa stellare",
+    "backToMap": "Torna alla mappa stellare",
+    "backToNebula": "Torna a {{nebula}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Ingrandisci",
+    "out": "Riduci"
+  },
+  "subjects": {
+    "label": "Materie"
+  },
+  "announce": {
+    "map": "{{subject}}, tutta la mappa stellare: {{lit}} su {{total}} accese",
+    "nebula": "{{nebula}}: {{lit}} su {{total}} accese",
+    "star": "{{name}}: {{state}}"
+  },
+  "empty": "In questa materia non c’è ancora niente da imparare."
+}

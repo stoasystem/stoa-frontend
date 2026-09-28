@@ -204,13 +204,13 @@
       "body": "Questa schermata è in fase di rifacimento. Il link funziona già e resterà lo stesso."
     },
     "home": {
-      "title": "Il tuo pianeta"
+      "title": "La tua mappa stellare"
     },
-    "planet": {
-      "title": "Pianeta della materia"
+    "map": {
+      "title": "Mappa stellare"
     },
-    "region": {
-      "title": "Regione"
+    "nebula": {
+      "title": "Nebulosa"
     },
     "unit": {
       "title": "Punto di conoscenza"

@@ -204,13 +204,13 @@
       "body": "Diese Ansicht wird gerade neu gebaut. Der Link funktioniert schon und bleibt gleich."
     },
     "home": {
-      "title": "Dein Planet"
+      "title": "Deine Sternkarte"
     },
-    "planet": {
-      "title": "Fachplanet"
+    "map": {
+      "title": "Sternkarte"
     },
-    "region": {
-      "title": "Region"
+    "nebula": {
+      "title": "Nebel"
     },
     "unit": {
       "title": "Wissenspunkt"

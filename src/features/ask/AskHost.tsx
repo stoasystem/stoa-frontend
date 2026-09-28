@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Composer } from '@/components/base'
+import { COMPOSER } from '@/components/base/sizes'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { ASK_PANEL, ASK_SHEET, DOCKED_COMPOSER, sheetHeightFor } from '@/features/ask/askLayout'
 import { useAskController, type AskRoute } from '@/features/ask/useAskController'
@@ -98,7 +99,12 @@ export function AskHost({
         data-ask-page
         inert={sheet || undefined}
         className="absolute inset-y-0 left-0 bg-sky text-on-sky"
-        style={{ right: open && wide ? ASK_PANEL.width : 0 }}
+        // Reserve the dock's space for the page's own controls, including while
+        // the panel is open, so closing it never covers a control.
+        style={{
+          right: open && wide ? ASK_PANEL.width : 0,
+          '--page-bottom-inset': `${(wide ? DOCKED_COMPOSER.desktop.bottom : DOCKED_COMPOSER.phone.bottom) + COMPOSER.docked.height}px`,
+        } as CSSProperties}
       >
         {children}
         {!open && (

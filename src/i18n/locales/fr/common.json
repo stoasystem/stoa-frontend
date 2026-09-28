@@ -204,13 +204,13 @@
       "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même."
     },
     "home": {
-      "title": "Ta planète"
+      "title": "Ta carte du ciel"
     },
-    "planet": {
-      "title": "Planète de la matière"
+    "map": {
+      "title": "Carte du ciel"
     },
-    "region": {
-      "title": "Région"
+    "nebula": {
+      "title": "Nébuleuse"
     },
     "unit": {
       "title": "Point de connaissance"

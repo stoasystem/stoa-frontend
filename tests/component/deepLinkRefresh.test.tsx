@@ -1,7 +1,7 @@
 /**
  * A deep link survives a refresh: the whole app mounts cold at the address,
  * with nothing but the stored token, waits for /auth/me, and then shows the
- * page for that address -- not the sign-in page, not the planet's front, and
+ * page for that address -- not the sign-in page, not the star map's front, and
  * with every route parameter intact.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -55,7 +55,6 @@ describe('a deep link refreshed in the browser', () => {
   })
 
   it.each([
-    ['/planet/math/fractions/u-7', 'Knowledge point', ['math', 'fractions', 'u-7']],
     ['/chapter/u-7/l-3', 'Lesson', ['u-7', 'l-3']],
   ])('reopens %s once the account is back', async (path, title, params) => {
     refreshAt(path)
@@ -70,7 +69,7 @@ describe('a deep link refreshed in the browser', () => {
     refreshAt('/ask/c-42')
 
     // Ask opens over the home planet, on the conversation the path names (#49).
-    expect(await screen.findByRole('heading', { name: 'Your planet' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Mathematics' })).toBeInTheDocument()
     expect(window.location.pathname).toBe('/ask/c-42')
     expect(document.querySelector('[data-ask-surface]')?.getAttribute('data-ask-conversation')).toBe('c-42')
   })
@@ -84,7 +83,7 @@ describe('a deep link refreshed in the browser', () => {
   })
 
   it('still sends a signed-out refresh to sign in', async () => {
-    window.history.replaceState(null, '', '/planet/math')
+    window.history.replaceState(null, '', '/map/math')
     useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
     const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
     render(
@@ -96,5 +95,16 @@ describe('a deep link refreshed in the browser', () => {
     )
 
     await vi.waitFor(() => expect(window.location.pathname).toBe('/login'))
+  })
+
+  it('reopens a star on the star map, at that star (#47, #72)', async () => {
+    // jsdom has no 2D canvas; the map draws nothing but keeps its DOM.
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
+    refreshAt('/map/math/algebra/u-5')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/map/math/algebra/u-5')
+    expect(screen.getByRole('article', { name: 'Linear equations' })).toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 })

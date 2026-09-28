@@ -204,13 +204,13 @@
       "body": "This screen is being rebuilt. The link already works and will stay the same."
     },
     "home": {
-      "title": "Your planet"
+      "title": "Your star map"
     },
-    "planet": {
-      "title": "Subject planet"
+    "map": {
+      "title": "Star map"
     },
-    "region": {
-      "title": "Region"
+    "nebula": {
+      "title": "Nebula"
     },
     "unit": {
       "title": "Knowledge point"

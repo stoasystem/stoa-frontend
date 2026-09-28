@@ -67,7 +67,7 @@ function useRedirectTarget(redirect: LegacyRedirect) {
   const location = useLocation()
   const search = new URLSearchParams(location.search)
   const pathname =
-    typeof redirect.to === 'string' ? redirect.to : redirect.to({ params, search })
+    typeof redirect.to === 'string' ? redirect.to : redirect.to({ params, search, pathname: location.pathname })
 
   if (!redirect.carryContext) return { to: pathname, state: undefined }
 

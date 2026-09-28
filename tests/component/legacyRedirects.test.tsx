@@ -5,31 +5,38 @@
  * its test red instead of taking the test with it.
  */
 import { describe, expect, it, vi } from 'vitest'
+import { mapPathForLegacyPlanet } from '@/app/router/routeManifest'
 import { openAs } from './routeHarness'
 
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
-describe('legacy student routes redirect to the planet routes', () => {
+describe('legacy student routes redirect to the star map routes', () => {
   it.each([
     // /learn*
-    ['/learn', '/', 'PlanetHomePage'],
-    ['/learn/mistakes', '/', 'PlanetHomePage'],
+    ['/learn', '/', 'MapHomePage'],
+    ['/learn/mistakes', '/', 'MapHomePage'],
     // /dashboard
-    ['/dashboard', '/', 'PlanetHomePage'],
+    ['/dashboard', '/', 'MapHomePage'],
     // /practice*
-    ['/practice', '/', 'PlanetHomePage'],
-    ['/practice/math/fractions/lessons/l-1/result', '/', 'PlanetHomePage'],
+    ['/practice', '/', 'MapHomePage'],
+    ['/practice/math/fractions/lessons/l-1/result', '/', 'MapHomePage'],
     // /question-bank*
-    ['/question-bank', '/', 'PlanetHomePage'],
-    ['/question-bank/sets/s-1', '/', 'PlanetHomePage'],
+    ['/question-bank', '/', 'MapHomePage'],
+    ['/question-bank/sets/s-1', '/', 'MapHomePage'],
     // /classroom*
-    ['/classroom', '/', 'PlanetHomePage'],
-    ['/classroom/sessions/s-1/room', '/', 'PlanetHomePage'],
+    ['/classroom', '/', 'MapHomePage'],
+    ['/classroom/sessions/s-1/room', '/', 'MapHomePage'],
     // learning history is gone (#13 point 3)
-    ['/learning-history', '/', 'PlanetHomePage'],
+    ['/learning-history', '/', 'MapHomePage'],
     // /chat, /assistant
     ['/chat', '/ask', 'AskPage'],
     ['/assistant', '/ask', 'AskPage'],
+    // /planet* became /map* (#72 point 8)
+    ['/planet/math', '/map/math', 'MapSubjectPage'],
+    ['/planet/math/fractions', '/map/math/fractions', 'MapNebulaPage'],
+    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1', 'MapStarPage'],
+    ['/planet', '/', 'MapHomePage'],
+    ['/planet/math/fractions/u-1/extra', '/', 'MapHomePage'],
     // /profile, /settings/password
     ['/profile', '/me', 'MePage'],
     ['/settings/password', '/me', 'MePage'],
@@ -39,6 +46,47 @@ describe('legacy student routes redirect to the planet routes', () => {
     expect(landed.pathname).toBe(pathname)
     expect(landed.page).toBe(page)
   })
+})
+
+describe('an old /planet link cannot leave /map (decoded once, plain ids only)', () => {
+  it.each([
+    ['/planet/..', '/'],
+    ['/planet/math/..', '/'],
+    ['/planet/%2e%2e', '/'],
+    ['/planet/math/%2E%2E/u-1', '/'],
+    ['/planet/%252e%252e', '/'],
+    ['/planet/a%2Fb', '/'],
+    ['/planet/math/a%2fb', '/'],
+    ['/planet/%5C', '/'],
+    ['/planet/math/%5Cfoo', '/'],
+    ['/planet/math/%E0%A4%A', '/'],
+    ['/planet/math/fractions/u-1/x', '/'],
+    ['/planet', '/'],
+    ['/planetarium/x', '/'],
+    ['/planet/math', '/map/math'],
+    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1'],
+    ['/planet/math/u.1', '/map/math/u.1'],
+    ['/Planet/math', '/map/math'],
+    ['/PLANET/math/fractions', '/map/math/fractions'],
+    ['/Planet/%2e%2e', '/'],
+  ])('%s -> %s', (from, to) => {
+    expect(mapPathForLegacyPlanet(from)).toBe(to)
+  })
+
+  it('matches /Planet in any case, as the router does', () => {
+    expect(openAs('student', '/Planet/math')).toMatchObject({ pathname: '/map/math', page: 'MapSubjectPage' })
+  })
+
+  it.each(['/planet/%2e%2e', '/planet/%252e%252e', '/planet/a%2Fb', '/planet/%5C'])('the router sends %s home', (from) => {
+    expect(openAs('student', from)).toMatchObject({ pathname: '/', page: 'MapHomePage' })
+  })
+})
+
+describe('an old /planet link keeps its query', () => {
+  it('carries the query string to /map', () => {
+    expect(openAs('student', '/planet/math?points=500')).toMatchObject({ pathname: '/map/math', search: '?points=500', page: 'MapSubjectPage' })
+  })
+
 })
 
 describe('a /chat link that names a conversation opens it in Ask', () => {
