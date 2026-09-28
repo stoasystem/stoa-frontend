@@ -114,10 +114,8 @@ export function LoginForm() {
       </p>
       <p className="text-[15px] leading-[1.35] text-[color:var(--on-sky-text-body)]">
         {t('auth:login.needAccount')}{' '}
-        <Link
-          className="font-semibold text-[color:var(--on-sky-text)] underline decoration-[color:var(--on-sky-field-rule)] underline-offset-4 hover:decoration-[color:var(--on-sky-text)]"
-          to="/register"
-        >
+        {/* Coloured and underlined by index.css (`data-sky-link`). */}
+        <Link className="font-semibold" data-sky-link="inline" to="/register">
           {t('auth:login.howToGetAccount')}
         </Link>
       </p>

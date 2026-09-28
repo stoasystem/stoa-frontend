@@ -1,8 +1,11 @@
+import { useLayoutEffect, useRef, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LoginForm } from '@/components/auth/LoginForm'
+import { TOP_BAR, TOP_BAR_PHONE } from '@/components/base/sizes'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { StoaLogo } from '@/components/common/StoaLogo'
+import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { stoaContactInfo } from '@/lib/brandContact'
 import { LoginPlanet } from '@/pages/login/LoginPlanet'
 
@@ -20,22 +23,58 @@ import { LoginPlanet } from '@/pages/login/LoginPlanet'
  * Signing in itself is LoginForm's, unchanged; this page only places it.
  */
 
-const linkClass =
-  'inline-flex min-h-11 items-center text-[color:var(--on-sky-text-caption)] hover:text-[color:var(--on-sky-text)] md:min-h-0'
+// The link colours come from index.css (`data-sky-link`): the unlayered `a`
+// rule there outranks Tailwind colour classes.
+const linkClass = 'inline-flex min-h-11 items-center md:min-h-0'
+
+/** The layout's own breakpoint (Tailwind `md`); the bar and logo follow it. */
+const WIDE_LOGIN_QUERY = '(min-width: 768px)'
+
+/*
+ * While the page is up, the document behind it is the sky too, so an iOS
+ * overscroll or a short window never shows the light ground at the edges.
+ * The colour is read from the surface itself: --sky exists only inside it.
+ */
+function usePaintDocumentWithSky(surface: RefObject<HTMLElement | null>) {
+  useLayoutEffect(() => {
+    const element = surface.current
+    if (!element) return
+    const sky = getComputedStyle(element).getPropertyValue('--sky').trim()
+    if (!sky) return
+    const targets = [document.documentElement, document.body]
+    const before = targets.map((target) => target.style.backgroundColor)
+    targets.forEach((target) => {
+      target.style.backgroundColor = sky
+    })
+    return () => {
+      targets.forEach((target, index) => {
+        target.style.backgroundColor = before[index]
+      })
+    }
+  }, [surface])
+}
 
 export function LoginPage() {
   const { t } = useTranslation(['auth', 'common'])
+  const bar = useMediaQuery(WIDE_LOGIN_QUERY) ? TOP_BAR : TOP_BAR_PHONE
+  const surface = useRef<HTMLDivElement>(null)
+  usePaintDocumentWithSky(surface)
 
   return (
     <div
+      ref={surface}
       data-surface="sky"
       className="flex min-h-dvh flex-col bg-sky text-[color:var(--on-sky-text)]"
       style={{ fontFamily: 'var(--font-system)' }}
     >
       {/* Placement, top bar: 56 high with 20 at the sides; phone 44, 16 / 8. */}
-      <header data-sky-rule="" className="flex h-11 items-center gap-4 border-b pr-2 pl-4 md:h-14 md:px-5">
+      <header
+        data-sky-rule=""
+        className="flex items-center gap-4 border-b pr-2 pl-4 md:px-5"
+        style={{ height: bar.height }}
+      >
         <Link to="/" className="inline-flex min-h-11 shrink-0 items-center">
-          <StoaLogo variant="light" className="h-[26px] md:h-[30px]" />
+          <StoaLogo variant="light" height={bar.logo} />
         </Link>
         <p className="m-0 hidden flex-1 text-center text-[13px] leading-[1.3] text-[color:var(--on-sky-text-caption)] md:block">
           {t('auth:login.audience')}
@@ -78,16 +117,16 @@ export function LoginPage() {
       <footer className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-3 text-[12px] leading-[1.3] text-[color:var(--on-sky-text-caption)] md:px-5 md:py-4">
         <span className="py-2 md:py-0">{t('common:footer.copyright')}</span>
         <nav aria-label={t('common:footer.legal')} className="flex flex-wrap gap-x-4 gap-y-0">
-          <Link className={linkClass} to="/support">
+          <Link className={linkClass} data-sky-link="quiet" to="/support">
             {t('common:accountMenu.help')}
           </Link>
-          <Link className={linkClass} to="/privacy">
+          <Link className={linkClass} data-sky-link="quiet" to="/privacy">
             {t('common:navigation.privacy')}
           </Link>
-          <Link className={linkClass} to="/terms">
+          <Link className={linkClass} data-sky-link="quiet" to="/terms">
             {t('common:navigation.terms')}
           </Link>
-          <a className={linkClass} href={stoaContactInfo.homepageUrl}>
+          <a className={linkClass} data-sky-link="quiet" href={stoaContactInfo.homepageUrl}>
             {t('common:footer.backToHomepage')}
           </a>
         </nav>
