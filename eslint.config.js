@@ -1,5 +1,7 @@
 import js from '@eslint/js'
 import tseslint from 'typescript-eslint'
+import importX from 'eslint-plugin-import-x'
+import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript'
 
 export default tseslint.config(
   js.configs.recommended,
@@ -35,6 +37,25 @@ export default tseslint.config(
       parserOptions: {
         projectService: true,
       },
+    },
+  },
+  {
+    // Without this, an import of a file that does not exist lints clean: tsc -b
+    // only sees the files its projects include, and nothing else looks (card 041).
+    // The resolver reads the same tsconfigs as tsc, so '@/...' resolves exactly
+    // as it does for the compiler and for Vite's alias.
+    files: ['**/*.{js,mjs,cjs,jsx,ts,tsx}'],
+    plugins: { 'import-x': importX },
+    settings: {
+      'import-x/resolver-next': [
+        createTypeScriptImportResolver({
+          project: 'tsconfig.json',
+        }),
+      ],
+    },
+    rules: {
+      // 'virtual:' ids exist only inside a Vite plugin; no resolver can see them.
+      'import-x/no-unresolved': ['error', { ignore: ['^virtual:'] }],
     },
   },
 )

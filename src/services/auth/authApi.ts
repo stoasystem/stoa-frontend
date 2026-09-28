@@ -2,7 +2,6 @@ import { ApiError, LOGOUT_PATH, httpClient } from '@/services/api/httpClient'
 import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import type { RegisterPayload } from '@/types/onboarding'
-import { tabToken } from '@/lib/devSessions'
 import { TOKEN_KEY } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
 
@@ -71,13 +70,52 @@ export async function login(payload: LoginRequest) {
 
 // Signing out here alone leaves the access token working until it expires: the
 // backend records its own cut-off on this call (stoasystem/stoa-backend#5),
-// then signs Cognito out. The token is the one every other request from this
-// tab sends - a tab pinned to one role holds its own - and it travels in the
-// body, which is all the endpoint reads.
-export async function logout() {
-  const accessToken = tabToken() ?? localStorage.getItem(TOKEN_KEY)
-  if (!accessToken) return
-  await httpClient.post(LOGOUT_PATH, { access_token: accessToken })
+// then signs Cognito out. The caller passes the token in explicitly, read before
+// it cleared this device - by the time this request leaves, nothing is left in
+// storage to read. It travels in the body, which is all the endpoint reads.
+export const LOGOUT_TIMEOUT_MS = 8000
+
+export type LogoutOutcome =
+  | { kind: 'ok' }
+  | { kind: 'timeout' }
+  | { kind: 'network'; transportCode?: string }
+  | { kind: 'http'; status: number }
+
+// Never throws: the caller has already signed out here and only records how the
+// backend answered. Sent once, never retried.
+export async function logout(accessToken: string): Promise<LogoutOutcome> {
+  try {
+    await httpClient.post(
+      LOGOUT_PATH,
+      { access_token: accessToken },
+      {
+        // On a timeout or a network error the server-side revocation outcome is
+        // unknown: it may not have run, may have run in part, or may have
+        // completed with only the response lost (the backend writes its
+        // DynamoDB revocation cut-off and then calls Cognito global sign-out).
+        // In the worst case the access token stays usable until it expires and
+        // the refresh token can still mint new ones. The client has cleared
+        // itself regardless, does not retry, and keeps no credential to retry
+        // with.
+        timeout: LOGOUT_TIMEOUT_MS,
+        // Report a timeout as ETIMEDOUT instead of the ECONNABORTED an abort
+        // also uses, so the two cannot be confused below.
+        transitional: { clarifyTimeoutError: true },
+      },
+    )
+    return { kind: 'ok' }
+  } catch (error) {
+    return classifyLogoutFailure(error)
+  }
+}
+
+function classifyLogoutFailure(error: unknown): LogoutOutcome {
+  if (error instanceof ApiError && typeof error.status === 'number') {
+    return { kind: 'http', status: error.status }
+  }
+  const transportCode = error instanceof ApiError ? error.transportCode : undefined
+  if (transportCode === 'ETIMEDOUT') return { kind: 'timeout' }
+  return { kind: 'network', transportCode }
 }
 
 // Public registration is closed: the backend answers 410 and there is no route

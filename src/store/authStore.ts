@@ -7,6 +7,25 @@ export type { UserRole }
 
 export const TOKEN_KEY = 'stoa_access_token'
 
+// This tab's logout can outlive the account menu. Keep only its completion,
+// never a credential, so the next login waits for the existing 8 s request.
+let pendingLogout: Promise<void> = Promise.resolve()
+
+export function trackPendingLogout(request: Promise<unknown>): Promise<void> {
+  pendingLogout = Promise.allSettled([pendingLogout, request]).then(() => undefined)
+  return pendingLogout
+}
+
+export async function waitForPendingLogout(): Promise<void> {
+  // A second menu can start another logout while the first one is settling.
+  // Wait for every already-started request before issuing a new login.
+  let pending: Promise<void>
+  do {
+    pending = pendingLogout
+    await pending
+  } while (pending !== pendingLogout)
+}
+
 const validRoles: UserRole[] = [
   'student',
   'parent',

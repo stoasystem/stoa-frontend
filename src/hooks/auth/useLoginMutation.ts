@@ -10,7 +10,7 @@ import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore, waitForPendingLogout } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 
 const roleNextPathPrefixes: Record<UserRole, string[]> = {
@@ -63,7 +63,10 @@ export function useLoginMutation() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: LoginRequest) => login(payload),
+    mutationFn: async (payload: LoginRequest) => {
+      await waitForPendingLogout()
+      return login(payload)
+    },
     onSuccess: async (data) => {
       setAuth(data.user, data.accessToken)
       markLoginAuthenticated(data.user.role)
