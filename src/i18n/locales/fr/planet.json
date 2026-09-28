@@ -1,0 +1,65 @@
+{
+  "stage": {
+    "label": "Planète des connaissances : {{subject}}",
+    "regions": "Régions"
+  },
+  "summary": {
+    "lit": "{{lit}} sur {{total}} allumés",
+    "streak_one": "{{count}} jour d’affilée",
+    "streak_other": "{{count}} jours d’affilée",
+    "score_one": "{{formatted}} point",
+    "score_other": "{{formatted}} points"
+  },
+  "state": {
+    "lit": "Allumé",
+    "in_progress": "En cours",
+    "ready": "Prêt à commencer",
+    "locked": "Verrouillé"
+  },
+  "marker": {
+    "recommended": "Suggéré ensuite",
+    "reviewDue_one": "{{count}} carte à réviser",
+    "reviewDue_other": "{{count}} cartes à réviser"
+  },
+  "legend": {
+    "label": "Ce que signifient les points",
+    "reviewDue": "À réviser",
+    "hint": "Faites glisser pour tourner la planète. Faites défiler, pincez ou utilisez + et − pour zoomer sur une région ; choisissez un point pour voir son chapitre."
+  },
+  "point": {
+    "progress": "{{percent}} % des leçons faites",
+    "lessons": "{{done}} leçons faites sur {{total}}",
+    "unmet_one": "Toutes les leçons sont faites : encore {{count}} exercice à réussir",
+    "unmet_other": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",
+    "unmetPartial_one": "Encore {{count}} exercice à réussir",
+    "unmetPartial_other": "Encore {{count}} exercices à réussir",
+    "nextLesson": "Leçon suivante : {{title}}",
+    "skills": "Compétences",
+    "skillLit": "{{name}}, allumée",
+    "skillDark": "{{name}}, pas encore allumée",
+    "prerequisites": "À allumer d’abord",
+    "start": "Commencer",
+    "continue": "Continuer",
+    "open": "Ouvrir le chapitre",
+    "inRegion": "{{region}} · {{state}}"
+  },
+  "region": {
+    "link": "{{region}}, {{lit}} sur {{total}} allumés"
+  },
+  "nav": {
+    "planet": "Planète",
+    "backToPlanet": "Retour à la planète",
+    "backToRegion": "Retour à {{region}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Zoomer",
+    "out": "Dézoomer"
+  },
+  "announce": {
+    "planet": "{{subject}}, toute la planète : {{lit}} sur {{total}} allumés",
+    "region": "{{region}} : {{lit}} sur {{total}} allumés",
+    "point": "{{name}} : {{state}}"
+  },
+  "empty": "Rien à apprendre sur cette planète pour l’instant."
+}

@@ -1,0 +1,65 @@
+{
+  "stage": {
+    "label": "Knowledge planet: {{subject}}",
+    "regions": "Regions"
+  },
+  "summary": {
+    "lit": "{{lit}} of {{total}} lit",
+    "streak_one": "{{count}}-day streak",
+    "streak_other": "{{count}}-day streak",
+    "score_one": "{{formatted}} point",
+    "score_other": "{{formatted}} points"
+  },
+  "state": {
+    "lit": "Lit",
+    "in_progress": "In progress",
+    "ready": "Ready to start",
+    "locked": "Locked"
+  },
+  "marker": {
+    "recommended": "Suggested next",
+    "reviewDue_one": "{{count}} card due for review",
+    "reviewDue_other": "{{count}} cards due for review"
+  },
+  "legend": {
+    "label": "What the points mean",
+    "reviewDue": "Due for review",
+    "hint": "Drag to turn the planet. Scroll, pinch or use + and − to zoom into a region; pick a point to see its chapter."
+  },
+  "point": {
+    "progress": "{{percent}}% of lessons done",
+    "lessons": "{{done}} of {{total}} lessons done",
+    "unmet_one": "All lessons done: {{count}} exercise still to get right",
+    "unmet_other": "All lessons done: {{count}} exercises still to get right",
+    "unmetPartial_one": "{{count}} exercise still to get right",
+    "unmetPartial_other": "{{count}} exercises still to get right",
+    "nextLesson": "Next lesson: {{title}}",
+    "skills": "Skills",
+    "skillLit": "{{name}}, lit",
+    "skillDark": "{{name}}, not lit yet",
+    "prerequisites": "Light these first",
+    "start": "Start",
+    "continue": "Continue",
+    "open": "Open chapter",
+    "inRegion": "{{region}} · {{state}}"
+  },
+  "region": {
+    "link": "{{region}}, {{lit}} of {{total}} lit"
+  },
+  "nav": {
+    "planet": "Planet",
+    "backToPlanet": "Back to the planet",
+    "backToRegion": "Back to {{region}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Zoom in",
+    "out": "Zoom out"
+  },
+  "announce": {
+    "planet": "{{subject}}, the whole planet: {{lit}} of {{total}} lit",
+    "region": "{{region}}: {{lit}} of {{total}} lit",
+    "point": "{{name}}: {{state}}"
+  },
+  "empty": "Nothing to learn on this planet yet."
+}

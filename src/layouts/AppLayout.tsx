@@ -59,8 +59,20 @@ export type AppSurface = 'light' | 'sky'
  *
  * `surface="sky"` paints the page area as the dark sky (the planet, the stage)
  * and scopes the sky tokens to it; the bar stays light, as every board draws it.
+ *
+ * `bleed` hands the page area to the page whole: no padding, exactly the height
+ * under the bar, nothing scrolls. The planet uses it, with Ask beside or over
+ * it (#49); the page then paints its own surfaces.
  */
-export function AppLayout({ children, surface = 'light' }: { children: ReactNode; surface?: AppSurface }) {
+export function AppLayout({
+  children,
+  surface = 'light',
+  bleed = false,
+}: {
+  children: ReactNode
+  surface?: AppSurface
+  bleed?: boolean
+}) {
   const { t } = useTranslation('common')
   const location = useLocation()
   const user = useAuthStore((state) => state.user)
@@ -75,15 +87,23 @@ export function AppLayout({ children, surface = 'light' }: { children: ReactNode
   const page = (
     <main
       data-surface={surface === 'sky' ? 'sky' : undefined}
-      className={cn('min-w-0 flex-1', surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink')}
+      className={cn(
+        'min-w-0 flex-1',
+        bleed && 'relative flex min-h-0 flex-col overflow-hidden',
+        surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink',
+      )}
     >
-      {/* Placement: page padding 36 top and 48 at the sides; 8 and 16 on a phone. */}
-      <div className={cn(wide ? 'px-12 pt-9 pb-12' : 'px-4 pt-2 pb-8')}>{children}</div>
+      {bleed ? (
+        children
+      ) : (
+        /* Placement: page padding 36 top and 48 at the sides; 8 and 16 on a phone. */
+        <div className={cn(wide ? 'px-12 pt-9 pb-12' : 'px-4 pt-2 pb-8')}>{children}</div>
+      )}
     </main>
   )
 
   return (
-    <div className="flex min-h-screen flex-col bg-ground text-ink">
+    <div className={cn('flex flex-col bg-ground text-ink', bleed ? 'h-dvh overflow-hidden' : 'min-h-screen')}>
       <TopBar
         homePath={homePath}
         wide={wide}
@@ -105,7 +125,7 @@ export function AppLayout({ children, surface = 'light' }: { children: ReactNode
           {page}
         </div>
       ) : (
-        <div className="flex flex-1">{page}</div>
+        <div className={cn('flex flex-1', bleed && 'min-h-0')}>{page}</div>
       )}
       <InternalDebugPanel />
     </div>

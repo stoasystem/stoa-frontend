@@ -33,6 +33,8 @@ const ROOTS = [
   'src/pages/chapter',
   'src/pages/ask',
   'src/pages/me',
+  // The planet renderer: canvas, parallel DOM and the point card (#47).
+  'src/features/planet',
   // The redesign's base components and app shell (#18).
   'src/components/base',
   'src/components/shell',

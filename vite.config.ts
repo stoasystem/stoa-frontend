@@ -17,6 +17,10 @@ export default defineConfig({
           // dependency. KaTeX is loaded on demand, so it is left unnamed and
           // travels with the screen that needs it.
           if (normalizedId.includes('/katex/')) return undefined
+          // Likewise d3-geo (and the d3-array it uses): only the planet draws
+          // with it, so it rides in the planet's chunk (#47), not in `vendor`
+          // where every role would download it.
+          if (normalizedId.includes('/d3-geo/') || normalizedId.includes('/d3-array/')) return undefined
 
           if (
             normalizedId.includes('/react/') ||

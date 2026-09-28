@@ -1,0 +1,65 @@
+{
+  "stage": {
+    "label": "Wissensplanet: {{subject}}",
+    "regions": "Regionen"
+  },
+  "summary": {
+    "lit": "{{lit}} von {{total}} leuchten",
+    "streak_one": "{{count}} Tag in Folge",
+    "streak_other": "{{count}} Tage in Folge",
+    "score_one": "{{formatted}} Punkt",
+    "score_other": "{{formatted}} Punkte"
+  },
+  "state": {
+    "lit": "Leuchtet",
+    "in_progress": "In Arbeit",
+    "ready": "Bereit zum Start",
+    "locked": "Gesperrt"
+  },
+  "marker": {
+    "recommended": "Als Nächstes empfohlen",
+    "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",
+    "reviewDue_other": "{{count}} Karten zur Wiederholung fällig"
+  },
+  "legend": {
+    "label": "Was die Punkte bedeuten",
+    "reviewDue": "Wiederholung fällig",
+    "hint": "Ziehen dreht den Planeten. Scrollen, mit zwei Fingern zoomen oder + und − nutzen, um in eine Region zu gehen; einen Punkt wählen, um sein Kapitel zu sehen."
+  },
+  "point": {
+    "progress": "{{percent}} % der Lektionen erledigt",
+    "lessons": "{{done}} von {{total}} Lektionen erledigt",
+    "unmet_one": "Alle Lektionen erledigt: noch {{count}} Aufgabe richtig zu lösen",
+    "unmet_other": "Alle Lektionen erledigt: noch {{count}} Aufgaben richtig zu lösen",
+    "unmetPartial_one": "Noch {{count}} Aufgabe richtig zu lösen",
+    "unmetPartial_other": "Noch {{count}} Aufgaben richtig zu lösen",
+    "nextLesson": "Nächste Lektion: {{title}}",
+    "skills": "Fähigkeiten",
+    "skillLit": "{{name}}, leuchtet",
+    "skillDark": "{{name}}, leuchtet noch nicht",
+    "prerequisites": "Zuerst zum Leuchten bringen",
+    "start": "Starten",
+    "continue": "Weiter",
+    "open": "Kapitel öffnen",
+    "inRegion": "{{region}} · {{state}}"
+  },
+  "region": {
+    "link": "{{region}}, {{lit}} von {{total}} leuchten"
+  },
+  "nav": {
+    "planet": "Planet",
+    "backToPlanet": "Zurück zum Planeten",
+    "backToRegion": "Zurück zu {{region}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Hineinzoomen",
+    "out": "Herauszoomen"
+  },
+  "announce": {
+    "planet": "{{subject}}, der ganze Planet: {{lit}} von {{total}} leuchten",
+    "region": "{{region}}: {{lit}} von {{total}} leuchten",
+    "point": "{{name}}: {{state}}"
+  },
+  "empty": "Auf diesem Planeten gibt es noch nichts zu lernen."
+}

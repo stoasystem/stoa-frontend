@@ -12,6 +12,7 @@ export const namespaces = [
   'legal',
   'admin',
   'errors',
+  'planet',
 ] as const
 
 export type I18nNamespace = (typeof namespaces)[number]

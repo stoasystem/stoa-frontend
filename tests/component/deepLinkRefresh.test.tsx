@@ -55,7 +55,6 @@ describe('a deep link refreshed in the browser', () => {
   })
 
   it.each([
-    ['/planet/math/fractions/u-7', 'Knowledge point', ['math', 'fractions', 'u-7']],
     ['/chapter/u-7/l-3', 'Lesson', ['u-7', 'l-3']],
     ['/ask/c-42', 'Ask', ['c-42']],
   ])('reopens %s once the account is back', async (path, title, params) => {
@@ -88,5 +87,16 @@ describe('a deep link refreshed in the browser', () => {
     )
 
     await vi.waitFor(() => expect(window.location.pathname).toBe('/login'))
+  })
+
+  it('reopens a knowledge point on the planet, at that point (#47)', async () => {
+    // jsdom has no 2D canvas; the planet draws nothing but keeps its DOM.
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
+    refreshAt('/planet/math/algebra/u-5')
+
+    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/planet/math/algebra/u-5')
+    expect(screen.getByRole('article', { name: 'Linear equations' })).toBeInTheDocument()
+    vi.restoreAllMocks()
   })
 })
