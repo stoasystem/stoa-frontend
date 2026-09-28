@@ -161,6 +161,11 @@
     "learningOperations": "Learning operations",
     "learningOperationsDescription": "Signals, completions and data readiness by subject",
     "learningAutomation": "Learning automation",
-    "learningAutomationDescription": "Preview and run automatic practice assignments"
+    "learningAutomationDescription": "Preview and run automatic practice assignments",
+    "scope": {
+      "title": "Operations scope",
+      "covers": "Administrators manage accounts under Users (invitations, assignments, password resets, suspension and archiving) and review teacher applications, the curriculum and moderation in their own sections.",
+      "notYet": "Support cases are not handled here yet, and system status is still to come."
+    }
   }
 }

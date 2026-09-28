@@ -13,16 +13,19 @@ import { cn } from '@/lib/utils'
  */
 export function Group({
   title,
+  label,
   children,
   className,
 }: {
   /** Section header above the group (13 / 500, caps, +0.4). */
   title?: ReactNode
+  /** The list's accessible name, where no header names it. */
+  label?: string
   children: ReactNode
   className?: string
 }) {
   return (
-    <section className={cn('flex flex-col', className)}>
+    <section aria-label={label} className={cn('flex flex-col', className)}>
       {title && (
         <h2
           className="m-0 text-caption uppercase"

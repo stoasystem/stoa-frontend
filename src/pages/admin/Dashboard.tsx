@@ -46,17 +46,11 @@ export function AdminDashboardPage() {
         <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Operations scope</CardTitle>
+              <CardTitle className="text-base">{t('system.scope.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                Admin operations are limited to platform status, usage summary, and feedback
-                triage boundaries for the pilot.
-              </p>
-              <p>
-                Full user management, role changes, account status controls, support cases, and
-                platform content administration remain explicitly deferred.
-              </p>
+              <p>{t('system.scope.covers')}</p>
+              <p>{t('system.scope.notYet')}</p>
             </CardContent>
           </Card>
           <Card>

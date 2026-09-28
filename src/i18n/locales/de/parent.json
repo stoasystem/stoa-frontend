@@ -160,8 +160,19 @@
     "more": "Mehr",
     "account": "Konto und Familie",
     "accountLoading": "Konto wird geprüft…",
-    "accountReady": "Verknüpfte Kinder und Kontaktdaten",
-    "accountAttention_one": "{{count}} Punkt braucht Aufmerksamkeit",
-    "accountAttention_other": "{{count}} Punkte brauchen Aufmerksamkeit"
+    "accountReady_one": "Bereit · {{count}} verknüpftes Kind",
+    "accountReady_other": "Bereit · {{count}} verknüpfte Kinder",
+    "accountAttention_one": "Braucht Aufmerksamkeit: {{issue}}",
+    "accountAttention_other": "Braucht Aufmerksamkeit ({{count}} Punkte): {{issue}}",
+    "accountBlocked_one": "Gesperrt: {{issue}}",
+    "accountBlocked_other": "Gesperrt ({{count}} Punkte): {{issue}}",
+    "accountSeeDetails": "Details im Konto",
+    "issues": {
+      "parent_email_unverified": "E-Mail-Adresse der Eltern ist noch nicht bestätigt",
+      "no_linked_children": "Kein Kinderkonto verknüpft",
+      "child_email_unverified": "Die E-Mail-Adresse eines Kinderkontos ist nicht bestätigt",
+      "usage_unreconciled": "Die Nutzung wird noch abgeglichen",
+      "child_binding": "Eine Verknüpfung mit einem Kind muss geprüft werden"
+    }
   }
 }

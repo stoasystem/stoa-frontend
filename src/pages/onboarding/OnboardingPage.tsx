@@ -42,7 +42,6 @@ export function OnboardingPage() {
           eyebrow={t('onboarding.eyebrow')}
           title={t('onboarding.title')}
           description={t('onboarding.description')}
-          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
             <Button asChild>
               <Link to="/support">{t('onboarding.needHelp')}</Link>

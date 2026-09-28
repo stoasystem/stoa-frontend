@@ -38,7 +38,17 @@ export interface ButtonProps
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : 'button'
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />
+    // The default variant is a filled button: marked so the one-filled-button-
+    // per-screen rule (Components board) can count it next to base `Button`.
+    const filled = (variant ?? 'default') === 'default'
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        data-emphasis={filled ? 'filled' : undefined}
+        ref={ref}
+        {...props}
+      />
+    )
   },
 )
 Button.displayName = 'Button'

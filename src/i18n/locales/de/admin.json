@@ -161,6 +161,11 @@
     "learningOperations": "Lernbetrieb",
     "learningOperationsDescription": "Signale, Abschlüsse und Datenbereitschaft nach Fach",
     "learningAutomation": "Lernautomatisierung",
-    "learningAutomationDescription": "Automatische Übungszuweisungen prüfen und ausführen"
+    "learningAutomationDescription": "Automatische Übungszuweisungen prüfen und ausführen",
+    "scope": {
+      "title": "Umfang der Verwaltung",
+      "covers": "Administratorinnen und Administratoren verwalten Konten unter «Benutzer» (Einladungen, Zuordnungen, Passwort-Zurücksetzungen, Sperren und Archivieren) und prüfen Bewerbungen von Lehrpersonen, den Lehrplan und die Moderation in eigenen Bereichen.",
+      "notYet": "Supportfälle werden hier noch nicht bearbeitet, und der Systemstatus folgt noch."
+    }
   }
 }

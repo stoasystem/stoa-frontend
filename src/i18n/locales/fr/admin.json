@@ -161,6 +161,11 @@
     "learningOperations": "Suivi de l’apprentissage",
     "learningOperationsDescription": "Signaux, achèvements et disponibilité des données par matière",
     "learningAutomation": "Automatisation de l’apprentissage",
-    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices"
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices",
+    "scope": {
+      "title": "Périmètre de l’administration",
+      "covers": "Les administrateurs gèrent les comptes sous « Utilisateurs » (invitations, attributions, réinitialisations de mot de passe, suspension et archivage) et examinent les candidatures d’enseignants, le programme et la modération dans leurs propres sections.",
+      "notYet": "Les demandes d’assistance ne sont pas encore traitées ici, et l’état du système reste à venir."
+    }
   }
 }

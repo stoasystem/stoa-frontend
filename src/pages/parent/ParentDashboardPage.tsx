@@ -66,19 +66,40 @@ function ChildRow({ child }: { child: ParentChild }) {
   )
 }
 
-/* The account and family: what the summary card used to say, as one row. */
+/*
+ * The account and family: what the summary card used to say, as one row --
+ * the account's state (ready, needs attention, blocked) and, when it is not
+ * ready, the first thing to fix. Billing codes are not named (card 007: billing
+ * is frozen and named nowhere a family can read).
+ */
+const ISSUE_KEYS = [
+  'parent_email_unverified',
+  'no_linked_children',
+  'child_email_unverified',
+  'usage_unreconciled',
+] as const
+
+function issueKey(code: string) {
+  if (code.startsWith('child_binding_')) return 'child_binding'
+  return (ISSUE_KEYS as readonly string[]).includes(code) ? code : null
+}
+
 function AccountRow() {
   const { t } = useTranslation('parent')
   const query = useParentAccountOperationsQuery()
-  const state = query.data?.supportState
-  const issues = (state?.blockers.length ?? 0) + (state?.warnings.length ?? 0)
-  const subtitle = query.isLoading
-    ? t('overview.accountLoading')
-    : query.isError
-      ? t('accountOps.loadFailed')
-      : issues > 0
-        ? t('overview.accountAttention', { count: issues })
-        : t('overview.accountReady')
+  const data = query.data
+  const state = data?.supportState
+  const codes = [...(state?.blockers ?? []), ...(state?.warnings ?? [])]
+  const firstKey = codes.map(issueKey).find((key) => key !== null)
+  const issue = firstKey ? t(`overview.issues.${firstKey}`) : t('overview.accountSeeDetails')
+  const count = Math.max(codes.length, 1)
+
+  let subtitle: string
+  if (query.isLoading) subtitle = t('overview.accountLoading')
+  else if (query.isError || !state) subtitle = t('accountOps.loadFailed')
+  else if (state.state === 'blocked') subtitle = t('overview.accountBlocked', { count, issue })
+  else if (state.state === 'attention' || codes.length > 0) subtitle = t('overview.accountAttention', { count, issue })
+  else subtitle = t('overview.accountReady', { count: data?.children.length ?? 0 })
 
   return (
     <Row
@@ -89,4 +110,3 @@ function AccountRow() {
     />
   )
 }
-

@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
-import { CalendarDays, FileText, UserRound } from 'lucide-react'
+// CalendarDays goes back into this import with the monthly report row below.
+import { FileText, UserRound } from 'lucide-react'
 import { Group, Row, Stats } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -10,8 +11,8 @@ import type { ParentChild } from '@/types/parent'
 
 /*
  * Parent board, Reports (#52): the figures under the title, then one grouped
- * list per child whose rows open that child's summary, weekly report and
- * monthly report.
+ * list per child whose rows open that child's summary and weekly report. The
+ * monthly report has no route yet, so it has no row.
  */
 export function ParentReportsPage() {
   const { t } = useTranslation('parent')
@@ -27,7 +28,8 @@ export function ParentReportsPage() {
           items={[
             { key: 'children', value: children.length, label: t('reports.children') },
             { key: 'weekly', value: t('reports.weeklyReportsValue'), label: t('reports.weeklyReports') },
-            { key: 'monthly', value: t('reports.monthlyTrendsValue'), label: t('reports.monthlyTrends') },
+            // Monthly trends come back with the monthly report's route (see ChildReports).
+            // { key: 'monthly', value: t('reports.monthlyTrendsValue'), label: t('reports.monthlyTrends') },
           ]}
         />
 
@@ -65,12 +67,16 @@ function ChildReports({ child }: { child: ParentChild }) {
         title={t('weeklyReport')}
         subtitle={t('reports.weeklyLinkDescription')}
       />
+      {/*
+        * The monthly report row comes back when /parent/children/:id/monthly-report
+        * is a registered route; until then it would open the 404 page (#78 review).
       <Row
         to={`/parent/children/${child.id}/monthly-report`}
         leading={{ kind: 'icon', icon: CalendarDays }}
         title={t('monthlyReport')}
         subtitle={t('reports.monthlyLinkDescription')}
       />
+      */}
     </Group>
   )
 }

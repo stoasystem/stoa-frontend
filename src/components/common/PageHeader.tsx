@@ -7,8 +7,6 @@ type PageHeaderProps = {
   actions?: ReactNode
   eyebrow?: string
   className?: string
-  titleClassName?: string
-  eyebrowClassName?: string
 }
 
 /*
@@ -17,7 +15,8 @@ type PageHeaderProps = {
  * page's actions on the right, bottom-aligned with it. An eyebrow, where a
  * page still has one, is a group header above the title (13 / 500, caps).
  * Every page built before the redesign takes its title from here, so this
- * restyles their headers in one place.
+ * restyles their headers in one place -- the public pages (support, terms,
+ * privacy, onboarding) included, so the title takes no per-page classes.
  */
 export function PageHeader({
   title,
@@ -25,22 +24,20 @@ export function PageHeader({
   actions,
   eyebrow,
   className,
-  titleClassName,
-  eyebrowClassName,
 }: PageHeaderProps) {
   return (
     <header className={cn('flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between', className)}>
       <div className="min-w-0">
         {eyebrow && (
           <p
-            className={cn('m-0 mb-1 text-caption uppercase', eyebrowClassName)}
+            className="m-0 mb-1 text-caption uppercase"
             style={{ font: 'var(--t-section)', letterSpacing: 'var(--t-section-tracking)' }}
           >
             {eyebrow}
           </p>
         )}
         <h1
-          className={cn('m-0 break-words text-ink', titleClassName)}
+          className="m-0 break-words text-ink"
           style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}
         >
           {title}

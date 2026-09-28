@@ -160,8 +160,19 @@
     "more": "More",
     "account": "Account and family",
     "accountLoading": "Checking the account…",
-    "accountReady": "Linked children and contact details",
-    "accountAttention_one": "{{count}} item needs attention",
-    "accountAttention_other": "{{count}} items need attention"
+    "accountReady_one": "Ready · {{count}} linked child",
+    "accountReady_other": "Ready · {{count}} linked children",
+    "accountAttention_one": "Needs attention: {{issue}}",
+    "accountAttention_other": "Needs attention ({{count}} items): {{issue}}",
+    "accountBlocked_one": "Blocked: {{issue}}",
+    "accountBlocked_other": "Blocked ({{count}} items): {{issue}}",
+    "accountSeeDetails": "Open for details",
+    "issues": {
+      "parent_email_unverified": "Parent email needs verification",
+      "no_linked_children": "No linked child account",
+      "child_email_unverified": "A child account email is not verified",
+      "usage_unreconciled": "Usage is still being reconciled",
+      "child_binding": "A child link needs review"
+    }
   }
 }

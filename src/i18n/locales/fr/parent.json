@@ -160,8 +160,19 @@
     "more": "Plus",
     "account": "Compte et famille",
     "accountLoading": "Vérification du compte…",
-    "accountReady": "Enfants liés et coordonnées",
-    "accountAttention_one": "{{count}} point demande votre attention",
-    "accountAttention_other": "{{count}} points demandent votre attention"
+    "accountReady_one": "Prêt · {{count}} enfant lié",
+    "accountReady_other": "Prêt · {{count}} enfants liés",
+    "accountAttention_one": "À vérifier : {{issue}}",
+    "accountAttention_other": "À vérifier ({{count}} points) : {{issue}}",
+    "accountBlocked_one": "Bloqué : {{issue}}",
+    "accountBlocked_other": "Bloqué ({{count}} points) : {{issue}}",
+    "accountSeeDetails": "Ouvrir pour les détails",
+    "issues": {
+      "parent_email_unverified": "L’e-mail du parent n’est pas encore vérifié",
+      "no_linked_children": "Aucun compte enfant lié",
+      "child_email_unverified": "L’e-mail d’un compte enfant n’est pas vérifié",
+      "usage_unreconciled": "L’utilisation est en cours de rapprochement",
+      "child_binding": "Un lien avec un enfant est à vérifier"
+    }
   }
 }

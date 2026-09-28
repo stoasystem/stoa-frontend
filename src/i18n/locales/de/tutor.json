@@ -80,6 +80,8 @@
     },
     "more": "Mehr",
     "learningAutomation": "Lernautomatisierung",
-    "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen"
+    "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
+    "firstAction": "Erste Aktion der Lehrperson: {{time}}",
+    "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
   }
 }

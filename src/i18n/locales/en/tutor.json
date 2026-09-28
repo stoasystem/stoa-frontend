@@ -80,6 +80,8 @@
     },
     "more": "More",
     "learningAutomation": "Learning automation",
-    "learningAutomationDescription": "Preview and run automatic practice assignments for your students"
+    "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
+    "firstAction": "First tutor action: {{time}}",
+    "firstActionNone": "First tutor action: not recorded yet"
   }
 }

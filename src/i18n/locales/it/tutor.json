@@ -80,6 +80,8 @@
     },
     "more": "Altro",
     "learningAutomation": "Automazione dell’apprendimento",
-    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti"
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
+    "firstAction": "Prima azione del docente: {{time}}",
+    "firstActionNone": "Prima azione del docente: non ancora registrata"
   }
 }

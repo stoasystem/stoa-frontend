@@ -161,6 +161,11 @@
     "learningOperations": "Gestione dell’apprendimento",
     "learningOperationsDescription": "Segnali, completamenti e disponibilità dei dati per materia",
     "learningAutomation": "Automazione dell’apprendimento",
-    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi"
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi",
+    "scope": {
+      "title": "Ambito dell’amministrazione",
+      "covers": "Gli amministratori gestiscono gli account in «Utenti» (inviti, assegnazioni, reimpostazioni della password, sospensione e archiviazione) ed esaminano le candidature dei docenti, il programma e la moderazione nelle rispettive sezioni.",
+      "notYet": "Le richieste di assistenza non sono ancora gestite qui e lo stato del sistema arriverà in seguito."
+    }
   }
 }

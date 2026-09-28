@@ -160,8 +160,19 @@
     "more": "Altro",
     "account": "Account e famiglia",
     "accountLoading": "Verifica dell’account…",
-    "accountReady": "Figli collegati e dati di contatto",
-    "accountAttention_one": "{{count}} elemento richiede attenzione",
-    "accountAttention_other": "{{count}} elementi richiedono attenzione"
+    "accountReady_one": "Pronto · {{count}} figlio collegato",
+    "accountReady_other": "Pronto · {{count}} figli collegati",
+    "accountAttention_one": "Da verificare: {{issue}}",
+    "accountAttention_other": "Da verificare ({{count}} elementi): {{issue}}",
+    "accountBlocked_one": "Bloccato: {{issue}}",
+    "accountBlocked_other": "Bloccato ({{count}} elementi): {{issue}}",
+    "accountSeeDetails": "Apri per i dettagli",
+    "issues": {
+      "parent_email_unverified": "L’e-mail del genitore non è ancora verificata",
+      "no_linked_children": "Nessun account figlio collegato",
+      "child_email_unverified": "L’e-mail di un account figlio non è verificata",
+      "usage_unreconciled": "L’utilizzo è ancora in fase di riconciliazione",
+      "child_binding": "Un collegamento con un figlio va verificato"
+    }
   }
 }

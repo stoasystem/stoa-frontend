@@ -80,6 +80,8 @@
     },
     "more": "Plus",
     "learningAutomation": "Automatisation de l’apprentissage",
-    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves"
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves",
+    "firstAction": "Première action de l’enseignant : {{time}}",
+    "firstActionNone": "Première action de l’enseignant : pas encore enregistrée"
   }
 }

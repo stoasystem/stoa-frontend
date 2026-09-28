@@ -22,7 +22,9 @@ export function TutorRequestFilters({
 
   return (
     // Five segments do not fit every phone in every language: the track scrolls.
-    <div className="-mx-1 max-w-full overflow-x-auto px-1">
+    // The scroller clips on both axes, so it keeps room for the focus ring
+    // (2 + 2 px) on every side and gives it back with a negative margin.
+    <div className="-m-1 max-w-full overflow-x-auto p-1">
       <SegmentedFilter className="w-max" options={options} value={value} onChange={onChange} label={t('requests.filterLabel')} />
     </div>
   )
