@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import { Avatar } from '@/components/base/Avatar'
+import { Button } from '@/components/base/Button'
 import { Group, Row } from '@/components/base/Group'
 import { ICON, ROW } from '@/components/base/sizes'
 import { PASSWORD_SECTION_ID } from '@/components/shell/accountMenuTargets'
@@ -90,6 +91,13 @@ function PasswordGroup() {
           {t(passwordChangeStatusKey(flow), { email: flow.maskedRecipient })}
         </p>
         <PasswordChangeFields flow={flow} idPrefix="me-password" />
+        {flow.step === 'done' && (
+          <div>
+            <Button variant="plain" onClick={flow.reset}>
+              {t('common:me.password.again')}
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   )

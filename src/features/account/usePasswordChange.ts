@@ -86,6 +86,19 @@ export function usePasswordChange() {
     setStep('verifyCurrent')
   }
 
+  /** Back to an empty first step, for another change on the same page. */
+  function reset() {
+    setStep('verifyCurrent')
+    setCurrentPassword('')
+    setCode('')
+    setPassword('')
+    setConfirmPassword('')
+    setMaskedRecipient('')
+    setFormError(null)
+    requestMutation.reset()
+    confirmMutation.reset()
+  }
+
   const activeError = step === 'enterCode' ? confirmMutation.error : requestMutation.error
   const errorCode = activeError instanceof ApiError ? activeError.code : undefined
   const errorText = activeError
@@ -115,6 +128,7 @@ export function usePasswordChange() {
     submitCurrent,
     submitNew,
     requestNewCode,
+    reset,
   }
 }
 

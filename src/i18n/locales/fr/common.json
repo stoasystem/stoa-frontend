@@ -260,7 +260,8 @@
       }
     },
     "password": {
-      "heading": "Mot de passe"
+      "heading": "Mot de passe",
+      "again": "Le modifier encore"
     }
   }
 }

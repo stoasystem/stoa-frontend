@@ -260,7 +260,8 @@
       }
     },
     "password": {
-      "heading": "Passwort"
+      "heading": "Passwort",
+      "again": "Noch einmal ändern"
     }
   }
 }

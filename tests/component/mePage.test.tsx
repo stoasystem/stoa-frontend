@@ -193,6 +193,27 @@ describe('changing the password on /me', () => {
     expect(pathname).toBe('/me')
   })
 
+  it('offers another change after one went through, starting from empty fields', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+    await completeChange(user, 'Old!Pass123')
+
+    await user.click(screen.getByRole('button', { name: enCommon.me.password.again }))
+
+    const current = await screen.findByLabelText(copy.currentPasswordLabel)
+    expect(current).toHaveValue('')
+    expect(screen.queryByText(copy.successBody)).toBeNull()
+    expect(screen.getByText(copy.body)).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+    expect(pathname).toBe('/me')
+
+    // And the second change is a full one: current password again, a new code.
+    await completeChange(user, 'New!Pass123')
+    expect(seen.request).toEqual([{ currentPassword: 'Old!Pass123' }, { currentPassword: 'New!Pass123' }])
+    expect(seen.confirm).toHaveLength(2)
+  })
+
   it('says so when the current password is wrong, and asks for no code', async () => {
     const user = userEvent.setup()
     backend({
