@@ -9,7 +9,8 @@
 // Exit 2: the inputs cannot be rated, or the theme mapping cannot be trusted
 //         (missing token, unreadable value, bad JSON, nested rule, a block the
 //         pairs use that no theme reads, two themes on the same blocks, a
-//         theme with no gated pair).
+//         theme with no gated pair, a rated token defined in any source file
+//         other than the token file).
 //
 // The token source is data, not code: "tokens.file" and "tokens.themes" in the
 // pairs file say which CSS file and which of its blocks each theme reads, so
@@ -18,8 +19,8 @@
 // It rates token definitions only. It cannot see colours written inline in
 // JSX, or layers composited at render time other than a declared "over".
 
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { readdirSync, readFileSync, statSync } from 'node:fs';
+import { dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -250,6 +251,75 @@ function checkUnreadBlocks(tokens, blocks, used) {
   }
 }
 
+// The token file is the only place a rated token may be defined. Any other
+// stylesheet the app loads (legacy-bridge.css, a page's own CSS, an inline
+// style) that declares one would override it on screen while the gate went on
+// rating the token file's value. So every source under src/ and the entry HTML
+// is read for a declaration of a token the pairs use, directly or through
+// their var() chains: a CSS declaration `--x:`, a Tailwind arbitrary property
+// `[--x:`, an object key `'--x':` or `['--x' as string]:`, or `setProperty('--x'`.
+const SCANNED_ROOTS = ['src', 'index.html'];
+const SCANNED_EXTENSIONS = new Set(['.css', '.ts', '.tsx', '.html']);
+
+function sourceFiles(path) {
+  const absolute = resolve(ROOT, path);
+  let stat;
+  try {
+    stat = statSync(absolute);
+  } catch {
+    return [];
+  }
+  if (stat.isFile()) return SCANNED_EXTENSIONS.has(extname(absolute)) ? [absolute] : [];
+  return readdirSync(absolute).flatMap((entry) => sourceFiles(relative(ROOT, join(absolute, entry))));
+}
+
+const escapeRegExp = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function findForeignDefinitions(source, extension, tokens) {
+  const text =
+    extension === '.css'
+      ? source.replace(/\/\*[\s\S]*?\*\//g, '')
+      : extension === '.html'
+        ? source.replace(/<!--[\s\S]*?-->/g, '')
+        : source;
+  const found = [];
+  for (const token of tokens) {
+    const name = escapeRegExp(token);
+    const patterns = [
+      new RegExp(`\\[${name}\\s*:`),
+      new RegExp(`['"\`]${name}['"\`]\\s*:`),
+      new RegExp(`setProperty\\(\\s*['"\`]${name}['"\`]`),
+      new RegExp(`\\[\\s*['"\`]${name}['"\`][^\\]\\n]*\\]\\s*:`),
+    ];
+    if (extension === '.css' || extension === '.html') {
+      patterns.push(new RegExp(`(^|[\\s;{])${name}\\s*:`, 'm'));
+    }
+    const hit = patterns.find((pattern) => pattern.test(text));
+    if (hit) {
+      const index = text.search(hit);
+      found.push({ token, line: text.slice(0, index).split('\n').length });
+    }
+  }
+  return found;
+}
+
+function checkForeignDefinitions(tokens, used) {
+  const tokenFile = resolve(ROOT, tokens.file);
+  const offences = [];
+  for (const file of SCANNED_ROOTS.flatMap(sourceFiles)) {
+    if (file === tokenFile) continue;
+    const source = readFileSync(file, 'utf8');
+    for (const { token, line } of findForeignDefinitions(source, extname(file), used)) {
+      offences.push(`${relative(ROOT, file)}:${line} defines ${token}`);
+    }
+  }
+  if (offences.length) {
+    throw new InputError(
+      `a rated token is defined outside ${tokens.file}, so the screen would not show the value the gate rates:\n  ${offences.join('\n  ')}`,
+    );
+  }
+}
+
 function ratePair(themes, pair) {
   const theme = themes.get(pair.theme);
   const fg = resolveToken(theme, pair.fg);
@@ -274,7 +344,9 @@ function main() {
   checkUnreadBlocks(tokens, blocks, new Set(pairs.flatMap((p) => [p.fg, p.bg, p.over].filter(Boolean))));
   const rows = pairs.map((pair) => ratePair(themes, pair));
   // Again with every token the var() chains passed through.
-  checkUnreadBlocks(tokens, blocks, new Set(rows.flatMap((r) => r.chains)));
+  const chained = new Set(rows.flatMap((r) => r.chains));
+  checkUnreadBlocks(tokens, blocks, chained);
+  checkForeignDefinitions(tokens, chained);
 
   const result = (r) => {
     if (r.gated) return r.ok ? 'ok' : 'FAIL';
