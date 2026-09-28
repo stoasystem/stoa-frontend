@@ -56,6 +56,11 @@ jobs:
       - name: Translation guard
         run: npm run check:untranslated
 
+      # Rates the token pairs in scripts/contrast-pairs.json against the token
+      # file it names (#17). Reads two repo files; no network, no secrets.
+      - name: Contrast guard
+        run: npm run check:contrast
+
       - name: Unit tests
         run: npm test
 
