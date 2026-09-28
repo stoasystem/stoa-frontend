@@ -18,12 +18,12 @@ export async function getAdminNotifications() {
 }
 
 export async function markNotificationRead(eventId: string) {
-  const response = await httpClient.post<NotificationEvent>(`/notifications/${eventId}/read`)
+  const response = await httpClient.post<NotificationEvent>(`/notifications/${encodeURIComponent(eventId)}/read`)
   return response.data
 }
 
 export async function archiveNotification(eventId: string) {
-  const response = await httpClient.post<NotificationEvent>(`/notifications/${eventId}/archive`)
+  const response = await httpClient.post<NotificationEvent>(`/notifications/${encodeURIComponent(eventId)}/archive`)
   return response.data
 }
 

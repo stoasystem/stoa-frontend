@@ -46,8 +46,15 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
 
 /** The page a notification opens for `role`, or null when it has none. */
 export function notificationTargetPath(event: Target, role: UserRole): string | null {
-  const targets = NOTIFICATION_TARGETS[navAreaForRole(role)]
+  const has = (object: object, key: string) => Object.prototype.hasOwnProperty.call(object, key)
+  const area = navAreaForRole(role)
+  // The payload is the backend's and the role the store's: neither is trusted
+  // to have the declared type. Anything off is no target, never a throw that
+  // would take the bell down with it.
+  if (!has(NOTIFICATION_TARGETS, area)) return null
+  const targets = NOTIFICATION_TARGETS[area]
+  const { targetType, targetId } = event as { targetType: unknown; targetId: unknown }
   // Own keys only: a `targetType` of "constructor" must not reach Object's.
-  if (!Object.prototype.hasOwnProperty.call(targets, event.targetType)) return null
-  return targets[event.targetType](event.targetId)
+  if (typeof targetType !== 'string' || !has(targets, targetType)) return null
+  return targets[targetType](typeof targetId === 'string' ? targetId : '')
 }

@@ -424,8 +424,9 @@ export const pageRoutes: readonly PageRoute[] = [
 const CONVERSATION_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/
 
 /** `/ask`, or `/ask/<id>` when the old link named a conversation. */
-export function askPathFor(conversationId: string | null | undefined): string {
-  const id = conversationId?.trim() ?? ''
+export function askPathFor(conversationId: unknown): string {
+  // Anything but a string (a number, an object from a malformed payload) is no id.
+  const id = typeof conversationId === 'string' ? conversationId.trim() : ''
   return CONVERSATION_ID.test(id) ? `${ASK_PATH}/${id}` : ASK_PATH
 }
 

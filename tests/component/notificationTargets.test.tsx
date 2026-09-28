@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter, matchPath, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { isAdmitted } from '@/app/router/AppRoutes'
-import { navAreaForRole, pageRoutes } from '@/app/router/routeManifest'
+import { askPathFor, navAreaForRole, pageRoutes } from '@/app/router/routeManifest'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { NOTIFICATION_TARGETS, notificationTargetPath } from '@/components/notifications/notificationTargets'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -189,8 +189,57 @@ describe('every notification target', () => {
     expect(notificationTargetPath({ targetType: 'toString', targetId: 'x' }, 'admin')).toBeNull()
   })
 
-  it('keeps a conversation id that is not an id out of the address', () => {
-    expect(notificationTargetPath({ targetType: 'conversation', targetId: '..' }, 'student')).toBe('/ask')
-    expect(notificationTargetPath({ targetType: 'conversation', targetId: 'a/b' }, 'student')).toBe('/ask')
+  it.each([
+    '..',
+    '../admin',
+    '%2e%2e',
+    'a/b',
+    'a%2Fb',
+    '//evil.com',
+    '/\\evil.com',
+    'c-1?x=1',
+    'c-1#x',
+    'javascript:alert(1)',
+    'c-1/..',
+    'x'.repeat(200),
+  ])('keeps a conversation id that is not an id (%s) out of the address', (targetId) => {
+    expect(notificationTargetPath({ targetType: 'conversation', targetId }, 'student')).toBe('/ask')
+  })
+
+  it('trims a conversation id the backend padded', () => {
+    expect(notificationTargetPath({ targetType: 'conversation', targetId: ' c-1 ' }, 'student')).toBe('/ask/c-1')
+  })
+
+  // The payload is not trusted to match its type: a malformed field is no
+  // target, never a throw during the bell's render.
+  it.each([123, null, undefined, { a: 1 }])('treats a conversation id of %s as no id', (targetId) => {
+    const malformed = { targetType: 'conversation', targetId } as unknown as NotificationEvent
+    expect(notificationTargetPath(malformed, 'student')).toBe('/ask')
+  })
+
+  it.each([null, 7, '__proto__', 'hasOwnProperty'])('gives a target type of %s no target', (targetType) => {
+    const malformed = { targetType, targetId: 'c-1' } as unknown as NotificationEvent
+    for (const role of ALL_ROLES) expect(notificationTargetPath(malformed, role)).toBeNull()
+  })
+
+  it.each([123, null, undefined, { a: 1 }, ['c-1']])('lets askPathFor itself take %s without throwing', (id) => {
+    expect(askPathFor(id)).toBe('/ask')
+  })
+
+  it('gives a role it does not know no target', () => {
+    expect(notificationTargetPath({ targetType: 'conversation', targetId: 'c-1' }, 'superuser' as UserRole)).toBeNull()
+  })
+})
+
+describe('a malformed notification in the bell', () => {
+  it('renders, and opens Ask, when its conversation id is not a string', async () => {
+    renderBell('student', [
+      { ...event({ targetType: 'conversation', title: 'Teacher joined' }), targetId: 123 } as unknown as NotificationEvent,
+    ])
+    await openBell()
+
+    await userEvent.click(screen.getByRole('button', { name: /Teacher joined/ }))
+
+    expect(pathname).toBe('/ask')
   })
 })
