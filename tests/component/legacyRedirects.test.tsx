@@ -5,6 +5,7 @@
  * its test red instead of taking the test with it.
  */
 import { describe, expect, it, vi } from 'vitest'
+import { mapPathForLegacyPlanet } from '@/app/router/routeManifest'
 import { openAs } from './routeHarness'
 
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
@@ -47,14 +48,38 @@ describe('legacy student routes redirect to the star map routes', () => {
   })
 })
 
-describe('an old /planet link keeps its query and its segments safe', () => {
+describe('an old /planet link cannot leave /map (decoded once, plain ids only)', () => {
+  it.each([
+    ['/planet/..', '/'],
+    ['/planet/math/..', '/'],
+    ['/planet/%2e%2e', '/'],
+    ['/planet/math/%2E%2E/u-1', '/'],
+    ['/planet/%252e%252e', '/'],
+    ['/planet/a%2Fb', '/'],
+    ['/planet/math/a%2fb', '/'],
+    ['/planet/%5C', '/'],
+    ['/planet/math/%5Cfoo', '/'],
+    ['/planet/math/%E0%A4%A', '/'],
+    ['/planet/math/fractions/u-1/x', '/'],
+    ['/planet', '/'],
+    ['/planetarium/x', '/'],
+    ['/planet/math', '/map/math'],
+    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1'],
+    ['/planet/math/u.1', '/map/math/u.1'],
+  ])('%s -> %s', (from, to) => {
+    expect(mapPathForLegacyPlanet(from)).toBe(to)
+  })
+
+  it.each(['/planet/%2e%2e', '/planet/%252e%252e', '/planet/a%2Fb', '/planet/%5C'])('the router sends %s home', (from) => {
+    expect(openAs('student', from)).toMatchObject({ pathname: '/', page: 'MapHomePage' })
+  })
+})
+
+describe('an old /planet link keeps its query', () => {
   it('carries the query string to /map', () => {
     expect(openAs('student', '/planet/math?points=500')).toMatchObject({ pathname: '/map/math', search: '?points=500', page: 'MapSubjectPage' })
   })
 
-  it('re-encodes a segment rather than passing it through raw', () => {
-    expect(openAs('student', '/planet/math/a%20b')).toMatchObject({ pathname: '/map/math/a%20b', page: 'MapNebulaPage' })
-  })
 })
 
 describe('a /chat link that names a conversation opens it in Ask', () => {

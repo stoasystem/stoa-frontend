@@ -92,6 +92,8 @@ export type PageRoute = {
 export type LegacyRedirectInput = {
   params: Readonly<Record<string, string | undefined>>
   search: URLSearchParams
+  /** The old address as it arrived, still percent-encoded. */
+  pathname?: string
 }
 
 export type LegacyRedirect = {
@@ -441,22 +443,34 @@ const toAsk = ({ params, search }: LegacyRedirectInput) =>
 
 /*
  * `/planet/...` became `/map/...` when the planet became a star map (#72
- * point 8). The same segments carry over; anything that is not a plain
- * segment, or more of them than a star's address has, lands on the home map.
+ * point 8). The same segments carry over, read from the address as it
+ * arrived (still percent-encoded) and decoded exactly once. A segment that
+ * is not a plain id after that one decoding -- `.`, `..`, anything with a
+ * `/`, `\` or `%` in it (a double-encoded `%252e%252e` decodes to `%2e%2e`) --
+ * or more segments than a star's address has, lands on the home map.
  */
-const toMap = ({ params }: LegacyRedirectInput) => {
-  const segments = (params['*'] ?? '').split('/').filter(Boolean)
-  if (segments.length === 0 || segments.length > 3 || segments.some((s) => s === '.' || s === '..')) return '/'
-  return `/map/${segments.map((segment) => encodeURIComponent(decodeSegment(segment))).join('/')}`
+const MAP_SEGMENT = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,127}$/
+
+export function mapPathForLegacyPlanet(pathname: string | undefined): string {
+  const match = /^\/planet(\/.*)?$/.exec(pathname ?? '')
+  if (!match) return '/'
+  const raw = (match[1] ?? '').split('/').filter((segment) => segment !== '')
+  if (raw.length === 0 || raw.length > 3) return '/'
+  const decoded: string[] = []
+  for (const segment of raw) {
+    let value: string
+    try {
+      value = decodeURIComponent(segment)
+    } catch {
+      return '/'
+    }
+    if (!MAP_SEGMENT.test(value)) return '/'
+    decoded.push(value)
+  }
+  return `/map/${decoded.map(encodeURIComponent).join('/')}`
 }
 
-function decodeSegment(segment: string): string {
-  try {
-    return decodeURIComponent(segment)
-  } catch {
-    return segment
-  }
-}
+const toMap = ({ pathname }: LegacyRedirectInput) => mapPathForLegacyPlanet(pathname)
 
 export const legacyRedirects: readonly LegacyRedirect[] = [
   { from: '/planet/*', to: toMap, access: STUDENT, carryContext: true, decision: '#72 §8' },
