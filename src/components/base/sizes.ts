@@ -89,6 +89,9 @@ export const SEARCH_FIELD = {
   fontSize: 15,
 } as const
 
+/** Text field: the page search field's measure (38, radius 10, 12 inside, text 15), as a fill. */
+export const TEXT_FIELD = { height: 38, radius: 10, paddingX: 12, fontSize: 15 } as const
+
 /** List rows: 52; 48 in settings; 56 with a subtitle; 60-64 with an avatar. */
 export const ROW = {
   settings: 48,

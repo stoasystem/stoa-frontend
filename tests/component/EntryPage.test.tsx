@@ -20,7 +20,7 @@ vi.mock('@/components/auth/LoginForm', () => ({
 import { useAuthStore } from '@/store/authStore'
 import { EntryPage } from '@/pages/entry/EntryPage'
 
-// Since #45 the root is the student's planet, and the router shows EntryPage
+// Since #45 the root is the student's star map, and the router shows EntryPage
 // there only to a visitor who is not a student (routeGuards.test.tsx). The
 // entry page itself is exercised at /login, where it always renders.
 function renderAt() {

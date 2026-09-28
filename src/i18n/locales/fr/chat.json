@@ -120,10 +120,7 @@
   },
   "tutorEscalation": {
     "requestedTitle": "Aide d’un tuteur demandée",
-    "requestedBody": "Un tuteur rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant.",
-    "joinedTitle": "Le tuteur a rejoint",
-    "joinedBody": "L’assistant d’apprentissage observe pendant que ton tuteur t’aide. Lance une classe en direct s’il te faut un accompagnement plus poussé.",
-    "confirmJoined": "Le tuteur a rejoint"
+    "requestedBody": "Un tuteur rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant."
   },
   "contextLines": {
     "uploadSource": "Source du téléversement : {{title}}",
@@ -146,5 +143,78 @@
     "similar": "Donne-moi un exercice similaire",
     "why": "Pourquoi est-ce que cela marche ?"
   },
-  "duplicateReopened": "Tu as déjà posé cette question. Voici la conversation correspondante."
+  "duplicateReopened": "Tu as déjà posé cette question. Voici la conversation correspondante.",
+  "ask": {
+    "title": "Question",
+    "close": "Fermer",
+    "back": "Toutes les conversations",
+    "listSubtitle": "Tes conversations",
+    "composerLabel": "Ta question",
+    "placeholder": "Message…",
+    "dockedPlaceholder": "Pose une question sur tout ce qui est sur la planète…",
+    "dockedPlaceholderPhone": "Demande ce que tu veux…",
+    "grabber": "Glisse vers le bas pour fermer",
+    "list": {
+      "label": "Conversations",
+      "loading": "Chargement de tes conversations…",
+      "failed": "Tes conversations n’ont pas pu être chargées.",
+      "retry": "Réessayer",
+      "untitled": "Nouvelle conversation"
+    },
+    "empty": {
+      "title": "Demande ce que tu veux",
+      "suggestionsLabel": "Questions suggérées",
+      "point": "Explique-moi {{point}}",
+      "check": "Comment vérifier ma réponse moi-même ?",
+      "practice": "Donne-moi un exercice"
+    },
+    "thread": {
+      "label": "Messages",
+      "loading": "Chargement de la conversation…",
+      "failed": "Cette conversation n’a pas pu être chargée.",
+      "retry": "Réessayer",
+      "you": "Toi",
+      "assistant": "Assistant STOA",
+      "teacherFallback": "Enseignant",
+      "thinking": "Réflexion…",
+      "notSent": "Non envoyé",
+      "sendAgain": "Renvoyer",
+      "stopped": "Arrêté",
+      "stop": "Arrêter",
+      "starting": "La conversation démarre…",
+      "startFailed": "La conversation n’a pas pu démarrer. Réessaie."
+    },
+    "presence": {
+      "online_one": "{{count}} enseignant en ligne",
+      "online_other": "{{count}} enseignants en ligne",
+      "offline": "Aucun enseignant en ligne"
+    },
+    "help": {
+      "request": "Demander à un enseignant",
+      "requesting": "Demande en cours…",
+      "offline": "Aucun enseignant n’est en ligne pour le moment. À son retour, il répondra ici.",
+      "cardLabel": "Aide d’un enseignant",
+      "status": {
+        "pending": "En attente",
+        "assigned": "Attribuée",
+        "in_progress": "En cours",
+        "resolved": "Terminée",
+        "cancelled": "Annulée"
+      },
+      "title": {
+        "pending": "Aide d’un enseignant demandée",
+        "assigned": "{{name}} va rejoindre cette conversation",
+        "in_progress": "{{name}} t’aide",
+        "resolved": "L’aide de l’enseignant est terminée",
+        "cancelled": "La demande a été annulée"
+      },
+      "body": {
+        "pending": "Un enseignant répondra dans cette conversation. Continue en attendant.",
+        "assigned": "Sa réponse apparaîtra dans cette conversation.",
+        "in_progress": "Ses réponses apparaissent dans cette conversation.",
+        "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
+        "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse."
+      }
+    }
+  }
 }

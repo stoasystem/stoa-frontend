@@ -13,14 +13,13 @@ import { openAs, type Viewer } from './routeHarness'
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
 const STUDENT_ROUTES = [
-  ['/planet/math', 'PlanetSubjectPage'],
-  ['/planet/math/fractions', 'PlanetTopicPage'],
-  ['/planet/math/fractions/u-1', 'PlanetUnitPage'],
+  ['/map/math', 'MapSubjectPage'],
+  ['/map/math/fractions', 'MapNebulaPage'],
+  ['/map/math/fractions/u-1', 'MapStarPage'],
   ['/chapter/u-1', 'ChapterPage'],
   ['/chapter/u-1/l-1', 'LessonStagePage'],
   ['/ask', 'AskPage'],
   ['/ask/c-1', 'AskPage'],
-  ['/me', 'MePage'],
   ['/assignments', 'StudentAssignmentsPage'],
 ] as const
 
@@ -69,12 +68,51 @@ describe('student routes', () => {
   })
 })
 
-describe('/ is the planet for a student and the front door for everyone else', () => {
-  it('shows a student the planet', () => {
-    expect(openAs('student', '/')).toMatchObject({ pathname: '/', page: 'PlanetHomePage' })
+// The account page (#46): a student's, and the profile page of administrators
+// and the organisation roles. Teachers and parents keep their own.
+describe('/me', () => {
+  it.each(['student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer'] as const)(
+    'opens for a %s',
+    (viewer) => {
+      expect(openAs(viewer, '/me')).toMatchObject({ pathname: '/me', page: 'MePage' })
+    },
+  )
+
+  it.each(['parent', 'teacher'] as const)('refuses a %s', (viewer) => {
+    expect(openAs(viewer, '/me')).toMatchObject({ pathname: '/forbidden', page: 'ForbiddenPage' })
   })
 
-  it.each(['anonymous', ...OTHER_ROLES] as Viewer[])('shows %s the entry page, not the planet', (viewer) => {
+  it('sends a signed-out visitor to sign in, remembering /me', () => {
+    const landed = openAs('anonymous', '/me')
+    expect(landed).toMatchObject({ pathname: '/login', page: 'EntryPage' })
+    expect(landed.state).toMatchObject({ from: { pathname: '/me' } })
+  })
+
+  it.each(['student', 'admin'] as const)('sends a reset %s from /me to the password change', (viewer) => {
+    expect(openAs(viewer, '/me', { mustChangePassword: true })).toMatchObject({
+      pathname: '/settings/password',
+      page: 'ChangePasswordPage',
+    })
+  })
+
+  it('keeps a reset student on the password change instead of forwarding it to /me', () => {
+    expect(openAs('student', '/settings/password', { mustChangePassword: true })).toMatchObject({
+      pathname: '/settings/password',
+      page: 'ChangePasswordPage',
+    })
+  })
+
+  it('forwards a student who was not reset from /settings/password to /me', () => {
+    expect(openAs('student', '/settings/password')).toMatchObject({ pathname: '/me', page: 'MePage' })
+  })
+})
+
+describe('/ is the star map for a student and the front door for everyone else', () => {
+  it('shows a student the star map', () => {
+    expect(openAs('student', '/')).toMatchObject({ pathname: '/', page: 'MapHomePage' })
+  })
+
+  it.each(['anonymous', ...OTHER_ROLES] as Viewer[])('shows %s the entry page, not the star map', (viewer) => {
     // EntryPage signs the visitor in, or sends them to their own home.
     expect(openAs(viewer, '/')).toMatchObject({ pathname: '/', page: 'EntryPage' })
   })

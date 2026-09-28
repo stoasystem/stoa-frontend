@@ -81,7 +81,7 @@ export type PageRoute = {
   demoSurface?: boolean
   /**
    * Shown instead of refusing a visitor the guard would turn away. Only `/`
-   * uses it: it is the student's planet, and the sign-in page (or the way to
+   * uses it: it is the student's star map, and the sign-in page (or the way to
    * one's own home) for everybody else.
    */
   refusedPage?: LazyPage
@@ -92,6 +92,8 @@ export type PageRoute = {
 export type LegacyRedirectInput = {
   params: Readonly<Record<string, string | undefined>>
   search: URLSearchParams
+  /** The old address as it arrived, still percent-encoded. */
+  pathname?: string
 }
 
 export type LegacyRedirect = {
@@ -146,6 +148,7 @@ const PARENT = only('parent')
 const TEACHER = only('teacher')
 const ADMIN = only('admin')
 const ORGANIZATION = only('admin', 'organization_admin', 'school_teacher', 'school_viewer')
+const ME_ACCESS = only('student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer')
 
 // ---------------------------------------------------------------------------
 // Pages
@@ -164,11 +167,11 @@ const UnauthorizedPage = lazyPage('UnauthorizedPage', () => import('@/pages/erro
 const ForbiddenPage = lazyPage('ForbiddenPage', () => import('@/pages/error/ForbiddenPage'))
 const NotFoundPage = lazyPage('NotFoundPage', () => import('@/pages/not-found/NotFoundPage'))
 
-// Student: the planet redesign (#13). Placeholders until their slices land.
-const PlanetHomePage = lazyPage('PlanetHomePage', () => import('@/pages/planet/PlanetPages'))
-const PlanetSubjectPage = lazyPage('PlanetSubjectPage', () => import('@/pages/planet/PlanetPages'))
-const PlanetTopicPage = lazyPage('PlanetTopicPage', () => import('@/pages/planet/PlanetPages'))
-const PlanetUnitPage = lazyPage('PlanetUnitPage', () => import('@/pages/planet/PlanetPages'))
+// Student: the planet redesign (#13), whose map is a star map since #72.
+const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages'))
+const MapSubjectPage = lazyPage('MapSubjectPage', () => import('@/pages/map/MapPages'))
+const MapNebulaPage = lazyPage('MapNebulaPage', () => import('@/pages/map/MapPages'))
+const MapStarPage = lazyPage('MapStarPage', () => import('@/pages/map/MapPages'))
 const ChapterPage = lazyPage('ChapterPage', () => import('@/pages/chapter/ChapterPages'))
 const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapter/ChapterPages'))
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
@@ -255,10 +258,10 @@ export const pageRoutes: readonly PageRoute[] = [
   {
     path: '/',
     access: STUDENT,
-    page: PlanetHomePage,
+    page: MapHomePage,
     refusedPage: EntryPage,
     titleKey: 'studentRoutes.home.title',
-    meta: { module: 'Planet', status: 'placeholder', purpose: 'Student: the default subject planet. Everyone else: sign-in, or the way to their own home.' },
+    meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },
   { path: '/login', access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
   { path: '/register', access: PUBLIC, page: RegisterPage, meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
@@ -283,16 +286,17 @@ export const pageRoutes: readonly PageRoute[] = [
     path: CHANGE_PASSWORD_PATH,
     access: SIGNED_IN,
     page: ChangePasswordPage,
-    meta: { module: 'Auth', status: 'core', purpose: 'Self-service password change, reached from the account menu. Students are sent to /me (see legacyRedirects), except under a forced change.' },
+    meta: { module: 'Auth', status: 'core', purpose: 'Self-service password change for teachers and parents, and the forced change for every role. Students are sent to /me (see legacyRedirects), except under a forced change.' },
   },
 
   // ---- student -----------------------------------------------------------
   // No student route carries a `nav` entry: the student's bar holds only the
-  // logo, the bell and the avatar (#13 point 5). The planet is the navigation;
+  // logo, the bell and the avatar (#13 point 5). The star map is the navigation;
   // /me is reached from the avatar menu, /ask from the composer.
-  { path: '/planet/:subjectId', access: STUDENT, page: PlanetSubjectPage, titleKey: 'studentRoutes.planet.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A subject planet.' } },
-  { path: '/planet/:subjectId/:topicId', access: STUDENT, page: PlanetTopicPage, titleKey: 'studentRoutes.region.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A region (topic) of a planet.' } },
-  { path: '/planet/:subjectId/:topicId/:unitId', access: STUDENT, page: PlanetUnitPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A knowledge point (unit) of a region.' } },
+  // The star map's three layers (#72 point 8); fixture data until #48.
+  { path: '/map/:subjectId', access: STUDENT, page: MapSubjectPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
+  { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapNebulaPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
+  { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapStarPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The chapter of a knowledge point.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   {
@@ -300,15 +304,17 @@ export const pageRoutes: readonly PageRoute[] = [
     access: STUDENT,
     page: AskPage,
     titleKey: 'studentRoutes.ask.title',
-    meta: { module: 'Ask', status: 'placeholder', purpose: 'Ask: the planet with a side panel on a desktop, a full-screen sheet on a phone.' },
+    meta: { module: 'Ask', status: 'placeholder', purpose: 'Ask: the star map with a side panel on a desktop, a full-screen sheet on a phone.' },
   },
   { path: '/ask/:conversationId', access: STUDENT, page: AskPage, titleKey: 'studentRoutes.ask.title', meta: { module: 'Ask', status: 'placeholder', purpose: 'One Ask conversation.' } },
   {
+    // Also the profile page of administrators and the organisation roles,
+    // who have no other (#46); teachers and parents keep their own.
     path: '/me',
-    access: STUDENT,
+    access: ME_ACCESS,
     page: MePage,
     titleKey: 'studentRoutes.me.title',
-    meta: { module: 'Account', status: 'placeholder', purpose: 'Student account: profile, language, notification preferences, password.' },
+    meta: { module: 'Account', status: 'core', purpose: 'Account page: profile, language, notification preferences, password change.' },
   },
   // Kept, but out of navigation: reached from the bell (#13 point 3).
   { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
@@ -421,8 +427,9 @@ export const pageRoutes: readonly PageRoute[] = [
 const CONVERSATION_ID = /^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/
 
 /** `/ask`, or `/ask/<id>` when the old link named a conversation. */
-export function askPathFor(conversationId: string | null | undefined): string {
-  const id = conversationId?.trim() ?? ''
+export function askPathFor(conversationId: unknown): string {
+  // Anything but a string (a number, an object from a malformed payload) is no id.
+  const id = typeof conversationId === 'string' ? conversationId.trim() : ''
   return CONVERSATION_ID.test(id) ? `${ASK_PATH}/${id}` : ASK_PATH
 }
 
@@ -438,7 +445,40 @@ const CONVERSATION_QUERY = 'conversationId'
 const toAsk = ({ params, search }: LegacyRedirectInput) =>
   askPathFor(params.conversationId ?? search.get(CONVERSATION_QUERY))
 
+/*
+ * `/planet/...` became `/map/...` when the planet became a star map (#72
+ * point 8). The same segments carry over, read from the address as it
+ * arrived (still percent-encoded) and decoded exactly once. A segment that
+ * is not a plain id after that one decoding -- `.`, `..`, anything with a
+ * `/`, `\` or `%` in it (a double-encoded `%252e%252e` decodes to `%2e%2e`) --
+ * or more segments than a star's address has, lands on the home map.
+ */
+const MAP_SEGMENT = /^[A-Za-z0-9_-][A-Za-z0-9_.-]{0,127}$/
+
+export function mapPathForLegacyPlanet(pathname: string | undefined): string {
+  // Case-insensitive, as React Router matches `/planet/*`: `/Planet/math` lands here too.
+  const match = /^\/planet(\/.*)?$/i.exec(pathname ?? '')
+  if (!match) return '/'
+  const raw = (match[1] ?? '').split('/').filter((segment) => segment !== '')
+  if (raw.length === 0 || raw.length > 3) return '/'
+  const decoded: string[] = []
+  for (const segment of raw) {
+    let value: string
+    try {
+      value = decodeURIComponent(segment)
+    } catch {
+      return '/'
+    }
+    if (!MAP_SEGMENT.test(value)) return '/'
+    decoded.push(value)
+  }
+  return `/map/${decoded.map(encodeURIComponent).join('/')}`
+}
+
+const toMap = ({ pathname }: LegacyRedirectInput) => mapPathForLegacyPlanet(pathname)
+
 export const legacyRedirects: readonly LegacyRedirect[] = [
+  { from: '/planet/*', to: toMap, access: STUDENT, carryContext: true, decision: '#72 §8' },
   { from: '/learn/*', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/dashboard', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/practice/*', to: '/', access: STUDENT, decision: '#13 §2' },
@@ -447,11 +487,13 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   // Learning history is gone (#13 §3); it used to forward to /learn/progress.
   { from: '/learning-history', to: '/', access: STUDENT, decision: '#13 §3' },
   { from: '/chat', to: toAsk, access: STUDENT, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
-  { from: '/chat/:conversationId', to: toAsk, access: STUDENT, carryContext: true, decision: '#13 §2' },
+  // The id is taken from the path; a `conversationId` in the query is dropped,
+  // so Ask never sees two ids (it reads only the path's).
+  { from: '/chat/:conversationId', to: toAsk, access: STUDENT, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   // Always public: it used to forward to /chat before any guard ran.
   { from: '/assistant', to: toAsk, access: PUBLIC, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },
-  // Teachers, parents and administrators keep the page here.
-  // This branch must not reach main until /me has the password form (#46).
+  // Students change their password on /me (#46); everyone else keeps the page
+  // here, and so does any account under a forced change (RoleScopedRedirect).
   { from: CHANGE_PASSWORD_PATH, to: '/me', access: SIGNED_IN, onlyFor: ['student'], decision: '#13 §2' },
 ]

@@ -1,0 +1,69 @@
+{
+  "stage": {
+    "label": "Sternkarte: {{subject}}",
+    "nebulae": "Nebel"
+  },
+  "summary": {
+    "lit": "{{lit}} von {{total}} leuchten",
+    "streak_one": "{{count}} Tag in Folge",
+    "streak_other": "{{count}} Tage in Folge",
+    "score_one": "{{formatted}} Punkt",
+    "score_other": "{{formatted}} Punkte"
+  },
+  "state": {
+    "lit": "Leuchtet",
+    "in_progress": "In Arbeit",
+    "ready": "Bereit zum Start",
+    "locked": "Gesperrt"
+  },
+  "marker": {
+    "recommended": "Als Nächstes empfohlen",
+    "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",
+    "reviewDue_other": "{{count}} Karten zur Wiederholung fällig"
+  },
+  "legend": {
+    "label": "Was die Sterne bedeuten",
+    "reviewDue": "Wiederholung fällig",
+    "hint": "Ziehen verschiebt die Karte. Scrollen, mit zwei Fingern zoomen oder + und − nutzen, um in einen Nebel zu gehen; einen Stern wählen, um sein Kapitel zu sehen."
+  },
+  "star": {
+    "progress": "{{percent}} % der Lektionen erledigt",
+    "lessons": "{{done}} von {{total}} Lektionen erledigt",
+    "unmet_one": "Alle Lektionen erledigt: noch {{count}} Aufgabe richtig zu lösen",
+    "unmet_other": "Alle Lektionen erledigt: noch {{count}} Aufgaben richtig zu lösen",
+    "unmetPartial_one": "Noch {{count}} Aufgabe richtig zu lösen",
+    "unmetPartial_other": "Noch {{count}} Aufgaben richtig zu lösen",
+    "nextLesson": "Nächste Lektion: {{title}}",
+    "skills": "Fähigkeiten",
+    "skillLit": "{{name}}, leuchtet",
+    "skillDark": "{{name}}, leuchtet noch nicht",
+    "prerequisites": "Zuerst zum Leuchten bringen",
+    "start": "Starten",
+    "continue": "Weiter",
+    "open": "Kapitel öffnen",
+    "inNebula": "{{nebula}} · {{state}}"
+  },
+  "nebula": {
+    "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
+    "related": "{{base}}, verbunden mit {{list}}"
+  },
+  "nav": {
+    "map": "Sternkarte",
+    "backToMap": "Zurück zur Sternkarte",
+    "backToNebula": "Zurück zu {{nebula}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Hineinzoomen",
+    "out": "Herauszoomen"
+  },
+  "subjects": {
+    "label": "Fächer"
+  },
+  "announce": {
+    "map": "{{subject}}, die ganze Sternkarte: {{lit}} von {{total}} leuchten",
+    "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
+    "star": "{{name}}: {{state}}"
+  },
+  "empty": "In diesem Fach gibt es noch nichts zu lernen."
+}

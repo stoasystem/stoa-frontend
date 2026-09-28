@@ -120,10 +120,7 @@
   },
   "tutorEscalation": {
     "requestedTitle": "Tutor-Unterstützung angefragt",
-    "requestedBody": "Ein Tutor tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten.",
-    "joinedTitle": "Tutor ist beigetreten",
-    "joinedBody": "Der Lernassistent beobachtet mit, während dein Tutor hilft. Starte ein Live-Klassenzimmer, wenn du noch mehr Unterstützung brauchst.",
-    "confirmJoined": "Tutor ist beigetreten"
+    "requestedBody": "Ein Tutor tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten."
   },
   "contextLines": {
     "uploadSource": "Quelle des Uploads: {{title}}",
@@ -146,5 +143,78 @@
     "similar": "Gib mir eine ähnliche Aufgabe",
     "why": "Warum funktioniert das?"
   },
-  "duplicateReopened": "Das hast du schon gefragt. Hier ist das Gespräch dazu."
+  "duplicateReopened": "Das hast du schon gefragt. Hier ist das Gespräch dazu.",
+  "ask": {
+    "title": "Fragen",
+    "close": "Schliessen",
+    "back": "Alle Unterhaltungen",
+    "listSubtitle": "Deine Unterhaltungen",
+    "composerLabel": "Deine Frage",
+    "placeholder": "Nachricht…",
+    "dockedPlaceholder": "Frag nach allem auf dem Planeten…",
+    "dockedPlaceholderPhone": "Frag, was du willst…",
+    "grabber": "Nach unten ziehen zum Schliessen",
+    "list": {
+      "label": "Unterhaltungen",
+      "loading": "Deine Unterhaltungen werden geladen…",
+      "failed": "Deine Unterhaltungen konnten nicht geladen werden.",
+      "retry": "Erneut versuchen",
+      "untitled": "Neue Unterhaltung"
+    },
+    "empty": {
+      "title": "Frag, was du willst",
+      "suggestionsLabel": "Vorgeschlagene Fragen",
+      "point": "Erklär mir {{point}}",
+      "check": "Wie kann ich meine Antwort selbst prüfen?",
+      "practice": "Gib mir eine Übungsaufgabe"
+    },
+    "thread": {
+      "label": "Nachrichten",
+      "loading": "Die Unterhaltung wird geladen…",
+      "failed": "Diese Unterhaltung konnte nicht geladen werden.",
+      "retry": "Erneut versuchen",
+      "you": "Du",
+      "assistant": "STOA-Assistent",
+      "teacherFallback": "Lehrperson",
+      "thinking": "Denkt nach…",
+      "notSent": "Nicht gesendet",
+      "sendAgain": "Erneut senden",
+      "stopped": "Angehalten",
+      "stop": "Anhalten",
+      "starting": "Die Unterhaltung wird gestartet…",
+      "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal."
+    },
+    "presence": {
+      "online_one": "{{count}} Lehrperson online",
+      "online_other": "{{count}} Lehrpersonen online",
+      "offline": "Keine Lehrperson online"
+    },
+    "help": {
+      "request": "Lehrperson fragen",
+      "requesting": "Lehrperson wird gefragt…",
+      "offline": "Gerade ist keine Lehrperson online. Sobald sie wieder da ist, antwortet sie hier.",
+      "cardLabel": "Unterstützung durch eine Lehrperson",
+      "status": {
+        "pending": "Wartet",
+        "assigned": "Zugewiesen",
+        "in_progress": "In Bearbeitung",
+        "resolved": "Erledigt",
+        "cancelled": "Abgebrochen"
+      },
+      "title": {
+        "pending": "Lehrperson angefragt",
+        "assigned": "{{name}} kommt in diese Unterhaltung",
+        "in_progress": "{{name}} hilft dir",
+        "resolved": "Die Unterstützung ist abgeschlossen",
+        "cancelled": "Die Anfrage wurde abgebrochen"
+      },
+      "body": {
+        "pending": "Eine Lehrperson antwortet in dieser Unterhaltung. Mach in der Zwischenzeit weiter.",
+        "assigned": "Die Antwort erscheint in dieser Unterhaltung.",
+        "in_progress": "Die Antworten erscheinen in dieser Unterhaltung.",
+        "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
+        "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson."
+      }
+    }
+  }
 }

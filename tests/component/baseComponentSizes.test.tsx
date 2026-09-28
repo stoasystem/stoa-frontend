@@ -23,6 +23,7 @@ import {
   SearchField,
   SegmentedFilter,
   SegmentedNav,
+  TextField,
   Toggle,
   initialsOf,
 } from '@/components/base'
@@ -247,6 +248,18 @@ describe('SearchField (Sizes: 36; 32 in toolbars, 38 on a page)', () => {
   })
 })
 
+// Components: "a field is a fill, not a bordered box"; the page search field's measure.
+describe('TextField (the page field: 38, radius 10, 12 inside, text 15)', () => {
+  it('is a 38 fill with its label above it and its hint read with it', () => {
+    render(<TextField label="Current password" hint="Six digits" type="password" />)
+    const input = screen.getByLabelText('Current password')
+
+    expect(input.getAttribute('style')).toBe('height: 38px; border-radius: 10px; padding-inline: 12px; font-size: 15px;')
+    expect(input).toHaveClass('bg-fill')
+    expect(input).toHaveAccessibleDescription('Six digits')
+  })
+})
+
 describe('Row and Group (Sizes: list rows 48-64)', () => {
   const renderRow = (row: React.ReactNode) =>
     render(
@@ -256,7 +269,7 @@ describe('Row and Group (Sizes: list rows 48-64)', () => {
     )
 
   it('is 52 by default and a link with a chevron when it navigates', () => {
-    const { container } = renderRow(<Row title="Mathematics" to="/planet/math" />)
+    const { container } = renderRow(<Row title="Mathematics" to="/map/math" />)
     const row = screen.getByRole('link', { name: 'Mathematics' })
 
     expect(row).toHaveStyle({ minHeight: '52px', paddingInline: '16px' })

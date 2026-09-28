@@ -173,7 +173,6 @@
     "loading": "Loading notifications...",
     "unavailable": "Notifications are unavailable.",
     "empty": "No notifications yet.",
-    "markRead": "Mark read",
     "archive": "Archive",
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} unread",
@@ -206,13 +205,13 @@
       "body": "This screen is being rebuilt. The link already works and will stay the same."
     },
     "home": {
-      "title": "Your planet"
+      "title": "Your star map"
     },
-    "planet": {
-      "title": "Subject planet"
+    "map": {
+      "title": "Star map"
     },
-    "region": {
-      "title": "Region"
+    "nebula": {
+      "title": "Nebula"
     },
     "unit": {
       "title": "Knowledge point"
@@ -238,5 +237,32 @@
   "composer": {
     "attach": "Add a photo or file",
     "send": "Send"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profile",
+      "name": "Name",
+      "email": "Email",
+      "managed": "Your name and email address come with your account. To change them, ask an administrator."
+    },
+    "language": {
+      "heading": "Language"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "loading": "Loading your notification settings…",
+      "unavailable": "Notification settings are unavailable right now.",
+      "saveFailed": "That change was not saved. Try again.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Teacher replies",
+          "body": "In the bell when a teacher takes on or answers your question"
+        }
+      }
+    },
+    "password": {
+      "heading": "Password",
+      "again": "Change it again"
+    }
   }
 }

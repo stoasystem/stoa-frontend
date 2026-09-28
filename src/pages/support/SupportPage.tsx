@@ -7,8 +7,10 @@ import { SupportInfoSection } from '@/components/support/SupportInfoSection'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { MarketingLayout } from '@/layouts/MarketingLayout'
 import { buildContactMailtoHref, stoaContactInfo } from '@/lib/brandContact'
+import { useAuthStore } from '@/store/authStore'
 
 const sectionKeys = [
   { key: 'faq', icon: HelpCircle },
@@ -19,15 +21,24 @@ const sectionKeys = [
 
 const tagKeys = ['faq', 'problems', 'teacherHelp', 'contact'] as const
 
+/*
+ * `/support`, the avatar menu's Help. Signed in, it stays inside the app shell
+ * (the bar, the bell, the avatar and its sign-out), and offers nothing that
+ * belongs to a visitor: the marketing layout's "Start learning" and the
+ * public onboarding tour are left out (#46). Signed out, it is the public
+ * page it always was.
+ */
 export function SupportPage() {
   const { t } = useTranslation(['support', 'common'])
+  const signedIn = useAuthStore((state) => state.isAuthenticated && state.user !== null)
+  const Layout = signedIn ? DashboardLayout : MarketingLayout
   const contactHref = buildContactMailtoHref(t('support:contactSubject'))
 
   const toItems = (value: unknown) =>
     Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
 
   return (
-    <MarketingLayout>
+    <Layout>
       <PageContainer className="space-y-8">
         <PageHeader
           eyebrow={t('support:eyebrow')}
@@ -41,9 +52,11 @@ export function SupportPage() {
                   {t('common:navigation.contact')}
                 </a>
               </Button>
-              <Button variant="outline" asChild>
-                <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
-              </Button>
+              {!signedIn && (
+                <Button variant="outline" asChild>
+                  <Link to="/onboarding">{t('support:viewOnboarding')}</Link>
+                </Button>
+              )}
             </>
           }
         />
@@ -101,6 +114,6 @@ export function SupportPage() {
 
         </section>
       </PageContainer>
-    </MarketingLayout>
+    </Layout>
   )
 }

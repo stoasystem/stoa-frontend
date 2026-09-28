@@ -286,3 +286,47 @@ canvas {
   0%, 100% { opacity: 1; }
   50%       { opacity: 0; }
 }
+
+/*
+ * Ask (#49). Motion and states: the desktop panel slides 40 px in from the
+ * right and fades (280 ms), the phone sheet rises from the bottom (320 ms) over
+ * a 25% dim, both on the standard curve; under reduced motion a 200 ms linear
+ * crossfade replaces them. The page area beside the panel re-centres on the
+ * same timing. Nothing here loops.
+ */
+@keyframes ask-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+@keyframes ask-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes ask-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+[data-ask-motion="panel"] {
+  animation: ask-panel-in var(--motion-panel) var(--ease-standard);
+}
+[data-ask-motion="sheet"] {
+  animation: ask-sheet-in var(--motion-sheet) var(--ease-standard);
+}
+[data-ask-motion="dim"] {
+  animation: ask-fade-in var(--motion-sheet) var(--ease-standard);
+}
+[data-ask-page] {
+  transition: right var(--motion-panel) var(--ease-standard);
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-ask-motion] {
+    animation: ask-fade-in var(--motion-reduced) linear;
+  }
+  [data-ask-page] {
+    transition: none;
+  }
+}
