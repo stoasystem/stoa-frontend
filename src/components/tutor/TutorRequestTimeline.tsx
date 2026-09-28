@@ -15,7 +15,7 @@ export function TutorRequestTimeline({ notes }: { notes: TutorHelpRequestNote[] 
       {notes.map((note) => (
         <article key={note.id} className="rounded-md border bg-card p-4">
           <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-medium">{note.tutor.name}</p>
+            <p className="text-sm font-medium">{note.teacher.name}</p>
             <time className="text-xs text-muted-foreground">{new Date(note.createdAt).toLocaleString()}</time>
           </div>
           <div className="mt-3">

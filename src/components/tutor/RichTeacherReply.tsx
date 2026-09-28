@@ -1,6 +1,6 @@
 import type { TeacherReplyRichContent } from '@/types/tutor'
 
-export function RichTeacherReply({ content, fallback }: { content?: TeacherReplyRichContent; fallback: string }) {
+export function RichTeacherReply({ content, fallback }: { content?: TeacherReplyRichContent | null; fallback: string }) {
   if (!content?.blocks?.length) {
     return <p className="text-sm leading-6 text-muted-foreground">{fallback}</p>
   }
