@@ -65,7 +65,7 @@ export type RecordedFrame = Omit<SceneFrame, 'x' | 'y' | 'starAlpha' | 'sharpnes
   nebulaR: number[]
 }
 
-export type RecordingRenderer = StarMapRenderer & { frames: RecordedFrame[]; snapshots: number; last: () => RecordedFrame }
+export type RecordingRenderer = StarMapRenderer & { frames: RecordedFrame[]; snapshots: number; ratios: number[]; last: () => RecordedFrame }
 
 export function recordingRenderer(): RecordingRenderer {
   const renderer: RecordingRenderer = {
@@ -73,8 +73,11 @@ export function recordingRenderer(): RecordingRenderer {
     stats: { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0 },
     frames: [],
     snapshots: 0,
+    ratios: [],
     last: () => renderer.frames[renderer.frames.length - 1],
-    resize() {},
+    resize(_viewport, dpr) {
+      renderer.ratios.push(dpr)
+    },
     setTheme() {},
     setData() {},
     draw(frame) {
@@ -97,7 +100,7 @@ export function recordingRenderer(): RecordingRenderer {
   return renderer
 }
 
-export type CanvasCounter = { drawImage: number; filterSets: number }
+export type CanvasCounter = { drawImage: number; filterSets: number; texts?: { text: string; x: number; y: number }[] }
 
 /** A 2D context that accepts every call, counts `drawImage`, and counts any `filter` set. */
 export function fakeContext(counter: CanvasCounter) {
@@ -109,6 +112,7 @@ export function fakeContext(counter: CanvasCounter) {
       if (prop === 'createRadialGradient' || prop === 'createLinearGradient') return () => gradient
       if (prop === 'measureText') return (text: string) => ({ width: 7 * String(text).length })
       if (prop === 'drawImage') return () => (counter.drawImage += 1)
+      if (prop === 'fillText') return (text: string, x: number, y: number) => counter.texts?.push({ text, x, y })
       return () => undefined
     },
     set(target, prop, value) {

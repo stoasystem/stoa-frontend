@@ -17,6 +17,7 @@ import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
+import { nebulaLinks } from '@/features/starmap/model/links'
 import { StarMapEngine, type FrameScheduler, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, litCount, nebulaCounts, orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
@@ -65,6 +66,26 @@ export type StarMapViewProps = {
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
 }
 
+/**
+ * The canvas's pixels per CSS pixel: the screen's, but never over 2. A 3x
+ * phone would fill 2.25 times the pixels of 2x for detail nobody can see on
+ * a map of soft glows, and pay for it in every frame.
+ */
+export const MAX_PIXEL_RATIO = 2
+
+export function canvasPixelRatio(): number {
+  return Math.min(MAX_PIXEL_RATIO, window.devicePixelRatio || 1)
+}
+
+/**
+ * The bands the page keeps over the canvas for its own controls, CSS px: the
+ * subject switcher and where-you-are line above; the legend (wide) or the zoom
+ * buttons (phone) below. The whole map fits between them.
+ */
+function controlBands(wide: boolean): { top: number; bottom: number } {
+  return wide ? { top: 76, bottom: 164 } : { top: 112, bottom: 72 }
+}
+
 /** A link's box: the glyph, but never under 32 px, so the focus ring can be seen. */
 function linkSize(glyph: number): number {
   return Math.round(Math.max(32, Math.min(56, glyph * 0.75)))
@@ -93,6 +114,23 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
 
   const stars = useMemo(() => orderedStars(map), [map])
   const nebulae = useMemo(() => orderedNebulae(map).filter((n) => stars.some((s) => s.nebulaId === n.topicId)), [map, stars])
+  // The lines between nebulae carry meaning, so the parallel DOM says them too.
+  const relatedTo = useMemo(() => {
+    const names = new Map(nebulae.map((n) => [n.topicId, n.name]))
+    const order = new Map(nebulae.map((n, i) => [n.topicId, i]))
+    const related = new Map<string, string[]>()
+    for (const link of nebulaLinks(map)) {
+      related.set(link.a, [...(related.get(link.a) ?? []), link.b])
+      related.set(link.b, [...(related.get(link.b) ?? []), link.a])
+    }
+    const byOrder = (a: string, b: string) => (order.get(a) ?? 0) - (order.get(b) ?? 0)
+    return new Map([...related].map(([id, others]) => [id, others.sort(byOrder).map((other) => names.get(other) ?? other)]))
+  }, [map, nebulae])
+  const nebulaText = (nebula: (typeof nebulae)[number]) => {
+    const related = relatedTo.get(nebula.topicId)
+    const base = nebulaLabel(t, nebula, stars)
+    return related?.length ? t('nebula.related', { base, list: related.join(', ') }) : base
+  }
   const subjectId = map.subject.subjectId
 
   // The engine lives as long as the canvas.
@@ -115,12 +153,27 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
     // Ask panel opens beside it (#49).
     const measure = () => {
       const rect = stage.getBoundingClientRect()
-      engine.setViewport(Math.round(rect.width), Math.round(rect.height), window.devicePixelRatio || 1)
-      setWide(isWide({ width: rect.width, height: rect.height }))
+      const isWideNow = isWide({ width: rect.width, height: rect.height })
+      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow))
+      setWide(isWideNow)
     }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(stage)
+
+    // The pixel ratio changes when the window moves to another screen or the
+    // page is zoomed; a size observer does not see it. Watch the ratio itself.
+    let ratioQuery: MediaQueryList | null = null
+    const onRatio = () => {
+      measure()
+      watchRatio()
+    }
+    const watchRatio = () => {
+      ratioQuery?.removeEventListener?.('change', onRatio)
+      ratioQuery = typeof window.matchMedia === 'function' ? window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`) : null
+      ratioQuery?.addEventListener?.('change', onRatio)
+    }
+    watchRatio()
 
     const onWheel = (event: WheelEvent) => {
       const rect = stage.getBoundingClientRect()
@@ -141,6 +194,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
     syncPaused()
 
     return () => {
+      ratioQuery?.removeEventListener?.('change', onRatio)
       document.removeEventListener('visibilitychange', syncPaused)
       inertWatch.disconnect()
       stage.removeEventListener('wheel', onWheel)
@@ -346,13 +400,13 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
               return (
                 <li key={nebula.topicId} data-nebula={nebula.topicId}>
                   {isCurrent ? (
-                    <span className="sr-only">{nebulaLabel(t, nebula, stars)}</span>
+                    <span className="sr-only">{nebulaText(nebula)}</span>
                   ) : (
                     <Link
                       to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
                       className="sr-only rounded-[10px] px-3 py-2 text-[15px] font-semibold text-on-sky focus-visible:not-sr-only focus-visible:absolute focus-visible:bottom-24 focus-visible:left-1/2 focus-visible:-translate-x-1/2 focus-visible:bg-[var(--sky-glass)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                     >
-                      {nebulaLabel(t, nebula, stars)}
+                      {nebulaText(nebula)}
                     </Link>
                   )}
                   {inNebula.length > 0 && (
@@ -360,6 +414,9 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
                       {inNebula.map((entry) => {
                         const star = stars[entry.index]
                         const to: LayerTarget = { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId }
+                        // Tab reaches a star once its nebula is open; on the whole map, Tab
+                        // goes nebula by nebula and a screen reader still reads every star.
+                        const tabbable = isCurrent
                         return (
                           <li key={star.unitId}>
                             {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
@@ -367,6 +424,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
                               href={pathForTarget(subjectId, to)}
                               className="starmap-link"
                               data-unit={star.unitId}
+                              tabIndex={tabbable ? undefined : -1}
                               style={{
                                 width: size,
                                 height: size,
@@ -408,7 +466,17 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
 
       {/* What the glyphs mean (wide screens, whole map). */}
       {wide && target.layer === 'map' && stars.length > 0 && (
-        <div data-starmap-overlay className="absolute bottom-6 left-6 flex max-w-[560px] flex-col gap-2">
+        <div
+          data-starmap-overlay
+          className="absolute bottom-6 left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
+          // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
+          style={{
+            background: 'var(--sky-glass)',
+            borderColor: 'var(--sky-glass-border)',
+            backdropFilter: 'blur(var(--sky-glass-blur))',
+            WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
+          }}
+        >
           <h2 className="sr-only">{t('legend.label')}</h2>
           <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
             {LEARNING_STATES.map((state) => (
@@ -426,7 +494,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
               {t('legend.reviewDue')}
             </li>
           </ul>
-          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-caption)]">{t('legend.hint')}</p>
+          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('legend.hint')}</p>
         </div>
       )}
 

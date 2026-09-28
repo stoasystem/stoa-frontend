@@ -44,7 +44,8 @@
     "inNebula": "{{nebula}} · {{state}}"
   },
   "nebula": {
-    "link": "{{nebula}}, {{lit}} sur {{total}} allumées"
+    "link": "{{nebula}}, {{lit}} sur {{total}} allumées",
+    "related": "{{base}}, liée à {{list}}"
   },
   "nav": {
     "map": "Carte du ciel",

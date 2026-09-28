@@ -106,7 +106,7 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
   let made: number
 
   beforeEach(() => {
-    counter = { drawImage: 0, filterSets: 0 }
+    counter = { drawImage: 0, filterSets: 0, texts: [] }
     made = 0
     vi.stubGlobal('Path2D', class {})
   })
@@ -197,6 +197,64 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     clock.advance(20)
     clock.advance(500)
     expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)
+  })
+
+  it('never reuses a tile across maps: a subject switch repaints every tile', () => {
+    const renderer = realRenderer()
+    const { clock, engine } = engineWith(renderer, map500, true)
+    const nebulaCount = orderedNebulae(map500).length
+    expect(renderer.stats.tilePaints).toBe(nebulaCount)
+    // Another subject with the same topic ids and the same lit counts: only its identity differs.
+    const other: StarMap = { ...map500, subject: { subjectId: 'physics', name: 'Physics' } }
+    engine.setData(other, { layer: 'map' })
+    clock.advance(20)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount * 2)
+    // The same subject laid out differently (mirrored): new layout, new tiles.
+    const mirrored: StarMap = { ...other, stars: other.stars.map((star) => ({ ...star, x: 1 - star.x })) }
+    engine.setData(mirrored, { layer: 'map' })
+    clock.advance(20)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount * 3)
+  })
+
+  it('places each nebula name by its own nebula, never over another name, and not at all when its nebula is off screen', () => {
+    counter.texts = []
+    const renderer = realRenderer()
+    const { clock, engine } = engineWith(renderer, map500, true)
+    const frame = renderer.frames[renderer.frames.length - 1]
+    const names = orderedNebulae(map500).map((n) => n.name.toLocaleUpperCase())
+    const drawn = counter.texts.filter((t) => names.includes(t.text))
+    expect(drawn.length).toBeGreaterThan(3)
+    const boxes = drawn.map((t) => {
+      const n = names.indexOf(t.text)
+      const half = (7 * t.text.length + 8) / 2
+      // By its own nebula: within its disc plus one label height of it.
+      const gap = Math.max(0, Math.hypot(t.x - frame.nebulaX[n], t.y - frame.nebulaY[n]) - frame.nebulaR[n])
+      expect(gap).toBeLessThan(half + 24)
+      return { x0: t.x - half, x1: t.x + half, y0: t.y, y1: t.y + 16 }
+    })
+    for (let i = 0; i < boxes.length; i += 1) {
+      for (let j = i + 1; j < boxes.length; j += 1) {
+        const a = boxes[i]
+        const b = boxes[j]
+        expect(a.x0 < b.x1 && a.x1 > b.x0 && a.y0 < b.y1 && a.y1 > b.y0).toBe(false)
+      }
+    }
+    // Pan far to one side: nebulae now off screen have no name drawn anywhere.
+    counter.texts = []
+    engine.pointerDown(1, 100, 400)
+    for (let i = 1; i <= 10; i += 1) {
+      engine.pointerMove(1, 100 + i * 90, 400)
+      clock.advance(16)
+    }
+    // Only the frame drawn after letting go counts (reduced motion: no glide, one frame).
+    counter.texts = []
+    engine.pointerUp(1, 1000, 400)
+    clock.advance(20)
+    const moved = renderer.frames[renderer.frames.length - 1]
+    const offScreen = names.filter((_, n) => moved.nebulaX[n] > W || moved.nebulaX[n] < 0)
+    expect(offScreen.length).toBeGreaterThan(0)
+    expect(counter.texts.length).toBeGreaterThan(0)
+    for (const name of offScreen) expect(counter.texts.some((t) => t.text === name)).toBe(false)
   })
 
   it('never blurs per frame: no filter is ever set on the canvas', () => {

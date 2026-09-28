@@ -7,7 +7,12 @@
  *
  * The front end only needs this for its fixtures until #60 lands; the real
  * map arrives with its coordinates. Everything is seeded, so the same input
- * always gives the same map, on every device and every visit.
+ * gives the same map on the same JavaScript engine. Across engines it may
+ * not: the force layout runs hundreds of iterations of Math.sqrt / log2 /
+ * sin / cos, and JavaScript does not promise transcendental functions agree
+ * to the last bit between engines, so small differences can grow. That is
+ * why the backend computes the layout once, offline, and stores the
+ * coordinates (#60) instead of every device laying the map out itself.
  */
 
 export type LayoutNebula = { id: string; order: number; size: number }
@@ -16,7 +21,7 @@ export type Placement = { x: number; y: number; r: number }
 
 const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5))
 
-/** mulberry32: small, fast and the same everywhere. */
+/** mulberry32: small, fast, integer-only, so the same sequence on every engine. */
 export function seededRandom(seed: number): () => number {
   let a = seed >>> 0
   return () => {
@@ -175,29 +180,51 @@ export function layoutNebulae(nebulae: readonly LayoutNebula[], links: readonly 
 }
 
 /**
- * `count` stars spread evenly over a nebula's disc: a golden-angle (Vogel)
- * spiral, which gives every star about the same room, shaken by a seeded
- * jitter so no spiral arms or rows show. Star 0 sits nearest the middle.
+ * `count` stars spread over a nebula's disc like a star cloud: a golden-angle
+ * (Vogel) spiral gives every star about the same room, a strong seeded
+ * jitter breaks up its arms and rows, and a few rounds of relaxation push
+ * apart any two stars closer than 0.6 of the typical spacing, so no two
+ * collide on screen. Star 0 sits nearest the middle.
  */
 export function scatterStars(count: number, nebula: Placement, seed: number): [number, number][] {
   const rand = seededRandom(seed)
   if (count === 1) return [[nebula.x, nebula.y]]
   const spacing = nebula.r * Math.sqrt(Math.PI / Math.max(1, count))
   const phase = rand() * Math.PI * 2
-  const out: [number, number][] = []
+  const limit = 0.94 * nebula.r
+  const px = new Float64Array(count)
+  const py = new Float64Array(count)
   for (let k = 0; k < count; k += 1) {
     const rho = 0.86 * nebula.r * Math.sqrt((k + 0.5) / count)
-    const theta = phase + k * GOLDEN_ANGLE
-    let px = rho * Math.cos(theta) + (rand() - 0.5) * 0.3 * spacing
-    let py = rho * Math.sin(theta) + (rand() - 0.5) * 0.3 * spacing
-    const d = Math.hypot(px, py)
-    const limit = 0.94 * nebula.r
-    if (d > limit) {
-      px *= limit / d
-      py *= limit / d
-    }
-    out.push([nebula.x + px, nebula.y + py])
+    const theta = phase + k * GOLDEN_ANGLE + (rand() - 0.5) * 0.6
+    px[k] = rho * Math.cos(theta) + (rand() - 0.5) * 0.7 * spacing
+    py[k] = rho * Math.sin(theta) + (rand() - 0.5) * 0.7 * spacing
   }
+  const minGap = 0.6 * spacing
+  for (let round = 0; round < 8; round += 1) {
+    for (let i = 0; i < count; i += 1) {
+      for (let j = i + 1; j < count; j += 1) {
+        const dx = px[j] - px[i]
+        const dy = py[j] - py[i]
+        const d = Math.hypot(dx, dy) || 1e-9
+        if (d >= minGap) continue
+        const push = (minGap - d) / 2
+        px[i] -= (dx / d) * push
+        py[i] -= (dy / d) * push
+        px[j] += (dx / d) * push
+        py[j] += (dy / d) * push
+      }
+    }
+    for (let k = 0; k < count; k += 1) {
+      const d = Math.hypot(px[k], py[k])
+      if (d > limit) {
+        px[k] *= limit / d
+        py[k] *= limit / d
+      }
+    }
+  }
+  const out: [number, number][] = []
+  for (let k = 0; k < count; k += 1) out.push([nebula.x + px[k], nebula.y + py[k]])
   return out
 }
 

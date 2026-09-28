@@ -1,14 +1,16 @@
 /*
- * Nebula tiles (#72 point 6): each nebula outside the focus is drawn as one
- * small image, painted once -- its stars as soft dots at low resolution,
- * blurred by downsampling -- and then only scaled and faded. A tile is
- * repainted only when its nebula's lit fraction changes; panning, zooming,
- * breathing and plain redraws never touch it. No blur filter ever runs per
- * frame (nor at all: `ctx.filter` is missing on Safari, so the blur is the
- * downsample).
+ * Nebula tiles (#72 point 6). Each nebula has two small images, painted once:
+ * its haze, drawn under every nebula whether it is in focus or not (so a
+ * sharp nebula and a blurred one read as the same kind of thing), and its
+ * stars as soft dots at low resolution, blurred by downsampling, which
+ * stands in for the stars of a nebula outside the focus. Both are only
+ * scaled and faded after that. A tile is repainted only when its nebula's
+ * lit fraction changes (or it belongs to another map); panning, zooming,
+ * breathing and plain redraws never touch it. No blur filter ever runs
+ * (`ctx.filter` is missing on Safari anyway; the blur is the downsample).
  */
 
-export type Tile = { canvas: CanvasImageSource; size: number }
+export type Tile = { haze: CanvasImageSource; stars: CanvasImageSource; size: number }
 
 export type TileCache = {
   /** The tile for nebula `index`, painting it if `key` differs from the last one. */
@@ -18,9 +20,12 @@ export type TileCache = {
   readonly paints: number
 }
 
-/** The tile key: the one thing that repaints a tile. */
-export function litFractionKey(lit: number, total: number): string {
-  return `${lit}/${total}`
+/**
+ * The tile key: which map (subject, orientation, layout), which nebula, and
+ * its lit fraction. Within one map only the lit fraction ever changes it.
+ */
+export function tileKey(mapKey: string, topicId: string, lit: number, total: number): string {
+  return `${mapKey}|${topicId}|${lit}/${total}`
 }
 
 export function createTileCache(paint: (index: number) => Tile): TileCache {

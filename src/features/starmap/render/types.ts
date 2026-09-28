@@ -31,6 +31,12 @@ export type StarMapTheme = {
 
 /** What stays the same from frame to frame: the map's data, in arrays. */
 export type SceneData = {
+  /**
+   * Which map this is: subject, orientation and layout. Tiles painted for one
+   * map are never shown on another, even where nebula indices and lit counts
+   * happen to match.
+   */
+  mapKey: string
   count: number
   /** Map position of every star, map units. */
   mapX: Float32Array
@@ -46,6 +52,7 @@ export type SceneData = {
   /** Each star's skills, lit or not (#9 point 10; `[]` until stoa-backend#58). */
   skills: readonly (readonly boolean[])[]
   nebulae: readonly {
+    topicId: string
     name: string
     /** Map disc. */
     x: number
@@ -81,6 +88,14 @@ export type SceneFrame = {
   sharpness: Float32Array
   /** A star's drawn box, CSS px. */
   glyphSize: number
+  /**
+   * 1: stars in focus are small dots (the whole map, where a full glyph per
+   * star would pack a nebula solid); 0: full glyphs (zoomed in); between, a
+   * crossfade. The recommended star is always a glyph.
+   */
+  dotBlend: number
+  /** A dot's radius, CSS px. */
+  dotRadius: number
   /** The recommended star's breath, when it breathes. */
   breath: { index: number; scale: number; alpha: number } | null
   /** Star names inside the chosen nebula. */

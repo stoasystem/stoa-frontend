@@ -74,6 +74,37 @@ export function glyphSizeFor(scale: number, spacing: number): number {
   return Math.max(9, Math.min(56, scale * spacing * 0.55))
 }
 
+/**
+ * Dots on the whole map, glyphs zoomed in: a full glyph per star packs a
+ * dense nebula solid, so below 18 px stars are dots, from 26 px glyphs.
+ */
+export function dotBlendFor(glyphSize: number): number {
+  return Math.max(0, Math.min(1, (26 - glyphSize) / 8))
+}
+
+export type Orientation = 'landscape' | 'portrait'
+
+export function orientationFor(width: number, height: number): Orientation {
+  return height > width * 1.15 ? 'portrait' : 'landscape'
+}
+
+/**
+ * The map for a viewport. The layout is landscape; on a portrait screen it is
+ * turned a quarter clockwise, (x, y) -> (1 - y, x), which keeps it inside
+ * [0, 1] and keeps it the same map every time.
+ */
+export function orient(map: StarMap, orientation: Orientation): StarMap {
+  if (orientation === 'landscape') return map
+  return { ...map, stars: map.stars.map((star) => ({ ...star, x: 1 - star.y, y: star.x })) }
+}
+
+/** A short fingerprint of where the stars are, so tiles of one layout are never reused for another. */
+function layoutChecksum(map: StarMap): string {
+  let sum = 0
+  for (const star of map.stars) sum = (sum * 31 + Math.round(star.x * 1e5) * 7 + Math.round(star.y * 1e5)) % 2147483647
+  return sum.toString(36)
+}
+
 const TAP_SLOP = 5
 const WHEEL_STEP = 120
 const WHEEL_COOLDOWN_MS = 450
@@ -89,6 +120,9 @@ export class StarMapEngine {
   private readonly inertia: Inertia = createInertia()
 
   private policy: MotionPolicy
+  /** The map as the read model sent it, and as drawn (turned for a portrait viewport). */
+  private source: StarMap | null = null
+  private orientation: Orientation = 'landscape'
   private map: StarMap | null = null
   private stars: Star[] = []
   private nebulaIndex = new Map<string, number>()
@@ -139,6 +173,15 @@ export class StarMapEngine {
   // ---- inputs from React ------------------------------------------------
 
   setData(map: StarMap, target: LayerTarget): void {
+    this.source = map
+    // New data for the same layer (a star lit, say) keeps the view where it is.
+    this.load(target, this.drewFirstFrame && sameTarget(target, this.target))
+  }
+
+  private load(target: LayerTarget, keepView: boolean): void {
+    const source = this.source
+    if (!source) return
+    const map = orient(source, this.orientation)
     this.map = map
     this.stars = orderedStars(map)
     const nebulae = orderedNebulae(map).filter((nebula) => map.stars.some((star) => star.nebulaId === nebula.topicId))
@@ -151,6 +194,7 @@ export class StarMapEngine {
     const count = this.stars.length
     const starIndex = new Map(this.stars.map((star, i) => [star.unitId, i]))
     const scene: SceneData = {
+      mapKey: `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
       count,
       mapX: new Float32Array(count),
       mapY: new Float32Array(count),
@@ -165,6 +209,7 @@ export class StarMapEngine {
         const disc = this.discs.get(nebula.topicId)!
         const members = map.stars.filter((star) => star.nebulaId === nebula.topicId)
         return {
+          topicId: nebula.topicId,
           name: nebula.name,
           x: disc.x,
           y: disc.y,
@@ -202,8 +247,6 @@ export class StarMapEngine {
     this.visibleKey = ''
     this.emittedOnce = false
 
-    // New data for the same layer (a star lit, say) keeps the view where it is.
-    const keepView = this.drewFirstFrame && sameTarget(target, this.target)
     this.target = target
     if (!keepView) this.view = this.viewFor(target)
     this.transition = null
@@ -237,10 +280,20 @@ export class StarMapEngine {
   }
 
   /** The page area's size (it narrows when Ask's panel opens, #49): re-centre on the layer. */
-  setViewport(width: number, height: number, dpr: number): void {
-    const changed = width !== this.viewport.width || height !== this.viewport.height
-    this.viewport = { width, height }
+  setViewport(width: number, height: number, dpr: number, bands: { top?: number; bottom?: number } = {}): void {
+    const changed =
+      width !== this.viewport.width ||
+      height !== this.viewport.height ||
+      bands.top !== this.viewport.top ||
+      bands.bottom !== this.viewport.bottom
+    this.viewport = { width, height, top: bands.top, bottom: bands.bottom }
     this.renderer.resize(this.viewport, dpr)
+    // A portrait page area gets the map turned a quarter, so it fills the screen.
+    const orientation = orientationFor(width, height)
+    if (orientation !== this.orientation) {
+      this.orientation = orientation
+      if (this.source) this.load(this.target, false)
+    }
     if (changed && this.map && !this.transition) this.view = this.viewFor(this.target)
     this.positionsStale = true
     this.invalidate()
@@ -408,7 +461,7 @@ export class StarMapEngine {
   // ---- internals --------------------------------------------------------
 
   private viewFor(target: LayerTarget): View {
-    if (!this.map || this.viewport.width === 0) return overviewView(this.bounds)
+    if (!this.map || this.viewport.width === 0) return overviewView(this.bounds, this.viewport)
     return viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
   }
 
@@ -597,6 +650,8 @@ export class StarMapEngine {
       target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : this.focusStar
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
     return {
+      dotBlend: dotBlendFor(glyphSize),
+      dotRadius: Math.max(1.6, Math.min(3.2, t.scale * this.spacing * 0.16)),
       viewport: this.viewport,
       scale: t.scale,
       ox: t.ox,

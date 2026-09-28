@@ -88,9 +88,29 @@ describe('the parallel DOM', () => {
   it('offers each nebula as a link too, in the reader’s language', async () => {
     await i18n.changeLanguage('de')
     showMap()
-    expect(screen.getByRole('link', { name: 'Algebra, 1 von 3 leuchten' })).toHaveAttribute('href', '/map/math/algebra')
+    expect(screen.getByRole('link', { name: 'Algebra, 1 von 3 leuchten, verbunden mit Numbers, Geometry' })).toHaveAttribute('href', '/map/math/algebra')
     // The star's name is content from the backend; the rest is ours.
     expect(screen.getByRole('link', { name: 'Decimals, In Arbeit, 60 % der Lektionen erledigt, Als Nächstes empfohlen' })).toBeInTheDocument()
+  })
+
+  it('says which nebulae each one is linked to, since the lines carry meaning', () => {
+    showMap()
+    expect(screen.getByRole('link', { name: 'Numbers, 2 of 3 lit, related to Algebra, Data' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Geometry, 0 of 2 lit, related to Algebra' })).toBeInTheDocument()
+  })
+
+  it('on the whole map, Tab goes nebula by nebula; the stars are read but not tabbed through', () => {
+    const { container } = showMap()
+    for (const link of starLinks(container)) expect(link).toHaveAttribute('tabindex', '-1')
+    const nav = screen.getByRole('navigation', { name: 'Star map: Mathematics' })
+    const tabbable = within(nav).getAllByRole('link').filter((link) => link.getAttribute('tabindex') !== '-1')
+    expect(tabbable.map((link) => link.getAttribute('href'))).toEqual(['/map/math/numbers', '/map/math/algebra', '/map/math/geometry', '/map/math/data'])
+  })
+
+  it('inside a nebula, its stars are the next Tab stops', () => {
+    const { container } = showMap({ layer: 'nebula', nebulaId: 'algebra' })
+    const tabbable = starLinks(container).filter((link) => link.getAttribute('tabindex') !== '-1').map((link) => link.dataset.unit)
+    expect(tabbable).toEqual(['u-4', 'u-5', 'u-6'])
   })
 
   it('lists every star on screen, blurred or sharp, on a 500-star map', () => {
@@ -142,6 +162,30 @@ describe('the star layer is HTML', () => {
   it('shows the review count', () => {
     showMap({ layer: 'star', nebulaId: 'numbers', unitId: 'u-2' })
     expect(screen.getByText('3 cards due for review')).toBeInTheDocument()
+  })
+})
+
+describe('the canvas pixel ratio', () => {
+  it('is capped at 2 and follows the screen when it changes', () => {
+    const listeners: (() => void)[] = []
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: false,
+          media: query,
+          addEventListener: (_: string, listener: () => void) => listeners.push(listener),
+          removeEventListener: vi.fn(),
+          addListener: vi.fn(),
+          removeListener: vi.fn(),
+          dispatchEvent: vi.fn(),
+        }) as unknown as MediaQueryList,
+    )
+    const ratio = vi.spyOn(window, 'devicePixelRatio', 'get').mockReturnValue(3)
+    const { renderer } = showMap()
+    expect(renderer.ratios[renderer.ratios.length - 1]).toBe(2)
+    ratio.mockReturnValue(1)
+    act(() => listeners.forEach((listener) => listener()))
+    expect(renderer.ratios[renderer.ratios.length - 1]).toBe(1)
   })
 })
 

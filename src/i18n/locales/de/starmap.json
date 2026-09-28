@@ -44,7 +44,8 @@
     "inNebula": "{{nebula}} · {{state}}"
   },
   "nebula": {
-    "link": "{{nebula}}, {{lit}} von {{total}} leuchten"
+    "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
+    "related": "{{base}}, verbunden mit {{list}}"
   },
   "nav": {
     "map": "Sternkarte",

@@ -44,7 +44,8 @@
     "inNebula": "{{nebula}} · {{state}}"
   },
   "nebula": {
-    "link": "{{nebula}}, {{lit}} su {{total}} accese"
+    "link": "{{nebula}}, {{lit}} su {{total}} accese",
+    "related": "{{base}}, collegata a {{list}}"
   },
   "nav": {
     "map": "Mappa stellare",

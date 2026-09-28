@@ -8,7 +8,17 @@
  * whole map fits the viewport.
  */
 
-export type Viewport = { width: number; height: number }
+/**
+ * The page area, CSS px. `top` and `bottom` are bands the page keeps for its
+ * own controls (the subject switcher above, the legend below); the whole map
+ * fits between them.
+ */
+export type Viewport = { width: number; height: number; top?: number; bottom?: number }
+
+/** The height left for the map between the page's own controls. */
+export function usableHeight({ height, top = 0, bottom = 0 }: Viewport): number {
+  return Math.max(height * 0.4, height - top - bottom)
+}
 
 export type View = {
   cx: number
@@ -24,14 +34,13 @@ export type Bounds = { minX: number; minY: number; maxX: number; maxY: number }
 export const UNIT_BOUNDS: Bounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 }
 
 /**
- * Pixels per map unit at `k = 1`: the map's bounds fill 88% of the width or
- * 78% of the height, whichever is tighter (the subject switcher sits on top,
- * the legend and zoom buttons below).
+ * Pixels per map unit at `k = 1`: the map's bounds fill 90% of the width or
+ * 92% of the height between the page's own controls, whichever is tighter.
  */
-export function baseScale({ width, height }: Viewport, bounds: Bounds): number {
+export function baseScale(viewport: Viewport, bounds: Bounds): number {
   const bw = Math.max(1e-6, bounds.maxX - bounds.minX)
   const bh = Math.max(1e-6, bounds.maxY - bounds.minY)
-  return Math.max(1, Math.min((width * 0.88) / bw, (height * 0.78) / bh))
+  return Math.max(1, Math.min((viewport.width * 0.9) / bw, (usableHeight(viewport) * 0.92) / bh))
 }
 
 export type Transform = { scale: number; ox: number; oy: number }
@@ -54,9 +63,10 @@ export function toMap(t: Transform, sx: number, sy: number): [number, number] {
   return [(sx - t.ox) / t.scale, (sy - t.oy) / t.scale]
 }
 
-/** The whole map, centred a little below the middle (the switcher is above it). */
-export function overviewView(bounds: Bounds): View {
-  return { cx: (bounds.minX + bounds.maxX) / 2, cy: (bounds.minY + bounds.maxY) / 2, k: 1, fx: 0.5, fy: 0.52 }
+/** The whole map, centred in the band between the page's own controls. */
+export function overviewView(bounds: Bounds, viewport?: Viewport): View {
+  const fy = viewport && viewport.height > 0 ? ((viewport.top ?? 0) + usableHeight(viewport) / 2) / viewport.height : 0.5
+  return { cx: (bounds.minX + bounds.maxX) / 2, cy: (bounds.minY + bounds.maxY) / 2, k: 1, fx: 0.5, fy }
 }
 
 /** Keep the focus point over the map: a pan may not lose the map off screen. */

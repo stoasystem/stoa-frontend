@@ -95,9 +95,9 @@ export function viewForTarget(
   bounds: Bounds,
   viewport: Viewport,
 ): View {
-  if (target.layer === 'map') return overviewView(bounds)
+  if (target.layer === 'map') return overviewView(bounds, viewport)
   const disc = discs.get(target.nebulaId)
-  if (!disc) return overviewView(bounds)
+  if (!disc) return overviewView(bounds, viewport)
   const k = nebulaZoom(disc, viewport, bounds)
   if (target.layer === 'nebula') return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
