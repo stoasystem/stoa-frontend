@@ -57,7 +57,7 @@ export function NotificationPreferencesGroup() {
                     checked={enabled}
                     aria-labelledby={titleId}
                     disabled={update.isPending}
-                    onCheckedChange={(next) => update.mutate(withCategory(query.data.preferences, category, next))}
+                    onCheckedChange={(next) => update.mutate((matrix) => withCategory(matrix, category, next))}
                   />
                 }
               />

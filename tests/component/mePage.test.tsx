@@ -428,6 +428,40 @@ describe('notification preferences on /me', () => {
     await waitFor(() => expect(toggle).not.toBeChecked())
   })
 
+  it('applies the change to the matrix as the server has it now, not as the page loaded it', async () => {
+    const user = userEvent.setup()
+    const seen = backend()
+    openAt('/me')
+    const toggle = await screen.findByRole('switch', {
+      name: enCommon.me.notifications.categories.teacher_responses.title,
+    })
+
+    // Meanwhile, on another device: weekly reports by e-mail.
+    const elsewhere = {
+      ...DEFAULT_MATRIX,
+      weekly_reports: { in_app: true, realtime: true, email_digest: true, push: false },
+    }
+    mswServer.use(
+      http.get('https://api.test/notifications/preferences', () =>
+        HttpResponse.json({
+          userId: 'u-1',
+          preferences: elsewhere,
+          supportedCategories: Object.keys(DEFAULT_MATRIX),
+          supportedChannels: ['email_digest', 'in_app', 'push', 'realtime'],
+        }),
+      ),
+    )
+    await user.click(toggle)
+
+    await waitFor(() => expect(seen.preferences).toHaveLength(1))
+    expect(seen.preferences[0]).toEqual({
+      preferences: {
+        ...elsewhere,
+        teacher_responses: { in_app: false, realtime: false, email_digest: true, push: false },
+      },
+    })
+  })
+
   it('says so when the change is refused', async () => {
     const user = userEvent.setup()
     backend()
