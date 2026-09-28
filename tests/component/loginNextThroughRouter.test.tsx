@@ -12,7 +12,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { useParams, useSearchParams } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
@@ -271,6 +271,15 @@ describe('opening /login while already signed in', () => {
     // A session can carry a role this build has never heard of; the login
     // screen must still move it on rather than throw while rendering.
     alreadySignedInAs({ ...account('student'), role: 'janitor' as UserRole })
+    // Hold /auth/me back: its answer goes through normalizeUserRole, which
+    // turns an unknown role into a student, and whether it arrived before the
+    // login screen's chunk loaded would decide what this test sees.
+    mswServer.use(
+      http.get('https://api.test/auth/me', async () => {
+        await delay('infinite')
+        return HttpResponse.json({})
+      }),
+    )
 
     openAt('/login?next=/me')
 
