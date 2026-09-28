@@ -236,3 +236,64 @@ describe('signing in from the sky page', () => {
     expectNoLightAlarmColours(container)
   })
 })
+
+describe('the document behind the sign-in page', () => {
+  // jsdom reads no index.css; give the surface its --sky the way brand-tokens.css does.
+  let tokens: HTMLStyleElement
+  beforeAll(() => {
+    tokens = document.createElement('style')
+    tokens.textContent = '[data-surface="sky"] { --sky: #0A1020; }'
+    document.head.appendChild(tokens)
+  })
+  afterAll(() => tokens.remove())
+  afterEach(() => {
+    document.documentElement.style.backgroundColor = ''
+    document.body.style.backgroundColor = ''
+  })
+
+  const SKY = /^(rgb\(10, 16, 32\)|#0a1020)$/i
+
+  function renderWithAWayOut() {
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    return render(
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={client}>
+          <MemoryRouter initialEntries={['/login']}>
+            <Routes>
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/privacy" element={<p>the privacy notice</p>} />
+            </Routes>
+          </MemoryRouter>
+        </QueryClientProvider>
+      </I18nextProvider>,
+    )
+  }
+
+  it('is the sky while the page is up, and is given back when the reader leaves', async () => {
+    const user = userEvent.setup()
+    renderWithAWayOut()
+
+    expect(document.documentElement.style.backgroundColor).toMatch(SKY)
+    expect(document.body.style.backgroundColor).toMatch(SKY)
+
+    await user.click(screen.getByRole('link', { name: 'Privacy' }))
+
+    expect(await screen.findByText('the privacy notice')).toBeInTheDocument()
+    expect(document.documentElement.style.backgroundColor).toBe('')
+    expect(document.body.style.backgroundColor).toBe('')
+  })
+
+  it('puts back whatever inline background was there before, on unmount', () => {
+    document.documentElement.style.backgroundColor = 'rgb(1, 2, 3)'
+    document.body.style.backgroundColor = 'rgb(4, 5, 6)'
+    const view = renderWithAWayOut()
+
+    expect(document.documentElement.style.backgroundColor).toMatch(SKY)
+    expect(document.body.style.backgroundColor).toMatch(SKY)
+
+    view.unmount()
+
+    expect(document.documentElement.style.backgroundColor).toBe('rgb(1, 2, 3)')
+    expect(document.body.style.backgroundColor).toBe('rgb(4, 5, 6)')
+  })
+})
