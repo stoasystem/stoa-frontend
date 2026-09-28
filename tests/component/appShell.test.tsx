@@ -159,6 +159,15 @@ describe('touch targets on a phone', () => {
     if (role === 'admin') expect(strip).not.toBeNull()
   })
 
+  it('keeps the bell and avatar targets square, so a tap in a corner of the 44 box still lands', () => {
+    renderShell('student', '/', 375)
+    for (const name of ['notifications.openLabel', 'accountMenu.open']) {
+      const target = within(bar()).getByRole('button', { name })
+      // Chrome hit-tests the rounded shape: a rounded 44 box is a 44 circle.
+      expect(target.className, name).not.toMatch(/\brounded/)
+    }
+  })
+
   it('makes every account menu item a 44 target', async () => {
     renderShell('parent', '/parent', 375)
     await userEvent.click(within(bar()).getByRole('button', { name: 'accountMenu.open' }))

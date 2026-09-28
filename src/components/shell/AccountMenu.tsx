@@ -92,10 +92,13 @@ export function AccountMenu({
           aria-label={t('accountMenu.open')}
           title={t('accountMenu.open')}
           data-account-trigger
-          className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0"
+          data-ring-on-face
+          className="group inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
           style={touch ? { width: TOUCH_TARGET, height: TOUCH_TARGET } : { width: avatarSize, height: avatarSize }}
         >
-          <Avatar name={user.name} size={avatarSize} />
+          <span className="inline-flex rounded-full group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-ring">
+            <Avatar name={user.name} size={avatarSize} />
+          </span>
         </button>
       </Menu.Trigger>
       <ItemHeight.Provider value={itemHeight}>

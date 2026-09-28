@@ -20,6 +20,13 @@ select:focus-visible,
   outline-offset: var(--focus-ring-offset);
 }
 
+/* A 44 hit box around a smaller round control (bell, avatar): the ring goes on
+   the drawn face, not on the square box, which stays square so its corners
+   still take a tap. */
+[data-ring-on-face]:focus-visible {
+  outline: none;
+}
+
 .premium-reveal {
   animation: premium-reveal 620ms ease both;
 }

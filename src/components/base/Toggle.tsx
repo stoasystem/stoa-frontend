@@ -14,6 +14,11 @@ export interface ToggleProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement
  * the end. Off: --toggle-track-off, which keeps 3:1 against the row and the
  * knob (the canvas draws no off state; --fill would be 1.22:1). A real switch,
  * so a screen reader says "on" or "off" and Space flips it.
+ *
+ * Only on --surface, --ground, --sidebar or --accent-tint, the backgrounds the
+ * contrast gate rates the off track against. Not on --fill (2.97:1) and not
+ * inside data-surface="sky" (the on track is 1.45:1 there); add a pair to
+ * scripts/contrast-pairs.json before putting it anywhere else.
  */
 export function Toggle({ checked, onCheckedChange, label, className, style, disabled, ...props }: ToggleProps) {
   const inset = (TOGGLE.height - TOGGLE.knob) / 2

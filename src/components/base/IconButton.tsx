@@ -52,8 +52,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-label={label}
       title={label}
       data-variant={variant}
+      data-ring-on-face
       className={cn(
-        'group relative inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0',
+        'group relative inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0',
         'disabled:pointer-events-none disabled:opacity-40',
         className,
       )}
@@ -64,7 +65,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
         aria-hidden="true"
         data-icon-button-face
         className={cn(
-          'relative inline-flex items-center justify-center rounded-full',
+          'relative inline-flex items-center justify-center rounded-full group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-ring',
           'transition-[background-color,opacity] duration-[var(--motion-press)] ease-out',
           variantClasses[variant],
         )}
