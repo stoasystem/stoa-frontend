@@ -1,10 +1,7 @@
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
 import { matchPath } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { navItems } from '@/app/router/routeConfig'
-import { getNavItemsForRole } from '@/lib/navigation'
-import { registeredPaths } from './routerSource'
+import { legacyRedirects, pageRoutes } from '@/app/router/routeManifest'
+import { getNavItemsForRole, navItems } from '@/lib/navigation'
 
 // The shared setup pins every flag in '@/lib/env'. What a user is shown is
 // decided by the real ones, demo visibility included, so this suite reads them
@@ -31,10 +28,9 @@ vi.mock('@/lib/runtimeConfig', async (importOriginal) => ({
   }),
 }))
 
-// The catch-all only renders NotFoundPage, so matching it is not a route.
-const registeredRoutes = registeredPaths(
-  readFileSync(path.resolve(__dirname, '../../src/app/router/AppRouter.tsx'), 'utf8'),
-).filter((route) => route !== '*')
+// The catch-all only renders NotFoundPage, so matching it is not a route; a
+// redirect is not a page either.
+const registeredRoutes = pageRoutes.map((route) => route.path).filter((route) => route !== '*')
 
 const roles = [...new Set(navItems.map((item) => item.role))]
 
@@ -62,7 +58,16 @@ describe('the navigation shown to a user', () => {
     },
   )
 
-  it('reads routes from the router itself', () => {
+  it('never leads to a path that only redirects', () => {
+    const redirected = navItems
+      .map((item) => item.path)
+      .filter((navPath) =>
+        legacyRedirects.some((redirect) => !redirect.onlyFor && matchPath(redirect.from, navPath)),
+      )
+    expect(redirected).toEqual([])
+  })
+
+  it('reads routes from the route manifest', () => {
     expect(registeredRoutes.length).toBeGreaterThan(20)
     expect(registeredRoutes).toContain('/admin/users')
   })

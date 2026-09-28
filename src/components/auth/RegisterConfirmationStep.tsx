@@ -3,13 +3,13 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { EmailVerificationPanel } from '@/components/auth/EmailVerificationPanel'
 import { Button } from '@/components/ui/button'
+import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import type { AuthResponse } from '@/types/user'
 
 function getContinueHref(data: AuthResponse) {
-  if (data.user.role === 'student') return '/chat'
   if (data.user.role === 'parent') return '/parent'
   if (data.user.role === 'teacher') return '/tutor'
-  return '/chat'
+  return getDefaultRouteForRole('student')
 }
 
 export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {

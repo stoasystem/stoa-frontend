@@ -25,10 +25,10 @@ import { InternalDebugPanel } from '@/components/internal/InternalDebugPanel'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { NotificationCenter } from '@/components/notifications/NotificationCenter'
 import { UserMenu } from '@/components/common/UserMenu'
-import type { AppNavIcon, AppNavItem } from '@/app/router/routeConfig'
+import type { AppNavIcon } from '@/app/router/routeManifest'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { cn } from '@/lib/utils'
-import { getNavItemsForUserRole } from '@/lib/navigation'
+import { getNavItemsForUserRole, type AppNavItem } from '@/lib/navigation'
 import { useAuthStore } from '@/store/authStore'
 
 const navIcons: Record<AppNavIcon, LucideIcon> = {
@@ -49,36 +49,6 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   tutors: GraduationCap,
 }
 
-const navLabelKeys: Record<string, string> = {
-  'Advanced Analytics': 'navigation.analytics',
-  Analytics: 'navigation.analytics',
-  Availability: 'navigation.availability',
-  'Ask a question': 'navigation.chat',
-  Billing: 'navigation.billing',
-  Chat: 'navigation.chat',
-  'Classroom Queue': 'navigation.classroomQueue',
-  Contact: 'navigation.contact',
-  Dashboard: 'navigation.dashboard',
-  'Help Requests': 'navigation.helpRequests',
-  'Learning Activity': 'navigation.learningActivity',
-  'Learning History': 'navigation.learningHistory',
-  Learn: 'navigation.learn',
-  Library: 'navigation.questionBank',
-  Overview: 'navigation.overview',
-  'Online Classroom': 'navigation.onlineClassroom',
-  Profile: 'navigation.profile',
-  Practice: 'navigation.practice',
-  'Question Bank': 'navigation.questionBank',
-  Reports: 'navigation.reports',
-  Requests: 'navigation.requests',
-  Retention: 'navigation.analytics',
-  Students: 'navigation.users',
-  Support: 'navigation.support',
-  'Support Inbox': 'navigation.supportInbox',
-  Tutors: 'navigation.tutors',
-  Users: 'navigation.users',
-}
-
 function NavItemLink({
   item,
   items,
@@ -91,7 +61,8 @@ function NavItemLink({
   const Icon = navIcons[item.icon]
   const { t } = useTranslation('common')
   const location = useLocation()
-  const labelKey = navLabelKeys[item.label] ?? item.label
+  // The manifest names the key; an entry without one shows its English label.
+  const labelKey = item.labelKey ?? item.label
   const fullLabel = t(labelKey, { defaultValue: item.label })
   // Five tabs share a phone's width, where the full labels are cut mid-word.
   const label = compact

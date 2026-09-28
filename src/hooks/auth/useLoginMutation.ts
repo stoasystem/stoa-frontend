@@ -14,7 +14,9 @@ import { useAuthStore, waitForPendingLogout } from '@/store/authStore'
 import type { UserRole } from '@/types/user'
 
 const roleNextPathPrefixes: Record<UserRole, string[]> = {
-  student: ['/chat', '/learn', '/profile'],
+  // The planet routes (#45), plus the legacy entries that redirect into them,
+  // so a sign-in that interrupted an old link still lands where it pointed.
+  student: ['/', '/planet', '/chapter', '/ask', '/me', '/assignments', '/chat', '/learn', '/profile'],
   parent: ['/parent', '/billing', '/support'],
   teacher: ['/tutor', '/support', '/teacher-activate'],
   admin: ['/admin'],

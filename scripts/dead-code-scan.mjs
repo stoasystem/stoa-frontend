@@ -24,8 +24,9 @@
  *
  * Every run also checks itself, and exits 1 if a check fails:
  *   - no tracked text file holds a byte file(1) would call binary;
- *   - negative control: `src/components/chat/ChatInput.tsx` (imported by
- *     ChatPage.tsx) must not be judged dead;
+ *   - negative control: `src/app/router/ProtectedRoute.tsx` (imported by
+ *     AppRoutes.tsx) must not be judged dead. It was ChatInput.tsx, imported
+ *     by ChatPage.tsx, until #45 took ChatPage off the router;
  *   - positive control: a probe module added in memory, imported by nothing
  *     and named nowhere, must be judged dead by both methods;
  *   - `*.test-d.ts` type-contract files (checked by `tsc -b`, imported by
@@ -69,7 +70,7 @@ const DEFAULT_OPTIONS = {
   testPrefixes: ['tests/'],
   alias: { '@/': 'src/' },
   exempt: [/\.test-d\.ts$/, /\.d\.ts$/],
-  negativeControls: [{ file: 'src/components/chat/ChatInput.tsx', importer: 'src/pages/chat/ChatPage.tsx' }],
+  negativeControls: [{ file: 'src/app/router/ProtectedRoute.tsx', importer: 'src/app/router/AppRoutes.tsx' }],
   exemptionControls: ['src/types/billing.contract.test-d.ts'],
   probe: true,
   // This file names the controls above; it must not count as their importer.

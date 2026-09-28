@@ -1,25 +1,12 @@
+import { CHANGE_PASSWORD_PATH, navAreaForRole, roleHomePaths } from '@/app/router/routeManifest'
 import type { UserRole } from '@/types/user'
 
 // The one screen an account under a forced password change can still use.
-export const CHANGE_PASSWORD_PATH = '/settings/password'
+export { CHANGE_PASSWORD_PATH }
 
+/** Where a signed-in account starts: its role's home in the route manifest. */
 export function getDefaultRouteForRole(role: UserRole) {
-  switch (role) {
-    case 'student':
-      return '/chat'
-    case 'parent':
-      return '/parent'
-    case 'teacher':
-      return '/tutor'
-    case 'admin':
-      return '/admin'
-    case 'organization_admin':
-    case 'school_teacher':
-    case 'school_viewer':
-      return '/organization'
-    default:
-      return '/chat'
-  }
+  return roleHomePaths[navAreaForRole(role)]
 }
 
 export function canAccessRoute(role: UserRole, allowedRoles: UserRole[]) {
