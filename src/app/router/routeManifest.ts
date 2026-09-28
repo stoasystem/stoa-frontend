@@ -81,7 +81,7 @@ export type PageRoute = {
   demoSurface?: boolean
   /**
    * Shown instead of refusing a visitor the guard would turn away. Only `/`
-   * uses it: it is the student's planet, and the sign-in page (or the way to
+   * uses it: it is the student's star map, and the sign-in page (or the way to
    * one's own home) for everybody else.
    */
   refusedPage?: LazyPage
@@ -164,11 +164,11 @@ const UnauthorizedPage = lazyPage('UnauthorizedPage', () => import('@/pages/erro
 const ForbiddenPage = lazyPage('ForbiddenPage', () => import('@/pages/error/ForbiddenPage'))
 const NotFoundPage = lazyPage('NotFoundPage', () => import('@/pages/not-found/NotFoundPage'))
 
-// Student: the planet redesign (#13). Placeholders until their slices land.
-const PlanetHomePage = lazyPage('PlanetHomePage', () => import('@/pages/planet/PlanetPages'))
-const PlanetSubjectPage = lazyPage('PlanetSubjectPage', () => import('@/pages/planet/PlanetPages'))
-const PlanetTopicPage = lazyPage('PlanetTopicPage', () => import('@/pages/planet/PlanetPages'))
-const PlanetUnitPage = lazyPage('PlanetUnitPage', () => import('@/pages/planet/PlanetPages'))
+// Student: the planet redesign (#13), whose map is a star map since #72.
+const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages'))
+const MapSubjectPage = lazyPage('MapSubjectPage', () => import('@/pages/map/MapPages'))
+const MapNebulaPage = lazyPage('MapNebulaPage', () => import('@/pages/map/MapPages'))
+const MapStarPage = lazyPage('MapStarPage', () => import('@/pages/map/MapPages'))
 const ChapterPage = lazyPage('ChapterPage', () => import('@/pages/chapter/ChapterPages'))
 const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapter/ChapterPages'))
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
@@ -255,10 +255,10 @@ export const pageRoutes: readonly PageRoute[] = [
   {
     path: '/',
     access: STUDENT,
-    page: PlanetHomePage,
+    page: MapHomePage,
     refusedPage: EntryPage,
     titleKey: 'studentRoutes.home.title',
-    meta: { module: 'Planet', status: 'placeholder', purpose: 'Student: the default subject planet. Everyone else: sign-in, or the way to their own home.' },
+    meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },
   { path: '/login', access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
   { path: '/register', access: PUBLIC, page: RegisterPage, meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
@@ -288,11 +288,12 @@ export const pageRoutes: readonly PageRoute[] = [
 
   // ---- student -----------------------------------------------------------
   // No student route carries a `nav` entry: the student's bar holds only the
-  // logo, the bell and the avatar (#13 point 5). The planet is the navigation;
+  // logo, the bell and the avatar (#13 point 5). The star map is the navigation;
   // /me is reached from the avatar menu, /ask from the composer.
-  { path: '/planet/:subjectId', access: STUDENT, page: PlanetSubjectPage, titleKey: 'studentRoutes.planet.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A subject planet.' } },
-  { path: '/planet/:subjectId/:topicId', access: STUDENT, page: PlanetTopicPage, titleKey: 'studentRoutes.region.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A region (topic) of a planet.' } },
-  { path: '/planet/:subjectId/:topicId/:unitId', access: STUDENT, page: PlanetUnitPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Planet', status: 'placeholder', purpose: 'A knowledge point (unit) of a region.' } },
+  // The star map's three layers (#72 point 8); fixture data until #48.
+  { path: '/map/:subjectId', access: STUDENT, page: MapSubjectPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
+  { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapNebulaPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
+  { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapStarPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The chapter of a knowledge point.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   {
@@ -300,7 +301,7 @@ export const pageRoutes: readonly PageRoute[] = [
     access: STUDENT,
     page: AskPage,
     titleKey: 'studentRoutes.ask.title',
-    meta: { module: 'Ask', status: 'placeholder', purpose: 'Ask: the planet with a side panel on a desktop, a full-screen sheet on a phone.' },
+    meta: { module: 'Ask', status: 'placeholder', purpose: 'Ask: the star map with a side panel on a desktop, a full-screen sheet on a phone.' },
   },
   { path: '/ask/:conversationId', access: STUDENT, page: AskPage, titleKey: 'studentRoutes.ask.title', meta: { module: 'Ask', status: 'placeholder', purpose: 'One Ask conversation.' } },
   {
@@ -438,7 +439,27 @@ const CONVERSATION_QUERY = 'conversationId'
 const toAsk = ({ params, search }: LegacyRedirectInput) =>
   askPathFor(params.conversationId ?? search.get(CONVERSATION_QUERY))
 
+/*
+ * `/planet/...` became `/map/...` when the planet became a star map (#72
+ * point 8). The same segments carry over; anything that is not a plain
+ * segment, or more of them than a star's address has, lands on the home map.
+ */
+const toMap = ({ params }: LegacyRedirectInput) => {
+  const segments = (params['*'] ?? '').split('/').filter(Boolean)
+  if (segments.length === 0 || segments.length > 3 || segments.some((s) => s === '.' || s === '..')) return '/'
+  return `/map/${segments.map((segment) => encodeURIComponent(decodeSegment(segment))).join('/')}`
+}
+
+function decodeSegment(segment: string): string {
+  try {
+    return decodeURIComponent(segment)
+  } catch {
+    return segment
+  }
+}
+
 export const legacyRedirects: readonly LegacyRedirect[] = [
+  { from: '/planet/*', to: toMap, access: STUDENT, carryContext: true, decision: '#72 §8' },
   { from: '/learn/*', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/dashboard', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/practice/*', to: '/', access: STUDENT, decision: '#13 §2' },

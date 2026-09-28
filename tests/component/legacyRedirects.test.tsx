@@ -9,27 +9,33 @@ import { openAs } from './routeHarness'
 
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
-describe('legacy student routes redirect to the planet routes', () => {
+describe('legacy student routes redirect to the star map routes', () => {
   it.each([
     // /learn*
-    ['/learn', '/', 'PlanetHomePage'],
-    ['/learn/mistakes', '/', 'PlanetHomePage'],
+    ['/learn', '/', 'MapHomePage'],
+    ['/learn/mistakes', '/', 'MapHomePage'],
     // /dashboard
-    ['/dashboard', '/', 'PlanetHomePage'],
+    ['/dashboard', '/', 'MapHomePage'],
     // /practice*
-    ['/practice', '/', 'PlanetHomePage'],
-    ['/practice/math/fractions/lessons/l-1/result', '/', 'PlanetHomePage'],
+    ['/practice', '/', 'MapHomePage'],
+    ['/practice/math/fractions/lessons/l-1/result', '/', 'MapHomePage'],
     // /question-bank*
-    ['/question-bank', '/', 'PlanetHomePage'],
-    ['/question-bank/sets/s-1', '/', 'PlanetHomePage'],
+    ['/question-bank', '/', 'MapHomePage'],
+    ['/question-bank/sets/s-1', '/', 'MapHomePage'],
     // /classroom*
-    ['/classroom', '/', 'PlanetHomePage'],
-    ['/classroom/sessions/s-1/room', '/', 'PlanetHomePage'],
+    ['/classroom', '/', 'MapHomePage'],
+    ['/classroom/sessions/s-1/room', '/', 'MapHomePage'],
     // learning history is gone (#13 point 3)
-    ['/learning-history', '/', 'PlanetHomePage'],
+    ['/learning-history', '/', 'MapHomePage'],
     // /chat, /assistant
     ['/chat', '/ask', 'AskPage'],
     ['/assistant', '/ask', 'AskPage'],
+    // /planet* became /map* (#72 point 8)
+    ['/planet/math', '/map/math', 'MapSubjectPage'],
+    ['/planet/math/fractions', '/map/math/fractions', 'MapNebulaPage'],
+    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1', 'MapStarPage'],
+    ['/planet', '/', 'MapHomePage'],
+    ['/planet/math/fractions/u-1/extra', '/', 'MapHomePage'],
     // /profile, /settings/password
     ['/profile', '/me', 'MePage'],
     ['/settings/password', '/me', 'MePage'],
@@ -38,6 +44,16 @@ describe('legacy student routes redirect to the planet routes', () => {
 
     expect(landed.pathname).toBe(pathname)
     expect(landed.page).toBe(page)
+  })
+})
+
+describe('an old /planet link keeps its query and its segments safe', () => {
+  it('carries the query string to /map', () => {
+    expect(openAs('student', '/planet/math?points=500')).toMatchObject({ pathname: '/map/math', search: '?points=500', page: 'MapSubjectPage' })
+  })
+
+  it('re-encodes a segment rather than passing it through raw', () => {
+    expect(openAs('student', '/planet/math/a%20b')).toMatchObject({ pathname: '/map/math/a%20b', page: 'MapNebulaPage' })
   })
 })
 

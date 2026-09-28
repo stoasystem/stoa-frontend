@@ -13,9 +13,9 @@ import { openAs, type Viewer } from './routeHarness'
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
 const STUDENT_ROUTES = [
-  ['/planet/math', 'PlanetSubjectPage'],
-  ['/planet/math/fractions', 'PlanetTopicPage'],
-  ['/planet/math/fractions/u-1', 'PlanetUnitPage'],
+  ['/map/math', 'MapSubjectPage'],
+  ['/map/math/fractions', 'MapNebulaPage'],
+  ['/map/math/fractions/u-1', 'MapStarPage'],
   ['/chapter/u-1', 'ChapterPage'],
   ['/chapter/u-1/l-1', 'LessonStagePage'],
   ['/ask', 'AskPage'],
@@ -69,12 +69,12 @@ describe('student routes', () => {
   })
 })
 
-describe('/ is the planet for a student and the front door for everyone else', () => {
-  it('shows a student the planet', () => {
-    expect(openAs('student', '/')).toMatchObject({ pathname: '/', page: 'PlanetHomePage' })
+describe('/ is the star map for a student and the front door for everyone else', () => {
+  it('shows a student the star map', () => {
+    expect(openAs('student', '/')).toMatchObject({ pathname: '/', page: 'MapHomePage' })
   })
 
-  it.each(['anonymous', ...OTHER_ROLES] as Viewer[])('shows %s the entry page, not the planet', (viewer) => {
+  it.each(['anonymous', ...OTHER_ROLES] as Viewer[])('shows %s the entry page, not the star map', (viewer) => {
     // EntryPage signs the visitor in, or sends them to their own home.
     expect(openAs(viewer, '/')).toMatchObject({ pathname: '/', page: 'EntryPage' })
   })

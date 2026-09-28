@@ -1,0 +1,68 @@
+{
+  "stage": {
+    "label": "Carte du ciel : {{subject}}",
+    "nebulae": "Nébuleuses"
+  },
+  "summary": {
+    "lit": "{{lit}} sur {{total}} allumées",
+    "streak_one": "{{count}} jour d’affilée",
+    "streak_other": "{{count}} jours d’affilée",
+    "score_one": "{{formatted}} point",
+    "score_other": "{{formatted}} points"
+  },
+  "state": {
+    "lit": "Allumée",
+    "in_progress": "En cours",
+    "ready": "Prête à commencer",
+    "locked": "Verrouillée"
+  },
+  "marker": {
+    "recommended": "Suggérée ensuite",
+    "reviewDue_one": "{{count}} carte à réviser",
+    "reviewDue_other": "{{count}} cartes à réviser"
+  },
+  "legend": {
+    "label": "Ce que signifient les étoiles",
+    "reviewDue": "À réviser",
+    "hint": "Faites glisser pour parcourir la carte. Faites défiler, pincez ou utilisez + et − pour zoomer sur une nébuleuse ; choisissez une étoile pour voir son chapitre."
+  },
+  "star": {
+    "progress": "{{percent}} % des leçons faites",
+    "lessons": "{{done}} leçons faites sur {{total}}",
+    "unmet_one": "Toutes les leçons sont faites : encore {{count}} exercice à réussir",
+    "unmet_other": "Toutes les leçons sont faites : encore {{count}} exercices à réussir",
+    "unmetPartial_one": "Encore {{count}} exercice à réussir",
+    "unmetPartial_other": "Encore {{count}} exercices à réussir",
+    "nextLesson": "Leçon suivante : {{title}}",
+    "skills": "Compétences",
+    "skillLit": "{{name}}, allumée",
+    "skillDark": "{{name}}, pas encore allumée",
+    "prerequisites": "À allumer d’abord",
+    "start": "Commencer",
+    "continue": "Continuer",
+    "open": "Ouvrir le chapitre",
+    "inNebula": "{{nebula}} · {{state}}"
+  },
+  "nebula": {
+    "link": "{{nebula}}, {{lit}} sur {{total}} allumées"
+  },
+  "nav": {
+    "map": "Carte du ciel",
+    "backToMap": "Retour à la carte du ciel",
+    "backToNebula": "Retour à {{nebula}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Zoomer",
+    "out": "Dézoomer"
+  },
+  "subjects": {
+    "label": "Matières"
+  },
+  "announce": {
+    "map": "{{subject}}, toute la carte du ciel : {{lit}} sur {{total}} allumées",
+    "nebula": "{{nebula}} : {{lit}} sur {{total}} allumées",
+    "star": "{{name}} : {{state}}"
+  },
+  "empty": "Rien à apprendre dans cette matière pour l’instant."
+}

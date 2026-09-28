@@ -256,7 +256,7 @@ describe('Row and Group (Sizes: list rows 48-64)', () => {
     )
 
   it('is 52 by default and a link with a chevron when it navigates', () => {
-    const { container } = renderRow(<Row title="Mathematics" to="/planet/math" />)
+    const { container } = renderRow(<Row title="Mathematics" to="/map/math" />)
     const row = screen.getByRole('link', { name: 'Mathematics' })
 
     expect(row).toHaveStyle({ minHeight: '52px', paddingInline: '16px' })

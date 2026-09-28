@@ -58,9 +58,9 @@ describe('the route manifest', () => {
     expect(student).toEqual(
       expect.arrayContaining([
         '/',
-        '/planet/:subjectId',
-        '/planet/:subjectId/:topicId',
-        '/planet/:subjectId/:topicId/:unitId',
+        '/map/:subjectId',
+        '/map/:subjectId/:topicId',
+        '/map/:subjectId/:topicId/:unitId',
         '/chapter/:unitId',
         '/chapter/:unitId/:lessonId',
         '/ask',
