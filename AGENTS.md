@@ -67,6 +67,14 @@ src/i18n       四语言 locale 资源
 tests/         unit · component · smoke（真部署）· release
 ```
 
+## 判断死代码
+
+「这个模块还有没有人用」只认 `node scripts/dead-code-scan.mjs`（import 图 + 整词计数取交集，
+自带阴性 / 阳性对照，自检失败 exit 1）。**不要拿裸 `grep` 的零命中当删除依据**：agent shell
+里的 `grep` 是带 `-I` 的 ugrep，会静默跳过含 NUL 等二进制字节的文件；BSD `command grep -n`
+对这种文件只打印 `Binary file … matches`。用法、结论含义、盲区和复现见
+`docs/agents/dead-code.md`。
+
 ## 还没清理干净的地方
 
 改到这些区域时先确认状态，别在废弃分支上加功能：
@@ -79,3 +87,13 @@ tests/         unit · component · smoke（真部署）· release
 - 未挂路由的旧版 student / teacher / parent 页面，以及双首页、双 Mistakes 页实验。
 
 `src/stores/`（与 `src/store/` 并存的那个空壳）已经删除，旧文档若还提到它，是旧文档过时。
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues via the `gh` CLI (stoasystem/stoa-frontend). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.

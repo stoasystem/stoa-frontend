@@ -121,6 +121,24 @@ export function forgetSession(email: string): DevSession[] {
   return next
 }
 
+/**
+ * Drop the held entry carrying this token, whichever account it is under.
+ * Signing a session out ends it here too: kept, it would be offered to the
+ * next person on this browser, and if the backend never confirmed the
+ * revocation it would still work. Other held roles are left as they are.
+ */
+export function forgetSessionHolding(accessToken: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    const next = raw.filter((entry) => entry?.accessToken !== accessToken)
+    if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing this could offer anyone.
+  }
+}
+
 /** Live, refused, or no answer — a failed check is not the same as a dead session. */
 export type SessionLiveness = 'live' | 'refused' | 'unknown'
 
