@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import {
   BarChart3,
   BookOpen,
@@ -27,6 +27,7 @@ import { TopBar } from '@/components/shell/TopBar'
 import { SOURCE_LIST_QUERY, WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import type { AppNavItem } from '@/lib/navigation'
+import { ShellCoverContext } from '@/layouts/shellCover'
 import { cn } from '@/lib/utils'
 import { useAuthStore } from '@/store/authStore'
 
@@ -59,8 +60,20 @@ export type AppSurface = 'light' | 'sky'
  *
  * `surface="sky"` paints the page area as the dark sky (the planet, the stage)
  * and scopes the sky tokens to it; the bar stays light, as every board draws it.
+ *
+ * `bleed` hands the page area to the page whole: no padding, exactly the height
+ * under the bar, nothing scrolls. The planet uses it, with Ask beside or over
+ * it (#49); the page then paints its own surfaces.
  */
-export function AppLayout({ children, surface = 'light' }: { children: ReactNode; surface?: AppSurface }) {
+export function AppLayout({
+  children,
+  surface = 'light',
+  bleed = false,
+}: {
+  children: ReactNode
+  surface?: AppSurface
+  bleed?: boolean
+}) {
   const { t } = useTranslation('common')
   const location = useLocation()
   const user = useAuthStore((state) => state.user)
@@ -70,44 +83,56 @@ export function AppLayout({ children, surface = 'light' }: { children: ReactNode
   const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
   const activeIndex = activeNavIndex(items, location.pathname)
+  const [covered, setCovered] = useState(false)
   const label = (item: AppNavItem) => t(item.labelKey ?? item.label, { defaultValue: item.label })
 
   const page = (
     <main
       data-surface={surface === 'sky' ? 'sky' : undefined}
-      className={cn('min-w-0 flex-1', surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink')}
+      className={cn(
+        'min-w-0 flex-1',
+        bleed && 'relative flex min-h-0 flex-col overflow-hidden',
+        surface === 'sky' ? 'bg-sky text-on-sky' : 'bg-ground text-ink',
+      )}
     >
-      {/* Placement: page padding 36 top and 48 at the sides; 8 and 16 on a phone. */}
-      <div className={cn(wide ? 'px-12 pt-9 pb-12' : 'px-4 pt-2 pb-8')}>{children}</div>
+      {bleed ? (
+        children
+      ) : (
+        /* Placement: page padding 36 top and 48 at the sides; 8 and 16 on a phone. */
+        <div className={cn(wide ? 'px-12 pt-9 pb-12' : 'px-4 pt-2 pb-8')}>{children}</div>
+      )}
     </main>
   )
 
   return (
-    <div className="flex min-h-screen flex-col bg-ground text-ink">
-      <TopBar
-        homePath={homePath}
-        wide={wide}
-        signedIn={Boolean(user)}
-        segments={
-          navigation.kind === 'segmented'
-            ? navigation.items.map((item) => ({ to: item.path, label: label(item) }))
-            : undefined
-        }
-        activeIndex={activeIndex}
-      />
-      {navigation.kind === 'sourceList' ? (
-        <div className={cn('flex flex-1', roomForSourceList ? 'flex-row' : 'flex-col')}>
-          <SourceList
-            wide={roomForSourceList}
-            activeIndex={activeIndex}
-            items={navigation.items.map((item) => ({ to: item.path, label: label(item), icon: navIcons[item.icon] }))}
-          />
-          {page}
-        </div>
-      ) : (
-        <div className="flex flex-1">{page}</div>
-      )}
-      <InternalDebugPanel />
-    </div>
+    <ShellCoverContext.Provider value={setCovered}>
+      <div className={cn('flex flex-col bg-ground text-ink', bleed ? 'h-dvh overflow-hidden' : 'min-h-screen')}>
+        <TopBar
+          covered={covered}
+          homePath={homePath}
+          wide={wide}
+          signedIn={Boolean(user)}
+          segments={
+            navigation.kind === 'segmented'
+              ? navigation.items.map((item) => ({ to: item.path, label: label(item) }))
+              : undefined
+          }
+          activeIndex={activeIndex}
+        />
+        {navigation.kind === 'sourceList' ? (
+          <div className={cn('flex flex-1', roomForSourceList ? 'flex-row' : 'flex-col')}>
+            <SourceList
+              wide={roomForSourceList}
+              activeIndex={activeIndex}
+              items={navigation.items.map((item) => ({ to: item.path, label: label(item), icon: navIcons[item.icon] }))}
+            />
+            {page}
+          </div>
+        ) : (
+          <div className={cn('flex flex-1', bleed && 'min-h-0')}>{page}</div>
+        )}
+        <InternalDebugPanel />
+      </div>
+    </ShellCoverContext.Provider>
   )
 }

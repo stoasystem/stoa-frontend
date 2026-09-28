@@ -37,6 +37,8 @@ const ROOTS = [
   'src/components/base',
   'src/components/shell',
   'src/layouts',
+  // Ask: the panel, the sheet and the docked composer (#49).
+  'src/features/ask',
   // The account page, the bell and Help (#46).
   'src/features/account',
   'src/components/notifications',

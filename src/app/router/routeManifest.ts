@@ -451,7 +451,9 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   // Learning history is gone (#13 §3); it used to forward to /learn/progress.
   { from: '/learning-history', to: '/', access: STUDENT, decision: '#13 §3' },
   { from: '/chat', to: toAsk, access: STUDENT, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
-  { from: '/chat/:conversationId', to: toAsk, access: STUDENT, carryContext: true, decision: '#13 §2' },
+  // The id is taken from the path; a `conversationId` in the query is dropped,
+  // so Ask never sees two ids (it reads only the path's).
+  { from: '/chat/:conversationId', to: toAsk, access: STUDENT, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   // Always public: it used to forward to /chat before any guard ran.
   { from: '/assistant', to: toAsk, access: PUBLIC, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },

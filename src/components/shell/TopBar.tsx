@@ -23,6 +23,7 @@ export function TopBar({
   segments,
   activeIndex,
   signedIn,
+  covered = false,
 }: {
   homePath: string
   wide: boolean
@@ -30,6 +31,8 @@ export function TopBar({
   segments?: readonly SegmentedNavItem[]
   activeIndex: number
   signedIn: boolean
+  /** Under a modal (the phone Ask sheet): dimmed with the page, and inert. */
+  covered?: boolean
 }) {
   const { t } = useTranslation('common')
   const bar = wide ? TOP_BAR : TOP_BAR_PHONE
@@ -48,6 +51,7 @@ export function TopBar({
   return (
     <header
       data-top-bar
+      inert={covered || undefined}
       className="sticky top-0 z-30 border-b border-separator"
       style={{
         background: 'var(--bar)',
@@ -83,6 +87,15 @@ export function TopBar({
         </div>
       </div>
       {!wide && segmented && <div className="px-4 pb-[3px]">{segmented}</div>}
+      {covered && (
+        <div
+          aria-hidden="true"
+          data-top-bar-dim
+          data-ask-motion="dim"
+          className="pointer-events-none absolute inset-0"
+          style={{ background: 'rgba(0, 0, 0, 0.25)' }}
+        />
+      )}
     </header>
   )
 }

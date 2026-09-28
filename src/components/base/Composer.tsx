@@ -22,6 +22,10 @@ export interface ComposerProps {
   disabled?: boolean
   /** Sending: the field stays editable, send is held. */
   busy?: boolean
+  /** An input method started composing (IME, dead keys). */
+  onCompositionStart?: () => void
+  /** An input method finished composing; the field's value then. */
+  onCompositionEnd?: (value: string) => void
   className?: string
 }
 
@@ -45,6 +49,8 @@ export function Composer({
   footerStart,
   disabled = false,
   busy = false,
+  onCompositionStart,
+  onCompositionEnd,
   className,
 }: ComposerProps) {
   const { t } = useTranslation('common')
@@ -102,6 +108,8 @@ export function Composer({
         disabled={disabled}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
+        onCompositionStart={onCompositionStart}
+        onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
         className={cn(
           'min-w-0 resize-none border-0 bg-transparent text-ink outline-none placeholder:text-caption',
           variant === 'docked' ? 'flex-1 text-[16px] leading-[1.4]' : 'text-[17px] leading-[1.45]',
