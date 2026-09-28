@@ -12,11 +12,11 @@ import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
-import { rememberPendingMessage } from '@/hooks/chat/useStreamingChat'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
 import { conversationGrade } from '@/lib/conversationGrade'
+import { rememberPendingMessage } from '@/lib/pendingChatMessages'
 import { teacherHelpErrorKey } from '@/lib/teacherHelpErrors'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { cn } from '@/lib/utils'
@@ -83,22 +83,38 @@ export function AskPanel({
   const phone = layout === 'sheet'
   const subject = subjectFor(subjectId, profile?.primarySubjects?.[0])
 
+  // Whether this panel is still on screen when the conversation comes back.
+  const mounted = useRef(true)
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+    }
+  }, [])
+
   function startConversation(content: string) {
     if (creatingRef.current || createConversation.isPending) return
     creatingRef.current = true
     askedAtRef.current = new Date().toISOString()
-    createConversation.mutate(
-      { subject, grade: conversationGrade(profile?.grade), initialMessage: content },
-      {
-        onSuccess: (created) => {
-          setDraft('')
-          select(created.id)
+    // Sent is sent: the question leaves the composer now, so closing Ask while
+    // the conversation is being made cannot leave it there to be sent twice.
+    // It comes back only if the conversation could not be made.
+    setDraft('')
+    createConversation
+      .mutateAsync({ subject, grade: conversationGrade(profile?.grade), initialMessage: content })
+      .then(
+        (created) => {
+          // Opened only in the panel that asked; a closed Ask stays closed.
+          if (mounted.current) select(created.id)
         },
-        onSettled: () => {
-          creatingRef.current = false
+        () => {
+          // Unless the student has started another question meanwhile.
+          if (!controller.readDraft()) setDraft(content)
         },
-      },
-    )
+      )
+      .finally(() => {
+        creatingRef.current = false
+      })
   }
 
   function submit(value: string) {
@@ -281,7 +297,9 @@ function AskThread({
     const node = scroller.current
     if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
   }
-  const announcement = useFinishedReplyAnnouncement(messages, conversationQuery.isSuccess)
+  const announcement = useFinishedReplyAnnouncement(messages, conversationQuery.isSuccess, {
+    teacher: help?.teacherName?.trim() || t('ask.thread.teacherFallback'),
+  })
 
   return (
     <>
@@ -347,7 +365,11 @@ const STICK_TO_BOTTOM_PX = 48
  * The reply to read out: an answer or a teacher's message once it is whole.
  * What was already there when the conversation opened is not announced.
  */
-function useFinishedReplyAnnouncement(messages: readonly ChatMessage[], loaded: boolean) {
+function useFinishedReplyAnnouncement(
+  messages: readonly ChatMessage[],
+  loaded: boolean,
+  names: { teacher: string },
+) {
   const [announcement, setAnnouncement] = useState('')
   const seen = useRef<Set<string> | null>(null)
   useEffect(() => {
@@ -366,8 +388,9 @@ function useFinishedReplyAnnouncement(messages: readonly ChatMessage[], loaded: 
     const fresh = finished.filter((message) => !known.has(message.id))
     for (const message of fresh) known.add(message.id)
     const latest = fresh[fresh.length - 1]
-    if (latest) setAnnouncement(latest.content)
-  }, [loaded, messages])
+    // A teacher's reply says who it is from; an answer is the assistant's.
+    if (latest) setAnnouncement(latest.role === 'teacher' ? `${names.teacher}: ${latest.content}` : latest.content)
+  }, [loaded, messages, names.teacher])
   return announcement
 }
 

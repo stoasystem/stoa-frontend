@@ -14,6 +14,8 @@ export type AskController = {
   /** The open conversation; `null` shows the conversation list. */
   conversationId: string | null
   draft: string
+  /** The draft now, outside a render (after a request has come back). */
+  readDraft: () => string
   setDraft: (draft: string) => void
   /** Typing in the docked composer on the planet. */
   openWithDraft: (draft: string) => void
@@ -52,6 +54,8 @@ export function useAskController(route?: AskRoute): AskController {
     [ownerId, storeSetDraft],
   )
 
+  const readDraft = useCallback(() => askFor(useAskStore.getState(), ownerId).draft, [ownerId])
+
   const openWithDraft = useCallback(
     (value: string) => {
       if (ownerId) storeOpenWithDraft(ownerId, value)
@@ -80,6 +84,7 @@ export function useAskController(route?: AskRoute): AskController {
     open: direct ? true : planetOpen,
     conversationId: direct ? directId : planetConversationId,
     draft,
+    readDraft,
     setDraft,
     openWithDraft,
     select,

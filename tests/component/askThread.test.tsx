@@ -332,6 +332,8 @@ describe('a teacher in the conversation', () => {
     const bubble = reply.closest('[data-message-role]')
     expect(bubble).toHaveAttribute('data-message-role', 'teacher')
     expect(within(bubble as HTMLElement).getByText('Ms Bergmann')).toBeInTheDocument()
+    // Read out with who it is from.
+    expect(announcer()).toHaveTextContent('Ms Bergmann: Well done - now try 4x − 7 = −19.')
   })
 
   it('is not polled for while no help is open', async () => {

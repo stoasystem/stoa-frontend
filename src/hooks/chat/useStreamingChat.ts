@@ -10,19 +10,11 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent } from '@/types/chat'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { watchGeneration, type GenerationOutcome } from '@/services/chat/generationWatch'
-
-/**
- * One message on its way: what was asked, and the idempotency key that makes
- * it one command on the server however often it is sent. Kept in session
- * storage while unanswered, so a reload picks the same command up again.
- */
-type PendingMessage = {
-  idempotencyKey: string
-  content: string
-  attachmentIds?: string[]
-  attachments?: ChatAttachment[]
-  askedAt: string
-}
+import {
+  readPendingMessage,
+  writePendingMessage,
+  type PendingMessage,
+} from '@/lib/pendingChatMessages'
 
 type RetryPayload = Omit<PendingMessage, 'askedAt' | 'idempotencyKey'> & {
   // Set when the failed command may be sent again as the same message; absent
@@ -41,67 +33,10 @@ type SendStreamingMessagePayload = Omit<StreamMessagePayload, 'idempotencyKey'> 
 const streamErrorFallback =
   'The explanation could not be prepared right now. Please try again or ask a teacher.'
 
-export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
-const pendingKey = (conversationId: string) => `${PENDING_MESSAGE_KEY_PREFIX}${conversationId}`
-
-function readPending(conversationId: string): PendingMessage | null {
-  try {
-    const raw = sessionStorage.getItem(pendingKey(conversationId))
-    if (!raw) return null
-    const value = JSON.parse(raw) as Partial<PendingMessage>
-    if (typeof value.idempotencyKey !== 'string' || typeof value.content !== 'string') return null
-    return {
-      idempotencyKey: value.idempotencyKey,
-      content: value.content,
-      attachmentIds: value.attachmentIds,
-      attachments: value.attachments,
-      askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
-    }
-  } catch {
-    return null
-  }
-}
-
-function writePending(conversationId: string, pending: PendingMessage | null) {
-  try {
-    if (pending) {
-      sessionStorage.setItem(pendingKey(conversationId), JSON.stringify(pending))
-    } else {
-      sessionStorage.removeItem(pendingKey(conversationId))
-    }
-  } catch {
-    // Without storage a reload loses the wait, not the message.
-  }
-}
-
-/**
- * A message the server already has but has not answered yet -- the first one
- * of a conversation, sent with `POST /conversations` itself -- so the hook
- * waits for its answer as it would after a reload, instead of sending it.
- */
-export function rememberPendingMessage(
-  conversationId: string,
-  pending: { idempotencyKey: string; content: string; askedAt: string },
-) {
-  writePending(conversationId, pending)
-}
-
-/**
- * Signing out: the questions still waiting for an answer are this account's
- * words, and must not be left in the tab for the next one.
- */
-export function clearPendingMessages() {
-  try {
-    const keys: string[] = []
-    for (let index = 0; index < sessionStorage.length; index += 1) {
-      const key = sessionStorage.key(index)
-      if (key?.startsWith(PENDING_MESSAGE_KEY_PREFIX)) keys.push(key)
-    }
-    for (const key of keys) sessionStorage.removeItem(key)
-  } catch {
-    // Without storage nothing was kept.
-  }
-}
+// Kept in the tab while unanswered: see pendingChatMessages.
+export { PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
+const readPending = readPendingMessage
+const writePending = writePendingMessage
 
 function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`

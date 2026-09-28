@@ -15,7 +15,18 @@ function focusables(container: HTMLElement) {
   )
 }
 
-type KeyEvent = Pick<KeyboardEvent, 'key' | 'shiftKey' | 'preventDefault' | 'stopPropagation'>
+type KeyEvent = Pick<KeyboardEvent, 'key' | 'keyCode' | 'shiftKey' | 'preventDefault' | 'stopPropagation'> & {
+  isComposing?: boolean
+  nativeEvent?: { isComposing?: boolean }
+}
+
+/**
+ * An input method is still composing: its Esc cancels the composition, not
+ * Ask. keyCode 229 is how Safari reports a key that belongs to one.
+ */
+function composing(event: KeyEvent) {
+  return Boolean(event.isComposing || event.nativeEvent?.isComposing || event.keyCode === 229)
+}
 
 /**
  * Keyboard handling for Ask: Esc closes it, and, when `trap` is set (the phone
@@ -32,6 +43,7 @@ export function useAskKeyboard(
 ) {
   const handle = useCallback(
     (event: KeyEvent) => {
+      if (composing(event)) return
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()

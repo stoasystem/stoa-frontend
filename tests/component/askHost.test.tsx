@@ -525,8 +525,41 @@ describe('the first question of a new conversation', () => {
     // It went out once, with the conversation; the answer waits for when it is opened.
     expect(streamConversationMessage).not.toHaveBeenCalled()
     expect(surface()).toBeNull()
+    // And it is not left in the composer to be sent a second time.
+    expect(dockedField()).toHaveValue('')
     expect(JSON.parse(sessionStorage.getItem('stoa_pending_chat_message:c-new') ?? '{}')).toMatchObject({
       idempotencyKey: 'initial-c-new',
     })
+  })
+})
+
+describe('a new conversation that cannot be made', () => {
+  it('gives the question back to the composer', async () => {
+    vi.mocked(getConversations).mockResolvedValue({ items: [] })
+    vi.mocked(createConversation).mockRejectedValue(new ApiError('busy', { status: 503 }))
+    show({ width: 1280 })
+    await userEvent.type(dockedField(), 'What is a prime?')
+    const field = within(surface()!).getByRole('textbox', { name: 'Your question' })
+
+    await userEvent.type(field, '{Enter}')
+
+    await vi.waitFor(() => expect(field).toHaveValue('What is a prime?'))
+    expect(createConversation).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Esc while an input method is composing', () => {
+  it('belongs to the composition, not to the sheet', async () => {
+    show({ width: 375 })
+    await userEvent.type(dockedField(), 'W')
+    const field = within(screen.getByRole('dialog', { name: 'Ask' })).getByRole('textbox', { name: 'Your question' })
+
+    fireEvent.keyDown(field, { key: 'Escape', isComposing: true })
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBeInTheDocument()
+    fireEvent.keyDown(field, { key: 'Escape', keyCode: 229 })
+    expect(screen.getByRole('dialog', { name: 'Ask' })).toBeInTheDocument()
+
+    fireEvent.keyDown(field, { key: 'Escape' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 })
