@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { UserMenu } from '@/components/common/UserMenu'
+import { AccountMenu } from '@/components/shell/AccountMenu'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
 import { logger } from '@/services/logging/logger'
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
@@ -34,7 +34,7 @@ function answerLogout(status: number): SeenLogout[] {
   return seen
 }
 
-function renderSignedIn(variant: 'sidebar' | 'top' = 'sidebar') {
+function renderSignedIn() {
   localStorage.setItem(TOKEN_KEY, 'shared-token')
   const clearAuth = vi.fn(storeClearAuth)
   useAuthStore.setState({
@@ -47,7 +47,7 @@ function renderSignedIn(variant: 'sidebar' | 'top' = 'sidebar') {
     <QueryClientProvider client={new QueryClient()}>
       <MemoryRouter initialEntries={['/tutor']}>
         <Routes>
-          <Route path="/tutor" element={<UserMenu variant={variant} />} />
+          <Route path="/tutor" element={<AccountMenu />} />
           <Route path="/login" element={<p>login page</p>} />
         </Routes>
       </MemoryRouter>
@@ -56,11 +56,13 @@ function renderSignedIn(variant: 'sidebar' | 'top' = 'sidebar') {
   return { clearAuth }
 }
 
-// The menu signs out here and leaves first, then tells the backend without
-// waiting for it; this waits until the backend's answer has been handled too.
+// The avatar menu signs out here and leaves first, then tells the backend
+// without waiting for it; this waits until the backend's answer has been
+// handled too.
 async function logOut() {
   const handled = [vi.spyOn(logger, 'info'), vi.spyOn(logger, 'warn')]
-  await userEvent.click(screen.getByRole('button', { name: 'actions.logOut' }))
+  await userEvent.click(screen.getByRole('button', { name: 'accountMenu.open' }))
+  await userEvent.click(await screen.findByRole('menuitem', { name: 'actions.logOut' }))
   expect(await screen.findByText('login page')).toBeInTheDocument()
   await waitFor(() => expect(handled.some((spy) => spy.mock.calls.length > 0)).toBe(true))
 }
@@ -87,18 +89,15 @@ describe('logging out', () => {
     sessionStorage.clear()
   })
 
-  it.each(['sidebar', 'top'] as const)(
-    'signs out here and sends the token it held in the body of POST /auth/logout (%s menu)',
-    async (variant) => {
-      const seen = answerLogout(204)
-      renderSignedIn(variant)
+  it('signs out here and sends the token it held in the body of POST /auth/logout', async () => {
+    const seen = answerLogout(204)
+    renderSignedIn()
 
-      await logOut()
+    await logOut()
 
-      expect(seen).toEqual([{ body: { access_token: 'shared-token' }, authorization: null }])
-      expectSignedOutHere()
-    },
-  )
+    expect(seen).toEqual([{ body: { access_token: 'shared-token' }, authorization: null }])
+    expectSignedOutHere()
+  })
 
   it('revokes the token a pinned tab holds, not the one the browser shares', async () => {
     const seen = answerLogout(204)
