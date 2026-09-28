@@ -1,50 +1,100 @@
 @import "tailwindcss";
+@import "./styles/brand-tokens.css";
+@import "./styles/legacy-bridge.css";
 @import "./styles/stoa-theme.css";
 @import "./styles/premium-theme.css";
-@import "./styles/brand-tokens.css";
 @import "./styles/platform-theme.css";
 
-@theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
+/*
+ * Tailwind colours, radii and type read the canvas tokens in brand-tokens.css.
+ * `inline` makes each utility carry `var(--token)` itself, so a token that is
+ * redefined inside a sky surface is picked up there.
+ *
+ * `secondary`, `muted` and `accent` keep the meaning the existing pages give
+ * them (shadcn: a quiet fill, a caption colour, the brand action colour). The
+ * canvas's own --secondary is a caption text colour: new code writes
+ * `text-caption` for it.
+ */
+@theme inline {
+  --color-background: var(--ground);
+  --color-foreground: var(--ink);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--ink);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--ink);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--on-accent);
+  --color-secondary: var(--fill);
+  --color-secondary-foreground: var(--ink);
+  --color-muted: var(--fill);
+  --color-muted-foreground: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--on-accent);
+  --color-destructive: var(--red);
+  --color-destructive-foreground: var(--on-accent);
+  --color-border: var(--hairline);
+  --color-input: var(--separator);
+  --color-ring: var(--focus-ring);
+
+  /* Canvas names (Tokens board). */
+  --color-ink: var(--ink);
+  --color-caption: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-sidebar: var(--sidebar);
+  --color-fill: var(--fill);
+  --color-separator: var(--separator);
+  --color-hairline: var(--hairline);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-accent-tint: var(--accent-tint);
+  --color-on-accent: var(--on-accent);
+  --color-star: var(--star);
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+  --color-gold: var(--gold);
+  --color-gold-tint: var(--gold-tint);
+  --color-red: var(--red);
+  --color-pill-neutral: var(--pill-neutral);
+  /* Only inside a sky surface. */
+  --color-sky: var(--sky);
+  --color-sky-2: var(--sky-2);
+  --color-lit: var(--lit);
+  --color-on-sky: var(--on-sky-text);
+
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-seg: var(--radius-seg);
+  --radius-small: var(--radius-small);
+  --radius-button: var(--radius-button);
+  --radius-list: var(--radius-list);
+  --radius-card: var(--radius-card);
+  --radius-composer: var(--radius-composer);
+  --radius-dock: var(--radius-dock);
 }
 
 * {
   box-sizing: border-box;
-  border-color: hsl(var(--border));
+  border-color: var(--hairline);
 }
 
 html {
-  background: hsl(var(--background));
+  background: var(--ground);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  color: hsl(var(--foreground));
-  background: hsl(var(--background));
+  color: var(--ink);
+  background: var(--ground);
+  font-size: 15px;
+  line-height: 1.4;
   font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -66,8 +116,8 @@ body {
 }
 
 ::selection {
-  color: hsl(var(--primary-foreground));
-  background: hsl(var(--stoa-brand-burgundy) / 0.86);
+  color: var(--on-accent);
+  background: var(--accent);
 }
 
 button {
@@ -132,6 +182,21 @@ svg,
 video,
 canvas {
   max-width: 100%;
+}
+
+/*
+ * A field drawn as a fill (the search field, the composer) takes the focus
+ * ring on the fill, not on the bare input inside it (#18).
+ */
+[data-search-field]:focus-within,
+[data-composer]:has([data-composer-field]:focus-visible) {
+  outline: var(--focus-ring-width) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+[data-search-field] input:focus-visible,
+[data-composer-field]:focus-visible {
+  outline: none;
 }
 
 /* ── Streaming cursor blink animation ─────────────────────────────────── */

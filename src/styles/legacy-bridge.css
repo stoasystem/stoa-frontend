@@ -1,0 +1,97 @@
+/*
+ * Old token names, mapped onto the canvas tokens in brand-tokens.css (#18).
+ *
+ * The pages written before the redesign read colours as bare HSL triplets
+ * (`hsl(var(--stoa-brand-burgundy-soft))`, `hsl(var(--platform-surface-app))`,
+ * shadcn's `hsl(var(--border))`) in some 80 files. Rather than rewrite pages
+ * that later slices restyle anyway, each old name here holds the triplet of
+ * the canvas token it now means, so every existing page already renders in
+ * Graphite and navy, with no burgundy.
+ *
+ * Nothing new may use these names. A slice that restyles a page drops its uses;
+ * when nothing reads a name any more, delete it here. This file is not the
+ * token source and the contrast gate does not read it: it must never define a
+ * canvas token name (--ink, --accent, --secondary, ...).
+ */
+
+:root {
+  /* Triplets of the canvas colours (brand-tokens.css), for hsl(var(--x) / a). */
+  --legacy-ink: 240 3.3% 11.8%;              /* --ink #1D1D1F */
+  --legacy-secondary: 240 2.3% 41.8%;        /* --secondary #68686D */
+  --legacy-ground: 240 11.1% 96.5%;          /* --ground #F5F5F7 */
+  --legacy-surface: 0 0% 100%;               /* --surface #FFFFFF */
+  --legacy-fill: 240 12.2% 92%;              /* --fill #E8E8ED */
+  --legacy-separator: 240 5.9% 83.3%;        /* --separator #D2D2D7 */
+  --legacy-hairline: 240 10.6% 90.8%;        /* --hairline #E5E5EA */
+  --legacy-accent: 225 49.6% 24.1%;          /* --accent #1F2E5C */
+  --legacy-accent-pressed: 227 57.4% 18.4%;  /* --accent-pressed #14204A */
+  --legacy-accent-tint: 221 57.1% 94.5%;     /* --accent-tint #E9EEF9 */
+  --legacy-green: 145 46.4% 32.9%;           /* --green #2D7B4E */
+  --legacy-green-tint: 145 31.6% 92.5%;      /* --green-tint #E6F2EB */
+  --legacy-gold: 38 76.8% 27.1%;             /* --gold #7A5410 */
+  --legacy-gold-tint: 41 63.6% 91.4%;        /* --gold-tint #F7EEDB */
+  --legacy-red: 353 66.1% 46.3%;             /* --red #C4283A */
+
+  /* One family (Foundations: "never by a second font"). */
+  --font-serif: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-heading: var(--font-sans);
+  --font-display: var(--font-sans);
+  --font-nav: var(--font-sans);
+  --font-button: var(--font-sans);
+  --font-input: var(--font-sans);
+  --font-label: var(--font-sans);
+
+  /* The old brand palette. "Burgundy" is the navy accent now: the colour moved, the name did not. */
+  --stoa-brand-burgundy: var(--legacy-accent);
+  --stoa-brand-burgundy-strong: var(--legacy-accent-pressed);
+  --stoa-brand-burgundy-soft: var(--legacy-accent-tint);
+  --stoa-brand-charcoal: var(--legacy-ink);
+  --stoa-brand-ink: var(--legacy-ink);
+  --stoa-brand-warm-grey: var(--legacy-fill);
+  --stoa-brand-paper: var(--legacy-ground);
+  --stoa-brand-card: var(--legacy-surface);
+  --stoa-brand-muted-text: var(--legacy-secondary);
+  --stoa-brand-border: var(--legacy-separator);
+  --stoa-brand-highlight: var(--legacy-accent) / 0.12;
+  --stoa-brand-sage: var(--legacy-green);
+  --stoa-brand-sage-soft: var(--legacy-green-tint);
+  --stoa-brand-gold: var(--legacy-gold);
+  --stoa-brand-gold-soft: var(--legacy-gold-tint);
+
+  /*
+   * shadcn's semantic triplets. `--secondary` and `--accent` are canvas names
+   * now, so their old triplets are gone; the Tailwind colours `secondary` and
+   * `accent` are mapped in index.css instead.
+   */
+  --background: var(--legacy-ground);
+  --foreground: var(--legacy-ink);
+  --card: var(--legacy-surface);
+  --card-foreground: var(--legacy-ink);
+  --popover: var(--legacy-surface);
+  --popover-foreground: var(--legacy-ink);
+  --primary: var(--legacy-accent);
+  --primary-foreground: var(--legacy-surface);
+  --muted: var(--legacy-fill);
+  --muted-foreground: var(--legacy-secondary);
+  --destructive: var(--legacy-red);
+  --destructive-foreground: var(--legacy-surface);
+  --border: var(--legacy-hairline);
+  --input: var(--legacy-separator);
+  --ring: var(--legacy-accent);
+  --radius: 10px; /* the canvas button radius */
+
+  /* The old platform surfaces. Cards on Ground carry no shadow (Tokens board). */
+  --platform-surface-page: var(--legacy-ground);
+  --platform-surface-app: var(--legacy-ground);
+  --platform-surface-card: var(--legacy-surface);
+  --platform-surface-strong: var(--legacy-ink);
+  --platform-border-soft: var(--legacy-hairline);
+  --platform-accent-soft: var(--legacy-green-tint);
+  --platform-accent: var(--legacy-green);
+  --platform-warning-soft: var(--legacy-gold-tint);
+  --platform-warning: var(--legacy-gold);
+  --platform-shadow-soft: var(--shadow-float);
+  --platform-shadow-card: 0 0 #0000;
+  --platform-shadow-focus: 0 0 0 4px hsl(var(--legacy-accent) / 0.14);
+}

@@ -1,67 +1,179 @@
+/*
+ * STOA design tokens: the one token source.
+ *
+ * Transcribed from the redesign canvas, row "Design language · start here",
+ * board Tokens (https://claude.ai/artifact/XTHszGBU78LNmon3uJjMNk), with the
+ * Sizes, Placement and Motion boards for the non-colour tokens. Ticket #18.
+ *
+ * scripts/contrast-pairs.json rates this file (`tokens.file`): the light theme
+ * reads `:root`, the dark theme reads `:root` + `[data-surface="sky"]`. Keep
+ * the rules flat (the gate refuses nesting), and do not redefine a token the
+ * pairs use in any block the gate does not read -- no print, forced-colors or
+ * component overrides here.
+ *
+ * Light and dark are not an app-wide colour scheme. The canvas draws one light
+ * family (every teacher, parent and admin screen, the bars, the menus) and one
+ * dark surface, "the sky": the planet, the practice stage, the sign-in page.
+ * A sky surface is marked with `data-surface="sky"`; its tokens exist inside it
+ * and nowhere else, so a white-on-navy button cannot end up on a light page.
+ *
+ * Burgundy lives in the logo asset only. No colour here is burgundy.
+ *
+ * Old names the pages still use (`--stoa-brand-*`, `--platform-*`, the shadcn
+ * HSL triplets) are mapped onto these in legacy-bridge.css, which later slices
+ * empty as they restyle the pages.
+ */
+
 :root {
   color-scheme: light;
 
+  /* ---- Light surfaces (Tokens board) ---------------------------------- */
+  --ink: #1D1D1F;            /* text, titles */
+  --secondary: #68686D;      /* captions, inactive. Canvas #6E6E73, darkened to clear 4.5:1 on --fill and --sidebar (user 2026-09-28, #17) */
+  --tertiary: #AEAEB2;       /* chevrons, dividers: never text */
+  --ground: #F5F5F7;         /* page background */
+  --surface: #FFFFFF;        /* lists, cards, bars */
+  --sidebar: #F0F0F2;        /* source lists */
+  --fill: #E8E8ED;           /* segmented, search, gray button */
+  --separator: #D2D2D7;      /* bar borders */
+  --hairline: #E5E5EA;       /* row dividers */
+  --accent: #1F2E5C;         /* buttons, links, active, sent bubble */
+  --accent-pressed: #14204A; /* hover / press */
+  --accent-tint: #E9EEF9;    /* tinted buttons, selection */
+  --star: #BB831A;           /* streak, lit on light. Canvas #C48A1C, darkened to clear 3:1 on --ground (user 2026-09-28, #17) */
+  --green: #2D7B4E;          /* online, resolved. Canvas #2E7D4F, darkened to clear 4.5:1 on --green-tint (user 2026-09-28, #17) */
+  --gold: #7A5410;           /* waiting */
+  --red: #C4283A;            /* destructive text, never a fill */
+
+  /*
+   * Drawn on the canvas but not named on the Tokens board. The names were
+   * proposed by the contrast gate (#17) and are confirmed here (#18).
+   */
+  --on-accent: #FFFFFF;      /* label on a filled navy control (Placement, Components) */
+  --green-tint: #E6F2EB;     /* Foundations: green "paired with tint #E6F2EB" */
+  --gold-tint: #F7EEDB;      /* Foundations: gold "paired with tint #F7EEDB" */
+  --pill-neutral: #3A3A3C;   /* Motion and states: "Resolved" pill text on --fill; neutral icon tiles */
+
+  /* Bars: Surface at 86% under a 20 px blur (Placement, every top bar). */
+  --bar: rgba(255, 255, 255, 0.86);
+  --bar-blur: 20px;
+  /* Hairline on a card or group that sits on Ground (Foundations: "Lines and depth"). */
+  --card-border: rgba(0, 0, 0, 0.06);
+  /* Floating surfaces (composer, menus) carry this border and --shadow-float. */
+  --float-border: rgba(0, 0, 0, 0.08);
+
+  /* Motion and states: focus ring 2 px navy, 2 px offset. */
+  --focus-ring: var(--accent);
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  /* Disabled: 40% opacity, no hover. */
+  --disabled-opacity: 0.4;
+
+  /* ---- Type (Tokens board; one family, the system face) --------------- */
   --font-sans:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
-  --font-serif: Georgia, Cambria, "Times New Roman", ui-serif, serif;
-  --font-body: var(--font-sans);
-  --font-heading: var(--font-serif);
-  --font-display: var(--font-heading);
-  --font-nav: var(--font-sans);
-  --font-button: var(--font-sans);
-  --font-input: var(--font-sans);
-  --font-label: var(--font-sans);
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
+    "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono:
-    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, ui-monospace, monospace;
+    "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
 
-  --stoa-brand-burgundy: 352 59% 35%;
-  --stoa-brand-burgundy-strong: 351 59% 23%;
-  --stoa-brand-burgundy-soft: 349 42% 91%;
-  --stoa-brand-charcoal: 24 9% 13%;
-  --stoa-brand-ink: 20 12% 8%;
-  --stoa-brand-warm-grey: 36 35% 90%;
-  --stoa-brand-paper: 38 30% 96%;
-  --stoa-brand-card: 40 34% 98%;
-  --stoa-brand-muted-text: 24 8% 39%;
-  --stoa-brand-border: 29 21% 81%;
-  --stoa-brand-highlight: 352 59% 35% / 0.12;
-  --stoa-brand-sage: 105 12% 39%;
-  --stoa-brand-sage-soft: 99 24% 90%;
-  --stoa-brand-gold: 41 42% 42%;
-  --stoa-brand-gold-soft: 42 42% 89%;
+  --t-large: 700 34px/1.15 var(--font-sans);    /* page and greeting titles */
+  --t-large-tracking: -0.6px;
+  --t-title1: 700 28px/1.2 var(--font-sans);    /* section titles, lit moment numbers */
+  --t-title1-tracking: -0.5px;
+  --t-title2: 600 22px/1.25 var(--font-sans);   /* card titles, point names */
+  --t-title2-tracking: -0.3px;
+  --t-headline: 600 17px/1.3 var(--font-sans);  /* row titles that matter, card heads */
+  --t-body: 400 17px/1.45 var(--font-sans);     /* messages, questions */
+  --t-subhead: 400 15px/1.35 var(--font-sans);  /* rows, buttons, controls (400-500) */
+  --t-section: 500 13px/1.3 var(--font-sans);   /* group headers, caps */
+  --t-section-tracking: 0.4px;
+  --t-caption: 400 12px/1.3 var(--font-sans);   /* meta, hints (12-13; 11 only inside dense chips) */
+  --t-question: 600 42px/1.15 var(--font-sans); /* the maths itself on the stage (40-44) */
+  --t-question-tracking: -1px;
 
-  --background: var(--stoa-brand-paper);
-  --foreground: var(--stoa-brand-ink);
-  --card: var(--stoa-brand-card);
-  --card-foreground: var(--stoa-brand-ink);
-  --popover: var(--stoa-brand-card);
-  --popover-foreground: var(--stoa-brand-ink);
-  --primary: var(--stoa-brand-burgundy);
-  --primary-foreground: 38 33% 96%;
-  --secondary: var(--stoa-brand-warm-grey);
-  --secondary-foreground: var(--stoa-brand-ink);
-  --muted: var(--stoa-brand-warm-grey);
-  --muted-foreground: var(--stoa-brand-muted-text);
-  --accent: var(--stoa-brand-burgundy);
-  --accent-foreground: 38 33% 96%;
-  --destructive: 358 65% 39%;
-  --destructive-foreground: 38 33% 96%;
-  --border: var(--stoa-brand-border);
-  --input: var(--stoa-brand-border);
-  --ring: var(--stoa-brand-burgundy);
-  --radius: 0.5rem;
+  /* ---- Spacing (Tokens board) ----------------------------------------- */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
 
-  --platform-surface-page: var(--stoa-brand-paper);
-  --platform-surface-app: 40 28% 95%;
-  --platform-surface-card: var(--stoa-brand-card);
-  --platform-surface-strong: var(--stoa-brand-charcoal);
-  --platform-border-soft: var(--stoa-brand-border);
-  --platform-accent-soft: var(--stoa-brand-sage-soft);
-  --platform-accent: var(--stoa-brand-sage);
-  --platform-warning-soft: var(--stoa-brand-gold-soft);
-  --platform-warning: var(--stoa-brand-gold);
-  --platform-shadow-soft: 0 18px 55px hsl(var(--stoa-brand-charcoal) / 0.08);
-  --platform-shadow-card: 0 10px 28px hsl(var(--stoa-brand-charcoal) / 0.055);
-  --platform-shadow-focus: 0 0 0 4px hsl(var(--stoa-brand-burgundy) / 0.14);
+  /* ---- Radius (Tokens board) ------------------------------------------ */
+  --radius-seg: 7px;        /* segment inside a segmented control */
+  --radius-small: 8px;      /* small button, source-list item */
+  --radius-button: 10px;    /* regular button, search field */
+  --radius-list: 12px;      /* grouped list, large button, menu */
+  --radius-card: 16px;      /* card, glass card */
+  --radius-composer: 18px;  /* full composer */
+  --radius-dock: 22px;      /* docked composer */
+  --radius-pill: 999px;
+
+  /* ---- Elevation (Tokens board) --------------------------------------- */
+  /* Light: no shadow on Ground; floating surfaces only (composer, menus). */
+  --shadow-float: 0 1px 2px rgba(0, 0, 0, 0.04), 0 10px 30px rgba(0, 0, 0, 0.06);
+
+  /* ---- Motion (Motion and states board) ------------------------------- */
+  --motion-press: 120ms;    /* hover / press, ease-out */
+  --motion-panel: 280ms;    /* Ask panel, desktop */
+  --motion-sheet: 320ms;    /* sheet, phone */
+  --motion-zoom: 420ms;     /* planet <-> region */
+  --motion-jump: 560ms;     /* the jump, once */
+  --motion-lighting: 800ms; /* the lighting */
+  --motion-reduced: 200ms;  /* reduced motion: a linear crossfade replaces all of the above */
+  --ease-out: cubic-bezier(0, 0, 0.58, 1);
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-jump: cubic-bezier(0.3, 0.8, 0.2, 1);
+}
+
+/*
+ * The sky: the dark surfaces (Tokens board, "Dark surfaces"). Put
+ * `data-surface="sky"` on the element that paints --sky; everything inside it
+ * reads these.
+ */
+[data-surface="sky"] {
+  color-scheme: dark;
+
+  --sky: #0A1020;                          /* planet ground, stages */
+  --sky-2: #131C33;                        /* raised dark surfaces */
+  --sky-glass: rgba(22, 30, 52, 0.78);     /* cards over the sky, with --sky-glass-blur */
+  --sky-glass-blur: 24px;
+  --sky-glass-border: rgba(255, 255, 255, 0.12); /* Sizes: glass card border white 12% */
+  --lit: #F2C572;                          /* stars, rings, rays */
+  --lit-core: #FFF8EA;                     /* the white-hot core of a lit point */
+  --lit-deep: rgb(214, 160, 70);           /* glow gradients */
+  --node-fill: #141E38;                    /* hollow node interiors */
+  --sphere-0: #2A3A64;                     /* sphere highlight */
+  --sphere-1: #152040;                     /* sphere mid */
+  --sphere-2: #080C1A;                     /* sphere limb */
+  --atmosphere: rgba(120, 160, 255, 0.16); /* halo around the sphere */
+  --on-sky-button: #FFFFFF;                /* filled button on dark */
+
+  /*
+   * Named by the contrast gate (#17), confirmed here (#18). The Tokens board
+   * writes --on-sky-button as "#FFFFFF / text #0A1020" and --on-sky-text as
+   * "white 100 / 75 / 65 / 35 = title / body / caption / muted".
+   */
+  --on-sky-button-text: #0A1020;               /* Placement says "navy text"; the Tokens board wins (user 2026-09-28) */
+  --on-sky-text: #FFFFFF;                      /* titles */
+  --on-sky-text-body: rgba(255, 255, 255, 0.75);
+  --on-sky-text-caption: rgba(255, 255, 255, 0.65);
+  /*
+   * 3.20:1 on --sky, below 4.5. Only for labels of disabled, non-interactive
+   * controls (WCAG 1.4.3 "inactive user interface components"). Never for
+   * anything clickable -- a locked planet node opens its prerequisites, so it
+   * does not qualify -- and never for text meant to be read (user 2026-09-28).
+   */
+  --on-sky-text-muted: rgba(255, 255, 255, 0.35);
+  --on-sky-plain: rgba(255, 255, 255, 0.85);    /* Placement: plain button on dark, "plain white 85%" */
+  --on-sky-selected: rgba(255, 255, 255, 0.10); /* Motion and states: selected row on dark */
+
+  /* Motion and states: the focus ring on dark is 2 px star-gold. */
+  --focus-ring: var(--lit);
+  /* Tokens board: glass cards 0 12px 40px 45%; the composer floats over the sky (Components). */
+  --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.45);
+  --shadow-float: 0 2px 6px rgba(0, 0, 0, 0.25), 0 18px 50px rgba(0, 0, 0, 0.45);
 }
