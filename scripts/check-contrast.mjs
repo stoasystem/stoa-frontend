@@ -4,8 +4,12 @@
 // WCAG 2.1 relative luminance.
 //
 // Exit 0: every gated pair meets its threshold (a table of readings is printed).
-// Exit 1: at least one gated pair is below its threshold (each one is named).
-// Exit 2: the inputs cannot be rated (missing token, unreadable value, bad JSON).
+// Exit 1: a gated pair is below its threshold, or a "gate": false pair now
+//         meets it (each one is named).
+// Exit 2: the inputs cannot be rated, or the theme mapping cannot be trusted
+//         (missing token, unreadable value, bad JSON, nested rule, a block the
+//         pairs use that no theme reads, two themes on the same blocks, a
+//         theme with no gated pair).
 //
 // The token source is data, not code: "tokens.file" and "tokens.themes" in the
 // pairs file say which CSS file and which of its blocks each theme reads, so
@@ -25,7 +29,9 @@ const THRESHOLDS = { text: 4.5, large: 3, ui: 3 };
 class InputError extends Error {}
 
 // Returns Map<blockPath, Map<token, value>>. A block's path is its selector,
-// prefixed by the at-rules it sits in: ":root", "@media (...) :root".
+// prefixed by the at-rules it sits in: ":root", "@media (...) :root". A rule
+// nested inside a style rule (CSS nesting) is refused rather than guessed at:
+// its parent's declarations would otherwise be read without it or not at all.
 function readBlocks(css) {
   const blocks = new Map();
   const source = css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -34,7 +40,12 @@ function readBlocks(css) {
   for (let i = 0; i < source.length; i += 1) {
     const ch = source[i];
     if (ch === '{') {
-      stack.push({ prelude: source.slice(start, i).split(';').pop().trim().replace(/\s+/g, ' '), body: i + 1 });
+      const prelude = source.slice(start, i).split(';').pop().trim().replace(/\s+/g, ' ');
+      const parent = stack.at(-1);
+      if (parent && !parent.prelude.startsWith('@')) {
+        throw new InputError(`"${prelude}" is nested inside "${parent.prelude}"; the gate reads flat rules and at-rules only`);
+      }
+      stack.push({ prelude, body: i + 1 });
       start = i + 1;
     } else if (ch === '}') {
       const block = stack.pop();
@@ -68,9 +79,12 @@ function hslToRgb(h, s, l) {
   return [channel(0), channel(8), channel(4)];
 }
 
+// Alpha outside 0-1 is refused: a browser would clamp it, and a token that
+// relies on that is more likely a typo than a colour.
 const alphaOf = (raw) => {
   if (raw === undefined) return 1;
-  return raw.endsWith('%') ? Number(raw.slice(0, -1)) / 100 : Number(raw);
+  const alpha = raw.endsWith('%') ? Number(raw.slice(0, -1)) / 100 : Number(raw);
+  return alpha >= 0 && alpha <= 1 ? alpha : NaN;
 };
 
 // Returns { rgb: [r, g, b] in 0-255, alpha: 0-1 } or null. Accepts #hex (3, 4,
@@ -117,6 +131,10 @@ function resolveToken(theme, name, seen = []) {
   if (alias) return resolveToken(theme, alias[1], [...seen, name]);
   const colour = parseColour(value);
   if (!colour) throw new InputError(`${theme.name}: ${name}: "${value}" is not a colour the gate can read`);
+  if (Number.isNaN(colour.alpha)) throw new InputError(`${theme.name}: ${name}: "${value}" has an alpha outside 0-1`);
+  if (!colour.rgb.every((c) => c >= 0 && c <= 255)) {
+    throw new InputError(`${theme.name}: ${name}: "${value}" has a channel outside 0-255`);
+  }
   return { colour, chain: [...seen, name] };
 }
 
@@ -147,31 +165,51 @@ function loadConfig() {
     throw new InputError(`${PAIRS_FILE}: ${error.message}`);
   }
   const { tokens, pairs } = parsed;
-  if (typeof tokens?.file !== 'string' || typeof tokens.themes !== 'object' || tokens.themes === null) {
+  const themesOk = typeof tokens?.themes === 'object' && tokens.themes !== null && !Array.isArray(tokens.themes);
+  if (typeof tokens?.file !== 'string' || !themesOk) {
     throw new InputError(`${PAIRS_FILE}: "tokens" needs a string "file" and a "themes" object`);
   }
+  const themeNames = Object.keys(tokens.themes);
+  if (themeNames.length === 0) throw new InputError(`${PAIRS_FILE}: tokens.themes names no theme`);
   for (const [name, paths] of Object.entries(tokens.themes)) {
     if (!Array.isArray(paths) || paths.length === 0 || !paths.every((p) => typeof p === 'string')) {
       throw new InputError(`${PAIRS_FILE}: tokens.themes.${name} must be a non-empty array of block paths`);
     }
   }
+  // Two themes reading the same blocks would rate one set of values twice and
+  // call it both themes.
+  const blockSet = (name) => JSON.stringify([...new Set(tokens.themes[name])].sort());
+  themeNames.forEach((a, index) => {
+    for (const b of themeNames.slice(index + 1)) {
+      if (blockSet(a) === blockSet(b)) {
+        throw new InputError(`${PAIRS_FILE}: tokens.themes.${a} and .${b} read the same blocks; each theme needs its own`);
+      }
+    }
+  });
   if (!Array.isArray(pairs) || pairs.length === 0) {
     throw new InputError(`${PAIRS_FILE}: "pairs" must be a non-empty array`);
   }
   pairs.forEach((pair, index) => {
     const where = `${PAIRS_FILE}: pairs[${index}]`;
-    if (typeof pair.fg !== 'string' || typeof pair.bg !== 'string' || !(pair.kind in THRESHOLDS)) {
+    if (typeof pair?.fg !== 'string' || typeof pair.bg !== 'string' || !Object.hasOwn(THRESHOLDS, pair.kind)) {
       throw new InputError(`${where} needs string "fg", "bg" and "kind" one of ${Object.keys(THRESHOLDS).join('/')}`);
     }
-    if (!(pair.theme in tokens.themes)) {
-      throw new InputError(`${where}: "theme" must be one of ${Object.keys(tokens.themes).join('/')}`);
+    if (!Object.hasOwn(tokens.themes, pair.theme)) {
+      throw new InputError(`${where}: "theme" must be one of ${themeNames.join('/')}`);
     }
     if (pair.over !== undefined && typeof pair.over !== 'string') throw new InputError(`${where}: "over" must be a token name`);
     if (pair.gate !== undefined && typeof pair.gate !== 'boolean') throw new InputError(`${where}: "gate" must be true or false`);
-    if (pair.gate === false && (typeof pair.why !== 'string' || pair.why.trim() === '')) {
-      throw new InputError(`${where}: "gate": false needs a "why"`);
+    // An exemption names the issue that will settle it, so it has an owner.
+    if (pair.gate === false && (typeof pair.why !== 'string' || !/#\d+/.test(pair.why))) {
+      throw new InputError(`${where}: "gate": false needs a "why" that cites an issue (#<number>)`);
     }
   });
+  // "gate": false must not be a way to switch a theme off.
+  for (const name of themeNames) {
+    if (!pairs.some((pair) => pair.theme === name && pair.gate !== false)) {
+      throw new InputError(`${PAIRS_FILE}: theme "${name}" has no gated pair`);
+    }
+  }
   return { tokens, pairs };
 }
 
@@ -193,36 +231,55 @@ function loadThemes(tokens) {
     }
     themes.set(name, { name, tokens: merged, where: `${paths.join(' + ')} of ${tokens.file}` });
   }
-  return themes;
+  return { themes, blocks };
+}
+
+// A block that no theme reads but that defines a token the pairs use means the
+// theme mapping is wrong: the gate would rate some other value for that token,
+// or none, and pass. Refuse instead.
+function checkUnreadBlocks(tokens, blocks, used) {
+  const read = new Set(Object.values(tokens.themes).flat());
+  for (const [path, block] of blocks) {
+    if (read.has(path)) continue;
+    const hit = [...block.keys()].filter((token) => used.has(token));
+    if (hit.length) {
+      throw new InputError(
+        `"${path}" in ${tokens.file} defines ${hit.join(', ')}, which the pairs use, but no entry of tokens.themes reads it`,
+      );
+    }
+  }
 }
 
 function ratePair(themes, pair) {
   const theme = themes.get(pair.theme);
   const fg = resolveToken(theme, pair.fg);
   const bg = resolveToken(theme, pair.bg);
-  let under = null;
-  if (bg.colour.alpha < 1) {
-    if (!pair.over) {
-      throw new InputError(`${pair.theme}: ${pair.bg} is translucent; the pair needs "over", the token it sits on`);
-    }
-    const over = resolveToken(theme, pair.over);
-    if (over.colour.alpha < 1) throw new InputError(`${pair.theme}: "over" ${pair.over} must be opaque`);
-    under = over.colour.rgb;
+  const over = pair.over === undefined ? null : resolveToken(theme, pair.over);
+  if (over && over.colour.alpha < 1) throw new InputError(`${pair.theme}: "over" ${pair.over} must be opaque`);
+  if (bg.colour.alpha < 1 && !over) {
+    throw new InputError(`${pair.theme}: ${pair.bg} is translucent; the pair needs "over", the token it sits on`);
   }
-  const bgPainted = paint(bg.colour, under);
+  const bgPainted = paint(bg.colour, over?.colour.rgb);
   const fgPainted = paint(fg.colour, bgPainted);
   const ratio = contrastRatio(fgPainted, bgPainted);
   const required = THRESHOLDS[pair.kind];
   const gated = pair.gate !== false;
-  return { ...pair, fgRes: fg, bgRes: bg, fgPainted, bgPainted, ratio, required, gated, ok: ratio >= required };
+  const chains = [fg, bg, over].filter(Boolean).flatMap((r) => r.chain);
+  return { ...pair, fgRes: fg, bgRes: bg, fgPainted, bgPainted, ratio, required, gated, ok: ratio >= required, chains };
 }
 
 function main() {
   const { tokens, pairs } = loadConfig();
-  const themes = loadThemes(tokens);
+  const { themes, blocks } = loadThemes(tokens);
+  checkUnreadBlocks(tokens, blocks, new Set(pairs.flatMap((p) => [p.fg, p.bg, p.over].filter(Boolean))));
   const rows = pairs.map((pair) => ratePair(themes, pair));
+  // Again with every token the var() chains passed through.
+  checkUnreadBlocks(tokens, blocks, new Set(rows.flatMap((r) => r.chains)));
 
-  const result = (r) => (r.ok ? (r.gated ? 'ok' : 'ok (not gated)') : r.gated ? 'FAIL' : 'below (not gated)');
+  const result = (r) => {
+    if (r.gated) return r.ok ? 'ok' : 'FAIL';
+    return r.ok ? 'STALE (not gated, passes)' : 'below (not gated)';
+  };
   const table = [
     ['theme', 'foreground', 'background', 'fg', 'bg', 'ratio', 'need', 'kind', 'result', 'use'],
     ...rows.map((r) => [
@@ -243,23 +300,21 @@ function main() {
   for (const row of table) console.log(row.map((cell, col) => cell.padEnd(widths[col])).join('  ').trimEnd());
 
   const gated = rows.filter((r) => r.gated);
-  const notGated = rows.filter((r) => !r.gated);
+  const exempt = rows.filter((r) => !r.gated && !r.ok);
+  const stale = rows.filter((r) => !r.gated && r.ok);
   const failures = gated.filter((r) => !r.ok);
   const perTheme = [...themes.keys()]
     .map((name) => `${name} ${gated.filter((r) => r.theme === name).length}`)
     .join(', ');
 
-  if (notGated.length) {
+  if (exempt.length) {
     console.log('');
-    console.log(`Not gated (${notGated.length}), open until the token owner settles them:`);
-    for (const r of notGated) {
-      const note = r.ok ? 'now meets its threshold; remove "gate": false' : r.why;
-      console.log(`  ${r.theme} ${r.fg} / ${r.bg} ${formatRatio(r.ratio)} (${r.kind}): ${note}`);
-    }
+    console.log(`Not gated (${exempt.length}), below threshold until the cited issue settles them:`);
+    for (const r of exempt) console.log(`  ${r.theme} ${r.fg} / ${r.bg} ${formatRatio(r.ratio)} (${r.kind}): ${r.why}`);
   }
 
   console.log('');
-  if (failures.length === 0) {
+  if (failures.length === 0 && stale.length === 0) {
     console.log(`${gated.length} gated pairs (${perTheme}), all meet their threshold.`);
     return 0;
   }
@@ -268,7 +323,14 @@ function main() {
     console.log(`     fg: ${describe(r.fgRes, r.fgPainted)}`);
     console.log(`     bg: ${describe(r.bgRes, r.bgPainted)}${r.over ? ` over ${r.over}` : ''}`);
   }
-  console.log(`${failures.length} of ${gated.length} gated pairs below threshold.`);
+  // An exemption that no longer fails would sit there hiding the next regression.
+  for (const r of stale) {
+    console.log(`STALE ${r.theme} ${r.fg} / ${r.bg} ${formatRatio(r.ratio)} meets ${r.required}:1 (${r.kind}); remove its "gate": false`);
+  }
+  const parts = [];
+  if (failures.length) parts.push(`${failures.length} of ${gated.length} gated pairs below threshold`);
+  if (stale.length) parts.push(`${stale.length} exemption(s) no longer needed`);
+  console.log(`${parts.join('; ')}.`);
   return 1;
 }
 
