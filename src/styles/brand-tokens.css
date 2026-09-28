@@ -70,25 +70,25 @@
   --disabled-opacity: 0.4;
 
   /* ---- Type (Tokens board; one family, the system face) --------------- */
-  --font-sans:
+  --font-system:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", system-ui,
     "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono:
+  --font-code:
     "SF Mono", "SFMono-Regular", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
 
-  --t-large: 700 34px/1.15 var(--font-sans);    /* page and greeting titles */
+  --t-large: 700 34px/1.15 var(--font-system);    /* page and greeting titles */
   --t-large-tracking: -0.6px;
-  --t-title1: 700 28px/1.2 var(--font-sans);    /* section titles, lit moment numbers */
+  --t-title1: 700 28px/1.2 var(--font-system);    /* section titles, lit moment numbers */
   --t-title1-tracking: -0.5px;
-  --t-title2: 600 22px/1.25 var(--font-sans);   /* card titles, point names */
+  --t-title2: 600 22px/1.25 var(--font-system);   /* card titles, point names */
   --t-title2-tracking: -0.3px;
-  --t-headline: 600 17px/1.3 var(--font-sans);  /* row titles that matter, card heads */
-  --t-body: 400 17px/1.45 var(--font-sans);     /* messages, questions */
-  --t-subhead: 400 15px/1.35 var(--font-sans);  /* rows, buttons, controls (400-500) */
-  --t-section: 500 13px/1.3 var(--font-sans);   /* group headers, caps */
+  --t-headline: 600 17px/1.3 var(--font-system);  /* row titles that matter, card heads */
+  --t-body: 400 17px/1.45 var(--font-system);     /* messages, questions */
+  --t-subhead: 400 15px/1.35 var(--font-system);  /* rows, buttons, controls (400-500) */
+  --t-section: 500 13px/1.3 var(--font-system);   /* group headers, caps */
   --t-section-tracking: 0.4px;
-  --t-caption: 400 12px/1.3 var(--font-sans);   /* meta, hints (12-13; 11 only inside dense chips) */
-  --t-question: 600 42px/1.15 var(--font-sans); /* the maths itself on the stage (40-44) */
+  --t-caption: 400 12px/1.3 var(--font-system);   /* meta, hints (12-13; 11 only inside dense chips) */
+  --t-question: 600 42px/1.15 var(--font-system); /* the maths itself on the stage (40-44) */
   --t-question-tracking: -1px;
 
   /* ---- Spacing (Tokens board) ----------------------------------------- */
@@ -103,14 +103,14 @@
   --space-48: 48px;
 
   /* ---- Radius (Tokens board) ------------------------------------------ */
-  --radius-seg: 7px;        /* segment inside a segmented control */
-  --radius-small: 8px;      /* small button, source-list item */
-  --radius-button: 10px;    /* regular button, search field */
-  --radius-list: 12px;      /* grouped list, large button, menu */
-  --radius-card: 16px;      /* card, glass card */
-  --radius-composer: 18px;  /* full composer */
-  --radius-dock: 22px;      /* docked composer */
-  --radius-pill: 999px;
+  --corner-seg: 7px;        /* segment inside a segmented control */
+  --corner-small: 8px;      /* small button, source-list item */
+  --corner-button: 10px;    /* regular button, search field */
+  --corner-list: 12px;      /* grouped list, large button, menu */
+  --corner-card: 16px;      /* card, glass card */
+  --corner-composer: 18px;  /* full composer */
+  --corner-dock: 22px;      /* docked composer */
+  --corner-pill: 999px;
 
   /* ---- Elevation (Tokens board) --------------------------------------- */
   /* Light: no shadow on Ground; floating surfaces only (composer, menus). */

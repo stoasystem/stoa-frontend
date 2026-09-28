@@ -33,14 +33,14 @@
   --legacy-red: 353 66.1% 46.3%;             /* --red #C4283A */
 
   /* One family (Foundations: "never by a second font"). */
-  --font-serif: var(--font-sans);
-  --font-body: var(--font-sans);
-  --font-heading: var(--font-sans);
-  --font-display: var(--font-sans);
-  --font-nav: var(--font-sans);
-  --font-button: var(--font-sans);
-  --font-input: var(--font-sans);
-  --font-label: var(--font-sans);
+  --font-serif: var(--font-system);
+  --font-body: var(--font-system);
+  --font-heading: var(--font-system);
+  --font-display: var(--font-system);
+  --font-nav: var(--font-system);
+  --font-button: var(--font-system);
+  --font-input: var(--font-system);
+  --font-label: var(--font-system);
 
   /* The old brand palette. "Burgundy" is the navy accent now: the colour moved, the name did not. */
   --stoa-brand-burgundy: var(--legacy-accent);

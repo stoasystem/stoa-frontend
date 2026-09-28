@@ -8,7 +8,10 @@
 /*
  * Tailwind colours, radii and type read the canvas tokens in brand-tokens.css.
  * `inline` makes each utility carry `var(--token)` itself, so a token that is
- * redefined inside a sky surface is picked up there.
+ * redefined inside a sky surface is picked up there. Every entry names a brand
+ * token under a different name (`--font-sans` -> `--font-system`,
+ * `--radius-list` -> `--corner-list`), so none of them refers to itself if the
+ * tokens ever move into a cascade layer.
  *
  * `secondary`, `muted` and `accent` keep the meaning the existing pages give
  * them (shadcn: a quiet fill, a caption colour, the brand action colour). The
@@ -62,20 +65,20 @@
   --color-lit: var(--lit);
   --color-on-sky: var(--on-sky-text);
 
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
+  --font-sans: var(--font-system);
+  --font-mono: var(--font-code);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --radius-seg: var(--radius-seg);
-  --radius-small: var(--radius-small);
-  --radius-button: var(--radius-button);
-  --radius-list: var(--radius-list);
-  --radius-card: var(--radius-card);
-  --radius-composer: var(--radius-composer);
-  --radius-dock: var(--radius-dock);
+  --radius-seg: var(--corner-seg);
+  --radius-small: var(--corner-small);
+  --radius-button: var(--corner-button);
+  --radius-list: var(--corner-list);
+  --radius-card: var(--corner-card);
+  --radius-composer: var(--corner-composer);
+  --radius-dock: var(--corner-dock);
 }
 
 * {
@@ -169,7 +172,7 @@ code,
 kbd,
 samp,
 pre {
-  font-family: var(--font-mono);
+  font-family: var(--font-code);
 }
 
 a {

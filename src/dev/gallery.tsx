@@ -246,7 +246,7 @@ async function start() {
                 style={{
                   background: 'var(--sky-glass)',
                   border: '1px solid var(--sky-glass-border)',
-                  borderRadius: 'var(--radius-card)',
+                  borderRadius: 'var(--corner-card)',
                   backdropFilter: 'blur(var(--sky-glass-blur))',
                   boxShadow: 'var(--shadow-glass)',
                 }}
