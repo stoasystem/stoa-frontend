@@ -1,63 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
-import { CHANGE_PASSWORD_PATH, getDefaultRouteForRole } from '@/lib/authRoutes'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { useAuthStore, waitForPendingLogout } from '@/store/authStore'
-import type { UserRole } from '@/types/user'
-
-const roleNextPathPrefixes: Record<UserRole, string[]> = {
-  student: ['/chat', '/learn', '/profile'],
-  parent: ['/parent', '/billing', '/support'],
-  teacher: ['/tutor', '/support', '/teacher-activate'],
-  admin: ['/admin'],
-  organization_admin: ['/organization'],
-  school_teacher: ['/organization'],
-  school_viewer: ['/organization'],
-}
-
-function isSafePath(path: unknown): path is string {
-  return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//')
-}
-
-function canUseNextPathForRole(path: string, role: UserRole) {
-  return roleNextPathPrefixes[role].some((prefix) => path === prefix || path.startsWith(`${prefix}/`))
-}
-
-function getLoginRedirectPath({
-  role,
-  queryNext,
-  from,
-  search,
-}: {
-  role: UserRole
-  queryNext: string | null
-  from: unknown
-  search: string
-}) {
-  const defaultRoute = getDefaultRouteForRole(role)
-
-  if (isSafePath(queryNext) && canUseNextPathForRole(queryNext, role)) {
-    return queryNext
-  }
-
-  if (isSafePath(from) && canUseNextPathForRole(from, role)) {
-    return `${from}${search}`
-  }
-
-  return defaultRoute
-}
 
 export function useLoginMutation() {
-  const navigate = useNavigate()
-  const location = useLocation()
   const { t } = useTranslation('auth')
   const setAuth = useAuthStore((state) => state.setAuth)
   const queryClient = useQueryClient()
@@ -68,41 +21,29 @@ export function useLoginMutation() {
       return login(payload)
     },
     onSuccess: async (data) => {
-      setAuth(data.user, data.accessToken)
-      markLoginAuthenticated(data.user.role)
-      trackEvent('user_login', { role: data.user.role, userId: data.user.id })
-      toast.success(t('login.signedIn'))
-      // 切完语言再跳转，避免路由已经渲染但语言还没切换完成的闪烁
+      // 先切语言再写入登录态：登录态一写入，EntryPage 就会跳走，
+      // 避免路由已经渲染但语言还没切换完成的闪烁
       const locale = resolveUserLanguage(data.user)
       if (locale && i18n.language !== locale) {
         await i18n.changeLanguage(locale)
       }
-      // An administrator reset leaves nothing else reachable, so the role's home
-      // would only bounce off ProtectedRoute. Go straight to the one screen that
-      // works, and skip the prefetch that would only be refused.
-      if (data.user.mustChangePassword) {
-        navigate(CHANGE_PASSWORD_PATH, { replace: true })
-        return
-      }
-      const from = location.state?.from?.pathname
-      const search = location.state?.from?.search ?? ''
-      const queryNext = new URLSearchParams(location.search).get('next')
-      const nextPath = getLoginRedirectPath({
-        role: data.user.role,
-        queryNext,
-        from,
-        search,
-      })
+      // Signing in is all this does. The login screen (EntryPage) sees the
+      // session and picks the destination: the password change for a reset
+      // account, else a permitted `?next=` or `from`, else the role's home.
+      setAuth(data.user, data.accessToken)
+      markLoginAuthenticated(data.user.role)
+      trackEvent('user_login', { role: data.user.role, userId: data.user.id })
+      toast.success(t('login.signedIn'))
       // ChatPage waits on this query before it counts as usable (BUG-008);
       // firing it here overlaps that round trip with the route transition
-      // instead of waiting for the page to mount first.
-      if (data.user.role === 'student') {
+      // instead of waiting for the page to mount first. An account under a
+      // forced password change skips it: it would only be refused.
+      if (data.user.role === 'student' && !data.user.mustChangePassword) {
         void queryClient.prefetchQuery({
           queryKey: chatQueryKeys.conversations(),
           queryFn: getConversations,
         })
       }
-      navigate(nextPath)
     },
     onError: (error) => {
       toast.error(
