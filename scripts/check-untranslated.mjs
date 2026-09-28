@@ -39,6 +39,11 @@ const ROOTS = [
   'src/layouts',
   // Ask: the panel, the sheet and the docked composer (#49).
   'src/features/ask',
+  // The account page, the bell and Help (#46).
+  'src/features/account',
+  'src/components/notifications',
+  'src/pages/support',
+  'src/pages/auth',
 ]
 
 // Anything a screen puts words into.

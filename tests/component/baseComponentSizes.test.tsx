@@ -23,6 +23,7 @@ import {
   SearchField,
   SegmentedFilter,
   SegmentedNav,
+  TextField,
   Toggle,
   initialsOf,
 } from '@/components/base'
@@ -244,6 +245,18 @@ describe('SearchField (Sizes: 36; 32 in toolbars, 38 on a page)', () => {
     expect(field).toHaveStyle({ height: px(height), borderRadius: '10px' })
     expect(field?.querySelector('svg')).toHaveAttribute('width', '18')
     expect(screen.getByRole('searchbox', { name: 'Search students' })).toBeInTheDocument()
+  })
+})
+
+// Components: "a field is a fill, not a bordered box"; the page search field's measure.
+describe('TextField (the page field: 38, radius 10, 12 inside, text 15)', () => {
+  it('is a 38 fill with its label above it and its hint read with it', () => {
+    render(<TextField label="Current password" hint="Six digits" type="password" />)
+    const input = screen.getByLabelText('Current password')
+
+    expect(input.getAttribute('style')).toBe('height: 38px; border-radius: 10px; padding-inline: 12px; font-size: 15px;')
+    expect(input).toHaveClass('bg-fill')
+    expect(input).toHaveAccessibleDescription('Six digits')
   })
 })
 

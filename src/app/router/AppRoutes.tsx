@@ -6,7 +6,7 @@
  * `public` at the top level, `signedIn` inside ProtectedRoute, and a role list
  * inside ProtectedRoute and a RoleRoute for exactly those roles.
  */
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
@@ -87,7 +87,9 @@ function LegacyRedirectElement({ redirect }: { redirect: LegacyRedirect }) {
 /**
  * A redirect for some roles on a path that is still a page for the others.
  * An account under a forced password change is never led away from the one
- * screen it can use.
+ * screen it can use -- not even the moment the change goes through, which
+ * clears the flag while the page is still saying so (#46). Once the page has
+ * been shown for a forced change, it stays until the visitor leaves it.
  */
 function RoleScopedRedirect({
   redirect,
@@ -100,10 +102,17 @@ function RoleScopedRedirect({
   const location = useLocation()
   const { to, state } = useRedirectTarget(redirect)
   const applies = Boolean(user && redirect.onlyFor?.includes(user.role))
-  const forcedChange =
-    Boolean(user?.mustChangePassword) && location.pathname === CHANGE_PASSWORD_PATH
+  const forcedNow = Boolean(user?.mustChangePassword) && location.pathname === CHANGE_PASSWORD_PATH
+  // Remembered from an earlier render (React's "adjust state while
+  // rendering"), so the render that clears the flag still finds it. It is
+  // kept for the account that was forced: a different account in the store,
+  // swapped in without leaving the page, gets no benefit of it.
+  const [forcedFor, setForcedFor] = useState<string | null>(null)
+  const userId = user?.id ?? null
+  if (forcedNow && userId !== null && forcedFor !== userId) setForcedFor(userId)
+  const wasForced = forcedFor !== null && forcedFor === userId
 
-  if (applies && !forcedChange) return <Navigate replace to={to} state={state} />
+  if (applies && !forcedNow && !wasForced) return <Navigate replace to={to} state={state} />
   return children
 }
 

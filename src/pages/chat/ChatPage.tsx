@@ -14,7 +14,7 @@ import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
-import { UserMenu } from '@/components/common/UserMenu'
+import { AccountMenu } from '@/components/shell/AccountMenu'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -574,14 +574,14 @@ export function ChatPage() {
 }
 
 /**
- * The account pill for the states that render no ChatHeader: without it a
+ * The avatar menu for the states that render no ChatHeader: without it a
  * student with no conversation yet, or whose list failed to load, could not
  * sign out (stoasystem/stoa-frontend#2).
  */
 function StandaloneAccountBar() {
   return (
     <div className="flex shrink-0 justify-end px-4 pt-3 md:px-6">
-      <UserMenu variant="top" />
+      <AccountMenu />
     </div>
   )
 }

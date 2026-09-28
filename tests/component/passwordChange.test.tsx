@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
-import { UserMenu } from '@/components/common/UserMenu'
+import { AccountMenu } from '@/components/shell/AccountMenu'
 import deAuth from '@/i18n/locales/de/auth.json'
 import enAuth from '@/i18n/locales/en/auth.json'
 import frAuth from '@/i18n/locales/fr/auth.json'
@@ -65,34 +65,26 @@ describe('the password change entry point', () => {
     useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
   })
 
-  const roles: UserRole[] = ['student', 'parent', 'teacher', 'admin']
-
-  it.each(roles)('is offered to a signed-in %s in the sidebar account menu', (role) => {
+  // Since #46 the old account pill is gone; the entry is the avatar menu's
+  // "Change password", which accountMenu.test.tsx checks item by item.
+  it.each([
+    ['student', '/me#password'],
+    ['parent', '/settings/password'],
+    ['teacher', '/settings/password'],
+    ['admin', '/me#password'],
+  ] as const)('is offered to a signed-in %s in the avatar menu, leading to %s', async (role, to) => {
     signIn(role)
 
-    renderWithProviders(<UserMenu />)
+    renderWithProviders(<AccountMenu />)
+    await userEvent.click(screen.getByRole('button', { name: 'accountMenu.open' }))
 
-    expect(screen.getByRole('link', { name: 'actions.changePassword' })).toHaveAttribute(
-      'href',
-      '/settings/password',
-    )
-  })
-
-  it('is offered in the top bar account menu too', () => {
-    signIn('student')
-
-    renderWithProviders(<UserMenu variant="top" />)
-
-    expect(screen.getByRole('link', { name: 'actions.changePassword' })).toHaveAttribute(
-      'href',
-      '/settings/password',
-    )
+    expect(await screen.findByRole('menuitem', { name: 'actions.changePassword' })).toHaveAttribute('href', to)
   })
 
   it('is not offered to a visitor who is not signed in', () => {
-    renderWithProviders(<UserMenu />)
+    renderWithProviders(<AccountMenu />)
 
-    expect(screen.queryByRole('link', { name: 'actions.changePassword' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'accountMenu.open' })).not.toBeInTheDocument()
   })
 
   it('carries its own wording in every supported language, with no English fallback', () => {
