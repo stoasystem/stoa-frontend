@@ -1,11 +1,11 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, CircleHelp, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { createContext, useContext, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { navAreaForRole } from '@/app/router/routeManifest'
 import { Avatar, type AvatarSize } from '@/components/base/Avatar'
-import { ACCOUNT_MENU, ICON } from '@/components/base/sizes'
+import { ACCOUNT_MENU, ICON, TOUCH_TARGET } from '@/components/base/sizes'
 import { accountMenuFor } from '@/components/shell/accountMenuTargets'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { languageNameKeys, useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
@@ -39,9 +39,14 @@ function ItemBody({ icon: Icon, children, tone }: { icon: LucideIcon; children: 
   )
 }
 
-const itemStyle = { height: ACCOUNT_MENU.item, borderRadius: ACCOUNT_MENU.itemRadius }
+// 34 as drawn; 44 on a phone, where each item is a touch target (Sizes).
+const ItemHeight = createContext<number>(ACCOUNT_MENU.item)
+function useItemStyle() {
+  return { height: useContext(ItemHeight), borderRadius: ACCOUNT_MENU.itemRadius }
+}
 
 function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon; children: ReactNode }) {
+  const itemStyle = useItemStyle()
   if (!to) {
     return (
       <Menu.Item disabled className={ITEM} style={itemStyle}>
@@ -60,7 +65,14 @@ function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon;
 
 const extraIcons: Record<string, LucideIcon> = { billing: CreditCard }
 
-export function AccountMenu({ avatarSize = 30 }: { avatarSize?: AvatarSize }) {
+export function AccountMenu({
+  avatarSize = 30,
+  touch = false,
+}: {
+  avatarSize?: AvatarSize
+  /** A phone: the avatar and every item get a 44 target; what is drawn stays the same. */
+  touch?: boolean
+}) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
   const { signOut, isSigningOut } = useSignOut()
@@ -69,6 +81,8 @@ export function AccountMenu({ avatarSize = 30 }: { avatarSize?: AvatarSize }) {
   if (!user) return null
 
   const targets = accountMenuFor(navAreaForRole(user.role))
+  const itemHeight = touch ? TOUCH_TARGET : ACCOUNT_MENU.item
+  const itemStyle = { height: itemHeight, borderRadius: ACCOUNT_MENU.itemRadius }
 
   return (
     <Menu.Root>
@@ -79,10 +93,12 @@ export function AccountMenu({ avatarSize = 30 }: { avatarSize?: AvatarSize }) {
           title={t('accountMenu.open')}
           data-account-trigger
           className="inline-flex shrink-0 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent p-0"
+          style={touch ? { width: TOUCH_TARGET, height: TOUCH_TARGET } : { width: avatarSize, height: avatarSize }}
         >
           <Avatar name={user.name} size={avatarSize} />
         </button>
       </Menu.Trigger>
+      <ItemHeight.Provider value={itemHeight}>
       <Menu.Portal>
         <Menu.Content
           align="end"
@@ -164,6 +180,7 @@ export function AccountMenu({ avatarSize = 30 }: { avatarSize?: AvatarSize }) {
           </Menu.Item>
         </Menu.Content>
       </Menu.Portal>
+      </ItemHeight.Provider>
     </Menu.Root>
   )
 }

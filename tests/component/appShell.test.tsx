@@ -6,6 +6,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -89,10 +90,15 @@ describe('the top bar', () => {
   it('is 44 high on a phone, 16 / 8 from the edges: logo 26, avatar 28', () => {
     renderShell('student', '/', 375)
 
-    expect(barRow()).toHaveStyle({ height: '44px', paddingLeft: '16px', paddingRight: '8px' })
+    // The avatar's 44 target reaches 8 into the edge padding, so the drawn
+    // 28 avatar still sits 8 from the edge.
+    expect(barRow()).toHaveStyle({ height: '44px', paddingLeft: '16px', paddingRight: '0px' })
     expect(within(bar()).getByRole('img', { name: 'STOA' })).toHaveStyle({ height: '26px' })
     const account = within(bar()).getByRole('button', { name: 'accountMenu.open' })
     expect(account.querySelector('[data-avatar]')).toHaveStyle({ width: '28px' })
+    expect(account).toHaveStyle({ width: '44px' })
+    const bell = within(bar()).getByRole('button', { name: 'notifications.openLabel' })
+    expect(bell.querySelector('[data-icon-button-face]')).toHaveStyle({ width: '36px', height: '36px' })
   })
 
   it.each([375, 1280])('holds only the logo, the bell and the avatar for a student at %ipx', (width) => {
@@ -110,6 +116,56 @@ describe('the top bar', () => {
   it('makes the logo the way home', () => {
     renderShell('teacher', '/tutor/availability', 1280)
     expect(within(bar()).getByRole('link', { name: 'navigation.logoHome' })).toHaveAttribute('href', '/tutor')
+  })
+})
+
+// Sizes: "Touch targets never fall under 44 on phone; the visible control may
+// be smaller." jsdom lays nothing out, so each target's own box is read off
+// its style; they sit side by side with no gap, so none overlaps another.
+const px = (value: string) => Number.parseFloat(value)
+function expectTouchTarget(element: HTMLElement, what: string) {
+  // A flex link without a width is as wide as its label: only the logo is not.
+  const width = element.style.width
+    ? px(element.style.width)
+    : element.style.minWidth
+      ? px(element.style.minWidth)
+      : element.hasAttribute('data-logo-link')
+        ? 0
+        : Infinity
+  const height = px(element.style.height)
+  expect(height, `${what} is ${height} high`).toBeGreaterThanOrEqual(44)
+  expect(width, `${what} is ${width} wide`).toBeGreaterThanOrEqual(44)
+}
+
+describe('touch targets on a phone', () => {
+  it.each(['student', 'teacher', 'parent', 'admin'] as const)('are at least 44 x 44 for every bar control of a %s', (role) => {
+    const home = { student: '/', teacher: '/tutor', parent: '/parent', admin: '/admin/users' }[role]
+    renderShell(role, home, 375)
+
+    expectTouchTarget(within(bar()).getByRole('link', { name: 'navigation.logoHome' }), 'the logo')
+    expectTouchTarget(within(bar()).getByRole('button', { name: 'notifications.openLabel' }), 'the bell')
+    expectTouchTarget(within(bar()).getByRole('button', { name: 'accountMenu.open' }), 'the avatar')
+    expect(barRow().querySelector('[data-top-bar-row] > div:last-child')).toHaveStyle({ gap: '0px' })
+
+    const segmented = within(bar()).queryByRole('navigation', { name: 'navigation.primary' })
+    for (const link of segmented ? within(segmented).getAllByRole('link') : []) {
+      expectTouchTarget(link, `the ${link.textContent} segment`)
+    }
+    const strip = screen.queryByRole('navigation', { name: 'navigation.administration' })
+    for (const link of strip ? within(strip).getAllByRole('link') : []) {
+      expectTouchTarget(link, `the ${link.textContent} source-list link`)
+    }
+    if (role === 'teacher' || role === 'parent') expect(segmented).not.toBeNull()
+    if (role === 'admin') expect(strip).not.toBeNull()
+  })
+
+  it('makes every account menu item a 44 target', async () => {
+    renderShell('parent', '/parent', 375)
+    await userEvent.click(within(bar()).getByRole('button', { name: 'accountMenu.open' }))
+    const menu = screen.getByRole('menu')
+    for (const item of within(menu).getAllByRole('menuitem')) {
+      expect(item).toHaveStyle({ height: '44px' })
+    }
   })
 })
 
@@ -176,7 +232,9 @@ describe('what sits beside the logo', () => {
     ])
     expect(within(list).getByRole('link', { name: 'Accounts' })).toHaveAttribute('aria-current', 'page')
     expect(within(list).getByRole('link', { name: 'navigation.overview' })).not.toHaveAttribute('aria-current')
-    expect(within(list).getByRole('link', { name: 'Accounts' })).toHaveStyle({ height: '34px', borderRadius: '8px' })
+    const accounts = within(list).getByRole('link', { name: 'Accounts' })
+    expect(accounts.querySelector('[data-source-item]')).toHaveStyle({ height: '34px', borderRadius: '8px' })
+    expect(accounts).toHaveStyle({ height: shape === 'column' ? '34px' : '44px' })
   })
 
   it('lights the most specific entry for the open page', () => {

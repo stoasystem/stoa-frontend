@@ -23,7 +23,7 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   offline: 'notifications.connection.offline',
 }
 
-export function NotificationCenter() {
+export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
@@ -61,6 +61,7 @@ export function NotificationCenter() {
       <IconButton
         icon={Bell}
         size={36}
+        hitSize={hitSize}
         label={
           unread
             ? t('notifications.openLabelUnread', { count: unread })

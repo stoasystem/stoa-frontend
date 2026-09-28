@@ -51,6 +51,9 @@ export const ICON = {
   toolbar: 22,
 } as const
 
+/** Sizes: "Touch targets never fall under 44 on phone; the visible control may be smaller." */
+export const TOUCH_TARGET = 44
+
 /** Top bar (Sizes: "Logo 30 h · bell 36 · avatar 30 · gap 6 · side padding 20"); a 1 px separator under it. */
 export const TOP_BAR = { height: 56, logo: 30, bell: 36, avatar: 30, gap: 6, paddingX: 20, border: 1 } as const
 

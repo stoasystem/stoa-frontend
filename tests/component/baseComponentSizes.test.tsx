@@ -109,6 +109,15 @@ describe('IconButton (Sizes: box / glyph)', () => {
     expect(svg).toHaveAttribute('stroke-width', '1.6')
   })
 
+  it('can take a 44 hit area around a 36 face', () => {
+    render(<IconButton label="Notifications" icon={Bell} size={36} hitSize={44} />)
+    const button = screen.getByRole('button', { name: 'Notifications' })
+
+    expect(button).toHaveStyle({ width: '44px', height: '44px' })
+    expect(button.querySelector('[data-icon-button-face]')).toHaveStyle({ width: '36px', height: '36px' })
+    expect(button.querySelector('svg')).toHaveAttribute('width', '22')
+  })
+
   it('always carries its label, read out and as the tooltip', () => {
     render(<IconButton label="Add" icon={Plus} />)
     const button = screen.getByRole('button', { name: 'Add' })
@@ -158,12 +167,42 @@ describe('Segmented (Sizes: navigation 30, filters 28)', () => {
       </MemoryRouter>,
     )
     const nav = screen.getByRole('navigation', { name: 'Teacher' })
-    expect(nav).toHaveStyle({ padding: '2px', borderRadius: '9px' })
+    expect(nav).toHaveStyle({ height: '34px', paddingInline: '2px', paddingBlock: '2px' })
+    expect(nav.querySelector('[data-segmented-track]')).toHaveStyle({ top: '0px', height: '34px', borderRadius: '9px' })
 
     const current = within(nav).getByRole('link', { name: 'Requests' })
     expect(current).toHaveAttribute('aria-current', 'page')
-    expect(current).toHaveStyle({ height: '30px', fontSize: '14px', paddingInline: '12px', borderRadius: '7px' })
+    expect(current).toHaveStyle({ height: '30px' })
+    expect(current.querySelector('[data-segment-face]')).toHaveStyle({
+      height: '30px',
+      fontSize: '14px',
+      paddingInline: '12px',
+      borderRadius: '7px',
+    })
     expect(within(nav).getByRole('link', { name: 'Availability' })).not.toHaveAttribute('aria-current')
+  })
+
+  it('gives a phone 44-high segments while the control is still drawn 30 high', () => {
+    render(
+      <MemoryRouter>
+        <SegmentedNav
+          label="Teacher"
+          activeIndex={0}
+          hitHeight={44}
+          items={[
+            { to: '/tutor', label: 'Requests' },
+            { to: '/tutor/availability', label: 'Availability' },
+          ]}
+        />
+      </MemoryRouter>,
+    )
+    const nav = screen.getByRole('navigation', { name: 'Teacher' })
+    expect(nav).toHaveStyle({ height: '44px', paddingBlock: '0px' })
+    expect(nav.querySelector('[data-segmented-track]')).toHaveStyle({ top: '5px', height: '34px' })
+    for (const link of within(nav).getAllByRole('link')) {
+      expect(link).toHaveStyle({ height: '44px' })
+      expect(link.querySelector('[data-segment-face]')).toHaveStyle({ height: '30px' })
+    }
   })
 
   it('filters at 28 and says which filter is on', async () => {
@@ -185,7 +224,7 @@ describe('Segmented (Sizes: navigation 30, filters 28)', () => {
     const group = screen.getByRole('group', { name: 'Status' })
     const pending = within(group).getByRole('button', { name: 'Pending' })
 
-    expect(pending).toHaveStyle({ height: '28px' })
+    expect(pending.querySelector('[data-segment-face]')).toHaveStyle({ height: '28px' })
     expect(pending).toHaveAttribute('aria-pressed', 'false')
     await userEvent.click(pending)
     expect(pending).toHaveAttribute('aria-pressed', 'true')
@@ -280,6 +319,16 @@ describe('Toggle (Sizes: 26 x 44, knob 22)', () => {
     await userEvent.click(toggle)
     expect(toggle).toHaveAttribute('aria-checked', 'false')
     expect(toggle.querySelector('[data-knob]')).toHaveStyle({ left: '2px' })
+  })
+
+  it('draws the off track in the gated off colour, not the fill that vanishes under the knob', async () => {
+    render(<Toggle label="Off" checked={false} onCheckedChange={() => {}} />)
+    const toggle = screen.getByRole('switch', { name: 'Off' })
+
+    // contrast-pairs.json holds --toggle-track-off at 3:1 against the knob and the row.
+    expect(toggle.className).toContain('var(--toggle-track-off)')
+    expect(toggle.className).not.toMatch(/\bbg-fill\b/)
+    expect(toggle.querySelector('[data-knob]')?.className).toContain('bg-surface')
   })
 })
 
