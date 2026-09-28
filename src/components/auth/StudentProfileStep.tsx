@@ -96,7 +96,7 @@ export function StudentProfileStep({
         <Label htmlFor="student-answer-language">{t('register.answerLanguage')}</Label>
         <select
           id="student-answer-language"
-          className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45"
+          className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-ring/45"
           value={value.preferredAnswerLanguage}
           onChange={(event) => onChange({ preferredAnswerLanguage: event.target.value as SupportedLanguage })}
         >

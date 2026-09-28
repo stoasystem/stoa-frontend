@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
 import { CheckCircle2, CircleAlert, MailCheck, RotateCcw, ShieldAlert } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { skyErrorClass, skyFieldProps, skyInputClass, skyLabelClass } from '@/components/auth/skyFields'
+import { skyErrorClass, skyInputClass, skyLabelClass } from '@/components/auth/skyFields'
 import { Button as SkyButton } from '@/components/base/Button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -44,7 +44,7 @@ const looks = {
     error: 'rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive',
   },
   sky: {
-    card: 'rounded-[var(--corner-card)] border bg-[var(--sky-glass)] p-5 shadow-[var(--shadow-glass)] backdrop-blur-[var(--sky-glass-blur)]',
+    card: 'rounded-[var(--corner-card)] border border-[color:var(--sky-glass-border)] bg-[var(--sky-glass)] p-5 shadow-[var(--shadow-glass)] backdrop-blur-[var(--sky-glass-blur)]',
     badge: 'bg-[var(--on-sky-button)] text-[color:var(--on-sky-button-text)]',
     kicker: 'm-0 text-[13px] leading-[1.3] font-medium tracking-[0.4px] uppercase text-[color:var(--on-sky-text-caption)]',
     title: 'mt-2 text-[17px] leading-[1.3] font-semibold text-[color:var(--on-sky-text)]',
@@ -136,7 +136,7 @@ export function EmailVerificationPanel({
   }
 
   return (
-    <div className={look.card} data-sky-rule={sky ? '' : undefined}>
+    <div className={look.card}>
       <div className="flex items-start gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${look.badge}`}>
           <Icon className="h-5 w-5" aria-hidden="true" />
@@ -162,7 +162,6 @@ export function EmailVerificationPanel({
               readOnly
               autoComplete="email"
               className={look.input}
-              {...(sky ? skyFieldProps : {})}
             />
           </div>
           <div className="space-y-2">
@@ -176,7 +175,6 @@ export function EmailVerificationPanel({
               placeholder={t('auth:verification.codePlaceholder')}
               aria-describedby="verification-help"
               className={look.input}
-              {...(sky ? skyFieldProps : {})}
             />
             <p id="verification-help" className={look.help}>
               {t('auth:verification.codeHelp')}

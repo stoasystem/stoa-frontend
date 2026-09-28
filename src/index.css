@@ -81,9 +81,21 @@
   --radius-dock: var(--corner-dock);
 }
 
-* {
-  box-sizing: border-box;
-  border-color: var(--hairline);
+/*
+ * Global base rules sit in Tailwind's `base` layer (#73), after preflight, so
+ * a utility class (a border colour, a link colour, `no-underline`) overrides
+ * them. Outside any layer they outranked every utility.
+ */
+@layer base {
+  * {
+    box-sizing: border-box;
+    border-color: var(--hairline);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 html {
@@ -175,11 +187,6 @@ pre {
   font-family: var(--font-code);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 img,
 svg,
 video,
@@ -200,63 +207,6 @@ canvas {
 [data-search-field] input:focus-visible,
 [data-composer-field]:focus-visible {
   outline: none;
-}
-
-/*
- * Lines on the sky (#53). The `*` rule above is unlayered, so it outranks
- * every Tailwind border colour and would draw them all --hairline, near white
- * on the sky. Sky elements say what their line is instead: a divider
- * (`data-sky-rule`, glass border white 12%) or a text field's underline
- * (`data-sky-field`, gated at 3:1), which turns white when the field has
- * focus or is invalid.
- */
-[data-surface="sky"] [data-sky-rule] {
-  border-color: var(--sky-glass-border);
-}
-
-[data-surface="sky"] [data-sky-field] {
-  border-color: var(--on-sky-field-rule);
-}
-
-[data-surface="sky"] [data-sky-field]:focus-visible,
-[data-surface="sky"] [data-sky-field][aria-invalid="true"] {
-  border-color: var(--on-sky-text);
-}
-
-/*
- * Links on the sky (#53), for the same reason: the unlayered `a` rule above
- * (colour inherit, no underline) outranks the Tailwind classes. A link inside
- * a sentence is white and underlined, so it never rests on colour alone
- * (WCAG 1.4.1); a quiet link (the footer) is caption white and turns white
- * on hover.
- */
-[data-surface="sky"] a[data-sky-link="inline"] {
-  color: var(--on-sky-text);
-  text-decoration: underline;
-  text-decoration-color: var(--on-sky-field-rule);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 4px;
-}
-
-[data-surface="sky"] a[data-sky-link="inline"]:hover {
-  text-decoration-color: var(--on-sky-text);
-}
-
-[data-surface="sky"] a[data-sky-link="quiet"] {
-  color: var(--on-sky-text-caption);
-}
-
-[data-surface="sky"] a[data-sky-link="quiet"]:hover {
-  color: var(--on-sky-text);
-}
-
-/* A base Button drawn as a link (`asChild`) on the sky keeps its label colour. */
-[data-surface="sky"] a[data-variant="onSky"] {
-  color: var(--on-sky-button-text);
-}
-
-[data-surface="sky"] a[data-variant="onSkyPlain"] {
-  color: var(--on-sky-plain);
 }
 
 /*

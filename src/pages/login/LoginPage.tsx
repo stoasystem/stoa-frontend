@@ -24,9 +24,9 @@ import { LoginNebula } from '@/pages/login/LoginNebula'
  * Signing in itself is LoginForm's, unchanged; this page only places it.
  */
 
-// The link colours come from index.css (`data-sky-link`): the unlayered `a`
-// rule there outranks Tailwind colour classes.
-const linkClass = 'inline-flex min-h-11 items-center md:min-h-0'
+// A quiet link (the footer) is caption white and turns white on hover.
+const linkClass =
+  'inline-flex min-h-11 items-center text-[color:var(--on-sky-text-caption)] hover:text-on-sky md:min-h-0'
 
 /** The layout's own breakpoint (Tailwind `md`); the bar and logo follow it. */
 const WIDE_LOGIN_QUERY = '(min-width: 768px)'
@@ -70,8 +70,7 @@ export function LoginPage() {
     >
       {/* Placement, top bar: 56 high with 20 at the sides; phone 44, 16 / 8. */}
       <header
-        data-sky-rule=""
-        className="flex items-center gap-4 border-b pr-2 pl-4 md:px-5"
+        className="flex items-center gap-4 border-b border-[color:var(--sky-glass-border)] pr-2 pl-4 md:px-5"
         style={{ height: bar.height }}
       >
         <Link to="/" className="inline-flex min-h-11 shrink-0 items-center">
@@ -103,12 +102,11 @@ export function LoginPage() {
           </div>
         </section>
 
-        <div data-sky-rule="" className="flex max-w-[420px] items-center gap-5 border-t pt-6 md:max-w-none md:flex-col md:items-stretch md:gap-0 md:border-t-0 md:pt-0">
+        <div className="flex max-w-[420px] items-center gap-5 border-t border-[color:var(--sky-glass-border)] pt-6 md:max-w-none md:flex-col md:items-stretch md:gap-0 md:border-t-0 md:pt-0">
           {/* A width, not a max-width: index.css caps every svg at 100% unlayered. */}
           <LoginNebula className="w-[104px] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
           <p
-            data-sky-rule=""
-            className="m-0 text-[17px] leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
+            className="m-0 border-[color:var(--sky-glass-border)] text-[17px] leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
           >
             {t('auth:login.skyCaption')}
           </p>
@@ -118,16 +116,16 @@ export function LoginPage() {
       <footer className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-3 text-[12px] leading-[1.3] text-[color:var(--on-sky-text-caption)] md:px-5 md:py-4">
         <span className="py-2 md:py-0">{t('common:footer.copyright')}</span>
         <nav aria-label={t('common:footer.legal')} className="flex flex-wrap gap-x-4 gap-y-0">
-          <Link className={linkClass} data-sky-link="quiet" to="/support">
+          <Link className={linkClass} to="/support">
             {t('common:accountMenu.help')}
           </Link>
-          <Link className={linkClass} data-sky-link="quiet" to="/privacy">
+          <Link className={linkClass} to="/privacy">
             {t('common:navigation.privacy')}
           </Link>
-          <Link className={linkClass} data-sky-link="quiet" to="/terms">
+          <Link className={linkClass} to="/terms">
             {t('common:navigation.terms')}
           </Link>
-          <a className={linkClass} data-sky-link="quiet" href={stoaContactInfo.homepageUrl}>
+          <a className={linkClass} href={stoaContactInfo.homepageUrl}>
             {t('common:footer.backToHomepage')}
           </a>
         </nav>

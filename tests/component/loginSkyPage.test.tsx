@@ -120,10 +120,10 @@ describe('the sign-in page', () => {
   it('marks the account link as a link inside the sentence, not by colour alone', () => {
     renderLogin()
 
-    // index.css underlines `data-sky-link="inline"` on the sky.
-    expect(screen.getByRole('link', { name: enAuth.login.howToGetAccount })).toHaveAttribute('data-sky-link', 'inline')
+    // White and underlined by its own classes (#73: the base `a` rule no longer outranks them).
+    expect(screen.getByRole('link', { name: enAuth.login.howToGetAccount })).toHaveClass('text-on-sky', 'underline')
     for (const name of ['Help and support', 'Privacy', 'Terms', 'Back to STOA homepage']) {
-      expect(screen.getByRole('link', { name })).toHaveAttribute('data-sky-link', 'quiet')
+      expect(screen.getByRole('link', { name })).toHaveClass('text-[color:var(--on-sky-text-caption)]', 'hover:text-on-sky')
     }
   })
 
@@ -197,7 +197,7 @@ describe('signing in from the sky page', () => {
     }
     for (const label of ['Email', 'Password']) {
       expect(screen.getByLabelText(label)).toHaveClass('border-b-2')
-      expect(screen.getByLabelText(label)).toHaveAttribute('data-sky-field')
+      expect(screen.getByLabelText(label)).toHaveClass('border-[color:var(--on-sky-field-rule)]', 'aria-[invalid=true]:border-on-sky')
     }
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-describedby', 'login-email-error')
