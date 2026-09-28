@@ -29,6 +29,7 @@
     { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "ui", "use": "focus ring" },
     { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "ui", "use": "focus ring on cards" },
     { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "ui", "use": "selected answer border" },
+    { "theme": "light", "fg": "--accent", "bg": "--fill", "kind": "ui", "use": "focus ring inside a highlighted menu item: account menu, language list (#53)" },
     { "theme": "light", "fg": "--green", "bg": "--surface", "kind": "ui", "use": "online dot" },
     { "theme": "light", "fg": "--star", "bg": "--surface", "kind": "ui", "use": "streak / lit icon on cards" },
     { "theme": "light", "fg": "--star", "bg": "--ground", "kind": "ui", "use": "streak / lit icon on the page" },

@@ -105,10 +105,23 @@ describe('the sign-in page', () => {
     expect(submit).toHaveAttribute('data-variant', 'onSky')
   })
 
-  it('offers the language switch on the sky', () => {
+  it('offers the language switch on the sky, named with the language it shows', () => {
     renderLogin()
 
-    expect(screen.getByRole('button', { name: 'Language' })).toHaveTextContent('EN')
+    // WCAG 2.5.3: the visible "EN" is part of the name.
+    const trigger = screen.getByRole('button', { name: 'Language: English (EN)' })
+    expect(trigger).toHaveTextContent('EN')
+    expect(trigger.getAttribute('aria-label')).toContain(trigger.textContent?.trim())
+  })
+
+  it('marks the account link as a link inside the sentence, not by colour alone', () => {
+    renderLogin()
+
+    // index.css underlines `data-sky-link="inline"` on the sky.
+    expect(screen.getByRole('link', { name: enAuth.login.howToGetAccount })).toHaveAttribute('data-sky-link', 'inline')
+    for (const name of ['Help and support', 'Privacy', 'Terms', 'Back to STOA homepage']) {
+      expect(screen.getByRole('link', { name })).toHaveAttribute('data-sky-link', 'quiet')
+    }
   })
 
   it.each([
@@ -119,6 +132,10 @@ describe('the sign-in page', () => {
   ] as const)('speaks %s throughout', async (language, auth) => {
     await i18n.changeLanguage(language)
     renderLogin()
+
+    expect(screen.getByRole('button', { name: new RegExp(`\\(${language.toUpperCase()}\\)$`) })).toHaveTextContent(
+      language.toUpperCase(),
+    )
 
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(auth.login.title)
     expect(screen.getByText(auth.login.eyebrow)).toBeInTheDocument()
@@ -170,6 +187,15 @@ describe('signing in from the sky page', () => {
 
     const alerts = await screen.findAllByRole('alert')
     expect(alerts).toHaveLength(2)
+    // Not colour alone: every error carries a glyph, and the invalid field's
+    // rule is thicker, not only whiter.
+    for (const alert of alerts) {
+      expect(alert.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
+    }
+    for (const label of ['Email', 'Password']) {
+      expect(screen.getByLabelText(label)).toHaveClass('border-b-2')
+      expect(screen.getByLabelText(label)).toHaveAttribute('data-sky-field')
+    }
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-describedby', 'login-email-error')
     expect(screen.getByLabelText('Password')).toHaveAttribute('aria-describedby', 'login-password-error')
@@ -183,7 +209,9 @@ describe('signing in from the sky page', () => {
 
     await signIn(user)
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Too many sign-in attempts. Try again in a minute.')
+    const alert = await screen.findByRole('alert')
+    expect(alert).toHaveTextContent('Too many sign-in attempts. Try again in a minute.')
+    expect(alert.querySelector('svg[aria-hidden="true"]')).not.toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expectNoLightAlarmColours(container)
   })

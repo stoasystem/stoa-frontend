@@ -170,7 +170,12 @@ function SkyLanguageMenu({ className }: { className?: string }) {
           className,
         )}
         style={{ minHeight: TOUCH_TARGET, minWidth: TOUCH_TARGET }}
-        aria-label={t('language.label')}
+        // The name carries what the button shows, "EN", so a voice command
+        // naming it works (WCAG 2.5.3): "Language: English (EN)".
+        aria-label={t('language.current', {
+          language: t(languageNameKeys[currentLanguage.code]),
+          code: currentLanguage.shortLabel,
+        })}
       >
         <span translate="no" className="notranslate">{currentLanguage.shortLabel}</span>
         <ChevronDown aria-hidden="true" size={16} strokeWidth={ICON.stroke} />

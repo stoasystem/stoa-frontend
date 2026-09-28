@@ -14,10 +14,21 @@ textarea:focus-visible,
 select:focus-visible,
 [role="button"]:focus-visible,
 [role="menuitem"]:focus-visible,
+[role="menuitemradio"]:focus-visible,
+[role="menuitemcheckbox"]:focus-visible,
 [role="switch"]:focus-visible {
   /* Motion and states: 2 px navy, 2 px offset; star-gold on the sky. */
   outline: var(--focus-ring-width) solid var(--focus-ring);
   outline-offset: var(--focus-ring-offset);
+}
+
+/* Menu items sit flush in a list: the ring goes inside each one, so it is not
+   cut by the panel's edge or drawn over the next item (#53 review). The item's
+   highlight fill alone is 1.1:1 and is not a focus indicator. */
+[role="menuitem"]:focus-visible,
+[role="menuitemradio"]:focus-visible,
+[role="menuitemcheckbox"]:focus-visible {
+  outline-offset: calc(var(--focus-ring-width) * -1);
 }
 
 /* A 44 hit box around a smaller round control (bell, avatar): the ring goes on
