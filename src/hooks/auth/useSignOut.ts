@@ -2,9 +2,11 @@ import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
+import { clearPendingMessages } from '@/hooks/chat/useStreamingChat'
 import { forgetSessionHolding, tabToken } from '@/lib/devSessions'
 import { logout, type LogoutOutcome } from '@/services/auth/authApi'
 import { logger } from '@/services/logging/logger'
+import { resetAsk } from '@/store/askStore'
 import { TOKEN_KEY, trackPendingLogout, useAuthStore } from '@/store/authStore'
 
 function logOutcome(outcome: LogoutOutcome) {
@@ -56,6 +58,10 @@ export function useSignOut() {
     // Left in the tab, the upload hand-off opens the next student's chat with
     // this person's prompt and attachments already in the composer.
     clearUploadHandoff()
+    // Likewise Ask: a half-typed question, the open conversation, and any
+    // question still waiting for its answer (#49).
+    resetAsk()
+    clearPendingMessages()
     if (accessToken) forgetSessionHolding(accessToken)
     // Register before navigation unmounts this menu. The login mutation waits
     // for completion or the request's 8 s timeout; server work may outlive it.

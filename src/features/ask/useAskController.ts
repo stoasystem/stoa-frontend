@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { askPathFor, roleHomePaths } from '@/app/router/routeManifest'
 import type { AskEntry } from '@/features/ask/askLayout'
-import { planetAskFor, useAskStore } from '@/store/askStore'
+import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
 /** `/ask` or `/ask/:conversationId`: the id comes from the path, and only from it. */
@@ -33,17 +33,24 @@ export type AskController = {
 export function useAskController(route?: AskRoute): AskController {
   const navigate = useNavigate()
   const ownerId = useAuthStore((state) => state.user?.id ?? null)
-  // Two primitive reads: a selector that builds an object is a new snapshot on
-  // every render, which zustand 5 refuses.
-  const planetOpen = useAskStore((state) => planetAskFor(state, ownerId).open)
-  const planetConversationId = useAskStore((state) => planetAskFor(state, ownerId).conversationId)
-  const draft = useAskStore((state) => state.draft)
-  const setDraft = useAskStore((state) => state.setDraft)
+  // Primitive reads: a selector that builds an object is a new snapshot on
+  // every render, which zustand 5 refuses. Each is this account's only.
+  const planetOpen = useAskStore((state) => askFor(state, ownerId).open)
+  const planetConversationId = useAskStore((state) => askFor(state, ownerId).conversationId)
+  const draft = useAskStore((state) => askFor(state, ownerId).draft)
+  const storeSetDraft = useAskStore((state) => state.setDraft)
   const storeOpenWithDraft = useAskStore((state) => state.openWithDraft)
   const storeSelect = useAskStore((state) => state.select)
   const storeClose = useAskStore((state) => state.close)
   const direct = route !== undefined
   const directId = route?.conversationId ?? null
+
+  const setDraft = useCallback(
+    (value: string) => {
+      if (ownerId) storeSetDraft(ownerId, value)
+    },
+    [ownerId, storeSetDraft],
+  )
 
   const openWithDraft = useCallback(
     (value: string) => {

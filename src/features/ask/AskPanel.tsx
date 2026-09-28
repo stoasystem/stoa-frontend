@@ -12,6 +12,7 @@ import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
+import { rememberPendingMessage } from '@/hooks/chat/useStreamingChat'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
 import { useRecommendationsQuery } from '@/hooks/learning/useWeakTopicsQuery'
 import { useStudentProfileQuery } from '@/hooks/student/useStudentProfileQuery'
@@ -22,7 +23,6 @@ import { cn } from '@/lib/utils'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
-import { useAskStore } from '@/store/askStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import type { ChatMessage } from '@/types/chat'
 
@@ -59,30 +59,43 @@ export function AskPanel({
   const availability = useTeacherAvailabilityQuery().data
   const teachersOnline = availability?.online
   const profile = useStudentProfileQuery().data
-  const createConversation = useCreateConversationMutation()
-  const queued = useAskStore((state) => state.queued)
-  const queue = useAskStore((state) => state.queue)
+  // The first question goes out with the conversation itself
+  // (`POST /conversations` with `initialMessage`), so it is sent exactly when
+  // the student sends it: never later, and not lost if Ask closes or the page
+  // reloads before the conversation opens. Its answer comes on the command the
+  // backend keys `initial-<id>`; it is remembered as a message waiting for its
+  // answer, which the conversation picks up when it opens (after a reload too).
+  const createConversation = useCreateConversationMutation({
+    onCreated: (created, payload) => {
+      if (!payload.initialMessage) return
+      rememberPendingMessage(created.id, {
+        idempotencyKey: `initial-${created.id}`,
+        content: payload.initialMessage,
+        askedAt: askedAtRef.current ?? new Date().toISOString(),
+      })
+    },
+  })
+  // Two sends in one tick would start two conversations.
+  const creatingRef = useRef(false)
+  const askedAtRef = useRef<string | null>(null)
   const ask = useAskConversation(conversationId)
   const { sendStreamingMessage, isStreaming, conversation } = ask
   const phone = layout === 'sheet'
   const subject = subjectFor(subjectId, profile?.primarySubjects?.[0])
 
-  // The first message of a conversation just started goes out once it is open.
-  useEffect(() => {
-    if (!queued || !conversationId || queued.conversationId !== conversationId || !conversation) return
-    queue(null)
-    void sendStreamingMessage({ content: queued.content })
-  }, [conversation, conversationId, queue, queued, sendStreamingMessage])
-
   function startConversation(content: string) {
-    if (createConversation.isPending) return
+    if (creatingRef.current || createConversation.isPending) return
+    creatingRef.current = true
+    askedAtRef.current = new Date().toISOString()
     createConversation.mutate(
-      { subject, grade: conversationGrade(profile?.grade) },
+      { subject, grade: conversationGrade(profile?.grade), initialMessage: content },
       {
         onSuccess: (created) => {
-          queue({ conversationId: created.id, content })
           setDraft('')
           select(created.id)
+        },
+        onSettled: () => {
+          creatingRef.current = false
         },
       },
     )
@@ -151,7 +164,6 @@ export function AskPanel({
           ask={ask}
           layout={layout}
           teachersOnline={teachersOnline}
-          starting={queued?.conversationId === conversationId}
         />
       ) : (
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto" style={{ padding: phone ? '8px 6px' : '10px 8px' }}>
@@ -224,13 +236,11 @@ function AskThread({
   ask,
   layout,
   teachersOnline,
-  starting,
 }: {
   conversationId: string
   ask: ReturnType<typeof useAskConversation>
   layout: AskLayout
   teachersOnline: boolean | undefined
-  starting: boolean
 }) {
   const { t } = useTranslation('chat')
   const queryClient = useQueryClient()
@@ -260,11 +270,18 @@ function AskThread({
   const lastAnswerId = latestAnswerId(messages)
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
 
-  // Keep the latest message in view as the thread grows.
+  // Keep the latest message in view as the thread grows -- unless the student
+  // has scrolled up to read something earlier.
+  const atBottom = useRef(true)
   useLayoutEffect(() => {
     const node = scroller.current
-    if (node) node.scrollTop = node.scrollHeight
+    if (node && atBottom.current) node.scrollTop = node.scrollHeight
   }, [messages])
+  const onScroll = () => {
+    const node = scroller.current
+    if (node) atBottom.current = node.scrollHeight - node.scrollTop - node.clientHeight < STICK_TO_BOTTOM_PX
+  }
+  const announcement = useFinishedReplyAnnouncement(messages, conversationQuery.isSuccess)
 
   return (
     <>
@@ -277,12 +294,15 @@ function AskThread({
         ref={scroller}
         role="log"
         aria-label={t('ask.thread.label')}
-        aria-live="polite"
+        // An answer is written a few words at a time; read out whole, once
+        // finished, by the announcer below -- not token by token.
+        aria-live="off"
+        onScroll={onScroll}
         className="flex min-h-0 flex-1 flex-col overflow-y-auto"
         style={{ gap: layout === 'sheet' ? 10 : 12, padding: layout === 'sheet' ? '12px 14px' : '16px 18px' }}
       >
         <div className="flex-1" />
-        {conversationQuery.isLoading && !starting ? (
+        {conversationQuery.isLoading ? (
           <p className="text-[13px] text-caption">{t('ask.thread.loading')}</p>
         ) : conversationQuery.isError ? (
           <div className="flex flex-col items-start gap-2">
@@ -313,8 +333,42 @@ function AskThread({
           />
         ))}
       </div>
+      <p className="sr-only" aria-live="polite" data-ask-announcer>
+        {announcement}
+      </p>
     </>
   )
+}
+
+/** How near the bottom still counts as reading the latest message. */
+const STICK_TO_BOTTOM_PX = 48
+
+/**
+ * The reply to read out: an answer or a teacher's message once it is whole.
+ * What was already there when the conversation opened is not announced.
+ */
+function useFinishedReplyAnnouncement(messages: readonly ChatMessage[], loaded: boolean) {
+  const [announcement, setAnnouncement] = useState('')
+  const seen = useRef<Set<string> | null>(null)
+  useEffect(() => {
+    if (!loaded) return
+    const finished = messages.filter(
+      (message) =>
+        (message.role === 'assistant' || message.role === 'teacher') &&
+        message.status !== 'streaming' &&
+        message.content.length > 0,
+    )
+    if (seen.current === null) {
+      seen.current = new Set(finished.map((message) => message.id))
+      return
+    }
+    const known = seen.current
+    const fresh = finished.filter((message) => !known.has(message.id))
+    for (const message of fresh) known.add(message.id)
+    const latest = fresh[fresh.length - 1]
+    if (latest) setAnnouncement(latest.content)
+  }, [loaded, messages])
+  return announcement
 }
 
 /** The latest answer the assistant finished: the request for a teacher sits under it. */

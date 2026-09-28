@@ -7,6 +7,7 @@ import { useAskController, type AskRoute } from '@/features/ask/useAskController
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
 import { WIDE_QUERY, useMediaQuery } from '@/hooks/layout/useMediaQuery'
+import { useCoverShell } from '@/layouts/shellCover'
 
 /**
  * The planet with Ask on it (#12 points 1 and 6; #13 point 1).
@@ -41,11 +42,18 @@ export function AskHost({
   const wide = useMediaQuery(WIDE_QUERY)
   const controller = useAskController(route)
   const { open, entry, close } = controller
-  const surface = useRef<HTMLDivElement>(null)
+  const surface = useRef<HTMLElement>(null)
   const docked = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(open)
   const layout = wide ? 'panel' : 'sheet'
-  const modal = open && !wide
+  const sheet = open && !wide
+  // From the planet the phone sheet is a modal over it: the planet and the bar
+  // are dimmed and inert, and the keyboard stays in the sheet. Opened at /ask
+  // the full-screen sheet is the page itself, so the bar stays usable.
+  const modal = sheet && entry === 'planet'
+  const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+  const composing = useRef(false)
+  useCoverShell(modal)
 
   // Closed again: the focus goes back to where Ask was opened from.
   useEffect(() => {
@@ -63,12 +71,22 @@ export function AskHost({
     field.setSelectionRange?.(end, end)
   }, [open, layout])
 
-  const onKeyDown = useAskKeyboard(surface, { trap: modal, onEscape: close })
+  const onKeyDown = useAskKeyboard(surface, { trap: modal, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
+  // An input method (Chinese, Japanese, a dead key for an accent) is still
+  // composing while its first characters arrive; opening Ask then would move
+  // the field from under it. Ask opens once the composition ends.
   const onDockedChange = useCallback(
     (value: string) => {
-      if (value.trim().length > 0) controller.openWithDraft(value)
+      if (value.trim().length > 0 && !composing.current) controller.openWithDraft(value)
       else controller.setDraft(value)
+    },
+    [controller],
+  )
+  const onDockedCompositionEnd = useCallback(
+    (value: string) => {
+      composing.current = false
+      if (value.trim().length > 0) controller.openWithDraft(value)
     },
     [controller],
   )
@@ -78,7 +96,7 @@ export function AskHost({
       <div
         data-surface="sky"
         data-ask-page
-        inert={modal || undefined}
+        inert={sheet || undefined}
         className="absolute inset-y-0 left-0 bg-sky text-on-sky"
         style={{ right: open && wide ? ASK_PANEL.width : 0 }}
       >
@@ -98,6 +116,10 @@ export function AskHost({
               <Composer
                 value={controller.draft}
                 onChange={onDockedChange}
+                onCompositionStart={() => {
+                  composing.current = true
+                }}
+                onCompositionEnd={onDockedCompositionEnd}
                 onSubmit={(value) => controller.openWithDraft(value)}
                 label={t('ask.composerLabel')}
                 placeholder={wide ? t('ask.dockedPlaceholder') : t('ask.dockedPlaceholderPhone')}
@@ -134,10 +156,10 @@ export function AskHost({
             <AskPanel controller={controller} layout="panel" subjectId={subjectId} />
           </aside>
         ) : (
-          <div
+          <section
             ref={surface}
-            role="dialog"
-            aria-modal="true"
+            role={modal ? 'dialog' : undefined}
+            aria-modal={modal || undefined}
             aria-label={t('ask.title')}
             data-ask-surface="sheet"
             data-ask-entry={entry}
@@ -150,7 +172,8 @@ export function AskHost({
               borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
               boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
               transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
-              transition: drag.dragging ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
+              transition:
+                drag.dragging || reducedMotion ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
             }}
           >
             {entry === 'planet' && (
@@ -171,7 +194,7 @@ export function AskHost({
                 headerHandle={entry === 'planet' ? drag.handle : undefined}
               />
             </div>
-          </div>
+          </section>
         ))}
     </div>
   )

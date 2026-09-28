@@ -2,14 +2,24 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createConversation } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import type { ConversationListResponse, CreateConversationRequest } from '@/types/chat'
+import type { Conversation, ConversationListResponse, CreateConversationRequest } from '@/types/chat'
 
-export function useCreateConversationMutation() {
+export function useCreateConversationMutation(
+  options: {
+    /**
+     * Runs once the conversation exists, even if the screen that asked for it
+     * has gone meanwhile -- unlike a callback passed to `mutate`.
+     */
+    onCreated?: (conversation: Conversation, payload: CreateConversationRequest) => void
+  } = {},
+) {
   const queryClient = useQueryClient()
+  const { onCreated } = options
 
   return useMutation({
     mutationFn: (payload: CreateConversationRequest) => createConversation(payload),
-    onSuccess: (conversation) => {
+    onSuccess: (conversation, payload) => {
+      onCreated?.(conversation, payload)
       trackEvent('chat_conversation_created', {
         conversationId: conversation.id,
         subject: conversation.subject,

@@ -1,4 +1,4 @@
-import { useCallback, type KeyboardEvent, type RefObject } from 'react'
+import { useCallback, useEffect, type RefObject } from 'react'
 
 const FOCUSABLE = [
   'a[href]',
@@ -15,17 +15,23 @@ function focusables(container: HTMLElement) {
   )
 }
 
+type KeyEvent = Pick<KeyboardEvent, 'key' | 'shiftKey' | 'preventDefault' | 'stopPropagation'>
+
 /**
- * Keyboard handling for Ask: Esc closes it wherever the focus is inside, and,
- * when `trap` is set (the phone sheet, which is modal), Tab and Shift+Tab go
- * round the sheet instead of leaving it for the dimmed planet behind.
+ * Keyboard handling for Ask: Esc closes it, and, when `trap` is set (the phone
+ * sheet opened from the planet, which is modal), Tab and Shift+Tab go round the
+ * sheet instead of leaving it -- from wherever the focus is, even outside it.
+ *
+ * The modal sheet listens on the document, so Esc and Tab work while nothing
+ * inside it has the focus; the desktop panel and the full-screen sheet answer
+ * only keys pressed inside them (the returned `onKeyDown`).
  */
 export function useAskKeyboard(
   container: RefObject<HTMLElement | null>,
-  { trap, onEscape }: { trap: boolean; onEscape: () => void },
+  { trap, active, onEscape }: { trap: boolean; active: boolean; onEscape: () => void },
 ) {
-  return useCallback(
-    (event: KeyboardEvent<HTMLElement>) => {
+  const handle = useCallback(
+    (event: KeyEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
         event.stopPropagation()
@@ -40,15 +46,26 @@ export function useAskKeyboard(
       }
       const first = items[0]
       const last = items[items.length - 1]
-      const active = document.activeElement
-      if (event.shiftKey && (active === first || !container.current.contains(active))) {
+      const focused = document.activeElement
+      const inside = container.current.contains(focused)
+      if (event.shiftKey && (!inside || focused === first)) {
         event.preventDefault()
         last.focus()
-      } else if (!event.shiftKey && active === last) {
+      } else if (!event.shiftKey && (!inside || focused === last)) {
         event.preventDefault()
         first.focus()
       }
     },
     [container, onEscape, trap],
   )
+
+  useEffect(() => {
+    if (!trap || !active) return
+    const listener = (event: KeyboardEvent) => handle(event)
+    document.addEventListener('keydown', listener)
+    return () => document.removeEventListener('keydown', listener)
+  }, [active, handle, trap])
+
+  // With the document listening, the element's own handler stands down.
+  return trap ? undefined : handle
 }

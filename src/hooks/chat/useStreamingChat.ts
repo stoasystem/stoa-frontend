@@ -74,6 +74,35 @@ function writePending(conversationId: string, pending: PendingMessage | null) {
   }
 }
 
+/**
+ * A message the server already has but has not answered yet -- the first one
+ * of a conversation, sent with `POST /conversations` itself -- so the hook
+ * waits for its answer as it would after a reload, instead of sending it.
+ */
+export function rememberPendingMessage(
+  conversationId: string,
+  pending: { idempotencyKey: string; content: string; askedAt: string },
+) {
+  writePending(conversationId, pending)
+}
+
+/**
+ * Signing out: the questions still waiting for an answer are this account's
+ * words, and must not be left in the tab for the next one.
+ */
+export function clearPendingMessages() {
+  try {
+    const keys: string[] = []
+    for (let index = 0; index < sessionStorage.length; index += 1) {
+      const key = sessionStorage.key(index)
+      if (key?.startsWith(PENDING_MESSAGE_KEY_PREFIX)) keys.push(key)
+    }
+    for (const key of keys) sessionStorage.removeItem(key)
+  } catch {
+    // Without storage nothing was kept.
+  }
+}
+
 function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
 }

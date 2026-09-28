@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useConversationQuery } from '@/hooks/chat/useConversationQuery'
 import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStreamingChat'
 import {
@@ -27,6 +27,19 @@ export function useAskConversation(conversationId: string | null) {
   const conversationQuery = useConversationQuery(conversationId, {
     refetchInterval: teacherHelpPollInterval(help?.status),
   })
+  // A teacher who replies and resolves within one poll leaves the conversation
+  // unpolled just as their reply lands: the resolved status turns the polling
+  // off before the conversation is read again. So each change of status reads
+  // the conversation once more, whatever the new status is.
+  const status = help?.status ?? null
+  const lastStatus = useRef(status)
+  const { refetch } = conversationQuery
+  useEffect(() => {
+    if (lastStatus.current === status) return
+    const previous = lastStatus.current
+    lastStatus.current = status
+    if (previous !== null && conversationId) void refetch()
+  }, [conversationId, refetch, status])
   const streaming = useStreamingChat(conversationId)
   const serverMessages = conversationQuery.data?.messages
   const messages = useMemo(

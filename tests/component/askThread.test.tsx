@@ -6,7 +6,7 @@
  * says, and a teacher's reply reaches the thread while that help is open.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, render, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
@@ -14,7 +14,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
-import { useAskStore } from '@/store/askStore'
+import { resetAsk, useAskStore } from '@/store/askStore'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { ChatMessage, Conversation } from '@/types/chat'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
@@ -112,6 +112,15 @@ function openAsk() {
   return within(screen.getByRole('complementary', { name: 'Ask' }))
 }
 
+/** The messages themselves, without the live region that reads replies out. */
+function thread(ask: ReturnType<typeof openAsk>) {
+  return within(ask.getByRole('log', { name: 'Messages' }))
+}
+
+function announcer() {
+  return document.querySelector('[data-ask-announcer]') as HTMLElement
+}
+
 async function advance(ms: number) {
   await act(async () => {
     await vi.advanceTimersByTimeAsync(ms)
@@ -129,7 +138,7 @@ beforeEach(async () => {
     accessToken: 'token',
     isAuthenticated: true,
   })
-  useAskStore.setState({ ownerId: null, open: false, conversationId: null, draft: '', queued: null })
+  resetAsk()
   vi.mocked(getConversations).mockResolvedValue({ items: [] })
   vi.mocked(getTeacherAvailability).mockResolvedValue({ online: true, availableTeachers: 2 })
   helpStatusMock.mockRejectedValue(NEVER_ESCALATED)
@@ -166,11 +175,15 @@ describe('sending a message', () => {
     expect(await ask.findByText('Is x = 5?')).toBeInTheDocument()
     await advance(1100)
     expect(await ask.findByText('Checking your steps')).toBeInTheDocument()
+    // Not read out while it is being written.
+    expect(announcer()).toBeEmptyDOMElement()
     expect(streamMock.mock.calls[0][0].payload).toMatchObject({ content: 'Is x = 5?' })
 
     answered = true
     await advance(3000)
-    expect(await ask.findByText('Yes: 3 · 5 + 5 = 20.')).toBeInTheDocument()
+    expect(await thread(ask).findByText('Yes: 3 · 5 + 5 = 20.')).toBeInTheDocument()
+    // Read out once, whole, when it is finished.
+    expect(announcer()).toHaveTextContent('Yes: 3 · 5 + 5 = 20.')
     expect(ask.queryByText('Checking your steps')).not.toBeInTheDocument()
     // The wait is over: nothing is left for a reload to pick up.
     expect(sessionStorage.getItem('stoa_pending_chat_message:c1')).toBeNull()
@@ -202,7 +215,7 @@ describe('sending a message', () => {
 
     answered = true
     await advance(1100)
-    expect(await ask.findByText('A number with exactly two divisors.')).toBeInTheDocument()
+    expect(await thread(ask).findByText('A number with exactly two divisors.')).toBeInTheDocument()
     expect(streamMock).not.toHaveBeenCalled()
     expect(progressMock.mock.calls[0][2]).toBe('k-1')
   })
@@ -315,7 +328,7 @@ describe('a teacher in the conversation', () => {
     replied = true
     await advance(5_100)
 
-    const reply = await ask.findByText('Well done - now try 4x − 7 = −19.')
+    const reply = await thread(ask).findByText('Well done - now try 4x − 7 = −19.')
     const bubble = reply.closest('[data-message-role]')
     expect(bubble).toHaveAttribute('data-message-role', 'teacher')
     expect(within(bubble as HTMLElement).getByText('Ms Bergmann')).toBeInTheDocument()
@@ -332,5 +345,123 @@ describe('a teacher in the conversation', () => {
     await advance(20_000)
 
     expect(getConversationMock.mock.calls.length).toBe(reads)
+  })
+})
+
+describe('reading the conversation again', () => {
+  it('keeps a reply the teacher sent just before resolving the request', async () => {
+    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
+    let replied = false
+    getConversationMock.mockImplementation(async () =>
+      conversation([
+        message('s1', 'student', 'Is x = 5?'),
+        message('a1', 'assistant', 'Yes.'),
+        ...(replied ? [message('t1', 'teacher', 'All clear now - good luck!')] : []),
+      ]),
+    )
+    const ask = openAsk()
+    await ask.findByText('Yes.')
+
+    // Within one poll window the teacher replies and then resolves.
+    await advance(3_000)
+    replied = true
+    helpStatusMock.mockResolvedValue(help('resolved', 'Ms Bergmann'))
+    await advance(2_500)
+
+    await waitFor(() =>
+      expect(ask.getByRole('region', { name: 'Teacher support' })).toHaveAttribute('data-help-status', 'resolved'),
+    )
+    expect(await thread(ask).findByText('All clear now - good luck!')).toBeInTheDocument()
+  })
+
+  it('stops once Ask is closed', async () => {
+    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
+    getConversationMock.mockResolvedValue(conversation([message('a1', 'assistant', 'Yes.')]))
+    // Opened from the planet, so closing it takes it away rather than leaving the page.
+    useAskStore.setState({ ownerId: 'u-1', open: true, conversationId: 'c1' })
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    render(
+      <I18nextProvider i18n={i18n}>
+        <QueryClientProvider client={client}>
+          <MemoryRouter>
+            <AskHost />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </I18nextProvider>,
+    )
+    const ask = within(screen.getByRole('complementary', { name: 'Ask' }))
+    await ask.findByText('Yes.')
+    await advance(5_100)
+    expect(getConversationMock.mock.calls.length).toBeGreaterThan(1)
+
+    await userEvent.click(ask.getByRole('button', { name: 'Close' }))
+    const conversationReads = getConversationMock.mock.calls.length
+    const helpReads = helpStatusMock.mock.calls.length
+    await advance(30_000)
+
+    expect(getConversationMock.mock.calls.length).toBe(conversationReads)
+    expect(helpStatusMock.mock.calls.length).toBe(helpReads)
+  })
+})
+
+describe('the scroll position', () => {
+  /** jsdom lays nothing out: give the thread a height and track where it is scrolled to. */
+  function measure(log: HTMLElement) {
+    let top = 0
+    Object.defineProperty(log, 'scrollHeight', { configurable: true, get: () => 1000 })
+    Object.defineProperty(log, 'clientHeight', { configurable: true, get: () => 300 })
+    Object.defineProperty(log, 'scrollTop', {
+      configurable: true,
+      get: () => top,
+      set: (value: number) => {
+        top = value
+      },
+    })
+    return { at: () => top, scrollTo: (value: number) => {
+      top = value
+      fireEvent.scroll(log)
+    } }
+  }
+
+  async function replyArrives(ask: ReturnType<typeof openAsk>, content: string, state: { replied: boolean }) {
+    state.replied = true
+    await advance(5_100)
+    await thread(ask).findByText(content)
+  }
+
+  function setUp() {
+    helpStatusMock.mockResolvedValue(help('in_progress', 'Ms Bergmann'))
+    const state = { replied: false }
+    getConversationMock.mockImplementation(async () =>
+      conversation([
+        message('a1', 'assistant', 'Yes.'),
+        ...(state.replied ? [message('t1', 'teacher', 'A new reply')] : []),
+      ]),
+    )
+    return state
+  }
+
+  it('follows a new message while the student reads the latest', async () => {
+    const state = setUp()
+    const ask = openAsk()
+    await ask.findByText('Yes.')
+    const log = measure(ask.getByRole('log', { name: 'Messages' }))
+    log.scrollTo(700)
+
+    await replyArrives(ask, 'A new reply', state)
+
+    expect(log.at()).toBe(1000)
+  })
+
+  it('stays put when the student has scrolled up to read something earlier', async () => {
+    const state = setUp()
+    const ask = openAsk()
+    await ask.findByText('Yes.')
+    const log = measure(ask.getByRole('log', { name: 'Messages' }))
+    log.scrollTo(100)
+
+    await replyArrives(ask, 'A new reply', state)
+
+    expect(log.at()).toBe(100)
   })
 })
