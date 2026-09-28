@@ -1,0 +1,55 @@
+{
+  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"). A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run and needs a \"why\"; those pairs fail on today's canvas values and are open questions for #18. Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), locked points (rgba white 28%, inactive), --lit-deep and --atmosphere (glow only).",
+  "tokens": {
+    "file": "design/tokens.css",
+    "themes": {
+      "light": [":root"],
+      "dark": [":root"]
+    }
+  },
+  "pairs": [
+    { "theme": "light", "fg": "--ink", "bg": "--ground", "kind": "text", "use": "body, titles on the page" },
+    { "theme": "light", "fg": "--ink", "bg": "--surface", "kind": "text", "use": "rows, cards" },
+    { "theme": "light", "fg": "--ink", "bg": "--sidebar", "kind": "text", "use": "source lists" },
+    { "theme": "light", "fg": "--ink", "bg": "--fill", "kind": "text", "use": "gray button, selected segment" },
+    { "theme": "light", "fg": "--secondary", "bg": "--ground", "kind": "text", "use": "captions on the page" },
+    { "theme": "light", "fg": "--secondary", "bg": "--surface", "kind": "text", "use": "captions in rows and cards" },
+    { "theme": "light", "fg": "--secondary", "bg": "--sidebar", "kind": "text", "use": "list meta in source lists", "gate": false, "why": "below 4.5 on canvas values; darken --secondary or keep captions off --sidebar (#18)" },
+    { "theme": "light", "fg": "--secondary", "bg": "--fill", "kind": "text", "use": "search placeholder, inactive segment", "gate": false, "why": "below 4.5 on canvas values; Components draws it and the boards set input::placeholder to --secondary on a --fill search field (#18)" },
+    { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "text", "use": "links" },
+    { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "text", "use": "plain buttons" },
+    { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "text", "use": "tinted button, Pending pill" },
+    { "theme": "light", "fg": "--on-accent", "bg": "--accent", "kind": "text", "use": "filled button" },
+    { "theme": "light", "fg": "--on-accent", "bg": "--accent-pressed", "kind": "text", "use": "filled button, hover / press" },
+    { "theme": "light", "fg": "--red", "bg": "--ground", "kind": "text", "use": "destructive text" },
+    { "theme": "light", "fg": "--red", "bg": "--surface", "kind": "text", "use": "destructive text in rows" },
+    { "theme": "light", "fg": "--gold", "bg": "--gold-tint", "kind": "text", "use": "Assigned / waiting pill" },
+    { "theme": "light", "fg": "--green", "bg": "--green-tint", "kind": "text", "use": "In progress / Ready pill", "gate": false, "why": "below 4.5 on canvas values; pill text is 12/600, not large; darken --green or lighten the tint (#18)" },
+    { "theme": "light", "fg": "--pill-neutral", "bg": "--fill", "kind": "text", "use": "Resolved pill" },
+    { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "ui", "use": "focus ring" },
+    { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "ui", "use": "focus ring on cards" },
+    { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "ui", "use": "selected answer border" },
+    { "theme": "light", "fg": "--green", "bg": "--surface", "kind": "ui", "use": "online dot" },
+    { "theme": "light", "fg": "--star", "bg": "--surface", "kind": "ui", "use": "streak / lit icon on cards" },
+    { "theme": "light", "fg": "--star", "bg": "--ground", "kind": "ui", "use": "streak / lit icon on the page", "gate": false, "why": "below 3 on canvas values; Foundations allows star-gold on light only as an icon or pill, and as an icon it needs 3:1 (#18)" },
+
+    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky", "kind": "text", "use": "titles on the sky" },
+    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-2", "kind": "text", "use": "titles on raised dark surfaces" },
+    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky", "kind": "text", "use": "body on the sky" },
+    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky-2", "kind": "text", "use": "body on raised dark surfaces" },
+    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky", "kind": "text", "use": "captions on the sky" },
+    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky-2", "kind": "text", "use": "captions on raised dark surfaces" },
+    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card title" },
+    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card body" },
+    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card caption" },
+    { "theme": "dark", "fg": "--on-sky-button-text", "bg": "--on-sky-button", "kind": "text", "use": "filled button on dark" },
+    { "theme": "dark", "fg": "--on-sky-plain", "bg": "--sky", "kind": "text", "use": "plain button on dark" },
+    { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "large", "use": "lit moment numbers (title 1)" },
+    { "theme": "dark", "fg": "--on-sky-text-muted", "bg": "--sky", "kind": "text", "use": "muted text on the sky", "gate": false, "why": "below 4.5 on canvas values; passes only if muted is inactive text (WCAG exempts it) or large; #18 settles what muted is for" },
+    { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "ui", "use": "focus ring, selected answer border" },
+    { "theme": "dark", "fg": "--lit", "bg": "--sky-2", "kind": "ui", "use": "focus ring on raised dark surfaces" },
+    { "theme": "dark", "fg": "--lit", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "focus ring on glass cards" },
+    { "theme": "dark", "fg": "--lit", "bg": "--node-fill", "kind": "ui", "use": "ring of a hollow node" },
+    { "theme": "dark", "fg": "--lit", "bg": "--sphere-0", "kind": "ui", "use": "lit point on the sphere highlight" }
+  ]
+}

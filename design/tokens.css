@@ -1,0 +1,64 @@
+/*
+ * Design tokens transcribed from the redesign canvas, board
+ * "Design language · Tokens" (https://claude.ai/artifact/XTHszGBU78LNmon3uJjMNk),
+ * read 2026-09-28. This file is the token source that scripts/check-contrast.mjs
+ * rates (declared in scripts/contrast-pairs.json under "tokens"). Nothing in the
+ * app imports it.
+ *
+ * Ticket #18 owns the real token file. When src/styles/brand-tokens.css carries
+ * these names, #18 points "tokens.file" in scripts/contrast-pairs.json at it and
+ * deletes this file; the script does not change. If #18 puts the sky tokens in a
+ * separate block (a data-theme selector, a prefers-color-scheme media query),
+ * it lists that block under "tokens.themes.dark" instead.
+ *
+ * The canvas treats light and dark as one family with distinct names (the
+ * light surfaces and "the sky"), so both themes live in one :root block here.
+ */
+
+:root {
+  /* Light surfaces */
+  --ink: #1D1D1F;
+  --secondary: #6E6E73;
+  --tertiary: #AEAEB2; /* chevrons, dividers: never text */
+  --ground: #F5F5F7;
+  --surface: #FFFFFF;
+  --sidebar: #F0F0F2;
+  --fill: #E8E8ED;
+  --separator: #D2D2D7;
+  --hairline: #E5E5EA;
+  --accent: #1F2E5C;
+  --accent-pressed: #14204A;
+  --accent-tint: #E9EEF9;
+  --star: #C48A1C;
+  --green: #2E7D4F;
+  --gold: #7A5410;
+  --red: #C4283A;
+
+  /* Dark surfaces (the sky) */
+  --sky: #0A1020;
+  --sky-2: #131C33;
+  --sky-glass: rgba(22, 30, 52, 0.78); /* + blur 24, over --sky */
+  --lit: #F2C572;
+  --lit-deep: rgb(214, 160, 70);
+  --node-fill: #141E38;
+  --sphere-0: #2A3A64;
+  --sphere-1: #152040;
+  --sphere-2: #080C1A;
+  --atmosphere: rgba(120, 160, 255, 0.16);
+  --on-sky-button: #FFFFFF;
+
+  /*
+   * Not named on the Tokens board. The canvas draws these colours in the pairs
+   * the gate rates, so they need a name here; #18 confirms or renames them.
+   */
+  --on-accent: #FFFFFF;              /* label on filled navy buttons (Placement, Components) */
+  --on-sky-button-text: #0A1020;     /* Tokens: "--on-sky-button #FFFFFF / text #0A1020"; Placement says "navy text" */
+  --on-sky-text: #FFFFFF;            /* Tokens: --on-sky-text "white 100 / 75 / 65 / 35" = title / body / caption / muted */
+  --on-sky-text-body: rgba(255, 255, 255, 0.75);
+  --on-sky-text-caption: rgba(255, 255, 255, 0.65);
+  --on-sky-text-muted: rgba(255, 255, 255, 0.35);
+  --on-sky-plain: rgba(255, 255, 255, 0.85); /* Placement: plain button on dark, "plain white 85%" */
+  --green-tint: #E6F2EB;             /* Foundations: green "paired with tint #E6F2EB" */
+  --gold-tint: #F7EEDB;              /* Foundations: gold "paired with tint #F7EEDB" */
+  --pill-neutral: #3A3A3C;           /* Motion and states: "Resolved" pill text on --fill */
+}
