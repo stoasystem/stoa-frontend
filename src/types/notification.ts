@@ -45,3 +45,27 @@ export type RealtimeNotificationEnvelope = {
   deliveryId?: string | null
   deliveryAttempt?: number | null
 }
+
+/*
+ * GET / PATCH /notifications/preferences. Categories and channels are the
+ * backend's (`notification_service.PREFERENCE_CATEGORIES` / `_CHANNELS`); the
+ * response lists which ones it supports.
+ */
+export type NotificationPreferenceCategory =
+  | 'learning_updates'
+  | 'teacher_responses'
+  | 'assignments'
+  | 'weekly_reports'
+  | 'admin_operations'
+
+export type NotificationPreferenceChannel = 'in_app' | 'realtime' | 'email_digest' | 'push'
+
+export type NotificationPreferenceMatrix = Record<string, Partial<Record<NotificationPreferenceChannel, boolean>>>
+
+export type NotificationPreferences = {
+  userId: string
+  preferences: NotificationPreferenceMatrix
+  supportedCategories: string[]
+  supportedChannels: string[]
+  updatedAt?: string | null
+}

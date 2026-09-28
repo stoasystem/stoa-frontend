@@ -88,9 +88,13 @@ describe('the account menu', () => {
   )
 
   it.each([
-    ['student', '/me', '/me'],
+    ['student', '/me', '/me#password'],
     ['teacher', '/tutor/profile', '/settings/password'],
     ['parent', '/parent/account-operations', '/settings/password'],
+    ['admin', '/me', '/me#password'],
+    ['organization_admin', '/me', '/me#password'],
+    ['school_teacher', '/me', '/me#password'],
+    ['school_viewer', '/me', '/me#password'],
   ] as const)('sends a %s to %s for the profile and %s for the password', async (role, profile, password) => {
     const menu = await openWithMouse(role)
 
@@ -99,12 +103,14 @@ describe('the account menu', () => {
     expect(within(menu).getByRole('menuitem', { name: 'accountMenu.help' })).toHaveAttribute('href', '/support')
   })
 
-  it('shows an administrator the profile item without a page behind it, and cannot be chosen', async () => {
-    const menu = await openWithMouse('admin')
+  // #18 left these disabled: administrators and the organisation roles had no
+  // profile page. /me is theirs now (#46), so no item is ever a dead end.
+  it.each(['admin', 'organization_admin'] as const)('gives a %s a profile item that can be chosen', async (role) => {
+    const menu = await openWithMouse(role)
     const profile = within(menu).getByRole('menuitem', { name: 'navigation.profile' })
 
-    expect(profile).not.toHaveAttribute('href')
-    expect(profile).toHaveAttribute('aria-disabled', 'true')
+    expect(profile).toHaveAttribute('href', '/me')
+    expect(profile).not.toHaveAttribute('aria-disabled')
   })
 
   it('names the person and their role at the top', async () => {
@@ -181,8 +187,10 @@ const ALL_ROLES: UserRole[] = [
   'school_viewer',
 ]
 
+// A `#section` never reaches the router; the page is what must admit the role.
 function routeFor(path: string) {
-  return pageRoutes.find((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, path))
+  const pathname = path.split('#')[0]
+  return pageRoutes.find((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, pathname))
 }
 
 describe('every link the shell offers a role admits that role', () => {

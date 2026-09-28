@@ -116,12 +116,6 @@ function shownAt(element: Element, width: number): boolean {
   return true
 }
 
-function signOutButtonsShownAt(width: number) {
-  return screen
-    .getAllByRole('button', { name: 'actions.logOut' })
-    .filter((button) => shownAt(button, width) && !button.hasAttribute('disabled'))
-}
-
 const originalMatchMedia = window.matchMedia
 
 // Since #18 the shell has one sign-out, in the avatar menu, and chooses its
@@ -249,15 +243,15 @@ describe('signing out on a narrow screen', () => {
   })
 
   // The chat has no app shell, and before #20 no sign-out at any width; with
-  // no conversation, or a list that failed, it had no header either.
+  // no conversation, or a list that failed, it had no header either. Since
+  // #46 it carries the shell's avatar menu rather than the old account pill.
   describe.each([375, 632, 1280])('on /chat at %ipx', (width) => {
     it.each(CHAT_STATES)('offers a student showing %s a visible sign-out', async (state) => {
       await renderChatShowing(state)
 
-      const shown = signOutButtonsShownAt(width)
-      expect(shown, `no sign-out on /chat (${state}) at ${width}px`).toHaveLength(1)
-
-      await userEvent.click(shown[0])
+      expect(screen.queryAllByRole('button', { name: 'actions.logOut' })).toHaveLength(0)
+      const signOutItem = await openAccountMenuAt(width)
+      await userEvent.click(signOutItem)
       expect(signOut).toHaveBeenCalledOnce()
     })
   })
