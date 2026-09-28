@@ -126,7 +126,9 @@
       "saveFailed": "The figure could not be saved.",
       "outOfRange": "Enter a whole number between 0 and {{maximum}}.",
       "zeroWarning": "Zero turns teacher support off for this student entirely — they will be told to contact an administrator, not that they have used this week up."
-    }
+    },
+    "operations": "Account operations",
+    "operationsDescription": "One parent account across verification, child access and usage"
   },
   "activation": {
     "eyebrow": "Account invitation",
@@ -149,5 +151,16 @@
       "password_rejected": "This password was rejected. Choose a stronger password.",
       "date_of_birth_invalid": "That date of birth is not a valid past date. Use the day, month and year of birth."
     }
+  },
+  "system": {
+    "title": "System",
+    "description": "Teacher response times, operational notifications, and the system pages.",
+    "pages": "In System",
+    "status": "System status",
+    "statusDescription": "Not available yet",
+    "learningOperations": "Learning operations",
+    "learningOperationsDescription": "Signals, completions and data readiness by subject",
+    "learningAutomation": "Learning automation",
+    "learningAutomationDescription": "Preview and run automatic practice assignments"
   }
 }

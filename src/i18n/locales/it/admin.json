@@ -126,7 +126,9 @@
       "saveFailed": "Non è stato possibile salvare il numero.",
       "outOfRange": "Inserisci un numero intero tra 0 e {{maximum}}.",
       "zeroWarning": "Zero disattiva completamente il supporto dell'insegnante per questo studente: gli verrà detto di contattare un amministratore, non che la settimana è esaurita."
-    }
+    },
+    "operations": "Operazioni sugli account",
+    "operationsDescription": "Un account genitore: verifica, accesso dei figli e utilizzo"
   },
   "activation": {
     "eyebrow": "Invito all'account",
@@ -149,5 +151,16 @@
       "password_rejected": "Questa password è stata rifiutata. Scegline una più forte.",
       "date_of_birth_invalid": "Questa data di nascita non è una data passata valida. Indica giorno, mese e anno di nascita."
     }
+  },
+  "system": {
+    "title": "Sistema",
+    "description": "Tempi di risposta dei docenti, notifiche operative e pagine di sistema.",
+    "pages": "In Sistema",
+    "status": "Stato del sistema",
+    "statusDescription": "Non ancora disponibile",
+    "learningOperations": "Gestione dell’apprendimento",
+    "learningOperationsDescription": "Segnali, completamenti e disponibilità dei dati per materia",
+    "learningAutomation": "Automazione dell’apprendimento",
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi"
   }
 }

@@ -1,16 +1,12 @@
-import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
+import { SegmentedFilter } from '@/components/base'
 import type { TeacherHelpStatus } from '@/types/teacherHelp'
 
 export type TutorRequestFilter = TeacherHelpStatus | 'all'
 
-const filterOptions: { label: string; value: TutorRequestFilter }[] = [
-  { label: 'All', value: 'all' },
-  { label: 'Pending', value: 'pending' },
-  { label: 'Assigned', value: 'assigned' },
-  { label: 'In progress', value: 'in_progress' },
-  { label: 'Resolved', value: 'resolved' },
-]
+const filterValues: readonly TutorRequestFilter[] = ['all', 'pending', 'assigned', 'in_progress', 'resolved']
 
+/* Canvas rule: filters are one segmented control, never a row of buttons. */
 export function TutorRequestFilters({
   value,
   onChange,
@@ -18,20 +14,16 @@ export function TutorRequestFilters({
   value: TutorRequestFilter
   onChange: (value: TutorRequestFilter) => void
 }) {
+  const { t } = useTranslation('tutor')
+  const options = filterValues.map((option) => ({
+    value: option,
+    label: option === 'all' ? t('requests.all') : t(`common:status.teacherHelp.${option}`),
+  }))
+
   return (
-    <div className="flex min-w-0 gap-2 overflow-x-auto pb-1">
-      {filterOptions.map((option) => (
-        <Button
-          key={option.value}
-          type="button"
-          variant={value === option.value ? 'default' : 'outline'}
-          size="sm"
-          className="shrink-0"
-          onClick={() => onChange(option.value)}
-        >
-          {option.label}
-        </Button>
-      ))}
+    // Five segments do not fit every phone in every language: the track scrolls.
+    <div className="-mx-1 max-w-full overflow-x-auto px-1">
+      <SegmentedFilter className="w-max" options={options} value={value} onChange={onChange} label={t('requests.filterLabel')} />
     </div>
   )
 }

@@ -55,7 +55,14 @@
     "primary": "Navigazione principale",
     "mobilePrimary": "Navigazione principale mobile",
     "logoHome": "Home di STOA",
-    "administration": "Amministrazione"
+    "administration": "Amministrazione",
+    "admin": {
+      "users": "Utenti",
+      "teacherApplications": "Candidature dei docenti",
+      "curriculum": "Programma",
+      "moderation": "Moderazione",
+      "system": "Sistema"
+    }
   },
   "actions": {
     "startLearning": "Inizia a studiare",
@@ -164,7 +171,8 @@
       "new": "Nuovo",
       "reviewed": "Rivisto",
       "resolved": "Risolto"
-    }
+    },
+    "loadingAccount": "Caricamento dell’account…"
   },
   "notifications": {
     "title": "Notifiche",
@@ -264,5 +272,14 @@
       "heading": "Password",
       "again": "Cambiala di nuovo"
     }
+  },
+  "organizationHome": {
+    "title": "Organizzazione",
+    "description": "L’apprendimento nella tua organizzazione e gli esercizi assegnati.",
+    "pages": "Le tue pagine",
+    "learningOperations": "Gestione dell’apprendimento",
+    "learningOperationsDescription": "Segnali, completamenti e disponibilità dei dati per materia",
+    "learningAutomation": "Automazione dell’apprendimento",
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi"
   }
 }

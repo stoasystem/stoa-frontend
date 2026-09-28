@@ -146,11 +146,22 @@
     "noSubjects": "Aucune matière définie",
     "summary": "Résumé",
     "weeklyLinkDescription": "Questions récentes, sujets à travailler, accompagnement enseignant et prochaine action parentale.",
-    "monthlyLinkDescription": "Tendances par matière, points faibles récurrents et schémas d’accompagnement à plus long terme."
+    "monthlyLinkDescription": "Tendances par matière, points faibles récurrents et schémas d’accompagnement à plus long terme.",
+    "childReports": "Rapports pour {{name}}"
   },
   "valueCard": {
     "title": "Pourquoi c’est important",
     "body1": "STOA montre aux parents si l’apprentissage a vraiment lieu : questions récentes, thèmes fragiles, implication de l’enseignant et la prochaine action concrète.",
     "body2": "Les rapports aux parents transforment l’activité des devoirs en une décision hebdomadaire : poursuivre l’accompagnement, demander l’aide d’un enseignant ou revoir un thème ensemble."
+  },
+  "overview": {
+    "children": "Enfants",
+    "childSubtitle": "{{grade}} · {{subjects}}",
+    "more": "Plus",
+    "account": "Compte et famille",
+    "accountLoading": "Vérification du compte…",
+    "accountReady": "Enfants liés et coordonnées",
+    "accountAttention_one": "{{count}} point demande votre attention",
+    "accountAttention_other": "{{count}} points demandent votre attention"
   }
 }

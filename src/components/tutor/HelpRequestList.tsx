@@ -1,58 +1,65 @@
-import { Link } from 'react-router-dom'
-import { HelpRequestStatusBadge } from '@/components/tutor/HelpRequestStatusBadge'
-import { TeacherSlaBadge } from '@/components/tutor/TeacherSlaBadge'
-import { Card, CardContent } from '@/components/ui/card'
+import { useTranslation } from 'react-i18next'
+import { Group, Pill, Row, type PillTone } from '@/components/base'
+import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
+import type { TeacherHelpStatus } from '@/types/teacherHelp'
 import type { TutorHelpRequestSummary } from '@/types/tutor'
 
+/*
+ * Teacher board, Requests: one grouped list, a row per request (avatar 36,
+ * the student, "subject · grade -- the question", then when it came in and
+ * its status as a tinted pill, and the chevron into the request). The
+ * response-time target shows only when it is at risk or missed. Where the
+ * request came from and the first action are on the request itself.
+ */
+const statusTones: Record<TeacherHelpStatus, PillTone> = {
+  pending: 'accent',
+  assigned: 'gold',
+  in_progress: 'green',
+  resolved: 'neutral',
+  cancelled: 'neutral',
+}
+
 export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummary[] }) {
+  const { t, i18n } = useTranslation('tutor')
+
   if (requests.length === 0) {
-    return <p className="text-sm text-muted-foreground">No tutor support requests are available.</p>
+    return <p className="m-0 text-[15px] text-caption">{t('requests.empty')}</p>
   }
 
+  const opened = (iso: string) =>
+    new Date(iso).toLocaleString(i18n.resolvedLanguage, { dateStyle: 'short', timeStyle: 'short' })
+
   return (
-    <div className="min-w-0 space-y-3">
-      {requests.map((request) => (
-        <Link className="block min-w-0" key={request.requestId} to={`/tutor/requests/${request.requestId}`}>
-          <Card className="min-w-0 transition-colors hover:bg-secondary/40">
-            <CardContent className="grid min-w-0 gap-3 p-4 sm:grid-cols-[1fr_auto] sm:items-center">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="min-w-0 break-words font-medium">{request.studentName}</h2>
-                  {request.priority && (
-                    <span className="rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground">
-                      {request.priority} priority
-                    </span>
-                  )}
-                </div>
-                <p className="break-words text-sm text-muted-foreground">
-                  {request.subject} - {request.grade}
-                </p>
-                {request.requestMessage && (
-                  <p className="mt-2 line-clamp-2 break-words text-sm text-muted-foreground">
-                    {request.requestMessage}
-                  </p>
-                )}
-                <time className="mt-2 block text-xs text-muted-foreground">
-                  Opened {new Date(request.createdAt).toLocaleString()}
+    <Group>
+      {requests.map((request) => {
+        const where = t('requests.row', { subject: request.subject, grade: request.grade })
+        const sla = request.sla?.status
+        return (
+          <Row
+            key={request.requestId}
+            to={`/tutor/requests/${request.requestId}`}
+            leading={{ kind: 'avatar', name: request.studentName }}
+            title={request.studentName}
+            subtitle={request.requestMessage ? `${where} — ${request.requestMessage}` : where}
+            trailing={
+              <>
+                <time dateTime={request.createdAt} className="hidden text-[13px] sm:inline">
+                  {opened(request.createdAt)}
                 </time>
-                <p className="mt-1 break-words text-xs text-muted-foreground">
-                  Source: Learning Assistant conversation
-                </p>
-                <p className="mt-1 break-words text-xs text-muted-foreground">
-                  First tutor action:{' '}
-                  {request.firstTutorActionAt
-                    ? new Date(request.firstTutorActionAt).toLocaleString()
-                    : 'not recorded'}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-                <TeacherSlaBadge sla={request.sla} />
-                <HelpRequestStatusBadge status={request.status} />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      ))}
-    </div>
+                {request.priority === 'high' && (
+                  <Pill tone="gold" className="hidden sm:inline-flex">
+                    {t('requests.priority', { priority: t('common:status.priority.high') })}
+                  </Pill>
+                )}
+                {(sla === 'at_risk' || sla === 'breached') && <Pill tone="gold">{t(`requests.sla.${sla}`)}</Pill>}
+                <Pill tone={statusTones[request.status] ?? 'neutral'}>
+                  <SafeStatusLabel kind="teacherHelp" value={request.status} />
+                </Pill>
+              </>
+            }
+          />
+        )
+      })}
+    </Group>
   )
 }

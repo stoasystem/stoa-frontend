@@ -62,5 +62,24 @@
       "busy": "Actuellement occupé",
       "unavailable": "N’accepte pas d’élèves"
     }
+  },
+  "requests": {
+    "pending": "En attente",
+    "resolvedToday": "Terminées aujourd’hui",
+    "averageResponse": "Première réponse moyenne",
+    "minutes": "{{count}} min",
+    "filterLabel": "Filtrer les demandes",
+    "all": "Toutes",
+    "empty": "Aucune demande d’accompagnement pour le moment.",
+    "listLabel": "Demandes",
+    "row": "{{subject}} · {{grade}}",
+    "priority": "Priorité : {{priority}}",
+    "sla": {
+      "at_risk": "Délai menacé",
+      "breached": "En retard"
+    },
+    "more": "Plus",
+    "learningAutomation": "Automatisation de l’apprentissage",
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves"
   }
 }
