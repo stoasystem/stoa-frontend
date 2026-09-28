@@ -172,7 +172,6 @@
     "loading": "Chargement des notifications...",
     "unavailable": "Les notifications ne sont pas disponibles.",
     "empty": "Aucune notification pour l’instant.",
-    "markRead": "Marquer comme lue",
     "archive": "Archiver",
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} non lue(s)",
@@ -237,5 +236,32 @@
   "composer": {
     "attach": "Ajouter une photo ou un fichier",
     "send": "Envoyer"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profil",
+      "name": "Nom",
+      "email": "E-mail",
+      "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur."
+    },
+    "language": {
+      "heading": "Langue"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "loading": "Chargement de tes réglages de notification…",
+      "unavailable": "Les réglages de notification sont indisponibles pour le moment.",
+      "saveFailed": "Cette modification n’a pas été enregistrée. Réessaie.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Réponses des enseignants",
+          "body": "Dans la cloche, quand un enseignant prend en charge ta question ou y répond"
+        }
+      }
+    },
+    "password": {
+      "heading": "Mot de passe",
+      "again": "Le modifier encore"
+    }
   }
 }

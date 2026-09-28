@@ -20,7 +20,6 @@ const STUDENT_ROUTES = [
   ['/chapter/u-1/l-1', 'LessonStagePage'],
   ['/ask', 'AskPage'],
   ['/ask/c-1', 'AskPage'],
-  ['/me', 'MePage'],
   ['/assignments', 'StudentAssignmentsPage'],
 ] as const
 
@@ -66,6 +65,45 @@ describe('student routes', () => {
       pathname: '/settings/password',
       page: 'ChangePasswordPage',
     })
+  })
+})
+
+// The account page (#46): a student's, and the profile page of administrators
+// and the organisation roles. Teachers and parents keep their own.
+describe('/me', () => {
+  it.each(['student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer'] as const)(
+    'opens for a %s',
+    (viewer) => {
+      expect(openAs(viewer, '/me')).toMatchObject({ pathname: '/me', page: 'MePage' })
+    },
+  )
+
+  it.each(['parent', 'teacher'] as const)('refuses a %s', (viewer) => {
+    expect(openAs(viewer, '/me')).toMatchObject({ pathname: '/forbidden', page: 'ForbiddenPage' })
+  })
+
+  it('sends a signed-out visitor to sign in, remembering /me', () => {
+    const landed = openAs('anonymous', '/me')
+    expect(landed).toMatchObject({ pathname: '/login', page: 'EntryPage' })
+    expect(landed.state).toMatchObject({ from: { pathname: '/me' } })
+  })
+
+  it.each(['student', 'admin'] as const)('sends a reset %s from /me to the password change', (viewer) => {
+    expect(openAs(viewer, '/me', { mustChangePassword: true })).toMatchObject({
+      pathname: '/settings/password',
+      page: 'ChangePasswordPage',
+    })
+  })
+
+  it('keeps a reset student on the password change instead of forwarding it to /me', () => {
+    expect(openAs('student', '/settings/password', { mustChangePassword: true })).toMatchObject({
+      pathname: '/settings/password',
+      page: 'ChangePasswordPage',
+    })
+  })
+
+  it('forwards a student who was not reset from /settings/password to /me', () => {
+    expect(openAs('student', '/settings/password')).toMatchObject({ pathname: '/me', page: 'MePage' })
   })
 })
 

@@ -172,7 +172,6 @@
     "loading": "Mitteilungen werden geladen ...",
     "unavailable": "Mitteilungen sind nicht verfügbar.",
     "empty": "Noch keine Mitteilungen.",
-    "markRead": "Als gelesen markieren",
     "archive": "Archivieren",
     "openLabel": "Mitteilungen",
     "openLabelUnread": "Mitteilungen, {{count}} ungelesen",
@@ -237,5 +236,32 @@
   "composer": {
     "attach": "Foto oder Datei hinzufügen",
     "send": "Senden"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profil",
+      "name": "Name",
+      "email": "E-Mail",
+      "managed": "Name und E-Mail-Adresse gehören zu deinem Konto. Für eine Änderung wende dich an eine Administratorin oder einen Administrator."
+    },
+    "language": {
+      "heading": "Sprache"
+    },
+    "notifications": {
+      "heading": "Mitteilungen",
+      "loading": "Mitteilungseinstellungen werden geladen …",
+      "unavailable": "Die Mitteilungseinstellungen sind gerade nicht verfügbar.",
+      "saveFailed": "Diese Änderung wurde nicht gespeichert. Versuch es noch einmal.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Antworten von Lehrpersonen",
+          "body": "In der Glocke, wenn eine Lehrperson deine Frage übernimmt oder beantwortet"
+        }
+      }
+    },
+    "password": {
+      "heading": "Passwort",
+      "again": "Noch einmal ändern"
+    }
   }
 }

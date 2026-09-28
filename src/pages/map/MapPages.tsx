@@ -2,15 +2,10 @@
  * shows the same map and the path picks the layer. The manifest still passes
  * each page a `titleKey`; the map names itself instead (the subject, the
  * nebula, or the star). */
-import { StarMapRoute } from '@/features/starmap/StarMapRoute'
-import { AppLayout } from '@/layouts/AppLayout'
+import { PlanetScreen } from '@/pages/map/PlanetScreen'
 
 function MapScreen() {
-  return (
-    <AppLayout surface="sky" bleed>
-      <StarMapRoute />
-    </AppLayout>
-  )
+  return <PlanetScreen />
 }
 
 /** `/`: the default subject's star map (last opened, else the first with content). */

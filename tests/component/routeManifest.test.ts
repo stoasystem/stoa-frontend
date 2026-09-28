@@ -7,6 +7,7 @@ import path from 'node:path'
 import { matchPath } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
 import {
+  askPathFor,
   legacyRedirects,
   pageRoutes,
   roleHomePaths,
@@ -65,10 +66,17 @@ describe('the route manifest', () => {
         '/chapter/:unitId/:lessonId',
         '/ask',
         '/ask/:conversationId',
-        '/me',
         '/assignments',
       ]),
     )
+  })
+
+  it('opens /me to students, administrators and the organisation roles (#46)', () => {
+    const me = pageRoutes.find((route) => route.path === '/me')
+    expect(me?.access).toEqual({
+      kind: 'roles',
+      roles: ['student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer'],
+    })
   })
 
   it('keeps /assignments out of navigation', () => {
@@ -110,6 +118,17 @@ describe('the redirect table', () => {
 
   it('names where each redirect was decided', () => {
     expect(legacyRedirects.filter((redirect) => !redirect.decision)).toEqual([])
+  })
+})
+
+describe('askPathFor', () => {
+  it('treats "." as naming no conversation', () => {
+    // A router resolves `/ask/.` to `/ask/`, and `/ask/..` to `/`.
+    expect(askPathFor('.')).toBe('/ask')
+  })
+
+  it('puts a well-formed id in the path', () => {
+    expect(askPathFor('c-1')).toBe('/ask/c-1')
   })
 })
 

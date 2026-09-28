@@ -100,6 +100,14 @@ describe('a /chat link that names a conversation opens it in Ask', () => {
     expect(landed).toMatchObject({ pathname: '/ask/c-42', search: '?source=practice-upload', page: 'AskPage' })
   })
 
+  it('reads the id from the path when the query names another, and drops the query one', () => {
+    // Ask reads only the path's id; a second one left in the query would be
+    // a second answer to "which conversation".
+    const landed = openAs('student', '/chat/c1?conversationId=c2&source=bell')
+
+    expect(landed).toMatchObject({ pathname: '/ask/c1', search: '?source=bell', page: 'AskPage' })
+  })
+
   it('carries it through /assistant too', () => {
     expect(openAs('student', '/assistant?conversationId=c-7')).toMatchObject({ pathname: '/ask/c-7' })
   })

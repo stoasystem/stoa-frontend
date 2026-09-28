@@ -14,7 +14,7 @@ import { ChatSkeleton } from '@/components/chat/ChatSkeleton'
 import { ConversationListItem } from '@/components/chat/ConversationListItem'
 import { ConversationSidebar } from '@/components/chat/ConversationSidebar'
 import { EmptyState } from '@/components/common/EmptyState'
-import { UserMenu } from '@/components/common/UserMenu'
+import { AccountMenu } from '@/components/shell/AccountMenu'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -44,10 +44,9 @@ import { learningSubjectOptions } from '@/types/learningProfile'
 import type { QuestionBankChatLocationState } from '@/types/questionBank'
 import type { TeacherHelpRequest } from '@/types/teacherHelp'
 
-type TeacherSupportStage =
-  | 'idle'
-  | 'teacher_text_requested'
-  | 'teacher_text_active'
+// Whether a teacher has joined is the server's to say (#12 point 2); this page
+// no longer lets the student declare it. Ask reads it from the help request.
+type TeacherSupportStage = 'idle' | 'teacher_text_requested'
 
 /** How long the same opening question is treated as a repeat of the one just sent. */
 const DUPLICATE_CONVERSATION_WINDOW_MS = 60_000
@@ -323,10 +322,6 @@ export function ChatPage() {
     )
   }
 
-  function handleTeacherTextActive() {
-    setTeacherSupportStage('teacher_text_active')
-  }
-
   if (conversationsQuery.isLoading) {
     return <ChatSkeleton />
   }
@@ -555,10 +550,7 @@ export function ChatPage() {
               isFollowUpDisabled={isStreaming}
             />
             {(teacherHelpRequest || teacherSupportStage !== 'idle') && (
-              <TeacherTextSupportCard
-                stage={teacherSupportStage}
-                onTeacherTextActive={handleTeacherTextActive}
-              />
+              <TeacherTextSupportCard />
             )}
             {sendError && (
               <div className="px-4 pb-3 md:px-6">
@@ -582,14 +574,14 @@ export function ChatPage() {
 }
 
 /**
- * The account pill for the states that render no ChatHeader: without it a
+ * The avatar menu for the states that render no ChatHeader: without it a
  * student with no conversation yet, or whose list failed to load, could not
  * sign out (stoasystem/stoa-frontend#2).
  */
 function StandaloneAccountBar() {
   return (
     <div className="flex shrink-0 justify-end px-4 pt-3 md:px-6">
-      <UserMenu variant="top" />
+      <AccountMenu />
     </div>
   )
 }
@@ -629,41 +621,15 @@ function MobileConversationList({
 // Text support only. Card 020 withdrew live video lessons, which have no
 // backend, and the button that opened one from here led to a page that no
 // longer exists (stoasystem/stoa-backend#29).
-function TeacherTextSupportCard({
-  stage,
-  onTeacherTextActive,
-}: {
-  stage: TeacherSupportStage
-  onTeacherTextActive: () => void
-}) {
+function TeacherTextSupportCard() {
   const { t } = useTranslation('chat')
-  const isTextActive = stage === 'teacher_text_active'
 
   return (
     <section className="px-4 pb-3 md:px-6" aria-live="polite">
       <div className="mx-auto max-w-3xl rounded-lg border border-primary/15 bg-card p-4 shadow-[var(--platform-shadow-soft)]">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="brand-section-kicker">{t('tutorSupport')}</p>
-            <h2 className="mt-2 text-lg font-semibold">
-              {isTextActive
-                ? t('tutorEscalation.joinedTitle')
-                : t('tutorEscalation.requestedTitle')}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              {isTextActive
-                ? t('tutorEscalation.joinedBody')
-                : t('tutorEscalation.requestedBody')}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2 sm:justify-end">
-            {!isTextActive && (
-              <Button type="button" variant="outline" onClick={onTeacherTextActive}>
-                {t('tutorEscalation.confirmJoined')}
-              </Button>
-            )}
-          </div>
-        </div>
+        <p className="brand-section-kicker">{t('tutorSupport')}</p>
+        <h2 className="mt-2 text-lg font-semibold">{t('tutorEscalation.requestedTitle')}</h2>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('tutorEscalation.requestedBody')}</p>
       </div>
     </section>
   )

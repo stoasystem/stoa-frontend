@@ -1,6 +1,6 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
 import { Check, ChevronRight, CircleHelp, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
-import { createContext, useContext, type ReactNode } from 'react'
+import { createContext, useContext, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { navAreaForRole } from '@/app/router/routeManifest'
@@ -41,12 +41,15 @@ function ItemBody({ icon: Icon, children, tone }: { icon: LucideIcon; children: 
 
 // 34 as drawn; 44 on a phone, where each item is a touch target (Sizes).
 const ItemHeight = createContext<number>(ACCOUNT_MENU.item)
+// Told when an item opens a page, so the page, not the avatar, keeps focus.
+const ChosePage = createContext<() => void>(() => {})
 function useItemStyle() {
   return { height: useContext(ItemHeight), borderRadius: ACCOUNT_MENU.itemRadius }
 }
 
 function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon; children: ReactNode }) {
   const itemStyle = useItemStyle()
+  const chosePage = useContext(ChosePage)
   if (!to) {
     return (
       <Menu.Item disabled className={ITEM} style={itemStyle}>
@@ -55,7 +58,7 @@ function LinkItem({ to, icon, children }: { to: string | null; icon: LucideIcon;
     )
   }
   return (
-    <Menu.Item asChild className={ITEM} style={itemStyle}>
+    <Menu.Item asChild className={ITEM} style={itemStyle} onSelect={chosePage}>
       <Link to={to}>
         <ItemBody icon={icon}>{children}</ItemBody>
       </Link>
@@ -77,6 +80,7 @@ export function AccountMenu({
   const user = useAuthStore((state) => state.user)
   const { signOut, isSigningOut } = useSignOut()
   const { current, changeLanguage } = useChangeLanguage()
+  const openedPage = useRef(false)
 
   if (!user) return null
 
@@ -102,6 +106,7 @@ export function AccountMenu({
         </button>
       </Menu.Trigger>
       <ItemHeight.Provider value={itemHeight}>
+      <ChosePage.Provider value={() => (openedPage.current = true)}>
       <Menu.Portal>
         <Menu.Content
           align="end"
@@ -109,6 +114,14 @@ export function AccountMenu({
           collisionPadding={8}
           aria-label={t('accountMenu.open')}
           className={PANEL}
+          // Escape or a click outside hands focus back to the avatar. An item
+          // that opened a page leaves focus to that page (/me#password moves
+          // it to the password section).
+          onCloseAutoFocus={(event) => {
+            if (!openedPage.current) return
+            openedPage.current = false
+            event.preventDefault()
+          }}
           style={{ width: ACCOUNT_MENU.width, maxWidth: 'calc(100vw - 16px)', borderRadius: 12 }}
         >
           <div className="mb-1.5 flex items-center gap-2.5 border-b border-hairline px-2.5 pt-1.5 pb-2.5">
@@ -183,6 +196,7 @@ export function AccountMenu({
           </Menu.Item>
         </Menu.Content>
       </Menu.Portal>
+      </ChosePage.Provider>
       </ItemHeight.Provider>
     </Menu.Root>
   )
