@@ -33,7 +33,7 @@ gh pr create --base redesign/planet
 依次跑，任何一步红都不能合：
 
 ```
-lint → typecheck → check:api-contract → check:untranslated
+lint → typecheck → check:api-contract → check:untranslated → check:contrast
 → test → test:release → publisher 测试 → build
 ```
 
@@ -50,6 +50,14 @@ lint → typecheck → check:api-contract → check:untranslated
 - API 契约只扫 `src/services`（`scripts/check-api-contract.mjs` 的 `SERVICE_ROOT`）。新代码里的后端调用要放进
   `src/services`，放在 `src/features/planet` 之类的目录里就不会被检查。
 - `workflow_dispatch` 暂时用不了：GitHub 只允许手动触发默认分支上的工作流。
+- 对比度门禁（`check:contrast`）只评 `scripts/contrast-pairs.json` 里声明的前景/背景对，token 从该文件
+  `tokens.file` 指向的那一个文件读。在 [#18](https://github.com/stoasystem/stoa-frontend/issues/18) 落地前它指向
+  `design/tokens.css`（画布 Tokens 页的誊本，应用不引用），所以**评的是画布值，不是线上样式**；#18 把
+  `tokens.file` 改成 `src/styles/brand-tokens.css` 并删掉誊本。`tokens.themes` 写每个主题读哪些块：
+  两个主题读同一组块、或者某个没被任何主题读的块定义了 pairs 用到的 token、或者 token 文件里有嵌套规则，
+  都 exit 2（誊本里深色 token 单放在 `[data-theme="dark"]` 块，选择器由 #18 定）。
+  `"gate": false` 的对只打印读数、不拦，那是画布值本身不达标、留给 #18 定的开放问题；它的 `why` 必须引用
+  票号（`#n`），每个主题至少留一对受门禁，豁免的对一旦达标就 exit 1，要求删掉豁免。JSX 里的内联颜色它看不到。
 
 ## 翻译守卫：新目录要登记
 

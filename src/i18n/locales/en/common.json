@@ -196,5 +196,35 @@
     "title": "Something went wrong",
     "body": "Please try again or reload the page."
   },
-  "nextStep": "Recommended next step"
+  "nextStep": "Recommended next step",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Coming soon",
+      "body": "This screen is being rebuilt. The link already works and will stay the same."
+    },
+    "home": {
+      "title": "Your planet"
+    },
+    "planet": {
+      "title": "Subject planet"
+    },
+    "region": {
+      "title": "Region"
+    },
+    "unit": {
+      "title": "Knowledge point"
+    },
+    "chapter": {
+      "title": "Chapter"
+    },
+    "lesson": {
+      "title": "Lesson"
+    },
+    "ask": {
+      "title": "Ask"
+    },
+    "me": {
+      "title": "Your account"
+    }
+  }
 }

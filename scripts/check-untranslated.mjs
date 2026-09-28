@@ -28,6 +28,11 @@ const ROOTS = [
   'src/pages/tutor',
   'src/pages/parent',
   'src/pages/admin',
+  // The planet redesign's student screens (#45).
+  'src/pages/planet',
+  'src/pages/chapter',
+  'src/pages/ask',
+  'src/pages/me',
 ]
 
 // Anything a screen puts words into.

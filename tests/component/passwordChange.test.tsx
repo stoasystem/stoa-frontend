@@ -147,7 +147,7 @@ describe('ChangePasswordPage', () => {
   })
 
   it.each([
-    ['student', '/dashboard'],
+    ['student', '/'],
     ['parent', '/parent'],
     ['teacher', '/tutor'],
     ['admin', '/admin'],

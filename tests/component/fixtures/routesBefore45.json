@@ -1,0 +1,2912 @@
+{
+  "_about": "What every non-student visitor got from the router before #45 (origin/redesign/planet e363be5), for every path that router registered, one sample value per param. Pages count as terminal; guards and Navigate elements are followed. Read off AppRouter.tsx and routeConfig.ts at that commit; the route snapshot test renders the generated router and must match it.",
+  "outcomes": [
+    {
+      "path": "/",
+      "viewer": "anonymous",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "parent",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "teacher",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "admin",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "organization_admin",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "school_teacher",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/",
+      "viewer": "school_viewer",
+      "pathname": "/",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "parent",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "teacher",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "admin",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "organization_admin",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "school_teacher",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/login",
+      "viewer": "school_viewer",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "anonymous",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "parent",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "teacher",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "admin",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "organization_admin",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "school_teacher",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/register",
+      "viewer": "school_viewer",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "anonymous",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "parent",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "teacher",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "admin",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "organization_admin",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "school_teacher",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/teacher-activate",
+      "viewer": "school_viewer",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "anonymous",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "parent",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "teacher",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "admin",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "organization_admin",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "school_teacher",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/activate",
+      "viewer": "school_viewer",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "anonymous",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "parent",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "teacher",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "admin",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "organization_admin",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "school_teacher",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/privacy",
+      "viewer": "school_viewer",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "anonymous",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "parent",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "teacher",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "admin",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "organization_admin",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "school_teacher",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/terms",
+      "viewer": "school_viewer",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "anonymous",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "parent",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "teacher",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "admin",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "organization_admin",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "school_teacher",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/onboarding",
+      "viewer": "school_viewer",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "anonymous",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "parent",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "teacher",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "admin",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "organization_admin",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "school_teacher",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/support",
+      "viewer": "school_viewer",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "anonymous",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "parent",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "teacher",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "admin",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "organization_admin",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "school_teacher",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/unauthorized",
+      "viewer": "school_viewer",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "anonymous",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/forbidden",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assistant",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "parent",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "teacher",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "admin",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "organization_admin",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "school_teacher",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/settings/password",
+      "viewer": "school_viewer",
+      "pathname": "/settings/password",
+      "page": "ChangePasswordPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/dashboard",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/chat",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learn/tab-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/assignments",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/mistakes",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/mistakes",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/saved",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/sets/setId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/session/sessionId-1/result",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1/topicId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/question-bank/subjectId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/topicId-1/lessons/lessonId-1/result",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/practice/subjectId-1/lessons/lessonId-1/result",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/profile",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/learning-history",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "parent",
+      "pathname": "/parent",
+      "page": "ParentDashboardPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "parent",
+      "pathname": "/parent/account-operations",
+      "page": "ParentAccountOperationsPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "parent",
+      "pathname": "/parent/reports",
+      "page": "ParentReportsPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "parent",
+      "pathname": "/parent/children/childId-1",
+      "page": "ChildSummaryPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "parent",
+      "pathname": "/parent/children/childId-1/progress",
+      "page": "ParentChildProgressPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "parent",
+      "pathname": "/parent/children/childId-1/report",
+      "page": "ChildReportPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "parent",
+      "pathname": "/parent/children/childId-1/history",
+      "page": "ChildLearningHistoryPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "admin",
+      "pathname": "/organization/learning-operations",
+      "page": "LearningOperationsDashboardPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "organization_admin",
+      "pathname": "/organization/learning-operations",
+      "page": "LearningOperationsDashboardPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "school_teacher",
+      "pathname": "/organization/learning-operations",
+      "page": "LearningOperationsDashboardPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "viewer": "school_viewer",
+      "pathname": "/organization/learning-operations",
+      "page": "LearningOperationsDashboardPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "admin",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "organization_admin",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "school_teacher",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "viewer": "school_viewer",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "admin",
+      "pathname": "/organization/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "organization_admin",
+      "pathname": "/organization/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "school_teacher",
+      "pathname": "/organization/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "viewer": "school_viewer",
+      "pathname": "/organization/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "admin",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "organization_admin",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "school_teacher",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "viewer": "school_viewer",
+      "pathname": "/not-found",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "teacher",
+      "pathname": "/tutor",
+      "page": "TutorDashboardPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "teacher",
+      "pathname": "/tutor/availability",
+      "page": "TutorAvailabilityPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "teacher",
+      "pathname": "/tutor/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "teacher",
+      "pathname": "/tutor/profile",
+      "page": "TutorProfilePage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "teacher",
+      "pathname": "/tutor/requests/requestId-1",
+      "page": "TutorHelpRequestDetailPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "admin",
+      "pathname": "/admin",
+      "page": "AdminDashboardPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "admin",
+      "pathname": "/admin/learning-operations",
+      "page": "LearningOperationsDashboardPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "admin",
+      "pathname": "/admin/moderation",
+      "page": "AdminModerationPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "admin",
+      "pathname": "/admin/learning-automation",
+      "page": "LearningAutomationConsolePage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "admin",
+      "pathname": "/admin/curriculum",
+      "page": "AdminCurriculumPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "admin",
+      "pathname": "/admin/account-operations",
+      "page": "AdminAccountOperationsPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "admin",
+      "pathname": "/admin/teacher-applications",
+      "page": "AdminTeacherApplicationsPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "admin",
+      "pathname": "/admin/users",
+      "page": "AdminAccountsPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "anonymous",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "admin",
+      "pathname": "/admin/system",
+      "page": "AdminOperationsPlaceholderPage title=\"System status\""
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "organization_admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "school_teacher",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "viewer": "school_viewer",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "anonymous",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "parent",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "teacher",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "admin",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "organization_admin",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "school_teacher",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "viewer": "school_viewer",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    }
+  ],
+  "nav": {
+    "parent": {
+      "desktop": [
+        [
+          "/parent",
+          "Overview",
+          "primary",
+          "dashboard",
+          true,
+          "navigation.overview"
+        ],
+        [
+          "/parent/reports",
+          "Reports",
+          "primary",
+          "reports",
+          true,
+          "navigation.reports"
+        ]
+      ],
+      "mobile": [
+        "/parent",
+        "/parent/reports"
+      ]
+    },
+    "teacher": {
+      "desktop": [
+        [
+          "/tutor",
+          "Requests",
+          "primary",
+          "requests",
+          true,
+          "navigation.requests"
+        ],
+        [
+          "/tutor/availability",
+          "Availability",
+          "primary",
+          "settings",
+          true,
+          "navigation.availability"
+        ],
+        [
+          "/tutor/profile",
+          "Profile",
+          "primary",
+          "profile",
+          true,
+          "navigation.profile"
+        ],
+        [
+          "/support",
+          "Support",
+          "secondary",
+          "support",
+          false,
+          "navigation.support"
+        ]
+      ],
+      "mobile": [
+        "/tutor",
+        "/tutor/availability",
+        "/tutor/profile"
+      ]
+    },
+    "admin": {
+      "desktop": [
+        [
+          "/admin",
+          "Overview",
+          "primary",
+          "dashboard",
+          true,
+          "navigation.overview"
+        ],
+        [
+          "/admin/users",
+          "Accounts",
+          "primary",
+          "students",
+          false,
+          "Accounts"
+        ],
+        [
+          "/admin/moderation",
+          "Moderation",
+          "primary",
+          "support",
+          true,
+          "Moderation"
+        ],
+        [
+          "/admin/curriculum",
+          "Curriculum",
+          "primary",
+          "practice",
+          false,
+          "Curriculum"
+        ],
+        [
+          "/admin/teacher-applications",
+          "Teacher applications",
+          "primary",
+          "tutors",
+          false,
+          "Teacher applications"
+        ]
+      ],
+      "mobile": [
+        "/admin",
+        "/admin/moderation"
+      ]
+    },
+    "organization": {
+      "desktop": [],
+      "mobile": []
+    }
+  },
+  "_about_nav": "Per area: desktop = [path, label, priority, icon, mobile, the translation key AppLayout looked the label up by]; mobile = the bottom bar's paths.",
+  "_about_student": "What a student got before #45 on every old path that is not the student's own: not behind a student-only guard, and not one #45 changes for students on purpose (/, /assistant, /settings/password). Read off AppRouter.tsx at origin/redesign/planet e363be5 the same way as 'outcomes'.",
+  "studentOutcomes": [
+    {
+      "path": "/login",
+      "pathname": "/login",
+      "page": "EntryPage"
+    },
+    {
+      "path": "/register",
+      "pathname": "/register",
+      "page": "RegisterPage"
+    },
+    {
+      "path": "/teacher-activate",
+      "pathname": "/teacher-activate",
+      "page": "TeacherActivatePage"
+    },
+    {
+      "path": "/activate",
+      "pathname": "/activate",
+      "page": "ActivateAccountPage"
+    },
+    {
+      "path": "/privacy",
+      "pathname": "/privacy",
+      "page": "PrivacyPage"
+    },
+    {
+      "path": "/terms",
+      "pathname": "/terms",
+      "page": "TermsPage"
+    },
+    {
+      "path": "/onboarding",
+      "pathname": "/onboarding",
+      "page": "OnboardingPage"
+    },
+    {
+      "path": "/support",
+      "pathname": "/support",
+      "page": "SupportPage"
+    },
+    {
+      "path": "/unauthorized",
+      "pathname": "/unauthorized",
+      "page": "UnauthorizedPage"
+    },
+    {
+      "path": "/forbidden",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/account-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/reports",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/progress",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/report",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/parent/children/childId-1/history",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/students/studentId-1/learning-profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/organization/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/students/studentId-1/learning-profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/availability",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/profile",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/tutor/requests/requestId-1",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/moderation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/learning-automation",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/curriculum",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/account-operations",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/teacher-applications",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/users",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/admin/system",
+      "pathname": "/forbidden",
+      "page": "ForbiddenPage"
+    },
+    {
+      "path": "/definitely-not-a-page",
+      "pathname": "/definitely-not-a-page",
+      "page": "NotFoundPage"
+    }
+  ]
+}
