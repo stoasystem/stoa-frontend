@@ -1,20 +1,26 @@
-import { ChevronDown, Languages } from 'lucide-react'
+import * as Menu from '@radix-ui/react-dropdown-menu'
+import { Check, ChevronDown, Languages } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { ICON, TOUCH_TARGET } from '@/components/base/sizes'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
-import { languageOptions, type SupportedLanguage } from '@/i18n/languages'
+import { languageNameKeys, useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
+import { languageOptions, supportedLanguages, type SupportedLanguage } from '@/i18n/languages'
 import { cn } from '@/lib/utils'
 
 type LanguageSwitcherProps = {
   compact?: boolean
   className?: string
-  variant?: 'select' | 'footer'
+  variant?: 'select' | 'footer' | 'sky'
 }
 
 export function LanguageSwitcher({ compact = false, className, variant = 'select' }: LanguageSwitcherProps) {
   const { t } = useTranslation('common')
   const { current, changeLanguage } = useChangeLanguage()
   const currentLanguage = languageOptions.find((language) => language.code === current) ?? languageOptions[0]
+
+  if (variant === 'sky') {
+    return <SkyLanguageMenu className={className} />
+  }
 
   if (variant === 'footer') {
     return (
@@ -137,5 +143,58 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
         ))}
       </select>
     </label>
+  )
+}
+
+/*
+ * On a sky surface (the sign-in page, #53). The trigger is a plain button on
+ * the sky -- white 85% (Placement: dark surface, secondary) -- with a 44 box
+ * to tap. The list opens in a portal outside the sky, so it is the light
+ * floating menu the account menu uses (#18: menus are always light).
+ */
+const SKY_MENU_PANEL =
+  'z-50 flex min-w-[180px] flex-col rounded-[12px] border border-[color:var(--float-border)] bg-[rgba(255,255,255,0.96)] p-1.5 text-ink shadow-[var(--shadow-float)] backdrop-blur-[20px] outline-none'
+const SKY_MENU_ITEM =
+  'flex h-[34px] w-full cursor-pointer select-none items-center gap-2.5 rounded-[7px] border-0 bg-transparent px-2.5 text-left text-[14px] text-ink outline-none data-[highlighted]:bg-fill'
+
+function SkyLanguageMenu({ className }: { className?: string }) {
+  const { t } = useTranslation('common')
+  const { current, changeLanguage } = useChangeLanguage()
+  const currentLanguage = languageOptions.find((language) => language.code === current) ?? languageOptions[0]
+
+  return (
+    <Menu.Root>
+      <Menu.Trigger
+        className={cn(
+          'inline-flex cursor-pointer items-center justify-center gap-1 border-0 bg-transparent px-2 text-[15px] font-semibold text-[color:var(--on-sky-plain)] transition-opacity duration-[var(--motion-press)] ease-out hover:opacity-70',
+          className,
+        )}
+        style={{ minHeight: TOUCH_TARGET, minWidth: TOUCH_TARGET }}
+        aria-label={t('language.label')}
+      >
+        <span translate="no" className="notranslate">{currentLanguage.shortLabel}</span>
+        <ChevronDown aria-hidden="true" size={16} strokeWidth={ICON.stroke} />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Content align="end" sideOffset={6} collisionPadding={8} className={SKY_MENU_PANEL}>
+          <Menu.RadioGroup value={current}>
+            {supportedLanguages.map((code) => (
+              <Menu.RadioItem
+                key={code}
+                value={code}
+                lang={code}
+                onSelect={() => changeLanguage(code)}
+                className={SKY_MENU_ITEM}
+              >
+                <span className="flex-1">{t(languageNameKeys[code])}</span>
+                <Menu.ItemIndicator>
+                  <Check aria-hidden="true" size={16} strokeWidth={ICON.stroke} className="text-accent" />
+                </Menu.ItemIndicator>
+              </Menu.RadioItem>
+            ))}
+          </Menu.RadioGroup>
+        </Menu.Content>
+      </Menu.Portal>
+    </Menu.Root>
   )
 }
