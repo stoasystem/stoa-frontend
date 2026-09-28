@@ -1,0 +1,73 @@
+{
+  "chapter": {
+    "backToMap": "Carte du ciel",
+    "lessons": "{{done}} leçons sur {{total}} terminées",
+    "progress": "Progression du chapitre",
+    "start": "Commencer : {{title}}",
+    "continue": "Continuer : {{title}}",
+    "again": "S’exercer encore",
+    "listLabel": "Leçons",
+    "lessonNumber": "Leçon {{number}}",
+    "lessonMeta_one": "{{minutes}} min · {{count}} exercice",
+    "lessonMeta_other": "{{minutes}} min · {{count}} exercices",
+    "status": {
+      "completed": "Terminée",
+      "current": "À suivre",
+      "available": "Prête",
+      "review": "À revoir",
+      "locked": "Verrouillée"
+    },
+    "loading": "Chargement du chapitre…",
+    "failed": "Le chapitre n’a pas pu être chargé.",
+    "retry": "Réessayer",
+    "missing": "Ce chapitre est introuvable.",
+    "empty": "Ce chapitre n’a pas encore de leçons."
+  },
+  "stage": {
+    "backToChapter": "Retour à {{chapter}}",
+    "backToLessons": "Retour au chapitre",
+    "lessonOf": "Leçon {{lesson}} sur {{lessons}}",
+    "questionOf": "Question {{question}} sur {{questions}}",
+    "youAreHere": "Tu es ici",
+    "chooseAnswer": "Choisis une réponse",
+    "yourAnswer": "Ta réponse",
+    "answerPlaceholder": "Saisis ta réponse",
+    "explainPlaceholder": "Écris ton explication",
+    "order": {
+      "available": "Touche-les dans le bon ordre",
+      "chosen": "Ton ordre",
+      "empty": "Rien de choisi pour l’instant."
+    },
+    "check": "Vérifier la réponse",
+    "checking": "Vérification…",
+    "skip": "Passer",
+    "skipAndFinish": "Passer et terminer",
+    "hint": "Indice",
+    "hintFailed": "Pas d’indice pour le moment. Réessaie dans un instant.",
+    "correct": "Correct",
+    "notQuite": "Pas tout à fait",
+    "tryAgain": "Réessayer",
+    "next": "Question suivante",
+    "finish": "Terminer la leçon",
+    "finishing": "En cours…",
+    "checkFailed": "Ta réponse n’a pas pu être vérifiée. Réessaie.",
+    "finishFailed": "La leçon n’a pas pu être terminée. Réessaie.",
+    "done": {
+      "title": "Leçon terminée",
+      "progress": "{{done}} leçons sur {{total}} terminées dans {{chapter}}",
+      "allDone": "Toutes les leçons de {{chapter}} sont terminées.",
+      "next": "Leçon suivante : {{title}}",
+      "backToChapter": "Retour au chapitre"
+    },
+    "loading": "Chargement de la leçon…",
+    "failed": "La leçon n’a pas pu être chargée.",
+    "retry": "Réessayer",
+    "missing": "Cette leçon est introuvable.",
+    "empty": "Cette leçon n’a pas encore d’exercices."
+  },
+  "quote": {
+    "label": "Demander à propos du texte sélectionné",
+    "ask": "Demander sur ce passage",
+    "comingSoon": "Bientôt disponible"
+  }
+}

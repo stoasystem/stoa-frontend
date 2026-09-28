@@ -1,0 +1,73 @@
+{
+  "chapter": {
+    "backToMap": "Sternkarte",
+    "lessons": "{{done}} von {{total}} Lektionen erledigt",
+    "progress": "Fortschritt im Kapitel",
+    "start": "Beginnen: {{title}}",
+    "continue": "Weiter: {{title}}",
+    "again": "Noch einmal üben",
+    "listLabel": "Lektionen",
+    "lessonNumber": "Lektion {{number}}",
+    "lessonMeta_one": "{{minutes}} Min. · {{count}} Aufgabe",
+    "lessonMeta_other": "{{minutes}} Min. · {{count}} Aufgaben",
+    "status": {
+      "completed": "Erledigt",
+      "current": "Als Nächstes",
+      "available": "Bereit",
+      "review": "Wiederholen",
+      "locked": "Gesperrt"
+    },
+    "loading": "Das Kapitel wird geladen…",
+    "failed": "Das Kapitel konnte nicht geladen werden.",
+    "retry": "Erneut versuchen",
+    "missing": "Dieses Kapitel wurde nicht gefunden.",
+    "empty": "Dieses Kapitel hat noch keine Lektionen."
+  },
+  "stage": {
+    "backToChapter": "Zurück zu {{chapter}}",
+    "backToLessons": "Zurück zum Kapitel",
+    "lessonOf": "Lektion {{lesson}} von {{lessons}}",
+    "questionOf": "Aufgabe {{question}} von {{questions}}",
+    "youAreHere": "Du bist hier",
+    "chooseAnswer": "Wähle eine Antwort",
+    "yourAnswer": "Deine Antwort",
+    "answerPlaceholder": "Antwort eingeben",
+    "explainPlaceholder": "Schreib deine Erklärung",
+    "order": {
+      "available": "Tippe sie in der richtigen Reihenfolge an",
+      "chosen": "Deine Reihenfolge",
+      "empty": "Noch nichts gewählt."
+    },
+    "check": "Antwort prüfen",
+    "checking": "Wird geprüft…",
+    "skip": "Überspringen",
+    "skipAndFinish": "Überspringen und abschliessen",
+    "hint": "Tipp",
+    "hintFailed": "Gerade gibt es keinen Tipp. Versuch es gleich noch einmal.",
+    "correct": "Richtig",
+    "notQuite": "Noch nicht ganz",
+    "tryAgain": "Nochmals versuchen",
+    "next": "Nächste Aufgabe",
+    "finish": "Lektion abschliessen",
+    "finishing": "Wird abgeschlossen…",
+    "checkFailed": "Deine Antwort konnte nicht geprüft werden. Versuch es nochmals.",
+    "finishFailed": "Die Lektion konnte nicht abgeschlossen werden. Versuch es nochmals.",
+    "done": {
+      "title": "Lektion abgeschlossen",
+      "progress": "{{done}} von {{total}} Lektionen in {{chapter}} erledigt",
+      "allDone": "Alle Lektionen in {{chapter}} sind erledigt.",
+      "next": "Nächste Lektion: {{title}}",
+      "backToChapter": "Zurück zum Kapitel"
+    },
+    "loading": "Die Lektion wird geladen…",
+    "failed": "Die Lektion konnte nicht geladen werden.",
+    "retry": "Erneut versuchen",
+    "missing": "Diese Lektion wurde nicht gefunden.",
+    "empty": "Diese Lektion hat noch keine Aufgaben."
+  },
+  "quote": {
+    "label": "Zum markierten Text fragen",
+    "ask": "Dazu fragen",
+    "comingSoon": "Demnächst"
+  }
+}

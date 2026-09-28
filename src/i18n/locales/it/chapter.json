@@ -1,0 +1,73 @@
+{
+  "chapter": {
+    "backToMap": "Mappa stellare",
+    "lessons": "{{done}} lezioni su {{total}} completate",
+    "progress": "Avanzamento del capitolo",
+    "start": "Inizia: {{title}}",
+    "continue": "Continua: {{title}}",
+    "again": "Esercitati di nuovo",
+    "listLabel": "Lezioni",
+    "lessonNumber": "Lezione {{number}}",
+    "lessonMeta_one": "{{minutes}} min · {{count}} esercizio",
+    "lessonMeta_other": "{{minutes}} min · {{count}} esercizi",
+    "status": {
+      "completed": "Completata",
+      "current": "Prossima",
+      "available": "Pronta",
+      "review": "Da ripassare",
+      "locked": "Bloccata"
+    },
+    "loading": "Caricamento del capitolo…",
+    "failed": "Non è stato possibile caricare il capitolo.",
+    "retry": "Riprova",
+    "missing": "Questo capitolo non è stato trovato.",
+    "empty": "Questo capitolo non ha ancora lezioni."
+  },
+  "stage": {
+    "backToChapter": "Torna a {{chapter}}",
+    "backToLessons": "Torna al capitolo",
+    "lessonOf": "Lezione {{lesson}} di {{lessons}}",
+    "questionOf": "Domanda {{question}} di {{questions}}",
+    "youAreHere": "Sei qui",
+    "chooseAnswer": "Scegli una risposta",
+    "yourAnswer": "La tua risposta",
+    "answerPlaceholder": "Scrivi la tua risposta",
+    "explainPlaceholder": "Scrivi la tua spiegazione",
+    "order": {
+      "available": "Toccali nell’ordine giusto",
+      "chosen": "Il tuo ordine",
+      "empty": "Ancora niente scelto."
+    },
+    "check": "Verifica la risposta",
+    "checking": "Verifica in corso…",
+    "skip": "Salta",
+    "skipAndFinish": "Salta e termina",
+    "hint": "Suggerimento",
+    "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
+    "correct": "Giusto",
+    "notQuite": "Non proprio",
+    "tryAgain": "Riprova",
+    "next": "Domanda successiva",
+    "finish": "Termina la lezione",
+    "finishing": "Chiusura in corso…",
+    "checkFailed": "Non è stato possibile verificare la tua risposta. Riprova.",
+    "finishFailed": "Non è stato possibile terminare la lezione. Riprova.",
+    "done": {
+      "title": "Lezione completata",
+      "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
+      "allDone": "Tutte le lezioni di {{chapter}} sono completate.",
+      "next": "Lezione successiva: {{title}}",
+      "backToChapter": "Torna al capitolo"
+    },
+    "loading": "Caricamento della lezione…",
+    "failed": "Non è stato possibile caricare la lezione.",
+    "retry": "Riprova",
+    "missing": "Questa lezione non è stata trovata.",
+    "empty": "Questa lezione non ha ancora esercizi."
+  },
+  "quote": {
+    "label": "Chiedi sul testo selezionato",
+    "ask": "Chiedi su questo",
+    "comingSoon": "Prossimamente"
+  }
+}

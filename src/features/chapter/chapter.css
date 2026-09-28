@@ -1,0 +1,25 @@
+/*
+ * The chapter and the practice stage (#50). Motion and states: under reduced
+ * motion the jump from a star becomes a 200 ms linear crossfade. Nothing here
+ * loops.
+ */
+@keyframes chapter-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+[data-chapter-motion='crossfade'] {
+  animation: chapter-fade-in var(--motion-reduced) linear;
+}
+
+/* A new exercise on the stage fades in; held still under reduced motion. */
+[data-stage-exercise] {
+  animation: chapter-fade-in var(--motion-panel) var(--ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-stage-exercise] {
+    animation: chapter-fade-in var(--motion-reduced) linear;
+  }
+}

@@ -44,6 +44,8 @@ const ROOTS = [
   'src/pages/login',
   // Ask: the panel, the sheet and the docked composer (#49).
   'src/features/ask',
+  // The chapter, the practice stage beside Ask, the jump and 「问这段」 (#50).
+  'src/features/chapter',
   // The account page, the bell and Help (#46).
   'src/features/account',
   'src/components/notifications',

@@ -5,8 +5,10 @@
  * beside it on a wide screen and along the bottom on a phone.
  */
 import { ChevronLeft } from 'lucide-react'
+import { useRef, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -27,7 +29,21 @@ export function StarCard({
   reducedMotion: boolean
 }) {
   const { t } = useTranslation('starmap')
+  const navigate = useNavigate()
+  const glyph = useRef<HTMLDivElement>(null)
   const subjectId = map.subject.subjectId
+  const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
+
+  // Into the chapter by the jump (#50 point 5): it starts at this star.
+  // A click that opens a new tab or window stays the link's own.
+  function jump(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const rect = glyph.current?.getBoundingClientRect()
+    if (!rect) return
+    event.preventDefault()
+    const state: JumpState = { jump: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } }
+    navigate(chapterTo, { state })
+  }
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
   const prerequisites =
@@ -71,7 +87,7 @@ export function StarCard({
       </Link>
 
       <div className="flex items-center gap-4">
-        <div className="shrink-0">
+        <div ref={glyph} className="shrink-0">
           <StarGlyph
             state={star.state}
             size={wide ? 96 : 72}
@@ -172,7 +188,9 @@ export function StarCard({
         <div className="pt-1">
           {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
           <Button asChild variant="onSky" size="regular" style={{ color: 'var(--on-sky-button-text)' }}>
-            <Link to={`/chapter/${encodeURIComponent(star.unitId)}`}>{action}</Link>
+            <Link to={chapterTo} onClick={jump}>
+              {action}
+            </Link>
           </Button>
         </div>
       )}

@@ -10,6 +10,7 @@ import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
+import { markPracticeContextTold, withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
@@ -46,12 +47,18 @@ export function AskPanel({
   layout,
   subjectId,
   headerHandle,
+  practice,
 }: {
   controller: AskController
   layout: AskLayout
   subjectId?: string
   /** Pointer handlers that make the header the sheet's drag handle. */
   headerHandle?: HTMLAttributes<HTMLElement>
+  /**
+   * Beside the practice stage: the exercise on screen, which goes out with
+   * the question -- as text in front of it until #56 sends ids instead.
+   */
+  practice?: AskPractice
 }) {
   const { t } = useTranslation('chat')
   const { conversationId, draft, setDraft, select, close } = controller
@@ -94,6 +101,8 @@ export function AskPanel({
 
   function startConversation(content: string) {
     if (creatingRef.current || createConversation.isPending) return
+    // TEXT FALLBACK (#56): the exercise on screen rides in the first message.
+    const initialMessage = withPracticeContext(t, practice, null, content)
     creatingRef.current = true
     askedAtRef.current = new Date().toISOString()
     // Sent is sent: the question leaves the composer now, so closing Ask while
@@ -101,9 +110,10 @@ export function AskPanel({
     // It comes back only if the conversation could not be made.
     setDraft('')
     createConversation
-      .mutateAsync({ subject, grade: conversationGrade(profile?.grade), initialMessage: content })
+      .mutateAsync({ subject, grade: conversationGrade(profile?.grade), initialMessage })
       .then(
         (created) => {
+          markPracticeContextTold(practice, created.id)
           // Opened only in the panel that asked; a closed Ask stays closed.
           if (mounted.current) select(created.id)
         },
@@ -126,7 +136,10 @@ export function AskPanel({
     }
     if (isStreaming) return
     setDraft('')
-    void sendStreamingMessage({ content })
+    // TEXT FALLBACK (#56): told again only when the exercise on screen changed.
+    const message = withPracticeContext(t, practice, conversationId, content)
+    markPracticeContextTold(practice, conversationId)
+    void sendStreamingMessage({ content: message })
   }
 
   const conversationTitle = conversation ? conversationDisplayTitle(conversation, t) : ''
@@ -135,7 +148,9 @@ export function AskPanel({
     ? conversation
       ? subjectDisplayLabel(conversation.subject, t)
       : ''
-    : t('ask.listSubtitle')
+    : practice
+      ? t('ask.practice.subtitle')
+      : t('ask.listSubtitle')
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -225,7 +240,7 @@ export function AskPanel({
           onChange={setDraft}
           onSubmit={submit}
           label={t('ask.composerLabel')}
-          placeholder={t('ask.placeholder')}
+          placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending}
         />
       </div>

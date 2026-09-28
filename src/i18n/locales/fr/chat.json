@@ -215,6 +215,10 @@
         "resolved": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse.",
         "cancelled": "Besoin de plus d’aide ? Redemande à un enseignant sous une réponse."
       }
+    },
+    "practice": {
+      "subtitle": "Connaît la question sur laquelle tu es",
+      "placeholder": "Pose une question sur cet exercice…"
     }
   }
 }

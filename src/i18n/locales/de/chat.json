@@ -215,6 +215,10 @@
         "resolved": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson.",
         "cancelled": "Brauchst du mehr Hilfe? Frag unter einer Antwort erneut eine Lehrperson."
       }
+    },
+    "practice": {
+      "subtitle": "Kennt die Aufgabe, an der du bist",
+      "placeholder": "Frag zu dieser Aufgabe…"
     }
   }
 }

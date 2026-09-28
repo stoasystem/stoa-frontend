@@ -89,6 +89,8 @@ export function AskMessage({
       <p className="sr-only">{t('ask.thread.assistant')}</p>
       <div
         aria-busy={streaming || undefined}
+        // Text chosen in an answer can be quoted back (#12 point 5, #50).
+        data-quote-source={streaming || failed ? undefined : 'answer'}
         className={cn(
           'max-w-full whitespace-pre-wrap break-words border border-[color:var(--card-border)] bg-surface',
           failed ? 'text-red' : 'text-ink',
