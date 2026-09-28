@@ -145,6 +145,7 @@ const BORDER_COLOR = ['border', 'border-color', 'border-top', 'border-top-color'
 const COLOR = ['color']
 const DECORATION = ['text-decoration', 'text-decoration-line']
 const OUTLINE_STYLE = ['outline', 'outline-style']
+const MAX_WIDTH = ['max-width']
 
 function place(html: string) {
   document.body.innerHTML = html
@@ -165,7 +166,7 @@ describe('global base rules sit under the utilities (#73)', () => {
     const css = readFileSync(path.join(SRC, 'index.css'), 'utf8')
     compiler = await compile(css, { base: SRC, loadStylesheet })
     document.head.append(sheet)
-    useClasses(['border', 'border-red', 'text-accent', 'underline', 'focus-visible:outline-none'])
+    useClasses(['border', 'border-red', 'text-accent', 'underline', 'focus-visible:outline-none', 'max-w-[10px]'])
   })
 
   it('draws a border in --hairline when no class names a colour', () => {
@@ -201,6 +202,14 @@ describe('global base rules sit under the utilities (#73)', () => {
     const button = place('<button type="button" class="focus-visible:outline-none">x</button>')
     button.focus()
     expect(winner(button, OUTLINE_STYLE)?.selector).toBe('.focus-visible\\:outline-none:focus-visible')
+  })
+
+  it('caps a bare svg at its container width', () => {
+    expect(winner(place('<svg></svg>'), MAX_WIDTH)?.value).toBe('100%')
+  })
+
+  it('lets a max-width class win over the svg cap', () => {
+    expect(winner(place('<svg class="max-w-[10px]"></svg>'), MAX_WIDTH)?.selector).toBe('.max-w-\\[10px\\]')
   })
 
   it('draws a sky Button rendered as a link (asChild) in the button label colour', () => {

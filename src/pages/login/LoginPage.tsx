@@ -103,7 +103,6 @@ export function LoginPage() {
         </section>
 
         <div className="flex max-w-[420px] items-center gap-5 border-t border-[color:var(--sky-glass-border)] pt-6 md:max-w-none md:flex-col md:items-stretch md:gap-0 md:border-t-0 md:pt-0">
-          {/* A width, not a max-width: index.css caps every svg at 100% unlayered. */}
           <LoginNebula className="w-[104px] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
           <p
             className="m-0 border-[color:var(--sky-glass-border)] text-[17px] leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
