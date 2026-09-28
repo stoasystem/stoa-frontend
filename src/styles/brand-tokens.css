@@ -53,6 +53,13 @@
   --green-tint: #E6F2EB;     /* Foundations: green "paired with tint #E6F2EB" */
   --gold-tint: #F7EEDB;      /* Foundations: gold "paired with tint #F7EEDB" */
   --pill-neutral: #3A3A3C;   /* Motion and states: "Resolved" pill text on --fill; neutral icon tiles */
+  /*
+   * Not on the canvas at all: the boards draw only a switched-on toggle. Off,
+   * the track must still stand out from the row (3:1, WCAG 1.4.11) and from
+   * the white knob, which --fill does not (1.22:1). Apple's gray, darkened
+   * until it clears 3:1 on Surface, Ground and Sidebar (#18 review).
+   */
+  --toggle-track-off: #86868B;
 
   /* Bars: Surface at 86% under a 20 px blur (Placement, every top bar). */
   --bar: rgba(255, 255, 255, 0.86);

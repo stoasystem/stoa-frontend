@@ -32,6 +32,11 @@
     { "theme": "light", "fg": "--green", "bg": "--surface", "kind": "ui", "use": "online dot" },
     { "theme": "light", "fg": "--star", "bg": "--surface", "kind": "ui", "use": "streak / lit icon on cards" },
     { "theme": "light", "fg": "--star", "bg": "--ground", "kind": "ui", "use": "streak / lit icon on the page" },
+    { "theme": "light", "fg": "--surface", "bg": "--toggle-track-off", "kind": "ui", "use": "toggle knob, off" },
+    { "theme": "light", "fg": "--surface", "bg": "--accent", "kind": "ui", "use": "toggle knob, on" },
+    { "theme": "light", "fg": "--toggle-track-off", "bg": "--surface", "kind": "ui", "use": "off toggle in a row or card" },
+    { "theme": "light", "fg": "--toggle-track-off", "bg": "--ground", "kind": "ui", "use": "off toggle on the page" },
+    { "theme": "light", "fg": "--toggle-track-off", "bg": "--sidebar", "kind": "ui", "use": "off toggle in a source list" },
 
     { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky", "kind": "text", "use": "titles on the sky" },
     { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-2", "kind": "text", "use": "titles on raised dark surfaces" },
