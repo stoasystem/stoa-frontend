@@ -12,6 +12,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
+import { useSearchParams } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import '@/i18n'
 import { AppRouter } from '@/app/router/AppRouter'
@@ -26,6 +27,12 @@ vi.mock('@/pages/profile/StudentProfilePage', () => ({
 vi.mock('@/pages/learn/LearnPage', () => ({ LearnPage: () => <h1>learn page</h1> }))
 vi.mock('@/pages/parent/ParentDashboardPage', () => ({
   ParentDashboardPage: () => <h1>parent home</h1>,
+}))
+vi.mock('@/pages/auth/TeacherActivatePage', () => ({
+  TeacherActivatePage: function TeacherActivateStub() {
+    const [params] = useSearchParams()
+    return <h1>{`teacher activation ${params.get('token') ?? 'without a token'}`}</h1>
+  },
 }))
 vi.mock('@/pages/auth/ChangePasswordPage', () => ({
   ChangePasswordPage: () => <h1>password change</h1>,
@@ -101,6 +108,38 @@ describe('signing in from /login', () => {
     await expectToLandOn('/profile', 'student profile')
   })
 
+  it('keeps the query on a ?next= page', async () => {
+    serve(account('student'))
+    openAt(`/login?next=${encodeURIComponent('/chat?conversation=c-7')}`)
+
+    await signIn()
+
+    await expectToLandOn('/chat', 'student home')
+    expect(window.location.search).toBe('?conversation=c-7')
+  })
+
+  it('resumes a teacher activation with its token', async () => {
+    // Built exactly as TeacherActivatePage builds its "sign in to resume" link.
+    const token = 'act-9f3c2e'
+    serve(account('teacher'))
+    openAt(`/login?next=${encodeURIComponent(`/teacher-activate?token=${token}`)}`)
+
+    await signIn()
+
+    await expectToLandOn('/teacher-activate', `teacher activation ${token}`)
+    expect(window.location.search).toBe(`?token=${token}`)
+  })
+
+  it('follows the signed-out "start practising" link into practice', async () => {
+    serve(account('student'))
+    openAt('/login?next=/practice')
+
+    await signIn()
+
+    // /practice itself forwards to the learning path.
+    await expectToLandOn('/learn/path', 'learn page')
+  })
+
   it('returns to the protected page that sent the visitor to sign in', async () => {
     serve(account('student'))
     openAt('/learn/progress')
@@ -109,6 +148,16 @@ describe('signing in from /login', () => {
     await signIn()
 
     await expectToLandOn('/learn/progress', 'learn page')
+  })
+
+  it("goes to the role's home when the page it was sent away from belongs to another role", async () => {
+    serve(account('parent'))
+    openAt('/learn/progress')
+    await waitFor(() => expect(window.location.pathname).toBe('/login'))
+
+    await signIn()
+
+    await expectToLandOn('/parent', 'parent home')
   })
 
   it("goes to the role's home when ?next= belongs to another role", async () => {
@@ -120,8 +169,19 @@ describe('signing in from /login', () => {
     await expectToLandOn('/parent', 'parent home')
   })
 
-  it.each(['//evil.example', 'https://evil.example', '//evil.example/chat'])(
-    "goes to the role's home when ?next=%s points off the site",
+  it.each([
+    '//evil.example',
+    'https://evil.example',
+    '//evil.example/profile',
+    '/\\evil.example',
+    '/\\evil.example/profile',
+    '/%5C%5Cevil.example',
+    '\\\\evil.example',
+    '/chat/..//evil.example',
+    '/profile/../admin',
+    '/chat/../admin',
+  ])(
+    "goes to the role's home when ?next=%s points off the site or out of the role",
     async (next) => {
       serve(account('student'))
       openAt(`/login?next=${encodeURIComponent(next)}`)
@@ -164,5 +224,18 @@ describe('opening /login while already signed in', () => {
     openAt('/login?next=/admin')
 
     await expectToLandOn('/chat', 'student home')
+  })
+
+  it('is not stopped by a role the destination table does not know', async () => {
+    // A session can carry a role this build has never heard of; the login
+    // screen must still move it on rather than throw while rendering.
+    alreadySignedInAs({ ...account('student'), role: 'janitor' as UserRole })
+
+    openAt('/login?next=/profile')
+
+    // Its fallback home is /chat, which RoleRoute then turns away; what
+    // matters is that the login screen moved it on instead of failing.
+    await waitFor(() => expect(window.location.pathname).toBe('/forbidden'))
+    expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
   })
 })
