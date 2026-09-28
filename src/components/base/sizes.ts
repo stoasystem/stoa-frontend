@@ -51,8 +51,8 @@ export const ICON = {
   toolbar: 22,
 } as const
 
-/** Top bar (Sizes: "Logo 30 h · bell 36 · avatar 30 · gap 6 · side padding 20"). */
-export const TOP_BAR = { height: 56, logo: 30, bell: 36, avatar: 30, gap: 6, paddingX: 20 } as const
+/** Top bar (Sizes: "Logo 30 h · bell 36 · avatar 30 · gap 6 · side padding 20"); a 1 px separator under it. */
+export const TOP_BAR = { height: 56, logo: 30, bell: 36, avatar: 30, gap: 6, paddingX: 20, border: 1 } as const
 
 /** Phone top bar (Placement: "44 below a 54 safe area · 16 / 8 from edges"). */
 export const TOP_BAR_PHONE = {
@@ -119,7 +119,7 @@ export const COMPOSER = {
 } as const
 
 /** Account menu (Components: Account menu). */
-export const ACCOUNT_MENU = { width: 260, item: 34, itemRadius: 7, glyph: 17, avatar: 34 } as const
+export const ACCOUNT_MENU = { width: 260, item: 34, itemRadius: 7, glyph: 17 } as const
 
 /** Admin source list (Teacher · Parent · Admin row, Admin board). */
 export const SOURCE_LIST = { width: 240, item: 34, itemRadius: 8, glyph: 18 } as const

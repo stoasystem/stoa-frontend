@@ -162,6 +162,11 @@ describe('what sits beside the logo', () => {
 
     const list = screen.getByRole('navigation', { name: 'navigation.administration' })
     expect(list).toHaveAttribute('data-source-list', shape)
+    if (shape === 'column') {
+      // Admin board: 240 wide, sticky under the 56 bar and its separator.
+      expect(list).toHaveStyle({ width: '240px' })
+      expect(list.style.top).toBe('calc(57px + env(safe-area-inset-top))')
+    }
     expect(within(list).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
       '/admin',
       '/admin/users',
@@ -181,6 +186,14 @@ describe('what sits beside the logo', () => {
     expect(activeNavIndex(items, '/admin')).toBe(0)
     expect(activeNavIndex(items, '/admin/users/42')).toBe(1)
     expect(activeNavIndex(items, '/adminx')).toBe(-1)
+  })
+
+  it('never offers in the bar what the avatar menu already holds, billing included once it is back', () => {
+    for (const role of ['student', 'parent', 'teacher', 'admin'] as const) {
+      const navigation = shellNavigationFor(role)
+      const paths = navigation.kind === 'none' ? [] : navigation.items.map((item) => item.path)
+      expect(paths.filter((path) => ['/billing', '/support', '/me', '/tutor/profile', '/settings/password', '/parent/account-operations'].includes(path))).toEqual([])
+    }
   })
 
   it.each(['student', 'organization_admin', 'school_teacher', 'school_viewer'] as const)(

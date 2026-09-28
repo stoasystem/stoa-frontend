@@ -93,6 +93,7 @@ export function AccountMenu({ avatarSize = 30 }: { avatarSize?: AvatarSize }) {
           style={{ width: ACCOUNT_MENU.width, maxWidth: 'calc(100vw - 16px)', borderRadius: 12 }}
         >
           <div className="mb-1.5 flex items-center gap-2.5 border-b border-hairline px-2.5 pt-1.5 pb-2.5">
+            {/* The board draws 34 here; the Sizes board has no 34, so it is 36. */}
             <Avatar name={user.name} size={36} />
             <div className="flex min-w-0 flex-col">
               <span className="truncate text-[14px] leading-[1.3] font-semibold">{user.name}</span>

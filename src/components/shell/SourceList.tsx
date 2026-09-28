@@ -1,8 +1,11 @@
 import type { LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { ICON, SOURCE_LIST } from '@/components/base/sizes'
+import { ICON, SOURCE_LIST, TOP_BAR } from '@/components/base/sizes'
 import { cn } from '@/lib/utils'
+
+// Where the sticky list starts: under the bar, its separator and the safe area.
+const BELOW_BAR = `calc(${TOP_BAR.height + TOP_BAR.border}px + env(safe-area-inset-top))`
 
 export type SourceListItem = { to: string; label: string; icon: LucideIcon }
 
@@ -32,7 +35,7 @@ export function SourceList({
           ? 'sticky flex flex-col gap-1 self-start border-r border-separator px-3 py-4'
           : 'flex gap-1 overflow-x-auto border-b border-separator px-3 py-2',
       )}
-      style={wide ? { width: SOURCE_LIST.width, top: 57, height: 'calc(100vh - 57px)' } : undefined}
+      style={wide ? { width: SOURCE_LIST.width, top: BELOW_BAR, height: `calc(100vh - ${BELOW_BAR})` } : undefined}
     >
       {items.map((item, index) => {
         const active = index === activeIndex

@@ -218,7 +218,8 @@ const CheckoutResultPage = lazyPage('CheckoutResultPage', () => import('@/pages/
 const PaymentSettingsPage = lazyPage('PaymentSettingsPage', () => import('@/pages/billing/PaymentSettingsPage'))
 const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/pages/billing/VirtualCheckoutPage'))
 
-  { path: '/billing', access: SIGNED_IN, page: BillingPage, nav: [{ area: 'parent', label: 'Billing', labelKey: 'navigation.billing', priority: 'primary', icon: 'billing', mobile: true }], meta: { module: 'Billing', status: 'core', purpose: 'Plan and billing state.' } },
+  // No `nav`: a parent reaches billing from the avatar menu, between Help and Sign out (#13, #46).
+  { path: '/billing', access: SIGNED_IN, page: BillingPage, meta: { module: 'Billing', status: 'core', purpose: 'Plan and billing state.' } },
   { path: '/billing/payment-settings', access: SIGNED_IN, page: PaymentSettingsPage, meta: { module: 'Billing', status: 'core', purpose: 'Payment method and billing contact.' } },
   { path: '/billing/checkout/result', access: SIGNED_IN, page: CheckoutResultPage, meta: { module: 'Billing', status: 'demo', purpose: 'Checkout result.' } },
   { path: '/billing/checkout/demo', access: SIGNED_IN, page: VirtualCheckoutPage, meta: { module: 'Billing', status: 'demo', purpose: 'Virtual checkout demo.' } },

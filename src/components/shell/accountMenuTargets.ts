@@ -39,6 +39,12 @@ const PASSWORD_PATHS: Record<AppNavArea, string> = {
 
 export type AccountMenuExtra = { key: string; labelKey: string; to: string }
 
+/*
+ * Billing and payments: the item opens /billing. /billing/payment-settings is
+ * reached from inside that page, not as a second menu item; when #46 brings
+ * billing back it decides whether the page links there or the item becomes a
+ * submenu. Neither route may carry a `nav` entry in the manifest.
+ */
 const EXTRAS: Record<AppNavArea, readonly AccountMenuExtra[]> = {
   student: [],
   teacher: [],

@@ -9,8 +9,8 @@ import type { UserRole } from '@/types/user'
  * #13 point 5: the bar holds the logo, the bell and the avatar, and nothing
  * else for a student. Point 6: a teacher and a parent switch between their two
  * pages with a segmented control; an administrator has a source list. A page
- * the account menu already reaches (the teacher's profile) is not offered a
- * second time here. The final item sets are #52's.
+ * the account menu reaches (the teacher's profile, a parent's billing) is not
+ * offered a second time here. The final item sets are #52's.
  */
 export type ShellNavigation =
   | { kind: 'none' }
@@ -19,8 +19,14 @@ export type ShellNavigation =
 
 export function shellNavigationFor(role: UserRole): ShellNavigation {
   const area: AppNavArea = navAreaForRole(role)
+  // Everything the avatar menu can lead to, extras included whether or not
+  // their routes are registered today, so unfreezing billing cannot put it in
+  // two places.
+  const menu = accountMenuFor(area, () => true)
   const inAccountMenu = new Set(
-    [accountMenuFor(area).profile, accountMenuFor(area).password].filter((path): path is string => Boolean(path)),
+    [menu.profile, menu.password, menu.help, ...menu.extras.map((extra) => extra.to)].filter(
+      (path): path is string => Boolean(path),
+    ),
   )
   const items = getNavItemsForRole(area).filter((item) => !inAccountMenu.has(item.path))
 

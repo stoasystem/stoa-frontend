@@ -5,7 +5,7 @@
  * `src/components/base/sizes.ts`: the point is that changing a dimension there
  * (a button height, a row height) turns this red until the board changes too.
  */
-import { render, screen, within } from '@testing-library/react'
+import { fireEvent, render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Bell, Plus, UserRound } from 'lucide-react'
 import { useState } from 'react'
@@ -352,5 +352,18 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
     expect(send).toBeEnabled()
     await userEvent.keyboard('{Enter}')
     expect(onSubmit).toHaveBeenCalledWith('Why divide both sides?\n')
+  })
+
+  it('does not send on the Enter that ends an input-method composition', () => {
+    const onSubmit = vi.fn()
+    render(<Harness variant="docked" onSubmit={onSubmit} />)
+    const field = screen.getByRole('textbox', { name: 'Ask' })
+    fireEvent.change(field, { target: { value: 'にほんご' } })
+
+    fireEvent.keyDown(field, { key: 'Enter', keyCode: 229 })
+    fireEvent.keyDown(field, { key: 'Enter', isComposing: true })
+    expect(onSubmit).not.toHaveBeenCalled()
+    fireEvent.keyDown(field, { key: 'Enter', keyCode: 13 })
+    expect(onSubmit).toHaveBeenCalledWith('にほんご')
   })
 })

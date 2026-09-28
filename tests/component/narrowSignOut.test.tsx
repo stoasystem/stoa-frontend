@@ -210,7 +210,15 @@ const CHAT_STATES: ChatState[] = [
   'a list that failed to load',
 ]
 
-const ROLES: UserRole[] = ['student', 'parent', 'teacher', 'admin']
+const ROLES: UserRole[] = [
+  'student',
+  'parent',
+  'teacher',
+  'admin',
+  'organization_admin',
+  'school_teacher',
+  'school_viewer',
+]
 
 // Below 640px both sign-out buttons used to be hidden, the sidebar's below
 // `md` and the top bar's below `sm`, so a phone could not sign out at all

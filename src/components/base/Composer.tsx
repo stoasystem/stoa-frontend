@@ -58,7 +58,9 @@ export function Composer({
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === 'Enter' && !event.shiftKey && !event.nativeEvent.isComposing) {
+    // keyCode 229 is how Safari reports the Enter that ends a composition.
+    const composing = event.nativeEvent.isComposing || event.keyCode === 229
+    if (event.key === 'Enter' && !event.shiftKey && !composing) {
       event.preventDefault()
       submit()
     }

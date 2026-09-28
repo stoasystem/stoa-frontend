@@ -6,9 +6,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, matchPath } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { AppNavArea } from '@/app/router/routeManifest'
+import { isAdmitted } from '@/app/router/AppRoutes'
+import { navAreaForRole, pageRoutes, type AppNavArea } from '@/app/router/routeManifest'
+import { shellNavigationFor } from '@/components/shell/shellNavigation'
 import { AccountMenu } from '@/components/shell/AccountMenu'
 import { accountMenuFor, isRegisteredPage } from '@/components/shell/accountMenuTargets'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
@@ -119,6 +121,15 @@ describe('the account menu', () => {
     }
   })
 
+  it('holds each item at 34 high, radius 7, in a 260 menu (Components: Account menu)', async () => {
+    const menu = await openWithMouse('teacher')
+
+    expect(menu).toHaveStyle({ width: '260px' })
+    for (const item of within(menu).getAllByRole('menuitem')) {
+      expect(item).toHaveStyle({ height: '34px', borderRadius: '7px' })
+    }
+  })
+
   it('keeps the parent billing item out while billing is withdrawn (card 007)', async () => {
     expect(accountMenuFor('parent').extras).toEqual([])
     const menu = await openWithMouse('parent')
@@ -154,6 +165,44 @@ describe('the account menu', () => {
     await userEvent.click(german)
     expect(i18n.changeLanguage).toHaveBeenCalledWith('de')
     expect(updateLocale).toHaveBeenCalledWith('de')
+  })
+})
+
+// A link that leads into another role's area would only end on the guard's
+// refusal. Each target, the menu's and the bar's alike, must be a page whose
+// manifest access admits the very role it is offered to.
+const ALL_ROLES: UserRole[] = [
+  'student',
+  'parent',
+  'teacher',
+  'admin',
+  'organization_admin',
+  'school_teacher',
+  'school_viewer',
+]
+
+function routeFor(path: string) {
+  return pageRoutes.find((route) => route.path !== '*' && matchPath({ path: route.path, end: true }, path))
+}
+
+describe('every link the shell offers a role admits that role', () => {
+  it.each(ALL_ROLES)('holds for a %s', (role) => {
+    const menu = accountMenuFor(navAreaForRole(role), () => true)
+    const navigation = shellNavigationFor(role)
+    const targets = [
+      menu.profile,
+      menu.password,
+      menu.help,
+      ...menu.extras.map((extra) => extra.to).filter(isRegisteredPage),
+      ...(navigation.kind === 'none' ? [] : navigation.items.map((item) => item.path)),
+    ].filter((path): path is string => path !== null)
+
+    const refused = targets.filter((path) => {
+      const route = routeFor(path)
+      return !route || !isAdmitted(route.access, { role }, true)
+    })
+    expect(refused).toEqual([])
+    expect(targets.length).toBeGreaterThanOrEqual(2)
   })
 })
 
