@@ -167,6 +167,7 @@
     "accountBlocked_one": "Blocked: {{issue}}",
     "accountBlocked_other": "Blocked ({{count}} items): {{issue}}",
     "accountSeeDetails": "Open for details",
+    "state": { "blocked": "Blocked", "attention": "Needs attention" },
     "issues": {
       "parent_email_unverified": "Parent email needs verification",
       "no_linked_children": "No linked child account",

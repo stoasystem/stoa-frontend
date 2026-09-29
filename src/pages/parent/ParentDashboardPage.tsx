@@ -1,6 +1,6 @@
 import { UsersRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Group, Row } from '@/components/base'
+import { Group, Pill, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
@@ -94,19 +94,47 @@ function AccountRow() {
   const issue = firstKey ? t(`overview.issues.${firstKey}`) : t('overview.accountSeeDetails')
   const count = Math.max(codes.length, 1)
 
+  // The state is said twice, as the summary card said it (#78 review): as a
+  // pill in the row's tone -- red for blocked, gold for attention -- and in
+  // the subtitle, which is a live region so a reader hears the answer arrive
+  // (or the failure, as an alert) without the row being read again.
+  type AccountState = 'loading' | 'failed' | 'blocked' | 'attention' | 'ready'
+  let kind: AccountState
   let subtitle: string
-  if (query.isLoading) subtitle = t('overview.accountLoading')
-  else if (query.isError || !state) subtitle = t('accountOps.loadFailed')
-  else if (state.state === 'blocked') subtitle = t('overview.accountBlocked', { count, issue })
-  else if (state.state === 'attention' || codes.length > 0) subtitle = t('overview.accountAttention', { count, issue })
-  else subtitle = t('overview.accountReady', { count: data?.children.length ?? 0 })
+  if (query.isLoading) {
+    kind = 'loading'
+    subtitle = t('overview.accountLoading')
+  } else if (query.isError || !state) {
+    kind = 'failed'
+    subtitle = t('accountOps.loadFailed')
+  } else if (state.state === 'blocked') {
+    kind = 'blocked'
+    subtitle = t('overview.accountBlocked', { count, issue })
+  } else if (state.state === 'attention' || codes.length > 0) {
+    kind = 'attention'
+    subtitle = t('overview.accountAttention', { count, issue })
+  } else {
+    kind = 'ready'
+    subtitle = t('overview.accountReady', { count: data?.children.length ?? 0 })
+  }
+  const pill =
+    kind === 'blocked' ? (
+      <Pill tone="danger">{t('overview.state.blocked')}</Pill>
+    ) : kind === 'attention' ? (
+      <Pill tone="gold">{t('overview.state.attention')}</Pill>
+    ) : undefined
 
   return (
     <Row
       to="/parent/account-operations"
       leading={{ kind: 'icon', icon: UsersRound }}
       title={t('overview.account')}
-      subtitle={subtitle}
+      subtitle={
+        <span role={kind === 'failed' ? 'alert' : 'status'} data-account-state={kind}>
+          {subtitle}
+        </span>
+      }
+      trailing={pill}
     />
   )
 }

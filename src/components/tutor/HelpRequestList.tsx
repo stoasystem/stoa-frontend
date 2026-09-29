@@ -64,6 +64,9 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
             to={`/tutor/requests/${request.requestId}`}
             leading={{ kind: 'avatar', name: request.studentName }}
             title={request.studentName}
+            // The question is what the teacher triages by: two lines of it,
+            // as the old card gave it, not one cut after "subject · grade".
+            subtitleLines={2}
             subtitle={
               <>
                 <span data-phone-meta className="sm:hidden">

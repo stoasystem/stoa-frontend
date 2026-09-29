@@ -24,6 +24,8 @@ import type { UserRole } from '@/types/user'
 
 const account = vi.hoisted(() => ({
   supportState: { state: 'attention', blockers: [], warnings: ['parent_email_unverified'] } as AccountOperationsSupportState,
+  /** The account read fails: no data, `isError`. */
+  failed: false,
 }))
 
 vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
@@ -85,8 +87,11 @@ vi.mock('@/hooks/parent/useParentChildrenQuery', () => ({
 vi.mock('@/hooks/parent/useParentAccountOperationsQuery', () => ({
   useParentAccountOperationsQuery: () => ({
     isLoading: false,
-    isError: false,
+    get isError() {
+      return account.failed
+    },
     get data() {
+      if (account.failed) return undefined
       return { supportState: account.supportState, children: [{ childId: 'ch-1' }, { childId: 'ch-2' }] }
     },
   }),
@@ -124,6 +129,7 @@ vi.mock('@/services/admin/accountsApi', async () => {
 afterEach(() => {
   useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
   account.supportState = { state: 'attention', blockers: [], warnings: ['parent_email_unverified'] }
+  account.failed = false
 })
 
 function renderAs(role: UserRole, path: string, page: ReactNode) {
@@ -152,6 +158,12 @@ describe('a teacher\'s Requests', () => {
     expect(row.querySelector('[data-chevron]')).not.toBeNull()
     expect(within(row).getByText('Pending')).toBeInTheDocument()
     expect(within(row).getByText('At risk')).toBeInTheDocument()
+    // The question is what the teacher triages by: it is on the row, and the
+    // subtitle may take two lines for it rather than cut after subject · grade.
+    const subtitle = row.querySelector('[data-row-subtitle]')
+    expect(subtitle).toHaveTextContent('Why do we divide both sides?')
+    expect(subtitle).toHaveClass('line-clamp-2')
+    expect(subtitle).not.toHaveClass('truncate')
     const filter = screen.getByRole('group', { name: 'Filter requests' })
     expect(within(filter).getAllByRole('button').map((button) => button.textContent)).toEqual([
       'All',
@@ -212,21 +224,44 @@ describe('a parent\'s Overview and Reports', () => {
     expect(rowLinks()).toEqual(['/parent/children/ch-1', '/parent/account-operations'])
   })
 
+  // The state is a pill in the row's tone as well as words (#78 review): a
+  // blocked account must not look like a ready one.
   it.each([
-    [{ state: 'ready', blockers: [], warnings: [] }, 'Ready · 2 linked children'],
-    [{ state: 'attention', blockers: [], warnings: ['parent_email_unverified'] }, 'Needs attention: Parent email needs verification'],
+    [{ state: 'ready', blockers: [], warnings: [] }, 'Ready · 2 linked children', null],
+    [
+      { state: 'attention', blockers: [], warnings: ['parent_email_unverified'] },
+      'Needs attention: Parent email needs verification',
+      ['Needs attention', 'gold'],
+    ],
     [
       { state: 'blocked', blockers: ['no_linked_children'], warnings: ['usage_unreconciled'] },
       'Blocked (2 items): No linked child account',
+      ['Blocked', 'danger'],
     ],
     // Billing is frozen (card 007): its codes count, but are never named.
-    [{ state: 'attention', blockers: [], warnings: ['billing_inactive'] }, 'Needs attention: Open for details'],
-  ] as const)('states the account as %j', (supportState, subtitle) => {
+    [{ state: 'attention', blockers: [], warnings: ['billing_inactive'] }, 'Needs attention: Open for details', ['Needs attention', 'gold']],
+  ] as const)('states the account as %j', (supportState, subtitle, pill) => {
     account.supportState = { ...supportState, blockers: [...supportState.blockers], warnings: [...supportState.warnings] }
     renderAs('parent', '/parent', <ParentDashboardPage />)
 
     const row = screen.getByRole('link', { name: /Account and family/ })
-    expect(row).toHaveTextContent(subtitle)
+    // The subtitle is a live region: the answer is announced when it lands.
+    expect(within(row).getByRole('status')).toHaveTextContent(subtitle)
+    const tones = Array.from(row.querySelectorAll('[data-tone]'))
+    if (pill) {
+      expect(tones.map((node) => [node.textContent, node.getAttribute('data-tone')])).toEqual([pill])
+    } else {
+      expect(tones).toEqual([])
+    }
+  })
+
+  it('reports a failed account read as an alert, with no state pill', () => {
+    account.failed = true
+    renderAs('parent', '/parent', <ParentDashboardPage />)
+
+    const row = screen.getByRole('link', { name: /Account and family/ })
+    expect(within(row).getByRole('alert')).toHaveTextContent('Account operations are unavailable.')
+    expect(row.querySelector('[data-tone]')).toBeNull()
   })
 
   it('offers each child\'s summary and reports as rows', () => {

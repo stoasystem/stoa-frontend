@@ -167,6 +167,7 @@
     "accountBlocked_one": "Gesperrt: {{issue}}",
     "accountBlocked_other": "Gesperrt ({{count}} Punkte): {{issue}}",
     "accountSeeDetails": "Details im Konto",
+    "state": { "blocked": "Gesperrt", "attention": "Bitte prüfen" },
     "issues": {
       "parent_email_unverified": "E-Mail-Adresse der Eltern ist noch nicht bestätigt",
       "no_linked_children": "Kein Kinderkonto verknüpft",

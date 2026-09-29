@@ -167,6 +167,7 @@
     "accountBlocked_one": "Bloccato: {{issue}}",
     "accountBlocked_other": "Bloccato ({{count}} elementi): {{issue}}",
     "accountSeeDetails": "Apri per i dettagli",
+    "state": { "blocked": "Bloccato", "attention": "Da verificare" },
     "issues": {
       "parent_email_unverified": "L’e-mail del genitore non è ancora verificata",
       "no_linked_children": "Nessun account figlio collegato",
