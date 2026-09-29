@@ -122,6 +122,9 @@ export type LegacyRedirect = {
 /** The one screen an account under a forced password change can still use. */
 export const CHANGE_PASSWORD_PATH = '/settings/password'
 
+/** Where a guard sends a role a route is not for (RoleRoute, and a role with no home). */
+export const FORBIDDEN_PATH = '/forbidden'
+
 export const ASK_PATH = '/ask'
 
 export const roleHomePaths: Record<AppNavArea, string> = {
@@ -278,7 +281,7 @@ export const pageRoutes: readonly PageRoute[] = [
     meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' },
   },
   { path: '/unauthorized', access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
-  { path: '/forbidden', access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
+  { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
   { path: '*', access: PUBLIC, page: NotFoundPage, meta: { module: 'Errors', status: 'core', purpose: 'Anything no entry matches.' } },
 
   // ---- any signed-in account ---------------------------------------------
