@@ -3,9 +3,11 @@ import { isAdmitted } from '@/app/router/routeAccess'
 import {
   CHANGE_PASSWORD_PATH,
   FORBIDDEN_PATH,
+  UNAUTHORIZED_PATH,
   legacyRedirects,
   navAreaForRole,
   pageRoutes,
+  LOGIN_PATH,
   roleHomePaths,
 } from '@/app/router/routeManifest'
 import type { UserRole } from '@/types/user'
@@ -26,9 +28,16 @@ export function canAccessRoute(role: UserRole, allowedRoles: UserRole[]) {
  * Manifest entries a sign-in never returns to, by their pattern:
  * - `*`, the public catch-all: it matches every path, so it would admit them all;
  * - the password change: an account under a forced change is sent there first
- *   anyway (getPostLoginPath), and any other account has no reason to be.
+ *   anyway (getPostLoginPath), and any other account has no reason to be;
+ * - the sign-in itself and the two refusal pages: nothing to go back to.
  */
-const NOT_A_DESTINATION: ReadonlySet<string> = new Set(['*', CHANGE_PASSWORD_PATH])
+const NOT_A_DESTINATION: ReadonlySet<string> = new Set([
+  '*',
+  CHANGE_PASSWORD_PATH,
+  LOGIN_PATH,
+  FORBIDDEN_PATH,
+  UNAUTHORIZED_PATH,
+])
 
 function destinations() {
   return [
@@ -53,7 +62,8 @@ function isSafePath(path: unknown): path is string {
 export function canUseNextPathForRole(pathname: string, role: UserRole) {
   // A role the manifest has no home for (a session stored before it existed)
   // gets none of the public pages either, and no exception mid-render.
-  if ((roleHomePaths[navAreaForRole(role)] as string | undefined) === undefined) return false
+  // Own properties only: `constructor` or `toString` is not a role with a home.
+  if (!Object.prototype.hasOwnProperty.call(roleHomePaths, navAreaForRole(role))) return false
   const account = { role }
   return destinations().some(
     ({ pattern, access }) => matchPath({ path: pattern, end: true }, pathname) !== null && isAdmitted(access, account, true),

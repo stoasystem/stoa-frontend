@@ -6,11 +6,29 @@
  * matches it. These tests hold that to the manifest for every role, and pin the
  * cases the table used to get wrong.
  */
+import { matchRoutes } from 'react-router-dom'
 import { describe, expect, it } from 'vitest'
-import { isAdmitted } from '@/app/router/AppRoutes'
-import { CHANGE_PASSWORD_PATH, legacyRedirects, pageRoutes, roleHomePaths, navAreaForRole } from '@/app/router/routeManifest'
+import {
+  CHANGE_PASSWORD_PATH,
+  FORBIDDEN_PATH,
+  LOGIN_PATH,
+  UNAUTHORIZED_PATH,
+  legacyRedirects,
+  navAreaForRole,
+  pageRoutes,
+  roleHomePaths,
+  type RouteAccess,
+} from '@/app/router/routeManifest'
 import { canUseNextPathForRole, getPostLoginPath } from '@/lib/authRoutes'
 import type { UserRole } from '@/types/user'
+
+/**
+ * Who an entry admits, written out here rather than taken from the code under
+ * test, so a fault in the shared rule (routeAccess.ts) shows up as a failure.
+ */
+function admits(access: RouteAccess, role: UserRole) {
+  return access.kind === 'public' || access.kind === 'signedIn' || (access.kind === 'roles' && access.roles.includes(role))
+}
 
 const ROLES: readonly UserRole[] = [
   'student',
@@ -84,22 +102,28 @@ describe('the paths the other roles may be returned to', () => {
     ['admin', '/map/math'],
     ['school_teacher', '/admin/users'],
     ['organization_admin', '/ask/c-1'],
+    ['teacher', '/students/s-1/learning-profile'],
+    ['parent', '/me'],
+    ['student', '/students/s-1/learning-profile'],
     // Billing is frozen (card 007): no billing route is registered, so there is nowhere to return to.
     ['parent', '/billing'],
   ] as const)('%s may not return to %s', (role, path) => {
     expect(canUseNextPathForRole(path, role)).toBe(false)
   })
 
-  it('a role the manifest has no home for gets no destination, not even a public page', () => {
-    expect(canUseNextPathForRole('/support', 'ghost' as UserRole)).toBe(false)
-  })
+  it.each(['ghost', 'constructor', 'toString', '__proto__'])(
+    'a role the manifest has no home for (%s) gets no destination, not even a public page',
+    (role) => {
+      expect(canUseNextPathForRole('/support', role as UserRole)).toBe(false)
+    },
+  )
 })
 
 describe('every page and legacy entry of the manifest, for every role', () => {
   // A concrete address for an entry's pattern, as a deep link would carry it.
   const sample = (pattern: string) =>
     pattern.replace(/:([A-Za-z]+)/g, (_, name: string) => `${name}-1`).replace(/\/\*$/, '/deep/x')
-  const exempt = new Set(['*', CHANGE_PASSWORD_PATH])
+  const exempt = new Set(['*', CHANGE_PASSWORD_PATH, LOGIN_PATH, FORBIDDEN_PATH, UNAUTHORIZED_PATH])
   const entries = [
     ...pageRoutes.map((route) => ({ pattern: route.path, access: route.access })),
     ...legacyRedirects.map((redirect) => ({ pattern: redirect.from, access: redirect.access })),
@@ -111,7 +135,7 @@ describe('every page and legacy entry of the manifest, for every role', () => {
   it.each(cases)('$role, ?next=$path', ({ role, access, path }) => {
     const home = roleHomePaths[navAreaForRole(role)]
     const destination = getPostLoginPath({ role }, { search: `?next=${encodeURIComponent(path)}` })
-    expect(destination).toBe(isAdmitted(access, { role }, true) ? path : home)
+    expect(destination).toBe(admits(access, role) ? path : home)
   })
 
   it.each(ROLES.flatMap((role) => [...exempt].map((pattern) => ({ role, pattern }))))(
@@ -121,6 +145,21 @@ describe('every page and legacy entry of the manifest, for every role', () => {
       expect(canUseNextPathForRole(path, role)).toBe(false)
     },
   )
+
+  // Judged by the router, not by the rule under test: the entry react-router
+  // itself picks for the destination (catch-all included) must admit the role.
+  const routes = [
+    ...pageRoutes.map((route) => ({ path: route.path, access: route.access })),
+    ...legacyRedirects.map((redirect) => ({ path: redirect.from, access: redirect.access })),
+  ]
+  it.each(cases)('$role, ?next=$path lands only where the router admits it', ({ role, path }) => {
+    const destination = getPostLoginPath({ role }, { search: `?next=${encodeURIComponent(path)}` })
+    if (destination === roleHomePaths[navAreaForRole(role)]) return
+    const matches = matchRoutes(routes, destination.split(/[?#]/)[0]) ?? []
+    const won = matches[matches.length - 1]?.route as { path: string; access: RouteAccess } | undefined
+    expect(won?.path).not.toBe('*')
+    expect(won && admits(won.access, role)).toBe(true)
+  })
 
   it('covers every role and entry it claims to', () => {
     // Guards the table above against an empty manifest or role list.
