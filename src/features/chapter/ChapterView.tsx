@@ -7,6 +7,9 @@
  * button for the lesson to go on with, and the lessons as rows (Components,
  * "Grouped list": every navigation target is a row with a chevron; rows carry
  * their status, never a button). Opened from a star, the jump plays first.
+ *
+ * A lesson not done yet also offers 「跳过这一课」 beside its row: the short
+ * quiz that tests out of it (`quiz.ts`), locked or not.
  */
 import { Check, ChevronLeft, ChevronRight, Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -14,7 +17,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { JumpTransition } from '@/features/chapter/JumpTransition'
-import { chapterPath, useChapter, type Chapter, type ChapterLesson } from '@/features/chapter/useChapter'
+import { chapterPath, quizPath, useChapter, type Chapter, type ChapterLesson } from '@/features/chapter/useChapter'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -145,8 +148,9 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
             }}
           >
             {chapter.lessons.map((lesson, index) => (
-              <li key={lesson.id} data-lesson-status={lesson.status}>
+              <li key={lesson.id} data-lesson-status={lesson.status} className="flex flex-col sm:flex-row sm:items-stretch">
                 <LessonRow unitId={chapter.unitId} lesson={lesson} number={index + 1} upNext={lesson.id === chapter.nextLessonId} />
+                {lesson.status !== 'completed' && <TestOut unitId={chapter.unitId} lesson={lesson} />}
               </li>
             ))}
           </ol>
@@ -187,7 +191,7 @@ function LessonRow({ unitId, lesson, number, upNext }: { unitId: string; lesson:
       </span>
     </>
   )
-  const classes = 'flex min-h-14 w-full items-center gap-3 px-4 py-2.5 text-inherit no-underline'
+  const classes = 'flex min-h-14 min-w-0 flex-1 items-center gap-3 px-4 py-2.5 text-inherit no-underline'
 
   if (locked) return <div className={classes}>{body}</div>
   return (
@@ -197,6 +201,22 @@ function LessonRow({ unitId, lesson, number, upNext }: { unitId: string; lesson:
       aria-current={upNext ? 'step' : undefined}
     >
       {body}
+    </Link>
+  )
+}
+
+/** 「跳过这一课」: the short quiz that tests out of a lesson not done yet. A sibling of the row, not inside its link. */
+function TestOut({ unitId, lesson }: { unitId: string; lesson: ChapterLesson }) {
+  const { t } = useTranslation('chapter')
+  return (
+    <Link
+      to={quizPath(unitId, lesson.id)}
+      data-test-out
+      aria-label={t('quiz.testOut.label', { title: lesson.title })}
+      // A phone puts it under the row's title (a third line), wider screens at the row's end.
+      className="-mt-2 flex min-h-11 shrink-0 items-center self-start pr-4 pl-[60px] text-[13px] font-semibold text-[color:var(--on-sky-plain)] no-underline hover:opacity-70 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:mt-0 sm:self-auto sm:border-l sm:border-white/10 sm:px-3 sm:hover:bg-white/[0.06] sm:hover:opacity-100"
+    >
+      {t('quiz.testOut.action')}
     </Link>
   )
 }

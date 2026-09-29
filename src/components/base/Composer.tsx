@@ -20,6 +20,8 @@ export interface ComposerProps {
   /** Full composer only: between + and send, e.g. the subject picker. */
   footerStart?: ReactNode
   disabled?: boolean
+  /** The id of a line saying more about the field, e.g. why it is disabled. */
+  describedBy?: string
   /** Sending: the field stays editable, send is held. */
   busy?: boolean
   /** An input method started composing (IME, dead keys). */
@@ -48,6 +50,7 @@ export function Composer({
   onAttach,
   footerStart,
   disabled = false,
+  describedBy,
   busy = false,
   onCompositionStart,
   onCompositionEnd,
@@ -106,6 +109,7 @@ export function Composer({
         value={value}
         placeholder={placeholder}
         disabled={disabled}
+        aria-describedby={describedBy}
         onChange={(event) => onChange(event.target.value)}
         onKeyDown={onKeyDown}
         onCompositionStart={onCompositionStart}

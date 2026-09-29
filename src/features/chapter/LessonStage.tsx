@@ -9,20 +9,27 @@
  * (Placement: "Practice row: primary left, large, min 200; plain right of it;
  * Hint plain at far right"; on a phone the primary is full width and docked).
  * Ask sits beside it as a light window and knows the exercise on screen.
+ *
+ * Skip gives no credit: the exercise goes to the back. Once only skipped
+ * exercises are left, the short quiz is offered instead (`quiz.ts`); with
+ * `?mode=quiz` the stage opens on the quiz that tests out of the lesson. In a
+ * quiz there are no hints, no skip, and Ask and 「问这段」 are off.
  */
-import { Check, ChevronLeft, Lightbulb, Lock, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
+import { useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import type { AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
-import { chapterPath, lessonAfter, useChapter, type Chapter } from '@/features/chapter/useChapter'
+import { QUIZ_HEARTS } from '@/features/chapter/quiz'
+import { chapterPath, lessonAfter, QUIZ_MODE, quizPath, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { formatPracticeAnswer, useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
+import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -45,6 +52,10 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   const chapterQuery = useChapter(unitId)
   const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
   const lesson = lessonQuery.data
+  // Testing out of the lesson from the chapter: the quiz, locked or not. A
+  // reload starts it again from the beginning; nothing of it is kept.
+  const [params] = useSearchParams()
+  const testOut = params.get('mode') === QUIZ_MODE
   // A lesson from another unit is not this chapter's: a link that pairs them
   // finds nothing, as a chapter not in the catalog does.
   const inUnit = lesson !== undefined && (!unitId || lesson.unitId === unitId)
@@ -60,17 +71,23 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         ? 'missing'
         : chapterQuery.status === 'loading'
           ? 'loading'
-          : status === 'locked'
+          : status === 'locked' && !testOut
             ? 'locked'
             : null
-  // Keyed by lesson: moving on to the next lesson starts a fresh run.
+  // Keyed by lesson and mode: the next lesson, or the quiz, starts a fresh run.
   return (
     <AppLayout bleed>
       {lesson && notice === null ? (
-        <LessonRunStage key={lesson.id} lesson={lesson} unitId={unitId ?? lesson.unitId} chapter={chapter} />
+        <LessonRunStage
+          key={`${lesson.id}:${testOut ? 'quiz' : 'lesson'}`}
+          lesson={lesson}
+          unitId={unitId ?? lesson.unitId}
+          chapter={chapter}
+          testOut={testOut}
+        />
       ) : (
         <div data-surface="sky" className="flex min-h-0 flex-1 flex-col items-start gap-3 bg-sky p-6 text-on-sky">
-          <StageNotice unitId={unitId} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
+          <StageNotice unitId={unitId} lessonId={lesson?.id} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
         </div>
       )}
     </AppLayout>
@@ -79,7 +96,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
 
 type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
 
-function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
+function StageNotice({ unitId, lessonId, kind, retry }: { unitId?: string; lessonId?: string; kind: StageNoticeKind; retry: () => void }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -109,6 +126,16 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
             {t('stage.locked.title')}
           </h1>
           <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
+          {unitId && lessonId && (
+            <div className="flex flex-col items-start gap-1 pt-2">
+              <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('quiz.testOut.offer')}</p>
+              <Button asChild variant="onSky" style={{ color: 'var(--on-sky-button-text)' }}>
+                <Link to={quizPath(unitId, lessonId)} data-test-out>
+                  {t('quiz.testOut.action')}
+                </Link>
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
         <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
@@ -119,18 +146,33 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
   )
 }
 
-function LessonRunStage({ lesson, unitId, chapter }: { lesson: PracticeLesson; unitId: string; chapter: Chapter | null }) {
+function LessonRunStage({
+  lesson,
+  unitId,
+  chapter,
+  testOut,
+}: {
+  lesson: PracticeLesson
+  unitId: string
+  chapter: Chapter | null
+  testOut: boolean
+}) {
   const { t } = useTranslation('chapter')
-  const run = useLessonRun(lesson)
+  const run = useLessonRun(lesson, { testOut })
   const side = useMediaQuery(STAGE_SIDE_QUERY)
   const host = useRef<HTMLDivElement>(null)
+  // The first question on arrival keeps the page's focus; every one after it
+  // (the next exercise, the quiz, back from the quiz) takes the keyboard.
+  const arrived = useRef(true)
   const { challenge } = run
+  const inQuiz = run.quiz !== null
 
   // TEXT FALLBACK (#56): what Ask is told about the exercise on screen. #56
   // sends `{ challengeId, lessonId, unitId }` instead of the words.
   const practice = useMemo<AskPractice | undefined>(
     () =>
-      challenge && !run.finished
+      // Not during a quiz: Ask is off, and told nothing.
+      challenge && !run.finished && !inQuiz
         ? {
             context: {
               unitId,
@@ -144,26 +186,28 @@ function LessonRunStage({ lesson, unitId, chapter }: { lesson: PracticeLesson; u
             },
           }
         : undefined,
-    [challenge, lesson.id, lesson.topic, run.answer, run.finished, run.hint, run.wrong, unitId],
+    [challenge, inQuiz, lesson.id, lesson.topic, run.answer, run.finished, run.hint, run.wrong, unitId],
   )
 
   const lessonNumber = chapter ? chapter.lessons.findIndex((item) => item.id === lesson.id) + 1 : 0
 
   return (
     <div ref={host} className="flex min-h-0 flex-1 flex-col">
-      <StageWithAsk practice={practice} subjectId={lesson.subjectId}>
+      <StageWithAsk practice={practice} subjectId={lesson.subjectId} off={inQuiz ? t('quiz.askOff') : undefined}>
         <StageStrip lesson={lesson} unitId={unitId} chapter={chapter} lessonNumber={lessonNumber} run={run} side={side} />
         {run.finished ? (
           <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} />
+        ) : run.failed ? (
+          <QuizFailed run={run} unitId={unitId} />
         ) : challenge ? (
-          <Exercise run={run} challenge={challenge} chapter={chapter} side={side} />
+          <Exercise run={run} challenge={challenge} chapter={chapter} side={side} arrived={arrived} />
         ) : (
           <div className="p-6">
             <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.empty')}</p>
           </div>
         )}
       </StageWithAsk>
-      <QuoteSelection scope={host} />
+      {!inQuiz && <QuoteSelection scope={host} />}
     </div>
   )
 }
@@ -189,7 +233,8 @@ function StageStrip({
   const where = [
     side ? chapterTitle : null,
     chapter && lessonNumber > 0 ? t('stage.lessonOf', { lesson: lessonNumber, lessons: chapter.total }) : null,
-    run.count > 0 && !run.finished ? t('stage.questionOf', { question: run.index + 1, questions: run.count }) : null,
+    run.quiz ? t('quiz.label') : null,
+    run.count > 0 && !run.finished && !run.failed ? t('stage.questionOf', { question: Math.min(run.index + 1, run.count), questions: run.count }) : null,
   ]
     .filter(Boolean)
     .join(' · ')
@@ -209,7 +254,7 @@ function StageStrip({
         {chapter && chapter.total > 0 && <LessonDots chapter={chapter} lessonId={lesson.id} width={side ? 220 : 150} />}
       </div>
       <div className="justify-self-end">
-        {!side && !run.finished && run.challenge && !run.feedback && <HintButton run={run} />}
+        {run.quiz ? <Hearts left={run.quiz.hearts} /> : !side && !run.finished && run.challenge && !run.feedback && <HintButton run={run} />}
       </div>
     </div>
   )
@@ -248,6 +293,34 @@ function HintButton({ run }: { run: LessonRun }) {
   )
 }
 
+/** The quiz's hearts: one for each mistake it forgives, and the last one. */
+function Hearts({ left }: { left: number }) {
+  const { t } = useTranslation('chapter')
+  // A heart lost gives a small beat (chapter.css); held still under reduced motion.
+  const reducedMotion = usePrefersReducedMotion()
+  return (
+    <p
+      role="img"
+      data-quiz-hearts={left}
+      data-motion={reducedMotion ? 'none' : 'beat'}
+      aria-label={t('quiz.hearts', { count: left, total: QUIZ_HEARTS })}
+      className="m-0 flex items-center gap-1 px-2 text-lit"
+    >
+      {Array.from({ length: QUIZ_HEARTS }, (_, index) => (
+        <Heart
+          key={index}
+          aria-hidden="true"
+          data-heart={index < left ? 'full' : 'lost'}
+          size={20}
+          strokeWidth={ICON.stroke}
+          fill={index < left ? 'currentColor' : 'none'}
+          className={index < left ? undefined : 'text-[color:var(--on-sky-text-caption)]'}
+        />
+      ))}
+    </p>
+  )
+}
+
 /** "You are here": the star and its ring, filling as the chapter's lessons pass. */
 function YouAreHere({ chapter }: { chapter: Chapter }) {
   const { t } = useTranslation('chapter')
@@ -271,22 +344,36 @@ function YouAreHere({ chapter }: { chapter: Chapter }) {
   )
 }
 
-function Exercise({ run, challenge, chapter, side }: { run: LessonRun; challenge: PracticeChallenge; chapter: Chapter | null; side: boolean }) {
+function Exercise({
+  run,
+  challenge,
+  chapter,
+  side,
+  arrived,
+}: {
+  run: LessonRun
+  challenge: PracticeChallenge
+  chapter: Chapter | null
+  side: boolean
+  arrived: MutableRefObject<boolean>
+}) {
   const { t } = useTranslation('chapter')
   const prompt = useRef<HTMLHeadingElement>(null)
-  const firstQuestion = useRef(true)
+  const mode = run.quiz ? 'quiz' : 'lesson'
 
-  // A new exercise: the keyboard and the screen reader start on its question.
+  // A new exercise, the quiz begun, or back from it: the keyboard and the
+  // screen reader start on its question. Not on arrival.
   useEffect(() => {
-    if (firstQuestion.current) {
-      firstQuestion.current = false
+    if (arrived.current) {
+      arrived.current = false
       return
     }
     prompt.current?.focus()
-  }, [challenge.id])
+  }, [arrived, challenge.id, mode])
 
   const long = challenge.prompt.length > 48
-  const locked = Boolean(run.feedback?.correct) || run.checking
+  // In a quiz an answer is checked once: right or wrong, it holds still.
+  const locked = Boolean(run.feedback?.correct) || run.checking || Boolean(run.quiz && run.feedback)
 
   return (
     <>
@@ -386,6 +473,11 @@ function Feedback({ run }: { run: LessonRun }) {
           </p>
           {feedback.feedback && <p className={cn('m-0 text-[15px]', bodyOnSky)}>{feedback.feedback}</p>}
           {feedback.correct && feedback.explanation && <p className="m-0 text-[15px]">{feedback.explanation}</p>}
+          {run.quiz && !feedback.correct && (
+            <p data-quiz-hearts-left className={cn('m-0 text-[15px]', bodyOnSky)}>
+              {run.quiz.hearts > 0 ? t('quiz.heartLost', { count: run.quiz.hearts }) : t('quiz.noHeartsLeft')}
+            </p>
+          )}
         </div>
       )}
       {run.checkFailed && !feedback && (
@@ -402,20 +494,31 @@ function Feedback({ run }: { run: LessonRun }) {
   )
 }
 
-/** One lit button, a plain one beside it, Hint at the far right (the phone keeps Hint in the strip). */
+/**
+ * One lit button, a plain one beside it, Hint at the far right (the phone
+ * keeps Hint in the strip). The plain one is Skip -- no credit, the exercise
+ * goes to the back -- or, once only skipped exercises are left, the short
+ * quiz. A quiz has neither, nor Hint.
+ */
 function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
   const { t } = useTranslation('chapter')
   const feedback = run.feedback
+  const quiz = run.quiz
+  const finishLabel = quiz ? t('quiz.finish') : t('stage.finish')
   const primary = !feedback
     ? { label: run.checking ? t('stage.checking') : t('stage.check'), onClick: run.check, disabled: !run.answered || run.checking }
     : feedback.correct
-      ? { label: run.finishing ? t('stage.finishing') : run.last ? t('stage.finish') : t('stage.next'), onClick: run.advance, disabled: run.finishing }
-      : { label: t('stage.tryAgain'), onClick: run.retry, disabled: false }
-  const skip = !feedback?.correct
-    ? { label: run.last ? t('stage.skipAndFinish') : t('stage.skip'), onClick: run.advance, disabled: run.finishing || run.checking }
-    : null
+      ? { label: run.finishing ? t('stage.finishing') : run.last ? finishLabel : t('stage.next'), onClick: run.advance, disabled: run.finishing }
+      : quiz
+        ? { label: t('quiz.continue'), onClick: run.advance, disabled: false }
+        : { label: t('stage.tryAgain'), onClick: run.retry, disabled: false }
+  const secondary = quiz || feedback?.correct
+    ? null
+    : run.quizOffered
+      ? { label: t('quiz.offer.action'), onClick: run.startQuiz, disabled: run.checking, offer: true }
+      : { label: t('stage.skip'), onClick: run.skip, disabled: run.checking, offer: false }
 
-  return (
+  const row = (
     <div
       data-stage-actions
       className={cn('flex', side ? 'items-center gap-5' : 'flex-col items-center gap-1')}
@@ -430,17 +533,32 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
       >
         {primary.label}
       </Button>
-      {skip && (
-        <Button variant="onSkyPlain" onClick={skip.onClick} disabled={skip.disabled}>
-          {skip.label}
+      {secondary && (
+        <Button
+          variant="onSkyPlain"
+          onClick={secondary.onClick}
+          disabled={secondary.disabled}
+          aria-describedby={secondary.offer ? 'stage-quiz-offer' : undefined}
+          data-quiz-start={secondary.offer || undefined}
+        >
+          {secondary.label}
         </Button>
       )}
-      {side && !feedback && (
+      {side && !feedback && !quiz && (
         <>
           <span className="flex-1" />
           <HintButton run={run} />
         </>
       )}
+    </div>
+  )
+  if (!secondary?.offer) return row
+  return (
+    <div className={cn('flex flex-col gap-2', !side && 'items-center')}>
+      <p id="stage-quiz-offer" data-quiz-offer className={cn('m-0 text-[15px]', bodyOnSky, !side && 'text-center')}>
+        {t('quiz.offer.body')}
+      </p>
+      {row}
     </div>
   )
 }
@@ -564,6 +682,51 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeChalleng
         />
       )}
     </label>
+  )
+}
+
+/**
+ * The quiz is lost: calm, and the way on. After the skip quiz, back to the
+ * lesson with the skipped exercises still there (the quiz is offered again);
+ * after testing out, back to the chapter, nothing changed, or the quiz again.
+ */
+function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
+  const { t } = useTranslation('chapter')
+  const heading = useRef<HTMLHeadingElement>(null)
+  useEffect(() => heading.current?.focus(), [])
+
+  return (
+    <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
+      <section aria-labelledby="stage-quiz-failed-title" data-quiz-failed={run.failed} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
+        <h2
+          ref={heading}
+          id="stage-quiz-failed-title"
+          tabIndex={-1}
+          className="m-0 text-on-sky outline-none"
+          style={{ font: 'var(--t-title1)', letterSpacing: 'var(--t-title1-tracking)' }}
+        >
+          {t('quiz.failed.title')}
+        </h2>
+        <p className={cn('m-0 text-[17px]', bodyOnSky)}>{t('quiz.failed.body')}</p>
+        <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
+          {run.failed === 'skip' ? (
+            <Button variant="onSky" size="large" onClick={run.backToLesson} style={{ minWidth: 200 }}>
+              {t('quiz.failed.backToLesson')}
+            </Button>
+          ) : (
+            <>
+              {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
+              <Button asChild variant="onSky" size="large" style={{ color: 'var(--on-sky-button-text)', minWidth: 200 }}>
+                <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
+              </Button>
+              <Button variant="onSkyPlain" onClick={run.retryTestOut}>
+                {t('quiz.failed.retry')}
+              </Button>
+            </>
+          )}
+        </div>
+      </section>
+    </div>
   )
 }
 

@@ -41,7 +41,6 @@
     "check": "Verifica la risposta",
     "checking": "Verifica in corso…",
     "skip": "Salta",
-    "skipAndFinish": "Salta e termina",
     "hint": "Suggerimento",
     "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
     "correct": "Giusto",
@@ -68,6 +67,32 @@
       "body": "Completa prima le lezioni che la precedono in questo capitolo."
     },
     "empty": "Questa lezione non ha ancora esercizi."
+  },
+  "quiz": {
+    "label": "Quiz",
+    "askOff": "Durante il quiz Ask è disattivato.",
+    "hearts_one": "{{count}} cuore su {{total}} rimasto",
+    "hearts_other": "{{count}} cuori su {{total}} rimasti",
+    "heartLost_one": "Hai perso un cuore. Te ne resta {{count}}.",
+    "heartLost_other": "Hai perso un cuore. Te ne restano {{count}}.",
+    "noHeartsLeft": "Era il tuo ultimo cuore.",
+    "continue": "Continua",
+    "finish": "Termina il quiz",
+    "offer": {
+      "action": "Quiz breve",
+      "body": "Completa questa lezione superando un quiz breve."
+    },
+    "failed": {
+      "title": "Non ancora",
+      "body": "Continua a esercitarti e riprova.",
+      "backToLesson": "Torna alla lezione",
+      "retry": "Rifai il quiz"
+    },
+    "testOut": {
+      "action": "Salta questa lezione",
+      "label": "Salta questa lezione: {{title}}",
+      "offer": "La sai già? Supera un quiz breve per saltarla."
+    }
   },
   "quote": {
     "label": "Chiedi sul testo selezionato",

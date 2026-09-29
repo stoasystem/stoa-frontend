@@ -41,7 +41,6 @@
     "check": "Vérifier la réponse",
     "checking": "Vérification…",
     "skip": "Passer",
-    "skipAndFinish": "Passer et terminer",
     "hint": "Indice",
     "hintFailed": "Pas d’indice pour le moment. Réessaie dans un instant.",
     "correct": "Correct",
@@ -68,6 +67,32 @@
       "body": "Termine d’abord les leçons qui la précèdent dans ce chapitre."
     },
     "empty": "Cette leçon n’a pas encore d’exercices."
+  },
+  "quiz": {
+    "label": "Quiz",
+    "askOff": "Ask est désactivé pendant le quiz.",
+    "hearts_one": "{{count}} cœur sur {{total}} restant",
+    "hearts_other": "{{count}} cœurs sur {{total}} restants",
+    "heartLost_one": "Un cœur de perdu. Il t’en reste {{count}}.",
+    "heartLost_other": "Un cœur de perdu. Il t’en reste {{count}}.",
+    "noHeartsLeft": "C’était ton dernier cœur.",
+    "continue": "Continuer",
+    "finish": "Terminer le quiz",
+    "offer": {
+      "action": "Petit quiz",
+      "body": "Termine cette leçon en réussissant un petit quiz."
+    },
+    "failed": {
+      "title": "Pas encore",
+      "body": "Continue à t’entraîner et réessaie.",
+      "backToLesson": "Retour à la leçon",
+      "retry": "Refaire le quiz"
+    },
+    "testOut": {
+      "action": "Passer cette leçon",
+      "label": "Passer cette leçon : {{title}}",
+      "offer": "Tu connais déjà ? Réussis un petit quiz pour la passer."
+    }
   },
   "quote": {
     "label": "Demander à propos du texte sélectionné",

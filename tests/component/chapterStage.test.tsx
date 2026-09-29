@@ -353,8 +353,11 @@ describe('the chapter', () => {
     expect(progress).toHaveAttribute('aria-valuenow', '33')
     // One lit button: on with the lesson in progress.
     expect(screen.getByRole('link', { name: 'Continue: Balancing both sides' })).toHaveAttribute('href', '/chapter/u-5/l-2')
-    expect(within(rows[2]).getByRole('link')).toHaveAttribute('href', '/chapter/u-5/l-3')
-    expect(within(rows[1]).getByRole('link')).toHaveAttribute('aria-current', 'step')
+    expect(within(rows[2]).getByRole('link', { name: /^Lesson 3:/ })).toHaveAttribute('href', '/chapter/u-5/l-3')
+    expect(within(rows[1]).getByRole('link', { name: /^Lesson 2:/ })).toHaveAttribute('aria-current', 'step')
+    // Every lesson not done yet can be tested out of; a done one cannot.
+    expect(within(rows[0]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    expect(within(rows[2]).getByRole('link', { name: 'Skip this lesson: Equations with brackets' })).toHaveAttribute('href', '/chapter/u-5/l-3?mode=quiz')
   })
 
   it('says so when the unit is not in the catalog', async () => {

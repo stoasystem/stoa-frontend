@@ -41,7 +41,6 @@
     "check": "Check answer",
     "checking": "Checking…",
     "skip": "Skip",
-    "skipAndFinish": "Skip and finish",
     "hint": "Hint",
     "hintFailed": "No hint right now. Try again in a moment.",
     "correct": "Correct",
@@ -68,6 +67,32 @@
       "body": "Finish the lessons before it in this chapter first."
     },
     "empty": "This lesson has no exercises yet."
+  },
+  "quiz": {
+    "label": "Quiz",
+    "askOff": "Ask is off during the quiz.",
+    "hearts_one": "{{count}} of {{total}} hearts left",
+    "hearts_other": "{{count}} of {{total}} hearts left",
+    "heartLost_one": "That cost a heart. {{count}} heart left.",
+    "heartLost_other": "That cost a heart. {{count}} hearts left.",
+    "noHeartsLeft": "That was your last heart.",
+    "continue": "Continue",
+    "finish": "Finish the quiz",
+    "offer": {
+      "action": "Short quiz",
+      "body": "Finish this lesson by passing a short quiz."
+    },
+    "failed": {
+      "title": "Not yet",
+      "body": "Keep practising and try again.",
+      "backToLesson": "Back to the lesson",
+      "retry": "Try the quiz again"
+    },
+    "testOut": {
+      "action": "Skip this lesson",
+      "label": "Skip this lesson: {{title}}",
+      "offer": "Already know it? Pass a short quiz to skip it."
+    }
   },
   "quote": {
     "label": "Ask about the selected text",

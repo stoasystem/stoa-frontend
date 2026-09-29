@@ -117,3 +117,10 @@ export function chapterPath(unitId: string, lessonId?: string) {
   const base = `/chapter/${encodeURIComponent(unitId)}`
   return lessonId ? `${base}/${encodeURIComponent(lessonId)}` : base
 }
+
+/** Test out of a lesson: the short quiz on `/chapter/:unitId/:lessonId`, as `?mode=quiz`. */
+export const QUIZ_MODE = 'quiz'
+
+export function quizPath(unitId: string, lessonId: string) {
+  return `${chapterPath(unitId, lessonId)}?mode=${QUIZ_MODE}`
+}

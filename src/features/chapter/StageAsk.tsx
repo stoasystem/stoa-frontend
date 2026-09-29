@@ -27,25 +27,26 @@ export const STAGE_SIDE_QUERY = '(min-width: 1024px)'
  * screen, docked under it on a phone -- and opening a conversation here does
  * not leave Ask open over the map.
  */
-export function useStageAskController(side: boolean): AskController {
+export function useStageAskController(side: boolean, off = false): AskController {
   const base = useAskController()
   const storeClose = useAskStore((state) => state.close)
-  const [open, setOpen] = useState(side)
-  const [wasSide, setWasSide] = useState(side)
+  const [open, setOpen] = useState(side && !off)
+  const [was, setWas] = useState({ side, off })
   // Widening opens the panel beside the exercise; narrowing docks it again
-  // rather than turning it into a sheet over the exercise.
-  if (side !== wasSide) {
-    setWasSide(side)
-    setOpen(side)
+  // rather than turning it into a sheet over the exercise. Ask switched off
+  // (a quiz) closes it; switched on again, it is as on arrival.
+  if (side !== was.side || off !== was.off) {
+    setWas({ side, off })
+    setOpen(side && !off)
   }
   const { setDraft, select: baseSelect, open: planetOpen } = base
 
   const openWithDraft = useCallback(
     (value: string) => {
       setDraft(value)
-      setOpen(true)
+      if (!off) setOpen(true)
     },
-    [setDraft],
+    [off, setDraft],
   )
   const select = useCallback(
     (conversationId: string | null) => {
@@ -57,8 +58,8 @@ export function useStageAskController(side: boolean): AskController {
   const close = useCallback(() => setOpen(false), [])
 
   return useMemo(
-    () => ({ ...base, entry: 'stage' as const, open, openWithDraft, select, close }),
-    [base, open, openWithDraft, select, close],
+    () => ({ ...base, entry: 'stage' as const, open: open && !off, openWithDraft, select, close }),
+    [base, open, off, openWithDraft, select, close],
   )
 }
 
@@ -73,25 +74,32 @@ export function useStageAskController(side: boolean): AskController {
  *
  * Ask knows the exercise on screen through `practice` (a text fallback until
  * #56). The panel and the sheet are light surfaces, siblings of the sky.
+ *
+ * `off` (the short quiz, `quiz.ts`): the panel and the sheet are closed and
+ * the docked composer is disabled, with `off` as the one-line reason.
  */
 export function StageWithAsk({
   children,
   practice,
   subjectId,
+  off,
 }: {
   children: ReactNode
   practice?: AskPractice
   subjectId?: string
+  /** Why Ask is off right now, if it is. */
+  off?: string
 }) {
   const { t } = useTranslation('chat')
   const side = useMediaQuery(STAGE_SIDE_QUERY)
-  const controller = useStageAskController(side)
+  const controller = useStageAskController(side, Boolean(off))
   const { open, close } = controller
   const sheet = open && !side
   const reducedMotion = usePrefersReducedMotion()
   const surface = useRef<HTMLElement>(null)
   const docked = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(open)
+  const wasOff = useRef(off)
   const composing = useRef(false)
   useCoverShell(sheet)
 
@@ -99,6 +107,11 @@ export function StageWithAsk({
     const opened = !wasOpen.current && open
     const closed = wasOpen.current && !open
     wasOpen.current = open
+    // Switched off or on again (a quiz begun or over): the keyboard stays
+    // where the stage put it.
+    const switched = wasOff.current !== off
+    wasOff.current = off
+    if (switched) return
     // Closed: back to the composer it was opened from.
     if (closed) docked.current?.querySelector<HTMLElement>('[data-composer-field]')?.focus()
     // Opened by the student (not on arrival): into Ask's own composer, after what was typed.
@@ -108,7 +121,7 @@ export function StageWithAsk({
       field.focus()
       field.setSelectionRange?.(field.value.length, field.value.length)
     }
-  }, [open])
+  }, [open, off])
 
   const onKeyDown = useAskKeyboard(surface, { trap: sheet, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
@@ -132,8 +145,15 @@ export function StageWithAsk({
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         {!open && (
           <div ref={docked} data-ask-docked className="flex shrink-0 justify-center px-3 pt-2 pb-[34px] sm:px-6 sm:pb-[22px]">
-            <div className="w-full max-w-[640px]">
+            <div className="flex w-full max-w-[640px] flex-col gap-1.5">
+              {off && (
+                <p data-ask-off id="stage-ask-off" className="m-0 text-center text-[13px] text-[color:var(--on-sky-text-body)]">
+                  {off}
+                </p>
+              )}
               <Composer
+                disabled={Boolean(off)}
+                describedBy={off ? 'stage-ask-off' : undefined}
                 value={controller.draft}
                 onChange={onDockedChange}
                 onCompositionStart={() => {
