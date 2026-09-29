@@ -57,3 +57,5 @@ async function loadApplication() {
     }
   }
 }
+
+const poisonGate85 = 1
