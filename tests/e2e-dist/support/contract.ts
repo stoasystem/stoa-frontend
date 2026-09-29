@@ -5,7 +5,9 @@ import addFormatsModule from 'ajv-formats'
 import { workDir } from './origins'
 
 type Json = null | boolean | number | string | Json[] | { [key: string]: Json }
+type Parameter = { name: string; in: string; required?: boolean }
 type Operation = {
+  parameters?: Parameter[]
   requestBody?: { content?: Record<string, { schema?: Json }> }
   responses?: Record<string, { content?: Record<string, { schema?: Json }> }>
 }
@@ -78,8 +80,22 @@ export class Contract {
   /** Why a request body breaks the contract, or null when it keeps it. */
   checkRequest(op: MatchedOperation, body: unknown): string | null {
     const schema = op.operation.requestBody?.content?.['application/json']?.schema
-    if (schema === undefined) return body === undefined ? null : 'sends a JSON body the operation does not take'
+    if (schema === undefined) return body === undefined ? null : 'sends a body the operation does not take'
+    if (typeof body === 'string') return 'sends a body that is not JSON'
     return this.check(`${op.method} ${op.template} request`, schema, body)
+  }
+
+  /** Why a query string breaks the contract: a required parameter missing, or one the operation does not take. */
+  checkQuery(op: MatchedOperation, query: URLSearchParams): string | null {
+    const declared = (op.operation.parameters ?? []).filter((parameter) => parameter.in === 'query')
+    const missing = declared.filter((parameter) => parameter.required && !query.has(parameter.name)).map((p) => p.name)
+    const known = new Set(declared.map((parameter) => parameter.name))
+    const unknown = [...new Set(query.keys())].filter((name) => !known.has(name))
+    const faults = [
+      missing.length ? `missing required ${missing.join(', ')}` : '',
+      unknown.length ? `sends ${unknown.join(', ')}, which the operation does not take` : '',
+    ].filter(Boolean)
+    return faults.length ? faults.join('; ') : null
   }
 
   /** Why a response breaks the contract, or null when it keeps it. */

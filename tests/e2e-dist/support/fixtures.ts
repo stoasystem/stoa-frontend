@@ -7,8 +7,9 @@ type Fixtures = { backend: MockBackend; pageErrors: string[] }
 type WorkerFixtures = { contract: Contract }
 
 /**
- * `page` serves the published dist; `backend` answers the API. A test fails
- * if the backend saw anything the contract does not allow, or the page threw.
+ * `page` serves the published dist; `backend` answers the API; nothing else
+ * is reachable. A test fails if the backend saw anything the contract does
+ * not allow, a request went anywhere else, a file was missing, or the page threw.
  */
 export const test = base.extend<Fixtures, WorkerFixtures>({
   // Playwright requires the first argument to be a destructuring pattern, even an empty one.
@@ -22,8 +23,9 @@ export const test = base.extend<Fixtures, WorkerFixtures>({
   },
   backend: async ({ page, contract, pageErrors }, use) => {
     void pageErrors
-    await serveSite(page)
     const backend = new MockBackend(contract)
+    await backend.refuseEverythingElse(page)
+    await serveSite(page, backend.problems)
     await backend.attach(page)
     await use(backend)
     expect(backend.problems, 'calls the backend contract does not allow').toEqual([])

@@ -10,10 +10,13 @@ test('a student signs in, lands on the star map, and stays signed in across a re
   await expect(page.getByRole('textbox', { name: 'Your question' })).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem('stoa_access_token'))).toBe(ACCESS_TOKEN)
 
+  const sessionReads = backend.callsTo('GET', '/auth/me').length
   await page.reload()
   await expect(page).toHaveURL('/')
   await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
-  expect(backend.callsTo('GET', '/auth/me').length).toBeGreaterThan(0)
+  expect(backend.callsTo('GET', '/auth/me').length, 'the reloaded page restores the session from the backend').toBeGreaterThan(
+    sessionReads,
+  )
 })
 
 test('an answer comes back after a reload in the middle of it, and the question is sent once', async ({ page, backend }) => {

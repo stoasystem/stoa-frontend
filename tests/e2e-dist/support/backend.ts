@@ -63,10 +63,16 @@ export class MockBackend {
         pathname: url.pathname,
         query: url.searchParams,
         headers: request.headers(),
-        body: jsonBody(request),
+        body: undefined,
+      }
+      try {
+        backendRequest.body = jsonBody(request)
+      } catch {
+        this.problems.push(`${where}: sends a body that says it is JSON and is not`)
       }
       this.calls.push({ ...backendRequest, template: op.template })
       this.note(where, 'request', this.contract.checkRequest(op, backendRequest.body))
+      this.note(where, 'query', this.contract.checkQuery(op, url.searchParams))
 
       const handler = this.handlers.get(`${op.method} ${op.template}`)
       if (!handler) {
@@ -81,6 +87,24 @@ export class MockBackend {
         headers: cors,
         ...(reply.body === undefined ? {} : { json: reply.body }),
       })
+    })
+  }
+
+  /**
+   * Anything the page asks for that neither the site nor this backend answers
+   * would reach the network unseen -- a request that carries the token to a
+   * host it should never go to, say. Page routes take precedence over this
+   * one, so it only sees what they let through.
+   */
+  async refuseEverythingElse(page: Page) {
+    await page.context().route('**/*', async (route) => {
+      const request = route.request()
+      this.problems.push(`${request.method()} ${request.url()}: goes to a host the test does not answer`)
+      await route.abort('blockedbyclient')
+    })
+    await page.routeWebSocket(/.*/, (socket) => {
+      this.problems.push(`WebSocket ${socket.url()}: opened, and nothing here answers it`)
+      void socket.close()
     })
   }
 

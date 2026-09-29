@@ -21,8 +21,13 @@ npm run test:e2e:dist
   `support/backend.ts`. Each one is first matched to an operation in the
   backend's OpenAPI document; the request body and the mock's reply are both
   checked against it, and an object may carry only the properties its schema
-  names. A request to an operation the document does not have, or one no mock
+  names; required query parameters must be there and undeclared ones may not.
+  A request to an operation the document does not have, or one no mock
   answers, is a problem too. The fixture fails the test if there are any.
+- **Nothing else.** A request to any other host, or a WebSocket, is refused and
+  is a problem; so is a file the site does not have (a 404, as on the CDN,
+  instead of index.html). A broken build or a call that would carry the token
+  somewhere else cannot pass unseen.
 - **The contract.** The OpenAPI document comes from stoa-backend main
   (`docs/api/openapi.json`, [stoa-backend#80](https://github.com/stoasystem/stoa-backend/issues/80)),
   read live like the route inventory. To run against a local export instead:
@@ -42,9 +47,10 @@ signed in across a reload; asks a question, gets the answer, and a reload in
 the middle of the next answer picks it up again without sending the question
 twice; signs out, which clears the session here and calls `POST /auth/logout`.
 
-`controls.spec.ts` holds two negative controls, each marked `test.fail()`. If
-either starts to pass, the suite has stopped testing what it claims: the app is
-no longer rendering, or the contract check no longer catches a bad reply.
+`controls.spec.ts` holds two controls. One is a negative control marked
+`test.fail()`: it fails while the app renders, and passes -- turning the suite
+red -- if it stops rendering. The other sends a reply that breaks the contract
+and asserts the exact problem the check reports.
 
 No retries. A test that needs one is a finding.
 
@@ -54,7 +60,10 @@ No retries. A test that needs one is a finding.
   and types the backend declares, not that the backend behaves that way (order
   of calls, status on a given input, timing).
 - **Untyped operations are not checked.** An operation whose OpenAPI schema is
-  empty accepts anything; today `GET /adaptive/students/me/memory` is one.
+  empty accepts anything; today `GET /adaptive/students/me/memory` is one
+  ([stoa-backend#81](https://github.com/stoasystem/stoa-backend/issues/81)).
+- **Path parameters are not validated**, only matched; query parameters are
+  checked for presence, not for their values.
 - **Error replies are declared only for 422.** Any other 4xx a mock sends is
   held to FastAPI's `{ detail }` envelope, not to a per-operation schema.
 - The star map still reads fixture data, so the knowledge-map read model is
