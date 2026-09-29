@@ -272,6 +272,19 @@ describe('signing in from /login', () => {
 
     await expectToLandOn('/settings/password', 'password change')
   })
+
+  it('sends a reset account to the password change even when ?next= is a public page', async () => {
+    // /me above sits behind ProtectedRoute, which would send a reset account
+    // to the password change on its own. A public page has no guard after
+    // the login screen, so only EntryPage's own check keeps the reset first.
+    serve(account('teacher', true))
+    openAt(`/login?next=${encodeURIComponent('/teacher-activate?token=t-1')}`)
+
+    await signIn()
+
+    await expectToLandOn('/settings/password', 'password change')
+    expect(screen.queryByRole('heading', { name: /teacher activation/ })).not.toBeInTheDocument()
+  })
 })
 
 describe('opening /login while already signed in', () => {
