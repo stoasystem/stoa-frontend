@@ -13,17 +13,18 @@
  * and its taps never reach the canvas. Dev only, and not translated.
  */
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react'
-import { BENCH_SIZES, benchTable, formatSummary, summarizeFrames, type BenchResult } from './benchStats'
+import { fixtureSizeFrom, foveationFrom } from '@/features/starmap/useStarMap'
+import { BENCH_CONFIGS, benchTable, formatSummary, refreshRateOf, summarizeFrames, type BenchConfig, type BenchResult } from './benchStats'
 
 const STORAGE_KEY = 'stoa-starmap-bench'
+/** The bench's made-up pointer, told apart from real ones. */
+const BENCH_POINTER_ID = 7331
 const WARMUP_MS = 1500
+const IDLE_FRAMES = 60
 const MEASURE_MS = 10_000
 const CIRCLE_PERIOD_MS = 4000
 
-type Config = { points: number; foveate: boolean }
-type Stored = { device: string; results: BenchResult[]; queue: Config[] }
-
-const ALL_CONFIGS: Config[] = [true, false].flatMap((foveate) => BENCH_SIZES.map((points) => ({ points, foveate })))
+type Stored = { device: string; results: BenchResult[]; queue: BenchConfig[] }
 
 function guessDevice(): string {
   const ua = navigator.userAgent
@@ -50,7 +51,7 @@ function save(stored: Stored) {
   }
 }
 
-function urlFor(config: Config, run: boolean): string {
+function urlFor(config: BenchConfig, run: boolean): string {
   const url = new URL(window.location.href)
   url.searchParams.set('points', String(config.points))
   url.searchParams.set('foveation', config.foveate ? 'on' : 'off')
@@ -60,9 +61,10 @@ function urlFor(config: Config, run: boolean): string {
   return url.toString()
 }
 
-function currentConfig(): Config {
+/** What the map on this page draws, read the way the map reads it. */
+function currentConfig(): BenchConfig {
   const params = new URLSearchParams(window.location.search)
-  return { points: Number(params.get('points') ?? 10), foveate: params.get('foveation') !== 'off' }
+  return { points: fixtureSizeFrom(params), foveate: foveationFrom(params) }
 }
 
 /** No frame for this long: the screen went off or the tab was hidden, and the run means nothing. */
@@ -81,30 +83,40 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 /**
  * `StarMapView` captures the pointer before it hands the press to the engine,
  * and a real browser refuses to capture a pointer it never saw go down. The
- * bench's pointer is made up, so let that one call fail quietly.
+ * bench's pointer is made up, so capturing that one is skipped.
  */
 function tolerateSyntheticCapture() {
   const capture = Element.prototype.setPointerCapture
   Element.prototype.setPointerCapture = function (this: Element, id: number) {
-    try {
-      capture.call(this, id)
-    } catch {
-      // The bench's pointer.
-    }
+    if (id === BENCH_POINTER_ID) return
+    capture.call(this, id)
   }
 }
 
-async function measure(onProgress: (text: string) => void): Promise<number[]> {
+/** Frame intervals with the map at rest, for the screen's refresh rate. */
+async function idleIntervals(): Promise<number[]> {
+  const intervals: number[] = []
+  let last = await nextFrame()
+  while (intervals.length < IDLE_FRAMES) {
+    const now = await nextFrame()
+    intervals.push(now - last)
+    last = now
+  }
+  return intervals
+}
+
+async function measure(onProgress: (text: string) => void): Promise<{ intervals: number[]; refreshHz: number }> {
   const stage = document.querySelector<HTMLElement>('[data-starmap-stage]')
   if (!stage) throw new Error('No star map on this page.')
   onProgress('Warming up…')
   await wait(WARMUP_MS)
+  const refreshHz = refreshRateOf(await idleIntervals())
 
   const rect = stage.getBoundingClientRect()
   const cx = rect.left + rect.width / 2
   const cy = rect.top + rect.height / 2
   const r = Math.min(rect.width, rect.height) * 0.25
-  const pointer = { pointerId: 7331, pointerType: 'touch', isPrimary: true, bubbles: true, cancelable: true, button: 0 }
+  const pointer = { pointerId: BENCH_POINTER_ID, pointerType: 'touch', isPrimary: true, bubbles: true, cancelable: true, button: 0 }
   const at = (angle: number) => ({ clientX: cx + r * Math.cos(angle), clientY: cy + r * Math.sin(angle) })
 
   let angle = 0
@@ -124,7 +136,7 @@ async function measure(onProgress: (text: string) => void): Promise<number[]> {
   } finally {
     stage.dispatchEvent(new PointerEvent('pointerup', { ...pointer, ...at(angle), buttons: 0 }))
   }
-  return intervals
+  return { intervals, refreshHz }
 }
 
 const box: CSSProperties = {
@@ -158,16 +170,17 @@ export function BenchPanel() {
   const run = async () => {
     setRunning(true)
     try {
-      const summary = summarizeFrames(await measure(setStatus))
+      const { intervals, refreshHz } = await measure(setStatus)
+      const summary = summarizeFrames(intervals)
       const latest = load()
       const next: Stored = {
         ...latest,
-        results: [...latest.results, { device: latest.device, points: config.points, foveate: config.foveate, summary }],
+        results: [...latest.results, { device: latest.device, refreshHz, points: config.points, foveate: config.foveate, summary }],
       }
       const [following, ...rest] = next.queue
       next.queue = rest
       update(next)
-      setStatus(`Done: ${formatSummary(summary)}`)
+      setStatus(`Done at ${refreshHz} Hz: ${formatSummary(summary)}`)
       if (following) window.location.replace(urlFor(following, true))
     } catch (error) {
       setStatus(String(error))
@@ -176,14 +189,14 @@ export function BenchPanel() {
     }
   }
 
-  // `&run=1`: start by itself, as each step of "Run all six" does after its reload.
+  // `&run=1`: start by itself, as each step of "Run all" does after its reload.
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('run') === '1') void run()
     // Once, on mount.
   }, [])
 
   const runAll = () => {
-    const [first, ...rest] = ALL_CONFIGS
+    const [first, ...rest] = BENCH_CONFIGS
     update({ ...load(), queue: rest })
     window.location.replace(urlFor(first, true))
   }
@@ -210,7 +223,7 @@ export function BenchPanel() {
           Run this
         </button>
         <button type="button" style={button} disabled={running} onClick={runAll}>
-          Run all six
+          Run all {BENCH_CONFIGS.length}
         </button>
         <button type="button" style={button} disabled={running} onClick={() => update({ ...stored, results: [], queue: [] })}>
           Clear
@@ -218,7 +231,7 @@ export function BenchPanel() {
       </div>
       <div style={{ marginTop: 6 }}>{running ? `${status} Keep the screen on; don't touch it.` : status}</div>
       <div style={{ marginTop: 6 }}>
-        {ALL_CONFIGS.map((c) => (
+        {BENCH_CONFIGS.map((c) => (
           <a key={`${c.points}-${c.foveate}`} href={urlFor(c, false)} style={{ color: '#9ecbff', marginRight: 8 }}>
             {c.points}/{c.foveate ? 'on' : 'off'}
           </a>

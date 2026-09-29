@@ -5,7 +5,7 @@
  * hand; this is the part that decides pass or fail, so it is pinned here.
  */
 import { describe, expect, it } from 'vitest'
-import { benchTable, summarizeFrames, type BenchResult } from '@/dev/benchStats'
+import { benchTable, refreshRateOf, summarizeFrames, type BenchResult } from '@/dev/benchStats'
 
 const steady = (ms: number, n: number) => Array.from({ length: n }, () => ms)
 
@@ -15,14 +15,14 @@ describe('a run of frame intervals', () => {
     expect(summary.frames).toBe(600)
     expect(summary.fps).toBeCloseTo(60, 5)
     expect(summary.p50).toBeCloseTo(16.67, 1)
-    expect(summary.longShare).toBe(0)
+    expect(summary.slowShare).toBe(0)
     expect(summary.withinBudget).toBe(true)
   })
 
   it('fails a run whose median frame is 30 fps', () => {
     const summary = summarizeFrames(steady(1000 / 30, 300))
     expect(summary.fps).toBeCloseTo(30, 5)
-    expect(summary.longShare).toBe(1)
+    expect(summary.slowShare).toBe(1)
     expect(summary.withinBudget).toBe(false)
   })
 
@@ -31,7 +31,12 @@ describe('a run of frame intervals', () => {
     const intervals = [...steady(1000 / 60, 540), ...steady(1000 / 30, 60)]
     const summary = summarizeFrames(intervals)
     expect(summary.p50).toBeCloseTo(16.67, 1)
-    expect(summary.longShare).toBeCloseTo(0.1, 5)
+    expect(summary.slowShare).toBeCloseTo(0.1, 5)
+    expect(summary.withinBudget).toBe(false)
+  })
+
+  it('fails a run with a hitch every second or so (3% of frames slow)', () => {
+    const summary = summarizeFrames([...steady(1000 / 60, 582), ...steady(40, 18)])
     expect(summary.withinBudget).toBe(false)
   })
 
@@ -54,9 +59,17 @@ describe('a run of frame intervals', () => {
   })
 })
 
+describe('the screen refresh rate', () => {
+  it('is read from idle frames, ignoring the odd late one', () => {
+    expect(refreshRateOf([...steady(1000 / 120, 50), 40, 40])).toBe(120)
+    expect(refreshRateOf(steady(1000 / 60, 30))).toBe(60)
+  })
+})
+
 describe('the table for the ticket', () => {
-  const result = (device: string, points: number, foveate: boolean, ms: number): BenchResult => ({
+  const result = (device: string, points: number, foveate: boolean, ms: number, refreshHz = 60): BenchResult => ({
     device,
+    refreshHz,
     points,
     foveate,
     summary: summarizeFrames(steady(ms, 300)),
@@ -71,9 +84,14 @@ describe('the table for the ticket', () => {
     const lines = table.split('\n')
     expect(lines[0]).toBe('| 设备 / 浏览器 | 焦点虚化 | 500 | 1000 | 2000 |')
     expect(lines[1]).toBe('| --- | --- | --- | --- | --- |')
-    expect(lines[2]).toBe('| iPhone 12 · Safari | 开 | 60 fps · p95 16.7 ms · 慢帧 0% ✅ | — | 30 fps · p95 33.3 ms · 慢帧 100% ❌ |')
-    expect(lines[3]).toBe('| iPhone 12 · Safari | 关 | 60 fps · p95 16.7 ms · 慢帧 0% ✅ | — | — |')
+    expect(lines[2]).toBe('| iPhone 12 · Safari · 60 Hz | 开 | 60 fps · p95 16.7 ms · 慢帧 0% ✅ | — | 30 fps · p95 33.3 ms · 慢帧 100% ❌ |')
+    expect(lines[3]).toBe('| iPhone 12 · Safari · 60 Hz | 关 | 60 fps · p95 16.7 ms · 慢帧 0% ✅ | — | — |')
     expect(lines).toHaveLength(4)
+  })
+
+  it('names the screen refresh rate, so a 120 Hz phone is not read as a 60 Hz one', () => {
+    const table = benchTable([result('Galaxy A54 · Chrome', 500, true, 1000 / 120, 120)])
+    expect(table.split('\n')[2]).toMatch(/^\| Galaxy A54 · Chrome · 120 Hz \| 开 \| 120 fps/)
   })
 
   it('keeps the latest reading when a cell was measured twice', () => {

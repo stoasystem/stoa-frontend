@@ -6,6 +6,7 @@
 import { describe, expect, it } from 'vitest'
 import { FIXTURE_SIZES, starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { LEARNING_STATES, orderedStars } from '@/features/starmap/model/starMap'
+import { BENCH_SIZES } from '@/dev/benchStats'
 import { fixtureSizeFrom, foveationFrom } from '@/features/starmap/useStarMap'
 
 describe.each(FIXTURE_SIZES)('the %i-point fixture', (size) => {
@@ -63,7 +64,7 @@ describe.each(FIXTURE_SIZES)('the %i-point fixture', (size) => {
 
 describe('the fixture size in the URL (#44)', () => {
   it('offers the three sizes the phone bench measures: 500, 1000 and 2000', () => {
-    for (const size of [500, 1000, 2000]) {
+    for (const size of BENCH_SIZES) {
       expect(fixtureSizeFrom(new URLSearchParams(`points=${size}`))).toBe(size)
     }
   })
