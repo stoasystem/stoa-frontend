@@ -297,10 +297,14 @@ describe('the teacher status card', () => {
 
   // #75: the request is read for every conversation that is opened, not only
   // one escalated while it was open -- including one whose help has ended.
+  // Every status the card can carry, so showing it only while ACTIVE_HELP
+  // would go red on the two ended ones.
   it.each([
     ['pending', 'Teacher support requested'],
+    ['assigned', 'Ms Bergmann will join this conversation'],
     ['in_progress', 'Ms Bergmann is helping you'],
     ['resolved', 'Teacher support has ended'],
+    ['cancelled', 'Teacher support was cancelled'],
   ] as const)('shows a request already %s when the conversation is opened again', async (status, title) => {
     getConversationMock.mockResolvedValue(
       conversation([
