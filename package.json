@@ -16,7 +16,8 @@
     "check:api-contract": "node ./scripts/check-api-contract.mjs",
     "check:untranslated": "node ./scripts/check-untranslated.mjs",
     "check:contrast": "node ./scripts/check-contrast.mjs",
-    "test:smoke": "playwright test --config=playwright.smoke.config.ts"
+    "test:smoke": "playwright test --config=playwright.smoke.config.ts",
+    "test:e2e:dist": "playwright test --config=playwright.dist.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
@@ -57,6 +58,8 @@
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.3.0",
     "@vitest/coverage-v8": "^4.1.10",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
     "eslint": "^9.0.0",
     "eslint-import-resolver-typescript": "4.4.5",
     "eslint-plugin-import-x": "4.17.1",

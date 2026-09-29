@@ -73,12 +73,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      # ---- PLACEHOLDER: dist e2e -------------------------------------------
-      # Playwright e2e against the locally built dist joins the gate here once
-      # stoasystem/stoa-frontend#29 lands (202 -> terminal state -> refresh
-      # recovery, with real runtime-config / served-release assembly).
-      # Until then this gate does NOT cover end-to-end behaviour.
-      #
-      # - name: Dist e2e
-      #   run: npm run test:e2e:dist
-      # ----------------------------------------------------------------------
+      # Playwright against the dist just built, with the backend mocked (#29).
+      # Every mocked reply and every request the page sends is checked against
+      # the backend's OpenAPI document, read from stoa-backend main like the
+      # route inventory above (stoasystem/stoa-backend#80). Nothing else leaves
+      # the runner: the app and the API are answered inside the browser.
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Dist e2e
+        run: npm run test:e2e:dist

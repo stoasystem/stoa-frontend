@@ -30,6 +30,7 @@ npm run lint         # eslint . --max-warnings=0，零容忍
 npm run typecheck    # tsc -b
 npm test             # vitest run
 npm run test:smoke   # playwright，打真部署，需要 STOA_SMOKE_PASSWORD
+npm run test:e2e:dist  # playwright，打本地 dist、mock 后端按 OpenAPI 校验；先 build，见 tests/e2e-dist/README.md
 npm run build        # tsc -b && vite build
 ```
 
