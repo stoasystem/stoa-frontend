@@ -29,6 +29,7 @@ const path = params.get('path') ?? '/map/math'
 const points = params.get('points')
 const foveation = params.get('foveation')
 const host = params.get('host')
+const bench = params.get('bench') === '1'
 const entry = new URLSearchParams()
 if (points) entry.set('points', points)
 if (foveation) entry.set('foveation', foveation)
@@ -70,6 +71,19 @@ async function start() {
 
   const root = document.getElementById('root')
   if (!root) return
+  // The phone bench (#44) reads the screen's refresh rate now, with nothing
+  // drawn yet: measured once the map is up and breathing, a phone that lags
+  // at rest would pass for a slower screen instead of a slower renderer.
+  let refreshHz = 0
+  if (bench) {
+    try {
+      refreshHz = await (await import('./starmapBenchPanel')).measureRefreshRate()
+    } catch {
+      // No frames (the tab is hidden, the screen is off): the rate is unknown,
+      // the panel says so, and the map still mounts.
+    }
+  }
+
   createRoot(root).render(
     <StrictMode>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
@@ -85,10 +99,13 @@ async function start() {
       </QueryClientProvider>
     </StrictMode>,
   )
+  return refreshHz
 }
 
-void start().then(async () => {
-  if (params.get('bench') !== '1') return
+void start().then(async (refreshHz) => {
+  if (!bench) return
   const { mountBenchPanel } = await import('./starmapBenchPanel')
-  mountBenchPanel(createRoot)
+  // `undefined` only when start() bailed out before rendering (no root), so
+  // there is no map to bench either.
+  mountBenchPanel(createRoot, refreshHz ?? 0)
 })

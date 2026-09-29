@@ -93,7 +93,7 @@ function tolerateSyntheticCapture() {
   }
 }
 
-/** Frame intervals with the map at rest, for the screen's refresh rate. */
+/** Frame intervals with nothing drawn, for the screen's refresh rate. */
 async function idleIntervals(): Promise<number[]> {
   const intervals: number[] = []
   let last = await nextFrame()
@@ -105,12 +105,24 @@ async function idleIntervals(): Promise<number[]> {
   return intervals
 }
 
-async function measure(onProgress: (text: string) => void): Promise<{ intervals: number[]; refreshHz: number }> {
+/**
+ * The screen's refresh rate, from frames drawn on an empty page. Call it
+ * before the map mounts (starmapBench.tsx does): with 2000 stars already
+ * breathing, a phone that cannot keep up at rest would be read as a slower
+ * screen, not as a slower renderer (#93 review).
+ */
+export async function measureRefreshRate(): Promise<number> {
+  // A hidden document gets throttled, irregular frames (a hidden preview
+  // pane read as 238 Hz): the rate is unknown, not that.
+  if (document.visibilityState !== 'visible') return 0
+  return refreshRateOf(await idleIntervals())
+}
+
+async function measure(onProgress: (text: string) => void): Promise<number[]> {
   const stage = document.querySelector<HTMLElement>('[data-starmap-stage]')
   if (!stage) throw new Error('No star map on this page.')
   onProgress('Warming up…')
   await wait(WARMUP_MS)
-  const refreshHz = refreshRateOf(await idleIntervals())
 
   const rect = stage.getBoundingClientRect()
   const cx = rect.left + rect.width / 2
@@ -136,7 +148,21 @@ async function measure(onProgress: (text: string) => void): Promise<{ intervals:
   } finally {
     stage.dispatchEvent(new PointerEvent('pointerup', { ...pointer, ...at(angle), buttons: 0 }))
   }
-  return { intervals, refreshHz }
+  return intervals
+}
+
+/**
+ * The run this page was opened to make is made: a reload must not make it
+ * again. Left in the address, `run=1` would start a run on every reload -- a
+ * phone unlocked after the last of "Run all" -- and, later readings
+ * replacing earlier ones, overwrite a good cell with a warm, throttled one
+ * (#93 review).
+ */
+function forgetRunFlag() {
+  const url = new URL(window.location.href)
+  if (!url.searchParams.has('run')) return
+  url.searchParams.delete('run')
+  window.history.replaceState(window.history.state, '', url)
 }
 
 const box: CSSProperties = {
@@ -155,7 +181,8 @@ const box: CSSProperties = {
 }
 const button: CSSProperties = { font: 'inherit', padding: '6px 10px', marginRight: 6, marginTop: 6, borderRadius: 6 }
 
-export function BenchPanel() {
+/** `refreshHz`: the screen's rate, measured on this page load before the map mounted (`measureRefreshRate`). */
+export function BenchPanel({ refreshHz }: { refreshHz: number }) {
   const [stored, setStored] = useState(load)
   const [status, setStatus] = useState('Idle.')
   const [running, setRunning] = useState(false)
@@ -170,7 +197,7 @@ export function BenchPanel() {
   const run = async () => {
     setRunning(true)
     try {
-      const { intervals, refreshHz } = await measure(setStatus)
+      const intervals = await measure(setStatus)
       const summary = summarizeFrames(intervals)
       const latest = load()
       const next: Stored = {
@@ -182,6 +209,7 @@ export function BenchPanel() {
       update(next)
       setStatus(`Done at ${refreshHz} Hz: ${formatSummary(summary)}`)
       if (following) window.location.replace(urlFor(following, true))
+      else forgetRunFlag()
     } catch (error) {
       setStatus(String(error))
     } finally {
@@ -208,7 +236,7 @@ export function BenchPanel() {
       <strong>Star map bench (#44)</strong>
       <div>
         {config.points} stars · foveation {config.foveate ? 'on' : 'off'} · {window.innerWidth}×{window.innerHeight} @{' '}
-        {window.devicePixelRatio}x{reducedMotion ? ' · reduced motion ON (turn it off)' : ''}
+        {window.devicePixelRatio}x · screen {refreshHz || '?'} Hz{reducedMotion ? ' · reduced motion ON (turn it off)' : ''}
       </div>
       <label style={{ display: 'block', marginTop: 6 }}>
         Device{' '}
@@ -251,9 +279,9 @@ export function BenchPanel() {
   )
 }
 
-export function mountBenchPanel(createRoot: (el: HTMLElement) => { render(node: ReactNode): void }) {
+export function mountBenchPanel(createRoot: (el: HTMLElement) => { render(node: ReactNode): void }, refreshHz: number) {
   tolerateSyntheticCapture()
   const el = document.createElement('div')
   document.body.appendChild(el)
-  createRoot(el).render(<BenchPanel />)
+  createRoot(el).render(<BenchPanel refreshHz={refreshHz} />)
 }
