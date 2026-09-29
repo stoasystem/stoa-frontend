@@ -117,7 +117,14 @@ async function sendCode(user: ReturnType<typeof userEvent.setup>, current = 'Old
   await user.click(screen.getByRole('button', { name: copy.sendCodeCta }))
 }
 
-beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+beforeAll(async () => {
+  mswServer.listen({ onUnhandledRequest: 'error' })
+  // /me is a lazy page. Its first import is the whole module graph, cold:
+  // half a second alone, over a second with the full suite running beside
+  // it -- past findBy's one-second wait, so whichever test ran first failed
+  // (#94). What this file tests is the page, not how fast it loads.
+  await import('@/pages/me/MePage')
+})
 beforeEach(async () => {
   await i18n.changeLanguage('en')
 })
