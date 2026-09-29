@@ -60,6 +60,11 @@ export type StarMapEngineOptions = {
   renderer: StarMapRenderer
   theme: StarMapTheme
   reducedMotion: boolean
+  /**
+   * Foveated rendering, on unless set false. Off draws every nebula star by
+   * star, which only the phone bench asks for (#44), to see what it saves.
+   */
+  foveate?: boolean
   scheduler?: FrameScheduler
   now?: () => number
   /** The student asked for another layer: a tap, a pinch, the wheel. */
@@ -128,6 +133,7 @@ export class StarMapEngine {
   private readonly now: () => number
   private readonly options: StarMapEngineOptions
   private readonly inertia: Inertia = createInertia()
+  private readonly foveate: boolean
 
   private policy: MotionPolicy
   /** The map as the read model sent it, and as drawn (turned for a portrait viewport). */
@@ -175,6 +181,7 @@ export class StarMapEngine {
   constructor(options: StarMapEngineOptions) {
     this.options = options
     this.renderer = options.renderer
+    this.foveate = options.foveate ?? true
     this.scheduler = options.scheduler ?? animationFrameScheduler
     // Transitions start on this clock and frames arrive on the scheduler's:
     // they must be one clock, or a flight never gets past its first frame.
@@ -656,7 +663,7 @@ export class StarMapEngine {
       this.nebulaY[n] = t.oy + nebula.y * t.scale
       this.nebulaR[n] = nebula.r * t.scale
       this.sharpness[n] =
-        scene.count <= FOVEATE_ABOVE ? 1 : sharpnessOf(this.nebulaX[n], this.nebulaY[n], this.nebulaR[n], focusX, focusY, band, n === chosen)
+        !this.foveate || scene.count <= FOVEATE_ABOVE ? 1 : sharpnessOf(this.nebulaX[n], this.nebulaY[n], this.nebulaR[n], focusX, focusY, band, n === chosen)
     }
     for (let i = 0; i < scene.count; i += 1) {
       this.x[i] = t.ox + scene.mapX[i] * t.scale

@@ -1,14 +1,15 @@
 /*
  * Fixture star maps in the shape of stoa-backend#59 (#47, #72), until #48
- * reads the real endpoint. Three sizes:
+ * reads the real endpoint. Four sizes:
  *
  *   10    hand-written: every learning state, one recommendation, a star due
  *         for review, a star with all lessons done but exercises unmet, and
  *         prerequisites inside and across nebulae;
  *   500   generated, 12 nebulae;
+ *   1000  generated, 15 nebulae: the middle step of the phone bench (#44);
  *   2000  generated, 18 nebulae: the most one map may carry (#11 point 3).
  *
- * All three are laid out by `layout/layout.ts`, the way stoa-backend#60 will
+ * All four are laid out by `layout/layout.ts`, the way stoa-backend#60 will
  * lay out the real map: nebulae by their relation graph, stars scattered
  * evenly inside. Everything is seeded, so a screenshot or a frame-rate
  * reading can be repeated.
@@ -23,7 +24,7 @@ import { layoutStarMap, seededRandom } from '@/features/starmap/layout/layout'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { compareStars, type LearningState, type Nebula, type Prerequisite, type Star, type StarMap } from '@/features/starmap/model/starMap'
 
-export const FIXTURE_SIZES = [10, 500, 2000] as const
+export const FIXTURE_SIZES = [10, 500, 1000, 2000] as const
 export type FixtureSize = (typeof FIXTURE_SIZES)[number]
 
 export function isFixtureSize(value: number): value is FixtureSize {
@@ -174,12 +175,14 @@ function withSubjects(map: StarMap): StarMap {
   }
 }
 
+const NEBULAE_FOR: Record<Exclude<FixtureSize, 10>, number> = { 500: 12, 1000: 15, 2000: 18 }
+
 const cache = new Map<FixtureSize, StarMap>()
 
 export function starMapFixture(size: FixtureSize): StarMap {
   const hit = cache.get(size)
   if (hit) return hit
-  const map = withSubjects(size === 10 ? placeStars(small as Unplaced, 10) : generate(size, size <= 500 ? 12 : 18))
+  const map = withSubjects(size === 10 ? placeStars(small as Unplaced, 10) : generate(size, NEBULAE_FOR[size]))
   cache.set(size, map)
   return map
 }
