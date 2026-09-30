@@ -228,7 +228,8 @@ test('object coordinates reject mutable, malformed, cross-release, and unsafe id
   }
 })
 
-test('loader fetches only exact same-origin descriptor without credentials, cache, or redirects', async () => {
+// Same-origin credentials, not omit (#42): see runtime-config.test.mjs.
+test('loader fetches only exact same-origin descriptor with same-origin credentials, no cache, no redirects', async () => {
   const served = await loadServedReleaseModule()
   const body = JSON.stringify(validDescriptor())
   const calls = []
@@ -245,7 +246,7 @@ test('loader fetches only exact same-origin descriptor without credentials, cach
   assert.equal(calls[0][0], 'https://staging.stoaedu.ch/served-release.json')
   assert.deepEqual(calls[0][1], {
     method: 'GET',
-    credentials: 'omit',
+    credentials: 'same-origin',
     cache: 'no-store',
     redirect: 'error',
     headers: { Accept: 'application/json' },
