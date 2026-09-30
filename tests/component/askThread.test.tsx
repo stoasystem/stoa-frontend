@@ -295,6 +295,34 @@ describe('the teacher status card', () => {
     expect(ask.getByRole('button', { name: 'Ask a teacher' })).toBeInTheDocument()
   })
 
+  // #75: the request is read for every conversation that is opened, not only
+  // one escalated while it was open -- including one whose help has ended.
+  // Every status the card can carry, so showing it only while ACTIVE_HELP
+  // would go red on the two ended ones.
+  it.each([
+    ['pending', 'Teacher support requested'],
+    ['assigned', 'Ms Bergmann will join this conversation'],
+    ['in_progress', 'Ms Bergmann is helping you'],
+    ['resolved', 'Teacher support has ended'],
+    ['cancelled', 'Teacher support was cancelled'],
+  ] as const)('shows a request already %s when the conversation is opened again', async (status, title) => {
+    getConversationMock.mockResolvedValue(
+      conversation([
+        message('s1', 'student', 'Is x = 5?'),
+        message('a1', 'assistant', 'Yes.'),
+        message('t1', 'teacher', 'All clear now.'),
+      ]),
+    )
+    helpStatusMock.mockResolvedValue(help(status, 'Ms Bergmann'))
+    const ask = openAsk()
+
+    const card = await ask.findByRole('region', { name: 'Teacher support' })
+    expect(card).toHaveAttribute('data-help-status', status)
+    expect(within(card).getByText(title)).toBeInTheDocument()
+    expect(helpStatusMock).toHaveBeenCalledWith('c1')
+    expect(requestHelpMock).not.toHaveBeenCalled()
+  })
+
   it('says a request can still be sent while no teacher is online, without a time', async () => {
     vi.mocked(getTeacherAvailability).mockResolvedValue({ online: false, availableTeachers: 0, nextWindow: '16:00' })
     getConversationMock.mockResolvedValue(
