@@ -254,7 +254,7 @@ async function onScreen(lessonId = 'l-2') {
 }
 
 const where = () => screen.getByTestId('where').textContent
-const TEST_OUT_NOTE = 'The lesson counts as done. The star lights up once every exercise in it has been answered right.'
+const TEST_OUT_NOTE = 'The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.'
 const strip = () => document.querySelector('[data-stage-actions]')!
 const hearts = () => document.querySelector('[data-quiz-hearts]')
 
@@ -581,9 +581,22 @@ describe('testing out of a lesson from the chapter', () => {
   it('a locked lesson offers no test-out, and ?mode=quiz on it shows the locked notice (#96)', async () => {
     open('/chapter/u-5/l-3?mode=quiz')
     expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    expect(screen.queryByText(/^Quiz · Question/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
     expect(seen.completes).toEqual([])
+  })
+
+  it('opens a lesson already done as the lesson, not a quiz, even with ?mode=quiz (#96)', async () => {
+    open('/chapter/u-5/l-1?mode=quiz')
+    expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
+  })
+
+  it('starts no quiz while the chapter cannot say the lesson is open: the frontend is the only gate (#96)', async () => {
+    mswServer.use(http.get(`${API}/practice/math/algebra/roadmap`, () => HttpResponse.json({ detail: 'down' }, { status: 500 })))
+    open('/chapter/u-5/l-3?mode=quiz')
+    expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
   })
 
   it('says, once passed, that the star still needs every exercise answered right (#96)', async () => {
@@ -596,6 +609,7 @@ describe('testing out of a lesson from the chapter', () => {
 
   it('says nothing of the sort when the lesson was worked through', async () => {
     open('/chapter/u-5/l-2')
+    // l-2 has six exercises (LESSONS above).
     for (let n = 1; n <= 6; n += 1) await answerRight()
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
     expect(screen.queryByText(TEST_OUT_NOTE)).not.toBeInTheDocument()

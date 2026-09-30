@@ -57,7 +57,7 @@
       "allDone": "Toutes les leçons de {{chapter}} sont terminées.",
       "next": "Leçon suivante : {{title}}",
       "backToChapter": "Retour au chapitre",
-      "testedOut": "La leçon compte comme terminée. L’étoile s’allume dès que chaque exercice a été réussi au moins une fois."
+      "testedOut": "La leçon compte comme terminée. L’étoile s’allume dès que chaque exercice de ce chapitre a été réussi au moins une fois."
     },
     "loading": "Chargement de la leçon…",
     "failed": "La leçon n’a pas pu être chargée.",

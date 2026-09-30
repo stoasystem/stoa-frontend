@@ -18,8 +18,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { JumpTransition } from '@/features/chapter/JumpTransition'
-import { canTestOut } from '@/features/chapter/quiz'
-import { chapterPath, quizPath, useChapter, type Chapter, type ChapterLesson } from '@/features/chapter/useChapter'
+import { chapterPath, isOpenLesson, quizPath, useChapter, type Chapter, type ChapterLesson } from '@/features/chapter/useChapter'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import { AppLayout } from '@/layouts/AppLayout'
@@ -151,7 +150,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
             {chapter.lessons.map((lesson, index) => (
               <li key={lesson.id} data-lesson-status={lesson.status} className="flex flex-col sm:flex-row sm:items-stretch">
                 <LessonRow unitId={chapter.unitId} lesson={lesson} number={index + 1} upNext={lesson.id === chapter.nextLessonId} />
-                {canTestOut(lesson.status) && <TestOut unitId={chapter.unitId} lesson={lesson} />}
+                {isOpenLesson(lesson.status) && <TestOut unitId={chapter.unitId} lesson={lesson} />}
               </li>
             ))}
           </ol>

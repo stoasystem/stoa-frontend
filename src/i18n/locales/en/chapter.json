@@ -57,7 +57,7 @@
       "allDone": "Every lesson in {{chapter}} is done.",
       "next": "Next lesson: {{title}}",
       "backToChapter": "Back to the chapter",
-      "testedOut": "The lesson counts as done. The star lights up once every exercise in it has been answered right."
+      "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once."
     },
     "loading": "Loading the lesson…",
     "failed": "The lesson could not be loaded.",

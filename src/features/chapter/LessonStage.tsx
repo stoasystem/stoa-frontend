@@ -16,7 +16,7 @@
  * quiz there are no hints, no skip, and Ask and 「问这段」 are off.
  */
 import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
-import { useEffect, useMemo, useRef, type MutableRefObject, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/base'
@@ -26,7 +26,7 @@ import type { AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { QUIZ_HEARTS } from '@/features/chapter/quiz'
-import { chapterPath, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
+import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { formatPracticeAnswer, useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
@@ -52,11 +52,8 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   const chapterQuery = useChapter(unitId)
   const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
   const lesson = lessonQuery.data
-  // Testing out of the lesson from the chapter. A reload starts it again from
-  // the beginning; nothing of it is kept. A locked lesson has no quiz (#81):
-  // `?mode=quiz` on one gets the locked notice like any other way in.
   const [params] = useSearchParams()
-  const testOut = params.get('mode') === QUIZ_MODE
+  const askedForQuiz = params.get('mode') === QUIZ_MODE
   // A lesson from another unit is not this chapter's: a link that pairs them
   // finds nothing, as a chapter not in the catalog does.
   const inUnit = lesson !== undefined && (!unitId || lesson.unitId === unitId)
@@ -64,6 +61,18 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   // waits rather than flash an exercise it may take back; if the chapter
   // cannot be read the stage opens, and the backend still decides.
   const status = chapter?.lessons.find((item) => item.id === lesson?.id)?.status
+  // Testing out of the lesson from the chapter: only where the chapter says the
+  // lesson is open (#81). Until stoa-backend#83 checks it this is the only
+  // gate, so a lesson done, or one the chapter could not be read for, opens
+  // as the lesson itself; a locked one gets its notice like any other way in.
+  // Decided once, when the chapter first says: passing the quiz turns the
+  // lesson done, and that must not turn the quiz on screen into the lesson.
+  // A reload starts the quiz again from the beginning; nothing of it is kept.
+  const [openWhenEntered, setOpenWhenEntered] = useState<{ lessonId: string; open: boolean } | null>(null)
+  if (lesson && status !== undefined && openWhenEntered?.lessonId !== lesson.id) {
+    setOpenWhenEntered({ lessonId: lesson.id, open: isOpenLesson(status) })
+  }
+  const testOut = askedForQuiz && openWhenEntered?.lessonId === lesson?.id && openWhenEntered?.open === true
   const notice: StageNoticeKind | null = lessonQuery.isLoading
     ? 'loading'
     : lessonQuery.isError
@@ -765,7 +774,7 @@ function LessonDone({
           </p>
         )}
         {testedOut && (
-          <p data-stage-done-tested-out className={cn('m-0 text-[15px]', bodyOnSky)}>
+          <p className={cn('m-0 text-[15px]', bodyOnSky)}>
             {t('stage.done.testedOut')}
           </p>
         )}
