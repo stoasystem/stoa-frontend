@@ -122,6 +122,13 @@ export type LegacyRedirect = {
 /** The one screen an account under a forced password change can still use. */
 export const CHANGE_PASSWORD_PATH = '/settings/password'
 
+/** Where a guard sends a role a route is not for (RoleRoute, and a role with no home). */
+export const FORBIDDEN_PATH = '/forbidden'
+
+/** The sign-in, and the page that says one is needed. */
+export const LOGIN_PATH = '/login'
+export const UNAUTHORIZED_PATH = '/unauthorized'
+
 export const ASK_PATH = '/ask'
 
 export const roleHomePaths: Record<AppNavArea, string> = {
@@ -263,7 +270,7 @@ export const pageRoutes: readonly PageRoute[] = [
     titleKey: 'studentRoutes.home.title',
     meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },
-  { path: '/login', access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
+  { path: LOGIN_PATH, access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
   { path: '/register', access: PUBLIC, page: RegisterPage, meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
   { path: '/teacher-activate', access: PUBLIC, page: TeacherActivatePage, meta: { module: 'Auth', status: 'core', purpose: 'Teacher invitation claim and account activation.' } },
   { path: '/activate', access: PUBLIC, page: ActivateAccountPage, meta: { module: 'Auth', status: 'core', purpose: 'Role-neutral invitation claim and account activation.' } },
@@ -277,8 +284,8 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'teacher', label: 'Support', labelKey: 'navigation.support', priority: 'secondary', icon: 'support', description: 'Tutor support and help.' }],
     meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' },
   },
-  { path: '/unauthorized', access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
-  { path: '/forbidden', access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
+  { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
+  { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
   { path: '*', access: PUBLIC, page: NotFoundPage, meta: { module: 'Errors', status: 'core', purpose: 'Anything no entry matches.' } },
 
   // ---- any signed-in account ---------------------------------------------
