@@ -7,14 +7,16 @@ import { cn } from '@/lib/utils'
  * for the rest. No borders, no icons inside pills.
  *   accent  Pending          gold     Assigned, waiting
  *   green   In progress, Ready   neutral  Resolved
+ *   danger  Overdue: red text on the neutral fill (--red is never a fill)
  */
-export type PillTone = 'accent' | 'gold' | 'green' | 'neutral'
+export type PillTone = 'accent' | 'gold' | 'green' | 'neutral' | 'danger'
 
 const toneClasses: Record<PillTone, string> = {
   accent: 'bg-accent-tint text-accent',
   gold: 'bg-gold-tint text-gold',
   green: 'bg-green-tint text-green',
   neutral: 'bg-fill text-pill-neutral',
+  danger: 'bg-fill text-red',
 }
 
 export function Pill({ tone = 'accent', children, className }: { tone?: PillTone; children: ReactNode; className?: string }) {

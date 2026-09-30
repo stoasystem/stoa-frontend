@@ -55,7 +55,14 @@
     "primary": "Hauptnavigation",
     "mobilePrimary": "Hauptnavigation mobil",
     "logoHome": "STOA-Startseite",
-    "administration": "Verwaltung"
+    "administration": "Verwaltung",
+    "admin": {
+      "users": "Benutzer",
+      "teacherApplications": "Bewerbungen von Lehrpersonen",
+      "curriculum": "Lehrplan",
+      "moderation": "Moderation",
+      "system": "System"
+    }
   },
   "actions": {
     "startLearning": "Lernen starten",
@@ -164,7 +171,8 @@
       "new": "Neu",
       "reviewed": "Geprüft",
       "resolved": "Gelöst"
-    }
+    },
+    "loadingAccount": "Konto wird geladen…"
   },
   "notifications": {
     "title": "Mitteilungen",
@@ -264,5 +272,14 @@
       "heading": "Passwort",
       "again": "Noch einmal ändern"
     }
+  },
+  "organizationHome": {
+    "title": "Organisation",
+    "description": "Das Lernen in Ihrer Organisation und die dafür zugewiesene Übung.",
+    "pages": "Ihre Seiten",
+    "learningOperations": "Lernbetrieb",
+    "learningOperationsDescription": "Signale, Abschlüsse und Datenbereitschaft nach Fach",
+    "learningAutomation": "Lernautomatisierung",
+    "learningAutomationDescription": "Automatische Übungszuweisungen prüfen und ausführen"
   }
 }

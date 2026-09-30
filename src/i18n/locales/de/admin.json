@@ -126,7 +126,9 @@
       "saveFailed": "Der Wert konnte nicht gespeichert werden.",
       "outOfRange": "Geben Sie eine ganze Zahl zwischen 0 und {{maximum}} ein.",
       "zeroWarning": "Null schaltet die Lehrerunterstützung für diese Person vollständig ab — ihr wird gesagt, sie solle sich an die Administration wenden, nicht, dass die Woche aufgebraucht sei."
-    }
+    },
+    "operations": "Kontovorgänge",
+    "operationsDescription": "Ein Elternkonto: Verifizierung, Zugang der Kinder und Nutzung"
   },
   "activation": {
     "eyebrow": "Kontoeinladung",
@@ -148,6 +150,22 @@
       "account_exists": "Für diese E-Mail besteht bereits ein Konto. Melden Sie sich stattdessen an.",
       "password_rejected": "Dieses Passwort wurde abgelehnt. Wählen Sie ein stärkeres Passwort.",
       "date_of_birth_invalid": "Dieses Geburtsdatum ist kein gültiges Datum in der Vergangenheit. Bitte Tag, Monat und Jahr der Geburt angeben."
+    }
+  },
+  "system": {
+    "title": "System",
+    "description": "Antwortzeiten der Lehrpersonen, Betriebsmeldungen und die Systemseiten.",
+    "pages": "Im Bereich System",
+    "status": "Systemstatus",
+    "statusDescription": "Noch nicht verfügbar",
+    "learningOperations": "Lernbetrieb",
+    "learningOperationsDescription": "Signale, Abschlüsse und Datenbereitschaft nach Fach",
+    "learningAutomation": "Lernautomatisierung",
+    "learningAutomationDescription": "Automatische Übungszuweisungen prüfen und ausführen",
+    "scope": {
+      "title": "Umfang der Verwaltung",
+      "covers": "Administratorinnen und Administratoren verwalten Konten unter «Benutzer» (Einladungen, Zuordnungen, Passwort-Zurücksetzungen, Sperren und Archivieren) und prüfen Bewerbungen von Lehrpersonen, den Lehrplan und die Moderation in eigenen Bereichen.",
+      "notYet": "Supportfälle werden hier noch nicht bearbeitet, und der Systemstatus folgt noch."
     }
   }
 }

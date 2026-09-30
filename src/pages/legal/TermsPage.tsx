@@ -24,7 +24,6 @@ export function TermsPage() {
           eyebrow={t('terms.eyebrow')}
           title={t('terms.title')}
           description={t('terms.description')}
-          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
           {sectionKeys.map((sectionKey) => (

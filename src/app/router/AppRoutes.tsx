@@ -11,6 +11,7 @@ import { Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-r
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
 import { RoleRoute } from '@/app/router/RoleRoute'
+import { isAdmitted, unknownAccess } from '@/app/router/routeAccess'
 import {
   CHANGE_PASSWORD_PATH,
   legacyRedirects,
@@ -20,17 +21,14 @@ import {
   type RouteAccess,
 } from '@/app/router/routeManifest'
 import { useAuthStore } from '@/store/authStore'
-import type { UserRole } from '@/types/user'
+
+// Tests and the account menu read who a route admits from here too.
+export { isAdmitted }
 
 /*
- * Each of these fails closed: an `access` whose kind is not one of the three
- * (a typo that got past the types, a cast) throws while the router is built,
- * rather than quietly falling through to "any signed-in account".
+ * Fails closed like isAdmitted: an `access` whose kind is not one of the three
+ * throws while the router is built.
  */
-function unknownAccess(access: never): never {
-  throw new Error(`route manifest: unknown access ${JSON.stringify(access)}`)
-}
-
 export function accessKey(access: RouteAccess): string {
   switch (access.kind) {
     case 'public':
@@ -38,24 +36,6 @@ export function accessKey(access: RouteAccess): string {
       return access.kind
     case 'roles':
       return `roles:${access.roles.join(',')}`
-    default:
-      return unknownAccess(access)
-  }
-}
-
-/** Whether the signed-in account (if any) may open a route with `access`. */
-export function isAdmitted(
-  access: RouteAccess,
-  user: { role: UserRole } | null,
-  isAuthenticated: boolean,
-): boolean {
-  switch (access.kind) {
-    case 'public':
-      return true
-    case 'signedIn':
-      return isAuthenticated && user !== null
-    case 'roles':
-      return isAuthenticated && user !== null && access.roles.includes(user.role)
     default:
       return unknownAccess(access)
   }
