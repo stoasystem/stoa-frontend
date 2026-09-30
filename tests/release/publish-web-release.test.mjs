@@ -262,8 +262,9 @@ test('every preview job is held to redesign/planet, and one job maps it to one E
 
 test('the preview publish is serialised per target and never cancelled', async () => {
   const lines = await readWorkflow(PREVIEW_WORKFLOW)
-  const deploy = jobsOf(lines).get('deploy-planet')
-  assert.deepEqual(trimmed(blockAt(deploy, deploy.indexOf('    concurrency:'))), [
+  // Workflow-level, as production has it: a later push can then never publish
+  // before an earlier one still going through the gate.
+  assert.deepEqual(trimmed(topLevel(lines, 'concurrency')), [
     'concurrency:',
     'group: frontend-preview-planet',
     'cancel-in-progress: false',
@@ -379,6 +380,12 @@ test('the preview publish names its bucket, distribution and origins, and refuse
   const check = stepText(steps.find((step) => stepName(step) === 'Check preview target'))
   assert.match(check, /set -euo pipefail/)
   assert.doesNotMatch(check.slice(check.indexOf('run: |')), /\$\{\{/)
+  // The two shape checks are what stop an empty variable; without them it
+  // reaches the publisher and falls back to production.
+  assert.ok(check.includes('[[ "$PREVIEW_BUCKET" =~ ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$ ]]'), 'checks the bucket name, so empty fails')
+  assert.ok(check.includes('[[ "$PREVIEW_DISTRIBUTION_ID" =~ ^E[A-Z0-9]{5,20}$ ]]'), 'checks the distribution id, so empty fails')
+  const names = steps.map(stepName)
+  assert.ok(names.indexOf('Check preview target') < names.indexOf('Configure AWS credentials (OIDC)'), 'checked before any credentials')
   assert.ok(check.includes(`!= "${PRODUCTION_DEFAULTS.bucket}"`), 'refuses the production bucket')
   assert.ok(check.includes(`!= "${PRODUCTION_DEFAULTS.distributionId}"`), 'refuses the production distribution')
 })

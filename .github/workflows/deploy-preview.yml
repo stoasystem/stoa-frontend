@@ -19,7 +19,7 @@ name: Deploy Frontend Preview
 #
 # The production workflow (deploy-production.yml) is untouched by this file.
 # Plan B (redesign/cute -> preview-cute) is on hold; adding it means a second
-# publish job with its own Environment, `if` and concurrency group.
+# publish job with its own Environment and `if`, and a concurrency group per target.
 
 on:
   push:
@@ -28,6 +28,12 @@ on:
 
 permissions:
   contents: read
+
+# One preview publish at a time, in push order; a run in progress is never
+# cancelled, like production's frontend-production-deploy.
+concurrency:
+  group: frontend-preview-planet
+  cancel-in-progress: false
 
 jobs:
   verify:
@@ -90,9 +96,6 @@ jobs:
     environment:
       name: preview-planet
       url: https://app-planet.stoaedu.ch
-    concurrency:
-      group: frontend-preview-planet
-      cancel-in-progress: false
     permissions:
       contents: read
       id-token: write
