@@ -310,8 +310,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/map/:subjectId', access: STUDENT, page: MapSubjectPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
   { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapNebulaPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
   { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapStarPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
-  { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The chapter of a knowledge point.' } },
-  { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
+  { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
+  { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   {
     path: ASK_PATH,
     access: STUDENT,
