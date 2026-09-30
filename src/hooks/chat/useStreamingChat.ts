@@ -169,11 +169,12 @@ export function useStreamingChat(conversationId: string | null) {
   /**
    * Send a message, or with `send: false` wait for one already sent, and settle
    * it by what its command says: the answer, or a failure the student can send
-   * again - as the same message when the command allows it.
+   * again - as the same message when the command allows it. True once it was
+   * answered; false when it failed, was stopped or was overtaken.
    */
   const runAttempt = useCallback(
-    async (pending: PendingMessage, { send }: { send: boolean }) => {
-      if (!conversationId) return
+    async (pending: PendingMessage, { send }: { send: boolean }): Promise<boolean> => {
+      if (!conversationId) return false
 
       const attempt = ++currentAttemptRef.current
       const owns = () => currentAttemptRef.current === attempt
@@ -188,7 +189,7 @@ export function useStreamingChat(conversationId: string | null) {
         studentMessageId: createLocalId('student'),
         assistantMessageId: createLocalId('assistant'),
       }))
-      if (!owns()) return
+      if (!owns()) return false
 
       stopRef.current = () => {
         requestController.abort()
@@ -275,7 +276,7 @@ export function useStreamingChat(conversationId: string | null) {
         outcome = await watcher.outcome
       }
       pollController.abort()
-      if (!owns()) return
+      if (!owns()) return false
       // Read now: the updaters below run when React renders, after the refs
       // have been cleared for the next attempt.
       const settledAssistantId = activeAssistantMessageIdRef.current ?? assistantMessageId
@@ -293,9 +294,9 @@ export function useStreamingChat(conversationId: string | null) {
             ),
           )
           trackEvent('chat_response_stopped', { conversationId })
-          return
+          return false
         }
-        if (outcome === null || outcome.kind === 'aborted') return
+        if (outcome === null || outcome.kind === 'aborted') return false
 
         writePending(conversationId, null)
         if (outcome.kind === 'completed') {
@@ -304,7 +305,7 @@ export function useStreamingChat(conversationId: string | null) {
           if (!localStorage.getItem('stoa_access_token')?.startsWith('demo:')) {
             setLocalMessages([])
           }
-          return
+          return true
         }
 
         const sameMessage = outcome.kind !== 'failed' || outcome.retryable
@@ -329,6 +330,7 @@ export function useStreamingChat(conversationId: string | null) {
             return message
           }),
         )
+        return false
       } finally {
         if (owns()) {
           setIsStreaming(false)
@@ -364,17 +366,17 @@ export function useStreamingChat(conversationId: string | null) {
       { content, attachmentIds, attachments }: SendStreamingMessagePayload,
       idempotencyKey?: string,
     ) => {
-      if (!conversationId || isStreaming) return
+      if (!conversationId || isStreaming) return false
 
       const trimmed = content.trim()
-      if (!trimmed) return
+      if (!trimmed) return false
 
       trackEvent('chat_message_sent', {
         conversationId,
         hasAttachments: Boolean(attachmentIds?.length),
       })
       trackEvent('chat_response_started', { conversationId })
-      await runAttempt(
+      return runAttempt(
         {
           // The key names the message, not the attempt: a retry of a message
           // the server may still answer sends the same one.

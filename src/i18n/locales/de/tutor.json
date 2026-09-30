@@ -62,5 +62,26 @@
       "busy": "Zurzeit ausgelastet",
       "unavailable": "Nimmt keine Lernenden an"
     }
+  },
+  "requests": {
+    "pending": "Ausstehend",
+    "resolvedToday": "Heute abgeschlossen",
+    "averageResponse": "Durchschnittliche erste Antwort",
+    "minutes": "{{count}} Min.",
+    "filterLabel": "Anfragen filtern",
+    "all": "Alle",
+    "empty": "Es liegen keine Anfragen vor.",
+    "listLabel": "Anfragen",
+    "row": "{{subject}} · {{grade}}",
+    "priority": "Priorität: {{priority}}",
+    "sla": {
+      "at_risk": "Frist gefährdet",
+      "breached": "Überfällig"
+    },
+    "more": "Mehr",
+    "learningAutomation": "Lernautomatisierung",
+    "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
+    "firstAction": "Erste Aktion der Lehrperson: {{time}}",
+    "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
   }
 }

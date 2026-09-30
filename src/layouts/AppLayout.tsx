@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import {
   BarChart3,
+  BookMarked,
   BookOpen,
   CreditCard,
   GraduationCap,
@@ -11,6 +12,7 @@ import {
   MessageCircle,
   Route,
   Settings,
+  ShieldCheck,
   TicketCheck,
   User,
   Users,
@@ -36,8 +38,10 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   billing: CreditCard,
   chat: MessageCircle,
   classroom: Video,
+  curriculum: BookMarked,
   dashboard: LayoutDashboard,
   history: History,
+  moderation: ShieldCheck,
   profile: User,
   practice: Route,
   questionBank: LibraryBig,
@@ -82,7 +86,7 @@ export function AppLayout({
   const homePath = user ? getDefaultRouteForRole(user.role) : '/'
   const navigation = user ? shellNavigationFor(user.role) : ({ kind: 'none' } as const)
   const items: readonly AppNavItem[] = navigation.kind === 'none' ? [] : navigation.items
-  const activeIndex = activeNavIndex(items, location.pathname)
+  const activeIndex = activeNavIndex(items, location.pathname, user?.role)
   const [covered, setCovered] = useState(false)
   const label = (item: AppNavItem) => t(item.labelKey ?? item.label, { defaultValue: item.label })
 

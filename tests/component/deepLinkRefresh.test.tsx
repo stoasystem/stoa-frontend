@@ -11,6 +11,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRouter } from '@/app/router/AppRouter'
 import i18n from '@/i18n'
 import { getCurrentUser } from '@/services/auth/authApi'
+import { getPracticeLesson } from '@/services/practice/practiceApi'
 import { TOKEN_KEY, useAuthStore, type CurrentUser } from '@/store/authStore'
 
 vi.mock('@/services/auth/authApi', async (importOriginal) => ({
@@ -19,6 +20,24 @@ vi.mock('@/services/auth/authApi', async (importOriginal) => ({
 }))
 // The bell polls the backend; it has nothing to do with where a link lands.
 vi.mock('@/components/notifications/NotificationCenter', () => ({ NotificationCenter: () => null }))
+// The practice stage's lesson, and a catalog without the unit (the chapter strip then says less).
+vi.mock('@/services/practice/practiceApi', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/services/practice/practiceApi')>()),
+  getPracticeLesson: vi.fn(async (lessonId: string) => ({
+    id: lessonId,
+    unitId: 'u-7',
+    subjectId: 'math',
+    gradeLevel: '8',
+    topicId: 'geometry',
+    title: 'Measuring angles',
+    topic: 'Angles',
+    difficulty: 'intro',
+    status: 'available',
+    estimatedMinutes: 10,
+    challenges: [],
+  })),
+  getCurriculumCatalog: vi.fn(async () => ({ subjects: [], topics: [], units: [], lessons: [], rolloutSubjects: [], includePreview: false, source: 'test' })),
+}))
 
 const student = {
   id: 'u-1',
@@ -54,15 +73,14 @@ describe('a deep link refreshed in the browser', () => {
     window.history.replaceState(null, '', '/')
   })
 
-  it.each([
-    ['/chapter/u-7/l-3', 'Lesson', ['u-7', 'l-3']],
-  ])('reopens %s once the account is back', async (path, title, params) => {
-    refreshAt(path)
+  it('reopens /chapter/u-7/l-3 on that lesson of that chapter once the account is back', async () => {
+    refreshAt('/chapter/u-7/l-3')
 
-    expect(await screen.findByRole('heading', { name: title })).toBeInTheDocument()
-    expect(window.location.pathname).toBe(path)
-    const shown = screen.getByTestId('route-params').textContent ?? ''
-    for (const value of params) expect(shown).toContain(value)
+    // The practice stage (#50): the lesson the path names, the way back to the chapter it names.
+    expect(await screen.findByRole('heading', { level: 1, name: 'Measuring angles' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/chapter/u-7/l-3')
+    expect(vi.mocked(getPracticeLesson)).toHaveBeenCalledWith('l-3')
+    expect(screen.getByRole('link', { name: 'Back to Angles' })).toHaveAttribute('href', '/chapter/u-7')
   })
 
   it('reopens /ask/c-42 on that conversation once the account is back', async () => {

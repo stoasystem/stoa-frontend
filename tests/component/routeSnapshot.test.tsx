@@ -16,6 +16,35 @@ vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 type Recorded = { path: string; viewer: Viewer; pathname: string; page: string }
 
 const outcomes = before.outcomes as Recorded[]
+
+/*
+ * The navigation, too, is what it was before #45 -- except where #52 gave the
+ * teacher and the administrator their shells (#13 point 6): the teacher's
+ * profile and Help moved into the avatar menu, and the administrator's list
+ * became Users, Teacher applications, Curriculum, Moderation and System
+ * (Subscriptions and billing is frozen, card 007). Only the navigation moved;
+ * every route above still ends where it ended.
+ */
+const expectedNav = {
+  ...before.nav,
+  teacher: {
+    desktop: [
+      ['/tutor', 'Requests', 'primary', 'requests', true, 'navigation.requests'],
+      ['/tutor/availability', 'Availability', 'primary', 'settings', true, 'navigation.availability'],
+    ],
+    mobile: ['/tutor', '/tutor/availability'],
+  },
+  admin: {
+    desktop: [
+      ['/admin/users', 'Users', 'primary', 'students', false, 'navigation.admin.users'],
+      ['/admin/teacher-applications', 'Teacher applications', 'primary', 'tutors', false, 'navigation.admin.teacherApplications'],
+      ['/admin/curriculum', 'Curriculum', 'primary', 'curriculum', false, 'navigation.admin.curriculum'],
+      ['/admin/moderation', 'Moderation', 'primary', 'moderation', true, 'navigation.admin.moderation'],
+      ['/admin', 'System', 'primary', 'settings', true, 'navigation.admin.system'],
+    ],
+    mobile: ['/admin/moderation', '/admin'],
+  },
+}
 const viewers = [...new Set(outcomes.map((outcome) => outcome.viewer))]
 
 describe('non-student routes are unchanged by the route manifest', () => {
@@ -57,7 +86,7 @@ describe('non-student routes are unchanged by the route manifest', () => {
   })
 
   it.each(['parent', 'teacher', 'admin', 'organization'] as const)(
-    'shows the same navigation as before (%s)',
+    'shows the same navigation as before, apart from #52 (%s)',
     (area) => {
       const desktop = getNavItemsForRole(area, { includeSecondary: true }).map((item) => [
         item.path,
@@ -71,7 +100,7 @@ describe('non-student routes are unchanged by the route manifest', () => {
         .slice(0, 5)
         .map((item) => item.path)
 
-      expect({ desktop, mobile }).toEqual(before.nav[area])
+      expect({ desktop, mobile }).toEqual(expectedNav[area])
     },
   )
 })

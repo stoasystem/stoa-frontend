@@ -10,6 +10,12 @@ export type AskEntry =
   | 'planet'
   /** `/ask` or `/ask/:id` opened directly (a deep link, a notification). */
   | 'direct'
+  /**
+   * Beside the practice stage (#50): a panel next to the exercise on a wide
+   * screen; on a narrower one the composer under the stage, which raises the
+   * same 72% sheet the planet does.
+   */
+  | 'stage'
 
 export const ASK_PANEL = {
   /** Placement: "right, 420 wide, over the sky". */
@@ -20,7 +26,7 @@ export const ASK_PANEL = {
 } as const
 
 export const ASK_SHEET = {
-  /** Placement: "sheet, 72% high" -- from the planet (#12 point 6). */
+  /** Placement: "sheet, 72% high" -- from the planet (#12 point 6), and from the stage. */
   planetHeight: '72%',
   /** Opened directly: a full-screen sheet (#13 point 1). */
   directHeight: '100%',

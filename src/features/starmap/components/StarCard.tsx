@@ -5,8 +5,10 @@
  * beside it on a wide screen and along the bottom on a phone.
  */
 import { ChevronLeft } from 'lucide-react'
+import { useRef, type MouseEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -27,7 +29,21 @@ export function StarCard({
   reducedMotion: boolean
 }) {
   const { t } = useTranslation('starmap')
+  const navigate = useNavigate()
+  const glyph = useRef<HTMLDivElement>(null)
   const subjectId = map.subject.subjectId
+  const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
+
+  // Into the chapter by the jump (#50 point 5): it starts at this star.
+  // A click that opens a new tab or window stays the link's own.
+  function jump(event: MouseEvent<HTMLAnchorElement>) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const rect = glyph.current?.getBoundingClientRect()
+    if (!rect) return
+    event.preventDefault()
+    const state: JumpState = { jump: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } }
+    navigate(chapterTo, { state })
+  }
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
   const prerequisites =
@@ -51,12 +67,11 @@ export function StarCard({
     <article
       aria-labelledby="starmap-star-title"
       className={cn(
-        'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border p-[18px] text-on-sky',
+        'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky',
         wide ? 'right-12 top-1/2 w-[340px] -translate-y-1/2' : 'inset-x-4 bottom-[calc(1rem+var(--page-bottom-inset,0px))]',
       )}
       style={{
         background: 'var(--sky-glass)',
-        borderColor: 'var(--sky-glass-border)',
         backdropFilter: 'blur(var(--sky-glass-blur))',
         WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
         boxShadow: 'var(--shadow-glass)',
@@ -71,7 +86,7 @@ export function StarCard({
       </Link>
 
       <div className="flex items-center gap-4">
-        <div className="shrink-0">
+        <div ref={glyph} className="shrink-0">
           <StarGlyph
             state={star.state}
             size={wide ? 96 : 72}
@@ -137,8 +152,7 @@ export function StarCard({
               <li key={skill.skillId} className="inline-flex items-center gap-1.5 text-[13px] text-on-sky">
                 <span
                   aria-hidden="true"
-                  className={cn('inline-block size-2 rounded-full', skill.lit ? 'bg-lit' : 'border border-solid')}
-                  style={skill.lit ? undefined : { borderColor: 'rgba(255, 255, 255, 0.55)' }}
+                  className={cn('inline-block size-2 rounded-full', skill.lit ? 'bg-lit' : 'border border-solid border-white/55')}
                 />
                 <span className="sr-only">{t(skill.lit ? 'star.skillLit' : 'star.skillDark', { name: skill.name })}</span>
                 <span aria-hidden="true">{skill.name}</span>
@@ -170,9 +184,10 @@ export function StarCard({
 
       {action && (
         <div className="pt-1">
-          {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
-          <Button asChild variant="onSky" size="regular" style={{ color: 'var(--on-sky-button-text)' }}>
-            <Link to={`/chapter/${encodeURIComponent(star.unitId)}`}>{action}</Link>
+          <Button asChild variant="onSky" size="regular">
+            <Link to={chapterTo} onClick={jump}>
+              {action}
+            </Link>
           </Button>
         </div>
       )}

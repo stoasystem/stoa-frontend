@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
+import { Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { HelpRequestList } from '@/components/tutor/HelpRequestList'
@@ -32,15 +34,15 @@ export function TutorDashboardPage() {
 
   return (
     <DashboardLayout>
-      <PageContainer className="p-0">
+      <PageContainer className="max-w-[920px] p-0">
         <PageHeader
           title={t('dashboardTitle')}
           description={t('dashboardDescription')}
         />
         {requestsQuery.isLoading && <TutorDashboardSkeleton showHeader={false} />}
-        {requestsQuery.isError && <p className="text-sm text-destructive">{t('loadRequestsFailed')}</p>}
+        {requestsQuery.isError && <p className="text-sm text-red">{t('loadRequestsFailed')}</p>}
         {requestsQuery.data && (
-          <div className="space-y-4">
+          <div className="flex flex-col gap-[22px]">
             {/* Card 020: the classroom queue is withdrawn until it has a backend.
             <Card className="border-primary/15 bg-card/95">
               <CardHeader>
@@ -69,6 +71,15 @@ export function TutorDashboardPage() {
             <HelpRequestList requests={filteredRequests} />
           </div>
         )}
+        {/* Learning automation: the secondary entry inside Requests (#13 point 6). */}
+        <Group title={t('requests.more')}>
+          <Row
+            to="/tutor/learning-automation"
+            leading={{ kind: 'icon', icon: Sparkles }}
+            title={t('requests.learningAutomation')}
+            subtitle={t('requests.learningAutomationDescription')}
+          />
+        </Group>
       </PageContainer>
     </DashboardLayout>
   )

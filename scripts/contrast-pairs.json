@@ -26,6 +26,7 @@
     { "theme": "light", "fg": "--gold", "bg": "--gold-tint", "kind": "text", "use": "Assigned / waiting pill" },
     { "theme": "light", "fg": "--green", "bg": "--green-tint", "kind": "text", "use": "In progress / Ready pill" },
     { "theme": "light", "fg": "--pill-neutral", "bg": "--fill", "kind": "text", "use": "Resolved pill" },
+    { "theme": "light", "fg": "--red", "bg": "--fill", "kind": "text", "use": "Overdue pill" },
     { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "ui", "use": "focus ring" },
     { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "ui", "use": "focus ring on cards" },
     { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "ui", "use": "selected answer border" },

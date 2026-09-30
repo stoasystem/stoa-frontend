@@ -44,7 +44,6 @@ export function SupportPage() {
           eyebrow={t('support:eyebrow')}
           title={t('support:title')}
           description={t('support:description')}
-          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
           actions={
             <>
               <Button variant="outline" asChild>

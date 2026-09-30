@@ -25,7 +25,7 @@ export function TutorRequestNoteForm({
       </label>
       <textarea
         id="teacher-note"
-        className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
         placeholder="Add the next step, explanation focus, or follow-up needed."
         value={content}
         onChange={(event) => setContent(event.target.value)}

@@ -84,9 +84,9 @@ describe('the route manifest', () => {
   })
 
   it('gives every role a home that is a registered page', () => {
-    // Organisation roles have had a home with no page since before #45; that is
-    // left as it was, not fixed here.
-    const homes = Object.entries(roleHomePaths).filter(([area]) => area !== 'organization')
+    // The organisation roles' home had no page from before #45 until #52.
+    const homes = Object.entries(roleHomePaths)
+    expect(homes.map(([area]) => area)).toContain('organization')
     expect(homes.filter(([, home]) => !landsOnPage(home))).toEqual([])
   })
 })
