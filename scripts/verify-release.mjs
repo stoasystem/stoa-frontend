@@ -80,6 +80,9 @@ export const STEP_DEFINITIONS = Object.freeze([
   { id: 'web-release-contracts', argv: Object.freeze(['npm', 'run', 'test:release']) },
 ].map((step) => Object.freeze(step)))
 
+// `test:release` runs this file's own tests, so package.json drifting from this
+// list turns the release tests red. Before, only the formal gate read it, and a
+// release test added to package.json alone left that gate refusing every run.
 const REQUIRED_PACKAGE_SCRIPTS = Object.freeze({
   build: 'tsc -b && node ./scripts/vite.mjs build',
   lint: 'eslint . --max-warnings=0',
@@ -91,6 +94,8 @@ const REQUIRED_PACKAGE_SCRIPTS = Object.freeze({
     'tests/release/runtime-monitoring-flag.test.mjs',
     'tests/release/runtime-startup-barrier.test.mjs',
     'tests/release/served-release.test.mjs',
+    'tests/release/sandbox-evidence-sources-present.test.mjs',
+    'tests/release/verify-release.test.mjs',
   ].join(' '),
   typecheck: 'tsc -b',
   'verify:release': 'node ./scripts/verify-release.mjs verify',

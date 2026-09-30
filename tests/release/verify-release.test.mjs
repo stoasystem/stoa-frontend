@@ -34,6 +34,11 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../
 const externalOutput = '/tmp/stoa-web-gate-run.json'
 const sha = (character) => character.repeat(64)
 const clone = (value) => JSON.parse(JSON.stringify(value))
+// The verifier is POSIX-only: it runs in the backend release gate and the Linux
+// CI job, and refuses any output parent it cannot check with getuid and 0700.
+// These tests pin POSIX paths, owners and modes, so a Windows checkout skips
+// them instead of leaving `npm run test:release` red there.
+const posixOnly = { skip: process.platform === 'win32' && 'the verifier is POSIX-only' }
 
 function checkout(overrides = {}) {
   return {
@@ -147,6 +152,8 @@ test('package scripts and schema define one closed five-step Web gate', async ()
     'tests/release/runtime-monitoring-flag.test.mjs',
     'tests/release/runtime-startup-barrier.test.mjs',
     'tests/release/served-release.test.mjs',
+    'tests/release/sandbox-evidence-sources-present.test.mjs',
+    'tests/release/verify-release.test.mjs',
   ].join(' '))
   assert.equal(packageJson.scripts['verify:release'], 'node ./scripts/verify-release.mjs verify')
   assert.deepEqual(STEP_DEFINITIONS, [
@@ -218,7 +225,7 @@ test('reviewed package scripts cannot be replaced by npx, lifecycle wrappers, or
   }
 })
 
-test('CLI accepts only verify with one absolute source-external output', () => {
+test('CLI accepts only verify with one absolute source-external output', posixOnly,() => {
   assert.deepEqual(parseCli(['verify', '--output', externalOutput], { repoRoot }), {
     command: 'verify',
     outputPath: externalOutput,
@@ -237,7 +244,7 @@ test('CLI accepts only verify with one absolute source-external output', () => {
   }
 })
 
-test('default CLI rejects a shared output parent before inspecting source', () => {
+test('default CLI rejects a shared output parent before inspecting source', posixOnly,() => {
   const result = spawnSync(process.execPath, [
     path.join(repoRoot, 'scripts/verify-release.mjs'),
     'verify',
@@ -258,7 +265,7 @@ test('default CLI rejects a shared output parent before inspecting source', () =
   assert.match(result.stderr, /OUTPUT_PARENT_UNSAFE/)
 })
 
-test('private output publication replaces stale bytes with one canonical 0600 receipt', async () => {
+test('private output publication replaces stale bytes with one canonical 0600 receipt', posixOnly,async () => {
   const state = harness()
   const receipt = await verifyWebRelease({
     outputPath: externalOutput,
@@ -307,7 +314,7 @@ test('output publication rejects symlinked or non-private parents', async () => 
   }
 })
 
-test('command environment is deterministic and drops ambient execution and build configuration', () => {
+test('command environment is deterministic and drops ambient execution and build configuration', posixOnly,() => {
   const environment = buildCommandEnvironment({
     ambient: {
       AWS_SECRET_ACCESS_KEY: 'secret',
