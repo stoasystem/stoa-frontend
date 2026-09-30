@@ -1,39 +1,56 @@
+import { Activity, BarChart3, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { AdminTeacherSlaCard } from '@/components/admin/AdminTeacherSlaCard'
 import { AdminOperationalNotificationsCard } from '@/components/admin/AdminOperationalNotificationsCard'
-import { AdminOperationCard } from '@/components/admin/AdminOperationCard'
+import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
-import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAdminPlatformStatsQuery } from '@/hooks/admin/useAdminPlatformStatsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
+/*
+ * The administrator's home and the source list's System item (#13 point 6,
+ * #52): the operations overview, and the section's other pages as chevron
+ * rows. Moderation and teacher applications have their own items in the
+ * source list; account operations sits under Users.
+ */
 export function AdminDashboardPage() {
+  const { t } = useTranslation('admin')
   const platformStatsQuery = useAdminPlatformStatsQuery()
 
   return (
     <DashboardLayout>
       <PageContainer className="p-0">
-        <PageHeader
-          eyebrow="Admin operations"
-          title="Pilot operations"
-          description="Monitor the minimum operational signals needed for pilot readiness."
-          actions={<Badge variant="secondary">Basic operations</Badge>}
-        />
+        <PageHeader title={t('system.title')} description={t('system.description')} />
+        <Group title={t('system.pages')}>
+          <Row
+            to="/admin/system"
+            leading={{ kind: 'icon', icon: Activity }}
+            title={t('system.status')}
+            subtitle={t('system.statusDescription')}
+          />
+          <Row
+            to="/admin/learning-operations"
+            leading={{ kind: 'icon', icon: BarChart3 }}
+            title={t('system.learningOperations')}
+            subtitle={t('system.learningOperationsDescription')}
+          />
+          <Row
+            to="/admin/learning-automation"
+            leading={{ kind: 'icon', icon: Sparkles }}
+            title={t('system.learningAutomation')}
+            subtitle={t('system.learningAutomationDescription')}
+          />
+        </Group>
         <div className="grid gap-4 lg:grid-cols-[1fr_20rem]">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Operations scope</CardTitle>
+              <CardTitle className="text-base">{t('system.scope.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>
-                Admin operations are limited to platform status, usage summary, and feedback
-                triage boundaries for the pilot.
-              </p>
-              <p>
-                Full user management, role changes, account status controls, support cases, and
-                platform content administration remain explicitly deferred.
-              </p>
+              <p>{t('system.scope.covers')}</p>
+              <p>{t('system.scope.notYet')}</p>
             </CardContent>
           </Card>
           <Card>
@@ -48,30 +65,8 @@ export function AdminDashboardPage() {
         </div>
         <AdminTeacherSlaCard stats={platformStatsQuery.data?.teacher_sla} />
         <AdminOperationalNotificationsCard />
-        <div className="grid gap-4 md:grid-cols-2">
-          <AdminOperationCard
-            title="Content moderation"
-            description="Review reported questions, assistant answers, and teacher replies."
-            to="/admin/moderation"
-          />
-          {/* Card 007 (frozen):
-          <AdminOperationCard
-            title="Billing interest"
-            description="Review plan interest before real payment collection is enabled."
-            to="/admin/billing-interest"
-          />
-          */}
-          <AdminOperationCard
-            title="Account operations"
-            description="Inspect one parent account across verification, billing, child access, entitlement, and usage state."
-            to="/admin/account-operations"
-          />
-          <AdminOperationCard
-            title="Teacher applications"
-            description="Review teacher applications and send activation invitations."
-            to="/admin/teacher-applications"
-          />
-        </div>
+        {/* Card 007 (frozen): billing interest comes back as the source list's
+            Subscriptions and billing item, not as a link here. */}
       </PageContainer>
     </DashboardLayout>
   )

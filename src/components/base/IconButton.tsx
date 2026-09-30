@@ -52,9 +52,9 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       aria-label={label}
       title={label}
       data-variant={variant}
-      data-ring-on-face
       className={cn(
-        'group relative inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0',
+        // The ring goes on the drawn face, not on a larger hit box around it.
+        'group relative inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none',
         'disabled:pointer-events-none disabled:opacity-40',
         className,
       )}

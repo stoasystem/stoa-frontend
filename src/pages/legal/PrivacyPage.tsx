@@ -18,7 +18,6 @@ export function PrivacyPage() {
           eyebrow={t('privacy.eyebrow')}
           title={t('privacy.title')}
           description={t('privacy.description')}
-          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
           {sectionKeys.map((sectionKey) => (

@@ -55,7 +55,14 @@
     "primary": "Navigation principale",
     "mobilePrimary": "Navigation principale mobile",
     "logoHome": "Accueil STOA",
-    "administration": "Administration"
+    "administration": "Administration",
+    "admin": {
+      "users": "Utilisateurs",
+      "teacherApplications": "Candidatures d’enseignants",
+      "curriculum": "Programme",
+      "moderation": "Modération",
+      "system": "Système"
+    }
   },
   "actions": {
     "startLearning": "Commencer à apprendre",
@@ -164,7 +171,8 @@
       "new": "Nouveau",
       "reviewed": "Examiné",
       "resolved": "Résolu"
-    }
+    },
+    "loadingAccount": "Chargement du compte…"
   },
   "notifications": {
     "title": "Notifications",
@@ -264,5 +272,14 @@
       "heading": "Mot de passe",
       "again": "Le modifier encore"
     }
+  },
+  "organizationHome": {
+    "title": "Organisation",
+    "description": "L’apprentissage dans votre organisation et les exercices qui lui sont attribués.",
+    "pages": "Vos pages",
+    "learningOperations": "Suivi de l’apprentissage",
+    "learningOperationsDescription": "Signaux, achèvements et disponibilité des données par matière",
+    "learningAutomation": "Automatisation de l’apprentissage",
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices"
   }
 }

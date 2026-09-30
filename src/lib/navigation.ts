@@ -20,6 +20,8 @@ export type AppNavItem = {
   icon: AppNavIcon
   mobile?: boolean
   description?: string
+  /** The other pages of the entry's section, which light it too. */
+  covers?: readonly string[]
 }
 
 /*
@@ -39,6 +41,7 @@ export const navItems: readonly AppNavItem[] = pageRoutes
       icon: nav.icon,
       mobile: nav.mobile,
       description: nav.description,
+      covers: nav.covers,
     })),
   )
   .sort((a, b) => Number(a.priority === 'secondary') - Number(b.priority === 'secondary'))

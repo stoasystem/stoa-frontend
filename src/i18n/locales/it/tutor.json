@@ -62,5 +62,26 @@
       "busy": "Al momento occupato",
       "unavailable": "Non accetta studenti"
     }
+  },
+  "requests": {
+    "pending": "In attesa",
+    "resolvedToday": "Completate oggi",
+    "averageResponse": "Prima risposta media",
+    "minutes": "{{count}} min",
+    "filterLabel": "Filtra le richieste",
+    "all": "Tutte",
+    "empty": "Nessuna richiesta di supporto disponibile.",
+    "listLabel": "Richieste",
+    "row": "{{subject}} · {{grade}}",
+    "priority": "Priorità: {{priority}}",
+    "sla": {
+      "at_risk": "Scadenza a rischio",
+      "breached": "In ritardo"
+    },
+    "more": "Altro",
+    "learningAutomation": "Automazione dell’apprendimento",
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
+    "firstAction": "Prima azione del docente: {{time}}",
+    "firstActionNone": "Prima azione del docente: non ancora registrata"
   }
 }

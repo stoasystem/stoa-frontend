@@ -67,12 +67,11 @@ export function StarCard({
     <article
       aria-labelledby="starmap-star-title"
       className={cn(
-        'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border p-[18px] text-on-sky',
+        'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky',
         wide ? 'right-12 top-1/2 w-[340px] -translate-y-1/2' : 'inset-x-4 bottom-[calc(1rem+var(--page-bottom-inset,0px))]',
       )}
       style={{
         background: 'var(--sky-glass)',
-        borderColor: 'var(--sky-glass-border)',
         backdropFilter: 'blur(var(--sky-glass-blur))',
         WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
         boxShadow: 'var(--shadow-glass)',
@@ -153,8 +152,7 @@ export function StarCard({
               <li key={skill.skillId} className="inline-flex items-center gap-1.5 text-[13px] text-on-sky">
                 <span
                   aria-hidden="true"
-                  className={cn('inline-block size-2 rounded-full', skill.lit ? 'bg-lit' : 'border border-solid')}
-                  style={skill.lit ? undefined : { borderColor: 'rgba(255, 255, 255, 0.55)' }}
+                  className={cn('inline-block size-2 rounded-full', skill.lit ? 'bg-lit' : 'border border-solid border-white/55')}
                 />
                 <span className="sr-only">{t(skill.lit ? 'star.skillLit' : 'star.skillDark', { name: skill.name })}</span>
                 <span aria-hidden="true">{skill.name}</span>
@@ -186,8 +184,7 @@ export function StarCard({
 
       {action && (
         <div className="pt-1">
-          {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
-          <Button asChild variant="onSky" size="regular" style={{ color: 'var(--on-sky-button-text)' }}>
+          <Button asChild variant="onSky" size="regular">
             <Link to={chapterTo} onClick={jump}>
               {action}
             </Link>

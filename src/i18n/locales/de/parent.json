@@ -146,11 +146,34 @@
     "noSubjects": "Keine Fächer festgelegt",
     "summary": "Übersicht",
     "weeklyLinkDescription": "Aktuelle Fragen, schwache Themen, Unterstützung durch Lehrpersonen und der nächste Schritt für Eltern.",
-    "monthlyLinkDescription": "Fachtrends, wiederkehrende Schwachstellen und längerfristige Unterstützungsmuster."
+    "monthlyLinkDescription": "Fachtrends, wiederkehrende Schwachstellen und längerfristige Unterstützungsmuster.",
+    "childReports": "Berichte für {{name}}"
   },
   "valueCard": {
     "title": "Warum das zählt",
     "body1": "STOA zeigt Eltern, ob tatsächlich gelernt wird: aktuelle Fragen, schwache Themen, Beteiligung der Lehrperson und der nächste praktische Schritt.",
     "body2": "Elternberichte machen aus der Hausaufgabenaktivität eine wöchentliche Entscheidung: begleitete Unterstützung fortsetzen, Lehrpersonen-Unterstützung anfordern oder ein Thema gemeinsam wiederholen."
+  },
+  "overview": {
+    "children": "Kinder",
+    "childSubtitle": "{{grade}} · {{subjects}}",
+    "more": "Mehr",
+    "account": "Konto und Familie",
+    "accountLoading": "Konto wird geprüft…",
+    "accountReady_one": "Bereit · {{count}} verknüpftes Kind",
+    "accountReady_other": "Bereit · {{count}} verknüpfte Kinder",
+    "accountAttention_one": "Braucht Aufmerksamkeit: {{issue}}",
+    "accountAttention_other": "Braucht Aufmerksamkeit ({{count}} Punkte): {{issue}}",
+    "accountBlocked_one": "Gesperrt: {{issue}}",
+    "accountBlocked_other": "Gesperrt ({{count}} Punkte): {{issue}}",
+    "accountSeeDetails": "Details im Konto",
+    "state": { "blocked": "Gesperrt", "attention": "Bitte prüfen" },
+    "issues": {
+      "parent_email_unverified": "E-Mail-Adresse der Eltern ist noch nicht bestätigt",
+      "no_linked_children": "Kein Kinderkonto verknüpft",
+      "child_email_unverified": "Die E-Mail-Adresse eines Kinderkontos ist nicht bestätigt",
+      "usage_unreconciled": "Die Nutzung wird noch abgeglichen",
+      "child_binding": "Eine Verknüpfung mit einem Kind muss geprüft werden"
+    }
   }
 }

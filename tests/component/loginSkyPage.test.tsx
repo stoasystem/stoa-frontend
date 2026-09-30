@@ -5,6 +5,11 @@
  * mutation and the real HTTP layer (MSW), a sign-in still lands where `next`
  * points, a reset account still goes to the password page, and refusals
  * still reach the screen -- without anything red or burgundy on the sky.
+ *
+ * `/login` is mounted as the app mounts it, on EntryPage: once the session
+ * exists, EntryPage alone decides where the visitor goes (#67), so the form on
+ * its own would stay put. The full router's version of these probes is in
+ * loginNextThroughRouter.test.tsx.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, within } from '@testing-library/react'
@@ -18,6 +23,7 @@ import deAuth from '@/i18n/locales/de/auth.json'
 import enAuth from '@/i18n/locales/en/auth.json'
 import frAuth from '@/i18n/locales/fr/auth.json'
 import itAuth from '@/i18n/locales/it/auth.json'
+import { EntryPage } from '@/pages/entry/EntryPage'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
@@ -29,7 +35,7 @@ function renderLogin(entry = '/login') {
       <QueryClientProvider client={client}>
         <MemoryRouter initialEntries={[entry]}>
           <Routes>
-            <Route path="/login" element={<LoginPage />} />
+            <Route path="/login" element={<EntryPage />} />
             <Route path="/" element={<p>student home</p>} />
             <Route path="/planet/:subjectId" element={<p>the maths planet</p>} />
             <Route path="/settings/password" element={<p>change your password</p>} />
@@ -120,10 +126,10 @@ describe('the sign-in page', () => {
   it('marks the account link as a link inside the sentence, not by colour alone', () => {
     renderLogin()
 
-    // index.css underlines `data-sky-link="inline"` on the sky.
-    expect(screen.getByRole('link', { name: enAuth.login.howToGetAccount })).toHaveAttribute('data-sky-link', 'inline')
+    // White and underlined by its own classes (#73: the base `a` rule no longer outranks them).
+    expect(screen.getByRole('link', { name: enAuth.login.howToGetAccount })).toHaveClass('text-on-sky', 'underline')
     for (const name of ['Help and support', 'Privacy', 'Terms', 'Back to STOA homepage']) {
-      expect(screen.getByRole('link', { name })).toHaveAttribute('data-sky-link', 'quiet')
+      expect(screen.getByRole('link', { name })).toHaveClass('text-[color:var(--on-sky-text-caption)]', 'hover:text-on-sky')
     }
   })
 
@@ -197,7 +203,7 @@ describe('signing in from the sky page', () => {
     }
     for (const label of ['Email', 'Password']) {
       expect(screen.getByLabelText(label)).toHaveClass('border-b-2')
-      expect(screen.getByLabelText(label)).toHaveAttribute('data-sky-field')
+      expect(screen.getByLabelText(label)).toHaveClass('border-[color:var(--on-sky-field-rule)]', 'aria-[invalid=true]:border-on-sky')
     }
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-invalid', 'true')
     expect(screen.getByLabelText('Email')).toHaveAttribute('aria-describedby', 'login-email-error')

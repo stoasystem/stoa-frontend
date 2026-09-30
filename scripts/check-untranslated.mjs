@@ -51,6 +51,8 @@ const ROOTS = [
   'src/components/notifications',
   'src/pages/support',
   'src/pages/auth',
+  // The organisation roles' home (#52).
+  'src/pages/organization',
 ]
 
 // Anything a screen puts words into.

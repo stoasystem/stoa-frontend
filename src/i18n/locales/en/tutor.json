@@ -62,5 +62,26 @@
       "busy": "Currently busy",
       "unavailable": "Not accepting students"
     }
+  },
+  "requests": {
+    "pending": "Pending",
+    "resolvedToday": "Resolved today",
+    "averageResponse": "Average first response",
+    "minutes": "{{count}} min",
+    "filterLabel": "Filter requests",
+    "all": "All",
+    "empty": "No tutor support requests are available.",
+    "listLabel": "Requests",
+    "row": "{{subject}} · {{grade}}",
+    "priority": "{{priority}} priority",
+    "sla": {
+      "at_risk": "At risk",
+      "breached": "Overdue"
+    },
+    "more": "More",
+    "learningAutomation": "Learning automation",
+    "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
+    "firstAction": "First tutor action: {{time}}",
+    "firstActionNone": "First tutor action: not recorded yet"
   }
 }

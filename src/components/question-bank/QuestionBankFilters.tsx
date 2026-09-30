@@ -162,7 +162,7 @@ function FilterGroup<T extends string>({
             type="button"
             onClick={() => onChange(option.value)}
             className={cn(
-              'rounded-md border px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'rounded-md border px-3 py-2 text-xs font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-ring',
               value === option.value
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-border/80 bg-[hsl(var(--platform-surface-app))] text-muted-foreground hover:border-primary/35 hover:text-foreground',

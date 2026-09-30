@@ -55,7 +55,14 @@
     "primary": "Primary",
     "mobilePrimary": "Mobile primary",
     "logoHome": "STOA home",
-    "administration": "Administration"
+    "administration": "Administration",
+    "admin": {
+      "users": "Users",
+      "teacherApplications": "Teacher applications",
+      "curriculum": "Curriculum",
+      "moderation": "Moderation",
+      "system": "System"
+    }
   },
   "actions": {
     "startLearning": "Start learning",
@@ -164,7 +171,8 @@
       "new": "New",
       "reviewed": "Reviewed",
       "resolved": "Resolved"
-    }
+    },
+    "loadingAccount": "Loading account…"
   },
   "notifications": {
     "title": "Notifications",
@@ -264,5 +272,14 @@
       "heading": "Password",
       "again": "Change it again"
     }
+  },
+  "organizationHome": {
+    "title": "Organization",
+    "description": "Learning across your organization, and the practice assigned to it.",
+    "pages": "Your pages",
+    "learningOperations": "Learning operations",
+    "learningOperationsDescription": "Signals, completions and data readiness by subject",
+    "learningAutomation": "Learning automation",
+    "learningAutomationDescription": "Preview and run automatic practice assignments"
   }
 }
