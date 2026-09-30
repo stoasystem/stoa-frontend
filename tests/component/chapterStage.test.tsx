@@ -355,7 +355,7 @@ describe('the chapter', () => {
     expect(screen.getByRole('link', { name: 'Continue: Balancing both sides' })).toHaveAttribute('href', '/chapter/u-5/l-2')
     expect(within(rows[2]).getByRole('link', { name: /^Lesson 3:/ })).toHaveAttribute('href', '/chapter/u-5/l-3')
     expect(within(rows[1]).getByRole('link', { name: /^Lesson 2:/ })).toHaveAttribute('aria-current', 'step')
-    // Every lesson not done yet can be tested out of; a done one cannot.
+    // A lesson open to the student can be tested out of; a done one cannot (a locked one neither, #96).
     expect(within(rows[0]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
     expect(within(rows[2]).getByRole('link', { name: 'Skip this lesson: Equations with brackets' })).toHaveAttribute('href', '/chapter/u-5/l-3?mode=quiz')
   })
@@ -458,6 +458,8 @@ describe('a lesson the chapter does not open', () => {
     expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
     expect(screen.queryByRole('heading', { level: 2, name: '3x + 5 = 20' })).not.toBeInTheDocument()
     expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
+    // No test-out from a locked lesson (#96).
+    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
   })
 
   it('shows no exercise while the chapter is still saying whether the lesson is open', async () => {

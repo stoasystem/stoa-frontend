@@ -56,7 +56,8 @@
       "progress": "{{done}} of {{total}} lessons in {{chapter}} done",
       "allDone": "Every lesson in {{chapter}} is done.",
       "next": "Next lesson: {{title}}",
-      "backToChapter": "Back to the chapter"
+      "backToChapter": "Back to the chapter",
+      "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once."
     },
     "loading": "Loading the lesson…",
     "failed": "The lesson could not be loaded.",
@@ -90,8 +91,7 @@
     },
     "testOut": {
       "action": "Skip this lesson",
-      "label": "Skip this lesson: {{title}}",
-      "offer": "Already know it? Pass a short quiz to skip it."
+      "label": "Skip this lesson: {{title}}"
     }
   },
   "quote": {

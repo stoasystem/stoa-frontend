@@ -4,8 +4,11 @@
  *
  * Skipping inside a lesson gives no credit: the exercise goes to the back of
  * the queue. Once only skipped exercises are left, the stage offers this quiz
- * instead of skipping again. From the chapter, a lesson not done yet can be
- * tested out of with the same quiz ("jump here").
+ * instead of skipping again. From the chapter, a lesson open to the student
+ * and not done yet can be tested out of with the same quiz ("jump here"); a
+ * locked one cannot (#81, `isOpenLesson`). Passing it completes the lesson
+ * and nothing more: the star lights only once every exercise in its chapter
+ * has been answered right at least once (#9).
  *
  * During a quiz: no hints, no Ask, no skip. Every wrong answer costs a heart
  * and sends the exercise to the back of the quiz; losing more than
@@ -14,7 +17,6 @@
  *
  * Every number the rules turn on is here, so they are easy to change.
  */
-
 /** Wrong answers a quiz forgives. Shown as QUIZ_MAX_MISTAKES + 1 hearts. */
 export const QUIZ_MAX_MISTAKES = 1
 /** Hearts at the start of a quiz: one for each forgiven mistake, and the last one. */

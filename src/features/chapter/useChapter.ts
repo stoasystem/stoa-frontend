@@ -53,11 +53,19 @@ export function nextLessonOf(lessons: readonly ChapterLesson[]): string | null {
   return open?.id ?? null
 }
 
+/**
+ * A lesson the student can work on now: open to them and not done yet. The
+ * one to go on with next, and the only kind that can be tested out of (#81).
+ */
+export function isOpenLesson(status: ChapterLessonStatus): boolean {
+  return status === 'available' || status === 'current' || status === 'review'
+}
+
 /** The lesson after `lessonId` in the chapter that is not done yet, if any. */
 export function lessonAfter(chapter: Chapter, lessonId: string): ChapterLesson | null {
   const index = chapter.lessons.findIndex((lesson) => lesson.id === lessonId)
   const rest = index >= 0 ? chapter.lessons.slice(index + 1) : chapter.lessons
-  return rest.find((lesson) => lesson.status !== 'completed' && lesson.status !== 'locked') ?? null
+  return rest.find((lesson) => isOpenLesson(lesson.status)) ?? null
 }
 
 export function useChapter(unitId: string | undefined): ChapterQuery {

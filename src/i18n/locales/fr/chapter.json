@@ -56,7 +56,8 @@
       "progress": "{{done}} leçons sur {{total}} terminées dans {{chapter}}",
       "allDone": "Toutes les leçons de {{chapter}} sont terminées.",
       "next": "Leçon suivante : {{title}}",
-      "backToChapter": "Retour au chapitre"
+      "backToChapter": "Retour au chapitre",
+      "testedOut": "La leçon compte comme terminée. L’étoile s’allume dès que chaque exercice de ce chapitre a été réussi au moins une fois."
     },
     "loading": "Chargement de la leçon…",
     "failed": "La leçon n’a pas pu être chargée.",
@@ -90,8 +91,7 @@
     },
     "testOut": {
       "action": "Passer cette leçon",
-      "label": "Passer cette leçon : {{title}}",
-      "offer": "Tu connais déjà ? Réussis un petit quiz pour la passer."
+      "label": "Passer cette leçon : {{title}}"
     }
   },
   "quote": {

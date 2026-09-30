@@ -254,6 +254,7 @@ async function onScreen(lessonId = 'l-2') {
 }
 
 const where = () => screen.getByTestId('where').textContent
+const TEST_OUT_NOTE = 'The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.'
 const strip = () => document.querySelector('[data-stage-actions]')!
 const hearts = () => document.querySelector('[data-quiz-hearts]')
 
@@ -555,13 +556,14 @@ describe('the quiz that finishes a lesson with skips', () => {
 })
 
 describe('testing out of a lesson from the chapter', () => {
-  it('offers 「跳过这一课」 on every lesson not done, locked ones too', async () => {
+  it('offers 「跳过这一课」 on a lesson open to the student, never on a locked or a done one (#96)', async () => {
     open('/chapter/u-5')
     const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
     expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])
     expect(within(rows[0]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
     expect(within(rows[1]).getByRole('link', { name: 'Skip this lesson: Balancing both sides' })).toHaveAttribute('href', '/chapter/u-5/l-2?mode=quiz')
-    expect(within(rows[2]).getByRole('link', { name: 'Skip this lesson: Equations with brackets' })).toHaveAttribute('href', '/chapter/u-5/l-3?mode=quiz')
+    expect(within(rows[2]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    expect(within(rows[3]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
   })
 
   it('draws five of a longer lesson, with the same rules', async () => {
@@ -576,36 +578,56 @@ describe('testing out of a lesson from the chapter', () => {
     expect(seen.completes).toEqual(['l-2'])
   })
 
-  it('passed on a locked lesson: the lesson is done and the next one opens', async () => {
-    open('/chapter/u-5')
-    const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
-    await userEvent.click(within(rows[2]).getByRole('link', { name: 'Skip this lesson: Equations with brackets' }))
-    expect(where()).toBe('/chapter/u-5/l-3?mode=quiz')
+  it('a locked lesson offers no test-out, and ?mode=quiz on it shows the locked notice (#96)', async () => {
+    open('/chapter/u-5/l-3?mode=quiz')
+    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
+    expect(seen.completes).toEqual([])
+  })
 
-    expect(await screen.findByText(/Quiz · Question 1 of 3$/)).toBeInTheDocument()
-    await passQuiz('l-3')
+  it('opens a lesson already done as the lesson, not a quiz, even with ?mode=quiz (#96)', async () => {
+    open('/chapter/u-5/l-1?mode=quiz')
+    expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
+  })
+
+  it('starts no quiz while the chapter cannot say the lesson is open: the frontend is the only gate (#96)', async () => {
+    mswServer.use(http.get(`${API}/practice/math/algebra/roadmap`, () => HttpResponse.json({ detail: 'down' }, { status: 500 })))
+    open('/chapter/u-5/l-3?mode=quiz')
+    expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
+    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
+  })
+
+  it('says, once passed, that the star still needs every exercise answered right (#96)', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    await passQuiz()
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(seen.completes).toEqual(['l-3'])
+    expect(screen.getByText(TEST_OUT_NOTE)).toBeInTheDocument()
+  })
 
-    await userEvent.click(screen.getByRole('link', { name: 'Back to the chapter' }))
-    await screen.findByText('2 of 4 lessons done')
-    const after = within(screen.getByRole('list')).getAllByRole('listitem')
-    expect(after.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'completed', 'available'])
+  it('says nothing of the sort when the lesson was worked through', async () => {
+    open('/chapter/u-5/l-2')
+    // l-2 has six exercises (LESSONS above).
+    for (let n = 1; n <= 6; n += 1) await answerRight()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(screen.queryByText(TEST_OUT_NOTE)).not.toBeInTheDocument()
   })
 
   it('lost: back to the chapter with nothing changed, and it can be tried again', async () => {
-    open('/chapter/u-5/l-3?mode=quiz')
-    await screen.findByText(/Quiz · Question 1 of 3$/)
-    await answerWrong('l-3')
-    await answerWrong('l-3')
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    await answerWrong()
+    await answerWrong()
     expect(await screen.findByRole('heading', { name: 'Not yet' })).toHaveFocus()
     expect(seen.completes).toEqual([])
 
     await userEvent.click(screen.getByRole('button', { name: 'Try the quiz again' }))
-    expect(await screen.findByText(/Quiz · Question 1 of 3$/)).toBeInTheDocument()
+    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
     expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
-    await answerWrong('l-3')
-    await answerWrong('l-3')
+    await answerWrong()
+    await answerWrong()
 
     await userEvent.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
     expect(where()).toBe('/chapter/u-5')
@@ -615,26 +637,18 @@ describe('testing out of a lesson from the chapter', () => {
     expect(seen.completes).toEqual([])
   })
 
-  it('is offered from a locked lesson’s notice too', async () => {
-    open('/chapter/u-5/l-3')
-    expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('link', { name: 'Skip this lesson' }))
-    expect(where()).toBe('/chapter/u-5/l-3?mode=quiz')
-    expect(await screen.findByText(/Quiz · Question 1 of 3$/)).toBeInTheDocument()
-  })
-
   it('holds the hearts still under reduced motion', async () => {
-    open('/chapter/u-5/l-3?mode=quiz', { reducedMotion: true })
-    await screen.findByText(/Quiz · Question 1 of 3$/)
+    open('/chapter/u-5/l-2?mode=quiz', { reducedMotion: true })
+    await screen.findByText(/Quiz · Question 1 of 5$/)
     expect(hearts()).toHaveAttribute('data-motion', 'none')
-    await answerWrong('l-3')
+    await answerWrong()
     expect(hearts()?.querySelector('[data-heart="lost"]')).not.toBeNull()
     expect(hearts()).toHaveAttribute('data-motion', 'none')
   })
 
   it('lets the lost heart beat once with motion allowed', async () => {
-    open('/chapter/u-5/l-3?mode=quiz')
-    await screen.findByText(/Quiz · Question 1 of 3$/)
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
     expect(hearts()).toHaveAttribute('data-motion', 'beat')
   })
 })

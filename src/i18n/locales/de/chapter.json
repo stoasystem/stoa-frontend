@@ -56,7 +56,8 @@
       "progress": "{{done}} von {{total}} Lektionen in {{chapter}} erledigt",
       "allDone": "Alle Lektionen in {{chapter}} sind erledigt.",
       "next": "Nächste Lektion: {{title}}",
-      "backToChapter": "Zurück zum Kapitel"
+      "backToChapter": "Zurück zum Kapitel",
+      "testedOut": "Die Lektion zählt als erledigt. Der Stern leuchtet, sobald jede Aufgabe in diesem Kapitel mindestens einmal richtig beantwortet ist."
     },
     "loading": "Die Lektion wird geladen…",
     "failed": "Die Lektion konnte nicht geladen werden.",
@@ -90,8 +91,7 @@
     },
     "testOut": {
       "action": "Lektion überspringen",
-      "label": "Lektion überspringen: {{title}}",
-      "offer": "Kannst du es schon? Mit einem kurzen Quiz überspringst du sie."
+      "label": "Lektion überspringen: {{title}}"
     }
   },
   "quote": {
