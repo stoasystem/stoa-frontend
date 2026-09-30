@@ -135,6 +135,38 @@ async function expectPolicyFailure(promise, code) {
   )
 }
 
+// The production deploy gate runs this file twice: through `test:release`,
+// and by itself (#101). The second does not depend on package.json, so
+// dropping this file from `test:release` still meets PACKAGE_SCRIPT_DRIFT
+// here; dropping the step instead is met by this test through `test:release`.
+test('the production deploy gate runs this file by itself, ahead of the publish job', async () => {
+  const workflow = await readFile(path.join(repoRoot, '.github/workflows/deploy-production.yml'), 'utf8')
+  const lines = workflow.split(/\r?\n/)
+  const jobAt = (name) => lines.findIndex((line) => line === `  ${name}:`)
+  const verifyAt = jobAt('verify')
+  assert.ok(verifyAt >= 0, 'the deploy workflow has a verify job')
+  const nextJob = lines.findIndex((line, index) => index > verifyAt && /^ {2}[A-Za-z][\w-]*:\s*$/.test(line))
+  const verifyJob = lines.slice(verifyAt, nextJob < 0 ? undefined : nextJob)
+  const runAt = verifyJob.findIndex((line) => /^\s+run: node --test tests\/release\/verify-release\.test\.mjs\s*$/.test(line))
+  assert.ok(runAt >= 0, 'the verify job runs `node --test tests/release/verify-release.test.mjs` as its own step')
+  // The step and its job must be able to fail the gate: no condition that
+  // skips them, no continue-on-error that lets a failure through.
+  const isStepStart = (line) => /^ {6}- /.test(line)
+  let stepStart = runAt
+  while (stepStart > 0 && !isStepStart(verifyJob[stepStart])) stepStart -= 1
+  const stepEnd = verifyJob.findIndex((line, index) => index > stepStart && isStepStart(line))
+  const step = verifyJob.slice(stepStart, stepEnd < 0 ? undefined : stepEnd)
+  const softening = /^\s*(- )?(if|continue-on-error):/
+  assert.ok(!step.some((line) => softening.test(line)), 'the verifier step has no `if:` or `continue-on-error:`')
+  assert.ok(
+    !verifyJob.some((line) => /^ {4}(if|continue-on-error):/.test(line)),
+    'the verify job has no `if:` or `continue-on-error:`',
+  )
+  const deploy = lines.slice(jobAt('deploy'))
+  assert.ok(jobAt('deploy') > verifyAt, 'the publish job comes after the gate')
+  assert.ok(deploy.some((line) => /^\s+needs: verify\s*$/.test(line)), 'the publish job waits for the gate')
+})
+
 test('package scripts and schema define one closed five-step Web gate', async () => {
   const packageJson = JSON.parse(await readFile(path.join(repoRoot, 'package.json'), 'utf8'))
   const schema = JSON.parse(await readFile(
