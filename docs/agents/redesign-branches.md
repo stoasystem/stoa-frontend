@@ -29,16 +29,16 @@ gh pr create --base redesign/planet
 
 ## 门禁
 
-`.github/workflows/redesign-gate.yml` 对 base 为 `redesign/planet` 或 `redesign/cute` 的每个 PR
-依次跑，任何一步红都不能合：
+`.github/workflows/redesign-gate.yml` 对 base 为 `redesign/planet`、`redesign/cute` 或 `main` 的每个 PR
+依次跑，任何一步红都不能合（`main` 那一项只对合并提交里带着这个文件的 PR 生效，见下方「合并」）：
 
 ```
 lint → typecheck → check:api-contract → check:untranslated → check:contrast
 → test → test:release → publisher 测试 → build
 ```
 
-**工作流文件必须已经在集成分支里，门禁才会跑。** GitHub 跑的是 PR 合并提交里的工作流，而 `main` 上没有这个
-文件。所以 `redesign/cute` 要从已经包含 `redesign-gate.yml` 的提交切出，或者把这个工作流作为它的第一个提交；
+**工作流文件必须已经在集成分支里，门禁才会跑。** GitHub 跑的是 PR 合并提交里的工作流，而 `main` 上（在
+`redesign/planet` 合入之前）没有这个文件。所以 `redesign/cute` 要从已经包含 `redesign-gate.yml` 的提交切出，或者把这个工作流作为它的第一个提交；
 否则指向它的 PR 一个检查都不跑，也不会有任何提示。
 
 与 `deploy-production.yml` 的门同源（同样的 action 版本、Node 22、`npm ci` 参数，API 契约同样实时拉
@@ -49,7 +49,9 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
 - API 契约只查路径与方法，不查响应字段（决议 #5 第 9 条）。星球读模型与异步 Ask 要单独做契约验证。
 - API 契约只扫 `src/services`（`scripts/check-api-contract.mjs` 的 `SERVICE_ROOT`）。新代码里的后端调用要放进
   `src/services`，放在 `src/features/planet` 之类的目录里就不会被检查。
-- `workflow_dispatch` 暂时用不了：GitHub 只允许手动触发默认分支上的工作流。
+- `workflow_dispatch` 暂时用不了：GitHub 只允许手动触发默认分支上的工作流（`redesign/planet` 合入 `main` 后可用）。
+- **PR 有合并冲突时门禁一次都不跑**，也不会显示红：GitHub 生成不了合并提交，`pull_request` 工作流就不触发。
+  看不到这个检查时，先看 PR 是不是冲突了。
 - 对比度门禁（`check:contrast`）只评 `scripts/contrast-pairs.json` 里声明的前景/背景对，token 从该文件
   `tokens.file` 指向的那一个文件读，自 [#18](https://github.com/stoasystem/stoa-frontend/issues/18) 起就是
   应用真正引用的 `src/styles/brand-tokens.css`。浅色主题读 `:root`，深色（「天空」表面：星球、练习舞台、登录页）
@@ -75,9 +77,11 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
 
 - **进集成分支**：门禁绿；碰到红线（认证、发布投递与工作流、写入边界、密钥等）的票据，合并前必须有
   独立审计记录，写票据的人不能自审。
-- **进 `main`**：只在方案对比完成、**胜出方案已决议**之后，由胜出方案的集成分支整体合入。
-  合并层的其余条件（冒烟打预览、红线审计记录、对比度门禁）见决议 #5 第 9 条。
-  落选方案的集成分支不合。
-- 胜出分支合进 `main` 的那个 PR，**不会触发本门禁**，因为本门禁只认 base 为 `redesign/*` 的 PR。
-  合并前要手动跑一次 `frontend-ci.yml`，或者在集成分支上确认最后一次门禁是绿的；否则第一次检查
-  要等 push 到 `main` 以后才发生。
+- **进 `main`**：`redesign/planet` 满足决议 [#84](https://github.com/stoasystem/stoa-frontend/issues/84)
+  的条件后，以一个 merge commit 整体合入（方案 B 暂缓，A 不等 B）。硬条件与执行顺序见
+  [#86](https://github.com/stoasystem/stoa-frontend/issues/86)。合并到 `main` 即部署生产，逐次得到用户确认。
+- 集成分支合进 `main` 的那个 PR **会触发本门禁**（[#85](https://github.com/stoasystem/stoa-frontend/issues/85)
+  把 `main` 加进了 PR 目标）。门禁测的是合并提交，而 `main` 移动时不会重新触发：**合并前先重跑一次**
+  （在 Actions 里 Re-run，或推一次 head），确认这次运行是绿的，而且跑在当前 head 与当前 `main` 上，再合并。
+- 从 `main` 切出的热修 PR 不受影响：`main` 上还没有这个工作流文件，GitHub 用的是合并提交里的工作流，
+  所以这些 PR 不会触发。集成分支合入以后，文件进了 `main`，本门禁就成了 `main` 的 PR 门禁。
