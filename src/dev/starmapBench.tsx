@@ -2,7 +2,12 @@
  * The star map routes with a signed-in student and no backend, for looking
  * at the map and timing it (#47, #72). Dev server only: open
  * /src/dev/starmap.html?path=/map/math&points=2000 (`path` is the map route
- * to open, `points` the fixture size: 10, 500 or 2000).
+ * to open, `points` the fixture size: 10, 500, 1000 or 2000).
+ *
+ * `&foveation=off` draws every nebula star by star; `&bench=1` adds the
+ * phone bench's panel (#44, `starmapBenchPanel.tsx`). On a phone, run
+ * `npm run dev -- --host` and open the Network address it prints, e.g.
+ * http://192.168.1.20:5173/src/dev/starmap.html?points=500&bench=1.
  *
  * `&host=ask` mounts the map the way #66's AskHost will hold it: a plain
  * block page area (`absolute inset-y-0 left-0`), not a flex container, with
@@ -22,7 +27,12 @@ registerDevelopmentRuntimeConfig('http://localhost:8000', window.location.origin
 const params = new URLSearchParams(window.location.search)
 const path = params.get('path') ?? '/map/math'
 const points = params.get('points')
+const foveation = params.get('foveation')
 const host = params.get('host')
+const bench = params.get('bench') === '1'
+const entry = new URLSearchParams()
+if (points) entry.set('points', points)
+if (foveation) entry.set('foveation', foveation)
 
 async function start() {
   await Promise.all([import('../index.css'), import('@/i18n')])
@@ -61,10 +71,23 @@ async function start() {
 
   const root = document.getElementById('root')
   if (!root) return
+  // The phone bench (#44) reads the screen's refresh rate now, with nothing
+  // drawn yet: measured once the map is up and breathing, a phone that lags
+  // at rest would pass for a slower screen instead of a slower renderer.
+  let refreshHz = 0
+  if (bench) {
+    try {
+      refreshHz = await (await import('./starmapBenchPanel')).measureRefreshRate()
+    } catch {
+      // No frames (the tab is hidden, the screen is off): the rate is unknown,
+      // the panel says so, and the map still mounts.
+    }
+  }
+
   createRoot(root).render(
     <StrictMode>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
-        <MemoryRouter initialEntries={[points ? `${path}?points=${points}` : path]}>
+        <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
           <Routes>
             <Route path="/" element={Page('MapHomePage')} />
             <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
@@ -76,6 +99,13 @@ async function start() {
       </QueryClientProvider>
     </StrictMode>,
   )
+  return refreshHz
 }
 
-void start()
+void start().then(async (refreshHz) => {
+  if (!bench) return
+  const { mountBenchPanel } = await import('./starmapBenchPanel')
+  // `undefined` only when start() bailed out before rendering (no root), so
+  // there is no map to bench either.
+  mountBenchPanel(createRoot, refreshHz ?? 0)
+})

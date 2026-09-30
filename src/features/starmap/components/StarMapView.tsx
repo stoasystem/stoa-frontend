@@ -61,6 +61,8 @@ export type StarMapViewProps = {
   onNavigate: (target: LayerTarget) => void
   /** The first frame with the map on it is on screen. */
   onFirstFrame?: () => void
+  /** Foveated rendering; the phone bench switches it off (#44). Read once, when the canvas mounts. */
+  foveate?: boolean
   /** For tests: the frame clock and the renderer. */
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
@@ -94,7 +96,7 @@ function linkSize(glyph: number): number {
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, createRendererFor }: StarMapViewProps) {
+export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, scheduler, createRendererFor }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
@@ -147,6 +149,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
       renderer: createRendererFor ? createRendererFor(canvas) : createRenderer(canvas),
       theme: readTheme(stage),
       reducedMotion,
+      foveate,
       scheduler,
       onRequestTarget: (next) => navigateRef.current(next),
       onVisibleChange: (list, glyph, discs) => setVisible({ stars: list, glyph, nebulae: discs }),

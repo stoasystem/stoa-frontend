@@ -8,7 +8,7 @@
 import { useCallback, useMemo, useRef } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
-import { DEFAULT_SUBJECT_ID, fixtureSizeFrom, useStarMap } from '@/features/starmap/useStarMap'
+import { DEFAULT_SUBJECT_ID, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 
@@ -33,5 +33,7 @@ export function StarMapRoute() {
     [navigate, map.subject.subjectId, location.search],
   )
 
-  return <StarMapView map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} />
+  return (
+    <StarMapView map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} foveate={foveationFrom(search)} />
+  )
 }

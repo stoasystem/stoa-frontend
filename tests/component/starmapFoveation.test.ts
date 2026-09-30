@@ -71,6 +71,18 @@ describe('the engine draws only the focus star by star', () => {
     expect(renderer.last().sharpness.every((s) => s === 1)).toBe(true)
   })
 
+  it('draws a big map star by star everywhere with foveation switched off, for the phone bench (#44)', () => {
+    const renderer = recordingRenderer()
+    const clock = fakeClock()
+    const engine = new StarMapEngine({ renderer, theme: THEME, reducedMotion: true, scheduler: clock, now: clock.now, foveate: false })
+    engine.setViewport(W, H, 2)
+    engine.setData(map500, { layer: 'map' })
+    clock.advance(20)
+    const frame = renderer.last()
+    expect(frame.sharpness.every((s) => s === 1)).toBe(true)
+    expect(frame.starAlpha.every((a) => a === 1)).toBe(true)
+  })
+
   it('moves the focus with a pan: a nebula brought to the middle turns sharp', () => {
     const renderer = recordingRenderer()
     const { clock, engine } = engineWith(renderer)

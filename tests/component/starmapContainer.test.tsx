@@ -13,7 +13,7 @@ import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import i18n from '@/i18n'
-import { fakeClock, fakeContext } from './starmapHarness'
+import { fakeClock, fakeContext, recordingRenderer } from './starmapHarness'
 
 let size = { width: 843, height: 700 }
 let resize: (() => void) | null = null
@@ -105,5 +105,38 @@ describe('the star map in a plain block container', () => {
       clock.advance(20)
     })
     expect(canvas.width).toBe(843 * 2)
+  })
+})
+
+describe('the foveation switch (#44)', () => {
+  function mountWith(foveate: boolean | undefined) {
+    const clock = fakeClock()
+    const renderer = recordingRenderer()
+    render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter>
+          <div data-surface="sky" style={{ position: 'absolute', top: 0, left: 0, width: size.width, height: size.height }}>
+            <StarMapView
+              map={starMapFixture(500)}
+              target={{ layer: 'map' }}
+              onNavigate={() => {}}
+              foveate={foveate}
+              scheduler={clock}
+              createRendererFor={() => renderer}
+            />
+          </div>
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    act(() => clock.advance(20))
+    return renderer.last()
+  }
+
+  it('blurs the nebulae outside the focus by default', () => {
+    expect(mountWith(undefined).sharpness.some((s) => s === 0)).toBe(true)
+  })
+
+  it('reaches the engine: switched off, every nebula is drawn sharp', () => {
+    expect(mountWith(false).sharpness.every((s) => s === 1)).toBe(true)
   })
 })

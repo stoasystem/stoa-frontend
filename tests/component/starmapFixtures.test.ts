@@ -6,6 +6,8 @@
 import { describe, expect, it } from 'vitest'
 import { FIXTURE_SIZES, starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { LEARNING_STATES, orderedStars } from '@/features/starmap/model/starMap'
+import { BENCH_SIZES } from '@/dev/benchStats'
+import { fixtureSizeFrom, foveationFrom } from '@/features/starmap/useStarMap'
 
 describe.each(FIXTURE_SIZES)('the %i-point fixture', (size) => {
   const map = starMapFixture(size)
@@ -57,5 +59,26 @@ describe.each(FIXTURE_SIZES)('the %i-point fixture', (size) => {
   it('counts its lit stars in the summary', () => {
     expect(map.summary.total).toBe(size)
     expect(map.summary.lit).toBe(map.stars.filter((point) => point.state === 'lit').length)
+  })
+})
+
+describe('the fixture size in the URL (#44)', () => {
+  it('offers the three sizes the phone bench measures: 500, 1000 and 2000', () => {
+    for (const size of BENCH_SIZES) {
+      expect(fixtureSizeFrom(new URLSearchParams(`points=${size}`))).toBe(size)
+    }
+  })
+
+  it('falls back to the hand-written map for anything else', () => {
+    expect(fixtureSizeFrom(new URLSearchParams('points=750'))).toBe(10)
+    expect(fixtureSizeFrom(new URLSearchParams(''))).toBe(10)
+  })
+})
+
+describe('the foveation switch in the URL (#44)', () => {
+  it('is on unless the URL says foveation=off', () => {
+    expect(foveationFrom(new URLSearchParams(''))).toBe(true)
+    expect(foveationFrom(new URLSearchParams('foveation=on'))).toBe(true)
+    expect(foveationFrom(new URLSearchParams('foveation=off'))).toBe(false)
   })
 })

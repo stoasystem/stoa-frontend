@@ -28,10 +28,15 @@ function emptyMap(subjectId: string, subjects: StarMap['subjects']): StarMap {
   }
 }
 
-/** `?points=500` or `?points=2000` draws a bigger fixture map; default 10. */
+/** `?points=500`, `1000` or `2000` draws a bigger fixture map; default 10. */
 export function fixtureSizeFrom(search: URLSearchParams): FixtureSize {
   const asked = Number(search.get('points'))
   return isFixtureSize(asked) ? asked : 10
+}
+
+/** `?foveation=off` draws every nebula star by star, for the phone bench (#44); on otherwise. */
+export function foveationFrom(search: URLSearchParams): boolean {
+  return search.get('foveation') !== 'off'
 }
 
 export function useStarMap(subjectId: string, size: FixtureSize): StarMap {
