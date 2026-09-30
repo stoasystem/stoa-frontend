@@ -119,8 +119,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       {primary && (
         <div>
-          {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
-          <Button asChild variant="onSky" size="large" style={{ color: 'var(--on-sky-button-text)', minWidth: 200 }}>
+          <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
             <Link to={primary.to}>{primary.label}</Link>
           </Button>
         </div>

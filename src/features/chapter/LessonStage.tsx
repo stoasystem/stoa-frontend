@@ -129,7 +129,7 @@ function StageNotice({ unitId, lessonId, kind, retry }: { unitId?: string; lesso
           {unitId && lessonId && (
             <div className="flex flex-col items-start gap-1 pt-2">
               <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('quiz.testOut.offer')}</p>
-              <Button asChild variant="onSky" style={{ color: 'var(--on-sky-button-text)' }}>
+              <Button asChild variant="onSky">
                 <Link to={quizPath(unitId, lessonId)} data-test-out>
                   {t('quiz.testOut.action')}
                 </Link>
@@ -715,8 +715,7 @@ function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
             </Button>
           ) : (
             <>
-              {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
-              <Button asChild variant="onSky" size="large" style={{ color: 'var(--on-sky-button-text)', minWidth: 200 }}>
+              <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
                 <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
               </Button>
               <Button variant="onSkyPlain" onClick={run.retryTestOut}>
@@ -762,8 +761,7 @@ function LessonDone({ lesson, unitId, chapter }: { lesson: PracticeLesson; unitI
           </p>
         )}
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
-          {/* index.css's unlayered `a { color: inherit }` beats the variant's text class on a link. */}
-          <Button asChild variant="onSky" size="large" style={{ color: 'var(--on-sky-button-text)', minWidth: 200 }}>
+          <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
             {next ? (
               <Link to={chapterPath(unitId, next.id)}>{t('stage.done.next', { title: next.title })}</Link>
             ) : (
