@@ -1,9 +1,15 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { render } from '@testing-library/react'
+import type { ReactElement } from 'react'
+import { cleanup, render, screen } from '@testing-library/react'
 import { compile } from 'tailwindcss'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { Button } from '@/components/base/Button'
+import { Button as UiButton } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Textarea } from '@/components/ui/textarea'
 
 /*
  * The global base rules -- `* { border-color }`, `a { color; text-decoration }`
@@ -15,6 +21,11 @@ import { Button } from '@/components/base/Button'
  * jsdom parses `@layer` but applies none of it, so this compiles the real
  * src/index.css with Tailwind and settles the cascade here: origin importance,
  * then layer order (unlayered last), then specificity, then source order.
+ *
+ * `@media` blocks are walked and each rule keeps its conditions (#83). A test
+ * page is taken to be wide and to hover: `(hover: hover)` and a lower width
+ * bound (`md:` and up) count as met; anything else (`max-md:`,
+ * `motion-reduce:`, print) does not, and its rules never win.
  */
 
 const ROOT = path.resolve(__dirname, '../..')
@@ -71,9 +82,27 @@ const matches = (element: Element, selector: string) => {
   }
 }
 
+/**
+ * Whether a test page meets a media query list: it is wide and it hovers.
+ * Every feature of one comma-separated alternative must be `hover: hover` or
+ * a lower width bound.
+ */
+function mediaMet(condition: string): boolean {
+  return condition.split(/\s*,\s*/).some((alternative) => {
+    if (/^\s*not\b|\bprint\b/.test(alternative)) return false
+    const features = alternative.match(/\([^()]*\)/g) ?? []
+    return features.every(
+      (feature) =>
+        /^\(\s*hover\s*:\s*hover\s*\)$/.test(feature) || /^\(\s*min-width\s*:/.test(feature) || /^\(\s*width\s*>=?[^<]*\)$/.test(feature),
+    )
+  })
+}
+
+type Rule = { style: CSSStyleDeclaration; selectorText: string; layer: number; order: number; media: string[] }
+
 function collect(sheet: CSSStyleSheet) {
   const layerOrder: string[] = []
-  const rules: { rule: CSSStyleRule; selectorText: string; layer: number; order: number }[] = []
+  const rules: Rule[] = []
   let order = 0
   const layerIndex = (name: string) => {
     if (!layerOrder.includes(name)) layerOrder.push(name)
@@ -87,25 +116,31 @@ function collect(sheet: CSSStyleSheet) {
       : splitList(parent)
           .flatMap((outer) => splitList(own).map((inner) => (inner.includes('&') ? inner.replace(/&/g, outer) : `${outer} ${inner}`)))
           .join(', ')
-  const walk = (list: CSSRuleList, layer: number, parent?: string) => {
+  const walk = (list: CSSRuleList, layer: number, media: string[], parent?: string) => {
     for (const rule of Array.from(list)) {
       const name = rule.constructor.name
       if (name === 'CSSLayerStatementRule') {
         for (const layerName of (rule as unknown as { nameList: string[] }).nameList ?? rule.cssText.replace(/^@layer\s+|;$/g, '').split(/\s*,\s*/)) layerIndex(layerName)
       } else if (name === 'CSSLayerBlockRule') {
-        walk((rule as CSSGroupingRule).cssRules, layerIndex((rule as unknown as { name: string }).name), parent)
+        walk((rule as CSSGroupingRule).cssRules, layerIndex((rule as unknown as { name: string }).name), media, parent)
       } else if (name === 'CSSStyleRule') {
         const selectorText = nest(parent, (rule as CSSStyleRule).selectorText)
-        rules.push({ rule: rule as CSSStyleRule, selectorText, layer, order: order++ })
+        rules.push({ style: (rule as CSSStyleRule).style, selectorText, layer, order: order++, media })
         const nested = (rule as CSSStyleRule).cssRules
-        if (nested?.length) walk(nested, layer, selectorText)
-      } else if ('cssRules' in rule && name !== 'CSSMediaRule') {
-        // @supports and the like: treat as met. @media is skipped: no rule this file checks sits in one.
-        walk((rule as CSSGroupingRule).cssRules, layer, parent)
+        if (nested?.length) walk(nested, layer, media, selectorText)
+      } else if (name === 'CSSNestedDeclarations') {
+        // Declarations inside an at-rule nested in a style rule
+        // (`&:hover { @media (hover: hover) { ... } }`) belong to that rule's selector.
+        if (parent !== undefined) rules.push({ style: (rule as unknown as { style: CSSStyleDeclaration }).style, selectorText: parent, layer, order: order++, media })
+      } else if (name === 'CSSMediaRule') {
+        walk((rule as CSSMediaRule).cssRules, layer, [...media, (rule as CSSMediaRule).media.mediaText], parent)
+      } else if ('cssRules' in rule) {
+        // @supports and the like: treat as met.
+        walk((rule as CSSGroupingRule).cssRules, layer, media, parent)
       }
     }
   }
-  walk(sheet.cssRules, UNLAYERED)
+  walk(sheet.cssRules, UNLAYERED, [])
   return rules
 }
 
@@ -114,17 +149,18 @@ let sheetRules: ReturnType<typeof collect>
 /** The declaration that wins `property` on `element`, among the declarations naming any of `via`. */
 function winner(element: Element, via: string[]): Declaration | undefined {
   const found: Declaration[] = []
-  for (const { rule, selectorText, layer, order } of sheetRules) {
+  for (const { style, selectorText, layer, order, media } of sheetRules) {
+    if (!media.every(mediaMet)) continue
     const hits = splitList(selectorText).filter((selector) => matches(element, selector))
     if (!hits.length) continue
     const specificity = hits.map(specificityOf).sort((a, b) => b[0] - a[0] || b[1] - a[1] || b[2] - a[2])[0]
-    for (let i = 0; i < rule.style.length; i += 1) {
-      const property = rule.style[i]
+    for (let i = 0; i < style.length; i += 1) {
+      const property = style[i]
       if (!via.includes(property)) continue
       found.push({
         property,
-        value: rule.style.getPropertyValue(property),
-        important: rule.style.getPropertyPriority(property) === 'important',
+        value: style.getPropertyValue(property),
+        important: style.getPropertyPriority(property) === 'important',
         layer,
         specificity,
         order,
@@ -146,27 +182,96 @@ const COLOR = ['color']
 const DECORATION = ['text-decoration', 'text-decoration-line']
 const OUTLINE_STYLE = ['outline', 'outline-style']
 const MAX_WIDTH = ['max-width']
+const RING_SHADOW = ['--tw-ring-shadow']
 
 function place(html: string) {
   document.body.innerHTML = html
   return document.body.firstElementChild as HTMLElement
 }
 
-let compiler: Awaited<ReturnType<typeof compile>>
-const sheet = document.createElement('style')
+/** The shadcn primitives that drew their own ring on top of the base one (#83), and how to reach the focusable part. */
+const PRIMITIVES: [string, () => ReactElement, () => HTMLElement][] = [
+  ['ui Button', () => <UiButton>Save</UiButton>, () => screen.getByRole('button', { name: 'Save' })],
+  ['Input', () => <Input aria-label="Name" />, () => screen.getByRole('textbox', { name: 'Name' })],
+  ['Textarea', () => <Textarea aria-label="Note" />, () => screen.getByRole('textbox', { name: 'Note' })],
+  [
+    'TabsTrigger',
+    () => (
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">First</TabsTrigger>
+        </TabsList>
+        <TabsContent value="a">Panel</TabsContent>
+      </Tabs>
+    ),
+    () => screen.getByRole('tab', { name: 'First' }),
+  ],
+  [
+    'TabsContent',
+    () => (
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">First</TabsTrigger>
+        </TabsList>
+        <TabsContent value="a">Panel</TabsContent>
+      </Tabs>
+    ),
+    () => screen.getByRole('tabpanel'),
+  ],
+  [
+    'Dialog close button',
+    () => (
+      <Dialog open>
+        <DialogContent>
+          <DialogTitle>Title</DialogTitle>
+          <DialogDescription>Body</DialogDescription>
+        </DialogContent>
+      </Dialog>
+    ),
+    () => screen.getByRole('button', { name: 'Close' }),
+  ],
+]
 
-/** Builds src/index.css with these class names in use, as Vite would. */
-function useClasses(classes: string[]) {
-  sheet.textContent = compiler.build(classes)
-  sheetRules = collect(sheet.sheet as CSSStyleSheet)
+const skyLink = () => (
+  <Button asChild variant="onSky">
+    <a href="/chapter/u-1">Open</a>
+  </Button>
+)
+
+/** Every class the fixtures above put on the page, so one build covers them all. */
+function classesInUse(fixtures: (() => ReactElement)[]) {
+  const classes = new Set<string>()
+  for (const fixture of fixtures) {
+    render(fixture())
+    for (const element of Array.from(document.body.querySelectorAll('[class]'))) element.classList.forEach((name) => classes.add(name))
+    cleanup()
+  }
+  return Array.from(classes)
 }
 
+const sheet = document.createElement('style')
+
 describe('global base rules sit under the utilities (#73)', () => {
+  // One build of src/index.css with every candidate class in use, as Vite would.
   beforeAll(async () => {
     const css = readFileSync(path.join(SRC, 'index.css'), 'utf8')
-    compiler = await compile(css, { base: SRC, loadStylesheet })
+    const compiler = await compile(css, { base: SRC, loadStylesheet })
+    const candidates = [
+      'border',
+      'border-red',
+      'text-accent',
+      'underline',
+      'hover:underline',
+      'focus-visible:outline-none',
+      'max-w-[10px]',
+      'md:max-w-[20px]',
+      'max-md:max-w-[30px]',
+      'motion-reduce:max-w-[40px]',
+      ...classesInUse([skyLink, ...PRIMITIVES.map(([, fixture]) => fixture)]),
+    ]
+    sheet.textContent = compiler.build(candidates)
     document.head.append(sheet)
-    useClasses(['border', 'border-red', 'text-accent', 'underline', 'focus-visible:outline-none', 'max-w-[10px]'])
+    sheetRules = collect(sheet.sheet as CSSStyleSheet)
   })
 
   it('draws a border in --hairline when no class names a colour', () => {
@@ -213,15 +318,37 @@ describe('global base rules sit under the utilities (#73)', () => {
   })
 
   it('draws a sky Button rendered as a link (asChild) in the button label colour', () => {
-    const { getByRole } = render(
-      <Button asChild variant="onSky">
-        <a href="/chapter/u-1">Open</a>
-      </Button>,
-    )
-    const link = getByRole('link', { name: 'Open' })
-    useClasses(Array.from(link.classList))
-    const win = winner(link, COLOR)
+    render(skyLink())
+    const win = winner(screen.getByRole('link', { name: 'Open' }), COLOR)
     expect(win?.selector).toBe('.text-\\[color\\:var\\(--on-sky-button-text\\)\\]')
     expect(win?.value).toBe('var(--on-sky-button-text)')
+  })
+})
+
+describe('rules inside @media (#83)', () => {
+  it('keeps the condition of a hover variant on its rule and reads it as met', () => {
+    // jsdom matches no :hover, so the rule is looked up rather than won.
+    const rule = sheetRules.find(({ selectorText, style }) => selectorText === '.hover\\:underline:hover' && style.length > 0)
+    expect(rule?.media).toEqual(['(hover: hover)'])
+    expect(rule?.media.every(mediaMet)).toBe(true)
+  })
+
+  it('lets a min-width breakpoint class win over the svg cap', () => {
+    expect(winner(place('<svg class="md:max-w-[20px]"></svg>'), MAX_WIDTH)?.value).toBe('20px')
+  })
+
+  it.each([['max-md:max-w-[30px]'], ['motion-reduce:max-w-[40px]']])('leaves %s out, its condition unmet', (name) => {
+    expect(winner(place(`<svg class="${name}"></svg>`), MAX_WIDTH)?.value).toBe('100%')
+  })
+})
+
+describe('one focus ring on the shadcn primitives (#83)', () => {
+  it.each(PRIMITIVES)('rings a focused %s with the base outline and no ring shadow', (_name, fixture, target) => {
+    render(fixture())
+    const element = target()
+    element.focus()
+    const outline = winner(element, OUTLINE_STYLE)
+    expect(outline?.value).toContain('var(--focus-ring-width)')
+    expect(winner(element, RING_SHADOW)?.selector ?? '').not.toMatch(/:focus/)
   })
 })

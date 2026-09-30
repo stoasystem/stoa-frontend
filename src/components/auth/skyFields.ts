@@ -17,7 +17,6 @@ export const skyInputClass = [
   'h-11 rounded-none border-0 border-b bg-transparent px-0 py-0',
   'border-[color:var(--on-sky-field-rule)] focus-visible:border-on-sky aria-[invalid=true]:border-on-sky',
   'text-[17px] text-[color:var(--on-sky-text)] placeholder:text-[color:var(--on-sky-text-caption)]',
-  'focus-visible:ring-0 focus-visible:ring-offset-0',
   'read-only:text-[color:var(--on-sky-text-body)]',
   // A browser's saved-address fill paints its own light box; keep the sky.
   'autofill:shadow-[inset_0_0_0_1000px_var(--sky)] autofill:[-webkit-text-fill-color:var(--on-sky-text)]',

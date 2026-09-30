@@ -19,8 +19,10 @@
   [role="menuitem"]:focus-visible,
   [role="menuitemradio"]:focus-visible,
   [role="menuitemcheckbox"]:focus-visible,
-  [role="switch"]:focus-visible {
-    /* Motion and states: 2 px navy, 2 px offset; star-gold on the sky. */
+  [role="switch"]:focus-visible,
+  [role="tabpanel"]:focus-visible {
+    /* The one focus indicator: primitives draw no ring of their own (#83).
+       Motion and states: 2 px navy, 2 px offset; star-gold on the sky. */
     outline: var(--focus-ring-width) solid var(--focus-ring);
     outline-offset: var(--focus-ring-offset);
   }

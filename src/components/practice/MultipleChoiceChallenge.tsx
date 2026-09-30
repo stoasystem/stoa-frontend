@@ -17,7 +17,7 @@ export function MultipleChoiceChallenge({
         <button
           aria-checked={selected === option}
           className={cn(
-            'min-h-14 rounded-md border px-4 py-3 text-left text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+            'min-h-14 rounded-md border px-4 py-3 text-left text-sm font-medium transition-colors',
             selected === option
               ? 'border-primary bg-[hsl(var(--stoa-brand-burgundy-soft))] text-foreground'
               : 'border-border bg-card hover:border-primary/40',

@@ -161,7 +161,7 @@ export function StudentProfilePage() {
                     <Label htmlFor="answer-language">{t('profile.answerLanguageLong')}</Label>
                     <select
                       id="answer-language"
-                      className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45 focus-visible:ring-2 focus-visible:ring-ring/45"
+                      className="h-10 w-full rounded-md border border-border/80 bg-card/75 px-3 text-sm text-foreground focus-visible:border-primary/45"
                       value={preferredAnswerLanguage}
                       onChange={(event) => setPreferredAnswerLanguage(event.target.value as SupportedLanguage)}
                     >
