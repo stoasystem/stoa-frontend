@@ -56,7 +56,8 @@
       "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
       "allDone": "Tutte le lezioni di {{chapter}} sono completate.",
       "next": "Lezione successiva: {{title}}",
-      "backToChapter": "Torna al capitolo"
+      "backToChapter": "Torna al capitolo",
+      "testedOut": "La lezione conta come completata. La stella si accende quando ogni esercizio è stato risolto correttamente almeno una volta."
     },
     "loading": "Caricamento della lezione…",
     "failed": "Non è stato possibile caricare la lezione.",
@@ -90,8 +91,7 @@
     },
     "testOut": {
       "action": "Salta questa lezione",
-      "label": "Salta questa lezione: {{title}}",
-      "offer": "La sai già? Supera un quiz breve per saltarla."
+      "label": "Salta questa lezione: {{title}}"
     }
   },
   "quote": {

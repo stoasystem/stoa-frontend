@@ -26,7 +26,7 @@ import type { AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { QUIZ_HEARTS } from '@/features/chapter/quiz'
-import { chapterPath, lessonAfter, QUIZ_MODE, quizPath, useChapter, type Chapter } from '@/features/chapter/useChapter'
+import { chapterPath, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
 import { formatPracticeAnswer, useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
@@ -52,8 +52,9 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
   const chapterQuery = useChapter(unitId)
   const chapter = chapterQuery.status === 'ready' ? chapterQuery.chapter : null
   const lesson = lessonQuery.data
-  // Testing out of the lesson from the chapter: the quiz, locked or not. A
-  // reload starts it again from the beginning; nothing of it is kept.
+  // Testing out of the lesson from the chapter. A reload starts it again from
+  // the beginning; nothing of it is kept. A locked lesson has no quiz (#81):
+  // `?mode=quiz` on one gets the locked notice like any other way in.
   const [params] = useSearchParams()
   const testOut = params.get('mode') === QUIZ_MODE
   // A lesson from another unit is not this chapter's: a link that pairs them
@@ -71,7 +72,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         ? 'missing'
         : chapterQuery.status === 'loading'
           ? 'loading'
-          : status === 'locked' && !testOut
+          : status === 'locked'
             ? 'locked'
             : null
   // Keyed by lesson and mode: the next lesson, or the quiz, starts a fresh run.
@@ -87,7 +88,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
         />
       ) : (
         <div data-surface="sky" className="flex min-h-0 flex-1 flex-col items-start gap-3 bg-sky p-6 text-on-sky">
-          <StageNotice unitId={unitId} lessonId={lesson?.id} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
+          <StageNotice unitId={unitId} kind={notice ?? 'missing'} retry={() => void lessonQuery.refetch()} />
         </div>
       )}
     </AppLayout>
@@ -96,7 +97,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
 
 type StageNoticeKind = 'loading' | 'failed' | 'missing' | 'locked'
 
-function StageNotice({ unitId, lessonId, kind, retry }: { unitId?: string; lessonId?: string; kind: StageNoticeKind; retry: () => void }) {
+function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoticeKind; retry: () => void }) {
   const { t } = useTranslation('chapter')
   return (
     <>
@@ -126,16 +127,6 @@ function StageNotice({ unitId, lessonId, kind, retry }: { unitId?: string; lesso
             {t('stage.locked.title')}
           </h1>
           <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
-          {unitId && lessonId && (
-            <div className="flex flex-col items-start gap-1 pt-2">
-              <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('quiz.testOut.offer')}</p>
-              <Button asChild variant="onSky">
-                <Link to={quizPath(unitId, lessonId)} data-test-out>
-                  {t('quiz.testOut.action')}
-                </Link>
-              </Button>
-            </div>
-          )}
         </div>
       ) : (
         <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
@@ -196,7 +187,7 @@ function LessonRunStage({
       <StageWithAsk practice={practice} subjectId={lesson.subjectId} off={inQuiz ? t('quiz.askOff') : undefined}>
         <StageStrip lesson={lesson} unitId={unitId} chapter={chapter} lessonNumber={lessonNumber} run={run} side={side} />
         {run.finished ? (
-          <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} />
+          <LessonDone lesson={lesson} unitId={unitId} chapter={chapter} testedOut={testOut} />
         ) : run.failed ? (
           <QuizFailed run={run} unitId={unitId} />
         ) : challenge ? (
@@ -729,8 +720,21 @@ function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
   )
 }
 
-/** The lesson is done: how far the chapter is now, and where to go on. */
-function LessonDone({ lesson, unitId, chapter }: { lesson: PracticeLesson; unitId: string; chapter: Chapter | null }) {
+/**
+ * The lesson is done: how far the chapter is now, and where to go on. Done by
+ * testing out, it also says that the star is not lit by that alone (#81).
+ */
+function LessonDone({
+  lesson,
+  unitId,
+  chapter,
+  testedOut,
+}: {
+  lesson: PracticeLesson
+  unitId: string
+  chapter: Chapter | null
+  testedOut: boolean
+}) {
   const { t } = useTranslation('chapter')
   const heading = useRef<HTMLHeadingElement>(null)
   useEffect(() => heading.current?.focus(), [])
@@ -758,6 +762,11 @@ function LessonDone({ lesson, unitId, chapter }: { lesson: PracticeLesson; unitI
             {allDone
               ? t('stage.done.allDone', { chapter: chapterTitle })
               : t('stage.done.progress', { done: chapter.done, total: chapter.total, chapter: chapterTitle })}
+          </p>
+        )}
+        {testedOut && (
+          <p data-stage-done-tested-out className={cn('m-0 text-[15px]', bodyOnSky)}>
+            {t('stage.done.testedOut')}
           </p>
         )}
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">

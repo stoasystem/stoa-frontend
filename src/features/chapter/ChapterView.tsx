@@ -8,8 +8,9 @@
  * "Grouped list": every navigation target is a row with a chevron; rows carry
  * their status, never a button). Opened from a star, the jump plays first.
  *
- * A lesson not done yet also offers 「跳过这一课」 beside its row: the short
- * quiz that tests out of it (`quiz.ts`), locked or not.
+ * A lesson open to the student and not done yet also offers 「跳过这一课」
+ * beside its row: the short quiz that tests out of it (`quiz.ts`). A locked
+ * lesson offers none (#81).
  */
 import { Check, ChevronLeft, ChevronRight, Lock } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -17,6 +18,7 @@ import { Link } from 'react-router-dom'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { JumpTransition } from '@/features/chapter/JumpTransition'
+import { canTestOut } from '@/features/chapter/quiz'
 import { chapterPath, quizPath, useChapter, type Chapter, type ChapterLesson } from '@/features/chapter/useChapter'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
@@ -149,7 +151,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
             {chapter.lessons.map((lesson, index) => (
               <li key={lesson.id} data-lesson-status={lesson.status} className="flex flex-col sm:flex-row sm:items-stretch">
                 <LessonRow unitId={chapter.unitId} lesson={lesson} number={index + 1} upNext={lesson.id === chapter.nextLessonId} />
-                {lesson.status !== 'completed' && <TestOut unitId={chapter.unitId} lesson={lesson} />}
+                {canTestOut(lesson.status) && <TestOut unitId={chapter.unitId} lesson={lesson} />}
               </li>
             ))}
           </ol>
@@ -204,7 +206,7 @@ function LessonRow({ unitId, lesson, number, upNext }: { unitId: string; lesson:
   )
 }
 
-/** 「跳过这一课」: the short quiz that tests out of a lesson not done yet. A sibling of the row, not inside its link. */
+/** 「跳过这一课」: the short quiz that tests out of an open lesson. A sibling of the row, not inside its link. */
 function TestOut({ unitId, lesson }: { unitId: string; lesson: ChapterLesson }) {
   const { t } = useTranslation('chapter')
   return (

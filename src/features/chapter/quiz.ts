@@ -4,8 +4,10 @@
  *
  * Skipping inside a lesson gives no credit: the exercise goes to the back of
  * the queue. Once only skipped exercises are left, the stage offers this quiz
- * instead of skipping again. From the chapter, a lesson not done yet can be
- * tested out of with the same quiz ("jump here").
+ * instead of skipping again. From the chapter, a lesson open to the student
+ * and not done yet can be tested out of with the same quiz ("jump here"); a
+ * locked one cannot (#81). Passing it completes the lesson and nothing more:
+ * the star still lights only once every exercise has been answered right (#9).
  *
  * During a quiz: no hints, no Ask, no skip. Every wrong answer costs a heart
  * and sends the exercise to the back of the quiz; losing more than
@@ -14,6 +16,7 @@
  *
  * Every number the rules turn on is here, so they are easy to change.
  */
+import type { RoadmapLessonStatus } from '@/types/practice'
 
 /** Wrong answers a quiz forgives. Shown as QUIZ_MAX_MISTAKES + 1 hearts. */
 export const QUIZ_MAX_MISTAKES = 1
@@ -27,6 +30,11 @@ export const QUIZ_MIN_SIZE = 3
 export const QUIZ_TEST_OUT_SIZE = 5
 
 export type QuizKind = 'skip' | 'testOut'
+
+/** Whether a lesson can be tested out of: open to the student and not done yet (#81). */
+export function canTestOut(status: RoadmapLessonStatus): boolean {
+  return status === 'available' || status === 'current' || status === 'review'
+}
 
 type Random = () => number
 
