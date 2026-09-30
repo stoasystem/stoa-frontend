@@ -51,6 +51,11 @@ jobs:
       - name: Release contract tests
         run: npm run test:release
 
+      # Again by itself, so the verifier's tests run even if package.json's
+      # test:release list drifts and leaves them out (#101).
+      - name: Release verifier tests
+        run: node --test tests/release/verify-release.test.mjs
+
       - name: Publisher tests
         run: node --test tests/release/publish-web-release.test.mjs
 
