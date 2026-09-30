@@ -7,52 +7,50 @@
     border-color 180ms ease;
 }
 
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible,
-[role="button"]:focus-visible,
-[role="menuitem"]:focus-visible,
-[role="menuitemradio"]:focus-visible,
-[role="menuitemcheckbox"]:focus-visible,
-[role="switch"]:focus-visible {
-  /* Motion and states: 2 px navy, 2 px offset; star-gold on the sky. */
-  outline: var(--focus-ring-width) solid var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
-}
+/* The focus ring sits in the `base` layer (#73) so a utility on the element
+   (`focus-visible:outline-none` where the ring goes on a drawn face) wins. */
+@layer base {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  [role="button"]:focus-visible,
+  [role="menuitem"]:focus-visible,
+  [role="menuitemradio"]:focus-visible,
+  [role="menuitemcheckbox"]:focus-visible,
+  [role="switch"]:focus-visible {
+    /* Motion and states: 2 px navy, 2 px offset; star-gold on the sky. */
+    outline: var(--focus-ring-width) solid var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
 
-/* Menu items sit flush in a list: the ring goes inside each one, so it is not
-   cut by the panel's edge or drawn over the next item (#53 review). The item's
-   highlight fill alone is 1.1:1 and is not a focus indicator. */
-[role="menuitem"]:focus-visible,
-[role="menuitemradio"]:focus-visible,
-[role="menuitemcheckbox"]:focus-visible {
-  outline-offset: calc(var(--focus-ring-width) * -1);
-}
+  /* Menu items sit flush in a list: the ring goes inside each one, so it is not
+     cut by the panel's edge or drawn over the next item (#53 review). The item's
+     highlight fill alone is 1.1:1 and is not a focus indicator. */
+  [role="menuitem"]:focus-visible,
+  [role="menuitemradio"]:focus-visible,
+  [role="menuitemcheckbox"]:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
 
-/* Rows sit flush in a grouped list whose rounded corners clip them: the ring
-   goes inside each row, as for menu items, and the first and last rows take
-   the group's corners so the ring follows them (#52 review). */
-[data-group] > [data-row]:focus-visible {
-  outline-offset: calc(var(--focus-ring-width) * -1);
-}
+  /* Rows sit flush in a grouped list whose rounded corners clip them: the ring
+     goes inside each row, as for menu items, and the first and last rows take
+     the group's corners so the ring follows them (#52 review). In the base
+     layer like the rest (#73), so a utility on a row still wins. */
+  [data-group] > [data-row]:focus-visible {
+    outline-offset: calc(var(--focus-ring-width) * -1);
+  }
 
-[data-group] > [data-row]:first-child {
-  border-start-start-radius: inherit;
-  border-start-end-radius: inherit;
-}
+  [data-group] > [data-row]:first-child {
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+  }
 
-[data-group] > [data-row]:last-child {
-  border-end-start-radius: inherit;
-  border-end-end-radius: inherit;
-}
-
-/* A 44 hit box around a smaller round control (bell, avatar): the ring goes on
-   the drawn face, not on the square box, which stays square so its corners
-   still take a tap. */
-[data-ring-on-face]:focus-visible {
-  outline: none;
+  [data-group] > [data-row]:last-child {
+    border-end-start-radius: inherit;
+    border-end-end-radius: inherit;
+  }
 }
 
 .premium-reveal {

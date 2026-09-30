@@ -35,7 +35,7 @@ export function RoadmapLessonNode({
       aria-describedby={activeHint ? `${lessonId}-unlock-hint` : undefined}
       className={cn(
         'group min-h-[9rem] w-full rounded-lg border p-4 text-left transition-all',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         status === 'completed' && 'border-emerald-700/20 bg-emerald-50/70 text-foreground',
         status === 'review' && 'border-amber-700/20 bg-amber-50/75 text-foreground',
         status === 'current' && 'border-primary/50 bg-card shadow-[0_18px_45px_rgba(17,24,39,0.10)] ring-1 ring-primary/20',

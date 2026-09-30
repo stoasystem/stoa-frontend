@@ -23,7 +23,7 @@ import { useAuthStore } from '@/store/authStore'
 const PANEL =
   'z-50 flex flex-col border border-[color:var(--float-border)] bg-[rgba(255,255,255,0.96)] p-1.5 text-ink shadow-[var(--shadow-float)] backdrop-blur-[20px] outline-none'
 const ITEM =
-  'flex w-full cursor-pointer select-none items-center gap-2.5 border-0 bg-transparent px-2.5 text-left text-[14px] text-ink no-underline outline-none data-[highlighted]:bg-fill data-[disabled]:cursor-default data-[disabled]:opacity-40'
+  'flex w-full cursor-pointer select-none items-center gap-2.5 border-0 bg-transparent px-2.5 text-left text-[14px] text-ink no-underline data-[highlighted]:bg-fill data-[disabled]:cursor-default data-[disabled]:opacity-40'
 
 function ItemBody({ icon: Icon, children, tone }: { icon: LucideIcon; children: ReactNode; tone?: 'red' }) {
   return (
@@ -96,8 +96,7 @@ export function AccountMenu({
           aria-label={t('accountMenu.open')}
           title={t('accountMenu.open')}
           data-account-trigger
-          data-ring-on-face
-          className="group inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+          className="group inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none"
           style={touch ? { width: TOUCH_TARGET, height: TOUCH_TARGET } : { width: avatarSize, height: avatarSize }}
         >
           <span className="inline-flex rounded-full group-focus-visible:outline-2 group-focus-visible:outline-offset-2 group-focus-visible:outline-ring">
