@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { HelpRequestStatusBadge } from '@/components/tutor/HelpRequestStatusBadge'
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/tutor/TeacherSlaBadge'
@@ -5,6 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { TutorHelpRequestDetail } from '@/types/tutor'
 
 export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDetail }) {
+  const { t, i18n } = useTranslation('tutor')
+  const firstAction = request.firstTutorActionAt
+    ? t('requests.firstAction', {
+        time: new Date(request.firstTutorActionAt).toLocaleString(i18n.resolvedLanguage, {
+          dateStyle: 'short',
+          timeStyle: 'short',
+        }),
+      })
+    : t('requests.firstActionNone')
+
   return (
     <Card>
       <CardHeader>
@@ -13,6 +24,10 @@ export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDe
             <CardTitle>{request.student.name}</CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
               {request.subject} - {request.student.grade}
+            </p>
+            {/* The request list leaves this out of its rows; it lives here. */}
+            <p className="mt-1 text-xs text-muted-foreground" data-first-action>
+              {firstAction}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">

@@ -126,7 +126,9 @@
       "saveFailed": "Le nombre n'a pas pu être enregistré.",
       "outOfRange": "Saisissez un nombre entier entre 0 et {{maximum}}.",
       "zeroWarning": "Zéro désactive entièrement le soutien enseignant pour cet élève — il lui sera dit de contacter un administrateur, et non que sa semaine est épuisée."
-    }
+    },
+    "operations": "Opérations de compte",
+    "operationsDescription": "Un compte parent : vérification, accès des enfants et utilisation"
   },
   "activation": {
     "eyebrow": "Invitation de compte",
@@ -148,6 +150,22 @@
       "account_exists": "Un compte existe déjà pour cet e-mail. Connectez-vous plutôt.",
       "password_rejected": "Ce mot de passe a été refusé. Choisissez un mot de passe plus fort.",
       "date_of_birth_invalid": "Cette date de naissance n'est pas une date passée valide. Indiquez le jour, le mois et l'année de naissance."
+    }
+  },
+  "system": {
+    "title": "Système",
+    "description": "Délais de réponse des enseignants, notifications d’exploitation et pages système.",
+    "pages": "Dans Système",
+    "status": "État du système",
+    "statusDescription": "Pas encore disponible",
+    "learningOperations": "Suivi de l’apprentissage",
+    "learningOperationsDescription": "Signaux, achèvements et disponibilité des données par matière",
+    "learningAutomation": "Automatisation de l’apprentissage",
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices",
+    "scope": {
+      "title": "Périmètre de l’administration",
+      "covers": "Les administrateurs gèrent les comptes sous « Utilisateurs » (invitations, attributions, réinitialisations de mot de passe, suspension et archivage) et examinent les candidatures d’enseignants, le programme et la modération dans leurs propres sections.",
+      "notYet": "Les demandes d’assistance ne sont pas encore traitées ici, et l’état du système reste à venir."
     }
   }
 }

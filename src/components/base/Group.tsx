@@ -13,16 +13,19 @@ import { cn } from '@/lib/utils'
  */
 export function Group({
   title,
+  label,
   children,
   className,
 }: {
   /** Section header above the group (13 / 500, caps, +0.4). */
   title?: ReactNode
+  /** The list's accessible name, where no header names it. */
+  label?: string
   children: ReactNode
   className?: string
 }) {
   return (
-    <section className={cn('flex flex-col', className)}>
+    <section aria-label={label} className={cn('flex flex-col', className)}>
       {title && (
         <h2
           className="m-0 text-caption uppercase"
@@ -58,6 +61,12 @@ export interface RowProps {
   onSelect?: () => void
   /** A settings row: 48 instead of 52. */
   compact?: boolean
+  /**
+   * How many lines the subtitle may take before it is cut: one (the default)
+   * for a value or a status, two where the subtitle carries what the row is
+   * about -- a student's question in the teacher's queue (#78 review).
+   */
+  subtitleLines?: 1 | 2
   className?: string
 }
 
@@ -87,7 +96,7 @@ function Leading({ leading }: { leading: RowLeading }) {
   )
 }
 
-export function Row({ title, subtitle, leading, trailing, to, onSelect, compact, className }: RowProps) {
+export function Row({ title, subtitle, leading, trailing, to, onSelect, compact, subtitleLines = 1, className }: RowProps) {
   const navigates = Boolean(to || onSelect)
   const style: CSSProperties = {
     minHeight: rowHeight({ leading, subtitle, compact }),
@@ -100,7 +109,14 @@ export function Row({ title, subtitle, leading, trailing, to, onSelect, compact,
       {leading && <Leading leading={leading} />}
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
         <span className="truncate text-[15px] leading-[1.35] font-medium text-ink">{title}</span>
-        {subtitle && <span className="truncate text-[13px] leading-[1.35] text-caption">{subtitle}</span>}
+        {subtitle && (
+          <span
+            data-row-subtitle
+            className={cn('text-[13px] leading-[1.35] text-caption', subtitleLines === 2 ? 'line-clamp-2' : 'truncate')}
+          >
+            {subtitle}
+          </span>
+        )}
       </span>
       {(trailing || navigates) && (
         <span className="flex shrink-0 items-center gap-2.5 text-[15px] text-caption">

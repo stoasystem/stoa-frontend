@@ -31,6 +31,23 @@ select:focus-visible,
   outline-offset: calc(var(--focus-ring-width) * -1);
 }
 
+/* Rows sit flush in a grouped list whose rounded corners clip them: the ring
+   goes inside each row, as for menu items, and the first and last rows take
+   the group's corners so the ring follows them (#52 review). */
+[data-group] > [data-row]:focus-visible {
+  outline-offset: calc(var(--focus-ring-width) * -1);
+}
+
+[data-group] > [data-row]:first-child {
+  border-start-start-radius: inherit;
+  border-start-end-radius: inherit;
+}
+
+[data-group] > [data-row]:last-child {
+  border-end-start-radius: inherit;
+  border-end-end-radius: inherit;
+}
+
 /* A 44 hit box around a smaller round control (bell, avatar): the ring goes on
    the drawn face, not on the square box, which stays square so its corners
    still take a tap. */
