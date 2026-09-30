@@ -45,7 +45,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                 key={language.code}
                 type="button"
                 className={cn(
-                  'min-h-8 min-w-9 rounded px-2 text-xs font-semibold transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                  'min-h-8 min-w-9 rounded px-2 text-xs font-semibold transition-colors',
                   isActive
                     ? 'bg-[hsl(var(--stoa-brand-burgundy))] text-white shadow-sm'
                     : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
@@ -73,7 +73,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
           <button
             type="button"
             className={cn(
-              'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))] focus-visible:ring-2 focus-visible:ring-[hsl(var(--stoa-brand-burgundy)/0.2)]',
+              'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))]',
               className,
             )}
             aria-label={t('language.label')}

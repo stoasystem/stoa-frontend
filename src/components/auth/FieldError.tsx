@@ -1,4 +1,4 @@
-export const invalidFieldClass = 'border-destructive focus-visible:border-destructive focus-visible:ring-destructive/40'
+export const invalidFieldClass = 'border-destructive focus-visible:border-destructive'
 
 export function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null
