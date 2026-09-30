@@ -412,7 +412,8 @@ export async function loadServedRelease(
   try {
     response = await fetchImpl(request.href, {
       method: 'GET',
-      credentials: 'omit',
+      // Same-origin credentials (#42): see runtimeConfig.ts.
+      credentials: 'same-origin',
       cache: 'no-store',
       redirect: 'error',
       headers: { Accept: 'application/json' },

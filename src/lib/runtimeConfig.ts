@@ -456,7 +456,10 @@ export async function loadRuntimeConfig(
   try {
     response = await fetchImpl(request.href, {
       method: 'GET',
-      credentials: 'omit',
+      // Same-origin credentials (#42): a preview behind Basic Auth serves this
+      // file only to a request carrying the browser's cached credentials.
+      // The URL is pinned to this origin above, so nothing else can get them.
+      credentials: 'same-origin',
       cache: 'no-store',
       redirect: 'error',
       headers: { Accept: 'application/json' },
