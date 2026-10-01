@@ -47,6 +47,23 @@ const expectedNav = {
 }
 const viewers = [...new Set(outcomes.map((outcome) => outcome.viewer))]
 
+/*
+ * The one old path whose ending changed on purpose since: `/assistant` sent
+ * every signed-in role but the student to /forbidden. Since #104 it sends each
+ * of them to their own home. Signed out, it still ends on the sign-in.
+ */
+const changedSince45: Record<string, Partial<Record<Viewer, { pathname: string; page: string }>>> = {
+  '/assistant': {
+    parent: { pathname: '/parent', page: 'ParentDashboardPage' },
+    teacher: { pathname: '/tutor', page: 'TutorDashboardPage' },
+    admin: { pathname: '/admin', page: 'AdminDashboardPage' },
+    organization_admin: { pathname: '/organization', page: 'OrganizationHomePage' },
+    school_teacher: { pathname: '/organization', page: 'OrganizationHomePage' },
+    school_viewer: { pathname: '/organization', page: 'OrganizationHomePage' },
+  },
+}
+const expectedOutcome = (recorded: Recorded) => changedSince45[recorded.path]?.[recorded.viewer] ?? recorded
+
 describe('non-student routes are unchanged by the route manifest', () => {
   it('covers every registered path for every non-student viewer', () => {
     expect(viewers).not.toContain('student')
@@ -59,10 +76,11 @@ describe('non-student routes are unchanged by the route manifest', () => {
       .filter((recorded) => recorded.viewer === viewer)
       .flatMap((recorded) => {
         const now = openAs(viewer, recorded.path)
-        const same = now.pathname === recorded.pathname && now.page === recorded.page
+        const expected = expectedOutcome(recorded)
+        const same = now.pathname === expected.pathname && now.page === expected.page
         return same
           ? []
-          : [{ path: recorded.path, before: `${recorded.pathname} ${recorded.page}`, now: `${now.pathname} ${now.page}` }]
+          : [{ path: recorded.path, before: `${expected.pathname} ${expected.page}`, now: `${now.pathname} ${now.page}` }]
       })
 
     expect(changed).toEqual([])

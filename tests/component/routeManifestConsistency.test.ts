@@ -149,7 +149,11 @@ function sampleAddresses(from: string): string[] {
   return [base || '/', `${base}/a`, `${base}/a/b`, `${base}/a/b/c`, `${base}/a/b/c/d`]
 }
 
-function targetsOf(redirect: LegacyRedirect): string[] {
+/** Every role there is, from the areas written out above. */
+const EVERY_ROLE: readonly UserRole[] = [...new Set(Object.values(AREA_ROLES).flat())]
+
+/** Where a redirect sends `role` (undefined: nobody signed in) from each sampled address. */
+function targetsFor(redirect: LegacyRedirect, role: UserRole | undefined): string[] {
   return sampleAddresses(redirect.from).flatMap((address) => {
     if (typeof redirect.to === 'string') return [redirect.to]
     const to = redirect.to
@@ -157,14 +161,23 @@ function targetsOf(redirect: LegacyRedirect): string[] {
     for (const name of redirect.from.match(/:(\w+)/g) ?? []) params[name.slice(1)] = `sample-${name.slice(1)}`
     if (redirect.from.endsWith('/*')) params['*'] = address.slice(redirect.from.length - 1)
     const searches = ['', ...(redirect.consumes ?? []).map((name) => `${name}=sample-query`)]
-    return searches.map((search) => to({ params, search: new URLSearchParams(search), pathname: address }))
+    return searches.map((search) => to({ params, search: new URLSearchParams(search), pathname: address, role }))
   })
 }
 
-/** Who a redirect sends somewhere; undefined when it is open to anyone. */
-function audienceOf(redirect: LegacyRedirect): readonly UserRole[] | undefined {
+/** Where a redirect sends anybody at all, signed in or not. */
+function targetsOf(redirect: LegacyRedirect): string[] {
+  return [undefined, ...EVERY_ROLE].flatMap((role) => targetsFor(redirect, role))
+}
+
+/**
+ * Who a redirect sends somewhere: `onlyFor`, else the roles its guard admits.
+ * A public or signed-in redirect is for every role; a public one is also for
+ * visitors who are not signed in, checked on their own below.
+ */
+function audienceOf(redirect: LegacyRedirect): readonly UserRole[] {
   if (redirect.onlyFor) return redirect.onlyFor
-  return redirect.access.kind === 'roles' ? redirect.access.roles : undefined
+  return redirect.access.kind === 'roles' ? redirect.access.roles : EVERY_ROLE
 }
 
 describe('#21 point 2: every redirect lands on a page its audience may open', () => {
@@ -176,16 +189,35 @@ describe('#21 point 2: every redirect lands on a page its audience may open', ()
     },
   )
 
+  it('knows every role there is', () => {
+    expect([...EVERY_ROLE].sort()).toEqual(
+      ['admin', 'organization_admin', 'parent', 'school_teacher', 'school_viewer', 'student', 'teacher'],
+    )
+  })
+
   it('never sends its audience to a page that refuses them', () => {
-    const refused = legacyRedirects.flatMap((redirect) => {
-      const audience = audienceOf(redirect)
-      if (!audience) return []
-      return targetsOf(redirect).flatMap((target) => {
-        const page = pageAt(target)
-        const turnedAway = audience.filter((role) => page && !admits(page.access, role))
-        return turnedAway.length ? [`${redirect.from} -> ${target} refuses ${turnedAway.join(',')}`] : []
-      })
-    })
+    const refused = legacyRedirects.flatMap((redirect) =>
+      audienceOf(redirect).flatMap((role) =>
+        targetsFor(redirect, role).flatMap((target) => {
+          const page = pageAt(target)
+          return page && !admits(page.access, role) ? [`${redirect.from} -> ${target} refuses ${role}`] : []
+        }),
+      ),
+    )
+    expect(refused).toEqual([])
+  })
+
+  it('never sends a signed-out visitor from a public redirect to a page that needs a sign-in', () => {
+    // A redirect that needs a sign-in says so in its own `access`, so the
+    // visitor signs in and comes back to it, not to where it would have led.
+    const refused = legacyRedirects
+      .filter((redirect) => redirect.access.kind === 'public')
+      .flatMap((redirect) =>
+        targetsFor(redirect, undefined).flatMap((target) => {
+          const page = pageAt(target)
+          return page && page.access.kind !== 'public' ? [`${redirect.from} -> ${target}`] : []
+        }),
+      )
     expect(refused).toEqual([])
   })
 

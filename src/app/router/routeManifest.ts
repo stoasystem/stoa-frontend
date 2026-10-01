@@ -102,6 +102,12 @@ export type LegacyRedirectInput = {
   search: URLSearchParams
   /** The old address as it arrived, still percent-encoded. */
   pathname?: string
+  /**
+   * The signed-in account's role; undefined when nobody is signed in. Behind
+   * a `roles` guard it is always one of those roles: RoleRoute waits for the
+   * account before the redirect runs.
+   */
+  role?: UserRole
 }
 
 export type LegacyRedirect = {
@@ -164,6 +170,22 @@ const TEACHER = only('teacher')
 const ADMIN = only('admin')
 const ORGANIZATION = only('admin', 'organization_admin', 'school_teacher', 'school_viewer')
 const ME_ACCESS = only('student', 'admin', 'organization_admin', 'school_teacher', 'school_viewer')
+/*
+ * Every role, as a role list rather than SIGNED_IN, so that RoleRoute waits
+ * for the account after a refresh before a role-dependent redirect decides.
+ * The record makes a new role a type error here until it is listed.
+ */
+const EVERY_ROLE = only(
+  ...(Object.keys({
+    student: true,
+    parent: true,
+    teacher: true,
+    admin: true,
+    organization_admin: true,
+    school_teacher: true,
+    school_viewer: true,
+  } satisfies Record<UserRole, true>) as UserRole[]),
+)
 
 // ---------------------------------------------------------------------------
 // Pages
@@ -469,6 +491,21 @@ const CONVERSATION_QUERY = 'conversationId'
 const toAsk = ({ params, search }: LegacyRedirectInput) =>
   askPathFor(params.conversationId ?? search.get(CONVERSATION_QUERY))
 
+/** A role's home (roleHomePaths); `/forbidden` for a role the manifest has no home for. */
+function homePathFor(role: UserRole): string {
+  const area = navAreaForRole(role)
+  // Own properties only: `constructor` or `toString` is not a role with a home.
+  return Object.prototype.hasOwnProperty.call(roleHomePaths, area) ? roleHomePaths[area] : FORBIDDEN_PATH
+}
+
+/*
+ * `/assistant` (#104): Ask is the students' only, so a student lands there,
+ * as from `/chat`, and every other role at its own home instead of on
+ * `/forbidden`.
+ */
+const toAskOrHome = (input: LegacyRedirectInput) =>
+  input.role === undefined || input.role === 'student' ? toAsk(input) : homePathFor(input.role)
+
 /*
  * `/planet/...` became `/map/...` when the planet became a star map (#72
  * point 8). The same segments carry over, read from the address as it
@@ -514,8 +551,10 @@ export const legacyRedirects: readonly LegacyRedirect[] = [
   // The id is taken from the path; a `conversationId` in the query is dropped,
   // so Ask never sees two ids (it reads only the path's).
   { from: '/chat/:conversationId', to: toAsk, access: STUDENT, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
-  // Always public: it used to forward to /chat before any guard ran.
-  { from: '/assistant', to: toAsk, access: PUBLIC, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#13 §2' },
+  // Open to every role, and signed-out visitors sign in first and come back
+  // here (#104): a public prototype page from July 2026 until it forwarded to
+  // /chat, so outside links to it may still exist.
+  { from: '/assistant', to: toAskOrHome, access: EVERY_ROLE, carryContext: true, consumes: [CONVERSATION_QUERY], decision: '#104' },
   { from: '/profile', to: '/me', access: STUDENT, decision: '#13 §2' },
   // Students change their password on /me (#46); everyone else keeps the page
   // here, and so does any account under a forced change (RoleScopedRedirect).
