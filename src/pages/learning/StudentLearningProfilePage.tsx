@@ -1,12 +1,11 @@
 import { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { BackButton } from '@/components/common/BackButton'
 import { Breadcrumbs } from '@/components/common/Breadcrumbs'
 import { PageActions } from '@/components/common/PageActions'
 import { LearningProfileHeader } from '@/components/learning/LearningProfileHeader'
 import { StrongTopicList } from '@/components/learning/StrongTopicList'
 import { WeakTopicList } from '@/components/learning/WeakTopicList'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -30,17 +29,15 @@ export function StudentLearningProfilePage() {
           title="Advanced learning profile"
           description="Learning profile view for reviewing progress patterns, topic history, and recommended next steps."
           actions={
-            <PageActions
-              primary={<Button asChild><Link to={`/students/${studentId}/diagnosis`}>Open diagnosis</Link></Button>}
-              secondary={<BackButton label="Students" to="/organization/students" />}
-            />
+            // No diagnosis page and no organisation student list are registered (#25).
+            <PageActions secondary={<BackButton label="Organization" to="/organization" />} />
           }
         />
         <Breadcrumbs
           className="mb-6"
           items={[
             { label: 'Organization', to: '/organization' },
-            { label: 'Students', to: '/organization/students' },
+            { label: 'Students' },
             { label: profileQuery.data?.studentId ?? 'Learning profile' },
           ]}
         />
@@ -75,21 +72,6 @@ export function StudentLearningProfilePage() {
                   <p className="text-sm text-muted-foreground">
                     Updated {new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(profileQuery.data.updatedAt))}.
                   </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-2">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Parent report links</CardTitle>
-                </CardHeader>
-                <CardContent className="flex flex-wrap gap-2">
-                  <Button asChild variant="outline">
-                    <Link to={`/parent/children/${studentId}/monthly-report`}>Monthly report</Link>
-                  </Button>
-                  <Button asChild variant="outline">
-                    <Link to="/organization/reports">Organization reports</Link>
-                  </Button>
                 </CardContent>
               </Card>
             </div>
