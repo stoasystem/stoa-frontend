@@ -299,7 +299,12 @@ describe('a tab holding its own role', () => {
       handlers: { rejected: (error: unknown) => Promise<unknown> }[]
     }).handlers
 
-    await expect(handlers[0].rejected({ response: { status: 401 } })).rejects.toBeTruthy()
+    await expect(
+      handlers[0].rejected({
+        response: { status: 401 },
+        config: { url: '/auth/me', headers: { Authorization: 'Bearer this-tab-only' } },
+      }),
+    ).rejects.toBeTruthy()
 
     expect(tabToken()).toBeNull()
     expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
@@ -322,7 +327,12 @@ describe('a tab holding its own role', () => {
       handlers: { rejected: (error: unknown) => Promise<unknown> }[]
     }).handlers
 
-    await expect(handlers[0].rejected({ response: { status: 401 } })).rejects.toBeTruthy()
+    await expect(
+      handlers[0].rejected({
+        response: { status: 401 },
+        config: { url: '/auth/me', headers: { Authorization: 'Bearer the-shared-one' } },
+      }),
+    ).rejects.toBeTruthy()
 
     expect(localStorage.getItem('stoa_access_token')).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)

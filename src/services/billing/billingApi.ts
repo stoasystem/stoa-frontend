@@ -1,4 +1,5 @@
 import { httpClient } from '@/services/api/httpClient'
+import { currentSessionToken } from '@/store/authStore'
 import { pricingPlans } from '@/components/pricing/pricingPlans'
 import type {
   BillingOverview,
@@ -119,7 +120,28 @@ export function clearTerminalCheckoutOperation(checkoutRef?: string): void {
   }
 }
 
+/**
+ * Signing out: the checkout in this tab is this person's. Left behind, the next
+ * person's billing page polls it and refuses to start their own (#34).
+ */
+export function forgetCheckoutOperation(): void {
+  if (typeof window === 'undefined') return
+  window.sessionStorage.removeItem(CHECKOUT_OPERATION_STORAGE_KEY)
+}
+
+/**
+ * The answer belongs to whoever sent the request. If the tab's session changed
+ * while it was on its way, it is not kept for the session there now (#34).
+ */
+export class CheckoutOwnerChangedError extends Error {
+  constructor() {
+    super('Signed out before this checkout was answered')
+    this.name = 'CheckoutOwnerChangedError'
+  }
+}
+
 export async function createCheckoutSession(selection: CheckoutSelection) {
+  const owner = currentSessionToken()
   const operation = getOrCreateCheckoutOperation()
   if (operation.checkoutRef) {
     throw new Error('A checkout is already in progress.')
@@ -134,6 +156,7 @@ export async function createCheckoutSession(selection: CheckoutSelection) {
       headers: { 'Idempotency-Key': operation.idempotencyKey },
     },
   )
+  if (currentSessionToken() !== owner) throw new CheckoutOwnerChangedError()
   storeCheckoutOperation({
     idempotencyKey: operation.idempotencyKey,
     checkoutRef: response.data.checkoutRef,
@@ -160,6 +183,7 @@ export async function supersedeCheckoutCommand(
   checkoutRef: string,
   selection: CheckoutSelection,
 ) {
+  const owner = currentSessionToken()
   const current = getCheckoutOperation()
   if (current?.checkoutRef !== checkoutRef) {
     throw new Error('The retained checkout reference has changed.')
@@ -179,6 +203,7 @@ export async function supersedeCheckoutCommand(
       headers: { 'Idempotency-Key': successorKey },
     },
   )
+  if (currentSessionToken() !== owner) throw new CheckoutOwnerChangedError()
   if (response.data.checkoutRef) {
     storeCheckoutOperation({
       idempotencyKey: successorKey,

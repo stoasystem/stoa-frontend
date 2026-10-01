@@ -15,6 +15,7 @@ import {
   writePendingMessage,
   type PendingMessage,
 } from '@/lib/pendingChatMessages'
+import { currentSessionToken } from '@/store/authStore'
 
 type RetryPayload = Omit<PendingMessage, 'askedAt' | 'idempotencyKey'> & {
   // Set when the failed command may be sent again as the same message; absent
@@ -177,7 +178,11 @@ export function useStreamingChat(conversationId: string | null) {
       if (!conversationId) return false
 
       const attempt = ++currentAttemptRef.current
-      const owns = () => currentAttemptRef.current === attempt
+      // The message is the signed-in person's. Signing out clears what they
+      // left in the tab; an attempt resuming after that must not write it back,
+      // send it, or report on it under whoever holds the tab now (#34).
+      const sender = currentSessionToken()
+      const owns = () => currentAttemptRef.current === attempt && currentSessionToken() === sender
       const requestController = new AbortController()
       const pollController = new AbortController()
       // The server's own ids, so the bubbles are recognised as its messages when

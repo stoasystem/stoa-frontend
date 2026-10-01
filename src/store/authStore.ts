@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { pinTabToSession, tabToken } from '@/lib/devSessions'
+import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
 export type CurrentUser = User
@@ -67,6 +67,16 @@ const getStoredToken = () => {
   return tabToken() ?? localStorage.getItem(TOKEN_KEY)
 }
 
+/**
+ * The token this tab's requests carry right now, with the same precedence
+ * every request uses. Work started under one session compares it once it
+ * resumes: if it changed, someone signed out (and maybe someone else in)
+ * meanwhile, and what that work brings back is not theirs (#34).
+ */
+export function currentSessionToken(): string | null {
+  return getStoredToken()
+}
+
 type AuthState = {
   user: CurrentUser | null
   accessToken: string | null
@@ -96,10 +106,17 @@ export const useAuthStore = create<AuthState>((set) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('stoa_tab_access_token')
+      // Only the session this tab is using ends. A pinned tab's sign-out
+      // revokes its own token; the shared one belongs to whichever account the
+      // rest of the browser is signed into and was never revoked, unless it is
+      // the very same token (#34).
+      const pinned = tabToken()
+      if (pinned) {
+        releaseTab()
+        if (localStorage.getItem(TOKEN_KEY) === pinned) localStorage.removeItem(TOKEN_KEY)
+      } else {
+        localStorage.removeItem(TOKEN_KEY)
       }
-      localStorage.removeItem(TOKEN_KEY)
       set({ user: null, accessToken: null, isAuthenticated: false })
     },
     hydrateFromStorage: () => {
