@@ -41,7 +41,10 @@
     "start": "Commencer",
     "continue": "Continuer",
     "open": "Ouvrir le chapitre",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Réviser {{count}} exercice",
+    "review_other": "Réviser {{count}} exercices",
+    "reviewSoon": "Bientôt disponible"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} sur {{total}} allumées",
@@ -65,5 +68,17 @@
     "nebula": "{{nebula}} : {{lit}} sur {{total}} allumées",
     "star": "{{name}} : {{state}}"
   },
-  "empty": "Rien à apprendre dans cette matière pour l’instant."
+  "empty": "Rien à apprendre dans cette matière pour l’instant.",
+  "demo": {
+    "notice": "Démo · Contenu et progression fictifs",
+    "sampleNebula": "Nébuleuse {{index}}",
+    "sampleStar": "Point de connaissance {{index}}",
+    "emptyStar": "Le contenu pédagogique arrive bientôt.",
+    "subjects": {
+      "math": "Mathématiques",
+      "physics": "Physique",
+      "german": "Allemand"
+    },
+    "longNebula": "Fractions, équations et raisonnement proportionnel {{index}}"
+  }
 }

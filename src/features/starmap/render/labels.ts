@@ -50,7 +50,7 @@ export type Obstacles = {
 
 /**
  * The first free box among `candidates` (in order of preference): none may
- * overlap a placed name, and the least in the way of cores and lines wins.
+ * overlap a placed name or a line; the least in the way of cores wins.
  * A candidate outside `area` does not count, so a name near a control band
  * moves to the side of its nebula that is clear of it. `null`: leave the
  * name out.
@@ -68,10 +68,11 @@ export function placeLabel(
   candidates.forEach((box, order) => {
     if (box.x0 < area.x0 || box.y0 < area.y0 || box.x1 > area.x1 || box.y1 > area.y1) return
     if (obstacles.boxes.some((placed) => boxesOverlap(box, placed))) return
+    if (obstacles.segments.some((segment) => boxHitsSegment(box, segment))) return
     let cost = order * 0.5
     for (const circle of obstacles.circles) if (boxHitsCircle(box, circle)) cost += 10
-    for (const segment of obstacles.segments) if (boxHitsSegment(box, segment)) cost += 3
     cost += extraCost(box)
+    if (!Number.isFinite(cost)) return
     if (cost < bestCost) {
       best = box
       bestCost = cost
@@ -129,4 +130,38 @@ export function splitByCircles(s: Segment, circles: readonly Circle[]): { clear:
   }
   if (t < 1) clear.push([t, 1])
   return { clear, hidden }
+}
+
+/** Every part of a label must lie nearer its own centre than another nebula's. */
+export function belongsTo(box: Box, own: Circle, others: readonly Circle[]): boolean {
+  return [[box.x0, box.y0], [box.x1, box.y0], [box.x0, box.y1], [box.x1, box.y1]].every(([x, y]) =>
+    others.every((other) => Math.hypot(x - own.x, y - own.y) < Math.hypot(x - other.x, y - other.y)))
+}
+
+/** Rim anchors stay clear of star glyphs; a small gap becomes a visible bowed bridge. */
+export function nebulaConnection(a: Circle, b: Circle, padding: number): { segments: Segment[]; bridge: boolean } {
+  const d = Math.hypot(b.x - a.x, b.y - a.y)
+  if (d === 0) return { segments: [], bridge: false }
+  const ux = (b.x - a.x) / d
+  const uy = (b.y - a.y) / d
+  const ra = a.r + padding
+  const rb = b.r + padding
+  const bridge = d - ra - rb < 24
+  const turn = bridge ? 0.5 : 0
+  const cos = Math.cos(turn), sin = Math.sin(turn)
+  const start = { x: a.x + (ux * cos - uy * sin) * ra, y: a.y + (uy * cos + ux * sin) * ra }
+  const end = { x: b.x + (-ux * cos - uy * sin) * rb, y: b.y + (-uy * cos + ux * sin) * rb }
+  const bend = bridge ? Math.max(32, Math.min(ra, rb) * 0.3) : 0
+  const control = { x: (start.x + end.x) / 2 - uy * bend, y: (start.y + end.y) / 2 + ux * bend }
+  const steps = bridge ? 8 : 1
+  const segments: Segment[] = []
+  let previous = start
+  for (let i = 1; i <= steps; i += 1) {
+    const t = i / steps
+    const next = { x: (1-t)**2 * start.x + 2*(1-t)*t*control.x + t*t*end.x,
+      y: (1-t)**2 * start.y + 2*(1-t)*t*control.y + t*t*end.y }
+    segments.push({ x0: previous.x, y0: previous.y, x1: next.x, y1: next.y })
+    previous = next
+  }
+  return { segments, bridge }
 }

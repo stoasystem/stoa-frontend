@@ -13,6 +13,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { NEBULA_LABEL_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
+import { KNOWLEDGE_GLOW_ALPHA, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
 import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
 import { linkWeight } from '@/features/starmap/model/links'
 
@@ -112,4 +113,13 @@ describe('lines and locked stars keep 3:1', () => {
     expect(contrast(over(text, sky, LOCKED_RING_ALPHA), sky)).toBeGreaterThanOrEqual(3)
     expect(contrast(over(text, haze, LOCKED_RING_ALPHA), haze)).toBeGreaterThanOrEqual(3)
   })
+})
+
+it('the continuous knowledge galaxy keeps readable states even at its saturated warm core', () => {
+  // One composited cloud layer: channel-wise maximum including the white stellar grain, capped at source opacity.
+  const peak: RGBA = [255, 255, 255, 1]
+  const background = over(peak, over(peak, sky, SKY_MIST_ALPHA), KNOWLEDGE_GLOW_ALPHA)
+  expect(contrast(over(text, background, LOCKED_RING_ALPHA), background)).toBeGreaterThanOrEqual(3)
+  expect(contrast(over(text, background, INK.innerLinkAlpha), background)).toBeGreaterThanOrEqual(3)
+  expect(contrast(over(body, background, 0.8), background)).toBeGreaterThanOrEqual(4.5)
 })

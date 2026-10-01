@@ -118,11 +118,12 @@ describe('a deep link refreshed in the browser', () => {
   it('reopens a star on the star map, at that star (#47, #72)', async () => {
     // jsdom has no 2D canvas; the map draws nothing but keeps its DOM.
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
-    refreshAt('/map/math/algebra/u-5')
+    refreshAt('/map/math/numbers/u-1-5')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
-    expect(window.location.pathname).toBe('/map/math/algebra/u-5')
-    expect(screen.getByRole('article', { name: 'Linear equations' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Knowledge point 5' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/map/math/numbers/u-1-5')
+    expect(screen.getByRole('article', { name: 'Knowledge point 5' })).toBeInTheDocument()
+    expect(screen.getByText('Learning content is coming soon.')).toBeInTheDocument()
     vi.restoreAllMocks()
   })
 })
