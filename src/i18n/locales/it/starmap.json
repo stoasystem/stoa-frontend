@@ -41,7 +41,10 @@
     "start": "Inizia",
     "continue": "Continua",
     "open": "Apri il capitolo",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Ripassa {{count}} esercizio",
+    "review_other": "Ripassa {{count}} esercizi",
+    "reviewSoon": "Disponibile a breve"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} su {{total}} accese",
@@ -65,5 +68,17 @@
     "nebula": "{{nebula}}: {{lit}} su {{total}} accese",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "In questa materia non c’è ancora niente da imparare."
+  "empty": "In questa materia non c’è ancora niente da imparare.",
+  "demo": {
+    "notice": "Demo · Contenuti e progressi di esempio",
+    "sampleNebula": "Nebulosa {{index}}",
+    "sampleStar": "Punto di conoscenza {{index}}",
+    "emptyStar": "I contenuti didattici saranno disponibili presto.",
+    "subjects": {
+      "math": "Matematica",
+      "physics": "Fisica",
+      "german": "Tedesco"
+    },
+    "longNebula": "Frazioni, equazioni e ragionamento proporzionale {{index}}"
+  }
 }

@@ -17,12 +17,14 @@ import { cn } from '@/lib/utils'
 
 export function StarCard({
   map,
+  demo = false,
   star,
   nebula,
   wide,
   reducedMotion,
 }: {
   map: StarMap
+  demo?: boolean
   star: Star
   nebula: Nebula
   wide: boolean
@@ -54,7 +56,7 @@ export function StarCard({
           .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
       : []
   const action =
-    star.state === 'locked'
+    star.state === 'locked' || demo
       ? null
       : star.state === 'lit'
         ? t('star.open')
@@ -106,21 +108,25 @@ export function StarCard({
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <div
-          role="progressbar"
-          aria-label={t('star.lessons', { done: lessonsDone, total: lessonCount })}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-          className="h-1 overflow-hidden rounded-[4px] bg-white/15"
-        >
-          <div className="h-full rounded-[4px] bg-lit" style={{ width: `${percent}%` }} />
+      {demo && lessonCount === 0 ? (
+        <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('demo.emptyStar')}</p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          <div
+            role="progressbar"
+            aria-label={t('star.lessons', { done: lessonsDone, total: lessonCount })}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percent}
+            className="h-1 overflow-hidden rounded-[4px] bg-white/15"
+          >
+            <div className="h-full rounded-[4px] bg-lit" style={{ width: `${percent}%` }} />
+          </div>
+          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+            {t('star.lessons', { done: lessonsDone, total: lessonCount })}
+          </p>
         </div>
-        <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-          {t('star.lessons', { done: lessonsDone, total: lessonCount })}
-        </p>
-      </div>
+      )}
 
       {(star.recommendation || star.reviewDue > 0 || star.unmetExercises > 0) && (
         <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] text-on-sky">
@@ -182,12 +188,19 @@ export function StarCard({
         </section>
       )}
 
+      {star.reviewDue > 0 && (
+        <div className="flex flex-col gap-1">
+          <Button variant="onSky" size="regular" disabled aria-describedby="starmap-review-soon">
+            {t('star.review', { count: star.reviewDue })}
+          </Button>
+          <p id="starmap-review-soon" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('star.reviewSoon')}</p>
+        </div>
+      )}
+
       {action && (
         <div className="pt-1">
           <Button asChild variant="onSky" size="regular">
-            <Link to={chapterTo} onClick={jump}>
-              {action}
-            </Link>
+            <Link to={chapterTo} onClick={jump}>{action}</Link>
           </Button>
         </div>
       )}

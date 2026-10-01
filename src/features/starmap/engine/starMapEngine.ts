@@ -65,6 +65,8 @@ export type StarMapEngineOptions = {
    * star, which only the phone bench asks for (#44), to see what it saves.
    */
   foveate?: boolean
+  /** Continuous demo galaxy: regions remain semantic, without circular visual islands. */
+  galaxy?: boolean
   scheduler?: FrameScheduler
   now?: () => number
   /** The student asked for another layer: a tap, a pinch, the wheel. */
@@ -81,9 +83,9 @@ type Transition =
 
 type Pointer = { x: number; y: number }
 
-/** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 56. */
+/** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 40. */
 export function glyphSizeFor(scale: number, spacing: number): number {
-  return Math.max(9, Math.min(56, scale * spacing * 0.55))
+  return Math.max(9, Math.min(40, scale * spacing * 0.55))
 }
 
 /**
@@ -173,6 +175,7 @@ export class StarMapEngine {
   private wheel = { accumulated: 0, lastIntentAt: Number.NEGATIVE_INFINITY }
   private focusStar = -1
   private focusNebula = -1
+  private hoveredNebula = -1
 
   private visibleKey = ''
   private emittedOnce = false
@@ -208,7 +211,12 @@ export class StarMapEngine {
     this.nebulaIds = nebulae.map((nebula) => nebula.topicId)
     this.nebulaIndex = new Map(this.nebulaIds.map((id, index) => [id, index]))
     this.discs = nebulaDiscs(map)
-    this.bounds = mapBounds(this.discs)
+    this.bounds = this.options.galaxy && map.stars.length ? {
+      minX: Math.min(...map.stars.map((s) => s.x)) - 0.015,
+      minY: Math.min(...map.stars.map((s) => s.y)) - 0.015,
+      maxX: Math.max(...map.stars.map((s) => s.x)) + 0.015,
+      maxY: Math.max(...map.stars.map((s) => s.y)) + 0.015,
+    } : mapBounds(this.discs)
     this.spacing = typicalSpacing(map, this.discs)
 
     const count = this.stars.length
@@ -216,6 +224,7 @@ export class StarMapEngine {
     const scene: SceneData = {
       mapKey: `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
       count,
+      galaxy: this.options.galaxy,
       mapX: new Float32Array(count),
       mapY: new Float32Array(count),
       state: new Uint8Array(count),
@@ -566,6 +575,7 @@ export class StarMapEngine {
 
   /** The nebula under `(x, y)`; with `nearest`, the closest one if none is under it. */
   private nebulaAt(x: number, y: number, nearest = false): string | null {
+    if (this.options.galaxy) return this.nearestStar(x, y, nearest ? Infinity : 28)?.nebulaId ?? null
     let best = -1
     let bestGap = nearest ? Number.POSITIVE_INFINITY : 0
     for (let n = 0; n < this.nebulaIds.length; n += 1) {
@@ -593,6 +603,14 @@ export class StarMapEngine {
     }
     const nebulaId = this.nebulaAt(x, y)
     if (nebulaId && nebulaId !== this.target.nebulaId) this.options.onRequestTarget?.({ layer: 'nebula', nebulaId })
+  }
+
+  hoverAt(x: number | null, y = 0) {
+    const id = x === null ? null : this.nebulaAt(x, y)
+    const next = id ? this.nebulaIndex.get(id) ?? -1 : -1
+    if (next === this.hoveredNebula) return
+    this.hoveredNebula = next
+    this.invalidate()
   }
 
   private invalidate() {
@@ -723,8 +741,8 @@ export class StarMapEngine {
       target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : this.focusStar
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
     return {
-      dotBlend: dotBlendFor(glyphSize),
-      dotRadius: Math.max(1.6, Math.min(3.2, t.scale * this.spacing * 0.16)),
+      dotBlend: lerp(from === 'map' ? 1 : dotBlendFor(glyphSize), to === 'map' ? 1 : dotBlendFor(glyphSize)),
+      dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.spacing * 0.11)),
       viewport: this.viewport,
       scale: t.scale,
       ox: t.ox,
@@ -743,6 +761,7 @@ export class StarMapEngine {
       innerLinkAlpha: starLabelAlpha,
       chosenNebula: chosen,
       focusStar,
+      hoveredNebula: this.hoveredNebula,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: lerp(dimOf(from), dimOf(to)),
       showSkills: glyphSize >= 30,

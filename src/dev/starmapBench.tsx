@@ -33,6 +33,11 @@ const bench = params.get('bench') === '1'
 const entry = new URLSearchParams()
 if (points) entry.set('points', points)
 if (foveation) entry.set('foveation', foveation)
+else if (bench) entry.set('foveation', 'on')
+for (const key of ['relations', 'longNames']) {
+  const value = params.get(key)
+  if (value) entry.set(key, value)
+}
 
 async function start() {
   await Promise.all([import('../index.css'), import('@/i18n')])
@@ -57,7 +62,7 @@ async function start() {
       <AppLayout bleed>
         <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
           <div data-surface="sky" data-ask-page className="absolute inset-y-0 left-0 bg-sky text-on-sky" style={{ right: panel ? 420 : 0 }}>
-            <StarMapRoute />
+            <StarMapRoute relations={params.get('relations') === 'fixture'} longNames={params.get('longNames') === '1'} />
           </div>
         </div>
       </AppLayout>
