@@ -107,7 +107,10 @@ describe('logging out', () => {
     await logOut()
 
     expect(seen.map((request) => request.body)).toEqual([{ access_token: 'tab-token' }])
-    expectSignedOutHere()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
+    // The shared session is another account's and was not revoked (#34).
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('shared-token')
   })
 
   it('still signs out here when the backend call fails', async () => {

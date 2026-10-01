@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom'
 import { clearPracticeContextTold } from '@/features/ask/practiceContext'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
-import { forgetSessionHolding, tabToken } from '@/lib/devSessions'
+import { forgetSessionHolding } from '@/lib/devSessions'
+import { rotateAnalyticsSession } from '@/services/analytics/analyticsClient'
 import { logout, type LogoutOutcome } from '@/services/auth/authApi'
+import { forgetCheckoutOperation } from '@/services/billing/billingApi'
 import { logger } from '@/services/logging/logger'
 import { resetAsk } from '@/store/askStore'
-import { TOKEN_KEY, trackPendingLogout, useAuthStore } from '@/store/authStore'
+import { currentSessionToken, trackPendingLogout, useAuthStore } from '@/store/authStore'
 
 function logOutcome(outcome: LogoutOutcome) {
   if (outcome.kind === 'ok') {
@@ -47,7 +49,7 @@ export function useSignOut() {
     runningRef.current = true
     setIsSigningOut(true)
 
-    const accessToken = tabToken() ?? localStorage.getItem(TOKEN_KEY)
+    const accessToken = currentSessionToken()
 
     clearAuth()
     // Query keys do not name the user, so whoever signs in next on this tab
@@ -64,6 +66,12 @@ export function useSignOut() {
     resetAsk()
     clearPendingMessages()
     clearPracticeContextTold()
+    // A checkout started here, and the analytics session, are this person's
+    // too (#34).
+    forgetCheckoutOperation()
+    rotateAnalyticsSession()
+    // Roles held in the switcher for other accounts stay: signing out ends this
+    // tab's session only, as it leaves the shared one of a pinned tab (#34).
     if (accessToken) forgetSessionHolding(accessToken)
     // Register before navigation unmounts this menu. The login mutation waits
     // for completion or the request's 8 s timeout; server work may outlive it.

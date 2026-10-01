@@ -10,6 +10,7 @@ import { UPLOAD_HANDOFF_STORAGE_KEY } from '@/features/uploads/utils/uploadHando
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { CHECKOUT_OPERATION_STORAGE_KEY } from '@/services/billing/billingApi'
 import { httpClient } from '@/services/api/httpClient'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -140,7 +141,10 @@ describe('useSignOut', () => {
     await act(() => result.current.signOut())
 
     expect(bodies).toEqual([{ access_token: 'tab-token' }])
-    expectSignedOutHere()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
+    // The shared session is another account's and was not revoked (#34).
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('shared-token')
   })
 
   it('empties the query cache, so the next person on this tab is not served these answers', async () => {
@@ -326,6 +330,11 @@ describe('useSignOut', () => {
     answerLogout('ok')
     const { result } = renderSignedIn()
     sessionStorage.setItem(UPLOAD_HANDOFF_STORAGE_KEY, JSON.stringify({ prompt: "A's question" }))
+    sessionStorage.setItem(
+      CHECKOUT_OPERATION_STORAGE_KEY,
+      JSON.stringify({ idempotencyKey: 'key-of-a-checkout', checkoutRef: 'ref-a' }),
+    )
+    sessionStorage.setItem('stoa_analytics_session_id', 'analytics-session-of-a')
     localStorage.setItem('stoa_role_switcher', 'on')
     localStorage.setItem(
       'stoa_dev_sessions',
@@ -338,7 +347,12 @@ describe('useSignOut', () => {
     await act(() => result.current.signOut())
 
     expect(sessionStorage.getItem(UPLOAD_HANDOFF_STORAGE_KEY)).toBeNull()
-    // The signed-out session goes; another role held on purpose stays.
+    // B's billing page would poll A's checkout, and refuse B's own (#34).
+    expect(sessionStorage.getItem(CHECKOUT_OPERATION_STORAGE_KEY)).toBeNull()
+    // The next person's events start an analytics session of their own.
+    expect(sessionStorage.getItem('stoa_analytics_session_id')).toBeNull()
+    // The signed-out session goes; another role held on purpose stays (#34
+    // decided to keep them: see forgetSessionHolding).
     expect(JSON.parse(localStorage.getItem('stoa_dev_sessions') ?? '[]')).toEqual([
       expect.objectContaining({ email: 'pa@example.com', accessToken: 'parent-token' }),
     ])
