@@ -53,7 +53,7 @@ describe('the paths a student may be returned to after sign-in', () => {
     '/learn/progress',
     '/practice',
     '/question-bank/q-1',
-    // A public legacy entry the table left out.
+    // A legacy entry the table left out; open to every role since #104.
     '/assistant',
     // Routes match case-insensitively; so does the return.
     '/Map/math',

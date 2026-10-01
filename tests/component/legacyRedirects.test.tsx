@@ -5,8 +5,11 @@
  * its test red instead of taking the test with it.
  */
 import { describe, expect, it, vi } from 'vitest'
+import '@/i18n'
 import { mapPathForLegacyPlanet } from '@/app/router/routeManifest'
-import { openAs } from './routeHarness'
+import { getPostLoginPath } from '@/lib/authRoutes'
+import type { UserRole } from '@/types/user'
+import { ALL_VIEWERS, openAs } from './routeHarness'
 
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
@@ -142,6 +145,67 @@ describe('a /chat link that names a conversation opens it in Ask', () => {
 
     expect(landed.pathname).toBe('/ask')
     expect(landed.state).toEqual(state)
+  })
+})
+
+/*
+ * #104: `/assistant` was a public page, so old links to it may come from
+ * anyone. A student lands in Ask, as from /chat; every other role at its own
+ * home, not on /forbidden; a signed-out visitor signs in first and is then
+ * brought back here to be sent on by role.
+ */
+describe('/assistant sends each visitor where they belong', () => {
+  const landings = {
+    anonymous: ['/login', '/login', 'EntryPage'],
+    student: ['/ask', '/ask/c-7', 'AskPage'],
+    parent: ['/parent', '/parent', 'ParentDashboardPage'],
+    teacher: ['/tutor', '/tutor', 'TutorDashboardPage'],
+    admin: ['/admin', '/admin', 'AdminDashboardPage'],
+    organization_admin: ['/organization', '/organization', 'OrganizationHomePage'],
+    school_teacher: ['/organization', '/organization', 'OrganizationHomePage'],
+    school_viewer: ['/organization', '/organization', 'OrganizationHomePage'],
+  } as const
+
+  it('covers every viewer', () => {
+    expect(Object.keys(landings).sort()).toEqual([...ALL_VIEWERS].sort())
+  })
+
+  it.each(ALL_VIEWERS)('%s, plain /assistant', (viewer) => {
+    const [pathname, , page] = landings[viewer]
+    expect(openAs(viewer, '/assistant')).toMatchObject({ pathname, search: '', page })
+  })
+
+  it.each(ALL_VIEWERS)('%s, /assistant naming a conversation', (viewer) => {
+    const [, pathname, page] = landings[viewer]
+    // The id is consumed into the path (or, away from Ask, dropped); the rest of the query rides along.
+    const landed = openAs(viewer, '/assistant?conversationId=c-7&source=bell')
+    expect(landed).toMatchObject({ pathname, page })
+    if (viewer !== 'anonymous') expect(landed.search).toBe('?source=bell')
+  })
+
+  it('remembers the whole old address for a signed-out visitor', () => {
+    expect(openAs('anonymous', '/assistant?conversationId=c-7').state).toMatchObject({
+      from: { pathname: '/assistant', search: '?conversationId=c-7' },
+    })
+  })
+
+  it.each(ALL_VIEWERS.filter((viewer): viewer is UserRole => viewer !== 'anonymous'))(
+    'brings %s back from the sign-in and on to the same landing',
+    (role) => {
+      const { state } = openAs('anonymous', '/assistant?conversationId=c-7')
+      const back = getPostLoginPath({ role }, { search: '', state })
+
+      expect(back).toBe('/assistant?conversationId=c-7')
+      const [, pathname, page] = landings[role]
+      expect(openAs(role, back)).toMatchObject({ pathname, search: '', page })
+    },
+  )
+
+  it('waits for the account after a refresh before deciding', () => {
+    const landed = openAs('pending', '/assistant?conversationId=c-7')
+
+    expect(landed).toMatchObject({ pathname: '/assistant', page: null })
+    expect(landed.text).toContain('Loading account')
   })
 })
 
