@@ -1,4 +1,4 @@
-/** Demo sky: a broad, irregular density field, with knowledge stars across the whole view. */
+/** Demo sky: a broad, irregular density field, with the demo stars (placeholder stars, one demo knowledge point) across the whole view. */
 import { seededRandom } from '@/features/starmap/layout/layout'
 import type { Star } from '@/features/starmap/model/starMap'
 
