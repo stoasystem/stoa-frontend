@@ -33,10 +33,13 @@ export function isFixtureSize(value: number): value is FixtureSize {
 
 type Unplaced = Omit<StarMap, 'stars'> & { stars: Omit<Star, 'x' | 'y'>[] }
 
+/** Anything with nebulae, unplaced stars and prerequisites: a one-subject map or the whole sky. */
+type Placeable = { nebulae: Nebula[]; stars: Omit<Star, 'x' | 'y'>[]; prerequisites: Prerequisite[] }
+
 const slug = (name: string) => name.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
 /** Give every star its place, as the backend's offline layout will. */
-export function placeStars(map: Unplaced, seed: number): StarMap {
+export function placeStars<T extends Placeable>(map: T, seed: number): Omit<T, 'stars'> & { stars: Star[] } {
   const links = nebulaLinks({ stars: map.stars as Star[], prerequisites: map.prerequisites })
   const sizes = new Map<string, number>()
   for (const star of map.stars) sizes.set(star.nebulaId, (sizes.get(star.nebulaId) ?? 0) + 1)
@@ -168,9 +171,9 @@ function withSubjects(map: StarMap): StarMap {
   return {
     ...map,
     subjects: [
-      { subjectId: 'math', name: 'Mathematics', lit: map.summary.lit, total: map.summary.total },
-      { subjectId: 'physics', name: 'Physics', lit: 0, total: 0 },
-      { subjectId: 'german', name: 'German', lit: 0, total: 0 },
+      { subjectId: 'math', name: 'Mathematics', lit: map.summary.lit, total: map.summary.total, enrolled: true },
+      { subjectId: 'physics', name: 'Physics', lit: 0, total: 0, enrolled: true },
+      { subjectId: 'german', name: 'German', lit: 0, total: 0, enrolled: false },
     ],
   }
 }

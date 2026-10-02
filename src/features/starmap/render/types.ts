@@ -38,6 +38,8 @@ export type SceneData = {
    */
   mapKey: string
   count: number
+  /** Continuous demo presentation; topic circles are navigation bounds, not visual islands. */
+  galaxy?: boolean
   /** Map position of every star, map units. */
   mapX: Float32Array
   mapY: Float32Array
@@ -110,6 +112,7 @@ export type SceneFrame = {
   focusStar: number
   /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */
   highlightNebula: number
+  hoveredNebula?: number
   /** Everything but the focus star fades to this (the star layer). */
   dim: number
   /** Skill dots beside the stars (large enough glyphs only). */

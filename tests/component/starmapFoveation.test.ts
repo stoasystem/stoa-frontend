@@ -1,7 +1,7 @@
 /**
  * Foveated rendering (#72 point 6): only the focus -- near the focus point,
  * and the chosen nebula -- is drawn star by star; every other nebula is one
- * pre-rendered, blurred tile, repainted only when its lit fraction changes.
+ * pre-rendered, blurred tile, repainted only when its star states change or a larger resolution is needed.
  *
  * Poison (#72): repaint the tiles on every frame (key the tile cache on
  * anything that changes per frame) and "repaints a tile only when..." goes red.
@@ -173,7 +173,7 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(made).toBeGreaterThan(0)
   })
 
-  it('repaints a tile only when its nebula’s lit fraction changes', () => {
+  it('repaints tiles for every state change, including changes with identical lit counts', () => {
     const renderer = realRenderer()
     const { clock, engine } = engineWith(renderer, map500, false)
     const nebulaCount = orderedNebulae(map500).length
@@ -196,19 +196,19 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(renderer.stats.frames).toBeGreaterThan(100)
     expect(renderer.stats.tilePaints).toBe(nebulaCount)
 
-    // A star changes state but its nebula's lit fraction does not: still none.
+    // Ready → locked keeps the lit fraction but changes the tile's actual dots.
     const ready = map500.stars.find((s) => s.state === 'ready')!
     const shuffled: StarMap = { ...map500, stars: map500.stars.map((s) => (s === ready ? { ...s, state: 'locked' as const } : s)) }
     engine.setData(shuffled, { layer: 'map' })
     clock.advance(20)
-    expect(renderer.stats.tilePaints).toBe(nebulaCount)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)
 
     // A star lights up: exactly its nebula's tile is repainted.
     const lit: StarMap = { ...shuffled, stars: shuffled.stars.map((s) => (s.unitId === ready.unitId ? { ...s, state: 'lit' as const } : s)) }
     engine.setData(lit, { layer: 'map' })
     clock.advance(20)
     clock.advance(500)
-    expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount + 2)
   })
 
   it('never reuses a tile across maps: a subject switch repaints every tile', () => {
