@@ -4,7 +4,7 @@
  * docs/agents/design-preview.md.
  *
  *   /src/dev/preview.html?surface=map&points=1000
- *   /src/dev/preview.html?path=/chapter/u-1-1&lang=de
+ *   /src/dev/preview.html?path=/chapter/demo-sine-cosine&lang=de
  *
  * `surface` is one of `surfaces.ts`; `path` opens any route instead;
  * `points` (10 / 1000 / 2000) sizes the star map; `lang` (de / en / fr / it)
@@ -40,25 +40,28 @@ registerDevelopmentRuntimeConfig(API_ORIGIN, window.location.origin)
 async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
-  if (language && isSupportedLanguage(language)) {
-    localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-    ;(await import('@/dev/preview/handlers')).setPreviewLocale(language)
-  }
-  await Promise.all([import('../../index.css'), import('@/i18n')])
+  if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+  const [, { default: i18n }, { demo, setDemoLanguage }] = await Promise.all([
+    import('../../index.css'),
+    import('@/i18n'),
+    import('@/dev/preview/demoSource'),
+  ])
+  // The demo account reads in the page's language, so `/auth/me` does not switch it back.
+  const reading = i18n.resolvedLanguage ?? i18n.language
+  setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
 
   const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter }] = await Promise.all([
     import('react'),
     import('react-dom/client'),
     import('react-router-dom'),
   ])
-  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { PageSkeleton }, { useAuthStore }, { demoStudent }, { PreviewChrome }] =
+  const [{ AppProviders }, { AppRoutes }, { AuthBootstrap }, { PageSkeleton }, { useAuthStore }, { PreviewChrome }] =
     await Promise.all([
       import('@/app/providers/AppProviders'),
       import('@/app/router/AppRoutes'),
       import('@/app/router/AuthBootstrap'),
       import('@/components/common/PageSkeleton'),
       import('@/store/authStore'),
-      import('@/dev/preview/demoSource'),
       import('@/dev/preview/PreviewChrome'),
     ])
 
@@ -66,7 +69,7 @@ async function start() {
   // account read back from `/auth/me` by the real AuthBootstrap.
   useAuthStore.setState(
     signedIn
-      ? { user: demoStudent, accessToken: 'design-preview', isAuthenticated: true }
+      ? { user: demo().demoStudent, accessToken: 'design-preview', isAuthenticated: true }
       : { user: null, accessToken: null, isAuthenticated: false },
   )
 

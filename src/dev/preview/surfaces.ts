@@ -3,7 +3,7 @@
  * real route it ships under. `preview.html?surface=<id>` opens one; the
  * comparison page lists them.
  */
-import { starMapFixture, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+import { DEMO_HELP_CONVERSATION_ID, DEMO_KNOWLEDGE_POINT, type FixtureSize } from '@/dev/demo/data'
 
 export const STAR_COUNTS = [10, 1000, 2000] as const satisfies readonly FixtureSize[]
 export type StarCount = (typeof STAR_COUNTS)[number]
@@ -24,44 +24,40 @@ export type Surface = {
   pending?: string
 }
 
-/** The first nebula and its first star, whatever the map's size. */
-function firstStar(points: StarCount) {
-  const star = starMapFixture(points).stars[0]
-  return { topicId: star.nebulaId, unitId: star.unitId }
-}
+const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
+const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
+/** The lesson the chapter goes on with: the first one not done when the preview opens. */
+const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
 
 const withPoints = (path: string, points: StarCount) => `${path}?points=${points}`
 
 export const SURFACES: readonly Surface[] = [
   { id: 'login', label: 'Login', path: () => '/login', signedIn: false, stars: false },
-  { id: 'map', label: 'Star map · panorama', path: (points) => withPoints('/map/math', points), signedIn: true, stars: true },
+  { id: 'map', label: 'Star map · panorama', path: (points) => withPoints(`/map/${subjectId}`, points), signedIn: true, stars: true },
   {
     id: 'map-nebula',
     label: 'Star map · nebula',
-    path: (points) => withPoints(`/map/math/${firstStar(points).topicId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
     signedIn: true,
     stars: true,
   },
   {
     id: 'map-star',
-    label: 'Star map · star',
-    path: (points) => {
-      const { topicId, unitId } = firstStar(points)
-      return withPoints(`/map/math/${topicId}/${unitId}`, points)
-    },
+    label: 'Star map · demo knowledge point',
+    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
     signedIn: true,
     stars: true,
   },
-  { id: 'chapter', label: 'Chapter', path: () => '/chapter/u-1-1', signedIn: true, stars: false },
-  { id: 'lesson', label: 'Practice stage', path: () => '/chapter/u-1-1/demo-lesson-2', signedIn: true, stars: false },
+  { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
+  { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },
-  { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints('/ask/demo-conversation-1', points), signedIn: true, stars: true },
+  { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints(`/ask/${DEMO_HELP_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },
   { id: 'account-menu', label: 'Account menu', path: () => '/me', signedIn: true, stars: false, open: 'account-menu' },
   {
     id: 'lighting',
     label: 'Lighting moment',
-    path: (points) => withPoints('/map/math', points),
+    path: (points) => withPoints(`/map/${subjectId}`, points),
     signedIn: true,
     stars: true,
     pending: 'Not built yet: the lighting moment has no implementation to show.',
