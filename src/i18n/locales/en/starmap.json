@@ -71,14 +71,7 @@
   "empty": "Nothing to learn in this subject yet.",
   "demo": {
     "notice": "Demo · Sample content and progress",
-    "sampleNebula": "Nebula {{index}}",
-    "sampleStar": "Knowledge point {{index}}",
-    "emptyStar": "Learning content is coming soon.",
-    "subjects": {
-      "math": "Mathematics",
-      "physics": "Physics",
-      "german": "German"
-    },
+    "emptyStar": "Placeholder star · demo content, no chapter.",
     "longNebula": "Fractions, equations and proportional reasoning {{index}}"
   }
 }

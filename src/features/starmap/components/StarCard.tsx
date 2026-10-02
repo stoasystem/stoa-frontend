@@ -56,7 +56,8 @@ export function StarCard({
           .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
       : []
   const action =
-    star.state === 'locked' || demo
+    // In the design preview only the demo knowledge point has a chapter; a placeholder star has none.
+    star.state === 'locked' || (demo && lessonCount === 0)
       ? null
       : star.state === 'lit'
         ? t('star.open')

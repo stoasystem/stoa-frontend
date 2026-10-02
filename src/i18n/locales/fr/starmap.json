@@ -71,14 +71,7 @@
   "empty": "Rien à apprendre dans cette matière pour l’instant.",
   "demo": {
     "notice": "Démo · Contenu et progression fictifs",
-    "sampleNebula": "Nébuleuse {{index}}",
-    "sampleStar": "Point de connaissance {{index}}",
-    "emptyStar": "Le contenu pédagogique arrive bientôt.",
-    "subjects": {
-      "math": "Mathématiques",
-      "physics": "Physique",
-      "german": "Allemand"
-    },
+    "emptyStar": "Étoile fictive · contenu de démonstration, sans chapitre.",
     "longNebula": "Fractions, équations et raisonnement proportionnel {{index}}"
   }
 }

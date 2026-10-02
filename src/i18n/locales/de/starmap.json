@@ -71,14 +71,7 @@
   "empty": "In diesem Fach gibt es noch nichts zu lernen.",
   "demo": {
     "notice": "Demo · Beispieldaten und Lernfortschritt",
-    "sampleNebula": "Sternnebel {{index}}",
-    "sampleStar": "Wissenspunkt {{index}}",
-    "emptyStar": "Die Lerninhalte folgen bald.",
-    "subjects": {
-      "math": "Mathematik",
-      "physics": "Physik",
-      "german": "Deutsch"
-    },
+    "emptyStar": "Platzhalterstern · Demo-Inhalt, kein Kapitel.",
     "longNebula": "Bruchrechnung, Gleichungen und proportionales Denken {{index}}"
   }
 }

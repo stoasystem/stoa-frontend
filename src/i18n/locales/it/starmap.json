@@ -71,14 +71,7 @@
   "empty": "In questa materia non c’è ancora niente da imparare.",
   "demo": {
     "notice": "Demo · Contenuti e progressi di esempio",
-    "sampleNebula": "Nebulosa {{index}}",
-    "sampleStar": "Punto di conoscenza {{index}}",
-    "emptyStar": "I contenuti didattici saranno disponibili presto.",
-    "subjects": {
-      "math": "Matematica",
-      "physics": "Fisica",
-      "german": "Tedesco"
-    },
+    "emptyStar": "Stella segnaposto · contenuto dimostrativo, nessun capitolo.",
     "longNebula": "Frazioni, equazioni e ragionamento proporzionale {{index}}"
   }
 }
