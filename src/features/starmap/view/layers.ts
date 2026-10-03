@@ -1,20 +1,23 @@
 /*
- * The three layers (#72 point 5) and the flight between them.
+ * What the route chooses (#72 point 8), and the flight to it. Since #134 the
+ * zoom is continuous and these are no longer layers the camera stops at:
+ * they are what is chosen, and the route follows the choice, never the zoom.
  *
- *   map     the whole star map: every nebula, the links between them;
- *   nebula  one nebula fills the view: its stars get names, its own
- *           prerequisite lines appear;
- *   star    one star, drawn in HTML/SVG beside the map: skills, progress,
- *           markers, the way into its chapter.
+ *   map     nothing chosen: the galaxy the header names (`/map/<subject>`);
+ *   nebula  a nebula chosen (`/map/<subject>/<nebula>`): the camera flies in
+ *           until its stars are full glyphs;
+ *   star    a star chosen (`.../<star>`): its card opens beside the map (HTML/
+ *           SVG: skills, progress, markers, the way into its chapter).
+ *
+ * What the map shows -- names, lines -- follows the zoom instead
+ * (`view/semanticZoom.ts`).
  *
  * The flight is d3-zoom's smooth zoom (van Wijk & Nuij, rho = sqrt 2) in two
  * dimensions: a long move pulls back first, a short one zooms straight in.
  */
-import { orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import type { StarMap } from '@/features/starmap/model/starMap'
 import { baseScale, overviewView, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
-
-export type MapLayer = 'map' | 'nebula' | 'star'
 
 export type LayerTarget =
   | { layer: 'map' }
@@ -85,7 +88,7 @@ export function nebulaZoom(disc: NebulaDisc, viewport: Viewport, bounds: Bounds)
   return Math.max(1.4, Math.min(30, (0.85 * shorter) / (2 * disc.r * base)))
 }
 
-/** The view a layer asks for. */
+/** Where a choice is seen: its centre, and where on screen (`fx`, `fy`); the engine sets the zoom (`view/semanticZoom.ts`'s `ZOOM`). */
 export function viewForTarget(
   target: LayerTarget,
   map: Pick<StarMap, 'stars'>,
@@ -101,12 +104,12 @@ export function viewForTarget(
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
   if (!star) return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const wide = isWide(viewport)
-  return { cx: star.x, cy: star.y, k: Math.min(50, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
+  return { cx: star.x, cy: star.y, k: k * 1.8, fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
 }
 
 /**
- * The layer a route asks for, made safe: a nebula or star the map does not
- * have falls back to the nearest layer it does have.
+ * The choice a route asks for, made safe: a nebula or star the map does not
+ * have falls back to the nearest choice it does have.
  */
 export function resolveTarget(map: StarMap, topicId: string | undefined, unitId: string | undefined): LayerTarget {
   const nebula = topicId ? map.nebulae.find((candidate) => candidate.topicId === topicId) : undefined
@@ -118,32 +121,13 @@ export function resolveTarget(map: StarMap, topicId: string | undefined, unitId:
   return { layer: 'star', nebulaId: nebula.topicId, unitId: star.unitId }
 }
 
-/** One layer out: star to its nebula, nebula to the map. */
+/** The choice one step out: a star's card closed (its nebula), a nebula let go (the galaxy). */
 export function outerTarget(target: LayerTarget): LayerTarget {
   if (target.layer === 'star') return { layer: 'nebula', nebulaId: target.nebulaId }
   return { layer: 'map' }
 }
 
-/** One layer in, around the nebula or star nearest the point of interest. */
-export function innerTarget(
-  target: LayerTarget,
-  map: StarMap,
-  nearestNebula: string | null,
-  nearestStar: Star | null,
-): LayerTarget {
-  if (target.layer === 'map') {
-    const nebulaId = nearestNebula ?? orderedStars(map)[0]?.nebulaId
-    return nebulaId ? { layer: 'nebula', nebulaId } : target
-  }
-  if (target.layer === 'nebula') {
-    const inNebula = nearestStar && nearestStar.nebulaId === target.nebulaId ? nearestStar : null
-    const star = inNebula ?? orderedStars(map).find((candidate) => candidate.nebulaId === target.nebulaId)
-    return star ? { layer: 'star', nebulaId: target.nebulaId, unitId: star.unitId } : target
-  }
-  return target
-}
-
-/** The route a layer lives at (#72 point 8). */
+/** The route a choice lives at (#72 point 8). */
 export function pathForTarget(subjectId: string, target: LayerTarget): string {
   const subject = `/map/${encodeURIComponent(subjectId)}`
   if (target.layer === 'map') return subject

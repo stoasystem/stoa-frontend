@@ -3,11 +3,17 @@
  * DOM a screen reader and a keyboard use instead of it, and the controls
  * around it -- the subject switcher, where you are, zoom, the legend.
  *
- * The canvas is hidden from assistive technology. Every star the current
- * layer has on screen is an `<a>` placed over its glyph, blurred or not (the
- * blur is visual only), in the order nebula first, then
- * `(topic.order, unit.order)`; its text is the star's name, learning state,
- * progress and markers (#11 point 5). The star layer is plain HTML and SVG.
+ * The canvas is hidden from assistive technology. Every star on screen is an
+ * `<a>` placed over its glyph, blurred or not (the blur is visual only), in
+ * the order nebula first, then `(topic.order, unit.order)`; its text is the
+ * star's name, learning state, progress and markers (#11 point 5). Stars are
+ * Tab stops once they are big enough to pick (#134: by zoom, the same
+ * threshold as a tap), and in the chosen nebula. A chosen star's card is
+ * plain HTML and SVG.
+ *
+ * The zoom is continuous (#134): the wheel and trackpad scroll by how far
+ * they scroll, the buttons and + / - keys by ×1.5, a pinch and a double tap
+ * in the engine. The route follows what is chosen, never the zoom.
  */
 import { ArrowUp, ChevronLeft, Minus, Plus } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
@@ -18,14 +24,15 @@ import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
 import { nebulaLinks } from '@/features/starmap/model/links'
-import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
+import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
 import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, pathForTarget, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
+import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
@@ -129,11 +136,12 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const stageRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<StarMapEngine | null>(null)
-  const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null }>({
+  const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null; zoom: ZoomState }>({
     stars: [],
     glyph: 12,
     nebulae: [],
     focus: null,
+    zoom: { starPx: 0, band: 'panorama', atMin: true, atMax: false, pickable: false },
   })
   const cardRef = useRef<HTMLDivElement>(null)
   const [hint, setHint] = useState<ReturnType<typeof starHintSpot>>(null)
@@ -187,8 +195,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
       galaxy: true,
       scheduler,
       onRequestTarget: (next) => navigateRef.current(next),
-      // The star layer lists no stars, but says where its star is: panned away, a hint points back (#132).
-      onVisibleChange: (list, glyph, discs) => setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen }),
+      // A chosen star lists no stars, but says where its star is: panned away, a hint points back (#132).
+      onVisibleChange: (list, glyph, discs, zoom) => setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen, zoom }),
       onFirstFrame: () => firstFrameRef.current?.(),
       onCentreGalaxy: (id) => centreRef.current?.(id),
     })
@@ -224,9 +232,11 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
 
     const onWheel = (event: WheelEvent) => {
       const rect = stage.getBoundingClientRect()
-      // Trackpad pinch arrives as a ctrl+wheel; both zoom the map, not the page.
+      // Trackpad pinch arrives as a ctrl+wheel; both zoom the map, not the page,
+      // by as far as they scrolled (#134), around the pointer.
       event.preventDefault()
-      engine.wheelBy(event.deltaY * (event.ctrlKey ? 10 : 1), event.clientX - rect.left, event.clientY - rect.top)
+      const unit = event.deltaMode === 1 ? ZOOM.wheelLinePx : event.deltaMode === 2 ? ZOOM.wheelPagePx : 1
+      engine.wheelBy(event.deltaY * unit * (event.ctrlKey ? ZOOM.pinchWheelBoost : 1), event.clientX - rect.left, event.clientY - rect.top)
     }
     stage.addEventListener('wheel', onWheel, { passive: false })
 
@@ -260,6 +270,12 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   useEffect(() => {
     engineRef.current?.setTarget(target)
   }, [target])
+
+  /** Back out of a choice: the card closes on its nebula, a nebula lets go to the galaxy; the camera stays (#134 Z2). */
+  const letGo = () => {
+    if (target.layer === 'map') return
+    navigateRef.current(outerTarget(target))
+  }
 
   useEffect(() => {
     engineRef.current?.setReducedMotion(reducedMotion)
@@ -323,7 +339,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
       engineRef.current?.step('out')
     } else if (event.key === 'Escape' && target.layer !== 'map') {
       event.preventDefault()
-      engineRef.current?.step('out')
+      letGo()
     } else if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && target.layer === 'star' && !event.shiftKey && !typing(event.target)) {
       // On the star layer, left and right go to the star before or after this
       // one in its nebula, in course order -- the Tab order of the nebula
@@ -361,6 +377,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
 
   // The links, grouped by nebula in keyboard order.
   const size = linkSize(visible.glyph)
+  const pickable = visible.zoom.pickable
   const visibleByNebula = useMemo(() => {
     const groups = new Map<string, VisibleStar[]>()
     for (const entry of visible.stars) {
@@ -418,7 +435,13 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         </div>
       ) : (
         <>
-          <Link to={mapPath} aria-label={t('nav.backToMap')} className={cn(OVERLAY_LINK, 'gap-1.5 text-[15px] font-semibold')}>
+          <Link
+            to={mapPath}
+            aria-label={t('nav.backToMap')}
+            className={cn(OVERLAY_LINK, 'gap-1.5 text-[15px] font-semibold')}
+            // Back to the map flies out to the galaxy's panorama; other ways of letting go keep the zoom.
+            onClick={() => engineRef.current?.expectTarget({ layer: 'map' }, 'fly')}
+          >
             <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
             <span aria-hidden="true">{t('nav.map')}</span>
           </Link>
@@ -469,6 +492,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         className="absolute inset-0 touch-none overflow-hidden select-none"
         data-starmap-stage
         data-layer={target.layer}
+        data-zoom-band={visible.zoom.band}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -547,11 +571,11 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                         {inNebula.map((entry) => {
                           const star = stars[entry.index]
                           const to: LayerTarget = { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId }
-                          // Tab reaches a star once its nebula is open; on the whole map, Tab
-                          // goes nebula by nebula (and to the recommended star), and a screen
-                          // reader still reads every star.
+                          // Tab reaches a star once stars are big enough to pick (#134), and in
+                          // the chosen nebula; far out, Tab goes nebula by nebula (and to the
+                          // recommended star), and a screen reader still reads every star.
                           // The recommended star stays a Tab stop everywhere: it is the way in.
-                          const tabbable = isCurrent || Boolean(star.recommendation)
+                          const tabbable = pickable || isCurrent || Boolean(star.recommendation)
                           return (
                             <li key={star.unitId}>
                               {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
@@ -672,7 +696,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                 type="button"
                 aria-label={t(`zoom.${direction}`)}
                 title={t(`zoom.${direction}`)}
-                disabled={direction === 'in' ? target.layer === 'star' : target.layer === 'map'}
+                disabled={direction === 'in' ? visible.zoom.atMax : visible.zoom.atMin}
                 onClick={() => engineRef.current?.step(direction)}
                 className={cn(
                   'inline-flex cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)]',

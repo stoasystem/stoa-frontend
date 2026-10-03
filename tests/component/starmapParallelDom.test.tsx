@@ -189,7 +189,9 @@ describe('the parallel DOM', () => {
     }
   })
 
-  it('inside a nebula, its stars are the next Tab stops', () => {
+  it('inside a chosen nebula, its stars are the next Tab stops', () => {
+    // Ten stars are big on screen even this far out, but still the panorama's dots: only the chosen nebula's are
+    // Tab stops. Zoomed in on a real sky, every star on screen is one (starmapZoom).
     const { container } = showMap({ layer: 'nebula', nebulaId: 'trigonometry' }, 10, sky10())
     const tabbable = starLinks(container).filter((link) => link.getAttribute('tabindex') !== '-1').map((link) => link.dataset.unit)
     expect(tabbable.filter((unit) => !unit!.startsWith('mechanics'))).toEqual(['demo-sine-cosine', 'trigonometry-2'])

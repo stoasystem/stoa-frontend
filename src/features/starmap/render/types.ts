@@ -152,22 +152,32 @@ export type SceneFrame = {
   dotRadius: number
   /** The recommended star's breath, when it breathes. */
   breath: { index: number; scale: number; alpha: number } | null
-  /** Star names inside the chosen nebula. */
+  /** Star names, by zoom (#134: `starNameAlpha`); 0 far out. */
   starLabelAlpha: number
-  /** Nebula names. */
-  nebulaLabelAlpha: number
-  /** The nebula and star layers' lines between stars: 0 on the panorama, 1 zoomed in (#121). */
-  innerLinkAlpha: number
-  /** 1 on the star layer, 0 elsewhere, between during a layer change (#121: the focused star's lines, every tier). */
-  starLayer?: number
   /**
-   * The chosen nebula, or -1: on the nebula and star layers the open one; on
-   * the whole map the one with keyboard focus, or the focused star's.
+   * Which stars get a name (#134): those within `radius` px of the view's
+   * focus point, fading out over the last `feather` px -- the nearest few
+   * first, more as the zoom grows. Absent: every star on screen.
+   */
+  starNameReach?: { x: number; y: number; radius: number; feather: number }
+  /** Nebula names, all of them (a multiplier on `nebulaNames`). */
+  nebulaLabelAlpha: number
+  /** Each nebula's name by zoom (#134: `nebulaNameAlpha`); absent: 1 for every nebula. */
+  nebulaNames?: ArrayLike<number>
+  /** The hovered or keyboard-focused nebula's name: shown far out too, until star names take over. Absent: 1. */
+  priorityNameAlpha?: number
+  /** The lines by zoom (#121's tiers crossfaded by zoom, #134): the panorama's bridges, and each tier's star lines (index = tier). */
+  lineReveal: { bridges: number; tiers: readonly number[] }
+  /** With a star chosen, 0..1: how far the map has given way to it -- its own lines, every tier; the rest fade (#121, #134). */
+  starFocus?: number
+  /**
+   * The chosen nebula, or -1: the one the route opens (or the chosen star's);
+   * with nothing chosen, the one with keyboard focus, or the focused star's.
    */
   chosenNebula: number
   /**
-   * The whole-map layer is the target (#123). One sky then names a single
-   * nebula -- the hovered or keyboard-focused one -- never the rest; a focused
+   * Nothing is chosen (the route is the galaxy's). One sky then names a
+   * nebula far out only when hovered or keyboard-focused; a focused
    * nebula's name is its link's pill. Absent: read from `chosenNebula < 0`.
    */
   wholeMap?: boolean
@@ -176,10 +186,13 @@ export type SceneFrame = {
   /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */
   highlightNebula: number
   hoveredNebula?: number
-  /** Everything but the focus star fades to this (the star layer). */
+  /** Everything but the focus star fades to this (a chosen star, zoomed in to it). */
   dim: number
-  /** Skill dots beside the stars (large enough glyphs only). */
-  showSkills: boolean
+  /** Skill dots beside the stars, 0..1 by zoom (large enough glyphs only). */
+  showSkills: number
+  /** The frame's time, ms, and how long a name takes to fade when it gains or loses its place (0: at once). */
+  time?: number
+  labelFadeMs?: number
   /** Alpha of the frame before a crossfade, laid over this one; 0 = none. */
   crossfade: number
 }
@@ -197,6 +210,10 @@ export type RenderStats = {
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
   links?: { bridges: number; hints: number; lines: number; labels: number }
+  /** Names drawn in the last frame, star and nebula (#134). */
+  names?: { stars: number; nebulae: number }
+  /** A name is still fading in or out: the renderer wants another frame. */
+  settling?: boolean
 }
 
 export interface StarMapRenderer {

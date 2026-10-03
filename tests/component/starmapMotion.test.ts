@@ -11,6 +11,7 @@ import { orderedStars } from '@/features/starmap/model/starMap'
 import { CROSSFADE_MS, motionPolicy, ZOOM_MS } from '@/features/starmap/motion/motionPolicy'
 import type { View } from '@/features/starmap/view/camera'
 import { fakeClock, recordingRenderer, THEME, skyMap } from './starmapHarness'
+import { ZOOM } from '@/features/starmap/view/semanticZoom'
 
 function starMap(reducedMotion: boolean, size: 10 | 500 = 10) {
   const clock = fakeClock()
@@ -98,11 +99,11 @@ describe('without reduced motion', () => {
     expect(Math.max(...breaths.map((breath) => breath!.scale))).toBeGreaterThan(1.02)
   })
 
-  it('asks for no frames once the star layer is open: nothing breathes there', () => {
+  it('asks for no frames once a star is chosen and the flight is over: nothing breathes there', () => {
     const { clock, renderer, engine } = starMap(false)
     clock.advance(20)
     engine.setTarget({ layer: 'star', nebulaId: 'geometry', unitId: 'u-7' })
-    clock.advance(ZOOM_MS + 100)
+    clock.advance(ZOOM.flightMs + 300)
     const count = renderer.frames.length
     expect(renderer.last().breath).toBeNull()
     clock.advance(3000)
@@ -117,14 +118,14 @@ describe('without reduced motion', () => {
     expect(moved(released, engine.currentView)).toBeGreaterThan(0.01)
   })
 
-  it('flies between layers', () => {
+  it('flies to a chosen nebula', () => {
     const { clock, renderer, engine } = starMap(false)
     clock.advance(20)
     engine.setTarget({ layer: 'nebula', nebulaId: 'algebra' })
-    clock.advance(ZOOM_MS / 2)
+    clock.advance(ZOOM.flightMs / 2)
     const midway = engine.currentView.k
     expect(midway).toBeGreaterThan(1)
-    clock.advance(ZOOM_MS)
+    clock.advance(ZOOM.flightMs)
     expect(engine.currentView.k).toBeGreaterThan(midway)
     expect(renderer.snapshots).toBe(0)
   })

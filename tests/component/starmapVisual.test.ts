@@ -42,8 +42,8 @@ describe('visual acceptance geometry (#76, #109)', () => {
       const nebulae = orderedNebulae(s.map)
       const names = nebulae.map((n) => n.name.toLocaleUpperCase())
       const circles = nebulae.map((_, n) => ({ x: f.nebulaX[n], y: f.nebulaY[n], r: f.nebulaR[n] }))
-      // The panorama's soft bridges (#121), one per related pair of nebulae.
-      const segments = nebulaLinks(s.map).flatMap((link) => bridgeAxis(
+      // The panorama's soft bridges (#121), one per related pair of nebulae, while drawn (#134: they give way to star lines by zoom).
+      const segments = f.lineReveal.bridges <= 0 ? [] : nebulaLinks(s.map).flatMap((link) => bridgeAxis(
         circles[nebulae.findIndex((n) => n.topicId === link.a)],
         circles[nebulae.findIndex((n) => n.topicId === link.b)]) ?? [])
       const labels = s.counter.texts!.filter((t) => names.includes(t.text))

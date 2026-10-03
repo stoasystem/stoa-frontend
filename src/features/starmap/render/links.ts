@@ -4,15 +4,16 @@
  * decides how strongly each is drawn; this module only turns that into
  * strokes, and is the one call the Canvas 2D renderer makes for them.
  *
- *   panorama  soft bridges between related nebulae of one galaxy, and a
+ *   far out   soft bridges between related nebulae of one galaxy, and a
  *             faint glow at the edges of the dark between two galaxies that
  *             share prerequisites; a focused nebula's bridges brighten, its
  *             bridges to other galaxies appear.
- *   nebula    star-to-star lines of the chosen nebula, by tier; a line to
- *             another nebula fades out near its own star (direction only),
- *             and the nebula it leads to is named at the screen's edge when
- *             it is off screen -- with its subject when that is another one.
- *   star      the star's own lines, all four tiers, drawn to the other star.
+ *   closer    star-to-star lines of every star on screen, each tier fading
+ *             in at its own zoom (#134); a line to another nebula fades out
+ *             near its own star (direction only), and from the chosen
+ *             nebula the nebula it leads to is named at the screen's edge
+ *             when it is off screen -- with its subject when that is another one.
+ *   a star    chosen: its own lines, all four tiers, drawn to the other star.
  *
  * Seam (#120): x wraps, `x mod 1`, galaxies on a ring. A line between two
  * points always takes the shorter way round (`shortestDx`), anchored on one
@@ -112,8 +113,6 @@ type Hint = { a: number; b: number; nebulae: [number[], number[]] }
 
 type Prepared = {
   lines: StarLine[]
-  /** Lines touching each nebula, by index into `lines`. */
-  byNebula: number[][]
   /** Galaxy of each nebula, or -1 (not one sky). */
   galaxyOf: Int16Array
   bridges: NebulaBridge[]
@@ -128,7 +127,6 @@ function prepare(scene: SceneData): Prepared {
   const galaxyOf = new Int16Array(scene.nebulae.length).fill(-1)
   scene.galaxies?.forEach((galaxy, g) => galaxy.nebulae.forEach((n) => (galaxyOf[n] = g)))
   const recommended = new Set(scene.recommendations ?? (scene.recommended >= 0 ? [scene.recommended] : []))
-  const byNebula: number[][] = scene.nebulae.map(() => [])
   const lines: StarLine[] = []
   for (const { from, to } of scene.starLinks) {
     if (from === to || from < 0 || to < 0 || from >= scene.count || to >= scene.count) continue
@@ -139,8 +137,6 @@ function prepare(scene: SceneData): Prepared {
       toNebula: scene.nebula[to],
       tier: linkTier(LEARNING_STATES[scene.state[from]], LEARNING_STATES[scene.state[to]], recommended.has(to)),
     }
-    byNebula[line.fromNebula]?.push(lines.length)
-    if (line.toNebula !== line.fromNebula) byNebula[line.toNebula]?.push(lines.length)
     lines.push(line)
   }
   const bridges: NebulaBridge[] = scene.links.map((link) => ({
@@ -158,7 +154,7 @@ function prepare(scene: SceneData): Prepared {
     if (!hint.nebulae[1].includes(nb)) hint.nebulae[1].push(nb)
     hints.set(key, hint)
   }
-  const made = { lines, byNebula, galaxyOf, bridges, hints: [...hints.values()] }
+  const made = { lines, galaxyOf, bridges, hints: [...hints.values()] }
   prepared.set(scene, made)
   return made
 }
@@ -199,8 +195,9 @@ export function drawLinks(
   const data = prepare(scene)
   const { width, height } = frame.viewport
   const view: LinkView = {
-    nebula: Math.max(0, Math.min(1, frame.innerLinkAlpha)),
-    star: frame.starLayer ?? 0,
+    bridges: frame.lineReveal.bridges,
+    tiers: frame.lineReveal.tiers,
+    star: frame.starFocus ?? 0,
     chosen: frame.chosenNebula,
     focusStar: frame.focusStar,
   }
@@ -214,7 +211,7 @@ export function drawLinks(
   ctx.setLineDash([])
 
   // ---- The panorama: bridges between nebulae, glows between galaxies ----
-  if (view.nebula < 1) {
+  if (view.bridges > 0) {
     const focus = frame.highlightNebula >= 0 ? frame.highlightNebula : frame.chosenNebula >= 0 ? frame.chosenNebula : (frame.hoveredNebula ?? -1)
     const cores: Circle[] = scene.nebulae.map((_, n) => ({ x: frame.nebulaX[n], y: frame.nebulaY[n], r: frame.nebulaR[n] * 0.6 }))
 
@@ -308,83 +305,99 @@ export function drawLinks(
     }
   }
 
-  // ---- The nebula and star layers: lines between stars, by tier ----
-  if (view.nebula > 0 && view.chosen >= 0 && view.chosen < data.byNebula.length) {
+  // ---- Closer in: lines between stars, each tier by zoom ----
+  const anyLines = view.tiers.some((tier) => tier > 0.001) || (view.star > 0.001 && view.focusStar >= 0)
+  if (anyLines) {
     const trim = Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + 2
-    const fadeLength = Math.max(LINE.fadeMin, frame.nebulaR[view.chosen] * LINE.fade)
-    /** Other nebulae a drawn line leads to: the strongest line to each, and (focused) where it runs. */
+    const fadeOf = (n: number) => Math.max(LINE.fadeMin, (frame.nebulaR[n] ?? 0) * LINE.fade)
+    /** Other nebulae a drawn line from the chosen one leads to: the strongest line to each, and (focused) where it runs. */
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
-    for (const index of data.byNebula[view.chosen]) {
-      const line = data.lines[index]
+    const ends: [number, number][] = []
+    for (const line of data.lines) {
       const { strength, reach } = starLineLook(line, view)
       if (strength <= 0.001) continue
-      // Anchored on the focused star, else on the end inside the chosen nebula.
-      const flip = line.to === view.focusStar || (line.from !== view.focusStar && line.fromNebula !== view.chosen)
-      const [p, q] = flip ? [line.to, line.from] : [line.from, line.to]
-      const qNebula = flip ? line.fromNebula : line.toNebula
-      const leaves = qNebula !== view.chosen
-      const px = frame.x[p]
-      const py = frame.y[p]
-      const qx = px + shortestDx(scene.mapX[p], scene.mapX[q]) * band
-      const qy = frame.y[q]
-      const d = Math.hypot(qx - px, qy - py)
-      if (d <= trim * 2) continue
-      const ux = (qx - px) / d
-      const uy = (qy - py) / d
-      const full = d - trim * 2
-      const length = leaves ? Math.min(full, fadeLength + reach * Math.max(0, full - fadeLength)) : full
-      const color = inkOf(ink, line.tier)
-      const lineWidth = LINE.width[line.tier]
+      // Anchored on the focused star, else on the end in the chosen nebula;
+      // a line between two other nebulae is drawn from both ends, each fading out.
+      ends.length = 0
+      if (view.focusStar >= 0 && (line.from === view.focusStar || line.to === view.focusStar)) {
+        ends.push(line.to === view.focusStar ? [line.to, line.from] : [line.from, line.to])
+      } else if (view.chosen >= 0 && (line.fromNebula === view.chosen || line.toNebula === view.chosen)) {
+        ends.push(line.fromNebula === view.chosen ? [line.from, line.to] : [line.to, line.from])
+      } else {
+        ends.push([line.from, line.to])
+        if (line.fromNebula !== line.toNebula) ends.push([line.to, line.from])
+      }
       let drawn = false
-      for (const k of periods) {
-        const x0 = px + ux * trim + k * band
-        const y0 = py + uy * trim
-        const x1 = x0 + ux * length
-        const y1 = y0 + uy * length
-        if (!onScreen(x0, y0, x1, y1, 8)) continue
-        const faded = leaves && reach < 0.999
-        let stroke: string | CanvasGradient = color
-        if (faded) {
-          const gradient = ctx.createLinearGradient(x0, y0, x1, y1)
-          gradient.addColorStop(0, fade(color, 1))
-          gradient.addColorStop(1, fade(color, reach))
-          stroke = gradient
-        }
-        if (line.tier === TIER_RECOMMENDED) {
-          ctx.setLineDash([])
-          ctx.strokeStyle = faded ? stroke : fade(color, 1)
-          ctx.globalAlpha = strength * LINE.glow.alpha
-          ctx.lineWidth = LINE.glow.width
+      for (const [p, q] of ends) {
+        const pNebula = scene.nebula[p]
+        const qNebula = scene.nebula[q]
+        const leaves = qNebula !== pNebula
+        const px = frame.x[p]
+        const py = frame.y[p]
+        const qx = px + shortestDx(scene.mapX[p], scene.mapX[q]) * band
+        const qy = frame.y[q]
+        const d = Math.hypot(qx - px, qy - py)
+        if (d <= trim * 2) continue
+        const ux = (qx - px) / d
+        const uy = (qy - py) / d
+        const full = d - trim * 2
+        const fadeLength = fadeOf(pNebula)
+        const length = leaves ? Math.min(full, fadeLength + reach * Math.max(0, full - fadeLength)) : full
+        const color = inkOf(ink, line.tier)
+        const lineWidth = LINE.width[line.tier]
+        let seen = false
+        for (const k of periods) {
+          const x0 = px + ux * trim + k * band
+          const y0 = py + uy * trim
+          const x1 = x0 + ux * length
+          const y1 = y0 + uy * length
+          if (!onScreen(x0, y0, x1, y1, 8)) continue
+          const faded = leaves && reach < 0.999
+          let stroke: string | CanvasGradient = color
+          if (faded) {
+            const gradient = ctx.createLinearGradient(x0, y0, x1, y1)
+            gradient.addColorStop(0, fade(color, 1))
+            gradient.addColorStop(1, fade(color, reach))
+            stroke = gradient
+          }
+          if (line.tier === TIER_RECOMMENDED) {
+            ctx.setLineDash([])
+            ctx.strokeStyle = faded ? stroke : fade(color, 1)
+            ctx.globalAlpha = strength * LINE.glow.alpha
+            ctx.lineWidth = LINE.glow.width
+            ctx.beginPath()
+            ctx.moveTo(x0, y0)
+            ctx.lineTo(x1, y1)
+            ctx.stroke()
+          }
+          ctx.setLineDash(line.tier === TIER_LOCKED ? [...LINE.dash] : [])
+          ctx.strokeStyle = stroke
+          ctx.globalAlpha = Math.min(1, strength)
+          ctx.lineWidth = lineWidth
           ctx.beginPath()
           ctx.moveTo(x0, y0)
           ctx.lineTo(x1, y1)
           ctx.stroke()
+          seen = true
+          // Names keep clear of what carries the message now; the faint path walked may run under them.
+          if (strength >= 0.5 && (line.tier <= 2 || reach > 0)) obstacles.segments.push({ x0, y0, x1, y1 })
         }
-        ctx.setLineDash(line.tier === TIER_LOCKED ? [...LINE.dash] : [])
-        ctx.strokeStyle = stroke
-        ctx.globalAlpha = Math.min(1, strength)
-        ctx.lineWidth = lineWidth
-        ctx.beginPath()
-        ctx.moveTo(x0, y0)
-        ctx.lineTo(x1, y1)
-        ctx.stroke()
+        if (!seen) continue
         drawn = true
-        // Names keep clear of what carries the message now; the faint path walked may run under them.
-        if (strength >= 0.5 && (line.tier <= 2 || reach > 0)) obstacles.segments.push({ x0, y0, x1, y1 })
+        if (!leaves || view.chosen < 0 || (pNebula !== view.chosen && p !== view.focusStar)) continue
+        const known = leadsTo.get(qNebula)
+        if (strength >= 0.5 && (!known || strength > known.strength || (reach > 0 && !known.along))) {
+          leadsTo.set(qNebula, { strength, along: reach > 0 ? { x: px, y: py, ux, uy, d } : known?.along ?? null })
+        }
       }
-      if (!drawn) continue
-      stats.lines += 1
-      const known = leadsTo.get(qNebula)
-      if (leaves && strength >= 0.5 && (!known || strength > known.strength || (reach > 0 && !known.along))) {
-        leadsTo.set(qNebula, { strength, along: reach > 0 ? { x: px, y: py, ux, uy, d } : known?.along ?? null })
-      }
+      if (drawn) stats.lines += 1
     }
     ctx.setLineDash([])
 
     // Where those lines lead: a nebula off screen is named at the edge, in
     // its direction; one in another galaxy also says which subject it is in.
-    const labelAlpha = Math.max(frame.nebulaLabelAlpha, view.star) * view.nebula
-    if (leadsTo.size > 0 && labelAlpha > 0.01) {
+    const labelAlpha = Math.max(view.tiers[1] ?? 0, view.star)
+    if (leadsTo.size > 0 && labelAlpha > 0.01 && view.chosen >= 0) {
       const top = frame.viewport.top ?? 0
       const bottom = height - (frame.viewport.bottom ?? 0)
       const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
