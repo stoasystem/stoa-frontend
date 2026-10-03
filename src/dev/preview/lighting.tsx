@@ -16,9 +16,12 @@
  *     app's own route leaves them out (no backend claim, #110); only this
  *     preview, like the bench's `&relations=fixture`, puts them in.
  *
- * `PreviewLighting` provides both around the app.
+ * `PreviewLighting` provides both around the app; with `longNames` (the
+ * preview's `&longNames=1`) the override also gives the nebulae long names.
  */
+import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoKnowledgePointState, demoSky, localize } from '@/dev/demo/data'
 import {
   acknowledgeLit,
@@ -31,7 +34,7 @@ import {
 import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { StarMapOverrideContext } from '@/features/starmap/lighting/starMapOverride'
-import { orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -75,9 +78,10 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
     return star
   })
 
-  // A lit point is no longer what to learn next.
+  // A lit point is no longer what to learn next. The next pick is its own galaxy's: at most one
+  // per subject (#9 point 8), so another galaxy's recommendation is never touched.
   if (hasPoint && state === 'lit' && stars.some((star) => star.unitId === kp.unitId && star.recommendation)) {
-    const ordered = orderedStars({ ...map, stars })
+    const ordered = orderedStars({ ...map, stars }).filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId)
     const pick = ordered.find((star) => star.state === 'in_progress' && star.unitId !== kp.unitId) ?? ordered.find((star) => star.state === 'ready')
     stars = stars.map((star) =>
       star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation: { source: 'system' } } : star,
@@ -85,23 +89,46 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   }
 
   const delta = (state === 'lit' ? 1 : 0) - (fixtureState === 'lit' ? 1 : 0)
+  // `summary` counts the galaxy in focus only; the map holds the whole sky (#119), so the point is
+  // on every galaxy's map but counts only on its own.
+  const inFocus = hasPoint && map.subject.subjectId === kp.subjectId
   return {
     ...map,
     stars,
     prerequisites,
-    summary: hasPoint ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
+    summary: inFocus ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
     subjects: map.subjects.map((subject) => (subject.subjectId === kp.subjectId ? { ...subject, lit: subject.lit + delta } : subject)),
   }
 }
 
-export function PreviewLighting({ children }: { children: ReactNode }) {
+const longNebulae = new WeakMap<Nebula[], { t: TFunction<'starmap'>; nebulae: Nebula[] }>()
+
+/**
+ * The map with long nebula names, to check labels in four languages: what
+ * the bench's `&longNames=1` gives the route by its `longNames` prop, which
+ * the app's routes do not pass. The same names `demoStarMap` makes, in the
+ * same array for the same sky and language, so the engine keeps its tiles.
+ */
+export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): StarMap {
+  const known = longNebulae.get(map.nebulae)
+  if (known?.t === t) return { ...map, nebulae: known.nebulae }
+  const nebulae = map.nebulae.map((nebula) => ({ ...nebula, name: t('demo.longNebula', { index: nebula.order }) }))
+  longNebulae.set(map.nebulae, { t, nebulae })
+  return { ...map, nebulae }
+}
+
+export function PreviewLighting({ children, longNames = false }: { children: ReactNode; longNames?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
+  const { t } = useTranslation('starmap')
   // A new function when the demo backend changes, so the map is drawn again.
   const override = useMemo(() => {
     void version
     const completed = completedLessons()
-    return (map: StarMap, size: FixtureSize) => demoStarMapOverride(map, size, completed)
-  }, [version])
+    return (map: StarMap, size: FixtureSize) => {
+      const followed = demoStarMapOverride(map, size, completed)
+      return longNames ? withLongNebulaNames(followed, t) : followed
+    }
+  }, [version, longNames, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
       <StarMapOverrideContext.Provider value={override}>{children}</StarMapOverrideContext.Provider>

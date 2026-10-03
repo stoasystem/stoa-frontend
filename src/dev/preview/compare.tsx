@@ -4,6 +4,7 @@
  * docs/agents/design-preview.md.
  *
  *   /src/dev/preview-compare.html?surface=map&points=1000            live
+ *   /src/dev/preview-compare.html?surface=map&longNames=1            live, long nebula names
  *   /src/dev/preview-compare.html?mode=shots&before=a&after=b         screenshots
  *
  * `live` shows the preview itself in three frames at their real sizes,
@@ -14,7 +15,7 @@
  */
 import { StrictMode, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { DEFAULT_STAR_COUNT, STAR_COUNTS, starCountFrom, surfaceById, SURFACES, type StarCount } from '@/dev/preview/surfaces'
+import { STAR_COUNTS, starCountFrom, surfaceById, SURFACES, type StarCount } from '@/dev/preview/surfaces'
 
 const VIEWPORTS = [
   { id: 'desktop', label: 'Desktop 1440×900', width: 1440, height: 900 },
@@ -97,6 +98,7 @@ function Compare() {
   const surface = surfaceById(query.get('surface')) ?? SURFACES[1]
   const points: StarCount = starCountFrom(query.get('points'))
   const lang = query.get('lang') ?? ''
+  const longNames = query.get('longNames') === '1'
   const height = rowHeight(width)
   const sets = Object.keys(index).sort((a, b) => index[b].createdAt.localeCompare(index[a].createdAt))
 
@@ -110,13 +112,27 @@ function Compare() {
   const previewSrc = (viewport: string) => {
     const url = new URLSearchParams({ surface: surface.id, points: String(points) })
     if (lang) url.set('lang', lang)
+    if (longNames && surface.stars) url.set('longNames', '1')
     // Each frame is its own page, so a frame reloads when its key changes.
     return `/src/dev/preview.html?${url.toString()}&frame=${viewport}`
   }
 
+  /**
+   * The screenshot of this surface at this size and, where the star map is on
+   * screen, at exactly this star count: a missing tier is shown as missing,
+   * never stood in for by another. A surface without the star map is taken
+   * at one count only, which is the one it has.
+   */
+  const shotsFor = (set: string, viewport: string) =>
+    index[set]?.shots.filter((shot) => shot.surface === surface.id && shot.viewport === viewport) ?? []
   const shotFor = (set: string, viewport: string) => {
-    const shots = index[set]?.shots.filter((shot) => shot.surface === surface.id && shot.viewport === viewport) ?? []
-    return shots.find((shot) => shot.points === points) ?? shots.find((shot) => shot.points === DEFAULT_STAR_COUNT) ?? shots[0]
+    const shots = shotsFor(set, viewport)
+    return surface.stars ? shots.find((shot) => shot.points === points) : shots[0]
+  }
+  const missing = (set: string, viewport: string) => {
+    const taken = shotsFor(set, viewport).map((shot) => shot.points)
+    if (!surface.stars || taken.length === 0) return `No screenshot of this surface at this size in “${set}”.`
+    return `No ${points}-star screenshot of this surface at this size in “${set}” (taken: ${taken.join(', ')} stars).`
   }
 
   const row = (set: string) => (
@@ -131,7 +147,7 @@ function Compare() {
             <Frame key={viewport.id} viewport={viewport} height={height}>
               {shot
                 ? <img alt={`${surface.label}, ${viewport.label}`} src={`${SHOTS}/${set}/${shot.file}`} style={{ display: 'block', width: viewport.width, height: viewport.height }} />
-                : <p style={{ padding: 24, fontSize: 32 }}>No screenshot of this surface at this size in “{set}”.</p>}
+                : <p data-missing-shot style={{ padding: 24, fontSize: 32, color: '#a33' }}>{missing(set, viewport.id)}</p>}
             </Frame>
           )
         })}
@@ -155,7 +171,13 @@ function Compare() {
           disabled={!surface.stars}
         />
         {mode === 'live' && (
-          <Select name="Language" value={lang} options={LANGUAGES.map((code) => [code, code || 'default'] as const)} onChange={(value) => set('lang', value)} />
+          <>
+            <Select name="Language" value={lang} options={LANGUAGES.map((code) => [code, code || 'default'] as const)} onChange={(value) => set('lang', value)} />
+            <label style={label}>
+              <input type="checkbox" checked={longNames} disabled={!surface.stars} onChange={(event) => set('longNames', event.target.checked ? '1' : '')} />
+              Long names
+            </label>
+          </>
         )}
         {mode === 'shots' && (
           <>

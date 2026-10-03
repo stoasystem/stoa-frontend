@@ -5,7 +5,9 @@
  * knowledge point are done, so finishing one moves the chapter on; when the
  * point was first lit (finishing its last lesson, as #9 point 3 triggers it
  * on the lesson-completion write); and whether the student has acknowledged
- * that lighting (stoa-backend#71's shape, #51).
+ * that lighting (stoa-backend#71's shape, #51); and Ask's conversations
+ * started and messages sent on the page, with their answers, so the thread
+ * read back from the "server" holds them.
  *
  * That state is the "server's": kept in this module, and mirrored to the
  * tab's own sessionStorage (`demoServerStorage`), so a reload of the same tab
@@ -26,15 +28,23 @@ import {
 import { demoServerStorage } from '@/dev/preview/storage'
 import type { LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import type { SupportedLanguage } from '@/i18n/languages'
+import type { ChatMessage, Conversation, ConversationListResponse, ConversationSummary } from '@/types/chat'
 
 let language: SupportedLanguage = 'en'
 let data: DemoData = demoDataFor(language)
 const SERVER_KEY = 'stoa.design-preview.v1.demo-server'
 
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean }
+type AskState = {
+  /** Conversations started on the page, newest last. */
+  created: ConversationSummary[]
+  /** Messages sent on the page and their answers, per conversation, in order. */
+  sent: Record<string, ChatMessage[]>
+}
+
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState }
 
 function opening(): ServerState {
-  return { completed: [...DEMO_COMPLETED_LESSONS], litAt: null, acknowledged: false }
+  return { completed: [...DEMO_COMPLETED_LESSONS], litAt: null, acknowledged: false, ask: { created: [], sent: {} } }
 }
 
 function restore(): ServerState {
@@ -130,6 +140,42 @@ export function completeLesson(lessonId: string) {
   // First lit on the write that makes it so, and only then (#9 point 3).
   if (!server.litAt && demoKnowledgePointState([...completed]) === 'lit') server = { ...server, litAt: new Date().toISOString() }
   changed()
+}
+
+/** A conversation started on the page. */
+export function createDemoConversation(summary: ConversationSummary) {
+  server = { ...server, ask: { ...server.ask, created: [...server.ask.created.filter((known) => known.id !== summary.id), summary] } }
+  changed()
+}
+
+/** A message and its answer, as the backend stores them once the answer is written. Sent again with the same ids, kept once. */
+export function recordDemoExchange(conversationId: string, messages: ChatMessage[]) {
+  const known = server.ask.sent[conversationId] ?? []
+  const ids = new Set(messages.map((message) => message.id))
+  const sent = { ...server.ask.sent, [conversationId]: [...known.filter((message) => !ids.has(message.id)), ...messages] }
+  server = { ...server, ask: { ...server.ask, sent } }
+  changed()
+}
+
+function withSent<T extends ConversationSummary>(conversation: T): T {
+  const sent = server.ask.sent[conversation.id] ?? []
+  const last = sent[sent.length - 1]
+  return last ? { ...conversation, updatedAt: last.createdAt, lastMessagePreview: last.content } : conversation
+}
+
+/** One conversation as the backend reads it back: the demo one, or one started here, with what was sent on the page. */
+export function demoConversation(conversationId: string): Conversation | null {
+  const fixture = data.demoConversations.find((conversation) => conversation.id === conversationId)
+  const created = server.ask.created.find((conversation) => conversation.id === conversationId)
+  const conversation: Conversation | null = fixture ?? (created ? { ...created, messages: [] } : null)
+  if (!conversation) return null
+  return withSent({ ...conversation, messages: [...conversation.messages, ...(server.ask.sent[conversationId] ?? [])] })
+}
+
+/** Ask's list: the conversations started here first, then the demo ones. */
+export function demoConversationList(): ConversationListResponse {
+  const created = [...server.ask.created].reverse().map(withSent)
+  return { items: [...created, ...data.demoConversationList.items.map(withSent)] }
 }
 
 /** The roadmap and lessons of the demo knowledge point, with this page's completed lessons. */

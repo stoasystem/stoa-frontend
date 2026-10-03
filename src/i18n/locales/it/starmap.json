@@ -75,6 +75,6 @@
     "longNebula": "Frazioni, equazioni e ragionamento proporzionale {{index}}"
   },
   "lighting": {
-    "announce": "{{name}} è accesa"
+    "announce": "La stella {{name}} è accesa"
   }
 }

@@ -222,7 +222,7 @@
     },
     "lit": {
       "label": "Progressi",
-      "title": "{{name}} è accesa",
+      "title": "La stella {{name}} è accesa",
       "body": "Hai finito il suo capitolo. La stella ora brilla sulla tua mappa.",
       "link": "Vedi sulla mappa"
     }

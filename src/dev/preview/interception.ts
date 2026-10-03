@@ -60,8 +60,8 @@ function apiPath(url: URL) {
   return url.pathname.replace(/^\/api(?=\/)/, '')
 }
 
-function reply(method: string, url: URL, body: unknown): PreviewReply {
-  const found = answer({ method, path: apiPath(url), query: url.searchParams, body: parseBody(body) })
+async function reply(method: string, url: URL, body: unknown): Promise<PreviewReply> {
+  const found = await answer({ method, path: apiPath(url), query: url.searchParams, body: parseBody(body) })
   const record = { method, url: `${apiPath(url)}${url.search}`, status: found?.status ?? 404 }
   if (found) {
     journal().answered.push(record)
@@ -75,7 +75,7 @@ function axiosAdapter(client: AxiosInstance): AxiosAdapter {
   return async (config) => {
     const url = new URL(client.getUri(config), window.location.origin)
     const method = (config.method ?? 'get').toUpperCase()
-    const { status, data } = reply(method, url, config.data)
+    const { status, data } = await reply(method, url, config.data)
     const response: AxiosResponse = {
       data,
       status,
@@ -107,13 +107,14 @@ function installFetch() {
     const stream = /^\/conversations\/([^/]+)\/messages\/stream$/.exec(apiPath(url))
     if (stream && method === 'POST') {
       journal().answered.push({ method, url: apiPath(url), status: 200 })
-      const content = (parseBody(body) as { content?: string } | null)?.content ?? ''
-      return new Response(streamedAnswer(decodeURIComponent(stream[1]), content), {
+      const sent = parseBody(body) as { content?: string; idempotencyKey?: string } | null
+      const events = await streamedAnswer(decodeURIComponent(stream[1]), sent?.content ?? '', sent?.idempotencyKey ?? `demo-${Date.now()}`)
+      return new Response(events, {
         status: 200,
         headers: { 'content-type': 'text/event-stream' },
       })
     }
-    const { status, data } = reply(method, url, body)
+    const { status, data } = await reply(method, url, body)
     return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
   }
 }

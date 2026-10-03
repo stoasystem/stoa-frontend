@@ -3,23 +3,30 @@
  * answered from #116's demo data through `demoSource.ts` (#115).
  *
  * A path missing from this table is answered 404 by `interception.ts` and
- * recorded, never sent anywhere. Writes are acknowledged; the only one kept
- * (until the page reloads) is a completed lesson, so the chapter moves on.
+ * recorded, never sent anywhere. Writes are acknowledged; those the demo
+ * backend keeps (`demoSource.ts`, for the tab's session) are a completed
+ * lesson, so the chapter moves on, and Ask's conversations and messages with
+ * their answers, so the thread read back holds them.
  */
 import {
   checkDemoAnswer,
   completeLesson,
+  createDemoConversation,
   demo,
+  demoConversation,
+  demoConversationList,
   demoChapterNow,
   demoHint,
   demoLanguage,
   demoLessonResult,
   demoTeacherAvailability,
   demoTeacherHelpRequests,
+  recordDemoExchange,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { isSupportedLanguage } from '@/i18n/languages'
-import type { ChatMessage } from '@/types/chat'
+import { commandMessageIds } from '@/services/chat/commandMessageIds'
+import type { ChatMessage, ConversationSummary } from '@/types/chat'
 
 export type PreviewRequest = {
   method: string
@@ -76,16 +83,22 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   ['PATCH', '/notifications/preferences', ({ body }) => ({ userId: demo().demoStudent.id, supportedCategories: [], supportedChannels: [], ...(body as object) })],
 
   // Ask
-  ['GET', '/conversations', () => demo().demoConversationList],
-  ['POST', '/conversations', ({ body }) => ({
-    id: `demo-conversation-${Date.now()}`,
-    title: field<string>(body, 'initialMessage') ?? '…',
-    subject: field<string>(body, 'subject') ?? 'math',
-    grade: field<string>(body, 'grade') ?? demo().demoProfile.grade,
-    updatedAt: now(),
-    messages: [],
-  })],
-  ['GET', '/conversations/:id', ({ params }) => demo().demoConversations.find((c) => c.id === params.id) ?? {
+  ['GET', '/conversations', () => demoConversationList()],
+  ['POST', '/conversations', async ({ body }) => {
+    const initialMessage = field<string>(body, 'initialMessage')?.trim()
+    const summary: ConversationSummary = {
+      id: `demo-conversation-${Date.now()}`,
+      title: initialMessage ? titleOf(initialMessage) : '…',
+      subject: field<string>(body, 'subject') ?? 'math',
+      grade: field<string>(body, 'grade') ?? demo().demoProfile.grade,
+      updatedAt: now(),
+    }
+    createDemoConversation(summary)
+    // The first question goes out with the conversation; its answer comes on the command `initial-<id>`.
+    if (initialMessage) recordDemoExchange(summary.id, await exchange(summary.id, `initial-${summary.id}`, initialMessage))
+    return { ...summary, messages: [] }
+  }],
+  ['GET', '/conversations/:id', ({ params }) => demoConversation(params.id) ?? {
     id: params.id, title: '…', subject: 'math', grade: demo().demoProfile.grade, updatedAt: now(), messages: [],
   }],
   ['GET', '/conversations/:id/generation', ({ params }) => ({ conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' })],
@@ -137,28 +150,50 @@ function compile(pattern: string) {
 const compiled = routes.map(([method, pattern, handler]) => ({ method, pattern, handler, ...compile(pattern) }))
 
 /** The demo answer to one request, or `null` when the preview has none. A handler's `null` is the backend's 404. */
-export function answer(request: Omit<PreviewRequest, 'params'>): PreviewReply | null {
+export async function answer(request: Omit<PreviewRequest, 'params'>): Promise<PreviewReply | null> {
   for (const route of compiled) {
     if (route.method !== request.method) continue
     const match = route.regex.exec(request.path)
     if (!match) continue
     const params = Object.fromEntries(route.names.map((name, index) => [name, decodeURIComponent(match[index + 1])]))
-    const data = route.handler({ ...request, params })
+    const data = await route.handler({ ...request, params })
     return data === null ? { status: 404, data: { detail: 'Not in the demo data' } } : { status: 200, data }
   }
   return null
 }
 
-/** The assistant's answer to a message sent in Ask, as the stream endpoint's events. */
-export function streamedAnswer(conversationId: string, content: string): string {
-  const messageId = `demo-answer-${Date.now()}`
-  const reply: Pick<ChatMessage, 'content'> = {
-    content: `This is the design preview, so no assistant is answering. You asked: “${content}”.`,
-  }
+/** A conversation's title, as the backend makes it from the first question: its last line, cut short. */
+function titleOf(question: string): string {
+  const lines = question.split('\n')
+  const line = lines[lines.length - 1].trim() || question
+  return line.length > 60 ? `${line.slice(0, 59)}…` : line
+}
+
+const replyTo = (content: string) => `This is the design preview, so no assistant is answering. You asked: “${content}”.`
+
+/** A question and its answer as the backend stores them, with the ids it derives from the command. */
+async function exchange(conversationId: string, idempotencyKey: string, content: string): Promise<ChatMessage[]> {
+  const { studentMessageId, assistantMessageId } = await commandMessageIds(conversationId, idempotencyKey)
+  const askedAt = now()
+  return [
+    { id: studentMessageId, conversationId, role: 'student', content, createdAt: askedAt, status: 'completed' },
+    { id: assistantMessageId, conversationId, role: 'assistant', content: replyTo(content), createdAt: now(), status: 'completed' },
+  ]
+}
+
+/**
+ * The assistant's answer to a message sent in Ask, as the stream endpoint's
+ * events. The exchange is stored first, as the backend does, so reading the
+ * conversation back afterwards (and after a reload) finds it.
+ */
+export async function streamedAnswer(conversationId: string, content: string, idempotencyKey: string): Promise<string> {
+  const messages = await exchange(conversationId, idempotencyKey, content)
+  recordDemoExchange(conversationId, messages)
+  const reply = messages[1]
   const events = [
-    ['message_start', { messageId, conversationId, role: 'assistant', createdAt: now() }],
-    ['message_delta', { messageId, delta: reply.content }],
-    ['message_done', { messageId, status: 'completed' }],
+    ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
+    ['message_delta', { messageId: reply.id, delta: reply.content }],
+    ['message_done', { messageId: reply.id, status: 'completed' }],
   ] as const
   return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`).join('')
 }

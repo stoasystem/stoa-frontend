@@ -1,12 +1,15 @@
 /*
- * What the design preview adds around the app (#115): the route written back
- * into the page address, the click a surface needs to show its state, a
+ * What the design preview adds around the app (#115): the route, sign-in and
+ * language written back into the page address (so a reload opens the same
+ * place), the click a surface needs to show its state, a
  * banner for a surface that is not built yet, and `data-preview-ready` on
  * <html> once the page has settled, for the screenshot script.
  */
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation } from 'react-router-dom'
 import type { Surface } from '@/dev/preview/surfaces'
+import { useAuthStore } from '@/store/authStore'
 
 /** Radix menus open on pointer down, not on click. */
 function press(element: Element) {
@@ -37,16 +40,29 @@ export function PreviewChrome({
   readyWhen?: string
 }) {
   const location = useLocation()
+  const { i18n } = useTranslation()
+  const language = i18n.resolvedLanguage ?? i18n.language
+  const [openedIn] = useState(language)
+  const signedIn = useAuthStore((state) => state.isAuthenticated)
 
+  // The address says where the page is, so a reload opens the same place: the route
+  // (`path`, also once back on the surface's own), signed in or out, and the language.
   useEffect(() => {
     const route = `${location.pathname}${location.search}`
-    if (route === initialPath) return
-    // Once the page is somewhere its surface did not put it, the address says where.
     const url = new URL(window.location.href)
-    url.searchParams.set('path', route)
-    url.searchParams.delete('surface')
-    window.history.replaceState(null, '', url)
-  }, [initialPath, location.pathname, location.search])
+    const params = url.searchParams
+    if (route !== initialPath || params.has('path')) {
+      params.set('path', route)
+      params.delete('surface')
+    }
+    // Without a surface the preview opens signed in, unless told otherwise.
+    if (params.has('path')) {
+      if (signedIn) params.delete('signedIn')
+      else params.set('signedIn', '0')
+    }
+    if (params.has('lang') || language !== openedIn) params.set('lang', language)
+    if (url.href !== window.location.href) window.history.replaceState(null, '', url)
+  }, [initialPath, location.pathname, location.search, signedIn, language, openedIn])
 
   useEffect(() => {
     let cancelled = false

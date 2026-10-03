@@ -222,7 +222,7 @@
     },
     "lit": {
       "label": "Progrès",
-      "title": "{{name}} est allumée",
+      "title": "L’étoile {{name}} est allumée",
       "body": "Tu as terminé son chapitre. L’étoile brille maintenant sur ta carte.",
       "link": "Voir sur la carte"
     }

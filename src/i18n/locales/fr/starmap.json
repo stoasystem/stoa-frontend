@@ -75,6 +75,6 @@
     "longNebula": "Fractions, équations et raisonnement proportionnel {{index}}"
   },
   "lighting": {
-    "announce": "{{name}} est allumée"
+    "announce": "L’étoile {{name}} est allumée"
   }
 }
