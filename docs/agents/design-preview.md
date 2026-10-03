@@ -23,7 +23,10 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `demoSky`，#119 起是星图唯一的数据）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
-- `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认，见下文「演示后端的状态」），回到 #116 的开场状态。
+- `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景本来不画星云名，所以只在星云层看得到。
+- `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认、Ask 里新建的对话和发出的消息，见下文「演示后端的状态」），回到 #116 的开场状态。
+
+页面里一旦移动过，地址栏就始终写回 `path`；登出后写回 `signedIn=0`，在页面里改过语言后写回 `lang`。所以刷新总是回到离开时的那一页、那个登录状态和语言。
 
 | surface | 路由 | 状态 |
 | --- | --- | --- |
@@ -71,7 +74,8 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 - 输出：`.codex-screenshots/design-preview/<label>/<surface>__<desktop|phone|narrow>__<points>.png`，Git 忽略；`index.json` 记录每一组。
 - 视口：`desktop` 1440×900、`phone` 390×844、`narrow` 375×812；手机两档开启触屏与移动端模拟，`deviceScaleFactor` 为 1。
 - 显示星图的界面拍 10 / 1000 / 2000 三档，其余只拍一档。
-- 可选：`--surfaces map,lesson`、`--points 1000`、`--viewports phone`、`--lang de`。
+- 可选：`--surfaces map,lesson`、`--points 1000`、`--viewports phone`、`--lang de`、`--long-names`（`index.json` 会记录）。
+- 对照页只取与所请求完全相同的星数档；缺那一档时明确写出「No 2000-star screenshot … (taken: 1000 stars)」，不拿别的档顶替。实时模式有「Long names」开关。
 - 脚本同时监听页面的每个请求与 WebSocket：发往开发服务器以外（或其 `/api` 代理）的请求会列出，并使脚本以 1 退出；无演示答复的请求、控制台错误与警告也会列出。
 
 界面清单由页面自己报告（`window.__stoaPreviewSurfaces`，来自 `surfaces.ts`），脚本不另存一份。
@@ -95,7 +99,7 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 ### 演示后端的状态（#51）
 
-演示后端记住三件事：已完成的课时、演示知识点第一次点亮的时间（完成最后一个课时的那次写入时记下，`litAtSource: observed`）、学生是否已确认这次点亮（stoa-backend#71 的形状）。这些是「服务端」的状态：存在 `demoSource.ts` 里，并镜像到**本标签页真实的** `sessionStorage`（键 `stoa.design-preview.v1.demo-server`，由 `storage.ts` 在模块加载、隔离之前取得，应用本身看不到）。所以：
+演示后端记住这些：Ask 里新建的对话、每个问题及其答复（id 用后端按命令推导的 `commandMessageIds`，流事件同一个 id，不会显示两遍）、已完成的课时、演示知识点第一次点亮的时间（完成最后一个课时的那次写入时记下，`litAtSource: observed`）、学生是否已确认这次点亮（stoa-backend#71 的形状）。这些是「服务端」的状态：存在 `demoSource.ts` 里，并镜像到**本标签页真实的** `sessionStorage`（键 `stoa.design-preview.v1.demo-server`，由 `storage.ts` 在模块加载、隔离之前取得，应用本身看不到）。所以：
 
 - 同一标签页刷新：课时仍是完成的，星仍点亮，确认也还在，**不重播**；
 - 新标签页、新浏览器上下文（截图脚本每张图都是）或 `?fresh=1`：回到 #116 的开场状态；
@@ -113,12 +117,23 @@ node scripts/design-preview-flows.mjs --base http://127.0.0.1:5173
 
 依次走：登录表单登录 → 从演示知识点的星卡片进入章节 → 下一课时每道题先答错、重试、再答对，直到完成课时（并确认路线图把它记为完成）→ Ask 发消息收到流式答复 → 账号菜单退出 → 打开通知铃 → 切换学科。完成课时后的画面存为 `.codex-screenshots/design-preview/flows/lesson-finished.png`。
 
+每一步都在沉淀 2 秒（Ask 7 秒）后检查屏幕上的终态，而不是只看 URL 或某个事件出现过：例如切换学科后标题和切换器仍在 Physics、Ask 的问题和答复在气泡里各出现一次、通知面板先开后关。
+
 然后是点亮时刻（`scripts/design-preview-lighting-flows.mjs`，每段各用一个新的浏览器上下文）：做完演示知识点剩下的课时 → 从章节回星图，动画在这颗星上只播一次、`aria-live` 播报「Sine and cosine is lit」→ 物理的 Refraction 读作「Ready to start」→ 从星图的输入框打开 Ask、进入一段对话，看到点亮卡片 → 刷新不重播、星仍点亮 → Refraction 的星卡片读作可开始 → 开 reduced motion：不播动画但仍播报 → 手机（390×844）上的动画与 Ask sheet 里的卡片。帧序列与各状态截图存在 `.codex-screenshots/design-preview/lighting/`。任何一步失败、任何请求离开开发服务器、任何请求没有演示答复、任何控制台错误或警告，脚本都以 1 退出。
+
+## 逐项核查
+
+```bash
+node scripts/design-preview-checks.mjs --base http://127.0.0.1:5173
+```
+
+2026-10-02 审计（#123）里预览与点亮时刻的每条发现各有一项核查（点亮只算焦点星系、推荐按学科、只在星真正上屏后确认、法意文案、Ask 消息保留、刷新回到原处、对照页不顶替档位、长名称），`--only 1,5` 只跑其中几项。
 
 ## 已知限制
 
 - 点亮时刻只演示「演示知识点」这一颗；判据只看课时是否全部完成（#9 还要求每道题至少答对一次，演示数据里完成课时前已逐题答对）。
-- Ask 的答复是固定文字，不是 AI；新发起的老师求助只返回「等待中」。
+- Ask 的答复是固定文字（只有英文），不是 AI；新发起的老师求助只返回「等待中」。
+- 点亮只在星真正上屏、所在星系在焦点、页面可见时开始，并在动画播完（reduced motion 下在播报）时才确认；星一直不在屏上时只是等着，不提示、不超时。
 - 写操作只回一个合理答复；除了「完成课时」在本页内记住之外都不保存，刷新即复原。
 - 浏览器模拟视口，不是真机（#114 已接受这一限制）。
 - `src/dev/starmap.html`（#48 的星图台架）没有接这层拦截，通知组件仍会请求 `localhost:8000`；看设计请用本预览。
