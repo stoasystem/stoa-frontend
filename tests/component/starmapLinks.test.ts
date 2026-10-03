@@ -18,14 +18,15 @@ import {
   TIER_RECOMMENDED,
   TIER_WALKED,
   UNFOCUSED_LINE,
+  type LinkTier,
   type LinkView,
   type StarLine,
 } from '@/features/starmap/model/linkTiers'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
-import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
-import { drawLinks, shortestDx, type LinkObstacles } from '@/features/starmap/render/links'
-import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
+import { createCanvas2DRenderer, withAlpha } from '@/features/starmap/render/canvas2d'
+import { drawLinks, LINE, LINK_INK, shortestDx, type LinkObstacles } from '@/features/starmap/render/links'
+import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type LinkInk, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import { fakeCanvas, fakeClock, THEME, skyMap, type CanvasCounter } from './starmapHarness'
 
@@ -345,6 +346,146 @@ describe('the seam: the shorter way round (#120)', () => {
       expect(x0).toBeGreaterThan(500)
       expect(x1).toBeLessThan(x0)
     }
+  })
+})
+
+describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
+  /** A star at the centre with one prerequisite line to each of four stars around it, one per tier. */
+  function tierScene(): { scene: SceneData; frame: SceneFrame; tierOf: Map<number, LinkTier> } {
+    // 0 lit at the centre; 1 ready and recommended (tier 1), 2 in progress (tier 2), 3 lit (tier 3), 4 locked (tier 4).
+    const mapX = [0.5, 0.7, 0.3, 0.5, 0.5]
+    const mapY = [0.5, 0.5, 0.5, 0.3, 0.7]
+    const scene: SceneData = {
+      mapKey: 'tiers',
+      count: 5,
+      mapX: Float32Array.from(mapX),
+      mapY: Float32Array.from(mapY),
+      state: Uint8Array.from([STATE_LIT, STATE_READY, STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED]),
+      progress: new Float32Array(5),
+      reviewDue: new Uint8Array(5),
+      recommended: 1,
+      recommendations: [1],
+      nebula: new Uint16Array(5),
+      names: ['centre', 'r', 'p', 'w', 'l'],
+      skills: [[], [], [], [], []],
+      nebulae: [{ topicId: 'n0', name: 'Zero', x: 0.5, y: 0.5, r: 0.3, lit: 2, total: 5 }],
+      links: [],
+      starLinks: [1, 2, 3, 4].map((to) => ({ from: 0, to })),
+    }
+    const scale = 1000
+    const frame = {
+      viewport: { width: 1000, height: 1000 },
+      scale,
+      ox: 0,
+      oy: 0,
+      x: Float32Array.from(mapX.map((v) => v * scale)),
+      y: Float32Array.from(mapY.map((v) => v * scale)),
+      starAlpha: new Float32Array(5).fill(1),
+      nebulaX: Float32Array.from([500]),
+      nebulaY: Float32Array.from([500]),
+      nebulaR: Float32Array.from([300]),
+      sharpness: Float32Array.from([1]),
+      glyphSize: 30,
+      dotBlend: 0,
+      dotRadius: 1.5,
+      breath: null,
+      starLabelAlpha: 1,
+      nebulaLabelAlpha: 0,
+      // The star layer, on the centre star: every tier is drawn, all the way.
+      innerLinkAlpha: 1,
+      starLayer: 1,
+      chosenNebula: 0,
+      focusStar: 0,
+      highlightNebula: -1,
+      dim: 0.35,
+      showSkills: false,
+      crossfade: 0,
+    } satisfies SceneFrame
+    const tierOf = new Map<number, LinkTier>([[1, TIER_RECOMMENDED], [2, TIER_IN_PROGRESS], [3, TIER_WALKED], [4, TIER_LOCKED]])
+    return { scene, frame, tierOf }
+  }
+
+  type InkStroke = { to: [number, number]; style: unknown; width: number; dash: number[]; alpha: number }
+
+  /** A 2D context that notes each stroke's end point and the ink it was stroked with. */
+  function inkContext() {
+    const strokes: InkStroke[] = []
+    let path: number[] = []
+    let dash: number[] = []
+    const store: Record<string | symbol, unknown> = { globalAlpha: 1, lineWidth: 1 }
+    const ctx = new Proxy(store, {
+      get(target, prop) {
+        if (prop === 'strokes') return strokes
+        if (prop in target) return target[prop]
+        if (prop === 'createRadialGradient' || prop === 'createLinearGradient') return () => ({ addColorStop() {} })
+        if (prop === 'measureText') return (text: string) => ({ width: 7 * String(text).length })
+        if (prop === 'setLineDash') return (next: number[]) => (dash = [...next])
+        if (prop === 'beginPath') return () => (path = [])
+        if (prop === 'moveTo' || prop === 'lineTo') return (x: number, y: number) => path.push(x, y)
+        if (prop === 'stroke') return () => {
+          if (path.length >= 4) strokes.push({
+            to: [path[path.length - 2], path[path.length - 1]],
+            style: target.strokeStyle, width: target.lineWidth as number, dash, alpha: target.globalAlpha as number,
+          })
+        }
+        return () => undefined
+      },
+      set(target, prop, value) {
+        target[prop] = value
+        return true
+      },
+    })
+    return ctx as unknown as CanvasRenderingContext2D & { strokes: InkStroke[] }
+  }
+
+  /** The strokes of the line from the centre star to star `to`, in order (tier 1: its glow, then the line). */
+  const strokesTo = (ctx: { strokes: InkStroke[] }, frame: SceneFrame, to: number) => {
+    const [cx, cy] = [frame.x[0], frame.y[0]]
+    const [ux, uy] = [Math.sign(Math.round(frame.x[to] - cx)), Math.sign(Math.round(frame.y[to] - cy))]
+    return ctx.strokes.filter(({ to: [x, y] }) => Math.sign(Math.round(x - cx)) === ux && Math.sign(Math.round(y - cy)) === uy)
+  }
+
+  const custom: LinkInk = { recommended: '#AA0001', inProgress: '#AA0002', walked: '#AA0003', locked: '#AA0004', bridge: '#AA0005' }
+  const inkFor = (ink: LinkInk, tier: LinkTier) =>
+    ({ [TIER_RECOMMENDED]: ink.recommended, [TIER_IN_PROGRESS]: ink.inProgress, [TIER_WALKED]: ink.walked, [TIER_LOCKED]: ink.locked })[tier]
+
+  it.each([
+    ['the default inks (LINK_INK)', undefined, LINK_INK],
+    ['the sky tokens the theme reads', custom, custom],
+  ] as const)('draws each tier with its ink, width and dash: %s', (_name, links, ink) => {
+    const { scene, frame, tierOf } = tierScene()
+    const ctx = inkContext()
+    const stats = drawLinks(ctx, scene, frame, { ...THEME, links }, { segments: [], boxes: [] })
+    expect(stats.lines).toBe(4)
+    for (const [to, tier] of tierOf) {
+      const strokes = strokesTo(ctx, frame, to)
+      // Tier 1 has its warm glow under the line; every tier, one line.
+      expect(strokes, `tier ${tier}`).toHaveLength(tier === TIER_RECOMMENDED ? 2 : 1)
+      const line = strokes[strokes.length - 1]
+      expect(line.style, `tier ${tier} ink`).toBe(inkFor(ink, tier))
+      expect(line.width, `tier ${tier} width`).toBe(LINE.width[tier])
+      expect(line.dash, `tier ${tier} dash`).toEqual(tier === TIER_LOCKED ? [...LINE.dash] : [])
+      expect(line.alpha, `tier ${tier} strength`).toBe(1)
+      if (tier === TIER_RECOMMENDED) {
+        const glow = strokes[0]
+        expect(glow.width).toBe(LINE.glow.width)
+        expect(glow.alpha).toBeCloseTo(LINE.glow.alpha)
+        expect(glow.dash).toEqual([])
+        expect(String(glow.style).replace(/\s/g, '')).toBe(withAlpha(inkFor(ink, tier), 1).replace(/\s/g, ''))
+      }
+    }
+  })
+
+  it('pins the tier constants to the token values (#121 table)', () => {
+    expect(LINK_INK).toEqual({
+      recommended: 'rgba(242, 197, 114, 0.9)',
+      inProgress: 'rgba(255, 255, 255, 0.5)',
+      walked: 'rgba(255, 255, 255, 0.16)',
+      locked: 'rgba(255, 255, 255, 0.3)',
+      bridge: 'rgba(170, 190, 255, 0.07)',
+    })
+    expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2, [TIER_IN_PROGRESS]: 1.5, [TIER_WALKED]: 1, [TIER_LOCKED]: 1 })
+    expect([...LINE.dash]).toEqual([3, 4])
   })
 })
 
