@@ -659,14 +659,16 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
         const priority = frame.highlightNebula >= 0 ? frame.highlightNebula : frame.hoveredNebula ?? -1
-        const limit = scene.galaxy && frame.chosenNebula < 0 ? (priority >= 0 ? 1 : 0) : width < 768 && frame.chosenNebula < 0 ? 4 : nebulaCount
+        // One sky's whole map names only the nebula under the pointer or in
+        // keyboard focus. If its name finds no place, no other nebula's name
+        // may stand in for it (#123); keyboard focus on the whole map is a
+        // chosen nebula too, and must not open the names of every galaxy.
+        const onlyPriority = Boolean(scene.galaxy) && (frame.wholeMap ?? frame.chosenNebula < 0)
+        const limit = onlyPriority ? (priority >= 0 ? 1 : 0) : width < 768 && frame.chosenNebula < 0 ? 4 : nebulaCount
         const order = Array.from({ length: nebulaCount }, (_, n) => n).sort((a, b) =>
           (a === priority ? -1 : b === priority ? 1 :
             Math.hypot(nebulaX[a] - width / 2, nebulaY[a] - height / 2) - Math.hypot(nebulaX[b] - width / 2, nebulaY[b] - height / 2)))
         let labelled = 0
-        // One sky's whole map names only the nebula under the pointer: if its
-        // name finds no place, no other nebula's name may stand in for it (#123).
-        const onlyPriority = scene.galaxy && frame.chosenNebula < 0
         for (const n of order) {
           if (n === frame.chosenNebula || labelled >= limit) continue
           if (onlyPriority && n !== priority) continue

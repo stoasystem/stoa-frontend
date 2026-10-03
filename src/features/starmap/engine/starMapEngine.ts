@@ -970,6 +970,7 @@ export class StarMapEngine {
       innerLinkAlpha: starLabelAlpha,
       starLayer: lerp(from === 'star' ? 1 : 0, to === 'star' ? 1 : 0),
       chosenNebula: chosen,
+      wholeMap: to === 'map',
       focusStar,
       hoveredNebula: this.hoveredNebula,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,

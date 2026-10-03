@@ -160,8 +160,17 @@ export type SceneFrame = {
   innerLinkAlpha: number
   /** 1 on the star layer, 0 elsewhere, between during a layer change (#121: the focused star's lines, every tier). */
   starLayer?: number
-  /** The chosen nebula (nebula and star layers), or -1. */
+  /**
+   * The chosen nebula, or -1: on the nebula and star layers the open one; on
+   * the whole map the one with keyboard focus, or the focused star's.
+   */
   chosenNebula: number
+  /**
+   * The whole-map layer is the target (#123). One sky then names a single
+   * nebula -- the hovered or keyboard-focused one -- never the rest; a focused
+   * nebula's name is its link's pill. Absent: read from `chosenNebula < 0`.
+   */
+  wholeMap?: boolean
   /** The star picked out (keyboard focus, the star layer), or -1. */
   focusStar: number
   /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */

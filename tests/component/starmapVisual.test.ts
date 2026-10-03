@@ -255,6 +255,39 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     }
   })
 
+  it.each([[1440, 900], [390, 844]])('keyboard focus on the whole sky names no other nebula, of any galaxy, at %s×%s (#123)', (width, height) => {
+    const s = scene(1000, width, height, true)
+    const nebulae = orderedNebulae(s.map)
+    const names = nebulae.map((n) => n.name.toLocaleUpperCase())
+    const stars = orderedStars(s.map)
+    const named = () => {
+      s.counter.texts = []
+      s.real.draw(s.frame())
+      return s.counter.texts.filter((t) => names.includes(t.text)).map((t) => t.text)
+    }
+    const others: string[] = []
+    // A nebula's link: its name is the focus pill (parallel DOM); the canvas adds none.
+    for (let n = 0; n < nebulae.length; n += 1) {
+      s.engine.setFocusNebula(n)
+      s.clock.advance(400)
+      expect(s.frame().highlightNebula).toBe(n)
+      for (const text of named()) if (text !== names[n]) others.push(`${names[n]}: ${text}`)
+      s.engine.setFocusNebula(-1)
+      s.clock.advance(20)
+    }
+    // A recommended star's link on the whole map: no nebula's name either, but its own.
+    for (const i of stars.flatMap((star, k) => (star.recommendation ? [k] : []))) {
+      const own = names[nebulae.findIndex((n) => n.topicId === stars[i].nebulaId)]
+      s.engine.setFocusStar(i)
+      s.clock.advance(20)
+      for (const text of named()) if (text !== own) others.push(`star in ${own}: ${text}`)
+      s.engine.setFocusStar(-1)
+      s.clock.advance(20)
+    }
+    expect(others).toEqual([])
+    s.engine.destroy()
+  })
+
   it('caches the light of the whole margin: nothing missing at the right or bottom after a pan (#123)', () => {
     // Every offscreen canvas records what is drawn into it, so the light cache can be read back.
     type Blit = { x: number; y: number; w: number; h: number }
