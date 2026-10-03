@@ -664,18 +664,26 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           (a === priority ? -1 : b === priority ? 1 :
             Math.hypot(nebulaX[a] - width / 2, nebulaY[a] - height / 2) - Math.hypot(nebulaX[b] - width / 2, nebulaY[b] - height / 2)))
         let labelled = 0
+        // One sky's whole map names only the nebula under the pointer: if its
+        // name finds no place, no other nebula's name may stand in for it (#123).
+        const onlyPriority = scene.galaxy && frame.chosenNebula < 0
         for (const n of order) {
           if (n === frame.chosenNebula || labelled >= limit) continue
+          if (onlyPriority && n !== priority) continue
           if (nebulaX[n] < 0 || nebulaY[n] < 0 || nebulaX[n] > width || nebulaY[n] > height) continue
           const text = scene.nebulae[n].name.toLocaleUpperCase()
           const w = ctx.measureText(text).width + 8
           const own = { x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] }
           const others = cores.filter((_, m) => m !== n)
-          const box = placeLabel(
-            aroundDisc(own.x, own.y, own.r * 0.95, w, 16, 6),
-            { boxes: placed, circles: others, segments }, labelArea,
-            (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity,
-          )
+          const candidates = aroundDisc(own.x, own.y, own.r * 0.95, w, 16, 6)
+          const obstacles = { boxes: placed, circles: others, segments }
+          const box =
+            placeLabel(candidates, obstacles, labelArea,
+              (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
+            // The one name on one sky's whole map: a nebula packed among
+            // others has no side nearer itself than its neighbours, so there
+            // being nearer is a preference, not a rule -- the pointer says whose name it is.
+            (onlyPriority ? placeLabel(candidates, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
           if (!box) continue
           labelled += 1
           placed.push(box)

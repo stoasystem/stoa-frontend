@@ -227,6 +227,34 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     engine.destroy()
   })
 
+  it.each([[1440, 900], [390, 844]])('names only the nebula under the pointer at %s×%s, never another (#123)', (width, height) => {
+    for (const points of [1000, 2000] as const) {
+      const s = scene(points, width, height, true)
+      const nebulae = orderedNebulae(s.map)
+      const names = nebulae.map((n) => n.name.toLocaleUpperCase())
+      const f = s.frame()
+      const wrong: string[] = []
+      const unnamed: string[] = []
+      for (let n = 0; n < nebulae.length; n += 1) {
+        const [x, y] = [f.nebulaX[n], f.nebulaY[n]]
+        if (x < 0 || y < 0 || x > width || y > height) continue
+        s.engine.hoverAt(x, y)
+        s.counter.texts = []
+        s.clock.advance(20)
+        s.real.draw(s.frame())
+        const hovered = s.frame().hoveredNebula ?? -1
+        expect(hovered, `pointer on ${names[n]}`).toBe(n)
+        const drawn = s.counter.texts.filter((t) => names.includes(t.text)).map((t) => t.text)
+        for (const text of drawn) if (text !== names[n]) wrong.push(`${names[n]} -> ${text}`)
+        if (!drawn.includes(names[n])) unnamed.push(names[n])
+      }
+      expect(wrong, `${points} stars`).toEqual([])
+      // And the name drawn is its own: every nebula on screen is named when hovered.
+      expect(unnamed, `${points} stars`).toEqual([])
+      s.engine.destroy()
+    }
+  })
+
   it('caches the light of the whole margin: nothing missing at the right or bottom after a pan (#123)', () => {
     // Every offscreen canvas records what is drawn into it, so the light cache can be read back.
     type Blit = { x: number; y: number; w: number; h: number }
