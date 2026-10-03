@@ -143,6 +143,18 @@ describe('one sky: galaxies along a band (#119)', () => {
     expect(boxes[0].x0 + (1 - boxes[boxes.length - 1].x1)).toBeCloseTo(galaxyGaps[0], 9)
   })
 
+  it('never lets two nebula discs overlap, so a neighbour’s cloud never lies over a core (starmapContrast)', () => {
+    for (const size of [10, 1000, 2000] as const) {
+      const sky = skyMap(size)
+      const placed = [...layoutSky(skyInput(sky), sky.stars, [], 116).nebulae.values()]
+      for (let i = 0; i < placed.length; i += 1) {
+        for (let j = i + 1; j < placed.length; j += 1) {
+          expect(Math.hypot(placed[i].x - placed[j].x, placed[i].y - placed[j].y)).toBeGreaterThanOrEqual((placed[i].r + placed[j].r) * (1 - 1e-6))
+        }
+      }
+    }
+  })
+
   it('makes galaxies that share prerequisites neighbours (mathematics next to physics)', () => {
     expect(galaxyOrder(['a', 'c', 'b'], [{ a: 'a', b: 'b', count: 3 }])).toEqual(['a', 'b', 'c'])
     expect(galaxyOrder(['a', 'b', 'c'], [])).toEqual(['a', 'b', 'c'])

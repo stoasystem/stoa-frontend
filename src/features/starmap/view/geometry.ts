@@ -83,5 +83,5 @@ export function cloudSpacing(map: Pick<StarMap, 'stars'>, discs: ReadonlyMap<str
   }
   if (nearest.length < 8) return typicalSpacing(map, discs)
   nearest.sort((a, b) => a - b)
-  return nearest[Math.floor(nearest.length / 2)] * 1.6
+  return nearest[Math.floor(nearest.length / 2)] * 1.35
 }

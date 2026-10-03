@@ -13,7 +13,7 @@ import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { NEBULA_LABEL_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
-import { KNOWLEDGE_GLOW_ALPHA, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
+import { GALAXY_HAZE_ALPHA, KNOWLEDGE_GLOW_ALPHA, NEBULA_GLOW, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
 import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
 import { linkWeight } from '@/features/starmap/model/links'
 
@@ -115,8 +115,11 @@ describe('lines and locked stars keep 3:1', () => {
   })
 })
 
-it('the continuous knowledge galaxy keeps readable states even at its saturated warm core', () => {
-  // One composited cloud layer: channel-wise maximum including the white stellar grain, capped at source opacity.
+it('one sky (#119) keeps readable states even at a fully lit nebula’s core', () => {
+  // A galaxy's haze under one nebula's cloud at full brightness (every star lit),
+  // taken as white -- the stellar grain is -- at the sum of their alphas. Nebula
+  // discs never overlap (starmapLayout), so a neighbour's cloud never reaches a core.
+  expect(KNOWLEDGE_GLOW_ALPHA).toBeCloseTo(GALAXY_HAZE_ALPHA + NEBULA_GLOW.base + NEBULA_GLOW.lit, 9)
   const peak: RGBA = [255, 255, 255, 1]
   const background = over(peak, over(peak, sky, SKY_MIST_ALPHA), KNOWLEDGE_GLOW_ALPHA)
   expect(contrast(over(text, background, LOCKED_RING_ALPHA), background)).toBeGreaterThanOrEqual(3)

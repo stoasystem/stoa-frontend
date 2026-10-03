@@ -135,6 +135,10 @@ const WHEEL_COOLDOWN_MS = 450
 const PINCH_IN = 1.25
 const PINCH_OUT = 0.8
 const STAR_LAYER_DIM = 0.35
+/** The glyph size a nebula is opened at, at least (CSS px): full glyphs, not dots. */
+const NEBULA_GLYPH = 28
+/** A flight to another galaxy lasts this many layer changes. */
+const GALAXY_FLIGHT = 1.8
 
 export class StarMapEngine {
   private readonly renderer: StarMapRenderer
@@ -229,7 +233,8 @@ export class StarMapEngine {
       const switched = map.subject.subjectId !== this.centred
       if (this.drewFirstFrame && target.layer === 'map' && this.target.layer === 'map' && switched) {
         this.cancelGestures()
-        this.panTo(this.viewFor(target))
+        // A longer flight than a layer change: the sky passes by on the way.
+        this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
         this.centred = map.subject.subjectId
       }
       this.invalidate()
@@ -470,7 +475,7 @@ export class StarMapEngine {
   }
 
   /** Move the view without changing layer: a short flight, or a crossfade under reduced motion. */
-  private panTo(to: View): void {
+  private panTo(to: View, flightMs = this.policy.layerMs): void {
     this.inertia.stop()
     const layer = this.target.layer
     const now = this.now()
@@ -482,7 +487,7 @@ export class StarMapEngine {
       this.view = to
     } else {
       const flight = interpolateView(this.view, to, Math.min(this.viewport.width, this.viewport.height), baseScale(this.viewport, this.bounds))
-      this.transition = { kind: 'zoom', startedAt: now, durationMs: this.policy.layerMs, flight, from: layer, to: layer }
+      this.transition = { kind: 'zoom', startedAt: now, durationMs: flightMs, flight, from: layer, to: layer }
     }
     this.positionsStale = true
   }
@@ -616,7 +621,12 @@ export class StarMapEngine {
       const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
       return galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport)
     }
-    return viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
+    const view = viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
+    if (!this.sky || target.layer === 'map') return view
+    // A cloud's rim reaches far past its core: zoom in until its stars are full
+    // glyphs, so the four learning states can be told apart (#117).
+    const glyphK = NEBULA_GLYPH / (0.55 * baseScale(this.viewport, this.bounds) * this.spacing)
+    return { ...view, k: Math.min(60, Math.max(view.k, target.layer === 'star' ? glyphK * 1.5 : glyphK)) }
   }
 
   private pointerSpread(): number {
