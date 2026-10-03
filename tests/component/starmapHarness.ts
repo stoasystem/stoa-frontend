@@ -3,7 +3,11 @@
  * a test advances time, a renderer that keeps every frame the engine hands
  * it, and a fake 2D canvas for driving the real Canvas 2D renderer in jsdom.
  */
+import type { TFunction } from 'i18next'
 import type { FrameScheduler } from '@/features/starmap/engine/starMapEngine'
+import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
+import { demoStarMap, type DemoStarMapOptions } from '@/features/starmap/fixtures/demoStarMap'
+import type { StarMap } from '@/features/starmap/model/starMap'
 import type { SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 
 export const THEME: StarMapTheme = {
@@ -130,4 +134,13 @@ export function fakeContext(counter: CanvasCounter) {
 export function fakeCanvas(counter: CanvasCounter, width = 1, height = 1): HTMLCanvasElement {
   const context = fakeContext(counter)
   return { width, height, getContext: () => context } as unknown as HTMLCanvasElement
+}
+
+/**
+ * The star map the tests draw: the design preview's one sky (`demoSky`, #116,
+ * #119), with `subjectId` the galaxy in focus. Since #119 there is no other
+ * star-map fixture; the renderer, the engine and the bench all read this one.
+ */
+export function skyMap(size: FixtureSize, subjectId = 'math', options: DemoStarMapOptions = {}): StarMap {
+  return demoStarMap(subjectId, size, ((key: string) => key) as unknown as TFunction<'starmap'>, options)
 }
