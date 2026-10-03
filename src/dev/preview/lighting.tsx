@@ -31,7 +31,7 @@ import {
 import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { StarMapOverrideContext } from '@/features/starmap/lighting/starMapOverride'
-import { orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { orderedStars, subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -75,9 +75,10 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
     return star
   })
 
-  // A lit point is no longer what to learn next.
+  // A lit point is no longer what to learn next. The next pick is its own galaxy's: at most one
+  // per subject (#9 point 8), so another galaxy's recommendation is never touched.
   if (hasPoint && state === 'lit' && stars.some((star) => star.unitId === kp.unitId && star.recommendation)) {
-    const ordered = orderedStars({ ...map, stars })
+    const ordered = orderedStars({ ...map, stars }).filter((star) => subjectOfNebula(map, star.nebulaId) === kp.subjectId)
     const pick = ordered.find((star) => star.state === 'in_progress' && star.unitId !== kp.unitId) ?? ordered.find((star) => star.state === 'ready')
     stars = stars.map((star) =>
       star.unitId === kp.unitId ? { ...star, recommendation: null } : star.unitId === pick?.unitId ? { ...star, recommendation: { source: 'system' } } : star,
@@ -85,11 +86,14 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   }
 
   const delta = (state === 'lit' ? 1 : 0) - (fixtureState === 'lit' ? 1 : 0)
+  // `summary` counts the galaxy in focus only; the map holds the whole sky (#119), so the point is
+  // on every galaxy's map but counts only on its own.
+  const inFocus = hasPoint && map.subject.subjectId === kp.subjectId
   return {
     ...map,
     stars,
     prerequisites,
-    summary: hasPoint ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
+    summary: inFocus ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
     subjects: map.subjects.map((subject) => (subject.subjectId === kp.subjectId ? { ...subject, lit: subject.lit + delta } : subject)),
   }
 }

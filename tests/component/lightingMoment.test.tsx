@@ -24,7 +24,7 @@ import {
   type LitEvent,
 } from '@/features/starmap/lighting/lightingEvents'
 import { identityStarMapOverride } from '@/features/starmap/lighting/starMapOverride'
-import type { StarMap } from '@/features/starmap/model/starMap'
+import { orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import i18n from '@/i18n'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMomentsStore, type LitMoment } from '@/store/litMomentsStore'
@@ -228,9 +228,41 @@ describe('the design preview follows its lessons', () => {
     expect(before.stars.find((star) => star.unitId === KP)?.state).toBe('in_progress')
     expect(after.stars.find((star) => star.unitId === KP)).toMatchObject({ state: 'lit', progress: 1, unmetExercises: 0, recommendation: null })
     expect(after.summary.lit).toBe(before.summary.lit + 1)
-    expect(after.stars.filter((star) => star.recommendation)).toHaveLength(1)
+    // One recommendation per enrolled galaxy (#9 point 8), math's re-picked, physics' kept.
+    expect(after.stars.filter((star) => star.recommendation && subjectOfNebula(after, star.nebulaId) === 'math')).toHaveLength(1)
     expect(mapOf('physics', OPENING).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)?.state).toBe('locked')
     expect(mapOf('physics', ALL_LESSONS).stars.find((star) => star.unitId === DEMO_BRIDGE_STAR)?.state).toBe('ready')
+  })
+
+  it.each([10, 1000] as const)('changes only the lit point’s own galaxy, at %i stars (audit #1)', (size) => {
+    const t = i18n.getFixedT('en', 'starmap')
+    for (const subjectId of ['math', 'physics', 'chemistry']) {
+      const before = demoStarMap(subjectId, size, t, { language: 'en' })
+      const after = demoStarMapOverride(before, size, ALL_LESSONS)
+      const own = subjectId === DEMO_KNOWLEDGE_POINT.subjectId ? 1 : 0
+      expect({ subjectId, lit: after.summary.lit }).toEqual({ subjectId, lit: before.summary.lit + own })
+      expect(after.subjects.map((galaxy) => [galaxy.subjectId, galaxy.lit])).toEqual(
+        before.subjects.map((galaxy) => [galaxy.subjectId, galaxy.lit + (galaxy.subjectId === DEMO_KNOWLEDGE_POINT.subjectId ? 1 : 0)]),
+      )
+    }
+  })
+
+  it.each([10, 1000] as const)('re-picks the recommendation inside the lit point’s galaxy only, at %i stars (audit #2)', (size) => {
+    const t = i18n.getFixedT('en', 'starmap')
+    const before = demoStarMap('math', size, t, { language: 'en' })
+    const after = demoStarMapOverride(before, size, ALL_LESSONS)
+    const recommended = (map: StarMap, subjectId: string) =>
+      map.stars.filter((star) => star.recommendation && subjectOfNebula(map, star.nebulaId) === subjectId).map((star) => star.unitId)
+    for (const galaxy of after.subjects) {
+      expect(recommended(after, galaxy.subjectId).length).toBeLessThanOrEqual(1)
+      if (galaxy.subjectId !== DEMO_KNOWLEDGE_POINT.subjectId) {
+        expect(recommended(after, galaxy.subjectId)).toEqual(recommended(before, galaxy.subjectId))
+      }
+    }
+    // Math still has something to learn next, and it is math's, by #9 point 8.
+    const math = orderedStars(after).filter((star) => subjectOfNebula(after, star.nebulaId) === 'math')
+    const expected = math.find((star) => star.state === 'in_progress') ?? math.find((star) => star.state === 'ready')
+    expect(recommended(after, 'math')).toEqual(expected ? [expected.unitId] : [])
   })
 
   it('draws the flare the same for the same instant', () => {
