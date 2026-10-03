@@ -227,10 +227,18 @@ describe('one sky: galaxies of nebulae (#119)', () => {
 
   it('caches galaxy haze and nebula clouds, and repaints only the cloud whose star changed', () => {
     const s = scene(500, 390, 700, true)
+    // The second frame at one zoom keeps the light as one image (a pan then moves only that).
+    s.real.draw(s.frame())
     const made = s.canvases()
+    const blits = s.counter.drawImage
     s.real.draw(s.frame())
     s.clock.advance(200)
     expect(s.canvases()).toBe(made)
+    // A redraw at rest: the sky, one image of light, the stars -- no cloud drawn one by one.
+    const perFrame = s.counter.drawImage - blits
+    s.real.draw(s.frame())
+    expect(s.counter.drawImage - blits).toBe(perFrame * 2)
+    expect(perFrame).toBeLessThan(2 + s.map.stars.length)
     const paints = s.real.stats.tilePaints
     const ready = s.map.stars.find((star) => star.state === 'ready')!
     s.engine.setData({ ...s.map, stars: s.map.stars.map((star) => (star === ready ? { ...star, state: 'in_progress' } : star)) }, { layer: 'map' })

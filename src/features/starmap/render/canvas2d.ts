@@ -147,6 +147,11 @@ export const INK = {
   innerLinkAlpha: 0.42,
 } as const
 
+/** How far past the viewport the cached light of one sky reaches, as a share of the longer side. */
+const LIGHT_MARGIN = 0.25
+/** The most pixels that cached light may hold (about 48 MB). */
+const LIGHT_PIXELS = 12_000_000
+
 /** A nebula's haze: the atmosphere token at its core, warming with the lit share up to 9% gold. */
 export const HAZE = { core: 0.5, mid: 0.3, warmthBase: 0.03, warmthLit: 0.06 } as const
 
@@ -167,6 +172,16 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let galaxyHazes: HTMLCanvasElement[] = []
   let hazesFor = ''
   let stateKeys: string[] = []
+  let stateKeysJoined = ''
+  /** One sky: galaxy haze and nebula clouds as one image, while the zoom holds still. */
+  const lightCache: { canvas: HTMLCanvasElement | null; key: string; ox: number; oy: number; margin: number } = {
+    canvas: null,
+    key: '',
+    ox: 0,
+    oy: 0,
+    margin: 0,
+  }
+  let lastLightKey = ''
   const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
@@ -344,6 +359,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const sparse = Boolean(data?.galaxy)
       data = next
       stateKeys = nebulaStateKeys(next.state, next.nebula, next.nebulae.length)
+      stateKeysJoined = stateKeys.join('|')
       if (Boolean(next.galaxy) !== sparse) paintSky()
       paintHazes()
     },
@@ -375,44 +391,90 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const { nebulaX, nebulaY, nebulaR, sharpness, x, y, starAlpha } = frame
       const { state, count } = scene
       const nebulaCount = scene.nebulae.length
-      // One sky: each galaxy's faint haze, under its nebulae.
-      if (scene.galaxy && scene.galaxies) {
-        ctx.imageSmoothingEnabled = true
-        scene.galaxies.forEach((galaxy, g) => {
+      const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
+      const nebulaDim = (n: number) => (frame.chosenNebula >= 0 && n !== frame.chosenNebula ? Math.max(frame.dim, 0.6) : 1)
+      const tileOf = (n: number, reach: number) => {
+        const nebula = scene.nebulae[n]
+        return tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr, scene.galaxy ? 512 : 256))
+      }
+
+      // One sky: the galaxies' haze, then each nebula's cloud, brighter with
+      // its lit share (#117), core first: lit stars warm it from within.
+      // `(dx, dy)` shifts it, `margin` widens what counts as in view.
+      const paintLight = (target: CanvasRenderingContext2D, dx: number, dy: number, margin: number) => {
+        target.imageSmoothingEnabled = true
+        const inView = (px: number, py: number, r: number) =>
+          px + r > -margin && py + r > -margin && px - r < width + margin && py - r < height + margin
+        scene.galaxies?.forEach((galaxy, g) => {
           const haze = galaxyHazes[g]
           if (!haze) return
           const box = galaxyHazeBox(galaxy)
-          const x0 = frame.ox + box.x0 * frame.scale
-          const x1 = frame.ox + box.x1 * frame.scale
-          if (x1 < 0 || x0 > width) return
-          ctx.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
-          ctx.drawImage(haze, x0, frame.oy + box.y0 * frame.scale, x1 - x0, (box.y1 - box.y0) * frame.scale)
+          const x0 = frame.ox + box.x0 * frame.scale + dx
+          const x1 = frame.ox + box.x1 * frame.scale + dx
+          if (x1 < -margin || x0 > width + margin) return
+          target.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
+          target.drawImage(haze, x0, frame.oy + box.y0 * frame.scale + dy, x1 - x0, (box.y1 - box.y0) * frame.scale)
         })
+        for (let n = 0; n < nebulaCount; n += 1) {
+          const reach = nebulaR[n] * CLOUD_REACH
+          if (!inView(nebulaX[n] + dx, nebulaY[n] + dy, reach)) continue
+          const nebula = scene.nebulae[n]
+          const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
+          target.globalAlpha = (NEBULA_GLOW.base + NEBULA_GLOW.lit * litShare) * (nebula.dim ?? 1) * nebulaDim(n)
+          target.drawImage(tileOf(n, reach).haze, nebulaX[n] - reach + dx, nebulaY[n] - reach + dy, reach * 2, reach * 2)
+        }
+        target.globalAlpha = 1
       }
 
-      const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
-      const nebulaDim = (n: number) => (frame.chosenNebula >= 0 && n !== frame.chosenNebula ? Math.max(frame.dim, 0.6) : 1)
+      if (scene.galaxy) {
+        // While the zoom holds still (a pan, a glide, breathing), the light is
+        // one cached image moved with the map; it is repainted when the zoom
+        // changes, a star changes state, or the pan runs past its margin.
+        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${width}x${height}@${dpr}`
+        const shiftX = frame.ox - lightCache.ox
+        const shiftY = frame.oy - lightCache.oy
+        const margin = Math.round(Math.max(width, height) * LIGHT_MARGIN)
+        const covered = lightCache.canvas && lightCache.key === key && Math.abs(shiftX) <= lightCache.margin && Math.abs(shiftY) <= lightCache.margin
+        if (!covered && key === lastLightKey) {
+          // A second frame at this zoom: worth caching.
+          const pixels = Math.min(dpr, Math.sqrt(LIGHT_PIXELS / ((width + 2 * margin) * (height + 2 * margin))))
+          const canvasWidth = Math.max(1, Math.round((width + 2 * margin) * pixels))
+          const canvasHeight = Math.max(1, Math.round((height + 2 * margin) * pixels))
+          lightCache.canvas ??= makeCanvas(canvasWidth, canvasHeight)
+          lightCache.canvas.width = canvasWidth
+          lightCache.canvas.height = canvasHeight
+          const light = lightCache.canvas.getContext('2d')
+          if (light) {
+            light.setTransform(pixels, 0, 0, pixels, 0, 0)
+            paintLight(light, margin, margin, margin)
+            Object.assign(lightCache, { key, ox: frame.ox, oy: frame.oy, margin })
+          }
+        }
+        if (lightCache.canvas && lightCache.key === key && Math.abs(frame.ox - lightCache.ox) <= lightCache.margin && Math.abs(frame.oy - lightCache.oy) <= lightCache.margin) {
+          ctx.globalAlpha = 1
+          ctx.imageSmoothingEnabled = true
+          const m = lightCache.margin
+          ctx.drawImage(lightCache.canvas, frame.ox - lightCache.ox - m, frame.oy - lightCache.oy - m, width + 2 * m, height + 2 * m)
+        } else {
+          paintLight(ctx, 0, 0, 0)
+        }
+        lastLightKey = key
+      }
 
-      // Haze under every nebula, and the blurred stars of those outside the focus.
+      // Haze under every nebula (one sky: its cloud, above), and the blurred stars of those outside the focus.
       ctx.imageSmoothingEnabled = true
       for (let n = 0; n < nebulaCount; n += 1) {
         const reach = nebulaR[n] * (scene.galaxy ? CLOUD_REACH : TILE_REACH)
         if (!onScreen(nebulaX[n], nebulaY[n], reach)) continue
-        const nebula = scene.nebulae[n]
-        const tile = tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr, scene.galaxy ? 512 : 256))
+        const tile = tileOf(n, reach)
         const box = [nebulaX[n] - reach, nebulaY[n] - reach, reach * 2, reach * 2] as const
-        const own = nebula.dim ?? 1
-        if (scene.galaxy) {
-          // The cloud brightens with its lit share (#117), core first: lit stars warm it from within.
-          const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
-          ctx.globalAlpha = (NEBULA_GLOW.base + NEBULA_GLOW.lit * litShare) * own * nebulaDim(n)
-        } else {
+        if (!scene.galaxy) {
           ctx.globalAlpha = nebulaDim(n)
+          ctx.drawImage(tile.haze, ...box)
         }
-        ctx.drawImage(tile.haze, ...box)
         const blurred = 1 - sharpness[n]
         if (blurred > 0.01) {
-          ctx.globalAlpha = blurred * nebulaDim(n) * own
+          ctx.globalAlpha = blurred * nebulaDim(n) * (scene.nebulae[n].dim ?? 1)
           ctx.drawImage(tile.stars, ...box)
         }
         stats.tileDraws += 1
@@ -724,6 +786,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       snapshotCanvas = null
       skyCanvas = null
       galaxyHazes = []
+      lightCache.canvas = null
       data = null
       tiles.clear()
     },
