@@ -9,8 +9,10 @@
  * `surface` is one of `surfaces.ts`; `path` opens any route instead;
  * `points` (10 / 1000 / 2000) sizes the star map; `lang` (de / en / fr / it)
  * the language; `fresh=1` forgets what the demo backend kept in this tab
- * (completed lessons, the lighting and its acknowledgement, #51). Moving around inside the page writes the route back to
- * `path`, so a reload stays where it was.
+ * (completed lessons, the lighting and its acknowledgement, Ask's messages,
+ * #51). Moving around inside the page writes the route back to `path` (with
+ * `signedIn=0` once signed out, and `lang` once the language changes), so a
+ * reload stays where it was -- also back on the surface's own route.
  *
  * Order matters: storage is isolated, the runtime config registered and the
  * network intercepted before anything of the app is imported, because the

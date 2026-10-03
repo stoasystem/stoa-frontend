@@ -210,6 +210,37 @@ try {
     return `address ${written}`
   })
 
+  await check('6', 'signed out from the account menu, a reload stays on the login page', async () => {
+    const { context, page } = await tab()
+    await open(page, { surface: 'account-menu' })
+    await page.getByRole('menuitem', { name: /log out/i }).click()
+    await page.locator('input[type="password"]').first().waitFor({ timeout: 10_000 })
+    const written = new URL(page.url()).search
+    await page.reload()
+    await page.waitForSelector('html[data-preview-ready="1"]', { timeout: 30_000 })
+    await delay(SETTLE_MS)
+    const onLogin = await page.locator('input[type="password"]').first().isVisible().catch(() => false)
+    const signedIn = await page.locator('[data-account-trigger]').first().isVisible().catch(() => false)
+    await context.close()
+    if (!onLogin || signedIn) throw new Error(`address ${written} reloads ${signedIn ? 'signed in' : 'off the login page'}`)
+    return `address ${written}`
+  })
+
+  await check('6', 'a language chosen on the page survives a reload', async () => {
+    const { context, page } = await tab()
+    await open(page, { surface: 'me', lang: 'en' })
+    const before = await page.evaluate(async (file) => (await import(file)).default.resolvedLanguage, '/src/i18n/index.ts')
+    await page.evaluate(async (file) => (await import(file)).default.changeLanguage('de'), '/src/i18n/index.ts')
+    await delay(500)
+    const written = new URL(page.url()).search
+    await page.reload()
+    await page.waitForSelector('html[data-preview-ready="1"]', { timeout: 30_000 })
+    const after = await page.evaluate(async (file) => (await import(file)).default.resolvedLanguage, '/src/i18n/index.ts')
+    await context.close()
+    if (after !== 'de') throw new Error(`${before} -> de, address ${written} reloads in ${after}`)
+    return `address ${written}`
+  })
+
   await check('8', 'the comparison page shows a missing star-count tier as missing', async () => {
     const indexFile = path.resolve('.codex-screenshots/design-preview/index.json')
     await mkdir(path.dirname(indexFile), { recursive: true })
