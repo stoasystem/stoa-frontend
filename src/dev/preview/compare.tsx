@@ -14,7 +14,7 @@
  */
 import { StrictMode, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { DEFAULT_STAR_COUNT, STAR_COUNTS, starCountFrom, surfaceById, SURFACES, type StarCount } from '@/dev/preview/surfaces'
+import { STAR_COUNTS, starCountFrom, surfaceById, SURFACES, type StarCount } from '@/dev/preview/surfaces'
 
 const VIEWPORTS = [
   { id: 'desktop', label: 'Desktop 1440×900', width: 1440, height: 900 },
@@ -114,9 +114,22 @@ function Compare() {
     return `/src/dev/preview.html?${url.toString()}&frame=${viewport}`
   }
 
+  /**
+   * The screenshot of this surface at this size and, where the star map is on
+   * screen, at exactly this star count: a missing tier is shown as missing,
+   * never stood in for by another. A surface without the star map is taken
+   * at one count only, which is the one it has.
+   */
+  const shotsFor = (set: string, viewport: string) =>
+    index[set]?.shots.filter((shot) => shot.surface === surface.id && shot.viewport === viewport) ?? []
   const shotFor = (set: string, viewport: string) => {
-    const shots = index[set]?.shots.filter((shot) => shot.surface === surface.id && shot.viewport === viewport) ?? []
-    return shots.find((shot) => shot.points === points) ?? shots.find((shot) => shot.points === DEFAULT_STAR_COUNT) ?? shots[0]
+    const shots = shotsFor(set, viewport)
+    return surface.stars ? shots.find((shot) => shot.points === points) : shots[0]
+  }
+  const missing = (set: string, viewport: string) => {
+    const taken = shotsFor(set, viewport).map((shot) => shot.points)
+    if (!surface.stars || taken.length === 0) return `No screenshot of this surface at this size in “${set}”.`
+    return `No ${points}-star screenshot of this surface at this size in “${set}” (taken: ${taken.join(', ')} stars).`
   }
 
   const row = (set: string) => (
@@ -131,7 +144,7 @@ function Compare() {
             <Frame key={viewport.id} viewport={viewport} height={height}>
               {shot
                 ? <img alt={`${surface.label}, ${viewport.label}`} src={`${SHOTS}/${set}/${shot.file}`} style={{ display: 'block', width: viewport.width, height: viewport.height }} />
-                : <p style={{ padding: 24, fontSize: 32 }}>No screenshot of this surface at this size in “{set}”.</p>}
+                : <p data-missing-shot style={{ padding: 24, fontSize: 32, color: '#a33' }}>{missing(set, viewport.id)}</p>}
             </Frame>
           )
         })}
