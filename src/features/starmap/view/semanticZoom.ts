@@ -31,6 +31,12 @@ export const ZOOM = {
   pinchWheelBoost: 10,
   /** The wheel, the buttons and a double tap glide to their zoom with this time constant, ms. */
   glideMs: 90,
+  /**
+   * The wheel's and buttons' glide never zooms faster than this, log2 per
+   * second (×64 a second: the panorama to the closest zoom in about half a
+   * second), so a hard flick still crosses every fade over several frames.
+   */
+  maxRate: 6,
   /** After a pinch is let go, its zoom carries on and slows with this time constant, ms. */
   pinchDecayMs: 200,
   /** Below this zoom speed (log2 per ms) a released pinch has stopped. */

@@ -7,18 +7,23 @@
  *
  *   node scripts/design-preview-zoom-frames.mjs --base http://127.0.0.1:5173 --label after-134
  *
- * Desktop (1440×900) zooms with the mouse wheel around a point over a nebula;
- * the phones (390×844, 375×812) with a synthetic two-finger pinch (touch
- * events through the DevTools protocol) around the same kind of point. Each
- * run then taps a star (the card opens) and pinches / wheels back out.
+ * Two scenarios. `zoom`: desktop (1440×900) zooms with the mouse wheel around
+ * a point over a nebula, the phones (390×844, 375×812) with a synthetic
+ * two-finger pinch (touch events through the DevTools protocol) around the
+ * same kind of point; then a tap on a star (its card opens) and back out to
+ * the panorama. `choose`: a tap on a nebula (the flight in), a tap on a star
+ * (its card), Escape (the card closes, the map stays), three presses of -,
+ * a double tap and two presses of +.
  *
  * Options: --base, --label (default `zoom-frames`), --points 1000|2000,
- * --viewports desktop,phone,narrow, --surface (default `map`).
+ * --viewports desktop,phone,narrow, --scenarios zoom,choose, --surface
+ * (default `map`).
  *
- * Writes .codex-screenshots/design-preview/<label>/zoom-<viewport>-<points>/NNNN.jpg
- * (every frame) and zoom-<viewport>-<points>-sheet-N.png (contact sheets of
- * 30 frames, in order, each stamped with its time). Fails (exit 1) on a
- * request outside the dev server.
+ * Writes .codex-screenshots/design-preview/<label>/<scenario>-<viewport>-<points>/NNNN.jpg
+ * (every frame) and <scenario>-<viewport>-<points>-sheet-N.png (contact
+ * sheets of 30 frames, in order, each stamped with its time), and prints the
+ * routes along the way and how much each frame differs from the one before
+ * (a jump is a spike). Fails (exit 1) on a request outside the dev server.
  */
 import { mkdir, readdir, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -44,6 +49,7 @@ const label = option('label', 'zoom-frames').replace(/[^\w.-]/g, '_')
 const points = Number(option('points', '1000'))
 const surface = option('surface', 'map')
 const viewports = option('viewports', 'desktop,phone,narrow').split(',')
+const scenarios = option('scenarios', 'zoom,choose').split(',')
 const outDir = path.resolve('.codex-screenshots/design-preview', label)
 const leaks = []
 
@@ -169,7 +175,7 @@ async function sheets(browser, frames, name) {
 const browser = await chromium.launch()
 try {
   await mkdir(outDir, { recursive: true })
-  for (const name of viewports) {
+  for (const scenario of scenarios) for (const name of viewports) {
     const viewport = VIEWPORTS[name]
     if (!viewport) throw new Error(`Unknown viewport ${name}`)
     const context = await browser.newContext({
@@ -194,48 +200,85 @@ try {
     const y = Math.round(height * 0.48)
     const route = () => page.evaluate(() => new URL(window.location.href).searchParams.get('path'))
     const routes = [await route()]
+    const press = async (px, py) => (viewport.mobile ? tap(cast.client, px, py) : page.mouse.click(px, py))
+    const zoomButton = (direction) => page.locator(`[data-starmap-stage] [role="group"] button`).nth(direction === 'in' ? 0 : 1)
     await cast.start()
     await delay(300)
-    if (!viewport.mobile) {
-      await page.mouse.move(x, y)
-      for (let i = 0; i < 26; i += 1) {
-        await page.mouse.wheel(0, -100)
-        await delay(70)
+    if (scenario === 'zoom') {
+      if (!viewport.mobile) {
+        await page.mouse.move(x, y)
+        for (let i = 0; i < 26; i += 1) {
+          await page.mouse.wheel(0, -100)
+          await delay(70)
+        }
+      } else {
+        await pinch(cast.client, x, y, 60, 300)
+        await delay(250)
+        await pinch(cast.client, x, y, 60, 300)
+        await delay(250)
+        await pinch(cast.client, x, y, 80, 200)
       }
-    } else {
-      await pinch(cast.client, x, y, 60, 300)
-      await delay(250)
-      await pinch(cast.client, x, y, 60, 300)
-      await delay(250)
-      await pinch(cast.client, x, y, 80, 200)
-    }
-    await delay(900)
-    routes.push(await route())
-    // Tap the star nearest the middle: its card opens.
-    const star = await starNearMiddle(page, width, height)
-    if (star) {
-      if (viewport.mobile) await tap(cast.client, star.x, star.y)
-      else await page.mouse.click(star.x, star.y)
+      await delay(900)
+      routes.push(await route())
+      // Tap the star nearest the middle: its card opens.
+      const star = await starNearMiddle(page, width, height)
+      if (star) {
+        await press(star.x, star.y)
+        await delay(1200)
+        routes.push(await route())
+      }
+      // And back out to the panorama.
+      if (!viewport.mobile) {
+        await page.mouse.move(x, y)
+        for (let i = 0; i < 30; i += 1) {
+          await page.mouse.wheel(0, 100)
+          await delay(70)
+        }
+      } else {
+        for (let i = 0; i < 4; i += 1) {
+          await pinch(cast.client, x, y, 300, 60)
+          await delay(200)
+        }
+      }
       await delay(1200)
       routes.push(await route())
-    }
-    // And back out to the panorama.
-    if (!viewport.mobile) {
-      await page.mouse.move(x, y)
-      for (let i = 0; i < 30; i += 1) {
-        await page.mouse.wheel(0, 100)
-        await delay(70)
-      }
     } else {
-      for (let i = 0; i < 4; i += 1) {
-        await pinch(cast.client, x, y, 300, 60)
-        await delay(200)
+      // Choose: a tap on a nebula flies in; a tap on a star opens its card; Escape
+      // closes it where the map is; the - button steps out; a double tap and + step in.
+      const nebula = await starNearMiddle(page, width, height)
+      await press(nebula.x, nebula.y)
+      await delay(1200)
+      routes.push(await route())
+      const star = await starNearMiddle(page, width, height)
+      await press(star.x, star.y)
+      await delay(1200)
+      routes.push(await route())
+      await page.keyboard.press('Escape')
+      await delay(800)
+      routes.push(await route())
+      for (let i = 0; i < 3; i += 1) {
+        await zoomButton('out').click()
+        await delay(350)
       }
+      await delay(600)
+      routes.push(await route())
+      if (viewport.mobile) {
+        await tap(cast.client, x, y)
+        await delay(60)
+        await tap(cast.client, x, y)
+      } else {
+        await page.mouse.dblclick(x, y)
+      }
+      await delay(800)
+      for (let i = 0; i < 2; i += 1) {
+        await zoomButton('in').click()
+        await delay(350)
+      }
+      await delay(800)
+      routes.push(await route())
     }
-    await delay(1200)
-    routes.push(await route())
     await cast.stop()
-    const runName = `zoom-${name}-${points}`
+    const runName = `${scenario}-${name}-${points}`
     const frameDir = path.join(outDir, runName)
     await rm(frameDir, { recursive: true, force: true })
     await mkdir(frameDir, { recursive: true })

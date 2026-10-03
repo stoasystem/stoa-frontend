@@ -211,6 +211,8 @@ const TAP_SLOP = 5
 const STAR_FOCUS_DIM = 0.35
 /** A flight to another galaxy lasts this many layer changes. */
 const GALAXY_FLIGHT = 1.8
+/** Choosing or letting go eases the sky's emphasis in or out with this time constant, ms (at once under reduced motion). */
+const EMPHASIS_MS = 140
 /** A pinch's zoom speed is averaged over this long, ms, so one jittery move does not decide the glide. */
 const PINCH_SMOOTHING_MS = 40
 /** A pinch held still this long before it is let go glides no further, ms. */
@@ -267,6 +269,12 @@ export class StarMapEngine {
   private nebulaY = new Float32Array(0)
   private nebulaR = new Float32Array(0)
   private nebulaNames = new Float32Array(0)
+  /** Eased emphasis (#134): each nebula's lift out of the dimming around a chosen one, how far that dimming is in, and a chosen star's. */
+  private nebulaLift = new Float32Array(0)
+  private chosenAmount = 0
+  private starAmount = 0
+  /** The star chosen last: while its emphasis eases out after the card closes, it stays the one picked out. */
+  private lastChosenStar = -1
   private sharpness = new Float32Array(0)
 
   private viewport: Viewport = { width: 0, height: 0 }
@@ -464,6 +472,7 @@ export class StarMapEngine {
     this.nebulaY = new Float32Array(nebulaCount)
     this.nebulaR = new Float32Array(nebulaCount)
     this.nebulaNames = new Float32Array(nebulaCount)
+    this.nebulaLift = new Float32Array(nebulaCount)
     this.sharpness = new Float32Array(nebulaCount)
     this.renderer.setData(scene)
     this.visibleKey = ''
@@ -1101,13 +1110,18 @@ export class StarMapEngine {
       if (glide) {
         // The rest of the zoom approaches exponentially: the wheel's notches
         // and the buttons' steps arrive as one smooth zoom, never as a jump.
-        let step = glide.log * (1 - Math.exp(-dt / glide.tauMs))
+        // No faster than `ZOOM.maxRate`: a hard flick still crosses each reveal over several frames.
+        const most = (ZOOM.maxRate * dt) / 1000
+        let step = Math.max(-most, Math.min(most, glide.log * (1 - Math.exp(-dt / glide.tauMs))))
         if (Math.abs(glide.log - step) < 0.002) step = glide.log
         glide.log -= step
         const changed = this.applyZoom(step, glide.x, glide.y)
+        // The glide's last frame is a frame at rest, like a flight's.
         if (!changed || Math.abs(glide.log) < 1e-6) this.zoomGlide = null
-        else keepGoing = true
-        moving = true
+        else {
+          keepGoing = true
+          moving = true
+        }
       }
     }
 
@@ -1150,6 +1164,18 @@ export class StarMapEngine {
     // The one exception: the recommended star is the student's way in, so it
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
     for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
+
+    // Choosing and letting go ease in and out.
+    const ease = this.policy.inertia ? 1 - Math.exp(-dt / EMPHASIS_MS) : 1
+    const approach = (value: number, to: number) => (Math.abs(to - value) < 0.002 ? to : value + (to - value) * ease)
+    this.chosenAmount = approach(this.chosenAmount, chosen >= 0 ? 1 : 0)
+    this.starAmount = approach(this.starAmount, target.layer === 'star' ? 1 : 0)
+    let easing = (this.chosenAmount > 0 && this.chosenAmount < 1) || (this.starAmount > 0 && this.starAmount < 1)
+    for (let n = 0; n < this.nebulaLift.length; n += 1) {
+      this.nebulaLift[n] = approach(this.nebulaLift[n], n === chosen ? 1 : 0)
+      if (this.nebulaLift[n] > 0 && this.nebulaLift[n] < 1) easing = true
+    }
+    if (easing) keepGoing = true
 
     // Only the recommended star breathes (#72 point 6), and only when seen sharp.
     let breath: SceneFrame['breath'] = null
@@ -1208,9 +1234,10 @@ export class StarMapEngine {
     const target = this.target
     const starPx = starPxFor(t.scale, this.spacing)
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
-    const chosenStar = target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : -1
-    // With a star chosen, the map gives way to it as the zoom closes in.
-    const focus = chosenStar >= 0 ? starFocusAmount(starPx) : 0
+    if (target.layer === 'star') this.lastChosenStar = this.stars.findIndex((star) => star.unitId === target.unitId)
+    const chosenStar = this.starAmount > 0 ? this.lastChosenStar : -1
+    // With a star chosen, the map gives way to it as the zoom closes in (eased in as it is chosen, out as its card closes).
+    const focus = chosenStar >= 0 ? starFocusAmount(starPx) * this.starAmount : 0
     const focusStar = chosenStar >= 0 ? chosenStar : this.focusStar
     // One sky names a nebula by its size on screen, past the panorama; a flat
     // map of one subject (no galaxies, tests and the bench's old maps) names every nebula.
@@ -1248,6 +1275,9 @@ export class StarMapEngine {
       hoveredNebula: this.hoveredNebula,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: 1 - (1 - STAR_FOCUS_DIM) * focus,
+      chosenAmount: this.chosenAmount,
+      nebulaLift: this.nebulaLift,
+      emphasisKey: `${this.chosenAmount.toFixed(3)}:${this.nebulaLift.reduce((sum, lift, n) => sum + lift * (n + 1), 0).toFixed(3)}`,
       showSkills: skillAlpha(starPx),
       crossfade,
       time: now,

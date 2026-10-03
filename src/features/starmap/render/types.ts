@@ -188,6 +188,16 @@ export type SceneFrame = {
   hoveredNebula?: number
   /** Everything but the focus star fades to this (a chosen star, zoomed in to it). */
   dim: number
+  /**
+   * How far the other nebulae have stepped back from a chosen one, 0..1, and
+   * how far each nebula is lifted out of that (1: the chosen one): eased, so
+   * choosing or letting go never dims the sky in one frame (#134). Absent:
+   * read from `chosenNebula`.
+   */
+  chosenAmount?: number
+  nebulaLift?: ArrayLike<number>
+  /** Changes whenever `chosenAmount` or `nebulaLift` do: the light cache's key. */
+  emphasisKey?: string
   /** Skill dots beside the stars, 0..1 by zoom (large enough glyphs only). */
   showSkills: number
   /** The frame's time, ms, and how long a name takes to fade when it gains or loses its place (0: at once). */

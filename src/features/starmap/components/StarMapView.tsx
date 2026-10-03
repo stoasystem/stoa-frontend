@@ -277,6 +277,21 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     navigateRef.current(outerTarget(target))
   }
 
+  // Escape lets go of a choice also when nothing has focus (after a tap on the
+  // map, focus stays on the page): the stage's own keys handle focus inside it.
+  useEffect(() => {
+    if (target.layer === 'map') return
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented || event.altKey || event.metaKey || event.ctrlKey) return
+      const active = document.activeElement
+      if (active && active !== document.body) return
+      event.preventDefault()
+      navigateRef.current(outerTarget(target))
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [target])
+
   useEffect(() => {
     engineRef.current?.setReducedMotion(reducedMotion)
   }, [reducedMotion])

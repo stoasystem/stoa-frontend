@@ -31,7 +31,20 @@ import {
 type LabelFade = { alpha: number; slot: number; placed: boolean; seen: number }
 
 /** Glyph sizes (px) over which the small cut gives way to the large (#134). */
-const GLYPH_CUT_FADE: Ramp = [26, 34]
+const GLYPH_CUT_FADE: Ramp = [28, 32]
+/**
+ * The small cut is drawn bolder than the large (its star fills more of its
+ * box), so swapping them at one size would shrink every glyph. From
+ * `SMALL_CUT_EASE_FROM` px up to the swap it is drawn a little smaller, until
+ * it is exactly the large cut's size there -- linearly over a range wide
+ * enough (over twice its start) that a glyph still only ever grows as the zoom does.
+ */
+const SMALL_CUT_EASE_FROM = 12
+const CUT_MATCH = GLYPH_LARGE.lit.tip / GLYPH_LARGE.box / (GLYPH_SMALL.lit.tip / GLYPH_SMALL.box)
+function smallCutScale(box: number): number {
+  const t = Math.max(0, Math.min(1, (box - SMALL_CUT_EASE_FROM) / (SMALL_CUT_BELOW - SMALL_CUT_EASE_FROM)))
+  return 1 - (1 - CUT_MATCH) * t
+}
 
 /**
  * A nebula's name sits by its rim, but never more than this far (px) from its
@@ -416,7 +429,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const { state, count } = scene
       const nebulaCount = scene.nebulae.length
       const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
-      const nebulaDim = (n: number) => (frame.chosenNebula >= 0 && n !== frame.chosenNebula ? Math.max(frame.dim, 0.6) : 1)
+      // Around a chosen nebula the others step back; `chosenAmount` and `nebulaLift` ease it in and out (#134).
+      const chosenAmount = frame.chosenAmount ?? (frame.chosenNebula >= 0 ? 1 : 0)
+      const nebulaDim = (n: number) => {
+        const lift = frame.nebulaLift ? frame.nebulaLift[n] ?? 0 : n === frame.chosenNebula ? 1 : 0
+        return 1 - (1 - Math.max(frame.dim, 0.6)) * chosenAmount * (1 - lift)
+      }
       const tileOf = (n: number, reach: number) => {
         const nebula = scene.nebulae[n]
         return tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr, scene.galaxy ? 512 : 256))
@@ -460,7 +478,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         // changes, a star changes state, or the pan runs past its margin.
         // A galaxy moving to its other copy on the ring (#120) is a new picture too.
         const turns = frame.galaxyShift ? Array.prototype.join.call(frame.galaxyShift, ',') : ''
-        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${width}x${height}@${dpr}|${turns}`
+        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${frame.emphasisKey ?? ''}|${width}x${height}@${dpr}|${turns}`
         const shiftX = frame.ox - lightCache.ox
         const shiftY = frame.oy - lightCache.oy
         const margin = Math.round(Math.max(width, height) * LIGHT_MARGIN)
@@ -546,7 +564,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       /** One measure of the glyph at `box` px, in px: the two cuts' own, blended by size. */
       const geom = (box: number, pick: (cut: GlyphCut) => number) => {
         const t = ramp(box, GLYPH_CUT_FADE)
-        return box * ((1 - t) * (pick(GLYPH_SMALL) / GLYPH_SMALL.box) + t * (pick(GLYPH_LARGE) / GLYPH_LARGE.box))
+        return box * ((1 - t) * (pick(GLYPH_SMALL) / GLYPH_SMALL.box) * smallCutScale(box) + t * (pick(GLYPH_LARGE) / GLYPH_LARGE.box))
       }
       const margin = Math.max(frame.glyphSize, 16) * 2
       const visible = (i: number) => {
@@ -574,7 +592,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           for (const [sprites, cut, share] of [[set.small, GLYPH_SMALL, smallOut(box)], [set.large, GLYPH_LARGE, largeIn(box)]] as const) {
             if (share < 0.01) continue
             const sprite = sprites[state[i]]
-            const size = (box * grow * sprite.extent * 2) / cut.box
+            const size = (box * grow * sprite.extent * 2 * (cut === GLYPH_SMALL ? smallCutScale(box) : 1)) / cut.box
             ctx.globalAlpha = alpha * share
             ctx.drawImage(sprite.canvas, x[i] - size / 2, y[i] - size / 2, size, size)
           }
