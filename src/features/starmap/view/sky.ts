@@ -6,9 +6,23 @@
  * edges of its neighbours, on a phone a narrower window of the same layout
  * (never the band turned on its side). The header follows the galaxy at the
  * centre of the view.
+ *
+ * The band is a ring (#120, #117 B3): x wraps with a circumference of
+ * `SKY_WRAP`, and the seam is one more gap between the last galaxy and the
+ * first. Each frame every galaxy -- its haze, its nebulae, their stars -- is
+ * placed at the one copy nearest the centre of the view (`galaxyTurns`), so
+ * hit-testing, the parallel DOM and the lighting overlay all see exactly the
+ * copy that is drawn. A galaxy moves to its other copy only when its centre
+ * is half a turn from the view's, and `ringSafeZoom` keeps the window narrow
+ * enough that this happens off screen: the same galaxy is never seen twice.
  */
 import type { StarMap } from '@/features/starmap/model/starMap'
-import { baseScale, usableHeight, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import { CLOUD_REACH, galaxyHazeBox } from '@/features/starmap/render/galaxy'
+import { baseScale, turnsToward, usableHeight, wrapX, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import type { NebulaDisc } from '@/features/starmap/view/geometry'
+
+/** The ring's circumference in map units: the band runs over x in [0, 1] with half a gap at each end (#119). */
+export const SKY_WRAP = 1
 
 export type SkyGalaxy = {
   subjectId: string
@@ -102,16 +116,80 @@ export function galaxyView(galaxy: SkyGalaxy, galaxies: readonly SkyGalaxy[], bo
   }
 }
 
-/** The galaxy nearest the map point `x` (inside one, or nearer its edge than the next one's). */
-export function galaxyAt(galaxies: readonly SkyGalaxy[], x: number): SkyGalaxy | undefined {
+/**
+ * The galaxy nearest the map point `x` (inside one, or nearer its edge than
+ * the next one's). On a ring (`wrap` > 0) `x` may be any turn, and the gap
+ * across the seam counts like any other.
+ */
+export function galaxyAt(galaxies: readonly SkyGalaxy[], x: number, wrap = 0): SkyGalaxy | undefined {
   let best: SkyGalaxy | undefined
   let bestGap = Infinity
+  const at = wrapX(x, wrap)
   for (const galaxy of galaxies) {
-    const gap = x < galaxy.x0 ? galaxy.x0 - x : x > galaxy.x1 ? x - galaxy.x1 : 0
+    const gapTo = (p: number) => (p < galaxy.x0 ? galaxy.x0 - p : p > galaxy.x1 ? p - galaxy.x1 : 0)
+    const gap = wrap > 0 ? Math.min(gapTo(at), gapTo(at - wrap), gapTo(at + wrap)) : gapTo(at)
     if (gap < bestGap) {
       best = galaxy
       bestGap = gap
     }
   }
   return best
+}
+
+/** A galaxy's middle along the band, map units. */
+export function galaxyCentre(galaxy: Pick<SkyGalaxy, 'x0' | 'x1'>): number {
+  return (galaxy.x0 + galaxy.x1) / 2
+}
+
+/**
+ * How many turns of the ring to add to each galaxy's x so it sits at its
+ * copy nearest the view's centre `cx` (any turn). One number per galaxy:
+ * a galaxy's haze, nebulae and stars always move together.
+ */
+export function galaxyTurns(galaxies: readonly Pick<SkyGalaxy, 'x0' | 'x1'>[], cx: number, wrap: number, out?: Float64Array): Float64Array {
+  const turns = out && out.length === galaxies.length ? out : new Float64Array(galaxies.length)
+  for (let g = 0; g < galaxies.length; g += 1) turns[g] = turnsToward(galaxyCentre(galaxies[g]), cx, wrap)
+  return turns
+}
+
+/**
+ * The farthest anything drawn for one galaxy reaches from its middle along
+ * the band, map units: its haze, and every nebula's cloud.
+ */
+export function galaxyReach(galaxy: SkyGalaxy, discs: Iterable<NebulaDisc>): number {
+  const centre = galaxyCentre(galaxy)
+  const haze = galaxyHazeBox(galaxy)
+  let reach = Math.max(centre - haze.x0, haze.x1 - centre)
+  for (const disc of discs) reach = Math.max(reach, Math.abs(disc.x - centre) + disc.r * CLOUD_REACH)
+  return reach
+}
+
+/** Screen pixels kept free beyond a galaxy's reach before it may jump to its other copy (glyphs, a beacon, a name). */
+export const RING_PAD_PX = 48
+
+/**
+ * The least zoom at which the ring stays seamless: the window reaches no
+ * farther from the view's centre than half a turn less the widest galaxy's
+ * reach (and a little room), so a galaxy only ever jumps to its other copy
+ * while all of it is off screen. `fx` is where the view's centre sits across
+ * the viewport. Zero when there is no ring.
+ */
+export function ringSafeZoom(reach: number, wrap: number, viewport: Viewport, bounds: Bounds, fx = 0.5): number {
+  const room = wrap / 2 - reach
+  if (!(wrap > 0) || room <= 0 || viewport.width <= 0) return 0
+  const scale = (viewport.width * Math.max(fx, 1 - fx) + RING_PAD_PX) / room
+  return scale / baseScale(viewport, bounds)
+}
+
+/**
+ * The next item round the ring from `from`, going right (`+1`) or left
+ * (`-1`), by position along the band (`xs`, map units): after the rightmost
+ * comes the leftmost, across the seam, so moving by keys never hits an end.
+ * Ties keep the given order. Returns `from` when there is nothing else.
+ */
+export function ringNeighbour(xs: readonly number[], from: number, direction: 1 | -1): number {
+  if (xs.length < 2 || from < 0 || from >= xs.length) return from
+  const along = xs.map((x, i) => i).sort((a, b) => xs[a] - xs[b] || a - b)
+  const at = along.indexOf(from)
+  return along[(at + direction + along.length) % along.length]
 }

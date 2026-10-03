@@ -409,8 +409,10 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const haze = galaxyHazes[g]
           if (!haze) return
           const box = galaxyHazeBox(galaxy)
-          const x0 = frame.ox + box.x0 * frame.scale + dx
-          const x1 = frame.ox + box.x1 * frame.scale + dx
+          // On the ring, at the galaxy's copy nearest the view, like its nebulae and stars (#120).
+          const turn = frame.galaxyShift?.[g] ?? 0
+          const x0 = frame.ox + (box.x0 + turn) * frame.scale + dx
+          const x1 = frame.ox + (box.x1 + turn) * frame.scale + dx
           if (x1 < -margin || x0 > width + margin) return
           target.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
           target.drawImage(haze, x0, frame.oy + box.y0 * frame.scale + dy, x1 - x0, (box.y1 - box.y0) * frame.scale)
@@ -430,7 +432,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         // While the zoom holds still (a pan, a glide, breathing), the light is
         // one cached image moved with the map; it is repainted when the zoom
         // changes, a star changes state, or the pan runs past its margin.
-        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${width}x${height}@${dpr}`
+        // A galaxy moving to its other copy on the ring (#120) is a new picture too.
+        const turns = frame.galaxyShift ? Array.prototype.join.call(frame.galaxyShift, ',') : ''
+        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${width}x${height}@${dpr}|${turns}`
         const shiftX = frame.ox - lightCache.ox
         const shiftY = frame.oy - lightCache.oy
         const margin = Math.round(Math.max(width, height) * LIGHT_MARGIN)

@@ -23,7 +23,9 @@ import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfN
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
+import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, pathForTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { ringNeighbour } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
 
@@ -307,6 +309,24 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
 
+  // Left and right arrows on a nebula's link go to the next nebula along the
+  // band, round the ring (#120): past the last galaxy comes the first, and the
+  // map pans the shorter way. Tab keeps the reading order, each nebula once.
+  const nebulaX = useMemo(() => {
+    const discs = nebulaDiscs(map)
+    return new Map(nebulae.map((nebula) => [nebula.topicId, discs.get(nebula.topicId)?.x ?? 0]))
+  }, [map, nebulae])
+  const stepAlongRing = (event: KeyboardEvent<HTMLAnchorElement>) => {
+    if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    const links = [...(stageRef.current?.querySelectorAll<HTMLAnchorElement>('a[data-nebula-link]') ?? [])]
+    const from = links.indexOf(event.currentTarget)
+    if (from < 0 || links.length < 2) return
+    event.preventDefault()
+    const xs = links.map((link) => nebulaX.get(link.dataset.nebulaLink ?? '') ?? 0)
+    links[ringNeighbour(xs, from, event.key === 'ArrowRight' ? 1 : -1)].focus()
+  }
+
   // The links, grouped by nebula in keyboard order.
   const size = linkSize(visible.glyph)
   const visibleByNebula = useMemo(() => {
@@ -467,6 +487,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                         data-focus-top={spot?.y}
                         onFocus={(event) => { measureFocusPill(event.currentTarget); focusNebula(nebulaIndex) }}
                         onBlur={() => focusNebula(-1)}
+                        onKeyDown={stepAlongRing}
                       >
                         <span aria-hidden="true">{nebula.name}</span>
                         <span className="sr-only">{nebulaText(nebula)}</span>

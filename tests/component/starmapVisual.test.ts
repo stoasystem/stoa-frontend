@@ -162,8 +162,9 @@ describe('one sky: galaxies of nebulae (#119)', () => {
       const chemistry = nebulae.flatMap((n, i) => (n.subjectId === 'chemistry' ? [i] : []))
       const middle = math.reduce((sum, n) => sum + f.nebulaX[n], 0) / math.length
       expect(Math.abs(middle - width / 2)).toBeLessThan(width * 0.12)
-      // Chemistry is two galaxies along: off screen.
-      for (const n of chemistry) expect(f.nebulaX[n] - f.nebulaR[n]).toBeGreaterThan(width)
+      // Chemistry is two galaxies along, which on the ring (#120) is math's left
+      // neighbour across the seam: off screen, to the left.
+      for (const n of chemistry) expect(f.nebulaX[n] + f.nebulaR[n]).toBeLessThan(0)
       // Not turned on a phone: the band still runs left to right.
       const ys = math.map((n) => f.nebulaY[n])
       const xs = math.map((n) => f.nebulaX[n])
@@ -213,12 +214,13 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     expect(real.stats.tilePaints - paints).toBeLessThan(nebulae.length)
     // Arrived where it was sent: nothing to report.
     expect(centred).not.toHaveBeenCalled()
-    // A drag to chemistry, and once at rest the header is told.
+    // A drag to chemistry (put down, no glide), and once at rest the header is told.
     engine.pointerDown(1, 1300, 400)
     for (let x = 1300; x >= 200; x -= 50) {
       engine.pointerMove(1, x, 400)
       clock.advance(16)
     }
+    clock.advance(200)
     engine.pointerUp(1, 200, 400)
     clock.advance(3000)
     expect(centred).toHaveBeenLastCalledWith('chemistry')

@@ -104,9 +104,16 @@ export type SceneFrame = {
   scale: number
   ox: number
   oy: number
-  /** Screen position of every star. */
+  /** Screen position of every star (on one sky's ring, of its drawn copy). */
   x: Float32Array
   y: Float32Array
+  /**
+   * One sky's ring (#120): map units added to each galaxy's x this frame,
+   * whole turns of the ring, so it is drawn at its copy nearest the view.
+   * `x`, `y` and the nebula positions already include it; only what the
+   * renderer places from map units (a galaxy's haze) needs it. Absent: none.
+   */
+  galaxyShift?: ArrayLike<number>
   /**
    * How strongly each star is drawn on its own, 0..1. Zero means it is left
    * to its nebula's tile: stars outside the focus are never drawn one by one.

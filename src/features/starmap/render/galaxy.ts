@@ -176,7 +176,7 @@ export function paintNebulaCloud(ctx: CanvasRenderingContext2D, size: number, da
 }
 
 /** Where a galaxy's haze canvas sits, map units: its box with room for the haze to fade. */
-export function galaxyHazeBox(galaxy: NonNullable<SceneData['galaxies']>[number]) {
+export function galaxyHazeBox(galaxy: { x0: number; x1: number; y0: number; y1: number }) {
   const margin = (galaxy.y1 - galaxy.y0) * 0.35
   return { x0: galaxy.x0 - margin, y0: galaxy.y0 - margin, x1: galaxy.x1 + margin, y1: galaxy.y1 + margin }
 }

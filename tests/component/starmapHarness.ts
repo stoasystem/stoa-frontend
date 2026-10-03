@@ -59,7 +59,8 @@ export function fakeClock(): FakeClock {
 }
 
 /** A frame as the renderer got it, with its arrays copied (the engine reuses them). */
-export type RecordedFrame = Omit<SceneFrame, 'x' | 'y' | 'starAlpha' | 'sharpness' | 'nebulaX' | 'nebulaY' | 'nebulaR'> & {
+export type RecordedFrame = Omit<SceneFrame, 'x' | 'y' | 'starAlpha' | 'sharpness' | 'nebulaX' | 'nebulaY' | 'nebulaR' | 'galaxyShift'> & {
+  galaxyShift?: number[]
   x: number[]
   y: number[]
   starAlpha: number[]
@@ -94,6 +95,7 @@ export function recordingRenderer(): RecordingRenderer {
         nebulaX: Array.from(frame.nebulaX),
         nebulaY: Array.from(frame.nebulaY),
         nebulaR: Array.from(frame.nebulaR),
+        galaxyShift: frame.galaxyShift ? Array.from(frame.galaxyShift) : undefined,
       })
     },
     snapshot() {
