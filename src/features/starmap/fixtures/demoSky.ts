@@ -220,8 +220,8 @@ function build(size: FixtureSize): Built {
       })
   }
 
-  const prerequisites = prerequisitesFor(members, rand)
   const recommended = recommendationsFor(nebulae, stars)
+  const prerequisites = withWayIn(prerequisitesFor(members, rand), members, recommended)
   const withMarks = stars.map((star) => (recommended.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))
 
   // One sky (#119): galaxies along a band, neighbours where prerequisites cross subjects.
@@ -331,6 +331,31 @@ function prerequisitesFor(members: Map<string, Omit<Star, 'x' | 'y'>[]>, rand: (
     })
   }
   return edges
+}
+
+/**
+ * The way into each recommended star (#121): up to two lit stars before it
+ * in its own nebula become its prerequisites, so the line into the
+ * recommendation -- the brightest tier -- is there to see. Lit before
+ * in progress or ready keeps every state true; no random draw is taken, so
+ * the rest of the sky stays as it was, and no edge crosses nebulae, so the
+ * layout does not move.
+ */
+function withWayIn(edges: Prerequisite[], members: Map<string, Omit<Star, 'x' | 'y'>[]>, recommended: Set<string>): Prerequisite[] {
+  const seen = new Set(edges.map((edge) => `${edge.from}\u0000${edge.to}`))
+  const out = [...edges]
+  for (const list of members.values()) {
+    list.forEach((star, k) => {
+      if (!recommended.has(star.unitId)) return
+      for (const before of list.slice(0, k).filter((candidate) => candidate.state === 'lit').slice(-2)) {
+        const key = `${before.unitId}\u0000${star.unitId}`
+        if (seen.has(key)) continue
+        seen.add(key)
+        out.push({ from: before.unitId, to: star.unitId })
+      }
+    })
+  }
+  return out
 }
 
 /** At most one per subject the student takes: the demo knowledge point in its subject, else the backend's rule. */
