@@ -219,6 +219,12 @@
     "practice": {
       "subtitle": "Knows the question you are on",
       "placeholder": "Ask about this question…"
+    },
+    "lit": {
+      "label": "Progress",
+      "title": "{{name}} is lit",
+      "body": "You finished its chapter. The star now shines on your map.",
+      "link": "See it on the map"
     }
   }
 }

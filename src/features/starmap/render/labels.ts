@@ -50,7 +50,7 @@ export type Obstacles = {
 
 /**
  * The first free box among `candidates` (in order of preference): none may
- * overlap a placed name, and the least in the way of cores and lines wins.
+ * overlap a placed name or a line; the least in the way of cores wins.
  * A candidate outside `area` does not count, so a name near a control band
  * moves to the side of its nebula that is clear of it. `null`: leave the
  * name out.
@@ -68,10 +68,11 @@ export function placeLabel(
   candidates.forEach((box, order) => {
     if (box.x0 < area.x0 || box.y0 < area.y0 || box.x1 > area.x1 || box.y1 > area.y1) return
     if (obstacles.boxes.some((placed) => boxesOverlap(box, placed))) return
+    if (obstacles.segments.some((segment) => boxHitsSegment(box, segment))) return
     let cost = order * 0.5
     for (const circle of obstacles.circles) if (boxHitsCircle(box, circle)) cost += 10
-    for (const segment of obstacles.segments) if (boxHitsSegment(box, segment)) cost += 3
     cost += extraCost(box)
+    if (!Number.isFinite(cost)) return
     if (cost < bestCost) {
       best = box
       bestCost = cost
@@ -91,42 +92,8 @@ export function aroundDisc(x: number, y: number, r: number, width: number, heigh
   ]
 }
 
-/**
- * The parts of a segment that run clear of every circle, and the parts
- * inside one, as [t0, t1] intervals along it (0 = start, 1 = end).
- */
-export function splitByCircles(s: Segment, circles: readonly Circle[]): { clear: [number, number][]; hidden: [number, number][] } {
-  const dx = s.x1 - s.x0
-  const dy = s.y1 - s.y0
-  const a = dx * dx + dy * dy
-  const inside: [number, number][] = []
-  if (a > 0) {
-    for (const c of circles) {
-      const fx = s.x0 - c.x
-      const fy = s.y0 - c.y
-      const b = 2 * (fx * dx + fy * dy)
-      const cc = fx * fx + fy * fy - c.r * c.r
-      const disc = b * b - 4 * a * cc
-      if (disc <= 0) continue
-      const root = Math.sqrt(disc)
-      const t0 = Math.max(0, (-b - root) / (2 * a))
-      const t1 = Math.min(1, (-b + root) / (2 * a))
-      if (t1 > t0) inside.push([t0, t1])
-    }
-  }
-  inside.sort((p, q) => p[0] - q[0])
-  const hidden: [number, number][] = []
-  for (const span of inside) {
-    const last = hidden[hidden.length - 1]
-    if (last && span[0] <= last[1]) last[1] = Math.max(last[1], span[1])
-    else hidden.push([span[0], span[1]])
-  }
-  const clear: [number, number][] = []
-  let t = 0
-  for (const [h0, h1] of hidden) {
-    if (h0 > t) clear.push([t, h0])
-    t = Math.max(t, h1)
-  }
-  if (t < 1) clear.push([t, 1])
-  return { clear, hidden }
+/** Every part of a label must lie nearer its own centre than another nebula's. */
+export function belongsTo(box: Box, own: Circle, others: readonly Circle[]): boolean {
+  return [[box.x0, box.y0], [box.x1, box.y0], [box.x0, box.y1], [box.x1, box.y1]].every(([x, y]) =>
+    others.every((other) => Math.hypot(x - own.x, y - own.y) < Math.hypot(x - other.x, y - other.y)))
 }

@@ -17,6 +17,23 @@
  * `order` on nebulae and stars, which the keyboard order needs; one `name` per
  * nebula and star, already in the reader's language; `nebulaId` on each star;
  * unit-level `prerequisites`.
+ *
+ * One sky (ADR 0001, #117): the star map is one sky holding every subject.
+ * A subject is drawn as a galaxy (`Galaxy`), its topics as that galaxy's
+ * nebulae, and a prerequisite may cross subjects -- unit ids are global, so a
+ * cross-subject prerequisite is an ordinary `Prerequisite` whose two stars
+ * sit in different galaxies. `Sky` is that whole picture. Since #119 the
+ * renderer draws the whole sky too: a `StarMap` holds every galaxy's nebulae
+ * and stars, and `subject` is only the galaxy in focus (the route's
+ * `/map/:subjectId`, the header, the switcher), not a cut. The backend read
+ * model (stoa-backend#59) answers per subject today; how it will answer for
+ * the whole sky is settled in #3, so `Sky` is this front end's reading too.
+ *
+ * Only knowledge points are `Star`s. Star dust (星尘, `render/galaxy.ts`) is
+ * decoration painted from a seed: it has no id, no learning state, is never
+ * a click target and is never in `stars`. The design preview's placeholder
+ * stars (占位星) are `Star`s in shape only; `fixtures/demoSky.ts` says which
+ * one star is the demo knowledge point and that all others are placeholders.
  */
 
 /** The four learning states, in priority order (#9 point 7). */
@@ -29,11 +46,16 @@ export type Recommendation = { source: 'system' | 'teacher' }
 /** A skill of the unit's exercises (#9 point 10). `[]` until stoa-backend#58. */
 export type KnowledgeSkill = { skillId: string; name: string; lit: boolean }
 
-/** A nebula: one topic of the subject. */
+/**
+ * A nebula: one topic. In a map of the whole sky (#119) it names the galaxy
+ * (subject) it belongs to, and `order` runs across the sky: galaxy by galaxy
+ * along the band, then by `topic.order` inside each galaxy.
+ */
 export type Nebula = {
   topicId: string
   name: string
   order: number
+  subjectId?: string
 }
 
 export type ChapterSummary = {
@@ -67,14 +89,54 @@ export type Star = {
 /** `from` must be lit before `to` opens (stoa-backend#56). Units, not topics. */
 export type Prerequisite = { from: string; to: string }
 
+/**
+ * A galaxy: one subject of the sky (ADR 0001), with its lit count.
+ * `enrolled` is false for a subject the student does not take: it is still
+ * in the sky, drawn dimmed (#117 C4), and has no student evidence.
+ */
+export type Galaxy = {
+  subjectId: string
+  name: string
+  lit: number
+  total: number
+  enrolled: boolean
+}
+
 export type StarMap = {
   subject: { subjectId: string; name: string }
   nebulae: Nebula[]
   stars: Star[]
   prerequisites: Prerequisite[]
+  /** The galaxy in focus: its lit and total stars (streak and score are the student's). */
   summary: { lit: number; total: number; streakDays: number; score: number }
-  /** Every subject the student has, this one included, for the switcher (#72 point 7). */
-  subjects: { subjectId: string; name: string; lit: number; total: number }[]
+  /** Every subject in the sky, this one included, for the switcher (#72 point 7). */
+  subjects: Galaxy[]
+}
+
+/** A nebula of the sky, which names the galaxy (subject) it belongs to. */
+export type SkyNebula = Nebula & { subjectId: string }
+
+/**
+ * The whole sky: every galaxy, every nebula and star, and every
+ * prerequisite, those across subjects included.
+ */
+export type Sky = {
+  galaxies: Galaxy[]
+  nebulae: SkyNebula[]
+  stars: Star[]
+  prerequisites: Prerequisite[]
+  summary: { lit: number; total: number; streakDays: number; score: number }
+}
+
+/** The prerequisites whose two stars are in different galaxies. */
+export function crossSubjectPrerequisites(sky: Pick<Sky, 'nebulae' | 'stars' | 'prerequisites'>): Prerequisite[] {
+  const subjectOf = new Map(sky.nebulae.map((nebula) => [nebula.topicId, nebula.subjectId]))
+  const galaxyOf = new Map(sky.stars.map((star) => [star.unitId, subjectOf.get(star.nebulaId)]))
+  return sky.prerequisites.filter(({ from, to }) => {
+    const a = galaxyOf.get(from)
+    const b = galaxyOf.get(to)
+    return a !== undefined && b !== undefined && a !== b
+  })
 }
 
 const byId = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0)
@@ -105,10 +167,6 @@ export function orderedStars(map: Pick<StarMap, 'nebulae' | 'stars'>): Star[] {
   return [...map.stars].sort(compareStars(nebulaOrderOf(map)))
 }
 
-export function litCount(stars: readonly Star[]): number {
-  return stars.reduce((count, star) => count + (star.state === 'lit' ? 1 : 0), 0)
-}
-
 export function nebulaCounts(stars: readonly Star[], nebulaId: string): { lit: number; total: number } {
   let lit = 0
   let total = 0
@@ -118,4 +176,9 @@ export function nebulaCounts(stars: readonly Star[], nebulaId: string): { lit: n
     if (star.state === 'lit') lit += 1
   }
   return { lit, total }
+}
+
+/** The galaxy (subject) a nebula belongs to; the map's own subject when the nebula does not say. */
+export function subjectOfNebula(map: Pick<StarMap, 'nebulae' | 'subject'>, nebulaId: string): string {
+  return map.nebulae.find((nebula) => nebula.topicId === nebulaId)?.subjectId ?? map.subject.subjectId
 }

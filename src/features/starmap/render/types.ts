@@ -17,6 +17,20 @@ export const STATE_IN_PROGRESS = 1
 export const STATE_READY = 2
 export const STATE_LOCKED = 3
 
+/** The connection lines' inks (#121), from the `--starmap-link-*` and `--starmap-bridge` sky tokens. */
+export type LinkInk = {
+  /** Tier 1: a line into the recommended star. */
+  recommended: string
+  /** Tier 2: an in-progress star to its prerequisites. */
+  inProgress: string
+  /** Tier 3: both ends lit, the path walked. */
+  walked: string
+  /** Tier 4: into a locked star (star layer only, dashed). */
+  locked: string
+  /** The panorama's soft bridges between nebulae, and the glow between galaxies. */
+  bridge: string
+}
+
 /** Colours read from the sky tokens (`data-surface="sky"`). */
 export type StarMapTheme = {
   sky: string
@@ -27,6 +41,8 @@ export type StarMapTheme = {
   textBody: string
   textCaption: string
   fontFamily: string
+  /** The connection lines (#121); `LINK_INK` (render/links.ts) when absent. */
+  links?: LinkInk
 }
 
 /** What stays the same from frame to frame: the map's data, in arrays. */
@@ -38,14 +54,41 @@ export type SceneData = {
    */
   mapKey: string
   count: number
+  /**
+   * One sky (#119): nebulae drawn as clouds in their own tint, galaxies as a
+   * faint haze of their base tint with dark sky between them; topic discs
+   * are navigation bounds only.
+   */
+  galaxy?: boolean
+  /** The sky's galaxies, left to right (one sky only; absent otherwise). */
+  galaxies?: readonly {
+    subjectId: string
+    name: string
+    /** The box round its stars, map units. */
+    x0: number
+    x1: number
+    y0: number
+    y1: number
+    /** 0 blue-violet .. 1 warm gold. */
+    tint: number
+    /** 1, or less for a subject the student does not take. */
+    dim: number
+    /** Its nebulae, by index. */
+    nebulae: readonly number[]
+  }[]
   /** Map position of every star, map units. */
   mapX: Float32Array
   mapY: Float32Array
   state: Uint8Array
   progress: Float32Array
   reviewDue: Uint8Array
-  /** Index of the one recommended star, or -1. */
+  /** Index of the recommended star (in the galaxy in focus, on one sky), or -1. */
   recommended: number
+  /**
+   * Every recommended star -- one per subject the student takes, on one sky
+   * -- drawn as a full glyph at every zoom: the way in. Absent: just `recommended`.
+   */
+  recommendations?: readonly number[]
   /** Nebula index of every star. */
   nebula: Uint16Array
   names: readonly string[]
@@ -60,11 +103,15 @@ export type SceneData = {
     r: number
     lit: number
     total: number
+    /** Its own tint, 0 blue-violet .. 1 warm gold (one sky only). */
+    tint?: number
+    /** 1, or less in a galaxy the student does not take (one sky only). */
+    dim?: number
   }[]
   /** Lines between nebulae, aggregated from prerequisites (#72 point 2). */
   links: readonly { a: number; b: number; count: number }[]
-  /** Prerequisites inside a nebula, star index pairs, with the nebula (#72 point 3). */
-  innerLinks: readonly { from: number; to: number; nebula: number }[]
+  /** Every prerequisite as star index pairs, across nebulae and subjects (#121; drawn by tier in `render/links.ts`). */
+  starLinks: readonly { from: number; to: number }[]
 }
 
 export type SceneFrame = {
@@ -102,14 +149,17 @@ export type SceneFrame = {
   starLabelAlpha: number
   /** Nebula names. */
   nebulaLabelAlpha: number
-  /** Prerequisite lines inside the chosen nebula. */
+  /** The nebula and star layers' lines between stars: 0 on the panorama, 1 zoomed in (#121). */
   innerLinkAlpha: number
+  /** 1 on the star layer, 0 elsewhere, between during a layer change (#121: the focused star's lines, every tier). */
+  starLayer?: number
   /** The chosen nebula (nebula and star layers), or -1. */
   chosenNebula: number
   /** The star picked out (keyboard focus, the star layer), or -1. */
   focusStar: number
   /** The nebula whose link has keyboard focus, drawn with a ring, or -1. */
   highlightNebula: number
+  hoveredNebula?: number
   /** Everything but the focus star fades to this (the star layer). */
   dim: number
   /** Skill dots beside the stars (large enough glyphs only). */
@@ -129,6 +179,8 @@ export type RenderStats = {
   tilePaints: number
   /** The nebula drawn with a focus ring in the last frame, or -1. */
   highlightNebula: number
+  /** Connection lines drawn in the last frame (#121). */
+  links?: { bridges: number; hints: number; lines: number; labels: number }
 }
 
 export interface StarMapRenderer {
