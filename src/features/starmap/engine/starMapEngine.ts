@@ -147,6 +147,27 @@ function layoutChecksum(map: StarMap): string {
   return sum.toString(36)
 }
 
+/**
+ * What makes two maps one sky (#123): the same galaxies, nebulae and stars at
+ * the same places. Learning states, names and prerequisites may differ (a
+ * star lit); the array objects may too -- the backend, a star-count tier or
+ * the preview's override hands over a new map on every render.
+ */
+const skyKeys = new WeakMap<StarMap, string>()
+export function skyLayoutKey(map: StarMap): string {
+  const known = skyKeys.get(map)
+  if (known !== undefined) return known
+  let sum = 0
+  const mix = (value: string) => {
+    for (let i = 0; i < value.length; i += 1) sum = (Math.imul(sum, 31) + value.charCodeAt(i)) | 0
+  }
+  for (const nebula of map.nebulae) mix(`${nebula.topicId}@${nebula.subjectId ?? ''};`)
+  for (const star of map.stars) mix(`${star.unitId}@${star.nebulaId}:${Math.round(star.x * 1e5)},${Math.round(star.y * 1e5)};`)
+  const key = `${map.nebulae.length}:${map.stars.length}:${(sum >>> 0).toString(36)}`
+  skyKeys.set(map, key)
+  return key
+}
+
 /** How strongly nebula names are drawn in each layer: dimmer around a chosen nebula, gone behind a star's card. */
 export const NEBULA_LABEL_ALPHA: Record<MapLayer, number> = { map: 1, nebula: 0.8, star: 0 }
 
@@ -248,17 +269,18 @@ export class StarMapEngine {
     const previous = this.source
     this.source = map
     // The same sky with another galaxy in focus (the switcher, or the header
-    // following a pan): keep everything drawn, and fly there if the view is
-    // not already on it.
-    if (
-      this.sky &&
-      this.map &&
-      previous &&
-      previous.stars === map.stars &&
-      previous.nebulae === map.nebulae &&
-      previous.prerequisites === map.prerequisites
-    ) {
-      this.map = map
+    // following a pan): keep the camera, and fly there if the view is not
+    // already on it. One sky is decided by its layout, never by whether the
+    // arrays are the same objects (#123): a new but equal map is the same sky.
+    if (this.sky && this.map && previous && skyLayoutKey(previous) === skyLayoutKey(map)) {
+      const centred = this.centred
+      if (previous.stars === map.stars && previous.nebulae === map.nebulae && previous.prerequisites === map.prerequisites) {
+        this.map = map
+      } else {
+        // States, names or lines may have changed: draw them, but keep the view and any flight.
+        this.load(this.target, true, true)
+        this.centred = centred
+      }
       const switched = map.subject.subjectId !== this.centred
       if (this.drewFirstFrame && target.layer === 'map' && this.target.layer === 'map' && switched) {
         this.cancelGestures()
@@ -270,7 +292,17 @@ export class StarMapEngine {
       return
     }
     // New data for the same layer (a star lit, say) keeps the view where it is.
-    this.load(target, this.drewFirstFrame && sameTarget(target, this.target))
+    const keepView = this.drewFirstFrame && sameTarget(target, this.target)
+    // Another sky with another galaxy in focus (#123: a link that drops
+    // `?points=`, an answer of another size): keeping the view would leave it
+    // on the old galaxy, and at rest the route would be put back there. Fly.
+    const refocus = keepView && this.sky && target.layer === 'map' && map.subject.subjectId !== this.centred
+    this.load(target, keepView)
+    if (refocus && this.sky && this.viewport.width > 0) {
+      this.cancelGestures()
+      this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
+      this.invalidate()
+    }
   }
 
   /** The galaxies along the band (one sky only), left to right. */
@@ -278,7 +310,7 @@ export class StarMapEngine {
     return this.skyGalaxies
   }
 
-  private load(target: LayerTarget, keepView: boolean): void {
+  private load(target: LayerTarget, keepView: boolean, keepTransition = false): void {
     const source = this.source
     if (!source) return
     const sky = this.options.galaxy === true && source.nebulae.some((nebula) => nebula.subjectId !== undefined)
@@ -385,7 +417,7 @@ export class StarMapEngine {
 
     this.target = target
     if (!keepView) this.view = this.viewFor(target)
-    this.transition = null
+    if (!keepTransition) this.transition = null
     this.invalidate()
   }
 

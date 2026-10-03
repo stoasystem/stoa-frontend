@@ -391,6 +391,53 @@ describe('across the seam: taps, the lighting overlay, the switcher, keyboard fo
     }
   })
 
+  it('flies to the clicked galaxy and stays there when each render brings an equal but new map (#123)', () => {
+    // The backend (#48), a star-count tier, the preview's override: each hands
+    // over the same sky as new arrays. Sameness is the sky's content, not identity.
+    const copy = (map: StarMap): StarMap => ({
+      ...map,
+      stars: map.stars.map((star) => ({ ...star })),
+      nebulae: map.nebulae.map((nebula) => ({ ...nebula })),
+      prerequisites: [...map.prerequisites],
+    })
+    for (const points of [10, 1000, 2000] as const) {
+      for (const to of ['physics', 'chemistry']) {
+        const s = session(1440, 900, points, 'math', false)
+        s.engine.setData(copy(skyMap(points, 'math')), { layer: 'map' })
+        s.clock.advance(100)
+        const start = s.engine.currentView.cx
+        s.engine.setData(copy(skyMap(points, to)), { layer: 'map' })
+        const moved: number[] = []
+        for (let t = 0; t < 2000; t += 16) {
+          s.clock.advance(16)
+          moved.push(s.engine.currentView.cx)
+        }
+        const galaxy = skyGalaxies(s.map).find((g) => g.subjectId === to)!
+        expect(moved.some((cx) => Math.abs(ringStep(cx - start)) > 1e-6), `${points} ${to}: the camera flew`).toBe(true)
+        expect(wrapX(s.engine.currentView.cx, SKY_WRAP)).toBeCloseTo((galaxy.x0 + galaxy.x1) / 2, 5)
+        // At rest the route is never put back on the galaxy it left.
+        expect(s.centred.mock.calls.filter(([id]) => id !== to), `${points} ${to}`).toEqual([])
+        s.engine.destroy()
+      }
+    }
+  })
+
+  it('lands on the clicked galaxy, not back on the old one, when the switch brings another sky (#123)', () => {
+    // A link that drops `?points=` (or a backend answer of another size) hands
+    // over a sky of a different layout with another galaxy in focus.
+    for (const [from, to] of [[2000, 1000], [10, 1000], [1000, 2000]] as const) {
+      const s = session(1440, 900, from, 'math', false)
+      s.clock.advance(100)
+      const sky = skyMap(to, 'physics')
+      s.engine.setData(sky, { layer: 'map' })
+      s.clock.advance(2000)
+      const galaxy = skyGalaxies(sky).find((g) => g.subjectId === 'physics')!
+      expect(wrapX(s.engine.currentView.cx, SKY_WRAP), `${from} -> ${to}`).toBeCloseTo((galaxy.x0 + galaxy.x1) / 2, 5)
+      expect(s.centred.mock.calls.filter(([id]) => id !== 'physics'), `${from} -> ${to}`).toEqual([])
+      s.engine.destroy()
+    }
+  })
+
   it('pans to a focused nebula the shorter way round', () => {
     const s = session(1440, 900, 1000, 'chemistry')
     const nebulae = orderedNebulae(s.map)
@@ -438,6 +485,32 @@ describe('keyboard across the seam (#120)', () => {
     act(() => clock.advance(20))
     return { clock, renderer, ...view }
   }
+
+  it('keeps the query on the switcher and the map links, so a switch keeps the same sky (#123)', () => {
+    const clock = fakeClock()
+    const renderer = recordingRenderer()
+    const map = skyMap(10, 'math')
+    const view = render(
+      <I18nextProvider i18n={i18n}>
+        <MemoryRouter initialEntries={['/map/math?points=10']}>
+          <div data-surface="sky" className="flex">
+            <StarMapView map={map} target={{ layer: 'map' }} onNavigate={vi.fn()} scheduler={clock} createRendererFor={() => renderer} />
+          </div>
+        </MemoryRouter>
+      </I18nextProvider>,
+    )
+    act(() => clock.advance(20))
+    for (const subject of map.subjects) {
+      // The switcher's links, by their text (role queries over every star's link are slow).
+      const links = [...view.container.querySelectorAll('a')].filter((a) => a.textContent === subject.name)
+      expect(links.length).toBeGreaterThan(0)
+      for (const link of links) expect(link.getAttribute('href')).toBe(`/map/${subject.subjectId}?points=10`)
+    }
+    const nebulaLinks = view.container.querySelectorAll('[data-nebula-link]')
+    expect(nebulaLinks.length).toBeGreaterThan(0)
+    for (const link of nebulaLinks) expect(link.getAttribute('href')).toMatch(/\?points=10$/)
+    view.unmount()
+  })
 
   it('lists every nebula once, whichever copy is drawn', () => {
     const map = skyMap(1000, 'chemistry')

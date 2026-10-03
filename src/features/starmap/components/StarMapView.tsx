@@ -12,7 +12,7 @@
 import { ChevronLeft, Minus, Plus } from 'lucide-react'
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
@@ -116,6 +116,10 @@ const OVERLAY_LINK =
 
 export function StarMapView({ map, demo = false, target, onNavigate, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
+  // The map's own links keep the query (`?points=`, the dev switches), as its
+  // navigation does: a switch must hand the engine the same sky (#123).
+  const { search } = useLocation()
+  const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -365,7 +369,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
   const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language])
-  const mapPath = pathForTarget(subjectId, { layer: 'map' })
+  const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
 
@@ -391,7 +395,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                 <h1 className="m-0 truncate text-[17px] font-bold leading-tight text-on-sky">{currentNebula.name}</h1>
               ) : (
                 <Link
-                  to={pathForTarget(subjectOfNebula(map, currentNebula.topicId), { layer: 'nebula', nebulaId: currentNebula.topicId })}
+                  to={here(pathForTarget(subjectOfNebula(map, currentNebula.topicId), { layer: 'nebula', nebulaId: currentNebula.topicId }))}
                   className={cn(OVERLAY_LINK, 'truncate text-[17px] font-bold')}
                 >
                   {currentNebula.name}
@@ -411,7 +415,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     subjects.length > 1 ? (
       <SegmentedNav
         label={t('subjects.label')}
-        items={subjects.map((subject) => ({ to: pathForTarget(subject.subjectId, { layer: 'map' }), label: subject.name, key: subject.subjectId }))}
+        items={subjects.map((subject) => ({ to: here(pathForTarget(subject.subjectId, { layer: 'map' })), label: subject.name, key: subject.subjectId }))}
         activeIndex={activeSubject}
         hitHeight={wide ? undefined : 44}
       />
@@ -487,7 +491,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                       <span className="sr-only">{nebulaText(nebula)}</span>
                     ) : (
                       <Link
-                        to={pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId })}
+                        to={here(pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId }))}
                         className="starmap-nebula-link"
                         data-nebula-link={nebula.topicId}
                         // Shown on focus as a name pill by its own nebula, inside the band
@@ -516,7 +520,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                             <li key={star.unitId}>
                               {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
                               <a
-                                href={pathForTarget(subjectOfNebula(map, star.nebulaId), to)}
+                                href={here(pathForTarget(subjectOfNebula(map, star.nebulaId), to))}
                                 className="starmap-link"
                                 data-unit={star.unitId}
                                 data-index={entry.index}
