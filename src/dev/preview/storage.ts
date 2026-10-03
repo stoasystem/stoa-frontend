@@ -31,8 +31,24 @@ class MemoryStorage implements Storage {
   }
 }
 
+let tabSession: Storage | null = null
+
+/**
+ * The tab's real `sessionStorage`, kept aside for the demo backend only
+ * (`demoSource.ts`): what the "server" remembers across a reload of this tab
+ * (#51). The app never sees it.
+ */
+export function demoServerStorage(): Storage | null {
+  return tabSession
+}
+
 /** Replaces `localStorage` and `sessionStorage` for this page. Call before the app is imported. */
 export function isolateStorage() {
+  try {
+    tabSession = window.sessionStorage
+  } catch {
+    tabSession = null
+  }
   for (const name of ['localStorage', 'sessionStorage'] as const) {
     Object.defineProperty(window, name, { configurable: true, value: new MemoryStorage() })
   }
