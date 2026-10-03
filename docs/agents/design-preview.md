@@ -29,6 +29,8 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | --- | --- | --- |
 | `login` | `/login` | 可看 |
 | `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；星层停在演示知识点上，它的星卡片「Continue」进入章节 |
+| `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
+| `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
 | `lesson` | `/chapter/demo-sine-cosine/demo-sine-cosine-2` | 可看：4 道题（单选 ×2、填空、排序），能答错、重试、答对、完成课时 |
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |

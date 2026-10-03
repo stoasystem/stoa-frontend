@@ -6,7 +6,13 @@
  * own alphas, against the sky and against stacked haze.
  *
  *   text (names, legend)        4.5:1
- *   lines and a locked star     3:1 (they carry meaning / are controls)
+ *   a locked star               3:1 (a control)
+ *   lines visible at rest that  3:1 (#121: brightness is relevance now --
+ *   carry that message              tier 1, into the recommended star, and
+ *                                   tier 2, an in-progress star to its
+ *                                   prerequisites; the path walked, lines
+ *                                   into locked stars and the panorama's
+ *                                   bridges are quiet on purpose, below it)
  */
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
@@ -15,7 +21,7 @@ import { NEBULA_LABEL_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
 import { GALAXY_HAZE_ALPHA, KNOWLEDGE_GLOW_ALPHA, NEBULA_GLOW, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
 import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
-import { linkWeight } from '@/features/starmap/model/links'
+import { LINK_INK } from '@/features/starmap/render/links'
 
 type RGBA = [number, number, number, number]
 
@@ -98,15 +104,37 @@ describe('names on the canvas keep 4.5:1', () => {
   })
 })
 
-describe('lines and locked stars keep 3:1', () => {
-  it('the weakest line between nebulae', () => {
-    const alpha = Math.max(INK.linkMinAlpha, linkWeight(1).alpha)
-    expect(contrast(over(text, sky, alpha), sky)).toBeGreaterThanOrEqual(3)
+/** A line's ink, alpha in the token, at `strength`, over `bg`. */
+const line = (name: string, bg: RGBA, strength = 1) => contrast(over(token(name), bg, strength), bg)
+
+describe('lines by tier (#121) and locked stars', () => {
+  it('the canvas falls back to exactly the sky tokens', () => {
+    const tokens = {
+      recommended: '--starmap-link-recommended',
+      inProgress: '--starmap-link-in-progress',
+      walked: '--starmap-link-walked',
+      locked: '--starmap-link-locked',
+      bridge: '--starmap-bridge',
+    } as const
+    for (const [key, name] of Object.entries(tokens)) {
+      const fallback = LINK_INK[key as keyof typeof LINK_INK].match(/[\d.]+/g)!.map(Number)
+      expect(token(name)).toEqual([fallback[0], fallback[1], fallback[2], fallback[3] ?? 1])
+    }
   })
 
-  it('prerequisite lines inside a nebula, and the weakest line between nebulae, over stacked haze', () => {
-    expect(contrast(over(text, haze, Math.max(INK.linkMinAlpha, linkWeight(1).alpha)), haze)).toBeGreaterThanOrEqual(3)
-    expect(contrast(over(text, haze, INK.innerLinkAlpha), haze)).toBeGreaterThanOrEqual(3)
+  it('the tiers seen at rest that say "now" keep 3:1, on the sky and on stacked haze', () => {
+    for (const name of ['--starmap-link-recommended', '--starmap-link-in-progress']) {
+      expect(line(name, sky)).toBeGreaterThanOrEqual(3)
+      expect(line(name, haze)).toBeGreaterThanOrEqual(3)
+    }
+  })
+
+  it('brightness falls tier by tier; the quiet tiers and the bridges stay below 3:1 on purpose', () => {
+    const tiers = ['--starmap-link-recommended', '--starmap-link-in-progress', '--starmap-link-walked'].map((name) => line(name, sky))
+    expect(tiers[0]).toBeGreaterThan(tiers[1])
+    expect(tiers[1]).toBeGreaterThan(tiers[2])
+    // Tier 4 is drawn dashed (about a third inked), so its ink may be a little stronger than tier 3's.
+    for (const name of ['--starmap-link-walked', '--starmap-link-locked', '--starmap-bridge']) expect(line(name, sky)).toBeLessThan(3)
   })
 
   it('a locked star’s ring, on the sky and on stacked haze', () => {
@@ -123,6 +151,7 @@ it('one sky (#119) keeps readable states even at a fully lit nebula’s core', (
   const peak: RGBA = [255, 255, 255, 1]
   const background = over(peak, over(peak, sky, SKY_MIST_ALPHA), KNOWLEDGE_GLOW_ALPHA)
   expect(contrast(over(text, background, LOCKED_RING_ALPHA), background)).toBeGreaterThanOrEqual(3)
-  expect(contrast(over(text, background, INK.innerLinkAlpha), background)).toBeGreaterThanOrEqual(3)
+  expect(line('--starmap-link-recommended', background)).toBeGreaterThanOrEqual(3)
+  expect(line('--starmap-link-in-progress', background)).toBeGreaterThanOrEqual(3)
   expect(contrast(over(body, background, 0.8), background)).toBeGreaterThanOrEqual(4.5)
 })

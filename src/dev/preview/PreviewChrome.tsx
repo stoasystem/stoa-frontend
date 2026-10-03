@@ -26,11 +26,13 @@ async function waitFor(selector: string, timeoutMs = 5000) {
 export function PreviewChrome({
   initialPath,
   open,
+  focus,
   pending,
   readyWhen,
 }: {
   initialPath: string
   open?: Surface['open']
+  focus?: string
   pending?: string
   readyWhen?: string
 }) {
@@ -54,6 +56,12 @@ export function PreviewChrome({
         if (trigger && !cancelled) press(trigger)
         await waitFor('[role="menu"]')
       }
+      if (focus) {
+        const element = await waitFor(focus, 10_000)
+        if (element instanceof HTMLElement && !cancelled) element.focus()
+        // A focused nebula pans into the focus region first.
+        await new Promise((resolve) => window.setTimeout(resolve, 900))
+      }
       if (readyWhen) await waitFor(readyWhen, 15_000)
       // Two frames after the last change, so the star map has drawn once.
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
@@ -62,7 +70,7 @@ export function PreviewChrome({
     return () => {
       cancelled = true
     }
-  }, [open, readyWhen])
+  }, [open, focus, readyWhen])
 
   if (!pending) return null
   return (

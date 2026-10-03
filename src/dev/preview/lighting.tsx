@@ -10,7 +10,11 @@
  *     `demoKnowledgePointState(completed)`; once it is lit, "Refraction" in
  *     physics, whose only unlit prerequisite it was, becomes ready to start,
  *     and the subject's recommendation moves on by the backend's rule (#9
- *     point 8: first in progress, else first ready, in order).
+ *     point 8: first in progress, else first ready, in order). It also
+ *     carries the demo sky's prerequisites (#121), across subjects too, as
+ *     the read model will: the connection lines are drawn from them. The
+ *     app's own route leaves them out (no backend claim, #110); only this
+ *     preview, like the bench's `&relations=fixture`, puts them in.
  *
  * `PreviewLighting` provides both around the app.
  */
@@ -44,7 +48,9 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   const isLit = (unitId: string) => (unitId === kp.unitId ? state === 'lit' : sky.stars.find((star) => star.unitId === unitId)?.state === 'lit')
   const hasPoint = map.stars.some((star) => star.unitId === kp.unitId)
   const hasBridge = map.stars.some((star) => star.unitId === DEMO_BRIDGE_STAR)
-  if (!hasPoint && !hasBridge) return map
+  // The same array every time, so a new state keeps the engine's sky (it compares by identity).
+  const prerequisites = map.prerequisites.length > 0 || map.stars.length === 0 ? map.prerequisites : sky.prerequisites
+  if (!hasPoint && !hasBridge) return { ...map, prerequisites }
 
   const remaining = kp.lessons.filter((lesson) => !completed.includes(lesson.lessonId))
   const next = remaining[0]
@@ -82,6 +88,7 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   return {
     ...map,
     stars,
+    prerequisites,
     summary: hasPoint ? { ...map.summary, lit: map.summary.lit + delta } : map.summary,
     subjects: map.subjects.map((subject) => (subject.subjectId === kp.subjectId ? { ...subject, lit: subject.lit + delta } : subject)),
   }

@@ -1,13 +1,13 @@
 /**
  * How the star map is drawn (review of #71): names placed clear of each
- * other and of what they would cover, lines faded where they cross a third
- * nebula, dots on the whole map and glyphs zoomed in, a portrait screen
+ * other and of what they would cover (the lines themselves: starmapLinks,
+ * #121), dots on the whole map and glyphs zoomed in, a portrait screen
  * getting the map turned to fill it, and stars that never crowd.
  */
 import { describe, expect, it } from 'vitest'
 import { dotBlendFor, orient, orientationFor, StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { cloudStars } from '@/features/starmap/layout/layout'
-import { aroundDisc, boxHitsSegment, placeLabel, splitByCircles } from '@/features/starmap/render/labels'
+import { aroundDisc, boxHitsSegment, placeLabel } from '@/features/starmap/render/labels'
 import { nebulaFocusSpot, NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
 import { fakeClock, recordingRenderer, THEME, skyMap } from './starmapHarness'
 
@@ -44,29 +44,6 @@ describe('placing a name', () => {
     const box = { x0: 0, y0: 0, x1: 10, y1: 10 }
     expect(boxHitsSegment(box, { x0: -5, y0: 5, x1: 15, y1: 5 })).toBe(true)
     expect(boxHitsSegment(box, { x0: -5, y0: 20, x1: 15, y1: 20 })).toBe(false)
-  })
-})
-
-describe('a line between nebulae crossing a third one', () => {
-  it('is split into the parts clear of it and the part inside it', () => {
-    const { clear, hidden } = splitByCircles({ x0: 0, y0: 0, x1: 100, y1: 0 }, [{ x: 50, y: 0, r: 10 }])
-    expect(hidden).toEqual([[0.4, 0.6]])
-    expect(clear).toEqual([
-      [0, 0.4],
-      [0.6, 1],
-    ])
-  })
-
-  it('merges overlapping nebulae and ignores ones it misses', () => {
-    const { clear, hidden } = splitByCircles({ x0: 0, y0: 0, x1: 100, y1: 0 }, [
-      { x: 40, y: 0, r: 10 },
-      { x: 55, y: 0, r: 10 },
-      { x: 50, y: 50, r: 10 },
-    ])
-    expect(hidden).toHaveLength(1)
-    expect(hidden[0][0]).toBeCloseTo(0.3, 9)
-    expect(hidden[0][1]).toBeCloseTo(0.65, 9)
-    expect(clear).toHaveLength(2)
   })
 })
 
