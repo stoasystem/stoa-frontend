@@ -6,8 +6,8 @@
  *   1. finish the demo knowledge point's remaining lessons, go back to the
  *      map from the chapter: the flare plays once on its star and the live
  *      region announces it;
- *   2. physics' Refraction now reads "Ready to start";
- *   3. Ask, opened from the map's composer: a conversation shows the lit card;
+ *   2. Ask, opened from the map's composer: a conversation shows the lit card;
+ *   3. physics' Refraction now reads "Ready to start";
  *   4. a reload of the tab does not replay it, and the star stays lit;
  *   5. with reduced motion: no animation, the announcement all the same;
  *   6. the flare on a phone, and the card in the Ask sheet.
@@ -21,7 +21,7 @@ import { setTimeout as delay } from 'node:timers/promises'
 
 const SHOTS = '.codex-screenshots/design-preview/lighting'
 
-export async function lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button }) {
+export async function lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button, settle }) {
   mkdirSync(SHOTS, { recursive: true })
   const sky = JSON.parse(readFileSync('src/features/starmap/fixtures/demo-sky.json', 'utf8'))
   const point = sky.knowledgePoint
@@ -99,24 +99,31 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     return `${files.length} frames; announced "${said}"; phases ${seen.join(' -> ')}`
   })
 
-  await flow('lighting: Refraction is now ready to start', async () => {
-    await walk.getByRole('link', { name: 'Physics', exact: true }).first().click()
-    const star = walk.locator(`a[data-unit="${bridge.unitId}"]`)
-    await star.waitFor({ state: 'attached', timeout: 8000 })
-    await delay(600)
-    const label = (await star.textContent()) ?? ''
-    if (!label.includes('Ready to start')) throw new Error(`Refraction reads "${label}"`)
-    await walk.screenshot({ path: `${SHOTS}/refraction-ready-desktop.png` })
-    return label
-  })
-
+  // Before anything reloads the page: the cards are kept in memory (store/litMomentsStore.ts).
   await flow('lighting: Ask shows the lit card', async () => {
     await openConversation(walk)
     const card = walk.locator(`[data-message-role="lit"][data-lit-unit="${point.unitId}"]`)
     await card.waitFor({ timeout: 8000 })
-    await delay(800)
+    await settle()
     await walk.screenshot({ path: `${SHOTS}/ask-card-desktop.png` })
-    return (await card.textContent())?.trim()
+    if (!(await card.isVisible())) throw new Error('the card went away')
+    const text = (await card.textContent())?.trim() ?? ''
+    if (!text.startsWith(litText)) throw new Error(`the card reads "${text}"`)
+    return text
+  })
+
+  await flow('lighting: Refraction is now ready to start', async () => {
+    // Its own nebula, opened by address: the switcher has a step of its own, and the
+    // whole sky holds Refraction's star whichever galaxy is in focus.
+    await open({ path: `/map/physics/${bridge.topicId}?points=1000` }, walk)
+    const star = walk.locator(`a[data-unit="${bridge.unitId}"]`)
+    await star.waitFor({ state: 'attached', timeout: 8000 })
+    await settle()
+    const heading = (await walk.getByRole('heading', { level: 1 }).first().textContent())?.trim()
+    const label = (await star.textContent()) ?? ''
+    if (!label.includes('Ready to start')) throw new Error(`Refraction reads "${label}"`)
+    await walk.screenshot({ path: `${SHOTS}/refraction-ready-desktop.png` })
+    return `${label} (heading "${heading}")`
   })
 
   await flow('lighting: a reload does not replay it', async () => {
@@ -124,16 +131,20 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     await delay(3000)
     const seen = await phases(walk)
     const said = await announced(walk)
-    const lit = await walk.getByText(/· Lit$/).count()
+    // The card open is the demo point's own, and it reads Lit.
+    const named = await walk.getByRole('heading', { name: point.name.en }).first().isVisible().catch(() => false)
+    const state = (await walk.getByText(/· (Lit|In progress|Ready to start|Locked)$/).first().textContent().catch(() => '')) ?? ''
     await walk.screenshot({ path: `${SHOTS}/after-reload-desktop.png` })
     if (seen.some((phase) => phase !== 'idle') || said) throw new Error(`phases ${seen.join(',')}; announced "${said}"`)
-    if (!lit) throw new Error('the star is not lit after the reload')
-    return `phases ${seen.join(' -> ')}; the star card still reads Lit`
+    if (!named || !state.endsWith('· Lit')) throw new Error(`the card ${named ? '' : 'of another star '}reads "${state}" after the reload`)
+    return `phases ${seen.join(' -> ')}; the star card reads "${state}"`
   })
 
   await flow('lighting: Refraction\'s star card reads Ready to start', async () => {
     await open({ path: `/map/physics/${bridge.topicId}/${bridge.unitId}` }, walk)
-    await delay(800)
+    const card = walk.getByRole('heading', { name: bridge.name.en })
+    await card.first().waitFor({ timeout: 8000 })
+    await settle()
     const ready = await walk.getByText(/· Ready to start$/).count()
     await walk.screenshot({ path: `${SHOTS}/refraction-card-desktop.png` })
     if (!ready) throw new Error('the card does not read Ready to start')
@@ -145,6 +156,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
   const reduced = await tab({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
   await flow('lighting: reduced motion, no animation, still announced', async () => {
     await open({ surface: 'lighting' }, reduced.page)
+    await settle()
     const seen = await phases(reduced.page)
     const said = await announced(reduced.page)
     await reduced.page.screenshot({ path: `${SHOTS}/reduced-motion-desktop.png` })
@@ -161,11 +173,15 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     const files = await frames(phone.page, 'phone')
     await phone.page.waitForSelector('[data-lighting="done"]', { timeout: 10_000 })
     await phone.page.screenshot({ path: `${SHOTS}/phone-after.png` })
+    const said = await announced(phone.page)
+    if (said !== litText) throw new Error(`announced "${said}"`)
     await openConversation(phone.page)
-    await phone.page.locator('[data-message-role="lit"]').waitFor({ timeout: 8000 })
-    await delay(800)
+    const card = phone.page.locator(`[data-message-role="lit"][data-lit-unit="${point.unitId}"]`)
+    await card.waitFor({ timeout: 8000 })
+    await settle()
     await phone.page.screenshot({ path: `${SHOTS}/ask-card-phone.png` })
-    return `${files.length} frames; announced "${await announced(phone.page)}"`
+    if (!(await card.isVisible())) throw new Error('the card is not on screen in the sheet')
+    return `${files.length} frames; announced "${said}"; the card in the sheet`
   })
   await collect(phone.page)
   await phone.context.close()

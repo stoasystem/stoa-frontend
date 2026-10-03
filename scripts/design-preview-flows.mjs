@@ -11,12 +11,18 @@
  * log out from the account menu; open the bell; switch subject. Then the
  * lighting moment (#51), in `design-preview-lighting-flows.mjs`.
  *
+ * Each step asserts its end state on screen after a settle delay (#123): the
+ * header still on the galaxy clicked 2 s later, the message still in the
+ * thread once its answer is done, and so on -- a state that is reached and
+ * then lost fails.
+ *
  * The page after finishing the lesson is saved as
  * .codex-screenshots/design-preview/flows/lesson-finished.png.
  *
  * Fails (exit 1) on a failed flow, a request outside the dev server, a request
  * the preview had no demo answer for, or a console error or warning.
  */
+import { readFileSync } from 'node:fs'
 import { setTimeout as delay } from 'node:timers/promises'
 import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
@@ -31,6 +37,10 @@ function option(name, fallback) {
 
 const base = new URL(option('base', 'http://127.0.0.1:5173'))
 const API = 'https://api.design-preview.invalid'
+const POINT = JSON.parse(readFileSync('src/features/starmap/fixtures/demo-sky.json', 'utf8')).knowledgePoint
+/** How long a step's end state must hold before it counts: what snaps back, or goes away, fails. */
+const SETTLE_MS = 2000
+const settle = (ms = SETTLE_MS) => delay(ms)
 const leaks = []
 const unanswered = []
 const problems = []
@@ -122,19 +132,28 @@ try {
     await page.locator('input[type="email"], input[name="email"]').first().fill('lena.muster@example.com')
     await page.locator('input[type="password"]').first().fill('design-preview')
     await page.getByRole('button', { name: /sign in/i }).click()
-    await page.waitForFunction(() => !new URL(window.location.href).searchParams.get('path')?.startsWith('/login'), null, { timeout: 8000 })
     await page.locator('[data-account-trigger]').first().waitFor({ timeout: 8000 })
-    return `now at ${await route()}`
+    await settle()
+    // Still signed in, and off the login page, once it has settled.
+    if (!(await page.locator('[data-account-trigger]').first().isVisible())) throw new Error('signed out again')
+    if (await page.locator('input[type="password"]').count()) throw new Error('the login form is still on screen')
+    const at = await route()
+    if (at?.startsWith('/login')) throw new Error(`still at ${at}`)
+    return `now at ${at}`
   })
 
   await open({ surface: 'map-star', points: 1000 })
   await flow('star card of the demo knowledge point opens its chapter', async () => {
-    const link = page.locator('a[href^="/chapter/"]').first()
+    const link = page.locator(`a[href^="/chapter/${POINT.unitId}"]`).first()
     await link.waitFor({ timeout: 8000 })
     await link.click()
-    await page.waitForFunction(() => new URL(window.location.href).searchParams.get('path')?.startsWith('/chapter/'), null, { timeout: 8000 })
-    await page.getByRole('heading').first().waitFor()
-    return `${await route()}`
+    await page.waitForFunction((unitId) => new URL(window.location.href).searchParams.get('path')?.startsWith(`/chapter/${unitId}`), POINT.unitId, { timeout: 8000 })
+    await settle()
+    const at = await route()
+    if (at !== `/chapter/${POINT.unitId}`) throw new Error(`settled at ${at}`)
+    const heading = (await page.getByRole('heading', { level: 1 }).first().textContent())?.trim()
+    if (heading !== POINT.name.en) throw new Error(`the chapter's heading reads "${heading}"`)
+    return `${at}, "${heading}"`
   })
 
   // The lesson the chapter goes on with, as the chapter itself finds it.
@@ -161,49 +180,84 @@ try {
       const last = index === lesson.challenges.length - 1
       await button(last ? 'Finish lesson' : 'Next question').click()
     }
-    await delay(1000)
-    await page.screenshot({ path: '.codex-screenshots/design-preview/flows/lesson-finished.png' })
-    const journal = await page.evaluate(() => window.__stoaPreview.answered)
-    const completed = journal.find((entry) => entry.url === `/practice/lessons/${lessonId}/complete`)
-    if (!completed || completed.status !== 200) throw new Error('the lesson was not completed')
     const expected = lesson.challenges.flatMap(() => ['wrong', 'correct'])
     if (JSON.stringify(verdicts) !== JSON.stringify(expected)) throw new Error(`verdicts ${verdicts.join(',')}`)
-    // The chapter counts it: the roadmap the chapter reads, in this same page.
-    const roadmap = await page.evaluate(async ([api, l]) => (await fetch(`${api}/practice/${l.subjectId}/${l.topicId}/roadmap`)).json(), [API, lesson])
-    const lessons = roadmap.units[0].lessons
-    if (lessons.find((item) => item.id === lessonId)?.status !== 'completed') throw new Error('the roadmap does not count the lesson')
-    const done = lessons.filter((item) => item.status === 'completed').length
-    return `${lesson.challenges.length} exercises (${lesson.challenges.map((c) => c.type).join(', ')}); roadmap ${done} of ${lessons.length} done; page now at ${await route()}`
+    // On screen: the lesson's result, still there once it has settled.
+    await page.getByRole('heading', { name: 'Lesson complete' }).waitFor({ timeout: 8000 })
+    await settle()
+    await page.screenshot({ path: '.codex-screenshots/design-preview/flows/lesson-finished.png' })
+    if (!(await page.getByRole('heading', { name: 'Lesson complete' }).isVisible())) throw new Error('the result went away')
+    const counted = (await page.getByText(/^\d+ of \d+ lessons in .* done$/).first().textContent())?.trim()
+    const position = POINT.lessons.findIndex((item) => item.lessonId === lessonId)
+    if (counted !== `${position + 1} of ${POINT.lessons.length} lessons in ${POINT.name.en} done`) throw new Error(`the result reads "${counted}"`)
+    // And the chapter, back on screen, goes on with the lesson after it.
+    await page.getByRole('link', { name: 'Back to the chapter' }).click()
+    const following = POINT.lessons[position + 1]
+    const go = page.getByRole('link', { name: /^Continue:/ }).first()
+    await go.waitFor({ timeout: 8000 })
+    await settle()
+    const href = await go.getAttribute('href')
+    if (following && !href?.endsWith(`/${following.lessonId}`)) throw new Error(`the chapter continues with ${href}`)
+    return `${lesson.challenges.length} exercises (${lesson.challenges.map((c) => c.type).join(', ')}); "${counted}"; the chapter continues with ${href}`
   })
 
   await open({ surface: 'ask-conversation', points: 1000 })
-  await flow('Ask sends a message and streams the answer', async () => {
+  await flow('Ask sends a message, the answer streams in, both stay in the thread', async () => {
+    const question = 'Why is sin 30° one half, again?'
     const box = page.getByPlaceholder(/message/i).first()
-    await box.fill('Why is sin 30° one half?')
+    await box.fill(question)
     await box.press('Enter')
     await page.getByText(/no assistant is answering/).first().waitFor({ timeout: 8000 })
+    // Past the answer's command and the conversation read back (the local bubbles are dropped then).
+    await settle(7000)
+    // In the thread's bubbles (the live region says the answer too, unseen).
+    const asked = page.locator('[data-message-role="student"]').filter({ hasText: question })
+    const answered = page.locator('[data-message-role="assistant"]').filter({ hasText: /no assistant is answering/ })
+    if ((await asked.count()) !== 1 || !(await asked.first().isVisible())) throw new Error(`the question is on screen ${await asked.count()} times`)
+    if ((await answered.count()) !== 1 || !(await answered.first().isVisible())) throw new Error(`the answer is on screen ${await answered.count()} times`)
+    return 'question and answer once each, after 7 s'
   })
 
   await open({ surface: 'account-menu' })
   await flow('account menu logs out', async () => {
     await page.getByRole('menuitem', { name: /log out/i }).click()
     await page.waitForFunction(() => new URL(window.location.href).searchParams.get('path')?.startsWith('/login'), null, { timeout: 10_000 })
+    await settle()
+    if (!(await page.locator('input[type="password"]').first().isVisible())) throw new Error('no login form')
+    if (await page.locator('[data-account-trigger]').count()) throw new Error('the account menu is still there')
+    return `${await route()}`
   })
 
   await open({ surface: 'map', points: 2000 })
-  await flow('the bell opens', async () => {
-    await page.locator('[data-top-bar] button').filter({ hasNot: page.locator('[data-account-trigger]') }).first().click()
-    await delay(500)
+  await flow('the bell opens its notifications, Escape closes them', async () => {
+    const bell = page.getByRole('button', { name: /^Notifications/ })
+    await bell.click()
+    const panel = page.getByText('Notifications', { exact: true })
+    await panel.waitFor({ timeout: 5000 })
+    await settle(500)
+    if ((await bell.getAttribute('aria-expanded')) !== 'true' || !(await panel.isVisible())) throw new Error('the notifications did not open')
     await page.keyboard.press('Escape')
+    await settle(500)
+    if ((await bell.getAttribute('aria-expanded')) === 'true' || (await panel.isVisible())) throw new Error('Escape did not close them')
+    return 'opened, then closed'
   })
-  await flow('subject switch', async () => {
+  // Expected to FAIL until the star map engine's fix lands (another branch of
+  // #123): the switcher snaps back to the galaxy it left.
+  await flow('subject switch: the header stays on the galaxy clicked [FAILS until the engine snap-back fix is merged]', async () => {
     await page.getByRole('link', { name: 'Physics', exact: true }).first().click()
     await page.waitForFunction(() => new URL(window.location.href).searchParams.get('path')?.includes('physics'), null, { timeout: 5000 })
-    return `${await route()}`
+    await settle()
+    const heading = (await page.getByRole('heading', { level: 1 }).first().textContent())?.trim()
+    const current = (await page.locator('a[aria-current="page"][href^="/map/"]').first().textContent())?.trim()
+    const at = await route()
+    if (heading !== 'Physics' || current !== 'Physics' || !at?.startsWith('/map/physics')) {
+      throw new Error(`2 s later: heading "${heading}", switcher on "${current}", at ${at}`)
+    }
+    return `${at}`
   })
   await collect()
 
-  await lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button })
+  await lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button, settle })
 } finally {
   await browser.close()
 }
