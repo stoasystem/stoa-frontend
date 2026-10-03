@@ -5,7 +5,8 @@ import { NOT_ENROLLED_DIM } from '@/features/starmap/view/sky'
 import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
-import { belongsTo, boxHitsSegment, nebulaConnection, placeLabel } from '@/features/starmap/render/labels'
+import { belongsTo, boxHitsSegment, placeLabel } from '@/features/starmap/render/labels'
+import { bridgeAxis } from '@/features/starmap/render/links'
 import { createTileCache, tileSizeFor } from '@/features/starmap/render/nebulaTiles'
 import { nebulaFocusSpot } from '@/features/starmap/view/layers'
 import type { SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
@@ -40,9 +41,10 @@ describe('visual acceptance geometry (#76, #109)', () => {
       const nebulae = orderedNebulae(s.map)
       const names = nebulae.map((n) => n.name.toLocaleUpperCase())
       const circles = nebulae.map((_, n) => ({ x: f.nebulaX[n], y: f.nebulaY[n], r: f.nebulaR[n] }))
-      const segments = nebulaLinks(s.map).flatMap((link) => nebulaConnection(
+      // The panorama's soft bridges (#121), one per related pair of nebulae.
+      const segments = nebulaLinks(s.map).flatMap((link) => bridgeAxis(
         circles[nebulae.findIndex((n) => n.topicId === link.a)],
-        circles[nebulae.findIndex((n) => n.topicId === link.b)], Math.max(10, f.glyphSize * 0.65)).segments)
+        circles[nebulae.findIndex((n) => n.topicId === link.b)]) ?? [])
       const labels = s.counter.texts!.filter((t) => names.includes(t.text))
       expect(labels.length).toBeGreaterThan(0)
       if (width < 768) expect(labels.length).toBeLessThanOrEqual(4)
@@ -67,15 +69,12 @@ describe('visual acceptance geometry (#76, #109)', () => {
     expect(belongsTo({ x0: 0, x1: 80, y0: 0, y1: 16 }, { x: 0, y: 0, r: 10 }, [{ x: 100, y: 0, r: 10 }])).toBe(false)
   })
 
-  it('bridges a tiny rim gap with a visible curve and anchors outside the outermost stars', () => {
-    const a = { x: 0, y: 0, r: 50 }, b = { x: 130, y: 0, r: 50 }
-    const path = nebulaConnection(a, b, 14)
-    expect(path.bridge).toBe(true)
-    const first = path.segments[0], last = path.segments[path.segments.length - 1]
-    expect(Math.hypot(first.x0 - a.x, first.y0 - a.y)).toBeCloseTo(64)
-    expect(Math.hypot(last.x1 - b.x, last.y1 - b.y)).toBeCloseTo(64)
-    expect(path.segments.reduce((sum, s) => sum + Math.hypot(s.x1 - s.x0, s.y1 - s.y0), 0)).toBeGreaterThan(24)
-    expect(nebulaConnection(a, { ...b, x: 300 }, 14).bridge).toBe(false)
+  it('trims a bridge into both clouds, and leaves out one between clouds that touch (#121)', () => {
+    const a = { x: 0, y: 0, r: 50 }, b = { x: 300, y: 0, r: 50 }
+    const axis = bridgeAxis(a, b)!
+    expect(axis.x0).toBeCloseTo(27.5)
+    expect(axis.x1).toBeCloseTo(272.5)
+    expect(bridgeAxis(a, { ...b, x: 80 })).toBeNull()
   })
 
   it('names related destinations beyond the viewport in the nebula layer', () => {

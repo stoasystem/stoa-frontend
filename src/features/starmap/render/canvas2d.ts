@@ -2,17 +2,17 @@
  * The Canvas 2D renderer (#11 point 1, kept by #72).
  *
  * A frame is: the sky; every nebula's haze; the blurred stars of nebulae
- * outside the focus (one tile each); the lines between nebulae, faded where
- * they cross a third nebula; then, for the focus only, one sprite per star
+ * outside the focus (one tile each); the connection lines (`render/links.ts`,
+ * #121); then, for the focus only, one sprite per star
  * (a small dot on the whole map, a full glyph zoomed in), the few marks that
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
-import { aroundDisc, belongsTo, boxHitsCircle, nebulaConnection, placeLabel, splitByCircles, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, GALAXY_HAZE_ALPHA, galaxyHazeBox, NEBULA_GLOW, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
-import { linkWeight } from '@/features/starmap/model/links'
+import { drawLinks } from '@/features/starmap/render/links'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
 import {
@@ -140,11 +140,6 @@ const DOT: Record<number, { lit: boolean; alpha: number; radius: number; glow: b
 export const INK = {
   /** Nebula names: body white, over a sky-coloured outline so neighbouring haze never lowers them. */
   nebulaName: { alpha: 1, outline: 3 },
-  /** A line between nebulae: at least 42% white (3.8:1 on the sky); faded to a quarter inside a third nebula. */
-  linkMinAlpha: 0.42,
-  linkInsideFactor: 0.25,
-  /** Prerequisite lines inside a nebula. */
-  innerLinkAlpha: 0.42,
 } as const
 
 /** How far past the viewport the cached light of one sky reaches, as a share of the longer side. */
@@ -496,58 +491,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         stats.highlightNebula = -1
       }
 
-      // Lines between nebulae, from rim to rim, faded where they cross a third nebula.
+      // Connection lines (#121): by layer and tier, in their own module. Names keep clear of what it lists.
       const segments: Segment[] = []
       const cores: Circle[] = []
       for (let n = 0; n < nebulaCount; n += 1) cores.push({ x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] * 0.9 })
-      ctx.lineCap = 'round'
-      ctx.strokeStyle = colours.text
-      const offscreen: { name: string; arrow: string; x: number; y: number }[] = []
-      for (const link of scene.links) {
-        // One sky: no lines on the whole map (#117 D1; their tiers are #121).
-        if (scene.galaxy && frame.chosenNebula < 0) break
-        if (frame.chosenNebula >= 0 && link.a !== frame.chosenNebula && link.b !== frame.chosenNebula) continue
-        const a = { x: nebulaX[link.a], y: nebulaY[link.a], r: nebulaR[link.a] }
-        const b = { x: nebulaX[link.b], y: nebulaY[link.b], r: nebulaR[link.b] }
-        const path = nebulaConnection(a, b, Math.max(10, frame.glyphSize * 0.65))
-        const others = cores.filter((_, n) => n !== link.a && n !== link.b)
-        const weight = linkWeight(link.count)
-        const alpha = Math.max(INK.linkMinAlpha, weight.alpha) * frame.dim
-        const clearParts: Segment[] = [], hiddenParts: Segment[] = []
-        for (const line of path.segments) {
-          const { clear, hidden } = splitByCircles(line, others)
-          for (const [spans, parts] of [[clear, clearParts], [hidden, hiddenParts]] as const) {
-            for (const [t0, t1] of spans) parts.push({
-              x0: line.x0 + (line.x1 - line.x0) * t0, y0: line.y0 + (line.y1 - line.y0) * t0,
-              x1: line.x0 + (line.x1 - line.x0) * t1, y1: line.y0 + (line.y1 - line.y0) * t1,
-            })
-          }
-          segments.push(line) // Even the faint part is forbidden to labels.
-        }
-        const stroke = (parts: Segment[], strength: number, width: number) => {
-          ctx.globalAlpha = strength
-          ctx.lineWidth = width
-          ctx.beginPath()
-          for (const line of parts) {
-            ctx.moveTo(line.x0, line.y0)
-            ctx.lineTo(line.x1, line.y1)
-          }
-          ctx.stroke() // One composite: adjacent curve segments cannot pile up opaque caps.
-        }
-        if (path.bridge) stroke(clearParts, 0.12 * frame.dim, 5)
-        stroke(clearParts, alpha, weight.width)
-        if (hiddenParts.length) stroke(hiddenParts, alpha * INK.linkInsideFactor, weight.width)
-        if (frame.chosenNebula >= 0) {
-          const dest = link.a === frame.chosenNebula ? link.b : link.a
-          const cx = nebulaX[frame.chosenNebula], cy = nebulaY[frame.chosenNebula]
-          const dx = nebulaX[dest] - cx, dy = nebulaY[dest] - cy
-          const top = viewport.top ?? 0, bottom = height - (viewport.bottom ?? 0)
-          if (nebulaX[dest] >= 0 && nebulaX[dest] <= width && nebulaY[dest] >= top && nebulaY[dest] <= bottom) continue
-          const hit = Math.min(dx > 0 ? (width - 16 - cx) / dx : dx < 0 ? (16 - cx) / dx : Infinity,
-            dy > 0 ? (bottom - 24 - cy) / dy : dy < 0 ? (top + 16 - cy) / dy : Infinity)
-          if (hit > 0 && Number.isFinite(hit)) offscreen.push({ name: scene.nebulae[dest].name, arrow: dy < 0 ? (dx < 0 ? '↖' : '↗') : (dx < 0 ? '↙' : '↘'), x: cx + dx * hit, y: cy + dy * hit })
-        }
-      }
+      const placed: Box[] = []
+      stats.links = drawLinks(ctx, scene, frame, colours, { segments, boxes: placed })
 
       const breath = frame.breath
       const glyphs = 1 - frame.dotBlend
@@ -564,28 +513,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const beacons = new Set(scene.recommendations ?? (scene.recommended >= 0 ? [scene.recommended] : []))
       const isBeacon = (i: number) => beacons.has(i)
       const beaconSize = frame.dotBlend > 0.5 ? 12 : Math.min(frame.glyphSize, 32)
-
-      // Prerequisite lines inside the chosen nebula, trimmed clear of both stars.
-      if (frame.innerLinkAlpha > 0.01 && frame.chosenNebula >= 0) {
-        ctx.strokeStyle = colours.text
-        ctx.lineWidth = 1
-        const trim = Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + 2
-        ctx.globalAlpha = frame.innerLinkAlpha * INK.innerLinkAlpha * frame.dim
-        ctx.beginPath()
-        for (const link of scene.innerLinks) {
-          if (link.nebula !== frame.chosenNebula) continue
-          const dx = x[link.to] - x[link.from]
-          const dy = y[link.to] - y[link.from]
-          const d = Math.hypot(dx, dy)
-          if (d <= trim * 2) continue
-          const line = { x0: x[link.from] + (dx / d) * trim, y0: y[link.from] + (dy / d) * trim,
-            x1: x[link.to] - (dx / d) * trim, y1: y[link.to] - (dy / d) * trim }
-          ctx.moveTo(line.x0, line.y0)
-          ctx.lineTo(line.x1, line.y1)
-          segments.push(line)
-        }
-        ctx.stroke()
-      }
 
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.
       for (let i = 0; i < count; i += 1) {
@@ -682,7 +609,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
       // Names. Each stays by its own nebula or star; a name with no free
       // place is left out, and one whose nebula is off screen is not drawn.
-      const placed: Box[] = []
       // Names stay out of the bands the page keeps for its own controls: the
       // placer only considers spots inside this area.
       const labelArea: Box = { x0: 0, y0: viewport.top ?? 0, x1: width, y1: height - (viewport.bottom ?? 0) }
@@ -750,26 +676,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           outlinedText(text, (box.x0 + box.x1) / 2, box.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
         }
         setLetterSpacing('0px')
-      }
-
-      if (offscreen.length && frame.chosenNebula >= 0 && frame.nebulaLabelAlpha > 0.01) {
-        setFont(12, 500)
-        ctx.textBaseline = 'middle'
-        ctx.textAlign = 'center'
-        for (const destination of offscreen) {
-          let text = `${destination.arrow} ${destination.name}`
-          while (ctx.measureText(text).width > Math.min(180, width - 40) && text.length > 5) text = `${text.slice(0, -2)}…`
-          const half = ctx.measureText(text).width / 2 + 8
-          const px = Math.max(half + 12, Math.min(width - half - 12, destination.x))
-          const py = Math.max(labelArea.y0 + 14, Math.min(labelArea.y1 - 14, destination.y))
-          const box = { x0: px - half, y0: py - 12, x1: px + half, y1: py + 12 }
-          if (placed.some((b) => b.x0 < box.x1 && b.x1 > box.x0 && b.y0 < box.y1 && b.y1 > box.y0)) continue
-          placed.push(box)
-          ctx.globalAlpha = 1
-          ctx.fillStyle = colours.sky
-          ctx.fillRect(box.x0, box.y0, half * 2, 24)
-          outlinedText(text, px, py, colours.textBody, colours.sky, 3)
-        }
       }
 
       // The frame before a layer change, fading out over this one.

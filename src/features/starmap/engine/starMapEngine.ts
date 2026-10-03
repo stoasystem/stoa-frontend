@@ -10,7 +10,7 @@
  * reduced motion, or while the map is paused (hidden tab, `inert` page area),
  * asks for none.
  */
-import { innerLinks, nebulaLinks } from '@/features/starmap/model/links'
+import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
 import { LEARNING_STATES, orderedNebulae, orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
 import type { SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
@@ -317,9 +317,7 @@ export class StarMapEngine {
       links: nebulaLinks(map)
         .map((link) => ({ a: this.nebulaIndex.get(link.a) ?? -1, b: this.nebulaIndex.get(link.b) ?? -1, count: link.count }))
         .filter((link) => link.a >= 0 && link.b >= 0),
-      innerLinks: this.nebulaIds.flatMap((id, n) =>
-        innerLinks(map, id).map((edge) => ({ from: starIndex.get(edge.from) ?? -1, to: starIndex.get(edge.to) ?? -1, nebula: n })),
-      ).filter((edge) => edge.from >= 0 && edge.to >= 0),
+      starLinks: starLinkIndices(map, starIndex),
     }
     this.stars.forEach((star, i) => {
       scene.mapX[i] = star.x
@@ -868,6 +866,7 @@ export class StarMapEngine {
       starLabelAlpha,
       nebulaLabelAlpha: lerp(nebulaLabels(from), nebulaLabels(to)),
       innerLinkAlpha: starLabelAlpha,
+      starLayer: lerp(from === 'star' ? 1 : 0, to === 'star' ? 1 : 0),
       chosenNebula: chosen,
       focusStar,
       hoveredNebula: this.hoveredNebula,

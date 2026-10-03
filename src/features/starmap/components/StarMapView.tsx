@@ -22,6 +22,7 @@ import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarO
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
+import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, pathForTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { cn } from '@/lib/utils'
@@ -36,6 +37,7 @@ const THEME_FALLBACK: StarMapTheme = {
   textBody: 'rgba(255, 255, 255, 0.75)',
   textCaption: 'rgba(255, 255, 255, 0.65)',
   fontFamily: 'system-ui, sans-serif',
+  links: LINK_INK,
 }
 
 /** The sky tokens as the canvas needs them, read where `data-surface="sky"` defines them. */
@@ -51,6 +53,13 @@ function readTheme(element: Element): StarMapTheme {
     textBody: read('--on-sky-text-body', THEME_FALLBACK.textBody),
     textCaption: read('--on-sky-text-caption', THEME_FALLBACK.textCaption),
     fontFamily: read('--font-system', THEME_FALLBACK.fontFamily),
+    links: {
+      recommended: read('--starmap-link-recommended', LINK_INK.recommended),
+      inProgress: read('--starmap-link-in-progress', LINK_INK.inProgress),
+      walked: read('--starmap-link-walked', LINK_INK.walked),
+      locked: read('--starmap-link-locked', LINK_INK.locked),
+      bridge: read('--starmap-bridge', LINK_INK.bridge),
+    },
   }
 }
 

@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { cloudStars, galaxyOrder, layoutNebulae, layoutSky } from '@/features/starmap/layout/layout'
-import { innerLinks, linkWeight, nebulaLinks } from '@/features/starmap/model/links'
+import { linkWeight, nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
 import type { StarMap } from '@/features/starmap/model/starMap'
 import { panBy, toMap, toScreen, transformOf, type View } from '@/features/starmap/view/camera'
 import { createInertia, DEFAULT_INERTIA } from '@/features/starmap/view/inertia'
@@ -205,12 +205,15 @@ describe('links from prerequisites (#72 points 2 and 3)', () => {
     expect(nebulaLinks(extra).find((l) => l.a === first.a && l.b === first.b)?.count).toBe(first.count + 1)
   })
 
-  it('keeps a nebula’s own prerequisites for when it is zoomed into', () => {
-    const inner = map.prerequisites.filter(({ from, to }) => nebulaOf.get(from) === nebulaOf.get(to))
-    expect(inner.length).toBeGreaterThan(0)
-    for (const topic of new Set(map.stars.map((s) => s.nebulaId))) {
-      expect(innerLinks(map, topic)).toEqual(inner.filter(({ from }) => nebulaOf.get(from) === topic))
-    }
+  it('keeps every prerequisite between stars, inside nebulae and across them (#121), by star index', () => {
+    const index = new Map(map.stars.map((s, i) => [s.unitId, i]))
+    const pairs = starLinkIndices(map, index)
+    expect(pairs).toEqual(map.prerequisites.map(({ from, to }) => ({ from: index.get(from), to: index.get(to) })))
+    expect(pairs.some(({ from, to }) => nebulaOf.get(map.stars[from].unitId) === nebulaOf.get(map.stars[to].unitId))).toBe(true)
+    expect(pairs.some(({ from, to }) => nebulaOf.get(map.stars[from].unitId) !== nebulaOf.get(map.stars[to].unitId))).toBe(true)
+    // Unknown units and self-loops are left out.
+    const extra = { prerequisites: [...map.prerequisites, { from: 'u-404', to: map.stars[0].unitId }, { from: map.stars[0].unitId, to: map.stars[0].unitId }] }
+    expect(starLinkIndices(extra, index)).toEqual(pairs)
     expect(nebulaLinks(map).some((l) => l.a === l.b)).toBe(false)
   })
 
