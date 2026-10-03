@@ -6,13 +6,16 @@
  *     points this student has not acknowledged. Only `observed` ones are
  *     celebrated; the backfill's never are. A point waits until the map it
  *     is on is open and draws it lit.
- *   - The animation (`flare.ts`) runs on this layer's own canvas, above the
- *     map's, following the star while the map settles. With reduced motion
- *     there is none: the star simply is lit.
- *   - Either way an `aria-live` region says "<name> is lit".
- *   - Once shown, the point is acknowledged to the source, so a reload does
- *     not replay it, and the moment is handed to Ask as a card
- *     (`store/litMomentsStore.ts`).
+ *   - It waits until the star is on screen: in the galaxy in focus, inside
+ *     the map's frame. Then the animation (`flare.ts`) runs on this layer's
+ *     own canvas, above the map's, following the star while the map
+ *     settles. With reduced motion there is none: the star simply is lit.
+ *   - Either way an `aria-live` region says "<name> is lit" at that moment.
+ *   - Only once shown (the flare played to its end, or with reduced motion
+ *     announced) is the point acknowledged to the source, so a reload does
+ *     not replay it, and the moment handed to Ask as a card
+ *     (`store/litMomentsStore.ts`). A star never brought on screen, or a map
+ *     left mid-flare, is not acknowledged: it comes back next time.
  *
  * `data-lighting` on the root says `idle`, `playing` or `done` (at least one
  * moment shown), for the design preview's screenshots.
@@ -29,10 +32,8 @@ import { useLitMomentsStore } from '@/store/litMomentsStore'
 
 /** Time for the map to finish arriving (a layer flight) before the flare starts. */
 export const SETTLE_MS = 450
-/** How long to wait for the star to be on screen before letting the animation go. */
-const FIND_STAR_MS = 4000
 
-type Moment = { event: LitEvent; star: Star }
+type Moment = { event: LitEvent; star: Star; subjectId: string }
 
 export type LightingOverlayProps = {
   map: StarMap
@@ -53,6 +54,7 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
   const handled = useRef(new Set<string>())
   const [pending, setPending] = useState<LitEvent[]>([])
   const [current, setCurrent] = useState<Moment | null>(null)
+  const [playing, setPlaying] = useState(false)
   const [shown, setShown] = useState(0)
   const [announcement, setAnnouncement] = useState('')
 
@@ -75,6 +77,14 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
 
   const starsById = useMemo(() => new Map(map.stars.map((star) => [star.unitId, star])), [map])
 
+  // The galaxy in focus now, for the frame loop: a moment still waiting for its star goes back
+  // to the queue when the student flies to another galaxy.
+  const focus = map.subject.subjectId
+  const focusRef = useRef(focus)
+  useEffect(() => {
+    focusRef.current = focus
+  }, [focus])
+
   // The next moment: a point seen lit, in the galaxy in focus, drawn lit, not shown yet. The map
   // holds the whole sky (#119), so another galaxy's star is on it too; it waits for its own.
   useEffect(() => {
@@ -85,18 +95,14 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
       const subjectId = subjectOfNebula(map, star.nebulaId)
       if (subjectId !== map.subject.subjectId) continue
       handled.current.add(event.unitId)
-      setAnnouncement(t('lighting.announce', { name: star.name }))
-      source.acknowledge([event.unitId]).catch(() => {})
-      if (ownerId) {
-        addMoment(ownerId, { unitId: star.unitId, name: star.name, subjectId, nebulaId: star.nebulaId, litAt: event.litAt })
-      }
-      if (reducedMotion) setShown((count) => count + 1)
-      else setCurrent({ event, star })
+      setCurrent({ event, star, subjectId })
       return
     }
-  }, [pending, starsById, current, reducedMotion, source, ownerId, addMoment, map, t])
+  }, [pending, starsById, current, map])
 
-  // The flare, frame by frame, wherever the star is drawn now.
+  // The moment, frame by frame: wait until the star is on screen, then play the flare there (or,
+  // with reduced motion, only say it). Acknowledged once it has been shown, never before: a star
+  // panned away, a map left mid-flare or another galaxy flown to leaves it for next time.
   useEffect(() => {
     const canvas = canvasRef.current
     if (!current || !canvas) return
@@ -105,28 +111,47 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
       lit: getComputedStyle(canvas).getPropertyValue('--lit').trim() || '#F2C572',
       core: getComputedStyle(canvas).getPropertyValue('--lit-core').trim() || '#FFF8EA',
     }
-    const now = scheduler.now ?? (() => performance.now())
-    const askedAt = now()
+    const { event, star, subjectId } = current
     let startAt: number | null = null
     let handle: number | null = null
     let finished = false
 
-    const finish = () => {
+    const onScreen = (spot: StarOnScreen | null): spot is StarOnScreen => {
+      const width = canvas.clientWidth
+      const height = canvas.clientHeight
+      return spot !== null && !document.hidden && width > 0 && height > 0 && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
+    }
+
+    const end = (seen: boolean) => {
       if (finished) return
       finished = true
       ctx?.clearRect(0, 0, canvas.width, canvas.height)
       if (captionRef.current) captionRef.current.style.opacity = '0'
+      if (seen) {
+        source.acknowledge([event.unitId]).catch(() => {})
+        if (ownerId) addMoment(ownerId, { unitId: star.unitId, name: star.name, subjectId, nebulaId: star.nebulaId, litAt: event.litAt })
+        setShown((count) => count + 1)
+      } else {
+        handled.current.delete(event.unitId)
+      }
+      setPlaying(false)
       setCurrent(null)
-      setShown((count) => count + 1)
     }
 
     const frame = (at: number) => {
       handle = null
-      const spot = locate(current.star.unitId)
+      const spot = locate(star.unitId)
       if (startAt === null) {
-        // Wait until the star is on screen and the map has settled; give up after a while.
-        if (spot && !document.hidden) startAt = at + SETTLE_MS
-        else if (at - askedAt > FIND_STAR_MS) return finish()
+        if (focusRef.current !== subjectId) return end(false)
+        if (!onScreen(spot)) {
+          // Not on screen yet: keep looking, draw nothing.
+          handle = scheduler.request(frame)
+          return
+        }
+        setAnnouncement(t('lighting.announce', { name: star.name }))
+        if (reducedMotion) return end(true)
+        startAt = at + SETTLE_MS
+        setPlaying(true)
       }
       const width = canvas.clientWidth
       const height = canvas.clientHeight
@@ -135,7 +160,7 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
         canvas.width = Math.round(width * ratio)
         canvas.height = Math.round(height * ratio)
       }
-      const elapsed = startAt === null ? -1 : at - startAt
+      const elapsed = at - startAt
       if (ctx) {
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
         ctx.clearRect(0, 0, width, height)
@@ -148,20 +173,22 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
         caption.style.transform = `translate(${Math.round(spot.x)}px, ${Math.round(below)}px) translateX(-50%)`
         caption.style.opacity = String(captionOpacity(elapsed))
       }
-      if (elapsed >= FLARE_MS + 600) return finish()
+      if (elapsed >= FLARE_MS + 600) return end(true)
       handle = scheduler.request(frame)
     }
     handle = scheduler.request(frame)
     return () => {
       if (handle !== null) scheduler.cancel(handle)
+      // Left before it was shown: not acknowledged, so it comes back.
+      if (!finished) handled.current.delete(event.unitId)
     }
-  }, [current, locate, scheduler])
+  }, [current, locate, scheduler, reducedMotion, source, ownerId, addMoment, t])
 
-  const phase = current ? 'playing' : shown > 0 ? 'done' : 'idle'
+  const phase = playing ? 'playing' : shown > 0 ? 'done' : 'idle'
   return (
     <div data-lighting={phase} className="pointer-events-none absolute inset-0">
       <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
-      {current && (
+      {playing && current && (
         // Seen, not read: the live region below says it.
         <p
           ref={captionRef}

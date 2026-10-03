@@ -16,7 +16,7 @@ import { threadEntries } from '@/features/ask/AskPanel'
 import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/features/starmap/fixtures/demoSky'
 import { drawFlare, FLARE_MS } from '@/features/starmap/lighting/flare'
-import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
+import { LightingOverlay, SETTLE_MS } from '@/features/starmap/lighting/LightingOverlay'
 import {
   emptyLightingEventSource,
   LightingEventSourceContext,
@@ -94,6 +94,9 @@ beforeEach(async () => {
   const counting = countingContext()
   calls = counting.calls
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(counting.ctx as never)
+  // The lighting layer covers an 800 x 600 map.
+  vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(800)
+  vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(600)
   setReducedMotion(false)
   useAuthStore.setState({ user: { id: 'student-a' } as never })
   useLitMomentsStore.setState({ byOwner: {} })
@@ -104,9 +107,12 @@ afterEach(() => {
   useAuthStore.setState({ user: null })
 })
 
-async function showMap(map: StarMap, source?: LightingEventSource) {
+type Spot = { x: number; y: number; size: number }
+const ON_SCREEN: Spot = { x: 400, y: 300, size: 16 }
+
+async function showMap(map: StarMap, source?: LightingEventSource, where: () => Spot | null = () => ON_SCREEN) {
   const clock = fakeClock()
-  const locate = vi.fn((unitId: string) => (unitId === KP ? { x: 400, y: 300, size: 16 } : null))
+  const locate = vi.fn((unitId: string) => (unitId === KP ? where() : null))
   const overlay = <LightingOverlay map={map} locate={locate} scheduler={clock} />
   const view = render(
     <I18nextProvider i18n={i18n}>
@@ -125,16 +131,18 @@ describe('the lighting moment', () => {
     const { source, acknowledge } = serverSource([observed])
     const lit = mapOf('math', ALL_LESSONS)
     const first = await showMap(lit, source)
+    act(() => first.clock.advance(20))
     expect(first.phase()).toBe('playing')
     expect(first.announced()).toBe('Sine and cosine is lit')
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
-    expect(acknowledge).toHaveBeenCalledTimes(1)
-    expect(acknowledge).toHaveBeenCalledWith([KP])
 
     act(() => first.clock.advance(1500))
     expect(calls.fill).toBeGreaterThan(0) // the flare is drawn on its own canvas
+    expect(acknowledge).not.toHaveBeenCalled() // still playing
     act(() => first.clock.advance(FLARE_MS + 1000))
     expect(first.phase()).toBe('done')
+    expect(acknowledge).toHaveBeenCalledTimes(1)
+    expect(acknowledge).toHaveBeenCalledWith([KP])
     first.view.unmount()
 
     // A reload: the same account, the same server.
@@ -151,6 +159,7 @@ describe('the lighting moment', () => {
     setReducedMotion(true)
     const { source, acknowledge } = serverSource([observed])
     const shown = await showMap(mapOf('math', ALL_LESSONS), source)
+    act(() => shown.clock.advance(20))
     expect(shown.phase()).toBe('done')
     act(() => shown.clock.advance(4000))
     expect(calls.fill).toBe(0)
@@ -179,6 +188,56 @@ describe('the lighting moment', () => {
     expect(acknowledge).not.toHaveBeenCalled()
   })
 
+  it('is not acknowledged while the star is off screen, and plays once it comes into view (audit #3)', async () => {
+    const { source, acknowledge } = serverSource([observed])
+    let spot: Spot | null = { x: -240, y: 300, size: 16 } // left of the map, panned away
+    const shown = await showMap(mapOf('math', ALL_LESSONS), source, () => spot)
+    act(() => shown.clock.advance(8000))
+    expect(acknowledge).not.toHaveBeenCalled()
+    expect(shown.announced()).toBe('')
+    expect(shown.phase()).toBe('idle')
+    expect(useLitMomentsStore.getState().byOwner).toEqual({})
+    expect(calls.fill).toBe(0)
+
+    spot = ON_SCREEN
+    act(() => shown.clock.advance(1000))
+    expect(shown.phase()).toBe('playing')
+    expect(shown.announced()).toBe('Sine and cosine is lit')
+    expect(acknowledge).not.toHaveBeenCalled() // not before the flare has been shown
+    act(() => shown.clock.advance(FLARE_MS + 1000))
+    expect(shown.phase()).toBe('done')
+    expect(acknowledge).toHaveBeenCalledTimes(1)
+    expect(acknowledge).toHaveBeenCalledWith([KP])
+    expect(useLitMomentsStore.getState().byOwner['student-a']).toHaveLength(1)
+  })
+
+  it('with reduced motion, is announced and acknowledged only once the star is on screen (audit #3)', async () => {
+    setReducedMotion(true)
+    const { source, acknowledge } = serverSource([observed])
+    let spot: Spot | null = null // not drawn yet
+    const shown = await showMap(mapOf('math', ALL_LESSONS), source, () => spot)
+    act(() => shown.clock.advance(8000))
+    expect(acknowledge).not.toHaveBeenCalled()
+    expect(shown.announced()).toBe('')
+    spot = { x: 400, y: 900, size: 16 } // below the map
+    act(() => shown.clock.advance(1000))
+    expect(acknowledge).not.toHaveBeenCalled()
+    spot = ON_SCREEN
+    act(() => shown.clock.advance(100))
+    expect(shown.announced()).toBe('Sine and cosine is lit')
+    expect(shown.phase()).toBe('done')
+    expect(acknowledge).toHaveBeenCalledWith([KP])
+    expect(calls.fill).toBe(0)
+  })
+
+  it('is not acknowledged when the map is left before the flare has been shown (audit #3)', async () => {
+    const { source, acknowledge } = serverSource([observed])
+    const shown = await showMap(mapOf('math', ALL_LESSONS), source)
+    act(() => shown.clock.advance(300))
+    shown.view.unmount()
+    expect(acknowledge).not.toHaveBeenCalled()
+  })
+
   it('in production the default source emits nothing and asks nothing', async () => {
     await expect(emptyLightingEventSource.unacknowledged()).resolves.toEqual([])
     const spy = vi.spyOn(emptyLightingEventSource, 'unacknowledged')
@@ -200,7 +259,8 @@ describe('the lit card in Ask', () => {
 
   it('is handed over when the moment is shown', async () => {
     const { source } = serverSource([observed])
-    await showMap(mapOf('math', ALL_LESSONS), source)
+    const shown = await showMap(mapOf('math', ALL_LESSONS), source)
+    act(() => shown.clock.advance(SETTLE_MS + FLARE_MS + 1000))
     expect(useLitMomentsStore.getState().byOwner['student-a']).toEqual([
       expect.objectContaining({ unitId: KP, name: 'Sine and cosine', subjectId: 'math', litAt: observed.litAt }),
     ])
