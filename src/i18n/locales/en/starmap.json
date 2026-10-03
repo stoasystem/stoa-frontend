@@ -41,7 +41,10 @@
     "start": "Start",
     "continue": "Continue",
     "open": "Open chapter",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Review {{count}} exercise",
+    "review_other": "Review {{count}} exercises",
+    "reviewSoon": "Coming soon"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} of {{total}} lit",
@@ -65,5 +68,13 @@
     "nebula": "{{nebula}}: {{lit}} of {{total}} lit",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "Nothing to learn in this subject yet."
+  "empty": "Nothing to learn in this subject yet.",
+  "demo": {
+    "notice": "Demo · Sample content and progress",
+    "emptyStar": "Placeholder star · demo content, no chapter.",
+    "longNebula": "Fractions, equations and proportional reasoning {{index}}"
+  },
+  "lighting": {
+    "announce": "{{name}} is lit"
+  }
 }

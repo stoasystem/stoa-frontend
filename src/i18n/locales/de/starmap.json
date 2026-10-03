@@ -41,7 +41,10 @@
     "start": "Starten",
     "continue": "Weiter",
     "open": "Kapitel öffnen",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "{{count}} Aufgabe wiederholen",
+    "review_other": "{{count}} Aufgaben wiederholen",
+    "reviewSoon": "Bald verfügbar"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
@@ -65,5 +68,13 @@
     "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "In diesem Fach gibt es noch nichts zu lernen."
+  "empty": "In diesem Fach gibt es noch nichts zu lernen.",
+  "demo": {
+    "notice": "Demo · Beispieldaten und Lernfortschritt",
+    "emptyStar": "Platzhalterstern · Demo-Inhalt, kein Kapitel.",
+    "longNebula": "Bruchrechnung, Gleichungen und proportionales Denken {{index}}"
+  },
+  "lighting": {
+    "announce": "{{name}} leuchtet jetzt"
+  }
 }

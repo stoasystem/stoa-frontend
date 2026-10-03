@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>STOA design preview</title>
+  </head>
+  <body>
+    <!--
+      Dev server only (#115): `npm run dev`, then /src/dev/preview.html?surface=map.
+      The real routes with a demo student and no backend; see docs/agents/design-preview.md.
+      Not a build input (vite.config.ts builds index.html alone), and
+      tests/component/designPreviewExcluded.test.ts holds that nothing under src/dev/ is reachable from src/main.tsx.
+    -->
+    <div id="root"></div>
+    <script type="module" src="./preview/main.tsx"></script>
+  </body>
+</html>

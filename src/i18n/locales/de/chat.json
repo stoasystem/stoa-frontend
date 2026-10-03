@@ -219,6 +219,12 @@
     "practice": {
       "subtitle": "Kennt die Aufgabe, an der du bist",
       "placeholder": "Frag zu dieser Aufgabe…"
+    },
+    "lit": {
+      "label": "Fortschritt",
+      "title": "{{name}} leuchtet jetzt",
+      "body": "Du hast das Kapitel abgeschlossen. Der Stern leuchtet jetzt auf deiner Karte.",
+      "link": "Auf der Karte ansehen"
     }
   }
 }

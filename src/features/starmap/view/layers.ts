@@ -173,13 +173,14 @@ export function nebulaFocusSpot(
   disc: { x: number; y: number; r: number },
   viewport: { width: number; height: number },
   bands: { top: number; bottom: number },
+  pill = { width: 280, height: NEBULA_FOCUS_HEIGHT },
 ): { x: number; y: number } {
   const top = bands.top + 4
-  const bottom = viewport.height - bands.bottom - 4 - NEBULA_FOCUS_HEIGHT
+  const bottom = viewport.height - bands.bottom - 4 - pill.height
   const below = disc.y + disc.r + 8
-  const above = disc.y - disc.r - 8 - NEBULA_FOCUS_HEIGHT
-  const y = below <= bottom ? below : above >= top ? above : disc.y - NEBULA_FOCUS_HEIGHT / 2
-  const margin = Math.min(140, viewport.width / 2)
+  const above = disc.y - disc.r - 8 - pill.height
+  const y = below <= bottom ? below : above >= top ? above : disc.y - pill.height / 2
+  const margin = Math.min(pill.width / 2, viewport.width / 2)
   return {
     x: Math.max(margin, Math.min(viewport.width - margin, disc.x)),
     y: Math.max(top, Math.min(bottom, y)),
