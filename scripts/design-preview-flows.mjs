@@ -243,7 +243,7 @@ try {
   })
   // Expected to FAIL until the star map engine's fix lands (another branch of
   // #123): the switcher snaps back to the galaxy it left.
-  await flow('subject switch: the header stays on the galaxy clicked [FAILS until the engine snap-back fix is merged]', async () => {
+  await flow('subject switch: the header stays on the galaxy clicked', async () => {
     await page.getByRole('link', { name: 'Physics', exact: true }).first().click()
     await page.waitForFunction(() => new URL(window.location.href).searchParams.get('path')?.includes('physics'), null, { timeout: 5000 })
     await settle()
