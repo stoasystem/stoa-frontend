@@ -10,7 +10,7 @@ import { act, render, screen } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { demoStarMapOverride } from '@/dev/preview/lighting'
+import { demoStarMapOverride, withLongNebulaNames } from '@/dev/preview/lighting'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { threadEntries } from '@/features/ask/AskPanel'
 import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
@@ -337,6 +337,18 @@ describe('the design preview follows its lessons', () => {
     const math = orderedStars(after).filter((star) => subjectOfNebula(after, star.nebulaId) === 'math')
     const expected = math.find((star) => star.state === 'in_progress') ?? math.find((star) => star.state === 'ready')
     expect(recommended(after, 'math')).toEqual(expected ? [expected.unitId] : [])
+  })
+
+  it('shows long nebula names on request, as the bench’s longNames does, keeping the sky’s identity (audit #9)', () => {
+    const t = i18n.getFixedT('en', 'starmap')
+    const map = mapOf('math', OPENING)
+    const long = withLongNebulaNames(map, t)
+    expect(long.nebulae.map((nebula) => nebula.name)).toEqual(
+      demoStarMap('math', 10, t, { language: 'en', longNames: true }).nebulae.map((nebula) => nebula.name),
+    )
+    expect(long.stars).toBe(map.stars)
+    // The same nebulae array for the same sky, so the engine keeps its tiles.
+    expect(withLongNebulaNames(mapOf('math', ALL_LESSONS), t).nebulae).toBe(long.nebulae)
   })
 
   it('draws the flare the same for the same instant', () => {

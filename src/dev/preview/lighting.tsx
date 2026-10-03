@@ -16,9 +16,12 @@
  *     app's own route leaves them out (no backend claim, #110); only this
  *     preview, like the bench's `&relations=fixture`, puts them in.
  *
- * `PreviewLighting` provides both around the app.
+ * `PreviewLighting` provides both around the app; with `longNames` (the
+ * preview's `&longNames=1`) the override also gives the nebulae long names.
  */
+import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoKnowledgePointState, demoSky, localize } from '@/dev/demo/data'
 import {
   acknowledgeLit,
@@ -31,7 +34,7 @@ import {
 import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
 import { StarMapOverrideContext } from '@/features/starmap/lighting/starMapOverride'
-import { orderedStars, subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -98,14 +101,34 @@ export function demoStarMapOverride(map: StarMap, size: FixtureSize, completed: 
   }
 }
 
-export function PreviewLighting({ children }: { children: ReactNode }) {
+const longNebulae = new WeakMap<Nebula[], { t: TFunction<'starmap'>; nebulae: Nebula[] }>()
+
+/**
+ * The map with long nebula names, to check labels in four languages: what
+ * the bench's `&longNames=1` gives the route by its `longNames` prop, which
+ * the app's routes do not pass. The same names `demoStarMap` makes, in the
+ * same array for the same sky and language, so the engine keeps its tiles.
+ */
+export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): StarMap {
+  const known = longNebulae.get(map.nebulae)
+  if (known?.t === t) return { ...map, nebulae: known.nebulae }
+  const nebulae = map.nebulae.map((nebula) => ({ ...nebula, name: t('demo.longNebula', { index: nebula.order }) }))
+  longNebulae.set(map.nebulae, { t, nebulae })
+  return { ...map, nebulae }
+}
+
+export function PreviewLighting({ children, longNames = false }: { children: ReactNode; longNames?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
+  const { t } = useTranslation('starmap')
   // A new function when the demo backend changes, so the map is drawn again.
   const override = useMemo(() => {
     void version
     const completed = completedLessons()
-    return (map: StarMap, size: FixtureSize) => demoStarMapOverride(map, size, completed)
-  }, [version])
+    return (map: StarMap, size: FixtureSize) => {
+      const followed = demoStarMapOverride(map, size, completed)
+      return longNames ? withLongNebulaNames(followed, t) : followed
+    }
+  }, [version, longNames, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
       <StarMapOverrideContext.Provider value={override}>{children}</StarMapOverrideContext.Provider>

@@ -4,6 +4,7 @@
  * docs/agents/design-preview.md.
  *
  *   /src/dev/preview-compare.html?surface=map&points=1000            live
+ *   /src/dev/preview-compare.html?surface=map&longNames=1            live, long nebula names
  *   /src/dev/preview-compare.html?mode=shots&before=a&after=b         screenshots
  *
  * `live` shows the preview itself in three frames at their real sizes,
@@ -97,6 +98,7 @@ function Compare() {
   const surface = surfaceById(query.get('surface')) ?? SURFACES[1]
   const points: StarCount = starCountFrom(query.get('points'))
   const lang = query.get('lang') ?? ''
+  const longNames = query.get('longNames') === '1'
   const height = rowHeight(width)
   const sets = Object.keys(index).sort((a, b) => index[b].createdAt.localeCompare(index[a].createdAt))
 
@@ -110,6 +112,7 @@ function Compare() {
   const previewSrc = (viewport: string) => {
     const url = new URLSearchParams({ surface: surface.id, points: String(points) })
     if (lang) url.set('lang', lang)
+    if (longNames && surface.stars) url.set('longNames', '1')
     // Each frame is its own page, so a frame reloads when its key changes.
     return `/src/dev/preview.html?${url.toString()}&frame=${viewport}`
   }
@@ -168,7 +171,13 @@ function Compare() {
           disabled={!surface.stars}
         />
         {mode === 'live' && (
-          <Select name="Language" value={lang} options={LANGUAGES.map((code) => [code, code || 'default'] as const)} onChange={(value) => set('lang', value)} />
+          <>
+            <Select name="Language" value={lang} options={LANGUAGES.map((code) => [code, code || 'default'] as const)} onChange={(value) => set('lang', value)} />
+            <label style={label}>
+              <input type="checkbox" checked={longNames} disabled={!surface.stars} onChange={(event) => set('longNames', event.target.checked ? '1' : '')} />
+              Long names
+            </label>
+          </>
         )}
         {mode === 'shots' && (
           <>

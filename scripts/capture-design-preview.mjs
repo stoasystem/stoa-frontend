@@ -12,7 +12,9 @@
  *
  * Options: --base <dev server origin> (default http://127.0.0.1:5173),
  * --label <set name> (default: a timestamp), --surfaces a,b (default: all),
- * --points 10,1000,2000, --viewports desktop,phone,narrow, --lang de|en|fr|it.
+ * --points 10,1000,2000, --viewports desktop,phone,narrow (1440×900,
+ * 390×844, 375×812), --lang de|en|fr|it, --long-names (the star map's
+ * nebulae with long names, the preview's `longNames=1`).
  *
  * Writes .codex-screenshots/design-preview/<label>/<surface>__<viewport>__<points>.png
  * (Git ignores the folder) and records the set in index.json beside them.
@@ -45,6 +47,7 @@ const askedSurfaces = option('surfaces', '')
 const pointsList = option('points', '10,1000,2000').split(',').map(Number)
 const viewports = option('viewports', 'desktop,phone,narrow').split(',')
 const language = option('lang', '')
+const longNames = process.argv.includes('--long-names')
 const outRoot = path.resolve('.codex-screenshots/design-preview')
 const outDir = path.join(outRoot, label)
 
@@ -101,7 +104,7 @@ try {
         })
         page.on('pageerror', (error) => consoleProblems.push(`${where}: [pageerror] ${error.message}`))
 
-        await page.goto(previewUrl({ surface: surface.id, points, lang: language }))
+        await page.goto(previewUrl({ surface: surface.id, points, lang: language, longNames: longNames && surface.stars ? 1 : '' }))
         await page.waitForSelector('html[data-preview-ready="1"]', { timeout: 20_000 })
         await page.waitForLoadState('networkidle')
         // The star map eases in; let it settle before the picture.
@@ -127,7 +130,7 @@ try {
 } catch {
   index = {}
 }
-index[label] = { createdAt: new Date().toISOString(), language: language || null, shots, leaks, unanswered, consoleProblems }
+index[label] = { createdAt: new Date().toISOString(), language: language || null, longNames, shots, leaks, unanswered, consoleProblems }
 await writeFile(path.join(outRoot, 'index.json'), `${JSON.stringify(index, null, 2)}\n`)
 
 console.log(`${shots.length} screenshots in ${path.relative(process.cwd(), outDir)}`)

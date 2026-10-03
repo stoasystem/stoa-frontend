@@ -8,9 +8,10 @@
  *
  * `surface` is one of `surfaces.ts`; `path` opens any route instead;
  * `points` (10 / 1000 / 2000) sizes the star map; `lang` (de / en / fr / it)
- * the language; `fresh=1` forgets what the demo backend kept in this tab
- * (completed lessons, the lighting and its acknowledgement, Ask's messages,
- * #51). Moving around inside the page writes the route back to `path` (with
+ * the language; `longNames=1` gives the star map's nebulae long names, to
+ * check labels; `fresh=1` forgets what the demo backend kept in this tab
+ * (completed lessons, the lighting and its acknowledgement, #51, and Ask's
+ * messages). Moving around inside the page writes the route back to `path` (with
  * `signedIn=0` once signed out, and `lang` once the language changes), so a
  * reload stays where it was -- also back on the surface's own route.
  *
@@ -31,6 +32,7 @@ const points = starCountFrom(params.get('points'))
 const path = params.get('path') ?? surface?.path(points) ?? '/'
 const signedIn = params.has('signedIn') ? params.get('signedIn') !== '0' : (surface?.signedIn ?? true)
 const language = params.get('lang')
+const longNames = params.get('longNames') === '1'
 
 // For the screenshot script and the comparison page: what there is to open.
 ;(window as Window & { __stoaPreviewSurfaces?: unknown }).__stoaPreviewSurfaces = SURFACES.map(
@@ -84,7 +86,7 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <AppProviders>
-        <PreviewLighting>
+        <PreviewLighting longNames={longNames}>
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
             <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
