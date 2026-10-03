@@ -181,6 +181,9 @@ export function galaxyHazeBox(galaxy: { x0: number; x1: number; y0: number; y1: 
   return { x0: galaxy.x0 - margin, y0: galaxy.y0 - margin, x1: galaxy.x1 + margin, y1: galaxy.y1 + margin }
 }
 
+/** How far in from each edge a galaxy's haze fades out, as a share of its width. */
+const HAZE_EDGE = 0.06
+
 /** One galaxy's haze, `width` device px wide, in its base tint, with sparse dust between its nebulae. */
 export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, data: SceneData, index: number,
   theme: StarMapTheme, makeCanvas: MakeCanvas) {
@@ -209,6 +212,25 @@ export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, da
     ctx.beginPath()
     ctx.arc(x, y, (0.5 + random() ** 4 * 1.4) * (width / 1024), 0, Math.PI * 2)
     ctx.fill()
+  }
+  // A nebula's soft brush can reach past the box: fade the canvas out at all
+  // four edges, so the haze never ends in a straight cut (in the gaps between
+  // galaxies, and across the ring's seam, #120).
+  const height = ctx.canvas?.height ?? 0
+  if (height > 0) {
+    ctx.globalAlpha = 1
+    ctx.globalCompositeOperation = 'destination-in'
+    for (const [x1, y1, length] of [[width, 0, width], [0, height, height]] as const) {
+      const fade = ctx.createLinearGradient(0, 0, x1, y1)
+      const edge = Math.min(0.5, (HAZE_EDGE * width) / length)
+      fade.addColorStop(0, 'rgba(0, 0, 0, 0)')
+      fade.addColorStop(edge, 'rgba(0, 0, 0, 1)')
+      fade.addColorStop(1 - edge, 'rgba(0, 0, 0, 1)')
+      fade.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = fade
+      ctx.fillRect(0, 0, width, height)
+    }
+    ctx.globalCompositeOperation = 'source-over'
   }
   ctx.globalAlpha = 1
 }

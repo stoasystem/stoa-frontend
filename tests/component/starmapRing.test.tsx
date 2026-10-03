@@ -15,6 +15,7 @@ import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/m
 import { galaxyHazeBox } from '@/features/starmap/render/galaxy'
 import { baseScale, clampView, nearestCopy, panBy, turnsToward, wrapX } from '@/features/starmap/view/camera'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
+import type { LayerTarget } from '@/features/starmap/view/layers'
 import {
   galaxyAt,
   galaxyReach,
@@ -99,7 +100,14 @@ describe('ring arithmetic', () => {
 
 type Session = ReturnType<typeof session>
 
-function session(width: number, height: number, points: 10 | 1000 | 2000 = 1000, subjectId = 'math', reducedMotion = true) {
+function session(
+  width: number,
+  height: number,
+  points: 10 | 1000 | 2000 = 1000,
+  subjectId = 'math',
+  reducedMotion = true,
+  target: LayerTarget = { layer: 'map' },
+) {
   const clock = fakeClock()
   const renderer = recordingRenderer()
   const navigate = vi.fn()
@@ -116,7 +124,7 @@ function session(width: number, height: number, points: 10 | 1000 | 2000 = 1000,
   })
   const map = skyMap(points, subjectId)
   engine.setViewport(width, height, 1, { top: 120, bottom: 90 })
-  engine.setData(map, { layer: 'map' })
+  engine.setData(map, target)
   clock.advance(20)
   return { clock, renderer, engine, map, navigate, centred, width, height }
 }
@@ -229,6 +237,35 @@ describe('dragging round the ring (#120)', () => {
       })
     }
   }
+
+  it('wraps at the nebula layer too: from the last galaxy across the seam into the first, without a jump', () => {
+    for (const [width, height] of [[1440, 900], [390, 844]] as const) {
+      const map = skyMap(1000, 'chemistry')
+      const nebulae = orderedNebulae(map)
+      const discs = nebulaDiscs(map)
+      // The nebula nearest the seam, on its left.
+      const last = nebulae.filter((n) => n.subjectId === 'chemistry').sort((a, b) => discs.get(b.topicId)!.x - discs.get(a.topicId)!.x)[0]
+      const s = session(width, height, 1000, 'chemistry', true, { layer: 'nebula', nebulaId: last.topicId })
+      const galaxies = skyGalaxies(map)
+      const toMath = (galaxies[0].x0 + 1 - discs.get(last.topicId)!.x) + 0.01
+      const frames = drag(s, -toMath * s.renderer.last().scale, 60)
+      const stars = orderedStars(map)
+      const mathStar = stars.map((star) => nebulae.find((n) => n.topicId === star.nebulaId)!.subjectId === 'math')
+      for (let f = 1; f < frames.length; f += 1) {
+        const [a, b] = [frames[f - 1], frames[f]]
+        const steps = a.x.map((x, i) => b.x[i] - x).sort((p, q) => p - q)
+        const moved = steps[Math.floor(steps.length / 2)]
+        for (let i = 0; i < stars.length; i += 1) {
+          if (a.x[i] > -20 && a.x[i] < width + 20 && b.x[i] > -20 && b.x[i] < width + 20) expect(Math.abs(b.x[i] - a.x[i] - moved)).toBeLessThan(0.01)
+        }
+      }
+      // Mathematics came round from the right.
+      const end = s.renderer.last()
+      expect(stars.some((_, i) => mathStar[i] && end.x[i] > 0 && end.x[i] < width)).toBe(true)
+      expect(s.engine.layer).toBe('nebula')
+      s.engine.destroy()
+    }
+  })
 
   it('keeps the band bounded vertically: a drag down stops at the band', () => {
     const s = session(1440, 900)
