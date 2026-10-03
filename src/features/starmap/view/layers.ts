@@ -82,7 +82,7 @@ export function isWide(viewport: Viewport): boolean {
 export function nebulaZoom(disc: NebulaDisc, viewport: Viewport, bounds: Bounds): number {
   const shorter = Math.min(viewport.width, viewport.height)
   const base = baseScale(viewport, bounds)
-  return Math.max(1.4, Math.min(14, (0.85 * shorter) / (2 * disc.r * base)))
+  return Math.max(1.4, Math.min(30, (0.85 * shorter) / (2 * disc.r * base)))
 }
 
 /** The view a layer asks for. */
@@ -101,7 +101,7 @@ export function viewForTarget(
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
   if (!star) return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const wide = isWide(viewport)
-  return { cx: star.x, cy: star.y, k: Math.min(24, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
+  return { cx: star.x, cy: star.y, k: Math.min(50, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
 }
 
 /**
@@ -173,15 +173,50 @@ export function nebulaFocusSpot(
   disc: { x: number; y: number; r: number },
   viewport: { width: number; height: number },
   bands: { top: number; bottom: number },
+  pill = { width: 280, height: NEBULA_FOCUS_HEIGHT },
 ): { x: number; y: number } {
   const top = bands.top + 4
-  const bottom = viewport.height - bands.bottom - 4 - NEBULA_FOCUS_HEIGHT
+  const bottom = viewport.height - bands.bottom - 4 - pill.height
   const below = disc.y + disc.r + 8
-  const above = disc.y - disc.r - 8 - NEBULA_FOCUS_HEIGHT
-  const y = below <= bottom ? below : above >= top ? above : disc.y - NEBULA_FOCUS_HEIGHT / 2
-  const margin = Math.min(140, viewport.width / 2)
+  const above = disc.y - disc.r - 8 - pill.height
+  const y = below <= bottom ? below : above >= top ? above : disc.y - pill.height / 2
+  const margin = Math.min(pill.width / 2, viewport.width / 2)
   return {
     x: Math.max(margin, Math.min(viewport.width - margin, disc.x)),
     y: Math.max(top, Math.min(bottom, y)),
   }
+}
+
+/** The part of the stage where the map can be seen on the star layer: inside the page's controls, beside or above the card. */
+export type ClearArea = { left: number; top: number; right: number; bottom: number }
+
+/**
+ * The star layer's way back (#132): once the focused star is panned out of
+ * the clear area, a hint sits on the area's edge where a line from its middle
+ * to the star leaves it, pointing at the star. `angle` is in radians, 0 to
+ * the right, clockwise (screen y grows down); `alignX` / `alignY` say which
+ * edge of the hint touches the point (0 start, 0.5 middle, 1 end), so it
+ * stays inside the area. Null while the star is in the area.
+ */
+export function starHintSpot(
+  star: { x: number; y: number },
+  area: ClearArea,
+  slack = 0,
+): { x: number; y: number; angle: number; alignX: number; alignY: number } | null {
+  if (area.right <= area.left || area.bottom <= area.top) return null
+  // Within `slack` px of the area the star still counts as seen: no hint beside a star in plain sight.
+  const seen = (value: number, low: number, high: number) => value >= low - slack && value <= high + slack
+  if (seen(star.x, area.left, area.right) && seen(star.y, area.top, area.bottom)) return null
+  const cx = (area.left + area.right) / 2
+  const cy = (area.top + area.bottom) / 2
+  const dx = star.x - cx
+  const dy = star.y - cy
+  const halfW = (area.right - area.left) / 2
+  const halfH = (area.bottom - area.top) / 2
+  // How far along the ray the area's edge is: the nearer of the two sides it can cross.
+  const reach = Math.min(dx === 0 ? Infinity : halfW / Math.abs(dx), dy === 0 ? Infinity : halfH / Math.abs(dy))
+  const x = cx + dx * reach
+  const y = cy + dy * reach
+  const edge = (value: number, low: number, high: number) => (value <= low + 0.5 ? 0 : value >= high - 0.5 ? 1 : 0.5)
+  return { x, y, angle: Math.atan2(dy, dx), alignX: edge(x, area.left, area.right), alignY: edge(y, area.top, area.bottom) }
 }

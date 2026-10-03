@@ -33,6 +33,11 @@ const bench = params.get('bench') === '1'
 const entry = new URLSearchParams()
 if (points) entry.set('points', points)
 if (foveation) entry.set('foveation', foveation)
+else if (bench) entry.set('foveation', 'on')
+for (const key of ['relations', 'longNames']) {
+  const value = params.get(key)
+  if (value) entry.set(key, value)
+}
 
 async function start() {
   await Promise.all([import('../index.css'), import('@/i18n')])
@@ -46,6 +51,8 @@ async function start() {
   })
 
   const { StarMapRoute } = await import('@/features/starmap/StarMapRoute')
+  // The application's own source has no sky (#131): the bench draws the demo sky.
+  const { DemoStarMapSource } = await import('@/dev/demo/sky/source')
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useState } = await import('react')
 
@@ -57,7 +64,7 @@ async function start() {
       <AppLayout bleed>
         <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
           <div data-surface="sky" data-ask-page className="absolute inset-y-0 left-0 bg-sky text-on-sky" style={{ right: panel ? 420 : 0 }}>
-            <StarMapRoute />
+            <StarMapRoute relations={params.get('relations') === 'fixture'} longNames={params.get('longNames') === '1'} />
           </div>
         </div>
       </AppLayout>
@@ -87,15 +94,17 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
-        <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
-          <Routes>
-            <Route path="/" element={Page('MapHomePage')} />
-            <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
-            <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
-            <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
-            <Route path="*" element={<p>Left the map.</p>} />
-          </Routes>
-        </MemoryRouter>
+        <DemoStarMapSource>
+          <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
+            <Routes>
+              <Route path="/" element={Page('MapHomePage')} />
+              <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
+              <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
+              <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
+              <Route path="*" element={<p>Left the map.</p>} />
+            </Routes>
+          </MemoryRouter>
+        </DemoStarMapSource>
       </QueryClientProvider>
     </StrictMode>,
   )

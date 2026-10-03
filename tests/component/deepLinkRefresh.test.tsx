@@ -8,7 +8,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { ReactNode } from 'react'
 import { AppRouter } from '@/app/router/AppRouter'
+import { DemoStarMapSource } from '@/dev/demo/sky/source'
 import i18n from '@/i18n'
 import { getCurrentUser } from '@/services/auth/authApi'
 import { getPracticeLesson } from '@/services/practice/practiceApi'
@@ -47,7 +49,7 @@ const student = {
   mustChangePassword: false,
 } as CurrentUser
 
-function refreshAt(path: string) {
+function refreshAt(path: string, wrap: (app: ReactNode) => ReactNode = (app) => app) {
   window.history.replaceState(null, '', path)
   // What survives a reload: the stored token, and no account in memory.
   localStorage.setItem(TOKEN_KEY, 'token')
@@ -56,7 +58,7 @@ function refreshAt(path: string) {
   render(
     <I18nextProvider i18n={i18n}>
       <QueryClientProvider client={client}>
-        <AppRouter />
+        {wrap(<AppRouter />)}
       </QueryClientProvider>
     </I18nextProvider>,
   )
@@ -86,8 +88,9 @@ describe('a deep link refreshed in the browser', () => {
   it('reopens /ask/c-42 on that conversation once the account is back', async () => {
     refreshAt('/ask/c-42')
 
-    // Ask opens over the home planet, on the conversation the path names (#49).
-    expect(await screen.findByRole('heading', { name: 'Mathematics' })).toBeInTheDocument()
+    // Ask opens over the home planet, on the conversation the path names (#49). The
+    // application's star map has no sky yet (#131), so the planet shows its empty state.
+    expect(await screen.findByRole('heading', { name: 'Your star map is on its way' })).toBeInTheDocument()
     expect(window.location.pathname).toBe('/ask/c-42')
     expect(document.querySelector('[data-ask-surface]')?.getAttribute('data-ask-conversation')).toBe('c-42')
   })
@@ -118,11 +121,13 @@ describe('a deep link refreshed in the browser', () => {
   it('reopens a star on the star map, at that star (#47, #72)', async () => {
     // jsdom has no 2D canvas; the map draws nothing but keeps its DOM.
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(null)
-    refreshAt('/map/math/algebra/u-5')
+    // The demo sky, injected through the star map source the way the design preview does (#131).
+    refreshAt('/map/math/numbers/numbers-5', (app) => <DemoStarMapSource>{app}</DemoStarMapSource>)
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Linear equations' })).toBeInTheDocument()
-    expect(window.location.pathname).toBe('/map/math/algebra/u-5')
-    expect(screen.getByRole('article', { name: 'Linear equations' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Numbers 5' })).toBeInTheDocument()
+    expect(window.location.pathname).toBe('/map/math/numbers/numbers-5')
+    expect(screen.getByRole('article', { name: 'Numbers 5' })).toBeInTheDocument()
+    expect(screen.getByText('Placeholder star · demo content, no chapter.')).toBeInTheDocument()
     vi.restoreAllMocks()
   })
 })

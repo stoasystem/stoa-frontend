@@ -11,13 +11,13 @@ import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { controlBands, StarMapView } from '@/features/starmap/components/StarMapView'
 import { nebulaFocusSpot, NEBULA_FOCUS_HEIGHT } from '@/features/starmap/view/layers'
-import { starMapFixture, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
-import type { StarMap } from '@/features/starmap/model/starMap'
+import type { FixtureSize } from '@/dev/demo/sky/demoSky'
+import { orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import type { LayerTarget } from '@/features/starmap/view/layers'
 import i18n from '@/i18n'
-import { fakeClock, recordingRenderer } from './starmapHarness'
+import { fakeClock, recordingRenderer, skyMap } from './starmapHarness'
 
-function showMap(target: LayerTarget = { layer: 'map' }, size: FixtureSize = 10, map: StarMap = starMapFixture(size)) {
+function showMap(target: LayerTarget = { layer: 'map' }, size: FixtureSize = 10, map: StarMap = skyMap(size)) {
   const clock = fakeClock()
   const renderer = recordingRenderer()
   const onNavigate = vi.fn()
@@ -50,6 +50,9 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+/** The ten-star sky with its prerequisites, so the lines (and what they say) are there. */
+const sky10 = (subjectId = 'math') => skyMap(10, subjectId, { relations: true })
+
 describe('the parallel DOM', () => {
   it('hides the canvas from assistive technology', () => {
     const { container } = showMap()
@@ -57,79 +60,90 @@ describe('the parallel DOM', () => {
   })
 
   it('gives every star on screen a link, in nebula order, then unit order', () => {
-    const { container } = showMap()
-    expect(starLinks(container).map((link) => link.dataset.unit)).toEqual([
-      'u-1', 'u-2', 'u-3', // numbers (topic order 1)
-      'u-4', 'u-5', 'u-6', // algebra (2)
-      'u-7', 'u-8', // geometry (3)
-      'u-9', 'u-10', // data (4)
-    ])
+    const map = sky10()
+    const { container } = showMap({ layer: 'map' }, 10, map)
+    const units = starLinks(container).map((link) => link.dataset.unit)
+    // The galaxy in focus, whole, in order: numbers, algebra, trigonometry...
+    expect(units.slice(0, 4)).toEqual(['numbers-1', 'algebra-1', 'demo-sine-cosine', 'trigonometry-2'])
+    // ...and whatever else of the sky is on screen, still in the sky's order.
+    const order = orderedStars(map).map((star) => star.unitId)
+    expect([...units].sort((p, q) => order.indexOf(p!) - order.indexOf(q!))).toEqual(units)
   })
 
   it('reads out name, learning state, progress and markers', () => {
-    showMap()
+    showMap({ layer: 'map' }, 10, sky10())
     const nav = screen.getByRole('navigation', { name: 'Star map: Mathematics' })
     const star = (name: string) => within(nav).getByRole('link', { name: new RegExp(`^${name},`) })
-    expect(star('Decimals')).toHaveAccessibleName('Decimals, In progress, 60% of lessons done, Suggested next')
-    expect(star('Fractions')).toHaveAccessibleName('Fractions, Lit, 100% of lessons done, 3 cards due for review')
-    expect(star('Triangles')).toHaveAccessibleName('Triangles, Locked, 0% of lessons done')
-    expect(star('Angles')).toHaveAccessibleName('Angles, Ready to start, 0% of lessons done')
+    expect(star('Sine and cosine')).toHaveAccessibleName('Sine and cosine, In progress, 33% of lessons done, Suggested next')
+    expect(star('Integers')).toHaveAccessibleName('Integers, Lit, 100% of lessons done, 4 cards due for review')
+    expect(star('Tangent')).toHaveAccessibleName('Tangent, Locked, 0% of lessons done')
+    expect(star('Terms and expressions')).toHaveAccessibleName('Terms and expressions, Ready to start, 0% of lessons done')
   })
 
-  it('links every star to its route under /map', () => {
-    showMap()
-    expect(screen.getByRole('link', { name: /^Linear equations,/ })).toHaveAttribute('href', '/map/math/algebra/u-5')
+  it('links every star to its route under /map, under its own galaxy', () => {
+    showMap({ layer: 'map' }, 10, sky10())
+    expect(screen.getByRole('link', { name: /^Terms and expressions,/ })).toHaveAttribute('href', '/map/math/algebra/algebra-1')
+    // One sky: a physics nebula is a link under physics, whichever galaxy the map opened on.
+    expect(screen.getByRole('link', { name: /^Optics,/ })).toHaveAttribute('href', '/map/physics/optics')
   })
 
   it('opens the star layer when a star link is activated', () => {
-    const { onNavigate } = showMap()
-    fireEvent.click(screen.getByRole('link', { name: /^Angles,/ }))
-    expect(onNavigate).toHaveBeenCalledWith({ layer: 'star', nebulaId: 'geometry', unitId: 'u-7' })
+    const { onNavigate } = showMap({ layer: 'map' }, 10, sky10())
+    fireEvent.click(screen.getByRole('link', { name: /^Terms and expressions,/ }))
+    expect(onNavigate).toHaveBeenCalledWith({ layer: 'star', nebulaId: 'algebra', unitId: 'algebra-1' })
   })
 
   it('offers each nebula as a link too, in the reader’s language', async () => {
     await i18n.changeLanguage('de')
-    showMap()
-    expect(screen.getByRole('link', { name: 'Algebra, 1 von 3 leuchten, verbunden mit Numbers, Geometry' })).toHaveAttribute('href', '/map/math/algebra')
+    showMap({ layer: 'map' }, 10, sky10())
+    expect(screen.getByRole('link', { name: 'Algebra, 0 von 1 leuchten, verbunden mit Numbers' })).toHaveAttribute('href', '/map/math/algebra')
     // The star's name is content from the backend; the rest is ours.
-    expect(screen.getByRole('link', { name: 'Decimals, In Arbeit, 60 % der Lektionen erledigt, Als Nächstes empfohlen' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Sine and cosine, In Arbeit, 33 % der Lektionen erledigt, Als Nächstes empfohlen' })).toBeInTheDocument()
   })
 
-  it('says which nebulae each one is linked to, since the lines carry meaning', () => {
-    showMap()
-    expect(screen.getByRole('link', { name: 'Numbers, 2 of 3 lit, related to Algebra, Data' })).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Geometry, 0 of 2 lit, related to Algebra' })).toBeInTheDocument()
+  it('says which nebulae each one is linked to, since the lines carry meaning -- across galaxies too', () => {
+    showMap({ layer: 'map' }, 10, sky10())
+    expect(screen.getByRole('link', { name: 'Numbers, 1 of 1 lit, related to Algebra' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Trigonometry, 0 of 2 lit, related to Optics' })).toBeInTheDocument()
   })
 
-  it('on the whole map, Tab goes nebula by nebula and to the recommended star; the other stars are read, not tabbed through', () => {
-    const { container } = showMap()
+  it('on the whole map, Tab goes nebula by nebula and to the recommended stars; the other stars are read, not tabbed through', () => {
+    const map = sky10()
+    const { container } = showMap({ layer: 'map' }, 10, map)
+    const recommended = new Set(map.stars.filter((star) => star.recommendation).map((star) => star.unitId))
     for (const link of starLinks(container)) {
-      if (link.dataset.unit === 'u-3') expect(link).not.toHaveAttribute('tabindex')
+      if (recommended.has(link.dataset.unit!)) expect(link).not.toHaveAttribute('tabindex')
       else expect(link).toHaveAttribute('tabindex', '-1')
     }
     const nav = screen.getByRole('navigation', { name: 'Star map: Mathematics' })
     const tabbable = within(nav).getAllByRole('link').filter((link) => link.getAttribute('tabindex') !== '-1')
-    expect(tabbable.map((link) => link.getAttribute('href'))).toEqual([
+    const hrefs = tabbable.map((link) => link.getAttribute('href'))
+    // Every nebula of the sky, in band order, each under its own galaxy.
+    expect(hrefs.filter((href) => href!.split('/').length === 4)).toEqual([
       '/map/math/numbers',
-      '/map/math/numbers/u-3', // Decimals, the recommended star
       '/map/math/algebra',
-      '/map/math/geometry',
-      '/map/math/data',
+      '/map/math/trigonometry',
+      '/map/physics/mechanics',
+      '/map/physics/optics',
+      '/map/chemistry/atoms',
+      '/map/chemistry/reactions',
     ])
+    // The recommended star of the galaxy in focus, right after its nebula.
+    expect(hrefs.indexOf('/map/math/trigonometry/demo-sine-cosine')).toBe(hrefs.indexOf('/map/math/trigonometry') + 1)
   })
 
   it('moves the focus pill with its nebula when focusing pans the map (normal motion, nothing breathing)', () => {
     // No recommended star, so no breathing frame can come along later and
     // mask a stale last frame of the pan.
-    const quiet: StarMap = { ...starMapFixture(10), stars: starMapFixture(10).stars.map((star) => ({ ...star, recommendation: null })) }
+    const quiet: StarMap = { ...sky10(), stars: sky10().stars.map((star) => ({ ...star, recommendation: null })) }
     const { clock, renderer, container } = showMap({ layer: 'nebula', nebulaId: 'algebra' }, 10, quiet)
-    const link = container.querySelector<HTMLAnchorElement>('a[data-nebula-link="geometry"]')!
+    const link = container.querySelector<HTMLAnchorElement>('a[data-nebula-link="trigonometry"]')!
     act(() => {
       link.focus()
       clock.advance(600)
     })
     const frame = renderer.last()
-    const n = 2 // geometry, in nebula order
+    const n = 2 // trigonometry, in nebula order
     expect(frame.highlightNebula).toBe(n)
     // The pill is where nebulaFocusSpot puts it for the nebula as drawn now, not before the pan.
     const expected = nebulaFocusSpot(
@@ -176,9 +190,9 @@ describe('the parallel DOM', () => {
   })
 
   it('inside a nebula, its stars are the next Tab stops', () => {
-    const { container } = showMap({ layer: 'nebula', nebulaId: 'algebra' })
+    const { container } = showMap({ layer: 'nebula', nebulaId: 'trigonometry' }, 10, sky10())
     const tabbable = starLinks(container).filter((link) => link.getAttribute('tabindex') !== '-1').map((link) => link.dataset.unit)
-    expect(tabbable).toEqual(['u-4', 'u-5', 'u-6'])
+    expect(tabbable.filter((unit) => !unit!.startsWith('mechanics'))).toEqual(['demo-sine-cosine', 'trigonometry-2'])
   })
 
   it('lists every star on screen, blurred or sharp, on a 500-star map', () => {
@@ -187,49 +201,55 @@ describe('the parallel DOM', () => {
     const onScreen = frame.x.filter((x, i) => x >= -8 && frame.y[i] >= -8 && x <= 1288 && frame.y[i] <= 784).length
     const links = starLinks(container)
     expect(links).toHaveLength(onScreen)
-    const blurred = frame.starAlpha.filter((alpha) => alpha === 0).length
-    expect(blurred).toBeGreaterThan(50)
-    expect(links.length).toBeGreaterThan(frame.starAlpha.filter((alpha) => alpha > 0).length)
+    expect(onScreen).toBeGreaterThan(150)
   })
 
   it('in a nebula, keeps the nebula order and names the nebula as the heading', () => {
-    const { container } = showMap({ layer: 'nebula', nebulaId: 'algebra' })
-    expect(screen.getByRole('heading', { level: 1, name: 'Algebra' })).toBeInTheDocument()
+    const map = sky10()
+    const { container } = showMap({ layer: 'nebula', nebulaId: 'trigonometry' }, 10, map)
+    expect(screen.getByRole('heading', { level: 1, name: 'Trigonometry' })).toBeInTheDocument()
     const units = starLinks(container).map((link) => link.dataset.unit)
-    expect(units.filter((unit) => ['u-4', 'u-5', 'u-6'].includes(unit!))).toEqual(['u-4', 'u-5', 'u-6'])
-    const order = ['u-1', 'u-2', 'u-3', 'u-4', 'u-5', 'u-6', 'u-7', 'u-8', 'u-9', 'u-10']
-    expect([...units].sort((a, b) => order.indexOf(a!) - order.indexOf(b!))).toEqual(units)
+    expect(units.filter((unit) => unit!.startsWith('demo-sine') || unit!.startsWith('trigonometry'))).toEqual(['demo-sine-cosine', 'trigonometry-2'])
+    const order = orderedStars(map).map((star) => star.unitId)
+    expect([...units].sort((p, q) => order.indexOf(p!) - order.indexOf(q!))).toEqual(units)
   })
 })
 
 describe('the star layer is HTML', () => {
   it('shows state, progress, markers, skills and the way into the chapter', () => {
-    const { container } = showMap({ layer: 'star', nebulaId: 'numbers', unitId: 'u-3' })
+    const { container } = showMap({ layer: 'star', nebulaId: 'trigonometry', unitId: 'demo-sine-cosine' }, 10, sky10())
     expect(starLinks(container)).toHaveLength(0)
-    const card = screen.getByRole('article', { name: 'Decimals' })
-    expect(within(card).getByText('Numbers · In progress')).toBeInTheDocument()
-    expect(within(card).getByRole('progressbar', { name: '3 of 5 lessons done' })).toHaveAttribute('aria-valuenow', '60')
+    const card = screen.getByRole('article', { name: 'Sine and cosine' })
+    expect(within(card).getByText('Trigonometry · In progress')).toBeInTheDocument()
+    expect(within(card).getByRole('progressbar', { name: '1 of 3 lessons done' })).toHaveAttribute('aria-valuenow', '33')
     expect(within(card).getByText('Suggested next')).toBeInTheDocument()
-    expect(within(card).getByText('Rounding, lit')).toBeInTheDocument()
-    expect(within(card).getByText('Comparing decimals, not lit yet')).toBeInTheDocument()
-    expect(within(card).getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/chapter/u-3')
+    expect(within(card).getByText('Opposite and adjacent sides, lit')).toBeInTheDocument()
+    expect(within(card).getByText('Sine as a ratio, not lit yet')).toBeInTheDocument()
+    expect(within(card).getByRole('link', { name: 'Continue' })).toHaveAttribute('href', '/chapter/demo-sine-cosine')
   })
 
   it('says what is still missing when every lesson is done but the star is not lit', () => {
-    showMap({ layer: 'star', nebulaId: 'algebra', unitId: 'u-5' })
+    const map = sky10()
+    const done: StarMap = {
+      ...map,
+      stars: map.stars.map((star) =>
+        star.unitId === 'demo-sine-cosine' ? { ...star, progress: 1, unmetExercises: 2, chapter: { ...star.chapter, lessonsDone: star.chapter.lessonCount } } : star,
+      ),
+    }
+    showMap({ layer: 'star', nebulaId: 'trigonometry', unitId: 'demo-sine-cosine' }, 10, done)
     expect(screen.getByText('All lessons done: 2 exercises still to get right')).toBeInTheDocument()
   })
 
-  it('lists a locked star’s prerequisites instead of a chapter link', () => {
-    showMap({ layer: 'star', nebulaId: 'geometry', unitId: 'u-8' })
-    const card = screen.getByRole('article', { name: 'Triangles' })
-    expect(within(card).getByRole('link', { name: 'Angles' })).toHaveAttribute('href', '/map/math/geometry/u-7')
+  it('lists a locked star’s prerequisites instead of a chapter link, across galaxies too', () => {
+    showMap({ layer: 'star', nebulaId: 'optics', unitId: 'demo-refraction' }, 10, sky10('physics'))
+    const card = screen.getByRole('article', { name: 'Refraction' })
+    expect(within(card).getByRole('link', { name: 'Sine and cosine' })).toHaveAttribute('href', '/map/math/trigonometry/demo-sine-cosine')
     expect(within(card).queryByRole('link', { name: /Start|Continue|Open chapter/ })).toBeNull()
   })
 
   it('shows the review count', () => {
-    showMap({ layer: 'star', nebulaId: 'numbers', unitId: 'u-2' })
-    expect(screen.getByText('3 cards due for review')).toBeInTheDocument()
+    showMap({ layer: 'star', nebulaId: 'numbers', unitId: 'numbers-1' }, 10, sky10())
+    expect(screen.getByText('4 cards due for review')).toBeInTheDocument()
   })
 })
 
@@ -258,7 +278,7 @@ describe('the canvas pixel ratio', () => {
 })
 
 describe('the subject switcher (#72 point 7)', () => {
-  it('shows one map at a time and links to the others', () => {
+  it('names the galaxy in focus and links to the others, which the map flies to', () => {
     showMap()
     const switcher = screen.getByRole('navigation', { name: 'Subjects' })
     expect(within(switcher).getByRole('link', { name: 'Mathematics' })).toHaveAttribute('aria-current', 'page')

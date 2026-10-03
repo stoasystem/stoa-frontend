@@ -41,7 +41,10 @@
     "start": "Commencer",
     "continue": "Continuer",
     "open": "Ouvrir le chapitre",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Réviser {{count}} exercice",
+    "review_other": "Réviser {{count}} exercices",
+    "reviewSoon": "Bientôt disponible"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} sur {{total}} allumées",
@@ -50,7 +53,8 @@
   "nav": {
     "map": "Carte du ciel",
     "backToMap": "Retour à la carte du ciel",
-    "backToNebula": "Retour à {{nebula}}"
+    "backToNebula": "Retour à {{nebula}}",
+    "backToStar": "Retour à {{name}}"
   },
   "zoom": {
     "group": "Zoom",
@@ -65,5 +69,12 @@
     "nebula": "{{nebula}} : {{lit}} sur {{total}} allumées",
     "star": "{{name}} : {{state}}"
   },
-  "empty": "Rien à apprendre dans cette matière pour l’instant."
+  "empty": "Rien à apprendre dans cette matière pour l’instant.",
+  "emptySky": {
+    "title": "Ta carte du ciel arrive bientôt",
+    "body": "Tes matières et tes notions apparaîtront ici dès qu’elles seront prêtes."
+  },
+  "lighting": {
+    "announce": "L’étoile {{name}} est allumée"
+  }
 }

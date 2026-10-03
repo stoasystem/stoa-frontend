@@ -1,47 +1,37 @@
 /*
- * Where the star map's data comes from. For now, fixtures (#47); #48 swaps
- * the body of this hook for a query of `GET /practice/knowledge-map?subjectId=`
- * through `src/services` (the API contract check only reads that directory).
- *
- * The fixture subject answers to both `math` and `mathematics`, as the real
- * endpoint will (stoa-backend#62); any other subject is an empty map, which
- * is what the backend returns for a subject with no content -- never a 404.
+ * The star map the route draws, from the star map source (`starMapSource.ts`,
+ * #131). In the application that is an empty sky until #48 wires the read
+ * model (stoa-backend#59) in here; the design preview and the bench inject
+ * the demo sky from `src/dev`. No demo data is imported from here.
  */
 import { useMemo } from 'react'
-import { isFixtureSize, starMapFixture, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+import { useTranslation } from 'react-i18next'
 import type { StarMap } from '@/features/starmap/model/starMap'
+import { isFixtureSize, useStarMapSource, type FixtureSize } from '@/features/starmap/starMapSource'
+import { isSupportedLanguage } from '@/i18n/languages'
 
-/** The subject `/` opens. #48: the last one opened, else the first with content. */
+/** The sky size the route asks a demo source for when `?points=` says nothing. */
+export const DEMO_STAR_COUNT: FixtureSize = 1000
+
 export const DEFAULT_SUBJECT_ID = 'math'
 
-const FIXTURE_SUBJECTS = new Set(['math', 'mathematics'])
-
-function emptyMap(subjectId: string, subjects: StarMap['subjects']): StarMap {
-  const known = subjects.find((subject) => subject.subjectId === subjectId)
-  return {
-    subject: { subjectId, name: known?.name ?? subjectId },
-    nebulae: [],
-    stars: [],
-    prerequisites: [],
-    summary: { lit: 0, total: 0, streakDays: 0, score: 0 },
-    subjects,
-  }
-}
-
-/** `?points=500`, `1000` or `2000` draws a bigger fixture map; default 10. */
-export function fixtureSizeFrom(search: URLSearchParams): FixtureSize {
+/** Benchmark-only fixture sizes; default is the curated demonstration. */
+export function fixtureSizeFrom(search: URLSearchParams, fallback: FixtureSize = 10): FixtureSize {
   const asked = Number(search.get('points'))
-  return isFixtureSize(asked) ? asked : 10
+  return isFixtureSize(asked) ? asked : fallback
 }
 
-/** `?foveation=off` draws every nebula star by star, for the phone bench (#44); on otherwise. */
 export function foveationFrom(search: URLSearchParams): boolean {
   return search.get('foveation') !== 'off'
 }
 
-export function useStarMap(subjectId: string, size: FixtureSize): StarMap {
-  return useMemo(() => {
-    const fixture = starMapFixture(size)
-    return FIXTURE_SUBJECTS.has(subjectId.trim().toLowerCase()) ? fixture : emptyMap(subjectId, fixture.subjects)
-  }, [subjectId, size])
+export function useStarMap(subjectId: string, size: FixtureSize, relations = false, longNames = false): StarMap {
+  const { t, i18n } = useTranslation('starmap')
+  const resolved = i18n.resolvedLanguage ?? i18n.language
+  const language = isSupportedLanguage(resolved) ? resolved : 'en'
+  const source = useStarMapSource() // #131: empty in production; the preview's and the bench's give the demo sky.
+  return useMemo(
+    () => source.read({ subjectId, size, t, language, relations, longNames }),
+    [subjectId, size, t, language, relations, longNames, source],
+  )
 }

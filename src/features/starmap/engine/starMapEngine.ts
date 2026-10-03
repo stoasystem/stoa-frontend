@@ -9,14 +9,21 @@
  * glide, a layer change, or the recommended star breathing. A still map under
  * reduced motion, or while the map is paused (hidden tab, `inert` page area),
  * asks for none.
+ *
+ * One sky is a ring (#120): the view's `cx` runs on round it without bound,
+ * and every frame places each galaxy at its copy nearest the centre of the
+ * view (see `view/sky.ts`). Screen positions -- `x`, `y`, `nebulaX` -- are
+ * always those of the drawn copy, so taps, keyboard focus, the parallel DOM
+ * and `starOnScreen` never meet a star twice or the wrong copy.
  */
-import { innerLinks, nebulaLinks } from '@/features/starmap/model/links'
+import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
 import { LEARNING_STATES, orderedNebulae, orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
 import type { SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import {
   baseScale,
   clampView,
+  nearestCopy,
   overviewView,
   panBy,
   transformOf,
@@ -25,7 +32,19 @@ import {
   type Viewport,
 } from '@/features/starmap/view/camera'
 import { DRAW_THRESHOLD, FOVEATE_ABOVE, focusBand, sharpnessOf } from '@/features/starmap/view/foveation'
-import { mapBounds, nebulaDiscs, typicalSpacing, type NebulaDisc } from '@/features/starmap/view/geometry'
+import { cloudSpacing, mapBounds, nebulaDiscs, typicalSpacing, type NebulaDisc } from '@/features/starmap/view/geometry'
+import {
+  galaxyAt,
+  galaxyReach,
+  galaxyTurns,
+  galaxyView,
+  NOT_ENROLLED_DIM,
+  ringSafeZoom,
+  SKY_WRAP,
+  skyBounds,
+  skyGalaxies,
+  type SkyGalaxy,
+} from '@/features/starmap/view/sky'
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import {
   innerTarget,
@@ -56,6 +75,9 @@ export type VisibleStar = { index: number; x: number; y: number }
 /** A nebula's disc on screen now, CSS px, for placing its link's focus indicator. */
 export type NebulaDiscOnScreen = { x: number; y: number; r: number }
 
+/** Where one star is drawn in the last frame, CSS px, and the glyph size (#51's lighting layer). */
+export type StarOnScreen = { x: number; y: number; size: number }
+
 export type StarMapEngineOptions = {
   renderer: StarMapRenderer
   theme: StarMapTheme
@@ -65,6 +87,14 @@ export type StarMapEngineOptions = {
    * star, which only the phone bench asks for (#44), to see what it saves.
    */
   foveate?: boolean
+  /**
+   * One sky (#119): the map holds every galaxy along a band; the whole-map
+   * layer is a window on the galaxy in focus, nebulae are drawn as clouds,
+   * and a portrait screen sees a narrower window instead of a turned map.
+   */
+  galaxy?: boolean
+  /** At rest on the whole-map layer, the galaxy at the centre of the view changed (the header follows it). */
+  onCentreGalaxy?: (subjectId: string) => void
   scheduler?: FrameScheduler
   now?: () => number
   /** The student asked for another layer: a tap, a pinch, the wheel. */
@@ -81,9 +111,9 @@ type Transition =
 
 type Pointer = { x: number; y: number }
 
-/** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 56. */
+/** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 40. */
 export function glyphSizeFor(scale: number, spacing: number): number {
-  return Math.max(9, Math.min(56, scale * spacing * 0.55))
+  return Math.max(9, Math.min(40, scale * spacing * 0.55))
 }
 
 /**
@@ -117,6 +147,27 @@ function layoutChecksum(map: StarMap): string {
   return sum.toString(36)
 }
 
+/**
+ * What makes two maps one sky (#123): the same galaxies, nebulae and stars at
+ * the same places. Learning states, names and prerequisites may differ (a
+ * star lit); the array objects may too -- the backend, a star-count tier or
+ * the preview's override hands over a new map on every render.
+ */
+const skyKeys = new WeakMap<StarMap, string>()
+export function skyLayoutKey(map: StarMap): string {
+  const known = skyKeys.get(map)
+  if (known !== undefined) return known
+  let sum = 0
+  const mix = (value: string) => {
+    for (let i = 0; i < value.length; i += 1) sum = (Math.imul(sum, 31) + value.charCodeAt(i)) | 0
+  }
+  for (const nebula of map.nebulae) mix(`${nebula.topicId}@${nebula.subjectId ?? ''};`)
+  for (const star of map.stars) mix(`${star.unitId}@${star.nebulaId}:${Math.round(star.x * 1e5)},${Math.round(star.y * 1e5)};`)
+  const key = `${map.nebulae.length}:${map.stars.length}:${(sum >>> 0).toString(36)}`
+  skyKeys.set(map, key)
+  return key
+}
+
 /** How strongly nebula names are drawn in each layer: dimmer around a chosen nebula, gone behind a star's card. */
 export const NEBULA_LABEL_ALPHA: Record<MapLayer, number> = { map: 1, nebula: 0.8, star: 0 }
 
@@ -126,6 +177,10 @@ const WHEEL_COOLDOWN_MS = 450
 const PINCH_IN = 1.25
 const PINCH_OUT = 0.8
 const STAR_LAYER_DIM = 0.35
+/** The glyph size a nebula is opened at, at least (CSS px): full glyphs, not dots. */
+const NEBULA_GLYPH = 28
+/** A flight to another galaxy lasts this many layer changes. */
+const GALAXY_FLIGHT = 1.8
 
 export class StarMapEngine {
   private readonly renderer: StarMapRenderer
@@ -144,9 +199,26 @@ export class StarMapEngine {
   private nebulaIndex = new Map<string, number>()
   private nebulaIds: string[] = []
   private discs = new Map<string, NebulaDisc>()
+  /** The recommended star of each subject (one sky has one per subject the student takes). */
+  private recommendedBy = new Map<string, number>()
   private bounds: Bounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 }
   private spacing = 0.05
+  /** The even-spread spacing, which sizes the dots of the whole map (1.15 to 2.1 px, #110). */
+  private dotSpacing = 0.05
+  /** One sky: the option is on and the map says which galaxy each nebula is in. */
+  private sky = false
+  private skyGalaxies: SkyGalaxy[] = []
+  /** The galaxy the header names: the route's, then whichever is at the centre of the view at rest. */
+  private centred = ''
   private scene: SceneData | null = null
+  /** The ring's circumference (one sky of two galaxies or more), else 0: nothing wraps. */
+  private wrap = 0
+  /** The widest reach of any galaxy from its middle, map units (sets the least zoom on the ring). */
+  private ringReach = 0
+  /** Each nebula's galaxy index, or -1. */
+  private nebulaGalaxy = new Int16Array(0)
+  /** Turns of the ring added to each galaxy this frame, times `wrap`: map units, for the renderer. */
+  private galaxyShift = new Float64Array(0)
 
   private x = new Float32Array(0)
   private y = new Float32Array(0)
@@ -173,6 +245,7 @@ export class StarMapEngine {
   private wheel = { accumulated: 0, lastIntentAt: Number.NEGATIVE_INFINITY }
   private focusStar = -1
   private focusNebula = -1
+  private hoveredNebula = -1
 
   private visibleKey = ''
   private emittedOnce = false
@@ -193,35 +266,106 @@ export class StarMapEngine {
   // ---- inputs from React ------------------------------------------------
 
   setData(map: StarMap, target: LayerTarget): void {
+    const previous = this.source
     this.source = map
+    // The same sky with another galaxy in focus (the switcher, or the header
+    // following a pan): keep the camera, and fly there if the view is not
+    // already on it. One sky is decided by its layout, never by whether the
+    // arrays are the same objects (#123): a new but equal map is the same sky.
+    if (this.sky && this.map && previous && skyLayoutKey(previous) === skyLayoutKey(map)) {
+      const centred = this.centred
+      if (previous.stars === map.stars && previous.nebulae === map.nebulae && previous.prerequisites === map.prerequisites) {
+        this.map = map
+      } else {
+        // States, names or lines may have changed: draw them, but keep the view and any flight.
+        this.load(this.target, true, true)
+        this.centred = centred
+      }
+      const switched = map.subject.subjectId !== this.centred
+      if (this.drewFirstFrame && target.layer === 'map' && this.target.layer === 'map' && switched) {
+        this.cancelGestures()
+        // A longer flight than a layer change: the sky passes by on the way.
+        this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
+        this.centred = map.subject.subjectId
+      }
+      this.invalidate()
+      return
+    }
     // New data for the same layer (a star lit, say) keeps the view where it is.
-    this.load(target, this.drewFirstFrame && sameTarget(target, this.target))
+    const keepView = this.drewFirstFrame && sameTarget(target, this.target)
+    // Another sky with another galaxy in focus (#123: a link that drops
+    // `?points=`, an answer of another size): keeping the view would leave it
+    // on the old galaxy, and at rest the route would be put back there. Fly.
+    const refocus = keepView && this.sky && target.layer === 'map' && map.subject.subjectId !== this.centred
+    this.load(target, keepView)
+    if (refocus && this.sky && this.viewport.width > 0) {
+      this.cancelGestures()
+      this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
+      this.invalidate()
+    }
   }
 
-  private load(target: LayerTarget, keepView: boolean): void {
+  /** The galaxies along the band (one sky only), left to right. */
+  get galaxies(): readonly SkyGalaxy[] {
+    return this.skyGalaxies
+  }
+
+  private load(target: LayerTarget, keepView: boolean, keepTransition = false): void {
     const source = this.source
     if (!source) return
-    const map = orient(source, this.orientation)
+    const sky = this.options.galaxy === true && source.nebulae.some((nebula) => nebula.subjectId !== undefined)
+    this.sky = sky
+    // One sky is never turned: a portrait screen sees a narrower window of the same band.
+    const map = sky ? source : orient(source, this.orientation)
     this.map = map
     this.stars = orderedStars(map)
     const nebulae = orderedNebulae(map).filter((nebula) => map.stars.some((star) => star.nebulaId === nebula.topicId))
     this.nebulaIds = nebulae.map((nebula) => nebula.topicId)
     this.nebulaIndex = new Map(this.nebulaIds.map((id, index) => [id, index]))
     this.discs = nebulaDiscs(map)
-    this.bounds = mapBounds(this.discs)
-    this.spacing = typicalSpacing(map, this.discs)
+    this.skyGalaxies = sky ? skyGalaxies(map) : []
+    this.bounds = sky && map.stars.length ? skyBounds(this.skyGalaxies) : mapBounds(this.discs)
+    this.dotSpacing = typicalSpacing(map, this.discs)
+    this.spacing = sky ? cloudSpacing(map, this.discs) : this.dotSpacing
+    this.centred = map.subject.subjectId
+    const galaxyIndex = new Map(this.skyGalaxies.map((galaxy, index) => [galaxy.subjectId, index]))
+    this.nebulaGalaxy = Int16Array.from(nebulae, (nebula) => galaxyIndex.get(nebula.subjectId ?? '') ?? -1)
+    this.galaxyShift = new Float64Array(this.skyGalaxies.length)
+    this.ringReach = Math.max(
+      0,
+      ...this.skyGalaxies.map((galaxy) =>
+        galaxyReach(galaxy, nebulae.flatMap((nebula) => (nebula.subjectId === galaxy.subjectId ? [this.discs.get(nebula.topicId)!] : []))),
+      ),
+    )
+    // A ring needs room: with a single galaxy (or one wider than half the
+    // band) its two copies would show at once, so such a sky stays a strip.
+    this.wrap = sky && this.skyGalaxies.length >= 2 && this.ringReach < SKY_WRAP / 2 ? SKY_WRAP : 0
 
     const count = this.stars.length
+    this.recommendedBy = new Map()
     const starIndex = new Map(this.stars.map((star, i) => [star.unitId, i]))
     const scene: SceneData = {
-      mapKey: `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
+      mapKey: sky ? `sky:${count}:${layoutChecksum(map)}` : `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
       count,
+      galaxy: sky,
+      galaxies: this.skyGalaxies.map((galaxy) => ({
+        subjectId: galaxy.subjectId,
+        name: galaxy.name,
+        x0: galaxy.x0,
+        x1: galaxy.x1,
+        y0: galaxy.y0,
+        y1: galaxy.y1,
+        tint: galaxy.tint,
+        dim: galaxy.enrolled ? 1 : NOT_ENROLLED_DIM,
+        nebulae: nebulae.flatMap((nebula, n) => (nebula.subjectId === galaxy.subjectId ? [n] : [])),
+      })),
       mapX: new Float32Array(count),
       mapY: new Float32Array(count),
       state: new Uint8Array(count),
       progress: new Float32Array(count),
       reviewDue: new Uint8Array(count),
       recommended: -1,
+      recommendations: [],
       nebula: new Uint16Array(count),
       names: this.stars.map((star) => star.name),
       skills: this.stars.map((star) => star.skills.map((skill) => skill.lit)),
@@ -236,14 +380,13 @@ export class StarMapEngine {
           r: disc.r,
           lit: members.filter((star) => star.state === 'lit').length,
           total: members.length,
+          ...this.nebulaLook(nebula.topicId, galaxyIndex.get(nebula.subjectId ?? '')),
         }
       }),
       links: nebulaLinks(map)
         .map((link) => ({ a: this.nebulaIndex.get(link.a) ?? -1, b: this.nebulaIndex.get(link.b) ?? -1, count: link.count }))
         .filter((link) => link.a >= 0 && link.b >= 0),
-      innerLinks: this.nebulaIds.flatMap((id, n) =>
-        innerLinks(map, id).map((edge) => ({ from: starIndex.get(edge.from) ?? -1, to: starIndex.get(edge.to) ?? -1, nebula: n })),
-      ).filter((edge) => edge.from >= 0 && edge.to >= 0),
+      starLinks: starLinkIndices(map, starIndex),
     }
     this.stars.forEach((star, i) => {
       scene.mapX[i] = star.x
@@ -252,8 +395,13 @@ export class StarMapEngine {
       scene.progress[i] = star.progress
       scene.reviewDue[i] = star.reviewDue > 0 ? 1 : 0
       scene.nebula[i] = this.nebulaIndex.get(star.nebulaId) ?? 0
-      if (star.recommendation && scene.recommended === -1) scene.recommended = i
+      if (star.recommendation) {
+        ;(scene.recommendations as number[]).push(i)
+        const subject = map.nebulae.find((nebula) => nebula.topicId === star.nebulaId)?.subjectId ?? map.subject.subjectId
+        if (!this.recommendedBy.has(subject)) this.recommendedBy.set(subject, i)
+      }
     })
+    scene.recommended = this.recommendedBy.get(map.subject.subjectId) ?? scene.recommendations?.[0] ?? -1
     this.scene = scene
     this.x = new Float32Array(count)
     this.y = new Float32Array(count)
@@ -269,8 +417,21 @@ export class StarMapEngine {
 
     this.target = target
     if (!keepView) this.view = this.viewFor(target)
-    this.transition = null
+    if (!keepTransition) this.transition = null
     this.invalidate()
+  }
+
+  /**
+   * A nebula's own tint, near its galaxy's (#117 B2: each its own shade
+   * between blue-violet and warm gold, never a rainbow), and its dimming.
+   */
+  private nebulaLook(topicId: string, galaxy: number | undefined): { tint: number; dim: number } {
+    if (galaxy === undefined) return { tint: 0.3, dim: 1 }
+    let hash = 2166136261
+    for (let i = 0; i < topicId.length; i += 1) hash = Math.imul(hash ^ topicId.charCodeAt(i), 16777619) >>> 0
+    const jitter = ((hash % 1000) / 1000 - 0.5) * 0.3
+    const owner = this.skyGalaxies[galaxy]
+    return { tint: Math.max(0, Math.min(1, owner.tint + jitter)), dim: owner.enrolled ? 1 : NOT_ENROLLED_DIM }
   }
 
   setTarget(target: LayerTarget): void {
@@ -312,7 +473,7 @@ export class StarMapEngine {
     const orientation = orientationFor(width, height)
     if (orientation !== this.orientation) {
       this.orientation = orientation
-      if (this.source) this.load(this.target, false)
+      if (this.source && !this.sky) this.load(this.target, false)
     }
     if (changed && this.map && !this.transition) this.view = this.viewFor(this.target)
     this.positionsStale = true
@@ -323,7 +484,7 @@ export class StarMapEngine {
     this.policy = motionPolicy(reduced)
     if (!this.policy.inertia) this.inertia.stop()
     if (this.transition?.kind === 'zoom' && reduced) {
-      this.view = this.transition.flight(1)
+      this.view = this.ringSafe(this.transition.flight(1))
       this.transition = null
     }
     this.invalidate()
@@ -370,13 +531,15 @@ export class StarMapEngine {
     if (index >= 0 && this.scene && this.target.layer !== 'star' && this.viewport.width > 0) {
       const nebula = this.scene.nebulae[index]
       const t = transformOf(this.view, this.viewport, this.bounds)
-      const sx = t.ox + nebula.x * t.scale
+      // On the ring, the copy nearest the view: the shorter way round.
+      const x = nearestCopy(nebula.x, this.view.cx, this.wrap)
+      const sx = t.ox + x * t.scale
       const sy = t.oy + nebula.y * t.scale
       const fx = this.viewport.width * this.view.fx
       const fy = this.viewport.height * this.view.fy
       const band = focusBand(this.viewport.width, this.viewport.height)
       if (Math.hypot(sx - fx, sy - fy) > band.inner) {
-        const to = clampView({ ...this.view, cx: nebula.x, cy: nebula.y }, this.bounds)
+        const to = clampView({ ...this.view, cx: x, cy: nebula.y }, this.bounds, this.wrap)
         this.panTo(to)
       }
     }
@@ -384,7 +547,7 @@ export class StarMapEngine {
   }
 
   /** Move the view without changing layer: a short flight, or a crossfade under reduced motion. */
-  private panTo(to: View): void {
+  private panTo(to: View, flightMs = this.policy.layerMs): void {
     this.inertia.stop()
     const layer = this.target.layer
     const now = this.now()
@@ -396,9 +559,21 @@ export class StarMapEngine {
       this.view = to
     } else {
       const flight = interpolateView(this.view, to, Math.min(this.viewport.width, this.viewport.height), baseScale(this.viewport, this.bounds))
-      this.transition = { kind: 'zoom', startedAt: now, durationMs: this.policy.layerMs, flight, from: layer, to: layer }
+      this.transition = { kind: 'zoom', startedAt: now, durationMs: flightMs, flight, from: layer, to: layer }
     }
     this.positionsStale = true
+  }
+
+  /**
+   * Back to the layer's own view after a pan: on the star layer, the focused
+   * star returns to its place beside its card (#132), the shorter way round
+   * the ring. A flight, or a crossfade under reduced motion.
+   */
+  recentre(): void {
+    if (!this.map || this.viewport.width === 0) return
+    this.cancelGestures()
+    this.panTo(this.viewFor(this.target))
+    this.invalidate()
   }
 
   // ---- gestures ---------------------------------------------------------
@@ -437,13 +612,15 @@ export class StarMapEngine {
     if (!this.press.moved && Math.hypot(x - this.press.x, y - this.press.y) < TAP_SLOP) return
     if (!this.press.moved) {
       this.press.moved = true
-      // The star layer holds still: its card is the thing to read.
-      if (this.target.layer !== 'star' && !this.transition) this.dragging = { x: this.press.x, y: this.press.y, at: this.press.at }
+      // Every layer pans, the star layer too (#132): its card stays open for
+      // the focused star wherever the map is dragged, and the star's lines go
+      // with it. Only a flight in progress holds the map.
+      if (!this.transition) this.dragging = { x: this.press.x, y: this.press.y, at: this.press.at }
     }
     if (!this.dragging) return
     const dx = x - this.dragging.x
     const dy = y - this.dragging.y
-    this.view = panBy(this.view, dx, dy, this.viewport, this.bounds)
+    this.view = panBy(this.view, dx, dy, this.viewport, this.bounds, this.wrap)
     this.inertia.sample(dx, dy, Math.max(1, now - this.dragging.at), now)
     this.dragging = { x, y, at: now }
     this.positionsStale = true
@@ -510,6 +687,17 @@ export class StarMapEngine {
     return glyphSizeFor(transformOf(this.view, this.viewport, this.bounds).scale, this.spacing)
   }
 
+  /** Where `unitId`'s star was drawn in the last frame; null before one, or for a star not on this map (#51). */
+  starOnScreen(unitId: string): StarOnScreen | null {
+    const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
+    return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize }
+  }
+
+  /** On the star layer, where its star was drawn in the last frame (it may be panned off screen, #132); else null. */
+  get focusedStarOnScreen(): StarOnScreen | null {
+    return this.target.layer === 'star' ? this.starOnScreen(this.target.unitId) : null
+  }
+
   /** Whether the engine has a frame on order. */
   get animating(): boolean {
     return this.handle !== null
@@ -526,7 +714,32 @@ export class StarMapEngine {
 
   private viewFor(target: LayerTarget): View {
     if (!this.map || this.viewport.width === 0) return overviewView(this.bounds, this.viewport)
-    return viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
+    if (target.layer === 'map' && this.skyGalaxies.length > 0) {
+      const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
+      return this.onRing(galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport))
+    }
+    const view = viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
+    if (!this.sky || target.layer === 'map') return view
+    // A cloud's rim reaches far past its core: zoom in until its stars are full
+    // glyphs, so the four learning states can be told apart (#117).
+    const glyphK = NEBULA_GLYPH / (0.55 * baseScale(this.viewport, this.bounds) * this.spacing)
+    return this.onRing({ ...view, k: Math.min(60, Math.max(view.k, target.layer === 'star' ? glyphK * 1.5 : glyphK)) })
+  }
+
+  /**
+   * A view on the ring: at the copy of its centre nearest the current view
+   * (so a flight takes the shorter way round), and zoomed in at least far
+   * enough that no galaxy is ever on screen twice (`ringSafeZoom`).
+   */
+  private onRing(view: View): View {
+    if (this.wrap <= 0) return view
+    return this.ringSafe({ ...view, cx: nearestCopy(view.cx, this.view.cx, this.wrap) })
+  }
+
+  private ringSafe(view: View): View {
+    if (this.wrap <= 0) return view
+    const least = ringSafeZoom(this.ringReach, this.wrap, this.viewport, this.bounds, view.fx)
+    return view.k >= least ? view : { ...view, k: least }
   }
 
   private pointerSpread(): number {
@@ -566,6 +779,7 @@ export class StarMapEngine {
 
   /** The nebula under `(x, y)`; with `nearest`, the closest one if none is under it. */
   private nebulaAt(x: number, y: number, nearest = false): string | null {
+    if (this.sky) return this.nearestStar(x, y, nearest ? Infinity : 28)?.nebulaId ?? null
     let best = -1
     let bestGap = nearest ? Number.POSITIVE_INFINITY : 0
     for (let n = 0; n < this.nebulaIds.length; n += 1) {
@@ -588,11 +802,21 @@ export class StarMapEngine {
     }
     const hit = this.nearestStar(x, y, reach)
     if (hit) {
-      this.options.onRequestTarget?.({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId })
+      // A tap on the star already open brings it back to its place beside the card.
+      if (this.target.layer === 'star' && hit.unitId === this.target.unitId) this.recentre()
+      else this.options.onRequestTarget?.({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId })
       return
     }
     const nebulaId = this.nebulaAt(x, y)
     if (nebulaId && nebulaId !== this.target.nebulaId) this.options.onRequestTarget?.({ layer: 'nebula', nebulaId })
+  }
+
+  hoverAt(x: number | null, y = 0) {
+    const id = x === null ? null : this.nebulaAt(x, y)
+    const next = id ? this.nebulaIndex.get(id) ?? -1 : -1
+    if (next === this.hoveredNebula) return
+    this.hoveredNebula = next
+    this.invalidate()
   }
 
   private invalidate() {
@@ -617,7 +841,8 @@ export class StarMapEngine {
       progress = t
       from = this.transition.from
       if (this.transition.kind === 'zoom') {
-        this.view = this.transition.flight(easeStandard(t))
+        // A long flight pulls back, but never so far that the ring shows a galaxy twice.
+        this.view = this.ringSafe(this.transition.flight(easeStandard(t)))
         // The flight's last frame is a frame at rest: the parallel DOM (and a
         // focused nebula's name pill) must get these final positions now,
         // since nothing else may ask for another frame.
@@ -634,7 +859,7 @@ export class StarMapEngine {
     } else if (this.inertia.moving && this.policy.inertia && !this.paused) {
       const step = this.inertia.advance(dt)
       if (step) {
-        this.view = panBy(this.view, step[0], step[1], this.viewport, this.bounds)
+        this.view = panBy(this.view, step[0], step[1], this.viewport, this.bounds, this.wrap)
         moving = true
         keepGoing = true
       }
@@ -657,26 +882,34 @@ export class StarMapEngine {
             ? scene.nebula[this.focusStar]
             : -1
         : (this.nebulaIndex.get(target.nebulaId) ?? -1)
+    // On the ring, each galaxy at its copy nearest the centre of the view.
+    const shift = this.galaxyShift
+    if (this.wrap > 0) {
+      galaxyTurns(this.skyGalaxies, this.view.cx, this.wrap, shift)
+      for (let g = 0; g < shift.length; g += 1) shift[g] *= this.wrap
+    }
+    const shiftOf = (n: number) => (this.wrap > 0 && this.nebulaGalaxy[n] >= 0 ? shift[this.nebulaGalaxy[n]] : 0)
     for (let n = 0; n < scene.nebulae.length; n += 1) {
       const nebula = scene.nebulae[n]
-      this.nebulaX[n] = t.ox + nebula.x * t.scale
+      this.nebulaX[n] = t.ox + (nebula.x + shiftOf(n)) * t.scale
       this.nebulaY[n] = t.oy + nebula.y * t.scale
       this.nebulaR[n] = nebula.r * t.scale
       this.sharpness[n] =
         !this.foveate || scene.count <= FOVEATE_ABOVE ? 1 : sharpnessOf(this.nebulaX[n], this.nebulaY[n], this.nebulaR[n], focusX, focusY, band, n === chosen)
     }
     for (let i = 0; i < scene.count; i += 1) {
-      this.x[i] = t.ox + scene.mapX[i] * t.scale
+      this.x[i] = t.ox + (scene.mapX[i] + shiftOf(scene.nebula[i])) * t.scale
       this.y[i] = t.oy + scene.mapY[i] * t.scale
       this.starAlpha[i] = this.sharpness[scene.nebula[i]]
     }
     // The one exception: the recommended star is the student's way in, so it
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
-    if (scene.recommended >= 0) this.starAlpha[scene.recommended] = 1
+    for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
 
     // Only the recommended star breathes (#72 point 6), and only when seen sharp.
     let breath: SceneFrame['breath'] = null
-    const rec = scene.recommended
+    // On one sky, the recommended star of the galaxy the header names.
+    const rec = this.recommendedBy.get(this.centred) ?? scene.recommended
     if (
       rec >= 0 &&
       this.policy.breathing &&
@@ -699,6 +932,20 @@ export class StarMapEngine {
       this.options.onFirstFrame?.()
     }
     this.emitVisible(moving)
+    const atRest = !moving && !this.transition && !(this.inertia.moving && this.policy.inertia && !this.paused)
+    // At rest on the whole sky: the header names whichever galaxy is at the centre.
+    if (atRest && target.layer === 'map' && this.skyGalaxies.length > 0) {
+      const centre = galaxyAt(this.skyGalaxies, this.view.cx, this.wrap)
+      if (centre && centre.subjectId !== this.centred) {
+        this.centred = centre.subjectId
+        this.options.onCentreGalaxy?.(centre.subjectId)
+      }
+    }
+    // At rest, bring the view back to the first turn of the ring: nothing on
+    // screen moves (every galaxy turns with it), the numbers just stay small.
+    if (atRest && this.wrap > 0 && (this.view.cx < 0 || this.view.cx >= this.wrap)) {
+      this.view = { ...this.view, cx: this.view.cx - Math.floor(this.view.cx / this.wrap) * this.wrap }
+    }
     if (keepGoing) this.invalidate()
   }
 
@@ -723,14 +970,15 @@ export class StarMapEngine {
       target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : this.focusStar
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
     return {
-      dotBlend: dotBlendFor(glyphSize),
-      dotRadius: Math.max(1.6, Math.min(3.2, t.scale * this.spacing * 0.16)),
+      dotBlend: lerp(from === 'map' ? 1 : dotBlendFor(glyphSize), to === 'map' ? 1 : dotBlendFor(glyphSize)),
+      dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.dotSpacing * 0.11)),
       viewport: this.viewport,
       scale: t.scale,
       ox: t.ox,
       oy: t.oy,
       x: this.x,
       y: this.y,
+      galaxyShift: this.wrap > 0 ? this.galaxyShift : undefined,
       starAlpha: this.starAlpha,
       nebulaX: this.nebulaX,
       nebulaY: this.nebulaY,
@@ -741,8 +989,11 @@ export class StarMapEngine {
       starLabelAlpha,
       nebulaLabelAlpha: lerp(nebulaLabels(from), nebulaLabels(to)),
       innerLinkAlpha: starLabelAlpha,
+      starLayer: lerp(from === 'star' ? 1 : 0, to === 'star' ? 1 : 0),
       chosenNebula: chosen,
+      wholeMap: to === 'map',
       focusStar,
+      hoveredNebula: this.hoveredNebula,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
       dim: lerp(dimOf(from), dimOf(to)),
       showSkills: glyphSize >= 30,

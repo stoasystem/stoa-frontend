@@ -41,7 +41,10 @@
     "start": "Starten",
     "continue": "Weiter",
     "open": "Kapitel öffnen",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "{{count}} Aufgabe wiederholen",
+    "review_other": "{{count}} Aufgaben wiederholen",
+    "reviewSoon": "Bald verfügbar"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
@@ -50,7 +53,8 @@
   "nav": {
     "map": "Sternkarte",
     "backToMap": "Zurück zur Sternkarte",
-    "backToNebula": "Zurück zu {{nebula}}"
+    "backToNebula": "Zurück zu {{nebula}}",
+    "backToStar": "Zurück zu {{name}}"
   },
   "zoom": {
     "group": "Zoom",
@@ -65,5 +69,12 @@
     "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "In diesem Fach gibt es noch nichts zu lernen."
+  "empty": "In diesem Fach gibt es noch nichts zu lernen.",
+  "emptySky": {
+    "title": "Deine Sternkarte ist unterwegs",
+    "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
+  },
+  "lighting": {
+    "announce": "{{name}} leuchtet jetzt"
+  }
 }

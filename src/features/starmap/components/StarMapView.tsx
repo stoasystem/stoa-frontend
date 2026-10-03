@@ -9,21 +9,24 @@
  * `(topic.order, unit.order)`; its text is the star's name, learning state,
  * progress and markers (#11 point 5). The star layer is plain HTML and SVG.
  */
-import { ChevronLeft, Minus, Plus } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { ArrowUp, ChevronLeft, Minus, Plus } from 'lucide-react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
 import { nebulaLinks } from '@/features/starmap/model/links'
-import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
-import { LEARNING_STATES, litCount, nebulaCounts, orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
+import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
+import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
+import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, pathForTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { nebulaDiscs } from '@/features/starmap/view/geometry'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, pathForTarget, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
+import { ringNeighbour } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
 
@@ -36,6 +39,7 @@ const THEME_FALLBACK: StarMapTheme = {
   textBody: 'rgba(255, 255, 255, 0.75)',
   textCaption: 'rgba(255, 255, 255, 0.65)',
   fontFamily: 'system-ui, sans-serif',
+  links: LINK_INK,
 }
 
 /** The sky tokens as the canvas needs them, read where `data-surface="sky"` defines them. */
@@ -51,21 +55,34 @@ function readTheme(element: Element): StarMapTheme {
     textBody: read('--on-sky-text-body', THEME_FALLBACK.textBody),
     textCaption: read('--on-sky-text-caption', THEME_FALLBACK.textCaption),
     fontFamily: read('--font-system', THEME_FALLBACK.fontFamily),
+    links: {
+      recommended: read('--starmap-link-recommended', LINK_INK.recommended),
+      inProgress: read('--starmap-link-in-progress', LINK_INK.inProgress),
+      walked: read('--starmap-link-walked', LINK_INK.walked),
+      locked: read('--starmap-link-locked', LINK_INK.locked),
+      bridge: read('--starmap-bridge', LINK_INK.bridge),
+    },
   }
 }
 
 export type StarMapViewProps = {
   map: StarMap
+  /** Fixture-backed route: label sample progress and keep chapter actions local. */
+  demo?: boolean
   target: LayerTarget
   /** Go to another layer's route. */
   onNavigate: (target: LayerTarget) => void
   /** The first frame with the map on it is on screen. */
   onFirstFrame?: () => void
+  /** One sky: at rest on the whole map, another galaxy is at the centre of the view (the header follows it). */
+  onCentreGalaxy?: (subjectId: string) => void
   /** Foveated rendering; the phone bench switches it off (#44). Read once, when the canvas mounts. */
   foveate?: boolean
   /** For tests: the frame clock and the renderer. */
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
+  /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star is drawn. */
+  overlay?: (locate: (unitId: string) => StarOnScreen | null) => ReactNode
 }
 
 /**
@@ -84,8 +101,9 @@ export function canvasPixelRatio(): number {
  * subject switcher and where-you-are line above; the legend (wide) or the zoom
  * buttons (phone) below. The whole map fits between them.
  */
-export function controlBands(wide: boolean, bottomInset = 0): { top: number; bottom: number } {
-  return wide ? { top: 76, bottom: 164 + bottomInset } : { top: 112, bottom: 72 + bottomInset }
+export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
+  const noticeHeight = demo ? 32 : 0
+  return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
 }
 
 /** A link's box: the glyph, but never under 32 px, so the focus ring can be seen. */
@@ -93,30 +111,45 @@ function linkSize(glyph: number): number {
   return Math.round(Math.max(32, Math.min(56, glyph * 0.75)))
 }
 
+/** Whether a key goes to a field the student is typing in, not to the map. */
+function typing(target: EventTarget): boolean {
+  return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
+}
+
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, scheduler, createRendererFor }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, onNavigate, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
+  // The map's own links keep the query (`?points=`, the dev switches), as its
+  // navigation does: a switch must hand the engine the same sky (#123).
+  const { search } = useLocation()
+  const here = (path: string) => path + search
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<StarMapEngine | null>(null)
-  const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[] }>({
+  const [visible, setVisible] = useState<{ stars: VisibleStar[]; glyph: number; nebulae: NebulaDiscOnScreen[]; focus: StarOnScreen | null }>({
     stars: [],
     glyph: 12,
     nebulae: [],
+    focus: null,
   })
+  const cardRef = useRef<HTMLDivElement>(null)
+  const [hint, setHint] = useState<ReturnType<typeof starHintSpot>>(null)
   const [stageSize, setStageSize] = useState({ width: 0, height: 0, bottomInset: 0 })
   const [wide, setWide] = useState(true)
   const [announcement, setAnnouncement] = useState('')
+  const [focusPill, setFocusPill] = useState<{ id: string; width: number; height: number } | null>(null)
 
   // Keep the latest callbacks without rebuilding the engine.
   const navigateRef = useRef(onNavigate)
   const firstFrameRef = useRef(onFirstFrame)
+  const centreRef = useRef(onCentreGalaxy)
   useLayoutEffect(() => {
     navigateRef.current = onNavigate
     firstFrameRef.current = onFirstFrame
+    centreRef.current = onCentreGalaxy
   })
 
   const stars = useMemo(() => orderedStars(map), [map])
@@ -150,10 +183,14 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
       theme: readTheme(stage),
       reducedMotion,
       foveate,
+      // One sky (#119) whenever the map says which galaxy each nebula is in.
+      galaxy: true,
       scheduler,
       onRequestTarget: (next) => navigateRef.current(next),
-      onVisibleChange: (list, glyph, discs) => setVisible({ stars: list, glyph, nebulae: discs }),
+      // The star layer lists no stars, but says where its star is: panned away, a hint points back (#132).
+      onVisibleChange: (list, glyph, discs) => setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen }),
       onFirstFrame: () => firstFrameRef.current?.(),
+      onCentreGalaxy: (id) => centreRef.current?.(id),
     })
     engineRef.current = engine
 
@@ -163,7 +200,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
       const rect = stage.getBoundingClientRect()
       const isWideNow = isWide({ width: rect.width, height: rect.height })
       const bottomInset = parseFloat(getComputedStyle(stage).getPropertyValue('--page-bottom-inset')) || 0
-      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow, bottomInset))
+      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow, bottomInset, demo))
       setWide(isWideNow)
       setStageSize({ width: Math.round(rect.width), height: Math.round(rect.height), bottomInset })
     }
@@ -236,7 +273,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
       return
     }
     if (target.layer === 'map') {
-      setAnnouncement(t('announce.map', { subject: map.subject.name, lit: litCount(stars), total: stars.length }))
+      setAnnouncement(t('announce.map', { subject: map.subject.name, lit: map.summary.lit, total: map.summary.total }))
     } else if (target.layer === 'nebula') {
       const nebula = nebulae.find((n) => n.topicId === target.nebulaId)
       if (nebula) setAnnouncement(t('announce.nebula', { nebula: nebula.name, ...nebulaCounts(stars, nebula.topicId) }))
@@ -263,6 +300,9 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
   }
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const [x, y] = stagePoint(event)
+    if (event.pointerType === 'mouse' && event.buttons === 0) {
+      engineRef.current?.hoverAt(onOverlay(event) ? null : x, y)
+    }
     engineRef.current?.pointerMove(event.pointerId, x, y)
   }
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
@@ -284,11 +324,40 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
     } else if (event.key === 'Escape' && target.layer !== 'map') {
       event.preventDefault()
       engineRef.current?.step('out')
+    } else if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && target.layer === 'star' && !event.shiftKey && !typing(event.target)) {
+      // On the star layer, left and right go to the star before or after this
+      // one in its nebula, in course order -- the Tab order of the nebula
+      // layer (#132). The ends stop; the map flies to the next star.
+      const inNebula = stars.filter((star) => star.nebulaId === target.nebulaId)
+      const at = inNebula.findIndex((star) => star.unitId === target.unitId)
+      const next = inNebula[at + (event.key === 'ArrowRight' ? 1 : -1)]
+      if (at < 0 || !next) return
+      event.preventDefault()
+      navigateRef.current({ layer: 'star', nebulaId: next.nebulaId, unitId: next.unitId })
     }
   }
 
   const focusStar = useCallback((index: number) => engineRef.current?.setFocusStar(index), [])
+  const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
+
+  // Left and right arrows on a nebula's link go to the next nebula along the
+  // band, round the ring (#120): past the last galaxy comes the first, and the
+  // map pans the shorter way. Tab keeps the reading order, each nebula once.
+  const nebulaX = useMemo(() => {
+    const discs = nebulaDiscs(map)
+    return new Map(nebulae.map((nebula) => [nebula.topicId, discs.get(nebula.topicId)?.x ?? 0]))
+  }, [map, nebulae])
+  const stepAlongRing = (event: KeyboardEvent<HTMLAnchorElement>) => {
+    if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return
+    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    const links = [...(stageRef.current?.querySelectorAll<HTMLAnchorElement>('a[data-nebula-link]') ?? [])]
+    const from = links.indexOf(event.currentTarget)
+    if (from < 0 || links.length < 2) return
+    event.preventDefault()
+    const xs = links.map((link) => nebulaX.get(link.dataset.nebulaLink ?? '') ?? 0)
+    links[ringNeighbour(xs, from, event.key === 'ArrowRight' ? 1 : -1)].focus()
+  }
 
   // The links, grouped by nebula in keyboard order.
   const size = linkSize(visible.glyph)
@@ -304,10 +373,39 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
     return groups
   }, [visible, stars])
 
+  const measureFocusPill = (element: HTMLElement) => {
+    if (!element.offsetWidth) return
+    const id = element.dataset.nebulaLink ?? ''
+    const width = element.offsetWidth + 16 // 8 px of room for the focus ring at both edges.
+    const height = Math.max(NEBULA_FOCUS_HEIGHT, element.scrollHeight)
+    setFocusPill((old) => old?.id === id && old.width === width && old.height === height ? old : { id, width, height })
+  }
+  useLayoutEffect(() => {
+    const focused = document.activeElement
+    if (focused instanceof HTMLElement && focused.matches('[data-nebula-link]') && stageRef.current?.contains(focused)) measureFocusPill(focused)
+  }, [visible, stageSize])
+
+  // Where the star layer's way back sits: on the edge of the map's clear area
+  // (inside the page's controls, beside or above the card) towards its star.
+  useLayoutEffect(() => {
+    const spot = target.layer === 'star' ? visible.focus : null
+    if (!spot || stageSize.width === 0) {
+      setHint(null)
+      return
+    }
+    const bands = controlBands(wide, stageSize.bottomInset, demo)
+    const area = { left: 16, top: bands.top, right: stageSize.width - 16, bottom: stageSize.height - bands.bottom }
+    const card = cardRef.current?.querySelector('article')
+    if (card && wide && card.offsetWidth > 0) area.right = Math.min(area.right, card.offsetLeft - 16)
+    if (card && !wide && card.offsetHeight > 0) area.bottom = Math.min(area.bottom, card.offsetTop - 16)
+    const next = starHintSpot(spot, area, 16)
+    setHint((old) => (old && next && old.x === next.x && old.y === next.y && old.angle === next.angle ? old : next))
+  }, [visible, stageSize, wide, demo, target])
+
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
   const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language])
-  const mapPath = pathForTarget(subjectId, { layer: 'map' })
+  const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
 
@@ -316,7 +414,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
       {target.layer === 'map' ? (
         <div className="flex flex-col">
           <h1 className="m-0 text-[17px] font-bold leading-tight text-on-sky">{map.subject.name}</h1>
-          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-caption)]">{t('summary.lit', { lit: litCount(stars), total: stars.length })}</p>
+          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-caption)]">{t('summary.lit', { lit: map.summary.lit, total: map.summary.total })}</p>
         </div>
       ) : (
         <>
@@ -333,7 +431,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
                 <h1 className="m-0 truncate text-[17px] font-bold leading-tight text-on-sky">{currentNebula.name}</h1>
               ) : (
                 <Link
-                  to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: currentNebula.topicId })}
+                  to={here(pathForTarget(subjectOfNebula(map, currentNebula.topicId), { layer: 'nebula', nebulaId: currentNebula.topicId }))}
                   className={cn(OVERLAY_LINK, 'truncate text-[17px] font-bold')}
                 >
                   {currentNebula.name}
@@ -353,7 +451,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
     subjects.length > 1 ? (
       <SegmentedNav
         label={t('subjects.label')}
-        items={subjects.map((subject) => ({ to: pathForTarget(subject.subjectId, { layer: 'map' }), label: subject.name, key: subject.subjectId }))}
+        items={subjects.map((subject) => ({ to: here(pathForTarget(subject.subjectId, { layer: 'map' })), label: subject.name, key: subject.subjectId }))}
         activeIndex={activeSubject}
         hitHeight={wide ? undefined : 44}
       />
@@ -375,13 +473,21 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        onPointerLeave={() => engineRef.current?.hoverAt(null)}
         onKeyDown={onKeyDown}
       >
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+        {overlay?.(locateStar)}
+
+        {demo && (
+          <p className="absolute inset-x-0 top-0 m-0 flex h-8 items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">
+            {t('demo.notice')}
+          </p>
+        )}
 
         {/* Top: where you are, the subject switcher (#72 point 7), and the tally. */}
         {wide ? (
-          <div data-starmap-overlay className="pointer-events-none absolute inset-x-6 top-5 grid grid-cols-[1fr_auto_1fr] items-start gap-4">
+          <div data-starmap-overlay className={cn('pointer-events-none absolute inset-x-6 grid grid-cols-[1fr_auto_1fr] items-start gap-4', demo ? 'top-[52px]' : 'top-5')}>
             <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
             <div className="pointer-events-auto">{switcher}</div>
             <div
@@ -398,7 +504,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
             </div>
           </div>
         ) : (
-          <div data-starmap-overlay className="absolute inset-x-4 top-2 flex flex-col items-start gap-1">
+          <div data-starmap-overlay className={cn('absolute inset-x-4 flex flex-col items-start gap-1', demo ? 'top-10' : 'top-2')}>
             {switcher}
             {whereYouAre}
           </div>
@@ -413,22 +519,24 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
                 const inNebula = visibleByNebula.get(nebula.topicId) ?? []
                 const isCurrent = currentNebula?.topicId === nebula.topicId
                 const disc = visible.nebulae[nebulaIndex]
-                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide, stageSize.bottomInset)) : null
+                const pill = focusPill?.id === nebula.topicId ? focusPill : undefined
+                const spot = disc ? nebulaFocusSpot(disc, stageSize, controlBands(wide, stageSize.bottomInset, demo), pill) : null
                 return (
                   <li key={nebula.topicId} data-nebula={nebula.topicId}>
                     {isCurrent ? (
                       <span className="sr-only">{nebulaText(nebula)}</span>
                     ) : (
                       <Link
-                        to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
+                        to={here(pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId }))}
                         className="starmap-nebula-link"
                         data-nebula-link={nebula.topicId}
                         // Shown on focus as a name pill by its own nebula, inside the band
                         // between the page's controls, never under the legend (WCAG 2.4.11).
-                        style={spot ? { transform: `translate(${spot.x}px, ${spot.y}px) translateX(-50%)`, height: NEBULA_FOCUS_HEIGHT } : undefined}
+                        style={spot ? { transform: `translate(${spot.x}px, ${spot.y}px) translateX(-50%)`, height: pill?.height ?? NEBULA_FOCUS_HEIGHT, maxWidth: Math.max(32, stageSize.width - 32) } : undefined}
                         data-focus-top={spot?.y}
-                        onFocus={() => focusNebula(nebulaIndex)}
+                        onFocus={(event) => { measureFocusPill(event.currentTarget); focusNebula(nebulaIndex) }}
                         onBlur={() => focusNebula(-1)}
+                        onKeyDown={stepAlongRing}
                       >
                         <span aria-hidden="true">{nebula.name}</span>
                         <span className="sr-only">{nebulaText(nebula)}</span>
@@ -448,7 +556,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
                             <li key={star.unitId}>
                               {/* A plain anchor, not a router Link: a thousand of these re-render at once. */}
                               <a
-                                href={pathForTarget(subjectId, to)}
+                                href={here(pathForTarget(subjectOfNebula(map, star.nebulaId), to))}
                                 className="starmap-link"
                                 data-unit={star.unitId}
                                 data-index={entry.index}
@@ -487,8 +595,30 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, sc
         )}
 
         {currentStar && currentNebula && (
+          <div data-starmap-overlay ref={cardRef}>
+            <StarCard demo={demo} map={map} star={currentStar} nebula={currentNebula} wide={wide} reducedMotion={reducedMotion} />
+          </div>
+        )}
+
+        {/* Panned away from the star layer's star: a way back, pointing at it (#132). */}
+        {currentStar && hint && (
           <div data-starmap-overlay>
-            <StarCard map={map} star={currentStar} nebula={currentNebula} wide={wide} reducedMotion={reducedMotion} />
+            <button
+              type="button"
+              data-star-hint
+              aria-label={t('nav.backToStar', { name: currentStar.name })}
+              onClick={() => engineRef.current?.recentre()}
+              className="absolute left-0 top-0 inline-flex min-h-11 max-w-[220px] cursor-pointer items-center gap-1.5 rounded-full border border-solid border-[color:var(--sky-glass-border)] px-3.5 text-[13px] font-semibold text-on-sky hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              style={{
+                transform: `translate(${Math.round(hint.x)}px, ${Math.round(hint.y)}px) translate(${-hint.alignX * 100}%, ${-hint.alignY * 100}%)`,
+                background: 'var(--sky-glass)',
+                backdropFilter: 'blur(var(--sky-glass-blur))',
+                WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
+              }}
+            >
+              <ArrowUp size={16} strokeWidth={1.8} aria-hidden="true" className="shrink-0" style={{ transform: `rotate(${hint.angle + Math.PI / 2}rad)` }} />
+              <span aria-hidden="true" className="truncate">{currentStar.name}</span>
+            </button>
           </div>
         )}
 

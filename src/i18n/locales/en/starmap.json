@@ -41,7 +41,10 @@
     "start": "Start",
     "continue": "Continue",
     "open": "Open chapter",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Review {{count}} exercise",
+    "review_other": "Review {{count}} exercises",
+    "reviewSoon": "Coming soon"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} of {{total}} lit",
@@ -50,7 +53,8 @@
   "nav": {
     "map": "Star map",
     "backToMap": "Back to the star map",
-    "backToNebula": "Back to {{nebula}}"
+    "backToNebula": "Back to {{nebula}}",
+    "backToStar": "Back to {{name}}"
   },
   "zoom": {
     "group": "Zoom",
@@ -65,5 +69,12 @@
     "nebula": "{{nebula}}: {{lit}} of {{total}} lit",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "Nothing to learn in this subject yet."
+  "empty": "Nothing to learn in this subject yet.",
+  "emptySky": {
+    "title": "Your star map is on its way",
+    "body": "Your subjects and knowledge points will appear here as soon as they are ready."
+  },
+  "lighting": {
+    "announce": "{{name}} is lit"
+  }
 }

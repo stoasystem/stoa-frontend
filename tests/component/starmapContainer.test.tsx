@@ -10,10 +10,9 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import i18n from '@/i18n'
-import { fakeClock, fakeContext, recordingRenderer } from './starmapHarness'
+import { fakeClock, fakeContext, recordingRenderer, skyMap } from './starmapHarness'
 
 let size = { width: 843, height: 700 }
 let resize: (() => void) | null = null
@@ -56,7 +55,7 @@ function mountInBlock() {
         {/* A plain block of known size, like #66's `data-ask-page`: not a flex container. */}
         <div data-surface="sky" style={{ position: 'absolute', top: 0, left: 0, width: size.width, height: size.height }}>
           <StarMapView
-            map={starMapFixture(10)}
+            map={skyMap(10)}
             target={{ layer: 'map' }}
             onNavigate={() => {}}
             scheduler={clock}
@@ -117,7 +116,7 @@ describe('the foveation switch (#44)', () => {
         <MemoryRouter>
           <div data-surface="sky" style={{ position: 'absolute', top: 0, left: 0, width: size.width, height: size.height }}>
             <StarMapView
-              map={starMapFixture(500)}
+              map={skyMap(500)}
               target={{ layer: 'map' }}
               onNavigate={() => {}}
               foveate={foveate}

@@ -7,18 +7,17 @@
  */
 import { describe, expect, it } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { orderedStars } from '@/features/starmap/model/starMap'
 import { CROSSFADE_MS, motionPolicy, ZOOM_MS } from '@/features/starmap/motion/motionPolicy'
 import type { View } from '@/features/starmap/view/camera'
-import { fakeClock, recordingRenderer, THEME } from './starmapHarness'
+import { fakeClock, recordingRenderer, THEME, skyMap } from './starmapHarness'
 
 function starMap(reducedMotion: boolean, size: 10 | 500 = 10) {
   const clock = fakeClock()
   const renderer = recordingRenderer()
   const engine = new StarMapEngine({ renderer, theme: THEME, reducedMotion, scheduler: clock, now: clock.now })
   engine.setViewport(1280, 776, 2)
-  engine.setData(starMapFixture(size), { layer: 'map' })
+  engine.setData(skyMap(size), { layer: 'map' })
   return { clock, renderer, engine }
 }
 
@@ -93,7 +92,7 @@ describe('without reduced motion', () => {
   it('breathes the recommended star, and only that one', () => {
     const { clock, renderer } = starMap(false)
     clock.advance(1000)
-    const recommended = orderedStars(starMapFixture(10)).findIndex((star) => star.recommendation)
+    const recommended = orderedStars(skyMap(10)).findIndex((star) => star.recommendation)
     const breaths = renderer.frames.map((frame) => frame.breath)
     expect(breaths.every((breath) => breath?.index === recommended)).toBe(true)
     expect(Math.max(...breaths.map((breath) => breath!.scale))).toBeGreaterThan(1.02)
