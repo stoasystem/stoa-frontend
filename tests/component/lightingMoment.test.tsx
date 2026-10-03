@@ -281,6 +281,20 @@ describe('the lit card in Ask', () => {
   })
 })
 
+describe('the lighting copy agrees with its noun (audit #4)', () => {
+  // The name is the knowledge point's (“Sinus et cosinus”, “Seno e coseno”): masculine plural, or any
+  // gender. A participle that agrees with “star” (étoile / stella, feminine, as the state copy
+  // “Allumée” / “Accesa” does) needs that noun in the sentence, as its subject.
+  it.each([
+    ['fr', 'starmap:lighting.announce', /^L’étoile {{name}} est allumée$/],
+    ['fr', 'chat:ask.lit.title', /^L’étoile {{name}} est allumée$/],
+    ['it', 'starmap:lighting.announce', /^La stella {{name}} è accesa$/],
+    ['it', 'chat:ask.lit.title', /^La stella {{name}} è accesa$/],
+  ] as const)('%s %s', (language, key, expected) => {
+    expect(i18n.getFixedT(language)(key, { name: '{{name}}', interpolation: { escapeValue: false, skipOnVariables: true } })).toMatch(expected)
+  })
+})
+
 describe('the design preview follows its lessons', () => {
   it('lights the demo knowledge point once its chapter is done, and opens Refraction', () => {
     const before = mapOf('math', OPENING)
