@@ -3,7 +3,7 @@
  * real route it ships under. `preview.html?surface=<id>` opens one; the
  * comparison page lists them.
  */
-import { DEMO_HELP_CONVERSATION_ID, DEMO_KNOWLEDGE_POINT, type FixtureSize } from '@/dev/demo/data'
+import { DEMO_BRIDGE_STAR, DEMO_HELP_CONVERSATION_ID, DEMO_KNOWLEDGE_POINT, type FixtureSize } from '@/dev/demo/data'
 
 export const STAR_COUNTS = [10, 1000, 2000] as const satisfies readonly FixtureSize[]
 export type StarCount = (typeof STAR_COUNTS)[number]
@@ -20,6 +20,12 @@ export type Surface = {
   stars: boolean
   /** Something to do once the page is up, to show a state behind a click. */
   open?: 'account-menu'
+  /**
+   * An element to give keyboard focus once the page is up (#121): a nebula's
+   * link on the panorama, or a star's link in a nebula, to show what focus
+   * lights up.
+   */
+  focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
   demo?: 'demo-point-finished'
   /** What must be on the page before it counts as ready, for the screenshot. */
@@ -32,6 +38,9 @@ const { subjectId, topicId, unitId } = DEMO_KNOWLEDGE_POINT
 const [firstLesson] = DEMO_KNOWLEDGE_POINT.lessons
 /** The lesson the chapter goes on with: the first one not done when the preview opens. */
 const nextLesson = DEMO_KNOWLEDGE_POINT.lessons[DEMO_KNOWLEDGE_POINT.lessonsDone] ?? firstLesson
+
+/** The physics nebula of `DEMO_BRIDGE_STAR` (`demo-sky.json`'s `bridge.topicId`). */
+const DEMO_BRIDGE_TOPIC = 'optics'
 
 const withPoints = (path: string, points: StarCount) => `${path}?points=${points}`
 
@@ -49,6 +58,39 @@ export const SURFACES: readonly Surface[] = [
     id: 'map-star',
     label: 'Star map · demo knowledge point',
     path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
+    signedIn: true,
+    stars: true,
+  },
+  // The connection lines (#121): what lights up when a nebula or a star is in
+  // focus, and the cross-subject prerequisite (physics optics needs
+  // mathematics trigonometry; Refraction waits for the demo knowledge point).
+  {
+    id: 'map-focus-optics',
+    label: 'Star map · panorama, optics in focus',
+    path: (points) => withPoints('/map/physics', points),
+    signedIn: true,
+    stars: true,
+    focus: '[data-nebula-link="optics"]',
+  },
+  {
+    id: 'map-focus-star',
+    label: 'Star map · nebula, a star in focus',
+    path: (points) => withPoints(`/map/${subjectId}/${topicId}`, points),
+    signedIn: true,
+    stars: true,
+    focus: `[data-unit="${unitId}"]`,
+  },
+  {
+    id: 'map-optics',
+    label: 'Star map · optics nebula (cross-subject)',
+    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}`, points),
+    signedIn: true,
+    stars: true,
+  },
+  {
+    id: 'map-refraction',
+    label: 'Star map · Refraction (locked, cross-subject)',
+    path: (points) => withPoints(`/map/physics/${DEMO_BRIDGE_TOPIC}/${DEMO_BRIDGE_STAR}`, points),
     signedIn: true,
     stars: true,
   },

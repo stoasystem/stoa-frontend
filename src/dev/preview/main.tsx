@@ -85,7 +85,7 @@ async function start() {
         <PreviewLighting>
           <MemoryRouter initialEntries={[path]}>
             <AuthBootstrap />
-            <PreviewChrome initialPath={path} open={surface?.open} pending={surface?.pending} readyWhen={surface?.readyWhen} />
+            <PreviewChrome initialPath={path} open={surface?.open} focus={surface?.focus} pending={surface?.pending} readyWhen={surface?.readyWhen} />
             <Suspense fallback={<PageSkeleton rows={4} />}>
               <AppRoutes />
             </Suspense>
