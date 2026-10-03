@@ -31,9 +31,9 @@ export type LitEvent = {
 
 export type LightingEventSource = {
   /** The lit points this student has not acknowledged. */
-  unacknowledged: () => Promise<LitEvent[]>
+  unacknowledged(): Promise<LitEvent[]>
   /** The student has seen these celebrated; they are not to come back. */
-  acknowledge: (unitIds: string[]) => Promise<void>
+  acknowledge(unitIds: string[]): Promise<void>
   /** Called when `unacknowledged` may have changed. Optional: a source may only be read on mount. */
   subscribe?: (onChange: () => void) => () => void
 }

@@ -46,7 +46,7 @@ function countingContext() {
     get(target, key: string) {
       if (key in target) return target[key]
       if (key === 'createRadialGradient' || key === 'createLinearGradient') return () => gradient
-      return (..._args: unknown[]) => {
+      return () => {
         if (key in calls) calls[key as keyof typeof calls] += 1
       }
     },
