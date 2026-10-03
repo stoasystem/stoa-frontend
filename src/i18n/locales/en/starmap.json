@@ -53,7 +53,8 @@
   "nav": {
     "map": "Star map",
     "backToMap": "Back to the star map",
-    "backToNebula": "Back to {{nebula}}"
+    "backToNebula": "Back to {{nebula}}",
+    "backToStar": "Back to {{name}}"
   },
   "zoom": {
     "group": "Zoom",
