@@ -1,9 +1,9 @@
 /*
  * The design preview's demo data set (#116, map #114). Local development
  * only: nothing outside `src/dev` imports this, and it never reaches the
- * production bundle. The one demo path production code has is the star map's
- * fixture route (`useStarMap.ts`), which reads `src/features/starmap/fixtures`
- * directly; this module only re-exports that sky.
+ * production bundle. The star map's demo sky lives beside it in
+ * `src/dev/demo/sky` (#131) and reaches the map only through the star map
+ * source seam (`starMapSource.ts`); this module re-exports it.
  *
  * Stable contract (the preview, #115, reads these names; keep them):
  *
@@ -31,7 +31,7 @@ import { demoChapterFor, type DemoChapter } from '@/dev/demo/data/chapter'
 import { demoConversationListFor, demoConversationsFor } from '@/dev/demo/data/conversations'
 import { demoNotificationsFor } from '@/dev/demo/data/notifications'
 import { demoProfileFor, demoStudentFor } from '@/dev/demo/data/student'
-import { demoSky, type DemoSky } from '@/features/starmap/fixtures/demoSky'
+import { demoSky, type DemoSky } from '@/dev/demo/sky/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type { Conversation, ConversationListResponse } from '@/types/chat'
 import type { NotificationListResponse } from '@/types/notification'
@@ -95,6 +95,6 @@ export {
   type DemoSky,
   type DemoStarKind,
   type Localized,
-} from '@/features/starmap/fixtures/demoSky'
-export { defaultDemoSubject, demoStarMap, type DemoStarMapOptions } from '@/features/starmap/fixtures/demoStarMap'
-export { FIXTURE_SIZES, type FixtureSize } from '@/features/starmap/fixtures/demoSky'
+} from '@/dev/demo/sky/demoSky'
+export { demoStarMap, type DemoStarMapOptions } from '@/dev/demo/sky/demoStarMap'
+export { FIXTURE_SIZES, type FixtureSize } from '@/dev/demo/sky/demoSky'

@@ -15,7 +15,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ```
 
 - `/src/dev/preview.html?surface=map&points=1000`（全景）、`surface=map-nebula`（三角函数星云）、`surface=map-star`（演示知识点）；`points=10|1000|2000`。
-- 连线（#121）：`surface=map-focus-optics`（全景，键盘聚焦物理「光学」）、`map-focus-star`（三角函数星云，聚焦演示知识点）、`map-optics`（光学星云）、`map-refraction`（锁定的 Refraction，星层）。预览通过星图覆盖接缝带上演示天空的前置（含跨学科）；正式路由仍不带（#110 的「无后端声明」）。
+- 连线（#121）：`surface=map-focus-optics`（全景，键盘聚焦物理「光学」）、`map-focus-star`（三角函数星云，聚焦演示知识点）、`map-optics`（光学星云）、`map-refraction`（锁定的 Refraction，星层）。预览通过星图数据源接缝（`starMapSource.ts`，#131）注入演示天空并带上它的前置（含跨学科）；正式路由没有演示天空，只有空星图。
 - 任意路由：`/src/dev/preview.html?path=/map/physics?points=2000`；`/map/chemistry` 看没修的星系。
 - 截图对照：`npm run design-preview:capture -- --base http://127.0.0.1:5173 --label <集>`，再开 `/src/dev/preview-compare.html?mode=shots&surface=map&before=before-119&after=after-119`。
 
@@ -101,8 +101,9 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 ## 数据
 
-- 唯一的星图数据是 `src/features/starmap/fixtures/demoSky.ts`（#116）。`demoStarMap(subjectId)` 把整片天空交给渲染器，`subject` 只是聚焦的星系、`summary` 是它的点亮数；无论聚焦哪个星系，星与星云数组是同一份（切换器飞行时不重画）。
-- 渲染器单测、台架、预览都读它；#110 以前的数学单学科夹具（`starMapFixture`、`map-10.json`、`nebula-names.json`）与 `demoGalaxyPositions` 已删除。测试用 `tests/component/starmapHarness.ts` 的 `skyMap(size, subjectId)`。
+- 星图从**数据源接缝**取数据（#131）：`src/features/starmap/starMapSource.ts` 的 `StarMapSourceContext`，`useStarMap` 只调用 `source.read({ subjectId, size, t, language, relations, longNames })`，形状不变，#48 的读模型接在这里。**生产默认 `emptyStarMapSource`**：空天空、`demo: false`；`StarMapRoute` 见到没有任何学科时不挂渲染器，显示空状态「Your star map is on its way」（四语，`starmap:emptySky.*`），不显示 Demo 横幅，并照常结束登录计时。`demo` 为真时才把 `demo` 传给 `StarMapView`（Demo 横幅、占位星说明）。
+- 演示天空在 `src/dev/demo/sky/`（#131 从 `src/features/starmap/fixtures/` 移来）：`demoSky.ts`（#116 的生成器）、`demo-sky.json`、`demoStarMap.ts`（把整片天空交给渲染器，`subject` 只是聚焦的星系、`summary` 是它的点亮数；无论聚焦哪个星系，星与星云数组是同一份，切换器飞行时不重画）、`strings.ts`（演示专用文案 `starmap:demo.notice / emptyStar / longNebula`，已移出 locale 文件）、`source.tsx`（`demoStarMapSource` / `<DemoStarMapSource>`，import 时注册文案）。预览经 `PreviewLighting` 注入（叠加点亮覆盖与长名），台架 `starmap.html` 用 `<DemoStarMapSource>`。
+- 渲染器单测、台架、预览都从 `src/dev/demo/sky` 取数据，不从生产代码取；#110 以前的数学单学科夹具（`starMapFixture`、`map-10.json`、`nebula-names.json`）与 `demoGalaxyPositions` 已删除。测试用 `tests/component/starmapHarness.ts` 的 `skyMap(size, subjectId)`；要走真实路由看演示天空的测试用 `<DemoStarMapSource>` 包一层（`deepLinkRefresh`、`starmapProductionSource` 的阳性对照）。生产包里不得出现演示天空的标记，由 `designPreviewExcluded.test.ts` 检查（见 `design-preview.md`「不进生产包」）。
 - 只有一颗**演示知识点**（数学 · 三角函数「正弦与余弦」）有章节；其余是**占位星**；**星尘**是装饰，不是数据。
 
 ## 验证

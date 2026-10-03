@@ -13,7 +13,7 @@
  * `&relations=fixture` dev switch); then all of them, across subjects too.
  */
 import type { TFunction } from 'i18next'
-import { demoSky, type FixtureSize } from '@/features/starmap/fixtures/demoSky'
+import { demoSky, type FixtureSize } from '@/dev/demo/sky/demoSky'
 import type { Nebula, StarMap } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 
@@ -73,13 +73,4 @@ export function demoStarMap(
     summary: { ...sky.summary, lit: galaxy.lit, total: galaxy.total },
     ...skyParts(size, t, language, relations, longNames),
   }
-}
-
-/** The subject to open: the last one, else the first the student takes that has stars. */
-export function defaultDemoSubject(last: string | undefined, subjects: StarMap['subjects']): string {
-  return subjects.find((s) => s.subjectId === last)?.subjectId
-    ?? subjects.find((s) => s.enrolled && s.total > 0)?.subjectId
-    ?? subjects.find((s) => s.total > 0)?.subjectId
-    ?? subjects[0]?.subjectId
-    ?? 'math'
 }

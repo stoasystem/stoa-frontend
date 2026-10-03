@@ -69,10 +69,9 @@
     "star": "{{name}} : {{state}}"
   },
   "empty": "Rien à apprendre dans cette matière pour l’instant.",
-  "demo": {
-    "notice": "Démo · Contenu et progression fictifs",
-    "emptyStar": "Étoile fictive · contenu de démonstration, sans chapitre.",
-    "longNebula": "Fractions, équations et raisonnement proportionnel {{index}}"
+  "emptySky": {
+    "title": "Ta carte du ciel arrive bientôt",
+    "body": "Tes matières et tes notions apparaîtront ici dès qu’elles seront prêtes."
   },
   "lighting": {
     "announce": "L’étoile {{name}} est allumée"

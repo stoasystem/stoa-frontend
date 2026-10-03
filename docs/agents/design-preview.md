@@ -20,7 +20,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 ## 参数
 
 - `surface`：见下表；与 `path` 同给时 `path` 优先。
-- `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `demoSky`，#119 起是星图唯一的数据）。
+- `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `src/dev/demo/sky/demoSky.ts`，只经星图数据源接缝注入，见下文「演示数据」，#131）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
 - `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景本来不画星云名，所以只在星云层看得到。
@@ -89,13 +89,17 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 投毒验证：在 `src/main.tsx` 的 `loadApplication` 里加一行 `void import('./dev/preview/main')`，两项都变红（模块图列出 `src/dev/preview/*` 七个文件；构建产物 `main-*.js` 带上三个标记）。
 
+**演示天空也不进生产包**（#131）。第 2 项同时在 JS 包里搜演示天空的标记：演示知识点 id `demo-sine-cosine`、桥接星 id `demo-refraction`、演示知识点四语名称（Sine and cosine 等）、只在 `demo-sky.json` 里的占位星技能名 `Ordering integers`，以及演示专用文案的四语版本（Demo 横幅「Demo · Sample content and progress」、占位星说明「Placeholder star · demo content, no chapter.」、长星云名）。标记从 `src/dev/demo/sky` 本身取，另有一项断言它们确实出现在 `demo-sky.json` / 文案里，不会悄悄失效；阴性对照是空星图标题「Your star map is on its way」必须在包里。投毒两次：`useStarMap` 重新 import `demoStarMap` → 模块图列出 `src/dev/demo/sky/` 三个文件、`PlanetScreen-*.js` 带上 7 个标记；把 `demo` 文案放回 `en/starmap.json` → `index-*.js` 带上三条英文文案。
+
 `vite.config.ts` 只以 `index.html` 为构建入口，`src/dev/*.html` 本来就不会被构建；以上测试锁住的是「应用不会 import 它」。
 
 ## 演示数据
 
 数据来自 #116 的演示数据集 `src/dev/demo/data`（契约见其 `index.ts`）。`src/dev/preview/demoSource.ts` 是 handlers 读它的唯一入口：按当前语言取 `demoDataFor(language)`，并记住本页已完成的课时。`handlers.ts` 的练习接口直接用 #116 的 `checkDemoAnswer`（判题）、`demoHint`（提示）、`demoLessonResult`（完成课时）、`demoRoadmap(completed)`（章节进度），老师求助用 `demoTeacherHelpRequests` / `demoTeacherAvailability`。
 
-完成一个课时后，章节与路线图跟着前进（例如 1/3 → 2/3）。星图也跟着走（#51）：`src/dev/preview/lighting.tsx` 通过星图覆盖接缝（`StarMapOverrideContext`）把演示知识点的状态换成 #116 的 `demoKnowledgePointState(completed)`；课时全部完成后它点亮，物理里唯一还差它这个前置的 Refraction 变成可开始，推荐标记按后端规则移到下一个（#9 第 8 条）。
+**星图的数据源接缝**（#131，由 #51 的覆盖接缝泛化而来）：`src/features/starmap/starMapSource.ts` 的 `StarMapSourceContext`，值是 `{ read(request), demo }`。`useStarMap` 只读它，不 import 任何演示数据。生产默认 `emptyStarMapSource`：空天空（没有学科、星云、星）、`demo: false`，正式路由显示空状态（`starmap:emptySky.*`），不显示 Demo 横幅；#48 接读模型时就换掉这个默认。演示天空、生成器和演示专用文案在 `src/dev/demo/sky/`（`demo-sky.json`、`demoSky.ts`、`demoStarMap.ts`、`strings.ts`、`source.tsx`）；`source.tsx` 的 `demoStarMapSource` / `<DemoStarMapSource>` 给台架和测试用，import 它时把 `starmap:demo.*` 文案加进 i18next（这些文案已不在 locale 文件里，所以不进生产包，也不进 `check:untranslated` 的视野）。
+
+完成一个课时后，章节与路线图跟着前进（例如 1/3 → 2/3）。星图也跟着走（#51）：`src/dev/preview/lighting.tsx` 的 `PreviewLighting` 经数据源接缝提供演示天空，再过一遍 `demoStarMapOverride`，把演示知识点的状态换成 #116 的 `demoKnowledgePointState(completed)`；课时全部完成后它点亮，物理里唯一还差它这个前置的 Refraction 变成可开始，推荐标记按后端规则移到下一个（#9 第 8 条）。
 
 ### 演示后端的状态（#51）
 

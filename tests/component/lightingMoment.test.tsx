@@ -13,8 +13,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { demoStarMapOverride, withLongNebulaNames } from '@/dev/preview/lighting'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { threadEntries } from '@/features/ask/AskPanel'
-import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
-import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/features/starmap/fixtures/demoSky'
+import { demoStarMap } from '@/dev/demo/sky/demoStarMap'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
 import { drawFlare, FLARE_MS } from '@/features/starmap/lighting/flare'
 import { LightingOverlay, SETTLE_MS } from '@/features/starmap/lighting/LightingOverlay'
 import {
@@ -23,8 +23,8 @@ import {
   type LightingEventSource,
   type LitEvent,
 } from '@/features/starmap/lighting/lightingEvents'
-import { identityStarMapOverride } from '@/features/starmap/lighting/starMapOverride'
 import { orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
+import { emptyStarMapSource } from '@/features/starmap/starMapSource'
 import i18n from '@/i18n'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMomentsStore, type LitMoment } from '@/store/litMomentsStore'
@@ -247,9 +247,10 @@ describe('the lighting moment', () => {
     expect(shown.phase()).toBe('idle')
     expect(shown.announced()).toBe('')
     expect(calls.fill).toBe(0)
-    // And the map's states are what the fixture says.
-    const map = demoStarMap('math', 10, i18n.getFixedT('en', 'starmap'))
-    expect(identityStarMapOverride(map, 10)).toBe(map)
+    // And the default star map source has no sky to change (#131): no demo data in production.
+    const map = emptyStarMapSource.read({ subjectId: 'math', size: 10, t: i18n.getFixedT('en', 'starmap'), language: 'en', relations: false, longNames: false })
+    expect(emptyStarMapSource.demo).toBe(false)
+    expect([map.subjects, map.nebulae, map.stars, map.prerequisites]).toEqual([[], [], [], []])
   })
 })
 

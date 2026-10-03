@@ -37,7 +37,7 @@ function option(name, fallback) {
 
 const base = new URL(option('base', 'http://127.0.0.1:5173'))
 const API = 'https://api.design-preview.invalid'
-const POINT = JSON.parse(readFileSync('src/features/starmap/fixtures/demo-sky.json', 'utf8')).knowledgePoint
+const POINT = JSON.parse(readFileSync('src/dev/demo/sky/demo-sky.json', 'utf8')).knowledgePoint
 /** How long a step's end state must hold before it counts: what snaps back, or goes away, fails. */
 const SETTLE_MS = 2000
 const settle = (ms = SETTLE_MS) => delay(ms)

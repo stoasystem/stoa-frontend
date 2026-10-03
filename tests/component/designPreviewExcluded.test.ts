@@ -4,7 +4,9 @@
  * ships: it lives under src/dev/, which is no build input, and nothing the
  * application loads imports it. Both halves are checked here - the import
  * graph of src/main.tsx, and a fresh production build - so that one import of
- * the preview from the application turns this red.
+ * the preview from the application turns this red. The build is also searched
+ * for the demo sky (#131): its ids, its knowledge point and its demo-only
+ * words must not ship, wherever they would come from.
  *
  * A component test rather than a release one: `test:release` is a reviewed
  * script that scripts/verify-release.mjs pins word for word.
@@ -15,6 +17,8 @@ import os from 'node:os'
 import path from 'node:path'
 import ts from 'typescript'
 import { afterAll, describe, expect, it } from 'vitest'
+import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT } from '@/dev/demo/sky/demoSky'
+import { DEMO_SKY_STRINGS } from '@/dev/demo/sky/strings'
 
 const ROOT = path.resolve(__dirname, '../..')
 const SRC = path.join(ROOT, 'src')
@@ -26,6 +30,19 @@ const FORBIDDEN_DIRS = ['src/dev/', 'src/mocks/']
 
 // Strings only the preview's code carries (src/dev/preview/interception.ts).
 const FORBIDDEN_IN_BUNDLES = ['stoa.design-preview.v1', 'api.design-preview.invalid', '__stoaPreview']
+
+// The demo sky (#131): it reaches the map only through the star map source the
+// preview and the bench provide, never from the application. Its ids, the demo
+// knowledge point's name, and its demo-only words in every language (the Demo
+// notice, the placeholder star's note, the long nebula names).
+const DEMO_SKY_IN_BUNDLES = [
+  'demo-sine-cosine',
+  DEMO_BRIDGE_STAR,
+  ...Object.values(DEMO_KNOWLEDGE_POINT.name),
+  // A placeholder star's skill, only in demo-sky.json.
+  'Ordering integers',
+  ...Object.values(DEMO_SKY_STRINGS).flatMap(({ notice, emptyStar, longNebula }) => [notice, emptyStar, longNebula.replace(' {{index}}', '')]),
+]
 
 const EXTENSIONS = ['', '.ts', '.tsx', '.js', '.jsx', '.mjs', '.json', '/index.ts', '/index.tsx', '/index.js']
 
@@ -84,6 +101,14 @@ describe('the design preview stays out of the application', () => {
     expect(graph.filter((file) => FORBIDDEN_DIRS.some((dir) => file.startsWith(dir)))).toEqual([])
   })
 
+  it('names the demo sky by what it really carries (the markers cannot go stale)', () => {
+    expect(DEMO_KNOWLEDGE_POINT.unitId).toBe('demo-sine-cosine')
+    const sky = readFileSync(path.join(SRC, 'dev/demo/sky/demo-sky.json'), 'utf8')
+    for (const marker of ['demo-sine-cosine', DEMO_BRIDGE_STAR, 'Ordering integers', DEMO_KNOWLEDGE_POINT.name.en]) expect(sky).toContain(marker)
+    expect(DEMO_SKY_IN_BUNDLES).toContain('Demo · Sample content and progress')
+    expect(DEMO_SKY_IN_BUNDLES).toContain('Placeholder star · demo content, no chapter.')
+  })
+
   it('walks the whole application (negative control)', () => {
     // An empty or truncated walk would pass the test above trivially.
     const graph = importGraph(ENTRY)
@@ -113,8 +138,11 @@ describe('the design preview stays out of the application', () => {
       // Negative control: the verified startup path is there to be found.
       expect(texts.some(({ text }) => text.includes('stoa.web.runtime-config.v1'))).toBe(true)
 
+      // Negative control for the demo sky: the star map's own words are there to be found.
+      expect(texts.some(({ text }) => text.includes('Your star map is on its way'))).toBe(true)
+
       const carrying = texts.flatMap(({ name, text }) =>
-        FORBIDDEN_IN_BUNDLES.filter((marker) => text.includes(marker)).map((marker) => `${name}: ${marker}`),
+        [...FORBIDDEN_IN_BUNDLES, ...DEMO_SKY_IN_BUNDLES].filter((marker) => text.includes(marker)).map((marker) => `${name}: ${marker}`),
       )
       expect(carrying).toEqual([])
     }, 120_000)

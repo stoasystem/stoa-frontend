@@ -1,5 +1,5 @@
 /* The bell's demo notifications (#116): two unread from the teacher, two read. `GET /notifications`. */
-import { DEMO_KNOWLEDGE_POINT, localize, type Localized } from '@/features/starmap/fixtures/demoSky'
+import { DEMO_KNOWLEDGE_POINT, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import { DEMO_HELP_CONVERSATION_ID, DEMO_TEACHER_NAME } from '@/dev/demo/data/conversations'
 import { DEMO_STUDENT_ID } from '@/dev/demo/data/student'
 import type { SupportedLanguage } from '@/i18n/languages'

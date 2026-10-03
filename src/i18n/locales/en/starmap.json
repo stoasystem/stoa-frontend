@@ -69,10 +69,9 @@
     "star": "{{name}}: {{state}}"
   },
   "empty": "Nothing to learn in this subject yet.",
-  "demo": {
-    "notice": "Demo · Sample content and progress",
-    "emptyStar": "Placeholder star · demo content, no chapter.",
-    "longNebula": "Fractions, equations and proportional reasoning {{index}}"
+  "emptySky": {
+    "title": "Your star map is on its way",
+    "body": "Your subjects and knowledge points will appear here as soon as they are ready."
   },
   "lighting": {
     "announce": "{{name}} is lit"

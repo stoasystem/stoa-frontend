@@ -10,7 +10,7 @@
  * come from the star map's demo sky (`DEMO_KNOWLEDGE_POINT`), so the star and
  * its chapter cannot disagree.
  */
-import { DEMO_KNOWLEDGE_POINT, demoSky, localize, type Localized } from '@/features/starmap/fixtures/demoSky'
+import { DEMO_KNOWLEDGE_POINT, demoSky, localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { LearningState } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type {

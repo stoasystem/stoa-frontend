@@ -5,8 +5,8 @@
  */
 import type { TFunction } from 'i18next'
 import type { FrameScheduler } from '@/features/starmap/engine/starMapEngine'
-import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
-import { demoStarMap, type DemoStarMapOptions } from '@/features/starmap/fixtures/demoStarMap'
+import type { FixtureSize } from '@/dev/demo/sky/demoSky'
+import { demoStarMap, type DemoStarMapOptions } from '@/dev/demo/sky/demoStarMap'
 import type { StarMap } from '@/features/starmap/model/starMap'
 import type { SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 
