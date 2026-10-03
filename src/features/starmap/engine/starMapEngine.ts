@@ -564,6 +564,18 @@ export class StarMapEngine {
     this.positionsStale = true
   }
 
+  /**
+   * Back to the layer's own view after a pan: on the star layer, the focused
+   * star returns to its place beside its card (#132), the shorter way round
+   * the ring. A flight, or a crossfade under reduced motion.
+   */
+  recentre(): void {
+    if (!this.map || this.viewport.width === 0) return
+    this.cancelGestures()
+    this.panTo(this.viewFor(this.target))
+    this.invalidate()
+  }
+
   // ---- gestures ---------------------------------------------------------
 
   pointerDown(id: number, x: number, y: number): void {
@@ -600,8 +612,10 @@ export class StarMapEngine {
     if (!this.press.moved && Math.hypot(x - this.press.x, y - this.press.y) < TAP_SLOP) return
     if (!this.press.moved) {
       this.press.moved = true
-      // The star layer holds still: its card is the thing to read.
-      if (this.target.layer !== 'star' && !this.transition) this.dragging = { x: this.press.x, y: this.press.y, at: this.press.at }
+      // Every layer pans, the star layer too (#132): its card stays open for
+      // the focused star wherever the map is dragged, and the star's lines go
+      // with it. Only a flight in progress holds the map.
+      if (!this.transition) this.dragging = { x: this.press.x, y: this.press.y, at: this.press.at }
     }
     if (!this.dragging) return
     const dx = x - this.dragging.x
@@ -677,6 +691,11 @@ export class StarMapEngine {
   starOnScreen(unitId: string): StarOnScreen | null {
     const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
     return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize }
+  }
+
+  /** On the star layer, where its star was drawn in the last frame (it may be panned off screen, #132); else null. */
+  get focusedStarOnScreen(): StarOnScreen | null {
+    return this.target.layer === 'star' ? this.starOnScreen(this.target.unitId) : null
   }
 
   /** Whether the engine has a frame on order. */
@@ -783,7 +802,9 @@ export class StarMapEngine {
     }
     const hit = this.nearestStar(x, y, reach)
     if (hit) {
-      this.options.onRequestTarget?.({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId })
+      // A tap on the star already open brings it back to its place beside the card.
+      if (this.target.layer === 'star' && hit.unitId === this.target.unitId) this.recentre()
+      else this.options.onRequestTarget?.({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId })
       return
     }
     const nebulaId = this.nebulaAt(x, y)
