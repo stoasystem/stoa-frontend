@@ -31,6 +31,25 @@ class MemoryStorage implements Storage {
   }
 }
 
+// Taken when this module loads, before `isolateStorage` replaces it: the demo
+// backend's modules load ahead of that call (`interception.ts` imports them).
+const tabSession: Storage | null = (() => {
+  try {
+    return window.sessionStorage
+  } catch {
+    return null
+  }
+})()
+
+/**
+ * The tab's real `sessionStorage`, kept aside for the demo backend only
+ * (`demoSource.ts`): what the "server" remembers across a reload of this tab
+ * (#51). The app never sees it.
+ */
+export function demoServerStorage(): Storage | null {
+  return tabSession
+}
+
 /** Replaces `localStorage` and `sessionStorage` for this page. Call before the app is imported. */
 export function isolateStorage() {
   for (const name of ['localStorage', 'sessionStorage'] as const) {

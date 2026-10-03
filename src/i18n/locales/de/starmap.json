@@ -73,5 +73,8 @@
     "notice": "Demo · Beispieldaten und Lernfortschritt",
     "emptyStar": "Platzhalterstern · Demo-Inhalt, kein Kapitel.",
     "longNebula": "Bruchrechnung, Gleichungen und proportionales Denken {{index}}"
+  },
+  "lighting": {
+    "announce": "{{name}} leuchtet jetzt"
   }
 }

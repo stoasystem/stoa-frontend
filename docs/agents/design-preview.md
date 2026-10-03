@@ -23,6 +23,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `demoSky`，#119 起是星图唯一的数据）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
+- `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认，见下文「演示后端的状态」），回到 #116 的开场状态。
 
 | surface | 路由 | 状态 |
 | --- | --- | --- |
@@ -33,7 +34,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
-| `lighting` | `/map/math` | **未实现**：点亮时刻还没有代码，页面左下角有提示条 |
+| `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认，进入星层即在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
 
 ## 拦截：怎么做到零后端请求
 
@@ -49,7 +50,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 **为什么不用 MSW 浏览器 worker**：worker 要求 `public/mockServiceWorker.js`，而 `public/` 整个会被复制进 `dist`，这条路天然靠近生产包；worker 还要异步注册，首屏请求可能抢在它前面发出。adapter 加 fetch 垫片只存在于预览入口的模块图里，同步装好，构建产物里没有它的位置。`src/mocks/handlers` 仍只给 vitest 用：它覆盖的路由少、形状偏旧（例如 `/me`），复用它反而要先改它。
 
-**存储隔离**：预览与 `npm run dev` 的真实应用同源。`storage.ts` 把 `localStorage` / `sessionStorage` 换成内存实现，每次加载都从同一状态开始：真实应用留下的令牌或「上次学科」影响不到预览，预览的假登录也不会留下令牌被真实应用发往后端；同一界面的两次截图只差被比较的改动。
+**存储隔离**：预览与 `npm run dev` 的真实应用同源。`storage.ts` 把 `localStorage` / `sessionStorage` 换成内存实现，每次加载都从同一状态开始：真实应用留下的令牌或「上次学科」影响不到预览，预览的假登录也不会留下令牌被真实应用发往后端；同一界面的两次截图只差被比较的改动。唯一的例外是演示后端自己的状态（#51），它留在本标签页里，见「演示后端的状态」。
 
 **假登录**：入口直接把演示学生写进 `useAuthStore`（令牌只在内存里），再由真实的 `AuthBootstrap` 读 `/auth/me`，与登录后的路径一致。
 
@@ -88,7 +89,17 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 数据来自 #116 的演示数据集 `src/dev/demo/data`（契约见其 `index.ts`）。`src/dev/preview/demoSource.ts` 是 handlers 读它的唯一入口：按当前语言取 `demoDataFor(language)`，并记住本页已完成的课时。`handlers.ts` 的练习接口直接用 #116 的 `checkDemoAnswer`（判题）、`demoHint`（提示）、`demoLessonResult`（完成课时）、`demoRoadmap(completed)`（章节进度），老师求助用 `demoTeacherHelpRequests` / `demoTeacherAvailability`。
 
-完成一个课时后，章节与路线图在本页内跟着前进（例如 1/3 → 2/3），刷新回到 #116 的开场状态。星图本身走 `useStarMap` 的夹具，不读这些接口，所以星的学习状态不随完成课时变化；那是点亮时刻要做的事。
+完成一个课时后，章节与路线图跟着前进（例如 1/3 → 2/3）。星图也跟着走（#51）：`src/dev/preview/lighting.tsx` 通过星图覆盖接缝（`StarMapOverrideContext`）把演示知识点的状态换成 #116 的 `demoKnowledgePointState(completed)`；课时全部完成后它点亮，物理里唯一还差它这个前置的 Refraction 变成可开始，推荐标记按后端规则移到下一个（#9 第 8 条）。
+
+### 演示后端的状态（#51）
+
+演示后端记住三件事：已完成的课时、演示知识点第一次点亮的时间（完成最后一个课时的那次写入时记下，`litAtSource: observed`）、学生是否已确认这次点亮（stoa-backend#71 的形状）。这些是「服务端」的状态：存在 `demoSource.ts` 里，并镜像到**本标签页真实的** `sessionStorage`（键 `stoa.design-preview.v1.demo-server`，由 `storage.ts` 在模块加载、隔离之前取得，应用本身看不到）。所以：
+
+- 同一标签页刷新：课时仍是完成的，星仍点亮，确认也还在，**不重播**；
+- 新标签页、新浏览器上下文（截图脚本每张图都是）或 `?fresh=1`：回到 #116 的开场状态；
+- `lighting` 界面每次打开都重新设成「已点亮、未确认」，用来反复看动画。
+
+应用这边不存任何东西：是否庆祝只看事件源给的「未确认点亮」，确认后由事件源去掉（`LightingEventSourceContext`，生产默认是永不发事件、不发请求的空源）。Ask 里的点亮卡片只在本次会话的内存里（`store/litMomentsStore.ts`），刷新后消失；把卡片写进对话本身需要后端，留给 #3。
 
 只有演示知识点 `demo-sine-cosine`（数学 · 三角函数）有章节；占位星的星卡片没有进入章节的按钮。
 
@@ -98,11 +109,13 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 node scripts/design-preview-flows.mjs --base http://127.0.0.1:5173
 ```
 
-依次走：登录表单登录 → 从演示知识点的星卡片进入章节 → 下一课时每道题先答错、重试、再答对，直到完成课时（并确认路线图把它记为完成）→ Ask 发消息收到流式答复 → 账号菜单退出 → 打开通知铃 → 切换学科。完成课时后的画面存为 `.codex-screenshots/design-preview/flows/lesson-finished.png`。任何一步失败、任何请求离开开发服务器、任何请求没有演示答复、任何控制台错误或警告，脚本都以 1 退出。
+依次走：登录表单登录 → 从演示知识点的星卡片进入章节 → 下一课时每道题先答错、重试、再答对，直到完成课时（并确认路线图把它记为完成）→ Ask 发消息收到流式答复 → 账号菜单退出 → 打开通知铃 → 切换学科。完成课时后的画面存为 `.codex-screenshots/design-preview/flows/lesson-finished.png`。
+
+然后是点亮时刻（`scripts/design-preview-lighting-flows.mjs`，每段各用一个新的浏览器上下文）：做完演示知识点剩下的课时 → 从章节回星图，动画在这颗星上只播一次、`aria-live` 播报「Sine and cosine is lit」→ 物理的 Refraction 读作「Ready to start」→ 从星图的输入框打开 Ask、进入一段对话，看到点亮卡片 → 刷新不重播、星仍点亮 → Refraction 的星卡片读作可开始 → 开 reduced motion：不播动画但仍播报 → 手机（390×844）上的动画与 Ask sheet 里的卡片。帧序列与各状态截图存在 `.codex-screenshots/design-preview/lighting/`。任何一步失败、任何请求离开开发服务器、任何请求没有演示答复、任何控制台错误或警告，脚本都以 1 退出。
 
 ## 已知限制
 
-- 点亮时刻未实现，`lighting` 只是占位。
+- 点亮时刻只演示「演示知识点」这一颗；判据只看课时是否全部完成（#9 还要求每道题至少答对一次，演示数据里完成课时前已逐题答对）。
 - Ask 的答复是固定文字，不是 AI；新发起的老师求助只返回「等待中」。
 - 写操作只回一个合理答复；除了「完成课时」在本页内记住之外都不保存，刷新即复原。
 - 浏览器模拟视口，不是真机（#114 已接受这一限制）。

@@ -8,6 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
+import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -57,6 +58,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   )
 
   return (
-    <StarMapView demo map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false} />
+    <StarMapView demo map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+      overlay={(locate) => <LightingOverlay map={map} locate={locate} />} />
   )
 }

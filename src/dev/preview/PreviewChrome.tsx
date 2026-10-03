@@ -23,7 +23,17 @@ async function waitFor(selector: string, timeoutMs = 5000) {
   return null
 }
 
-export function PreviewChrome({ initialPath, open, pending }: { initialPath: string; open?: Surface['open']; pending?: string }) {
+export function PreviewChrome({
+  initialPath,
+  open,
+  pending,
+  readyWhen,
+}: {
+  initialPath: string
+  open?: Surface['open']
+  pending?: string
+  readyWhen?: string
+}) {
   const location = useLocation()
 
   useEffect(() => {
@@ -44,6 +54,7 @@ export function PreviewChrome({ initialPath, open, pending }: { initialPath: str
         if (trigger && !cancelled) press(trigger)
         await waitFor('[role="menu"]')
       }
+      if (readyWhen) await waitFor(readyWhen, 15_000)
       // Two frames after the last change, so the star map has drawn once.
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
       if (!cancelled) document.documentElement.dataset.previewReady = '1'
@@ -51,7 +62,7 @@ export function PreviewChrome({ initialPath, open, pending }: { initialPath: str
     return () => {
       cancelled = true
     }
-  }, [open])
+  }, [open, readyWhen])
 
   if (!pending) return null
   return (

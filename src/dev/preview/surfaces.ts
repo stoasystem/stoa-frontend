@@ -20,6 +20,10 @@ export type Surface = {
   stars: boolean
   /** Something to do once the page is up, to show a state behind a click. */
   open?: 'account-menu'
+  /** The demo backend's state to start from, when it is not #116's opening state. */
+  demo?: 'demo-point-finished'
+  /** What must be on the page before it counts as ready, for the screenshot. */
+  readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
   pending?: string
 }
@@ -55,12 +59,15 @@ export const SURFACES: readonly Surface[] = [
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },
   { id: 'account-menu', label: 'Account menu', path: () => '/me', signedIn: true, stars: false, open: 'account-menu' },
   {
+    // The chapter's way back to the map, right after its last lesson: the
+    // flare plays once on the star; the screenshot is taken once it is over.
     id: 'lighting',
     label: 'Lighting moment',
-    path: (points) => withPoints(`/map/${subjectId}`, points),
+    path: (points) => withPoints(`/map/${subjectId}/${topicId}/${unitId}`, points),
     signedIn: true,
     stars: true,
-    pending: 'Not built yet: the lighting moment has no implementation to show.',
+    demo: 'demo-point-finished',
+    readyWhen: '[data-lighting="done"]',
   },
 ]
 
