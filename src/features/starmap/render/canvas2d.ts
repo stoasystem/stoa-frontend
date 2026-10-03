@@ -395,7 +395,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
       // One sky: the galaxies' haze, then each nebula's cloud, brighter with
       // its lit share (#117), core first: lit stars warm it from within.
-      // `(dx, dy)` shifts it, `margin` widens what counts as in view.
+      // `(dx, dy)` shifts it, `margin` widens what counts as in view. In view is
+      // judged before the shift, on screen coordinates: judged after it, the
+      // cache would leave out the right and bottom margins (#123).
       const paintLight = (target: CanvasRenderingContext2D, dx: number, dy: number, margin: number) => {
         target.imageSmoothingEnabled = true
         const inView = (px: number, py: number, r: number) =>
@@ -408,13 +410,13 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const turn = frame.galaxyShift?.[g] ?? 0
           const x0 = frame.ox + (box.x0 + turn) * frame.scale + dx
           const x1 = frame.ox + (box.x1 + turn) * frame.scale + dx
-          if (x1 < -margin || x0 > width + margin) return
+          if (x1 - dx < -margin || x0 - dx > width + margin) return
           target.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
           target.drawImage(haze, x0, frame.oy + box.y0 * frame.scale + dy, x1 - x0, (box.y1 - box.y0) * frame.scale)
         })
         for (let n = 0; n < nebulaCount; n += 1) {
           const reach = nebulaR[n] * CLOUD_REACH
-          if (!inView(nebulaX[n] + dx, nebulaY[n] + dy, reach)) continue
+          if (!inView(nebulaX[n], nebulaY[n], reach)) continue
           const nebula = scene.nebulae[n]
           const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
           target.globalAlpha = (NEBULA_GLOW.base + NEBULA_GLOW.lit * litShare) * (nebula.dim ?? 1) * nebulaDim(n)

@@ -5,11 +5,12 @@ import { NOT_ENROLLED_DIM } from '@/features/starmap/view/sky'
 import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
+import { CLOUD_REACH, galaxyHazeBox } from '@/features/starmap/render/galaxy'
 import { belongsTo, boxHitsSegment, placeLabel } from '@/features/starmap/render/labels'
 import { bridgeAxis } from '@/features/starmap/render/links'
 import { createTileCache, tileSizeFor } from '@/features/starmap/render/nebulaTiles'
 import { nebulaFocusSpot } from '@/features/starmap/view/layers'
-import type { SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
+import type { SceneData, SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, THEME, type CanvasCounter, skyMap } from './starmapHarness'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -223,6 +224,69 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     engine.pointerUp(1, 200, 400)
     clock.advance(3000)
     expect(centred).toHaveBeenLastCalledWith('chemistry')
+    engine.destroy()
+  })
+
+  it('caches the light of the whole margin: nothing missing at the right or bottom after a pan (#123)', () => {
+    // Every offscreen canvas records what is drawn into it, so the light cache can be read back.
+    type Blit = { x: number; y: number; w: number; h: number }
+    const blits = new Map<HTMLCanvasElement, Blit[]>()
+    const counter: CanvasCounter = { drawImage: 0, filterSets: 0 }
+    const recording = (w: number, h: number) => {
+      const canvas = fakeCanvas(counter, w, h)
+      const list: Blit[] = []
+      const ctx = canvas.getContext('2d')!
+      const own = new Proxy(ctx, {
+        get: (target, prop) =>
+          prop === 'drawImage'
+            ? (_image: unknown, x: number, y: number, dw: number, dh: number) => list.push({ x, y, w: dw, h: dh })
+            : Reflect.get(target, prop),
+      })
+      const recorded = { get width() { return canvas.width }, set width(v) { canvas.width = v },
+        get height() { return canvas.height }, set height(v) { canvas.height = v }, getContext: () => own } as unknown as HTMLCanvasElement
+      blits.set(recorded, list)
+      return recorded
+    }
+    const real = createCanvas2DRenderer(fakeCanvas(counter), { createCanvas: recording })!
+    let frame!: SceneFrame
+    const renderer: StarMapRenderer = { ...real, draw: (next) => { frame = next; real.draw(next) } }
+    const clock = fakeClock()
+    const engine = new StarMapEngine({ renderer, theme: THEME, reducedMotion: true, scheduler: clock, now: clock.now, galaxy: true })
+    const [width, height] = [1440, 900]
+    engine.setViewport(width, height, 1)
+    engine.setData(skyMap(1000, 'math'), { layer: 'map' })
+    clock.advance(20)
+    for (const n of Array.from(blits.values())) n.length = 0
+    // The second frame at one zoom paints the cache: the view grown by the margin on every side.
+    real.draw(frame)
+    const margin = Math.round(Math.max(width, height) * 0.25)
+    const cache = [...blits.entries()].find(([canvas]) => canvas.width === width + 2 * margin && canvas.height === height + 2 * margin)
+    expect(cache, 'the light cache').toBeDefined()
+    const drawn = cache![1]
+    const missing: number[] = []
+    let expected = 0
+    for (let n = 0; n < frame.nebulaX.length; n += 1) {
+      const reach = frame.nebulaR[n] * CLOUD_REACH
+      // In cache space: the cloud's box shifted by the margin.
+      const x = frame.nebulaX[n] - reach + margin
+      const y = frame.nebulaY[n] - reach + margin
+      if (x + 2 * reach <= 0 || y + 2 * reach <= 0 || x >= width + 2 * margin || y >= height + 2 * margin) continue
+      expected += 1
+      if (!drawn.some((b) => Math.abs(b.x - x) < 0.5 && Math.abs(b.y - y) < 0.5 && Math.abs(b.w - 2 * reach) < 0.5)) missing.push(n)
+    }
+    // The physics galaxy to the right reaches into the margin: a pan left shows it from the cache.
+    expect(expected).toBeGreaterThan(0)
+    expect(missing).toEqual([])
+    // And each galaxy's haze that reaches into the cache is in it.
+    const scene = (engine as unknown as { scene: SceneData }).scene
+    scene.galaxies!.forEach((galaxy, g) => {
+      const box = galaxyHazeBox(galaxy)
+      const turn = frame.galaxyShift?.[g] ?? 0
+      const x0 = frame.ox + (box.x0 + turn) * frame.scale + margin
+      const x1 = frame.ox + (box.x1 + turn) * frame.scale + margin
+      if (x1 <= 0 || x0 >= width + 2 * margin) return
+      expect(drawn.some((b) => Math.abs(b.x - x0) < 0.5 && Math.abs(b.w - (x1 - x0)) < 0.5), galaxy.subjectId).toBe(true)
+    })
     engine.destroy()
   })
 
