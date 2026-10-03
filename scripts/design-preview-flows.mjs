@@ -8,7 +8,9 @@
  * Flows: sign in from the login page; open the demo knowledge point's chapter
  * from its star card; answer every exercise of the next lesson wrong, then
  * right, and finish it, and see the chapter count it; send a message in Ask;
- * log out from the account menu; open the bell; switch subject. Then the
+ * log out from the account menu; open the bell; zoom the star map (#134: the
+ * wheel zooms without changing the route, a star tapped opens its card,
+ * zooming out closes it and lets the nebula go); switch subject. Then the
  * lighting moment (#51), in `design-preview-lighting-flows.mjs`.
  *
  * Each step asserts its end state on screen after a settle delay (#123): the
@@ -28,7 +30,7 @@ import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
 import { lightingFlows } from './design-preview-lighting-flows.mjs'
 
-/* global window, fetch -- used inside page.evaluate, in the browser */
+/* global window, document, fetch -- used inside page.evaluate, in the browser */
 
 function option(name, fallback) {
   const index = process.argv.indexOf(`--${name}`)
@@ -241,6 +243,47 @@ try {
     if ((await bell.getAttribute('aria-expanded')) === 'true' || (await panel.isVisible())) throw new Error('Escape did not close them')
     return 'opened, then closed'
   })
+  await open({ surface: 'map', points: 1000 })
+  await flow('zoom: the wheel zooms in and out continuously; the route follows the star tapped, not the zoom (#134)', async () => {
+    const stage = page.locator('[data-starmap-stage]')
+    const band = () => stage.getAttribute('data-zoom-band')
+    const start = await route()
+    await page.mouse.move(660, 430)
+    for (let i = 0; i < 10; i += 1) {
+      await page.mouse.wheel(0, -100)
+      await delay(60)
+    }
+    await settle(1000)
+    if ((await band()) !== 'star' || (await route()) !== start) throw new Error(`zoomed in: band ${await band()}, at ${await route()}`)
+    // The star link nearest the middle, where the parallel DOM puts it.
+    const star = await page.evaluate(() => {
+      let best = null
+      for (const link of document.querySelectorAll('a[data-unit]')) {
+        const box = link.getBoundingClientRect()
+        const d = Math.hypot(box.left + box.width / 2 - 660, box.top + box.height / 2 - 430)
+        if (!best || d < best.d) best = { x: box.left + box.width / 2, y: box.top + box.height / 2, d, unit: link.getAttribute('data-unit') }
+      }
+      return best
+    })
+    await page.mouse.click(star.x, star.y)
+    await settle(1200)
+    const chosen = await route()
+    if (!chosen?.includes(`/${star.unit}`) || !(await page.locator('article[aria-labelledby="starmap-star-title"]').isVisible())) {
+      throw new Error(`tapped ${star.unit}: at ${chosen}`)
+    }
+    for (let i = 0; i < 16; i += 1) {
+      await page.mouse.wheel(0, 100)
+      await delay(60)
+    }
+    await settle()
+    const out = await route()
+    if (out?.split('?')[0].split('/').length !== 3 || (await band()) !== 'panorama' || (await page.locator('article[aria-labelledby="starmap-star-title"]').count())) {
+      throw new Error(`zoomed back out: at ${out}, band ${await band()}`)
+    }
+    return `${start ?? 'map'} -> ${chosen} -> ${out}`
+  })
+  await collect()
+
   // Expected to FAIL until the star map engine's fix lands (another branch of
   // #123): the switcher snaps back to the galaxy it left.
   await flow('subject switch: the header stays on the galaxy clicked', async () => {
