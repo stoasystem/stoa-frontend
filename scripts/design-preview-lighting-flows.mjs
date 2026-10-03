@@ -23,7 +23,7 @@ const SHOTS = '.codex-screenshots/design-preview/lighting'
 
 export async function lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button, settle }) {
   mkdirSync(SHOTS, { recursive: true })
-  const sky = JSON.parse(readFileSync('src/features/starmap/fixtures/demo-sky.json', 'utf8'))
+  const sky = JSON.parse(readFileSync('src/dev/demo/sky/demo-sky.json', 'utf8'))
   const point = sky.knowledgePoint
   const bridge = sky.bridge
   const litText = `${point.name.en} is lit`

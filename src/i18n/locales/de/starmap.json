@@ -69,10 +69,9 @@
     "star": "{{name}}: {{state}}"
   },
   "empty": "In diesem Fach gibt es noch nichts zu lernen.",
-  "demo": {
-    "notice": "Demo · Beispieldaten und Lernfortschritt",
-    "emptyStar": "Platzhalterstern · Demo-Inhalt, kein Kapitel.",
-    "longNebula": "Bruchrechnung, Gleichungen und proportionales Denken {{index}}"
+  "emptySky": {
+    "title": "Deine Sternkarte ist unterwegs",
+    "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
   },
   "lighting": {
     "announce": "{{name}} leuchtet jetzt"

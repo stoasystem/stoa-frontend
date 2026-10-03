@@ -51,6 +51,8 @@ async function start() {
   })
 
   const { StarMapRoute } = await import('@/features/starmap/StarMapRoute')
+  // The application's own source has no sky (#131): the bench draws the demo sky.
+  const { DemoStarMapSource } = await import('@/dev/demo/sky/source')
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useState } = await import('react')
 
@@ -92,15 +94,17 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
-        <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
-          <Routes>
-            <Route path="/" element={Page('MapHomePage')} />
-            <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
-            <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
-            <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
-            <Route path="*" element={<p>Left the map.</p>} />
-          </Routes>
-        </MemoryRouter>
+        <DemoStarMapSource>
+          <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
+            <Routes>
+              <Route path="/" element={Page('MapHomePage')} />
+              <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
+              <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
+              <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
+              <Route path="*" element={<p>Left the map.</p>} />
+            </Routes>
+          </MemoryRouter>
+        </DemoStarMapSource>
       </QueryClientProvider>
     </StrictMode>,
   )

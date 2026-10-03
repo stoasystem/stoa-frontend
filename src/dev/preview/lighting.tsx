@@ -1,11 +1,13 @@
 /*
- * The design preview's side of the lighting moment (#51): the two seams the
- * app leaves open, filled from the demo backend (`demoSource.ts`).
+ * The design preview's side of the lighting moment (#51) and of the star
+ * map's data (#131): the two seams the app leaves open, filled from the demo
+ * backend (`demoSource.ts`) and the demo sky (`src/dev/demo/sky`).
  *
  *   - `demoLightingSource`: stoa-backend#71's unacknowledged lit points and
  *     their acknowledgement, kept by the demo backend (so a reload of the tab
  *     does not replay the celebration).
- *   - `demoStarMapOverride`: the star map follows the lessons completed on the
+ *   - the star map source: the demo sky (`readDemoStarMap`), passed through
+ *     `demoStarMapOverride`, so the star map follows the lessons completed on the
  *     page. The demo knowledge point's state is #116's
  *     `demoKnowledgePointState(completed)`; once it is lit, "Refraction" in
  *     physics, whose only unlit prerequisite it was, becomes ready to start,
@@ -13,11 +15,11 @@
  *     point 8: first in progress, else first ready, in order). It also
  *     carries the demo sky's prerequisites (#121), across subjects too, as
  *     the read model will: the connection lines are drawn from them. The
- *     app's own route leaves them out (no backend claim, #110); only this
- *     preview, like the bench's `&relations=fixture`, puts them in.
+ *     application's own source has no sky at all (#131); only this preview,
+ *     like the bench's `&relations=fixture`, puts the prerequisites in.
  *
  * `PreviewLighting` provides both around the app; with `longNames` (the
- * preview's `&longNames=1`) the override also gives the nebulae long names.
+ * preview's `&longNames=1`) the source also gives the nebulae long names.
  */
 import type { TFunction } from 'i18next'
 import { useMemo, useSyncExternalStore, type ReactNode } from 'react'
@@ -31,10 +33,10 @@ import {
   onDemoServerChange,
   unacknowledgedLit,
 } from '@/dev/preview/demoSource'
-import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
+import { readDemoStarMap } from '@/dev/demo/sky/source'
 import { LightingEventSourceContext, type LightingEventSource } from '@/features/starmap/lighting/lightingEvents'
-import { StarMapOverrideContext } from '@/features/starmap/lighting/starMapOverride'
 import { orderedStars, subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
+import { StarMapSourceContext, type FixtureSize, type StarMapSource } from '@/features/starmap/starMapSource'
 
 export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
@@ -120,18 +122,21 @@ export function withLongNebulaNames(map: StarMap, t: TFunction<'starmap'>): Star
 export function PreviewLighting({ children, longNames = false }: { children: ReactNode; longNames?: boolean }) {
   const version = useSyncExternalStore(onDemoServerChange, demoServerVersion)
   const { t } = useTranslation('starmap')
-  // A new function when the demo backend changes, so the map is drawn again.
-  const override = useMemo(() => {
+  // A new source when the demo backend changes, so the map is drawn again.
+  const source = useMemo<StarMapSource>(() => {
     void version
     const completed = completedLessons()
-    return (map: StarMap, size: FixtureSize) => {
-      const followed = demoStarMapOverride(map, size, completed)
-      return longNames ? withLongNebulaNames(followed, t) : followed
+    return {
+      demo: true,
+      read: (request) => {
+        const followed = demoStarMapOverride(readDemoStarMap(request), request.size, completed)
+        return longNames ? withLongNebulaNames(followed, t) : followed
+      },
     }
   }, [version, longNames, t])
   return (
     <LightingEventSourceContext.Provider value={demoLightingSource}>
-      <StarMapOverrideContext.Provider value={override}>{children}</StarMapOverrideContext.Provider>
+      <StarMapSourceContext.Provider value={source}>{children}</StarMapSourceContext.Provider>
     </LightingEventSourceContext.Provider>
   )
 }

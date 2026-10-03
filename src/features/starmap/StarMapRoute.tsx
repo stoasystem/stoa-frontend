@@ -4,16 +4,23 @@
  * paints nothing around itself -- the page supplies the sky surface (today
  * `AppLayout surface="sky"`, and `AskHost` once Ask lands, #49) and the map
  * fills whatever box it is given, following that box's size.
+ *
+ * The data comes from the star map source (`starMapSource.ts`, #131). The
+ * application's has no sky yet (#48 wires the read model in), so the route
+ * shows an empty state instead of the renderer; the Demo notice shows only
+ * when the source says its map is demo content (the design preview, the
+ * bench).
  */
 import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
-import { defaultDemoSubject } from '@/features/starmap/fixtures/demoStarMap'
 import { subjectOfNebula } from '@/features/starmap/model/starMap'
+import { defaultSubject, useStarMapSource } from '@/features/starmap/starMapSource'
 import { useAuthStore } from '@/store/authStore'
 import { useStarMapStore } from '@/store/starMapStore'
 
@@ -26,9 +33,10 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const lastSubject = useStarMapStore((state) => state.lastSubjects[ownerId])
   const remember = useStarMapStore((state) => state.remember)
   const defaults = useStarMap(DEFAULT_SUBJECT_ID, fixtureSizeFrom(search, DEMO_STAR_COUNT))
-  const subjectId = params.subjectId ?? defaultDemoSubject(lastSubject, defaults.subjects)
+  const subjectId = params.subjectId ?? defaultSubject(lastSubject, defaults.subjects)
   const map = useStarMap(subjectId, fixtureSizeFrom(search, DEMO_STAR_COUNT),
     relations, longNames)
+  const { demo } = useStarMapSource()
   useEffect(() => {
     if (map.subjects.some((s) => s.subjectId === map.subject.subjectId) && lastSubject !== map.subject.subjectId) {
       remember(ownerId, map.subject.subjectId)
@@ -57,8 +65,27 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
     [navigate, map.subject.subjectId, location.search],
   )
 
+  if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
+
   return (
-    <StarMapView demo map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate) => <LightingOverlay map={map} locate={locate} />} />
+  )
+}
+
+/** No sky to draw yet (#131): the application's map until #48 wires the read model in. */
+function EmptyStarMap({ onShown }: { onShown: () => void }) {
+  const { t } = useTranslation('starmap')
+  // Nothing will be drawn, so this is the first screen a student signing in waits for.
+  useEffect(() => {
+    onShown()
+  }, [onShown])
+  return (
+    <section data-starmap-empty aria-labelledby="starmap-empty-title" className="flex h-full min-h-0 w-full flex-1 items-center justify-center p-6 text-center">
+      <div className="max-w-sm">
+        <h1 id="starmap-empty-title" className="m-0 text-[17px] font-semibold text-[color:var(--on-sky-text)]">{t('emptySky.title')}</h1>
+        <p className="mt-2 mb-0 text-[14px] text-[color:var(--on-sky-text-body)]">{t('emptySky.body')}</p>
+      </div>
+    </section>
   )
 }

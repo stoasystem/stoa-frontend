@@ -1,5 +1,5 @@
 /* The demo student (#116): the signed-in user and the profile /me shows. A made-up person. */
-import { demoSky } from '@/features/starmap/fixtures/demoSky'
+import { demoSky } from '@/dev/demo/sky/demoSky'
 import { supportedLanguages, type SupportedLanguage } from '@/i18n/languages'
 import type { StudentProfile } from '@/types/student'
 import type { User } from '@/types/user'

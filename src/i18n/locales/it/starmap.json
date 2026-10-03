@@ -69,10 +69,9 @@
     "star": "{{name}}: {{state}}"
   },
   "empty": "In questa materia non c’è ancora niente da imparare.",
-  "demo": {
-    "notice": "Demo · Contenuti e progressi di esempio",
-    "emptyStar": "Stella segnaposto · contenuto dimostrativo, nessun capitolo.",
-    "longNebula": "Frazioni, equazioni e ragionamento proporzionale {{index}}"
+  "emptySky": {
+    "title": "La tua mappa stellare sta arrivando",
+    "body": "Le tue materie e i tuoi punti di conoscenza appariranno qui appena saranno pronti."
   },
   "lighting": {
     "announce": "La stella {{name}} è accesa"

@@ -1,12 +1,16 @@
-/** Fixture source for the demo. Backend #59 will replace this hook with a service query. */
+/*
+ * The star map the route draws, from the star map source (`starMapSource.ts`,
+ * #131). In the application that is an empty sky until #48 wires the read
+ * model (stoa-backend#59) in here; the design preview and the bench inject
+ * the demo sky from `src/dev`. No demo data is imported from here.
+ */
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { isFixtureSize, type FixtureSize } from '@/features/starmap/fixtures/demoSky'
-import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
 import type { StarMap } from '@/features/starmap/model/starMap'
-import { useStarMapOverride } from '@/features/starmap/lighting/starMapOverride'
+import { isFixtureSize, useStarMapSource, type FixtureSize } from '@/features/starmap/starMapSource'
 import { isSupportedLanguage } from '@/i18n/languages'
 
+/** The sky size the route asks a demo source for when `?points=` says nothing. */
 export const DEMO_STAR_COUNT: FixtureSize = 1000
 
 export const DEFAULT_SUBJECT_ID = 'math'
@@ -25,9 +29,9 @@ export function useStarMap(subjectId: string, size: FixtureSize, relations = fal
   const { t, i18n } = useTranslation('starmap')
   const resolved = i18n.resolvedLanguage ?? i18n.language
   const language = isSupportedLanguage(resolved) ? resolved : 'en'
-  const override = useStarMapOverride() // #51: identity in production; the design preview's follows its lessons.
+  const source = useStarMapSource() // #131: empty in production; the preview's and the bench's give the demo sky.
   return useMemo(
-    () => override(demoStarMap(subjectId, size, t, { language, relations, longNames }), size),
-    [subjectId, size, t, language, relations, longNames, override],
+    () => source.read({ subjectId, size, t, language, relations, longNames }),
+    [subjectId, size, t, language, relations, longNames, source],
   )
 }

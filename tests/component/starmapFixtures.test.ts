@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { BENCH_SIZES } from '@/dev/benchStats'
-import { FIXTURE_SIZES } from '@/features/starmap/fixtures/demoSky'
+import { FIXTURE_SIZES } from '@/dev/demo/sky/demoSky'
 import { fixtureSizeFrom, foveationFrom } from '@/features/starmap/useStarMap'
 
 describe('the fixture size in the URL (#44)', () => {

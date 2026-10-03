@@ -5,7 +5,7 @@
  * (`GET /conversations`, `GET /conversations/:id`, the teacher-help status and
  * availability).
  */
-import { localize, type Localized } from '@/features/starmap/fixtures/demoSky'
+import { localize, type Localized } from '@/dev/demo/sky/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type { ChatMessage, ChatRole, Conversation, ConversationListResponse } from '@/types/chat'
 import type { TeacherAvailability, TeacherHelpRequest } from '@/types/teacherHelp'

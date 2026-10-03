@@ -32,7 +32,7 @@
  * Only knowledge points are `Star`s. Star dust (星尘, `render/galaxy.ts`) is
  * decoration painted from a seed: it has no id, no learning state, is never
  * a click target and is never in `stars`. The design preview's placeholder
- * stars (占位星) are `Star`s in shape only; `fixtures/demoSky.ts` says which
+ * stars (占位星) are `Star`s in shape only; `src/dev/demo/sky/demoSky.ts` says which
  * one star is the demo knowledge point and that all others are placeholders.
  */
 

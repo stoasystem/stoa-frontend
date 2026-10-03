@@ -29,7 +29,7 @@
  * sends names already in the reader's language; they are demo content, so
  * they stay out of the locale bundles.
  */
-import data from '@/features/starmap/fixtures/demo-sky.json'
+import data from '@/dev/demo/sky/demo-sky.json'
 import { galaxyOrder, layoutSky, seededRandom, type GalaxyBox } from '@/features/starmap/layout/layout'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import {
@@ -42,18 +42,10 @@ import {
   type SkyNebula,
   type Star,
 } from '@/features/starmap/model/starMap'
+import type { FixtureSize } from '@/features/starmap/starMapSource'
 import type { SupportedLanguage } from '@/i18n/languages'
 
-/**
- * The sky's sizes, counting the stars of the whole sky: 10 is planned by
- * hand; 500, 1000 and 2000 are the phone bench's steps (#44).
- */
-export const FIXTURE_SIZES = [10, 500, 1000, 2000] as const
-export type FixtureSize = (typeof FIXTURE_SIZES)[number]
-
-export function isFixtureSize(value: number): value is FixtureSize {
-  return (FIXTURE_SIZES as readonly number[]).includes(value)
-}
+export { FIXTURE_SIZES, isFixtureSize, type FixtureSize } from '@/features/starmap/starMapSource'
 
 /** A text in the four languages the app ships. */
 export type Localized = Record<SupportedLanguage, string>

@@ -2,10 +2,13 @@ import { act, render, screen, within } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
+import { DEMO_KNOWLEDGE_POINT, demoStarKind } from '@/dev/demo/sky/demoSky'
+import type { FixtureSize } from '@/dev/demo/sky/demoSky'
+import { demoStarMap } from '@/dev/demo/sky/demoStarMap'
+// The demo-only words (the Demo notice, the placeholder star's note) come with the demo source (#131).
+import '@/dev/demo/sky/source'
+import { defaultSubject } from '@/features/starmap/starMapSource'
 import i18n from '@/i18n'
-import { demoStarMap, defaultDemoSubject } from '@/features/starmap/fixtures/demoStarMap'
-import { DEMO_KNOWLEDGE_POINT, demoStarKind } from '@/features/starmap/fixtures/demoSky'
-import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
 import { DEMO_STAR_COUNT, fixtureSizeFrom } from '@/features/starmap/useStarMap'
 import { LEARNING_STATES, type StarMap } from '@/features/starmap/model/starMap'
@@ -79,10 +82,10 @@ it('keeps account preferences separate and falls back to the first subject the s
   useStarMapStore.getState().remember('b', 'math')
   await useStarMapStore.persist.rehydrate()
   expect(useStarMapStore.getState().lastSubjects).toEqual({ a: 'physics', b: 'math' })
-  expect(defaultDemoSubject(useStarMapStore.getState().lastSubjects.a, subjects)).toBe('physics')
-  expect(defaultDemoSubject(undefined, [subjects[2], subjects[1], subjects[0]])).toBe('physics')
-  expect(defaultDemoSubject('removed', subjects)).toBe('math')
-  expect(defaultDemoSubject('chemistry', subjects)).toBe('chemistry')
+  expect(defaultSubject(useStarMapStore.getState().lastSubjects.a, subjects)).toBe('physics')
+  expect(defaultSubject(undefined, [subjects[2], subjects[1], subjects[0]])).toBe('physics')
+  expect(defaultSubject('removed', subjects)).toBe('math')
+  expect(defaultSubject('chemistry', subjects)).toBe('chemistry')
   useStarMapStore.setState({ lastSubjects: {} })
 })
 

@@ -410,7 +410,8 @@ describe('the page a forced change stays on', () => {
     await waitFor(() => expect(pathname).toBe('/'))
     // The lazy home page must commit before we come back: the location probe
     // can render '/' while Suspense still retains the password page.
-    expect(await screen.findByRole('heading', { name: 'Mathematics' })).toBeInTheDocument()
+    // The home planet: the application's star map, empty until #48 (#131).
+    expect(await screen.findByRole('heading', { name: 'Your star map is on its way' })).toBeInTheDocument()
     act(() => go('/settings/password'))
     await waitFor(() => expect(pathname).toBe('/me'))
   })

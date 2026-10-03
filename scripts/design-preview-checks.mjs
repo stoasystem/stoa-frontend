@@ -107,7 +107,7 @@ try {
     const out = []
     for (const points of [10, 1000]) {
       await open(page, { surface: 'lighting', points })
-      const files = ['/src/dev/preview/lighting.tsx', '/src/features/starmap/fixtures/demoStarMap.ts', '/src/features/starmap/model/starMap.ts', '/src/dev/preview/demoSource.ts', '/src/i18n/index.ts']
+      const files = ['/src/dev/preview/lighting.tsx', '/src/dev/demo/sky/demoStarMap.ts', '/src/features/starmap/model/starMap.ts', '/src/dev/preview/demoSource.ts', '/src/i18n/index.ts']
       const picked = await page.evaluate(async ([size, modules]) => {
         const [{ demoStarMapOverride }, { demoStarMap }, { subjectOfNebula, orderedStars }, { completedLessons }, { default: i18n }] = await Promise.all(modules.map((file) => import(file)))
         const map = demoStarMapOverride(demoStarMap('math', size, i18n.getFixedT('en', 'starmap'), { language: 'en' }), size, completedLessons())
