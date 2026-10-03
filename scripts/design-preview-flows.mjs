@@ -8,7 +8,8 @@
  * Flows: sign in from the login page; open the demo knowledge point's chapter
  * from its star card; answer every exercise of the next lesson wrong, then
  * right, and finish it, and see the chapter count it; send a message in Ask;
- * log out from the account menu; open the bell; switch subject.
+ * log out from the account menu; open the bell; switch subject. Then the
+ * lighting moment (#51), in `design-preview-lighting-flows.mjs`.
  *
  * The page after finishing the lesson is saved as
  * .codex-screenshots/design-preview/flows/lesson-finished.png.
@@ -19,6 +20,7 @@
 import { setTimeout as delay } from 'node:timers/promises'
 import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
+import { lightingFlows } from './design-preview-lighting-flows.mjs'
 
 /* global window, fetch -- used inside page.evaluate, in the browser */
 
@@ -36,30 +38,39 @@ const results = []
 
 const browser = await chromium.launch()
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } })
-page.on('request', (request) => {
-  const url = new URL(request.url())
-  if (url.protocol === 'data:' || url.protocol === 'blob:') return
-  if (url.origin !== base.origin || url.pathname.startsWith('/api/')) leaks.push(`${request.method()} ${request.url()}`)
-})
-page.on('console', (message) => {
-  if (message.type() === 'error' || message.type() === 'warning') problems.push(`[${message.type()}] ${message.text()}`)
-})
-page.on('pageerror', (error) => problems.push(`[pageerror] ${error.message}`))
+watch(page)
 
-async function open(query) {
-  // Collect what the page before this one could not answer.
-  await collect()
-  const url = new URL('/src/dev/preview.html', base)
-  for (const [key, value] of Object.entries(query)) url.searchParams.set(key, String(value))
-  await page.goto(url.href)
-  await page.waitForSelector('html[data-preview-ready="1"]', { timeout: 20_000 })
+/** Every request and socket of `target` must stay on the dev server; console errors and warnings are problems. */
+function watch(target) {
+  target.on('request', (request) => {
+    const url = new URL(request.url())
+    if (url.protocol === 'data:' || url.protocol === 'blob:') return
+    if (url.origin !== base.origin || url.pathname.startsWith('/api/')) leaks.push(`${request.method()} ${request.url()}`)
+  })
+  target.on('console', (message) => {
+    if (message.type() === 'error' || message.type() === 'warning') problems.push(`[${message.type()}] ${message.text()}`)
+  })
+  target.on('pageerror', (error) => problems.push(`[pageerror] ${error.message}`))
 }
 
-async function collect() {
-  if (!page.url().startsWith(base.origin)) return
-  const journal = await page.evaluate(() => window.__stoaPreview).catch(() => null)
+function previewUrl(query) {
+  const url = new URL('/src/dev/preview.html', base)
+  for (const [key, value] of Object.entries(query)) url.searchParams.set(key, String(value))
+  return url.href
+}
+
+async function open(query, on = page) {
+  // Collect what the page before this one could not answer.
+  await collect(on)
+  await on.goto(previewUrl(query))
+  await on.waitForSelector('html[data-preview-ready="1"]', { timeout: 20_000 })
+}
+
+async function collect(on = page) {
+  if (!on.url().startsWith(base.origin)) return
+  const journal = await on.evaluate(() => window.__stoaPreview).catch(() => null)
   for (const entry of journal?.unanswered ?? []) unanswered.push(`${entry.method} ${entry.url}`)
-  await page.evaluate(() => { if (window.__stoaPreview) window.__stoaPreview.unanswered = [] }).catch(() => {})
+  await on.evaluate(() => { if (window.__stoaPreview) window.__stoaPreview.unanswered = [] }).catch(() => {})
 }
 
 const route = () => page.evaluate(() => new URL(window.location.href).searchParams.get('path') ?? new URL(window.location.href).searchParams.get('surface'))
@@ -73,10 +84,11 @@ async function flow(name, run) {
   }
 }
 
-const button = (name) => page.getByRole('button', { name, exact: true })
+const mainPage = page
+const button = (name, on = mainPage) => on.getByRole('button', { name, exact: true })
 
 /** Gives `challenge` an answer: its right one, or a wrong one. */
-async function answer(challenge, right) {
+async function answer(challenge, right, page = mainPage) {
   const wanted = right ? challenge.correctAnswer : wrongAnswer(challenge)
   if (challenge.type === 'multiple_choice') {
     await page.locator('label').filter({ has: page.locator(`input[type="radio"][value="${wanted}"]`) }).click()
@@ -98,7 +110,7 @@ function wrongAnswer(challenge) {
   return 'not the answer'
 }
 
-async function feedback() {
+async function feedback(page = mainPage) {
   const verdict = page.locator('[data-stage-feedback]')
   await verdict.waitFor({ timeout: 5000 })
   return verdict.getAttribute('data-stage-feedback')
@@ -190,6 +202,8 @@ try {
     return `${await route()}`
   })
   await collect()
+
+  await lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button })
 } finally {
   await browser.close()
 }
