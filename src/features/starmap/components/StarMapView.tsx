@@ -10,7 +10,7 @@
  * progress and markers (#11 point 5). The star layer is plain HTML and SVG.
  */
 import { ChevronLeft, Minus, Plus } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { SegmentedNav } from '@/components/base'
@@ -18,7 +18,7 @@ import { StarCard } from '@/features/starmap/components/StarCard'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
 import { nebulaLinks } from '@/features/starmap/model/links'
-import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
+import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, litCount, nebulaCounts, orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
@@ -68,6 +68,8 @@ export type StarMapViewProps = {
   /** For tests: the frame clock and the renderer. */
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
+  /** Drawn above the canvas, below the controls: the lighting layer (#51), told where a star is drawn. */
+  overlay?: (locate: (unitId: string) => StarOnScreen | null) => ReactNode
 }
 
 /**
@@ -99,7 +101,7 @@ function linkSize(glyph: number): number {
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, onNavigate, onFirstFrame, foveate, scheduler, createRendererFor }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, onNavigate, onFirstFrame, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
@@ -296,6 +298,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   }
 
   const focusStar = useCallback((index: number) => engineRef.current?.setFocusStar(index), [])
+  const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
 
   // The links, grouped by nebula in keyboard order.
@@ -399,6 +402,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         onKeyDown={onKeyDown}
       >
         <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 block h-full w-full" />
+        {overlay?.(locateStar)}
 
         {demo && (
           <p className="absolute inset-x-0 top-0 m-0 flex h-8 items-center justify-center border-b border-white/10 px-2 text-[12px] text-[color:var(--on-sky-text-body)]">

@@ -73,5 +73,8 @@
     "notice": "Demo · Sample content and progress",
     "emptyStar": "Placeholder star · demo content, no chapter.",
     "longNebula": "Fractions, equations and proportional reasoning {{index}}"
+  },
+  "lighting": {
+    "announce": "{{name}} is lit"
   }
 }

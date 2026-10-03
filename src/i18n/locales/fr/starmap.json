@@ -73,5 +73,8 @@
     "notice": "Démo · Contenu et progression fictifs",
     "emptyStar": "Étoile fictive · contenu de démonstration, sans chapitre.",
     "longNebula": "Fractions, équations et raisonnement proportionnel {{index}}"
+  },
+  "lighting": {
+    "announce": "{{name}} est allumée"
   }
 }

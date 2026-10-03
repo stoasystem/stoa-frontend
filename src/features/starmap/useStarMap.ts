@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { isFixtureSize, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
 import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
 import type { StarMap } from '@/features/starmap/model/starMap'
+import { useStarMapOverride } from '@/features/starmap/lighting/starMapOverride'
 import { isSupportedLanguage } from '@/i18n/languages'
 
 export const DEMO_STAR_COUNT: FixtureSize = 1000
@@ -24,8 +25,9 @@ export function useStarMap(subjectId: string, size: FixtureSize, relations = fal
   const { t, i18n } = useTranslation('starmap')
   const resolved = i18n.resolvedLanguage ?? i18n.language
   const language = isSupportedLanguage(resolved) ? resolved : 'en'
+  const override = useStarMapOverride() // #51: identity in production; the design preview's follows its lessons.
   return useMemo(
-    () => demoStarMap(subjectId, size, t, { language, relations, longNames }),
-    [subjectId, size, t, language, relations, longNames],
+    () => override(demoStarMap(subjectId, size, t, { language, relations, longNames }), size),
+    [subjectId, size, t, language, relations, longNames, override],
   )
 }

@@ -56,6 +56,9 @@ export type VisibleStar = { index: number; x: number; y: number }
 /** A nebula's disc on screen now, CSS px, for placing its link's focus indicator. */
 export type NebulaDiscOnScreen = { x: number; y: number; r: number }
 
+/** Where one star is drawn in the last frame, CSS px, and the glyph size (#51's lighting layer). */
+export type StarOnScreen = { x: number; y: number; size: number }
+
 export type StarMapEngineOptions = {
   renderer: StarMapRenderer
   theme: StarMapTheme
@@ -517,6 +520,12 @@ export class StarMapEngine {
   /** The drawn glyph size now, CSS px. */
   get glyphSize(): number {
     return glyphSizeFor(transformOf(this.view, this.viewport, this.bounds).scale, this.spacing)
+  }
+
+  /** Where `unitId`'s star was drawn in the last frame; null before one, or for a star not on this map (#51). */
+  starOnScreen(unitId: string): StarOnScreen | null {
+    const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
+    return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize }
   }
 
   /** Whether the engine has a frame on order. */
