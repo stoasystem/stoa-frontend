@@ -5,7 +5,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import { demoStarMap, defaultDemoSubject } from '@/features/starmap/fixtures/demoStarMap'
 import { DEMO_KNOWLEDGE_POINT, demoStarKind } from '@/features/starmap/fixtures/demoSky'
-import type { FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import type { SupportedLanguage } from '@/i18n/languages'
 import { DEMO_STAR_COUNT, fixtureSizeFrom } from '@/features/starmap/useStarMap'
 import { LEARNING_STATES, type StarMap } from '@/features/starmap/model/starMap'
@@ -33,9 +33,27 @@ it('normalizes math aliases and gives unknown subjects truthful summaries', () =
 
 it('keeps a subject the student does not take in the sky, with no student evidence', () => {
   const map = mapFor('chemistry', 1000)
-  expect(map.stars.length).toBeGreaterThan(0)
-  expect(map.subjects.find((s) => s.subjectId === 'chemistry')).toMatchObject({ enrolled: false, lit: 0, total: map.stars.length })
-  expect(map.stars.every((s) => (s.state === 'ready' || s.state === 'locked') && !s.recommendation)).toBe(true)
+  const topics = new Set(map.nebulae.filter((n) => n.subjectId === 'chemistry').map((n) => n.topicId))
+  const own = map.stars.filter((s) => topics.has(s.nebulaId))
+  expect(own.length).toBeGreaterThan(0)
+  expect(map.subjects.find((s) => s.subjectId === 'chemistry')).toMatchObject({ enrolled: false, lit: 0, total: own.length })
+  expect(map.summary).toMatchObject({ lit: 0, total: own.length })
+  expect(own.every((s) => (s.state === 'ready' || s.state === 'locked') && !s.recommendation)).toBe(true)
+})
+
+it('hands out the whole sky whichever galaxy is in focus, the same arrays every time (#119)', () => {
+  const math = mapFor('math', 1000)
+  const physics = mapFor('physics', 1000)
+  expect(math.stars).toHaveLength(1000)
+  expect(physics.stars).toBe(math.stars)
+  expect(physics.nebulae).toBe(math.nebulae)
+  expect(new Set(math.nebulae.map((n) => n.subjectId))).toEqual(new Set(['math', 'physics', 'chemistry']))
+  // Nebulae in band order: galaxy by galaxy, then topic order; one order across the sky.
+  expect(math.nebulae.map((n) => n.order)).toEqual(math.nebulae.map((_, i) => i + 1))
+  const galaxyRuns = math.nebulae.map((n) => n.subjectId).filter((id, i, all) => id !== all[i - 1])
+  expect(galaxyRuns).toEqual(['math', 'physics', 'chemistry'])
+  expect([math.subject.subjectId, physics.subject.subjectId]).toEqual(['math', 'physics'])
+  expect(physics.summary).toMatchObject({ lit: physics.subjects[1].lit, total: physics.subjects[1].total })
 })
 
 it.each(['de', 'en', 'fr', 'it'] as const)('names every subject, nebula and star in %s', async (language) => {
@@ -108,13 +126,16 @@ it.each(['math', 'physics'])('defaults to the %s galaxy of the 1000-star sky, pl
   const size = fixtureSizeFrom(new URLSearchParams(), DEMO_STAR_COUNT)
   expect(size).toBe(1000)
   const map = demoStarMap(id, size, i18n.getFixedT('en', 'starmap'))
-  for (const state of LEARNING_STATES) expect(map.stars.some((s) => s.state === state)).toBe(true)
-  expect(map.stars.filter((s) => s.recommendation)).toHaveLength(1)
-  expect(map.stars.length).toBe(map.subjects.find((s) => s.subjectId === id)?.total)
-  expect(map.stars.length).toBeGreaterThan(250)
+  const topics = new Set(map.nebulae.filter((n) => n.subjectId === id).map((n) => n.topicId))
+  const own = map.stars.filter((s) => topics.has(s.nebulaId))
+  for (const state of LEARNING_STATES) expect(own.some((s) => s.state === state)).toBe(true)
+  expect(own.filter((s) => s.recommendation)).toHaveLength(1)
+  expect(own.length).toBe(map.subjects.find((s) => s.subjectId === id)?.total)
+  expect(map.summary.total).toBe(own.length)
+  expect(own.length).toBeGreaterThan(250)
   expect(map.subjects.reduce((sum, s) => sum + s.total, 0)).toBe(1000)
   expect(map.prerequisites).toEqual([])
-  const withChapter = map.stars.filter((s) => s.chapter.lessonCount > 0).map((s) => s.unitId)
+  const withChapter = own.filter((s) => s.chapter.lessonCount > 0).map((s) => s.unitId)
   expect(withChapter).toEqual(id === 'math' ? [DEMO_KNOWLEDGE_POINT.unitId] : [])
   for (const star of map.stars) {
     expect(star.x).toBeGreaterThanOrEqual(0)
@@ -122,7 +143,7 @@ it.each(['math', 'physics'])('defaults to the %s galaxy of the 1000-star sky, pl
   }
 })
 
-it('shows only the subject’s own prerequisites when relations are asked for', () => {
+it('shows the sky’s prerequisites, across subjects too, when relations are asked for', () => {
   const map = demoStarMap('physics', 1000, i18n.getFixedT('en', 'starmap'), { relations: true })
   const units = new Set(map.stars.map((s) => s.unitId))
   expect(map.prerequisites.length).toBeGreaterThan(0)
@@ -130,4 +151,5 @@ it('shows only the subject’s own prerequisites when relations are asked for', 
     expect(units.has(edge.from)).toBe(true)
     expect(units.has(edge.to)).toBe(true)
   }
+  expect(map.prerequisites).toContainEqual({ from: DEMO_KNOWLEDGE_POINT.unitId, to: 'demo-refraction' })
 })

@@ -38,16 +38,41 @@ export type SceneData = {
    */
   mapKey: string
   count: number
-  /** Continuous demo presentation; topic circles are navigation bounds, not visual islands. */
+  /**
+   * One sky (#119): nebulae drawn as clouds in their own tint, galaxies as a
+   * faint haze of their base tint with dark sky between them; topic discs
+   * are navigation bounds only.
+   */
   galaxy?: boolean
+  /** The sky's galaxies, left to right (one sky only; absent otherwise). */
+  galaxies?: readonly {
+    subjectId: string
+    name: string
+    /** The box round its stars, map units. */
+    x0: number
+    x1: number
+    y0: number
+    y1: number
+    /** 0 blue-violet .. 1 warm gold. */
+    tint: number
+    /** 1, or less for a subject the student does not take. */
+    dim: number
+    /** Its nebulae, by index. */
+    nebulae: readonly number[]
+  }[]
   /** Map position of every star, map units. */
   mapX: Float32Array
   mapY: Float32Array
   state: Uint8Array
   progress: Float32Array
   reviewDue: Uint8Array
-  /** Index of the one recommended star, or -1. */
+  /** Index of the recommended star (in the galaxy in focus, on one sky), or -1. */
   recommended: number
+  /**
+   * Every recommended star -- one per subject the student takes, on one sky
+   * -- drawn as a full glyph at every zoom: the way in. Absent: just `recommended`.
+   */
+  recommendations?: readonly number[]
   /** Nebula index of every star. */
   nebula: Uint16Array
   names: readonly string[]
@@ -62,6 +87,10 @@ export type SceneData = {
     r: number
     lit: number
     total: number
+    /** Its own tint, 0 blue-violet .. 1 warm gold (one sky only). */
+    tint?: number
+    /** 1, or less in a galaxy the student does not take (one sky only). */
+    dim?: number
   }[]
   /** Lines between nebulae, aggregated from prerequisites (#72 point 2). */
   links: readonly { a: number; b: number; count: number }[]

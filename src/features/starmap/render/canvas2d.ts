@@ -11,7 +11,7 @@
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, belongsTo, boxHitsCircle, nebulaConnection, placeLabel, splitByCircles, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
-import { KNOWLEDGE_GLOW_ALPHA, paintGalaxy, paintKnowledgeGlow } from '@/features/starmap/render/galaxy'
+import { CLOUD_REACH, GALAXY_HAZE_ALPHA, galaxyHazeBox, NEBULA_GLOW, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { linkWeight } from '@/features/starmap/model/links'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
@@ -163,8 +163,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let sprites: { small: Sprite[]; large: Sprite[]; dots: HTMLCanvasElement[] } | null = null
   let snapshotCanvas: HTMLCanvasElement | null = null
   let skyCanvas: HTMLCanvasElement | null = null
-  let knowledgeGlow: HTMLCanvasElement | null = null
-  let knowledgeFor = ''
+  /** One sky: each galaxy's haze, painted once per sky and theme. */
+  let galaxyHazes: HTMLCanvasElement[] = []
+  let hazesFor = ''
   let stateKeys: string[] = []
   const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
@@ -215,20 +216,25 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
     const s = small.getContext('2d')
     if (!h || !t || !s || !data || !theme) return { haze: hazeCanvas, stars: starsCanvas, size }
     const nebula = data.nebulae[index]
-    const reach = nebula.r * TILE_REACH
+    const reach = nebula.r * (data.galaxy ? CLOUD_REACH : TILE_REACH)
     const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
 
-    const haze = h.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
-    haze.addColorStop(0, withAlpha(theme.atmosphere, HAZE.core))
-    haze.addColorStop(0.45, withAlpha(theme.atmosphere, HAZE.mid))
-    haze.addColorStop(1, withAlpha(theme.atmosphere, 0))
-    h.fillStyle = haze
-    h.fillRect(0, 0, size, size)
-    const warmth = h.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size * 0.4)
-    warmth.addColorStop(0, withAlpha(theme.lit, HAZE.warmthBase + HAZE.warmthLit * litShare))
-    warmth.addColorStop(1, withAlpha(theme.lit, 0))
-    h.fillStyle = warmth
-    h.fillRect(0, 0, size, size)
+    // One sky: the haze is the nebula's cloud, in its own tint, shaped by its stars.
+    if (data.galaxy) {
+      paintNebulaCloud(h, size, data, index, theme, makeCanvas)
+    } else {
+      const haze = h.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+      haze.addColorStop(0, withAlpha(theme.atmosphere, HAZE.core))
+      haze.addColorStop(0.45, withAlpha(theme.atmosphere, HAZE.mid))
+      haze.addColorStop(1, withAlpha(theme.atmosphere, 0))
+      h.fillStyle = haze
+      h.fillRect(0, 0, size, size)
+      const warmth = h.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size * 0.4)
+      warmth.addColorStop(0, withAlpha(theme.lit, HAZE.warmthBase + HAZE.warmthLit * litShare))
+      warmth.addColorStop(1, withAlpha(theme.lit, 0))
+      h.fillStyle = warmth
+      h.fillRect(0, 0, size, size)
+    }
 
     const q = size / 2
     const toTile = (value: number, centre: number) => ((value - centre) / reach) * (q / 2) + q / 2
@@ -267,18 +273,25 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
     const sky = skyCanvas.getContext('2d')
     if (!sky) return
     sky.scale(dpr, dpr)
-    paintGalaxy(sky, viewport.width, viewport.height, theme)
+    paintGalaxy(sky, viewport.width, viewport.height, theme, Boolean(data?.galaxy))
   }
 
-  const paintKnowledge = () => {
-    if (!data?.galaxy) { knowledgeGlow = null; return }
-    knowledgeGlow = makeCanvas(1280, 1280)
-    const glow = knowledgeGlow.getContext('2d')
-    if (glow && theme) {
-      glow.translate(128, 128) // Let edge clouds fade beyond the map instead of clipping into a rectangle.
-      paintKnowledgeGlow(glow, makeCanvas(96, 96), makeCanvas(96, 96), data, 1024, theme)
+  /** Each galaxy's haze, 1024 px across its box; only the sky's layout and the theme change it. */
+  const paintHazes = () => {
+    const key = data?.galaxy ? data.mapKey : ''
+    if (key === hazesFor && galaxyHazes.length > 0) return
+    hazesFor = key
+    galaxyHazes = []
+    if (!data?.galaxy || !theme) return
+    for (let g = 0; g < (data.galaxies?.length ?? 0); g += 1) {
+      const box = galaxyHazeBox(data.galaxies![g])
+      const width = 1024
+      const height = Math.max(16, Math.round((width * (box.y1 - box.y0)) / (box.x1 - box.x0)))
+      const haze = makeCanvas(width, height)
+      const h = haze.getContext('2d')
+      if (h) paintGalaxyHaze(h, width, data, g, theme, makeCanvas)
+      galaxyHazes.push(haze)
     }
-    knowledgeFor = `${data.mapKey}:${stateKeys.join('|')}`
   }
 
   const setFont = (px: number, weight: number) => {
@@ -318,7 +331,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       theme = next
       rebuild()
       paintSky()
-      paintKnowledge()
+      hazesFor = ''
+      paintHazes()
     },
 
     setData(next) {
@@ -327,9 +341,11 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // repaint exactly the nebulae whose stars changed state.
       if (next.mapKey !== tilesFor) tiles.clear()
       tilesFor = next.mapKey
+      const sparse = Boolean(data?.galaxy)
       data = next
       stateKeys = nebulaStateKeys(next.state, next.nebula, next.nebulae.length)
-      if (`${next.mapKey}:${stateKeys.join('|')}` !== knowledgeFor) paintKnowledge()
+      if (Boolean(next.galaxy) !== sparse) paintSky()
+      paintHazes()
     },
 
     snapshot() {
@@ -359,9 +375,19 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const { nebulaX, nebulaY, nebulaR, sharpness, x, y, starAlpha } = frame
       const { state, count } = scene
       const nebulaCount = scene.nebulae.length
-      if (knowledgeGlow && scene.galaxy) {
-        ctx.globalAlpha = KNOWLEDGE_GLOW_ALPHA
-        ctx.drawImage(knowledgeGlow, frame.ox - frame.scale / 8, frame.oy - frame.scale / 8, frame.scale * 1.25, frame.scale * 1.25)
+      // One sky: each galaxy's faint haze, under its nebulae.
+      if (scene.galaxy && scene.galaxies) {
+        ctx.imageSmoothingEnabled = true
+        scene.galaxies.forEach((galaxy, g) => {
+          const haze = galaxyHazes[g]
+          if (!haze) return
+          const box = galaxyHazeBox(galaxy)
+          const x0 = frame.ox + box.x0 * frame.scale
+          const x1 = frame.ox + box.x1 * frame.scale
+          if (x1 < 0 || x0 > width) return
+          ctx.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
+          ctx.drawImage(haze, x0, frame.oy + box.y0 * frame.scale, x1 - x0, (box.y1 - box.y0) * frame.scale)
+        })
       }
 
       const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
@@ -370,16 +396,23 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // Haze under every nebula, and the blurred stars of those outside the focus.
       ctx.imageSmoothingEnabled = true
       for (let n = 0; n < nebulaCount; n += 1) {
-        const reach = nebulaR[n] * TILE_REACH
+        const reach = nebulaR[n] * (scene.galaxy ? CLOUD_REACH : TILE_REACH)
         if (!onScreen(nebulaX[n], nebulaY[n], reach)) continue
         const nebula = scene.nebulae[n]
-        const tile = tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr))
+        const tile = tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr, scene.galaxy ? 512 : 256))
         const box = [nebulaX[n] - reach, nebulaY[n] - reach, reach * 2, reach * 2] as const
-        ctx.globalAlpha = nebulaDim(n)
-        if (!scene.galaxy) ctx.drawImage(tile.haze, ...box)
+        const own = nebula.dim ?? 1
+        if (scene.galaxy) {
+          // The cloud brightens with its lit share (#117), core first: lit stars warm it from within.
+          const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
+          ctx.globalAlpha = (NEBULA_GLOW.base + NEBULA_GLOW.lit * litShare) * own * nebulaDim(n)
+        } else {
+          ctx.globalAlpha = nebulaDim(n)
+        }
+        ctx.drawImage(tile.haze, ...box)
         const blurred = 1 - sharpness[n]
         if (blurred > 0.01) {
-          ctx.globalAlpha = blurred * nebulaDim(n)
+          ctx.globalAlpha = blurred * nebulaDim(n) * own
           ctx.drawImage(tile.stars, ...box)
         }
         stats.tileDraws += 1
@@ -409,6 +442,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       ctx.strokeStyle = colours.text
       const offscreen: { name: string; arrow: string; x: number; y: number }[] = []
       for (const link of scene.links) {
+        // One sky: no lines on the whole map (#117 D1; their tiers are #121).
+        if (scene.galaxy && frame.chosenNebula < 0) break
         if (frame.chosenNebula >= 0 && link.a !== frame.chosenNebula && link.b !== frame.chosenNebula) continue
         const a = { x: nebulaX[link.a], y: nebulaY[link.a], r: nebulaR[link.a] }
         const b = { x: nebulaX[link.b], y: nebulaY[link.b], r: nebulaR[link.b] }
@@ -463,7 +498,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const py = y[i]
         return !(px < -margin || py < -margin || px > width + margin || py > height + margin)
       }
-      // The recommended star is always a full glyph, at least 18 px: the way in.
+      // A recommended star is always a full glyph, at least 18 px: the way in.
+      const beacons = new Set(scene.recommendations ?? (scene.recommended >= 0 ? [scene.recommended] : []))
+      const isBeacon = (i: number) => beacons.has(i)
       const beaconSize = frame.dotBlend > 0.5 ? 12 : Math.min(frame.glyphSize, 32)
 
       // Prerequisite lines inside the chosen nebula, trimmed clear of both stars.
@@ -492,8 +529,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       for (let i = 0; i < count; i += 1) {
         const a = starAlpha[i]
         if (a < DRAW_THRESHOLD || !visible(i)) continue
-        const focus = i === frame.focusStar ? 1 : frame.dim
-        const beacon = i === scene.recommended
+        const focus = (i === frame.focusStar ? 1 : frame.dim) * (scene.nebulae[scene.nebula[i]]?.dim ?? 1)
+        const beacon = isBeacon(i)
         const breathing = breath && breath.index === i
         if (glyphs > 0.01) {
           const sprite = glyphSet[state[i]]
@@ -515,7 +552,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       for (let i = 0; i < count; i += 1) {
         const a = starAlpha[i]
         if (a < DRAW_THRESHOLD || !visible(i)) continue
-        const beacon = i === scene.recommended
+        const beacon = isBeacon(i)
         const show = beacon ? 1 : glyphs
         if (show < 0.01) continue
         const inProgress = state[i] === STATE_IN_PROGRESS
@@ -596,14 +633,14 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const glyphR = Math.max(frame.glyphSize * 0.42, frame.dotRadius * 2)
         const stars: Circle[] = []
         for (let i = 0; i < count; i += 1) {
-          if (starAlpha[i] >= DRAW_THRESHOLD && visible(i)) stars.push({ x: x[i], y: y[i], r: i === scene.recommended ? beaconSize * 0.45 : glyphR })
+          if (starAlpha[i] >= DRAW_THRESHOLD && visible(i)) stars.push({ x: x[i], y: y[i], r: isBeacon(i) ? beaconSize * 0.45 : glyphR })
         }
         const order = frame.focusStar >= 0 ? [frame.focusStar] : []
         for (let i = 0; i < count; i += 1) if (i !== frame.focusStar) order.push(i)
         for (const i of order) {
           if (scene.nebula[i] !== frame.chosenNebula || starAlpha[i] < DRAW_THRESHOLD || !visible(i)) continue
           const w = ctx.measureText(scene.names[i]).width + 6
-          const own = i === scene.recommended ? beaconSize * 0.45 : glyphR
+          const own = isBeacon(i) ? beaconSize * 0.45 : glyphR
           const box = placeLabel(
             aroundDisc(x[i], y[i], own, w, 17, 3),
             { boxes: placed, circles: stars.filter((c) => c.x !== x[i] || c.y !== y[i]), segments },
@@ -686,7 +723,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       sprites = null
       snapshotCanvas = null
       skyCanvas = null
-      knowledgeGlow = null
+      galaxyHazes = []
       data = null
       tiles.clear()
     },

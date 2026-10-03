@@ -1,24 +1,25 @@
 /*
- * One galaxy of the demo sky (`demoSky.ts`), as the one-subject `StarMap` the
- * renderer draws until #119 draws the whole sky. Visual placeholders only:
- * stoa-backend#59 will supply the actual curriculum and progress.
+ * The demo sky (`demoSky.ts`) as the `StarMap` the renderer draws (#119):
+ * every galaxy's nebulae and stars, with `subject` the galaxy in focus -- the
+ * route's `/map/:subjectId`, the header and the switcher -- and `summary`
+ * that galaxy's lit count. Visual placeholders only: stoa-backend#59 will
+ * supply the actual curriculum and progress.
  *
- * Positions come from `demoGalaxyPositions` (#110's star-light layout).
+ * The nebulae and stars are the same arrays whichever galaxy is in focus, so
+ * flying from one galaxy to another hands the engine the same sky (it keeps
+ * its tiles and only moves the camera).
+ *
  * Prerequisites are left out unless `relations` asks for them (the
- * `&relations=fixture` dev switch); then only those inside the subject, as a
- * one-subject map cannot draw a star of another one. The sky keeps the
- * cross-subject ones.
+ * `&relations=fixture` dev switch); then all of them, across subjects too.
  */
 import type { TFunction } from 'i18next'
-import { demoGalaxyPositions } from '@/features/starmap/fixtures/demoGalaxy'
-import { demoSky } from '@/features/starmap/fixtures/demoSky'
-import type { FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
-import type { StarMap } from '@/features/starmap/model/starMap'
+import { demoSky, type FixtureSize } from '@/features/starmap/fixtures/demoSky'
+import type { Nebula, StarMap } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
 
 export type DemoStarMapOptions = {
   language?: SupportedLanguage
-  /** Show the subject's own prerequisites (dev switch). */
+  /** Show the sky's prerequisites (dev switch). */
   relations?: boolean
   /** Replace nebula names with long ones, to check labels in four languages (dev switch). */
   longNames?: boolean
@@ -27,6 +28,29 @@ export type DemoStarMapOptions = {
 const normalSubjectId = (subjectId: string) => {
   const id = subjectId.trim().toLowerCase()
   return id === 'mathematics' ? 'math' : id
+}
+
+type SkyParts = Pick<StarMap, 'nebulae' | 'stars' | 'prerequisites'>
+const parts = new Map<string, SkyParts>()
+
+function skyParts(size: FixtureSize, t: TFunction<'starmap'>, language: SupportedLanguage, relations: boolean, longNames: boolean): SkyParts {
+  const key = `${size}:${language}:${relations}:${longNames}`
+  const hit = parts.get(key)
+  if (hit) return hit
+  const sky = demoSky(size, language)
+  // Nebulae in band order: galaxy by galaxy from the left, then by topic order.
+  const along = Object.entries(sky.galaxyBoxes).sort(([, a], [, b]) => a.x0 - b.x0).map(([id]) => id)
+  const nebulae: Nebula[] = [...sky.nebulae]
+    .sort((a, b) => along.indexOf(a.subjectId) - along.indexOf(b.subjectId) || a.order - b.order)
+    .map((nebula, index) => ({
+      topicId: nebula.topicId,
+      subjectId: nebula.subjectId,
+      order: index + 1,
+      name: longNames ? t('demo.longNebula', { index: index + 1 }) : nebula.name,
+    }))
+  const made: SkyParts = { nebulae, stars: sky.stars, prerequisites: relations ? sky.prerequisites : [] }
+  parts.set(key, made)
+  return made
 }
 
 export function demoStarMap(
@@ -40,21 +64,14 @@ export function demoStarMap(
   const galaxy = sky.galaxies.find((candidate) => candidate.subjectId === id)
   const subject = { subjectId: id, name: galaxy?.name ?? id }
   const subjects = sky.galaxies
-  const nebulae = sky.nebulae.filter((nebula) => nebula.subjectId === id)
-  const topics = new Set(nebulae.map((nebula) => nebula.topicId))
-  const stars = sky.stars.filter((star) => topics.has(star.nebulaId))
-  if (!galaxy || stars.length === 0) {
+  if (!galaxy || galaxy.total === 0) {
     return { subject, nebulae: [], stars: [], prerequisites: [], subjects, summary: { lit: 0, total: 0, streakDays: 0, score: 0 } }
   }
-  const units = new Set(stars.map((star) => star.unitId))
-  const positions = demoGalaxyPositions(stars)
   return {
     subject,
     subjects,
     summary: { ...sky.summary, lit: galaxy.lit, total: galaxy.total },
-    prerequisites: relations ? sky.prerequisites.filter((edge) => units.has(edge.from) && units.has(edge.to)) : [],
-    nebulae: longNames ? nebulae.map((nebula, index) => ({ ...nebula, name: t('demo.longNebula', { index: index + 1 }) })) : nebulae,
-    stars: stars.map((star, index) => ({ ...star, ...positions[index] })),
+    ...skyParts(size, t, language, relations, longNames),
   }
 }
 

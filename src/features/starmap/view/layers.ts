@@ -82,7 +82,7 @@ export function isWide(viewport: Viewport): boolean {
 export function nebulaZoom(disc: NebulaDisc, viewport: Viewport, bounds: Bounds): number {
   const shorter = Math.min(viewport.width, viewport.height)
   const base = baseScale(viewport, bounds)
-  return Math.max(1.4, Math.min(14, (0.85 * shorter) / (2 * disc.r * base)))
+  return Math.max(1.4, Math.min(30, (0.85 * shorter) / (2 * disc.r * base)))
 }
 
 /** The view a layer asks for. */
@@ -101,7 +101,7 @@ export function viewForTarget(
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
   if (!star) return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const wide = isWide(viewport)
-  return { cx: star.x, cy: star.y, k: Math.min(24, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
+  return { cx: star.x, cy: star.y, k: Math.min(50, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
 }
 
 /**

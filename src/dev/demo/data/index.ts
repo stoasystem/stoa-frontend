@@ -97,4 +97,4 @@ export {
   type Localized,
 } from '@/features/starmap/fixtures/demoSky'
 export { defaultDemoSubject, demoStarMap, type DemoStarMapOptions } from '@/features/starmap/fixtures/demoStarMap'
-export { FIXTURE_SIZES, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+export { FIXTURE_SIZES, type FixtureSize } from '@/features/starmap/fixtures/demoSky'

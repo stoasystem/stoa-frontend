@@ -8,16 +8,15 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import type { SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
 import { DRAW_THRESHOLD, focusBand, sharpnessOf } from '@/features/starmap/view/foveation'
-import { fakeCanvas, fakeClock, recordingRenderer, THEME, type CanvasCounter, type RecordingRenderer } from './starmapHarness'
+import { fakeCanvas, fakeClock, recordingRenderer, THEME, type CanvasCounter, type RecordingRenderer, skyMap } from './starmapHarness'
 
 const W = 1280
 const H = 776
-const map500 = starMapFixture(500)
+const map500 = skyMap(500)
 
 function engineWith(renderer: StarMapRenderer, map: StarMap = map500, reducedMotion = true) {
   const clock = fakeClock()
@@ -59,15 +58,17 @@ describe('the engine draws only the focus star by star', () => {
     const sharp = frame.sharpness.filter((s) => s === 1)
     expect(blurred.length).toBeGreaterThan(2)
     expect(sharp.length).toBeGreaterThan(0)
-    const recommended = orderedStars(map500).findIndex((star) => star.recommendation)
-    frame.starAlpha.forEach((alpha, i) => expect(alpha).toBe(i === recommended ? 1 : frame.sharpness[nebulaOf[i]]))
+    // One sky: a recommended star per subject the student takes, each drawn whatever the blur.
+    const recommended = new Set(orderedStars(map500).flatMap((star, i) => (star.recommendation ? [i] : [])))
+    expect(recommended.size).toBe(2)
+    frame.starAlpha.forEach((alpha, i) => expect(alpha).toBe(recommended.has(i) ? 1 : frame.sharpness[nebulaOf[i]]))
     const drawn = frame.starAlpha.filter((a) => a >= DRAW_THRESHOLD).length
     expect(drawn).toBeLessThan(map500.stars.length * 0.8)
   })
 
   it('draws a small map star by star everywhere', () => {
     const renderer = recordingRenderer()
-    engineWith(renderer, starMapFixture(10))
+    engineWith(renderer, skyMap(10))
     expect(renderer.last().sharpness.every((s) => s === 1)).toBe(true)
   })
 
@@ -292,7 +293,7 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     // but the DOM kept the pre-pan positions, because the flight's last frame
     // was treated as moving and no later frame came (the recommended star,
     // in Numbers, is off screen).
-    const map = starMapFixture(10)
+    const map = skyMap(10)
     const recording = recordingRenderer()
     let discs: { x: number; y: number; r: number }[] = []
     let stars: { index: number; x: number; y: number }[] = []

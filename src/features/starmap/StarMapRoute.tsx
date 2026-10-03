@@ -12,6 +12,7 @@ import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, us
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
 import { defaultDemoSubject } from '@/features/starmap/fixtures/demoStarMap'
+import { subjectOfNebula } from '@/features/starmap/model/starMap'
 import { useAuthStore } from '@/store/authStore'
 import { useStarMapStore } from '@/store/starMapStore'
 
@@ -41,12 +42,21 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   const landedAt = useRef(location.pathname)
   const onFirstFrame = useCallback(() => markLoginFirstScreenReady(landedAt.current), [])
 
+  // A nebula or star lives under its own galaxy's route: one sky, so it may be another subject's.
   const onNavigate = useCallback(
-    (next: LayerTarget) => navigate({ pathname: pathForTarget(map.subject.subjectId, next), search: location.search }),
+    (next: LayerTarget) =>
+      navigate({ pathname: pathForTarget(next.layer === 'map' ? map.subject.subjectId : subjectOfNebula(map, next.nebulaId), next), search: location.search }),
+    [navigate, map, location.search],
+  )
+  // Panned to another galaxy: the route (and with it the header and the switcher) follows, in place.
+  const onCentreGalaxy = useCallback(
+    (id: string) => {
+      if (id !== map.subject.subjectId) navigate({ pathname: pathForTarget(id, { layer: 'map' }), search: location.search }, { replace: true })
+    },
     [navigate, map.subject.subjectId, location.search],
   )
 
   return (
-    <StarMapView demo map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} foveate={search.has('foveation') ? foveationFrom(search) : false} />
+    <StarMapView demo map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false} />
   )
 }

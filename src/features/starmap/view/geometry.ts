@@ -57,3 +57,31 @@ export function typicalSpacing(map: Pick<StarMap, 'stars'>, discs: ReadonlyMap<s
   spacings.sort((a, b) => a - b)
   return spacings[Math.floor(spacings.length / 2)]
 }
+
+/**
+ * One sky's clouds are dense at the core and sparse at the rim, so the room
+ * a star gets is not its nebula's area over its count: the median distance
+ * to the nearest star of the same nebula, scaled to match `typicalSpacing`
+ * on an even spread, keeps glyphs in a dense core from piling up.
+ */
+export function cloudSpacing(map: Pick<StarMap, 'stars'>, discs: ReadonlyMap<string, NebulaDisc>): number {
+  const byNebula = new Map<string, { x: number; y: number }[]>()
+  for (const star of map.stars) {
+    const list = byNebula.get(star.nebulaId) ?? []
+    list.push(star)
+    byNebula.set(star.nebulaId, list)
+  }
+  const nearest: number[] = []
+  for (const list of byNebula.values()) {
+    for (let i = 0; i < list.length; i += 1) {
+      let best = Infinity
+      for (let j = 0; j < list.length; j += 1) {
+        if (i !== j) best = Math.min(best, Math.hypot(list[i].x - list[j].x, list[i].y - list[j].y))
+      }
+      if (Number.isFinite(best)) nearest.push(best)
+    }
+  }
+  if (nearest.length < 8) return typicalSpacing(map, discs)
+  nearest.sort((a, b) => a - b)
+  return nearest[Math.floor(nearest.length / 2)] * 1.6
+}

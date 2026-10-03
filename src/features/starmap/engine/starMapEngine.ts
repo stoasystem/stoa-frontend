@@ -25,7 +25,8 @@ import {
   type Viewport,
 } from '@/features/starmap/view/camera'
 import { DRAW_THRESHOLD, FOVEATE_ABOVE, focusBand, sharpnessOf } from '@/features/starmap/view/foveation'
-import { mapBounds, nebulaDiscs, typicalSpacing, type NebulaDisc } from '@/features/starmap/view/geometry'
+import { cloudSpacing, mapBounds, nebulaDiscs, typicalSpacing, type NebulaDisc } from '@/features/starmap/view/geometry'
+import { galaxyAt, galaxyView, NOT_ENROLLED_DIM, skyBounds, skyGalaxies, type SkyGalaxy } from '@/features/starmap/view/sky'
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import {
   innerTarget,
@@ -65,8 +66,14 @@ export type StarMapEngineOptions = {
    * star, which only the phone bench asks for (#44), to see what it saves.
    */
   foveate?: boolean
-  /** Continuous demo galaxy: regions remain semantic, without circular visual islands. */
+  /**
+   * One sky (#119): the map holds every galaxy along a band; the whole-map
+   * layer is a window on the galaxy in focus, nebulae are drawn as clouds,
+   * and a portrait screen sees a narrower window instead of a turned map.
+   */
   galaxy?: boolean
+  /** At rest on the whole-map layer, the galaxy at the centre of the view changed (the header follows it). */
+  onCentreGalaxy?: (subjectId: string) => void
   scheduler?: FrameScheduler
   now?: () => number
   /** The student asked for another layer: a tap, a pinch, the wheel. */
@@ -146,8 +153,17 @@ export class StarMapEngine {
   private nebulaIndex = new Map<string, number>()
   private nebulaIds: string[] = []
   private discs = new Map<string, NebulaDisc>()
+  /** The recommended star of each subject (one sky has one per subject the student takes). */
+  private recommendedBy = new Map<string, number>()
   private bounds: Bounds = { minX: 0, minY: 0, maxX: 1, maxY: 1 }
   private spacing = 0.05
+  /** The even-spread spacing, which sizes the dots of the whole map (1.15 to 2.1 px, #110). */
+  private dotSpacing = 0.05
+  /** One sky: the option is on and the map says which galaxy each nebula is in. */
+  private sky = false
+  private skyGalaxies: SkyGalaxy[] = []
+  /** The galaxy the header names: the route's, then whichever is at the centre of the view at rest. */
+  private centred = ''
   private scene: SceneData | null = null
 
   private x = new Float32Array(0)
@@ -196,41 +212,83 @@ export class StarMapEngine {
   // ---- inputs from React ------------------------------------------------
 
   setData(map: StarMap, target: LayerTarget): void {
+    const previous = this.source
     this.source = map
+    // The same sky with another galaxy in focus (the switcher, or the header
+    // following a pan): keep everything drawn, and fly there if the view is
+    // not already on it.
+    if (
+      this.sky &&
+      this.map &&
+      previous &&
+      previous.stars === map.stars &&
+      previous.nebulae === map.nebulae &&
+      previous.prerequisites === map.prerequisites
+    ) {
+      this.map = map
+      const switched = map.subject.subjectId !== this.centred
+      if (this.drewFirstFrame && target.layer === 'map' && this.target.layer === 'map' && switched) {
+        this.cancelGestures()
+        this.panTo(this.viewFor(target))
+        this.centred = map.subject.subjectId
+      }
+      this.invalidate()
+      return
+    }
     // New data for the same layer (a star lit, say) keeps the view where it is.
     this.load(target, this.drewFirstFrame && sameTarget(target, this.target))
+  }
+
+  /** The galaxies along the band (one sky only), left to right. */
+  get galaxies(): readonly SkyGalaxy[] {
+    return this.skyGalaxies
   }
 
   private load(target: LayerTarget, keepView: boolean): void {
     const source = this.source
     if (!source) return
-    const map = orient(source, this.orientation)
+    const sky = this.options.galaxy === true && source.nebulae.some((nebula) => nebula.subjectId !== undefined)
+    this.sky = sky
+    // One sky is never turned: a portrait screen sees a narrower window of the same band.
+    const map = sky ? source : orient(source, this.orientation)
     this.map = map
     this.stars = orderedStars(map)
     const nebulae = orderedNebulae(map).filter((nebula) => map.stars.some((star) => star.nebulaId === nebula.topicId))
     this.nebulaIds = nebulae.map((nebula) => nebula.topicId)
     this.nebulaIndex = new Map(this.nebulaIds.map((id, index) => [id, index]))
     this.discs = nebulaDiscs(map)
-    this.bounds = this.options.galaxy && map.stars.length ? {
-      minX: Math.min(...map.stars.map((s) => s.x)) - 0.015,
-      minY: Math.min(...map.stars.map((s) => s.y)) - 0.015,
-      maxX: Math.max(...map.stars.map((s) => s.x)) + 0.015,
-      maxY: Math.max(...map.stars.map((s) => s.y)) + 0.015,
-    } : mapBounds(this.discs)
-    this.spacing = typicalSpacing(map, this.discs)
+    this.skyGalaxies = sky ? skyGalaxies(map) : []
+    this.bounds = sky && map.stars.length ? skyBounds(this.skyGalaxies) : mapBounds(this.discs)
+    this.dotSpacing = typicalSpacing(map, this.discs)
+    this.spacing = sky ? cloudSpacing(map, this.discs) : this.dotSpacing
+    this.centred = map.subject.subjectId
+    const galaxyIndex = new Map(this.skyGalaxies.map((galaxy, index) => [galaxy.subjectId, index]))
 
     const count = this.stars.length
+    this.recommendedBy = new Map()
     const starIndex = new Map(this.stars.map((star, i) => [star.unitId, i]))
     const scene: SceneData = {
-      mapKey: `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
+      mapKey: sky ? `sky:${count}:${layoutChecksum(map)}` : `${map.subject.subjectId}:${this.orientation}:${count}:${layoutChecksum(map)}`,
       count,
-      galaxy: this.options.galaxy,
+      galaxy: sky,
+      galaxies: this.skyGalaxies.map((galaxy) => ({
+        subjectId: galaxy.subjectId,
+        name: galaxy.name,
+        x0: galaxy.x0,
+        x1: galaxy.x1,
+        y0: galaxy.y0,
+        y1: galaxy.y1,
+        tint: galaxy.tint,
+        dim: galaxy.enrolled ? 1 : NOT_ENROLLED_DIM,
+        nebulae: nebulae.flatMap((nebula, n) => (nebula.subjectId === galaxy.subjectId ? [n] : [])),
+      })),
       mapX: new Float32Array(count),
       mapY: new Float32Array(count),
       state: new Uint8Array(count),
       progress: new Float32Array(count),
       reviewDue: new Uint8Array(count),
       recommended: -1,
+      recommendations: [],
       nebula: new Uint16Array(count),
       names: this.stars.map((star) => star.name),
       skills: this.stars.map((star) => star.skills.map((skill) => skill.lit)),
@@ -245,6 +303,7 @@ export class StarMapEngine {
           r: disc.r,
           lit: members.filter((star) => star.state === 'lit').length,
           total: members.length,
+          ...this.nebulaLook(nebula.topicId, galaxyIndex.get(nebula.subjectId ?? '')),
         }
       }),
       links: nebulaLinks(map)
@@ -261,8 +320,13 @@ export class StarMapEngine {
       scene.progress[i] = star.progress
       scene.reviewDue[i] = star.reviewDue > 0 ? 1 : 0
       scene.nebula[i] = this.nebulaIndex.get(star.nebulaId) ?? 0
-      if (star.recommendation && scene.recommended === -1) scene.recommended = i
+      if (star.recommendation) {
+        ;(scene.recommendations as number[]).push(i)
+        const subject = map.nebulae.find((nebula) => nebula.topicId === star.nebulaId)?.subjectId ?? map.subject.subjectId
+        if (!this.recommendedBy.has(subject)) this.recommendedBy.set(subject, i)
+      }
     })
+    scene.recommended = this.recommendedBy.get(map.subject.subjectId) ?? scene.recommendations?.[0] ?? -1
     this.scene = scene
     this.x = new Float32Array(count)
     this.y = new Float32Array(count)
@@ -280,6 +344,19 @@ export class StarMapEngine {
     if (!keepView) this.view = this.viewFor(target)
     this.transition = null
     this.invalidate()
+  }
+
+  /**
+   * A nebula's own tint, near its galaxy's (#117 B2: each its own shade
+   * between blue-violet and warm gold, never a rainbow), and its dimming.
+   */
+  private nebulaLook(topicId: string, galaxy: number | undefined): { tint: number; dim: number } {
+    if (galaxy === undefined) return { tint: 0.3, dim: 1 }
+    let hash = 2166136261
+    for (let i = 0; i < topicId.length; i += 1) hash = Math.imul(hash ^ topicId.charCodeAt(i), 16777619) >>> 0
+    const jitter = ((hash % 1000) / 1000 - 0.5) * 0.3
+    const owner = this.skyGalaxies[galaxy]
+    return { tint: Math.max(0, Math.min(1, owner.tint + jitter)), dim: owner.enrolled ? 1 : NOT_ENROLLED_DIM }
   }
 
   setTarget(target: LayerTarget): void {
@@ -321,7 +398,7 @@ export class StarMapEngine {
     const orientation = orientationFor(width, height)
     if (orientation !== this.orientation) {
       this.orientation = orientation
-      if (this.source) this.load(this.target, false)
+      if (this.source && !this.sky) this.load(this.target, false)
     }
     if (changed && this.map && !this.transition) this.view = this.viewFor(this.target)
     this.positionsStale = true
@@ -535,6 +612,10 @@ export class StarMapEngine {
 
   private viewFor(target: LayerTarget): View {
     if (!this.map || this.viewport.width === 0) return overviewView(this.bounds, this.viewport)
+    if (target.layer === 'map' && this.skyGalaxies.length > 0) {
+      const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
+      return galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport)
+    }
     return viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
   }
 
@@ -575,7 +656,7 @@ export class StarMapEngine {
 
   /** The nebula under `(x, y)`; with `nearest`, the closest one if none is under it. */
   private nebulaAt(x: number, y: number, nearest = false): string | null {
-    if (this.options.galaxy) return this.nearestStar(x, y, nearest ? Infinity : 28)?.nebulaId ?? null
+    if (this.sky) return this.nearestStar(x, y, nearest ? Infinity : 28)?.nebulaId ?? null
     let best = -1
     let bestGap = nearest ? Number.POSITIVE_INFINITY : 0
     for (let n = 0; n < this.nebulaIds.length; n += 1) {
@@ -690,11 +771,12 @@ export class StarMapEngine {
     }
     // The one exception: the recommended star is the student's way in, so it
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
-    if (scene.recommended >= 0) this.starAlpha[scene.recommended] = 1
+    for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
 
     // Only the recommended star breathes (#72 point 6), and only when seen sharp.
     let breath: SceneFrame['breath'] = null
-    const rec = scene.recommended
+    // On one sky, the recommended star of the galaxy the header names.
+    const rec = this.recommendedBy.get(this.centred) ?? scene.recommended
     if (
       rec >= 0 &&
       this.policy.breathing &&
@@ -717,6 +799,14 @@ export class StarMapEngine {
       this.options.onFirstFrame?.()
     }
     this.emitVisible(moving)
+    // At rest on the whole sky: the header names whichever galaxy is at the centre.
+    if (!moving && !this.transition && !(this.inertia.moving && this.policy.inertia && !this.paused) && target.layer === 'map' && this.skyGalaxies.length > 0) {
+      const centre = galaxyAt(this.skyGalaxies, this.view.cx)
+      if (centre && centre.subjectId !== this.centred) {
+        this.centred = centre.subjectId
+        this.options.onCentreGalaxy?.(centre.subjectId)
+      }
+    }
     if (keepGoing) this.invalidate()
   }
 
@@ -742,7 +832,7 @@ export class StarMapEngine {
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
     return {
       dotBlend: lerp(from === 'map' ? 1 : dotBlendFor(glyphSize), to === 'map' ? 1 : dotBlendFor(glyphSize)),
-      dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.spacing * 0.11)),
+      dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.dotSpacing * 0.11)),
       viewport: this.viewport,
       scale: t.scale,
       ox: t.ox,

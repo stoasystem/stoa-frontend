@@ -5,7 +5,7 @@
  */
 import { describe, expect, it } from 'vitest'
 import { DEMO_BRIDGE_STAR, DEMO_KNOWLEDGE_POINT, demoSky, demoStarKind } from '@/features/starmap/fixtures/demoSky'
-import { FIXTURE_SIZES } from '@/features/starmap/fixtures/starMapFixtures'
+import { FIXTURE_SIZES } from '@/features/starmap/fixtures/demoSky'
 import { crossSubjectPrerequisites, LEARNING_STATES, type Sky } from '@/features/starmap/model/starMap'
 import { supportedLanguages } from '@/i18n/languages'
 

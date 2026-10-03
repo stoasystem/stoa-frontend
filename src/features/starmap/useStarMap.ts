@@ -1,7 +1,7 @@
 /** Fixture source for the demo. Backend #59 will replace this hook with a service query. */
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { isFixtureSize, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
+import { isFixtureSize, type FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { demoStarMap } from '@/features/starmap/fixtures/demoStarMap'
 import type { StarMap } from '@/features/starmap/model/starMap'
 import { isSupportedLanguage } from '@/i18n/languages'

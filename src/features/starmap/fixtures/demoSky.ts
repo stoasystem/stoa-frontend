@@ -30,9 +30,10 @@
  * they stay out of the locale bundles.
  */
 import data from '@/features/starmap/fixtures/demo-sky.json'
-import { placeStars, type FixtureSize } from '@/features/starmap/fixtures/starMapFixtures'
-import { seededRandom } from '@/features/starmap/layout/layout'
+import { galaxyOrder, layoutSky, seededRandom, type GalaxyBox } from '@/features/starmap/layout/layout'
+import { nebulaLinks } from '@/features/starmap/model/links'
 import {
+  crossSubjectPrerequisites,
   type Galaxy,
   type KnowledgeSkill,
   type LearningState,
@@ -42,6 +43,17 @@ import {
   type Star,
 } from '@/features/starmap/model/starMap'
 import type { SupportedLanguage } from '@/i18n/languages'
+
+/**
+ * The sky's sizes, counting the stars of the whole sky: 10 is planned by
+ * hand; 500, 1000 and 2000 are the phone bench's steps (#44).
+ */
+export const FIXTURE_SIZES = [10, 500, 1000, 2000] as const
+export type FixtureSize = (typeof FIXTURE_SIZES)[number]
+
+export function isFixtureSize(value: number): value is FixtureSize {
+  return (FIXTURE_SIZES as readonly number[]).includes(value)
+}
 
 /** A text in the four languages the app ships. */
 export type Localized = Record<SupportedLanguage, string>
@@ -81,8 +93,11 @@ export function demoStarKind(unitId: string): DemoStarKind {
   return unitId === DEMO_KNOWLEDGE_POINT.unitId ? 'knowledge_point' : 'placeholder'
 }
 
-/** The design preview's sky, which says which star is the demo knowledge point. */
-export type DemoSky = Sky & { knowledgePointId: string }
+/**
+ * The design preview's sky, which says which star is the demo knowledge
+ * point and where each galaxy lies along the band (`layoutSky`).
+ */
+export type DemoSky = Sky & { knowledgePointId: string; galaxyBoxes: Record<string, GalaxyBox> }
 
 type NebulaSpec = (typeof data.nebulae)[number]
 
@@ -209,11 +224,26 @@ function build(size: FixtureSize): Built {
   const recommended = recommendationsFor(nebulae, stars)
   const withMarks = stars.map((star) => (recommended.has(star.unitId) ? { ...star, recommendation: { source: 'system' as const } } : star))
 
-  // The current renderer lays a sky out like any map; #119 replaces this with galaxies.
-  const placed = placeStars(
-    { nebulae: nebulae.map((nebula, order) => ({ ...nebula, order: order + 1 })), stars: withMarks, prerequisites },
-    116 + size,
+  // One sky (#119): galaxies along a band, neighbours where prerequisites cross subjects.
+  const unplaced = withMarks as Star[]
+  const subjectOfTopic = new Map(nebulae.map((nebula) => [nebula.topicId, nebula.subjectId]))
+  const crossLinks = nebulaLinks({ stars: unplaced, prerequisites: crossSubjectPrerequisites({ nebulae, stars: unplaced, prerequisites }) })
+    .map((link) => ({ a: subjectOfTopic.get(link.a)!, b: subjectOfTopic.get(link.b)!, count: link.count }))
+  const order = galaxyOrder(data.galaxies.map((galaxy) => galaxy.subjectId), crossLinks)
+  const sizes = new Map<string, number>()
+  for (const star of withMarks) sizes.set(star.nebulaId, (sizes.get(star.nebulaId) ?? 0) + 1)
+  const layout = layoutSky(
+    order.map((subjectId) => ({
+      id: subjectId,
+      nebulae: nebulae
+        .filter((nebula) => nebula.subjectId === subjectId)
+        .map((nebula) => ({ id: nebula.topicId, order: nebula.order, size: sizes.get(nebula.topicId) ?? 1 })),
+    })),
+    withMarks,
+    nebulaLinks({ stars: unplaced, prerequisites }),
+    116, // One seed for every size: the galaxies and nebulae keep their places, only the star count changes.
   )
+  const placedStars: Star[] = withMarks.map((star) => ({ ...star, ...(layout.stars.get(star.unitId) ?? { x: 0.5, y: 0.5 }) }))
   const galaxies: Galaxy[] = data.galaxies.map((galaxy) => {
     const topics = new Set(nebulae.filter((nebula) => nebula.subjectId === galaxy.subjectId).map((nebula) => nebula.topicId))
     const own = stars.filter((star) => topics.has(star.nebulaId))
@@ -229,10 +259,11 @@ function build(size: FixtureSize): Built {
     sky: {
       galaxies,
       nebulae,
-      stars: placed.stars,
+      stars: placedStars,
       prerequisites,
       summary: { lit: stars.filter((star) => star.state === 'lit').length, total: stars.length, streakDays: 5, score: 1240 },
       knowledgePointId: kp.unitId,
+      galaxyBoxes: Object.fromEntries(layout.galaxies),
     },
     starName,
     skillName,

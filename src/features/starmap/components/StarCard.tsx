@@ -12,7 +12,7 @@ import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
-import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
+import { subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { cn } from '@/lib/utils'
 
 export function StarCard({
@@ -33,7 +33,6 @@ export function StarCard({
   const { t } = useTranslation('starmap')
   const navigate = useNavigate()
   const glyph = useRef<HTMLDivElement>(null)
-  const subjectId = map.subject.subjectId
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
 
   // Into the chapter by the jump (#50 point 5): it starts at this star.
@@ -81,7 +80,7 @@ export function StarCard({
       }}
     >
       <Link
-        to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
+        to={pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId })}
         className="inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
       >
         <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
@@ -178,7 +177,7 @@ export function StarCard({
             {prerequisites.map((before) => (
               <li key={before.unitId}>
                 <Link
-                  to={pathForTarget(subjectId, { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId })}
+                  to={pathForTarget(subjectOfNebula(map, before.nebulaId), { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId })}
                   className="inline-flex min-h-11 items-center text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {before.name}

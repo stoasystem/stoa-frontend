@@ -53,10 +53,13 @@ export function createTileCache(paint: (index: number, size: number) => Tile): T
 export const TILE_SIZE = 64
 export const TILE_REACH = 1.3
 
-/** At most 256 px per tile; tiers only grow until data/theme changes. */
-export function tileSizeFor(diameter: number, dpr: number): number {
+/**
+ * At most `max` px per tile (256, or 512 for one sky's clouds, whose grain
+ * must stay fine); tiers only grow until data/theme changes.
+ */
+export function tileSizeFor(diameter: number, dpr: number, max: 256 | 512 = 256): number {
   const pixels = diameter * dpr
-  return pixels <= 64 ? 64 : pixels <= 128 ? 128 : 256
+  return pixels <= 64 ? 64 : pixels <= 128 ? 128 : pixels <= 256 || max === 256 ? 256 : 512
 }
 
 /** State identity, not just lit fraction: ready → locked must repaint too. Computed on data change. */

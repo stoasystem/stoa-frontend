@@ -1,20 +1,20 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
-import { demoGalaxyPositions } from '@/features/starmap/fixtures/demoGalaxy'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
-import { orderedNebulae } from '@/features/starmap/model/starMap'
+import { orderedNebulae, orderedStars } from '@/features/starmap/model/starMap'
+import { NOT_ENROLLED_DIM } from '@/features/starmap/view/sky'
+import type { FixtureSize } from '@/features/starmap/fixtures/demoSky'
 import { nebulaLinks } from '@/features/starmap/model/links'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import { belongsTo, boxHitsSegment, nebulaConnection, placeLabel } from '@/features/starmap/render/labels'
 import { createTileCache, tileSizeFor } from '@/features/starmap/render/nebulaTiles'
 import { nebulaFocusSpot } from '@/features/starmap/view/layers'
 import type { SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
-import { fakeCanvas, fakeClock, THEME, type CanvasCounter } from './starmapHarness'
+import { fakeCanvas, fakeClock, THEME, type CanvasCounter, skyMap } from './starmapHarness'
 
 afterEach(() => vi.unstubAllGlobals())
 beforeEach(() => vi.stubGlobal('Path2D', class {}))
 
-function scene(points: 10 | 500 | 2000, width: number, height: number, galaxy = false) {
+function scene(points: FixtureSize, width: number, height: number, galaxy = false) {
   const counter: CanvasCounter = { drawImage: 0, filterSets: 0, texts: [] }
   let canvases = 0
   const real = createCanvas2DRenderer(fakeCanvas(counter), { createCanvas: (w, h) => {
@@ -25,9 +25,7 @@ function scene(points: 10 | 500 | 2000, width: number, height: number, galaxy = 
   const renderer: StarMapRenderer = { ...real, draw: (next) => { frame = next; real.draw(next) } }
   const clock = fakeClock()
   const engine = new StarMapEngine({ renderer, theme: THEME, reducedMotion: true, scheduler: clock, now: clock.now, foveate: false, galaxy })
-  const base = starMapFixture(points)
-  const positions = demoGalaxyPositions(base.stars)
-  const map = galaxy ? { ...base, stars: base.stars.map((star, i) => ({ ...star, ...positions[i] })) } : base
+  const map = skyMap(points, 'math', { relations: true })
   engine.setViewport(width, height, 2)
   engine.setData(map, { layer: 'map' })
   clock.advance(20)
@@ -136,24 +134,7 @@ describe('cached atmosphere and resolution tiers', () => {
 })
 
 
-describe('knowledge stars fill the sky', () => {
-  it.each([500, 1000, 2000] as const)('%s real points cover the full field, including outside the dense cloud', (count) => {
-    const fixture = starMapFixture(count)
-    const positions = demoGalaxyPositions(fixture.stars)
-    expect(demoGalaxyPositions(fixture.stars)).toEqual(positions)
-    const bins = Array<number>(60).fill(0)
-    positions.forEach((p) => {
-      expect(p.x).toBeGreaterThanOrEqual(0)
-      expect(p.x).toBeLessThanOrEqual(1)
-      expect(p.y).toBeGreaterThanOrEqual(0)
-      expect(p.y).toBeLessThanOrEqual(1)
-      bins[Math.min(5, Math.floor((p.y - 0.28) / 0.44 * 6)) * 10 + Math.min(9, Math.floor((p.x - 0.03) / 0.94 * 10))] += 1
-    })
-    expect(bins.filter((count) => count > 0).length).toBeGreaterThanOrEqual(58)
-    expect(positions.filter((p) => p.y < 0.355).length).toBeGreaterThan(count * 0.07)
-    expect(positions.filter((p) => p.y > 0.645).length).toBeGreaterThan(count * 0.07)
-  })
-
+describe('one sky: galaxies of nebulae (#119)', () => {
   it.each([[1280, 776], [390, 700]])('keeps real star clicks in their own topic at %s×%s', (width, height) => {
     const s = scene(500, width, height, true)
     const navigate = vi.fn()
@@ -163,24 +144,99 @@ describe('knowledge stars fill the sky', () => {
     engine.setData(s.map, { layer: 'map' })
     s.clock.advance(20)
     const frame = renderer.draw.mock.calls[0][0]
-    const x = frame.x[0], y = frame.y[0]
-    engine.pointerDown(1, x, y)
-    engine.pointerUp(1, x, y)
-    expect(navigate).toHaveBeenCalledWith({ layer: 'nebula', nebulaId: s.map.stars[0].nebulaId })
+    const onScreen = s.map.stars.findIndex((_, i) => frame.x[i] > 40 && frame.x[i] < width - 40 && frame.y[i] > 160 && frame.y[i] < height - 100)
+    const star = orderedStars(s.map)[onScreen]
+    engine.pointerDown(1, frame.x[onScreen], frame.y[onScreen])
+    engine.pointerUp(1, frame.x[onScreen], frame.y[onScreen])
+    expect(navigate).toHaveBeenCalledWith({ layer: 'nebula', nebulaId: star.nebulaId })
     engine.destroy()
     s.engine.destroy()
   })
 
-  it('caches the coordinate-aligned glow and updates it when a knowledge star changes colour', () => {
+  it('opens on the galaxy in focus: the window on the band is that galaxy, never the whole band squeezed in', () => {
+    for (const [width, height] of [[1440, 844], [390, 760]]) {
+      const s = scene(1000, width, height, true)
+      const f = s.frame()
+      const nebulae = orderedNebulae(s.map)
+      const math = nebulae.flatMap((n, i) => (n.subjectId === 'math' ? [i] : []))
+      const chemistry = nebulae.flatMap((n, i) => (n.subjectId === 'chemistry' ? [i] : []))
+      const middle = math.reduce((sum, n) => sum + f.nebulaX[n], 0) / math.length
+      expect(Math.abs(middle - width / 2)).toBeLessThan(width * 0.12)
+      // Chemistry is two galaxies along: off screen.
+      for (const n of chemistry) expect(f.nebulaX[n] - f.nebulaR[n]).toBeGreaterThan(width)
+      // Not turned on a phone: the band still runs left to right.
+      const ys = math.map((n) => f.nebulaY[n])
+      const xs = math.map((n) => f.nebulaX[n])
+      expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(Math.max(...ys) - Math.min(...ys))
+      s.engine.destroy()
+    }
+  })
+
+  it('gives every nebula its own tint between blue-violet and gold, and dims a subject not taken', () => {
+    const s = scene(1000, 1440, 844, true)
+    const engine = s.engine as unknown as { scene: { nebulae: { topicId: string; tint: number; dim: number }[]; galaxies: { subjectId: string; dim: number }[] } }
+    const { nebulae, galaxies } = engine.scene
+    for (const nebula of nebulae) {
+      expect(nebula.tint).toBeGreaterThanOrEqual(0)
+      expect(nebula.tint).toBeLessThanOrEqual(1)
+    }
+    expect(new Set(nebulae.map((n) => n.tint.toFixed(3))).size).toBe(nebulae.length)
+    const subject = new Map(s.map.nebulae.map((n) => [n.topicId, n.subjectId]))
+    for (const nebula of nebulae) expect(nebula.dim).toBe(subject.get(nebula.topicId) === 'chemistry' ? NOT_ENROLLED_DIM : 1)
+    expect(galaxies.map((g) => [g.subjectId, g.dim])).toEqual([['math', 1], ['physics', 1], ['chemistry', NOT_ENROLLED_DIM]])
+    s.engine.destroy()
+  })
+
+  it('flies to another galaxy when the switcher asks, keeping every tile, and names the galaxy at the centre once at rest', () => {
+    const counter: CanvasCounter = { drawImage: 0, filterSets: 0 }
+    const real = createCanvas2DRenderer(fakeCanvas(counter), { createCanvas: (w, h) => fakeCanvas(counter, w, h) })!
+    const frames: SceneFrame[] = []
+    const renderer: StarMapRenderer = { ...real, draw: (next) => { frames.push({ ...next, nebulaX: Float32Array.from(next.nebulaX) }); real.draw(next) } }
+    const clock = fakeClock()
+    const centred = vi.fn()
+    const engine = new StarMapEngine({ renderer, theme: THEME, reducedMotion: false, scheduler: clock, now: clock.now, galaxy: true, onCentreGalaxy: centred })
+    engine.setViewport(1440, 844, 1)
+    const math = skyMap(1000, 'math')
+    engine.setData(math, { layer: 'map' })
+    clock.advance(50)
+    const paints = real.stats.tilePaints
+    const physics = skyMap(1000, 'physics')
+    engine.setData(physics, { layer: 'map' })
+    clock.advance(2000)
+    const nebulae = orderedNebulae(physics)
+    const own = nebulae.flatMap((n, i) => (n.subjectId === 'physics' ? [i] : []))
+    const last = frames[frames.length - 1]
+    const middle = own.reduce((sum, n) => sum + last.nebulaX[n], 0) / own.length
+    expect(Math.abs(middle - 720)).toBeLessThan(1440 * 0.12)
+    // A flight, not a jump: frames in between.
+    expect(frames.length).toBeGreaterThan(10)
+    expect(real.stats.tilePaints - paints).toBeLessThan(nebulae.length)
+    // Arrived where it was sent: nothing to report.
+    expect(centred).not.toHaveBeenCalled()
+    // A drag to chemistry, and once at rest the header is told.
+    engine.pointerDown(1, 1300, 400)
+    for (let x = 1300; x >= 200; x -= 50) {
+      engine.pointerMove(1, x, 400)
+      clock.advance(16)
+    }
+    engine.pointerUp(1, 200, 400)
+    clock.advance(3000)
+    expect(centred).toHaveBeenLastCalledWith('chemistry')
+    engine.destroy()
+  })
+
+  it('caches galaxy haze and nebula clouds, and repaints only the cloud whose star changed', () => {
     const s = scene(500, 390, 700, true)
     const made = s.canvases()
     s.real.draw(s.frame())
     s.clock.advance(200)
     expect(s.canvases()).toBe(made)
+    const paints = s.real.stats.tilePaints
     const ready = s.map.stars.find((star) => star.state === 'ready')!
-    s.engine.setData({ ...s.map, stars: s.map.stars.map((star) => star === ready ? { ...star, state: 'in_progress' } : star) }, { layer: 'map' })
+    s.engine.setData({ ...s.map, stars: s.map.stars.map((star) => (star === ready ? { ...star, state: 'in_progress' } : star)) }, { layer: 'map' })
     s.clock.advance(20)
-    expect(s.canvases()).toBeGreaterThan(made)
+    s.real.draw(s.frame())
+    expect(s.real.stats.tilePaints - paints).toBeLessThanOrEqual(1)
     s.engine.destroy()
   })
 })
