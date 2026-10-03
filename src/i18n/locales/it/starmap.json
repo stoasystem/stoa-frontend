@@ -53,7 +53,8 @@
   "nav": {
     "map": "Mappa stellare",
     "backToMap": "Torna alla mappa stellare",
-    "backToNebula": "Torna a {{nebula}}"
+    "backToNebula": "Torna a {{nebula}}",
+    "backToStar": "Torna a {{name}}"
   },
   "zoom": {
     "group": "Zoom",

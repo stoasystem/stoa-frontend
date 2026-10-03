@@ -186,3 +186,37 @@ export function nebulaFocusSpot(
     y: Math.max(top, Math.min(bottom, y)),
   }
 }
+
+/** The part of the stage where the map can be seen on the star layer: inside the page's controls, beside or above the card. */
+export type ClearArea = { left: number; top: number; right: number; bottom: number }
+
+/**
+ * The star layer's way back (#132): once the focused star is panned out of
+ * the clear area, a hint sits on the area's edge where a line from its middle
+ * to the star leaves it, pointing at the star. `angle` is in radians, 0 to
+ * the right, clockwise (screen y grows down); `alignX` / `alignY` say which
+ * edge of the hint touches the point (0 start, 0.5 middle, 1 end), so it
+ * stays inside the area. Null while the star is in the area.
+ */
+export function starHintSpot(
+  star: { x: number; y: number },
+  area: ClearArea,
+  slack = 0,
+): { x: number; y: number; angle: number; alignX: number; alignY: number } | null {
+  if (area.right <= area.left || area.bottom <= area.top) return null
+  // Within `slack` px of the area the star still counts as seen: no hint beside a star in plain sight.
+  const seen = (value: number, low: number, high: number) => value >= low - slack && value <= high + slack
+  if (seen(star.x, area.left, area.right) && seen(star.y, area.top, area.bottom)) return null
+  const cx = (area.left + area.right) / 2
+  const cy = (area.top + area.bottom) / 2
+  const dx = star.x - cx
+  const dy = star.y - cy
+  const halfW = (area.right - area.left) / 2
+  const halfH = (area.bottom - area.top) / 2
+  // How far along the ray the area's edge is: the nearer of the two sides it can cross.
+  const reach = Math.min(dx === 0 ? Infinity : halfW / Math.abs(dx), dy === 0 ? Infinity : halfH / Math.abs(dy))
+  const x = cx + dx * reach
+  const y = cy + dy * reach
+  const edge = (value: number, low: number, high: number) => (value <= low + 0.5 ? 0 : value >= high - 0.5 ? 1 : 0.5)
+  return { x, y, angle: Math.atan2(dy, dx), alignX: edge(x, area.left, area.right), alignY: edge(y, area.top, area.bottom) }
+}

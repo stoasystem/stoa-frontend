@@ -53,7 +53,8 @@
   "nav": {
     "map": "Carte du ciel",
     "backToMap": "Retour à la carte du ciel",
-    "backToNebula": "Retour à {{nebula}}"
+    "backToNebula": "Retour à {{nebula}}",
+    "backToStar": "Retour à {{name}}"
   },
   "zoom": {
     "group": "Zoom",
