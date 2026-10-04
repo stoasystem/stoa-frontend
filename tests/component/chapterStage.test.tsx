@@ -781,7 +781,7 @@ describe('the jump from a star', () => {
       <I18nextProvider i18n={i18n}>
         <MemoryRouter initialEntries={['/map/math/trigonometry/demo-sine-cosine']}>
           <Routes>
-            <Route path="/map/*" element={<StarCard map={map} star={star} nebula={nebula} wide reducedMotion={false} />} />
+            <Route path="/map/*" element={<StarCard map={map} star={star} nebula={nebula} reducedMotion={false} />} />
             <Route path="*" element={null} />
           </Routes>
           <Where />

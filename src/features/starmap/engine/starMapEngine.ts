@@ -568,13 +568,14 @@ export class StarMapEngine {
   }
 
   /** The page area's size (it narrows when Ask's panel opens, #49): the view keeps its place, within the zoom's limits. */
-  setViewport(width: number, height: number, dpr: number, bands: { top?: number; bottom?: number } = {}): void {
+  setViewport(width: number, height: number, dpr: number, bands: { top?: number; bottom?: number; sheet?: number } = {}): void {
     const changed =
       width !== this.viewport.width ||
       height !== this.viewport.height ||
       bands.top !== this.viewport.top ||
-      bands.bottom !== this.viewport.bottom
-    this.viewport = { width, height, top: bands.top, bottom: bands.bottom }
+      bands.bottom !== this.viewport.bottom ||
+      bands.sheet !== this.viewport.sheet
+    this.viewport = { width, height, top: bands.top, bottom: bands.bottom, sheet: bands.sheet }
     this.renderer.resize(this.viewport, dpr)
     // A portrait page area gets the map turned a quarter, so it fills the screen.
     const orientation = orientationFor(width, height)

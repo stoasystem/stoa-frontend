@@ -180,6 +180,28 @@ export const KEYS = {
 } as const
 
 /**
+ * The phone's star card is a sheet (#139, round two E2 of #123): collapsed
+ * along the bottom it shows only the star's name and its main action, so the
+ * map keeps most of the screen; pulled up or tapped it opens to the details,
+ * at most `expandedMax` of the map's height. A chosen star is framed in the
+ * map above the collapsed sheet. px unless said otherwise.
+ */
+export const SHEET = {
+  /** Collapsed height: the grabber and one row (the star's glyph, name and state, its action). */
+  collapsedPx: 76,
+  /** From the stage's sides, and above the page's bottom inset. */
+  marginPx: 12,
+  /** Room kept clear between the area a chosen star is framed in and the collapsed sheet's top. */
+  clearancePx: 16,
+  /** Expanded: at most this share of the stage's height. */
+  expandedMax: 0.55,
+  /** A press on the sheet's head that moves less than this is a tap (it toggles), not a drag. */
+  tapSlopPx: 6,
+  /** Let go faster than this (px/ms) up or down, the sheet follows the flick; slower, it settles at the nearer state. */
+  flickSpeed: 0.4,
+} as const
+
+/**
  * The flight first (#139, round two B6 of #123): a star chosen on the map is
  * flown to at once, and the route -- with it the card or sheet and the
  * parallel DOM, a long frame of React's -- follows this many frames into the

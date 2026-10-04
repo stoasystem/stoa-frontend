@@ -45,7 +45,8 @@
     "inNebula": "{{nebula}} · {{state}}",
     "review_one": "Review {{count}} exercise",
     "review_other": "Review {{count}} exercises",
-    "reviewSoon": "Coming soon"
+    "reviewSoon": "Coming soon",
+    "sheetDetails": "Shows or hides this star's details"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} of {{total}} lit",

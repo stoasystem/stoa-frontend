@@ -17,7 +17,7 @@
  */
 import type { Star, StarMap } from '@/features/starmap/model/starMap'
 import { baseScale, overviewView, usableHeight, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
-import { ZOOM } from '@/features/starmap/view/semanticZoom'
+import { SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
 
 export type LayerTarget =
@@ -144,7 +144,29 @@ export function viewForTarget(
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
   if (!star) return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const wide = isWide(viewport)
-  return { cx: star.x, cy: star.y, k: k * 1.8, fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
+  return { cx: star.x, cy: star.y, k: k * 1.8, fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : starFrameY(viewport) }
+}
+
+/**
+ * How far up from the bottom a phone's collapsed star sheet reaches (#139),
+ * with the room kept clear above it: the page's bottom inset (Ask's docked
+ * composer, #49), the sheet's margin, its collapsed height and the clearance.
+ */
+export function sheetBand(bottomInset = 0): number {
+  return bottomInset + SHEET.marginPx + SHEET.collapsedPx + SHEET.clearancePx
+}
+
+/**
+ * Where on a phone a chosen star is framed, as a share of the height: the
+ * middle of the map's clear area, between the page's top controls and the
+ * collapsed sheet (`viewport.sheet`, #139), so the star is never framed
+ * under the sheet. Without a sheet, the card's old place (0.3).
+ */
+export function starFrameY(viewport: Viewport): number {
+  if (viewport.sheet === undefined || viewport.height <= 0) return 0.3
+  const top = viewport.top ?? 0
+  const bottom = viewport.height - Math.max(viewport.bottom ?? 0, viewport.sheet)
+  return bottom > top ? (top + bottom) / 2 / viewport.height : 0.5
 }
 
 /**
@@ -211,7 +233,7 @@ export function nebulaFocusSpot(
   }
 }
 
-/** The part of the stage where the map can be seen on the star layer: inside the page's controls, beside or above the card. */
+/** The part of the stage where the map can be seen on the star layer: inside the page's controls, beside the card or above the sheet. */
 export type ClearArea = { left: number; top: number; right: number; bottom: number }
 
 /**
