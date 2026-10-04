@@ -17,7 +17,7 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { NEBULA_LABEL_ALPHA } from '@/features/starmap/engine/starMapEngine'
+import { NEBULA_NAME_ALPHA } from '@/features/starmap/engine/starMapEngine'
 import { HAZE, INK } from '@/features/starmap/render/canvas2d'
 import { GALAXY_HAZE_ALPHA, KNOWLEDGE_GLOW_ALPHA, NEBULA_GLOW, SKY_MIST_ALPHA } from '@/features/starmap/render/galaxy'
 import { LOCKED_RING_ALPHA } from '@/features/starmap/render/glyph'
@@ -76,9 +76,9 @@ const haze = over(token('--atmosphere'), oneHaze, HAZE.mid)
 const white: RGBA = [255, 255, 255, 1]
 
 describe('names on the canvas keep 4.5:1', () => {
-  it('nebula names, drawn over a sky outline, and over stacked haze, in every layer that shows them', () => {
-    const weakest = Math.min(...Object.values(NEBULA_LABEL_ALPHA).filter((alpha) => alpha > 0)) * INK.nebulaName.alpha
-    expect(weakest).toBeCloseTo(0.8, 9)
+  it('nebula names, drawn over a sky outline, and over stacked haze, once faded in (#134: names fade in by zoom to full strength)', () => {
+    const weakest = NEBULA_NAME_ALPHA * INK.nebulaName.alpha
+    expect(weakest).toBe(1)
     expect(contrast(over(body, sky, weakest), sky)).toBeGreaterThanOrEqual(4.5)
     expect(contrast(over(body, haze, weakest), haze)).toBeGreaterThanOrEqual(4.5)
     expect(INK.nebulaName.outline).toBeGreaterThanOrEqual(2)

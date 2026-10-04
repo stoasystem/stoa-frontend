@@ -71,7 +71,7 @@ async function start() {
     )
   }
 
-  const Page = (name: 'MapHomePage' | 'MapSubjectPage' | 'MapNebulaPage' | 'MapStarPage') => {
+  const Page = (name: 'MapHomePage' | 'MapPage') => {
     const Component = pages[name]
     return host === 'ask' ? <AskLikeHost /> : <Component />
   }
@@ -98,9 +98,9 @@ async function start() {
           <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
             <Routes>
               <Route path="/" element={Page('MapHomePage')} />
-              <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
-              <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
-              <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
+              <Route path="/map/:subjectId" element={Page('MapPage')} />
+              <Route path="/map/:subjectId/:topicId" element={Page('MapPage')} />
+              <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapPage')} />
               <Route path="*" element={<p>Left the map.</p>} />
             </Routes>
           </MemoryRouter>

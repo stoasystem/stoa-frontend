@@ -10,6 +10,7 @@
  */
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, GALAXY_HAZE_ALPHA, galaxyHazeBox, NEBULA_GLOW, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { drawLinks } from '@/features/starmap/render/links'
@@ -25,6 +26,35 @@ import {
   type StarMapRenderer,
   type StarMapTheme,
 } from '@/features/starmap/render/types'
+
+/** A name's fade (#134): how far in it is, the side it took, whether it had a place last frame. */
+type LabelFade = { alpha: number; slot: number; placed: boolean; seen: number }
+
+/** Glyph sizes (px) over which the small cut gives way to the large (#134). */
+const GLYPH_CUT_FADE: Ramp = [28, 32]
+/**
+ * The small cut is drawn bolder than the large (its star fills more of its
+ * box), so swapping them at one size would shrink every glyph. From
+ * `SMALL_CUT_EASE_FROM` px up to the swap it is drawn a little smaller, until
+ * it is exactly the large cut's size there -- linearly over a range wide
+ * enough (over twice its start) that a glyph still only ever grows as the zoom does.
+ */
+const SMALL_CUT_EASE_FROM = 12
+const CUT_MATCH = GLYPH_LARGE.lit.tip / GLYPH_LARGE.box / (GLYPH_SMALL.lit.tip / GLYPH_SMALL.box)
+function smallCutScale(box: number): number {
+  const t = Math.max(0, Math.min(1, (box - SMALL_CUT_EASE_FROM) / (SMALL_CUT_BELOW - SMALL_CUT_EASE_FROM)))
+  return 1 - (1 - CUT_MATCH) * t
+}
+
+/**
+ * A nebula's name sits by its rim, but never more than this far (px) from its
+ * centre: zoomed in, the name stays with its stars instead of riding out on
+ * a rim that has left the screen (#134).
+ */
+const NEBULA_NAME_RING = 160
+
+/** At most this many star names at once. */
+const STAR_NAMES_AT_MOST = REVEAL.starNamesAtMost
 
 type Sprite = { canvas: HTMLCanvasElement; /** Half the sprite's side, in cut units. */ extent: number }
 
@@ -177,6 +207,13 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
     margin: 0,
   }
   let lastLightKey = ''
+  /** Names on screen and fading, by `s<star>` / `n<nebula>` (#134). */
+  const labelFades = new Map<string, LabelFade>()
+  let lastLabelTime: number | null = null
+  let labelFrame = 0
+  /** Measured name widths, CSS px, per star and nebula of the current data. */
+  let starNameWidths: (number | undefined)[] = []
+  let nebulaNameWidths: (number | undefined)[] = []
   const stats: RenderStats = { frames: 0, starDraws: 0, tileDraws: 0, tilePaints: 0, highlightNebula: -1 }
 
   const buildSprites = (cut: GlyphCut, largestBox: number): Sprite[] => {
@@ -339,6 +376,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
     setTheme(next) {
       theme = next
+      starNameWidths = []
+      nebulaNameWidths = []
       rebuild()
       paintSky()
       hazesFor = ''
@@ -353,6 +392,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       tilesFor = next.mapKey
       const sparse = Boolean(data?.galaxy)
       data = next
+      starNameWidths = []
+      nebulaNameWidths = []
+      labelFades.clear()
       stateKeys = nebulaStateKeys(next.state, next.nebula, next.nebulae.length)
       stateKeysJoined = stateKeys.join('|')
       if (Boolean(next.galaxy) !== sparse) paintSky()
@@ -387,7 +429,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const { state, count } = scene
       const nebulaCount = scene.nebulae.length
       const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
-      const nebulaDim = (n: number) => (frame.chosenNebula >= 0 && n !== frame.chosenNebula ? Math.max(frame.dim, 0.6) : 1)
+      // Around a chosen nebula the others step back; `chosenAmount` and `nebulaLift` ease it in and out (#134).
+      const chosenAmount = frame.chosenAmount ?? (frame.chosenNebula >= 0 ? 1 : 0)
+      const nebulaDim = (n: number) => {
+        const lift = frame.nebulaLift ? frame.nebulaLift[n] ?? 0 : n === frame.chosenNebula ? 1 : 0
+        return 1 - (1 - Math.max(frame.dim, 0.6)) * chosenAmount * (1 - lift)
+      }
       const tileOf = (n: number, reach: number) => {
         const nebula = scene.nebulae[n]
         return tiles.get(n, `${tileKey(scene.mapKey, nebula.topicId, nebula.lit, nebula.total)}:${stateKeys[n]}`, tileSizeFor(reach * 2, dpr, scene.galaxy ? 512 : 256))
@@ -431,7 +478,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         // changes, a star changes state, or the pan runs past its margin.
         // A galaxy moving to its other copy on the ring (#120) is a new picture too.
         const turns = frame.galaxyShift ? Array.prototype.join.call(frame.galaxyShift, ',') : ''
-        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${width}x${height}@${dpr}|${turns}`
+        const key = `${scene.mapKey}|${stateKeysJoined}|${frame.scale}|${frame.chosenNebula}|${frame.dim}|${frame.emphasisKey ?? ''}|${width}x${height}@${dpr}|${turns}`
         const shiftX = frame.ox - lightCache.ox
         const shiftY = frame.oy - lightCache.oy
         const margin = Math.round(Math.max(width, height) * LIGHT_MARGIN)
@@ -507,19 +554,29 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
       const breath = frame.breath
       const glyphs = 1 - frame.dotBlend
-      const cut = frame.glyphSize < SMALL_CUT_BELOW ? GLYPH_SMALL : GLYPH_LARGE
-      const glyphSet = cut === GLYPH_SMALL ? set.small : set.large
-      const unit = frame.glyphSize / cut.box
+      // The glyph's two cuts (#134): as a glyph grows past SMALL_CUT_BELOW the
+      // bolder small cut gives way to the large one over GLYPH_CUT_FADE -- the
+      // large fades in, then the small fades out, and the marks' geometry is
+      // blended between the two -- so a continuous zoom never swaps one look
+      // for the other in a single frame.
+      const largeIn = (box: number) => ramp(box, [GLYPH_CUT_FADE[0], SMALL_CUT_BELOW])
+      const smallOut = (box: number) => 1 - ramp(box, [SMALL_CUT_BELOW, GLYPH_CUT_FADE[1]])
+      /** One measure of the glyph at `box` px, in px: the two cuts' own, blended by size. */
+      const geom = (box: number, pick: (cut: GlyphCut) => number) => {
+        const t = ramp(box, GLYPH_CUT_FADE)
+        return box * ((1 - t) * (pick(GLYPH_SMALL) / GLYPH_SMALL.box) * smallCutScale(box) + t * (pick(GLYPH_LARGE) / GLYPH_LARGE.box))
+      }
       const margin = Math.max(frame.glyphSize, 16) * 2
       const visible = (i: number) => {
         const px = x[i]
         const py = y[i]
         return !(px < -margin || py < -margin || px > width + margin || py > height + margin)
       }
-      // A recommended star is always a full glyph, at least 18 px: the way in.
+      // A recommended star is always a full glyph, at least 12 px: the way in.
       const beacons = new Set(scene.recommendations ?? (scene.recommended >= 0 ? [scene.recommended] : []))
       const isBeacon = (i: number) => beacons.has(i)
-      const beaconSize = frame.dotBlend > 0.5 ? 12 : Math.min(frame.glyphSize, 32)
+      // Grows with the zoom like every glyph, never under 12 px: no jump as dots turn to glyphs (#134).
+      const beaconSize = Math.max(12, Math.min(frame.glyphSize, 32))
 
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.
       for (let i = 0; i < count; i += 1) {
@@ -528,14 +585,19 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const focus = (i === frame.focusStar ? 1 : frame.dim) * (scene.nebulae[scene.nebula[i]]?.dim ?? 1)
         const beacon = isBeacon(i)
         const breathing = breath && breath.index === i
-        if (glyphs > 0.01) {
-          const sprite = glyphSet[state[i]]
+        if (glyphs > 0.01 || beacon) {
           const box = beacon ? beaconSize : frame.glyphSize
-          const size = (box * (breathing ? breath.scale : 1) * sprite.extent * 2) / cut.box
-          ctx.globalAlpha = a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus
-          ctx.drawImage(sprite.canvas, x[i] - size / 2, y[i] - size / 2, size, size)
+          const alpha = a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus
+          const grow = breathing ? breath.scale : 1
+          for (const [sprites, cut, share] of [[set.small, GLYPH_SMALL, smallOut(box)], [set.large, GLYPH_LARGE, largeIn(box)]] as const) {
+            if (share < 0.01) continue
+            const sprite = sprites[state[i]]
+            const size = (box * grow * sprite.extent * 2 * (cut === GLYPH_SMALL ? smallCutScale(box) : 1)) / cut.box
+            ctx.globalAlpha = alpha * share
+            ctx.drawImage(sprite.canvas, x[i] - size / 2, y[i] - size / 2, size, size)
+          }
         }
-        if (frame.dotBlend > 0.01) {
+        if (frame.dotBlend > 0.01 && !beacon) {
           const size = frame.dotRadius * 4
           ctx.globalAlpha = a * frame.dotBlend * focus
           ctx.drawImage(set.dots[state[i]], x[i] - size / 2, y[i] - size / 2, size, size)
@@ -553,44 +615,41 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         if (show < 0.01) continue
         const inProgress = state[i] === STATE_IN_PROGRESS
         const review = scene.reviewDue[i] === 1
-        const skills = frame.showSkills ? scene.skills[i] : undefined
+        const skills = frame.showSkills > 0.01 ? scene.skills[i] : undefined
         if (!beacon && !inProgress && !review && !skills?.length) continue
         const px = x[i]
         const py = y[i]
-        const markUnit = beacon ? beaconSize / cut.box : unit
+        const box = beacon ? beaconSize : frame.glyphSize
         const grow = breath && breath.index === i ? breath.scale : 1
         const fade = a * show * (i === frame.focusStar ? 1 : frame.dim)
         if (glyphs > 0.01 && inProgress && scene.progress[i] > 0) {
-          const g = cut.inProgress
           ctx.globalAlpha = fade
           ctx.strokeStyle = colours.lit
-          ctx.lineWidth = g.ringWidth * markUnit * grow
+          ctx.lineWidth = geom(box, (c) => c.inProgress.ringWidth) * grow
           ctx.beginPath()
-          ctx.arc(px, py, g.ring * markUnit * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, scene.progress[i]))
+          ctx.arc(px, py, geom(box, (c) => c.inProgress.ring) * grow, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, scene.progress[i]))
           ctx.stroke()
         }
         if (beacon) {
-          const g = cut.recommended
           ctx.globalAlpha = fade
           ctx.save()
           ctx.translate(px, py)
-          ctx.scale(markUnit * grow, markUnit * grow)
-          halo(ctx, g.halo, g.blur, colours.lit, g.haloAlpha)
-          ctx.setLineDash([...g.dash])
-          ring(ctx, g.ring, g.ringWidth, colours.lit, 1)
+          halo(ctx, geom(box, (c) => c.recommended.halo) * grow, geom(box, (c) => c.recommended.blur) * grow, colours.lit, GLYPH_LARGE.recommended.haloAlpha)
+          ctx.setLineDash([geom(box, (c) => c.recommended.dash[0]) * grow, geom(box, (c) => c.recommended.dash[1]) * grow])
+          ring(ctx, geom(box, (c) => c.recommended.ring) * grow, geom(box, (c) => c.recommended.ringWidth) * grow, colours.lit, 1)
           ctx.restore()
         }
         if (glyphs > 0.01 && review) {
-          const g = cut.review
-          const offset = (g.offset * markUnit) / Math.SQRT2
+          const offset = geom(box, (c) => c.review.offset) / Math.SQRT2
+          const radius = geom(box, (c) => c.review.radius)
           ctx.globalAlpha = fade
           ctx.fillStyle = colours.sky
           ctx.beginPath()
-          ctx.arc(px + offset, py - offset, (g.radius + g.outline) * markUnit, 0, Math.PI * 2)
+          ctx.arc(px + offset, py - offset, radius + geom(box, (c) => c.review.outline), 0, Math.PI * 2)
           ctx.fill()
           ctx.fillStyle = colours.text
           ctx.beginPath()
-          ctx.arc(px + offset, py - offset, g.radius * markUnit, 0, Math.PI * 2)
+          ctx.arc(px + offset, py - offset, radius, 0, Math.PI * 2)
           ctx.fill()
         }
         if (skills?.length) {
@@ -599,7 +658,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const dot = Math.max(1.6, frame.glyphSize * 0.045)
           skills.forEach((lit, k) => {
             const angle = Math.PI * (7 / 6 + ((2 / 3) * (k + 0.5)) / skills.length)
-            ctx.globalAlpha = fade
+            ctx.globalAlpha = fade * Math.min(1, frame.showSkills)
             ctx.beginPath()
             ctx.arc(px + Math.cos(angle) * radius, py + Math.sin(angle) * radius, dot, 0, Math.PI * 2)
             if (lit) {
@@ -614,86 +673,167 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         }
       }
 
-      // Names. Each stays by its own nebula or star; a name with no free
-      // place is left out, and one whose nebula is off screen is not drawn.
-      // Names stay out of the bands the page keeps for its own controls: the
-      // placer only considers spots inside this area.
+      // Names (#134: by zoom). Each stays by its own nebula or star; a name
+      // with no free place is left out, and one whose nebula is off screen is
+      // not drawn. Names stay out of the bands the page keeps for its own
+      // controls: the placer only considers spots inside this area. A name
+      // that gains or loses its place fades in or out (`labelFadeMs`) instead
+      // of blinking, and keeps its place and side while it can.
       const labelArea: Box = { x0: 0, y0: viewport.top ?? 0, x1: width, y1: height - (viewport.bottom ?? 0) }
+      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
+        ? 1
+        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
+      lastLabelTime = frame.time ?? null
+      labelFrame += 1
+      let settling = false
+      const names = { stars: 0, nebulae: 0 }
+      const fadeOf = (key: string): LabelFade => {
+        let entry = labelFades.get(key)
+        if (!entry) {
+          entry = { alpha: 0, slot: -1, placed: false, seen: 0 }
+          labelFades.set(key, entry)
+        }
+        entry.seen = labelFrame
+        return entry
+      }
+      const settle = (entry: LabelFade, placed: boolean) => {
+        entry.alpha = placed ? Math.min(1, entry.alpha + fadeStep) : Math.max(0, entry.alpha - fadeStep)
+        entry.placed = placed
+        if (entry.alpha > 0 && entry.alpha < 1) settling = true
+      }
+      /** The candidate boxes with the side the name had last frame first: a name does not hop sides. */
+      const preferring = (boxes: Box[], slot: number) => (slot > 0 && slot < boxes.length ? [boxes[slot], ...boxes.filter((_, k) => k !== slot)] : boxes)
 
-      // Star names in the chosen nebula first: they are what the layer is for.
-      if (frame.starLabelAlpha > 0.01 && frame.chosenNebula >= 0) {
+      // Star names: nearest the focus point first, more as the zoom grows.
+      if (frame.starLabelAlpha > 0.01) {
         setFont(13, 500)
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
         const glyphR = Math.max(frame.glyphSize * 0.42, frame.dotRadius * 2)
-        const stars: Circle[] = []
+        const radiusOf = (i: number) => (isBeacon(i) ? beaconSize * 0.45 : glyphR)
+        // The stars on screen, in a grid, so a name only checks its neighbours.
+        const cell = 64
+        const grid = new Map<number, number[]>()
+        const cellKey = (cx: number, cy: number) => (cx + 1024) * 4096 + (cy + 1024)
+        const listed: number[] = []
         for (let i = 0; i < count; i += 1) {
-          if (starAlpha[i] >= DRAW_THRESHOLD && visible(i)) stars.push({ x: x[i], y: y[i], r: isBeacon(i) ? beaconSize * 0.45 : glyphR })
+          if (starAlpha[i] < DRAW_THRESHOLD || !visible(i)) continue
+          listed.push(i)
+          const k = cellKey(Math.floor(x[i] / cell), Math.floor(y[i] / cell))
+          const bucket = grid.get(k)
+          if (bucket) bucket.push(i)
+          else grid.set(k, [i])
         }
-        const order = frame.focusStar >= 0 ? [frame.focusStar] : []
-        for (let i = 0; i < count; i += 1) if (i !== frame.focusStar) order.push(i)
-        for (const i of order) {
-          if (scene.nebula[i] !== frame.chosenNebula || starAlpha[i] < DRAW_THRESHOLD || !visible(i)) continue
-          const w = ctx.measureText(scene.names[i]).width + 6
-          const own = isBeacon(i) ? beaconSize * 0.45 : glyphR
-          const box = placeLabel(
-            aroundDisc(x[i], y[i], own, w, 17, 3),
-            { boxes: placed, circles: stars.filter((c) => c.x !== x[i] || c.y !== y[i]), segments },
-            labelArea,
-          )
-          if (!box) continue
-          // A star's name may not sit on another star at all.
-          if (stars.some((c) => (c.x !== x[i] || c.y !== y[i]) && boxHitsCircle(box, c))) continue
-          placed.push(box)
+        const reachR = Math.max(glyphR, beaconSize * 0.45)
+        const near = (box: Box, own: number): Circle[] => {
+          const out: Circle[] = []
+          for (let cx = Math.floor((box.x0 - reachR) / cell); cx <= Math.floor((box.x1 + reachR) / cell); cx += 1) {
+            for (let cy = Math.floor((box.y0 - reachR) / cell); cy <= Math.floor((box.y1 + reachR) / cell); cy += 1) {
+              for (const j of grid.get(cellKey(cx, cy)) ?? []) if (j !== own) out.push({ x: x[j], y: y[j], r: radiusOf(j) })
+            }
+          }
+          return out
+        }
+        const reach = frame.starNameReach
+        const candidates: { i: number; base: number; d: number; was: boolean }[] = []
+        for (const i of listed) {
+          if (x[i] < 0 || y[i] < 0 || x[i] > width || y[i] > height) continue
+          const d = reach ? Math.hypot(x[i] - reach.x, y[i] - reach.y) : 0
+          const base = frame.starLabelAlpha * (reach ? reachFade(d, reach) : 1)
+          const known = labelFades.get(`s${i}`)
+          if (base < 0.01 && !(known && known.alpha > 0)) continue
+          candidates.push({ i, base, d, was: known?.placed ?? false })
+        }
+        // The focused star first, then the names already up (they keep their place), then by distance.
+        candidates.sort((a, b) =>
+          (a.i === frame.focusStar ? -1 : 0) - (b.i === frame.focusStar ? -1 : 0) || Number(b.was) - Number(a.was) || a.d - b.d)
+        let placedNames = 0
+        for (const { i, base } of candidates) {
+          const entry = fadeOf(`s${i}`)
+          const nameWidth = (starNameWidths[i] ??= ctx.measureText(scene.names[i]).width + 6)
+          const boxes = aroundDisc(x[i], y[i], radiusOf(i), nameWidth, 17, 3)
+          let box: Box | null = null
+          if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
+            const circles = near({ x0: x[i] - nameWidth, y0: y[i] - 40, x1: x[i] + nameWidth, y1: y[i] + 40 }, i)
+            const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments }, labelArea)
+            // A star's name may not sit on another star at all.
+            box = found && !circles.some((c) => boxHitsCircle(found, c)) ? found : null
+          }
+          settle(entry, box !== null)
+          if (box) {
+            placed.push(box)
+            placedNames += 1
+            entry.slot = boxes.indexOf(box)
+          }
+          const at = box ?? (entry.slot >= 0 ? boxes[entry.slot] : null)
+          if (!at || entry.alpha <= 0.001) continue
           const color =
             state[i] === STATE_LIT || state[i] === STATE_IN_PROGRESS ? colours.text : state[i] === STATE_READY ? colours.textBody : colours.textCaption
-          ctx.globalAlpha = frame.starLabelAlpha * (i === frame.focusStar ? 1 : frame.dim)
-          outlinedText(scene.names[i], (box.x0 + box.x1) / 2, box.y0 + 1, color, colours.sky, 3)
+          ctx.globalAlpha = Math.min(1, base * entry.alpha * (i === frame.focusStar ? 1 : frame.dim))
+          outlinedText(scene.names[i], (at.x0 + at.x1) / 2, at.y0 + 1, color, colours.sky, 3)
+          names.stars += 1
         }
       }
 
-      // Nebula names, by their own nebula.
+      // Nebula names, by their own nebula: by its size on screen (#134), and
+      // the one hovered or in keyboard focus wherever nebula names are drawn.
       if (frame.nebulaLabelAlpha > 0.01) {
         setFont(12, 600)
         setLetterSpacing('1.5px')
         ctx.textAlign = 'center'
         ctx.textBaseline = 'top'
         const priority = frame.highlightNebula >= 0 ? frame.highlightNebula : frame.hoveredNebula ?? -1
-        // One sky's whole map names only the nebula under the pointer or in
-        // keyboard focus. If its name finds no place, no other nebula's name
-        // may stand in for it (#123); keyboard focus on the whole map is a
-        // chosen nebula too, and must not open the names of every galaxy.
-        const onlyPriority = Boolean(scene.galaxy) && (frame.wholeMap ?? frame.chosenNebula < 0)
-        const limit = onlyPriority ? (priority >= 0 ? 1 : 0) : width < 768 && frame.chosenNebula < 0 ? 4 : nebulaCount
-        const order = Array.from({ length: nebulaCount }, (_, n) => n).sort((a, b) =>
-          (a === priority ? -1 : b === priority ? 1 :
-            Math.hypot(nebulaX[a] - width / 2, nebulaY[a] - height / 2) - Math.hypot(nebulaX[b] - width / 2, nebulaY[b] - height / 2)))
-        let labelled = 0
-        for (const n of order) {
-          if (n === frame.chosenNebula || labelled >= limit) continue
-          if (onlyPriority && n !== priority) continue
+        const wholeMap = frame.wholeMap ?? frame.chosenNebula < 0
+        const limit = width < 768 && frame.chosenNebula < 0 ? 4 : nebulaCount
+        const nameOf = (n: number) => (frame.nebulaNames ? frame.nebulaNames[n] ?? 0 : 1)
+        const order: { n: number; base: number; was: boolean; d: number }[] = []
+        for (let n = 0; n < nebulaCount; n += 1) {
+          if (n === frame.chosenNebula) continue
           if (nebulaX[n] < 0 || nebulaY[n] < 0 || nebulaX[n] > width || nebulaY[n] > height) continue
+          const base = n === priority ? Math.max(nameOf(n), frame.priorityNameAlpha ?? 1) : nameOf(n)
+          const known = labelFades.get(`n${n}`)
+          if (base < 0.01 && !(known && known.alpha > 0)) continue
+          order.push({ n, base, was: known?.placed ?? false, d: Math.hypot(nebulaX[n] - width / 2, nebulaY[n] - height / 2) })
+        }
+        order.sort((a, b) => (a.n === priority ? -1 : 0) - (b.n === priority ? -1 : 0) || Number(b.was) - Number(a.was) || a.d - b.d)
+        let labelled = 0
+        for (const { n, base } of order) {
+          const entry = fadeOf(`n${n}`)
           const text = scene.nebulae[n].name.toLocaleUpperCase()
-          const w = ctx.measureText(text).width + 8
+          const nameWidth = (nebulaNameWidths[n] ??= ctx.measureText(text).width + 8)
           const own = { x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] }
           const others = cores.filter((_, m) => m !== n)
-          const candidates = aroundDisc(own.x, own.y, own.r * 0.95, w, 16, 6)
-          const obstacles = { boxes: placed, circles: others, segments }
-          const box =
-            placeLabel(candidates, obstacles, labelArea,
-              (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
-            // The one name on one sky's whole map: a nebula packed among
-            // others has no side nearer itself than its neighbours, so there
-            // being nearer is a preference, not a rule -- the pointer says whose name it is.
-            (onlyPriority ? placeLabel(candidates, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
-          if (!box) continue
-          labelled += 1
-          placed.push(box)
-          ctx.globalAlpha = frame.nebulaLabelAlpha * INK.nebulaName.alpha * nebulaDim(n)
-          outlinedText(text, (box.x0 + box.x1) / 2, box.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
+          const candidates = aroundDisc(own.x, own.y, Math.min(own.r * 0.95, NEBULA_NAME_RING), nameWidth, 16, 6)
+          let box: Box | null = null
+          if (base >= 0.01 && (labelled < limit || n === priority)) {
+            const obstacles = { boxes: placed, circles: others, segments }
+            const preferred = preferring(candidates, entry.slot)
+            box =
+              placeLabel(preferred, obstacles, labelArea,
+                (candidate) => belongsTo(candidate, own, others) && !others.some((c) => boxHitsCircle(candidate, c)) ? 0 : Infinity) ??
+              // The hovered or focused name far out on one sky: a nebula packed
+              // among others has no side nearer itself than its neighbours, so
+              // there being nearer is a preference, not a rule -- the pointer says whose name it is.
+              (scene.galaxy && wholeMap && n === priority ? placeLabel(preferred, obstacles, labelArea, (candidate) => (belongsTo(candidate, own, others) ? 0 : 20)) : null)
+          }
+          settle(entry, box !== null)
+          if (box) {
+            labelled += 1
+            placed.push(box)
+            entry.slot = candidates.indexOf(box)
+          }
+          const at = box ?? (entry.slot >= 0 ? candidates[entry.slot] : null)
+          if (!at || entry.alpha <= 0.001) continue
+          ctx.globalAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
+          outlinedText(text, (at.x0 + at.x1) / 2, at.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
+          names.nebulae += 1
         }
         setLetterSpacing('0px')
       }
+      // Names no longer in play are forgotten (they had faded with the zoom).
+      for (const [key, entry] of labelFades) if (entry.seen !== labelFrame) labelFades.delete(key)
+      stats.names = names
+      stats.settling = settling
 
       // The frame before a layer change, fading out over this one.
       if (frame.crossfade > 0 && snapshotCanvas) {

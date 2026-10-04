@@ -1,14 +1,25 @@
 /*
- * The star map's engine (#47, #72): one object that owns the camera, the
- * layer, gestures, the glide after a pan, foveation and the one breathing
- * star, and hands each frame to a renderer. React never renders per frame; it
- * tells the engine what the route asks for and gets back the stars on screen,
- * for the parallel DOM, when the map comes to rest.
+ * The star map's engine (#47, #72): one object that owns the camera, what is
+ * chosen, gestures, the glides after a pan or a zoom, foveation and the one
+ * breathing star, and hands each frame to a renderer. React never renders per
+ * frame; it tells the engine what the route has chosen and gets back the
+ * stars on screen, for the parallel DOM, when the map comes to rest.
+ *
+ * Semantic zoom (#134): the zoom is continuous. The wheel and a trackpad zoom
+ * by how far they scroll, around the pointer; a pinch around the midpoint of
+ * the two fingers, with a glide after it is let go; the + and - buttons and
+ * keys by ×1.5, a double tap by ×2, each gliding there. Nothing snaps: what
+ * the map shows -- names, lines, dimming -- is a continuous function of the
+ * zoom (`view/semanticZoom.ts`). The route follows what is chosen, never the
+ * zoom: a tap on a nebula or a star asks for its route and flies there; the
+ * engine only asks for a route by itself to let a choice go, when zoomed out
+ * past it (a star's card closes once its glyph is too small to read, a
+ * nebula is let go back on the panorama).
  *
  * The engine asks for animation frames only while something moves: a pan, a
- * glide, a layer change, or the recommended star breathing. A still map under
- * reduced motion, or while the map is paused (hidden tab, `inert` page area),
- * asks for none.
+ * glide, a flight, a name fading, or the recommended star breathing. A still
+ * map under reduced motion, or while the map is paused (hidden tab, `inert`
+ * page area), asks for none.
  *
  * One sky is a ring (#120): the view's `cx` runs on round it without bound,
  * and every frame places each galaxy at its copy nearest the centre of the
@@ -39,6 +50,7 @@ import {
   galaxyTurns,
   galaxyView,
   NOT_ENROLLED_DIM,
+  panoramaZoom,
   ringSafeZoom,
   SKY_WRAP,
   skyBounds,
@@ -46,15 +58,24 @@ import {
   type SkyGalaxy,
 } from '@/features/starmap/view/sky'
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
+import { interpolateView, sameTarget, viewForTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import {
-  innerTarget,
-  interpolateView,
-  outerTarget,
-  sameTarget,
-  viewForTarget,
-  type LayerTarget,
-  type MapLayer,
-} from '@/features/starmap/view/layers'
+  anchorAt,
+  kForGlyph,
+  lineReveal,
+  nebulaNameAlpha,
+  ramp,
+  REVEAL,
+  skillAlpha,
+  starFocusAmount,
+  starNameAlpha,
+  starNameReach,
+  starPxFor,
+  ZOOM,
+  zoomAround,
+  zoomBand,
+  type ZoomBand,
+} from '@/features/starmap/view/semanticZoom'
 
 export type FrameScheduler = {
   request(callback: (now: number) => void): number
@@ -78,6 +99,20 @@ export type NebulaDiscOnScreen = { x: number; y: number; r: number }
 /** Where one star is drawn in the last frame, CSS px, and the glyph size (#51's lighting layer). */
 export type StarOnScreen = { x: number; y: number; size: number }
 
+/**
+ * How far in the map is (#134): the glyph size every reveal reads, its rough
+ * band, whether a limit is reached, and whether stars can be picked one by
+ * one (a tap, a Tab stop): big enough, and no longer the panorama's dots.
+ */
+export type ZoomState = { starPx: number; band: ZoomBand; atMin: boolean; atMax: boolean; pickable: boolean }
+
+/**
+ * How the camera answers a new choice: `fly` there (a tap on a nebula or a
+ * star, a link, the keys), or `stay` where it is (a choice let go: the card
+ * closed, zoomed out past it).
+ */
+export type ChoiceMotion = 'fly' | 'stay'
+
 export type StarMapEngineOptions = {
   renderer: StarMapRenderer
   theme: StarMapTheme
@@ -88,32 +123,32 @@ export type StarMapEngineOptions = {
    */
   foveate?: boolean
   /**
-   * One sky (#119): the map holds every galaxy along a band; the whole-map
-   * layer is a window on the galaxy in focus, nebulae are drawn as clouds,
-   * and a portrait screen sees a narrower window instead of a turned map.
+   * One sky (#119): the map holds every galaxy along a band; the panorama is
+   * a window on the galaxy in focus, nebulae are drawn as clouds, and a
+   * portrait screen sees a narrower window instead of a turned map.
    */
   galaxy?: boolean
-  /** At rest on the whole-map layer, the galaxy at the centre of the view changed (the header follows it). */
+  /** At rest with nothing chosen, the galaxy at the centre of the view changed (the header follows it). */
   onCentreGalaxy?: (subjectId: string) => void
   scheduler?: FrameScheduler
   now?: () => number
-  /** The student asked for another layer: a tap, a pinch, the wheel. */
+  /** The student chose something, or let a choice go: a tap, a tap on empty space, zooming out past it. */
   onRequestTarget?: (target: LayerTarget) => void
-  /** The stars on screen changed, and how big they are drawn; sent when the map is at rest. */
-  onVisibleChange?: (stars: VisibleStar[], glyphSize: number, nebulae: NebulaDiscOnScreen[]) => void
+  /** The stars on screen changed, how big they are drawn, and how far in the map is; sent when the map is at rest. */
+  onVisibleChange?: (stars: VisibleStar[], glyphSize: number, nebulae: NebulaDiscOnScreen[], zoom: ZoomState) => void
   /** The first frame with the map on it has been drawn. */
   onFirstFrame?: () => void
 }
 
 type Transition =
-  | { kind: 'zoom'; startedAt: number; durationMs: number; flight: (t: number) => View; from: MapLayer; to: MapLayer }
-  | { kind: 'crossfade'; startedAt: number; durationMs: number; from: MapLayer; to: MapLayer }
+  | { kind: 'zoom'; startedAt: number; durationMs: number; flight: (t: number) => View }
+  | { kind: 'crossfade'; startedAt: number; durationMs: number }
 
 type Pointer = { x: number; y: number }
 
 /** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 40. */
 export function glyphSizeFor(scale: number, spacing: number): number {
-  return Math.max(9, Math.min(40, scale * spacing * 0.55))
+  return Math.max(9, Math.min(40, starPxFor(scale, spacing)))
 }
 
 /**
@@ -168,19 +203,26 @@ export function skyLayoutKey(map: StarMap): string {
   return key
 }
 
-/** How strongly nebula names are drawn in each layer: dimmer around a chosen nebula, gone behind a star's card. */
-export const NEBULA_LABEL_ALPHA: Record<MapLayer, number> = { map: 1, nebula: 0.8, star: 0 }
+/** A nebula's name at full strength: the alpha its contrast is checked at (names fade in to it, #134). */
+export const NEBULA_NAME_ALPHA = 1
 
 const TAP_SLOP = 5
-const WHEEL_STEP = 120
-const WHEEL_COOLDOWN_MS = 450
-const PINCH_IN = 1.25
-const PINCH_OUT = 0.8
-const STAR_LAYER_DIM = 0.35
-/** The glyph size a nebula is opened at, at least (CSS px): full glyphs, not dots. */
-const NEBULA_GLYPH = 28
+/** Behind a chosen star, zoomed in to it, the rest of the map fades to this. */
+const STAR_FOCUS_DIM = 0.35
 /** A flight to another galaxy lasts this many layer changes. */
 const GALAXY_FLIGHT = 1.8
+/** Choosing or letting go eases the sky's emphasis in or out with this time constant, ms (at once under reduced motion). */
+const EMPHASIS_MS = 140
+/** A pinch's zoom speed is averaged over this long, ms, so one jittery move does not decide the glide. */
+const PINCH_SMOOTHING_MS = 40
+/** A pinch held still this long before it is let go glides no further, ms. */
+const PINCH_HOLD_MS = 100
+
+/** Whether `next` only lets a choice of `previous` go: back to the galaxy, or the card closed on its own nebula. */
+function letsGo(previous: LayerTarget, next: LayerTarget): boolean {
+  if (next.layer === 'map') return previous.layer !== 'map'
+  return next.layer === 'nebula' && previous.layer === 'star' && previous.nebulaId === next.nebulaId
+}
 
 export class StarMapEngine {
   private readonly renderer: StarMapRenderer
@@ -226,10 +268,18 @@ export class StarMapEngine {
   private nebulaX = new Float32Array(0)
   private nebulaY = new Float32Array(0)
   private nebulaR = new Float32Array(0)
+  private nebulaNames = new Float32Array(0)
+  /** Eased emphasis (#134): each nebula's lift out of the dimming around a chosen one, how far that dimming is in, and a chosen star's. */
+  private nebulaLift = new Float32Array(0)
+  private chosenAmount = 0
+  private starAmount = 0
+  /** The star chosen last: while its emphasis eases out after the card closes, it stays the one picked out. */
+  private lastChosenStar = -1
   private sharpness = new Float32Array(0)
 
   private viewport: Viewport = { width: 0, height: 0 }
   private view: View = { cx: 0.5, cy: 0.5, k: 1, fx: 0.5, fy: 0.5 }
+  /** What is chosen: the route's galaxy, nebula or star. */
   private target: LayerTarget = { layer: 'map' }
   private transition: Transition | null = null
   private handle: number | null = null
@@ -241,8 +291,15 @@ export class StarMapEngine {
   private pointers = new Map<number, Pointer>()
   private press: { x: number; y: number; at: number; moved: boolean } | null = null
   private dragging: { x: number; y: number; at: number } | null = null
-  private pinch: { distance: number; fired: boolean } | null = null
-  private wheel = { accumulated: 0, lastIntentAt: Number.NEGATIVE_INFINITY }
+  /** Two fingers: the spread and zoom they started at, the map point they hold, and the zoom's speed (log2 per ms). */
+  private pinch: { spread: number; k: number; mx: number; my: number; x: number; y: number; at: number; velocity: number; ended: boolean } | null = null
+  /** A zoom still to come (log2 of k), around a screen point: the wheel's, a button's, a released pinch's glide. */
+  private zoomGlide: { log: number; x: number; y: number; tauMs: number } | null = null
+  private lastTap: { x: number; y: number; at: number; acted: boolean } | null = null
+  /** The choice the engine itself asked for last, and how the camera should answer it when the route brings it. */
+  private requested: { target: LayerTarget; motion: ChoiceMotion } | null = null
+  /** A choice already let go by zooming out (asked once, until the route answers). */
+  private released = ''
   private focusStar = -1
   private focusNebula = -1
   private hoveredNebula = -1
@@ -281,17 +338,21 @@ export class StarMapEngine {
         this.load(this.target, true, true)
         this.centred = centred
       }
-      const switched = map.subject.subjectId !== this.centred
-      if (this.drewFirstFrame && target.layer === 'map' && this.target.layer === 'map' && switched) {
+      if (target.layer !== 'map') {
+        // A nebula or star lives under its own galaxy's route: the header names that galaxy now.
+        this.centred = map.subject.subjectId
+      } else if (this.drewFirstFrame && map.subject.subjectId !== this.centred) {
+        // The switcher: a longer flight than a choice, the sky passes by on the way.
         this.cancelGestures()
-        // A longer flight than a layer change: the sky passes by on the way.
+        this.target = target
+        this.released = ''
         this.panTo(this.viewFor(target), this.policy.layerMs * GALAXY_FLIGHT)
         this.centred = map.subject.subjectId
       }
       this.invalidate()
       return
     }
-    // New data for the same layer (a star lit, say) keeps the view where it is.
+    // New data for the same choice (a star lit, say) keeps the view where it is.
     const keepView = this.drewFirstFrame && sameTarget(target, this.target)
     // Another sky with another galaxy in focus (#123: a link that drops
     // `?points=`, an answer of another size): keeping the view would leave it
@@ -410,6 +471,8 @@ export class StarMapEngine {
     this.nebulaX = new Float32Array(nebulaCount)
     this.nebulaY = new Float32Array(nebulaCount)
     this.nebulaR = new Float32Array(nebulaCount)
+    this.nebulaNames = new Float32Array(nebulaCount)
+    this.nebulaLift = new Float32Array(nebulaCount)
     this.sharpness = new Float32Array(nebulaCount)
     this.renderer.setData(scene)
     this.visibleKey = ''
@@ -434,33 +497,43 @@ export class StarMapEngine {
     return { tint: Math.max(0, Math.min(1, owner.tint + jitter)), dim: owner.enrolled ? 1 : NOT_ENROLLED_DIM }
   }
 
+  /**
+   * The route chose something else (#134 Z2). A new nebula or star: fly to
+   * it (a crossfade under reduced motion), never zooming out to open a star.
+   * A choice let go -- the card closed, back to the galaxy -- leaves the
+   * camera where it is. The engine's own requests say which they are.
+   */
   setTarget(target: LayerTarget): void {
     if (!this.map || sameTarget(target, this.target)) return
-    const from = this.target.layer
+    const previous = this.target
     this.target = target
-    this.cancelGestures()
-    const to = this.viewFor(target)
-    const now = this.now()
+    this.released = ''
+    const asked = this.requested && sameTarget(this.requested.target, target) ? this.requested.motion : null
+    this.requested = null
+    const motion: ChoiceMotion = asked ?? (letsGo(previous, target) ? 'stay' : 'fly')
     if (!this.drewFirstFrame || this.viewport.width === 0) {
-      this.view = to
+      this.view = this.viewFor(target)
       this.transition = null
-    } else if (this.policy.layerTransition === 'crossfade') {
-      this.renderer.snapshot()
-      this.view = to
-      this.transition = { kind: 'crossfade', startedAt: now, durationMs: this.policy.layerMs, from, to: target.layer }
-    } else {
-      const flight = interpolateView(
-        this.view,
-        to,
-        Math.min(this.viewport.width, this.viewport.height),
-        baseScale(this.viewport, this.bounds),
-      )
-      this.transition = { kind: 'zoom', startedAt: now, durationMs: this.policy.layerMs, flight, from, to: target.layer }
+    } else if (motion === 'fly') {
+      this.cancelGestures()
+      let to = this.viewFor(target)
+      // A star opens at least as close as the map already is.
+      if (target.layer === 'star') to = this.limit({ ...to, k: Math.max(to.k, this.view.k) })
+      this.panTo(to, ZOOM.flightMs)
     }
+    this.positionsStale = true
     this.invalidate()
   }
 
-  /** The page area's size (it narrows when Ask's panel opens, #49): re-centre on the layer. */
+  /**
+   * The next route change to `target` is answered with `motion` instead of
+   * the default (the page's "Map" link flies back out to the galaxy).
+   */
+  expectTarget(target: LayerTarget, motion: ChoiceMotion): void {
+    this.requested = { target, motion }
+  }
+
+  /** The page area's size (it narrows when Ask's panel opens, #49): the view keeps its place, within the zoom's limits. */
   setViewport(width: number, height: number, dpr: number, bands: { top?: number; bottom?: number } = {}): void {
     const changed =
       width !== this.viewport.width ||
@@ -475,14 +548,22 @@ export class StarMapEngine {
       this.orientation = orientation
       if (this.source && !this.sky) this.load(this.target, false)
     }
-    if (changed && this.map && !this.transition) this.view = this.viewFor(this.target)
+    if (changed && this.map && !this.transition) {
+      this.view = this.drewFirstFrame ? this.limit(this.ringSafe(clampView(this.view, this.bounds, this.wrap))) : this.viewFor(this.target)
+    }
     this.positionsStale = true
     this.invalidate()
   }
 
   setReducedMotion(reduced: boolean): void {
     this.policy = motionPolicy(reduced)
-    if (!this.policy.inertia) this.inertia.stop()
+    if (!this.policy.inertia) {
+      this.inertia.stop()
+      // A zoom on its way arrives at once.
+      const glide = this.zoomGlide
+      this.zoomGlide = null
+      if (glide) this.applyZoom(glide.log, glide.x, glide.y)
+    }
     if (this.transition?.kind === 'zoom' && reduced) {
       this.view = this.ringSafe(this.transition.flight(1))
       this.transition = null
@@ -546,33 +627,35 @@ export class StarMapEngine {
     this.invalidate()
   }
 
-  /** Move the view without changing layer: a short flight, or a crossfade under reduced motion. */
+  /** Move the view: a short flight, or a crossfade under reduced motion. */
   private panTo(to: View, flightMs = this.policy.layerMs): void {
     this.inertia.stop()
-    const layer = this.target.layer
+    this.zoomGlide = null
     const now = this.now()
     if (!this.drewFirstFrame || this.policy.layerTransition === 'crossfade') {
       if (this.drewFirstFrame) {
         this.renderer.snapshot()
-        this.transition = { kind: 'crossfade', startedAt: now, durationMs: this.policy.layerMs, from: layer, to: layer }
+        this.transition = { kind: 'crossfade', startedAt: now, durationMs: this.policy.layerMs }
       }
       this.view = to
     } else {
       const flight = interpolateView(this.view, to, Math.min(this.viewport.width, this.viewport.height), baseScale(this.viewport, this.bounds))
-      this.transition = { kind: 'zoom', startedAt: now, durationMs: flightMs, flight, from: layer, to: layer }
+      this.transition = { kind: 'zoom', startedAt: now, durationMs: flightMs, flight }
     }
     this.positionsStale = true
   }
 
   /**
-   * Back to the layer's own view after a pan: on the star layer, the focused
-   * star returns to its place beside its card (#132), the shorter way round
-   * the ring. A flight, or a crossfade under reduced motion.
+   * Back to the chosen star after a pan (#132): it returns to its place
+   * beside its card, at the zoom the map is at now, the shorter way round the
+   * ring. With a nebula or nothing chosen, back to its view. A flight, or a
+   * crossfade under reduced motion.
    */
   recentre(): void {
     if (!this.map || this.viewport.width === 0) return
     this.cancelGestures()
-    this.panTo(this.viewFor(this.target))
+    const to = this.viewFor(this.target)
+    this.panTo(this.target.layer === 'star' ? this.ringSafe({ ...to, k: this.view.k }) : to)
     this.invalidate()
   }
 
@@ -586,9 +669,25 @@ export class StarMapEngine {
       this.dragging = null
       this.pinch = null
     } else if (this.pointers.size === 2) {
+      // Two fingers: from now on they zoom and pan together, around their midpoint.
       this.press = null
       this.dragging = null
-      this.pinch = { distance: this.pointerSpread(), fired: false }
+      this.zoomGlide = null
+      if (this.transition?.kind === 'zoom') this.transition = null
+      const [a, b] = [...this.pointers.values()]
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
+      const t = transformOf(this.view, this.viewport, this.bounds)
+      this.pinch = {
+        spread: Math.max(1, this.pointerSpread()),
+        k: this.view.k,
+        mx: (mid.x - t.ox) / t.scale,
+        my: (mid.y - t.oy) / t.scale,
+        x: mid.x,
+        y: mid.y,
+        at: this.now(),
+        velocity: 0,
+        ended: false,
+      }
     }
   }
 
@@ -599,12 +698,25 @@ export class StarMapEngine {
     pointer.y = y
     const now = this.now()
 
-    if (this.pinch && this.pointers.size >= 2) {
-      const ratio = this.pointerSpread() / Math.max(1, this.pinch.distance)
-      if (!this.pinch.fired && (ratio > PINCH_IN || ratio < PINCH_OUT)) {
-        this.pinch.fired = true
-        this.requestStep(ratio > 1 ? 'in' : 'out', x, y)
-      }
+    if (this.pinch) {
+      const pinch = this.pinch
+      if (pinch.ended || this.pointers.size < 2 || !this.map) return
+      const [a, b] = [...this.pointers.values()]
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }
+      const { min, max } = this.zoomLimits()
+      const before = this.view.k
+      const k = Math.max(min, Math.min(max, (pinch.k * this.pointerSpread()) / pinch.spread))
+      // The map point the fingers took hold of stays between them: zoom and pan in one.
+      this.view = this.ringSafe(anchorAt(this.view, k, pinch.mx, pinch.my, mid.x, mid.y, this.viewport, this.bounds, this.wrap))
+      const dt = Math.max(1, now - pinch.at)
+      const rate = (Math.log2(this.view.k) - Math.log2(before)) / dt
+      pinch.velocity += (rate - pinch.velocity) * (1 - Math.exp(-dt / PINCH_SMOOTHING_MS))
+      pinch.at = now
+      pinch.x = mid.x
+      pinch.y = mid.y
+      this.positionsStale = true
+      this.afterUserZoom(this.view.k < before)
+      this.invalidate()
       return
     }
 
@@ -612,9 +724,9 @@ export class StarMapEngine {
     if (!this.press.moved && Math.hypot(x - this.press.x, y - this.press.y) < TAP_SLOP) return
     if (!this.press.moved) {
       this.press.moved = true
-      // Every layer pans, the star layer too (#132): its card stays open for
-      // the focused star wherever the map is dragged, and the star's lines go
-      // with it. Only a flight in progress holds the map.
+      // The map pans at every zoom, a chosen star's too (#132): its card
+      // stays open wherever the map is dragged, and the star's lines go with
+      // it. Only a flight in progress holds the map.
       if (!this.transition) this.dragging = { x: this.press.x, y: this.press.y, at: this.press.at }
     }
     if (!this.dragging) return
@@ -628,10 +740,19 @@ export class StarMapEngine {
   }
 
   pointerUp(id: number, x: number, y: number): void {
-    const wasPinch = this.pinch !== null
+    const pinch = this.pinch
     this.pointers.delete(id)
-    if (wasPinch) {
+    if (pinch) {
+      if (!pinch.ended) {
+        pinch.ended = true
+        // Let go while still pinching: the zoom carries on and slows (none under reduced motion).
+        const now = this.now()
+        if (this.policy.inertia && !this.paused && now - pinch.at < PINCH_HOLD_MS && Math.abs(pinch.velocity) > ZOOM.pinchRestSpeed) {
+          this.glideZoom(pinch.velocity * ZOOM.pinchDecayMs, pinch.x, pinch.y, ZOOM.pinchDecayMs)
+        }
+      }
       if (this.pointers.size === 0) this.pinch = null
+      this.invalidate()
       return
     }
     const press = this.press
@@ -652,25 +773,38 @@ export class StarMapEngine {
     if (this.pointers.size === 0) this.cancelGestures()
   }
 
-  /** A wheel or trackpad scroll; `deltaY` < 0 zooms in. */
+  /** A wheel or trackpad scroll of `deltaY` px (< 0 zooms in), around `(x, y)`: as far as it scrolled, at once. */
   wheelBy(deltaY: number, x: number, y: number): void {
-    const now = this.now()
-    if (now - this.wheel.lastIntentAt < WHEEL_COOLDOWN_MS) return
-    this.wheel.accumulated += deltaY
-    if (Math.abs(this.wheel.accumulated) < WHEEL_STEP) return
-    const direction = this.wheel.accumulated < 0 ? 'in' : 'out'
-    this.wheel = { accumulated: 0, lastIntentAt: now }
-    this.requestStep(direction, x, y)
+    this.zoomBy(-deltaY * ZOOM.wheelPerPx, x, y)
   }
 
-  /** The zoom buttons and keys: in centres on what is nearest the focus point. */
+  /** The zoom buttons and keys: ×1.5 in or out around the view's focus point (the chosen star stays put). */
   step(direction: 'in' | 'out'): void {
-    this.requestStep(direction, this.viewport.width * this.view.fx, this.viewport.height * this.view.fy)
+    const log = Math.log2(ZOOM.buttonStep) * (direction === 'in' ? 1 : -1)
+    this.zoomBy(log, this.viewport.width * this.view.fx, this.viewport.height * this.view.fy)
+  }
+
+  /**
+   * Zoom by `log` (log2 of the factor) around the screen point `(x, y)`: a
+   * glide there, or at once under reduced motion. A flight in progress gives
+   * way to the hand.
+   */
+  zoomBy(log: number, x: number, y: number): void {
+    if (!this.map || this.viewport.width === 0 || !log) return
+    if (this.transition?.kind === 'zoom') this.transition = null
+    if (!this.policy.inertia) {
+      this.zoomGlide = null
+      this.applyZoom(log, x, y)
+      this.invalidate()
+      return
+    }
+    this.glideZoom(log, x, y, ZOOM.glideMs)
   }
 
   // ---- queries ----------------------------------------------------------
 
-  get layer(): MapLayer {
+  /** What is chosen (the route's): the galaxy, a nebula, a star. */
+  get layer(): LayerTarget['layer'] {
     return this.target.layer
   }
 
@@ -687,13 +821,26 @@ export class StarMapEngine {
     return glyphSizeFor(transformOf(this.view, this.viewport, this.bounds).scale, this.spacing)
   }
 
+  /** How far in the map is now (#134). */
+  get zoom(): ZoomState {
+    const starPx = this.starPx()
+    const { min, max } = this.zoomLimits()
+    const pickable = starPx >= REVEAL.starsPickableFrom && ramp(this.view.k / min, REVEAL.dotsPastPanorama) >= 0.5
+    return { starPx, band: zoomBand(starPx), atMin: this.view.k <= min * 1.001, atMax: this.view.k >= max * 0.999, pickable }
+  }
+
+  /** The zoom's limits now: the panorama (and the ring's least zoom), and a star glyph of `ZOOM.maxGlyph` px. */
+  get zoomRange(): { min: number; max: number } {
+    return this.zoomLimits()
+  }
+
   /** Where `unitId`'s star was drawn in the last frame; null before one, or for a star not on this map (#51). */
   starOnScreen(unitId: string): StarOnScreen | null {
     const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
     return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize }
   }
 
-  /** On the star layer, where its star was drawn in the last frame (it may be panned off screen, #132); else null. */
+  /** With a star chosen, where it was drawn in the last frame (it may be panned off screen, #132); else null. */
   get focusedStarOnScreen(): StarOnScreen | null {
     return this.target.layer === 'star' ? this.starOnScreen(this.target.unitId) : null
   }
@@ -712,18 +859,43 @@ export class StarMapEngine {
 
   // ---- internals --------------------------------------------------------
 
+  private starPx(view: View = this.view): number {
+    return starPxFor(transformOf(view, this.viewport, this.bounds).scale, this.spacing)
+  }
+
+  /**
+   * How far the zoom may go: out to the panorama (#134 Z3; on the ring never
+   * past `ringSafeZoom`, #120), in until a star's glyph is `ZOOM.maxGlyph` px.
+   */
+  private zoomLimits(fx = this.view.fx): { min: number; max: number } {
+    if (!this.map || this.viewport.width === 0) return { min: 1, max: 1 }
+    const far = this.skyGalaxies.length > 0 ? panoramaZoom(this.skyGalaxies, this.bounds, this.viewport) : 1
+    const ring = this.wrap > 0 ? ringSafeZoom(this.ringReach, this.wrap, this.viewport, this.bounds, fx) : 0
+    const min = Math.max(far, ring)
+    return { min, max: Math.max(min, kForGlyph(ZOOM.maxGlyph, this.viewport, this.bounds, this.spacing)) }
+  }
+
+  private limit(view: View): View {
+    const { min, max } = this.zoomLimits(view.fx)
+    return view.k < min ? { ...view, k: min } : view.k > max ? { ...view, k: max } : view
+  }
+
+  /** The view that shows what is chosen: the galaxy's panorama, a nebula's stars as full glyphs, a star beside its card. */
   private viewFor(target: LayerTarget): View {
     if (!this.map || this.viewport.width === 0) return overviewView(this.bounds, this.viewport)
-    if (target.layer === 'map' && this.skyGalaxies.length > 0) {
+    if (target.layer === 'map') {
+      if (this.skyGalaxies.length === 0) return this.limit(overviewView(this.bounds, this.viewport))
       const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
-      return this.onRing(galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport))
+      return this.limit(this.onRing(galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport)))
     }
     const view = viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
-    if (!this.sky || target.layer === 'map') return view
     // A cloud's rim reaches far past its core: zoom in until its stars are full
     // glyphs, so the four learning states can be told apart (#117).
-    const glyphK = NEBULA_GLYPH / (0.55 * baseScale(this.viewport, this.bounds) * this.spacing)
-    return this.onRing({ ...view, k: Math.min(60, Math.max(view.k, target.layer === 'star' ? glyphK * 1.5 : glyphK)) })
+    const k =
+      target.layer === 'star'
+        ? kForGlyph(ZOOM.starGlyph, this.viewport, this.bounds, this.spacing)
+        : Math.max(view.k, kForGlyph(ZOOM.nebulaGlyph, this.viewport, this.bounds, this.spacing))
+    return this.limit(this.onRing({ ...view, k }))
   }
 
   /**
@@ -751,16 +923,58 @@ export class StarMapEngine {
     this.press = null
     this.dragging = null
     this.pinch = null
+    this.zoomGlide = null
     this.inertia.stop()
   }
 
-  private requestStep(direction: 'in' | 'out', x: number, y: number) {
-    if (!this.map) return
-    const next =
-      direction === 'in'
-        ? innerTarget(this.target, this.map, this.nebulaAt(x, y, true), this.nearestStar(x, y, Number.POSITIVE_INFINITY))
-        : outerTarget(this.target)
-    if (!sameTarget(next, this.target)) this.options.onRequestTarget?.(next)
+  /** Glide by `log` more (log2 of k) around `(x, y)`, with time constant `tauMs`; never past the zoom's limits. */
+  private glideZoom(log: number, x: number, y: number, tauMs: number) {
+    const { min, max } = this.zoomLimits()
+    const now = Math.log2(this.view.k)
+    const goal = Math.max(Math.log2(min), Math.min(Math.log2(max), now + (this.zoomGlide?.log ?? 0) + log))
+    const remaining = goal - now
+    this.zoomGlide = Math.abs(remaining) < 1e-4 ? null : { log: remaining, x, y, tauMs }
+    this.invalidate()
+  }
+
+  /** Zoom by `log` (log2 of k) around `(x, y)` now, within the limits. Whether the view changed. */
+  private applyZoom(log: number, x: number, y: number): boolean {
+    const { min, max } = this.zoomLimits()
+    const k = Math.max(min, Math.min(max, this.view.k * 2 ** log))
+    if (Math.abs(k - this.view.k) < 1e-9 * this.view.k) return false
+    const out = k < this.view.k
+    this.view = this.ringSafe(zoomAround(this.view, k, x, y, this.viewport, this.bounds, this.wrap))
+    this.positionsStale = true
+    this.afterUserZoom(out)
+    return true
+  }
+
+  /**
+   * Zoomed out by hand past a choice, let it go (#134 Z2): the chosen star's
+   * card closes once its glyph is under `REVEAL.cardClosesBelow` px, a
+   * chosen nebula is let go back within `REVEAL.panoramaBand` of the
+   * panorama. Asked once; the camera stays where the hand put it.
+   */
+  private afterUserZoom(out: boolean) {
+    if (!out || !this.map) return
+    const target = this.target
+    if (target.layer === 'star' && this.starPx() < REVEAL.cardClosesBelow) {
+      this.release({ layer: 'nebula', nebulaId: target.nebulaId })
+    } else if (target.layer === 'nebula' && this.view.k < this.zoomLimits().min * REVEAL.panoramaBand) {
+      this.release({ layer: 'map' })
+    }
+  }
+
+  private release(next: LayerTarget) {
+    const key = next.layer === 'map' ? 'map' : `${next.layer}:${next.nebulaId}`
+    if (this.released === key) return
+    this.released = key
+    this.request(next, 'stay')
+  }
+
+  private request(target: LayerTarget, motion: ChoiceMotion) {
+    this.requested = { target, motion }
+    this.options.onRequestTarget?.(target)
   }
 
   /** The star on screen nearest `(x, y)` within `radius` px. */
@@ -775,6 +989,15 @@ export class StarMapEngine {
       }
     }
     return best >= 0 ? this.stars[best] : null
+  }
+
+  /** The recommended star under `(x, y)`: a full glyph at every zoom, so it can be picked from far out too. */
+  private beaconAt(x: number, y: number): Star | null {
+    const reach = Math.max(14, Math.min(this.glyphSize, 32) * 0.6)
+    for (const i of this.scene?.recommendations ?? []) {
+      if (Math.hypot(this.x[i] - x, this.y[i] - y) <= reach) return this.stars[i]
+    }
+    return null
   }
 
   /** The nebula under `(x, y)`; with `nearest`, the closest one if none is under it. */
@@ -792,23 +1015,43 @@ export class StarMapEngine {
     return best >= 0 ? this.nebulaIds[best] : null
   }
 
+  /** A tap; a second one close by, soon after a first that chose nothing, zooms in ×2 around it. */
   private tap(x: number, y: number) {
     if (!this.map) return
-    const reach = Math.max(22, this.glyphSize * 0.5)
-    if (this.target.layer === 'map') {
-      const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId
-      if (nebulaId) this.options.onRequestTarget?.({ layer: 'nebula', nebulaId })
+    const now = this.now()
+    const last = this.lastTap
+    if (last && now - last.at < ZOOM.doubleTapMs && Math.hypot(x - last.x, y - last.y) < ZOOM.doubleTapPx) {
+      this.lastTap = null
+      // After a first tap that chose something, the flight it started is the zoom in.
+      if (!last.acted) this.zoomBy(Math.log2(ZOOM.doubleTapStep), x, y)
       return
     }
-    const hit = this.nearestStar(x, y, reach)
+    this.lastTap = { x, y, at: now, acted: this.choose(x, y) }
+  }
+
+  /**
+   * What a tap chooses (#134 Z2): a star once stars are big enough to pick
+   * (the recommended star at any zoom); with a star's card open, a tap on no
+   * star closes it; else the nebula under the tap. Whether it asked for a route.
+   */
+  private choose(x: number, y: number): boolean {
+    const reach = Math.max(22, this.glyphSize * 0.5)
+    const hit = this.zoom.pickable ? (this.nearestStar(x, y, reach) ?? this.beaconAt(x, y)) : this.beaconAt(x, y)
+    const target = this.target
     if (hit) {
       // A tap on the star already open brings it back to its place beside the card.
-      if (this.target.layer === 'star' && hit.unitId === this.target.unitId) this.recentre()
-      else this.options.onRequestTarget?.({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId })
-      return
+      if (target.layer === 'star' && hit.unitId === target.unitId) this.recentre()
+      else this.request({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId }, 'fly')
+      return true
     }
-    const nebulaId = this.nebulaAt(x, y)
-    if (nebulaId && nebulaId !== this.target.nebulaId) this.options.onRequestTarget?.({ layer: 'nebula', nebulaId })
+    if (target.layer === 'star') {
+      this.request({ layer: 'nebula', nebulaId: target.nebulaId }, 'stay')
+      return true
+    }
+    const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+    if (!nebulaId || (target.layer === 'nebula' && target.nebulaId === nebulaId)) return false
+    this.request({ layer: 'nebula', nebulaId }, 'fly')
+    return true
   }
 
   hoverAt(x: number | null, y = 0) {
@@ -827,19 +1070,16 @@ export class StarMapEngine {
   private frame(now: number) {
     this.handle = null
     if (this.destroyed || !this.scene || !this.map || this.viewport.width === 0) return
-    const dt = this.lastFrameAt === null ? 16 : Math.max(0, Math.min(64, now - this.lastFrameAt))
+    // After a pause in the frames (nothing moved), the first step is one frame long, not the whole pause.
+    const dt = this.lastFrameAt === null ? 1000 / 60 : Math.max(0, Math.min(64, now - this.lastFrameAt))
     this.lastFrameAt = now
     let keepGoing = false
-    let moving = this.dragging !== null
+    let moving = this.dragging !== null || (this.pinch !== null && !this.pinch.ended)
 
-    // Layer transitions, else the glide after a pan.
+    // A flight, else the glides after a pan and a zoom.
     let crossfade = 0
-    let progress = 1
-    let from: MapLayer = this.target.layer
     if (this.transition) {
       const t = Math.min(1, (now - this.transition.startedAt) / this.transition.durationMs)
-      progress = t
-      from = this.transition.from
       if (this.transition.kind === 'zoom') {
         // A long flight pulls back, but never so far that the ring shows a galaxy twice.
         this.view = this.ringSafe(this.transition.flight(easeStandard(t)))
@@ -856,14 +1096,33 @@ export class StarMapEngine {
       } else {
         keepGoing = true
       }
-    } else if (this.inertia.moving && this.policy.inertia && !this.paused) {
-      const step = this.inertia.advance(dt)
-      if (step) {
-        this.view = panBy(this.view, step[0], step[1], this.viewport, this.bounds, this.wrap)
-        moving = true
-        keepGoing = true
+    } else {
+      if (this.inertia.moving && this.policy.inertia && !this.paused) {
+        const step = this.inertia.advance(dt)
+        if (step) {
+          this.view = panBy(this.view, step[0], step[1], this.viewport, this.bounds, this.wrap)
+          moving = true
+          keepGoing = true
+        }
+        this.positionsStale = true
       }
-      this.positionsStale = true
+      const glide = this.zoomGlide
+      if (glide) {
+        // The rest of the zoom approaches exponentially: the wheel's notches
+        // and the buttons' steps arrive as one smooth zoom, never as a jump.
+        // No faster than `ZOOM.maxRate`: a hard flick still crosses each reveal over several frames.
+        const most = (ZOOM.maxRate * dt) / 1000
+        let step = Math.max(-most, Math.min(most, glide.log * (1 - Math.exp(-dt / glide.tauMs))))
+        if (Math.abs(glide.log - step) < 0.002) step = glide.log
+        glide.log -= step
+        const changed = this.applyZoom(step, glide.x, glide.y)
+        // The glide's last frame is a frame at rest, like a flight's.
+        if (!changed || Math.abs(glide.log) < 1e-6) this.zoomGlide = null
+        else {
+          keepGoing = true
+          moving = true
+        }
+      }
     }
 
     // Where everything is on screen, and what is in focus.
@@ -906,6 +1165,18 @@ export class StarMapEngine {
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
     for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
 
+    // Choosing and letting go ease in and out.
+    const ease = this.policy.inertia ? 1 - Math.exp(-dt / EMPHASIS_MS) : 1
+    const approach = (value: number, to: number) => (Math.abs(to - value) < 0.002 ? to : value + (to - value) * ease)
+    this.chosenAmount = approach(this.chosenAmount, chosen >= 0 ? 1 : 0)
+    this.starAmount = approach(this.starAmount, target.layer === 'star' ? 1 : 0)
+    let easing = (this.chosenAmount > 0 && this.chosenAmount < 1) || (this.starAmount > 0 && this.starAmount < 1)
+    for (let n = 0; n < this.nebulaLift.length; n += 1) {
+      this.nebulaLift[n] = approach(this.nebulaLift[n], n === chosen ? 1 : 0)
+      if (this.nebulaLift[n] > 0 && this.nebulaLift[n] < 1) easing = true
+    }
+    if (easing) keepGoing = true
+
     // Only the recommended star breathes (#72 point 6), and only when seen sharp.
     let breath: SceneFrame['breath'] = null
     // On one sky, the recommended star of the galaxy the header names.
@@ -925,15 +1196,17 @@ export class StarMapEngine {
       keepGoing = true
     }
 
-    this.renderer.draw(this.frameState(t, progress, from, crossfade, chosen, breath))
+    this.renderer.draw(this.frameState(t, crossfade, chosen, breath, now))
+    // A name still fading in or out wants the next frame too.
+    if (this.renderer.stats.settling) keepGoing = true
 
     if (!this.drewFirstFrame) {
       this.drewFirstFrame = true
       this.options.onFirstFrame?.()
     }
     this.emitVisible(moving)
-    const atRest = !moving && !this.transition && !(this.inertia.moving && this.policy.inertia && !this.paused)
-    // At rest on the whole sky: the header names whichever galaxy is at the centre.
+    const atRest = !moving && !this.transition && !this.zoomGlide && !(this.inertia.moving && this.policy.inertia && !this.paused)
+    // At rest with nothing chosen: the header names whichever galaxy is at the centre.
     if (atRest && target.layer === 'map' && this.skyGalaxies.length > 0) {
       const centre = galaxyAt(this.skyGalaxies, this.view.cx, this.wrap)
       if (centre && centre.subjectId !== this.centred) {
@@ -947,30 +1220,33 @@ export class StarMapEngine {
       this.view = { ...this.view, cx: this.view.cx - Math.floor(this.view.cx / this.wrap) * this.wrap }
     }
     if (keepGoing) this.invalidate()
+    else this.lastFrameAt = null
   }
 
+  /** What the renderer draws this frame: every reveal a continuous function of the zoom (#134). */
   private frameState(
     t: { scale: number; ox: number; oy: number },
-    progress: number,
-    from: MapLayer,
     crossfade: number,
     chosen: number,
     breath: SceneFrame['breath'],
+    now: number,
   ): SceneFrame {
-    const to = this.target.layer
-    const lerp = (a: number, b: number) => a + (b - a) * progress
-    // Names fade in after 60% of the zoom and out over its first 40%.
-    const named = (layer: MapLayer) => (layer === 'map' ? 0 : 1)
-    const starLabelAlpha =
-      named(to) === named(from) ? named(to) : named(to) === 1 ? Math.max(0, (progress - 0.6) / 0.4) : Math.max(0, 1 - progress / 0.4)
-    const nebulaLabels = (layer: MapLayer) => NEBULA_LABEL_ALPHA[layer]
-    const dimOf = (layer: MapLayer) => (layer === 'star' ? STAR_LAYER_DIM : 1)
     const target = this.target
-    const focusStar =
-      target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : this.focusStar
+    const starPx = starPxFor(t.scale, this.spacing)
     const glyphSize = glyphSizeFor(t.scale, this.spacing)
+    if (target.layer === 'star') this.lastChosenStar = this.stars.findIndex((star) => star.unitId === target.unitId)
+    const chosenStar = this.starAmount > 0 ? this.lastChosenStar : -1
+    // With a star chosen, the map gives way to it as the zoom closes in (eased in as it is chosen, out as its card closes).
+    const focus = chosenStar >= 0 ? starFocusAmount(starPx) * this.starAmount : 0
+    const focusStar = chosenStar >= 0 ? chosenStar : this.focusStar
+    // One sky names a nebula by its size on screen, past the panorama; a flat
+    // map of one subject (no galaxies, tests and the bench's old maps) names every nebula.
+    const giveWay = this.sky ? 1 - ramp(starPx, REVEAL.nebulaNameOut) : 1
+    const pastPanorama = this.view.k / this.zoomLimits().min
+    for (let n = 0; n < this.nebulaNames.length; n += 1) this.nebulaNames[n] = this.sky ? nebulaNameAlpha(this.nebulaR[n], starPx, pastPanorama) : 1
+    const { width, height } = this.viewport
     return {
-      dotBlend: lerp(from === 'map' ? 1 : dotBlendFor(glyphSize), to === 'map' ? 1 : dotBlendFor(glyphSize)),
+      dotBlend: Math.max(dotBlendFor(glyphSize), 1 - ramp(pastPanorama, REVEAL.dotsPastPanorama)),
       dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.dotSpacing * 0.11)),
       viewport: this.viewport,
       scale: t.scale,
@@ -986,18 +1262,26 @@ export class StarMapEngine {
       sharpness: this.sharpness,
       glyphSize,
       breath,
-      starLabelAlpha,
-      nebulaLabelAlpha: lerp(nebulaLabels(from), nebulaLabels(to)),
-      innerLinkAlpha: starLabelAlpha,
-      starLayer: lerp(from === 'star' ? 1 : 0, to === 'star' ? 1 : 0),
+      starLabelAlpha: starNameAlpha(starPx),
+      starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
+      nebulaLabelAlpha: 1,
+      nebulaNames: this.nebulaNames,
+      priorityNameAlpha: giveWay,
+      lineReveal: lineReveal(starPx),
+      starFocus: focus,
       chosenNebula: chosen,
-      wholeMap: to === 'map',
+      wholeMap: target.layer === 'map',
       focusStar,
       hoveredNebula: this.hoveredNebula,
       highlightNebula: target.layer === 'star' ? -1 : this.focusNebula,
-      dim: lerp(dimOf(from), dimOf(to)),
-      showSkills: glyphSize >= 30,
+      dim: 1 - (1 - STAR_FOCUS_DIM) * focus,
+      chosenAmount: this.chosenAmount,
+      nebulaLift: this.nebulaLift,
+      emphasisKey: `${this.chosenAmount.toFixed(3)}:${this.nebulaLift.reduce((sum, lift, n) => sum + lift * (n + 1), 0).toFixed(3)}`,
+      showSkills: skillAlpha(starPx),
       crossfade,
+      time: now,
+      labelFadeMs: this.policy.inertia ? REVEAL.labelFadeMs : 0,
     }
   }
 
@@ -1018,7 +1302,7 @@ export class StarMapEngine {
     const margin = 8
     const list: VisibleStar[] = []
     const keys: number[] = []
-    // The star layer's DOM is its card; the map behind it has no links.
+    // A chosen star's DOM is its card; the map behind it has no links.
     if (this.target.layer !== 'star') {
       for (let i = 0; i < this.stars.length; i += 1) {
         const x = this.x[i]
@@ -1035,6 +1319,6 @@ export class StarMapEngine {
     this.positionsStale = false
     const nebulae: NebulaDiscOnScreen[] = []
     for (let n = 0; n < this.nebulaX.length; n += 1) nebulae.push({ x: this.nebulaX[n], y: this.nebulaY[n], r: this.nebulaR[n] })
-    listener(list, this.glyphSize, nebulae)
+    listener(list, this.glyphSize, nebulae, this.zoom)
   }
 }

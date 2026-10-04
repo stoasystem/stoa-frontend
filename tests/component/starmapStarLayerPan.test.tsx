@@ -107,7 +107,7 @@ describe('dragging the star layer (#132)', () => {
       // Still the star layer, on the same star: its lines (the renderer draws the focused star's) follow.
       expect(s.engine.layer).toBe('star')
       expect(after.focusStar).toBe(i)
-      expect(after.starLayer).toBe(1)
+      expect(after.starFocus).toBe(1)
       expect(s.navigate).not.toHaveBeenCalled()
       // The lighting layer is told where the star is drawn now.
       const moved2 = s.engine.starOnScreen(star.unitId)!

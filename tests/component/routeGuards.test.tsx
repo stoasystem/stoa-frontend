@@ -15,9 +15,9 @@ import { openAs, type Viewer } from './routeHarness'
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))
 
 const STUDENT_ROUTES = [
-  ['/map/math', 'MapSubjectPage'],
-  ['/map/math/fractions', 'MapNebulaPage'],
-  ['/map/math/fractions/u-1', 'MapStarPage'],
+  ['/map/math', 'MapPage'],
+  ['/map/math/fractions', 'MapPage'],
+  ['/map/math/fractions/u-1', 'MapPage'],
   ['/chapter/u-1', 'ChapterPage'],
   ['/chapter/u-1/l-1', 'LessonStagePage'],
   ['/ask', 'AskPage'],

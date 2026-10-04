@@ -28,6 +28,7 @@ import { createCanvas2DRenderer, withAlpha } from '@/features/starmap/render/can
 import { drawLinks, LINE, LINK_INK, shortestDx, type LinkObstacles } from '@/features/starmap/render/links'
 import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type LinkInk, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import type { LayerTarget } from '@/features/starmap/view/layers'
+import { lineReveal } from '@/features/starmap/view/semanticZoom'
 import { fakeCanvas, fakeClock, THEME, skyMap, type CanvasCounter } from './starmapHarness'
 
 afterEach(() => vi.unstubAllGlobals())
@@ -56,11 +57,13 @@ describe('four tiers, bright to dark', () => {
   })
 })
 
-describe('what each layer shows', () => {
+describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
   const inside = (tier: StarLine['tier'], from = 1, to = 2): StarLine => ({ from, to, fromNebula: 0, toNebula: 0, tier })
-  const panorama: LinkView = { nebula: 0, star: 0, chosen: -1, focusStar: -1 }
-  const nebula: LinkView = { nebula: 1, star: 0, chosen: 0, focusStar: -1 }
-  const star: LinkView = { nebula: 1, star: 1, chosen: 0, focusStar: 1 }
+  /** The lines at a glyph size of `starPx`. */
+  const at = (starPx: number, more: Partial<LinkView> = {}): LinkView => ({ ...lineReveal(starPx), star: 0, chosen: -1, focusStar: -1, ...more })
+  const panorama = at(5)
+  const nebula = at(28, { chosen: 0 })
+  const star = at(34, { chosen: 0, focusStar: 1, star: 1 })
 
   it('the panorama draws no line between stars', () => {
     for (const tier of [1, 2, 3, 4] as const) {
@@ -69,22 +72,24 @@ describe('what each layer shows', () => {
     }
   })
 
-  it('the nebula layer draws its own lines in tiers 1-3, never tier 4, and nothing of other nebulae', () => {
+  it('a nebula zoomed in draws lines in tiers 1-3, tier 4 only very close, and other nebulae’s lines too', () => {
     for (const tier of [1, 2, 3] as const) expect(starLineLook(inside(tier), nebula)).toEqual({ strength: 1, reach: 0 })
     expect(starLineLook(inside(4), nebula).strength).toBe(0)
-    expect(starLineLook({ ...inside(1), fromNebula: 3, toNebula: 4 }, nebula).strength).toBe(0)
+    expect(starLineLook(inside(4), at(40)).strength).toBe(1)
+    // Every star's lines by zoom, not just the chosen nebula's: nothing pops when a nebula is chosen.
+    expect(starLineLook({ ...inside(1), fromNebula: 3, toNebula: 4 }, nebula).strength).toBe(1)
     // A line to another nebula: drawn, fading out near this nebula's star (reach 0).
     expect(starLineLook({ ...inside(2), toNebula: 5 }, nebula)).toEqual({ strength: 1, reach: 0 })
   })
 
-  it('a focused star on the nebula layer keeps only its own lines lit', () => {
+  it('a focused star keeps only its own lines lit', () => {
     const focused = { ...nebula, focusStar: 1 }
     expect(starLineLook(inside(3, 1, 2), focused).strength).toBe(1)
     expect(starLineLook(inside(3, 7, 8), focused).strength).toBe(UNFOCUSED_LINE)
     expect(starLineLook(inside(4, 1, 2), focused).strength).toBe(0)
   })
 
-  it('the star layer lights the star’s prerequisites and successors fully, every tier, and hides the rest', () => {
+  it('a chosen star, zoomed in, lights its prerequisites and successors fully, every tier, and hides the rest', () => {
     for (const tier of [1, 2, 3, 4] as const) {
       expect(starLineLook(inside(tier, 9, 1), star)).toEqual({ strength: 1, reach: 1 })
       expect(starLineLook(inside(tier, 1, 9), star)).toEqual({ strength: 1, reach: 1 })
@@ -94,8 +99,8 @@ describe('what each layer shows', () => {
     expect(starLineLook({ ...inside(4, 1, 9), toNebula: 6 }, star)).toEqual({ strength: 1, reach: 1 })
   })
 
-  it('crossfades between the nebula and star layers', () => {
-    const half = { ...star, star: 0.5 }
+  it('crossfades as the map gives way to a chosen star', () => {
+    const half = at(28, { chosen: 0, focusStar: 1, star: 0.5 })
     expect(starLineLook(inside(4, 1, 2), half).strength).toBeCloseTo(0.5)
     expect(starLineLook(inside(3, 7, 8), half).strength).toBeCloseTo(UNFOCUSED_LINE / 2)
   })
@@ -112,7 +117,7 @@ describe('what each layer shows', () => {
 })
 
 describe('cross-subject lines', () => {
-  const panorama = { nebula: 0 }
+  const panorama = { bridges: 1 }
   it('at rest no bridge crosses galaxies; a focused nebula lights its own', () => {
     const across = { a: 0, b: 5, count: 1, crossGalaxy: true }
     expect(bridgeLook(across, -1, panorama)).toBe(0)
@@ -123,7 +128,7 @@ describe('cross-subject lines', () => {
   it('the glow between two galaxies is there at rest, and steps back while one of their bridges is lit', () => {
     expect(galaxyHintLook(false, panorama)).toBe(1)
     expect(galaxyHintLook(true, panorama)).toBe(HINT_WHILE_BRIDGED)
-    expect(galaxyHintLook(false, { nebula: 1 })).toBe(0)
+    expect(galaxyHintLook(false, { bridges: 0 })).toBe(0)
   })
 })
 
@@ -195,8 +200,8 @@ describe('the 2000-star panorama (#121 acceptance)', () => {
   })
 })
 
-describe('the nebula and star layers', () => {
-  it('the nebula layer draws its own lines, and names an off-screen destination in its own galaxy without a subject', () => {
+describe('a chosen nebula and a chosen star', () => {
+  it('a chosen nebula draws its lines, and names an off-screen destination in its own galaxy without a subject', () => {
     const s = sky(2000, 1440, 900)
     s.go({ layer: 'nebula', nebulaId: 'trigonometry' })
     expect(s.real.stats.links!.lines).toBeGreaterThan(0)
@@ -206,7 +211,7 @@ describe('the nebula and star layers', () => {
     s.engine.destroy()
   })
 
-  it('the star layer of Refraction draws its line into mathematics in full and says which subject it leads to', () => {
+  it('a chosen Refraction draws its line into mathematics in full and says which subject it leads to', () => {
     const s = sky(2000, 1440, 900, 'physics')
     s.go({ layer: 'star', nebulaId: 'optics', unitId: 'demo-refraction' })
     expect(s.real.stats.links!.lines).toBeGreaterThan(0)
@@ -293,13 +298,13 @@ describe('the seam: the shorter way round (#120)', () => {
       breath: null,
       starLabelAlpha: 0,
       nebulaLabelAlpha: 1,
-      innerLinkAlpha: 0,
-      starLayer: 0,
+      lineReveal: lineReveal(5),
+      starFocus: 0,
       chosenNebula: -1,
       focusStar: -1,
       highlightNebula: 0,
       dim: 1,
-      showSkills: false,
+      showSkills: 0,
       crossfade: 0,
     } satisfies SceneFrame
     return { scene, frame }
@@ -322,7 +327,7 @@ describe('the seam: the shorter way round (#120)', () => {
   it('a star line across the seam on the nebula layer leaves to the right, the short way', () => {
     const { scene, frame } = seamScene()
     const ctx = recordingContext()
-    drawLinks(ctx, scene, { ...frame, innerLinkAlpha: 1, chosenNebula: 0, highlightNebula: -1 }, THEME, { segments: [], boxes: [] })
+    drawLinks(ctx, scene, { ...frame, lineReveal: lineReveal(28), chosenNebula: 0, highlightNebula: -1 }, THEME, { segments: [], boxes: [] })
     // Anchored on the chosen nebula's star at x 500, it heads right, the short way, towards x 0.05 one band on (600).
     expect(ctx.strokes.length).toBeGreaterThan(0)
     for (const [x0, , x1] of ctx.strokes) {
@@ -335,10 +340,10 @@ describe('the seam: the shorter way round (#120)', () => {
   it('with `wrap`, each shape is drawn again one band either side, where the other copies are', () => {
     const { scene, frame } = seamScene()
     const once = recordingContext()
-    drawLinks(once, scene, { ...frame, innerLinkAlpha: 1, chosenNebula: 1, highlightNebula: -1 }, THEME, { segments: [], boxes: [] })
+    drawLinks(once, scene, { ...frame, lineReveal: lineReveal(28), chosenNebula: 1, highlightNebula: -1 }, THEME, { segments: [], boxes: [] })
     const wrapped = recordingContext()
     const obstacles: LinkObstacles = { segments: [], boxes: [] }
-    drawLinks(wrapped, scene, { ...frame, innerLinkAlpha: 1, chosenNebula: 1, highlightNebula: -1 }, THEME, obstacles, { wrap: true })
+    drawLinks(wrapped, scene, { ...frame, lineReveal: lineReveal(28), chosenNebula: 1, highlightNebula: -1 }, THEME, obstacles, { wrap: true })
     // The chosen star sits at x -400, off screen; its copy one band on, at 600, is in view.
     expect(once.strokes).toHaveLength(0)
     expect(wrapped.strokes.length).toBeGreaterThan(0)
@@ -391,14 +396,14 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
       breath: null,
       starLabelAlpha: 1,
       nebulaLabelAlpha: 0,
-      // The star layer, on the centre star: every tier is drawn, all the way.
-      innerLinkAlpha: 1,
-      starLayer: 1,
+      // A chosen centre star, zoomed in to it: every tier is drawn, all the way.
+      lineReveal: lineReveal(34),
+      starFocus: 1,
       chosenNebula: 0,
       focusStar: 0,
       highlightNebula: -1,
       dim: 0.35,
-      showSkills: false,
+      showSkills: 0,
       crossfade: 0,
     } satisfies SceneFrame
     const tierOf = new Map<number, LinkTier>([[1, TIER_RECOMMENDED], [2, TIER_IN_PROGRESS], [3, TIER_WALKED], [4, TIER_LOCKED]])
