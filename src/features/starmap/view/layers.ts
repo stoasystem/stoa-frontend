@@ -15,13 +15,15 @@
  * The flight is d3-zoom's smooth zoom (van Wijk & Nuij, rho = sqrt 2) in two
  * dimensions: a long move pulls back first, a short one zooms straight in.
  */
-import type { StarMap } from '@/features/starmap/model/starMap'
-import { baseScale, overviewView, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import type { Star, StarMap } from '@/features/starmap/model/starMap'
+import { baseScale, overviewView, usableHeight, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import { ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
 
 export type LayerTarget =
   | { layer: 'map' }
-  | { layer: 'nebula'; nebulaId: string }
+  /** `whole`: the nebula seen whole, `star` kept in view: back on the map from a lighting (#140). */
+  | { layer: 'nebula'; nebulaId: string; whole?: { star: string } }
   | { layer: 'star'; nebulaId: string; unitId: string }
 
 const RHO = Math.SQRT2
@@ -86,6 +88,44 @@ export function nebulaZoom(disc: NebulaDisc, viewport: Viewport, bounds: Bounds)
   const shorter = Math.min(viewport.width, viewport.height)
   const base = baseScale(viewport, bounds)
   return Math.max(1.4, Math.min(30, (0.85 * shorter) / (2 * disc.r * base)))
+}
+
+/**
+ * A nebula seen whole (#140): all its stars within `ZOOM.wholeNebulaFill`
+ * of the band between the page's controls, centred in that band, at a zoom
+ * within `zoom` (the engine's, from `ZOOM.wholeNebulaGlyph`), with `star`
+ * kept near the middle (`ZOOM.wholeNebulaKeep`) even where the nebula is too
+ * big for the screen. Null for a nebula with no stars.
+ */
+export function wholeNebulaView(
+  nebulaId: string,
+  star: string,
+  stars: readonly Pick<Star, 'unitId' | 'nebulaId' | 'x' | 'y'>[],
+  viewport: Viewport,
+  bounds: Bounds,
+  [least, most]: readonly [number, number],
+): View | null {
+  const own = stars.filter((candidate) => candidate.nebulaId === nebulaId)
+  if (own.length === 0) return null
+  const xs = own.map((candidate) => candidate.x)
+  const ys = own.map((candidate) => candidate.y)
+  const [minX, maxX, minY, maxY] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const usable = usableHeight(viewport)
+  const base = baseScale(viewport, bounds)
+  const room = { width: ZOOM.wholeNebulaFill * viewport.width, height: ZOOM.wholeNebulaFill * usable }
+  const fit = Math.min(room.width / Math.max(1e-6, (maxX - minX) * base), room.height / Math.max(1e-6, (maxY - minY) * base))
+  const k = Math.max(least, Math.min(most, fit))
+  let cx = (minX + maxX) / 2
+  let cy = (minY + maxY) / 2
+  const kept = own.find((candidate) => candidate.unitId === star)
+  if (kept) {
+    const reachX = (ZOOM.wholeNebulaKeep * room.width) / 2 / (base * k)
+    const reachY = (ZOOM.wholeNebulaKeep * room.height) / 2 / (base * k)
+    cx = Math.max(kept.x - reachX, Math.min(kept.x + reachX, cx))
+    cy = Math.max(kept.y - reachY, Math.min(kept.y + reachY, cy))
+  }
+  const fy = viewport.height > 0 ? ((viewport.top ?? 0) + usable / 2) / viewport.height : 0.5
+  return { cx, cy, k, fx: 0.5, fy }
 }
 
 /** Where a choice is seen: its centre, and where on screen (`fx`, `fy`); the engine sets the zoom (`view/semanticZoom.ts`'s `ZOOM`). */

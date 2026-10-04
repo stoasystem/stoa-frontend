@@ -4,6 +4,8 @@
  *
  *   0 - 600 ms     gathering: twelve sparks spiral in to the star;
  *   600 ms         ignition: a white-gold bloom swells from the star;
+ *   768 ms         the brightest moment (`FLARE_PEAK_MS`): the bloom at its
+ *                  fullest -- under it the star turns lit gold (#140);
  *   600 - 2000 ms  a ring of light spreads and thins out, a four-point
  *                  glint turns a little and fades, eight motes drift out.
  *
@@ -13,6 +15,10 @@
 
 export const FLARE_MS = 2000
 const GATHER_MS = 600
+/** How long the ignition bloom takes to swell to its fullest, as a share of the time after the gathering. */
+const BLOOM_SWELL = 0.12
+/** The flare's brightest moment, ms in: the bloom at its fullest. */
+export const FLARE_PEAK_MS = GATHER_MS + BLOOM_SWELL * (FLARE_MS - GATHER_MS)
 
 export type FlareColors = { lit: string; core: string }
 
@@ -61,7 +67,7 @@ export function drawFlare(
     const t = (elapsed - GATHER_MS) / (FLARE_MS - GATHER_MS)
 
     // Ignition bloom: quick to swell, slower to settle.
-    const bloom = t < 0.12 ? easeOut(t / 0.12) : 1 - easeOut((t - 0.12) / 0.88)
+    const bloom = t < BLOOM_SWELL ? easeOut(t / BLOOM_SWELL) : 1 - easeOut((t - BLOOM_SWELL) / (1 - BLOOM_SWELL))
     glow(ctx, x, y, base * (1.1 + 1.6 * bloom), colors, 0.35 + 0.65 * bloom)
 
     // The ring spreads and thins out.

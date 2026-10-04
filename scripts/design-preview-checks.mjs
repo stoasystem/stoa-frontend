@@ -8,7 +8,8 @@
  *
  *   1  lighting the demo point counts on math's map only, not physics' or chemistry's
  *   2  after it, each galaxy recommends at most one star, math its own next one
- *   3  a lit point whose star is off screen is not acknowledged (nor announced)
+ *   3  a lit point whose star is off screen is not acknowledged (nor announced), nor
+ *      drawn lit; opened by its star's route it lands on its nebula (#140)
  *   4  the French and Italian announcement names the star it agrees with
  *   5  a message sent in Ask, and its answer, stay in the thread, and after a reload
  *   6  back on the surface's first route, a reload opens that route
@@ -21,6 +22,7 @@ import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
+/* global window, document, URLSearchParams -- used inside the browser */
 
 
 function option(name, fallback) {
@@ -143,13 +145,21 @@ try {
       if (!waiting.includes('demo-sine-cosine') || phase !== 'idle' || said) {
         throw new Error(`off screen: unacknowledged ${JSON.stringify(waiting)}, phase ${phase}, announced "${said}"`)
       }
-      // Its own star, on screen: shown, then acknowledged.
+      // Not celebrated yet, so not drawn lit either (#140): its nebula's count leaves it out.
+      const trigonometry = () => page.getByText(/^Trigonometry, \d+ of \d+ lit/).first().textContent({ timeout: 8000 }).then((text) => text.split(', ')[1])
+      const header = await trigonometry()
+      // Its own star's route, on screen: it lands on the nebula seen whole (#140), shown, then acknowledged.
       await open(page, { path: '/map/math/trigonometry/demo-sine-cosine?points=1000' })
       await page.waitForSelector('[data-lighting="done"]', { timeout: 15_000 })
       const after = await unacknowledged(page)
+      const landed = await page.evaluate(() => [new URLSearchParams(window.location.search).get('path'), document.querySelector('[data-starmap-stage]')?.getAttribute('data-layer')])
+      // On its own nebula the count is the header's.
+      const counted = ((await page.getByText(/^· \d+ of \d+ lit$/).first().textContent({ timeout: 8000 })) ?? '').slice(2)
       await context.close()
       if (after.length) throw new Error(`shown but still unacknowledged: ${JSON.stringify(after)}`)
-      return `waited off screen; shown and acknowledged in math`
+      if (landed[0] !== '/map/math/trigonometry?points=1000' || landed[1] !== 'nebula') throw new Error(`landed on ${JSON.stringify(landed)}`)
+      if (Number(counted.split(' ')[0]) !== Number(header.split(' ')[0]) + 1) throw new Error(`Trigonometry counted "${header}" while waiting, "${counted}" once shown`)
+      return `waited off screen, not counted ("${header}"); landed on ${landed[0]}, shown, acknowledged, counted ("${counted}")`
     })
   }
 

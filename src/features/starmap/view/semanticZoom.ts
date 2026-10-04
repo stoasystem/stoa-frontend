@@ -56,6 +56,19 @@ export const ZOOM = {
   nebulaGlyph: 28,
   /** Choosing a star flies in until its glyph is this big (px), never out. */
   starGlyph: 34,
+  /**
+   * Back on the map from a lighting (#140): the star's nebula is seen whole,
+   * all its stars within this share of the band between the page's controls...
+   */
+  wholeNebulaFill: 0.9,
+  /**
+   * ...with its glyphs within this range (px): never closer than choosing the
+   * nebula, and never so far out that stars turn to dots, where in progress
+   * and lit look alike -- a nebula too big for that keeps its star in view...
+   */
+  wholeNebulaGlyph: [22, 28] as Ramp,
+  /** The star is kept within this share of the nebula's room around its middle, so its flare has space on every side. */
+  wholeNebulaKeep: 0.55,
 } as const
 
 /** What appears when, by zoom. Each `Ramp` is a fade from 0 to 1 between its two values. */
