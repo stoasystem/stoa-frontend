@@ -170,6 +170,14 @@ export type SceneFrame = {
    * first, more as the zoom grows. Absent: every star on screen.
    */
   starNameReach?: { x: number; y: number; radius: number; feather: number }
+  /**
+   * How far the names of stars other than the key ones (recommended, in
+   * progress, on the gold path) are in, 0..1 (#138 B2: `restStarNameAlpha`).
+   * Absent: 1, every star named alike.
+   */
+  restStarNames?: number
+  /** The star under the mouse, or -1 / absent: its name shows wherever star names can (#138 B2). */
+  hoveredStar?: number
   /** Nebula names, all of them (a multiplier on `nebulaNames`). */
   nebulaLabelAlpha: number
   /** Each nebula's name by zoom (#134: `nebulaNameAlpha`); absent: 1 for every nebula. */
@@ -245,7 +253,7 @@ export type RenderStats = {
   /** The nebula drawn with a focus ring in the last frame, or -1. */
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
-  links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number }
+  links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number; bridgeLabels?: number }
   /** Galaxy names drawn in the last frame (#137; one sky, far out). */
   galaxyNames?: number
   /** Names drawn in the last frame, star and nebula (#134). */

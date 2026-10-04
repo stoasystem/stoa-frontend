@@ -80,6 +80,7 @@ import {
   starFocusAmount,
   starNameAlpha,
   starNameReach,
+  restStarNameAlpha,
   starPxFor,
   DRAG,
   ZOOM,
@@ -331,6 +332,8 @@ export class StarMapEngine {
   private focusStar = -1
   private focusNebula = -1
   private hoveredNebula = -1
+  /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
+  private hoveredStar = -1
 
   private visibleKey = ''
   private emittedOnce = false
@@ -1209,8 +1212,10 @@ export class StarMapEngine {
   hoverAt(x: number | null, y = 0) {
     const id = x === null ? null : this.nebulaAt(x, y)
     const next = id ? this.nebulaIndex.get(id) ?? -1 : -1
-    if (next === this.hoveredNebula) return
+    const star = x === null ? -1 : this.grabbable(x, y, 'mouse')
+    if (next === this.hoveredNebula && star === this.hoveredStar) return
     this.hoveredNebula = next
+    this.hoveredStar = star
     this.invalidate()
   }
 
@@ -1464,6 +1469,8 @@ export class StarMapEngine {
       glyphSize,
       breath,
       starLabelAlpha: starNameAlpha(starPx),
+      restStarNames: restStarNameAlpha(starPx),
+      hoveredStar: this.hoveredStar,
       starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
       nebulaLabelAlpha: 1,
       nebulaNames: this.nebulaNames,

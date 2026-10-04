@@ -2,7 +2,8 @@
  * The connection lines on the canvas (#121): every line the star map draws
  * between nebulae and between stars, in one place. `model/linkTiers.ts`
  * decides how strongly each is drawn; this module only turns that into
- * strokes, and is the one call the Canvas 2D renderer makes for them.
+ * strokes. The Canvas 2D renderer calls it once for the lines, and once more
+ * (`drawEdgeLabels`) for the names at the edge, over the stars (#138 D5).
  *
  *   far out   soft bridges between related nebulae of one galaxy, and a
  *             faint glow at the edges of the dark between two galaxies that
@@ -15,6 +16,12 @@
  *             when it is off screen -- with its subject when that is another one.
  *   a star    chosen: its own lines, all four tiers, drawn to the other star.
  *
+ * Names at the screen's edge (where a line or a bridge leads, #121, #136,
+ * #138) are placed while the lines are drawn -- so star names keep clear of
+ * them -- but painted last, over the stars (#138 D5): with `obstacles.labels`
+ * they are handed back and the renderer paints them with `drawEdgeLabels`
+ * after the stars and names; without it they are painted at once.
+ *
  * Seam (#120): x wraps, `x mod 1`, galaxies on a ring. A line between two
  * points always takes the shorter way round (`shortestDx`), anchored on one
  * end's screen position, so it is right whichever copy of that end is
@@ -24,6 +31,7 @@
 import { LEARNING_STATES } from '@/features/starmap/model/starMap'
 import { linkWeight } from '@/features/starmap/model/links'
 import {
+  BRIDGE_FOCUSED,
   bridgeLook,
   galaxyHintLook,
   linkTier,
@@ -36,6 +44,9 @@ import {
   type StarLine,
 } from '@/features/starmap/model/linkTiers'
 import { boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { ditherHaze } from '@/features/starmap/render/galaxy'
+import { seededRandom } from '@/features/starmap/layout/layout'
+import { PANORAMA } from '@/features/starmap/view/semanticZoom'
 import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
 
 /**
@@ -86,15 +97,179 @@ export const HINT = { offset: 0.16, rx: 0.3, ry: 0.32, alpha: 1.6 } as const
 const DRAG_LINE_WIDTH = 1.6
 const DRAG_LINE_INK = 1.4
 
-/** What the lines took in the last frame (tests, and the acceptance count of #121). */
-export type LinkStats = { bridges: number; hints: number; lines: number; labels: number; dragLabels: number }
+/**
+ * What the lines took in the last frame (tests, and the acceptance count of
+ * #121). `bridgeLabels`: off-screen ends of a focused nebula's bridges to
+ * other galaxies named at the edge (#138 D3).
+ */
+export type LinkStats = { bridges: number; hints: number; lines: number; labels: number; dragLabels: number; bridgeLabels: number }
 
-/** The obstacles names must keep clear of: the renderer's own lists, added to. */
-export type LinkObstacles = { segments: Segment[]; boxes: Box[] }
+/** A name at the screen's edge (or beside a line): where its text goes, the box it holds, how strongly it is drawn. */
+export type EdgeLabel = { text: string; x: number; y: number; box: Box; alpha: number }
+
+/**
+ * The obstacles names must keep clear of: the renderer's own lists, added to.
+ * With `labels`, the edge names are placed (their boxes go into `boxes`) and
+ * handed back here to be painted later, over the stars (#138 D5).
+ */
+export type LinkObstacles = { segments: Segment[]; boxes: Box[]; labels?: EdgeLabel[] }
 
 export type LinkOptions = {
   /** x wraps (#120): also draw each shape one band to either side. */
   wrap?: boolean
+  /**
+   * The glow between two galaxies as a dithered sprite for this ink (#138:
+   * drawn this faint, a plain radial gradient shows rings of 8-bit steps).
+   * Absent, or null: the plain gradient.
+   */
+  glowSprite?: (ink: string) => CanvasImageSource | null
+}
+
+/** Size (px) of the dithered glow sprite between galaxies. */
+export const GLOW_SPRITE_PX = 256
+
+/** Stops of the glow's fade from its middle to its rim: `1 - smoothstep`, flat at both ends. */
+export const GLOW_STOPS = 12
+
+/** The glow's alpha at `t` (0 middle .. 1 rim): falls smoothly and meets the rim flat, so the rim leaves no edge. */
+export function glowProfile(t: number): number {
+  const u = Math.max(0, Math.min(1, t))
+  return 1 - u * u * (3 - 2 * u)
+}
+
+/**
+ * Paint the glow between galaxies into `canvas` (`GLOW_SPRITE_PX` square):
+ * the ink's colour, opaque at the middle, fading to nothing at the rim by
+ * `glowProfile` (the old linear fade met the dark at an angle and its rim
+ * read as a circle), with triangular dither on its alpha sized to the levels
+ * it has once drawn at the ink's own alpha (#137's `PANORAMA.dither`, as for
+ * the galaxy haze), so its fade has no rings either.
+ */
+export function paintGlowSprite(canvas: HTMLCanvasElement, ink: string): void {
+  const size = GLOW_SPRITE_PX
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  const half = size / 2
+  const glow = ctx.createRadialGradient(half, half, 0, half, half, half)
+  const opaque = 1 / Math.max(1e-3, inkAlpha(ink))
+  for (let k = 0; k <= GLOW_STOPS; k += 1) glow.addColorStop(k / GLOW_STOPS, fade(ink, opaque * glowProfile(k / GLOW_STOPS)))
+  ctx.clearRect(0, 0, size, size)
+  ctx.fillStyle = glow
+  ctx.beginPath()
+  ctx.arc(half, half, half, 0, Math.PI * 2)
+  ctx.fill()
+  const image = typeof ctx.getImageData === 'function' ? ctx.getImageData(0, 0, size, size) : undefined
+  if (image?.data) {
+    ditherHaze(image.data, glowDitherAmplitude(ink), seededRandom(5113))
+    ctx.putImageData(image, 0, 0)
+  }
+}
+
+/** How far (alpha levels of the sprite) the glow's dither reaches: `PANORAMA.dither` levels as drawn, at the ink's alpha. */
+export function glowDitherAmplitude(ink: string): number {
+  return PANORAMA.dither / Math.max(0.02, inkAlpha(ink))
+}
+
+/** The alpha of an ink (`#RRGGBB`: 1). */
+export function inkAlpha(color: string): number {
+  const value = color.trim()
+  if (value.startsWith('#')) return 1
+  const parts = value.match(/[\d.]+/g)?.map(Number) ?? []
+  return parts.length >= 4 ? Math.max(0, Math.min(1, parts[3])) : 1
+}
+
+/** An arrow pointing along `(dx, dy)` (screen y down). */
+export function arrowFor(dx: number, dy: number): string {
+  return dy < 0 ? (dx < 0 ? '↖' : '↗') : (dx < 0 ? '↙' : '↘')
+}
+
+const LABEL_FONT = (theme: StarMapTheme) => `500 12px ${theme.fontFamily}`
+
+/** Paint one edge name: a patch of sky, the text outlined in it. */
+function paintEdgeLabel(ctx: CanvasRenderingContext2D, label: EdgeLabel, theme: StarMapTheme) {
+  ctx.globalAlpha = label.alpha
+  ctx.fillStyle = theme.sky
+  ctx.fillRect(label.box.x0, label.box.y0, label.box.x1 - label.box.x0, label.box.y1 - label.box.y0)
+  ctx.lineJoin = 'round'
+  ctx.lineWidth = 3
+  ctx.strokeStyle = theme.sky
+  ctx.strokeText(label.text, label.x, label.y)
+  ctx.fillStyle = theme.textBody
+  ctx.fillText(label.text, label.x, label.y)
+}
+
+/**
+ * Paint the edge names `drawLinks` placed (#138 D5): the renderer's second
+ * call into this module, after the stars and their names, so a name at the
+ * edge is never under a star. Returns how many it painted.
+ */
+export function drawEdgeLabels(ctx: CanvasRenderingContext2D, labels: readonly EdgeLabel[], theme: StarMapTheme): number {
+  if (labels.length === 0) return 0
+  ctx.save()
+  ctx.font = LABEL_FONT(theme)
+  ctx.textBaseline = 'middle'
+  ctx.textAlign = 'center'
+  ctx.setLineDash([])
+  for (const label of labels) paintEdgeLabel(ctx, label, theme)
+  ctx.restore()
+  return labels.length
+}
+
+/** Hand a placed name to the renderer (`obstacles.labels`), or paint it now. */
+function emitLabel(ctx: CanvasRenderingContext2D, label: EdgeLabel, theme: StarMapTheme, obstacles: LinkObstacles) {
+  if (obstacles.labels) obstacles.labels.push(label)
+  else paintEdgeLabel(ctx, label, theme)
+}
+
+/** `text` cut with an ellipsis to fit `max` px in the context's font. */
+function fitText(ctx: CanvasRenderingContext2D, text: string, max: number): string {
+  let out = text
+  while (ctx.measureText(out).width > max && out.length > 5) out = `${out.slice(0, -2)}…`
+  return out
+}
+
+/**
+ * Place a name at the screen's edge where the ray from `(fx, fy)` along
+ * `(dx, dy)` leaves the area between the page's controls -- else slid along
+ * that edge until it is free, never over `avoid` (the dragged star, the
+ * focused nebula). Its box goes into the obstacles. Null: nowhere free.
+ */
+function placeAtEdge(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  fx: number,
+  fy: number,
+  dx: number,
+  dy: number,
+  frame: SceneFrame,
+  obstacles: LinkObstacles,
+  alpha: number,
+  avoid?: Circle,
+): EdgeLabel | null {
+  const { width, height } = frame.viewport
+  const top = frame.viewport.top ?? 0
+  const bottom = height - (frame.viewport.bottom ?? 0)
+  const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
+  const hit = Math.min(dx > 0 ? (width - 16 - fx) / dx : dx < 0 ? (16 - fx) / dx : Infinity,
+    dy > 0 ? (bottom - 24 - fy) / dy : dy < 0 ? (top + 16 - fy) / dy : Infinity)
+  if (!(hit > 0) || !Number.isFinite(hit)) return null
+  const fitted = fitText(ctx, text, Math.min(220, width - 40))
+  const half = ctx.measureText(fitted).width / 2 + 8
+  const x = Math.max(half + 12, Math.min(width - half - 12, fx + dx * hit))
+  const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, fy + dy * hit))
+  const spots: Box[] = []
+  const across = Math.abs(dx) + Math.abs(dy) || 1
+  for (const shift of [0, 1, -1, 2, -2, 3, -3]) {
+    const sx = Math.max(half + 12, Math.min(width - half - 12, x + shift * (half * 2 + 8) * Math.abs(dy) / across))
+    const sy = Math.max(area.y0 + 14, Math.min(area.y1 - 14, y + shift * 32 * Math.abs(dx) / across))
+    spots.push({ x0: sx - half, y0: sy - 12, x1: sx + half, y1: sy + 12 })
+  }
+  const box = placeLabel(spots, { boxes: obstacles.boxes, circles: [], segments: [] }, area, (b) => (avoid && boxHitsCircle(b, avoid) ? Infinity : 0))
+  if (!box) return null
+  obstacles.boxes.push(box)
+  return { text: fitted, x: (box.x0 + box.x1) / 2, y: (box.y0 + box.y1) / 2, box, alpha }
 }
 
 /** `xb - xa` the shorter way round a band of width 1: in [-0.5, 0.5). */
@@ -141,6 +316,8 @@ function prepare(scene: SceneData): Prepared {
       toNebula: scene.nebula[to],
       tier: linkTier(LEARNING_STATES[scene.state[from]], LEARNING_STATES[scene.state[to]], recommended.has(to)),
     }
+    const [ga, gb] = [galaxyOf[line.fromNebula] ?? -1, galaxyOf[line.toNebula] ?? -1]
+    if (ga >= 0 && gb >= 0 && ga !== gb) line.crossSubject = true
     lines.push(line)
   }
   const bridges: NebulaBridge[] = scene.links.map((link) => ({
@@ -194,7 +371,7 @@ export function drawLinks(
   obstacles: LinkObstacles,
   options: LinkOptions = {},
 ): LinkStats {
-  const stats: LinkStats = { bridges: 0, hints: 0, lines: 0, labels: 0, dragLabels: 0 }
+  const stats: LinkStats = { bridges: 0, hints: 0, lines: 0, labels: 0, dragLabels: 0, bridgeLabels: 0 }
   const ink = theme.links ?? LINK_INK
   const data = prepare(scene)
   const { width, height } = frame.viewport
@@ -224,6 +401,7 @@ export function drawLinks(
   if (view.bridges > 0) {
     const focus = frame.highlightNebula >= 0 ? frame.highlightNebula : frame.chosenNebula >= 0 ? frame.chosenNebula : (frame.hoveredNebula ?? -1)
     const cores: Circle[] = scene.nebulae.map((_, n) => ({ x: frame.nebulaX[n], y: frame.nebulaY[n], r: frame.nebulaR[n] * 0.6 }))
+    const sprite = data.hints.length > 0 ? options.glowSprite?.(ink.bridge) ?? null : null
 
     for (const hint of data.hints) {
       const bridged = focus >= 0 && data.bridges.some((b) => b.crossGalaxy && (b.a === focus || b.b === focus) &&
@@ -245,13 +423,21 @@ export function drawLinks(
           const x = frame.ox + (edge + dir * gap * HINT.offset + k) * band
           const y = frame.oy + cy * band
           if (!onScreen(x - rx, y - ry, x + rx, y + ry, 0)) continue
+          const alpha = Math.min(1, strength * HINT.alpha) * (own.dim ?? 1)
+          if (sprite) {
+            // The same fade, dithered once into a sprite: no rings of 8-bit steps (#138).
+            ctx.globalAlpha = alpha * inkAlpha(ink.bridge)
+            ctx.drawImage(sprite, x - rx, y - ry, rx * 2, ry * 2)
+            drawn = true
+            continue
+          }
           ctx.save()
           ctx.translate(x, y)
           ctx.scale(rx, ry)
           const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, 1)
           glow.addColorStop(0, fade(ink.bridge, 1))
           glow.addColorStop(1, fade(ink.bridge, 0))
-          ctx.globalAlpha = Math.min(1, strength * HINT.alpha) * (own.dim ?? 1)
+          ctx.globalAlpha = alpha
           ctx.fillStyle = glow
           ctx.beginPath()
           ctx.arc(0, 0, 1, 0, Math.PI * 2)
@@ -312,6 +498,29 @@ export function drawLinks(
         drawn = true
       }
       if (drawn) stats.bridges += 1
+      // A focused nebula's bridge into another galaxy whose far end is off
+      // screen (a phone, #138 D3): the edge points to it, "↖ Trigonometry · Mathematics".
+      if (bridge.crossGalaxy && focus >= 0 && (a === focus || b === focus)) {
+        const far = a === focus ? b : a
+        const fx = frame.nebulaX[focus]
+        const fy = frame.nebulaY[focus]
+        const ex = fx + shortestDx(scene.nebulae[focus].x, scene.nebulae[far].x) * band
+        const ey = frame.nebulaY[far]
+        const top = frame.viewport.top ?? 0
+        const bottom = height - (frame.viewport.bottom ?? 0)
+        if (ex >= 0 && ex <= width && ey >= top && ey <= bottom) continue
+        const subject = scene.galaxies?.[data.galaxyOf[far]]?.name
+        ctx.font = LABEL_FONT(theme)
+        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'center'
+        const text = `${arrowFor(ex - fx, ey - fy)} ${scene.nebulae[far].name}${subject ? ` · ${subject}` : ''}`
+        const own = { x: fx, y: fy, r: frame.nebulaR[focus] * 1.05 + 6 }
+        const label = placeAtEdge(ctx, text, fx, fy, ex - fx, ey - fy, frame, obstacles, Math.min(1, strength / BRIDGE_FOCUSED), own)
+        if (label) {
+          emitLabel(ctx, label, theme, obstacles)
+          stats.bridgeLabels += 1
+        }
+      }
     }
   }
 
@@ -410,7 +619,9 @@ export function drawLinks(
         drawn = true
         if (!leaves || view.chosen < 0 || (pNebula !== view.chosen && p !== view.focusStar)) continue
         const known = leadsTo.get(qNebula)
-        if (strength >= 0.5 && (!known || strength > known.strength || (reach > 0 && !known.along))) {
+        // Across subjects even a faint direction names where it leads (#138 D2).
+        const named = strength >= 0.5 || (line.crossSubject === true && strength >= 0.05)
+        if (named && (!known || strength > known.strength || (reach > 0 && !known.along))) {
           leadsTo.set(qNebula, { strength, along: reach > 0 ? { x: px, y: py, ux, uy, d } : known?.along ?? null })
         }
       }
@@ -430,7 +641,7 @@ export function drawLinks(
       const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
       const cx = frame.nebulaX[view.chosen]
       const cy = frame.nebulaY[view.chosen]
-      ctx.font = `500 12px ${theme.fontFamily}`
+      ctx.font = LABEL_FONT(theme)
       ctx.textBaseline = 'middle'
       ctx.textAlign = 'center'
       for (const n of [...leadsTo.keys()].sort((m, o) => leadsTo.get(o)!.strength - leadsTo.get(m)!.strength || m - o)) {
@@ -447,8 +658,7 @@ export function drawLinks(
           // The star layer: the name rides on the star's own line, near the star -- the
           // screen's edge may be under the star's card.
           const t = Math.min(along.d * 0.5, 200)
-          const arrow = along.uy < 0 ? (along.ux < 0 ? '↖' : '↗') : (along.ux < 0 ? '↙' : '↘')
-          text = `${arrow} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
+          text = `${arrowFor(along.ux, along.uy)} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
           const side = along.ux < 0 ? 1 : -1
           at = { x: along.x + along.ux * t - along.uy * 16 * side, y: along.y + along.uy * t + along.ux * 16 * side }
         } else if (visible) {
@@ -462,26 +672,17 @@ export function drawLinks(
           const hit = Math.min(dx > 0 ? (width - 16 - cx) / dx : dx < 0 ? (16 - cx) / dx : Infinity,
             dy > 0 ? (bottom - 24 - cy) / dy : dy < 0 ? (top + 16 - cy) / dy : Infinity)
           if (!(hit > 0) || !Number.isFinite(hit)) continue
-          const arrow = dy < 0 ? (dx < 0 ? '↖' : '↗') : (dx < 0 ? '↙' : '↘')
-          text = `${arrow} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
+          text = `${arrowFor(dx, dy)} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
           at = { x: cx + dx * hit, y: cy + dy * hit }
         }
-        while (ctx.measureText(text).width > Math.min(220, width - 40) && text.length > 5) text = `${text.slice(0, -2)}…`
+        text = fitText(ctx, text, Math.min(220, width - 40))
         const half = ctx.measureText(text).width / 2 + 8
         const x = Math.max(half + 12, Math.min(width - half - 12, at.x))
         const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, at.y))
         const box = placeLabel([{ x0: x - half, y0: y - 12, x1: x + half, y1: y + 12 }], { boxes: obstacles.boxes, circles: [], segments: [] }, area)
         if (!box) continue
         obstacles.boxes.push(box)
-        ctx.globalAlpha = labelAlpha
-        ctx.fillStyle = theme.sky
-        ctx.fillRect(box.x0, box.y0, half * 2, 24)
-        ctx.lineJoin = 'round'
-        ctx.lineWidth = 3
-        ctx.strokeStyle = theme.sky
-        ctx.strokeText(text, x, y)
-        ctx.fillStyle = theme.textBody
-        ctx.fillText(text, x, y)
+        emitLabel(ctx, { text, x, y, box, alpha: labelAlpha }, theme, obstacles)
         stats.labels += 1
       }
     }
@@ -500,8 +701,11 @@ export function drawLinks(
 
 /**
  * Name, at the screen's edge, where a dragged star's off-screen linked stars
- * are (#136 D6): one name per nebula they are in, in the direction of the
- * nearest of them from the dragged star, the shorter way round the ring.
+ * are (#136 D6): one name per other nebula they are in -- the nebula, with
+ * its subject when that is another one -- in the direction of the nearest of
+ * them from the dragged star, the shorter way round the ring. A linked star
+ * in the dragged star's own nebula is named itself (#138 H4): its nebula's
+ * name would only repeat the one on screen.
  */
 function drawDragDestinations(
   ctx: CanvasRenderingContext2D,
@@ -515,13 +719,11 @@ function drawDragDestinations(
   const drag = frame.drag!
   const g = drag.star
   const { width, height } = frame.viewport
-  const top = frame.viewport.top ?? 0
-  const bottom = height - (frame.viewport.bottom ?? 0)
   const gx = frame.x[g]
   const gy = frame.y[g]
   const own = scene.nebula[g]
-  // The nearest off-screen linked star of each nebula.
-  const nearest = new Map<number, { dx: number; dy: number; d: number }>()
+  // The nearest off-screen linked star of each other nebula; each one of its own nebula (keyed -1 - star).
+  const nearest = new Map<number, { dx: number; dy: number; d: number; star: number }>()
   for (let i = 0; i < scene.count; i += 1) {
     if (drag.related[i] !== 1 || i === g) continue
     const dx = shortestDx(scene.mapX[g], scene.mapX[i]) * frame.scale + drag.offsetX[i] - drag.offsetX[g]
@@ -531,51 +733,30 @@ function drawDragDestinations(
     // On screen (under the page's own controls too): its line shows where it is.
     if (x >= 0 && x <= width && y >= 0 && y <= height) continue
     const n = scene.nebula[i]
+    const key = n === own ? -1 - i : n
     const d = Math.hypot(dx, dy)
-    const known = nearest.get(n)
-    if (!known || d < known.d) nearest.set(n, { dx, dy, d })
+    const known = nearest.get(key)
+    if (!known || d < known.d) nearest.set(key, { dx, dy, d, star: i })
   }
   if (nearest.size === 0) return 0
-  const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
-  ctx.font = `500 12px ${theme.fontFamily}`
+  ctx.font = LABEL_FONT(theme)
   ctx.textBaseline = 'middle'
   ctx.textAlign = 'center'
+  // Never over the dragged star itself: the hand is there.
+  const held = { x: gx, y: gy, r: frame.glyphSize * 0.8 + 6 }
   let drawn = 0
-  for (const [n, { dx, dy }] of [...nearest].sort((a, b) => a[1].d - b[1].d || a[0] - b[0])) {
-    const hit = Math.min(dx > 0 ? (width - 16 - gx) / dx : dx < 0 ? (16 - gx) / dx : Infinity,
-      dy > 0 ? (bottom - 24 - gy) / dy : dy < 0 ? (top + 16 - gy) / dy : Infinity)
-    if (!(hit > 0) || !Number.isFinite(hit)) continue
-    const ga = galaxyOf[n]
-    const subject = ga >= 0 && ga !== galaxyOf[own] ? scene.galaxies?.[ga]?.name : undefined
-    const arrow = dy < 0 ? (dx < 0 ? '↖' : '↗') : (dx < 0 ? '↙' : '↘')
-    let text = `${arrow} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
-    while (ctx.measureText(text).width > Math.min(220, width - 40) && text.length > 5) text = `${text.slice(0, -2)}…`
-    const half = ctx.measureText(text).width / 2 + 8
-    const x = Math.max(half + 12, Math.min(width - half - 12, gx + dx * hit))
-    const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, gy + dy * hit))
-    // Never over the dragged star itself: the hand is there.
-    const held = { x: gx, y: gy, r: frame.glyphSize * 0.8 + 6 }
-    // At the edge where the line leaves, else slid along the edge to clear the star.
-    const spots: Box[] = []
-    for (const shift of [0, 1, -1, 2, -2, 3, -3]) {
-      const sx = Math.max(half + 12, Math.min(width - half - 12, x + shift * (half * 2 + 8) * Math.abs(dy) / (Math.abs(dx) + Math.abs(dy) || 1)))
-      const sy = Math.max(area.y0 + 14, Math.min(area.y1 - 14, y + shift * 32 * Math.abs(dx) / (Math.abs(dx) + Math.abs(dy) || 1)))
-      spots.push({ x0: sx - half, y0: sy - 12, x1: sx + half, y1: sy + 12 })
+  for (const [key, { dx, dy, star }] of [...nearest].sort((a, b) => a[1].d - b[1].d || a[0] - b[0])) {
+    let name: string
+    if (key < 0) {
+      name = scene.names[star]
+    } else {
+      const ga = galaxyOf[key]
+      const subject = ga >= 0 && ga !== galaxyOf[own] ? scene.galaxies?.[ga]?.name : undefined
+      name = `${scene.nebulae[key].name}${subject ? ` · ${subject}` : ''}`
     }
-    const box = placeLabel(spots, { boxes: obstacles.boxes, circles: [], segments: [] }, area, (b) => (boxHitsCircle(b, held) ? Infinity : 0))
-    if (!box) continue
-    obstacles.boxes.push(box)
-    ctx.globalAlpha = alpha
-    ctx.fillStyle = theme.sky
-    ctx.fillRect(box.x0, box.y0, half * 2, 24)
-    ctx.lineJoin = 'round'
-    ctx.lineWidth = 3
-    ctx.strokeStyle = theme.sky
-    const lx = (box.x0 + box.x1) / 2
-    const ly = (box.y0 + box.y1) / 2
-    ctx.strokeText(text, lx, ly)
-    ctx.fillStyle = theme.textBody
-    ctx.fillText(text, lx, ly)
+    const label = placeAtEdge(ctx, `${arrowFor(dx, dy)} ${name}`, gx, gy, dx, dy, frame, obstacles, alpha, held)
+    if (!label) continue
+    emitLabel(ctx, label, theme, obstacles)
     drawn += 1
   }
   return drawn

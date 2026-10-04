@@ -24,10 +24,12 @@
  *             galaxies, only a faint glow at the edges of the dark between
  *             them. The bridges fade out as tiers 1-2 fade in.
  *   closer    every star's lines on screen, tiers 1-2 first, then 3 (the
- *             path walked), tier 4 (locked) only when the glyph is very
- *             large; a line to another nebula is drawn from its star towards
- *             the other end and fades out with distance, keeping only its
- *             direction. A focused star: only its own lines stay lit.
+ *             path walked); tier 4 (locked) only for the star in focus
+ *             (#138 D1); a line to another nebula is drawn from its star
+ *             towards the other end and fades out with distance, keeping
+ *             only its direction -- one across subjects is kept at least
+ *             faintly, whatever its tier (#138 D2). A focused star: only its
+ *             own lines stay lit.
  *   a star    chosen (its card open): its prerequisites and successors fully
  *             lit, tier 4 included, drawn to the other end; everything else
  *             fades away as the map gives way to it.
@@ -35,6 +37,7 @@
  *             to the other end, whatever its tier; every other line dimmed.
  */
 import type { LearningState } from '@/features/starmap/model/starMap'
+import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
 export const TIER_RECOMMENDED = 1
 export const TIER_IN_PROGRESS = 2
@@ -82,8 +85,14 @@ export type LinkView = {
   drag?: number
 }
 
-/** A prerequisite between two stars, by index, with their nebulae and its tier. */
-export type StarLine = { from: number; to: number; fromNebula: number; toNebula: number; tier: LinkTier }
+/**
+ * A prerequisite between two stars, by index, with their nebulae and its
+ * tier; `crossSubject`: its ends are in two galaxies (#138 D2).
+ */
+export type StarLine = { from: number; to: number; fromNebula: number; toNebula: number; tier: LinkTier; crossSubject?: boolean }
+
+/** A relation across subjects keeps at least this share of its ink once tiers 1-2 are in (#138 D2). */
+export const CROSS_SUBJECT_LINE = REVEAL.crossSubjectLine
 
 /**
  * How a star-to-star line is drawn: `strength` multiplies its tier's ink (0 =
@@ -96,7 +105,11 @@ export function starLineLook(line: StarLine, view: LinkView): { strength: number
   const focused = view.focusStar >= 0 && (line.from === view.focusStar || line.to === view.focusStar)
   const star = Math.max(0, Math.min(1, view.star))
   // By zoom: this tier's share; with a star in focus, only its own lines stay lit.
-  const tier = Math.max(0, Math.min(1, view.tiers[line.tier] ?? 0))
+  const share = (t: number) => Math.max(0, Math.min(1, view.tiers[t] ?? 0))
+  // Tier 4 (locked) only for the star in focus (#138 D1): never every star's dashes.
+  let tier = line.tier === TIER_LOCKED ? (focused ? share(TIER_LOCKED) : 0) : share(line.tier)
+  // Across subjects, whatever its tier, at least a faint direction (#138 D2).
+  if (line.crossSubject) tier = Math.max(tier, CROSS_SUBJECT_LINE * share(TIER_RECOMMENDED))
   const atZoom = view.focusStar >= 0 && !focused ? tier * UNFOCUSED_LINE : tier
   // A chosen star: only its own lines, every tier.
   const atStar = focused ? 1 : 0
