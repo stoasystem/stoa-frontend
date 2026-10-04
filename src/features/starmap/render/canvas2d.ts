@@ -10,9 +10,10 @@
  */
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
-import { DRAG, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
+import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
-import { CLOUD_REACH, GALAXY_HAZE_ALPHA, galaxyHazeBox, NEBULA_GLOW, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
+import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
+import { drawGalaxyNames } from '@/features/starmap/render/galaxyNames'
 import { drawLinks } from '@/features/starmap/render/links'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
@@ -190,7 +191,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let dpr = 1
   let theme: StarMapTheme | null = null
   let data: SceneData | null = null
-  let sprites: { small: Sprite[]; large: Sprite[]; dots: HTMLCanvasElement[] } | null = null
+  let sprites: { small: Sprite[]; large: Sprite[]; dots: HTMLCanvasElement[]; quietDots: HTMLCanvasElement[]; dotGlows: HTMLCanvasElement[] } | null = null
   let snapshotCanvas: HTMLCanvasElement | null = null
   let skyCanvas: HTMLCanvasElement | null = null
   /** One sky: each galaxy's haze, painted once per sky and theme. */
@@ -232,8 +233,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
     })
   }
 
-  /** A dot sprite per state: a core of radius 1/4 of the sprite, a soft glow for lit ones. */
-  const buildDots = (): HTMLCanvasElement[] => {
+  /**
+   * A dot sprite per state: a core of radius 1/4 of the sprite, a soft glow
+   * for lit ones (`glow`), or only the glow (`'glow'`) or only the core
+   * (`'core'`), which the panorama crossfades (#137: lit dots lose their glow far out).
+   */
+  const buildDots = (part: 'both' | 'glow' | 'core' = 'both'): HTMLCanvasElement[] => {
     const size = 32
     return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((state) => {
       const dot = DOT[state]
@@ -241,9 +246,11 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const s = sprite.getContext('2d')
       if (s && theme) {
         s.translate(size / 2, size / 2)
-        if (dot.glow) halo(s, size * 0.22, size * 0.12, theme.lit, 0.35)
-        disc(s, (size / 4) * dot.radius, dot.lit ? theme.lit : theme.text, dot.alpha)
-        if (state === STATE_LIT) disc(s, size * 0.08, theme.litCore)
+        if (dot.glow && part !== 'core') halo(s, size * 0.22, size * 0.12, theme.lit, 0.35)
+        if (part !== 'glow') {
+          disc(s, (size / 4) * dot.radius, dot.lit ? theme.lit : theme.text, dot.alpha)
+          if (state === STATE_LIT) disc(s, size * 0.08, theme.litCore)
+        }
       }
       return sprite
     })
@@ -310,6 +317,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       small: buildSprites(GLYPH_SMALL, LARGEST_BOX.small),
       large: buildSprites(GLYPH_LARGE, LARGEST_BOX.large),
       dots: buildDots(),
+      quietDots: buildDots('core'),
+      dotGlows: buildDots('glow'),
     }
     tiles.clear()
   }
@@ -426,6 +435,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       if (skyCanvas) ctx.drawImage(skyCanvas, 0, 0, width, height)
 
       const { nebulaX, nebulaY, nebulaR, sharpness, x, y, starAlpha } = frame
+      // The panorama's light (#137): 1 at the farthest zoom of one sky, 0 once past it.
+      const look = frame.pastPanorama === undefined ? 0 : panoramaLook(frame.pastPanorama, frame.starPx)
       const { state, count } = scene
       const nebulaCount = scene.nebulae.length
       const onScreen = (px: number, py: number, r: number) => px + r > 0 && py + r > 0 && px - r < width && py - r < height
@@ -458,7 +469,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           const x0 = frame.ox + (box.x0 + turn) * frame.scale + dx
           const x1 = frame.ox + (box.x1 + turn) * frame.scale + dx
           if (x1 - dx < -margin || x0 - dx > width + margin) return
-          target.globalAlpha = GALAXY_HAZE_ALPHA * galaxy.dim
+          target.globalAlpha = galaxyHazeAlpha(look) * galaxy.dim
           target.drawImage(haze, x0, frame.oy + box.y0 * frame.scale + dy, x1 - x0, (box.y1 - box.y0) * frame.scale)
         })
         for (let n = 0; n < nebulaCount; n += 1) {
@@ -466,7 +477,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           if (!inView(nebulaX[n], nebulaY[n], reach)) continue
           const nebula = scene.nebulae[n]
           const litShare = nebula.total > 0 ? nebula.lit / nebula.total : 0
-          target.globalAlpha = (NEBULA_GLOW.base + NEBULA_GLOW.lit * litShare) * (nebula.dim ?? 1) * nebulaDim(n)
+          target.globalAlpha = nebulaGlowAlpha(litShare, look) * (nebula.dim ?? 1) * nebulaDim(n)
           target.drawImage(tileOf(n, reach).haze, nebulaX[n] - reach + dx, nebulaY[n] - reach + dy, reach * 2, reach * 2)
         }
         target.globalAlpha = 1
@@ -507,6 +518,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           paintLight(ctx, 0, 0, 0)
         }
         lastLightKey = key
+        // Far out, each galaxy's name, very faint, under its stars (#137 A3).
+        stats.galaxyNames = drawGalaxyNames(ctx, scene, frame, colours)
       }
 
       // Haze under every nebula (one sky: its cloud, above), and the blurred stars of those outside the focus.
@@ -585,6 +598,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       /** The dragged star grows a little while it is held. */
       const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
 
+      const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((st) => panoramaDot(DOT[st].lit, look))
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.
       // A dragged star is drawn last, over the stars it passes.
       const lastStar = drag ? drag.star : count - 1
@@ -608,9 +622,22 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
         }
         if (frame.dotBlend > 0.01 && !beacon) {
-          const size = frame.dotRadius * 4
-          ctx.globalAlpha = a * frame.dotBlend * focus
-          ctx.drawImage(set.dots[state[i]], x[i] - size / 2, y[i] - size / 2, size, size)
+          // On the panorama a lit star is a small, dim dot without its glow: the light is its nebula's (#137 A2).
+          const quiet = dotLooks[state[i]]
+          const size = frame.dotRadius * 4 * quiet.radius
+          const alpha = a * frame.dotBlend * focus * quiet.alpha
+          const at = [x[i] - size / 2, y[i] - size / 2, size, size] as const
+          if (quiet.glow >= 0.99 || !DOT[state[i]].glow) {
+            ctx.globalAlpha = alpha
+            ctx.drawImage(set.dots[state[i]], ...at)
+          } else {
+            if (quiet.glow > 0.01) {
+              ctx.globalAlpha = alpha * quiet.glow
+              ctx.drawImage(set.dotGlows[state[i]], ...at)
+            }
+            ctx.globalAlpha = alpha
+            ctx.drawImage(set.quietDots[state[i]], ...at)
+          }
         }
         stats.starDraws += 1
       }

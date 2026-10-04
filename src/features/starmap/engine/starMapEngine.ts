@@ -1442,6 +1442,8 @@ export class StarMapEngine {
     return {
       dotBlend: Math.max(dotBlendFor(glyphSize), 1 - ramp(pastPanorama, REVEAL.dotsPastPanorama)),
       dotRadius: Math.max(1.15, Math.min(2.1, t.scale * this.dotSpacing * 0.11)),
+      pastPanorama: this.sky ? pastPanorama : undefined,
+      starPx,
       viewport: this.viewport,
       scale: t.scale,
       ox: t.ox,

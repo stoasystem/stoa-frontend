@@ -18,21 +18,51 @@
  */
 import { seededRandom } from '@/features/starmap/layout/layout'
 import type { SceneData, StarMapTheme } from '@/features/starmap/render/types'
+import { PANORAMA } from '@/features/starmap/view/semanticZoom'
 
 export const SKY_MIST_ALPHA = 0.04
 
-/** A nebula's cloud is drawn at `base`, plus `lit` times its lit share (#117: a nebula brightens as it is lit). */
+/**
+ * A nebula's cloud, zoomed in, is drawn at `base`, plus `lit` times its lit
+ * share (#117: a nebula brightens as it is lit). On the panorama it glows
+ * brighter, `PANORAMA.nebulaGlow` (#137): see `nebulaGlowAlpha`.
+ */
 export const NEBULA_GLOW = { base: 0.1, lit: 0.06 } as const
 
-/** A galaxy's haze, under its nebulae. */
+/**
+ * A nebula cloud's alpha for its lit share at `look` (1 on the panorama, 0
+ * zoomed in, `panoramaLook`): rises with the lit share at every zoom.
+ */
+export function nebulaGlowAlpha(litShare: number, look: number): number {
+  const share = Math.max(0, Math.min(1, litShare))
+  const t = Math.max(0, Math.min(1, look))
+  const base = NEBULA_GLOW.base + (PANORAMA.nebulaGlow.base - NEBULA_GLOW.base) * t
+  const lit = NEBULA_GLOW.lit + (PANORAMA.nebulaGlow.lit - NEBULA_GLOW.lit) * t
+  return base + lit * share
+}
+
+/** A galaxy's haze, under its nebulae, zoomed in (on the panorama it is `PANORAMA.galaxyHaze`, #137). */
 export const GALAXY_HAZE_ALPHA = 0.04
 
+/** A galaxy haze's alpha at `look` (1 on the panorama, 0 zoomed in): strong far out, so a galaxy reads as one whole (#137 A3). */
+export function galaxyHazeAlpha(look: number): number {
+  const t = Math.max(0, Math.min(1, look))
+  return GALAXY_HAZE_ALPHA + (PANORAMA.galaxyHaze - GALAXY_HAZE_ALPHA) * t
+}
+
 /**
- * The brightest the sky's light can stack to anywhere: a galaxy's haze under
- * a fully lit nebula's core. `starmapContrast` checks names, lines and a
- * locked star against white at this alpha, an upper bound of the real light.
+ * The brightest the sky's light can stack to wherever star names, lines and
+ * full glyphs are drawn: a galaxy's haze under a fully lit nebula's core,
+ * zoomed in. `starmapContrast` checks names, lines and a locked star against
+ * white at this alpha, an upper bound of the real light. The panorama's
+ * brighter clouds (`PANORAMA.nebulaGlow`) have given way before any of those
+ * appear (`starmapPanoramaLight` checks the order); far out only dots, the
+ * recommended star and an outlined nebula name sit on them.
  */
 export const KNOWLEDGE_GLOW_ALPHA = GALAXY_HAZE_ALPHA + NEBULA_GLOW.base + NEBULA_GLOW.lit
+
+/** The same bound on the panorama, with its brighter clouds (#137). */
+export const PANORAMA_GLOW_ALPHA = galaxyHazeAlpha(1) + nebulaGlowAlpha(1, 1)
 
 /** How far a nebula's cloud tile reaches past its disc, in disc radii. */
 export const CLOUD_REACH = 1.35
@@ -175,14 +205,19 @@ export function paintNebulaCloud(ctx: CanvasRenderingContext2D, size: number, da
   ctx.globalAlpha = 1
 }
 
+/** A galaxy haze box's margin round its stars, as a share of the galaxy's height. */
+const HAZE_MARGIN = 0.35
+
 /** Where a galaxy's haze canvas sits, map units: its box with room for the haze to fade. */
 export function galaxyHazeBox(galaxy: { x0: number; x1: number; y0: number; y1: number }) {
-  const margin = (galaxy.y1 - galaxy.y0) * 0.35
+  const margin = (galaxy.y1 - galaxy.y0) * HAZE_MARGIN
   return { x0: galaxy.x0 - margin, y0: galaxy.y0 - margin, x1: galaxy.x1 + margin, y1: galaxy.y1 + margin }
 }
 
-/** How far in from each edge a galaxy's haze fades out, as a share of its width. */
-const HAZE_EDGE = 0.06
+/** How much of a haze box's margin (`galaxyHazeBox`) its edge fade spans: all of it, so no edge reads as a line (#137 C4). */
+const HAZE_EDGE = 1
+/** The edge fade's stops: a smoothstep, so its start and end are as soft as its middle. */
+const HAZE_EDGE_STOPS = 8
 
 /** One galaxy's haze, `width` device px wide, in its base tint, with sparse dust between its nebulae. */
 export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, data: SceneData, index: number,
@@ -215,22 +250,58 @@ export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, da
   }
   // A nebula's soft brush can reach past the box: fade the canvas out at all
   // four edges, so the haze never ends in a straight cut (in the gaps between
-  // galaxies, and across the ring's seam, #120).
+  // galaxies, and across the ring's seam, #120). The fade spans the box's
+  // whole margin as a smoothstep: a short linear one showed as a vertical
+  // line once the panorama's haze was made stronger (#137 C4).
   const height = ctx.canvas?.height ?? 0
   if (height > 0) {
     ctx.globalAlpha = 1
     ctx.globalCompositeOperation = 'destination-in'
+    const margin = (galaxy.y1 - galaxy.y0) * HAZE_MARGIN * k * HAZE_EDGE
     for (const [x1, y1, length] of [[width, 0, width], [0, height, height]] as const) {
       const fade = ctx.createLinearGradient(0, 0, x1, y1)
-      const edge = Math.min(0.5, (HAZE_EDGE * width) / length)
-      fade.addColorStop(0, 'rgba(0, 0, 0, 0)')
-      fade.addColorStop(edge, 'rgba(0, 0, 0, 1)')
-      fade.addColorStop(1 - edge, 'rgba(0, 0, 0, 1)')
-      fade.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      const edge = Math.min(0.5, margin / length)
+      for (let i = 0; i <= HAZE_EDGE_STOPS; i += 1) {
+        const t = i / HAZE_EDGE_STOPS
+        const alpha = t * t * (3 - 2 * t)
+        fade.addColorStop(edge * t, `rgba(0, 0, 0, ${alpha})`)
+        fade.addColorStop(1 - edge * t, `rgba(0, 0, 0, ${alpha})`)
+      }
       ctx.fillStyle = fade
       ctx.fillRect(0, 0, width, height)
     }
     ctx.globalCompositeOperation = 'source-over'
+    // Drawn at a few percent, the haze has only a dozen alpha levels from its
+    // core to the dark: dither them, or its fades fall into bands (#137 C4).
+    const image = typeof ctx.getImageData === 'function' ? ctx.getImageData(0, 0, width, height) : undefined
+    if (image?.data) {
+      ditherHaze(image.data, hazeDitherAmplitude(galaxy.dim), seededRandom(8807 + index * 29))
+      ctx.putImageData(image, 0, 0)
+    }
   }
   ctx.globalAlpha = 1
+}
+
+/**
+ * How far (alpha levels of the haze canvas) its dither reaches: `PANORAMA.dither`
+ * levels as drawn on the panorama, where the canvas is drawn at
+ * `PANORAMA.galaxyHaze` times `dim` (the bands were seen there, #123 C4).
+ */
+export function hazeDitherAmplitude(dim = 1): number {
+  return PANORAMA.dither / (PANORAMA.galaxyHaze * Math.max(0.05, dim))
+}
+
+/**
+ * Triangular dither on the alpha of RGBA pixels (C4): each pixel with any
+ * haze moves by up to ±`amplitude`, its mean unchanged, and less where the haze
+ * is fainter than the noise -- so the dark around the haze stays dark and gets
+ * no grain or edge of its own.
+ */
+export function ditherHaze(pixels: Uint8ClampedArray, amplitude: number, random: () => number) {
+  for (let p = 3; p < pixels.length; p += 4) {
+    const a = pixels[p]
+    if (a === 0) continue
+    const noise = (random() + random() - 1) * amplitude * Math.min(1, a / amplitude)
+    pixels[p] = Math.max(0, Math.min(255, Math.round(a + noise)))
+  }
 }

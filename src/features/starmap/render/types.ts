@@ -43,6 +43,8 @@ export type StarMapTheme = {
   fontFamily: string
   /** The connection lines (#121); `LINK_INK` (render/links.ts) when absent. */
   links?: LinkInk
+  /** A galaxy's name on the panorama (#137), the `--starmap-galaxy-name` sky token; `GALAXY_NAME_INK` (render/galaxyNames.ts) when absent. */
+  galaxyName?: string
 }
 
 /** What stays the same from frame to frame: the map's data, in arrays. */
@@ -150,6 +152,14 @@ export type SceneFrame = {
   dotBlend: number
   /** A dot's radius, CSS px. */
   dotRadius: number
+  /**
+   * One sky: the zoom over the farthest zoom (1 on the panorama). The
+   * panorama's light (#137: quiet dots, brighter clouds, galaxy names) is a
+   * continuous function of it (`PANORAMA`, view/semanticZoom.ts). Absent: zoomed in.
+   */
+  pastPanorama?: number
+  /** The zoom as every reveal reads it: the glyph a star would be drawn at, unclamped (px, `starPxFor`). */
+  starPx?: number
   /** The recommended star's breath, when it breathes. */
   breath: { index: number; scale: number; alpha: number } | null
   /** Star names, by zoom (#134: `starNameAlpha`); 0 far out. */
@@ -236,6 +246,8 @@ export type RenderStats = {
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
   links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number }
+  /** Galaxy names drawn in the last frame (#137; one sky, far out). */
+  galaxyNames?: number
   /** Names drawn in the last frame, star and nebula (#134). */
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */
