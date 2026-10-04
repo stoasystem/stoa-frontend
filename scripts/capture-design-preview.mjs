@@ -93,7 +93,7 @@ try {
         page.on('request', (request) => {
           const url = new URL(request.url())
           if (url.protocol === 'data:' || url.protocol === 'blob:') return
-          if (url.origin !== base.origin || url.pathname.startsWith('/api/')) leaks.push(`${where}: ${request.method()} ${request.url()}`)
+          if (url.origin !== base.origin || url.pathname.startsWith('/api')) leaks.push(`${where}: ${request.method()} ${request.url()}`)
         })
         page.on('websocket', (socket) => {
           const url = new URL(socket.url())

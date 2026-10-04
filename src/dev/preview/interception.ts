@@ -9,7 +9,8 @@
  * - axios: `httpClient` gets an adapter that answers from `handlers.ts`. The
  *   client's own interceptors (token, language, error mapping) still run, so
  *   the screens see exactly the responses and errors they see in production.
- * - fetch: requests to the API origin, to the dev server's `/api` proxy, or to
+ * - fetch: requests to the API origin, to any path the dev server's `/api`
+ *   proxy forwards (it matches the bare prefix, `DEV_PROXY_PREFIX`), or to
  *   any other origin are answered here; only the dev server's own files go
  *   through.
  * - WebSocket: anything but the dev server's hot reload gets a socket that
@@ -30,6 +31,13 @@ import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosInstance, type A
 import { answer, streamedAnswer, type PreviewReply } from '@/dev/preview/handlers'
 
 export const API_ORIGIN = 'https://api.design-preview.invalid'
+
+/**
+ * The dev server's proxy key in vite.config.ts. Vite forwards every request
+ * whose path starts with it - `/api`, `/api?x=1` and `/apiauth/me` as much as
+ * `/api/auth/me` - so every such path is answered here, never passed on.
+ */
+export const DEV_PROXY_PREFIX = '/api'
 
 /** A string the exclusion test looks for in the built bundles. */
 export const PREVIEW_MARKER = 'stoa.design-preview.v1'
@@ -55,9 +63,14 @@ function parseBody(body: unknown): unknown {
   }
 }
 
-/** The API path of a request: the origin and the dev proxy's `/api` dropped. */
+/**
+ * The API path of a request: the origin dropped, and the dev proxy's prefix
+ * when it stands as a path segment (`/api/auth/me` and `/api` become `/auth/me` and `/`).
+ * Anything else that starts with the prefix, such as `/apiauth/me`, keeps
+ * its path, has no demo answer and is recorded under it.
+ */
 function apiPath(url: URL) {
-  return url.pathname.replace(/^\/api(?=\/)/, '')
+  return url.pathname.replace(/^\/api(?=\/|$)/, '') || '/'
 }
 
 async function reply(method: string, url: URL, body: unknown): Promise<PreviewReply> {
@@ -92,7 +105,7 @@ function axiosAdapter(client: AxiosInstance): AxiosAdapter {
 }
 
 function isDevServerFile(url: URL) {
-  return url.origin === window.location.origin && !url.pathname.startsWith('/api/')
+  return url.origin === window.location.origin && !url.pathname.startsWith(DEV_PROXY_PREFIX)
 }
 
 function installFetch() {

@@ -46,7 +46,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 应用访问后端只有三条路：共用的 axios 实例 `httpClient`、`fetch`（Ask 答复流、统计、角色切换器的会话检查）、WebSocket（实时通知）。`src/dev/preview/interception.ts` 在应用模块加载**之前**把三条路都接管：
 
 - **axios**：给 `httpClient` 换一个 adapter，按 `handlers.ts` 的路由表答以演示数据。`httpClient` 自己的拦截器（令牌、`Accept-Language`、错误映射）照常运行，页面拿到的响应与错误形态和生产一致。
-- **fetch**：发往 API 源、开发服务器 `/api` 代理或任何其他源的请求就地作答（答复流按 SSE 格式返回），只有开发服务器自身的文件放行。
+- **fetch**：发往 API 源、开发服务器 `/api` 代理会转发的任何路径（代理按裸前缀匹配：`/api`、`/api?x=1`、`/apiauth/me` 都会被转发，所以都在这里作答并记入 `unanswered`；#126 审计 F2，`tests/component/designPreviewInterception.test.ts` 锁住，并核对 `vite.config.ts` 的代理键就是 `DEV_PROXY_PREFIX`）或任何其他源的请求就地作答（答复流按 SSE 格式返回），只有开发服务器自身的文件放行。
 - **WebSocket**：除了 Vite 热更新，一律给一个永远不连接的假套接字。
 
 运行时配置的 API 源登记为 `https://api.design-preview.invalid`（`.invalid` 是保留域名，无法解析）。万一有请求绕过以上三处，它只会在 DNS 失败，并以这个名字出现在网络日志里，到不了任何服务器。
@@ -76,7 +76,7 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 - 显示星图的界面拍 10 / 1000 / 2000 三档，其余只拍一档。
 - 可选：`--surfaces map,lesson`、`--points 1000`、`--viewports phone`、`--lang de`、`--long-names`（`index.json` 会记录）。
 - 对照页只取与所请求完全相同的星数档；缺那一档时明确写出「No 2000-star screenshot … (taken: 1000 stars)」，不拿别的档顶替。实时模式有「Long names」开关。
-- 脚本同时监听页面的每个请求与 WebSocket：发往开发服务器以外（或其 `/api` 代理）的请求会列出，并使脚本以 1 退出；无演示答复的请求、控制台错误与警告也会列出。
+- 脚本同时监听页面的每个请求与 WebSocket：发往开发服务器以外（或其 `/api` 代理，同样按裸前缀判断）的请求会列出，并使脚本以 1 退出；无演示答复的请求、控制台错误与警告也会列出。
 
 界面清单由页面自己报告（`window.__stoaPreviewSurfaces`，来自 `surfaces.ts`），脚本不另存一份。
 
