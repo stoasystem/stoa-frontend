@@ -43,6 +43,8 @@ export function devOnlyCodeStaysOut(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), devOnlyCodeStaysOut()],
+  // A worker is a build of its own that only runs worker.plugins: guard it too (PR #126 re-audit, N1).
+  worker: { plugins: () => [devOnlyCodeStaysOut()] },
   build: {
     rollupOptions: {
       output: {

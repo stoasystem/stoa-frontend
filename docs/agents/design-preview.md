@@ -86,7 +86,7 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 两道互相独立的防线，任一道都能单独拦下。
 
-**构建期守卫**（#126 审计 F1 之后加的，最硬的一道）：`vite.config.ts` 里的插件 `devOnlyCodeStaysOut`（名字 `stoa:dev-only-code-stays-out`）。生产构建结束时检查 Rollup 模块图里的每个模块 id（去掉 `?raw` 之类的查询）和每个产出资源的来源文件，只要有一个在 `src/dev/` 或 `src/mocks/` 下，构建直接失败，报错列出文件。它不管代码是怎么进来的——根绝对路径、`import.meta.glob`、`new URL(…, import.meta.url)`、`?url` / `?raw`、新加的别名都一样。`apply: 'build'`，所以开发服务器（本来就要伺服 `src/dev/`）不受影响；vitest 用的是自己的 `vitest.config.ts`，也不受影响；星图台架 `vite.bench.config.ts` 构建的就是 `src/dev/starmap.html`，按名字把这个插件去掉，全仓只有那一处。`npm run build` 与部署工作流用的都是 `vite.config.ts`，所以 push 到 `main` 的门禁本身就会被它拦下。
+**构建期守卫**（#126 审计 F1 之后加的，最硬的一道）：`vite.config.ts` 里的插件 `devOnlyCodeStaysOut`（名字 `stoa:dev-only-code-stays-out`）。生产构建结束时检查 Rollup 模块图里的每个模块 id（去掉 `?raw` 之类的查询）和每个产出资源的来源文件，只要有一个在 `src/dev/` 或 `src/mocks/` 下，构建直接失败，报错列出文件。它不管代码是怎么进来的——根绝对路径、`import.meta.glob`、`new URL(…, import.meta.url)`、`?url` / `?raw`、新加的别名都一样。`apply: 'build'`，所以开发服务器（本来就要伺服 `src/dev/`）不受影响；vitest 用的是自己的 `vitest.config.ts`，也不受影响；星图台架 `vite.bench.config.ts` 构建的就是 `src/dev/starmap.html`，按名字把这个插件去掉，全仓只有那一处。`npm run build` 与部署工作流用的都是 `vite.config.ts`，所以 push 到 `main` 的门禁本身就会被它拦下。Worker（`new Worker(new URL(…, import.meta.url))`）在 Vite 里是单独的子构建，只跑 `worker.plugins`、不经过顶层 `plugins`，所以守卫也挂在 `worker.plugins` 上（PR #126 复核 N1：之前 Worker 投毒能让构建通过）。
 
 **`tests/component/designPreviewExcluded.test.ts`**（在 `npm test` 里；没放进 `test:release`，因为那条脚本被 `scripts/verify-release.mjs` 逐字锁定）：
 
