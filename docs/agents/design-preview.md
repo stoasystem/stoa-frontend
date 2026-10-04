@@ -82,16 +82,31 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 
 ## 不进生产包
 
-`tests/component/designPreviewExcluded.test.ts`（在 `npm test` 里；没放进 `test:release`，因为那条脚本被 `scripts/verify-release.mjs` 逐字锁定）：
+两道互相独立的防线，任一道都能单独拦下。
 
-1. 从 `src/main.tsx` 沿静态 import、re-export 与字面量 `import()` 走完整个模块图，`src/dev/` 与 `src/mocks/` 下的文件一个都不能出现；另有阴性对照确认走到了 `App.tsx`、`AppRoutes.tsx` 等 200 个以上的模块。
-2. 生产构建到临时目录（约 3 秒）：只允许 `index.html` 一个 HTML，任何 JS 包里不得出现预览独有的标记（`stoa.design-preview.v1`、`api.design-preview.invalid`、`__stoaPreview`）；阴性对照确认包里有 `stoa.web.runtime-config.v1`。
+**构建期守卫**（#126 审计 F1 之后加的，最硬的一道）：`vite.config.ts` 里的插件 `devOnlyCodeStaysOut`（名字 `stoa:dev-only-code-stays-out`）。生产构建结束时检查 Rollup 模块图里的每个模块 id（去掉 `?raw` 之类的查询）和每个产出资源的来源文件，只要有一个在 `src/dev/` 或 `src/mocks/` 下，构建直接失败，报错列出文件。它不管代码是怎么进来的——根绝对路径、`import.meta.glob`、`new URL(…, import.meta.url)`、`?url` / `?raw`、新加的别名都一样。`apply: 'build'`，所以开发服务器（本来就要伺服 `src/dev/`）不受影响；vitest 用的是自己的 `vitest.config.ts`，也不受影响；星图台架 `vite.bench.config.ts` 构建的就是 `src/dev/starmap.html`，按名字把这个插件去掉，全仓只有那一处。`npm run build` 与部署工作流用的都是 `vite.config.ts`，所以 push 到 `main` 的门禁本身就会被它拦下。
 
-投毒验证：在 `src/main.tsx` 的 `loadApplication` 里加一行 `void import('./dev/preview/main')`，两项都变红（模块图列出 `src/dev/preview/*` 七个文件；构建产物 `main-*.js` 带上三个标记）。
+**`tests/component/designPreviewExcluded.test.ts`**（在 `npm test` 里；没放进 `test:release`，因为那条脚本被 `scripts/verify-release.mjs` 逐字锁定）：
+
+1. 从 `src/main.tsx` 走完整个模块图，`src/dev/` 与 `src/mocks/` 下的文件一个都不能出现。跟随 Vite 收文件的每一种方式：静态 import、re-export、字面量 `import()`、`@/` / 相对 / 根绝对（`/src/...`，按项目根解析）说明符、`import.meta.glob`（字符串或数组模式，按导入文件解析后用 `fs.globSync` 展开；`!` 排除模式忽略，只会多算不会少算）、`new URL('…', import.meta.url)`。读不出来的一律抛错而不是放过：非字面量的 `import()` / glob / `new URL`、既不是文件也不是 `node_modules` 里已装包的说明符（未知别名、`virtual:`、URL）、不存在的路径。另有阳性对照（在临时文件里依次写入审计的两种投毒、数组 glob、`?raw`、`new URL`，断言都走到 `src/dev/` / `src/mocks/`，五种读不出来的写法都抛错）和阴性对照（走到 `App.tsx`、`AppRoutes.tsx` 等 200 个以上的模块）。
+2. 生产构建到临时目录（约 3 秒，上面的构建期守卫在这一步生效）：只允许 `index.html` 一个 HTML，任何 JS 包里不得出现预览独有的标记（`stoa.design-preview.v1`、`api.design-preview.invalid`、`__stoaPreview`）；阴性对照确认包里有 `stoa.web.runtime-config.v1`。
+
+投毒验证：在 `src/main.tsx` 的 `loadApplication` 里加一行 `void import('./dev/preview/main')`，两项都变红（模块图列出 `src/dev/preview/*` 七个文件；构建产物 `main-*.js` 带上三个标记）。#126 审计之后又在 `src/App.tsx`（或 barrel）里投毒六种，测试与单独的 `npm run build` 结果如下：
+
+| 投毒 | 模块图 | 生产构建 |
+| --- | --- | --- |
+| `import { PreviewChrome } from '/src/dev/preview/PreviewChrome'` | 红，列出 10 个 `src/dev/` 文件 | 失败：`The production build takes in dev-only code: src/dev/preview/PreviewChrome.tsx` |
+| `import.meta.glob('./dev/preview/PreviewChrome.tsx', { eager: true })` | 红，同上 | 失败，同上 |
+| `import './dev/preview/PreviewChrome'` | 红 | 失败 |
+| `src/components/base/index.ts` 里 `export * from '@/dev/preview/PreviewChrome'` | 红 | 失败 |
+| `import('./dev/preview/' + 'PreviewChrome')` | 红：`has an import() this walk cannot follow` | 通过（Vite 不打包运行时拼出的路径，代码不进包） |
+| `new URL('./dev/demo/sky/demo-sky.json', import.meta.url)` | 红 | 失败：`The production build emits dev-only files: src/dev/demo/sky/demo-sky.json` |
+
+前两种在审计时（`871ec24`）测试全绿、代码进了 `assets/App-*.js`。
 
 **演示天空也不进生产包**（#131）。第 2 项同时在 JS 包里搜演示天空的标记：演示知识点 id `demo-sine-cosine`、桥接星 id `demo-refraction`、演示知识点四语名称（Sine and cosine 等）、只在 `demo-sky.json` 里的占位星技能名 `Ordering integers`，以及演示专用文案的四语版本（Demo 横幅「Demo · Sample content and progress」、占位星说明「Placeholder star · demo content, no chapter.」、长星云名）。标记从 `src/dev/demo/sky` 本身取，另有一项断言它们确实出现在 `demo-sky.json` / 文案里，不会悄悄失效；阴性对照是空星图标题「Your star map is on its way」必须在包里。投毒两次：`useStarMap` 重新 import `demoStarMap` → 模块图列出 `src/dev/demo/sky/` 三个文件、`PlanetScreen-*.js` 带上 7 个标记；把 `demo` 文案放回 `en/starmap.json` → `index-*.js` 带上三条英文文案。
 
-`vite.config.ts` 只以 `index.html` 为构建入口，`src/dev/*.html` 本来就不会被构建；以上测试锁住的是「应用不会 import 它」。
+`vite.config.ts` 只以 `index.html` 为构建入口，`src/dev/*.html` 本来就不会被构建；以上测试与构建期守卫锁住的是「应用不会把它带进来」。
 
 ## 演示数据
 
