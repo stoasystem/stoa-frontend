@@ -12,7 +12,9 @@
  * wheel zooms without changing the route, a star tapped opens its card,
  * zooming out closes it and lets the nebula go); drag a star (#136: it
  * follows the mouse and springs back, every star back in place, no route
- * change, no card); switch subject. Then the
+ * change, no card); on a phone (#139), tap a star -- the sheet opens
+ * collapsed, pulls up and down, closes on Escape, its way back and a tap on
+ * empty map, and its Continue opens the chapter; switch subject. Then the
  * lighting moment (#51), in `design-preview-lighting-flows.mjs`.
  *
  * Each step asserts its end state on screen after a settle delay (#123): the
@@ -285,6 +287,90 @@ try {
     return `${start ?? 'map'} -> ${chosen} -> ${out}`
   })
   await collect()
+
+  // The phone's star card is a sheet (#139): a tap flies first, the sheet
+  // opens collapsed and pulls up and down; Escape, its way back and a tap on
+  // empty map close it; Continue opens the chapter.
+  {
+    const phone = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, hasTouch: true, isMobile: true })
+    const tab = await phone.newPage()
+    watch(tab)
+    const cdp = await phone.newCDPSession(tab)
+    const touch = (type, points) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: points })
+    const tapAt = async (x, y) => {
+      await touch('touchStart', [{ x, y, id: 1 }])
+      await delay(40)
+      await touch('touchEnd', [])
+    }
+    const pullSheet = async (x, from, to) => {
+      await touch('touchStart', [{ x, y: from, id: 1 }])
+      for (let k = 1; k <= 12; k += 1) {
+        await touch('touchMove', [{ x, y: from + ((to - from) * k) / 12, id: 1 }])
+        await delay(16)
+      }
+      await touch('touchEnd', [])
+    }
+    const at = () => tab.evaluate(() => new URL(window.location.href).searchParams.get('path'))
+    const sheet = tab.locator('[data-star-sheet]')
+    const openOnPoint = async () => {
+      await open({ surface: 'map-nebula', points: 1000 }, tab)
+      await delay(1200)
+      const star = await tab.evaluate((unit) => {
+        const box = document.querySelector(`a[data-unit="${unit}"]`).getBoundingClientRect()
+        return { x: Math.round(box.left + box.width / 2), y: Math.round(box.top + box.height / 2) }
+      }, POINT.unitId)
+      await tapAt(star.x, star.y)
+      await settle(1200)
+    }
+    await flow('phone star sheet: a tap flies first, the sheet opens collapsed and pulls up and down (#139)', async () => {
+      await openOnPoint()
+      if (!(await at())?.includes(`/${POINT.unitId}`)) throw new Error(`tapped the demo point: at ${await at()}`)
+      if ((await sheet.getAttribute('data-star-sheet')) !== 'collapsed') throw new Error('the sheet did not open collapsed')
+      const collapsed = await sheet.boundingBox()
+      if (collapsed.height > 90) throw new Error(`collapsed, it is ${collapsed.height} px tall`)
+      const name = (await tab.locator('#starmap-star-title').textContent())?.trim()
+      if (name !== POINT.name.en || !(await sheet.getByRole('link', { name: 'Continue' }).isVisible())) throw new Error(`collapsed it shows "${name}" without Continue`)
+      await pullSheet(collapsed.x + collapsed.width / 2, collapsed.y + 12, collapsed.y - 300)
+      await settle(800)
+      const expanded = await sheet.boundingBox()
+      if ((await sheet.getAttribute('data-star-sheet')) !== 'expanded' || expanded.height <= collapsed.height + 100) throw new Error(`pulled up: ${expanded.height} px`)
+      if (!(await sheet.getByRole('link', { name: /^Back to / }).isVisible())) throw new Error('the details do not show')
+      await pullSheet(expanded.x + expanded.width / 2, expanded.y + 12, expanded.y + 300)
+      await settle(800)
+      if ((await sheet.getAttribute('data-star-sheet')) !== 'collapsed') throw new Error('pulled down, it stayed open')
+      return `collapsed ${collapsed.height} px, open ${expanded.height} px`
+    })
+    await flow('phone star sheet: Escape, its way back and a tap on empty map close it (#139)', async () => {
+      const closed = []
+      await tab.keyboard.press('Escape')
+      await settle(600)
+      if (await sheet.count()) throw new Error('Escape left it open')
+      closed.push(await at())
+      await openOnPoint()
+      await sheet.getByRole('button', { name: POINT.name.en }).click()
+      await settle(500)
+      await sheet.getByRole('link', { name: /^Back to / }).click()
+      await settle(600)
+      if (await sheet.count()) throw new Error('its way back left it open')
+      closed.push(await at())
+      await openOnPoint()
+      await tapAt(6, 330)
+      await settle(600)
+      if (await sheet.count()) throw new Error('a tap on empty map left it open')
+      closed.push(await at())
+      if (closed.some((path) => !path?.startsWith('/map/math/trigonometry') || path.includes(POINT.unitId))) throw new Error(`closed at ${closed.join(', ')}`)
+      return closed.join(' / ')
+    })
+    await flow('phone star sheet: Continue opens the chapter (#139)', async () => {
+      await openOnPoint()
+      await sheet.getByRole('link', { name: 'Continue' }).click()
+      await tab.waitForFunction((unitId) => new URL(window.location.href).searchParams.get('path')?.startsWith(`/chapter/${unitId}`), POINT.unitId, { timeout: 8000 })
+      await settle()
+      return await at()
+    })
+    await collect(tab)
+    await phone.close()
+  }
 
   await open({ surface: 'map-focus-star', points: 1000 })
   await flow('star drag: the star follows the mouse, its linked stars follow, all spring back; no route change, no card (#136)', async () => {

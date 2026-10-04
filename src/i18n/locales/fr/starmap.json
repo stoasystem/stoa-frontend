@@ -45,7 +45,8 @@
     "inNebula": "{{nebula}} · {{state}}",
     "review_one": "Réviser {{count}} exercice",
     "review_other": "Réviser {{count}} exercices",
-    "reviewSoon": "Bientôt disponible"
+    "reviewSoon": "Bientôt disponible",
+    "sheetDetails": "Affiche ou masque les détails de cette étoile"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} sur {{total}} allumées",

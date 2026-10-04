@@ -9,7 +9,13 @@
  * star's name, learning state, progress and markers (#11 point 5). Stars are
  * Tab stops once they are big enough to pick (#134: by zoom, the same
  * threshold as a tap), and in the chosen nebula. A chosen star's card is
- * plain HTML and SVG.
+ * plain HTML and SVG: beside the map on a wide screen, a sheet along the
+ * bottom on a phone (#139).
+ *
+ * The flight first (#139): a star or nebula chosen on the map is handed to
+ * the engine at once, so its flight starts in the next frame; the route --
+ * and with it the card, the sheet and the parallel DOM, which take React a
+ * long frame to build -- follows `CHOICE.routeAfterFrames` frames later.
  *
  * Two keyboard orders, one rule each (#141): Tab follows the course (the
  * DOM's order); the arrow keys follow the map -- left and right along the
@@ -21,15 +27,16 @@
  * in the engine. The route follows what is chosen, never the zoom.
  */
 import { ArrowUp, ChevronLeft, Minus, Plus } from 'lucide-react'
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
+import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
+import { StarSheet } from '@/features/starmap/components/StarSheet'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { nebulaLabel, starLabel } from '@/features/starmap/components/labels'
 import { nebulaLinks } from '@/features/starmap/model/links'
-import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
+import { animationFrameScheduler, StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarOnScreen, type VisibleStar, type ZoomState } from '@/features/starmap/engine/starMapEngine'
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
@@ -38,8 +45,8 @@ import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/starmap/view/keyboardOrder'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
-import { ZOOM } from '@/features/starmap/view/semanticZoom'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
+import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
@@ -152,6 +159,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     zoom: { starPx: 0, band: 'panorama', atMin: true, atMax: false, pickable: false },
   })
   const cardRef = useRef<HTMLDivElement>(null)
+  // The phone's star sheet at rest: how tall (#139). The way back to the star sits above it.
+  const [sheetRest, setSheetRest] = useState<number>(SHEET.collapsedPx)
   const [hint, setHint] = useState<ReturnType<typeof starHintSpot>>(null)
   const [stageSize, setStageSize] = useState({ width: 0, height: 0, bottomInset: 0 })
   const [wide, setWide] = useState(true)
@@ -202,7 +211,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
       // One sky (#119) whenever the map says which galaxy each nebula is in.
       galaxy: true,
       scheduler,
-      onRequestTarget: (next) => navigateRef.current(next),
+      onRequestTarget: (next) => chooseRef.current(next),
       // A chosen star lists no stars, but says where its star is: panned away, a hint points back (#132).
       onVisibleChange: (list, glyph, discs, zoom) => setVisible({ stars: list, glyph, nebulae: discs, focus: engine.focusedStarOnScreen, zoom }),
       onFirstFrame: () => firstFrameRef.current?.(),
@@ -216,7 +225,11 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
       const rect = stage.getBoundingClientRect()
       const isWideNow = isWide({ width: rect.width, height: rect.height })
       const bottomInset = parseFloat(getComputedStyle(stage).getPropertyValue('--page-bottom-inset')) || 0
-      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), controlBands(isWideNow, bottomInset, demo))
+      // On a phone a chosen star is framed above its collapsed sheet (#139).
+      engine.setViewport(Math.round(rect.width), Math.round(rect.height), canvasPixelRatio(), {
+        ...controlBands(isWideNow, bottomInset, demo),
+        sheet: isWideNow ? undefined : sheetBand(bottomInset),
+      })
       setWide(isWideNow)
       setStageSize({ width: Math.round(rect.width), height: Math.round(rect.height), bottomInset })
     }
@@ -278,6 +291,50 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   useEffect(() => {
     engineRef.current?.setTarget(target)
   }, [target])
+
+  /**
+   * A choice made on the map (a tap, a star's link): the flight first (#139,
+   * #123 B6). The engine takes it now and flies in the next frame; the route
+   * follows `CHOICE.routeAfterFrames` frames into the flight, so mounting
+   * the card or sheet and taking the parallel DOM down never hold up the
+   * flight's first frames. Letting a choice go (the card closed, back to the
+   * galaxy) moves no camera, so its route follows at once.
+   */
+  const pendingRoute = useRef<number | null>(null)
+  const frames = scheduler ?? animationFrameScheduler
+  const choose = (next: LayerTarget) => {
+    if (pendingRoute.current !== null) frames.cancel(pendingRoute.current)
+    pendingRoute.current = null
+    const current = targetRef.current
+    const lettingGo = next.layer === 'map' || (next.layer === 'nebula' && current.layer === 'star' && current.nebulaId === next.nebulaId)
+    const engine = engineRef.current
+    if (lettingGo || !engine) {
+      navigateRef.current(next)
+      return
+    }
+    engine.setTarget(next)
+    let left = CHOICE.routeAfterFrames
+    const step = () => {
+      left -= 1
+      if (left > 0) {
+        pendingRoute.current = frames.request(step)
+        return
+      }
+      pendingRoute.current = null
+      navigateRef.current(next)
+    }
+    pendingRoute.current = frames.request(step)
+  }
+  const chooseRef = useRef(choose)
+  const targetRef = useRef(target)
+  useLayoutEffect(() => {
+    chooseRef.current = choose
+    targetRef.current = target
+  })
+  // A route still to follow is dropped with the map.
+  useEffect(() => () => {
+    if (pendingRoute.current !== null) frames.cancel(pendingRoute.current)
+  }, [frames])
 
   /** Back out of a choice: the card closes on its nebula, a nebula lets go to the galaxy; the camera stays (#134 Z2). */
   const letGo = () => {
@@ -469,11 +526,19 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     const area = { left: 16, top: bands.top, right: stageSize.width - 16, bottom: stageSize.height - bands.bottom }
     const card = cardRef.current?.querySelector('article')
     if (card && wide && card.offsetWidth > 0) area.right = Math.min(area.right, card.offsetLeft - 16)
-    if (card && !wide && card.offsetHeight > 0) area.bottom = Math.min(area.bottom, card.offsetTop - 16)
-    const next = starHintSpot(spot, area, 16)
+    // On a phone the star counts as seen above the collapsed sheet, where it is
+    // framed (#139); an open sheet hides it without moving it, so no way back is
+    // offered for that. Once it is away, the way back sits above the sheet as it rests.
+    const sheetTop = (rest: number) => stageSize.height - stageSize.bottomInset - SHEET.marginPx - rest - 16
+    if (!wide) area.bottom = Math.min(area.bottom, sheetTop(SHEET.collapsedPx))
+    let next = starHintSpot(spot, area, 16)
+    if (next && !wide && sheetRest > SHEET.collapsedPx) next = starHintSpot(spot, { ...area, bottom: Math.min(area.bottom, sheetTop(sheetRest)) }, 16) ?? next
     setHint((old) => (old && next && old.x === next.x && old.y === next.y && old.angle === next.angle ? old : next))
-  }, [visible, stageSize, wide, demo, target])
+  }, [visible, stageSize, wide, demo, target, sheetRest])
 
+  // The parallel DOM goes when a star is chosen, a render after the card or
+  // sheet comes (#139): two short commits during the flight, not one long one.
+  const parallelDomGone = useDeferredValue(target.layer === 'star')
   const currentNebula = target.layer === 'map' ? undefined : nebulae.find((n) => n.topicId === target.nebulaId)
   const currentStar = target.layer === 'star' ? stars.find((s) => s.unitId === target.unitId) : undefined
   const numberFormat = useMemo(() => new Intl.NumberFormat(i18n.language), [i18n.language])
@@ -594,7 +659,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         )}
 
         {/* The parallel DOM: one link per star on screen, blurred or not. */}
-        {target.layer !== 'star' && (
+        {!parallelDomGone && (
           <nav aria-label={t('stage.label', { subject: map.subject.name })} className="pointer-events-none absolute inset-0">
             <h2 className="sr-only">{t('stage.nebulae')}</h2>
             <ul className="m-0 list-none p-0">
@@ -652,7 +717,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                                 onClick={(event) => {
                                   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
                                   event.preventDefault()
-                                  navigateRef.current(to)
+                                  chooseRef.current(to)
                                 }}
                                 onFocus={() => focusStar(entry.index)}
                                 onBlur={() => focusStar(-1)}
@@ -680,7 +745,12 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
 
         {currentStar && currentNebula && (
           <div data-starmap-overlay ref={cardRef}>
-            <StarCard demo={demo} map={map} star={currentStar} nebula={currentNebula} wide={wide} reducedMotion={reducedMotion} />
+            {wide ? (
+              <StarCard demo={demo} map={map} star={currentStar} nebula={currentNebula} reducedMotion={reducedMotion} />
+            ) : (
+              // Each star opens its sheet collapsed (#139).
+              <StarSheet key={currentStar.unitId} demo={demo} map={map} star={currentStar} nebula={currentNebula} reducedMotion={reducedMotion} onRest={setSheetRest} />
+            )}
           </div>
         )}
 

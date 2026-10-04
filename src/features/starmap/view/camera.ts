@@ -16,9 +16,10 @@
 /**
  * The page area, CSS px. `top` and `bottom` are bands the page keeps for its
  * own controls (the subject switcher above, the legend below); the whole map
- * fits between them.
+ * fits between them. `sheet`, on a phone: how far up from the bottom the
+ * collapsed star sheet reaches (#139); a chosen star is framed above it.
  */
-export type Viewport = { width: number; height: number; top?: number; bottom?: number }
+export type Viewport = { width: number; height: number; top?: number; bottom?: number; sheet?: number }
 
 /** The height left for the map between the page's own controls. */
 export function usableHeight({ height, top = 0, bottom = 0 }: Viewport): number {

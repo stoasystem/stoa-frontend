@@ -45,7 +45,8 @@
     "inNebula": "{{nebula}} · {{state}}",
     "review_one": "Ripassa {{count}} esercizio",
     "review_other": "Ripassa {{count}} esercizi",
-    "reviewSoon": "Disponibile a breve"
+    "reviewSoon": "Disponibile a breve",
+    "sheetDetails": "Mostra o nasconde i dettagli di questa stella"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} su {{total}} accese",

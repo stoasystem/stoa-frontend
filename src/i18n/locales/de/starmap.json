@@ -45,7 +45,8 @@
     "inNebula": "{{nebula}} · {{state}}",
     "review_one": "{{count}} Aufgabe wiederholen",
     "review_other": "{{count}} Aufgaben wiederholen",
-    "reviewSoon": "Bald verfügbar"
+    "reviewSoon": "Bald verfügbar",
+    "sheetDetails": "Zeigt oder verbirgt die Details dieses Sterns"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} von {{total}} leuchten",

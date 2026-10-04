@@ -87,9 +87,15 @@ describe('the parallel DOM', () => {
     expect(screen.getByRole('link', { name: /^Optics,/ })).toHaveAttribute('href', '/map/physics/optics')
   })
 
-  it('opens the star layer when a star link is activated', () => {
-    const { onNavigate } = showMap({ layer: 'map' }, 10, sky10())
+  it('opens the star layer when a star link is activated: the flight first, the route a few frames later (#139)', () => {
+    const { onNavigate, clock, renderer } = showMap({ layer: 'map' }, 10, sky10())
+    const before = renderer.frames.length
     fireEvent.click(screen.getByRole('link', { name: /^Terms and expressions,/ }))
+    expect(onNavigate).not.toHaveBeenCalled()
+    act(() => clock.advance(1000 / 60))
+    expect(renderer.frames.length).toBeGreaterThan(before)
+    expect(onNavigate).not.toHaveBeenCalled()
+    act(() => clock.advance(1000 / 60))
     expect(onNavigate).toHaveBeenCalledWith({ layer: 'star', nebulaId: 'algebra', unitId: 'algebra-1' })
   })
 
