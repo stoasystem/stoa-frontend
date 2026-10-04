@@ -2,7 +2,7 @@
  * The star layer pans (#132): a drag moves the map as on the other layers,
  * round the ring (#120) without a jump; the card stays open for the focused
  * star, whose lines go with it; a tap on another star refocuses it; panned
- * out of sight, a button points back; arrows step through the nebula.
+ * out of sight, a button points back. Its arrow keys: starmapKeyboard.test.tsx (#141).
  */
 import { act, fireEvent, render } from '@testing-library/react'
 import { I18nextProvider } from 'react-i18next'
@@ -344,31 +344,5 @@ describe('the star layer in the page (#132)', () => {
     expect(renderer.last().x[i]).toBeCloseTo(x0, 1)
     expect(hint()).toBeNull()
     expect(navigate).not.toHaveBeenCalled()
-  })
-
-  it('left and right arrows go to the star before and after in the nebula, stopping at the ends', () => {
-    const map = skyMap(1000, 'math')
-    const star = starOf(map, 'math')
-    const inNebula = orderedStars(map).filter((s) => s.nebulaId === star.nebulaId)
-    const at = inNebula.findIndex((s) => s.unitId === star.unitId)
-    const { navigate, card, unmount } = show(map, star)
-    const back = card()!.querySelector('a')!
-    act(() => back.focus())
-    fireEvent.keyDown(back, { key: 'ArrowRight' })
-    expect(navigate).toHaveBeenLastCalledWith(starTarget(inNebula[at + 1]))
-    fireEvent.keyDown(back, { key: 'ArrowLeft' })
-    expect(navigate).toHaveBeenLastCalledWith(starTarget(inNebula[at - 1]))
-    // Escape still leaves for the nebula.
-    fireEvent.keyDown(back, { key: 'Escape' })
-    expect(navigate).toHaveBeenLastCalledWith({ layer: 'nebula', nebulaId: star.nebulaId })
-    unmount()
-    const lastStar = inNebula[inNebula.length - 1]
-    const end = show(map, lastStar)
-    const link = end.card()!.querySelector('a')!
-    act(() => link.focus())
-    fireEvent.keyDown(link, { key: 'ArrowRight' })
-    expect(end.navigate).not.toHaveBeenCalled()
-    fireEvent.keyDown(link, { key: 'ArrowLeft' })
-    expect(end.navigate).toHaveBeenLastCalledWith(starTarget(inNebula[inNebula.length - 2]))
   })
 })

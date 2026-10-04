@@ -5,11 +5,16 @@
  *
  * The canvas is hidden from assistive technology. Every star on screen is an
  * `<a>` placed over its glyph, blurred or not (the blur is visual only), in
- * the order nebula first, then `(topic.order, unit.order)`; its text is the
+ * course order: galaxy, then nebula, then `unit.order`; its text is the
  * star's name, learning state, progress and markers (#11 point 5). Stars are
  * Tab stops once they are big enough to pick (#134: by zoom, the same
  * threshold as a tap), and in the chosen nebula. A chosen star's card is
  * plain HTML and SVG.
+ *
+ * Two keyboard orders, one rule each (#141): Tab follows the course (the
+ * DOM's order); the arrow keys follow the map -- left and right along the
+ * ring between nebulae, otherwise to the nearest star or nebula in that
+ * direction (`view/keyboardOrder.ts`).
  *
  * The zoom is continuous (#134): the wheel and trackpad scroll by how far
  * they scroll, the buttons and + / - keys by ×1.5, a pinch and a double tap
@@ -31,9 +36,10 @@ import { createRenderer } from '@/features/starmap/render/createRenderer'
 import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
+import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/starmap/view/keyboardOrder'
 import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
 import { ZOOM } from '@/features/starmap/view/semanticZoom'
-import { ringNeighbour } from '@/features/starmap/view/sky'
+import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
 import '@/features/starmap/starmap.css'
 
@@ -363,14 +369,15 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     } else if (event.key === 'Escape' && target.layer !== 'map') {
       event.preventDefault()
       letGo()
-    } else if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && target.layer === 'star' && !event.shiftKey && !typing(event.target)) {
-      // On the star layer, left and right go to the star before or after this
-      // one in its nebula, in course order -- the Tab order of the nebula
-      // layer (#132). The ends stop; the map flies to the next star.
+    } else if (target.layer === 'star' && !event.shiftKey && !event.defaultPrevented && !typing(event.target)) {
+      // With a star chosen, an arrow goes to the nearest star of its nebula in
+      // that direction, by where the stars are (#141; #132 went by course
+      // order). Nothing that way: it stays. The map flies to the next star.
+      const direction = arrowDirection(event.key)
+      if (!direction) return
       const inNebula = stars.filter((star) => star.nebulaId === target.nebulaId)
-      const at = inNebula.findIndex((star) => star.unitId === target.unitId)
-      const next = inNebula[at + (event.key === 'ArrowRight' ? 1 : -1)]
-      if (at < 0 || !next) return
+      const next = inNebula[nearestInDirection(inNebula, inNebula.findIndex((star) => star.unitId === target.unitId), direction)]
+      if (!next) return
       event.preventDefault()
       navigateRef.current({ layer: 'star', nebulaId: next.nebulaId, unitId: next.unitId })
     }
@@ -380,22 +387,45 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const locateStar = useCallback((unitId: string) => engineRef.current?.starOnScreen(unitId) ?? null, [])
   const focusNebula = useCallback((index: number) => engineRef.current?.setFocusNebula(index), [])
 
-  // Left and right arrows on a nebula's link go to the next nebula along the
-  // band, round the ring (#120): past the last galaxy comes the first, and the
-  // map pans the shorter way. Tab keeps the reading order, each nebula once.
-  const nebulaX = useMemo(() => {
+  // Tab follows the course: galaxy by galaxy, then nebula by nebula (#141).
+  // Each nebula keeps its engine index (focus and discs are keyed by it).
+  const nebulaeInCourse = useMemo(() => courseNebulae(nebulae, map.subjects, subjectId), [nebulae, map.subjects, subjectId])
+
+  // Arrows follow the map (#141). On a nebula's link, left and right go to the
+  // next nebula along the band, round the ring (#120): past the last galaxy
+  // comes the first, and the map pans the shorter way; up and down go to the
+  // nearest nebula above or below, measured the shorter way round too.
+  const nebulaSpot = useMemo(() => {
     const discs = nebulaDiscs(map)
-    return new Map(nebulae.map((nebula) => [nebula.topicId, discs.get(nebula.topicId)?.x ?? 0]))
+    return new Map(nebulae.map((nebula) => [nebula.topicId, discs.get(nebula.topicId) ?? { x: 0, y: 0 }]))
   }, [map, nebulae])
-  const stepAlongRing = (event: KeyboardEvent<HTMLAnchorElement>) => {
+  const stepNebula = (event: KeyboardEvent<HTMLAnchorElement>) => {
     if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return
-    if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
+    const direction = arrowDirection(event.key)
+    if (!direction) return
     const links = [...(stageRef.current?.querySelectorAll<HTMLAnchorElement>('a[data-nebula-link]') ?? [])]
     const from = links.indexOf(event.currentTarget)
     if (from < 0 || links.length < 2) return
+    // The arrow is the map's even when nothing lies that way: the page does not scroll.
     event.preventDefault()
-    const xs = links.map((link) => nebulaX.get(link.dataset.nebulaLink ?? '') ?? 0)
-    links[ringNeighbour(xs, from, event.key === 'ArrowRight' ? 1 : -1)].focus()
+    const spots = links.map((link) => nebulaSpot.get(link.dataset.nebulaLink ?? '') ?? { x: 0, y: 0 })
+    const to =
+      direction === 'left' || direction === 'right'
+        ? ringNeighbour(spots.map((spot) => spot.x), from, direction === 'right' ? 1 : -1)
+        : nearestInDirection(spots, from, direction, SKY_WRAP)
+    if (to >= 0 && to !== from) links[to].focus()
+  }
+  // On a star's link, every arrow goes to the nearest star of the same nebula
+  // that has a link (is on screen), in that direction, by map position. None: it stays.
+  const stepStar = (event: KeyboardEvent<HTMLAnchorElement>) => {
+    if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return
+    const direction = arrowDirection(event.key)
+    if (!direction) return
+    event.preventDefault()
+    const links = [...(event.currentTarget.closest('ul')?.querySelectorAll<HTMLAnchorElement>('a[data-unit]') ?? [])]
+    const spots = links.map((link) => stars[Number(link.dataset.index)] ?? { x: 0, y: 0 })
+    const to = nearestInDirection(spots, links.indexOf(event.currentTarget), direction)
+    if (to >= 0) links[to].focus()
   }
 
   // The links, grouped by nebula in keyboard order.
@@ -566,7 +596,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
           <nav aria-label={t('stage.label', { subject: map.subject.name })} className="pointer-events-none absolute inset-0">
             <h2 className="sr-only">{t('stage.nebulae')}</h2>
             <ul className="m-0 list-none p-0">
-              {nebulae.map((nebula, nebulaIndex) => {
+              {nebulaeInCourse.map(({ nebula, index: nebulaIndex }) => {
                 const inNebula = visibleByNebula.get(nebula.topicId) ?? []
                 const isCurrent = currentNebula?.topicId === nebula.topicId
                 const disc = visible.nebulae[nebulaIndex]
@@ -587,7 +617,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                         data-focus-top={spot?.y}
                         onFocus={(event) => { measureFocusPill(event.currentTarget); focusNebula(nebulaIndex) }}
                         onBlur={() => focusNebula(-1)}
-                        onKeyDown={stepAlongRing}
+                        onKeyDown={stepNebula}
                       >
                         <span aria-hidden="true">{nebula.name}</span>
                         <span className="sr-only">{nebulaText(nebula)}</span>
@@ -624,6 +654,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                                 }}
                                 onFocus={() => focusStar(entry.index)}
                                 onBlur={() => focusStar(-1)}
+                                onKeyDown={stepStar}
                               >
                                 <span className="sr-only">{starLabel(t, star)}</span>
                               </a>
