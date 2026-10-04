@@ -121,7 +121,7 @@ export const DRAG = {
   /** While held: how a linked star chases its share -- a little behind, settling with a small wobble. */
   follow: { stiffness: 260, damping: 0.42 },
   /** Let go: every moved star (the grabbed one too) springs back to its place with a little overshoot. */
-  release: { stiffness: 220, damping: 0.5 },
+  release: { stiffness: 220, damping: 0.55 },
   /**
    * Linked stars further from the grabbed one lag a little more: the follow
    * stiffness falls by up to this share with their distance on screen (up to

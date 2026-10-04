@@ -749,14 +749,16 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         for (const i of listed) {
           if (x[i] < 0 || y[i] < 0 || x[i] > width || y[i] > height) continue
           const d = reach ? Math.hypot(x[i] - reach.x, y[i] - reach.y) : 0
-          const base = frame.starLabelAlpha * (reach ? reachFade(d, reach) : 1)
+          // The dragged star keeps its name wherever the hand takes it (#136).
+          const base = frame.starLabelAlpha * (reach && !(drag && drag.star === i) ? reachFade(d, reach) : 1)
           const known = labelFades.get(`s${i}`)
           if (base < 0.01 && !(known && known.alpha > 0)) continue
           candidates.push({ i, base, d, was: known?.placed ?? false })
         }
-        // The focused star first, then the names already up (they keep their place), then by distance.
+        // The dragged star first, the focused star next, then the names already up (they keep their place), then by distance.
+        const first = (i: number) => (drag && drag.star === i ? -2 : i === frame.focusStar ? -1 : 0)
         candidates.sort((a, b) =>
-          (a.i === frame.focusStar ? -1 : 0) - (b.i === frame.focusStar ? -1 : 0) || Number(b.was) - Number(a.was) || a.d - b.d)
+          first(a.i) - first(b.i) || Number(b.was) - Number(a.was) || a.d - b.d)
         let placedNames = 0
         for (const { i, base } of candidates) {
           const entry = fadeOf(`s${i}`)

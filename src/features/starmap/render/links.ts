@@ -35,7 +35,7 @@ import {
   type NebulaBridge,
   type StarLine,
 } from '@/features/starmap/model/linkTiers'
-import { placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
 
 /**
@@ -421,7 +421,9 @@ export function drawLinks(
     // Where those lines lead: a nebula off screen is named at the edge, in
     // its direction; one in another galaxy also says which subject it is in.
     // While a star is dragged, its own destinations (below) take over.
-    const labelAlpha = Math.max(view.tiers[1] ?? 0, view.star) * (1 - drag)
+    // One set of names at a time: the nebulae's in the first half of the
+    // emphasis, the dragged star's destinations in the second, never both.
+    const labelAlpha = Math.max(view.tiers[1] ?? 0, view.star) * Math.max(0, Math.min(1, 1 - 2 * drag))
     if (leadsTo.size > 0 && labelAlpha > 0.01 && view.chosen >= 0) {
       const top = frame.viewport.top ?? 0
       const bottom = height - (frame.viewport.bottom ?? 0)
@@ -487,8 +489,8 @@ export function drawLinks(
     // A dragged star's linked stars off screen (#136 D6): they move too, their
     // lines run to the edge, and the edge names where they lead -- the
     // nebula, and its subject when that is another one ("↗ Waves · Physics").
-    if (drag > 0.01 && frame.drag) {
-      stats.dragLabels = drawDragDestinations(ctx, scene, frame, theme, data.galaxyOf, obstacles, drag)
+    if (drag > 0.5 && frame.drag) {
+      stats.dragLabels = drawDragDestinations(ctx, scene, frame, theme, data.galaxyOf, obstacles, Math.min(1, 2 * drag - 1))
     }
   }
 
@@ -526,7 +528,8 @@ function drawDragDestinations(
     const dy = frame.y[i] - gy
     const x = gx + dx
     const y = gy + dy
-    if (x >= 0 && x <= width && y >= top && y <= bottom) continue
+    // On screen (under the page's own controls too): its line shows where it is.
+    if (x >= 0 && x <= width && y >= 0 && y <= height) continue
     const n = scene.nebula[i]
     const d = Math.hypot(dx, dy)
     const known = nearest.get(n)
@@ -550,7 +553,16 @@ function drawDragDestinations(
     const half = ctx.measureText(text).width / 2 + 8
     const x = Math.max(half + 12, Math.min(width - half - 12, gx + dx * hit))
     const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, gy + dy * hit))
-    const box = placeLabel([{ x0: x - half, y0: y - 12, x1: x + half, y1: y + 12 }], { boxes: obstacles.boxes, circles: [], segments: [] }, area)
+    // Never over the dragged star itself: the hand is there.
+    const held = { x: gx, y: gy, r: frame.glyphSize * 0.8 + 6 }
+    // At the edge where the line leaves, else slid along the edge to clear the star.
+    const spots: Box[] = []
+    for (const shift of [0, 1, -1, 2, -2, 3, -3]) {
+      const sx = Math.max(half + 12, Math.min(width - half - 12, x + shift * (half * 2 + 8) * Math.abs(dy) / (Math.abs(dx) + Math.abs(dy) || 1)))
+      const sy = Math.max(area.y0 + 14, Math.min(area.y1 - 14, y + shift * 32 * Math.abs(dx) / (Math.abs(dx) + Math.abs(dy) || 1)))
+      spots.push({ x0: sx - half, y0: sy - 12, x1: sx + half, y1: sy + 12 })
+    }
+    const box = placeLabel(spots, { boxes: obstacles.boxes, circles: [], segments: [] }, area, (b) => (boxHitsCircle(b, held) ? Infinity : 0))
     if (!box) continue
     obstacles.boxes.push(box)
     ctx.globalAlpha = alpha
@@ -559,9 +571,11 @@ function drawDragDestinations(
     ctx.lineJoin = 'round'
     ctx.lineWidth = 3
     ctx.strokeStyle = theme.sky
-    ctx.strokeText(text, x, y)
+    const lx = (box.x0 + box.x1) / 2
+    const ly = (box.y0 + box.y1) / 2
+    ctx.strokeText(text, lx, ly)
     ctx.fillStyle = theme.textBody
-    ctx.fillText(text, x, y)
+    ctx.fillText(text, lx, ly)
     drawn += 1
   }
   return drawn
