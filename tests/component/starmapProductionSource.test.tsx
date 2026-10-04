@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { I18nextProvider } from 'react-i18next'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AppRouter } from '@/app/router/AppRouter'
 import { DemoStarMapSource } from '@/dev/demo/sky/source'
 import i18n from '@/i18n'
@@ -40,6 +40,13 @@ function openAt(path: string, wrap: (app: ReactNode) => ReactNode = (app) => app
 }
 
 describe('the star map in the application (#131)', () => {
+  // /map is a lazy page whose first import is the whole star map, continuous zoom included
+  // (#134): cold, with the full suite beside it, that runs past findBy's one-second wait,
+  // as /me's did (#94, #133). What this file tests is the page, not how fast it loads.
+  beforeAll(async () => {
+    await import('@/pages/map/MapPages')
+  })
+
   beforeEach(async () => {
     await i18n.changeLanguage('en')
     vi.mocked(getCurrentUser).mockResolvedValue(student)
