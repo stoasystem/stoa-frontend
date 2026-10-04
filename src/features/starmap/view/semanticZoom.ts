@@ -179,6 +179,88 @@ export const KEYS = {
   minAhead: 1e-6,
 } as const
 
+/**
+ * The panorama's light (#137, round two A2 / A3 / A4 / C4 of #123). Far out
+ * the sky should read as glowing nebulae grouped into galaxies, not as a
+ * scatter of gold grains: lit stars there are small, dim dots, and the light
+ * comes from each nebula's cloud -- brighter the larger its lit share (#117) --
+ * and from each galaxy's haze, under one very faint, large name. All of it is
+ * one continuous function of `pastPanorama` (the zoom over the farthest zoom):
+ * the panorama look is whole at the farthest zoom and gives way as the zoom
+ * passes it, so nothing pops. The numbers are a first set for the user to
+ * tune in round three (#142).
+ */
+export const PANORAMA = {
+  /** The panorama look is whole up to the first factor past the farthest zoom and gone by the second. */
+  look: [1.02, 1.3] as Ramp,
+  /**
+   * A lit or in-progress star's dot on the panorama, as shares of its dot
+   * zoomed in: smaller and dimmer, and without its glow, so the gold of a
+   * lit nebula is its cloud's, not its grains'. The recommended star stays a
+   * full glyph at every zoom.
+   */
+  litDot: { radius: 0.55, alpha: 0.5, glow: 0 },
+  /** A ready or locked star's dot on the panorama: a little quieter too, so the cloud carries the picture. */
+  otherDot: { radius: 0.85, alpha: 0.75 },
+  /**
+   * Each nebula's cloud on the panorama: `base`, plus `lit` times its lit
+   * share (zoomed in it is `NEBULA_GLOW`, render/galaxy.ts). A fully lit
+   * nebula glows several times as bright as an unlit one.
+   */
+  nebulaGlow: { base: 0.16, lit: 0.34 },
+  /** A galaxy's base tint (its haze under its nebulae) on the panorama: strong enough that a galaxy reads as one whole (zoomed in it is `GALAXY_HAZE_ALPHA`, 0.04). */
+  galaxyHaze: 0.22,
+  /**
+   * The galaxy's name, very faint and large under its stars (A3), in the
+   * subject's own name (the read model's, in the student's language). It is
+   * whole on the panorama and fades out as the zoom passes it by `out`.
+   * Its letters are `size` times the galaxy's width on screen (within
+   * `minPx`..`maxPx`), spaced `tracking` ems apart, its middle `below` ems
+   * under the galaxy's lowest star. A neighbour's name fades out as its
+   * middle moves away from the view's (`aside`: its distance from the view's
+   * centre as a share of the screen's width), so its cut-off letters never
+   * linger at an edge.
+   */
+  galaxyName: { out: [1.1, 1.8] as Ramp, size: 0.085, minPx: 26, maxPx: 96, tracking: 0.42, weight: 300, below: 0.9, aside: [0.28, 0.5] as Ramp },
+  /**
+   * A phone held upright (A4): the panorama starts one zoom step (`ZOOM.buttonStep`)
+   * further out than a three-quarter view of the widest galaxy, so the whole
+   * galaxy in view is on screen; its stars span at most this share of the width.
+   * A landscape screen is unchanged.
+   */
+  portraitFit: 1.3 / ZOOM.buttonStep,
+  /**
+   * The galaxy haze is dithered (C4): drawn this faint, its whole gradient
+   * spans only a dozen 8-bit alpha levels, which showed as vertical bands
+   * between galaxies. Each pixel of the haze gets triangular noise of up to
+   * ±`dither` of those drawn levels (painted once per sky, so it costs no frame).
+   */
+  dither: 1.5,
+} as const
+
+/**
+ * How much of the panorama look is on: 1 at the farthest zoom, 0 once past
+ * it (`PANORAMA.look`) -- and always gone where the knowledge lines come in
+ * (`REVEAL.linesNear`, by `starPx`): a very wide screen's farthest zoom is
+ * already that close, and lines, names and glyph rings are only ever drawn
+ * on the zoomed-in light the contrast checks bound.
+ */
+export function panoramaLook(pastPanorama: number, starPx = 0): number {
+  return (1 - ramp(pastPanorama, PANORAMA.look)) * (1 - ramp(starPx, REVEAL.linesNear))
+}
+
+/** A star's dot at `look` (0..1): its radius and alpha as shares of its dot zoomed in, and its glow. */
+export function panoramaDot(lit: boolean, look: number): { radius: number; alpha: number; glow: number } {
+  const quiet = lit ? PANORAMA.litDot : { ...PANORAMA.otherDot, glow: 1 }
+  const mix = (to: number) => 1 + (to - 1) * look
+  return { radius: mix(quiet.radius), alpha: mix(quiet.alpha), glow: mix(quiet.glow) }
+}
+
+/** A galaxy name's visibility, 0..1, by `pastPanorama`: whole far out, fading continuously as the zoom closes in. */
+export function galaxyNameAlpha(pastPanorama: number): number {
+  return 1 - ramp(pastPanorama, PANORAMA.galaxyName.out)
+}
+
 /** A smoothstep from 0 (at or below `from`) to 1 (at or above `to`): continuous, monotone, flat at both ends. */
 export function ramp(value: number, [from, to]: Ramp): number {
   if (!(value > from)) return 0

@@ -20,6 +20,7 @@ import type { StarMap } from '@/features/starmap/model/starMap'
 import { CLOUD_REACH, galaxyHazeBox } from '@/features/starmap/render/galaxy'
 import { baseScale, turnsToward, usableHeight, wrapX, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
+import { PANORAMA } from '@/features/starmap/view/semanticZoom'
 
 /** The ring's circumference in map units: the band runs over x in [0, 1] with half a gap at each end (#119). */
 export const SKY_WRAP = 1
@@ -91,16 +92,19 @@ export function skyBounds(galaxies: readonly SkyGalaxy[]): Bounds {
 
 /**
  * The whole-map layer's zoom over the band: the tallest galaxy fills 80% of
- * the height between the page's controls, but a phone never gets less than
- * three quarters of the widest galaxy across (more, and the clusters turn
- * to grain). Every galaxy is seen at this one zoom, so flying between them
- * keeps their sizes comparable.
+ * the height between the page's controls, but a landscape screen never gets
+ * less than three quarters of the widest galaxy across (more, and the
+ * clusters turn to grain). A screen held upright (a phone) starts one zoom
+ * step further out, so the whole galaxy in view is on it (#137 A4:
+ * `PANORAMA.portraitFit`). Every galaxy is seen at this one zoom, so flying
+ * between them keeps their sizes comparable.
  */
 export function panoramaZoom(galaxies: readonly SkyGalaxy[], bounds: Bounds, viewport: Viewport): number {
   const base = baseScale(viewport, bounds)
   const tallest = Math.max(1e-6, ...galaxies.map((g) => g.y1 - g.y0))
   const widest = Math.max(1e-6, ...galaxies.map((g) => g.x1 - g.x0))
-  const scale = Math.min((usableHeight(viewport) * 0.8) / tallest, (viewport.width * 1.3) / widest)
+  const across = viewport.height > viewport.width ? PANORAMA.portraitFit : 1.3
+  const scale = Math.min((usableHeight(viewport) * 0.8) / tallest, (viewport.width * across) / widest)
   return Math.max(1, scale / base)
 }
 

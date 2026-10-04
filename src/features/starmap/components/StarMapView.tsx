@@ -33,6 +33,7 @@ import { StarMapEngine, type FrameScheduler, type NebulaDiscOnScreen, type StarO
 import { LEARNING_STATES, nebulaCounts, orderedNebulae, orderedStars, subjectOfNebula, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { createRenderer } from '@/features/starmap/render/createRenderer'
+import { GALAXY_NAME_INK } from '@/features/starmap/render/galaxyNames'
 import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
@@ -68,6 +69,7 @@ function readTheme(element: Element): StarMapTheme {
     textBody: read('--on-sky-text-body', THEME_FALLBACK.textBody),
     textCaption: read('--on-sky-text-caption', THEME_FALLBACK.textCaption),
     fontFamily: read('--font-system', THEME_FALLBACK.fontFamily),
+    galaxyName: read('--starmap-galaxy-name', GALAXY_NAME_INK),
     links: {
       recommended: read('--starmap-link-recommended', LINK_INK.recommended),
       inProgress: read('--starmap-link-in-progress', LINK_INK.inProgress),

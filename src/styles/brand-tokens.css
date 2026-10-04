@@ -200,6 +200,12 @@
   --starmap-link-walked: rgba(255, 255, 255, 0.16);
   --starmap-link-locked: rgba(255, 255, 255, 0.3);
   --starmap-bridge: rgba(170, 190, 255, 0.07);
+  /*
+   * A galaxy's name across its middle on the star map's panorama (#137):
+   * very faint and large on purpose, decoration (the same name is the page's
+   * heading and the switcher's segment). Drawn by render/galaxyNames.ts.
+   */
+  --starmap-galaxy-name: rgba(214, 222, 255, 0.13);
 
   /* Motion and states: the focus ring on dark is 2 px star-gold. */
   --focus-ring: var(--lit);
