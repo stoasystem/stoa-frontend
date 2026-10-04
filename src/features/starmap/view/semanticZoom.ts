@@ -180,6 +180,17 @@ export const KEYS = {
 } as const
 
 /**
+ * The flight first (#139, round two B6 of #123): a star chosen on the map is
+ * flown to at once, and the route -- with it the card or sheet and the
+ * parallel DOM, a long frame of React's -- follows this many frames into the
+ * flight, so the first frames of the flight are on screen within a frame of
+ * the tap.
+ */
+export const CHOICE = {
+  routeAfterFrames: 2,
+} as const
+
+/**
  * The panorama's light (#137, round two A2 / A3 / A4 / C4 of #123). Far out
  * the sky should read as glowing nebulae grouped into galaxies, not as a
  * scatter of gold grains: lit stars there are small, dim dots, and the light
