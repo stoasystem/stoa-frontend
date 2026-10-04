@@ -313,9 +313,11 @@ export class StarMapEngine {
   /**
    * A press on a star that may become a drag of it (#136): `dragging` once it
    * has (the mouse moved past the tap slop, a finger held still long enough).
-   * `(ax, ay)`: the pointer minus the star's displacement, so it stays under the hand.
+   * `(hx, hy)`: where the hand is; `(ax, ay)`: where it holds the star, from
+   * the star's centre -- each frame the star is put there, so it stays under
+   * the hand through a zoom too.
    */
-  private grab: { id: number; star: number; kind: PointerKind; at: number; dragging: boolean; ax: number; ay: number } | null = null
+  private grab: { id: number; star: number; kind: PointerKind; at: number; dragging: boolean; hx: number; hy: number; ax: number; ay: number } | null = null
   /** The star being dragged, or springing back after it was let go. */
   private drag: StarDrag | null = null
   /** Every star's displacement by the drag this frame, px (0 for most), and the grabbed star and its linked stars. */
@@ -702,7 +704,7 @@ export class StarMapEngine {
       this.pinch = null
       // On a star big enough to pick: it may become a drag of it (#136).
       const star = this.grabbable(x, y, kind)
-      this.grab = star >= 0 ? { id, star, kind, at: this.now(), dragging: false, ax: x, ay: y } : null
+      this.grab = star >= 0 ? { id, star, kind, at: this.now(), dragging: false, hx: x, hy: y, ax: 0, ay: 0 } : null
       // A finger is held before it grabs: the frames watch the clock.
       if (this.grab && kind === 'touch') this.invalidate()
     } else if (this.pointers.size === 2) {
@@ -764,8 +766,8 @@ export class StarMapEngine {
     if (grab && grab.id === id) {
       if (grab.dragging && this.drag) {
         // The grabbed star follows the hand exactly; the springs do the rest each frame.
-        this.drag.gx = x - grab.ax
-        this.drag.gy = y - grab.ay
+        grab.hx = x
+        grab.hy = y
         this.press.moved = true
         this.invalidate()
         return
@@ -777,9 +779,9 @@ export class StarMapEngine {
         } else {
           // A mouse moved off the press: the star is dragged, from where it was pressed.
           this.press.moved = true
-          const drag = this.startDrag(grab, this.press.x, this.press.y)
-          drag.gx = x - grab.ax
-          drag.gy = y - grab.ay
+          this.startDrag(grab, this.press.x, this.press.y)
+          grab.hx = x
+          grab.hy = y
           return
         }
       } else {
@@ -1055,8 +1057,10 @@ export class StarMapEngine {
     }
     drag.held = true
     grab.dragging = true
-    grab.ax = x - drag.gx
-    grab.ay = y - drag.gy
+    grab.hx = x
+    grab.hy = y
+    grab.ax = x - this.x[star]
+    grab.ay = y - this.y[star]
     this.invalidate()
     return drag
   }
@@ -1385,6 +1389,12 @@ export class StarMapEngine {
   private applyDrag(dt: number, end = false): boolean {
     const drag = this.drag
     if (!drag) return false
+    // Held: the star where the hand holds it, whatever the camera did since.
+    const grab = this.grab
+    if (drag.held && grab?.dragging && grab.star === drag.star) {
+      drag.gx = grab.hx - grab.ax - this.x[drag.star]
+      drag.gy = grab.hy - grab.ay - this.y[drag.star]
+    }
     const alive = !end && stepStarDrag(drag, dt, !this.policy.inertia)
     if (!alive) {
       this.drag = null
