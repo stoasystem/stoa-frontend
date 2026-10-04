@@ -4,12 +4,16 @@
  * backend keeps its state per tab (docs/agents/design-preview.md):
  *
  *   1. finish the demo knowledge point's remaining lessons, go back to the
- *      map from the chapter: the flare plays once on its star and the live
+ *      map from the chapter: the map opens on the star's nebula seen whole
+ *      (#140 F2, the route the nebula's), the star still in progress as the
+ *      flare starts and lit after it (F1), the flare plays once and the live
  *      region announces it;
  *   2. Ask, opened from the map's composer: a conversation shows the lit card;
  *   3. physics' Refraction now reads "Ready to start";
  *   4. a reload of the tab does not replay it, and the star stays lit;
- *   5. with reduced motion: no animation, the announcement all the same;
+ *   5. with reduced motion: no animation, the announcement all the same, and
+ *      a still "<name> is lit" label beside the star that goes after a few
+ *      seconds, at once, never faded (#140 F3);
  *   6. the flare on a phone, and the card in the Ask sheet.
  *
  * Frames and states land in .codex-screenshots/design-preview/lighting/.
@@ -19,7 +23,7 @@ import { setTimeout as delay } from 'node:timers/promises'
 
 /* global window, document, fetch, MutationObserver -- used inside the browser */
 
-const SHOTS = '.codex-screenshots/design-preview/lighting'
+const SHOTS = process.env.LIGHTING_SHOTS || '.codex-screenshots/design-preview/lighting'
 
 export async function lightingFlows({ browser, API, flow, watch, open, collect, previewUrl, answer, feedback, button, settle }) {
   mkdirSync(SHOTS, { recursive: true })
@@ -67,6 +71,31 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
 
   const phases = (page) => page.evaluate(() => window.__lightingPhases)
   const announced = (page) => page.locator('[data-lighting-announcer]').textContent()
+  /** The star's own link in the parallel DOM: its name and state, as the map draws it now. */
+  const starReads = (page) => page.locator(`a[data-unit="${point.unitId}"]`).first().textContent({ timeout: 4000 }).catch(() => '')
+  /** Where the map is: the route the preview wrote back, what is chosen, and the zoom band. */
+  const where = (page) =>
+    page.evaluate(() => {
+      const stage = document.querySelector('[data-starmap-stage]')
+      return { path: new URLSearchParams(window.location.search).get('path') ?? '', layer: stage?.getAttribute('data-layer'), band: stage?.getAttribute('data-zoom-band') }
+    })
+  /** #140: back from the lighting, on the star's nebula seen whole, the star drawn in progress until the peak and lit after. */
+  const nebulaPath = `/map/math/${point.topicId}`
+  async function landedInProgress(page) {
+    await page.waitForSelector('[data-lighting="playing"]', { timeout: 10_000 })
+    const before = (await starReads(page)) ?? ''
+    const at = await where(page)
+    if (!at.path.startsWith(nebulaPath) || at.path.includes(point.unitId) || at.layer !== 'nebula' || at.band === 'panorama') {
+      throw new Error(`landed at ${JSON.stringify(at)}, expected ${nebulaPath} seen whole`)
+    }
+    if (!before.includes('In progress')) throw new Error(`as the flare starts the star reads "${before}"`)
+    return { at, before }
+  }
+  async function litAfter(page) {
+    const after = (await starReads(page)) ?? ''
+    if (!after.includes('Lit')) throw new Error(`after the flare the star reads "${after}"`)
+    return after
+  }
 
   const desktop = await tab({ viewport: { width: 1440, height: 900 } })
   const walk = desktop.page
@@ -89,14 +118,16 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     await open({ path: `/chapter/${point.unitId}` }, walk)
     if ((await phases(walk)).length) throw new Error('the chapter page celebrated')
     await walk.getByRole('link', { name: 'Star map' }).first().click()
+    const landed = await landedInProgress(walk)
     const files = await frames(walk, 'walk-desktop')
     await walk.waitForSelector('[data-lighting="done"]', { timeout: 10_000 })
+    const lit = await litAfter(walk)
     await walk.screenshot({ path: `${SHOTS}/walk-desktop-after.png` })
     const said = await announced(walk)
     if (said !== litText) throw new Error(`announced "${said}"`)
     const seen = await phases(walk)
     if (seen.filter((phase) => phase === 'playing').length !== 1) throw new Error(`phases ${seen.join(',')}`)
-    return `${files.length} frames; announced "${said}"; phases ${seen.join(' -> ')}`
+    return `landed on ${landed.at.path} (${landed.at.band}); "${landed.before}" -> "${lit}"; ${files.length} frames; announced "${said}"; phases ${seen.join(' -> ')}`
   })
 
   // Before anything reloads the page: the cards are kept in memory (store/litMomentsStore.ts).
@@ -154,15 +185,24 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
   await desktop.context.close()
 
   const reduced = await tab({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' })
-  await flow('lighting: reduced motion, no animation, still announced', async () => {
+  await flow('lighting: reduced motion, no animation, still announced, a still label for a few seconds', async () => {
     await open({ surface: 'lighting' }, reduced.page)
-    await settle()
+    const label = reduced.page.locator('[data-lighting-label]')
+    await label.waitFor({ timeout: 10_000 })
+    await delay(300)
+    const shown = { text: (await label.textContent())?.trim(), visible: await label.isVisible(), opacity: await label.evaluate((element) => element.style.opacity + getComputedStyle(element).transitionDuration) }
+    await reduced.page.screenshot({ path: `${SHOTS}/reduced-motion-desktop.png` })
+    if (shown.text !== litText || !shown.visible) throw new Error(`the label ${JSON.stringify(shown)}`)
+    if (shown.opacity !== '0s') throw new Error(`the label fades: ${shown.opacity}`)
+    const at = await where(reduced.page)
+    await label.waitFor({ state: 'detached', timeout: 8000 })
+    await reduced.page.screenshot({ path: `${SHOTS}/reduced-motion-desktop-after.png` })
     const seen = await phases(reduced.page)
     const said = await announced(reduced.page)
-    await reduced.page.screenshot({ path: `${SHOTS}/reduced-motion-desktop.png` })
+    const lit = await litAfter(reduced.page)
     if (seen.includes('playing')) throw new Error(`phases ${seen.join(',')}`)
     if (said !== litText) throw new Error(`announced "${said}"`)
-    return `phases ${seen.join(' -> ')}; announced "${said}"`
+    return `label "${shown.text}", then gone; on ${at.path}; "${lit}"; phases ${seen.join(' -> ')}; announced "${said}"`
   })
   await collect(reduced.page)
   await reduced.context.close()
@@ -170,6 +210,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
   const phone = await tab({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 })
   await flow('lighting: the flare on a phone, and the card in the Ask sheet', async () => {
     await phone.page.goto(previewUrl({ surface: 'lighting' }))
+    const landed = await landedInProgress(phone.page)
     const files = await frames(phone.page, 'phone')
     await phone.page.waitForSelector('[data-lighting="done"]', { timeout: 10_000 })
     await phone.page.screenshot({ path: `${SHOTS}/phone-after.png` })
@@ -181,7 +222,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     await settle()
     await phone.page.screenshot({ path: `${SHOTS}/ask-card-phone.png` })
     if (!(await card.isVisible())) throw new Error('the card is not on screen in the sheet')
-    return `${files.length} frames; announced "${said}"; the card in the sheet`
+    return `landed on ${landed.at.path}; ${files.length} frames; announced "${said}"; the card in the sheet`
   })
   await collect(phone.page)
   await phone.context.close()
