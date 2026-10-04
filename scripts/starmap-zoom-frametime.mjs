@@ -16,10 +16,20 @@
  * p95 / max (ms) and the median of the runs' p95.
  *
  * `--scenario pan` instead drags the map left 6 px a frame (the measure of
- * #120 / #132), for the same build's baseline in the same session.
+ * #120 / #132), for the same build's baseline in the same session; it
+ * presses on empty space, since a press on a star drags the star (#136).
+ *
+ * `--scenario drag` drags a star (#136): `--unit` (default the demo
+ * knowledge point, the best-linked star of the demo sky) round a circle, 6 px
+ * a frame, letting it go for 0.6 s every 2.5 s so the spring-back is timed
+ * too. It needs a zoom where stars can be grabbed and the prerequisites:
+ *
+ *   node scripts/starmap-zoom-frametime.mjs --scenario drag --path /map/math/trigonometry --relations
+ *   node scripts/starmap-zoom-frametime.mjs --scenario pan --path /map/math/trigonometry --relations
  *
  * Options: --points 2000, --runs 3, --seconds 10, --width 390, --height 844,
- * --scenario zoom|pan.
+ * --scenario zoom|pan|drag, --path (default /map/math), --relations (the
+ * prerequisites, through the bench's Ask-like host), --unit.
  */
 import { setTimeout as delay } from 'node:timers/promises'
 import { chromium } from '@playwright/test'
@@ -38,6 +48,19 @@ const seconds = Number(option('seconds', '10'))
 const width = Number(option('width', '390'))
 const height = Number(option('height', '844'))
 const scenario = option('scenario', 'zoom')
+const mapPath = option('path', '/map/math')
+// The prerequisites reach the map through the Ask-like host only (`starmapBench.tsx`).
+const relations = process.argv.includes('--relations') ? '&relations=fixture&host=ask' : ''
+const unit = option('unit', 'demo-sine-cosine')
+
+/** Where the parallel DOM puts each star now. */
+const starLinks = (page) =>
+  page.evaluate(() =>
+    [...document.querySelectorAll('a[data-unit]')].map((link) => {
+      const box = link.getBoundingClientRect()
+      return { unit: link.getAttribute('data-unit'), x: box.left + box.width / 2, y: box.top + box.height / 2 }
+    }),
+  )
 
 const browser = await chromium.launch({ args: ['--disable-gpu-vsync', '--disable-frame-rate-limit'] })
 const p95s = []
@@ -53,7 +76,7 @@ try {
         return original.apply(this, args)
       }
     })
-    await page.goto(`${base}/src/dev/starmap.html?path=/map/math&points=${points}`)
+    await page.goto(`${base}/src/dev/starmap.html?path=${mapPath}&points=${points}${relations}`)
     await page.waitForSelector('[data-starmap-stage]', { timeout: 30_000 })
     await delay(2000)
     const timing = page.evaluate(
@@ -86,10 +109,18 @@ try {
         }),
       { seconds, zoom: scenario === 'zoom' },
     )
+    const stars = scenario === 'zoom' ? [] : await starLinks(page)
     if (scenario === 'pan') {
-      // Drag left 6 px a frame, picking the map up again near the left edge.
+      // Drag left 6 px a frame, picking the map up again near the left edge, on empty space.
       const end = Date.now() + seconds * 1000
-      const y = Math.round(height * 0.45)
+      let y = Math.round(height * 0.45)
+      for (let dy = 0; dy < height * 0.3; dy += 4) {
+        const candidate = Math.round(height * 0.45 + (dy % 8 ? dy : -dy) / 2)
+        if (stars.every((star) => Math.hypot(star.x - (width - 40), star.y - candidate) > 40)) {
+          y = candidate
+          break
+        }
+      }
       while (Date.now() < end) {
         let x = width - 40
         await page.mouse.move(x, y)
@@ -101,6 +132,26 @@ try {
         }
         await delay(120)
         await page.mouse.up()
+      }
+    }
+    if (scenario === 'drag') {
+      const star = stars.find((s) => s.unit === unit)
+      if (!star) throw new Error(`${unit} is not on screen at ${mapPath}`)
+      // Round a circle 6 px a frame; let go for 0.6 s every 2.5 s (the spring-back), then grab it again at home.
+      const end = Date.now() + seconds * 1000
+      const r = Math.min(width, height) * 0.22
+      let angle = 0
+      while (Date.now() < end) {
+        await page.mouse.move(star.x, star.y)
+        await page.mouse.down()
+        const until = Math.min(end, Date.now() + 2500)
+        while (Date.now() < until) {
+          angle += 6 / r
+          await page.mouse.move(star.x + r * Math.sin(angle), star.y - r * (1 - Math.cos(angle)))
+          await delay(16)
+        }
+        await page.mouse.up()
+        await delay(600)
       }
     }
     const intervals = await timing
