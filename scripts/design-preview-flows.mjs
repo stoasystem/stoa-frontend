@@ -10,7 +10,9 @@
  * right, and finish it, and see the chapter count it; send a message in Ask;
  * log out from the account menu; open the bell; zoom the star map (#134: the
  * wheel zooms without changing the route, a star tapped opens its card,
- * zooming out closes it and lets the nebula go); switch subject. Then the
+ * zooming out closes it and lets the nebula go); drag a star (#136: it
+ * follows the mouse and springs back, every star back in place, no route
+ * change, no card); switch subject. Then the
  * lighting moment (#51), in `design-preview-lighting-flows.mjs`.
  *
  * Each step asserts its end state on screen after a settle delay (#123): the
@@ -30,7 +32,7 @@ import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
 import { lightingFlows } from './design-preview-lighting-flows.mjs'
 
-/* global window, document, fetch -- used inside page.evaluate, in the browser */
+/* global window, document, fetch, HTMLElement -- used inside page.evaluate, in the browser */
 
 function option(name, fallback) {
   const index = process.argv.indexOf(`--${name}`)
@@ -281,6 +283,64 @@ try {
       throw new Error(`zoomed back out: at ${out}, band ${await band()}`)
     }
     return `${start ?? 'map'} -> ${chosen} -> ${out}`
+  })
+  await collect()
+
+  await open({ surface: 'map-focus-star', points: 1000 })
+  await flow('star drag: the star follows the mouse, its linked stars follow, all spring back; no route change, no card (#136)', async () => {
+    await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur())
+    await settle(800)
+    const links = () =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('a[data-unit]')].map((link) => {
+          const box = link.getBoundingClientRect()
+          return { unit: link.getAttribute('data-unit'), x: box.left + box.width / 2, y: box.top + box.height / 2 }
+        }),
+      )
+    /** The brightest the canvas is within 4 px of `(x, y)`: a star there is bright. */
+    const light = (x, y) =>
+      page.evaluate(([px, py]) => {
+        const canvas = document.querySelector('[data-starmap-stage] canvas')
+        const box = canvas.getBoundingClientRect()
+        const k = canvas.width / box.width
+        // Read through a copy, so the map's own canvas is never read back.
+        const side = Math.round(9 * k)
+        const copy = document.createElement('canvas')
+        copy.width = side
+        copy.height = side
+        const ctx = copy.getContext('2d', { willReadFrequently: true })
+        ctx.drawImage(canvas, Math.round((px - box.left - 4) * k), Math.round((py - box.top - 4) * k), side, side, 0, 0, side, side)
+        const data = ctx.getImageData(0, 0, side, side).data
+        let most = 0
+        for (let i = 0; i < data.length; i += 4) most = Math.max(most, (data[i] + data[i + 1] + data[i + 2]) / 3)
+        return most
+      }, [x, y])
+    const before = await links()
+    const star = before.find((s) => s.unit === POINT.unitId)
+    if (!star) throw new Error('the demo knowledge point is not on screen')
+    const start = await route()
+    const to = { x: star.x - 180, y: star.y + 120 }
+    const dark = await light(to.x, to.y)
+    await page.mouse.move(star.x, star.y)
+    await page.mouse.down()
+    for (let i = 1; i <= 20; i += 1) {
+      await page.mouse.move(star.x + ((to.x - star.x) * i) / 20, star.y + ((to.y - star.y) * i) / 20)
+      await delay(16)
+    }
+    await delay(400)
+    const held = await light(to.x, to.y)
+    if (!(held > dark + 60)) throw new Error(`the star is not under the hand: brightness ${dark.toFixed(0)} -> ${held.toFixed(0)}`)
+    await page.mouse.up()
+    await settle()
+    const after = new Map((await links()).map((s) => [s.unit, s]))
+    const off = before.filter((s) => {
+      const a = after.get(s.unit)
+      return !a || Math.hypot(a.x - s.x, a.y - s.y) > 0.5
+    })
+    if (off.length) throw new Error(`${off.length} stars not back in place (${off[0].unit})`)
+    if ((await route()) !== start) throw new Error(`the route changed: ${start} -> ${await route()}`)
+    if (await page.locator('article[aria-labelledby="starmap-star-title"]').count()) throw new Error('a card opened')
+    return `held at brightness ${held.toFixed(0)} (was ${dark.toFixed(0)}); ${before.length} stars back in place; route ${start ?? 'unchanged'}`
   })
   await collect()
 
