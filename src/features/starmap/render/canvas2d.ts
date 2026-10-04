@@ -767,9 +767,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           let box: Box | null = null
           if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
             const circles = near({ x0: x[i] - nameWidth, y0: y[i] - 40, x1: x[i] + nameWidth, y1: y[i] + 40 }, i)
-            const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments }, labelArea)
+            // The dragged star is held over the others, which step back, and its own lines
+            // leave it every way: its name goes where it is least in the way (#136).
+            const held = Boolean(drag && drag.star === i)
+            const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments: held ? [] : segments }, labelArea)
             // A star's name may not sit on another star at all.
-            box = found && !circles.some((c) => boxHitsCircle(found, c)) ? found : null
+            box = found && (held || !circles.some((c) => boxHitsCircle(found, c))) ? found : null
           }
           settle(entry, box !== null)
           if (box) {
