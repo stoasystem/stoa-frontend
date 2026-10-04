@@ -68,7 +68,7 @@ import {
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
 import { shortestDx } from '@/features/starmap/render/links'
-import { interpolateView, sameTarget, viewForTarget, type LayerTarget } from '@/features/starmap/view/layers'
+import { interpolateView, sameTarget, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import {
   anchorAt,
   kForGlyph,
@@ -977,13 +977,17 @@ export class StarMapEngine {
       const galaxy = this.skyGalaxies.find((candidate) => candidate.subjectId === this.map!.subject.subjectId) ?? this.skyGalaxies[0]
       return this.limit(this.onRing(galaxyView(galaxy, this.skyGalaxies, this.bounds, this.viewport)))
     }
+    const glyphK = (glyph: number) => kForGlyph(glyph, this.viewport, this.bounds, this.spacing)
+    if (target.layer === 'nebula' && target.whole) {
+      // Back from a lighting (#140): the nebula seen whole, its stars still glyphs.
+      const zoom = [glyphK(ZOOM.wholeNebulaGlyph[0]), glyphK(ZOOM.wholeNebulaGlyph[1])] as const
+      const whole = wholeNebulaView(target.nebulaId, target.whole.star, this.map.stars, this.viewport, this.bounds, zoom)
+      if (whole) return this.limit(this.onRing(whole))
+    }
     const view = viewForTarget(target, this.map, this.discs, this.bounds, this.viewport)
     // A cloud's rim reaches far past its core: zoom in until its stars are full
     // glyphs, so the four learning states can be told apart (#117).
-    const k =
-      target.layer === 'star'
-        ? kForGlyph(ZOOM.starGlyph, this.viewport, this.bounds, this.spacing)
-        : Math.max(view.k, kForGlyph(ZOOM.nebulaGlyph, this.viewport, this.bounds, this.spacing))
+    const k = target.layer === 'star' ? glyphK(ZOOM.starGlyph) : Math.max(view.k, glyphK(ZOOM.nebulaGlyph))
     return this.limit(this.onRing({ ...view, k }))
   }
 
