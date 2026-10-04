@@ -9,12 +9,12 @@
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
-import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, keyStars, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { createGalaxyNames } from '@/features/starmap/render/galaxyNames'
-import { drawLinks } from '@/features/starmap/render/links'
+import { drawEdgeLabels, drawLinks, paintGlowSprite, type EdgeLabel } from '@/features/starmap/render/links'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
 import {
@@ -210,6 +210,21 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   let lastLightKey = ''
   /** Names on screen and fading, by `s<star>` / `n<nebula>` (#134). */
   const labelFades = new Map<string, LabelFade>()
+  /** The stars named first (#138 B2: recommended, in progress, on the gold path), 1 each, per data. */
+  let keyStar: Uint8Array = new Uint8Array(0)
+  /** A hovered star's name: how far it is in (0..1), fading in and out with `labelFadeMs` (#138 B2). */
+  const hoverFades = new Map<number, number>()
+  /** The glow between galaxies, dithered once per ink (#138). */
+  const glowSprites = new Map<string, HTMLCanvasElement>()
+  const glowSprite = (ink: string) => {
+    let sprite = glowSprites.get(ink)
+    if (!sprite) {
+      sprite = makeCanvas(1, 1)
+      paintGlowSprite(sprite, ink)
+      glowSprites.set(ink, sprite)
+    }
+    return sprite
+  }
   let lastLabelTime: number | null = null
   let labelFrame = 0
   /** Measured name widths, CSS px, per star and nebula of the current data. */
@@ -406,6 +421,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       starNameWidths = []
       nebulaNameWidths = []
       labelFades.clear()
+      hoverFades.clear()
+      keyStar = keyStars(next, STATE_IN_PROGRESS)
       stateKeys = nebulaStateKeys(next.state, next.nebula, next.nebulae.length)
       stateKeysJoined = stateKeys.join('|')
       if (Boolean(next.galaxy) !== sparse) paintSky()
@@ -564,8 +581,14 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const cores: Circle[] = []
       for (let n = 0; n < nebulaCount; n += 1) cores.push({ x: nebulaX[n], y: nebulaY[n], r: nebulaR[n] * 0.9 })
       const placed: Box[] = []
+      // Names at the edge are placed with the lines, so star names keep clear
+      // of them, but painted last, over the stars (#138 D5: `drawEdgeLabels` below).
+      const edgeLabels: EdgeLabel[] = []
       // The ring (#120) is on whenever the engine shifts galaxies; lines then take the shorter side.
-      stats.links = drawLinks(ctx, scene, frame, colours, { segments, boxes: placed }, { wrap: frame.galaxyShift !== undefined })
+      stats.links = drawLinks(ctx, scene, frame, colours, { segments, boxes: placed, labels: edgeLabels }, {
+        wrap: frame.galaxyShift !== undefined,
+        glowSprite,
+      })
 
       const breath = frame.breath
       const glyphs = 1 - frame.dotBlend
@@ -743,7 +766,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       /** The candidate boxes with the side the name had last frame first: a name does not hop sides. */
       const preferring = (boxes: Box[], slot: number) => (slot > 0 && slot < boxes.length ? [boxes[slot], ...boxes.filter((_, k) => k !== slot)] : boxes)
 
-      // Star names: nearest the focus point first, more as the zoom grows.
+      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2).
+      const hovered = frame.hoveredStar ?? -1
+      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
+      for (const [i, amount] of hoverFades) {
+        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
+        if (next <= 0 && i !== hovered) hoverFades.delete(i)
+        else hoverFades.set(i, next)
+        if (next > 0 && next < 1) settling = true
+      }
+
+      // Star names: nearest the focus point first, more as the zoom grows --
+      // at first only the key stars', the rest further in or on hover (#138 B2).
       if (frame.starLabelAlpha > 0.01) {
         setFont(13, 500)
         ctx.textAlign = 'center'
@@ -774,31 +808,41 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           return out
         }
         const reach = frame.starNameReach
-        const candidates: { i: number; base: number; d: number; was: boolean }[] = []
+        const rest = frame.restStarNames ?? 1
+        const candidates: { i: number; base: number; d: number; was: boolean; key: boolean }[] = []
         for (const i of listed) {
           if (x[i] < 0 || y[i] < 0 || x[i] > width || y[i] > height) continue
           const d = reach ? Math.hypot(x[i] - reach.x, y[i] - reach.y) : 0
           // The dragged star keeps its name wherever the hand takes it (#136).
-          const base = frame.starLabelAlpha * (reach && !(drag && drag.star === i) ? reachFade(d, reach) : 1)
+          const held = Boolean(drag && drag.star === i)
+          const key = keyStar[i] === 1 || i === frame.focusStar
+          // A key star by zoom; any other only as far as `restStarNames` lets it, while hovered,
+          // or while linked to a dragged star (its names say what it connects to).
+          const asked = Math.max(hoverFades.get(i) ?? 0, drag && drag.related[i] === 1 ? drag.amount : 0)
+          const share = held ? 1 : Math.max((key ? 1 : rest) * (reach ? reachFade(d, reach) : 1), asked)
+          const base = frame.starLabelAlpha * share
           const known = labelFades.get(`s${i}`)
           if (base < 0.01 && !(known && known.alpha > 0)) continue
-          candidates.push({ i, base, d, was: known?.placed ?? false })
+          candidates.push({ i, base, d, was: known?.placed ?? false, key: key || asked > 0 })
         }
-        // The dragged star first, the focused star next, then the names already up (they keep their place), then by distance.
-        const first = (i: number) => (drag && drag.star === i ? -2 : i === frame.focusStar ? -1 : 0)
+        // The dragged star first, the focused and hovered stars next, then the key stars,
+        // then the names already up (they keep their place), then by distance.
+        const first = (i: number) => (drag && drag.star === i ? -2 : i === frame.focusStar || i === hovered ? -1 : 0)
         candidates.sort((a, b) =>
-          first(a.i) - first(b.i) || Number(b.was) - Number(a.was) || a.d - b.d)
+          first(a.i) - first(b.i) || Number(b.key) - Number(a.key) || Number(b.was) - Number(a.was) || a.d - b.d)
         let placedNames = 0
-        for (const { i, base } of candidates) {
+        for (const { i, base, key } of candidates) {
           const entry = fadeOf(`s${i}`)
           const nameWidth = (starNameWidths[i] ??= ctx.measureText(scene.names[i]).width + 6)
-          const boxes = aroundDisc(x[i], y[i], radiusOf(i), nameWidth, 17, 3)
+          // A key star also tries the corners: its lines often leave it on all four sides.
+          const boxes = (key ? aroundDiscWide : aroundDisc)(x[i], y[i], radiusOf(i), nameWidth, 17, 3)
           let box: Box | null = null
           if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
             const circles = near({ x0: x[i] - nameWidth, y0: y[i] - 40, x1: x[i] + nameWidth, y1: y[i] + 40 }, i)
             // The dragged star is held over the others, which step back, and its own lines
-            // leave it every way: its name goes where it is least in the way (#136).
-            const held = Boolean(drag && drag.star === i)
+            // leave it every way: its name goes where it is least in the way (#136). A
+            // hovered star's name was asked for: it may cross a line or a star too (#138 B2).
+            const held = Boolean(drag && drag.star === i) || i === hovered
             const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments: held ? [] : segments }, labelArea)
             // A star's name may not sit on another star at all.
             box = found && (held || !circles.some((c) => boxHitsCircle(found, c))) ? found : null
@@ -878,6 +922,11 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       for (const [key, entry] of labelFades) if (entry.seen !== labelFrame) labelFades.delete(key)
       stats.names = names
       stats.settling = settling
+
+      // Where lines and bridges lead, named at the screen's edge: the topmost
+      // layer, over every star and name (#138 D5). The renderer's second call
+      // into render/links.ts; the names were placed by `drawLinks` above.
+      drawEdgeLabels(ctx, edgeLabels, colours)
 
       // The frame before a layer change, fading out over this one.
       if (frame.crossfade > 0 && snapshotCanvas) {

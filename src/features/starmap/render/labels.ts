@@ -92,8 +92,57 @@ export function aroundDisc(x: number, y: number, r: number, width: number, heigh
   ]
 }
 
+/**
+ * `aroundDisc`'s four spots, then the four corners (below right, below left,
+ * above right, above left): for a name that should find a place if any is
+ * free (#138 B2: a key star's lines leave it every way, often through all
+ * four sides).
+ */
+export function aroundDiscWide(x: number, y: number, r: number, width: number, height: number, gap: number): Box[] {
+  const d = (r + gap) * Math.SQRT1_2
+  return [
+    ...aroundDisc(x, y, r, width, height, gap),
+    { x0: x + d, y0: y + d, x1: x + d + width, y1: y + d + height },
+    { x0: x - d - width, y0: y + d, x1: x - d, y1: y + d + height },
+    { x0: x + d, y0: y - d - height, x1: x + d + width, y1: y - d },
+    { x0: x - d - width, y0: y - d - height, x1: x - d, y1: y - d },
+  ]
+}
+
 /** Every part of a label must lie nearer its own centre than another nebula's. */
 export function belongsTo(box: Box, own: Circle, others: readonly Circle[]): boolean {
   return [[box.x0, box.y0], [box.x1, box.y0], [box.x0, box.y1], [box.x1, box.y1]].every(([x, y]) =>
     others.every((other) => Math.hypot(x - own.x, y - own.y) < Math.hypot(x - other.x, y - other.y)))
+}
+
+/** What `keyStars` reads of a scene: its stars' states, its prerequisites and its recommended stars. */
+export type KeyStarScene = {
+  count: number
+  state: ArrayLike<number>
+  starLinks: readonly { from: number; to: number }[]
+  recommended: number
+  recommendations?: readonly number[]
+}
+
+/**
+ * The stars named first, at the nebula band (#138 B2), 1 each: every
+ * recommended star, every star in progress (`inProgress`, the state's
+ * number), and every star the gold path (tier 1, a line into a recommended
+ * star) runs through. The rest are named on hover, or zoomed further in.
+ */
+export function keyStars(scene: KeyStarScene, inProgress: number): Uint8Array {
+  const key = new Uint8Array(scene.count)
+  const beacons = scene.recommendations ?? (scene.recommended >= 0 ? [scene.recommended] : [])
+  const recommended = new Set<number>()
+  for (const i of beacons) {
+    if (i < 0 || i >= scene.count) continue
+    recommended.add(i)
+    key[i] = 1
+  }
+  for (let i = 0; i < scene.count; i += 1) if (scene.state[i] === inProgress) key[i] = 1
+  for (const { from, to } of scene.starLinks) {
+    if (!recommended.has(to) || from < 0 || from >= scene.count) continue
+    key[from] = 1
+  }
+  return key
 }
