@@ -72,10 +72,11 @@ describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
     }
   })
 
-  it('a nebula zoomed in draws lines in tiers 1-3, tier 4 only very close, and other nebulae’s lines too', () => {
+  it('a nebula zoomed in draws lines in tiers 1-3, tier 4 never for a star not in focus (#138 D1), and other nebulae’s lines too', () => {
     for (const tier of [1, 2, 3] as const) expect(starLineLook(inside(tier), nebula)).toEqual({ strength: 1, reach: 0, lit: 0 })
     expect(starLineLook(inside(4), nebula).strength).toBe(0)
-    expect(starLineLook(inside(4), at(40)).strength).toBe(1)
+    expect(starLineLook(inside(4), at(40)).strength).toBe(0)
+    expect(starLineLook(inside(4), at(40, { focusStar: 1 })).strength).toBe(1)
     // Every star's lines by zoom, not just the chosen nebula's: nothing pops when a nebula is chosen.
     expect(starLineLook({ ...inside(1), fromNebula: 3, toNebula: 4 }, nebula).strength).toBe(1)
     // A line to another nebula: drawn, fading out near this nebula's star (reach 0).
@@ -86,7 +87,9 @@ describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
     const focused = { ...nebula, focusStar: 1 }
     expect(starLineLook(inside(3, 1, 2), focused).strength).toBe(1)
     expect(starLineLook(inside(3, 7, 8), focused).strength).toBe(UNFOCUSED_LINE)
-    expect(starLineLook(inside(4, 1, 2), focused).strength).toBe(0)
+    // Its locked lines too (#138 D1), and still no one else's.
+    expect(starLineLook(inside(4, 1, 2), focused).strength).toBe(1)
+    expect(starLineLook(inside(4, 7, 8), focused).strength).toBe(0)
   })
 
   it('a chosen star, zoomed in, lights its prerequisites and successors fully, every tier, and hides the rest', () => {
@@ -101,7 +104,8 @@ describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
 
   it('crossfades as the map gives way to a chosen star', () => {
     const half = at(28, { chosen: 0, focusStar: 1, star: 0.5 })
-    expect(starLineLook(inside(4, 1, 2), half).strength).toBeCloseTo(0.5)
+    expect(starLineLook(inside(4, 1, 2), half).strength).toBeCloseTo(1)
+    expect(starLineLook(inside(2, 7, 8), half).strength).toBeCloseTo(UNFOCUSED_LINE / 2)
     expect(starLineLook(inside(3, 7, 8), half).strength).toBeCloseTo(UNFOCUSED_LINE / 2)
   })
 
@@ -207,7 +211,9 @@ describe('a chosen nebula and a chosen star', () => {
     expect(s.real.stats.links!.lines).toBeGreaterThan(0)
     expect(s.real.stats.links!.bridges).toBe(0)
     const destinations = s.counter.texts!.filter((t) => /^[↖↗↙↘] /.test(t.text))
-    for (const t of destinations) expect(t.text).not.toContain(' · ')
+    const others = s.scene().galaxies!.filter((g) => g.subjectId !== 'math').map((g) => g.name)
+    // A subject is named only for a destination in another galaxy (#138 D2 adds those at this zoom).
+    for (const t of destinations) if (t.text.includes(' · ')) expect(others).toContain(t.text.split(' · ').pop())
     s.engine.destroy()
   })
 

@@ -82,8 +82,19 @@ export const REVEAL = {
   nebulaNamePastPanorama: [1.15, 1.45] as Ramp,
   /** ...and out again as star names take over, by `starPx`. */
   nebulaNameOut: [18, 24] as Ramp,
-  /** Star names fade in as the glyph grows over this range (px). */
+  /**
+   * Star names fade in as the glyph grows over this range (px) -- at first
+   * only the stars that matter now (#138 B2): the recommended stars, the
+   * stars in progress, and the stars the gold path (tier 1) runs through.
+   */
   starNameIn: [14, 18] as Ramp,
+  /**
+   * Every other star's name fades in over this range (px): past the zoom a
+   * chosen nebula opens at (`ZOOM.nebulaGlyph`, 28), so the nebula band
+   * names only the key stars and the gold path reads clearly; a hovered star
+   * is named from `starNameIn` on (#138 B2).
+   */
+  starNamesRest: [31, 37] as Ramp,
   /** From this glyph size (px) a tap picks a star (and stars on screen are Tab stops); below it, its nebula. The recommended star can always be picked. */
   starsPickableFrom: 14,
   /**
@@ -99,8 +110,18 @@ export const REVEAL = {
   linesNear: [8, 12] as Ramp,
   /** Tier 3 (the path walked). */
   linesWalked: [12, 18] as Ramp,
-  /** Tier 4 (locked, dashed): only when the glyph is very large. */
-  linesLocked: [28, 34] as Ramp,
+  /**
+   * Tier 4 (locked, dashed): only the lines of the star in focus (keyboard
+   * focus, or chosen) and of a dragged star (#138 D1), fading in over this
+   * range (px) -- never every star's.
+   */
+  linesLocked: [12, 18] as Ramp,
+  /**
+   * A relation across subjects (#138 D2), whatever its tier, keeps at least
+   * this share of its ink once tiers 1-2 are in (`linesNear`): a faint
+   * direction from its star, and the edge names the other subject.
+   */
+  crossSubjectLine: 0.7,
   /** With a star chosen (its card open): the map behind it dims and only its own lines stay, over this range. */
   starFocus: [12, 20] as Ramp,
   /**
@@ -288,9 +309,14 @@ export function nebulaNameAlpha(radiusPx: number, starPx: number, pastPanorama: 
   return ramp(radiusPx, REVEAL.nebulaNameIn) * ramp(pastPanorama, REVEAL.nebulaNamePastPanorama) * (1 - ramp(starPx, REVEAL.nebulaNameOut))
 }
 
-/** How strongly star names are drawn. */
+/** How strongly star names are drawn (the key stars'; the rest also by `restStarNameAlpha`). */
 export function starNameAlpha(starPx: number): number {
   return ramp(starPx, REVEAL.starNameIn)
+}
+
+/** The share of its name an ordinary star (not a key star, not hovered) gets at this zoom (#138 B2). */
+export function restStarNameAlpha(starPx: number): number {
+  return ramp(starPx, REVEAL.starNamesRest)
 }
 
 /** Where star names reach: within `radius` px of the focus point, fading out over the last `feather` px. */

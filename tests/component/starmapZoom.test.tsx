@@ -21,6 +21,7 @@ import {
   REVEAL,
   skillAlpha,
   starFocusAmount,
+  restStarNameAlpha,
   starNameAlpha,
   starNameReach,
   ZOOM,
@@ -423,7 +424,7 @@ describe('what appears, by zoom (#134 Z1, Z4)', () => {
     }
   })
 
-  it('in the right order: bridges, then tiers 1-2, star names, tier 3; tier 4 only very close; nebula names give way to star names', () => {
+  it('in the right order: bridges, then tiers 1-2, key star names, tier 3, the rest of the names; nebula names give way to star names', () => {
     expect(lineReveal(4).bridges).toBe(1)
     expect(lineReveal(4).tiers.slice(1)).toEqual([0, 0, 0, 0])
     expect(lineReveal(13).tiers[1]).toBe(1)
@@ -431,8 +432,12 @@ describe('what appears, by zoom (#134 Z1, Z4)', () => {
     expect(starNameAlpha(13)).toBe(0)
     expect(starNameAlpha(18)).toBe(1)
     expect(lineReveal(18).tiers[3]).toBe(1)
-    expect(lineReveal(ZOOM.nebulaGlyph).tiers[4]).toBe(0)
-    expect(lineReveal(ZOOM.maxGlyph).tiers[4]).toBe(1)
+    // Tier 4 is the star in focus's only (#138 D1, `starLineLook`): in by the zoom a nebula opens at.
+    expect(lineReveal(ZOOM.nebulaGlyph).tiers[4]).toBe(1)
+    // Past the key stars' names, the rest only further in than a chosen nebula opens (#138 B2).
+    expect(restStarNameAlpha(ZOOM.nebulaGlyph)).toBe(0)
+    expect(restStarNameAlpha(ZOOM.starGlyph)).toBeGreaterThan(0)
+    expect(restStarNameAlpha(ZOOM.maxGlyph)).toBe(1)
     expect(nebulaNameAlpha(400, 10, 3)).toBe(1)
     expect(nebulaNameAlpha(400, 30, 3)).toBe(0)
     // Far out only the hovered nebula is named (#123): none by size on the panorama.
