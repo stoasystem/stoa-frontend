@@ -21,6 +21,8 @@
  *     with the map moved), and when the card (`article`) is in the DOM.
  *
  * Options: --base, --points 1000|2000, --viewports phone,narrow, --runs 5,
+ * --unit (a star to tap, e.g. `demo-sine-cosine`; default the star link
+ * nearest the middle),
  * --throttle 1,4 (CPU slow-down factors), --surface (default `map-nebula`).
  * Prints every run and the median per viewport and throttle. Fails (exit 1)
  * on a request outside the dev server.
@@ -47,6 +49,7 @@ const surface = option('surface', 'map-nebula')
 const viewports = option('viewports', 'phone,narrow').split(',')
 const runs = Number(option('runs', '5'))
 const throttles = option('throttle', '1,4').split(',').map(Number)
+const unit = option('unit', '')
 const leaks = []
 
 function previewUrl(query) {
@@ -110,18 +113,18 @@ try {
       if (throttle > 1) await client.send('Emulation.setCPUThrottlingRate', { rate: throttle })
       await delay(300)
 
-      const star = await page.evaluate(([w, h]) => {
+      const star = await page.evaluate(([w, h, wanted]) => {
         let best = null
-        for (const link of document.querySelectorAll('a[data-unit]')) {
+        for (const link of document.querySelectorAll(wanted ? `a[data-unit="${wanted}"]` : 'a[data-unit]')) {
           const box = link.getBoundingClientRect()
           const x = box.left + box.width / 2
           const y = box.top + box.height / 2
-          if (y < 140 || y > h - 120) continue
+          if (!wanted && (y < 140 || y > h - 120)) continue
           const d = Math.hypot(x - w / 2, y - h * 0.5)
           if (!best || d < best.d) best = { x: Math.round(x), y: Math.round(y), d, unit: link.getAttribute('data-unit') }
         }
         return best
-      }, [viewport.width, viewport.height])
+      }, [viewport.width, viewport.height, unit])
       if (!star) throw new Error('No star link on screen')
 
       // In the page: the pointerup, every animation frame, the long tasks.
