@@ -708,7 +708,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         {wide && target.layer === 'map' && stars.length > 0 && (
           <div
             data-starmap-overlay
-            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
+            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[640px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
             // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
             style={{
               background: 'var(--sky-glass)',
@@ -733,7 +733,9 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
                 {t('legend.reviewDue')}
               </li>
             </ul>
-            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('legend.hint')}</p>
+            {/* How to move (#141 B7), and the keyboard's two orders (#141 E5). */}
+            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-pointer>{t('legend.pointer')}</p>
+            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-keys>{t('legend.keys')}</p>
           </div>
         )}
 
