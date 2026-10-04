@@ -73,13 +73,13 @@ describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
   })
 
   it('a nebula zoomed in draws lines in tiers 1-3, tier 4 only very close, and other nebulae’s lines too', () => {
-    for (const tier of [1, 2, 3] as const) expect(starLineLook(inside(tier), nebula)).toEqual({ strength: 1, reach: 0 })
+    for (const tier of [1, 2, 3] as const) expect(starLineLook(inside(tier), nebula)).toEqual({ strength: 1, reach: 0, lit: 0 })
     expect(starLineLook(inside(4), nebula).strength).toBe(0)
     expect(starLineLook(inside(4), at(40)).strength).toBe(1)
     // Every star's lines by zoom, not just the chosen nebula's: nothing pops when a nebula is chosen.
     expect(starLineLook({ ...inside(1), fromNebula: 3, toNebula: 4 }, nebula).strength).toBe(1)
     // A line to another nebula: drawn, fading out near this nebula's star (reach 0).
-    expect(starLineLook({ ...inside(2), toNebula: 5 }, nebula)).toEqual({ strength: 1, reach: 0 })
+    expect(starLineLook({ ...inside(2), toNebula: 5 }, nebula)).toEqual({ strength: 1, reach: 0, lit: 0 })
   })
 
   it('a focused star keeps only its own lines lit', () => {
@@ -91,12 +91,12 @@ describe('what each zoom shows (#121 tiers, by zoom since #134)', () => {
 
   it('a chosen star, zoomed in, lights its prerequisites and successors fully, every tier, and hides the rest', () => {
     for (const tier of [1, 2, 3, 4] as const) {
-      expect(starLineLook(inside(tier, 9, 1), star)).toEqual({ strength: 1, reach: 1 })
-      expect(starLineLook(inside(tier, 1, 9), star)).toEqual({ strength: 1, reach: 1 })
+      expect(starLineLook(inside(tier, 9, 1), star)).toEqual({ strength: 1, reach: 1, lit: 0 })
+      expect(starLineLook(inside(tier, 1, 9), star)).toEqual({ strength: 1, reach: 1, lit: 0 })
       expect(starLineLook(inside(tier, 7, 8), star).strength).toBe(0)
     }
     // Across nebulae too, drawn all the way to the other star.
-    expect(starLineLook({ ...inside(4, 1, 9), toNebula: 6 }, star)).toEqual({ strength: 1, reach: 1 })
+    expect(starLineLook({ ...inside(4, 1, 9), toNebula: 6 }, star)).toEqual({ strength: 1, reach: 1, lit: 0 })
   })
 
   it('crossfades as the map gives way to a chosen star', () => {

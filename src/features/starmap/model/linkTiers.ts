@@ -31,6 +31,8 @@
  *   a star    chosen (its card open): its prerequisites and successors fully
  *             lit, tier 4 included, drawn to the other end; everything else
  *             fades away as the map gives way to it.
+ *   dragged   (#136) while a star is dragged, every line of it lit and drawn
+ *             to the other end, whatever its tier; every other line dimmed.
  */
 import type { LearningState } from '@/features/starmap/model/starMap'
 
@@ -52,6 +54,9 @@ export function linkTier(from: LearningState, to: LearningState, toRecommended: 
   return TIER_WALKED
 }
 
+/** While a star is dragged (#136), a line that does not touch it keeps this much. */
+export const UNDRAGGED_LINE = 0.2
+
 /** With a star in focus, a line that does not touch it keeps this much. */
 export const UNFOCUSED_LINE = 0.15
 /** A panorama bridge of the hovered / focused nebula, and the others, against a bridge at rest. */
@@ -72,6 +77,9 @@ export type LinkView = {
   chosen: number
   /** The star in focus (keyboard focus, or the chosen star), or -1. */
   focusStar: number
+  /** A star being dragged (#136), or -1 / absent, and how far its emphasis is in (0..1, eased). */
+  dragStar?: number
+  drag?: number
 }
 
 /** A prerequisite between two stars, by index, with their nebulae and its tier. */
@@ -83,8 +91,8 @@ export type StarLine = { from: number; to: number; fromNebula: number; toNebula:
  * drawn at full strength -- 0: it fades out near its own star, keeping only
  * the direction; 1: drawn all the way to the other star.
  */
-export function starLineLook(line: StarLine, view: LinkView): { strength: number; reach: number } {
-  const none = { strength: 0, reach: 0 }
+export function starLineLook(line: StarLine, view: LinkView): { strength: number; reach: number; lit: number } {
+  const none = { strength: 0, reach: 0, lit: 0 }
   const focused = view.focusStar >= 0 && (line.from === view.focusStar || line.to === view.focusStar)
   const star = Math.max(0, Math.min(1, view.star))
   // By zoom: this tier's share; with a star in focus, only its own lines stay lit.
@@ -93,7 +101,19 @@ export function starLineLook(line: StarLine, view: LinkView): { strength: number
   // A chosen star: only its own lines, every tier.
   const atStar = focused ? 1 : 0
   const strength = atZoom + (atStar - atZoom) * star
-  return strength <= 0.001 ? none : { strength, reach: focused ? star : 0 }
+  const reach = focused ? star : 0
+  // A dragged star (#136): its lines all light up, drawn to the other star
+  // whatever their tier (tier 4 too, `lit`); every other line steps back.
+  const drag = Math.max(0, Math.min(1, view.drag ?? 0))
+  const dragStar = view.dragStar ?? -1
+  if (drag > 0 && dragStar >= 0) {
+    if (line.from === dragStar || line.to === dragStar) {
+      return { strength: strength + (1 - strength) * drag, reach: reach + (1 - reach) * drag, lit: drag }
+    }
+    const kept = strength * (1 - (1 - UNDRAGGED_LINE) * drag)
+    return kept <= 0.001 ? none : { strength: kept, reach, lit: 0 }
+  }
+  return strength <= 0.001 ? none : { strength, reach, lit: 0 }
 }
 
 /** A line between two nebulae on the panorama: their prerequisites aggregated, and whether it crosses galaxies. */

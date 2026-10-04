@@ -106,6 +106,52 @@ export const REVEAL = {
   labelFadeMs: 180,
 } as const
 
+/**
+ * Dragging a star (#136): the grabbed star follows the hand exactly; the stars
+ * it is directly linked to (its prerequisites and successors, one hop, across
+ * subjects too) are pulled after it by springs, and everything springs back
+ * when it is let go. Nothing is kept: the layout stays the backend's. The
+ * springs are damped oscillators, `stiffness` in 1/s^2 and `damping` as a
+ * ratio of critical (1 = no overshoot; lower wobbles more). The numbers are a
+ * first set for the user to tune by hand in the design preview.
+ */
+export const DRAG = {
+  /** A linked star moves this share of the grabbed star's displacement. */
+  followRatio: 0.6,
+  /** While held: how a linked star chases its share -- a little behind, settling with a small wobble. */
+  follow: { stiffness: 260, damping: 0.42 },
+  /** Let go: every moved star (the grabbed one too) springs back to its place with a little overshoot. */
+  release: { stiffness: 220, damping: 0.55 },
+  /**
+   * Linked stars further from the grabbed one lag a little more: the follow
+   * stiffness falls by up to this share with their distance on screen (up to
+   * `lagReachPx`), so the web does not move as one rigid piece.
+   */
+  lagSpread: 0.35,
+  lagReachPx: 600,
+  /** Touch: hold a star this long (ms), without moving more than the tap slop, to grab it; a swipe before that pans. */
+  longPressMs: 300,
+  /** Stars can be grabbed from this glyph size (px) up: where single stars are hittable (`REVEAL.starsPickableFrom`). */
+  grabFromGlyph: 14,
+  /** Within this share of the glyph (and at least `grabMinPx`) of a star's centre a press grabs it; touch reaches further. */
+  grabReach: 0.5,
+  grabMinPx: 10,
+  touchGrabReach: 0.7,
+  touchGrabMinPx: 18,
+  /** The grabbed star grows to this share of its size, easing over `growMs`. */
+  grow: 1.22,
+  growMs: 90,
+  /** While dragging, other stars and names fade to this, other lines to `dimLines`; eased in and out over `emphasisMs`. */
+  dimStars: 0.4,
+  dimLines: 0.2,
+  emphasisMs: 140,
+  /** Let go: the emphasis eases out over this long (ms), with the springs. */
+  emphasisOutMs: 260,
+  /** Below this displacement (px) and speed (px/s) a star has settled and the drag is over. */
+  restPx: 0.05,
+  restSpeed: 2,
+} as const
+
 /** A smoothstep from 0 (at or below `from`) to 1 (at or above `to`): continuous, monotone, flat at both ends. */
 export function ramp(value: number, [from, to]: Ramp): number {
   if (!(value > from)) return 0

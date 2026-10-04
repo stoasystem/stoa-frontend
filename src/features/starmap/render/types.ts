@@ -198,6 +198,22 @@ export type SceneFrame = {
   nebulaLift?: ArrayLike<number>
   /** Changes whenever `chosenAmount` or `nebulaLift` do: the light cache's key. */
   emphasisKey?: string
+  /**
+   * A star being dragged (#136), or absent. `x` / `y` already include every
+   * displacement; `offsetX` / `offsetY` say how far each star is from its
+   * place (px, 0 for most), so a line can be drawn between moved stars the
+   * shorter way round the ring. `related` is 1 for the grabbed star and the
+   * stars linked to it. `amount` (0..1, eased) lights the grabbed star's lines
+   * and dims everything else; `grow` is the grabbed star's size factor.
+   */
+  drag?: {
+    star: number
+    related: Uint8Array
+    offsetX: Float32Array
+    offsetY: Float32Array
+    amount: number
+    grow: number
+  }
   /** Skill dots beside the stars, 0..1 by zoom (large enough glyphs only). */
   showSkills: number
   /** The frame's time, ms, and how long a name takes to fade when it gains or loses its place (0: at once). */
@@ -219,7 +235,7 @@ export type RenderStats = {
   /** The nebula drawn with a focus ring in the last frame, or -1. */
   highlightNebula: number
   /** Connection lines drawn in the last frame (#121). */
-  links?: { bridges: number; hints: number; lines: number; labels: number }
+  links?: { bridges: number; hints: number; lines: number; labels: number; dragLabels?: number }
   /** Names drawn in the last frame, star and nebula (#134). */
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */

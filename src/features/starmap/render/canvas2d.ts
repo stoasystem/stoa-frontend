@@ -10,7 +10,7 @@
  */
 import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
-import { ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
+import { DRAG, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, GALAXY_HAZE_ALPHA, galaxyHazeBox, NEBULA_GLOW, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
 import { drawLinks } from '@/features/starmap/render/links'
@@ -577,18 +577,28 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const isBeacon = (i: number) => beacons.has(i)
       // Grows with the zoom like every glyph, never under 12 px: no jump as dots turn to glyphs (#134).
       const beaconSize = Math.max(12, Math.min(frame.glyphSize, 32))
+      // How much of itself a star keeps: the focus star all, the rest `frame.dim`;
+      // while a star is dragged (#136) it and its linked stars all, the rest fade further.
+      const drag = frame.drag
+      const dragDim = drag ? 1 - (1 - DRAG.dimStars) * drag.amount : 1
+      const kept = (i: number) => (drag && drag.related[i] === 1 ? 1 : (i === frame.focusStar ? 1 : frame.dim) * dragDim)
+      /** The dragged star grows a little while it is held. */
+      const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
 
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.
-      for (let i = 0; i < count; i += 1) {
+      // A dragged star is drawn last, over the stars it passes.
+      const lastStar = drag ? drag.star : count - 1
+      for (let j = 0; j < count; j += 1) {
+        const i = j < lastStar ? j : j === count - 1 ? lastStar : j + 1
         const a = starAlpha[i]
         if (a < DRAW_THRESHOLD || !visible(i)) continue
-        const focus = (i === frame.focusStar ? 1 : frame.dim) * (scene.nebulae[scene.nebula[i]]?.dim ?? 1)
+        const focus = kept(i) * (scene.nebulae[scene.nebula[i]]?.dim ?? 1)
         const beacon = isBeacon(i)
         const breathing = breath && breath.index === i
         if (glyphs > 0.01 || beacon) {
           const box = beacon ? beaconSize : frame.glyphSize
           const alpha = a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus
-          const grow = breathing ? breath.scale : 1
+          const grow = (breathing ? breath.scale : 1) * grown(i)
           for (const [sprites, cut, share] of [[set.small, GLYPH_SMALL, smallOut(box)], [set.large, GLYPH_LARGE, largeIn(box)]] as const) {
             if (share < 0.01) continue
             const sprite = sprites[state[i]]
@@ -620,8 +630,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const px = x[i]
         const py = y[i]
         const box = beacon ? beaconSize : frame.glyphSize
-        const grow = breath && breath.index === i ? breath.scale : 1
-        const fade = a * show * (i === frame.focusStar ? 1 : frame.dim)
+        const grow = (breath && breath.index === i ? breath.scale : 1) * grown(i)
+        const fade = a * show * kept(i)
         if (glyphs > 0.01 && inProgress && scene.progress[i] > 0) {
           ctx.globalAlpha = fade
           ctx.strokeStyle = colours.lit
@@ -739,14 +749,16 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         for (const i of listed) {
           if (x[i] < 0 || y[i] < 0 || x[i] > width || y[i] > height) continue
           const d = reach ? Math.hypot(x[i] - reach.x, y[i] - reach.y) : 0
-          const base = frame.starLabelAlpha * (reach ? reachFade(d, reach) : 1)
+          // The dragged star keeps its name wherever the hand takes it (#136).
+          const base = frame.starLabelAlpha * (reach && !(drag && drag.star === i) ? reachFade(d, reach) : 1)
           const known = labelFades.get(`s${i}`)
           if (base < 0.01 && !(known && known.alpha > 0)) continue
           candidates.push({ i, base, d, was: known?.placed ?? false })
         }
-        // The focused star first, then the names already up (they keep their place), then by distance.
+        // The dragged star first, the focused star next, then the names already up (they keep their place), then by distance.
+        const first = (i: number) => (drag && drag.star === i ? -2 : i === frame.focusStar ? -1 : 0)
         candidates.sort((a, b) =>
-          (a.i === frame.focusStar ? -1 : 0) - (b.i === frame.focusStar ? -1 : 0) || Number(b.was) - Number(a.was) || a.d - b.d)
+          first(a.i) - first(b.i) || Number(b.was) - Number(a.was) || a.d - b.d)
         let placedNames = 0
         for (const { i, base } of candidates) {
           const entry = fadeOf(`s${i}`)
@@ -755,9 +767,12 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           let box: Box | null = null
           if (base >= 0.01 && placedNames < STAR_NAMES_AT_MOST) {
             const circles = near({ x0: x[i] - nameWidth, y0: y[i] - 40, x1: x[i] + nameWidth, y1: y[i] + 40 }, i)
-            const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments }, labelArea)
+            // The dragged star is held over the others, which step back, and its own lines
+            // leave it every way: its name goes where it is least in the way (#136).
+            const held = Boolean(drag && drag.star === i)
+            const found = placeLabel(preferring(boxes, entry.slot), { boxes: placed, circles, segments: held ? [] : segments }, labelArea)
             // A star's name may not sit on another star at all.
-            box = found && !circles.some((c) => boxHitsCircle(found, c)) ? found : null
+            box = found && (held || !circles.some((c) => boxHitsCircle(found, c))) ? found : null
           }
           settle(entry, box !== null)
           if (box) {
@@ -769,7 +784,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           if (!at || entry.alpha <= 0.001) continue
           const color =
             state[i] === STATE_LIT || state[i] === STATE_IN_PROGRESS ? colours.text : state[i] === STATE_READY ? colours.textBody : colours.textCaption
-          ctx.globalAlpha = Math.min(1, base * entry.alpha * (i === frame.focusStar ? 1 : frame.dim))
+          ctx.globalAlpha = Math.min(1, base * entry.alpha * kept(i))
           outlinedText(scene.names[i], (at.x0 + at.x1) / 2, at.y0 + 1, color, colours.sky, 3)
           names.stars += 1
         }

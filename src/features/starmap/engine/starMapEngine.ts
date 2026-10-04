@@ -26,6 +26,14 @@
  * view (see `view/sky.ts`). Screen positions -- `x`, `y`, `nebulaX` -- are
  * always those of the drawn copy, so taps, keyboard focus, the parallel DOM
  * and `starOnScreen` never meet a star twice or the wrong copy.
+ *
+ * A star can be dragged (#136): pressed with a mouse once stars are big
+ * enough to pick one by one, or held for `DRAG.longPressMs` on a touch
+ * screen. It follows the hand; the stars linked to it are pulled after it by
+ * springs and everything springs back when it is let go (`view/starDrag.ts`).
+ * The displacements are added to the screen positions each frame and never
+ * to the layout. A press on empty space, or a swipe before the hold, still
+ * pans; a drag is never a tap.
  */
 import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
 import { LEARNING_STATES, orderedNebulae, orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
@@ -58,6 +66,8 @@ import {
   type SkyGalaxy,
 } from '@/features/starmap/view/sky'
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
+import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
+import { shortestDx } from '@/features/starmap/render/links'
 import { interpolateView, sameTarget, viewForTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import {
   anchorAt,
@@ -71,6 +81,7 @@ import {
   starNameAlpha,
   starNameReach,
   starPxFor,
+  DRAG,
   ZOOM,
   zoomAround,
   zoomBand,
@@ -145,6 +156,9 @@ type Transition =
   | { kind: 'crossfade'; startedAt: number; durationMs: number }
 
 type Pointer = { x: number; y: number }
+
+/** What a pointer is: a mouse (or pen) grabs a star by pressing and moving; a finger by holding first (#136). */
+export type PointerKind = 'mouse' | 'touch' | 'pen'
 
 /** A star's box, CSS px: a little over half the gap to its neighbours, 9 to 40. */
 export function glyphSizeFor(scale: number, spacing: number): number {
@@ -296,6 +310,20 @@ export class StarMapEngine {
   /** A zoom still to come (log2 of k), around a screen point: the wheel's, a button's, a released pinch's glide. */
   private zoomGlide: { log: number; x: number; y: number; tauMs: number } | null = null
   private lastTap: { x: number; y: number; at: number; acted: boolean } | null = null
+  /**
+   * A press on a star that may become a drag of it (#136): `dragging` once it
+   * has (the mouse moved past the tap slop, a finger held still long enough).
+   * `(hx, hy)`: where the hand is; `(ax, ay)`: where it holds the star, from
+   * the star's centre -- each frame the star is put there, so it stays under
+   * the hand through a zoom too.
+   */
+  private grab: { id: number; star: number; kind: PointerKind; at: number; dragging: boolean; hx: number; hy: number; ax: number; ay: number } | null = null
+  /** The star being dragged, or springing back after it was let go. */
+  private drag: StarDrag | null = null
+  /** Every star's displacement by the drag this frame, px (0 for most), and the grabbed star and its linked stars. */
+  private dragX = new Float32Array(0)
+  private dragY = new Float32Array(0)
+  private dragRelated = new Uint8Array(0)
   /** The choice the engine itself asked for last, and how the camera should answer it when the route brings it. */
   private requested: { target: LayerTarget; motion: ChoiceMotion } | null = null
   /** A choice already let go by zooming out (asked once, until the route answers). */
@@ -467,6 +495,12 @@ export class StarMapEngine {
     this.x = new Float32Array(count)
     this.y = new Float32Array(count)
     this.starAlpha = new Float32Array(count)
+    // Another sky: a drag of the old one's star is over.
+    this.grab = null
+    this.drag = null
+    this.dragX = new Float32Array(count)
+    this.dragY = new Float32Array(count)
+    this.dragRelated = new Uint8Array(count)
     const nebulaCount = nebulae.length
     this.nebulaX = new Float32Array(nebulaCount)
     this.nebulaY = new Float32Array(nebulaCount)
@@ -661,15 +695,22 @@ export class StarMapEngine {
 
   // ---- gestures ---------------------------------------------------------
 
-  pointerDown(id: number, x: number, y: number): void {
+  pointerDown(id: number, x: number, y: number, kind: PointerKind = 'mouse'): void {
     this.pointers.set(id, { x, y })
     this.inertia.stop()
     if (this.pointers.size === 1) {
       this.press = { x, y, at: this.now(), moved: false }
       this.dragging = null
       this.pinch = null
+      // On a star big enough to pick: it may become a drag of it (#136).
+      const star = this.grabbable(x, y, kind)
+      this.grab = star >= 0 ? { id, star, kind, at: this.now(), dragging: false, hx: x, hy: y, ax: 0, ay: 0 } : null
+      // A finger is held before it grabs: the frames watch the clock.
+      if (this.grab && kind === 'touch') this.invalidate()
     } else if (this.pointers.size === 2) {
       // Two fingers: from now on they zoom and pan together, around their midpoint.
+      // A star held by one of them is let go (it springs back).
+      this.letGo()
       this.press = null
       this.dragging = null
       this.zoomGlide = null
@@ -721,6 +762,32 @@ export class StarMapEngine {
     }
 
     if (!this.press) return
+    const grab = this.grab
+    if (grab && grab.id === id) {
+      if (grab.dragging && this.drag) {
+        // The grabbed star follows the hand exactly; the springs do the rest each frame.
+        grab.hx = x
+        grab.hy = y
+        this.press.moved = true
+        this.invalidate()
+        return
+      }
+      if (Math.hypot(x - this.press.x, y - this.press.y) >= TAP_SLOP) {
+        if (grab.kind === 'touch') {
+          // A swipe before the hold: the map pans, as always.
+          this.grab = null
+        } else {
+          // A mouse moved off the press: the star is dragged, from where it was pressed.
+          this.press.moved = true
+          this.startDrag(grab, this.press.x, this.press.y)
+          grab.hx = x
+          grab.hy = y
+          return
+        }
+      } else {
+        return
+      }
+    }
     if (!this.press.moved && Math.hypot(x - this.press.x, y - this.press.y) < TAP_SLOP) return
     if (!this.press.moved) {
       this.press.moved = true
@@ -757,7 +824,15 @@ export class StarMapEngine {
     }
     const press = this.press
     this.press = null
+    const grab = this.grab
+    this.grab = null
     if (!press) return
+    if (grab?.dragging) {
+      // A drag of a star is never a tap: let it go, it springs back.
+      this.drag!.held = false
+      this.invalidate()
+      return
+    }
     if (this.dragging) {
       this.dragging = null
       if (this.policy.inertia && !this.paused) this.inertia.release(this.now())
@@ -771,6 +846,20 @@ export class StarMapEngine {
   pointerCancel(id: number): void {
     this.pointers.delete(id)
     if (this.pointers.size === 0) this.cancelGestures()
+  }
+
+  /**
+   * The cursor over `(x, y)` for a mouse: `grab` over a star that can be
+   * dragged, `grabbing` while one is, else '' (the stage's own).
+   */
+  cursorAt(x: number, y: number): '' | 'grab' | 'grabbing' {
+    if (this.grab?.dragging) return 'grabbing'
+    return this.pointers.size === 0 && this.grabbable(x, y, 'mouse') >= 0 ? 'grab' : ''
+  }
+
+  /** A star is held by the hand now (#136; a touch's long press then must not open a context menu). */
+  get holdingStar(): boolean {
+    return Boolean(this.grab?.dragging)
   }
 
   /** A wheel or trackpad scroll of `deltaY` px (< 0 zooms in), around `(x, y)`: as far as it scrolled, at once. */
@@ -920,11 +1009,69 @@ export class StarMapEngine {
   }
 
   private cancelGestures() {
+    this.letGo()
     this.press = null
     this.dragging = null
     this.pinch = null
     this.zoomGlide = null
     this.inertia.stop()
+  }
+
+  /**
+   * The star a press at `(x, y)` would grab (#136), or -1: only where single
+   * stars can be picked (glyph at least `DRAG.grabFromGlyph` px, past the
+   * panorama's dots), never during a flight, within the glyph's reach
+   * (further for a finger).
+   */
+  private grabbable(x: number, y: number, kind: PointerKind): number {
+    if (!this.map || this.viewport.width === 0 || this.transition?.kind === 'zoom') return -1
+    if (!this.zoom.pickable || this.starPx() < DRAG.grabFromGlyph) return -1
+    const glyph = this.glyphSize
+    const reach = kind === 'touch' ? Math.max(DRAG.touchGrabMinPx, glyph * DRAG.touchGrabReach) : Math.max(DRAG.grabMinPx, glyph * DRAG.grabReach)
+    let best = -1
+    let bestDistance = reach
+    for (let i = 0; i < this.stars.length; i += 1) {
+      const distance = Math.hypot(this.x[i] - x, this.y[i] - y)
+      if (distance < bestDistance) {
+        best = i
+        bestDistance = distance
+      }
+    }
+    return best
+  }
+
+  /** The press `grab` becomes a drag of its star, held at the screen point `(x, y)`. */
+  private startDrag(grab: NonNullable<StarMapEngine['grab']>, x: number, y: number): StarDrag {
+    const scene = this.scene!
+    const star = grab.star
+    this.inertia.stop()
+    let drag = this.drag
+    if (!drag || drag.star !== star) {
+      // Another star still springing back is put back at once: one drag at a time.
+      if (drag) this.applyDrag(0, true)
+      const t = transformOf(this.view, this.viewport, this.bounds)
+      const distance = (i: number) =>
+        Math.hypot(shortestDx(scene.mapX[star], scene.mapX[i]) * t.scale, (scene.mapY[i] - scene.mapY[star]) * t.scale)
+      drag = createStarDrag(star, linkedStars(scene.starLinks, star), distance)
+      this.drag = drag
+    }
+    drag.held = true
+    grab.dragging = true
+    grab.hx = x
+    grab.hy = y
+    grab.ax = x - this.x[star]
+    grab.ay = y - this.y[star]
+    this.invalidate()
+    return drag
+  }
+
+  /** The held star is let go: it and its linked stars spring back (at once under reduced motion). */
+  private letGo() {
+    this.grab = null
+    if (this.drag?.held) {
+      this.drag.held = false
+      this.invalidate()
+    }
   }
 
   /** Glide by `log` more (log2 of k) around `(x, y)`, with time constant `tauMs`; never past the zoom's limits. */
@@ -1075,6 +1222,12 @@ export class StarMapEngine {
     this.lastFrameAt = now
     let keepGoing = false
     let moving = this.dragging !== null || (this.pinch !== null && !this.pinch.ended)
+    // A finger held on a star long enough grabs it (#136); until then, watch the clock.
+    const grab = this.grab
+    if (grab && grab.kind === 'touch' && !grab.dragging && this.press && !this.press.moved) {
+      if (now - grab.at >= DRAG.longPressMs) this.startDrag(grab, this.press.x, this.press.y)
+      else keepGoing = true
+    }
 
     // A flight, else the glides after a pan and a zoom.
     let crossfade = 0
@@ -1164,6 +1317,10 @@ export class StarMapEngine {
     // The one exception: the recommended star is the student's way in, so it
     // is drawn, and breathes, even inside a blurred nebula -- one sprite.
     for (const i of scene.recommendations ?? []) this.starAlpha[i] = 1
+    if (this.applyDrag(dt)) {
+      moving = true
+      keepGoing = true
+    }
 
     // Choosing and letting go ease in and out.
     const ease = this.policy.inertia ? 1 - Math.exp(-dt / EMPHASIS_MS) : 1
@@ -1223,6 +1380,43 @@ export class StarMapEngine {
     else this.lastFrameAt = null
   }
 
+  /**
+   * Step the drag's springs by `dt` and move the grabbed star and its linked
+   * stars on screen by their displacements (#136); they are drawn one by one
+   * even in a blurred nebula. Whether the drag goes on (false: none, or it
+   * has just come to rest, every star back in its place). `end` drops it at once.
+   */
+  private applyDrag(dt: number, end = false): boolean {
+    const drag = this.drag
+    if (!drag) return false
+    // Held: the star where the hand holds it, whatever the camera did since.
+    const grab = this.grab
+    if (drag.held && grab?.dragging && grab.star === drag.star) {
+      drag.gx = grab.hx - grab.ax - this.x[drag.star]
+      drag.gy = grab.hy - grab.ay - this.y[drag.star]
+    }
+    const alive = !end && stepStarDrag(drag, dt, !this.policy.inertia)
+    if (!alive) {
+      this.drag = null
+      this.dragX.fill(0)
+      this.dragY.fill(0)
+      this.dragRelated.fill(0)
+      this.positionsStale = true
+      return false
+    }
+    const set = (i: number, dx: number, dy: number) => {
+      this.dragX[i] = dx
+      this.dragY[i] = dy
+      this.dragRelated[i] = 1
+      this.x[i] += dx
+      this.y[i] += dy
+      this.starAlpha[i] = 1
+    }
+    set(drag.star, drag.gx, drag.gy)
+    for (let k = 0; k < drag.followers.length; k += 1) set(drag.followers[k], drag.fx[k], drag.fy[k])
+    return true
+  }
+
   /** What the renderer draws this frame: every reveal a continuous function of the zoom (#134). */
   private frameState(
     t: { scale: number; ox: number; oy: number },
@@ -1278,6 +1472,9 @@ export class StarMapEngine {
       chosenAmount: this.chosenAmount,
       nebulaLift: this.nebulaLift,
       emphasisKey: `${this.chosenAmount.toFixed(3)}:${this.nebulaLift.reduce((sum, lift, n) => sum + lift * (n + 1), 0).toFixed(3)}`,
+      drag: this.drag
+        ? { star: this.drag.star, related: this.dragRelated, offsetX: this.dragX, offsetY: this.dragY, amount: this.drag.amount, grow: this.drag.grow }
+        : undefined,
       showSkills: skillAlpha(starPx),
       crossfade,
       time: now,
