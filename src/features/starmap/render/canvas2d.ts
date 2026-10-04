@@ -13,7 +13,7 @@ import { aroundDisc, belongsTo, boxHitsCircle, placeLabel, type Box, type Circle
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
 import { CLOUD_REACH, galaxyHazeAlpha, galaxyHazeBox, nebulaGlowAlpha, paintGalaxy, paintGalaxyHaze, paintNebulaCloud } from '@/features/starmap/render/galaxy'
-import { drawGalaxyNames } from '@/features/starmap/render/galaxyNames'
+import { createGalaxyNames } from '@/features/starmap/render/galaxyNames'
 import { drawLinks } from '@/features/starmap/render/links'
 import { DRAW_THRESHOLD } from '@/features/starmap/view/foveation'
 import type { Viewport } from '@/features/starmap/view/camera'
@@ -309,6 +309,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   }
 
   const tiles: TileCache = createTileCache(paintTile)
+  const galaxyNames = createGalaxyNames(makeCanvas)
   let tilesFor = ''
 
   const rebuild = () => {
@@ -385,6 +386,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
     setTheme(next) {
       theme = next
+      galaxyNames.clear()
       starNameWidths = []
       nebulaNameWidths = []
       rebuild()
@@ -519,7 +521,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         }
         lastLightKey = key
         // Far out, each galaxy's name, very faint, under its stars (#137 A3).
-        stats.galaxyNames = drawGalaxyNames(ctx, scene, frame, colours)
+        stats.galaxyNames = galaxyNames.draw(ctx, scene, frame, colours, dpr)
       }
 
       // Haze under every nebula (one sky: its cloud, above), and the blurred stars of those outside the focus.

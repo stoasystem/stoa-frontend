@@ -41,23 +41,23 @@ export function galaxyNameAside(offsetPx: number, width: number): number {
   return width > 0 ? 1 - ramp(Math.abs(offsetPx) / width, PANORAMA.galaxyName.aside) : 1
 }
 
+/** Where and how strongly one galaxy's name is drawn this frame. */
+export type GalaxyNamePlacement = { galaxy: number; text: string; x: number; y: number; px: number; alpha: number }
+
 /**
- * Draws every galaxy's name that is on screen and not yet faded out. Returns
- * how many it drew (for the render stats and tests).
+ * Every galaxy name on screen and not yet faded out: its text (the subject's
+ * name, upper case), its middle, its size and its alpha (the token's own
+ * alpha times its visibility, the galaxy's dimming and how far aside it is).
  */
-export function drawGalaxyNames(ctx: CanvasRenderingContext2D, scene: SceneData, frame: SceneFrame, theme: StarMapTheme): number {
+export function galaxyNamePlacements(scene: SceneData, frame: SceneFrame, theme: StarMapTheme): GalaxyNamePlacement[] {
   const galaxies = scene.galaxies
-  if (!galaxies || frame.pastPanorama === undefined) return 0
+  if (!galaxies || frame.pastPanorama === undefined) return []
   const visibility = galaxyNameAlpha(frame.pastPanorama)
-  if (visibility < 0.01) return 0
+  if (visibility < 0.01) return []
   const { width, height } = frame.viewport
-  const ink = theme.galaxyName ?? GALAXY_NAME_INK
-  const { tracking, weight, below } = PANORAMA.galaxyName
-  const canSpace = 'letterSpacing' in ctx
-  let drawn = 0
-  ctx.save()
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
+  const inkAlpha = alphaOf(theme.galaxyName ?? GALAXY_NAME_INK)
+  const { tracking, below } = PANORAMA.galaxyName
+  const out: GalaxyNamePlacement[] = []
   galaxies.forEach((galaxy, g) => {
     const turn = frame.galaxyShift?.[g] ?? 0
     const x0 = frame.ox + (galaxy.x0 + turn) * frame.scale
@@ -66,20 +66,85 @@ export function drawGalaxyNames(ctx: CanvasRenderingContext2D, scene: SceneData,
     const y = frame.oy + galaxy.y1 * frame.scale + px * below
     const text = galaxy.name.toLocaleUpperCase()
     // A rough reach (the measured width is not needed to skip a galaxy far off screen).
-    const reach = px * (0.62 + tracking) * text.length / 2
-    const cx = (x0 + x1) / 2
-    const alpha = visibility * galaxy.dim * galaxyNameAside(cx - width / 2, width)
-    if (alpha < 0.005 || cx + reach < 0 || cx - reach > width || y + px < 0 || y - px > height) return
-    ctx.font = `${weight} ${px}px ${theme.fontFamily}`
-    // Chrome 99+, Safari 18+; elsewhere the name just sits tighter.
-    if (canSpace) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${Math.round(px * tracking)}px`
-    ctx.globalAlpha = 1
-    ctx.fillStyle = fade(ink, alpha)
-    // Letter spacing adds a trailing space after the last letter: shift by half of it to stay centred.
-    ctx.fillText(text, cx + (canSpace ? (px * tracking) / 2 : 0), y)
-    drawn += 1
+    const reach = (px * (0.62 + tracking) * text.length) / 2
+    const x = (x0 + x1) / 2
+    const alpha = inkAlpha * visibility * galaxy.dim * galaxyNameAside(x - width / 2, width)
+    if (alpha < 0.002 || x + reach < 0 || x - reach > width || y + px < 0 || y - px > height) return
+    out.push({ galaxy: g, text, x, y, px, alpha })
   })
-  if (canSpace) (ctx as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = '0px'
-  ctx.restore()
-  return drawn
+  return out
+}
+
+function alphaOf(colour: string): number {
+  const parts = colour.trim().startsWith('#') ? [] : (colour.match(/[\d.]+/g)?.map(Number) ?? [])
+  return parts[3] ?? 1
+}
+
+type MakeCanvas = (width: number, height: number) => HTMLCanvasElement
+
+/** Sprites are set at sizes this many steps per octave apart, and drawn scaled by less than one step. */
+const SPRITE_STEPS_PER_OCTAVE = 8
+/** At most this many sprites are kept (a zoom out and in again sets a few sizes). */
+const SPRITES_KEPT = 24
+
+/**
+ * The names as the renderer draws them: each name is set once per size step
+ * into its own sprite, and each frame only places and fades it, at nearly
+ * its own size -- no text is shaped while the map pans, and no large image
+ * is resampled.
+ */
+export function createGalaxyNames(makeCanvas: MakeCanvas) {
+  const sprites = new Map<string, { canvas: HTMLCanvasElement; size: number; width: number; height: number }>()
+  const spriteFor = (text: string, px: number, theme: StarMapTheme, dpr: number) => {
+    const ink = fade(theme.galaxyName ?? GALAXY_NAME_INK, 1 / Math.max(1e-6, alphaOf(theme.galaxyName ?? GALAXY_NAME_INK)))
+    const size = 2 ** (Math.round(Math.log2(px) * SPRITE_STEPS_PER_OCTAVE) / SPRITE_STEPS_PER_OCTAVE)
+    const key = `${text}|${size}|${ink}|${theme.fontFamily}|${dpr}`
+    const hit = sprites.get(key)
+    if (hit) return hit
+    if (sprites.size >= SPRITES_KEPT) sprites.delete(sprites.keys().next().value!)
+    const { tracking, weight } = PANORAMA.galaxyName
+    const scale = Math.max(1, dpr)
+    const font = `${weight} ${size * scale}px ${theme.fontFamily}`
+    const spacing = Math.round(size * tracking * scale)
+    const probe = makeCanvas(1, 1).getContext('2d')
+    let measured = text.length * size * scale * 0.7
+    if (probe) {
+      probe.font = font
+      if ('letterSpacing' in probe) (probe as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${spacing}px`
+      measured = probe.measureText(text)?.width ?? measured
+    }
+    const width = Math.ceil(measured + spacing + size * scale * 0.5)
+    const height = Math.ceil(size * scale * 1.6)
+    const canvas = makeCanvas(width, height)
+    const c = canvas.getContext('2d')
+    if (c) {
+      c.font = font
+      if ('letterSpacing' in c) (c as CanvasRenderingContext2D & { letterSpacing: string }).letterSpacing = `${spacing}px`
+      c.textAlign = 'center'
+      c.textBaseline = 'middle'
+      c.fillStyle = ink
+      // Letter spacing adds a trailing space after the last letter: shift by half of it to stay centred.
+      c.fillText(text, width / 2 + spacing / 2, height / 2)
+    }
+    const sprite = { canvas, size, width: width / scale, height: height / scale }
+    sprites.set(key, sprite)
+    return sprite
+  }
+  return {
+    /** Draws every name in view; returns how many. */
+    draw(ctx: CanvasRenderingContext2D, scene: SceneData, frame: SceneFrame, theme: StarMapTheme, dpr: number): number {
+      const placements = galaxyNamePlacements(scene, frame, theme)
+      for (const name of placements) {
+        const sprite = spriteFor(name.text, name.px, theme, dpr)
+        const k = name.px / sprite.size
+        ctx.globalAlpha = Math.min(1, name.alpha)
+        ctx.drawImage(sprite.canvas, name.x - (sprite.width * k) / 2, name.y - (sprite.height * k) / 2, sprite.width * k, sprite.height * k)
+      }
+      ctx.globalAlpha = 1
+      return placements.length
+    },
+    clear() {
+      sprites.clear()
+    },
+  }
 }

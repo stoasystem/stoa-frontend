@@ -25,7 +25,7 @@ import {
   nebulaGlowAlpha,
   paintGalaxyHaze,
 } from '@/features/starmap/render/galaxy'
-import { drawGalaxyNames, GALAXY_NAME_INK, galaxyNameAside, galaxyNameSize } from '@/features/starmap/render/galaxyNames'
+import { GALAXY_NAME_INK, galaxyNameAside, galaxyNamePlacements, galaxyNameSize } from '@/features/starmap/render/galaxyNames'
 import { seededRandom } from '@/features/starmap/layout/layout'
 import type { SceneData, SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
 import { galaxyNameAlpha, PANORAMA, panoramaDot, panoramaLook, ramp, REVEAL, ZOOM } from '@/features/starmap/view/semanticZoom'
@@ -61,27 +61,6 @@ function session(width: number, height: number, points: 1000 | 2000 = 1000, subj
   engine.setData(map, { layer: 'map' })
   clock.advance(20)
   return { engine, clock, frames, real, map, counter, scene: () => scene!, last: () => frames[frames.length - 1] }
-}
-
-/** A recording 2D context: every `fillText` with the fill style and font it was drawn in. */
-function textRecorder() {
-  const texts: { text: string; x: number; y: number; fill: string; font: string }[] = []
-  const store: Record<string | symbol, unknown> = { fillStyle: '', font: '' }
-  const ctx = new Proxy(store, {
-    get(target, prop) {
-      if (prop in target) return target[prop]
-      if (prop === 'fillText') return (text: string, x: number, y: number) => texts.push({ text, x, y, fill: String(store.fillStyle), font: String(store.font) })
-      return () => undefined
-    },
-    set(target, prop, value) {
-      target[prop] = value
-      return true
-    },
-    has(target, prop) {
-      return prop in target
-    },
-  }) as unknown as CanvasRenderingContext2D
-  return { ctx, texts }
 }
 
 const alphaOf = (colour: string) => Number(colour.match(/[\d.]+/g)![3])
@@ -178,17 +157,17 @@ describe('A3: each galaxy is named far out, and reads as one whole', () => {
     s.engine.destroy()
   })
 
-  it('draws the subject’s name, large and faint, under its galaxy; a galaxy not taken dimmed; none once zoomed in', () => {
+  it('places the subject’s name, large and faint, under its galaxy; a galaxy not taken dimmed; none once zoomed in', () => {
     const s = session(1440, 900)
     const scene = s.scene()
     const frame = s.last()
-    const { ctx, texts } = textRecorder()
-    expect(drawGalaxyNames(ctx, scene, frame, THEME)).toBeGreaterThan(0)
-    const math = texts.find((t) => t.text === 'MATHEMATICS')!
+    const placed = galaxyNamePlacements(scene, frame, THEME)
+    const math = placed.find((t) => t.text === 'MATHEMATICS')!
     expect(math).toBeDefined()
-    expect(Number(math.font.match(/(\d+(?:\.\d+)?)px/)![1])).toBeGreaterThanOrEqual(PANORAMA.galaxyName.minPx)
-    expect(alphaOf(math.fill)).toBeGreaterThan(0.05)
-    expect(alphaOf(math.fill)).toBeLessThan(0.2)
+    expect(math.px).toBeGreaterThanOrEqual(PANORAMA.galaxyName.minPx)
+    expect(math.alpha).toBeGreaterThan(0.05)
+    expect(math.alpha).toBeLessThan(0.2)
+    expect(math.alpha).toBeCloseTo(alphaOf(GALAXY_NAME_INK), 6)
     // Under its stars: below the galaxy's lowest star on screen.
     const galaxy = scene.galaxies!.find((g) => g.subjectId === 'math')!
     expect(math.y).toBeGreaterThan(frame.oy + galaxy.y1 * frame.scale)
@@ -197,15 +176,11 @@ describe('A3: each galaxy is named far out, and reads as one whole', () => {
 
     // The galaxy not taken: centred on chemistry, its name is drawn at NOT_ENROLLED_DIM of math's.
     const c = session(1440, 900, 1000, 'chemistry')
-    const other = textRecorder()
-    drawGalaxyNames(other.ctx, c.scene(), c.last(), THEME)
-    const chemistry = other.texts.find((t) => t.text === 'CHEMISTRY')!
-    expect(alphaOf(chemistry.fill)).toBeCloseTo(alphaOf(math.fill) * NOT_ENROLLED_DIM, 3)
+    const chemistry = galaxyNamePlacements(c.scene(), c.last(), THEME).find((t) => t.text === 'CHEMISTRY')!
+    expect(chemistry.alpha).toBeCloseTo(math.alpha * NOT_ENROLLED_DIM, 6)
 
     // Zoomed in: no galaxy names at all.
-    const zoomed = textRecorder()
-    expect(drawGalaxyNames(zoomed.ctx, scene, { ...frame, pastPanorama: PANORAMA.galaxyName.out[1] + 0.01 }, THEME)).toBe(0)
-    expect(zoomed.texts).toHaveLength(0)
+    expect(galaxyNamePlacements(scene, { ...frame, pastPanorama: PANORAMA.galaxyName.out[1] + 0.01 }, THEME)).toHaveLength(0)
     s.engine.destroy()
     c.engine.destroy()
   })
@@ -228,11 +203,24 @@ describe('A3: each galaxy is named far out, and reads as one whole', () => {
     expect(galaxyNameSize(1e5)).toBe(PANORAMA.galaxyName.maxPx)
   })
 
-  it('the renderer draws the names far out and counts them', () => {
+  it('the renderer draws the names far out from sprites set once, and counts them', () => {
     const s = session(1440, 900)
     s.clock.advance(40)
     expect(s.real.stats.galaxyNames).toBeGreaterThan(0)
-    expect(s.counter.texts!.some((t) => t.text === 'MATHEMATICS')).toBe(true)
+    const set = s.counter.texts!.filter((t) => t.text === 'MATHEMATICS').length
+    expect(set).toBe(1)
+    // Panning far out redraws the names without setting them again.
+    const frames = s.frames.length
+    s.engine.pointerDown(1, 700, 450)
+    for (let i = 1; i <= 6; i += 1) {
+      s.engine.pointerMove(1, 700 - 10 * i, 450)
+      s.clock.advance(17)
+    }
+    s.engine.pointerUp(1, 640, 450)
+    s.clock.advance(100)
+    expect(s.frames.length).toBeGreaterThan(frames + 3)
+    expect(s.real.stats.galaxyNames).toBeGreaterThan(0)
+    expect(s.counter.texts!.filter((t) => t.text === 'MATHEMATICS').length).toBe(set)
     s.engine.destroy()
   })
 
