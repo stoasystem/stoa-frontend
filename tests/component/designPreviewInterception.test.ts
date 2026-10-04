@@ -26,7 +26,8 @@ afterAll(() => {
 
 describe('the design preview fetch replacement', () => {
   it('uses the same prefix the dev server proxies', () => {
-    const config = readFileSync(path.resolve(__dirname, '../../vite.config.ts'), 'utf8')
+    // A Windows checkout may carry CRLF; the shape below is read with LF.
+    const config = readFileSync(path.resolve(__dirname, '../../vite.config.ts'), 'utf8').replace(/\r\n/g, '\n')
     const proxy = /proxy:\s*\{([\s\S]*?)\n {4}\},?\n/.exec(config)?.[1] ?? ''
     expect([...proxy.matchAll(/^ {6}'([^']+)':/gm)].map(([, key]) => key)).toEqual([DEV_PROXY_PREFIX])
   })
