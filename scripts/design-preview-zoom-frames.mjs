@@ -257,7 +257,7 @@ try {
       await delay(800)
       routes.push(await route())
       for (let i = 0; i < 3; i += 1) {
-        await zoomButton('out').click()
+        if (await zoomButton('out').isEnabled()) await zoomButton('out').click()
         await delay(350)
       }
       await delay(600)
@@ -271,7 +271,7 @@ try {
       }
       await delay(800)
       for (let i = 0; i < 2; i += 1) {
-        await zoomButton('in').click()
+        if (await zoomButton('in').isEnabled()) await zoomButton('in').click()
         await delay(350)
       }
       await delay(800)

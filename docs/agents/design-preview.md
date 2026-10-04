@@ -23,7 +23,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - `points`：整片天空的星数 `10` / `1000` / `2000`，默认 1000（演示天空 `src/dev/demo/sky/demoSky.ts`，只经星图数据源接缝注入，见下文「演示数据」，#131）。
 - `lang`：`de` / `en` / `fr` / `it`；不给时按浏览器语言。界面文字和演示内容（章节、对话、通知、星名）同一种语言；在 /me 或账号菜单改语言后，后续请求也按新语言作答。
 - `signedIn=0`：以未登录访客打开（`login` 默认如此）。
-- `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景本来不画星云名，所以只在星云层看得到。
+- `longNames=1`：星云用四语里最长的名字（经预览自己的星图覆盖，`withLongNebulaNames`）；全景只画悬停的那团星云名，放大后（#134 按星云屏上大小淡入）才看得到。
 - `fresh=1`：清掉演示后端在本标签页里记住的状态（已完成课时、点亮与确认、Ask 里新建的对话和发出的消息，见下文「演示后端的状态」），回到 #116 的开场状态。
 
 页面里一旦移动过，地址栏就始终写回 `path`；登出后写回 `signedIn=0`，在页面里改过语言后写回 `lang`。所以刷新总是回到离开时的那一页、那个登录状态和语言。
@@ -31,7 +31,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | surface | 路由 | 状态 |
 | --- | --- | --- |
 | `login` | `/login` | 可看 |
-| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；星层停在演示知识点上，它的星卡片「Continue」进入章节 |
+| `map` / `map-nebula` / `map-star` | `/map/math`、`/map/math/trigonometry`、`/map/math/trigonometry/demo-sine-cosine` | 可看；#134 起这三个是「什么都没选 / 选了三角函数 / 选了演示知识点」，打开时缩放分别是全景、星形 28 px、34 px，之后可以无级缩放；演示知识点的星卡片「Continue」进入章节 |
 | `map-focus-optics` / `map-focus-star` | `/map/physics`（键盘聚焦「光学」）、`/map/math/trigonometry`（聚焦演示知识点） | 可看：聚焦时点亮的连线（#121） |
 | `map-optics` / `map-refraction` | `/map/physics/optics`、`/map/physics/optics/demo-refraction` | 可看：跨学科前置（#121） |
 | `chapter` | `/chapter/demo-sine-cosine` | 可看：3 个课时，开场时第 1 课已完成 |
@@ -39,7 +39,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 | `ask` / `ask-conversation` | `/ask`、`/ask/demo-ask-sine` | 可看；桌面为侧栏，手机为全屏 sheet；`demo-ask-sine` 带一位进行中的老师；能发消息（答复为固定文字）、请老师 |
 | `me` | `/me` | 可看 |
 | `account-menu` | `/me` 并自动打开头像菜单 | 可看，能退出（回到登录页） |
-| `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认，进入星层即在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
+| `lighting` | `/map/math/trigonometry/demo-sine-cosine` | 可看：打开前把演示知识点的课时全部记为完成、点亮尚未确认，打开这颗星（星卡片）即在这颗星上播放一次点亮动画（#51）；截图等动画结束（`data-lighting="done"`）后再拍 |
 
 ## 拦截：怎么做到零后端请求
 
@@ -60,6 +60,8 @@ npm run dev -- --host 127.0.0.1 --port 5173
 **假登录**：入口直接把演示学生写进 `useAuthStore`（令牌只在内存里），再由真实的 `AuthBootstrap` 读 `/auth/me`，与登录后的路径一致。
 
 ## 截图
+
+无级缩放（#134）的连续帧另用 `node scripts/design-preview-zoom-frames.mjs --base <开发服务器> --label <集>`，见 `starmap-demo.md`「无级缩放」。
 
 开发服务器运行时：
 
