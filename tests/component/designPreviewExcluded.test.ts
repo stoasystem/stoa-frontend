@@ -172,7 +172,9 @@ function importGraph(entry: string): string[] {
 }
 
 describe('the design preview stays out of the application', () => {
-  it('has nothing under src/dev or src/mocks in the import graph of src/main.tsx', () => {
+  // Reads and parses every module reachable from src/main.tsx and expands its globs: a
+  // second or two alone, past the default 5 s beside the full suite (#133).
+  it('has nothing under src/dev or src/mocks in the import graph of src/main.tsx', { timeout: 30_000 }, () => {
     const graph = importGraph(ENTRY)
     expect(graph.filter((file) => FORBIDDEN_DIRS.some((dir) => file.startsWith(dir)))).toEqual([])
   })
