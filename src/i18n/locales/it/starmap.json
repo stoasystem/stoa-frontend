@@ -24,7 +24,8 @@
   "legend": {
     "label": "Cosa significano le stelle",
     "reviewDue": "Da ripassare",
-    "hint": "Trascina per muoverti sulla mappa. Scorri, pizzica o usa + e − per avvicinarti a una nebulosa; scegli una stella per vederne il capitolo."
+    "pointer": "Trascina per spostarti, scorri o pizzica per lo zoom. Scegli una stella per vederne il capitolo; premila e trascinala (sul touch, prima tienila premuta) per vedere a cosa è collegata.",
+    "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom."
   },
   "star": {
     "progress": "{{percent}}% delle lezioni svolte",

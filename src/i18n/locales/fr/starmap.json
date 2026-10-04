@@ -24,7 +24,8 @@
   "legend": {
     "label": "Ce que signifient les étoiles",
     "reviewDue": "À réviser",
-    "hint": "Faites glisser pour parcourir la carte. Faites défiler, pincez ou utilisez + et − pour zoomer sur une nébuleuse ; choisissez une étoile pour voir son chapitre."
+    "pointer": "Faites glisser pour vous déplacer, faites défiler ou pincez pour zoomer. Choisissez une étoile pour voir son chapitre ; appuyez dessus et faites-la glisser (en tactile, maintenez d’abord) pour voir ses liens.",
+    "keys": "Clavier : flèches vers le plus proche dans ce sens, Tab suit le cours, + et − zooment."
   },
   "star": {
     "progress": "{{percent}} % des leçons faites",

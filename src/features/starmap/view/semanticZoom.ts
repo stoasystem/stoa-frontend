@@ -152,6 +152,20 @@ export const DRAG = {
   restSpeed: 2,
 } as const
 
+/**
+ * Arrow keys by position (#141, `view/keyboardOrder.ts`): from a star (or,
+ * up and down, a nebula) to the nearest one in the arrow's direction. Map
+ * units for distances; the cone is a ratio, sideways over ahead.
+ */
+export const KEYS = {
+  /** A candidate counts only this far off the axis: sideways up to this many times its distance ahead (2 ≈ 63°). */
+  coneSlope: 2,
+  /** Sideways distance weighs this many times ahead, so the one straight ahead wins over a nearer one off to the side. */
+  offAxisWeight: 2,
+  /** Less than this ahead (map units) is level with the start, not ahead of it. */
+  minAhead: 1e-6,
+} as const
+
 /** A smoothstep from 0 (at or below `from`) to 1 (at or above `to`): continuous, monotone, flat at both ends. */
 export function ramp(value: number, [from, to]: Ramp): number {
   if (!(value > from)) return 0
