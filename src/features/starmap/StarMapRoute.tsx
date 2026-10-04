@@ -16,6 +16,7 @@ import { useTranslation } from 'react-i18next'
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { StarMapView } from '@/features/starmap/components/StarMapView'
 import { LightingOverlay } from '@/features/starmap/lighting/LightingOverlay'
+import { useLightingStage } from '@/features/starmap/lighting/useLightingStage'
 import { DEFAULT_SUBJECT_ID, DEMO_STAR_COUNT, fixtureSizeFrom, foveationFrom, useStarMap } from '@/features/starmap/useStarMap'
 import { pathForTarget, resolveTarget, type LayerTarget } from '@/features/starmap/view/layers'
 import { markLoginFirstScreenReady } from '@/lib/loginTiming'
@@ -43,7 +44,9 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
     }
   }, [map, lastSubject, ownerId, remember])
   const { topicId, unitId } = params
-  const target = useMemo(() => resolveTarget(map, topicId, unitId), [map, topicId, unitId])
+  const routeTarget = useMemo(() => resolveTarget(map, topicId, unitId), [map, topicId, unitId])
+  // A point waiting for its lighting moment is drawn in progress until it, and its star's route opens on its nebula (#140).
+  const stage = useLightingStage(map, routeTarget)
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
   // lands on the map now, so its first drawn frame ends the wait. The mark is
@@ -68,8 +71,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={map} target={target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
-      overlay={(locate) => <LightingOverlay map={map} locate={locate} />} />
+    <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+      overlay={(locate) => <LightingOverlay map={map} locate={locate} onReveal={stage.reveal} />} />
   )
 }
 

@@ -9,7 +9,13 @@
  *   - It waits until the star is on screen: in the galaxy in focus, inside
  *     the map's frame. Then the animation (`flare.ts`) runs on this layer's
  *     own canvas, above the map's, following the star while the map
- *     settles. With reduced motion there is none: the star simply is lit.
+ *     settles. With reduced motion there is none: the star simply is lit,
+ *     and a small still label beside it says "<name> is lit" for
+ *     `STILL_LABEL_MS`, then goes -- at once, without fading (#140 F3).
+ *   - The star turns lit gold under the flare's brightest moment, not before
+ *     (#140 F1): until then the map draws it as it was (`useLightingStage.ts`),
+ *     and this layer says when (`onReveal`) -- with reduced motion, as it
+ *     is shown.
  *   - Either way an `aria-live` region says "<name> is lit" at that moment.
  *   - Only once shown (the flare played to its end, or with reduced motion
  *     announced) is the point acknowledged to the source, so a reload does
@@ -23,7 +29,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { animationFrameScheduler, type FrameScheduler, type StarOnScreen } from '@/features/starmap/engine/starMapEngine'
-import { drawFlare, flareBase, FLARE_MS } from '@/features/starmap/lighting/flare'
+import { drawFlare, flareBase, FLARE_MS, FLARE_PEAK_MS } from '@/features/starmap/lighting/flare'
 import { isCelebrated, useLightingEventSource, type LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import { subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
@@ -33,17 +39,22 @@ import { useLitMomentsStore } from '@/store/litMomentsStore'
 /** Time for the map to finish arriving (a layer flight) before the flare starts. */
 export const SETTLE_MS = 450
 
+/** With reduced motion, how long the still "<name> is lit" label stays beside the star (#140 F3). */
+export const STILL_LABEL_MS = 4000
+
 type Moment = { event: LitEvent; star: Star; subjectId: string }
 
 export type LightingOverlayProps = {
   map: StarMap
   /** Where a star is drawn now, from the map's engine. */
   locate: (unitId: string) => StarOnScreen | null
+  /** The star may be drawn lit now: the flare's brightest moment, or the moment shown without one (#140). */
+  onReveal?: (unitId: string) => void
   /** For tests: the frame clock. */
   scheduler?: FrameScheduler
 }
 
-export function LightingOverlay({ map, locate, scheduler = animationFrameScheduler }: LightingOverlayProps) {
+export function LightingOverlay({ map, locate, onReveal, scheduler = animationFrameScheduler }: LightingOverlayProps) {
   const { t } = useTranslation('starmap')
   const source = useLightingEventSource()
   const reducedMotion = usePrefersReducedMotion()
@@ -51,12 +62,19 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
   const addMoment = useLitMomentsStore((state) => state.add)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const captionRef = useRef<HTMLParagraphElement>(null)
+  const stillRef = useRef<HTMLParagraphElement>(null)
+  const revealRef = useRef(onReveal)
+  useEffect(() => {
+    revealRef.current = onReveal
+  }, [onReveal])
   const handled = useRef(new Set<string>())
   const [pending, setPending] = useState<LitEvent[]>([])
   const [current, setCurrent] = useState<Moment | null>(null)
   const [playing, setPlaying] = useState(false)
   const [shown, setShown] = useState(0)
   const [announcement, setAnnouncement] = useState('')
+  /** With reduced motion: the still label, while it stays. */
+  const [still, setStill] = useState<{ unitId: string; text: string } | null>(null)
 
   // Read the source on arrival, and again whenever it says it changed.
   useEffect(() => {
@@ -115,6 +133,12 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
     let startAt: number | null = null
     let handle: number | null = null
     let finished = false
+    let revealed = false
+    const reveal = () => {
+      if (revealed) return
+      revealed = true
+      revealRef.current?.(star.unitId)
+    }
 
     const onScreen = (spot: StarOnScreen | null): spot is StarOnScreen => {
       const width = canvas.clientWidth
@@ -128,6 +152,7 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
       ctx?.clearRect(0, 0, canvas.width, canvas.height)
       if (captionRef.current) captionRef.current.style.opacity = '0'
       if (seen) {
+        reveal()
         source.acknowledge([event.unitId]).catch(() => {})
         if (ownerId) addMoment(ownerId, { unitId: star.unitId, name: star.name, subjectId, nebulaId: star.nebulaId, litAt: event.litAt })
         setShown((count) => count + 1)
@@ -149,7 +174,10 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
           return
         }
         setAnnouncement(t('lighting.announce', { name: star.name }))
-        if (reducedMotion) return end(true)
+        if (reducedMotion) {
+          setStill({ unitId: star.unitId, text: t('lighting.announce', { name: star.name }) })
+          return end(true)
+        }
         startAt = at + SETTLE_MS
         setPlaying(true)
       }
@@ -161,6 +189,8 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
         canvas.height = Math.round(height * ratio)
       }
       const elapsed = at - startAt
+      // Under the bloom at its fullest, the star turns gold.
+      if (elapsed >= FLARE_PEAK_MS) reveal()
       if (ctx) {
         ctx.setTransform(ratio, 0, 0, ratio, 0, 0)
         ctx.clearRect(0, 0, width, height)
@@ -168,9 +198,7 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
       }
       const caption = captionRef.current
       if (caption && spot) {
-        const base = flareBase(spot.size)
-        const below = Math.min(height - 48, spot.y + base * 1.6 + 12)
-        caption.style.transform = `translate(${Math.round(spot.x)}px, ${Math.round(below)}px) translateX(-50%)`
+        placeBelow(caption, spot, flareBase(spot.size) * 1.6 + 12, width, height)
         caption.style.opacity = String(captionOpacity(elapsed))
       }
       if (elapsed >= FLARE_MS + 600) return end(true)
@@ -183,6 +211,37 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
       if (!finished) handled.current.delete(event.unitId)
     }
   }, [current, locate, scheduler, reducedMotion, source, ownerId, addMoment, t])
+
+  // The still label (reduced motion): beside its star while the star is on screen -- it moves
+  // only when the map is moved -- and gone after STILL_LABEL_MS, at once.
+  useEffect(() => {
+    if (!still) return
+    let shownAt: number | null = null
+    let handle: number | null = null
+    const frame = (at: number) => {
+      handle = null
+      shownAt ??= at
+      if (at - shownAt >= STILL_LABEL_MS) {
+        setStill(null)
+        return
+      }
+      const label = stillRef.current
+      const box = label?.parentElement
+      const spot = locate(still.unitId)
+      if (label && box) {
+        const width = box.clientWidth
+        const height = box.clientHeight
+        const inside = spot !== null && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
+        label.style.visibility = inside ? 'visible' : 'hidden'
+        if (spot && inside) placeBelow(label, spot, flareBase(spot.size) * 0.6 + 10, width, height)
+      }
+      handle = scheduler.request(frame)
+    }
+    handle = scheduler.request(frame)
+    return () => {
+      if (handle !== null) scheduler.cancel(handle)
+    }
+  }, [still, locate, scheduler])
 
   const phase = playing ? 'playing' : shown > 0 ? 'done' : 'idle'
   return (
@@ -200,11 +259,31 @@ export function LightingOverlay({ map, locate, scheduler = animationFrameSchedul
           {t('lighting.announce', { name: current.star.name })}
         </p>
       )}
+      {still && (
+        // Seen, not read: the live region below says it. No transition: it comes and goes at once.
+        <p
+          ref={stillRef}
+          aria-hidden="true"
+          data-lighting-label={still.unitId}
+          className="absolute left-0 top-0 m-0 whitespace-nowrap rounded-full border border-solid border-[color:var(--sky-glass-border)] px-3 py-1 text-[13px] font-semibold text-on-sky"
+          style={{ visibility: 'hidden', background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
+        >
+          {still.text}
+        </p>
+      )}
       <p role="status" aria-live="polite" data-lighting-announcer className="sr-only">
         {announcement}
       </p>
     </div>
   )
+}
+
+/** A caption or label `gap` px below its star, kept inside the layer's `width` x `height`. */
+function placeBelow(element: HTMLElement, spot: StarOnScreen, gap: number, width: number, height: number) {
+  const half = element.offsetWidth / 2
+  const x = half > 0 && width > 2 * (8 + half) ? Math.max(8 + half, Math.min(width - 8 - half, spot.x)) : spot.x
+  const y = Math.min(height - 48, spot.y + gap)
+  element.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translateX(-50%)`
 }
 
 /** The caption comes in with the ignition and leaves after the flare. */

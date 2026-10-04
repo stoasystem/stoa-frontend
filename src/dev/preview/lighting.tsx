@@ -5,7 +5,9 @@
  *
  *   - `demoLightingSource`: stoa-backend#71's unacknowledged lit points and
  *     their acknowledgement, kept by the demo backend (so a reload of the tab
- *     does not replay the celebration).
+ *     does not replay the celebration); known at once (`known`, #140), so
+ *     the point is drawn in progress until the flare's brightest moment and
+ *     its star's route opens on its nebula seen whole.
  *   - the star map source: the demo sky (`readDemoStarMap`), passed through
  *     `demoStarMapOverride`, so the star map follows the lessons completed on the
  *     page. The demo knowledge point's state is #116's
@@ -42,6 +44,8 @@ export const demoLightingSource: LightingEventSource = {
   unacknowledged: async () => unacknowledgedLit(),
   acknowledge: async (unitIds) => acknowledgeLit(unitIds),
   subscribe: onDemoServerChange,
+  // The demo backend's state is at hand: the map draws the point in progress from its first frame (#140).
+  known: () => unacknowledgedLit(),
 }
 
 /** `map` as the demo backend would send it after the lessons completed so far. */

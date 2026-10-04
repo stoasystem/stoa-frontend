@@ -36,6 +36,15 @@ export type LightingEventSource = {
   acknowledge(unitIds: string[]): Promise<void>
   /** Called when `unacknowledged` may have changed. Optional: a source may only be read on mount. */
   subscribe?: (onChange: () => void) => () => void
+  /**
+   * The same list, now, without asking: what the source already holds (#140).
+   * Optional. With it the map draws a point not yet celebrated as it was
+   * before -- in progress -- from its very first frame until the flare's
+   * brightest moment, and a student coming back to its star lands on its
+   * nebula seen whole (`useLightingStage.ts`). A source without it is
+   * celebrated as before (#51): on a star already drawn lit, where it opens.
+   */
+  known?: () => readonly LitEvent[]
 }
 
 /** Production's source until stoa-backend#71: nothing is ever lit "just now", and nothing is asked. */
