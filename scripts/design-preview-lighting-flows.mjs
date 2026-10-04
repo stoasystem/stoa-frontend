@@ -21,7 +21,7 @@
 import { mkdirSync, readFileSync } from 'node:fs'
 import { setTimeout as delay } from 'node:timers/promises'
 
-/* global window, document, fetch, MutationObserver -- used inside the browser */
+/* global window, document, fetch, MutationObserver, URLSearchParams, getComputedStyle -- used inside the browser */
 
 const SHOTS = process.env.LIGHTING_SHOTS || '.codex-screenshots/design-preview/lighting'
 

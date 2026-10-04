@@ -22,6 +22,7 @@ import path from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
 import { URL } from 'node:url'
 import { chromium } from '@playwright/test'
+/* global window, document, URLSearchParams -- used inside the browser */
 
 
 function option(name, fallback) {
