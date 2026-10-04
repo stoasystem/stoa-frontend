@@ -327,18 +327,26 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     if (onOverlay(event) || (event.pointerType === 'mouse' && event.button !== 0)) return
     event.currentTarget.setPointerCapture?.(event.pointerId)
     const [x, y] = stagePoint(event)
-    engineRef.current?.pointerDown(event.pointerId, x, y)
+    // A mouse or pen grabs a star by pressing and moving it; a finger by holding it first (#136).
+    engineRef.current?.pointerDown(event.pointerId, x, y, event.pointerType === 'touch' ? 'touch' : event.pointerType === 'pen' ? 'pen' : 'mouse')
   }
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const [x, y] = stagePoint(event)
+    const engine = engineRef.current
     if (event.pointerType === 'mouse' && event.buttons === 0) {
-      engineRef.current?.hoverAt(onOverlay(event) ? null : x, y)
+      engine?.hoverAt(onOverlay(event) ? null : x, y)
     }
-    engineRef.current?.pointerMove(event.pointerId, x, y)
+    engine?.pointerMove(event.pointerId, x, y)
+    // Over a star that can be dragged, the hand says so (#136).
+    if (engine && event.pointerType === 'mouse') {
+      const cursor = onOverlay(event) ? '' : engine.cursorAt(x, y)
+      if (event.currentTarget.style.cursor !== cursor) event.currentTarget.style.cursor = cursor
+    }
   }
   const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
     const [x, y] = stagePoint(event)
     engineRef.current?.pointerUp(event.pointerId, x, y)
+    if (event.pointerType === 'mouse') event.currentTarget.style.cursor = engineRef.current?.cursorAt(x, y) ?? ''
   }
   const onPointerCancel = (event: PointerEvent<HTMLDivElement>) => {
     engineRef.current?.pointerCancel(event.pointerId)
@@ -504,7 +512,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     <div data-starmap-frame className="relative h-full min-h-[320px] w-full flex-1">
       <div
         ref={stageRef}
-        className="absolute inset-0 touch-none overflow-hidden select-none"
+        className="absolute inset-0 touch-none overflow-hidden select-none [-webkit-touch-callout:none]"
         data-starmap-stage
         data-layer={target.layer}
         data-zoom-band={visible.zoom.band}
@@ -512,6 +520,10 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        // A finger holding a star (#136) is not asking for the context menu.
+        onContextMenu={(event) => {
+          if (engineRef.current?.holdingStar) event.preventDefault()
+        }}
         onPointerLeave={() => engineRef.current?.hoverAt(null)}
         onKeyDown={onKeyDown}
       >

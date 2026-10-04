@@ -82,8 +82,12 @@ export const BRIDGE = {
 /** The glow between two galaxies: how far into the gap it reaches (share of the gap) and how tall (share of the galaxy). */
 export const HINT = { offset: 0.16, rx: 0.3, ry: 0.32, alpha: 1.6 } as const
 
+/** A dragged star's lines, lit (#136): this wide, in the in-progress ink at this strength (gold into the recommended star). */
+const DRAG_LINE_WIDTH = 1.6
+const DRAG_LINE_INK = 1.4
+
 /** What the lines took in the last frame (tests, and the acceptance count of #121). */
-export type LinkStats = { bridges: number; hints: number; lines: number; labels: number }
+export type LinkStats = { bridges: number; hints: number; lines: number; labels: number; dragLabels: number }
 
 /** The obstacles names must keep clear of: the renderer's own lists, added to. */
 export type LinkObstacles = { segments: Segment[]; boxes: Box[] }
@@ -190,7 +194,7 @@ export function drawLinks(
   obstacles: LinkObstacles,
   options: LinkOptions = {},
 ): LinkStats {
-  const stats: LinkStats = { bridges: 0, hints: 0, lines: 0, labels: 0 }
+  const stats: LinkStats = { bridges: 0, hints: 0, lines: 0, labels: 0, dragLabels: 0 }
   const ink = theme.links ?? LINK_INK
   const data = prepare(scene)
   const { width, height } = frame.viewport
@@ -200,7 +204,13 @@ export function drawLinks(
     star: frame.starFocus ?? 0,
     chosen: frame.chosenNebula,
     focusStar: frame.focusStar,
+    dragStar: frame.drag?.star ?? -1,
+    drag: frame.drag?.amount ?? 0,
   }
+  const dragStar = view.dragStar ?? -1
+  const drag = dragStar >= 0 ? (view.drag ?? 0) : 0
+  // How far a star is from its place (#136): a line between moved stars runs between where they are drawn.
+  const offX = frame.drag?.offsetX
   const periods = options.wrap ? [0, -1, 1] : [0]
   const band = frame.scale
   const onScreen = (x0: number, y0: number, x1: number, y1: number, pad: number) =>
@@ -306,7 +316,7 @@ export function drawLinks(
   }
 
   // ---- Closer in: lines between stars, each tier by zoom ----
-  const anyLines = view.tiers.some((tier) => tier > 0.001) || (view.star > 0.001 && view.focusStar >= 0)
+  const anyLines = view.tiers.some((tier) => tier > 0.001) || (view.star > 0.001 && view.focusStar >= 0) || drag > 0.001
   if (anyLines) {
     const trim = Math.max(frame.glyphSize * 0.5, frame.dotRadius * 2) + 2
     const fadeOf = (n: number) => Math.max(LINE.fadeMin, (frame.nebulaR[n] ?? 0) * LINE.fade)
@@ -314,12 +324,14 @@ export function drawLinks(
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
     const ends: [number, number][] = []
     for (const line of data.lines) {
-      const { strength, reach } = starLineLook(line, view)
+      const { strength, reach, lit } = starLineLook(line, view)
       if (strength <= 0.001) continue
-      // Anchored on the focused star, else on the end in the chosen nebula;
+      // Anchored on the dragged star, else the focused star, else on the end in the chosen nebula;
       // a line between two other nebulae is drawn from both ends, each fading out.
       ends.length = 0
-      if (view.focusStar >= 0 && (line.from === view.focusStar || line.to === view.focusStar)) {
+      if (lit > 0) {
+        ends.push(line.to === dragStar ? [line.to, line.from] : [line.from, line.to])
+      } else if (view.focusStar >= 0 && (line.from === view.focusStar || line.to === view.focusStar)) {
         ends.push(line.to === view.focusStar ? [line.to, line.from] : [line.from, line.to])
       } else if (view.chosen >= 0 && (line.fromNebula === view.chosen || line.toNebula === view.chosen)) {
         ends.push(line.fromNebula === view.chosen ? [line.from, line.to] : [line.to, line.from])
@@ -334,7 +346,7 @@ export function drawLinks(
         const leaves = qNebula !== pNebula
         const px = frame.x[p]
         const py = frame.y[p]
-        const qx = px + shortestDx(scene.mapX[p], scene.mapX[q]) * band
+        const qx = px + shortestDx(scene.mapX[p], scene.mapX[q]) * band + (offX ? offX[q] - offX[p] : 0)
         const qy = frame.y[q]
         const d = Math.hypot(qx - px, qy - py)
         if (d <= trim * 2) continue
@@ -378,6 +390,18 @@ export function drawLinks(
           ctx.moveTo(x0, y0)
           ctx.lineTo(x1, y1)
           ctx.stroke()
+          if (lit > 0.001) {
+            // A dragged star's line lights up whatever its tier: a bright solid
+            // stroke over it (gold into the recommended star), eased in and out.
+            ctx.setLineDash([])
+            ctx.strokeStyle = line.tier === TIER_RECOMMENDED ? fade(ink.recommended, 1) : fade(ink.inProgress, DRAG_LINE_INK)
+            ctx.globalAlpha = Math.min(1, lit)
+            ctx.lineWidth = DRAG_LINE_WIDTH
+            ctx.beginPath()
+            ctx.moveTo(x0, y0)
+            ctx.lineTo(x1, y1)
+            ctx.stroke()
+          }
           seen = true
           // Names keep clear of what carries the message now; the faint path walked may run under them.
           if (strength >= 0.5 && (line.tier <= 2 || reach > 0)) obstacles.segments.push({ x0, y0, x1, y1 })
@@ -396,7 +420,8 @@ export function drawLinks(
 
     // Where those lines lead: a nebula off screen is named at the edge, in
     // its direction; one in another galaxy also says which subject it is in.
-    const labelAlpha = Math.max(view.tiers[1] ?? 0, view.star)
+    // While a star is dragged, its own destinations (below) take over.
+    const labelAlpha = Math.max(view.tiers[1] ?? 0, view.star) * (1 - drag)
     if (leadsTo.size > 0 && labelAlpha > 0.01 && view.chosen >= 0) {
       const top = frame.viewport.top ?? 0
       const bottom = height - (frame.viewport.bottom ?? 0)
@@ -458,8 +483,86 @@ export function drawLinks(
         stats.labels += 1
       }
     }
+
+    // A dragged star's linked stars off screen (#136 D6): they move too, their
+    // lines run to the edge, and the edge names where they lead -- the
+    // nebula, and its subject when that is another one ("↗ Waves · Physics").
+    if (drag > 0.01 && frame.drag) {
+      stats.dragLabels = drawDragDestinations(ctx, scene, frame, theme, data.galaxyOf, obstacles, drag)
+    }
   }
 
   ctx.restore()
   return stats
+}
+
+/**
+ * Name, at the screen's edge, where a dragged star's off-screen linked stars
+ * are (#136 D6): one name per nebula they are in, in the direction of the
+ * nearest of them from the dragged star, the shorter way round the ring.
+ */
+function drawDragDestinations(
+  ctx: CanvasRenderingContext2D,
+  scene: SceneData,
+  frame: SceneFrame,
+  theme: StarMapTheme,
+  galaxyOf: Int16Array,
+  obstacles: LinkObstacles,
+  alpha: number,
+): number {
+  const drag = frame.drag!
+  const g = drag.star
+  const { width, height } = frame.viewport
+  const top = frame.viewport.top ?? 0
+  const bottom = height - (frame.viewport.bottom ?? 0)
+  const gx = frame.x[g]
+  const gy = frame.y[g]
+  const own = scene.nebula[g]
+  // The nearest off-screen linked star of each nebula.
+  const nearest = new Map<number, { dx: number; dy: number; d: number }>()
+  for (let i = 0; i < scene.count; i += 1) {
+    if (drag.related[i] !== 1 || i === g) continue
+    const dx = shortestDx(scene.mapX[g], scene.mapX[i]) * frame.scale + drag.offsetX[i] - drag.offsetX[g]
+    const dy = frame.y[i] - gy
+    const x = gx + dx
+    const y = gy + dy
+    if (x >= 0 && x <= width && y >= top && y <= bottom) continue
+    const n = scene.nebula[i]
+    const d = Math.hypot(dx, dy)
+    const known = nearest.get(n)
+    if (!known || d < known.d) nearest.set(n, { dx, dy, d })
+  }
+  if (nearest.size === 0) return 0
+  const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
+  ctx.font = `500 12px ${theme.fontFamily}`
+  ctx.textBaseline = 'middle'
+  ctx.textAlign = 'center'
+  let drawn = 0
+  for (const [n, { dx, dy }] of [...nearest].sort((a, b) => a[1].d - b[1].d || a[0] - b[0])) {
+    const hit = Math.min(dx > 0 ? (width - 16 - gx) / dx : dx < 0 ? (16 - gx) / dx : Infinity,
+      dy > 0 ? (bottom - 24 - gy) / dy : dy < 0 ? (top + 16 - gy) / dy : Infinity)
+    if (!(hit > 0) || !Number.isFinite(hit)) continue
+    const ga = galaxyOf[n]
+    const subject = ga >= 0 && ga !== galaxyOf[own] ? scene.galaxies?.[ga]?.name : undefined
+    const arrow = dy < 0 ? (dx < 0 ? '↖' : '↗') : (dx < 0 ? '↙' : '↘')
+    let text = `${arrow} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
+    while (ctx.measureText(text).width > Math.min(220, width - 40) && text.length > 5) text = `${text.slice(0, -2)}…`
+    const half = ctx.measureText(text).width / 2 + 8
+    const x = Math.max(half + 12, Math.min(width - half - 12, gx + dx * hit))
+    const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, gy + dy * hit))
+    const box = placeLabel([{ x0: x - half, y0: y - 12, x1: x + half, y1: y + 12 }], { boxes: obstacles.boxes, circles: [], segments: [] }, area)
+    if (!box) continue
+    obstacles.boxes.push(box)
+    ctx.globalAlpha = alpha
+    ctx.fillStyle = theme.sky
+    ctx.fillRect(box.x0, box.y0, half * 2, 24)
+    ctx.lineJoin = 'round'
+    ctx.lineWidth = 3
+    ctx.strokeStyle = theme.sky
+    ctx.strokeText(text, x, y)
+    ctx.fillStyle = theme.textBody
+    ctx.fillText(text, x, y)
+    drawn += 1
+  }
+  return drawn
 }

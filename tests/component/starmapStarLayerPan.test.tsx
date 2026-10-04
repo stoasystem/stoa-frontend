@@ -44,13 +44,25 @@ function session(width: number, height: number, map: StarMap, target: LayerTarge
 }
 type Session = ReturnType<typeof session>
 
+/**
+ * A point near `(x, y)` with no star under it: a press on a star drags the
+ * star (#136), a press on empty space pans the map.
+ */
+function clearOf(s: Session, x: number, y: number): [number, number] {
+  const f = s.renderer.last()
+  for (let step = 0; step < 200; step += 1) {
+    const dy = (step % 2 ? 1 : -1) * Math.ceil(step / 2) * 6
+    if (f.x.every((sx, k) => Math.hypot(sx - x, f.y[k] - (y + dy)) > 30)) return [x, y + dy]
+  }
+  return [x, y]
+}
+
 /** Drag horizontally by `dx` px in strokes across the screen, holding still before each release (no glide). */
 function drag(s: Session, dx: number, dy = 0, step = 40): RecordedFrame[] {
   const start = s.renderer.frames.length
   const y0 = s.height * 0.4
   const fresh = () => (dx < 0 ? s.width * 0.8 : s.width * 0.2)
-  let x = fresh()
-  let y = y0
+  let [x, y] = clearOf(s, fresh(), y0)
   s.engine.pointerDown(1, x, y)
   x += Math.sign(dx) * 10
   s.engine.pointerMove(1, x, y)
@@ -69,8 +81,7 @@ function drag(s: Session, dx: number, dy = 0, step = 40): RecordedFrame[] {
     if (x < 20 || x > s.width - 20) {
       s.clock.advance(200)
       s.engine.pointerUp(1, x, y)
-      x = fresh()
-      y = y0
+      ;[x, y] = clearOf(s, fresh(), y0)
       s.engine.pointerDown(1, x, y)
       x += Math.sign(dx) * 10
       s.engine.pointerMove(1, x, y)
