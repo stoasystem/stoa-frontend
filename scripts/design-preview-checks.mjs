@@ -43,7 +43,7 @@ async function tab(options = {}) {
   page.on('request', (request) => {
     const url = new URL(request.url())
     if (url.protocol === 'data:' || url.protocol === 'blob:') return
-    if (url.origin !== base.origin || url.pathname.startsWith('/api/')) leaks.push(`${request.method()} ${request.url()}`)
+    if (url.origin !== base.origin || url.pathname.startsWith('/api')) leaks.push(`${request.method()} ${request.url()}`)
   })
   return { context, page }
 }

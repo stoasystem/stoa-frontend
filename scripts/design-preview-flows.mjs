@@ -57,7 +57,7 @@ function watch(target) {
   target.on('request', (request) => {
     const url = new URL(request.url())
     if (url.protocol === 'data:' || url.protocol === 'blob:') return
-    if (url.origin !== base.origin || url.pathname.startsWith('/api/')) leaks.push(`${request.method()} ${request.url()}`)
+    if (url.origin !== base.origin || url.pathname.startsWith('/api')) leaks.push(`${request.method()} ${request.url()}`)
   })
   target.on('console', (message) => {
     if (message.type() === 'error' || message.type() === 'warning') problems.push(`[${message.type()}] ${message.text()}`)
