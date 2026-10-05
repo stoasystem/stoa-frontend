@@ -243,14 +243,18 @@ describe('the design preview stays out of the application', () => {
       // may hold only index.html, assets/** and the files git tracks in public/
       // (#126 F7).
       const trackedPublic = execFileSync('git', ['ls-files', '-z', 'public'], { cwd: ROOT, encoding: 'utf8' })
-        .split(' ')
+        .split('\0')
         .filter(Boolean)
         .map((name) => name.slice('public/'.length))
       // Negative control: the tracked public files are there, so the check sees public/.
       expect(trackedPublic).toContain('_redirects')
       for (const name of trackedPublic) expect(files, `public/${name} is missing from the build`).toContain(name)
       const unexpected = files.filter((name) => name !== 'index.html' && !name.startsWith('assets/') && !trackedPublic.includes(name))
-      expect(unexpected, 'files in the build that are neither index.html, assets/** nor tracked in public/').toEqual([])
+      expect(
+        unexpected,
+        'files in the build that are neither index.html, assets/** nor tracked in public/ -- '
+          + 'public/mockServiceWorker.js is left over from an npm ci before #125: delete it',
+      ).toEqual([])
       expect(files.filter((name) => name.startsWith('src/'))).toEqual([])
 
       const bundles = files.filter((name) => name.startsWith('assets/') && name.endsWith('.js'))
