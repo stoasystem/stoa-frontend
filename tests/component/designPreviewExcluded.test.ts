@@ -233,8 +233,24 @@ describe('the design preview stays out of the application', () => {
         stdio: 'pipe',
       })
 
-      const files = readdirSync(outDir, { recursive: true }).map((name) => String(name).split(path.sep).join('/'))
+      const files = readdirSync(outDir, { recursive: true })
+        .map((name) => String(name).split(path.sep).join('/'))
+        .filter((name) => statSync(path.join(outDir, name)).isFile())
       expect(files.filter((name) => name.endsWith('.html'))).toEqual(['index.html'])
+
+      // Vite copies public/ whole, tracked or not: an untracked file there (msw's
+      // mockServiceWorker.js once, #125) would ship from a local build. The output
+      // may hold only index.html, assets/** and the files git tracks in public/
+      // (#126 F7).
+      const trackedPublic = execFileSync('git', ['ls-files', '-z', 'public'], { cwd: ROOT, encoding: 'utf8' })
+        .split(' ')
+        .filter(Boolean)
+        .map((name) => name.slice('public/'.length))
+      // Negative control: the tracked public files are there, so the check sees public/.
+      expect(trackedPublic).toContain('_redirects')
+      for (const name of trackedPublic) expect(files, `public/${name} is missing from the build`).toContain(name)
+      const unexpected = files.filter((name) => name !== 'index.html' && !name.startsWith('assets/') && !trackedPublic.includes(name))
+      expect(unexpected, 'files in the build that are neither index.html, assets/** nor tracked in public/').toEqual([])
       expect(files.filter((name) => name.startsWith('src/'))).toEqual([])
 
       const bundles = files.filter((name) => name.startsWith('assets/') && name.endsWith('.js'))
