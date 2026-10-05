@@ -53,7 +53,15 @@ export class StudentWorld {
     b.on('POST', '/auth/login', ({ body }) => {
       const { email, password } = body as { email: string; password: string }
       if (email !== STUDENT.email || password !== STUDENT.password) {
-        return { status: 401, body: { detail: 'Invalid credentials' } }
+        // What the backend answers for a refused sign-in: the security body at the top level.
+        return {
+          status: 401,
+          body: {
+            code: 'invalid_credentials',
+            message: 'Check your email and password, then try signing in again.',
+            correlationId: 'e2e-correlation',
+          },
+        }
       }
       return { status: 200, body: { accessToken: ACCESS_TOKEN, user: user() } }
     })
@@ -142,20 +150,47 @@ export class StudentWorld {
       status: 404,
       body: { detail: 'This conversation was never escalated to a teacher' },
     }))
-    // Untyped in the backend's OpenAPI (a `{}` schema): the shape below is the
-    // frontend's `MemorySummaryResponse`, and nothing checks it against the backend.
+    // A student with no evidence yet, as the backend's `MemorySummaryResponse`
+    // describes it (stoasystem/stoa-backend#81).
     b.on('GET', '/adaptive/students/me/memory', () => ({
       status: 200,
       body: {
         studentId: STUDENT.id,
         roleView: 'student',
-        subjects: [{ id: 'math', label: 'Mathematics', rolloutState: 'live' }],
+        locale: {
+          effectiveLocale: 'de',
+          contentLanguage: 'de',
+          supportedLocales: ['de', 'en', 'fr', 'it'],
+          canonicalValuesStable: true,
+        },
+        subjects: [{ id: 'math', label: 'Mathematics', rolloutState: 'active' }],
+        subjectActivity: [
+          {
+            subject: 'math',
+            label: 'Mathematics',
+            rolloutState: 'active',
+            questionCount: 0,
+            aiResolvedCount: 0,
+            teacherEscalationCount: 0,
+            feedbackAverage: null,
+          },
+        ],
         weakTopics: [],
         strengthTopics: [],
         memorySnapshots: [],
         recommendations: [],
-        sequencingSummary: {},
-        freshness: {},
+        sequencingSummary: {
+          recommendedCount: 0,
+          topCandidateType: null,
+          topTopicId: null,
+          topConfidence: null,
+          activeAssignments: 0,
+          completedAssignments: 0,
+          skippedAssignments: 0,
+          archivedAssignments: 0,
+          explanation: 'No reviewed next-work recommendation is available from current signals.',
+        },
+        freshness: { status: 'empty', staleCount: 0 },
         updatedAt: '2026-09-29T08:00:00Z',
       },
     }))

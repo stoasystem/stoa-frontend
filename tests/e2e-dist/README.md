@@ -60,12 +60,17 @@ No retries. A test that needs one is a finding.
   and types the backend declares, not that the backend behaves that way (order
   of calls, status on a given input, timing).
 - **Untyped operations are not checked.** An operation whose OpenAPI schema is
-  empty accepts anything; today `GET /adaptive/students/me/memory` is one
-  ([stoa-backend#81](https://github.com/stoasystem/stoa-backend/issues/81)).
+  empty accepts anything. None of the operations mocked here is untyped since
+  [stoa-backend#81](https://github.com/stoasystem/stoa-backend/issues/81) gave
+  `GET /adaptive/students/me/memory` its model; the open parts inside it
+  (`memorySnapshots`, `strengthTopics`, extra keys in list items) accept anything.
 - **Path parameters are not validated**, only matched; query parameters are
   checked for presence, not for their values.
-- **Error replies are declared only for 422.** Any other 4xx a mock sends is
-  held to FastAPI's `{ detail }` envelope, not to a per-operation schema.
+- **Error replies are checked only where the backend declares them.** Since
+  stoa-backend#81 the backend declares the 401 of every operation that takes a
+  bearer token and of sign-in, refresh and sign-out, the 409 of the generation
+  progress and the 404 of the teacher-help status; a mock's reply there is held
+  to that schema. Any other 4xx is held to FastAPI's `{ detail }` envelope only.
 - The star map still reads fixture data, so the knowledge-map read model is
   not exercised; when #48 connects it, its mock must be added here.
 - Chromium on a desktop viewport only. No real Cognito, Bedrock or SES.
