@@ -19,7 +19,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - 任意路由：`/src/dev/preview.html?path=/map/physics?points=2000`；`/map/chemistry` 看没修的星系。
 - 截图对照：`npm run design-preview:capture -- --base http://127.0.0.1:5173 --label <集>`，再开 `/src/dev/preview-compare.html?mode=shots&surface=map&before=before-119&after=after-119`。
 
-计帧台架仍是 `/src/dev/starmap.html?host=ask&path=/map/math&points=2000&bench=1`（#44 的面板；它没接预览的拦截层，通知组件会请求本地后端）。`&foveation=on|off`、`&relations=fixture`（显示整片天空的前置，含跨学科）、`&longNames=1` 同前。
+计帧台架仍是 `/src/dev/starmap.html?host=ask&path=/map/math&points=2000&bench=1`（#44 的面板；与预览同一层存储隔离与网络拦截，不读真实存储里的令牌，请求不出开发服务器，#135）。`&foveation=on|off`、`&relations=fixture`（显示整片天空的前置，含跨学科）、`&longNames=1` 同前。
 
 ## 无级缩放（#134）
 

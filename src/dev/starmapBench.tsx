@@ -14,15 +14,19 @@
  * `&panel=1` leaving 420 px for the Ask panel. `window.__askPanel(true|false)`
  * opens and closes that space at run time.
  *
+ * Offline like the design preview (#135): `takePageOffline()` gives the page
+ * its own empty in-memory storage and answers every backend request from the
+ * preview's demo handlers (or 404), before any app module is imported (only
+ * libraries load statically). A token the real dev app left in this origin's
+ * storage is never read, and nothing leaves the dev server.
+ *
  * Not a product screen, so its words are not translated.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { registerDevelopmentRuntimeConfig } from '@/lib/runtimeConfig'
-
-registerDevelopmentRuntimeConfig('http://localhost:8000', window.location.origin)
+import { takePageOffline } from '@/dev/preview/offline'
 
 const params = new URLSearchParams(window.location.search)
 const path = params.get('path') ?? '/map/math'
@@ -40,6 +44,7 @@ for (const key of ['relations', 'longNames']) {
 }
 
 async function start() {
+  await takePageOffline()
   await Promise.all([import('../index.css'), import('@/i18n')])
   const { useAuthStore } = await import('@/store/authStore')
   const pages = await import('@/pages/map/MapPages')
