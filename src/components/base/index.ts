@@ -18,5 +18,6 @@ export {
   type SegmentedNavItem,
   type SegmentedOption,
 } from '@/components/base/Segmented'
+export { Stats, type Stat } from '@/components/base/Stats'
 export { TextField, type TextFieldProps } from '@/components/base/TextField'
 export { Toggle, type ToggleProps } from '@/components/base/Toggle'

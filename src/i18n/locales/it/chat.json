@@ -215,6 +215,10 @@
         "resolved": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta.",
         "cancelled": "Ti serve altro aiuto? Chiedi di nuovo a un insegnante sotto una risposta."
       }
+    },
+    "practice": {
+      "subtitle": "Conosce la domanda su cui sei",
+      "placeholder": "Chiedi su questa domanda…"
     }
   }
 }

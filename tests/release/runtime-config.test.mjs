@@ -237,7 +237,11 @@ test('disabled realtime requires a null endpoint and matching feature flag', asy
   }), { name: 'RuntimeConfigError' })
 })
 
-test('loader fetches a same-origin bounded document without credentials, cache, or redirects', async () => {
+// Same-origin credentials, not omit (#42): a preview behind Basic Auth only
+// serves this file to a request that carries the browser's cached
+// credentials; `omit` gets a 401 and the app never starts. Everything else
+// that keeps the request same-origin and bounded stays as it was.
+test('loader fetches a same-origin bounded document with same-origin credentials, no cache, no redirects', async () => {
   const runtime = await loadRuntimeConfigModule()
   const config = validConfig()
   const body = JSON.stringify(config)
@@ -260,7 +264,7 @@ test('loader fetches a same-origin bounded document without credentials, cache, 
   assert.equal(calls[0][0], 'https://staging.stoaedu.ch/runtime-config.json')
   assert.deepEqual(calls[0][1], {
     method: 'GET',
-    credentials: 'omit',
+    credentials: 'same-origin',
     cache: 'no-store',
     redirect: 'error',
     headers: { Accept: 'application/json' },

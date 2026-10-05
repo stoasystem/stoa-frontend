@@ -76,7 +76,7 @@ export function TeacherReplyComposer({
       </label>
       <textarea
         id="teacher-rich-reply"
-        className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 outline-none ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring"
+        className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 placeholder:text-muted-foreground"
         placeholder={mode === 'formula' ? '2x + 4 = 10' : 'Write the next step for the student.'}
         value={value}
         onChange={(event) => setValue(event.target.value)}

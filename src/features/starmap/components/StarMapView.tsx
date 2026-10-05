@@ -61,6 +61,8 @@ export type StarMapViewProps = {
   onNavigate: (target: LayerTarget) => void
   /** The first frame with the map on it is on screen. */
   onFirstFrame?: () => void
+  /** Foveated rendering; the phone bench switches it off (#44). Read once, when the canvas mounts. */
+  foveate?: boolean
   /** For tests: the frame clock and the renderer. */
   scheduler?: FrameScheduler
   createRendererFor?: (canvas: HTMLCanvasElement) => StarMapRenderer
@@ -94,7 +96,7 @@ function linkSize(glyph: number): number {
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, createRendererFor }: StarMapViewProps) {
+export function StarMapView({ map, target, onNavigate, onFirstFrame, foveate, scheduler, createRendererFor }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   const reducedMotion = usePrefersReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
@@ -147,6 +149,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
       renderer: createRendererFor ? createRendererFor(canvas) : createRenderer(canvas),
       theme: readTheme(stage),
       reducedMotion,
+      foveate,
       scheduler,
       onRequestTarget: (next) => navigateRef.current(next),
       onVisibleChange: (list, glyph, discs) => setVisible({ stars: list, glyph, nebulae: discs }),
@@ -382,9 +385,7 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
             <div className="pointer-events-auto min-w-0">{whereYouAre}</div>
             <div className="pointer-events-auto">{switcher}</div>
             <div
-              className="pointer-events-auto flex items-center gap-5 justify-self-end rounded-[12px] border border-solid bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-[20px]"
-              // index.css sets an unlayered `* { border-color }`, which beats a utility class.
-              style={{ borderColor: 'rgba(255, 255, 255, 0.08)' }}
+              className="pointer-events-auto flex items-center gap-5 justify-self-end rounded-[12px] border border-solid border-white/8 bg-white/10 px-3.5 py-2 text-[13px] backdrop-blur-[20px]"
             >
               <span className="inline-flex items-center gap-1.5 font-semibold text-on-sky">
                 <span aria-hidden="true" className="inline-block size-2 rounded-full bg-lit" />
@@ -495,11 +496,10 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
         {wide && target.layer === 'map' && stars.length > 0 && (
           <div
             data-starmap-overlay
-            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid px-3.5 py-2.5"
+            className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[560px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
             // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
             style={{
               background: 'var(--sky-glass)',
-              borderColor: 'var(--sky-glass-border)',
               backdropFilter: 'blur(var(--sky-glass-blur))',
               WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
             }}
@@ -532,10 +532,9 @@ export function StarMapView({ map, target, onNavigate, onFirstFrame, scheduler, 
             role="group"
             aria-label={t('zoom.group')}
             className={cn(
-              'absolute flex flex-col gap-0.5 rounded-[11px] border border-solid bg-white/10 p-[3px] backdrop-blur-[20px]',
+              'absolute flex flex-col gap-0.5 rounded-[11px] border border-solid border-white/10 bg-white/10 p-[3px] backdrop-blur-[20px]',
               wide ? 'bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] right-6' : target.layer === 'star' ? 'right-4 top-2' : 'bottom-[calc(1rem+var(--page-bottom-inset,0px))] right-4',
             )}
-            style={{ borderColor: 'rgba(255, 255, 255, 0.10)' }}
           >
             {(['in', 'out'] as const).map((direction) => (
               <button

@@ -43,7 +43,7 @@ export function ChatPageNavigation({
           <Link
             aria-label={compact ? label : undefined}
             className={cn(
-              'inline-flex items-center justify-center gap-2 rounded-md border border-border/90 bg-card/60 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'inline-flex items-center justify-center gap-2 rounded-md border border-border/90 bg-card/60 text-sm font-semibold text-foreground transition-colors hover:border-primary/35 hover:bg-[hsl(var(--stoa-brand-burgundy-soft))]',
               compact ? 'h-10 w-10 p-0' : 'min-w-0 px-2 py-2',
             )}
             key={path}

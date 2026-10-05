@@ -8,6 +8,8 @@
  * an entry's `access` there turns these red.
  */
 import { describe, expect, it, vi } from 'vitest'
+// The real bundles, so the guard's loading line is read as a visitor reads it.
+import '@/i18n'
 import { openAs, type Viewer } from './routeHarness'
 
 vi.mock('@/app/router/lazyPage', () => import('./lazyPageStub'))

@@ -45,7 +45,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
                 key={language.code}
                 type="button"
                 className={cn(
-                  'min-h-8 min-w-9 rounded px-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'min-h-8 min-w-9 rounded px-2 text-xs font-semibold transition-colors',
                   isActive
                     ? 'bg-[hsl(var(--stoa-brand-burgundy))] text-white shadow-sm'
                     : 'text-muted-foreground hover:bg-[hsl(var(--stoa-brand-burgundy-soft))] hover:text-foreground',
@@ -73,7 +73,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
           <button
             type="button"
             className={cn(
-              'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--stoa-brand-burgundy)/0.2)]',
+              'inline-flex h-8 w-14 items-center justify-between rounded-md border border-[hsl(var(--stoa-brand-border))] bg-[linear-gradient(180deg,hsl(var(--stoa-brand-card)/0.96),hsl(var(--stoa-brand-paper)/0.86))] px-2 text-xs font-semibold uppercase tracking-[0.02em] text-[hsl(var(--stoa-brand-ink))] shadow-[inset_0_1px_0_hsl(42_35%_98%/0.75),0_8px_18px_hsl(var(--stoa-brand-charcoal)/0.06)] transition-colors hover:border-[hsl(var(--stoa-brand-burgundy)/0.42)] hover:bg-[hsl(var(--stoa-brand-card))]',
               className,
             )}
             aria-label={t('language.label')}
@@ -128,7 +128,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
         aria-label={t('language.label')}
         translate="no"
         className={cn(
-          'notranslate bg-transparent text-inherit outline-none',
+          'notranslate bg-transparent text-inherit',
           'max-w-[8rem]',
         )}
         value={currentLanguage.code}
@@ -155,7 +155,7 @@ export function LanguageSwitcher({ compact = false, className, variant = 'select
 const SKY_MENU_PANEL =
   'z-50 flex min-w-[180px] flex-col rounded-[12px] border border-[color:var(--float-border)] bg-[rgba(255,255,255,0.96)] p-1.5 text-ink shadow-[var(--shadow-float)] backdrop-blur-[20px] outline-none'
 const SKY_MENU_ITEM =
-  'flex h-[34px] w-full cursor-pointer select-none items-center gap-2.5 rounded-[7px] border-0 bg-transparent px-2.5 text-left text-[14px] text-ink outline-none data-[highlighted]:bg-fill'
+  'flex h-[34px] w-full cursor-pointer select-none items-center gap-2.5 rounded-[7px] border-0 bg-transparent px-2.5 text-left text-[14px] text-ink data-[highlighted]:bg-fill'
 
 function SkyLanguageMenu({ className }: { className?: string }) {
   const { t } = useTranslation('common')

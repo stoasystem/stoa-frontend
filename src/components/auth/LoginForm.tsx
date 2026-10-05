@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CircleAlert } from 'lucide-react'
 import { EmailVerificationPanel } from '@/components/auth/EmailVerificationPanel'
-import { skyErrorClass, skyFieldProps, skyInputClass, skyInvalidInputClass, skyLabelClass } from '@/components/auth/skyFields'
+import { skyErrorClass, skyInputClass, skyInvalidInputClass, skyLabelClass } from '@/components/auth/skyFields'
 import { Button } from '@/components/base/Button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -65,7 +65,6 @@ export function LoginForm() {
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'login-email-error' : undefined}
           className={cn(skyInputClass, errors.email && skyInvalidInputClass)}
-          {...skyFieldProps}
         />
         {errors.email && <FieldAlert id="login-email-error">{errors.email}</FieldAlert>}
       </div>
@@ -81,7 +80,6 @@ export function LoginForm() {
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'login-password-error' : undefined}
           className={cn(skyInputClass, errors.password && skyInvalidInputClass)}
-          {...skyFieldProps}
         />
         {errors.password && <FieldAlert id="login-password-error">{errors.password}</FieldAlert>}
         {/* There is no self-service recovery any more: a forgotten password is
@@ -114,8 +112,12 @@ export function LoginForm() {
       </p>
       <p className="text-[15px] leading-[1.35] text-[color:var(--on-sky-text-body)]">
         {t('auth:login.needAccount')}{' '}
-        {/* Coloured and underlined by index.css (`data-sky-link`). */}
-        <Link className="font-semibold" data-sky-link="inline" to="/register">
+        {/* A link inside a sentence is white and underlined, so it never
+            rests on colour alone (WCAG 1.4.1). */}
+        <Link
+          className="font-semibold text-on-sky underline decoration-[color:var(--on-sky-field-rule)] decoration-1 underline-offset-4 hover:decoration-on-sky"
+          to="/register"
+        >
           {t('auth:login.howToGetAccount')}
         </Link>
       </p>

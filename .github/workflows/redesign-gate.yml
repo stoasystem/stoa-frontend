@@ -1,8 +1,12 @@
 name: Redesign Branch Gate
 
-# Runs on every pull request into a redesign integration branch. It only
-# checks; it never builds a release for anyone, holds no secrets and talks to
-# no cloud account. Publishing a preview lives in its own workflow (#28).
+# Runs on every pull request into a redesign integration branch, and on the
+# pull request that merges an integration branch back into main (#85): main
+# has no PR gate of its own, and deploy-production only checks after the push.
+# A PR only runs this when its merge commit carries this file, so hotfix PRs
+# cut from main are untouched until the redesign lands. It only checks; it
+# never builds a release for anyone, holds no secrets and talks to no cloud
+# account. Publishing a preview lives in its own workflow (#28).
 
 on:
   pull_request:
@@ -12,6 +16,7 @@ on:
     branches:
       - redesign/planet
       - redesign/cute
+      - main
   workflow_dispatch:
 
 permissions:

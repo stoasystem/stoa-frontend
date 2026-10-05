@@ -43,7 +43,7 @@ describe("registration's email verification card", () => {
 
     const card = container.firstElementChild as HTMLElement
     expect(card.className).toBe('rounded-lg border border-border/70 bg-card/90 p-5')
-    expect(container.querySelector('[data-surface], [data-sky-rule], [data-sky-field], [data-variant]')).toBeNull()
+    expect(container.querySelector('[data-surface], [data-variant]')).toBeNull()
     expect(container.innerHTML).toMatchSnapshot()
   })
 

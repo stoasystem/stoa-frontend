@@ -215,6 +215,10 @@
         "resolved": "Need more help? Ask a teacher again under any answer.",
         "cancelled": "Need more help? Ask a teacher again under any answer."
       }
+    },
+    "practice": {
+      "subtitle": "Knows the question you are on",
+      "placeholder": "Ask about this question…"
     }
   }
 }

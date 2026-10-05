@@ -232,18 +232,66 @@ describe('what sits beside the logo', () => {
       expect(list).toHaveStyle({ width: '240px' })
       expect(list.style.top).toBe('calc(57px + env(safe-area-inset-top))')
     }
+    // #13 point 6: six items, Subscriptions and billing withheld while frozen (card 007).
     expect(within(list).getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
-      '/admin',
       '/admin/users',
-      '/admin/moderation',
-      '/admin/curriculum',
       '/admin/teacher-applications',
+      '/admin/curriculum',
+      '/admin/moderation',
+      '/admin',
     ])
-    expect(within(list).getByRole('link', { name: 'Accounts' })).toHaveAttribute('aria-current', 'page')
-    expect(within(list).getByRole('link', { name: 'navigation.overview' })).not.toHaveAttribute('aria-current')
-    const accounts = within(list).getByRole('link', { name: 'Accounts' })
+    expect(within(list).getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'navigation.admin.users',
+      'navigation.admin.teacherApplications',
+      'navigation.admin.curriculum',
+      'navigation.admin.moderation',
+      'navigation.admin.system',
+    ])
+    expect(within(list).getByRole('link', { name: 'navigation.admin.users' })).toHaveAttribute('aria-current', 'page')
+    expect(within(list).getByRole('link', { name: 'navigation.admin.system' })).not.toHaveAttribute('aria-current')
+    const accounts = within(list).getByRole('link', { name: 'navigation.admin.users' })
     expect(accounts.querySelector('[data-source-item]')).toHaveStyle({ height: '34px', borderRadius: '8px' })
     expect(accounts).toHaveStyle({ height: shape === 'column' ? '34px' : '44px' })
+  })
+
+  it.each([
+    ['/admin/account-operations', 'navigation.admin.users'],
+    ['/admin', 'navigation.admin.system'],
+    ['/admin/system', 'navigation.admin.system'],
+    ['/admin/learning-operations', 'navigation.admin.system'],
+    ['/admin/learning-automation', 'navigation.admin.system'],
+    ['/admin/moderation', 'navigation.admin.moderation'],
+  ])('lights the section a page belongs to (%s lights %s)', (path, label) => {
+    renderShell('admin', path, 1280)
+    const list = screen.getByRole('navigation', { name: 'navigation.administration' })
+    const current = within(list)
+      .getAllByRole('link')
+      .filter((link) => link.getAttribute('aria-current') === 'page')
+    expect(current.map((link) => link.textContent)).toEqual([label])
+  })
+
+  it.each([
+    ['/tutor/learning-automation', 'navigation.requests'],
+    ['/tutor/requests/r-1', 'navigation.requests'],
+  ])('keeps a teacher on Requests inside it (%s)', (path, label) => {
+    renderShell('teacher', path, 1280)
+    const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
+    expect(within(nav).getByRole('link', { name: label })).toHaveAttribute('aria-current', 'page')
+  })
+
+  it.each([
+    ['teacher', '/tutor/profile'],
+    ['parent', '/parent/account-operations'],
+  ] as const)('lights no segment on a page the avatar menu opens (%s, %s)', (role, path) => {
+    renderShell(role, path, 1280)
+    const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
+    expect(within(nav).getAllByRole('link').filter((link) => link.hasAttribute('aria-current'))).toEqual([])
+  })
+
+  it('keeps a parent on Overview in a child\'s detail', () => {
+    renderShell('parent', '/parent/children/c-1', 1280)
+    const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
+    expect(within(nav).getByRole('link', { name: 'navigation.overview' })).toHaveAttribute('aria-current', 'page')
   })
 
   it('lights the most specific entry for the open page', () => {

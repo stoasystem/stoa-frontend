@@ -35,8 +35,10 @@ export type AppNavIcon =
   | 'billing'
   | 'chat'
   | 'classroom'
+  | 'curriculum'
   | 'dashboard'
   | 'history'
+  | 'moderation'
   | 'profile'
   | 'practice'
   | 'questionBank'
@@ -60,6 +62,12 @@ export type RouteNav = {
   /** Offered in the phone's bottom bar (first five per area). */
   mobile?: boolean
   description?: string
+  /**
+   * The other pages of this entry's section (#52): the entry stays lit on
+   * them and beneath them, e.g. Users on /admin/account-operations. Each must
+   * be a registered page open to the same roles.
+   */
+  covers?: readonly string[]
 }
 
 export type RouteMeta = {
@@ -121,6 +129,13 @@ export type LegacyRedirect = {
 
 /** The one screen an account under a forced password change can still use. */
 export const CHANGE_PASSWORD_PATH = '/settings/password'
+
+/** Where a guard sends a role a route is not for (RoleRoute, and a role with no home). */
+export const FORBIDDEN_PATH = '/forbidden'
+
+/** The sign-in, and the page that says one is needed. */
+export const LOGIN_PATH = '/login'
+export const UNAUTHORIZED_PATH = '/unauthorized'
 
 export const ASK_PATH = '/ask'
 
@@ -189,6 +204,7 @@ const ChildLearningHistoryPage = lazyPage('ChildLearningHistoryPage', () => impo
 const LearningOperationsDashboardPage = lazyPage('LearningOperationsDashboardPage', () => import('@/pages/learning/LearningOperationsDashboardPage'))
 const LearningAutomationConsolePage = lazyPage('LearningAutomationConsolePage', () => import('@/pages/learning/LearningAutomationConsolePage'))
 const StudentLearningProfilePage = lazyPage('StudentLearningProfilePage', () => import('@/pages/learning/StudentLearningProfilePage'))
+const OrganizationHomePage = lazyPage('OrganizationHomePage', () => import('@/pages/organization/OrganizationHomePage'))
 
 const TutorDashboardPage = lazyPage('TutorDashboardPage', () => import('@/pages/tutor/TutorDashboardPage'))
 const TutorAvailabilityPage = lazyPage('TutorAvailabilityPage', () => import('@/pages/tutor/TutorAvailabilityPage'))
@@ -226,7 +242,9 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
   { path: '/billing/payment-settings', access: SIGNED_IN, page: PaymentSettingsPage, meta: { module: 'Billing', status: 'core', purpose: 'Payment method and billing contact.' } },
   { path: '/billing/checkout/result', access: SIGNED_IN, page: CheckoutResultPage, meta: { module: 'Billing', status: 'demo', purpose: 'Checkout result.' } },
   { path: '/billing/checkout/demo', access: SIGNED_IN, page: VirtualCheckoutPage, meta: { module: 'Billing', status: 'demo', purpose: 'Virtual checkout demo.' } },
-  { path: '/admin/subscriptions', access: ADMIN, page: AdminSubscriptionRequestsPage, nav: [{ area: 'admin', label: 'Subscriptions', priority: 'primary', icon: 'billing' }], meta: { module: 'Admin', status: 'core', purpose: 'Manual subscription request queue.' } },
+  // The admin source list's fifth item (#13 point 6, #52), between Moderation and System; add its
+  // `navigation.admin.billing` key to the four `common` bundles when it comes back.
+  { path: '/admin/subscriptions', access: ADMIN, page: AdminSubscriptionRequestsPage, nav: [{ area: 'admin', label: 'Subscriptions and billing', labelKey: 'navigation.admin.billing', priority: 'primary', icon: 'billing', covers: ['/admin/billing-interest', '/admin/billing/checkout-recovery'] }], meta: { module: 'Admin', status: 'core', purpose: 'Manual subscription request queue.' } },
   { path: '/admin/billing-interest', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'Billing interest' }, meta: { module: 'Admin', status: 'placeholder', purpose: 'Future billing interest admin placeholder.' } },
   { path: '/admin/billing/checkout-recovery', access: ADMIN, page: AdminBillingCheckoutPage, meta: { module: 'Admin', status: 'core', purpose: 'Checkout recovery.' } },
  */
@@ -263,22 +281,17 @@ export const pageRoutes: readonly PageRoute[] = [
     titleKey: 'studentRoutes.home.title',
     meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },
-  { path: '/login', access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
+  { path: LOGIN_PATH, access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
   { path: '/register', access: PUBLIC, page: RegisterPage, meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
   { path: '/teacher-activate', access: PUBLIC, page: TeacherActivatePage, meta: { module: 'Auth', status: 'core', purpose: 'Teacher invitation claim and account activation.' } },
   { path: '/activate', access: PUBLIC, page: ActivateAccountPage, meta: { module: 'Auth', status: 'core', purpose: 'Role-neutral invitation claim and account activation.' } },
   { path: '/privacy', access: PUBLIC, page: PrivacyPage, meta: { module: 'Legal', status: 'core', purpose: 'Privacy notice.' } },
   { path: '/terms', access: PUBLIC, page: TermsPage, meta: { module: 'Legal', status: 'core', purpose: 'Terms of use.' } },
   { path: '/onboarding', access: PUBLIC, page: OnboardingPage, meta: { module: 'Onboarding', status: 'demo', purpose: 'Role onboarding guide.' } },
-  {
-    path: '/support',
-    access: PUBLIC,
-    page: SupportPage,
-    nav: [{ area: 'teacher', label: 'Support', labelKey: 'navigation.support', priority: 'secondary', icon: 'support', description: 'Tutor support and help.' }],
-    meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' },
-  },
-  { path: '/unauthorized', access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
-  { path: '/forbidden', access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
+  // No `nav`: every role reaches Help from the avatar menu (#13 point 4, #46).
+  { path: '/support', access: PUBLIC, page: SupportPage, meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' } },
+  { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
+  { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
   { path: '*', access: PUBLIC, page: NotFoundPage, meta: { module: 'Errors', status: 'core', purpose: 'Anything no entry matches.' } },
 
   // ---- any signed-in account ---------------------------------------------
@@ -297,8 +310,8 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/map/:subjectId', access: STUDENT, page: MapSubjectPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
   { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapNebulaPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
   { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapStarPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
-  { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The chapter of a knowledge point.' } },
-  { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'placeholder', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
+  { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
+  { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   {
     path: ASK_PATH,
     access: STUDENT,
@@ -341,6 +354,15 @@ export const pageRoutes: readonly PageRoute[] = [
   { path: '/parent/children/:childId/history', access: PARENT, page: ChildLearningHistoryPage, meta: { module: 'Parent', status: 'core', purpose: 'Child learning history.' } },
 
   // ---- organisation (and admin) ------------------------------------------
+  // The organisation roles' home (roleHomePaths), so their logo never ends on
+  // a 404 (#52): the two organisation pages as rows. No `nav`: the bar offers
+  // these roles nothing beside the logo.
+  {
+    path: '/organization',
+    access: ORGANIZATION,
+    page: OrganizationHomePage,
+    meta: { module: 'Organization', status: 'core', purpose: 'Organisation home: learning operations and learning automation.' },
+  },
   { path: '/organization/learning-operations', access: ORGANIZATION, page: LearningOperationsDashboardPage, meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning operations.' } },
   { path: '/organization/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Organisation-scoped learning profile.' } },
   { path: '/organization/learning-automation', access: ORGANIZATION, page: LearningAutomationConsolePage, meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning automation.' } },
@@ -351,6 +373,8 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/tutor',
     access: TEACHER,
     page: TutorDashboardPage,
+    // Learning automation is a secondary entry inside Requests (#13 point 6),
+    // a row on the page, and lights Requests while it is open.
     nav: [{ area: 'teacher', label: 'Requests', labelKey: 'navigation.requests', priority: 'primary', icon: 'requests', mobile: true, description: 'Tutor help requests queue.' }],
     meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request queue.' },
   },
@@ -362,51 +386,51 @@ export const pageRoutes: readonly PageRoute[] = [
     meta: { module: 'Tutor', status: 'core', purpose: 'Tutor availability.' },
   },
   { path: '/tutor/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
-  {
-    path: '/tutor/profile',
-    access: TEACHER,
-    page: TutorProfilePage,
-    nav: [{ area: 'teacher', label: 'Profile', labelKey: 'navigation.profile', priority: 'primary', icon: 'profile', mobile: true, description: 'Tutor account, contact, credentials, and payout details.' }],
-    meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' },
-  },
+  // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
+  { path: '/tutor/profile', access: TEACHER, page: TutorProfilePage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
   { path: '/tutor/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
 
   // ---- admin -------------------------------------------------------------
-  // Navigation order follows the order of these entries.
-  {
-    path: '/admin',
-    access: ADMIN,
-    page: AdminDashboardPage,
-    nav: [{ area: 'admin', label: 'Overview', labelKey: 'navigation.overview', priority: 'primary', icon: 'dashboard', mobile: true, description: 'Admin operations overview.' }],
-    meta: { module: 'Admin', status: 'core', purpose: 'Admin operations overview.' },
-  },
+  // The source list (#13 point 6, #52) follows the order of these entries:
+  // Users (with account operations), Teacher applications, Curriculum,
+  // Moderation, Subscriptions and billing (frozen, card 007: its entry is in
+  // the comment above and comes back with its routes), System (the operations
+  // overview, with system status, learning operations and learning automation).
   {
     path: '/admin/users',
     access: ADMIN,
     page: AdminAccountsPage,
-    nav: [{ area: 'admin', label: 'Accounts', priority: 'primary', icon: 'students', description: 'Invite, assign, reset, suspend and archive accounts.' }],
+    nav: [{ area: 'admin', label: 'Users', labelKey: 'navigation.admin.users', priority: 'primary', icon: 'students', covers: ['/admin/account-operations'], description: 'Invite, assign, reset, suspend and archive accounts.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Account console: invite, assign, reset password, suspend and archive.' },
-  },
-  {
-    path: '/admin/moderation',
-    access: ADMIN,
-    page: AdminModerationPage,
-    nav: [{ area: 'admin', label: 'Moderation', priority: 'primary', icon: 'support', mobile: true, description: 'Reported learning content and internal moderation actions.' }],
-    meta: { module: 'Admin', status: 'core', purpose: 'Reported learning content and moderation.' },
-  },
-  {
-    path: '/admin/curriculum',
-    access: ADMIN,
-    page: AdminCurriculumPage,
-    nav: [{ area: 'admin', label: 'Curriculum', priority: 'primary', icon: 'practice', description: 'Curriculum authoring, review, migration, and evidence console.' }],
-    meta: { module: 'Admin', status: 'core', purpose: 'Curriculum editor, review, migration, and evidence console.' },
   },
   {
     path: '/admin/teacher-applications',
     access: ADMIN,
     page: AdminTeacherApplicationsPage,
-    nav: [{ area: 'admin', label: 'Teacher applications', priority: 'primary', icon: 'tutors', description: 'Review teacher applications and send activation invitations.' }],
+    nav: [{ area: 'admin', label: 'Teacher applications', labelKey: 'navigation.admin.teacherApplications', priority: 'primary', icon: 'tutors', description: 'Review teacher applications and send activation invitations.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Teacher application review and invitation.' },
+  },
+  {
+    path: '/admin/curriculum',
+    access: ADMIN,
+    page: AdminCurriculumPage,
+    nav: [{ area: 'admin', label: 'Curriculum', labelKey: 'navigation.admin.curriculum', priority: 'primary', icon: 'curriculum', description: 'Curriculum authoring, review, migration, and evidence console.' }],
+    meta: { module: 'Admin', status: 'core', purpose: 'Curriculum editor, review, migration, and evidence console.' },
+  },
+  {
+    path: '/admin/moderation',
+    access: ADMIN,
+    page: AdminModerationPage,
+    nav: [{ area: 'admin', label: 'Moderation', labelKey: 'navigation.admin.moderation', priority: 'primary', icon: 'moderation', mobile: true, description: 'Reported learning content and internal moderation actions.' }],
+    meta: { module: 'Admin', status: 'core', purpose: 'Reported learning content and moderation.' },
+  },
+  {
+    // The administrator's home (roleHomePaths) and the System item.
+    path: '/admin',
+    access: ADMIN,
+    page: AdminDashboardPage,
+    nav: [{ area: 'admin', label: 'System', labelKey: 'navigation.admin.system', priority: 'primary', icon: 'settings', mobile: true, covers: ['/admin/system', '/admin/learning-operations', '/admin/learning-automation'], description: 'Operations overview, system status, learning operations and learning automation.' }],
+    meta: { module: 'Admin', status: 'core', purpose: 'Admin operations overview.' },
   },
   { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
   { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
