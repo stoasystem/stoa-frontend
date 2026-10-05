@@ -57,6 +57,8 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 **存储隔离**：预览与 `npm run dev` 的真实应用同源。`storage.ts` 把 `localStorage` / `sessionStorage` 换成内存实现，每次加载都从同一状态开始：真实应用留下的令牌或「上次学科」影响不到预览，预览的假登录也不会留下令牌被真实应用发往后端；同一界面的两次截图只差被比较的改动。唯一的例外是演示后端自己的状态（#51），它留在本标签页里，见「演示后端的状态」。
 
+**另外两个开发页也走同一层**（#135，#126 审计 F6）：星图台架 `src/dev/starmap.html`（`starmapBench.tsx`）和组件画廊 `src/dev/components.html`（`gallery.tsx`）同样做假登录。它们的 `start()` 第一步是 `await takePageOffline()`（`src/dev/preview/offline.ts`）：先 `isolateStorage()`，再动态 import 拦截层与运行时配置，把 API 源登记为 `API_ORIGIN` 并 `installInterception()`；之后才动态 import 任何 `@/` 应用模块（静态 import 的只有 React、react-router、TanStack Query、lucide 这些库）。所以真实存储里的令牌读不到也不会被改，请求由预览的演示答复作答或安静 404，不会发往 `localhost:8000` 或任何其他源。`tests/component/devPagesOffline.test.tsx` 锁住：两个入口的应用模块首次求值时存储已隔离、拦截已装好；预置在真实 `localStorage` / `sessionStorage` 的令牌不被读、不被改；`httpClient`、`fetch`、WebSocket 都到不了底层网络。台架的生产构建（`npm run bench:build`）照样带这层，计帧脚本不受影响。
+
 **假登录**：入口直接把演示学生写进 `useAuthStore`（令牌只在内存里），再由真实的 `AuthBootstrap` 读 `/auth/me`，与登录后的路径一致。
 
 ## 截图
@@ -166,4 +168,4 @@ node scripts/design-preview-checks.mjs --base http://127.0.0.1:5173
 - 回到星云时，星的读屏链接读作「In progress, 100% of lessons done」直到峰值——这是「先显示旧状态」的直接后果。
 - 写操作只回一个合理答复；除了「完成课时」在本页内记住之外都不保存，刷新即复原。
 - 浏览器模拟视口，不是真机（#114 已接受这一限制）。
-- `src/dev/starmap.html`（#48 的星图台架）没有接这层拦截，通知组件仍会请求 `localhost:8000`；看设计请用本预览。
+- `src/dev/starmap.html`（#48 的星图台架）与 `src/dev/components.html` 只做离线渲染（同一层存储隔离与拦截，#135），不是完整的应用路由；看设计请用本预览。

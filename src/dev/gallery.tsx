@@ -4,6 +4,12 @@
  * server only: open /src/dev/components.html. `?view=shell` shows the app shell
  * on a light page, `?view=sky` over the sky; `&role=` picks the account.
  *
+ * Offline like the design preview (#135): `takePageOffline()` gives the page
+ * its own empty in-memory storage and answers every backend request from the
+ * preview's demo handlers (or 404), before any app module is imported (only
+ * libraries load statically). A token the real dev app left in this origin's
+ * storage is never read, and nothing leaves the dev server.
+ *
  * Not a product screen, so its words are not translated.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
@@ -11,16 +17,15 @@ import { Bell, BookOpen, Globe, Lightbulb, Plus, UserRound, X } from 'lucide-rea
 import { StrictMode, useState, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import { registerDevelopmentRuntimeConfig } from '@/lib/runtimeConfig'
+import { takePageOffline } from '@/dev/preview/offline'
 import type { UserRole } from '@/types/user'
-
-registerDevelopmentRuntimeConfig('http://localhost:8000', window.location.origin)
 
 const params = new URLSearchParams(window.location.search)
 const view = params.get('view') ?? 'components'
 const role = (params.get('role') ?? 'student') as UserRole
 
 async function start() {
+  await takePageOffline()
   await Promise.all([import('../index.css'), import('@/i18n')])
   const base = await import('@/components/base')
   const { AppLayout } = await import('@/layouts/AppLayout')
