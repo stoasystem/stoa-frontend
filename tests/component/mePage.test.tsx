@@ -122,8 +122,9 @@ beforeAll(async () => {
   // /me is a lazy page. Its first import is the whole module graph, cold:
   // half a second alone, over a second with the full suite running beside
   // it -- past findBy's one-second wait, so whichever test ran first failed
-  // (#94). What this file tests is the page, not how fast it loads.
-  await import('@/pages/me/MePage')
+  // (#94). What this file tests is the page, not how fast it loads. The
+  // forced change lands on /settings/password, another lazy page (#133).
+  await Promise.all([import('@/pages/me/MePage'), import('@/pages/auth/ChangePasswordPage')])
 })
 beforeEach(async () => {
   await i18n.changeLanguage('en')

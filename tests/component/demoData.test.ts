@@ -6,7 +6,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { renderHook, waitFor } from '@testing-library/react'
-import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createElement, type ReactNode } from 'react'
 import { describe, expect, it, vi } from 'vitest'
@@ -158,14 +158,18 @@ describe('Ask, the bell and /me', () => {
 })
 
 describe('production code', () => {
+  // The directory entries say which are directories: no stat call per file.
   function files(dir: string): string[] {
-    return readdirSync(dir).flatMap((entry) => {
-      const path = join(dir, entry)
-      return statSync(path).isDirectory() ? files(path) : /\.(ts|tsx)$/.test(path) ? [path] : []
+    return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+      const path = join(dir, entry.name)
+      return entry.isDirectory() ? files(path) : /\.(ts|tsx)$/.test(path) ? [path] : []
     })
   }
 
-  it('never imports the demo data set (`src/dev` only)', () => {
+  // Reads every source file: some 30 ms alone, but with the full suite beside
+  // it (a production build among it) reading the same disk, it once took 21 s
+  // (#133). A real hang still fails, at 30 s, like designPreviewExcluded's walk.
+  it('never imports the demo data set (`src/dev` only)', { timeout: 30_000 }, () => {
     const offenders = files('src')
       .filter((path) => !path.replace(/\\/g, '/').startsWith('src/dev/'))
       .filter((path) => /from\s+['"](@\/dev\/demo|[./]+\/dev\/demo)/.test(readFileSync(path, 'utf8')))

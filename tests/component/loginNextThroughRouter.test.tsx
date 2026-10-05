@@ -99,7 +99,14 @@ async function expectToLandOn(pathname: string, heading: string) {
   await waitFor(() => expect(window.location.pathname).toBe(pathname))
 }
 
-beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+beforeAll(async () => {
+  mswServer.listen({ onUnhandledRequest: 'error' })
+  // /login is EntryPage, a lazy page whose first import is its whole module
+  // graph, cold. With the full suite beside it that ran past findBy's
+  // one-second wait for the sign-in form, so the first test here failed (#133),
+  // as /me's did (#94). What this file tests is where signing in lands.
+  await import('@/pages/entry/EntryPage')
+})
 afterAll(() => mswServer.close())
 beforeEach(async () => {
   await i18n.changeLanguage('en')
