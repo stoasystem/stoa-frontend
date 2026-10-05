@@ -27,6 +27,11 @@ vi.mock('@/components/notifications/NotificationCenter', () => ({ NotificationCe
 
 const student = { id: 'u-1', name: 'Ada', email: 'ada@example.com', role: 'student', mustChangePassword: false } as CurrentUser
 
+// Opening /map is the whole app mounting, /auth/me, the guards and the map, one
+// after another: over findBy's one second with the full suite beside it, even
+// with the page warm, and up to 5 s for the demo sky (#133, as deepLinkRefresh).
+const OPENING = { timeout: 10_000 }
+
 function openAt(path: string, wrap: (app: ReactNode) => ReactNode = (app) => app) {
   window.history.replaceState(null, '', path)
   localStorage.setItem(TOKEN_KEY, 'token')
@@ -63,7 +68,7 @@ describe('the star map in the application (#131)', () => {
   it('shows an empty sky on /map/math: no demo notice, no placeholder stars, no canvas', async () => {
     const { container } = openAt('/map/math')
 
-    expect(await screen.findByRole('heading', { level: 1, name: 'Your star map is on its way' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { level: 1, name: 'Your star map is on its way' }, OPENING)).toBeInTheDocument()
     expect(screen.getByText('Your subjects and knowledge points will appear here as soon as they are ready.')).toBeInTheDocument()
     expect(window.location.pathname).toBe('/map/math')
     expect(container.querySelector('[data-starmap-empty]')).not.toBeNull()
@@ -83,7 +88,7 @@ describe('the star map in the application (#131)', () => {
   it('draws the demo sky once a source injects it (positive control)', async () => {
     const { container } = openAt('/map/math', (app) => <DemoStarMapSource>{app}</DemoStarMapSource>)
 
-    expect(await screen.findByRole('heading', { name: 'Mathematics' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Mathematics' }, OPENING)).toBeInTheDocument()
     expect(screen.getByText('Demo · Sample content and progress')).toBeInTheDocument()
     expect(container.querySelector('[data-starmap-empty]')).toBeNull()
   })
