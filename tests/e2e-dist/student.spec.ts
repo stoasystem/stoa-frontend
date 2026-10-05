@@ -60,6 +60,39 @@ test('an answer comes back after a reload in the middle of it, and the question 
   expect(backend.callsTo('POST', '/conversations/{conv_id}/messages/stream'), 'sent again after the reload').toHaveLength(1)
 })
 
+test('a message that failed retryably is sent again as the same message, and answered once', async ({ page, backend }) => {
+  const world = new StudentWorld(backend)
+  world.install()
+  await signInAsStudent(page)
+
+  const first = 'What is a prime number?'
+  await page.getByRole('textbox', { name: 'Your question' }).fill(first)
+  const panel = page.getByRole('complementary', { name: 'Ask' })
+  await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
+  const thread = panel.getByRole('log', { name: 'Messages' })
+  await expect(thread.getByText(world.answerFor(first))).toBeVisible()
+  const conversationId = [...world.conversations.keys()][0]
+
+  // The next message fails, and the backend says it may be sent again (#29).
+  await page.goto(`/ask/${conversationId}`)
+  world.failNextRetryably = true
+  const second = 'Is 1 a prime number?'
+  await panel.getByRole('textbox', { name: 'Your question' }).fill(second)
+  await panel.getByRole('textbox', { name: 'Your question' }).press('Enter')
+  await expect(thread.getByText('Not sent')).toBeVisible()
+
+  await thread.getByRole('button', { name: 'Send again' }).click()
+  await expect(thread.getByText(world.answerFor(second))).toBeVisible()
+
+  const sends = backend.callsTo('POST', '/conversations/{conv_id}/messages/stream')
+  expect(sends, 'the first attempt and the retry').toHaveLength(2)
+  const keys = sends.map((call) => (call.body as { idempotencyKey: string }).idempotencyKey)
+  expect(keys[1], 'the retry names the same message').toBe(keys[0])
+  expect([...world.commands.values()].filter((command) => command.question === second)).toHaveLength(1)
+  await expect(thread.getByText(second, { exact: true })).toHaveCount(1)
+  await expect(thread.getByText(world.answerFor(second))).toHaveCount(1)
+})
+
 test('signing out ends the session here and on the backend', async ({ page, backend }) => {
   new StudentWorld(backend).install()
   await signInAsStudent(page)

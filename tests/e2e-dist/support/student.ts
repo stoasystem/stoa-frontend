@@ -10,7 +10,16 @@ export const STUDENT = {
 export const ACCESS_TOKEN = 'e2e-access-token'
 
 type Message = { id: string; conversationId: string; role: string; content: string; createdAt: string }
-type Command = { key: string; conversationId: string; question: string; answer: string; finished: boolean; reads: number }
+type Command = {
+  key: string
+  conversationId: string
+  question: string
+  answer: string
+  finished: boolean
+  failed: boolean
+  attempt: number
+  reads: number
+}
 type Conversation = { id: string; subject: string; grade: string; createdAt: string; messages: Message[] }
 
 /**
@@ -24,6 +33,8 @@ export class StudentWorld {
   readonly commands = new Map<string, Command>()
   /** Answers finish on their own after this many reads of their progress, unless held. */
   autoFinishAfterReads: number | null = 2
+  /** The next message accepted fails on its first attempt, as one the backend may answer if sent again. */
+  failNextRetryably = false
   private clock = Date.parse('2026-09-29T08:00:00Z')
   private nextConversation = 1
 
@@ -95,6 +106,14 @@ export class StudentWorld {
       const conversation = this.conversations.get(pathname.split('/')[2])
       if (!conversation) return { status: 404, body: { detail: 'Not Found' } }
       const { content, idempotencyKey } = body as { content: string; idempotencyKey: string }
+      // What the backend does with a retryable failure sent again under the same key:
+      // the same command is reopened, no second one is made.
+      const failed = this.commands.get(idempotencyKey)
+      if (failed?.failed) {
+        failed.failed = false
+        failed.attempt += 1
+        failed.reads = 0
+      }
       const student = this.accept(conversation, idempotencyKey, content)
       const { commandId } = commandIds(conversation.id, idempotencyKey)
       return {
@@ -120,6 +139,22 @@ export class StudentWorld {
           },
         }
       }
+      if (command.failed) {
+        return {
+          status: 200,
+          body: {
+            conversationId,
+            commandId: commandIds(conversationId, key).commandId,
+            status: 'failed',
+            attempt: command.attempt,
+            assistantMessageId: null,
+            retryable: true,
+            failureCategory: 'provider_dependency_error',
+            steps: [],
+            updatedAt: this.now(),
+          },
+        }
+      }
       command.reads += 1
       if (!command.finished && this.autoFinishAfterReads !== null && command.reads >= this.autoFinishAfterReads) {
         this.complete(command)
@@ -131,7 +166,7 @@ export class StudentWorld {
           conversationId,
           commandId: ids.commandId,
           status: command.finished ? 'completed' : 'ai_running',
-          attempt: 1,
+          attempt: command.attempt,
           assistantMessageId: command.finished ? ids.assistantMessageId : null,
           retryable: null,
           failureCategory: null,
@@ -150,8 +185,8 @@ export class StudentWorld {
       status: 404,
       body: { detail: 'This conversation was never escalated to a teacher' },
     }))
-    // A student with no evidence yet, as the backend's `MemorySummaryResponse`
-    // describes it (stoasystem/stoa-backend#81).
+    // What the backend answers for a student with no evidence yet (stoasystem/stoa-backend#81):
+    // every supported subject, whatever subject is asked about, all counts at zero.
     b.on('GET', '/adaptive/students/me/memory', () => ({
       status: 200,
       body: {
@@ -163,12 +198,44 @@ export class StudentWorld {
           supportedLocales: ['de', 'en', 'fr', 'it'],
           canonicalValuesStable: true,
         },
-        subjects: [{ id: 'math', label: 'Mathematics', rolloutState: 'active' }],
+        subjects: [
+          { id: 'math', label: 'Mathematics', rolloutState: 'active' },
+          { id: 'physics', label: 'Physics', rolloutState: 'foundation' },
+          { id: 'german', label: 'German', rolloutState: 'foundation' },
+          { id: 'english', label: 'English', rolloutState: 'foundation' },
+        ],
         subjectActivity: [
           {
             subject: 'math',
             label: 'Mathematics',
             rolloutState: 'active',
+            questionCount: 0,
+            aiResolvedCount: 0,
+            teacherEscalationCount: 0,
+            feedbackAverage: null,
+          },
+          {
+            subject: 'physics',
+            label: 'Physics',
+            rolloutState: 'foundation',
+            questionCount: 0,
+            aiResolvedCount: 0,
+            teacherEscalationCount: 0,
+            feedbackAverage: null,
+          },
+          {
+            subject: 'german',
+            label: 'German',
+            rolloutState: 'foundation',
+            questionCount: 0,
+            aiResolvedCount: 0,
+            teacherEscalationCount: 0,
+            feedbackAverage: null,
+          },
+          {
+            subject: 'english',
+            label: 'English',
+            rolloutState: 'foundation',
             questionCount: 0,
             aiResolvedCount: 0,
             teacherEscalationCount: 0,
@@ -202,7 +269,18 @@ export class StudentWorld {
     if (existing) return existing
     const student = { id: ids.studentMessageId, conversationId: conversation.id, role: 'user', content: question, createdAt: this.now() }
     conversation.messages.push(student)
-    this.commands.set(key, { key, conversationId: conversation.id, question, answer: this.answerFor(question), finished: false, reads: 0 })
+    const failed = this.failNextRetryably
+    this.failNextRetryably = false
+    this.commands.set(key, {
+      key,
+      conversationId: conversation.id,
+      question,
+      answer: this.answerFor(question),
+      finished: false,
+      failed,
+      attempt: 1,
+      reads: 0,
+    })
     return student
   }
 
