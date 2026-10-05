@@ -4,7 +4,7 @@
  * the parsing logic.
  */
 import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { MathRenderer, parseSegments } from '@/components/ui/MathRenderer'
 
 describe('parseSegments', () => {
@@ -40,6 +40,14 @@ describe('parseSegments', () => {
 })
 
 describe('MathRenderer rendering', () => {
+  // KaTeX's module is a third of the shared bundle; imported cold with the full
+  // suite beside it, it can run past waitFor's one second, as it did in
+  // ChatMessageBubble (#133). Warmed here, the renderer still loads it on the
+  // first formula; only the transform is done.
+  beforeAll(async () => {
+    await import('@/components/ui/katexLoader')
+  })
+
   it('renders nothing for empty content', () => {
     const { container } = render(<MathRenderer>{''}</MathRenderer>)
     expect(container).toBeEmptyDOMElement()
