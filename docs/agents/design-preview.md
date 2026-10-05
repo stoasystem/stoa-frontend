@@ -53,7 +53,7 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 没有演示答复的请求一律答 404，记进 `window.__stoaPreview.unanswered`，不写控制台；页面显示自己的错误态。`window.__stoaPreview.answered` 是已作答的请求清单。
 
-**为什么不用 MSW 浏览器 worker**：worker 要求 `public/mockServiceWorker.js`，而 `public/` 整个会被复制进 `dist`，这条路天然靠近生产包；worker 还要异步注册，首屏请求可能抢在它前面发出。adapter 加 fetch 垫片只存在于预览入口的模块图里，同步装好，构建产物里没有它的位置。`src/mocks/handlers` 仍只给 vitest 用：它覆盖的路由少、形状偏旧（例如 `/me`），复用它反而要先改它。
+**为什么不用 MSW 浏览器 worker**：worker 要求 `public/mockServiceWorker.js`，而 `public/` 整个会被复制进 `dist`，这条路天然靠近生产包（#125 之前 `package.json` 的 `msw.workerDirectory` 让本地 `npm ci` 的 postinstall 生成这个文件，于是混进本地 `dist`；该字段已删，见「不进生产包」第 2 项）；worker 还要异步注册，首屏请求可能抢在它前面发出。adapter 加 fetch 垫片只存在于预览入口的模块图里，同步装好，构建产物里没有它的位置。`src/mocks/handlers` 仍只给 vitest 用：它覆盖的路由少、形状偏旧（例如 `/me`），复用它反而要先改它。
 
 **存储隔离**：预览与 `npm run dev` 的真实应用同源。`storage.ts` 把 `localStorage` / `sessionStorage` 换成内存实现，每次加载都从同一状态开始：真实应用留下的令牌或「上次学科」影响不到预览，预览的假登录也不会留下令牌被真实应用发往后端；同一界面的两次截图只差被比较的改动。唯一的例外是演示后端自己的状态（#51），它留在本标签页里，见「演示后端的状态」。
 
@@ -91,7 +91,7 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 **`tests/component/designPreviewExcluded.test.ts`**（在 `npm test` 里；没放进 `test:release`，因为那条脚本被 `scripts/verify-release.mjs` 逐字锁定）：
 
 1. 从 `src/main.tsx` 走完整个模块图，`src/dev/` 与 `src/mocks/` 下的文件一个都不能出现。跟随 Vite 收文件的每一种方式：静态 import、re-export、字面量 `import()`、`@/` / 相对 / 根绝对（`/src/...`，按项目根解析）说明符、`import.meta.glob`（字符串或数组模式，按导入文件解析后用 `fs.globSync` 展开；`!` 排除模式忽略，只会多算不会少算）、`new URL('…', import.meta.url)`。读不出来的一律抛错而不是放过：非字面量的 `import()` / glob / `new URL`、既不是文件也不是 `node_modules` 里已装包的说明符（未知别名、`virtual:`、URL）、不存在的路径。另有阳性对照（在临时文件里依次写入审计的两种投毒、数组 glob、`?raw`、`new URL`，断言都走到 `src/dev/` / `src/mocks/`，五种读不出来的写法都抛错）和阴性对照（走到 `App.tsx`、`AppRoutes.tsx` 等 200 个以上的模块）。
-2. 生产构建到临时目录（约 3 秒，上面的构建期守卫在这一步生效）：只允许 `index.html` 一个 HTML，任何 JS 包里不得出现预览独有的标记（`stoa.design-preview.v1`、`api.design-preview.invalid`、`__stoaPreview`）；阴性对照确认包里有 `stoa.web.runtime-config.v1`。
+2. 生产构建到临时目录（约 3 秒，上面的构建期守卫在这一步生效）：只允许 `index.html` 一个 HTML，任何 JS 包里不得出现预览独有的标记（`stoa.design-preview.v1`、`api.design-preview.invalid`、`__stoaPreview`）；阴性对照确认包里有 `stoa.web.runtime-config.v1`。产物的文件集只能是 `index.html`、`assets/**` 与 `git ls-files public` 列出的文件（#126 审计 F7）：Vite 把 `public/` 整个复制进产物，不管有没有入库，所以本地 `public/` 里任何未入库的文件都会让这一项变红并列出文件名；阴性对照确认已入库的 `public` 文件（`_redirects` 等）都在产物里。仓里没有任何代码用 MSW 浏览器 worker（vitest 用 `msw/node`），`package.json` 已不再有 `msw.workerDirectory`，本地 `npm ci` 不会再生成 `public/mockServiceWorker.js`（#125）；旧工作区里留下的这个文件要手动删掉，否则这一项会红。投毒验证：往 `public/` 放一个未入库的 `poison-125.txt`，这一项变红并列出 `poison-125.txt`；删掉后恢复绿。
 
 投毒验证：在 `src/main.tsx` 的 `loadApplication` 里加一行 `void import('./dev/preview/main')`，两项都变红（模块图列出 `src/dev/preview/*` 七个文件；构建产物 `main-*.js` 带上三个标记）。#126 审计之后又在 `src/App.tsx`（或 barrel）里投毒六种，测试与单独的 `npm run build` 结果如下：
 
