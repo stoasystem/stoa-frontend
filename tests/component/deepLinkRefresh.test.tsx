@@ -79,6 +79,8 @@ describe('a deep link refreshed in the browser', () => {
   // one-second wait, so whichever test reached a page first failed (#133), as
   // /me's did (#94). What this file tests is where a refresh lands, not how fast
   // a page loads; the mount, /auth/me and the guards still run inside the wait.
+  // Four page graphs transformed cold took over the 10 s hook default under
+  // load (#133), so the warm-up says how long it may take.
   beforeAll(async () => {
     await Promise.all([
       import('@/pages/chapter/ChapterPages'),
@@ -86,7 +88,7 @@ describe('a deep link refreshed in the browser', () => {
       import('@/pages/map/MapPages'),
       import('@/pages/me/MePage'),
     ])
-  })
+  }, 30_000)
 
   beforeEach(async () => {
     await i18n.changeLanguage('en')
