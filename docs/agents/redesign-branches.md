@@ -34,7 +34,7 @@ gh pr create --base redesign/planet
 
 ```
 lint → typecheck → check:api-contract → check:untranslated → check:contrast
-→ test → test:release → publisher 测试 → build
+→ test → test:release → publisher 测试 → build → dist e2e
 ```
 
 **工作流文件必须已经在集成分支里，门禁才会跑。** GitHub 跑的是 PR 合并提交里的工作流，而 `main` 上（在
@@ -42,8 +42,9 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
 否则指向它的 PR 一个检查都不跑，也不会有任何提示。
 
 与 `deploy-production.yml` 的门同源（同样的 action 版本、Node 22、`npm ci` 参数，API 契约同样实时拉
-`stoa-backend` main 的路由清单）。dist e2e 在 [#29](https://github.com/stoasystem/stoa-frontend/issues/29)
-建好前**还没有接入**，工作流里留了占位。
+`stoa-backend` main 的路由清单）。dist e2e（[#29](https://github.com/stoasystem/stoa-frontend/issues/29)）打刚 build 出来的 dist，后端是 mock，
+每个 mock 的响应和页面发出的每个请求体都按后端 OpenAPI 校验；OpenAPI 从 `stoa-backend` main 实时拉取
+（[stoa-backend#80](https://github.com/stoasystem/stoa-backend/issues/80)）。用法和盲区见 `tests/e2e-dist/README.md`。
 
 门禁的已知缺口：
 - API 契约只查路径与方法，不查响应字段（决议 #5 第 9 条）。星球读模型与异步 Ask 要单独做契约验证。
