@@ -27,6 +27,15 @@ export type LitEvent = {
   /** When it was first lit, ISO 8601. */
   litAt: string
   litAtSource: LitAtSource
+  /**
+   * It was its subject's recommendation when it was lit (#145, round three
+   * of #114, C11). Optional, and not in stoa-backend#71's shape yet: with it
+   * the map keeps the recommendation marker on the point until the flare's
+   * brightest moment and moves it on together with the gold
+   * (`useLightingStage.ts`); without it the marker is drawn where the map
+   * says from the first frame, as before.
+   */
+  recommended?: boolean
 }
 
 export type LightingEventSource = {

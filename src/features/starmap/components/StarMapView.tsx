@@ -94,6 +94,8 @@ export type StarMapViewProps = {
   target: LayerTarget
   /** Go to another layer's route. */
   onNavigate: (target: LayerTarget) => void
+  /** Where a choice made on the map lands, asked before its flight takes off (#145 C6: a star waiting for its lighting, its nebula seen whole). */
+  land?: (next: LayerTarget) => LayerTarget
   /** The first frame with the map on it is on screen. */
   onFirstFrame?: () => void
   /** One sky: at rest on the whole map, another galaxy is at the centre of the view (the header follows it). */
@@ -141,7 +143,7 @@ function typing(target: EventTarget): boolean {
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
-export function StarMapView({ map, demo = false, target, onNavigate, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
+export function StarMapView({ map, demo = false, target, onNavigate, land, onFirstFrame, onCentreGalaxy, foveate, scheduler, createRendererFor, overlay }: StarMapViewProps) {
   const { t, i18n } = useTranslation('starmap')
   // The map's own links keep the query (`?points=`, the dev switches), as its
   // navigation does: a switch must hand the engine the same sky (#123).
@@ -302,7 +304,9 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
    */
   const pendingRoute = useRef<number | null>(null)
   const frames = scheduler ?? animationFrameScheduler
-  const choose = (next: LayerTarget) => {
+  const choose = (asked: LayerTarget) => {
+    // The landing is decided before take-off, so the flight never turns (#145 C6).
+    const next = land ? land(asked) : asked
     if (pendingRoute.current !== null) frames.cancel(pendingRoute.current)
     pendingRoute.current = null
     const current = targetRef.current

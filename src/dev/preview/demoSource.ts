@@ -106,10 +106,14 @@ export function completedLessons(): readonly string[] {
   return [...completed]
 }
 
-/** stoa-backend#71's unacknowledged lit points: the demo knowledge point, once lit and until acknowledged. */
+/**
+ * stoa-backend#71's unacknowledged lit points: the demo knowledge point, once lit and until
+ * acknowledged. It was math's recommendation until then (the demo sky recommends it in its
+ * subject), so it says so (#145 C11: the marker moves on at the flare's brightest moment).
+ */
 export function unacknowledgedLit(): LitEvent[] {
   return server.litAt && !server.acknowledged
-    ? [{ unitId: DEMO_KNOWLEDGE_POINT.unitId, litAt: server.litAt, litAtSource: 'observed' }]
+    ? [{ unitId: DEMO_KNOWLEDGE_POINT.unitId, litAt: server.litAt, litAtSource: 'observed', recommended: true }]
     : []
 }
 
