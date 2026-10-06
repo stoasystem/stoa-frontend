@@ -255,7 +255,7 @@ describe('H4: dragging, a linked star off screen in the same nebula is named its
       mapKey: 'h4',
       count: 3,
       galaxy: true,
-      galaxies: [{ subjectId: 'a', name: 'Alpha', x0: 0, x1: 1, y0: 0.4, y1: 0.6, tint: 0.2, dim: 1, nebulae: [0, 1] }],
+      galaxies: [{ subjectId: 'a', name: 'Alpha', x0: 0, x1: 1, y0: 0.4, y1: 0.6, colour: { base: [140, 128, 224], name: [196, 190, 255] }, dim: 1, nebulae: [0, 1] }],
       mapX: Float32Array.from(mapX),
       mapY: Float32Array.from([0.5, 0.5, 0.52]),
       state: Uint8Array.from([STATE_IN_PROGRESS, STATE_LOCKED, STATE_LIT]),

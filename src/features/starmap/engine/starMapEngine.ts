@@ -68,6 +68,7 @@ import {
 import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
 import { shortestDx } from '@/features/starmap/render/links'
+import { nebulaShade } from '@/features/starmap/render/galaxy'
 import { interpolateView, sameTarget, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import {
   anchorAt,
@@ -453,7 +454,7 @@ export class StarMapEngine {
         x1: galaxy.x1,
         y0: galaxy.y0,
         y1: galaxy.y1,
-        tint: galaxy.tint,
+        colour: galaxy.colour,
         dim: galaxy.enrolled ? 1 : NOT_ENROLLED_DIM,
         nebulae: nebulae.flatMap((nebula, n) => (nebula.subjectId === galaxy.subjectId ? [n] : [])),
       })),
@@ -528,16 +529,16 @@ export class StarMapEngine {
   }
 
   /**
-   * A nebula's own tint, near its galaxy's (#117 B2: each its own shade
-   * between blue-violet and warm gold, never a rainbow), and its dimming.
+   * A nebula's own shade, a small shift round its galaxy's base colour
+   * (#117 B2, #143: `nebulaShade`), and its dimming.
    */
-  private nebulaLook(topicId: string, galaxy: number | undefined): { tint: number; dim: number } {
-    if (galaxy === undefined) return { tint: 0.3, dim: 1 }
+  private nebulaLook(topicId: string, galaxy: number | undefined): Pick<SceneData['nebulae'][number], 'colour' | 'dim'> {
+    if (galaxy === undefined) return { dim: 1 }
     let hash = 2166136261
     for (let i = 0; i < topicId.length; i += 1) hash = Math.imul(hash ^ topicId.charCodeAt(i), 16777619) >>> 0
-    const jitter = ((hash % 1000) / 1000 - 0.5) * 0.3
     const owner = this.skyGalaxies[galaxy]
-    return { tint: Math.max(0, Math.min(1, owner.tint + jitter)), dim: owner.enrolled ? 1 : NOT_ENROLLED_DIM }
+    const shift = (at: number) => (((hash >>> at) % 1000) / 1000) * 2 - 1
+    return { colour: nebulaShade(owner.colour.base, shift(0), shift(10)), dim: owner.enrolled ? 1 : NOT_ENROLLED_DIM }
   }
 
   /**

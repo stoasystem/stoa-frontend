@@ -173,15 +173,16 @@ describe('one sky: galaxies of nebulae (#119)', () => {
     }
   })
 
-  it('gives every nebula its own tint between blue-violet and gold, and dims a subject not taken', () => {
+  it('gives every nebula its own shade near its galaxy’s base colour (#143), and dims a subject not taken', () => {
     const s = scene(1000, 1440, 844, true)
-    const engine = s.engine as unknown as { scene: { nebulae: { topicId: string; tint: number; dim: number }[]; galaxies: { subjectId: string; dim: number }[] } }
+    const engine = s.engine as unknown as { scene: { nebulae: { topicId: string; colour: readonly number[]; dim: number }[]; galaxies: { subjectId: string; dim: number }[] } }
     const { nebulae, galaxies } = engine.scene
     for (const nebula of nebulae) {
-      expect(nebula.tint).toBeGreaterThanOrEqual(0)
-      expect(nebula.tint).toBeLessThanOrEqual(1)
+      expect(nebula.colour).toHaveLength(3)
+      for (const channel of nebula.colour) expect(channel).toBeGreaterThanOrEqual(0)
+      for (const channel of nebula.colour) expect(channel).toBeLessThanOrEqual(255)
     }
-    expect(new Set(nebulae.map((n) => n.tint.toFixed(3))).size).toBe(nebulae.length)
+    expect(new Set(nebulae.map((n) => n.colour.join(','))).size).toBeGreaterThan(nebulae.length * 0.8)
     const subject = new Map(s.map.nebulae.map((n) => [n.topicId, n.subjectId]))
     for (const nebula of nebulae) expect(nebula.dim).toBe(subject.get(nebula.topicId) === 'chemistry' ? NOT_ENROLLED_DIM : 1)
     expect(galaxies.map((g) => [g.subjectId, g.dim])).toEqual([['math', 1], ['physics', 1], ['chemistry', NOT_ENROLLED_DIM]])

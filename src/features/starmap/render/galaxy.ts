@@ -13,12 +13,14 @@
  *     (`paintNebulaCloud`). Lit stars warm the core; the renderer draws the
  *     whole cloud brighter the larger its lit share.
  *
- * Tints run from blue-violet through silver to warm gold, never a rainbow
- * (#117 B2).
+ * Each galaxy has its subject's base colour (#143: mathematics blue-violet,
+ * physics cyan-blue, chemistry warm amber, `GALAXY_COLOURS`), muted and
+ * mid-light, never a rainbow (#117 B2); each nebula is its own small shift
+ * round it (`nebulaShade`), so a subject is told by hue alone.
  */
 import { seededRandom } from '@/features/starmap/layout/layout'
 import type { SceneData, StarMapTheme } from '@/features/starmap/render/types'
-import { PANORAMA } from '@/features/starmap/view/semanticZoom'
+import { NEBULA_SHADE, PANORAMA, type Rgb } from '@/features/starmap/view/semanticZoom'
 
 export const SKY_MIST_ALPHA = 0.04
 
@@ -69,21 +71,48 @@ export const CLOUD_REACH = 1.35
 
 export const GALAXY = { mist: '#B9C4D9', violet: '#8A7FAA' } as const
 
-/** Blue-violet, silver, warm gold: the only colours a cloud is tinted with. */
-const TINT_STOPS: readonly [number, number, number][] = [
-  [146, 136, 214],
-  [196, 204, 228],
-  [232, 200, 142],
-]
+/** The shade a nebula takes when its galaxy has no colour (a sky without galaxies): the old silver. */
+const NO_GALAXY_SHADE: Rgb = [196, 204, 228]
 
-/** A tint, 0 blue-violet .. 0.5 silver .. 1 warm gold, as `rgb()`. */
-export function tintColour(t: number): string {
-  const x = Math.max(0, Math.min(1, t)) * (TINT_STOPS.length - 1)
-  const i = Math.min(TINT_STOPS.length - 2, Math.floor(x))
-  const f = x - i
-  const [a, b] = [TINT_STOPS[i], TINT_STOPS[i + 1]]
-  const mix = (k: number) => Math.round(a[k] + (b[k] - a[k]) * f)
-  return `rgb(${mix(0)}, ${mix(1)}, ${mix(2)})`
+/** An `Rgb` as `rgb()`. */
+export function rgbColour([r, g, b]: Rgb): string {
+  return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`
+}
+
+function toHsl([r, g, b]: Rgb): [number, number, number] {
+  const [R, G, B] = [r / 255, g / 255, b / 255]
+  const max = Math.max(R, G, B)
+  const min = Math.min(R, G, B)
+  const l = (max + min) / 2
+  if (max === min) return [0, 0, l]
+  const d = max - min
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+  const h = max === R ? (G - B) / d + (G < B ? 6 : 0) : max === G ? (B - R) / d + 2 : (R - G) / d + 4
+  return [h * 60, s, l]
+}
+
+function fromHsl(h: number, s: number, l: number): Rgb {
+  const k = (n: number) => (n + h / 30) % 12
+  const a = s * Math.min(l, 1 - l)
+  const f = (n: number) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1))
+  return [f(0) * 255, f(8) * 255, f(4) * 255].map((v) => Math.round(Math.max(0, Math.min(255, v)))) as unknown as Rgb
+}
+
+/** An `Rgb`'s hue, degrees 0..360 (for tests and the hue checks). */
+export function hueOf(colour: Rgb): number {
+  return toHsl(colour)[0]
+}
+
+/**
+ * A nebula's own shade (#143): its galaxy's `base` turned by `hue` (-1..1)
+ * times `NEBULA_SHADE.hue` degrees and lightened or darkened by `light`
+ * (-1..1) times `NEBULA_SHADE.light`, so nebulae differ a little and their
+ * subject never comes into doubt.
+ */
+export function nebulaShade(base: Rgb, hue: number, light: number): Rgb {
+  const clamp = (v: number) => Math.max(-1, Math.min(1, v))
+  const [h, s, l] = toHsl(base)
+  return fromHsl((h + clamp(hue) * NEBULA_SHADE.hue + 360) % 360, s, Math.max(0, Math.min(1, l + clamp(light) * NEBULA_SHADE.light)))
 }
 
 /** `#RRGGBB` or `rgb(r, g, b)` at an alpha. */
@@ -153,7 +182,7 @@ export function paintNebulaCloud(ctx: CanvasRenderingContext2D, size: number, da
   for (let i = 0; i < data.count; i += 1) if (data.nebula[i] === index) members.push(i)
   const n = Math.max(1, members.length)
   const random = seededRandom(7703 + index * 131 + n)
-  const tint = tintColour(nebula.tint ?? 0.3)
+  const tint = rgbColour(nebula.colour ?? NO_GALAXY_SHADE)
   const cool = brush(makeCanvas(64, 64), tint)
   const warm = brush(makeCanvas(64, 64), theme.lit, 0.35)
   const r = nebula.r * k
@@ -219,7 +248,7 @@ const HAZE_EDGE = 1
 /** The edge fade's stops: a smoothstep, so its start and end are as soft as its middle. */
 const HAZE_EDGE_STOPS = 8
 
-/** One galaxy's haze, `width` device px wide, in its base tint, with sparse dust between its nebulae. */
+/** One galaxy's haze, `width` device px wide, in its base colour, with sparse dust between its nebulae. */
 export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, data: SceneData, index: number,
   theme: StarMapTheme, makeCanvas: MakeCanvas) {
   const galaxy = data.galaxies?.[index]
@@ -227,7 +256,7 @@ export function paintGalaxyHaze(ctx: CanvasRenderingContext2D, width: number, da
   const box = galaxyHazeBox(galaxy)
   const k = width / (box.x1 - box.x0)
   const random = seededRandom(5309 + index * 17)
-  const tint = tintColour(galaxy.tint)
+  const tint = rgbColour(galaxy.colour.base)
   const soft = brush(makeCanvas(64, 64), tint, 0.3)
   for (const n of galaxy.nebulae) {
     const nebula = data.nebulae[n]
