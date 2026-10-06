@@ -16,6 +16,7 @@ import { nearestCopy } from '@/features/starmap/view/camera'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { arrowDirection, courseNebulae, nearestInDirection, type ArrowDirection } from '@/features/starmap/view/keyboardOrder'
 import type { LayerTarget } from '@/features/starmap/view/layers'
+import { KEYS } from '@/features/starmap/view/semanticZoom'
 import { SKY_WRAP } from '@/features/starmap/view/sky'
 import i18n from '@/i18n'
 import { fakeClock, recordingRenderer, skyMap } from './starmapHarness'
@@ -28,6 +29,40 @@ function ahead(from: { x: number; y: number }, to: { x: number; y: number }, dir
   const dx = nearestCopy(to.x, from.x, wrap) - from.x
   const dy = to.y - from.y
   return direction === 'right' ? dx : direction === 'left' ? -dx : direction === 'down' ? dy : -dy
+}
+
+/** The cone alone (#141): the index `nearestInDirection` picked before the fallback (#146), or -1. */
+function inCone(points: readonly { x: number; y: number }[], from: number, direction: ArrowDirection, wrap = 0): number {
+  let best = -1
+  let bestScore = Infinity
+  points.forEach((point, i) => {
+    if (i === from) return
+    const a = ahead(points[from], point, direction, wrap)
+    const dx = nearestCopy(point.x, points[from].x, wrap) - points[from].x
+    const aside = Math.abs(direction === 'left' || direction === 'right' ? point.y - points[from].y : dx)
+    if (!(a > KEYS.minAhead) || aside > a * KEYS.coneSlope) return
+    const score = a + aside * KEYS.offAxisWeight
+    if (score < bestScore) {
+      best = i
+      bestScore = score
+    }
+  })
+  return best
+}
+
+/** The nearest point anywhere ahead in `direction`, by straight distance (the fallback, #146), or -1. */
+function nearestAhead(points: readonly { x: number; y: number }[], from: number, direction: ArrowDirection, wrap = 0): number {
+  let best = -1
+  let bestDistance = Infinity
+  points.forEach((point, i) => {
+    if (i === from || !(ahead(points[from], point, direction, wrap) > KEYS.minAhead)) return
+    const distance = Math.hypot(nearestCopy(point.x, points[from].x, wrap) - points[from].x, point.y - points[from].y)
+    if (distance < bestDistance) {
+      best = i
+      bestDistance = distance
+    }
+  })
+  return best
 }
 
 describe('arrows by position: the arithmetic', () => {
@@ -65,10 +100,22 @@ describe('arrows by position: the arithmetic', () => {
     expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.3, y: 0 }], 0, 'down')).toBe(-1)
   })
 
-  it('ignores points outside the cone', () => {
-    // Far to the side and barely below: not "down".
-    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.5, y: 0.01 }], 0, 'down')).toBe(-1)
+  it('prefers a point inside the cone to a nearer one outside it', () => {
+    // Far to the side and barely below loses to one straight below, however much further.
+    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.5, y: 0.01 }, { x: 0.01, y: 0.9 }], 0, 'down')).toBe(2)
     expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.01, y: 0.5 }], 0, 'down')).toBe(1)
+  })
+
+  it('falls back to the nearest point anywhere that way when the cone is empty (#146 C17)', () => {
+    // Only off to the side and barely below: still "down", the nearer of the two.
+    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.5, y: 0.01 }], 0, 'down')).toBe(1)
+    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.9, y: 0.02 }, { x: -0.4, y: 0.05 }], 0, 'down')).toBe(2)
+    // Left and right the same.
+    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.02, y: 0.7 }, { x: 0.01, y: -0.3 }], 0, 'right')).toBe(2)
+    // Behind or level is never that way: it stays.
+    expect(nearestInDirection([{ x: 0, y: 0 }, { x: 0.5, y: -0.01 }, { x: 0.5, y: 0 }], 0, 'down')).toBe(-1)
+    // On a ring the shorter way counts for the fallback too.
+    expect(nearestInDirection([{ x: 0.98, y: 0.5 }, { x: 0.5, y: 0.52 }, { x: 0.1, y: 0.53 }], 0, 'down', 1)).toBe(2)
   })
 
   it('measures across the seam the shorter way, so the ring has no end', () => {
@@ -220,6 +267,61 @@ describe('the keyboard on the map (#141)', () => {
       }
     }
     expect(moved).toBeGreaterThan(4)
+  })
+
+  it('up and down between nebulae fall back to the nearest one that way when the cone is empty (#146 C17)', () => {
+    const map = skyMap(1000, 'chemistry')
+    const { nebulaLink, press } = show(map)
+    const discs = nebulaDiscs(map)
+    const nebulae = orderedNebulae(map)
+    const spots = nebulae.map((n) => discs.get(n.topicId)!)
+    let fellBack = 0
+    for (const [i, nebula] of nebulae.entries()) {
+      for (const direction of ['up', 'down'] as const) {
+        if (inCone(spots, i, direction, SKY_WRAP) >= 0) continue
+        const expected = nearestAhead(spots, i, direction, SKY_WRAP)
+        const from = nebulaLink(nebula.topicId)
+        act(() => from.focus())
+        press(from, KEY[direction])
+        const to = (document.activeElement as HTMLElement).dataset.nebulaLink
+        if (expected < 0) {
+          // Nothing at all that way: it stays.
+          expect(to).toBe(nebula.topicId)
+          continue
+        }
+        expect(to).toBe(nebulae[expected].topicId)
+        expect(ahead(spots[i], spots[expected], direction, SKY_WRAP)).toBeGreaterThan(0)
+        fellBack += 1
+      }
+    }
+    // The band has such nebulae: before #146 these arrows did nothing.
+    expect(fellBack).toBeGreaterThan(0)
+  })
+
+  it('arrows on a star fall back to the nearest star of its nebula that way when the cone is empty (#146 C17)', () => {
+    const map = skyMap(1000, 'math')
+    const stars = orderedStars(map)
+    // A star whose cone is empty one way while some star of its nebula still lies that way.
+    const cases: { star: Star; direction: ArrowDirection; expected: Star }[] = []
+    for (const nebula of orderedNebulae(map)) {
+      const inNebula = stars.filter((s) => s.nebulaId === nebula.topicId)
+      inNebula.forEach((star, i) => {
+        for (const direction of DIRECTIONS) {
+          const expected = nearestAhead(inNebula, i, direction)
+          if (inCone(inNebula, i, direction) < 0 && expected >= 0) cases.push({ star, direction, expected: inNebula[expected] })
+        }
+      })
+    }
+    expect(cases.length).toBeGreaterThan(0)
+    // The star layer: the arrow flies to it.
+    for (const { star, direction, expected } of cases.slice(0, 6)) {
+      const { container, navigate, unmount } = show(map, { layer: 'star', nebulaId: star.nebulaId, unitId: star.unitId })
+      const link = container.querySelector<HTMLElement>('article[aria-labelledby="starmap-star-title"] a')!
+      act(() => link.focus())
+      fireEvent.keyDown(link, { key: KEY[direction] })
+      expect(navigate).toHaveBeenLastCalledWith({ layer: 'star', nebulaId: expected.nebulaId, unitId: expected.unitId })
+      unmount()
+    }
   })
 
   it('every arrow on a star goes to the nearest star of its nebula that way, and focus shows on the canvas', () => {

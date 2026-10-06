@@ -27,6 +27,10 @@
     "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
     "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen."
   },
+  "help": {
+    "open": "So funktioniert die Sternkarte",
+    "close": "Schließen"
+  },
   "star": {
     "progress": "{{percent}} % der Lektionen erledigt",
     "lessons": "{{done}} von {{total}} Lektionen erledigt",

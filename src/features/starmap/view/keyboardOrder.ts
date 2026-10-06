@@ -35,31 +35,45 @@ export function arrowDirection(key: string): ArrowDirection | null {
 
 /**
  * The point nearest `points[from]` in `direction`, by map position (y grows
- * downwards), or -1 when there is none. A candidate must lie ahead, inside a
- * cone of `KEYS.coneSlope` off the axis; among those, the least
+ * downwards), or -1 when there is none. A candidate must lie ahead; inside a
+ * cone of `KEYS.coneSlope` off the axis, the least
  * `ahead + KEYS.offAxisWeight × aside` wins, so a point straight ahead beats
- * a slightly nearer one off to the side. Ties keep the given order. On a ring
- * (`wrap` > 0) x is measured the shorter way round.
+ * a slightly nearer one off to the side. When nothing ahead lies inside the
+ * cone, the nearest point anywhere ahead (the half-plane that way, by
+ * straight distance) is taken instead (#146, round three C17 of #142), so an
+ * arrow moves whenever something lies that way at all. Ties keep the given
+ * order. On a ring (`wrap` > 0) x is measured the shorter way round.
  */
 export function nearestInDirection(points: readonly { x: number; y: number }[], from: number, direction: ArrowDirection, wrap = 0): number {
   const origin = points[from]
   if (!origin) return -1
   let best = -1
   let bestScore = Infinity
+  // Outside the cone but ahead: the nearest, kept in case the cone is empty.
+  let fallback = -1
+  let fallbackDistance = Infinity
   for (let i = 0; i < points.length; i += 1) {
     if (i === from) continue
     const dx = nearestCopy(points[i].x, origin.x, wrap) - origin.x
     const dy = points[i].y - origin.y
     const ahead = direction === 'right' ? dx : direction === 'left' ? -dx : direction === 'down' ? dy : -dy
     const aside = Math.abs(direction === 'left' || direction === 'right' ? dy : dx)
-    if (!(ahead > KEYS.minAhead) || aside > ahead * KEYS.coneSlope) continue
+    if (!(ahead > KEYS.minAhead)) continue
+    if (aside > ahead * KEYS.coneSlope) {
+      const distance = Math.hypot(ahead, aside)
+      if (distance < fallbackDistance) {
+        fallback = i
+        fallbackDistance = distance
+      }
+      continue
+    }
     const score = ahead + aside * KEYS.offAxisWeight
     if (score < bestScore) {
       best = i
       bestScore = score
     }
   }
-  return best
+  return best >= 0 ? best : fallback
 }
 
 /**

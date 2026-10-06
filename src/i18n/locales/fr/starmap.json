@@ -27,6 +27,10 @@
     "pointer": "Faites glisser pour vous déplacer, faites défiler ou pincez pour zoomer. Choisissez une étoile pour voir son chapitre ; appuyez dessus et faites-la glisser (en tactile, maintenez d’abord) pour voir ses liens.",
     "keys": "Clavier : flèches vers le plus proche dans ce sens, Tab suit le cours, + et − zooment."
   },
+  "help": {
+    "open": "Comment fonctionne la carte du ciel",
+    "close": "Fermer"
+  },
   "star": {
     "progress": "{{percent}} % des leçons faites",
     "lessons": "{{done}} leçons faites sur {{total}}",

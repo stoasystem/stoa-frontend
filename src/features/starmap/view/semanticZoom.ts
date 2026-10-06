@@ -189,10 +189,12 @@ export const DRAG = {
 /**
  * Arrow keys by position (#141, `view/keyboardOrder.ts`): from a star (or,
  * up and down, a nebula) to the nearest one in the arrow's direction. Map
- * units for distances; the cone is a ratio, sideways over ahead.
+ * units for distances; the cone is a ratio, sideways over ahead. With
+ * nothing inside the cone, the nearest one anywhere ahead (the half-plane
+ * that way) is taken instead (#146), so an arrow only stays put at an edge.
  */
 export const KEYS = {
-  /** A candidate counts only this far off the axis: sideways up to this many times its distance ahead (2 ≈ 63°). */
+  /** A candidate inside this cone is preferred: sideways up to this many times its distance ahead (2 ≈ 63°). */
   coneSlope: 2,
   /** Sideways distance weighs this many times ahead, so the one straight ahead wins over a nearer one off to the side. */
   offAxisWeight: 2,
