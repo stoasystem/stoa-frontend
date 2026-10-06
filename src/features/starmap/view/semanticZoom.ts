@@ -277,6 +277,14 @@ export const PANORAMA = {
    */
   galaxyName: { out: [1.1, 1.8] as Ramp, size: 0.085, minPx: 26, maxPx: 96, tracking: 0.42, weight: 300, below: 0.9, aside: [0.28, 0.5] as Ramp },
   /**
+   * While a nebula is hovered or keyboard-focused (or chosen), its galaxy's
+   * name steps back to `to` of its alpha (#143, round three A3 of #142), so
+   * the big faint letters never compete with the focus ring and the nebula's
+   * name pill; it eases there and back over `ms` (a hover that comes and
+   * goes never blinks the name).
+   */
+  galaxyNameYield: { to: 0.3, ms: 260 },
+  /**
    * A phone held upright (A4): the panorama starts one zoom step (`ZOOM.buttonStep`)
    * further out than a three-quarter view of the widest galaxy, so the whole
    * galaxy in view is on screen; its stars span at most this share of the width.
@@ -291,6 +299,35 @@ export const PANORAMA = {
    */
   dither: 1.5,
 } as const
+
+/** An sRGB colour, 0..255 per channel. */
+export type Rgb = readonly [r: number, g: number, b: number]
+
+/**
+ * Each galaxy's base colour (#143, round three A5 of #142): a subject can be
+ * told by hue alone -- mathematics blue-violet, physics cyan-blue, chemistry
+ * warm amber -- all three muted, mid-light, inside the sky's blue-violet ..
+ * silver .. gold range (#117 B2: no rainbow, no neon). The galaxy's haze, its
+ * nebulae's clouds (each a small shift round it, `nebulaShade`) and its name
+ * all take it. `name` is the name's ink, the base lifted towards white so the
+ * letters read as light, drawn at the `--starmap-galaxy-name` alpha.
+ *
+ * Mirrors the `--starmap-galaxy-*` sky tokens (src/styles/brand-tokens.css;
+ * a test keeps them equal). A subject not listed takes the next colour in
+ * this order by its place on the band.
+ */
+export const GALAXY_COLOURS = {
+  math: { base: [140, 128, 224] as Rgb, name: [196, 190, 255] as Rgb },
+  physics: { base: [100, 182, 220] as Rgb, name: [176, 226, 250] as Rgb },
+  chemistry: { base: [226, 166, 100] as Rgb, name: [255, 214, 168] as Rgb },
+} as const
+
+/**
+ * How far a nebula's own shade strays from its galaxy's base (#117 B2: each
+ * nebula its own shade; #143: never so far that its subject is in doubt):
+ * up to ±`hue` degrees of hue and ±`light` of lightness (0..1).
+ */
+export const NEBULA_SHADE = { hue: 9, light: 0.06 } as const
 
 /**
  * How much of the panorama look is on: 1 at the farthest zoom, 0 once past

@@ -264,8 +264,8 @@ describe('the seam: the shorter way round (#120)', () => {
       count: 2,
       galaxy: true,
       galaxies: [
-        { subjectId: 'a', name: 'Alpha', x0: 0.9, x1: 0.99, y0: 0.4, y1: 0.6, tint: 0.2, dim: 1, nebulae: [0] },
-        { subjectId: 'b', name: 'Beta', x0: 0.01, x1: 0.1, y0: 0.4, y1: 0.6, tint: 0.8, dim: 1, nebulae: [1] },
+        { subjectId: 'a', name: 'Alpha', x0: 0.9, x1: 0.99, y0: 0.4, y1: 0.6, colour: { base: [140, 128, 224], name: [196, 190, 255] }, dim: 1, nebulae: [0] },
+        { subjectId: 'b', name: 'Beta', x0: 0.01, x1: 0.1, y0: 0.4, y1: 0.6, colour: { base: [226, 166, 100], name: [255, 214, 168] }, dim: 1, nebulae: [1] },
       ],
       mapX: Float32Array.from([0.95, 0.05]),
       mapY: Float32Array.from([0.5, 0.5]),

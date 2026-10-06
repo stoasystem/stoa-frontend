@@ -921,7 +921,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // Names no longer in play are forgotten (they had faded with the zoom).
       for (const [key, entry] of labelFades) if (entry.seen !== labelFrame) labelFades.delete(key)
       stats.names = names
-      stats.settling = settling
+      // A galaxy name stepping back for a hovered or focused nebula (#143) wants frames too.
+      stats.settling = settling || (scene.galaxy === true && galaxyNames.settling)
 
       // Where lines and bridges lead, named at the screen's edge: the topmost
       // layer, over every star and name (#138 D5). The renderer's second call

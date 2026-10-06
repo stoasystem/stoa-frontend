@@ -206,6 +206,21 @@
    * heading and the switcher's segment). Drawn by render/galaxyNames.ts.
    */
   --starmap-galaxy-name: rgba(214, 222, 255, 0.13);
+  /*
+   * Each galaxy's base colour on the star map (#143, round three A5 of #142):
+   * its haze, its nebulae's clouds (each a small shift round it) and, lifted
+   * towards white at the --starmap-galaxy-name alpha, its name. A subject is
+   * told by hue alone: mathematics blue-violet, physics cyan-blue, chemistry
+   * warm amber; muted and mid-light, never a rainbow (#117 B2). Mirrored by
+   * GALAXY_COLOURS (src/features/starmap/view/semanticZoom.ts; a test keeps
+   * them equal). Decoration: the haze is drawn at a few percent.
+   */
+  --starmap-galaxy-math: rgb(140, 128, 224);
+  --starmap-galaxy-physics: rgb(100, 182, 220);
+  --starmap-galaxy-chemistry: rgb(226, 166, 100);
+  --starmap-galaxy-name-math: rgba(196, 190, 255, 0.13);
+  --starmap-galaxy-name-physics: rgba(176, 226, 250, 0.13);
+  --starmap-galaxy-name-chemistry: rgba(255, 214, 168, 0.13);
 
   /* Motion and states: the focus ring on dark is 2 px star-gold. */
   --focus-ring: var(--lit);

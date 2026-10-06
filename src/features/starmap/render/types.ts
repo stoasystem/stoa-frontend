@@ -8,6 +8,7 @@
  * glow, then WebGL).
  */
 import type { Viewport } from '@/features/starmap/view/camera'
+import type { Rgb } from '@/features/starmap/view/semanticZoom'
 
 export type RendererKind = 'canvas2d' | 'webgl'
 
@@ -71,8 +72,8 @@ export type SceneData = {
     x1: number
     y0: number
     y1: number
-    /** 0 blue-violet .. 1 warm gold. */
-    tint: number
+    /** Its base colour (haze, clouds) and its name's ink, by subject (#143: `GALAXY_COLOURS`). */
+    colour: { readonly base: Rgb; readonly name: Rgb }
     /** 1, or less for a subject the student does not take. */
     dim: number
     /** Its nebulae, by index. */
@@ -105,8 +106,8 @@ export type SceneData = {
     r: number
     lit: number
     total: number
-    /** Its own tint, 0 blue-violet .. 1 warm gold (one sky only). */
-    tint?: number
+    /** Its own shade, near its galaxy's base colour (one sky only; #143: `nebulaShade`). */
+    colour?: Rgb
     /** 1, or less in a galaxy the student does not take (one sky only). */
     dim?: number
   }[]

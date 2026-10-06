@@ -20,7 +20,7 @@ import type { StarMap } from '@/features/starmap/model/starMap'
 import { CLOUD_REACH, galaxyHazeBox } from '@/features/starmap/render/galaxy'
 import { baseScale, turnsToward, usableHeight, wrapX, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
-import { PANORAMA } from '@/features/starmap/view/semanticZoom'
+import { GALAXY_COLOURS, PANORAMA, type Rgb } from '@/features/starmap/view/semanticZoom'
 
 /** The ring's circumference in map units: the band runs over x in [0, 1] with half a gap at each end (#119). */
 export const SKY_WRAP = 1
@@ -34,19 +34,35 @@ export type SkyGalaxy = {
   x1: number
   y0: number
   y1: number
-  /** Its nebula indices are found by `subjectId`; its base tint, 0 (blue-violet) .. 1 (warm gold). */
-  tint: number
+  /** Its nebula indices are found by `subjectId`; its base colour and its name's ink (`galaxyColour`, #143). */
+  colour: GalaxyColour
 }
+
+/** A galaxy's base colour and its name's ink (`GALAXY_COLOURS`). */
+export type GalaxyColour = { readonly base: Rgb; readonly name: Rgb }
 
 /** A galaxy the student does not take is drawn at this share of its brightness (#117 C4). */
 export const NOT_ENROLLED_DIM = 0.4
 
+/** Which subject a galaxy is, by its id or, failing that, its name in any of the four languages. */
+const SUBJECT_WORDS: readonly [keyof typeof GALAXY_COLOURS, RegExp][] = [
+  ['math', /math|matem/i],
+  ['physics', /phys|fisic/i],
+  ['chemistry', /chem|chim/i],
+]
+
 /**
- * Base tints along the band, between blue-violet and warm gold (#117 B2:
- * no rainbow). Spread over however many galaxies there are.
+ * A galaxy's base colour (#143): its subject's (`GALAXY_COLOURS`), known by
+ * its id or its name; a subject not listed takes the colours in turn by its
+ * place on the band (`index`), so neighbours still differ.
  */
-export function galaxyTint(index: number, count: number): number {
-  return count <= 1 ? 0.3 : 0.12 + (0.66 * index) / (count - 1)
+export function galaxyColour(subjectId: string, name: string, index: number): GalaxyColour {
+  for (const text of [subjectId, name]) {
+    const hit = SUBJECT_WORDS.find(([, words]) => words.test(text))
+    if (hit) return GALAXY_COLOURS[hit[0]]
+  }
+  const order = Object.values(GALAXY_COLOURS)
+  return order[((index % order.length) + order.length) % order.length]
 }
 
 /** The galaxies of a sky map, left to right, each boxed round its own stars. */
@@ -66,12 +82,13 @@ export function skyGalaxies(map: Pick<StarMap, 'nebulae' | 'stars' | 'subjects'>
   const along = [...boxes].sort(([, a], [, b]) => a.x0 - b.x0)
   return along.map(([subjectId, box], index) => {
     const galaxy = map.subjects.find((subject) => subject.subjectId === subjectId)
+    const name = galaxy?.name ?? subjectId
     return {
       subjectId,
-      name: galaxy?.name ?? subjectId,
+      name,
       enrolled: galaxy?.enrolled ?? true,
       ...box,
-      tint: galaxyTint(index, along.length),
+      colour: galaxyColour(subjectId, name, index),
     }
   })
 }
