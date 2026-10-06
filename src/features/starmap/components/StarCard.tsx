@@ -9,7 +9,7 @@ import { ChevronLeft } from 'lucide-react'
 import type { MouseEvent, RefObject } from 'react'
 import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
@@ -61,12 +61,24 @@ export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HT
   return { action, chapterTo, jump }
 }
 
+/**
+ * The map's own query (`?points=`, the dev switches) on a path inside the map,
+ * as the map's other links keep it (#123): the card's links lead back into
+ * the same sky (#146, round three C7 of #142), on a wide screen and a phone.
+ */
+function useMapPath() {
+  const { search } = useLocation()
+  return (path: string) => path + search
+}
+
 /** The card's way back: the star's nebula (the card closes; the camera stays, #134). */
 export function StarCardBack({ map, nebula }: { map: StarMap; nebula: Nebula }) {
   const { t } = useTranslation('starmap')
+  const here = useMapPath()
   return (
     <Link
-      to={pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId })}
+      data-star-back
+      to={here(pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId }))}
       className="inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
       <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
@@ -78,6 +90,7 @@ export function StarCardBack({ map, nebula }: { map: StarMap; nebula: Nebula }) 
 /** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to light first, review. */
 export function StarCardDetails({ map, demo = false, star }: { map: StarMap; demo?: boolean; star: Star }) {
   const { t } = useTranslation('starmap')
+  const here = useMapPath()
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
   const prerequisites =
@@ -160,7 +173,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
             {prerequisites.map((before) => (
               <li key={before.unitId}>
                 <Link
-                  to={pathForTarget(subjectOfNebula(map, before.nebulaId), { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId })}
+                  to={here(pathForTarget(subjectOfNebula(map, before.nebulaId), { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId }))}
                   className="inline-flex min-h-11 items-center text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {before.name}
