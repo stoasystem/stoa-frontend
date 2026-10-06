@@ -109,7 +109,13 @@ export type VisibleStar = { index: number; x: number; y: number }
 export type NebulaDiscOnScreen = { x: number; y: number; r: number }
 
 /** Where one star is drawn in the last frame, CSS px, and the glyph size (#51's lighting layer). */
-export type StarOnScreen = { x: number; y: number; size: number }
+export type StarOnScreen = {
+  x: number
+  y: number
+  size: number
+  /** The names at the screen's edge in the same frame, CSS px: a label laid beside the star keeps clear of them (#145 C14). */
+  keepClear?: readonly { x0: number; y0: number; x1: number; y1: number }[]
+}
 
 /**
  * How far in the map is (#134): the glyph size every reveal reads, its rough
@@ -930,7 +936,7 @@ export class StarMapEngine {
   /** Where `unitId`'s star was drawn in the last frame; null before one, or for a star not on this map (#51). */
   starOnScreen(unitId: string): StarOnScreen | null {
     const index = this.drewFirstFrame ? this.stars.findIndex((star) => star.unitId === unitId) : -1
-    return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize }
+    return index < 0 ? null : { x: this.x[index], y: this.y[index], size: this.glyphSize, keepClear: this.renderer.stats.edgeLabels }
   }
 
   /** With a star chosen, where it was drawn in the last frame (it may be panned off screen, #132); else null. */

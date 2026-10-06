@@ -45,7 +45,8 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   }, [map, lastSubject, ownerId, remember])
   const { topicId, unitId } = params
   const routeTarget = useMemo(() => resolveTarget(map, topicId, unitId), [map, topicId, unitId])
-  // A point waiting for its lighting moment is drawn in progress until it, and its star's route opens on its nebula (#140).
+  // A point waiting for its lighting moment is drawn in progress until it, and its star's route
+  // (or a tap on it) opens on its nebula (#140, #145).
   const stage = useLightingStage(map, routeTarget)
 
   // Sign-in timing, handed over from ChatPage / LearnPage (#45): a student
@@ -71,7 +72,7 @@ export function StarMapRoute({ relations = false, longNames = false }: { relatio
   if (map.subjects.length === 0) return <EmptyStarMap onShown={onFirstFrame} />
 
   return (
-    <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
+    <StarMapView demo={demo} map={stage.map} target={stage.target} onNavigate={onNavigate} land={stage.land} onFirstFrame={onFirstFrame} onCentreGalaxy={onCentreGalaxy} foveate={search.has('foveation') ? foveationFrom(search) : false}
       overlay={(locate) => <LightingOverlay map={map} locate={locate} onReveal={stage.reveal} />} />
   )
 }

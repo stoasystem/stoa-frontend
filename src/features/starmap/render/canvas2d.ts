@@ -927,6 +927,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // layer, over every star and name (#138 D5). The renderer's second call
       // into render/links.ts; the names were placed by `drawLinks` above.
       drawEdgeLabels(ctx, edgeLabels, colours)
+      // Where they went, for what is laid over the map to keep clear of (#145 C14).
+      stats.edgeLabels = edgeLabels.map((label) => label.box)
 
       // The frame before a layer change, fading out over this one.
       if (frame.crossfade > 0 && snapshotCanvas) {

@@ -131,8 +131,14 @@ npm run design-preview:capture -- --base http://127.0.0.1:5173 --label after
 ### 点亮时刻的节奏（#140，第二轮 F1–F3）
 
 - **最亮一刻才变金（F1）**：未庆祝的点亮在星图上先画成「进行中」（星云与星系的点亮数也先不算它），直到动画最亮的一刻（`flare.ts` 的 `FLARE_PEAK_MS`，约 768 ms：600 ms 聚光后，绽放到最满）才换成点亮的金色。做法在接缝上：事件源可选的 `known()`（同步给出未确认的点亮，演示事件源有，生产空源没有）→ `lighting/useLightingStage.ts` 把这些点按「进行中」交给渲染器；覆盖层在峰值调 `onReveal`。覆盖层读的仍是真实地图，所以照样知道它已点亮。渲染代码没改。
-- **回到星云这一档播放（F2）**：到达一颗正等着庆祝的星的地址（从章节回星图就是这样），改为停在它所在星云的整团视野：星云所有星在页面控件之间的 90% 区域里（`ZOOM.wholeNebulaFill`），星形 22–28 px（`ZOOM.wholeNebulaGlyph`，比点星云飞到的 28 px 不近、也不远到变成圆点——圆点下「进行中」和「点亮」几乎一样），星云放不下时（手机）把这颗星保持在中间 55%（`ZOOM.wholeNebulaKeep`）。不开星卡片；地址原地换成星云的（replace），之后用户自己决定是否拉近。只在到达那一刻判断：之后再点这颗星照常开卡片；已确认或从未等待庆祝的星，旧链接照旧开到星层。
-- **reduced motion 的静态标签（F3）**：不播动画，星直接变成点亮；星下方出现一枚「<星名> is lit」小标签（文案复用 `starmap:lighting.announce`，四语），停留 `STILL_LABEL_MS`（4 秒）后直接移除，没有淡入淡出。`aria-live` 播报照旧。
+- **回到星云这一档播放（F2）**：到达一颗正等着庆祝的星的地址（从章节回星图就是这样），改为停在它所在星云的整团视野：星云所有星在页面控件之间的 90% 区域里（`ZOOM.wholeNebulaFill`），星形 22–28 px（`ZOOM.wholeNebulaGlyph`，比点星云飞到的 28 px 不近、也不远到变成圆点——圆点下「进行中」和「点亮」几乎一样），星云放不下时（手机）把这颗星保持在中间 55%（`ZOOM.wholeNebulaKeep`）。不开星卡片；地址原地换成星云的（replace），之后用户自己决定是否拉近。已确认或从未等待庆祝的星，旧链接照旧开到星层。
+- **reduced motion 的静态标签（F3）**：不播动画，星直接变成点亮；星旁出现一枚「<星名> is lit」小标签（文案复用 `starmap:lighting.announce`，四语），停留 `STILL_LABEL_MS`（4 秒）后直接移除，没有淡入淡出。`aria-live` 播报照旧。
+
+### 点亮时刻的细节（#145，第三轮 C11、C14、C6）
+
+- **推荐标记在峰值移动（C11）**：点亮前它是本学科推荐的那颗时，推荐标记留在它身上，到火光最亮一刻与变金同一帧移到地图现在推荐的那颗（其他学科的推荐不动，老师的推荐不动）。「点亮前它是不是推荐」前端推不出来（演示天空按约定推荐演示知识点，不按 #9 第 8 条的规则），所以由事件给：`LitEvent.recommended`（可选；演示事件源对演示知识点给 `true`；stoa-backend#71 还没有这个字段，没有时标记照地图画，等于改前）。实现在 `useLightingStage.ts` 的 `presentHeld(map, held, recommended)`。
+- **标签避开边缘标签（C14）**：动画标题和 reduced motion 静态标签默认在星下方；会压住屏幕边缘的星云名（如手机上的「↘ Optics · Physics」）时，依次改放上方、右侧、左侧，再不行沿下方 / 上方横移到不压的位置，都压时取压得最少的一处；已选的一侧只要仍不压就保持，不来回跳。边缘标签的框由渲染器每帧写进 `RenderStats.edgeLabels`，经引擎 `starOnScreen()` 的 `keepClear` 交给覆盖层；放置是纯函数 `lighting/labelPlace.ts`，可调的数在 `semanticZoom.ts` 的 `LIGHTING`（与边缘标签的间隙 6 px、离图层边 8 px、底部给输入框留 48 px）。标签上的 `data-side` 说明放在哪一侧，供截图核对。
+- **未播点亮的星起飞前定落点（C6）**：在星图上点（或用键盘打开）一颗正等着庆祝的星，落点直接是它所在星云的整团视野（与 F2 同一个视野），地址是星云的。判断发生在起飞之前：`StarMapView` 的 flight first（#139）先问路由的 `land(next)`（`useLightingStage` 给），再把结果交给引擎和路由，所以飞行从第一帧就朝最终视野去，途中不换方向。已经在这团星云的视野里时不再移动。变金之后再点这颗星，照常开星卡片。
 - 不变的：只有星真正上屏才开始、只有播完（reduced motion 下在播报时）才确认；回填的点亮从不庆祝；Ask 的点亮卡片；Refraction 变成可开始。
 
 应用这边不存任何东西：是否庆祝只看事件源给的「未确认点亮」，确认后由事件源去掉（`LightingEventSourceContext`，生产默认是永不发事件、不发请求的空源）。Ask 里的点亮卡片只在本次会话的内存里（`store/litMomentsStore.ts`），刷新后消失；把卡片写进对话本身需要后端，留给 #3。
@@ -149,7 +155,7 @@ node scripts/design-preview-flows.mjs --base http://127.0.0.1:5173
 
 每一步都在沉淀 2 秒（Ask 7 秒）后检查屏幕上的终态，而不是只看 URL 或某个事件出现过：例如切换学科后标题和切换器仍在 Physics、Ask 的问题和答复在气泡里各出现一次、通知面板先开后关。
 
-然后是点亮时刻（`scripts/design-preview-lighting-flows.mjs`，每段各用一个新的浏览器上下文）：做完演示知识点剩下的课时 → 从章节回星图，落在三角函数星云的整团视野、地址是星云的，动画开始时这颗星读作「In progress」、播完读作「Lit」，动画只播一次、`aria-live` 播报「Sine and cosine is lit」→ 物理的 Refraction 读作「Ready to start」→ 从星图的输入框打开 Ask、进入一段对话，看到点亮卡片 → 刷新不重播、星仍点亮 → Refraction 的星卡片读作可开始 → 开 reduced motion：不播动画但仍播报，静态标签出现、几秒后直接消失、从未淡出 → 手机（390×844）上的动画与 Ask sheet 里的卡片。帧序列与各状态截图存在 `.codex-screenshots/design-preview/lighting/`（环境变量 `LIGHTING_SHOTS` 可改目录）。任何一步失败、任何请求离开开发服务器、任何请求没有演示答复、任何控制台错误或警告，脚本都以 1 退出。
+然后是点亮时刻（`scripts/design-preview-lighting-flows.mjs`，每段各用一个新的浏览器上下文）：做完演示知识点剩下的课时 → 从章节回星图，落在三角函数星云的整团视野、地址是星云的，动画开始时这颗星读作「In progress」、播完读作「Lit」，动画只播一次、`aria-live` 播报「Sine and cosine is lit」→ 物理的 Refraction 读作「Ready to start」→ 从星图的输入框打开 Ask、进入一段对话，看到点亮卡片 → 刷新不重播、星仍点亮 → Refraction 的星卡片读作可开始 → 开 reduced motion：不播动画但仍播报，静态标签出现、几秒后直接消失、从未淡出 → 手机（390×844）上的动画与 Ask sheet 里的卡片 → 桌面与手机各一次：从全景（`/map/math`）在动画刚开始、星仍读作「In progress」时点这颗星，落在三角函数星云的整团视野、地址是星云的、途中从未经过星的地址，并逐帧记录星在屏上的位置，任何一帧离终点比上一帧远就失败（#145 C6）。全程还核对：动画开始时这颗星读作「Suggested next」、播完不再是（C11）；标题与静态标签记下放在哪一侧（`data-side`，C14）。帧序列与各状态截图存在 `.codex-screenshots/design-preview/lighting/`（环境变量 `LIGHTING_SHOTS` 可改目录）。任何一步失败、任何请求离开开发服务器、任何请求没有演示答复、任何控制台错误或警告，脚本都以 1 退出。
 
 ## 逐项核查
 
