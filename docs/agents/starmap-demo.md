@@ -250,9 +250,13 @@ npm run dev -- --host 127.0.0.1 --port 5173
   - 星的链接上（星云层，屏上的星）：四个方向都走到**同一星云**里该方向最近的那颗（只在有链接、即在屏上的星里找），没有就不动。
   - 选了星（星层）：四个方向都飞到同一星云里该方向最近的那颗星（本星云所有星），到边即停、不跨星云；输入框里不拦截。#132 原来的「← / → 按课程顺序」已改成按位置。
   - 「该方向最近」：候选必须在前方，且偏离轴线不超过 `KEYS.coneSlope`（2，约 63°）；得分 = 前方距离 + `KEYS.offAxisWeight`（2）× 侧向距离，取最小，正前方的胜过侧边略近的。数在 `view/semanticZoom.ts` 的 `KEYS` 块，可调。
-- **图例**（宽屏、全景）：状态图例之下两行——指针「Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.」与键盘那一行；最宽 640 px，四语在 1440×900 都落在给图例留的底部控件带里。手机（< 768 px）仍不显示图例。
+  - **兜底（#146，第三轮 C17）**：锥形里一个都没有时，取该方向半平面（前方距离 > `KEYS.minAhead`）里**直线距离**最近的那个（星云间 x 仍按环走较短的一侧）。所以带状布局里 ↑ / ↓ 不再「没有反应」；只有那一侧什么都没有（真正到边）才不动。兜底写在 `nearestInDirection` 里，星云间 ↑ / ↓、星链接、星层四个方向都适用；星云间 ← / → 本来就走 `ringNeighbour`，不受影响。仍不跨星云（C16 通过）。
+- **图例**（宽屏、全景）：状态图例之下两行——指针「Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.」与键盘那一行；最宽 640 px，四语在 1440×900 都落在给图例留的底部控件带里。图例内容是 `StarMapView` 里的 `LegendBody`，宽屏图例与手机说明共用。
+- **手机「?」说明（#146，第三轮 C15）**：窄屏（< 768 px）不显示图例，改为左下角一个「?」按钮（玻璃底，与右下缩放键同高同框，44 px 触控区；读作「How the star map works」四语，`starmap:help.open`）。全景与星云层有；选了星（星层）没有，底部归 sheet。点开是模态对话框（Radix Dialog，不 portal，留在 stage 里以继承天空的 token）：标题同按钮名，右上关闭键（`starmap:help.close`），下面「What the stars mean」小标题 + 与桌面图例相同的状态 / 标记 / 指针 / 键盘几行。从底部 12 px 起向上长，最高不超过 stage；四语在 390×844、375×812 都不需内部滚动（高 260–300 px），盖在缩放键之上（z-20），页面不横向溢出。焦点进对话框并被困住，Escape / 关闭键 / 点外面关闭，焦点回到「?」；对话框里的按键不传给地图（+ / − 不缩放，Escape 不退出星云层）。宽屏切到窄屏或选星时对话框自动关闭。
 
-**测试**：`tests/component/starmapKeyboard.test.tsx`（方向判定的算术、锥形与跨接缝、`courseNebulae` 星系优先、Tab 课程顺序（打乱 topic.order 也按星系）、星云内 Tab 逐颗、星云 ← / → 过接缝、星云 ↑ / ↓ 逐个核对且不滚页面、星链接四向最近且画布焦点跟着、星层四向飞到最近 / 到边不动、+ / − 与拖动不受影响）；`tests/component/starmapLegend.test.tsx`（四语文案与渲染）。
+**测试**：`tests/component/starmapKeyboard.test.tsx`（方向判定的算术、锥形与跨接缝、`courseNebulae` 星系优先、Tab 课程顺序（打乱 topic.order 也按星系）、星云内 Tab 逐颗、星云 ← / → 过接缝、星云 ↑ / ↓ 逐个核对且不滚页面、星链接四向最近且画布焦点跟着、星层四向飞到最近 / 到边不动、+ / − 与拖动不受影响）、兜底（算术：锥形优先、锥形空时取半平面最近、背后与平齐不算、环上较短一侧；组件：星云间 ↑ / ↓ 兜底逐个核对、星层兜底飞到半平面最近的星）；`tests/component/starmapLegend.test.tsx`（四语文案与渲染；手机「?」：四语按钮名与内容同图例、关闭键与焦点回位、Enter / Space 打开、Tab 困在对话框内、Escape 关闭且焦点回位、星云层 Escape 只关对话框、宽屏与星层没有「?」）。
+
+**截图**（`.codex-screenshots/after-146/`，Git 忽略）：`help-{390,375}-{en,de,fr,it}-{closed,open}.png`、`help-390-en-nebula.png`、`help-390-en-star.png`（星层无「?」）、`back-{1440,390}.png`。
 
 ## 手机星卡片 sheet 与点星先飞（#139，#123 E2、B6）
 
@@ -264,7 +268,8 @@ npm run dev -- --host 127.0.0.1 --port 5173
 - **展开**：上拉、点星名或点 sheet 头部空白处；高度 = 一行 + 全部详情，最高为星图高度的 `expandedMax` 0.55，超出时详情区内部滚动。详情与桌面卡片相同：「‹ 返回 <星云>」、课时进度、标记、下一课、技能、要先点亮的星、复习。下拉、再点星名收起。
 - **拖动**：按在头部（小横条与那一行，主操作除外）上下拖，高度跟手、不缓动；移动不到 `tapSlopPx` 6 px 算点按（切换）。松手时速度超过 `flickSpeed` 0.4 px/ms 就顺着甩的方向停，否则停在较近的一端（`settleSheet`）。高度过渡用 `--motion-sheet`（320 ms）与 `--ease-standard`，与 Ask 的 sheet 相同；reduced motion 下没有过渡。换一颗星时 sheet 重新收起。
 - **仍是这颗星的卡片**：`article`，由星名命名（`aria-labelledby="starmap-star-title"`）；星名按钮 `aria-expanded` / `aria-controls` 指向详情，描述读作「Shows or hides this star's details」（四语，`starmap:star.sheetDetails`）。Tab 顺序与屏幕一致：星名 → 主操作 → 详情里的链接；键盘焦点进入详情时 sheet 自动展开，聚焦的东西永远不会被裁掉。
-- **关闭规则不变**：Escape、「返回 <星云>」、点空处、缩小到星形 < 12 px。点 sheet 不会传到星图（它在 `data-starmap-overlay` 里）。
+- **关闭规则不变**：Escape、「返回 <星云>」、点空处、缩小到星形 < 12 px。
+- **「返回」保留查询参数（#146，第三轮 C7）**：卡片与 sheet 共用的「‹ 返回 <星云>」（`StarCardBack`，`data-star-back`）以及「要先点亮的星」链接都带上当前查询串（`?points=`、开发开关），桌面与手机相同，回去还是同一片天空。测试 `tests/component/starmapBackLink.test.tsx`。点 sheet 不会传到星图（它在 `data-starmap-overlay` 里）。
 - **可见区**：引擎的视口多了 `sheet` 一档（`Viewport.sheet` = 底部内边距 + 12 + 76 + `clearancePx` 16，`view/layers.ts` 的 `sheetBand`），手机上选中的星被框在顶部控件与收起的 sheet 之间的正中（`starFrameY`，原来是屏高的 0.3），不会落在 sheet 下面；回到原位（点本星、提示按钮）同样。缩放范围、名字与连线的避让区不变。
 - **回到这颗星**（#132）：判断星是否还「看得见」按收起的 sheet 算（展开只是盖住，不算离开，不出提示）；星离开后，提示按钮摆在 sheet 此刻停放位置（收起或展开）的上方 16 px。
 

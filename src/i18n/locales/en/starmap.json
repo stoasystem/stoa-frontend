@@ -27,6 +27,10 @@
     "pointer": "Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.",
     "keys": "Keys: arrows go to the nearest one that way, Tab follows the course, + and − zoom."
   },
+  "help": {
+    "open": "How the star map works",
+    "close": "Close"
+  },
   "star": {
     "progress": "{{percent}}% of lessons done",
     "lessons": "{{done}} of {{total}} lessons done",

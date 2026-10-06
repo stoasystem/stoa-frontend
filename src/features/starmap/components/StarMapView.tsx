@@ -22,13 +22,18 @@
  * ring between nebulae, otherwise to the nearest star or nebula in that
  * direction (`view/keyboardOrder.ts`).
  *
+ * What the glyphs mean and how to move (#141 B7, E5): a legend along the
+ * bottom of a wide screen; on a phone, a "?" button that opens the same
+ * words in a dialog (#146, round three C15 of #142).
+ *
  * The zoom is continuous (#134): the wheel and trackpad scroll by how far
  * they scroll, the buttons and + / - keys by ×1.5, a pinch and a double tap
  * in the engine. The route follows what is chosen, never the zoom.
  */
-import { ArrowUp, ChevronLeft, Minus, Plus } from 'lucide-react'
+import * as Dialog from '@radix-ui/react-dialog'
+import { ArrowUp, ChevronLeft, Minus, Plus, X } from 'lucide-react'
 import { useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, type UseTranslationResponse } from 'react-i18next'
 import { Link, useLocation } from 'react-router-dom'
 import { SegmentedNav } from '@/components/base'
 import { StarCard } from '@/features/starmap/components/StarCard'
@@ -138,6 +143,44 @@ function typing(target: EventTarget): boolean {
   return target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName))
 }
 
+/** Glass over the sky: words on it keep 4.5:1 over any nebula behind them. */
+const GLASS = {
+  background: 'var(--sky-glass)',
+  backdropFilter: 'blur(var(--sky-glass-blur))',
+  WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
+} as const
+
+/**
+ * What the glyphs mean, how to move, and the keyboard's two orders (#141 B7,
+ * E5): the wide screen's legend and the phone's help dialog (#146) say the
+ * same words, from here.
+ */
+function LegendBody({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
+  return (
+    <>
+      <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
+        {LEARNING_STATES.map((state) => (
+          <li key={state} className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+            <StarGlyph state={state} size={18} progress={0.6} />
+            {t(`state.${state}`)}
+          </li>
+        ))}
+        <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+          <StarGlyph state="ready" size={18} recommended />
+          {t('marker.recommended')}
+        </li>
+        <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
+          <StarGlyph state="lit" size={18} reviewDue />
+          {t('legend.reviewDue')}
+        </li>
+      </ul>
+      {/* How to move (#141 B7), and the keyboard's two orders (#141 E5). */}
+      <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-pointer>{t('legend.pointer')}</p>
+      <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-keys>{t('legend.keys')}</p>
+    </>
+  )
+}
+
 const OVERLAY_LINK =
   'inline-flex min-h-11 items-center text-on-sky hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
 
@@ -166,6 +209,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const [wide, setWide] = useState(true)
   const [announcement, setAnnouncement] = useState('')
   const [focusPill, setFocusPill] = useState<{ id: string; width: number; height: number } | null>(null)
+  // The phone's help dialog: the legend's words behind a "?" (#146).
+  const [helpOpen, setHelpOpen] = useState(false)
 
   // Keep the latest callbacks without rebuilding the engine.
   const navigateRef = useRef(onNavigate)
@@ -419,6 +464,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.altKey || event.metaKey || event.ctrlKey) return
+    // Keys in the help dialog are the dialog's own: Escape closes it, + and - do not zoom.
+    if (event.target instanceof Element && event.target.closest('[data-starmap-help]')) return
     if (event.key === '+' || event.key === '=') {
       event.preventDefault()
       engineRef.current?.step('in')
@@ -431,7 +478,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     } else if (target.layer === 'star' && !event.shiftKey && !event.defaultPrevented && !typing(event.target)) {
       // With a star chosen, an arrow goes to the nearest star of its nebula in
       // that direction, by where the stars are (#141; #132 went by course
-      // order). Nothing that way: it stays. The map flies to the next star.
+      // order); with none in the cone, the nearest anywhere that way (#146).
+      // Nothing that way at all: it stays. The map flies to the next star.
       const direction = arrowDirection(event.key)
       if (!direction) return
       const inNebula = stars.filter((star) => star.nebulaId === target.nebulaId)
@@ -453,7 +501,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   // Arrows follow the map (#141). On a nebula's link, left and right go to the
   // next nebula along the band, round the ring (#120): past the last galaxy
   // comes the first, and the map pans the shorter way; up and down go to the
-  // nearest nebula above or below, measured the shorter way round too.
+  // nearest nebula above or below, measured the shorter way round too, and
+  // with none in the cone the nearest anywhere above or below (#146).
   const nebulaSpot = useMemo(() => {
     const discs = nebulaDiscs(map)
     return new Map(nebulae.map((nebula) => [nebula.topicId, discs.get(nebula.topicId) ?? { x: 0, y: 0 }]))
@@ -475,7 +524,8 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
     if (to >= 0 && to !== from) links[to].focus()
   }
   // On a star's link, every arrow goes to the nearest star of the same nebula
-  // that has a link (is on screen), in that direction, by map position. None: it stays.
+  // that has a link (is on screen), in that direction, by map position (the
+  // cone first, else the nearest anywhere that way, #146). None: it stays.
   const stepStar = (event: KeyboardEvent<HTMLAnchorElement>) => {
     if (event.altKey || event.metaKey || event.ctrlKey || event.shiftKey) return
     const direction = arrowDirection(event.key)
@@ -545,6 +595,9 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
   const mapPath = here(pathForTarget(subjectId, { layer: 'map' }))
   const subjects = map.subjects
   const activeSubject = subjects.findIndex((subject) => subject.subjectId === subjectId)
+  const helpShown = !wide && target.layer !== 'star' && stars.length > 0
+  // Gone with the "?" (a wide screen, a chosen star): it comes back closed.
+  if (!helpShown && helpOpen) setHelpOpen(false)
 
   const whereYouAre = (
     <div className="flex min-w-0 items-center gap-2.5">
@@ -781,33 +834,61 @@ export function StarMapView({ map, demo = false, target, onNavigate, onFirstFram
           <div
             data-starmap-overlay
             className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[640px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
-            // Glass over the sky: the legend's words keep 4.5:1 over any nebula behind them.
-            style={{
-              background: 'var(--sky-glass)',
-              backdropFilter: 'blur(var(--sky-glass-blur))',
-              WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
-            }}
+            style={GLASS}
           >
             <h2 className="sr-only">{t('legend.label')}</h2>
-            <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
-              {LEARNING_STATES.map((state) => (
-                <li key={state} className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-                  <StarGlyph state={state} size={18} progress={0.6} />
-                  {t(`state.${state}`)}
-                </li>
-              ))}
-              <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-                <StarGlyph state="ready" size={18} recommended />
-                {t('marker.recommended')}
-              </li>
-              <li className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
-                <StarGlyph state="lit" size={18} reviewDue />
-                {t('legend.reviewDue')}
-              </li>
-            </ul>
-            {/* How to move (#141 B7), and the keyboard's two orders (#141 E5). */}
-            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-pointer>{t('legend.pointer')}</p>
-            <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-keys>{t('legend.keys')}</p>
+            <LegendBody t={t} />
+          </div>
+        )}
+
+        {/*
+          On a phone the legend would cover the map: a "?" opens the same words
+          (#146), bottom left, across from the zoom buttons; not with a star
+          chosen, where the star's sheet has the bottom. A modal dialog: focus
+          stays in it, Escape or the close button or a tap outside closes it,
+          and focus goes back to the "?".
+        */}
+        {helpShown && (
+          <div data-starmap-overlay data-starmap-help>
+            <Dialog.Root open={helpOpen} onOpenChange={setHelpOpen}>
+              <div className="absolute bottom-[calc(1rem+var(--page-bottom-inset,0px))] left-4 rounded-[11px] border border-solid border-white/10 bg-white/10 p-[3px] backdrop-blur-[20px]">
+                <Dialog.Trigger asChild>
+                  <button
+                    type="button"
+                    data-starmap-help-button
+                    aria-label={t('help.open')}
+                    title={t('help.open')}
+                    className="inline-flex size-11 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[20px] font-bold leading-none text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </Dialog.Trigger>
+              </div>
+              {/* In the stage, not portalled: the sky's tokens and the stage's size hold inside it. */}
+              <Dialog.Overlay className="absolute inset-0 z-20 bg-black/40" />
+              <Dialog.Content
+                aria-describedby={undefined}
+                data-starmap-help-dialog
+                className="absolute inset-x-3 bottom-[calc(12px+var(--page-bottom-inset,0px))] z-20 flex max-h-[calc(100%-24px-var(--page-bottom-inset,0px))] touch-pan-y flex-col gap-2.5 overflow-y-auto overscroll-contain rounded-[16px] border border-solid border-[color:var(--sky-glass-border)] px-4 pt-2 pb-4 text-on-sky focus-visible:outline-none"
+                style={{ ...GLASS, boxShadow: 'var(--shadow-glass)' }}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <Dialog.Title className="m-0 text-[17px] font-semibold leading-tight text-on-sky">{t('help.open')}</Dialog.Title>
+                  <Dialog.Close asChild>
+                    <button
+                      type="button"
+                      aria-label={t('help.close')}
+                      title={t('help.close')}
+                      className="-mr-2 inline-flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-[8px] border-0 bg-transparent p-0 text-[color:var(--on-sky-plain)] hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring"
+                    >
+                      <X size={18} strokeWidth={1.6} aria-hidden="true" />
+                    </button>
+                  </Dialog.Close>
+                </div>
+                <h3 className="m-0 text-[13px] font-semibold text-on-sky">{t('legend.label')}</h3>
+                <LegendBody t={t} />
+              </Dialog.Content>
+            </Dialog.Root>
           </div>
         )}
 

@@ -27,6 +27,10 @@
     "pointer": "Trascina per spostarti, scorri o pizzica per lo zoom. Scegli una stella per vederne il capitolo; premila e trascinala (sul touch, prima tienila premuta) per vedere a cosa è collegata.",
     "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom."
   },
+  "help": {
+    "open": "Come funziona la mappa stellare",
+    "close": "Chiudi"
+  },
   "star": {
     "progress": "{{percent}}% delle lezioni svolte",
     "lessons": "{{done}} lezioni svolte su {{total}}",
