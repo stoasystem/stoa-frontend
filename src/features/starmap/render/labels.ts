@@ -3,7 +3,11 @@
  * own nebula or star, never pushed away from it, and never on top of another
  * name, a nebula's core, a line between nebulae, or another star's glyph.
  * A name with nowhere free to go is left out -- the parallel DOM still has it.
+ * Two kinds of name insist (#144): a key star's may sit over other stars and
+ * lines, on a thin dark backing (`placeInsisting`), and a name at the
+ * screen's edge slides along it (`edgeSpots`) to keep clear of the key stars.
  */
+import { REVEAL } from '@/features/starmap/view/semanticZoom'
 
 export type Box = { x0: number; y0: number; x1: number; y1: number }
 export type Circle = { x: number; y: number; r: number }
@@ -107,6 +111,70 @@ export function aroundDiscWide(x: number, y: number, r: number, width: number, h
     { x0: x + d, y0: y - d - height, x1: x + d + width, y1: y - d },
     { x0: x - d - width, y0: y - d - height, x1: x - d, y1: y - d },
   ]
+}
+
+/**
+ * Spots for a name of half-width `half` (24 px tall) at the screen's edge
+ * around `(x, y)` (#144 B4): there first, then slid further and further
+ * either way -- along the edge (`horizontal`: at the top or the bottom) or
+ * up and down it (at a side) -- every one inside `area`.
+ */
+export function edgeSpots(x: number, y: number, half: number, area: Box, horizontal: boolean): Box[] {
+  const { slideSteps, slideX, slideY } = REVEAL.edgeLabel
+  const clampX = (v: number) => Math.max(area.x0 + half + 12, Math.min(area.x1 - half - 12, v))
+  const clampY = (v: number) => Math.max(area.y0 + 14, Math.min(area.y1 - 14, v))
+  const spots: Box[] = []
+  const seen = new Set<string>()
+  for (let k = 0; k <= slideSteps * 2; k += 1) {
+    const shift = k === 0 ? 0 : k % 2 === 1 ? (k + 1) / 2 : -k / 2
+    const sx = clampX(x + (horizontal ? shift * slideX : 0))
+    const sy = clampY(y + (horizontal ? 0 : shift * slideY))
+    const key = `${Math.round(sx)}:${Math.round(sy)}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    spots.push({ x0: sx - half, y0: sy - 12, x1: sx + half, y1: sy + 12 })
+  }
+  return spots
+}
+
+/**
+ * A key star's name when no free place is left (#144 B5): it may sit over
+ * other stars (`circles`) and cross lines, on a thin dark backing, but never
+ * over a placed name, over a key star (`keyCircles`) while another spot is
+ * clear of them, or outside `area`. Over a star weighs less than across a
+ * line; the nearer spots win. Null only if every spot is under a placed name.
+ */
+export function placeInsisting(
+  candidates: readonly Box[],
+  boxes: readonly Box[],
+  circles: readonly Circle[],
+  keyCircles: readonly Circle[],
+  segments: readonly Segment[],
+  area: Box,
+  /** Extra cost for a spot, as `placeLabel`'s. */
+  extraCost: (box: Box) => number = () => 0,
+): Box | null {
+  const { keyStarCost, starCost, lineCost } = REVEAL.keyName
+  return placeLabel(candidates, { boxes: [...boxes], circles: [], segments: [] }, area, (box) => {
+    let cost = extraCost(box)
+    for (const c of keyCircles) if (boxHitsCircle(box, c)) cost += keyStarCost
+    for (const c of circles) if (boxHitsCircle(box, c)) cost += starCost
+    for (const s of segments) if (boxHitsSegment(box, s)) cost += lineCost
+    return cost
+  })
+}
+
+/**
+ * How many of `others` lie nearer the middle of `box` than `own` does: a
+ * name there could be read as theirs (#144 B5). 0: it reads as its own.
+ */
+export function nearerStars(box: Box, own: { x: number; y: number }, others: readonly Circle[]): number {
+  const cx = (box.x0 + box.x1) / 2
+  const cy = (box.y0 + box.y1) / 2
+  const d = Math.hypot(cx - own.x, cy - own.y)
+  let count = 0
+  for (const c of others) if (Math.hypot(cx - c.x, cy - c.y) < d) count += 1
+  return count
 }
 
 /** Every part of a label must lie nearer its own centre than another nebula's. */

@@ -261,9 +261,19 @@ export type RenderStats = {
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */
   settling?: boolean
-  /** The boxes of the names at the screen's edge drawn in the last frame, CSS px (#138 D5); the lighting keeps clear of them (#145 C14). */
-  edgeLabels?: readonly { x0: number; y0: number; x1: number; y1: number }[]
+  /**
+   * The names at the screen's edge drawn in the last frame (#144, so the
+   * page's own overlays -- #145's lighting labels -- can keep clear of
+   * them): off-screen destinations, other subjects, a focused nebula's
+   * bridges to other galaxies, a dragged star's far links. Each its text,
+   * its box in CSS px of the stage, and the alpha it was drawn at. A new
+   * array every frame; empty when there are none.
+   */
+  edgeLabels?: readonly EdgeLabelBox[]
 }
+
+/** A name at the screen's edge as drawn (`RenderStats.edgeLabels`): its text, its box in CSS px of the stage, its alpha. */
+export type EdgeLabelBox = { text: string; x0: number; y0: number; x1: number; y1: number; alpha: number }
 
 export interface StarMapRenderer {
   readonly kind: RendererKind

@@ -138,6 +138,38 @@ export const REVEAL = {
   panoramaBand: 1.25,
   /** A name that gains or loses its place fades over this long (ms): placement never blinks. */
   labelFadeMs: 180,
+  /**
+   * Names at the screen's edge (#144 B4: off-screen destinations, other
+   * subjects, a dragged star's far links) keep clear of the key stars: from
+   * where their direction meets the edge they slide along it up to
+   * `slideSteps` steps either way, `slideX` px apart along the top or bottom
+   * and `slideY` px up and down a side. A spot over a key star (padded by
+   * `keyStarPad` px) costs `keyStarCost`, over another star `starCost` --
+   * more than the farthest slide (0.5 a spot), so any free spot wins, then
+   * one over other stars only, and over a key star only if every spot is.
+   */
+  edgeLabel: { slideSteps: 10, slideX: 36, slideY: 26, keyStarCost: 1000, starCost: 12, keyStarPad: 6 },
+  /**
+   * A key star's name with no free place (#144 B5) still gets one: over
+   * other stars (`starCost` each) or across lines (`lineCost` each), on a
+   * backing of the sky's colour at `backing`, never over a placed name, and
+   * over another key star only if nothing else is left. Its spots are the
+   * eight around it, then the same eight `farGap` px further out; a spot
+   * whose middle is nearer another star than its own costs `nearerStarCost`
+   * for each such star, so it is not read as theirs. A drag's
+   * linked stars (B8) insist the same way. Star names longer than
+   * `maxWidthPx` (or the screen's width less `sideMarginPx`) are cut with an
+   * ellipsis, so the longest of four languages still fits (#76).
+   */
+  keyName: { keyStarCost: 1000, starCost: 3, lineCost: 8, nearerStarCost: 4, backing: 0.78, farGap: 14, maxWidthPx: 240, sideMarginPx: 48 },
+  /**
+   * The phone's zoom buttons, bottom right over the map (StarMapView: 16 px
+   * from the right and above the bottom inset, two 44 px buttons): no name is
+   * placed in this corner, `width` x `height` px up from the bottom inset,
+   * while the stage is narrow (the viewport has a `sheet` band) and no star
+   * is chosen (then the buttons sit in the top band).
+   */
+  phoneZoomCorner: { width: 72, height: 118 },
 } as const
 
 /**
