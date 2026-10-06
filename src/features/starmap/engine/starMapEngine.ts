@@ -38,7 +38,7 @@
 import { nebulaLinks, starLinkIndices } from '@/features/starmap/model/links'
 import { LEARNING_STATES, orderedNebulae, orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { breathAt, easeStandard, motionPolicy, type MotionPolicy } from '@/features/starmap/motion/motionPolicy'
-import type { SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
+import type { EdgeLabelBox, SceneData, SceneFrame, StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import {
   baseScale,
   clampView,
@@ -864,6 +864,15 @@ export class StarMapEngine {
   /** A star is held by the hand now (#136; a touch's long press then must not open a context menu). */
   get holdingStar(): boolean {
     return Boolean(this.grab?.dragging)
+  }
+
+  /**
+   * The names at the screen's edge in the last frame drawn (#144): text and
+   * box in CSS px of the stage. For the page's overlays to keep clear of
+   * (#145); empty before the first frame or with a renderer that has none.
+   */
+  get edgeLabels(): readonly EdgeLabelBox[] {
+    return this.renderer.stats.edgeLabels ?? []
   }
 
   /** A wheel or trackpad scroll of `deltaY` px (< 0 zooms in), around `(x, y)`: as far as it scrolled, at once. */

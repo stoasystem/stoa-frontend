@@ -43,10 +43,10 @@ import {
   type NebulaBridge,
   type StarLine,
 } from '@/features/starmap/model/linkTiers'
-import { boxHitsCircle, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
+import { boxHitsCircle, edgeSpots, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { ditherHaze } from '@/features/starmap/render/galaxy'
 import { seededRandom } from '@/features/starmap/layout/layout'
-import { PANORAMA } from '@/features/starmap/view/semanticZoom'
+import { PANORAMA, REVEAL } from '@/features/starmap/view/semanticZoom'
 import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/starmap/render/types'
 
 /**
@@ -108,11 +108,48 @@ export type LinkStats = { bridges: number; hints: number; lines: number; labels:
 export type EdgeLabel = { text: string; x: number; y: number; box: Box; alpha: number }
 
 /**
+ * The stars on screen an edge name should keep clear of (#144 B4): `key` (the
+ * recommended stars, those in progress, the gold path's, the star in focus,
+ * a dragged star's linked stars) never while another place is free; `other`
+ * only when nothing else is free.
+ */
+export type EdgeStars = { key: readonly Circle[]; other: readonly Circle[] }
+
+/**
  * The obstacles names must keep clear of: the renderer's own lists, added to.
  * With `labels`, the edge names are placed (their boxes go into `boxes`) and
- * handed back here to be painted later, over the stars (#138 D5).
+ * handed back here to be painted later, over the stars (#138 D5). `stars`:
+ * the stars an edge name avoids (#144 B4), asked for only when a name is
+ * placed; absent, edge names ignore the stars.
  */
-export type LinkObstacles = { segments: Segment[]; boxes: Box[]; labels?: EdgeLabel[] }
+export type LinkObstacles = { segments: Segment[]; boxes: Box[]; labels?: EdgeLabel[]; stars?: () => EdgeStars }
+
+/**
+ * The first of `spots` (in order of preference) clear of every placed name
+ * (#144 B4): clear of the key stars too while one is, then of the others;
+ * a spot over a key star only when every one is. `avoid` (the dragged star,
+ * the focused nebula) is never covered. Its box goes into the obstacles.
+ */
+export function placeEdgeBox(spots: readonly Box[], obstacles: LinkObstacles, area: Box, avoid?: Circle): Box | null {
+  const stars = obstacles.stars?.()
+  // Only the stars along the spots can be under one.
+  const reach = spots.reduce((u, b) => ({ x0: Math.min(u.x0, b.x0), y0: Math.min(u.y0, b.y0), x1: Math.max(u.x1, b.x1), y1: Math.max(u.y1, b.y1) }), {
+    x0: Infinity, y0: Infinity, x1: -Infinity, y1: -Infinity,
+  })
+  const along = (c: Circle) => c.x + c.r > reach.x0 && c.x - c.r < reach.x1 && c.y + c.r > reach.y0 && c.y - c.r < reach.y1
+  const key = stars ? stars.key.filter(along) : []
+  const other = stars ? stars.other.filter(along) : []
+  const cost = (box: Box) => {
+    if (avoid && boxHitsCircle(box, avoid)) return Infinity
+    let sum = 0
+    for (const c of key) if (boxHitsCircle(box, c)) sum += REVEAL.edgeLabel.keyStarCost
+    for (const c of other) if (boxHitsCircle(box, c)) sum += REVEAL.edgeLabel.starCost
+    return sum
+  }
+  const box = placeLabel(spots, { boxes: obstacles.boxes, circles: [], segments: [] }, area, cost)
+  if (box) obstacles.boxes.push(box)
+  return box
+}
 
 export type LinkOptions = {
   /** x wraps (#120): also draw each shape one band to either side. */
@@ -252,23 +289,17 @@ function placeAtEdge(
   const top = frame.viewport.top ?? 0
   const bottom = height - (frame.viewport.bottom ?? 0)
   const area: Box = { x0: 0, y0: top, x1: width, y1: bottom }
-  const hit = Math.min(dx > 0 ? (width - 16 - fx) / dx : dx < 0 ? (16 - fx) / dx : Infinity,
-    dy > 0 ? (bottom - 24 - fy) / dy : dy < 0 ? (top + 16 - fy) / dy : Infinity)
+  const hitX = dx > 0 ? (width - 16 - fx) / dx : dx < 0 ? (16 - fx) / dx : Infinity
+  const hitY = dy > 0 ? (bottom - 24 - fy) / dy : dy < 0 ? (top + 16 - fy) / dy : Infinity
+  const hit = Math.min(hitX, hitY)
   if (!(hit > 0) || !Number.isFinite(hit)) return null
   const fitted = fitText(ctx, text, Math.min(220, width - 40))
   const half = ctx.measureText(fitted).width / 2 + 8
-  const x = Math.max(half + 12, Math.min(width - half - 12, fx + dx * hit))
-  const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, fy + dy * hit))
-  const spots: Box[] = []
-  const across = Math.abs(dx) + Math.abs(dy) || 1
-  for (const shift of [0, 1, -1, 2, -2, 3, -3]) {
-    const sx = Math.max(half + 12, Math.min(width - half - 12, x + shift * (half * 2 + 8) * Math.abs(dy) / across))
-    const sy = Math.max(area.y0 + 14, Math.min(area.y1 - 14, y + shift * 32 * Math.abs(dx) / across))
-    spots.push({ x0: sx - half, y0: sy - 12, x1: sx + half, y1: sy + 12 })
-  }
-  const box = placeLabel(spots, { boxes: obstacles.boxes, circles: [], segments: [] }, area, (b) => (avoid && boxHitsCircle(b, avoid) ? Infinity : 0))
+  const x = fx + dx * hit
+  const y = fy + dy * hit
+  // At a side the name slides up and down that side; at the top or bottom, along it.
+  const box = placeEdgeBox(edgeSpots(x, y, half, area, hitY <= hitX), obstacles, area, avoid)
   if (!box) return null
-  obstacles.boxes.push(box)
   return { text: fitted, x: (box.x0 + box.x1) / 2, y: (box.y0 + box.y1) / 2, box, alpha }
 }
 
@@ -653,6 +684,7 @@ export function drawLinks(
         const visible = nx >= 0 && nx <= width && ny >= top && ny <= bottom
         let text: string
         let at: { x: number; y: number }
+        let horizontal = true
         const along = leadsTo.get(n)!.along
         if (along && view.star >= 0.5) {
           // The star layer: the name rides on the star's own line, near the star -- the
@@ -669,20 +701,20 @@ export function drawLinks(
         } else {
           const dx = nx - cx
           const dy = ny - cy
-          const hit = Math.min(dx > 0 ? (width - 16 - cx) / dx : dx < 0 ? (16 - cx) / dx : Infinity,
-            dy > 0 ? (bottom - 24 - cy) / dy : dy < 0 ? (top + 16 - cy) / dy : Infinity)
+          const hitX = dx > 0 ? (width - 16 - cx) / dx : dx < 0 ? (16 - cx) / dx : Infinity
+          const hitY = dy > 0 ? (bottom - 24 - cy) / dy : dy < 0 ? (top + 16 - cy) / dy : Infinity
+          const hit = Math.min(hitX, hitY)
           if (!(hit > 0) || !Number.isFinite(hit)) continue
           text = `${arrowFor(dx, dy)} ${scene.nebulae[n].name}${subject ? ` · ${subject}` : ''}`
           at = { x: cx + dx * hit, y: cy + dy * hit }
+          horizontal = hitY <= hitX
         }
         text = fitText(ctx, text, Math.min(220, width - 40))
         const half = ctx.measureText(text).width / 2 + 8
-        const x = Math.max(half + 12, Math.min(width - half - 12, at.x))
-        const y = Math.max(area.y0 + 14, Math.min(area.y1 - 14, at.y))
-        const box = placeLabel([{ x0: x - half, y0: y - 12, x1: x + half, y1: y + 12 }], { boxes: obstacles.boxes, circles: [], segments: [] }, area)
+        // Clear of the key stars (#144 B4): slid along the edge it is at, or beside its line or nebula.
+        const box = placeEdgeBox(edgeSpots(at.x, at.y, half, area, horizontal), obstacles, area)
         if (!box) continue
-        obstacles.boxes.push(box)
-        emitLabel(ctx, { text, x, y, box, alpha: labelAlpha }, theme, obstacles)
+        emitLabel(ctx, { text, x: (box.x0 + box.x1) / 2, y: (box.y0 + box.y1) / 2, box, alpha: labelAlpha }, theme, obstacles)
         stats.labels += 1
       }
     }
