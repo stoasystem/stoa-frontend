@@ -14,7 +14,16 @@
  *   5. with reduced motion: no animation, the announcement all the same, and
  *      a still "<name> is lit" label beside the star that goes after a few
  *      seconds, at once, never faded (#140 F3);
- *   6. the flare on a phone, and the card in the Ask sheet.
+ *   6. the flare on a phone, and the card in the Ask sheet;
+ *   7. a tap on the star while its lighting is still to come, from the
+ *      galaxy, on a desktop and a phone: it lands on the nebula seen whole,
+ *      decided before take-off, the star coming straight on to where it
+ *      rests -- never turning on the way (#145 C6).
+ *
+ * Throughout: the recommendation marker stays on the star until the flare's
+ * brightest moment and moves on with the gold (#145 C11); the flare's title
+ * and the still label say which side of the star they went to
+ * (`data-side`), clear of the names at the screen's edge (#145 C14).
  *
  * Frames and states land in .codex-screenshots/design-preview/lighting/.
  */
@@ -48,14 +57,17 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     return { context, page }
   }
 
-  /** Screenshots while the flare plays, every `step` ms. */
+  /** Screenshots while the flare plays, every `step` ms; `files.sides`: the side of the star its title went to in each (#145 C14). */
   async function frames(page, name, count = 14, step = 150) {
     await page.waitForSelector('[data-lighting="playing"]', { timeout: 10_000 })
     const files = []
+    files.sides = new Set()
     for (let i = 0; i < count; i += 1) {
       const file = `${SHOTS}/${name}-${String(i).padStart(2, '0')}.png`
       await page.screenshot({ path: file })
       files.push(file)
+      const side = await page.locator('[data-lighting-caption]').getAttribute('data-side', { timeout: 200 }).catch(() => null)
+      if (side) files.sides.add(side)
       await delay(step)
     }
     return files
@@ -89,11 +101,14 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
       throw new Error(`landed at ${JSON.stringify(at)}, expected ${nebulaPath} seen whole`)
     }
     if (!before.includes('In progress')) throw new Error(`as the flare starts the star reads "${before}"`)
+    // #145 C11: still the recommendation until the brightest moment.
+    if (!before.includes('Suggested next')) throw new Error(`as the flare starts the star is not the recommendation: "${before}"`)
     return { at, before }
   }
   async function litAfter(page) {
     const after = (await starReads(page)) ?? ''
     if (!after.includes('Lit')) throw new Error(`after the flare the star reads "${after}"`)
+    if (after.includes('Suggested next')) throw new Error(`after the flare the star is still the recommendation: "${after}"`)
     return after
   }
 
@@ -127,7 +142,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     if (said !== litText) throw new Error(`announced "${said}"`)
     const seen = await phases(walk)
     if (seen.filter((phase) => phase === 'playing').length !== 1) throw new Error(`phases ${seen.join(',')}`)
-    return `landed on ${landed.at.path} (${landed.at.band}); "${landed.before}" -> "${lit}"; ${files.length} frames; announced "${said}"; phases ${seen.join(' -> ')}`
+    return `landed on ${landed.at.path} (${landed.at.band}); "${landed.before}" -> "${lit}"; ${files.length} frames, title ${[...files.sides].join('/')}; announced "${said}"; phases ${seen.join(' -> ')}`
   })
 
   // Before anything reloads the page: the cards are kept in memory (store/litMomentsStore.ts).
@@ -190,7 +205,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     const label = reduced.page.locator('[data-lighting-label]')
     await label.waitFor({ timeout: 10_000 })
     await delay(300)
-    const shown = { text: (await label.textContent())?.trim(), visible: await label.isVisible(), opacity: await label.evaluate((element) => element.style.opacity + getComputedStyle(element).transitionDuration) }
+    const shown = { text: (await label.textContent())?.trim(), visible: await label.isVisible(), opacity: await label.evaluate((element) => element.style.opacity + getComputedStyle(element).transitionDuration), side: await label.getAttribute('data-side') }
     await reduced.page.screenshot({ path: `${SHOTS}/reduced-motion-desktop.png` })
     if (shown.text !== litText || !shown.visible) throw new Error(`the label ${JSON.stringify(shown)}`)
     if (shown.opacity !== '0s') throw new Error(`the label fades: ${shown.opacity}`)
@@ -202,7 +217,7 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     const lit = await litAfter(reduced.page)
     if (seen.includes('playing')) throw new Error(`phases ${seen.join(',')}`)
     if (said !== litText) throw new Error(`announced "${said}"`)
-    return `label "${shown.text}", then gone; on ${at.path}; "${lit}"; phases ${seen.join(' -> ')}; announced "${said}"`
+    return `label "${shown.text}" (${shown.side}), then gone; on ${at.path}; "${lit}"; phases ${seen.join(' -> ')}; announced "${said}"`
   })
   await collect(reduced.page)
   await reduced.context.close()
@@ -222,8 +237,71 @@ export async function lightingFlows({ browser, API, flow, watch, open, collect, 
     await settle()
     await phone.page.screenshot({ path: `${SHOTS}/ask-card-phone.png` })
     if (!(await card.isVisible())) throw new Error('the card is not on screen in the sheet')
-    return `landed on ${landed.at.path}; ${files.length} frames; announced "${said}"; the card in the sheet`
+    if (files.sides.size === 0) throw new Error('the title was never placed')
+    return `landed on ${landed.at.path}; ${files.length} frames, title ${[...files.sides].join('/')}; announced "${said}"; the card in the sheet`
   })
   await collect(phone.page)
   await phone.context.close()
+
+  // #145 C6: from the galaxy, the star tapped while its lighting is still to come (its flare just
+  // started, the star still in progress). The page taps it itself, in the frame the flare starts,
+  // and keeps where the star is drawn every frame after (the flare's title follows it).
+  for (const [name, options] of [
+    ['desktop', { viewport: { width: 1440, height: 900 } }],
+    ['phone', { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }],
+  ]) {
+    const tapped = await tab(options)
+    await tapped.context.addInitScript((unitId) => {
+      window.__tapTrace = []
+      let at = null
+      const frame = (now) => {
+        const phase = document.querySelector('[data-lighting]')?.getAttribute('data-lighting')
+        const link = document.querySelector(`a[data-unit="${unitId}"]`)
+        if (at === null && phase === 'playing' && link) {
+          at = now
+          window.__tapped = link.textContent
+          link.click()
+        }
+        const caption = document.querySelector('[data-lighting-caption]')
+        if (at !== null && caption?.style.transform) {
+          const [x, y] = caption.style.transform.match(/-?[\d.]+/g).map(Number)
+          window.__tapTrace.push({ t: Math.round(now - at), x, y, side: caption.dataset.side, path: new URLSearchParams(window.location.search).get('path') })
+        }
+        window.requestAnimationFrame(frame)
+      }
+      window.requestAnimationFrame(frame)
+    }, point.unitId)
+    await flow(`lighting: the star tapped before its lighting lands on its nebula seen whole, never turning (${name})`, async () => {
+      await tapped.page.goto(previewUrl({ surface: 'lighting', path: '/map/math?points=1000' }))
+      await tapped.page.waitForFunction(() => window.__tapped !== undefined, null, { timeout: 15_000 })
+      const files = []
+      for (let i = 0; i < 10; i += 1) {
+        const file = `${SHOTS}/tap-${name}-${String(i).padStart(2, '0')}.png`
+        await tapped.page.screenshot({ path: file })
+        files.push(file)
+        await delay(100)
+      }
+      await tapped.page.waitForSelector('[data-lighting="done"]', { timeout: 10_000 })
+      await settle()
+      await tapped.page.screenshot({ path: `${SHOTS}/tap-${name}-after.png` })
+      const at = await where(tapped.page)
+      const said = await tapped.page.evaluate(() => window.__tapped)
+      if (!said.includes('In progress')) throw new Error(`tapped a star that read "${said}"`)
+      if (at.path !== `${nebulaPath}?points=1000` || at.layer !== 'nebula') throw new Error(`landed at ${JSON.stringify(at)}, expected ${nebulaPath} seen whole`)
+      // Where the star was drawn, frame by frame (one side of it, so the title's offset is the same):
+      // every frame as close to where it rests as the frame before, or closer.
+      const trace = await tapped.page.evaluate(() => window.__tapTrace)
+      const side = trace.at(-1)?.side
+      const same = trace.filter((entry) => entry.side === side)
+      const end = same.at(-1)
+      const away = same.map((entry) => Math.hypot(entry.x - end.x, entry.y - end.y))
+      const turned = away.findIndex((distance, i) => i > 0 && distance > away[i - 1] + 1)
+      if (turned >= 0) throw new Error(`the star turned back ${same[turned].t} ms after the tap: ${JSON.stringify(same.slice(Math.max(0, turned - 2), turned + 2))}`)
+      if (trace.some((entry) => entry.path?.includes(point.unitId))) throw new Error('the route went to the star on the way')
+      const lit = await litAfter(tapped.page)
+      return `tapped "${said}"; landed on ${at.path} (${at.band}); ${same.length} frames straight on (${Math.round(away[0] ?? 0)} px to go at the first); ${files.length} shots; "${lit}"`
+    })
+    await collect(tapped.page)
+    await tapped.context.close()
+  }
 }
