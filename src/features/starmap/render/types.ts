@@ -260,6 +260,8 @@ export type RenderStats = {
   names?: { stars: number; nebulae: number }
   /** A name is still fading in or out: the renderer wants another frame. */
   settling?: boolean
+  /** The boxes of the names at the screen's edge drawn in the last frame, CSS px (#138 D5); the lighting keeps clear of them (#145 C14). */
+  edgeLabels?: readonly { x0: number; y0: number; x1: number; y1: number }[]
 }
 
 export interface StarMapRenderer {

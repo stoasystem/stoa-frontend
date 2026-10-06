@@ -234,6 +234,22 @@ export const CHOICE = {
 } as const
 
 /**
+ * The lighting moment's labels beside the star (#145, round three C14 of
+ * #142): the flare's title and, with reduced motion, the still label. They
+ * go below the star, else above, right or left of it, else slid along
+ * below or above it -- the first place clear of the names at the screen's
+ * edge ("Optics · Physics") -- and stay where they are while it stays clear.
+ */
+export const LIGHTING = {
+  /** Room kept between a label and a name at the screen's edge, px. */
+  edgeLabelClearancePx: 6,
+  /** Room kept between a label and the layer's sides and top, px. */
+  insetPx: 8,
+  /** A label's top never comes lower than this far above the layer's bottom (the docked composer), px. */
+  bottomReservePx: 48,
+} as const
+
+/**
  * The panorama's light (#137, round two A2 / A3 / A4 / C4 of #123). Far out
  * the sky should read as glowing nebulae grouped into galaxies, not as a
  * scatter of gold grains: lit stars there are small, dim dots, and the light

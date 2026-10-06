@@ -12,6 +12,8 @@
  *     settles. With reduced motion there is none: the star simply is lit,
  *     and a small still label beside it says "<name> is lit" for
  *     `STILL_LABEL_MS`, then goes -- at once, without fading (#140 F3).
+ *     The flare's title and that label sit below the star unless that covers
+ *     a name at the screen's edge; then they go where it does not (#145 C14).
  *   - The star turns lit gold under the flare's brightest moment, not before
  *     (#140 F1): until then the map draws it as it was (`useLightingStage.ts`),
  *     and this layer says when (`onReveal`) -- with reduced motion, as it
@@ -30,6 +32,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { animationFrameScheduler, type FrameScheduler, type StarOnScreen } from '@/features/starmap/engine/starMapEngine'
 import { drawFlare, flareBase, FLARE_MS, FLARE_PEAK_MS } from '@/features/starmap/lighting/flare'
+import { placeBesideStar, type LabelSide } from '@/features/starmap/lighting/labelPlace'
 import { isCelebrated, useLightingEventSource, type LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import { subjectOfNebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
@@ -134,6 +137,7 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
     let handle: number | null = null
     let finished = false
     let revealed = false
+    let side: LabelSide | undefined
     const reveal = () => {
       if (revealed) return
       revealed = true
@@ -198,7 +202,7 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
       }
       const caption = captionRef.current
       if (caption && spot) {
-        placeBelow(caption, spot, flareBase(spot.size) * 1.6 + 12, width, height)
+        side = place(caption, spot, flareBase(spot.size) * 1.6 + 12, width, height, side)
         caption.style.opacity = String(captionOpacity(elapsed))
       }
       if (elapsed >= FLARE_MS + 600) return end(true)
@@ -218,6 +222,7 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
     if (!still) return
     let shownAt: number | null = null
     let handle: number | null = null
+    let side: LabelSide | undefined
     const frame = (at: number) => {
       handle = null
       shownAt ??= at
@@ -233,7 +238,7 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
         const height = box.clientHeight
         const inside = spot !== null && spot.x >= 0 && spot.x <= width && spot.y >= 0 && spot.y <= height
         label.style.visibility = inside ? 'visible' : 'hidden'
-        if (spot && inside) placeBelow(label, spot, flareBase(spot.size) * 0.6 + 10, width, height)
+        if (spot && inside) side = place(label, spot, flareBase(spot.size) * 0.6 + 10, width, height, side)
       }
       handle = scheduler.request(frame)
     }
@@ -278,12 +283,16 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
   )
 }
 
-/** A caption or label `gap` px below its star, kept inside the layer's `width` x `height`. */
-function placeBelow(element: HTMLElement, spot: StarOnScreen, gap: number, width: number, height: number) {
-  const half = element.offsetWidth / 2
-  const x = half > 0 && width > 2 * (8 + half) ? Math.max(8 + half, Math.min(width - 8 - half, spot.x)) : spot.x
-  const y = Math.min(height - 48, spot.y + gap)
-  element.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translateX(-50%)`
+/**
+ * A caption or label `gap` px from its star, kept inside the layer's `width` x `height` and clear
+ * of the names at the screen's edge (#145 C14): below it unless that covers one (`labelPlace.ts`).
+ * Returns the side it went to, kept next frame while it stays clear.
+ */
+function place(element: HTMLElement, spot: StarOnScreen, gap: number, width: number, height: number, was: LabelSide | undefined): LabelSide {
+  const at = placeBesideStar(spot, { width: element.offsetWidth, height: element.offsetHeight }, gap, { width, height }, spot.keepClear, was)
+  element.style.transform = `translate(${at.x}px, ${at.y}px)`
+  element.dataset.side = at.side
+  return at.side
 }
 
 /** The caption comes in with the ignition and leaves after the flare. */
