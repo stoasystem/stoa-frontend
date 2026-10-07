@@ -14,15 +14,19 @@
  * `&panel=1` leaving 420 px for the Ask panel. `window.__askPanel(true|false)`
  * opens and closes that space at run time.
  *
+ * Offline like the design preview (#135): `takePageOffline()` gives the page
+ * its own empty in-memory storage and answers every backend request from the
+ * preview's demo handlers (or 404), before any app module is imported (only
+ * libraries load statically). A token the real dev app left in this origin's
+ * storage is never read, and nothing leaves the dev server.
+ *
  * Not a product screen, so its words are not translated.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { registerDevelopmentRuntimeConfig } from '@/lib/runtimeConfig'
-
-registerDevelopmentRuntimeConfig('http://localhost:8000', window.location.origin)
+import { takePageOffline } from '@/dev/preview/offline'
 
 const params = new URLSearchParams(window.location.search)
 const path = params.get('path') ?? '/map/math'
@@ -33,8 +37,14 @@ const bench = params.get('bench') === '1'
 const entry = new URLSearchParams()
 if (points) entry.set('points', points)
 if (foveation) entry.set('foveation', foveation)
+else if (bench) entry.set('foveation', 'on')
+for (const key of ['relations', 'longNames']) {
+  const value = params.get(key)
+  if (value) entry.set(key, value)
+}
 
 async function start() {
+  await takePageOffline()
   await Promise.all([import('../index.css'), import('@/i18n')])
   const { useAuthStore } = await import('@/store/authStore')
   const pages = await import('@/pages/map/MapPages')
@@ -46,6 +56,8 @@ async function start() {
   })
 
   const { StarMapRoute } = await import('@/features/starmap/StarMapRoute')
+  // The application's own source has no sky (#131): the bench draws the demo sky.
+  const { DemoStarMapSource } = await import('@/dev/demo/sky/source')
   const { AppLayout } = await import('@/layouts/AppLayout')
   const { useState } = await import('react')
 
@@ -57,14 +69,14 @@ async function start() {
       <AppLayout bleed>
         <div data-ask-host className="relative min-h-0 flex-1 overflow-hidden">
           <div data-surface="sky" data-ask-page className="absolute inset-y-0 left-0 bg-sky text-on-sky" style={{ right: panel ? 420 : 0 }}>
-            <StarMapRoute />
+            <StarMapRoute relations={params.get('relations') === 'fixture'} longNames={params.get('longNames') === '1'} />
           </div>
         </div>
       </AppLayout>
     )
   }
 
-  const Page = (name: 'MapHomePage' | 'MapSubjectPage' | 'MapNebulaPage' | 'MapStarPage') => {
+  const Page = (name: 'MapHomePage' | 'MapPage') => {
     const Component = pages[name]
     return host === 'ask' ? <AskLikeHost /> : <Component />
   }
@@ -87,15 +99,17 @@ async function start() {
   createRoot(root).render(
     <StrictMode>
       <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false, enabled: false } } })}>
-        <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
-          <Routes>
-            <Route path="/" element={Page('MapHomePage')} />
-            <Route path="/map/:subjectId" element={Page('MapSubjectPage')} />
-            <Route path="/map/:subjectId/:topicId" element={Page('MapNebulaPage')} />
-            <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapStarPage')} />
-            <Route path="*" element={<p>Left the map.</p>} />
-          </Routes>
-        </MemoryRouter>
+        <DemoStarMapSource>
+          <MemoryRouter initialEntries={[entry.toString() ? `${path}?${entry.toString()}` : path]}>
+            <Routes>
+              <Route path="/" element={Page('MapHomePage')} />
+              <Route path="/map/:subjectId" element={Page('MapPage')} />
+              <Route path="/map/:subjectId/:topicId" element={Page('MapPage')} />
+              <Route path="/map/:subjectId/:topicId/:unitId" element={Page('MapPage')} />
+              <Route path="*" element={<p>Left the map.</p>} />
+            </Routes>
+          </MemoryRouter>
+        </DemoStarMapSource>
       </QueryClientProvider>
     </StrictMode>,
   )

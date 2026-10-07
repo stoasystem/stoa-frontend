@@ -24,7 +24,12 @@
   "legend": {
     "label": "Cosa significano le stelle",
     "reviewDue": "Da ripassare",
-    "hint": "Trascina per muoverti sulla mappa. Scorri, pizzica o usa + e − per avvicinarti a una nebulosa; scegli una stella per vederne il capitolo."
+    "pointer": "Trascina per spostarti, scorri o pizzica per lo zoom. Scegli una stella per vederne il capitolo; premila e trascinala (sul touch, prima tienila premuta) per vedere a cosa è collegata.",
+    "keys": "Tastiera: frecce verso il più vicino da quel lato, Tab segue il corso, + e − per lo zoom."
+  },
+  "help": {
+    "open": "Come funziona la mappa stellare",
+    "close": "Chiudi"
   },
   "star": {
     "progress": "{{percent}}% delle lezioni svolte",
@@ -41,7 +46,11 @@
     "start": "Inizia",
     "continue": "Continua",
     "open": "Apri il capitolo",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Ripassa {{count}} esercizio",
+    "review_other": "Ripassa {{count}} esercizi",
+    "reviewSoon": "Disponibile a breve",
+    "sheetDetails": "Mostra o nasconde i dettagli di questa stella"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} su {{total}} accese",
@@ -50,7 +59,8 @@
   "nav": {
     "map": "Mappa stellare",
     "backToMap": "Torna alla mappa stellare",
-    "backToNebula": "Torna a {{nebula}}"
+    "backToNebula": "Torna a {{nebula}}",
+    "backToStar": "Torna a {{name}}"
   },
   "zoom": {
     "group": "Zoom",
@@ -65,5 +75,12 @@
     "nebula": "{{nebula}}: {{lit}} su {{total}} accese",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "In questa materia non c’è ancora niente da imparare."
+  "empty": "In questa materia non c’è ancora niente da imparare.",
+  "emptySky": {
+    "title": "La tua mappa stellare sta arrivando",
+    "body": "Le tue materie e i tuoi punti di conoscenza appariranno qui appena saranno pronti."
+  },
+  "lighting": {
+    "announce": "La stella {{name}} è accesa"
+  }
 }

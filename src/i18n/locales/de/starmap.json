@@ -24,7 +24,12 @@
   "legend": {
     "label": "Was die Sterne bedeuten",
     "reviewDue": "Wiederholung fällig",
-    "hint": "Ziehen verschiebt die Karte. Scrollen, mit zwei Fingern zoomen oder + und − nutzen, um in einen Nebel zu gehen; einen Stern wählen, um sein Kapitel zu sehen."
+    "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
+    "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen."
+  },
+  "help": {
+    "open": "So funktioniert die Sternkarte",
+    "close": "Schließen"
   },
   "star": {
     "progress": "{{percent}} % der Lektionen erledigt",
@@ -41,7 +46,11 @@
     "start": "Starten",
     "continue": "Weiter",
     "open": "Kapitel öffnen",
-    "inNebula": "{{nebula}} · {{state}}"
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "{{count}} Aufgabe wiederholen",
+    "review_other": "{{count}} Aufgaben wiederholen",
+    "reviewSoon": "Bald verfügbar",
+    "sheetDetails": "Zeigt oder verbirgt die Details dieses Sterns"
   },
   "nebula": {
     "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
@@ -50,7 +59,8 @@
   "nav": {
     "map": "Sternkarte",
     "backToMap": "Zurück zur Sternkarte",
-    "backToNebula": "Zurück zu {{nebula}}"
+    "backToNebula": "Zurück zu {{nebula}}",
+    "backToStar": "Zurück zu {{name}}"
   },
   "zoom": {
     "group": "Zoom",
@@ -65,5 +75,12 @@
     "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
     "star": "{{name}}: {{state}}"
   },
-  "empty": "In diesem Fach gibt es noch nichts zu lernen."
+  "empty": "In diesem Fach gibt es noch nichts zu lernen.",
+  "emptySky": {
+    "title": "Deine Sternkarte ist unterwegs",
+    "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
+  },
+  "lighting": {
+    "announce": "{{name}} leuchtet jetzt"
+  }
 }

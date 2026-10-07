@@ -185,6 +185,43 @@
    */
   --on-sky-field-rule: rgba(255, 255, 255, 0.45);
 
+  /*
+   * The star map's connection lines (#121). Brightness says how relevant a
+   * relation is to the student now, not that it exists, so only what carries
+   * that message at rest is held to 3:1 (WCAG 1.4.11): a line into the
+   * recommended star, and an in-progress star's lines to its prerequisites.
+   * The path walked (both ends lit), the lines into locked stars (star layer
+   * only, dashed) and the panorama's bridges are quiet on purpose; what they
+   * say is already in the stars' own states (and a locked star's card). Read by
+   * StarMapView into the canvas theme; drawn by render/links.ts.
+   */
+  --starmap-link-recommended: rgba(242, 197, 114, 0.9);
+  --starmap-link-in-progress: rgba(255, 255, 255, 0.5);
+  --starmap-link-walked: rgba(255, 255, 255, 0.16);
+  --starmap-link-locked: rgba(255, 255, 255, 0.3);
+  --starmap-bridge: rgba(170, 190, 255, 0.07);
+  /*
+   * A galaxy's name across its middle on the star map's panorama (#137):
+   * very faint and large on purpose, decoration (the same name is the page's
+   * heading and the switcher's segment). Drawn by render/galaxyNames.ts.
+   */
+  --starmap-galaxy-name: rgba(214, 222, 255, 0.13);
+  /*
+   * Each galaxy's base colour on the star map (#143, round three A5 of #142):
+   * its haze, its nebulae's clouds (each a small shift round it) and, lifted
+   * towards white at the --starmap-galaxy-name alpha, its name. A subject is
+   * told by hue alone: mathematics blue-violet, physics cyan-blue, chemistry
+   * warm amber; muted and mid-light, never a rainbow (#117 B2). Mirrored by
+   * GALAXY_COLOURS (src/features/starmap/view/semanticZoom.ts; a test keeps
+   * them equal). Decoration: the haze is drawn at a few percent.
+   */
+  --starmap-galaxy-math: rgb(140, 128, 224);
+  --starmap-galaxy-physics: rgb(100, 182, 220);
+  --starmap-galaxy-chemistry: rgb(226, 166, 100);
+  --starmap-galaxy-name-math: rgba(196, 190, 255, 0.13);
+  --starmap-galaxy-name-physics: rgba(176, 226, 250, 0.13);
+  --starmap-galaxy-name-chemistry: rgba(255, 214, 168, 0.13);
+
   /* Motion and states: the focus ring on dark is 2 px star-gold. */
   --focus-ring: var(--lit);
   /* Tokens board: glass cards 0 12px 40px 45%; the composer floats over the sky (Components). */

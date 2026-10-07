@@ -1,24 +1,29 @@
 /*
- * The three layers (#72 point 5) and the flight between them.
+ * What the route chooses (#72 point 8), and the flight to it. Since #134 the
+ * zoom is continuous and these are no longer layers the camera stops at:
+ * they are what is chosen, and the route follows the choice, never the zoom.
  *
- *   map     the whole star map: every nebula, the links between them;
- *   nebula  one nebula fills the view: its stars get names, its own
- *           prerequisite lines appear;
- *   star    one star, drawn in HTML/SVG beside the map: skills, progress,
- *           markers, the way into its chapter.
+ *   map     nothing chosen: the galaxy the header names (`/map/<subject>`);
+ *   nebula  a nebula chosen (`/map/<subject>/<nebula>`): the camera flies in
+ *           until its stars are full glyphs;
+ *   star    a star chosen (`.../<star>`): its card opens beside the map (HTML/
+ *           SVG: skills, progress, markers, the way into its chapter).
+ *
+ * What the map shows -- names, lines -- follows the zoom instead
+ * (`view/semanticZoom.ts`).
  *
  * The flight is d3-zoom's smooth zoom (van Wijk & Nuij, rho = sqrt 2) in two
  * dimensions: a long move pulls back first, a short one zooms straight in.
  */
-import { orderedStars, type Star, type StarMap } from '@/features/starmap/model/starMap'
-import { baseScale, overviewView, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import type { Star, StarMap } from '@/features/starmap/model/starMap'
+import { baseScale, overviewView, usableHeight, type Bounds, type View, type Viewport } from '@/features/starmap/view/camera'
+import { SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import type { NebulaDisc } from '@/features/starmap/view/geometry'
-
-export type MapLayer = 'map' | 'nebula' | 'star'
 
 export type LayerTarget =
   | { layer: 'map' }
-  | { layer: 'nebula'; nebulaId: string }
+  /** `whole`: the nebula seen whole, `star` kept in view: back on the map from a lighting (#140). */
+  | { layer: 'nebula'; nebulaId: string; whole?: { star: string } }
   | { layer: 'star'; nebulaId: string; unitId: string }
 
 const RHO = Math.SQRT2
@@ -82,10 +87,48 @@ export function isWide(viewport: Viewport): boolean {
 export function nebulaZoom(disc: NebulaDisc, viewport: Viewport, bounds: Bounds): number {
   const shorter = Math.min(viewport.width, viewport.height)
   const base = baseScale(viewport, bounds)
-  return Math.max(1.4, Math.min(14, (0.85 * shorter) / (2 * disc.r * base)))
+  return Math.max(1.4, Math.min(30, (0.85 * shorter) / (2 * disc.r * base)))
 }
 
-/** The view a layer asks for. */
+/**
+ * A nebula seen whole (#140): all its stars within `ZOOM.wholeNebulaFill`
+ * of the band between the page's controls, centred in that band, at a zoom
+ * within `zoom` (the engine's, from `ZOOM.wholeNebulaGlyph`), with `star`
+ * kept near the middle (`ZOOM.wholeNebulaKeep`) even where the nebula is too
+ * big for the screen. Null for a nebula with no stars.
+ */
+export function wholeNebulaView(
+  nebulaId: string,
+  star: string,
+  stars: readonly Pick<Star, 'unitId' | 'nebulaId' | 'x' | 'y'>[],
+  viewport: Viewport,
+  bounds: Bounds,
+  [least, most]: readonly [number, number],
+): View | null {
+  const own = stars.filter((candidate) => candidate.nebulaId === nebulaId)
+  if (own.length === 0) return null
+  const xs = own.map((candidate) => candidate.x)
+  const ys = own.map((candidate) => candidate.y)
+  const [minX, maxX, minY, maxY] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+  const usable = usableHeight(viewport)
+  const base = baseScale(viewport, bounds)
+  const room = { width: ZOOM.wholeNebulaFill * viewport.width, height: ZOOM.wholeNebulaFill * usable }
+  const fit = Math.min(room.width / Math.max(1e-6, (maxX - minX) * base), room.height / Math.max(1e-6, (maxY - minY) * base))
+  const k = Math.max(least, Math.min(most, fit))
+  let cx = (minX + maxX) / 2
+  let cy = (minY + maxY) / 2
+  const kept = own.find((candidate) => candidate.unitId === star)
+  if (kept) {
+    const reachX = (ZOOM.wholeNebulaKeep * room.width) / 2 / (base * k)
+    const reachY = (ZOOM.wholeNebulaKeep * room.height) / 2 / (base * k)
+    cx = Math.max(kept.x - reachX, Math.min(kept.x + reachX, cx))
+    cy = Math.max(kept.y - reachY, Math.min(kept.y + reachY, cy))
+  }
+  const fy = viewport.height > 0 ? ((viewport.top ?? 0) + usable / 2) / viewport.height : 0.5
+  return { cx, cy, k, fx: 0.5, fy }
+}
+
+/** Where a choice is seen: its centre, and where on screen (`fx`, `fy`); the engine sets the zoom (`view/semanticZoom.ts`'s `ZOOM`). */
 export function viewForTarget(
   target: LayerTarget,
   map: Pick<StarMap, 'stars'>,
@@ -101,12 +144,34 @@ export function viewForTarget(
   const star = map.stars.find((candidate) => candidate.unitId === target.unitId)
   if (!star) return { cx: disc.x, cy: disc.y, k, fx: 0.5, fy: 0.5 }
   const wide = isWide(viewport)
-  return { cx: star.x, cy: star.y, k: Math.min(24, k * 1.8), fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : 0.3 }
+  return { cx: star.x, cy: star.y, k: k * 1.8, fx: wide ? 0.34 : 0.5, fy: wide ? 0.5 : starFrameY(viewport) }
 }
 
 /**
- * The layer a route asks for, made safe: a nebula or star the map does not
- * have falls back to the nearest layer it does have.
+ * How far up from the bottom a phone's collapsed star sheet reaches (#139),
+ * with the room kept clear above it: the page's bottom inset (Ask's docked
+ * composer, #49), the sheet's margin, its collapsed height and the clearance.
+ */
+export function sheetBand(bottomInset = 0): number {
+  return bottomInset + SHEET.marginPx + SHEET.collapsedPx + SHEET.clearancePx
+}
+
+/**
+ * Where on a phone a chosen star is framed, as a share of the height: the
+ * middle of the map's clear area, between the page's top controls and the
+ * collapsed sheet (`viewport.sheet`, #139), so the star is never framed
+ * under the sheet. Without a sheet, the card's old place (0.3).
+ */
+export function starFrameY(viewport: Viewport): number {
+  if (viewport.sheet === undefined || viewport.height <= 0) return 0.3
+  const top = viewport.top ?? 0
+  const bottom = viewport.height - Math.max(viewport.bottom ?? 0, viewport.sheet)
+  return bottom > top ? (top + bottom) / 2 / viewport.height : 0.5
+}
+
+/**
+ * The choice a route asks for, made safe: a nebula or star the map does not
+ * have falls back to the nearest choice it does have.
  */
 export function resolveTarget(map: StarMap, topicId: string | undefined, unitId: string | undefined): LayerTarget {
   const nebula = topicId ? map.nebulae.find((candidate) => candidate.topicId === topicId) : undefined
@@ -118,32 +183,13 @@ export function resolveTarget(map: StarMap, topicId: string | undefined, unitId:
   return { layer: 'star', nebulaId: nebula.topicId, unitId: star.unitId }
 }
 
-/** One layer out: star to its nebula, nebula to the map. */
+/** The choice one step out: a star's card closed (its nebula), a nebula let go (the galaxy). */
 export function outerTarget(target: LayerTarget): LayerTarget {
   if (target.layer === 'star') return { layer: 'nebula', nebulaId: target.nebulaId }
   return { layer: 'map' }
 }
 
-/** One layer in, around the nebula or star nearest the point of interest. */
-export function innerTarget(
-  target: LayerTarget,
-  map: StarMap,
-  nearestNebula: string | null,
-  nearestStar: Star | null,
-): LayerTarget {
-  if (target.layer === 'map') {
-    const nebulaId = nearestNebula ?? orderedStars(map)[0]?.nebulaId
-    return nebulaId ? { layer: 'nebula', nebulaId } : target
-  }
-  if (target.layer === 'nebula') {
-    const inNebula = nearestStar && nearestStar.nebulaId === target.nebulaId ? nearestStar : null
-    const star = inNebula ?? orderedStars(map).find((candidate) => candidate.nebulaId === target.nebulaId)
-    return star ? { layer: 'star', nebulaId: target.nebulaId, unitId: star.unitId } : target
-  }
-  return target
-}
-
-/** The route a layer lives at (#72 point 8). */
+/** The route a choice lives at (#72 point 8). */
 export function pathForTarget(subjectId: string, target: LayerTarget): string {
   const subject = `/map/${encodeURIComponent(subjectId)}`
   if (target.layer === 'map') return subject
@@ -173,15 +219,50 @@ export function nebulaFocusSpot(
   disc: { x: number; y: number; r: number },
   viewport: { width: number; height: number },
   bands: { top: number; bottom: number },
+  pill = { width: 280, height: NEBULA_FOCUS_HEIGHT },
 ): { x: number; y: number } {
   const top = bands.top + 4
-  const bottom = viewport.height - bands.bottom - 4 - NEBULA_FOCUS_HEIGHT
+  const bottom = viewport.height - bands.bottom - 4 - pill.height
   const below = disc.y + disc.r + 8
-  const above = disc.y - disc.r - 8 - NEBULA_FOCUS_HEIGHT
-  const y = below <= bottom ? below : above >= top ? above : disc.y - NEBULA_FOCUS_HEIGHT / 2
-  const margin = Math.min(140, viewport.width / 2)
+  const above = disc.y - disc.r - 8 - pill.height
+  const y = below <= bottom ? below : above >= top ? above : disc.y - pill.height / 2
+  const margin = Math.min(pill.width / 2, viewport.width / 2)
   return {
     x: Math.max(margin, Math.min(viewport.width - margin, disc.x)),
     y: Math.max(top, Math.min(bottom, y)),
   }
+}
+
+/** The part of the stage where the map can be seen on the star layer: inside the page's controls, beside the card or above the sheet. */
+export type ClearArea = { left: number; top: number; right: number; bottom: number }
+
+/**
+ * The star layer's way back (#132): once the focused star is panned out of
+ * the clear area, a hint sits on the area's edge where a line from its middle
+ * to the star leaves it, pointing at the star. `angle` is in radians, 0 to
+ * the right, clockwise (screen y grows down); `alignX` / `alignY` say which
+ * edge of the hint touches the point (0 start, 0.5 middle, 1 end), so it
+ * stays inside the area. Null while the star is in the area.
+ */
+export function starHintSpot(
+  star: { x: number; y: number },
+  area: ClearArea,
+  slack = 0,
+): { x: number; y: number; angle: number; alignX: number; alignY: number } | null {
+  if (area.right <= area.left || area.bottom <= area.top) return null
+  // Within `slack` px of the area the star still counts as seen: no hint beside a star in plain sight.
+  const seen = (value: number, low: number, high: number) => value >= low - slack && value <= high + slack
+  if (seen(star.x, area.left, area.right) && seen(star.y, area.top, area.bottom)) return null
+  const cx = (area.left + area.right) / 2
+  const cy = (area.top + area.bottom) / 2
+  const dx = star.x - cx
+  const dy = star.y - cy
+  const halfW = (area.right - area.left) / 2
+  const halfH = (area.bottom - area.top) / 2
+  // How far along the ray the area's edge is: the nearer of the two sides it can cross.
+  const reach = Math.min(dx === 0 ? Infinity : halfW / Math.abs(dx), dy === 0 ? Infinity : halfH / Math.abs(dy))
+  const x = cx + dx * reach
+  const y = cy + dy * reach
+  const edge = (value: number, low: number, high: number) => (value <= low + 0.5 ? 0 : value >= high - 0.5 ? 1 : 0.5)
+  return { x, y, angle: Math.atan2(dy, dx), alignX: edge(x, area.left, area.right), alignY: edge(y, area.top, area.bottom) }
 }

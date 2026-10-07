@@ -1,0 +1,169 @@
+name: Deploy Frontend Preview
+
+# Publishes the redesign integration branch to its preview site (#28). One
+# fixed mapping, and nothing else can deploy:
+#
+#   branch redesign/planet -> Environment preview-planet
+#                          -> https://app-planet.stoaedu.ch
+#
+# Bucket and DistributionId come from the preview-planet Environment's
+# variables (stoa-infra#1 outputs), so no other branch or workflow can read
+# them. workflow_dispatch takes no inputs: a manual run publishes the branch
+# it was started from, and only redesign/planet gets past the job `if` below
+# and the Environment's deployment-branch rule.
+#
+# Two checks guard the branch, by design (decision in #5): the job `if` here,
+# and the Environment's branch rule in repository settings. AWS then checks
+# the Environment identity: the preview role trusts only
+# repo:stoasystem/stoa-frontend:environment:preview-planet (stoa-infra#2).
+#
+# The production workflow (deploy-production.yml) is untouched by this file.
+# Plan B (redesign/cute -> preview-cute) is on hold; adding it means a second
+# publish job with its own Environment and `if`, and a concurrency group per target.
+
+on:
+  push:
+    branches: [redesign/planet]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One preview publish at a time, in push order; a run in progress is never
+# cancelled, like production's frontend-production-deploy.
+concurrency:
+  group: frontend-preview-planet
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Lint, typecheck, and test gate
+    if: github.ref == 'refs/heads/redesign/planet'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: API contract guard
+        run: |
+          curl -fsSL -o /tmp/route-inventory.json \
+            https://raw.githubusercontent.com/stoasystem/stoa-backend/main/docs/security/route-authorization-inventory.json
+          npm run check:api-contract -- --inventory /tmp/route-inventory.json
+
+      - name: Translation guard
+        run: npm run check:untranslated
+
+      # The redesign branch gate runs this too (#17); a preview should not
+      # publish what that gate would reject.
+      - name: Contrast guard
+        run: npm run check:contrast
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Release contract tests
+        run: npm run test:release
+
+      # Again by itself, as in the production gate (#101).
+      - name: Release verifier tests
+        run: node --test tests/release/verify-release.test.mjs
+
+      - name: Publisher tests
+        run: node --test tests/release/publish-web-release.test.mjs
+
+  deploy-planet:
+    name: Build and publish the planet preview
+    needs: verify
+    if: github.ref == 'refs/heads/redesign/planet'
+    runs-on: ubuntu-24.04
+    environment:
+      name: preview-planet
+      url: https://app-planet.stoaedu.ch
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Check out backend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: stoasystem/stoa-backend
+          path: stoa-backend
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Build
+        run: npm run build
+
+      # The publisher falls back to the production bucket and distribution
+      # when --bucket or --distribution-id is empty, so an unset or mistyped
+      # Environment variable must stop the job here, before any credentials.
+      - name: Check preview target
+        env:
+          PREVIEW_BUCKET: ${{ vars.PREVIEW_BUCKET }}
+          PREVIEW_DISTRIBUTION_ID: ${{ vars.PREVIEW_DISTRIBUTION_ID }}
+        run: |
+          set -euo pipefail
+          [[ "$PREVIEW_BUCKET" =~ ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$ ]] \
+            || { echo "PREVIEW_BUCKET is unset or not a bucket name"; exit 1; }
+          [[ "$PREVIEW_DISTRIBUTION_ID" =~ ^E[A-Z0-9]{5,20}$ ]] \
+            || { echo "PREVIEW_DISTRIBUTION_ID is unset or not a distribution id"; exit 1; }
+          [[ "$PREVIEW_BUCKET" != "stoa-frontend-562923011260" ]] \
+            || { echo "PREVIEW_BUCKET is the production bucket"; exit 1; }
+          [[ "$PREVIEW_DISTRIBUTION_ID" != "E27CVAMQHDMW80" ]] \
+            || { echo "PREVIEW_DISTRIBUTION_ID is the production distribution"; exit 1; }
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@e6de054238d6b7531b4efff3b6587d9aade6a06c
+        with:
+          role-to-assume: arn:aws:iam::562923011260:role/stoa-github-frontend-preview
+          aws-region: eu-central-2
+
+      # environment stays at the publisher default `production`: the Web
+      # client only accepts staging / staging-pilot / production, and the
+      # preview talks to the production API. The web origin is what differs.
+      - name: Publish served release
+        env:
+          PREVIEW_BUCKET: ${{ vars.PREVIEW_BUCKET }}
+          PREVIEW_DISTRIBUTION_ID: ${{ vars.PREVIEW_DISTRIBUTION_ID }}
+        run: |
+          set -euo pipefail
+          backend_artifact_sha256="$(
+            git -C stoa-backend rev-parse HEAD | sha256sum | awk '{print $1}'
+          )"
+          node scripts/publish-web-release.mjs \
+            --dist dist \
+            --bucket "$PREVIEW_BUCKET" \
+            --distribution-id "$PREVIEW_DISTRIBUTION_ID" \
+            --web-origin https://app-planet.stoaedu.ch \
+            --api-origin https://api.stoaedu.ch \
+            --backend-artifact-sha256 "$backend_artifact_sha256"

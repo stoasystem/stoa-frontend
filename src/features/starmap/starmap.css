@@ -82,6 +82,9 @@
   overflow: visible;
   clip-path: none;
   padding: 0 14px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 20px;
   border-radius: 10px;
   background: var(--sky-glass);
   color: var(--on-sky-text);
