@@ -703,9 +703,14 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
                 {t('summary.lit', { lit: map.summary.lit, total: map.summary.total })}
               </span>
               <span className="text-[color:var(--on-sky-text-body)]">{t('summary.streak', { count: map.summary.streakDays })}</span>
-              <span className="text-[color:var(--on-sky-text-body)]">
-                {t('summary.score', { count: map.summary.score, formatted: numberFormat.format(map.summary.score) })}
-              </span>
+              {/* A score only when there is one to show. The read model has no
+                * source for it yet (stoa-backend#59), and "0 Punkte" reads as
+                * a score the student earned rather than one nobody keeps. */}
+              {map.summary.score > 0 ? (
+                <span className="text-[color:var(--on-sky-text-body)]">
+                  {t('summary.score', { count: map.summary.score, formatted: numberFormat.format(map.summary.score) })}
+                </span>
+              ) : null}
             </div>
           </div>
         ) : (
