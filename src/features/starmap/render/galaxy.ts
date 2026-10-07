@@ -239,9 +239,22 @@ const HAZE_MARGIN = 0.35
 
 /** Where a galaxy's haze canvas sits, map units: its box with room for the haze to fade. */
 export function galaxyHazeBox(galaxy: { x0: number; x1: number; y0: number; y1: number }) {
-  const margin = (galaxy.y1 - galaxy.y0) * HAZE_MARGIN
-  return { x0: galaxy.x0 - margin, y0: galaxy.y0 - margin, x1: galaxy.x1 + margin, y1: galaxy.y1 + margin }
+  // A galaxy of one nebula has no extent of its own, and the haze canvas is
+  // sized by dividing by this box's width: zero there makes the height NaN,
+  // the canvas 0 px tall, and every drawImage onto it throw. A subject with a
+  // single topic is ordinary - a newly opened one has exactly that - so the
+  // box is given a floor rather than the callers each guarding the divide.
+  const spread = Math.max(galaxy.y1 - galaxy.y0, galaxy.x1 - galaxy.x0, HAZE_MIN_SPREAD)
+  const margin = spread * HAZE_MARGIN
+  const x0 = galaxy.x0 - margin
+  const x1 = Math.max(galaxy.x1 + margin, x0 + HAZE_MIN_SPREAD)
+  const y0 = galaxy.y0 - margin
+  const y1 = Math.max(galaxy.y1 + margin, y0 + HAZE_MIN_SPREAD)
+  return { x0, y0, x1, y1 }
 }
+
+/** The smallest extent a galaxy's haze box may have, in map units. */
+const HAZE_MIN_SPREAD = 0.02
 
 /** How much of a haze box's margin (`galaxyHazeBox`) its edge fade spans: all of it, so no edge reads as a line (#137 C4). */
 const HAZE_EDGE = 1

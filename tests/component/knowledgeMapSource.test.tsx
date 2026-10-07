@@ -6,7 +6,7 @@ import {
   KnowledgeMapSourceProvider,
   projectStarMap,
 } from '@/features/starmap/readModelSource'
-import { useStarMapSource } from '@/features/starmap/starMapSource'
+import { StarMapSourceContext, useStarMapSource } from '@/features/starmap/starMapSource'
 import { getKnowledgeMap } from '@/services/practice/practiceApi'
 import { useAuthStore } from '@/store/authStore'
 import type { KnowledgeMapResponse } from '@/types/practice'
@@ -136,6 +136,30 @@ describe('the star map source behind a signed-in student', () => {
 
     await waitFor(() => expect(mockedGet).toHaveBeenCalled())
     expect(result.current.demo).toBe(false)
+  })
+})
+
+describe('a sky somebody above already supplied', () => {
+  it('wins, and the read model is not asked for one', async () => {
+    // The design preview and the bench inject their own source from outside
+    // the router, and this provider sits inside it. Replacing theirs would
+    // make every override silently ineffective.
+    signIn('student')
+    mockedGet.mockResolvedValue(sky())
+    const injected = { read: () => ({ marker: 'injected' }) as never, demo: true }
+
+    const { result } = renderHook(() => useStarMapSource(), {
+      wrapper: ({ children }) => (
+        <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+          <StarMapSourceContext.Provider value={injected}>
+            <KnowledgeMapSourceProvider>{children}</KnowledgeMapSourceProvider>
+          </StarMapSourceContext.Provider>
+        </QueryClientProvider>
+      ),
+    })
+
+    expect(result.current).toBe(injected)
+    await waitFor(() => expect(mockedGet).not.toHaveBeenCalled())
   })
 })
 

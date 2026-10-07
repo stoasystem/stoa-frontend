@@ -21,6 +21,8 @@ import { useMemo, type ReactNode } from 'react'
 import {
   StarMapSourceContext,
   emptyStarMap,
+  emptyStarMapSource,
+  useStarMapSource,
   type StarMapRequest,
   type StarMapSource,
 } from '@/features/starmap/starMapSource'
@@ -66,6 +68,16 @@ export function projectStarMap(sky: KnowledgeMapResponse, { subjectId }: StarMap
  * every route that draws it, and one query serves them all.
  */
 export function KnowledgeMapSourceProvider({ children }: { children: ReactNode }) {
+  // Somebody above may already have supplied a sky — the design preview, the
+  // bench, a test. This sits inside the router, so without yielding to them it
+  // would silently replace theirs with the read model's and no override would
+  // ever take effect.
+  const provided = useStarMapSource()
+  if (provided !== emptyStarMapSource) return <>{children}</>
+  return <ReadModelSource>{children}</ReadModelSource>
+}
+
+function ReadModelSource({ children }: { children: ReactNode }) {
   // Only a signed-in student has a sky. Asking for one from the sign-in page,
   // or as a parent or teacher, would be a request that can only be refused.
   const isStudent = useAuthStore(
