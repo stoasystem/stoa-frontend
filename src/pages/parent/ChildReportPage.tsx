@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import type { TFunction } from 'i18next'
 import { BackButton } from '@/components/common/BackButton'
@@ -11,7 +11,6 @@ import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 // Card 007 (frozen): import { UpgradePromptCard } from '@/components/parent/UpgradePromptCard'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useChildReportQuery } from '@/hooks/parent/useChildReportQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -52,14 +51,12 @@ export function ChildReportPage() {
               description={t('reportDescription')}
             />
           </div>
+          {/*
+            * The monthly report button comes back when /parent/children/:id/monthly-report
+            * is a registered route; until then it would open the 404 page (#25).
+            * primary={<Button asChild><Link to={`/parent/children/${childId}/monthly-report`}>{t('monthlyReport')}</Link></Button>}
+          */}
           <PageActions
-            primary={
-              childId && (
-                <Button asChild>
-                  <Link to={`/parent/children/${childId}/monthly-report`}>{t('monthlyReport')}</Link>
-                </Button>
-              )
-            }
             secondary={childId && <BackButton label={t('childSummary')} to={`/parent/children/${childId}`} />}
           />
         </div>
