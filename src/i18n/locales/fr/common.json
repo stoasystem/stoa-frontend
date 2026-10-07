@@ -1,285 +1,290 @@
 {
-  "brand": {
-    "name": "STOA",
-    "platform": "Plateforme d’apprentissage STOA",
-    "learningAssistant": "Assistant d’apprentissage",
-    "teacherSupport": "Accompagnement par un enseignant qualifié"
-  },
-  "navigation": {
-    "home": "Accueil",
-    "howItWorks": "Fonctionnement",
-    "parents": "Parents",
-    "tutors": "Enseignants",
-    "pricing": "Tarifs",
-    "qa": "Q&R",
-    "login": "Connexion",
-    "startLearning": "Commencer à apprendre",
-    "forTutors": "Pour les enseignants",
-    "forParents": "Pour les parents",
-    "privacy": "Confidentialité",
-    "terms": "Conditions",
-    "contact": "Contact",
-    "support": "Aide",
-    "dashboard": "Tableau de bord",
-    "chat": "Poser une question",
-    "onlineClassroom": "Online Classroom",
-    "classroomQueue": "File classroom",
-    "practice": "S’entraîner",
-    "questionBank": "Bibliotheque",
-    "learningHistory": "Historique",
-    "profile": "Profil",
-    "overview": "Vue d’ensemble",
-    "reports": "Rapports",
-    "billing": "Abonnement",
-    "referrals": "Invitations",
-    "requests": "Demandes",
-    "availability": "Disponibilité",
-    "users": "Élèves",
-    "learningActivity": "Activité d’apprentissage",
-    "helpRequests": "Demandes enseignant",
-    "supportInbox": "Aide",
-    "analytics": "Analyses",
-    "more": "Plus",
-    "short": {
-      "chat": "Question",
-      "onlineClassroom": "Classe",
-      "learningHistory": "Historique",
-      "questionBank": "Biblio",
-      "practice": "Exercices",
-      "dashboard": "Accueil",
-      "learn": "Apprendre"
-    },
-    "learn": "Apprendre",
-    "about": "À propos de STOA",
-    "studentNavigationLabel": "Navigation de l'élève",
-    "primary": "Navigation principale",
-    "mobilePrimary": "Navigation principale mobile",
-    "logoHome": "Accueil STOA",
-    "administration": "Administration",
-    "admin": {
-      "users": "Utilisateurs",
-      "teacherApplications": "Candidatures d’enseignants",
-      "curriculum": "Programme",
-      "moderation": "Modération",
-      "system": "Système"
-    }
-  },
-  "actions": {
-    "startLearning": "Commencer à apprendre",
-    "startLearningShort": "Commencer",
-    "continue": "Continuer",
-    "back": "Retour",
-    "createAccount": "Créer un compte",
-    "creatingAccount": "Création du compte...",
-    "signIn": "Se connecter",
-    "signingIn": "Connexion...",
-    "saving": "Enregistrement...",
-    "sending": "Envoi...",
-    "register": "S’inscrire",
-    "choosePlan": "Choisir un plan",
-    "viewPricing": "Voir les tarifs",
-    "askTeacher": "Demander à un enseignant",
-    "send": "Envoyer le message",
-    "stop": "Arrêter",
-    "logOut": "Se déconnecter",
-    "changePassword": "Modifier le mot de passe",
-    "tryAgain": "Réessayer"
-  },
-  "roles": {
-    "student": "Élève",
-    "parent": "Parent",
-    "tutor": "Enseignant",
-    "admin": "Admin",
-    "organization_admin": "Admin organisation",
-    "school_teacher": "Enseignant scolaire",
-    "school_viewer": "Observateur scolaire",
-    "teacher": "Enseignant"
-  },
-  "language": {
-    "label": "Langue",
-    "current": "Langue : {{language}} ({{code}})",
-    "english": "English",
-    "german": "Deutsch",
-    "french": "Français",
-    "italian": "Italiano"
-  },
-  "footer": {
-    "description": "Une plateforme d’apprentissage claire pour poser des questions, comprendre les explications, suivre les progrès et recevoir l’appui d’un enseignant qualifié.",
-    "contactInfo": "Contact",
-    "address": "Adresses",
-    "email": "E-mail",
-    "phone": "Téléphone",
-    "platform": "Plateforme",
-    "legal": "Liens légaux",
-    "contact": "Contact",
-    "backToHomepage": "Retour au site STOA",
-    "copyright": "© 2026 STOA. Tous droits réservés."
-  },
-  "status": {
-    "loading": "Chargement...",
-    "error": "Une erreur est survenue.",
-    "empty": "Rien à afficher pour le moment.",
-    "ready": "Prêt",
-    "pending": "En attente",
-    "resolved": "Résolu",
-    "inProgress": "En cours",
-    "unavailable": "Statut indisponible",
-    "teacherHelp": {
-      "pending": "En attente",
-      "assigned": "Attribué",
-      "in_progress": "En cours",
-      "resolved": "Terminé",
-      "cancelled": "Annulé"
-    },
-    "supportTicket": {
-      "open": "Ouvert",
-      "waiting_on_user": "En attente de réponse",
-      "in_review": "En examen",
-      "resolved": "Résolu"
-    },
-    "priority": {
-      "low": "Faible",
-      "normal": "Normale",
-      "high": "Élevée",
-      "urgent": "Urgente"
-    },
-    "subscription": {
-      "trial": "Essai",
-      "active": "Actif",
-      "inactive": "Inactif",
-      "expired": "Expiré"
-    },
-    "plan": {
-      "free_trial": "Essai gratuit",
-      "student": "Formule élève",
-      "family": "Formule famille",
-      "teacher_supported": "Formule avec enseignant"
-    },
-    "file": {
-      "uploaded": "Téléversé",
-      "processing": "En traitement",
-      "parsed": "Prêt",
-      "failed": "Échec"
-    },
-    "learningTopic": {
-      "strong": "Solide",
-      "stable": "Stable",
-      "developing": "En progression",
-      "weak": "À travailler"
-    },
-    "adminFeedback": {
-      "new": "Nouveau",
-      "reviewed": "Examiné",
-      "resolved": "Résolu"
-    },
-    "loadingAccount": "Chargement du compte…"
-  },
-  "notifications": {
-    "title": "Notifications",
-    "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
-    "unread": "{{count}} non lue(s)",
-    "loading": "Chargement des notifications...",
-    "unavailable": "Les notifications ne sont pas disponibles.",
-    "empty": "Aucune notification pour l’instant.",
-    "archive": "Archiver",
-    "openLabel": "Notifications",
-    "openLabelUnread": "Notifications, {{count}} non lue(s)",
-    "connection": {
-      "live": "À jour",
-      "connecting": "Connexion",
-      "reconnecting": "Reconnexion",
-      "checking": "Recherche de nouveautés",
-      "offline": "Hors ligne"
-    },
-    "itemStatus": {
-      "created": "Nouveau",
-      "read": "Lu",
-      "archived": "Archivé"
-    }
-  },
   "a11y": {
-    "loadingPage": "Chargement de la page",
+    "breadcrumb": "Fil d’Ariane",
     "loadingDashboard": "Chargement du tableau de bord",
-    "breadcrumb": "Fil d’Ariane"
-  },
-  "errorBoundary": {
-    "title": "Une erreur est survenue",
-    "body": "Réessaie ou recharge la page."
-  },
-  "nextStep": "Prochaine étape recommandée",
-  "studentRoutes": {
-    "placeholder": {
-      "eyebrow": "Bientôt disponible",
-      "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même."
-    },
-    "home": {
-      "title": "Ta carte du ciel"
-    },
-    "map": {
-      "title": "Carte du ciel"
-    },
-    "nebula": {
-      "title": "Nébuleuse"
-    },
-    "unit": {
-      "title": "Point de connaissance"
-    },
-    "chapter": {
-      "title": "Chapitre"
-    },
-    "lesson": {
-      "title": "Leçon"
-    },
-    "ask": {
-      "title": "Question"
-    },
-    "me": {
-      "title": "Ton compte"
-    }
+    "loadingPage": "Chargement de la page"
   },
   "accountMenu": {
-    "open": "Compte",
+    "addAccount": "Ajouter un autre compte",
+    "billing": "Facturation et paiement",
+    "forgetAccount": "Retirer le compte",
     "help": "Aide et assistance",
-    "billing": "Facturation et paiement"
+    "open": "Compte",
+    "switchAccount": "Changer de compte",
+    "switchExpired": "Cette session a expiré. Reconnecte-toi.",
+    "switchUnreachable": "Serveur injoignable. Le compte reste enregistré."
+  },
+  "actions": {
+    "askTeacher": "Demander à un enseignant",
+    "back": "Retour",
+    "changePassword": "Modifier le mot de passe",
+    "choosePlan": "Choisir un plan",
+    "continue": "Continuer",
+    "createAccount": "Créer un compte",
+    "creatingAccount": "Création du compte...",
+    "logOut": "Se déconnecter",
+    "register": "S’inscrire",
+    "saving": "Enregistrement...",
+    "send": "Envoyer le message",
+    "sending": "Envoi...",
+    "signIn": "Se connecter",
+    "signingIn": "Connexion...",
+    "startLearning": "Commencer à apprendre",
+    "startLearningShort": "Commencer",
+    "stop": "Arrêter",
+    "tryAgain": "Réessayer",
+    "viewPricing": "Voir les tarifs"
+  },
+  "brand": {
+    "learningAssistant": "Assistant d’apprentissage",
+    "name": "STOA",
+    "platform": "Plateforme d’apprentissage STOA",
+    "teacherSupport": "Accompagnement par un enseignant qualifié"
   },
   "composer": {
     "attach": "Ajouter une photo ou un fichier",
     "send": "Envoyer"
   },
+  "errorBoundary": {
+    "body": "Réessaie ou recharge la page.",
+    "title": "Une erreur est survenue"
+  },
+  "footer": {
+    "address": "Adresses",
+    "backToHomepage": "Retour au site STOA",
+    "contact": "Contact",
+    "contactInfo": "Contact",
+    "copyright": "© 2026 STOA. Tous droits réservés.",
+    "description": "Une plateforme d’apprentissage claire pour poser des questions, comprendre les explications, suivre les progrès et recevoir l’appui d’un enseignant qualifié.",
+    "email": "E-mail",
+    "legal": "Liens légaux",
+    "phone": "Téléphone",
+    "platform": "Plateforme"
+  },
+  "language": {
+    "current": "Langue : {{language}} ({{code}})",
+    "english": "English",
+    "french": "Français",
+    "german": "Deutsch",
+    "italian": "Italiano",
+    "label": "Langue"
+  },
   "me": {
-    "profile": {
-      "heading": "Profil",
-      "name": "Nom",
-      "email": "E-mail",
-      "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur."
-    },
     "language": {
       "heading": "Langue"
     },
     "notifications": {
-      "heading": "Notifications",
-      "loading": "Chargement de tes réglages de notification…",
-      "unavailable": "Les réglages de notification sont indisponibles pour le moment.",
-      "saveFailed": "Cette modification n’a pas été enregistrée. Réessaie.",
       "categories": {
         "teacher_responses": {
-          "title": "Réponses des enseignants",
-          "body": "Dans la cloche, quand un enseignant prend en charge ta question ou y répond"
+          "body": "Dans la cloche, quand un enseignant prend en charge ta question ou y répond",
+          "title": "Réponses des enseignants"
         }
-      }
+      },
+      "heading": "Notifications",
+      "loading": "Chargement de tes réglages de notification…",
+      "saveFailed": "Cette modification n’a pas été enregistrée. Réessaie.",
+      "unavailable": "Les réglages de notification sont indisponibles pour le moment."
     },
     "password": {
-      "heading": "Mot de passe",
-      "again": "Le modifier encore"
+      "again": "Le modifier encore",
+      "heading": "Mot de passe"
+    },
+    "profile": {
+      "email": "E-mail",
+      "heading": "Profil",
+      "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur.",
+      "name": "Nom"
     }
   },
+  "navigation": {
+    "about": "À propos de STOA",
+    "admin": {
+      "curriculum": "Programme",
+      "moderation": "Modération",
+      "system": "Système",
+      "teacherApplications": "Candidatures d’enseignants",
+      "users": "Utilisateurs"
+    },
+    "administration": "Administration",
+    "analytics": "Analyses",
+    "availability": "Disponibilité",
+    "billing": "Abonnement",
+    "chat": "Poser une question",
+    "classroomQueue": "File classroom",
+    "contact": "Contact",
+    "dashboard": "Tableau de bord",
+    "forParents": "Pour les parents",
+    "forTutors": "Pour les enseignants",
+    "helpRequests": "Demandes enseignant",
+    "home": "Accueil",
+    "howItWorks": "Fonctionnement",
+    "learn": "Apprendre",
+    "learningActivity": "Activité d’apprentissage",
+    "learningHistory": "Historique",
+    "login": "Connexion",
+    "logoHome": "Accueil STOA",
+    "mobilePrimary": "Navigation principale mobile",
+    "more": "Plus",
+    "onlineClassroom": "Online Classroom",
+    "overview": "Vue d’ensemble",
+    "parents": "Parents",
+    "practice": "S’entraîner",
+    "pricing": "Tarifs",
+    "primary": "Navigation principale",
+    "privacy": "Confidentialité",
+    "profile": "Profil",
+    "qa": "Q&R",
+    "questionBank": "Bibliotheque",
+    "referrals": "Invitations",
+    "reports": "Rapports",
+    "requests": "Demandes",
+    "short": {
+      "chat": "Question",
+      "dashboard": "Accueil",
+      "learn": "Apprendre",
+      "learningHistory": "Historique",
+      "onlineClassroom": "Classe",
+      "practice": "Exercices",
+      "questionBank": "Biblio"
+    },
+    "startLearning": "Commencer à apprendre",
+    "studentNavigationLabel": "Navigation de l'élève",
+    "support": "Aide",
+    "supportInbox": "Aide",
+    "terms": "Conditions",
+    "tutors": "Enseignants",
+    "users": "Élèves"
+  },
+  "nextStep": "Prochaine étape recommandée",
+  "notifications": {
+    "archive": "Archiver",
+    "connection": {
+      "checking": "Recherche de nouveautés",
+      "connecting": "Connexion",
+      "live": "À jour",
+      "offline": "Hors ligne",
+      "reconnecting": "Reconnexion"
+    },
+    "empty": "Aucune notification pour l’instant.",
+    "itemStatus": {
+      "archived": "Archivé",
+      "created": "Nouveau",
+      "read": "Lu"
+    },
+    "loading": "Chargement des notifications...",
+    "openLabel": "Notifications",
+    "openLabelUnread": "Notifications, {{count}} non lue(s)",
+    "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
+    "title": "Notifications",
+    "unavailable": "Les notifications ne sont pas disponibles.",
+    "unread": "{{count}} non lue(s)"
+  },
   "organizationHome": {
-    "title": "Organisation",
     "description": "L’apprentissage dans votre organisation et les exercices qui lui sont attribués.",
-    "pages": "Vos pages",
+    "learningAutomation": "Automatisation de l’apprentissage",
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices",
     "learningOperations": "Suivi de l’apprentissage",
     "learningOperationsDescription": "Signaux, achèvements et disponibilité des données par matière",
-    "learningAutomation": "Automatisation de l’apprentissage",
-    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices"
+    "pages": "Vos pages",
+    "title": "Organisation"
+  },
+  "roles": {
+    "admin": "Admin",
+    "organization_admin": "Admin organisation",
+    "parent": "Parent",
+    "school_teacher": "Enseignant scolaire",
+    "school_viewer": "Observateur scolaire",
+    "student": "Élève",
+    "teacher": "Enseignant",
+    "tutor": "Enseignant"
+  },
+  "status": {
+    "adminFeedback": {
+      "new": "Nouveau",
+      "resolved": "Résolu",
+      "reviewed": "Examiné"
+    },
+    "empty": "Rien à afficher pour le moment.",
+    "error": "Une erreur est survenue.",
+    "file": {
+      "failed": "Échec",
+      "parsed": "Prêt",
+      "processing": "En traitement",
+      "uploaded": "Téléversé"
+    },
+    "inProgress": "En cours",
+    "learningTopic": {
+      "developing": "En progression",
+      "stable": "Stable",
+      "strong": "Solide",
+      "weak": "À travailler"
+    },
+    "loading": "Chargement...",
+    "loadingAccount": "Chargement du compte…",
+    "pending": "En attente",
+    "plan": {
+      "family": "Formule famille",
+      "free_trial": "Essai gratuit",
+      "student": "Formule élève",
+      "teacher_supported": "Formule avec enseignant"
+    },
+    "priority": {
+      "high": "Élevée",
+      "low": "Faible",
+      "normal": "Normale",
+      "urgent": "Urgente"
+    },
+    "ready": "Prêt",
+    "resolved": "Résolu",
+    "subscription": {
+      "active": "Actif",
+      "expired": "Expiré",
+      "inactive": "Inactif",
+      "trial": "Essai"
+    },
+    "supportTicket": {
+      "in_review": "En examen",
+      "open": "Ouvert",
+      "resolved": "Résolu",
+      "waiting_on_user": "En attente de réponse"
+    },
+    "teacherHelp": {
+      "assigned": "Attribué",
+      "cancelled": "Annulé",
+      "in_progress": "En cours",
+      "pending": "En attente",
+      "resolved": "Terminé"
+    },
+    "unavailable": "Statut indisponible"
+  },
+  "studentRoutes": {
+    "ask": {
+      "title": "Question"
+    },
+    "chapter": {
+      "title": "Chapitre"
+    },
+    "home": {
+      "title": "Ta carte du ciel"
+    },
+    "lesson": {
+      "title": "Leçon"
+    },
+    "map": {
+      "title": "Carte du ciel"
+    },
+    "me": {
+      "title": "Ton compte"
+    },
+    "nebula": {
+      "title": "Nébuleuse"
+    },
+    "placeholder": {
+      "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même.",
+      "eyebrow": "Bientôt disponible"
+    },
+    "unit": {
+      "title": "Point de connaissance"
+    }
   }
 }

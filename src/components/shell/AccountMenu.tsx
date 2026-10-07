@@ -1,5 +1,5 @@
 import * as Menu from '@radix-ui/react-dropdown-menu'
-import { Check, ChevronRight, CircleHelp, CreditCard, Globe, KeyRound, LogOut, UserRound, type LucideIcon } from 'lucide-react'
+import { Check, ChevronRight, CircleHelp, CreditCard, Globe, KeyRound, LogOut, Plus, UserRound, Users, type LucideIcon } from 'lucide-react'
 import { createContext, useContext, useRef, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -7,6 +7,7 @@ import { navAreaForRole } from '@/app/router/routeManifest'
 import { Avatar, type AvatarSize } from '@/components/base/Avatar'
 import { ACCOUNT_MENU, ICON, TOUCH_TARGET } from '@/components/base/sizes'
 import { accountMenuFor } from '@/components/shell/accountMenuTargets'
+import { useHeldAccounts } from '@/hooks/auth/useHeldAccounts'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { languageNameKeys, useChangeLanguage } from '@/hooks/i18n/useChangeLanguage'
 import { supportedLanguages } from '@/i18n/languages'
@@ -80,6 +81,7 @@ export function AccountMenu({
   const user = useAuthStore((state) => state.user)
   const { signOut, isSigningOut } = useSignOut()
   const { current, changeLanguage } = useChangeLanguage()
+  const held = useHeldAccounts()
   const openedPage = useRef(false)
 
   if (!user) return null
@@ -166,6 +168,57 @@ export function AccountMenu({
                     </Menu.RadioItem>
                   ))}
                 </Menu.RadioGroup>
+              </Menu.SubContent>
+            </Menu.Portal>
+          </Menu.Sub>
+
+          {/* Switch account. Offered to everyone: holding more than one account
+            * is an ordinary need — a parent with their children's accounts, a
+            * shared computer — not the testing aid it began as. Only the
+            * accounts that have signed in on this browser appear, and only the
+            * session the server issued is kept. */}
+          <Menu.Sub>
+            <Menu.SubTrigger className={ITEM} style={itemStyle} data-account-switch>
+              <ItemBody icon={Users}>{t('accountMenu.switchAccount')}</ItemBody>
+              <ChevronRight aria-hidden="true" size={14} strokeWidth={2} className="shrink-0 text-tertiary" />
+            </Menu.SubTrigger>
+            <Menu.Portal>
+              <Menu.SubContent
+                sideOffset={6}
+                collisionPadding={8}
+                className={PANEL}
+                style={{ minWidth: ACCOUNT_MENU.width, maxWidth: 'calc(100vw - 16px)', borderRadius: 12 }}
+              >
+                {held.problem !== null && (
+                  <p role="alert" className="m-0 px-2.5 py-2 text-[13px] text-red">
+                    {t(held.problem === 'expired' ? 'accountMenu.switchExpired' : 'accountMenu.switchUnreachable')}
+                  </p>
+                )}
+                {held.sessions
+                  .filter((session) => session.email.toLowerCase() !== user.email.toLowerCase())
+                  .map((session) => (
+                    <Menu.Item
+                      key={session.email}
+                      className={ITEM}
+                      style={itemStyle}
+                      disabled={held.busy}
+                      onSelect={(event) => {
+                        // The switch reloads the page; letting the menu close
+                        // first would unmount the handler mid-flight.
+                        event.preventDefault()
+                        void held.switchTo(session)
+                      }}
+                    >
+                      <Avatar name={session.name} size={26} />
+                      <span className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate">{session.name}</span>
+                        <span className="truncate text-[12px] text-caption">{t(`roles.${session.role}`)}</span>
+                      </span>
+                    </Menu.Item>
+                  ))}
+                <LinkItem to="/login?add=1" icon={Plus}>
+                  {t('accountMenu.addAccount')}
+                </LinkItem>
               </Menu.SubContent>
             </Menu.Portal>
           </Menu.Sub>

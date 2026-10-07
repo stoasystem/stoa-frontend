@@ -23,7 +23,7 @@ export function useRegisterMutation(options: { redirect?: boolean } = {}) {
       if (data.verificationStatus === 'pending_review' || emailVerificationRequired) {
         clearAuth()
       } else {
-        setAuth(data.user, data.accessToken)
+        setAuth(data.user, data.accessToken, data.refreshToken)
       }
       trackEvent('user_register', { role: data.user.role, userId: data.user.id })
       if (data.verificationStatus === 'pending_review') {

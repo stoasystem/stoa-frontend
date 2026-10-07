@@ -58,13 +58,23 @@ describe('switching between the test roles', () => {
     expect(screen.getByRole('button', { name: /student/i })).toBeInTheDocument()
   })
 
-  it('refuses to hold a session for anyone outside the test accounts', () => {
+  it('holds a session for an ordinary account too', () => {
+    // Switching accounts used to be a testing aid gated on a test address.
+    // It is a feature of the account menu now: a parent with two children's
+    // accounts, a shared family computer. What is held is still only the
+    // session the server issued, never a password.
     rememberSession({
       email: 'a.real.parent@gmail.com',
       role: 'parent',
       name: 'Real',
       accessToken: 'token',
     })
+
+    expect(readSessions().map((entry) => entry.email)).toEqual(['a.real.parent@gmail.com'])
+  })
+
+  it('refuses one with no address to hold it under', () => {
+    rememberSession({ email: '  ', role: 'parent', name: 'Nobody', accessToken: 'token' })
 
     expect(readSessions()).toEqual([])
   })

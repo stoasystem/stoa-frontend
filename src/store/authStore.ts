@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { forgetRefreshToken, rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
@@ -81,7 +82,7 @@ type AuthState = {
   user: CurrentUser | null
   accessToken: string | null
   isAuthenticated: boolean
-  setAuth: (user: CurrentUser, accessToken: string) => void
+  setAuth: (user: CurrentUser, accessToken: string, refreshToken?: string) => void
   setUser: (user: CurrentUser) => void
   clearAuth: () => void
   hydrateFromStorage: () => void
@@ -94,7 +95,10 @@ export const useAuthStore = create<AuthState>((set) => {
     user: null,
     accessToken: storedToken,
     isAuthenticated: Boolean(storedToken),
-    setAuth: (user, accessToken) => {
+    setAuth: (user, accessToken, refreshToken) => {
+      // Undefined means "unchanged", not "none": a refresh hands back a new
+      // access token and keeps the refresh token it already had.
+      rememberRefreshToken(refreshToken)
       if (tabToken()) {
         pinTabToSession(accessToken)
       } else {
@@ -106,6 +110,7 @@ export const useAuthStore = create<AuthState>((set) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
+      forgetRefreshToken()
       // Only the session this tab is using ends. A pinned tab's sign-out
       // revokes its own token; the shared one belongs to whichever account the
       // rest of the browser is signed into and was never revoked, unless it is

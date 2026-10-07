@@ -64,22 +64,31 @@ export function adoptSwitcherOptInFromUrl(): void {
 /**
  * Whether a session for this address may be held in this browser.
  *
- * The domain rule remains the default, so nothing changes for a browser that
- * never opted in. Once one has, that rule would only mean the accounts an
- * administrator actually opened cannot be tested, since those carry ordinary
- * addresses.
+ * Every address may. Holding more than one account was a testing aid behind
+ * `?roleswitcher=on`, but it is an ordinary thing to need: a parent with two
+ * children's accounts beside their own, a teacher who also has a personal
+ * account, anyone on a shared family computer. The switcher is a feature of
+ * the account menu now, so the rule it was gated by is gone.
+ *
+ * What has not changed is what is held: the session the server already issued,
+ * never a password, and only for an account that signed in on this browser.
  */
 export function accountMayBeHeld(email: string | undefined | null): boolean {
-  return switcherEnabledHere() || isTestAccount(email)
+  return String(email ?? '').trim().length > 0
 }
 
-export type DevSession = {
+export type HeldSession = {
   email: string
   role: string
   name: string
   accessToken: string
+  /** So a held account outlives its access token the way the open one does. */
+  refreshToken?: string
   savedAt: string
 }
+
+/** @deprecated The name from when this was a testing aid. */
+export type DevSession = HeldSession
 
 export function isTestAccount(email: string | undefined | null): boolean {
   return TEST_ACCOUNT_PATTERN.test(String(email ?? '').trim())
