@@ -156,7 +156,10 @@ const catalog = {
 }
 
 const challenge = (id: string, rest: Partial<PracticeLesson['challenges'][number]>) => ({
-  id,
+  // `challengeId`, because that is what the backend sends. These fixtures said
+  // `id`, the type agreed with them, and every answer in production went to
+  // `/practice/challenges/undefined/answer`.
+  challengeId: id,
   lessonId: 'l-2',
   unitId: 'u-5',
   subjectId: 'math',

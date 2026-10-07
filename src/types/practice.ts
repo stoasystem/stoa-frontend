@@ -76,7 +76,14 @@ export type PracticeRoadmap = {
 }
 
 export type PracticeChallenge = {
-  id: string
+  /**
+   * What `GET /practice/lessons/:id` actually calls it. It was declared as
+   * `id` here, which is not a field the backend sends: every answer went to
+   * `/practice/challenges/undefined/answer` and came back 404, so no student
+   * could answer anything. The fixtures used `id` too, so 2438 tests stayed
+   * green over it.
+   */
+  challengeId: string
   lessonId: string
   unitId: string
   subjectId: string
