@@ -51,7 +51,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const completeLesson = useCompleteLessonMutation()
   const hintMutation = usePracticeHintMutation()
   const challenges = useMemo(() => lesson?.challenges ?? [], [lesson?.challenges])
-  const ids = useMemo(() => challenges.map((item) => item.id), [challenges])
+  const ids = useMemo(() => challenges.map((item) => item.challengeId), [challenges])
 
   // The lesson's queue, the exercises answered right, and those skipped.
   const [queue, setQueue] = useState<string[]>(ids)
@@ -69,20 +69,20 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
   const finishing = useRef(false)
 
   const onScreen = quiz ? quiz.queue[0] : queue[0]
-  const challenge = failed || finished ? undefined : challenges.find((item) => item.id === onScreen)
+  const challenge = failed || finished ? undefined : challenges.find((item) => item.challengeId === onScreen)
   const last = quiz ? quiz.queue.length <= 1 : queue.length <= 1
   const answered = Array.isArray(state.answer) ? state.answer.length > 0 : state.answer.trim().length > 0
-  const hintForChallenge = !quiz && hint && challenge && hint.challengeId === challenge.id ? hint.hint : null
-  const wrong = tries && challenge && tries.challengeId === challenge.id ? tries.wrong : 0
+  const hintForChallenge = !quiz && hint && challenge && hint.challengeId === challenge.challengeId ? hint.hint : null
+  const wrong = tries && challenge && tries.challengeId === challenge.challengeId ? tries.wrong : 0
   // Only skipped exercises are left: the quiz is offered instead of skipping again.
   const quizOffered = !quiz && !failed && !finished && queue.length > 0 && queue.every((id) => skipped.includes(id))
 
   const check = useCallback(async () => {
     if (!challenge || !answered || submitAnswer.isPending) return
-    const feedback = await submitAnswer.mutateAsync({ challengeId: challenge.id, payload: { answer: state.answer } })
+    const feedback = await submitAnswer.mutateAsync({ challengeId: challenge.challengeId, payload: { answer: state.answer } })
     if (!feedback.correct) {
       if (quiz) setQuiz({ ...quiz, mistakes: quiz.mistakes + 1 })
-      else setTries({ challengeId: challenge.id, wrong: wrong + 1 })
+      else setTries({ challengeId: challenge.challengeId, wrong: wrong + 1 })
     }
     dispatch({ type: 'feedback', feedback })
   }, [answered, challenge, quiz, state.answer, submitAnswer, wrong])
@@ -94,10 +94,10 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
       gradeLevel: lesson.gradeLevel,
       topicId: lesson.topicId,
       lessonId: lesson.id,
-      challengeId: challenge.id,
+      challengeId: challenge.challengeId,
       answer: state.answer,
     })
-    setHint({ challengeId: challenge.id, hint: response })
+    setHint({ challengeId: challenge.challengeId, hint: response })
     dispatch({ type: 'hint' })
   }, [challenge, hintMutation, lesson, quiz, state.answer])
 
@@ -131,7 +131,7 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
           setFailed(quiz.kind)
           setQuiz(null)
         } else {
-          setQuiz({ ...quiz, queue: [...quiz.queue.slice(1), challenge.id] })
+          setQuiz({ ...quiz, queue: [...quiz.queue.slice(1), challenge.challengeId] })
         }
         dispatch({ type: 'reset' })
         return
@@ -146,22 +146,22 @@ export function useLessonRun(lesson: PracticeLesson | undefined, { testOut = fal
       return
     }
     if (!state.feedback.correct) return
-    const rest = queue.filter((id) => id !== challenge.id)
+    const rest = queue.filter((id) => id !== challenge.challengeId)
     if (rest.length === 0) {
       await finish()
       return
     }
     setQueue(rest)
-    setCorrect((done) => [...done, challenge.id])
-    setSkipped((list) => list.filter((id) => id !== challenge.id))
+    setCorrect((done) => [...done, challenge.challengeId])
+    setSkipped((list) => list.filter((id) => id !== challenge.challengeId))
     dispatch({ type: 'reset' })
   }, [challenge, finish, queue, quiz, state.feedback])
 
   /** No credit: the exercise goes to the back of the queue. Not in a quiz, nor once the quiz is offered. */
   const skip = useCallback(() => {
     if (!challenge || quiz || quizOffered || state.feedback?.correct) return
-    setQueue((list) => [...list.filter((id) => id !== challenge.id), challenge.id])
-    setSkipped((list) => (list.includes(challenge.id) ? list : [...list, challenge.id]))
+    setQueue((list) => [...list.filter((id) => id !== challenge.challengeId), challenge.challengeId])
+    setSkipped((list) => (list.includes(challenge.challengeId) ? list : [...list, challenge.challengeId]))
     dispatch({ type: 'reset' })
   }, [challenge, quiz, quizOffered, state.feedback?.correct])
 

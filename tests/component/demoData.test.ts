@@ -79,8 +79,8 @@ describe('the demo knowledge point’s chapter', () => {
         for (const challenge of lesson.challenges) {
           if (challenge.type === 'multiple_choice') expect(challenge.options).toContain(challenge.correctAnswer)
           if (challenge.type === 'ordering') expect([...(challenge.correctAnswer as string[])].sort()).toEqual([...challenge.options!].sort())
-          expect(demo.checkDemoAnswer(challenge.id, challenge.correctAnswer, language)?.correct).toBe(true)
-          expect(demo.demoHint(challenge.id, language)?.hint).toBe(challenge.hint)
+          expect(demo.checkDemoAnswer(challenge.challengeId, challenge.correctAnswer, language)?.correct).toBe(true)
+          expect(demo.demoHint(challenge.challengeId, language)?.hint).toBe(challenge.hint)
         }
       }
     }
@@ -94,12 +94,12 @@ describe('the demo knowledge point’s chapter', () => {
     const current = demoChapter.lessons.find((lesson) => lesson.id === roadmap.currentLessonId)!
     const first = current.challenges[0]
     const wrong = first.options!.find((option) => option !== first.correctAnswer)!
-    const missed = demo.checkDemoAnswer(first.id, wrong)!
+    const missed = demo.checkDemoAnswer(first.challengeId, wrong)!
     expect(missed).toMatchObject({ correct: false, feedback: first.incorrectFeedback, hint: first.hint })
-    expect(demo.checkDemoAnswer(first.id, first.correctAnswer)).toMatchObject({ correct: true, feedback: first.correctFeedback })
+    expect(demo.checkDemoAnswer(first.challengeId, first.correctAnswer)).toMatchObject({ correct: true, feedback: first.correctFeedback })
     // A text answer counts with a decimal comma, too.
     const decimal = current.challenges.find((challenge) => challenge.correctAnswer === '0.6')!
-    expect(demo.checkDemoAnswer(decimal.id, ' 0,6 ')?.correct).toBe(true)
+    expect(demo.checkDemoAnswer(decimal.challengeId, ' 0,6 ')?.correct).toBe(true)
 
     expect(demo.demoLessonResult(current.id)).toMatchObject({ lessonId: current.id, correctCount: current.challenges.length })
     const afterTwo = [...demoChapter.completed, current.id]

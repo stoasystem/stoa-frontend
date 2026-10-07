@@ -242,7 +242,7 @@ function challengeOf(spec: ExerciseSpec, lesson: number, exercise: number, langu
         ? spec.answer.map((index) => options![index])
         : localize(spec.answer, language)
   return {
-    id: challengeId(lesson, exercise),
+    challengeId: challengeId(lesson, exercise),
     lessonId: DEMO_KNOWLEDGE_POINT.lessons[lesson].lessonId,
     unitId,
     subjectId,

@@ -109,7 +109,7 @@ function lessonBody(lessonId: string) {
     status: statusOf(lessonId),
     estimatedMinutes: 10,
     challenges: Array.from({ length: meta.exercises }, (_, i) => ({
-      id: exerciseId(lessonId, i + 1),
+      challengeId: exerciseId(lessonId, i + 1),
       lessonId,
       unitId: 'u-5',
       subjectId: 'math',

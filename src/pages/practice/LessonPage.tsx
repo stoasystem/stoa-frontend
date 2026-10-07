@@ -55,7 +55,7 @@ export function LessonPage() {
   async function handleCheck() {
     if (!challenge) return
     const feedback = await submitAnswer.mutateAsync({
-      challengeId: challenge.id,
+      challengeId: challenge.challengeId,
       payload: { answer: state.answer },
     })
     dispatch({ type: 'feedback', feedback })
@@ -68,7 +68,7 @@ export function LessonPage() {
       gradeLevel: lesson.gradeLevel,
       topicId: lesson.topicId,
       lessonId: lesson.id,
-      challengeId: challenge.id,
+      challengeId: challenge.challengeId,
       answer: state.answer,
     })
     dispatch({ type: 'hint' })
@@ -87,7 +87,7 @@ export function LessonPage() {
       topicId: targetChallenge.topicId,
       unitId: targetChallenge.unitId,
       lessonId: lesson?.id ?? lessonId ?? '',
-      challengeId: targetChallenge.id,
+      challengeId: targetChallenge.challengeId,
       challengePrompt: targetChallenge.prompt,
       studentAnswer: formatPracticeAnswer(state.answer),
       correctAnswer: formatPracticeAnswer(targetChallenge.correctAnswer),
@@ -121,7 +121,7 @@ export function LessonPage() {
       gradeLevel: lesson.gradeLevel,
       topicId: lesson.topicId,
       lessonId: lesson.id,
-      challengeId: challenge.id,
+      challengeId: challenge.challengeId,
       message: `Student is still stuck on ${challenge.topic}.`,
       practiceContext: {
         source: 'practice',
@@ -130,7 +130,7 @@ export function LessonPage() {
         topicId: lesson.topicId,
         unitId: lesson.unitId,
         lessonId: lesson.id,
-        challengeId: challenge.id,
+        challengeId: challenge.challengeId,
         challengePrompt: challenge.prompt,
         topic: challenge.topic,
         studentAnswer: formatPracticeAnswer(state.answer),
