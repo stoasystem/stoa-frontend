@@ -34,7 +34,7 @@ gh pr create --base redesign/planet
 
 ```
 lint → typecheck → check:api-contract → check:untranslated → check:contrast
-→ test → test:release → publisher 测试 → build
+→ test → test:release → publisher 测试 → build → dist e2e
 ```
 
 **工作流文件必须已经在集成分支里，门禁才会跑。** GitHub 跑的是 PR 合并提交里的工作流，而 `main` 上（在
@@ -42,8 +42,9 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
 否则指向它的 PR 一个检查都不跑，也不会有任何提示。
 
 与 `deploy-production.yml` 的门同源（同样的 action 版本、Node 22、`npm ci` 参数，API 契约同样实时拉
-`stoa-backend` main 的路由清单）。dist e2e 在 [#29](https://github.com/stoasystem/stoa-frontend/issues/29)
-建好前**还没有接入**，工作流里留了占位。
+`stoa-backend` main 的路由清单）。dist e2e（[#29](https://github.com/stoasystem/stoa-frontend/issues/29)）打刚 build 出来的 dist，后端是 mock，
+每个 mock 的响应和页面发出的每个请求体都按后端 OpenAPI 校验；OpenAPI 从 `stoa-backend` main 实时拉取
+（[stoa-backend#80](https://github.com/stoasystem/stoa-backend/issues/80)）。用法和盲区见 `tests/e2e-dist/README.md`。
 
 门禁的已知缺口：
 - API 契约只查路径与方法，不查响应字段（决议 #5 第 9 条）。星球读模型与异步 Ask 要单独做契约验证。
@@ -64,6 +65,20 @@ lint → typecheck → check:api-contract → check:untranslated → check:contr
   达标就 exit 1，要求删掉豁免。现在只剩 `--on-sky-text-muted`（仅限禁用、不可交互控件的标签）一对豁免。
   旧页面用的 `--stoa-brand-*`、`--platform-*` 等旧名在 `src/styles/legacy-bridge.css` 里映射到新 token，门禁不读
   那个文件，它也不许定义画布 token 名。JSX 里的内联颜色门禁看不到。
+
+## 预览发布
+
+`.github/workflows/deploy-preview.yml`（#28）在 push 到 `redesign/planet` 时把它发到
+`https://app-planet.stoaedu.ch`。映射只有一项：`redesign/planet` → Environment `preview-planet` → 预览 bucket /
+分发（从该 Environment 的 variables `PREVIEW_BUCKET`、`PREVIEW_DISTRIBUTION_ID` 读）。先跑与生产同样的门禁
+（外加 `check:contrast`），再用 OIDC 扮演 `stoa-github-frontend-preview` 发布。
+
+- 两道分支检查：job 级 `if` 限定 `refs/heads/redesign/planet`，以及 Environment 的部署分支规则。AWS 那边的
+  信任策略只认 `environment:preview-planet` 这个 subject（stoa-infra#2）。
+- 变量缺失、格式不对，或者填成了生产 bucket / 分发，工作流在拿凭据之前就失败：publisher 在参数为空时会退回生产默认值。
+- 每个目标一个并发组，不取消进行中的发布。
+- `workflow_dispatch` 同样要等文件进了默认分支才能用（见上面门禁的已知缺口），而且手动触发不接受目标输入。
+- 结构测试在 `tests/release/publish-web-release.test.mjs`，随 publisher 测试一起跑。
 
 ## 翻译守卫：新目录要登记
 
