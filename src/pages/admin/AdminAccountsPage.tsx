@@ -1,5 +1,7 @@
 import { Fragment, useMemo, useState } from 'react'
+import { ClipboardList } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Group, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -214,6 +216,16 @@ export function AdminAccountsPage() {
           description={t('accounts.description')}
           actions={<Badge variant="secondary">{t('accounts.total', { count: rows.length })}</Badge>}
         />
+
+        {/* Users holds account operations too (#13 point 6): the second page of the item. */}
+        <Group>
+          <Row
+            to="/admin/account-operations"
+            leading={{ kind: 'icon', icon: ClipboardList }}
+            title={t('accounts.operations')}
+            subtitle={t('accounts.operationsDescription')}
+          />
+        </Group>
 
         <Card className="mb-4">
           <CardHeader>

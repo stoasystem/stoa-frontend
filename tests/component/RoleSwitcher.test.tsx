@@ -226,7 +226,9 @@ describe('switching between the test roles', () => {
     expect(getDefaultRouteForRole('parent')).toBe('/parent')
     expect(getDefaultRouteForRole('teacher')).toBe('/tutor')
     expect(getDefaultRouteForRole('admin')).toBe('/admin')
-    expect(getDefaultRouteForRole('student')).toBe('/chat')
+    // The root is the student's own home since #45: the router decides there
+    // from the account it loads, so it cannot land a student on /forbidden.
+    expect(getDefaultRouteForRole('student')).toBe('/')
   })
 
   it('recognises which addresses are test accounts', () => {
@@ -297,7 +299,12 @@ describe('a tab holding its own role', () => {
       handlers: { rejected: (error: unknown) => Promise<unknown> }[]
     }).handlers
 
-    await expect(handlers[0].rejected({ response: { status: 401 } })).rejects.toBeTruthy()
+    await expect(
+      handlers[0].rejected({
+        response: { status: 401 },
+        config: { url: '/auth/me', headers: { Authorization: 'Bearer this-tab-only' } },
+      }),
+    ).rejects.toBeTruthy()
 
     expect(tabToken()).toBeNull()
     expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
@@ -320,7 +327,12 @@ describe('a tab holding its own role', () => {
       handlers: { rejected: (error: unknown) => Promise<unknown> }[]
     }).handlers
 
-    await expect(handlers[0].rejected({ response: { status: 401 } })).rejects.toBeTruthy()
+    await expect(
+      handlers[0].rejected({
+        response: { status: 401 },
+        config: { url: '/auth/me', headers: { Authorization: 'Bearer the-shared-one' } },
+      }),
+    ).rejects.toBeTruthy()
 
     expect(localStorage.getItem('stoa_access_token')).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)

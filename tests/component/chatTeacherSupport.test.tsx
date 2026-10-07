@@ -75,7 +75,7 @@ function Location() {
 // this was the one way left into it - a student whose teacher had joined was
 // offered "start video classroom", which led to /classroom/..., a 404.
 describe('teacher support in a conversation', () => {
-  it('offers no way into the withdrawn video classroom once a teacher has joined', async () => {
+  it('offers no way into the withdrawn video classroom, and no local "teacher joined" confirm', async () => {
     render(
       <QueryClientProvider client={new QueryClient()}>
         <MemoryRouter initialEntries={['/chat']}>
@@ -88,9 +88,10 @@ describe('teacher support in a conversation', () => {
 
     await userEvent.click(screen.getAllByRole('button', { name: /Brüche/ })[0])
     await userEvent.click(await screen.findByRole('button', { name: 'teacher.cta' }))
-    await userEvent.click(await screen.findByRole('button', { name: 'tutorEscalation.confirmJoined' }))
 
-    expect(await screen.findByText('tutorEscalation.joinedTitle')).toBeInTheDocument()
+    expect(await screen.findByText('tutorEscalation.requestedTitle')).toBeInTheDocument()
+    // Whether a teacher joined is the server's to say (#12 point 2).
+    expect(screen.queryByRole('button', { name: 'tutorEscalation.confirmJoined' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /startClassroom|preparingLobby/ })).not.toBeInTheDocument()
     expect(document.querySelector('a[href^="/classroom"]')).toBeNull()
     expect(screen.getByTestId('location')).not.toHaveTextContent('/classroom')

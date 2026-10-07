@@ -1,0 +1,95 @@
+/*
+ * The star map's only CSS animation: the recommended star breathing in the
+ * star layer's SVG glyph (#11 point 6: CSS animation only on the third layer;
+ * #72 point 6: only the recommended star breathes). The canvas breathes from
+ * JS. Reduced motion holds the star still.
+ */
+@keyframes starmap-breathe {
+  0%,
+  100% {
+    opacity: 0.82;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes starmap-halo {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+[data-starmap-breathe] .starmap-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: starmap-breathe 3.4s ease-in-out infinite;
+}
+
+[data-starmap-breathe] .starmap-halo {
+  animation: starmap-halo 3.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-starmap-breathe] .starmap-star,
+  [data-starmap-breathe] .starmap-halo {
+    animation: none;
+  }
+}
+
+/* A star's link sits over its glyph: invisible until it has keyboard focus. */
+.starmap-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  outline: none;
+}
+
+.starmap-link:focus-visible {
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset, 2px);
+}
+
+/*
+ * A nebula's link: nothing to see until it has keyboard focus, then a name
+ * pill on glass by its own nebula (placed by nebulaFocusSpot), clear of the
+ * page's controls.
+ */
+.starmap-nebula-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: inline-flex;
+  align-items: center;
+  width: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+  clip-path: inset(50%);
+  pointer-events: none;
+}
+
+.starmap-nebula-link:focus,
+.starmap-nebula-link:focus-visible {
+  width: auto;
+  overflow: visible;
+  clip-path: none;
+  padding: 0 14px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 20px;
+  border-radius: 10px;
+  background: var(--sky-glass);
+  color: var(--on-sky-text);
+  font-size: 15px;
+  font-weight: 600;
+  outline: var(--focus-ring-width, 2px) solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset, 2px);
+}

@@ -20,14 +20,17 @@ vi.mock('@/components/auth/LoginForm', () => ({
 import { useAuthStore } from '@/store/authStore'
 import { EntryPage } from '@/pages/entry/EntryPage'
 
+// Since #45 the root is the student's star map, and the router shows EntryPage
+// there only to a visitor who is not a student (routeGuards.test.tsx). The
+// entry page itself is exercised at /login, where it always renders.
 function renderAt() {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={['/login']}>
         <Routes>
-          <Route path="/" element={<EntryPage />} />
-          <Route path="/chat" element={<p>the student app</p>} />
+          <Route path="/login" element={<EntryPage />} />
+          <Route path="/" element={<p>the student app</p>} />
           <Route path="/parent" element={<p>the parent app</p>} />
           <Route path="/tutor" element={<p>the teacher app</p>} />
         </Routes>
@@ -73,7 +76,7 @@ describe('arriving at the app domain', () => {
         <MemoryRouter initialEntries={['/login']}>
           <Routes>
             <Route path="/login" element={<EntryPage />} />
-            <Route path="/chat" element={<p>the student app</p>} />
+            <Route path="/" element={<p>the student app</p>} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>,

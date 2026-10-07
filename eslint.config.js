@@ -12,7 +12,8 @@ export default tseslint.config(
     // `tests/e2e` holds no suite any more (card 024). The one file left is a
     // source the Phase 476 sandbox evidence chain digests, kept because deleting
     // it breaks that chain - not something to run, type-check or lint.
-    ignores: ['dist', 'node_modules', 'backend', '.claude', 'tests/e2e'],
+    // `.e2e-dist` is the dist e2e's published copy of dist (#29): built code, not ours to lint.
+    ignores: ['dist', 'dist-bench', 'node_modules', 'backend', '.claude', 'tests/e2e', '.e2e-dist'],
   },
   {
     files: [

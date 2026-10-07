@@ -1,54 +1,73 @@
+import { matchPath } from 'react-router-dom'
+import { isAdmitted } from '@/app/router/routeAccess'
+import {
+  CHANGE_PASSWORD_PATH,
+  FORBIDDEN_PATH,
+  UNAUTHORIZED_PATH,
+  legacyRedirects,
+  navAreaForRole,
+  pageRoutes,
+  LOGIN_PATH,
+  roleHomePaths,
+} from '@/app/router/routeManifest'
 import type { UserRole } from '@/types/user'
 
 // The one screen an account under a forced password change can still use.
-export const CHANGE_PASSWORD_PATH = '/settings/password'
+export { CHANGE_PASSWORD_PATH }
 
+/** Where a signed-in account starts: its role's home in the route manifest. */
 export function getDefaultRouteForRole(role: UserRole) {
-  switch (role) {
-    case 'student':
-      return '/chat'
-    case 'parent':
-      return '/parent'
-    case 'teacher':
-      return '/tutor'
-    case 'admin':
-      return '/admin'
-    case 'organization_admin':
-    case 'school_teacher':
-    case 'school_viewer':
-      return '/organization'
-    default:
-      return '/chat'
-  }
+  return roleHomePaths[navAreaForRole(role)]
 }
 
 export function canAccessRoute(role: UserRole, allowedRoles: UserRole[]) {
   return allowedRoles.includes(role)
 }
 
-// Where a deep link may send each role once it has signed in. Anything else,
-// and anything that is not a same-origin path, falls back to the role's home.
-// Every /practice route sits under the student RoleRoute; the signed-out
-// "start practising" link (src/lib/navigation.ts) points there.
-const roleNextPathPrefixes: Record<UserRole, readonly string[]> = {
-  student: ['/chat', '/learn', '/practice', '/profile'],
-  parent: ['/parent', '/billing', '/support'],
-  teacher: ['/tutor', '/support', '/teacher-activate'],
-  admin: ['/admin'],
-  organization_admin: ['/organization'],
-  school_teacher: ['/organization'],
-  school_viewer: ['/organization'],
+/**
+ * Manifest entries a sign-in never returns to, by their pattern:
+ * - `*`, the public catch-all: it matches every path, so it would admit them all;
+ * - the password change: an account under a forced change is sent there first
+ *   anyway (getPostLoginPath), and any other account has no reason to be;
+ * - the sign-in itself and the two refusal pages: nothing to go back to.
+ */
+const NOT_A_DESTINATION: ReadonlySet<string> = new Set([
+  '*',
+  CHANGE_PASSWORD_PATH,
+  LOGIN_PATH,
+  FORBIDDEN_PATH,
+  UNAUTHORIZED_PATH,
+])
+
+function destinations() {
+  return [
+    ...pageRoutes.map((route) => ({ pattern: route.path, access: route.access })),
+    ...legacyRedirects.map((redirect) => ({ pattern: redirect.from, access: redirect.access })),
+  ].filter((entry) => !NOT_A_DESTINATION.has(entry.pattern))
 }
 
 function isSafePath(path: unknown): path is string {
   return typeof path === 'string' && path.startsWith('/') && !path.startsWith('//')
 }
 
-function canUseNextPathForRole(pathname: string, role: UserRole) {
-  // A role missing from the table (a session stored before it existed) gets
-  // its home, rather than an exception in the middle of rendering the login.
-  const prefixes: readonly string[] | undefined = roleNextPathPrefixes[role]
-  return prefixes?.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)) ?? false
+/**
+ * Whether a normalised pathname (no query, no hash) is a page or legacy entry
+ * of the route manifest that admits the role: where a deep link may send it
+ * once it has signed in. Anything else falls back to the role's home.
+ *
+ * Read from the manifest itself (#82), with the router's own matching (react-
+ * router's `matchPath`, case-insensitive as the routes are), so a page added
+ * for a role is a destination for it at once and a path no route has is not.
+ */
+export function canUseNextPathForRole(pathname: string, role: UserRole) {
+  // A role the manifest has no home for (a session stored before it existed)
+  // gets none of the public pages either, and no exception mid-render.
+  // Own properties only: `constructor` or `toString` is not a role with a home.
+  if (!Object.prototype.hasOwnProperty.call(roleHomePaths, navAreaForRole(role))) return false
+  const account = { role }
+  return destinations().some(
+    ({ pattern, access }) => matchPath({ path: pattern, end: true }, pathname) !== null && isAdmitted(access, account, true),
+  )
 }
 
 /**
@@ -57,7 +76,7 @@ function canUseNextPathForRole(pathname: string, role: UserRole) {
  * The prefix test runs on the pathname the browser would actually load, after
  * parsing: a query or hash no longer hides a permitted page (`/teacher-activate?
  * token=…`), and dot segments or backslashes cannot walk out of one
- * (`/chat/../admin`, `/\evil.example`).
+ * (`/map/../admin`, `/\evil.example`).
  */
 function resolveDestination(path: unknown, role: UserRole): string | null {
   if (!isSafePath(path)) return null
@@ -98,5 +117,7 @@ export function getPostLoginPath(
     if (back) return back
   }
 
-  return getDefaultRouteForRole(user.role)
+  // A role the manifest has no home for is refused outright; left undefined,
+  // the redirect would resolve to wherever an empty path happens to point.
+  return (getDefaultRouteForRole(user.role) as string | undefined) ?? FORBIDDEN_PATH
 }

@@ -27,7 +27,7 @@ export function QuestionAnswerInput({
             type="button"
             onClick={() => onChange(option)}
             className={cn(
-              'flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+              'flex w-full items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors',
               selected === option
                 ? 'border-primary bg-[hsl(var(--stoa-brand-burgundy-soft))] text-foreground'
                 : 'border-border/80 bg-card hover:border-primary/35',

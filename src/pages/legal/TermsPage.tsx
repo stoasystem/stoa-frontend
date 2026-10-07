@@ -8,7 +8,7 @@ import { MarketingLayout } from '@/layouts/MarketingLayout'
 /* Card 007: the subscriptions section is withdrawn while billing is frozen.
  * Its copy is kept in `legal.json` in all four languages; only its place in
  * this list is taken out, the same way the billing routes are withdrawn in
- * `AppRouter.tsx`. To unfreeze, put 'subscriptions' back before
+ * `routeManifest.ts`. To unfreeze, put 'subscriptions' back before
  * 'serviceChanges'.
  */
 const sectionKeys = ['learningSupport', 'accuracy', 'acceptableUse', 'serviceChanges'] as const
@@ -24,7 +24,6 @@ export function TermsPage() {
           eyebrow={t('terms.eyebrow')}
           title={t('terms.title')}
           description={t('terms.description')}
-          titleClassName="editorial-heading editorial-title-shell max-w-3xl text-4xl leading-tight md:text-6xl"
         />
         <div className="space-y-4">
           {sectionKeys.map((sectionKey) => (

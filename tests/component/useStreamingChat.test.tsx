@@ -40,6 +40,9 @@ import {
 } from '@/services/chat/chatStreamApi'
 import { ApiError } from '@/services/api/httpClient'
 import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStreamingChat'
+import { clearPendingMessages, PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
+import { trackEvent } from '@/services/analytics/analyticsClient'
+import { commandMessageIds } from '@/services/chat/commandMessageIds'
 
 const mockedStream = vi.mocked(streamConversationMessage)
 const mockedProgress = vi.mocked(getGenerationProgress)
@@ -473,5 +476,77 @@ describe('the conversation shown', () => {
     )
 
     expect(merged.map((message) => [message.id, message.status])).toEqual([['s-1', 'failed']])
+  })
+})
+
+// #34: the question is A's. Once A has signed out of the tab, nothing of it may
+// be written back or sent, even if its attempt is still running.
+describe('a message whose sender signed out meanwhile', () => {
+  afterEach(() => {
+    vi.clearAllMocks()
+    sessionStorage.clear()
+    localStorage.clear()
+  })
+
+  function signOutAndLetBeaIn() {
+    clearPendingMessages()
+    localStorage.setItem('stoa_access_token', 'token-b')
+  }
+
+  it('is neither kept in the tab nor sent once its ids are ready', async () => {
+    localStorage.setItem('stoa_access_token', 'token-a')
+    let idsReady: () => void = () => {}
+    vi.mocked(commandMessageIds).mockImplementationOnce(
+      (conversationId, key) =>
+        new Promise((resolve) => {
+          idsReady = () =>
+            resolve({
+              studentMessageId: `student:${conversationId}:${key}`,
+              assistantMessageId: `assistant:${conversationId}:${key}`,
+            })
+        }),
+    )
+    mockedStream.mockImplementationOnce(() => new Promise<StreamOutcome>(() => {}))
+    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    const { result } = render()
+    act(() => {
+      void result.current.sendStreamingMessage({ content: "A's question" })
+    })
+
+    signOutAndLetBeaIn()
+    await act(async () => {
+      idsReady()
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    })
+
+    expect(Object.keys(sessionStorage).filter((key) => key.startsWith(PENDING_MESSAGE_KEY_PREFIX))).toEqual([])
+    expect(mockedStream).not.toHaveBeenCalled()
+    expect(result.current.localMessages).toEqual([])
+  })
+
+  it('does not report its answer under the next session', async () => {
+    localStorage.setItem('stoa_access_token', 'token-a')
+    let finish: () => void = () => {}
+    mockedStream.mockImplementationOnce(
+      () => new Promise<StreamOutcome>((resolve) => {
+        finish = () => resolve('streamed')
+      }),
+    )
+    mockedProgress.mockResolvedValue(state({ status: 'ai_running' }))
+    const { result } = render()
+    act(() => {
+      void result.current.sendStreamingMessage({ content: "A's question" })
+    })
+    await waitFor(() => expect(mockedStream).toHaveBeenCalled())
+    vi.mocked(trackEvent).mockClear()
+
+    signOutAndLetBeaIn()
+    await act(async () => {
+      finish()
+      await new Promise((resolve) => setTimeout(resolve, 20))
+    })
+
+    expect(trackEvent).not.toHaveBeenCalled()
+    expect(Object.keys(sessionStorage).filter((key) => key.startsWith(PENDING_MESSAGE_KEY_PREFIX))).toEqual([])
   })
 })

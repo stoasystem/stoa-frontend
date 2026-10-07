@@ -1,0 +1,90 @@
+name: Redesign Branch Gate
+
+# Runs on every pull request into a redesign integration branch, and on the
+# pull request that merges an integration branch back into main (#85): main
+# has no PR gate of its own, and deploy-production only checks after the push.
+# A PR only runs this when its merge commit carries this file, so hotfix PRs
+# cut from main are untouched until the redesign lands. It only checks; it
+# never builds a release for anyone, holds no secrets and talks to no cloud
+# account. Publishing a preview lives in its own workflow (#28).
+
+on:
+  pull_request:
+    # edited is included so retargeting an open PR onto an integration branch
+    # starts a run instead of waiting for the next push.
+    types: [opened, synchronize, reopened, edited]
+    branches:
+      - redesign/planet
+      - redesign/cute
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: redesign-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: Redesign gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Check out frontend
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version: 22
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: API contract guard
+        run: |
+          curl -fsSL -o /tmp/route-inventory.json \
+            https://raw.githubusercontent.com/stoasystem/stoa-backend/main/docs/security/route-authorization-inventory.json
+          npm run check:api-contract -- --inventory /tmp/route-inventory.json
+
+      - name: Translation guard
+        run: npm run check:untranslated
+
+      # Rates the token pairs in scripts/contrast-pairs.json against the token
+      # file it names (#17). Reads two repo files; no network, no secrets.
+      - name: Contrast guard
+        run: npm run check:contrast
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Release contract tests
+        run: npm run test:release
+
+      - name: Publisher tests
+        run: node --test tests/release/publish-web-release.test.mjs
+
+      - name: Build
+        run: npm run build
+
+      # Playwright against the dist just built, with the backend mocked (#29).
+      # Every mocked reply and every request the page sends is checked against
+      # the backend's OpenAPI document, read from stoa-backend main like the
+      # route inventory above (stoasystem/stoa-backend#80). Nothing else leaves
+      # the runner: the app and the API are answered inside the browser.
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Dist e2e
+        run: npm run test:e2e:dist

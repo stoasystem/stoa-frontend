@@ -30,6 +30,7 @@ npm run lint         # eslint . --max-warnings=0，零容忍
 npm run typecheck    # tsc -b
 npm test             # vitest run
 npm run test:smoke   # playwright，打真部署，需要 STOA_SMOKE_PASSWORD
+npm run test:e2e:dist  # playwright，打本地 dist、mock 后端按 OpenAPI 校验；先 build，见 tests/e2e-dist/README.md
 npm run build        # tsc -b && vite build
 ```
 
@@ -48,6 +49,9 @@ npm run check:untranslated   # 未翻译文案的棘轮，基线在 scripts/untr
 
 API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取路由清单。所以涉及
 接口变更时，先推后端再推前端，否则这道门会拦下来。
+
+改版在集成分支 `redesign/planet` / `redesign/cute` 上进行，不直接进 `main`，
+分支命名与门禁见 `docs/agents/redesign-branches.md`。
 
 ## 目录约定
 

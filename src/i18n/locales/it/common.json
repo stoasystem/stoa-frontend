@@ -53,7 +53,16 @@
     "about": "Chi è STOA",
     "studentNavigationLabel": "Navigazione dello studente",
     "primary": "Navigazione principale",
-    "mobilePrimary": "Navigazione principale mobile"
+    "mobilePrimary": "Navigazione principale mobile",
+    "logoHome": "Home di STOA",
+    "administration": "Amministrazione",
+    "admin": {
+      "users": "Utenti",
+      "teacherApplications": "Candidature dei docenti",
+      "curriculum": "Programma",
+      "moderation": "Moderazione",
+      "system": "Sistema"
+    }
   },
   "actions": {
     "startLearning": "Inizia a studiare",
@@ -88,6 +97,7 @@
   },
   "language": {
     "label": "Lingua",
+    "current": "Lingua: {{language}} ({{code}})",
     "english": "English",
     "german": "Deutsch",
     "french": "Français",
@@ -161,7 +171,8 @@
       "new": "Nuovo",
       "reviewed": "Rivisto",
       "resolved": "Risolto"
-    }
+    },
+    "loadingAccount": "Caricamento dell’account…"
   },
   "notifications": {
     "title": "Notifiche",
@@ -170,7 +181,6 @@
     "loading": "Caricamento delle notifiche...",
     "unavailable": "Le notifiche non sono disponibili.",
     "empty": "Ancora nessuna notifica.",
-    "markRead": "Segna come letta",
     "archive": "Archivia",
     "openLabel": "Notifiche",
     "openLabelUnread": "Notifiche, {{count}} da leggere",
@@ -196,5 +206,80 @@
     "title": "Qualcosa è andato storto",
     "body": "Riprova o ricarica la pagina."
   },
-  "nextStep": "Prossimo passo consigliato"
+  "nextStep": "Prossimo passo consigliato",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Presto disponibile",
+      "body": "Questa schermata è in fase di rifacimento. Il link funziona già e resterà lo stesso."
+    },
+    "home": {
+      "title": "La tua mappa stellare"
+    },
+    "map": {
+      "title": "Mappa stellare"
+    },
+    "nebula": {
+      "title": "Nebulosa"
+    },
+    "unit": {
+      "title": "Punto di conoscenza"
+    },
+    "chapter": {
+      "title": "Capitolo"
+    },
+    "lesson": {
+      "title": "Lezione"
+    },
+    "ask": {
+      "title": "Domanda"
+    },
+    "me": {
+      "title": "Il tuo account"
+    }
+  },
+  "accountMenu": {
+    "open": "Account",
+    "help": "Aiuto e supporto",
+    "billing": "Fatturazione e pagamenti"
+  },
+  "composer": {
+    "attach": "Aggiungi una foto o un file",
+    "send": "Invia"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profilo",
+      "name": "Nome",
+      "email": "E-mail",
+      "managed": "Nome e indirizzo e-mail fanno parte del tuo account. Per modificarli, rivolgiti a un amministratore."
+    },
+    "language": {
+      "heading": "Lingua"
+    },
+    "notifications": {
+      "heading": "Notifiche",
+      "loading": "Caricamento delle impostazioni delle notifiche…",
+      "unavailable": "Le impostazioni delle notifiche non sono disponibili al momento.",
+      "saveFailed": "La modifica non è stata salvata. Riprova.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Risposte degli insegnanti",
+          "body": "Nella campanella, quando un insegnante prende in carico la tua domanda o risponde"
+        }
+      }
+    },
+    "password": {
+      "heading": "Password",
+      "again": "Cambiala di nuovo"
+    }
+  },
+  "organizationHome": {
+    "title": "Organizzazione",
+    "description": "L’apprendimento nella tua organizzazione e gli esercizi assegnati.",
+    "pages": "Le tue pagine",
+    "learningOperations": "Gestione dell’apprendimento",
+    "learningOperationsDescription": "Segnali, completamenti e disponibilità dei dati per materia",
+    "learningAutomation": "Automazione dell’apprendimento",
+    "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi"
+  }
 }

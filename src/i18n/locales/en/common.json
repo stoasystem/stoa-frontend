@@ -53,7 +53,16 @@
     "about": "About STOA",
     "studentNavigationLabel": "Student navigation",
     "primary": "Primary",
-    "mobilePrimary": "Mobile primary"
+    "mobilePrimary": "Mobile primary",
+    "logoHome": "STOA home",
+    "administration": "Administration",
+    "admin": {
+      "users": "Users",
+      "teacherApplications": "Teacher applications",
+      "curriculum": "Curriculum",
+      "moderation": "Moderation",
+      "system": "System"
+    }
   },
   "actions": {
     "startLearning": "Start learning",
@@ -88,6 +97,7 @@
   },
   "language": {
     "label": "Language",
+    "current": "Language: {{language}} ({{code}})",
     "english": "English",
     "german": "Deutsch",
     "french": "Français",
@@ -161,7 +171,8 @@
       "new": "New",
       "reviewed": "Reviewed",
       "resolved": "Resolved"
-    }
+    },
+    "loadingAccount": "Loading account…"
   },
   "notifications": {
     "title": "Notifications",
@@ -170,7 +181,6 @@
     "loading": "Loading notifications...",
     "unavailable": "Notifications are unavailable.",
     "empty": "No notifications yet.",
-    "markRead": "Mark read",
     "archive": "Archive",
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} unread",
@@ -196,5 +206,80 @@
     "title": "Something went wrong",
     "body": "Please try again or reload the page."
   },
-  "nextStep": "Recommended next step"
+  "nextStep": "Recommended next step",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Coming soon",
+      "body": "This screen is being rebuilt. The link already works and will stay the same."
+    },
+    "home": {
+      "title": "Your star map"
+    },
+    "map": {
+      "title": "Star map"
+    },
+    "nebula": {
+      "title": "Nebula"
+    },
+    "unit": {
+      "title": "Knowledge point"
+    },
+    "chapter": {
+      "title": "Chapter"
+    },
+    "lesson": {
+      "title": "Lesson"
+    },
+    "ask": {
+      "title": "Ask"
+    },
+    "me": {
+      "title": "Your account"
+    }
+  },
+  "accountMenu": {
+    "open": "Account",
+    "help": "Help and support",
+    "billing": "Billing and payments"
+  },
+  "composer": {
+    "attach": "Add a photo or file",
+    "send": "Send"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profile",
+      "name": "Name",
+      "email": "Email",
+      "managed": "Your name and email address come with your account. To change them, ask an administrator."
+    },
+    "language": {
+      "heading": "Language"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "loading": "Loading your notification settings…",
+      "unavailable": "Notification settings are unavailable right now.",
+      "saveFailed": "That change was not saved. Try again.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Teacher replies",
+          "body": "In the bell when a teacher takes on or answers your question"
+        }
+      }
+    },
+    "password": {
+      "heading": "Password",
+      "again": "Change it again"
+    }
+  },
+  "organizationHome": {
+    "title": "Organization",
+    "description": "Learning across your organization, and the practice assigned to it.",
+    "pages": "Your pages",
+    "learningOperations": "Learning operations",
+    "learningOperationsDescription": "Signals, completions and data readiness by subject",
+    "learningAutomation": "Learning automation",
+    "learningAutomationDescription": "Preview and run automatic practice assignments"
+  }
 }

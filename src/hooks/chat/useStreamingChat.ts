@@ -10,19 +10,12 @@ import { toUserFacingError } from '@/lib/userFacingText'
 import type { ChatAttachment, ChatMessage, ChatStreamEvent } from '@/types/chat'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import { watchGeneration, type GenerationOutcome } from '@/services/chat/generationWatch'
-
-/**
- * One message on its way: what was asked, and the idempotency key that makes
- * it one command on the server however often it is sent. Kept in session
- * storage while unanswered, so a reload picks the same command up again.
- */
-type PendingMessage = {
-  idempotencyKey: string
-  content: string
-  attachmentIds?: string[]
-  attachments?: ChatAttachment[]
-  askedAt: string
-}
+import {
+  readPendingMessage,
+  writePendingMessage,
+  type PendingMessage,
+} from '@/lib/pendingChatMessages'
+import { currentSessionToken } from '@/store/authStore'
 
 type RetryPayload = Omit<PendingMessage, 'askedAt' | 'idempotencyKey'> & {
   // Set when the failed command may be sent again as the same message; absent
@@ -41,38 +34,10 @@ type SendStreamingMessagePayload = Omit<StreamMessagePayload, 'idempotencyKey'> 
 const streamErrorFallback =
   'The explanation could not be prepared right now. Please try again or ask a teacher.'
 
-export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
-const pendingKey = (conversationId: string) => `${PENDING_MESSAGE_KEY_PREFIX}${conversationId}`
-
-function readPending(conversationId: string): PendingMessage | null {
-  try {
-    const raw = sessionStorage.getItem(pendingKey(conversationId))
-    if (!raw) return null
-    const value = JSON.parse(raw) as Partial<PendingMessage>
-    if (typeof value.idempotencyKey !== 'string' || typeof value.content !== 'string') return null
-    return {
-      idempotencyKey: value.idempotencyKey,
-      content: value.content,
-      attachmentIds: value.attachmentIds,
-      attachments: value.attachments,
-      askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
-    }
-  } catch {
-    return null
-  }
-}
-
-function writePending(conversationId: string, pending: PendingMessage | null) {
-  try {
-    if (pending) {
-      sessionStorage.setItem(pendingKey(conversationId), JSON.stringify(pending))
-    } else {
-      sessionStorage.removeItem(pendingKey(conversationId))
-    }
-  } catch {
-    // Without storage a reload loses the wait, not the message.
-  }
-}
+// Kept in the tab while unanswered: see pendingChatMessages.
+export { PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
+const readPending = readPendingMessage
+const writePending = writePendingMessage
 
 function createLocalId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`
@@ -205,14 +170,19 @@ export function useStreamingChat(conversationId: string | null) {
   /**
    * Send a message, or with `send: false` wait for one already sent, and settle
    * it by what its command says: the answer, or a failure the student can send
-   * again - as the same message when the command allows it.
+   * again - as the same message when the command allows it. True once it was
+   * answered; false when it failed, was stopped or was overtaken.
    */
   const runAttempt = useCallback(
-    async (pending: PendingMessage, { send }: { send: boolean }) => {
-      if (!conversationId) return
+    async (pending: PendingMessage, { send }: { send: boolean }): Promise<boolean> => {
+      if (!conversationId) return false
 
       const attempt = ++currentAttemptRef.current
-      const owns = () => currentAttemptRef.current === attempt
+      // The message is the signed-in person's. Signing out clears what they
+      // left in the tab; an attempt resuming after that must not write it back,
+      // send it, or report on it under whoever holds the tab now (#34).
+      const sender = currentSessionToken()
+      const owns = () => currentAttemptRef.current === attempt && currentSessionToken() === sender
       const requestController = new AbortController()
       const pollController = new AbortController()
       // The server's own ids, so the bubbles are recognised as its messages when
@@ -224,7 +194,7 @@ export function useStreamingChat(conversationId: string | null) {
         studentMessageId: createLocalId('student'),
         assistantMessageId: createLocalId('assistant'),
       }))
-      if (!owns()) return
+      if (!owns()) return false
 
       stopRef.current = () => {
         requestController.abort()
@@ -311,7 +281,7 @@ export function useStreamingChat(conversationId: string | null) {
         outcome = await watcher.outcome
       }
       pollController.abort()
-      if (!owns()) return
+      if (!owns()) return false
       // Read now: the updaters below run when React renders, after the refs
       // have been cleared for the next attempt.
       const settledAssistantId = activeAssistantMessageIdRef.current ?? assistantMessageId
@@ -329,9 +299,9 @@ export function useStreamingChat(conversationId: string | null) {
             ),
           )
           trackEvent('chat_response_stopped', { conversationId })
-          return
+          return false
         }
-        if (outcome === null || outcome.kind === 'aborted') return
+        if (outcome === null || outcome.kind === 'aborted') return false
 
         writePending(conversationId, null)
         if (outcome.kind === 'completed') {
@@ -340,7 +310,7 @@ export function useStreamingChat(conversationId: string | null) {
           if (!localStorage.getItem('stoa_access_token')?.startsWith('demo:')) {
             setLocalMessages([])
           }
-          return
+          return true
         }
 
         const sameMessage = outcome.kind !== 'failed' || outcome.retryable
@@ -365,6 +335,7 @@ export function useStreamingChat(conversationId: string | null) {
             return message
           }),
         )
+        return false
       } finally {
         if (owns()) {
           setIsStreaming(false)
@@ -400,17 +371,17 @@ export function useStreamingChat(conversationId: string | null) {
       { content, attachmentIds, attachments }: SendStreamingMessagePayload,
       idempotencyKey?: string,
     ) => {
-      if (!conversationId || isStreaming) return
+      if (!conversationId || isStreaming) return false
 
       const trimmed = content.trim()
-      if (!trimmed) return
+      if (!trimmed) return false
 
       trackEvent('chat_message_sent', {
         conversationId,
         hasAttachments: Boolean(attachmentIds?.length),
       })
       trackEvent('chat_response_started', { conversationId })
-      await runAttempt(
+      return runAttempt(
         {
           // The key names the message, not the attempt: a retry of a message
           // the server may still answer sends the same one.

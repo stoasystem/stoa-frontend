@@ -10,6 +10,7 @@ export const practiceQueryKeys = {
   subjects: () => [...practiceQueryKeys.all, 'subjects'] as const,
   subjectPath: (subjectId: string, topicId: string) =>
     [...practiceQueryKeys.subjects(), subjectId, 'topics', topicId, 'path'] as const,
+  knowledgeMap: (subjectId: string) => [...practiceQueryKeys.all, 'knowledge-map', subjectId] as const,
   roadmap: (subjectId: string, topicId: string) =>
     [...practiceQueryKeys.all, 'roadmap', subjectId, topicId] as const,
   lesson: (lessonId: string) => [...practiceQueryKeys.all, 'lessons', lessonId] as const,

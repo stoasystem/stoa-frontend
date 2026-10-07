@@ -3,30 +3,44 @@
  *
  * `/login` is rendered by EntryPage, not LoginPage, so a test that mounts the
  * login form on its own cannot see what happens once the session exists. This
- * mounts the whole AppRouter -- EntryPage, the real login form and mutation,
- * ProtectedRoute and RoleRoute -- against MSW, and reads the address bar.
+ * mounts the whole AppRouter -- generated from the route manifest, with the
+ * real EntryPage, login form and mutation, ProtectedRoute, RoleRoute and the
+ * legacy redirects -- against MSW, and reads the address bar.
  *
  * Only the destination pages are stubbed: what they render is not under test,
  * and the real ones would each fetch their own data.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
-import { useSearchParams } from 'react-router-dom'
+import { delay, http, HttpResponse } from 'msw'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import '@/i18n'
+import i18n from '@/i18n'
 import { AppRouter } from '@/app/router/AppRouter'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import type { User, UserRole } from '@/types/user'
 import { mswServer } from '../mswServer'
 
-vi.mock('@/pages/chat/ChatPage', () => ({ ChatPage: () => <h1>student home</h1> }))
-vi.mock('@/pages/profile/StudentProfilePage', () => ({
-  StudentProfilePage: () => <h1>student profile</h1>,
+vi.mock('@/pages/map/MapPages', () => ({
+  MapHomePage: () => <h1>student home</h1>,
+  // One page for a subject, a nebula and a star (#134); the stub says which the path chose.
+  MapPage: function MapStub() {
+    const { subjectId, topicId, unitId } = useParams()
+    if (unitId) return <h1>star</h1>
+    return <h1>{topicId ? `nebula ${subjectId}/${topicId}` : `star map ${subjectId}`}</h1>
+  },
 }))
-vi.mock('@/pages/learn/LearnPage', () => ({ LearnPage: () => <h1>learn page</h1> }))
+vi.mock('@/pages/me/MePage', () => ({ MePage: () => <h1>student account</h1> }))
+vi.mock('@/pages/ask/AskPage', () => ({
+  AskPage: function AskStub() {
+    return <h1>{`ask ${useParams().conversationId ?? 'without a conversation'}`}</h1>
+  },
+}))
 vi.mock('@/pages/parent/ParentDashboardPage', () => ({
   ParentDashboardPage: () => <h1>parent home</h1>,
+}))
+vi.mock('@/pages/tutor/TutorDashboardPage', () => ({
+  TutorDashboardPage: () => <h1>teacher home</h1>,
 }))
 vi.mock('@/pages/auth/TeacherActivatePage', () => ({
   TeacherActivatePage: function TeacherActivateStub() {
@@ -60,8 +74,8 @@ function serve(user: User) {
   )
 }
 
-function openAt(url: string) {
-  window.history.replaceState(null, '', url)
+function openAt(url: string, state: unknown = null) {
+  window.history.replaceState(state, '', url)
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   })
@@ -85,9 +99,17 @@ async function expectToLandOn(pathname: string, heading: string) {
   await waitFor(() => expect(window.location.pathname).toBe(pathname))
 }
 
-beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+beforeAll(async () => {
+  mswServer.listen({ onUnhandledRequest: 'error' })
+  // /login is EntryPage, a lazy page whose first import is its whole module
+  // graph, cold. With the full suite beside it that ran past findBy's
+  // one-second wait for the sign-in form, so the first test here failed (#133),
+  // as /me's did (#94). What this file tests is where signing in lands.
+  await import('@/pages/entry/EntryPage')
+})
 afterAll(() => mswServer.close())
-beforeEach(() => {
+beforeEach(async () => {
+  await i18n.changeLanguage('en')
   localStorage.clear()
   sessionStorage.clear()
   useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
@@ -101,21 +123,22 @@ afterEach(() => {
 describe('signing in from /login', () => {
   it('lands on the ?next= page when the role may use it', async () => {
     serve(account('student'))
-    openAt('/login?next=/profile')
+    openAt('/login?next=/me')
 
     await signIn()
 
-    await expectToLandOn('/profile', 'student profile')
+    await expectToLandOn('/me', 'student account')
   })
 
-  it('keeps the query on a ?next= page', async () => {
+  it('keeps the query and the hash on a ?next= page', async () => {
     serve(account('student'))
-    openAt(`/login?next=${encodeURIComponent('/chat?conversation=c-7')}`)
+    openAt(`/login?next=${encodeURIComponent('/map/math?focus=u-3#algebra')}`)
 
     await signIn()
 
-    await expectToLandOn('/chat', 'student home')
-    expect(window.location.search).toBe('?conversation=c-7')
+    await expectToLandOn('/map/math', 'star map math')
+    expect(window.location.search).toBe('?focus=u-3')
+    expect(window.location.hash).toBe('#algebra')
   })
 
   it('resumes a teacher activation with its token', async () => {
@@ -130,39 +153,36 @@ describe('signing in from /login', () => {
     expect(window.location.search).toBe(`?token=${token}`)
   })
 
-  it('follows the signed-out "start practising" link into practice', async () => {
+  it.each([
+    // An old conversation link lands on that conversation in Ask.
+    ['/chat/c-9', '/ask/c-9', 'ask c-9'],
+    // An old planet link lands on the same place in the star map.
+    ['/planet/math', '/map/math', 'star map math'],
+    // The old signed-out "start practising" link: practice now forwards home.
+    ['/practice', '/', 'student home'],
+  ])('follows the legacy ?next=%s through its redirect to %s', async (next, pathname, heading) => {
     serve(account('student'))
-    openAt('/login?next=/practice')
+    openAt(`/login?next=${encodeURIComponent(next)}`)
 
     await signIn()
 
-    // /practice itself forwards to the learning path.
-    await expectToLandOn('/learn/path', 'learn page')
+    await expectToLandOn(pathname, heading)
   })
 
   it('returns to the protected page that sent the visitor to sign in', async () => {
     serve(account('student'))
-    openAt('/learn/progress')
+    openAt('/map/math/algebra')
     await waitFor(() => expect(window.location.pathname).toBe('/login'))
 
     await signIn()
 
-    await expectToLandOn('/learn/progress', 'learn page')
+    await expectToLandOn('/map/math/algebra', 'nebula math/algebra')
   })
 
   it("goes to the role's home when the page it was sent away from belongs to another role", async () => {
     serve(account('parent'))
-    openAt('/learn/progress')
+    openAt('/map/math/algebra')
     await waitFor(() => expect(window.location.pathname).toBe('/login'))
-
-    await signIn()
-
-    await expectToLandOn('/parent', 'parent home')
-  })
-
-  it("goes to the role's home when ?next= belongs to another role", async () => {
-    serve(account('parent'))
-    openAt('/login?next=/learn/progress')
 
     await signIn()
 
@@ -170,16 +190,30 @@ describe('signing in from /login', () => {
   })
 
   it.each([
+    ['parent', '/parent', 'parent home'],
+    ['teacher', '/tutor', 'teacher home'],
+  ] as const)("sends a %s whose ?next= belongs to a student to the role's home", async (role, home, heading) => {
+    serve(account(role))
+    openAt('/login?next=/map/math')
+
+    await signIn()
+
+    await expectToLandOn(home, heading)
+  })
+
+  it.each([
     '//evil.example',
     'https://evil.example',
-    '//evil.example/profile',
+    '//evil.example/me',
     '/\\evil.example',
-    '/\\evil.example/profile',
+    '/\\evil.example/me',
     '/%5C%5Cevil.example',
     '\\\\evil.example',
-    '/chat/..//evil.example',
-    '/profile/../admin',
-    '/chat/../admin',
+    '/.//evil.example',
+    '/ask/..//evil.example',
+    '/map/../\\evil.example',
+    '/me/../admin',
+    '/map/../admin',
   ])(
     "goes to the role's home when ?next=%s points off the site or out of the role",
     async (next) => {
@@ -188,18 +222,73 @@ describe('signing in from /login', () => {
 
       await signIn()
 
-      await expectToLandOn('/chat', 'student home')
+      await expectToLandOn('/', 'student home')
       expect(window.location.host).toBe('localhost:3000')
     },
   )
 
+  it("goes to the role's home on the address an earlier review probed", async () => {
+    // Exactly as typed into the address bar: `next` decodes to `/map/../\evil.com`,
+    // which starts with `/map/` as a string but loads `//evil.com`.
+    serve(account('student'))
+    openAt('/login?next=/map/..%2F%5Cevil.com')
+
+    await signIn()
+
+    await expectToLandOn('/', 'student home')
+    expect(window.location.host).toBe('localhost:3000')
+  })
+
+  // ProtectedRoute's state.from lives in history.state, where anything with
+  // access to the page can write it; the rebuilt address is checked whole.
+  function openLoginSentAwayFrom(from: { pathname: string; search?: string; hash?: string }) {
+    openAt('/login', { usr: { from }, key: 'forged', idx: 0 })
+  }
+
+  it.each([
+    [{ pathname: '/map', search: '/../\\evil.example' }],
+    [{ pathname: '/me', hash: '/../../admin' }],
+  ])("goes to the role's home when state.from is forged as %o", async (from) => {
+    serve(account('student'))
+    openLoginSentAwayFrom(from)
+
+    await signIn()
+
+    await expectToLandOn('/', 'student home')
+    expect(window.location.host).toBe('localhost:3000')
+  })
+
+  it('returns to state.from with its query and hash', async () => {
+    serve(account('student'))
+    openLoginSentAwayFrom({ pathname: '/me', search: '?ok=1', hash: '#h' })
+
+    await signIn()
+
+    await expectToLandOn('/me', 'student account')
+    expect(window.location.search).toBe('?ok=1')
+    expect(window.location.hash).toBe('#h')
+  })
+
   it('sends a reset account to the password change first, whatever ?next= says', async () => {
     serve(account('student', true))
-    openAt('/login?next=/profile')
+    openAt('/login?next=/me')
 
     await signIn()
 
     await expectToLandOn('/settings/password', 'password change')
+  })
+
+  it('sends a reset account to the password change even when ?next= is a public page', async () => {
+    // /me above sits behind ProtectedRoute, which would send a reset account
+    // to the password change on its own. A public page has no guard after
+    // the login screen, so only EntryPage's own check keeps the reset first.
+    serve(account('teacher', true))
+    openAt(`/login?next=${encodeURIComponent('/teacher-activate?token=t-1')}`)
+
+    await signIn()
+
+    await expectToLandOn('/settings/password', 'password change')
+    expect(screen.queryByRole('heading', { name: /teacher activation/ })).not.toBeInTheDocument()
   })
 })
 
@@ -213,9 +302,9 @@ describe('opening /login while already signed in', () => {
   it('goes straight to the ?next= page when the role may use it', async () => {
     alreadySignedInAs(account('student'))
 
-    openAt('/login?next=/profile')
+    openAt('/login?next=/me')
 
-    await expectToLandOn('/profile', 'student profile')
+    await expectToLandOn('/me', 'student account')
   })
 
   it("goes to the role's home when the role may not use it", async () => {
@@ -223,18 +312,27 @@ describe('opening /login while already signed in', () => {
 
     openAt('/login?next=/admin')
 
-    await expectToLandOn('/chat', 'student home')
+    await expectToLandOn('/', 'student home')
   })
 
   it('is not stopped by a role the destination table does not know', async () => {
     // A session can carry a role this build has never heard of; the login
     // screen must still move it on rather than throw while rendering.
     alreadySignedInAs({ ...account('student'), role: 'janitor' as UserRole })
+    // Hold /auth/me back: its answer goes through normalizeUserRole, which
+    // turns an unknown role into a student, and whether it arrived before the
+    // login screen's chunk loaded would decide what this test sees.
+    mswServer.use(
+      http.get('https://api.test/auth/me', async () => {
+        await delay('infinite')
+        return HttpResponse.json({})
+      }),
+    )
 
-    openAt('/login?next=/profile')
+    openAt('/login?next=/me')
 
-    // Its fallback home is /chat, which RoleRoute then turns away; what
-    // matters is that the login screen moved it on instead of failing.
+    // The manifest has no home for it, so it is refused; what matters is that
+    // the login screen moved it on instead of failing.
     await waitFor(() => expect(window.location.pathname).toBe('/forbidden'))
     expect(screen.queryByLabelText('Email')).not.toBeInTheDocument()
   })

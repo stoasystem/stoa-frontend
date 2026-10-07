@@ -152,14 +152,14 @@ export function LibraryTab() {
         <label htmlFor="question-bank-search" className="sr-only">
           {t('learn.searchLabel')}
         </label>
-        <div className="mt-3 flex items-center gap-2 rounded-lg border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
+        <div data-search-field className="mt-3 flex items-center gap-2 rounded-lg border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
           <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
           <Input
             id="question-bank-search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={t('ui.searchPlaceholder')}
-            className="border-0 bg-transparent px-0 shadow-none focus-visible:ring-0"
+            className="border-0 bg-transparent px-0 shadow-none"
           />
         </div>
         <p className="mt-2 text-xs text-muted-foreground" aria-live="polite">

@@ -53,7 +53,16 @@
     "about": "Über STOA",
     "studentNavigationLabel": "Schülernavigation",
     "primary": "Hauptnavigation",
-    "mobilePrimary": "Hauptnavigation mobil"
+    "mobilePrimary": "Hauptnavigation mobil",
+    "logoHome": "STOA-Startseite",
+    "administration": "Verwaltung",
+    "admin": {
+      "users": "Benutzer",
+      "teacherApplications": "Bewerbungen von Lehrpersonen",
+      "curriculum": "Lehrplan",
+      "moderation": "Moderation",
+      "system": "System"
+    }
   },
   "actions": {
     "startLearning": "Lernen starten",
@@ -88,6 +97,7 @@
   },
   "language": {
     "label": "Sprache",
+    "current": "Sprache: {{language}} ({{code}})",
     "english": "English",
     "german": "Deutsch",
     "french": "Français",
@@ -161,7 +171,8 @@
       "new": "Neu",
       "reviewed": "Geprüft",
       "resolved": "Gelöst"
-    }
+    },
+    "loadingAccount": "Konto wird geladen…"
   },
   "notifications": {
     "title": "Mitteilungen",
@@ -170,7 +181,6 @@
     "loading": "Mitteilungen werden geladen ...",
     "unavailable": "Mitteilungen sind nicht verfügbar.",
     "empty": "Noch keine Mitteilungen.",
-    "markRead": "Als gelesen markieren",
     "archive": "Archivieren",
     "openLabel": "Mitteilungen",
     "openLabelUnread": "Mitteilungen, {{count}} ungelesen",
@@ -196,5 +206,80 @@
     "title": "Etwas ist schiefgelaufen",
     "body": "Bitte versuche es erneut oder lade die Seite neu."
   },
-  "nextStep": "Empfohlener nächster Schritt"
+  "nextStep": "Empfohlener nächster Schritt",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Bald verfügbar",
+      "body": "Diese Ansicht wird gerade neu gebaut. Der Link funktioniert schon und bleibt gleich."
+    },
+    "home": {
+      "title": "Deine Sternkarte"
+    },
+    "map": {
+      "title": "Sternkarte"
+    },
+    "nebula": {
+      "title": "Nebel"
+    },
+    "unit": {
+      "title": "Wissenspunkt"
+    },
+    "chapter": {
+      "title": "Kapitel"
+    },
+    "lesson": {
+      "title": "Lektion"
+    },
+    "ask": {
+      "title": "Fragen"
+    },
+    "me": {
+      "title": "Dein Konto"
+    }
+  },
+  "accountMenu": {
+    "open": "Konto",
+    "help": "Hilfe und Support",
+    "billing": "Abrechnung und Zahlung"
+  },
+  "composer": {
+    "attach": "Foto oder Datei hinzufügen",
+    "send": "Senden"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profil",
+      "name": "Name",
+      "email": "E-Mail",
+      "managed": "Name und E-Mail-Adresse gehören zu deinem Konto. Für eine Änderung wende dich an eine Administratorin oder einen Administrator."
+    },
+    "language": {
+      "heading": "Sprache"
+    },
+    "notifications": {
+      "heading": "Mitteilungen",
+      "loading": "Mitteilungseinstellungen werden geladen …",
+      "unavailable": "Die Mitteilungseinstellungen sind gerade nicht verfügbar.",
+      "saveFailed": "Diese Änderung wurde nicht gespeichert. Versuch es noch einmal.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Antworten von Lehrpersonen",
+          "body": "In der Glocke, wenn eine Lehrperson deine Frage übernimmt oder beantwortet"
+        }
+      }
+    },
+    "password": {
+      "heading": "Passwort",
+      "again": "Noch einmal ändern"
+    }
+  },
+  "organizationHome": {
+    "title": "Organisation",
+    "description": "Das Lernen in Ihrer Organisation und die dafür zugewiesene Übung.",
+    "pages": "Ihre Seiten",
+    "learningOperations": "Lernbetrieb",
+    "learningOperationsDescription": "Signale, Abschlüsse und Datenbereitschaft nach Fach",
+    "learningAutomation": "Lernautomatisierung",
+    "learningAutomationDescription": "Automatische Übungszuweisungen prüfen und ausführen"
+  }
 }

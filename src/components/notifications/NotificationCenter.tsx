@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Archive, Bell, Check, CircleAlert, Radio, WifiOff } from 'lucide-react'
+import { Archive, Bell, ChevronRight, CircleAlert, Radio, WifiOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
+import { IconButton } from '@/components/base/IconButton'
+import { ICON } from '@/components/base/sizes'
+import { notificationTargetPath } from '@/components/notifications/notificationTargets'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import {
   useArchiveNotificationMutation,
   useMarkNotificationReadMutation,
@@ -12,6 +15,8 @@ import {
   type RealtimeNotificationStatus,
   useRealtimeNotifications,
 } from '@/hooks/notifications/useRealtimeNotifications'
+import { useAuthStore } from '@/store/authStore'
+import type { NotificationEvent } from '@/types/notification'
 
 const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   disabled: 'notifications.connection.checking',
@@ -22,10 +27,12 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   offline: 'notifications.connection.offline',
 }
 
-export function NotificationCenter() {
+export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
   const { t } = useTranslation('common')
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const role = useAuthStore((state) => state.user?.role)
   const query = useNotificationsQuery()
   const realtime = useRealtimeNotifications()
   const markRead = useMarkNotificationReadMutation()
@@ -33,6 +40,17 @@ export function NotificationCenter() {
   const items = query.data?.items ?? []
   const unread = items.filter((item) => item.status === 'created').length
   const RealtimeIcon = realtime.status === 'offline' ? WifiOff : Radio
+  const targetOf = (event: NotificationEvent) => (role ? notificationTargetPath(event, role) : null)
+
+  // Every item can be chosen (#46): it is marked read, and one with a target
+  // opens it and closes the panel.
+  function choose(event: NotificationEvent) {
+    if (event.status === 'created') markRead.mutate(event.eventId)
+    const target = targetOf(event)
+    if (!target) return
+    setOpen(false)
+    navigate(target)
+  }
 
   // A panel anchored to the bell closes the way every other one does: a click
   // outside it, or Escape.
@@ -56,23 +74,24 @@ export function NotificationCenter() {
 
   return (
     <div className="relative" ref={shell}>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        className="relative"
-        aria-label={
+      {/* Sizes board: the bell in the bar is a 36 icon button with a 22 glyph. */}
+      <IconButton
+        icon={Bell}
+        size={36}
+        hitSize={hitSize}
+        label={
           unread
             ? t('notifications.openLabelUnread', { count: unread })
             : t('notifications.openLabel')
         }
+        aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-      >
-        <Bell className="h-4 w-4" aria-hidden="true" />
-        {unread > 0 && (
-          <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
-        )}
-      </Button>
+        badge={
+          unread > 0 ? (
+            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" aria-hidden="true" />
+          ) : undefined
+        }
+      />
       {open && (
         <div className="absolute right-0 top-11 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)]">
           <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
@@ -106,43 +125,47 @@ export function NotificationCenter() {
             {!query.isLoading && !query.isError && items.length === 0 && (
               <p className="text-sm text-muted-foreground">{t('notifications.empty')}</p>
             )}
-            {items.map((event) => (
-              <div key={event.eventId} className="rounded-md border border-border/70 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium">{event.title}</p>
-                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{event.summary}</p>
-                  </div>
-                  <Badge variant={event.status === 'created' ? 'default' : 'secondary'}>
-                    {t(`notifications.itemStatus.${event.status}`, { defaultValue: event.status })}
-                  </Badge>
-                </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {event.status === 'created' && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      disabled={markRead.isPending}
-                      onClick={() => markRead.mutate(event.eventId)}
-                    >
-                      <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                      {t('notifications.markRead')}
-                    </Button>
-                  )}
-                  <Button
+            {items.map((event) => {
+              const target = targetOf(event)
+              return (
+                <div
+                  key={event.eventId}
+                  data-notification={event.eventId}
+                  className="flex items-start gap-1 rounded-md border border-border/70 p-1"
+                >
+                  <button
                     type="button"
-                    size="sm"
-                    variant="ghost"
+                    data-notification-target={target ?? undefined}
+                    onClick={() => choose(event)}
+                    className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-[6px] border-0 bg-transparent p-2 text-left text-ink hover:bg-ground"
+                  >
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="text-sm font-medium">{event.title}</span>
+                      <span className="mt-1 text-xs leading-5 text-muted-foreground">{event.summary}</span>
+                    </span>
+                    {event.status === 'created' && (
+                      <Badge variant="default">{t('notifications.itemStatus.created')}</Badge>
+                    )}
+                    {target && (
+                      <ChevronRight
+                        aria-hidden="true"
+                        size={ICON.rowTrailing}
+                        strokeWidth={1.8}
+                        className="mt-0.5 shrink-0 text-tertiary"
+                      />
+                    )}
+                  </button>
+                  <IconButton
+                    icon={Archive}
+                    size={28}
+                    hitSize={hitSize}
+                    label={t('notifications.archive')}
                     disabled={archive.isPending}
                     onClick={() => archive.mutate(event.eventId)}
-                  >
-                    <Archive className="h-3.5 w-3.5" aria-hidden="true" />
-                    {t('notifications.archive')}
-                  </Button>
+                  />
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         </div>
       )}

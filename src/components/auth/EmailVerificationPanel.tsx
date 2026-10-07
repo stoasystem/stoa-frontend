@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { CheckCircle2, MailCheck, RotateCcw, ShieldAlert } from 'lucide-react'
+import { CheckCircle2, CircleAlert, MailCheck, RotateCcw, ShieldAlert } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { skyErrorClass, skyInputClass, skyLabelClass } from '@/components/auth/skyFields'
+import { Button as SkyButton } from '@/components/base/Button'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -20,7 +22,39 @@ type EmailVerificationPanelProps = {
   role?: UserRole
   source: 'register' | 'login'
   initialStatus?: EmailVerificationStatus
+  /**
+   * `sky` when the panel sits on a sky surface (the sign-in page, #53): a
+   * glass card with the sky's text, fields and white buttons. Registration
+   * keeps the light card. Only the look differs.
+   */
+  surface?: 'light' | 'sky'
 }
+
+// The light card's classes are the ones it always had; the sky's read the sky tokens.
+const looks = {
+  light: {
+    card: 'rounded-lg border border-border/70 bg-card/90 p-5',
+    badge: 'bg-primary text-primary-foreground',
+    kicker: 'brand-section-kicker',
+    title: 'mt-2 text-xl font-semibold text-foreground',
+    body: 'mt-2 text-sm leading-6 text-muted-foreground',
+    label: undefined,
+    input: undefined,
+    help: 'text-xs text-muted-foreground',
+    error: 'rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive',
+  },
+  sky: {
+    card: 'rounded-[var(--corner-card)] border border-[color:var(--sky-glass-border)] bg-[var(--sky-glass)] p-5 shadow-[var(--shadow-glass)] backdrop-blur-[var(--sky-glass-blur)]',
+    badge: 'bg-[var(--on-sky-button)] text-[color:var(--on-sky-button-text)]',
+    kicker: 'm-0 text-[13px] leading-[1.3] font-medium tracking-[0.4px] uppercase text-[color:var(--on-sky-text-caption)]',
+    title: 'mt-2 text-[17px] leading-[1.3] font-semibold text-[color:var(--on-sky-text)]',
+    body: 'mt-2 text-[15px] leading-[1.4] text-[color:var(--on-sky-text-body)]',
+    label: skyLabelClass,
+    input: skyInputClass,
+    help: 'text-[12px] leading-[1.35] text-[color:var(--on-sky-text-caption)]',
+    error: skyErrorClass,
+  },
+} as const
 
 function verificationMessageKey(response: EmailVerificationResponse | undefined) {
   if (!response) return null
@@ -46,7 +80,10 @@ export function EmailVerificationPanel({
   role,
   source,
   initialStatus,
+  surface = 'light',
 }: EmailVerificationPanelProps) {
+  const look = looks[surface]
+  const sky = surface === 'sky'
   const { t } = useTranslation(['auth', 'common'])
   const [code, setCode] = useState('')
   const [response, setResponse] = useState<EmailVerificationResponse | undefined>()
@@ -82,23 +119,34 @@ export function EmailVerificationPanel({
     return sourceBody
   }, [initialStatus, sourceBody, statusKey, t])
 
+  const errorText = errorKey ? t(`auth:${errorKey}`) : toUserFacingError(lastError, t('auth:verification.failed'))
+  const confirmLabel = confirmMutation.isPending ? t('common:actions.saving') : t('auth:verification.confirmCta')
+  const resendLabel = resendMutation.isPending ? (
+    t('common:actions.sending')
+  ) : (
+    <>
+      <RotateCcw className="h-4 w-4" aria-hidden="true" />
+      {t('auth:verification.resendCta')}
+    </>
+  )
+
   function handleConfirm() {
     if (confirmDisabled) return
     confirmMutation.mutate()
   }
 
   return (
-    <div className="rounded-lg border border-border/70 bg-card/90 p-5">
+    <div className={look.card}>
       <div className="flex items-start gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${look.badge}`}>
           <Icon className="h-5 w-5" aria-hidden="true" />
         </div>
         <div className="min-w-0">
-          <p className="brand-section-kicker">{t('auth:verification.eyebrow')}</p>
-          <h2 className="mt-2 text-xl font-semibold text-foreground">
+          <p className={look.kicker}>{t('auth:verification.eyebrow')}</p>
+          <h2 className={look.title}>
             {confirmed ? t('auth:verification.confirmedTitle') : t('auth:verification.title')}
           </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground" role="status">
+          <p className={look.body} role="status">
             {statusText}
           </p>
         </div>
@@ -107,11 +155,17 @@ export function EmailVerificationPanel({
       {!confirmed && (
         <div className="mt-5 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="verification-email">{t('auth:register.email')}</Label>
-            <Input id="verification-email" value={email} readOnly autoComplete="email" />
+            <Label htmlFor="verification-email" className={look.label}>{t('auth:register.email')}</Label>
+            <Input
+              id="verification-email"
+              value={email}
+              readOnly
+              autoComplete="email"
+              className={look.input}
+            />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="verification-code">{t('auth:verification.codeLabel')}</Label>
+            <Label htmlFor="verification-code" className={look.label}>{t('auth:verification.codeLabel')}</Label>
             <Input
               id="verification-code"
               value={code}
@@ -120,47 +174,62 @@ export function EmailVerificationPanel({
               inputMode="numeric"
               placeholder={t('auth:verification.codePlaceholder')}
               aria-describedby="verification-help"
+              className={look.input}
             />
-            <p id="verification-help" className="text-xs text-muted-foreground">
+            <p id="verification-help" className={look.help}>
               {t('auth:verification.codeHelp')}
             </p>
           </div>
 
           {lastError !== undefined && (
-            <p className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive" role="alert">
-              {errorKey ? t(`auth:${errorKey}`) : toUserFacingError(lastError, t('auth:verification.failed'))}
+            <p className={look.error} role="alert">
+              {sky ? (
+                <>
+                  <CircleAlert aria-hidden="true" size={16} strokeWidth={1.6} className="mt-px shrink-0" />
+                  <span>{errorText}</span>
+                </>
+              ) : errorText}
             </p>
           )}
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="button" className="min-w-36" disabled={confirmDisabled} onClick={handleConfirm}>
-              {confirmMutation.isPending ? t('common:actions.saving') : t('auth:verification.confirmCta')}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="min-w-36"
-              disabled={resendDisabled}
-              onClick={() => resendMutation.mutate()}
-            >
-              {resendMutation.isPending ? (
-                t('common:actions.sending')
-              ) : (
-                <>
-                  <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                  {t('auth:verification.resendCta')}
-                </>
-              )}
-            </Button>
-          </div>
+          {sky ? (
+            // Placement, dark surface: white button first, plain white 85% beside it.
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
+              <SkyButton variant="onSky" disabled={confirmDisabled} onClick={handleConfirm}>
+                {confirmLabel}
+              </SkyButton>
+              <SkyButton variant="onSkyPlain" disabled={resendDisabled} onClick={() => resendMutation.mutate()}>
+                {resendLabel}
+              </SkyButton>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button type="button" className="min-w-36" disabled={confirmDisabled} onClick={handleConfirm}>
+                {confirmLabel}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="min-w-36"
+                disabled={resendDisabled}
+                onClick={() => resendMutation.mutate()}
+              >
+                {resendLabel}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
-      {confirmed && (
+      {confirmed && (sky ? (
+        <SkyButton asChild variant="onSky" className="mt-5">
+          <Link to="/login">{t('auth:verification.signInCta')}</Link>
+        </SkyButton>
+      ) : (
         <Button asChild className="premium-button-lift mt-5 rounded-full">
           <Link to="/login">{t('auth:verification.signInCta')}</Link>
         </Button>
-      )}
+      ))}
     </div>
   )
 }

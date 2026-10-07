@@ -1,0 +1,86 @@
+{
+  "stage": {
+    "label": "Star map: {{subject}}",
+    "nebulae": "Nebulae"
+  },
+  "summary": {
+    "lit": "{{lit}} of {{total}} lit",
+    "streak_one": "{{count}}-day streak",
+    "streak_other": "{{count}}-day streak",
+    "score_one": "{{formatted}} point",
+    "score_other": "{{formatted}} points"
+  },
+  "state": {
+    "lit": "Lit",
+    "in_progress": "In progress",
+    "ready": "Ready to start",
+    "locked": "Locked"
+  },
+  "marker": {
+    "recommended": "Suggested next",
+    "reviewDue_one": "{{count}} card due for review",
+    "reviewDue_other": "{{count}} cards due for review"
+  },
+  "legend": {
+    "label": "What the stars mean",
+    "reviewDue": "Due for review",
+    "pointer": "Drag to move, scroll or pinch to zoom. Pick a star to see its chapter; press and drag it (on touch, hold it first) to see what it connects to.",
+    "keys": "Keys: arrows go to the nearest one that way, Tab follows the course, + and − zoom."
+  },
+  "help": {
+    "open": "How the star map works",
+    "close": "Close"
+  },
+  "star": {
+    "progress": "{{percent}}% of lessons done",
+    "lessons": "{{done}} of {{total}} lessons done",
+    "unmet_one": "All lessons done: {{count}} exercise still to get right",
+    "unmet_other": "All lessons done: {{count}} exercises still to get right",
+    "unmetPartial_one": "{{count}} exercise still to get right",
+    "unmetPartial_other": "{{count}} exercises still to get right",
+    "nextLesson": "Next lesson: {{title}}",
+    "skills": "Skills",
+    "skillLit": "{{name}}, lit",
+    "skillDark": "{{name}}, not lit yet",
+    "prerequisites": "Light these first",
+    "start": "Start",
+    "continue": "Continue",
+    "open": "Open chapter",
+    "inNebula": "{{nebula}} · {{state}}",
+    "review_one": "Review {{count}} exercise",
+    "review_other": "Review {{count}} exercises",
+    "reviewSoon": "Coming soon",
+    "sheetDetails": "Shows or hides this star's details"
+  },
+  "nebula": {
+    "link": "{{nebula}}, {{lit}} of {{total}} lit",
+    "related": "{{base}}, related to {{list}}"
+  },
+  "nav": {
+    "map": "Star map",
+    "backToMap": "Back to the star map",
+    "backToNebula": "Back to {{nebula}}",
+    "backToStar": "Back to {{name}}"
+  },
+  "zoom": {
+    "group": "Zoom",
+    "in": "Zoom in",
+    "out": "Zoom out"
+  },
+  "subjects": {
+    "label": "Subjects"
+  },
+  "announce": {
+    "map": "{{subject}}, the whole star map: {{lit}} of {{total}} lit",
+    "nebula": "{{nebula}}: {{lit}} of {{total}} lit",
+    "star": "{{name}}: {{state}}"
+  },
+  "empty": "Nothing to learn in this subject yet.",
+  "emptySky": {
+    "title": "Your star map is on its way",
+    "body": "Your subjects and knowledge points will appear here as soon as they are ready."
+  },
+  "lighting": {
+    "announce": "{{name}} is lit"
+  }
+}

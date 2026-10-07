@@ -15,6 +15,8 @@ import enSupport from '@/i18n/locales/en/support.json'
 import enLegal from '@/i18n/locales/en/legal.json'
 import enAdmin from '@/i18n/locales/en/admin.json'
 import enErrors from '@/i18n/locales/en/errors.json'
+import enStarmap from '@/i18n/locales/en/starmap.json'
+import enChapter from '@/i18n/locales/en/chapter.json'
 import deCommon from '@/i18n/locales/de/common.json'
 import deAuth from '@/i18n/locales/de/auth.json'
 import deChat from '@/i18n/locales/de/chat.json'
@@ -28,6 +30,8 @@ import deSupport from '@/i18n/locales/de/support.json'
 import deLegal from '@/i18n/locales/de/legal.json'
 import deAdmin from '@/i18n/locales/de/admin.json'
 import deErrors from '@/i18n/locales/de/errors.json'
+import deStarmap from '@/i18n/locales/de/starmap.json'
+import deChapter from '@/i18n/locales/de/chapter.json'
 import frCommon from '@/i18n/locales/fr/common.json'
 import frAuth from '@/i18n/locales/fr/auth.json'
 import frChat from '@/i18n/locales/fr/chat.json'
@@ -41,6 +45,8 @@ import frSupport from '@/i18n/locales/fr/support.json'
 import frLegal from '@/i18n/locales/fr/legal.json'
 import frAdmin from '@/i18n/locales/fr/admin.json'
 import frErrors from '@/i18n/locales/fr/errors.json'
+import frStarmap from '@/i18n/locales/fr/starmap.json'
+import frChapter from '@/i18n/locales/fr/chapter.json'
 import itCommon from '@/i18n/locales/it/common.json'
 import itAuth from '@/i18n/locales/it/auth.json'
 import itChat from '@/i18n/locales/it/chat.json'
@@ -54,6 +60,8 @@ import itSupport from '@/i18n/locales/it/support.json'
 import itLegal from '@/i18n/locales/it/legal.json'
 import itAdmin from '@/i18n/locales/it/admin.json'
 import itErrors from '@/i18n/locales/it/errors.json'
+import itStarmap from '@/i18n/locales/it/starmap.json'
+import itChapter from '@/i18n/locales/it/chapter.json'
 
 export const resources = {
   en: {
@@ -70,6 +78,8 @@ export const resources = {
     legal: enLegal,
     admin: enAdmin,
     errors: enErrors,
+    starmap: enStarmap,
+    chapter: enChapter,
   },
   de: {
     common: deCommon,
@@ -85,6 +95,8 @@ export const resources = {
     legal: deLegal,
     admin: deAdmin,
     errors: deErrors,
+    starmap: deStarmap,
+    chapter: deChapter,
   },
   fr: {
     common: frCommon,
@@ -100,6 +112,8 @@ export const resources = {
     legal: frLegal,
     admin: frAdmin,
     errors: frErrors,
+    starmap: frStarmap,
+    chapter: frChapter,
   },
   it: {
     common: itCommon,
@@ -115,6 +129,8 @@ export const resources = {
     legal: itLegal,
     admin: itAdmin,
     errors: itErrors,
+    starmap: itStarmap,
+    chapter: itChapter,
   },
 } as const
 

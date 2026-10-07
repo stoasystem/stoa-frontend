@@ -53,7 +53,16 @@
     "about": "À propos de STOA",
     "studentNavigationLabel": "Navigation de l'élève",
     "primary": "Navigation principale",
-    "mobilePrimary": "Navigation principale mobile"
+    "mobilePrimary": "Navigation principale mobile",
+    "logoHome": "Accueil STOA",
+    "administration": "Administration",
+    "admin": {
+      "users": "Utilisateurs",
+      "teacherApplications": "Candidatures d’enseignants",
+      "curriculum": "Programme",
+      "moderation": "Modération",
+      "system": "Système"
+    }
   },
   "actions": {
     "startLearning": "Commencer à apprendre",
@@ -88,6 +97,7 @@
   },
   "language": {
     "label": "Langue",
+    "current": "Langue : {{language}} ({{code}})",
     "english": "English",
     "german": "Deutsch",
     "french": "Français",
@@ -161,7 +171,8 @@
       "new": "Nouveau",
       "reviewed": "Examiné",
       "resolved": "Résolu"
-    }
+    },
+    "loadingAccount": "Chargement du compte…"
   },
   "notifications": {
     "title": "Notifications",
@@ -170,7 +181,6 @@
     "loading": "Chargement des notifications...",
     "unavailable": "Les notifications ne sont pas disponibles.",
     "empty": "Aucune notification pour l’instant.",
-    "markRead": "Marquer comme lue",
     "archive": "Archiver",
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} non lue(s)",
@@ -196,5 +206,80 @@
     "title": "Une erreur est survenue",
     "body": "Réessaie ou recharge la page."
   },
-  "nextStep": "Prochaine étape recommandée"
+  "nextStep": "Prochaine étape recommandée",
+  "studentRoutes": {
+    "placeholder": {
+      "eyebrow": "Bientôt disponible",
+      "body": "Cet écran est en cours de refonte. Le lien fonctionne déjà et restera le même."
+    },
+    "home": {
+      "title": "Ta carte du ciel"
+    },
+    "map": {
+      "title": "Carte du ciel"
+    },
+    "nebula": {
+      "title": "Nébuleuse"
+    },
+    "unit": {
+      "title": "Point de connaissance"
+    },
+    "chapter": {
+      "title": "Chapitre"
+    },
+    "lesson": {
+      "title": "Leçon"
+    },
+    "ask": {
+      "title": "Question"
+    },
+    "me": {
+      "title": "Ton compte"
+    }
+  },
+  "accountMenu": {
+    "open": "Compte",
+    "help": "Aide et assistance",
+    "billing": "Facturation et paiement"
+  },
+  "composer": {
+    "attach": "Ajouter une photo ou un fichier",
+    "send": "Envoyer"
+  },
+  "me": {
+    "profile": {
+      "heading": "Profil",
+      "name": "Nom",
+      "email": "E-mail",
+      "managed": "Ton nom et ton adresse e-mail sont liés à ton compte. Pour les modifier, adresse-toi à un administrateur."
+    },
+    "language": {
+      "heading": "Langue"
+    },
+    "notifications": {
+      "heading": "Notifications",
+      "loading": "Chargement de tes réglages de notification…",
+      "unavailable": "Les réglages de notification sont indisponibles pour le moment.",
+      "saveFailed": "Cette modification n’a pas été enregistrée. Réessaie.",
+      "categories": {
+        "teacher_responses": {
+          "title": "Réponses des enseignants",
+          "body": "Dans la cloche, quand un enseignant prend en charge ta question ou y répond"
+        }
+      }
+    },
+    "password": {
+      "heading": "Mot de passe",
+      "again": "Le modifier encore"
+    }
+  },
+  "organizationHome": {
+    "title": "Organisation",
+    "description": "L’apprentissage dans votre organisation et les exercices qui lui sont attribués.",
+    "pages": "Vos pages",
+    "learningOperations": "Suivi de l’apprentissage",
+    "learningOperationsDescription": "Signaux, achèvements et disponibilité des données par matière",
+    "learningAutomation": "Automatisation de l’apprentissage",
+    "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices"
+  }
 }

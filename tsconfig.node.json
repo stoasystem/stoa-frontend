@@ -7,9 +7,18 @@
     "moduleResolution": "Bundler",
     "types": ["node"],
     "allowSyntheticDefaultImports": true,
+    // The dist e2e reuses scripts/publish-web-release.mjs; types are inferred from it, not checked.
+    "allowJs": true,
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["vite.config.ts", "playwright.smoke.config.ts", "tests/smoke/**/*.ts"]
+  "include": [
+    "vite.config.ts",
+    "vite.bench.config.ts",
+    "playwright.smoke.config.ts",
+    "tests/smoke/**/*.ts",
+    "playwright.dist.config.ts",
+    "tests/e2e-dist/**/*.ts"
+  ]
 }
