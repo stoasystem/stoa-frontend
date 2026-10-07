@@ -23,7 +23,7 @@ import { describePracticeContext, withPracticeContext, type AskPractice } from '
 import { jumpFrameAt, JUMP, JUMP_MS } from '@/features/chapter/jump'
 import { chipTop } from '@/features/chapter/QuoteSelection'
 import { StarCard } from '@/features/starmap/components/StarCard'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
+import { skyMap } from './starmapHarness'
 import i18n from '@/i18n'
 import { ChapterPage, LessonStagePage } from '@/pages/chapter/ChapterPages'
 import { ApiError } from '@/services/api/httpClient'
@@ -774,14 +774,14 @@ describe('the jump from a star', () => {
 
   it('leaves the star with where it was', async () => {
     emulate(1280)
-    const map = starMapFixture(10)
-    const star = map.stars.find((candidate) => candidate.unitId === 'u-5')!
+    const map = skyMap(10)
+    const star = map.stars.find((candidate) => candidate.unitId === 'demo-sine-cosine')!
     const nebula = map.nebulae.find((candidate) => candidate.topicId === star.nebulaId)!
     render(
       <I18nextProvider i18n={i18n}>
-        <MemoryRouter initialEntries={['/map/math/algebra/u-5']}>
+        <MemoryRouter initialEntries={['/map/math/trigonometry/demo-sine-cosine']}>
           <Routes>
-            <Route path="/map/*" element={<StarCard map={map} star={star} nebula={nebula} wide reducedMotion={false} />} />
+            <Route path="/map/*" element={<StarCard map={map} star={star} nebula={nebula} reducedMotion={false} />} />
             <Route path="*" element={null} />
           </Routes>
           <Where />
@@ -791,7 +791,7 @@ describe('the jump from a star', () => {
 
     await userEvent.click(screen.getByRole('link', { name: 'Continue' }))
 
-    expect(screen.getByTestId('where')).toHaveTextContent('/chapter/u-5')
+    expect(screen.getByTestId('where')).toHaveTextContent('/chapter/demo-sine-cosine')
     expect(JSON.parse(screen.getByTestId('where').dataset.state ?? 'null')).toEqual({ jump: { x: 0, y: 0 } })
   })
 

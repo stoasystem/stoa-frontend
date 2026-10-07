@@ -6,14 +6,20 @@
  * the map point `(cx, cy)` to show at the screen position `(fx, fy)` (a
  * fraction of the viewport: 0.5 is the middle) and a zoom `k`. At `k = 1` the
  * whole map fits the viewport.
+ *
+ * One sky wraps horizontally (#120, #117 B3): the band is a ring of
+ * circumference `wrap` (1) map units, so `cx` runs on without bound and only
+ * `cx mod wrap` says where on the ring the view is. Vertically the map stays
+ * bounded. With `wrap = 0` (every other map) nothing wraps.
  */
 
 /**
  * The page area, CSS px. `top` and `bottom` are bands the page keeps for its
  * own controls (the subject switcher above, the legend below); the whole map
- * fits between them.
+ * fits between them. `sheet`, on a phone: how far up from the bottom the
+ * collapsed star sheet reaches (#139); a chosen star is framed above it.
  */
-export type Viewport = { width: number; height: number; top?: number; bottom?: number }
+export type Viewport = { width: number; height: number; top?: number; bottom?: number; sheet?: number }
 
 /** The height left for the map between the page's own controls. */
 export function usableHeight({ height, top = 0, bottom = 0 }: Viewport): number {
@@ -69,17 +75,41 @@ export function overviewView(bounds: Bounds, viewport?: Viewport): View {
   return { cx: (bounds.minX + bounds.maxX) / 2, cy: (bounds.minY + bounds.maxY) / 2, k: 1, fx: 0.5, fy }
 }
 
-/** Keep the focus point over the map: a pan may not lose the map off screen. */
-export function clampView(view: View, bounds: Bounds): View {
+/** `x` brought into `[0, wrap)`; unchanged without a wrap. */
+export function wrapX(x: number, wrap: number): number {
+  if (!(wrap > 0)) return x
+  const r = x % wrap
+  return r < 0 ? r + wrap : r
+}
+
+/**
+ * Which turn of the ring puts the map point `x` nearest `ref`: the whole
+ * number of circumferences to add to `x`. Ties go to the lower copy.
+ */
+export function turnsToward(x: number, ref: number, wrap: number): number {
+  if (!(wrap > 0)) return 0
+  return Math.ceil((ref - x) / wrap - 0.5) + 0 // never -0
+}
+
+/** The copy of map point `x` nearest `ref`: on a ring, the shorter way round. */
+export function nearestCopy(x: number, ref: number, wrap: number): number {
+  return x + turnsToward(x, ref, wrap) * wrap
+}
+
+/**
+ * Keep the focus point over the map: a pan may not lose the map off screen.
+ * On a ring only `cy` is bounded; `cx` may run on round it.
+ */
+export function clampView(view: View, bounds: Bounds, wrap = 0): View {
   return {
     ...view,
-    cx: Math.min(bounds.maxX, Math.max(bounds.minX, view.cx)),
+    cx: wrap > 0 ? view.cx : Math.min(bounds.maxX, Math.max(bounds.minX, view.cx)),
     cy: Math.min(bounds.maxY, Math.max(bounds.minY, view.cy)),
   }
 }
 
 /** Move the view by a screen-space drag of `(dx, dy)` pixels. */
-export function panBy(view: View, dx: number, dy: number, viewport: Viewport, bounds: Bounds): View {
+export function panBy(view: View, dx: number, dy: number, viewport: Viewport, bounds: Bounds, wrap = 0): View {
   const scale = baseScale(viewport, bounds) * view.k
-  return clampView({ ...view, cx: view.cx - dx / scale, cy: view.cy - dy / scale }, bounds)
+  return clampView({ ...view, cx: view.cx - dx / scale, cy: view.cy - dy / scale }, bounds, wrap)
 }

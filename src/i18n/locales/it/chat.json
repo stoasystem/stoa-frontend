@@ -219,6 +219,12 @@
     "practice": {
       "subtitle": "Conosce la domanda su cui sei",
       "placeholder": "Chiedi su questa domanda…"
+    },
+    "lit": {
+      "label": "Progressi",
+      "title": "La stella {{name}} è accesa",
+      "body": "Hai finito il suo capitolo. La stella ora brilla sulla tua mappa.",
+      "link": "Vedi sulla mappa"
     }
   }
 }

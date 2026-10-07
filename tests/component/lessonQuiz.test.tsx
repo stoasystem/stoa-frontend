@@ -13,7 +13,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
@@ -260,7 +260,7 @@ const hearts = () => document.querySelector('[data-quiz-hearts]')
 
 async function answer(value: string) {
   const field = await screen.findByRole('textbox', { name: 'Your answer' })
-  await userEvent.type(field, `${value}{Enter}`)
+  await user.type(field, `${value}{Enter}`)
   await screen.findByText(/^(Correct|Not quite)$/)
 }
 
@@ -268,7 +268,7 @@ async function answer(value: string) {
 async function answerRight(lessonId = 'l-2') {
   const id = await onScreen(lessonId)
   await answer(right(id))
-  await userEvent.click(screen.getByRole('button', { name: /^(Next question|Finish lesson|Finish the quiz)$/ }))
+  await user.click(screen.getByRole('button', { name: /^(Next question|Finish lesson|Finish the quiz)$/ }))
   return id
 }
 
@@ -277,13 +277,13 @@ async function answerWrong(lessonId = 'l-2') {
   const id = await onScreen(lessonId)
   await answer('0')
   const go = screen.queryByRole('button', { name: 'Continue' })
-  if (go) await userEvent.click(go)
+  if (go) await user.click(go)
   return id
 }
 
 async function skip() {
   const id = await onScreen()
-  await userEvent.click(within(strip() as HTMLElement).getByRole('button', { name: 'Skip' }))
+  await user.click(within(strip() as HTMLElement).getByRole('button', { name: 'Skip' }))
   return id
 }
 
@@ -300,9 +300,18 @@ async function passQuiz(lessonId = 'l-2') {
 }
 
 const originalMatchMedia = window.matchMedia
+// Most tests here click and type through a whole lesson, dozens of actions.
+// user-event's default `delay: 0` waits on a real timer between every key and
+// pointer step: idle time, a millisecond or more each on Windows and far more
+// with the full suite beside it. It was half of this file's time on its own
+// and took the longest cases past the 5 s test timeout (#133). With
+// `delay: null` every action is still awaited and wrapped in act(); only the
+// idle timer goes.
+let user: UserEvent
 
 beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
 beforeEach(async () => {
+  user = userEvent.setup({ delay: null })
   await i18n.changeLanguage('en')
   completed = new Set(['l-1'])
   seen = { answers: [], completes: [], hints: 0 }
@@ -373,7 +382,7 @@ describe('skipping inside a lesson', () => {
 
     // Answered right at last, it finishes the lesson the normal way.
     await answer('2')
-    await userEvent.click(screen.getByRole('button', { name: 'Finish lesson' }))
+    await user.click(screen.getByRole('button', { name: 'Finish lesson' }))
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
     expect(seen.completes).toEqual(['l-2'])
   })
@@ -410,7 +419,7 @@ describe('the quiz that finishes a lesson with skips', () => {
       if (n <= rightOnes) answered.push(await answerRight())
       else await skip()
     }
-    await userEvent.click(await screen.findByRole('button', { name: 'Short quiz' }))
+    await user.click(await screen.findByRole('button', { name: 'Short quiz' }))
     return answered
   }
 
@@ -437,7 +446,7 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(await screen.findByRole('complementary', { name: 'Ask' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Hint' })).toBeInTheDocument()
     for (let n = 1; n <= 6; n += 1) await skip()
-    await userEvent.click(await screen.findByRole('button', { name: 'Short quiz' }))
+    await user.click(await screen.findByRole('button', { name: 'Short quiz' }))
 
     expect(await screen.findByText(/Quiz · Question 1 of 6$/)).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Hint' })).not.toBeInTheDocument()
@@ -469,7 +478,7 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(seen.hints).toBe(0)
 
     // Passed, Ask is back.
-    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
     await passQuiz()
     expect(await screen.findByRole('complementary', { name: 'Ask' })).toBeInTheDocument()
   })
@@ -477,13 +486,13 @@ describe('the quiz that finishes a lesson with skips', () => {
   it('keeps the phone composer disabled and never raises the sheet during the quiz', async () => {
     open('/chapter/u-5/l-2', { width: 375 })
     for (let n = 1; n <= 6; n += 1) await skip()
-    await userEvent.click(await screen.findByRole('button', { name: 'Short quiz' }))
+    await user.click(await screen.findByRole('button', { name: 'Short quiz' }))
     await screen.findByText(/Quiz · Question 1 of 6$/)
 
     expect(screen.queryByRole('button', { name: 'Hint' })).not.toBeInTheDocument()
     const composer = within(document.querySelector<HTMLElement>('[data-ask-docked]')!).getByRole('textbox')
     expect(composer).toBeDisabled()
-    await userEvent.type(composer, 'Help')
+    await user.type(composer, 'Help')
     expect(screen.queryByRole('dialog', { name: 'Ask' })).not.toBeInTheDocument()
     expect(document.querySelector('[data-ask-surface]')).toBeNull()
   })
@@ -518,11 +527,11 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(seen.completes).toEqual([])
 
     // Back to the lesson: the skipped exercises still pending, the quiz offered again.
-    await userEvent.click(screen.getByRole('button', { name: 'Back to the lesson' }))
+    await user.click(screen.getByRole('button', { name: 'Back to the lesson' }))
     expect(['l-2-e5', 'l-2-e6']).toContain(await onScreen())
     expect(screen.getByRole('heading', { level: 2, name: /^Exercise/ })).toHaveFocus()
     expect(screen.getByText(/Question 5 of 6/)).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Short quiz' }))
+    await user.click(screen.getByRole('button', { name: 'Short quiz' }))
     expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
     await passQuiz()
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
@@ -534,21 +543,21 @@ describe('the quiz that finishes a lesson with skips', () => {
     for (let n = 1; n <= 5; n += 1) await answerRight()
     await skip()
     const offer = await screen.findByRole('button', { name: 'Short quiz' })
-    for (let step = 0; step < 30 && document.activeElement !== offer; step += 1) await userEvent.tab()
+    for (let step = 0; step < 30 && document.activeElement !== offer; step += 1) await user.tab()
     expect(offer).toHaveFocus()
-    await userEvent.keyboard('{Enter}')
+    await user.keyboard('{Enter}')
 
     for (let question = 0; question < 3; question += 1) {
       const prompt = await screen.findByRole('heading', { level: 2, name: /^Exercise/ })
       await waitFor(() => expect(prompt).toHaveFocus())
       const id = await onScreen()
-      await userEvent.tab()
+      await user.tab()
       expect(screen.getByRole('textbox', { name: 'Your answer' })).toHaveFocus()
-      await userEvent.keyboard(`${right(id)}{Enter}`)
+      await user.keyboard(`${right(id)}{Enter}`)
       const go = await screen.findByRole('button', { name: /^(Next question|Finish the quiz)$/ })
-      for (let step = 0; step < 10 && document.activeElement !== go; step += 1) await userEvent.tab()
+      for (let step = 0; step < 10 && document.activeElement !== go; step += 1) await user.tab()
       expect(go).toHaveFocus()
-      await userEvent.keyboard('{Enter}')
+      await user.keyboard('{Enter}')
     }
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toHaveFocus()
     expect(seen.completes).toEqual(['l-2'])
@@ -623,13 +632,13 @@ describe('testing out of a lesson from the chapter', () => {
     expect(await screen.findByRole('heading', { name: 'Not yet' })).toHaveFocus()
     expect(seen.completes).toEqual([])
 
-    await userEvent.click(screen.getByRole('button', { name: 'Try the quiz again' }))
+    await user.click(screen.getByRole('button', { name: 'Try the quiz again' }))
     expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
     expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
     await answerWrong()
     await answerWrong()
 
-    await userEvent.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
+    await user.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
     expect(where()).toBe('/chapter/u-5')
     const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
     expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])

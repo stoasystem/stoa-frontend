@@ -32,9 +32,9 @@ describe('legacy student routes redirect to the star map routes', () => {
     ['/chat', '/ask', 'AskPage'],
     ['/assistant', '/ask', 'AskPage'],
     // /planet* became /map* (#72 point 8)
-    ['/planet/math', '/map/math', 'MapSubjectPage'],
-    ['/planet/math/fractions', '/map/math/fractions', 'MapNebulaPage'],
-    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1', 'MapStarPage'],
+    ['/planet/math', '/map/math', 'MapPage'],
+    ['/planet/math/fractions', '/map/math/fractions', 'MapPage'],
+    ['/planet/math/fractions/u-1', '/map/math/fractions/u-1', 'MapPage'],
     ['/planet', '/', 'MapHomePage'],
     ['/planet/math/fractions/u-1/extra', '/', 'MapHomePage'],
     // /profile, /settings/password
@@ -74,7 +74,7 @@ describe('an old /planet link cannot leave /map (decoded once, plain ids only)',
   })
 
   it('matches /Planet in any case, as the router does', () => {
-    expect(openAs('student', '/Planet/math')).toMatchObject({ pathname: '/map/math', page: 'MapSubjectPage' })
+    expect(openAs('student', '/Planet/math')).toMatchObject({ pathname: '/map/math', page: 'MapPage' })
   })
 
   it.each(['/planet/%2e%2e', '/planet/%252e%252e', '/planet/a%2Fb', '/planet/%5C'])('the router sends %s home', (from) => {
@@ -84,7 +84,7 @@ describe('an old /planet link cannot leave /map (decoded once, plain ids only)',
 
 describe('an old /planet link keeps its query', () => {
   it('carries the query string to /map', () => {
-    expect(openAs('student', '/planet/math?points=500')).toMatchObject({ pathname: '/map/math', search: '?points=500', page: 'MapSubjectPage' })
+    expect(openAs('student', '/planet/math?points=500')).toMatchObject({ pathname: '/map/math', search: '?points=500', page: 'MapPage' })
   })
 
 })

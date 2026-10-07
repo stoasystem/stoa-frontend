@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
+import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
 import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
@@ -24,6 +25,8 @@ import { cn } from '@/lib/utils'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
+import { useAuthStore } from '@/store/authStore'
+import { useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
 import type { ChatMessage } from '@/types/chat'
 
@@ -303,6 +306,8 @@ function AskThread({
     },
   })
 
+  const ownerId = useAuthStore((state) => state.user?.id)
+  const entries = threadEntries(messages, useLitMoments(ownerId))
   const lastAnswerId = latestAnswerId(messages)
   const offerHelp = !helpActive && !isStreaming && !requestHelp.isPending
 
@@ -352,14 +357,16 @@ function AskThread({
             </Button>
           </div>
         ) : null}
-        {messages.map((message) => (
+        {entries.map((entry) => entry.kind === 'lit' ? (
+          <AskLitCard key={`lit:${entry.moment.unitId}`} moment={entry.moment} />
+        ) : (
           <AskMessage
-            key={message.id}
-            message={message}
+            key={entry.message.id}
+            message={entry.message}
             teacherName={help?.teacherName}
             onRetry={retryMessage}
             after={
-              message.id === lastAnswerId && (offerHelp || requestHelp.isPending) ? (
+              entry.message.id === lastAnswerId && (offerHelp || requestHelp.isPending) ? (
                 <TeacherHelpAction
                   onRequest={() => requestHelp.mutate()}
                   requesting={requestHelp.isPending}
@@ -412,6 +419,24 @@ function useFinishedReplyAnnouncement(
     if (latest) setAnnouncement(latest.role === 'teacher' ? `${names.teacher}: ${latest.content}` : latest.content)
   }, [loaded, messages, names.teacher])
   return announcement
+}
+
+type ThreadEntry = { kind: 'message'; message: ChatMessage } | { kind: 'lit'; moment: LitMoment }
+
+/**
+ * The thread's entries in time order: the messages, and the knowledge points
+ * lit this session (#51), each after the messages sent before it was lit.
+ */
+export function threadEntries(messages: readonly ChatMessage[], moments: readonly LitMoment[]): ThreadEntry[] {
+  const entries: ThreadEntry[] = []
+  const lit = [...moments].sort((a, b) => Date.parse(a.litAt) - Date.parse(b.litAt))
+  let next = 0
+  for (const message of messages) {
+    while (next < lit.length && Date.parse(lit[next].litAt) < Date.parse(message.createdAt)) entries.push({ kind: 'lit', moment: lit[next++] })
+    entries.push({ kind: 'message', message })
+  }
+  while (next < lit.length) entries.push({ kind: 'lit', moment: lit[next++] })
+  return entries
 }
 
 /** The latest answer the assistant finished: the request for a teacher sits under it. */

@@ -7,10 +7,11 @@
  * many such prerequisites there are. Direction does not matter for the line,
  * so A -> B and B -> A add to the same one.
  *
- * Inside a nebula: its own prerequisite lines, shown only when the map is
- * zoomed into that nebula.
+ * Between stars: every prerequisite as a pair of star indices, inside a
+ * nebula, between nebulae and across subjects; which are drawn, and how
+ * brightly, is `linkTiers.ts` (#121).
  */
-import type { Prerequisite, StarMap } from '@/features/starmap/model/starMap'
+import type { StarMap } from '@/features/starmap/model/starMap'
 
 export type NebulaLink = {
   /** The two topics, in id order. */
@@ -36,15 +37,21 @@ export function nebulaLinks(map: Pick<StarMap, 'stars' | 'prerequisites'>): Nebu
   return [...links.values()].sort((x, y) => (x.a < y.a ? -1 : x.a > y.a ? 1 : x.b < y.b ? -1 : x.b > y.b ? 1 : 0))
 }
 
-/** The prerequisites between two stars of the same nebula. */
-export function innerLinks(map: Pick<StarMap, 'stars' | 'prerequisites'>, nebulaId: string): Prerequisite[] {
-  const nebulaOf = new Map(map.stars.map((star) => [star.unitId, star.nebulaId]))
-  return map.prerequisites.filter(
-    ({ from, to }) => from !== to && nebulaOf.get(from) === nebulaId && nebulaOf.get(to) === nebulaId,
-  )
+/** Every prerequisite as star indices (`indexOf`: unit id to index); self-loops and unknown stars left out. */
+export function starLinkIndices(
+  map: Pick<StarMap, 'prerequisites'>,
+  indexOf: ReadonlyMap<string, number>,
+): { from: number; to: number }[] {
+  const out: { from: number; to: number }[] = []
+  for (const { from, to } of map.prerequisites) {
+    const a = indexOf.get(from)
+    const b = indexOf.get(to)
+    if (a !== undefined && b !== undefined && a !== b) out.push({ from: a, to: b })
+  }
+  return out
 }
 
-/** Line width (CSS px) and alpha for a link carrying `count` prerequisites. */
+/** Line width (CSS px) and alpha for a link carrying `count` prerequisites; a panorama bridge widens with it (#121). */
 export function linkWeight(count: number): { width: number; alpha: number } {
   return {
     width: Math.min(4, 0.8 + 0.6 * Math.sqrt(Math.max(1, count))),

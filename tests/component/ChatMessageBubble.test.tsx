@@ -3,7 +3,7 @@
  * math rendering, the streaming placeholder, and the blinking cursor.
  */
 import { render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 import { ChatMessageBubble } from '@/components/chat/ChatMessageBubble'
 import type { ChatMessage } from '@/types/chat'
 
@@ -23,6 +23,13 @@ function message(overrides: Partial<ChatMessage> = {}): ChatMessage {
 }
 
 describe('assistant message content', () => {
+  // KaTeX's module is a third of the shared bundle; imported cold with the full
+  // suite beside it, it ran past waitFor's one second (#133). Warmed here, the
+  // bubble still loads it on the first formula; only the transform is done.
+  beforeAll(async () => {
+    await import('@/components/ui/katexLoader')
+  })
+
   it('renders the answer text', () => {
     render(<ChatMessageBubble message={message()} />)
     expect(screen.getByText('Here is the answer.')).toBeInTheDocument()

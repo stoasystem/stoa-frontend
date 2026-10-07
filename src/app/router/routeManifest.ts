@@ -184,9 +184,8 @@ const NotFoundPage = lazyPage('NotFoundPage', () => import('@/pages/not-found/No
 
 // Student: the planet redesign (#13), whose map is a star map since #72.
 const MapHomePage = lazyPage('MapHomePage', () => import('@/pages/map/MapPages'))
-const MapSubjectPage = lazyPage('MapSubjectPage', () => import('@/pages/map/MapPages'))
-const MapNebulaPage = lazyPage('MapNebulaPage', () => import('@/pages/map/MapPages'))
-const MapStarPage = lazyPage('MapStarPage', () => import('@/pages/map/MapPages'))
+// One page for a subject, a nebula and a star: moving between them keeps the map mounted (#134).
+const MapPage = lazyPage('MapPage', () => import('@/pages/map/MapPages'))
 const ChapterPage = lazyPage('ChapterPage', () => import('@/pages/chapter/ChapterPages'))
 const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapter/ChapterPages'))
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
@@ -307,9 +306,9 @@ export const pageRoutes: readonly PageRoute[] = [
   // logo, the bell and the avatar (#13 point 5). The star map is the navigation;
   // /me is reached from the avatar menu, /ask from the composer.
   // The star map's three layers (#72 point 8); fixture data until #48.
-  { path: '/map/:subjectId', access: STUDENT, page: MapSubjectPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
-  { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapNebulaPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
-  { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapStarPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
+  { path: '/map/:subjectId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.map.title', meta: { module: 'Star map', status: 'demo', purpose: 'A subject star map.' } },
+  { path: '/map/:subjectId/:topicId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.nebula.title', meta: { module: 'Star map', status: 'demo', purpose: 'A nebula (topic) of a star map.' } },
+  { path: '/map/:subjectId/:topicId/:unitId', access: STUDENT, page: MapPage, titleKey: 'studentRoutes.unit.title', meta: { module: 'Star map', status: 'demo', purpose: 'A star (unit, knowledge point) of a nebula.' } },
   { path: '/chapter/:unitId', access: STUDENT, page: ChapterPage, titleKey: 'studentRoutes.chapter.title', meta: { module: 'Chapter', status: 'core', purpose: 'The chapter of a knowledge point: its lessons in order, with progress.' } },
   { path: '/chapter/:unitId/:lessonId', access: STUDENT, page: LessonStagePage, titleKey: 'studentRoutes.lesson.title', meta: { module: 'Chapter', status: 'core', purpose: 'The practice stage of a lesson, with Ask beside it.' } },
   {
