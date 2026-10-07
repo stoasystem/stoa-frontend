@@ -30,7 +30,7 @@ export function useLoginMutation() {
       // Signing in is all this does. The login screen (EntryPage) sees the
       // session and picks the destination: the password change for a reset
       // account, else a permitted `?next=` or `from`, else the role's home.
-      setAuth(data.user, data.accessToken)
+      setAuth(data.user, data.accessToken, data.refreshToken)
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       toast.success(t('login.signedIn'))
