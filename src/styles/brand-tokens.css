@@ -119,6 +119,20 @@
   --press-sink: 3px;
   --press-time: 90ms;
 
+  /* Control sizes. One definition each, so a button, a field and a chip that
+     mean to be the same height actually are. Before these, the same intent was
+     written as min-h-10, min-h-11 and h-9 in different files. */
+  --control-h: 44px;          /* the smallest a thumb can land on */
+  --control-h-large: 52px;
+  --control-px: 20px;
+  --control-px-small: 16px;
+  --control-px-large: 32px;
+  --control-py: 10px;
+  --control-py-large: 12px;
+  --control-text: 15px;
+  --control-text-small: 14px;
+  --control-text-large: 17px;
+
   /* ---- Type (Tokens board; one family, the system face) --------------- */
   /* Nunito first; the system stack stays as the fallback while the face
      loads and if it never does. Rounder and heavier than the system face at
