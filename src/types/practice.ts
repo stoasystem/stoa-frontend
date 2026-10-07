@@ -389,3 +389,44 @@ export type ReviewSummary = {
   scheduledCount: number
   nextDueAt: string
 }
+
+/**
+ * `GET /practice/knowledge-map` (stoa-backend#59): the sky the star map draws.
+ *
+ * The field names are the star map model's own (`@/features/starmap/model/starMap`),
+ * so the source maps it across without renaming. `prerequisites` and each star's
+ * `skills` arrive empty until stoa-backend#56 and #58 land; the map draws no
+ * locks and no skill rows while they are.
+ */
+export type KnowledgeMapResponse = {
+  subjectId: string
+  galaxies: {
+    subjectId: string
+    name: string
+    lit: number
+    total: number
+    enrolled: boolean
+  }[]
+  nebulae: { topicId: string; name: string; order: number; subjectId: string }[]
+  stars: {
+    unitId: string
+    name: string
+    nebulaId: string
+    order: number
+    state: 'lit' | 'in_progress' | 'ready' | 'locked'
+    progress: number
+    unmetExercises: number
+    reviewDue: number
+    recommendation: { source: 'system' | 'teacher' } | null
+    x: number
+    y: number
+    skills: { skillId: string; name: string; lit: boolean }[]
+    chapter: {
+      lessonCount: number
+      lessonsDone: number
+      nextLesson: { lessonId: string; title: string } | null
+    }
+  }[]
+  prerequisites: { from: string; to: string }[]
+  summary: { lit: number; total: number; streakDays: number; score: number }
+}
