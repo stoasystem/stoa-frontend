@@ -3,74 +3,495 @@
   "tokens": {
     "file": "src/styles/brand-tokens.css",
     "themes": {
-      "light": [":root"],
-      "dark": [":root", "[data-surface=\"sky\"]"]
+      "light": [
+        ":root"
+      ],
+      "dark": [
+        ":root",
+        "[data-surface=\"sky\"]"
+      ]
     }
   },
   "pairs": [
-    { "theme": "light", "fg": "--ink", "bg": "--ground", "kind": "text", "use": "body, titles on the page" },
-    { "theme": "light", "fg": "--ink", "bg": "--surface", "kind": "text", "use": "rows, cards" },
-    { "theme": "light", "fg": "--ink", "bg": "--sidebar", "kind": "text", "use": "source lists" },
-    { "theme": "light", "fg": "--ink", "bg": "--fill", "kind": "text", "use": "gray button, selected segment" },
-    { "theme": "light", "fg": "--secondary", "bg": "--ground", "kind": "text", "use": "captions on the page" },
-    { "theme": "light", "fg": "--secondary", "bg": "--surface", "kind": "text", "use": "captions in rows and cards" },
-    { "theme": "light", "fg": "--secondary", "bg": "--sidebar", "kind": "text", "use": "list meta in source lists" },
-    { "theme": "light", "fg": "--secondary", "bg": "--fill", "kind": "text", "use": "search placeholder, inactive segment" },
-    { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "text", "use": "links" },
-    { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "text", "use": "plain buttons" },
-    { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "text", "use": "tinted button, Pending pill" },
-    { "theme": "light", "fg": "--on-accent", "bg": "--accent", "kind": "text", "use": "filled button" },
-    { "theme": "light", "fg": "--on-accent", "bg": "--accent-pressed", "kind": "text", "use": "filled button, hover / press" },
-    { "theme": "light", "fg": "--red", "bg": "--ground", "kind": "text", "use": "destructive text" },
-    { "theme": "light", "fg": "--red", "bg": "--surface", "kind": "text", "use": "destructive text in rows" },
-    { "theme": "light", "fg": "--gold", "bg": "--gold-tint", "kind": "text", "use": "Assigned / waiting pill" },
-    { "theme": "light", "fg": "--green", "bg": "--green-tint", "kind": "text", "use": "In progress / Ready pill" },
-    { "theme": "light", "fg": "--pill-neutral", "bg": "--fill", "kind": "text", "use": "Resolved pill" },
-    { "theme": "light", "fg": "--red", "bg": "--fill", "kind": "text", "use": "Overdue pill" },
-    { "theme": "light", "fg": "--accent", "bg": "--ground", "kind": "ui", "use": "focus ring" },
-    { "theme": "light", "fg": "--accent", "bg": "--surface", "kind": "ui", "use": "focus ring on cards" },
-    { "theme": "light", "fg": "--accent", "bg": "--accent-tint", "kind": "ui", "use": "selected answer border" },
-    { "theme": "light", "fg": "--accent", "bg": "--fill", "kind": "ui", "use": "focus ring inside a highlighted menu item: account menu, language list (#53)" },
-    { "theme": "light", "fg": "--green", "bg": "--surface", "kind": "ui", "use": "online dot" },
-    { "theme": "light", "fg": "--star", "bg": "--surface", "kind": "ui", "use": "streak / lit icon on cards" },
-    { "theme": "light", "fg": "--star", "bg": "--ground", "kind": "ui", "use": "streak / lit icon on the page" },
-    { "theme": "light", "fg": "--surface", "bg": "--toggle-track-off", "kind": "ui", "use": "toggle knob, off" },
-    { "theme": "light", "fg": "--surface", "bg": "--accent", "kind": "ui", "use": "toggle knob, on" },
-    { "theme": "light", "fg": "--toggle-track-off", "bg": "--surface", "kind": "ui", "use": "off toggle in a row or card" },
-    { "theme": "light", "fg": "--toggle-track-off", "bg": "--ground", "kind": "ui", "use": "off toggle on the page" },
-    { "theme": "light", "fg": "--toggle-track-off", "bg": "--sidebar", "kind": "ui", "use": "off toggle in a source list" },
-
-    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky", "kind": "text", "use": "titles on the sky" },
-    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-2", "kind": "text", "use": "titles on raised dark surfaces" },
-    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky", "kind": "text", "use": "body on the sky" },
-    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky-2", "kind": "text", "use": "body on raised dark surfaces" },
-    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky", "kind": "text", "use": "captions on the sky" },
-    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky-2", "kind": "text", "use": "captions on raised dark surfaces" },
-    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card title" },
-    { "theme": "dark", "fg": "--on-sky-text-body", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card body" },
-    { "theme": "dark", "fg": "--on-sky-text-caption", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "glass card caption" },
-    { "theme": "dark", "fg": "--on-sky-button-text", "bg": "--on-sky-button", "kind": "text", "use": "filled button on dark" },
-    { "theme": "dark", "fg": "--on-sky-plain", "bg": "--sky", "kind": "text", "use": "plain button on dark" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "large", "use": "lit moment numbers (title 1)" },
-    { "theme": "dark", "fg": "--on-sky-text-muted", "bg": "--sky", "kind": "text", "use": "muted text on the sky", "gate": false, "why": "inactive text only: labels of disabled, non-interactive controls, which WCAG 1.4.3 exempts; never for anything clickable (a tappable locked node is not exempt) or text meant to be read (user 2026-09-28, #17, #18)" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sky", "kind": "ui", "use": "focus ring, selected answer border" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sky-2", "kind": "ui", "use": "focus ring on raised dark surfaces" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "focus ring on glass cards" },
-    { "theme": "dark", "fg": "--lit", "bg": "--node-fill", "kind": "ui", "use": "ring of a hollow node" },
-    { "theme": "dark", "fg": "--lit", "bg": "--sphere-0", "kind": "ui", "use": "lit point on the sphere highlight" },
-    { "theme": "dark", "fg": "--on-sky-plain", "bg": "--sky-glass", "over": "--sky", "kind": "text", "use": "plain button in a glass card: resend the verification code (#53)" },
-    { "theme": "dark", "fg": "--on-sky-field-rule", "bg": "--sky", "kind": "ui", "use": "text field underline on the sign-in page (#53)" },
-    { "theme": "dark", "fg": "--on-sky-field-rule", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "text field underline in the email verification card (#53)" },
-    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky", "kind": "ui", "use": "invalid field underline, error glyph on the sign-in page (#53)" },
-    { "theme": "dark", "fg": "--on-sky-text", "bg": "--sky-glass", "over": "--sky", "kind": "ui", "use": "invalid field underline, error glyph in the verification card (#53)" },
-    { "theme": "dark", "fg": "--starmap-link-recommended", "bg": "--sky", "kind": "ui", "use": "star map line into the recommended star, tier 1, visible at rest on the nebula and star layers (#121)", "why": "The semantic-line 3:1 rule (WCAG 1.4.11) now holds for the tiers that are visible at rest and say how relevant a relation is now: tier 1 and tier 2. Over nebula haze it is checked in starmapContrast.test.ts (#121)." },
-    { "theme": "dark", "fg": "--starmap-link-in-progress", "bg": "--sky", "kind": "ui", "use": "star map line from an in-progress star to its prerequisites, tier 2, visible at rest on the nebula layer (#121)", "why": "Gated with tier 1: the in-progress star's way back to what it needs is part of what to do now (#121)." },
-    { "theme": "dark", "fg": "--starmap-link-walked", "bg": "--sky", "kind": "ui", "use": "star map line with both ends lit, tier 3, the path walked (#121)", "gate": false, "why": "Quiet on purpose (#121, #117 D1-D3: bright lines everywhere read as a tangle of scribbles). Both ends are already lit, which the stars' own glyphs show; nothing about it asks for action now. Only tiers 1 and 2 are held to the semantic-line 3:1." },
-    { "theme": "dark", "fg": "--starmap-link-locked", "bg": "--sky", "kind": "ui", "use": "star map line into a locked star, tier 4, dashed: only the lines of the star in focus (keyboard focus or chosen) or being dragged (#121, #138 D1); a relation across subjects at 70% of its tier's ink as a faint direction at the nebula band (#138 D2)", "gate": false, "why": "Darkest tier by design (#121), and since #138 D1 never drawn for every star: only around the one star in focus or in the hand (a locked star's card lists its missing prerequisites as links). Nothing on it can be done yet. Dashed, so about a third inked. Across subjects (#138 D2) the faint direction is never the only cue: the screen's edge names where it leads (\"↘ Optics · Physics\") in --on-sky-text-body on a patch of --sky, gated text above." },
-    { "theme": "dark", "fg": "--starmap-bridge", "bg": "--sky", "kind": "ui", "use": "star map panorama: soft bridge between two related nebulae, and the glow between two galaxies that share prerequisites (#121)", "gate": false, "why": "Decoration at rest, almost dissolved in the star dust by decision (#121, #117 D1): the panorama shows no knowledge-point lines; a hovered or focused nebula brightens its bridges, and its relations are read out by its nebula link in the parallel DOM." },
-    { "theme": "dark", "fg": "--starmap-galaxy-name", "bg": "--sky", "kind": "large", "use": "star map panorama: a galaxy's subject name, very faint and large under its stars, fading out as the zoom closes in (#137)", "gate": false, "why": "Decorative by decision (#123 round two A3: very faint, large, low contrast, so the galaxy reads as one whole without a label competing with its light). The same name is always the page heading and the subject switcher's segment, both gated text; the canvas name is never the only place it is said, and is not in the accessibility tree (#137)." },
-    { "theme": "dark", "fg": "--starmap-galaxy-name-math", "bg": "--sky", "kind": "large", "use": "star map panorama: the mathematics galaxy's name in its own colour, blue-violet, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)", "gate": false, "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree." },
-    { "theme": "dark", "fg": "--starmap-galaxy-name-physics", "bg": "--sky", "kind": "large", "use": "star map panorama: the physics galaxy's name in its own colour, cyan-blue, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)", "gate": false, "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree." },
-    { "theme": "dark", "fg": "--starmap-galaxy-name-chemistry", "bg": "--sky", "kind": "large", "use": "star map panorama: the chemistry galaxy's name in its own colour, warm amber, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)", "gate": false, "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree." }
+    {
+      "theme": "light",
+      "fg": "--ink",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "body, titles on the page"
+    },
+    {
+      "theme": "light",
+      "fg": "--ink",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "rows, cards"
+    },
+    {
+      "theme": "light",
+      "fg": "--ink",
+      "bg": "--sidebar",
+      "kind": "text",
+      "use": "source lists"
+    },
+    {
+      "theme": "light",
+      "fg": "--ink",
+      "bg": "--fill",
+      "kind": "text",
+      "use": "gray button, selected segment"
+    },
+    {
+      "theme": "light",
+      "fg": "--secondary",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "captions on the page"
+    },
+    {
+      "theme": "light",
+      "fg": "--secondary",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "captions in rows and cards"
+    },
+    {
+      "theme": "light",
+      "fg": "--secondary",
+      "bg": "--sidebar",
+      "kind": "text",
+      "use": "list meta in source lists"
+    },
+    {
+      "theme": "light",
+      "fg": "--secondary",
+      "bg": "--fill",
+      "kind": "text",
+      "use": "search placeholder, inactive segment"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "links"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "plain buttons"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--accent-tint",
+      "kind": "text",
+      "use": "tinted button, Pending pill"
+    },
+    {
+      "theme": "light",
+      "fg": "--on-accent",
+      "bg": "--accent",
+      "kind": "text",
+      "use": "filled button"
+    },
+    {
+      "theme": "light",
+      "fg": "--on-accent",
+      "bg": "--accent-pressed",
+      "kind": "text",
+      "use": "filled button, hover / press"
+    },
+    {
+      "theme": "light",
+      "fg": "--red",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "destructive text"
+    },
+    {
+      "theme": "light",
+      "fg": "--red",
+      "bg": "--surface",
+      "kind": "text",
+      "use": "destructive text in rows"
+    },
+    {
+      "theme": "light",
+      "fg": "--gold",
+      "bg": "--gold-tint",
+      "kind": "text",
+      "use": "Assigned / waiting pill"
+    },
+    {
+      "theme": "light",
+      "fg": "--green",
+      "bg": "--green-tint",
+      "kind": "text",
+      "use": "In progress / Ready pill"
+    },
+    {
+      "theme": "light",
+      "fg": "--pill-neutral",
+      "bg": "--fill",
+      "kind": "text",
+      "use": "Resolved pill"
+    },
+    {
+      "theme": "light",
+      "fg": "--red",
+      "bg": "--fill",
+      "kind": "text",
+      "use": "Overdue pill"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--ground",
+      "kind": "ui",
+      "use": "focus ring"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--surface",
+      "kind": "ui",
+      "use": "focus ring on cards"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--accent-tint",
+      "kind": "ui",
+      "use": "selected answer border"
+    },
+    {
+      "theme": "light",
+      "fg": "--accent",
+      "bg": "--fill",
+      "kind": "ui",
+      "use": "focus ring inside a highlighted menu item: account menu, language list (#53)"
+    },
+    {
+      "theme": "light",
+      "fg": "--green",
+      "bg": "--surface",
+      "kind": "ui",
+      "use": "online dot"
+    },
+    {
+      "theme": "light",
+      "fg": "--star",
+      "bg": "--surface",
+      "kind": "ui",
+      "use": "streak / lit icon on cards"
+    },
+    {
+      "theme": "light",
+      "fg": "--star",
+      "bg": "--ground",
+      "kind": "ui",
+      "use": "streak / lit icon on the page"
+    },
+    {
+      "theme": "light",
+      "fg": "--surface",
+      "bg": "--toggle-track-off",
+      "kind": "ui",
+      "use": "toggle knob, off"
+    },
+    {
+      "theme": "light",
+      "fg": "--surface",
+      "bg": "--accent",
+      "kind": "ui",
+      "use": "toggle knob, on"
+    },
+    {
+      "theme": "light",
+      "fg": "--toggle-track-off",
+      "bg": "--surface",
+      "kind": "ui",
+      "use": "off toggle in a row or card"
+    },
+    {
+      "theme": "light",
+      "fg": "--toggle-track-off",
+      "bg": "--ground",
+      "kind": "ui",
+      "use": "off toggle on the page"
+    },
+    {
+      "theme": "light",
+      "fg": "--toggle-track-off",
+      "bg": "--sidebar",
+      "kind": "ui",
+      "use": "off toggle in a source list"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "titles on the sky"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text",
+      "bg": "--sky-2",
+      "kind": "text",
+      "use": "titles on raised dark surfaces"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-body",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "body on the sky"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-body",
+      "bg": "--sky-2",
+      "kind": "text",
+      "use": "body on raised dark surfaces"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-caption",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "captions on the sky"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-caption",
+      "bg": "--sky-2",
+      "kind": "text",
+      "use": "captions on raised dark surfaces"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "text",
+      "use": "glass card title"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-body",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "text",
+      "use": "glass card body"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-caption",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "text",
+      "use": "glass card caption"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-button-text",
+      "bg": "--on-sky-button",
+      "kind": "text",
+      "use": "filled button on dark"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-plain",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "plain button on dark"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--sky",
+      "kind": "large",
+      "use": "lit moment numbers (title 1)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text-muted",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "muted text on the sky",
+      "gate": false,
+      "why": "inactive text only: labels of disabled, non-interactive controls, which WCAG 1.4.3 exempts; never for anything clickable (a tappable locked node is not exempt) or text meant to be read (user 2026-09-28, #17, #18)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "focus ring, selected answer border"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--sky-2",
+      "kind": "ui",
+      "use": "focus ring on raised dark surfaces"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "ui",
+      "use": "focus ring on glass cards"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--node-fill",
+      "kind": "ui",
+      "use": "ring of a hollow node"
+    },
+    {
+      "theme": "dark",
+      "fg": "--lit",
+      "bg": "--sphere-0",
+      "kind": "ui",
+      "use": "lit point on the sphere highlight"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-plain",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "text",
+      "use": "plain button in a glass card: resend the verification code (#53)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-field-rule",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "text field underline on the sign-in page (#53)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-field-rule",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "ui",
+      "use": "text field underline in the email verification card (#53)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "invalid field underline, error glyph on the sign-in page (#53)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-sky-text",
+      "bg": "--sky-glass",
+      "over": "--sky",
+      "kind": "ui",
+      "use": "invalid field underline, error glyph in the verification card (#53)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-link-recommended",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map line into the recommended star, tier 1, visible at rest on the nebula and star layers (#121)",
+      "why": "The semantic-line 3:1 rule (WCAG 1.4.11) now holds for the tiers that are visible at rest and say how relevant a relation is now: tier 1 and tier 2. Over nebula haze it is checked in starmapContrast.test.ts (#121)."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-link-in-progress",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map line from an in-progress star to its prerequisites, tier 2, visible at rest on the nebula layer (#121)",
+      "why": "Gated with tier 1: the in-progress star's way back to what it needs is part of what to do now (#121)."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-link-walked",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map line with both ends lit, tier 3, the path walked (#121)",
+      "gate": false,
+      "why": "Quiet on purpose (#121, #117 D1-D3: bright lines everywhere read as a tangle of scribbles). Both ends are already lit, which the stars' own glyphs show; nothing about it asks for action now. Only tiers 1 and 2 are held to the semantic-line 3:1."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-link-locked",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map line into a locked star, tier 4, dashed: only the lines of the star in focus (keyboard focus or chosen) or being dragged (#121, #138 D1); a relation across subjects at 70% of its tier's ink as a faint direction at the nebula band (#138 D2)",
+      "gate": false,
+      "why": "Darkest tier by design (#121), and since #138 D1 never drawn for every star: only around the one star in focus or in the hand (a locked star's card lists its missing prerequisites as links). Nothing on it can be done yet. Dashed, so about a third inked. Across subjects (#138 D2) the faint direction is never the only cue: the screen's edge names where it leads (\"↘ Optics · Physics\") in --on-sky-text-body on a patch of --sky, gated text above."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-bridge",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map panorama: soft bridge between two related nebulae, and the glow between two galaxies that share prerequisites (#121)",
+      "gate": false,
+      "why": "Decoration at rest, almost dissolved in the star dust by decision (#121, #117 D1): the panorama shows no knowledge-point lines; a hovered or focused nebula brightens its bridges, and its relations are read out by its nebula link in the parallel DOM."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-galaxy-name",
+      "bg": "--sky",
+      "kind": "large",
+      "use": "star map panorama: a galaxy's subject name, very faint and large under its stars, fading out as the zoom closes in (#137)",
+      "gate": false,
+      "why": "Decorative by decision (#123 round two A3: very faint, large, low contrast, so the galaxy reads as one whole without a label competing with its light). The same name is always the page heading and the subject switcher's segment, both gated text; the canvas name is never the only place it is said, and is not in the accessibility tree (#137)."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-galaxy-name-math",
+      "bg": "--sky",
+      "kind": "large",
+      "use": "star map panorama: the mathematics galaxy's name in its own colour, blue-violet, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)",
+      "gate": false,
+      "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-galaxy-name-physics",
+      "bg": "--sky",
+      "kind": "large",
+      "use": "star map panorama: the physics galaxy's name in its own colour, cyan-blue, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)",
+      "gate": false,
+      "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-galaxy-name-chemistry",
+      "bg": "--sky",
+      "kind": "large",
+      "use": "star map panorama: the chemistry galaxy's name in its own colour, warm amber, very faint and large under its stars, stepping back while one of its nebulae is hovered or focused (#143)",
+      "gate": false,
+      "why": "Decorative by decision, as --starmap-galaxy-name (#123 round two A3, #137): the same alpha, only tinted with its galaxy's base colour so a subject is told by hue (#142 round three A5, #143). The name is always the page heading and the subject switcher's segment, both gated text; the canvas name is not in the accessibility tree."
+    },
+    {
+      "theme": "dark",
+      "fg": "--accent-on-sky",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "Alpenklar: interactive text and icons on the sky"
+    },
+    {
+      "theme": "dark",
+      "fg": "--on-accent-on-sky",
+      "bg": "--accent-on-sky",
+      "kind": "text",
+      "use": "Alpenklar: filled button on the sky"
+    }
   ]
 }

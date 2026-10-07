@@ -3,6 +3,12 @@
  * sign-in page gained a sky version of it (#53). The snapshots were first
  * written from the panel as it stood before #53 and must not change unless
  * registration is being restyled on purpose.
+ *
+ * The snapshots were re-recorded when the shared Button took the Alpenklar
+ * shape: its class list is in them, and that is a deliberate restyle. The
+ * assertions above each snapshot are what this file is really about — the
+ * card's own classes, that it carries no `data-surface`, and that the error
+ * line is a plain tinted row — and none of those moved.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
