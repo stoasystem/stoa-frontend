@@ -60,6 +60,7 @@ export class StudentWorld {
     const signedIn = (headers: Record<string, string>) => headers.authorization === `Bearer ${ACCESS_TOKEN}`
     const denied = { status: 401, body: { detail: 'Not authenticated' } }
     this.installAskSurroundings()
+    this.installKnowledgeMap()
 
     b.on('POST', '/auth/login', ({ body }) => {
       const { email, password } = body as { email: string; password: string }
@@ -175,6 +176,37 @@ export class StudentWorld {
         },
       }
     })
+  }
+
+  /** The star map read model (stoa-backend#59), as #48 wires it in. */
+  private installKnowledgeMap() {
+    this.backend.on('GET', '/practice/knowledge-map', () => ({
+      status: 200,
+      body: {
+        subjectId: 'math',
+        galaxies: [{ subjectId: 'math', name: 'Mathematics', lit: 0, total: 1, enrolled: true }],
+        nebulae: [{ topicId: 'fractions', name: 'Fractions', order: 0, subjectId: 'math' }],
+        stars: [
+          {
+            unitId: 'reducing',
+            name: 'Reducing fractions',
+            nebulaId: 'fractions',
+            order: 0,
+            state: 'ready',
+            progress: 0,
+            unmetExercises: 2,
+            reviewDue: 0,
+            recommendation: { source: 'system' },
+            x: 0.5,
+            y: 0.5,
+            skills: [],
+            chapter: { lessonCount: 1, lessonsDone: 0, nextLesson: null },
+          },
+        ],
+        prerequisites: [],
+        summary: { lit: 0, total: 1, streakDays: 0, score: 0 },
+      },
+    }))
   }
 
   private installAskSurroundings() {

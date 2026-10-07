@@ -2,16 +2,11 @@ import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { ACCESS_TOKEN, StudentWorld } from './support/student'
 
-// What the star map draws in a production build is the empty sky until #48
-// wires `GET /practice/knowledge-map` into the star map source: #131 moved the
-// demo sky into `src/dev`, so the bundle carries no subjects of its own. The
-// heading below is therefore the empty state, not a weakened assertion — it is
-// the one thing a signed-in student actually sees today, and it is the reason
-// this branch must not reach `main` before #48 does.
-//
-// #48 replaces `STAR_MAP_HEADING` with the subject name the read model returns
-// and this test goes back to proving a student lands on their own sky.
-const STAR_MAP_HEADING = 'Your star map is on its way'
+// #48 wired `GET /practice/knowledge-map` into the star map source, so a
+// production build draws the student's own sky. The heading is the subject the
+// read model returns - which is what makes this a test that a student lands on
+// their map, rather than on the empty state they saw between #131 and #48.
+const STAR_MAP_HEADING = 'Mathematics'
 
 test('a student signs in, lands on the star map, and stays signed in across a reload', async ({ page, backend }) => {
   new StudentWorld(backend).install()

@@ -21,6 +21,7 @@ import type {
   PracticeTeacherHelpResponse,
   CurriculumCatalog,
   CurriculumProgressSummary,
+  KnowledgeMapResponse,
 } from '@/types/practice'
 
 export async function getPracticeOverview() {
@@ -158,4 +159,12 @@ export function normalizeCurriculumSubjectId(subjectId?: string) {
     englisch: 'english',
   }
   return aliases[normalized] ?? normalized
+}
+
+/** The star map read model (stoa-backend#59). `subjectId` is the galaxy in focus. */
+export async function getKnowledgeMap(subjectId?: string) {
+  const response = await httpClient.get<KnowledgeMapResponse>('/practice/knowledge-map', {
+    params: subjectId ? { subjectId } : undefined,
+  })
+  return response.data
 }
