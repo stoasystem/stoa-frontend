@@ -25,7 +25,12 @@ import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import { createConversation, getConversations } from '@/services/chat/chatApi'
 import { getGenerationProgress, streamConversationMessage } from '@/services/chat/chatStreamApi'
 
-vi.mock('@/services/analytics/analyticsClient', () => ({ trackEvent: vi.fn() }))
+// `rotateAnalyticsSession` is called on sign-out (#34). A mock without it
+// throws past the assertions, so 26 green tests still failed the run.
+vi.mock('@/services/analytics/analyticsClient', () => ({
+  trackEvent: vi.fn(),
+  rotateAnalyticsSession: vi.fn(),
+}))
 vi.mock('@/services/auth/authApi', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/auth/authApi')>()),
   logout: vi.fn(async () => ({ kind: 'ok' })),

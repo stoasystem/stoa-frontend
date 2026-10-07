@@ -104,6 +104,18 @@ function getSessionId() {
   }
 }
 
+/**
+ * Signing out: the next person's events must not continue this person's
+ * analytics session, so the next event starts a new one (#34).
+ */
+export function rotateAnalyticsSession() {
+  try {
+    sessionStorage.removeItem(SESSION_ID_KEY)
+  } catch {
+    // Without storage no session id was kept.
+  }
+}
+
 function getAccessToken() {
   try {
     return localStorage.getItem(TOKEN_KEY)

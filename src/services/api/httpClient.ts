@@ -1,8 +1,7 @@
-import { releaseTab, tabToken } from '@/lib/devSessions'
 import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
-import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
+import { currentSessionToken, useAuthStore } from '@/store/authStore'
 
 export class ApiError extends Error {
   status?: number
@@ -79,7 +78,7 @@ function isPublicAuthPath(url?: string, method?: string) {
 httpClient.interceptors.request.use((config) => {
   // A tab holding its own role must send that role's token, not the one
   // the rest of the browser shares.
-  const token = tabToken() ?? localStorage.getItem(TOKEN_KEY)
+  const token = currentSessionToken()
 
   config.headers['Accept-Language'] = activeLanguage()
 
@@ -92,6 +91,16 @@ httpClient.interceptors.request.use((config) => {
   return config
 })
 
+/** The token a request went out with, or null when it carried none. */
+function tokenSent(config?: { headers?: unknown }): string | null {
+  const headers = config?.headers as
+    | { get?: (name: string) => unknown; Authorization?: unknown }
+    | undefined
+  const value = typeof headers?.get === 'function' ? headers.get('Authorization') : headers?.Authorization
+  if (typeof value !== 'string' || !value.startsWith('Bearer ')) return null
+  return value.slice('Bearer '.length)
+}
+
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -100,15 +109,19 @@ httpClient.interceptors.response.use(
     // Logging out with a token that already expired or was revoked answers
     // 401. That session is over either way, and the caller finishes signing
     // out itself; clearing and reloading here as well would race it.
-    if (status === 401 && requestPath(error.config?.url) !== LOGOUT_PATH) {
-      // A tab pinned to one test role fails on that role's own token. Dropping
-      // the pin is enough; clearing here would take the session the rest of the
-      // browser shares down with it, which is not what expired.
-      if (tabToken()) {
-        releaseTab()
-      } else {
-        useAuthStore.getState().clearAuth()
-      }
+    //
+    // A 401 only says the session the request carried is over. If this tab
+    // now holds a different one - the sender signed out and someone signed in
+    // since, or a request sent before anyone signed in answers late - that is
+    // not the session that failed, and it stays (#34).
+    if (
+      status === 401 &&
+      requestPath(error.config?.url) !== LOGOUT_PATH &&
+      tokenSent(error.config) === currentSessionToken()
+    ) {
+      // A tab pinned to one test role fails on that role's own token; clearing
+      // drops the pin and leaves the session the rest of the browser shares.
+      useAuthStore.getState().clearAuth()
       if (window.location.pathname !== '/login') {
         window.location.assign('/login')
       }

@@ -125,7 +125,11 @@ export function forgetSession(email: string): DevSession[] {
  * Drop the held entry carrying this token, whichever account it is under.
  * Signing a session out ends it here too: kept, it would be offered to the
  * next person on this browser, and if the backend never confirmed the
- * revocation it would still work. Other held roles are left as they are.
+ * revocation it would still work. Other held roles are left as they are:
+ * signing out ends the session this tab used, not the ones held on purpose for
+ * other accounts, just as a pinned tab's sign-out leaves the shared session
+ * (#34). Each of those is ended by signing out in a tab that uses it, or by
+ * Forget in the switcher.
  */
 export function forgetSessionHolding(accessToken: string): void {
   if (typeof window === 'undefined') return
