@@ -1,7 +1,7 @@
-/* The star map, layer by layer (#13 point 1; #47, #72). Every map route
- * shows the same map and the path picks the layer. The manifest still passes
- * each page a `titleKey`; the map names itself instead (the subject, the
- * nebula, or the star). */
+/* The star map (#13 point 1; #47, #72). Every map route shows the same map
+ * and the path picks what is chosen -- the galaxy, a nebula, a star. The
+ * manifest still passes each page a `titleKey`; the map names itself instead
+ * (the subject, the nebula, or the star). */
 import { PlanetScreen } from '@/pages/map/PlanetScreen'
 
 function MapScreen() {
@@ -13,17 +13,12 @@ export function MapHomePage() {
   return <MapScreen />
 }
 
-/** `/map/:subjectId`: a subject's star map. */
-export function MapSubjectPage() {
-  return <MapScreen />
-}
-
-/** `/map/:subjectId/:topicId`: a nebula. */
-export function MapNebulaPage() {
-  return <MapScreen />
-}
-
-/** `/map/:subjectId/:topicId/:unitId`: a star. */
-export function MapStarPage() {
+/**
+ * `/map/:subjectId`, `/map/:subjectId/:topicId` and
+ * `/map/:subjectId/:topicId/:unitId`: one page for all three, so choosing a
+ * nebula or a star keeps the map mounted and the camera flies there (#134);
+ * a page per route made React swap the whole map on every choice.
+ */
+export function MapPage() {
   return <MapScreen />
 }

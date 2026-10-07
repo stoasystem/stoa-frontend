@@ -8,13 +8,19 @@
  *   npm run bench:preview    # prints a Network address for the phone
  *
  * then open <address>/src/dev/starmap.html?points=500&bench=1.
+ *
+ * The bench is dev-only code by design, so the production guard that rejects
+ * src/dev/ in a build is left out here, and only here.
  */
 import path from 'node:path'
-import { defineConfig, mergeConfig } from 'vite'
-import base from './vite.config'
+import { defineConfig, mergeConfig, type PluginOption } from 'vite'
+import base, { devOnlyCodeStaysOut } from './vite.config'
+
+const guard = devOnlyCodeStaysOut().name
+const notTheGuard = (plugin: PluginOption) => !(plugin && typeof plugin === 'object' && 'name' in plugin && plugin.name === guard)
 
 export default mergeConfig(
-  base,
+  { ...base, plugins: base.plugins?.filter(notTheGuard) },
   defineConfig({
     build: {
       outDir: 'dist-bench',

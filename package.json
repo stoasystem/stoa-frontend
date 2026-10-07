@@ -9,6 +9,7 @@
     "preview": "node ./scripts/vite.mjs preview",
     "bench:build": "node ./scripts/vite.mjs build --config vite.bench.config.ts",
     "bench:preview": "node ./scripts/vite.mjs preview --config vite.bench.config.ts",
+    "design-preview:capture": "node ./scripts/capture-design-preview.mjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b",
     "test:release": "node --test tests/release/contact-backend-only.test.mjs tests/release/runtime-config.test.mjs tests/release/runtime-env-projection.test.mjs tests/release/runtime-monitoring-flag.test.mjs tests/release/runtime-startup-barrier.test.mjs tests/release/served-release.test.mjs tests/release/sandbox-evidence-sources-present.test.mjs tests/release/verify-release.test.mjs",
@@ -71,10 +72,5 @@
     "typescript-eslint": "^8.0.0",
     "vite": "^6.0.0",
     "vitest": "^4.1.10"
-  },
-  "msw": {
-    "workerDirectory": [
-      "public"
-    ]
   }
 }

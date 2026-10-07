@@ -1,0 +1,158 @@
+{
+  "galaxies": [
+    {"subjectId": "math", "enrolled": true, "name": {"en": "Mathematics", "de": "Mathematik", "fr": "Mathématiques", "it": "Matematica"}},
+    {"subjectId": "physics", "enrolled": true, "name": {"en": "Physics", "de": "Physik", "fr": "Physique", "it": "Fisica"}},
+    {"subjectId": "chemistry", "enrolled": false, "name": {"en": "Chemistry", "de": "Chemie", "fr": "Chimie", "it": "Chimica"}}
+  ],
+  "nebulae": [
+    {"topicId": "numbers", "subjectId": "math", "weight": 1.0, "lit": 0.85,
+     "name": {"en": "Numbers", "de": "Zahlen", "fr": "Nombres", "it": "Numeri"},
+     "stars": [
+       {"name": {"en": "Integers", "de": "Ganze Zahlen", "fr": "Nombres entiers", "it": "Numeri interi"},
+        "skills": [
+          {"en": "Ordering integers", "de": "Ganze Zahlen ordnen", "fr": "Ordonner les entiers", "it": "Ordinare i numeri interi"},
+          {"en": "Negative numbers", "de": "Negative Zahlen", "fr": "Nombres négatifs", "it": "Numeri negativi"}
+        ]},
+       {"name": {"en": "Fractions", "de": "Brüche", "fr": "Fractions", "it": "Frazioni"}},
+       {"name": {"en": "Decimals", "de": "Dezimalzahlen", "fr": "Nombres décimaux", "it": "Numeri decimali"}}
+     ]},
+    {"topicId": "algebra", "subjectId": "math", "weight": 1.2, "lit": 0.6,
+     "name": {"en": "Algebra", "de": "Algebra", "fr": "Algèbre", "it": "Algebra"},
+     "stars": [
+       {"name": {"en": "Terms and expressions", "de": "Terme", "fr": "Expressions algébriques", "it": "Espressioni algebriche"}},
+       {"name": {"en": "Linear equations", "de": "Lineare Gleichungen", "fr": "Équations linéaires", "it": "Equazioni lineari"}},
+       {"name": {"en": "Systems of equations", "de": "Gleichungssysteme", "fr": "Systèmes d'équations", "it": "Sistemi di equazioni"}}
+     ]},
+    {"topicId": "geometry", "subjectId": "math", "weight": 1.0, "lit": 0.45,
+     "name": {"en": "Geometry", "de": "Geometrie", "fr": "Géométrie", "it": "Geometria"},
+     "stars": [
+       {"name": {"en": "Angles", "de": "Winkel", "fr": "Angles", "it": "Angoli"}},
+       {"name": {"en": "Triangles", "de": "Dreiecke", "fr": "Triangles", "it": "Triangoli"}},
+       {"name": {"en": "Pythagorean theorem", "de": "Satz des Pythagoras", "fr": "Théorème de Pythagore", "it": "Teorema di Pitagora"}}
+     ]},
+    {"topicId": "functions", "subjectId": "math", "weight": 1.1, "lit": 0.25,
+     "name": {"en": "Functions", "de": "Funktionen", "fr": "Fonctions", "it": "Funzioni"},
+     "stars": [
+       {"name": {"en": "Linear functions", "de": "Lineare Funktionen", "fr": "Fonctions affines", "it": "Funzioni lineari"}},
+       {"name": {"en": "Quadratic functions", "de": "Quadratische Funktionen", "fr": "Fonctions du second degré", "it": "Funzioni quadratiche"}},
+       {"name": {"en": "Exponential growth", "de": "Exponentielles Wachstum", "fr": "Croissance exponentielle", "it": "Crescita esponenziale"}}
+     ]},
+    {"topicId": "trigonometry", "subjectId": "math", "weight": 0.8, "lit": 0.3,
+     "name": {"en": "Trigonometry", "de": "Trigonometrie", "fr": "Trigonométrie", "it": "Trigonometria"},
+     "stars": [
+       {"name": {"en": "Degrees and radians", "de": "Grad- und Bogenmass", "fr": "Degrés et radians", "it": "Gradi e radianti"}},
+       {"name": {"en": "Tangent", "de": "Tangens", "fr": "Tangente", "it": "Tangente"}},
+       {"name": {"en": "The unit circle", "de": "Der Einheitskreis", "fr": "Le cercle trigonométrique", "it": "La circonferenza goniometrica"}}
+     ]},
+    {"topicId": "probability", "subjectId": "math", "weight": 0.8, "lit": 0.08,
+     "name": {"en": "Probability", "de": "Wahrscheinlichkeit", "fr": "Probabilités", "it": "Probabilità"},
+     "stars": [
+       {"name": {"en": "Random experiments", "de": "Zufallsexperimente", "fr": "Expériences aléatoires", "it": "Esperimenti casuali"}},
+       {"name": {"en": "Tree diagrams", "de": "Baumdiagramme", "fr": "Arbres de probabilités", "it": "Diagrammi ad albero"}},
+       {"name": {"en": "Expected value", "de": "Erwartungswert", "fr": "Espérance", "it": "Valore atteso"}}
+     ]},
+    {"topicId": "statistics", "subjectId": "math", "weight": 0.7, "lit": 0,
+     "name": {"en": "Statistics", "de": "Statistik", "fr": "Statistique", "it": "Statistica"},
+     "stars": [
+       {"name": {"en": "Mean and median", "de": "Mittelwert und Median", "fr": "Moyenne et médiane", "it": "Media e mediana"}},
+       {"name": {"en": "Spread", "de": "Streuung", "fr": "Dispersion", "it": "Dispersione"}},
+       {"name": {"en": "Box plots", "de": "Boxplots", "fr": "Boîtes à moustaches", "it": "Box plot"}}
+     ]},
+    {"topicId": "mechanics", "subjectId": "physics", "weight": 1.2, "lit": 0.7,
+     "name": {"en": "Mechanics", "de": "Mechanik", "fr": "Mécanique", "it": "Meccanica"},
+     "stars": [
+       {"name": {"en": "Speed", "de": "Geschwindigkeit", "fr": "Vitesse", "it": "Velocità"},
+        "skills": [
+          {"en": "Units of speed", "de": "Einheiten der Geschwindigkeit", "fr": "Unités de vitesse", "it": "Unità di velocità"},
+          {"en": "Distance-time graphs", "de": "s-t-Diagramme", "fr": "Graphiques distance-temps", "it": "Grafici spazio-tempo"}
+        ]},
+       {"name": {"en": "Acceleration", "de": "Beschleunigung", "fr": "Accélération", "it": "Accelerazione"}},
+       {"name": {"en": "Newton's laws", "de": "Newtonsche Gesetze", "fr": "Lois de Newton", "it": "Leggi di Newton"}}
+     ]},
+    {"topicId": "energy", "subjectId": "physics", "weight": 0.9, "lit": 0.4,
+     "name": {"en": "Energy", "de": "Energie", "fr": "Énergie", "it": "Energia"},
+     "stars": [
+       {"name": {"en": "Work and power", "de": "Arbeit und Leistung", "fr": "Travail et puissance", "it": "Lavoro e potenza"}},
+       {"name": {"en": "Kinetic energy", "de": "Kinetische Energie", "fr": "Énergie cinétique", "it": "Energia cinetica"}},
+       {"name": {"en": "Conservation of energy", "de": "Energieerhaltung", "fr": "Conservation de l'énergie", "it": "Conservazione dell'energia"}}
+     ]},
+    {"topicId": "waves", "subjectId": "physics", "weight": 0.8, "lit": 0.15,
+     "name": {"en": "Waves", "de": "Wellen", "fr": "Ondes", "it": "Onde"},
+     "stars": [
+       {"name": {"en": "Oscillations", "de": "Schwingungen", "fr": "Oscillations", "it": "Oscillazioni"}},
+       {"name": {"en": "Wavelength and frequency", "de": "Wellenlänge und Frequenz", "fr": "Longueur d'onde et fréquence", "it": "Lunghezza d'onda e frequenza"}},
+       {"name": {"en": "Sound", "de": "Schall", "fr": "Son", "it": "Suono"}}
+     ]},
+    {"topicId": "optics", "subjectId": "physics", "weight": 0.8, "lit": 0,
+     "name": {"en": "Optics", "de": "Optik", "fr": "Optique", "it": "Ottica"},
+     "stars": [
+       {"name": {"en": "Light rays", "de": "Lichtstrahlen", "fr": "Rayons lumineux", "it": "Raggi luminosi"}},
+       {"name": {"en": "Reflection", "de": "Reflexion", "fr": "Réflexion", "it": "Riflessione"}},
+       {"name": {"en": "Lenses", "de": "Linsen", "fr": "Lentilles", "it": "Lenti"}}
+     ]},
+    {"topicId": "electricity", "subjectId": "physics", "weight": 1.0, "lit": 0.05,
+     "name": {"en": "Electricity", "de": "Elektrizität", "fr": "Électricité", "it": "Elettricità"},
+     "stars": [
+       {"name": {"en": "Charge", "de": "Ladung", "fr": "Charge électrique", "it": "Carica elettrica"}},
+       {"name": {"en": "Circuits", "de": "Stromkreise", "fr": "Circuits électriques", "it": "Circuiti elettrici"}},
+       {"name": {"en": "Ohm's law", "de": "Ohmsches Gesetz", "fr": "Loi d'Ohm", "it": "Legge di Ohm"}}
+     ]},
+    {"topicId": "atoms", "subjectId": "chemistry", "weight": 1.0, "lit": 0,
+     "name": {"en": "Atoms", "de": "Atome", "fr": "Atomes", "it": "Atomi"},
+     "stars": [
+       {"name": {"en": "Atomic structure", "de": "Atombau", "fr": "Structure de l'atome", "it": "Struttura dell'atomo"}},
+       {"name": {"en": "Periodic table", "de": "Periodensystem", "fr": "Tableau périodique", "it": "Tavola periodica"}},
+       {"name": {"en": "Ions", "de": "Ionen", "fr": "Ions", "it": "Ioni"}}
+     ]},
+    {"topicId": "reactions", "subjectId": "chemistry", "weight": 1.0, "lit": 0,
+     "name": {"en": "Reactions", "de": "Reaktionen", "fr": "Réactions", "it": "Reazioni"},
+     "stars": [
+       {"name": {"en": "Chemical equations", "de": "Reaktionsgleichungen", "fr": "Équations chimiques", "it": "Equazioni chimiche"}},
+       {"name": {"en": "The mole", "de": "Das Mol", "fr": "La mole", "it": "La mole"}},
+       {"name": {"en": "Reaction rate", "de": "Reaktionsgeschwindigkeit", "fr": "Vitesse de réaction", "it": "Velocità di reazione"}}
+     ]},
+    {"topicId": "acids", "subjectId": "chemistry", "weight": 0.8, "lit": 0,
+     "name": {"en": "Acids and bases", "de": "Säuren und Basen", "fr": "Acides et bases", "it": "Acidi e basi"},
+     "stars": [
+       {"name": {"en": "The pH scale", "de": "Die pH-Skala", "fr": "L'échelle de pH", "it": "La scala del pH"}},
+       {"name": {"en": "Neutralisation", "de": "Neutralisation", "fr": "Neutralisation", "it": "Neutralizzazione"}},
+       {"name": {"en": "Indicators", "de": "Indikatoren", "fr": "Indicateurs", "it": "Indicatori"}}
+     ]},
+    {"topicId": "organic", "subjectId": "chemistry", "weight": 0.9, "lit": 0,
+     "name": {"en": "Organic chemistry", "de": "Organische Chemie", "fr": "Chimie organique", "it": "Chimica organica"},
+     "stars": [
+       {"name": {"en": "Hydrocarbons", "de": "Kohlenwasserstoffe", "fr": "Hydrocarbures", "it": "Idrocarburi"}},
+       {"name": {"en": "Alcohols", "de": "Alkohole", "fr": "Alcools", "it": "Alcoli"}},
+       {"name": {"en": "Polymers", "de": "Polymere", "fr": "Polymères", "it": "Polimeri"}}
+     ]}
+  ],
+  "relations": [
+    ["numbers", "algebra"], ["numbers", "geometry"], ["algebra", "functions"], ["geometry", "trigonometry"],
+    ["functions", "trigonometry"], ["numbers", "probability"], ["probability", "statistics"],
+    ["mechanics", "energy"], ["mechanics", "waves"], ["waves", "optics"], ["energy", "electricity"],
+    ["atoms", "reactions"], ["reactions", "acids"], ["atoms", "organic"],
+    ["trigonometry", "optics"], ["algebra", "mechanics"]
+  ],
+  "knowledgePoint": {
+    "unitId": "demo-sine-cosine",
+    "topicId": "trigonometry",
+    "gradeLevel": "9",
+    "name": {"en": "Sine and cosine", "de": "Sinus und Kosinus", "fr": "Sinus et cosinus", "it": "Seno e coseno"},
+    "skills": [
+      {"name": {"en": "Opposite and adjacent sides", "de": "Gegen- und Ankathete", "fr": "Côté opposé et côté adjacent", "it": "Cateto opposto e adiacente"}, "lit": true},
+      {"name": {"en": "Sine as a ratio", "de": "Sinus als Verhältnis", "fr": "Le sinus comme rapport", "it": "Il seno come rapporto"}, "lit": false},
+      {"name": {"en": "Finding a side", "de": "Seiten berechnen", "fr": "Calculer un côté", "it": "Calcolare un lato"}, "lit": false}
+    ],
+    "lessons": [
+      {"lessonId": "demo-sine-cosine-1", "exercises": 3, "title": {"en": "Sides of a right triangle", "de": "Seiten im rechtwinkligen Dreieck", "fr": "Les côtés du triangle rectangle", "it": "I lati del triangolo rettangolo"}},
+      {"lessonId": "demo-sine-cosine-2", "exercises": 4, "title": {"en": "Sine and cosine as ratios", "de": "Sinus und Kosinus als Verhältnisse", "fr": "Sinus et cosinus comme rapports", "it": "Seno e coseno come rapporti"}},
+      {"lessonId": "demo-sine-cosine-3", "exercises": 3, "title": {"en": "Finding a missing side", "de": "Fehlende Seiten berechnen", "fr": "Calculer un côté manquant", "it": "Calcolare un lato mancante"}}
+    ],
+    "lessonsDone": 1
+  },
+  "bridge": {
+    "unitId": "demo-refraction",
+    "topicId": "optics",
+    "name": {"en": "Refraction", "de": "Brechung", "fr": "Réfraction", "it": "Rifrazione"}
+  }
+}

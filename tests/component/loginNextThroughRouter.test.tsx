@@ -23,14 +23,12 @@ import { mswServer } from '../mswServer'
 
 vi.mock('@/pages/map/MapPages', () => ({
   MapHomePage: () => <h1>student home</h1>,
-  MapSubjectPage: function MapSubjectStub() {
-    return <h1>{`star map ${useParams().subjectId}`}</h1>
+  // One page for a subject, a nebula and a star (#134); the stub says which the path chose.
+  MapPage: function MapStub() {
+    const { subjectId, topicId, unitId } = useParams()
+    if (unitId) return <h1>star</h1>
+    return <h1>{topicId ? `nebula ${subjectId}/${topicId}` : `star map ${subjectId}`}</h1>
   },
-  MapNebulaPage: function MapNebulaStub() {
-    const { subjectId, topicId } = useParams()
-    return <h1>{`nebula ${subjectId}/${topicId}`}</h1>
-  },
-  MapStarPage: () => <h1>star</h1>,
 }))
 vi.mock('@/pages/me/MePage', () => ({ MePage: () => <h1>student account</h1> }))
 vi.mock('@/pages/ask/AskPage', () => ({
@@ -101,7 +99,14 @@ async function expectToLandOn(pathname: string, heading: string) {
   await waitFor(() => expect(window.location.pathname).toBe(pathname))
 }
 
-beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
+beforeAll(async () => {
+  mswServer.listen({ onUnhandledRequest: 'error' })
+  // /login is EntryPage, a lazy page whose first import is its whole module
+  // graph, cold. With the full suite beside it that ran past findBy's
+  // one-second wait for the sign-in form, so the first test here failed (#133),
+  // as /me's did (#94). What this file tests is where signing in lands.
+  await import('@/pages/entry/EntryPage')
+})
 afterAll(() => mswServer.close())
 beforeEach(async () => {
   await i18n.changeLanguage('en')

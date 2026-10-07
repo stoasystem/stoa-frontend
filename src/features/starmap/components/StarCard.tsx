@@ -1,37 +1,41 @@
 /*
  * The third layer: one star in HTML/SVG (#11 points 3 and 4, #72 point 5) --
  * its skills, progress, recommendation and review marker, and the way into
- * its chapter. A glass card over the dimmed map (canvas board "Zoomed in"),
- * beside it on a wide screen and along the bottom on a phone.
+ * its chapter. A glass card over the dimmed map (canvas board "Zoomed in")
+ * beside it on a wide screen; on a phone the same card is a sheet along the
+ * bottom (`StarSheet`, #139), built from the pieces below.
  */
 import { ChevronLeft } from 'lucide-react'
-import { useRef, type MouseEvent } from 'react'
+import type { MouseEvent, RefObject } from 'react'
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { JumpState } from '@/features/chapter/jump'
 import { Button } from '@/components/base'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { pathForTarget } from '@/features/starmap/view/layers'
-import type { Nebula, Star, StarMap } from '@/features/starmap/model/starMap'
+import { subjectOfNebula, type Nebula, type Star, type StarMap } from '@/features/starmap/model/starMap'
 import { cn } from '@/lib/utils'
 
-export function StarCard({
-  map,
-  star,
-  nebula,
-  wide,
-  reducedMotion,
-}: {
+export type StarCardProps = {
   map: StarMap
+  demo?: boolean
   star: Star
   nebula: Nebula
-  wide: boolean
   reducedMotion: boolean
-}) {
+}
+
+/** The id of the star's name: the card (or sheet) is labelled by it. */
+export const STAR_TITLE_ID = 'starmap-star-title'
+
+/**
+ * What a star's card says and where its main action leads: the chapter, by
+ * the jump from `glyph` (#50 point 5), or nothing for a locked star or the
+ * preview's placeholder stars.
+ */
+export function useStarCardAction(star: Star, demo: boolean, glyph: RefObject<HTMLElement | null>) {
   const { t } = useTranslation('starmap')
   const navigate = useNavigate()
-  const glyph = useRef<HTMLDivElement>(null)
-  const subjectId = map.subject.subjectId
   const chapterTo = `/chapter/${encodeURIComponent(star.unitId)}`
 
   // Into the chapter by the jump (#50 point 5): it starts at this star.
@@ -44,6 +48,49 @@ export function StarCard({
     const state: JumpState = { jump: { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 } }
     navigate(chapterTo, { state })
   }
+
+  const action =
+    // In the design preview only the demo knowledge point has a chapter; a placeholder star has none.
+    star.state === 'locked' || (demo && star.chapter.lessonCount === 0)
+      ? null
+      : star.state === 'lit'
+        ? t('star.open')
+        : star.state === 'in_progress'
+          ? t('star.continue')
+          : t('star.start')
+  return { action, chapterTo, jump }
+}
+
+/**
+ * The map's own query (`?points=`, the dev switches) on a path inside the map,
+ * as the map's other links keep it (#123): the card's links lead back into
+ * the same sky (#146, round three C7 of #142), on a wide screen and a phone.
+ */
+function useMapPath() {
+  const { search } = useLocation()
+  return (path: string) => path + search
+}
+
+/** The card's way back: the star's nebula (the card closes; the camera stays, #134). */
+export function StarCardBack({ map, nebula }: { map: StarMap; nebula: Nebula }) {
+  const { t } = useTranslation('starmap')
+  const here = useMapPath()
+  return (
+    <Link
+      data-star-back
+      to={here(pathForTarget(subjectOfNebula(map, nebula.topicId), { layer: 'nebula', nebulaId: nebula.topicId }))}
+      className="inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
+      {t('nav.backToNebula', { nebula: nebula.name })}
+    </Link>
+  )
+}
+
+/** Everything a card says below the star's name: progress, markers, the next lesson, skills, what to light first, review. */
+export function StarCardDetails({ map, demo = false, star }: { map: StarMap; demo?: boolean; star: Star }) {
+  const { t } = useTranslation('starmap')
+  const here = useMapPath()
   const { lessonCount, lessonsDone, nextLesson } = star.chapter
   const percent = Math.round(Math.max(0, Math.min(1, star.progress)) * 100)
   const prerequisites =
@@ -53,74 +100,29 @@ export function StarCard({
           .map((edge) => map.stars.find((candidate) => candidate.unitId === edge.from))
           .filter((candidate): candidate is Star => Boolean(candidate) && candidate!.state !== 'lit')
       : []
-  const action =
-    star.state === 'locked'
-      ? null
-      : star.state === 'lit'
-        ? t('star.open')
-        : star.state === 'in_progress'
-          ? t('star.continue')
-          : t('star.start')
   const allLessonsDone = lessonCount > 0 && lessonsDone >= lessonCount
 
   return (
-    <article
-      aria-labelledby="starmap-star-title"
-      className={cn(
-        'pointer-events-auto absolute flex flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky',
-        wide ? 'right-12 top-1/2 w-[340px] -translate-y-1/2' : 'inset-x-4 bottom-[calc(1rem+var(--page-bottom-inset,0px))]',
-      )}
-      style={{
-        background: 'var(--sky-glass)',
-        backdropFilter: 'blur(var(--sky-glass-blur))',
-        WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
-        boxShadow: 'var(--shadow-glass)',
-      }}
-    >
-      <Link
-        to={pathForTarget(subjectId, { layer: 'nebula', nebulaId: nebula.topicId })}
-        className="inline-flex min-h-11 items-center gap-1 self-start text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      >
-        <ChevronLeft size={18} strokeWidth={1.6} aria-hidden="true" />
-        {t('nav.backToNebula', { nebula: nebula.name })}
-      </Link>
-
-      <div className="flex items-center gap-4">
-        <div ref={glyph} className="shrink-0">
-          <StarGlyph
-            state={star.state}
-            size={wide ? 96 : 72}
-            progress={star.progress}
-            recommended={Boolean(star.recommendation)}
-            reviewDue={star.reviewDue > 0}
-            breathe={!reducedMotion && Boolean(star.recommendation)}
-          />
-        </div>
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <h1 id="starmap-star-title" className="m-0 text-[18px] font-semibold leading-tight tracking-[-0.3px] text-on-sky">
-            {star.name}
-          </h1>
+    <>
+      {demo && lessonCount === 0 ? (
+        <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('demo.emptyStar')}</p>
+      ) : (
+        <div className="flex flex-col gap-1.5">
+          <div
+            role="progressbar"
+            aria-label={t('star.lessons', { done: lessonsDone, total: lessonCount })}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={percent}
+            className="h-1 overflow-hidden rounded-[4px] bg-white/15"
+          >
+            <div className="h-full rounded-[4px] bg-lit" style={{ width: `${percent}%` }} />
+          </div>
           <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-            {t('star.inNebula', { nebula: nebula.name, state: t(`state.${star.state}`) })}
+            {t('star.lessons', { done: lessonsDone, total: lessonCount })}
           </p>
         </div>
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <div
-          role="progressbar"
-          aria-label={t('star.lessons', { done: lessonsDone, total: lessonCount })}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={percent}
-          className="h-1 overflow-hidden rounded-[4px] bg-white/15"
-        >
-          <div className="h-full rounded-[4px] bg-lit" style={{ width: `${percent}%` }} />
-        </div>
-        <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
-          {t('star.lessons', { done: lessonsDone, total: lessonCount })}
-        </p>
-      </div>
+      )}
 
       {(star.recommendation || star.reviewDue > 0 || star.unmetExercises > 0) && (
         <ul className="m-0 flex list-none flex-col gap-1 p-0 text-[13px] text-on-sky">
@@ -171,7 +173,7 @@ export function StarCard({
             {prerequisites.map((before) => (
               <li key={before.unitId}>
                 <Link
-                  to={pathForTarget(subjectId, { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId })}
+                  to={here(pathForTarget(subjectOfNebula(map, before.nebulaId), { layer: 'star', nebulaId: before.nebulaId, unitId: before.unitId }))}
                   className="inline-flex min-h-11 items-center text-[15px] font-semibold text-[color:var(--on-sky-plain)] hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
                 >
                   {before.name}
@@ -182,12 +184,64 @@ export function StarCard({
         </section>
       )}
 
+      {star.reviewDue > 0 && (
+        <div className="flex flex-col gap-1">
+          <Button variant="onSky" size="regular" disabled aria-describedby="starmap-review-soon">
+            {t('star.review', { count: star.reviewDue })}
+          </Button>
+          <p id="starmap-review-soon" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('star.reviewSoon')}</p>
+        </div>
+      )}
+    </>
+  )
+}
+
+/** The star's card on a wide screen: beside the map, every detail at once. */
+export function StarCard({ map, demo = false, star, nebula, reducedMotion }: StarCardProps) {
+  const { t } = useTranslation('starmap')
+  const glyph = useRef<HTMLDivElement>(null)
+  const { action, chapterTo, jump } = useStarCardAction(star, demo, glyph)
+
+  return (
+    <article
+      aria-labelledby={STAR_TITLE_ID}
+      className="pointer-events-auto absolute right-12 top-1/2 flex w-[340px] -translate-y-1/2 flex-col gap-3 rounded-[16px] border border-[color:var(--sky-glass-border)] p-[18px] text-on-sky"
+      style={{
+        background: 'var(--sky-glass)',
+        backdropFilter: 'blur(var(--sky-glass-blur))',
+        WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
+        boxShadow: 'var(--shadow-glass)',
+      }}
+    >
+      <StarCardBack map={map} nebula={nebula} />
+
+      <div className="flex items-center gap-4">
+        <div ref={glyph} className="shrink-0">
+          <StarGlyph
+            state={star.state}
+            size={96}
+            progress={star.progress}
+            recommended={Boolean(star.recommendation)}
+            reviewDue={star.reviewDue > 0}
+            breathe={!reducedMotion && Boolean(star.recommendation)}
+          />
+        </div>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <h1 id={STAR_TITLE_ID} className="m-0 text-[18px] font-semibold leading-tight tracking-[-0.3px] text-on-sky">
+            {star.name}
+          </h1>
+          <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">
+            {t('star.inNebula', { nebula: nebula.name, state: t(`state.${star.state}`) })}
+          </p>
+        </div>
+      </div>
+
+      <StarCardDetails map={map} demo={demo} star={star} />
+
       {action && (
         <div className="pt-1">
           <Button asChild variant="onSky" size="regular">
-            <Link to={chapterTo} onClick={jump}>
-              {action}
-            </Link>
+            <Link to={chapterTo} onClick={jump}>{action}</Link>
           </Button>
         </div>
       )}

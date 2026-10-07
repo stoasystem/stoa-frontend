@@ -2,18 +2,29 @@ import { expect, test } from './support/fixtures'
 import { signInAsStudent } from './support/signIn'
 import { ACCESS_TOKEN, StudentWorld } from './support/student'
 
+// What the star map draws in a production build is the empty sky until #48
+// wires `GET /practice/knowledge-map` into the star map source: #131 moved the
+// demo sky into `src/dev`, so the bundle carries no subjects of its own. The
+// heading below is therefore the empty state, not a weakened assertion — it is
+// the one thing a signed-in student actually sees today, and it is the reason
+// this branch must not reach `main` before #48 does.
+//
+// #48 replaces `STAR_MAP_HEADING` with the subject name the read model returns
+// and this test goes back to proving a student lands on their own sky.
+const STAR_MAP_HEADING = 'Your star map is on its way'
+
 test('a student signs in, lands on the star map, and stays signed in across a reload', async ({ page, backend }) => {
   new StudentWorld(backend).install()
   await signInAsStudent(page)
 
-  await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: STAR_MAP_HEADING })).toBeVisible()
   await expect(page.getByRole('textbox', { name: 'Your question' })).toBeVisible()
   expect(await page.evaluate(() => localStorage.getItem('stoa_access_token'))).toBe(ACCESS_TOKEN)
 
   const sessionReads = backend.callsTo('GET', '/auth/me').length
   await page.reload()
   await expect(page).toHaveURL('/')
-  await expect(page.getByRole('heading', { name: 'Mathematics' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: STAR_MAP_HEADING })).toBeVisible()
   expect(backend.callsTo('GET', '/auth/me').length, 'the reloaded page restores the session from the backend').toBeGreaterThan(
     sessionReads,
   )

@@ -1,23 +1,22 @@
 /**
  * Foveated rendering (#72 point 6): only the focus -- near the focus point,
  * and the chosen nebula -- is drawn star by star; every other nebula is one
- * pre-rendered, blurred tile, repainted only when its lit fraction changes.
+ * pre-rendered, blurred tile, repainted only when its star states change or a larger resolution is needed.
  *
  * Poison (#72): repaint the tiles on every frame (key the tile cache on
  * anything that changes per frame) and "repaints a tile only when..." goes red.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
-import { starMapFixture } from '@/features/starmap/fixtures/starMapFixtures'
 import { orderedNebulae, orderedStars, type StarMap } from '@/features/starmap/model/starMap'
 import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import type { SceneFrame, StarMapRenderer } from '@/features/starmap/render/types'
 import { DRAW_THRESHOLD, focusBand, sharpnessOf } from '@/features/starmap/view/foveation'
-import { fakeCanvas, fakeClock, recordingRenderer, THEME, type CanvasCounter, type RecordingRenderer } from './starmapHarness'
+import { fakeCanvas, fakeClock, recordingRenderer, THEME, type CanvasCounter, type RecordingRenderer, skyMap } from './starmapHarness'
 
 const W = 1280
 const H = 776
-const map500 = starMapFixture(500)
+const map500 = skyMap(500)
 
 function engineWith(renderer: StarMapRenderer, map: StarMap = map500, reducedMotion = true) {
   const clock = fakeClock()
@@ -59,15 +58,17 @@ describe('the engine draws only the focus star by star', () => {
     const sharp = frame.sharpness.filter((s) => s === 1)
     expect(blurred.length).toBeGreaterThan(2)
     expect(sharp.length).toBeGreaterThan(0)
-    const recommended = orderedStars(map500).findIndex((star) => star.recommendation)
-    frame.starAlpha.forEach((alpha, i) => expect(alpha).toBe(i === recommended ? 1 : frame.sharpness[nebulaOf[i]]))
+    // One sky: a recommended star per subject the student takes, each drawn whatever the blur.
+    const recommended = new Set(orderedStars(map500).flatMap((star, i) => (star.recommendation ? [i] : [])))
+    expect(recommended.size).toBe(2)
+    frame.starAlpha.forEach((alpha, i) => expect(alpha).toBe(recommended.has(i) ? 1 : frame.sharpness[nebulaOf[i]]))
     const drawn = frame.starAlpha.filter((a) => a >= DRAW_THRESHOLD).length
     expect(drawn).toBeLessThan(map500.stars.length * 0.8)
   })
 
   it('draws a small map star by star everywhere', () => {
     const renderer = recordingRenderer()
-    engineWith(renderer, starMapFixture(10))
+    engineWith(renderer, skyMap(10))
     expect(renderer.last().sharpness.every((s) => s === 1)).toBe(true)
   })
 
@@ -173,7 +174,7 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(made).toBeGreaterThan(0)
   })
 
-  it('repaints a tile only when its nebula’s lit fraction changes', () => {
+  it('repaints tiles for every state change, including changes with identical lit counts', () => {
     const renderer = realRenderer()
     const { clock, engine } = engineWith(renderer, map500, false)
     const nebulaCount = orderedNebulae(map500).length
@@ -196,19 +197,19 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     expect(renderer.stats.frames).toBeGreaterThan(100)
     expect(renderer.stats.tilePaints).toBe(nebulaCount)
 
-    // A star changes state but its nebula's lit fraction does not: still none.
+    // Ready → locked keeps the lit fraction but changes the tile's actual dots.
     const ready = map500.stars.find((s) => s.state === 'ready')!
     const shuffled: StarMap = { ...map500, stars: map500.stars.map((s) => (s === ready ? { ...s, state: 'locked' as const } : s)) }
     engine.setData(shuffled, { layer: 'map' })
     clock.advance(20)
-    expect(renderer.stats.tilePaints).toBe(nebulaCount)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)
 
     // A star lights up: exactly its nebula's tile is repainted.
     const lit: StarMap = { ...shuffled, stars: shuffled.stars.map((s) => (s.unitId === ready.unitId ? { ...s, state: 'lit' as const } : s)) }
     engine.setData(lit, { layer: 'map' })
     clock.advance(20)
     clock.advance(500)
-    expect(renderer.stats.tilePaints).toBe(nebulaCount + 1)
+    expect(renderer.stats.tilePaints).toBe(nebulaCount + 2)
   })
 
   it('never reuses a tile across maps: a subject switch repaints every tile', () => {
@@ -292,7 +293,7 @@ describe('the Canvas 2D renderer: sprites for the focus, tiles for the rest', ()
     // but the DOM kept the pre-pan positions, because the flight's last frame
     // was treated as moving and no later frame came (the recommended star,
     // in Numbers, is off screen).
-    const map = starMapFixture(10)
+    const map = skyMap(10)
     const recording = recordingRenderer()
     let discs: { x: number; y: number; r: number }[] = []
     let stars: { index: number; x: number; y: number }[] = []
