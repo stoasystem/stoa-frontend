@@ -27,6 +27,8 @@ import {
   type StarMapSource,
 } from '@/features/starmap/starMapSource'
 import type { StarMap } from '@/features/starmap/model/starMap'
+import { nebulaLinks } from '@/features/starmap/model/links'
+import { layoutSky } from '@/features/starmap/layout/layout'
 import { getKnowledgeMap } from '@/services/practice/practiceApi'
 import { useAuthStore } from '@/store/authStore'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
@@ -36,7 +38,53 @@ import type { KnowledgeMapResponse } from '@/types/practice'
  *  not between two glances at the map, so this is minutes rather than seconds. */
 export const KNOWLEDGE_MAP_STALE_MS = 2 * 60 * 1000
 
-export function projectStarMap(sky: KnowledgeMapResponse, { subjectId }: StarMapRequest): StarMap {
+/**
+ * One seed for every sky, so a student's map keeps its arrangement between
+ * visits and between devices. The same number the demo sky uses, so what the
+ * design was accepted against is what real content is laid out by.
+ */
+const LAYOUT_SEED = 116
+
+/**
+ * Place the sky the way the demo sky is placed: with the layout engine, not
+ * with the coordinates the read model sends.
+ *
+ * The backend derives `(x, y)` deterministically from identifiers as a
+ * stand-in for the offline layout (stoa-backend#60). Passed straight through,
+ * that put every nebula on one thin horizontal band and the student landed
+ * zoomed into a single star with the rest of their subject off-screen -
+ * measured on production: 1 of 10 knowledge points visible.
+ *
+ * `layoutSky` is the engine the design was accepted against: it groups a
+ * galaxy's nebulae by their relations, sizes each by its star count, and
+ * scatters stars inside them. Running it here costs one pass over the sky and
+ * makes real content look like what was signed off.
+ */
+function placed(sky: KnowledgeMapResponse): KnowledgeMapResponse['stars'] {
+  const starsPerNebula = new Map<string, number>()
+  for (const star of sky.stars) {
+    starsPerNebula.set(star.nebulaId, (starsPerNebula.get(star.nebulaId) ?? 0) + 1)
+  }
+  const layout = layoutSky(
+    sky.galaxies.map((galaxy) => ({
+      id: galaxy.subjectId,
+      nebulae: sky.nebulae
+        .filter((nebula) => nebula.subjectId === galaxy.subjectId)
+        .map((nebula) => ({
+          id: nebula.topicId,
+          order: nebula.order,
+          size: starsPerNebula.get(nebula.topicId) ?? 1,
+        })),
+    })),
+    sky.stars,
+    nebulaLinks({ stars: sky.stars as never, prerequisites: sky.prerequisites }),
+    LAYOUT_SEED,
+  )
+  return sky.stars.map((star) => ({ ...star, ...(layout.stars.get(star.unitId) ?? { x: star.x, y: star.y }) }))
+}
+
+export function projectStarMap(response: KnowledgeMapResponse, { subjectId }: StarMapRequest): StarMap {
+  const sky = { ...response, stars: placed(response) }
   const focus = subjectId || sky.subjectId
   const nebulaeOfFocus = new Set(
     sky.nebulae.filter((nebula) => nebula.subjectId === focus).map((nebula) => nebula.topicId),

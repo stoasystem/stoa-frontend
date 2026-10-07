@@ -183,6 +183,42 @@ describe('who does not ask for a sky', () => {
   })
 })
 
+describe('where the stars are put', () => {
+  it('lays the sky out here rather than trusting the read model’s coordinates', () => {
+    // The backend derives (x, y) from identifiers as a stand-in for the
+    // offline layout (stoa-backend#60). Passed through, every nebula landed
+    // on one thin band and a student saw 1 of 10 knowledge points - measured
+    // on production. The engine the design was accepted against places them.
+    const flat = sky({
+      stars: [
+        { ...star('u1', 't1', 'ready'), x: 0.5, y: 0.5 },
+        { ...star('u2', 't1', 'ready'), x: 0.5, y: 0.5 },
+        { ...star('u3', 't2', 'ready'), x: 0.5, y: 0.5 },
+      ],
+    })
+
+    const map = projectStarMap(flat, request('math'))
+
+    const spots = map.stars.map((s) => `${s.x},${s.y}`)
+    expect(new Set(spots).size).toBe(3)
+    expect(map.stars.every((s) => s.x !== 0.5 || s.y !== 0.5)).toBe(true)
+  })
+
+  it('puts the same sky in the same place every time', () => {
+    const a = projectStarMap(sky(), request('math')).stars.map((s) => [s.x, s.y])
+    const b = projectStarMap(sky(), request('math')).stars.map((s) => [s.x, s.y])
+
+    expect(a).toEqual(b)
+  })
+
+  it('spreads a subject wider than a single star’s neighbourhood', () => {
+    const map = projectStarMap(sky(), request('math'))
+    const xs = map.stars.map((s) => s.x)
+
+    expect(Math.max(...xs) - Math.min(...xs)).toBeGreaterThan(0.01)
+  })
+})
+
 describe('projecting one galaxy out of the sky', () => {
   it('counts the galaxy in focus, not the whole sky', () => {
     const map = projectStarMap(sky(), request('math'))
