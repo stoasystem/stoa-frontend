@@ -45,9 +45,10 @@ export function accessKey(access: RouteAccess): string {
 function useRedirectTarget(redirect: LegacyRedirect) {
   const params = useParams()
   const location = useLocation()
+  const role = useAuthStore((state) => state.user?.role)
   const search = new URLSearchParams(location.search)
   const pathname =
-    typeof redirect.to === 'string' ? redirect.to : redirect.to({ params, search, pathname: location.pathname })
+    typeof redirect.to === 'string' ? redirect.to : redirect.to({ params, search, pathname: location.pathname, role })
 
   if (!redirect.carryContext) return { to: pathname, state: undefined }
 
