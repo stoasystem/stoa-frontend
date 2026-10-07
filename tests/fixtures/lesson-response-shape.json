@@ -1,0 +1,33 @@
+{
+  "capturedAt": "2026-10-07",
+  "route": "GET /practice/lessons/{lessonId}",
+  "shape": {
+    "challenges": [
+      {
+        "challengeId": "str",
+        "gradeLevel": "str",
+        "hintAvailable": "bool",
+        "lessonId": "str",
+        "options": [
+          []
+        ],
+        "prompt": "str",
+        "subjectId": "str",
+        "topic": "str",
+        "topicId": "str",
+        "type": "str",
+        "unitId": "str"
+      }
+    ],
+    "difficulty": "str",
+    "estimatedMinutes": "int",
+    "gradeLevel": "str",
+    "id": "str",
+    "status": "str",
+    "subjectId": "str",
+    "title": "str",
+    "topic": "str",
+    "topicId": "str",
+    "unitId": "str"
+  }
+}

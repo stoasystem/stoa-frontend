@@ -127,7 +127,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   }],
   ['POST', '/practice/lessons/:lessonId/complete', ({ params }) => {
     const lesson = demoChapterNow().lessons.find((candidate) => candidate.id === params.lessonId)
-    const right = lesson?.challenges.filter((challenge) => answeredRight.has(challenge.id)).length
+    const right = lesson?.challenges.filter((challenge) => answeredRight.has(challenge.challengeId)).length
     const result = demoLessonResult(params.lessonId, right)
     if (result) completeLesson(params.lessonId)
     return result

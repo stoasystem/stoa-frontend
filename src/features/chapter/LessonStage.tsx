@@ -177,7 +177,7 @@ function LessonRunStage({
             context: {
               unitId,
               lessonId: lesson.id,
-              challengeId: challenge.id,
+              challengeId: challenge.challengeId,
               topic: challenge.topic || lesson.topic,
               prompt: challenge.prompt,
               answer: formatPracticeAnswer(run.answer) || undefined,
@@ -369,7 +369,7 @@ function Exercise({
       return
     }
     prompt.current?.focus()
-  }, [arrived, challenge.id, mode])
+  }, [arrived, challenge.challengeId, mode])
 
   const long = challenge.prompt.length > 48
   // In a quiz an answer is checked once: right or wrong, it holds still.
@@ -388,7 +388,7 @@ function Exercise({
           className="relative flex min-h-full items-center justify-center"
           style={{ padding: side ? '40px 48px 40px 360px' : '22px 16px 16px' }}
         >
-          <div key={challenge.id} data-stage-exercise className="flex w-full max-w-[620px] flex-col" style={{ gap: side ? 26 : 20 }}>
+          <div key={challenge.challengeId} data-stage-exercise className="flex w-full max-w-[620px] flex-col" style={{ gap: side ? 26 : 20 }}>
             <div data-quote-source="exercise" className="flex flex-col gap-2">
               {challenge.topic && <p className={cn('m-0 text-[17px]', bodyOnSky)}>{challenge.topic}</p>}
               <h2
@@ -587,7 +587,7 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeChalleng
               >
                 <input
                   type="radio"
-                  name={`answer-${challenge.id}`}
+                  name={`answer-${challenge.challengeId}`}
                   value={option}
                   checked={chosen}
                   disabled={disabled}
