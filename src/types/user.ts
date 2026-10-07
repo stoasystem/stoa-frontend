@@ -76,6 +76,8 @@ export type LocalePreferenceResponse = {
 
 export type AuthResponse = {
   accessToken: string
+  /** Exchanged at `/auth/refresh` so a session outlives the access token. */
+  refreshToken?: string
   user: User
   onboardingStatus?: 'completed' | 'pending_review' | 'email_verification_required'
   parentLinked?: boolean

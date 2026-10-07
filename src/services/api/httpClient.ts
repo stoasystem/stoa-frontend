@@ -2,6 +2,7 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
+import { forgetRefreshToken, refreshAccessToken } from '@/services/auth/sessionRefresh'
 
 export class ApiError extends Error {
   status?: number
@@ -101,6 +102,21 @@ function tokenSent(config?: { headers?: unknown }): string | null {
   return value.slice('Bearer '.length)
 }
 
+/**
+ * The session is over: drop it and go to sign-in.
+ *
+ * A tab pinned to one test role fails on that role's own token; clearing drops
+ * the pin and leaves the session the rest of the browser shares.
+ */
+function endSession(): never | Promise<never> {
+  forgetRefreshToken()
+  useAuthStore.getState().clearAuth()
+  if (window.location.pathname !== '/login') {
+    window.location.assign('/login')
+  }
+  return Promise.reject(new Error('session_ended'))
+}
+
 httpClient.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -119,12 +135,23 @@ httpClient.interceptors.response.use(
       requestPath(error.config?.url) !== LOGOUT_PATH &&
       tokenSent(error.config) === currentSessionToken()
     ) {
-      // A tab pinned to one test role fails on that role's own token; clearing
-      // drops the pin and leaves the session the rest of the browser shares.
-      useAuthStore.getState().clearAuth()
-      if (window.location.pathname !== '/login') {
-        window.location.assign('/login')
+      // An expired access token is not the end of the session: there is a
+      // refresh token for exactly this, and using it is the difference between
+      // a reader staying signed in and being thrown out every hour. Only when
+      // the refresh is refused is the session really over.
+      //
+      // `retried` keeps a request that fails again after a fresh token from
+      // looping: the second 401 falls through to signing out.
+      const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined
+      if (config && !config._retried) {
+        return refreshAccessToken().then((token) => {
+          if (!token) return endSession()
+          useAuthStore.getState().setAuth(useAuthStore.getState().user!, token)
+          config._retried = true
+          return httpClient.request(config)
+        })
       }
+      return endSession()
     }
 
     const detail = error.response?.data?.detail ?? error.response?.data?.message
