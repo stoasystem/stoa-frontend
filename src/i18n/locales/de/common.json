@@ -70,6 +70,15 @@
     "label": "Sprache"
   },
   "me": {
+    "grade": {
+      "heading": "Klassenstufe",
+      "hint": "Zum Beispiel «6. Klasse». Danach passen die Erklärungen besser zu dir.",
+      "label": "Deine Klassenstufe",
+      "save": "Speichern",
+      "saveFailed": "Die Klassenstufe wurde nicht gespeichert. Versuch es noch einmal.",
+      "saved": "Gespeichert.",
+      "unavailable": "Die Klassenstufe kann gerade nicht geladen werden."
+    },
     "language": {
       "heading": "Sprache"
     },

@@ -70,6 +70,15 @@
     "label": "Language"
   },
   "me": {
+    "grade": {
+      "heading": "Year group",
+      "hint": "For example “Year 6”. Explanations will then fit you better.",
+      "label": "Your year group",
+      "save": "Save",
+      "saveFailed": "Your year group was not saved. Try again.",
+      "saved": "Saved.",
+      "unavailable": "Your year group can't be loaded right now."
+    },
     "language": {
       "heading": "Language"
     },

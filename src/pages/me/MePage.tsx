@@ -1,5 +1,6 @@
 /*
- * `/me`, the account page (#13 point 4, built in #46): profile, language,
+ * `/me`, the account page (#13 point 4, built in #46): profile, a student's
+ * year group (#154), language,
  * notification preferences and the password change. A student's, and the
  * profile page for administrators and the organisation roles, who have no
  * other; teachers and parents keep their own (/teacher/profile,
@@ -14,6 +15,7 @@ import { Button } from '@/components/base/Button'
 import { Group, Row } from '@/components/base/Group'
 import { ICON, ROW } from '@/components/base/sizes'
 import { PASSWORD_SECTION_ID } from '@/components/shell/accountMenuTargets'
+import { GradeGroup } from '@/features/account/GradeGroup'
 import { NotificationPreferencesGroup } from '@/features/account/NotificationPreferencesGroup'
 import { PasswordChangeFields, passwordChangeStatusKey } from '@/features/account/PasswordChangeFields'
 import { usePasswordChange } from '@/features/account/usePasswordChange'
@@ -133,6 +135,8 @@ export function MePage({ titleKey = 'studentRoutes.me.title' }: { titleKey?: str
           </Group>
           <p className="m-0 px-4 text-[13px] leading-[1.35] text-caption">{t('me.profile.managed')}</p>
         </div>
+
+        {user.role === 'student' && <GradeGroup />}
 
         <LanguageGroup />
 
