@@ -6,7 +6,8 @@
  * `public` at the top level, `signedIn` inside ProtectedRoute, and a role list
  * inside ProtectedRoute and a RoleRoute for exactly those roles.
  */
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Navigate, Outlet, Route, Routes, useLocation, useParams } from 'react-router-dom'
 import { DemoSurfaceRoute } from '@/app/router/DemoSurfaceRoute'
 import { ProtectedRoute } from '@/app/router/ProtectedRoute'
@@ -108,10 +109,40 @@ function RefusedPageSwitch({ access, refused }: { access: RouteAccess; refused: 
   return isAdmitted(access, user, isAuthenticated) ? <Outlet /> : refused
 }
 
+/**
+ * Puts the page's name in the browser's title bar.
+ *
+ * Every route carries a `titleKey` (#103), and until this existed only two
+ * pages ever reached `document.title`: a reader arriving anywhere else was
+ * told the name of the site and nothing about where they were. A screen
+ * reader announces this on arrival, so it is the first thing said.
+ */
+function PageTitle({ titleKey }: { titleKey: string }) {
+  const { t, i18n } = useTranslation()
+
+  useEffect(() => {
+    const name = t(titleKey)
+    document.title = name && name !== titleKey ? `${name} · STOA` : 'STOA'
+  }, [t, titleKey, i18n.resolvedLanguage])
+
+  return null
+}
+
+/** A page's own title key, or the name its navigation entry gives it. */
+export function nameKeyOf(route: PageRoute): string | undefined {
+  return route.titleKey ?? route.nav?.find((entry) => entry.labelKey)?.labelKey
+}
+
 function pageElement(route: PageRoute, redirects: readonly LegacyRedirect[]): ReactNode {
   const Page = route.page
   const props = route.titleKey ? { ...route.props, titleKey: route.titleKey } : route.props
-  const page = <Page {...props} />
+  const nameKey = nameKeyOf(route)
+  const page = (
+    <>
+      {nameKey && <PageTitle titleKey={nameKey} />}
+      <Page {...props} />
+    </>
+  )
   const shown = route.demoSurface ? <DemoSurfaceRoute>{page}</DemoSurfaceRoute> : page
   const redirect = redirects.find(
     (candidate) => candidate.from === route.path && candidate.onlyFor,
