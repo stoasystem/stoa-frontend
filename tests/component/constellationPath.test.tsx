@@ -139,7 +139,10 @@ describe('the constellation a chapter is drawn as', () => {
     ) as HTMLElement
 
     expect(thread, 'the line is not a child of the row').toBeDefined()
+    // It has to reach the *middle* of the next node, which is half a node
+    // below the next row's top — reaching the row boundary left a gap.
     expect(thread.style.bottom).toContain('var(--constellation-gap)')
+    expect(thread.style.bottom).toContain('var(--constellation-node)')
   })
 
   it('draws a ring on the nodes that are not filled in', () => {

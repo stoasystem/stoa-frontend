@@ -80,7 +80,7 @@ function Thread({ walked }: { walked: boolean }) {
         left: 'calc(var(--constellation-gutter) / 2)',
         marginLeft: 'calc(var(--constellation-line) / -2)',
         top: 'calc(var(--constellation-node) / 2)',
-        bottom: 'calc(var(--constellation-gap) * -1)',
+        bottom: 'calc((var(--constellation-gap) + var(--constellation-node) / 2) * -1)',
         width: 'var(--constellation-line)',
         background: walked ? 'var(--constellation-walked)' : 'var(--constellation-ahead)',
       }}
@@ -150,7 +150,11 @@ function Node({
     </>
   )
 
-  const row = 'flex min-w-0 items-center gap-3 text-inherit no-underline'
+  // `items-start`, not `items-center`: the line below reaches down by half a
+  // node, which is only where the next node's middle is if the node sits at a
+  // known height in its row rather than floating in the middle of whatever
+  // text happens to be beside it.
+  const row = 'flex min-w-0 items-start gap-3 text-inherit no-underline'
   if (locked) return <div className={row}>{body}</div>
   return (
     <Link
