@@ -198,6 +198,83 @@
     "teacher": "Enseignant",
     "tutor": "Enseignant"
   },
+  "routes": {
+    "accountOperations": {
+      "title": "Console de support aux parents"
+    },
+    "activate": {
+      "title": "Activez votre compte"
+    },
+    "assignments": {
+      "title": "Mes devoirs"
+    },
+    "changePassword": {
+      "title": "Changer votre mot de passe"
+    },
+    "childHistory": {
+      "title": "Historique d’apprentissage de l’enfant"
+    },
+    "childProgress": {
+      "title": "Explications des activités"
+    },
+    "childReport": {
+      "title": "Rapport hebdomadaire"
+    },
+    "childSummary": {
+      "title": "Résumé de l’enfant"
+    },
+    "forbidden": {
+      "title": "Accès refusé"
+    },
+    "helpRequest": {
+      "title": "Demande d’aide"
+    },
+    "learningAutomation": {
+      "title": "Automatisation de l’apprentissage"
+    },
+    "learningOperations": {
+      "title": "Suivi de l’apprentissage"
+    },
+    "learningProfile": {
+      "title": "Profil d’apprentissage avancé"
+    },
+    "login": {
+      "title": "Connexion"
+    },
+    "notFound": {
+      "title": "Page introuvable"
+    },
+    "onboarding": {
+      "title": "Premiers pas avec STOA"
+    },
+    "parentAccountOperations": {
+      "title": "Statut du compte famille"
+    },
+    "privacy": {
+      "title": "Politique de confidentialité"
+    },
+    "register": {
+      "title": "Demander un compte"
+    },
+    "support": {
+      "title": "Aide et retour"
+    },
+    "systemStatus": {
+      "title": "État du système"
+    },
+    "teacherActivate": {
+      "title": "Activer votre compte enseignant"
+    },
+    "teacherProfile": {
+      "title": "Profil enseignant"
+    },
+    "terms": {
+      "title": "Conditions d’utilisation"
+    },
+    "unauthorized": {
+      "title": "Connexion requise"
+    }
+  },
   "state": {
     "notYourFault": "Ce n'est pas de ta faute."
   },
