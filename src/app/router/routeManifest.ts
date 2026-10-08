@@ -302,24 +302,26 @@ export const pageRoutes: readonly PageRoute[] = [
     titleKey: 'studentRoutes.home.title',
     meta: { module: 'Star map', status: 'demo', purpose: 'Student: the default subject star map. Everyone else: sign-in, or the way to their own home.' },
   },
-  { path: LOGIN_PATH, access: PUBLIC, page: EntryPage, meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
-  { path: '/register', access: PUBLIC, page: RegisterPage, meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
-  { path: '/teacher-activate', access: PUBLIC, page: TeacherActivatePage, meta: { module: 'Auth', status: 'core', purpose: 'Teacher invitation claim and account activation.' } },
-  { path: '/activate', access: PUBLIC, page: ActivateAccountPage, meta: { module: 'Auth', status: 'core', purpose: 'Role-neutral invitation claim and account activation.' } },
-  { path: '/privacy', access: PUBLIC, page: PrivacyPage, meta: { module: 'Legal', status: 'core', purpose: 'Privacy notice.' } },
-  { path: '/terms', access: PUBLIC, page: TermsPage, meta: { module: 'Legal', status: 'core', purpose: 'Terms of use.' } },
-  { path: '/onboarding', access: PUBLIC, page: OnboardingPage, meta: { module: 'Onboarding', status: 'demo', purpose: 'Role onboarding guide.' } },
+  { path: LOGIN_PATH, access: PUBLIC, page: EntryPage, titleKey: 'routes.login.title', meta: { module: 'Auth', status: 'core', purpose: 'User sign-in.' } },
+  { path: '/register', access: PUBLIC, page: RegisterPage, titleKey: 'routes.register.title', meta: { module: 'Auth', status: 'core', purpose: 'Accounts are issued by an administrator; this page explains how to ask for one.' } },
+  { path: '/teacher-activate', access: PUBLIC, page: TeacherActivatePage, titleKey: 'routes.teacherActivate.title', meta: { module: 'Auth', status: 'core', purpose: 'Teacher invitation claim and account activation.' } },
+  { path: '/activate', access: PUBLIC, page: ActivateAccountPage, titleKey: 'routes.activate.title', meta: { module: 'Auth', status: 'core', purpose: 'Role-neutral invitation claim and account activation.' } },
+  { path: '/privacy', access: PUBLIC, page: PrivacyPage, titleKey: 'routes.privacy.title', meta: { module: 'Legal', status: 'core', purpose: 'Privacy notice.' } },
+  { path: '/terms', access: PUBLIC, page: TermsPage, titleKey: 'routes.terms.title', meta: { module: 'Legal', status: 'core', purpose: 'Terms of use.' } },
+  { path: '/onboarding', access: PUBLIC, page: OnboardingPage, titleKey: 'routes.onboarding.title', meta: { module: 'Onboarding', status: 'demo', purpose: 'Role onboarding guide.' } },
   // No `nav`: every role reaches Help from the avatar menu (#13 point 4, #46).
-  { path: '/support', access: PUBLIC, page: SupportPage, meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' } },
-  { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
-  { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
-  { path: '*', access: PUBLIC, page: NotFoundPage, meta: { module: 'Errors', status: 'core', purpose: 'Anything no entry matches.' } },
+  { path: '/support', access: PUBLIC, page: SupportPage, titleKey: 'routes.support.title', meta: { module: 'Support', status: 'core', purpose: 'Support request entry.' } },
+  { path: UNAUTHORIZED_PATH, access: PUBLIC, page: UnauthorizedPage, titleKey: 'routes.unauthorized.title', meta: { module: 'Errors', status: 'core', purpose: 'Sign-in required.' } },
+  { path: FORBIDDEN_PATH, access: PUBLIC, page: ForbiddenPage, titleKey: 'routes.forbidden.title', meta: { module: 'Errors', status: 'core', purpose: 'Where a guard sends a role the route is not for.' } },
+  // The catch-all is a page a visitor really lands on, so it is named like one.
+  { path: '*', access: PUBLIC, page: NotFoundPage, titleKey: 'routes.notFound.title', meta: { module: 'Errors', status: 'core', purpose: 'Anything no entry matches.' } },
 
   // ---- any signed-in account ---------------------------------------------
   {
     path: CHANGE_PASSWORD_PATH,
     access: SIGNED_IN,
     page: ChangePasswordPage,
+    titleKey: 'routes.changePassword.title',
     meta: { module: 'Auth', status: 'core', purpose: 'Self-service password change for teachers and parents, and the forced change for every role. Students are sent to /me (see legacyRedirects), except under a forced change.' },
   },
 
@@ -351,7 +353,7 @@ export const pageRoutes: readonly PageRoute[] = [
     meta: { module: 'Account', status: 'core', purpose: 'Account page: profile, language, notification preferences, password change.' },
   },
   // Kept, but out of navigation: reached from the bell (#13 point 3).
-  { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
+  { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, titleKey: 'routes.assignments.title', meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
 
   // ---- parent ------------------------------------------------------------
   {
@@ -361,7 +363,7 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'parent', label: 'Overview', labelKey: 'navigation.overview', priority: 'primary', icon: 'dashboard', mobile: true, description: 'Child learning summary and parent next steps.' }],
     meta: { module: 'Parent', status: 'core', purpose: 'Parent overview and child list.' },
   },
-  { path: '/parent/account-operations', access: PARENT, page: ParentAccountOperationsPage, meta: { module: 'Parent', status: 'core', purpose: 'Parent account operations.' } },
+  { path: '/parent/account-operations', access: PARENT, page: ParentAccountOperationsPage, titleKey: 'routes.parentAccountOperations.title', meta: { module: 'Parent', status: 'core', purpose: 'Parent account operations.' } },
   {
     path: '/parent/reports',
     access: PARENT,
@@ -369,10 +371,10 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'parent', label: 'Reports', labelKey: 'navigation.reports', priority: 'primary', icon: 'reports', mobile: true, description: 'Open weekly and monthly child reports.' }],
     meta: { module: 'Parent', status: 'core', purpose: 'Parent report hub for weekly and monthly child reports.' },
   },
-  { path: '/parent/children/:childId', access: PARENT, page: ChildSummaryPage, meta: { module: 'Parent', status: 'core', purpose: 'Child summary detail.' } },
-  { path: '/parent/children/:childId/progress', access: PARENT, page: ParentChildProgressPage, meta: { module: 'Parent', status: 'core', purpose: 'Child progress.' } },
-  { path: '/parent/children/:childId/report', access: PARENT, page: ChildReportPage, meta: { module: 'Parent', status: 'core', purpose: 'Weekly child report.' } },
-  { path: '/parent/children/:childId/history', access: PARENT, page: ChildLearningHistoryPage, meta: { module: 'Parent', status: 'core', purpose: 'Child learning history.' } },
+  { path: '/parent/children/:childId', access: PARENT, page: ChildSummaryPage, titleKey: 'routes.childSummary.title', meta: { module: 'Parent', status: 'core', purpose: 'Child summary detail.' } },
+  { path: '/parent/children/:childId/progress', access: PARENT, page: ParentChildProgressPage, titleKey: 'routes.childProgress.title', meta: { module: 'Parent', status: 'core', purpose: 'Child progress.' } },
+  { path: '/parent/children/:childId/report', access: PARENT, page: ChildReportPage, titleKey: 'routes.childReport.title', meta: { module: 'Parent', status: 'core', purpose: 'Weekly child report.' } },
+  { path: '/parent/children/:childId/history', access: PARENT, page: ChildLearningHistoryPage, titleKey: 'routes.childHistory.title', meta: { module: 'Parent', status: 'core', purpose: 'Child learning history.' } },
 
   // ---- organisation (and admin) ------------------------------------------
   // The organisation roles' home (roleHomePaths), so their logo never ends on
@@ -382,12 +384,14 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/organization',
     access: ORGANIZATION,
     page: OrganizationHomePage,
+    // The page already names itself under `organizationHome`; no second phrase for the same name.
+    titleKey: 'organizationHome.title',
     meta: { module: 'Organization', status: 'core', purpose: 'Organisation home: learning operations and learning automation.' },
   },
-  { path: '/organization/learning-operations', access: ORGANIZATION, page: LearningOperationsDashboardPage, meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning operations.' } },
-  { path: '/organization/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Organisation-scoped learning profile.' } },
-  { path: '/organization/learning-automation', access: ORGANIZATION, page: LearningAutomationConsolePage, meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning automation.' } },
-  { path: '/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Advanced learning profile direct route.' } },
+  { path: '/organization/learning-operations', access: ORGANIZATION, page: LearningOperationsDashboardPage, titleKey: 'routes.learningOperations.title', meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning operations.' } },
+  { path: '/organization/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Organisation-scoped learning profile.' } },
+  { path: '/organization/learning-automation', access: ORGANIZATION, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Learning Operations', status: 'core', purpose: 'Organisation learning automation.' } },
+  { path: '/students/:studentId/learning-profile', access: ORGANIZATION, page: StudentLearningProfilePage, demoSurface: true, titleKey: 'routes.learningProfile.title', meta: { module: 'Learning Intelligence', status: 'demo', purpose: 'Advanced learning profile direct route.' } },
 
   // ---- teacher -----------------------------------------------------------
   {
@@ -406,10 +410,10 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'teacher', label: 'Availability', labelKey: 'navigation.availability', priority: 'primary', icon: 'settings', mobile: true, description: 'Tutor availability and subjects.' }],
     meta: { module: 'Tutor', status: 'core', purpose: 'Tutor availability.' },
   },
-  { path: '/tutor/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
+  { path: '/tutor/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
   // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
-  { path: '/tutor/profile', access: TEACHER, page: TutorProfilePage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
-  { path: '/tutor/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
+  { path: '/tutor/profile', access: TEACHER, page: TutorProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
+  { path: '/tutor/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
 
   // ---- admin -------------------------------------------------------------
   // The source list (#13 point 6, #52) follows the order of these entries:
@@ -453,10 +457,10 @@ export const pageRoutes: readonly PageRoute[] = [
     nav: [{ area: 'admin', label: 'System', labelKey: 'navigation.admin.system', priority: 'primary', icon: 'settings', mobile: true, covers: ['/admin/system', '/admin/learning-operations', '/admin/learning-automation'], description: 'Operations overview, system status, learning operations and learning automation.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Admin operations overview.' },
   },
-  { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
-  { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
-  { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
-  { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'System status' }, meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
+  { path: '/admin/learning-operations', access: ADMIN, page: LearningOperationsDashboardPage, titleKey: 'routes.learningOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning operations.' } },
+  { path: '/admin/learning-automation', access: ADMIN, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Admin', status: 'core', purpose: 'Platform learning automation.' } },
+  { path: '/admin/account-operations', access: ADMIN, page: AdminAccountOperationsPage, titleKey: 'routes.accountOperations.title', meta: { module: 'Admin', status: 'core', purpose: 'Account operations queue.' } },
+  { path: '/admin/system', access: ADMIN, page: AdminOperationsPlaceholderPage, props: { title: 'System status' }, titleKey: 'routes.systemStatus.title', meta: { module: 'Admin', status: 'placeholder', purpose: 'Future system status admin placeholder.' } },
 ]
 
 // ---------------------------------------------------------------------------

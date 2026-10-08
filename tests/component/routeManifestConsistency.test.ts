@@ -75,44 +75,12 @@ function pageAt(address: string): PageRoute | null {
 // ---------------------------------------------------------------------------
 
 /*
- * Pages that name no translation key yet: neither a `titleKey` nor a
- * translated navigation label. This is the debt found when #21 was built; it
- * may only shrink. A new page must name a key, and a page given one must be
- * taken off this list. Giving these pages titles is a copy decision, left
- * open in the PR for #21.
+ * Pages that name no translation key: neither a `titleKey` nor a translated
+ * navigation label. The debt found when #21 was built held 30 of the 48
+ * pages; #103 gave every one of them a title, so the list is empty and may
+ * only stay that way. A new page must name a key.
  */
-const PAGES_WITHOUT_A_KEY = [
-  '/login',
-  '/register',
-  '/teacher-activate',
-  '/activate',
-  '/privacy',
-  '/terms',
-  '/onboarding',
-  '/support',
-  '/unauthorized',
-  '/forbidden',
-  '*',
-  '/settings/password',
-  '/assignments',
-  '/parent/account-operations',
-  '/parent/children/:childId',
-  '/parent/children/:childId/progress',
-  '/parent/children/:childId/report',
-  '/parent/children/:childId/history',
-  '/organization',
-  '/organization/learning-operations',
-  '/organization/students/:studentId/learning-profile',
-  '/organization/learning-automation',
-  '/students/:studentId/learning-profile',
-  '/tutor/learning-automation',
-  '/tutor/profile',
-  '/tutor/requests/:requestId',
-  '/admin/learning-operations',
-  '/admin/learning-automation',
-  '/admin/account-operations',
-  '/admin/system',
-]
+const PAGES_WITHOUT_A_KEY: string[] = []
 
 function keysOf(route: PageRoute): string[] {
   return [

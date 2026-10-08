@@ -198,6 +198,83 @@
     "teacher": "Teacher",
     "tutor": "Teacher"
   },
+  "routes": {
+    "accountOperations": {
+      "title": "Parent support console"
+    },
+    "activate": {
+      "title": "Activate your account"
+    },
+    "assignments": {
+      "title": "My assignments"
+    },
+    "changePassword": {
+      "title": "Change your password"
+    },
+    "childHistory": {
+      "title": "Child learning history"
+    },
+    "childProgress": {
+      "title": "Assignment explanations"
+    },
+    "childReport": {
+      "title": "Weekly report"
+    },
+    "childSummary": {
+      "title": "Child summary"
+    },
+    "forbidden": {
+      "title": "No access"
+    },
+    "helpRequest": {
+      "title": "Help request"
+    },
+    "learningAutomation": {
+      "title": "Learning automation"
+    },
+    "learningOperations": {
+      "title": "Learning operations"
+    },
+    "learningProfile": {
+      "title": "Advanced learning profile"
+    },
+    "login": {
+      "title": "Sign in"
+    },
+    "notFound": {
+      "title": "Page not found"
+    },
+    "onboarding": {
+      "title": "Getting started with STOA"
+    },
+    "parentAccountOperations": {
+      "title": "Family account status"
+    },
+    "privacy": {
+      "title": "Privacy policy"
+    },
+    "register": {
+      "title": "Request an account"
+    },
+    "support": {
+      "title": "Support and feedback"
+    },
+    "systemStatus": {
+      "title": "System status"
+    },
+    "teacherActivate": {
+      "title": "Activate your teacher account"
+    },
+    "teacherProfile": {
+      "title": "Teacher profile"
+    },
+    "terms": {
+      "title": "Terms of use"
+    },
+    "unauthorized": {
+      "title": "Sign-in required"
+    }
+  },
   "state": {
     "notYourFault": "This isn't your fault."
   },

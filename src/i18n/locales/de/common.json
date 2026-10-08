@@ -198,6 +198,83 @@
     "teacher": "Lehrperson",
     "tutor": "Lehrperson"
   },
+  "routes": {
+    "accountOperations": {
+      "title": "Elternsupport-Konsole"
+    },
+    "activate": {
+      "title": "Konto freischalten"
+    },
+    "assignments": {
+      "title": "Meine Aufgaben"
+    },
+    "changePassword": {
+      "title": "Passwort ändern"
+    },
+    "childHistory": {
+      "title": "Lernverlauf des Kindes"
+    },
+    "childProgress": {
+      "title": "Erklärungen zu Aufgaben"
+    },
+    "childReport": {
+      "title": "Wochenbericht"
+    },
+    "childSummary": {
+      "title": "Kindübersicht"
+    },
+    "forbidden": {
+      "title": "Kein Zugriff"
+    },
+    "helpRequest": {
+      "title": "Hilfeanfrage"
+    },
+    "learningAutomation": {
+      "title": "Lernautomatisierung"
+    },
+    "learningOperations": {
+      "title": "Lernbetrieb"
+    },
+    "learningProfile": {
+      "title": "Erweitertes Lernprofil"
+    },
+    "login": {
+      "title": "Anmelden"
+    },
+    "notFound": {
+      "title": "Seite nicht gefunden"
+    },
+    "onboarding": {
+      "title": "Erste Schritte mit STOA"
+    },
+    "parentAccountOperations": {
+      "title": "Status des Familienkontos"
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung"
+    },
+    "register": {
+      "title": "Konto anfragen"
+    },
+    "support": {
+      "title": "Hilfe und Rückmeldung"
+    },
+    "systemStatus": {
+      "title": "Systemstatus"
+    },
+    "teacherActivate": {
+      "title": "Lehrpersonenkonto aktivieren"
+    },
+    "teacherProfile": {
+      "title": "Lehrpersonen-Profil"
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen"
+    },
+    "unauthorized": {
+      "title": "Anmeldung erforderlich"
+    }
+  },
   "state": {
     "notYourFault": "Das liegt nicht an dir."
   },
