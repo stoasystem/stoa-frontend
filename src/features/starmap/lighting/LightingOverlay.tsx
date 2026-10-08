@@ -28,6 +28,7 @@
  * `data-lighting` on the root says `idle`, `playing` or `done` (at least one
  * moment shown), for the design preview's screenshots.
  */
+import { Murmi } from '@/components/brand/Murmi'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { animationFrameScheduler, type FrameScheduler, type StarOnScreen } from '@/features/starmap/engine/starMapEngine'
@@ -258,9 +259,14 @@ export function LightingOverlay({ map, locate, onReveal, scheduler = animationFr
           ref={captionRef}
           aria-hidden="true"
           data-lighting-caption
-          className="absolute left-0 top-0 m-0 whitespace-nowrap rounded-full border border-solid border-[color:var(--sky-glass-border)] px-3 py-1 text-[13px] font-semibold text-on-sky"
+          className="absolute left-0 top-0 m-0 flex items-center gap-1.5 whitespace-nowrap rounded-full border border-solid border-[color:var(--sky-glass-border)] py-1 pl-1.5 pr-3 text-[13px] font-bold text-on-sky"
           style={{ opacity: 0, background: 'var(--sky-glass)', backdropFilter: 'blur(var(--sky-glass-blur))', WebkitBackdropFilter: 'blur(var(--sky-glass-blur))' }}
         >
+          {/* The one place Murmi is delighted. The star's own flare is already
+            * on screen; this is the character noticing it, not a second
+            * celebration. The caption's placement measures this element, so the
+            * figure goes inside it rather than beside it. */}
+          <Murmi mood="delighted" size={22} />
           {t('lighting.announce', { name: current.star.name })}
         </p>
       )}

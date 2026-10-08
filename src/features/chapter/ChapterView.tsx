@@ -15,6 +15,7 @@
 import { ChevronLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { Murmi } from '@/components/brand/Murmi'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { ConstellationPath } from '@/features/chapter/ConstellationPath'
@@ -111,17 +112,23 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
         * stars to go before this point lights" is the thing a student is
         * actually working towards; 33% is not. The bar's semantics stay — a
         * screen reader still hears a progressbar with its value. */}
-      <p
-        role="progressbar"
-        aria-label={t('chapter.progress')}
-        aria-valuetext={lessonsLabel}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={percent}
-        className="m-0 text-[15px] font-bold text-[color:var(--lit)]"
+      <div
+        className="flex items-center gap-3 rounded-[var(--r-card)] border p-4"
+        style={{ background: 'var(--sky-glass)', borderColor: 'var(--sky-glass-border)' }}
       >
-        {remaining > 0 ? t('chapter.remaining', { count: remaining }) : t('chapter.lit')}
-      </p>
+        <Murmi mood={remaining > 0 ? 'watching' : 'delighted'} size={56} />
+        <p
+          role="progressbar"
+          aria-label={t('chapter.progress')}
+          aria-valuetext={lessonsLabel}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={percent}
+          className="m-0 text-[15px] font-bold text-[color:var(--lit)]"
+        >
+          {remaining > 0 ? t('chapter.remaining', { count: remaining }) : t('chapter.lit')}
+        </p>
+      </div>
 
       {primary && (
         <div>
