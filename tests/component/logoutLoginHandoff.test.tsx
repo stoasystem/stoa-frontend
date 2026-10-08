@@ -121,3 +121,29 @@ it('sends login immediately when no logout is pending', async () => {
   fireEvent.click(screen.getByText('Sign in'))
   await waitFor(() => expect(loginRequests).toBe(1))
 })
+
+it('holds the account that just signed in, with its refresh token', async () => {
+  // 「添加账号」 in the account menu goes to the login screen and nothing put
+  // the result in the list the switcher reads, so signing in a second account
+  // offered you nothing to switch to. The refresh token goes with it: without
+  // one, a held account is over an hour later whatever anyone does with it.
+  mswServer.use(http.post('https://api.test/auth/login', () =>
+    HttpResponse.json({
+      accessToken: 'access-for-parent',
+      refreshToken: 'refresh-for-parent',
+      user: { id: 'u-2', email: 'parent@example.com', role: 'parent', name: 'A Parent' },
+    }),
+  ))
+  renderPages('/login')
+  useAuthStore.getState().clearAuth()
+
+  fireEvent.click(screen.getByText('Sign in'))
+
+  await waitFor(() => {
+    const held = JSON.parse(localStorage.getItem('stoa_dev_sessions') ?? '[]')
+    expect(held).toHaveLength(1)
+    expect(held[0].email).toBe('parent@example.com')
+    expect(held[0].accessToken).toBe('access-for-parent')
+    expect(held[0].refreshToken).toBe('refresh-for-parent')
+  })
+})

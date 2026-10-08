@@ -61,6 +61,53 @@ export function forgetRefreshToken(): void {
   }
 }
 
+/**
+ * What came of offering a refresh token to the server.
+ *
+ * The three outcomes have to stay apart, because only one of them means the
+ * session is over: a refusal. A network that could not be reached must not
+ * cost anyone their session, and the account switcher turns that distinction
+ * into "sign in again" or "try again in a moment".
+ */
+export type RefreshOutcome =
+  | { status: 'renewed'; accessToken: string; refreshToken?: string }
+  | { status: 'refused' }
+  | { status: 'unreachable' }
+
+/**
+ * Offer one refresh token to the server, storing nothing.
+ *
+ * The stored-token path below is one caller. The other is a held account in
+ * the switcher, whose own refresh token is not the one this tab is using.
+ */
+export async function exchangeRefreshToken(refreshToken: string): Promise<RefreshOutcome> {
+  const abort = new AbortController()
+  const timer = setTimeout(() => abort.abort(), REFRESH_TIMEOUT_MS)
+  try {
+    // Deliberately `fetch` and not the shared client: that client's response
+    // interceptor calls this, and sending the refresh through it would have a
+    // refused refresh trigger another refresh.
+    const response = await fetch(`${apiBaseUrl}/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+      signal: abort.signal,
+    })
+    if (response.status === 401 || response.status === 403) return { status: 'refused' }
+    if (!response.ok) return { status: 'unreachable' }
+    const body = (await response.json()) as { accessToken?: string; refreshToken?: string }
+    // A 200 with nothing in it is a server that did not answer, not a server
+    // that refused the token: dropping it here would end a live session.
+    if (!body.accessToken) return { status: 'unreachable' }
+    return { status: 'renewed', accessToken: body.accessToken, refreshToken: body.refreshToken }
+  } catch {
+    // A network failure is not a refusal.
+    return { status: 'unreachable' }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 /** The refresh in flight, so concurrent callers wait on one attempt. */
 let inFlight: Promise<string | null> | null = null
 
@@ -83,33 +130,15 @@ async function attempt(): Promise<string | null> {
   const refreshToken = storedRefreshToken()
   if (!refreshToken) return null
 
-  const abort = new AbortController()
-  const timer = setTimeout(() => abort.abort(), REFRESH_TIMEOUT_MS)
-  try {
-    // Deliberately `fetch` and not the shared client: that client's response
-    // interceptor is what calls this, and sending the refresh through it would
-    // have a refused refresh trigger another refresh.
-    const response = await fetch(`${apiBaseUrl}/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refresh_token: refreshToken }),
-      signal: abort.signal,
-    })
-    if (!response.ok) {
-      // A refused refresh token will never be accepted again; keeping it would
-      // make every later 401 wait on a request that cannot succeed.
-      if (response.status === 401 || response.status === 403) forgetRefreshToken()
-      return null
-    }
-    const body = (await response.json()) as { accessToken?: string; refreshToken?: string }
-    if (!body.accessToken) return null
-    rememberRefreshToken(body.refreshToken)
-    return body.accessToken
-  } catch {
-    // A network failure is not a refusal: the token stays, and the next 401
-    // tries again.
+  const outcome = await exchangeRefreshToken(refreshToken)
+  if (outcome.status === 'refused') {
+    // A refused refresh token will never be accepted again; keeping it would
+    // make every later 401 wait on a request that cannot succeed. A network
+    // failure is not a refusal: that token stays, and the next 401 tries again.
+    forgetRefreshToken()
     return null
-  } finally {
-    clearTimeout(timer)
   }
+  if (outcome.status !== 'renewed') return null
+  rememberRefreshToken(outcome.refreshToken)
+  return outcome.accessToken
 }

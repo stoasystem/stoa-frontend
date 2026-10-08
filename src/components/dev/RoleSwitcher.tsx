@@ -20,18 +20,17 @@ import { login } from '@/services/auth/authApi'
 import {
   accountMayBeHeld,
   adoptSwitcherOptInFromUrl,
-  forgetSession,
   isTestAccount,
   switcherEnabledHere,
-  pinTabToSession,
-  readSessions,
   rememberSession,
-  sessionLiveness,
-  type DevSession,
 } from '@/lib/devSessions'
-import { getDefaultRouteForRole } from '@/lib/authRoutes'
-import { apiBaseUrl } from '@/lib/env'
+import { useHeldAccounts } from '@/hooks/auth/useHeldAccounts'
 import { useAuthStore } from '@/store/authStore'
+
+const PROBLEM_TEXT = {
+  expired: 'That session has expired. Add the role again.',
+  unreachable: 'Could not reach the server. The role is still held; try again.',
+}
 
 export function RoleSwitcher() {
   const user = useAuthStore((state) => state.user)
@@ -42,12 +41,18 @@ export function RoleSwitcher() {
     return switcherEnabledHere()
   })
   const [open, setOpen] = useState(false)
-  const [sessions, setSessions] = useState<DevSession[]>(() => readSessions())
+  // One implementation of holding and switching, shared with the account menu:
+  // this file had its own copy, and the copy kept the bug the other one lost
+  // (an expired access token ended the account instead of being renewed).
+  const held = useHeldAccounts()
   const [adding, setAdding] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [busy, setBusy] = useState(false)
-  const [problem, setProblem] = useState('')
+  const [addProblem, setAddProblem] = useState('')
+  const [addBusy, setAddBusy] = useState(false)
+  const sessions = held.sessions
+  const busy = held.busy || addBusy
+  const problem = addProblem || (held.problem ? PROBLEM_TEXT[held.problem] : '')
 
   // An address outside the test domain needs the opt-in, because for those the
   // stored sessions are somebody's real ones. Inside it, no gate: the domain
@@ -57,60 +62,35 @@ export function RoleSwitcher() {
     return null
   }
 
-  async function adopt(session: DevSession) {
-    setProblem('')
-    setBusy(true)
-    // The stored token is issued for an hour and nothing here renews it. A
-    // stale one reaching any request lands on the 401 handler, which signs the
-    // whole browser out, so it is checked before this tab adopts it.
-    const liveness = await sessionLiveness(session.accessToken, apiBaseUrl)
-    if (liveness === 'refused') {
-      setSessions(forgetSession(session.email))
-      setProblem('That session has expired. Add the role again.')
-      setBusy(false)
-      return
-    }
-    // Only a refusal means the token is gone. A check that could not be made
-    // keeps the stored session, because it cannot be recovered once dropped.
-    if (liveness === 'unknown') {
-      setProblem('Could not reach the server. The role is still held; try again.')
-      setBusy(false)
-      return
-    }
-    pinTabToSession(session.accessToken)
-    // Nothing else changes here. Telling the store about the new role while
-    // the old role's page is still mounted lets its route guard reject the
-    // new one and land on the forbidden page before the load begins. The
-    // reload drops the previous role's answers with the rest of the cache.
-    window.location.assign(getDefaultRouteForRole(session.role as never))
-  }
-
   async function addRole(event: React.FormEvent) {
     event.preventDefault()
-    setProblem('')
+    setAddProblem('')
     if (!accountMayBeHeld(email)) {
-      setProblem(
+      setAddProblem(
         'Only @test.stoaedu.ch accounts can be held here. Open ?roleswitcher=on to hold others.',
       )
       return
     }
-    setBusy(true)
+    setAddBusy(true)
     try {
       const result = await login({ email, password })
-      const next = rememberSession({
+      // The refresh token too: without it the held account is over an hour
+      // after it was added, whatever anyone does with it.
+      rememberSession({
         email: result.user.email,
         role: result.user.role,
         name: result.user.name,
         accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
       })
-      setSessions(next)
+      held.refresh()
       setAdding(false)
       setEmail('')
       setPassword('')
     } catch {
-      setProblem('That sign-in did not work.')
+      setAddProblem('That sign-in did not work.')
     } finally {
-      setBusy(false)
+      setAddBusy(false)
     }
   }
 
@@ -136,7 +116,7 @@ export function RoleSwitcher() {
                   size="sm"
                   className="h-8 flex-1 justify-start text-xs"
                   disabled={busy}
-                  onClick={() => void adopt(session)}
+                  onClick={() => void held.switchTo(session)}
                 >
                   {session.role} · {session.email.split('@')[0]}
                 </Button>
@@ -145,7 +125,7 @@ export function RoleSwitcher() {
                   variant="ghost"
                   className="h-8 w-8 p-0"
                   aria-label={`Forget ${session.email}`}
-                  onClick={() => setSessions(forgetSession(session.email))}
+                  onClick={() => held.forget(session.email)}
                 >
                   <X className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>

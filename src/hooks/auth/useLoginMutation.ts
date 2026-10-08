@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
+import { rememberSession } from '@/lib/devSessions'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -31,6 +32,18 @@ export function useLoginMutation() {
       // session and picks the destination: the password change for a reset
       // account, else a permitted `?next=` or `from`, else the role's home.
       setAuth(data.user, data.accessToken, data.refreshToken)
+      // Hold the account that just signed in, so the account menu has
+      // something to switch back to. Nothing did this except the developer
+      // switcher's own form, which is why 「添加账号」 signed you in and then
+      // offered you nothing. The refresh token travels with it: without one
+      // the held account is over an hour later, whatever anyone does with it.
+      rememberSession({
+        email: data.user.email,
+        role: data.user.role,
+        name: data.user.name,
+        accessToken: data.accessToken,
+        refreshToken: data.refreshToken,
+      })
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       toast.success(t('login.signedIn'))

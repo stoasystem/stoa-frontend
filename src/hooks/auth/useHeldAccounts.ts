@@ -15,12 +15,13 @@ import {
   forgetSession,
   pinTabToSession,
   readSessions,
+  rememberSession,
   sessionLiveness,
   type HeldSession,
 } from '@/lib/devSessions'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { apiBaseUrl } from '@/lib/env'
-import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
+import { exchangeRefreshToken, rememberRefreshToken } from '@/services/auth/sessionRefresh'
 
 export type SwitchProblem = 'expired' | 'unreachable' | null
 
@@ -33,22 +34,50 @@ export function useHeldAccounts() {
     setProblem(null)
     setBusy(true)
     try {
-      // A held access token lasts an hour. One that has gone stale would reach
-      // the 401 handler, and before the refresh token existed that signed the
-      // whole browser out — so it is still checked before this tab adopts it.
-      const liveness = await sessionLiveness(session.accessToken, apiBaseUrl)
-      if (liveness === 'refused') {
-        setSessions(forgetSession(session.email))
-        setProblem('expired')
-        return
-      }
+      // A held access token lasts an hour, and a held account is by definition
+      // one nobody has used for a while — so by the time anyone switches to it
+      // this almost always comes back refused. It used to end there: the
+      // account was dropped and the reader told to sign in again, every time,
+      // which is what made the switcher feel broken.
+      let accessToken = session.accessToken
+      const liveness = await sessionLiveness(accessToken, apiBaseUrl)
+
       // Only a refusal means the session is gone. A check that could not be
       // made keeps it: it cannot be recovered once dropped.
       if (liveness === 'unknown') {
         setProblem('unreachable')
         return
       }
-      pinTabToSession(session.accessToken)
+      if (liveness === 'refused') {
+        // The account has its own refresh token. An expired access token is
+        // what that exists for; the account is only really over when the
+        // server refuses the refresh as well.
+        const renewed = session.refreshToken
+          ? await exchangeRefreshToken(session.refreshToken)
+          : ({ status: 'refused' } as const)
+        if (renewed.status === 'unreachable') {
+          setProblem('unreachable')
+          return
+        }
+        if (renewed.status !== 'renewed') {
+          setSessions(forgetSession(session.email))
+          setProblem('expired')
+          return
+        }
+        accessToken = renewed.accessToken
+        // Keep the account on its new token, so the next switch to it does not
+        // spend another round trip discovering the old one is dead.
+        setSessions(
+          rememberSession({
+            ...session,
+            accessToken,
+            refreshToken: renewed.refreshToken ?? session.refreshToken,
+          }),
+        )
+        session = { ...session, accessToken, refreshToken: renewed.refreshToken ?? session.refreshToken }
+      }
+
+      pinTabToSession(accessToken)
       // The held account's own refresh token travels with it, so switching to
       // it does not hand the reader a session that ends in an hour.
       rememberRefreshToken(session.refreshToken)

@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/services/auth/authApi', () => ({ login: vi.fn() }))
 
+import { login } from '@/services/auth/authApi'
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
 import {
   isTestAccount,
@@ -173,6 +174,127 @@ describe('switching between the test roles', () => {
     expect(sessionStorage.getItem('stoa_tab_access_token')).toBeNull()
     expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
     expect(readSessions()).toHaveLength(0)
+  })
+
+  it('keeps the refresh token of a role it has just been given', async () => {
+    // Without it the held account is over an hour after it was added, and
+    // nothing can renew it: the switcher would be back to "sign in again".
+    vi.mocked(login).mockResolvedValue({
+      accessToken: 'parent-access',
+      refreshToken: 'parent-refresh',
+      user: { id: 'u-2', email: 'parent@test.stoaedu.ch', role: 'parent', name: 'Demo Parent' },
+    } as never)
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /add a role/i }))
+    await user.type(screen.getByPlaceholderText(/role@test/i), 'parent@test.stoaedu.ch')
+    await user.type(screen.getByPlaceholderText(/password/i), 'secret')
+    await user.click(screen.getByRole('button', { name: /hold this role/i }))
+
+    await waitFor(() => expect(readSessions()).toHaveLength(1))
+    expect(readSessions()[0].refreshToken).toBe('parent-refresh')
+  })
+
+  it('renews a held account whose access token has run out, instead of dropping it', async () => {
+    // The complaint that started this: switching to any account that had been
+    // sitting for an hour answered "That session has expired. Sign in again."
+    // every time. An access token running out is the ordinary state of an
+    // account nobody has used — it is what the refresh token is for.
+    const calls: string[] = []
+    globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+      calls.push(String(url))
+      if (String(url).includes('/auth/refresh')) {
+        return { ok: true, status: 200, json: async () => ({ accessToken: 'fresh-parent', refreshToken: 'r-2' }) }
+      }
+      return { ok: false, status: 401 }
+    }) as never
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, href: 'https://app.stoaedu.ch/chat' },
+      writable: true,
+    })
+    rememberSession({
+      email: 'parent@test.stoaedu.ch',
+      role: 'parent',
+      name: 'Demo Parent',
+      accessToken: 'stale-parent-token',
+      refreshToken: 'r-1',
+    })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('/parent'))
+    expect(screen.queryByText(/expired/i)).toBeNull()
+    expect(calls.some((url) => url.includes('/auth/refresh'))).toBe(true)
+    expect(sessionStorage.getItem('stoa_tab_access_token')).toBe('fresh-parent')
+    // Kept on its new token, so the next switch does not spend a round trip
+    // finding out the old one is dead.
+    const held = readSessions().find((entry) => entry.email === 'parent@test.stoaedu.ch')
+    expect(held?.accessToken).toBe('fresh-parent')
+    expect(held?.refreshToken).toBe('r-2')
+  })
+
+  it('says the session is over only when the refresh is refused too', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 }) as never
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, href: 'https://app.stoaedu.ch/chat' },
+      writable: true,
+    })
+    rememberSession({
+      email: 'parent@test.stoaedu.ch',
+      role: 'parent',
+      name: 'Demo Parent',
+      accessToken: 'stale-parent-token',
+      refreshToken: 'r-1',
+    })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    await waitFor(() => expect(screen.getByText(/expired/i)).toBeInTheDocument())
+    expect(assign).not.toHaveBeenCalled()
+    expect(readSessions()).toHaveLength(0)
+  })
+
+  it('keeps a held account when the renewal could not be made', async () => {
+    // A refresh that did not reach the server must not cost the account: it
+    // cannot be recovered once dropped.
+    globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
+      if (String(url).includes('/auth/refresh')) throw new Error('offline')
+      return { ok: false, status: 401 }
+    }) as never
+    const assign = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { assign, href: 'https://app.stoaedu.ch/chat' },
+      writable: true,
+    })
+    rememberSession({
+      email: 'parent@test.stoaedu.ch',
+      role: 'parent',
+      name: 'Demo Parent',
+      accessToken: 'stale-parent-token',
+      refreshToken: 'r-1',
+    })
+    signedInAs('student@test.stoaedu.ch')
+    const user = (await import('@testing-library/user-event')).default.setup()
+    renderSwitcher()
+
+    await user.click(screen.getByRole('button', { name: /student/i }))
+    await user.click(screen.getByRole('button', { name: /parent · parent/i }))
+
+    await waitFor(() => expect(screen.getByText(/could not reach/i)).toBeInTheDocument())
+    expect(readSessions()).toHaveLength(1)
   })
 
   it('keeps the held role when the check could not be made', async () => {
