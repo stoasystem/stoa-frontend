@@ -160,6 +160,16 @@ const GLASS = {
 function LegendBody({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
   return (
     <>
+      <LegendKey t={t} />
+      <LegendHow t={t} />
+    </>
+  )
+}
+
+/** The glyphs and what they mean: read on every visit, so always open. */
+function LegendKey({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
+  return (
+    <>
       <ul className="m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1 p-0">
         {LEARNING_STATES.map((state) => (
           <li key={state} className="inline-flex items-center gap-1.5 text-[13px] text-[color:var(--on-sky-text-body)]">
@@ -176,7 +186,14 @@ function LegendBody({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'
           {t('legend.reviewDue')}
         </li>
       </ul>
-      {/* How to move (#141 B7), and the keyboard's two orders (#141 E5). */}
+    </>
+  )
+}
+
+/** How to move (#141 B7), and the keyboard's two orders (#141 E5). Read once. */
+function LegendHow({ t }: { t: UseTranslationResponse<'starmap', undefined>['t'] }) {
+  return (
+    <>
       <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-pointer>{t('legend.pointer')}</p>
       <p className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]" data-legend-keys>{t('legend.keys')}</p>
     </>
@@ -838,15 +855,29 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
           </div>
         )}
 
-        {/* What the glyphs mean (wide screens, whole map). */}
+        {/*
+          What the glyphs mean (wide screens, whole map).
+
+          The key is open; how to move is folded away. Five lines of
+          instructions took the whole bottom-left corner and were wider and
+          louder than the stars they explained — and they are read once,
+          while the key is read every visit.
+        */}
         {wide && target.layer === 'map' && stars.length > 0 && (
           <div
             data-starmap-overlay
+            data-starmap-legend
             className="absolute bottom-[calc(1.5rem+var(--page-bottom-inset,0px))] left-6 flex max-w-[640px] flex-col gap-2 rounded-[12px] border border-solid border-[color:var(--sky-glass-border)] px-3.5 py-2.5"
             style={GLASS}
           >
             <h2 className="sr-only">{t('legend.label')}</h2>
-            <LegendBody t={t} />
+            <LegendKey t={t} />
+            <details data-starmap-legend-how className="m-0">
+              <summary className="cursor-pointer list-none text-[13px] text-[color:var(--on-sky-plain)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+                {t('legend.howLabel')}
+              </summary>
+              <LegendHow t={t} />
+            </details>
           </div>
         )}
 

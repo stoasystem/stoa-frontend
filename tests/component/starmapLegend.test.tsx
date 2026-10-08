@@ -165,3 +165,28 @@ describe('the phone’s "?" (#146 C15)', () => {
     phone.unmount()
   })
 })
+
+describe('how much of the legend is open', () => {
+  it('keeps the key open and folds the instructions away', () => {
+    // Five lines of instructions took the whole bottom-left corner and were
+    // louder than the stars they explained. The key is read on every visit;
+    // how to drag and zoom is read once.
+    const { container } = showAt(1280, 800)
+
+    const legend = container.querySelector('[data-starmap-legend]')!
+    expect(legend.querySelector('ul'), 'the key is not in the legend').not.toBeNull()
+    const how = legend.querySelector('[data-starmap-legend-how]') as HTMLDetailsElement
+    expect(how, 'the instructions are not folded away').not.toBeNull()
+    expect(how.open).toBe(false)
+    expect(how.querySelector('[data-legend-pointer]')).not.toBeNull()
+    expect(how.querySelector('[data-legend-keys]')).not.toBeNull()
+  })
+
+  it('names the fold in the reader’s language, never as a bare key', () => {
+    const { container } = showAt(1280, 800)
+
+    const summary = container.querySelector('[data-starmap-legend-how] summary')!
+    expect(summary.textContent?.trim()).toBeTruthy()
+    expect(summary.textContent).not.toContain('legend.')
+  })
+})

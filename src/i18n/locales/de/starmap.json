@@ -1,35 +1,46 @@
 {
-  "stage": {
-    "label": "Sternkarte: {{subject}}",
-    "nebulae": "Nebel"
+  "announce": {
+    "map": "{{subject}}, die ganze Sternkarte: {{lit}} von {{total}} leuchten",
+    "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
+    "star": "{{name}}: {{state}}"
   },
-  "summary": {
-    "lit": "{{lit}} von {{total}} leuchten",
-    "streak_one": "{{count}} Tag in Folge",
-    "streak_other": "{{count}} Tage in Folge",
-    "score_one": "{{formatted}} Punkt",
-    "score_other": "{{formatted}} Punkte"
+  "empty": "In diesem Fach gibt es noch nichts zu lernen.",
+  "emptySky": {
+    "title": "Deine Sternkarte ist unterwegs",
+    "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
   },
-  "state": {
-    "lit": "Leuchtet",
-    "in_progress": "In Arbeit",
-    "ready": "Bereit zum Start",
-    "locked": "Gesperrt"
+  "help": {
+    "open": "So funktioniert die Sternkarte",
+    "close": "Schließen"
+  },
+  "legend": {
+    "howLabel": "Wie du dich bewegst",
+    "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen.",
+    "label": "Was die Sterne bedeuten",
+    "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
+    "reviewDue": "Wiederholung fällig"
+  },
+  "lighting": {
+    "announce": "{{name}} leuchtet jetzt"
   },
   "marker": {
     "recommended": "Als Nächstes empfohlen",
     "reviewDue_one": "{{count}} Karte zur Wiederholung fällig",
     "reviewDue_other": "{{count}} Karten zur Wiederholung fällig"
   },
-  "legend": {
-    "label": "Was die Sterne bedeuten",
-    "reviewDue": "Wiederholung fällig",
-    "pointer": "Ziehen verschiebt, Scrollen oder Zwei-Finger-Zoom zoomt. Einen Stern wählen zeigt sein Kapitel; ihn gedrückt ziehen (am Touchscreen erst halten) zeigt, womit er zusammenhängt.",
-    "keys": "Tasten: Pfeile zum Nächsten in dieser Richtung, Tab folgt dem Kurs, + und − zoomen."
+  "nav": {
+    "map": "Sternkarte",
+    "backToMap": "Zurück zur Sternkarte",
+    "backToNebula": "Zurück zu {{nebula}}",
+    "backToStar": "Zurück zu {{name}}"
   },
-  "help": {
-    "open": "So funktioniert die Sternkarte",
-    "close": "Schließen"
+  "nebula": {
+    "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
+    "related": "{{base}}, verbunden mit {{list}}"
+  },
+  "stage": {
+    "label": "Sternkarte: {{subject}}",
+    "nebulae": "Nebel"
   },
   "star": {
     "progress": "{{percent}} % der Lektionen erledigt",
@@ -52,35 +63,25 @@
     "reviewSoon": "Bald verfügbar",
     "sheetDetails": "Zeigt oder verbirgt die Details dieses Sterns"
   },
-  "nebula": {
-    "link": "{{nebula}}, {{lit}} von {{total}} leuchten",
-    "related": "{{base}}, verbunden mit {{list}}"
+  "state": {
+    "lit": "Leuchtet",
+    "in_progress": "In Arbeit",
+    "ready": "Bereit zum Start",
+    "locked": "Gesperrt"
   },
-  "nav": {
-    "map": "Sternkarte",
-    "backToMap": "Zurück zur Sternkarte",
-    "backToNebula": "Zurück zu {{nebula}}",
-    "backToStar": "Zurück zu {{name}}"
+  "subjects": {
+    "label": "Fächer"
+  },
+  "summary": {
+    "lit": "{{lit}} von {{total}} leuchten",
+    "streak_one": "{{count}} Tag in Folge",
+    "streak_other": "{{count}} Tage in Folge",
+    "score_one": "{{formatted}} Punkt",
+    "score_other": "{{formatted}} Punkte"
   },
   "zoom": {
     "group": "Zoom",
     "in": "Hineinzoomen",
     "out": "Herauszoomen"
-  },
-  "subjects": {
-    "label": "Fächer"
-  },
-  "announce": {
-    "map": "{{subject}}, die ganze Sternkarte: {{lit}} von {{total}} leuchten",
-    "nebula": "{{nebula}}: {{lit}} von {{total}} leuchten",
-    "star": "{{name}}: {{state}}"
-  },
-  "empty": "In diesem Fach gibt es noch nichts zu lernen.",
-  "emptySky": {
-    "title": "Deine Sternkarte ist unterwegs",
-    "body": "Deine Fächer und Wissenspunkte erscheinen hier, sobald sie bereit sind."
-  },
-  "lighting": {
-    "announce": "{{name}} leuchtet jetzt"
   }
 }
