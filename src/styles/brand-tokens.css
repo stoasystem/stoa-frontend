@@ -280,6 +280,7 @@
   --constellation-node: 54px;      /* the disc a lesson is */
   --constellation-gutter: 60px;    /* the column the line runs down */
   --constellation-line: 2.5px;
+  --constellation-ring: 2.5px;   /* the outline a node that is not filled is drawn with */
   --constellation-gap: 6px;        /* between one node row and the next */
   --constellation-walked: var(--lit);           /* the line behind you */
   --constellation-ahead: rgba(255, 255, 255, 0.22);

@@ -37,9 +37,23 @@ const DISC: Record<NodeState, string> = {
   done: 'bg-lit text-[color:var(--on-sky-button-text)] shadow-[0_var(--press-depth)_0_var(--lit-deep)]',
   doing:
     'bg-[color:var(--accent-on-sky)] text-[color:var(--on-accent-on-sky)] shadow-[0_var(--press-depth)_0_rgba(0,0,0,0.45)]',
-  ready: 'border-[var(--constellation-line)] border-white/75 text-on-sky',
-  review: 'border-[var(--constellation-line)] border-[color:var(--lit)] text-[color:var(--lit)]',
-  locked: 'bg-white/[0.07] border-2 border-white/15 text-[color:var(--on-sky-text-muted)]',
+  ready: 'border-solid border-white/75 text-on-sky',
+  review: 'border-solid border-[color:var(--lit)] text-[color:var(--lit)]',
+  locked: 'bg-white/[0.07] border-solid border-white/15 text-[color:var(--on-sky-text-muted)]',
+}
+
+/**
+ * The outline width, as a value rather than a class.
+ *
+ * `border-[var(--token)]` compiles to a border *colour*, not a width: the two
+ * outlined states shipped with no ring at all, and only the colour classes
+ * made it look deliberate. A width the component sets itself cannot be read
+ * as the other property.
+ */
+const RING: Partial<Record<NodeState, string>> = {
+  ready: 'var(--constellation-ring)',
+  review: 'var(--constellation-ring)',
+  locked: 'var(--constellation-ring)',
 }
 
 function NodeFace({ state, number }: { state: NodeState; number: number }) {
@@ -105,7 +119,12 @@ function Node({
             'relative z-[1] inline-flex items-center justify-center rounded-full text-[17px] font-extrabold',
             DISC[state],
           )}
-          style={{ width: 'var(--constellation-node)', height: 'var(--constellation-node)' }}
+          data-node-state={state}
+          style={{
+            width: 'var(--constellation-node)',
+            height: 'var(--constellation-node)',
+            borderWidth: RING[state],
+          }}
         >
           <NodeFace state={state} number={number} />
         </span>

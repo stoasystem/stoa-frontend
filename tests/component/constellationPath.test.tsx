@@ -127,6 +127,22 @@ describe('the constellation a chapter is drawn as', () => {
     }
   })
 
+  it('draws a ring on the nodes that are not filled in', () => {
+    // `border-[var(--token)]` compiles to a border colour, not a width: both
+    // outlined states shipped to production with no ring, and the screenshot
+    // read as a bare number floating next to the line.
+    const { container } = draw()
+
+    const width = (state: string) =>
+      (container.querySelector(`[data-node-state="${state}"]`) as HTMLElement).style.borderWidth
+
+    for (const state of ['ready', 'review', 'locked']) {
+      expect(width(state), `${state} has no ring`).toBe('var(--constellation-ring)')
+    }
+    expect(width('done')).toBe('')
+    expect(width('doing')).toBe('')
+  })
+
   it('measures nothing itself: every size comes from a token', () => {
     const { container } = draw()
 
