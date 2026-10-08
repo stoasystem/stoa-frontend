@@ -8,7 +8,7 @@
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
-import { GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type GlyphCut } from '@/features/starmap/render/glyph'
+import { DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
@@ -172,6 +172,58 @@ const DOT: Record<number, { lit: boolean; alpha: number; radius: number; glow: b
   [STATE_LOCKED]: { lit: false, alpha: LOCKED_RING_ALPHA, radius: 0.6, glow: false },
 }
 
+/**
+ * The ink a dot's mark is drawn at, as the `--starmap-dot-*` sky tokens
+ * define it (`src/styles/brand-tokens.css`; a test keeps them equal). The
+ * colour is the theme's (`lit` or `text`), the alpha is here.
+ */
+export const DOT_ALPHA = {
+  [STATE_LIT]: 1,
+  [STATE_IN_PROGRESS]: 0.92,
+  [STATE_READY]: 0.88,
+  [STATE_LOCKED]: 0.62,
+  review: 0.92,
+} as const
+
+/** How far a state's dot mark reaches from its centre, `DotCut` box units. */
+export function dotExtent(cut: DotCut, state: number): number {
+  if (state === STATE_LIT) return Math.max(cut.lit.tip, cut.halo.radius + 2 * cut.halo.blur)
+  if (state === STATE_IN_PROGRESS) return Math.max(cut.inProgress.ring + cut.inProgress.ringWidth / 2, cut.halo.radius + 2 * cut.halo.blur)
+  if (state === STATE_READY) return cut.ready.ring + cut.ready.ringWidth / 2
+  return cut.locked.ring + cut.locked.ringWidth / 2
+}
+
+/**
+ * One dot's mark, in `DotCut` box units around the origin. `part` splits the
+ * glow from the figure so the panorama can fade the glow out on its own
+ * (#137 A2). Each state is its own figure: a filled star, a filled star
+ * inside a ring, a ring with a core, a bare ring.
+ */
+export function drawDotMark(ctx: CanvasRenderingContext2D, cut: DotCut, state: number, theme: StarMapTheme, part: 'both' | 'glow' | 'core' = 'both') {
+  const glowing = state === STATE_LIT || state === STATE_IN_PROGRESS
+  if (glowing && part !== 'core') halo(ctx, cut.halo.radius, cut.halo.blur, theme.lit, cut.halo.alpha)
+  if (part === 'glow') return
+  if (state === STATE_LIT) {
+    const g = cut.lit
+    ctx.fillStyle = withAlpha(theme.lit, DOT_ALPHA[STATE_LIT])
+    ctx.fill(new Path2D(starPath(g.tip, g.waist)))
+    disc(ctx, g.core, theme.litCore)
+  } else if (state === STATE_IN_PROGRESS) {
+    const g = cut.inProgress
+    ctx.fillStyle = withAlpha(theme.lit, DOT_ALPHA[STATE_IN_PROGRESS])
+    ctx.fill(new Path2D(starPath(g.tip, g.waist)))
+    ring(ctx, g.ring, g.ringWidth, theme.lit, DOT_ALPHA[STATE_IN_PROGRESS])
+    disc(ctx, g.core, theme.litCore)
+  } else if (state === STATE_READY) {
+    const g = cut.ready
+    ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_READY])
+    disc(ctx, g.core, theme.text, DOT_ALPHA[STATE_READY])
+  } else {
+    const g = cut.locked
+    ring(ctx, g.ring, g.ringWidth, theme.text, DOT_ALPHA[STATE_LOCKED])
+  }
+}
+
 /*
  * What the canvas draws in text and lines, and at what strength. The contrast
  * of each is checked in starmapContrast.test.ts against the sky tokens.
@@ -259,23 +311,21 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
   }
 
   /**
-   * A dot sprite per state: a core of radius 1/4 of the sprite, a soft glow
-   * for lit ones (`glow`), or only the glow (`'glow'`) or only the core
-   * (`'core'`), which the panorama crossfades (#137: lit dots lose their glow far out).
+   * A dot sprite per state: the dot cut's figure (`drawDotMark`), or only its
+   * glow (`'glow'`) or only its figure (`'core'`), which the panorama
+   * crossfades (#137: lit dots lose their glow far out). The sprite spans the
+   * dot's whole box, so every state is drawn at one size and tells itself
+   * apart by its figure.
    */
   const buildDots = (part: 'both' | 'glow' | 'core' = 'both'): HTMLCanvasElement[] => {
-    const size = 32
+    const size = 64
     return [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((state) => {
-      const dot = DOT[state]
       const sprite = makeCanvas(size, size)
       const s = sprite.getContext('2d')
       if (s && theme) {
         s.translate(size / 2, size / 2)
-        if (dot.glow && part !== 'core') halo(s, size * 0.22, size * 0.12, theme.lit, 0.35)
-        if (part !== 'glow') {
-          disc(s, (size / 4) * dot.radius, dot.lit ? theme.lit : theme.text, dot.alpha)
-          if (state === STATE_LIT) disc(s, size * 0.08, theme.litCore)
-        }
+        s.scale(size / DOT_CUT.box, size / DOT_CUT.box)
+        drawDotMark(s, DOT_CUT, state, theme, part)
       }
       return sprite
     })
@@ -675,6 +725,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
 
       const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((st) => panoramaDot(DOT[st].lit, look))
+      // A dot's box: the engine's, grown toward the glyph box where the map is sparse enough to have room.
+      const dotBox = dotBoxFor(frame.dotRadius, frame.glyphSize)
       // Stars in focus: dots on the whole map, glyphs zoomed in, crossfading between.
       // A dragged star is drawn last, over the stars it passes.
       const lastStar = drag ? drag.star : count - 1
@@ -700,7 +752,7 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         if (frame.dotBlend > 0.01 && !beacon) {
           // On the panorama a lit star is a small, dim dot without its glow: the light is its nebula's (#137 A2).
           const quiet = dotLooks[state[i]]
-          const size = frame.dotRadius * 4 * quiet.radius
+          const size = dotBox * quiet.radius
           const alpha = a * frame.dotBlend * focus * quiet.alpha
           const at = [x[i] - size / 2, y[i] - size / 2, size, size] as const
           if (quiet.glow >= 0.99 || !DOT[state[i]].glow) {
@@ -713,6 +765,20 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             }
             ctx.globalAlpha = alpha
             ctx.drawImage(set.quietDots[state[i]], ...at)
+          }
+          // Due for review: the glyph's pip at dot scale, so the sixth state is told apart far out too.
+          if (scene.reviewDue[i] === 1) {
+            const unit = (size / DOT_CUT.box) * quiet.radius
+            const off = (DOT_CUT.review.offset * unit) / Math.SQRT2
+            ctx.globalAlpha = alpha
+            ctx.fillStyle = colours.sky
+            ctx.beginPath()
+            ctx.arc(x[i] + off, y[i] - off, (DOT_CUT.review.radius + DOT_CUT.review.outline) * unit, 0, Math.PI * 2)
+            ctx.fill()
+            ctx.fillStyle = withAlpha(colours.text, DOT_ALPHA.review)
+            ctx.beginPath()
+            ctx.arc(x[i] + off, y[i] - off, DOT_CUT.review.radius * unit, 0, Math.PI * 2)
+            ctx.fill()
           }
         }
         stats.starDraws += 1

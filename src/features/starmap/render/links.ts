@@ -73,6 +73,26 @@ export const LINE = {
   fadeMin: 48,
 } as const
 
+/**
+ * The locked web far out (#109, #138 D1). Two rules decide whether a
+ * prerequisite into a locked star is drawn, and on a map of a dozen points
+ * neither reaches it: the panorama's bridges have already faded out
+ * (`REVEAL.linesNear`, by glyph size, and a sparse map's glyphs are large at
+ * its farthest zoom), while tier 4 waits for a star to be in focus. The
+ * points are then drawn with nothing between them at all, though most of
+ * them are locked. Wherever the stars are still dots and the bridges are
+ * gone, tier 4 keeps this much of its ink -- a dashed hint of the web, in
+ * tier 4's own ink and dashes -- and hands back to the focus rule as the
+ * dots give way to glyphs.
+ */
+export const LOCKED_WEB = 0.55
+
+/** How much of tier 4's ink the locked web keeps this frame: nothing while the bridges carry the panorama. */
+export function lockedWebHint(frame: Pick<SceneFrame, 'dotBlend' | 'lineReveal'>): number {
+  const gap = Math.max(0, Math.min(1, frame.dotBlend)) * (1 - Math.max(0, Math.min(1, frame.lineReveal.bridges)))
+  return LOCKED_WEB * gap
+}
+
 /** A bridge between nebulae: trimmed this far into each cloud (share of radius), its width, and its soft passes. */
 export const BRIDGE = {
   trim: 0.55,
@@ -563,8 +583,12 @@ export function drawLinks(
     /** Other nebulae a drawn line from the chosen one leads to: the strongest line to each, and (focused) where it runs. */
     const leadsTo = new Map<number, { strength: number; along: { x: number; y: number; ux: number; uy: number; d: number } | null }>()
     const ends: [number, number][] = []
+    const web = lockedWebHint(frame)
     for (const line of data.lines) {
-      const { strength, reach, lit } = starLineLook(line, view)
+      const look = starLineLook(line, view)
+      const { reach, lit } = look
+      // The locked web far out: tier 4 where neither the bridges nor the focus rule reach it.
+      const strength = line.tier === TIER_LOCKED ? Math.max(look.strength, web) : look.strength
       if (strength <= 0.001) continue
       // Anchored on the dragged star, else the focused star, else on the end in the chosen nebula;
       // a line between two other nebulae is drawn from both ends, each fading out.
