@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import { rememberSession } from '@/lib/devSessions'
+import { getPostLoginPath } from '@/lib/authRoutes'
 import { markLoginAuthenticated } from '@/lib/loginTiming'
 import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
@@ -47,6 +48,16 @@ export function useLoginMutation() {
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
       toast.success(t('login.signedIn'))
+      // Signing in from 「添加账号」 lands on the new account rather than
+      // waiting for the login screen to move: that screen is deliberately not
+      // moving while `?add=1` is up. A full load, not a route change, so the
+      // account being left behind takes its cached answers with it — the same
+      // reason switching to a held account reloads.
+      if (new URLSearchParams(window.location.search).get('add') === '1') {
+        window.location.assign(getPostLoginPath(data.user, { search: '' }))
+        return
+      }
+
       // ChatPage waits on this query before it counts as usable (BUG-008);
       // firing it here overlaps that round trip with the route transition
       // instead of waiting for the page to mount first. An account under a

@@ -10,6 +10,14 @@
  * they are signed in, so a `?next=` link or the page they were sent away from
  * is honoured here; a second navigation from the login mutation would race
  * this one, and the later of the two would win.
+ *
+ * `?add=1` is the exception, and the account menu's 「添加账号」 is where it
+ * comes from: someone who is already signed in is asking to sign in as
+ * somebody else. Without it that link went to this page and was bounced
+ * straight back, which read as the button doing nothing at all. Leaving is
+ * not this page's job in that case — the login itself reloads onto the new
+ * account's home, the way switching to a held account does, so the account
+ * being left behind takes its cached answers with it.
  */
 import { Navigate, useLocation } from 'react-router-dom'
 import { LoginPage } from '@/pages/login/LoginPage'
@@ -21,7 +29,9 @@ export function EntryPage() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const location = useLocation()
 
-  if (isAuthenticated && user?.role) {
+  const addingAnother = new URLSearchParams(location.search).get('add') === '1'
+
+  if (isAuthenticated && user?.role && !addingAnother) {
     return <Navigate replace to={getPostLoginPath(user, location)} />
   }
 

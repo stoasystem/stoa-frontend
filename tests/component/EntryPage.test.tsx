@@ -23,11 +23,11 @@ import { EntryPage } from '@/pages/entry/EntryPage'
 // Since #45 the root is the student's star map, and the router shows EntryPage
 // there only to a visitor who is not a student (routeGuards.test.tsx). The
 // entry page itself is exercised at /login, where it always renders.
-function renderAt() {
+function renderAt(entry = '/login') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={['/login']}>
+      <MemoryRouter initialEntries={[entry]}>
         <Routes>
           <Route path="/login" element={<EntryPage />} />
           <Route path="/" element={<p>the student app</p>} />
@@ -94,5 +94,39 @@ describe('arriving at the app domain', () => {
     signedInAs('teacher')
     renderAt()
     expect(screen.getByText('the teacher app')).toBeInTheDocument()
+  })
+})
+
+describe('signing in as somebody else', () => {
+  beforeEach(() => {
+    useAuthStore.setState({ user: null, isAuthenticated: false } as never)
+  })
+
+  it('shows the form to someone who is already signed in and asked for it', () => {
+    // 「添加账号」 in the account menu goes to /login?add=1. This page sends
+    // anyone with a session straight back to their own app, so the button
+    // looked like it did nothing at all.
+    signedInAs('student')
+
+    renderAt('/login?add=1')
+
+    expect(screen.getByRole('form', { name: 'sign in' })).toBeInTheDocument()
+    expect(screen.queryByText('the student app')).not.toBeInTheDocument()
+  })
+
+  it('still sends them home when they did not ask for it', () => {
+    signedInAs('student')
+
+    renderAt('/login')
+
+    expect(screen.getByText('the student app')).toBeInTheDocument()
+  })
+
+  it('does not take any other value for it', () => {
+    signedInAs('student')
+
+    renderAt('/login?add=0')
+
+    expect(screen.getByText('the student app')).toBeInTheDocument()
   })
 })

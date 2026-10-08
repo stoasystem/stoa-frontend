@@ -147,3 +147,50 @@ it('holds the account that just signed in, with its refresh token', async () => 
     expect(held[0].refreshToken).toBe('refresh-for-parent')
   })
 })
+
+it('lands on the new account when signing in from 「添加账号」', async () => {
+  // The login screen deliberately does not move while ?add=1 is up — that is
+  // what keeps the form on screen for someone who is already signed in — so
+  // the login itself has to leave. A full load, so the account being left
+  // behind takes its cached answers with it.
+  const assign = vi.fn()
+  Object.defineProperty(window, 'location', {
+    value: { assign, search: '?add=1', href: 'https://app.stoaedu.ch/login?add=1' },
+    writable: true,
+  })
+  mswServer.use(http.post('https://api.test/auth/login', () =>
+    HttpResponse.json({
+      accessToken: 'access-for-parent',
+      refreshToken: 'refresh-for-parent',
+      user: { id: 'u-2', email: 'parent@example.com', role: 'parent', name: 'A Parent' },
+    }),
+  ))
+  renderPages('/login')
+  useAuthStore.getState().clearAuth()
+
+  fireEvent.click(screen.getByText('Sign in'))
+
+  await waitFor(() => expect(assign).toHaveBeenCalledWith('/parent'))
+})
+
+it('does not reload when signing in the ordinary way', async () => {
+  const assign = vi.fn()
+  Object.defineProperty(window, 'location', {
+    value: { assign, search: '', href: 'https://app.stoaedu.ch/login' },
+    writable: true,
+  })
+  mswServer.use(http.post('https://api.test/auth/login', () =>
+    HttpResponse.json({
+      accessToken: 'access-for-parent',
+      refreshToken: 'refresh-for-parent',
+      user: { id: 'u-2', email: 'parent@example.com', role: 'parent', name: 'A Parent' },
+    }),
+  ))
+  renderPages('/login')
+  useAuthStore.getState().clearAuth()
+
+  fireEvent.click(screen.getByText('Sign in'))
+
+  await waitFor(() => expect(useAuthStore.getState().isAuthenticated).toBe(true))
+  expect(assign).not.toHaveBeenCalled()
+})
