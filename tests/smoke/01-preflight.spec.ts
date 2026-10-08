@@ -34,6 +34,7 @@ import { readStateFile, record } from './run'
  *   03 writes     item 5 (no model), 4 (PDF), 2 (E03), 3 (E01 x2)         3 generations
  *   04 logout     item 8, last, because it revokes every parent@ session
  * Item 10 is the removal of the old `3x + 5 = 20` question; item 3 replaces it.
+ * Item 5's hint is marked as expected to fail until Ask shows it (#154).
  *
  * Generation budget: three requests in a normal run (items 2 and 3), at most
  * five per run counting any repeat; run.ts refuses the sixth.

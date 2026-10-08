@@ -1,4 +1,4 @@
-import { expect, test, type Request, type Response, type TestInfo } from '@playwright/test'
+import { expect, test, type TestInfo } from '@playwright/test'
 import {
   ANSWER_WAIT_LIMIT_MS,
   SmokeApi,
@@ -28,58 +28,73 @@ async function studentGrade(api: SmokeApi): Promise<string> {
   return body.grade
 }
 
-test('item 5: a blank grade shows the hint and opens a blank-grade conversation (#50)', {
+// Ask (the student's chat since the redesign; `/chat` redirects to it) sends
+// the first question with the conversation itself: `POST /conversations` with
+// `initialMessage`, answered on the command keyed `initial-<id>`. So the
+// screen's create request is the send, and #26's "no initialMessage" now holds
+// only for a create made without a question.
+const ASK = '/ask'
+
+function isCreate(method: string, url: string): boolean {
+  return method === 'POST' && isApiUrl(url) && CREATE.test(pathOf(url))
+}
+
+test('item 5: a blank grade opens a blank-grade conversation (#50)', {
   tag: ['@item5'],
-}, async ({ page }, testInfo) => {
-  // No model is asked: the chat sends the opening question as a second
-  // request once the conversation exists, and that request is stopped here.
+}, async ({ page, request, baseURL }, testInfo) => {
+  // No model is asked. The screen's create carries the question, so it is read
+  // and stopped in the browser; the stored grade is read from a create sent
+  // over the API without a question.
   const failures = watchApiFailures(page)
   const errors = watchPageErrors(page)
-  const blockedSends: string[] = []
-  await page.route(SEND, async (route) => {
-    if (route.request().method() !== 'POST') return route.continue()
-    blockedSends.push(pathOf(route.request().url()))
+  const stopped: Array<Record<string, unknown>> = []
+  await page.route(CREATE, async (route) => {
+    if (!isCreate(route.request().method(), route.request().url())) return route.continue()
+    stopped.push(route.request().postDataJSON() as Record<string, unknown>)
     await route.abort('blockedbyclient')
   })
   await signIn(page, 'agent')
-  await page.goto('/chat')
+  await page.goto(ASK)
 
-  await expect(page.getByText(anyLanguage('chat', 'gradeMissingHint')), 'the blank-grade hint').toBeVisible({
-    timeout: 20_000,
+  const composer = page.getByRole('textbox', { name: anyLanguage('chat', 'ask.composerLabel') }).last()
+  await composer.fill('[smoke] #50 blank grade')
+  await composer.press('Enter')
+  await expect.poll(() => stopped.length, { message: 'Ask never asked for a conversation' }).toBeGreaterThan(0)
+
+  const api = await SmokeApi.signIn(request, baseURL!, 'agent')
+  const created = await api.call<{ id: string; grade: string; messages: unknown[] }>('POST', '/conversations', {
+    data: { subject: 'math', grade: '' },
+    expect: 201,
   })
 
-  const createRequest = page.waitForRequest(
-    (request: Request) => request.method() === 'POST' && isApiUrl(request.url()) && CREATE.test(pathOf(request.url())),
-  )
-  const createResponse = page.waitForResponse(
-    (response: Response) =>
-      response.request().method() === 'POST' && isApiUrl(response.url()) && CREATE.test(pathOf(response.url())),
-  )
-  await page.getByRole('textbox', { name: anyLanguage('chat', 'newConversationLabel') }).fill('[smoke] #50 blank grade')
-  await page.getByRole('button', { name: anyLanguage('chat', 'startConversation') }).click()
-
-  const sent = (await createRequest).postDataJSON() as Record<string, unknown>
-  const created = await createResponse
-  const createdBody = (await created.json()) as { id: string; grade: string }
-  await expect.poll(() => blockedSends.length, { message: 'the opening question was sent on its own' }).toBeGreaterThan(0)
-
+  const sent = stopped[0]
   await record(testInfo, 'item5-blank-grade', {
-    request: sent,
-    status: created.status(),
-    conversationId: createdBody.id,
-    grade: createdBody.grade,
-    blockedSends,
+    screenRequest: { ...sent, initialMessage: typeof sent.initialMessage === 'string' ? '(the question)' : sent.initialMessage },
+    screenRequestsStopped: stopped.length,
+    apiCreate: { status: created.status, conversationId: created.body.id, grade: created.body.grade, messages: created.body.messages.length },
   })
-  expect(sent.grade, 'the grade the chat sent').toBe('')
-  expect(Object.keys(sent), 'the create request carries no initialMessage').not.toContain('initialMessage')
-  expect(created.status(), 'POST /conversations').toBe(201)
-  expect(createdBody.grade, 'the grade the conversation was stored with').toBe('')
+  expect(sent.grade, 'the grade the screen sent').toBe('')
+  expect(stopped, 'the screen asked for one conversation').toHaveLength(1)
+  expect(created.body.grade, 'the grade the conversation was stored with').toBe('')
+  expect(created.body.messages, 'a create without a question holds no message').toEqual([])
   expect(errors, 'uncaught page errors').toEqual([])
   await expectApiClean(failures, [
-    { method: 'POST', path: SEND, status: 'failed', times: 1, why: 'item 5: the send this test stops' },
-    // Until it gives up, the chat asks whether the stopped message was stored.
-    { method: 'GET', path: /\/conversations\/[^/]+\/generation$/, status: 404, optional: true, times: 10, why: 'item 5: the stopped message was never stored' },
+    { method: 'POST', path: CREATE, status: 'failed', times: 1, why: 'item 5: the create this test stops' },
   ])
+})
+
+test('item 5: Ask tells a blank-grade student to fill in their grade (#50)', {
+  tag: ['@item5'],
+}, async ({ page }) => {
+  // The hint #50 put on the chat page did not come over to Ask; this marks the
+  // gap and turns red the day the hint is back, so the mark is taken off.
+  // https://github.com/stoasystem/stoa-frontend/issues/154
+  test.fail(true, 'Ask has no blank-grade hint yet (stoa-frontend#154)')
+  await signIn(page, 'agent')
+  await page.goto(ASK)
+  await expect(page.getByText(anyLanguage('chat', 'gradeMissingHint')), 'the blank-grade hint').toBeVisible({
+    timeout: 15_000,
+  })
 })
 
 test('item 4: a PDF with a 4 MiB object header is refused as upload_invalid (E08)', {
@@ -199,35 +214,42 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     })
   })
 
-  test('item 3: the derivative question in the browser, 202 to answer on screen (E01, E13, E19-E21)', {
+  test('item 3: the derivative question in Ask, from the create to the answer on screen (E01, E13, E19-E21)', {
     tag: ['@item3', '@browser'],
   }, async ({ page, baseURL }, testInfo) => {
     test.setTimeout(ANSWER_WAIT_LIMIT_MS + 90_000)
     const failures = watchApiFailures(page)
     const question = 'Was ist eine Ableitung? Kannst du mir das erklären?'
 
-    // One send, and only after it was counted against the budget.
+    // One create, which is the send, and only after it was counted against
+    // the budget. A second message would be a second generation.
+    let creates = 0
+    await page.route(CREATE, async (route) => {
+      if (!isCreate(route.request().method(), route.request().url())) return route.continue()
+      creates += 1
+      if (creates > 1) return route.abort('blockedbyclient')
+      return route.continue()
+    })
     let sends = 0
     await page.route(SEND, async (route) => {
       if (route.request().method() !== 'POST') return route.continue()
       sends += 1
-      if (sends > 1) return route.abort('blockedbyclient')
-      return route.continue()
+      return route.abort('blockedbyclient')
     })
 
     // Written from the page's events, so kept in an object the checks read.
-    const seen = { sentAt: 0, acceptedAt: 0, acceptLanguage: null as string | null }
+    const seen = { sentAt: 0, acceptedAt: 0, acceptLanguage: null as string | null, subject: null as string | null }
     type Generation = { commandId?: string | null; status?: string | null; assistantMessageId?: string | null }
     const generations: Array<{ at: number; key: string | null; body: Generation }> = []
     const details = new Map<string, { messages: Array<{ id: string; role: string; content: string }> }>()
     page.on('request', (request) => {
-      if (request.method() === 'POST' && SEND.test(pathOf(request.url()))) {
-        seen.sentAt = Date.now()
-        seen.acceptLanguage = request.headers()['accept-language'] ?? null
-      }
+      if (!isCreate(request.method(), request.url())) return
+      seen.sentAt = Date.now()
+      seen.acceptLanguage = request.headers()['accept-language'] ?? null
+      seen.subject = (request.postDataJSON() as { subject?: string }).subject ?? null
     })
     page.on('response', (response) => {
-      if (response.request().method() === 'POST' && SEND.test(pathOf(response.url()))) seen.acceptedAt = Date.now()
+      if (isCreate(response.request().method(), response.url())) seen.acceptedAt = Date.now()
       if (!isApiUrl(response.url()) || response.status() !== 200) return
       const url = new URL(response.url())
       if (/\/generation$/.test(url.pathname)) {
@@ -242,43 +264,37 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     })
 
     await signIn(page, 'student')
-    await page.goto('/chat')
-    await page.getByRole('button', { name: anyLanguage('chat', 'subjects.math', { exact: false }) }).first().click()
-    await page.getByRole('textbox', { name: anyLanguage('chat', 'newConversationLabel') }).fill(question)
+    await page.goto(ASK)
+    const composer = page.getByRole('textbox', { name: anyLanguage('chat', 'ask.composerLabel') }).last()
+    await composer.fill(question)
 
-    const created = page.waitForResponse(
-      (response) => response.request().method() === 'POST' && isApiUrl(response.url()) && CREATE.test(pathOf(response.url())),
-    )
-    const accepted = page.waitForResponse(
-      (response) => response.request().method() === 'POST' && isApiUrl(response.url()) && SEND.test(pathOf(response.url())),
-      { timeout: 60_000 },
-    )
+    const created = page.waitForResponse((response) => isCreate(response.request().method(), response.url()), {
+      timeout: 60_000,
+    })
     spendGeneration('item3-math-browser')
-    await page.getByRole('button', { name: anyLanguage('chat', 'startConversation') }).click()
+    await composer.press('Enter')
 
-    const conversation = (await (await created).json()) as { id: string }
-    rememberConversations(baseURL!, [conversation.id])
-    const send = await accepted
-    const acceptBody = (await send.json().catch(() => null)) as {
-      conversationId?: string
-      commandId?: string
-      idempotencyKey?: string
+    const createResponse = await created
+    const conversation = (await createResponse.json().catch(() => null)) as {
+      id?: string
+      messages?: Array<{ role: string }>
     } | null
     const acceptMs = seen.acceptedAt - seen.sentAt
-
     const base = {
-      conversationId: conversation.id,
-      sendStatus: send.status(),
-      commandId: acceptBody?.commandId ?? null,
+      conversationId: conversation?.id ?? null,
+      createStatus: createResponse.status(),
+      subject: seen.subject,
       acceptMs,
       acceptLanguage: seen.acceptLanguage,
     }
-    if (send.status() !== 202) await record(testInfo, 'item3-e01-math-browser', base)
-    expect(send.status(), 'the send is accepted and answered later (E21)').toBe(202)
-    expect(acceptBody?.conversationId, 'the 202 names this conversation').toBe(conversation.id)
-    const commandId = acceptBody!.commandId!
-    const key = acceptBody!.idempotencyKey!
-    expect(commandId, 'the 202 names a command').toBeTruthy()
+    if (createResponse.status() !== 201) await record(testInfo, 'item3-e01-math-browser', base)
+    expect(createResponse.status(), 'POST /conversations with the question').toBe(201)
+    const conversationId = conversation!.id!
+    rememberConversations(baseURL!, [conversationId])
+    // The question is stored and its answer is left to the worker (E21): a
+    // create that already carries the answer was answered inside the request.
+    expect(conversation?.messages?.map((message) => message.role), 'the create holds the question only').toEqual(['student'])
+    const key = `initial-${conversationId}`
 
     // The page's own polling, read as it happens (E13, E19, E20).
     const deadline = seen.acceptedAt + ANSWER_WAIT_LIMIT_MS
@@ -288,12 +304,12 @@ test.describe('answers', { tag: ['@generation'] }, () => {
       terminal = generations.find((entry) => entry.key === key && ['completed', 'failed'].includes(entry.body.status ?? ''))
     }
     const mine = generations.filter((entry) => entry.key === key)
-    const bound = mine.filter((entry) => entry.body.commandId)
+    const commandIds = [...new Set(mine.map((entry) => entry.body.commandId).filter(Boolean))]
     const last = mine.at(-1)
     if (!terminal) {
       const note = timedOutNote({
         kind: 'timed_out',
-        commandId,
+        commandId: commandIds[0] ?? null,
         lastStatus: last?.body.status ?? null,
         elapsedMs: Date.now() - seen.sentAt,
       })
@@ -301,25 +317,24 @@ test.describe('answers', { tag: ['@generation'] }, () => {
       throw new Error(note)
     }
     const completeMs = terminal.at - seen.sentAt
-    expect(bound.map((entry) => entry.body.commandId), 'every poll reports the command the 202 named').toEqual(
-      bound.map(() => commandId),
-    )
+    expect(commandIds, 'every poll reports the one command the question was given').toHaveLength(1)
+    const commandId = commandIds[0]
     if (terminal.body.status !== 'completed') {
-      await record(testInfo, 'item3-e01-math-browser', { ...base, completeMs, polls: mine.length, terminal: terminal.body })
+      await record(testInfo, 'item3-e01-math-browser', { ...base, commandId, completeMs, polls: mine.length, terminal: terminal.body })
     }
     expect(terminal.body.status, 'the command ended in a successful terminal state').toBe('completed')
     const assistantId = terminal.body.assistantMessageId!
 
     // The frontend reads the conversation back and shows the stored answer.
     await expect
-      .poll(() => details.get(conversation.id)?.messages.some((message) => message.id === assistantId) ?? false, {
+      .poll(() => details.get(conversationId)?.messages.some((message) => message.id === assistantId) ?? false, {
         timeout: 20_000,
         message: 'the page read back the answer the command named',
       })
       .toBe(true)
-    const answer = details.get(conversation.id)!.messages.find((message) => message.id === assistantId)!.content
+    const answer = details.get(conversationId)!.messages.find((message) => message.id === assistantId)!.content
     const snippet = plainSnippet(answer)
-    const shown = page.getByRole('article', { name: anyLanguage('chat', 'assistantMessageLabel') }).last()
+    const shown = page.locator('[data-message-role=assistant]').last()
     if (snippet) {
       await expect(shown, 'the answer is on screen').toContainText(snippet, { timeout: 15_000 })
     } else {
@@ -327,13 +342,14 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     }
 
     const screen: Screen = {
-      language: seen.acceptLanguage === 'en' ? 'en' : 'de',
+      language: seen.acceptLanguage?.toLowerCase().startsWith('en') ? 'en' : 'de',
       topic: /Ableitung|Steigung|Änderung|ändert|Tangente/i,
       wantsExample: true,
     }
     const problems = screenAnswer(answer, screen)
     await record(testInfo, 'item3-e01-math-browser', {
       ...base,
+      commandId,
       completeMs,
       polls: mine.length,
       assistantMessageId: assistantId,
@@ -342,10 +358,12 @@ test.describe('answers', { tag: ['@generation'] }, () => {
       needsHumanConfirmation: { language: screen.language, explainsRatherThanRefuses: true, exampleOrAnalogy: true },
     })
     if (acceptMs > 1000) {
-      testInfo.annotations.push({ type: 'performance', description: `202 after ${acceptMs} ms; target 1 s` })
+      testInfo.annotations.push({ type: 'performance', description: `201 after ${acceptMs} ms; target 1 s` })
     }
-    expect(sends, 'the page sent the question once').toBe(1)
-    expect.soft(seen.acceptLanguage, 'student@ reads the app in German').toBe('de')
+    expect(creates, 'the page sent the question once').toBe(1)
+    expect(sends, 'nothing was sent after the question').toBe(0)
+    expect.soft(seen.subject, 'Ask opened the conversation in maths').toBe('math')
+    expect.soft(seen.acceptLanguage, 'student@ reads the app in German').toMatch(/^de\b/)
     expect.soft(problems, 'keyword screen (a person still reads the answer)').toEqual([])
     await expectApiClean(failures)
   })

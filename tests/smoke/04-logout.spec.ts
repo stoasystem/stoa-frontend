@@ -35,7 +35,9 @@ test('item 8: logging out revokes the token the page held (#49, #5)', { tag: ['@
     (response: Response) =>
       response.request().method() === 'POST' && isApiUrl(response.url()) && pathOf(response.url()) === '/auth/logout',
   )
-  await page.getByRole('button', { name: anyLanguage('common', 'actions.logOut') }).filter({ visible: true }).first().click()
+  // Logging out is the last entry of the account menu in the top bar.
+  await page.getByRole('button', { name: anyLanguage('common', 'accountMenu.open') }).filter({ visible: true }).first().click()
+  await page.getByRole('menuitem', { name: anyLanguage('common', 'actions.logOut') }).click()
   const sent = (await logoutRequest).postDataJSON() as { access_token?: string }
   const answered = await logoutResponse
   await expect(page).toHaveURL(/\/login/)

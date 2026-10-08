@@ -11,12 +11,17 @@
  */
 export type SmokeRole = 'student' | 'parent' | 'teacher' | 'admin' | 'agent'
 
-export const smokeAccounts: Record<SmokeRole, { email: string; landing: RegExp }> = {
-  student: { email: 'student@test.stoaedu.ch', landing: /\/(chat|learn)/ },
-  parent: { email: 'parent@test.stoaedu.ch', landing: /\/parent/ },
-  teacher: { email: 'teacher@test.stoaedu.ch', landing: /\/teacher/ },
-  admin: { email: 'admin@test.stoaedu.ch', landing: /\/admin/ },
-  agent: { email: 'agent@test.stoaedu.ch', landing: /\/(chat|learn)/ },
+/**
+ * Each role's home, from `roleHomePaths` in src/app/router/routeManifest.ts.
+ * A student's is the star map at `/`, which is why this is a path and not a
+ * pattern: `/` is a prefix of every other one.
+ */
+export const smokeAccounts: Record<SmokeRole, { email: string; landing: string }> = {
+  student: { email: 'student@test.stoaedu.ch', landing: '/' },
+  parent: { email: 'parent@test.stoaedu.ch', landing: '/parent' },
+  teacher: { email: 'teacher@test.stoaedu.ch', landing: '/teacher' },
+  admin: { email: 'admin@test.stoaedu.ch', landing: '/admin' },
+  agent: { email: 'agent@test.stoaedu.ch', landing: '/' },
 }
 
 export function smokePassword(): string {

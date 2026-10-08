@@ -198,19 +198,26 @@ export function watchPageErrors(page: Page): string[] {
 export async function signIn(page: Page, role: SmokeRole): Promise<void> {
   const account = smokeAccounts[role]
   await page.goto('/login')
-  await page.getByLabel(/e-?mail/i).first().fill(account.email)
-  await page.locator('input[type=password]').first().fill(smokePassword())
+  // By input type, not label: the label is in whichever language the page chose.
+  const password = page.locator('input[type=password]').first()
+  await page.locator('input[type=email]').first().fill(account.email)
+  await password.fill(smokePassword())
   await page.locator('button[type=submit]').first().click()
-  await expect(page).toHaveURL(account.landing, { timeout: 30_000 })
+  await expect(page).toHaveURL((url) => url.pathname === account.landing, { timeout: 30_000 })
+  // `/` also shows the sign-in form to a visitor; the form has to be gone.
+  await expect(password, 'the sign-in form is still on screen').toBeHidden()
 }
 
-/** The token the signed-in page holds. It is never printed or recorded. */
+/**
+ * The token the signed-in page's requests carry, read the way the app reads it
+ * (`getStoredToken` in src/store/authStore.ts): a tab pinned to an account
+ * holds its own in sessionStorage (#34), every other tab the shared one in
+ * localStorage. It is never printed or recorded.
+ */
 export async function pageAccessToken(page: Page): Promise<string> {
-  const origin = new URL(page.url()).origin
-  const state = await page.context().storageState()
-  const token = state.origins
-    .find((entry) => entry.origin === origin)
-    ?.localStorage.find((entry) => entry.name === 'stoa_access_token')?.value
-  if (!token) throw new Error(`no access token in ${origin}'s storage after signing in`)
+  const token = await page.evaluate(
+    () => sessionStorage.getItem('stoa_tab_access_token') ?? localStorage.getItem('stoa_access_token'),
+  )
+  if (!token) throw new Error(`no access token in ${new URL(page.url()).origin}'s storage after signing in`)
   return token
 }
