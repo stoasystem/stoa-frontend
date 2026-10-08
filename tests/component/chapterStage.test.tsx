@@ -368,6 +368,19 @@ describe('the chapter', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('This chapter could not be found.')
     expect(getPracticeRoadmap).not.toHaveBeenCalled()
+    // Card 059: a page with nothing on it is not left as one grey line. The
+    // marmot is decorative, so the sentence above is what is read out.
+    expect(document.querySelector('[data-murmi]')).toHaveAttribute('aria-hidden', 'true')
+  })
+
+  it('offers another try when the chapter could not be loaded, and does not stand there bare', async () => {
+    vi.mocked(getPracticeRoadmap).mockRejectedValue(new ApiError('upstream', { status: 503 }))
+
+    open('/chapter/u-5')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The chapter could not be loaded.')
+    expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument()
+    expect(document.querySelector('[data-murmi]')).toHaveAttribute('aria-hidden', 'true')
   })
 })
 

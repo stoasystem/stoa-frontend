@@ -19,6 +19,7 @@ import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-rea
 import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
+import { Murmi } from '@/components/brand/Murmi'
 import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
@@ -117,11 +118,15 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
         </Link>
       )}
       {kind === 'loading' ? (
-        <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
-          {t('stage.loading')}
-        </p>
+        <div className="flex items-center gap-2">
+          <Murmi mood="thinking" size="var(--murmi-inline)" />
+          <p role="status" className={cn('m-0 text-[15px]', bodyOnSky)}>
+            {t('stage.loading')}
+          </p>
+        </div>
       ) : kind === 'failed' ? (
         <>
+          <Murmi mood="thinking" size="var(--murmi-state)" />
           <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
             {t('stage.failed')}
           </p>
@@ -138,9 +143,12 @@ function StageNotice({ unitId, kind, retry }: { unitId?: string; kind: StageNoti
           <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.locked.body')}</p>
         </div>
       ) : (
-        <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
-          {t('stage.missing')}
-        </p>
+        <>
+          <Murmi mood="calm" size="var(--murmi-state)" />
+          <p role="alert" className={cn('m-0 text-[15px]', bodyOnSky)}>
+            {t('stage.missing')}
+          </p>
+        </>
       )}
     </>
   )

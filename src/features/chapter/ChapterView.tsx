@@ -51,11 +51,15 @@ function ChapterState({ query }: { query: Exclude<ReturnType<typeof useChapter>,
         {t('chapter.backToMap')}
       </Link>
       {query.status === 'loading' ? (
-        <p role="status" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
-          {t('chapter.loading')}
-        </p>
+        <div className="flex items-center gap-2">
+          <Murmi mood="thinking" size="var(--murmi-inline)" />
+          <p role="status" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
+            {t('chapter.loading')}
+          </p>
+        </div>
       ) : query.status === 'error' ? (
         <div className="flex flex-col items-start gap-3">
+          <Murmi mood="thinking" size="var(--murmi-state)" />
           <p role="alert" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
             {t('chapter.failed')}
           </p>
@@ -64,9 +68,12 @@ function ChapterState({ query }: { query: Exclude<ReturnType<typeof useChapter>,
           </Button>
         </div>
       ) : (
-        <p role="alert" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
-          {t('chapter.missing')}
-        </p>
+        <div className="flex flex-col items-start gap-3">
+          <Murmi mood="calm" size="var(--murmi-state)" />
+          <p role="alert" className="m-0 text-[15px] text-[color:var(--on-sky-text-body)]">
+            {t('chapter.missing')}
+          </p>
+        </div>
       )}
     </>
   )

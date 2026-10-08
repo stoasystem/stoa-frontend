@@ -80,6 +80,7 @@ export function Murmi({
       width={measured ? size : undefined}
       height={measured ? size : undefined}
       style={measured ? undefined : { width: size, height: size }}
+      data-murmi={mood}
       aria-hidden="true"
       focusable="false"
       className={cn('shrink-0', className)}
