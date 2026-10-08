@@ -1,6 +1,7 @@
 import { BookOpenCheck, Clock, Compass } from 'lucide-react'
 import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
+import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingState } from '@/components/common/LoadingState'
 import { PageContainer } from '@/components/common/PageContainer'
@@ -107,7 +108,7 @@ export function StudentAssignmentsPage() {
         {assignments.length === 0 && assignmentsQuery.isSuccess && (
           <Card>
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground">{t('assignments.empty')}</p>
+              <EmptyState message={t('assignments.empty')} />
             </CardContent>
           </Card>
         )}
