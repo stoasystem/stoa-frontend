@@ -299,6 +299,21 @@
   --constellation-ahead: rgba(255, 255, 255, 0.22);
   --constellation-pulse: 2100ms;   /* the ring on the lesson in progress */
 
+  /*
+   * A knowledge point drawn as a dot, far out on the star map (#109). The
+   * dot is the only thing most points ever are -- on a map of ten, eight of
+   * them -- so each state carries its own ink here, and each is rated: a
+   * locked point opens its prerequisites when tapped, so it is a control
+   * (WCAG 1.4.11), and the other three say which state a point is in. The rgb
+   * is --lit or --on-sky-text; the alpha is DOT_ALPHA
+   * (src/features/starmap/render/canvas2d.ts; a test keeps them equal).
+   */
+  --starmap-dot-lit: rgba(242, 197, 114, 1);
+  --starmap-dot-in-progress: rgba(242, 197, 114, 0.92);
+  --starmap-dot-ready: rgba(255, 255, 255, 0.88);
+  --starmap-dot-locked: rgba(255, 255, 255, 0.62);
+  --starmap-dot-review: rgba(255, 255, 255, 0.92);
+
   --starmap-link-recommended: rgba(242, 197, 114, 0.9);
   --starmap-link-in-progress: rgba(255, 255, 255, 0.5);
   --starmap-link-walked: rgba(255, 255, 255, 0.16);

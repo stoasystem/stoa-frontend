@@ -1,5 +1,5 @@
 {
-  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), locked points (rgba white 28%, inactive), --lit-deep and --atmosphere (glow only).",
+  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), --lit-deep and --atmosphere (glow only).",
   "tokens": {
     "file": "src/styles/brand-tokens.css",
     "themes": {
@@ -513,6 +513,46 @@
       "bg": "--state-error-surface",
       "kind": "text",
       "use": "the message on a failed page, in its own panel (card 059)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-dot-lit",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map knowledge point drawn as a dot, lit (#109): far out this is the whole mark, and it says the point is done",
+      "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-dot-in-progress",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map knowledge point drawn as a dot, in progress (#109)",
+      "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-dot-ready",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map knowledge point drawn as a dot, ready to start (#109)",
+      "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-dot-locked",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map knowledge point drawn as a dot, locked (#109): a locked point opens its prerequisites when tapped, so it is a control (WCAG 1.4.11)",
+      "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
+    },
+    {
+      "theme": "dark",
+      "fg": "--starmap-dot-review",
+      "bg": "--sky",
+      "kind": "ui",
+      "use": "star map review pip on a knowledge point drawn as a dot (#109)",
+      "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
     }
   ]
 }

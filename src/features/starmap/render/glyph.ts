@@ -53,6 +53,52 @@ export const GLYPH_SMALL: GlyphCut = {
 /** Glyph boxes below this many CSS px use the small cut. */
 export const SMALL_CUT_BELOW = 30
 
+/**
+ * The dot cut: what a knowledge point is far out (#109), where a full glyph
+ * per star would pack a nebula solid. The states are told apart there by
+ * figure, not by colour or by a tenth of a pixel of radius: the legend's
+ * marks at dot scale -- a filled star, a filled star inside a ring, a ring
+ * with a core, a bare ring -- so a colour-blind reader tells them by shape
+ * and a sighted one finds every point at all. The recommendation (a dashed
+ * ring and halo) and the review pip are laid over these as they are over the
+ * glyph. Box units from the centre, in an 18 box like `GLYPH_SMALL`.
+ */
+export type DotCut = {
+  box: number
+  lit: { tip: number; waist: number; core: number }
+  inProgress: { tip: number; waist: number; ring: number; ringWidth: number; core: number }
+  ready: { ring: number; ringWidth: number; core: number }
+  locked: { ring: number; ringWidth: number }
+  /** The soft glow under a lit or in-progress dot. */
+  halo: { radius: number; blur: number; alpha: number }
+  review: { offset: number; radius: number; outline: number }
+}
+
+export const DOT_CUT: DotCut = {
+  box: 18,
+  lit: { tip: 7.7, waist: 2.7, core: 2 },
+  inProgress: { tip: 5.6, waist: 1.9, ring: 7.2, ringWidth: 1.3, core: 1.7 },
+  ready: { ring: 6.1, ringWidth: 1.35, core: 2.3 },
+  locked: { ring: 6.5, ringWidth: 1.35 },
+  halo: { radius: 4, blur: 2.2, alpha: 0.3 },
+  review: { offset: 7.2, radius: 2, outline: 0.9 },
+}
+
+/**
+ * A dot's box on screen, CSS px. The engine sizes it from the gap between
+ * stars (`dotRadius`, capped at 2.1 for a packed nebula), which on a map of
+ * ten points leaves a 2.5 px mark in a screen of room -- inside the spread of
+ * the sky's own dust. Where the glyph box says there is room, the dot grows
+ * with it, to `room` of it and never past `max`: still a dot, and still far
+ * below the recommended star's glyph, which keeps the eye.
+ */
+export const DOT_BOX = { fromDot: 4, room: 0.45, max: 16 } as const
+
+/** The box a dot is drawn in, CSS px, from the frame's dot radius and glyph box. */
+export function dotBoxFor(dotRadius: number, glyphSize: number): number {
+  return Math.max(dotRadius * DOT_BOX.fromDot, Math.min(glyphSize * DOT_BOX.room, DOT_BOX.max))
+}
+
 /** The lens star: four points joined by quadratic curves pulled to the waist. */
 export function starPath(tip: number, waist: number, cx = 0, cy = 0): string {
   const f = (n: number) => n.toFixed(2)
