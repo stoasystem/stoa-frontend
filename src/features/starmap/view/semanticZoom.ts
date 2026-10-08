@@ -50,6 +50,17 @@ export const ZOOM = {
   doubleTapPx: 30,
   /** The closest zoom: a star's glyph this many px. The farthest is the panorama (and #120's `ringSafeZoom`). */
   maxGlyph: 40,
+  /**
+   * The least the closest zoom may be, as a factor of the farthest.
+   *
+   * `maxGlyph` is a target for a sky with enough stars in it. A subject with
+   * ten knowledge points has nebulae that are large for the few stars they
+   * hold, so a 40 px glyph is already reached at the panorama: the closest
+   * zoom lands on the farthest, both zoom buttons are disabled at once, and
+   * the reader is held at the one zoom the design deliberately shows least at
+   * — stars as dots and almost no names. There is always a way in.
+   */
+  leastRange: 2.5,
   /** A flight to a chosen nebula or star, ms (the switcher's longer flight is the motion policy's). */
   flightMs: 600,
   /** Choosing a nebula flies in until its stars are full glyphs this big (px): the four states tell apart. */

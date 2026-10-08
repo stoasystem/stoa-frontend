@@ -863,9 +863,26 @@ export class StarMapEngine {
    * The cursor over `(x, y)` for a mouse: `grab` over a star that can be
    * dragged, `grabbing` while one is, else '' (the stage's own).
    */
-  cursorAt(x: number, y: number): '' | 'grab' | 'grabbing' {
+  cursorAt(x: number, y: number): '' | 'pointer' | 'grab' | 'grabbing' {
     if (this.grab?.dragging) return 'grabbing'
-    return this.pointers.size === 0 && this.grabbable(x, y, 'mouse') >= 0 ? 'grab' : ''
+    if (this.pointers.size > 0) return ''
+    if (this.grabbable(x, y, 'mouse') >= 0) return 'grab'
+    // Everything on this map is reached by clicking it, and the pointer never
+    // said so: over a star or a nebula the cursor stayed the arrow, so the
+    // whole sky read as a picture rather than something to open.
+    return this.wouldChoose(x, y) ? 'pointer' : ''
+  }
+
+  /** Whether a tap here would open something. The same reach `choose` uses. */
+  private wouldChoose(x: number, y: number): boolean {
+    if (!this.map || this.viewport.width === 0) return false
+    const reach = Math.max(22, this.glyphSize * 0.5)
+    if (this.zoom.pickable && this.nearestStar(x, y, reach)) return true
+    if (this.beaconAt(x, y)) return true
+    const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+    const target = this.target
+    if (!nebulaId) return target.layer === 'star'
+    return !(target.layer === 'nebula' && target.nebulaId === nebulaId)
   }
 
   /** A star is held by the hand now (#136; a touch's long press then must not open a context menu). */
@@ -981,7 +998,11 @@ export class StarMapEngine {
     const far = this.skyGalaxies.length > 0 ? panoramaZoom(this.skyGalaxies, this.bounds, this.viewport) : 1
     const ring = this.wrap > 0 ? ringSafeZoom(this.ringReach, this.wrap, this.viewport, this.bounds, fx) : 0
     const min = Math.max(far, ring)
-    return { min, max: Math.max(min, kForGlyph(ZOOM.maxGlyph, this.viewport, this.bounds, this.spacing)) }
+    // Never a single point: a sky too sparse for `maxGlyph` to sit past the
+    // panorama would leave both zoom buttons dead and the reader stuck at the
+    // farthest view (`ZOOM.leastRange`).
+    const glyph = kForGlyph(ZOOM.maxGlyph, this.viewport, this.bounds, this.spacing)
+    return { min, max: Math.max(min * ZOOM.leastRange, glyph) }
   }
 
   private limit(view: View): View {
