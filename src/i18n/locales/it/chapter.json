@@ -1,93 +1,50 @@
 {
   "chapter": {
-    "backToMap": "Mappa stellare",
-    "lessons": "{{done}} lezioni su {{total}} completate",
-    "progress": "Avanzamento del capitolo",
-    "start": "Inizia: {{title}}",
-    "continue": "Continua: {{title}}",
     "again": "Esercitati di nuovo",
-    "listLabel": "Lezioni",
-    "lessonNumber": "Lezione {{number}}",
+    "backToMap": "Mappa stellare",
+    "continue": "Continua: {{title}}",
+    "empty": "Questo capitolo non ha ancora lezioni.",
+    "failed": "Non è stato possibile caricare il capitolo.",
     "lessonMeta_one": "{{minutes}} min · {{count}} esercizio",
     "lessonMeta_other": "{{minutes}} min · {{count}} esercizi",
+    "lessonNumber": "Lezione {{number}}",
+    "lessons": "{{done}} lezioni su {{total}} completate",
+    "listLabel": "Lezioni",
+    "lit": "Questo punto di conoscenza è acceso.",
+    "loading": "Caricamento del capitolo…",
+    "missing": "Questo capitolo non è stato trovato.",
+    "progress": "Avanzamento del capitolo",
+    "remaining_one": "Manca {{count}} stella prima che questo punto si accenda.",
+    "remaining_other": "Mancano {{count}} stelle prima che questo punto si accenda.",
+    "retry": "Riprova",
+    "start": "Inizia: {{title}}",
     "status": {
+      "available": "Pronta",
       "completed": "Completata",
       "current": "Prossima",
-      "available": "Pronta",
-      "review": "Da ripassare",
-      "locked": "Bloccata"
-    },
-    "loading": "Caricamento del capitolo…",
-    "failed": "Non è stato possibile caricare il capitolo.",
-    "retry": "Riprova",
-    "missing": "Questo capitolo non è stato trovato.",
-    "empty": "Questo capitolo non ha ancora lezioni."
-  },
-  "stage": {
-    "backToChapter": "Torna a {{chapter}}",
-    "backToLessons": "Torna al capitolo",
-    "lessonOf": "Lezione {{lesson}} di {{lessons}}",
-    "questionOf": "Domanda {{question}} di {{questions}}",
-    "youAreHere": "Sei qui",
-    "chooseAnswer": "Scegli una risposta",
-    "yourAnswer": "La tua risposta",
-    "answerPlaceholder": "Scrivi la tua risposta",
-    "explainPlaceholder": "Scrivi la tua spiegazione",
-    "order": {
-      "available": "Toccali nell’ordine giusto",
-      "chosen": "Il tuo ordine",
-      "empty": "Ancora niente scelto."
-    },
-    "check": "Verifica la risposta",
-    "checking": "Verifica in corso…",
-    "skip": "Salta",
-    "hint": "Suggerimento",
-    "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
-    "correct": "Giusto",
-    "notQuite": "Non proprio",
-    "tryAgain": "Riprova",
-    "next": "Domanda successiva",
-    "finish": "Termina la lezione",
-    "finishing": "Chiusura in corso…",
-    "checkFailed": "Non è stato possibile verificare la tua risposta. Riprova.",
-    "finishFailed": "Non è stato possibile terminare la lezione. Riprova.",
-    "done": {
-      "title": "Lezione completata",
-      "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
-      "allDone": "Tutte le lezioni di {{chapter}} sono completate.",
-      "next": "Lezione successiva: {{title}}",
-      "backToChapter": "Torna al capitolo",
-      "testedOut": "La lezione conta come completata. La stella si accende quando ogni esercizio di questo capitolo è stato risolto correttamente almeno una volta."
-    },
-    "loading": "Caricamento della lezione…",
-    "failed": "Non è stato possibile caricare la lezione.",
-    "retry": "Riprova",
-    "missing": "Questa lezione non è stata trovata.",
-    "locked": {
-      "title": "Questa lezione è bloccata",
-      "body": "Completa prima le lezioni che la precedono in questo capitolo."
-    },
-    "empty": "Questa lezione non ha ancora esercizi."
+      "locked": "Bloccata",
+      "review": "Da ripassare"
+    }
   },
   "quiz": {
-    "label": "Quiz",
     "askOff": "Durante il quiz Ask è disattivato.",
-    "hearts_one": "{{count}} cuore su {{total}} rimasto",
-    "hearts_other": "{{count}} cuori su {{total}} rimasti",
+    "continue": "Continua",
+    "failed": {
+      "backToLesson": "Torna alla lezione",
+      "body": "Continua a esercitarti e riprova.",
+      "retry": "Rifai il quiz",
+      "title": "Non ancora"
+    },
+    "finish": "Termina il quiz",
     "heartLost_one": "Hai perso un cuore. Te ne resta {{count}}.",
     "heartLost_other": "Hai perso un cuore. Te ne restano {{count}}.",
+    "hearts_one": "{{count}} cuore su {{total}} rimasto",
+    "hearts_other": "{{count}} cuori su {{total}} rimasti",
+    "label": "Quiz",
     "noHeartsLeft": "Era il tuo ultimo cuore.",
-    "continue": "Continua",
-    "finish": "Termina il quiz",
     "offer": {
       "action": "Quiz breve",
       "body": "Completa questa lezione superando un quiz breve."
-    },
-    "failed": {
-      "title": "Non ancora",
-      "body": "Continua a esercitarti e riprova.",
-      "backToLesson": "Torna alla lezione",
-      "retry": "Rifai il quiz"
     },
     "testOut": {
       "action": "Salta questa lezione",
@@ -95,8 +52,54 @@
     }
   },
   "quote": {
-    "label": "Chiedi sul testo selezionato",
     "ask": "Chiedi su questo",
-    "comingSoon": "Prossimamente"
+    "comingSoon": "Prossimamente",
+    "label": "Chiedi sul testo selezionato"
+  },
+  "stage": {
+    "answerPlaceholder": "Scrivi la tua risposta",
+    "backToChapter": "Torna a {{chapter}}",
+    "backToLessons": "Torna al capitolo",
+    "check": "Verifica la risposta",
+    "checkFailed": "Non è stato possibile verificare la tua risposta. Riprova.",
+    "checking": "Verifica in corso…",
+    "chooseAnswer": "Scegli una risposta",
+    "correct": "Giusto",
+    "done": {
+      "allDone": "Tutte le lezioni di {{chapter}} sono completate.",
+      "backToChapter": "Torna al capitolo",
+      "next": "Lezione successiva: {{title}}",
+      "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
+      "testedOut": "La lezione conta come completata. La stella si accende quando ogni esercizio di questo capitolo è stato risolto correttamente almeno una volta.",
+      "title": "Lezione completata"
+    },
+    "empty": "Questa lezione non ha ancora esercizi.",
+    "explainPlaceholder": "Scrivi la tua spiegazione",
+    "failed": "Non è stato possibile caricare la lezione.",
+    "finish": "Termina la lezione",
+    "finishFailed": "Non è stato possibile terminare la lezione. Riprova.",
+    "finishing": "Chiusura in corso…",
+    "hint": "Suggerimento",
+    "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
+    "lessonOf": "Lezione {{lesson}} di {{lessons}}",
+    "loading": "Caricamento della lezione…",
+    "locked": {
+      "body": "Completa prima le lezioni che la precedono in questo capitolo.",
+      "title": "Questa lezione è bloccata"
+    },
+    "missing": "Questa lezione non è stata trovata.",
+    "next": "Domanda successiva",
+    "notQuite": "Non proprio",
+    "order": {
+      "available": "Toccali nell’ordine giusto",
+      "chosen": "Il tuo ordine",
+      "empty": "Ancora niente scelto."
+    },
+    "questionOf": "Domanda {{question}} di {{questions}}",
+    "retry": "Riprova",
+    "skip": "Salta",
+    "tryAgain": "Riprova",
+    "youAreHere": "Sei qui",
+    "yourAnswer": "La tua risposta"
   }
 }

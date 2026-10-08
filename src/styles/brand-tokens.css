@@ -262,6 +262,29 @@
    * say is already in the stars' own states (and a locked star's card). Read by
    * StarMapView into the canvas theme; drawn by render/links.ts.
    */
+  /* ---- Murmi, the observatory marmot (step 5) --------------------------
+     Alpine marmot browns, warm enough to sit on the sky without glowing. The
+     figure is decorative — everything it says is in text too — so none of
+     these is a gated contrast pair. */
+  --murmi-fur: #C49468;
+  --murmi-fur-dark: #A8784F;
+  --murmi-belly: #E6CBA8;
+  --murmi-ink: #2B1F14;
+  --murmi-scope: #2B3A6B;
+
+  /* ---- The chapter's constellation (step 4) ---------------------------
+     A chapter is the lessons drawn as a constellation: each one a star, the
+     line between them lit as far as the student has come. It is the same
+     metaphor as the map one level up — finish the constellation and the
+     knowledge point becomes a single lit star there. */
+  --constellation-node: 54px;      /* the disc a lesson is */
+  --constellation-gutter: 60px;    /* the column the line runs down */
+  --constellation-line: 2.5px;
+  --constellation-gap: 6px;        /* between one node row and the next */
+  --constellation-walked: var(--lit);           /* the line behind you */
+  --constellation-ahead: rgba(255, 255, 255, 0.22);
+  --constellation-pulse: 2100ms;   /* the ring on the lesson in progress */
+
   --starmap-link-recommended: rgba(242, 197, 114, 0.9);
   --starmap-link-in-progress: rgba(255, 255, 255, 0.5);
   --starmap-link-walked: rgba(255, 255, 255, 0.16);
