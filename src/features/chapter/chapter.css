@@ -40,3 +40,20 @@
     animation: none;
   }
 }
+
+/*
+ * The ring on the lesson in progress. `motion-safe:` on the element already
+ * stops it under reduced motion; this keyframe is what it plays otherwise.
+ * The node itself does not move — only the ring leaves it — so nothing shifts
+ * under a reader who is tracking the line.
+ */
+@keyframes constellation-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.75;
+  }
+  to {
+    transform: scale(1.65);
+    opacity: 0;
+  }
+}

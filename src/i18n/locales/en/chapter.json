@@ -1,93 +1,50 @@
 {
   "chapter": {
-    "backToMap": "Star map",
-    "lessons": "{{done}} of {{total}} lessons done",
-    "progress": "Chapter progress",
-    "start": "Start: {{title}}",
-    "continue": "Continue: {{title}}",
     "again": "Practise again",
-    "listLabel": "Lessons",
-    "lessonNumber": "Lesson {{number}}",
+    "backToMap": "Star map",
+    "continue": "Continue: {{title}}",
+    "empty": "This chapter has no lessons yet.",
+    "failed": "The chapter could not be loaded.",
     "lessonMeta_one": "{{minutes}} min · {{count}} exercise",
     "lessonMeta_other": "{{minutes}} min · {{count}} exercises",
+    "lessonNumber": "Lesson {{number}}",
+    "lessons": "{{done}} of {{total}} lessons done",
+    "listLabel": "Lessons",
+    "lit": "This knowledge point is lit.",
+    "loading": "Loading the chapter…",
+    "missing": "This chapter could not be found.",
+    "progress": "Chapter progress",
+    "remaining_one": "{{count}} star to go before this point lights.",
+    "remaining_other": "{{count}} stars to go before this point lights.",
+    "retry": "Try again",
+    "start": "Start: {{title}}",
     "status": {
+      "available": "Ready",
       "completed": "Done",
       "current": "Up next",
-      "available": "Ready",
-      "review": "Review",
-      "locked": "Locked"
-    },
-    "loading": "Loading the chapter…",
-    "failed": "The chapter could not be loaded.",
-    "retry": "Try again",
-    "missing": "This chapter could not be found.",
-    "empty": "This chapter has no lessons yet."
-  },
-  "stage": {
-    "backToChapter": "Back to {{chapter}}",
-    "backToLessons": "Back to the chapter",
-    "lessonOf": "Lesson {{lesson}} of {{lessons}}",
-    "questionOf": "Question {{question}} of {{questions}}",
-    "youAreHere": "You are here",
-    "chooseAnswer": "Choose an answer",
-    "yourAnswer": "Your answer",
-    "answerPlaceholder": "Type your answer",
-    "explainPlaceholder": "Write your explanation",
-    "order": {
-      "available": "Tap them in the right order",
-      "chosen": "Your order",
-      "empty": "Nothing chosen yet."
-    },
-    "check": "Check answer",
-    "checking": "Checking…",
-    "skip": "Skip",
-    "hint": "Hint",
-    "hintFailed": "No hint right now. Try again in a moment.",
-    "correct": "Correct",
-    "notQuite": "Not quite",
-    "tryAgain": "Try again",
-    "next": "Next question",
-    "finish": "Finish lesson",
-    "finishing": "Finishing…",
-    "checkFailed": "Your answer could not be checked. Try again.",
-    "finishFailed": "The lesson could not be finished. Try again.",
-    "done": {
-      "title": "Lesson complete",
-      "progress": "{{done}} of {{total}} lessons in {{chapter}} done",
-      "allDone": "Every lesson in {{chapter}} is done.",
-      "next": "Next lesson: {{title}}",
-      "backToChapter": "Back to the chapter",
-      "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once."
-    },
-    "loading": "Loading the lesson…",
-    "failed": "The lesson could not be loaded.",
-    "retry": "Try again",
-    "missing": "This lesson could not be found.",
-    "locked": {
-      "title": "This lesson is locked",
-      "body": "Finish the lessons before it in this chapter first."
-    },
-    "empty": "This lesson has no exercises yet."
+      "locked": "Locked",
+      "review": "Review"
+    }
   },
   "quiz": {
-    "label": "Quiz",
     "askOff": "Ask is off during the quiz.",
-    "hearts_one": "{{count}} of {{total}} hearts left",
-    "hearts_other": "{{count}} of {{total}} hearts left",
+    "continue": "Continue",
+    "failed": {
+      "backToLesson": "Back to the lesson",
+      "body": "Keep practising and try again.",
+      "retry": "Try the quiz again",
+      "title": "Not yet"
+    },
+    "finish": "Finish the quiz",
     "heartLost_one": "That cost a heart. {{count}} heart left.",
     "heartLost_other": "That cost a heart. {{count}} hearts left.",
+    "hearts_one": "{{count}} of {{total}} hearts left",
+    "hearts_other": "{{count}} of {{total}} hearts left",
+    "label": "Quiz",
     "noHeartsLeft": "That was your last heart.",
-    "continue": "Continue",
-    "finish": "Finish the quiz",
     "offer": {
       "action": "Short quiz",
       "body": "Finish this lesson by passing a short quiz."
-    },
-    "failed": {
-      "title": "Not yet",
-      "body": "Keep practising and try again.",
-      "backToLesson": "Back to the lesson",
-      "retry": "Try the quiz again"
     },
     "testOut": {
       "action": "Skip this lesson",
@@ -95,8 +52,54 @@
     }
   },
   "quote": {
-    "label": "Ask about the selected text",
     "ask": "Ask about this",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "label": "Ask about the selected text"
+  },
+  "stage": {
+    "answerPlaceholder": "Type your answer",
+    "backToChapter": "Back to {{chapter}}",
+    "backToLessons": "Back to the chapter",
+    "check": "Check answer",
+    "checkFailed": "Your answer could not be checked. Try again.",
+    "checking": "Checking…",
+    "chooseAnswer": "Choose an answer",
+    "correct": "Correct",
+    "done": {
+      "allDone": "Every lesson in {{chapter}} is done.",
+      "backToChapter": "Back to the chapter",
+      "next": "Next lesson: {{title}}",
+      "progress": "{{done}} of {{total}} lessons in {{chapter}} done",
+      "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.",
+      "title": "Lesson complete"
+    },
+    "empty": "This lesson has no exercises yet.",
+    "explainPlaceholder": "Write your explanation",
+    "failed": "The lesson could not be loaded.",
+    "finish": "Finish lesson",
+    "finishFailed": "The lesson could not be finished. Try again.",
+    "finishing": "Finishing…",
+    "hint": "Hint",
+    "hintFailed": "No hint right now. Try again in a moment.",
+    "lessonOf": "Lesson {{lesson}} of {{lessons}}",
+    "loading": "Loading the lesson…",
+    "locked": {
+      "body": "Finish the lessons before it in this chapter first.",
+      "title": "This lesson is locked"
+    },
+    "missing": "This lesson could not be found.",
+    "next": "Next question",
+    "notQuite": "Not quite",
+    "order": {
+      "available": "Tap them in the right order",
+      "chosen": "Your order",
+      "empty": "Nothing chosen yet."
+    },
+    "questionOf": "Question {{question}} of {{questions}}",
+    "retry": "Try again",
+    "skip": "Skip",
+    "tryAgain": "Try again",
+    "youAreHere": "You are here",
+    "yourAnswer": "Your answer"
   }
 }
