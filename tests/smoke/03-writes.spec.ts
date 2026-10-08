@@ -83,18 +83,17 @@ test('item 5: a blank grade opens a blank-grade conversation (#50)', {
   ])
 })
 
-test('item 5: Ask tells a blank-grade student to fill in their grade (#50)', {
+test('item 5: Ask tells a blank-grade student where to fill in their grade (#50, #154)', {
   tag: ['@item5'],
 }, async ({ page }) => {
-  // The hint #50 put on the chat page did not come over to Ask; this marks the
-  // gap and turns red the day the hint is back, so the mark is taken off.
-  // https://github.com/stoasystem/stoa-frontend/issues/154
-  test.fail(true, 'Ask has no blank-grade hint yet (stoa-frontend#154)')
+  // Only the hint and where it leads; nothing is saved, so agent@ stays blank.
   await signIn(page, 'agent')
   await page.goto(ASK)
-  await expect(page.getByText(anyLanguage('chat', 'gradeMissingHint')), 'the blank-grade hint').toBeVisible({
-    timeout: 15_000,
-  })
+  const hint = page.getByRole('link', { name: anyLanguage('chat', 'gradeMissingHint') })
+  await expect(hint, 'the blank-grade hint').toBeVisible({ timeout: 15_000 })
+  await hint.click()
+  await expect(page).toHaveURL((url) => url.pathname === '/me' && url.hash === '#me-grade')
+  await expect(page.getByRole('textbox', { name: anyLanguage('common', 'me.grade.label') })).toBeFocused()
 })
 
 test('item 4: a PDF with a 4 MiB object header is refused as upload_invalid (E08)', {
