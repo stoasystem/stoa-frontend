@@ -492,6 +492,27 @@
       "bg": "--accent-on-sky",
       "kind": "text",
       "use": "Alpenklar: filled button on the sky"
+    },
+    {
+      "theme": "light",
+      "fg": "--red",
+      "bg": "--state-error-surface",
+      "kind": "text",
+      "use": "the message on a failed page, in its own panel (card 059)"
+    },
+    {
+      "theme": "dark",
+      "fg": "--red",
+      "bg": "--sky",
+      "kind": "text",
+      "use": "destructive text on a dark surface — it had no dark value before card 059"
+    },
+    {
+      "theme": "dark",
+      "fg": "--red",
+      "bg": "--state-error-surface",
+      "kind": "text",
+      "use": "the message on a failed page, in its own panel (card 059)"
     }
   ]
 }

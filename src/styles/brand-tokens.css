@@ -191,6 +191,27 @@
   --motion-zoom: 420ms;     /* planet <-> region */
   --motion-jump: 560ms;     /* the jump, once */
   --motion-lighting: 800ms; /* the lighting */
+  /* ---- Murmi, the observatory marmot (step 5) --------------------------
+     Alpine marmot browns, warm enough to sit on the sky without glowing. The
+     figure is decorative — everything it says is in text too — so none of
+     these is a gated contrast pair. */
+  --murmi-fur: #C49468;
+  --murmi-fur-dark: #A8784F;
+  --murmi-belly: #E6CBA8;
+  --murmi-ink: #2B1F14;
+  --murmi-scope: #2B3A6B;
+  --murmi-inline: 28px;   /* beside a line of text */
+  --murmi-state: 72px;    /* an empty or failed page, where it is the picture */
+
+  /* ---- Empty, loading and failed pages (card 059) ---------------------
+     An error gets a soft panel rather than red text on the page's own
+     background: the colour says "this is the part that went wrong" without
+     --red ever being used as a fill, which it is not meant to be. */
+  --state-error-surface: #FBEDEE;
+  --state-error-rule: #F0C9CE;
+  --state-gap: var(--space-16);
+  --state-measure: 42ch;  /* how wide a line of explanation may run */
+
   --motion-reduced: 200ms;  /* reduced motion: a linear crossfade replaces all of the above */
   --ease-out: cubic-bezier(0, 0, 0.58, 1);
   --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -262,15 +283,7 @@
    * say is already in the stars' own states (and a locked star's card). Read by
    * StarMapView into the canvas theme; drawn by render/links.ts.
    */
-  /* ---- Murmi, the observatory marmot (step 5) --------------------------
-     Alpine marmot browns, warm enough to sit on the sky without glowing. The
-     figure is decorative — everything it says is in text too — so none of
-     these is a gated contrast pair. */
-  --murmi-fur: #C49468;
-  --murmi-fur-dark: #A8784F;
-  --murmi-belly: #E6CBA8;
-  --murmi-ink: #2B1F14;
-  --murmi-scope: #2B3A6B;
+
 
   /* ---- The chapter's constellation (step 4) ---------------------------
      A chapter is the lessons drawn as a constellation: each one a star, the
@@ -312,6 +325,13 @@
   --starmap-galaxy-name-math: rgba(196, 190, 255, 0.13);
   --starmap-galaxy-name-physics: rgba(176, 226, 250, 0.13);
   --starmap-galaxy-name-chemistry: rgba(255, 214, 168, 0.13);
+
+  /* On the sky --red is unreadable as text (#C4283A on #0A1020), and it had
+     no dark value at all: `text-destructive` on a dark surface was ungated
+     and failing. A rose that carries on dark, and a panel to sit it on. */
+  --red: #FF9BA6;
+  --state-error-surface: #2A1217;
+  --state-error-rule: #5A2630;
 
   /* Motion and states: the focus ring on dark is 2 px star-gold. */
   --focus-ring: var(--lit);

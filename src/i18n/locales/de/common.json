@@ -198,6 +198,9 @@
     "teacher": "Lehrperson",
     "tutor": "Lehrperson"
   },
+  "state": {
+    "notYourFault": "Das liegt nicht an dir."
+  },
   "status": {
     "adminFeedback": {
       "new": "Neu",

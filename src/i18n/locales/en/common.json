@@ -198,6 +198,9 @@
     "teacher": "Teacher",
     "tutor": "Teacher"
   },
+  "state": {
+    "notYourFault": "This isn't your fault."
+  },
   "status": {
     "adminFeedback": {
       "new": "New",

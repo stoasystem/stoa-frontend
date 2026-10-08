@@ -65,18 +65,21 @@ function Face({ mood }: { mood: MurmiMood }) {
 
 export function Murmi({
   mood = 'calm',
-  size = 72,
+  size = 'var(--murmi-state)',
   className,
 }: {
   mood?: MurmiMood
-  size?: number
+  /** A number is a count of pixels; anything else is a CSS length, such as a token. */
+  size?: number | string
   className?: string
 }) {
+  const measured = typeof size === 'number'
   return (
     <svg
       viewBox="0 0 76 72"
-      width={size}
-      height={size}
+      width={measured ? size : undefined}
+      height={measured ? size : undefined}
+      style={measured ? undefined : { width: size, height: size }}
       aria-hidden="true"
       focusable="false"
       className={cn('shrink-0', className)}
