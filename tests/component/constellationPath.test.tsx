@@ -127,6 +127,21 @@ describe('the constellation a chapter is drawn as', () => {
     }
   })
 
+  it('hangs the line on the row, so a skip link cannot break it', () => {
+    // jsdom has no layout, so this holds the arrangement rather than the
+    // pixels: a line measured from the node stopped short of the next star
+    // whenever the lesson carried a "skip this one" link underneath.
+    const { container } = draw()
+
+    const row = container.querySelector('[data-lesson-status="available"]')!
+    const thread = [...row.children].find(
+      (node) => node instanceof HTMLElement && node.style.background,
+    ) as HTMLElement
+
+    expect(thread, 'the line is not a child of the row').toBeDefined()
+    expect(thread.style.bottom).toContain('var(--constellation-gap)')
+  })
+
   it('draws a ring on the nodes that are not filled in', () => {
     // `border-[var(--token)]` compiles to a border colour, not a width: both
     // outlined states shipped to production with no ring, and the screenshot

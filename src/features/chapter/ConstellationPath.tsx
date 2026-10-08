@@ -64,28 +64,45 @@ function NodeFace({ state, number }: { state: NodeState; number: number }) {
 }
 
 /**
- * One lesson.
+ * The line from one lesson down to the next.
  *
- * The line is drawn by the node above it reaching down, not between them, so a
- * row can be added or removed without the line needing to know.
+ * It is drawn by the row, not by the node, and reaches to the row's own bottom
+ * edge: a lesson that can be tested out of carries a second line of text under
+ * it, and a line measured from the node stopped short of the next star with
+ * the skip link sitting in the break.
  */
+function Thread({ walked }: { walked: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute"
+      style={{
+        left: 'calc(var(--constellation-gutter) / 2)',
+        marginLeft: 'calc(var(--constellation-line) / -2)',
+        top: 'calc(var(--constellation-node) / 2)',
+        bottom: 'calc(var(--constellation-gap) * -1)',
+        width: 'var(--constellation-line)',
+        background: walked ? 'var(--constellation-walked)' : 'var(--constellation-ahead)',
+      }}
+    />
+  )
+}
+
+/** One lesson. */
 function Node({
   unitId,
   lesson,
   number,
   upNext,
-  last,
 }: {
   unitId: string
   lesson: ChapterLesson
   number: number
   upNext: boolean
-  last: boolean
 }) {
   const { t } = useTranslation('chapter')
   const state = nodeState(lesson, upNext)
   const locked = state === 'locked'
-  const walked = state === 'done'
   const status = upNext ? t('chapter.status.current') : t(`chapter.status.${lesson.status}`)
   const meta = t('chapter.lessonMeta', { minutes: lesson.estimatedMinutes ?? 10, count: lesson.exerciseCount })
 
@@ -95,16 +112,6 @@ function Node({
         className="relative flex shrink-0 items-center justify-center"
         style={{ width: 'var(--constellation-gutter)', height: 'var(--constellation-node)' }}
       >
-        {!last && (
-          <span
-            aria-hidden="true"
-            className={cn('absolute top-1/2 h-[calc(100%+var(--constellation-gap)*2)]')}
-            style={{
-              width: 'var(--constellation-line)',
-              background: walked ? 'var(--constellation-walked)' : 'var(--constellation-ahead)',
-            }}
-          />
-        )}
         {state === 'doing' && (
           <span
             aria-hidden="true"
@@ -201,14 +208,9 @@ export function ConstellationPath({
         style={{ gap: 'var(--constellation-gap)', marginTop: 'var(--constellation-gap)' }}
       >
         {lessons.map((lesson, index) => (
-          <li key={lesson.id} data-lesson-status={lesson.status} className="flex flex-col">
-            <Node
-              unitId={unitId}
-              lesson={lesson}
-              number={index + 1}
-              upNext={lesson.id === nextLessonId}
-              last={index === lessons.length - 1}
-            />
+          <li key={lesson.id} data-lesson-status={lesson.status} className="relative flex flex-col">
+            {index < lessons.length - 1 && <Thread walked={lesson.status === 'completed'} />}
+            <Node unitId={unitId} lesson={lesson} number={index + 1} upNext={lesson.id === nextLessonId} />
             {isOpenLesson(lesson.status) && <TestOut unitId={unitId} lesson={lesson} />}
           </li>
         ))}
