@@ -8,7 +8,9 @@
 export type SmokeRole = 'student' | 'parent' | 'teacher' | 'admin'
 
 export const smokeAccounts: Record<SmokeRole, { email: string; landing: RegExp }> = {
-  student: { email: 'student@test.stoaedu.ch', landing: /\/(chat|learn)/ },
+  // The star map at the root: /chat and /learn were the old student pages,
+  // withdrawn in #45 and deleted in #54, and now only redirect.
+  student: { email: 'student@test.stoaedu.ch', landing: /\/$/ },
   parent: { email: 'parent@test.stoaedu.ch', landing: /\/parent/ },
   teacher: { email: 'teacher@test.stoaedu.ch', landing: /\/teacher/ },
   admin: { email: 'admin@test.stoaedu.ch', landing: /\/admin/ },

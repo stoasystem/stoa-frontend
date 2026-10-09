@@ -38,7 +38,7 @@ test('a student asks a question and the assistant answers', async ({ page }) => 
   const failures = watchApiFailures(page)
   await signIn(page, 'student')
 
-  await page.goto('/chat')
+  await page.goto('/ask')
   const composer = page.locator('textarea').first()
   await expect(composer).toBeVisible({ timeout: 20_000 })
   await composer.fill('Wie loese ich 3x + 5 = 20?')
@@ -52,7 +52,11 @@ test('a student asks a question and the assistant answers', async ({ page }) => 
     })
     .toBe(true)
 
-  expect(failures, 'API responses the page could not use').toEqual([])
+  // A conversation nobody escalated has no teacher-help request, and the
+  // backend says so with a 404 it documents on the route. Ask asks once per
+  // conversation and does not retry. Every other failure still counts.
+  const unexpected = failures.filter((f) => !/^404 GET \/teacher-help\/conversations\/[^/]+\/request$/.test(f))
+  expect(unexpected, 'API responses the page could not use').toEqual([])
 })
 
 test('an administrator sees the accounts that exist', async ({ page }) => {
