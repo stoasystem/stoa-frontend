@@ -1,29 +1,35 @@
 name: Deploy Frontend Preview
 
-# Publishes the redesign integration branch to its preview site (#28). One
-# fixed mapping, and nothing else can deploy:
+# Publishes the demo site (the design preview as a static site, with the demo
+# student signed in and no backend; vite.demo.config.ts) to the preview site.
+# One fixed mapping, and nothing else can deploy:
 #
-#   branch redesign/planet -> Environment preview-planet
-#                          -> https://app-planet.stoaedu.ch
+#   branch main -> npm run demo:build (dist-demo/)
+#               -> Environment preview-planet
+#               -> https://app-planet.stoaedu.ch
+#
+# It used to publish the redesign/planet integration branch's production build
+# (#28); that branch merged into main and was deleted, so the site now follows
+# main and shows the demo build, which never talks to an API.
 #
 # Bucket and DistributionId come from the preview-planet Environment's
 # variables (stoa-infra#1 outputs), so no other branch or workflow can read
 # them. workflow_dispatch takes no inputs: a manual run publishes the branch
-# it was started from, and only redesign/planet gets past the job `if` below
-# and the Environment's deployment-branch rule.
+# it was started from, and only main gets past the job `if` below and the
+# Environment's deployment-branch rule.
 #
 # Two checks guard the branch, by design (decision in #5): the job `if` here,
 # and the Environment's branch rule in repository settings. AWS then checks
 # the Environment identity: the preview role trusts only
 # repo:stoasystem/stoa-frontend:environment:preview-planet (stoa-infra#2).
 #
-# The production workflow (deploy-production.yml) is untouched by this file.
-# Plan B (redesign/cute -> preview-cute) is on hold; adding it means a second
-# publish job with its own Environment and `if`, and a concurrency group per target.
+# The production workflow (deploy-production.yml) is untouched by this file:
+# it builds with vite.config.ts, whose guard rejects src/dev/, so the demo
+# never reaches app.stoaedu.ch.
 
 on:
   push:
-    branches: [redesign/planet]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -38,7 +44,7 @@ concurrency:
 jobs:
   verify:
     name: Lint, typecheck, and test gate
-    if: github.ref == 'refs/heads/redesign/planet'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     steps:
       - name: Check out frontend
@@ -89,9 +95,9 @@ jobs:
         run: node --test tests/release/publish-web-release.test.mjs
 
   deploy-planet:
-    name: Build and publish the planet preview
+    name: Build and publish the demo site
     needs: verify
-    if: github.ref == 'refs/heads/redesign/planet'
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     environment:
       name: preview-planet
@@ -122,7 +128,7 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund --include=dev --package-lock=true
 
       - name: Build
-        run: npm run build
+        run: npm run demo:build
 
       # The publisher falls back to the production bucket and distribution
       # when --bucket or --distribution-id is empty, so an unset or mistyped
@@ -148,9 +154,10 @@ jobs:
           role-to-assume: arn:aws:iam::562923011260:role/stoa-github-frontend-preview
           aws-region: eu-central-2
 
-      # environment stays at the publisher default `production`: the Web
-      # client only accepts staging / staging-pilot / production, and the
-      # preview talks to the production API. The web origin is what differs.
+      # The demo build registers its own runtime config and answers every
+      # request in the page, so runtime-config.json is published but unread.
+      # environment stays at the publisher default `production`, which the
+      # publisher's own checks accept; the web origin is what differs.
       - name: Publish served release
         env:
           PREVIEW_BUCKET: ${{ vars.PREVIEW_BUCKET }}
@@ -161,7 +168,7 @@ jobs:
             git -C stoa-backend rev-parse HEAD | sha256sum | awk '{print $1}'
           )"
           node scripts/publish-web-release.mjs \
-            --dist dist \
+            --dist dist-demo \
             --bucket "$PREVIEW_BUCKET" \
             --distribution-id "$PREVIEW_DISTRIBUTION_ID" \
             --web-origin https://app-planet.stoaedu.ch \

@@ -168,7 +168,7 @@ test('tree hash is path-stable and ignores templates', () => {
 })
 
 // ---- Preview deploy workflow (#28) ----------------------------------------
-// deploy-preview.yml publishes redesign/planet to app-planet.stoaedu.ch. These
+// deploy-preview.yml publishes main's demo build to app-planet.stoaedu.ch. These
 // tests pin its shape the way verify-release.test.mjs pins the production
 // gate (#101): line-based, so no YAML dependency, and strict about indentation
 // because GitHub reads it that way. The Publisher tests step runs this file in
@@ -177,7 +177,7 @@ test('tree hash is path-stable and ignores templates', () => {
 
 const PREVIEW_WORKFLOW = '.github/workflows/deploy-preview.yml'
 const PRODUCTION_WORKFLOW = '.github/workflows/deploy-production.yml'
-const PREVIEW_BRANCH = 'redesign/planet'
+const PREVIEW_BRANCH = 'main'
 const PREVIEW_WEB_ORIGIN = 'https://app-planet.stoaedu.ch'
 const PREVIEW_JOB_IF = `if: github.ref == 'refs/heads/${PREVIEW_BRANCH}'`
 
@@ -230,17 +230,17 @@ const stepText = (step) => step.join('\n')
 const jobKey = (job, key) => job.filter((line) => new RegExp(`^ {4}${key}:`).test(line))
 const trimmed = (lines) => lines.filter((line) => line.trim() && !isComment(line)).map((line) => line.trim())
 
-test('the preview workflow triggers only on redesign/planet and a dispatch with no inputs', async () => {
+test('the preview workflow triggers only on main and a dispatch with no inputs', async () => {
   const on = topLevel(await readWorkflow(PREVIEW_WORKFLOW), 'on').filter((line) => line.trim() && !isComment(line))
   assert.deepEqual(on, [
     'on:',
     '  push:',
     `    branches: [${PREVIEW_BRANCH}]`,
     '  workflow_dispatch:',
-  ], 'push to redesign/planet and an input-less workflow_dispatch are the only triggers')
+  ], 'push to main and an input-less workflow_dispatch are the only triggers')
 })
 
-test('every preview job is held to redesign/planet, and one job maps it to one Environment', async () => {
+test('every preview job is held to main, and one job maps it to one Environment', async () => {
   const lines = await readWorkflow(PREVIEW_WORKFLOW)
   const jobs = jobsOf(lines)
   assert.deepEqual([...jobs.keys()], ['verify', 'deploy-planet'])
@@ -323,7 +323,8 @@ test('the preview gate runs every production gate step, unsoftened, before the p
     'Publish served release',
   ])
   const build = stepText(stepsOf(deploy).find((step) => stepName(step) === 'Build'))
-  assert.match(build, /\n {8}run: npm run build$/)
+  // The demo build, never the production one: that is deploy-production.yml's.
+  assert.match(build, /\n {8}run: npm run demo:build$/)
 })
 
 test('only the publish job may mint an OIDC token, as the preview role in the production region', async () => {
@@ -353,7 +354,7 @@ test('the preview publish names its bucket, distribution and origins, and refuse
   const call = publish.slice(publish.indexOf('node scripts/publish-web-release.mjs'))
   const flags = [...call.matchAll(/--([a-z0-9-]+)(?: +("[^"]*"|[^\s\\]+))?/g)].map(([, flag, value]) => [flag, value])
   assert.deepEqual(flags, [
-    ['dist', 'dist'],
+    ['dist', 'dist-demo'],
     ['bucket', '"$PREVIEW_BUCKET"'],
     ['distribution-id', '"$PREVIEW_DISTRIBUTION_ID"'],
     ['web-origin', PREVIEW_WEB_ORIGIN],

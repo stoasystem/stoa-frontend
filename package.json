@@ -9,6 +9,8 @@
     "preview": "node ./scripts/vite.mjs preview",
     "bench:build": "node ./scripts/vite.mjs build --config vite.bench.config.ts",
     "bench:preview": "node ./scripts/vite.mjs preview --config vite.bench.config.ts",
+    "demo:build": "node ./scripts/vite.mjs build --config vite.demo.config.ts",
+    "demo:preview": "node ./scripts/vite.mjs preview --config vite.demo.config.ts",
     "design-preview:capture": "node ./scripts/capture-design-preview.mjs",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b",

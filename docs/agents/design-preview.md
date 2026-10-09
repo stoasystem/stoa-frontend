@@ -17,6 +17,15 @@ npm run dev -- --host 127.0.0.1 --port 5173
 
 预览挂的是**真实**的 `AppProviders`、`AuthBootstrap`、`AppRoutes`（由 `routeManifest.ts` 生成，与生产同一份路由与守卫）和 `AppLayout`，只是路由器换成 `MemoryRouter`。所以评审看到的就是会发布的那套页面；在页面里点来点去会改写地址栏的 `path=`，刷新停在原处。
 
+## 演示站（app-planet.stoaedu.ch）
+
+同一个预览也构建成静态站，发布到 `https://app-planet.stoaedu.ch`，给演示和测试用：打开根地址就是已登录的演示学生，不连后端、不用真账号。上面「参数」一节的 `surface`、`path`、`lang`、`points`、`fresh=1`、`signedIn=0` 照样能用（例如 `https://app-planet.stoaedu.ch/?path=/chapter/demo-sine-cosine&lang=de`）。退出后登录页随便填邮箱和密码就能登录，由演示后端作答。
+
+- 构建：`npm run demo:build`（`vite.demo.config.ts`）只以 `src/dev/preview.html` 为入口，产出到 `dist-demo/`，并把这一页改名为站点的 `index.html`。生产守卫 `devOnlyCodeStaysOut` 只在这份配置里去掉，与星图台架的做法相同。
+- 本地看构建产物：`npm run demo:preview`，打开 `http://127.0.0.1:4174/`。
+- 发布：`.github/workflows/deploy-preview.yml`，每次 push 到 `main` 都跑一遍与生产相同的门禁，再把 `dist-demo/` 发到预览 bucket（`preview-planet` Environment）。生产工作流仍用 `vite.config.ts` 构建，守卫还在，演示内容进不了 app.stoaedu.ch。
+- 站点前面有 Basic Auth（stoa-infra 的 CloudFront Function），凭据存在 CloudFront KeyValueStore 的 `basic-auth` 键下，由人手动写入，CDK 不写。
+
 ## 参数
 
 - `surface`：见下表；与 `path` 同给时 `path` 优先。
