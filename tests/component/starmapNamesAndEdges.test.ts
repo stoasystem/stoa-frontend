@@ -334,8 +334,10 @@ describe('the glow between galaxies is dithered (#137 report, #138)', () => {
     expect(canvas.width).toBe(size)
     expect(put).not.toBeNull()
     const amplitude = glowDitherAmplitude(LINK_INK.bridge)
-    // 1.5 drawn levels at the ink's 0.07: about 21 levels of the sprite.
-    expect(amplitude).toBeCloseTo(1.5 / 0.07, 5)
+    // 1.5 drawn levels at the bridge ink's own alpha, read off the ink so a
+    // retune of the ink leaves no number here that pins nothing.
+    const bridgeAlpha = Number(LINK_INK.bridge.match(/[\d.]+/g)![3])
+    expect(amplitude).toBeCloseTo(1.5 / bridgeAlpha, 5)
     let changed = 0
     let sum = 0
     let sumSmooth = 0

@@ -68,8 +68,8 @@ const alphaOf = (colour: string) => Number(colour.match(/[\d.]+/g)![3])
 describe('A2: on the panorama the light is the nebulae’s, not the dots’', () => {
   it('a lit dot is smaller and dimmer far out, and loses its glow; zoomed in it is as before', () => {
     const far = panoramaDot(true, 1)
-    expect(far.radius).toBeLessThan(0.7)
-    expect(far.alpha).toBeLessThan(0.6)
+    expect(far.radius).toBeLessThan(0.8)
+    expect(far.alpha).toBeLessThan(0.75)
     expect(far.glow).toBe(0)
     expect(panoramaDot(true, 0)).toEqual({ radius: 1, alpha: 1, glow: 1 })
     expect(panoramaDot(false, 0)).toEqual({ radius: 1, alpha: 1, glow: 1 })

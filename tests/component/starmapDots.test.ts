@@ -24,7 +24,7 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { createCanvas2DRenderer, DOT_ALPHA, dotExtent, drawDotMark } from '@/features/starmap/render/canvas2d'
-import { DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, PRESS } from '@/features/starmap/render/glyph'
+import { CHOSEN, DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, PRESS } from '@/features/starmap/render/glyph'
 import { LOCKED_WEB, lockedWebHint } from '@/features/starmap/render/links'
 import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, skyMap, THEME, type CanvasCounter } from './starmapHarness'
@@ -305,6 +305,38 @@ describe('D6: skill points stay off the panorama', () => {
     expect(f.dotBlend).toBe(1)
     // Skill dots are drawn only where glyphs are (`glyphs = 1 - dotBlend`); the recommended star is the one glyph.
     expect(1 - f.dotBlend).toBeLessThan(0.01)
+  })
+})
+
+describe('the pointer and the open card are answered on the star itself', () => {
+  /** What `radiusOf` in canvas2d gives an ordinary star this frame. */
+  const starR = (frame: SceneFrame) => Math.max(frame.glyphSize * 0.42, frame.dotRadius * 2)
+
+  it('a hovered star takes a ring, and loses it again', () => {
+    const s = panorama()
+    const frame = s.frame()
+    const quiet = s.arcs.length
+    s.real.draw({ ...frame, hoveredStar: 0 })
+    const wanted = starR(frame) * HOVER.ring.gap + HOVER.ring.pad
+    expect(s.arcs.slice(quiet).some((arc) => Math.abs(arc.r - wanted) < 0.01), `no hover ring at ${wanted.toFixed(2)} px`).toBe(true)
+    const hovered = s.arcs.length
+    s.real.draw({ ...frame, hoveredStar: -1 })
+    expect(s.arcs.slice(hovered).some((arc) => Math.abs(arc.r - wanted) < 0.01), 'the ring outlived the pointer').toBe(false)
+  })
+
+  it('the star whose card is open keeps a ring of its own', () => {
+    const s = panorama()
+    const frame = s.frame()
+    expect(frame.focusStar).toBe(-1) // Nothing chosen on the panorama: the ring below is the choosing.
+    const quiet = s.arcs.length
+    s.real.draw({ ...frame, focusStar: 0 })
+    const wanted = starR(frame) * CHOSEN.ring.gap + CHOSEN.ring.pad
+    expect(s.arcs.slice(quiet).some((arc) => Math.abs(arc.r - wanted) < 0.01), `no chosen ring at ${wanted.toFixed(2)} px`).toBe(true)
+  })
+
+  it('the two rings do not land on top of each other', () => {
+    expect(CHOSEN.ring.gap).toBeGreaterThan(HOVER.ring.gap)
+    expect(CHOSEN.ring.pad).toBeGreaterThan(HOVER.ring.pad)
   })
 })
 

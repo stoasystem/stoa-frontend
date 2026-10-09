@@ -314,9 +314,9 @@ export const PANORAMA = {
    * lit nebula is its cloud's, not its grains'. The recommended star stays a
    * full glyph at every zoom.
    */
-  litDot: { radius: 0.55, alpha: 0.5, glow: 0 },
+  litDot: { radius: 0.75, alpha: 0.7, glow: 0 },
   /** A ready or locked star's dot on the panorama: a little quieter too, so the cloud carries the picture. */
-  otherDot: { radius: 0.85, alpha: 0.75 },
+  otherDot: { radius: 1, alpha: 0.95 },
   /**
    * Each nebula's cloud on the panorama: `base`, plus `lit` times its lit
    * share (zoomed in it is `NEBULA_GLOW`, render/galaxy.ts). A fully lit

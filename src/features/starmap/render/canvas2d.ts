@@ -8,7 +8,7 @@
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
-import { DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
+import { CHOSEN, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, HOVER, LOCKED_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
@@ -166,10 +166,10 @@ const LARGEST_BOX = { small: SMALL_CUT_BELOW, large: 64 } as const
 /** How a star shows as a dot (in a tile, and on the whole map): colour and alpha by state. */
 const DOT: Record<number, { lit: boolean; alpha: number; radius: number; glow: boolean }> = {
   [STATE_LIT]: { lit: true, alpha: 1, radius: 1, glow: true },
-  [STATE_IN_PROGRESS]: { lit: true, alpha: 0.8, radius: 0.85, glow: true },
-  [STATE_READY]: { lit: false, alpha: 0.75, radius: 0.7, glow: false },
-  // 42% white keeps a locked star at 3:1 (see LOCKED_RING_ALPHA).
-  [STATE_LOCKED]: { lit: false, alpha: LOCKED_RING_ALPHA, radius: 0.6, glow: false },
+  [STATE_IN_PROGRESS]: { lit: true, alpha: 0.9, radius: 0.95, glow: true },
+  [STATE_READY]: { lit: false, alpha: 0.88, radius: 0.85, glow: false },
+  // 55% white keeps a locked star well past 3:1 (see LOCKED_RING_ALPHA).
+  [STATE_LOCKED]: { lit: false, alpha: LOCKED_RING_ALPHA, radius: 0.8, glow: false },
 }
 
 /**
@@ -179,9 +179,9 @@ const DOT: Record<number, { lit: boolean; alpha: number; radius: number; glow: b
  */
 export const DOT_ALPHA = {
   [STATE_LIT]: 1,
-  [STATE_IN_PROGRESS]: 0.92,
-  [STATE_READY]: 0.88,
-  [STATE_LOCKED]: 0.62,
+  [STATE_IN_PROGRESS]: 0.95,
+  [STATE_READY]: 0.95,
+  [STATE_LOCKED]: 0.78,
   review: 0.92,
 } as const
 
@@ -726,6 +726,40 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const pressedStar = frame.pressedStar ?? -1
       const sunk = (i: number) => (i === pressedStar ? PRESS.scale : 1)
 
+      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
+        ? 1
+        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
+      lastLabelTime = frame.time ?? null
+      labelFrame += 1
+      let settling = false
+
+      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2).
+      const hovered = frame.hoveredStar ?? -1
+      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
+      for (const [i, amount] of hoverFades) {
+        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
+        if (next <= 0 && i !== hovered) hoverFades.delete(i)
+        else hoverFades.set(i, next)
+        if (next > 0 && next < 1) settling = true
+      }
+
+      /** How far star `i` is lifted by the pointer, 0..1. */
+      const lifted = (i: number) => hoverFades.get(i) ?? 0
+      const lift = (i: number) => 1 + (HOVER.scale - 1) * lifted(i)
+      /** A ring around a star, in screen px. */
+      const starRing = (i: number, radius: number, width: number, colour: string, alpha: number, dash?: readonly number[]) => {
+        if (alpha < 0.01) return
+        ctx.save()
+        ctx.globalAlpha = Math.min(1, alpha)
+        ctx.strokeStyle = colour
+        ctx.lineWidth = width
+        if (dash) ctx.setLineDash([...dash])
+        ctx.beginPath()
+        ctx.arc(x[i], y[i], radius, 0, Math.PI * 2)
+        ctx.stroke()
+        ctx.restore()
+      }
+
       const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((st) => panoramaDot(DOT[st].lit, look))
       // A dot's box: the engine's, grown toward the glyph box where the map is sparse enough to have room.
       const dotBox = dotBoxFor(frame.dotRadius, frame.glyphSize)
@@ -741,8 +775,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const breathing = breath && breath.index === i
         if (glyphs > 0.01 || beacon) {
           const box = beacon ? beaconSize : frame.glyphSize
-          const alpha = Math.min(1, a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus * (i === pressedStar ? PRESS.alpha : 1))
-          const grow = (breathing ? breath.scale : 1) * grown(i) * sunk(i)
+          const alpha = Math.min(1, a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus * (i === pressedStar ? PRESS.alpha : 1) * (1 + (HOVER.alpha - 1) * lifted(i)))
+          const grow = (breathing ? breath.scale : 1) * grown(i) * sunk(i) * lift(i)
           for (const [sprites, cut, share] of [[set.small, GLYPH_SMALL, smallOut(box)], [set.large, GLYPH_LARGE, largeIn(box)]] as const) {
             if (share < 0.01) continue
             const sprite = sprites[state[i]]
@@ -754,8 +788,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         if (frame.dotBlend > 0.01 && !beacon) {
           // On the panorama a lit star is a small, dim dot without its glow: the light is its nebula's (#137 A2).
           const quiet = dotLooks[state[i]]
-          const size = dotBox * quiet.radius * sunk(i)
-          const alpha = Math.min(1, a * frame.dotBlend * focus * quiet.alpha * (i === pressedStar ? PRESS.alpha : 1))
+          const size = dotBox * quiet.radius * sunk(i) * lift(i)
+          const alpha = Math.min(1, a * frame.dotBlend * focus * quiet.alpha * (i === pressedStar ? PRESS.alpha : 1) * (1 + (HOVER.alpha - 1) * lifted(i)))
           const at = [x[i] - size / 2, y[i] - size / 2, size, size] as const
           if (quiet.glow >= 0.99 || !DOT[state[i]].glow) {
             ctx.globalAlpha = alpha
@@ -782,6 +816,18 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
             ctx.arc(x[i] + off, y[i] - off, DOT_CUT.review.radius * unit, 0, Math.PI * 2)
             ctx.fill()
           }
+        }
+        // The pointer's ring, and the open card's: a star says "this one" on
+        // the star itself, not only by a name set down somewhere beside it.
+        const up = lifted(i)
+        const r = radiusOf(i)
+        if (up > 0.01) {
+          const ring = HOVER.ring
+          starRing(i, r * ring.gap + ring.pad, ring.width, colours.text, ring.alpha * up * focus * a)
+        }
+        if (i === frame.focusStar) {
+          const ring = CHOSEN.ring
+          starRing(i, r * ring.gap + ring.pad, ring.width, colours.lit, ring.alpha * a, ring.dash)
         }
         stats.starDraws += 1
       }
@@ -861,12 +907,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       // that gains or loses its place fades in or out (`labelFadeMs`) instead
       // of blinking, and keeps its place and side while it can.
       const labelArea: Box = { x0: 0, y0: viewport.top ?? 0, x1: width, y1: height - (viewport.bottom ?? 0) }
-      const fadeStep = !(frame.labelFadeMs && frame.labelFadeMs > 0) || frame.time === undefined || lastLabelTime === null
-        ? 1
-        : Math.max(0, frame.time - lastLabelTime) / frame.labelFadeMs
-      lastLabelTime = frame.time ?? null
-      labelFrame += 1
-      let settling = false
       const names = { stars: 0, nebulae: 0 }
       const fadeOf = (key: string): LabelFade => {
         let entry = labelFades.get(key)
@@ -884,16 +924,6 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       }
       /** The candidate boxes with the side the name had last frame first: a name does not hop sides. */
       const preferring = (boxes: Box[], slot: number) => (slot > 0 && slot < boxes.length ? [boxes[slot], ...boxes.filter((_, k) => k !== slot)] : boxes)
-
-      // A hovered star's name fades in, and out once the pointer leaves it (#138 B2).
-      const hovered = frame.hoveredStar ?? -1
-      if (hovered >= 0 && !hoverFades.has(hovered)) hoverFades.set(hovered, 0)
-      for (const [i, amount] of hoverFades) {
-        const next = i === hovered ? Math.min(1, amount + fadeStep) : Math.max(0, amount - fadeStep)
-        if (next <= 0 && i !== hovered) hoverFades.delete(i)
-        else hoverFades.set(i, next)
-        if (next > 0 && next < 1) settling = true
-      }
 
       // Star names: nearest the focus point first, more as the zoom grows --
       // at first only the key stars', the rest further in or on hover (#138 B2).

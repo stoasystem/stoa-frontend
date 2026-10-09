@@ -24,7 +24,7 @@
  * only on the panorama. What tells the two apart is the core: a ready star
  * has one, a locked star is hollow, the same as the dots say it far out.
  */
-export const LOCKED_RING_ALPHA = 0.42
+export const LOCKED_RING_ALPHA = 0.55
 
 export type GlyphCut = {
   box: number
@@ -107,7 +107,20 @@ export const DOT_BOX = { fromDot: 4, room: 0.45, max: 16 } as const
  * which reads as a click that did not land. Small on purpose: this says
  * "heard you", the flight that follows says the rest.
  */
-export const PRESS = { scale: 0.88, alpha: 1.15 } as const
+export const PRESS = { scale: 0.84, alpha: 1.3 } as const
+
+/**
+ * A star under the pointer lifts: it grows, brightens, and takes a ring.
+ * Its name alone was the whole answer before, and a name that appears
+ * somewhere beside the star does not say "this one".
+ */
+export const HOVER = { scale: 1.14, alpha: 1.3, ring: { gap: 1.5, pad: 4, width: 2, alpha: 0.8 } } as const
+
+/**
+ * The star whose card is open keeps a ring of its own, so the sky says which
+ * one the card belongs to after the press is over.
+ */
+export const CHOSEN = { ring: { gap: 1.85, pad: 6, width: 2.5, alpha: 0.9, dash: [5, 4] as readonly number[] } } as const
 
 /** The box a dot is drawn in, CSS px, from the frame's dot radius and glyph box. */
 export function dotBoxFor(dotRadius: number, glyphSize: number): number {

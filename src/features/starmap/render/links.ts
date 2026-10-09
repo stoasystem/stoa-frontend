@@ -54,20 +54,20 @@ import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/st
  * them (`src/styles/brand-tokens.css`); used until the theme is read.
  */
 export const LINK_INK: LinkInk = {
-  recommended: 'rgba(242, 197, 114, 0.9)',
-  inProgress: 'rgba(255, 255, 255, 0.5)',
-  walked: 'rgba(255, 255, 255, 0.16)',
-  locked: 'rgba(255, 255, 255, 0.3)',
-  bridge: 'rgba(170, 190, 255, 0.07)',
+  recommended: 'rgba(242, 197, 114, 0.95)',
+  inProgress: 'rgba(255, 255, 255, 0.62)',
+  walked: 'rgba(255, 255, 255, 0.28)',
+  locked: 'rgba(255, 255, 255, 0.32)',
+  bridge: 'rgba(170, 190, 255, 0.12)',
 }
 
 /** Stroke shapes, CSS px. */
 export const LINE = {
-  width: { 1: 2, 2: 1.5, 3: 1, 4: 1 } as Record<LinkTier, number>,
+  width: { 1: 2.8, 2: 2.2, 3: 1.6, 4: 1.6 } as Record<LinkTier, number>,
   /** Tier 1's warm halo under the line. */
-  glow: { width: 7, alpha: 0.16 },
+  glow: { width: 10, alpha: 0.24 },
   /** Tier 4: dashed. */
-  dash: [3, 4] as readonly number[],
+  dash: [4, 4] as readonly number[],
   /** A line leaving the chosen nebula fades out over this share of its radius on screen, at least `fadeMin` px. */
   fade: 0.4,
   fadeMin: 48,
@@ -85,7 +85,7 @@ export const LINE = {
  * tier 4's own ink and dashes -- and hands back to the focus rule as the
  * dots give way to glyphs.
  */
-export const LOCKED_WEB = 0.55
+export const LOCKED_WEB = 0.75
 
 /** How much of tier 4's ink the locked web keeps this frame: nothing while the bridges carry the panorama. */
 export function lockedWebHint(frame: Pick<SceneFrame, 'dotBlend' | 'lineReveal'>): number {

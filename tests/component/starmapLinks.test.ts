@@ -489,14 +489,14 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
 
   it('pins the tier constants to the token values (#121 table)', () => {
     expect(LINK_INK).toEqual({
-      recommended: 'rgba(242, 197, 114, 0.9)',
-      inProgress: 'rgba(255, 255, 255, 0.5)',
-      walked: 'rgba(255, 255, 255, 0.16)',
-      locked: 'rgba(255, 255, 255, 0.3)',
-      bridge: 'rgba(170, 190, 255, 0.07)',
+      recommended: 'rgba(242, 197, 114, 0.95)',
+      inProgress: 'rgba(255, 255, 255, 0.62)',
+      walked: 'rgba(255, 255, 255, 0.28)',
+      locked: 'rgba(255, 255, 255, 0.32)',
+      bridge: 'rgba(170, 190, 255, 0.12)',
     })
-    expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2, [TIER_IN_PROGRESS]: 1.5, [TIER_WALKED]: 1, [TIER_LOCKED]: 1 })
-    expect([...LINE.dash]).toEqual([3, 4])
+    expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2.8, [TIER_IN_PROGRESS]: 2.2, [TIER_WALKED]: 1.6, [TIER_LOCKED]: 1.6 })
+    expect([...LINE.dash]).toEqual([4, 4])
   })
 })
 
