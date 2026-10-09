@@ -13,7 +13,7 @@ export function TutorAvailabilityPage() {
   const availabilityQuery = useTutorAvailabilityQuery()
 
   useEffect(() => {
-    trackEvent('tutor_availability_viewed')
+    trackEvent('teacher_availability_viewed')
   }, [])
 
   return (

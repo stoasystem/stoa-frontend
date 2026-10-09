@@ -10,7 +10,7 @@ export function useUpdateTutorAvailabilityMutation() {
   return useMutation({
     mutationFn: (payload: TutorAvailability) => updateTutorAvailability(payload),
     onSuccess: () => {
-      trackEvent('tutor_availability_updated')
+      trackEvent('teacher_availability_updated')
       toast.success('Availability updated')
       void queryClient.invalidateQueries({ queryKey: ['tutor', 'availability'] })
     },

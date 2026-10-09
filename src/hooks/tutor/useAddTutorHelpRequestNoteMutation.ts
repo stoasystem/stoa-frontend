@@ -10,7 +10,7 @@ export function useAddTutorHelpRequestNoteMutation() {
   return useMutation({
     mutationFn: addTutorHelpRequestNote,
     onSuccess: (note, variables) => {
-      trackEvent('tutor_note_added', {
+      trackEvent('teacher_note_added', {
         requestId: variables.requestId,
         noteId: note.id,
       })

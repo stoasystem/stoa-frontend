@@ -48,7 +48,7 @@ export function TutorHelpRequestDetailPage() {
 
   useEffect(() => {
     if (!requestId) return
-    trackEvent('tutor_request_opened', { requestId })
+    trackEvent('teacher_request_opened', { requestId })
   }, [requestId])
 
   return (

@@ -10,7 +10,7 @@ export function useUpdateTutorHelpRequestMutation() {
   return useMutation({
     mutationFn: updateTutorHelpRequestStatus,
     onSuccess: (request) => {
-      trackEvent('tutor_request_status_updated', {
+      trackEvent('teacher_request_status_updated', {
         requestId: request.requestId,
         status: request.status,
       })

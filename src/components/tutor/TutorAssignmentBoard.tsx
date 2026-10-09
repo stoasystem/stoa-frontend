@@ -41,7 +41,7 @@ export function TutorAssignmentBoard({ board }: { board: TutorAssignmentBoardDat
                     <Button
                       size="sm"
                       onClick={() => {
-                        trackEvent('tutor_assignment_suggested_clicked', {
+                        trackEvent('teacher_assignment_suggested_clicked', {
                           requestId: request.requestId,
                           tutorId: suggestion.tutorId,
                         })
