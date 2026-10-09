@@ -4,6 +4,9 @@ import { createConversation } from '@/services/chat/chatApi'
 import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 
 import type {
+  LessonQuizAnswer,
+  LessonQuizKind,
+  LessonQuizSession,
   ReviewDueResponse,
   ReviewSummary,
   PracticeAnswerRequest,
@@ -62,9 +65,54 @@ export async function submitChallengeAnswer(challengeId: string, payload: Practi
   return response.data
 }
 
-export async function completePracticeLesson(lessonId: string) {
+/**
+ * Draw the short quiz that can complete a lesson (stoa-backend#92). The paper
+ * is composed server-side and kept there; nothing of it is decided here.
+ *
+ * 409 `lesson_locked` / `lesson_quiz_unavailable`.
+ */
+export async function startLessonQuiz(lessonId: string, kind: LessonQuizKind) {
+  const response = await httpClient.post<LessonQuizSession>(
+    `/practice/lessons/${lessonId}/quiz`,
+    { kind },
+  )
+  return response.data
+}
+
+/**
+ * Hand one quiz answer to the backend, which judges it. The reply carries
+ * `correct`, the hearts left and the next exercise -- never the right answer.
+ *
+ * 404 `lesson_quiz_not_found`; 409 `lesson_quiz_expired` / `lesson_quiz_finished`
+ * / `lesson_quiz_unavailable`.
+ */
+export async function answerLessonQuiz(
+  lessonId: string,
+  quizId: string,
+  payload: PracticeAnswerRequest,
+) {
+  const response = await httpClient.post<LessonQuizAnswer>(
+    `/practice/lessons/${lessonId}/quiz/${quizId}/answer`,
+    payload,
+  )
+  return response.data
+}
+
+/**
+ * Finish a lesson. With no credential the backend requires every exercise
+ * answered right (409 `lesson_exercises_unanswered`); with the credential a
+ * passed quiz issued, that stands in for them. The credential is good for ten
+ * minutes and for one completion.
+ *
+ * The string form is the ordinary completion and is what every existing
+ * caller passes.
+ */
+export async function completePracticeLesson(input: string | { lessonId: string; quizCredential?: string }) {
+  const lessonId = typeof input === 'string' ? input : input.lessonId
+  const quizCredential = typeof input === 'string' ? undefined : input.quizCredential
   const response = await httpClient.post<PracticeLessonResult>(
     `/practice/lessons/${lessonId}/complete`,
+    quizCredential ? { quizCredential } : undefined,
   )
   return response.data
 }

@@ -29,6 +29,7 @@
   "quiz": {
     "askOff": "Durante il quiz Ask è disattivato.",
     "continue": "Continua",
+    "drawing": "Stiamo preparando il tuo quiz…",
     "failed": {
       "backToLesson": "Torna alla lezione",
       "body": "Continua a esercitarti e riprova.",
@@ -77,7 +78,6 @@
     "explainPlaceholder": "Scrivi la tua spiegazione",
     "failed": "Non è stato possibile caricare la lezione.",
     "finish": "Termina la lezione",
-    "finishFailed": "Non è stato possibile terminare la lezione. Riprova.",
     "finishing": "Chiusura in corso…",
     "hint": "Suggerimento",
     "hintFailed": "Nessun suggerimento al momento. Riprova tra poco.",
@@ -98,6 +98,19 @@
     "questionOf": "Domanda {{question}} di {{questions}}",
     "retry": "Riprova",
     "skip": "Salta",
+    "trouble": {
+      "credentialExpired": "Il lasciapassare di questo quiz è scaduto prima che la lezione fosse completata. Rifai il quiz.",
+      "credentialInvalid": "Il lasciapassare di questo quiz non vale per questa lezione. Rifai il quiz.",
+      "expired": "Il quiz è durato troppo ed è scaduto. Avviane uno nuovo.",
+      "finished": "Questo quiz è già finito. Avviane uno nuovo.",
+      "locked": "Completa prima le lezioni precedenti: questa lezione è ancora bloccata.",
+      "notFound": "Questo quiz non è più aperto. Avviane uno nuovo.",
+      "restart": "Ricomincia il quiz",
+      "title": "Non ha funzionato",
+      "unanswered": "Rispondi correttamente a tutti gli esercizi di questa lezione, oppure supera il quiz breve, prima di completarla.",
+      "unavailable": "Questa lezione non ha ancora esercizi da mettere in un quiz.",
+      "unknown": "Non è stato possibile terminare la lezione. Riprova."
+    },
     "tryAgain": "Riprova",
     "youAreHere": "Sei qui",
     "yourAnswer": "La tua risposta"
