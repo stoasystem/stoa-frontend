@@ -29,6 +29,7 @@
   "quiz": {
     "askOff": "Ask is off during the quiz.",
     "continue": "Continue",
+    "drawing": "Putting your quiz together…",
     "failed": {
       "backToLesson": "Back to the lesson",
       "body": "Keep practising and try again.",
@@ -77,7 +78,6 @@
     "explainPlaceholder": "Write your explanation",
     "failed": "The lesson could not be loaded.",
     "finish": "Finish lesson",
-    "finishFailed": "The lesson could not be finished. Try again.",
     "finishing": "Finishing…",
     "hint": "Hint",
     "hintFailed": "No hint right now. Try again in a moment.",
@@ -98,6 +98,19 @@
     "questionOf": "Question {{question}} of {{questions}}",
     "retry": "Try again",
     "skip": "Skip",
+    "trouble": {
+      "credentialExpired": "The pass from that quiz expired before the lesson was finished. Take the quiz again.",
+      "credentialInvalid": "The pass from that quiz does not work for this lesson. Take the quiz again.",
+      "expired": "The quiz took too long and has expired. Start a new one.",
+      "finished": "This quiz is already over. Start a new one.",
+      "locked": "Finish the lessons before this one first: this lesson is still locked.",
+      "notFound": "This quiz is no longer open. Start a new one.",
+      "restart": "Start the quiz again",
+      "title": "That did not work",
+      "unanswered": "Answer every exercise of this lesson right, or pass the short quiz, before finishing it.",
+      "unavailable": "This lesson has no exercise a quiz could ask yet.",
+      "unknown": "The lesson could not be finished. Try again."
+    },
     "tryAgain": "Try again",
     "youAreHere": "You are here",
     "yourAnswer": "Your answer"

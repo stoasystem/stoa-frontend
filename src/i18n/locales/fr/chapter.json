@@ -29,6 +29,7 @@
   "quiz": {
     "askOff": "Ask est désactivé pendant le quiz.",
     "continue": "Continuer",
+    "drawing": "Ton quiz se prépare…",
     "failed": {
       "backToLesson": "Retour à la leçon",
       "body": "Continue à t’entraîner et réessaie.",
@@ -77,7 +78,6 @@
     "explainPlaceholder": "Écris ton explication",
     "failed": "La leçon n’a pas pu être chargée.",
     "finish": "Terminer la leçon",
-    "finishFailed": "La leçon n’a pas pu être terminée. Réessaie.",
     "finishing": "En cours…",
     "hint": "Indice",
     "hintFailed": "Pas d’indice pour le moment. Réessaie dans un instant.",
@@ -98,6 +98,19 @@
     "questionOf": "Question {{question}} sur {{questions}}",
     "retry": "Réessayer",
     "skip": "Passer",
+    "trouble": {
+      "credentialExpired": "Le laissez-passer de ce quiz a expiré avant la fin de la leçon. Refais le quiz.",
+      "credentialInvalid": "Le laissez-passer de ce quiz ne vaut pas pour cette leçon. Refais le quiz.",
+      "expired": "Le quiz a duré trop longtemps et a expiré. Lances-en un nouveau.",
+      "finished": "Ce quiz est déjà terminé. Lances-en un nouveau.",
+      "locked": "Termine d’abord les leçons précédentes : cette leçon est encore verrouillée.",
+      "notFound": "Ce quiz n’est plus ouvert. Lances-en un nouveau.",
+      "restart": "Recommencer le quiz",
+      "title": "Ça n’a pas marché",
+      "unanswered": "Réponds correctement à tous les exercices de cette leçon, ou réussis le petit quiz, avant de la terminer.",
+      "unavailable": "Cette leçon n’a encore aucun exercice à mettre dans un quiz.",
+      "unknown": "La leçon n’a pas pu être terminée. Réessaie."
+    },
     "tryAgain": "Réessayer",
     "youAreHere": "Tu es ici",
     "yourAnswer": "Ta réponse"

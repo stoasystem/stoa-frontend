@@ -100,6 +100,16 @@ export type PracticeChallenge = {
   incorrectFeedback?: string
 }
 
+/**
+ * An exercise as the backend hands it over before it is answered: the answer
+ * key and the explanation are not in it. The quiz only ever sees this much,
+ * which is why the frontend cannot judge a quiz answer.
+ */
+export type PracticeExercise = Omit<
+  PracticeChallenge,
+  'correctAnswer' | 'explanation' | 'correctFeedback' | 'incorrectFeedback'
+>
+
 export type PracticeLesson = {
   id: string
   unitId: string
@@ -160,6 +170,33 @@ export type PracticeAnswerResult = {
   attemptsRemaining: number
   canAskLearningAssistant?: boolean
   canAskTeacher?: boolean
+}
+
+export type LessonQuizKind = 'skip' | 'testOut'
+export type LessonQuizStatus = 'inProgress' | 'passed' | 'failed'
+
+/**
+ * The short quiz that completes a lesson (stoa-backend#92). The paper, the
+ * hearts and the verdict are the backend's; the stage draws what comes back
+ * and nothing else.
+ */
+export type LessonQuizSession = {
+  quizId: string
+  lessonId: string
+  kind: LessonQuizKind
+  status: LessonQuizStatus
+  heartsLeft: number
+  mistakesAllowed: number
+  remaining: number
+  expiresAt: string
+  exercise: PracticeExercise | null
+}
+
+/** One quiz answer judged. `credential` is set once, when the quiz is passed. */
+export type LessonQuizAnswer = LessonQuizSession & {
+  correct: boolean
+  credential: string | null
+  credentialExpiresAt: string | null
 }
 
 export type PracticeLessonResult = {

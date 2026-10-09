@@ -308,7 +308,8 @@ beforeEach(async () => {
       attemptsRemaining: correct ? 2 : 1,
     }
   })
-  vi.mocked(completePracticeLesson).mockImplementation(async (lessonId) => {
+  vi.mocked(completePracticeLesson).mockImplementation(async (input) => {
+    const lessonId = typeof input === 'string' ? input : input.lessonId
     completed.add(lessonId)
     return { lessonId } as Awaited<ReturnType<typeof completePracticeLesson>>
   })

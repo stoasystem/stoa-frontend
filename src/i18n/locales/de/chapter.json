@@ -29,6 +29,7 @@
   "quiz": {
     "askOff": "Während des Quiz ist Ask ausgeschaltet.",
     "continue": "Weiter",
+    "drawing": "Dein Quiz wird zusammengestellt…",
     "failed": {
       "backToLesson": "Zurück zur Lektion",
       "body": "Übe weiter und versuch es nochmals.",
@@ -77,7 +78,6 @@
     "explainPlaceholder": "Schreib deine Erklärung",
     "failed": "Die Lektion konnte nicht geladen werden.",
     "finish": "Lektion abschliessen",
-    "finishFailed": "Die Lektion konnte nicht abgeschlossen werden. Versuch es nochmals.",
     "finishing": "Wird abgeschlossen…",
     "hint": "Tipp",
     "hintFailed": "Gerade gibt es keinen Tipp. Versuch es gleich noch einmal.",
@@ -98,6 +98,19 @@
     "questionOf": "Aufgabe {{question}} von {{questions}}",
     "retry": "Erneut versuchen",
     "skip": "Überspringen",
+    "trouble": {
+      "credentialExpired": "Der Nachweis aus diesem Quiz ist abgelaufen, bevor die Lektion abgeschlossen war. Mach das Quiz nochmals.",
+      "credentialInvalid": "Der Nachweis aus diesem Quiz gilt nicht für diese Lektion. Mach das Quiz nochmals.",
+      "expired": "Das Quiz hat zu lange gedauert und ist abgelaufen. Starte ein neues.",
+      "finished": "Dieses Quiz ist bereits vorbei. Starte ein neues.",
+      "locked": "Schliess zuerst die Lektionen davor ab: diese Lektion ist noch gesperrt.",
+      "notFound": "Dieses Quiz ist nicht mehr offen. Starte ein neues.",
+      "restart": "Quiz neu starten",
+      "title": "Das hat nicht geklappt",
+      "unanswered": "Beantworte alle Aufgaben dieser Lektion richtig oder bestehe das kurze Quiz, bevor du sie abschliesst.",
+      "unavailable": "Diese Lektion hat noch keine Aufgabe, die ein Quiz stellen könnte.",
+      "unknown": "Die Lektion konnte nicht abgeschlossen werden. Versuch es nochmals."
+    },
     "tryAgain": "Nochmals versuchen",
     "youAreHere": "Du bist hier",
     "yourAnswer": "Deine Antwort"
