@@ -149,6 +149,20 @@ export async function getCurriculumProgress({
   return response.data
 }
 
+/**
+ * The lighting moments this student has now seen (stoa-backend#71). The
+ * student is taken from the token, so this only ever acknowledges the
+ * caller's own. At most 50 unit ids per call; over that the backend answers
+ * 422, so the caller splits them (`ACKNOWLEDGE_LIMIT`).
+ */
+export async function acknowledgeLitUnits(unitIds: readonly string[]) {
+  const response = await httpClient.post<{ acknowledged: string[] }>(
+    '/practice/knowledge-map/acknowledged-lit',
+    { unitIds },
+  )
+  return response.data.acknowledged
+}
+
 export function normalizeCurriculumSubjectId(subjectId?: string) {
   const normalized = subjectId?.trim().toLowerCase()
   if (!normalized) return undefined

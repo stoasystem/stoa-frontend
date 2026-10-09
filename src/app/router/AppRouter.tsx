@@ -5,6 +5,7 @@ import { AppRoutes } from '@/app/router/AppRoutes'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
 import { KnowledgeMapSourceProvider } from '@/features/starmap/readModelSource'
+import { LightingEventsProvider } from '@/features/starmap/lighting/readModelLighting'
 
 // Routes, guards and navigation are all generated from `routeManifest.ts`;
 // add or change a route there, not here.
@@ -18,10 +19,15 @@ export function AppRouter() {
         * design preview and the bench override this seam with their own
         * source, so neither reaches the API. */}
       <KnowledgeMapSourceProvider>
-        {/* Every page is loaded on demand, so one boundary covers them all. */}
-        <Suspense fallback={<PageSkeleton rows={4} />}>
-          <AppRoutes />
-        </Suspense>
+        {/* #51: the lighting moment reads the same sky response, so a point lit
+          * for the first time is celebrated once. The design preview builds its
+          * own tree and supplies the demo source there. */}
+        <LightingEventsProvider>
+          {/* Every page is loaded on demand, so one boundary covers them all. */}
+          <Suspense fallback={<PageSkeleton rows={4} />}>
+            <AppRoutes />
+          </Suspense>
+        </LightingEventsProvider>
       </KnowledgeMapSourceProvider>
     </BrowserRouter>
   )

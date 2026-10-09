@@ -433,7 +433,18 @@ export type KnowledgeMapResponse = {
       lessonsDone: number
       nextLesson: { lessonId: string; title: string } | null
     }
+    /** When the point was first lit, ISO 8601 (stoa-backend#71). */
+    litAt?: string | null
+    /** Seen happening, or written by the backfill (stoa-backend#71). Only `observed` is ever celebrated. */
+    litAtSource?: 'observed' | 'backfilled' | null
   }[]
   prerequisites: { from: string; to: string }[]
   summary: { lit: number; total: number; streakDays: number; score: number }
+  /**
+   * The points lit and not yet acknowledged by this student (stoa-backend#71),
+   * oldest first: what the lighting moment celebrates
+   * (`features/starmap/lighting/readModelLighting.tsx`). Observed lightings
+   * only; the backfill's are never listed.
+   */
+  unacknowledgedLit?: string[]
 }
