@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ChevronLeft, X } from 'lucide-react'
 import { useEffect, useLayoutEffect, useRef, useState, type HTMLAttributes } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
@@ -243,6 +244,19 @@ export function AskPanel({
             </Button>
           </div>
         )}
+        {/*
+          A student with no year group gets answers pitched at nobody in
+          particular. The old chat page said so; Ask replaced that page and
+          the sentence did not come with it, so for months the only person
+          who could fix it was never told (#154).
+        */}
+        {profile && !conversationGrade(profile.grade) && (
+          <p id="ask-grade-missing" className="m-0 pb-1 text-[13px] text-[color:var(--on-sky-text-body)]">
+            <Link to="/me" className="text-[color:var(--on-sky-plain)] underline underline-offset-2">
+              {t('gradeMissingHint')}
+            </Link>
+          </p>
+        )}
         <Composer
           value={draft}
           onChange={setDraft}
@@ -250,6 +264,7 @@ export function AskPanel({
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
           busy={isStreaming || createConversation.isPending}
+          describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
         />
       </div>
     </div>
