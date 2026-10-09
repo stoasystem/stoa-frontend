@@ -2,7 +2,13 @@ export type AutomationPolicy = {
   policyId?: string
   name?: string
   status: 'active' | 'paused' | 'off'
-  autonomyLevel: 'suggest_only' | 'teacher_approved_batch' | 'auto_create_reviewed' | 'off'
+  // 与后端 adaptive_learning_service.AUTOMATION_LEVELS 一一对应
+  autonomyLevel:
+    | 'off'
+    | 'suggest_only'
+    | 'teacher_approved_batch'
+    | 'auto_create_reviewed'
+    | 'future_auto_deliver'
   studentIds?: string[]
   subjectIds?: string[]
   topicIds?: string[]

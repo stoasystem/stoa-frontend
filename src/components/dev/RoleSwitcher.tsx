@@ -95,7 +95,11 @@ export function RoleSwitcher() {
   }
 
   return (
-    <div className="fixed bottom-24 right-4 z-50 md:bottom-4">
+    // Docked to the left edge, vertically centred: the bottom right corner is
+    // the star map's zoom pair and the bottom left its "?", and this sat on
+    // top of the zoom "-" on a phone. The middle of the left edge is free on
+    // every page.
+    <div className="fixed left-2 top-1/2 z-50 -translate-y-1/2">
       {open ? (
         <div className="w-72 rounded-lg border border-border bg-card p-3 shadow-lg">
           <div className="flex items-center justify-between">
