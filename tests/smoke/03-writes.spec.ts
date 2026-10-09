@@ -21,6 +21,13 @@ import { record, rememberConversations, spendGeneration } from './run'
 const SEND = /\/conversations\/[^/]+\/messages(\/stream)?$/
 const CREATE = /^\/conversations$/
 
+/**
+ * These patterns are paths, and `page.route` tests a regex against the whole
+ * URL: `CREATE` is anchored at `/conversations`, so routing on it directly
+ * never matched a request and the handler never ran. Route on the path.
+ */
+const onApiPath = (pattern: RegExp) => (url: URL) => isApiUrl(url.href) && pattern.test(pathOf(url.href))
+
 type Profile = { grade: string }
 
 async function studentGrade(api: SmokeApi): Promise<string> {
@@ -48,7 +55,7 @@ test('item 5: a blank grade opens a blank-grade conversation (#50)', {
   const failures = watchApiFailures(page)
   const errors = watchPageErrors(page)
   const stopped: Array<Record<string, unknown>> = []
-  await page.route(CREATE, async (route) => {
+  await page.route(onApiPath(CREATE), async (route) => {
     if (!isCreate(route.request().method(), route.request().url())) return route.continue()
     stopped.push(route.request().postDataJSON() as Record<string, unknown>)
     await route.abort('blockedbyclient')
@@ -223,14 +230,14 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     // One create, which is the send, and only after it was counted against
     // the budget. A second message would be a second generation.
     let creates = 0
-    await page.route(CREATE, async (route) => {
+    await page.route(onApiPath(CREATE), async (route) => {
       if (!isCreate(route.request().method(), route.request().url())) return route.continue()
       creates += 1
       if (creates > 1) return route.abort('blockedbyclient')
       return route.continue()
     })
     let sends = 0
-    await page.route(SEND, async (route) => {
+    await page.route(onApiPath(SEND), async (route) => {
       if (route.request().method() !== 'POST') return route.continue()
       sends += 1
       return route.abort('blockedbyclient')

@@ -24,8 +24,15 @@ export const smokeAccounts: Record<SmokeRole, { email: string; landing: string }
   agent: { email: 'agent@test.stoaedu.ch', landing: '/' },
 }
 
-export function smokePassword(): string {
-  const password = process.env.STOA_SMOKE_PASSWORD
+/**
+ * The password for one role. Four of the accounts share `STOA_SMOKE_PASSWORD`;
+ * `agent@` has its own, so `STOA_SMOKE_PASSWORD_AGENT` overrides it for that
+ * role. Without the override the shared one is tried, which is what the suite
+ * did before the override existed.
+ */
+export function smokePassword(role?: SmokeRole): string {
+  const own = role === 'agent' ? process.env.STOA_SMOKE_PASSWORD_AGENT : undefined
+  const password = own || process.env.STOA_SMOKE_PASSWORD
   if (!password) {
     throw new Error(
       'STOA_SMOKE_PASSWORD is not set. These tests sign in to a real deployment; ' +

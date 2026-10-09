@@ -201,7 +201,7 @@ export async function signIn(page: Page, role: SmokeRole): Promise<void> {
   // By input type, not label: the label is in whichever language the page chose.
   const password = page.locator('input[type=password]').first()
   await page.locator('input[type=email]').first().fill(account.email)
-  await password.fill(smokePassword())
+  await password.fill(smokePassword(role))
   await page.locator('button[type=submit]').first().click()
   await expect(page).toHaveURL((url) => url.pathname === account.landing, { timeout: 30_000 })
   // `/` also shows the sign-in form to a visitor; the form has to be gone.

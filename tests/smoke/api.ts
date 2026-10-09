@@ -63,7 +63,7 @@ export class SmokeApi {
     const origin = await apiOrigin(request, baseURL)
     const anonymous = new SmokeApi(request, origin, null)
     const login = await anonymous.call<{ accessToken?: string }>('POST', '/auth/login', {
-      data: { email: smokeAccounts[role].email, password: smokePassword() },
+      data: { email: smokeAccounts[role].email, password: smokePassword(role) },
       expect: 200,
     })
     const token = login.body.accessToken

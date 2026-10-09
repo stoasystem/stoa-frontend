@@ -114,9 +114,13 @@ test('item 9: the watcher sees a 404 the deployment is certain to give', { tag: 
   await apiSettled(failures)
 
   await record(testInfo, 'item9-negative-control', { url: `${origin}${path}`, status, seen: [...failures] })
-  expect(status, 'the control URL answered 404').toBe(404)
-  expect(failures, 'watchApiFailures missed the 404 - its clean results mean nothing').toContain(`404 GET ${path}`)
-  await expectApiClean(failures, [{ method: 'GET', path, status: 404, why: 'item 9: the negative control' }])
+  // The gateway refuses an unknown path before the application sees it, so the
+  // refusal is a 401 and not the 404 FastAPI would give. Either is a refusal
+  // and either serves as the control; what has to hold is that the watcher
+  // saw the one this deployment gave.
+  expect([401, 404], `the control URL answered ${status}`).toContain(status)
+  expect(failures, `watchApiFailures missed the ${status} - its clean results mean nothing`).toContain(`${status} GET ${path}`)
+  await expectApiClean(failures, [{ method: 'GET', path, status, why: 'item 9: the negative control' }])
 })
 
 test('item 6: the student still sees every conversation seen before (#11)', { tag: ['@item6', '@readonly'] }, async ({

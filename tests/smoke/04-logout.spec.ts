@@ -4,8 +4,11 @@ import { expectApiClean, isApiUrl, pageAccessToken, pathOf, signIn, watchApiFail
 import { anyLanguage } from './locales'
 import { record } from './run'
 
-// Last in the run, and parent@'s last step: logging out revokes every session
-// the account has, including one a person has open elsewhere (#27, 原则).
+// Last in the run, and parent@'s last step. Logging out ends **this** sign-in
+// and every token it minted, not the account's other sign-ins: backend #63
+// replaced the per-account cut-off with a per-sign-in revocation record on
+// 2026-10-09, and a session open on another device now survives. What is read
+// here is the page's own token, which is the one that has to stop working.
 // This is #49's acceptance reading: after the screen's logout, the token the
 // page held answers 401.
 
