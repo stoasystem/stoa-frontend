@@ -8,7 +8,7 @@ import type { AuthResponse } from '@/types/user'
 
 function getContinueHref(data: AuthResponse) {
   if (data.user.role === 'parent') return '/parent'
-  if (data.user.role === 'teacher') return '/tutor'
+  if (data.user.role === 'teacher') return '/teacher'
   return getDefaultRouteForRole('student')
 }
 

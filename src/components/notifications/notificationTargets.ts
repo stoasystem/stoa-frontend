@@ -30,7 +30,7 @@ export const NOTIFICATION_TARGETS: Record<AppNavArea, Readonly<Record<string, Re
   },
   teacher: {
     // The request queue; a `question` id is not a help-request id.
-    question: () => '/tutor',
+    question: () => '/teacher',
   },
   parent: {
     weekly_report: () => '/parent/reports',

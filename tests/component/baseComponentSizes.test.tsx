@@ -161,8 +161,8 @@ describe('Segmented (Sizes: navigation 30, filters 28)', () => {
           label="Teacher"
           activeIndex={0}
           items={[
-            { to: '/tutor', label: 'Requests' },
-            { to: '/tutor/availability', label: 'Availability' },
+            { to: '/teacher', label: 'Requests' },
+            { to: '/teacher/availability', label: 'Availability' },
           ]}
         />
       </MemoryRouter>,
@@ -191,8 +191,8 @@ describe('Segmented (Sizes: navigation 30, filters 28)', () => {
           activeIndex={0}
           hitHeight={44}
           items={[
-            { to: '/tutor', label: 'Requests' },
-            { to: '/tutor/availability', label: 'Availability' },
+            { to: '/teacher', label: 'Requests' },
+            { to: '/teacher/availability', label: 'Availability' },
           ]}
         />
       </MemoryRouter>,

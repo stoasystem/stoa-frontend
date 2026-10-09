@@ -61,7 +61,7 @@ export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummar
         return (
           <Row
             key={request.requestId}
-            to={`/tutor/requests/${request.requestId}`}
+            to={`/teacher/requests/${request.requestId}`}
             leading={{ kind: 'avatar', name: request.studentName }}
             title={request.studentName}
             // The question is what the teacher triages by: two lines of it,

@@ -114,8 +114,8 @@ describe('the top bar', () => {
   })
 
   it('makes the logo the way home', () => {
-    renderShell('teacher', '/tutor/availability', 1280)
-    expect(within(bar()).getByRole('link', { name: 'navigation.logoHome' })).toHaveAttribute('href', '/tutor')
+    renderShell('teacher', '/teacher/availability', 1280)
+    expect(within(bar()).getByRole('link', { name: 'navigation.logoHome' })).toHaveAttribute('href', '/teacher')
   })
 })
 
@@ -139,7 +139,7 @@ function expectTouchTarget(element: HTMLElement, what: string) {
 
 describe('touch targets on a phone', () => {
   it.each(['student', 'teacher', 'parent', 'admin'] as const)('are at least 44 x 44 for every bar control of a %s', (role) => {
-    const home = { student: '/', teacher: '/tutor', parent: '/parent', admin: '/admin/users' }[role]
+    const home = { student: '/', teacher: '/teacher', parent: '/parent', admin: '/admin/users' }[role]
     renderShell(role, home, 375)
 
     expectTouchTarget(within(bar()).getByRole('link', { name: 'navigation.logoHome' }), 'the logo')
@@ -192,11 +192,11 @@ describe('no sidebar and no bottom tab bar', () => {
 
 describe('what sits beside the logo', () => {
   it('gives a teacher Requests | Availability, with the profile left to the account menu', () => {
-    renderShell('teacher', '/tutor/availability', 1280)
+    renderShell('teacher', '/teacher/availability', 1280)
 
     const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
     const links = within(nav).getAllByRole('link')
-    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/tutor', '/tutor/availability'])
+    expect(links.map((link) => link.getAttribute('href'))).toEqual(['/teacher', '/teacher/availability'])
     expect(within(nav).getByRole('link', { name: 'navigation.availability' })).toHaveAttribute('aria-current', 'page')
     expect(within(nav).getByRole('link', { name: 'navigation.requests' })).not.toHaveAttribute('aria-current')
   })
@@ -212,7 +212,7 @@ describe('what sits beside the logo', () => {
   })
 
   it('puts the segmented control under the bar on a phone, still inside the header', () => {
-    renderShell('teacher', '/tutor', 375)
+    renderShell('teacher', '/teacher', 375)
 
     const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
     expect(barRow().contains(nav)).toBe(false)
@@ -271,8 +271,8 @@ describe('what sits beside the logo', () => {
   })
 
   it.each([
-    ['/tutor/learning-automation', 'navigation.requests'],
-    ['/tutor/requests/r-1', 'navigation.requests'],
+    ['/teacher/learning-automation', 'navigation.requests'],
+    ['/teacher/requests/r-1', 'navigation.requests'],
   ])('keeps a teacher on Requests inside it (%s)', (path, label) => {
     renderShell('teacher', path, 1280)
     const nav = within(bar()).getByRole('navigation', { name: 'navigation.primary' })
@@ -280,7 +280,7 @@ describe('what sits beside the logo', () => {
   })
 
   it.each([
-    ['teacher', '/tutor/profile'],
+    ['teacher', '/teacher/profile'],
     ['parent', '/parent/account-operations'],
   ] as const)('lights no segment on a page the avatar menu opens (%s, %s)', (role, path) => {
     renderShell(role, path, 1280)
@@ -307,7 +307,7 @@ describe('what sits beside the logo', () => {
     for (const role of ['student', 'parent', 'teacher', 'admin'] as const) {
       const navigation = shellNavigationFor(role)
       const paths = navigation.kind === 'none' ? [] : navigation.items.map((item) => item.path)
-      expect(paths.filter((path) => ['/billing', '/support', '/me', '/tutor/profile', '/settings/password', '/parent/account-operations'].includes(path))).toEqual([])
+      expect(paths.filter((path) => ['/billing', '/support', '/me', '/teacher/profile', '/settings/password', '/parent/account-operations'].includes(path))).toEqual([])
     }
   })
 

@@ -25,7 +25,7 @@ const ME_PASSWORD = `/me#${PASSWORD_SECTION_ID}`
  */
 const PROFILE_PATHS: Record<AppNavArea, string | null> = {
   student: '/me',
-  teacher: '/tutor/profile',
+  teacher: '/teacher/profile',
   parent: '/parent/account-operations',
   admin: '/me',
   organization: '/me',

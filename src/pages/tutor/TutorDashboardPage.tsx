@@ -61,7 +61,7 @@ export function TutorDashboardPage() {
                   {t('classroom.description')}
                 </p>
                 <Button asChild>
-                  <Link to="/tutor/classroom">{t('classroom.open')}</Link>
+                  <Link to="/teacher/classroom">{t('classroom.open')}</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -74,7 +74,7 @@ export function TutorDashboardPage() {
         {/* Learning automation: the secondary entry inside Requests (#13 point 6). */}
         <Group title={t('requests.more')}>
           <Row
-            to="/tutor/learning-automation"
+            to="/teacher/learning-automation"
             leading={{ kind: 'icon', icon: Sparkles }}
             title={t('requests.learningAutomation')}
             subtitle={t('requests.learningAutomationDescription')}

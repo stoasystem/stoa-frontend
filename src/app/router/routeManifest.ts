@@ -148,7 +148,7 @@ export const ASK_PATH = '/ask'
 export const roleHomePaths: Record<AppNavArea, string> = {
   student: '/',
   parent: '/parent',
-  teacher: '/tutor',
+  teacher: '/teacher',
   admin: '/admin',
   organization: '/organization',
 }
@@ -286,10 +286,10 @@ const ClassroomRoomPage = lazyPage('ClassroomRoomPage', () => import('@/features
 const ClassroomSummaryPage = lazyPage('ClassroomSummaryPage', () => import('@/features/live-classroom/pages/ClassroomSummaryPage'))
 // Student side, superseded by the planet: live-classroom/pages/StudentClassroomHomePage, ScheduleClassroomPage.
 
-  { path: '/tutor/classroom', access: TEACHER, page: TutorClassroomQueuePage, nav: [{ area: 'teacher', label: 'Classroom Queue', labelKey: 'navigation.classroomQueue', priority: 'primary', icon: 'classroom', mobile: true }], meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom queue.' } },
-  { path: '/tutor/classroom/sessions/:sessionId/lobby', access: TEACHER, page: ClassroomLobbyPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom lobby.' } },
-  { path: '/tutor/classroom/sessions/:sessionId/room', access: TEACHER, page: ClassroomRoomPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor live classroom room.' } },
-  { path: '/tutor/classroom/sessions/:sessionId/summary', access: TEACHER, page: ClassroomSummaryPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom summary.' } },
+  { path: '/teacher/classroom', access: TEACHER, page: TutorClassroomQueuePage, nav: [{ area: 'teacher', label: 'Classroom Queue', labelKey: 'navigation.classroomQueue', priority: 'primary', icon: 'classroom', mobile: true }], meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom queue.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/lobby', access: TEACHER, page: ClassroomLobbyPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom lobby.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/room', access: TEACHER, page: ClassroomRoomPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor live classroom room.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/summary', access: TEACHER, page: ClassroomSummaryPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom summary.' } },
  */
 
 export const pageRoutes: readonly PageRoute[] = [
@@ -395,7 +395,7 @@ export const pageRoutes: readonly PageRoute[] = [
 
   // ---- teacher -----------------------------------------------------------
   {
-    path: '/tutor',
+    path: '/teacher',
     access: TEACHER,
     page: TutorDashboardPage,
     // Learning automation is a secondary entry inside Requests (#13 point 6),
@@ -404,16 +404,16 @@ export const pageRoutes: readonly PageRoute[] = [
     meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request queue.' },
   },
   {
-    path: '/tutor/availability',
+    path: '/teacher/availability',
     access: TEACHER,
     page: TutorAvailabilityPage,
     nav: [{ area: 'teacher', label: 'Availability', labelKey: 'navigation.availability', priority: 'primary', icon: 'settings', mobile: true, description: 'Tutor availability and subjects.' }],
     meta: { module: 'Tutor', status: 'core', purpose: 'Tutor availability.' },
   },
-  { path: '/tutor/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
+  { path: '/teacher/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
   // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
-  { path: '/tutor/profile', access: TEACHER, page: TutorProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
-  { path: '/tutor/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
+  { path: '/teacher/profile', access: TEACHER, page: TutorProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
+  { path: '/teacher/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
 
   // ---- admin -------------------------------------------------------------
   // The source list (#13 point 6, #52) follows the order of these entries:
@@ -541,8 +541,37 @@ export function mapPathForLegacyPlanet(pathname: string | undefined): string {
 
 const toMap = ({ pathname }: LegacyRedirectInput) => mapPathForLegacyPlanet(pathname)
 
+/*
+ * The teacher area answered on LEGACY_TEACHER_HOME until #69 renamed the word
+ * out of the app. Those addresses went out in activation emails and sit in
+ * bookmarks, so each one forwards to its page under the teacher's home
+ * instead of ending on a 404. Only the shapes that existed carry their tail
+ * over; every other old address lands on the home, so no made-up tail reaches
+ * the router. The classroom tails are absent because card 020 withdrew those
+ * pages; restoring them means restoring their tails here.
+ */
+const LEGACY_TEACHER_HOME = '/tutor'
+
+const LEGACY_TEACHER_TAILS: readonly RegExp[] = [
+  /^\/(availability|profile|learning-automation)$/,
+  /^\/requests\/[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/,
+]
+
+export function teacherPathForLegacyAddress(pathname: string | undefined): string {
+  const home = roleHomePaths.teacher
+  // Case-insensitive, as React Router matches the pattern itself.
+  const match = new RegExp(`^${LEGACY_TEACHER_HOME}(/.*)?$`, 'i').exec(pathname ?? '')
+  if (!match) return home
+  const tail = (match[1] ?? '').replace(/\/+$/, '')
+  if (tail === '') return home
+  return LEGACY_TEACHER_TAILS.some((shape) => shape.test(tail)) ? `${home}${tail}` : home
+}
+
+const toTeacher = ({ pathname }: LegacyRedirectInput) => teacherPathForLegacyAddress(pathname)
+
 export const legacyRedirects: readonly LegacyRedirect[] = [
   { from: '/planet/*', to: toMap, access: STUDENT, carryContext: true, decision: '#72 §8' },
+  { from: `${LEGACY_TEACHER_HOME}/*`, to: toTeacher, access: TEACHER, carryContext: true, decision: '#69 §1' },
   { from: '/learn/*', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/dashboard', to: '/', access: STUDENT, decision: '#13 §2' },
   { from: '/practice/*', to: '/', access: STUDENT, decision: '#13 §2' },

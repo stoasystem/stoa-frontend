@@ -105,8 +105,8 @@ function SessionList({
               </span>
               <Button asChild>
                 <Link to={summary
-                  ? `/tutor/classroom/sessions/${session.id}/summary`
-                  : `/tutor/classroom/sessions/${session.id}/lobby`}
+                  ? `/teacher/classroom/sessions/${session.id}/summary`
+                  : `/teacher/classroom/sessions/${session.id}/lobby`}
                 >
                   {summary ? 'View Summary' : instant ? 'Review Context' : 'Open Lobby'}
                 </Link>

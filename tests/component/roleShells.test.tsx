@@ -47,7 +47,7 @@ const paths = (role: UserRole) => {
 describe('what each role is offered beside the logo', () => {
   it('gives a teacher Requests | Availability', () => {
     expect(shellNavigationFor('teacher').kind).toBe('segmented')
-    expect(paths('teacher')).toEqual(['/tutor', '/tutor/availability'])
+    expect(paths('teacher')).toEqual(['/teacher', '/teacher/availability'])
   })
 
   it('gives a parent Overview | Reports', () => {

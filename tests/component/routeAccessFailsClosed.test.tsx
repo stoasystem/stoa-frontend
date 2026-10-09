@@ -9,7 +9,7 @@ import { pageRoutes, type PageRoute, type RouteAccess } from '@/app/router/route
 
 const bogus = { kind: 'teachersAndFriends' } as unknown as RouteAccess
 const student = { role: 'student' as const }
-const tutorPage = pageRoutes.find((route) => route.path === '/tutor') as PageRoute
+const tutorPage = pageRoutes.find((route) => route.path === '/teacher') as PageRoute
 const rootPage = pageRoutes.find((route) => route.path === '/') as PageRoute
 
 describe('an unknown access kind', () => {

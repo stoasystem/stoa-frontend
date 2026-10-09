@@ -34,7 +34,7 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
     joinRoomMutation.mutate(undefined, {
       onSuccess: () => {
         navigate(tutorMode
-          ? `/tutor/classroom/sessions/${sessionId}/room`
+          ? `/teacher/classroom/sessions/${sessionId}/room`
           : `/classroom/sessions/${sessionId}/room`)
       },
     })
@@ -47,7 +47,7 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
           eyebrow={tutorMode ? 'Tutor classroom' : 'Classroom Lobby'}
           title={tutorMode ? 'Prepare for Classroom' : 'Classroom Lobby'}
           description={session ? `${session.title} · ${formatClassroomTimeRange(session)}` : 'Prepare before entering the classroom.'}
-          actions={<BackButton label="Back" to={tutorMode ? '/tutor/classroom' : '/classroom'} />}
+          actions={<BackButton label="Back" to={tutorMode ? '/teacher/classroom' : '/classroom'} />}
         />
 
         {sessionQuery.isLoading && <EmptyState message="Loading classroom lobby..." />}

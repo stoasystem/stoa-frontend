@@ -150,9 +150,9 @@ const rowLinks = () =>
 
 describe('a teacher\'s Requests', () => {
   it('lists requests as chevron rows, filters with one segmented control, and leads into learning automation', () => {
-    renderAs('teacher', '/tutor', <TutorDashboardPage />)
+    renderAs('teacher', '/teacher', <TutorDashboardPage />)
 
-    expect(rowLinks()).toEqual(['/tutor/requests/r-1', '/tutor/requests/r-2', '/tutor/learning-automation'])
+    expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2', '/teacher/learning-automation'])
     expect(screen.getByRole('region', { name: 'Requests' })).toBeInTheDocument()
     const row = screen.getByRole('link', { name: /Lina Meier/ })
     expect(row.querySelector('[data-chevron]')).not.toBeNull()
@@ -176,7 +176,7 @@ describe('a teacher\'s Requests', () => {
   })
 
   it('tells a missed response time from one at risk, and keeps time and priority on a phone', () => {
-    renderAs('teacher', '/tutor', <TutorDashboardPage />)
+    renderAs('teacher', '/teacher', <TutorDashboardPage />)
 
     const atRisk = screen.getByRole('link', { name: /Lina Meier/ })
     const breached = screen.getByRole('link', { name: /Noah Keller/ })
@@ -207,12 +207,12 @@ describe('a teacher\'s request detail', () => {
   }
 
   it('shows the first tutor action, which the list rows leave out', () => {
-    renderAs('teacher', '/tutor/requests/r-1', <HelpRequestDetailCard request={{ ...detail, firstTutorActionAt: '2026-09-28T09:12:00Z' }} />)
+    renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={{ ...detail, firstTutorActionAt: '2026-09-28T09:12:00Z' }} />)
     expect(document.querySelector('[data-first-action]')).toHaveTextContent(/^First tutor action: .*\d/)
   })
 
   it('says when no tutor has acted yet', () => {
-    renderAs('teacher', '/tutor/requests/r-1', <HelpRequestDetailCard request={detail} />)
+    renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={detail} />)
     expect(document.querySelector('[data-first-action]')).toHaveTextContent('First tutor action: not recorded yet')
   })
 })
@@ -291,7 +291,7 @@ const FILLED = '[data-variant="filled"], [data-emphasis="filled"]'
 
 describe('no screen carries more than one filled button', () => {
   it.each([
-    ['teacher', '/tutor', <TutorDashboardPage key="t" />, 'Lina Meier'],
+    ['teacher', '/teacher', <TutorDashboardPage key="t" />, 'Lina Meier'],
     ['parent', '/parent', <ParentDashboardPage key="p" />, 'Account and family'],
     ['parent', '/parent/reports', <ParentReportsPage key="r" />, 'Weekly report'],
     ['admin', '/admin', <AdminDashboardPage key="a" />, 'Operations scope'],

@@ -27,7 +27,7 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
   function confirmLeave() {
     if (tutorMode) {
       completeMutation.mutate(undefined, {
-        onSuccess: () => navigate(`/tutor/classroom/sessions/${sessionId}/summary`),
+        onSuccess: () => navigate(`/teacher/classroom/sessions/${sessionId}/summary`),
       })
       return
     }

@@ -191,7 +191,7 @@ describe('signing in from /login', () => {
 
   it.each([
     ['parent', '/parent', 'parent home'],
-    ['teacher', '/tutor', 'teacher home'],
+    ['teacher', '/teacher', 'teacher home'],
   ] as const)("sends a %s whose ?next= belongs to a student to the role's home", async (role, home, heading) => {
     serve(account(role))
     openAt('/login?next=/map/math')

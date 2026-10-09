@@ -57,13 +57,13 @@ export function TutorHelpRequestDetailPage() {
         <PageHeader
           title={tTutor('detail.title')}
           description={tTutor('detail.description')}
-          actions={<PageActions secondary={<BackButton label={tTutor('detail.backLabel')} to="/tutor" />} />}
+          actions={<PageActions secondary={<BackButton label={tTutor('detail.backLabel')} to="/teacher" />} />}
         />
         <Breadcrumbs
           className="mb-6"
           items={[
-            { label: tTutor('detail.breadcrumbRoot'), to: '/tutor' },
-            { label: tTutor('detail.backLabel'), to: '/tutor' },
+            { label: tTutor('detail.breadcrumbRoot'), to: '/teacher' },
+            { label: tTutor('detail.backLabel'), to: '/teacher' },
             { label: requestQuery.data?.student.name ?? tTutor('detail.breadcrumbFallback') },
           ]}
         />

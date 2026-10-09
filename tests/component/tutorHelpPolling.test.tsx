@@ -144,7 +144,7 @@ describe('the teacher dashboard', () => {
     })
     render(
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={['/tutor']}>
+        <MemoryRouter initialEntries={['/teacher']}>
           <TutorDashboardPage />
         </MemoryRouter>
       </QueryClientProvider>,
