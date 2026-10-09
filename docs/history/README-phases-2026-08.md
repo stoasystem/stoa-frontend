@@ -3,7 +3,7 @@
 > 旧的 `tutor` 角色命名、写在正文里的测试口令，这些现在都已不成立。
 > **不要据此配置环境或理解产品形态。**
 > 现状看仓根的 `README.md` 与 `stoasystem/stoa-docs`（`PRD.md` / `HLD.md` / `PLAN.md`）。
-> 以下正文一字未改，仅供追溯。
+> 以下正文除第 21 行的明文测试口令被涂掉外，一字未改，仅供追溯。
 
 ---
 
@@ -17,8 +17,9 @@ The app is deployed at https://app.stoaedu.ch, backed by the API at
 https://api.stoaedu.ch. The apex, https://stoaedu.ch, is a separate static
 marketing site and does not serve this app.
 
-These four accounts exist in the deployed environment and share one password,
-`StoaTest2026!`:
+These four accounts exist in the deployed environment and share one password
+(redacted on 2026-10-09, when this file was archived: a live password does not
+belong in a tracked file. It is the value `STOA_SMOKE_PASSWORD` carries):
 
 | Role    | Email                       |
 | ------- | --------------------------- |
