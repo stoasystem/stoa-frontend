@@ -72,21 +72,10 @@ type Kept = {
   marker: RegExp
 }
 
-const KEPT: Record<string, Kept> = {
-  // The mistakes list, long after the answer was judged: the backend sends the
-  // right answer with the record so the student can read it back. Nothing is
-  // compared here.
-  'components/practice/MistakeReviewCard.tsx': {
-    count: 2,
-    why: 'the recorded right answer, read off the mistake and passed on for review',
-    marker: /correctAnswer: mistake\.correctAnswer/,
-  },
-  'components/practice/LessonResultSummary.tsx': {
-    count: 2,
-    why: 'the same recorded answer on the lesson summary',
-    marker: /correctAnswer: mistake\.correctAnswer/,
-  },
-}
+// Empty since the old practice pages went: the files that registered a kept
+// occurrence -- MistakeReviewCard and LessonResultSummary -- were deleted with
+// them. A file that needs one again registers it here, with its count.
+const KEPT: Record<string, Kept> = {}
 
 function filesUnder(dir: string): string[] {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -118,11 +107,12 @@ describe('no second quiz judgement in the frontend', () => {
     expect(found).toEqual(Object.keys(KEPT).sort())
   })
 
-  it.each(Object.entries(KEPT))('keeps exactly what %s registers', (name, kept) => {
-    const full = path.join(SRC, name)
-    const source = readFileSync(full, 'utf8')
-    expect(source).toMatch(kept.marker)
-    expect(marksIn(source)).toHaveLength(kept.count)
+  it('keeps exactly what each registered file registers', () => {
+    for (const [name, kept] of Object.entries(KEPT)) {
+      const source = readFileSync(path.join(SRC, name), 'utf8')
+      expect(source).toMatch(kept.marker)
+      expect(marksIn(source)).toHaveLength(kept.count)
+    }
   })
 
   it('leaves the quiz module with no rule of its own to apply', () => {

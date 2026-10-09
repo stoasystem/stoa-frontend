@@ -7,7 +7,6 @@ import enAuth from '@/i18n/locales/en/auth.json'
 import enChat from '@/i18n/locales/en/chat.json'
 import enParent from '@/i18n/locales/en/parent.json'
 import enPractice from '@/i18n/locales/en/practice.json'
-import enQuestionBank from '@/i18n/locales/en/questionBank.json'
 import enUploads from '@/i18n/locales/en/uploads.json'
 import enTeacherArea from '@/i18n/locales/en/teacher.json'
 import enBilling from '@/i18n/locales/en/billing.json'
@@ -22,7 +21,6 @@ import deAuth from '@/i18n/locales/de/auth.json'
 import deChat from '@/i18n/locales/de/chat.json'
 import deParent from '@/i18n/locales/de/parent.json'
 import dePractice from '@/i18n/locales/de/practice.json'
-import deQuestionBank from '@/i18n/locales/de/questionBank.json'
 import deUploads from '@/i18n/locales/de/uploads.json'
 import deTeacherArea from '@/i18n/locales/de/teacher.json'
 import deBilling from '@/i18n/locales/de/billing.json'
@@ -37,7 +35,6 @@ import frAuth from '@/i18n/locales/fr/auth.json'
 import frChat from '@/i18n/locales/fr/chat.json'
 import frParent from '@/i18n/locales/fr/parent.json'
 import frPractice from '@/i18n/locales/fr/practice.json'
-import frQuestionBank from '@/i18n/locales/fr/questionBank.json'
 import frUploads from '@/i18n/locales/fr/uploads.json'
 import frTeacherArea from '@/i18n/locales/fr/teacher.json'
 import frBilling from '@/i18n/locales/fr/billing.json'
@@ -52,7 +49,6 @@ import itAuth from '@/i18n/locales/it/auth.json'
 import itChat from '@/i18n/locales/it/chat.json'
 import itParent from '@/i18n/locales/it/parent.json'
 import itPractice from '@/i18n/locales/it/practice.json'
-import itQuestionBank from '@/i18n/locales/it/questionBank.json'
 import itUploads from '@/i18n/locales/it/uploads.json'
 import itTeacherArea from '@/i18n/locales/it/teacher.json'
 import itBilling from '@/i18n/locales/it/billing.json'
@@ -70,7 +66,6 @@ export const resources = {
     chat: enChat,
     parent: enParent,
     practice: enPractice,
-    questionBank: enQuestionBank,
     uploads: enUploads,
     teacher: enTeacherArea,
     billing: enBilling,
@@ -87,7 +82,6 @@ export const resources = {
     chat: deChat,
     parent: deParent,
     practice: dePractice,
-    questionBank: deQuestionBank,
     uploads: deUploads,
     teacher: deTeacherArea,
     billing: deBilling,
@@ -104,7 +98,6 @@ export const resources = {
     chat: frChat,
     parent: frParent,
     practice: frPractice,
-    questionBank: frQuestionBank,
     uploads: frUploads,
     teacher: frTeacherArea,
     billing: frBilling,
@@ -121,7 +114,6 @@ export const resources = {
     chat: itChat,
     parent: itParent,
     practice: itPractice,
-    questionBank: itQuestionBank,
     uploads: itUploads,
     teacher: itTeacherArea,
     billing: itBilling,
