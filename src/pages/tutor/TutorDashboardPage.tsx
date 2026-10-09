@@ -22,7 +22,7 @@ import { useTutorStatsQuery } from '@/hooks/tutor/useTutorStatsQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 
 export function TutorDashboardPage() {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
   const requestsQuery = useTutorHelpRequestsQuery()
   const statsQuery = useTutorStatsQuery()
   const [filter, setFilter] = useState<TutorRequestFilter>('all')

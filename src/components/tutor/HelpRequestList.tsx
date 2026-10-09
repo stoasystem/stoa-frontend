@@ -31,7 +31,7 @@ const priorityLabelKeys = {
 } as const
 
 export function HelpRequestList({ requests }: { requests: TutorHelpRequestSummary[] }) {
-  const { t, i18n } = useTranslation('tutor')
+  const { t, i18n } = useTranslation('teacher')
 
   if (requests.length === 0) {
     return <p className="m-0 text-[15px] text-caption">{t('requests.empty')}</p>

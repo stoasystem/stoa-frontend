@@ -9,7 +9,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function TutorAvailabilityPage() {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
   const availabilityQuery = useTutorAvailabilityQuery()
 
   useEffect(() => {

@@ -18,8 +18,8 @@ const roleOptions = [
   },
   {
     role: 'teacher',
-    titleKey: 'common:roles.tutor',
-    descriptionKey: 'auth:register.tutorHelp',
+    titleKey: 'common:roles.teacher',
+    descriptionKey: 'auth:register.teacherHelp',
     icon: GraduationCap,
   },
 ] satisfies Array<{

@@ -1,5 +1,5 @@
 {
-  "dashboardTitle": "Tutor support requests",
+  "dashboardTitle": "Teacher support requests",
   "dashboardDescription": "Review student questions where qualified teacher guidance can help.",
   "loadRequestsFailed": "Failed to load requests.",
   "availabilityTitle": "Teacher availability",
@@ -8,7 +8,7 @@
   "markResolved": "Mark resolved",
   "notes": "Teacher notes",
   "availability": {
-    "eyebrow": "Tutor operations",
+    "eyebrow": "Teacher operations",
     "title": "Availability",
     "description": "Set availability and subjects so support requests can be routed clearly."
   },
@@ -20,9 +20,9 @@
   },
   "detail": {
     "title": "Help Request",
-    "description": "Review the student's context and record the tutor follow-up.",
+    "description": "Review the student's context and record the teacher follow-up.",
     "backLabel": "Requests",
-    "breadcrumbRoot": "Tutor",
+    "breadcrumbRoot": "Teacher",
     "breadcrumbFallback": "Request detail",
     "loadFailed": "Failed to load request.",
     "resolutionNote": "Resolution note",
@@ -70,7 +70,7 @@
     "minutes": "{{count}} min",
     "filterLabel": "Filter requests",
     "all": "All",
-    "empty": "No tutor support requests are available.",
+    "empty": "No teacher support requests are available.",
     "listLabel": "Requests",
     "row": "{{subject}} · {{grade}}",
     "priority": "{{priority}} priority",
@@ -81,7 +81,7 @@
     "more": "More",
     "learningAutomation": "Learning automation",
     "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
-    "firstAction": "First tutor action: {{time}}",
-    "firstActionNone": "First tutor action: not recorded yet"
+    "firstAction": "First teacher action: {{time}}",
+    "firstActionNone": "First teacher action: not recorded yet"
   }
 }

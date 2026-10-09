@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { TutorHelpRequestDetail } from '@/types/tutor'
 
 export function HelpRequestDetailCard({ request }: { request: TutorHelpRequestDetail }) {
-  const { t, i18n } = useTranslation('tutor')
+  const { t, i18n } = useTranslation('teacher')
   const firstAction = request.firstTutorActionAt
     ? t('requests.firstAction', {
         time: new Date(request.firstTutorActionAt).toLocaleString(i18n.resolvedLanguage, {

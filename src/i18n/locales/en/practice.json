@@ -13,7 +13,7 @@
   "askLearningChat": "Ask about this step",
   "backToLesson": "Back to lesson",
   "askQuestion": "Ask a question",
-  "askTeacher": "Ask a Tutor",
+  "askTeacher": "Ask a Teacher",
   "teacherSupportPrompt": "Would you like a teacher to explain this?",
   "lessonComplete": "Lesson complete",
   "reviewMistakes": "Review mistakes",
@@ -212,7 +212,7 @@
     "noWeakTopics": "No weak topics have enough evidence yet.",
     "signals": "{{count}} signals",
     "freshness": "Profile freshness",
-    "freshnessBody": "Updated {{date}} from questions, tutor escalation, and practice evidence.",
+    "freshnessBody": "Updated {{date}} from questions, teacher escalation, and practice evidence.",
     "feedback": "Feedback",
     "email": "Email",
     "usageActive": "Active",
@@ -287,7 +287,7 @@
     "recentMistakes": "Recent mistakes",
     "chatMessages": "Chat messages",
     "freeTrial": "Free trial",
-    "tutorHelp": "Tutor help",
+    "teacherHelp": "Teacher help",
     "uploadWhilePractising2": "Upload a photo or PDF and ask the Learning Assistant while you keep the Practice Path as your guide.",
     "uploadBody2": "Take a photo or attach a PDF from your schoolwork. The Learning Assistant can help you understand it step by step.",
     "chooseSubjectHint": "Choose a subject, then narrow by topic and level.",
@@ -356,9 +356,9 @@
     "parentTitle": "Curriculum rollout",
     "parentDescription": "Parent-visible curriculum coverage and weak-area signals for active subjects.",
     "parentContext": "Parent curriculum view",
-    "tutorTitle": "Curriculum context",
-    "tutorDescription": "Teacher-visible curriculum coverage for the current request subject.",
-    "tutorContext": "Tutor preview",
+    "teacherTitle": "Curriculum context",
+    "teacherDescription": "Teacher-visible curriculum coverage for the current request subject.",
+    "teacherContext": "Teacher preview",
     "studentContext": "Curriculum",
     "loading": "Loading curriculum coverage...",
     "error": "Curriculum coverage is unavailable right now.",
@@ -474,8 +474,8 @@
   },
   "teacherSupportCta": {
     "title": "This step may need a clearer explanation.",
-    "body": "Ask a tutor after trying the hint and a step-by-step explanation.",
-    "action": "Ask a Tutor"
+    "body": "Ask a teacher after trying the hint and a step-by-step explanation.",
+    "action": "Ask a Teacher"
   },
   "answerInput": {
     "chooseOne": "Choose one answer",
@@ -563,14 +563,14 @@
     "defaultRationale": "This practice was selected from reviewed learning signals so your next work stays focused.",
     "sources": {
       "automation": "Automation-created practice",
-      "ai_draft": "Tutor-reviewed AI practice",
+      "ai_draft": "Teacher-reviewed AI practice",
       "curriculum_exercise": "Curriculum practice",
       "reviewed": "Reviewed practice"
     },
     "nextAction": {
       "completed": "Review feedback",
       "started": "Continue practice",
-      "skipped": "Ask your tutor what to try next",
+      "skipped": "Ask your teacher what to try next",
       "default": "Start practice"
     }
   }

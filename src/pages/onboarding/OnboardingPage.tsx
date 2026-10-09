@@ -13,10 +13,10 @@ import { MarketingLayout } from '@/layouts/MarketingLayout'
 const roleKeys = [
   { key: 'student', icon: MessageSquareText },
   { key: 'parent', icon: Users },
-  { key: 'tutor', icon: GraduationCap },
+  { key: 'teacher', icon: GraduationCap },
 ] as const
 
-const badgeKeys = ['student', 'parent', 'tutor'] as const
+const badgeKeys = ['student', 'parent', 'teacher'] as const
 
 export function OnboardingPage() {
   const { t } = useTranslation('support')

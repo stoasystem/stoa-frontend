@@ -206,14 +206,14 @@ describe('a teacher\'s request detail', () => {
     messages: [],
   }
 
-  it('shows the first tutor action, which the list rows leave out', () => {
+  it('shows the first teacher action, which the list rows leave out', () => {
     renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={{ ...detail, firstTutorActionAt: '2026-09-28T09:12:00Z' }} />)
-    expect(document.querySelector('[data-first-action]')).toHaveTextContent(/^First tutor action: .*\d/)
+    expect(document.querySelector('[data-first-action]')).toHaveTextContent(/^First teacher action: .*\d/)
   })
 
-  it('says when no tutor has acted yet', () => {
+  it('says when no teacher has acted yet', () => {
     renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={detail} />)
-    expect(document.querySelector('[data-first-action]')).toHaveTextContent('First tutor action: not recorded yet')
+    expect(document.querySelector('[data-first-action]')).toHaveTextContent('First teacher action: not recorded yet')
   })
 })
 

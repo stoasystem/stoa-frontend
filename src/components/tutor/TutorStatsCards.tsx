@@ -10,7 +10,7 @@ const fallbackStats: TutorStats = {
 
 /* Teacher board: three figures under the title, not three cards. */
 export function TutorStatsCards({ stats = fallbackStats }: { stats?: TutorStats }) {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
 
   return (
     <Stats

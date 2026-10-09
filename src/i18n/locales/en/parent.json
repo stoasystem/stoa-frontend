@@ -1,6 +1,6 @@
 {
   "dashboardTitle": "Parent dashboard",
-  "dashboardDescription": "Follow learning rhythm, recent questions, reports, and moments when tutor support helped.",
+  "dashboardDescription": "Follow learning rhythm, recent questions, reports, and moments when teacher support helped.",
   "loadChildrenFailed": "Failed to load children.",
   "noChildren": "No children are linked to this parent account.",
   "child": "Child",
@@ -13,7 +13,7 @@
   "historyTitle": "Child learning history",
   "growth": "Learning progress",
   "recentQuestions": "Recent questions",
-  "teacherRecords": "Tutor support moments",
+  "teacherRecords": "Teacher support moments",
   "nextAction": "Recommended next action",
   "history": {
     "description": "Parent-visible summaries only. Student chat participation remains student-owned.",
@@ -67,7 +67,7 @@
     "practiceCompleted": "Practice completed",
     "practiceCompletedDescription": "Lessons this week",
     "subjectProfile": "Subject profile",
-    "subjectProfileDescription": "Parent-visible subject signals from questions, practice, and tutor escalation.",
+    "subjectProfileDescription": "Parent-visible subject signals from questions, practice, and teacher escalation.",
     "weakTopics": "Weak topics",
     "noWeakTopics": "No weak topics were flagged yet.",
     "recentActivity": "Recent activity",
@@ -152,7 +152,7 @@
   "valueCard": {
     "title": "Why this matters",
     "body1": "STOA helps parents see whether learning is actually happening: recent questions, weak topics, teacher involvement, and the next practical action.",
-    "body2": "Parent reports turn homework activity into a weekly decision: continue guided support, request tutor support, or review a topic together."
+    "body2": "Parent reports turn homework activity into a weekly decision: continue guided support, request teacher support, or review a topic together."
   },
   "overview": {
     "children": "Children",

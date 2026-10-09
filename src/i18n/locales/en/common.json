@@ -15,7 +15,7 @@
     "switchUnreachable": "Could not reach the server. The account is still held."
   },
   "actions": {
-    "askTeacher": "Ask a Tutor",
+    "askTeacher": "Ask a Teacher",
     "back": "Back",
     "changePassword": "Change password",
     "choosePlan": "Choose a plan",
@@ -39,7 +39,7 @@
     "learningAssistant": "Learning Assistant",
     "name": "STOA",
     "platform": "STOA Learning Platform",
-    "teacherSupport": "Tutor support"
+    "teacherSupport": "Teacher support"
   },
   "composer": {
     "attach": "Add a photo or file",
@@ -114,7 +114,7 @@
     "contact": "Contact",
     "dashboard": "Dashboard",
     "forParents": "For parents",
-    "forTutors": "For teachers",
+    "forTeachers": "For teachers",
     "helpRequests": "Teacher requests",
     "home": "Home",
     "howItWorks": "How it works",
@@ -152,7 +152,7 @@
     "support": "Support",
     "supportInbox": "Support inbox",
     "terms": "Terms",
-    "tutors": "Teachers",
+    "teachers": "Teachers",
     "users": "Students"
   },
   "nextStep": "Recommended next step",
@@ -174,7 +174,7 @@
     "loading": "Loading notifications...",
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} unread",
-    "subtitle": "Updates about your questions, practice, and tutor requests.",
+    "subtitle": "Updates about your questions, practice, and teacher requests.",
     "title": "Notifications",
     "unavailable": "Notifications are unavailable.",
     "unread": "{{count}} unread"
@@ -195,8 +195,7 @@
     "school_teacher": "School teacher",
     "school_viewer": "School viewer",
     "student": "Student",
-    "teacher": "Teacher",
-    "tutor": "Teacher"
+    "teacher": "Teacher"
   },
   "routes": {
     "accountOperations": {

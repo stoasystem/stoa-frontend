@@ -20,7 +20,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { TutorProfile } from '@/types/tutor'
 
 export function TutorProfilePage() {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
   const profileQuery = useTutorProfileQuery()
   const profile = profileQuery.data
 
@@ -49,7 +49,7 @@ export function TutorProfilePage() {
 }
 
 function IdentityCard({ profile }: { profile: TutorProfile }) {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
 
   return (
     <Card className="border-primary/15 bg-[linear-gradient(135deg,hsl(var(--stoa-brand-card))_0%,hsl(var(--stoa-brand-burgundy-soft)_/_0.42)_100%)] shadow-[var(--platform-shadow-soft)]">
@@ -75,7 +75,7 @@ function IdentityCard({ profile }: { profile: TutorProfile }) {
 }
 
 function StatusCard({ profile }: { profile: TutorProfile }) {
-  const { t, i18n } = useTranslation('tutor')
+  const { t, i18n } = useTranslation('teacher')
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)]">
@@ -111,7 +111,7 @@ function StatusCard({ profile }: { profile: TutorProfile }) {
 }
 
 function CoverageCard({ profile }: { profile: TutorProfile }) {
-  const { t, i18n } = useTranslation('tutor')
+  const { t, i18n } = useTranslation('teacher')
 
   return (
     <Card className="border-border/70 bg-card/90 shadow-[var(--platform-shadow-card)] lg:col-span-2">

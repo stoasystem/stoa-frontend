@@ -34,7 +34,7 @@ const statusActionKey: Record<string, string> = {
 
 export function TutorHelpRequestDetailPage() {
   const { t } = useTranslation('practice')
-  const { t: tTutor } = useTranslation('tutor')
+  const { t: tTutor } = useTranslation('teacher')
   const { requestId } = useParams()
   const [resolutionNote, setResolutionNote] = useState('')
   const requestQuery = useTutorHelpRequestDetailQuery(requestId)
@@ -82,12 +82,12 @@ export function TutorHelpRequestDetailPage() {
             />
             <AiTeacherToolsPanel request={requestQuery.data} />
             <CurriculumRolloutPanel
-              title={t('curriculumRollout.tutorTitle')}
-              description={t('curriculumRollout.tutorDescription')}
+              title={t('curriculumRollout.teacherTitle')}
+              description={t('curriculumRollout.teacherDescription')}
               catalog={curriculumQuery.data}
               isLoading={curriculumQuery.isLoading}
               isError={curriculumQuery.isError}
-              contextLabel={t('curriculumRollout.tutorContext')}
+              contextLabel={t('curriculumRollout.teacherContext')}
             />
             <div className="rounded-lg border p-4">
               <label className="text-sm font-medium" htmlFor="resolution-note">

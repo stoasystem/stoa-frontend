@@ -627,9 +627,9 @@ function TeacherTextSupportCard() {
   return (
     <section className="px-4 pb-3 md:px-6" aria-live="polite">
       <div className="mx-auto max-w-3xl rounded-lg border border-primary/15 bg-card p-4 shadow-[var(--platform-shadow-soft)]">
-        <p className="brand-section-kicker">{t('tutorSupport')}</p>
-        <h2 className="mt-2 text-lg font-semibold">{t('tutorEscalation.requestedTitle')}</h2>
-        <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('tutorEscalation.requestedBody')}</p>
+        <p className="brand-section-kicker">{t('teacherSupport')}</p>
+        <h2 className="mt-2 text-lg font-semibold">{t('teacherEscalation.requestedTitle')}</h2>
+        <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('teacherEscalation.requestedBody')}</p>
       </div>
     </section>
   )

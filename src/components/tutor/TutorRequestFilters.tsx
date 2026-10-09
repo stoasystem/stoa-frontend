@@ -14,7 +14,7 @@ export function TutorRequestFilters({
   value: TutorRequestFilter
   onChange: (value: TutorRequestFilter) => void
 }) {
-  const { t } = useTranslation('tutor')
+  const { t } = useTranslation('teacher')
   const options = filterValues.map((option) => ({
     value: option,
     label: option === 'all' ? t('requests.all') : t(`common:status.teacherHelp.${option}`),
