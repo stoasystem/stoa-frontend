@@ -49,7 +49,7 @@ describe('a student with no year group', () => {
     show()
 
     const hint = await screen.findByRole('link', { name: i18n.t('gradeMissingHint', { ns: 'chat' }) })
-    expect(hint).toHaveAttribute('href', '/me')
+    expect(hint).toHaveAttribute('href', '/me#me-grade')
   })
 
   it('has the composer point at it, so a screen reader hears it on the field', async () => {

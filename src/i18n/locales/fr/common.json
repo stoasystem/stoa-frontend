@@ -70,6 +70,15 @@
     "label": "Langue"
   },
   "me": {
+    "grade": {
+      "heading": "Année scolaire",
+      "hint": "Par exemple « 6e année ». Les explications seront alors mieux adaptées.",
+      "label": "Ton année scolaire",
+      "save": "Enregistrer",
+      "saveFailed": "Ton année scolaire n’a pas été enregistrée. Réessaie.",
+      "saved": "Enregistré.",
+      "unavailable": "Ton année scolaire ne peut pas être chargée pour le moment."
+    },
     "language": {
       "heading": "Langue"
     },
