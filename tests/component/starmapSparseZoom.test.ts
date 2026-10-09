@@ -137,3 +137,54 @@ describe('what the pointer says', () => {
     expect(engine.cursorAt(-500, -500)).toBe('')
   })
 })
+
+
+describe('what the sky answers to being pointed at', () => {
+  it('names the star under the pointer, even where nothing can be dragged', () => {
+    // Hover only tracked a star close enough to *drag*, and on the panorama
+    // nothing is draggable — so pointing at a star did nothing at all.
+    const { engine } = engineOn(1440, 900)
+    const star = engine.starOnScreen('brueche-u1')!
+
+    engine.hoverAt(star.x, star.y)
+
+    expect(engine.hoveredStarIndex).toBeGreaterThanOrEqual(0)
+  })
+
+  it('lets go once the pointer leaves', () => {
+    const { engine } = engineOn(1440, 900)
+    const star = engine.starOnScreen('brueche-u1')!
+    engine.hoverAt(star.x, star.y)
+
+    engine.hoverAt(null)
+
+    expect(engine.hoveredStarIndex).toBe(-1)
+  })
+})
+
+describe('where a zoom press goes', () => {
+  it('holds the stars where they are instead of walking away from them', () => {
+    // A press zoomed around the middle of the viewport. On a sky whose stars
+    // sit off to one side that is empty space, so each press pushed the
+    // content further towards the edge.
+    const { engine, clock } = engineOn(1440, 900)
+    const middleOfTheStars = () => {
+      const seen = PLACES.map(([unitId]) => engine.starOnScreen(unitId)).filter((p) => p !== null)
+      return {
+        x: seen.reduce((sum, p) => sum + p!.x, 0) / seen.length,
+        y: seen.reduce((sum, p) => sum + p!.y, 0) / seen.length,
+        seen: seen.length,
+      }
+    }
+    const before = middleOfTheStars()
+
+    engine.step('in')
+    clock.advance(1500)
+
+    const after = middleOfTheStars()
+    expect(after.seen, 'every star left the screen').toBeGreaterThan(0)
+    // Zooming around the stars keeps their middle still; zooming around the
+    // viewport's middle moves it by a share of the zoom.
+    expect(Math.hypot(after.x - before.x, after.y - before.y)).toBeLessThan(40)
+  })
+})

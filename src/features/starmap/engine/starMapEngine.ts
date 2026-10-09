@@ -885,6 +885,11 @@ export class StarMapEngine {
     return !(target.layer === 'nebula' && target.nebulaId === nebulaId)
   }
 
+  /** The star the pointer is on, or -1. Named wherever star names can be (#138 B2). */
+  get hoveredStarIndex(): number {
+    return this.hoveredStar
+  }
+
   /** A star is held by the hand now (#136; a touch's long press then must not open a context menu). */
   get holdingStar(): boolean {
     return Boolean(this.grab?.dragging)
@@ -904,10 +909,50 @@ export class StarMapEngine {
     this.zoomBy(-deltaY * ZOOM.wheelPerPx, x, y)
   }
 
-  /** The zoom buttons and keys: ×1.5 in or out around the view's focus point (the chosen star stays put). */
+  /** The zoom buttons and keys: ×1.5 in or out around what is worth looking at. */
   step(direction: 'in' | 'out'): void {
     const log = Math.log2(ZOOM.buttonStep) * (direction === 'in' ? 1 : -1)
-    this.zoomBy(log, this.viewport.width * this.view.fx, this.viewport.height * this.view.fy)
+    const [x, y] = this.zoomAnchor()
+    this.zoomBy(log, x, y)
+  }
+
+  /**
+   * Where a button press zooms towards.
+   *
+   * The focus point is the middle of the viewport, and on a sky whose stars
+   * sit off to one side zooming in walked away from them: two presses and the
+   * content was at the edge. Zooming in goes to the stars — the chosen one, or
+   * the recommended one, or the middle of what is on screen. Zooming out goes
+   * to the focus point, so the view settles back the way it is framed.
+   */
+  private zoomAnchor(): [number, number] {
+    const focus: [number, number] = [this.viewport.width * this.view.fx, this.viewport.height * this.view.fy]
+    if (!this.map || this.viewport.width === 0) return focus
+    const target = this.target
+    const chosen = target.layer === 'star' ? this.stars.findIndex((star) => star.unitId === target.unitId) : -1
+    const beacon = this.scene?.recommendations?.[0]
+    for (const index of [chosen, beacon]) {
+      if (index !== undefined && index >= 0 && this.onScreen(index)) return [this.x[index], this.y[index]]
+    }
+    let sumX = 0
+    let sumY = 0
+    let seen = 0
+    for (let i = 0; i < this.stars.length; i += 1) {
+      if (!this.onScreen(i)) continue
+      sumX += this.x[i]
+      sumY += this.y[i]
+      seen += 1
+    }
+    return seen > 0 ? [sumX / seen, sumY / seen] : focus
+  }
+
+  private onScreen(index: number): boolean {
+    return (
+      this.x[index] >= 0 &&
+      this.x[index] <= this.viewport.width &&
+      this.y[index] >= 0 &&
+      this.y[index] <= this.viewport.height
+    )
   }
 
   /**
@@ -1068,6 +1113,24 @@ export class StarMapEngine {
    * panorama's dots), never during a flight, within the glyph's reach
    * (further for a finger).
    */
+  /** The star the pointer is on, by the same reach a click uses. */
+  private hoverable(x: number, y: number): number {
+    const grabbed = this.grabbable(x, y, 'mouse')
+    if (grabbed >= 0) return grabbed
+    if (!this.map || this.viewport.width === 0) return -1
+    const reach = Math.max(22, this.glyphSize * 0.5)
+    let best = -1
+    let bestDistance = reach
+    for (let i = 0; i < this.stars.length; i += 1) {
+      const distance = Math.hypot(this.x[i] - x, this.y[i] - y)
+      if (distance < bestDistance) {
+        best = i
+        bestDistance = distance
+      }
+    }
+    return best
+  }
+
   private grabbable(x: number, y: number, kind: PointerKind): number {
     if (!this.map || this.viewport.width === 0 || this.transition?.kind === 'zoom') return -1
     if (!this.zoom.pickable || this.starPx() < DRAG.grabFromGlyph) return -1
@@ -1249,7 +1312,10 @@ export class StarMapEngine {
   hoverAt(x: number | null, y = 0) {
     const id = x === null ? null : this.nebulaAt(x, y)
     const next = id ? this.nebulaIndex.get(id) ?? -1 : -1
-    const star = x === null ? -1 : this.grabbable(x, y, 'mouse')
+    // The star under the pointer, not only one close enough to drag: on the
+    // panorama nothing is draggable, so hovering a star did nothing at all
+    // and the sky gave no answer to being pointed at.
+    const star = x === null ? -1 : this.hoverable(x, y)
     if (next === this.hoveredNebula && star === this.hoveredStar) return
     this.hoveredNebula = next
     this.hoveredStar = star
