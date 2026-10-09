@@ -6,7 +6,7 @@
  * nothing was watching. This looks for English prose rendered directly in the
  * screens a signed-in user sees, rather than trusting a sweep by eye.
  *
- * The tutor, parent and admin screens were outside ROOTS until card 002, so
+ * The teacher, parent and admin screens were outside ROOTS until card 002, so
  * their hard-coded English was invisible to this check the whole time.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
@@ -25,7 +25,7 @@ const ROOTS = [
   'src/components/dashboard',
   'src/components/learning',
   'src/components/common',
-  'src/pages/tutor',
+  'src/pages/teacher',
   'src/pages/parent',
   'src/pages/admin',
   // The planet redesign's student screens (#45).

@@ -10,7 +10,7 @@ labels: bug, triage
 ## User Role
 - [ ] Student
 - [ ] Parent
-- [ ] Tutor
+- [ ] Teacher
 - [ ] Admin
 
 ## Page / Route
