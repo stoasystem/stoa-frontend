@@ -80,12 +80,14 @@ tests/         unit · component · smoke（真部署）· release
 
 改到这些区域时先确认状态，别在废弃分支上加功能：
 
-- `backend/` —— SQLite 的 demo 后端（含 `local.db`），与真正的 `stoa-backend` 并存，
-  是契约漂移的来源。**新功能一律写 `stoa-backend`，不要往这里加东西。**
+- ~~`backend/` 的 SQLite demo 后端~~ 已出库（提交 `8db304f`）。本机那个目录下还剩的
+  `.venv` / `__pycache__` / `local.db` 都在 `.gitignore` 里。**新功能一律写 `stoa-backend`。**
 - `.planning/` —— GSD 工具留下的 1051 个文件，占仓库一半以上，最后改动 2026-08-15。
 - `docs/` —— 273 个入库文件，最后改动 2026-07-07，与 `stoa-docs` 职责重叠。
 - `vercel.json` —— 部署实际走 S3 + CloudFront，这个文件是历史遗留。
-- 未挂路由的旧版 student / teacher / parent 页面，以及双首页、双 Mistakes 页实验。
+- ~~未挂路由的旧版 student 页面、双首页、双 Mistakes 页实验~~ 已于 2026-10-09（#54）删除，
+  路由清单里只剩重定向。`src/features/live-classroom/` **故意保留**：Card 020 的决议是
+  「撤回不是删除」，`tests/component/billingFrozen.test.ts` 有断言钉着文件必须在。
 
 `src/stores/`（与 `src/store/` 并存的那个空壳）已经删除，旧文档若还提到它，是旧文档过时。
 
