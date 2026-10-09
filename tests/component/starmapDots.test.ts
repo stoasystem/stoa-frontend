@@ -24,7 +24,7 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { createCanvas2DRenderer, DOT_ALPHA, dotExtent, drawDotMark } from '@/features/starmap/render/canvas2d'
-import { DOT_BOX, DOT_CUT, dotBoxFor, PRESS } from '@/features/starmap/render/glyph'
+import { DOT_BOX, DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, PRESS } from '@/features/starmap/render/glyph'
 import { LOCKED_WEB, lockedWebHint } from '@/features/starmap/render/links'
 import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, skyMap, THEME, type CanvasCounter } from './starmapHarness'
@@ -329,5 +329,25 @@ describe('a pressed star answers before the page does', () => {
     expect(source).toContain('PRESS.alpha')
     expect(source, 'the glyph is drawn without the press').toMatch(/const grow = [^\n]*sunk\(i\)/)
     expect(source, 'the dot is drawn without the press').toMatch(/const size = dotBox \* quiet\.radius \* sunk\(i\)/)
+  })
+})
+
+describe('a locked knowledge point at full glyph size', () => {
+  it.each([
+    ['large', GLYPH_LARGE],
+    ['small', GLYPH_SMALL],
+  ])('is as big as a ready one on the %s cut', (_name, cut) => {
+    // It was half the size and the dimmest mark on the map, while being the
+    // state most points are in — so the sky read as empty at every zoom, not
+    // only on the panorama.
+    expect(cut.locked.ring).toBeCloseTo(cut.ready.ring, 5)
+  })
+
+  it.each([
+    ['large', GLYPH_LARGE],
+    ['small', GLYPH_SMALL],
+  ])('is still told apart from a ready one, by the core, on the %s cut', (_name, cut) => {
+    expect(cut.ready.core).toBeGreaterThan(0)
+    expect('core' in cut.locked).toBe(false)
   })
 })

@@ -17,6 +17,12 @@
  * sky. A locked star opens its prerequisites when tapped, so it is a control
  * and its ring must reach 3:1 (WCAG 1.4.11): 42% gives 3.8:1 on the sky and
  * 3.2:1 on the brightest nebula haze (checked in starmapContrast.test.ts).
+ *
+ * Its ring is the same size as a ready star's. It used to be half of it —
+ * the smallest and the dimmest mark on the map — while being the state most
+ * points are in, which left the whole sky looking empty at every zoom, not
+ * only on the panorama. What tells the two apart is the core: a ready star
+ * has one, a locked star is hollow, the same as the dots say it far out.
  */
 export const LOCKED_RING_ALPHA = 0.42
 
@@ -35,7 +41,7 @@ export const GLYPH_LARGE: GlyphCut = {
   lit: { halo: 46.2, haloAlpha: 0.26, blur: 6, tip: 44, waist: 15, starAlpha: 0.85, ring: 20.9, ringWidth: 1.6, ringAlpha: 0.55, core: 9.2 },
   inProgress: { halo: 52.8, haloAlpha: 0.3, blur: 6, tip: 31.9, waist: 10.8, starAlpha: 0.75, ring: 28.4, ringWidth: 3.5, trackAlpha: 0.16, core: 8.4 },
   ready: { ring: 17.6, ringWidth: 1.6, ringAlpha: 0.55, core: 4.4, coreAlpha: 0.75 },
-  locked: { ring: 9.2, ringWidth: 1.6, ringAlpha: LOCKED_RING_ALPHA },
+  locked: { ring: 17.6, ringWidth: 1.6, ringAlpha: LOCKED_RING_ALPHA },
   recommended: { halo: 44, haloAlpha: 0.14, blur: 6, ring: 34, ringWidth: 1.6, dash: [4.8, 6.4] },
   review: { offset: 21, radius: 5.5, outline: 2 },
 }
@@ -45,7 +51,7 @@ export const GLYPH_SMALL: GlyphCut = {
   lit: { halo: 10.6, haloAlpha: 0.26, blur: 2, tip: 10.1, waist: 3.4, starAlpha: 0.85, ring: 4.8, ringWidth: 0.8, ringAlpha: 0.55, core: 2.1 },
   inProgress: { halo: 12.1, haloAlpha: 0.3, blur: 2, tip: 7.3, waist: 2.5, starAlpha: 0.75, ring: 7.8, ringWidth: 1.5, trackAlpha: 0.16, core: 1.9 },
   ready: { ring: 4, ringWidth: 0.8, ringAlpha: 0.55, core: 1, coreAlpha: 0.75 },
-  locked: { ring: 2.1, ringWidth: 0.8, ringAlpha: LOCKED_RING_ALPHA },
+  locked: { ring: 4, ringWidth: 0.8, ringAlpha: LOCKED_RING_ALPHA },
   recommended: { halo: 10.1, haloAlpha: 0.14, blur: 2, ring: 8.6, ringWidth: 0.8, dash: [2.1, 2.8] },
   review: { offset: 5.6, radius: 1.8, outline: 0.8 },
 }
