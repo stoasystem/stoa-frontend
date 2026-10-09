@@ -94,6 +94,15 @@ export const DOT_CUT: DotCut = {
  */
 export const DOT_BOX = { fromDot: 4, room: 0.45, max: 16 } as const
 
+/**
+ * A pressed star sinks, the way a pressed button does.
+ *
+ * Between the press and the page changing the sky stayed perfectly still,
+ * which reads as a click that did not land. Small on purpose: this says
+ * "heard you", the flight that follows says the rest.
+ */
+export const PRESS = { scale: 0.88, alpha: 1.15 } as const
+
 /** The box a dot is drawn in, CSS px, from the frame's dot radius and glyph box. */
 export function dotBoxFor(dotRadius: number, glyphSize: number): number {
   return Math.max(dotRadius * DOT_BOX.fromDot, Math.min(glyphSize * DOT_BOX.room, DOT_BOX.max))

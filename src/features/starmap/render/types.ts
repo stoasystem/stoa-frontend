@@ -179,6 +179,8 @@ export type SceneFrame = {
   restStarNames?: number
   /** The star under the mouse, or -1 / absent: its name shows wherever star names can (#138 B2). */
   hoveredStar?: number
+  /** The star being pressed, or -1 / absent: it sinks while the press is held. */
+  pressedStar?: number
   /** Nebula names, all of them (a multiplier on `nebulaNames`). */
   nebulaLabelAlpha: number
   /** Each nebula's name by zoom (#134: `nebulaNameAlpha`); absent: 1 for every nebula. */

@@ -188,3 +188,47 @@ describe('where a zoom press goes', () => {
     expect(Math.hypot(after.x - before.x, after.y - before.y)).toBeLessThan(40)
   })
 })
+
+
+describe('what happens when a star is pressed', () => {
+  it('holds the star it was pressed on, and lets go on release', () => {
+    // Between the press and the page changing the sky stayed perfectly still,
+    // which reads as a click that did not land.
+    const { engine } = engineOn(1440, 900)
+    const star = engine.starOnScreen('brueche-u1')!
+
+    engine.pointerDown(1, star.x, star.y)
+    expect(engine.pressedStarIndex).toBeGreaterThanOrEqual(0)
+
+    engine.pointerUp(1, star.x, star.y)
+    expect(engine.pressedStarIndex).toBe(-1)
+  })
+
+  it('lets go when the press wanders off, because that is a pan', () => {
+    const { engine } = engineOn(1440, 900)
+    const star = engine.starOnScreen('brueche-u1')!
+    engine.pointerDown(1, star.x, star.y)
+
+    engine.pointerMove(1, star.x + 400, star.y + 300)
+
+    expect(engine.pressedStarIndex).toBe(-1)
+  })
+
+  it('presses nothing when the press lands on empty sky', () => {
+    const { engine } = engineOn(1440, 900)
+
+    engine.pointerDown(1, 5, 5)
+
+    expect(engine.pressedStarIndex).toBe(-1)
+  })
+
+  it('lets go when the gesture is cancelled', () => {
+    const { engine } = engineOn(1440, 900)
+    const star = engine.starOnScreen('brueche-u1')!
+    engine.pointerDown(1, star.x, star.y)
+
+    engine.pointerCancel(1)
+
+    expect(engine.pressedStarIndex).toBe(-1)
+  })
+})

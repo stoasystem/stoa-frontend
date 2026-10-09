@@ -8,7 +8,7 @@
  * differ star by star, and names placed clear of each other. Stars outside
  * the focus are never drawn one by one, and nothing is blurred per frame.
  */
-import { DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
+import { DOT_CUT, dotBoxFor, GLYPH_LARGE, GLYPH_SMALL, LOCKED_RING_ALPHA, PRESS, SMALL_CUT_BELOW, starPath, type DotCut, type GlyphCut } from '@/features/starmap/render/glyph'
 import { aroundDisc, aroundDiscWide, belongsTo, boxHitsCircle, boxHitsSegment, keyStars, nearerStars, placeInsisting, placeLabel, type Box, type Circle, type Segment } from '@/features/starmap/render/labels'
 import { DRAG, panoramaDot, panoramaLook, ramp, reachFade, REVEAL, type Ramp } from '@/features/starmap/view/semanticZoom'
 import { createTileCache, nebulaStateKeys, tileKey, tileSizeFor, TILE_REACH, type TileCache } from '@/features/starmap/render/nebulaTiles'
@@ -723,6 +723,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
       const kept = (i: number) => (drag && drag.related[i] === 1 ? 1 : (i === frame.focusStar ? 1 : frame.dim) * dragDim)
       /** The dragged star grows a little while it is held. */
       const grown = (i: number) => (drag && drag.star === i ? drag.grow : 1)
+      const pressedStar = frame.pressedStar ?? -1
+      const sunk = (i: number) => (i === pressedStar ? PRESS.scale : 1)
 
       const dotLooks = [STATE_LIT, STATE_IN_PROGRESS, STATE_READY, STATE_LOCKED].map((st) => panoramaDot(DOT[st].lit, look))
       // A dot's box: the engine's, grown toward the glyph box where the map is sparse enough to have room.
@@ -739,8 +741,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         const breathing = breath && breath.index === i
         if (glyphs > 0.01 || beacon) {
           const box = beacon ? beaconSize : frame.glyphSize
-          const alpha = a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus
-          const grow = (breathing ? breath.scale : 1) * grown(i)
+          const alpha = Math.min(1, a * (beacon ? 1 : glyphs) * (breathing ? breath.alpha : 1) * focus * (i === pressedStar ? PRESS.alpha : 1))
+          const grow = (breathing ? breath.scale : 1) * grown(i) * sunk(i)
           for (const [sprites, cut, share] of [[set.small, GLYPH_SMALL, smallOut(box)], [set.large, GLYPH_LARGE, largeIn(box)]] as const) {
             if (share < 0.01) continue
             const sprite = sprites[state[i]]
@@ -752,8 +754,8 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
         if (frame.dotBlend > 0.01 && !beacon) {
           // On the panorama a lit star is a small, dim dot without its glow: the light is its nebula's (#137 A2).
           const quiet = dotLooks[state[i]]
-          const size = dotBox * quiet.radius
-          const alpha = a * frame.dotBlend * focus * quiet.alpha
+          const size = dotBox * quiet.radius * sunk(i)
+          const alpha = Math.min(1, a * frame.dotBlend * focus * quiet.alpha * (i === pressedStar ? PRESS.alpha : 1))
           const at = [x[i] - size / 2, y[i] - size / 2, size, size] as const
           if (quiet.glow >= 0.99 || !DOT[state[i]].glow) {
             ctx.globalAlpha = alpha

@@ -341,6 +341,7 @@ export class StarMapEngine {
   private hoveredNebula = -1
   /** The star under the mouse, where single stars can be picked (#138 B2: its name shows), or -1. */
   private hoveredStar = -1
+  private pressedStar = -1
 
   private visibleKey = ''
   private emittedOnce = false
@@ -716,6 +717,10 @@ export class StarMapEngine {
       // On a star big enough to pick: it may become a drag of it (#136).
       const star = this.grabbable(x, y, kind)
       this.grab = star >= 0 ? { id, star, kind, at: this.now(), dragging: false, hx: x, hy: y, ax: 0, ay: 0 } : null
+      // Pressed, whatever happens next: the sky used to stay perfectly still
+      // between the press and the page changing, which reads as a click that
+      // did not land.
+      this.setPressed(this.hoverable(x, y))
       // A finger is held before it grabs: the frames watch the clock.
       if (this.grab && kind === 'touch') this.invalidate()
     } else if (this.pointers.size === 2) {
@@ -746,6 +751,8 @@ export class StarMapEngine {
   pointerMove(id: number, x: number, y: number): void {
     const pointer = this.pointers.get(id)
     if (!pointer) return
+    // A press that has wandered off its star is a pan, not a press on it.
+    if (this.pressedStar >= 0 && this.hoverable(x, y) !== this.pressedStar) this.setPressed(-1)
     pointer.x = x
     pointer.y = y
     const now = this.now()
@@ -819,6 +826,7 @@ export class StarMapEngine {
 
   pointerUp(id: number, x: number, y: number): void {
     const pinch = this.pinch
+    this.setPressed(-1)
     this.pointers.delete(id)
     if (pinch) {
       if (!pinch.ended) {
@@ -855,6 +863,7 @@ export class StarMapEngine {
   }
 
   pointerCancel(id: number): void {
+    this.setPressed(-1)
     this.pointers.delete(id)
     if (this.pointers.size === 0) this.cancelGestures()
   }
@@ -883,6 +892,17 @@ export class StarMapEngine {
     const target = this.target
     if (!nebulaId) return target.layer === 'star'
     return !(target.layer === 'nebula' && target.nebulaId === nebulaId)
+  }
+
+  /** The star being pressed, or -1: it answers before the page does. */
+  get pressedStarIndex(): number {
+    return this.pressedStar
+  }
+
+  private setPressed(index: number): void {
+    if (index === this.pressedStar) return
+    this.pressedStar = index
+    this.invalidate()
   }
 
   /** The star the pointer is on, or -1. Named wherever star names can be (#138 B2). */
@@ -1574,6 +1594,7 @@ export class StarMapEngine {
       starLabelAlpha: starNameAlpha(starPx),
       restStarNames: restStarNameAlpha(starPx),
       hoveredStar: this.hoveredStar,
+      pressedStar: this.pressedStar,
       starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
       nebulaLabelAlpha: 1,
       nebulaNames: this.nebulaNames,

@@ -24,7 +24,7 @@ import path from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import { createCanvas2DRenderer, DOT_ALPHA, dotExtent, drawDotMark } from '@/features/starmap/render/canvas2d'
-import { DOT_BOX, DOT_CUT, dotBoxFor } from '@/features/starmap/render/glyph'
+import { DOT_BOX, DOT_CUT, dotBoxFor, PRESS } from '@/features/starmap/render/glyph'
 import { LOCKED_WEB, lockedWebHint } from '@/features/starmap/render/links'
 import { STATE_IN_PROGRESS, STATE_LIT, STATE_LOCKED, STATE_READY, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
 import { fakeCanvas, fakeClock, skyMap, THEME, type CanvasCounter } from './starmapHarness'
@@ -305,5 +305,29 @@ describe('D6: skill points stay off the panorama', () => {
     expect(f.dotBlend).toBe(1)
     // Skill dots are drawn only where glyphs are (`glyphs = 1 - dotBlend`); the recommended star is the one glyph.
     expect(1 - f.dotBlend).toBeLessThan(0.01)
+  })
+})
+
+describe('a pressed star answers before the page does', () => {
+  it('draws the pressed star smaller than the others', () => {
+    // The whole point: the sky is not perfectly still between the press and
+    // the flight.
+    expect(PRESS.scale).toBeLessThan(1)
+    expect(PRESS.scale).toBeGreaterThan(0.7)
+  })
+
+  it('does not dim it while it sinks', () => {
+    expect(PRESS.alpha).toBeGreaterThanOrEqual(1)
+  })
+
+  it('is applied to both the glyph and the dot, not only declared', () => {
+    // A constant that exists and is never multiplied in is the same as no
+    // press feedback at all, and reads as done from the outside.
+    const source = readFileSync(path.resolve(__dirname, '../../src/features/starmap/render/canvas2d.ts'), 'utf8')
+
+    expect(source).toContain('PRESS.scale')
+    expect(source).toContain('PRESS.alpha')
+    expect(source, 'the glyph is drawn without the press').toMatch(/const grow = [^\n]*sunk\(i\)/)
+    expect(source, 'the dot is drawn without the press').toMatch(/const size = dotBox \* quiet\.radius \* sunk\(i\)/)
   })
 })
