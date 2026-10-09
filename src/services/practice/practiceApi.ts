@@ -69,8 +69,10 @@ export async function completePracticeLesson(lessonId: string) {
   return response.data
 }
 
-export async function getDueReview() {
-  const response = await httpClient.get<ReviewDueResponse>('/practice/review/due')
+export async function getDueReview(unitId?: string) {
+  const response = await httpClient.get<ReviewDueResponse>('/practice/review/due', {
+    params: unitId ? { unitId } : undefined,
+  })
   return response.data
 }
 

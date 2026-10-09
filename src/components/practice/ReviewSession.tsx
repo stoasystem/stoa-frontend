@@ -17,9 +17,11 @@ import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
 import { useDueReviewQuery } from '@/hooks/practice/useReviewQueries'
 import type { PracticeAnswerResult, ReviewCard } from '@/types/practice'
 
-export function ReviewSession() {
+export function ReviewSession({ unitId }: { unitId?: string } = {}) {
   const { t } = useTranslation('practice')
-  const dueQuery = useDueReviewQuery()
+  // With a knowledge point named, the server selects before it cuts a page,
+  // so what opens here is what its star said was due (stoa-backend#70).
+  const dueQuery = useDueReviewQuery({ unitId })
   const cards = dueQuery.data?.items ?? []
 
   if (dueQuery.isLoading) {

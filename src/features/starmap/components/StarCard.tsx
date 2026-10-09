@@ -185,12 +185,11 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
       )}
 
       {star.reviewDue > 0 && (
-        <div className="flex flex-col gap-1">
-          <Button variant="onSky" size="regular" disabled aria-describedby="starmap-review-soon">
+        <Button asChild variant="onSky" size="regular">
+          <Link to={`/review/${encodeURIComponent(star.unitId)}`}>
             {t('star.review', { count: star.reviewDue })}
-          </Button>
-          <p id="starmap-review-soon" className="m-0 text-[13px] text-[color:var(--on-sky-text-body)]">{t('star.reviewSoon')}</p>
-        </div>
+          </Link>
+        </Button>
       )}
     </>
   )

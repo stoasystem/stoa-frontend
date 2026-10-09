@@ -255,6 +255,9 @@
     "register": {
       "title": "Demander un compte"
     },
+    "review": {
+      "title": "Révision"
+    },
     "support": {
       "title": "Aide et retour"
     },

@@ -213,6 +213,7 @@ const LessonStagePage = lazyPage('LessonStagePage', () => import('@/pages/chapte
 const AskPage = lazyPage('AskPage', () => import('@/pages/ask/AskPage'))
 const MePage = lazyPage('MePage', () => import('@/pages/me/MePage'))
 const StudentAssignmentsPage = lazyPage('StudentAssignmentsPage', () => import('@/pages/learning/StudentAssignmentsPage'))
+const ReviewPage = lazyPage('ReviewPage', () => import('@/pages/review/ReviewPage'))
 
 const ParentDashboardPage = lazyPage('ParentDashboardPage', () => import('@/pages/parent/ParentDashboardPage'))
 const ParentAccountOperationsPage = lazyPage('ParentAccountOperationsPage', () => import('@/pages/parent/ParentAccountOperationsPage'))
@@ -354,6 +355,8 @@ export const pageRoutes: readonly PageRoute[] = [
   },
   // Kept, but out of navigation: reached from the bell (#13 point 3).
   { path: '/assignments', access: STUDENT, page: StudentAssignmentsPage, titleKey: 'routes.assignments.title', meta: { module: 'Learning', status: 'core', purpose: 'Teacher-assigned work, reached from a notification.' } },
+  // One knowledge point's due questions, opened from its star (#48).
+  { path: '/review/:unitId', access: STUDENT, page: ReviewPage, titleKey: 'routes.review.title', meta: { module: 'Learning', status: 'core', purpose: "One knowledge point's review session." } },
 
   // ---- parent ------------------------------------------------------------
   {

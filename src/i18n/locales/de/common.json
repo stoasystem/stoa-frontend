@@ -255,6 +255,9 @@
     "register": {
       "title": "Konto anfragen"
     },
+    "review": {
+      "title": "Wiederholung"
+    },
     "support": {
       "title": "Hilfe und Rückmeldung"
     },

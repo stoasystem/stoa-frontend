@@ -98,15 +98,17 @@ function showCard(map: StarMap, nebulaId: string, unitId: string) {
   act(() => clock.advance(20))
 }
 
-it('says a placeholder star is demo content, with no chapter, and offers review as coming soon', () => {
+it('says a placeholder star is demo content, with no chapter, and opens its review', () => {
   const map = mapFor('math')
   const star = map.stars.find((s) => s.reviewDue > 0 && s.skills.length > 0)!
   expect(demoStarKind(star.unitId)).toBe('placeholder')
   showCard(map, star.nebulaId, star.unitId)
   expect(screen.getByText('Demo · Sample content and progress')).toBeInTheDocument()
   const card = screen.getByRole('article', { name: star.name })
-  expect(within(card).getByRole('button', { name: i18n.t('star.review', { ns: 'starmap', count: star.reviewDue }) })).toBeDisabled()
-  expect(within(card).getByText('Coming soon')).toBeInTheDocument()
+  // The button waited on stoa-backend#70, which now selects a knowledge
+  // point's own cards before it cuts a page.
+  expect(within(card).getByRole('link', { name: i18n.t('star.review', { ns: 'starmap', count: star.reviewDue }) }))
+    .toHaveAttribute('href', `/review/${star.unitId}`)
   expect(within(card).queryByRole('link', { name: 'Open chapter' })).toBeNull()
   expect(within(card).getByRole('heading', { name: 'Skills' })).toBeInTheDocument()
   expect(within(card).queryByRole('progressbar')).toBeNull()

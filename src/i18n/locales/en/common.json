@@ -255,6 +255,9 @@
     "register": {
       "title": "Request an account"
     },
+    "review": {
+      "title": "Review"
+    },
     "support": {
       "title": "Support and feedback"
     },
