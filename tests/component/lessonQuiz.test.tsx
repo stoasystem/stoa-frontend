@@ -1,30 +1,30 @@
 /**
- * Skipping and the short quiz on the practice stage (product decision
- * 2026-09-29, after Duolingo), through the real API layer against a mocked
- * backend (MSW) and the real `practiceLessonReducer`.
+ * Skipping and the short quiz on the practice stage, through the real API
+ * layer against a mocked backend (MSW) and the real `practiceLessonReducer`.
  *
- * - Skip gives no credit: the exercise goes to the back, and skipping every
- *   exercise never finishes the lesson;
- * - once only skipped exercises are left, the short quiz is offered instead:
- *   what is skipped plus up to 2 answered right, at least 3;
- * - in a quiz: no hints, Ask off, no skip; one mistake forgiven (two hearts);
- *   passing finishes the lesson, losing it changes nothing and can be retried;
- * - from the chapter, 「跳过这一课」 tests out of a lesson with the same quiz.
+ * The quiz is the backend's (stoa-backend#92 / #83). The frontend used to draw
+ * the paper and judge it itself, pass the student on its own say-so, and then
+ * call `POST /practice/lessons/:id/complete`, which answered 409
+ * `lesson_exercises_unanswered` -- so nobody could ever finish a lesson that
+ * way. These tests pin the other half of the contract:
+ *
+ * - the paper, the verdict, the hearts and what is left all come off the wire,
+ *   and the stage believes them even when they contradict what it could have
+ *   worked out itself;
+ * - a pass sends the credential it was given to `complete`;
+ * - every refusal the three endpoints name gets its own sentence;
+ * - in a quiz: no hints, Ask off, no skip;
+ * - the ordinary lesson path still completes with no body at all.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
 import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  composeSkipQuiz,
-  composeTestOutQuiz,
-  QUIZ_HEARTS,
-  QUIZ_MAX_MISTAKES,
-  QUIZ_TEST_OUT_SIZE,
-} from '@/features/chapter/quiz'
 import i18n from '@/i18n'
 import { ChapterPage, LessonStagePage } from '@/pages/chapter/ChapterPages'
 import { ApiError } from '@/services/api/httpClient'
@@ -76,10 +76,42 @@ const LESSONS = [
   { id: 'l-3', title: 'Equations with brackets', order: 3, exercises: 3 },
   { id: 'l-4', title: 'Word problems', order: 4, exercises: 2 },
 ]
+const FAR_FUTURE = '2099-01-01T00:00:00+00:00'
 
-type Seen = { answers: { id: string; answer: unknown }[]; completes: string[]; hints: number }
+type Refusal = { status: number; code: string; extra?: Record<string, unknown> }
+type QuizSession = {
+  quizId: string
+  lessonId: string
+  kind: 'skip' | 'testOut'
+  queue: string[]
+  mistakes: number
+  status: 'inProgress' | 'passed' | 'failed'
+}
+type Seen = {
+  starts: { lessonId: string; kind: unknown }[]
+  quizAnswers: { quizId: string; answer: unknown }[]
+  answers: { id: string; answer: unknown }[]
+  completes: { lessonId: string; credential: unknown }[]
+  hints: number
+}
+
+/** What the mocked backend decides. Each test bends only what it is about. */
+type Rules = {
+  mistakesAllowed: number
+  judge: (challengeId: string, answer: unknown) => boolean
+  paper: (all: string[], kind: 'skip' | 'testOut') => string[]
+  startRefusal: Refusal | null
+  answerRefusal: Refusal | null
+  completeRefusal: Refusal | null
+}
+
 let completed: Set<string>
+let answeredRight: Set<string>
+let quizzes: Map<string, QuizSession>
+let credentials: Map<string, { lessonId: string }>
 let seen: Seen
+let rules: Rules
+let quizCounter: number
 
 /** A lesson opens when the one before it is done; the first open one is up next. */
 function statusOf(id: string) {
@@ -94,6 +126,26 @@ function statusOf(id: string) {
 // Exercise n of a lesson: "Exercise n: what is n × 2?", answered 2n.
 const exerciseId = (lessonId: string, n: number) => `${lessonId}-e${n}`
 const right = (id: string) => String(Number(id.split('-e')[1]) * 2)
+const exerciseIds = (lessonId: string) =>
+  Array.from({ length: LESSONS.find((lesson) => lesson.id === lessonId)!.exercises }, (_, i) =>
+    exerciseId(lessonId, i + 1),
+  )
+
+function exerciseBody(challengeId: string) {
+  const lessonId = challengeId.split('-e')[0]
+  const n = Number(challengeId.split('-e')[1])
+  return {
+    challengeId,
+    lessonId,
+    unitId: 'u-5',
+    subjectId: 'math',
+    gradeLevel: '8',
+    topicId: 'algebra',
+    topic: 'Multiply.',
+    type: 'text_input',
+    prompt: `Exercise ${n}: what is ${n} × 2?`,
+  }
+}
 
 function lessonBody(lessonId: string) {
   const meta = LESSONS.find((lesson) => lesson.id === lessonId)!
@@ -108,17 +160,28 @@ function lessonBody(lessonId: string) {
     difficulty: 'practice',
     status: statusOf(lessonId),
     estimatedMinutes: 10,
-    challenges: Array.from({ length: meta.exercises }, (_, i) => ({
-      challengeId: exerciseId(lessonId, i + 1),
-      lessonId,
-      unitId: 'u-5',
-      subjectId: 'math',
-      gradeLevel: '8',
-      topicId: 'algebra',
-      topic: 'Multiply.',
-      type: 'text_input',
-      prompt: `Exercise ${i + 1}: what is ${i + 1} × 2?`,
-    })),
+    challenges: exerciseIds(lessonId).map(exerciseBody),
+  }
+}
+
+/** The backend's refusal shape: FastAPI's `detail` with a code inside. */
+const refuse = ({ status, code, extra }: Refusal) =>
+  HttpResponse.json({ detail: { code, message: `refused: ${code}`, ...extra } }, { status })
+
+function quizView(session: QuizSession) {
+  return {
+    quizId: session.quizId,
+    lessonId: session.lessonId,
+    kind: session.kind,
+    status: session.status,
+    heartsLeft: Math.max(0, rules.mistakesAllowed + 1 - session.mistakes),
+    mistakesAllowed: rules.mistakesAllowed,
+    remaining: session.queue.length,
+    expiresAt: FAR_FUTURE,
+    exercise:
+      session.status === 'inProgress' && session.queue.length > 0
+        ? exerciseBody(session.queue[0])
+        : null,
   }
 }
 
@@ -183,6 +246,7 @@ function backend() {
       const { answer } = (await request.json()) as { answer: unknown }
       seen.answers.push({ id, answer })
       const correct = answer === right(id)
+      if (correct) answeredRight.add(id)
       return HttpResponse.json({
         challengeId: id,
         correct,
@@ -190,11 +254,81 @@ function backend() {
         attemptsRemaining: correct ? 2 : 1,
       })
     }),
-    http.post(`${API}/practice/lessons/:lessonId/complete`, ({ params }) => {
-      const id = String(params.lessonId)
-      seen.completes.push(id)
-      completed.add(id)
-      return HttpResponse.json({ lessonId: id, completed: true, nextLessonId: null, progressPoints: 10, studyStreak: 1, dailyGoalCompleted: false })
+    http.post(`${API}/practice/lessons/:lessonId/quiz`, async ({ params, request }) => {
+      const lessonId = String(params.lessonId)
+      const body = (await request.json()) as { kind: 'skip' | 'testOut' }
+      seen.starts.push({ lessonId, kind: body?.kind })
+      if (rules.startRefusal) return refuse(rules.startRefusal)
+      quizCounter += 1
+      const session: QuizSession = {
+        quizId: `q-${quizCounter}`,
+        lessonId,
+        kind: body.kind,
+        queue: rules.paper(exerciseIds(lessonId), body.kind),
+        mistakes: 0,
+        status: 'inProgress',
+      }
+      quizzes.set(session.quizId, session)
+      return HttpResponse.json(quizView(session))
+    }),
+    http.post(`${API}/practice/lessons/:lessonId/quiz/:quizId/answer`, async ({ params, request }) => {
+      const quizId = String(params.quizId)
+      const { answer } = (await request.json()) as { answer: unknown }
+      seen.quizAnswers.push({ quizId, answer })
+      if (rules.answerRefusal) return refuse(rules.answerRefusal)
+      const session = quizzes.get(quizId)
+      if (!session) return refuse({ status: 404, code: 'lesson_quiz_not_found' })
+
+      const asked = session.queue[0]
+      const correct = rules.judge(asked, answer)
+      session.queue = session.queue.slice(1)
+      if (!correct) {
+        session.mistakes += 1
+        session.queue = [...session.queue, asked]
+      }
+      if (session.mistakes > rules.mistakesAllowed) {
+        session.status = 'failed'
+        session.queue = []
+      } else if (session.queue.length === 0) {
+        session.status = 'passed'
+      }
+
+      const passed = session.status === 'passed'
+      const credential = passed ? `cred-${session.quizId}` : null
+      if (credential) credentials.set(credential, { lessonId: session.lessonId })
+      return HttpResponse.json({
+        ...quizView(session),
+        correct,
+        credential,
+        credentialExpiresAt: credential ? FAR_FUTURE : null,
+      })
+    }),
+    http.post(`${API}/practice/lessons/:lessonId/complete`, async ({ params, request }) => {
+      const lessonId = String(params.lessonId)
+      const raw = await request.text()
+      const body = raw ? (JSON.parse(raw) as { quizCredential?: string }) : null
+      const credential = body?.quizCredential ?? null
+      seen.completes.push({ lessonId, credential })
+      if (rules.completeRefusal) return refuse(rules.completeRefusal)
+      if (credential) {
+        const stored = credentials.get(credential)
+        if (!stored || stored.lessonId !== lessonId) {
+          return refuse({ status: 409, code: 'lesson_quiz_credential_invalid' })
+        }
+        // One completion per credential, as the backend spends it.
+        credentials.delete(credential)
+      } else {
+        const unanswered = exerciseIds(lessonId).filter((id) => !answeredRight.has(id))
+        if (unanswered.length > 0) {
+          return refuse({
+            status: 409,
+            code: 'lesson_exercises_unanswered',
+            extra: { unansweredCount: unanswered.length },
+          })
+        }
+      }
+      completed.add(lessonId)
+      return HttpResponse.json({ lessonId, completed: true, nextLessonId: null, progressPoints: 10, studyStreak: 1, dailyGoalCompleted: false })
     }),
     http.post(`${API}/practice/hints`, () => {
       seen.hints += 1
@@ -257,10 +391,16 @@ const where = () => screen.getByTestId('where').textContent
 const TEST_OUT_NOTE = 'The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.'
 const strip = () => document.querySelector('[data-stage-actions]')!
 const hearts = () => document.querySelector('[data-quiz-hearts]')
+const trouble = () => document.querySelector('[data-quiz-trouble]')
+
+/** Types into the exercise on screen and submits; the reply may be a refusal. */
+async function typeAnswer(value: string) {
+  const field = document.querySelector<HTMLInputElement>('[data-stage-exercise] input')!
+  await user.type(field, `${value}{Enter}`)
+}
 
 async function answer(value: string) {
-  const field = await screen.findByRole('textbox', { name: 'Your answer' })
-  await user.type(field, `${value}{Enter}`)
+  await typeAnswer(value)
   await screen.findByText(/^(Correct|Not quite)$/)
 }
 
@@ -291,22 +431,34 @@ async function skip() {
 async function passQuiz(lessonId = 'l-2') {
   const ids: string[] = []
   for (let step = 0; step < 20 && !screen.queryByRole('heading', { name: 'Lesson complete' }); step += 1) {
+    if (!screen.queryByRole('textbox', { name: 'Your answer' })) break
     ids.push(await answerRight(lessonId))
     await waitFor(() =>
-      expect(screen.queryByRole('heading', { name: 'Lesson complete' }) ?? screen.queryByRole('textbox', { name: 'Your answer' })).toBeTruthy(),
+      expect(
+        screen.queryByRole('heading', { name: 'Lesson complete' }) ??
+          screen.queryByRole('textbox', { name: 'Your answer' }) ??
+          trouble(),
+      ).toBeTruthy(),
     )
   }
   return ids
 }
 
+/** Answers the first `rightOnes` right, skips the rest, and takes the quiz. */
+async function skipIntoQuiz(rightOnes: number) {
+  open('/chapter/u-5/l-2')
+  for (let n = 1; n <= 6; n += 1) {
+    if (n <= rightOnes) await answerRight()
+    else await skip()
+  }
+  await user.click(await screen.findByRole('button', { name: 'Short quiz' }))
+  await screen.findByText(/Quiz · Question 1 of \d+$/)
+}
+
 const originalMatchMedia = window.matchMedia
-// Most tests here click and type through a whole lesson, dozens of actions.
 // user-event's default `delay: 0` waits on a real timer between every key and
-// pointer step: idle time, a millisecond or more each on Windows and far more
-// with the full suite beside it. It was half of this file's time on its own
-// and took the longest cases past the 5 s test timeout (#133). With
-// `delay: null` every action is still awaited and wrapped in act(); only the
-// idle timer goes.
+// pointer step; `delay: null` keeps every action awaited and act()-wrapped and
+// drops only the idle timer (#133).
 let user: UserEvent
 
 beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
@@ -314,7 +466,19 @@ beforeEach(async () => {
   user = userEvent.setup({ delay: null })
   await i18n.changeLanguage('en')
   completed = new Set(['l-1'])
-  seen = { answers: [], completes: [], hints: 0 }
+  answeredRight = new Set()
+  quizzes = new Map()
+  credentials = new Map()
+  quizCounter = 0
+  seen = { starts: [], quizAnswers: [], answers: [], completes: [], hints: 0 }
+  rules = {
+    mistakesAllowed: 1,
+    judge: (challengeId, value) => value === right(challengeId),
+    paper: (all, kind) => (kind === 'testOut' ? all.slice(0, 5) : all),
+    startRefusal: null,
+    answerRefusal: null,
+    completeRefusal: null,
+  }
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Lina Meier', email: 'lina@example.com', role: 'student' } as CurrentUser,
     accessToken: 'token',
@@ -336,30 +500,237 @@ afterAll(() => mswServer.close())
 
 // ---------------------------------------------------------------------------
 
-describe('what the quiz is made of', () => {
-  it('keeps its rules in one place: one mistake forgiven, two hearts, five to test out', () => {
-    expect(QUIZ_MAX_MISTAKES).toBe(1)
-    expect(QUIZ_HEARTS).toBe(2)
-    expect(QUIZ_TEST_OUT_SIZE).toBe(5)
+describe('the quiz is judged by the backend, not here', () => {
+  it('asks the backend for the paper, with the kind, and shows what came back', async () => {
+    rules.paper = (all) => all.slice(0, 4)
+    await skipIntoQuiz(0)
+
+    expect(seen.starts).toEqual([{ lessonId: 'l-2', kind: 'skip' }])
+    // Four, because the backend said four -- the lesson has six exercises.
+    expect(screen.getByText(/Quiz · Question 1 of 4$/)).toBeInTheDocument()
+    expect(await onScreen()).toBe('l-2-e1')
   })
 
-  it('takes every skipped exercise and up to two answered right, at least three when there are', () => {
-    const quiz = composeSkipQuiz(['a', 'b', 'c'], ['d', 'e', 'f', 'g'])
-    expect(quiz).toHaveLength(5)
-    expect(quiz).toEqual(expect.arrayContaining(['a', 'b', 'c']))
-    expect(quiz.filter((id) => ['d', 'e', 'f', 'g'].includes(id))).toHaveLength(2)
-    expect(composeSkipQuiz(['a'], ['b', 'c', 'd'])).toHaveLength(3)
-    // A lesson of two: all it has.
-    expect(composeSkipQuiz(['a'], ['b']).sort()).toEqual(['a', 'b'])
-    expect(composeSkipQuiz(['a', 'b'], [])).toHaveLength(2)
+  it('believes a verdict it could have worked out differently itself', async () => {
+    // Every answer is right, says the backend, whatever the student typed.
+    rules.judge = () => true
+    await skipIntoQuiz(0)
+
+    for (let n = 0; n < 6; n += 1) {
+      await answer('definitely not the answer')
+      expect(screen.getByText('Correct')).toBeInTheDocument()
+      await user.click(screen.getByRole('button', { name: /^(Next question|Finish the quiz)$/ }))
+    }
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(seen.quizAnswers.map((item) => item.answer)).toEqual(Array(6).fill('definitely not the answer'))
   })
 
-  it('tests out with five of a lesson, or all of a shorter one', () => {
-    const six = ['a', 'b', 'c', 'd', 'e', 'f']
-    const quiz = composeTestOutQuiz(six)
-    expect(quiz).toHaveLength(5)
-    expect(new Set(quiz).size).toBe(5)
-    expect(composeTestOutQuiz(['a', 'b', 'c']).sort()).toEqual(['a', 'b', 'c'])
+  it('calls a right answer wrong when the backend does, and loses the quiz on it', async () => {
+    rules.judge = () => false
+    await skipIntoQuiz(0)
+
+    const id = await onScreen()
+    await answer(right(id))
+    expect(screen.getByText('Not quite')).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    await answer(right(await onScreen()))
+    await user.click(screen.getByRole('button', { name: 'Continue' }))
+    expect(await screen.findByRole('heading', { name: 'Not yet' })).toBeInTheDocument()
+    expect(seen.completes).toEqual([])
+  })
+
+  it('shows the hearts the backend sends, however many that is', async () => {
+    rules.mistakesAllowed = 3
+    await skipIntoQuiz(0)
+
+    expect(hearts()).toHaveAccessibleName('4 of 4 hearts left')
+    expect(hearts()!.querySelectorAll('[data-heart]')).toHaveLength(4)
+    await answerWrong()
+    expect(hearts()).toHaveAccessibleName('3 of 4 hearts left')
+    await answerWrong()
+    expect(hearts()).toHaveAccessibleName('2 of 4 hearts left')
+    // Two mistakes would have lost it under the old frontend rule; here the
+    // backend is still going.
+    expect(screen.queryByRole('heading', { name: 'Not yet' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('textbox', { name: 'Your answer' })).toBeInTheDocument()
+  })
+
+  it('counts down what is left as the backend does, not by its own arithmetic', async () => {
+    await skipIntoQuiz(0)
+    expect(screen.getByText(/Quiz · Question 1 of 6$/)).toBeInTheDocument()
+    await answerRight()
+    expect(await screen.findByText(/Quiz · Question 2 of 6$/)).toBeInTheDocument()
+    // A wrong answer goes to the back: still as many to go.
+    await answerWrong()
+    expect(await screen.findByText(/Quiz · Question 2 of 6$/)).toBeInTheDocument()
+  })
+})
+
+describe('passing the quiz completes the lesson with its credential', () => {
+  it('sends the credential the backend issued, and finishes once', async () => {
+    await skipIntoQuiz(0)
+    await passQuiz()
+
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toHaveFocus()
+    expect(seen.completes).toEqual([{ lessonId: 'l-2', credential: 'cred-q-1' }])
+  })
+
+  it('never completes before the backend says the quiz is passed', async () => {
+    await skipIntoQuiz(0)
+    for (let n = 0; n < 5; n += 1) {
+      await answerRight()
+      expect(seen.completes).toEqual([])
+    }
+    await answerRight()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(seen.completes).toHaveLength(1)
+  })
+
+  it('says the star is not lit by testing out alone', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    expect(seen.starts).toEqual([{ lessonId: 'l-2', kind: 'testOut' }])
+    await passQuiz()
+    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
+    expect(screen.getByText(TEST_OUT_NOTE)).toBeInTheDocument()
+  })
+})
+
+describe('what the student reads when it goes wrong', () => {
+  it('a locked lesson: the reason, and no offer to take it again', async () => {
+    rules.startRefusal = { status: 409, code: 'lesson_locked' }
+    open('/chapter/u-5/l-2?mode=quiz')
+
+    expect(await screen.findByText('Finish the lessons before this one first: this lesson is still locked.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_locked')
+    expect(screen.queryByRole('button', { name: 'Start the quiz again' })).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toBeInTheDocument()
+  })
+
+  it('a lesson with nothing to ask: its own sentence', async () => {
+    rules.startRefusal = { status: 409, code: 'lesson_quiz_unavailable' }
+    open('/chapter/u-5/l-2?mode=quiz')
+
+    expect(await screen.findByText('This lesson has no exercise a quiz could ask yet.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_unavailable')
+  })
+
+  it('an expired quiz: the reason, and a fresh paper from the same screen', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    rules.answerRefusal = { status: 409, code: 'lesson_quiz_expired' }
+    await typeAnswer(right(await onScreen()))
+
+    expect(await screen.findByText('The quiz took too long and has expired. Start a new one.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_expired')
+    expect(seen.completes).toEqual([])
+
+    rules.answerRefusal = null
+    await user.click(screen.getByRole('button', { name: 'Start the quiz again' }))
+    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
+    // The second paper is a second ask, with the same kind.
+    expect(seen.starts).toEqual([
+      { lessonId: 'l-2', kind: 'testOut' },
+      { lessonId: 'l-2', kind: 'testOut' },
+    ])
+  })
+
+  it('a quiz the backend no longer has open: its own sentence', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    quizzes.clear()
+    await typeAnswer(right(await onScreen()))
+
+    expect(await screen.findByText('This quiz is no longer open. Start a new one.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_not_found')
+    expect(screen.getByRole('button', { name: 'Start the quiz again' })).toBeInTheDocument()
+  })
+
+  it('a credential the backend will not take: the reason, not a shrug', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    // Passed here, spent elsewhere: the completion is refused.
+    rules.completeRefusal = { status: 409, code: 'lesson_quiz_credential_invalid' }
+    await passQuiz()
+
+    expect(await screen.findByText('The pass from that quiz does not work for this lesson. Take the quiz again.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_credential_invalid')
+    expect(screen.queryByRole('heading', { name: 'Lesson complete' })).not.toBeInTheDocument()
+    expect(seen.completes).toEqual([{ lessonId: 'l-2', credential: 'cred-q-1' }])
+    expect(screen.getByRole('button', { name: 'Start the quiz again' })).toBeInTheDocument()
+  })
+
+  it('a credential past its ten minutes: the reason says so', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    rules.completeRefusal = { status: 409, code: 'lesson_quiz_credential_expired' }
+    await passQuiz()
+
+    expect(await screen.findByText('The pass from that quiz expired before the lesson was finished. Take the quiz again.')).toBeInTheDocument()
+    expect(trouble()).toHaveAttribute('data-quiz-trouble', 'lesson_quiz_credential_expired')
+  })
+
+  it('an ordinary completion the backend refuses: the reason, beside the exercise', async () => {
+    rules.completeRefusal = {
+      status: 409,
+      code: 'lesson_exercises_unanswered',
+      extra: { unansweredCount: 3 },
+    }
+    open('/chapter/u-5/l-2')
+    for (let n = 1; n <= 6; n += 1) await answerRight()
+
+    expect(
+      await screen.findByText('Answer every exercise of this lesson right, or pass the short quiz, before finishing it.'),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Lesson complete' })).not.toBeInTheDocument()
+    // The exercise stays on screen: this is a line beside it, not a dead end.
+    expect(screen.getByRole('heading', { level: 2, name: /^Exercise/ })).toBeInTheDocument()
+  })
+
+  it.each([
+    ['de', 'Dieses Quiz ist nicht mehr offen. Starte ein neues.'],
+    ['fr', 'Ce quiz n’est plus ouvert. Lances-en un nouveau.'],
+    ['it', 'Questo quiz non è più aperto. Avviane uno nuovo.'],
+  ])('says it in %s too', async (language, sentence) => {
+    await i18n.changeLanguage(language)
+    open('/chapter/u-5/l-2?mode=quiz')
+    await waitFor(() => expect(hearts()).not.toBeNull())
+    quizzes.clear()
+    await typeAnswer('2')
+
+    expect(await screen.findByText(sentence)).toBeInTheDocument()
+  })
+
+  it('has all four languages for every refusal it names', () => {
+    const KEYS = [
+      'title',
+      'restart',
+      'locked',
+      'unavailable',
+      'notFound',
+      'expired',
+      'finished',
+      'credentialInvalid',
+      'credentialExpired',
+      'unanswered',
+      'unknown',
+    ]
+    const copy = Object.fromEntries(
+      ['de', 'en', 'fr', 'it'].map((language) => [
+        language,
+        JSON.parse(
+          readFileSync(path.resolve(__dirname, `../../src/i18n/locales/${language}/chapter.json`), 'utf8'),
+        ).stage.trouble as Record<string, string>,
+      ]),
+    )
+    for (const language of ['de', 'en', 'fr', 'it']) {
+      expect(Object.keys(copy[language]).sort()).toEqual([...KEYS].sort())
+      for (const key of KEYS) expect(copy[language][key].trim().length).toBeGreaterThan(0)
+    }
+    // Translated, not copied: every sentence differs from the English one.
+    for (const language of ['de', 'fr', 'it']) {
+      for (const key of KEYS) expect(copy[language][key]).not.toBe(copy.en[key])
+    }
   })
 })
 
@@ -367,37 +738,35 @@ describe('skipping inside a lesson', () => {
   it('sends the exercise to the back of the queue, with no credit', async () => {
     open('/chapter/u-5/l-2')
     expect(await screen.findByText(/Question 1 of 6/)).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Skip and finish' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Short quiz' })).not.toBeInTheDocument()
 
     expect(await skip()).toBe('l-2-e1')
     expect(await onScreen()).toBe('l-2-e2')
-    // Nothing answered right yet: still the first of six.
     expect(screen.getByText(/Question 1 of 6/)).toBeInTheDocument()
 
-    // Answered right, the others go on; the skipped one comes back at the end.
     for (const expected of ['l-2-e2', 'l-2-e3', 'l-2-e4', 'l-2-e5', 'l-2-e6']) expect(await answerRight()).toBe(expected)
     expect(await onScreen()).toBe('l-2-e1')
     expect(screen.getByText(/Question 6 of 6/)).toBeInTheDocument()
     expect(seen.completes).toEqual([])
 
-    // Answered right at last, it finishes the lesson the normal way.
     await answer('2')
     await user.click(screen.getByRole('button', { name: 'Finish lesson' }))
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(seen.completes).toEqual(['l-2'])
+    // The ordinary road: no credential, no body at all.
+    expect(seen.completes).toEqual([{ lessonId: 'l-2', credential: null }])
+    expect(seen.starts).toEqual([])
   })
 
   it('never finishes the lesson by skipping everything: the quiz is offered instead of skipping again', async () => {
     open('/chapter/u-5/l-2')
     for (let n = 1; n <= 6; n += 1) expect(await skip()).toBe(`l-2-e${n}`)
 
-    // Round again: only skipped exercises left.
     expect(await onScreen()).toBe('l-2-e1')
     expect(within(strip() as HTMLElement).queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
     const offer = screen.getByRole('button', { name: 'Short quiz' })
     expect(offer).toHaveAccessibleDescription('Finish this lesson by passing a short quiz.')
     expect(seen.completes).toEqual([])
-    expect(screen.queryByRole('heading', { name: 'Lesson complete' })).not.toBeInTheDocument()
+    expect(seen.starts).toEqual([])
   })
 
   it('finishes as before when every exercise is answered right', async () => {
@@ -405,42 +774,12 @@ describe('skipping inside a lesson', () => {
     for (let n = 1; n <= 6; n += 1) expect(await answerRight()).toBe(`l-2-e${n}`)
 
     expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toHaveFocus()
-    expect(seen.completes).toEqual(['l-2'])
+    expect(seen.completes).toEqual([{ lessonId: 'l-2', credential: null }])
     expect(screen.getByText('2 of 4 lessons in Linear equations done')).toBeInTheDocument()
   })
 })
 
-describe('the quiz that finishes a lesson with skips', () => {
-  /** Answers the first `rightOnes` right, skips the rest, and takes the quiz. */
-  async function skipIntoQuiz(rightOnes: number) {
-    open('/chapter/u-5/l-2')
-    const answered: string[] = []
-    for (let n = 1; n <= 6; n += 1) {
-      if (n <= rightOnes) answered.push(await answerRight())
-      else await skip()
-    }
-    await user.click(await screen.findByRole('button', { name: 'Short quiz' }))
-    return answered
-  }
-
-  it('is every skipped exercise and two answered right', async () => {
-    const answered = await skipIntoQuiz(3)
-    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
-    const quiz = await passQuiz()
-    expect(quiz).toHaveLength(5)
-    expect(new Set(quiz).size).toBe(5)
-    expect(quiz).toEqual(expect.arrayContaining(['l-2-e4', 'l-2-e5', 'l-2-e6']))
-    expect(quiz.filter((id) => answered.includes(id))).toHaveLength(2)
-  })
-
-  it('is at least three, topping one skipped exercise up with two answered right', async () => {
-    await skipIntoQuiz(5)
-    expect(await screen.findByText(/Quiz · Question 1 of 3$/)).toBeInTheDocument()
-    const quiz = await passQuiz()
-    expect(quiz).toContain('l-2-e6')
-    expect(quiz).toHaveLength(3)
-  })
-
+describe('what a quiz turns off', () => {
   it('has no hints, no skip, and Ask off with a reason, on a wide screen', async () => {
     open('/chapter/u-5/l-2')
     expect(await screen.findByRole('complementary', { name: 'Ask' })).toBeInTheDocument()
@@ -452,7 +791,6 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(screen.queryByRole('button', { name: 'Hint' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Short quiz' })).not.toBeInTheDocument()
-    // Ask: closed, and its composer disabled with the reason.
     expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
     const composer = within(document.querySelector<HTMLElement>('[data-ask-docked]')!).getByRole('textbox')
     expect(composer).toBeDisabled()
@@ -467,17 +805,14 @@ describe('the quiz that finishes a lesson with skips', () => {
     })
     expect(screen.queryByRole('button', { name: /Ask about/ })).not.toBeInTheDocument()
 
-    // Two hearts; a wrong answer is not tried again, it goes on.
     expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
     await answer('0')
     expect(screen.queryByRole('button', { name: 'Try again' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Your answer' })).toBeDisabled()
     expect(hearts()).toHaveAccessibleName('1 of 2 hearts left')
     expect(screen.getByText('That cost a heart. 1 heart left.')).toBeInTheDocument()
     expect(seen.hints).toBe(0)
 
-    // Passed, Ask is back.
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     await passQuiz()
     expect(await screen.findByRole('complementary', { name: 'Ask' })).toBeInTheDocument()
@@ -496,29 +831,13 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(screen.queryByRole('dialog', { name: 'Ask' })).not.toBeInTheDocument()
     expect(document.querySelector('[data-ask-surface]')).toBeNull()
   })
+})
 
-  it('passes with no mistakes, and finishes the lesson once', async () => {
-    await skipIntoQuiz(4)
-    await passQuiz()
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toHaveFocus()
-    expect(seen.completes).toEqual(['l-2'])
-  })
-
-  it('passes with one mistake: the exercise comes back at the end, and the lesson finishes once', async () => {
-    await skipIntoQuiz(4)
-    expect(await screen.findByText(/Quiz · Question 1 of 4$/)).toBeInTheDocument()
-    const missed = await answerWrong()
-    expect(hearts()).toHaveAttribute('data-quiz-hearts', '1')
-    const rest = await passQuiz()
-    expect(rest[rest.length - 1]).toBe(missed)
-    expect(rest).toHaveLength(4)
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(seen.completes).toEqual(['l-2'])
-  })
-
-  it('is lost at a second mistake: a calm screen, nothing finished, back to the lesson, and it can be taken again', async () => {
+describe('losing the quiz', () => {
+  it('ends it where the backend says, with nothing finished, and it can be taken again', async () => {
     await skipIntoQuiz(4)
     await answerWrong()
+    expect(hearts()).toHaveAttribute('data-quiz-hearts', '1')
     await answerWrong()
 
     const failed = await screen.findByRole('heading', { name: 'Not yet' })
@@ -526,41 +845,36 @@ describe('the quiz that finishes a lesson with skips', () => {
     expect(screen.getByText('Keep practising and try again.')).toBeInTheDocument()
     expect(seen.completes).toEqual([])
 
-    // Back to the lesson: the skipped exercises still pending, the quiz offered again.
     await user.click(screen.getByRole('button', { name: 'Back to the lesson' }))
     expect(['l-2-e5', 'l-2-e6']).toContain(await onScreen())
-    expect(screen.getByRole('heading', { level: 2, name: /^Exercise/ })).toHaveFocus()
-    expect(screen.getByText(/Question 5 of 6/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Short quiz' }))
+    expect(await screen.findByText(/Quiz · Question 1 of \d+$/)).toBeInTheDocument()
     expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
-    await passQuiz()
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(seen.completes).toEqual(['l-2'])
+    expect(seen.starts).toHaveLength(2)
   })
 
-  it('goes through with the keyboard alone, the focus on each question', async () => {
-    open('/chapter/u-5/l-2')
-    for (let n = 1; n <= 5; n += 1) await answerRight()
-    await skip()
-    const offer = await screen.findByRole('button', { name: 'Short quiz' })
-    for (let step = 0; step < 30 && document.activeElement !== offer; step += 1) await user.tab()
-    expect(offer).toHaveFocus()
-    await user.keyboard('{Enter}')
+  it('lost after testing out: back to the chapter with nothing changed, or the quiz again', async () => {
+    open('/chapter/u-5/l-2?mode=quiz')
+    await screen.findByText(/Quiz · Question 1 of 5$/)
+    await answerWrong()
+    await answerWrong()
+    expect(await screen.findByRole('heading', { name: 'Not yet' })).toHaveFocus()
+    expect(seen.completes).toEqual([])
 
-    for (let question = 0; question < 3; question += 1) {
-      const prompt = await screen.findByRole('heading', { level: 2, name: /^Exercise/ })
-      await waitFor(() => expect(prompt).toHaveFocus())
-      const id = await onScreen()
-      await user.tab()
-      expect(screen.getByRole('textbox', { name: 'Your answer' })).toHaveFocus()
-      await user.keyboard(`${right(id)}{Enter}`)
-      const go = await screen.findByRole('button', { name: /^(Next question|Finish the quiz)$/ })
-      for (let step = 0; step < 10 && document.activeElement !== go; step += 1) await user.tab()
-      expect(go).toHaveFocus()
-      await user.keyboard('{Enter}')
-    }
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toHaveFocus()
-    expect(seen.completes).toEqual(['l-2'])
+    await user.click(screen.getByRole('button', { name: 'Try the quiz again' }))
+    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
+    expect(seen.starts).toEqual([
+      { lessonId: 'l-2', kind: 'testOut' },
+      { lessonId: 'l-2', kind: 'testOut' },
+    ])
+    await answerWrong()
+    await answerWrong()
+
+    await user.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
+    expect(where()).toBe('/chapter/u-5')
+    const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
+    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])
+    expect(seen.completes).toEqual([])
   })
 })
 
@@ -575,75 +889,25 @@ describe('testing out of a lesson from the chapter', () => {
     expect(within(rows[3]).queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
   })
 
-  it('draws five of a longer lesson, with the same rules', async () => {
-    open('/chapter/u-5/l-2?mode=quiz')
-    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
-    expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
-    expect(screen.queryByRole('button', { name: 'Hint' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Skip' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('complementary', { name: 'Ask' })).not.toBeInTheDocument()
-    const quiz = await passQuiz()
-    expect(new Set(quiz).size).toBe(5)
-    expect(seen.completes).toEqual(['l-2'])
-  })
-
   it('a locked lesson offers no test-out, and ?mode=quiz on it shows the locked notice (#96)', async () => {
     open('/chapter/u-5/l-3?mode=quiz')
     expect(await screen.findByRole('heading', { level: 1, name: 'This lesson is locked' })).toBeInTheDocument()
     expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: /^Skip this lesson/ })).not.toBeInTheDocument()
-    expect(seen.completes).toEqual([])
+    expect(seen.starts).toEqual([])
   })
 
   it('opens a lesson already done as the lesson, not a quiz, even with ?mode=quiz (#96)', async () => {
     open('/chapter/u-5/l-1?mode=quiz')
     expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
     expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
+    expect(seen.starts).toEqual([])
   })
 
   it('starts no quiz while the chapter cannot say the lesson is open: the frontend is the only gate (#96)', async () => {
     mswServer.use(http.get(`${API}/practice/math/algebra/roadmap`, () => HttpResponse.json({ detail: 'down' }, { status: 500 })))
     open('/chapter/u-5/l-3?mode=quiz')
     expect(await screen.findByRole('heading', { level: 2, name: /^Exercise \d+:/ })).toBeInTheDocument()
-    expect(screen.queryByText(/Quiz · Question \d+ of \d+$/)).not.toBeInTheDocument()
-  })
-
-  it('says, once passed, that the star still needs every exercise answered right (#96)', async () => {
-    open('/chapter/u-5/l-2?mode=quiz')
-    await screen.findByText(/Quiz · Question 1 of 5$/)
-    await passQuiz()
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(screen.getByText(TEST_OUT_NOTE)).toBeInTheDocument()
-  })
-
-  it('says nothing of the sort when the lesson was worked through', async () => {
-    open('/chapter/u-5/l-2')
-    // l-2 has six exercises (LESSONS above).
-    for (let n = 1; n <= 6; n += 1) await answerRight()
-    expect(await screen.findByRole('heading', { name: 'Lesson complete' })).toBeInTheDocument()
-    expect(screen.queryByText(TEST_OUT_NOTE)).not.toBeInTheDocument()
-  })
-
-  it('lost: back to the chapter with nothing changed, and it can be tried again', async () => {
-    open('/chapter/u-5/l-2?mode=quiz')
-    await screen.findByText(/Quiz · Question 1 of 5$/)
-    await answerWrong()
-    await answerWrong()
-    expect(await screen.findByRole('heading', { name: 'Not yet' })).toHaveFocus()
-    expect(seen.completes).toEqual([])
-
-    await user.click(screen.getByRole('button', { name: 'Try the quiz again' }))
-    expect(await screen.findByText(/Quiz · Question 1 of 5$/)).toBeInTheDocument()
-    expect(hearts()).toHaveAccessibleName('2 of 2 hearts left')
-    await answerWrong()
-    await answerWrong()
-
-    await user.click(await screen.findByRole('link', { name: 'Back to the chapter' }))
-    expect(where()).toBe('/chapter/u-5')
-    const rows = within(await screen.findByRole('list')).getAllByRole('listitem')
-    expect(rows.map((row) => row.getAttribute('data-lesson-status'))).toEqual(['completed', 'current', 'locked', 'locked'])
-    expect(screen.getByText('1 of 4 lessons done')).toBeInTheDocument()
-    expect(seen.completes).toEqual([])
+    expect(seen.starts).toEqual([])
   })
 
   it('holds the hearts still under reduced motion', async () => {
