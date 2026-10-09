@@ -39,7 +39,7 @@ export function OrganizationSelector({
             <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">Workspace</p>
             <h2 className="truncate text-lg font-semibold">{selectedOrganization.name}</h2>
             <p className="text-sm text-muted-foreground">
-              {selectedOrganization.location} · {selectedOrganization.studentCount} students · {selectedOrganization.tutorCount} tutors
+              {selectedOrganization.location} · {selectedOrganization.studentCount} students · {selectedOrganization.teacherCount} teachers
             </p>
           </div>
         </div>

@@ -37,7 +37,7 @@ const expectedNav = {
   admin: {
     desktop: [
       ['/admin/users', 'Users', 'primary', 'students', false, 'navigation.admin.users'],
-      ['/admin/teacher-applications', 'Teacher applications', 'primary', 'tutors', false, 'navigation.admin.teacherApplications'],
+      ['/admin/teacher-applications', 'Teacher applications', 'primary', 'teachers', false, 'navigation.admin.teacherApplications'],
       ['/admin/curriculum', 'Curriculum', 'primary', 'curriculum', false, 'navigation.admin.curriculum'],
       ['/admin/moderation', 'Moderation', 'primary', 'moderation', true, 'navigation.admin.moderation'],
       ['/admin', 'System', 'primary', 'settings', true, 'navigation.admin.system'],
@@ -61,20 +61,20 @@ const viewers = [...new Set(outcomes.map((outcome) => outcome.viewer))]
 const changedSince45: Record<string, Partial<Record<Viewer, { pathname: string; page: string }>>> = {
   '/assistant': {
     parent: { pathname: '/parent', page: 'ParentDashboardPage' },
-    teacher: { pathname: '/teacher', page: 'TutorDashboardPage' },
+    teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' },
     admin: { pathname: '/admin', page: 'AdminDashboardPage' },
     organization_admin: { pathname: '/organization', page: 'OrganizationHomePage' },
     school_teacher: { pathname: '/organization', page: 'OrganizationHomePage' },
     school_viewer: { pathname: '/organization', page: 'OrganizationHomePage' },
   },
-  '/tutor': { teacher: { pathname: '/teacher', page: 'TutorDashboardPage' } },
-  '/tutor/availability': { teacher: { pathname: '/teacher/availability', page: 'TutorAvailabilityPage' } },
-  '/tutor/profile': { teacher: { pathname: '/teacher/profile', page: 'TutorProfilePage' } },
+  '/tutor': { teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' } },
+  '/tutor/availability': { teacher: { pathname: '/teacher/availability', page: 'TeacherAvailabilityPage' } },
+  '/tutor/profile': { teacher: { pathname: '/teacher/profile', page: 'TeacherProfilePage' } },
   '/tutor/learning-automation': {
     teacher: { pathname: '/teacher/learning-automation', page: 'LearningAutomationConsolePage' },
   },
   '/tutor/requests/requestId-1': {
-    teacher: { pathname: '/teacher/requests/requestId-1', page: 'TutorHelpRequestDetailPage' },
+    teacher: { pathname: '/teacher/requests/requestId-1', page: 'TeacherHelpRequestDetailPage' },
   },
 }
 const expectedOutcome = (recorded: Recorded) => changedSince45[recorded.path]?.[recorded.viewer] ?? recorded

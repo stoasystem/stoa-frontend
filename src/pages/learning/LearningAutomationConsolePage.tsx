@@ -19,7 +19,7 @@ import type { AutomationCandidate, AutomationPolicy } from '@/types/learningOper
 
 const defaultPolicy: AutomationPolicy = {
   status: 'active',
-  autonomyLevel: 'tutor_approved_batch',
+  autonomyLevel: 'teacher_approved_batch',
   sourceTypes: ['ai_draft', 'curriculum_exercise'],
   maxAssignmentsPerStudent: 3,
   confidenceThreshold: 'medium',
@@ -85,7 +85,7 @@ function CandidateList({
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {mode === 'refused'
               ? candidate.refusalReason || 'Candidate was refused by policy.'
-              : candidate.expectedImpact || candidate.rationale || 'Candidate is ready for tutor approval.'}
+              : candidate.expectedImpact || candidate.rationale || 'Candidate is ready for teacher approval.'}
           </p>
         </div>
       ))}
@@ -112,7 +112,7 @@ export function LearningAutomationConsolePage() {
   const policy = useMemo<AutomationPolicy>(() => ({
     ...defaultPolicy,
     policyId: `policy-${studentId || 'student'}`,
-    name: 'Tutor approved assignment automation',
+    name: 'Teacher approved assignment automation',
     status: policyStatus,
     studentIds: studentId ? [studentId] : [],
     subjectIds: subject ? [subject] : [],

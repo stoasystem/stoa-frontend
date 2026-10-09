@@ -10,16 +10,16 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import '@/i18n'
-import { HelpRequestDetailCard } from '@/components/tutor/HelpRequestDetailCard'
+import { HelpRequestDetailCard } from '@/components/teacher/HelpRequestDetailCard'
 import { AdminAccountsPage } from '@/pages/admin/AdminAccountsPage'
 import { AdminDashboardPage } from '@/pages/admin/Dashboard'
 import { OrganizationHomePage } from '@/pages/organization/OrganizationHomePage'
 import { ParentDashboardPage } from '@/pages/parent/ParentDashboardPage'
 import { ParentReportsPage } from '@/pages/parent/ParentReportsPage'
-import { TutorDashboardPage } from '@/pages/tutor/TutorDashboardPage'
+import { TeacherDashboardPage } from '@/pages/teacher/TeacherDashboardPage'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import type { AccountOperationsSupportState } from '@/types/parentAccountOperations'
-import type { TutorHelpRequestDetail } from '@/types/tutor'
+import type { TeacherHelpRequestDetail } from '@/types/teacher'
 import type { UserRole } from '@/types/user'
 
 const account = vi.hoisted(() => ({
@@ -37,8 +37,8 @@ vi.mock('@/hooks/notifications/useNotificationsQuery', () => ({
 vi.mock('@/hooks/notifications/useRealtimeNotifications', () => ({
   useRealtimeNotifications: () => ({ status: 'disabled' }),
 }))
-vi.mock('@/hooks/tutor/useTutorHelpRequestsQuery', () => ({
-  useTutorHelpRequestsQuery: () => ({
+vi.mock('@/hooks/teacher/useTeacherHelpRequestsQuery', () => ({
+  useTeacherHelpRequestsQuery: () => ({
     isLoading: false,
     isError: false,
     data: {
@@ -70,8 +70,8 @@ vi.mock('@/hooks/tutor/useTutorHelpRequestsQuery', () => ({
     },
   }),
 }))
-vi.mock('@/hooks/tutor/useTutorStatsQuery', () => ({
-  useTutorStatsQuery: () => ({ data: { pendingRequests: 4, resolvedToday: 6, averageResponseTimeMinutes: 12 } }),
+vi.mock('@/hooks/teacher/useTeacherStatsQuery', () => ({
+  useTeacherStatsQuery: () => ({ data: { pendingRequests: 4, resolvedToday: 6, averageResponseTimeMinutes: 12 } }),
 }))
 vi.mock('@/hooks/parent/useParentChildrenQuery', () => ({
   useParentChildrenQuery: () => ({
@@ -150,7 +150,7 @@ const rowLinks = () =>
 
 describe('a teacher\'s Requests', () => {
   it('lists requests as chevron rows, filters with one segmented control, and leads into learning automation', () => {
-    renderAs('teacher', '/teacher', <TutorDashboardPage />)
+    renderAs('teacher', '/teacher', <TeacherDashboardPage />)
 
     expect(rowLinks()).toEqual(['/teacher/requests/r-1', '/teacher/requests/r-2', '/teacher/learning-automation'])
     expect(screen.getByRole('region', { name: 'Requests' })).toBeInTheDocument()
@@ -176,7 +176,7 @@ describe('a teacher\'s Requests', () => {
   })
 
   it('tells a missed response time from one at risk, and keeps time and priority on a phone', () => {
-    renderAs('teacher', '/teacher', <TutorDashboardPage />)
+    renderAs('teacher', '/teacher', <TeacherDashboardPage />)
 
     const atRisk = screen.getByRole('link', { name: /Lina Meier/ })
     const breached = screen.getByRole('link', { name: /Noah Keller/ })
@@ -197,7 +197,7 @@ describe('a teacher\'s Requests', () => {
 })
 
 describe('a teacher\'s request detail', () => {
-  const detail: TutorHelpRequestDetail = {
+  const detail: TeacherHelpRequestDetail = {
     requestId: 'r-1',
     conversationId: 'c-1',
     student: { id: 's-1', name: 'Lina Meier', grade: 'Grade 8' },
@@ -207,7 +207,7 @@ describe('a teacher\'s request detail', () => {
   }
 
   it('shows the first teacher action, which the list rows leave out', () => {
-    renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={{ ...detail, firstTutorActionAt: '2026-09-28T09:12:00Z' }} />)
+    renderAs('teacher', '/teacher/requests/r-1', <HelpRequestDetailCard request={{ ...detail, firstTeacherActionAt: '2026-09-28T09:12:00Z' }} />)
     expect(document.querySelector('[data-first-action]')).toHaveTextContent(/^First teacher action: .*\d/)
   })
 
@@ -291,7 +291,7 @@ const FILLED = '[data-variant="filled"], [data-emphasis="filled"]'
 
 describe('no screen carries more than one filled button', () => {
   it.each([
-    ['teacher', '/teacher', <TutorDashboardPage key="t" />, 'Lina Meier'],
+    ['teacher', '/teacher', <TeacherDashboardPage key="t" />, 'Lina Meier'],
     ['parent', '/parent', <ParentDashboardPage key="p" />, 'Account and family'],
     ['parent', '/parent/reports', <ParentReportsPage key="r" />, 'Weekly report'],
     ['admin', '/admin', <AdminDashboardPage key="a" />, 'Operations scope'],

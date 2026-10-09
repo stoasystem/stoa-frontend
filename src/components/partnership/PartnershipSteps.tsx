@@ -1,7 +1,7 @@
 const steps = [
   'Organization information',
   'Students and subjects',
-  'Tutor or teacher team',
+  'Teacher or teacher team',
   'Pilot timing',
   'Contact details',
 ]

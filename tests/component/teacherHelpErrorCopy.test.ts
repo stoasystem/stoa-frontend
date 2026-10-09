@@ -6,7 +6,7 @@ import italian from '@/i18n/locales/it/chat.json'
 
 const LOCALES = { de, en, fr, it: italian }
 
-describe('tutor-support failure copy', () => {
+describe('teacher-support failure copy', () => {
   it('exists in every shipped language', () => {
     for (const [language, bundle] of Object.entries(LOCALES)) {
       const errors = bundle.teacher.errors as Record<string, string>

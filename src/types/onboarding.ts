@@ -21,7 +21,7 @@ export type ParentOnboardingProfile = {
   subjectsNeedingHelp: string[]
 }
 
-export type TutorOnboardingProfile = {
+export type TeacherOnboardingProfile = {
   subjects: string[]
   educationBackground: string
   yearsOfExperience?: number
@@ -38,7 +38,7 @@ export type RegisterPayload = {
   profile:
     | StudentOnboardingProfile
     | ParentOnboardingProfile
-    | TutorOnboardingProfile
+    | TeacherOnboardingProfile
   acceptedTerms?: true
   termsVersion?: string
   acceptedAt?: string
@@ -51,7 +51,7 @@ export type RegisterPayload = {
   } | null
 }
 
-export type TutorCredentialUpload = {
+export type TeacherCredentialUpload = {
   id: string
   filename: string
   status: 'uploaded'

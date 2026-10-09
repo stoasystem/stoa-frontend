@@ -19,12 +19,12 @@ export function ClassroomSidePanel({
   session,
   activePanel,
   onPanelChange,
-  tutorMode = false,
+  teacherMode = false,
 }: {
   session: LiveClassroomSession
   activePanel: ClassroomSidePanelTab
   onPanelChange: (panel: ClassroomSidePanelTab) => void
-  tutorMode?: boolean
+  teacherMode?: boolean
 }) {
   return (
     <aside className="rounded-lg border bg-card p-3 shadow-[var(--platform-shadow-card)]">
@@ -47,7 +47,7 @@ export function ClassroomSidePanel({
       <div className="mt-4">
         {activePanel === 'chat' && <ClassroomChatPanel session={session} />}
         {activePanel === 'materials' && <ClassroomMaterialsPanel session={session} />}
-        {activePanel === 'notes' && <ClassroomNotesPanel session={session} tutorMode={tutorMode} />}
+        {activePanel === 'notes' && <ClassroomNotesPanel session={session} teacherMode={teacherMode} />}
         {activePanel === 'participants' && <ClassroomParticipantsPanel session={session} />}
       </div>
     </aside>
@@ -105,10 +105,10 @@ function ClassroomMaterialsPanel({ session }: { session: LiveClassroomSession })
 
 function ClassroomNotesPanel({
   session,
-  tutorMode,
+  teacherMode,
 }: {
   session: LiveClassroomSession
-  tutorMode: boolean
+  teacherMode: boolean
 }) {
   const [summary, setSummary] = useState(session.notes?.summary ?? '')
   const notesMutation = useClassroomNotes(session.id)
@@ -123,12 +123,12 @@ function ClassroomNotesPanel({
 
   return (
     <section aria-label="Classroom notes" className="space-y-3">
-      {tutorMode ? (
+      {teacherMode ? (
         <>
           <Textarea
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
-            aria-label="Tutor notes"
+            aria-label="Teacher notes"
             placeholder="Review the source, material, and suggested focus before saving notes."
             className="min-h-28"
           />
@@ -138,7 +138,7 @@ function ClassroomNotesPanel({
         </>
       ) : (
         <>
-          <p className="text-sm leading-6">{session.notes?.summary ?? 'Tutor notes will appear after the session.'}</p>
+          <p className="text-sm leading-6">{session.notes?.summary ?? 'Teacher notes will appear after the session.'}</p>
           <ul className="space-y-2 text-sm text-muted-foreground">
             {(session.notes?.keyPoints ?? []).map((point) => (
               <li key={point}>- {point}</li>

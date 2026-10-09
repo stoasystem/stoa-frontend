@@ -5,7 +5,7 @@ import type {
   ClassroomParticipant,
   LiveClassroomSession,
   StudentClassroomHomeData,
-  TutorClassroomQueueData,
+  TeacherClassroomQueueData,
 } from '@/features/live-classroom/types/liveClassroom'
 
 const now = new Date('2026-06-02T14:00:00.000Z')
@@ -49,8 +49,8 @@ export const mockClassroomParticipants: ClassroomParticipant[] = [
     connectionStatus: 'connected',
   },
   {
-    id: 'tutor-anna-keller',
-    role: 'tutor',
+    id: 'teacher-anna-keller',
+    role: 'teacher',
     displayName: 'Anna Keller',
     subjectLabels: ['Mathematics', 'Physics'],
     languageLabels: ['English', 'German'],
@@ -65,8 +65,8 @@ function createMessages(sessionId: string): ClassroomMessage[] {
     {
       id: `${sessionId}-message-1`,
       sessionId,
-      senderId: 'tutor-anna-keller',
-      senderRole: 'tutor',
+      senderId: 'teacher-anna-keller',
+      senderRole: 'teacher',
       senderName: 'Anna Keller',
       body: "Let's look at the first step together.",
       createdAt: iso(-0.5),
@@ -83,8 +83,8 @@ function createMessages(sessionId: string): ClassroomMessage[] {
     {
       id: `${sessionId}-message-3`,
       sessionId,
-      senderId: 'tutor-anna-keller',
-      senderRole: 'tutor',
+      senderId: 'teacher-anna-keller',
+      senderRole: 'teacher',
       senderName: 'Anna Keller',
       body: 'We isolate 2x by keeping both sides balanced.',
       createdAt: iso(-0.4),
@@ -134,14 +134,14 @@ export const mockLiveClassroomSessions: LiveClassroomSession[] = [
     type: 'standard_session',
     source: 'scheduled',
     status: 'lobby_open',
-    lobbyState: 'tutor_ready',
+    lobbyState: 'teacher_ready',
     scheduledStartAt: iso(3.5),
     scheduledEndAt: iso(4),
     studentId: 'student-demo',
     studentName: 'Anna Meier',
-    tutorId: 'tutor-anna-keller',
-    tutorName: 'Anna Keller',
-    tutorTitle: 'Mathematics and Physics tutor',
+    teacherId: 'teacher-anna-keller',
+    teacherName: 'Anna Keller',
+    teacherTitle: 'Mathematics and Physics teacher',
     context: {
       sourceLabel: 'Scheduled classroom',
       topicLabel: 'Linear Equations',
@@ -164,15 +164,15 @@ export const mockLiveClassroomSessions: LiveClassroomSession[] = [
     language: 'en',
     type: 'instant_video_help',
     source: 'teacher_text_help',
-    status: 'waiting_for_tutor',
-    lobbyState: 'waiting_for_tutor',
+    status: 'waiting_for_teacher',
+    lobbyState: 'waiting_for_teacher',
     scheduledStartAt: iso(0),
     scheduledEndAt: iso(0.25),
     studentId: 'student-demo',
     studentName: 'Anna Meier',
-    tutorId: 'tutor-anna-keller',
-    tutorName: 'Anna Keller',
-    tutorTitle: 'Mathematics and Physics tutor',
+    teacherId: 'teacher-anna-keller',
+    teacherName: 'Anna Keller',
+    teacherTitle: 'Mathematics and Physics teacher',
     context: {
       sourceConversationId: 'conversation-demo',
       sourceLabel: 'Learning Assistant conversation',
@@ -206,9 +206,9 @@ export const mockLiveClassroomSessions: LiveClassroomSession[] = [
     endedAt: iso(-25.5),
     studentId: 'student-demo',
     studentName: 'Anna Meier',
-    tutorId: 'tutor-anna-keller',
-    tutorName: 'Anna Keller',
-    tutorTitle: 'Mathematics and Physics tutor',
+    teacherId: 'teacher-anna-keller',
+    teacherName: 'Anna Keller',
+    teacherTitle: 'Mathematics and Physics teacher',
     context: {
       sourcePracticeLessonId: 'linear-equations-basics',
       sourceLabel: 'Practice Path lesson',
@@ -242,7 +242,7 @@ export function cloneSession(session: LiveClassroomSession): LiveClassroomSessio
 
 export function getMockStudentClassroomHome(sessions: LiveClassroomSession[]): StudentClassroomHomeData {
   const upcomingSession = sessions.find((session) =>
-    ['scheduled', 'lobby_open', 'waiting_for_tutor', 'active'].includes(session.status),
+    ['scheduled', 'lobby_open', 'waiting_for_teacher', 'active'].includes(session.status),
   )
 
   return {
@@ -274,7 +274,7 @@ export function getMockStudentClassroomHome(sessions: LiveClassroomSession[]): S
   }
 }
 
-export function getMockTutorClassroomQueue(sessions: LiveClassroomSession[]): TutorClassroomQueueData {
+export function getMockTeacherClassroomQueue(sessions: LiveClassroomSession[]): TeacherClassroomQueueData {
   return {
     startingSoon: sessions
       .filter((session) => ['scheduled', 'lobby_open'].includes(session.status))

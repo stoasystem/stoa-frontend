@@ -34,7 +34,7 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
           </div>
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{totals.teacherEscalationCount}</p>
-            <p className="text-muted-foreground">Tutor help</p>
+            <p className="text-muted-foreground">Teacher help</p>
           </div>
         </div>
       </CardContent>

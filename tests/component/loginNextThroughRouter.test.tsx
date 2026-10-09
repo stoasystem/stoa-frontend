@@ -39,8 +39,8 @@ vi.mock('@/pages/ask/AskPage', () => ({
 vi.mock('@/pages/parent/ParentDashboardPage', () => ({
   ParentDashboardPage: () => <h1>parent home</h1>,
 }))
-vi.mock('@/pages/tutor/TutorDashboardPage', () => ({
-  TutorDashboardPage: () => <h1>teacher home</h1>,
+vi.mock('@/pages/teacher/TeacherDashboardPage', () => ({
+  TeacherDashboardPage: () => <h1>teacher home</h1>,
 }))
 vi.mock('@/pages/auth/TeacherActivatePage', () => ({
   TeacherActivatePage: function TeacherActivateStub() {

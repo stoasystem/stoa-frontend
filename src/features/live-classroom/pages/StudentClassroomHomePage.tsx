@@ -18,7 +18,7 @@ export function StudentClassroomHomePage() {
         <PageHeader
           eyebrow="Live support"
           title="Online Classroom"
-          description="Live tutor support when a question needs deeper step-by-step help."
+          description="Live teacher support when a question needs deeper step-by-step help."
         />
 
         {homeQuery.isLoading && <EmptyState message="Loading classroom sessions..." />}
@@ -38,11 +38,11 @@ export function StudentClassroomHomePage() {
                         {home.upcomingSession ? 'Next classroom' : 'No upcoming session'}
                       </p>
                       <h2 className="mt-2 text-2xl font-semibold">
-                        {home.upcomingSession ? home.upcomingSession.title : 'Book live tutor help'}
+                        {home.upcomingSession ? home.upcomingSession.title : 'Book live teacher help'}
                       </h2>
                       <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
-                        Online Classroom is the focused live step after Learning Assistant guidance or tutor text support.
-                        Bring the question, materials, and goal into one short tutoring workspace.
+                        Online Classroom is the focused live step after Learning Assistant guidance or teacher text support.
+                        Bring the question, materials, and goal into one short teachering workspace.
                       </p>
                       <div className="mt-5 flex flex-wrap gap-2">
                         <Button asChild>

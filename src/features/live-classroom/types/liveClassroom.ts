@@ -1,6 +1,6 @@
 export type ClassroomRole =
   | 'student'
-  | 'tutor'
+  | 'teacher'
   | 'parent_observer'
   | 'admin_observer'
 
@@ -22,7 +22,7 @@ export type ClassroomSource =
 export type ClassroomStatus =
   | 'scheduled'
   | 'lobby_open'
-  | 'waiting_for_tutor'
+  | 'waiting_for_teacher'
   | 'waiting_for_student'
   | 'active'
   | 'completed'
@@ -32,8 +32,8 @@ export type ClassroomStatus =
 export type ClassroomLobbyState =
   | 'not_ready'
   | 'ready'
-  | 'waiting_for_tutor'
-  | 'tutor_ready'
+  | 'waiting_for_teacher'
+  | 'teacher_ready'
   | 'joining'
   | 'failed_to_join'
   | 'unavailable'
@@ -136,9 +136,9 @@ export type LiveClassroomSession = {
   endedAt?: string
   studentId: string
   studentName: string
-  tutorId?: string
-  tutorName?: string
-  tutorTitle?: string
+  teacherId?: string
+  teacherName?: string
+  teacherTitle?: string
   context?: ClassroomContext
   materials: ClassroomMaterial[]
   participants: ClassroomParticipant[]
@@ -181,7 +181,7 @@ export type InstantVideoHelpInput = {
   materials?: ClassroomMaterial[]
 }
 
-export type TutorClassroomQueueData = {
+export type TeacherClassroomQueueData = {
   startingSoon: LiveClassroomSession[]
   instantRequests: LiveClassroomSession[]
   completedToday: LiveClassroomSession[]

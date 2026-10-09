@@ -308,7 +308,7 @@ export function ChatPage() {
     teacherHelpMutation.mutate(
       {
         conversationId: activeConversationId,
-        message: 'Student requested help from a tutor.',
+        message: 'Student requested help from a teacher.',
       },
       {
         onSuccess: (request) => {

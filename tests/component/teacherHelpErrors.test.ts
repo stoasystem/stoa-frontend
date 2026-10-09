@@ -12,7 +12,7 @@ describe('teacherHelpErrorKey', () => {
     expect(teacherHelpErrorKey(error)).toBe('teacher.errors.temporary')
   })
 
-  it('names the plan when tutor support is not included', () => {
+  it('names the plan when teacher support is not included', () => {
     const error = new ApiError('Teacher support is not included in the active plan.', {
       status: 403,
       code: 'teacher_support_not_included',

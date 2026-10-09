@@ -7,7 +7,7 @@ import { TeacherApplicationSubmitted } from '@/components/auth/TeacherApplicatio
 import { ParentProfileStep } from '@/components/auth/ParentProfileStep'
 import { RegisterRoleStep } from '@/components/auth/RegisterRoleStep'
 import { StudentProfileStep } from '@/components/auth/StudentProfileStep'
-import { TutorProfileStep } from '@/components/auth/TutorProfileStep'
+import { TeacherProfileStep } from '@/components/auth/TeacherProfileStep'
 import { Button } from '@/components/ui/button'
 import { useRegisterMutation } from '@/hooks/auth/useRegisterMutation'
 import { useSubmitTeacherApplicationMutation } from '@/hooks/teacher/useTeacherApplication'
@@ -21,7 +21,7 @@ import type {
   RegisterPayload,
   RegisterRole,
   StudentOnboardingProfile,
-  TutorOnboardingProfile,
+  TeacherOnboardingProfile,
 } from '@/types/onboarding'
 
 export type RegisterStep = 'role' | 'account' | 'profile' | 'done'
@@ -71,7 +71,7 @@ const initialParentProfile: ParentOnboardingProfile = {
   subjectsNeedingHelp: ['Mathematics'],
 }
 
-const initialTutorProfile: TutorOnboardingProfile = {
+const initialTeacherProfile: TeacherOnboardingProfile = {
   subjects: ['Mathematics'],
   educationBackground: '',
   yearsOfExperience: 3,
@@ -95,8 +95,7 @@ function getStepNumber(step: Step) {
 
 function getInitialRole(value: string | null): RegisterRole {
   if (value === 'parent') return 'parent'
-  // `tutor` stays accepted so existing ?role=tutor links keep landing on the right step.
-  if (value === 'teacher' || value === 'tutor') return 'teacher'
+  if (value === 'teacher') return 'teacher'
   return 'student'
 }
 
@@ -119,10 +118,10 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
     preferredAnswerLanguage: initialAnswerLanguage,
   }))
   const [parentProfile, setParentProfile] = useState<ParentOnboardingProfile>(initialParentProfile)
-  const [tutorProfile, setTutorProfile] = useState<TutorOnboardingProfile>(initialTutorProfile)
+  const [teacherProfile, setTeacherProfile] = useState<TeacherOnboardingProfile>(initialTeacherProfile)
   const [studentSubjects, setStudentSubjects] = useState(initialStudentProfile.subjectsNeedingHelp.join(', '))
   const [parentSubjects, setParentSubjects] = useState(initialParentProfile.subjectsNeedingHelp.join(', '))
-  const [tutorSubjects, setTutorSubjects] = useState(initialTutorProfile.subjects.join(', '))
+  const [teacherSubjects, setTeacherSubjects] = useState(initialTeacherProfile.subjects.join(', '))
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const registerMutation = useRegisterMutation({ redirect: false })
@@ -149,10 +148,10 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
       }
     }
     return {
-      ...tutorProfile,
-      subjects: splitSubjects(tutorSubjects),
+      ...teacherProfile,
+      subjects: splitSubjects(teacherSubjects),
     }
-  }, [parentProfile, parentSubjects, role, studentProfile, studentSubjects, tutorProfile, tutorSubjects])
+  }, [parentProfile, parentSubjects, role, studentProfile, studentSubjects, teacherProfile, teacherSubjects])
 
   function validateCurrentStep(): FieldErrors {
     const errors: FieldErrors = {}
@@ -192,9 +191,9 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
         if (splitSubjects(parentSubjects).length === 0) errors.childSubjects = t('errors:subjectRequired')
       }
       if (role === 'teacher') {
-        if (splitSubjects(tutorSubjects).length === 0) errors.teachingSubjects = t('errors:teachingSubjectRequired')
-        if (!tutorProfile.educationBackground.trim()) errors.educationBackground = t('errors:educationRequired')
-        if (!tutorProfile.introduction.trim()) errors.introduction = t('errors:introductionRequired')
+        if (splitSubjects(teacherSubjects).length === 0) errors.teachingSubjects = t('errors:teachingSubjectRequired')
+        if (!teacherProfile.educationBackground.trim()) errors.educationBackground = t('errors:educationRequired')
+        if (!teacherProfile.introduction.trim()) errors.introduction = t('errors:introductionRequired')
       }
     }
 
@@ -233,11 +232,11 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
           email: email.trim(),
           emailVerified: true,
           fullName: name.trim(),
-          subjects: splitSubjects(tutorSubjects),
+          subjects: splitSubjects(teacherSubjects),
           statement: buildTeacherStatement({
-            introduction: tutorProfile.introduction,
-            educationBackground: tutorProfile.educationBackground,
-            yearsOfExperience: tutorProfile.yearsOfExperience,
+            introduction: teacherProfile.introduction,
+            educationBackground: teacherProfile.educationBackground,
+            yearsOfExperience: teacherProfile.yearsOfExperience,
           }),
         },
         { onSuccess: () => setStep('done') },
@@ -339,16 +338,16 @@ export function RegisterForm({ onStepChange }: { onStepChange?: (step: RegisterS
       )}
 
       {step === 'profile' && role === 'teacher' && (
-        <TutorProfileStep
-          value={tutorProfile}
-          subjectText={tutorSubjects}
+        <TeacherProfileStep
+          value={teacherProfile}
+          subjectText={teacherSubjects}
           errors={{
             subjects: fieldErrors.teachingSubjects,
             educationBackground: fieldErrors.educationBackground,
             introduction: fieldErrors.introduction,
           }}
-          onChange={(values) => setTutorProfile((current) => ({ ...current, ...values }))}
-          onSubjectTextChange={setTutorSubjects}
+          onChange={(values) => setTeacherProfile((current) => ({ ...current, ...values }))}
+          onSubjectTextChange={setTeacherSubjects}
         />
       )}
 

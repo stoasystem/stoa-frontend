@@ -1,5 +1,5 @@
 /**
- * Say why a tutor request failed in the student's own words.
+ * Say why a teacher request failed in the student's own words.
  *
  * The server answers a refused escalation with its own vocabulary — an
  * admission that is "safely recoverable" told a student nothing and read as a
@@ -23,7 +23,7 @@ const KEY_BY_STATUS: Record<number, string> = {
   504: 'teacher.errors.temporary',
 }
 
-/** Translation key in the `chat` namespace for a failed tutor request. */
+/** Translation key in the `chat` namespace for a failed teacher request. */
 export function teacherHelpErrorKey(error: unknown): string {
   if (!(error instanceof ApiError)) return 'teacher.errors.generic'
 

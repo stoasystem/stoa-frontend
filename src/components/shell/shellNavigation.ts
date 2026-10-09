@@ -49,7 +49,7 @@ const isOn = (pathname: string, path: string) =>
  * Which item the open page belongs to: the longest item path, or path an item
  * covers, that the address is on, so /admin/users lights Users and not System,
  * and /admin/account-operations lights Users too. -1 when none, and on a page
- * the avatar menu leads to (a teacher's /tutor/profile lights no segment).
+ * the avatar menu leads to (a teacher's /teacher/profile lights no segment).
  */
 export function activeNavIndex(
   items: readonly AppNavItem[],

@@ -2,7 +2,7 @@ export type AutomationPolicy = {
   policyId?: string
   name?: string
   status: 'active' | 'paused' | 'off'
-  autonomyLevel: 'suggest_only' | 'tutor_approved_batch' | 'auto_create_reviewed' | 'off'
+  autonomyLevel: 'suggest_only' | 'teacher_approved_batch' | 'auto_create_reviewed' | 'off'
   studentIds?: string[]
   subjectIds?: string[]
   topicIds?: string[]

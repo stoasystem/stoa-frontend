@@ -19,7 +19,7 @@ export function ClassroomDashboardCard() {
           <div>
             <p className="brand-section-kicker">Online Classroom</p>
             <CardTitle className="text-xl">
-              {upcoming ? 'Next session' : 'Book live tutor help'}
+              {upcoming ? 'Next session' : 'Book live teacher help'}
             </CardTitle>
           </div>
         </div>
@@ -30,12 +30,12 @@ export function ClassroomDashboardCard() {
             <p className="text-sm font-semibold">{upcoming.title}</p>
             <p className="mt-1 text-sm text-muted-foreground">{formatClassroomTimeRange(upcoming)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Tutor: {upcoming.tutorName ?? 'Tutor to be confirmed'}
+              Teacher: {upcoming.teacherName ?? 'Teacher to be confirmed'}
             </p>
           </div>
         ) : (
           <p className="text-sm leading-6 text-muted-foreground">
-            Book a live session when you need deeper help from a tutor.
+            Book a live session when you need deeper help from a teacher.
           </p>
         )}
         <div className="flex flex-wrap gap-2">
@@ -51,7 +51,7 @@ export function ClassroomDashboardCard() {
             <Link to="/classroom/schedule">Schedule a Session</Link>
           </Button>
           <Button asChild variant="outline">
-            <Link to="/chat?intent=teacher-help">Ask a Tutor</Link>
+            <Link to="/chat?intent=teacher-help">Ask a Teacher</Link>
           </Button>
         </div>
       </CardContent>

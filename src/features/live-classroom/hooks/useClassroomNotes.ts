@@ -11,7 +11,7 @@ export function useClassroomNotes(sessionId: string | undefined) {
     onSuccess: () => {
       if (!sessionId) return
       void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.session(sessionId) })
-      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.tutorQueue() })
+      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.teacherQueue() })
     },
   })
 }

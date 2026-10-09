@@ -6,7 +6,7 @@ export type Organization = {
   type: OrganizationType
   location?: string
   studentCount: number
-  tutorCount: number
+  teacherCount: number
 }
 
 export type OrganizationMemberRole =
@@ -18,7 +18,7 @@ export type OrganizationMemberRole =
 export type OrganizationSummary = {
   activeStudents: number
   totalStudents: number
-  totalTutors: number
+  totalTeachers: number
   questionsAskedThisWeek: number
   teacherHelpRequestsThisWeek: number
   parentReportViewsThisWeek: number
@@ -28,8 +28,8 @@ export type OrganizationSummary = {
     topic: string
     affectedStudents: number
   }[]
-  tutorWorkload: {
-    tutorId: string
+  teacherWorkload: {
+    teacherId: string
     name: string
     pendingRequests: number
     resolvedThisWeek: number
@@ -46,7 +46,7 @@ export type OrganizationStudent = {
   teacherHelpCount: number
 }
 
-export type OrganizationTutor = {
+export type OrganizationTeacher = {
   id: string
   name: string
   subjects: string[]

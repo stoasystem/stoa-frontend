@@ -1,7 +1,7 @@
 import {
   cloneSession,
   getMockStudentClassroomHome,
-  getMockTutorClassroomQueue,
+  getMockTeacherClassroomQueue,
   mockClassroomNotes,
   mockClassroomParticipants,
   mockLiveClassroomSessions,
@@ -61,9 +61,9 @@ export async function scheduleClassroomSession(input: ScheduleClassroomInput) {
     scheduledEndAt,
     studentId: 'student-demo',
     studentName: 'Anna Meier',
-    tutorId: 'tutor-anna-keller',
-    tutorName: 'Anna Keller',
-    tutorTitle: 'Mathematics and Physics tutor',
+    teacherId: 'teacher-anna-keller',
+    teacherName: 'Anna Keller',
+    teacherTitle: 'Mathematics and Physics teacher',
     context: {
       sourceLabel: 'Scheduled classroom',
       topicLabel: input.topicLabel,
@@ -117,18 +117,18 @@ export async function requestInstantVideoHelp(input: InstantVideoHelpInput) {
     type: 'instant_video_help',
     source: input.source,
     status: 'lobby_open',
-    lobbyState: 'tutor_ready',
+    lobbyState: 'teacher_ready',
     scheduledStartAt: new Date().toISOString(),
     scheduledEndAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
     studentId: 'student-demo',
     studentName: 'Anna Meier',
-    tutorId: 'tutor-anna-keller',
-    tutorName: 'Anna Keller',
-    tutorTitle: 'Mathematics and Physics tutor',
+    teacherId: 'teacher-anna-keller',
+    teacherName: 'Anna Keller',
+    teacherTitle: 'Mathematics and Physics teacher',
     context: {
       sourceConversationId: input.conversationId,
       sourceLabel: input.source === 'teacher_text_help'
-        ? 'Tutor support conversation'
+        ? 'Teacher support conversation'
         : 'Learning Assistant conversation',
       topicLabel: input.topicLabel,
       summary: input.summary ?? 'The student needs deeper live support.',
@@ -182,9 +182,9 @@ export async function completeClassroomSession(sessionId: string) {
   return cloneSession(session)
 }
 
-export async function getTutorClassroomQueue() {
+export async function getTeacherClassroomQueue() {
   await delay()
-  return getMockTutorClassroomQueue(sessions)
+  return getMockTeacherClassroomQueue(sessions)
 }
 
 export async function saveClassroomNotes(sessionId: string, notes: ClassroomNotes) {

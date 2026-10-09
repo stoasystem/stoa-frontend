@@ -3,11 +3,11 @@ import type { LiveClassroomSession } from '@/features/live-classroom/types/liveC
 
 export function ClassroomLearningWorkspace({
   session,
-  tutorMode = false,
+  teacherMode = false,
   whiteboardOpen,
 }: {
   session: LiveClassroomSession
-  tutorMode?: boolean
+  teacherMode?: boolean
   whiteboardOpen: boolean
 }) {
   return (
@@ -22,7 +22,7 @@ export function ClassroomLearningWorkspace({
               <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
                 {session.context?.studentMessage ??
                   session.context?.summary ??
-                  'Review the current learning material together with the tutor.'}
+                  'Review the current learning material together with the teacher.'}
               </p>
             </div>
           </div>
@@ -35,12 +35,12 @@ export function ClassroomLearningWorkspace({
                 <h3 className="mt-2 text-xl font-semibold">Step-by-step space</h3>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
                   {whiteboardOpen
-                    ? 'Use this space to work through the next step with the tutor.'
+                    ? 'Use this space to work through the next step with the teacher.'
                     : 'Open the whiteboard when you want to work through the next step visually.'}
                 </p>
               </div>
             </div>
-            {tutorMode && whiteboardOpen && (
+            {teacherMode && whiteboardOpen && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {['Pen', 'Eraser', 'Text', 'Clear'].map((tool) => (
                   <button

@@ -2,7 +2,7 @@
  * `/me`, the account page (#13 point 4, built in #46): profile, language,
  * notification preferences and the password change. A student's, and the
  * profile page for administrators and the organisation roles, who have no
- * other; teachers and parents keep their own (/tutor/profile,
+ * other; teachers and parents keep their own (/teacher/profile,
  * /parent/account-operations).
  */
 import { Check } from 'lucide-react'

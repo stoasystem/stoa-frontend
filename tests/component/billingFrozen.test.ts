@@ -70,7 +70,7 @@ describe('card 007: the paid surface is not reachable from the app', () => {
 // Card 020: the online classroom is withdrawn for a different reason and needs
 // the same kind of guard. It has no backend: `liveClassroomService` answers
 // every call from an array in the browser tab, sessions vanish on reload, and
-// each one names a student "Anna Meier" and a tutor "Anna Keller". Nine routes
+// each one names a student "Anna Meier" and a teacher "Anna Keller". Nine routes
 // and a primary navigation entry were registered against it, so a signed-in
 // student could book a lesson that was never going to happen.
 //
@@ -106,7 +106,7 @@ describe('card 020: the online classroom is not reachable while it has no backen
     // feature rather than restoring a few entries.
     const source = readFileSync(MANIFEST_SOURCE, 'utf8')
 
-    expect(source).toContain('live-classroom/pages/TutorClassroomQueuePage')
+    expect(source).toContain('live-classroom/pages/TeacherClassroomQueuePage')
     expect(
       existsSync(path.resolve(__dirname, '../../src/features/live-classroom/pages/StudentClassroomHomePage.tsx')),
     ).toBe(true)

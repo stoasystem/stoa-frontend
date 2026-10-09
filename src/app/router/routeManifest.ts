@@ -47,7 +47,7 @@ export type AppNavIcon =
   | 'settings'
   | 'students'
   | 'support'
-  | 'tutors'
+  | 'teachers'
 
 export type RouteStatus = 'core' | 'demo' | 'placeholder'
 
@@ -227,10 +227,10 @@ const LearningAutomationConsolePage = lazyPage('LearningAutomationConsolePage', 
 const StudentLearningProfilePage = lazyPage('StudentLearningProfilePage', () => import('@/pages/learning/StudentLearningProfilePage'))
 const OrganizationHomePage = lazyPage('OrganizationHomePage', () => import('@/pages/organization/OrganizationHomePage'))
 
-const TutorDashboardPage = lazyPage('TutorDashboardPage', () => import('@/pages/tutor/TutorDashboardPage'))
-const TutorAvailabilityPage = lazyPage('TutorAvailabilityPage', () => import('@/pages/tutor/TutorAvailabilityPage'))
-const TutorProfilePage = lazyPage('TutorProfilePage', () => import('@/pages/tutor/TutorProfilePage'))
-const TutorHelpRequestDetailPage = lazyPage('TutorHelpRequestDetailPage', () => import('@/pages/tutor/TutorHelpRequestDetailPage'))
+const TeacherDashboardPage = lazyPage('TeacherDashboardPage', () => import('@/pages/teacher/TeacherDashboardPage'))
+const TeacherAvailabilityPage = lazyPage('TeacherAvailabilityPage', () => import('@/pages/teacher/TeacherAvailabilityPage'))
+const TeacherProfilePage = lazyPage('TeacherProfilePage', () => import('@/pages/teacher/TeacherProfilePage'))
+const TeacherHelpRequestDetailPage = lazyPage('TeacherHelpRequestDetailPage', () => import('@/pages/teacher/TeacherHelpRequestDetailPage'))
 
 const AdminDashboardPage = lazyPage('AdminDashboardPage', () => import('@/pages/admin/Dashboard'))
 const AdminAccountsPage = lazyPage('AdminAccountsPage', () => import('@/pages/admin/AdminAccountsPage'))
@@ -274,22 +274,22 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
  *
  * `liveClassroomService` answers every call from an array in the browser tab:
  * sessions vanish on reload, and every one of them names a student "Anna Meier"
- * and a tutor "Anna Keller". There is no classroom route in the backend at all.
+ * and a teacher "Anna Keller". There is no classroom route in the backend at all.
  * The pages, the service and the mock data are all kept -- only the manifest
  * entries are withdrawn. Student `/classroom*` links now redirect to `/` (#13).
- * To bring the tutor side back: restore the loaders and entries below, and the
- * tutor dashboard link -- after `liveClassroomService` calls a real API.
+ * To bring the teacher side back: restore the loaders and entries below, and the
+ * teacher dashboard link -- after `liveClassroomService` calls a real API.
  *
-const TutorClassroomQueuePage = lazyPage('TutorClassroomQueuePage', () => import('@/features/live-classroom/pages/TutorClassroomQueuePage'))
+const TeacherClassroomQueuePage = lazyPage('TeacherClassroomQueuePage', () => import('@/features/live-classroom/pages/TeacherClassroomQueuePage'))
 const ClassroomLobbyPage = lazyPage('ClassroomLobbyPage', () => import('@/features/live-classroom/pages/ClassroomLobbyPage'))
 const ClassroomRoomPage = lazyPage('ClassroomRoomPage', () => import('@/features/live-classroom/pages/ClassroomRoomPage'))
 const ClassroomSummaryPage = lazyPage('ClassroomSummaryPage', () => import('@/features/live-classroom/pages/ClassroomSummaryPage'))
 // Student side, superseded by the planet: live-classroom/pages/StudentClassroomHomePage, ScheduleClassroomPage.
 
-  { path: '/teacher/classroom', access: TEACHER, page: TutorClassroomQueuePage, nav: [{ area: 'teacher', label: 'Classroom Queue', labelKey: 'navigation.classroomQueue', priority: 'primary', icon: 'classroom', mobile: true }], meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom queue.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/lobby', access: TEACHER, page: ClassroomLobbyPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom lobby.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/room', access: TEACHER, page: ClassroomRoomPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor live classroom room.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/summary', access: TEACHER, page: ClassroomSummaryPage, props: { tutorMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Tutor classroom summary.' } },
+  { path: '/teacher/classroom', access: TEACHER, page: TeacherClassroomQueuePage, nav: [{ area: 'teacher', label: 'Classroom Queue', labelKey: 'navigation.classroomQueue', priority: 'primary', icon: 'classroom', mobile: true }], meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom queue.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/lobby', access: TEACHER, page: ClassroomLobbyPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom lobby.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/room', access: TEACHER, page: ClassroomRoomPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher live classroom room.' } },
+  { path: '/teacher/classroom/sessions/:sessionId/summary', access: TEACHER, page: ClassroomSummaryPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom summary.' } },
  */
 
 export const pageRoutes: readonly PageRoute[] = [
@@ -397,23 +397,23 @@ export const pageRoutes: readonly PageRoute[] = [
   {
     path: '/teacher',
     access: TEACHER,
-    page: TutorDashboardPage,
+    page: TeacherDashboardPage,
     // Learning automation is a secondary entry inside Requests (#13 point 6),
     // a row on the page, and lights Requests while it is open.
-    nav: [{ area: 'teacher', label: 'Requests', labelKey: 'navigation.requests', priority: 'primary', icon: 'requests', mobile: true, description: 'Tutor help requests queue.' }],
-    meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request queue.' },
+    nav: [{ area: 'teacher', label: 'Requests', labelKey: 'navigation.requests', priority: 'primary', icon: 'requests', mobile: true, description: 'Teacher help requests queue.' }],
+    meta: { module: 'Teacher', status: 'core', purpose: 'Teacher request queue.' },
   },
   {
     path: '/teacher/availability',
     access: TEACHER,
-    page: TutorAvailabilityPage,
-    nav: [{ area: 'teacher', label: 'Availability', labelKey: 'navigation.availability', priority: 'primary', icon: 'settings', mobile: true, description: 'Tutor availability and subjects.' }],
-    meta: { module: 'Tutor', status: 'core', purpose: 'Tutor availability.' },
+    page: TeacherAvailabilityPage,
+    nav: [{ area: 'teacher', label: 'Availability', labelKey: 'navigation.availability', priority: 'primary', icon: 'settings', mobile: true, description: 'Teacher availability and subjects.' }],
+    meta: { module: 'Teacher', status: 'core', purpose: 'Teacher availability.' },
   },
-  { path: '/teacher/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor learning automation.' } },
+  { path: '/teacher/learning-automation', access: TEACHER, page: LearningAutomationConsolePage, titleKey: 'routes.learningAutomation.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher learning automation.' } },
   // No `nav`: the profile is the avatar menu's Profile (#13 point 6, #46).
-  { path: '/teacher/profile', access: TEACHER, page: TutorProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor profile, contact, verification, and payout settlement details.' } },
-  { path: '/teacher/requests/:requestId', access: TEACHER, page: TutorHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Tutor', status: 'core', purpose: 'Tutor request detail and status update.' } },
+  { path: '/teacher/profile', access: TEACHER, page: TeacherProfilePage, titleKey: 'routes.teacherProfile.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher profile, contact, verification, and payout settlement details.' } },
+  { path: '/teacher/requests/:requestId', access: TEACHER, page: TeacherHelpRequestDetailPage, titleKey: 'routes.helpRequest.title', meta: { module: 'Teacher', status: 'core', purpose: 'Teacher request detail and status update.' } },
 
   // ---- admin -------------------------------------------------------------
   // The source list (#13 point 6, #52) follows the order of these entries:
@@ -432,7 +432,7 @@ export const pageRoutes: readonly PageRoute[] = [
     path: '/admin/teacher-applications',
     access: ADMIN,
     page: AdminTeacherApplicationsPage,
-    nav: [{ area: 'admin', label: 'Teacher applications', labelKey: 'navigation.admin.teacherApplications', priority: 'primary', icon: 'tutors', description: 'Review teacher applications and send activation invitations.' }],
+    nav: [{ area: 'admin', label: 'Teacher applications', labelKey: 'navigation.admin.teacherApplications', priority: 'primary', icon: 'teachers', description: 'Review teacher applications and send activation invitations.' }],
     meta: { module: 'Admin', status: 'core', purpose: 'Teacher application review and invitation.' },
   },
   {

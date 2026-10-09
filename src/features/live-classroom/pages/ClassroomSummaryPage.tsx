@@ -10,7 +10,7 @@ import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { useClassroomSession } from '@/features/live-classroom/hooks/useClassroomSession'
 import { formatClassroomTimeRange } from '@/features/live-classroom/utils/formatClassroom'
 
-export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolean }) {
+export function ClassroomSummaryPage({ teacherMode = false }: { teacherMode?: boolean }) {
   const { sessionId } = useParams()
   const sessionQuery = useClassroomSession(sessionId)
   const session = sessionQuery.data
@@ -33,7 +33,7 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
               <p className="brand-section-kicker">Live classroom completed</p>
               <h2 className="mt-2 text-2xl font-semibold">What we reviewed</h2>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {session.notes?.summary ?? 'The tutor will add notes after the session.'}
+                {session.notes?.summary ?? 'The teacher will add notes after the session.'}
               </p>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
                 <div>
@@ -62,7 +62,7 @@ export function ClassroomSummaryPage({ tutorMode = false }: { tutorMode?: boolea
                   </div>
                 </div>
               </div>
-              {!tutorMode && (
+              {!teacherMode && (
                 <div className="mt-6 flex flex-wrap gap-2">
                   <Button asChild>
                     <Link to="/learning-history">

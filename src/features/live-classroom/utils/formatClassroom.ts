@@ -39,7 +39,7 @@ export function getClassroomStatusLabel(status: LiveClassroomSession['status']) 
   const labels: Record<LiveClassroomSession['status'], string> = {
     scheduled: 'Scheduled',
     lobby_open: 'Lobby open',
-    waiting_for_tutor: 'Waiting for tutor',
+    waiting_for_teacher: 'Waiting for teacher',
     waiting_for_student: 'Waiting for student',
     active: 'Active',
     completed: 'Completed',

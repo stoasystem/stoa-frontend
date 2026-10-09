@@ -25,7 +25,7 @@ export function ParentClassroomVisibilityCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          See upcoming and recent live tutor sessions at a summary level. Your child joins from the
+          See upcoming and recent live teacher sessions at a summary level. Your child joins from the
           student dashboard, and learning reports keep the classroom work connected to practice progress.
         </p>
         {upcoming && (

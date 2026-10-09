@@ -4,7 +4,7 @@ import type { ClassroomDeviceState, ClassroomSidePanelTab } from '@/features/liv
 
 export function ClassroomControlBar({
   deviceState,
-  tutorMode = false,
+  teacherMode = false,
   onToggleMicrophone,
   onToggleCamera,
   onToggleWhiteboard,
@@ -12,7 +12,7 @@ export function ClassroomControlBar({
   onLeave,
 }: {
   deviceState: ClassroomDeviceState
-  tutorMode?: boolean
+  teacherMode?: boolean
   onToggleMicrophone: () => void
   onToggleCamera: () => void
   onToggleWhiteboard: () => void
@@ -96,15 +96,15 @@ export function ClassroomControlBar({
         </Button>
         <Button
           type="button"
-          variant={tutorMode ? 'destructive' : 'outline'}
+          variant={teacherMode ? 'destructive' : 'outline'}
           size="sm"
           className="h-10 min-w-10 px-2 sm:px-3"
           onClick={onLeave}
-          aria-label={tutorMode ? 'End session' : 'Leave classroom'}
-          title={tutorMode ? 'End Session' : 'Leave'}
+          aria-label={teacherMode ? 'End session' : 'Leave classroom'}
+          title={teacherMode ? 'End Session' : 'Leave'}
         >
           <DoorOpen className="h-4 w-4" aria-hidden="true" />
-          <span className="hidden sm:inline">{tutorMode ? 'End Session' : 'Leave'}</span>
+          <span className="hidden sm:inline">{teacherMode ? 'End Session' : 'Leave'}</span>
         </Button>
       </div>
     </div>
