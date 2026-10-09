@@ -23,7 +23,7 @@ import { mswServer } from '../mswServer'
 
 const copy = enAuth.changePassword
 
-type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[]; log: string[] }
+type Seen = { request: unknown[]; confirm: unknown[]; preferences: unknown[]; profile: unknown[]; log: string[] }
 
 const DEFAULT_MATRIX = {
   admin_operations: { in_app: true, realtime: true, email_digest: false, push: false },
@@ -36,11 +36,17 @@ const DEFAULT_MATRIX = {
 function backend({
   request = () => HttpResponse.json({ status: 'sent', maskedRecipient: 'l******@example.com', expiresAt: 1_790_000_000 }),
   confirm = () => HttpResponse.json({ status: 'changed' }),
+  grade = '',
+  saveGrade,
 }: {
   request?: () => Response
   confirm?: () => Response
+  grade?: string
+  saveGrade?: () => Response
 } = {}): Seen {
-  const seen: Seen = { request: [], confirm: [], preferences: [], log: [] }
+  const seen: Seen = { request: [], confirm: [], preferences: [], profile: [], log: [] }
+  let storedGrade = grade
+  const profileBody = () => ({ userId: 'u-1', grade: storedGrade, primarySubjects: ['math'], schoolSystem: null })
   let matrix: Record<string, unknown> = structuredClone(DEFAULT_MATRIX)
   const preferencesBody = () => ({
     userId: 'u-1',
@@ -63,6 +69,14 @@ function backend({
       matrix = body.preferences
       seen.log.push('written')
       return HttpResponse.json(preferencesBody())
+    }),
+    http.get('https://api.test/students/me/profile', () => HttpResponse.json(profileBody())),
+    http.patch('https://api.test/students/me/profile', async ({ request: req }) => {
+      const body = (await req.json()) as { grade?: string }
+      seen.profile.push(body)
+      if (saveGrade) return saveGrade()
+      storedGrade = body.grade ?? storedGrade
+      return HttpResponse.json(profileBody())
     }),
     http.post('https://api.test/auth/password-change/request', async ({ request: req }) => {
       seen.request.push(await req.json())
@@ -167,6 +181,7 @@ describe('/me', () => {
 
     expect(await screen.findByLabelText(copy.currentPasswordLabel)).toBeInTheDocument()
     expect(screen.queryByRole('switch')).toBeNull()
+    expect(screen.queryByRole('region', { name: enCommon.me.grade.heading })).toBeNull()
   })
 
   it('switches the language from the list', async () => {
@@ -625,5 +640,63 @@ describe('notification preferences on /me', () => {
     )
 
     expect(await screen.findByRole('alert')).toHaveTextContent(enCommon.me.notifications.saveFailed)
+  })
+})
+
+describe('the year group on /me (#154)', () => {
+  const grade = enCommon.me.grade
+
+  it('saves the year group a student types, trimmed, and shows it as stored', async () => {
+    const seen = backend()
+    const user = userEvent.setup()
+    openAt('/me')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    const field = within(section).getByRole('textbox', { name: grade.label })
+    await waitFor(() => expect(field).toBeEnabled())
+    expect(field).toHaveValue('')
+    const save = within(section).getByRole('button', { name: grade.save })
+    expect(save).toBeDisabled()
+
+    await user.type(field, '  Year 6 ')
+    await user.click(save)
+
+    expect(await within(section).findByRole('status')).toHaveTextContent(grade.saved)
+    expect(seen.profile).toEqual([{ grade: 'Year 6' }])
+    expect(field).toHaveValue('Year 6')
+    expect(save).toBeDisabled()
+  })
+
+  it('shows the year group already stored', async () => {
+    backend({ grade: 'Year 8' })
+    openAt('/me')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    await waitFor(() => expect(within(section).getByRole('textbox', { name: grade.label })).toHaveValue('Year 8'))
+  })
+
+  it('says so when the year group was not saved, and keeps what was typed', async () => {
+    const seen = backend({ saveGrade: () => HttpResponse.json({ detail: 'nope' }, { status: 503 }) })
+    const user = userEvent.setup()
+    openAt('/me')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    const field = within(section).getByRole('textbox', { name: grade.label })
+    await waitFor(() => expect(field).toBeEnabled())
+    await user.type(field, 'Year 6')
+    await user.click(within(section).getByRole('button', { name: grade.save }))
+
+    expect(await within(section).findByRole('alert')).toHaveTextContent(grade.saveFailed)
+    expect(seen.profile).toHaveLength(1)
+    expect(field).toHaveValue('Year 6')
+  })
+
+  it('is where Ask\'s hint leads, with the field ready to type in', async () => {
+    backend()
+    openAt('/me#me-grade')
+
+    const section = await screen.findByRole('region', { name: grade.heading })
+    const field = within(section).getByRole('textbox', { name: grade.label })
+    await waitFor(() => expect(field).toHaveFocus())
   })
 })

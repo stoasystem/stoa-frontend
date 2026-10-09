@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Button, Composer, IconButton, PresenceDot } from '@/components/base'
 import { conversationDisplayTitle, subjectDisplayLabel } from '@/components/chat/conversationTitle'
+import { GRADE_SECTION_ID } from '@/features/account/GradeGroup'
 import { AskConversationList, AskEmptyState } from '@/features/ask/AskConversationList'
 import { AskLitCard } from '@/features/ask/AskLitCard'
 import { AskMessage } from '@/features/ask/AskMessage'
@@ -284,7 +285,7 @@ export function AskPanel({
         */}
         {profile && !conversationGrade(profile.grade) && (
           <p id="ask-grade-missing" className="m-0 pb-1 text-[13px] text-[color:var(--on-sky-text-body)]">
-            <Link to="/me" className="text-[color:var(--on-sky-plain)] underline underline-offset-2">
+            <Link to={`/me#${GRADE_SECTION_ID}`} className="text-[color:var(--on-sky-plain)] underline underline-offset-2">
               {t('gradeMissingHint')}
             </Link>
           </p>
