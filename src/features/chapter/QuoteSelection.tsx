@@ -1,25 +1,28 @@
 import { Quote } from 'lucide-react'
-import { useEffect, useId, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
-import { Pill } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
+import { makeQuote, type AskQuote } from '@/features/ask/practiceContext'
 
 /*
- * 「问这段」, ask about this (#12 point 5, #50 point 4). Select text in the
- * exercise or in an answer beside it and a small button appears by the
+ * 「问这段」, ask about this (#12 point 5, #50 point 4, #56). Select text in
+ * the exercise or in an answer beside it and a small button appears by the
  * selection, to ask about just that passage.
  *
- * The quote is meant to go out as a structured `quote: { text, source }`
- * field, shown as a quote block on top of the student's message. The backend
- * has no such field yet (stoasystem/stoa-backend#61), so -- by the user's rule
- * that the entry stays and says it is coming -- the button is here, disabled,
- * and marked 「即将推出」 (coming soon). #56 turns it on.
+ * Pressing it hands the passage to Ask as a structured
+ * `quote: { text, source }` (#56): the composer shows it, the next question
+ * carries it, and the student's own message shows it as a quote block.
  */
 
-export type QuoteSource = 'exercise' | 'answer'
+/** What the selection sits in, and what the backend calls it. */
+export type QuotableKind = 'exercise' | 'answer'
+const QUOTE_KIND: Record<QuotableKind, 'challenge' | 'message'> = {
+  exercise: 'challenge',
+  answer: 'message',
+}
 
-type Quotable = { text: string; source: QuoteSource; top: number; left: number }
+type Quotable = { text: string; source: QuotableKind; sourceId: string; top: number; left: number }
 
 /** How far from the selection the chip sits, and how tall it is. */
 const GAP = 4
@@ -64,18 +67,27 @@ function quotableSelection(scope: HTMLElement | null): Quotable | null {
   if (!source || !scope.contains(source)) return null
   const kind = source.dataset.quoteSource
   if (kind !== 'exercise' && kind !== 'answer') return null
+  // Which exercise, or which answer: the block itself, or the one around it.
+  const sourceId = source.closest<HTMLElement>('[data-quote-id]')?.dataset.quoteId
+  if (!sourceId) return null
 
   // jsdom and some older engines have no geometry for a range: use its block.
   const block = source.getBoundingClientRect()
   const measured = typeof range.getBoundingClientRect === 'function' ? range.getBoundingClientRect() : null
   const rect = measured && (measured.width > 0 || measured.height > 0) ? measured : block
-  return { text, source: kind, top: chipTop(rect, block), left: rect.left + rect.width / 2 }
+  return { text, source: kind, sourceId, top: chipTop(rect, block), left: rect.left + rect.width / 2 }
 }
 
 /** Watches the selection inside `scope` and offers 「问这段」 beside it. */
-export function QuoteSelection({ scope }: { scope: RefObject<HTMLElement | null> }) {
+export function QuoteSelection({
+  scope,
+  onQuote,
+}: {
+  scope: RefObject<HTMLElement | null>
+  /** The passage chosen, already cut to what the backend takes. */
+  onQuote: (quote: AskQuote) => void
+}) {
   const { t } = useTranslation('chapter')
-  const soonId = useId()
   const [quotable, setQuotable] = useState<Quotable | null>(null)
   const chip = useRef<HTMLDivElement>(null)
 
@@ -118,22 +130,22 @@ export function QuoteSelection({ scope }: { scope: RefObject<HTMLElement | null>
         top: quotable.top,
         left: quotable.left,
         height: CHIP_HEIGHT,
-        padding: '0 6px 0 12px',
+        padding: '0 12px',
         boxShadow: 'var(--shadow-float)',
       }}
     >
       <button
         type="button"
-        disabled
-        aria-describedby={soonId}
-        className="inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-[13px] font-semibold text-accent disabled:opacity-40"
+        onClick={() => {
+          onQuote(makeQuote(quotable.text, { kind: QUOTE_KIND[quotable.source], id: quotable.sourceId }))
+          window.getSelection()?.removeAllRanges()
+          setQuotable(null)
+        }}
+        className="inline-flex items-center gap-1.5 border-0 bg-transparent p-0 text-[13px] font-semibold text-accent"
       >
         <Quote size={ICON.chip} strokeWidth={ICON.stroke} aria-hidden="true" />
         {t('quote.ask')}
       </button>
-      <span id={soonId}>
-        <Pill tone="neutral">{t('quote.comingSoon')}</Pill>
-      </span>
     </div>,
     document.body,
   )

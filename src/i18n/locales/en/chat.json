@@ -122,20 +122,6 @@
     "requestedTitle": "Teacher support requested",
     "requestedBody": "A teacher will join this conversation when available. You can continue with the Learning Assistant while waiting."
   },
-  "contextLines": {
-    "uploadSource": "Upload source: {{title}}",
-    "questionSession": "Question session: {{sessionId}}",
-    "questionId": "Question: {{questionId}}",
-    "attachedMaterial": "Attached learning material: {{files}}",
-    "librarySet": "Practice Library set: {{title}}",
-    "libraryTopic": "Practice Library topic: {{topic}}",
-    "question": "Question: {{prompt}}",
-    "myAnswer": "My answer: {{answer}}",
-    "practiceTopic": "Practice topic: {{topic}}",
-    "practiceQuestion": "Practice question: {{prompt}}",
-    "attempts": "Attempts: {{attempts}}",
-    "hintViewed": "Hint viewed: yes"
-  },
   "followUp": {
     "label": "Follow-up suggestions",
     "explainStep": "I don’t understand one of the steps",
@@ -219,6 +205,11 @@
     "practice": {
       "subtitle": "Knows the question you are on",
       "placeholder": "Ask about this question…"
+    },
+    "quote": {
+      "title": "Quoted",
+      "remove": "Remove the quote",
+      "truncated": "The quote was shortened to the first {{count}} characters."
     },
     "lit": {
       "label": "Progress",

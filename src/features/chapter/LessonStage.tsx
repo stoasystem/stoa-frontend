@@ -26,11 +26,10 @@ import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import type { AskPractice } from '@/features/ask/practiceContext'
-import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
-import { formatPracticeAnswer, useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
+import { useLessonRun, type LessonRun } from '@/features/chapter/useLessonRun'
 import { StarGlyph } from '@/features/starmap/components/StarGlyph'
 import { usePrefersReducedMotion } from '@/features/starmap/motion/usePrefersReducedMotion'
 import { useLessonQuery } from '@/hooks/practice/useLessonQuery'
@@ -177,26 +176,15 @@ function LessonRunStage({
   const { challenge } = run
   const inQuiz = run.quiz !== null
 
-  // TEXT FALLBACK (#56): what Ask is told about the exercise on screen. #56
-  // sends `{ challengeId, lessonId, unitId }` instead of the words.
+  // The exercise on screen, by id (#56): the backend reads its wording, the
+  // chapter and the learning state from these three itself.
   const practice = useMemo<AskPractice | undefined>(
     () =>
       // Not during a quiz: Ask is off, and told nothing.
       challenge && !run.finished && !inQuiz
-        ? {
-            context: {
-              unitId,
-              lessonId: lesson.id,
-              challengeId: challenge.challengeId,
-              topic: challenge.topic || lesson.topic,
-              prompt: challenge.prompt,
-              answer: formatPracticeAnswer(run.answer) || undefined,
-              attempts: run.wrong,
-              hintViewed: Boolean(run.hint),
-            },
-          }
+        ? { context: { unitId, lessonId: lesson.id, challengeId: challenge.challengeId } }
         : undefined,
-    [challenge, inQuiz, lesson.id, lesson.topic, run.answer, run.finished, run.hint, run.wrong, unitId],
+    [challenge, inQuiz, lesson.id, run.finished, unitId],
   )
 
   const lessonNumber = chapter ? chapter.lessons.findIndex((item) => item.id === lesson.id) + 1 : 0
@@ -226,7 +214,6 @@ function LessonRunStage({
           </div>
         )}
       </StageWithAsk>
-      {!inQuiz && <QuoteSelection scope={host} />}
     </div>
   )
 }
@@ -407,7 +394,14 @@ function Exercise({
           className="relative flex min-h-full items-center justify-center"
           style={{ padding: side ? '40px 48px 40px 360px' : '22px 16px 16px' }}
         >
-          <div key={challenge.challengeId} data-stage-exercise className="flex w-full max-w-[620px] flex-col" style={{ gap: side ? 26 : 20 }}>
+          <div
+            key={challenge.challengeId}
+            data-stage-exercise
+            // Which exercise a passage chosen anywhere in here was taken from (#56).
+            data-quote-id={challenge.challengeId}
+            className="flex w-full max-w-[620px] flex-col"
+            style={{ gap: side ? 26 : 20 }}
+          >
             <div data-quote-source="exercise" className="flex flex-col gap-2">
               {challenge.topic && <p className={cn('m-0 text-[17px]', bodyOnSky)}>{challenge.topic}</p>}
               <h2

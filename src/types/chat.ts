@@ -19,6 +19,32 @@ export type ChatAttachment = {
   createdAt: string
 }
 
+/**
+ * The exercise on screen, by id only (#56). The backend reads the exercise,
+ * the chapter and the learning state from these itself, so nothing of the
+ * question's wording goes into the message. Exactly these three keys: the
+ * backend forbids any other and answers 422.
+ */
+export type PracticeContextRef = {
+  challengeId: string
+  lessonId: string
+  unitId: string
+}
+
+/** Where a quoted passage was taken from: an exercise, or an earlier message. */
+export type QuoteSource = {
+  kind: 'challenge' | 'message'
+  id: string
+}
+
+/** A passage quoted back to the assistant (#56). Longer than this is a 422. */
+export const QUOTE_MAX_LENGTH = 500
+
+export type MessageQuote = {
+  text: string
+  source: QuoteSource
+}
+
 export type ChatMessage = {
   id: string
   conversationId: string
@@ -27,6 +53,8 @@ export type ChatMessage = {
   createdAt: string
   status?: ChatMessageStatus
   attachments?: ChatAttachment[]
+  /** The passage this message quotes; `null` on every message without one. */
+  quote?: MessageQuote | null
 }
 
 export type ConversationSummary = {
@@ -49,6 +77,8 @@ export type ConversationListResponse = {
 export type SendMessageRequest = {
   content: string
   attachmentIds?: string[]
+  practiceContext?: PracticeContextRef
+  quote?: MessageQuote
 }
 
 export type SendMessageResponse = {
@@ -60,6 +90,7 @@ export type CreateConversationRequest = {
   subject: string
   grade: string
   initialMessage?: string
+  practiceContext?: PracticeContextRef
 }
 
 export type TeacherHelpRequest = {

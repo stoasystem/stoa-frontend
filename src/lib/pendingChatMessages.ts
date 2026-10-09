@@ -1,4 +1,4 @@
-import type { ChatAttachment } from '@/types/chat'
+import type { ChatAttachment, MessageQuote, PracticeContextRef } from '@/types/chat'
 
 /**
  * One message on its way: what was asked, and the idempotency key that makes
@@ -14,6 +14,9 @@ export type PendingMessage = {
   attachmentIds?: string[]
   attachments?: ChatAttachment[]
   askedAt: string
+  /** Sent again as it was: the same command carries the same fields (#56). */
+  practiceContext?: PracticeContextRef
+  quote?: MessageQuote
 }
 
 export const PENDING_MESSAGE_KEY_PREFIX = 'stoa_pending_chat_message:'
@@ -31,6 +34,8 @@ export function readPendingMessage(conversationId: string): PendingMessage | nul
       attachmentIds: value.attachmentIds,
       attachments: value.attachments,
       askedAt: typeof value.askedAt === 'string' ? value.askedAt : new Date(0).toISOString(),
+      ...(value.practiceContext ? { practiceContext: value.practiceContext } : {}),
+      ...(value.quote ? { quote: value.quote } : {}),
     }
   } catch {
     return null
@@ -57,7 +62,13 @@ export function writePendingMessage(conversationId: string, pending: PendingMess
  */
 export function rememberPendingMessage(
   conversationId: string,
-  pending: { idempotencyKey: string; content: string; askedAt: string },
+  pending: {
+    idempotencyKey: string
+    content: string
+    askedAt: string
+    practiceContext?: PracticeContextRef
+    quote?: MessageQuote
+  },
 ) {
   writePendingMessage(conversationId, pending)
 }

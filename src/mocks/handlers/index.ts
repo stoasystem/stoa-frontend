@@ -78,6 +78,8 @@ const conversationHandlers = [
       content: body?.content ?? '',
       createdAt: new Date(Date.now() - 100).toISOString(),
       status: 'done',
+      // #56: the quote comes back on the message that carried it, null elsewhere.
+      quote: body?.quote ?? null,
     }
     return HttpResponse.json({
       userMessage: userMsg,

@@ -12,7 +12,7 @@ import { ASK_PANEL } from '@/features/ask/askLayout'
 import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/TeacherHelp'
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
-import { withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
+import { quoteField, useAskQuoteStore, type AskPractice, type AskQuote } from '@/features/ask/practiceContext'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
@@ -29,7 +29,7 @@ import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
-import type { ChatMessage } from '@/types/chat'
+import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
 
 export type AskLayout = 'panel' | 'sheet'
 
@@ -59,8 +59,8 @@ export function AskPanel({
   /** Pointer handlers that make the header the sheet's drag handle. */
   headerHandle?: HTMLAttributes<HTMLElement>
   /**
-   * Beside the practice stage: the exercise on screen, which goes out with
-   * the question -- as text in front of it until #56 sends ids instead.
+   * Beside the practice stage: the exercise on screen, whose ids go out with
+   * the question as `practiceContext` (#56). Nothing of its wording does.
    */
   practice?: AskPractice
 }) {
@@ -103,25 +103,56 @@ export function AskPanel({
     }
   }, [])
 
-  function startConversation(content: string) {
+  // The passage 「问这段」 put aside, waiting to go out with the next question.
+  const quote = useAskQuoteStore((state) => state.quote)
+  const setQuote = useAskQuoteStore((state) => state.setQuote)
+  const clearQuote = () => setQuote(null)
+  // A quoted question waiting for the conversation it started to open.
+  const queued = useRef<{ content: string; quote: AskQuote } | null>(null)
+  useEffect(() => {
+    const waiting = queued.current
+    if (!waiting || !conversationId || isStreaming) return
+    queued.current = null
+    setQuote(null)
+    void sendStreamingMessage({
+      content: waiting.content,
+      ...(practice ? { practiceContext: practice.context } : {}),
+      quote: quoteField(waiting.quote),
+    })
+  }, [conversationId, isStreaming, practice, sendStreamingMessage, setQuote])
+
+  // The exercise on screen goes out with every question asked beside it: the
+  // backend reads the exercise, the chapter and the learning state from the
+  // three ids itself (#56). Away from the stage the key is absent altogether.
+  const practiceField = practice ? { practiceContext: practice.context } : {}
+
+  function startConversation(content: string, quote?: AskQuote | null) {
     if (creatingRef.current || createConversation.isPending) return
-    // TEXT FALLBACK (#56): the exercise on screen rides in the first message.
-    const { content: initialMessage, told } = withPracticeContext(t, practice, null, content)
     creatingRef.current = true
     askedAtRef.current = new Date().toISOString()
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if the conversation could not be made.
     setDraft('')
+    // `POST /conversations` takes no quote, so a quoted question starts the
+    // conversation empty and is sent into it as a message of its own, which
+    // the effect below does once the new conversation is the open one.
+    if (quote) queued.current = { content, quote }
     createConversation
-      .mutateAsync({ subject, grade: conversationGrade(profile?.grade), initialMessage })
+      .mutateAsync({
+        subject,
+        grade: conversationGrade(profile?.grade),
+        ...(quote ? {} : { initialMessage: content }),
+        ...practiceField,
+      })
       .then(
         (created) => {
-          told(created.id)
+          if (!quote) clearQuote()
           // Opened only in the panel that asked; a closed Ask stays closed.
           if (mounted.current) select(created.id)
         },
         () => {
+          queued.current = null
           // Unless the student has started another question meanwhile.
           if (!controller.readDraft()) setDraft(content)
         },
@@ -135,19 +166,16 @@ export function AskPanel({
     const content = value.trim()
     if (!content) return
     if (!conversationId) {
-      startConversation(content)
+      startConversation(content, quote)
       return
     }
     if (isStreaming) return
     setDraft('')
-    // TEXT FALLBACK (#56): told again only when the exercise on screen changed,
-    // and counted as told only once the message went out. One that failed is
-    // sent again as it was (same words, same key); a new question instead
-    // carries the context itself.
-    const id = conversationId
-    const { content: message, told } = withPracticeContext(t, practice, id, content)
-    void sendStreamingMessage({ content: message }).then((delivered) => {
-      if (delivered) told(id)
+    clearQuote()
+    void sendStreamingMessage({
+      content,
+      ...practiceField,
+      ...(quote ? { quote: quoteField(quote) } : {}),
     })
   }
 
@@ -219,7 +247,11 @@ export function AskPanel({
               </Button>
             </div>
           ) : (conversationsQuery.data?.items.length ?? 0) === 0 ? (
-            <RecommendedEmptyState subject={subject} onAsk={startConversation} disabled={createConversation.isPending} />
+            <RecommendedEmptyState
+              subject={subject}
+              onAsk={(question) => startConversation(question, quote)}
+              disabled={createConversation.isPending}
+            />
           ) : (
             <AskConversationList conversations={conversationsQuery.data?.items ?? []} onSelect={(id) => select(id)} />
           )}
@@ -257,6 +289,7 @@ export function AskPanel({
             </Link>
           </p>
         )}
+        {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
         <Composer
           value={draft}
           onChange={setDraft}
@@ -267,6 +300,31 @@ export function AskPanel({
           describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
         />
       </div>
+    </div>
+  )
+}
+
+/**
+ * The passage waiting to go out with the next question, above the composer,
+ * with the note that it had to be shortened to what the backend takes (#56).
+ */
+function PendingQuote({ quote, onRemove }: { quote: AskQuote; onRemove: () => void }) {
+  const { t } = useTranslation('chat')
+  return (
+    <div
+      data-ask-pending-quote={quote.source.kind}
+      className="mb-1.5 flex items-start gap-2 rounded-[12px] border border-[color:var(--card-border)] bg-surface px-3 py-2"
+    >
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="text-[12px] font-semibold text-caption">{t('ask.quote.title')}</span>
+        <span className="truncate text-[13px] text-ink">{quote.text}</span>
+        {quote.truncated && (
+          <span role="status" className="text-[12px] text-caption">
+            {t('ask.quote.truncated', { count: QUOTE_MAX_LENGTH })}
+          </span>
+        )}
+      </div>
+      <IconButton label={t('ask.quote.remove')} icon={X} size={24} variant="gray" onClick={onRemove} />
     </div>
   )
 }
