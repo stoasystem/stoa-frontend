@@ -154,12 +154,49 @@ describe('a /chat link that names a conversation opens it in Ask', () => {
  * home, not on /forbidden; a signed-out visitor signs in first and is then
  * brought back here to be sent on by role.
  */
+describe('the teacher area moved off its old prefix (#69)', () => {
+  it.each([
+    ['/tutor', '/teacher', 'TeacherDashboardPage'],
+    ['/tutor/availability', '/teacher/availability', 'TeacherAvailabilityPage'],
+    ['/tutor/profile', '/teacher/profile', 'TeacherProfilePage'],
+    ['/tutor/learning-automation', '/teacher/learning-automation', 'LearningAutomationConsolePage'],
+    ['/tutor/requests/r-1', '/teacher/requests/r-1', 'TeacherHelpRequestDetailPage'],
+    // An address no page answers keeps its tail out of the router: the
+    // classroom pages are withdrawn (card 020), so their old links land home.
+    ['/tutor/classroom', '/teacher', 'TeacherDashboardPage'],
+    ['/tutor/made-up', '/teacher', 'TeacherDashboardPage'],
+    ['/tutor/requests/../admin', '/teacher', 'TeacherDashboardPage'],
+    ['/tutor/requests/a%2Fb', '/teacher', 'TeacherDashboardPage'],
+    ['/TUTOR/availability', '/teacher/availability', 'TeacherAvailabilityPage'],
+  ])('%s -> %s', (from, pathname, page) => {
+    const landed = openAs('teacher', from)
+
+    expect(landed.pathname).toBe(pathname)
+    expect(landed.page).toBe(page)
+  })
+
+  it('carries the query string across', () => {
+    expect(openAs('teacher', '/tutor/requests/r-1?from=bell')).toMatchObject({
+      pathname: '/teacher/requests/r-1',
+      search: '?from=bell',
+    })
+  })
+
+  it('refuses every other role exactly as the old address did', () => {
+    for (const viewer of ALL_VIEWERS) {
+      if (viewer === 'teacher') continue
+      const landed = openAs(viewer, '/tutor/availability')
+      expect(landed.pathname).toBe(viewer === 'anonymous' ? '/login' : '/forbidden')
+    }
+  })
+})
+
 describe('/assistant sends each visitor where they belong', () => {
   const landings = {
     anonymous: ['/login', '/login', 'EntryPage'],
     student: ['/ask', '/ask/c-7', 'AskPage'],
     parent: ['/parent', '/parent', 'ParentDashboardPage'],
-    teacher: ['/tutor', '/tutor', 'TutorDashboardPage'],
+    teacher: ['/teacher', '/teacher', 'TeacherDashboardPage'],
     admin: ['/admin', '/admin', 'AdminDashboardPage'],
     organization_admin: ['/organization', '/organization', 'OrganizationHomePage'],
     school_teacher: ['/organization', '/organization', 'OrganizationHomePage'],

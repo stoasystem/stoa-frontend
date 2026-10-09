@@ -212,7 +212,7 @@
     "noWeakTopics": "Aucun thème faible ne réunit encore assez d’indices.",
     "signals": "{{count}} signaux",
     "freshness": "Fraîcheur du profil",
-    "freshnessBody": "Mis à jour le {{date}} à partir des questions, des escalades vers un tuteur et des preuves de pratique.",
+    "freshnessBody": "Mis à jour le {{date}} à partir des questions, des escalades vers un enseignant et des preuves de pratique.",
     "feedback": "Retour",
     "email": "E-mail",
     "usageActive": "Actif",
@@ -287,7 +287,7 @@
     "recentMistakes": "Erreurs récentes",
     "chatMessages": "Messages du chat",
     "freeTrial": "Essai gratuit",
-    "tutorHelp": "Aide d’un enseignant",
+    "teacherHelp": "Aide d’un enseignant",
     "uploadWhilePractising2": "Téléverse une photo ou un PDF et interroge l’assistant tout en suivant le parcours guidé.",
     "uploadBody2": "Prends une photo ou joins un PDF de tes devoirs. L’assistant t’aide à les comprendre pas à pas.",
     "chooseSubjectHint": "Choisis une matière, puis affine par sujet et niveau.",
@@ -356,9 +356,9 @@
     "parentTitle": "Déploiement du programme",
     "parentDescription": "Couverture du programme et signaux de points faibles visibles par les parents pour les matières actives.",
     "parentContext": "Vue parent du programme",
-    "tutorTitle": "Contexte du programme",
-    "tutorDescription": "Couverture du programme visible par l'enseignant pour la matière de la demande en cours.",
-    "tutorContext": "Aperçu tuteur",
+    "teacherTitle": "Contexte du programme",
+    "teacherDescription": "Couverture du programme visible par l'enseignant pour la matière de la demande en cours.",
+    "teacherContext": "Aperçu enseignant",
     "studentContext": "Programme",
     "loading": "Chargement de la couverture du programme...",
     "error": "La couverture du programme n'est pas disponible pour le moment.",
@@ -474,8 +474,8 @@
   },
   "teacherSupportCta": {
     "title": "Cette étape mérite peut-être une explication plus claire.",
-    "body": "Interroge un tuteur après avoir essayé l’indice et une explication étape par étape.",
-    "action": "Demander à un tuteur"
+    "body": "Interroge un enseignant après avoir essayé l’indice et une explication étape par étape.",
+    "action": "Demander à un enseignant"
   },
   "answerInput": {
     "chooseOne": "Choisis une réponse",
@@ -563,14 +563,14 @@
     "defaultRationale": "Cette pratique a été choisie à partir de signaux d’apprentissage vérifiés pour que ton prochain travail reste ciblé.",
     "sources": {
       "automation": "Pratique créée automatiquement",
-      "ai_draft": "Pratique IA vérifiée par un tuteur",
+      "ai_draft": "Pratique IA vérifiée par un enseignant",
       "curriculum_exercise": "Pratique du programme",
       "reviewed": "Pratique vérifiée"
     },
     "nextAction": {
       "completed": "Consulter le retour",
       "started": "Reprendre la pratique",
-      "skipped": "Demande à ton tuteur quoi essayer ensuite",
+      "skipped": "Demande à ton enseignant quoi essayer ensuite",
       "default": "Commencer la pratique"
     }
   }

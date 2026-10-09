@@ -212,7 +212,7 @@
     "noWeakTopics": "Nessun argomento debole ha ancora indizi sufficienti.",
     "signals": "{{count}} segnali",
     "freshness": "Aggiornamento del profilo",
-    "freshnessBody": "Aggiornato il {{date}} da domande, escalation ai tutor e prove di esercitazione.",
+    "freshnessBody": "Aggiornato il {{date}} da domande, escalation agli insegnanti e prove di esercitazione.",
     "feedback": "Riscontro",
     "email": "E-mail",
     "usageActive": "Attivo",
@@ -287,7 +287,7 @@
     "recentMistakes": "Errori recenti",
     "chatMessages": "Messaggi in chat",
     "freeTrial": "Prova gratuita",
-    "tutorHelp": "Aiuto dell’insegnante",
+    "teacherHelp": "Aiuto dell’insegnante",
     "uploadWhilePractising2": "Carica una foto o un PDF e chiedi all’assistente mentre segui il percorso guidato.",
     "uploadBody2": "Scatta una foto o allega un PDF dei compiti. L’assistente ti aiuta a capirli passo passo.",
     "chooseSubjectHint": "Scegli una materia, poi restringi per argomento e livello.",
@@ -356,9 +356,9 @@
     "parentTitle": "Attivazione del curriculum",
     "parentDescription": "Copertura del curriculum visibile ai genitori e segnali sulle aree deboli per le materie attive.",
     "parentContext": "Vista curriculum per i genitori",
-    "tutorTitle": "Contesto del curriculum",
-    "tutorDescription": "Copertura del curriculum visibile all'insegnante per la materia della richiesta corrente.",
-    "tutorContext": "Anteprima tutor",
+    "teacherTitle": "Contesto del curriculum",
+    "teacherDescription": "Copertura del curriculum visibile all'insegnante per la materia della richiesta corrente.",
+    "teacherContext": "Anteprima insegnante",
     "studentContext": "Curriculum",
     "loading": "Caricamento della copertura del curriculum...",
     "error": "La copertura del curriculum non è disponibile al momento.",
@@ -474,8 +474,8 @@
   },
   "teacherSupportCta": {
     "title": "Questo passaggio forse ha bisogno di una spiegazione più chiara.",
-    "body": "Chiedi a un tutor dopo aver provato il suggerimento e una spiegazione passo per passo.",
-    "action": "Chiedi a un tutor"
+    "body": "Chiedi a un insegnante dopo aver provato il suggerimento e una spiegazione passo per passo.",
+    "action": "Chiedi a un insegnante"
   },
   "answerInput": {
     "chooseOne": "Scegli una risposta",
@@ -563,14 +563,14 @@
     "defaultRationale": "Questa esercitazione è stata scelta da segnali di apprendimento verificati, così il tuo prossimo lavoro resta mirato.",
     "sources": {
       "automation": "Esercitazione creata automaticamente",
-      "ai_draft": "Esercitazione IA verificata da un tutor",
+      "ai_draft": "Esercitazione IA verificata da un insegnante",
       "curriculum_exercise": "Esercitazione del programma",
       "reviewed": "Esercitazione verificata"
     },
     "nextAction": {
       "completed": "Vedi il riscontro",
       "started": "Riprendi l’esercitazione",
-      "skipped": "Chiedi al tuo tutor cosa provare adesso",
+      "skipped": "Chiedi al tuo insegnante cosa provare adesso",
       "default": "Inizia l’esercitazione"
     }
   }

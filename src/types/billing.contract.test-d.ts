@@ -55,7 +55,7 @@ export const teacherSupportedPlan: BillingPlan = {
 }
 
 // @ts-expect-error tutor_supported is not an active plan identity
-export const legacyTutorPlan: SubscriptionPlan = 'tutor_supported'
+export const legacyTeacherPlan: SubscriptionPlan = 'tutor_supported'
 
 // @ts-expect-error free_trial cannot be marked as purchasable
 export const purchasableTrial: BillingPlan = { ...freeTrialPlan, purchasable: true }

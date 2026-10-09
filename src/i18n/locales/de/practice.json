@@ -212,7 +212,7 @@
     "noWeakTopics": "Für schwache Themen liegen noch nicht genügend Belege vor.",
     "signals": "{{count}} Signale",
     "freshness": "Aktualität des Profils",
-    "freshnessBody": "Am {{date}} aus Fragen, Tutor-Eskalationen und Übungsbelegen aktualisiert.",
+    "freshnessBody": "Am {{date}} aus Fragen, Eskalationen an Lehrpersonen und Übungsbelegen aktualisiert.",
     "feedback": "Rückmeldung",
     "email": "E-Mail",
     "usageActive": "Aktiv",
@@ -287,7 +287,7 @@
     "recentMistakes": "Letzte Fehler",
     "chatMessages": "Chat-Nachrichten",
     "freeTrial": "Testphase",
-    "tutorHelp": "Hilfe von Lehrpersonen",
+    "teacherHelp": "Hilfe von Lehrpersonen",
     "uploadWhilePractising2": "Lade ein Foto oder PDF hoch und frag den Lernassistenten, während dich der Lernpfad weiter führt.",
     "uploadBody2": "Fotografiere deine Schulaufgabe oder hänge ein PDF an. Der Lernassistent hilft dir, sie Schritt für Schritt zu verstehen.",
     "chooseSubjectHint": "Wähle ein Fach und grenze dann nach Thema und Niveau ein.",
@@ -356,9 +356,9 @@
     "parentTitle": "Lehrplan-Rollout",
     "parentDescription": "Für Eltern sichtbare Lehrplanabdeckung und Signale zu Schwachstellen für aktive Fächer.",
     "parentContext": "Elternansicht Lehrplan",
-    "tutorTitle": "Lehrplan-Kontext",
-    "tutorDescription": "Für Lehrkräfte sichtbare Lehrplanabdeckung für das aktuelle Anfragefach.",
-    "tutorContext": "Tutor-Vorschau",
+    "teacherTitle": "Lehrplan-Kontext",
+    "teacherDescription": "Für Lehrkräfte sichtbare Lehrplanabdeckung für das aktuelle Anfragefach.",
+    "teacherContext": "Lehrpersonen-Vorschau",
     "studentContext": "Lehrplan",
     "loading": "Lehrplanabdeckung wird geladen...",
     "error": "Lehrplanabdeckung ist derzeit nicht verfügbar.",
@@ -474,8 +474,8 @@
   },
   "teacherSupportCta": {
     "title": "Dieser Schritt braucht vielleicht eine klarere Erklärung.",
-    "body": "Frag einen Tutor, nachdem du den Tipp und eine Schritt-für-Schritt-Erklärung ausprobiert hast.",
-    "action": "Tutor fragen"
+    "body": "Frag eine Lehrperson, nachdem du den Tipp und eine Schritt-für-Schritt-Erklärung ausprobiert hast.",
+    "action": "Lehrperson fragen"
   },
   "answerInput": {
     "chooseOne": "Wähle eine Antwort",
@@ -563,14 +563,14 @@
     "defaultRationale": "Diese Übung wurde aus geprüften Lernsignalen ausgewählt, damit deine nächste Arbeit fokussiert bleibt.",
     "sources": {
       "automation": "Automatisch erstellte Übung",
-      "ai_draft": "Von Tutoren geprüfte KI-Übung",
+      "ai_draft": "Von Lehrpersonen geprüfte KI-Übung",
       "curriculum_exercise": "Übung aus dem Lehrplan",
       "reviewed": "Geprüfte Übung"
     },
     "nextAction": {
       "completed": "Rückmeldung ansehen",
       "started": "Übung fortsetzen",
-      "skipped": "Frag deinen Tutor, was du als Nächstes probieren sollst",
+      "skipped": "Frag deine Lehrperson, was du als Nächstes probieren sollst",
       "default": "Übung starten"
     }
   }

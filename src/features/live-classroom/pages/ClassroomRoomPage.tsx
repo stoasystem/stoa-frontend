@@ -13,21 +13,21 @@ import { useClassroomRoomState } from '@/features/live-classroom/hooks/useClassr
 import { useClassroomSession } from '@/features/live-classroom/hooks/useClassroomSession'
 import { formatClassroomTimeRange } from '@/features/live-classroom/utils/formatClassroom'
 
-export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }) {
+export function ClassroomRoomPage({ teacherMode = false }: { teacherMode?: boolean }) {
   const { sessionId } = useParams()
   const location = useLocation()
   const navigate = useNavigate()
   const sessionQuery = useClassroomSession(sessionId)
   const leaveMutation = useLeaveClassroomRoom(sessionId)
   const completeMutation = useCompleteClassroomSession(sessionId)
-  const initialPanel = location.search.includes('source=chat') ? 'chat' : tutorMode ? 'notes' : 'materials'
+  const initialPanel = location.search.includes('source=chat') ? 'chat' : teacherMode ? 'notes' : 'materials'
   const roomState = useClassroomRoomState(initialPanel)
   const session = sessionQuery.data
 
   function confirmLeave() {
-    if (tutorMode) {
+    if (teacherMode) {
       completeMutation.mutate(undefined, {
-        onSuccess: () => navigate(`/tutor/classroom/sessions/${sessionId}/summary`),
+        onSuccess: () => navigate(`/teacher/classroom/sessions/${sessionId}/summary`),
       })
       return
     }
@@ -49,7 +49,7 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
               <header className="rounded-lg border bg-card px-4 py-3 shadow-[var(--platform-shadow-card)]">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div className="min-w-0">
-                    <p className="brand-section-kicker">{tutorMode ? 'Tutor classroom' : 'Online Classroom'}</p>
+                    <p className="brand-section-kicker">{teacherMode ? 'Teacher classroom' : 'Online Classroom'}</p>
                     <h1 className="mt-1 truncate text-xl font-semibold sm:text-2xl">{session.title}</h1>
                   </div>
                   <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
@@ -57,7 +57,7 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
                       {formatClassroomTimeRange(session)}
                     </span>
                     <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
-                      Tutor: {session.tutorName ?? 'Tutor'}
+                      Teacher: {session.teacherName ?? 'Teacher'}
                     </span>
                     {session.context?.sourceLabel && (
                       <span className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2">
@@ -72,14 +72,14 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
                 <div className="space-y-4">
                   <ClassroomLearningWorkspace
                     session={session}
-                    tutorMode={tutorMode}
+                    teacherMode={teacherMode}
                     whiteboardOpen={roomState.whiteboardOpen}
                   />
                   <ClassroomSidePanel
                     session={session}
                     activePanel={roomState.activePanel}
                     onPanelChange={roomState.setActivePanel}
-                    tutorMode={tutorMode}
+                    teacherMode={teacherMode}
                   />
                 </div>
                 <div className="xl:sticky xl:top-24 xl:self-start">
@@ -93,7 +93,7 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
         {session && (
           <ClassroomControlBar
             deviceState={roomState.deviceState}
-            tutorMode={tutorMode}
+            teacherMode={teacherMode}
             onToggleMicrophone={roomState.toggleMicrophone}
             onToggleCamera={roomState.toggleCamera}
             onToggleWhiteboard={roomState.toggleWhiteboard}
@@ -103,7 +103,7 @@ export function ClassroomRoomPage({ tutorMode = false }: { tutorMode?: boolean }
         )}
         <ClassroomLeaveDialog
           open={roomState.leaveDialogOpen}
-          tutorMode={tutorMode}
+          teacherMode={teacherMode}
           onOpenChange={roomState.setLeaveDialogOpen}
           onConfirm={confirmLeave}
         />

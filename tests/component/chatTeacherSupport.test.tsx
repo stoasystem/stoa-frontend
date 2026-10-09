@@ -89,9 +89,9 @@ describe('teacher support in a conversation', () => {
     await userEvent.click(screen.getAllByRole('button', { name: /Brüche/ })[0])
     await userEvent.click(await screen.findByRole('button', { name: 'teacher.cta' }))
 
-    expect(await screen.findByText('tutorEscalation.requestedTitle')).toBeInTheDocument()
+    expect(await screen.findByText('teacherEscalation.requestedTitle')).toBeInTheDocument()
     // Whether a teacher joined is the server's to say (#12 point 2).
-    expect(screen.queryByRole('button', { name: 'tutorEscalation.confirmJoined' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'teacherEscalation.confirmJoined' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /startClassroom|preparingLobby/ })).not.toBeInTheDocument()
     expect(document.querySelector('a[href^="/classroom"]')).toBeNull()
     expect(screen.getByTestId('location')).not.toHaveTextContent('/classroom')

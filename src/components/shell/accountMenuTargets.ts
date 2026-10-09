@@ -18,14 +18,14 @@ export const PASSWORD_SECTION_ID = 'password'
 const ME_PASSWORD = `/me#${PASSWORD_SECTION_ID}`
 
 /*
- * Profile per role. The student's is /me. A teacher has /tutor/profile; a
+ * Profile per role. The student's is /me. A teacher has /teacher/profile; a
  * parent's account page is the account-operations page. Administrators and
  * the organisation roles have no profile page of their own, so theirs is /me
  * too (#46), which the manifest opens to them.
  */
 const PROFILE_PATHS: Record<AppNavArea, string | null> = {
   student: '/me',
-  teacher: '/tutor/profile',
+  teacher: '/teacher/profile',
   parent: '/parent/account-operations',
   admin: '/me',
   organization: '/me',

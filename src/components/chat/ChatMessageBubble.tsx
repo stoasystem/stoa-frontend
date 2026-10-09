@@ -9,7 +9,7 @@ import { formatTimeOfDay } from '@/lib/formatDateTime'
 import { useTranslation } from 'react-i18next'
 
 function roleLabelKey(message: ChatMessage) {
-  if (message.role === 'teacher') return 'roles.tutor'
+  if (message.role === 'teacher') return 'roles.teacher'
   if (message.role === 'system') return 'roles.system'
   if (message.role === 'assistant') return 'roles.assistant'
   return null

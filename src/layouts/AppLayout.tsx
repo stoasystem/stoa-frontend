@@ -50,7 +50,7 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   settings: Settings,
   students: Users,
   support: HelpCircle,
-  tutors: GraduationCap,
+  teachers: GraduationCap,
 }
 
 export type AppSurface = 'light' | 'sky'

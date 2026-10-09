@@ -39,8 +39,8 @@ vi.mock('@/pages/ask/AskPage', () => ({
 vi.mock('@/pages/parent/ParentDashboardPage', () => ({
   ParentDashboardPage: () => <h1>parent home</h1>,
 }))
-vi.mock('@/pages/tutor/TutorDashboardPage', () => ({
-  TutorDashboardPage: () => <h1>teacher home</h1>,
+vi.mock('@/pages/teacher/TeacherDashboardPage', () => ({
+  TeacherDashboardPage: () => <h1>teacher home</h1>,
 }))
 vi.mock('@/pages/auth/TeacherActivatePage', () => ({
   TeacherActivatePage: function TeacherActivateStub() {
@@ -191,7 +191,7 @@ describe('signing in from /login', () => {
 
   it.each([
     ['parent', '/parent', 'parent home'],
-    ['teacher', '/tutor', 'teacher home'],
+    ['teacher', '/teacher', 'teacher home'],
   ] as const)("sends a %s whose ?next= belongs to a student to the role's home", async (role, home, heading) => {
     serve(account(role))
     openAt('/login?next=/map/math')

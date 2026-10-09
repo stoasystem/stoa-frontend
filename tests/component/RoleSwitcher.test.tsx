@@ -356,7 +356,7 @@ describe('switching between the test roles', () => {
     const { getDefaultRouteForRole } = await import('@/lib/authRoutes')
 
     expect(getDefaultRouteForRole('parent')).toBe('/parent')
-    expect(getDefaultRouteForRole('teacher')).toBe('/tutor')
+    expect(getDefaultRouteForRole('teacher')).toBe('/teacher')
     expect(getDefaultRouteForRole('admin')).toBe('/admin')
     // The root is the student's own home since #45: the router decides there
     // from the account it loads, so it cannot land a student on /forbidden.

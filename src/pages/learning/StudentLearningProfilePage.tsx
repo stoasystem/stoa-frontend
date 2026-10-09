@@ -58,7 +58,7 @@ export function StudentLearningProfilePage() {
                     <div key={item.subject} className="rounded-md border p-3">
                       <p className="font-medium">{item.label}</p>
                       <p className="text-sm text-muted-foreground">
-                        {item.questionCount} questions · {item.aiResolvedCount} AI resolved · {item.teacherEscalationCount} tutor help
+                        {item.questionCount} questions · {item.aiResolvedCount} AI resolved · {item.teacherEscalationCount} teacher help
                       </p>
                     </div>
                   ))}

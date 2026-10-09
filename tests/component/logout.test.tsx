@@ -45,9 +45,9 @@ function renderSignedIn() {
   })
   render(
     <QueryClientProvider client={new QueryClient()}>
-      <MemoryRouter initialEntries={['/tutor']}>
+      <MemoryRouter initialEntries={['/teacher']}>
         <Routes>
-          <Route path="/tutor" element={<AccountMenu />} />
+          <Route path="/teacher" element={<AccountMenu />} />
           <Route path="/login" element={<p>login page</p>} />
         </Routes>
       </MemoryRouter>

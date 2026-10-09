@@ -141,7 +141,7 @@ describe('ChangePasswordPage', () => {
   it.each([
     ['student', '/'],
     ['parent', '/parent'],
-    ['teacher', '/tutor'],
+    ['teacher', '/teacher'],
     ['admin', '/admin'],
   ] as const)('sends %s back into the app, never to the login screen', (role, home) => {
     // The route lives inside ProtectedRoute and Cognito's change_password does

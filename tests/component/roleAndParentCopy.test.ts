@@ -14,7 +14,7 @@ const COMMON = { de: deCommon, en: enCommon, fr: frCommon, it: itCommon }
 const PARENT = { de: deParent, en: enParent, fr: frParent, it: itParent }
 
 // `RoleBadge` looks a role up as `roles.<role>`, and the role it is handed is
-// the backend's canonical one. The map was written with `tutor`, the backend
+// the backend's canonical one. The map was written with `teacher`, the backend
 // says `teacher`, and so a signed-in teacher's own header read `roles.teacher`
 // on every screen, in all four languages.
 const CANONICAL_ROLES = ['student', 'parent', 'teacher', 'admin'] as const

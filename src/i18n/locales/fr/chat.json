@@ -81,7 +81,7 @@
   "newConversationReady": "Prêt pour une nouvelle question.",
   "stopGenerating": "Arrêter la génération",
   "loadingChat": "Chargement du chat",
-  "tutorSupport": "Aide enseignante",
+  "teacherSupport": "Aide enseignante",
   "uploadedMaterial": "Document pédagogique déposé",
   "back": "Retour",
   "needHelpFromTeacher": "Besoin de l'aide d'un enseignant ?",
@@ -92,7 +92,7 @@
     "planRestricted": "L'aide enseignante ne fait pas partie de votre offre actuelle."
   },
   "roles": {
-    "tutor": "Tuteur",
+    "teacher": "Enseignant",
     "system": "Système",
     "assistant": "Assistant d’apprentissage STOA"
   },
@@ -118,9 +118,9 @@
     "questionBank": "Peux-tu expliquer cette étape de la bibliothèque d’exercices ?",
     "questionStep": "Peux-tu expliquer cette étape de l’exercice ?"
   },
-  "tutorEscalation": {
-    "requestedTitle": "Aide d’un tuteur demandée",
-    "requestedBody": "Un tuteur rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant."
+  "teacherEscalation": {
+    "requestedTitle": "Aide d’un enseignant demandée",
+    "requestedBody": "Un enseignant rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant."
   },
   "contextLines": {
     "uploadSource": "Source du téléversement : {{title}}",

@@ -51,7 +51,7 @@ describe('the navigation shown to a user', () => {
     expect(deadLinks).toEqual([])
   })
 
-  it.each(['/classroom', '/tutor/classroom', '/billing'])(
+  it.each(['/classroom', '/teacher/classroom', '/billing'])(
     'does not accept a withdrawn route that remains in a comment (%s)',
     (navPath) => {
       expect(registeredRoutes.some((route) => matchPath(route, navPath))).toBe(false)

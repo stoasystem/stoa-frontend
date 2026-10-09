@@ -114,7 +114,7 @@
     "contact": "Contact",
     "dashboard": "Tableau de bord",
     "forParents": "Pour les parents",
-    "forTutors": "Pour les enseignants",
+    "forTeachers": "Pour les enseignants",
     "helpRequests": "Demandes enseignant",
     "home": "Accueil",
     "howItWorks": "Fonctionnement",
@@ -152,7 +152,7 @@
     "support": "Aide",
     "supportInbox": "Aide",
     "terms": "Conditions",
-    "tutors": "Enseignants",
+    "teachers": "Enseignants",
     "users": "Élèves"
   },
   "nextStep": "Prochaine étape recommandée",
@@ -195,8 +195,7 @@
     "school_teacher": "Enseignant scolaire",
     "school_viewer": "Observateur scolaire",
     "student": "Élève",
-    "teacher": "Enseignant",
-    "tutor": "Enseignant"
+    "teacher": "Enseignant"
   },
   "routes": {
     "accountOperations": {

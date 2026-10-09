@@ -81,7 +81,7 @@
   "newConversationReady": "Bereit für eine neue Frage.",
   "stopGenerating": "Erstellung stoppen",
   "loadingChat": "Chat wird geladen",
-  "tutorSupport": "Tutor-Unterstützung",
+  "teacherSupport": "Unterstützung durch Lehrpersonen",
   "uploadedMaterial": "Hochgeladenes Lernmaterial",
   "back": "Zurück",
   "needHelpFromTeacher": "Brauchst du Hilfe von einer Lehrperson?",
@@ -92,7 +92,7 @@
     "planRestricted": "Unterstützung durch eine Lehrperson ist nicht Teil deines aktuellen Plans."
   },
   "roles": {
-    "tutor": "Tutor",
+    "teacher": "Lehrperson",
     "system": "System",
     "assistant": "STOA Lernassistent"
   },
@@ -118,9 +118,9 @@
     "questionBank": "Kannst du diesen Schritt aus der Übungsbibliothek erklären?",
     "questionStep": "Kannst du diesen Aufgabenschritt erklären?"
   },
-  "tutorEscalation": {
-    "requestedTitle": "Tutor-Unterstützung angefragt",
-    "requestedBody": "Ein Tutor tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten."
+  "teacherEscalation": {
+    "requestedTitle": "Unterstützung durch eine Lehrperson angefragt",
+    "requestedBody": "Eine Lehrperson tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten."
   },
   "contextLines": {
     "uploadSource": "Quelle des Uploads: {{title}}",

@@ -198,7 +198,7 @@ function inferRole(email: string): UserRole {
   if (email.includes('school.teacher')) return 'school_teacher'
   if (email.includes('school.viewer')) return 'school_viewer'
   if (email.includes('parent')) return 'parent'
-  if (email.includes('tutor') || email.includes('teacher')) return 'teacher'
+  if (email.includes('teacher')) return 'teacher'
   if (email.includes('admin')) return 'admin'
   return 'student'
 }

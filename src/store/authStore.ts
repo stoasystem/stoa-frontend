@@ -37,12 +37,10 @@ const validRoles: UserRole[] = [
   'school_viewer',
 ]
 
-// Maps Cognito group names and the legacy `tutor` value onto the canonical role the
-// backend emits. `tutor` must stay accepted so sessions stored before the rename
-// keep resolving instead of silently falling back to `student`.
+// Maps Cognito group names onto the canonical role the backend emits. The
+// groups are the four the backend recognises; no legacy spelling is accepted
+// here, because the backend refuses one (T-472-03) and never emits one.
 const roleAliases: Record<string, UserRole> = {
-  tutor: 'teacher',
-  tutors: 'teacher',
   teachers: 'teacher',
   students: 'student',
   parents: 'parent',

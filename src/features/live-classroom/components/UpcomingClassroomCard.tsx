@@ -16,7 +16,7 @@ export function UpcomingClassroomCard({ session }: { session: LiveClassroomSessi
           <h2 className="mt-2 text-2xl font-semibold">{session.title}</h2>
           <p className="mt-2 text-sm text-muted-foreground">{formatClassroomTimeRange(session)}</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Tutor: {session.tutorName ?? 'Tutor to be confirmed'} · {session.topicLabel ?? session.subjectLabel}
+            Teacher: {session.teacherName ?? 'Teacher to be confirmed'} · {session.topicLabel ?? session.subjectLabel}
           </p>
         </div>
         <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] px-3 py-2 text-sm font-medium">

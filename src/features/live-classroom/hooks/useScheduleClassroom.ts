@@ -11,7 +11,7 @@ export function useScheduleClassroom() {
     onSuccess: (session) => {
       queryClient.setQueryData(liveClassroomQueryKeys.session(session.id), session)
       void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.studentHome() })
-      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.tutorQueue() })
+      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.teacherQueue() })
     },
   })
 }

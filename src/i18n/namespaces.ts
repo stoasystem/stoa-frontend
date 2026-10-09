@@ -6,7 +6,7 @@ export const namespaces = [
   'practice',
   'questionBank',
   'uploads',
-  'tutor',
+  'teacher',
   'billing',
   'support',
   'legal',

@@ -8,16 +8,16 @@ import type { AuthResponse } from '@/types/user'
 
 function getContinueHref(data: AuthResponse) {
   if (data.user.role === 'parent') return '/parent'
-  if (data.user.role === 'teacher') return '/tutor'
+  if (data.user.role === 'teacher') return '/teacher'
   return getDefaultRouteForRole('student')
 }
 
 export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {
   const { t } = useTranslation(['auth', 'common'])
-  const tutorPending = data.verificationStatus === 'pending_review'
-  const Icon = tutorPending ? Clock3 : CheckCircle2
+  const teacherPending = data.verificationStatus === 'pending_review'
+  const Icon = teacherPending ? Clock3 : CheckCircle2
 
-  if (!tutorPending && (data.emailVerificationRequired || data.onboardingStatus === 'email_verification_required')) {
+  if (!teacherPending && (data.emailVerificationRequired || data.onboardingStatus === 'email_verification_required')) {
     return (
       <EmailVerificationPanel
         email={data.user.email}
@@ -28,7 +28,7 @@ export function RegisterConfirmationStep({ data }: { data: AuthResponse }) {
     )
   }
 
-  if (tutorPending) {
+  if (teacherPending) {
     return (
       <div className="rounded-xl border border-border/70 bg-card/90 p-6 text-center">
         <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">

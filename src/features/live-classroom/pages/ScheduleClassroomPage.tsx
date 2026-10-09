@@ -110,7 +110,7 @@ export function ScheduleClassroomPage() {
         <PageHeader
           eyebrow="Online Classroom"
           title="Schedule a Classroom Session"
-          description="Set the learning focus, choose a time, and add the material your tutor should see first."
+          description="Set the learning focus, choose a time, and add the material your teacher should see first."
           actions={<BackButton label="Back to Online Classroom" to="/classroom" />}
         />
 
@@ -190,16 +190,16 @@ export function ScheduleClassroomPage() {
                 <Textarea
                   value={contextMessage}
                   onChange={(event) => setContextMessage(event.target.value)}
-                  placeholder="What should the tutor know?"
+                  placeholder="What should the teacher know?"
                   className="min-h-28"
-                  aria-label="What should the tutor know?"
+                  aria-label="What should the teacher know?"
                 />
                 <div className="rounded-lg border bg-[hsl(var(--platform-surface-app))] p-4">
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="text-sm font-semibold">Attach materials</p>
                       <p className="text-xs leading-5 text-muted-foreground">
-                        Add a photo or PDF so the tutor can prepare. This uses the same learning-material upload flow.
+                        Add a photo or PDF so the teacher can prepare. This uses the same learning-material upload flow.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -237,7 +237,7 @@ export function ScheduleClassroomPage() {
                 </dl>
               </div>
               <p className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6 text-muted-foreground">
-                The tutor sees this brief before joining, so keep the question and material focused.
+                The teacher sees this brief before joining, so keep the question and material focused.
               </p>
               <div className="grid gap-2">
                 <Button type="button" onClick={handleSchedule} disabled={scheduleMutation.isPending || isUploading}>

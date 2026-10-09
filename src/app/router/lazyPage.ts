@@ -6,7 +6,7 @@ import { lazy, type ComponentType, type LazyExoticComponent } from 'react'
 export type PageComponent = ComponentType<any>
 
 export type LazyPage = LazyExoticComponent<PageComponent> & {
-  /** The named export the page is loaded from, e.g. `TutorDashboardPage`. */
+  /** The named export the page is loaded from, e.g. `TeacherDashboardPage`. */
   readonly pageName: string
 }
 

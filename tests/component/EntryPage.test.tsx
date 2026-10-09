@@ -32,7 +32,7 @@ function renderAt(entry = '/login') {
           <Route path="/login" element={<EntryPage />} />
           <Route path="/" element={<p>the student app</p>} />
           <Route path="/parent" element={<p>the parent app</p>} />
-          <Route path="/tutor" element={<p>the teacher app</p>} />
+          <Route path="/teacher" element={<p>the teacher app</p>} />
         </Routes>
       </MemoryRouter>
     </QueryClientProvider>,

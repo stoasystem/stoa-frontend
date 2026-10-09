@@ -29,15 +29,15 @@ const expectedNav = {
   ...before.nav,
   teacher: {
     desktop: [
-      ['/tutor', 'Requests', 'primary', 'requests', true, 'navigation.requests'],
-      ['/tutor/availability', 'Availability', 'primary', 'settings', true, 'navigation.availability'],
+      ['/teacher', 'Requests', 'primary', 'requests', true, 'navigation.requests'],
+      ['/teacher/availability', 'Availability', 'primary', 'settings', true, 'navigation.availability'],
     ],
-    mobile: ['/tutor', '/tutor/availability'],
+    mobile: ['/teacher', '/teacher/availability'],
   },
   admin: {
     desktop: [
       ['/admin/users', 'Users', 'primary', 'students', false, 'navigation.admin.users'],
-      ['/admin/teacher-applications', 'Teacher applications', 'primary', 'tutors', false, 'navigation.admin.teacherApplications'],
+      ['/admin/teacher-applications', 'Teacher applications', 'primary', 'teachers', false, 'navigation.admin.teacherApplications'],
       ['/admin/curriculum', 'Curriculum', 'primary', 'curriculum', false, 'navigation.admin.curriculum'],
       ['/admin/moderation', 'Moderation', 'primary', 'moderation', true, 'navigation.admin.moderation'],
       ['/admin', 'System', 'primary', 'settings', true, 'navigation.admin.system'],
@@ -48,18 +48,33 @@ const expectedNav = {
 const viewers = [...new Set(outcomes.map((outcome) => outcome.viewer))]
 
 /*
- * The one old path whose ending changed on purpose since: `/assistant` sent
- * every signed-in role but the student to /forbidden. Since #104 it sends each
- * of them to their own home. Signed out, it still ends on the sign-in.
+ * The old paths whose ending changed on purpose since.
+ *
+ * `/assistant` sent every signed-in role but the student to /forbidden. Since
+ * #104 it sends each of them to their own home. Signed out, it still ends on
+ * the sign-in.
+ *
+ * The teacher area moved off the legacy prefix in #69. Its old addresses now
+ * forward to the same page under /teacher, so a teacher ends one redirect
+ * later than before and everybody else is refused exactly as before.
  */
 const changedSince45: Record<string, Partial<Record<Viewer, { pathname: string; page: string }>>> = {
   '/assistant': {
     parent: { pathname: '/parent', page: 'ParentDashboardPage' },
-    teacher: { pathname: '/tutor', page: 'TutorDashboardPage' },
+    teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' },
     admin: { pathname: '/admin', page: 'AdminDashboardPage' },
     organization_admin: { pathname: '/organization', page: 'OrganizationHomePage' },
     school_teacher: { pathname: '/organization', page: 'OrganizationHomePage' },
     school_viewer: { pathname: '/organization', page: 'OrganizationHomePage' },
+  },
+  '/tutor': { teacher: { pathname: '/teacher', page: 'TeacherDashboardPage' } },
+  '/tutor/availability': { teacher: { pathname: '/teacher/availability', page: 'TeacherAvailabilityPage' } },
+  '/tutor/profile': { teacher: { pathname: '/teacher/profile', page: 'TeacherProfilePage' } },
+  '/tutor/learning-automation': {
+    teacher: { pathname: '/teacher/learning-automation', page: 'LearningAutomationConsolePage' },
+  },
+  '/tutor/requests/requestId-1': {
+    teacher: { pathname: '/teacher/requests/requestId-1', page: 'TeacherHelpRequestDetailPage' },
   },
 }
 const expectedOutcome = (recorded: Recorded) => changedSince45[recorded.path]?.[recorded.viewer] ?? recorded

@@ -61,7 +61,7 @@
       "audience": "Für neue Nutzerinnen und Nutzer",
       "student": "Schüler/in",
       "parent": "Elternteil",
-      "tutor": "Lehrperson"
+      "teacher": "Lehrperson"
     },
     "expectations": {
       "title": "Was Sie erwartet",
@@ -108,7 +108,7 @@
           }
         ]
       },
-      "tutor": {
+      "teacher": {
         "title": "Ablauf für Lehrpersonen",
         "audience": "Für Lehrpersonen, die Hilfeanfragen beantworten",
         "steps": [

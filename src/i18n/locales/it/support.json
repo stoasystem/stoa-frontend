@@ -61,7 +61,7 @@
       "audience": "Per i nuovi utenti",
       "student": "Studente",
       "parent": "Genitore",
-      "tutor": "Insegnante"
+      "teacher": "Insegnante"
     },
     "expectations": {
       "title": "Che cosa aspettarsi",
@@ -108,7 +108,7 @@
           }
         ]
       },
-      "tutor": {
+      "teacher": {
         "title": "Flusso per gli insegnanti",
         "audience": "Per gli insegnanti che rispondono alle richieste",
         "steps": [

@@ -9,7 +9,7 @@
 ## Loading Feedback
 
 - Prefer skeletons over plain loading text for page-level data loads.
-- Use feature skeletons when the loaded shape is known, such as dashboard cards, chat panes, parent child cards, and tutor request rows.
+- Use feature skeletons when the loaded shape is known, such as dashboard cards, chat panes, parent child cards, and teacher request rows.
 - Keep skeleton dimensions stable so content does not jump when data arrives.
 
 ## Visual Tone

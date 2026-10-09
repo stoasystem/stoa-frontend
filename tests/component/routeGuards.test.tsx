@@ -128,17 +128,17 @@ describe('/ is the star map for a student and the front door for everyone else',
 
 describe('other roles cannot reach each other either', () => {
   it.each([
-    ['student', '/tutor'],
+    ['student', '/teacher'],
     ['student', '/parent'],
     ['student', '/admin/users'],
     ['student', '/organization/learning-operations'],
     ['teacher', '/admin'],
-    ['parent', '/tutor/requests/r-1'],
+    ['parent', '/teacher/requests/r-1'],
   ] as const)('refuses %s at %s', (viewer, path) => {
     expect(openAs(viewer, path).pathname).toBe('/forbidden')
   })
 
-  it.each(['/tutor', '/parent', '/admin', '/settings/password'])(
+  it.each(['/teacher', '/parent', '/admin', '/settings/password'])(
     'sends a signed-out visitor at %s to sign in',
     (path) => {
       expect(openAs('anonymous', path).pathname).toBe('/login')

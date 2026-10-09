@@ -10,7 +10,7 @@ export type SmokeRole = 'student' | 'parent' | 'teacher' | 'admin'
 export const smokeAccounts: Record<SmokeRole, { email: string; landing: RegExp }> = {
   student: { email: 'student@test.stoaedu.ch', landing: /\/(chat|learn)/ },
   parent: { email: 'parent@test.stoaedu.ch', landing: /\/parent/ },
-  teacher: { email: 'teacher@test.stoaedu.ch', landing: /\/tutor/ },
+  teacher: { email: 'teacher@test.stoaedu.ch', landing: /\/teacher/ },
   admin: { email: 'admin@test.stoaedu.ch', landing: /\/admin/ },
 }
 

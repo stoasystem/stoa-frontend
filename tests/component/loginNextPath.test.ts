@@ -63,7 +63,7 @@ describe('the paths a student may be returned to after sign-in', () => {
   })
 
   it.each([
-    '/tutor',
+    '/teacher',
     '/admin/users',
     '/parent',
     '//evil.example',
@@ -84,7 +84,7 @@ describe('the paths the other roles may be returned to', () => {
     ['school_viewer', '/students/s-1/learning-profile'],
     ['admin', '/me'],
     ['organization_admin', '/me'],
-    ['teacher', '/tutor/requests/r-1'],
+    ['teacher', '/teacher/requests/r-1'],
     ['teacher', '/teacher-activate'],
     ['parent', '/parent/children/c-1/report'],
     ['parent', '/support'],
@@ -97,7 +97,7 @@ describe('the paths the other roles may be returned to', () => {
     ['teacher', '/'],
     ['teacher', '/me'],
     ['teacher', '/parent'],
-    ['parent', '/tutor/requests/r-1'],
+    ['parent', '/teacher/requests/r-1'],
     ['parent', '/map/math'],
     ['admin', '/map/math'],
     ['school_teacher', '/admin/users'],

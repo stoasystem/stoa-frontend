@@ -15,7 +15,7 @@ import { useClassroomRoomState } from '@/features/live-classroom/hooks/useClassr
 import { useClassroomSession } from '@/features/live-classroom/hooks/useClassroomSession'
 import { formatClassroomTimeRange } from '@/features/live-classroom/utils/formatClassroom'
 
-export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean }) {
+export function ClassroomLobbyPage({ teacherMode = false }: { teacherMode?: boolean }) {
   const { sessionId } = useParams()
   const navigate = useNavigate()
   const sessionQuery = useClassroomSession(sessionId)
@@ -33,8 +33,8 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
   function handleJoin() {
     joinRoomMutation.mutate(undefined, {
       onSuccess: () => {
-        navigate(tutorMode
-          ? `/tutor/classroom/sessions/${sessionId}/room`
+        navigate(teacherMode
+          ? `/teacher/classroom/sessions/${sessionId}/room`
           : `/classroom/sessions/${sessionId}/room`)
       },
     })
@@ -44,10 +44,10 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
         <PageHeader
-          eyebrow={tutorMode ? 'Tutor classroom' : 'Classroom Lobby'}
-          title={tutorMode ? 'Prepare for Classroom' : 'Classroom Lobby'}
+          eyebrow={teacherMode ? 'Teacher classroom' : 'Classroom Lobby'}
+          title={teacherMode ? 'Prepare for Classroom' : 'Classroom Lobby'}
           description={session ? `${session.title} · ${formatClassroomTimeRange(session)}` : 'Prepare before entering the classroom.'}
-          actions={<BackButton label="Back" to={tutorMode ? '/tutor/classroom' : '/classroom'} />}
+          actions={<BackButton label="Back" to={teacherMode ? '/teacher/classroom' : '/classroom'} />}
         />
 
         {sessionQuery.isLoading && <EmptyState message="Loading classroom lobby..." />}
@@ -62,11 +62,11 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
                     <UserRound className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div className="min-w-0">
-                    <p className="brand-section-kicker">Tutor</p>
-                    <h2 className="mt-2 text-xl font-semibold">{session.tutorName ?? 'Tutor to be confirmed'}</h2>
-                    <p className="mt-1 text-sm text-muted-foreground">{session.tutorTitle ?? 'STOA tutor'}</p>
+                    <p className="brand-section-kicker">Teacher</p>
+                    <h2 className="mt-2 text-xl font-semibold">{session.teacherName ?? 'Teacher to be confirmed'}</h2>
+                    <p className="mt-1 text-sm text-muted-foreground">{session.teacherTitle ?? 'STOA teacher'}</p>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                      {tutorMode
+                      {teacherMode
                         ? `Student: ${session.studentName}. Review the learning context before joining.`
                         : 'Review the question, material, and goal before entering the live workspace.'}
                     </p>
@@ -85,15 +85,15 @@ export function ClassroomLobbyPage({ tutorMode = false }: { tutorMode?: boolean 
               <aside className="border-t bg-[hsl(var(--platform-surface-app))] p-5 lg:border-l lg:border-t-0">
                 <p className="brand-section-kicker">Status</p>
                 <h2 className="mt-2 text-xl font-semibold">
-                  {session.lobbyState === 'waiting_for_tutor'
-                    ? 'Waiting for tutor'
+                  {session.lobbyState === 'waiting_for_teacher'
+                    ? 'Waiting for teacher'
                     : session.lobbyState === 'completed'
                       ? 'Classroom ended'
                       : 'Ready to join'}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  {session.lobbyState === 'waiting_for_tutor'
-                    ? 'Review the attached question while the tutor joins.'
+                  {session.lobbyState === 'waiting_for_teacher'
+                    ? 'Review the attached question while the teacher joins.'
                     : session.lobbyState === 'completed'
                       ? 'This classroom has ended. Review the summary.'
                       : 'Enter when your camera, microphone, and context are ready.'}

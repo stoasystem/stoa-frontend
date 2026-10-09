@@ -26,7 +26,7 @@ export function useJoinClassroomRoom(sessionId: string | undefined) {
     onSuccess: (session) => {
       queryClient.setQueryData(liveClassroomQueryKeys.session(session.id), session)
       void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.studentHome() })
-      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.tutorQueue() })
+      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.teacherQueue() })
     },
   })
 }
@@ -52,7 +52,7 @@ export function useCompleteClassroomSession(sessionId: string | undefined) {
     onSuccess: (session) => {
       queryClient.setQueryData(liveClassroomQueryKeys.session(session.id), session)
       void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.studentHome() })
-      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.tutorQueue() })
+      void queryClient.invalidateQueries({ queryKey: liveClassroomQueryKeys.teacherQueue() })
     },
   })
 }

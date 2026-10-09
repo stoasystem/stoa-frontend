@@ -61,7 +61,7 @@
       "audience": "For new users",
       "student": "Student",
       "parent": "Parent",
-      "tutor": "Teacher"
+      "teacher": "Teacher"
     },
     "expectations": {
       "title": "What to expect",
@@ -108,7 +108,7 @@
           }
         ]
       },
-      "tutor": {
+      "teacher": {
         "title": "Teacher workflow",
         "audience": "For teachers answering help requests",
         "steps": [

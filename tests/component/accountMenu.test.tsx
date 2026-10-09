@@ -99,7 +99,7 @@ describe('the account menu', () => {
 
   it.each([
     ['student', '/me', '/me#password'],
-    ['teacher', '/tutor/profile', '/settings/password'],
+    ['teacher', '/teacher/profile', '/settings/password'],
     ['parent', '/parent/account-operations', '/settings/password'],
     ['admin', '/me', '/me#password'],
     ['organization_admin', '/me', '/me#password'],
