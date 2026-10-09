@@ -12,6 +12,8 @@ dist-bench/
 __pycache__/
 playwright-report/
 test-results/
+# what a smoke run observed, and the ids it remembers (tests/smoke/run.ts)
+.smoke/
 .vscode/
 backend/local.db
 backend/.venv/
