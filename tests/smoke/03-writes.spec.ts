@@ -74,11 +74,14 @@ test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] },
   })
 
   test.afterAll(async ({ playwright }, testInfo) => {
-    if (found === null || found.trim() === '') return
+    if (found === null) return
     const { request, api } = await agentApi(playwright, testInfo)
     try {
-      await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
-      const restored = await studentGrade(api)
+      // A grade that was blank already needs no write, only the reading.
+      if (found.trim() !== '') {
+        await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
+      }
+      const restored = (await studentGrade(api)) ?? ''
       await record(testInfo, 'item5-grade-after', { grade: restored })
       expect(restored, 'agent@ grade put back').toBe(found)
     } finally {
