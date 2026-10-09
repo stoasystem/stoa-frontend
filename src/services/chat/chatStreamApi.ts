@@ -1,7 +1,7 @@
 import { ApiError, httpClient } from '@/services/api/httpClient'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
-import type { ChatStreamEvent } from '@/types/chat'
+import type { ChatStreamEvent, MessageQuote, PracticeContextRef } from '@/types/chat'
 
 export type StreamMessagePayload = {
   content: string
@@ -9,6 +9,13 @@ export type StreamMessagePayload = {
   // The backend requires this to make a retry safe; without it the request is
   // rejected before the message is ever read.
   idempotencyKey: string
+  /**
+   * The exercise on screen, by id (#56). Exactly three keys, or the backend
+   * answers 422; absent altogether when the question was not asked beside one.
+   */
+  practiceContext?: PracticeContextRef
+  /** The passage the student chose to ask about (#56). */
+  quote?: MessageQuote
 }
 
 /**

@@ -7,19 +7,19 @@
  * - `/chapter/:unitId` lists the unit's lessons in their order, with progress;
  * - `/chapter/:unitId/:lessonId` checks an answer with the backend, shows the
  *   feedback, and finishing the lesson moves the chapter's progress on;
- * - Ask beside the stage is told which exercise is on screen in its first
- *   message (the text fallback until #56);
- * - 「问这段」 shows by a selection, disabled and marked coming soon;
+ * - Ask beside the stage sends which exercise is on screen as the structured
+ *   `practiceContext` (#56): three ids, and no word of the exercise;
+ * - 「问这段」 shows by a selection and hands the passage to Ask as `quote`;
  * - the keyboard can do all of it, and a star's jump is a crossfade under
  *   reduced motion.
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { describePracticeContext, withPracticeContext, type AskPractice } from '@/features/ask/practiceContext'
+import { useAskQuoteStore } from '@/features/ask/practiceContext'
 import { jumpFrameAt, JUMP, JUMP_MS } from '@/features/chapter/jump'
 import { chipTop } from '@/features/chapter/QuoteSelection'
 import { StarCard } from '@/features/starmap/components/StarCard'
@@ -201,12 +201,30 @@ const lesson: PracticeLesson = {
 
 const RIGHT: Record<string, string> = { 'ch-1': 'x = 5', 'ch-2': '3' }
 
-/** None of what the exercise keeps from the student may leave in a message. */
+/** None of what the exercise keeps from the student may leave in a request. */
 function expectNoAnswerKey(sent: string) {
   const first = lesson.challenges[0]
   expect(sent).not.toContain(`${first.correctAnswer}`)
   expect(sent).not.toContain(first.hint)
   expect(sent).not.toContain(first.explanation)
+}
+
+/** The exercise's own wording must not reach the request either (#56). */
+function expectNoExerciseWords(sent: string) {
+  for (const challenge of lesson.challenges) {
+    expect(sent).not.toContain(challenge.prompt)
+    if (challenge.topic) expect(sent).not.toContain(challenge.topic)
+  }
+  expect(sent).not.toContain(lesson.topic)
+}
+
+/**
+ * `practiceContext` as the backend takes it: these three ids and no other key
+ * -- a fourth is a 422 (`extra="forbid"`).
+ */
+function expectPracticeContext(context: unknown, challengeId: string) {
+  expect(context).toEqual({ unitId: 'u-5', lessonId: 'l-2', challengeId })
+  expect(Object.keys(context as object).sort()).toEqual(['challengeId', 'lessonId', 'unitId'])
 }
 
 const emptyThread = (id: string) =>
@@ -295,6 +313,7 @@ beforeEach(async () => {
     isAuthenticated: true,
   })
   resetAsk()
+  useAskQuoteStore.setState({ quote: null })
   vi.mocked(getCurriculumCatalog).mockResolvedValue(catalog)
   vi.mocked(getPracticeRoadmap).mockImplementation(async () => roadmap())
   vi.mocked(getPracticeLesson).mockResolvedValue(lesson)
@@ -509,7 +528,7 @@ describe('a lesson the chapter does not open', () => {
 })
 
 describe('Ask beside the stage', () => {
-  it('sits beside the exercise on a wide screen and tells a new conversation which exercise is on screen', async () => {
+  it('sits beside the exercise on a wide screen and sends a new conversation the exercise ids', async () => {
     vi.mocked(createConversation).mockResolvedValue({
       id: 'c-new',
       title: 'Balancing',
@@ -539,21 +558,17 @@ describe('Ask beside the stage', () => {
     await userEvent.type(within(panel).getByRole('textbox', { name: 'Your question' }), 'Why is it not 3?{Enter}')
 
     expect(createConversation).toHaveBeenCalledTimes(1)
-    const sent = vi.mocked(createConversation).mock.calls[0][0].initialMessage ?? ''
-    expectNoAnswerKey(sent)
-    // TEXT FALLBACK (#56): the question first, then the exercise in words.
-    expect(sent.split('\n')).toEqual([
-      'Why is it not 3?',
-      '',
-      'Practice topic: Solve for x.',
-      'Practice question: 3x + 5 = 20',
-      'My answer: x = 3',
-    ])
+    const body = vi.mocked(createConversation).mock.calls[0][0]
+    // The question alone: nothing of the exercise is written into it (#56).
+    expect(body.initialMessage).toBe('Why is it not 3?')
+    expectPracticeContext(body.practiceContext, 'ch-1')
+    expectNoAnswerKey(JSON.stringify(body))
+    expectNoExerciseWords(JSON.stringify(body))
     // Asking there did not leave Ask open over the map.
     expect(useAskStore.getState().open).toBe(false)
   })
 
-  it('docks under the stage on a phone and opens a modal sheet that knows the exercise too', async () => {
+  it('docks under the stage on a phone and opens a modal sheet that sends the ids too', async () => {
     vi.mocked(createConversation).mockImplementation(() => new Promise(() => {}))
     open('/chapter/u-5/l-2', { width: 375 })
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
@@ -576,34 +591,15 @@ describe('Ask beside the stage', () => {
 
     field.focus()
     await userEvent.type(field, 'elp{Enter}')
-    const sent = vi.mocked(createConversation).mock.calls[0][0].initialMessage ?? ''
-    expect(sent).toContain('Practice question: 3x + 5 = 20')
-    expectNoAnswerKey(sent)
+    const body = vi.mocked(createConversation).mock.calls[0][0]
+    expect(body.initialMessage).toBe('Help')
+    expectPracticeContext(body.practiceContext, 'ch-1')
+    expectNoExerciseWords(JSON.stringify(body))
 
     await userEvent.keyboard('{Escape}')
     expect(screen.queryByRole('dialog', { name: 'Ask' })).not.toBeInTheDocument()
     expect(stage()).not.toHaveAttribute('inert')
     expect(dockedField()).toHaveFocus()
-  })
-
-  it('tells a conversation again only when what is on screen has changed', () => {
-    const t = i18n.getFixedT('en', 'chat')
-    const practice: AskPractice = {
-      context: { unitId: 'u-5', lessonId: 'l-2', challengeId: 'ch-1', topic: 'Solve for x.', prompt: '3x + 5 = 20', attempts: 0, hintViewed: false },
-    }
-    const first = withPracticeContext(t, practice, 'c1', 'Why?')
-    expect(first.content).toBe(describePracticeContext(t, practice.context, 'Why?'))
-    // Not told until the message went out.
-    expect(withPracticeContext(t, practice, 'c1', 'Why?').content).toContain('Practice question')
-    first.told('c1')
-    expect(withPracticeContext(t, practice, 'c1', 'And now?').content).toBe('And now?')
-    // Another conversation has not been told.
-    expect(withPracticeContext(t, practice, 'c2', 'Why?').content).toContain('Practice question: 3x + 5 = 20')
-    // Another answer on the same exercise is news.
-    practice.context = { ...practice.context, answer: 'x = 5', attempts: 1 }
-    expect(withPracticeContext(t, practice, 'c1', 'Better?').content).toContain('My answer: x = 5')
-    // Without a stage there is nothing to tell.
-    expect(withPracticeContext(t, undefined, null, 'Hi').content).toBe('Hi')
   })
 
   describe('in a conversation already open', () => {
@@ -627,7 +623,7 @@ describe('Ask beside the stage', () => {
       vi.mocked(getConversation).mockResolvedValue(emptyThread('c1'))
     })
 
-    it('tells it once, and again only after the exercise on screen changed', async () => {
+    it('sends the three ids with every question, and the exercise in no other form', async () => {
       streamMock().mockResolvedValue('streamed')
       open('/chapter/u-5/l-2')
       await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
@@ -635,32 +631,39 @@ describe('Ask beside the stage', () => {
 
       await ask(panel, 'Why subtract?')
       await settled(panel, 1)
-      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
-      expectNoAnswerKey(sentAt(0).content)
+      expect(sentAt(0).content).toBe('Why subtract?')
+      expectPracticeContext(sentAt(0).practiceContext, 'ch-1')
+      // No quote was chosen, so the key is not there at all -- not `undefined`.
+      expect('quote' in sentAt(0)).toBe(false)
+      expectNoAnswerKey(JSON.stringify(sentAt(0)))
+      expectNoExerciseWords(JSON.stringify(sentAt(0)))
 
-      // Nothing on screen changed: the question alone.
+      // Every question after it carries them too: there is nothing to remember.
       await ask(panel, 'And then?')
       await settled(panel, 2)
       expect(sentAt(1).content).toBe('And then?')
+      expectPracticeContext(sentAt(1).practiceContext, 'ch-1')
 
-      // Another answer down: told again, with it.
+      // An answer down changes nothing in the request: the ids are the same.
       await userEvent.click(screen.getByRole('radio', { name: /x = 3/ }))
       await ask(panel, 'Is this right?')
       await settled(panel, 3)
-      expect(sentAt(2).content).toContain('My answer: x = 3')
-      expectNoAnswerKey(sentAt(2).content)
+      expect(sentAt(2).content).toBe('Is this right?')
+      expectPracticeContext(sentAt(2).practiceContext, 'ch-1')
+      expectNoAnswerKey(JSON.stringify(sentAt(2)))
 
-      // Another exercise: told again.
+      // Another exercise: another challenge id.
       await userEvent.click(screen.getByRole('radio', { name: /x = 5/ }))
       await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
       await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
       await screen.findByRole('heading', { level: 2, name: 'What is 12 ÷ 4?' })
       await ask(panel, 'How do I divide?')
       await settled(panel, 4)
-      expect(sentAt(3).content).toContain('Practice question: What is 12 ÷ 4?')
+      expect(sentAt(3).content).toBe('How do I divide?')
+      expectPracticeContext(sentAt(3).practiceContext, 'ch-2')
     })
 
-    it('counts a message that failed as not told, and sends it again as it was', async () => {
+    it('sends a failed message again as it was, ids and all', async () => {
       // The first send and the retry fail before the server has them.
       streamMock()
         .mockRejectedValueOnce(new TypeError('Failed to fetch'))
@@ -675,43 +678,31 @@ describe('Ask beside the stage', () => {
 
       await ask(panel, 'Why subtract?')
       await settled(panel, 1)
-      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
+      expectPracticeContext(sentAt(0).practiceContext, 'ch-1')
       await userEvent.click(await within(panel).findByRole('button', { name: 'Send again' }, { timeout: 5000 }))
 
-      // Sent again, it is the same message: same words, same key.
+      // Sent again, it is the same message: same words, same key, same ids.
       await settled(panel, 2)
       expect(sentAt(1).content).toBe(sentAt(0).content)
       expect(sentAt(1).idempotencyKey).toBe(sentAt(0).idempotencyKey)
+      expect(sentAt(1).practiceContext).toEqual(sentAt(0).practiceContext)
       expect(await within(panel).findByRole('button', { name: 'Send again' }, { timeout: 5000 })).toBeInTheDocument()
 
-      // Neither got through, so a new question instead carries the context.
+      // A new question carries them just the same.
       await ask(panel, 'Where do I start?')
       await settled(panel, 3)
-      expect(sentAt(2).content).toContain('Where do I start?')
-      expect(sentAt(2).content).toContain('Practice question: 3x + 5 = 20')
-    })
-
-    it('does not tell the same conversation the same thing again after the stage remounts', async () => {
-      streamMock().mockResolvedValue('streamed')
-      const first = open('/chapter/u-5/l-2')
-      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
-      await ask(await findAskPanel(), 'Why subtract?')
-      await settled(askPanel(), 1)
-      expect(sentAt(0).content).toContain('Practice question: 3x + 5 = 20')
-      first.clear()
-      cleanup()
-
-      open('/chapter/u-5/l-2')
-      await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
-      await ask(await findAskPanel(), 'And then?')
-      await settled(askPanel(), 2)
-      expect(sentAt(1).content).toBe('And then?')
+      expect(sentAt(2).content).toBe('Where do I start?')
+      expectPracticeContext(sentAt(2).practiceContext, 'ch-1')
     })
   })
 })
 
 describe('「问这段」, ask about this', () => {
-  it('appears by text chosen in the exercise, disabled and marked coming soon', async () => {
+  it('appears by text chosen in the exercise and sends it as a quote on the challenge', async () => {
+    const streamMock = vi.mocked(streamConversationMessage)
+    streamMock.mockResolvedValue('streamed')
+    useAskStore.setState({ ownerId: 'u-1', open: false, conversationId: 'c1', draft: '' })
+    vi.mocked(getConversation).mockResolvedValue(emptyThread('c1'))
     open('/chapter/u-5/l-2')
     const prompt = await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
     expect(screen.queryByRole('group', { name: 'Ask about the selected text' })).not.toBeInTheDocument()
@@ -720,15 +711,57 @@ describe('「问这段」, ask about this', () => {
 
     const chip = screen.getByRole('group', { name: 'Ask about the selected text' })
     expect(chip).toHaveAttribute('data-quote-chip', 'exercise')
-    const ask = within(chip).getByRole('button', { name: 'Ask about this' })
-    expect(ask).toBeDisabled()
-    expect(ask).toHaveAccessibleDescription('Coming soon')
+    const askAbout = within(chip).getByRole('button', { name: 'Ask about this' })
+    expect(askAbout).toBeEnabled()
+    await userEvent.click(askAbout)
 
-    window.getSelection()?.removeAllRanges()
-    act(() => {
-      document.dispatchEvent(new Event('selectionchange'))
-    })
+    // The chip goes, and the passage waits above the composer.
     expect(screen.queryByRole('group', { name: 'Ask about the selected text' })).not.toBeInTheDocument()
+    const panel = await findAskPanel()
+    const pending = panel.querySelector('[data-ask-pending-quote]')!
+    expect(pending).toHaveAttribute('data-ask-pending-quote', 'challenge')
+    expect(within(pending as HTMLElement).getByText('3x + 5 = 20')).toBeInTheDocument()
+
+    await userEvent.type(within(panel).getByRole('textbox', { name: 'Your question' }), 'What does this mean?{Enter}')
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1), { timeout: 5000 })
+
+    const payload = streamMock.mock.calls[0][0].payload
+    expect(payload.content).toBe('What does this mean?')
+    expect(payload.quote).toEqual({ text: '3x + 5 = 20', source: { kind: 'challenge', id: 'ch-1' } })
+    // Exactly the two keys the backend takes, and the two its source takes.
+    expect(Object.keys(payload.quote!).sort()).toEqual(['source', 'text'])
+    expect(Object.keys(payload.quote!.source).sort()).toEqual(['id', 'kind'])
+    // Sent is sent: it does not ride along on the question after it.
+    expect(panel.querySelector('[data-ask-pending-quote]')).toBeNull()
+  })
+
+  it('cuts a passage over 500 characters and says so above the composer', async () => {
+    const streamMock = vi.mocked(streamConversationMessage)
+    streamMock.mockResolvedValue('streamed')
+    useAskStore.setState({ ownerId: 'u-1', open: false, conversationId: 'c1', draft: '' })
+    const long = 'A'.repeat(640)
+    vi.mocked(getConversation).mockResolvedValue({
+      ...emptyThread('c1'),
+      messages: [
+        { id: 'a1', conversationId: 'c1', role: 'assistant', content: long, createdAt: '2026-09-28T10:00:01.000Z', status: 'completed', attachments: [] },
+      ],
+    } as Awaited<ReturnType<typeof getConversation>>)
+    open('/chapter/u-5/l-2')
+    const panel = await findAskPanel()
+
+    select(await within(panel).findByText(long))
+    await userEvent.click(within(screen.getByRole('group', { name: 'Ask about the selected text' })).getByRole('button', { name: 'Ask about this' }))
+
+    const pending = (await findAskPanel()).querySelector('[data-ask-pending-quote]') as HTMLElement
+    expect(within(pending).getByRole('status')).toHaveTextContent('shortened to the first 500 characters')
+
+    await userEvent.type(within(await findAskPanel()).getByRole('textbox', { name: 'Your question' }), 'Shorter please{Enter}')
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1), { timeout: 5000 })
+
+    const quote = streamMock.mock.calls[0][0].payload.quote!
+    expect(quote.text).toHaveLength(500)
+    expect(quote.text).toBe(long.slice(0, 500))
+    expect(quote.source).toEqual({ kind: 'message', id: 'a1' })
   })
 
   it('appears by text chosen in an answer in Ask, and not elsewhere', async () => {

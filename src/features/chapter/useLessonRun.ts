@@ -33,10 +33,6 @@ import type {
   PracticeLesson,
 } from '@/types/practice'
 
-export function formatPracticeAnswer(answer: string | string[]) {
-  return Array.isArray(answer) ? answer.join(', ') : answer
-}
-
 /** What the stage draws after an answer, from either way of checking one. */
 export type StageFeedback = {
   correct: boolean

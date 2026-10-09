@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { Composer } from '@/components/base'
 import { AskPanel } from '@/features/ask/AskPanel'
 import { ASK_PANEL, ASK_SHEET, sheetHeightFor } from '@/features/ask/askLayout'
-import type { AskPractice } from '@/features/ask/practiceContext'
+import { useAskQuoteStore, type AskPractice } from '@/features/ask/practiceContext'
+import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { useAskController, type AskController } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
@@ -72,8 +73,10 @@ export function useStageAskController(side: boolean, off = false): AskController
  *   over the dimmed, inert stage (and the bar), which keeps the keyboard in
  *   it, closes on Esc, a tap on the dim or a drag down.
  *
- * Ask knows the exercise on screen through `practice` (a text fallback until
- * #56). The panel and the sheet are light surfaces, siblings of the sky.
+ * Ask knows the exercise on screen through `practice`: its three ids go out
+ * with every question (#56). The panel and the sheet are light surfaces,
+ * siblings of the sky. 「问这段」 watches the whole of it -- the exercise and
+ * the answers in Ask alike -- and hands what was chosen to the composer.
  *
  * `off` (the short quiz, `quiz.ts`): the panel and the sheet are closed and
  * the docked composer is disabled, with `off` as the one-line reason.
@@ -97,6 +100,7 @@ export function StageWithAsk({
   const sheet = open && !side
   const reducedMotion = usePrefersReducedMotion()
   const surface = useRef<HTMLElement>(null)
+  const host = useRef<HTMLDivElement>(null)
   const docked = useRef<HTMLDivElement>(null)
   const wasOpen = useRef(open)
   const wasOff = useRef(off)
@@ -123,6 +127,7 @@ export function StageWithAsk({
     }
   }, [open, off])
 
+  const setQuote = useAskQuoteStore((state) => state.setQuote)
   const onKeyDown = useAskKeyboard(surface, { trap: sheet, active: open, onEscape: close })
   const drag = useSheetDrag(surface, close)
 
@@ -135,7 +140,7 @@ export function StageWithAsk({
   )
 
   return (
-    <div data-stage-host className="relative flex min-h-0 flex-1 overflow-hidden">
+    <div ref={host} data-stage-host className="relative flex min-h-0 flex-1 overflow-hidden">
       <div
         data-surface="sky"
         data-stage-page
@@ -237,6 +242,17 @@ export function StageWithAsk({
             </div>
           </section>
         ))}
+
+      {/* A quoted passage opens Ask with it waiting above the composer (#56). */}
+      {!off && (
+        <QuoteSelection
+          scope={host}
+          onQuote={(quote) => {
+            setQuote(quote)
+            controller.openWithDraft(controller.draft)
+          }}
+        />
+      )}
     </div>
   )
 }

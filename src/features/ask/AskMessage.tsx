@@ -43,9 +43,18 @@ export function AskMessage({
       <div data-message-role="student" className="flex max-w-[88%] flex-col items-end gap-1 self-end">
         <p className="sr-only">{t('ask.thread.you')}</p>
         <div
-          className="whitespace-pre-wrap break-words bg-accent text-on-accent"
+          className="flex flex-col gap-2 whitespace-pre-wrap break-words bg-accent text-on-accent"
           style={{ padding: '10px 14px', borderRadius: 18, borderBottomRightRadius: 6, fontSize: 15, lineHeight: 1.45 }}
         >
+          {message.quote && (
+            <figure
+              data-message-quote={message.quote.source.kind}
+              className="m-0 flex flex-col gap-1 border-l-2 border-[color:color-mix(in_srgb,var(--on-accent)_45%,transparent)] pl-2.5 text-left"
+            >
+              <figcaption className="text-[12px] font-semibold opacity-80">{t('ask.quote.title')}</figcaption>
+              <blockquote className="m-0 text-[14px] leading-[1.4] opacity-90">{message.quote.text}</blockquote>
+            </figure>
+          )}
           {message.content}
         </div>
         {failed && (
@@ -91,6 +100,7 @@ export function AskMessage({
         aria-busy={streaming || undefined}
         // Text chosen in an answer can be quoted back (#12 point 5, #50).
         data-quote-source={streaming || failed ? undefined : 'answer'}
+        data-quote-id={message.id}
         className={cn(
           'max-w-full whitespace-pre-wrap break-words border border-[color:var(--card-border)] bg-surface',
           failed ? 'text-red' : 'text-ink',

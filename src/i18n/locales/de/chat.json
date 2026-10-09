@@ -122,20 +122,6 @@
     "requestedTitle": "Unterstützung durch eine Lehrperson angefragt",
     "requestedBody": "Eine Lehrperson tritt diesem Gespräch bei, sobald jemand verfügbar ist. Du kannst in der Zwischenzeit mit dem Lernassistenten weiterarbeiten."
   },
-  "contextLines": {
-    "uploadSource": "Quelle des Uploads: {{title}}",
-    "questionSession": "Aufgabensitzung: {{sessionId}}",
-    "questionId": "Aufgabe: {{questionId}}",
-    "attachedMaterial": "Angehängtes Lernmaterial: {{files}}",
-    "librarySet": "Set der Übungsbibliothek: {{title}}",
-    "libraryTopic": "Thema der Übungsbibliothek: {{topic}}",
-    "question": "Aufgabe: {{prompt}}",
-    "myAnswer": "Meine Antwort: {{answer}}",
-    "practiceTopic": "Übungsthema: {{topic}}",
-    "practiceQuestion": "Übungsaufgabe: {{prompt}}",
-    "attempts": "Versuche: {{attempts}}",
-    "hintViewed": "Tipp angesehen: ja"
-  },
   "followUp": {
     "label": "Vorschläge für Rückfragen",
     "explainStep": "Einen der Schritte verstehe ich nicht",
@@ -219,6 +205,11 @@
     "practice": {
       "subtitle": "Kennt die Aufgabe, an der du bist",
       "placeholder": "Frag zu dieser Aufgabe…"
+    },
+    "quote": {
+      "title": "Zitat",
+      "remove": "Zitat entfernen",
+      "truncated": "Das Zitat wurde auf die ersten {{count}} Zeichen gekürzt."
     },
     "lit": {
       "label": "Fortschritt",

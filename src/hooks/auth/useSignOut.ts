@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { clearPracticeContextTold } from '@/features/ask/practiceContext'
+import { clearAskQuote } from '@/features/ask/practiceContext'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
 import { forgetSessionHolding } from '@/lib/devSessions'
@@ -65,7 +65,7 @@ export function useSignOut() {
     // question still waiting for its answer (#49).
     resetAsk()
     clearPendingMessages()
-    clearPracticeContextTold()
+    clearAskQuote()
     // A checkout started here, and the analytics session, are this person's
     // too (#34).
     forgetCheckoutOperation()

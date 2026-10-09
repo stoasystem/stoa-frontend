@@ -122,20 +122,6 @@
     "requestedTitle": "Aide d’un enseignant demandée",
     "requestedBody": "Un enseignant rejoindra cette conversation dès qu’il sera disponible. Tu peux continuer avec l’assistant d’apprentissage en attendant."
   },
-  "contextLines": {
-    "uploadSource": "Source du téléversement : {{title}}",
-    "questionSession": "Séance d’exercices : {{sessionId}}",
-    "questionId": "Exercice : {{questionId}}",
-    "attachedMaterial": "Matériel d’apprentissage joint : {{files}}",
-    "librarySet": "Série de la bibliothèque d’exercices : {{title}}",
-    "libraryTopic": "Thème de la bibliothèque d’exercices : {{topic}}",
-    "question": "Exercice : {{prompt}}",
-    "myAnswer": "Ma réponse : {{answer}}",
-    "practiceTopic": "Thème de la pratique : {{topic}}",
-    "practiceQuestion": "Exercice de pratique : {{prompt}}",
-    "attempts": "Tentatives : {{attempts}}",
-    "hintViewed": "Indice consulté : oui"
-  },
   "followUp": {
     "label": "Suggestions de questions",
     "explainStep": "Je ne comprends pas une des étapes",
@@ -219,6 +205,11 @@
     "practice": {
       "subtitle": "Connaît la question sur laquelle tu es",
       "placeholder": "Pose une question sur cet exercice…"
+    },
+    "quote": {
+      "title": "Citation",
+      "remove": "Retirer la citation",
+      "truncated": "La citation a été raccourcie aux {{count}} premiers caractères."
     },
     "lit": {
       "label": "Progrès",

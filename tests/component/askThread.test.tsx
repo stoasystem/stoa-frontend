@@ -495,3 +495,61 @@ describe('the scroll position', () => {
     expect(log.at()).toBe(100)
   })
 })
+
+/**
+ * The two structured fields of #56 seen from Ask on its own, away from the
+ * practice stage: a question carries neither key, and a quote that did go out
+ * is drawn as a quote block when the conversation is read back.
+ */
+describe('the practice context and the quote', () => {
+  it('sends neither key from a question asked away from the stage', async () => {
+    getConversationMock.mockResolvedValue(conversation([]))
+    streamMock.mockResolvedValue('streamed')
+    const ask = openAsk()
+    await ask.findByText('Linear equations')
+
+    await userEvent.type(ask.getByRole('textbox', { name: 'Your question' }), 'What is a prime?{Enter}')
+    await waitFor(() => expect(streamMock).toHaveBeenCalledTimes(1))
+
+    const payload = streamMock.mock.calls[0][0].payload
+    // Absent, not `undefined`: `JSON.stringify` would still write a key the
+    // backend forbids if either were set to undefined by mistake.
+    expect(Object.keys(payload).sort()).toEqual(['attachmentIds', 'content', 'idempotencyKey'])
+    expect('practiceContext' in payload).toBe(false)
+    expect('quote' in payload).toBe(false)
+    expect(JSON.parse(JSON.stringify(payload))).toEqual({
+      content: 'What is a prime?',
+      idempotencyKey: payload.idempotencyKey,
+    })
+  })
+
+  it('draws the quote block on the student message that carried it, and on no other', async () => {
+    getConversationMock.mockResolvedValue(
+      conversation([
+        { ...message('s1', 'student', 'Why subtract 5?'), quote: null },
+        {
+          ...message('s2', 'student', 'And what does this line mean?'),
+          quote: { text: '3x + 5 = 20', source: { kind: 'challenge', id: 'gleichungen-l3-c1' } },
+        },
+        { ...message('a1', 'assistant', 'It keeps the equation balanced.'), quote: null },
+      ]),
+    )
+    const ask = openAsk()
+    const log = thread(ask)
+    await log.findByText('And what does this line mean?')
+
+    // One quote block in the whole thread, on the message that carried it.
+    const blocks = document.querySelectorAll('[data-message-quote]')
+    expect(blocks).toHaveLength(1)
+    const block = blocks[0] as HTMLElement
+    expect(block).toHaveAttribute('data-message-quote', 'challenge')
+    expect(within(block).getByText('Quoted')).toBeInTheDocument()
+    expect(within(block).getByText('3x + 5 = 20')).toBeInTheDocument()
+    // It sits above the question, inside the student's own bubble.
+    const bubble = block.closest('[data-message-role="student"]')!
+    expect(bubble).toHaveTextContent('And what does this line mean?')
+    expect(bubble.textContent!.indexOf('3x + 5 = 20')).toBeLessThan(
+      bubble.textContent!.indexOf('And what does this line mean?'),
+    )
+  })
+})

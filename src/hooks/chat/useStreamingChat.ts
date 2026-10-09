@@ -218,6 +218,9 @@ export function useStreamingChat(conversationId: string | null) {
           createdAt: pending.askedAt,
           status: 'sending',
           attachments: pending.attachments,
+          // The quote block shows on the student's own bubble at once, as it
+          // does when the conversation is read back from the server (#56).
+          quote: pending.quote ?? null,
         },
         {
           id: assistantMessageId,
@@ -258,10 +261,14 @@ export function useStreamingChat(conversationId: string | null) {
         try {
           const delivered = await streamConversationMessage({
             conversationId,
+            // Spread, not `undefined`: a question asked away from the stage
+            // sends a body without these keys at all (#56).
             payload: {
               content: pending.content,
               attachmentIds: pending.attachmentIds,
               idempotencyKey: pending.idempotencyKey,
+              ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
+              ...(pending.quote ? { quote: pending.quote } : {}),
             },
             signal: requestController.signal,
             onEvent: (event) => {
@@ -318,6 +325,8 @@ export function useStreamingChat(conversationId: string | null) {
           content: pending.content,
           attachmentIds: pending.attachmentIds,
           attachments: pending.attachments,
+          ...(pending.practiceContext ? { practiceContext: pending.practiceContext } : {}),
+          ...(pending.quote ? { quote: pending.quote } : {}),
           ...(sameMessage ? { idempotencyKey: pending.idempotencyKey } : {}),
         }
         setLocalMessages((messages) =>
@@ -368,7 +377,7 @@ export function useStreamingChat(conversationId: string | null) {
 
   const sendStreamingMessage = useCallback(
     async (
-      { content, attachmentIds, attachments }: SendStreamingMessagePayload,
+      { content, attachmentIds, attachments, practiceContext, quote }: SendStreamingMessagePayload,
       idempotencyKey?: string,
     ) => {
       if (!conversationId || isStreaming) return false
@@ -390,6 +399,8 @@ export function useStreamingChat(conversationId: string | null) {
           attachmentIds,
           attachments,
           askedAt: new Date().toISOString(),
+          ...(practiceContext ? { practiceContext } : {}),
+          ...(quote ? { quote } : {}),
         },
         { send: true },
       )
