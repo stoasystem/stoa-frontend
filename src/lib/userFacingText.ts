@@ -17,14 +17,6 @@ const internalTerms = [
 
 const statusOnlyMessage = /^request failed with status code \d+$/i
 
-function fieldLabel(loc: unknown): string {
-  if (!Array.isArray(loc)) return ''
-  const segments = loc.filter((part) => typeof part === 'string' && part !== 'body') as string[]
-  if (segments.length === 0) return ''
-  const name = segments[segments.length - 1]
-  return name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (char) => char.toUpperCase())
-}
-
 /**
  * Translate a validation issue the server marked with a code.
  *
@@ -38,23 +30,25 @@ function translatedIssue(issue: object, translate?: BackendMessageTranslator) {
   return code ? translate(code) : ''
 }
 
-/** FastAPI returns 422 `detail` as a list of issues, so turn it into one readable sentence. */
+/**
+ * FastAPI returns 422 `detail` as a list of issues; keep only the ones written
+ * for a reader.
+ *
+ * An issue the server means a person to act on carries a stable `code`, and
+ * that code has a phrase in all four languages. Everything else in that list is
+ * the validator talking to whoever wrote the request: `loc` names a parameter
+ * and `msg` is the framework's own English — "Field required", "Input should be
+ * a valid integer". The teacher application queue printed exactly that,
+ * `Application_id: Field required`, in red where a reviewer expected a sentence
+ * about applications. Those never become user text; the caller's fallback does.
+ */
 function fromValidationDetail(detail: unknown, translate?: BackendMessageTranslator) {
   if (!Array.isArray(detail)) return ''
   const sentences: string[] = []
   for (const issue of detail) {
     if (!issue || typeof issue !== 'object') continue
     const translated = translatedIssue(issue, translate)
-    if (translated) {
-      if (!sentences.includes(translated)) sentences.push(translated)
-      continue
-    }
-    const raw = 'msg' in issue ? String((issue as { msg?: unknown }).msg ?? '') : ''
-    const text = raw.replace(/^(value error|assertion failed|type error),\s*/i, '').trim()
-    if (!text) continue
-    const label = fieldLabel((issue as { loc?: unknown }).loc)
-    const sentence = label && !text.toLowerCase().startsWith(label.toLowerCase()) ? `${label}: ${text}` : text
-    if (!sentences.includes(sentence)) sentences.push(sentence)
+    if (translated && !sentences.includes(translated)) sentences.push(translated)
   }
   return sentences.join(' ')
 }

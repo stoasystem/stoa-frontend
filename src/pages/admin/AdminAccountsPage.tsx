@@ -83,6 +83,13 @@ export function AdminAccountsPage() {
   const inviteIssues = accountDraftIssues(draft)
   const inviteBlocking = blockingIssues(draft)
   const inviteReasons = inviteBlocking.map((issue) => t(`accounts.fieldIssues.${issue}`))
+  // Card 124: an untouched form is not a wrong one. The blocked line used to
+  // open under a blank form reading "Not ready to send: Enter an email
+  // address.", which tells an administrator who has typed nothing that they
+  // already did something wrong. It waits until a field has been touched; the
+  // button is disabled until then either way, and its tooltip still says why.
+  const inviteTouched = Object.values(touched).some(Boolean)
+  const shownInviteReasons = inviteTouched ? inviteReasons : []
   // Blocked: say what is missing. Ready: say what the button will do.
   const inviteTooltip =
     inviteBlocking.length > 0 ? inviteReasons.join(' · ') : t('accounts.inviteExplainer')
@@ -243,7 +250,7 @@ export function AdminAccountsPage() {
               onTouch={(field) => setTouched((current) => ({ ...current, [field]: true }))}
             />
 
-            <BlockedReason id="invite-blocked" reasons={inviteReasons} />
+            <BlockedReason id="invite-blocked" reasons={shownInviteReasons} />
 
             <div className="flex w-full flex-wrap items-center gap-3">
               <span title={inviteTooltip}>
@@ -251,7 +258,7 @@ export function AdminAccountsPage() {
                   type="button"
                   onClick={invite}
                   title={inviteTooltip}
-                  aria-describedby={inviteBlocking.length > 0 ? 'invite-blocked' : undefined}
+                  aria-describedby={shownInviteReasons.length > 0 ? 'invite-blocked' : undefined}
                   disabled={inviteBlocking.length > 0 || inviteMutation.isPending}
                 >
                   {t('accounts.invite')}
@@ -324,6 +331,13 @@ export function AdminAccountsPage() {
               {t('accounts.keywordLabel')}
               <Input value={keyword} onChange={(event) => setKeyword(event.target.value)} />
             </label>
+            {/* Card 124: these read `mm/dd/yyyy` for an administrator whose
+              * browser is set to English. A native date input takes its
+              * display format from the browser's own locale, not from the
+              * page's `lang`, not from a placeholder and not from CSS, so
+              * nothing here can make it read `dd.mm.yyyy`. Changing that needs
+              * a controlled field, which needs copy in all four languages.
+              * Until then the value stays ISO and the picker stays native. */}
             <label className="flex flex-col gap-1 text-sm">
               {t('accounts.createdFromLabel')}
               <Input type="date" value={createdFrom} onChange={(event) => setCreatedFrom(event.target.value)} />
