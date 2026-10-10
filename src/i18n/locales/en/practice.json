@@ -367,6 +367,7 @@
   },
   "review": {
     "answerFailed": "That answer could not be recorded. Try again.",
+    "answerInLesson": "This question cannot be answered here. Open it in its lesson.",
     "backToMap": "Back to the star map",
     "checking": "Checking...",
     "comesBackLater": "This one will come back later, further out than last time.",

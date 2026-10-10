@@ -367,6 +367,7 @@
   },
   "review": {
     "answerFailed": "Non è stato possibile registrare la risposta. Riprova.",
+    "answerInLesson": "A questa domanda non puoi rispondere qui. Aprila nella sua lezione.",
     "backToMap": "Torna alla mappa",
     "checking": "Verifica in corso …",
     "comesBackLater": "Questa tornerà più avanti, più in là dell’ultima volta.",
