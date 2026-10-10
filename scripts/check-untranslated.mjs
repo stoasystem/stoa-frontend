@@ -8,11 +8,39 @@
  *
  * The teacher, parent and admin screens were outside ROOTS until card 002, so
  * their hard-coded English was invisible to this check the whole time.
+ *
+ * The same mistake was made one level down, and card 124 found it by reading
+ * the screens instead of the number: `src/pages/parent` and `src/pages/teacher`
+ * were listed, but the components those pages are built from were not, and that
+ * is where the English lived. A parent's account page was showing "Attention",
+ * "No linked child account is available." and "Admin marked verified" in a
+ * German product while this check reported a clean 142. `src/pages/learning` --
+ * the operations screens a teacher can open -- was never listed at all and owed
+ * 57 on its own.
+ *
+ * Widening the scan took the count from 142 to 251. Nothing regressed: 109 of
+ * those sentences were always there and never counted. A number that only ever
+ * goes down is worth having only if it looks everywhere the reader does.
  */
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 
 const ROOTS = [
+  // Card 124: the components the parent and teacher pages are built from, and
+  // the operations screens. The pages were listed; what they render was not.
+  'src/components/parent',
+  'src/components/teacher',
+  'src/components/admin',
+  'src/components/moderation',
+  'src/components/auth',
+  'src/components/onboarding',
+  'src/components/support',
+  'src/pages/learning',
+  'src/pages/review',
+  'src/pages/entry',
+  'src/pages/onboarding',
+  'src/pages/error',
+  'src/pages/not-found',
   'src/pages/chat',
   'src/pages/learn',
   'src/pages/practice',
