@@ -3,6 +3,7 @@ import { HelpRequestStatusBadge } from '@/components/teacher/HelpRequestStatusBa
 import { ModerationReportDialog } from '@/components/moderation/ModerationReportDialog'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { getSubjectLabel } from '@/lib/displayLabels'
 import type { TeacherHelpRequestDetail } from '@/types/teacher'
 
 export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequestDetail }) {
@@ -22,8 +23,13 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>{request.student.name}</CardTitle>
+            {/* The subject arrives as its id (`mathematics`); the rest of the
+              * app calls it Mathematik. Same row wording as the request list. */}
             <p className="mt-1 text-sm text-muted-foreground">
-              {request.subject} - {request.student.grade}
+              {t('requests.row', {
+                subject: getSubjectLabel(request.subject, t),
+                grade: request.student.grade,
+              })}
             </p>
             {/* The request list leaves this out of its rows; it lives here. */}
             <p className="mt-1 text-xs text-muted-foreground" data-first-action>
@@ -39,7 +45,8 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
       <CardContent className="space-y-3">
         {request.requestMessage && (
           <div className="rounded-md bg-secondary p-3">
-            <p className="text-xs uppercase text-muted-foreground">Request summary</p>
+            <p className="text-xs uppercase text-muted-foreground">{t('detail.requestSummary')}</p>
+            {/* The message itself is the student's own words: served, not translated. */}
             <p className="mt-2 text-sm leading-6">{request.requestMessage}</p>
           </div>
         )}
@@ -53,8 +60,9 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             }
           >
             <p className="text-xs uppercase text-muted-foreground">
-              {message.role === 'assistant' ? 'Learning Assistant explanation' : message.role}
+              {t(`detail.roles.${message.role}`, { defaultValue: message.role })}
             </p>
+            {/* Served by the backend, in whatever language it wrote it. */}
             <p className="mt-2 text-sm leading-6">{message.content}</p>
             {(message.role === 'student' || message.role === 'assistant' || message.role === 'teacher') && (
               <div className="mt-2 border-t pt-2">
@@ -67,8 +75,10 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
                         ? 'teacher_reply'
                         : 'question'
                   }
-                  triggerLabel={message.role === 'student' ? 'Report student content' : 'Report content'}
-                  contextLabel="Send this request context to the internal moderation queue."
+                  triggerLabel={t(
+                    message.role === 'student' ? 'detail.reportStudentContent' : 'detail.reportContent',
+                  )}
+                  contextLabel={t('detail.reportContext')}
                   defaultReason={message.role === 'assistant' ? 'incorrect_answer' : 'other'}
                 />
               </div>

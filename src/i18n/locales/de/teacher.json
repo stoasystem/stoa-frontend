@@ -23,7 +23,18 @@
     "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
     "updateFailed": "Status konnte nicht aktualisiert werden.",
     "replyTitle": "Antwort der Lehrperson",
-    "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen."
+    "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen.",
+    "requestSummary": "Die Anfrage",
+    "roles": {
+      "student": "Lernende Person",
+      "assistant": "Erklärung des Lernassistenten",
+      "teacher": "Lehrperson",
+      "system": "System"
+    },
+    "reportContent": "Inhalt melden",
+    "reportStudentContent": "Beitrag der lernenden Person melden",
+    "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
+    "noNotes": "Noch keine Notizen der Lehrperson."
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -69,13 +80,33 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorität: {{priority}}",
     "sla": {
-      "at_risk": "Frist gefährdet",
-      "breached": "Überfällig"
+      "within_target": "Im Zeitrahmen",
+      "at_risk": "Gefährdet",
+      "breached": "Überfällig",
+      "unknown": "Keine Reaktionszeit erfasst",
+      "elapsed": "{{elapsed}} von {{target}}",
+      "target": "Ziel {{target}}"
     },
     "more": "Mehr",
     "learningAutomation": "Lernautomatisierung",
     "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
     "firstAction": "Erste Aktion der Lehrperson: {{time}}",
     "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
+  },
+  "assistance": {
+    "title": "Zusammenfassung zur Vorbereitung",
+    "description": "Eine begrenzte Zusammenfassung zur Vorbereitung, keine automatische Aufgabenerstellung.",
+    "sources_one": "{{count}} Quelle",
+    "sources_other": "{{count}} Quellen",
+    "loading": "Zusammenfassung wird vorbereitet ...",
+    "error": "Für diese Anfrage ist keine Zusammenfassung verfügbar.",
+    "empty": "Es liegt noch keine Zusammenfassung vor.",
+    "studentContext": "Kontext der lernenden Person",
+    "suggestedFocus": "Empfohlener Schwerpunkt",
+    "question": "Frage",
+    "assistantAnswer": "Antwort des Lernassistenten",
+    "noQuestion": "Kein Fragetext verfügbar.",
+    "noAnswer": "Keine Antwort des Lernassistenten verfügbar.",
+    "noWeakTopics": "Keine Hinweise auf schwache Themen"
   }
 }

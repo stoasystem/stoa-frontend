@@ -23,7 +23,18 @@
     "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
     "updateFailed": "Impossible de mettre à jour le statut.",
     "replyTitle": "Réponse de l’enseignant",
-    "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin."
+    "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin.",
+    "requestSummary": "La demande",
+    "roles": {
+      "student": "Élève",
+      "assistant": "Explication de l’assistant d’apprentissage",
+      "teacher": "Enseignant",
+      "system": "Système"
+    },
+    "reportContent": "Signaler ce contenu",
+    "reportStudentContent": "Signaler le message de l’élève",
+    "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
+    "noNotes": "Aucune note d’enseignant pour l’instant."
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -69,13 +80,33 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorité : {{priority}}",
     "sla": {
-      "at_risk": "Délai menacé",
-      "breached": "En retard"
+      "within_target": "Dans les délais",
+      "at_risk": "À risque",
+      "breached": "En retard",
+      "unknown": "Aucun délai de réponse enregistré",
+      "elapsed": "{{elapsed}} sur {{target}}",
+      "target": "Objectif {{target}}"
     },
     "more": "Plus",
     "learningAutomation": "Automatisation de l’apprentissage",
     "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves",
     "firstAction": "Première action de l’enseignant : {{time}}",
     "firstActionNone": "Première action de l’enseignant : pas encore enregistrée"
+  },
+  "assistance": {
+    "title": "Résumé de préparation",
+    "description": "Un résumé limité pour la préparation du cours, pas une génération automatique d’exercices.",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "loading": "Préparation du résumé ...",
+    "error": "Aucun résumé n’est disponible pour cette demande.",
+    "empty": "Aucun résumé n’est encore disponible.",
+    "studentContext": "Contexte de l’élève",
+    "suggestedFocus": "Point à travailler en priorité",
+    "question": "Question",
+    "assistantAnswer": "Réponse de l’assistant d’apprentissage",
+    "noQuestion": "Aucun texte de question disponible.",
+    "noAnswer": "Aucune réponse de l’assistant disponible.",
+    "noWeakTopics": "Aucun indice de sujet à travailler"
   }
 }

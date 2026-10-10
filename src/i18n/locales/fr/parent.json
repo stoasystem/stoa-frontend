@@ -106,7 +106,51 @@
     "remaining": "{{count}} restants",
     "consumedOfLimit": "{{consumed}} sur {{limit}} utilisés",
     "support": "Assistance : {{action}}",
-    "loadFailed": "La gestion du compte est indisponible. Veuillez réessayer plus tard."
+    "loadFailed": "La gestion du compte est indisponible. Veuillez réessayer plus tard.",
+    "states": {
+      "ready": "Prêt",
+      "attention": "À vérifier",
+      "blocked": "Bloqué",
+      "registered": "Inscrit",
+      "unverified": "Non vérifié",
+      "pending_verification": "Vérification en attente",
+      "verified": "Vérifié",
+      "expired_verification": "Vérification expirée",
+      "resend_limited": "Limite d’envois atteinte",
+      "admin_marked_verified": "Vérifié par l’administration STOA",
+      "active": "Actif",
+      "active_pending_verification": "Actif, vérification en attente",
+      "profile_parent_link": "Lié depuis le profil",
+      "pending_email_verification": "En attente de la vérification de l’e-mail",
+      "limited_onboarding": "Limité jusqu’à la vérification",
+      "expired_code": "Code expiré",
+      "verification_not_required": "Aucune vérification nécessaire",
+      "resend_available": "Un nouveau code peut être envoyé",
+      "resend_cooldown": "Patientez avant un nouvel envoi",
+      "none": "Rien à faire",
+      "resend_verification_code": "Renvoyer le code de vérification",
+      "contact_support": "Contacter le support STOA",
+      "wait_for_resend_cooldown": "Patientez avant un nouvel envoi",
+      "review_account_verification": "Vérifier la validation du compte",
+      "unknown": "Inconnu"
+    },
+    "evidence": {
+      "title": "Vérification et récupération",
+      "parent": "Parent",
+      "child": "Enfant",
+      "status": "Statut",
+      "activation": "Activation",
+      "recovery": "Récupération",
+      "resend": "Renvoi",
+      "resendCount": "Envois effectués",
+      "updated": "Mis à jour",
+      "lastResend": "Dernier envoi",
+      "policy": "Règle",
+      "requested": "Demandé",
+      "resendAllowed": "Possible",
+      "resendNotAvailable": "Impossible",
+      "noDate": "Jamais"
+    }
   },
   "progress": {
     "eyebrow": "Progrès parents",
@@ -167,13 +211,17 @@
     "accountBlocked_one": "Bloqué : {{issue}}",
     "accountBlocked_other": "Bloqué ({{count}} points) : {{issue}}",
     "accountSeeDetails": "Ouvrir pour les détails",
-    "state": { "blocked": "Bloqué", "attention": "À vérifier" },
+    "state": {
+      "blocked": "Bloqué",
+      "attention": "À vérifier"
+    },
     "issues": {
       "parent_email_unverified": "L’e-mail du parent n’est pas encore vérifié",
       "no_linked_children": "Aucun compte enfant lié",
       "child_email_unverified": "L’e-mail d’un compte enfant n’est pas vérifié",
       "usage_unreconciled": "L’utilisation est en cours de rapprochement",
-      "child_binding": "Un lien avec un enfant est à vérifier"
+      "child_binding": "Un lien avec un enfant est à vérifier",
+      "billing_inactive": "Le compte doit être vérifié par l’administration STOA"
     }
   }
 }

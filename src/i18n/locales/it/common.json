@@ -374,5 +374,13 @@
     "unit": {
       "title": "Punto di conoscenza"
     }
+  },
+  "duration": {
+    "minutes_one": "{{count}} minuto",
+    "minutes_other": "{{count}} minuti",
+    "hours_one": "{{count}} ora",
+    "hours_other": "{{count}} ore",
+    "days_one": "{{count}} giorno",
+    "days_other": "{{count}} giorni"
   }
 }
