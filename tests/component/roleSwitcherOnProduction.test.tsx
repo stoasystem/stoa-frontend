@@ -10,6 +10,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/services/auth/authApi', () => ({ login: vi.fn() }))
@@ -23,10 +24,14 @@ vi.mock('@/lib/env', () => ({
 import { RoleSwitcher } from '@/components/dev/RoleSwitcher'
 import { useAuthStore } from '@/store/authStore'
 
-function renderSwitcher() {
+function renderSwitcher(path = '/') {
   const client = new QueryClient()
   function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    return (
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[path]}>{children}</MemoryRouter>
+      </QueryClientProvider>
+    )
   }
   return render(<RoleSwitcher />, { wrapper: Wrapper })
 }
