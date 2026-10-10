@@ -167,7 +167,10 @@
     "accountBlocked_one": "Gesperrt: {{issue}}",
     "accountBlocked_other": "Gesperrt ({{count}} Punkte): {{issue}}",
     "accountSeeDetails": "Details im Konto",
-    "state": { "blocked": "Gesperrt", "attention": "Bitte prüfen" },
+    "state": {
+      "blocked": "Gesperrt",
+      "attention": "Bitte prüfen"
+    },
     "issues": {
       "parent_email_unverified": "E-Mail-Adresse der Eltern ist noch nicht bestätigt",
       "no_linked_children": "Kein Kinderkonto verknüpft",
@@ -175,5 +178,57 @@
       "usage_unreconciled": "Die Nutzung wird noch abgeglichen",
       "child_binding": "Eine Verknüpfung mit einem Kind muss geprüft werden"
     }
+  },
+  "verification": {
+    "title": "Wiederherstellung der Verifizierung",
+    "parent": "Elternteil",
+    "child": "Kind",
+    "status": "Status",
+    "activation": "Aktivierung",
+    "recovery": "Wiederherstellung",
+    "resend": "Erneut senden",
+    "resendAllowed": "Möglich",
+    "resendUnavailable": "Nicht möglich",
+    "resendCount": "Anzahl Wiederholungen",
+    "lastResend": "Zuletzt gesendet",
+    "updated": "Aktualisiert",
+    "policy": "Richtlinie",
+    "requested": "Angefordert",
+    "none": "Keine"
+  },
+  "issues": {
+    "parent_email_unverified": "Die E-Mail-Adresse der Eltern muss noch bestätigt werden.",
+    "billing_inactive": "Die Abrechnung braucht Aufmerksamkeit.",
+    "no_linked_children": "Es ist noch kein Kinderkonto verknüpft.",
+    "child_email_unverified": "Die E-Mail-Adresse eines Kinderkontos ist nicht bestätigt.",
+    "usage_unreconciled": "Die Nutzung wird noch abgeglichen.",
+    "childBinding": "Die Verknüpfung mit dem Kind muss geprüft werden: {{status}}."
+  },
+  "status": {
+    "unknown": "Unbekannt",
+    "ready": "Bereit",
+    "attention": "Aufmerksamkeit nötig",
+    "blocked": "Blockiert",
+    "active": "Aktiv",
+    "pending": "Ausstehend",
+    "revoked": "Aufgehoben",
+    "verified": "Bestätigt",
+    "pending_verification": "Bestätigung ausstehend",
+    "pending_email_verification": "E-Mail-Bestätigung ausstehend",
+    "expired_verification": "Bestätigung abgelaufen",
+    "expired_code": "Code abgelaufen",
+    "verification_not_required": "Keine Bestätigung nötig",
+    "admin_marked_verified": "Von der Verwaltung bestätigt",
+    "legacy_or_verified": "Bestätigt (älteres Konto)",
+    "active_pending_verification": "Aktiv, Bestätigung ausstehend",
+    "limited_onboarding": "Eingeschränkter Start",
+    "resend_available": "Erneutes Senden möglich",
+    "resend_cooldown": "Kurz warten, dann erneut senden",
+    "resend_limited": "Zu viele Versuche",
+    "resend_verification_code": "Bestätigungscode erneut senden",
+    "wait_for_resend_cooldown": "Warten, bis erneut gesendet werden kann",
+    "review_account_verification": "Verifizierung des Kontos prüfen",
+    "contact_support": "Support kontaktieren",
+    "email_verification_required": "E-Mail-Bestätigung erforderlich"
   }
 }

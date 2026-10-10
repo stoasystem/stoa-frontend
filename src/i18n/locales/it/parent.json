@@ -167,7 +167,10 @@
     "accountBlocked_one": "Bloccato: {{issue}}",
     "accountBlocked_other": "Bloccato ({{count}} elementi): {{issue}}",
     "accountSeeDetails": "Apri per i dettagli",
-    "state": { "blocked": "Bloccato", "attention": "Da verificare" },
+    "state": {
+      "blocked": "Bloccato",
+      "attention": "Da verificare"
+    },
     "issues": {
       "parent_email_unverified": "L’e-mail del genitore non è ancora verificata",
       "no_linked_children": "Nessun account figlio collegato",
@@ -175,5 +178,57 @@
       "usage_unreconciled": "L’utilizzo è ancora in fase di riconciliazione",
       "child_binding": "Un collegamento con un figlio va verificato"
     }
+  },
+  "verification": {
+    "title": "Recupero della verifica",
+    "parent": "Genitore",
+    "child": "Figlio/a",
+    "status": "Stato",
+    "activation": "Attivazione",
+    "recovery": "Recupero",
+    "resend": "Reinvio",
+    "resendAllowed": "Possibile",
+    "resendUnavailable": "Non possibile",
+    "resendCount": "Numero di reinvii",
+    "lastResend": "Ultimo reinvio",
+    "updated": "Aggiornato",
+    "policy": "Regola",
+    "requested": "Richiesto",
+    "none": "Nessuno"
+  },
+  "issues": {
+    "parent_email_unverified": "L’indirizzo e-mail del genitore deve ancora essere confermato.",
+    "billing_inactive": "La fatturazione richiede attenzione.",
+    "no_linked_children": "Nessun account figlio è ancora collegato.",
+    "child_email_unverified": "L’indirizzo e-mail di un account figlio non è confermato.",
+    "usage_unreconciled": "L’utilizzo è ancora in fase di riconciliazione.",
+    "childBinding": "Il collegamento con il figlio va verificato: {{status}}."
+  },
+  "status": {
+    "unknown": "Sconosciuto",
+    "ready": "Pronto",
+    "attention": "Attenzione richiesta",
+    "blocked": "Bloccato",
+    "active": "Attivo",
+    "pending": "In attesa",
+    "revoked": "Revocato",
+    "verified": "Confermato",
+    "pending_verification": "Conferma in attesa",
+    "pending_email_verification": "Conferma e-mail in attesa",
+    "expired_verification": "Conferma scaduta",
+    "expired_code": "Codice scaduto",
+    "verification_not_required": "Conferma non richiesta",
+    "admin_marked_verified": "Confermato dall’amministrazione",
+    "legacy_or_verified": "Confermato (account precedente)",
+    "active_pending_verification": "Attivo, conferma in attesa",
+    "limited_onboarding": "Avvio limitato",
+    "resend_available": "Reinvio possibile",
+    "resend_cooldown": "Attendere prima di reinviare",
+    "resend_limited": "Troppi tentativi",
+    "resend_verification_code": "Reinvia il codice di conferma",
+    "wait_for_resend_cooldown": "Attendere che il reinvio sia possibile",
+    "review_account_verification": "Verificare la conferma dell’account",
+    "contact_support": "Contattare l’assistenza",
+    "email_verification_required": "Conferma e-mail richiesta"
   }
 }

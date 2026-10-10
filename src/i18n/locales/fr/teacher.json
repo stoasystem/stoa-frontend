@@ -10,7 +10,22 @@
   "availability": {
     "eyebrow": "Espace enseignant",
     "title": "Disponibilité",
-    "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement."
+    "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement.",
+    "editor": {
+      "subjects": "Matières",
+      "weeklySlots": "Créneaux hebdomadaires",
+      "day": "Jour",
+      "start": "Début",
+      "end": "Fin",
+      "addSlot": "Ajouter un créneau",
+      "save": "Enregistrer la disponibilité",
+      "saving": "Enregistrement…"
+    },
+    "summary": {
+      "title": "Disponibilité actuelle",
+      "subjects": "Matières : {{subjects}}",
+      "noSubjects": "aucune sélectionnée"
+    }
   },
   "detail": {
     "title": "Demande d’aide",
@@ -23,7 +38,19 @@
     "resolutionNotePlaceholder": "Obligatoire avant de marquer comme résolu.",
     "updateFailed": "Impossible de mettre à jour le statut.",
     "replyTitle": "Réponse de l’enseignant",
-    "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin."
+    "replyDescription": "Consignez l’intervention, la prochaine étape ou le suivi dont l’élève a besoin.",
+    "card": {
+      "requestSummary": "Résumé de la demande",
+      "report": "Signaler le contenu",
+      "reportStudent": "Signaler le contenu de l’élève",
+      "reportContext": "Envoyer le contexte de cette demande à la modération interne.",
+      "roles": {
+        "student": "Élève",
+        "assistant": "Explication de l’assistant d’apprentissage",
+        "teacher": "Enseignant·e",
+        "system": "Système"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Compte enseignant",
@@ -77,5 +104,112 @@
     "learningAutomationDescription": "Prévisualiser et lancer les attributions automatiques d’exercices pour vos élèves",
     "firstAction": "Première action de l’enseignant : {{time}}",
     "firstActionNone": "Première action de l’enseignant : pas encore enregistrée"
+  },
+  "aiTools": {
+    "title": "Outils IA pour enseignant·es",
+    "description": "Préparez, à partir du contexte visible de l’élève, des brouillons que vous relisez vous-même.",
+    "draftOnly": "Brouillon uniquement",
+    "generate": "Générer",
+    "noDraft": "Aucun brouillon pour l’instant.",
+    "notAvailable": "Non disponible.",
+    "unavailable": "Impossible de générer des brouillons pour le moment.",
+    "summary": {
+      "title": "Brouillon de synthèse",
+      "description": "Synthèse de la séance, malentendu probable et explication de suivi.",
+      "generateLabel": "Générer un brouillon de synthèse",
+      "session": "Séance",
+      "misconception": "Malentendu",
+      "focus": "Point d’attention suggéré",
+      "followUp": "Suivi"
+    },
+    "exercise": {
+      "title": "Brouillon d’exercices",
+      "description": "Courts exercices à relire avant de les transmettre à l’élève.",
+      "generateLabel": "Générer un brouillon d’exercices",
+      "difficulty": "Difficulté",
+      "items": "Exercices",
+      "item": "Exercice {{number}}",
+      "answerKey": "Corrigé",
+      "difficulties": {
+        "targeted": "Ciblé",
+        "standard": "Standard",
+        "stretch": "Approfondi"
+      }
+    },
+    "status": {
+      "draft": "Brouillon",
+      "accepted": "Accepté",
+      "rejected": "Refusé",
+      "archived": "Archivé"
+    },
+    "delivery": {
+      "not_delivered": "Non transmis",
+      "delivered": "Transmis"
+    },
+    "actions": {
+      "regenerate": "Régénérer",
+      "accept": "Accepter",
+      "reject": "Refuser",
+      "archive": "Archiver"
+    }
+  },
+  "reply": {
+    "label": "Réponse de l’enseignant·e",
+    "placeholder": "Écrivez la prochaine étape pour l’élève.",
+    "queued_one": "{{count}} bloc prêt",
+    "queued_other": "{{count}} blocs prêts",
+    "addBlock": "Ajouter un bloc",
+    "send": "Envoyer la réponse",
+    "modes": {
+      "paragraph": "Paragraphe",
+      "formula": "Formule",
+      "unordered_list": "Liste",
+      "code": "Code"
+    },
+    "unsafe": {
+      "html": "Le code HTML n’est pas autorisé dans une réponse.",
+      "privateMarkers": "Des identifiants internes ne peuvent pas être envoyés dans une réponse."
+    }
+  },
+  "slaBadge": {
+    "elapsed": "{{minutes}} / {{target}} min",
+    "target": "Objectif {{target}} min",
+    "status": {
+      "within_target": "Dans les délais",
+      "at_risk": "Délai menacé",
+      "breached": "En retard",
+      "unknown": "Délai inconnu"
+    }
+  },
+  "practiceContext": {
+    "source": "Source : {{source}}",
+    "library": "Bibliothèque d’exercices",
+    "path": "Parcours d’apprentissage",
+    "title": "L’élève a demandé de l’aide après s’être exercé·e sur cette étape.",
+    "topic": "Thème",
+    "attempts": "Tentatives",
+    "answer": "Réponse de l’élève",
+    "notRecorded": "Non enregistrée",
+    "hint": "Indice consulté",
+    "yes": "Oui",
+    "no": "Non",
+    "question": "Question",
+    "help": "Le contexte d’apprentissage vous montre où l’élève a bloqué avant que vous preniez la demande."
+  },
+  "assistance": {
+    "title": "Préparation pour l’enseignant·e",
+    "description": "Une synthèse brève pour préparer l’intervention, pas des exercices générés automatiquement.",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "loading": "Préparation de la synthèse…",
+    "failed": "Aucune synthèse n’est disponible pour cette demande.",
+    "empty": "Aucune synthèse pour l’instant.",
+    "context": "Contexte de l’élève",
+    "focus": "Point d’attention suggéré",
+    "question": "Question",
+    "noQuestion": "Aucun texte de question disponible.",
+    "answer": "Réponse de l’assistant",
+    "noAnswer": "Aucune réponse de l’assistant disponible.",
+    "noWeakTopics": "Aucun indice de thème fragile"
   }
 }

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Archive, Check, CircleAlert, FileText, RefreshCw, Sparkles, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,6 +23,7 @@ type Props = {
 }
 
 export function AiTeacherToolsPanel({ request }: Props) {
+  const { t } = useTranslation('teacher')
   const [summaryDraft, setSummaryDraft] = useState<AiTeacherDraft>()
   const [exerciseDraft, setExerciseDraft] = useState<AiTeacherDraft>()
   const [difficulty, setDifficulty] = useState('targeted')
@@ -83,13 +85,13 @@ export function AiTeacherToolsPanel({ request }: Props) {
           <div>
             <CardTitle className="flex items-center gap-2 text-base">
               <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-              AI teacher tools
+              {t('aiTools.title')}
             </CardTitle>
             <p className="mt-1 text-sm text-muted-foreground">
-              Prepare teacher-reviewed drafts from visible student context.
+              {t('aiTools.description')}
             </p>
           </div>
-          <Badge variant="outline">Draft only</Badge>
+          <Badge variant="outline">{t('aiTools.draftOnly')}</Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-5">
@@ -97,29 +99,29 @@ export function AiTeacherToolsPanel({ request }: Props) {
           <div className="space-y-3 rounded-md border border-border/70 p-3">
             <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
               <div>
-                <p className="text-sm font-medium">Teacher summary draft</p>
+                <p className="text-sm font-medium">{t('aiTools.summary.title')}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Session summary, likely misconception, and follow-up explanation.
+                  {t('aiTools.summary.description')}
                 </p>
               </div>
               <Button
                 type="button"
                 size="sm"
-                aria-label="Generate summary draft"
+                aria-label={t('aiTools.summary.generateLabel')}
                 disabled={createSummary.isPending}
                 onClick={() => createSummary.mutate(request.requestId, { onSuccess: setSummaryDraft })}
               >
                 <FileText className="h-4 w-4" aria-hidden="true" />
-                Generate
+                {t('aiTools.generate')}
               </Button>
             </div>
             <DraftStatus draft={summaryDraft} />
             {summaryDraft && (
               <div className="space-y-3">
-                <SummaryLine label="Session" value={summaryDraft.sessionSummary} />
-                <SummaryLine label="Misconception" value={summaryDraft.misconceptionSummary} />
-                <SummaryLine label="Suggested focus" value={summaryDraft.suggestedTeachingFocus} />
-                <SummaryLine label="Follow-up" value={summaryDraft.draftFollowupExplanation} />
+                <SummaryLine label={t('aiTools.summary.session')} value={summaryDraft.sessionSummary} />
+                <SummaryLine label={t('aiTools.summary.misconception')} value={summaryDraft.misconceptionSummary} />
+                <SummaryLine label={t('aiTools.summary.focus')} value={summaryDraft.suggestedTeachingFocus} />
+                <SummaryLine label={t('aiTools.summary.followUp')} value={summaryDraft.draftFollowupExplanation} />
                 <DraftActions
                   draft={summaryDraft}
                   isPending={isReviewing}
@@ -135,43 +137,43 @@ export function AiTeacherToolsPanel({ request }: Props) {
           <div className="space-y-3 rounded-md border border-border/70 p-3">
             <div className="flex flex-col items-start justify-between gap-3 sm:flex-row">
               <div>
-                <p className="text-sm font-medium">Exercise draft</p>
+                <p className="text-sm font-medium">{t('aiTools.exercise.title')}</p>
                 <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                  Short practice items for teacher review before student delivery.
+                  {t('aiTools.exercise.description')}
                 </p>
               </div>
               <Button
                 type="button"
                 size="sm"
-                aria-label="Generate exercise draft"
+                aria-label={t('aiTools.exercise.generateLabel')}
                 disabled={createExercise.isPending}
                 onClick={handleCreateExercise}
               >
                 <Sparkles className="h-4 w-4" aria-hidden="true" />
-                Generate
+                {t('aiTools.generate')}
               </Button>
             </div>
             <div className="grid gap-3 sm:grid-cols-[1fr_96px]">
               <div className="space-y-2">
-                <Label htmlFor="exercise-difficulty">Difficulty</Label>
+                <Label htmlFor="exercise-difficulty">{t('aiTools.exercise.difficulty')}</Label>
                 <div id="exercise-difficulty" className="flex flex-wrap gap-2">
                   {difficulties.map((option) => (
                     <button
                       key={option}
                       type="button"
                       aria-pressed={difficulty === option}
-                      className={`rounded-md border px-3 py-2 text-sm capitalize transition-colors ${
+                      className={`rounded-md border px-3 py-2 text-sm transition-colors ${
                         difficulty === option ? 'border-primary bg-primary text-primary-foreground' : 'bg-background'
                       }`}
                       onClick={() => setDifficulty(option)}
                     >
-                      {option}
+                      {t(`aiTools.exercise.difficulties.${option}`)}
                     </button>
                   ))}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="exercise-count">Items</Label>
+                <Label htmlFor="exercise-count">{t('aiTools.exercise.items')}</Label>
                 <Input
                   id="exercise-count"
                   type="number"
@@ -189,14 +191,14 @@ export function AiTeacherToolsPanel({ request }: Props) {
                   {exerciseDraft.items.map((item, index) => (
                     <div key={item.id} className="rounded-md bg-secondary/40 p-3">
                       <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
-                        Item {index + 1}
+                        {t('aiTools.exercise.item', { number: index + 1 })}
                       </p>
                       <p className="mt-1 text-sm leading-6">{item.prompt}</p>
                     </div>
                   ))}
                 </div>
                 <SummaryLine
-                  label="Answer key"
+                  label={t('aiTools.exercise.answerKey')}
                   value={exerciseDraft.answerKey.map((item) => item.answer).join(', ')}
                 />
                 <DraftActions
@@ -214,7 +216,7 @@ export function AiTeacherToolsPanel({ request }: Props) {
         {(createSummary.isError || createExercise.isError) && (
           <p className="flex items-center gap-2 text-sm text-destructive">
             <CircleAlert className="h-4 w-4" aria-hidden="true" />
-            Draft generation is unavailable.
+            {t('aiTools.unavailable')}
           </p>
         )}
       </CardContent>
@@ -223,23 +225,27 @@ export function AiTeacherToolsPanel({ request }: Props) {
 }
 
 function DraftStatus({ draft }: { draft?: AiTeacherDraft }) {
+  const { t } = useTranslation('teacher')
   if (!draft) {
-    return <p className="text-sm text-muted-foreground">No draft generated yet.</p>
+    return <p className="text-sm text-muted-foreground">{t('aiTools.noDraft')}</p>
   }
 
   return (
     <div className="grid gap-2 sm:flex sm:flex-wrap">
-      <Badge variant={draft.status === 'draft' ? 'secondary' : 'outline'}>{draft.status}</Badge>
-      <Badge variant="outline">{draft.studentDeliveryStatus.replace('_', ' ')}</Badge>
+      <Badge variant={draft.status === 'draft' ? 'secondary' : 'outline'}>{t(`aiTools.status.${draft.status}`, { defaultValue: draft.status })}</Badge>
+      <Badge variant="outline">
+        {t(`aiTools.delivery.${draft.studentDeliveryStatus}`, { defaultValue: draft.studentDeliveryStatus.replace('_', ' ') })}
+      </Badge>
     </div>
   )
 }
 
 function SummaryLine({ label, value }: { label: string; value?: string | null }) {
+  const { t } = useTranslation('teacher')
   return (
     <div>
       <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">{label}</p>
-      <p className="mt-1 text-sm leading-6">{value || 'Not available.'}</p>
+      <p className="mt-1 text-sm leading-6">{value || t('aiTools.notAvailable')}</p>
     </div>
   )
 }
@@ -259,25 +265,26 @@ function DraftActions({
   onArchive: () => void
   onRegenerate: () => void
 }) {
+  const { t } = useTranslation('teacher')
   const disabled = isPending || draft.status !== 'draft'
 
   return (
     <div className="flex flex-wrap gap-2">
       <Button type="button" variant="outline" size="sm" disabled={isPending} onClick={onRegenerate}>
         <RefreshCw className="h-4 w-4" aria-hidden="true" />
-        Regenerate
+        {t('aiTools.actions.regenerate')}
       </Button>
       <Button type="button" size="sm" disabled={disabled} onClick={onAccept}>
         <Check className="h-4 w-4" aria-hidden="true" />
-        Accept
+        {t('aiTools.actions.accept')}
       </Button>
       <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={onReject}>
         <X className="h-4 w-4" aria-hidden="true" />
-        Reject
+        {t('aiTools.actions.reject')}
       </Button>
       <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={onArchive}>
         <Archive className="h-4 w-4" aria-hidden="true" />
-        Archive
+        {t('aiTools.actions.archive')}
       </Button>
     </div>
   )

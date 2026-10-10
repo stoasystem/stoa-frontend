@@ -10,7 +10,22 @@
   "availability": {
     "eyebrow": "Area insegnante",
     "title": "Disponibilità",
-    "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza."
+    "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza.",
+    "editor": {
+      "subjects": "Materie",
+      "weeklySlots": "Fasce settimanali",
+      "day": "Giorno",
+      "start": "Inizio",
+      "end": "Fine",
+      "addSlot": "Aggiungi fascia",
+      "save": "Salva disponibilità",
+      "saving": "Salvataggio…"
+    },
+    "summary": {
+      "title": "Disponibilità attuale",
+      "subjects": "Materie: {{subjects}}",
+      "noSubjects": "nessuna selezionata"
+    }
   },
   "detail": {
     "title": "Richiesta di aiuto",
@@ -23,7 +38,19 @@
     "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
     "updateFailed": "Impossibile aggiornare lo stato.",
     "replyTitle": "Risposta dell’insegnante",
-    "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno."
+    "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno.",
+    "card": {
+      "requestSummary": "Riepilogo della richiesta",
+      "report": "Segnala contenuto",
+      "reportStudent": "Segnala il contenuto dell’allievo",
+      "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
+      "roles": {
+        "student": "Allievo/a",
+        "assistant": "Spiegazione dell’assistente di apprendimento",
+        "teacher": "Docente",
+        "system": "Sistema"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -77,5 +104,112 @@
     "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
     "firstAction": "Prima azione del docente: {{time}}",
     "firstActionNone": "Prima azione del docente: non ancora registrata"
+  },
+  "aiTools": {
+    "title": "Strumenti IA per docenti",
+    "description": "Preparate, dal contesto visibile dell’allievo, bozze che rivedete voi stessi.",
+    "draftOnly": "Solo bozza",
+    "generate": "Genera",
+    "noDraft": "Nessuna bozza ancora.",
+    "notAvailable": "Non disponibile.",
+    "unavailable": "Al momento non è possibile generare bozze.",
+    "summary": {
+      "title": "Bozza di riepilogo",
+      "description": "Riepilogo della sessione, probabile malinteso e spiegazione di seguito.",
+      "generateLabel": "Genera bozza di riepilogo",
+      "session": "Sessione",
+      "misconception": "Malinteso",
+      "focus": "Punto suggerito",
+      "followUp": "Seguito"
+    },
+    "exercise": {
+      "title": "Bozza di esercizi",
+      "description": "Brevi esercizi da rivedere prima di consegnarli all’allievo.",
+      "generateLabel": "Genera bozza di esercizi",
+      "difficulty": "Difficoltà",
+      "items": "Esercizi",
+      "item": "Esercizio {{number}}",
+      "answerKey": "Soluzioni",
+      "difficulties": {
+        "targeted": "Mirato",
+        "standard": "Standard",
+        "stretch": "Impegnativo"
+      }
+    },
+    "status": {
+      "draft": "Bozza",
+      "accepted": "Accettata",
+      "rejected": "Rifiutata",
+      "archived": "Archiviata"
+    },
+    "delivery": {
+      "not_delivered": "Non consegnato",
+      "delivered": "Consegnato"
+    },
+    "actions": {
+      "regenerate": "Rigenera",
+      "accept": "Accetta",
+      "reject": "Rifiuta",
+      "archive": "Archivia"
+    }
+  },
+  "reply": {
+    "label": "Risposta del/la docente",
+    "placeholder": "Scrivete il prossimo passo per l’allievo.",
+    "queued_one": "{{count}} blocco pronto",
+    "queued_other": "{{count}} blocchi pronti",
+    "addBlock": "Aggiungi blocco",
+    "send": "Invia risposta",
+    "modes": {
+      "paragraph": "Paragrafo",
+      "formula": "Formula",
+      "unordered_list": "Elenco",
+      "code": "Codice"
+    },
+    "unsafe": {
+      "html": "Il codice HTML non è consentito in una risposta.",
+      "privateMarkers": "Gli identificativi interni non possono essere inviati in una risposta."
+    }
+  },
+  "slaBadge": {
+    "elapsed": "{{minutes}} / {{target}} min",
+    "target": "Obiettivo {{target}} min",
+    "status": {
+      "within_target": "Nei tempi",
+      "at_risk": "Scadenza a rischio",
+      "breached": "In ritardo",
+      "unknown": "Scadenza sconosciuta"
+    }
+  },
+  "practiceContext": {
+    "source": "Fonte: {{source}}",
+    "library": "Biblioteca di esercizi",
+    "path": "Percorso di apprendimento",
+    "title": "L’allievo ha chiesto aiuto dopo essersi esercitato su questo passo.",
+    "topic": "Argomento",
+    "attempts": "Tentativi",
+    "answer": "Risposta dell’allievo",
+    "notRecorded": "Non registrata",
+    "hint": "Suggerimento visto",
+    "yes": "Sì",
+    "no": "No",
+    "question": "Domanda",
+    "help": "Il contesto di apprendimento vi mostra dove l’allievo si è bloccato prima che prendiate la richiesta."
+  },
+  "assistance": {
+    "title": "Preparazione per il/la docente",
+    "description": "Un breve riepilogo per prepararsi, non esercizi generati automaticamente.",
+    "sources_one": "{{count}} fonte",
+    "sources_other": "{{count}} fonti",
+    "loading": "Preparazione del riepilogo…",
+    "failed": "Nessun riepilogo disponibile per questa richiesta.",
+    "empty": "Nessun riepilogo ancora.",
+    "context": "Contesto dell’allievo",
+    "focus": "Punto suggerito",
+    "question": "Domanda",
+    "noQuestion": "Nessun testo della domanda disponibile.",
+    "answer": "Risposta dell’assistente",
+    "noAnswer": "Nessuna risposta dell’assistente disponibile.",
+    "noWeakTopics": "Nessun indizio di argomenti deboli"
   }
 }

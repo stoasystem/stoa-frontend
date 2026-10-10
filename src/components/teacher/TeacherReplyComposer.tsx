@@ -1,15 +1,16 @@
 import { FormEvent, useMemo, useState } from 'react'
 import { Code2, List, Pilcrow, Send, Sigma } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import type { TeacherReplyBlock, TeacherReplyRichContent } from '@/types/teacher'
 
 type ComposerMode = TeacherReplyBlock['type']
 
-const modeOptions: { mode: ComposerMode; label: string; Icon: typeof Pilcrow }[] = [
-  { mode: 'paragraph', label: 'Paragraph', Icon: Pilcrow },
-  { mode: 'formula', label: 'Formula', Icon: Sigma },
-  { mode: 'unordered_list', label: 'List', Icon: List },
-  { mode: 'code', label: 'Code', Icon: Code2 },
+const modeOptions: { mode: ComposerMode; Icon: typeof Pilcrow }[] = [
+  { mode: 'paragraph', Icon: Pilcrow },
+  { mode: 'formula', Icon: Sigma },
+  { mode: 'unordered_list', Icon: List },
+  { mode: 'code', Icon: Code2 },
 ]
 
 export function TeacherReplyComposer({
@@ -19,6 +20,7 @@ export function TeacherReplyComposer({
   isSubmitting: boolean
   onSubmit: (content: string, richContent: TeacherReplyRichContent, onSuccess: () => void) => void
 }) {
+  const { t } = useTranslation('teacher')
   const [mode, setMode] = useState<ComposerMode>('paragraph')
   const [value, setValue] = useState('')
   const [blocks, setBlocks] = useState<TeacherReplyBlock[]>([])
@@ -58,8 +60,8 @@ export function TeacherReplyComposer({
             <button
               key={option.mode}
               type="button"
-              title={option.label}
-              aria-label={option.label}
+              title={t(`reply.modes.${option.mode}`)}
+              aria-label={t(`reply.modes.${option.mode}`)}
               aria-pressed={active}
               className={`inline-flex h-9 w-9 items-center justify-center rounded-md border transition-colors ${
                 active ? 'border-primary bg-primary text-primary-foreground' : 'bg-background hover:bg-secondary'
@@ -72,22 +74,22 @@ export function TeacherReplyComposer({
         })}
       </div>
       <label className="block text-sm font-medium" htmlFor="teacher-rich-reply">
-        Teacher reply
+        {t('reply.label')}
       </label>
       <textarea
         id="teacher-rich-reply"
         className="min-h-28 w-full resize-y rounded-md border bg-background px-3 py-2 text-sm leading-6 placeholder:text-muted-foreground"
-        placeholder={mode === 'formula' ? '2x + 4 = 10' : 'Write the next step for the student.'}
+        placeholder={mode === 'formula' ? '2x + 4 = 10' : t('reply.placeholder')}
         value={value}
         onChange={(event) => setValue(event.target.value)}
         disabled={isSubmitting}
       />
       {blocks.length > 0 && (
         <div className="rounded-md border bg-secondary/40 p-3 text-xs text-muted-foreground">
-          {blocks.length} block{blocks.length === 1 ? '' : 's'} queued
+          {t('reply.queued', { count: blocks.length })}
         </div>
       )}
-      {unsafeReason && <p className="text-sm text-destructive">{unsafeReason}</p>}
+      {unsafeReason && <p className="text-sm text-destructive">{t(`reply.unsafe.${unsafeReason}`)}</p>}
       <div className="flex flex-wrap gap-2">
         <Button
           type="button"
@@ -95,11 +97,11 @@ export function TeacherReplyComposer({
           onClick={addBlock}
           disabled={isSubmitting || !value.trim() || Boolean(unsafeReason)}
         >
-          Add Block
+          {t('reply.addBlock')}
         </Button>
         <Button type="submit" disabled={!canSubmit}>
           <Send className="mr-2 h-4 w-4" aria-hidden="true" />
-          Send Reply
+          {t('reply.send')}
         </Button>
       </div>
     </form>
@@ -118,14 +120,15 @@ function plainTextFallback(content: TeacherReplyRichContent) {
     .trim()
 }
 
-function unsafeReplyReason(blocks: TeacherReplyBlock[]) {
+/** Why a reply may not be sent, as the key of its message; null when it may. */
+function unsafeReplyReason(blocks: TeacherReplyBlock[]): 'html' | 'privateMarkers' | null {
   const serialized = blocks
     .map((block) => (block.type === 'formula' ? block.latex : block.text))
     .join('\n')
     .toLowerCase()
   if (!serialized) return null
   if (/<\s*\/?\s*(script|iframe|embed|object|img|svg|a)\b/.test(serialized) || /\bon[a-z]+\s*=/.test(serialized)) {
-    return 'Unsafe raw HTML is not allowed.'
+    return 'html'
   }
   const privateMarkers = [
     'private/',
@@ -139,6 +142,6 @@ function unsafeReplyReason(blocks: TeacherReplyBlock[]) {
     'aws_secret_access_key',
   ]
   return privateMarkers.some((marker) => serialized.includes(marker))
-    ? 'Private markers cannot be sent in a teacher reply.'
+    ? 'privateMarkers'
     : null
 }

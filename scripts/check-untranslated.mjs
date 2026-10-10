@@ -53,6 +53,11 @@ const ROOTS = [
   'src/pages/auth',
   // The organisation roles' home (#52).
   'src/pages/organization',
+  // What the teacher and parent pages are built from. Neither was listed, so
+  // their English went unseen until a walkthrough found it in German screens
+  // (app-planet, 2026-10-10, #162).
+  'src/components/teacher',
+  'src/components/parent',
 ]
 
 // Anything a screen puts words into.

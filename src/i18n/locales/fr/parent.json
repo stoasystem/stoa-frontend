@@ -167,7 +167,10 @@
     "accountBlocked_one": "Bloqué : {{issue}}",
     "accountBlocked_other": "Bloqué ({{count}} points) : {{issue}}",
     "accountSeeDetails": "Ouvrir pour les détails",
-    "state": { "blocked": "Bloqué", "attention": "À vérifier" },
+    "state": {
+      "blocked": "Bloqué",
+      "attention": "À vérifier"
+    },
     "issues": {
       "parent_email_unverified": "L’e-mail du parent n’est pas encore vérifié",
       "no_linked_children": "Aucun compte enfant lié",
@@ -175,5 +178,57 @@
       "usage_unreconciled": "L’utilisation est en cours de rapprochement",
       "child_binding": "Un lien avec un enfant est à vérifier"
     }
+  },
+  "verification": {
+    "title": "Récupération de la vérification",
+    "parent": "Parent",
+    "child": "Enfant",
+    "status": "Statut",
+    "activation": "Activation",
+    "recovery": "Récupération",
+    "resend": "Renvoyer",
+    "resendAllowed": "Possible",
+    "resendUnavailable": "Impossible",
+    "resendCount": "Nombre de renvois",
+    "lastResend": "Dernier renvoi",
+    "updated": "Mis à jour",
+    "policy": "Règle",
+    "requested": "Demandé",
+    "none": "Aucun"
+  },
+  "issues": {
+    "parent_email_unverified": "L’adresse e-mail du parent doit encore être confirmée.",
+    "billing_inactive": "La facturation demande votre attention.",
+    "no_linked_children": "Aucun compte enfant n’est encore lié.",
+    "child_email_unverified": "L’adresse e-mail d’un compte enfant n’est pas confirmée.",
+    "usage_unreconciled": "L’utilisation est encore en cours de rapprochement.",
+    "childBinding": "Le lien avec l’enfant doit être vérifié : {{status}}."
+  },
+  "status": {
+    "unknown": "Inconnu",
+    "ready": "Prêt",
+    "attention": "Attention requise",
+    "blocked": "Bloqué",
+    "active": "Actif",
+    "pending": "En attente",
+    "revoked": "Révoqué",
+    "verified": "Confirmé",
+    "pending_verification": "Confirmation en attente",
+    "pending_email_verification": "Confirmation de l’e-mail en attente",
+    "expired_verification": "Confirmation expirée",
+    "expired_code": "Code expiré",
+    "verification_not_required": "Confirmation non requise",
+    "admin_marked_verified": "Confirmé par l’administration",
+    "legacy_or_verified": "Confirmé (ancien compte)",
+    "active_pending_verification": "Actif, confirmation en attente",
+    "limited_onboarding": "Démarrage limité",
+    "resend_available": "Renvoi possible",
+    "resend_cooldown": "Patientez avant de renvoyer",
+    "resend_limited": "Trop de tentatives",
+    "resend_verification_code": "Renvoyer le code de confirmation",
+    "wait_for_resend_cooldown": "Attendre qu’un renvoi soit possible",
+    "review_account_verification": "Vérifier la confirmation du compte",
+    "contact_support": "Contacter l’assistance",
+    "email_verification_required": "Confirmation de l’e-mail requise"
   }
 }
