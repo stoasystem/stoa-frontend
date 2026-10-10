@@ -7,7 +7,7 @@ import {
   type AskedQuestion,
 } from './api'
 import { expectApiClean, isApiUrl, pathOf, signIn, watchApiFailures, watchPageErrors } from './helpers'
-import { findErrorCode, plainSnippet, screenAnswer, type Screen } from './judge'
+import { E03_SCREEN, findErrorCode, plainSnippet, screenAnswer, type Screen } from './judge'
 import { anyLanguage } from './locales'
 import { longObjectHeaderPdf } from './pdf'
 import { record, rememberConversations, spendGeneration } from './run'
@@ -80,11 +80,14 @@ test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] },
   })
 
   test.afterAll(async ({ playwright }, testInfo) => {
-    if (found === null || found.trim() === '') return
+    if (found === null) return
     const { request, api } = await agentApi(playwright, testInfo)
     try {
-      await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
-      const restored = await studentGrade(api)
+      // A grade that was blank already needs no write, only the reading.
+      if (found.trim() !== '') {
+        await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
+      }
+      const restored = (await studentGrade(api)) ?? ''
       await record(testInfo, 'item5-grade-after', { grade: restored })
       expect(restored, 'agent@ grade put back').toBe(found)
     } finally {
@@ -277,7 +280,7 @@ test.describe('answers', { tag: ['@generation'] }, () => {
         acceptLanguage: 'de;q=0, en;q=1',
       })
       rememberConversations(baseURL!, [asked.conversationId])
-      await recordAnswer(testInfo, 'item2-e03-language', asked, { language: 'en', topic: /\b6\b/, minLength: 40 }, {
+      await recordAnswer(testInfo, 'item2-e03-language', asked, E03_SCREEN, {
         acceptLanguage: 'de;q=0, en;q=1',
       })
     })
