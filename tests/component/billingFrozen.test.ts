@@ -67,12 +67,12 @@ describe('card 007: the paid surface is not reachable from the app', () => {
   })
 })
 
-// Card 020: the online classroom is withdrawn for a different reason and needs
-// the same kind of guard. It has no backend: `liveClassroomService` answers
-// every call from an array in the browser tab, sessions vanish on reload, and
-// each one names a student "Anna Meier" and a teacher "Anna Keller". Nine routes
-// and a primary navigation entry were registered against it, so a signed-in
-// student could book a lesson that was never going to happen.
+// Card 020 withdrew the online classroom's routes because it had no backend:
+// `liveClassroomService` answered every call from an array in the browser tab,
+// sessions vanished on reload, and each one named a student "Anna Meier" and a
+// teacher "Anna Keller". On 2026-10-09 the feature was deleted outright -- the
+// product documents, the backend and the infrastructure never carried a
+// classroom, so there was nothing to restore it to.
 //
 // The judge is the same shape as card 007's: not "those nine were removed",
 // which agrees with itself the moment somebody adds a tenth, but "no classroom
@@ -82,7 +82,7 @@ describe('card 007: the paid surface is not reachable from the app', () => {
 
 const CLASSROOM_PATH = /(^|\/)classroom(\/|$)/i
 
-describe('card 020: the online classroom is not reachable while it has no backend', () => {
+describe('card 020: the online classroom is gone and does not come back', () => {
   it('registers no classroom page', () => {
     expect(pageRoutes.map((route) => route.path).filter((p) => CLASSROOM_PATH.test(p))).toEqual([])
   })
@@ -100,16 +100,24 @@ describe('card 020: the online classroom is not reachable while it has no backen
     expect(poisoned.filter((p) => CLASSROOM_PATH.test(p))).toEqual(['/classroom'])
   })
 
-  it('keeps the pages, so this is a withdrawal and not a deletion', () => {
-    // Second negative control. If the files were gone, the checks above would
-    // pass for a reason nobody chose, and unfreezing would mean rewriting the
-    // feature rather than restoring a few entries.
+  it('deletes the pages, so this is a deletion and not a withdrawal', () => {
+    // The other half of the decision. The checks above would also pass if the
+    // pages were merely commented out of the manifest again, so this one pins
+    // the files themselves: the feature directory is gone, and the manifest no
+    // longer names a loader for it. Bringing the classroom back means writing
+    // it against a real backend, not uncommenting four lines.
     const source = readFileSync(MANIFEST_SOURCE, 'utf8')
+    const classroomFiles = [
+      'src/features/live-classroom',
+      'src/features/live-classroom/pages/StudentClassroomHomePage.tsx',
+      'src/features/live-classroom/pages/TeacherClassroomQueuePage.tsx',
+      'src/features/live-classroom/services/liveClassroomService.ts',
+    ]
 
-    expect(source).toContain('live-classroom/pages/TeacherClassroomQueuePage')
     expect(
-      existsSync(path.resolve(__dirname, '../../src/features/live-classroom/pages/StudentClassroomHomePage.tsx')),
-    ).toBe(true)
+      classroomFiles.filter((file) => existsSync(path.resolve(__dirname, '../../', file))),
+    ).toEqual([])
+    expect(source).not.toContain('live-classroom')
     expect(pageRoutes.map((route) => route.path).filter((p) => CLASSROOM_PATH.test(p))).toEqual([])
   })
 

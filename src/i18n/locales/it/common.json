@@ -119,7 +119,6 @@
     "availability": "Disponibilità",
     "billing": "Abbonamento",
     "chat": "Fai una domanda",
-    "classroomQueue": "Coda classroom",
     "contact": "Contatto",
     "dashboard": "Panoramica",
     "forParents": "Per genitori",
@@ -134,7 +133,6 @@
     "logoHome": "Home di STOA",
     "mobilePrimary": "Navigazione principale mobile",
     "more": "Altro",
-    "onlineClassroom": "Online Classroom",
     "overview": "Panoramica",
     "parents": "Genitori",
     "practice": "Esercizi",
@@ -152,7 +150,6 @@
       "dashboard": "Home",
       "learn": "Impara",
       "learningHistory": "Cronologia",
-      "onlineClassroom": "Classe",
       "practice": "Esercizi",
       "questionBank": "Biblioteca"
     },

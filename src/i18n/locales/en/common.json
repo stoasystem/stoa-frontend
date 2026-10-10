@@ -119,7 +119,6 @@
     "availability": "Availability",
     "billing": "Billing",
     "chat": "Ask a question",
-    "classroomQueue": "Classroom Queue",
     "contact": "Contact",
     "dashboard": "Dashboard",
     "forParents": "For parents",
@@ -134,7 +133,6 @@
     "logoHome": "STOA home",
     "mobilePrimary": "Mobile primary",
     "more": "More",
-    "onlineClassroom": "Online Classroom",
     "overview": "Overview",
     "parents": "Parents",
     "practice": "Practice",
@@ -152,7 +150,6 @@
       "dashboard": "Home",
       "learn": "Learn",
       "learningHistory": "History",
-      "onlineClassroom": "Classroom",
       "practice": "Practice",
       "questionBank": "Library"
     },

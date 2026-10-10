@@ -119,7 +119,6 @@
     "availability": "Verfügbarkeit",
     "billing": "Abrechnung",
     "chat": "Frage stellen",
-    "classroomQueue": "Classroom-Warteschlange",
     "contact": "Kontakt",
     "dashboard": "Übersicht",
     "forParents": "Für Eltern",
@@ -134,7 +133,6 @@
     "logoHome": "STOA-Startseite",
     "mobilePrimary": "Hauptnavigation mobil",
     "more": "Mehr",
-    "onlineClassroom": "Online Classroom",
     "overview": "Übersicht",
     "parents": "Eltern",
     "practice": "Üben",
@@ -152,7 +150,6 @@
       "dashboard": "Start",
       "learn": "Lernen",
       "learningHistory": "Verlauf",
-      "onlineClassroom": "Klassenraum",
       "practice": "Üben",
       "questionBank": "Bibliothek"
     },
