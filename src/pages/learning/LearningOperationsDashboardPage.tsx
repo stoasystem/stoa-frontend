@@ -60,7 +60,10 @@ export function LearningOperationsDashboardPage() {
 
   const analytics = analyticsQuery.data
   const readiness = readinessQuery.data
-  const exportSummary = exportQuery.data
+  // Two different answers share this panel: a summary, and "your account may
+  // read the analytics but not export them". Neither is an empty panel.
+  const exportDenied = exportQuery.data?.permissionDenied === true
+  const exportSummary = exportQuery.data?.summary
 
   const summaryTiles = useMemo(() => [
     {
@@ -243,6 +246,13 @@ export function LearningOperationsDashboardPage() {
             <CardContent className="space-y-3">
               {exportQuery.isLoading && <LoadingState message="Loading warehouse export summary..." />}
               {exportQuery.error && <ErrorState title="Warehouse export failed" message={exportQuery.error.message} />}
+              {exportDenied && (
+                <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                  This account may read the curriculum analytics but not export the warehouse. Exporting is a
+                  separate grant, curriculum_analytics_exporter; ask an administrator who manages capabilities
+                  for it.
+                </p>
+              )}
               {exportSummary && (
                 <div className="grid gap-3 sm:grid-cols-3">
                   <InlineMetric label="Rows" value={exportSummary.count} />
