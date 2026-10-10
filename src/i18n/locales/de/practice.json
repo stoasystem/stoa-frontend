@@ -367,6 +367,7 @@
   },
   "review": {
     "answerFailed": "Die Antwort konnte nicht gespeichert werden. Bitte noch einmal versuchen.",
+    "answerInLesson": "Diese Frage kannst du hier nicht beantworten. Öffne sie in ihrer Lektion.",
     "backToMap": "Zur Sternkarte",
     "checking": "Wird geprüft …",
     "comesBackLater": "Diese Frage kommt später wieder – später als beim letzten Mal.",

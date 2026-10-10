@@ -367,6 +367,7 @@
   },
   "review": {
     "answerFailed": "Cette réponse n’a pas pu être enregistrée. Réessaie.",
+    "answerInLesson": "Cette question ne peut pas être traitée ici. Ouvre-la dans sa leçon.",
     "backToMap": "Retour à la carte",
     "checking": "Vérification …",
     "comesBackLater": "Celle-ci reviendra plus tard, plus loin que la dernière fois.",
