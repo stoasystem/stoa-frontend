@@ -533,6 +533,8 @@ describe('the quiz is judged by the backend, not here', () => {
     await answer(right(id))
     expect(screen.getByText('Not quite')).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Continue' }))
+    // On to the next question: the keyboard is on its prompt, not its answer.
+    await waitFor(() => expect(document.querySelector('[data-stage-prompt]')).toHaveFocus())
     await answer(right(await onScreen()))
     await user.click(screen.getByRole('button', { name: 'Continue' }))
     expect(await screen.findByRole('heading', { name: 'Not yet' })).toBeInTheDocument()
