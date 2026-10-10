@@ -15,6 +15,7 @@ import {
   useStudentAssignmentsQuery,
 } from '@/hooks/learning/useLearningOperationsQueries'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { ApiError } from '@/services/api/httpClient'
 import type { AutomationCandidate, AutomationPolicy } from '@/types/learningOperations'
 
 const defaultPolicy: AutomationPolicy = {
@@ -94,7 +95,12 @@ function CandidateList({
 }
 
 export function LearningAutomationConsolePage() {
-  const [studentId, setStudentId] = useState('student-1')
+  // No student until the operator names one. It opened on a placeholder,
+  // `student-1`, and read its history at once: every visit began with a 404
+  // and "Assignment history failed" (app-planet, 2026-10-10, #162).
+  const [studentId, setStudentId] = useState('')
+  // The history is read for the id the operator settled on, not on every key.
+  const [shownStudentId, setShownStudentId] = useState('')
   const [subject, setSubject] = useState('')
   const [topicIds, setTopicIds] = useState('')
   const [sourceTypes, setSourceTypes] = useState('ai_draft,curriculum_exercise')
@@ -103,7 +109,8 @@ export function LearningAutomationConsolePage() {
   const [policyStatus, setPolicyStatus] = useState<AutomationPolicy['status']>('active')
   const [pausedReason, setPausedReason] = useState('')
 
-  const assignmentsQuery = useStudentAssignmentsQuery(studentId)
+  const assignmentsQuery = useStudentAssignmentsQuery(shownStudentId)
+  const historyNotFound = assignmentsQuery.error instanceof ApiError && assignmentsQuery.error.status === 404
   const previewMutation = useAutomationPreviewMutation(studentId)
   const executeMutation = useAutomationExecuteMutation(studentId)
   const preview = previewMutation.data
@@ -129,6 +136,7 @@ export function LearningAutomationConsolePage() {
       toast.error('Enter a student id before previewing automation.')
       return
     }
+    setShownStudentId(studentId.trim())
     previewMutation.mutate({ policy, subject: subject || undefined })
   }
 
@@ -167,7 +175,13 @@ export function LearningAutomationConsolePage() {
               <form className="space-y-4" onSubmit={handlePreview}>
                 <div className="space-y-2">
                   <Label htmlFor="student-id">Student id</Label>
-                  <Input id="student-id" value={studentId} onChange={(event) => setStudentId(event.target.value)} />
+                  <Input
+                    id="student-id"
+                    value={studentId}
+                    placeholder="student_…"
+                    onChange={(event) => setStudentId(event.target.value)}
+                    onBlur={() => setShownStudentId(studentId.trim())}
+                  />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="space-y-2">
@@ -345,8 +359,20 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">Assignment history</CardTitle>
               </CardHeader>
               <CardContent>
+                {!shownStudentId && (
+                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    Enter a student id to see their assignment history.
+                  </p>
+                )}
                 {assignmentsQuery.isLoading && <LoadingState message="Loading assignment history..." />}
-                {assignmentsQuery.error && <ErrorState title="Assignment history failed" message={assignmentsQuery.error.message} />}
+                {historyNotFound && (
+                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    No student with this id, or not one you can see.
+                  </p>
+                )}
+                {assignmentsQuery.error && !historyNotFound && (
+                  <ErrorState title="Assignment history failed" message={assignmentsQuery.error.message} />
+                )}
                 {assignmentsQuery.data?.items.length === 0 && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
                     No assignment history returned for this student.
