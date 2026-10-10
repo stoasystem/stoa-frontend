@@ -12,12 +12,6 @@
     "title": "Availability",
     "description": "Set availability and subjects so support requests can be routed clearly."
   },
-  "classroom": {
-    "kicker": "Online Classroom",
-    "title": "Live classroom queue",
-    "description": "Review scheduled classroom sessions and instant video requests with student context.",
-    "open": "Open Classroom Queue"
-  },
   "detail": {
     "title": "Help Request",
     "description": "Review the student's context and record the teacher follow-up.",

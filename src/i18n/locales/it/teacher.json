@@ -12,12 +12,6 @@
     "title": "Disponibilità",
     "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza."
   },
-  "classroom": {
-    "kicker": "Online Classroom",
-    "title": "Coda classroom",
-    "description": "Rivedi le sessioni classroom pianificate e le richieste video immediate con il contesto dello studente.",
-    "open": "Apri la coda classroom"
-  },
   "detail": {
     "title": "Richiesta di aiuto",
     "description": "Rivedi il contesto dello studente e registra il follow-up dell’insegnante.",

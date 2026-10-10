@@ -1,39 +1,8 @@
-import type { UploadAttachment } from '@/features/uploads/types/uploads'
-
+// The upload hand-off that carried an attachment into the assistant went with
+// the online classroom (2026-10-09); nothing writes this key any more. Sign-out
+// still clears it, because a tab that stored it before the deletion would
+// otherwise keep it for the next account on this device.
 export const UPLOAD_HANDOFF_STORAGE_KEY = 'stoa.pendingLearningAssistantUpload'
-
-export type UploadChatHandoff = {
-  source: 'question-bank-upload' | 'question-session-upload' | 'practice-upload'
-  title: string
-  description: string
-  prompt: string
-  returnTo?: string
-  sessionId?: string
-  questionId?: string
-  attachments: UploadAttachment[]
-}
-
-export type UploadChatLocationState = {
-  uploadContext?: UploadChatHandoff
-}
-
-export function saveUploadHandoff(uploadContext: UploadChatHandoff) {
-  if (typeof window === 'undefined') return
-  window.sessionStorage.setItem(UPLOAD_HANDOFF_STORAGE_KEY, JSON.stringify(uploadContext))
-}
-
-export function readUploadHandoff() {
-  if (typeof window === 'undefined') return null
-
-  const raw = window.sessionStorage.getItem(UPLOAD_HANDOFF_STORAGE_KEY)
-  if (!raw) return null
-
-  try {
-    return JSON.parse(raw) as UploadChatHandoff
-  } catch {
-    return null
-  }
-}
 
 export function clearUploadHandoff() {
   if (typeof window === 'undefined') return

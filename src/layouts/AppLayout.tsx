@@ -16,7 +16,6 @@ import {
   TicketCheck,
   User,
   Users,
-  Video,
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -37,7 +36,6 @@ const navIcons: Record<AppNavIcon, LucideIcon> = {
   analytics: BarChart3,
   billing: CreditCard,
   chat: MessageCircle,
-  classroom: Video,
   curriculum: BookMarked,
   dashboard: LayoutDashboard,
   history: History,

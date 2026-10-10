@@ -34,7 +34,6 @@ export type AppNavIcon =
   | 'analytics'
   | 'billing'
   | 'chat'
-  | 'classroom'
   | 'curriculum'
   | 'dashboard'
   | 'history'
@@ -271,26 +270,11 @@ const VirtualCheckoutPage = lazyPage('VirtualCheckoutPage', () => import('@/page
   { path: '/admin/billing/checkout-recovery', access: ADMIN, page: AdminBillingCheckoutPage, meta: { module: 'Admin', status: 'core', purpose: 'Checkout recovery.' } },
  */
 
-/* Card 020: the online classroom has no backend, so it shows nobody anything real.
- *
- * `liveClassroomService` answers every call from an array in the browser tab:
- * sessions vanish on reload, and every one of them names a student "Anna Meier"
- * and a teacher "Anna Keller". There is no classroom route in the backend at all.
- * The pages, the service and the mock data are all kept -- only the manifest
- * entries are withdrawn. Student `/classroom*` links now redirect to `/` (#13).
- * To bring the teacher side back: restore the loaders and entries below, and the
- * teacher dashboard link -- after `liveClassroomService` calls a real API.
- *
-const TeacherClassroomQueuePage = lazyPage('TeacherClassroomQueuePage', () => import('@/features/live-classroom/pages/TeacherClassroomQueuePage'))
-const ClassroomLobbyPage = lazyPage('ClassroomLobbyPage', () => import('@/features/live-classroom/pages/ClassroomLobbyPage'))
-const ClassroomRoomPage = lazyPage('ClassroomRoomPage', () => import('@/features/live-classroom/pages/ClassroomRoomPage'))
-const ClassroomSummaryPage = lazyPage('ClassroomSummaryPage', () => import('@/features/live-classroom/pages/ClassroomSummaryPage'))
-// Student side, superseded by the planet: live-classroom/pages/StudentClassroomHomePage, ScheduleClassroomPage.
-
-  { path: '/teacher/classroom', access: TEACHER, page: TeacherClassroomQueuePage, nav: [{ area: 'teacher', label: 'Classroom Queue', labelKey: 'navigation.classroomQueue', priority: 'primary', icon: 'classroom', mobile: true }], meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom queue.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/lobby', access: TEACHER, page: ClassroomLobbyPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom lobby.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/room', access: TEACHER, page: ClassroomRoomPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher live classroom room.' } },
-  { path: '/teacher/classroom/sessions/:sessionId/summary', access: TEACHER, page: ClassroomSummaryPage, props: { teacherMode: true }, meta: { module: 'Online Classroom', status: 'core', purpose: 'Teacher classroom summary.' } },
+/* Card 020 is closed: the online classroom was deleted on 2026-10-09, pages,
+ * service and mock data included. Card 020 had only withdrawn its routes; the
+ * product documents, the backend and the infrastructure all turned out to carry
+ * no classroom at all, so there was nothing left to bring back. Old student
+ * `/classroom*` links still redirect to `/` (#13). The code is in git history.
  */
 
 export const pageRoutes: readonly PageRoute[] = [
@@ -550,8 +534,8 @@ const toMap = ({ pathname }: LegacyRedirectInput) => mapPathForLegacyPlanet(path
  * bookmarks, so each one forwards to its page under the teacher's home
  * instead of ending on a 404. Only the shapes that existed carry their tail
  * over; every other old address lands on the home, so no made-up tail reaches
- * the router. The classroom tails are absent because card 020 withdrew those
- * pages; restoring them means restoring their tails here.
+ * the router. The classroom tails are absent because the online classroom was
+ * deleted on 2026-10-09.
  */
 const LEGACY_TEACHER_HOME = '/tutor'
 

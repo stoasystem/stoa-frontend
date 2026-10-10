@@ -12,12 +12,6 @@
     "title": "Disponibilité",
     "description": "Définissez vos disponibilités et vos matières pour que les demandes soient orientées clairement."
   },
-  "classroom": {
-    "kicker": "Online Classroom",
-    "title": "File classroom",
-    "description": "Examinez les sessions classroom planifiées et les demandes vidéo instantanées avec le contexte de l’élève.",
-    "open": "Ouvrir la file classroom"
-  },
   "detail": {
     "title": "Demande d’aide",
     "description": "Examinez le contexte de l’élève et consignez le suivi enseignant.",

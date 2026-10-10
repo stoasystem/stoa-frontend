@@ -162,7 +162,7 @@ describe('the teacher area moved off its old prefix (#69)', () => {
     ['/tutor/learning-automation', '/teacher/learning-automation', 'LearningAutomationConsolePage'],
     ['/tutor/requests/r-1', '/teacher/requests/r-1', 'TeacherHelpRequestDetailPage'],
     // An address no page answers keeps its tail out of the router: the
-    // classroom pages are withdrawn (card 020), so their old links land home.
+    // classroom was deleted (card 020), so its old links land home.
     ['/tutor/classroom', '/teacher', 'TeacherDashboardPage'],
     ['/tutor/made-up', '/teacher', 'TeacherDashboardPage'],
     ['/tutor/requests/../admin', '/teacher', 'TeacherDashboardPage'],
