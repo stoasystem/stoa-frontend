@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { dominantLanguage, findErrorCode, plainSnippet, screenAnswer, type Screen } from '../judge'
+import { E03_SCREEN, dominantLanguage, findErrorCode, plainSnippet, screenAnswer, type Screen } from '../judge'
 
 /*
  * The negative controls for AI answers (#27, 判据): fixed answers, written
@@ -11,7 +11,6 @@ import { dominantLanguage, findErrorCode, plainSnippet, screenAnswer, type Scree
 
 const DERIVATIVE: Screen = { language: 'de', topic: /Ableitung|Steigung|Änderung|ändert|Tangente/i, wantsExample: true }
 const QUANTUM: Screen = { language: 'de', topic: /Quant|Teilchen|Atom|Energie|Licht|Welle|Photon/i, wantsExample: true }
-const E03: Screen = { language: 'en', topic: /\b6\b/, minLength: 40 }
 
 const GOOD_DERIVATIVE =
   'Eine Ableitung sagt dir, wie schnell sich etwas ändert. Stell dir vor, du fährst mit dem Velo einen Hügel ' +
@@ -28,6 +27,20 @@ const GOOD_QUANTUM =
 test('a German explanation with an example passes the screen', () => {
   expect(screenAnswer(GOOD_DERIVATIVE, DERIVATIVE)).toEqual([])
   expect(screenAnswer(GOOD_QUANTUM, QUANTUM)).toEqual([])
+})
+
+// User-confirmed synthetic response from the 2026-10-10 production smoke.
+const GUIDED_EQUATION = String.raw`1. Start with the equation: $2x + 7 = 19$
+2. We want to get $x$ alone on one side. First, remove the $+7$ by subtracting $7$ from **both sides**: $2x + 7 - 7 = 19 - 7$, which gives $2x = 12$
+3. Now $x$ is multiplied by $2$. To undo that, divide **both sides** by $2$: $\frac{2x}{2} = \frac{12}{2}$
+4. What do you get when you divide $12$ by $2$? That is your answer for $x$!
+
+Try the last step yourself: $x = ?$ (divide 12 by 2)
+
+**Hint:** Whatever you do to one side of the equation, you must do the same to the other side — that keeps the equation balanced, like a scale.`
+
+test('an English equation explanation can leave the final step to the student', () => {
+  expect(screenAnswer(GUIDED_EQUATION, E03_SCREEN)).toEqual([])
 })
 
 test('a refusal is flagged', () => {
@@ -51,9 +64,23 @@ test('an answer in the wrong language is flagged', () => {
 
   // E03 the other way round: German when the header chose English.
   const german = 'Wir ziehen zuerst 7 ab und teilen dann durch 2. Das ergibt x = 6, und das ist die Lösung, die du suchst.'
-  expect(screenAnswer(german, E03)).toEqual(expect.arrayContaining([expect.stringMatching(/^language: expected en/)]))
+  expect(screenAnswer(german, E03_SCREEN)).toEqual(expect.arrayContaining([expect.stringMatching(/^language: expected en/)]))
   const englishE03 = 'First subtract 7 from both sides, so 2x = 12. Then divide by 2, and you get x = 6. That is the answer.'
-  expect(screenAnswer(englishE03, E03)).toEqual([])
+  expect(screenAnswer(englishE03, E03_SCREEN)).toEqual([])
+})
+
+test('an English equation refusal is still flagged', () => {
+  const refusal = 'I cannot explain this equation to you. You should ask your teacher for help with it instead.'
+  expect(screenAnswer(refusal, E03_SCREEN)).toEqual(
+    expect.arrayContaining([expect.stringMatching(/^reads as a refusal/)]),
+  )
+})
+
+test('an English answer off the equation topic is flagged even when it contains 6', () => {
+  const offTopic = 'The weather is warm at 6 in the morning, and you can take a walk in the park. There is no rain today.'
+  expect(screenAnswer(offTopic, E03_SCREEN)).toEqual(
+    expect.arrayContaining([expect.stringMatching(/^never mentions/)]),
+  )
 })
 
 test('an explanation with no example or analogy is flagged', () => {

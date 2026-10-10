@@ -36,8 +36,14 @@ test.describe('every role can sign in and land on its own screen', { tag: '@read
 
       expect(errors, 'uncaught page errors').toEqual([])
       await expectApiClean(failures)
-      // A page that rendered nothing also has no failures.
-      expect((await page.locator('body').innerText()).length).toBeGreaterThan(200)
+      // The production star map is an intentional empty state (#131, #48).
+      // Check the rendered home and its composer, independent of copy length.
+      const main = page.getByRole('main')
+      await expect(main, 'the role home is visible').toBeVisible()
+      await expect(main, 'the role home has content').toContainText(/\S/)
+      if (role === 'student' || role === 'agent') {
+        await expect(main.getByRole('textbox'), 'the question composer is editable').toBeEditable()
+      }
     })
   }
 })
