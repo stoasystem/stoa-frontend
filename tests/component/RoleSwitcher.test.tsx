@@ -5,6 +5,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/services/auth/authApi', () => ({ login: vi.fn() }))
@@ -19,12 +20,17 @@ import {
   rememberSession,
   tabToken,
 } from '@/lib/devSessions'
+import { resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
-function renderSwitcher() {
+function renderSwitcher(path = '/') {
   const client = new QueryClient()
   function Wrapper({ children }: { children: ReactNode }) {
-    return <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    return (
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[path]}>{children}</MemoryRouter>
+      </QueryClientProvider>
+    )
   }
   return render(<RoleSwitcher />, { wrapper: Wrapper })
 }
@@ -594,5 +600,45 @@ describe('what decides whether the switcher is offered', () => {
     renderSwitcher()
 
     expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
+  })
+})
+
+describe('the switcher and an open Ask', () => {
+  // Ask is a sheet over the whole page on a phone and a narrow window; the
+  // switcher sat on top of it, over the first lines of an answer (2026-10-10).
+  beforeEach(() => {
+    localStorage.clear()
+    sessionStorage.clear()
+    resetAsk()
+    signedInAs('student@test.stoaedu.ch')
+  })
+
+  it('steps aside while Ask is open over the planet', () => {
+    useAskStore.getState().openWithDraft('u1', 'Warum?')
+
+    renderSwitcher()
+
+    expect(screen.queryByRole('button', { name: /student/i })).not.toBeInTheDocument()
+  })
+
+  it('steps aside on the Ask page and in one of its conversations', () => {
+    renderSwitcher('/ask/c1')
+
+    expect(screen.queryByRole('button', { name: /student/i })).not.toBeInTheDocument()
+  })
+
+  it('is back once Ask is closed', () => {
+    useAskStore.getState().openWithDraft('u1', 'Warum?')
+    useAskStore.getState().close()
+
+    renderSwitcher('/chapter/u2')
+
+    expect(screen.getByRole('button', { name: /student/i })).toBeInTheDocument()
+  })
+
+  it('does not hide for a page whose name only starts like Ask', () => {
+    renderSwitcher('/asked')
+
+    expect(screen.getByRole('button', { name: /student/i })).toBeInTheDocument()
   })
 })
