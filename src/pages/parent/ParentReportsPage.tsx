@@ -6,6 +6,7 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
+import { getSubjectLabel } from '@/lib/displayLabels'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type { ParentChild } from '@/types/parent'
 
@@ -27,14 +28,22 @@ export function ParentReportsPage() {
         <Stats
           items={[
             { key: 'children', value: children.length, label: t('reports.children') },
-            { key: 'weekly', value: t('reports.weeklyReportsValue'), label: t('reports.weeklyReports') },
+            // `Stats` is a row of figures. The weekly-report item put the word
+            // "Ready" where a figure goes, so it read as "0 / Children" beside
+            // a broken value; every child's weekly report is a row below.
+            // { key: 'weekly', value: t('reports.weeklyReportsValue'), label: t('reports.weeklyReports') },
             // Monthly trends come back with the monthly report's route (see ChildReports).
             // { key: 'monthly', value: t('reports.monthlyTrendsValue'), label: t('reports.monthlyTrends') },
           ]}
         />
 
         <section className="space-y-4">
-          <p className="m-0 text-[15px] leading-[1.45] text-caption">{t('reports.studentReportsDescription')}</p>
+          {/* The line telling a parent to open a report only makes sense once
+            * there is one: with no linked child it stood directly above the
+            * line saying there is no linked child. */}
+          {children.length > 0 && (
+            <p className="m-0 text-[15px] leading-[1.45] text-caption">{t('reports.studentReportsDescription')}</p>
+          )}
           {childrenQuery.isLoading && <PageSkeleton rows={3} />}
           {childrenQuery.isError && <p className="text-sm text-red">{t('loadChildrenFailed')}</p>}
           {childrenQuery.data && children.length === 0 && (
@@ -51,7 +60,9 @@ export function ParentReportsPage() {
 
 function ChildReports({ child }: { child: ParentChild }) {
   const { t } = useTranslation('parent')
-  const about = `${child.grade ?? t('reports.gradeNotSet')} · ${child.subjects.join(', ') || t('reports.noSubjects')}`
+  // The profile stores subject ids; the rest of the app says Mathematik.
+  const subjects = child.subjects.map((subject) => getSubjectLabel(subject, t)).join(', ')
+  const about = `${child.grade ?? t('reports.gradeNotSet')} · ${subjects || t('reports.noSubjects')}`
 
   return (
     <Group title={t('reports.childReports', { name: child.name })}>

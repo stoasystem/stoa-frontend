@@ -23,7 +23,18 @@
     "resolutionNotePlaceholder": "Required before marking resolved.",
     "updateFailed": "Failed to update status.",
     "replyTitle": "Teacher reply",
-    "replyDescription": "Record the intervention, next step, or follow-up the student needs."
+    "replyDescription": "Record the intervention, next step, or follow-up the student needs.",
+    "requestSummary": "The request",
+    "roles": {
+      "student": "Student",
+      "assistant": "Learning assistant explanation",
+      "teacher": "Teacher",
+      "system": "System"
+    },
+    "reportContent": "Report content",
+    "reportStudentContent": "Report student content",
+    "reportContext": "Send this request context to the internal moderation queue.",
+    "noNotes": "No teacher notes yet."
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -69,13 +80,33 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "{{priority}} priority",
     "sla": {
+      "within_target": "Within target",
       "at_risk": "At risk",
-      "breached": "Overdue"
+      "breached": "Overdue",
+      "unknown": "No response time recorded",
+      "elapsed": "{{elapsed}} of {{target}}",
+      "target": "Target {{target}}"
     },
     "more": "More",
     "learningAutomation": "Learning automation",
     "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
     "firstAction": "First teacher action: {{time}}",
     "firstActionNone": "First teacher action: not recorded yet"
+  },
+  "assistance": {
+    "title": "Preparation summary",
+    "description": "A bounded summary for teacher preparation, not automatic exercise generation.",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "loading": "Preparing the summary...",
+    "error": "No summary is available for this request.",
+    "empty": "No summary is available yet.",
+    "studentContext": "Student context",
+    "suggestedFocus": "Suggested focus",
+    "question": "Question",
+    "assistantAnswer": "Learning assistant answer",
+    "noQuestion": "No question text available.",
+    "noAnswer": "No assistant answer available.",
+    "noWeakTopics": "No weak topic evidence"
   }
 }

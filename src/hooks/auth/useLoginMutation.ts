@@ -47,7 +47,11 @@ export function useLoginMutation() {
       })
       markLoginAuthenticated(data.user.role)
       trackEvent('user_login', { role: data.user.role, userId: data.user.id })
-      toast.success(t('login.signedIn'))
+      // Read off the instance, not the `t` this hook closed over: react-i18next
+      // pins `t` to the language the component last rendered in, and the line
+      // above has just changed the language. A German account signing in on an
+      // English sign-in page got an English "Signed in" over a German app.
+      toast.success(i18n.t('auth:login.signedIn'))
       // Signing in from 「添加账号」 lands on the new account rather than
       // waiting for the login screen to move: that screen is deliberately not
       // moving while `?add=1` is up. A full load, not a route change, so the

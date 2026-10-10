@@ -23,7 +23,18 @@
     "resolutionNotePlaceholder": "Obbligatoria prima di segnare come risolta.",
     "updateFailed": "Impossibile aggiornare lo stato.",
     "replyTitle": "Risposta dell’insegnante",
-    "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno."
+    "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno.",
+    "requestSummary": "La richiesta",
+    "roles": {
+      "student": "Studente",
+      "assistant": "Spiegazione dell’assistente di apprendimento",
+      "teacher": "Insegnante",
+      "system": "Sistema"
+    },
+    "reportContent": "Segnala il contenuto",
+    "reportStudentContent": "Segnala il messaggio dello studente",
+    "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
+    "noNotes": "Ancora nessuna nota dell’insegnante."
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -69,13 +80,33 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorità: {{priority}}",
     "sla": {
-      "at_risk": "Scadenza a rischio",
-      "breached": "In ritardo"
+      "within_target": "Nei tempi",
+      "at_risk": "A rischio",
+      "breached": "In ritardo",
+      "unknown": "Nessun tempo di risposta registrato",
+      "elapsed": "{{elapsed}} su {{target}}",
+      "target": "Obiettivo {{target}}"
     },
     "more": "Altro",
     "learningAutomation": "Automazione dell’apprendimento",
     "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
     "firstAction": "Prima azione del docente: {{time}}",
     "firstActionNone": "Prima azione del docente: non ancora registrata"
+  },
+  "assistance": {
+    "title": "Sintesi per la preparazione",
+    "description": "Una sintesi limitata per la preparazione della lezione, non una generazione automatica di esercizi.",
+    "sources_one": "{{count}} fonte",
+    "sources_other": "{{count}} fonti",
+    "loading": "Preparazione della sintesi ...",
+    "error": "Per questa richiesta non è disponibile alcuna sintesi.",
+    "empty": "Non è ancora disponibile alcuna sintesi.",
+    "studentContext": "Contesto dello studente",
+    "suggestedFocus": "Punto su cui concentrarsi",
+    "question": "Domanda",
+    "assistantAnswer": "Risposta dell’assistente di apprendimento",
+    "noQuestion": "Nessun testo della domanda disponibile.",
+    "noAnswer": "Nessuna risposta dell’assistente disponibile.",
+    "noWeakTopics": "Nessun indizio di argomenti deboli"
   }
 }

@@ -181,6 +181,18 @@ export function getCurriculumTopicLabel(label: string, t: TFunction) {
   return t(`practice:progress.topicNames.${slug}`, { defaultValue: fallback })
 }
 
+/**
+ * A span of minutes in words. Minutes up to an hour, then hours, then days
+ * once two days have passed: a response-time badge printed the raw figure and
+ * read "Breached 6576m / 30m".
+ */
+export function formatMinutes(minutes: number, t: TFunction) {
+  const total = Math.max(0, Math.round(minutes))
+  if (total < 60) return t('common:duration.minutes', { count: total })
+  if (total < 2880) return t('common:duration.hours', { count: Math.round(total / 60) })
+  return t('common:duration.days', { count: Math.round(total / 1440) })
+}
+
 export function getRecommendationRationale(rationale: string, t: TFunction) {
   const key = rationaleKeys[rationale.trim()]
   if (!key) return rationale

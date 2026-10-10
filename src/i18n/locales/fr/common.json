@@ -374,5 +374,13 @@
     "unit": {
       "title": "Point de connaissance"
     }
+  },
+  "duration": {
+    "minutes_one": "{{count}} minute",
+    "minutes_other": "{{count}} minutes",
+    "hours_one": "{{count}} heure",
+    "hours_other": "{{count}} heures",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours"
   }
 }
