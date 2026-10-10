@@ -58,31 +58,56 @@ export function parseSegments(text: string): MathSegment[] {
   return segments
 }
 
-// Model answers arrive as Markdown-flavoured prose. Only `**bold**` is honoured,
-// and only inside text segments, so a `*` inside a formula keeps its maths meaning.
+// Model answers arrive as Markdown-flavoured prose. `**bold**` and `*italic*`
+// are honoured, and only outside formulas, so a `*` inside one keeps its maths
+// meaning. Italic was left out at first and its asterisks were shown as
+// written, in the middle of an assistant's explanation.
 const BOLD_RE = /\*\*(?=\S)([\s\S]*?\S)\*\*/g
+// A single asterisk, not part of a pair, with no space just inside it: the same
+// flanking rule as bold, so `2 * 3 * 4` stays an expression and a list marker
+// (`* item`) stays a list marker. It does not run across a line.
+const ITALIC_RE = /(?<!\*)\*(?=[^\s*])([^*\n]*?[^\s*])\*(?!\*)/g
 
-/** Turn the `**bold**` runs of a text segment into React nodes. */
-export function renderInlineMarkdown(value: string, keyPrefix: string): React.ReactNode[] {
+type Leaf = (text: string, key: string) => React.ReactNode[]
+
+/** Split one run by `re`, wrapping each match and handing the rest to `rest`. */
+function splitBy(
+  value: string,
+  re: RegExp,
+  key: string,
+  wrap: (inner: React.ReactNode[], key: string) => React.ReactNode,
+  inner: Leaf,
+  rest: Leaf,
+): React.ReactNode[] {
   const nodes: React.ReactNode[] = []
   let lastIndex = 0
   let match: RegExpExecArray | null
-
-  BOLD_RE.lastIndex = 0
-  while ((match = BOLD_RE.exec(value)) !== null) {
-    if (match.index > lastIndex) {
-      nodes.push(value.slice(lastIndex, match.index))
-    }
-    // React escapes these children, so model output cannot inject markup here.
-    nodes.push(<strong key={`${keyPrefix}-${match.index}`}>{match[1]}</strong>)
-    lastIndex = match.index + match[0].length
+  re.lastIndex = 0
+  const matches: RegExpExecArray[] = []
+  while ((match = re.exec(value)) !== null) matches.push(match)
+  for (const found of matches) {
+    if (found.index > lastIndex) nodes.push(...rest(value.slice(lastIndex, found.index), `${key}-${lastIndex}`))
+    const at = `${key}-${found.index}`
+    nodes.push(wrap(inner(found[1], at), at))
+    lastIndex = found.index + found[0].length
   }
-
-  if (lastIndex < value.length) {
-    nodes.push(value.slice(lastIndex))
-  }
-
+  if (lastIndex < value.length) nodes.push(...rest(value.slice(lastIndex), `${key}-${lastIndex}`))
   return nodes
+}
+
+/**
+ * Bold, then italic inside and between the bold runs. React escapes these
+ * children, so model output cannot inject markup through them.
+ */
+function emphasise(value: string, key: string, leaf: Leaf): React.ReactNode[] {
+  const italic: Leaf = (text, at) =>
+    splitBy(text, ITALIC_RE, `${at}i`, (inner, k) => <em key={k}>{inner}</em>, leaf, leaf)
+  return splitBy(value, BOLD_RE, `${key}b`, (inner, k) => <strong key={k}>{inner}</strong>, italic, italic)
+}
+
+/** Turn the `**bold**` and `*italic*` runs of a text into React nodes. */
+export function renderInlineMarkdown(value: string, keyPrefix: string): React.ReactNode[] {
+  return emphasise(value, keyPrefix, (text) => (text ? [text] : []))
 }
 
 /**
@@ -141,30 +166,9 @@ function renderSegments(segments: MathSegment[], katex: Katex): React.ReactNode[
     })
     .join('')
 
-  const nodes: React.ReactNode[] = []
+  // Runs are visited left to right, so the formulas come back in their order.
   const cursor = { index: 0 }
-  let lastIndex = 0
-  let match: RegExpExecArray | null
-
-  BOLD_RE.lastIndex = 0
-  while ((match = BOLD_RE.exec(joined)) !== null) {
-    if (match.index > lastIndex) {
-      nodes.push(...expandFormulas(joined.slice(lastIndex, match.index), formulas, cursor, katex, `pre${match.index}`))
-    }
-    // React escapes these children, so model output cannot inject markup here.
-    nodes.push(
-      <strong key={`bold-${match.index}`}>
-        {expandFormulas(match[1], formulas, cursor, katex, `bold${match.index}`)}
-      </strong>,
-    )
-    lastIndex = match.index + match[0].length
-  }
-
-  if (lastIndex < joined.length) {
-    nodes.push(...expandFormulas(joined.slice(lastIndex), formulas, cursor, katex, 'tail'))
-  }
-
-  return nodes
+  return emphasise(joined, 'md', (text, key) => expandFormulas(text, formulas, cursor, katex, key))
 }
 
 const HTML_ENTITIES: Record<string, string> = {
