@@ -12,16 +12,21 @@ import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { ReviewSession } from '@/components/practice/ReviewSession'
 import { BackButton } from '@/components/common/BackButton'
+import { AppLayout } from '@/layouts/AppLayout'
 
 export function ReviewPage() {
   const { t } = useTranslation('practice')
   const { unitId } = useParams<{ unitId: string }>()
 
+  // Inside the app shell like every other student page: it stood alone, with
+  // no bar, no bell and no account menu (app.stoaedu.ch, 2026-10-10).
   return (
-    <PageContainer className="space-y-6">
-      <BackButton label={t('review.backToMap')} to="/" />
-      <PageHeader eyebrow={t('review.eyebrow')} title={t('review.title')} description={t('review.description')} />
-      <ReviewSession unitId={unitId} />
-    </PageContainer>
+    <AppLayout>
+      <PageContainer className="space-y-6">
+        <BackButton label={t('review.backToMap')} to="/" />
+        <PageHeader eyebrow={t('review.eyebrow')} title={t('review.title')} description={t('review.description')} />
+        <ReviewSession unitId={unitId} />
+      </PageContainer>
+    </AppLayout>
   )
 }
