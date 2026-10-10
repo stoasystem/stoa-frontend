@@ -11,6 +11,7 @@ import {
   type AutomationExecuteRequest,
   type AutomationPreviewRequest,
 } from '@/services/learning/learningOperationsApi'
+import { ApiError } from '@/services/api/httpClient'
 
 export const learningOperationsQueryKeys = {
   all: ['learning-operations'] as const,
@@ -69,6 +70,10 @@ export function useWarehouseExportSummaryQuery(contentType?: string) {
   return useQuery({
     queryKey: learningOperationsQueryKeys.warehouseExport(contentType),
     queryFn: () => getWarehouseExportSummary(contentType),
+    // The export needs the `curriculum_analytics_exporter` capability; an
+    // account without it is refused with 403 every time, so asking again
+    // only repeats the refusal (it was asked four times, app-planet 2026-10-10).
+    retry: (failures, error) => !(error instanceof ApiError && error.status === 403) && failures < 3,
   })
 }
 
