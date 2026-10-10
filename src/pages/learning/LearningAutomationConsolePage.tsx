@@ -94,7 +94,10 @@ function CandidateList({
 }
 
 export function LearningAutomationConsolePage() {
-  const [studentId, setStudentId] = useState('student-1')
+  // Empty, not a sample id: `useStudentAssignmentsQuery` is enabled by a
+  // non-empty id, so a placeholder made every visit open on a red "Assignment
+  // history failed" from a student that does not exist (card 124).
+  const [studentId, setStudentId] = useState('')
   const [subject, setSubject] = useState('')
   const [topicIds, setTopicIds] = useState('')
   const [sourceTypes, setSourceTypes] = useState('ai_draft,curriculum_exercise')
@@ -167,7 +170,12 @@ export function LearningAutomationConsolePage() {
               <form className="space-y-4" onSubmit={handlePreview}>
                 <div className="space-y-2">
                   <Label htmlFor="student-id">Student id</Label>
-                  <Input id="student-id" value={studentId} onChange={(event) => setStudentId(event.target.value)} />
+                  <Input
+                    id="student-id"
+                    value={studentId}
+                    placeholder="Enter a student id to load their assignments"
+                    onChange={(event) => setStudentId(event.target.value)}
+                  />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="space-y-2">
@@ -345,6 +353,11 @@ export function LearningAutomationConsolePage() {
                 <CardTitle className="text-xl">Assignment history</CardTitle>
               </CardHeader>
               <CardContent>
+                {!studentId.trim() && (
+                  <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
+                    Enter a student id above to see what has been assigned to them.
+                  </p>
+                )}
                 {assignmentsQuery.isLoading && <LoadingState message="Loading assignment history..." />}
                 {assignmentsQuery.error && <ErrorState title="Assignment history failed" message={assignmentsQuery.error.message} />}
                 {assignmentsQuery.data?.items.length === 0 && (
