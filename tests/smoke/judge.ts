@@ -59,6 +59,14 @@ export type Screen = {
   minLength?: number
 }
 
+// E03 checks the language of equation guidance, not whether the tutor gives
+// the final result. A student may be asked to finish the last step.
+export const E03_SCREEN: Screen = {
+  language: 'en',
+  topic: /\b(equation|subtract|divide|2x)\b/i,
+  minLength: 40,
+}
+
 /**
  * What the screen found wrong with an answer; empty when it found nothing.
  * The answer still goes to a person either way.
