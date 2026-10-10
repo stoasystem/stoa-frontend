@@ -191,3 +191,55 @@ describe('a question that has come back', () => {
     expect(await screen.findByText('missed 3 times')).toBeInTheDocument()
   })
 })
+
+describe('a question answered in words', () => {
+  // A `text_input` card has no options. Only the options were drawn, so it came
+  // back as a prompt and a Check that could never be pressed (2026-10-10).
+  const typed = () =>
+    card({
+      challengeId: 'brueche-l2-c3',
+      prompt: 'Kürze den Bruch 12/18 so weit wie möglich.',
+      options: [],
+      type: 'text_input',
+      lapses: 0,
+    })
+
+  it('offers a field, and checks what was typed', async () => {
+    mockedDue.mockResolvedValue({ items: [typed()], dueCount: 1, generatedAt: '2026-03-02T09:00:00+00:00' })
+    mockedAnswer.mockResolvedValue({
+      challengeId: 'brueche-l2-c3',
+      correct: true,
+      feedback: 'Richtig!',
+      attemptsRemaining: 2,
+    })
+    const user = userEvent.setup()
+    renderSession()
+
+    const field = await screen.findByRole('textbox', { name: 'Your answer' })
+    expect(screen.getByRole('button', { name: 'Check answer' })).toBeDisabled()
+    await user.type(field, ' 2/3 {Enter}')
+
+    await waitFor(() => expect(screen.getByText('Richtig!')).toBeInTheDocument())
+    expect(mockedAnswer).toHaveBeenCalledWith('brueche-l2-c3', { answer: '2/3' })
+    expect(field).toBeDisabled()
+  })
+
+  it('starts again from an empty field after a miss', async () => {
+    mockedDue.mockResolvedValue({ items: [typed()], dueCount: 1, generatedAt: '2026-03-02T09:00:00+00:00' })
+    mockedAnswer.mockResolvedValue({
+      challengeId: 'brueche-l2-c3',
+      correct: false,
+      feedback: 'Noch nicht.',
+      attemptsRemaining: 1,
+    })
+    const user = userEvent.setup()
+    renderSession()
+
+    await user.type(await screen.findByRole('textbox', { name: 'Your answer' }), '6/9')
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+    await user.click(await screen.findByRole('button', { name: /Try again/ }))
+
+    expect(screen.getByRole('textbox', { name: 'Your answer' })).toHaveValue('')
+    expect(screen.getByRole('textbox', { name: 'Your answer' })).toBeEnabled()
+  })
+})

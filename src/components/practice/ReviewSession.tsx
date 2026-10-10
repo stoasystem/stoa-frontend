@@ -11,6 +11,8 @@ import { useTranslation } from 'react-i18next'
 import { Check, RotateCcw, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { EmptyState } from '@/components/common/EmptyState'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
 import { practiceQueryKeys } from '@/services/practice/practiceQueryKeys'
@@ -54,13 +56,18 @@ export function ReviewSession({ unitId }: { unitId?: string } = {}) {
 }
 
 function ReviewQuestion({ card }: { card: ReviewCard }) {
-  const { t } = useTranslation('practice')
+  const { t } = useTranslation(['practice', 'chapter'])
   const queryClient = useQueryClient()
   const [selected, setSelected] = useState<string | null>(null)
+  // A card with no options is answered in words: `text_input`, or an
+  // explanation. Only the choices were drawn, so a typed card came back as a
+  // prompt and a "Check" that could never be pressed (app.stoaedu.ch, 2026-10-10).
+  const typedCard = card.options.length === 0
+  const [typed, setTyped] = useState('')
   const [result, setResult] = useState<PracticeAnswerResult | null>(null)
 
   const answer = useMutation({
-    mutationFn: (choice: string) => submitChallengeAnswer(card.challengeId, { answer: choice }),
+    mutationFn: (value: string) => submitChallengeAnswer(card.challengeId, { answer: value }),
     onSuccess: (data) => {
       setResult(data)
       // The schedule moved, so what is due moved with it.
@@ -69,6 +76,12 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
   })
 
   const answered = result !== null
+  const value = typedCard ? typed.trim() : selected
+  const fieldId = `review-answer-${card.challengeId}`
+
+  function submit() {
+    if (value && !answered && !answer.isPending) answer.mutate(value)
+  }
 
   return (
     <Card className="border-border/70">
@@ -82,34 +95,68 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
           ) : null}
         </div>
 
-        <div className="grid gap-2">
-          {card.options.map((option) => {
-            const isChoice = selected === option
-            return (
-              <Button
-                key={option}
-                type="button"
-                variant={isChoice ? 'default' : 'outline'}
-                className="h-auto justify-start whitespace-normal py-2 text-left"
+        {typedCard ? (
+          <div className="grid gap-1.5">
+            <label htmlFor={fieldId} className="text-sm font-medium text-foreground">
+              {t('ui.yourAnswer')}
+            </label>
+            {card.type === 'explanation' ? (
+              <Textarea
+                id={fieldId}
+                rows={3}
+                value={typed}
                 disabled={answered || answer.isPending}
-                onClick={() => setSelected(option)}
-              >
-                {option}
-              </Button>
-            )
-          })}
-        </div>
+                placeholder={t('chapter:stage.answerPlaceholder')}
+                onChange={(event) => setTyped(event.target.value)}
+              />
+            ) : (
+              <Input
+                id={fieldId}
+                value={typed}
+                autoComplete="off"
+                disabled={answered || answer.isPending}
+                placeholder={t('chapter:stage.answerPlaceholder')}
+                onChange={(event) => setTyped(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    submit()
+                  }
+                }}
+              />
+            )}
+          </div>
+        ) : (
+          <div className="grid gap-2">
+            {card.options.map((option) => {
+              const isChoice = selected === option
+              return (
+                <Button
+                  key={option}
+                  type="button"
+                  variant={isChoice ? 'default' : 'outline'}
+                  className="h-auto justify-start whitespace-normal py-2 text-left"
+                  disabled={answered || answer.isPending}
+                  onClick={() => setSelected(option)}
+                >
+                  {option}
+                </Button>
+              )
+            })}
+          </div>
+        )}
 
         {answered ? (
           <ReviewFeedback result={result} onAgain={() => {
             setResult(null)
             setSelected(null)
+            setTyped('')
           }} />
         ) : (
           <Button
             type="button"
-            disabled={!selected || answer.isPending}
-            onClick={() => selected && answer.mutate(selected)}
+            disabled={!value || answer.isPending}
+            onClick={submit}
           >
             {answer.isPending ? t('review.checking') : t('checkAnswer')}
           </Button>
