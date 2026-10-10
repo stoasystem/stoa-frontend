@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { IconButton } from '@/components/base/IconButton'
 import { ICON } from '@/components/base/sizes'
+import { notificationText } from '@/lib/notificationCopy'
 import { notificationTargetPath } from '@/components/notifications/notificationTargets'
 import { Badge } from '@/components/ui/badge'
 import {
@@ -28,7 +29,7 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
 }
 
 export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
-  const { t } = useTranslation('common')
+  const { t } = useTranslation(['common', 'chat'])
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -127,6 +128,7 @@ export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
             )}
             {items.map((event) => {
               const target = targetOf(event)
+              const text = notificationText(event, t)
               return (
                 <div
                   key={event.eventId}
@@ -140,8 +142,8 @@ export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
                     className="flex min-w-0 flex-1 cursor-pointer items-start gap-2 rounded-[6px] border-0 bg-transparent p-2 text-left text-ink hover:bg-ground"
                   >
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="text-sm font-medium">{event.title}</span>
-                      <span className="mt-1 text-xs leading-5 text-muted-foreground">{event.summary}</span>
+                      <span className="text-sm font-medium">{text.title}</span>
+                      <span className="mt-1 text-xs leading-5 text-muted-foreground">{text.summary}</span>
                     </span>
                     {event.status === 'created' && (
                       <Badge variant="default">{t('notifications.itemStatus.created')}</Badge>

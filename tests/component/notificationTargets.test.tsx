@@ -100,7 +100,8 @@ describe('a notification in the bell', () => {
     renderBell('student', [event({ targetType: 'question', targetId: 'q-9' })])
     await openBell()
 
-    await userEvent.click(screen.getByRole('button', { name: /Teacher replied/ }))
+    // The backend's English for a question reply is shown translated (keys here).
+    await userEvent.click(screen.getByRole('button', { name: /notifications\.events\.replyQuestion\.title/ }))
 
     expect(pathname).toBe('/ask')
   })
