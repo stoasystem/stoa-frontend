@@ -1,4 +1,4 @@
-import { expect, test, type TestInfo } from '@playwright/test'
+import { expect, test, type PlaywrightWorkerArgs, type TestInfo } from '@playwright/test'
 import {
   ANSWER_WAIT_LIMIT_MS,
   SmokeApi,
@@ -46,61 +46,102 @@ function isCreate(method: string, url: string): boolean {
   return method === 'POST' && isApiUrl(url) && CREATE.test(pathOf(url))
 }
 
-test('item 5: a blank grade opens a blank-grade conversation (#50)', {
-  tag: ['@item5'],
-}, async ({ page, request, baseURL }, testInfo) => {
-  // No model is asked. The screen's create carries the question, so it is read
-  // and stopped in the browser; the stored grade is read from a create sent
-  // over the API without a question.
-  const failures = watchApiFailures(page)
-  const errors = watchPageErrors(page)
-  const stopped: Array<Record<string, unknown>> = []
-  await page.route(onApiPath(CREATE), async (route) => {
-    if (!isCreate(route.request().method(), route.request().url())) return route.continue()
-    stopped.push(route.request().postDataJSON() as Record<string, unknown>)
-    await route.abort('blockedbyclient')
+// agent@ is the account the blank-grade path is read on, but a student can set
+// a year group on /me (#154), and agent@'s is set for other work. So item 5
+// blanks it first and puts back what it found, even when a test fails. The
+// value it found is in the run record, in case the run is killed in between.
+test.describe('item 5: a student with no year group (#50)', { tag: ['@item5'] }, () => {
+  let found: string | null = null
+
+  async function agentApi(playwright: PlaywrightWorkerArgs['playwright'], testInfo: TestInfo) {
+    const request = await playwright.request.newContext()
+    const api = await SmokeApi.signIn(request, testInfo.project.use.baseURL!, 'agent')
+    return { request, api }
+  }
+
+  test.beforeAll(async ({ playwright }, testInfo) => {
+    const { request, api } = await agentApi(playwright, testInfo)
+    try {
+      found = (await studentGrade(api)) ?? ''
+      await record(testInfo, 'item5-grade-before', { grade: found })
+      if (found.trim() !== '') {
+        await api.call('PATCH', '/students/me/profile', { data: { grade: '' }, expect: 200 })
+      }
+      expect((await studentGrade(api) ?? '').trim(), 'agent@ grade blanked for item 5').toBe('')
+    } finally {
+      await request.dispose()
+    }
   })
-  await signIn(page, 'agent')
-  await page.goto(ASK)
 
-  const composer = page.getByRole('textbox', { name: anyLanguage('chat', 'ask.composerLabel') }).last()
-  await composer.fill('[smoke] #50 blank grade')
-  await composer.press('Enter')
-  await expect.poll(() => stopped.length, { message: 'Ask never asked for a conversation' }).toBeGreaterThan(0)
-
-  const api = await SmokeApi.signIn(request, baseURL!, 'agent')
-  const created = await api.call<{ id: string; grade: string; messages: unknown[] }>('POST', '/conversations', {
-    data: { subject: 'math', grade: '' },
-    expect: 201,
+  test.afterAll(async ({ playwright }, testInfo) => {
+    if (found === null || found.trim() === '') return
+    const { request, api } = await agentApi(playwright, testInfo)
+    try {
+      await api.call('PATCH', '/students/me/profile', { data: { grade: found }, expect: 200 })
+      const restored = await studentGrade(api)
+      await record(testInfo, 'item5-grade-after', { grade: restored })
+      expect(restored, 'agent@ grade put back').toBe(found)
+    } finally {
+      await request.dispose()
+    }
   })
 
-  const sent = stopped[0]
-  await record(testInfo, 'item5-blank-grade', {
-    screenRequest: { ...sent, initialMessage: typeof sent.initialMessage === 'string' ? '(the question)' : sent.initialMessage },
-    screenRequestsStopped: stopped.length,
-    apiCreate: { status: created.status, conversationId: created.body.id, grade: created.body.grade, messages: created.body.messages.length },
-  })
-  expect(sent.grade, 'the grade the screen sent').toBe('')
-  expect(stopped, 'the screen asked for one conversation').toHaveLength(1)
-  expect(created.body.grade, 'the grade the conversation was stored with').toBe('')
-  expect(created.body.messages, 'a create without a question holds no message').toEqual([])
-  expect(errors, 'uncaught page errors').toEqual([])
-  await expectApiClean(failures, [
-    { method: 'POST', path: CREATE, status: 'failed', times: 1, why: 'item 5: the create this test stops' },
-  ])
-})
+  test('item 5: a blank grade opens a blank-grade conversation (#50)', {
+    tag: ['@item5'],
+  }, async ({ page, request, baseURL }, testInfo) => {
+    // No model is asked. The screen's create carries the question, so it is read
+    // and stopped in the browser; the stored grade is read from a create sent
+    // over the API without a question.
+    const failures = watchApiFailures(page)
+    const errors = watchPageErrors(page)
+    const stopped: Array<Record<string, unknown>> = []
+    await page.route(onApiPath(CREATE), async (route) => {
+      if (!isCreate(route.request().method(), route.request().url())) return route.continue()
+      stopped.push(route.request().postDataJSON() as Record<string, unknown>)
+      await route.abort('blockedbyclient')
+    })
+    await signIn(page, 'agent')
+    await page.goto(ASK)
 
-test('item 5: Ask tells a blank-grade student where to fill in their grade (#50, #154)', {
-  tag: ['@item5'],
-}, async ({ page }) => {
-  // Only the hint and where it leads; nothing is saved, so agent@ stays blank.
-  await signIn(page, 'agent')
-  await page.goto(ASK)
-  const hint = page.getByRole('link', { name: anyLanguage('chat', 'gradeMissingHint') })
-  await expect(hint, 'the blank-grade hint').toBeVisible({ timeout: 15_000 })
-  await hint.click()
-  await expect(page).toHaveURL((url) => url.pathname === '/me' && url.hash === '#me-grade')
-  await expect(page.getByRole('textbox', { name: anyLanguage('common', 'me.grade.label') })).toBeFocused()
+    const composer = page.getByRole('textbox', { name: anyLanguage('chat', 'ask.composerLabel') }).last()
+    await composer.fill('[smoke] #50 blank grade')
+    await composer.press('Enter')
+    await expect.poll(() => stopped.length, { message: 'Ask never asked for a conversation' }).toBeGreaterThan(0)
+
+    const api = await SmokeApi.signIn(request, baseURL!, 'agent')
+    const created = await api.call<{ id: string; grade: string; messages: unknown[] }>('POST', '/conversations', {
+      data: { subject: 'math', grade: '' },
+      expect: 201,
+    })
+
+    const sent = stopped[0]
+    await record(testInfo, 'item5-blank-grade', {
+      screenRequest: { ...sent, initialMessage: typeof sent.initialMessage === 'string' ? '(the question)' : sent.initialMessage },
+      screenRequestsStopped: stopped.length,
+      apiCreate: { status: created.status, conversationId: created.body.id, grade: created.body.grade, messages: created.body.messages.length },
+    })
+    expect(sent.grade, 'the grade the screen sent').toBe('')
+    expect(stopped, 'the screen asked for one conversation').toHaveLength(1)
+    expect(created.body.grade, 'the grade the conversation was stored with').toBe('')
+    expect(created.body.messages, 'a create without a question holds no message').toEqual([])
+    expect(errors, 'uncaught page errors').toEqual([])
+    await expectApiClean(failures, [
+      { method: 'POST', path: CREATE, status: 'failed', times: 1, why: 'item 5: the create this test stops' },
+    ])
+  })
+
+  test('item 5: Ask tells a blank-grade student where to fill in their grade (#50, #154)', {
+    tag: ['@item5'],
+  }, async ({ page }) => {
+    // Only the hint and where it leads; nothing is saved.
+    await signIn(page, 'agent')
+    await page.goto(ASK)
+    const hint = page.getByRole('link', { name: anyLanguage('chat', 'gradeMissingHint') })
+    await expect(hint, 'the blank-grade hint').toBeVisible({ timeout: 15_000 })
+    await hint.click()
+    await expect(page).toHaveURL((url) => url.pathname === '/me' && url.hash === '#me-grade')
+    await expect(page.getByRole('textbox', { name: anyLanguage('common', 'me.grade.label') })).toBeFocused()
+  })
 })
 
 test('item 4: a PDF with a 4 MiB object header is refused as upload_invalid (E08)', {
