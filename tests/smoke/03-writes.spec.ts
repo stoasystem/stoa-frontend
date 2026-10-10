@@ -7,7 +7,7 @@ import {
   type AskedQuestion,
 } from './api'
 import { expectApiClean, isApiUrl, pathOf, signIn, watchApiFailures, watchPageErrors } from './helpers'
-import { findErrorCode, plainSnippet, screenAnswer, type Screen } from './judge'
+import { E03_SCREEN, findErrorCode, plainSnippet, screenAnswer, type Screen } from './judge'
 import { anyLanguage } from './locales'
 import { longObjectHeaderPdf } from './pdf'
 import { record, rememberConversations, spendGeneration } from './run'
@@ -280,7 +280,7 @@ test.describe('answers', { tag: ['@generation'] }, () => {
         acceptLanguage: 'de;q=0, en;q=1',
       })
       rememberConversations(baseURL!, [asked.conversationId])
-      await recordAnswer(testInfo, 'item2-e03-language', asked, { language: 'en', topic: /\b6\b/, minLength: 40 }, {
+      await recordAnswer(testInfo, 'item2-e03-language', asked, E03_SCREEN, {
         acceptLanguage: 'de;q=0, en;q=1',
       })
     })
