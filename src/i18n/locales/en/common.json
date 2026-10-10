@@ -172,6 +172,36 @@
       "reconnecting": "Reconnecting"
     },
     "empty": "No notifications yet.",
+    "events": {
+      "helpExpired": {
+        "summary": "Your request for a teacher expired.",
+        "title": "No teacher was available"
+      },
+      "helpExpiredReturned": {
+        "summary": "Your request for a teacher expired. This week's teacher help was given back.",
+        "title": "No teacher was available"
+      },
+      "helpRequested": {
+        "summary": "A student requested help with a {{subject}} question.",
+        "title": "Teacher help requested"
+      },
+      "replyConversation": {
+        "summary": "Your teacher answered in your conversation.",
+        "title": "Your teacher replied"
+      },
+      "replyQuestion": {
+        "summary": "Your teacher added a reply to your question.",
+        "title": "Teacher replied"
+      },
+      "takeoverConversation": {
+        "summary": "A teacher has started working on your request.",
+        "title": "A teacher joined your conversation"
+      },
+      "takeoverQuestion": {
+        "summary": "A teacher has started working on your question.",
+        "title": "Teacher joined your question"
+      }
+    },
     "itemStatus": {
       "archived": "Archived",
       "created": "New",

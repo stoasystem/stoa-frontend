@@ -172,6 +172,36 @@
       "reconnecting": "Reconnexion"
     },
     "empty": "Aucune notification pour l’instant.",
+    "events": {
+      "helpExpired": {
+        "summary": "Ta demande d’aide à un·e enseignant·e a expiré.",
+        "title": "Aucun·e enseignant·e disponible"
+      },
+      "helpExpiredReturned": {
+        "summary": "Ta demande d’aide à un·e enseignant·e a expiré. L’aide de cette semaine t’a été rendue.",
+        "title": "Aucun·e enseignant·e disponible"
+      },
+      "helpRequested": {
+        "summary": "Un·e élève demande de l’aide pour une question en {{subject}}.",
+        "title": "Aide demandée"
+      },
+      "replyConversation": {
+        "summary": "Ton enseignant·e a répondu dans ta conversation.",
+        "title": "Ton enseignant·e a répondu"
+      },
+      "replyQuestion": {
+        "summary": "Ton enseignant·e a répondu à ta question.",
+        "title": "Réponse de ton enseignant·e"
+      },
+      "takeoverConversation": {
+        "summary": "Un·e enseignant·e s’occupe maintenant de ta demande.",
+        "title": "Un·e enseignant·e a rejoint ta conversation"
+      },
+      "takeoverQuestion": {
+        "summary": "Un·e enseignant·e travaille maintenant sur ta question.",
+        "title": "Un·e enseignant·e a pris ta question"
+      }
+    },
     "itemStatus": {
       "archived": "Archivé",
       "created": "Nouveau",
