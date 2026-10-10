@@ -172,6 +172,36 @@
       "reconnecting": "Riconnessione in corso"
     },
     "empty": "Ancora nessuna notifica.",
+    "events": {
+      "helpExpired": {
+        "summary": "La tua richiesta di aiuto a un/a docente è scaduta.",
+        "title": "Nessun/a docente disponibile"
+      },
+      "helpExpiredReturned": {
+        "summary": "La tua richiesta di aiuto a un/a docente è scaduta. L’aiuto di questa settimana ti è stato restituito.",
+        "title": "Nessun/a docente disponibile"
+      },
+      "helpRequested": {
+        "summary": "Un/a allievo/a chiede aiuto per una domanda di {{subject}}.",
+        "title": "Aiuto richiesto"
+      },
+      "replyConversation": {
+        "summary": "Il/la tuo/a docente ha risposto nella tua conversazione.",
+        "title": "Il/la tuo/a docente ha risposto"
+      },
+      "replyQuestion": {
+        "summary": "Il/la tuo/a docente ha risposto alla tua domanda.",
+        "title": "Risposta dal/la tuo/a docente"
+      },
+      "takeoverConversation": {
+        "summary": "Un/a docente si sta occupando della tua richiesta.",
+        "title": "Un/a docente si è unito/a alla tua conversazione"
+      },
+      "takeoverQuestion": {
+        "summary": "Un/a docente sta lavorando alla tua domanda.",
+        "title": "Un/a docente ha preso la tua domanda"
+      }
+    },
     "itemStatus": {
       "archived": "Archiviata",
       "created": "Nuova",

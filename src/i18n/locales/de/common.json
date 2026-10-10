@@ -172,6 +172,36 @@
       "reconnecting": "Verbindung wird wiederhergestellt"
     },
     "empty": "Noch keine Mitteilungen.",
+    "events": {
+      "helpExpired": {
+        "summary": "Deine Anfrage an eine Lehrperson ist abgelaufen.",
+        "title": "Keine Lehrperson verfügbar"
+      },
+      "helpExpiredReturned": {
+        "summary": "Deine Anfrage an eine Lehrperson ist abgelaufen. Die Lehrpersonenhilfe dieser Woche hast du zurückbekommen.",
+        "title": "Keine Lehrperson verfügbar"
+      },
+      "helpRequested": {
+        "summary": "Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in {{subject}}.",
+        "title": "Hilfe angefragt"
+      },
+      "replyConversation": {
+        "summary": "Deine Lehrperson hat in deinem Gespräch geantwortet.",
+        "title": "Deine Lehrperson hat geantwortet"
+      },
+      "replyQuestion": {
+        "summary": "Deine Lehrperson hat auf deine Frage geantwortet.",
+        "title": "Antwort von deiner Lehrperson"
+      },
+      "takeoverConversation": {
+        "summary": "Eine Lehrperson kümmert sich jetzt um deine Anfrage.",
+        "title": "Eine Lehrperson ist deinem Gespräch beigetreten"
+      },
+      "takeoverQuestion": {
+        "summary": "Eine Lehrperson arbeitet jetzt an deiner Frage.",
+        "title": "Eine Lehrperson hat deine Frage übernommen"
+      }
+    },
     "itemStatus": {
       "archived": "Archiviert",
       "created": "Neu",
