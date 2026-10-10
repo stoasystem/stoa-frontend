@@ -28,11 +28,17 @@ const CREATE = /^\/conversations$/
  */
 const onApiPath = (pattern: RegExp) => (url: URL) => isApiUrl(url.href) && pattern.test(pathOf(url.href))
 
-type Profile = { grade: string }
+type Profile = { grade: string; preferredAnswerLanguage?: string | null }
 
 async function studentGrade(api: SmokeApi): Promise<string> {
   const { body } = await api.call<Profile>('GET', '/students/me/profile', { expect: 200 })
   return body.grade
+}
+
+/** The locale the account answers in, which a create with Accept-Language rewrites. */
+async function studentLocale(api: SmokeApi): Promise<string> {
+  const { body } = await api.call<Profile>('GET', '/students/me/profile', { expect: 200 })
+  return body.preferredAnswerLanguage ?? ''
 }
 
 // Ask (the student's chat since the redesign; `/chat` redirects to it) sends
@@ -220,23 +226,60 @@ async function recordAnswer(
 }
 
 test.describe('answers', { tag: ['@generation'] }, () => {
-  test('item 2: Accept-Language q-values choose English over German (E03)', { tag: ['@item2'] }, async ({
-    request,
-    baseURL,
-  }, testInfo) => {
-    test.setTimeout(ANSWER_WAIT_LIMIT_MS + 60_000)
-    const api = await SmokeApi.signIn(request, baseURL!, 'student')
-    // Only numbers in the question, so the header is the one language signal.
-    const asked = await askViaApi(api, {
-      label: 'item2-e03',
-      subject: 'math',
-      grade: await studentGrade(api),
-      content: '2x + 7 = 19',
-      acceptLanguage: 'de;q=0, en;q=1',
+  // A create carrying Accept-Language writes the account's preferred locale, so
+  // this item leaves student@ answering in English -- and the next item reads
+  // the same account expecting German. It puts back what it found, the way
+  // item 5 does with agent@'s year group, and does so even when the test fails.
+  test.describe('item 2: the header decides the answer language', () => {
+    let found: string | null = null
+
+    async function studentApi(playwright: PlaywrightWorkerArgs['playwright'], testInfo: TestInfo) {
+      const request = await playwright.request.newContext()
+      const api = await SmokeApi.signIn(request, testInfo.project.use.baseURL!, 'student')
+      return { request, api }
+    }
+
+    test.beforeAll(async ({ playwright }, testInfo) => {
+      const { request, api } = await studentApi(playwright, testInfo)
+      try {
+        found = await studentLocale(api)
+        await record(testInfo, 'item2-locale-before', { preferredAnswerLanguage: found })
+      } finally {
+        await request.dispose()
+      }
     })
-    rememberConversations(baseURL!, [asked.conversationId])
-    await recordAnswer(testInfo, 'item2-e03-language', asked, { language: 'en', topic: /\b6\b/, minLength: 40 }, {
-      acceptLanguage: 'de;q=0, en;q=1',
+
+    test.afterAll(async ({ playwright }, testInfo) => {
+      if (!found) return
+      const { request, api } = await studentApi(playwright, testInfo)
+      try {
+        await api.call('PATCH', '/auth/me/preferences/locale', { data: { preferredLocale: found }, expect: 200 })
+        const restored = await studentLocale(api)
+        await record(testInfo, 'item2-locale-after', { preferredAnswerLanguage: restored })
+        expect(restored, 'student@ answer language put back').toBe(found)
+      } finally {
+        await request.dispose()
+      }
+    })
+
+    test('item 2: Accept-Language q-values choose English over German (E03)', { tag: ['@item2'] }, async ({
+      request,
+      baseURL,
+    }, testInfo) => {
+      test.setTimeout(ANSWER_WAIT_LIMIT_MS + 60_000)
+      const api = await SmokeApi.signIn(request, baseURL!, 'student')
+      // Only numbers in the question, so the header is the one language signal.
+      const asked = await askViaApi(api, {
+        label: 'item2-e03',
+        subject: 'math',
+        grade: await studentGrade(api),
+        content: '2x + 7 = 19',
+        acceptLanguage: 'de;q=0, en;q=1',
+      })
+      rememberConversations(baseURL!, [asked.conversationId])
+      await recordAnswer(testInfo, 'item2-e03-language', asked, { language: 'en', topic: /\b6\b/, minLength: 40 }, {
+        acceptLanguage: 'de;q=0, en;q=1',
+      })
     })
   })
 
@@ -412,6 +455,10 @@ test.describe('answers', { tag: ['@generation'] }, () => {
     expect.soft(seen.subject, 'Ask opened the conversation in maths').toBe('math')
     expect.soft(seen.acceptLanguage, 'student@ reads the app in German').toMatch(/^de\b/)
     expect.soft(problems, 'keyword screen (a person still reads the answer)').toEqual([])
-    await expectApiClean(failures)
+    // A conversation nobody escalated has no teacher-help request, and the
+    // backend documents that 404 on the route; Ask asks once and does not retry.
+    await expectApiClean(failures, [
+      { method: 'GET', path: /\/teacher-help\/conversations\/[^/]+\/request$/, status: 404, why: 'no teacher help was asked for' },
+    ])
   })
 })
