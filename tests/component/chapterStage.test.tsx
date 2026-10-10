@@ -420,6 +420,8 @@ describe('the practice stage', () => {
     expect(screen.getByText('Put your answer back into the equation.')).toBeInTheDocument()
 
     await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    // The keyboard is back on the answer, not left on the page.
+    expect(screen.getByRole('radio', { name: /x = 3/ })).toHaveFocus()
     await userEvent.click(screen.getByRole('radio', { name: /x = 5/ }))
     await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
 
