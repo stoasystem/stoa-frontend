@@ -167,7 +167,10 @@
     "accountBlocked_one": "Blocked: {{issue}}",
     "accountBlocked_other": "Blocked ({{count}} items): {{issue}}",
     "accountSeeDetails": "Open for details",
-    "state": { "blocked": "Blocked", "attention": "Needs attention" },
+    "state": {
+      "blocked": "Blocked",
+      "attention": "Needs attention"
+    },
     "issues": {
       "parent_email_unverified": "Parent email needs verification",
       "no_linked_children": "No linked child account",
@@ -175,5 +178,57 @@
       "usage_unreconciled": "Usage is still being reconciled",
       "child_binding": "A child link needs review"
     }
+  },
+  "verification": {
+    "title": "Verification recovery",
+    "parent": "Parent",
+    "child": "Child",
+    "status": "Status",
+    "activation": "Activation",
+    "recovery": "Recovery",
+    "resend": "Resend",
+    "resendAllowed": "Allowed",
+    "resendUnavailable": "Not available",
+    "resendCount": "Resend count",
+    "lastResend": "Last resend",
+    "updated": "Updated",
+    "policy": "Policy",
+    "requested": "Requested",
+    "none": "None"
+  },
+  "issues": {
+    "parent_email_unverified": "Parent email needs verification.",
+    "billing_inactive": "Billing needs attention.",
+    "no_linked_children": "No linked child account is available.",
+    "child_email_unverified": "A child account email is not verified.",
+    "usage_unreconciled": "Usage is still being reconciled.",
+    "childBinding": "Child link needs review: {{status}}."
+  },
+  "status": {
+    "unknown": "Unknown",
+    "ready": "Ready",
+    "attention": "Attention",
+    "blocked": "Blocked",
+    "active": "Active",
+    "pending": "Pending",
+    "revoked": "Revoked",
+    "verified": "Verified",
+    "pending_verification": "Pending verification",
+    "pending_email_verification": "Pending email verification",
+    "expired_verification": "Verification expired",
+    "expired_code": "Code expired",
+    "verification_not_required": "Verification not required",
+    "admin_marked_verified": "Admin marked verified",
+    "legacy_or_verified": "Verified (older account)",
+    "active_pending_verification": "Active, pending verification",
+    "limited_onboarding": "Limited onboarding",
+    "resend_available": "Resend available",
+    "resend_cooldown": "Wait before resending",
+    "resend_limited": "Too many attempts",
+    "resend_verification_code": "Resend verification code",
+    "wait_for_resend_cooldown": "Wait until a resend is possible",
+    "review_account_verification": "Review account verification",
+    "contact_support": "Contact support",
+    "email_verification_required": "Email verification required"
   }
 }

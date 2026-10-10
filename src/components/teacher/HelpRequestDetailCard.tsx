@@ -39,7 +39,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
       <CardContent className="space-y-3">
         {request.requestMessage && (
           <div className="rounded-md bg-secondary p-3">
-            <p className="text-xs uppercase text-muted-foreground">Request summary</p>
+            <p className="text-xs uppercase text-muted-foreground">{t('detail.card.requestSummary')}</p>
             <p className="mt-2 text-sm leading-6">{request.requestMessage}</p>
           </div>
         )}
@@ -53,7 +53,7 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             }
           >
             <p className="text-xs uppercase text-muted-foreground">
-              {message.role === 'assistant' ? 'Learning Assistant explanation' : message.role}
+              {t(`detail.card.roles.${message.role}`, { defaultValue: message.role })}
             </p>
             <p className="mt-2 text-sm leading-6">{message.content}</p>
             {(message.role === 'student' || message.role === 'assistant' || message.role === 'teacher') && (
@@ -67,8 +67,8 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
                         ? 'teacher_reply'
                         : 'question'
                   }
-                  triggerLabel={message.role === 'student' ? 'Report student content' : 'Report content'}
-                  contextLabel="Send this request context to the internal moderation queue."
+                  triggerLabel={message.role === 'student' ? t('detail.card.reportStudent') : t('detail.card.report')}
+                  contextLabel={t('detail.card.reportContext')}
                   defaultReason={message.role === 'assistant' ? 'incorrect_answer' : 'other'}
                 />
               </div>

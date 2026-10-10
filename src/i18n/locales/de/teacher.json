@@ -10,7 +10,22 @@
   "availability": {
     "eyebrow": "Lehrpersonen-Bereich",
     "title": "Verfügbarkeit",
-    "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können."
+    "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können.",
+    "editor": {
+      "subjects": "Fächer",
+      "weeklySlots": "Wöchentliche Zeitfenster",
+      "day": "Tag",
+      "start": "Beginn",
+      "end": "Ende",
+      "addSlot": "Zeitfenster hinzufügen",
+      "save": "Verfügbarkeit speichern",
+      "saving": "Wird gespeichert …"
+    },
+    "summary": {
+      "title": "Aktuelle Verfügbarkeit",
+      "subjects": "Fächer: {{subjects}}",
+      "noSubjects": "keine ausgewählt"
+    }
   },
   "detail": {
     "title": "Hilfeanfrage",
@@ -23,7 +38,19 @@
     "resolutionNotePlaceholder": "Erforderlich, bevor als gelöst markiert werden kann.",
     "updateFailed": "Status konnte nicht aktualisiert werden.",
     "replyTitle": "Antwort der Lehrperson",
-    "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen."
+    "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen.",
+    "card": {
+      "requestSummary": "Zusammenfassung der Anfrage",
+      "report": "Inhalt melden",
+      "reportStudent": "Inhalt der Lernenden melden",
+      "reportContext": "Den Kontext dieser Anfrage an die interne Moderation senden.",
+      "roles": {
+        "student": "Lernende",
+        "assistant": "Erklärung des Lernassistenten",
+        "teacher": "Lehrperson",
+        "system": "System"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -77,5 +104,112 @@
     "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
     "firstAction": "Erste Aktion der Lehrperson: {{time}}",
     "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
+  },
+  "aiTools": {
+    "title": "KI-Werkzeuge für Lehrpersonen",
+    "description": "Bereiten Sie Entwürfe aus dem sichtbaren Kontext der Lernenden vor, die Sie selbst prüfen.",
+    "draftOnly": "Nur Entwurf",
+    "generate": "Erstellen",
+    "noDraft": "Noch kein Entwurf erstellt.",
+    "notAvailable": "Nicht verfügbar.",
+    "unavailable": "Entwürfe können gerade nicht erstellt werden.",
+    "summary": {
+      "title": "Entwurf einer Zusammenfassung",
+      "description": "Zusammenfassung der Sitzung, wahrscheinliches Missverständnis und Erklärung für die Nachbetreuung.",
+      "generateLabel": "Entwurf einer Zusammenfassung erstellen",
+      "session": "Sitzung",
+      "misconception": "Missverständnis",
+      "focus": "Vorgeschlagener Schwerpunkt",
+      "followUp": "Nachbetreuung"
+    },
+    "exercise": {
+      "title": "Entwurf von Übungen",
+      "description": "Kurze Übungsaufgaben, die Sie prüfen, bevor sie die Lernenden erhalten.",
+      "generateLabel": "Entwurf von Übungen erstellen",
+      "difficulty": "Schwierigkeit",
+      "items": "Aufgaben",
+      "item": "Aufgabe {{number}}",
+      "answerKey": "Lösungen",
+      "difficulties": {
+        "targeted": "Gezielt",
+        "standard": "Standard",
+        "stretch": "Anspruchsvoll"
+      }
+    },
+    "status": {
+      "draft": "Entwurf",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt",
+      "archived": "Archiviert"
+    },
+    "delivery": {
+      "not_delivered": "Nicht zugestellt",
+      "delivered": "Zugestellt"
+    },
+    "actions": {
+      "regenerate": "Neu erstellen",
+      "accept": "Annehmen",
+      "reject": "Ablehnen",
+      "archive": "Archivieren"
+    }
+  },
+  "reply": {
+    "label": "Antwort der Lehrperson",
+    "placeholder": "Schreiben Sie den nächsten Schritt für die Lernenden.",
+    "queued_one": "{{count}} Block vorbereitet",
+    "queued_other": "{{count}} Blöcke vorbereitet",
+    "addBlock": "Block hinzufügen",
+    "send": "Antwort senden",
+    "modes": {
+      "paragraph": "Absatz",
+      "formula": "Formel",
+      "unordered_list": "Liste",
+      "code": "Code"
+    },
+    "unsafe": {
+      "html": "HTML-Code ist in Antworten nicht erlaubt.",
+      "privateMarkers": "Interne Kennungen dürfen nicht in einer Antwort gesendet werden."
+    }
+  },
+  "slaBadge": {
+    "elapsed": "{{minutes}} / {{target}} Min.",
+    "target": "Ziel {{target}} Min.",
+    "status": {
+      "within_target": "Im Zeitrahmen",
+      "at_risk": "Frist gefährdet",
+      "breached": "Überfällig",
+      "unknown": "Frist unbekannt"
+    }
+  },
+  "practiceContext": {
+    "source": "Quelle: {{source}}",
+    "library": "Übungsbibliothek",
+    "path": "Lernpfad",
+    "title": "Die Lernenden haben nach dem Üben dieses Schritts um Unterstützung gebeten.",
+    "topic": "Thema",
+    "attempts": "Versuche",
+    "answer": "Antwort der Lernenden",
+    "notRecorded": "Nicht erfasst",
+    "hint": "Tipp angesehen",
+    "yes": "Ja",
+    "no": "Nein",
+    "question": "Frage",
+    "help": "Der Lernkontext zeigt Ihnen, wo die Lernenden hängen geblieben sind, bevor Sie die Anfrage übernehmen."
+  },
+  "assistance": {
+    "title": "Vorbereitung für die Lehrperson",
+    "description": "Eine knappe Zusammenfassung zur Vorbereitung, keine automatisch erstellten Übungen.",
+    "sources_one": "{{count}} Quelle",
+    "sources_other": "{{count}} Quellen",
+    "loading": "Zusammenfassung wird vorbereitet …",
+    "failed": "Für diese Anfrage ist keine Zusammenfassung verfügbar.",
+    "empty": "Noch keine Zusammenfassung verfügbar.",
+    "context": "Kontext der Lernenden",
+    "focus": "Vorgeschlagener Schwerpunkt",
+    "question": "Frage",
+    "noQuestion": "Kein Fragetext verfügbar.",
+    "answer": "Antwort des Assistenten",
+    "noAnswer": "Keine Antwort des Assistenten verfügbar.",
+    "noWeakTopics": "Keine Hinweise auf schwache Themen"
   }
 }

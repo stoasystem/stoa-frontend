@@ -10,7 +10,22 @@
   "availability": {
     "eyebrow": "Teacher operations",
     "title": "Availability",
-    "description": "Set availability and subjects so support requests can be routed clearly."
+    "description": "Set availability and subjects so support requests can be routed clearly.",
+    "editor": {
+      "subjects": "Subjects",
+      "weeklySlots": "Weekly slots",
+      "day": "Day",
+      "start": "Start",
+      "end": "End",
+      "addSlot": "Add slot",
+      "save": "Save availability",
+      "saving": "Saving…"
+    },
+    "summary": {
+      "title": "Current availability",
+      "subjects": "Subjects: {{subjects}}",
+      "noSubjects": "none selected"
+    }
   },
   "detail": {
     "title": "Help Request",
@@ -23,7 +38,19 @@
     "resolutionNotePlaceholder": "Required before marking resolved.",
     "updateFailed": "Failed to update status.",
     "replyTitle": "Teacher reply",
-    "replyDescription": "Record the intervention, next step, or follow-up the student needs."
+    "replyDescription": "Record the intervention, next step, or follow-up the student needs.",
+    "card": {
+      "requestSummary": "Request summary",
+      "report": "Report content",
+      "reportStudent": "Report student content",
+      "reportContext": "Send this request context to the internal moderation queue.",
+      "roles": {
+        "student": "Student",
+        "assistant": "Learning Assistant explanation",
+        "teacher": "Teacher",
+        "system": "System"
+      }
+    }
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -77,5 +104,112 @@
     "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
     "firstAction": "First teacher action: {{time}}",
     "firstActionNone": "First teacher action: not recorded yet"
+  },
+  "aiTools": {
+    "title": "AI teacher tools",
+    "description": "Prepare teacher-reviewed drafts from visible student context.",
+    "draftOnly": "Draft only",
+    "generate": "Generate",
+    "noDraft": "No draft generated yet.",
+    "notAvailable": "Not available.",
+    "unavailable": "Draft generation is unavailable.",
+    "summary": {
+      "title": "Teacher summary draft",
+      "description": "Session summary, likely misconception, and follow-up explanation.",
+      "generateLabel": "Generate summary draft",
+      "session": "Session",
+      "misconception": "Misconception",
+      "focus": "Suggested focus",
+      "followUp": "Follow-up"
+    },
+    "exercise": {
+      "title": "Exercise draft",
+      "description": "Short practice items for teacher review before student delivery.",
+      "generateLabel": "Generate exercise draft",
+      "difficulty": "Difficulty",
+      "items": "Items",
+      "item": "Item {{number}}",
+      "answerKey": "Answer key",
+      "difficulties": {
+        "targeted": "Targeted",
+        "standard": "Standard",
+        "stretch": "Stretch"
+      }
+    },
+    "status": {
+      "draft": "Draft",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "archived": "Archived"
+    },
+    "delivery": {
+      "not_delivered": "Not delivered",
+      "delivered": "Delivered"
+    },
+    "actions": {
+      "regenerate": "Regenerate",
+      "accept": "Accept",
+      "reject": "Reject",
+      "archive": "Archive"
+    }
+  },
+  "reply": {
+    "label": "Teacher reply",
+    "placeholder": "Write the next step for the student.",
+    "queued_one": "{{count}} block queued",
+    "queued_other": "{{count}} blocks queued",
+    "addBlock": "Add block",
+    "send": "Send reply",
+    "modes": {
+      "paragraph": "Paragraph",
+      "formula": "Formula",
+      "unordered_list": "List",
+      "code": "Code"
+    },
+    "unsafe": {
+      "html": "Unsafe raw HTML is not allowed.",
+      "privateMarkers": "Private markers cannot be sent in a teacher reply."
+    }
+  },
+  "slaBadge": {
+    "elapsed": "{{minutes}}m / {{target}}m",
+    "target": "{{target}}m target",
+    "status": {
+      "within_target": "Within SLA",
+      "at_risk": "At risk",
+      "breached": "Breached",
+      "unknown": "Unknown SLA"
+    }
+  },
+  "practiceContext": {
+    "source": "Source: {{source}}",
+    "library": "Practice Library",
+    "path": "Practice Path",
+    "title": "The student requested support after practising this step.",
+    "topic": "Topic",
+    "attempts": "Attempts",
+    "answer": "Student answer",
+    "notRecorded": "Not recorded",
+    "hint": "Hint viewed",
+    "yes": "Yes",
+    "no": "No",
+    "question": "Question",
+    "help": "Learning context helps you see where the student got stuck before joining the request."
+  },
+  "assistance": {
+    "title": "Teacher assistance seed",
+    "description": "A bounded summary for teacher preparation, not automatic exercise generation.",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "loading": "Preparing summary seed…",
+    "failed": "Summary seed is unavailable for this request.",
+    "empty": "No summary seed is available yet.",
+    "context": "Student context",
+    "focus": "Suggested focus",
+    "question": "Question",
+    "noQuestion": "No question text available.",
+    "answer": "Assistant answer",
+    "noAnswer": "No assistant answer available.",
+    "noWeakTopics": "No weak topic evidence"
   }
 }

@@ -45,7 +45,7 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
             <Icon className="mt-1 h-6 w-6 shrink-0" aria-hidden="true" />
             <div>
               <p className="brand-section-kicker">{t('accountOps.supportState')}</p>
-              <h2 className="mt-2 text-2xl font-semibold text-foreground">{formatStatus(state)}</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-foreground">{formatStatus(state, t)}</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
                 {state === 'ready' ? t('accountOps.ready') : t('accountOps.attention')}
               </p>
@@ -59,7 +59,7 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
           <div className="mt-4 flex flex-wrap gap-2">
             {issues.map((issue) => (
               <Badge key={issue} variant={data.supportState.blockers.includes(issue) ? 'destructive' : 'outline'}>
-                {describeIssueCode(issue)}
+                {describeIssueCode(issue, t)}
               </Badge>
             ))}
           </div>
@@ -69,13 +69,13 @@ function AccountOperationsContent({ data }: { data: ParentAccountOperations }) {
       <div className="grid gap-4 lg:grid-cols-3">
         <AccountFactCard
           title={t('accountOps.parentVerification')}
-          value={formatStatus(data.parent.verification?.emailVerificationStatus)}
+          value={formatStatus(data.parent.verification?.emailVerificationStatus, t)}
           detail={data.parent.email}
         />
         {/* Card 007: frozen. To unfreeze, restore the billing fact card:
           * <AccountFactCard title={t('accountOps.billing')}
-          *   value={formatStatus(data.billing.status)}
-          *   detail={t('accountOps.billingDetail', { tier: formatStatus(data.billing.subscriptionTier) })} /> */}
+          *   value={formatStatus(data.billing.status, t)}
+          *   detail={t('accountOps.billingDetail', { tier: formatStatus(data.billing.subscriptionTier, t) })} /> */}
         <AccountFactCard
           title={t('accountOps.linkedChildren')}
           value={String(data.children.length)}
@@ -143,12 +143,12 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
             <p className="truncate text-sm text-muted-foreground">{child.profile.email}</p>
           </div>
         </div>
-        <ChildMetric label={t('accountOps.binding')} value={formatStatus(child.binding.status)} />
-        <ChildMetric label={t('accountOps.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
-        <ChildMetric label={t('accountOps.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
+        <ChildMetric label={t('accountOps.binding')} value={formatStatus(child.binding.status, t)} />
+        <ChildMetric label={t('accountOps.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus, t)} />
+        <ChildMetric label={t('accountOps.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction, t)} />
         {/* Card 007: frozen. To unfreeze, restore the plan metric:
           * <ChildMetric label={t('accountOps.plan')}
-          *   value={formatStatus(child.entitlement?.effectivePlan)} /> */}
+          *   value={formatStatus(child.entitlement?.effectivePlan, t)} /> */}
         <ChildMetric label={t('accountOps.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>
     </Card>
@@ -183,7 +183,7 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
             <CardContent className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-foreground">{formatStatus(item.action)}</p>
+                  <p className="font-semibold text-foreground">{formatStatus(item.action, t)}</p>
                   <p className="mt-1 text-sm text-muted-foreground">{item.quotaPeriod}</p>
                 </div>
                 <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
@@ -198,7 +198,7 @@ function UsageSection({ usage }: { usage: AccountOperationsUsage[] }) {
               </p>
               {item.supportAction && (
                 <p className="mt-3 text-sm font-medium text-foreground">
-                  {t('accountOps.support', { action: formatStatus(item.supportAction) })}
+                  {t('accountOps.support', { action: formatStatus(item.supportAction, t) })}
                 </p>
               )}
               {item.explanation && (

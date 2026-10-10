@@ -1,5 +1,6 @@
 import { type FormEvent, useState } from 'react'
 import { AlertTriangle, CheckCircle2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -344,6 +345,7 @@ function BillingRecoveryError({
 }
 
 function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }) {
+  const { t: tParent } = useTranslation('parent')
   const state = data.supportState.state
   const Icon = state === 'blocked' ? ShieldAlert : state === 'attention' ? AlertTriangle : CheckCircle2
   const issues = [...data.supportState.blockers, ...data.supportState.warnings]
@@ -370,7 +372,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
           <div className="mt-4 flex flex-wrap gap-2">
             {issues.map((issue) => (
               <Badge key={issue} variant={data.supportState.blockers.includes(issue) ? 'destructive' : 'outline'}>
-                {describeIssueCode(issue)}
+                {describeIssueCode(issue, tParent)}
               </Badge>
             ))}
           </div>
