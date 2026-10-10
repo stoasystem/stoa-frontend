@@ -153,6 +153,50 @@ describe('MathRenderer markdown emphasis', () => {
   })
 })
 
+describe('MathRenderer italic', () => {
+  it('renders *italic* as an em element without the asterisks', () => {
+    // From an Ask answer on app.stoaedu.ch (2026-10-10), where it showed as written.
+    const { container } = render(
+      <MathRenderer>{'Der Nenner sagt uns: *Wie viele gleich große Stücke hat das Ganze?*'}</MathRenderer>,
+    )
+    expect(container.querySelector('em')?.textContent).toBe('Wie viele gleich große Stücke hat das Ganze?')
+    expect(container.textContent).not.toContain('*')
+  })
+
+  it('keeps bold and italic apart, and italic inside bold', () => {
+    const { container } = render(<MathRenderer>{'**fett** und *schräg* und **fett *beides* fett**'}</MathRenderer>)
+    const strong = container.querySelectorAll('strong')
+    expect([...strong].map((node) => node.textContent)).toEqual(['fett', 'fett beides fett'])
+    expect([...container.querySelectorAll('em')].map((node) => node.textContent)).toEqual(['schräg', 'beides'])
+    expect(container.textContent).not.toContain('*')
+  })
+
+  it('italicises prose around a formula and leaves the formula to katex', async () => {
+    const { container } = render(<MathRenderer>{'*Hier ist $a * b$ das Produkt*'}</MathRenderer>)
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    const em = container.querySelector('em')
+    expect(em?.querySelectorAll('.math-inline')).toHaveLength(1)
+    expect(container.querySelector('.math-inline')?.textContent).toContain('\u2217')
+  })
+
+  it('leaves a list marker, a spaced operator and a lone asterisk alone', () => {
+    const { container } = render(<MathRenderer>{'* erster Punkt\n2 * 3 * 4 und a*b'}</MathRenderer>)
+    expect(container.querySelector('em')).toBeNull()
+    expect(container.textContent).toBe('* erster Punkt\n2 * 3 * 4 und a*b')
+  })
+
+  it('does not pair asterisks across a line break', () => {
+    const { container } = render(<MathRenderer>{'*anfang\nende*'}</MathRenderer>)
+    expect(container.querySelector('em')).toBeNull()
+  })
+
+  it('escapes markup carried inside an italic run', () => {
+    const { container } = render(<MathRenderer>{'*<img src=x onerror="window.__xss4=1">*'}</MathRenderer>)
+    expect(container.querySelector('img')).toBeNull()
+    expect((window as unknown as { __xss4?: number }).__xss4).toBeUndefined()
+  })
+})
+
 describe('MathRenderer escaping', () => {
   // AI output is not trusted markup. A malformed formula takes the fallback
   // branch, which must not be able to inject nodes into the document.
