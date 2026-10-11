@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
+import type { TFunction } from 'i18next'
+import { useTranslation } from 'react-i18next'
 import { Activity, AlertCircle, BarChart3, Database, RefreshCw, Target } from 'lucide-react'
 import { ErrorState } from '@/components/common/ErrorState'
 import { LoadingState } from '@/components/common/LoadingState'
@@ -41,13 +43,15 @@ function valueFromRecord(record: Record<string, number> | undefined, key: string
   return typeof record?.[key] === 'number' ? record[key] : 0
 }
 
-function stringifyIntervention(value: Record<string, unknown>) {
-  const label = value.studentId || value.topicId || value.publicId || value.reason || 'Intervention candidate'
-  const reason = value.reason || value.suggestedAction || value.priorityReason || value.type || 'Review current learning signals.'
+function stringifyIntervention(value: Record<string, unknown>, t: TFunction) {
+  const label = value.studentId || value.topicId || value.publicId || value.reason || t('admin:learningOps.interventionFallback')
+  const reason = value.reason || value.suggestedAction || value.priorityReason || value.type
+    || t('admin:learningOps.interventionReasonFallback')
   return { label: String(label), reason: String(reason) }
 }
 
 export function LearningOperationsDashboardPage() {
+  const { t } = useTranslation('admin')
   const [subjectInput, setSubjectInput] = useState('')
   const [subjectId, setSubjectId] = useState('')
   const analyticsQuery = useCurriculumAnalyticsDashboardQuery(subjectId)
@@ -67,26 +71,28 @@ export function LearningOperationsDashboardPage() {
 
   const summaryTiles = useMemo(() => [
     {
-      label: 'Signals',
+      label: t('learningOps.signals'),
       value: valueFromRecord(analytics?.summary, 'totalSignals'),
-      detail: `${analytics?.sampleSize ?? 0} sampled rows`,
+      detail: t('learningOps.sampledRows', { count: analytics?.sampleSize ?? 0 }),
     },
     {
-      label: 'Assignment starts',
+      label: t('learningOps.assignmentStarts'),
       value: valueFromRecord(analytics?.summary, 'assignmentStarts'),
-      detail: 'Practice work started',
+      detail: t('learningOps.practiceStarted'),
     },
     {
-      label: 'Completions',
+      label: t('learningOps.completions'),
       value: valueFromRecord(analytics?.summary, 'assignmentCompletions') + valueFromRecord(analytics?.summary, 'lessonCompletions'),
-      detail: 'Assignment and lesson completions',
+      detail: t('learningOps.completionsDetail'),
     },
     {
-      label: 'Sequencing coverage',
+      label: t('learningOps.sequencingCoverage'),
       value: valueFromRecord(analytics?.sequencingCoverage, 'coveredTopics'),
-      detail: `${valueFromRecord(analytics?.sequencingCoverage, 'uncoveredTopics')} uncovered topics`,
+      detail: t('learningOps.uncoveredTopics', {
+        count: valueFromRecord(analytics?.sequencingCoverage, 'uncoveredTopics'),
+      }),
     },
-  ], [analytics])
+  ], [analytics, t])
 
   const refreshAll = () => {
     void analyticsQuery.refetch()
@@ -98,13 +104,13 @@ export function LearningOperationsDashboardPage() {
     <DashboardLayout>
       <PageContainer size="wide" className="p-0">
         <PageHeader
-          eyebrow="Learning operations"
-          title="Operations dashboard"
-          description="Inspect sequencing coverage, assignment outcomes, quality signals, interventions, and warehouse readiness from live backend contracts."
+          eyebrow={t('learningOps.eyebrow')}
+          title={t('learningOps.title')}
+          description={t('learningOps.description')}
           actions={(
             <Button variant="outline" onClick={refreshAll}>
               <RefreshCw className="h-4 w-4" />
-              Refresh
+              {t('learningOps.refresh')}
             </Button>
           )}
         />
@@ -112,7 +118,7 @@ export function LearningOperationsDashboardPage() {
         <Card>
           <CardContent className="grid gap-3 pt-6 sm:grid-cols-[1fr_auto] sm:items-end">
             <div className="space-y-2">
-              <Label htmlFor="ops-subject">Subject filter</Label>
+              <Label htmlFor="ops-subject">{t('learningOps.subjectFilter')}</Label>
               <Input
                 id="ops-subject"
                 value={subjectInput}
@@ -122,13 +128,13 @@ export function LearningOperationsDashboardPage() {
             </div>
             <Button onClick={() => setSubjectId(subjectInput.trim())}>
               <BarChart3 className="h-4 w-4" />
-              Apply filter
+              {t('learningOps.applyFilter')}
             </Button>
           </CardContent>
         </Card>
 
-        {analyticsQuery.isLoading && <LoadingState message="Loading learning operations dashboard..." />}
-        {analyticsQuery.error && <ErrorState title="Dashboard failed" message={analyticsQuery.error.message} />}
+        {analyticsQuery.isLoading && <LoadingState message={t('learningOps.loading')} />}
+        {analyticsQuery.error && <ErrorState title={t('learningOps.failed')} message={analyticsQuery.error.message} />}
 
         {analytics && (
           <>
@@ -152,13 +158,13 @@ export function LearningOperationsDashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <Target className="h-5 w-5" />
-                    Quality hotspots
+                    {t('learningOps.qualityHotspots')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {analytics.qualityHotspots.length === 0 && (
                     <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                      No quality hotspots returned for this filter.
+                      {t('learningOps.noHotspots')}
                     </p>
                   )}
                   {analytics.qualityHotspots.map((hotspot) => (
@@ -166,14 +172,14 @@ export function LearningOperationsDashboardPage() {
                       <div>
                         <p className="font-semibold">{hotspot.publicId}</p>
                         <p className="text-sm text-muted-foreground">
-                          {hotspot.subjectId || 'subject pending'} / {hotspot.topicId || 'topic pending'} / {hotspot.contentType}
+                          {hotspot.subjectId || t('learningOps.subjectPending')} / {hotspot.topicId || t('learningOps.topicPending')} / {hotspot.contentType}
                         </p>
                       </div>
                       <div className="grid min-w-44 grid-cols-2 gap-2 text-sm">
-                        <span>Priority {hotspot.priorityScore}</span>
-                        <span>{hotspot.wrongAnswers} wrong</span>
-                        <span>{hotspot.assignmentStarts} starts</span>
-                        <span>{hotspot.assignmentCompletions} done</span>
+                        <span>{t('learningOps.priority', { score: hotspot.priorityScore })}</span>
+                        <span>{t('learningOps.wrong', { count: hotspot.wrongAnswers })}</span>
+                        <span>{t('learningOps.starts', { count: hotspot.assignmentStarts })}</span>
+                        <span>{t('learningOps.done', { count: hotspot.assignmentCompletions })}</span>
                       </div>
                     </div>
                   ))}
@@ -184,17 +190,17 @@ export function LearningOperationsDashboardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <Activity className="h-5 w-5" />
-                    Interventions
+                    {t('learningOps.interventions')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {analytics.interventions.length === 0 && (
                     <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                      No intervention candidates returned.
+                      {t('learningOps.noInterventions')}
                     </p>
                   )}
                   {analytics.interventions.map((item, index) => {
-                    const intervention = stringifyIntervention(item)
+                    const intervention = stringifyIntervention(item, t)
                     return (
                       <div key={`${intervention.label}-${index}`} className="rounded-md border p-4">
                         <p className="font-semibold">{intervention.label}</p>
@@ -213,22 +219,28 @@ export function LearningOperationsDashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <Database className="h-5 w-5" />
-                Warehouse readiness
+                {t('learningOps.warehouseReadiness')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {readinessQuery.isLoading && <LoadingState message="Loading warehouse readiness..." />}
-              {readinessQuery.error && <ErrorState title="Warehouse readiness failed" message={readinessQuery.error.message} />}
+              {readinessQuery.isLoading && <LoadingState message={t('learningOps.loadingReadiness')} />}
+              {readinessQuery.error && <ErrorState title={t('learningOps.readinessFailed')} message={readinessQuery.error.message} />}
               {readiness && (
                 <>
                   <div className="grid gap-3 sm:grid-cols-3">
-                    <InlineMetric label="State" value={readiness.state} />
-                    <InlineMetric label="Export allowed" value={readiness.exportAllowed ? 'Yes' : 'No'} />
-                    <InlineMetric label="Live warehouse" value={readiness.liveWarehouseConfigured ? 'Configured' : 'Not configured'} />
+                    <InlineMetric label={t('learningOps.state')} value={readiness.state} />
+                    <InlineMetric
+                      label={t('learningOps.exportAllowed')}
+                      value={readiness.exportAllowed ? t('learningOps.yes') : t('learningOps.no')}
+                    />
+                    <InlineMetric
+                      label={t('learningOps.liveWarehouse')}
+                      value={readiness.liveWarehouseConfigured ? t('learningOps.configured') : t('learningOps.notConfigured')}
+                    />
                   </div>
                   {readiness.liveWarehouseConfigured === false && (
                     <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                      No live warehouse is configured. This is expected for internal development and should stay explicit.
+                      {t('learningOps.noLiveWarehouse')}
                     </p>
                   )}
                   {[...readiness.blockers, ...readiness.warnings].map((item) => (
@@ -241,23 +253,25 @@ export function LearningOperationsDashboardPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Export summary</CardTitle>
+              <CardTitle className="text-xl">{t('learningOps.exportSummary')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {exportQuery.isLoading && <LoadingState message="Loading warehouse export summary..." />}
-              {exportQuery.error && <ErrorState title="Warehouse export failed" message={exportQuery.error.message} />}
+              {exportQuery.isLoading && <LoadingState message={t('learningOps.loadingExport')} />}
+              {exportQuery.error && <ErrorState title={t('learningOps.exportFailed')} message={exportQuery.error.message} />}
               {exportDenied && (
                 <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                  This account may read the curriculum analytics but not export the warehouse. Exporting is a
-                  separate grant, curriculum_analytics_exporter; ask an administrator who manages capabilities
-                  for it.
+                  {/* The grant is a capability id, the same in every language. */}
+                  {t('learningOps.exportDenied', { grant: 'curriculum_analytics_exporter' })}
                 </p>
               )}
               {exportSummary && (
                 <div className="grid gap-3 sm:grid-cols-3">
-                  <InlineMetric label="Rows" value={exportSummary.count} />
-                  <InlineMetric label="Schema" value={exportSummary.schemaVersion} />
-                  <InlineMetric label="PII removed" value={exportSummary.privacy?.piiRemoved ? 'Yes' : 'Check'} />
+                  <InlineMetric label={t('learningOps.rows')} value={exportSummary.count} />
+                  <InlineMetric label={t('learningOps.schema')} value={exportSummary.schemaVersion} />
+                  <InlineMetric
+                    label={t('learningOps.piiRemoved')}
+                    value={exportSummary.privacy?.piiRemoved ? t('learningOps.yes') : t('learningOps.check')}
+                  />
                 </div>
               )}
             </CardContent>

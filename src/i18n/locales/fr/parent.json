@@ -156,6 +156,14 @@
       "resendAllowed": "Possible",
       "resendNotAvailable": "Impossible",
       "noDate": "Jamais"
+    },
+    "adminIssues": {
+      "parent_email_unverified": "L’adresse e-mail du parent doit être vérifiée.",
+      "billing_inactive": "La facturation demande une vérification.",
+      "no_linked_children": "Aucun compte enfant lié n’est disponible.",
+      "child_email_unverified": "L’adresse e-mail d’un compte enfant n’est pas vérifiée.",
+      "usage_unreconciled": "L’utilisation est encore en cours de rapprochement.",
+      "child_binding": "Le lien avec l’enfant doit être vérifié : {{status}}."
     }
   },
   "progress": {

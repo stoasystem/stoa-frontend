@@ -211,5 +211,28 @@
     "no": "Nein",
     "question": "Frage",
     "help": "Der Lernkontext zeigt Ihnen, wo die Lernenden hängen geblieben sind, bevor Sie die Anfrage übernehmen."
+  },
+  "moderationReport": {
+    "title": "Inhalt melden",
+    "reason": "Grund",
+    "severity": "Schweregrad",
+    "note": "Notiz",
+    "notePlaceholder": "Was soll die Administration prüfen?",
+    "submitFailed": "Die Meldung konnte nicht gesendet werden.",
+    "cancel": "Abbrechen",
+    "submitting": "Wird gesendet …",
+    "submit": "Meldung senden",
+    "reasons": {
+      "incorrect_answer": "Falsche Antwort",
+      "unsafe_content": "Unangemessener Inhalt",
+      "abuse": "Missbrauch oder Belästigung",
+      "privacy": "Datenschutzbedenken",
+      "other": "Anderes"
+    },
+    "severities": {
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    }
   }
 }

@@ -211,5 +211,28 @@
     "no": "Non",
     "question": "Question",
     "help": "Le contexte d’apprentissage vous montre où l’élève a bloqué avant que vous preniez la demande."
+  },
+  "moderationReport": {
+    "title": "Signaler un contenu",
+    "reason": "Motif",
+    "severity": "Gravité",
+    "note": "Note",
+    "notePlaceholder": "Que doit vérifier l’administration ?",
+    "submitFailed": "Impossible d’envoyer le signalement.",
+    "cancel": "Annuler",
+    "submitting": "Envoi…",
+    "submit": "Envoyer le signalement",
+    "reasons": {
+      "incorrect_answer": "Réponse incorrecte",
+      "unsafe_content": "Contenu inapproprié",
+      "abuse": "Abus ou harcèlement",
+      "privacy": "Problème de confidentialité",
+      "other": "Autre"
+    },
+    "severities": {
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée"
+    }
   }
 }

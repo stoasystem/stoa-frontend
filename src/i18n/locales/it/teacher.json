@@ -211,5 +211,28 @@
     "no": "No",
     "question": "Domanda",
     "help": "Il contesto di apprendimento vi mostra dove l’allievo si è bloccato prima che prendiate la richiesta."
+  },
+  "moderationReport": {
+    "title": "Segnala contenuto",
+    "reason": "Motivo",
+    "severity": "Gravità",
+    "note": "Nota",
+    "notePlaceholder": "Che cosa deve verificare l’amministrazione?",
+    "submitFailed": "Impossibile inviare la segnalazione.",
+    "cancel": "Annulla",
+    "submitting": "Invio in corso…",
+    "submit": "Invia segnalazione",
+    "reasons": {
+      "incorrect_answer": "Risposta errata",
+      "unsafe_content": "Contenuto inappropriato",
+      "abuse": "Abuso o molestie",
+      "privacy": "Problema di privacy",
+      "other": "Altro"
+    },
+    "severities": {
+      "low": "Bassa",
+      "medium": "Media",
+      "high": "Alta"
+    }
   }
 }

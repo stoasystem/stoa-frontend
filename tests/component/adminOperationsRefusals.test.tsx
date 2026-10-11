@@ -3,6 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+// Both pages read their words from `admin` now; the assertions below are on
+// the English ones, so the real catalogue is loaded rather than a key echo.
+import i18n from '@/i18n'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { AdminTeacherApplicationsPage } from '@/pages/admin/AdminTeacherApplicationsPage'
 import { LearningOperationsDashboardPage } from '@/pages/learning/LearningOperationsDashboardPage'
@@ -14,13 +17,6 @@ import { listTeacherApplications } from '@/services/teacher/teacherApplicationAp
 // printed `Application_id: Field required` in red and then said the queue was
 // empty, and the learning operations dashboard answered a refused export with
 // a blank panel and a second copy of the same request.
-
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: { resolvedLanguage: 'en', language: 'en' },
-  }),
-}))
 
 vi.mock('@/services/api/httpClient', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/services/api/httpClient')>()),
@@ -76,7 +72,9 @@ function wrapper({ children }: { children: ReactNode }) {
   )
 }
 
-beforeEach(() => {
+// The assertions read the English copy; the language is set, not detected.
+beforeEach(async () => {
+  await i18n.changeLanguage('en')
   mockedGet.mockReset()
 })
 

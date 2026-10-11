@@ -156,6 +156,14 @@
       "resendAllowed": "Allowed",
       "resendNotAvailable": "Not available",
       "noDate": "Not yet"
+    },
+    "adminIssues": {
+      "parent_email_unverified": "Parent email needs verification.",
+      "billing_inactive": "Billing needs attention.",
+      "no_linked_children": "No linked child account is available.",
+      "child_email_unverified": "A child account email is not verified.",
+      "usage_unreconciled": "Usage is still being reconciled.",
+      "child_binding": "Child link needs review: {{status}}."
     }
   },
   "progress": {

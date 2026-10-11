@@ -26,15 +26,19 @@ export function getAccountStateLabel(value: string | null | undefined, t: TFunct
   return translated || formatStatus(code)
 }
 
-/** The English wording, still read by the administrator's copy of this screen. */
-export function describeIssueCode(code: string) {
-  if (code === 'parent_email_unverified') return 'Parent email needs verification.'
-  if (code === 'billing_inactive') return 'Billing needs attention.'
-  if (code === 'no_linked_children') return 'No linked child account is available.'
-  if (code === 'child_email_unverified') return 'A child account email is not verified.'
-  if (code === 'usage_unreconciled') return 'Usage is still being reconciled.'
-  if (code.startsWith('child_binding_')) return `Child link needs review: ${formatStatus(code.replace('child_binding_', ''))}.`
-  return formatStatus(code)
+/*
+ * The administrator's copy of this screen names the same codes in its own,
+ * operator-facing words (`parent:accountOps.adminIssues`); an unknown code
+ * still falls back to the raw value.
+ */
+export function describeIssueCode(code: string, t: TFunction) {
+  if (code.startsWith('child_binding_')) {
+    return t('parent:accountOps.adminIssues.child_binding', {
+      status: formatStatus(code.replace('child_binding_', '')),
+    })
+  }
+  const translated = t(`parent:accountOps.adminIssues.${code}`, { defaultValue: '' })
+  return translated || formatStatus(code)
 }
 
 /*

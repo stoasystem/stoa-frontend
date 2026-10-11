@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { BookOpenCheck, CircleAlert, Gauge, HelpCircle } from 'lucide-react'
 import i18n from '@/i18n'
@@ -32,12 +33,12 @@ export function LearningProfileSignals({
       <SectionHeader title={title} description={description} />
       {isLoading && (
         <div className="rounded-lg border border-dashed border-border/80 p-5 text-sm text-muted-foreground">
-          Loading learning signals...
+          {tPractice('profile.loadingSignals')}
         </div>
       )}
       {isError && (
         <div className="rounded-lg border border-destructive/25 bg-destructive/5 p-5 text-sm text-destructive">
-          Learning signals are unavailable right now.
+          {tPractice('profile.signalsUnavailable')}
         </div>
       )}
       {!isLoading && !isError && profile && (
@@ -52,7 +53,7 @@ export function LearningProfileSignals({
                       <div>
                         <p className="text-sm font-medium">{tChat(subject.labelKey)}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {formatRolloutState(subject.rolloutState)}
+                          {formatRolloutState(subject.rolloutState, tPractice)}
                         </p>
                       </div>
                       <Badge variant={subject.rolloutState === 'active' ? 'default' : 'secondary'}>
@@ -75,7 +76,7 @@ export function LearningProfileSignals({
                       <SignalMetric
                         icon={Gauge}
                         label={tPractice('profile.feedback')}
-                        value={formatFeedback(subjectActivity?.feedbackAverage)}
+                        value={formatFeedback(subjectActivity?.feedbackAverage, tPractice)}
                       />
                     </div>
                   </CardContent>
@@ -158,12 +159,12 @@ function SignalMetric({
   )
 }
 
-function formatRolloutState(state: string) {
-  return state === 'active' ? 'Core subject support' : 'Foundation profile support'
+function formatRolloutState(state: string, t: TFunction) {
+  return state === 'active' ? t('practice:profile.rolloutCore') : t('practice:profile.rolloutFoundation')
 }
 
-function formatFeedback(value: number | null | undefined) {
-  return typeof value === 'number' ? `${value.toFixed(1)}/5` : 'No score'
+function formatFeedback(value: number | null | undefined, t: TFunction) {
+  return typeof value === 'number' ? `${value.toFixed(1)}/5` : t('practice:profile.noScore')
 }
 
 function formatSubjectLabel(profile: LearningProfile, subjectId: string) {
