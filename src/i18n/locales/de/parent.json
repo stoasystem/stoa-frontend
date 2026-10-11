@@ -229,6 +229,9 @@
     "wait_for_resend_cooldown": "Warten, bis erneut gesendet werden kann",
     "review_account_verification": "Verifizierung des Kontos prüfen",
     "contact_support": "Support kontaktieren",
-    "email_verification_required": "E-Mail-Bestätigung erforderlich"
+    "email_verification_required": "E-Mail-Bestätigung erforderlich",
+    "none": "Keine Massnahme nötig",
+    "registered": "Registriert",
+    "unverified": "Nicht bestätigt"
   }
 }

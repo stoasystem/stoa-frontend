@@ -229,6 +229,9 @@
     "wait_for_resend_cooldown": "Attendere che il reinvio sia possibile",
     "review_account_verification": "Verificare la conferma dell’account",
     "contact_support": "Contattare l’assistenza",
-    "email_verification_required": "Conferma e-mail richiesta"
+    "email_verification_required": "Conferma e-mail richiesta",
+    "none": "Nessuna azione necessaria",
+    "registered": "Registrato",
+    "unverified": "Non confermato"
   }
 }
