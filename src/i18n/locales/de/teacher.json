@@ -228,7 +228,7 @@
     "pausedReason": "Grund für die Pause",
     "preview": "Vorschläge ansehen",
     "previewFailed": "Vorschau fehlgeschlagen",
-    "needStudentId": "Gib zuerst eine Schüler-ID ein.",
+    "needStudentId": "Geben Sie zuerst eine Schüler-ID ein.",
     "summary": {
       "selected": "Ausgewählt",
       "refused": "Abgelehnt",
@@ -236,8 +236,8 @@
       "needReview": "Zu prüfen"
     },
     "selectedTitle": "Ausgewählte Vorschläge",
-    "selectedBefore": "Starte die Vorschau, um die ausgewählten Vorschläge zu sehen.",
-    "selectedEmpty": "Kein Vorschlag erfüllt die Regeln. Prüfe die Ablehnungsgründe, bevor du die Schwellen änderst.",
+    "selectedBefore": "Starten Sie die Vorschau, um die ausgewählten Vorschläge zu sehen.",
+    "selectedEmpty": "Kein Vorschlag erfüllt die Regeln. Prüfen Sie die Ablehnungsgründe, bevor Sie die Schwellen ändern.",
     "execute": "Freigegebenen Stapel ausführen",
     "executeFailed": "Ausführen fehlgeschlagen",
     "executed_one": "Der Stapel hat {{count}} Ergebnis geliefert.",
@@ -249,7 +249,7 @@
     "readyDefault": "Bereit zur Freigabe durch die Lehrperson.",
     "resultsTitle": "Ergebnisse",
     "historyTitle": "Bisherige Zuweisungen",
-    "historyNeedStudent": "Gib oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.",
+    "historyNeedStudent": "Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.",
     "historyLoading": "Zuweisungen werden geladen…",
     "historyFailed": "Zuweisungen konnten nicht geladen werden",
     "historyEmpty": "Für diese Person gibt es noch keine Zuweisungen.",

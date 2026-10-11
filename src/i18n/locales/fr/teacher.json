@@ -228,7 +228,7 @@
     "pausedReason": "Motif de la pause",
     "preview": "Prévisualiser les propositions",
     "previewFailed": "La prévisualisation a échoué",
-    "needStudentId": "Saisis d'abord l'identifiant d'un élève.",
+    "needStudentId": "Saisissez d'abord l'identifiant d'un élève.",
     "summary": {
       "selected": "Retenues",
       "refused": "Refusées",
@@ -236,8 +236,8 @@
       "needReview": "À vérifier"
     },
     "selectedTitle": "Propositions retenues",
-    "selectedBefore": "Lance la prévisualisation pour voir les propositions retenues.",
-    "selectedEmpty": "Aucune proposition ne respecte les règles. Vérifie les motifs de refus avant de modifier les seuils.",
+    "selectedBefore": "Lancez la prévisualisation pour voir les propositions retenues.",
+    "selectedEmpty": "Aucune proposition ne respecte les règles. Vérifiez les motifs de refus avant de modifier les seuils.",
     "execute": "Exécuter le lot approuvé",
     "executeFailed": "L'exécution a échoué",
     "executed_one": "Le lot a renvoyé {{count}} résultat.",
@@ -249,7 +249,7 @@
     "readyDefault": "Prête pour l'approbation de l'enseignant·e.",
     "resultsTitle": "Résultats",
     "historyTitle": "Historique des attributions",
-    "historyNeedStudent": "Saisis l'identifiant d'un élève ci-dessus pour voir ce qui lui a été attribué.",
+    "historyNeedStudent": "Saisissez l'identifiant d'un élève ci-dessus pour voir ce qui lui a été attribué.",
     "historyLoading": "Chargement de l'historique…",
     "historyFailed": "Impossible de charger l'historique",
     "historyEmpty": "Aucune attribution pour cet élève pour l'instant.",

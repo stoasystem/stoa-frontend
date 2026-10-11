@@ -101,7 +101,7 @@ describe('the automation console speaks the teacher’s language', () => {
     expect(screen.getByRole('heading', { name: 'Automatisierung prüfen' })).toBeInTheDocument()
     expect(screen.getByLabelText('Schüler-ID')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Vorschläge ansehen' })).toBeInTheDocument()
-    expect(screen.getByText('Gib oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).toBeInTheDocument()
+    expect(screen.getByText('Geben Sie oben eine Schüler-ID ein, um die bisherigen Zuweisungen zu sehen.')).toBeInTheDocument()
     expect(screen.getByRole('option', { name: 'Mittel' })).toBeInTheDocument()
 
     const text = container.textContent ?? ''
