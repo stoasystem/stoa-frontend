@@ -1,5 +1,7 @@
 import { type FormEvent, useMemo, useState } from 'react'
+import type { TFunction } from 'i18next'
 import { AlertTriangle, CheckCircle2, FileText, GitCompare, History, Save, UploadCloud } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { ApiError } from '@/services/api/httpClient'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -72,6 +74,7 @@ const starterManifest = JSON.stringify(
 )
 
 export function AdminCurriculumPage() {
+  const { t } = useTranslation('admin')
   const [selected, setSelected] = useState<CurriculumVersion | null>(null)
   const [patchJson, setPatchJson] = useState('{\n  "title": "Updated title"\n}')
   const [fromVersionId, setFromVersionId] = useState('')
@@ -119,13 +122,13 @@ export function AdminCurriculumPage() {
     patchMutation.mutate({
       publicLessonId: selectedPublicId,
       versionId: selectedVersionId,
-      payload: parseJson(patchJson),
+      payload: parseJson(patchJson, t),
     })
   }
 
   function runDryRun(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    dryRunMutation.mutate(parseJson(manifestJson), {
+    dryRunMutation.mutate(parseJson(manifestJson, t), {
       onSuccess: (data) => {
         setConfirmationToken(data.confirmationToken)
         setEvidenceId(data.migrationId)
@@ -137,7 +140,7 @@ export function AdminCurriculumPage() {
     if (!dryRunMutation.data) return
     applyMutation.mutate({
       migrationId: dryRunMutation.data.migrationId,
-      manifest: parseJson(manifestJson),
+      manifest: parseJson(manifestJson, t),
       confirmationToken,
     })
   }
@@ -151,25 +154,25 @@ export function AdminCurriculumPage() {
     <DashboardLayout>
       <PageContainer className="space-y-6 p-0">
         <PageHeader
-          eyebrow="Curriculum operations"
-          title="Curriculum editor"
-          description="Patch drafts, validate content, review lifecycle evidence, and apply migration manifests against backend-authorized curriculum APIs."
-          actions={<Button variant="outline" onClick={() => worklistQuery.refetch()}>Refresh worklist</Button>}
+          eyebrow={t('curriculum.eyebrow')}
+          title={t('curriculum.title')}
+          description={t('curriculum.description')}
+          actions={<Button variant="outline" onClick={() => worklistQuery.refetch()}>{t('curriculum.refresh')}</Button>}
         />
 
         <CapabilityStrip />
         <ApiErrorPanel error={worklistQuery.error} />
         {worklistQuery.data?.permissionDenied && (
-          <RestrictedPanel message="The backend did not grant access to curriculum operations." />
+          <RestrictedPanel message={t('curriculum.denied')} />
         )}
 
         <Tabs defaultValue="worklist" className="space-y-4">
           <TabsList className="flex h-auto flex-wrap justify-start">
-            <TabsTrigger value="worklist">Worklist</TabsTrigger>
-            <TabsTrigger value="editor">Editor</TabsTrigger>
-            <TabsTrigger value="review">Review</TabsTrigger>
-            <TabsTrigger value="migration">Migration</TabsTrigger>
-            <TabsTrigger value="evidence">Evidence</TabsTrigger>
+            <TabsTrigger value="worklist">{t('curriculum.tabs.worklist')}</TabsTrigger>
+            <TabsTrigger value="editor">{t('curriculum.tabs.editor')}</TabsTrigger>
+            <TabsTrigger value="review">{t('curriculum.tabs.review')}</TabsTrigger>
+            <TabsTrigger value="migration">{t('curriculum.tabs.migration')}</TabsTrigger>
+            <TabsTrigger value="evidence">{t('curriculum.tabs.evidence')}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="worklist">
@@ -263,13 +266,14 @@ export function AdminCurriculumPage() {
 }
 
 function CapabilityStrip() {
+  const { t } = useTranslation('admin')
   const capabilities = ['curriculum_author', 'curriculum_reviewer', 'curriculum_publisher', 'migration_operator']
   return (
     <section className="flex flex-col gap-3 rounded-md border border-border/70 bg-card p-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <p className="brand-section-kicker">Backend authorization</p>
+        <p className="brand-section-kicker">{t('curriculum.capabilities.kicker')}</p>
         <p className="mt-2 text-sm text-muted-foreground">
-          The console shows controls, but backend capability checks decide every mutation.
+          {t('curriculum.capabilities.description')}
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -292,9 +296,10 @@ function WorklistPanel({
   selectedVersionId?: string
   onSelect: (version: CurriculumVersion) => void
 }) {
-  if (isLoading) return <Card><CardContent className="p-5 text-sm text-muted-foreground">Loading curriculum worklist.</CardContent></Card>
+  const { t } = useTranslation('admin')
+  if (isLoading) return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.loading')}</CardContent></Card>
   if (items.length === 0) {
-    return <Card><CardContent className="p-5 text-sm text-muted-foreground">No curriculum items are available.</CardContent></Card>
+    return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.worklist.empty')}</CardContent></Card>
   }
   return (
     <div className="grid gap-3">
@@ -304,14 +309,17 @@ function WorklistPanel({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="text-base font-semibold text-foreground">{item.publicLessonId}</h2>
-                <Badge variant="outline">{formatStatus(item.state)}</Badge>
-                {item.reviewState && <Badge variant="secondary">{formatStatus(item.reviewState)}</Badge>}
+                <Badge variant="outline">{formatStatus(item.state, t)}</Badge>
+                {item.reviewState && <Badge variant="secondary">{formatStatus(item.reviewState, t)}</Badge>}
               </div>
               <p className="mt-2 text-sm text-muted-foreground">
-                {item.versionId} · Updated {item.updatedAt ?? 'unknown'} by {item.updatedBy ?? 'unknown'}
+                {item.versionId} · {t('curriculum.worklist.updated', {
+                  at: item.updatedAt ?? t('curriculum.worklist.unknown'),
+                  by: item.updatedBy ?? t('curriculum.worklist.unknown'),
+                })}
               </p>
             </div>
-            <Button type="button" variant="outline" onClick={() => onSelect(item)}>Open</Button>
+            <Button type="button" variant="outline" onClick={() => onSelect(item)}>{t('curriculum.worklist.open')}</Button>
           </CardContent>
         </Card>
       ))}
@@ -336,40 +344,41 @@ function EditorPanel({
   error: unknown
   result?: CurriculumVersion
 }) {
+  const { t } = useTranslation('admin')
   if (!version) return <SelectItemPanel />
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Draft patch</CardTitle>
+          <CardTitle className="text-base">{t('curriculum.editor.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={onSubmit}>
             <div className="grid gap-3 md:grid-cols-2">
-              <ReadOnlyField label="Public lesson" value={version.publicLessonId} />
-              <ReadOnlyField label="Version" value={version.versionId} />
+              <ReadOnlyField label={t('curriculum.editor.publicLesson')} value={version.publicLessonId} />
+              <ReadOnlyField label={t('curriculum.editor.version')} value={version.versionId} />
             </div>
             <Textarea value={patchJson} onChange={(event) => onPatchJsonChange(event.target.value)} className="min-h-72 font-mono text-xs" />
             <div className="flex flex-wrap gap-2">
               <Button type="submit" disabled={isSaving}>
                 <Save className="h-4 w-4" aria-hidden="true" />
-                Save draft
+                {t('curriculum.editor.save')}
               </Button>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onPatchJsonChange(JSON.stringify({ lesson: version.lesson ?? {}, exercises: version.exercises ?? [] }, null, 2))}
               >
-                Load current content
+                {t('curriculum.editor.loadCurrent')}
               </Button>
             </div>
           </form>
           <ApiErrorPanel error={error} />
-          {result && <SuccessPanel message={`Saved ${result.versionId}.`} />}
+          {result && <SuccessPanel message={t('curriculum.editor.saved', { version: result.versionId })} />}
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="text-base">Current content</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t('curriculum.editor.current')}</CardTitle></CardHeader>
         <CardContent>
           <pre className="max-h-[32rem] overflow-auto rounded-md bg-muted p-3 text-xs text-muted-foreground">
             {JSON.stringify({ lesson: version.lesson ?? {}, exercises: version.exercises ?? [] }, null, 2)}
@@ -404,13 +413,14 @@ function ReviewPanel(props: {
   onPublish: () => void
   actionError: unknown
 }) {
+  const { t } = useTranslation('admin')
   if (!props.version) return <SelectItemPanel />
   return (
     <div className="grid gap-4 xl:grid-cols-3">
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><CheckCircle2 className="h-4 w-4" /> Validation</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><CheckCircle2 className="h-4 w-4" /> {t('curriculum.review.validation')}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <Button type="button" onClick={props.onValidate} disabled={props.validationLoading}>Run validation</Button>
+          <Button type="button" onClick={props.onValidate} disabled={props.validationLoading}>{t('curriculum.review.runValidation')}</Button>
           <ApiErrorPanel error={props.validationError} />
           {props.validation && (
             <div className="space-y-2">
@@ -426,27 +436,27 @@ function ReviewPanel(props: {
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><GitCompare className="h-4 w-4" /> Diff</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><GitCompare className="h-4 w-4" /> {t('curriculum.review.diff')}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
-          <Input placeholder="from version" value={props.fromVersionId} onChange={(event) => props.onFromVersionIdChange(event.target.value)} />
-          <Input placeholder="to version" value={props.toVersionId} onChange={(event) => props.onToVersionIdChange(event.target.value)} />
-          <Button type="button" variant="outline" onClick={props.onDiff} disabled={props.diffLoading}>Compare</Button>
+          <Input placeholder={t('curriculum.review.fromVersion')} value={props.fromVersionId} onChange={(event) => props.onFromVersionIdChange(event.target.value)} />
+          <Input placeholder={t('curriculum.review.toVersion')} value={props.toVersionId} onChange={(event) => props.onToVersionIdChange(event.target.value)} />
+          <Button type="button" variant="outline" onClick={props.onDiff} disabled={props.diffLoading}>{t('curriculum.review.compare')}</Button>
           <ApiErrorPanel error={props.diffError} />
           <CompactJson value={props.diff?.changes ?? []} />
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><History className="h-4 w-4" /> Review and audit</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><History className="h-4 w-4" /> {t('curriculum.review.title')}</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="flex flex-wrap gap-2">
-            <Button type="button" variant="outline" onClick={props.onSubmitReview}>Submit</Button>
-            <Button type="button" variant="outline" onClick={props.onApprove}>Approve</Button>
-            <Button type="button" variant="outline" onClick={props.onRequestChanges}>Request changes</Button>
-            <Button type="button" onClick={props.onPublish}>Publish</Button>
+            <Button type="button" variant="outline" onClick={props.onSubmitReview}>{t('curriculum.review.submit')}</Button>
+            <Button type="button" variant="outline" onClick={props.onApprove}>{t('curriculum.review.approve')}</Button>
+            <Button type="button" variant="outline" onClick={props.onRequestChanges}>{t('curriculum.review.requestChanges')}</Button>
+            <Button type="button" onClick={props.onPublish}>{t('curriculum.review.publish')}</Button>
           </div>
-          <Button type="button" variant="outline" onClick={props.onLoadAudit} disabled={props.auditLoading}>Load audit</Button>
+          <Button type="button" variant="outline" onClick={props.onLoadAudit} disabled={props.auditLoading}>{t('curriculum.review.loadAudit')}</Button>
           <ApiErrorPanel error={props.actionError ?? props.auditError} />
-          {props.audit?.permissionDenied && <RestrictedPanel message="Missing reviewer or publisher capability." />}
+          {props.audit?.permissionDenied && <RestrictedPanel message={t('curriculum.review.missingCapability')} />}
           <CompactJson value={props.audit?.items ?? []} />
         </CardContent>
       </Card>
@@ -468,36 +478,37 @@ function MigrationPanel(props: {
   applyError: unknown
   applyLoading: boolean
 }) {
+  const { t } = useTranslation('admin')
   return (
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_28rem]">
       <Card>
-        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><UploadCloud className="h-4 w-4" /> Manifest</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="flex items-center gap-2 text-base"><UploadCloud className="h-4 w-4" /> {t('curriculum.migration.manifest')}</CardTitle></CardHeader>
         <CardContent>
           <form className="space-y-4" onSubmit={props.onDryRun}>
             <Textarea value={props.manifestJson} onChange={(event) => props.onManifestJsonChange(event.target.value)} className="min-h-[32rem] font-mono text-xs" />
-            <Button type="submit" disabled={props.dryRunLoading}>Dry-run</Button>
+            <Button type="submit" disabled={props.dryRunLoading}>{t('curriculum.migration.dryRun')}</Button>
           </form>
           <ApiErrorPanel error={props.dryRunError} />
         </CardContent>
       </Card>
       <Card>
-        <CardHeader><CardTitle className="text-base">Dry-run and apply</CardTitle></CardHeader>
+        <CardHeader><CardTitle className="text-base">{t('curriculum.migration.dryRunAndApply')}</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           {props.dryRun ? (
             <>
-              <SummaryGrid summary={props.dryRun.summary} />
+              <SummaryGrid summary={props.dryRun.summary} t={t} />
               <Badge variant={props.dryRun.publishReady ? 'secondary' : 'outline'}>
-                {props.dryRun.publishReady ? 'Ready' : 'Blocked'}
+                {props.dryRun.publishReady ? t('curriculum.migration.ready') : t('curriculum.migration.blocked')}
               </Badge>
               <CompactJson value={props.dryRun.rows} />
-              <Input value={props.confirmationToken} onChange={(event) => props.onConfirmationTokenChange(event.target.value)} placeholder="confirmation token" />
-              <Button type="button" onClick={props.onApply} disabled={props.applyLoading || !props.dryRun.publishReady}>Apply migration</Button>
+              <Input value={props.confirmationToken} onChange={(event) => props.onConfirmationTokenChange(event.target.value)} placeholder={t('curriculum.migration.tokenPlaceholder')} />
+              <Button type="button" onClick={props.onApply} disabled={props.applyLoading || !props.dryRun.publishReady}>{t('curriculum.migration.apply')}</Button>
             </>
           ) : (
-            <p className="text-sm text-muted-foreground">Run dry-run to inspect row actions and confirmation token.</p>
+            <p className="text-sm text-muted-foreground">{t('curriculum.migration.hint')}</p>
           )}
           <ApiErrorPanel error={props.applyError} />
-          {props.applyResult && <SuccessPanel message={`Applied ${props.applyResult.migrationId}.`} />}
+          {props.applyResult && <SuccessPanel message={t('curriculum.migration.applied', { migration: props.applyResult.migrationId })} />}
         </CardContent>
       </Card>
     </div>
@@ -512,28 +523,29 @@ function EvidencePanel(props: {
   error: unknown
   isLoading: boolean
 }) {
+  const { t } = useTranslation('admin')
   return (
     <Card>
-      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><FileText className="h-4 w-4" /> Migration evidence</CardTitle></CardHeader>
+      <CardHeader><CardTitle className="flex items-center gap-2 text-base"><FileText className="h-4 w-4" /> {t('curriculum.evidence.title')}</CardTitle></CardHeader>
       <CardContent className="space-y-4">
         <form className="flex flex-col gap-3 sm:flex-row" onSubmit={props.onSubmit}>
-          <Input value={props.evidenceId} onChange={(event) => props.onEvidenceIdChange(event.target.value)} placeholder="migration id" />
-          <Button type="submit" disabled={props.isLoading}>Load evidence</Button>
+          <Input value={props.evidenceId} onChange={(event) => props.onEvidenceIdChange(event.target.value)} placeholder={t('curriculum.evidence.idPlaceholder')} />
+          <Button type="submit" disabled={props.isLoading}>{t('curriculum.evidence.load')}</Button>
         </form>
         <ApiErrorPanel error={props.error} />
-        {props.evidence?.permissionDenied && <RestrictedPanel message="Missing migration operator or publisher capability." />}
+        {props.evidence?.permissionDenied && <RestrictedPanel message={t('curriculum.evidence.missingCapability')} />}
         {props.evidence && <CompactJson value={props.evidence} />}
       </CardContent>
     </Card>
   )
 }
 
-function SummaryGrid({ summary }: { summary: Record<string, number> }) {
+function SummaryGrid({ summary, t }: { summary: Record<string, number>; t: TFunction }) {
   return (
     <div className="grid grid-cols-3 gap-2">
       {Object.entries(summary).map(([key, value]) => (
         <div key={key} className="rounded-md border border-border/70 p-3">
-          <p className="text-xs text-muted-foreground">{formatStatus(key)}</p>
+          <p className="text-xs text-muted-foreground">{formatStatus(key, t)}</p>
           <p className="mt-1 text-lg font-semibold text-foreground">{value}</p>
         </div>
       ))}
@@ -556,7 +568,8 @@ function CompactJson({ value }: { value: unknown }) {
 }
 
 function SelectItemPanel() {
-  return <Card><CardContent className="p-5 text-sm text-muted-foreground">Select a curriculum item from the worklist.</CardContent></Card>
+  const { t } = useTranslation('admin')
+  return <Card><CardContent className="p-5 text-sm text-muted-foreground">{t('curriculum.selectItem')}</CardContent></Card>
 }
 
 function SuccessPanel({ message }: { message: string }) {
@@ -573,21 +586,22 @@ function RestrictedPanel({ message }: { message: string }) {
 }
 
 function ApiErrorPanel({ error }: { error: unknown }) {
+  const { t } = useTranslation('admin')
   if (!error) return null
-  const message = error instanceof ApiError ? error.message : 'Curriculum API request failed.'
+  const message = error instanceof ApiError ? error.message : t('curriculum.requestFailed')
   return <div role="alert" className="mt-3 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">{message}</div>
 }
 
-function parseJson(value: string) {
+function parseJson(value: string, t: TFunction) {
   try {
     return JSON.parse(value) as Record<string, unknown>
   } catch {
-    throw new ApiError('JSON is invalid')
+    throw new ApiError(t('curriculum.invalidJson'))
   }
 }
 
-function formatStatus(value?: string | null) {
-  return String(value ?? 'unknown').replace(/_/g, ' ')
+function formatStatus(value: string | null | undefined, t: TFunction) {
+  return String(value ?? t('curriculum.worklist.unknown')).replace(/_/g, ' ')
 }
 
 export default AdminCurriculumPage

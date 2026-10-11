@@ -187,5 +187,211 @@
       "covers": "Administratorinnen und Administratoren verwalten Konten unter «Benutzer» (Einladungen, Zuordnungen, Passwort-Zurücksetzungen, Sperren und Archivieren) und prüfen Bewerbungen von Lehrpersonen, den Lehrplan und die Moderation in eigenen Bereichen.",
       "notYet": "Supportfälle werden hier noch nicht bearbeitet, und der Systemstatus folgt noch."
     }
+  },
+  "accountOperations": {
+    "eyebrow": "Kontobetrieb",
+    "title": "Support-Konsole für Eltern",
+    "description": "Verifizierung, Abrechnung, Kinderzugang, Berechtigung und Nutzung eines Elternkontos prüfen.",
+    "lookup": {
+      "parentId": "Eltern-ID",
+      "usageDay": "Nutzungstag",
+      "checkoutRef": "Checkout-Referenz",
+      "submit": "Prüfen",
+      "empty": "Geben Sie eine Eltern-ID ein, um den Kontobetrieb zu prüfen, oder öffnen Sie diese Ansicht über einen Abrechnungseintrag des Anbieters in der Abo-Warteschlange.",
+      "notFound": "Das Elternkonto wurde nicht gefunden.",
+      "unavailable": "Der Kontobetrieb ist nicht verfügbar. Bitte versuchen Sie es später erneut."
+    },
+    "support": {
+      "kicker": "Support-Status",
+      "ready": "Derzeit sind keine Blocker oder Warnungen für dieses Konto gemeldet.",
+      "review": "Prüfen Sie Blocker und Warnungen, bevor Sie Support- oder Abrechnungsentscheide treffen."
+    },
+    "facts": {
+      "parentVerification": "Verifizierung Elternteil",
+      "billing": "Abrechnung",
+      "plan": "Plan {{plan}}",
+      "children": "Kinder",
+      "linkedChildren_one": "Verknüpftes Kind",
+      "linkedChildren_other": "Verknüpfte Kinder",
+      "usageRows": "Nutzungszeilen",
+      "reconciliationPending": "Abgleich ausstehend",
+      "usageMatched": "Nutzung abgeglichen"
+    },
+    "billing": {
+      "title": "Abrechnungsnachweise",
+      "description": "Anbieter, manuelle Übersteuerung, Bereitschaft und letzte Abrechnungsereignisse, die der Kontobetrieb verwendet.",
+      "provider": "Anbieter",
+      "manual": "Manuell",
+      "requestedTier": "Angefragte Stufe",
+      "currentPeriod": "Aktueller Zeitraum",
+      "lastEvent": "Letztes Ereignis",
+      "manualOverride": "Manuelle Übersteuerung",
+      "cancelAtPeriodEnd": "Kündigung auf Periodenende",
+      "supportAction": "Support-Aktion",
+      "duplicateEvents": "Doppelte Ereignisse",
+      "staleIgnored": "Veraltet, ignoriert",
+      "recentEvents": "Letzte Abrechnungsereignisse",
+      "noEvents": "Noch keine Abrechnungsereignisse erfasst.",
+      "eventStatus": "Status: {{status}}",
+      "providerEvent": "Anbieter-Ereignis: {{id}}",
+      "processing": "Verarbeitung: {{result}}"
+    },
+    "children": {
+      "title": "Kinderzugang und Berechtigung",
+      "empty": "Für dieses Elternkonto ist kein verknüpftes Kinderkonto sichtbar.",
+      "binding": "Verknüpfung",
+      "verification": "Verifizierung",
+      "recovery": "Wiederherstellung",
+      "plan": "Plan",
+      "usage": "Nutzung",
+      "usageUsed": "{{consumed}}/{{limit}} genutzt",
+      "usageUnavailable": "Nutzung nicht verfügbar"
+    },
+    "usage": {
+      "title": "Nutzungsübersicht",
+      "empty": "Für dieses Elternkonto und diesen Tag ist keine Nutzungsübersicht verfügbar.",
+      "reconciling": "Wird abgeglichen",
+      "matched": "Abgeglichen",
+      "remaining_one": "{{count}} verbleibend",
+      "remaining_other": "{{count}} verbleibend",
+      "consumed": "{{consumed}} von {{limit}} genutzt",
+      "support": "Support: {{action}}"
+    },
+    "recovery": {
+      "kicker": "Support, nur Lesen",
+      "title": "Nachweise zur Abrechnungs-Wiederherstellung",
+      "description": "Prüfen Sie geschwärzte Nachweise und lassen Sie nur diesen ursprünglichen Checkout-Befehl erneut prüfen.",
+      "rechecking": "Wird erneut geprüft …",
+      "recheck": "Ursprünglichen Checkout erneut prüfen",
+      "active": "Der Abrechnungsvorgang ist aktiv.",
+      "supportNeeded": "Support nötig: {{code}}.",
+      "state": "Status des Abrechnungsvorgangs: {{state}}.",
+      "safeAction": "Sichere Aktion: {{action}} · Lease-Generation {{generation}}",
+      "pendingConvergence": "Angleichung ausstehend",
+      "parent": "Elternteil",
+      "targetPlan": "Zielplan",
+      "effectivePlan": "Wirksamer Plan",
+      "sessionSuffix": "Suffix der Stripe-Sitzung",
+      "noSession": "Keine Sitzung erfasst",
+      "commandState": "Befehlsstatus",
+      "providerEffect": "Wirkung beim Anbieter",
+      "created": "Erstellt",
+      "updated": "Aktualisiert",
+      "lastRechecked": "Zuletzt erneut geprüft",
+      "failureCode": "Fehlercode",
+      "beneficiaries": "Begünstigte und Versionen",
+      "grantVersion": "Freigabeversion {{version}}",
+      "allowanceVersion": "Kontingentversion {{version}}",
+      "loading": "Nachweise zur Abrechnungs-Wiederherstellung werden geladen",
+      "facts": {
+        "title": "Massgebliche Abrechnungsfakten",
+        "empty": "Keine massgeblichen Abrechnungsfakten erfasst.",
+        "version": "Faktenversion {{version}}",
+        "signed": "Signierter Nachweis im Testmodus",
+        "eventDigest": "Ereignis-Digest: {{digest}}",
+        "objectDigest": "Objekt-Digest: {{digest}}"
+      },
+      "providerUsage": {
+        "title": "Nutzungsnachweise des Anbieters",
+        "empty": "Keine Nutzungsnachweise des Anbieters erfasst.",
+        "tokens": "{{input}} Eingabe / {{output}} Ausgabe",
+        "modelDigest": "Modell-Digest: {{digest}}",
+        "requestDigest": "Anfrage-Digest: {{digest}}",
+        "correlationDigest": "Korrelations-Digest: {{digest}}",
+        "costRetained": "Anbieterkosten gespeichert: {{value}}"
+      },
+      "reminder": {
+        "title": "Zahlungserinnerung",
+        "card": "{{brand}} mit Endziffern {{last4}}",
+        "expires": "Gültig bis {{month}}/{{year}}",
+        "status": "Erinnerung: {{status}}",
+        "empty": "Keine Zahlungserinnerung erfasst."
+      },
+      "errors": {
+        "recheck": "Die erneute Abrechnungsprüfung ist fehlgeschlagen. Wenden Sie sich mit der Checkout-Referenz an den Support.",
+        "read": "Die Nachweise zur Abrechnungs-Wiederherstellung konnten nicht geladen werden.",
+        "denied": "Der Zugriff auf Abrechnungsnachweise ist verweigert. Dafür ist die Berechtigung für Abrechnungssupport nötig.",
+        "inProgress": "Die erneute Abrechnungsprüfung läuft bereits. Warten Sie kurz und versuchen Sie es mit demselben Checkout erneut.",
+        "providerUnavailable": "Der Abrechnungsanbieter ist vorübergehend nicht erreichbar. Bewahren Sie diese Checkout-Referenz auf und versuchen Sie es später erneut.",
+        "notFound": "Für dieses Elternkonto wurde kein solcher Checkout gefunden."
+      }
+    },
+    "values": {
+      "none": "Keine",
+      "yes": "Ja",
+      "no": "Nein",
+      "unknown": "Unbekannt",
+      "pending": "Ausstehend",
+      "available": "Vorhanden"
+    }
+  },
+  "curriculum": {
+    "eyebrow": "Lehrplanbetrieb",
+    "title": "Lehrplan-Editor",
+    "description": "Entwürfe bearbeiten, Inhalte validieren, Nachweise zum Lebenszyklus prüfen und Migrationsmanifeste über die vom Backend autorisierten Lehrplan-APIs anwenden.",
+    "refresh": "Arbeitsliste aktualisieren",
+    "denied": "Das Backend hat keinen Zugriff auf den Lehrplanbetrieb gewährt.",
+    "tabs": {
+      "worklist": "Arbeitsliste",
+      "editor": "Editor",
+      "review": "Prüfung",
+      "migration": "Migration",
+      "evidence": "Nachweise"
+    },
+    "capabilities": {
+      "kicker": "Backend-Autorisierung",
+      "description": "Die Konsole zeigt die Bedienelemente, doch über jede Änderung entscheidet die Berechtigungsprüfung im Backend."
+    },
+    "worklist": {
+      "loading": "Arbeitsliste des Lehrplans wird geladen.",
+      "empty": "Es sind keine Lehrplaneinträge verfügbar.",
+      "updated": "Aktualisiert {{at}} von {{by}}",
+      "unknown": "unbekannt",
+      "open": "Öffnen"
+    },
+    "editor": {
+      "title": "Entwurf bearbeiten",
+      "publicLesson": "Öffentliche Lektion",
+      "version": "Version",
+      "save": "Entwurf speichern",
+      "loadCurrent": "Aktuellen Inhalt laden",
+      "saved": "{{version}} gespeichert.",
+      "current": "Aktueller Inhalt"
+    },
+    "review": {
+      "validation": "Validierung",
+      "runValidation": "Validierung starten",
+      "diff": "Vergleich",
+      "fromVersion": "von Version",
+      "toVersion": "bis Version",
+      "compare": "Vergleichen",
+      "title": "Prüfung und Audit",
+      "submit": "Einreichen",
+      "approve": "Freigeben",
+      "requestChanges": "Änderungen anfordern",
+      "publish": "Veröffentlichen",
+      "loadAudit": "Audit laden",
+      "missingCapability": "Es fehlt die Berechtigung zum Prüfen oder Veröffentlichen."
+    },
+    "migration": {
+      "manifest": "Manifest",
+      "dryRun": "Probelauf",
+      "dryRunAndApply": "Probelauf und Anwenden",
+      "ready": "Bereit",
+      "blocked": "Blockiert",
+      "tokenPlaceholder": "Bestätigungstoken",
+      "apply": "Migration anwenden",
+      "hint": "Starten Sie einen Probelauf, um die Zeilenaktionen und das Bestätigungstoken zu sehen.",
+      "applied": "{{migration}} angewendet."
+    },
+    "evidence": {
+      "title": "Migrationsnachweise",
+      "idPlaceholder": "Migrations-ID",
+      "load": "Nachweise laden",
+      "missingCapability": "Es fehlt die Berechtigung für Migrationen oder zum Veröffentlichen."
+    },
+    "selectItem": "Wählen Sie einen Lehrplaneintrag aus der Arbeitsliste.",
+    "requestFailed": "Die Anfrage an die Lehrplan-API ist fehlgeschlagen.",
+    "invalidJson": "Das JSON ist ungültig"
   }
 }
