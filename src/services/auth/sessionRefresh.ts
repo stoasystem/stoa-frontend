@@ -139,6 +139,10 @@ async function attempt(): Promise<string | null> {
     return null
   }
   if (outcome.status !== 'renewed') return null
+  // Kept only for the session that asked: one signed out meanwhile has
+  // forgotten its refresh token, and writing the rotated one back would leave
+  // the old account's credential in this browser (#34, #172 audit).
+  if (storedRefreshToken() !== refreshToken) return null
   rememberRefreshToken(outcome.refreshToken)
   return outcome.accessToken
 }

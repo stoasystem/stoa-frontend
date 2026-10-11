@@ -8,11 +8,12 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, waitFor } from '@testing-library/react'
-import { http, HttpResponse } from 'msw'
+import { delay, http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
-import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
+import { httpClient } from '@/services/api/httpClient'
+import { rememberRefreshToken, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
@@ -73,5 +74,48 @@ describe('opening the app on an access token that has run out', () => {
     await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'))
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('fresh-access')
     expect(localStorage.getItem(TOKEN_KEY)).toBe('someone-elses-access')
+  })
+})
+
+describe('a renewal and the session around it', () => {
+  it('keeps the account already read when a token is renewed mid-session', async () => {
+    useAuthStore.setState({
+      user: { id: 't-1', email: 'teacher@test.stoaedu.ch', name: 'Test Teacher', role: 'teacher' } as never,
+      accessToken: 'expired-access',
+      isAuthenticated: true,
+    })
+
+    const { data } = await httpClient.get('/auth/me')
+
+    expect(data.email).toBe('teacher@test.stoaedu.ch')
+    expect(useAuthStore.getState().user?.name).toBe('Test Teacher')
+    expect(useAuthStore.getState().accessToken).toBe('fresh-access')
+  })
+
+  it('stores nothing when the user signs out while the renewal is in flight', async () => {
+    // The #172 audit's race: storing the renewed token after a sign-out signed
+    // the old account straight back in, on the login screen.
+    mswServer.use(
+      http.post('https://api.test/auth/refresh', async () => {
+        await delay(150)
+        return HttpResponse.json({ accessToken: 'fresh-access', refreshToken: 'refresh-2' })
+      }),
+    )
+    useAuthStore.setState({
+      user: { id: 't-1', email: 'teacher@test.stoaedu.ch', name: 'Test Teacher', role: 'teacher' } as never,
+      accessToken: 'expired-access',
+      isAuthenticated: true,
+    })
+
+    const request = httpClient.get('/auth/me')
+    await delay(40)
+    useAuthStore.getState().clearAuth()
+
+    await expect(request).rejects.toMatchObject({ code: 'session_changed' })
+    expect(meCalls).toEqual(['Bearer expired-access'])
+    expect(useAuthStore.getState().accessToken).toBeNull()
+    expect(useAuthStore.getState().isAuthenticated).toBe(false)
+    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+    expect(storedRefreshToken()).toBeNull()
   })
 })

@@ -144,7 +144,14 @@ httpClient.interceptors.response.use(
       // looping: the second 401 falls through to signing out.
       const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined
       if (config && !config._retried) {
+        const sent = tokenSent(config)
         return refreshAccessToken().then((token) => {
+          // Signed out, or another account signed in, while the renewal was in
+          // flight: the token it brings back is the old session's, and storing
+          // it would sign that account straight back in (#34, #172 audit).
+          if (currentSessionToken() !== sent) {
+            return Promise.reject(new ApiError('The session changed while it was being renewed.', { status: 401, code: 'session_changed' }))
+          }
           if (!token) return endSession()
           // Only the token: at start-up the account has not been read yet.
           useAuthStore.getState().updateAccessToken(token)
