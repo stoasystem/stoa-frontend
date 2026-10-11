@@ -146,7 +146,8 @@ httpClient.interceptors.response.use(
       if (config && !config._retried) {
         return refreshAccessToken().then((token) => {
           if (!token) return endSession()
-          useAuthStore.getState().setAuth(useAuthStore.getState().user!, token)
+          // Only the token: at start-up the account has not been read yet.
+          useAuthStore.getState().updateAccessToken(token)
           config._retried = true
           return httpClient.request(config)
         })
