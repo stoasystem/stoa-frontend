@@ -46,18 +46,17 @@
     "updateFailed": "Failed to update status.",
     "replyTitle": "Teacher reply",
     "replyDescription": "Record the intervention, next step, or follow-up the student needs.",
-    "card": {
-      "requestSummary": "Request summary",
-      "report": "Report content",
-      "reportStudent": "Report student content",
-      "reportContext": "Send this request context to the internal moderation queue.",
-      "roles": {
-        "student": "Student",
-        "assistant": "Learning Assistant explanation",
-        "teacher": "Teacher",
-        "system": "System"
-      }
-    }
+    "requestSummary": "The request",
+    "roles": {
+      "student": "Student",
+      "assistant": "Learning assistant explanation",
+      "teacher": "Teacher",
+      "system": "System"
+    },
+    "reportContent": "Report content",
+    "reportStudentContent": "Report student content",
+    "reportContext": "Send this request context to the internal moderation queue.",
+    "noNotes": "No teacher notes yet."
   },
   "profile": {
     "eyebrow": "Teacher account",
@@ -103,14 +102,34 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "{{priority}} priority",
     "sla": {
+      "within_target": "Within target",
       "at_risk": "At risk",
-      "breached": "Overdue"
+      "breached": "Overdue",
+      "unknown": "No response time recorded",
+      "elapsed": "{{elapsed}} of {{target}}",
+      "target": "Target {{target}}"
     },
     "more": "More",
     "learningAutomation": "Learning automation",
     "learningAutomationDescription": "Preview and run automatic practice assignments for your students",
     "firstAction": "First teacher action: {{time}}",
     "firstActionNone": "First teacher action: not recorded yet"
+  },
+  "assistance": {
+    "title": "Preparation summary",
+    "description": "A bounded summary for teacher preparation, not automatic exercise generation.",
+    "sources_one": "{{count}} source",
+    "sources_other": "{{count}} sources",
+    "loading": "Preparing the summary...",
+    "error": "No summary is available for this request.",
+    "empty": "No summary is available yet.",
+    "studentContext": "Student context",
+    "suggestedFocus": "Suggested focus",
+    "question": "Question",
+    "assistantAnswer": "Learning assistant answer",
+    "noQuestion": "No question text available.",
+    "noAnswer": "No assistant answer available.",
+    "noWeakTopics": "No weak topic evidence"
   },
   "aiTools": {
     "title": "AI teacher tools",
@@ -178,16 +197,6 @@
       "privateMarkers": "Private markers cannot be sent in a teacher reply."
     }
   },
-  "slaBadge": {
-    "elapsed": "{{minutes}}m / {{target}}m",
-    "target": "{{target}}m target",
-    "status": {
-      "within_target": "Within SLA",
-      "at_risk": "At risk",
-      "breached": "Breached",
-      "unknown": "Unknown SLA"
-    }
-  },
   "practiceContext": {
     "source": "Source: {{source}}",
     "library": "Practice Library",
@@ -202,21 +211,5 @@
     "no": "No",
     "question": "Question",
     "help": "Learning context helps you see where the student got stuck before joining the request."
-  },
-  "assistance": {
-    "title": "Teacher assistance seed",
-    "description": "A bounded summary for teacher preparation, not automatic exercise generation.",
-    "sources_one": "{{count}} source",
-    "sources_other": "{{count}} sources",
-    "loading": "Preparing summary seed…",
-    "failed": "Summary seed is unavailable for this request.",
-    "empty": "No summary seed is available yet.",
-    "context": "Student context",
-    "focus": "Suggested focus",
-    "question": "Question",
-    "noQuestion": "No question text available.",
-    "answer": "Assistant answer",
-    "noAnswer": "No assistant answer available.",
-    "noWeakTopics": "No weak topic evidence"
   }
 }

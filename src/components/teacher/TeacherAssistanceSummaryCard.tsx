@@ -10,8 +10,15 @@ type Props = {
   isError: boolean
 }
 
+/*
+ * The card's own wording is translated here. The summary bodies inside it are
+ * not: `studentContextSummary`, `questionSummary`, `aiAnswerSummary`,
+ * `suggestedFocus` and `weakTopics` are written by the backend
+ * (teacher_assistance_service.py) and arrive in whatever language it used.
+ */
 export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Props) {
   const { t } = useTranslation('teacher')
+
   return (
     <Card>
       <CardHeader>
@@ -21,11 +28,11 @@ export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Pr
               <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
               {t('assistance.title')}
             </CardTitle>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t('assistance.description')}
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">{t('assistance.description')}</p>
           </div>
-          {summary && <Badge variant="secondary">{t('assistance.sources', { count: summary.sourceCount })}</Badge>}
+          {summary && (
+            <Badge variant="secondary">{t('assistance.sources', { count: summary.sourceCount })}</Badge>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -33,7 +40,7 @@ export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Pr
         {isError && (
           <p className="flex items-center gap-2 text-sm text-destructive">
             <CircleAlert className="h-4 w-4" aria-hidden="true" />
-            {t('assistance.failed')}
+            {t('assistance.error')}
           </p>
         )}
         {!isLoading && !isError && !summary && (
@@ -42,11 +49,11 @@ export function TeacherAssistanceSummaryCard({ summary, isLoading, isError }: Pr
         {summary && (
           <>
             <div className="grid gap-3 lg:grid-cols-2">
-              <SummaryBlock title={t('assistance.context')} value={summary.studentContextSummary} />
-              <SummaryBlock title={t('assistance.focus')} value={summary.suggestedFocus} />
+              <SummaryBlock title={t('assistance.studentContext')} value={summary.studentContextSummary} />
+              <SummaryBlock title={t('assistance.suggestedFocus')} value={summary.suggestedFocus} />
             </div>
             <SummaryBlock title={t('assistance.question')} value={summary.questionSummary || t('assistance.noQuestion')} />
-            <SummaryBlock title={t('assistance.answer')} value={summary.aiAnswerSummary || t('assistance.noAnswer')} />
+            <SummaryBlock title={t('assistance.assistantAnswer')} value={summary.aiAnswerSummary || t('assistance.noAnswer')} />
             <div className="flex flex-wrap gap-2">
               {summary.weakTopics.length === 0 && (
                 <Badge variant="outline">{t('assistance.noWeakTopics')}</Badge>

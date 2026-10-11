@@ -77,9 +77,30 @@ export async function getWarehouseReadiness() {
   return response.data
 }
 
-export async function getWarehouseExportSummary(contentType?: string) {
+/**
+ * A refusal is an answer, not a failure.
+ *
+ * Reading the analytics needs `curriculum_analytics_reader`; exporting the
+ * warehouse is a separate grant, `curriculum_analytics_exporter`, and an
+ * administrator who holds the first and not the second is the ordinary case.
+ * Letting that 403 reject left the panel blank — the dashboard said nothing at
+ * all — and the query's one retry sent the refused request a second time.
+ * Carrying it back as data ends both.
+ */
+export type WarehouseExportSummaryResult = {
+  /** The account may read the analytics but not export the warehouse. */
+  permissionDenied: boolean
+  /** Absent exactly when the export was refused. */
+  summary?: WarehouseExportSummary
+}
+
+const resolvedOrForbidden = (status: number) => (status >= 200 && status < 300) || status === 403
+
+export async function getWarehouseExportSummary(contentType?: string): Promise<WarehouseExportSummaryResult> {
   const response = await httpClient.get<WarehouseExportSummary>('/admin/curriculum/analytics/warehouse-export', {
     params: { contentType: contentType || undefined },
+    validateStatus: resolvedOrForbidden,
   })
-  return response.data
+  if (response.status === 403) return { permissionDenied: true }
+  return { permissionDenied: false, summary: response.data }
 }

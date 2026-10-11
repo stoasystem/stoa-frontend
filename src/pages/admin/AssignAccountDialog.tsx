@@ -59,6 +59,10 @@ export function AssignAccountDialog({
   const blocking = blockingIssues(draft)
   const reasons = blocking.map((issue) => t(`accounts.fieldIssues.${issue}`))
   const blocked = blocking.length > 0 || pending
+  // Card 124: the same rule as the card behind this dialog. The form is seeded
+  // and `touched` cleared on every opening, so until a field is touched the
+  // dialog opens quiet rather than already refusing.
+  const shownReasons = Object.values(touched).some(Boolean) ? reasons : []
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -87,7 +91,7 @@ export function AssignAccountDialog({
             onTouch={(field) => setTouched((current) => ({ ...current, [field]: true }))}
           />
 
-          <BlockedReason id="assign-blocked" reasons={reasons} />
+          <BlockedReason id="assign-blocked" reasons={shownReasons} />
 
           {error ? (
             <p role="alert" className="w-full text-sm text-destructive">
@@ -104,7 +108,7 @@ export function AssignAccountDialog({
                 type="submit"
                 disabled={blocked}
                 title={blocking.length > 0 ? reasons.join(' · ') : undefined}
-                aria-describedby={blocking.length > 0 ? 'assign-blocked' : undefined}
+                aria-describedby={shownReasons.length > 0 ? 'assign-blocked' : undefined}
               >
                 {t('accounts.assignDialogSubmit')}
               </Button>
