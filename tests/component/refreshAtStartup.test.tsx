@@ -118,4 +118,39 @@ describe('a renewal and the session around it', () => {
     expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
     expect(storedRefreshToken()).toBeNull()
   })
+
+  it('reads the account under the session another tab renewed first', async () => {
+    // Two restored tabs on one expired shared token both renew; the other one
+    // finishes first. This tab must not store its own renewal (the session is
+    // no longer the one it sent), but it must not sit on "Konto wird geladen…"
+    // either: it reads the account under the token the other tab stored.
+    mswServer.use(
+      http.get('https://api.test/auth/me', ({ request }) => {
+        const auth = request.headers.get('authorization')
+        meCalls.push(auth)
+        if (auth !== 'Bearer other-tab-access') return HttpResponse.json({ detail: 'expired' }, { status: 401 })
+        return HttpResponse.json({ id: 't-1', email: 'teacher@test.stoaedu.ch', name: 'Test Teacher', role: 'teacher' })
+      }),
+      http.post('https://api.test/auth/refresh', async () => {
+        await delay(150)
+        return HttpResponse.json({ accessToken: 'fresh-access', refreshToken: 'refresh-2' })
+      }),
+    )
+    // The application's own client: the guard asks that one to read the
+    // account again.
+    const { queryClient: appClient } = await import('@/app/query/queryClient')
+    render(
+      <QueryClientProvider client={appClient}>
+        <AuthBootstrap />
+      </QueryClientProvider>,
+    )
+    await delay(60)
+    // What the other tab's renewal leaves in the shared storage.
+    localStorage.setItem(TOKEN_KEY, 'other-tab-access')
+
+    await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'), { timeout: 3000 })
+    expect(useAuthStore.getState().accessToken).toBe('other-tab-access')
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
+    expect(meCalls[meCalls.length - 1]).toBe('Bearer other-tab-access')
+  })
 })

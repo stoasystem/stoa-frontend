@@ -3,6 +3,7 @@ import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { forgetRefreshToken, refreshAccessToken } from '@/services/auth/sessionRefresh'
+import { queryClient } from '@/app/query/queryClient'
 
 export class ApiError extends Error {
   status?: number
@@ -150,6 +151,16 @@ httpClient.interceptors.response.use(
           // flight: the token it brings back is the old session's, and storing
           // it would sign that account straight back in (#34, #172 audit).
           if (currentSessionToken() !== sent) {
+            // The tab may still hold a session, just not this one: another tab
+            // sharing it renewed first, or another account signed in. Read the
+            // account again under whatever the tab holds now, or a start-up in
+            // a second restored tab waits on "Konto wird geladen…" for good.
+            if (currentSessionToken()) {
+              useAuthStore.getState().hydrateFromStorage()
+              // After this rejection has settled: while the first read of the
+              // account is still in flight, an invalidation only joins it.
+              setTimeout(() => void queryClient.invalidateQueries({ queryKey: ['auth', 'me'] }), 0)
+            }
             return Promise.reject(new ApiError('The session changed while it was being renewed.', { status: 401, code: 'session_changed' }))
           }
           if (!token) return endSession()
