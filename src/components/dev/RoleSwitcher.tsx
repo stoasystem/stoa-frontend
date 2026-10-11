@@ -20,7 +20,6 @@ import { login } from '@/services/auth/authApi'
 import {
   accountMayBeHeld,
   adoptSwitcherOptInFromUrl,
-  isTestAccount,
   switcherEnabledHere,
   rememberSession,
 } from '@/lib/devSessions'
@@ -58,9 +57,13 @@ export function RoleSwitcher() {
   // stored sessions are somebody's real ones. Inside it, no gate: the domain
   // already says what the account is for.
   if (!user) return null
-  if (!enabledHere && !isTestAccount(user.email)) {
-    return null
-  }
+  // Asked for, every time. The test accounts live on the deployed site, so
+  // "no gate inside the test domain" meant a grey oval with an unlabelled
+  // glyph sat in the student's chrome for anyone reviewing the product, with
+  // nothing on screen saying what it was (card 125). A testing tool earns its
+  // place by being asked for: `?roleswitcher=on` turns it on for this browser
+  // and it stays on until `?roleswitcher=off`.
+  if (!enabledHere) return null
 
   async function addRole(event: React.FormEvent) {
     event.preventDefault()

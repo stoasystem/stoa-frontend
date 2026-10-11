@@ -44,7 +44,20 @@ describe('on the deployed site', () => {
     useAuthStore.setState({ user: null, isAuthenticated: false } as never)
   })
 
-  it('is offered to a test-domain account with nothing asked for first', () => {
+  it('is withheld from a test-domain account too, until that browser asks', () => {
+    // The deployed site is where the test accounts live, so "no gate inside
+    // the test domain" put an unlabelled grey oval in the student's chrome
+    // for everyone reviewing the product (card 125). Asking is the gate now,
+    // and it is the same gate for every address.
+    signedInAs('admin@test.stoaedu.ch', 'admin')
+
+    renderSwitcher()
+
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
+  })
+
+  it('is offered to a test-domain account once that browser has asked', () => {
+    localStorage.setItem('stoa_role_switcher', 'on')
     signedInAs('admin@test.stoaedu.ch', 'admin')
 
     renderSwitcher()

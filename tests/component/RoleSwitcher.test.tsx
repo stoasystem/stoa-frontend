@@ -29,6 +29,11 @@ function renderSwitcher() {
   return render(<RoleSwitcher />, { wrapper: Wrapper })
 }
 
+/** This browser asked for the switcher, the way `?roleswitcher=on` leaves it. */
+function askedFor() {
+  localStorage.setItem('stoa_role_switcher', 'on')
+}
+
 function signedInAs(email: string, role = 'student') {
   useAuthStore.setState({
     user: { id: 'u1', email, role, name: 'Someone' },
@@ -51,8 +56,21 @@ describe('switching between the test roles', () => {
     expect(screen.queryByRole('button', { name: /student/i })).not.toBeInTheDocument()
   })
 
-  it('is offered to a test account', () => {
+  it('is not offered to a test account either, until it is asked for', () => {
+    // It used to show itself to any @test.stoaedu.ch address with nothing
+    // asked for. The test accounts live on the deployed site, so that put an
+    // unlabelled grey oval in the student's chrome for everyone reviewing the
+    // product (card 125). A testing tool is asked for.
     signedInAs('student@test.stoaedu.ch')
+
+    renderSwitcher()
+
+    expect(screen.queryByRole('button', { name: /student/i })).not.toBeInTheDocument()
+  })
+
+  it('is offered once this browser has asked for it', () => {
+    signedInAs('student@test.stoaedu.ch')
+    askedFor()
 
     renderSwitcher()
 
@@ -119,6 +137,7 @@ describe('switching between the test roles', () => {
   })
 
   it('leaves the page alone until the load, so no guard can reject the new role', async () => {
+    askedFor()
     // Telling the store about the new role while the old role's page is still
     // mounted lets its route guard land on the forbidden page first.
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: true }) as never
@@ -147,6 +166,7 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps the browser signed in when the held session has expired', async () => {
+    askedFor()
     // Adopting a dead token put it on the next request, and the 401 handler
     // answered by clearing the session this tab arrived with.
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 }) as never
@@ -177,6 +197,7 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps the refresh token of a role it has just been given', async () => {
+    askedFor()
     // Without it the held account is over an hour after it was added, and
     // nothing can renew it: the switcher would be back to "sign in again".
     vi.mocked(login).mockResolvedValue({
@@ -199,6 +220,7 @@ describe('switching between the test roles', () => {
   })
 
   it('renews a held account whose access token has run out, instead of dropping it', async () => {
+    askedFor()
     // The complaint that started this: switching to any account that had been
     // sitting for an hour answered "That session has expired. Sign in again."
     // every time. An access token running out is the ordinary state of an
@@ -242,6 +264,7 @@ describe('switching between the test roles', () => {
   })
 
   it('says the session is over only when the refresh is refused too', async () => {
+    askedFor()
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401 }) as never
     const assign = vi.fn()
     Object.defineProperty(window, 'location', {
@@ -268,6 +291,7 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps a held account when the renewal could not be made', async () => {
+    askedFor()
     // A refresh that did not reach the server must not cost the account: it
     // cannot be recovered once dropped.
     globalThis.fetch = vi.fn().mockImplementation(async (url: string) => {
@@ -298,6 +322,7 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps the held role when the check could not be made', async () => {
+    askedFor()
     // Treating every failed check as a dead session deleted the stored token on
     // nothing worse than a dropped connection, and it cannot be recovered.
     globalThis.fetch = vi.fn().mockRejectedValue(new Error('offline')) as never
@@ -326,6 +351,7 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps the held role when the server answers with a fault', async () => {
+    askedFor()
     // A 500 says nothing about the token, so the stored session stays.
     globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 500 }) as never
     const assign = vi.fn()
@@ -560,17 +586,19 @@ describe('what decides whether the switcher is offered', () => {
     useAuthStore.setState({ user: null, isAuthenticated: false } as never)
   })
 
-  it('offers it to a test-domain account with nothing else asked for', () => {
-    // The accounts under test live on the deployed site. Requiring a step
-    // before the switcher appeared there hid it in the one place it is for.
+  it('withholds it from a test-domain account until this browser asks', () => {
+    // It used to appear for any @test.stoaedu.ch address with nothing asked
+    // for, and the accounts under test live on the deployed site -- so an
+    // unlabelled grey oval sat in the student's chrome for everyone looking
+    // at the product (card 125).
     signedInAs('admin@test.stoaedu.ch', 'admin')
 
     renderSwitcher()
 
-    expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /Testing as/ })).not.toBeInTheDocument()
   })
 
-  it('offers it to every one of the roles under test', () => {
+  it('offers it to every one of the roles under test once asked for', () => {
     for (const [email, role] of [
       ['admin@test.stoaedu.ch', 'admin'],
       ['teacher@test.stoaedu.ch', 'teacher'],
@@ -580,6 +608,7 @@ describe('what decides whether the switcher is offered', () => {
     ] as const) {
       localStorage.clear()
       signedInAs(email, role)
+      askedFor()
       const view = renderSwitcher()
       expect(screen.getByRole('button', { name: /Testing as/ })).toBeInTheDocument()
       view.unmount()
@@ -587,8 +616,7 @@ describe('what decides whether the switcher is offered', () => {
   })
 
   it('withholds it from an address outside the test domain', () => {
-    // Negative control. This is the boundary now that the build no longer is:
-    // for a real address the sessions this keeps would be somebody's real ones.
+    // Negative control: asking for it is what shows it, and nothing else does.
     signedInAs('a.real.parent@gmail.com', 'parent')
 
     renderSwitcher()
