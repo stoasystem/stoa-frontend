@@ -10,7 +10,29 @@
   "availability": {
     "eyebrow": "Area insegnante",
     "title": "Disponibilità",
-    "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza."
+    "description": "Imposta disponibilità e materie così che le richieste possano essere indirizzate con chiarezza.",
+    "editor": {
+      "subjects": "Materie",
+      "weeklySlots": "Fasce settimanali",
+      "day": "Giorno",
+      "start": "Inizio",
+      "end": "Fine",
+      "addSlot": "Aggiungi fascia",
+      "save": "Salva disponibilità",
+      "saving": "Salvataggio…",
+      "subjectNames": {
+        "Mathematics": "Matematica",
+        "Physics": "Fisica",
+        "Chemistry": "Chimica",
+        "English": "Inglese",
+        "Biology": "Biologia"
+      }
+    },
+    "summary": {
+      "title": "Disponibilità attuale",
+      "subjects": "Materie: {{subjects}}",
+      "noSubjects": "nessuna selezionata"
+    }
   },
   "detail": {
     "title": "Richiesta di aiuto",
@@ -108,5 +130,86 @@
     "noQuestion": "Nessun testo della domanda disponibile.",
     "noAnswer": "Nessuna risposta dell’assistente disponibile.",
     "noWeakTopics": "Nessun indizio di argomenti deboli"
+  },
+  "aiTools": {
+    "title": "Strumenti IA per docenti",
+    "description": "Preparate, dal contesto visibile dell’allievo, bozze che rivedete voi stessi.",
+    "draftOnly": "Solo bozza",
+    "generate": "Genera",
+    "noDraft": "Nessuna bozza ancora.",
+    "notAvailable": "Non disponibile.",
+    "unavailable": "Al momento non è possibile generare bozze.",
+    "summary": {
+      "title": "Bozza di riepilogo",
+      "description": "Riepilogo della sessione, probabile malinteso e spiegazione di seguito.",
+      "generateLabel": "Genera bozza di riepilogo",
+      "session": "Sessione",
+      "misconception": "Malinteso",
+      "focus": "Punto suggerito",
+      "followUp": "Seguito"
+    },
+    "exercise": {
+      "title": "Bozza di esercizi",
+      "description": "Brevi esercizi da rivedere prima di consegnarli all’allievo.",
+      "generateLabel": "Genera bozza di esercizi",
+      "difficulty": "Difficoltà",
+      "items": "Esercizi",
+      "item": "Esercizio {{number}}",
+      "answerKey": "Soluzioni",
+      "difficulties": {
+        "targeted": "Mirato",
+        "standard": "Standard",
+        "stretch": "Impegnativo"
+      }
+    },
+    "status": {
+      "draft": "Bozza",
+      "accepted": "Accettata",
+      "rejected": "Rifiutata",
+      "archived": "Archiviata"
+    },
+    "delivery": {
+      "not_delivered": "Non consegnato",
+      "delivered": "Consegnato"
+    },
+    "actions": {
+      "regenerate": "Rigenera",
+      "accept": "Accetta",
+      "reject": "Rifiuta",
+      "archive": "Archivia"
+    }
+  },
+  "reply": {
+    "label": "Risposta del/la docente",
+    "placeholder": "Scrivete il prossimo passo per l’allievo.",
+    "queued_one": "{{count}} blocco pronto",
+    "queued_other": "{{count}} blocchi pronti",
+    "addBlock": "Aggiungi blocco",
+    "send": "Invia risposta",
+    "modes": {
+      "paragraph": "Paragrafo",
+      "formula": "Formula",
+      "unordered_list": "Elenco",
+      "code": "Codice"
+    },
+    "unsafe": {
+      "html": "Il codice HTML non è consentito in una risposta.",
+      "privateMarkers": "Gli identificativi interni non possono essere inviati in una risposta."
+    }
+  },
+  "practiceContext": {
+    "source": "Fonte: {{source}}",
+    "library": "Biblioteca di esercizi",
+    "path": "Percorso di apprendimento",
+    "title": "L’allievo ha chiesto aiuto dopo essersi esercitato su questo passo.",
+    "topic": "Argomento",
+    "attempts": "Tentativi",
+    "answer": "Risposta dell’allievo",
+    "notRecorded": "Non registrata",
+    "hint": "Suggerimento visto",
+    "yes": "Sì",
+    "no": "No",
+    "question": "Domanda",
+    "help": "Il contesto di apprendimento vi mostra dove l’allievo si è bloccato prima che prendiate la richiesta."
   }
 }
