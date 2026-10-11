@@ -6,7 +6,6 @@ import { AskReopen } from '@/features/ask/AskReopen'
 import {
   ASK_PANEL,
   ASK_SHEET,
-  ASK_SKY_TOKENS,
   ASK_SURFACE_BACKGROUND,
   sheetHeightFor,
 } from '@/features/ask/askLayout'
@@ -217,7 +216,6 @@ export function StageWithAsk({
             data-surface="sky"
             className="relative shrink-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
-              ...ASK_SKY_TOKENS,
               width: ASK_PANEL.width,
               background: ASK_SURFACE_BACKGROUND.panel,
             } as CSSProperties}
@@ -238,7 +236,6 @@ export function StageWithAsk({
             data-surface="sky"
             className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
-              ...ASK_SKY_TOKENS,
               background: ASK_SURFACE_BACKGROUND.sheet,
               height: sheetHeightFor('stage'),
               borderRadius: `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,

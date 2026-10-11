@@ -367,3 +367,35 @@
   --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.45);
   --shadow-float: 0 2px 6px rgba(0, 0, 0, 0.25), 0 18px 50px rgba(0, 0, 0, 0.45);
 }
+
+/*
+ * Ask, the panel and the sheet (#125): a dark surface built from the light
+ * families. It carries `data-surface="sky"` for the sky's own tokens, and this
+ * points the light names its contents use at their sky counterparts, so one
+ * rule darkens the composer, the bubbles, the lists and the cards instead of
+ * every class being rewritten.
+ *
+ * It lives here, not in the component, so the contrast gate rates what Ask
+ * shows: scripts/contrast-pairs.json reads it as its own theme, "ask".
+ * No name on the left is used on the right, so nothing resolves in a circle.
+ */
+[data-surface="sky"][data-ask-surface] {
+  --ground: var(--sky);
+  --surface: var(--sky-glass);
+  --sidebar: var(--sky-2);
+  --fill: var(--on-sky-selected);
+  --ink: var(--on-sky-text);
+  --secondary: var(--on-sky-text-caption);
+  --tertiary: var(--on-sky-text-muted);
+  --separator: var(--sky-glass-border);
+  --hairline: var(--sky-glass-border);
+  --card-border: var(--sky-glass-border);
+  --float-border: var(--sky-glass-border);
+  --accent: var(--accent-on-sky);
+  /* color-mix(in srgb, --accent-on-sky 82%, --on-sky-text), written out so
+     the gate can read it: hover / press on the send button. */
+  --accent-pressed: #94A6FF;
+  --accent-tint: var(--on-sky-selected);
+  --on-accent: var(--on-accent-on-sky);
+  --pill-neutral: var(--on-sky-text-caption);
+}

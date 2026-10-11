@@ -3,11 +3,10 @@
  * rest -- it is white and the theme is not".
  *
  * Two things are held here. The panel and the sheet really do carry the sky,
- * through `data-surface="sky"` and the one token remap, rather than each class
- * being rewritten; and darkening it did not cost contrast. `check:contrast`
- * rates pairs declared in brand-tokens.css and cannot see a remap applied in a
- * component, so the same WCAG arithmetic runs here on the tokens the remap
- * actually resolves to.
+ * through `data-surface="sky"` and `data-ask-surface`, which select the one
+ * token remap in brand-tokens.css, rather than each class being rewritten; and
+ * darkening it did not cost contrast. `check:contrast` rates the remap as its
+ * own theme, "ask"; the arithmetic here also covers mixes it cannot see.
  *
  *   text        4.5:1
  *   a control   3:1 (WCAG 1.4.11)
@@ -20,7 +19,7 @@ import { I18nextProvider } from 'react-i18next'
 import { MemoryRouter } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { AskHost } from '@/features/ask/AskHost'
-import { ASK_SKY_TOKENS, ASK_SURFACE_BACKGROUND } from '@/features/ask/askLayout'
+import { ASK_SURFACE_BACKGROUND } from '@/features/ask/askLayout'
 import i18n from '@/i18n'
 import { ApiError } from '@/services/api/httpClient'
 import { resetAsk } from '@/store/askStore'
@@ -62,7 +61,13 @@ vi.mock('@/services/learning/memoryApi', () => ({
 type RGBA = [number, number, number, number]
 
 const css = readFileSync(path.resolve(__dirname, '../../src/styles/brand-tokens.css'), 'utf8')
-const skyBlock = css.slice(css.indexOf('[data-surface="sky"] {'))
+const ASK_RULE = '[data-surface="sky"][data-ask-surface] {'
+const skyBlock = css.slice(css.indexOf('[data-surface="sky"] {'), css.indexOf(ASK_RULE))
+/** The remap, as brand-tokens.css declares it: light name -> its value. */
+const askBlock = css.slice(css.indexOf(ASK_RULE), css.indexOf('}', css.indexOf(ASK_RULE)))
+const ASK_REMAP: Record<string, string> = Object.fromEntries(
+  [...askBlock.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--[a-z0-9-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]),
+)
 /** The light families, which the sky block leaves alone -- `--green` is one. */
 const rootBlock = css.slice(css.indexOf(':root {'), css.indexOf('[data-surface="sky"] {'))
 
@@ -78,8 +83,10 @@ function token(name: string, block = skyBlock): RGBA {
 }
 
 /** What one remapped light token resolves to, through the sky name it points at. */
-function remapped(name: keyof typeof ASK_SKY_TOKENS): RGBA {
-  const target = /^var\((--[a-z0-9-]+)\)$/.exec(ASK_SKY_TOKENS[name])
+function remapped(name: string): RGBA {
+  const value = ASK_REMAP[name]
+  if (!value) throw new Error(`${name} is not remapped for Ask`)
+  const target = /^var\((--[a-z0-9-]+)\)$/.exec(value)
   if (!target) throw new Error(`${name} is not a plain token reference`)
   return token(target[1])
 }
@@ -165,16 +172,20 @@ describe('the panel is the sky, not a white card', () => {
     const panel = openAsk()
 
     expect(panel).toHaveAttribute('data-surface', 'sky')
-    expect(panel.style.getPropertyValue('--ink')).toBe('var(--on-sky-text)')
-    expect(panel.style.getPropertyValue('--surface')).toBe('var(--sky-glass)')
-    expect(panel.style.getPropertyValue('--accent')).toBe('var(--accent-on-sky)')
+    expect(panel).toHaveAttribute('data-ask-surface')
+    expect(ASK_REMAP['--ink']).toBe('var(--on-sky-text)')
+    expect(ASK_REMAP['--surface']).toBe('var(--sky-glass)')
+    expect(ASK_REMAP['--accent']).toBe('var(--accent-on-sky)')
+    // The remap lives in the token file only, where the contrast gate reads it.
+    expect(panel.style.getPropertyValue('--ink')).toBe('')
     expect(panel.style.background).toBe(ASK_SURFACE_BACKGROUND.panel)
     // The negative: nothing is left pointing at the light page any more.
     expect(panel.style.background).not.toContain('var(--ground)')
   })
 
-  it('names only tokens: no colour is written into the remap', () => {
-    for (const [name, value] of Object.entries(ASK_SKY_TOKENS)) {
+  it('names only tokens: no colour is written into the remap, but the pressed accent the gate must read', () => {
+    for (const [name, value] of Object.entries(ASK_REMAP)) {
+      if (name === '--accent-pressed') continue
       expect(value, `${name} must not hold a literal colour`).not.toMatch(
         /#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|\b(?:white|black|red|green|blue|grey|gray)\b/i,
       )
@@ -183,8 +194,8 @@ describe('the panel is the sky, not a white card', () => {
   })
 
   it('cannot resolve in a circle: no remapped name is used as a target', () => {
-    const keys = new Set(Object.keys(ASK_SKY_TOKENS))
-    for (const [name, value] of Object.entries(ASK_SKY_TOKENS)) {
+    const keys = new Set(Object.keys(ASK_REMAP))
+    for (const [name, value] of Object.entries(ASK_REMAP)) {
       for (const referenced of value.match(/--[a-z0-9-]+/g) ?? []) {
         expect(keys.has(referenced), `${name} points at ${referenced}, which this remap also redefines`).toBe(false)
       }

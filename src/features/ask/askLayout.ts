@@ -67,38 +67,15 @@ export function sheetHeightFor(entry: AskEntry): string {
 }
 
 /**
- * The Ask panel and sheet are a dark surface now (#125): a white card over the
- * star map read as a different product, which is what the student said.
+ * The Ask panel and sheet are a dark surface (#125): a white card over the star
+ * map read as a different product, which is what the student said. Each
+ * carries `data-surface="sky"` and `data-ask-surface`; the rule for that pair
+ * in `src/styles/brand-tokens.css` points the light names the panel's contents
+ * use at their sky counterparts, where the contrast gate rates them.
  *
- * They carry `data-surface="sky"`, which brings the sky's own tokens, and this
- * points the light families the panel's contents are built from at their sky
- * counterparts, so one declaration darkens everything inside -- the composer,
- * the bubbles, the lists, the cards -- instead of every class being rewritten.
- *
- * Every value is a token. No key appears on the right-hand side of another, so
- * nothing resolves in a circle. `tests/component/askSkySurface.test.tsx` holds
- * both of those.
+ * What stays here is the panel's own ground: the sky, left slightly open so
+ * the blur has work.
  */
-export const ASK_SKY_TOKENS = {
-  '--ground': 'var(--sky)',
-  '--surface': 'var(--sky-glass)',
-  '--sidebar': 'var(--sky-2)',
-  '--fill': 'var(--on-sky-selected)',
-  '--ink': 'var(--on-sky-text)',
-  '--secondary': 'var(--on-sky-text-caption)',
-  '--tertiary': 'var(--on-sky-text-muted)',
-  '--separator': 'var(--sky-glass-border)',
-  '--hairline': 'var(--sky-glass-border)',
-  '--card-border': 'var(--sky-glass-border)',
-  '--float-border': 'var(--sky-glass-border)',
-  '--accent': 'var(--accent-on-sky)',
-  '--accent-pressed': 'color-mix(in srgb, var(--accent-on-sky) 82%, var(--on-sky-text))',
-  '--accent-tint': 'var(--on-sky-selected)',
-  '--on-accent': 'var(--on-accent-on-sky)',
-  '--pill-neutral': 'var(--on-sky-text-caption)',
-} as const satisfies Record<`--${string}`, string>
-
-/** The panel's own ground: the sky, left slightly open so the blur has work. */
 export const ASK_SURFACE_BACKGROUND = {
   panel: 'color-mix(in srgb, var(--sky) 94%, transparent)',
   sheet: 'color-mix(in srgb, var(--sky) 96%, transparent)',
