@@ -1,9 +1,11 @@
+import { FileText, Image as ImageGlyph } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, Button } from '@/components/base'
+import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { cn } from '@/lib/utils'
-import type { ChatMessage } from '@/types/chat'
+import type { ChatAttachment, ChatMessage } from '@/types/chat'
 
 /*
  * One message in the Ask thread, as the canvas draws the conversation (Home ·
@@ -56,6 +58,7 @@ export function AskMessage({
             </figure>
           )}
           {message.content}
+          <MessageAttachments attachments={message.attachments} />
         </div>
         {failed && (
           <div className="flex items-center gap-3 text-[13px]">
@@ -77,12 +80,17 @@ export function AskMessage({
       <div data-message-role="teacher" className="flex max-w-full flex-col items-start gap-1 self-start">
         <div className="flex items-center gap-1.5">
           <Avatar name={name} size={16} tone="green" />
-          <span data-teacher-name className="text-[12px] font-semibold text-green">
+          {/*
+            Ask is a dark surface (#125), where --green is 3.66:1 against it:
+            readable as a fill, not as a word. Lifted towards the sky's own ink
+            until it clears 4.5:1; tests/component/askSkySurface.test.tsx rates it.
+          */}
+          <span data-teacher-name className="text-[12px] font-semibold text-[color:color-mix(in_srgb,var(--green)_30%,var(--on-sky-text))]">
             {name}
           </span>
         </div>
         <div
-          className="whitespace-pre-wrap break-words bg-green-tint text-ink"
+          className="whitespace-pre-wrap break-words bg-[color:color-mix(in_srgb,var(--green)_26%,var(--sky))] text-ink"
           style={{ padding: '10px 14px', borderRadius: 18, borderTopLeftRadius: 6, fontSize: 15, lineHeight: 1.45 }}
         >
           {message.content}
@@ -112,9 +120,40 @@ export function AskMessage({
         ) : streaming ? (
           <span className="text-caption">{t('ask.thread.thinking')}</span>
         ) : null}
+        <MessageAttachments attachments={message.attachments} />
       </div>
       {message.status === 'stopped' && <span className="text-[12px] text-caption">{t('ask.thread.stopped')}</span>}
       {after}
     </div>
+  )
+}
+
+/**
+ * The files a message carries (#125). The server names each one and no more;
+ * nothing here opens them, because the thread is for reading the answer and
+ * the file is already the student's own.
+ */
+function MessageAttachments({ attachments }: { attachments?: ChatAttachment[] }) {
+  const { t } = useTranslation('chat')
+  if (!attachments || attachments.length === 0) return null
+  return (
+    <ul
+      data-message-attachments={attachments.length}
+      aria-label={t('ask.attachments.label')}
+      className="m-0 flex list-none flex-col gap-1 p-0 pt-1"
+    >
+      {attachments.map((attachment) => (
+        <li key={attachment.id} className="flex items-center gap-1.5 text-[13px] opacity-90">
+          <span aria-hidden="true" className="shrink-0">
+            {attachment.mimeType.startsWith('image/') ? (
+              <ImageGlyph size={ICON.chip} strokeWidth={ICON.stroke} />
+            ) : (
+              <FileText size={ICON.chip} strokeWidth={ICON.stroke} />
+            )}
+          </span>
+          <span className="truncate">{attachment.filename}</span>
+        </li>
+      ))}
+    </ul>
   )
 }

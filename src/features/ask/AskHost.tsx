@@ -3,7 +3,15 @@ import { useTranslation } from 'react-i18next'
 import { Composer } from '@/components/base'
 import { COMPOSER } from '@/components/base/sizes'
 import { AskPanel } from '@/features/ask/AskPanel'
-import { ASK_PANEL, ASK_SHEET, DOCKED_COMPOSER, sheetHeightFor } from '@/features/ask/askLayout'
+import { AskReopen } from '@/features/ask/AskReopen'
+import {
+  ASK_PANEL,
+  ASK_SHEET,
+  ASK_SKY_TOKENS,
+  ASK_SURFACE_BACKGROUND,
+  DOCKED_COMPOSER,
+  sheetHeightFor,
+} from '@/features/ask/askLayout'
 import { useAskController, type AskRoute } from '@/features/ask/useAskController'
 import { useAskKeyboard } from '@/features/ask/useAskKeyboard'
 import { useSheetDrag } from '@/features/ask/useSheetDrag'
@@ -25,9 +33,11 @@ import { useCoverShell } from '@/layouts/shellCover'
  * the same panel on a desktop, a full-screen sheet on a phone, and closing it
  * goes to `/`.
  *
- * The panel and the sheet are light surfaces, so they are siblings of the sky
- * rather than inside it: the sky tokens are scoped to `[data-surface="sky"]`
- * and must not reach them.
+ * The panel and the sheet are dark surfaces of their own (#125): each carries
+ * `data-surface="sky"` and `ASK_SKY_TOKENS`, so the sky's colours hold inside
+ * them and Ask no longer reads as a white card from another product.
+ *
+ * Closed, `AskReopen` on the right edge calls the same conversation back.
  */
 export function AskHost({
   children,
@@ -133,6 +143,7 @@ export function AskHost({
             </div>
           </div>
         )}
+        {!open && <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />}
       </div>
 
       {modal && (
@@ -156,8 +167,14 @@ export function AskHost({
             data-ask-conversation={controller.conversationId ?? ''}
             data-ask-motion="panel"
             onKeyDown={onKeyDown}
-            className="absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] bg-[color-mix(in_srgb,var(--ground)_94%,transparent)] text-ink backdrop-blur-[30px]"
-            style={{ width: ASK_PANEL.width, boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.25)' }}
+            data-surface="sky"
+            className="absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]"
+            style={{
+              ...ASK_SKY_TOKENS,
+              width: ASK_PANEL.width,
+              background: ASK_SURFACE_BACKGROUND.panel,
+              boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.25)',
+            } as CSSProperties}
           >
             <AskPanel controller={controller} layout="panel" subjectId={subjectId} />
           </aside>
@@ -172,15 +189,18 @@ export function AskHost({
             data-ask-conversation={controller.conversationId ?? ''}
             data-ask-motion="sheet"
             onKeyDown={onKeyDown}
-            className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden bg-[color-mix(in_srgb,var(--ground)_96%,transparent)] text-ink backdrop-blur-[30px]"
+            data-surface="sky"
+            className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
+              ...ASK_SKY_TOKENS,
+              background: ASK_SURFACE_BACKGROUND.sheet,
               height: sheetHeightFor(entry),
               borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
               boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
               transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
               transition:
                 drag.dragging || reducedMotion ? 'none' : `transform var(--motion-sheet) var(--ease-standard)`,
-            }}
+            } as CSSProperties}
           >
             {entry === 'planet' && (
               <div {...drag.handle} className="flex shrink-0 touch-none justify-center pt-2">

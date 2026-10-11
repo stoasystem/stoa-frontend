@@ -43,7 +43,11 @@
   },
   "composer": {
     "attach": "Ajouter une photo ou un fichier",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "sendBlocked": {
+      "empty": "Écris d’abord ta question, puis envoie-la.",
+      "busy": "C’est encore en cours d’envoi. Réessaie dans un instant."
+    }
   },
   "errorBoundary": {
     "body": "Réessaie ou recharge la page.",

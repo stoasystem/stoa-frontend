@@ -1,8 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Composer } from '@/components/base'
 import { AskPanel } from '@/features/ask/AskPanel'
-import { ASK_PANEL, ASK_SHEET, sheetHeightFor } from '@/features/ask/askLayout'
+import { AskReopen } from '@/features/ask/AskReopen'
+import {
+  ASK_PANEL,
+  ASK_SHEET,
+  ASK_SKY_TOKENS,
+  ASK_SURFACE_BACKGROUND,
+  sheetHeightFor,
+} from '@/features/ask/askLayout'
 import { useAskQuoteStore, type AskPractice } from '@/features/ask/practiceContext'
 import { QuoteSelection } from '@/features/chapter/QuoteSelection'
 import { useAskController, type AskController } from '@/features/ask/useAskController'
@@ -57,10 +64,16 @@ export function useStageAskController(side: boolean, off = false): AskController
     [baseSelect, planetOpen, storeClose],
   )
   const close = useCallback(() => setOpen(false), [])
+  // Back to the panel beside the exercise, on the conversation it was showing:
+  // only whether it is open belongs to the stage, and the conversation is the
+  // student's one Ask (#125).
+  const reopen = useCallback(() => {
+    if (!off) setOpen(true)
+  }, [off])
 
   return useMemo(
-    () => ({ ...base, entry: 'stage' as const, open: open && !off, openWithDraft, select, close }),
-    [base, open, off, openWithDraft, select, close],
+    () => ({ ...base, entry: 'stage' as const, open: open && !off, openWithDraft, reopen, select, close }),
+    [base, open, off, openWithDraft, reopen, select, close],
   )
 }
 
@@ -145,7 +158,7 @@ export function StageWithAsk({
         data-surface="sky"
         data-stage-page
         inert={sheet || undefined}
-        className="flex min-w-0 flex-1 flex-col bg-sky text-on-sky"
+        className="relative flex min-w-0 flex-1 flex-col bg-sky text-on-sky"
       >
         <div className="flex min-h-0 flex-1 flex-col">{children}</div>
         {!open && (
@@ -175,6 +188,9 @@ export function StageWithAsk({
             </div>
           </div>
         )}
+        {!open && !off && (
+          <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
+        )}
       </div>
 
       {sheet && (
@@ -198,8 +214,13 @@ export function StageWithAsk({
             data-ask-conversation={controller.conversationId ?? ''}
             data-ask-motion="panel"
             onKeyDown={onKeyDown}
-            className="relative shrink-0 border-l border-[color:var(--float-border)] bg-[color-mix(in_srgb,var(--ground)_94%,transparent)] text-ink backdrop-blur-[30px]"
-            style={{ width: ASK_PANEL.width }}
+            data-surface="sky"
+            className="relative shrink-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]"
+            style={{
+              ...ASK_SKY_TOKENS,
+              width: ASK_PANEL.width,
+              background: ASK_SURFACE_BACKGROUND.panel,
+            } as CSSProperties}
           >
             <AskPanel controller={controller} layout="panel" subjectId={subjectId} practice={practice} />
           </aside>
@@ -214,14 +235,17 @@ export function StageWithAsk({
             data-ask-conversation={controller.conversationId ?? ''}
             data-ask-motion="sheet"
             onKeyDown={onKeyDown}
-            className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden bg-[color-mix(in_srgb,var(--ground)_96%,transparent)] text-ink backdrop-blur-[30px]"
+            data-surface="sky"
+            className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
+              ...ASK_SKY_TOKENS,
+              background: ASK_SURFACE_BACKGROUND.sheet,
               height: sheetHeightFor('stage'),
               borderRadius: `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,
               boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.35)',
               transform: drag.offset ? `translateY(${drag.offset}px)` : undefined,
               transition: drag.dragging || reducedMotion ? 'none' : 'transform var(--motion-sheet) var(--ease-standard)',
-            }}
+            } as CSSProperties}
           >
             <div {...drag.handle} className="flex shrink-0 touch-none justify-center pt-2">
               <span

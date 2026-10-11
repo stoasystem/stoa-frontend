@@ -362,7 +362,15 @@ describe('Progress (Sizes: 4 high, radius 4)', () => {
 })
 
 describe('Composer (Sizes: docked 46, full ~150)', () => {
-  function Harness({ variant, onSubmit }: { variant: 'docked' | 'full'; onSubmit: (value: string) => void }) {
+  function Harness({
+    variant,
+    onSubmit,
+    busy,
+  }: {
+    variant: 'docked' | 'full'
+    onSubmit: (value: string) => void
+    busy?: boolean
+  }) {
     const [value, setValue] = useState('')
     return (
       <Composer
@@ -372,6 +380,7 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
         onChange={setValue}
         onSubmit={onSubmit}
         onAttach={() => {}}
+        busy={busy}
       />
     )
   }
@@ -404,16 +413,42 @@ describe('Composer (Sizes: docked 46, full ~150)', () => {
     const field = screen.getByRole('textbox', { name: 'Ask' })
     const send = screen.getByRole('button', { name: 'composer.send' })
 
-    expect(send).toBeDisabled()
+    // #125: send is checked when pressed, not shut before it. It stays in the
+    // tab order and says what is missing instead of swallowing the press.
+    expect(send).toBeEnabled()
+    expect(send).toHaveAttribute('aria-disabled', 'true')
     await userEvent.type(field, '   {Enter}')
     expect(onSubmit).not.toHaveBeenCalled()
+
+    await userEvent.click(send)
+    expect(onSubmit).not.toHaveBeenCalled()
+    const hint = screen.getByText('composer.sendBlocked.empty')
+    expect(hint).toHaveAttribute('data-composer-hint', 'empty')
+    expect(send).toHaveAttribute('aria-describedby', hint.id)
+    expect(field).toHaveFocus()
 
     await userEvent.clear(field)
     await userEvent.type(field, 'Why divide both sides?{Shift>}{Enter}{/Shift}')
     expect(onSubmit).not.toHaveBeenCalled()
-    expect(send).toBeEnabled()
+    expect(send).not.toHaveAttribute('aria-disabled')
+    // Typing takes the reason away with the reason for it.
+    expect(screen.queryByText('composer.sendBlocked.empty')).toBeNull()
     await userEvent.keyboard('{Enter}')
     expect(onSubmit).toHaveBeenCalledWith('Why divide both sides?\n')
+  })
+
+  it('says why send is held while the last question is still going out (#125)', async () => {
+    const onSubmit = vi.fn()
+    render(<Harness variant="docked" onSubmit={onSubmit} busy />)
+    const field = screen.getByRole('textbox', { name: 'Ask' })
+    const send = screen.getByRole('button', { name: 'composer.send' })
+    await userEvent.type(field, 'And the next step?')
+
+    await userEvent.click(send)
+    expect(onSubmit).not.toHaveBeenCalled()
+    expect(screen.getByText('composer.sendBlocked.busy')).toHaveAttribute('data-composer-hint', 'busy')
+    // The negative: the empty field's reason is not what is shown here.
+    expect(screen.queryByText('composer.sendBlocked.empty')).toBeNull()
   })
 
   it('does not send on the Enter that ends an input-method composition', () => {

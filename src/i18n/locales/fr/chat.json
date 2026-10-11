@@ -216,6 +216,25 @@
       "title": "L’étoile {{name}} est allumée",
       "body": "Tu as terminé son chapitre. L’étoile brille maintenant sur ta carte.",
       "link": "Voir sur la carte"
+    },
+    "reopen": {
+      "open": "Ouvrir les questions",
+      "resume": "Revenir à ta conversation"
+    },
+    "attachments": {
+      "label": "Fichiers joints",
+      "remove": "Retirer {{name}}",
+      "uploading": "Ajout en cours…",
+      "errors": {
+        "tooMany": "Tu peux envoyer au maximum {{count}} fichiers avec une question.",
+        "tooLarge": "Ce fichier est trop lourd. Les photos peuvent aller jusqu’à {{imageLimit}}, les autres fichiers jusqu’à {{fileLimit}}.",
+        "unsupported": "Ce type de fichier ne peut pas être envoyé. Les photos, PDF, Word, PowerPoint, Excel et fichiers texte, oui.",
+        "empty": "Ce fichier est vide. Choisis-en un autre.",
+        "expired": "Ce fichier a pris trop de temps. Choisis-le à nouveau.",
+        "quota": "Il n’y a plus de place pour des fichiers. Retires-en un plus ancien d’abord.",
+        "unavailable": "Impossible d’ajouter des fichiers pour le moment. Réessaie dans un instant.",
+        "failed": "Ce fichier n’a pas pu être ajouté. Réessaie."
+      }
     }
   }
 }

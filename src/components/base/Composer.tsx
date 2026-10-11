@@ -1,5 +1,5 @@
 import { ArrowUp, Plus } from 'lucide-react'
-import { useId, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
+import { useEffect, useId, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { IconButton } from '@/components/base/IconButton'
 import { COMPOSER } from '@/components/base/sizes'
@@ -31,6 +31,9 @@ export interface ComposerProps {
   className?: string
 }
 
+/** Why send would not go out yet. Pressing it says which, rather than doing nothing. */
+type SendBlocked = 'empty' | 'busy'
+
 /*
  * Components board, "Fields and composer": the composer is the only floating
  * surface on a page and holds the only filled control (send). Sizes board:
@@ -39,6 +42,14 @@ export interface ComposerProps {
  *
  * Enter sends, Shift+Enter breaks the line, and nothing is sent while an input
  * method is still composing (Japanese, Chinese, accented keyboards).
+ *
+ * Send is checked when it is pressed rather than held shut before it (#125).
+ * An empty field used to leave a grey arrow that swallowed every tap without a
+ * word, and `disabled` took it out of the tab order too, so the reader who most
+ * needs the reason could not even reach it. It stays pressable now: pressing it
+ * puts the cursor in the field and says what is missing. The field's own
+ * `disabled` -- Ask switched off during a quiz -- still shuts the whole
+ * composer, because there the reason is already on screen beside it.
  */
 export function Composer({
   value,
@@ -58,12 +69,37 @@ export function Composer({
 }: ComposerProps) {
   const { t } = useTranslation('common')
   const fieldId = useId()
+  const hintId = `${fieldId}-send-hint`
+  const field = useRef<HTMLTextAreaElement>(null)
+  const [blocked, setBlocked] = useState<SendBlocked | null>(null)
   const spec = COMPOSER[variant]
-  const canSend = !disabled && !busy && value.trim().length > 0
+  const empty = value.trim().length === 0
+  const canSend = !disabled && !busy && !empty
+
+  // The answer arrived: the reason for holding send went with it.
+  useEffect(() => {
+    if (!busy) setBlocked((reason) => (reason === 'busy' ? null : reason))
+  }, [busy])
+
+  function change(next: string) {
+    setBlocked(null)
+    onChange(next)
+  }
 
   function submit(event?: FormEvent) {
     event?.preventDefault()
-    if (canSend) onSubmit(value)
+    if (disabled) return
+    if (busy) {
+      setBlocked('busy')
+      return
+    }
+    if (empty) {
+      setBlocked('empty')
+      field.current?.focus()
+      return
+    }
+    setBlocked(null)
+    onSubmit(value)
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
@@ -94,23 +130,41 @@ export function Composer({
       size={spec.send}
       glyph={spec.sendGlyph}
       variant="filled"
-      disabled={!canSend}
+      disabled={disabled}
+      aria-disabled={canSend ? undefined : true}
+      aria-describedby={blocked ? hintId : undefined}
+      style={canSend ? undefined : { opacity: 'var(--disabled-opacity)' }}
     />
   )
-  const field = (
+  /*
+   * Above the pill, not inside it: the docked composer is one row 46 high with
+   * nowhere to put a sentence, and both hosts leave the space over it free.
+   */
+  const hint = blocked && (
+    <p
+      id={hintId}
+      data-composer-hint={blocked}
+      role="status"
+      className="pointer-events-none absolute inset-x-0 bottom-full m-0 mb-1.5 text-center text-[13px] text-[color:var(--on-sky-text-body,var(--secondary))]"
+    >
+      {t(`composer.sendBlocked.${blocked}`)}
+    </p>
+  )
+  const fieldParts = (
     <>
       <label htmlFor={fieldId} className="sr-only">
         {label}
       </label>
       <textarea
         id={fieldId}
+        ref={field}
         data-composer-field
         rows={variant === 'docked' ? 1 : 3}
         value={value}
         placeholder={placeholder}
         disabled={disabled}
         aria-describedby={describedBy}
-        onChange={(event) => onChange(event.target.value)}
+        onChange={(event) => change(event.target.value)}
         onKeyDown={onKeyDown}
         onCompositionStart={onCompositionStart}
         onCompositionEnd={onCompositionEnd && ((event) => onCompositionEnd(event.currentTarget.value))}
@@ -128,7 +182,10 @@ export function Composer({
       <form
         data-composer="docked"
         onSubmit={submit}
-        className={cn('flex w-full items-center gap-2 border border-[color:var(--float-border)] bg-surface', className)}
+        className={cn(
+          'relative flex w-full items-center gap-2 border border-[color:var(--float-border)] bg-surface',
+          className,
+        )}
         style={{
           height: COMPOSER.docked.height,
           borderRadius: COMPOSER.docked.radius,
@@ -136,8 +193,9 @@ export function Composer({
           boxShadow: 'var(--shadow-float)',
         }}
       >
+        {hint}
         {attach}
-        {field}
+        {fieldParts}
         {send}
       </form>
     )
@@ -155,7 +213,8 @@ export function Composer({
         boxShadow: 'var(--shadow-float)',
       }}
     >
-      {field}
+      {hint}
+      {fieldParts}
       <div data-composer-footer className="flex items-center gap-1.5" style={{ height: COMPOSER.full.footer }}>
         {attach}
         {footerStart}

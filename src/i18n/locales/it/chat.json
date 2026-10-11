@@ -216,6 +216,25 @@
       "title": "La stella {{name}} è accesa",
       "body": "Hai finito il suo capitolo. La stella ora brilla sulla tua mappa.",
       "link": "Vedi sulla mappa"
+    },
+    "reopen": {
+      "open": "Apri le domande",
+      "resume": "Torna alla tua conversazione"
+    },
+    "attachments": {
+      "label": "File allegati",
+      "remove": "Rimuovi {{name}}",
+      "uploading": "Aggiunta in corso…",
+      "errors": {
+        "tooMany": "Puoi inviare al massimo {{count}} file con una domanda.",
+        "tooLarge": "Questo file è troppo grande. Le foto possono arrivare a {{imageLimit}}, gli altri file a {{fileLimit}}.",
+        "unsupported": "Questo tipo di file non si può inviare. Foto, PDF, Word, PowerPoint, Excel e file di testo sì.",
+        "empty": "Questo file è vuoto. Scegline un altro.",
+        "expired": "Questo file ha impiegato troppo tempo. Scegli di nuovo.",
+        "quota": "Non c’è più spazio per i file. Rimuovine prima uno più vecchio.",
+        "unavailable": "Al momento non si possono aggiungere file. Riprova tra un attimo.",
+        "failed": "Non è stato possibile aggiungere questo file. Riprova."
+      }
     }
   }
 }

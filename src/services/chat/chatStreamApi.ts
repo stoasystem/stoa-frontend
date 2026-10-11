@@ -5,6 +5,7 @@ import type { ChatStreamEvent, MessageQuote, PracticeContextRef } from '@/types/
 
 export type StreamMessagePayload = {
   content: string
+  /** The saved attachments this question carries, by id (see `wireBody`). */
   attachmentIds?: string[]
   // The backend requires this to make a retry safe; without it the request is
   // rejected before the message is ever read.
@@ -24,6 +25,21 @@ export type StreamMessagePayload = {
  * which `/generation` reports. A failed request throws.
  */
 export type StreamOutcome = 'streamed' | 'accepted'
+
+/**
+ * `SendMessageRequest.attachmentIds` is a list of references, not of ids:
+ * each entry is `{attachmentId}` or `{uploadId}`, exactly one of the two, and
+ * the backend answers 422 for anything else (openapi.json, AttachmentReference;
+ * stoa-backend/src/stoa/models/attachment.py). The app has only saved
+ * attachments to send -- `/files/.../complete` gives their ids -- so the
+ * reference is made here, at the one place that writes the wire body, rather
+ * than being carried through the hooks.
+ */
+function wireBody({ attachmentIds, ...rest }: StreamMessagePayload) {
+  return attachmentIds && attachmentIds.length > 0
+    ? { ...rest, attachmentIds: attachmentIds.map((attachmentId) => ({ attachmentId })) }
+    : rest
+}
 
 export async function streamConversationMessage({
   conversationId,
@@ -51,7 +67,7 @@ export async function streamConversationMessage({
           'Accept-Language': activeLanguage(),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(wireBody(payload)),
         signal,
       },
     )
