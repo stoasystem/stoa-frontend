@@ -7,7 +7,6 @@ import { AskReopen } from '@/features/ask/AskReopen'
 import {
   ASK_PANEL,
   ASK_SHEET,
-  ASK_SKY_TOKENS,
   ASK_SURFACE_BACKGROUND,
   DOCKED_COMPOSER,
   sheetHeightFor,
@@ -34,8 +33,8 @@ import { useCoverShell } from '@/layouts/shellCover'
  * goes to `/`.
  *
  * The panel and the sheet are dark surfaces of their own (#125): each carries
- * `data-surface="sky"` and `ASK_SKY_TOKENS`, so the sky's colours hold inside
- * them and Ask no longer reads as a white card from another product.
+ * `data-surface="sky"` and `data-ask-surface`, which brand-tokens.css turns
+ * into the sky's colours, so they hold inside them and Ask no longer reads as a white card from another product.
  *
  * Closed, `AskReopen` on the right edge calls the same conversation back.
  */
@@ -170,7 +169,6 @@ export function AskHost({
             data-surface="sky"
             className="absolute inset-y-0 right-0 border-l border-[color:var(--float-border)] text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
-              ...ASK_SKY_TOKENS,
               width: ASK_PANEL.width,
               background: ASK_SURFACE_BACKGROUND.panel,
               boxShadow: '-12px 0 40px rgba(0, 0, 0, 0.25)',
@@ -192,7 +190,6 @@ export function AskHost({
             data-surface="sky"
             className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden text-ink backdrop-blur-[var(--sky-glass-blur)]"
             style={{
-              ...ASK_SKY_TOKENS,
               background: ASK_SURFACE_BACKGROUND.sheet,
               height: sheetHeightFor(entry),
               borderRadius: entry === 'direct' ? 0 : `${ASK_SHEET.radius}px ${ASK_SHEET.radius}px 0 0`,

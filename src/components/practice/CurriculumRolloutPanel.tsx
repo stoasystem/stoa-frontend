@@ -33,6 +33,9 @@ export function CurriculumRolloutPanel({
   const visibleWeakTopics = weakTopicLabels.length > 0
     ? weakTopicLabels
     : progress?.weakTopics.map((topic) => topic.topicId.replace(/-/g, ' ')) ?? []
+  // The backend names where the catalog came from in an internal id
+  // ("practice_backfill"); a source with no label is left out, never shown raw.
+  const sourceLabel = catalog ? t(`curriculumRollout.source.${catalog.source}`, { defaultValue: '' }) : ''
 
   return (
     <section className="space-y-4">
@@ -59,7 +62,7 @@ export function CurriculumRolloutPanel({
                     {t('curriculumRollout.subheading')}
                   </p>
                 </div>
-                <Badge variant="secondary">{catalog.source.replace(/_/g, ' ')}</Badge>
+                {sourceLabel && <Badge variant="secondary">{sourceLabel}</Badge>}
               </div>
 
               <div className="grid gap-3 md:grid-cols-4">
@@ -83,7 +86,7 @@ export function CurriculumRolloutPanel({
                                 t('curriculumRollout.allActiveGrades')}
                             </p>
                           </div>
-                          <Badge variant="outline">{subject.rolloutState}</Badge>
+                          <Badge variant="outline">{t(`curriculumRollout.rolloutState.${subject.rolloutState}`)}</Badge>
                         </div>
                       </div>
                     ))}

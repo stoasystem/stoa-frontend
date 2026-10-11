@@ -66,7 +66,17 @@
     "noWeakAreaEvidence": "Aucun point faible identifié pour l'instant.",
     "lessonBankSample": "Aperçu de la banque de leçons",
     "exerciseCount_one": "{{count}} exercice",
-    "exerciseCount_other": "{{count}} exercices"
+    "exerciseCount_other": "{{count}} exercices",
+    "source": {
+      "practice_backfill": "Depuis la banque d'exercices"
+    },
+    "rolloutState": {
+      "seed": "Base",
+      "draft": "Brouillon",
+      "reviewed": "Vérifié",
+      "active": "Actif",
+      "archived": "Archivé"
+    }
   },
   "dailyGoal": "Objectif du jour",
   "dashboard": {

@@ -1,5 +1,5 @@
 {
-  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), --lit-deep and --atmosphere (glow only).",
+  "$comment": "Foreground/background token pairs rated by scripts/check-contrast.mjs (WCAG 2.1). kind: text >= 4.5, large >= 3 (24px, or 18.66px bold), ui >= 3 (focus rings, borders, icons that carry state). tokens.file is the one token source; tokens.themes maps each theme to the CSS blocks read for it, in order, later blocks overriding earlier ones (a block inside an at-rule is named by its path, e.g. \"@media (prefers-color-scheme: dark) :root\"); two themes may not read the same blocks, and a block no theme reads may not define a token the pairs use. Nested style rules are refused. A translucent bg needs \"over\", the opaque token it sits on; a translucent fg is composited onto the bg. \"gate\": false keeps a pair's reading in the output without failing the run; it needs a \"why\" citing an issue (#n), every theme keeps at least one gated pair, and an exempt pair that meets its threshold fails the run until the exemption is removed. The dark theme is the sky: every dark token lives in the [data-surface=\"sky\"] block and exists only inside an element that carries that attribute (#18). The one exempt pair, --on-sky-text-muted on --sky, is settled: disabled, non-interactive control labels only (#17, #18). The third theme, ask, is the Ask panel and sheet: the sky plus the block that points the light names at sky values (#125). Pairs come from the canvas boards Tokens, Foundations, Placement, Components and Motion and states. Not listed on purpose: --tertiary, --separator and --hairline (dividers and chevrons, decorative, never text), --lit-deep and --atmosphere (glow only).",
   "tokens": {
     "file": "src/styles/brand-tokens.css",
     "themes": {
@@ -9,6 +9,11 @@
       "dark": [
         ":root",
         "[data-surface=\"sky\"]"
+      ],
+      "ask": [
+        ":root",
+        "[data-surface=\"sky\"]",
+        "[data-surface=\"sky\"][data-ask-surface]"
       ]
     }
   },
@@ -553,6 +558,110 @@
       "kind": "ui",
       "use": "star map review pip on a knowledge point drawn as a dot (#109)",
       "why": "The dot is what most knowledge points ever are -- on a map of ten, eight of them -- so each state's ink carries which state the point is in and is rated here, not left as decoration. Over nebula haze it is checked in starmapContrast.test.ts."
+    },
+    {
+      "theme": "ask",
+      "fg": "--ink",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "Ask: titles and answers on the panel"
+    },
+    {
+      "theme": "ask",
+      "fg": "--ink",
+      "bg": "--surface",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: text in a card or bubble on the panel"
+    },
+    {
+      "theme": "ask",
+      "fg": "--ink",
+      "bg": "--sidebar",
+      "kind": "text",
+      "use": "Ask: raised rows"
+    },
+    {
+      "theme": "ask",
+      "fg": "--ink",
+      "bg": "--fill",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: selected row, gray button"
+    },
+    {
+      "theme": "ask",
+      "fg": "--secondary",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "Ask: captions on the panel"
+    },
+    {
+      "theme": "ask",
+      "fg": "--secondary",
+      "bg": "--surface",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: captions in a card"
+    },
+    {
+      "theme": "ask",
+      "fg": "--secondary",
+      "bg": "--sidebar",
+      "kind": "text",
+      "use": "Ask: meta in raised rows"
+    },
+    {
+      "theme": "ask",
+      "fg": "--secondary",
+      "bg": "--fill",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: composer placeholder, inactive segment"
+    },
+    {
+      "theme": "ask",
+      "fg": "--accent",
+      "bg": "--ground",
+      "kind": "text",
+      "use": "Ask: links and plain buttons"
+    },
+    {
+      "theme": "ask",
+      "fg": "--accent",
+      "bg": "--surface",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: plain buttons in a card"
+    },
+    {
+      "theme": "ask",
+      "fg": "--on-accent",
+      "bg": "--accent",
+      "kind": "text",
+      "use": "Ask: send button, the student's own bubble"
+    },
+    {
+      "theme": "ask",
+      "fg": "--on-accent",
+      "bg": "--accent-pressed",
+      "kind": "text",
+      "use": "Ask: send button, hover / press"
+    },
+    {
+      "theme": "ask",
+      "fg": "--pill-neutral",
+      "bg": "--fill",
+      "over": "--ground",
+      "kind": "text",
+      "use": "Ask: neutral pill"
+    },
+    {
+      "theme": "ask",
+      "fg": "--accent",
+      "bg": "--ground",
+      "kind": "ui",
+      "use": "Ask: send button and focus ring on the panel"
     }
   ]
 }
