@@ -81,6 +81,8 @@ type AuthState = {
   accessToken: string | null
   isAuthenticated: boolean
   setAuth: (user: CurrentUser, accessToken: string, refreshToken?: string) => void
+  /** A renewed access token for the session already held, read account or not. */
+  updateAccessToken: (accessToken: string) => void
   setUser: (user: CurrentUser) => void
   clearAuth: () => void
   hydrateFromStorage: () => void
@@ -103,6 +105,18 @@ export const useAuthStore = create<AuthState>((set) => {
         localStorage.setItem(TOKEN_KEY, accessToken)
       }
       set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
+    },
+    updateAccessToken: (accessToken) => {
+      // Where setAuth would have put it, and nothing else: a renewal at start-up
+      // comes before the account is read, so there may be no user to keep yet
+      // (passing a null user to setAuth threw, and the app never got past
+      // "Konto wird geladen…").
+      if (tabToken()) {
+        pinTabToSession(accessToken)
+      } else {
+        localStorage.setItem(TOKEN_KEY, accessToken)
+      }
+      set({ accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })

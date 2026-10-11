@@ -64,6 +64,19 @@ describe('where the refresh token is kept', () => {
 })
 
 describe('exchanging it', () => {
+  it('does not write the rotated token back for a session that ended meanwhile', async () => {
+    rememberRefreshToken('r-1')
+    let answer: (value: Response) => void = () => undefined
+    vi.mocked(fetch).mockReturnValue(new Promise<Response>((resolve) => { answer = resolve }))
+
+    const renewed = refreshAccessToken()
+    forgetRefreshToken()
+    answer(ok({ accessToken: 'a-2', refreshToken: 'r-2' }))
+
+    await expect(renewed).resolves.toBeNull()
+    expect(storedRefreshToken()).toBeNull()
+  })
+
   it('returns the new access token and keeps the one it was handed back', async () => {
     rememberRefreshToken('r-1')
     vi.mocked(fetch).mockResolvedValue(ok({ accessToken: 'a-2', refreshToken: 'r-2' }))
