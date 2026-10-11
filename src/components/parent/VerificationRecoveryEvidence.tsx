@@ -1,6 +1,7 @@
+import type { TFunction } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { formatStatus } from '@/components/parent/accountOperationsView'
+import { getAccountStateLabel } from '@/components/parent/accountOperationsView'
 import type { AccountOperationsChild, AccountOperationsProfile, AccountOperationsVerification } from '@/types/parentAccountOperations'
 
 type VerificationRecoveryEvidenceProps = {
@@ -15,14 +16,15 @@ export function VerificationRecoveryEvidence({
   admin = false,
 }: VerificationRecoveryEvidenceProps) {
   const { t } = useTranslation('parent')
+
   return (
     <Card className="brand-rule">
       <CardHeader>
-        <CardTitle className="text-base">{t('verification.title')}</CardTitle>
+        <CardTitle className="text-base">{t('accountOps.evidence.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <VerificationRow
-          label={t('verification.parent')}
+          label={t('accountOps.evidence.parent')}
           name={parent.name || parent.email}
           email={parent.email}
           verification={parent.verification}
@@ -31,7 +33,7 @@ export function VerificationRecoveryEvidence({
         {children.map((child) => (
           <VerificationRow
             key={child.studentId}
-            label={t('verification.child')}
+            label={t('accountOps.evidence.child')}
             name={child.profile.name || child.profile.email}
             email={child.profile.email}
             verification={child.profile.verification ?? child.verification}
@@ -57,7 +59,8 @@ function VerificationRow({
   admin: boolean
 }) {
   const { t, i18n } = useTranslation('parent')
-  const date = (value?: string | null) => formatDate(value, i18n.language) ?? t('verification.none')
+  const date = (value?: string | null) => formatDate(value, i18n.resolvedLanguage, t)
+
   return (
     <div className="rounded-md border border-border/70 bg-background/80 p-4">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
@@ -67,21 +70,27 @@ function VerificationRow({
           <p className="truncate text-sm text-muted-foreground">{email}</p>
         </div>
         <p className="text-sm font-medium text-foreground">
-          {formatStatus(verification?.supportAction, t)}
+          {getAccountStateLabel(verification?.supportAction, t)}
         </p>
       </div>
       <div className="mt-4 grid gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <EvidenceItem label={t('verification.status')} value={formatStatus(verification?.emailVerificationStatus, t)} />
-        <EvidenceItem label={t('verification.activation')} value={formatStatus(verification?.accountActivationStatus, t)} />
-        <EvidenceItem label={t('verification.recovery')} value={formatStatus(verification?.supportRecoveryState, t)} />
-        <EvidenceItem label={t('verification.resend')} value={verification?.resendAllowed ? t('verification.resendAllowed') : t('verification.resendUnavailable')} />
-        <EvidenceItem label={t('verification.resendCount')} value={String(verification?.emailVerificationResendCount ?? 0)} />
-        <EvidenceItem label={admin ? t('verification.lastResend') : t('verification.updated')} value={date(verification?.emailVerificationLastResendAt ?? verification?.emailVerifiedAt)} />
+        <EvidenceItem label={t('accountOps.evidence.status')} value={getAccountStateLabel(verification?.emailVerificationStatus, t)} />
+        <EvidenceItem label={t('accountOps.evidence.activation')} value={getAccountStateLabel(verification?.accountActivationStatus, t)} />
+        <EvidenceItem label={t('accountOps.evidence.recovery')} value={getAccountStateLabel(verification?.supportRecoveryState, t)} />
+        <EvidenceItem
+          label={t('accountOps.evidence.resend')}
+          value={t(verification?.resendAllowed ? 'accountOps.evidence.resendAllowed' : 'accountOps.evidence.resendNotAvailable')}
+        />
+        <EvidenceItem label={t('accountOps.evidence.resendCount')} value={String(verification?.emailVerificationResendCount ?? 0)} />
+        <EvidenceItem
+          label={t(admin ? 'accountOps.evidence.lastResend' : 'accountOps.evidence.updated')}
+          value={date(verification?.emailVerificationLastResendAt ?? verification?.emailVerifiedAt)}
+        />
       </div>
       {admin && (
         <div className="mt-3 grid gap-3 md:grid-cols-2">
-          <EvidenceItem label={t('verification.policy')} value={formatStatus(verification?.emailVerificationPolicy, t)} />
-          <EvidenceItem label={t('verification.requested')} value={date(verification?.emailVerificationRequestedAt)} />
+          <EvidenceItem label={t('accountOps.evidence.policy')} value={getAccountStateLabel(verification?.emailVerificationPolicy, t)} />
+          <EvidenceItem label={t('accountOps.evidence.requested')} value={date(verification?.emailVerificationRequestedAt)} />
         </div>
       )}
     </div>
@@ -97,10 +106,11 @@ function EvidenceItem({ label, value }: { label: string; value: string }) {
   )
 }
 
-/** A time in the reader's language; null when there is none. */
-function formatDate(value: string | null | undefined, language: string) {
-  if (!value) return null
+// The dates were drawn with a hard-coded 'en' formatter, so a German page read
+// "Oct 9, 09:12" beside German labels.
+function formatDate(value: string | null | undefined, locale: string | undefined, t: TFunction) {
+  if (!value) return t('accountOps.evidence.noDate')
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat(language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
+  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
 }

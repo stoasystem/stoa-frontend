@@ -103,9 +103,26 @@ export async function consumeTeacherInvitation(invitationToken: string) {
   return response.data
 }
 
+/**
+ * The identifier the queue read is authorized against.
+ *
+ * `GET /teacher-applications` shares its reviewer dependency with the
+ * per-application reads, so it declares `application_id` as a required query
+ * parameter even though the queue is selected by `review_state` alone. Sending
+ * the detail shape without it answered 422, and the console printed the
+ * server's field complaint as if it were a sentence for the reviewer.
+ */
+export const TEACHER_APPLICATION_QUEUE_ID = '*'
+
+export const TEACHER_APPLICATION_QUEUE_PAGE_SIZE = 50
+
 export async function listTeacherApplications(reviewState: TeacherReviewState = 'pending_review') {
   const response = await httpClient.get<TeacherApplicationListResponse>('/teacher-applications', {
-    params: { review_state: reviewState, limit: 50 },
+    params: {
+      review_state: reviewState,
+      limit: TEACHER_APPLICATION_QUEUE_PAGE_SIZE,
+      application_id: TEACHER_APPLICATION_QUEUE_ID,
+    },
   })
   return response.data
 }

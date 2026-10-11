@@ -46,18 +46,17 @@
     "updateFailed": "Impossibile aggiornare lo stato.",
     "replyTitle": "Risposta dell’insegnante",
     "replyDescription": "Registra l’intervento, il passo successivo o il follow-up di cui lo studente ha bisogno.",
-    "card": {
-      "requestSummary": "Riepilogo della richiesta",
-      "report": "Segnala contenuto",
-      "reportStudent": "Segnala il contenuto dell’allievo",
-      "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
-      "roles": {
-        "student": "Allievo/a",
-        "assistant": "Spiegazione dell’assistente di apprendimento",
-        "teacher": "Docente",
-        "system": "Sistema"
-      }
-    }
+    "requestSummary": "La richiesta",
+    "roles": {
+      "student": "Studente",
+      "assistant": "Spiegazione dell’assistente di apprendimento",
+      "teacher": "Insegnante",
+      "system": "Sistema"
+    },
+    "reportContent": "Segnala il contenuto",
+    "reportStudentContent": "Segnala il messaggio dello studente",
+    "reportContext": "Invia il contesto di questa richiesta alla moderazione interna.",
+    "noNotes": "Ancora nessuna nota dell’insegnante."
   },
   "profile": {
     "eyebrow": "Account insegnante",
@@ -103,14 +102,34 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorità: {{priority}}",
     "sla": {
-      "at_risk": "Scadenza a rischio",
-      "breached": "In ritardo"
+      "within_target": "Nei tempi",
+      "at_risk": "A rischio",
+      "breached": "In ritardo",
+      "unknown": "Nessun tempo di risposta registrato",
+      "elapsed": "{{elapsed}} su {{target}}",
+      "target": "Obiettivo {{target}}"
     },
     "more": "Altro",
     "learningAutomation": "Automazione dell’apprendimento",
     "learningAutomationDescription": "Visualizzare ed eseguire le assegnazioni automatiche di esercizi per i tuoi studenti",
     "firstAction": "Prima azione del docente: {{time}}",
     "firstActionNone": "Prima azione del docente: non ancora registrata"
+  },
+  "assistance": {
+    "title": "Sintesi per la preparazione",
+    "description": "Una sintesi limitata per la preparazione della lezione, non una generazione automatica di esercizi.",
+    "sources_one": "{{count}} fonte",
+    "sources_other": "{{count}} fonti",
+    "loading": "Preparazione della sintesi ...",
+    "error": "Per questa richiesta non è disponibile alcuna sintesi.",
+    "empty": "Non è ancora disponibile alcuna sintesi.",
+    "studentContext": "Contesto dello studente",
+    "suggestedFocus": "Punto su cui concentrarsi",
+    "question": "Domanda",
+    "assistantAnswer": "Risposta dell’assistente di apprendimento",
+    "noQuestion": "Nessun testo della domanda disponibile.",
+    "noAnswer": "Nessuna risposta dell’assistente disponibile.",
+    "noWeakTopics": "Nessun indizio di argomenti deboli"
   },
   "aiTools": {
     "title": "Strumenti IA per docenti",
@@ -178,16 +197,6 @@
       "privateMarkers": "Gli identificativi interni non possono essere inviati in una risposta."
     }
   },
-  "slaBadge": {
-    "elapsed": "{{minutes}} / {{target}} min",
-    "target": "Obiettivo {{target}} min",
-    "status": {
-      "within_target": "Nei tempi",
-      "at_risk": "Scadenza a rischio",
-      "breached": "In ritardo",
-      "unknown": "Scadenza sconosciuta"
-    }
-  },
   "practiceContext": {
     "source": "Fonte: {{source}}",
     "library": "Biblioteca di esercizi",
@@ -202,21 +211,5 @@
     "no": "No",
     "question": "Domanda",
     "help": "Il contesto di apprendimento vi mostra dove l’allievo si è bloccato prima che prendiate la richiesta."
-  },
-  "assistance": {
-    "title": "Preparazione per il/la docente",
-    "description": "Un breve riepilogo per prepararsi, non esercizi generati automaticamente.",
-    "sources_one": "{{count}} fonte",
-    "sources_other": "{{count}} fonti",
-    "loading": "Preparazione del riepilogo…",
-    "failed": "Nessun riepilogo disponibile per questa richiesta.",
-    "empty": "Nessun riepilogo ancora.",
-    "context": "Contesto dell’allievo",
-    "focus": "Punto suggerito",
-    "question": "Domanda",
-    "noQuestion": "Nessun testo della domanda disponibile.",
-    "answer": "Risposta dell’assistente",
-    "noAnswer": "Nessuna risposta dell’assistente disponibile.",
-    "noWeakTopics": "Nessun indizio di argomenti deboli"
   }
 }

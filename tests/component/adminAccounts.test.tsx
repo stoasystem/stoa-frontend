@@ -320,9 +320,53 @@ describe('card 014: a dead button explains itself', () => {
     const button = screen.getByText('accounts.invite').closest('button')
     expect(button?.hasAttribute('disabled')).toBe(true)
     // The tooltip is the floor, not the ceiling: the same sentence stays on
-    // screen, because a disabled control swallows hover in most browsers.
+    // screen, because a disabled control swallows hover in most browsers --
+    // but only once the administrator has touched the form (card 124).
     expect(button?.getAttribute('title')).toContain('accounts.fieldIssues.email_required')
+
+    await userEvent.click(screen.getByLabelText('accounts.emailLabel'))
+    await userEvent.tab()
+
     expect(screen.getAllByText(/accounts\.fieldIssues\.email_required/).length).toBeGreaterThan(0)
+    expect(button?.getAttribute('aria-describedby')).toBe('invite-blocked')
+  })
+
+  // Card 124: on production the card opened reading "Not ready to send: Enter
+  // an email address." under a form nobody had touched yet, which tells an
+  // administrator who has done nothing that they already did it wrong.
+  it('opens quiet: nothing on the new-account form refuses before it is touched', async () => {
+    const { container } = render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    // Every refusal this form can print, not one of them: a check against
+    // `email_required` alone would pass while the form shouted about the role.
+    const everyIssue = Object.keys(enAdmin.accounts.fieldIssues)
+    expect(everyIssue.length).toBeGreaterThan(0)
+    for (const issue of everyIssue) {
+      expect(container.textContent).not.toContain(`accounts.fieldIssues.${issue}`)
+    }
+    expect(container.textContent).not.toContain('accounts.blockedPrefix')
+    expect(screen.getByText('accounts.invite').closest('button')?.hasAttribute('aria-describedby'))
+      .toBe(false)
+  })
+
+  it('opens the assign dialog quiet too', async () => {
+    render(<AdminAccountsPage />, { wrapper: wrapper('/admin/users') })
+    await waitFor(() => expect(screen.getByText('Parent A')).toBeTruthy())
+
+    await userEvent.click(screen.getByText('accounts.assign'))
+    const dialog = await screen.findByRole('dialog')
+
+    for (const issue of Object.keys(enAdmin.accounts.fieldIssues)) {
+      expect(dialog.textContent).not.toContain(`accounts.fieldIssues.${issue}`)
+    }
+    expect(dialog.textContent).not.toContain('accounts.blockedPrefix')
+
+    await userEvent.click(within(dialog).getByLabelText('accounts.emailLabel'))
+    await userEvent.tab()
+
+    expect(within(dialog).getAllByText(/accounts\.fieldIssues\.email_required/).length)
+      .toBeGreaterThan(0)
   })
 
   it('says an address without an @ is not an address, while it is being typed', async () => {

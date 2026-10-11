@@ -15,7 +15,6 @@ import {
 } from '@/hooks/learning/useLearningOperationsQueries'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import { ApiError } from '@/services/api/httpClient'
 
 function MetricTile({ label, value, detail }: { label: string, value: number | string, detail?: string }) {
   return (
@@ -61,8 +60,10 @@ export function LearningOperationsDashboardPage() {
 
   const analytics = analyticsQuery.data
   const readiness = readinessQuery.data
-  const exportSummary = exportQuery.data
-  const exportRefused = exportQuery.error instanceof ApiError && exportQuery.error.status === 403
+  // Two different answers share this panel: a summary, and "your account may
+  // read the analytics but not export them". Neither is an empty panel.
+  const exportDenied = exportQuery.data?.permissionDenied === true
+  const exportSummary = exportQuery.data?.summary
 
   const summaryTiles = useMemo(() => [
     {
@@ -222,9 +223,7 @@ export function LearningOperationsDashboardPage() {
                 <>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <InlineMetric label="State" value={readiness.state} />
-                    {/* A setting of the system, not of this account: the export itself
-                        also needs the exporter capability (see the summary below). */}
-                    <InlineMetric label="Export enabled (system)" value={readiness.exportAllowed ? 'Yes' : 'No'} />
+                    <InlineMetric label="Export allowed" value={readiness.exportAllowed ? 'Yes' : 'No'} />
                     <InlineMetric label="Live warehouse" value={readiness.liveWarehouseConfigured ? 'Configured' : 'Not configured'} />
                   </div>
                   {readiness.liveWarehouseConfigured === false && (
@@ -246,13 +245,13 @@ export function LearningOperationsDashboardPage() {
             </CardHeader>
             <CardContent className="space-y-3">
               {exportQuery.isLoading && <LoadingState message="Loading warehouse export summary..." />}
-              {exportRefused && (
+              {exportQuery.error && <ErrorState title="Warehouse export failed" message={exportQuery.error.message} />}
+              {exportDenied && (
                 <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                  This account does not hold the export permission (curriculum_analytics_exporter), so the export summary is not shown.
+                  This account may read the curriculum analytics but not export the warehouse. Exporting is a
+                  separate grant, curriculum_analytics_exporter; ask an administrator who manages capabilities
+                  for it.
                 </p>
-              )}
-              {exportQuery.error && !exportRefused && (
-                <ErrorState title="Warehouse export failed" message={exportQuery.error.message} />
               )}
               {exportSummary && (
                 <div className="grid gap-3 sm:grid-cols-3">

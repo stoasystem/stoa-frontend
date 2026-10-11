@@ -46,18 +46,17 @@
     "updateFailed": "Status konnte nicht aktualisiert werden.",
     "replyTitle": "Antwort der Lehrperson",
     "replyDescription": "Halten Sie die Massnahme, den nächsten Schritt oder die Nachbetreuung fest, die die Lernenden brauchen.",
-    "card": {
-      "requestSummary": "Zusammenfassung der Anfrage",
-      "report": "Inhalt melden",
-      "reportStudent": "Inhalt der Lernenden melden",
-      "reportContext": "Den Kontext dieser Anfrage an die interne Moderation senden.",
-      "roles": {
-        "student": "Lernende",
-        "assistant": "Erklärung des Lernassistenten",
-        "teacher": "Lehrperson",
-        "system": "System"
-      }
-    }
+    "requestSummary": "Die Anfrage",
+    "roles": {
+      "student": "Lernende Person",
+      "assistant": "Erklärung des Lernassistenten",
+      "teacher": "Lehrperson",
+      "system": "System"
+    },
+    "reportContent": "Inhalt melden",
+    "reportStudentContent": "Beitrag der lernenden Person melden",
+    "reportContext": "Diesen Anfragekontext an die interne Moderation senden.",
+    "noNotes": "Noch keine Notizen der Lehrperson."
   },
   "profile": {
     "eyebrow": "Lehrpersonen-Konto",
@@ -103,14 +102,34 @@
     "row": "{{subject}} · {{grade}}",
     "priority": "Priorität: {{priority}}",
     "sla": {
-      "at_risk": "Frist gefährdet",
-      "breached": "Überfällig"
+      "within_target": "Im Zeitrahmen",
+      "at_risk": "Gefährdet",
+      "breached": "Überfällig",
+      "unknown": "Keine Reaktionszeit erfasst",
+      "elapsed": "{{elapsed}} von {{target}}",
+      "target": "Ziel {{target}}"
     },
     "more": "Mehr",
     "learningAutomation": "Lernautomatisierung",
     "learningAutomationDescription": "Automatische Übungszuweisungen für Ihre Schülerinnen und Schüler prüfen und ausführen",
     "firstAction": "Erste Aktion der Lehrperson: {{time}}",
     "firstActionNone": "Erste Aktion der Lehrperson: noch nicht erfasst"
+  },
+  "assistance": {
+    "title": "Zusammenfassung zur Vorbereitung",
+    "description": "Eine begrenzte Zusammenfassung zur Vorbereitung, keine automatische Aufgabenerstellung.",
+    "sources_one": "{{count}} Quelle",
+    "sources_other": "{{count}} Quellen",
+    "loading": "Zusammenfassung wird vorbereitet ...",
+    "error": "Für diese Anfrage ist keine Zusammenfassung verfügbar.",
+    "empty": "Es liegt noch keine Zusammenfassung vor.",
+    "studentContext": "Kontext der lernenden Person",
+    "suggestedFocus": "Empfohlener Schwerpunkt",
+    "question": "Frage",
+    "assistantAnswer": "Antwort des Lernassistenten",
+    "noQuestion": "Kein Fragetext verfügbar.",
+    "noAnswer": "Keine Antwort des Lernassistenten verfügbar.",
+    "noWeakTopics": "Keine Hinweise auf schwache Themen"
   },
   "aiTools": {
     "title": "KI-Werkzeuge für Lehrpersonen",
@@ -178,16 +197,6 @@
       "privateMarkers": "Interne Kennungen dürfen nicht in einer Antwort gesendet werden."
     }
   },
-  "slaBadge": {
-    "elapsed": "{{minutes}} / {{target}} Min.",
-    "target": "Ziel {{target}} Min.",
-    "status": {
-      "within_target": "Im Zeitrahmen",
-      "at_risk": "Frist gefährdet",
-      "breached": "Überfällig",
-      "unknown": "Frist unbekannt"
-    }
-  },
   "practiceContext": {
     "source": "Quelle: {{source}}",
     "library": "Übungsbibliothek",
@@ -202,21 +211,5 @@
     "no": "Nein",
     "question": "Frage",
     "help": "Der Lernkontext zeigt Ihnen, wo die Lernenden hängen geblieben sind, bevor Sie die Anfrage übernehmen."
-  },
-  "assistance": {
-    "title": "Vorbereitung für die Lehrperson",
-    "description": "Eine knappe Zusammenfassung zur Vorbereitung, keine automatisch erstellten Übungen.",
-    "sources_one": "{{count}} Quelle",
-    "sources_other": "{{count}} Quellen",
-    "loading": "Zusammenfassung wird vorbereitet …",
-    "failed": "Für diese Anfrage ist keine Zusammenfassung verfügbar.",
-    "empty": "Noch keine Zusammenfassung verfügbar.",
-    "context": "Kontext der Lernenden",
-    "focus": "Vorgeschlagener Schwerpunkt",
-    "question": "Frage",
-    "noQuestion": "Kein Fragetext verfügbar.",
-    "answer": "Antwort des Assistenten",
-    "noAnswer": "Keine Antwort des Assistenten verfügbar.",
-    "noWeakTopics": "Keine Hinweise auf schwache Themen"
   }
 }
