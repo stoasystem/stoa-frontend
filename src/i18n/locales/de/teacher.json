@@ -264,7 +264,14 @@
       "off": "Aus"
     },
     "status": {
+      "reviewed_source": "Geprüfte Quelle",
+      "recommendation_review_required": "Empfehlung zu prüfen",
+      "draft": "Entwurf",
+      "recommended": "Empfohlen",
       "assigned": "Zugewiesen",
+      "started": "Begonnen",
+      "completed": "Abgeschlossen",
+      "archived": "Archiviert",
       "delivered": "Zugestellt",
       "created": "Erstellt",
       "duplicate": "Doppelt",

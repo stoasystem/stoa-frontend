@@ -264,7 +264,14 @@
       "off": "Disattivata"
     },
     "status": {
+      "reviewed_source": "Fonte verificata",
+      "recommendation_review_required": "Raccomandazione da verificare",
+      "draft": "Bozza",
+      "recommended": "Consigliato",
       "assigned": "Assegnato",
+      "started": "Iniziato",
+      "completed": "Completato",
+      "archived": "Archiviato",
       "delivered": "Consegnato",
       "created": "Creato",
       "duplicate": "Doppione",

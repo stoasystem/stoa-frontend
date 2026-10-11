@@ -264,7 +264,14 @@
       "off": "Off"
     },
     "status": {
+      "reviewed_source": "Reviewed source",
+      "recommendation_review_required": "Recommendation needs review",
+      "draft": "Draft",
+      "recommended": "Recommended",
       "assigned": "Assigned",
+      "started": "Started",
+      "completed": "Completed",
+      "archived": "Archived",
       "delivered": "Delivered",
       "created": "Created",
       "duplicate": "Duplicate",

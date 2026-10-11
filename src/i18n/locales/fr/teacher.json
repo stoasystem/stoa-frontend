@@ -264,7 +264,14 @@
       "off": "Désactivée"
     },
     "status": {
+      "reviewed_source": "Source vérifiée",
+      "recommendation_review_required": "Recommandation à vérifier",
+      "draft": "Brouillon",
+      "recommended": "Recommandé",
       "assigned": "Attribué",
+      "started": "Commencé",
+      "completed": "Terminé",
+      "archived": "Archivé",
       "delivered": "Remis",
       "created": "Créé",
       "duplicate": "Doublon",
