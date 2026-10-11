@@ -16,6 +16,9 @@ import { AppRoutes } from '@/app/router/AppRoutes'
 import i18n from '@/i18n'
 import { type CurrentUser, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
+import { useWarehouseExportSummaryQuery } from '@/hooks/learning/useLearningOperationsQueries'
+import { renderHook, waitFor } from '@testing-library/react'
+import type { ReactNode } from 'react'
 
 let exportReads = 0
 
@@ -80,5 +83,37 @@ describe('an export the account may not read', () => {
     expect(await screen.findByText('Export enabled (system)')).toBeInTheDocument()
     expect(screen.queryByText('Export allowed')).toBeNull()
     expect(exportReads).toBe(1)
+  })
+})
+
+describe('how often a failed export is asked again', () => {
+  // The application asks a failed read once more (queryClient.ts). Leaving out
+  // a 403 must not widen that: a 500 was asked four times instead of two.
+  function readExport(status: number) {
+    let reads = 0
+    mswServer.use(
+      http.get('https://api.test/admin/curriculum/analytics/warehouse-export', () => {
+        reads += 1
+        return HttpResponse.json({ detail: 'no' }, { status })
+      }),
+    )
+    const client = new QueryClient({ defaultOptions: { queries: { retryDelay: 0 } } })
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <QueryClientProvider client={client}>{children}</QueryClientProvider>
+    )
+    const hook = renderHook(() => useWarehouseExportSummaryQuery(), { wrapper })
+    return { hook, reads: () => reads }
+  }
+
+  it('asks a server failure once more, as every other read does', async () => {
+    const { hook, reads } = readExport(500)
+    await waitFor(() => expect(hook.result.current.isError).toBe(true))
+    expect(reads()).toBe(2)
+  })
+
+  it('does not ask again when the account may not export', async () => {
+    const { hook, reads } = readExport(403)
+    await waitFor(() => expect(hook.result.current.isError).toBe(true))
+    expect(reads()).toBe(1)
   })
 })

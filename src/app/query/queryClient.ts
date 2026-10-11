@@ -24,11 +24,14 @@ const mutationCache: MutationCache = new MutationCache({
   },
 })
 
+/** How many times a failed read is asked again, unless a query says otherwise. */
+export const APP_QUERY_RETRIES = 1
+
 export const queryClient = new QueryClient({
   mutationCache,
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: APP_QUERY_RETRIES,
       refetchOnWindowFocus: false,
       staleTime: 1000 * 60,
     },

@@ -19,7 +19,14 @@
       "end": "Ende",
       "addSlot": "Zeitfenster hinzufügen",
       "save": "Verfügbarkeit speichern",
-      "saving": "Wird gespeichert …"
+      "saving": "Wird gespeichert …",
+      "subjectNames": {
+        "Mathematics": "Mathematik",
+        "Physics": "Physik",
+        "Chemistry": "Chemie",
+        "English": "Englisch",
+        "Biology": "Biologie"
+      }
     },
     "summary": {
       "title": "Aktuelle Verfügbarkeit",

@@ -11,6 +11,7 @@ import {
   type AutomationExecuteRequest,
   type AutomationPreviewRequest,
 } from '@/services/learning/learningOperationsApi'
+import { APP_QUERY_RETRIES } from '@/app/query/queryClient'
 import { ApiError } from '@/services/api/httpClient'
 
 export const learningOperationsQueryKeys = {
@@ -72,8 +73,10 @@ export function useWarehouseExportSummaryQuery(contentType?: string) {
     queryFn: () => getWarehouseExportSummary(contentType),
     // The export needs the `curriculum_analytics_exporter` capability; an
     // account without it is refused with 403 every time, so asking again
-    // only repeats the refusal (it was asked four times, app-planet 2026-10-10).
-    retry: (failures, error) => !(error instanceof ApiError && error.status === 403) && failures < 3,
+    // only repeats the refusal. Every other failure keeps the application's
+    // one retry (queryClient.ts), which a 403-only rule here must not widen.
+    retry: (failures, error) =>
+      !(error instanceof ApiError && error.status === 403) && failures < APP_QUERY_RETRIES,
   })
 }
 

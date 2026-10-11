@@ -19,7 +19,14 @@
       "end": "Fine",
       "addSlot": "Aggiungi fascia",
       "save": "Salva disponibilità",
-      "saving": "Salvataggio…"
+      "saving": "Salvataggio…",
+      "subjectNames": {
+        "Mathematics": "Matematica",
+        "Physics": "Fisica",
+        "Chemistry": "Chimica",
+        "English": "Inglese",
+        "Biology": "Biologia"
+      }
     },
     "summary": {
       "title": "Disponibilità attuale",
