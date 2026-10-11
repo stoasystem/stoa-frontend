@@ -12,7 +12,8 @@
 import { describe, expect, it, vi } from 'vitest'
 import { StarMapEngine } from '@/features/starmap/engine/starMapEngine'
 import type { StarMap } from '@/features/starmap/model/starMap'
-import { ZOOM } from '@/features/starmap/view/semanticZoom'
+import { starLinkSize, type LayerTarget } from '@/features/starmap/view/layers'
+import { REVEAL, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { recordingRenderer, fakeClock, THEME } from './starmapHarness'
 
 const BANDS = { top: 120, bottom: 90 }
@@ -57,7 +58,7 @@ function sparseSky(): StarMap {
   }
 }
 
-function engineOn(width: number, height: number) {
+function engineOn(width: number, height: number, onRequestTarget: (target: LayerTarget) => void = vi.fn()) {
   const clock = fakeClock()
   const engine = new StarMapEngine({
     renderer: recordingRenderer(),
@@ -66,7 +67,7 @@ function engineOn(width: number, height: number) {
     scheduler: clock,
     now: clock.now,
     galaxy: true,
-    onRequestTarget: vi.fn(),
+    onRequestTarget,
   })
   engine.setViewport(width, height, 1, BANDS)
   engine.setData(sparseSky(), { layer: 'map' })
@@ -230,5 +231,220 @@ describe('what happens when a star is pressed', () => {
     engine.pointerCancel(1)
 
     expect(engine.pressedStarIndex).toBe(-1)
+  })
+})
+
+/**
+ * Card 125, measured on production 2026-10-11 signed in as `student@` at
+ * 1440x900, clicking each star's own box in the parallel DOM:
+ *
+ *   Understanding and reducing fractions  ->  /map/math/brueche
+ *   Calculating with fractions            ->  /map/math/brueche/brueche-u2
+ *   Solving simple equations              ->  /map/math/gleichungen
+ *   Equations from word problems          ->  /map/math/gleichungen
+ *   Area and perimeter                    ->  /map/math/geometrie
+ *
+ * Eight of ten opened the nebula the star is in. The one that opened itself,
+ * `brueche-u2`, is the recommended star -- the one case `beaconAt` let
+ * through whatever the zoom. The map moved and no card opened, which is what
+ * "I clicked the planet and nothing happened" was.
+ *
+ * `/` opens at the farthest zoom (`atMin`), so this is the zoom nearly every
+ * reader is at, and `zoom.pickable` is false there however large the glyph:
+ * it also asks for the zoom to be past the panorama.
+ */
+describe('a tap on a star picks that star, not its nebula (card 125)', () => {
+  const tap = (engine: StarMapEngine, x: number, y: number) => {
+    engine.pointerDown(1, x, y)
+    engine.pointerUp(1, x, y)
+  }
+
+  /** The three stars production was read on, by the route each one went to. */
+  const WENT_TO_THE_NEBULA = ['brueche-u1', 'gleichungen-u1', 'geometrie-u1'] as const
+
+  it.each(WENT_TO_THE_NEBULA)('%s opens itself', (unitId) => {
+    const asked: LayerTarget[] = []
+    const { engine } = engineOn(1440, 900, (target) => asked.push(target))
+    expect(engine.zoom.pickable, 'the zoom this is about is the one stars are not pickable at').toBe(false)
+
+    const at = engine.starOnScreen(unitId)
+    expect(at, `${unitId} is not on screen`).not.toBeNull()
+    tap(engine, at!.x, at!.y)
+
+    expect(asked).toEqual([{ layer: 'star', nebulaId: unitId.split('-')[0], unitId }])
+  })
+
+  it('and the pointer says so before the click: a hand over the star', () => {
+    const { engine } = engineOn(1440, 900)
+    const at = engine.starOnScreen('gleichungen-u1')!
+
+    expect(engine.cursorAt(at.x, at.y)).toBe('pointer')
+  })
+
+  /**
+   * The anti-control for the one above. A tap that is not on a star has to
+   * keep flying to the nebula, or "pick the star" would just mean "pick
+   * whichever star is nearest", and the nebula layer would be unreachable.
+   */
+  it('a tap on empty cloud still opens the nebula', () => {
+    const asked: LayerTarget[] = []
+    const { engine } = engineOn(1440, 900, (target) => asked.push(target))
+    const at = engine.starOnScreen('brueche-u1')!
+    const away = starLinkSize(engine.glyphSize) / 2 + 4
+
+    tap(engine, at.x + away, at.y)
+
+    expect(asked).toEqual([{ layer: 'nebula', nebulaId: 'brueche' }])
+  })
+
+  /**
+   * The second anti-control, and the reason the reach is the drawn box rather
+   * than something generous: a tap has to be clearly on one star. Between two
+   * stars nearer each other than their boxes, it is on both, and the tap
+   * belongs to the nebula -- which is what the zoom gate used to guarantee
+   * for the panorama's dots, and still holds without it. A phone shows the
+   * same ten stars in a third of the width, which brings a pair close enough.
+   */
+  it('a tap between two stars that share a box opens the nebula', () => {
+    const asked: LayerTarget[] = []
+    const { engine } = engineOn(390, 844, (target) => asked.push(target))
+    const a = engine.starOnScreen('brueche-u1')!
+    const b = engine.starOnScreen('brueche-u2')!
+    const reach = starLinkSize(engine.glyphSize) / 2
+    expect(Math.hypot(a.x - b.x, a.y - b.y), 'the pair is not close enough to be ambiguous').toBeLessThan(reach * 2)
+
+    tap(engine, (a.x + b.x) / 2, (a.y + b.y) / 2)
+
+    expect(asked).toEqual([{ layer: 'nebula', nebulaId: 'brueche' }])
+  })
+
+  /**
+   * ...and the control on that control: the same pair on a wide screen is far
+   * enough apart that a tap near one of them is on one star only, so the rule
+   * above is a rule about crowding and not a rule that two stars in a nebula
+   * can never be picked.
+   */
+  it('on a wide screen the same pair is not ambiguous: a tap near one picks it', () => {
+    const asked: LayerTarget[] = []
+    const { engine } = engineOn(1440, 900, (target) => asked.push(target))
+    const a = engine.starOnScreen('brueche-u1')!
+    const b = engine.starOnScreen('brueche-u2')!
+    const reach = starLinkSize(engine.glyphSize) / 2
+    expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(reach * 2)
+
+    tap(engine, a.x + (b.x - a.x) * 0.15, a.y + (b.y - a.y) * 0.15)
+
+    expect(asked).toEqual([{ layer: 'star', nebulaId: 'brueche', unitId: 'brueche-u1' }])
+  })
+})
+
+/**
+ * ...and for a name to be clickable it first has to be on screen. Measured on
+ * production 2026-10-11: not one of mathematics' five nebula names was ever
+ * drawn, at any zoom, hovered or not. A nebula is named by its disc's radius
+ * only past the panorama (`nebulaNameAlpha`), and `priorityNameAlpha` hands
+ * the nebula names to the star names by `starPx` -- and this map's farthest
+ * zoom already draws glyphs past `REVEAL.nebulaNameOut`, so the two windows
+ * never overlapped.
+ */
+describe('a cloud under the pointer says its name (card 125)', () => {
+  type NameFrame = { priorityNameAlpha?: number; nebulaNames?: ArrayLike<number> }
+  const frameNow = (engine: StarMapEngine): NameFrame => {
+    const { frames } = (engine as unknown as { renderer: { frames: NameFrame[] } }).renderer
+    return frames[frames.length - 1]
+  }
+
+  it('the precondition this is about: at the panorama the star names have already taken over', () => {
+    const { engine } = engineOn(1440, 900)
+
+    expect(engine.zoom.atMin, 'the map opens at the farthest zoom').toBe(true)
+    expect(engine.zoom.starPx, 'a sparse map draws big glyphs even here').toBeGreaterThanOrEqual(REVEAL.nebulaNameOut[1])
+  })
+
+  it('and no nebula names itself there by its own size', () => {
+    const { engine } = engineOn(1440, 900)
+    const names = frameNow(engine).nebulaNames!
+
+    expect([...Array(names.length).keys()].map((i) => names[i]).every((alpha) => alpha === 0)).toBe(true)
+  })
+
+  it('so the one under the pointer is named instead, at full strength', () => {
+    const { engine, clock } = engineOn(1440, 900)
+    const at = engine.starOnScreen('brueche-u1')!
+
+    engine.hoverAt(at.x, at.y)
+    clock.advance(40)
+
+    expect(frameNow(engine).priorityNameAlpha).toBe(1)
+  })
+
+  /**
+   * The anti-control: this is a panorama rule, not "name whatever is hovered,
+   * always". Once the zoom is past the panorama the clouds name themselves by
+   * size again and the star names take the rest, so the priority hands back.
+   */
+  it('zoomed in past the panorama it hands back to the star names', () => {
+    const { engine, clock } = engineOn(1440, 900)
+    const at = engine.starOnScreen('brueche-u1')!
+    engine.hoverAt(at.x, at.y)
+    for (let i = 0; i < 6; i += 1) {
+      engine.zoomBy(ZOOM.buttonStep, 1440 / 2, 900 / 2)
+      clock.advance(400)
+    }
+    clock.advance(1000)
+
+    expect(engine.zoom.atMin).toBe(false)
+    expect(frameNow(engine).priorityNameAlpha).toBe(0)
+  })
+})
+
+/**
+ * ...and the name has to still be there when the pointer arrives at it.
+ *
+ * A nebula's name is printed out at the cloud's rim, well past every star in
+ * it, and on one sky a nebula was known to the pointer only by a star within
+ * 28 px of it. So a student who read "FRACTIONS", moved towards it and
+ * clicked found nothing: the name had faded on the way. Verified in a browser
+ * on this branch, 2026-10-11: before this, a continuous glide from the star
+ * to the printed name ended on `cursor: auto` and the click went nowhere.
+ */
+describe('a cloud keeps its name while the pointer crosses it (card 125)', () => {
+  const hovered = (engine: StarMapEngine) => {
+    const { frames } = (engine as unknown as { renderer: { frames: { hoveredNebula?: number }[] } }).renderer
+    return frames[frames.length - 1].hoveredNebula
+  }
+
+  /** A point inside the fractions cloud, past every star in it -- where its name is printed. */
+  function outInTheCloud(engine: StarMapEngine) {
+    const discs = (engine as unknown as { nebulaX: Float32Array; nebulaY: Float32Array; nebulaR: Float32Array; nebulaIds: string[] })
+    const n = discs.nebulaIds.indexOf('brueche')
+    return { x: discs.nebulaX[n], y: discs.nebulaY[n] + discs.nebulaR[n] * 0.9, index: n }
+  }
+
+  it('the pointer out at the rim, far from every star, still names the cloud', () => {
+    const { engine, clock } = engineOn(1440, 900)
+    const spot = outInTheCloud(engine)
+    const stars = ['brueche-u1', 'brueche-u2'].map((id) => engine.starOnScreen(id)!)
+    const nearest = Math.min(...stars.map((s) => Math.hypot(s.x - spot.x, s.y - spot.y)))
+    expect(nearest, 'the spot is not past the 28 px a star reaches').toBeGreaterThan(28)
+
+    engine.hoverAt(spot.x, spot.y)
+    clock.advance(40)
+
+    expect(hovered(engine)).toBe(spot.index)
+  })
+
+  /** The anti-control: outside every cloud it is nobody's name, and nothing is highlighted. */
+  it('the pointer out in the dark names nothing', () => {
+    const { engine, clock } = engineOn(1440, 900)
+    const spot = outInTheCloud(engine)
+
+    engine.hoverAt(spot.x, spot.y)
+    clock.advance(40)
+    expect(hovered(engine)).toBe(spot.index)
+
+    engine.hoverAt(4, 4)
+    clock.advance(40)
+    expect(hovered(engine)).toBe(-1)
   })
 })

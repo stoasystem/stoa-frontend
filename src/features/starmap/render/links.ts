@@ -56,7 +56,7 @@ import type { LinkInk, SceneData, SceneFrame, StarMapTheme } from '@/features/st
 export const LINK_INK: LinkInk = {
   recommended: 'rgba(242, 197, 114, 0.95)',
   inProgress: 'rgba(255, 255, 255, 0.62)',
-  walked: 'rgba(255, 255, 255, 0.28)',
+  walked: 'rgba(242, 197, 114, 0.36)',
   locked: 'rgba(255, 255, 255, 0.32)',
   bridge: 'rgba(170, 190, 255, 0.12)',
 }
@@ -667,8 +667,14 @@ export function drawLinks(
             ctx.stroke()
           }
           seen = true
-          // Names keep clear of what carries the message now; the faint path walked may run under them.
-          if (strength >= 0.5 && (line.tier <= 2 || reach > 0)) obstacles.segments.push({ x0, y0, x1, y1 })
+          // Names keep clear of what carries the message now; the faint path
+          // walked may run under them. The locked web is the exception (#125):
+          // far out it is the whole picture, and a name struck through by one
+          // of its dashes reads as a mistake, so while it is lit it keeps
+          // names clear like any other line that is carrying the message.
+          if (strength >= 0.5 && (line.tier <= 2 || reach > 0 || (line.tier === TIER_LOCKED && web > 0))) {
+            obstacles.segments.push({ x0, y0, x1, y1 })
+          }
         }
         if (!seen) continue
         drawn = true

@@ -272,10 +272,22 @@ export type RenderStats = {
    * array every frame; empty when there are none.
    */
   edgeLabels?: readonly EdgeLabelBox[]
+  /**
+   * The nebula names drawn in the last frame, so a tap can land on one
+   * (#125: on screen the name is what a student reads as the nebula, and it
+   * used to be nothing at all to the pointer). Where a name goes is decided
+   * while it is drawn -- it is placed around its own disc, clear of the
+   * others -- so the engine cannot work it out; the renderer hands it back.
+   * A new array every frame; empty when no name was drawn.
+   */
+  nebulaNames?: readonly NebulaNameBox[]
 }
 
 /** A name at the screen's edge as drawn (`RenderStats.edgeLabels`): its text, its box in CSS px of the stage, its alpha. */
 export type EdgeLabelBox = { text: string; x0: number; y0: number; x1: number; y1: number; alpha: number }
+
+/** A nebula's name as drawn (`RenderStats.nebulaNames`): which nebula, its box in CSS px of the stage, its alpha. */
+export type NebulaNameBox = { nebula: number; x0: number; y0: number; x1: number; y1: number; alpha: number }
 
 export interface StarMapRenderer {
   readonly kind: RendererKind

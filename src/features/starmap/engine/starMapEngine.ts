@@ -69,7 +69,7 @@ import { createInertia, type Inertia } from '@/features/starmap/view/inertia'
 import { createStarDrag, linkedStars, stepStarDrag, type StarDrag } from '@/features/starmap/view/starDrag'
 import { shortestDx } from '@/features/starmap/render/links'
 import { nebulaShade } from '@/features/starmap/render/galaxy'
-import { interpolateView, sameTarget, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
+import { hitsNebulaName, interpolateView, sameTarget, starPickRadius, viewForTarget, wholeNebulaView, type LayerTarget } from '@/features/starmap/view/layers'
 import {
   anchorAt,
   kForGlyph,
@@ -885,11 +885,11 @@ export class StarMapEngine {
   /** Whether a tap here would open something. The same reach `choose` uses. */
   private wouldChoose(x: number, y: number): boolean {
     if (!this.map || this.viewport.width === 0) return false
-    const reach = Math.max(22, this.glyphSize * 0.5)
-    if (this.zoom.pickable && this.nearestStar(x, y, reach)) return true
-    if (this.beaconAt(x, y)) return true
-    const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, reach)?.nebulaId ?? null
+    if (this.pickStar(x, y) || this.beaconAt(x, y)) return true
     const target = this.target
+    const named = this.nebulaNameAt(x, y)
+    if (named) return !(target.layer === 'nebula' && target.nebulaId === named)
+    const nebulaId = this.nebulaAt(x, y) ?? this.nearestStar(x, y, starPickRadius(this.glyphSize, this.zoom.pickable))?.nebulaId ?? null
     if (!nebulaId) return target.layer === 'star'
     return !(target.layer === 'nebula' && target.nebulaId === nebulaId)
   }
@@ -1133,22 +1133,16 @@ export class StarMapEngine {
    * panorama's dots), never during a flight, within the glyph's reach
    * (further for a finger).
    */
-  /** The star the pointer is on, by the same reach a click uses. */
+  /**
+   * The star the pointer is on, by the same rule a click uses (#125): a star
+   * that lights up under the pointer and then is not the one a click opens
+   * is worse than no answer at all.
+   */
   private hoverable(x: number, y: number): number {
     const grabbed = this.grabbable(x, y, 'mouse')
     if (grabbed >= 0) return grabbed
-    if (!this.map || this.viewport.width === 0) return -1
-    const reach = Math.max(22, this.glyphSize * 0.5)
-    let best = -1
-    let bestDistance = reach
-    for (let i = 0; i < this.stars.length; i += 1) {
-      const distance = Math.hypot(this.x[i] - x, this.y[i] - y)
-      if (distance < bestDistance) {
-        best = i
-        bestDistance = distance
-      }
-    }
-    return best
+    const star = this.pickStar(x, y)
+    return star ? this.stars.indexOf(star) : -1
   }
 
   private grabbable(x: number, y: number, kind: PointerKind): number {
@@ -1266,6 +1260,76 @@ export class StarMapEngine {
     return best >= 0 ? this.stars[best] : null
   }
 
+  /**
+   * The star a tap at `(x, y)` picks, or null.
+   *
+   * Once stars are big enough to pick (#134) the nearest within reach, as
+   * before. Below that -- the panorama -- a tap used to pick a star only if
+   * it was the recommended one, so a student aiming at any other star flew to
+   * its nebula instead and read that as "nothing happened" (#125). It is now
+   * picked wherever the tap is clearly on it: inside the box the parallel DOM
+   * draws over its glyph (`starPickRadius`) and inside no other star's, so a
+   * crowded sky of dots still flies to the nebula.
+   */
+  private pickStar(x: number, y: number): Star | null {
+    if (!this.map || this.viewport.width === 0) return null
+    const reach = starPickRadius(this.glyphSize, this.zoom.pickable)
+    if (this.zoom.pickable) return this.nearestStar(x, y, reach)
+    let only: Star | null = null
+    for (let i = 0; i < this.stars.length; i += 1) {
+      if (Math.hypot(this.x[i] - x, this.y[i] - y) > reach) continue
+      if (only) return null
+      only = this.stars[i]
+    }
+    return only
+  }
+
+  /**
+   * The nebula whose name is drawn under `(x, y)`, or null (#125).
+   *
+   * On screen the name is what a student reads as the nebula, and it was
+   * nothing at all to the pointer: its only element is the parallel DOM's
+   * link, 1 px wide and clipped away until it has keyboard focus. Where the
+   * renderer put each name this frame comes back in `stats.nebulaNames`; the
+   * box is grown to a finger's height by `hitsNebulaName`.
+   */
+  private nebulaNameAt(x: number, y: number): string | null {
+    for (const box of this.renderer.stats.nebulaNames ?? []) {
+      if (box.alpha <= 0.05) continue
+      if (hitsNebulaName(box, x, y)) return this.nebulaIds[box.nebula] ?? null
+    }
+    return null
+  }
+
+  /**
+   * The nebula the pointer is over, for naming it (#125). Not what a tap
+   * chooses: naming is cosmetic, so it reaches further than `choose` does.
+   *
+   * Its own name first, then a star near the pointer, then -- on one sky,
+   * where `nebulaAt` only knows a nebula by a star within 28 px of the
+   * pointer -- the cloud the pointer is actually inside. A name is printed
+   * out at the cloud's rim, well past every star in it, so a pointer
+   * travelling from a star towards the name it just read left the 28 px
+   * behind at once: the name faded before the pointer arrived, and there was
+   * nothing left to click. The name is always drawn within the disc
+   * (`aroundDisc` keeps it inside 0.95 of the radius), so the disc is what
+   * has to hold it.
+   */
+  private hoveredNebulaAt(x: number, y: number): string | null {
+    const named = this.nebulaNameAt(x, y) ?? this.nebulaAt(x, y)
+    if (named || !this.sky) return named
+    let best = -1
+    let bestGap = 0
+    for (let n = 0; n < this.nebulaIds.length; n += 1) {
+      const gap = Math.hypot(this.nebulaX[n] - x, this.nebulaY[n] - y) - this.nebulaR[n]
+      if (gap < bestGap) {
+        best = n
+        bestGap = gap
+      }
+    }
+    return best >= 0 ? this.nebulaIds[best] : null
+  }
+
   /** The recommended star under `(x, y)`: a full glyph at every zoom, so it can be picked from far out too. */
   private beaconAt(x: number, y: number): Star | null {
     const reach = Math.max(14, Math.min(this.glyphSize, 32) * 0.6)
@@ -1310,13 +1374,21 @@ export class StarMapEngine {
    * star closes it; else the nebula under the tap. Whether it asked for a route.
    */
   private choose(x: number, y: number): boolean {
-    const reach = Math.max(22, this.glyphSize * 0.5)
-    const hit = this.zoom.pickable ? (this.nearestStar(x, y, reach) ?? this.beaconAt(x, y)) : this.beaconAt(x, y)
+    const reach = starPickRadius(this.glyphSize, this.zoom.pickable)
+    const hit = this.pickStar(x, y) ?? this.beaconAt(x, y)
     const target = this.target
     if (hit) {
       // A tap on the star already open brings it back to its place beside the card.
       if (target.layer === 'star' && hit.unitId === target.unitId) this.recentre()
       else this.request({ layer: 'star', nebulaId: hit.nebulaId, unitId: hit.unitId }, 'fly')
+      return true
+    }
+    // A tap on a nebula's name goes to that nebula, card open or not: the name
+    // is a target of its own (#125), never "a tap on nothing" that closes a card.
+    const named = this.nebulaNameAt(x, y)
+    if (named) {
+      if (target.layer === 'nebula' && target.nebulaId === named) return false
+      this.request({ layer: 'nebula', nebulaId: named }, 'fly')
       return true
     }
     if (target.layer === 'star') {
@@ -1330,7 +1402,7 @@ export class StarMapEngine {
   }
 
   hoverAt(x: number | null, y = 0) {
-    const id = x === null ? null : this.nebulaAt(x, y)
+    const id = x === null ? null : this.hoveredNebulaAt(x, y)
     const next = id ? this.nebulaIndex.get(id) ?? -1 : -1
     // The star under the pointer, not only one close enough to drag: on the
     // panorama nothing is draggable, so hovering a star did nothing at all
@@ -1570,6 +1642,21 @@ export class StarMapEngine {
     // map of one subject (no galaxies, tests and the bench's old maps) names every nebula.
     const giveWay = this.sky ? 1 - ramp(starPx, REVEAL.nebulaNameOut) : 1
     const pastPanorama = this.view.k / this.zoomLimits().min
+    /**
+     * The nebula under the pointer, or with keyboard focus, keeps its name on
+     * the panorama whatever `giveWay` says (#125).
+     *
+     * `giveWay` hands the nebula names to the star names by `starPx`, and a
+     * nebula is named by its disc's radius only once the zoom is past the
+     * panorama (`nebulaNameAlpha`). On a sparse map the two never meet:
+     * mathematics has ten stars in five clouds, so its farthest zoom already
+     * draws glyphs past `REVEAL.nebulaNameOut` -- measured on production
+     * 2026-10-11, not one of its five nebula names was ever drawn, at any
+     * zoom, hovered or not, so there was nothing on screen to click. Star
+     * names take over by how far in the map is, not by how large a sparse
+     * map's glyphs happen to be at the one zoom that shows the whole map.
+     */
+    const priorityName = this.sky ? Math.max(giveWay, 1 - ramp(pastPanorama, REVEAL.nebulaNamePastPanorama)) : 1
     for (let n = 0; n < this.nebulaNames.length; n += 1) this.nebulaNames[n] = this.sky ? nebulaNameAlpha(this.nebulaR[n], starPx, pastPanorama) : 1
     const { width, height } = this.viewport
     return {
@@ -1598,7 +1685,7 @@ export class StarMapEngine {
       starNameReach: { x: width * this.view.fx, y: height * this.view.fy, ...starNameReach(starPx, Math.min(width, height)) },
       nebulaLabelAlpha: 1,
       nebulaNames: this.nebulaNames,
-      priorityNameAlpha: giveWay,
+      priorityNameAlpha: priorityName,
       lineReveal: lineReveal(starPx),
       starFocus: focus,
       chosenNebula: chosen,

@@ -15,7 +15,7 @@ import { createCanvas2DRenderer } from '@/features/starmap/render/canvas2d'
 import { boxesOverlap, boxHitsCircle, edgeSpots, keyStars, nearerStars, placeInsisting, type Box, type Circle } from '@/features/starmap/render/labels'
 import { placeEdgeBox } from '@/features/starmap/render/links'
 import { STATE_IN_PROGRESS, type SceneData, type SceneFrame, type StarMapRenderer } from '@/features/starmap/render/types'
-import { sheetBand, type LayerTarget } from '@/features/starmap/view/layers'
+import { hitsNebulaName, NEBULA_NAME_PAD_X, NEBULA_NAME_TOUCH, sheetBand, starPickRadius, type LayerTarget } from '@/features/starmap/view/layers'
 import { DRAG, reachFade, REVEAL } from '@/features/starmap/view/semanticZoom'
 import { linkedStars } from '@/features/starmap/view/starDrag'
 import { demoStarMap } from '@/dev/demo/sky/demoStarMap'
@@ -316,4 +316,127 @@ describe('#76: the longest names of four languages fit at the nebula band', () =
       })
     }
   }
+})
+
+/**
+ * Card 125: a nebula's name is a target of its own.
+ *
+ * Measured on production 2026-10-11 as `student@`: the five nebula names had
+ * boxes 1 px wide in the accessibility tree, and clicking where each name is
+ * drawn did nothing at all. The name's only element is the parallel DOM's
+ * link, which is `width: 1px; clip-path: inset(50%); pointer-events: none`
+ * until it has keyboard focus -- a screen reader's and a keyboard's
+ * affordance, never a pointer's -- and the canvas, which is what a pointer
+ * actually hits, resolved a nebula only within 28 px of one of its stars.
+ * The name is drawn out at the cloud's rim, so a click on it fell between the
+ * two and chose nothing.
+ *
+ * Where each name goes is decided while it is drawn (around its own disc,
+ * clear of the others), so the renderer hands the boxes back and the engine
+ * hit-tests those.
+ */
+describe('card 125: a nebula name is something a pointer can hit', () => {
+  /**
+   * A session with a nebula name on screen. Far out, only the nebula under
+   * the pointer is named (#123), which is exactly the moment a student reads
+   * a name and reaches for it.
+   */
+  function named(width = 1440, height = 900) {
+    const s = session(width, height)
+    const f = s.frame()
+    s.engine.hoverAt(f.x[0], f.y[0])
+    s.clock.advance(400)
+    return s
+  }
+
+  /** A drawn name whose middle is not also inside a star's own pick box, so the two rules are not mixed up. */
+  function nameAwayFromStars(s: ReturnType<typeof session>) {
+    const f = s.frame()
+    const reach = starPickRadius(f.glyphSize, s.engine.zoom.pickable)
+    return (s.real.stats.nebulaNames ?? []).find((box) => {
+      const x = (box.x0 + box.x1) / 2
+      const y = (box.y0 + box.y1) / 2
+      for (let i = 0; i < s.scene().count; i += 1) if (Math.hypot(f.x[i] - x, f.y[i] - y) <= reach + 2) return false
+      return true
+    })
+  }
+
+  it('the reach is the drawn name, grown to the height of a finger', () => {
+    // The drawn name is 16 px tall; a finger is not.
+    const box = { x0: 100, y0: 200, x1: 220, y1: 216 }
+    expect(NEBULA_NAME_TOUCH).toBeGreaterThanOrEqual(44)
+    const padY = (NEBULA_NAME_TOUCH - 16) / 2
+
+    // Over the text itself, and anywhere in the target grown around it.
+    expect(hitsNebulaName(box, 160, 208)).toBe(true)
+    expect(hitsNebulaName(box, 100, 200)).toBe(true)
+    expect(hitsNebulaName(box, 220, 216)).toBe(true)
+    expect(hitsNebulaName(box, 160, 200 - padY)).toBe(true)
+    expect(hitsNebulaName(box, 160, 216 + padY)).toBe(true)
+    // The target is at least 44 px tall.
+    expect(216 + padY - (200 - padY)).toBeGreaterThanOrEqual(44)
+    // ...and the anti-control: past it is past it, in every direction.
+    expect(hitsNebulaName(box, 160, 200 - padY - 1)).toBe(false)
+    expect(hitsNebulaName(box, 160, 216 + padY + 1)).toBe(false)
+    expect(hitsNebulaName(box, 100 - NEBULA_NAME_PAD_X - 1, 208)).toBe(false)
+    expect(hitsNebulaName(box, 220 + NEBULA_NAME_PAD_X + 1, 208)).toBe(false)
+  })
+
+  it('the renderer hands back a box for every name it drew, where it wrote it', () => {
+    const s = named()
+    const written = s.redraw()
+    const boxes = s.real.stats.nebulaNames ?? []
+    const names = new Map(s.scene().nebulae.map((n, i) => [i, n.name.toLocaleUpperCase()]))
+
+    expect(boxes.length, 'no nebula name was drawn at all').toBeGreaterThan(0)
+    expect(boxes.length).toBe(s.real.stats.names?.nebulae)
+    for (const box of boxes) {
+      const text = names.get(box.nebula)!
+      const spot = written.find((entry) => entry.text === text)
+      expect(spot, text + ' is reported but was not written').toBeTruthy()
+      // Written centred on the box, at its top: the box is over the text.
+      expect(spot!.x).toBeCloseTo((box.x0 + box.x1) / 2, 0)
+      expect(spot!.y).toBeGreaterThanOrEqual(box.y0)
+      expect(spot!.y).toBeLessThanOrEqual(box.y1)
+      expect(box.alpha).toBeGreaterThan(0)
+    }
+    s.engine.destroy()
+  })
+
+  it('a tap on a drawn name opens that nebula', () => {
+    const s = named()
+    const box = nameAwayFromStars(s)
+    expect(box, 'no nebula name was drawn clear of the stars').toBeTruthy()
+    const nebulaId = s.scene().nebulae[box!.nebula].topicId
+    const x = (box!.x0 + box!.x1) / 2
+    const y = (box!.y0 + box!.y1) / 2
+
+    expect(s.engine.cursorAt(x, y)).toBe('pointer')
+    s.engine.pointerDown(1, x, y)
+    s.engine.pointerUp(1, x, y)
+
+    expect(s.navigate).toHaveBeenCalledWith({ layer: 'nebula', nebulaId })
+    s.engine.destroy()
+  })
+
+  /**
+   * The anti-control for the one above: the very same point, with the name
+   * not on screen. Nothing else changes -- same engine, same frame, same
+   * coordinates -- so what the tap found can only have been the name.
+   */
+  it('and the same point, with no name drawn there, does not', () => {
+    const s = named()
+    const box = nameAwayFromStars(s)!
+    const nebulaId = s.scene().nebulae[box.nebula].topicId
+    const x = (box.x0 + box.x1) / 2
+    const y = (box.y0 + box.y1) / 2
+
+    s.real.stats.nebulaNames = []
+    expect(s.engine.cursorAt(x, y)).not.toBe('pointer')
+    s.engine.pointerDown(1, x, y)
+    s.engine.pointerUp(1, x, y)
+
+    expect(s.navigate).not.toHaveBeenCalledWith({ layer: 'nebula', nebulaId })
+    s.engine.destroy()
+  })
 })

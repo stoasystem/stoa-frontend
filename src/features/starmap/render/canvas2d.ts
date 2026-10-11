@@ -23,6 +23,7 @@ import {
   STATE_LIT,
   STATE_LOCKED,
   STATE_READY,
+  type NebulaNameBox,
   type RenderStats,
   type SceneData,
   type StarMapRenderer,
@@ -1072,6 +1073,9 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
 
       // Nebula names, by their own nebula: by its size on screen (#134), and
       // the one hovered or in keyboard focus wherever nebula names are drawn.
+      // Each one drawn is handed back in `stats.nebulaNames`, so a tap on the
+      // name opens that nebula (#125).
+      const nebulaNameBoxes: NebulaNameBox[] = []
       if (frame.nebulaLabelAlpha > 0.01) {
         setFont(12, 600)
         setLetterSpacing('1.5px')
@@ -1119,12 +1123,15 @@ export function createCanvas2DRenderer(canvas: HTMLCanvasElement, options: Canva
           }
           const at = box ?? (entry.slot >= 0 ? candidates[entry.slot] : null)
           if (!at || entry.alpha <= 0.001) continue
-          ctx.globalAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
+          const nameAlpha = Math.min(1, frame.nebulaLabelAlpha * base * entry.alpha * INK.nebulaName.alpha * nebulaDim(n))
+          ctx.globalAlpha = nameAlpha
           outlinedText(text, (at.x0 + at.x1) / 2, at.y0 + 2, colours.textBody, colours.sky, INK.nebulaName.outline)
+          nebulaNameBoxes.push({ nebula: n, x0: at.x0, y0: at.y0, x1: at.x1, y1: at.y1, alpha: nameAlpha })
           names.nebulae += 1
         }
         setLetterSpacing('0px')
       }
+      stats.nebulaNames = nebulaNameBoxes
       // Names no longer in play are forgotten (they had faded with the zoom).
       for (const [key, entry] of labelFades) if (entry.seen !== labelFrame) labelFades.delete(key)
       stats.names = names
