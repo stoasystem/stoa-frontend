@@ -43,7 +43,11 @@
   },
   "composer": {
     "attach": "Aggiungi una foto o un file",
-    "send": "Invia"
+    "send": "Invia",
+    "sendBlocked": {
+      "empty": "Scrivi prima la tua domanda, poi invia.",
+      "busy": "È ancora in invio. Riprova tra un attimo."
+    }
   },
   "errorBoundary": {
     "body": "Riprova o ricarica la pagina.",

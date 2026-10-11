@@ -216,6 +216,25 @@
       "title": "{{name}} is lit",
       "body": "You finished its chapter. The star now shines on your map.",
       "link": "See it on the map"
+    },
+    "reopen": {
+      "open": "Open Ask",
+      "resume": "Back to your conversation"
+    },
+    "attachments": {
+      "label": "Attached files",
+      "remove": "Remove {{name}}",
+      "uploading": "Adding…",
+      "errors": {
+        "tooMany": "You can send up to {{count}} files with one question.",
+        "tooLarge": "This file is too big. Photos may be up to {{imageLimit}}, other files up to {{fileLimit}}.",
+        "unsupported": "This kind of file cannot be sent. Photos, PDF, Word, PowerPoint, Excel and text files can.",
+        "empty": "This file is empty. Choose another one.",
+        "expired": "This file took too long. Choose it again.",
+        "quota": "There is no room left for files. Remove an older one first.",
+        "unavailable": "Files cannot be added right now. Try again in a moment.",
+        "failed": "This file could not be added. Try again."
+      }
     }
   }
 }

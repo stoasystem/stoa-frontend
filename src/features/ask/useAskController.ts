@@ -19,6 +19,11 @@ export type AskController = {
   setDraft: (draft: string) => void
   /** Typing in the docked composer on the planet. */
   openWithDraft: (draft: string) => void
+  /**
+   * Open Ask again on whatever it last had open (#125): the conversation the
+   * student was reading, not a new empty one. The draft is left as it is.
+   */
+  reopen: () => void
   /** Open a conversation, or `null` to go back to the list. */
   select: (conversationId: string | null) => void
   close: () => void
@@ -63,6 +68,10 @@ export function useAskController(route?: AskRoute): AskController {
     [ownerId, storeOpenWithDraft],
   )
 
+  const reopen = useCallback(() => {
+    if (ownerId) storeOpenWithDraft(ownerId, askFor(useAskStore.getState(), ownerId).draft)
+  }, [ownerId, storeOpenWithDraft])
+
   const select = useCallback(
     (conversationId: string | null) => {
       if (direct) {
@@ -87,6 +96,7 @@ export function useAskController(route?: AskRoute): AskController {
     readDraft,
     setDraft,
     openWithDraft,
+    reopen,
     select,
     close,
   }

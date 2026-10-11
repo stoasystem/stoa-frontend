@@ -43,7 +43,11 @@
   },
   "composer": {
     "attach": "Add a photo or file",
-    "send": "Send"
+    "send": "Send",
+    "sendBlocked": {
+      "empty": "Write your question first, then send.",
+      "busy": "This is still going out. Try again in a moment."
+    }
   },
   "errorBoundary": {
     "body": "Please try again or reload the page.",

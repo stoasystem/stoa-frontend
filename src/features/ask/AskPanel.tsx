@@ -14,6 +14,27 @@ import { TeacherHelpAction, TeacherHelpStatusCard } from '@/features/ask/Teacher
 import type { AskController } from '@/features/ask/useAskController'
 import { useAskConversation } from '@/features/ask/useAskConversation'
 import { quoteField, useAskQuoteStore, type AskPractice, type AskQuote } from '@/features/ask/practiceContext'
+
+/**
+ * The paperclip stays off until the upload pipeline hands back an attachment.
+ *
+ * Measured against production on 2026-10-11, signed in as two different
+ * accounts: `POST /files/intents` answers 200, `PUT /files/{id}/chunks/1`
+ * answers 200, and `POST /files/{id}/complete` answers 200 with
+ * `{"status":"validated","attachment":null}` -- every time, however often it
+ * is called. `GET /files/attachments` answers 503 `upload_service_unavailable`.
+ * So an upload completes and never becomes an attachment, and `uploadFile`
+ * throws on exactly that case.
+ *
+ * The picker, the tray, the limits and their tests are all here and tested;
+ * what is withheld is the button, because a paperclip that cannot finish is
+ * worse than no paperclip. Flip this to `true` once a complete answers with an
+ * attachment on production.
+ */
+const ATTACHMENTS_WORK = false
+import { AttachmentTray } from '@/features/uploads/AttachmentTray'
+import { useAttachmentUploads } from '@/features/uploads/useAttachmentUploads'
+import { ACCEPT_ATTRIBUTE } from '@/services/files/uploadLimits'
 import { useConversationsQuery } from '@/hooks/chat/useConversationsQuery'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { useTeacherAvailabilityQuery } from '@/hooks/chat/useTeacherAvailabilityQuery'
@@ -30,9 +51,17 @@ import { createTeacherHelpRequest } from '@/services/teacherHelp/teacherHelpApi'
 import { useAuthStore } from '@/store/authStore'
 import { useLitMoments, type LitMoment } from '@/store/litMomentsStore'
 import { learningSubjectOptions } from '@/types/learningProfile'
-import { QUOTE_MAX_LENGTH, type ChatMessage } from '@/types/chat'
+import { QUOTE_MAX_LENGTH, type ChatAttachment, type ChatMessage } from '@/types/chat'
 
 export type AskLayout = 'panel' | 'sheet'
+
+/** A question the new conversation could not be created with; sent into it after. */
+type QueuedQuestion = {
+  content: string
+  quote: AskQuote | null
+  attachmentIds: string[]
+  attachments: ChatAttachment[]
+}
 
 /** The subject a new conversation is about: the planet's, else the student's first, else maths. */
 function subjectFor(subjectId: string | undefined, primarySubject: string | undefined) {
@@ -108,19 +137,30 @@ export function AskPanel({
   const quote = useAskQuoteStore((state) => state.quote)
   const setQuote = useAskQuoteStore((state) => state.setQuote)
   const clearQuote = () => setQuote(null)
-  // A quoted question waiting for the conversation it started to open.
-  const queued = useRef<{ content: string; quote: AskQuote } | null>(null)
+  // The files chosen for the next question, uploaded as they are picked (#125).
+  const attachments = useAttachmentUploads()
+  const picker = useRef<HTMLInputElement>(null)
+  const { clearSent } = attachments
+  // A question that `POST /conversations` cannot carry whole, waiting for the
+  // conversation it started to open: that request takes neither a quote nor a
+  // file, so both go in as a message of their own once the conversation is the
+  // open one.
+  const queued = useRef<QueuedQuestion | null>(null)
   useEffect(() => {
     const waiting = queued.current
     if (!waiting || !conversationId || isStreaming) return
     queued.current = null
     setQuote(null)
+    clearSent()
     void sendStreamingMessage({
       content: waiting.content,
       ...(practice ? { practiceContext: practice.context } : {}),
-      quote: quoteField(waiting.quote),
+      ...(waiting.quote ? { quote: quoteField(waiting.quote) } : {}),
+      ...(waiting.attachmentIds.length > 0
+        ? { attachmentIds: waiting.attachmentIds, attachments: waiting.attachments }
+        : {}),
     })
-  }, [conversationId, isStreaming, practice, sendStreamingMessage, setQuote])
+  }, [clearSent, conversationId, isStreaming, practice, sendStreamingMessage, setQuote])
 
   // The exercise on screen goes out with every question asked beside it: the
   // backend reads the exercise, the chapter and the learning state from the
@@ -129,21 +169,31 @@ export function AskPanel({
 
   function startConversation(content: string, quote?: AskQuote | null) {
     if (creatingRef.current || createConversation.isPending) return
+    const attachmentIds = attachments.readyIds
+    const carried = attachmentIds.length > 0
     creatingRef.current = true
     askedAtRef.current = new Date().toISOString()
     // Sent is sent: the question leaves the composer now, so closing Ask while
     // the conversation is being made cannot leave it there to be sent twice.
     // It comes back only if the conversation could not be made.
     setDraft('')
-    // `POST /conversations` takes no quote, so a quoted question starts the
-    // conversation empty and is sent into it as a message of its own, which
-    // the effect below does once the new conversation is the open one.
-    if (quote) queued.current = { content, quote }
+    // `POST /conversations` takes neither a quote nor a file, so a question
+    // carrying either starts the conversation empty and is sent into it as a
+    // message of its own, which the effect above does once the new conversation
+    // is the open one.
+    if (quote || carried) {
+      queued.current = {
+        content,
+        quote: quote ?? null,
+        attachmentIds,
+        attachments: attachments.readyAttachments,
+      }
+    }
     createConversation
       .mutateAsync({
         subject,
         grade: conversationGrade(profile?.grade),
-        ...(quote ? {} : { initialMessage: content }),
+        ...(quote || carried ? {} : { initialMessage: content }),
         ...practiceField,
       })
       .then(
@@ -166,17 +216,25 @@ export function AskPanel({
   function submit(value: string) {
     const content = value.trim()
     if (!content) return
+    // Pressing send while a file is still going up is held by the composer's
+    // `busy`, which says so; this is the second lock, so a question can never
+    // leave without the file it was written for.
+    if (attachments.uploading) return
     if (!conversationId) {
       startConversation(content, quote)
       return
     }
     if (isStreaming) return
+    const attachmentIds = attachments.readyIds
+    const carried = attachments.readyAttachments
     setDraft('')
     clearQuote()
+    clearSent()
     void sendStreamingMessage({
       content,
       ...practiceField,
       ...(quote ? { quote: quoteField(quote) } : {}),
+      ...(attachmentIds.length > 0 ? { attachmentIds, attachments: carried } : {}),
     })
   }
 
@@ -291,13 +349,27 @@ export function AskPanel({
           </p>
         )}
         {quote && <PendingQuote quote={quote} onRemove={clearQuote} />}
+        <AttachmentTray drafts={attachments.drafts} overflow={attachments.overflow} onRemove={attachments.remove} />
+        <input
+          ref={picker}
+          type="file"
+          multiple
+          accept={ACCEPT_ATTRIBUTE}
+          className="hidden"
+          onChange={(event) => {
+            attachments.add(Array.from(event.target.files ?? []))
+            // Cleared, so choosing the same file twice in a row still fires.
+            event.target.value = ''
+          }}
+        />
         <Composer
           value={draft}
           onChange={setDraft}
           onSubmit={submit}
+          onAttach={ATTACHMENTS_WORK ? () => picker.current?.click() : undefined}
           label={t('ask.composerLabel')}
           placeholder={practice ? t('ask.practice.placeholder') : t('ask.placeholder')}
-          busy={isStreaming || createConversation.isPending}
+          busy={isStreaming || createConversation.isPending || attachments.uploading}
           describedBy={profile && !conversationGrade(profile.grade) ? 'ask-grade-missing' : undefined}
         />
       </div>

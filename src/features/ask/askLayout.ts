@@ -45,6 +45,61 @@ export const DOCKED_COMPOSER = {
   phone: { inset: 12, bottom: 34 },
 } as const
 
+/**
+ * The button that calls Ask back after it was closed (#125).
+ *
+ * Every other corner is taken, measured on the pages Ask sits on:
+ *   bottom centre  the docked composer (640 wide, 46 high, 22 or 34 up)
+ *   bottom right   the star map's zoom pair, at 24 (wide) or 16 (phone) in
+ *                  from both edges, over the composer's reserved band
+ *   bottom left    the legend on a wide screen (up to 640 wide), the "?" on a
+ *                  phone, both at the same offsets as the zoom pair
+ *   left edge,     the role switcher used for testing, `fixed left-2 top-1/2`
+ *     middle
+ * The right edge's middle is the one band none of them reaches, and it mirrors
+ * the role switcher across the page. 44 is the smallest touch target the Sizes
+ * board allows.
+ */
+export const ASK_REOPEN = { size: 44, inset: 16 } as const
+
 export function sheetHeightFor(entry: AskEntry): string {
   return entry === 'direct' ? ASK_SHEET.directHeight : ASK_SHEET.planetHeight
 }
+
+/**
+ * The Ask panel and sheet are a dark surface now (#125): a white card over the
+ * star map read as a different product, which is what the student said.
+ *
+ * They carry `data-surface="sky"`, which brings the sky's own tokens, and this
+ * points the light families the panel's contents are built from at their sky
+ * counterparts, so one declaration darkens everything inside -- the composer,
+ * the bubbles, the lists, the cards -- instead of every class being rewritten.
+ *
+ * Every value is a token. No key appears on the right-hand side of another, so
+ * nothing resolves in a circle. `tests/component/askSkySurface.test.tsx` holds
+ * both of those.
+ */
+export const ASK_SKY_TOKENS = {
+  '--ground': 'var(--sky)',
+  '--surface': 'var(--sky-glass)',
+  '--sidebar': 'var(--sky-2)',
+  '--fill': 'var(--on-sky-selected)',
+  '--ink': 'var(--on-sky-text)',
+  '--secondary': 'var(--on-sky-text-caption)',
+  '--tertiary': 'var(--on-sky-text-muted)',
+  '--separator': 'var(--sky-glass-border)',
+  '--hairline': 'var(--sky-glass-border)',
+  '--card-border': 'var(--sky-glass-border)',
+  '--float-border': 'var(--sky-glass-border)',
+  '--accent': 'var(--accent-on-sky)',
+  '--accent-pressed': 'color-mix(in srgb, var(--accent-on-sky) 82%, var(--on-sky-text))',
+  '--accent-tint': 'var(--on-sky-selected)',
+  '--on-accent': 'var(--on-accent-on-sky)',
+  '--pill-neutral': 'var(--on-sky-text-caption)',
+} as const satisfies Record<`--${string}`, string>
+
+/** The panel's own ground: the sky, left slightly open so the blur has work. */
+export const ASK_SURFACE_BACKGROUND = {
+  panel: 'color-mix(in srgb, var(--sky) 94%, transparent)',
+  sheet: 'color-mix(in srgb, var(--sky) 96%, transparent)',
+} as const

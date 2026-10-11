@@ -216,6 +216,25 @@
       "title": "{{name}} leuchtet jetzt",
       "body": "Du hast das Kapitel abgeschlossen. Der Stern leuchtet jetzt auf deiner Karte.",
       "link": "Auf der Karte ansehen"
+    },
+    "reopen": {
+      "open": "Fragen öffnen",
+      "resume": "Zurück zu deinem Gespräch"
+    },
+    "attachments": {
+      "label": "Angehängte Dateien",
+      "remove": "{{name}} entfernen",
+      "uploading": "Wird hinzugefügt…",
+      "errors": {
+        "tooMany": "Du kannst zu einer Frage höchstens {{count}} Dateien senden.",
+        "tooLarge": "Diese Datei ist zu gross. Fotos dürfen bis {{imageLimit}} gross sein, andere Dateien bis {{fileLimit}}.",
+        "unsupported": "Diese Art von Datei kann nicht gesendet werden. Fotos, PDF, Word, PowerPoint, Excel und Textdateien gehen.",
+        "empty": "Diese Datei ist leer. Wähl eine andere.",
+        "expired": "Diese Datei hat zu lange gebraucht. Wähl sie noch einmal.",
+        "quota": "Für Dateien ist kein Platz mehr frei. Entferne zuerst eine ältere.",
+        "unavailable": "Dateien lassen sich gerade nicht hinzufügen. Versuch es gleich noch einmal.",
+        "failed": "Diese Datei konnte nicht hinzugefügt werden. Versuch es noch einmal."
+      }
     }
   }
 }

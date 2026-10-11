@@ -43,7 +43,11 @@
   },
   "composer": {
     "attach": "Foto oder Datei hinzufügen",
-    "send": "Senden"
+    "send": "Senden",
+    "sendBlocked": {
+      "empty": "Schreib zuerst deine Frage, dann senden.",
+      "busy": "Das wird noch gesendet. Versuch es gleich noch einmal."
+    }
   },
   "errorBoundary": {
     "body": "Bitte versuche es erneut oder lade die Seite neu.",
