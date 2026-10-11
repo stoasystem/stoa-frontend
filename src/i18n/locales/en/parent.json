@@ -229,6 +229,9 @@
     "wait_for_resend_cooldown": "Wait until a resend is possible",
     "review_account_verification": "Review account verification",
     "contact_support": "Contact support",
-    "email_verification_required": "Email verification required"
+    "email_verification_required": "Email verification required",
+    "none": "No action needed",
+    "registered": "Registered",
+    "unverified": "Not verified"
   }
 }

@@ -102,6 +102,28 @@ describe('the parent account page in German', () => {
   })
 })
 
+describe('every backend status value the parent page can show', () => {
+  // The #162 re-check still found "None": support_action can be `none`, and
+  // only the values seen so far had been translated. This is every value the
+  // backend's support_action / support_recovery_state and the frontend's
+  // verification and activation types name (2026-10-11).
+  const VALUES = [
+    'none', 'blocked', 'contact_support', 'expired_code', 'resend_available', 'resend_cooldown', 'resend_limited',
+    'resend_verification_code', 'review_account_verification', 'verification_not_required', 'verified',
+    'wait_for_resend_cooldown', 'active', 'admin_marked_verified', 'expired_verification', 'limited_onboarding',
+    'pending_email_verification', 'pending_verification', 'registered', 'unverified',
+  ]
+
+  it.each(['de', 'en', 'fr', 'it'])('has a translation in %s', (language) => {
+    const missing = VALUES.filter((value) => !i18n.exists(`parent:status.${value}`, { lng: language }))
+    expect(missing).toEqual([])
+  })
+
+  it('shows the support action "none" in German', () => {
+    expect(formatStatus('none', i18n.getFixedT('de', 'parent') as unknown as TFunction<'parent'>)).toBe('Keine Massnahme nötig')
+  })
+})
+
 describe('the new keys exist in all four languages', () => {
   function leaves(node: unknown, prefix = ''): string[] {
     if (typeof node !== 'object' || node === null) return [prefix]
