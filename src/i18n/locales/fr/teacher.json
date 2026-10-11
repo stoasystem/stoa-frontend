@@ -19,7 +19,14 @@
       "end": "Fin",
       "addSlot": "Ajouter un créneau",
       "save": "Enregistrer la disponibilité",
-      "saving": "Enregistrement…"
+      "saving": "Enregistrement…",
+      "subjectNames": {
+        "Mathematics": "Mathématiques",
+        "Physics": "Physique",
+        "Chemistry": "Chimie",
+        "English": "Anglais",
+        "Biology": "Biologie"
+      }
     },
     "summary": {
       "title": "Disponibilité actuelle",

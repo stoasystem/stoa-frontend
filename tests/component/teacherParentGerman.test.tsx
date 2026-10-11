@@ -7,6 +7,7 @@
  */
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { TFunction } from 'i18next'
 import type { ReactNode } from 'react'
 import { I18nextProvider } from 'react-i18next'
@@ -15,6 +16,7 @@ import { describeIssueCode, formatStatus } from '@/components/parent/accountOper
 import { VerificationRecoveryEvidence } from '@/components/parent/VerificationRecoveryEvidence'
 import { TeacherAvailabilitySummary } from '@/components/teacher/TeacherAvailabilitySummary'
 import { TeacherReplyComposer } from '@/components/teacher/TeacherReplyComposer'
+import { TeacherSubjectSelector } from '@/components/teacher/TeacherSubjectSelector'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import i18n from '@/i18n'
 import deParent from '@/i18n/locales/de/parent.json'
@@ -48,6 +50,17 @@ describe('the teacher pages in German', () => {
     expect(screen.getByText('Aktuelle Verfügbarkeit')).toBeInTheDocument()
     expect(screen.getByText('Fächer: Mathematik')).toBeInTheDocument()
     expect(screen.getByText('Freitag: 16:00–18:00')).toBeInTheDocument()
+  })
+
+  it('reads the subject options in German and keeps the values it sends', async () => {
+    const changes: string[][] = []
+    render(wrap(<TeacherSubjectSelector selectedSubjects={[]} onChange={(next) => changes.push(next)} />))
+    for (const label of ['Mathematik', 'Physik', 'Chemie', 'Englisch', 'Biologie']) {
+      expect(screen.getByRole('checkbox', { name: label })).toBeInTheDocument()
+    }
+    expect(screen.queryByText('Mathematics')).toBeNull()
+    await userEvent.click(screen.getByRole('checkbox', { name: 'Mathematik' }))
+    expect(changes).toEqual([['Mathematics']])
   })
 
   it('labels the reply composer in German', () => {
@@ -96,7 +109,7 @@ describe('the new keys exist in all four languages', () => {
   }
 
   it.each([
-    ['teacher', ['availability.editor', 'availability.summary', 'aiTools', 'reply', 'slaBadge', 'detail.card', 'practiceContext', 'assistance'], deTeacher],
+    ['teacher', ['availability.editor', 'availability.editor.subjectNames', 'availability.summary', 'aiTools', 'reply', 'slaBadge', 'detail.card', 'practiceContext', 'assistance'], deTeacher],
     ['parent', ['verification', 'issues', 'status'], deParent],
   ] as const)('%s', (namespace, groups, german) => {
     const keys = groups.flatMap((group) => leaves(group.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown>)?.[part], german), group))

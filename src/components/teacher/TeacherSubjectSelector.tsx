@@ -1,3 +1,7 @@
+import { useTranslation } from 'react-i18next'
+
+// What is stored on the teacher's availability and sent back: these exact
+// strings. Only what the checkbox reads is translated (#162 audit, 2026-10-11).
 const subjects = ['Mathematics', 'Physics', 'Chemistry', 'English', 'Biology']
 
 export function TeacherSubjectSelector({
@@ -7,6 +11,7 @@ export function TeacherSubjectSelector({
   selectedSubjects: string[]
   onChange: (subjects: string[]) => void
 }) {
+  const { t } = useTranslation('teacher')
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {subjects.map((subject) => (
@@ -23,7 +28,7 @@ export function TeacherSubjectSelector({
               )
             }}
           />
-          {subject}
+          {t(`availability.editor.subjectNames.${subject}`, { defaultValue: subject })}
         </label>
       ))}
     </div>

@@ -19,7 +19,14 @@
       "end": "End",
       "addSlot": "Add slot",
       "save": "Save availability",
-      "saving": "Saving…"
+      "saving": "Saving…",
+      "subjectNames": {
+        "Mathematics": "Mathematics",
+        "Physics": "Physics",
+        "Chemistry": "Chemistry",
+        "English": "English",
+        "Biology": "Biology"
+      }
     },
     "summary": {
       "title": "Current availability",
