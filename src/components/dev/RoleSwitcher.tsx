@@ -14,6 +14,8 @@
  */
 import { useState } from 'react'
 import { LogIn, Plus, Users, X } from 'lucide-react'
+import { useLocation } from 'react-router-dom'
+import { ASK_PATH } from '@/app/router/routeManifest'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { login } from '@/services/auth/authApi'
@@ -24,6 +26,7 @@ import {
   rememberSession,
 } from '@/lib/devSessions'
 import { useHeldAccounts } from '@/hooks/auth/useHeldAccounts'
+import { askFor, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
 const PROBLEM_TEXT = {
@@ -52,6 +55,12 @@ export function RoleSwitcher() {
   const sessions = held.sessions
   const busy = held.busy || addBusy
   const problem = addProblem || (held.problem ? PROBLEM_TEXT[held.problem] : '')
+  // Ask is a sheet over the whole page on a phone and a narrow window, and this
+  // sat on top of it, over the first lines of every answer. While Ask is open
+  // the closed switcher steps aside; one already open stays until it is closed.
+  const pathname = useLocation().pathname
+  const askOpenFromPlanet = useAskStore((state) => (user ? askFor(state, user.id).open : false))
+  const askOpen = askOpenFromPlanet || pathname === ASK_PATH || pathname.startsWith(`${ASK_PATH}/`)
 
   // An address outside the test domain needs the opt-in, because for those the
   // stored sessions are somebody's real ones. Inside it, no gate: the domain
@@ -64,6 +73,7 @@ export function RoleSwitcher() {
   // place by being asked for: `?roleswitcher=on` turns it on for this browser
   // and it stays on until `?roleswitcher=off`.
   if (!enabledHere) return null
+  if (askOpen && !open) return null
 
   async function addRole(event: React.FormEvent) {
     event.preventDefault()

@@ -10,7 +10,29 @@
   "availability": {
     "eyebrow": "Lehrpersonen-Bereich",
     "title": "Verfügbarkeit",
-    "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können."
+    "description": "Legen Sie Verfügbarkeit und Fächer fest, damit Anfragen klar zugewiesen werden können.",
+    "editor": {
+      "subjects": "Fächer",
+      "weeklySlots": "Wöchentliche Zeitfenster",
+      "day": "Tag",
+      "start": "Beginn",
+      "end": "Ende",
+      "addSlot": "Zeitfenster hinzufügen",
+      "save": "Verfügbarkeit speichern",
+      "saving": "Wird gespeichert …",
+      "subjectNames": {
+        "Mathematics": "Mathematik",
+        "Physics": "Physik",
+        "Chemistry": "Chemie",
+        "English": "Englisch",
+        "Biology": "Biologie"
+      }
+    },
+    "summary": {
+      "title": "Aktuelle Verfügbarkeit",
+      "subjects": "Fächer: {{subjects}}",
+      "noSubjects": "keine ausgewählt"
+    }
   },
   "detail": {
     "title": "Hilfeanfrage",
@@ -108,5 +130,86 @@
     "noQuestion": "Kein Fragetext verfügbar.",
     "noAnswer": "Keine Antwort des Lernassistenten verfügbar.",
     "noWeakTopics": "Keine Hinweise auf schwache Themen"
+  },
+  "aiTools": {
+    "title": "KI-Werkzeuge für Lehrpersonen",
+    "description": "Bereiten Sie Entwürfe aus dem sichtbaren Kontext der Lernenden vor, die Sie selbst prüfen.",
+    "draftOnly": "Nur Entwurf",
+    "generate": "Erstellen",
+    "noDraft": "Noch kein Entwurf erstellt.",
+    "notAvailable": "Nicht verfügbar.",
+    "unavailable": "Entwürfe können gerade nicht erstellt werden.",
+    "summary": {
+      "title": "Entwurf einer Zusammenfassung",
+      "description": "Zusammenfassung der Sitzung, wahrscheinliches Missverständnis und Erklärung für die Nachbetreuung.",
+      "generateLabel": "Entwurf einer Zusammenfassung erstellen",
+      "session": "Sitzung",
+      "misconception": "Missverständnis",
+      "focus": "Vorgeschlagener Schwerpunkt",
+      "followUp": "Nachbetreuung"
+    },
+    "exercise": {
+      "title": "Entwurf von Übungen",
+      "description": "Kurze Übungsaufgaben, die Sie prüfen, bevor sie die Lernenden erhalten.",
+      "generateLabel": "Entwurf von Übungen erstellen",
+      "difficulty": "Schwierigkeit",
+      "items": "Aufgaben",
+      "item": "Aufgabe {{number}}",
+      "answerKey": "Lösungen",
+      "difficulties": {
+        "targeted": "Gezielt",
+        "standard": "Standard",
+        "stretch": "Anspruchsvoll"
+      }
+    },
+    "status": {
+      "draft": "Entwurf",
+      "accepted": "Angenommen",
+      "rejected": "Abgelehnt",
+      "archived": "Archiviert"
+    },
+    "delivery": {
+      "not_delivered": "Nicht zugestellt",
+      "delivered": "Zugestellt"
+    },
+    "actions": {
+      "regenerate": "Neu erstellen",
+      "accept": "Annehmen",
+      "reject": "Ablehnen",
+      "archive": "Archivieren"
+    }
+  },
+  "reply": {
+    "label": "Antwort der Lehrperson",
+    "placeholder": "Schreiben Sie den nächsten Schritt für die Lernenden.",
+    "queued_one": "{{count}} Block vorbereitet",
+    "queued_other": "{{count}} Blöcke vorbereitet",
+    "addBlock": "Block hinzufügen",
+    "send": "Antwort senden",
+    "modes": {
+      "paragraph": "Absatz",
+      "formula": "Formel",
+      "unordered_list": "Liste",
+      "code": "Code"
+    },
+    "unsafe": {
+      "html": "HTML-Code ist in Antworten nicht erlaubt.",
+      "privateMarkers": "Interne Kennungen dürfen nicht in einer Antwort gesendet werden."
+    }
+  },
+  "practiceContext": {
+    "source": "Quelle: {{source}}",
+    "library": "Übungsbibliothek",
+    "path": "Lernpfad",
+    "title": "Die Lernenden haben nach dem Üben dieses Schritts um Unterstützung gebeten.",
+    "topic": "Thema",
+    "attempts": "Versuche",
+    "answer": "Antwort der Lernenden",
+    "notRecorded": "Nicht erfasst",
+    "hint": "Tipp angesehen",
+    "yes": "Ja",
+    "no": "Nein",
+    "question": "Frage",
+    "help": "Der Lernkontext zeigt Ihnen, wo die Lernenden hängen geblieben sind, bevor Sie die Anfrage übernehmen."
   }
 }

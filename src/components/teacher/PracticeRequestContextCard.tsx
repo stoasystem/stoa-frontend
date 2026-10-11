@@ -1,4 +1,5 @@
 import { BookOpenCheck, CheckCircle2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { PracticeTeacherRequestContext } from '@/types/practice'
 
@@ -7,6 +8,7 @@ export function PracticeRequestContextCard({
 }: {
   context: PracticeTeacherRequestContext
 }) {
+  const { t } = useTranslation('teacher')
   return (
     <Card className="border-primary/15 bg-card/95">
       <CardHeader>
@@ -16,29 +18,31 @@ export function PracticeRequestContextCard({
           </div>
           <div>
             <p className="brand-section-kicker">
-              Source: {context.source === 'question-bank' ? 'Practice Library' : 'Practice Path'}
+              {t('practiceContext.source', {
+                source: context.source === 'question-bank' ? t('practiceContext.library') : t('practiceContext.path'),
+              })}
             </p>
-            <CardTitle className="text-xl">The student requested support after practising this step.</CardTitle>
+            <CardTitle className="text-xl">{t('practiceContext.title')}</CardTitle>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-3 md:grid-cols-2">
-          <ContextItem label="Topic" value={context.topic} />
-          <ContextItem label="Attempts" value={`${context.attempts}`} />
-          <ContextItem label="Student answer" value={context.studentAnswer || 'Not recorded'} />
-          <ContextItem label="Hint viewed" value={context.hintViewed ? 'Yes' : 'No'} />
+          <ContextItem label={t('practiceContext.topic')} value={context.topic} />
+          <ContextItem label={t('practiceContext.attempts')} value={`${context.attempts}`} />
+          <ContextItem label={t('practiceContext.answer')} value={context.studentAnswer || t('practiceContext.notRecorded')} />
+          <ContextItem label={t('practiceContext.hint')} value={context.hintViewed ? t('practiceContext.yes') : t('practiceContext.no')} />
         </div>
         {context.challengePrompt && (
           <div className="rounded-md border bg-[hsl(var(--platform-surface-app))] p-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">Question</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.08em] text-muted-foreground">{t('practiceContext.question')}</p>
             <p className="mt-2 text-sm leading-6">{context.challengePrompt}</p>
           </div>
         )}
         <div className="flex gap-2 rounded-md border bg-[hsl(var(--platform-surface-app))] p-3 text-sm leading-6 text-muted-foreground">
           <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
           <p>
-            Learning context helps you see where the student got stuck before joining the request.
+            {t('practiceContext.help')}
           </p>
         </div>
       </CardContent>

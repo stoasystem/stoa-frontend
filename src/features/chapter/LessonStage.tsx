@@ -377,6 +377,22 @@ function Exercise({
     prompt.current?.focus()
   }, [arrived, challenge.challengeId, mode])
 
+  // "Try again" clears the answer and goes away with its button, which left the
+  // focus on the page (app.stoaedu.ch, 2026-10-10): the keyboard goes back to
+  // the answer instead, the first field or option still open.
+  // Only for the same exercise: moving on to the next one (a quiz goes on after
+  // a wrong answer) puts the keyboard on its question, above.
+  const exercise = useRef<HTMLDivElement>(null)
+  const wrongOn = useRef<string | null>(null)
+  useEffect(() => {
+    if (wrongOn.current === challenge.challengeId && !run.feedback) {
+      exercise.current
+        ?.querySelector<HTMLElement>('input:not([disabled]), textarea:not([disabled])')
+        ?.focus()
+    }
+    wrongOn.current = run.feedback && !run.feedback.correct ? challenge.challengeId : null
+  }, [run.feedback, challenge.challengeId])
+
   const long = challenge.prompt.length > 48
   // In a quiz an answer is checked once: right or wrong, it holds still.
   const locked = Boolean(run.feedback?.correct) || run.checking || Boolean(run.quiz && run.feedback)
@@ -396,6 +412,7 @@ function Exercise({
         >
           <div
             key={challenge.challengeId}
+            ref={exercise}
             data-stage-exercise
             // Which exercise a passage chosen anywhere in here was taken from (#56).
             data-quote-id={challenge.challengeId}
