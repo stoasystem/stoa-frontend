@@ -50,7 +50,7 @@ import { LINK_INK } from '@/features/starmap/render/links'
 import type { StarMapRenderer, StarMapTheme } from '@/features/starmap/render/types'
 import { nebulaDiscs } from '@/features/starmap/view/geometry'
 import { arrowDirection, courseNebulae, nearestInDirection } from '@/features/starmap/view/keyboardOrder'
-import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, type LayerTarget } from '@/features/starmap/view/layers'
+import { isWide, nebulaFocusSpot, NEBULA_FOCUS_HEIGHT, outerTarget, pathForTarget, sheetBand, starHintSpot, starLinkSize, type LayerTarget } from '@/features/starmap/view/layers'
 import { CHOICE, SHEET, ZOOM } from '@/features/starmap/view/semanticZoom'
 import { ringNeighbour, SKY_WRAP } from '@/features/starmap/view/sky'
 import { cn } from '@/lib/utils'
@@ -133,11 +133,6 @@ export function canvasPixelRatio(): number {
 export function controlBands(wide: boolean, bottomInset = 0, demo = false): { top: number; bottom: number } {
   const noticeHeight = demo ? 32 : 0
   return wide ? { top: 76 + noticeHeight, bottom: 164 + bottomInset } : { top: 112 + noticeHeight, bottom: 72 + bottomInset }
-}
-
-/** A link's box: the glyph, but never under 32 px, so the focus ring can be seen. */
-function linkSize(glyph: number): number {
-  return Math.round(Math.max(32, Math.min(56, glyph * 0.75)))
 }
 
 /** Whether a key goes to a field the student is typing in, not to the map. */
@@ -559,7 +554,7 @@ export function StarMapView({ map, demo = false, target, onNavigate, land, onFir
   }
 
   // The links, grouped by nebula in keyboard order.
-  const size = linkSize(visible.glyph)
+  const size = starLinkSize(visible.glyph)
   const pickable = visible.zoom.pickable
   const visibleByNebula = useMemo(() => {
     const groups = new Map<string, VisibleStar[]>()

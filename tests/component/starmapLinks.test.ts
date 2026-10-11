@@ -491,12 +491,45 @@ describe('each tier in its own ink, through drawLinks (#121, #123)', () => {
     expect(LINK_INK).toEqual({
       recommended: 'rgba(242, 197, 114, 0.95)',
       inProgress: 'rgba(255, 255, 255, 0.62)',
-      walked: 'rgba(255, 255, 255, 0.28)',
+      walked: 'rgba(242, 197, 114, 0.36)',
       locked: 'rgba(255, 255, 255, 0.32)',
       bridge: 'rgba(170, 190, 255, 0.12)',
     })
     expect(LINE.width).toEqual({ [TIER_RECOMMENDED]: 2.8, [TIER_IN_PROGRESS]: 2.2, [TIER_WALKED]: 1.6, [TIER_LOCKED]: 1.6 })
     expect([...LINE.dash]).toEqual([4, 4])
+  })
+
+  /**
+   * The design's one rule for the lines (card 125, the "星空 × Alpenklar"
+   * canvas): what you walked is a gold solid line, what you have not is
+   * dashed. Gold is --lit, the same ink as `--constellation-walked` a chapter
+   * down; it is the only colour that means "you earned this". Asserted on
+   * what was drawn (the stroke's ink and dash), not on how many strokes there
+   * were, and each positive paired with the tier that must NOT look like it.
+   */
+  it('what you walked is gold and solid; what you have not is white and dashed', () => {
+    const { scene, frame, tierOf } = tierScene()
+    const ctx = inkContext()
+    drawLinks(ctx, scene, frame, THEME, { segments: [], boxes: [] })
+    const drawn = new Map(
+      [...tierOf].map(([to, tier]) => {
+        const strokes = strokesTo(ctx, frame, to)
+        return [tier, strokes[strokes.length - 1]]
+      }),
+    )
+    const gold = [242, 197, 114]
+    const rgbOf = (style: unknown) => (String(style).match(/[\d.]+/g) ?? []).slice(0, 3).map(Number)
+
+    // Walked: the earned gold, drawn solid.
+    expect(rgbOf(drawn.get(TIER_WALKED)!.style)).toEqual(gold)
+    expect(drawn.get(TIER_WALKED)!.dash).toEqual([])
+    // Not walked: a line into a locked star is not gold, and is dashed.
+    expect(rgbOf(drawn.get(TIER_LOCKED)!.style)).not.toEqual(gold)
+    expect(drawn.get(TIER_LOCKED)!.dash).toEqual([...LINE.dash])
+    // The control: the two tiers are told apart by the dash as well as the
+    // ink, so the rule still reads without colour (#121 is about relevance,
+    // not decoration).
+    expect(drawn.get(TIER_WALKED)!.dash).not.toEqual(drawn.get(TIER_LOCKED)!.dash)
   })
 })
 

@@ -208,6 +208,42 @@ export function sameTarget(a: LayerTarget, b: LayerTarget): boolean {
 /** The height of a nebula link's focus indicator (its name pill), CSS px. */
 export const NEBULA_FOCUS_HEIGHT = 36
 
+/** A star link's box over its glyph, CSS px: the glyph, but never under 32, so the focus ring can be seen. */
+export function starLinkSize(glyph: number): number {
+  return Math.round(Math.max(32, Math.min(56, glyph * 0.75)))
+}
+
+/**
+ * How near a star's centre a tap has to be to pick that star rather than its
+ * nebula, CSS px.
+ *
+ * Once stars are big enough to pick (#134, `REVEAL.starsPickableFrom`) it is
+ * the old generous reach. Below that -- the panorama, where every tap used to
+ * fly to the nebula however exactly it hit the star (#125: "I clicked the
+ * planet and nothing happened") -- it is half the box the parallel DOM
+ * already draws over the glyph, so the pointer picks a star exactly where the
+ * page says one is. The caller still has to find the tap clearly on one star:
+ * where stars crowd closer than their boxes, the panorama's dots want the
+ * nebula.
+ */
+export function starPickRadius(glyph: number, pickable: boolean): number {
+  return pickable ? Math.max(22, glyph * 0.5) : starLinkSize(glyph) / 2
+}
+
+/**
+ * A nebula's name is grown to this tall, CSS px, as a tap target (#125,
+ * WCAG 2.5.8): the drawn name is 16 px tall, which no finger can land on.
+ * `NEBULA_NAME_PAD_X` is the same courtesy either side.
+ */
+export const NEBULA_NAME_TOUCH = 44
+export const NEBULA_NAME_PAD_X = 8
+
+/** Whether `(x, y)` is on a nebula name drawn at `box`, its target grown to `NEBULA_NAME_TOUCH` tall. */
+export function hitsNebulaName(box: { x0: number; y0: number; x1: number; y1: number }, x: number, y: number): boolean {
+  const padY = Math.max(0, (NEBULA_NAME_TOUCH - (box.y1 - box.y0)) / 2)
+  return x >= box.x0 - NEBULA_NAME_PAD_X && x <= box.x1 + NEBULA_NAME_PAD_X && y >= box.y0 - padY && y <= box.y1 + padY
+}
+
 /**
  * Where a focused nebula link shows its name (WCAG 2.4.11: a focus indicator
  * the page's own controls never cover): just below the nebula, else just
