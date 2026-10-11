@@ -1,4 +1,5 @@
 import { FormEvent, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AlertTriangle, CheckCircle2, Play, RefreshCw, Search, SlidersHorizontal } from 'lucide-react'
 import { toast } from 'sonner'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -46,9 +47,11 @@ function splitList(value: string) {
 }
 
 function StatusPill({ value }: { value: string }) {
+  const { t } = useTranslation('teacher')
+  // A status the backend adds later still shows, as it comes, until it has words.
   return (
     <span className={`inline-flex rounded-full border px-2 py-1 text-xs font-semibold ${statusClassNames[value] ?? 'border-border bg-muted text-muted-foreground'}`}>
-      {value}
+      {t(`automationConsole.status.${value}`, { defaultValue: value })}
     </span>
   )
 }
@@ -62,6 +65,7 @@ function CandidateList({
   empty: string
   mode: 'selected' | 'refused'
 }) {
+  const { t } = useTranslation('teacher')
   if (candidates.length === 0) {
     return <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">{empty}</p>
   }
@@ -74,7 +78,7 @@ function CandidateList({
             <div>
               <p className="text-sm font-semibold text-foreground">{candidate.title || candidate.candidateId}</p>
               <p className="mt-1 text-xs text-muted-foreground">
-                {candidate.subject || 'Subject pending'} / {candidate.topicId || 'topic pending'} / {candidate.sourceType}
+                {candidate.subject || t('automationConsole.subjectPending')} / {candidate.topicId || t('automationConsole.topicPending')} / {candidate.sourceType}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -84,8 +88,8 @@ function CandidateList({
           </div>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             {mode === 'refused'
-              ? candidate.refusalReason || 'Candidate was refused by policy.'
-              : candidate.expectedImpact || candidate.rationale || 'Candidate is ready for teacher approval.'}
+              ? candidate.refusalReason || t('automationConsole.refusedDefault')
+              : candidate.expectedImpact || candidate.rationale || t('automationConsole.readyDefault')}
           </p>
         </div>
       ))}
@@ -94,6 +98,7 @@ function CandidateList({
 }
 
 export function LearningAutomationConsolePage() {
+  const { t } = useTranslation('teacher')
   // Empty, not a sample id: `useStudentAssignmentsQuery` is enabled by a
   // non-empty id, so a placeholder made every visit open on a red "Assignment
   // history failed" from a student that does not exist (card 124).
@@ -115,6 +120,8 @@ export function LearningAutomationConsolePage() {
   const policy = useMemo<AutomationPolicy>(() => ({
     ...defaultPolicy,
     policyId: `policy-${studentId || 'student'}`,
+    // The policy's name and pause reason are stored with it, so they stay in
+    // one language whatever the console is shown in.
     name: 'Teacher approved assignment automation',
     status: policyStatus,
     studentIds: studentId ? [studentId] : [],
@@ -129,7 +136,7 @@ export function LearningAutomationConsolePage() {
   const handlePreview = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     if (!studentId.trim()) {
-      toast.error('Enter a student id before previewing automation.')
+      toast.error(t('automationConsole.needStudentId'))
       return
     }
     previewMutation.mutate({ policy, subject: subject || undefined })
@@ -144,7 +151,7 @@ export function LearningAutomationConsolePage() {
       candidates: preview.selected.map((candidate) => ({ ...candidate, approved: true })),
       subject: subject || undefined,
     }, {
-      onSuccess: (data) => toast.success(`Automation batch returned ${data.results.length} result(s).`),
+      onSuccess: (data) => toast.success(t('automationConsole.executed', { count: data.results.length })),
       onError: (error) => toast.error(error.message),
     })
   }
@@ -153,9 +160,9 @@ export function LearningAutomationConsolePage() {
     <DashboardLayout>
       <PageContainer size="wide" className="p-0">
         <PageHeader
-          eyebrow="Learning operations"
-          title="Automation review console"
-          description="Preview and approve controlled practice assignment batches from reviewed sources without hiding backend failures behind demo fallback."
+          eyebrow={t('automationConsole.eyebrow')}
+          title={t('automationConsole.title')}
+          description={t('automationConsole.description')}
         />
 
         <div className="grid gap-4 xl:grid-cols-[360px_1fr]">
@@ -163,75 +170,75 @@ export function LearningAutomationConsolePage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-xl">
                 <SlidersHorizontal className="h-5 w-5" />
-                Policy controls
+                {t('automationConsole.policyControls')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <form className="space-y-4" onSubmit={handlePreview}>
                 <div className="space-y-2">
-                  <Label htmlFor="student-id">Student id</Label>
+                  <Label htmlFor="student-id">{t('automationConsole.studentId')}</Label>
                   <Input
                     id="student-id"
                     value={studentId}
-                    placeholder="Enter a student id to load their assignments"
+                    placeholder={t('automationConsole.studentIdPlaceholder')}
                     onChange={(event) => setStudentId(event.target.value)}
                   />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject filter</Label>
+                    <Label htmlFor="subject">{t('automationConsole.subjectFilter')}</Label>
                     <Input id="subject" value={subject} placeholder="math" onChange={(event) => setSubject(event.target.value)} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="topics">Topic ids</Label>
+                    <Label htmlFor="topics">{t('automationConsole.topicIds')}</Label>
                     <Input id="topics" value={topicIds} placeholder="fractions,linear-equations" onChange={(event) => setTopicIds(event.target.value)} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="sources">Source types</Label>
+                  <Label htmlFor="sources">{t('automationConsole.sourceTypes')}</Label>
                   <Input id="sources" value={sourceTypes} onChange={(event) => setSourceTypes(event.target.value)} />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
                   <div className="space-y-2">
-                    <Label htmlFor="max">Max assignments</Label>
+                    <Label htmlFor="max">{t('automationConsole.maxAssignments')}</Label>
                     <Input id="max" type="number" min={1} max={20} value={maxAssignments} onChange={(event) => setMaxAssignments(Number(event.target.value))} />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confidence">Confidence</Label>
+                    <Label htmlFor="confidence">{t('automationConsole.confidence')}</Label>
                     <select
                       id="confidence"
                       className="min-h-10 w-full rounded-md border bg-background px-3 text-sm"
                       value={confidence}
                       onChange={(event) => setConfidence(event.target.value as AutomationPolicy['confidenceThreshold'])}
                     >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
+                      <option value="low">{t('automationConsole.option.low')}</option>
+                      <option value="medium">{t('automationConsole.option.medium')}</option>
+                      <option value="high">{t('automationConsole.option.high')}</option>
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="policy-status">Policy status</Label>
+                    <Label htmlFor="policy-status">{t('automationConsole.policyStatus')}</Label>
                     <select
                       id="policy-status"
                       className="min-h-10 w-full rounded-md border bg-background px-3 text-sm"
                       value={policyStatus}
                       onChange={(event) => setPolicyStatus(event.target.value as AutomationPolicy['status'])}
                     >
-                      <option value="active">Active</option>
-                      <option value="paused">Paused</option>
-                      <option value="off">Off</option>
+                      <option value="active">{t('automationConsole.option.active')}</option>
+                      <option value="paused">{t('automationConsole.option.paused')}</option>
+                      <option value="off">{t('automationConsole.option.off')}</option>
                     </select>
                   </div>
                 </div>
                 {policyStatus === 'paused' && (
                   <div className="space-y-2">
-                    <Label htmlFor="paused-reason">Paused reason</Label>
+                    <Label htmlFor="paused-reason">{t('automationConsole.pausedReason')}</Label>
                     <Input id="paused-reason" value={pausedReason} onChange={(event) => setPausedReason(event.target.value)} />
                   </div>
                 )}
                 <Button className="w-full" type="submit" disabled={previewMutation.isPending}>
                   {previewMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                  Preview candidates
+                  {t('automationConsole.preview')}
                 </Button>
               </form>
             </CardContent>
@@ -241,7 +248,7 @@ export function LearningAutomationConsolePage() {
             {previewMutation.error && (
               <Card className="border-destructive/40">
                 <CardContent className="pt-6">
-                  <ErrorState title="Preview failed" message={previewMutation.error.message} />
+                  <ErrorState title={t('automationConsole.previewFailed')} message={previewMutation.error.message} />
                 </CardContent>
               </Card>
             )}
@@ -251,25 +258,25 @@ export function LearningAutomationConsolePage() {
                 <Card>
                   <CardContent className="pt-6">
                     <p className="text-2xl font-semibold">{preview.summary.selectedCount}</p>
-                    <p className="text-sm text-muted-foreground">Selected</p>
+                    <p className="text-sm text-muted-foreground">{t('automationConsole.summary.selected')}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="pt-6">
                     <p className="text-2xl font-semibold">{preview.summary.refusedCount}</p>
-                    <p className="text-sm text-muted-foreground">Refused</p>
+                    <p className="text-sm text-muted-foreground">{t('automationConsole.summary.refused')}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="pt-6">
                     <p className="text-2xl font-semibold">{preview.summary.duplicateCount}</p>
-                    <p className="text-sm text-muted-foreground">Duplicates</p>
+                    <p className="text-sm text-muted-foreground">{t('automationConsole.summary.duplicates')}</p>
                   </CardContent>
                 </Card>
                 <Card>
                   <CardContent className="pt-6">
                     <p className="text-2xl font-semibold">{preview.summary.reviewRequiredCount}</p>
-                    <p className="text-sm text-muted-foreground">Need review</p>
+                    <p className="text-sm text-muted-foreground">{t('automationConsole.summary.needReview')}</p>
                   </CardContent>
                 </Card>
               </div>
@@ -280,22 +287,22 @@ export function LearningAutomationConsolePage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <CheckCircle2 className="h-5 w-5" />
-                    Selected candidates
+                    {t('automationConsole.selectedTitle')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {!preview && <p className="text-sm text-muted-foreground">Run preview to inspect selected candidates.</p>}
+                  {!preview && <p className="text-sm text-muted-foreground">{t('automationConsole.selectedBefore')}</p>}
                   {preview && (
                     <CandidateList
                       candidates={preview.selected}
-                      empty="No candidate passed policy. Check refused reasons before changing thresholds."
+                      empty={t('automationConsole.selectedEmpty')}
                       mode="selected"
                     />
                   )}
                   {preview && preview.selected.length > 0 && (
                     <Button className="mt-4" onClick={handleExecute} disabled={executeMutation.isPending}>
                       {executeMutation.isPending ? <RefreshCw className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
-                      Execute approved batch
+                      {t('automationConsole.execute')}
                     </Button>
                   )}
                 </CardContent>
@@ -305,15 +312,15 @@ export function LearningAutomationConsolePage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl">
                     <AlertTriangle className="h-5 w-5" />
-                    Refused candidates
+                    {t('automationConsole.refusedTitle')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {!preview && <p className="text-sm text-muted-foreground">Policy refusals appear after preview.</p>}
+                  {!preview && <p className="text-sm text-muted-foreground">{t('automationConsole.refusedBefore')}</p>}
                   {preview && (
                     <CandidateList
                       candidates={preview.refused}
-                      empty="No refusals for this preview."
+                      empty={t('automationConsole.refusedEmpty')}
                       mode="refused"
                     />
                   )}
@@ -324,7 +331,7 @@ export function LearningAutomationConsolePage() {
             {executeMutation.error && (
               <Card className="border-destructive/40">
                 <CardContent className="pt-6">
-                  <ErrorState title="Execute failed" message={executeMutation.error.message} />
+                  <ErrorState title={t('automationConsole.executeFailed')} message={executeMutation.error.message} />
                 </CardContent>
               </Card>
             )}
@@ -332,7 +339,7 @@ export function LearningAutomationConsolePage() {
             {results.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Execution results</CardTitle>
+                  <CardTitle className="text-xl">{t('automationConsole.resultsTitle')}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {results.map((result) => (
@@ -350,19 +357,19 @@ export function LearningAutomationConsolePage() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="text-xl">Assignment history</CardTitle>
+                <CardTitle className="text-xl">{t('automationConsole.historyTitle')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {!studentId.trim() && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    Enter a student id above to see what has been assigned to them.
+                    {t('automationConsole.historyNeedStudent')}
                   </p>
                 )}
-                {assignmentsQuery.isLoading && <LoadingState message="Loading assignment history..." />}
-                {assignmentsQuery.error && <ErrorState title="Assignment history failed" message={assignmentsQuery.error.message} />}
+                {assignmentsQuery.isLoading && <LoadingState message={t('automationConsole.historyLoading')} />}
+                {assignmentsQuery.error && <ErrorState title={t('automationConsole.historyFailed')} message={assignmentsQuery.error.message} />}
                 {assignmentsQuery.data?.items.length === 0 && (
                   <p className="rounded-md border border-dashed p-4 text-sm text-muted-foreground">
-                    No assignment history returned for this student.
+                    {t('automationConsole.historyEmpty')}
                   </p>
                 )}
                 <div className="space-y-3">
@@ -371,7 +378,7 @@ export function LearningAutomationConsolePage() {
                       <div>
                         <p className="font-medium">{assignment.title || assignment.assignmentId}</p>
                         <p className="text-sm text-muted-foreground">
-                          {assignment.subject || 'Subject pending'} / {assignment.topicIds.join(', ') || 'topic pending'}
+                          {assignment.subject || t('automationConsole.subjectPending')} / {assignment.topicIds.join(', ') || t('automationConsole.topicPending')}
                           {assignment.automation?.explanation ? ` - ${assignment.automation.explanation}` : ''}
                         </p>
                       </div>
