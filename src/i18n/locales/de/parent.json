@@ -3,6 +3,12 @@
   "dashboardDescription": "Verfolgen Sie Lernrhythmus, aktuelle Fragen, Berichte und Unterstützung durch Lehrpersonen.",
   "loadChildrenFailed": "Kinder konnten nicht geladen werden.",
   "noChildren": "Mit diesem Elternkonto sind keine Kinder verknüpft.",
+  "noChildrenNotice": {
+    "body": "Ein Schülerkonto wird von der Administration mit Ihrem Elternkonto verknüpft. Sobald das geschehen ist, erscheinen hier der Lernfortschritt und die Berichte Ihres Kindes.",
+    "accountNumberLabel": "Ihre Kontonummer:",
+    "accountNumberMissing": "Für Ihr Konto ist noch keine Kontonummer hinterlegt. Die Administration findet Sie über Ihre E-Mail-Adresse.",
+    "hint": "Geben Sie diese Nummer an, wenn Sie die Verknüpfung bei der Administration veranlassen."
+  },
   "child": "Kind",
   "weeklyReport": "Wochenbericht",
   "monthlyReport": "Monatsbericht",

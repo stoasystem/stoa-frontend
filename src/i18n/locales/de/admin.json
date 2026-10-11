@@ -83,7 +83,9 @@
       "account_exists": "Diese E-Mail-Adresse hat bereits ein Konto mit dieser Rolle ({{role}}). Dieselbe Adresse darf ein Konto pro Rolle haben, aber nicht zwei mit derselben Rolle.",
       "action_not_allowed": "Ihnen fehlt die Berechtigung, Konten aufzulisten. Bitten Sie eine Administration um die Berechtigung zur Kontosuche.",
       "account_not_a_student": "Nur ein Schülerkonto hat einen wöchentlichen Wert für Lehrerunterstützung.",
-      "allowance_version_conflict": "Eine andere Person hat diesen Wert während Ihrer Bearbeitung geändert. Öffnen Sie ihn erneut, um den aktuellen zu sehen."
+      "allowance_version_conflict": "Eine andere Person hat diesen Wert während Ihrer Bearbeitung geändert. Öffnen Sie ihn erneut, um den aktuellen zu sehen.",
+      "link_target_not_found": "Eines der beiden Konten ist nicht verwendbar: Es existiert nicht, hat nicht die passende Rolle oder ist nicht aktiv. Beide Konten müssen aktiv sein.",
+      "link_already_exists": "Diese beiden Konten sind bereits verknüpft. Es wurde nichts geändert."
     },
     "requiredTag": "Pflichtfeld",
     "optionalTag": "optional",
@@ -129,6 +131,24 @@
     },
     "operations": "Kontovorgänge",
     "operationsDescription": "Ein Elternkonto: Verifizierung, Zugang der Kinder und Nutzung"
+  },
+  "parentLinks": {
+    "title": "Kind mit einem Elternkonto verknüpfen",
+    "description": "Eine administrative Verknüpfung gilt sofort und muss von keiner Seite bestätigt werden. Für Minderjährige ist sie der einzige Weg: Ein Antrag der Eltern wird abgelehnt, sobald eines der beiden Konten minderjährig ist oder kein Geburtsdatum hinterlegt hat.",
+    "parentLabel": "Elternkonto",
+    "studentLabel": "Schülerkonto",
+    "filterLabel": "Nach Name, E-Mail oder Nummer filtern",
+    "choose": "Konto auswählen",
+    "relationshipLabel": "Beziehung",
+    "relationshipHint": "Wird mit der Verknüpfung gespeichert und protokolliert.",
+    "submit": "Verknüpfung anlegen",
+    "submitExplainer": "Verknüpft die beiden Konten sofort. Keines der Konten wird um Bestätigung gebeten.",
+    "assigned": "{{student}} ist jetzt mit {{parent}} verknüpft.",
+    "failed": "Die Verknüpfung konnte nicht angelegt werden.",
+    "loading": "Konten werden geladen …",
+    "loadFailed": "Die Kontoliste konnte nicht geladen werden.",
+    "noParents": "Kein aktives Elternkonto passt zu diesem Filter.",
+    "noStudents": "Kein aktives Schülerkonto passt zu diesem Filter."
   },
   "activation": {
     "eyebrow": "Kontoeinladung",

@@ -5,6 +5,7 @@ import { Group, Row, Stats } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { PageSkeleton } from '@/components/common/PageSkeleton'
+import { NoLinkedChildrenNotice } from '@/components/parent/NoLinkedChildrenNotice'
 import { useParentChildrenQuery } from '@/hooks/parent/useParentChildrenQuery'
 import { getSubjectLabel } from '@/lib/displayLabels'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
@@ -47,7 +48,7 @@ export function ParentReportsPage() {
           {childrenQuery.isLoading && <PageSkeleton rows={3} />}
           {childrenQuery.isError && <p className="text-sm text-red">{t('loadChildrenFailed')}</p>}
           {childrenQuery.data && children.length === 0 && (
-            <p className="m-0 text-[15px] text-caption">{t('reports.noChildren')}</p>
+            <NoLinkedChildrenNotice headline={t('reports.noChildren')} />
           )}
           {children.map((child) => (
             <ChildReports child={child} key={child.id} />

@@ -1,5 +1,7 @@
-import { type FormEvent, useState } from 'react'
-import { AlertTriangle, CheckCircle2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { type FormEvent, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
+import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
@@ -10,9 +12,13 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { ApiError } from '@/services/api/httpClient'
+import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { toUserFacingError } from '@/lib/userFacingText'
+import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
+import type { AccountRow } from '@/services/admin/accountsApi'
 import type { AdminBillingOperationDetail } from '@/services/admin/adminApi'
 import type { AdminAccountOperations } from '@/types/adminAccountOperations'
 import type { AccountOperationsChild, AccountOperationsUsage } from '@/types/parentAccountOperations'
@@ -84,6 +90,8 @@ export function AdminAccountOperationsPage() {
           </Button>
         </form>
 
+        <ParentLinkAssignment parentId={parentId} />
+
         {!parentId && <EmptyLookup />}
         {parentId && query.isLoading && <LoadingPanel />}
         {parentId && query.isError && <ErrorPanel error={query.error} />}
@@ -104,6 +112,253 @@ export function AdminAccountOperationsPage() {
       </PageContainer>
     </DashboardLayout>
   )
+}
+
+/**
+ * Linking a child to a parent, which until now existed only as a backend route.
+ *
+ * Card 008 settled who may do this: a self-service request is refused the
+ * moment either side is a minor - and a date of birth nobody recorded counts
+ * as a minor - so on a platform of schoolchildren the administrator's
+ * assignment is the only path that ever completes. It needs no confirmation
+ * from either account; the link is active as soon as it is made.
+ *
+ * The two accounts are picked from the same list the accounts console reads,
+ * filtered to the active ones: the backend refuses an invited, suspended or
+ * archived account as a target, and offering one would only produce a refusal
+ * nobody could act on.
+ */
+function ParentLinkAssignment({ parentId }: { parentId: string }) {
+  const { t } = useTranslation('admin')
+  const queryClient = useQueryClient()
+  const [parentKeyword, setParentKeyword] = useState('')
+  const [studentKeyword, setStudentKeyword] = useState('')
+  // Null means "follow the account the console is looking at"; once an
+  // administrator picks one themselves, their choice stands.
+  const [parentChoice, setParentChoice] = useState<string | null>(null)
+  const [studentChoice, setStudentChoice] = useState('')
+  const [relationship, setRelationship] = useState('child')
+  const [notice, setNotice] = useState<string | null>(null)
+  const [failure, setFailure] = useState<string | null>(null)
+
+  const parentFilters = useMemo(
+    () => ({ role: 'parent', status: 'active', q: parentKeyword.trim() }),
+    [parentKeyword],
+  )
+  const studentFilters = useMemo(
+    () => ({ role: 'student', status: 'active', q: studentKeyword.trim() }),
+    [studentKeyword],
+  )
+  const parents = useAdminAccountsQuery(parentFilters)
+  const students = useAdminAccountsQuery(studentFilters)
+  const assignment = useAssignParentLinkMutation()
+
+  const parentRows = parents.data?.items ?? []
+  const studentRows = students.data?.items ?? []
+  const selectedParent = parentChoice ?? parentId
+  const ready = Boolean(selectedParent && studentChoice && relationship.trim())
+
+  function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!ready || assignment.isPending) return
+    setNotice(null)
+    setFailure(null)
+    assignment.mutate(
+      {
+        parentId: selectedParent,
+        studentId: studentChoice,
+        relationship: relationship.trim(),
+      },
+      {
+        onSuccess: () => {
+          setNotice(
+            t('parentLinks.assigned', {
+              student: accountLabel(studentRows, studentChoice),
+              parent: accountLabel(parentRows, selectedParent),
+            }),
+          )
+          setStudentChoice('')
+          // The child list on this page is a different query; without this it
+          // keeps showing the parent as having no children right under a line
+          // saying the link was made.
+          void queryClient.invalidateQueries({ queryKey: adminQueryKeys.accountOperations(selectedParent) })
+        },
+        onError: (error) => setFailure(linkRefusal(error, t)),
+      },
+    )
+  }
+
+  return (
+    <Card className="mb-4">
+      <CardHeader>
+        <CardTitle className="text-base">{t('parentLinks.title')}</CardTitle>
+        <p className="mt-2 text-sm text-muted-foreground">{t('parentLinks.description')}</p>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit} className="grid gap-4 lg:grid-cols-2">
+          <AccountPicker
+            idPrefix="parent-link-parent"
+            label={t('parentLinks.parentLabel')}
+            filterLabel={t('parentLinks.filterLabel')}
+            placeholder={t('parentLinks.choose')}
+            keyword={parentKeyword}
+            onKeyword={setParentKeyword}
+            value={selectedParent}
+            onValue={setParentChoice}
+            rows={parentRows}
+            loading={parents.isLoading}
+            failed={parents.isError}
+            emptyLabel={t('parentLinks.noParents')}
+            loadingLabel={t('parentLinks.loading')}
+            failedLabel={t('parentLinks.loadFailed')}
+          />
+          <AccountPicker
+            idPrefix="parent-link-student"
+            label={t('parentLinks.studentLabel')}
+            filterLabel={t('parentLinks.filterLabel')}
+            placeholder={t('parentLinks.choose')}
+            keyword={studentKeyword}
+            onKeyword={setStudentKeyword}
+            value={studentChoice}
+            onValue={setStudentChoice}
+            rows={studentRows}
+            loading={students.isLoading}
+            failed={students.isError}
+            emptyLabel={t('parentLinks.noStudents')}
+            loadingLabel={t('parentLinks.loading')}
+            failedLabel={t('parentLinks.loadFailed')}
+          />
+
+          <label className="space-y-2 text-sm font-medium text-foreground" htmlFor="parent-link-relationship">
+            {t('parentLinks.relationshipLabel')}
+            <Input
+              id="parent-link-relationship"
+              value={relationship}
+              onChange={(event) => setRelationship(event.target.value)}
+            />
+            <span className="block text-xs font-normal text-muted-foreground">
+              {t('parentLinks.relationshipHint')}
+            </span>
+          </label>
+
+          <div className="flex items-end">
+            <Button type="submit" disabled={!ready || assignment.isPending} title={t('parentLinks.submitExplainer')}>
+              <Link2 className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t('parentLinks.submit')}
+            </Button>
+          </div>
+        </form>
+
+        {notice && (
+          <p className="mt-4 text-sm text-foreground" role="status" data-testid="parent-link-notice">
+            {notice}
+          </p>
+        )}
+        {failure && (
+          <p className="mt-4 text-sm text-destructive" role="alert" data-testid="parent-link-error">
+            {failure}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
+
+function AccountPicker({
+  idPrefix,
+  label,
+  filterLabel,
+  placeholder,
+  keyword,
+  onKeyword,
+  value,
+  onValue,
+  rows,
+  loading,
+  failed,
+  emptyLabel,
+  loadingLabel,
+  failedLabel,
+}: {
+  idPrefix: string
+  label: string
+  filterLabel: string
+  placeholder: string
+  keyword: string
+  onKeyword: (value: string) => void
+  value: string
+  onValue: (value: string) => void
+  rows: AccountRow[]
+  loading: boolean
+  failed: boolean
+  emptyLabel: string
+  loadingLabel: string
+  failedLabel: string
+}) {
+  // A value the list no longer carries would silently blank the select, so the
+  // account the console was opened with keeps its own option until it arrives.
+  const options = rows.some((row) => row.userId === value) || !value
+    ? rows
+    : [...rows, { userId: value, accountNumber: '', name: value } as AccountRow]
+
+  return (
+    <div className="space-y-2">
+      <label className="block space-y-2 text-sm font-medium text-foreground" htmlFor={`${idPrefix}-select`}>
+        {label}
+        <select
+          id={`${idPrefix}-select`}
+          className="h-10 w-full rounded-md border border-border/90 bg-card/75 px-2 text-sm"
+          value={value}
+          onChange={(event) => onValue(event.target.value)}
+        >
+          <option value="">{placeholder}</option>
+          {options.map((row) => (
+            <option key={row.userId} value={row.userId}>
+              {accountOptionLabel(row)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="block space-y-2 text-xs font-normal text-muted-foreground" htmlFor={`${idPrefix}-filter`}>
+        {filterLabel}
+        <Input id={`${idPrefix}-filter`} value={keyword} onChange={(event) => onKeyword(event.target.value)} />
+      </label>
+      {loading && <p className="text-xs text-muted-foreground">{loadingLabel}</p>}
+      {failed && (
+        <p className="text-xs text-destructive" role="alert">
+          {failedLabel}
+        </p>
+      )}
+      {!loading && !failed && rows.length === 0 && (
+        <p className="text-xs text-muted-foreground">{emptyLabel}</p>
+      )}
+    </div>
+  )
+}
+
+function accountOptionLabel(row: AccountRow) {
+  return [row.name || row.email || row.userId, row.accountNumber].filter(Boolean).join(' · ')
+}
+
+function accountLabel(rows: AccountRow[], userId: string) {
+  const row = rows.find((item) => item.userId === userId)
+  return row ? accountOptionLabel(row) : userId
+}
+
+/**
+ * Say which rule refused the link.
+ *
+ * The route answers with a stable code in `detail.code` and no prose a person
+ * could read. Since the user-facing error path only promotes an issue that
+ * carries a code it can translate, a code without a phrase here degrades to
+ * the caller's fallback - which tells an administrator nothing about whether
+ * they picked a suspended account or one that is already linked.
+ */
+function linkRefusal(error: unknown, t: (key: string, options?: Record<string, unknown>) => string) {
+  const fallback = t('parentLinks.failed')
+  const code = error instanceof ApiError ? error.code : undefined
+  if (!code) return toUserFacingError(error, fallback)
+  return t(`accounts.errors.${code}`, { defaultValue: toUserFacingError(error, fallback) })
 }
 
 function BillingRecoveryDetail({

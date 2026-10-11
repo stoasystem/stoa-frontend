@@ -3,6 +3,12 @@
   "dashboardDescription": "Segui ritmo di studio, domande recenti, report e momenti in cui il supporto dell’insegnante ha aiutato.",
   "loadChildrenFailed": "Impossibile caricare i figli.",
   "noChildren": "Nessun figlio è collegato a questo account genitore.",
+  "noChildrenNotice": {
+    "body": "Un account studente viene collegato al suo account genitore dall’amministrazione. Appena il collegamento è attivo, qui compaiono i progressi e i report di suo figlio.",
+    "accountNumberLabel": "Il suo numero di account:",
+    "accountNumberMissing": "Per il suo account non è ancora registrato un numero. L’amministrazione la troverà tramite il suo indirizzo e-mail.",
+    "hint": "Indichi questo numero quando chiede il collegamento all’amministrazione."
+  },
   "child": "Figlio",
   "weeklyReport": "Report settimanale",
   "monthlyReport": "Report mensile",

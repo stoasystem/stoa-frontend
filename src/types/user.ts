@@ -41,6 +41,11 @@ export type User = {
   subscriptionStatus?: SubscriptionStatus
   plan?: SubscriptionPlan
   subscription?: UserSubscription
+  // The account's own number, as an administrator reads it back. A parent whose
+  // child is not linked yet is found by this number, so the parent has to be
+  // able to read it off their own screen. `/auth/me` sends '' when the account
+  // predates numbering.
+  accountNumber?: string
   verificationStatus?: 'approved' | 'pending_review'
   emailVerificationStatus?: EmailVerificationStatus
   emailVerificationRequired?: boolean

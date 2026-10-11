@@ -83,7 +83,9 @@
       "account_exists": "This email address already has a {{role}} account. The same address may hold one account per role, but not two of the same role.",
       "action_not_allowed": "You do not have permission to list accounts. Ask an administrator for the account-lookup capability.",
       "account_not_a_student": "Only a student account has a weekly teacher-support figure.",
-      "allowance_version_conflict": "Another administrator changed this figure while you were editing it. Reopen it to see the current one."
+      "allowance_version_conflict": "Another administrator changed this figure while you were editing it. Reopen it to see the current one.",
+      "link_target_not_found": "One of the two accounts cannot be used: it does not exist, does not hold that role, or is not active. Both accounts have to be active.",
+      "link_already_exists": "These two accounts are already linked. Nothing was changed."
     },
     "requiredTag": "required",
     "optionalTag": "optional",
@@ -129,6 +131,24 @@
     },
     "operations": "Account operations",
     "operationsDescription": "One parent account across verification, child access and usage"
+  },
+  "parentLinks": {
+    "title": "Link a child to a parent",
+    "description": "An administrator link takes effect at once and needs no confirmation from either side. It is the only way to link a minor: a parent's own request is refused whenever either account is under age, or has no date of birth on file.",
+    "parentLabel": "Parent account",
+    "studentLabel": "Student account",
+    "filterLabel": "Filter by name, email or number",
+    "choose": "Select an account",
+    "relationshipLabel": "Relationship",
+    "relationshipHint": "Stored with the link and written to the audit log.",
+    "submit": "Create the link",
+    "submitExplainer": "Links the two accounts immediately. Neither account is asked to confirm.",
+    "assigned": "{{student}} is now linked to {{parent}}.",
+    "failed": "The link could not be created.",
+    "loading": "Loading accounts…",
+    "loadFailed": "The account list could not be loaded.",
+    "noParents": "No active parent account matches this filter.",
+    "noStudents": "No active student account matches this filter."
   },
   "activation": {
     "eyebrow": "Account invitation",

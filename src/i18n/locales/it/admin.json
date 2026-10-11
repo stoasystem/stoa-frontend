@@ -83,7 +83,9 @@
       "account_exists": "Questo indirizzo e-mail ha già un account {{role}}. Lo stesso indirizzo può avere un account per ruolo, ma non due con lo stesso ruolo.",
       "action_not_allowed": "Non hai l’autorizzazione per elencare gli account. Chiedi a un’amministrazione il permesso di ricerca account.",
       "account_not_a_student": "Solo un account studente ha un numero settimanale di supporto dell'insegnante.",
-      "allowance_version_conflict": "Un altro amministratore ha modificato questo numero mentre lo stavi modificando. Riaprilo per vedere quello attuale."
+      "allowance_version_conflict": "Un altro amministratore ha modificato questo numero mentre lo stavi modificando. Riaprilo per vedere quello attuale.",
+      "link_target_not_found": "Uno dei due account non è utilizzabile: non esiste, non ha il ruolo giusto o non è attivo. Entrambi gli account devono essere attivi.",
+      "link_already_exists": "Questi due account sono già collegati. Non è stato modificato nulla."
     },
     "requiredTag": "obbligatorio",
     "optionalTag": "facoltativo",
@@ -129,6 +131,24 @@
     },
     "operations": "Operazioni sugli account",
     "operationsDescription": "Un account genitore: verifica, accesso dei figli e utilizzo"
+  },
+  "parentLinks": {
+    "title": "Collega un figlio a un account genitore",
+    "description": "Un collegamento amministrativo ha effetto immediato e non richiede conferme. Per un minorenne è l’unica via: la richiesta di un genitore viene rifiutata se uno dei due account è minorenne o non ha una data di nascita registrata.",
+    "parentLabel": "Account genitore",
+    "studentLabel": "Account studente",
+    "filterLabel": "Filtra per nome, e-mail o numero",
+    "choose": "Seleziona un account",
+    "relationshipLabel": "Relazione",
+    "relationshipHint": "Viene salvata con il collegamento e registrata nel log di audit.",
+    "submit": "Crea il collegamento",
+    "submitExplainer": "Collega subito i due account. A nessuno dei due viene chiesta conferma.",
+    "assigned": "{{student}} ora è collegato a {{parent}}.",
+    "failed": "Non è stato possibile creare il collegamento.",
+    "loading": "Caricamento degli account…",
+    "loadFailed": "Non è stato possibile caricare l’elenco degli account.",
+    "noParents": "Nessun account genitore attivo corrisponde a questo filtro.",
+    "noStudents": "Nessun account studente attivo corrisponde a questo filtro."
   },
   "activation": {
     "eyebrow": "Invito all'account",
