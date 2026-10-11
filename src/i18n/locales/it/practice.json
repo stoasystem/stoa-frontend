@@ -66,7 +66,17 @@
     "noWeakAreaEvidence": "Nessuna evidenza di aree deboli per ora.",
     "lessonBankSample": "Esempio dalla banca lezioni",
     "exerciseCount_one": "{{count}} esercizio",
-    "exerciseCount_other": "{{count}} esercizi"
+    "exerciseCount_other": "{{count}} esercizi",
+    "source": {
+      "practice_backfill": "Dalla banca degli esercizi"
+    },
+    "rolloutState": {
+      "seed": "Base",
+      "draft": "Bozza",
+      "reviewed": "Verificato",
+      "active": "Attivo",
+      "archived": "Archiviato"
+    }
   },
   "dailyGoal": "Obiettivo giornaliero",
   "dashboard": {

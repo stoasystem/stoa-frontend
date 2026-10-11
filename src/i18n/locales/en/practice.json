@@ -66,7 +66,17 @@
     "noWeakAreaEvidence": "No weak area evidence yet.",
     "lessonBankSample": "Lesson bank sample",
     "exerciseCount_one": "{{count}} exercise",
-    "exerciseCount_other": "{{count}} exercises"
+    "exerciseCount_other": "{{count}} exercises",
+    "source": {
+      "practice_backfill": "From the practice bank"
+    },
+    "rolloutState": {
+      "seed": "Seed",
+      "draft": "Draft",
+      "reviewed": "Reviewed",
+      "active": "Active",
+      "archived": "Archived"
+    }
   },
   "dailyGoal": "Daily goal",
   "dashboard": {
