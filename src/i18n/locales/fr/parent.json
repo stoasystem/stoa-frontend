@@ -3,6 +3,12 @@
   "dashboardDescription": "Suivez le rythme d’apprentissage, les questions récentes, les rapports et les moments d’accompagnement enseignant.",
   "loadChildrenFailed": "Impossible de charger les enfants.",
   "noChildren": "Aucun enfant n’est lié à ce compte parent.",
+  "noChildrenNotice": {
+    "body": "Un compte élève est lié à votre compte parent par l’administration. Dès que c’est fait, les progrès et les rapports de votre enfant apparaissent ici.",
+    "accountNumberLabel": "Votre numéro de compte :",
+    "accountNumberMissing": "Aucun numéro de compte n’est encore enregistré pour votre compte. L’administration vous retrouvera grâce à votre adresse e-mail.",
+    "hint": "Indiquez ce numéro lorsque vous demandez la liaison à l’administration."
+  },
   "child": "Enfant",
   "weeklyReport": "Rapport hebdomadaire",
   "monthlyReport": "Rapport mensuel",

@@ -3,6 +3,12 @@
   "dashboardDescription": "Follow learning rhythm, recent questions, reports, and moments when teacher support helped.",
   "loadChildrenFailed": "Failed to load children.",
   "noChildren": "No children are linked to this parent account.",
+  "noChildrenNotice": {
+    "body": "A student account is linked to your parent account by the administration. Once that is done, your child's learning progress and reports appear here.",
+    "accountNumberLabel": "Your account number:",
+    "accountNumberMissing": "No account number is on file for your account yet. The administration will find you by your email address.",
+    "hint": "Quote this number when you ask the administration to set up the link."
+  },
   "child": "Child",
   "weeklyReport": "Weekly report",
   "monthlyReport": "Monthly report",

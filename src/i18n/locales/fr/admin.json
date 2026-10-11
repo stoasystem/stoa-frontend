@@ -83,7 +83,9 @@
       "account_exists": "Cette adresse e-mail possède déjà un compte {{role}}. Une même adresse peut avoir un compte par rôle, mais pas deux pour le même rôle.",
       "action_not_allowed": "Vous n’avez pas l’autorisation de lister les comptes. Demandez à une administration le droit de recherche de comptes.",
       "account_not_a_student": "Seul un compte élève dispose d'un nombre hebdomadaire de soutien enseignant.",
-      "allowance_version_conflict": "Un autre administrateur a modifié ce nombre pendant votre saisie. Rouvrez-le pour voir la valeur actuelle."
+      "allowance_version_conflict": "Un autre administrateur a modifié ce nombre pendant votre saisie. Rouvrez-le pour voir la valeur actuelle.",
+      "link_target_not_found": "L’un des deux comptes est inutilisable : il n’existe pas, n’a pas le bon rôle ou n’est pas actif. Les deux comptes doivent être actifs.",
+      "link_already_exists": "Ces deux comptes sont déjà liés. Rien n’a été modifié."
     },
     "requiredTag": "obligatoire",
     "optionalTag": "facultatif",
@@ -129,6 +131,24 @@
     },
     "operations": "Opérations de compte",
     "operationsDescription": "Un compte parent : vérification, accès des enfants et utilisation"
+  },
+  "parentLinks": {
+    "title": "Lier un enfant à un compte parent",
+    "description": "Une liaison administrative prend effet immédiatement et ne demande aucune confirmation. C’est la seule voie pour un mineur : une demande des parents est refusée dès que l’un des deux comptes est mineur ou n’a pas de date de naissance enregistrée.",
+    "parentLabel": "Compte parent",
+    "studentLabel": "Compte élève",
+    "filterLabel": "Filtrer par nom, e-mail ou numéro",
+    "choose": "Sélectionner un compte",
+    "relationshipLabel": "Lien de parenté",
+    "relationshipHint": "Enregistré avec la liaison et inscrit au journal d’audit.",
+    "submit": "Créer la liaison",
+    "submitExplainer": "Lie les deux comptes immédiatement. Aucun des deux n’a à confirmer.",
+    "assigned": "{{student}} est désormais lié à {{parent}}.",
+    "failed": "La liaison n’a pas pu être créée.",
+    "loading": "Chargement des comptes…",
+    "loadFailed": "La liste des comptes n’a pas pu être chargée.",
+    "noParents": "Aucun compte parent actif ne correspond à ce filtre.",
+    "noStudents": "Aucun compte élève actif ne correspond à ce filtre."
   },
   "activation": {
     "eyebrow": "Invitation de compte",

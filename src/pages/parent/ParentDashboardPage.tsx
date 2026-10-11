@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Group, Pill, Row } from '@/components/base'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
+import { NoLinkedChildrenNotice } from '@/components/parent/NoLinkedChildrenNotice'
 import { ParentDashboardSkeleton } from '@/components/parent/ParentDashboardSkeleton'
 import { ParentValueCard } from '@/components/parent/ParentValueCard'
 // Card 007: payments and billing are frozen; the upgrade prompt and the
@@ -34,7 +35,7 @@ export function ParentDashboardPage() {
         {childrenQuery.isLoading && <ParentDashboardSkeleton showHeader={false} />}
         {childrenQuery.isError && <p className="text-sm text-red">{t('loadChildrenFailed')}</p>}
         {childrenQuery.data && children.length === 0 && (
-          <p className="m-0 text-[15px] text-caption">{t('noChildren')}</p>
+          <NoLinkedChildrenNotice headline={t('noChildren')} />
         )}
         {children.length > 0 && (
           <Group title={t('overview.children')}>
