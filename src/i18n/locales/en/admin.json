@@ -187,5 +187,211 @@
       "covers": "Administrators manage accounts under Users (invitations, assignments, password resets, suspension and archiving) and review teacher applications, the curriculum and moderation in their own sections.",
       "notYet": "Support cases are not handled here yet, and system status is still to come."
     }
+  },
+  "accountOperations": {
+    "eyebrow": "Account operations",
+    "title": "Parent support console",
+    "description": "Inspect verification, billing, child access, entitlement, and usage state for one parent account.",
+    "lookup": {
+      "parentId": "Parent ID",
+      "usageDay": "Usage day",
+      "checkoutRef": "Checkout reference",
+      "submit": "Inspect",
+      "empty": "Enter a parent ID to inspect account operations, or open this view from a provider billing record in the subscription queue.",
+      "notFound": "Parent account was not found.",
+      "unavailable": "Admin account operations are unavailable. Please try again later."
+    },
+    "support": {
+      "kicker": "Support state",
+      "ready": "No account operations blockers or warnings are currently reported.",
+      "review": "Review blockers and warnings before making support or billing decisions."
+    },
+    "facts": {
+      "parentVerification": "Parent verification",
+      "billing": "Billing",
+      "plan": "{{plan}} plan",
+      "children": "Children",
+      "linkedChildren_one": "Linked child",
+      "linkedChildren_other": "Linked children",
+      "usageRows": "Usage rows",
+      "reconciliationPending": "Reconciliation pending",
+      "usageMatched": "Usage matched"
+    },
+    "billing": {
+      "title": "Billing evidence",
+      "description": "Provider, manual override, readiness, and recent billing events used by account operations.",
+      "provider": "Provider",
+      "manual": "Manual",
+      "requestedTier": "Requested tier",
+      "currentPeriod": "Current period",
+      "lastEvent": "Last event",
+      "manualOverride": "Manual override",
+      "cancelAtPeriodEnd": "Cancel at period end",
+      "supportAction": "Support action",
+      "duplicateEvents": "Duplicate events",
+      "staleIgnored": "Stale ignored",
+      "recentEvents": "Recent billing events",
+      "noEvents": "No billing events recorded yet.",
+      "eventStatus": "Status: {{status}}",
+      "providerEvent": "Provider event: {{id}}",
+      "processing": "Processing: {{result}}"
+    },
+    "children": {
+      "title": "Child access and entitlement",
+      "empty": "No linked child account is visible for this parent.",
+      "binding": "Binding",
+      "verification": "Verification",
+      "recovery": "Recovery",
+      "plan": "Plan",
+      "usage": "Usage",
+      "usageUsed": "{{consumed}}/{{limit}} used",
+      "usageUnavailable": "Usage unavailable"
+    },
+    "usage": {
+      "title": "Usage summary",
+      "empty": "No usage summary is available for this parent and day.",
+      "reconciling": "Reconciling",
+      "matched": "Matched",
+      "remaining_one": "{{count}} remaining",
+      "remaining_other": "{{count}} remaining",
+      "consumed": "{{consumed}} of {{limit}} used",
+      "support": "Support: {{action}}"
+    },
+    "recovery": {
+      "kicker": "Read-only support",
+      "title": "Billing recovery evidence",
+      "description": "Inspect redacted evidence and recheck only this original checkout command.",
+      "rechecking": "Rechecking…",
+      "recheck": "Recheck original checkout",
+      "active": "Billing operation is active.",
+      "supportNeeded": "Support needed: {{code}}.",
+      "state": "Billing operation is {{state}}.",
+      "safeAction": "Safe action: {{action}} · Lease generation {{generation}}",
+      "pendingConvergence": "Pending convergence",
+      "parent": "Parent",
+      "targetPlan": "Target plan",
+      "effectivePlan": "Effective plan",
+      "sessionSuffix": "Stripe session suffix",
+      "noSession": "No session recorded",
+      "commandState": "Command state",
+      "providerEffect": "Provider effect",
+      "created": "Created",
+      "updated": "Updated",
+      "lastRechecked": "Last rechecked",
+      "failureCode": "Failure code",
+      "beneficiaries": "Beneficiaries and versions",
+      "grantVersion": "Grant version {{version}}",
+      "allowanceVersion": "Allowance version {{version}}",
+      "loading": "Loading billing recovery evidence",
+      "facts": {
+        "title": "Authoritative billing facts",
+        "empty": "No authoritative billing facts recorded.",
+        "version": "Fact version {{version}}",
+        "signed": "Signed test-mode evidence",
+        "eventDigest": "Event digest: {{digest}}",
+        "objectDigest": "Object digest: {{digest}}"
+      },
+      "providerUsage": {
+        "title": "Provider usage evidence",
+        "empty": "No provider usage evidence recorded.",
+        "tokens": "{{input}} input / {{output}} output",
+        "modelDigest": "Model digest: {{digest}}",
+        "requestDigest": "Request digest: {{digest}}",
+        "correlationDigest": "Correlation digest: {{digest}}",
+        "costRetained": "Provider cost retained: {{value}}"
+      },
+      "reminder": {
+        "title": "Payment reminder",
+        "card": "{{brand}} ending in {{last4}}",
+        "expires": "Expires {{month}}/{{year}}",
+        "status": "Reminder {{status}}",
+        "empty": "No payment reminder recorded."
+      },
+      "errors": {
+        "recheck": "Billing recheck failed. Contact support with the checkout reference.",
+        "read": "Billing recovery evidence could not be loaded.",
+        "denied": "Billing evidence access is denied. The billing support capability is required.",
+        "inProgress": "Billing recheck is already in progress. Wait briefly and retry this same checkout.",
+        "providerUnavailable": "Billing provider is temporarily unavailable. Keep this checkout reference and retry later.",
+        "notFound": "Billing checkout was not found for this parent."
+      }
+    },
+    "values": {
+      "none": "None",
+      "yes": "Yes",
+      "no": "No",
+      "unknown": "Unknown",
+      "pending": "Pending",
+      "available": "Available"
+    }
+  },
+  "curriculum": {
+    "eyebrow": "Curriculum operations",
+    "title": "Curriculum editor",
+    "description": "Patch drafts, validate content, review lifecycle evidence, and apply migration manifests against backend-authorized curriculum APIs.",
+    "refresh": "Refresh worklist",
+    "denied": "The backend did not grant access to curriculum operations.",
+    "tabs": {
+      "worklist": "Worklist",
+      "editor": "Editor",
+      "review": "Review",
+      "migration": "Migration",
+      "evidence": "Evidence"
+    },
+    "capabilities": {
+      "kicker": "Backend authorization",
+      "description": "The console shows controls, but backend capability checks decide every mutation."
+    },
+    "worklist": {
+      "loading": "Loading curriculum worklist.",
+      "empty": "No curriculum items are available.",
+      "updated": "Updated {{at}} by {{by}}",
+      "unknown": "unknown",
+      "open": "Open"
+    },
+    "editor": {
+      "title": "Draft patch",
+      "publicLesson": "Public lesson",
+      "version": "Version",
+      "save": "Save draft",
+      "loadCurrent": "Load current content",
+      "saved": "Saved {{version}}.",
+      "current": "Current content"
+    },
+    "review": {
+      "validation": "Validation",
+      "runValidation": "Run validation",
+      "diff": "Diff",
+      "fromVersion": "from version",
+      "toVersion": "to version",
+      "compare": "Compare",
+      "title": "Review and audit",
+      "submit": "Submit",
+      "approve": "Approve",
+      "requestChanges": "Request changes",
+      "publish": "Publish",
+      "loadAudit": "Load audit",
+      "missingCapability": "Missing reviewer or publisher capability."
+    },
+    "migration": {
+      "manifest": "Manifest",
+      "dryRun": "Dry-run",
+      "dryRunAndApply": "Dry-run and apply",
+      "ready": "Ready",
+      "blocked": "Blocked",
+      "tokenPlaceholder": "confirmation token",
+      "apply": "Apply migration",
+      "hint": "Run dry-run to inspect row actions and confirmation token.",
+      "applied": "Applied {{migration}}."
+    },
+    "evidence": {
+      "title": "Migration evidence",
+      "idPlaceholder": "migration id",
+      "load": "Load evidence",
+      "missingCapability": "Missing migration operator or publisher capability."
+    },
+    "selectItem": "Select a curriculum item from the worklist.",
+    "requestFailed": "Curriculum API request failed.",
+    "invalidJson": "JSON is invalid"
   }
 }
