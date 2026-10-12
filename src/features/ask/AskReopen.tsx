@@ -16,15 +16,23 @@ import { ASK_REOPEN } from '@/features/ask/askLayout'
  * It sits on the right edge, halfway down, which is the one band the star map's
  * zoom pair, its legend, its "?" and the docked composer all leave alone --
  * `ASK_REOPEN` has the measurements.
+ *
+ * On the practice stage that band is the exercise itself, and at 375 the
+ * button sat over the heading and the feedback (#180). There it goes `inline`,
+ * at the end of the docked composer's row.
  */
 export function AskReopen({
   onOpen,
   /** A conversation is waiting; without one this opens the list. */
   resuming,
+  placement = 'edge',
 }: {
   onOpen: () => void
   resuming: boolean
+  /** `edge`: over the page, the right edge's middle; `inline`: in the flow, beside a composer. */
+  placement?: 'edge' | 'inline'
 }) {
+  const edge = placement === 'edge'
   const { t } = useTranslation('chat')
   const label = resuming ? t('ask.reopen.resume') : t('ask.reopen.open')
 
@@ -35,9 +43,10 @@ export function AskReopen({
       aria-label={label}
       title={label}
       onClick={onOpen}
-      className="absolute top-1/2 z-10 inline-flex -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-solid border-[color:var(--sky-glass-border)] bg-[color:var(--sky-glass)] p-0 text-[color:var(--on-sky-text)] backdrop-blur-[var(--sky-glass-blur)] hover:bg-[color:var(--on-sky-selected)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      data-ask-reopen-placement={placement}
+      className={`${edge ? 'absolute top-1/2 z-10 -translate-y-1/2' : 'shrink-0'} inline-flex cursor-pointer items-center justify-center rounded-full border border-solid border-[color:var(--sky-glass-border)] bg-[color:var(--sky-glass)] p-0 text-[color:var(--on-sky-text)] backdrop-blur-[var(--sky-glass-blur)] hover:bg-[color:var(--on-sky-selected)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring`}
       style={{
-        right: ASK_REOPEN.inset,
+        right: edge ? ASK_REOPEN.inset : undefined,
         width: ASK_REOPEN.size,
         height: ASK_REOPEN.size,
         boxShadow: 'var(--shadow-glass)',

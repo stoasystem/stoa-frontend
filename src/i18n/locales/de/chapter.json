@@ -14,8 +14,8 @@
     "loading": "Das Kapitel wird geladen…",
     "missing": "Dieses Kapitel wurde nicht gefunden.",
     "progress": "Fortschritt im Kapitel",
-    "remaining_one": "Noch {{count}} Stern, bis dieser Punkt leuchtet.",
-    "remaining_other": "Noch {{count}} Sterne, bis dieser Punkt leuchtet.",
+    "remaining_one": "Noch {{count}} Lektion, bis dieser Punkt leuchtet.",
+    "remaining_other": "Noch {{count}} Lektionen, bis dieser Punkt leuchtet.",
     "retry": "Erneut versuchen",
     "start": "Beginnen: {{title}}",
     "status": {
