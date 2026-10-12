@@ -389,5 +389,211 @@
     "signals_one": "{{count}} segnale",
     "signals_other": "{{count}} segnali",
     "evidenceQuestions": "Domande a supporto: {{count}}"
+  },
+  "accountOperations": {
+    "eyebrow": "Operazioni account",
+    "title": "Console di supporto genitori",
+    "description": "Controlla verifica, fatturazione, accesso dei figli, diritti e utilizzo di un account genitore.",
+    "lookup": {
+      "parentId": "ID genitore",
+      "usageDay": "Giorno di utilizzo",
+      "checkoutRef": "Riferimento checkout",
+      "submit": "Esamina",
+      "empty": "Inserisci l’ID di un genitore per esaminare le operazioni dell’account, oppure apri questa vista da un record di fatturazione del provider nella coda degli abbonamenti.",
+      "notFound": "Account genitore non trovato.",
+      "unavailable": "Le operazioni account non sono disponibili. Riprova più tardi."
+    },
+    "support": {
+      "kicker": "Stato del supporto",
+      "ready": "Al momento non sono segnalati blocchi o avvisi per questo account.",
+      "review": "Controlla blocchi e avvisi prima di prendere decisioni di supporto o fatturazione."
+    },
+    "facts": {
+      "parentVerification": "Verifica genitore",
+      "billing": "Fatturazione",
+      "plan": "Piano {{plan}}",
+      "children": "Figli",
+      "linkedChildren_one": "Figlio collegato",
+      "linkedChildren_other": "Figli collegati",
+      "usageRows": "Righe di utilizzo",
+      "reconciliationPending": "Riconciliazione in sospeso",
+      "usageMatched": "Utilizzo riconciliato"
+    },
+    "billing": {
+      "title": "Evidenze di fatturazione",
+      "description": "Provider, override manuale, prontezza ed eventi di fatturazione recenti usati dalle operazioni account.",
+      "provider": "Provider",
+      "manual": "Manuale",
+      "requestedTier": "Livello richiesto",
+      "currentPeriod": "Periodo corrente",
+      "lastEvent": "Ultimo evento",
+      "manualOverride": "Override manuale",
+      "cancelAtPeriodEnd": "Disdetta a fine periodo",
+      "supportAction": "Azione di supporto",
+      "duplicateEvents": "Eventi duplicati",
+      "staleIgnored": "Obsoleti ignorati",
+      "recentEvents": "Eventi di fatturazione recenti",
+      "noEvents": "Nessun evento di fatturazione registrato finora.",
+      "eventStatus": "Stato: {{status}}",
+      "providerEvent": "Evento provider: {{id}}",
+      "processing": "Elaborazione: {{result}}"
+    },
+    "children": {
+      "title": "Accesso e diritti dei figli",
+      "empty": "Nessun account figlio collegato è visibile per questo genitore.",
+      "binding": "Collegamento",
+      "verification": "Verifica",
+      "recovery": "Ripristino",
+      "plan": "Piano",
+      "usage": "Utilizzo",
+      "usageUsed": "{{consumed}}/{{limit}} usati",
+      "usageUnavailable": "Utilizzo non disponibile"
+    },
+    "usage": {
+      "title": "Riepilogo utilizzo",
+      "empty": "Nessun riepilogo di utilizzo disponibile per questo genitore e questo giorno.",
+      "reconciling": "In riconciliazione",
+      "matched": "Riconciliato",
+      "remaining_one": "{{count}} rimanente",
+      "remaining_other": "{{count}} rimanenti",
+      "consumed": "{{consumed}} di {{limit}} usati",
+      "support": "Supporto: {{action}}"
+    },
+    "recovery": {
+      "kicker": "Supporto in sola lettura",
+      "title": "Evidenze di ripristino fatturazione",
+      "description": "Esamina le evidenze oscurate e ricontrolla solo questo comando di checkout originale.",
+      "rechecking": "Nuovo controllo…",
+      "recheck": "Ricontrolla il checkout originale",
+      "active": "L’operazione di fatturazione è attiva.",
+      "supportNeeded": "Supporto necessario: {{code}}.",
+      "state": "Stato dell’operazione di fatturazione: {{state}}.",
+      "safeAction": "Azione sicura: {{action}} · Generazione lease {{generation}}",
+      "pendingConvergence": "Convergenza in sospeso",
+      "parent": "Genitore",
+      "targetPlan": "Piano di destinazione",
+      "effectivePlan": "Piano effettivo",
+      "sessionSuffix": "Suffisso sessione Stripe",
+      "noSession": "Nessuna sessione registrata",
+      "commandState": "Stato del comando",
+      "providerEffect": "Effetto presso il provider",
+      "created": "Creato",
+      "updated": "Aggiornato",
+      "lastRechecked": "Ultimo ricontrollo",
+      "failureCode": "Codice di errore",
+      "beneficiaries": "Beneficiari e versioni",
+      "grantVersion": "Versione concessione {{version}}",
+      "allowanceVersion": "Versione quota {{version}}",
+      "loading": "Caricamento delle evidenze di ripristino fatturazione",
+      "facts": {
+        "title": "Fatti di fatturazione di riferimento",
+        "empty": "Nessun fatto di fatturazione di riferimento registrato.",
+        "version": "Versione del fatto {{version}}",
+        "signed": "Evidenza firmata in modalità test",
+        "eventDigest": "Digest evento: {{digest}}",
+        "objectDigest": "Digest oggetto: {{digest}}"
+      },
+      "providerUsage": {
+        "title": "Evidenze di utilizzo del provider",
+        "empty": "Nessuna evidenza di utilizzo del provider registrata.",
+        "tokens": "{{input}} in ingresso / {{output}} in uscita",
+        "modelDigest": "Digest modello: {{digest}}",
+        "requestDigest": "Digest richiesta: {{digest}}",
+        "correlationDigest": "Digest correlazione: {{digest}}",
+        "costRetained": "Costo provider conservato: {{value}}"
+      },
+      "reminder": {
+        "title": "Promemoria di pagamento",
+        "card": "{{brand}} che termina con {{last4}}",
+        "expires": "Scadenza: {{month}}/{{year}}",
+        "status": "Promemoria: {{status}}",
+        "empty": "Nessun promemoria di pagamento registrato."
+      },
+      "errors": {
+        "recheck": "Il nuovo controllo della fatturazione non è riuscito. Contatta il supporto indicando il riferimento del checkout.",
+        "read": "Non è stato possibile caricare le evidenze di ripristino fatturazione.",
+        "denied": "Accesso alle evidenze di fatturazione negato. È necessaria la capacità di supporto fatturazione.",
+        "inProgress": "Un nuovo controllo della fatturazione è già in corso. Attendi un attimo e riprova con lo stesso checkout.",
+        "providerUnavailable": "Il provider di fatturazione non è momentaneamente disponibile. Conserva questo riferimento del checkout e riprova più tardi.",
+        "notFound": "Nessun checkout corrispondente trovato per questo genitore."
+      }
+    },
+    "values": {
+      "none": "Nessuno",
+      "yes": "Sì",
+      "no": "No",
+      "unknown": "Sconosciuto",
+      "pending": "In sospeso",
+      "available": "Disponibile"
+    }
+  },
+  "curriculum": {
+    "eyebrow": "Operazioni del programma",
+    "title": "Editor del programma",
+    "description": "Modifica le bozze, convalida i contenuti, esamina le evidenze del ciclo di vita e applica i manifest di migrazione tramite le API del programma autorizzate dal backend.",
+    "refresh": "Aggiorna la lista di lavoro",
+    "denied": "Il backend non ha concesso l’accesso alle operazioni del programma.",
+    "tabs": {
+      "worklist": "Lista di lavoro",
+      "editor": "Editor",
+      "review": "Revisione",
+      "migration": "Migrazione",
+      "evidence": "Evidenze"
+    },
+    "capabilities": {
+      "kicker": "Autorizzazione backend",
+      "description": "La console mostra i comandi, ma ogni modifica è decisa dai controlli di capacità del backend."
+    },
+    "worklist": {
+      "loading": "Caricamento della lista di lavoro del programma.",
+      "empty": "Nessun elemento del programma disponibile.",
+      "updated": "Aggiornato {{at}} da {{by}}",
+      "unknown": "sconosciuto",
+      "open": "Apri"
+    },
+    "editor": {
+      "title": "Modifica della bozza",
+      "publicLesson": "Lezione pubblica",
+      "version": "Versione",
+      "save": "Salva bozza",
+      "loadCurrent": "Carica il contenuto attuale",
+      "saved": "{{version}} salvata.",
+      "current": "Contenuto attuale"
+    },
+    "review": {
+      "validation": "Convalida",
+      "runValidation": "Avvia la convalida",
+      "diff": "Confronto",
+      "fromVersion": "dalla versione",
+      "toVersion": "alla versione",
+      "compare": "Confronta",
+      "title": "Revisione e audit",
+      "submit": "Invia",
+      "approve": "Approva",
+      "requestChanges": "Richiedi modifiche",
+      "publish": "Pubblica",
+      "loadAudit": "Carica audit",
+      "missingCapability": "Manca la capacità di revisore o di pubblicazione."
+    },
+    "migration": {
+      "manifest": "Manifest",
+      "dryRun": "Simulazione",
+      "dryRunAndApply": "Simulazione e applicazione",
+      "ready": "Pronto",
+      "blocked": "Bloccato",
+      "tokenPlaceholder": "token di conferma",
+      "apply": "Applica la migrazione",
+      "hint": "Avvia una simulazione per esaminare le azioni per riga e il token di conferma.",
+      "applied": "{{migration}} applicata."
+    },
+    "evidence": {
+      "title": "Evidenze di migrazione",
+      "idPlaceholder": "ID migrazione",
+      "load": "Carica le evidenze",
+      "missingCapability": "Manca la capacità di operatore di migrazione o di pubblicazione."
+    },
+    "selectItem": "Seleziona un elemento del programma dalla lista di lavoro.",
+    "requestFailed": "La richiesta all’API del programma non è riuscita.",
+    "invalidJson": "Il JSON non è valido"
   }
 }

@@ -1,5 +1,6 @@
 import { type FormEvent, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
+import type { TFunction } from 'i18next'
 import { AlertTriangle, CheckCircle2, Link2, RefreshCw, Search, ShieldAlert, UserRound } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useSearchParams } from 'react-router-dom'
@@ -15,7 +16,9 @@ import { ApiError } from '@/services/api/httpClient'
 import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
+import { activeLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { formatDayAndTime } from '@/lib/formatDateTime'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 import type { AccountRow } from '@/services/admin/accountsApi'
@@ -25,6 +28,7 @@ import type { AccountOperationsChild, AccountOperationsUsage } from '@/types/par
 import type { SubscriptionBillingEvent } from '@/types/subscriptionOperations'
 
 export function AdminAccountOperationsPage() {
+  const { t } = useTranslation('admin')
   const [searchParams, setSearchParams] = useSearchParams()
   const parentId = searchParams.get('parentId')?.trim() ?? ''
   const day = searchParams.get('day')?.trim() ?? ''
@@ -54,14 +58,14 @@ export function AdminAccountOperationsPage() {
             queue is unrouted and its action link is withdrawn:
             actions={<Button asChild variant="outline"><Link to="/admin/subscriptions">Subscription queue</Link></Button>} */}
         <PageHeader
-          eyebrow="Account operations"
-          title="Parent support console"
-          description="Inspect verification, billing, child access, entitlement, and usage state for one parent account."
+          eyebrow={t('accountOperations.eyebrow')}
+          title={t('accountOperations.title')}
+          description={t('accountOperations.description')}
         />
 
         <form onSubmit={submitLookup} className="grid gap-3 rounded-md border border-border/70 bg-card p-4 lg:grid-cols-[minmax(0,0.8fr)_12rem_minmax(0,1.2fr)_auto]">
           <label className="space-y-2 text-sm font-medium text-foreground">
-            Parent ID
+            {t('accountOperations.lookup.parentId')}
             <Input
               value={draftParentId}
               onChange={(event) => setDraftParentId(event.target.value)}
@@ -69,7 +73,7 @@ export function AdminAccountOperationsPage() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-foreground">
-            Usage day
+            {t('accountOperations.lookup.usageDay')}
             <Input
               value={draftDay}
               onChange={(event) => setDraftDay(event.target.value)}
@@ -77,7 +81,7 @@ export function AdminAccountOperationsPage() {
             />
           </label>
           <label className="space-y-2 text-sm font-medium text-foreground">
-            Checkout reference
+            {t('accountOperations.lookup.checkoutRef')}
             <Input
               value={draftCheckoutRef}
               onChange={(event) => setDraftCheckoutRef(event.target.value)}
@@ -86,7 +90,7 @@ export function AdminAccountOperationsPage() {
           </label>
           <Button type="submit" className="self-end">
             <Search className="mr-2 h-4 w-4" aria-hidden="true" />
-            Inspect
+            {t('accountOperations.lookup.submit')}
           </Button>
         </form>
 
@@ -372,12 +376,13 @@ function BillingRecoveryDetail({
   recheckError: Error | null
   onRecheck: () => void
 }) {
+  const { t } = useTranslation('admin')
   const reconciliation = data.reconciliation
   const supportNeeded = reconciliation.lifecycleState === 'support_needed'
   const active = reconciliation.lifecycleState === 'active'
   const effectivePlan = active && Object.keys(data.grantVersion).length > 0
     ? formatStatus(data.targetPlan)
-    : 'Pending convergence'
+    : t('accountOperations.recovery.pendingConvergence')
 
   return (
     <section className="space-y-4" aria-labelledby="billing-recovery-title">
@@ -385,12 +390,12 @@ function BillingRecoveryDetail({
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="brand-section-kicker">Read-only support</p>
+              <p className="brand-section-kicker">{t('accountOperations.recovery.kicker')}</p>
               <CardTitle id="billing-recovery-title" className="mt-2 text-xl">
-                Billing recovery evidence
+                {t('accountOperations.recovery.title')}
               </CardTitle>
               <p className="mt-2 text-sm text-muted-foreground">
-                Inspect redacted evidence and recheck only this original checkout command.
+                {t('accountOperations.recovery.description')}
               </p>
             </div>
             <Button
@@ -400,7 +405,7 @@ function BillingRecoveryDetail({
               onClick={onRecheck}
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${rechecking ? 'animate-spin' : ''}`} aria-hidden="true" />
-              {rechecking ? 'Rechecking…' : 'Recheck original checkout'}
+              {rechecking ? t('accountOperations.recovery.rechecking') : t('accountOperations.recovery.recheck')}
             </Button>
           </div>
         </CardHeader>
@@ -417,46 +422,52 @@ function BillingRecoveryDetail({
           >
             <p className="font-semibold">
               {active
-                ? 'Billing operation is active.'
+                ? t('accountOperations.recovery.active')
                 : supportNeeded
-                  ? `Support needed: ${formatStatus(reconciliation.failureCode)}.`
-                  : `Billing operation is ${formatStatus(reconciliation.lifecycleState)}.`}
+                  ? t('accountOperations.recovery.supportNeeded', { code: formatStatus(reconciliation.failureCode) })
+                  : t('accountOperations.recovery.state', { state: formatStatus(reconciliation.lifecycleState) })}
             </p>
             <p className="mt-1 text-sm">
-              Safe action: {formatStatus(reconciliation.safeAction)} · Lease generation{' '}
-              {reconciliation.reconciliationLeaseGeneration}
+              {t('accountOperations.recovery.safeAction', {
+                action: formatStatus(reconciliation.safeAction),
+                generation: reconciliation.reconciliationLeaseGeneration,
+              })}
             </p>
           </div>
 
           {recheckError && <BillingRecoveryError error={recheckError} operation="recheck" />}
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <DetailItem label="Parent" value={data.parentId} />
-            <DetailItem label="Target plan" value={formatStatus(data.targetPlan)} />
-            <DetailItem label="Effective plan" value={effectivePlan} />
+            <DetailItem label={t('accountOperations.recovery.parent')} value={data.parentId} />
+            <DetailItem label={t('accountOperations.recovery.targetPlan')} value={formatStatus(data.targetPlan)} />
+            <DetailItem label={t('accountOperations.recovery.effectivePlan')} value={effectivePlan} />
             <DetailItem
-              label="Stripe session suffix"
-              value={reconciliation.providerSessionSuffix ? `…${reconciliation.providerSessionSuffix}` : 'No session recorded'}
+              label={t('accountOperations.recovery.sessionSuffix')}
+              value={reconciliation.providerSessionSuffix ? `…${reconciliation.providerSessionSuffix}` : t('accountOperations.recovery.noSession')}
             />
-            <DetailItem label="Command state" value={formatStatus(data.commandLifecycle.state)} />
-            <DetailItem label="Provider effect" value={formatStatus(data.commandLifecycle.providerEffectStatus)} />
-            <DetailItem label="Created" value={formatDate(data.commandLifecycle.createdAt)} />
-            <DetailItem label="Updated" value={formatDate(data.commandLifecycle.updatedAt)} />
-            <DetailItem label="Last rechecked" value={formatDate(reconciliation.lastRecheckedAt)} />
-            <DetailItem label="Failure code" value={formatStatus(reconciliation.failureCode)} />
+            <DetailItem label={t('accountOperations.recovery.commandState')} value={formatStatus(data.commandLifecycle.state)} />
+            <DetailItem label={t('accountOperations.recovery.providerEffect')} value={formatStatus(data.commandLifecycle.providerEffectStatus)} />
+            <DetailItem label={t('accountOperations.recovery.created')} value={formatDate(data.commandLifecycle.createdAt)} />
+            <DetailItem label={t('accountOperations.recovery.updated')} value={formatDate(data.commandLifecycle.updatedAt)} />
+            <DetailItem label={t('accountOperations.recovery.lastRechecked')} value={formatDate(reconciliation.lastRecheckedAt)} />
+            <DetailItem label={t('accountOperations.recovery.failureCode')} value={formatStatus(reconciliation.failureCode)} />
           </div>
 
           <div>
-            <h3 className="text-base font-semibold text-foreground">Beneficiaries and versions</h3>
+            <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.beneficiaries')}</h3>
             <div className="mt-3 grid gap-3">
               {data.beneficiaryIds.map((beneficiaryId) => (
                 <div key={beneficiaryId} className="grid gap-2 rounded-md border border-border/70 p-3 sm:grid-cols-3">
                   <p className="font-medium text-foreground">{beneficiaryId}</p>
                   <p className="text-sm text-muted-foreground">
-                    Grant version {data.grantVersion[beneficiaryId] ?? 'Pending'}
+                    {t('accountOperations.recovery.grantVersion', {
+                      version: data.grantVersion[beneficiaryId] ?? t('accountOperations.values.pending'),
+                    })}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Allowance version {data.allowanceVersion[beneficiaryId] ?? 'Pending'}
+                    {t('accountOperations.recovery.allowanceVersion', {
+                      version: data.allowanceVersion[beneficiaryId] ?? t('accountOperations.values.pending'),
+                    })}
                   </p>
                 </div>
               ))}
@@ -473,11 +484,12 @@ function BillingRecoveryDetail({
 }
 
 function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  const { t } = useTranslation('admin')
   return (
     <div>
-      <h3 className="text-base font-semibold text-foreground">Authoritative billing facts</h3>
+      <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.facts.title')}</h3>
       {data.factLifecycle.length === 0 ? (
-        <p className="mt-2 text-sm text-muted-foreground">No authoritative billing facts recorded.</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('accountOperations.recovery.facts.empty')}</p>
       ) : (
         <div className="mt-3 grid gap-3">
           {data.factLifecycle.map((fact) => (
@@ -487,10 +499,10 @@ function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
                 <p className="text-muted-foreground">{formatDate(fact.observedAt)}</p>
               </div>
               <div className="mt-2 grid gap-1 text-muted-foreground lg:grid-cols-2">
-                <p>Fact version {fact.factVersion}</p>
-                <p>Signed test-mode evidence</p>
-                <p className="break-all">Event digest: {fact.providerEventIdDigest}</p>
-                <p className="break-all">Object digest: {fact.providerObjectIdDigest}</p>
+                <p>{t('accountOperations.recovery.facts.version', { version: fact.factVersion })}</p>
+                <p>{t('accountOperations.recovery.facts.signed')}</p>
+                <p className="break-all">{t('accountOperations.recovery.facts.eventDigest', { digest: fact.providerEventIdDigest })}</p>
+                <p className="break-all">{t('accountOperations.recovery.facts.objectDigest', { digest: fact.providerObjectIdDigest })}</p>
               </div>
             </div>
           ))}
@@ -501,11 +513,13 @@ function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
 }
 
 function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  const { t } = useTranslation('admin')
+  const formatCount = (value: number) => new Intl.NumberFormat(activeLanguage()).format(value)
   return (
     <div>
-      <h3 className="text-base font-semibold text-foreground">Provider usage evidence</h3>
+      <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.providerUsage.title')}</h3>
       {data.providerUsageEvidence.length === 0 ? (
-        <p className="mt-2 text-sm text-muted-foreground">No provider usage evidence recorded.</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('accountOperations.recovery.providerUsage.empty')}</p>
       ) : (
         <div className="mt-3 grid gap-3">
           {data.providerUsageEvidence.map((evidence) => (
@@ -518,13 +532,20 @@ function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) 
                 <p className="text-muted-foreground">{formatDate(evidence.observedAt)}</p>
               </div>
               <p className="mt-2 font-medium text-foreground">
-                {formatCount(evidence.inputTokens)} input / {formatCount(evidence.outputTokens)} output
+                {t('accountOperations.recovery.providerUsage.tokens', {
+                  input: formatCount(evidence.inputTokens),
+                  output: formatCount(evidence.outputTokens),
+                })}
               </p>
               <div className="mt-2 grid gap-1 break-all text-muted-foreground">
-                <p>Model digest: {evidence.modelIdDigest}</p>
-                <p>Request digest: {evidence.providerRequestIdDigest}</p>
-                <p>Correlation digest: {evidence.correlationDigest}</p>
-                <p>Provider cost retained: {evidence.providerCostRetained ? 'Yes' : 'No'}</p>
+                <p>{t('accountOperations.recovery.providerUsage.modelDigest', { digest: evidence.modelIdDigest })}</p>
+                <p>{t('accountOperations.recovery.providerUsage.requestDigest', { digest: evidence.providerRequestIdDigest })}</p>
+                <p>{t('accountOperations.recovery.providerUsage.correlationDigest', { digest: evidence.correlationDigest })}</p>
+                <p>
+                  {t('accountOperations.recovery.providerUsage.costRetained', {
+                    value: evidence.providerCostRetained ? t('accountOperations.values.yes') : t('accountOperations.values.no'),
+                  })}
+                </p>
               </div>
             </div>
           ))}
@@ -535,31 +556,38 @@ function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) 
 }
 
 function PaymentReminderEvidence({ data }: { data: AdminBillingOperationDetail }) {
+  const { t } = useTranslation('admin')
   const reminder = data.paymentReminder
   return (
     <div>
-      <h3 className="text-base font-semibold text-foreground">Payment reminder</h3>
+      <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.reminder.title')}</h3>
       {reminder ? (
         <div className="mt-3 grid gap-3 rounded-md border border-border/70 p-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
           <p className="font-medium text-foreground">
-            {formatStatus(reminder.brand)} ending in {reminder.last4}
+            {t('accountOperations.recovery.reminder.card', { brand: formatStatus(reminder.brand), last4: reminder.last4 })}
           </p>
           <p className="text-muted-foreground">
-            Expires {String(reminder.expiryMonth).padStart(2, '0')}/{reminder.expiryYear}
+            {t('accountOperations.recovery.reminder.expires', {
+              month: String(reminder.expiryMonth).padStart(2, '0'),
+              year: reminder.expiryYear,
+            })}
           </p>
-          <p className="text-muted-foreground">Reminder {formatStatus(reminder.status)}</p>
+          <p className="text-muted-foreground">
+            {t('accountOperations.recovery.reminder.status', { status: formatStatus(reminder.status) })}
+          </p>
           <p className="text-muted-foreground">{formatDate(reminder.reminderAt)}</p>
         </div>
       ) : (
-        <p className="mt-2 text-sm text-muted-foreground">No payment reminder recorded.</p>
+        <p className="mt-2 text-sm text-muted-foreground">{t('accountOperations.recovery.reminder.empty')}</p>
       )}
     </div>
   )
 }
 
 function BillingRecoveryLoading() {
+  const { t } = useTranslation('admin')
   return (
-    <Card aria-busy="true" aria-label="Loading billing recovery evidence">
+    <Card aria-busy="true" aria-label={t('accountOperations.recovery.loading')}>
       <CardContent className="space-y-3 p-5">
         <div className="h-4 w-48 rounded bg-muted" />
         <div className="h-4 w-full max-w-2xl rounded bg-muted" />
@@ -576,19 +604,20 @@ function BillingRecoveryError({
   error: Error | null
   operation: 'read' | 'recheck'
 }) {
+  const { t } = useTranslation('admin')
   const status = error instanceof ApiError ? error.status : undefined
   let message = operation === 'recheck'
-    ? 'Billing recheck failed. Contact support with the checkout reference.'
-    : 'Billing recovery evidence could not be loaded.'
+    ? t('accountOperations.recovery.errors.recheck')
+    : t('accountOperations.recovery.errors.read')
 
   if (status === 403) {
-    message = 'Billing evidence access is denied. The billing support capability is required.'
+    message = t('accountOperations.recovery.errors.denied')
   } else if (status === 409 || status === 423 || status === 429) {
-    message = 'Billing recheck is already in progress. Wait briefly and retry this same checkout.'
+    message = t('accountOperations.recovery.errors.inProgress')
   } else if (status === 503) {
-    message = 'Billing provider is temporarily unavailable. Keep this checkout reference and retry later.'
+    message = t('accountOperations.recovery.errors.providerUnavailable')
   } else if (status === 404) {
-    message = 'Billing checkout was not found for this parent.'
+    message = t('accountOperations.recovery.errors.notFound')
   }
 
   return (
@@ -611,12 +640,12 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
           <div className="flex items-start gap-3">
             <Icon className="mt-1 h-6 w-6 shrink-0" aria-hidden="true" />
             <div>
-              <p className="brand-section-kicker">Support state</p>
+              <p className="brand-section-kicker">{t('accountOperations.support.kicker')}</p>
               <h2 className="mt-2 text-2xl font-semibold text-foreground">{formatStatus(state)}</h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
                 {state === 'ready'
-                  ? 'No account operations blockers or warnings are currently reported.'
-                  : 'Review blockers and warnings before making support or billing decisions.'}
+                  ? t('accountOperations.support.ready')
+                  : t('accountOperations.support.review')}
               </p>
             </div>
           </div>
@@ -634,10 +663,10 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
       </section>
 
       <div className="grid gap-4 lg:grid-cols-4">
-        <FactCard title="Parent verification" value={formatStatus(data.parent.verification?.emailVerificationStatus)} detail={`${data.parent.name} / ${data.parent.email}`} />
-        <FactCard title="Billing" value={formatStatus(data.billing.status)} detail={`${formatStatus(data.billing.subscriptionTier)} plan`} />
-        <FactCard title="Children" value={String(data.children.length)} detail={data.children.length === 1 ? 'Linked child' : 'Linked children'} />
-        <FactCard title="Usage rows" value={String(data.usage.length)} detail={data.usage.some((item) => item.unreconciled) ? 'Reconciliation pending' : 'Usage matched'} />
+        <FactCard title={t('accountOperations.facts.parentVerification')} value={formatStatus(data.parent.verification?.emailVerificationStatus)} detail={`${data.parent.name} / ${data.parent.email}`} />
+        <FactCard title={t('accountOperations.facts.billing')} value={formatStatus(data.billing.status)} detail={t('accountOperations.facts.plan', { plan: formatStatus(data.billing.subscriptionTier) })} />
+        <FactCard title={t('accountOperations.facts.children')} value={String(data.children.length)} detail={t('accountOperations.facts.linkedChildren', { count: data.children.length })} />
+        <FactCard title={t('accountOperations.facts.usageRows')} value={String(data.usage.length)} detail={data.usage.some((item) => item.unreconciled) ? t('accountOperations.facts.reconciliationPending') : t('accountOperations.facts.usageMatched')} />
       </div>
 
       <VerificationRecoveryEvidence parent={data.parent} children={data.children} admin />
@@ -645,10 +674,10 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
       <BillingEvidence data={data} />
 
       <section className="space-y-3">
-        <h2 className="text-xl font-semibold text-foreground">Child access and entitlement</h2>
+        <h2 className="text-xl font-semibold text-foreground">{t('accountOperations.children.title')}</h2>
         {data.children.length === 0 ? (
           <Card>
-            <CardContent className="p-5 text-sm text-muted-foreground">No linked child account is visible for this parent.</CardContent>
+            <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOperations.children.empty')}</CardContent>
           </Card>
         ) : (
           <div className="grid gap-3">
@@ -665,6 +694,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
 }
 
 function BillingEvidence({ data }: { data: AdminAccountOperations }) {
+  const { t } = useTranslation('admin')
   const billing = data.billing
   const events = billing.events ?? []
   const supportEvidence = billing.supportEvidence
@@ -673,9 +703,9 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
       <CardHeader>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <CardTitle className="text-base">Billing evidence</CardTitle>
+            <CardTitle className="text-base">{t('accountOperations.billing.title')}</CardTitle>
             <p className="mt-2 text-sm text-muted-foreground">
-              Provider, manual override, readiness, and recent billing events used by account operations.
+              {t('accountOperations.billing.description')}
             </p>
           </div>
           <Badge variant={billing.status === 'active' ? 'secondary' : 'outline'}>{formatStatus(billing.mode)}</Badge>
@@ -683,19 +713,19 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
       </CardHeader>
       <CardContent className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(24rem,1.05fr)]">
         <div className="grid gap-3 sm:grid-cols-2">
-          <DetailItem label="Provider" value={billing.provider ?? 'Manual'} />
-          <DetailItem label="Requested tier" value={formatStatus(billing.requestedTier)} />
-          <DetailItem label="Current period" value={formatPeriod(billing.currentPeriodStart, billing.currentPeriodEnd)} />
-          <DetailItem label="Last event" value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : 'None'} />
-          <DetailItem label="Manual override" value={billing.manualOverrideSource ?? 'None'} />
-          <DetailItem label="Cancel at period end" value={billing.cancelAtPeriodEnd ? 'Yes' : 'No'} />
-          {supportEvidence && <DetailItem label="Support action" value={evidenceValue(supportEvidence, 'dunning', 'supportAction')} />}
-          {supportEvidence && <DetailItem label="Duplicate events" value={evidenceValue(supportEvidence, 'reconciliation', 'duplicateEvents')} />}
-          {supportEvidence && <DetailItem label="Stale ignored" value={evidenceValue(supportEvidence, 'reconciliation', 'staleIgnoredEvents')} />}
+          <DetailItem label={t('accountOperations.billing.provider')} value={billing.provider ?? t('accountOperations.billing.manual')} />
+          <DetailItem label={t('accountOperations.billing.requestedTier')} value={formatStatus(billing.requestedTier)} />
+          <DetailItem label={t('accountOperations.billing.currentPeriod')} value={formatPeriod(billing.currentPeriodStart, billing.currentPeriodEnd, formatDate, t)} />
+          <DetailItem label={t('accountOperations.billing.lastEvent')} value={billing.lastProviderEventType ? formatStatus(billing.lastProviderEventType) : t('accountOperations.values.none')} />
+          <DetailItem label={t('accountOperations.billing.manualOverride')} value={billing.manualOverrideSource ?? t('accountOperations.values.none')} />
+          <DetailItem label={t('accountOperations.billing.cancelAtPeriodEnd')} value={billing.cancelAtPeriodEnd ? t('accountOperations.values.yes') : t('accountOperations.values.no')} />
+          {supportEvidence && <DetailItem label={t('accountOperations.billing.supportAction')} value={evidenceValue(supportEvidence, 'dunning', 'supportAction', t)} />}
+          {supportEvidence && <DetailItem label={t('accountOperations.billing.duplicateEvents')} value={evidenceValue(supportEvidence, 'reconciliation', 'duplicateEvents', t)} />}
+          {supportEvidence && <DetailItem label={t('accountOperations.billing.staleIgnored')} value={evidenceValue(supportEvidence, 'reconciliation', 'staleIgnoredEvents', t)} />}
         </div>
         <div className="space-y-3">
-          <p className="text-sm font-semibold text-foreground">Recent billing events</p>
-          {events.length === 0 && <p className="text-sm text-muted-foreground">No billing events recorded yet.</p>}
+          <p className="text-sm font-semibold text-foreground">{t('accountOperations.billing.recentEvents')}</p>
+          {events.length === 0 && <p className="text-sm text-muted-foreground">{t('accountOperations.billing.noEvents')}</p>}
           {events.slice(0, 5).map((event) => (
             <BillingEventRow key={event.eventId} event={event} />
           ))}
@@ -706,8 +736,11 @@ function BillingEvidence({ data }: { data: AdminAccountOperations }) {
 }
 
 function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
+  const { t } = useTranslation('admin')
   const usage = child.usage
-  const usageLabel = usage ? `${usage.consumed}/${usage.limit} used` : 'Usage unavailable'
+  const usageLabel = usage
+    ? t('accountOperations.children.usageUsed', { consumed: usage.consumed, limit: usage.limit })
+    : t('accountOperations.children.usageUnavailable')
   return (
     <Card>
       <CardContent className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1.1fr)_repeat(5,minmax(8rem,0.7fr))]">
@@ -720,27 +753,28 @@ function ChildOperationsRow({ child }: { child: AccountOperationsChild }) {
             <p className="truncate text-sm text-muted-foreground">{child.profile.email}</p>
           </div>
         </div>
-        <ChildMetric label="Binding" value={formatStatus(child.binding.status)} />
-        <ChildMetric label="Verification" value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
-        <ChildMetric label="Recovery" value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
-        <ChildMetric label="Plan" value={formatStatus(child.entitlement?.effectivePlan)} />
-        <ChildMetric label="Usage" value={usageLabel} muted={Boolean(usage?.unreconciled)} />
+        <ChildMetric label={t('accountOperations.children.binding')} value={formatStatus(child.binding.status)} />
+        <ChildMetric label={t('accountOperations.children.verification')} value={formatStatus(child.profile.verification?.emailVerificationStatus ?? child.verification?.emailVerificationStatus)} />
+        <ChildMetric label={t('accountOperations.children.recovery')} value={formatStatus((child.profile.verification ?? child.verification)?.supportAction)} />
+        <ChildMetric label={t('accountOperations.children.plan')} value={formatStatus(child.entitlement?.effectivePlan)} />
+        <ChildMetric label={t('accountOperations.children.usage')} value={usageLabel} muted={Boolean(usage?.unreconciled)} />
       </CardContent>
     </Card>
   )
 }
 
 function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
+  const { t } = useTranslation('admin')
   if (usage.length === 0) {
     return (
       <Card>
-        <CardContent className="p-5 text-sm text-muted-foreground">No usage summary is available for this parent and day.</CardContent>
+        <CardContent className="p-5 text-sm text-muted-foreground">{t('accountOperations.usage.empty')}</CardContent>
       </Card>
     )
   }
   return (
     <section className="space-y-3">
-      <h2 className="text-xl font-semibold text-foreground">Usage summary</h2>
+      <h2 className="text-xl font-semibold text-foreground">{t('accountOperations.usage.title')}</h2>
       <div className="grid gap-3 md:grid-cols-2">
         {usage.map((item) => (
           <Card key={`${item.studentId}-${item.quotaPeriod}-${item.action}`}>
@@ -751,13 +785,19 @@ function UsageSummary({ usage }: { usage: AccountOperationsUsage[] }) {
                   <p className="mt-1 text-sm text-muted-foreground">{item.studentId} / {item.quotaPeriod}</p>
                 </div>
                 <Badge variant={item.unreconciled ? 'outline' : 'secondary'}>
-                  {item.unreconciled ? 'Reconciling' : 'Matched'}
+                  {item.unreconciled ? t('accountOperations.usage.reconciling') : t('accountOperations.usage.matched')}
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-semibold text-foreground">{item.remaining} remaining</p>
-              <p className="mt-1 text-sm text-muted-foreground">{item.consumed} of {item.limit} used</p>
+              <p className="mt-4 text-2xl font-semibold text-foreground">
+                {t('accountOperations.usage.remaining', { count: item.remaining })}
+              </p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('accountOperations.usage.consumed', { consumed: item.consumed, limit: item.limit })}
+              </p>
               {item.supportAction && (
-                <p className="mt-3 text-sm font-medium text-foreground">Support: {formatStatus(item.supportAction)}</p>
+                <p className="mt-3 text-sm font-medium text-foreground">
+                  {t('accountOperations.usage.support', { action: formatStatus(item.supportAction) })}
+                </p>
               )}
               {item.explanation && (
                 <p className="mt-1 text-sm text-muted-foreground">{item.explanation}</p>
@@ -803,6 +843,7 @@ function ChildMetric({ label, value, muted }: { label: string; value: string; mu
 }
 
 function BillingEventRow({ event }: { event: SubscriptionBillingEvent }) {
+  const { t } = useTranslation('admin')
   return (
     <div className="rounded-md border border-border/70 p-3 text-sm">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -810,19 +851,26 @@ function BillingEventRow({ event }: { event: SubscriptionBillingEvent }) {
         <span className="text-muted-foreground">{formatDate(event.eventAt)}</span>
       </div>
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
-        <p className="text-muted-foreground">Status: {formatStatus(event.billingStatus)}</p>
-        <p className="truncate text-muted-foreground">Provider event: {event.providerEventId ?? 'None'}</p>
-        <p className="text-muted-foreground">Processing: {formatStatus(event.processingResult)}</p>
+        <p className="text-muted-foreground">
+          {t('accountOperations.billing.eventStatus', { status: formatStatus(event.billingStatus) })}
+        </p>
+        <p className="truncate text-muted-foreground">
+          {t('accountOperations.billing.providerEvent', { id: event.providerEventId ?? t('accountOperations.values.none') })}
+        </p>
+        <p className="text-muted-foreground">
+          {t('accountOperations.billing.processing', { result: formatStatus(event.processingResult) })}
+        </p>
       </div>
     </div>
   )
 }
 
 function EmptyLookup() {
+  const { t } = useTranslation('admin')
   return (
     <Card>
       <CardContent className="p-5 text-sm text-muted-foreground">
-        Enter a parent ID to inspect account operations, or open this view from a provider billing record in the subscription queue.
+        {t('accountOperations.lookup.empty')}
       </CardContent>
     </Card>
   )
@@ -841,41 +889,43 @@ function LoadingPanel() {
 }
 
 function ErrorPanel({ error }: { error: Error | null }) {
+  const { t } = useTranslation('admin')
   const isMissingParent = error instanceof ApiError && error.status === 404
   return (
     <Card>
       <CardContent className="p-5 text-sm text-destructive" role="alert">
-        {isMissingParent ? 'Parent account was not found.' : 'Admin account operations are unavailable. Please try again later.'}
+        {isMissingParent ? t('accountOperations.lookup.notFound') : t('accountOperations.lookup.unavailable')}
       </CardContent>
     </Card>
   )
 }
 
-function formatPeriod(start?: string | null, end?: string | null) {
-  if (!start && !end) return 'None'
-  return `${start ? formatDate(start) : 'Unknown'} - ${end ? formatDate(end) : 'Unknown'}`
+function formatPeriod(
+  start: string | null | undefined,
+  end: string | null | undefined,
+  formatDate: (value: string) => string,
+  t: TFunction,
+) {
+  if (!start && !end) return t('accountOperations.values.none')
+  const unknown = t('accountOperations.values.unknown')
+  return `${start ? formatDate(start) : unknown} - ${end ? formatDate(end) : unknown}`
 }
 
-function evidenceValue(evidence: Record<string, unknown>, section: string, field: string) {
+function evidenceValue(evidence: Record<string, unknown>, section: string, field: string, t: TFunction) {
   const sectionValue = evidence[section]
-  if (!sectionValue || typeof sectionValue !== 'object') return 'None'
-  return formatEvidenceValue((sectionValue as Record<string, unknown>)[field])
+  if (!sectionValue || typeof sectionValue !== 'object') return t('accountOperations.values.none')
+  return formatEvidenceValue((sectionValue as Record<string, unknown>)[field], t)
 }
 
-function formatEvidenceValue(value: unknown) {
-  if (value === null || value === undefined || value === '') return 'None'
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No'
+function formatEvidenceValue(value: unknown, t: TFunction) {
+  if (value === null || value === undefined || value === '') return t('accountOperations.values.none')
+  if (typeof value === 'boolean') return value ? t('accountOperations.values.yes') : t('accountOperations.values.no')
   if (typeof value === 'number') return String(value)
   if (typeof value === 'string') return formatStatus(value)
-  return 'Available'
+  return t('accountOperations.values.available')
 }
 
+/** The shared day-and-time format; a value that is not a date shows as sent. */
 function formatDate(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return value
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
-}
-
-function formatCount(value: number) {
-  return new Intl.NumberFormat('en').format(value)
+  return Number.isNaN(new Date(value).getTime()) ? value : formatDayAndTime(value)
 }
