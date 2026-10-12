@@ -492,19 +492,35 @@ function Nudge({ children }: { children: ReactNode }) {
   )
 }
 
+/** "Richtig." under the heading "Richtig" says nothing new. */
+function repeatsVerdict(text: string, verdict: string) {
+  const bare = (value: string) => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
+  return bare(text) === bare(verdict)
+}
+
 function Feedback({ run }: { run: LessonRun }) {
   const { t } = useTranslation('chapter')
   const feedback = run.feedback
+  const verdict = feedback?.correct ? t('stage.correct') : t('stage.notQuite')
   return (
     <div role="status" aria-live="polite" data-stage-feedback={feedback ? (feedback.correct ? 'correct' : 'wrong') : undefined}>
       {feedback && (
         <div data-quote-source="exercise" className="flex flex-col gap-1 rounded-[16px] border px-[18px] py-4 text-on-sky" style={glass}>
           <p className="m-0 flex items-center gap-2 text-[17px] font-semibold">
             {feedback.correct && <Check size={18} strokeWidth={2} aria-hidden="true" className="text-lit" />}
-            {feedback.correct ? t('stage.correct') : t('stage.notQuite')}
+            {verdict}
           </p>
-          {feedback.feedback && <p className={cn('m-0 text-[15px]', bodyOnSky)}>{feedback.feedback}</p>}
-          {feedback.correct && feedback.explanation && <p className="m-0 text-[15px]">{feedback.explanation}</p>}
+          {/* Feedback and explanation carry formulas as $...$, like the prompt (#180). */}
+          {feedback.feedback && !repeatsVerdict(feedback.feedback, verdict) && (
+            <p className={cn('m-0 text-[15px]', bodyOnSky)}>
+              <MathRenderer>{feedback.feedback}</MathRenderer>
+            </p>
+          )}
+          {feedback.correct && feedback.explanation && (
+            <p className="m-0 text-[15px]">
+              <MathRenderer>{feedback.explanation}</MathRenderer>
+            </p>
+          )}
           {run.quiz && !feedback.correct && (
             <p data-quiz-hearts-left className={cn('m-0 text-[15px]', bodyOnSky)}>
               {run.quiz.hearts > 0 ? t('quiz.heartLost', { count: run.quiz.hearts }) : t('quiz.noHeartsLeft')}

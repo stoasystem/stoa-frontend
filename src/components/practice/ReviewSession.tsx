@@ -28,6 +28,7 @@ import { Check, RotateCcw, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { Textarea } from '@/components/ui/textarea'
 import { EmptyState } from '@/components/common/EmptyState'
 import { submitChallengeAnswer } from '@/services/practice/practiceApi'
@@ -113,7 +114,9 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
     <Card className="border-border/70">
       <CardContent className="space-y-4 pt-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <p className="text-base font-medium leading-6 text-foreground">{card.prompt}</p>
+          <p className="text-base font-medium leading-6 text-foreground">
+            <MathRenderer>{card.prompt}</MathRenderer>
+          </p>
           {card.lapses > 0 ? (
             <span className="whitespace-nowrap rounded-full bg-accent-tint px-2 py-1 text-xs font-medium text-primary">
               {t('review.missed', { count: card.lapses })}
@@ -187,11 +190,13 @@ function ReviewAnswerInput({
             key={option}
             type="button"
             variant={selected === option ? 'default' : 'outline'}
+            // The chosen one was told apart by colour alone (#181).
+            aria-pressed={selected === option}
             className="h-auto justify-start whitespace-normal py-2 text-left"
             disabled={disabled}
             onClick={() => onChange(option)}
           >
-            {option}
+            <MathRenderer>{option}</MathRenderer>
           </Button>
         ))}
       </div>
@@ -216,7 +221,7 @@ function ReviewAnswerInput({
               disabled={disabled}
               onClick={() => toggle(option)}
             >
-              {option}
+              <MathRenderer>{option}</MathRenderer>
             </Button>
           ))}
         </div>
@@ -226,7 +231,9 @@ function ReviewAnswerInput({
         ) : (
           <ol className="m-0 list-decimal space-y-1 pl-5 text-sm text-foreground">
             {chosen.map((option) => (
-              <li key={option}>{option}</li>
+              <li key={option}>
+                <MathRenderer>{option}</MathRenderer>
+              </li>
             ))}
           </ol>
         )}
@@ -284,12 +291,14 @@ function ReviewFeedback({
         ) : (
           <X className="h-4 w-4 text-destructive" aria-hidden="true" />
         )}
-        {result.feedback}
+        <MathRenderer>{result.feedback}</MathRenderer>
       </p>
       {/* The explanation states the answer, so it is held back until the
           student has found it; the feedback above points the way instead. */}
       {result.correct && result.explanation ? (
-        <p className="text-sm leading-6 text-muted-foreground">{result.explanation}</p>
+        <p className="text-sm leading-6 text-muted-foreground">
+          <MathRenderer>{result.explanation}</MathRenderer>
+        </p>
       ) : null}
       {result.correct ? (
         <p className="text-xs text-muted-foreground">
