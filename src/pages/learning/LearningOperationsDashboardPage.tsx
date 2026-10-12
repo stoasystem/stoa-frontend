@@ -68,6 +68,16 @@ export function LearningOperationsDashboardPage() {
   // read the analytics but not export them". Neither is an empty panel.
   const exportDenied = exportQuery.data?.permissionDenied === true
   const exportSummary = exportQuery.data?.summary
+  // Readiness says whether exporting is switched on for the system; whether
+  // this account may export is only known from the export request itself
+  // (#162: "Export allowed: Yes" sat above a refused export).
+  const accountExport = exportQuery.isLoading
+    ? t('learningOps.accountChecking')
+    : exportDenied
+      ? t('learningOps.accountNotGranted')
+      : exportSummary
+        ? t('learningOps.accountGranted')
+        : t('learningOps.accountUnknown')
 
   const summaryTiles = useMemo(() => [
     {
@@ -227,12 +237,13 @@ export function LearningOperationsDashboardPage() {
               {readinessQuery.error && <ErrorState title={t('learningOps.readinessFailed')} message={readinessQuery.error.message} />}
               {readiness && (
                 <>
-                  <div className="grid gap-3 sm:grid-cols-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <InlineMetric label={t('learningOps.state')} value={readiness.state} />
                     <InlineMetric
                       label={t('learningOps.exportAllowed')}
                       value={readiness.exportAllowed ? t('learningOps.yes') : t('learningOps.no')}
                     />
+                    <InlineMetric label={t('learningOps.accountExport')} value={accountExport} />
                     <InlineMetric
                       label={t('learningOps.liveWarehouse')}
                       value={readiness.liveWarehouseConfigured ? t('learningOps.configured') : t('learningOps.notConfigured')}
