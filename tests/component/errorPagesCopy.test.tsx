@@ -35,7 +35,7 @@ describe('the error pages speak the reader’s language', () => {
   it.each([
     { language: 'de', forbidden: 'Kein Zugriff', unauthorized: 'Anmeldung nötig', notFound: 'Seite nicht gefunden', home: 'Zur Startseite' },
     { language: 'fr', forbidden: 'Accès refusé', unauthorized: 'Connexion requise', notFound: 'Page introuvable', home: 'Aller à l’accueil' },
-    { language: 'it', forbidden: 'Accesso negato', unauthorized: 'Accesso richiesto', notFound: 'Pagina non trovata', home: 'Vai alla pagina iniziale' },
+    { language: 'it', forbidden: 'Accesso negato', unauthorized: 'Accesso richiesto', notFound: 'Pagina non trovata', home: 'Alla pagina iniziale' },
   ])('in $language', async ({ language, forbidden, unauthorized, notFound, home }) => {
     await i18n.changeLanguage(language)
 
