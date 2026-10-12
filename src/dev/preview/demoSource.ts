@@ -89,17 +89,22 @@ export function finishDemoKnowledgePoint() {
   changed()
 }
 
-/** Questions of the done lessons come due for review (the `review` surface, #181). */
+/**
+ * Questions of the done lessons come due for review (the `review` surface,
+ * #181). The second lesson counts as done too, so its ordering question is
+ * among them: the first has none, and the review answers ordering its own way.
+ */
 export function makeReviewDue() {
+  for (const lesson of DEMO_KNOWLEDGE_POINT.lessons.slice(0, 2)) completed.add(lesson.lessonId)
   server = { ...server, reviewDue: true }
   changed()
 }
 
 /**
  * `GET /practice/review/due`: nothing, as #116 opens; with `makeReviewDue`,
- * one question of each kind the lessons done have -- at the opening state a
- * picked one, missed twice, and a written one -- so the review shows each
- * way of answering they ask for.
+ * one question of each kind the lessons done have -- a picked one, missed
+ * twice, a written one and one put in order -- so the review shows each way
+ * of answering.
  */
 export function demoReviewDue(): ReviewDueResponse {
   const generatedAt = new Date().toISOString()
