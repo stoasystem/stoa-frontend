@@ -29,6 +29,7 @@ import { demoServerStorage } from '@/dev/preview/storage'
 import type { LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type { ChatMessage, Conversation, ConversationListResponse, ConversationSummary } from '@/types/chat'
+import type { ReviewCard, ReviewDueResponse, ReviewSummary } from '@/types/practice'
 
 let language: SupportedLanguage = 'en'
 let data: DemoData = demoDataFor(language)
@@ -41,10 +42,10 @@ type AskState = {
   sent: Record<string, ChatMessage[]>
 }
 
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState }
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean }
 
 function opening(): ServerState {
-  return { completed: [...DEMO_COMPLETED_LESSONS], litAt: null, acknowledged: false, ask: { created: [], sent: {} } }
+  return { completed: [...DEMO_COMPLETED_LESSONS], litAt: null, acknowledged: false, ask: { created: [], sent: {} }, reviewDue: false }
 }
 
 function restore(): ServerState {
@@ -86,6 +87,47 @@ export function finishDemoKnowledgePoint() {
   for (const lesson of DEMO_KNOWLEDGE_POINT.lessons) completed.add(lesson.lessonId)
   server = { ...server, litAt: server.litAt ?? new Date().toISOString(), acknowledged: false }
   changed()
+}
+
+/** Questions of the done lessons come due for review (the `review` surface, #181). */
+export function makeReviewDue() {
+  server = { ...server, reviewDue: true }
+  changed()
+}
+
+/**
+ * `GET /practice/review/due`: nothing, as #116 opens; with `makeReviewDue`,
+ * one question of each kind the lessons done have -- at the opening state a
+ * picked one, missed twice, and a written one -- so the review shows each
+ * way of answering they ask for.
+ */
+export function demoReviewDue(): ReviewDueResponse {
+  const generatedAt = new Date().toISOString()
+  if (!server.reviewDue) return { items: [], dueCount: 0, generatedAt }
+  const challenges = demoLessons(language, [...completed])
+    .filter((lesson) => completed.has(lesson.id))
+    .flatMap((lesson) => lesson.challenges.map((challenge) => ({ lesson, challenge })))
+  const picked = new Map<string, (typeof challenges)[number]>()
+  for (const entry of challenges) if (!picked.has(entry.challenge.type)) picked.set(entry.challenge.type, entry)
+  const items: ReviewCard[] = [...picked.values()].map(({ lesson, challenge }, index) => ({
+    challengeId: challenge.challengeId,
+    lessonId: lesson.id,
+    subjectId: lesson.subjectId,
+    topicId: lesson.topicId,
+    prompt: challenge.prompt,
+    options: challenge.options ?? [],
+    type: challenge.type,
+    dueAt: generatedAt,
+    lapses: index === 0 ? 2 : 0,
+    reps: index + 1,
+  }))
+  return { items, dueCount: items.length, generatedAt }
+}
+
+/** `GET /practice/review/summary`, agreeing with `demoReviewDue`. */
+export function demoReviewSummary(): ReviewSummary {
+  const { dueCount, generatedAt } = demoReviewDue()
+  return { dueCount, scheduledCount: dueCount, nextDueAt: generatedAt }
 }
 
 /** Called when the demo backend's state changes. */

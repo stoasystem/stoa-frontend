@@ -27,7 +27,7 @@ export type Surface = {
    */
   focus?: string
   /** The demo backend's state to start from, when it is not #116's opening state. */
-  demo?: 'demo-point-finished'
+  demo?: 'demo-point-finished' | 'review-due'
   /** What must be on the page before it counts as ready, for the screenshot. */
   readyWhen?: string
   /** Why the surface cannot be shown yet, if it cannot. */
@@ -96,6 +96,8 @@ export const SURFACES: readonly Surface[] = [
   },
   { id: 'chapter', label: 'Chapter', path: () => `/chapter/${unitId}`, signedIn: true, stars: false },
   { id: 'lesson', label: 'Practice stage', path: () => `/chapter/${unitId}/${nextLesson.lessonId}`, signedIn: true, stars: false },
+  // #181: the review page with questions due, one of each way of answering.
+  { id: 'review', label: 'Review', path: () => `/review/${unitId}`, signedIn: true, stars: false, demo: 'review-due', readyWhen: 'main form, main [role="radiogroup"], main textarea, main input' },
   { id: 'ask', label: 'Ask · new question', path: (points) => withPoints('/ask', points), signedIn: true, stars: true },
   { id: 'ask-conversation', label: 'Ask · conversation', path: (points) => withPoints(`/ask/${DEMO_HELP_CONVERSATION_ID}`, points), signedIn: true, stars: true },
   { id: 'me', label: '/me', path: () => '/me', signedIn: true, stars: false },

@@ -19,6 +19,8 @@ import {
   demoHint,
   demoLanguage,
   demoLessonResult,
+  demoReviewDue,
+  demoReviewSummary,
   demoTeacherAvailability,
   demoTeacherHelpRequests,
   recordDemoExchange,
@@ -133,8 +135,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return result
   }],
   ['POST', '/practice/hints', ({ body }) => demoHint(field<string>(body, 'challengeId') ?? '', demoLanguage())],
-  ['GET', '/practice/review/due', () => ({ items: [], count: 0 })],
-  ['GET', '/practice/review/summary', () => ({ dueCount: 0, items: [] })],
+  ['GET', '/practice/review/due', () => demoReviewDue()],
+  ['GET', '/practice/review/summary', () => demoReviewSummary()],
   ['GET', '/practice/mistakes', () => ({ items: [] })],
 ]
 
