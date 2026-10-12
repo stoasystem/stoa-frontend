@@ -86,9 +86,13 @@ export function AdminTeacherApplicationsPage() {
           title={t('teacherApplications.title')}
           description={t('teacherApplications.description')}
           actions={
-            <Badge variant="secondary">
-              {t('teacherApplications.inQueue', { count: listQuery.data?.count ?? 0 })}
-            </Badge>
+            // A count only once the queue has been read: "0 in queue" after a
+            // failed request would say there is nothing to review.
+            listQuery.isSuccess ? (
+              <Badge variant="secondary">
+                {t('teacherApplications.inQueue', { count: listQuery.data.count })}
+              </Badge>
+            ) : undefined
           }
         />
         <div className="mb-4 flex flex-wrap gap-2">
@@ -119,7 +123,7 @@ export function AdminTeacherApplicationsPage() {
                   {toUserFacingError(listQuery.error, t('teacherApplications.loadFailed'))}
                 </p>
               )}
-              {rows.length === 0 && !listQuery.isLoading && (
+              {listQuery.isSuccess && rows.length === 0 && (
                 <p className="text-sm text-muted-foreground">{t('teacherApplications.empty')}</p>
               )}
               {rows.map((row) => (

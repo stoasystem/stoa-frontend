@@ -346,7 +346,7 @@
     "loadingReadiness": "Caricamento dello stato del data warehouse…",
     "readinessFailed": "Stato del data warehouse non disponibile",
     "state": "Stato",
-    "exportAllowed": "Esportazione consentita",
+    "exportAllowed": "Esportazione attiva nel sistema",
     "yes": "Sì",
     "no": "No",
     "liveWarehouse": "Data warehouse in produzione",
@@ -360,7 +360,12 @@
     "rows": "Righe",
     "schema": "Schema",
     "piiRemoved": "Dati personali rimossi",
-    "check": "Da verificare"
+    "check": "Da verificare",
+    "accountExport": "Esportazione per questo account",
+    "accountGranted": "Autorizzato",
+    "accountNotGranted": "Non autorizzato",
+    "accountChecking": "Verifica in corso…",
+    "accountUnknown": "Impossibile da verificare"
   },
   "learningProfile": {
     "eyebrow": "Analisi dell’apprendimento",
