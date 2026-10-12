@@ -16,7 +16,9 @@ import { ApiError } from '@/services/api/httpClient'
 import { useAdminAccountsQuery, useAssignParentLinkMutation } from '@/hooks/admin/useAdminAccounts'
 import { useAdminParentAccountOperationsQuery } from '@/hooks/admin/useAdminAccountOperationsQuery'
 import { useAdminBillingOperation } from '@/hooks/admin/useAdminBillingOperation'
+import { activeLanguage } from '@/i18n/languages'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { formatDayAndTime } from '@/lib/formatDateTime'
 import { toUserFacingError } from '@/lib/userFacingText'
 import { adminQueryKeys } from '@/services/admin/adminQueryKeys'
 import type { AccountRow } from '@/services/admin/accountsApi'
@@ -375,7 +377,6 @@ function BillingRecoveryDetail({
   onRecheck: () => void
 }) {
   const { t } = useTranslation('admin')
-  const formatDate = useDateFormatter()
   const reconciliation = data.reconciliation
   const supportNeeded = reconciliation.lifecycleState === 'support_needed'
   const active = reconciliation.lifecycleState === 'active'
@@ -484,7 +485,6 @@ function BillingRecoveryDetail({
 
 function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
   const { t } = useTranslation('admin')
-  const formatDate = useDateFormatter()
   return (
     <div>
       <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.facts.title')}</h3>
@@ -513,9 +513,8 @@ function BillingFactEvidence({ data }: { data: AdminBillingOperationDetail }) {
 }
 
 function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) {
-  const { t, i18n } = useTranslation('admin')
-  const formatDate = useDateFormatter()
-  const formatCount = (value: number) => new Intl.NumberFormat(i18n.resolvedLanguage).format(value)
+  const { t } = useTranslation('admin')
+  const formatCount = (value: number) => new Intl.NumberFormat(activeLanguage()).format(value)
   return (
     <div>
       <h3 className="text-base font-semibold text-foreground">{t('accountOperations.recovery.providerUsage.title')}</h3>
@@ -558,7 +557,6 @@ function ProviderUsageEvidence({ data }: { data: AdminBillingOperationDetail }) 
 
 function PaymentReminderEvidence({ data }: { data: AdminBillingOperationDetail }) {
   const { t } = useTranslation('admin')
-  const formatDate = useDateFormatter()
   const reminder = data.paymentReminder
   return (
     <div>
@@ -697,7 +695,6 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
 
 function BillingEvidence({ data }: { data: AdminAccountOperations }) {
   const { t } = useTranslation('admin')
-  const formatDate = useDateFormatter()
   const billing = data.billing
   const events = billing.events ?? []
   const supportEvidence = billing.supportEvidence
@@ -847,7 +844,6 @@ function ChildMetric({ label, value, muted }: { label: string; value: string; mu
 
 function BillingEventRow({ event }: { event: SubscriptionBillingEvent }) {
   const { t } = useTranslation('admin')
-  const formatDate = useDateFormatter()
   return (
     <div className="rounded-md border border-border/70 p-3 text-sm">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
@@ -929,13 +925,7 @@ function formatEvidenceValue(value: unknown, t: TFunction) {
   return t('accountOperations.values.available')
 }
 
-/** Dates in the reader's language rather than always in English. */
-function useDateFormatter() {
-  const { i18n } = useTranslation('admin')
-  const language = i18n.resolvedLanguage
-  return (value: string) => {
-    const date = new Date(value)
-    if (Number.isNaN(date.getTime())) return value
-    return new Intl.DateTimeFormat(language, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date)
-  }
+/** The shared day-and-time format; a value that is not a date shows as sent. */
+function formatDate(value: string) {
+  return Number.isNaN(new Date(value).getTime()) ? value : formatDayAndTime(value)
 }
