@@ -108,7 +108,7 @@ describe('a question that has come back', () => {
     renderSession()
 
     await screen.findByText('Was ist 1/2 + 1/4?')
-    await user.click(screen.getByRole('button', { name: '3/4' }))
+    await user.click(screen.getByRole('radio', { name: '3/4' }))
     await user.click(screen.getByRole('button', { name: 'Check answer' }))
 
     await waitFor(() => expect(screen.getByText('Richtig! Gut gemacht.')).toBeInTheDocument())
@@ -127,7 +127,7 @@ describe('a question that has come back', () => {
 
     // Every option is offered on equal terms; nothing marks the right one.
     for (const option of ['3/4', '2/6', '1/6']) {
-      expect(screen.getByRole('button', { name: option })).toBeEnabled()
+      expect(screen.getByRole('radio', { name: option })).toBeEnabled()
     }
     expect(screen.queryByText(/correct answer/i)).not.toBeInTheDocument()
   })
@@ -148,7 +148,7 @@ describe('a question that has come back', () => {
     renderSession()
 
     await screen.findByText('Was ist 1/2 + 1/4?')
-    await user.click(screen.getByRole('button', { name: '2/6' }))
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
     await user.click(screen.getByRole('button', { name: 'Check answer' }))
 
     await waitFor(() => expect(screen.getByText('Leider falsch.')).toBeInTheDocument())
@@ -174,7 +174,7 @@ describe('a question that has come back', () => {
     renderSession()
 
     await screen.findByText('Was ist 1/2 + 1/4?')
-    await user.click(screen.getByRole('button', { name: '2/6' }))
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
     await user.click(screen.getByRole('button', { name: 'Check answer' }))
 
     await waitFor(() => expect(screen.getByText('Leider falsch.')).toBeInTheDocument())
@@ -241,15 +241,16 @@ describe('a question that has come back', () => {
   })
 
   it('says which option is chosen, not only by its colour (#181)', async () => {
+    // The stage's own options since #181: radios, so the choice is the input's.
     mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
     const user = userEvent.setup()
     renderSession()
 
     await screen.findByText('Was ist 1/2 + 1/4?')
-    await user.click(screen.getByRole('button', { name: '2/6' }))
+    await user.click(screen.getByRole('radio', { name: '2/6' }))
 
-    expect(screen.getByRole('button', { name: '2/6' })).toHaveAttribute('aria-pressed', 'true')
-    expect(screen.getByRole('button', { name: '3/4' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('radio', { name: '2/6' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: '3/4' })).not.toBeChecked()
   })
 
   it('gives a typed question somewhere to type', async () => {
@@ -426,7 +427,7 @@ describe('a question that has come back', () => {
       if (field) {
         await user.type(field, '2/3')
       } else {
-        await user.click(screen.getByRole('button', { name: '2/6' }))
+        await user.click(screen.queryByRole('radio', { name: '2/6' }) ?? screen.getByRole('button', { name: '2/6' }))
       }
       expect(check, kind.type).toBeEnabled()
       cleanup()

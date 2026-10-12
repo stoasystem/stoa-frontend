@@ -247,33 +247,41 @@ describe('what the screen carries is what is rated', () => {
     expect(badge.className).not.toMatch(/bg-primary\/\d/)
   })
 
-  it('the answer field is ruled with --separator, not with a divider', async () => {
+  // #181: the cards are the practice stage's own, so these hold the review to
+  // the stage's controls rather than to restyled light ones. Their colours are
+  // the sky's own tokens, rated in the dark theme of check:contrast (the field
+  // rule on --sky and on --sky-glass, the plain and filled buttons on dark).
+  it('the answer field is the stage’s, ruled with the sky’s field rule', async () => {
     const { surface } = await openReview()
     const answerField = within(surface).getByLabelText(enChapter.stage.yourAnswer)
 
-    expect(answerField.className).toContain('border-separator')
-    // The negative: the divider it replaces is gone from the class list, so
-    // which of the two wins does not depend on the order of two stylesheets.
-    expect(answerField.className).not.toContain('border-border/90')
+    expect(answerField.className).toContain('var(--on-sky-field-rule)')
+    // The negative: no light rule left over from the old card.
+    expect(answerField.className).not.toContain('border-separator')
   })
 
-  it('an option not picked yet is an outline button, so its rule is what makes it a control', async () => {
+  it('an option is the stage’s lettered choice, not an outline button', async () => {
     const { surface } = await openReview()
-    const option = within(surface).getByRole('button', { name: '3/4' })
+    const option = within(surface).getByRole('radio', { name: /3\/4/ })
 
-    // The outline variant draws itself in --separator on --surface.
-    expect(option.className).toContain('var(--separator)')
-    expect(option.className).toContain('var(--surface)')
-    expect(option.className).toContain('var(--ink)')
+    expect(option.closest('label')?.textContent).toMatch(/^A/)
+    expect(within(surface).queryByRole('button', { name: '3/4' })).toBeNull()
   })
 
-  it('Check is the one filled button, in the accent the sky can carry', async () => {
+  it('Check is the stage’s raised button on the sky', async () => {
     const { surface } = await openReview()
-    const check = within(surface).getAllByRole('button', { name: enPractice.checkAnswer })[0]
+    const check = within(surface).getAllByRole('button', { name: enChapter.stage.check })[0]
 
-    expect(check).toHaveAttribute('data-emphasis', 'filled')
-    expect(check.className).toContain('var(--accent)')
-    expect(check.className).toContain('var(--on-accent)')
+    expect(check).toHaveAttribute('data-variant', 'onSky')
+    expect(check).toHaveAttribute('data-lift')
+  })
+
+  it('the card is the stage’s glass, not a light card restyled', async () => {
+    const { surface } = await openReview()
+    const card = surface.querySelector<HTMLElement>('[data-review-card]')!
+
+    expect(card.style.background).toBe('var(--sky-glass)')
+    expect(card.className).not.toContain('stoa-card')
   })
 })
 

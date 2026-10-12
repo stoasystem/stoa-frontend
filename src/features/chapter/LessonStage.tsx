@@ -17,7 +17,7 @@
  * are drawn here exactly as they arrive. In a quiz there are no hints, no
  * skip, and Ask and 「问这段」 are off.
  */
-import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles, X } from 'lucide-react'
+import { ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -26,6 +26,7 @@ import { Button } from '@/components/base'
 import { ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import type { AskPractice } from '@/features/ask/practiceContext'
+import { AnswerInput, bodyOnSky, FeedbackCard, glass } from '@/features/chapter/answerControls'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
 import { quizTroubleIsRestartable, quizTroubleKey } from '@/features/chapter/quiz'
 import { chapterPath, isOpenLesson, lessonAfter, QUIZ_MODE, useChapter, type Chapter } from '@/features/chapter/useChapter'
@@ -41,13 +42,6 @@ import '@/features/chapter/chapter.css'
 
 const plainOnSky =
   'inline-flex min-h-11 items-center gap-1 text-[15px] font-semibold text-[color:var(--on-sky-plain)] no-underline hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring'
-const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
-const glass = {
-  background: 'var(--sky-glass)',
-  borderColor: 'var(--sky-glass-border)',
-  backdropFilter: 'blur(var(--sky-glass-blur))',
-  WebkitBackdropFilter: 'blur(var(--sky-glass-blur))',
-} as const
 
 export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; lessonId: string | undefined }) {
   const lessonQuery = useLessonQuery(lessonId)
@@ -445,7 +439,13 @@ function Exercise({
               }}
             >
               {/* Enter in a text answer checks it (a form with one field submits on Enter). */}
-              <AnswerInput challenge={challenge} run={run} disabled={locked} />
+              <AnswerInput
+                challenge={challenge}
+                value={run.answer}
+                onChange={run.setAnswer}
+                verdict={run.feedback ? (run.feedback.correct ? 'right' : 'wrong') : null}
+                disabled={locked}
+              />
             </form>
 
             {run.hint && (
@@ -492,41 +492,19 @@ function Nudge({ children }: { children: ReactNode }) {
   )
 }
 
-/** "Richtig." under the heading "Richtig" says nothing new. */
-function repeatsVerdict(text: string, verdict: string) {
-  const bare = (value: string) => value.toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
-  return bare(text) === bare(verdict)
-}
-
 function Feedback({ run }: { run: LessonRun }) {
   const { t } = useTranslation('chapter')
   const feedback = run.feedback
-  const verdict = feedback?.correct ? t('stage.correct') : t('stage.notQuite')
   return (
     <div role="status" aria-live="polite" data-stage-feedback={feedback ? (feedback.correct ? 'correct' : 'wrong') : undefined}>
       {feedback && (
-        <div data-quote-source="exercise" className="flex flex-col gap-1 rounded-[16px] border px-[18px] py-4 text-on-sky" style={glass}>
-          <p className="m-0 flex items-center gap-2 text-[17px] font-semibold">
-            {feedback.correct && <Check size={18} strokeWidth={2} aria-hidden="true" className="text-lit" />}
-            {verdict}
-          </p>
-          {/* Feedback and explanation carry formulas as $...$, like the prompt (#180). */}
-          {feedback.feedback && !repeatsVerdict(feedback.feedback, verdict) && (
-            <p className={cn('m-0 text-[15px]', bodyOnSky)}>
-              <MathRenderer>{feedback.feedback}</MathRenderer>
-            </p>
-          )}
-          {feedback.correct && feedback.explanation && (
-            <p className="m-0 text-[15px]">
-              <MathRenderer>{feedback.explanation}</MathRenderer>
-            </p>
-          )}
+        <FeedbackCard correct={feedback.correct} feedback={feedback.feedback} explanation={feedback.explanation}>
           {run.quiz && !feedback.correct && (
             <p data-quiz-hearts-left className={cn('m-0 text-[15px]', bodyOnSky)}>
               {run.quiz.hearts > 0 ? t('quiz.heartLost', { count: run.quiz.hearts }) : t('quiz.noHeartsLeft')}
             </p>
           )}
-        </div>
+        </FeedbackCard>
       )}
       {run.checkFailed && !feedback && (
         <p role="alert" className={cn('m-0 text-[13px]', bodyOnSky)}>
@@ -609,132 +587,6 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
       </p>
       {row}
     </div>
-  )
-}
-
-function AnswerInput({ challenge, run, disabled }: { challenge: PracticeExercise; run: LessonRun; disabled: boolean }) {
-  const { t } = useTranslation('chapter')
-  const options = challenge.options ?? []
-
-  if (challenge.type === 'multiple_choice' && options.length > 0) {
-    const selected = Array.isArray(run.answer) ? '' : run.answer
-    // The choice is gold while it is a choice; once checked it says what it was.
-    // A wrong one stayed gold with a tick, which reads as right (#180).
-    const verdict = run.feedback ? (run.feedback.correct ? 'right' : 'wrong') : null
-    return (
-      <fieldset className="m-0 min-w-0 border-0 p-0">
-        <legend className="sr-only">{t('stage.chooseAnswer')}</legend>
-        <div className="flex flex-col gap-2">
-          {options.map((option, index) => {
-            const chosen = selected === option
-            return (
-              <label
-                key={option}
-                data-answer-option={chosen ? (verdict ?? 'chosen') : undefined}
-                className={cn(
-                  'relative flex cursor-pointer items-center gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
-                  !chosen ? 'border-white/10 bg-white/[0.06]' : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
-                  disabled && 'cursor-default',
-                )}
-              >
-                <input
-                  type="radio"
-                  name={`answer-${challenge.challengeId}`}
-                  value={option}
-                  checked={chosen}
-                  disabled={disabled}
-                  onChange={() => run.setAnswer(option)}
-                  className="sr-only"
-                />
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    'inline-flex size-[30px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold',
-                    chosen && verdict !== 'wrong' ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
-                  )}
-                >
-                  {String.fromCharCode(65 + index)}
-                </span>
-                <span className="flex-1 text-[17px] font-medium text-on-sky">
-                  <MathRenderer>{option}</MathRenderer>
-                </span>
-                {chosen && verdict === 'right' && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
-                {chosen && verdict === 'wrong' && <X size={20} strokeWidth={2} aria-hidden="true" className="text-[color:var(--red)]" />}
-              </label>
-            )
-          })}
-        </div>
-      </fieldset>
-    )
-  }
-
-  if (challenge.type === 'ordering' && options.length > 0) {
-    const chosen = Array.isArray(run.answer) ? run.answer : []
-    const toggle = (option: string) =>
-      run.setAnswer(chosen.includes(option) ? chosen.filter((item) => item !== option) : [...chosen, option])
-    return (
-      <div className="flex flex-col gap-3">
-        <p className={cn('m-0 text-[13px] font-semibold', bodyOnSky)}>{t('stage.order.available')}</p>
-        <div className="flex flex-wrap gap-2">
-          {options.map((option) => (
-            <button
-              key={option}
-              type="button"
-              aria-pressed={chosen.includes(option)}
-              disabled={disabled}
-              onClick={() => toggle(option)}
-              className={cn(
-                'min-h-11 rounded-[12px] border px-4 text-[15px] font-medium text-on-sky focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-40',
-                chosen.includes(option) ? 'border-lit bg-lit/16' : 'border-white/10 bg-white/[0.06]',
-              )}
-            >
-              <MathRenderer>{option}</MathRenderer>
-            </button>
-          ))}
-        </div>
-        <p className={cn('m-0 text-[13px] font-semibold', bodyOnSky)}>{t('stage.order.chosen')}</p>
-        {chosen.length === 0 ? (
-          <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.order.empty')}</p>
-        ) : (
-          <ol className="m-0 flex flex-col gap-1 pl-5 text-[15px] text-on-sky">
-            {chosen.map((option) => (
-              <li key={option}>
-                <MathRenderer>{option}</MathRenderer>
-              </li>
-            ))}
-          </ol>
-        )}
-      </div>
-    )
-  }
-
-  const value = Array.isArray(run.answer) ? run.answer.join(', ') : run.answer
-  const field =
-    'w-full rounded-[12px] border border-[color:var(--on-sky-field-rule)] bg-white/[0.06] px-4 text-[17px] text-on-sky placeholder:text-[color:var(--on-sky-text-caption)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-40'
-  return (
-    <label className="flex flex-col gap-2">
-      <span className={cn('text-[13px] font-semibold', bodyOnSky)}>{t('stage.yourAnswer')}</span>
-      {challenge.type === 'explanation' ? (
-        <textarea
-          rows={4}
-          value={value}
-          disabled={disabled}
-          placeholder={t('stage.explainPlaceholder')}
-          onChange={(event) => run.setAnswer(event.target.value)}
-          className={cn(field, 'py-3 leading-[1.45]')}
-        />
-      ) : (
-        <input
-          type="text"
-          value={value}
-          disabled={disabled}
-          autoComplete="off"
-          placeholder={t('stage.answerPlaceholder')}
-          onChange={(event) => run.setAnswer(event.target.value)}
-          className={cn(field, 'h-12')}
-        />
-      )}
-    </label>
   )
 }
 
