@@ -20,13 +20,21 @@ export function ReviewPage() {
 
   // Inside the app shell like every other student page: it stood alone, with
   // no bar, no bell and no account menu (app.stoaedu.ch, 2026-10-10).
+  //
+  // And on the sky, like everything else the student walks through (#125): a
+  // star says "review N", and following it landed on a white page. The shell
+  // paints the page area dark; the wrapper below is what the token remap in
+  // brand-tokens.css selects, so the header, the cards, the options, the
+  // fields and the feedback all read their sky values from one rule.
   return (
-    <AppLayout>
-      <PageContainer className="space-y-6">
-        <BackButton label={t('review.backToMap')} to="/" />
-        <PageHeader eyebrow={t('review.eyebrow')} title={t('review.title')} description={t('review.description')} />
-        <ReviewSession unitId={unitId} />
-      </PageContainer>
+    <AppLayout surface="sky">
+      <div data-surface="sky" data-review-surface>
+        <PageContainer className="space-y-6">
+          <BackButton label={t('review.backToMap')} to="/" />
+          <PageHeader eyebrow={t('review.eyebrow')} title={t('review.title')} description={t('review.description')} />
+          <ReviewSession unitId={unitId} />
+        </PageContainer>
+      </div>
     </AppLayout>
   )
 }

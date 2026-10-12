@@ -233,6 +233,10 @@ describe('the teacher request page', () => {
     const badge = screen.getByText('Überfällig').parentElement
     expect(badge?.textContent).not.toMatch(/6576/)
     expect(badge?.textContent).toContain('Tage')
+    // "5 Tage von 30 Minuten" read as if the five days were part of the
+    // thirty minutes (#162 re-check); the target is named as the target.
+    expect(badge?.textContent).toMatch(/\(Ziel: 30 Minuten\)$/)
+    expect(badge?.textContent).not.toContain(' von ')
 
     unmount()
     await i18n.changeLanguage('en')

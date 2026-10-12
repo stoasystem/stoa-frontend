@@ -12,6 +12,14 @@
  * stage's `AnswerInput` (`@/features/chapter/LessonStage`), down to the
  * labels, which are read from its own `chapter` namespace so the two screens
  * cannot drift apart.
+ *
+ * Colour: nothing here names one. The page puts `data-surface="sky"` and
+ * `data-review-surface` round this subtree, and the one remap in
+ * brand-tokens.css points the light names these classes use at their sky
+ * values, so the card, the options, the fields, the badge and the feedback
+ * all darken together (#125). Where a class had an alpha the gate cannot
+ * read (`bg-primary/10`, `bg-muted/40`), it is the whole token now, so what
+ * `check:contrast` rates is what the screen shows.
  */
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -107,7 +115,7 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <p className="text-base font-medium leading-6 text-foreground">{card.prompt}</p>
           {card.lapses > 0 ? (
-            <span className="whitespace-nowrap rounded-full bg-primary/10 px-2 py-1 text-xs font-medium text-primary">
+            <span className="whitespace-nowrap rounded-full bg-accent-tint px-2 py-1 text-xs font-medium text-primary">
               {t('review.missed', { count: card.lapses })}
             </span>
           ) : null}
@@ -151,7 +159,7 @@ function ReviewQuestion({ card }: { card: ReviewCard }) {
 
 /**
  * The control a question of this kind is answered with, branch for branch as
- * the practice stage's `AnswerInput` has them, in this screen's light skin. A
+ * the practice stage's `AnswerInput` has them, in this screen's own skin. A
  * kind neither screen knows is typed, which is what the backend itself falls
  * back to, so a new kind of question is answerable before anything is changed
  * here.
@@ -236,6 +244,7 @@ function ReviewAnswerInput({
       {card.type === 'explanation' ? (
         <Textarea
           id={fieldId}
+          className="border-separator"
           rows={4}
           value={text}
           disabled={disabled}
@@ -245,6 +254,7 @@ function ReviewAnswerInput({
       ) : (
         <Input
           id={fieldId}
+          className="border-separator"
           type="text"
           value={text}
           disabled={disabled}
@@ -267,10 +277,10 @@ function ReviewFeedback({
   const { t } = useTranslation('practice')
 
   return (
-    <div className="space-y-3 rounded-md border border-border/70 bg-muted/40 p-3">
+    <div className="space-y-3 rounded-md border border-border bg-muted p-3">
       <p className="flex items-center gap-2 text-sm font-semibold">
         {result.correct ? (
-          <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+          <Check className="h-4 w-4 text-lit" aria-hidden="true" />
         ) : (
           <X className="h-4 w-4 text-destructive" aria-hidden="true" />
         )}

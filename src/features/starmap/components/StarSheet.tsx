@@ -227,7 +227,7 @@ export function StarSheet({
             </span>
           </div>
           {action && (
-            <Button asChild variant="onSky" size="regular" className="shrink-0">
+            <Button asChild lift variant="onSky" size="regular" className="shrink-0">
               <Link to={chapterTo} onClick={jump}>{action}</Link>
             </Button>
           )}

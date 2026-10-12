@@ -139,7 +139,7 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       {primary && (
         <div>
-          <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
             <Link to={primary.to}>{primary.label}</Link>
           </Button>
         </div>
