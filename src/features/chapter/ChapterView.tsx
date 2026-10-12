@@ -139,8 +139,11 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       {primary && (
         <div>
-          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
-            <Link to={primary.to}>{primary.label}</Link>
+          {/* "Weiter: <lesson>" ran off a 375 screen with a long lesson name; it ends in an ellipsis instead. */}
+          <Button asChild lift variant="onSky" size="large" className="max-w-full" style={{ minWidth: 200 }}>
+            <Link to={primary.to}>
+              <span className="min-w-0 truncate">{primary.label}</span>
+            </Link>
           </Button>
         </div>
       )}

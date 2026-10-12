@@ -17,7 +17,7 @@
  * are drawn here exactly as they arrive. In a quiz there are no hints, no
  * skip, and Ask and 「问这段」 are off.
  */
-import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles } from 'lucide-react'
+import { Check, ChevronLeft, Heart, Lightbulb, Lock, Sparkles, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type MutableRefObject, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -618,6 +618,9 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeExercise
 
   if (challenge.type === 'multiple_choice' && options.length > 0) {
     const selected = Array.isArray(run.answer) ? '' : run.answer
+    // The choice is gold while it is a choice; once checked it says what it was.
+    // A wrong one stayed gold with a tick, which reads as right (#180).
+    const verdict = run.feedback ? (run.feedback.correct ? 'right' : 'wrong') : null
     return (
       <fieldset className="m-0 min-w-0 border-0 p-0">
         <legend className="sr-only">{t('stage.chooseAnswer')}</legend>
@@ -627,10 +630,10 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeExercise
             return (
               <label
                 key={option}
-                data-answer-option={chosen ? 'chosen' : undefined}
+                data-answer-option={chosen ? (verdict ?? 'chosen') : undefined}
                 className={cn(
                   'relative flex cursor-pointer items-center gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
-                  chosen ? 'border-lit bg-lit/16' : 'border-white/10 bg-white/[0.06]',
+                  !chosen ? 'border-white/10 bg-white/[0.06]' : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
                   disabled && 'cursor-default',
                 )}
               >
@@ -647,7 +650,7 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeExercise
                   aria-hidden="true"
                   className={cn(
                     'inline-flex size-[30px] shrink-0 items-center justify-center rounded-full text-[13px] font-semibold',
-                    chosen ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
+                    chosen && verdict !== 'wrong' ? 'bg-lit text-[color:var(--on-sky-button-text)]' : 'bg-white/10 text-[color:var(--on-sky-text-body)]',
                   )}
                 >
                   {String.fromCharCode(65 + index)}
@@ -655,7 +658,8 @@ function AnswerInput({ challenge, run, disabled }: { challenge: PracticeExercise
                 <span className="flex-1 text-[17px] font-medium text-on-sky">
                   <MathRenderer>{option}</MathRenderer>
                 </span>
-                {chosen && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
+                {chosen && verdict === 'right' && <Check size={20} strokeWidth={2} aria-hidden="true" className="text-lit" />}
+                {chosen && verdict === 'wrong' && <X size={20} strokeWidth={2} aria-hidden="true" className="text-[color:var(--red)]" />}
               </label>
             )
           })}

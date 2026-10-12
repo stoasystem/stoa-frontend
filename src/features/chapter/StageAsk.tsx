@@ -168,6 +168,8 @@ export function StageWithAsk({
                   {off}
                 </p>
               )}
+              <div className="flex items-center gap-2">
+              <div className="min-w-0 flex-1">
               <Composer
                 disabled={Boolean(off)}
                 describedBy={off ? 'stage-ask-off' : undefined}
@@ -184,11 +186,11 @@ export function StageWithAsk({
                 label={t('ask.composerLabel')}
                 placeholder={t('ask.practice.placeholder')}
               />
+              </div>
+              {!off && <AskReopen placement="inline" onOpen={controller.reopen} resuming={controller.conversationId !== null} />}
+              </div>
             </div>
           </div>
-        )}
-        {!open && !off && (
-          <AskReopen onOpen={controller.reopen} resuming={controller.conversationId !== null} />
         )}
       </div>
 

@@ -372,6 +372,8 @@ describe('the chapter', () => {
     expect(within(rows[2]).getByText('10 min · 4 exercises')).toBeInTheDocument()
 
     expect(screen.getByText('1 of 3 lessons done')).toBeInTheDocument()
+    // Lessons, not stars: on the map one star is one knowledge point (#179).
+    expect(screen.getByText('2 lessons to go before this point lights.')).toBeInTheDocument()
     const progress = screen.getByRole('progressbar', { name: 'Chapter progress' })
     expect(progress).toHaveAttribute('aria-valuenow', '33')
     // One lit button: on with the lesson in progress.
@@ -431,6 +433,40 @@ describe('the practice stage', () => {
     // Right answered: the answers hold still, and the one lit button goes on.
     expect(screen.getByRole('radio', { name: /x = 5/ })).toBeDisabled()
     expect(screen.getByRole('button', { name: 'Next question' })).toBeEnabled()
+  })
+
+  it('marks a wrong choice as wrong once checked, never gold with a tick (#180)', async () => {
+    open('/chapter/u-5/l-2')
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    const option = (name: RegExp) => screen.getByRole('radio', { name }).closest('label') as HTMLElement
+
+    await userEvent.click(screen.getByRole('radio', { name: /x = 3/ }))
+    // Chosen, not yet checked: no verdict drawn.
+    expect(option(/x = 3/)).toHaveAttribute('data-answer-option', 'chosen')
+    expect(option(/x = 3/).querySelector('.lucide-check')).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Not quite')
+    expect(option(/x = 3/)).toHaveAttribute('data-answer-option', 'wrong')
+    expect(option(/x = 3/).querySelector('.lucide-check')).toBeNull()
+    expect(option(/x = 3/).querySelector('.lucide-x')).not.toBeNull()
+    expect(option(/x = 3/).className).not.toContain('border-lit')
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    await userEvent.click(screen.getByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Correct')
+    expect(option(/x = 5/)).toHaveAttribute('data-answer-option', 'right')
+    expect(option(/x = 5/).querySelector('.lucide-check')).not.toBeNull()
+  })
+
+  it('keeps the way back into Ask beside the composer, off the exercise, on a phone (#180)', async () => {
+    open('/chapter/u-5/l-2', { width: 375 })
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    const back = document.querySelector<HTMLElement>('[data-ask-reopen]')!
+    expect(back).toHaveAttribute('data-ask-reopen-placement', 'inline')
+    expect(document.querySelector('[data-ask-docked]')!.contains(back)).toBe(true)
+    expect(back.className).not.toContain('absolute')
   })
 
   it('sets formulas in the feedback as maths, and does not say "Correct" twice (#180)', async () => {
