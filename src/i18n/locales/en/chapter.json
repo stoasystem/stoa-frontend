@@ -14,8 +14,8 @@
     "loading": "Loading the chapter…",
     "missing": "This chapter could not be found.",
     "progress": "Chapter progress",
-    "remaining_one": "{{count}} star to go before this point lights.",
-    "remaining_other": "{{count}} stars to go before this point lights.",
+    "remaining_one": "{{count}} lesson to go before this point lights.",
+    "remaining_other": "{{count}} lessons to go before this point lights.",
     "retry": "Try again",
     "start": "Start: {{title}}",
     "status": {

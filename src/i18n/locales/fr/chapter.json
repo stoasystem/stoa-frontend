@@ -14,8 +14,8 @@
     "loading": "Chargement du chapitre…",
     "missing": "Ce chapitre est introuvable.",
     "progress": "Progression du chapitre",
-    "remaining_one": "Encore {{count}} étoile avant que ce point s’allume.",
-    "remaining_other": "Encore {{count}} étoiles avant que ce point s’allume.",
+    "remaining_one": "Encore {{count}} leçon avant que ce point s’allume.",
+    "remaining_other": "Encore {{count}} leçons avant que ce point s’allume.",
     "retry": "Réessayer",
     "start": "Commencer : {{title}}",
     "status": {
