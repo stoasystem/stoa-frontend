@@ -14,8 +14,8 @@
     "loading": "Caricamento del capitolo…",
     "missing": "Questo capitolo non è stato trovato.",
     "progress": "Avanzamento del capitolo",
-    "remaining_one": "Manca {{count}} stella prima che questo punto si accenda.",
-    "remaining_other": "Mancano {{count}} stelle prima che questo punto si accenda.",
+    "remaining_one": "Manca {{count}} lezione prima che questo punto si accenda.",
+    "remaining_other": "Mancano {{count}} lezioni prima che questo punto si accenda.",
     "retry": "Riprova",
     "start": "Inizia: {{title}}",
     "status": {

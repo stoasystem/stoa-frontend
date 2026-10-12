@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { Murmi } from '@/components/brand/Murmi'
 import { Button } from '@/components/base'
-import { ICON } from '@/components/base/sizes'
+import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { ConstellationPath } from '@/features/chapter/ConstellationPath'
 import { JumpTransition } from '@/features/chapter/JumpTransition'
 import { chapterPath, useChapter, type Chapter } from '@/features/chapter/useChapter'
@@ -139,8 +139,10 @@ function ChapterBody({ chapter }: { chapter: Chapter }) {
 
       {primary && (
         <div>
-          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
-            <Link to={primary.to}>{primary.label}</Link>
+          <Button asChild lift variant="onSky" size="large" className="max-w-full py-3" style={{ minWidth: 200, minHeight: BUTTON_SIZES.large.height, height: 'auto' }}>
+            <Link to={primary.to}>
+              <span className="min-w-0 whitespace-normal leading-5 [overflow-wrap:anywhere]">{primary.label}</span>
+            </Link>
           </Button>
         </div>
       )}
