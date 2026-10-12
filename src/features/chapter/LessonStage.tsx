@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Murmi } from '@/components/brand/Murmi'
 import { Button } from '@/components/base'
-import { ICON } from '@/components/base/sizes'
+import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
 import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
@@ -895,10 +895,10 @@ function LessonDone({
           {/* The last lesson leads to the star map, where the point lights: the
             * chapter in between was a step with nothing to do (#182). Its way
             * back stays, second. */}
-          <Button asChild lift variant="onSky" size="large" className="max-w-full" style={{ minWidth: 200 }}>
+          <Button asChild lift variant="onSky" size="large" className="max-w-full py-3" style={{ minWidth: 200, minHeight: BUTTON_SIZES.large.height, height: 'auto' }}>
             {next ? (
               <Link to={chapterPath(unitId, next.id)}>
-                <span className="min-w-0 truncate">{t('stage.done.next', { title: next.title })}</span>
+                <span className="min-w-0 whitespace-normal leading-5 [overflow-wrap:anywhere]">{t('stage.done.next', { title: next.title })}</span>
               </Link>
             ) : allDone && chapter ? (
               <Link
