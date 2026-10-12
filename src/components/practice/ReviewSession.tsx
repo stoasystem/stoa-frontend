@@ -221,7 +221,7 @@ function ReviewAnswerInput({
               disabled={disabled}
               onClick={() => toggle(option)}
             >
-              {option}
+              <MathRenderer>{option}</MathRenderer>
             </Button>
           ))}
         </div>
@@ -231,7 +231,9 @@ function ReviewAnswerInput({
         ) : (
           <ol className="m-0 list-decimal space-y-1 pl-5 text-sm text-foreground">
             {chosen.map((option) => (
-              <li key={option}>{option}</li>
+              <li key={option}>
+                <MathRenderer>{option}</MathRenderer>
+              </li>
             ))}
           </ol>
         )}

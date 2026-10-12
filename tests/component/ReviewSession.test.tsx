@@ -208,6 +208,38 @@ describe('a question that has come back', () => {
     expect(container.querySelectorAll('.katex').length).toBe(3)
   })
 
+  it('renders ordering formulas in both the choices and the chosen order (#181)', async () => {
+    mockedDue.mockResolvedValue({
+      items: [card({
+        prompt: 'Order the sine values.',
+        options: ['$\\sin30^\\circ$', '$\\sin90^\\circ$'],
+        type: 'ordering',
+      })],
+      dueCount: 1,
+      generatedAt: '',
+    })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Order the sine values.')
+    // jsdom cannot compute MathML styles while resolving KaTeX's accessible name.
+    const options = screen.getAllByRole('button', { hidden: true })
+    const first = options[0]
+    const second = options[1]
+    await waitFor(() => {
+      expect(first.querySelector('.katex')).not.toBeNull()
+      expect(second.querySelector('.katex')).not.toBeNull()
+    })
+    expect(first.textContent).not.toContain('$')
+    expect(second.textContent).not.toContain('$')
+
+    await user.click(first)
+    const chosen = screen.getByRole('listitem')
+    await waitFor(() => expect(chosen.querySelector('.katex')).not.toBeNull())
+    expect(chosen.textContent).not.toContain('$')
+    expect(first).toHaveAttribute('aria-pressed', 'true')
+  })
+
   it('says which option is chosen, not only by its colour (#181)', async () => {
     mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
     const user = userEvent.setup()
