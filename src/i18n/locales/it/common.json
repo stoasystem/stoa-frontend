@@ -12,7 +12,7 @@
     "help": "Aiuto e supporto",
     "open": "Account",
     "switchAccount": "Cambia account",
-    "switchExpired": "Questa sessione è scaduta. Accedi di nuovo.",
+    "switchExpired": "Questa sessione è scaduta. È necessario accedere di nuovo.",
     "switchUnreachable": "Server non raggiungibile. L’account resta salvato."
   },
   "actions": {
@@ -417,5 +417,22 @@
     "hours_other": "{{count}} ore",
     "days_one": "{{count}} giorno",
     "days_other": "{{count}} giorni"
+  },
+  "errorPages": {
+    "forbidden": {
+      "title": "Accesso negato",
+      "body": "Il ruolo di questo account non permette di aprire questa pagina.",
+      "action": "Alla pagina iniziale"
+    },
+    "unauthorized": {
+      "title": "Accesso richiesto",
+      "body": "È necessario accedere per continuare.",
+      "action": "All’accesso"
+    },
+    "notFound": {
+      "title": "Pagina non trovata",
+      "body": "A questo indirizzo non c’è nessuna pagina.",
+      "action": "Alla pagina iniziale"
+    }
   }
 }

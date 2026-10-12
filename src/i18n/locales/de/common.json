@@ -12,7 +12,7 @@
     "help": "Hilfe und Support",
     "open": "Konto",
     "switchAccount": "Konto wechseln",
-    "switchExpired": "Diese Sitzung ist abgelaufen. Melde dich erneut an.",
+    "switchExpired": "Diese Sitzung ist abgelaufen. Bitte erneut anmelden.",
     "switchUnreachable": "Server nicht erreichbar. Das Konto bleibt gespeichert."
   },
   "actions": {
@@ -417,5 +417,22 @@
     "hours_other": "{{count}} Stunden",
     "days_one": "{{count}} Tag",
     "days_other": "{{count}} Tage"
+  },
+  "errorPages": {
+    "forbidden": {
+      "title": "Kein Zugriff",
+      "body": "Mit der Rolle dieses Kontos lässt sich diese Seite nicht öffnen.",
+      "action": "Zur Startseite"
+    },
+    "unauthorized": {
+      "title": "Anmeldung nötig",
+      "body": "Bitte anmelden, um fortzufahren.",
+      "action": "Zur Anmeldung"
+    },
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "body": "Unter dieser Adresse gibt es keine Seite.",
+      "action": "Zur Startseite"
+    }
   }
 }

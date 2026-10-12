@@ -12,7 +12,7 @@
     "help": "Aide et assistance",
     "open": "Compte",
     "switchAccount": "Changer de compte",
-    "switchExpired": "Cette session a expiré. Reconnecte-toi.",
+    "switchExpired": "Cette session a expiré. Nouvelle connexion nécessaire.",
     "switchUnreachable": "Serveur injoignable. Le compte reste enregistré."
   },
   "actions": {
@@ -417,5 +417,22 @@
     "hours_other": "{{count}} heures",
     "days_one": "{{count}} jour",
     "days_other": "{{count}} jours"
+  },
+  "errorPages": {
+    "forbidden": {
+      "title": "Accès refusé",
+      "body": "Le rôle de ce compte ne permet pas d’ouvrir cette page.",
+      "action": "Aller à l’accueil"
+    },
+    "unauthorized": {
+      "title": "Connexion requise",
+      "body": "Connexion nécessaire pour continuer.",
+      "action": "Aller à la connexion"
+    },
+    "notFound": {
+      "title": "Page introuvable",
+      "body": "Aucune page n’existe à cette adresse.",
+      "action": "Aller à l’accueil"
+    }
   }
 }
