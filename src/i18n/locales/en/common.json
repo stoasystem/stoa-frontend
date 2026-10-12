@@ -12,7 +12,7 @@
     "help": "Help and support",
     "open": "Account",
     "switchAccount": "Switch account",
-    "switchExpired": "That session has expired. Sign in again.",
+    "switchExpired": "This session has expired. Please sign in again.",
     "switchUnreachable": "Could not reach the server. The account is still held."
   },
   "actions": {
@@ -417,5 +417,22 @@
     "hours_other": "{{count}} hours",
     "days_one": "{{count}} day",
     "days_other": "{{count}} days"
+  },
+  "errorPages": {
+    "forbidden": {
+      "title": "No access",
+      "body": "This account's role cannot open this page.",
+      "action": "Go to the start page"
+    },
+    "unauthorized": {
+      "title": "Sign-in needed",
+      "body": "Sign in to continue.",
+      "action": "Go to sign-in"
+    },
+    "notFound": {
+      "title": "Page not found",
+      "body": "There is no page at this address.",
+      "action": "Go to the start page"
+    }
   }
 }

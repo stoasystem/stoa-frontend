@@ -89,6 +89,14 @@ export function AccountMenu({
   const targets = accountMenuFor(navAreaForRole(user.role))
   const itemHeight = touch ? TOUCH_TARGET : ACCOUNT_MENU.item
   const itemStyle = { height: itemHeight, borderRadius: ACCOUNT_MENU.itemRadius }
+  // Beside the menu there is no room on a phone: at 375 a submenu flipped to
+  // the left of the 260 panel and opened at -152, half off the screen, where
+  // nothing in it could be tapped (#162). There it opens over the panel, at
+  // the panel's width; Radix keeps a submenu on its side, so the offset is the
+  // panel's width back.
+  const subPlacement = touch
+    ? { sideOffset: -ACCOUNT_MENU.width, width: ACCOUNT_MENU.width }
+    : { sideOffset: 6, width: undefined }
 
   return (
     <Menu.Root>
@@ -146,10 +154,10 @@ export function AccountMenu({
             </Menu.SubTrigger>
             <Menu.Portal>
               <Menu.SubContent
-                sideOffset={6}
+                sideOffset={subPlacement.sideOffset}
                 collisionPadding={8}
                 className={PANEL}
-                style={{ minWidth: 180, borderRadius: 12 }}
+                style={{ minWidth: 180, width: subPlacement.width, borderRadius: 12 }}
               >
                 <Menu.RadioGroup value={current}>
                   {supportedLanguages.map((code) => (
@@ -184,10 +192,10 @@ export function AccountMenu({
             </Menu.SubTrigger>
             <Menu.Portal>
               <Menu.SubContent
-                sideOffset={6}
+                sideOffset={subPlacement.sideOffset}
                 collisionPadding={8}
                 className={PANEL}
-                style={{ minWidth: ACCOUNT_MENU.width, maxWidth: 'calc(100vw - 16px)', borderRadius: 12 }}
+                style={{ minWidth: ACCOUNT_MENU.width, width: subPlacement.width, maxWidth: 'calc(100vw - 16px)', borderRadius: 12 }}
               >
                 {held.problem !== null && (
                   <p role="alert" className="m-0 px-2.5 py-2 text-[13px] text-red">

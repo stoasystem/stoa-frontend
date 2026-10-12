@@ -417,5 +417,22 @@
     "hours_other": "{{count}} ore",
     "days_one": "{{count}} giorno",
     "days_other": "{{count}} giorni"
+  },
+  "errorPages": {
+    "forbidden": {
+      "title": "Accesso negato",
+      "body": "Il ruolo di questo account non permette di aprire questa pagina.",
+      "action": "Vai alla pagina iniziale"
+    },
+    "unauthorized": {
+      "title": "Accesso richiesto",
+      "body": "Accedi per continuare.",
+      "action": "Vai all’accesso"
+    },
+    "notFound": {
+      "title": "Pagina non trovata",
+      "body": "A questo indirizzo non c’è nessuna pagina.",
+      "action": "Vai alla pagina iniziale"
+    }
   }
 }
