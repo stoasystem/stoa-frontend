@@ -370,8 +370,24 @@
     "students": "Lernende",
     "fallback": "Lernprofil",
     "subjectActivity": "Aktivität nach Fach",
-    "activityLine": "{{questions}} Fragen · {{aiResolved}} von der KI gelöst · {{teacherHelp}} Hilfe durch Lehrpersonen",
+    "activityQuestions_one": "{{count}} Frage",
+    "activityQuestions_other": "{{count}} Fragen",
+    "activityAiResolved_one": "{{count}} von der KI gelöst",
+    "activityAiResolved_other": "{{count}} von der KI gelöst",
+    "activityTeacherHelp_one": "{{count}}-mal Hilfe durch Lehrpersonen",
+    "activityTeacherHelp_other": "{{count}}-mal Hilfe durch Lehrpersonen",
     "freshness": "Aktualität des Profils",
-    "updated": "Aktualisiert am {{date}}."
+    "updated": "Aktualisiert am {{date}}.",
+    "kicker": "Lernprofil",
+    "questions": "Fragen",
+    "aiResolved": "Von der KI gelöst",
+    "teacherHelp": "Hilfe durch Lehrpersonen",
+    "weakTitle": "Schwache Themen",
+    "weakEmpty": "Noch kein schwaches Thema ist ausreichend belegt.",
+    "strongTitle": "Starke Themen",
+    "strongEmpty": "Noch kein starkes Thema ist ausreichend belegt.",
+    "signals_one": "{{count}} Hinweis",
+    "signals_other": "{{count}} Hinweise",
+    "evidenceQuestions": "Belegende Fragen: {{count}}"
   }
 }

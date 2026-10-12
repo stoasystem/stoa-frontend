@@ -2,7 +2,8 @@
   "a11y": {
     "breadcrumb": "Navigationspfad",
     "loadingDashboard": "Übersicht wird geladen",
-    "loadingPage": "Seite wird geladen"
+    "loadingPage": "Seite wird geladen",
+    "close": "Schliessen"
   },
   "accountMenu": {
     "addAccount": "Weiteres Konto hinzufügen",

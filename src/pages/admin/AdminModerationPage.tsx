@@ -14,7 +14,7 @@ import {
   useAdminModerationCasesQuery,
   useUpdateModerationCaseMutation,
 } from '@/hooks/admin/useAdminModerationCases'
-import { activeLanguage } from '@/i18n/languages'
+import { formatDayAndTime } from '@/lib/formatDateTime'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import type {
   ModerationCase,
@@ -424,12 +424,7 @@ function surfaceLabel(value: string, t: TFunction) {
 
 function formatDate(value: string | null | undefined, t: TFunction) {
   if (!value) return t('admin:moderation.unknownTime')
-  return new Intl.DateTimeFormat(activeLanguage(), {
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value))
+  return formatDayAndTime(value)
 }
 
 export default AdminModerationPage

@@ -4,6 +4,7 @@ import type { LearningProfile } from '@/types/learningProfile'
 
 export function LearningProfileHeader({ profile }: { profile: LearningProfile }) {
   const { t } = useTranslation('chat')
+  const { t: tAdmin } = useTranslation('admin')
   const totals = profile.subjectActivity.reduce(
     (acc, subject) => ({
       questionCount: acc.questionCount + subject.questionCount,
@@ -17,7 +18,7 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
     <Card>
       <CardContent className="grid gap-4 pt-6 md:grid-cols-[1.2fr_1fr]">
         <div>
-          <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">Student learning profile</p>
+          <p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">{tAdmin('learningProfile.kicker')}</p>
           <h2 className="mt-2 text-2xl font-semibold">{profile.studentId}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             {profile.subjects.map((subject) => t(subject.labelKey)).join(', ')}
@@ -26,15 +27,15 @@ export function LearningProfileHeader({ profile }: { profile: LearningProfile })
         <div className="grid grid-cols-3 gap-3 text-sm">
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{totals.questionCount}</p>
-            <p className="text-muted-foreground">Questions</p>
+            <p className="text-muted-foreground">{tAdmin('learningProfile.questions')}</p>
           </div>
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{totals.aiResolvedCount}</p>
-            <p className="text-muted-foreground">AI resolved</p>
+            <p className="text-muted-foreground">{tAdmin('learningProfile.aiResolved')}</p>
           </div>
           <div className="rounded-md border p-3">
             <p className="text-2xl font-semibold">{totals.teacherEscalationCount}</p>
-            <p className="text-muted-foreground">Teacher help</p>
+            <p className="text-muted-foreground">{tAdmin('learningProfile.teacherHelp')}</p>
           </div>
         </div>
       </CardContent>

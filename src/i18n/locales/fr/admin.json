@@ -370,8 +370,24 @@
     "students": "Élèves",
     "fallback": "Profil d’apprentissage",
     "subjectActivity": "Activité par matière",
-    "activityLine": "{{questions}} questions · {{aiResolved}} résolues par l’IA · {{teacherHelp}} aides d’enseignant",
+    "activityQuestions_one": "{{count}} question",
+    "activityQuestions_other": "{{count}} questions",
+    "activityAiResolved_one": "{{count}} résolue par l’IA",
+    "activityAiResolved_other": "{{count}} résolues par l’IA",
+    "activityTeacherHelp_one": "{{count}} aide d’enseignant",
+    "activityTeacherHelp_other": "{{count}} aides d’enseignant",
     "freshness": "Fraîcheur du profil",
-    "updated": "Mis à jour le {{date}}."
+    "updated": "Mis à jour le {{date}}.",
+    "kicker": "Profil d’apprentissage",
+    "questions": "Questions",
+    "aiResolved": "Résolues par l’IA",
+    "teacherHelp": "Aide d’enseignant",
+    "weakTitle": "Thèmes fragiles",
+    "weakEmpty": "Aucun thème fragile n’est encore suffisamment étayé.",
+    "strongTitle": "Points forts",
+    "strongEmpty": "Aucun point fort n’est encore suffisamment étayé.",
+    "signals_one": "{{count}} signal",
+    "signals_other": "{{count}} signaux",
+    "evidenceQuestions": "Questions à l’appui : {{count}}"
   }
 }

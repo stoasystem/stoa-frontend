@@ -13,6 +13,7 @@ import { PageHeader } from '@/components/common/PageHeader'
 import { useLearningProfileQuery } from '@/hooks/learning/useLearningProfileQuery'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { formatDayAndMonth } from '@/lib/formatDateTime'
+import { getSubjectLabel } from '@/lib/displayLabels'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 
 export function StudentLearningProfilePage() {
@@ -59,13 +60,14 @@ export function StudentLearningProfilePage() {
                 <CardContent className="space-y-3">
                   {profileQuery.data.subjectActivity.map((item) => (
                     <div key={item.subject} className="rounded-md border p-3">
-                      <p className="font-medium">{item.label}</p>
+                      {/* The backend labels subjects in English ("Mathematics"). */}
+                      <p className="font-medium">{getSubjectLabel(item.label || item.subject, t)}</p>
                       <p className="text-sm text-muted-foreground">
-                        {t('learningProfile.activityLine', {
-                          questions: item.questionCount,
-                          aiResolved: item.aiResolvedCount,
-                          teacherHelp: item.teacherEscalationCount,
-                        })}
+                        {[
+                          t('learningProfile.activityQuestions', { count: item.questionCount }),
+                          t('learningProfile.activityAiResolved', { count: item.aiResolvedCount }),
+                          t('learningProfile.activityTeacherHelp', { count: item.teacherEscalationCount }),
+                        ].join(' · ')}
                       </p>
                     </div>
                   ))}

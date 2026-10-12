@@ -370,8 +370,24 @@
     "students": "Students",
     "fallback": "Learning profile",
     "subjectActivity": "Subject activity",
-    "activityLine": "{{questions}} questions · {{aiResolved}} AI resolved · {{teacherHelp}} teacher help",
+    "activityQuestions_one": "{{count}} question",
+    "activityQuestions_other": "{{count}} questions",
+    "activityAiResolved_one": "{{count}} resolved by AI",
+    "activityAiResolved_other": "{{count}} resolved by AI",
+    "activityTeacherHelp_one": "{{count}} teacher help",
+    "activityTeacherHelp_other": "{{count}} teacher helps",
     "freshness": "Profile freshness",
-    "updated": "Updated {{date}}."
+    "updated": "Updated {{date}}.",
+    "kicker": "Student learning profile",
+    "questions": "Questions",
+    "aiResolved": "AI resolved",
+    "teacherHelp": "Teacher help",
+    "weakTitle": "Weak topics",
+    "weakEmpty": "No weak topics have enough evidence yet.",
+    "strongTitle": "Strength topics",
+    "strongEmpty": "No strength topics have enough evidence yet.",
+    "signals_one": "{{count}} signal",
+    "signals_other": "{{count}} signals",
+    "evidenceQuestions": "Evidence questions: {{count}}"
   }
 }

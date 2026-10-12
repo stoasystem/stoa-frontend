@@ -2,7 +2,8 @@
   "a11y": {
     "breadcrumb": "Breadcrumb",
     "loadingDashboard": "Loading dashboard",
-    "loadingPage": "Loading page"
+    "loadingPage": "Loading page",
+    "close": "Close"
   },
   "accountMenu": {
     "addAccount": "Add another account",

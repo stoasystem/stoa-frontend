@@ -370,8 +370,24 @@
     "students": "Studenti",
     "fallback": "Profilo di apprendimento",
     "subjectActivity": "Attività per materia",
-    "activityLine": "{{questions}} domande · {{aiResolved}} risolte dall’IA · {{teacherHelp}} aiuti del docente",
+    "activityQuestions_one": "{{count}} domanda",
+    "activityQuestions_other": "{{count}} domande",
+    "activityAiResolved_one": "{{count}} risolta dall’IA",
+    "activityAiResolved_other": "{{count}} risolte dall’IA",
+    "activityTeacherHelp_one": "{{count}} aiuto del docente",
+    "activityTeacherHelp_other": "{{count}} aiuti del docente",
     "freshness": "Aggiornamento del profilo",
-    "updated": "Aggiornato il {{date}}."
+    "updated": "Aggiornato il {{date}}.",
+    "kicker": "Profilo di apprendimento",
+    "questions": "Domande",
+    "aiResolved": "Risolte dall’IA",
+    "teacherHelp": "Aiuto del docente",
+    "weakTitle": "Argomenti deboli",
+    "weakEmpty": "Nessun argomento debole è ancora sufficientemente documentato.",
+    "strongTitle": "Punti di forza",
+    "strongEmpty": "Nessun punto di forza è ancora sufficientemente documentato.",
+    "signals_one": "{{count}} segnale",
+    "signals_other": "{{count}} segnali",
+    "evidenceQuestions": "Domande a supporto: {{count}}"
   }
 }
