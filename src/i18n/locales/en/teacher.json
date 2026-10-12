@@ -212,6 +212,29 @@
     "question": "Question",
     "help": "Learning context helps you see where the student got stuck before joining the request."
   },
+  "moderationReport": {
+    "title": "Report content",
+    "reason": "Reason",
+    "severity": "Severity",
+    "note": "Note",
+    "notePlaceholder": "What should the admin review?",
+    "submitFailed": "Could not submit moderation report.",
+    "cancel": "Cancel",
+    "submitting": "Submitting...",
+    "submit": "Submit report",
+    "reasons": {
+      "incorrect_answer": "Incorrect answer",
+      "unsafe_content": "Unsafe content",
+      "abuse": "Abuse or harassment",
+      "privacy": "Privacy concern",
+      "other": "Other"
+    },
+    "severities": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    }
+  },
   "automationConsole": {
     "eyebrow": "Learning operations",
     "title": "Automation review console",

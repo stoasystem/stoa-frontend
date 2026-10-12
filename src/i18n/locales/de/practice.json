@@ -290,7 +290,12 @@
     "email": "E-Mail",
     "usageActive": "Aktiv",
     "usagePaused": "Pausiert",
-    "checkFields": "Prüfe die Profilfelder vor dem Speichern."
+    "checkFields": "Prüfe die Profilfelder vor dem Speichern.",
+    "loadingSignals": "Lernsignale werden geladen …",
+    "signalsUnavailable": "Lernsignale sind gerade nicht verfügbar.",
+    "rolloutCore": "Volle Unterstützung im Fach",
+    "rolloutFoundation": "Grundlegende Unterstützung im Profil",
+    "noScore": "Keine Bewertung"
   },
   "progress": {
     "recommendedToday": "Heute empfohlen",

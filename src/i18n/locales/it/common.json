@@ -2,7 +2,8 @@
   "a11y": {
     "breadcrumb": "Percorso di navigazione",
     "loadingDashboard": "Caricamento della panoramica",
-    "loadingPage": "Caricamento della pagina"
+    "loadingPage": "Caricamento della pagina",
+    "close": "Chiudi"
   },
   "accountMenu": {
     "addAccount": "Aggiungi un altro account",

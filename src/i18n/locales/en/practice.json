@@ -290,7 +290,12 @@
     "email": "Email",
     "usageActive": "Active",
     "usagePaused": "Paused",
-    "checkFields": "Check the profile fields before saving."
+    "checkFields": "Check the profile fields before saving.",
+    "loadingSignals": "Loading learning signals...",
+    "signalsUnavailable": "Learning signals are unavailable right now.",
+    "rolloutCore": "Core subject support",
+    "rolloutFoundation": "Foundation profile support",
+    "noScore": "No score"
   },
   "progress": {
     "recommendedToday": "Recommended for Today",

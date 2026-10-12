@@ -655,7 +655,7 @@ function AdminAccountOperationsDetail({ data }: { data: AdminAccountOperations }
           <div className="mt-4 flex flex-wrap gap-2">
             {issues.map((issue) => (
               <Badge key={issue} variant={data.supportState.blockers.includes(issue) ? 'destructive' : 'outline'}>
-                {describeIssueCode(issue)}
+                {describeIssueCode(issue, t)}
               </Badge>
             ))}
           </div>

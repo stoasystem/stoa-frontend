@@ -290,7 +290,12 @@
     "email": "E-mail",
     "usageActive": "Actif",
     "usagePaused": "En pause",
-    "checkFields": "Vérifie les champs du profil avant d'enregistrer."
+    "checkFields": "Vérifie les champs du profil avant d'enregistrer.",
+    "loadingSignals": "Chargement des signaux d’apprentissage…",
+    "signalsUnavailable": "Les signaux d’apprentissage sont indisponibles pour le moment.",
+    "rolloutCore": "Accompagnement complet de la matière",
+    "rolloutFoundation": "Accompagnement de base dans le profil",
+    "noScore": "Aucune note"
   },
   "progress": {
     "recommendedToday": "Recommandé aujourd’hui",

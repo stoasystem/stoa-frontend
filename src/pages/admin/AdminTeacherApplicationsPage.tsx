@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { PageContainer } from '@/components/common/PageContainer'
 import { PageHeader } from '@/components/common/PageHeader'
 import { Badge } from '@/components/ui/badge'
@@ -18,8 +19,11 @@ import type { TeacherApplicationListItem, TeacherReviewState } from '@/services/
 const states: TeacherReviewState[] = ['pending_review', 'approved', 'rejected']
 
 export function AdminTeacherApplicationsPage() {
+  const { t } = useTranslation('admin')
   const [reviewState, setReviewState] = useState<TeacherReviewState>('pending_review')
   const [selected, setSelected] = useState<TeacherApplicationListItem | null>(null)
+  // The review reason is stored with the decision, so its starting text is
+  // data and stays in one language; the reviewer can overwrite it.
   const [reason, setReason] = useState('Reviewed against teacher onboarding criteria.')
   const [message, setMessage] = useState<string | null>(null)
   const listQuery = useTeacherApplicationsQuery(reviewState)
@@ -44,14 +48,14 @@ export function AdminTeacherApplicationsPage() {
           if (decision === 'approved') {
             setMessage(
               result.invitationDelivered
-                ? 'Approved. Invitation email was sent.'
-                : 'Approved, but the invitation email was not delivered. Use resend.',
+                ? t('teacherApplications.approvedSent')
+                : t('teacherApplications.approvedNotDelivered'),
             )
           } else {
-            setMessage('Application rejected.')
+            setMessage(t('teacherApplications.rejected'))
           }
         },
-        onError: (error) => setMessage(toUserFacingError(error, 'Review failed.')),
+        onError: (error) => setMessage(toUserFacingError(error, t('teacherApplications.reviewFailed'))),
       },
     )
   }
@@ -63,9 +67,13 @@ export function AdminTeacherApplicationsPage() {
       { applicationId: selected.applicationId, version: selected.version },
       {
         onSuccess: (result) => {
-          setMessage(result.invitationDelivered ? 'Invitation resent.' : 'Invitation created, but email was not delivered.')
+          setMessage(
+            result.invitationDelivered
+              ? t('teacherApplications.resent')
+              : t('teacherApplications.resentNotDelivered'),
+          )
         },
-        onError: (error) => setMessage(toUserFacingError(error, 'Could not resend the invitation.')),
+        onError: (error) => setMessage(toUserFacingError(error, t('teacherApplications.resendFailed'))),
       },
     )
   }
@@ -74,10 +82,14 @@ export function AdminTeacherApplicationsPage() {
     <DashboardLayout>
       <PageContainer className="p-0">
         <PageHeader
-          eyebrow="Teacher onboarding"
-          title="Teacher applications"
-          description="Review applications, approve to send an invitation, or reject with a reason."
-          actions={<Badge variant="secondary">{listQuery.data?.count ?? 0} in this queue</Badge>}
+          eyebrow={t('teacherApplications.eyebrow')}
+          title={t('teacherApplications.title')}
+          description={t('teacherApplications.description')}
+          actions={
+            <Badge variant="secondary">
+              {t('teacherApplications.inQueue', { count: listQuery.data?.count ?? 0 })}
+            </Badge>
+          }
         />
         <div className="mb-4 flex flex-wrap gap-2">
           {states.map((state) => (
@@ -92,23 +104,23 @@ export function AdminTeacherApplicationsPage() {
                 setMessage(null)
               }}
             >
-              {state.replace('_', ' ')}
+              {t(`teacherApplications.states.${state}`)}
             </Button>
           ))}
         </div>
         <div className="grid gap-4 lg:grid-cols-[1fr_24rem]">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Queue</CardTitle>
+              <CardTitle className="text-base">{t('teacherApplications.queue')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               {listQuery.isError && (
                 <p className="text-sm text-destructive">
-                  {toUserFacingError(listQuery.error, 'Could not load applications. Reviewer access is required.')}
+                  {toUserFacingError(listQuery.error, t('teacherApplications.loadFailed'))}
                 </p>
               )}
               {rows.length === 0 && !listQuery.isLoading && (
-                <p className="text-sm text-muted-foreground">No applications in this state.</p>
+                <p className="text-sm text-muted-foreground">{t('teacherApplications.empty')}</p>
               )}
               {rows.map((row) => (
                 <button
@@ -120,7 +132,7 @@ export function AdminTeacherApplicationsPage() {
                   <span className="font-medium text-foreground">{row.fullName || row.applicationId}</span>
                   <span className="text-sm text-muted-foreground">{row.verifiedEmail}</span>
                   <span className="mt-1 text-xs text-muted-foreground">
-                    {(row.subjects ?? []).join(', ') || 'No subjects'} · v{row.version}
+                    {(row.subjects ?? []).join(', ') || t('teacherApplications.noSubjects')} · v{row.version}
                   </span>
                 </button>
               ))}
@@ -128,16 +140,16 @@ export function AdminTeacherApplicationsPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Review</CardTitle>
+              <CardTitle className="text-base">{t('teacherApplications.review')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
-              {!selected && <p className="text-muted-foreground">Select an application to review.</p>}
+              {!selected && <p className="text-muted-foreground">{t('teacherApplications.selectPrompt')}</p>}
               {selected && (
                 <>
-                  <p><span className="font-medium">Name:</span> {detail?.fullName || selected.fullName}</p>
-                  <p><span className="font-medium">Email:</span> {selected.verifiedEmail}</p>
-                  <p><span className="font-medium">Subjects:</span> {(detail?.subjects || selected.subjects || []).join(', ')}</p>
-                  <p className="whitespace-pre-wrap text-muted-foreground">{detail?.statement || 'Loading statement…'}</p>
+                  <p><span className="font-medium">{t('teacherApplications.name')}</span> {detail?.fullName || selected.fullName}</p>
+                  <p><span className="font-medium">{t('teacherApplications.email')}</span> {selected.verifiedEmail}</p>
+                  <p><span className="font-medium">{t('teacherApplications.subjects')}</span> {(detail?.subjects || selected.subjects || []).join(', ')}</p>
+                  <p className="whitespace-pre-wrap text-muted-foreground">{detail?.statement || t('teacherApplications.loadingStatement')}</p>
                   <Textarea value={reason} onChange={(event) => setReason(event.target.value)} className="min-h-24" />
                   <div className="flex flex-wrap gap-2">
                     <Button
@@ -145,7 +157,7 @@ export function AdminTeacherApplicationsPage() {
                       disabled={reviewMutation.isPending || !reason.trim()}
                       onClick={() => decide('approved')}
                     >
-                      Approve
+                      {t('teacherApplications.approve')}
                     </Button>
                     <Button
                       type="button"
@@ -153,11 +165,11 @@ export function AdminTeacherApplicationsPage() {
                       disabled={reviewMutation.isPending || !reason.trim()}
                       onClick={() => decide('rejected')}
                     >
-                      Reject
+                      {t('teacherApplications.reject')}
                     </Button>
                     {reviewState === 'approved' && (
                       <Button type="button" variant="secondary" disabled={reissueMutation.isPending} onClick={resend}>
-                        Resend invitation
+                        {t('teacherApplications.resend')}
                       </Button>
                     )}
                   </div>

@@ -2,7 +2,8 @@
   "a11y": {
     "breadcrumb": "Fil d’Ariane",
     "loadingDashboard": "Chargement du tableau de bord",
-    "loadingPage": "Chargement de la page"
+    "loadingPage": "Chargement de la page",
+    "close": "Fermer"
   },
   "accountMenu": {
     "addAccount": "Ajouter un autre compte",

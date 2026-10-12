@@ -55,11 +55,11 @@ export function AdminDashboardPage() {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Service readiness</CardTitle>
+              <CardTitle className="text-base">{t('system.readiness.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3 text-sm leading-6 text-muted-foreground">
-              <p>Use these views to monitor learning support, usage patterns, and feedback triage.</p>
-              <p>Configuration diagnostics are available only in the internal debug panel.</p>
+              <p>{t('system.readiness.monitor')}</p>
+              <p>{t('system.readiness.diagnostics')}</p>
             </CardContent>
           </Card>
         </div>

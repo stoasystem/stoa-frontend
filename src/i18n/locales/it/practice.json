@@ -290,7 +290,12 @@
     "email": "E-mail",
     "usageActive": "Attivo",
     "usagePaused": "In pausa",
-    "checkFields": "Controlla i campi del profilo prima di salvare."
+    "checkFields": "Controlla i campi del profilo prima di salvare.",
+    "loadingSignals": "Caricamento dei segnali di apprendimento…",
+    "signalsUnavailable": "I segnali di apprendimento non sono disponibili al momento.",
+    "rolloutCore": "Supporto completo della materia",
+    "rolloutFoundation": "Supporto di base nel profilo",
+    "noScore": "Nessun punteggio"
   },
   "progress": {
     "recommendedToday": "Consigliato per oggi",
