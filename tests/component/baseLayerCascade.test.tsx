@@ -3,13 +3,19 @@ import path from 'node:path'
 import type { ReactElement } from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
 import { compile } from 'tailwindcss'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { Button } from '@/components/base/Button'
 import { Button as UiButton } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
+import i18n from '@/i18n'
+
+// The Dialog's close button is named from the locale files; the queries below read English.
+beforeEach(async () => {
+  await i18n.changeLanguage('en')
+})
 
 /*
  * The global base rules -- `* { border-color }`, `a { color; text-decoration }`
