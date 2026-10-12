@@ -46,7 +46,7 @@ async function start() {
   await installInterception()
   const { LANGUAGE_STORAGE_KEY, isSupportedLanguage } = await import('@/i18n/languages')
   if (language && isSupportedLanguage(language)) localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
-  const [, { default: i18n }, { demo, setDemoLanguage, resetDemoServer, finishDemoKnowledgePoint }] = await Promise.all([
+  const [, { default: i18n }, { demo, setDemoLanguage, resetDemoServer, finishDemoKnowledgePoint, makeReviewDue }] = await Promise.all([
     import('../../index.css'),
     import('@/i18n'),
     import('@/dev/preview/demoSource'),
@@ -56,6 +56,7 @@ async function start() {
   setDemoLanguage(isSupportedLanguage(reading) ? reading : 'en')
   if (params.get('fresh') === '1') resetDemoServer()
   if (surface?.demo === 'demo-point-finished') finishDemoKnowledgePoint()
+  if (surface?.demo === 'review-due') makeReviewDue()
 
   const [{ StrictMode, Suspense }, { createRoot }, { MemoryRouter }] = await Promise.all([
     import('react'),
