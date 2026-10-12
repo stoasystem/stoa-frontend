@@ -98,10 +98,14 @@
   /* Floating surfaces (composer, menus) carry this border and --shadow-float. */
   --float-border: rgba(0, 0, 0, 0.08);
 
-  /* Motion and states: focus ring 2 px navy, 2 px offset. */
+  /* Motion and states: focus ring 3 px, 3 px offset (#125). The colour is
+     unchanged -- every rated pair reads exactly what it read at 2 px -- and
+     what grew is the ring itself, which at 2 px on a 22 px card corner was
+     easy to lose. Width and offset move together so the ring never touches
+     the face it rings. */
   --focus-ring: var(--accent);
-  --focus-ring-width: 2px;
-  --focus-ring-offset: 2px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
   /* Disabled: 40% opacity, no hover. */
   --disabled-opacity: 0.4;
 
@@ -114,9 +118,18 @@
   --r-sheet: 28px;
   --r-pill: 999px;
   /* A button sits on a solid edge and sinks onto it when pressed. The depth
-     is the same on every surface; only the colour under it changes. */
+     is the same on every surface; only the colour under it changes.
+     The sink is the depth, not a pixel less (#125): pressed, the button lands
+     exactly where its edge was, so the whole shape stays put and only its
+     thickness goes. At 3 px against a 4 px edge the bottom crept up by one,
+     which reads as the button sliding rather than being pushed in.
+     This displacement is the one movement that survives
+     `prefers-reduced-motion`. It is the receipt for a direct manipulation,
+     not decoration: without it a button gives no sign it was hit. What
+     reduced motion does take off is the tween between the two positions --
+     see `motion-reduce:transition-none` on the buttons themselves. */
   --press-depth: 4px;
-  --press-sink: 3px;
+  --press-sink: var(--press-depth);
   --press-time: 90ms;
 
   /* Control sizes. One definition each, so a button, a field and a chip that
@@ -124,6 +137,12 @@
      written as min-h-10, min-h-11 and h-9 in different files. */
   --control-h: 44px;          /* the smallest a thumb can land on */
   --control-h-large: 52px;
+  /* The canvas asks for 48 on every button. It is a floor a button opts into
+     rather than the default (#125), because the same two button components
+     draw every parent, teacher and admin screen as well, and this round is
+     the student's screens only: `<Button lift>` takes it, nothing else moves.
+     Raising it everywhere later is this token becoming --control-h. */
+  --control-h-roomy: 48px;
   --control-px: 20px;
   --control-px-small: 16px;
   --control-px-large: 32px;
@@ -246,6 +265,17 @@
   --accent-on-sky: #7D93FF;
   --on-accent-on-sky: #0A1020;
   --on-sky-button: #FFFFFF;                /* filled button on dark */
+  /*
+   * The side of that button: the 4 px edge it sits on and sinks onto (#125).
+   * Black at 45%, which is what this was written as before, is the sky again
+   * -- on #0A1020 the edge simply disappeared and the button went back to
+   * being a white rectangle. A slate instead, measured both ways: 3.11:1
+   * against the white face it must be told apart from, 6.10:1 against the
+   * sky. Not a gated pair -- it is thickness, and the button's own white face
+   * is what carries the control's boundary (like --lit-deep, which the pairs
+   * also leave out as glow).
+   */
+  --on-sky-button-edge: #8792AE;
 
   /*
    * Named by the contrast gate (#17), confirmed here (#18). The Tokens board
@@ -361,7 +391,8 @@
   --state-error-surface: #2A1217;
   --state-error-rule: #5A2630;
 
-  /* Motion and states: the focus ring on dark is 2 px star-gold. */
+  /* Motion and states: the focus ring on dark is star-gold, at the width and
+     offset the light side uses (3 px since #125). */
   --focus-ring: var(--lit);
   /* Tokens board: glass cards 0 12px 40px 45%; the composer floats over the sky (Components). */
   --shadow-glass: 0 12px 40px rgba(0, 0, 0, 0.45);
