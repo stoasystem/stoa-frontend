@@ -460,6 +460,29 @@ describe('the practice stage', () => {
     expect(option(/x = 5/).querySelector('.lucide-check')).not.toBeNull()
   })
 
+  it('holds the checked choice until another attempt starts (#180)', async () => {
+    open('/chapter/u-5/l-2')
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 3/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Not quite')
+
+    const nextChoice = screen.getByRole('radio', { name: /x = 5/ })
+    expect(nextChoice).toBeDisabled()
+    await userEvent.click(nextChoice)
+    expect(screen.getByRole('radio', { name: /x = 3/ })).toBeChecked()
+    expect(nextChoice).not.toBeChecked()
+    expect(nextChoice.closest('label')!.querySelector('.lucide-x')).toBeNull()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(nextChoice).toBeEnabled()
+    await userEvent.click(nextChoice)
+    expect(nextChoice.closest('label')).toHaveAttribute('data-answer-option', 'chosen')
+    expect(nextChoice.closest('label')!.querySelector('.lucide-x')).toBeNull()
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await screen.findByText('Correct')
+    expect(nextChoice.closest('label')).toHaveAttribute('data-answer-option', 'right')
+  })
+
   it('keeps the way back into Ask beside the composer, off the exercise, on a phone (#180)', async () => {
     open('/chapter/u-5/l-2', { width: 375 })
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })

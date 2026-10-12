@@ -396,8 +396,8 @@ function Exercise({
   }, [run.feedback, challenge.challengeId])
 
   const long = challenge.prompt.length > 48
-  // In a quiz an answer is checked once: right or wrong, it holds still.
-  const locked = Boolean(run.feedback?.correct) || run.checking || Boolean(run.quiz && run.feedback)
+  // Keep the checked answer with its result; another attempt starts with Try again.
+  const locked = Boolean(run.feedback) || run.checking
 
   return (
     <>
