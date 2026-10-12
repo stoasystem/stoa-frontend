@@ -71,13 +71,15 @@ export function LearningOperationsDashboardPage() {
   // Readiness says whether exporting is switched on for the system; whether
   // this account may export is only known from the export request itself
   // (#162: "Export allowed: Yes" sat above a refused export).
-  const accountExport = exportQuery.isLoading
+  const accountExport = exportQuery.isFetching
     ? t('learningOps.accountChecking')
-    : exportDenied
-      ? t('learningOps.accountNotGranted')
-      : exportSummary
-        ? t('learningOps.accountGranted')
-        : t('learningOps.accountUnknown')
+    : exportQuery.isError
+      ? t('learningOps.accountUnknown')
+      : exportDenied
+        ? t('learningOps.accountNotGranted')
+        : exportSummary
+          ? t('learningOps.accountGranted')
+          : t('learningOps.accountUnknown')
 
   const summaryTiles = useMemo(() => [
     {

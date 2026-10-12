@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -222,6 +222,35 @@ describe('the warehouse export panel when the grant is missing', () => {
 
     await waitFor(() => expect(metric(account)).toBe(notGranted))
     expect(metric(system)).toBe(yes)
+  })
+
+  it('checks again on refresh and does not present cached permission after a failed check', async () => {
+    refuseExportOnAReadySystem()
+    const otherResponse = mockedGet.getMockImplementation()!
+    let exportCalls = 0
+    let rejectExport: (reason: Error) => void = () => undefined
+    const pendingExport = new Promise<never>((_resolve, reject) => {
+      rejectExport = reject
+    })
+    mockedGet.mockImplementation((url: string) => {
+      if (!url.endsWith('/warehouse-export')) return otherResponse(url)
+      exportCalls += 1
+      if (exportCalls > 1) return pendingExport
+      return Promise.resolve({
+        status: 200,
+        data: { schemaVersion: 'v3', count: 42, filters: {}, window: {}, privacy: { piiRemoved: true } },
+      })
+    })
+
+    render(<LearningOperationsDashboardPage />, { wrapper })
+    await waitFor(() => expect(metric('Export for this account')).toBe('Granted'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+    await waitFor(() => expect(metric('Export for this account')).toBe('Checking…'))
+
+    await act(async () => rejectExport(new Error('Export check failed')))
+    await waitFor(() => expect(metric('Export for this account')).toBe('Could not be checked'))
+    expect(metric('Export for this account')).not.toBe('Granted')
   })
 
   it('hands a granted export back as a summary', async () => {
