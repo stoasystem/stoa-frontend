@@ -399,3 +399,48 @@
   --on-accent: var(--on-accent-on-sky);
   --pill-neutral: var(--on-sky-text-caption);
 }
+
+/*
+ * Review, the questions that have come back round (#125, lane A2): the same
+ * kind of dark surface as Ask, built the same way. The page was a white card
+ * on light grey while the rest of the student's side -- the map, the chapter,
+ * the practice stage, Ask -- is the sky, so opening a review from a star
+ * dropped the student out of the night sky onto a sheet of paper.
+ *
+ * It carries `data-surface="sky"` for the sky's own tokens, and this points
+ * the light names its contents use (the card, the option buttons, the fields,
+ * the feedback panel, the lapse badge) at their sky counterparts. One rule
+ * darkens the whole subtree; no class on the page is rewritten to a colour.
+ *
+ * It lives here, not in the component, so the contrast gate rates what review
+ * shows: scripts/contrast-pairs.json reads it as its own theme, "review".
+ * No name on the left is used on the right, so nothing resolves in a circle.
+ *
+ * One value differs from Ask's remap, on purpose. Ask points --separator at
+ * --sky-glass-border (white 12%), which is a divider; here the same name draws
+ * the outline of an answer option and the rule under the answer field, and an
+ * option the student has not picked yet has nothing else to say it is a
+ * control. So it takes --on-sky-field-rule, the rule that exists for exactly
+ * that (4.52:1 on the sky, 4.44:1 on a glass card), and the dividers keep
+ * --sky-glass-border through --hairline.
+ */
+[data-surface="sky"][data-review-surface] {
+  --ground: var(--sky);
+  --surface: var(--sky-glass);
+  --sidebar: var(--sky-2);
+  --fill: var(--on-sky-selected);
+  --ink: var(--on-sky-text);
+  --secondary: var(--on-sky-text-caption);
+  --tertiary: var(--on-sky-text-muted);
+  --separator: var(--on-sky-field-rule);
+  --hairline: var(--sky-glass-border);
+  --card-border: var(--sky-glass-border);
+  --float-border: var(--sky-glass-border);
+  --accent: var(--accent-on-sky);
+  /* color-mix(in srgb, --accent-on-sky 82%, --on-sky-text), written out so
+     the gate can read it: hover / press on the Check button. */
+  --accent-pressed: #94A6FF;
+  --accent-tint: var(--on-sky-selected);
+  --on-accent: var(--on-accent-on-sky);
+  --pill-neutral: var(--on-sky-text-caption);
+}
