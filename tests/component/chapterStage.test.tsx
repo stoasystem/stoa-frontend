@@ -474,6 +474,23 @@ describe('the practice stage', () => {
     expect(screen.getByRole('progressbar', { name: 'Chapter progress' })).toHaveAttribute('aria-valuenow', '67')
   })
 
+  it('sends the last lesson to the star map, where the point lights, and keeps the way back second (#182)', async () => {
+    completed.add('l-3')
+    open('/chapter/u-5/l-2')
+
+    await userEvent.click(await screen.findByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Next question' }))
+    await userEvent.type(await screen.findByRole('textbox', { name: 'Your answer' }), '3{Enter}')
+    await userEvent.click(await screen.findByRole('button', { name: 'Finish lesson' }))
+
+    expect(await screen.findByText('Every lesson in Linear equations is done.')).toBeInTheDocument()
+    // The star's own address: the lighting plays there.
+    expect(screen.getByRole('link', { name: 'See it on the star map' })).toHaveAttribute('href', '/map/math/algebra/u-5')
+    expect(screen.getByRole('link', { name: 'Back to the chapter' })).toHaveAttribute('href', '/chapter/u-5')
+    expect(screen.queryByRole('link', { name: /^Next lesson/ })).not.toBeInTheDocument()
+  })
+
   it('moves the keyboard to the next question, and does it all without a pointer', async () => {
     open('/chapter/u-5/l-2')
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
