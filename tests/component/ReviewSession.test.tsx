@@ -181,6 +181,45 @@ describe('a question that has come back', () => {
     expect(screen.queryByText('1/2 + 1/4 = 3/4.')).not.toBeInTheDocument()
   })
 
+  it('sets the formulas in the working as maths, not as the $...$ they arrive in (#181)', async () => {
+    // The demo review showed "$\\sqrt{10^2 - 6^2} = \\sqrt{64} = 8$" letter for letter.
+    mockedDue.mockResolvedValue({
+      items: [card({ prompt: 'Wie lang ist die Kathete, wenn $c = 10$ und $a = 6$?', options: [], type: 'text_input' })],
+      dueCount: 1,
+      generatedAt: '',
+    })
+    mockedAnswer.mockResolvedValue({
+      challengeId: 'brueche-l1-c1',
+      correct: true,
+      feedback: 'Richtig.',
+      explanation: '$\\sqrt{10^2 - 6^2} = 8$',
+      attemptsRemaining: 2,
+    })
+    const user = userEvent.setup()
+    const { container } = renderSession()
+
+    await screen.findByText(/Wie lang ist die Kathete/)
+    await user.type(screen.getByLabelText('Your answer'), '8')
+    await user.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    await waitFor(() => expect(screen.getByText('Richtig.')).toBeInTheDocument())
+    await waitFor(() => expect(container.textContent).not.toContain('$'))
+    // Typeset by KaTeX: the prompt's two formulas and the working's one.
+    expect(container.querySelectorAll('.katex').length).toBe(3)
+  })
+
+  it('says which option is chosen, not only by its colour (#181)', async () => {
+    mockedDue.mockResolvedValue({ items: [card()], dueCount: 1, generatedAt: '' })
+    const user = userEvent.setup()
+    renderSession()
+
+    await screen.findByText('Was ist 1/2 + 1/4?')
+    await user.click(screen.getByRole('button', { name: '2/6' }))
+
+    expect(screen.getByRole('button', { name: '2/6' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '3/4' })).toHaveAttribute('aria-pressed', 'false')
+  })
+
   it('gives a typed question somewhere to type', async () => {
     // It had none: review drew options and nothing else, so a question whose
     // answer is written out had only a Check button under it and could never
