@@ -209,7 +209,9 @@ function LessonRunStage({
         ) : challenge ? (
           <Exercise run={run} challenge={challenge} chapter={chapter} side={side} arrived={arrived} />
         ) : (
-          <div className="p-6">
+          <div className="flex items-center gap-2 p-6">
+            {/* A lesson with nothing in it is still an empty state. */}
+            <Murmi mood="calm" size="var(--murmi-inline)" />
             <p className={cn('m-0 text-[15px]', bodyOnSky)}>{t('stage.empty')}</p>
           </div>
         )}
@@ -554,6 +556,7 @@ function ActionRow({ run, side }: { run: LessonRun; side: boolean }) {
       className={cn('flex', side ? 'items-center gap-5' : 'flex-col items-center gap-1')}
     >
       <Button
+        lift
         variant="onSky"
         size="large"
         fullWidth={!side}
@@ -749,7 +752,7 @@ function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
           {quizTroubleIsRestartable(code) ? (
             <>
-              <Button variant="onSky" size="large" onClick={run.restartQuiz} style={{ minWidth: 200 }}>
+              <Button lift variant="onSky" size="large" onClick={run.restartQuiz} style={{ minWidth: 200 }}>
                 {t('stage.trouble.restart')}
               </Button>
               <Link to={chapterPath(unitId)} className={plainOnSky}>
@@ -757,7 +760,7 @@ function QuizTrouble({ run, unitId }: { run: LessonRun; unitId: string }) {
               </Link>
             </>
           ) : (
-            <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
+            <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
               <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
             </Button>
           )}
@@ -780,6 +783,11 @@ function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
   return (
     <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto p-6">
       <section aria-labelledby="stage-quiz-failed-title" data-quiz-failed={run.failed} className="flex max-w-[520px] flex-col items-center gap-4 text-center">
+        {/* Losing the quiz is one of the four moments the marmot is for, and
+          * it was the only one of them on this page without it: the heading
+          * said "not this time" to an empty space. Thinking, like every other
+          * setback here -- looking again, not disappointed. */}
+        <Murmi mood="thinking" size="var(--murmi-state)" />
         <h2
           ref={heading}
           id="stage-quiz-failed-title"
@@ -792,12 +800,12 @@ function QuizFailed({ run, unitId }: { run: LessonRun; unitId: string }) {
         <p className={cn('m-0 text-[17px]', bodyOnSky)}>{t('quiz.failed.body')}</p>
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
           {run.failed === 'skip' ? (
-            <Button variant="onSky" size="large" onClick={run.backToLesson} style={{ minWidth: 200 }}>
+            <Button lift variant="onSky" size="large" onClick={run.backToLesson} style={{ minWidth: 200 }}>
               {t('quiz.failed.backToLesson')}
             </Button>
           ) : (
             <>
-              <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
+              <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
                 <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
               </Button>
               <Button variant="onSkyPlain" onClick={run.restartQuiz}>
@@ -839,6 +847,12 @@ function LessonDone({
         {chapter && (
           <StarGlyph state="in_progress" size={96} progress={chapter.total ? chapter.done / chapter.total : 0} />
         )}
+        {/* Finishing is the fourth of the marmot's moments, and the chapter
+          * page already draws exactly this pair a level up: at the telescope
+          * while there is a lesson left to look at, delighted once the
+          * chapter is whole. The star above says how far; this says how it
+          * went. */}
+        <Murmi mood={allDone ? 'delighted' : 'watching'} size={56} />
         <h2
           ref={heading}
           id="stage-done-title"
@@ -861,7 +875,7 @@ function LessonDone({
           </p>
         )}
         <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
-          <Button asChild variant="onSky" size="large" style={{ minWidth: 200 }}>
+          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
             {next ? (
               <Link to={chapterPath(unitId, next.id)}>{t('stage.done.next', { title: next.title })}</Link>
             ) : (

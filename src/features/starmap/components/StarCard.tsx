@@ -185,7 +185,7 @@ export function StarCardDetails({ map, demo = false, star }: { map: StarMap; dem
       )}
 
       {star.reviewDue > 0 && (
-        <Button asChild variant="onSky" size="regular">
+        <Button asChild lift variant="onSky" size="regular">
           <Link to={`/review/${encodeURIComponent(star.unitId)}`}>
             {t('star.review', { count: star.reviewDue })}
           </Link>
@@ -239,7 +239,7 @@ export function StarCard({ map, demo = false, star, nebula, reducedMotion }: Sta
 
       {action && (
         <div className="pt-1">
-          <Button asChild variant="onSky" size="regular">
+          <Button asChild lift variant="onSky" size="regular">
             <Link to={chapterTo} onClick={jump}>{action}</Link>
           </Button>
         </div>
