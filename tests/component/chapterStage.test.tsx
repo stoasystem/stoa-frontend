@@ -433,6 +433,27 @@ describe('the practice stage', () => {
     expect(screen.getByRole('button', { name: 'Next question' })).toBeEnabled()
   })
 
+  it('sets formulas in the feedback as maths, and does not say "Correct" twice (#180)', async () => {
+    // The demo walk showed "Richtig" over "Richtig." and the working as "$3 : 5 = 0{,}6$".
+    vi.mocked(submitChallengeAnswer).mockResolvedValueOnce({
+      challengeId: 'ch-1',
+      correct: true,
+      feedback: 'Correct.',
+      explanation: '$3x = 15$, so $x = 5$.',
+      attemptsRemaining: 2,
+    })
+    open('/chapter/u-5/l-2')
+
+    await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
+    await userEvent.click(screen.getByRole('radio', { name: /x = 5/ }))
+    await userEvent.click(screen.getByRole('button', { name: 'Check answer' }))
+
+    const verdict = document.querySelector('[data-stage-feedback]') as HTMLElement
+    await waitFor(() => expect(verdict.querySelectorAll('.katex').length).toBe(2))
+    expect(verdict.textContent).not.toContain('$')
+    expect(within(verdict).getAllByText(/^Correct\.?$/)).toHaveLength(1)
+  })
+
   it('finishes the lesson, and the chapter reads its progress again', async () => {
     open('/chapter/u-5/l-2')
 
