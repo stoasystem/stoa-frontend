@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -150,12 +150,14 @@ describe('a validator complaint is not a sentence for a reader', () => {
     await waitFor(() => expect(screen.getByText(/Could not load applications/)).toBeTruthy())
     const text = container.textContent ?? ''
     for (const fragment of developerFragments()) expect(text).not.toContain(fragment)
+    // A queue that could not be read is not an empty queue (#162).
+    expect(text).not.toContain('No applications in this state.')
+    expect(text).not.toMatch(/\d+ in this queue/)
   })
 })
 
-describe('the warehouse export panel when the grant is missing', () => {
-  it('reads a 403 as an answer and sends the request once', async () => {
-    mockedGet.mockImplementation((url: string) => {
+function refuseExportOnAReadySystem() {
+  mockedGet.mockImplementation((url: string) => {
       if (url.endsWith('/warehouse-export')) return Promise.resolve({ status: 403, data: {} })
       if (url.endsWith('/warehouse-readiness')) {
         return Promise.resolve({
@@ -180,6 +182,16 @@ describe('the warehouse export panel when the grant is missing', () => {
         },
       })
     })
+}
+
+/** The value an InlineMetric shows above `label`. */
+function metric(label: string) {
+  return screen.getByText(label).previousElementSibling?.textContent
+}
+
+describe('the warehouse export panel when the grant is missing', () => {
+  it('reads a 403 as an answer and sends the request once', async () => {
+    refuseExportOnAReadySystem()
 
     const { container } = render(<LearningOperationsDashboardPage />, { wrapper })
 
@@ -193,6 +205,52 @@ describe('the warehouse export panel when the grant is missing', () => {
     expect(exportCalls).toHaveLength(1)
     // And it stays a refusal, not a summary of nothing.
     expect(container.textContent).not.toContain('Warehouse export failed')
+  })
+
+  // #162: "Export allowed: Yes" sat above the refusal. The system switch and
+  // this account's grant are two facts, and each is named as what it is.
+  it.each([
+    { language: 'en', system: 'Export enabled in the system', yes: 'Yes', account: 'Export for this account', notGranted: 'Not granted' },
+    { language: 'de', system: 'Export im System aktiviert', yes: 'Ja', account: 'Export für dieses Konto', notGranted: 'Nicht berechtigt' },
+    { language: 'fr', system: 'Export activé dans le système', yes: 'Oui', account: 'Export pour ce compte', notGranted: 'Non autorisé' },
+    { language: 'it', system: 'Esportazione attiva nel sistema', yes: 'Sì', account: 'Esportazione per questo account', notGranted: 'Non autorizzato' },
+  ])('in $language, tells the system switch from the account grant', async ({ language, system, yes, account, notGranted }) => {
+    await i18n.changeLanguage(language)
+    refuseExportOnAReadySystem()
+
+    render(<LearningOperationsDashboardPage />, { wrapper })
+
+    await waitFor(() => expect(metric(account)).toBe(notGranted))
+    expect(metric(system)).toBe(yes)
+  })
+
+  it('checks again on refresh and does not present cached permission after a failed check', async () => {
+    refuseExportOnAReadySystem()
+    const otherResponse = mockedGet.getMockImplementation()!
+    let exportCalls = 0
+    let rejectExport: (reason: Error) => void = () => undefined
+    const pendingExport = new Promise<never>((_resolve, reject) => {
+      rejectExport = reject
+    })
+    mockedGet.mockImplementation((url: string) => {
+      if (!url.endsWith('/warehouse-export')) return otherResponse(url)
+      exportCalls += 1
+      if (exportCalls > 1) return pendingExport
+      return Promise.resolve({
+        status: 200,
+        data: { schemaVersion: 'v3', count: 42, filters: {}, window: {}, privacy: { piiRemoved: true } },
+      })
+    })
+
+    render(<LearningOperationsDashboardPage />, { wrapper })
+    await waitFor(() => expect(metric('Export for this account')).toBe('Granted'))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh' }))
+    await waitFor(() => expect(metric('Export for this account')).toBe('Checking…'))
+
+    await act(async () => rejectExport(new Error('Export check failed')))
+    await waitFor(() => expect(metric('Export for this account')).toBe('Could not be checked'))
+    expect(metric('Export for this account')).not.toBe('Granted')
   })
 
   it('hands a granted export back as a summary', async () => {

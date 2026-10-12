@@ -346,7 +346,7 @@
     "loadingReadiness": "Chargement de l’état de l’entrepôt…",
     "readinessFailed": "État de l’entrepôt indisponible",
     "state": "État",
-    "exportAllowed": "Export autorisé",
+    "exportAllowed": "Export activé dans le système",
     "yes": "Oui",
     "no": "Non",
     "liveWarehouse": "Entrepôt en production",
@@ -360,7 +360,12 @@
     "rows": "Lignes",
     "schema": "Schéma",
     "piiRemoved": "Données personnelles retirées",
-    "check": "À vérifier"
+    "check": "À vérifier",
+    "accountExport": "Export pour ce compte",
+    "accountGranted": "Autorisé",
+    "accountNotGranted": "Non autorisé",
+    "accountChecking": "Vérification…",
+    "accountUnknown": "Impossible à vérifier"
   },
   "learningProfile": {
     "eyebrow": "Analyse de l’apprentissage",

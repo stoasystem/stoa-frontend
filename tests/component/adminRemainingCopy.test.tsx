@@ -60,6 +60,7 @@ vi.mock('@/hooks/teacher/useTeacherApplication', () => ({
     data: { items: [], count: 0 },
     isLoading: false,
     isError: false,
+    isSuccess: true,
   }),
   useTeacherApplicationDetailQuery: () => ({ data: undefined }),
   useReviewTeacherApplicationMutation: () => idleMutation,

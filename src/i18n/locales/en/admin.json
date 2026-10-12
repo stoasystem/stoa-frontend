@@ -346,7 +346,7 @@
     "loadingReadiness": "Loading warehouse readiness...",
     "readinessFailed": "Warehouse readiness failed",
     "state": "State",
-    "exportAllowed": "Export allowed",
+    "exportAllowed": "Export enabled in the system",
     "yes": "Yes",
     "no": "No",
     "liveWarehouse": "Live warehouse",
@@ -360,7 +360,12 @@
     "rows": "Rows",
     "schema": "Schema",
     "piiRemoved": "PII removed",
-    "check": "Check"
+    "check": "Check",
+    "accountExport": "Export for this account",
+    "accountGranted": "Granted",
+    "accountNotGranted": "Not granted",
+    "accountChecking": "Checking…",
+    "accountUnknown": "Could not be checked"
   },
   "learningProfile": {
     "eyebrow": "Learning intelligence",
