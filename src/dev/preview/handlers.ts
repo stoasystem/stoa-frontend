@@ -8,6 +8,7 @@
  * lesson, so the chapter moves on, and Ask's conversations and messages with
  * their answers, so the thread read back holds them.
  */
+import { demoHeldAccounts } from '@/dev/demo/data'
 import {
   checkDemoAnswer,
   completeLesson,
@@ -19,16 +20,21 @@ import {
   demoHint,
   demoLanguage,
   demoLessonResult,
+  demoNotificationPreferences,
+  demoProfileNow,
   demoReviewDue,
   demoReviewSummary,
   demoTeacherAvailability,
   demoTeacherHelpRequests,
   recordDemoExchange,
+  saveDemoGrade,
+  saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary } from '@/types/chat'
+import type { NotificationPreferenceMatrix } from '@/types/notification'
 
 export type PreviewRequest = {
   method: string
@@ -36,13 +42,54 @@ export type PreviewRequest = {
   query: URLSearchParams
   body: unknown
   params: Record<string, string>
+  /** The bearer token the request carried, if any. */
+  token?: string
 }
 
 export type PreviewReply = { status: number; data: unknown }
 
 type Handler = (request: PreviewRequest) => unknown
 
+/** A handler's answer that is not a 200: the status and the body, as the backend sends a refusal. */
+const REFUSAL = Symbol('refusal')
+type Refusal = { [REFUSAL]: number; data: unknown }
+const refuse = (status: number, code: string, message: string): Refusal => ({ [REFUSAL]: status, data: { detail: { code, message } } })
+const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' && data !== null && REFUSAL in data
+
 const now = () => new Date().toISOString()
+
+/*
+ * The notification preferences as the backend keeps them
+ * (`notification_service.py`): every category, every channel; in the bell
+ * and live on, digest and push off; what was saved laid over that.
+ */
+const PREFERENCE_CATEGORIES = ['admin_operations', 'assignments', 'learning_updates', 'teacher_responses', 'weekly_reports']
+const PREFERENCE_CHANNELS = ['email_digest', 'in_app', 'push', 'realtime']
+
+/** The defaults with `over` laid on them, channel by channel (`_merged_preferences`). */
+function withDefaults(over: NotificationPreferenceMatrix | null): NotificationPreferenceMatrix {
+  return Object.fromEntries(PREFERENCE_CATEGORIES.map((category) => [
+    category,
+    { in_app: true, realtime: true, email_digest: false, push: false, ...over?.[category] },
+  ]))
+}
+
+/** `GET /notifications/preferences`: the demo student's, with what /me saved. */
+function notificationPreferences() {
+  return {
+    userId: demo().demoStudent.id,
+    preferences: withDefaults(demoNotificationPreferences()),
+    supportedCategories: PREFERENCE_CATEGORIES,
+    supportedChannels: PREFERENCE_CHANNELS,
+    updatedAt: null as string | null,
+  }
+}
+
+/** The address the code goes to, as the backend shows it: the first letter, then stars (`mask_recipient`). */
+function maskedAddress(email: string): string {
+  const [local, domain] = email.split('@')
+  return local && domain ? `${local[0]}${'*'.repeat(Math.max(local.length - 1, 1))}@${domain}` : '***'
+}
 
 const field = <T>(body: unknown, name: string): T | undefined =>
   typeof body === 'object' && body !== null ? (body as Record<string, T>)[name] : undefined
@@ -55,7 +102,13 @@ const askedForTeacher = new Map<string, { requestId: string; conversationId: str
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
-  ['GET', '/auth/me', () => demo().demoStudent],
+  // A held account's session is refused, as an expired one is: accepted, the
+  // switch to it would load the real app's start page, off the preview and on
+  // to the real backend (#184 review). Refused, the app says it has expired.
+  ['GET', '/auth/me', ({ token }) =>
+    demoHeldAccounts.some((account) => account.accessToken === token)
+      ? refuse(401, 'token_invalid', 'The session has expired.')
+      : demo().demoStudent],
   ['POST', '/auth/login', () => ({ accessToken: 'design-preview', user: demo().demoStudent, onboardingStatus: 'completed' })],
   ['POST', '/auth/logout', () => ({ ok: true })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
@@ -64,8 +117,23 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     const { preferredLocale, effectiveLocale, supportedLocales } = demo().demoStudent
     return { preferredLocale, effectiveLocale, supportedLocales, updatedAt: now() }
   }],
-  ['GET', '/students/me/profile', () => demo().demoProfile],
-  ['PATCH', '/students/me/profile', ({ body }) => ({ ...demo().demoProfile, ...(body as object) })],
+  ['GET', '/students/me/profile', () => demoProfileNow()],
+  // Kept, so the year group saved on /me is the one read back (#184).
+  ['PATCH', '/students/me/profile', ({ body }) => {
+    const grade = field<string>(body, 'grade')
+    if (typeof grade === 'string') saveDemoGrade(grade)
+    return demoProfileNow()
+  }],
+  // The password change on /me (#184): the current password with the marker in
+  // it is refused, a code with it is refused; anything else goes through.
+  ['POST', '/auth/password-change/request', ({ body }) =>
+    field<string>(body, 'currentPassword')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(400, 'password_change_credentials_invalid', 'Check the current password and try again.')
+      : { status: 'sent', maskedRecipient: maskedAddress(demo().demoStudent.email), expiresAt: Math.floor(Date.now() / 1000) + 600 }],
+  ['POST', '/auth/password-change/confirm', ({ body }) =>
+    field<string>(body, 'code')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(400, 'password_change_verification_failed', 'This code cannot be used. Request a new code and try again.')
+      : { status: 'changed' }],
 
   // Notifications
   ['GET', '/notifications', () => demo().demoNotifications],
@@ -78,14 +146,15 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return event ? { ...event, status: 'archived', archivedAt: now() } : null
   }],
   ['POST', '/notifications/read-all', () => ({ ok: true })],
-  ['GET', '/notifications/preferences', () => ({
-    userId: demo().demoStudent.id,
-    preferences: { learning_updates: { in_app: true, email_digest: false }, teacher_responses: { in_app: true, email_digest: true } },
-    supportedCategories: ['learning_updates', 'teacher_responses'],
-    supportedChannels: ['in_app', 'email_digest'],
-    updatedAt: null,
-  })],
-  ['PATCH', '/notifications/preferences', ({ body }) => ({ userId: demo().demoStudent.id, supportedCategories: [], supportedChannels: [], ...(body as object) })],
+  ['GET', '/notifications/preferences', () => notificationPreferences()],
+  // Kept, and answered whole: the app puts the answer straight into its cache,
+  // so an answer without the categories took the switch off /me (#184).
+  ['PATCH', '/notifications/preferences', ({ body }) => {
+    const asked = field<NotificationPreferenceMatrix>(body, 'preferences')
+    // Rebuilt from the defaults, as the backend does: what is left out goes back to its default.
+    if (asked) saveDemoNotificationPreferences(withDefaults(asked))
+    return { ...notificationPreferences(), updatedAt: now() }
+  }],
 
   // Ask
   ['GET', '/conversations', () => demoConversationList()],
@@ -95,7 +164,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       id: `demo-conversation-${Date.now()}`,
       title: initialMessage ? titleOf(initialMessage) : '…',
       subject: field<string>(body, 'subject') ?? 'math',
-      grade: field<string>(body, 'grade') ?? demo().demoProfile.grade,
+      grade: field<string>(body, 'grade') ?? demoProfileNow().grade,
       updatedAt: now(),
     }
     createDemoConversation(summary)
@@ -104,7 +173,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return { ...summary, messages: [] }
   }],
   ['GET', '/conversations/:id', ({ params }) => demoConversation(params.id) ?? {
-    id: params.id, title: '…', subject: 'math', grade: demo().demoProfile.grade, updatedAt: now(), messages: [],
+    id: params.id, title: '…', subject: 'math', grade: demoProfileNow().grade, updatedAt: now(), messages: [],
   }],
   // A command failed on purpose (#183) says so, as the backend does, and may be sent again with its key.
   ['GET', '/conversations/:id/generation', ({ params, query }) => {
@@ -174,6 +243,7 @@ export async function answer(request: Omit<PreviewRequest, 'params'>): Promise<P
     if (!match) continue
     const params = Object.fromEntries(route.names.map((name, index) => [name, decodeURIComponent(match[index + 1])]))
     const data = await route.handler({ ...request, params })
+    if (isRefusal(data)) return { status: data[REFUSAL], data: data.data }
     return data === null ? { status: 404, data: { detail: 'Not in the demo data' } } : { status: 200, data }
   }
   return null
