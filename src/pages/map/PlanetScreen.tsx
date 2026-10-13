@@ -9,7 +9,7 @@ export function PlanetScreen({ ask }: { ask?: AskRoute }) {
   const { subjectId } = useParams()
 
   return (
-    <AppLayout bleed>
+    <AppLayout bleed surface="sky">
       <AskHost route={ask} subjectId={subjectId}>
         <StarMapRoute />
       </AskHost>

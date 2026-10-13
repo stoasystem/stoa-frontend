@@ -28,7 +28,14 @@ const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   offline: 'notifications.connection.offline',
 }
 
-export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
+export function NotificationCenter({
+  hitSize,
+  onSky = false,
+}: {
+  hitSize?: number
+  /** In the bar over a sky page: the bell takes the bar's sky values. */
+  onSky?: boolean
+} = {}) {
   const { t } = useTranslation(['common', 'chat'])
   const [open, setOpen] = useState(false)
   const shell = useRef<HTMLDivElement>(null)
@@ -87,6 +94,8 @@ export function NotificationCenter({ hitSize }: { hitSize?: number } = {}) {
         }
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
+        // Over a sky page the glyph takes the bar's sky values; the panel below does not.
+        data-bar-control={onSky || undefined}
         badge={
           unread > 0 ? (
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-accent" aria-hidden="true" />

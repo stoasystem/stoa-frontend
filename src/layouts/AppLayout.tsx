@@ -61,7 +61,9 @@ export type AppSurface = 'light' | 'sky'
  * help, sign-out) is behind the avatar, at every width.
  *
  * `surface="sky"` paints the page area as the dark sky (the planet, the stage)
- * and scopes the sky tokens to it; the bar stays light, as every board draws it.
+ * and scopes the sky tokens to it, and the bar goes with it: the boards drew
+ * it light everywhere, and over the sky that read as another product (#183
+ * review), so a sky page has a sky bar. Light pages keep the light bar.
  *
  * `bleed` hands the page area to the page whole: no padding, exactly the height
  * under the bar, nothing scrolls. The planet uses it, with Ask beside or over
@@ -111,6 +113,7 @@ export function AppLayout({
       <div className={cn('flex flex-col bg-ground text-ink', bleed ? 'h-dvh overflow-hidden' : 'min-h-screen')}>
         <TopBar
           covered={covered}
+          sky={surface === 'sky'}
           homePath={homePath}
           wide={wide}
           signedIn={Boolean(user)}

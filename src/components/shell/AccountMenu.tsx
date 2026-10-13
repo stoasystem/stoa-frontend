@@ -72,10 +72,13 @@ const extraIcons: Record<string, LucideIcon> = { billing: CreditCard }
 export function AccountMenu({
   avatarSize = 30,
   touch = false,
+  onSky = false,
 }: {
   avatarSize?: AvatarSize
   /** A phone: the avatar and every item get a 44 target; what is drawn stays the same. */
   touch?: boolean
+  /** In the bar over a sky page: the avatar takes the bar's sky values; the menu stays light. */
+  onSky?: boolean
 }) {
   const { t } = useTranslation('common')
   const user = useAuthStore((state) => state.user)
@@ -106,6 +109,7 @@ export function AccountMenu({
           aria-label={t('accountMenu.open')}
           title={t('accountMenu.open')}
           data-account-trigger
+          data-bar-control={onSky || undefined}
           className="group inline-flex shrink-0 cursor-pointer items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none"
           style={touch ? { width: TOUCH_TARGET, height: TOUCH_TARGET } : { width: avatarSize, height: avatarSize }}
         >

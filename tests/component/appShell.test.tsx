@@ -320,16 +320,26 @@ describe('what sits beside the logo', () => {
 })
 
 describe('the sky', () => {
-  it('scopes the dark tokens to the page area and leaves the bar light', () => {
+  it('scopes the dark tokens to the page area, and the bar goes with it (#183 review)', () => {
+    // The boards drew the bar light everywhere; over the sky that read as
+    // another product ("the white top does not go with the rest at all").
     renderShell('student', '/', 1280, 'sky')
 
     const main = screen.getByRole('main')
     expect(main).toHaveAttribute('data-surface', 'sky')
-    expect(bar().closest('[data-surface="sky"]')).toBeNull()
+    const header = bar().closest('[data-top-bar]') as HTMLElement
+    expect(header).toHaveAttribute('data-surface', 'sky')
+    expect(header.style.background).toContain('var(--sky)')
+    // The logo is the white one, the bell and the avatar read the bar's sky values …
+    expect(header.querySelector('img[alt="STOA"]')?.className).toContain('invert')
+    expect(header.querySelector('[data-account-trigger]')).toHaveAttribute('data-bar-control')
   })
 
-  it('is not the default', () => {
+  it('is not the default, and a light page keeps the light bar', () => {
     renderShell('student', '/', 1280)
     expect(document.querySelector('[data-surface="sky"]')).toBeNull()
+    const header = bar().closest('[data-top-bar]') as HTMLElement
+    expect(header.style.background).toBe('var(--bar)')
+    expect(header.querySelector('[data-bar-control]')).toBeNull()
   })
 })

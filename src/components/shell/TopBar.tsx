@@ -16,6 +16,11 @@ import { AccountMenu } from '@/components/shell/AccountMenu'
  * size. The targets sit side by side with no gap, and the avatar's reaches
  * into the 8 px edge padding, so the drawn avatar stays 8 from the edge and no
  * two targets overlap.
+ *
+ * Over a sky page (`sky`) the bar is the sky too, at 86% under the same blur,
+ * with the logo in white and the bell and avatar in their sky values: a white
+ * bar over the night sky read as a different product (#183 review). The light
+ * pages keep the light bar.
  */
 export function TopBar({
   homePath,
@@ -24,6 +29,7 @@ export function TopBar({
   activeIndex,
   signedIn,
   covered = false,
+  sky = false,
 }: {
   homePath: string
   wide: boolean
@@ -33,6 +39,8 @@ export function TopBar({
   signedIn: boolean
   /** Under a modal (the phone Ask sheet): dimmed with the page, and inert. */
   covered?: boolean
+  /** Over a sky page: the bar is the sky as well. */
+  sky?: boolean
 }) {
   const { t } = useTranslation('common')
   const bar = wide ? TOP_BAR : TOP_BAR_PHONE
@@ -51,10 +59,11 @@ export function TopBar({
   return (
     <header
       data-top-bar
+      data-surface={sky ? 'sky' : undefined}
       inert={covered || undefined}
-      className="sticky top-0 z-30 border-b border-separator"
+      className={sky ? 'sticky top-0 z-30 border-b border-[color:var(--sky-glass-border)]' : 'sticky top-0 z-30 border-b border-separator'}
       style={{
-        background: 'var(--bar)',
+        background: sky ? 'color-mix(in srgb, var(--sky) 86%, transparent)' : 'var(--bar)',
         backdropFilter: 'blur(var(--bar-blur))',
         WebkitBackdropFilter: 'blur(var(--bar-blur))',
         paddingTop: 'env(safe-area-inset-top)',
@@ -78,12 +87,12 @@ export function TopBar({
           // The logo is narrower than 44 at 26 high, so its target is widened.
           style={{ height: bar.height, minWidth: touch ? TOUCH_TARGET : undefined }}
         >
-          <StoaLogo height={bar.logo} />
+          <StoaLogo height={bar.logo} variant={sky ? 'light' : 'dark'} />
         </Link>
         <div className="justify-self-center">{wide && segmented}</div>
         <div className="flex items-center justify-self-end" style={{ gap: touch ? 0 : bar.gap }}>
-          {signedIn && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} />}
-          <AccountMenu avatarSize={bar.avatar} touch={touch} />
+          {signedIn && <NotificationCenter hitSize={touch ? TOUCH_TARGET : undefined} onSky={sky} />}
+          <AccountMenu avatarSize={bar.avatar} touch={touch} onSky={sky} />
         </div>
       </div>
       {!wide && segmented && <div className="px-4 pb-[3px]">{segmented}</div>}
