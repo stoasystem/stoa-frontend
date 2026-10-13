@@ -73,8 +73,13 @@ function apiPath(url: URL) {
   return url.pathname.replace(/^\/api(?=\/|$)/, '') || '/'
 }
 
-async function reply(method: string, url: URL, body: unknown): Promise<PreviewReply> {
-  const found = await answer({ method, path: apiPath(url), query: url.searchParams, body: parseBody(body) })
+/** The bearer token in an Authorization header, if there is one. */
+function bearer(authorization: unknown): string | undefined {
+  return typeof authorization === 'string' ? /^Bearer (.+)$/.exec(authorization)?.[1] : undefined
+}
+
+async function reply(method: string, url: URL, body: unknown, token?: string): Promise<PreviewReply> {
+  const found = await answer({ method, path: apiPath(url), query: url.searchParams, body: parseBody(body), token })
   const record = { method, url: `${apiPath(url)}${url.search}`, status: found?.status ?? 404 }
   if (found) {
     journal().answered.push(record)
@@ -88,7 +93,7 @@ function axiosAdapter(client: AxiosInstance): AxiosAdapter {
   return async (config) => {
     const url = new URL(client.getUri(config), window.location.origin)
     const method = (config.method ?? 'get').toUpperCase()
-    const { status, data } = await reply(method, url, config.data)
+    const { status, data } = await reply(method, url, config.data, bearer(AxiosHeaders.from(config.headers).get('Authorization')))
     const response: AxiosResponse = {
       data,
       status,
@@ -150,7 +155,8 @@ function installFetch() {
         headers: { 'content-type': 'text/event-stream' },
       })
     }
-    const { status, data } = await reply(method, url, body)
+    const headers = new Headers(init?.headers ?? request?.headers)
+    const { status, data } = await reply(method, url, body, bearer(headers.get('Authorization')))
     return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } })
   }
 }
