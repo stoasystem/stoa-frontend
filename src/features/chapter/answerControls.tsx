@@ -18,6 +18,13 @@ export type AnswerChallenge = { challengeId: string; type: string; options?: str
 
 export const bodyOnSky = 'text-[color:var(--on-sky-text-body)]'
 
+/**
+ * The rule round a control not chosen yet: what tells it from the sky (WCAG
+ * 1.4.11, 3:1). White at 10% was 1.37:1 (#191 review); this is the field rule
+ * the contrast gate already rates on --sky (4.52:1) and on a glass card (4.44:1).
+ */
+const restingRule = 'border-[color:var(--on-sky-field-rule)]'
+
 /** A glass card over the sky (Tokens board: glass cards). */
 export const glass = {
   background: 'var(--sky-glass)',
@@ -109,7 +116,7 @@ export function AnswerInput({
                 data-answer-option={chosen ? (verdict ?? 'chosen') : undefined}
                 className={cn(
                   'relative flex cursor-pointer items-center gap-3.5 rounded-[14px] border px-[18px] py-3.5 backdrop-blur-[16px] has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-ring',
-                  !chosen ? 'border-white/10 bg-white/[0.06]' : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
+                  !chosen ? `${restingRule} bg-white/[0.06]` : verdict === 'wrong' ? 'border-[color:var(--red)] bg-white/[0.06]' : 'border-lit bg-lit/16',
                   disabled && 'cursor-default',
                 )}
               >
@@ -161,7 +168,7 @@ export function AnswerInput({
               onClick={() => toggle(option)}
               className={cn(
                 'min-h-11 rounded-[12px] border px-4 text-[15px] font-medium text-on-sky focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-40',
-                chosen.includes(option) ? 'border-lit bg-lit/16' : 'border-white/10 bg-white/[0.06]',
+                chosen.includes(option) ? 'border-lit bg-lit/16' : `${restingRule} bg-white/[0.06]`,
               )}
             >
               <MathRenderer>{option}</MathRenderer>

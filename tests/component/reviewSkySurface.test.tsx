@@ -268,6 +268,16 @@ describe('what the screen carries is what is rated', () => {
     expect(within(surface).queryByRole('button', { name: '3/4' })).toBeNull()
   })
 
+  it('a control not chosen yet is ruled with the gated field rule, not white at 10%', async () => {
+    // #191 review: border-white/10 is 1.37:1 on the glass, under 1.4.11's 3:1.
+    // --on-sky-field-rule is rated by check:contrast on --sky and on --sky-glass.
+    const { surface } = await openReview()
+    const option = within(surface).getByRole('radio', { name: /3\/4/ }).closest('label')!
+
+    expect(option.className).toContain('border-[color:var(--on-sky-field-rule)]')
+    expect(option.className).not.toContain('border-white/10')
+  })
+
   it('Check is the stage’s raised button on the sky', async () => {
     const { surface } = await openReview()
     const check = within(surface).getAllByRole('button', { name: enChapter.stage.check })[0]

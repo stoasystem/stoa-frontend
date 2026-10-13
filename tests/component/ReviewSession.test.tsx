@@ -238,6 +238,9 @@ describe('a question that has come back', () => {
     await waitFor(() => expect(chosen.querySelector('.katex')).not.toBeNull())
     expect(chosen.textContent).not.toContain('$')
     expect(first).toHaveAttribute('aria-pressed', 'true')
+    // A tile not chosen is ruled with the gated field rule, not white at 10% (#191 review).
+    expect(second.className).toContain('border-[color:var(--on-sky-field-rule)]')
+    expect(second.className).not.toContain('border-white/10')
   })
 
   it('says which option is chosen, not only by its colour (#181)', async () => {
