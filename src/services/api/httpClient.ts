@@ -179,9 +179,17 @@ httpClient.interceptors.response.use(
       : typeof detail === 'string'
         ? detail
         : error.message ?? 'Unknown API error'
+    // The backend sends its code two ways: under `detail` ({detail: {code,
+    // message}}), and flat ({code, message, correlationId}) for an identity
+    // provider's refusal (`safe_error_body`): an unconfirmed account, a wrong
+    // or expired verification code. Read only under `detail`, the flat one was
+    // lost (#185 review).
+    const flatCode = error.response?.data?.code
     const code = typeof detail === 'object' && detail !== null && 'code' in detail
       ? String(detail.code)
-      : undefined
+      : typeof flatCode === 'string'
+        ? flatCode
+        : undefined
 
     const transportCode = typeof error.code === 'string' ? error.code : undefined
 

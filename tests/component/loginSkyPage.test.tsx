@@ -243,6 +243,51 @@ describe('signing in from the sky page', () => {
   })
 })
 
+/*
+ * The backend answers an identity-provider refusal with a flat body,
+ * `{code, message, correlationId}` (`safe_error_body`, stoa-backend
+ * security/errors.py), not under `detail`: an unconfirmed account at sign-in,
+ * and a wrong or expired verification code. Read only under `detail`, the code
+ * was lost: the card did not open, and a wrong code showed the backend's
+ * English message in every language (#185 review).
+ */
+describe('the backend\'s flat refusals, as it sends them', () => {
+  const flat = (code: string, message: string) => ({ code, message, correlationId: 'corr-1' })
+
+  async function toVerificationCard(user: ReturnType<typeof userEvent.setup>) {
+    answerLoginWith(flat('email_verification_required', 'Verify your email, then sign in again.'), 403)
+    renderLogin()
+    await signIn(user)
+    await screen.findByRole('heading', { level: 2, name: enAuth.verification.title })
+  }
+
+  async function confirmAnsweredWith(user: ReturnType<typeof userEvent.setup>, body: object) {
+    mswServer.use(http.post('https://api.test/auth/email-verification/confirm', () => HttpResponse.json(body, { status: 400 })))
+    await user.type(screen.getByLabelText(enAuth.verification.codeLabel), '123456')
+    await user.click(screen.getByRole('button', { name: enAuth.verification.confirmCta }))
+  }
+
+  it('opens the verification card for an unconfirmed account', async () => {
+    await toVerificationCard(userEvent.setup())
+    expect(screen.queryByText('Verify your email, then sign in again.')).not.toBeInTheDocument()
+  })
+
+  it('says a wrong code is wrong in the page\'s words, not the backend\'s English', async () => {
+    const user = userEvent.setup()
+    await toVerificationCard(user)
+    await confirmAnsweredWith(user, flat('verification_code_invalid', 'Check the verification code and try again.'))
+    expect(await screen.findByText(enAuth.verification.invalid)).toBeInTheDocument()
+    expect(screen.queryByText('Check the verification code and try again.')).not.toBeInTheDocument()
+  })
+
+  it('says an expired code has expired', async () => {
+    const user = userEvent.setup()
+    await toVerificationCard(user)
+    await confirmAnsweredWith(user, flat('verification_code_expired', 'Request a new verification code, then try again.'))
+    expect(await screen.findByText(enAuth.verification.expired)).toBeInTheDocument()
+  })
+})
+
 describe('the document behind the sign-in page', () => {
   // jsdom reads no index.css; give the surface its --sky the way brand-tokens.css does.
   let tokens: HTMLStyleElement

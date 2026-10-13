@@ -14,6 +14,7 @@ import {
   isVerificationRateLimitedError,
   resendEmailVerification,
 } from '@/services/auth/authApi'
+import { ApiError } from '@/services/api/httpClient'
 import { toUserFacingError } from '@/lib/userFacingText'
 import type { EmailVerificationResponse, EmailVerificationStatus, UserRole } from '@/types/user'
 
@@ -66,10 +67,21 @@ function verificationMessageKey(response: EmailVerificationResponse | undefined)
   return null
 }
 
+/** The backend's codes for a code it refused (`SecurityErrorCode`), and what the panel says for each. */
+const KEY_BY_CODE: Record<string, string> = {
+  verification_code_invalid: 'verification.invalid',
+  verification_code_expired: 'verification.expired',
+}
+
 function getErrorCopy(error: unknown, fallback: string) {
   const message = toUserFacingError(error, fallback)
   if (isUnauthorizedError(error)) return 'verification.unauthorized'
   if (isVerificationRateLimitedError(error)) return 'verification.rateLimited'
+  // By the code: the backend's own messages ("Check the verification code and
+  // try again.") hold neither word the lines below look for, so a refused code
+  // was shown in English in every language (#185 review).
+  const byCode = error instanceof ApiError && error.code ? KEY_BY_CODE[error.code] : undefined
+  if (byCode) return byCode
   if (/expired/i.test(message)) return 'verification.expired'
   if (/invalid/i.test(message)) return 'verification.invalid'
   return null
