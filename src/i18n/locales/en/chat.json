@@ -168,7 +168,8 @@
       "stopped": "Stopped",
       "stop": "Stop",
       "starting": "Starting the conversation…",
-      "startFailed": "The conversation could not be started. Try again."
+      "startFailed": "The conversation could not be started. Try again.",
+      "answerFailed": "The explanation could not be prepared right now. Please try again or ask a teacher."
     },
     "presence": {
       "online_one": "{{count}} teacher online",

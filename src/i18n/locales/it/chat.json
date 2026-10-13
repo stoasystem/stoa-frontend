@@ -168,7 +168,8 @@
       "stopped": "Interrotto",
       "stop": "Interrompi",
       "starting": "Avvio della conversazione…",
-      "startFailed": "Non è stato possibile avviare la conversazione. Riprova."
+      "startFailed": "Non è stato possibile avviare la conversazione. Riprova.",
+      "answerFailed": "Al momento non è stato possibile preparare la spiegazione. Riprova o chiedi a un docente."
     },
     "presence": {
       "online_one": "{{count}} insegnante online",

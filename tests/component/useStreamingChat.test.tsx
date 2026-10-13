@@ -43,6 +43,7 @@ import { mergeWithServerMessages, useStreamingChat } from '@/hooks/chat/useStrea
 import { clearPendingMessages, PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
+import i18n from '@/i18n'
 
 const mockedStream = vi.mocked(streamConversationMessage)
 const mockedProgress = vi.mocked(getGenerationProgress)
@@ -191,7 +192,7 @@ describe('where the message stands', () => {
   })
 
   it('still shows the answer when the request is cut off before it arrives', async () => {
-    mockedStream.mockRejectedValue(new Error('Streaming request failed with status 504'))
+    mockedStream.mockRejectedValue(new Error('Request failed with status code 504'))
     mockedProgress.mockResolvedValue(state({ status: 'completed', assistantMessageId: 'a-1' }))
     const { result, invalidated } = render()
 
@@ -207,8 +208,24 @@ describe('where the message stands', () => {
     expect(invalidated()).toBe(true)
   })
 
+  it('says a failed answer in the reader\u2019s language (#183)', async () => {
+    // The fallback stood in English under every interface.
+    await i18n.changeLanguage('de')
+    try {
+      mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
+      mockedProgress.mockResolvedValue(state({ status: 'failed', failureCategory: 'provider_unavailable', retryable: true }))
+      const { result } = render()
+
+      await failOnce(result)
+      const answer = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'assistant')
+      expect(answer?.content).toBe('Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson.')
+    } finally {
+      await i18n.changeLanguage('en')
+    }
+  })
+
   it('offers a failed answer again under the same key', async () => {
-    mockedStream.mockRejectedValueOnce(new Error('Streaming request failed with status 503'))
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
     mockedProgress.mockResolvedValue(
       state({ status: 'failed', failureCategory: 'deadline_exceeded', retryable: true }),
     )
@@ -217,6 +234,10 @@ describe('where the message stands', () => {
     await failOnce(result)
     const failed = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'student')
     expect(failed).toBeDefined()
+    // The answer's place says so in words, not as a status code (#183).
+    const answer = result.current.localMessages.find((message) => message.status === 'failed' && message.role === 'assistant')
+    expect(answer?.content).toBe('The explanation could not be prepared right now. Please try again or ask a teacher.')
+    expect(answer?.content).not.toMatch(/status/i)
 
     mockedStream.mockResolvedValueOnce('streamed')
     await act(async () => {
@@ -230,7 +251,7 @@ describe('where the message stands', () => {
   })
 
   it('sends an answer that was paid for but unusable as a new message', async () => {
-    mockedStream.mockRejectedValueOnce(new Error('Streaming request failed with status 503'))
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
     mockedProgress.mockResolvedValue(
       state({ status: 'failed', failureCategory: 'incomplete_output', retryable: false }),
     )
@@ -251,7 +272,7 @@ describe('where the message stands', () => {
   })
 
   it('treats a message the server never stored as safe to send again', async () => {
-    mockedStream.mockRejectedValueOnce(new Error('Streaming request failed with status 429'))
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 429'))
     mockedProgress.mockRejectedValue(notFound())
     const { result } = render()
 
@@ -422,7 +443,7 @@ describe('a message that is replaced before it ends', () => {
   })
 
   it('does not leave an earlier attempt of the same message beside the retry', async () => {
-    mockedStream.mockRejectedValueOnce(new Error('Streaming request failed with status 503'))
+    mockedStream.mockRejectedValueOnce(new Error('Request failed with status code 503'))
     mockedProgress.mockResolvedValue(
       state({ status: 'failed', failureCategory: 'deadline_exceeded', retryable: true }),
     )

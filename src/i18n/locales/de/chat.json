@@ -168,7 +168,8 @@
       "stopped": "Angehalten",
       "stop": "Anhalten",
       "starting": "Die Unterhaltung wird gestartet…",
-      "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal."
+      "startFailed": "Die Unterhaltung konnte nicht gestartet werden. Versuch es noch einmal.",
+      "answerFailed": "Die Erklärung konnte gerade nicht erstellt werden. Versuch es noch einmal oder frag eine Lehrperson."
     },
     "presence": {
       "online_one": "{{count}} Lehrperson online",

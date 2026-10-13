@@ -132,7 +132,10 @@ export async function streamConversationMessage({
 
 /** The refusal as `httpClient` would report it: the server's message and code. */
 async function streamRequestError(response: Response) {
-  const fallback = `Streaming request failed with status ${response.status}`
+  // Said as axios says it, so `toUserFacingError` knows it for a bare status
+  // and shows its own words (#183: "Streaming request failed with status 503"
+  // reached the student).
+  const fallback = `Request failed with status code ${response.status}`
   let detail: unknown
   try {
     const body = (await response.json()) as { detail?: unknown }

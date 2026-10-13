@@ -11,6 +11,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { streamConversationMessage } from '@/services/chat/chatStreamApi'
+import { toUserFacingError } from '@/lib/userFacingText'
 
 const originalFetch = globalThis.fetch
 
@@ -60,5 +61,20 @@ describe('the attachments on a message, on the wire', () => {
     })
 
     expect('attachmentIds' in sentBody()).toBe(false)
+  })
+
+  it('reports a refusal with no detail as a bare status, the way axios does (#183)', async () => {
+    // A student read "Streaming request failed with status 503" in the thread:
+    // toUserFacingError knows axios's wording for a bare status, and only that.
+    globalThis.fetch = vi.fn(async () => new Response(JSON.stringify({}), { status: 503 })) as typeof fetch
+    const refused = await streamConversationMessage({
+      conversationId: 'c-1',
+      payload: { content: 'Why?', idempotencyKey: 'k-1' },
+      onEvent: () => {},
+    }).catch((error: unknown) => error)
+
+    expect(refused).toBeInstanceOf(Error)
+    expect((refused as Error).message).toBe('Request failed with status code 503')
+    expect(toUserFacingError(refused, 'fallback')).toBe('fallback')
   })
 })
