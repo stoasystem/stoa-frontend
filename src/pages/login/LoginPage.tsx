@@ -82,7 +82,7 @@ export function LoginPage() {
         <LanguageSwitcher variant="sky" className="ml-auto md:ml-0" />
       </header>
 
-      <main className="mx-auto grid w-full max-w-[1120px] flex-1 content-start gap-10 px-4 pt-8 pb-10 md:grid-cols-[minmax(0,360px)_minmax(0,1fr)] md:content-center md:items-center md:gap-[clamp(48px,8vw,120px)] md:px-12 md:py-9">
+      <main className="mx-auto grid w-full max-w-[1120px] flex-1 content-start gap-10 px-4 pt-4 pb-10 md:grid-cols-[minmax(0,360px)_minmax(0,1fr)] md:content-center md:items-center md:gap-[clamp(48px,8vw,120px)] md:px-12 md:py-9">
         <section aria-labelledby="login-title" className="w-full max-w-[420px] md:max-w-none">
           <p className="m-0 text-[13px] leading-[1.3] font-medium tracking-[0.4px] text-[color:var(--on-sky-text-caption)] uppercase">
             {t('auth:login.eyebrow')}
@@ -102,10 +102,14 @@ export function LoginPage() {
           </div>
         </section>
 
-        <div className="flex max-w-[420px] items-center gap-5 border-t border-[color:var(--sky-glass-border)] pt-6 md:max-w-none md:flex-col md:items-stretch md:gap-0 md:border-t-0 md:pt-0">
-          <LoginNebula className="w-[104px] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
+        {/* On a phone the nebula opens the page, above the heading, as the sky
+          * does beside the form on a desktop; under the form it decorated
+          * nothing (#185 review). The caption would stand against the heading
+          * there, so it is the desktop's only. */}
+        <div className="order-first -mb-4 flex justify-center md:order-none md:mb-0 md:max-w-none md:flex-col md:items-stretch md:gap-0">
+          <LoginNebula className="w-[min(220px,60vw)] shrink-0 md:mx-auto md:w-[min(360px,100%)]" />
           <p
-            className="m-0 border-[color:var(--sky-glass-border)] text-[17px] leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
+            className="m-0 hidden border-[color:var(--sky-glass-border)] text-[17px] md:block leading-[1.3] font-semibold tracking-[-0.2px] text-[color:var(--on-sky-text-body)] md:mt-8 md:border-t md:pt-6 md:text-[22px] md:leading-[1.25] md:tracking-[-0.3px]"
           >
             {t('auth:login.skyCaption')}
           </p>
