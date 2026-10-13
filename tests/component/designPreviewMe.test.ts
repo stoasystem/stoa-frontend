@@ -4,11 +4,32 @@
  * through, and the marker refuses the current password or the code the way
  * the backend does, so each state of the form can be seen.
  */
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { demoHeldAccounts } from '@/dev/demo/data'
+import { resetDemoServer } from '@/dev/preview/demoSource'
 import { answer, DEMO_FAIL_ONCE } from '@/dev/preview/handlers'
 
-const post = (path: string, body: unknown) => Promise.resolve(answer({ method: 'POST', path, query: new URLSearchParams(), body }))
+const call = (method: string, path: string, body: unknown = null) => Promise.resolve(answer({ method, path, query: new URLSearchParams(), body }))
+const post = (path: string, body: unknown) => call('POST', path, body)
+
+beforeEach(() => {
+  resetDemoServer()
+})
+
+describe('what /me saves in the design preview', () => {
+  it('reads back the year group it saved', async () => {
+    await call('PATCH', '/students/me/profile', { grade: '10. Klasse' })
+    expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: '10. Klasse' })
+  })
+
+  it('answers a saved notification switch whole, so the switch stays on the page', async () => {
+    const before = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object> }
+    const preferences = { ...before.preferences, teacher_responses: { in_app: false, realtime: false } }
+    const saved = (await call('PATCH', '/notifications/preferences', { preferences }))?.data
+    expect(saved).toMatchObject({ preferences, supportedCategories: expect.arrayContaining(['teacher_responses']) })
+    expect((await call('GET', '/notifications/preferences'))?.data).toMatchObject({ preferences })
+  })
+})
 
 describe('the password change in the design preview', () => {
   it('sends a code to the masked address and changes the password', async () => {
