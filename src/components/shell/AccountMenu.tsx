@@ -21,6 +21,8 @@ import { useAuthStore } from '@/store/authStore'
  * back to the avatar. It works the same at every width (#2, #20).
  */
 
+/** PANEL's 1px border and p-1.5: how far in from the panel's edge an item starts. */
+const PANEL_INSET = 7
 const PANEL =
   'z-50 flex flex-col border border-[color:var(--float-border)] bg-[rgba(255,255,255,0.96)] p-1.5 text-ink shadow-[var(--shadow-float)] backdrop-blur-[20px] outline-none'
 const ITEM =
@@ -96,9 +98,10 @@ export function AccountMenu({
   // the left of the 260 panel and opened at -152, half off the screen, where
   // nothing in it could be tapped (#162). There it opens over the panel, at
   // the panel's width; Radix keeps a submenu on its side, so the offset is the
-  // panel's width back.
+  // panel's width back, less the panel's border and padding the item sits
+  // inside, so the two lie edge on edge (#184).
   const subPlacement = touch
-    ? { sideOffset: -ACCOUNT_MENU.width, width: ACCOUNT_MENU.width }
+    ? { sideOffset: -(ACCOUNT_MENU.width - PANEL_INSET), width: ACCOUNT_MENU.width }
     : { sideOffset: 6, width: undefined }
 
   return (
