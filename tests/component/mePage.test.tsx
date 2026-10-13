@@ -386,6 +386,9 @@ describe('the forced change after an administrator reset', () => {
   })
 })
 
+/** How long a test may wait for the lazy home page to load: well inside the 15 s test timeout. */
+const HOME_LOAD_TIMEOUT_MS = 10_000
+
 const otherStudent = (id: string, mustChangePassword = false) =>
   ({ id, name: 'Noah Keller', email: 'noah@example.com', role: 'student', mustChangePassword }) as CurrentUser
 
@@ -427,7 +430,11 @@ describe('the page a forced change stays on', () => {
     // The lazy home page must commit before we come back: the location probe
     // can render '/' while Suspense still retains the password page.
     // The home planet: the application's star map, empty until #48 (#131).
-    expect(await screen.findByRole('heading', { name: 'Your star map is on its way' })).toBeInTheDocument()
+    // Its chunk pulls in the whole star map: measured 0.7–2.4 s to load here,
+    // past findBy's default 1 s, which failed this test now and then.
+    expect(
+      await screen.findByRole('heading', { name: 'Your star map is on its way' }, { timeout: HOME_LOAD_TIMEOUT_MS }),
+    ).toBeInTheDocument()
     act(() => go('/settings/password'))
     await waitFor(() => expect(pathname).toBe('/me'))
   })
