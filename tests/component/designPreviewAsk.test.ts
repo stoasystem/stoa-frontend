@@ -7,7 +7,7 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest'
 import { resetDemoServer } from '@/dev/preview/demoSource'
-import { answer, streamedAnswer } from '@/dev/preview/handlers'
+import { answer, DEMO_FAIL_ONCE, failsThisTime, streamedAnswer } from '@/dev/preview/handlers'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { Conversation, ConversationListResponse } from '@/types/chat'
 
@@ -48,6 +48,15 @@ describe('Ask in the design preview', () => {
       [assistantMessageId, 'assistant', true],
     ])
     // The stream names the answer by the id the conversation stores it under.
-    expect(events).toContain(`"messageId":"${assistantMessageId}"`)
+    expect(events.join('')).toContain(`"messageId":"${assistantMessageId}"`)
+    // One event at a time, so the answer can be seen arriving (#183).
+    expect(events.filter((event) => event.startsWith('event: message_delta')).length).toBeGreaterThan(3)
+  })
+
+  it('fails a marked question once, and its retry goes through (#183)', () => {
+    expect(failsThisTime(`Why? ${DEMO_FAIL_ONCE}`, 'key-fail')).toBe(true)
+    // The retry is the same command, so the same key: it goes through.
+    expect(failsThisTime(`Why? ${DEMO_FAIL_ONCE}`, 'key-fail')).toBe(false)
+    expect(failsThisTime('Why?', 'key-plain')).toBe(false)
   })
 })

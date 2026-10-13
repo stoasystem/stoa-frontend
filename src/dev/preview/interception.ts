@@ -28,7 +28,7 @@
  * that no built bundle carries `PREVIEW_MARKER`.
  */
 import { AxiosError, AxiosHeaders, type AxiosAdapter, type AxiosInstance, type AxiosResponse } from 'axios'
-import { answer, streamedAnswer, type PreviewReply } from '@/dev/preview/handlers'
+import { answer, failsThisTime, streamedAnswer, type PreviewReply } from '@/dev/preview/handlers'
 
 export const API_ORIGIN = 'https://api.design-preview.invalid'
 
@@ -108,6 +108,9 @@ function isDevServerFile(url: URL) {
   return url.origin === window.location.origin && !url.pathname.startsWith(DEV_PROXY_PREFIX)
 }
 
+/** Between one streamed event and the next, so streaming can be seen. */
+const STREAM_STEP_MS = 60
+
 function installFetch() {
   const passThrough = window.fetch.bind(window)
   window.fetch = async (input, init) => {
@@ -119,10 +122,30 @@ function installFetch() {
     const body = init?.body ?? null
     const stream = /^\/conversations\/([^/]+)\/messages\/stream$/.exec(apiPath(url))
     if (stream && method === 'POST') {
-      journal().answered.push({ method, url: apiPath(url), status: 200 })
       const sent = parseBody(body) as { content?: string; idempotencyKey?: string } | null
-      const events = await streamedAnswer(decodeURIComponent(stream[1]), sent?.content ?? '', sent?.idempotencyKey ?? `demo-${Date.now()}`)
-      return new Response(events, {
+      const key = sent?.idempotencyKey ?? `demo-${Date.now()}`
+      const fails = failsThisTime(sent?.content ?? '', key)
+      journal().answered.push({ method, url: apiPath(url), status: fails ? 503 : 200 })
+      if (fails) {
+        // No detail of its own: what the student reads is the app's own wording for a failed send.
+        return new Response(JSON.stringify({}), {
+          status: 503,
+          headers: { 'content-type': 'application/json' },
+        })
+      }
+      const events = await streamedAnswer(decodeURIComponent(stream[1]), sent?.content ?? '', key)
+      // Sent a little at a time, as a real answer arrives.
+      const encoder = new TextEncoder()
+      const body$ = new ReadableStream<Uint8Array>({
+        async start(controller) {
+          for (const event of events) {
+            controller.enqueue(encoder.encode(event))
+            await new Promise((resolve) => setTimeout(resolve, STREAM_STEP_MS))
+          }
+          controller.close()
+        },
+      })
+      return new Response(body$, {
         status: 200,
         headers: { 'content-type': 'text/event-stream' },
       })

@@ -103,7 +103,14 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   ['GET', '/conversations/:id', ({ params }) => demoConversation(params.id) ?? {
     id: params.id, title: '…', subject: 'math', grade: demo().demoProfile.grade, updatedAt: now(), messages: [],
   }],
-  ['GET', '/conversations/:id/generation', ({ params }) => ({ conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' })],
+  // A command failed on purpose (#183) says so, as the backend does, and may be sent again with its key.
+  ['GET', '/conversations/:id/generation', ({ params, query }) => {
+    const key = query.get('idempotencyKey')
+    const failed = key !== null && failedOnce.has(key) && !answeredAfterFailing.has(key)
+    return failed
+      ? { conversationId: params.id, steps: [], updatedAt: now(), status: 'failed', retryable: true, failureCategory: 'provider_unavailable' }
+      : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
+  }],
   ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
   ['POST', '/teacher-help/request', ({ body }) => ({
     requestId: `demo-help-${Date.now()}`,
@@ -183,19 +190,38 @@ async function exchange(conversationId: string, idempotencyKey: string, content:
   ]
 }
 
+/** A question with this in it fails its first send, so the failed state and its retry can be seen (#183). */
+export const DEMO_FAIL_ONCE = '#fail'
+const failedOnce = new Set<string>()
+const answeredAfterFailing = new Set<string>()
+
+/** Whether this send is the one that fails: the first for its command, with the marker in it. */
+export function failsThisTime(content: string, idempotencyKey: string): boolean {
+  if (!content.includes(DEMO_FAIL_ONCE)) return false
+  if (failedOnce.has(idempotencyKey)) {
+    answeredAfterFailing.add(idempotencyKey)
+    return false
+  }
+  failedOnce.add(idempotencyKey)
+  return true
+}
+
 /**
  * The assistant's answer to a message sent in Ask, as the stream endpoint's
- * events. The exchange is stored first, as the backend does, so reading the
+ * events, one per frame: the start, the answer a word at a time, the end, so
+ * the sending and streaming states are on screen long enough to be seen
+ * (#183). The exchange is stored first, as the backend does, so reading the
  * conversation back afterwards (and after a reload) finds it.
  */
-export async function streamedAnswer(conversationId: string, content: string, idempotencyKey: string): Promise<string> {
+export async function streamedAnswer(conversationId: string, content: string, idempotencyKey: string): Promise<string[]> {
   const messages = await exchange(conversationId, idempotencyKey, content)
   recordDemoExchange(conversationId, messages)
   const reply = messages[1]
-  const events = [
+  const words = reply.content.split(/(?<= )/)
+  const events: (readonly [string, object])[] = [
     ['message_start', { messageId: reply.id, conversationId, role: 'assistant', createdAt: reply.createdAt }],
-    ['message_delta', { messageId: reply.id, delta: reply.content }],
+    ...words.map((delta) => ['message_delta', { messageId: reply.id, delta }] as const),
     ['message_done', { messageId: reply.id, status: 'completed' }],
-  ] as const
-  return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`).join('')
+  ]
+  return events.map(([type, data]) => `event: ${type}\ndata: ${JSON.stringify(data)}\n\n`)
 }
