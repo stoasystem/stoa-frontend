@@ -42,7 +42,19 @@ export type PreviewReply = { status: number; data: unknown }
 
 type Handler = (request: PreviewRequest) => unknown
 
+/** A handler's answer that is not a 200: the status and the body, as the backend sends a refusal. */
+const REFUSAL = Symbol('refusal')
+type Refusal = { [REFUSAL]: number; data: unknown }
+const refuse = (status: number, code: string, message: string): Refusal => ({ [REFUSAL]: status, data: { detail: { code, message } } })
+const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' && data !== null && REFUSAL in data
+
 const now = () => new Date().toISOString()
+
+/** The address the code goes to, as the backend shows it: the first letter, then stars (`mask_recipient`). */
+function maskedAddress(email: string): string {
+  const [local, domain] = email.split('@')
+  return local && domain ? `${local[0]}${'*'.repeat(Math.max(local.length - 1, 1))}@${domain}` : '***'
+}
 
 const field = <T>(body: unknown, name: string): T | undefined =>
   typeof body === 'object' && body !== null ? (body as Record<string, T>)[name] : undefined
@@ -66,6 +78,16 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   }],
   ['GET', '/students/me/profile', () => demo().demoProfile],
   ['PATCH', '/students/me/profile', ({ body }) => ({ ...demo().demoProfile, ...(body as object) })],
+  // The password change on /me (#184): the current password with the marker in
+  // it is refused, a code with it is refused; anything else goes through.
+  ['POST', '/auth/password-change/request', ({ body }) =>
+    field<string>(body, 'currentPassword')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(400, 'password_change_credentials_invalid', 'Check the current password and try again.')
+      : { status: 'sent', maskedRecipient: maskedAddress(demo().demoStudent.email), expiresAt: Math.floor(Date.now() / 1000) + 600 }],
+  ['POST', '/auth/password-change/confirm', ({ body }) =>
+    field<string>(body, 'code')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(400, 'password_change_verification_failed', 'This code cannot be used. Request a new code and try again.')
+      : { status: 'changed' }],
 
   // Notifications
   ['GET', '/notifications', () => demo().demoNotifications],
@@ -174,6 +196,7 @@ export async function answer(request: Omit<PreviewRequest, 'params'>): Promise<P
     if (!match) continue
     const params = Object.fromEntries(route.names.map((name, index) => [name, decodeURIComponent(match[index + 1])]))
     const data = await route.handler({ ...request, params })
+    if (isRefusal(data)) return { status: data[REFUSAL], data: data.data }
     return data === null ? { status: 404, data: { detail: 'Not in the demo data' } } : { status: 200, data }
   }
   return null
