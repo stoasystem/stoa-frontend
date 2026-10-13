@@ -29,7 +29,9 @@ import { demoServerStorage } from '@/dev/preview/storage'
 import type { LitEvent } from '@/features/starmap/lighting/lightingEvents'
 import type { SupportedLanguage } from '@/i18n/languages'
 import type { ChatMessage, Conversation, ConversationListResponse, ConversationSummary } from '@/types/chat'
+import type { NotificationPreferenceMatrix } from '@/types/notification'
 import type { ReviewCard, ReviewDueResponse, ReviewSummary } from '@/types/practice'
+import type { StudentProfile } from '@/types/student'
 
 let language: SupportedLanguage = 'en'
 let data: DemoData = demoDataFor(language)
@@ -42,10 +44,20 @@ type AskState = {
   sent: Record<string, ChatMessage[]>
 }
 
-type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean }
+/** What /me saved (#184): the year group, and the notification preferences. Null until saved. */
+type AccountState = { grade: string | null; notificationPreferences: NotificationPreferenceMatrix | null }
+
+type ServerState = { completed: string[]; litAt: string | null; acknowledged: boolean; ask: AskState; reviewDue: boolean; account: AccountState }
 
 function opening(): ServerState {
-  return { completed: [...DEMO_COMPLETED_LESSONS], litAt: null, acknowledged: false, ask: { created: [], sent: {} }, reviewDue: false }
+  return {
+    completed: [...DEMO_COMPLETED_LESSONS],
+    litAt: null,
+    acknowledged: false,
+    ask: { created: [], sent: {} },
+    reviewDue: false,
+    account: { grade: null, notificationPreferences: null },
+  }
 }
 
 function restore(): ServerState {
@@ -227,6 +239,27 @@ export function demoConversation(conversationId: string): Conversation | null {
 export function demoConversationList(): ConversationListResponse {
   const created = [...server.ask.created].reverse().map(withSent)
   return { items: [...created, ...data.demoConversationList.items.map(withSent)] }
+}
+
+/** The student's profile as the backend reads it back: the demo one, with the year group saved on /me. */
+export function demoProfileNow(): StudentProfile {
+  const { grade } = server.account
+  return grade === null ? data.demoProfile : { ...data.demoProfile, grade }
+}
+
+export function saveDemoGrade(grade: string) {
+  server = { ...server, account: { ...server.account, grade } }
+  changed()
+}
+
+/** The notification preferences saved on /me, or null before any. */
+export function demoNotificationPreferences(): NotificationPreferenceMatrix | null {
+  return server.account.notificationPreferences
+}
+
+export function saveDemoNotificationPreferences(preferences: NotificationPreferenceMatrix) {
+  server = { ...server, account: { ...server.account, notificationPreferences: preferences } }
+  changed()
 }
 
 /** The roadmap and lessons of the demo knowledge point, with this page's completed lessons. */

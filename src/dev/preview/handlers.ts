@@ -19,16 +19,21 @@ import {
   demoHint,
   demoLanguage,
   demoLessonResult,
+  demoNotificationPreferences,
+  demoProfileNow,
   demoReviewDue,
   demoReviewSummary,
   demoTeacherAvailability,
   demoTeacherHelpRequests,
   recordDemoExchange,
+  saveDemoGrade,
+  saveDemoNotificationPreferences,
   setDemoLanguage,
 } from '@/dev/preview/demoSource'
 import { isSupportedLanguage } from '@/i18n/languages'
 import { commandMessageIds } from '@/services/chat/commandMessageIds'
 import type { ChatMessage, ConversationSummary } from '@/types/chat'
+import type { NotificationPreferenceMatrix } from '@/types/notification'
 
 export type PreviewRequest = {
   method: string
@@ -49,6 +54,20 @@ const refuse = (status: number, code: string, message: string): Refusal => ({ [R
 const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' && data !== null && REFUSAL in data
 
 const now = () => new Date().toISOString()
+
+/** `GET /notifications/preferences`: the demo student's, with what /me saved. */
+function notificationPreferences() {
+  return {
+    userId: demo().demoStudent.id,
+    preferences: demoNotificationPreferences() ?? {
+      learning_updates: { in_app: true, email_digest: false },
+      teacher_responses: { in_app: true, email_digest: true },
+    },
+    supportedCategories: ['learning_updates', 'teacher_responses'],
+    supportedChannels: ['in_app', 'email_digest'],
+    updatedAt: null as string | null,
+  }
+}
 
 /** The address the code goes to, as the backend shows it: the first letter, then stars (`mask_recipient`). */
 function maskedAddress(email: string): string {
@@ -76,8 +95,13 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     const { preferredLocale, effectiveLocale, supportedLocales } = demo().demoStudent
     return { preferredLocale, effectiveLocale, supportedLocales, updatedAt: now() }
   }],
-  ['GET', '/students/me/profile', () => demo().demoProfile],
-  ['PATCH', '/students/me/profile', ({ body }) => ({ ...demo().demoProfile, ...(body as object) })],
+  ['GET', '/students/me/profile', () => demoProfileNow()],
+  // Kept, so the year group saved on /me is the one read back (#184).
+  ['PATCH', '/students/me/profile', ({ body }) => {
+    const grade = field<string>(body, 'grade')
+    if (typeof grade === 'string') saveDemoGrade(grade)
+    return demoProfileNow()
+  }],
   // The password change on /me (#184): the current password with the marker in
   // it is refused, a code with it is refused; anything else goes through.
   ['POST', '/auth/password-change/request', ({ body }) =>
@@ -100,14 +124,15 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return event ? { ...event, status: 'archived', archivedAt: now() } : null
   }],
   ['POST', '/notifications/read-all', () => ({ ok: true })],
-  ['GET', '/notifications/preferences', () => ({
-    userId: demo().demoStudent.id,
-    preferences: { learning_updates: { in_app: true, email_digest: false }, teacher_responses: { in_app: true, email_digest: true } },
-    supportedCategories: ['learning_updates', 'teacher_responses'],
-    supportedChannels: ['in_app', 'email_digest'],
-    updatedAt: null,
-  })],
-  ['PATCH', '/notifications/preferences', ({ body }) => ({ userId: demo().demoStudent.id, supportedCategories: [], supportedChannels: [], ...(body as object) })],
+  ['GET', '/notifications/preferences', () => notificationPreferences()],
+  // Kept, and answered whole: the app puts the answer straight into its cache,
+  // so an answer without the categories took the switch off /me (#184).
+  ['PATCH', '/notifications/preferences', ({ body }) => {
+    const asked = field<NotificationPreferenceMatrix>(body, 'preferences')
+    // The whole matrix, as the backend takes it: what is left out goes back to its default.
+    if (asked) saveDemoNotificationPreferences(asked)
+    return { ...notificationPreferences(), updatedAt: now() }
+  }],
 
   // Ask
   ['GET', '/conversations', () => demoConversationList()],
@@ -117,7 +142,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       id: `demo-conversation-${Date.now()}`,
       title: initialMessage ? titleOf(initialMessage) : '…',
       subject: field<string>(body, 'subject') ?? 'math',
-      grade: field<string>(body, 'grade') ?? demo().demoProfile.grade,
+      grade: field<string>(body, 'grade') ?? demoProfileNow().grade,
       updatedAt: now(),
     }
     createDemoConversation(summary)
@@ -126,7 +151,7 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     return { ...summary, messages: [] }
   }],
   ['GET', '/conversations/:id', ({ params }) => demoConversation(params.id) ?? {
-    id: params.id, title: '…', subject: 'math', grade: demo().demoProfile.grade, updatedAt: now(), messages: [],
+    id: params.id, title: '…', subject: 'math', grade: demoProfileNow().grade, updatedAt: now(), messages: [],
   }],
   // A command failed on purpose (#183) says so, as the backend does, and may be sent again with its key.
   ['GET', '/conversations/:id/generation', ({ params, query }) => {
