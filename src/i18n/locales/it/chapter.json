@@ -71,7 +71,8 @@
       "next": "Lezione successiva: {{title}}",
       "progress": "{{done}} lezioni su {{total}} completate in {{chapter}}",
       "testedOut": "La lezione conta come completata. La stella si accende quando ogni esercizio di questo capitolo è stato risolto correttamente almeno una volta.",
-      "title": "Lezione completata"
+      "title": "Lezione completata",
+      "toMap": "Guarda sulla mappa delle stelle"
     },
     "empty": "Questa lezione non ha ancora esercizi.",
     "explainPlaceholder": "Scrivi la tua spiegazione",

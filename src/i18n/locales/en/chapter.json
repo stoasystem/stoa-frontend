@@ -71,7 +71,8 @@
       "next": "Next lesson: {{title}}",
       "progress": "{{done}} of {{total}} lessons in {{chapter}} done",
       "testedOut": "The lesson counts as done. The star lights up once every exercise in this chapter has been answered right at least once.",
-      "title": "Lesson complete"
+      "title": "Lesson complete",
+      "toMap": "See it on the star map"
     },
     "empty": "This lesson has no exercises yet.",
     "explainPlaceholder": "Write your explanation",

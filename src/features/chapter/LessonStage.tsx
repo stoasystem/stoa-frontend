@@ -23,8 +23,9 @@ import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Murmi } from '@/components/brand/Murmi'
 import { Button } from '@/components/base'
-import { ICON } from '@/components/base/sizes'
+import { BUTTON_SIZES, ICON } from '@/components/base/sizes'
 import { MathRenderer } from '@/components/ui/MathRenderer'
+import { pathForTarget } from '@/features/starmap/view/layers'
 import type { AskPractice } from '@/features/ask/practiceContext'
 import { AnswerInput, bodyOnSky, FeedbackCard, glass } from '@/features/chapter/answerControls'
 import { StageWithAsk, STAGE_SIDE_QUERY } from '@/features/chapter/StageAsk'
@@ -746,15 +747,27 @@ function LessonDone({
             {t('stage.done.testedOut')}
           </p>
         )}
-        <div className="flex flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
-          <Button asChild lift variant="onSky" size="large" style={{ minWidth: 200 }}>
+        <div className="flex max-w-full flex-col items-center gap-2 pt-2 sm:flex-row sm:gap-5">
+          {/* The last lesson leads to the star map, where the point lights: the
+            * chapter in between was a step with nothing to do (#182). Its way
+            * back stays, second. */}
+          <Button asChild lift variant="onSky" size="large" className="max-w-full py-3" style={{ minWidth: 200, minHeight: BUTTON_SIZES.large.height, height: 'auto' }}>
             {next ? (
-              <Link to={chapterPath(unitId, next.id)}>{t('stage.done.next', { title: next.title })}</Link>
+              <Link to={chapterPath(unitId, next.id)}>
+                <span className="min-w-0 whitespace-normal leading-5 [overflow-wrap:anywhere]">{t('stage.done.next', { title: next.title })}</span>
+              </Link>
+            ) : allDone && chapter ? (
+              <Link
+                data-stage-done-to-map
+                to={pathForTarget(chapter.subjectId, { layer: 'star', nebulaId: chapter.topicId, unitId: chapter.unitId })}
+              >
+                {t('stage.done.toMap')}
+              </Link>
             ) : (
               <Link to={chapterPath(unitId)}>{t('stage.done.backToChapter')}</Link>
             )}
           </Button>
-          {next && (
+          {(next || allDone) && (
             <Link to={chapterPath(unitId)} className={plainOnSky}>
               {t('stage.done.backToChapter')}
             </Link>
