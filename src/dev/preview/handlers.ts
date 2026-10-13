@@ -50,6 +50,9 @@ const field = <T>(body: unknown, name: string): T | undefined =>
 /** Exercises answered right on this page, for the lesson's result. */
 const answeredRight = new Set<string>()
 
+/** Teachers asked for on this page, by conversation. */
+const askedForTeacher = new Map<string, { requestId: string; conversationId: string; status: string; createdAt: string }>()
+
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
   ['GET', '/auth/me', () => demo().demoStudent],
@@ -112,15 +115,20 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
       : { conversationId: params.id, steps: [], updatedAt: now(), status: 'completed' }
   }],
   ['GET', '/teacher-help/availability', () => demoTeacherAvailability],
-  ['POST', '/teacher-help/request', ({ body }) => ({
-    requestId: `demo-help-${Date.now()}`,
-    conversationId: field<string>(body, 'conversationId') ?? '',
-    status: 'pending',
-    createdAt: now(),
-  })],
+  // Kept, as the backend keeps it: the card is drawn from the request read back, not from this answer (#183).
+  ['POST', '/teacher-help/request', ({ body }) => {
+    const request = {
+      requestId: `demo-help-${Date.now()}`,
+      conversationId: field<string>(body, 'conversationId') ?? '',
+      status: 'pending',
+      createdAt: now(),
+    }
+    askedForTeacher.set(request.conversationId, request)
+    return request
+  }],
   // A conversation never handed to a teacher answers 404, as the backend does.
   ['GET', '/teacher-help/conversations/:id/request', ({ params }) =>
-    demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? null],
+    demoTeacherHelpRequests.find((request) => request.conversationId === params.id) ?? askedForTeacher.get(params.id) ?? null],
 
   // Chapter and practice stage
   ['GET', '/practice/curriculum/catalog', () => demo().demoChapter.catalog],
@@ -178,7 +186,14 @@ function titleOf(question: string): string {
   return line.length > 60 ? `${line.slice(0, 59)}…` : line
 }
 
-const replyTo = (content: string) => `This is the design preview, so no assistant is answering. You asked: “${content}”.`
+/** The stand-in answer, in the language the preview is read in, so a German review reads German (#183). */
+const REPLY: Record<string, (content: string) => string> = {
+  en: (content) => `This is the design preview, so no assistant is answering. You asked: “${content}”.`,
+  de: (content) => `Das ist die Designvorschau, deshalb antwortet hier kein Assistent. Deine Frage war: «${content}».`,
+  fr: (content) => `Ceci est l’aperçu du design : aucun assistant ne répond ici. Ta question était : « ${content} ».`,
+  it: (content) => `Questa è l’anteprima del design: qui non risponde nessun assistente. La tua domanda era: «${content}».`,
+}
+const replyTo = (content: string) => (REPLY[demoLanguage()] ?? REPLY.en)(content)
 
 /** A question and its answer as the backend stores them, with the ids it derives from the command. */
 async function exchange(conversationId: string, idempotencyKey: string, content: string): Promise<ChatMessage[]> {
