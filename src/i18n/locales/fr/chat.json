@@ -168,7 +168,8 @@
       "stopped": "Arrêté",
       "stop": "Arrêter",
       "starting": "La conversation démarre…",
-      "startFailed": "La conversation n’a pas pu démarrer. Réessaie."
+      "startFailed": "La conversation n’a pas pu démarrer. Réessaie.",
+      "answerFailed": "L’explication n’a pas pu être préparée pour le moment. Réessaie ou demande à un enseignant."
     },
     "presence": {
       "online_one": "{{count}} enseignant en ligne",

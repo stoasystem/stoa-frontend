@@ -54,10 +54,13 @@ export function AskMessage({
               className="m-0 flex flex-col gap-1 border-l-2 border-[color:color-mix(in_srgb,var(--on-accent)_45%,transparent)] pl-2.5 text-left"
             >
               <figcaption className="text-[12px] font-semibold opacity-80">{t('ask.quote.title')}</figcaption>
-              <blockquote className="m-0 text-[14px] leading-[1.4] opacity-90">{message.quote.text}</blockquote>
+              <blockquote className="m-0 text-[14px] leading-[1.4] opacity-90">
+                <MathRenderer plain>{message.quote.text}</MathRenderer>
+              </blockquote>
             </figure>
           )}
-          {message.content}
+          {/* Formulas as maths -- a question asked from an exercise carries its $...$ (#183) -- the rest as typed. */}
+          <MathRenderer plain>{message.content}</MathRenderer>
           <MessageAttachments attachments={message.attachments} />
         </div>
         {failed && (
@@ -93,7 +96,7 @@ export function AskMessage({
           className="whitespace-pre-wrap break-words bg-[color:color-mix(in_srgb,var(--green)_26%,var(--sky))] text-ink"
           style={{ padding: '10px 14px', borderRadius: 18, borderTopLeftRadius: 6, fontSize: 15, lineHeight: 1.45 }}
         >
-          {message.content}
+          <MathRenderer plain>{message.content}</MathRenderer>
         </div>
       </div>
     )

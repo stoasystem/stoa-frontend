@@ -200,9 +200,22 @@ function renderKatex(katex: Katex, expression: string, displayMode: boolean): st
 interface MathRendererProps {
   children: string
   className?: string
+  /**
+   * Formulas only: everything else stays exactly as written. For what a
+   * person typed (a student's question, a teacher's reply), where "2*3*4" is a
+   * product and not emphasis; the assistant's markdown keeps the default.
+   */
+  plain?: boolean
 }
 
-export function MathRenderer({ children, className }: MathRendererProps) {
+/** Text runs as they are, formulas typeset. */
+function renderPlainSegments(segments: MathSegment[], katex: Katex): React.ReactNode[] {
+  const formulas = segments.filter((segment) => segment.type !== 'text')
+  const joined = segments.map((segment) => (segment.type === 'text' ? segment.value.split(MATH_PLACEHOLDER).join('') : MATH_PLACEHOLDER)).join('')
+  return expandFormulas(joined, formulas, { index: 0 }, katex, 'plain')
+}
+
+export function MathRenderer({ children, className, plain = false }: MathRendererProps) {
   const segments = children ? parseSegments(children) : []
   const hasMath = segments.some((segment) => segment.type !== 'text')
   const [katex, setKatex] = useState<Katex | null>(null)
@@ -222,8 +235,10 @@ export function MathRenderer({ children, className }: MathRendererProps) {
 
   // Until it loads, and if it never does, the expression is shown as written.
   if (!hasMath || !katex) {
+    // Plain text with no formula is the text itself, with no wrapper of its own.
+    if (plain) return className ? <span className={className}>{children}</span> : <>{children}</>
     return <span className={className}>{renderInlineMarkdown(children, 'md')}</span>
   }
 
-  return <span className={className}>{renderSegments(segments, katex)}</span>
+  return <span className={className}>{plain ? renderPlainSegments(segments, katex) : renderSegments(segments, katex)}</span>
 }

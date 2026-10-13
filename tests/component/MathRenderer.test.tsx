@@ -216,3 +216,21 @@ describe('MathRenderer escaping', () => {
     expect((window as unknown as { __xss2?: number }).__xss2).toBeUndefined()
   })
 })
+
+describe('plain: what a person typed (#183)', () => {
+  it('typesets the formulas and leaves the rest exactly as written', async () => {
+    const { container } = render(<MathRenderer plain>{'Is 2*3*4 the same as $\\sin 30^\\circ$?'}</MathRenderer>)
+
+    await waitFor(() => expect(container.querySelector('.katex')).not.toBeNull())
+    expect(container.querySelector('em, strong')).toBeNull()
+    expect(container.textContent).toContain('Is 2*3*4 the same as ')
+    expect(container.textContent).not.toContain('$')
+  })
+
+  it('without a formula is the text itself, asterisks and all', () => {
+    const { container } = render(<MathRenderer plain>{'2*3*4 is *not* emphasis here'}</MathRenderer>)
+
+    expect(container.querySelector('em, strong')).toBeNull()
+    expect(container.textContent).toBe('2*3*4 is *not* emphasis here')
+  })
+})

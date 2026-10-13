@@ -1,3 +1,4 @@
+import i18n from '@/i18n'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -31,8 +32,8 @@ type SendStreamingMessagePayload = Omit<StreamMessagePayload, 'idempotencyKey'> 
   attachments?: ChatAttachment[]
 }
 
-const streamErrorFallback =
-  'The explanation could not be prepared right now. Please try again or ask a teacher.'
+/** In the reader's language: it stood in English under every interface (#183). */
+const streamErrorFallback = () => i18n.t('chat:ask.thread.answerFailed')
 
 // Kept in the tab while unanswered: see pendingChatMessages.
 export { PENDING_MESSAGE_KEY_PREFIX } from '@/lib/pendingChatMessages'
@@ -44,7 +45,7 @@ function createLocalId(prefix: string) {
 }
 
 function getErrorMessage(error: unknown) {
-  return toUserFacingError(error, streamErrorFallback)
+  return toUserFacingError(error, streamErrorFallback())
 }
 
 /**
@@ -151,7 +152,7 @@ export function useStreamingChat(conversationId: string | null) {
 
     if (event.type === 'message_error') {
       const messageId = event.messageId ?? activeAssistantMessageIdRef.current
-      const safeMessage = toUserFacingError(new Error(event.message), streamErrorFallback)
+      const safeMessage = toUserFacingError(new Error(event.message), streamErrorFallback())
 
       setLocalMessages((messages) =>
         messages.map((message) =>

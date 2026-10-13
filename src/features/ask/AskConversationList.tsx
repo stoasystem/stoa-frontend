@@ -1,3 +1,4 @@
+import { MathRenderer } from '@/components/ui/MathRenderer'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/base'
 import { conversationDisplayTitle } from '@/components/chat/conversationTitle'
@@ -44,7 +45,8 @@ export function AskConversationList({
                 </span>
                 {conversation.lastMessagePreview && (
                   <span className="line-clamp-2 text-[13px] leading-[1.35] text-caption">
-                    {conversation.lastMessagePreview}
+                    {/* Mostly the start of an answer, so read as an answer is: formulas and emphasis (#183). */}
+                    <MathRenderer>{conversation.lastMessagePreview}</MathRenderer>
                   </span>
                 )}
               </button>
