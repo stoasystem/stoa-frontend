@@ -475,3 +475,20 @@
   --on-accent: var(--on-accent-on-sky);
   --pill-neutral: var(--on-sky-text-caption);
 }
+
+/*
+ * The top bar over a sky page (#183 review: "the white bar at the top does not
+ * go with the rest at all"). The bar itself carries `data-surface="sky"` and is
+ * the sky at 86% under its blur; its two controls -- the bell and the avatar --
+ * carry `data-bar-control` and read the light names they are drawn with as
+ * their sky values. The bell's panel sits outside them and stays the light card
+ * it is everywhere. check:contrast reads this as its own theme, "bar".
+ */
+[data-top-bar][data-surface="sky"] [data-bar-control] {
+  --ink: var(--on-sky-text);
+  --secondary: var(--on-sky-text-body);
+  --fill: var(--on-sky-selected);
+  --accent: var(--accent-on-sky);
+  --accent-tint: var(--on-sky-selected);
+  --on-accent: var(--on-accent-on-sky);
+}

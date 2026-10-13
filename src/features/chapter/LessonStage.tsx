@@ -83,7 +83,7 @@ export function LessonStage({ unitId, lessonId }: { unitId: string | undefined; 
             : null
   // Keyed by lesson and mode: the next lesson, or the quiz, starts a fresh run.
   return (
-    <AppLayout bleed>
+    <AppLayout bleed surface="sky">
       {lesson && notice === null ? (
         <LessonRunStage
           key={`${lesson.id}:${testOut ? 'quiz' : 'lesson'}`}
