@@ -35,10 +35,12 @@ vi.mock('react-i18next', () => ({
 const px = (value: number) => `${value}px`
 
 describe('Button (Sizes: three sizes, three weights)', () => {
+  // Radius 12 at every size, as the application's other button (ui/button,
+  // --r-control) draws it: the user's call on 2026-10-13 (#122).
   it.each([
     ['large', 50, 17, 24, 12],
-    ['regular', 40, 15, 18, 10],
-    ['small', 32, 13, 12, 8],
+    ['regular', 40, 15, 18, 12],
+    ['small', 32, 13, 12, 12],
   ] as const)('is %s: %i high, text %i, padding %i, radius %i', (size, height, font, pad, radius) => {
     render(<Button size={size}>Check answer</Button>)
     const button = screen.getByRole('button', { name: 'Check answer' })

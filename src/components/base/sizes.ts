@@ -9,14 +9,18 @@
  * smaller (the board's own rule).
  */
 
-/** Buttons: three sizes. Weight 600 throughout. */
+/**
+ * Buttons: three sizes. Weight 600 throughout. Radius 12 at every size, as
+ * ui/button draws it (--r-control); the board's 10 / 8 gave way to the build
+ * (user, 2026-10-13, #122).
+ */
 export const BUTTON_SIZES = {
   /** Phone primary, practice. */
   large: { height: 50, fontSize: 17, paddingX: 24, radius: 12 },
   /** The default. */
-  regular: { height: 40, fontSize: 15, paddingX: 18, radius: 10 },
+  regular: { height: 40, fontSize: 15, paddingX: 18, radius: 12 },
   /** Chips, in-card. */
-  small: { height: 32, fontSize: 13, paddingX: 12, radius: 8 },
+  small: { height: 32, fontSize: 13, paddingX: 12, radius: 12 },
 } as const
 
 /** Icon buttons: box -> glyph. Round, no border, always a label. */
