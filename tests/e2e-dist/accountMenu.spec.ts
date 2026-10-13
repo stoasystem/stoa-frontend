@@ -23,6 +23,10 @@ for (const submenu of ['Language', 'Switch account']) {
     expect(box, 'the submenu is laid out').not.toBeNull()
     expect(box!.x, 'its left edge').toBeGreaterThanOrEqual(0)
     expect(box!.x + box!.width, 'its right edge').toBeLessThanOrEqual(PHONE.width)
+    // It lies over the menu, edge on edge (#184): it used to sit 7 px to the
+    // left, the menu's padding and border, so the menu showed past its right edge.
+    const panel = await menus.nth(0).boundingBox()
+    expect(Math.abs(box!.x - panel!.x), 'its left edge against the menu\'s').toBeLessThanOrEqual(0.5)
 
     // And what is in it can be reached where it is drawn: a trial click runs
     // Playwright's checks, the element at that point among them, and stops.
