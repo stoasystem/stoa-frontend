@@ -22,6 +22,23 @@ describe('what /me saves in the design preview', () => {
     expect((await call('GET', '/students/me/profile'))?.data).toMatchObject({ grade: '10. Klasse' })
   })
 
+  it('answers the backend\'s whole matrix, every category and channel at its default (#184 review)', async () => {
+    const read = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object>; supportedCategories: string[]; supportedChannels: string[] }
+    expect(read.supportedCategories).toEqual(['admin_operations', 'assignments', 'learning_updates', 'teacher_responses', 'weekly_reports'])
+    expect(read.supportedChannels).toEqual(['email_digest', 'in_app', 'push', 'realtime'])
+    for (const category of read.supportedCategories) {
+      expect(read.preferences[category]).toEqual({ in_app: true, realtime: true, email_digest: false, push: false })
+    }
+  })
+
+  it('rebuilds a saved matrix from the defaults, as the backend does: what is left out goes back to its default', async () => {
+    await call('PATCH', '/notifications/preferences', { preferences: { assignments: { push: true } } })
+    await call('PATCH', '/notifications/preferences', { preferences: { teacher_responses: { in_app: false } } })
+    const read = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object> }
+    expect(read.preferences.teacher_responses).toEqual({ in_app: false, realtime: true, email_digest: false, push: false })
+    expect(read.preferences.assignments).toEqual({ in_app: true, realtime: true, email_digest: false, push: false })
+  })
+
   it('answers a saved notification switch whole, so the switch stays on the page', async () => {
     const before = (await call('GET', '/notifications/preferences'))?.data as { preferences: Record<string, object> }
     const preferences = { ...before.preferences, teacher_responses: { in_app: false, realtime: false } }
@@ -51,5 +68,16 @@ describe('the accounts the preview holds', () => {
   it('holds another account, never the demo student', () => {
     expect(demoHeldAccounts.length).toBeGreaterThan(0)
     expect(demoHeldAccounts.map((account) => account.email)).not.toContain('lena.muster@example.com')
+  })
+  it('refuses a held account\'s session, so switching to it stays in the preview (#184 review)', async () => {
+    // Accepted, the switch would load the real app's start page off the
+    // preview, where the real backend is. Refused, it takes the app's own
+    // "session expired" path and stays here.
+    const [held] = demoHeldAccounts
+    const asHeld = await Promise.resolve(answer({ method: 'GET', path: '/auth/me', query: new URLSearchParams(), body: null, token: held.accessToken }))
+    expect(asHeld?.status).toBe(401)
+    expect(held.refreshToken).toBeUndefined()
+    const asDemo = await Promise.resolve(answer({ method: 'GET', path: '/auth/me', query: new URLSearchParams(), body: null, token: 'design-preview' }))
+    expect(asDemo?.status).toBe(200)
   })
 })

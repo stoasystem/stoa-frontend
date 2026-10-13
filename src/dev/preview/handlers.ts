@@ -8,6 +8,7 @@
  * lesson, so the chapter moves on, and Ask's conversations and messages with
  * their answers, so the thread read back holds them.
  */
+import { demoHeldAccounts } from '@/dev/demo/data'
 import {
   checkDemoAnswer,
   completeLesson,
@@ -41,6 +42,8 @@ export type PreviewRequest = {
   query: URLSearchParams
   body: unknown
   params: Record<string, string>
+  /** The bearer token the request carried, if any. */
+  token?: string
 }
 
 export type PreviewReply = { status: number; data: unknown }
@@ -55,16 +58,29 @@ const isRefusal = (data: unknown): data is Refusal => typeof data === 'object' &
 
 const now = () => new Date().toISOString()
 
+/*
+ * The notification preferences as the backend keeps them
+ * (`notification_service.py`): every category, every channel; in the bell
+ * and live on, digest and push off; what was saved laid over that.
+ */
+const PREFERENCE_CATEGORIES = ['admin_operations', 'assignments', 'learning_updates', 'teacher_responses', 'weekly_reports']
+const PREFERENCE_CHANNELS = ['email_digest', 'in_app', 'push', 'realtime']
+
+/** The defaults with `over` laid on them, channel by channel (`_merged_preferences`). */
+function withDefaults(over: NotificationPreferenceMatrix | null): NotificationPreferenceMatrix {
+  return Object.fromEntries(PREFERENCE_CATEGORIES.map((category) => [
+    category,
+    { in_app: true, realtime: true, email_digest: false, push: false, ...over?.[category] },
+  ]))
+}
+
 /** `GET /notifications/preferences`: the demo student's, with what /me saved. */
 function notificationPreferences() {
   return {
     userId: demo().demoStudent.id,
-    preferences: demoNotificationPreferences() ?? {
-      learning_updates: { in_app: true, email_digest: false },
-      teacher_responses: { in_app: true, email_digest: true },
-    },
-    supportedCategories: ['learning_updates', 'teacher_responses'],
-    supportedChannels: ['in_app', 'email_digest'],
+    preferences: withDefaults(demoNotificationPreferences()),
+    supportedCategories: PREFERENCE_CATEGORIES,
+    supportedChannels: PREFERENCE_CHANNELS,
     updatedAt: null as string | null,
   }
 }
@@ -86,7 +102,13 @@ const askedForTeacher = new Map<string, { requestId: string; conversationId: str
 
 const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // Account
-  ['GET', '/auth/me', () => demo().demoStudent],
+  // A held account's session is refused, as an expired one is: accepted, the
+  // switch to it would load the real app's start page, off the preview and on
+  // to the real backend (#184 review). Refused, the app says it has expired.
+  ['GET', '/auth/me', ({ token }) =>
+    demoHeldAccounts.some((account) => account.accessToken === token)
+      ? refuse(401, 'token_invalid', 'The session has expired.')
+      : demo().demoStudent],
   ['POST', '/auth/login', () => ({ accessToken: 'design-preview', user: demo().demoStudent, onboardingStatus: 'completed' })],
   ['POST', '/auth/logout', () => ({ ok: true })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
@@ -129,8 +151,8 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
   // so an answer without the categories took the switch off /me (#184).
   ['PATCH', '/notifications/preferences', ({ body }) => {
     const asked = field<NotificationPreferenceMatrix>(body, 'preferences')
-    // The whole matrix, as the backend takes it: what is left out goes back to its default.
-    if (asked) saveDemoNotificationPreferences(asked)
+    // Rebuilt from the defaults, as the backend does: what is left out goes back to its default.
+    if (asked) saveDemoNotificationPreferences(withDefaults(asked))
     return { ...notificationPreferences(), updatedAt: now() }
   }],
 
