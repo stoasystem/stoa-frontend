@@ -440,6 +440,10 @@ describe('the practice stage', () => {
     await screen.findByRole('heading', { level: 2, name: '3x + 5 = 20' })
     const option = (name: RegExp) => screen.getByRole('radio', { name }).closest('label') as HTMLElement
 
+    // Not chosen yet: ruled with the gated field rule, not white at 10% (#191 review).
+    expect(option(/x = 3/).className).toContain('border-[color:var(--on-sky-field-rule)]')
+    expect(option(/x = 3/).className).not.toContain('border-white/10')
+
     await userEvent.click(screen.getByRole('radio', { name: /x = 3/ }))
     // Chosen, not yet checked: no verdict drawn.
     expect(option(/x = 3/)).toHaveAttribute('data-answer-option', 'chosen')
