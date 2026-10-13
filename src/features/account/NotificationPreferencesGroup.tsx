@@ -52,6 +52,8 @@ export function NotificationPreferencesGroup() {
                 key={category}
                 title={<span id={titleId}>{t(`me.notifications.categories.${category}.title`)}</span>}
                 subtitle={t(`me.notifications.categories.${category}.body`)}
+                // It says what the switch does; one line cut it on a phone (#184).
+                subtitleLines={2}
                 trailing={
                   <Toggle
                     checked={enabled}

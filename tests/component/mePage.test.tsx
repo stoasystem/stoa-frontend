@@ -540,6 +540,16 @@ describe('the password fields on /me', () => {
 })
 
 describe('notification preferences on /me', () => {
+  it('lets the switch\'s explanation take two lines, since it says what the switch does (#184)', async () => {
+    backend()
+    openAt('/me')
+    await screen.findByRole('switch', { name: enCommon.me.notifications.categories.teacher_responses.title })
+    // On a phone one line cut it after "when a teacher", before what they do.
+    const subtitle = screen.getByText(enCommon.me.notifications.categories.teacher_responses.body)
+    expect(subtitle).toHaveClass('line-clamp-2')
+    expect(subtitle).not.toHaveClass('truncate')
+  })
+
   it('turns teacher replies off in the bell and live, and sends the whole matrix back', async () => {
     const user = userEvent.setup()
     const seen = backend()
