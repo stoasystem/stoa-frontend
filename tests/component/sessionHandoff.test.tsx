@@ -134,6 +134,37 @@ describe("the first person's late answers after the next one signed in", () => {
     expect(assign).not.toHaveBeenCalled()
   })
 
+  it("does not renew the next person's session for a 401 the first person's request earned", async () => {
+    const late = gate()
+    const served = gate()
+    const refreshes = vi.fn()
+    mswServer.use(
+      http.get('https://api.test/conversations', async () => {
+        served.open()
+        await late.opened
+        return HttpResponse.json({ detail: { code: 'invalid_token', message: 'expired' } }, { status: 401 })
+      }),
+      http.post('https://api.test/auth/refresh', () => {
+        refreshes()
+        return HttpResponse.json({ accessToken: 'token-b2', refreshToken: 'refresh-b2' })
+      }),
+    )
+    const result = renderAsAda()
+    const request = getConversations()
+    await served.opened
+
+    await act(() => result.current.signOut())
+    act(() => useAuthStore.getState().setAuth(bea, 'token-b', 'refresh-b'))
+    late.open()
+    await expect(request).rejects.toBeTruthy()
+
+    // A's 401 says nothing about B's session, so B's refresh token is not
+    // spent on it: the check after a renewal alone would still rotate it.
+    expect(refreshes).not.toHaveBeenCalled()
+    expect(localStorage.getItem('stoa_refresh_token')).toBe('refresh-b')
+    expectBeaStillSignedIn()
+  })
+
   it('does not sign anyone out with a 401 for a request sent before anyone signed in', async () => {
     localStorage.removeItem(TOKEN_KEY)
     const late = gate()
