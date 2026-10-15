@@ -6,8 +6,8 @@
  *
  * The board's fifth glyph, "Next", is the recommendation marker now (#9
  * point 8): a dashed ring and faint halo laid over whatever state the star is
- * in. The board has no mark for "due for review"; `review` is a small pip at
- * the ring's upper right until the design says otherwise.
+ * in. "Due for review" is a small white pip at the ring's upper right
+ * (`review`), decided on the canvas's Decisions board (v46, #201).
  *
  * All numbers are in the cut's own box units, measured from its centre.
  */
@@ -15,8 +15,9 @@
 /**
  * The board draws a locked star as a white ring at 28%, which is 2.5:1 on the
  * sky. A locked star opens its prerequisites when tapped, so it is a control
- * and its ring must reach 3:1 (WCAG 1.4.11): 42% gives 3.8:1 on the sky and
- * 3.2:1 on the brightest nebula haze (checked in starmapContrast.test.ts).
+ * and its ring must reach 3:1 (WCAG 1.4.11): 55% gives 6.2:1 on the sky,
+ * 5.1:1 on stacked nebula haze and 4.1:1 at a fully lit nebula's core
+ * (checked in starmapContrast.test.ts).
  *
  * Its ring is the same size as a ready star's. It used to be half of it —
  * the smallest and the dimmest mark on the map — while being the state most
