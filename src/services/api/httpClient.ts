@@ -233,9 +233,10 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
       // Another tab sharing this session renewed it first and stored its
       // token; this tab's refresh token is still the one the request went
       // out under. Same session: retry with that token rather than failing
-      // as if someone else had signed in (#219).
+      // as if someone else had signed in (#219). Not after an ended
+      // renewal: that one says this tab's refresh token is no good.
       const now = currentSessionToken()
-      if (now && isSameSession(sent.refresh)) {
+      if (now && renewal.status !== 'ended' && isSameSession(sent.refresh)) {
         useAuthStore.getState().hydrateFromStorage()
         return retry(now, true)
       }
