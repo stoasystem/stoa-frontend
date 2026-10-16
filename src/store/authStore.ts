@@ -1,12 +1,14 @@
 import { create } from 'zustand'
-import { endRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
-import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
+import { endRefreshToken } from '@/services/auth/sessionRefresh'
+import { pinTabToSession, TAB_TOKEN_KEY, tabToken } from '@/lib/devSessions'
+import { bindTab, initializeTab, signOutTab } from '@/lib/tabAccount'
 import type { User, UserRole } from '@/types/user'
 
 export type CurrentUser = User
 export type { UserRole }
 
-export const TOKEN_KEY = 'stoa_access_token'
+/** Where this tab keeps its access token: sessionStorage, never shared (#216). */
+export const TOKEN_KEY = TAB_TOKEN_KEY
 
 // This tab's logout can outlive the account menu. Keep only its completion,
 // never a credential, so the next login waits for the existing 8 s request.
@@ -59,16 +61,16 @@ function normalizeCurrentUser(user: CurrentUser): CurrentUser {
   return { ...user, role: normalizeUserRole(user.role) }
 }
 
-// A tab that has picked a role holds its own token, so several roles can be
-// open at once. Everyone else reads the shared one and behaves as before.
+// Each tab holds its own token, so several accounts can be open at once and
+// no tab's account changes because of another (#216).
 const getStoredToken = () => {
   if (typeof window === 'undefined') return null
-  return tabToken() ?? localStorage.getItem(TOKEN_KEY)
+  return tabToken()
 }
 
 /**
- * The token this tab's requests carry right now, with the same precedence
- * every request uses. Work started under one session compares it once it
+ * The token this tab's requests carry right now. Work started under one
+ * session compares it once it
  * resumes: if it changed, someone signed out (and maybe someone else in)
  * meanwhile, and what that work brings back is not theirs (#34).
  */
@@ -94,6 +96,9 @@ type AuthState = {
 }
 
 export const useAuthStore = create<AuthState>((set) => {
+  // Before anything reads this tab's account: a new tab may take the only
+  // saved one here, and the session tabs used to share is retired.
+  initializeTab()
   const storedToken = getStoredToken()
 
   return {
@@ -106,12 +111,8 @@ export const useAuthStore = create<AuthState>((set) => {
       // "keep the one there". Kept, the previous account's would be spent at
       // the next 401 and turn the tab back into that account (#208). A renewal
       // goes through updateAccessToken and keeps its refresh token there.
-      replaceRefreshToken(refreshToken)
-      if (tabToken()) {
-        pinTabToSession(accessToken)
-      } else {
-        localStorage.setItem(TOKEN_KEY, accessToken)
-      }
+      // This tab only: no other tab's account changes because of it (#216).
+      bindTab(accessToken, refreshToken)
       set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
     },
     updateAccessToken: (accessToken) => {
@@ -119,30 +120,18 @@ export const useAuthStore = create<AuthState>((set) => {
       // comes before the account is read, so there may be no user to keep yet
       // (passing a null user to setAuth threw, and the app never got past
       // "Konto wird geladen…").
-      if (tabToken()) {
-        pinTabToSession(accessToken)
-      } else {
-        localStorage.setItem(TOKEN_KEY, accessToken)
-      }
+      pinTabToSession(accessToken)
       set({ accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
-      // Only the session this tab is using ends. A pinned tab's sign-out
-      // revokes its own token; the shared one belongs to whichever account the
-      // rest of the browser is signed into and was never revoked, unless it is
-      // the very same token (#34). The refresh token follows the same rule, and
-      // goes first, while the pin still says which place is this tab's (#211).
+      // Only the session this tab is using ends, and the tab stays signed
+      // out: it does not fall back on a saved account, not after a refresh
+      // either (#216, #217). Other tabs keep theirs.
       endRefreshToken()
-      const pinned = tabToken()
-      if (pinned) {
-        releaseTab()
-        if (localStorage.getItem(TOKEN_KEY) === pinned) localStorage.removeItem(TOKEN_KEY)
-      } else {
-        localStorage.removeItem(TOKEN_KEY)
-      }
+      signOutTab()
       set({ user: null, accessToken: null, isAuthenticated: false })
     },
     hydrateFromStorage: () => {

@@ -23,7 +23,7 @@ beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }))
 beforeEach(() => {
   localStorage.clear()
   sessionStorage.clear()
-  localStorage.setItem(TOKEN_KEY, 'expired-access')
+  sessionStorage.setItem(TOKEN_KEY, 'expired-access')
   rememberRefreshToken('refresh-1')
   useAuthStore.setState({ user: null, accessToken: 'expired-access', isAuthenticated: true })
   rememberSession({

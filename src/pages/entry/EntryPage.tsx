@@ -18,10 +18,16 @@
  * not this page's job in that case — the login itself reloads onto the new
  * account's home, the way switching to a held account does, so the account
  * being left behind takes its cached answers with it.
+ *
+ * A new tab with several saved accounts is asked which one it is before the
+ * sign-in form (#216); a tab whose sign-in ended is not, and neither is
+ * `?add=1`, which is there to sign in somebody new.
  */
+import { useCallback, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { LoginPage } from '@/pages/login/LoginPage'
 import { getPostLoginPath } from '@/lib/authRoutes'
+import { tabNeedsAccountChoice } from '@/lib/tabAccount'
 import { useAuthStore } from '@/store/authStore'
 
 export function EntryPage() {
@@ -30,10 +36,12 @@ export function EntryPage() {
   const location = useLocation()
 
   const addingAnother = new URLSearchParams(location.search).get('add') === '1'
+  const [choosing, setChoosing] = useState(() => !addingAnother && tabNeedsAccountChoice())
+  const signInOther = useCallback(() => setChoosing(false), [])
 
   if (isAuthenticated && user?.role && !addingAnother) {
     return <Navigate replace to={getPostLoginPath(user, location)} />
   }
 
-  return <LoginPage />
+  return <LoginPage onSignInOther={choosing ? signInOther : undefined} />
 }

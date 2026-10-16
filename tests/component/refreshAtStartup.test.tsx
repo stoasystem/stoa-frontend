@@ -25,7 +25,7 @@ beforeEach(() => {
   meCalls.length = 0
   localStorage.clear()
   sessionStorage.clear()
-  localStorage.setItem(TOKEN_KEY, 'expired-access')
+  sessionStorage.setItem(TOKEN_KEY, 'expired-access')
   rememberRefreshToken('refresh-1')
   useAuthStore.setState({ user: null, accessToken: 'expired-access', isAuthenticated: true })
   mswServer.use(
@@ -57,12 +57,11 @@ describe('opening the app on an access token that has run out', () => {
     await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'))
     expect(meCalls).toEqual(['Bearer expired-access', 'Bearer fresh-access'])
     expect(useAuthStore.getState().accessToken).toBe('fresh-access')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('fresh-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('fresh-access')
     expect(useAuthStore.getState().user?.role).toBe('teacher')
   })
 
-  it('keeps the renewal in a tab that holds its own account, and leaves the shared one', async () => {
-    localStorage.setItem(TOKEN_KEY, 'someone-elses-access')
+  it('keeps the renewal in this tab, and writes nothing every tab shares (#216)', async () => {
     sessionStorage.setItem(TAB_TOKEN_KEY, 'expired-access')
     rememberRefreshToken('refresh-1')
 
@@ -74,7 +73,8 @@ describe('opening the app on an access token that has run out', () => {
 
     await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'))
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('fresh-access')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('someone-elses-access')
+    expect(localStorage.getItem('stoa_access_token')).toBeNull()
+    expect(localStorage.getItem('stoa_refresh_token')).toBeNull()
   })
 })
 
@@ -116,7 +116,7 @@ describe('a renewal and the session around it', () => {
     expect(meCalls).toEqual(['Bearer expired-access'])
     expect(useAuthStore.getState().accessToken).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
     expect(storedRefreshToken()).toBeNull()
   })
 
@@ -147,11 +147,11 @@ describe('a renewal and the session around it', () => {
     )
     await delay(60)
     // What the other tab's renewal leaves in the shared storage.
-    localStorage.setItem(TOKEN_KEY, 'other-tab-access')
+    sessionStorage.setItem(TOKEN_KEY, 'other-tab-access')
 
     await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'), { timeout: 3000 })
     expect(useAuthStore.getState().accessToken).toBe('other-tab-access')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
     expect(meCalls[meCalls.length - 1]).toBe('Bearer other-tab-access')
   })
 })
@@ -178,7 +178,7 @@ describe('opening the app while /auth/refresh is out of reach (#214)', () => {
     // and the account is still on its way rather than signed out. Down for
     // more than one retry, so a limit of one would not pass.
     await waitFor(() => expect(refreshes).toBe(3), { timeout: 5000 })
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('expired-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('expired-access')
     expect(storedRefreshToken()).toBe('refresh-1')
     up = true
 

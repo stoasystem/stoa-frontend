@@ -35,7 +35,7 @@ function answerLogout(status: number): SeenLogout[] {
 }
 
 function renderSignedIn() {
-  localStorage.setItem(TOKEN_KEY, 'shared-token')
+  sessionStorage.setItem(TOKEN_KEY, 'shared-token')
   const clearAuth = vi.fn(storeClearAuth)
   useAuthStore.setState({
     user: { id: 'u-1', name: 'Ada', email: 'ada@example.com', role: 'teacher' } as CurrentUser,
@@ -69,7 +69,7 @@ async function logOut() {
 
 function expectSignedOutHere() {
   expect(useAuthStore.getState().isAuthenticated).toBe(false)
-  expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+  expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
   expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
 }
 
@@ -97,20 +97,6 @@ describe('logging out', () => {
 
     expect(seen).toEqual([{ body: { access_token: 'shared-token' }, authorization: null }])
     expectSignedOutHere()
-  })
-
-  it('revokes the token a pinned tab holds, not the one the browser shares', async () => {
-    const seen = answerLogout(204)
-    renderSignedIn()
-    sessionStorage.setItem(TAB_TOKEN_KEY, 'tab-token')
-
-    await logOut()
-
-    expect(seen.map((request) => request.body)).toEqual([{ access_token: 'tab-token' }])
-    expect(useAuthStore.getState().isAuthenticated).toBe(false)
-    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
-    // The shared session is another account's and was not revoked (#34).
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('shared-token')
   })
 
   it('still signs out here when the backend call fails', async () => {

@@ -13,7 +13,6 @@
 import { useCallback, useState } from 'react'
 import {
   forgetSession,
-  pinTabToSession,
   readSessions,
   rememberSession,
   sessionLiveness,
@@ -21,7 +20,8 @@ import {
 } from '@/lib/devSessions'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { apiBaseUrl } from '@/lib/env'
-import { exchangeRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
+import { bindTab } from '@/lib/tabAccount'
+import { exchangeRefreshToken } from '@/services/auth/sessionRefresh'
 
 export type SwitchProblem = 'expired' | 'unreachable' | null
 
@@ -30,7 +30,11 @@ export function useHeldAccounts() {
   const [problem, setProblem] = useState<SwitchProblem>(null)
   const [busy, setBusy] = useState(false)
 
-  const switchTo = useCallback(async (session: HeldSession) => {
+  /**
+   * Put this tab on `session` and load it, at `destination` if given (a page
+   * the new tab was opened on), else at the account's home.
+   */
+  const switchTo = useCallback(async (session: HeldSession, destination?: string) => {
     setProblem(null)
     setBusy(true)
     try {
@@ -77,17 +81,17 @@ export function useHeldAccounts() {
         session = { ...session, accessToken, refreshToken: renewed.refreshToken ?? session.refreshToken }
       }
 
-      pinTabToSession(accessToken)
-      // The held account's own refresh token travels with it, so switching to
-      // it does not hand the reader a session that ends in an hour. An account
-      // held without one empties the tab's, rather than keeping the previous
-      // account's for the next renewal to spend (#205 audit).
-      replaceRefreshToken(session.refreshToken)
+      // This tab only (#216). The held account's own refresh token travels
+      // with it, so switching to it does not hand the reader a session that
+      // ends in an hour; an account held without one empties the tab's,
+      // rather than keeping the previous account's for the next renewal to
+      // spend (#205 audit).
+      bindTab(accessToken, session.refreshToken)
       // A full load, not a store update: telling the store about the new role
       // while the old role's page is mounted lets that page's guard reject it
       // and land on the forbidden page. The load drops the previous account's
       // answers with the rest of the cache.
-      window.location.assign(getDefaultRouteForRole(session.role as never))
+      window.location.assign(destination ?? getDefaultRouteForRole(session.role as never))
     } finally {
       setBusy(false)
     }

@@ -21,7 +21,7 @@ function LoginPage() {
 }
 
 function renderPages(initialEntry = '/signed-in') {
-  localStorage.setItem(TOKEN_KEY, 'old-token')
+  sessionStorage.setItem(TOKEN_KEY, 'old-token')
   useAuthStore.setState({ accessToken: 'old-token', isAuthenticated: true })
   return render(
     <QueryClientProvider client={queryClient}>
@@ -74,7 +74,7 @@ it.each(['success', 'http failure', 'network failure'] as const)(
   try {
     await act(() => new Promise((resolve) => setTimeout(resolve, 40)))
     expect(requests).toEqual(['logout'])
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
   } finally {
     finishLogout()
   }
@@ -105,7 +105,7 @@ it('releases the waiting login when the logout request times out after 8 seconds
 
   await act(() => vi.advanceTimersByTimeAsync(7000))
   expect(requests).toEqual(['logout'])
-  expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+  expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
   await act(() => vi.advanceTimersByTimeAsync(1000))
   await waitFor(() => expect(requests).toEqual(['logout', 'login']))
 })
