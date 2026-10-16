@@ -600,5 +600,23 @@
     "selectItem": "Seleziona un elemento del programma dalla lista di lavoro.",
     "requestFailed": "La richiesta all’API del programma non è riuscita.",
     "invalidJson": "Il JSON non è valido"
+  },
+  "operationalNotifications": {
+    "title": "Notifiche operative",
+    "count_one": "{{count}} evento",
+    "count_other": "{{count}} eventi",
+    "loading": "Caricamento degli eventi operativi…",
+    "unavailable": "Le notifiche operative non sono disponibili.",
+    "empty": "Ancora nessun evento operativo.",
+    "eventTypes": {
+      "teacher_help_expired": "Aiuto dell’insegnante scaduto",
+      "teacher_reply": "Risposta di un insegnante",
+      "teacher_requested": "Insegnante richiesto",
+      "teacher_takeover": "Preso in carico da un insegnante"
+    },
+    "targetTypes": {
+      "conversation": "Conversazione",
+      "question": "Domanda"
+    }
   }
 }

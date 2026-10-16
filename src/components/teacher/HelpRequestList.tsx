@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Group, Pill, Row, type PillTone } from '@/components/base'
 import { SafeStatusLabel } from '@/components/common/SafeStatusLabel'
 import { getSubjectLabel } from '@/lib/displayLabels'
-import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import { isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 import type { TeacherHelpRequestSummary } from '@/types/teacher'
 
 /*
@@ -10,9 +10,10 @@ import type { TeacherHelpRequestSummary } from '@/types/teacher'
  * the student, "subject · grade -- the question", then when it came in, its
  * priority and its status as tinted pills, and the chevron into the request).
  * On a phone the priority and a short time move to the front of the subtitle
- * so they stay on the row. The response-time target shows only when it is at
- * risk (gold) or missed (red). The first teacher action is on the request
- * itself (HelpRequestDetailCard).
+ * so they stay on the row. The response-time target shows only on an open
+ * request, when it is at risk (gold) or missed (red): on a finished one it is
+ * history, and the extra pill squeezed the phone row down to "Te…" (#162).
+ * The first teacher action is on the request itself (HelpRequestDetailCard).
  */
 const statusTones: Record<TeacherHelpStatus, PillTone> = {
   pending: 'accent',
@@ -56,7 +57,7 @@ export function HelpRequestList({ requests }: { requests: TeacherHelpRequestSumm
       {requests.map((request) => {
         // The subject arrives as its id; the detail page names it the same way.
         const where = t('requests.row', { subject: getSubjectLabel(request.subject, t), grade: request.grade })
-        const sla = request.sla?.status
+        const sla = isOpenHelpRequest(request.status) ? request.sla?.status : undefined
         const priority = request.priority
           ? t('requests.priority', { priority: t(priorityLabelKeys[request.priority]) })
           : null

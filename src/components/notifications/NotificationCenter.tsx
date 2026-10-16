@@ -19,6 +19,15 @@ import {
 import { useAuthStore } from '@/store/authStore'
 import type { NotificationEvent } from '@/types/notification'
 
+// The panel's one line about what arrives here. The student's is the default:
+// a teacher read "Neues zu deinen Fragen, Übungen…" about questions they never
+// asked, in the "du" a teacher is not addressed with (#162).
+function subtitleKey(role: string | undefined): string {
+  return role === 'teacher' || role === 'parent' || role === 'admin'
+    ? `notifications.subtitleByRole.${role}`
+    : 'notifications.subtitle'
+}
+
 const connectionKeys: Record<RealtimeNotificationStatus, string> = {
   disabled: 'notifications.connection.checking',
   connecting: 'notifications.connection.connecting',
@@ -103,11 +112,18 @@ export function NotificationCenter({
         }
       />
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)]">
+        // On a phone the bell is not at the edge (the account button is to its
+        // right), so a panel the screen's width anchored to the bell started
+        // left of the screen and lost its first letters (#162). There it spans
+        // the screen inside the gutters instead; wider, it hangs off the bell.
+        <div
+          data-notification-panel
+          className="fixed inset-x-4 top-14 z-50 rounded-lg border border-border/80 bg-card p-3 shadow-[var(--platform-shadow-soft)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-11 sm:w-[22rem]"
+        >
           <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
             <div className="min-w-40 flex-1">
               <p className="text-sm font-semibold">{t('notifications.title')}</p>
-              <p className="text-xs text-muted-foreground">{t('notifications.subtitle')}</p>
+              <p className="text-xs text-muted-foreground">{t(subtitleKey(role))}</p>
             </div>
             {/* German says the same thing in half again the width, so these
                 wrap rather than sit on a fixed one and cut the word off. */}
