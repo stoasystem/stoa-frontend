@@ -26,7 +26,7 @@ vi.mock('@/components/auth/LoginForm', () => ({
 
 import { queryClient } from '@/app/query/queryClient'
 import { forgetHeldRefreshToken, readSessions, rememberSession, tabToken } from '@/lib/devSessions'
-import { bindTab, initializeTab, readTabSignOut, tabNeedsAccountChoice, tabSignedOut } from '@/lib/tabAccount'
+import { bindTab, initializeTab, readTabSignOut, signOutTab, tabNeedsAccountChoice, tabSignedOut } from '@/lib/tabAccount'
 import { EntryPage } from '@/pages/entry/EntryPage'
 import { httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { storedRefreshToken } from '@/services/auth/sessionRefresh'
@@ -224,6 +224,15 @@ describe('the sign-in page after the session ended', () => {
     signIn({ id: 'b-id', email: 'b@test.stoaedu.ch', role: 'student', name: 'Bea' })
 
     expect(screen.getByText('at /')).toBeInTheDocument()
+  })
+
+  it('says so when the sign-in was signed out in another tab (#232)', () => {
+    signOutTab({ reason: 'signed-out-elsewhere', account: { email: 'b@test.stoaedu.ch', name: 'Bea' } })
+
+    renderLogin()
+
+    expect(screen.getByText('auth:reauth.elsewhereTitle')).toBeInTheDocument()
+    expect(screen.getByRole('form', { name: 'sign in' })).toHaveAttribute('data-email', 'b@test.stoaedu.ch')
   })
 
   it('shows the plain sign-in after signing out', () => {

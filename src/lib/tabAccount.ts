@@ -30,6 +30,8 @@ import { replaceRefreshToken } from '@/services/auth/sessionRefresh'
 
 const TAB_STATE_KEY = 'stoa_tab_state'
 const TAB_ACCOUNT_KEY = 'stoa_tab_account'
+/** Where a sign-out tells the other tabs which sign-in ended. */
+export const SIGN_IN_ENDED_KEY = 'stoa_sign_in_ended'
 
 /** Where every tab used to read the browser's one shared session from. */
 const LEGACY_ACCESS_KEY = 'stoa_access_token'
@@ -218,4 +220,32 @@ export function initializeTab(): void {
   if (tabToken() || tabSignedOut()) return
   const saved = readSessions()
   if (saved.length === 1) bindTab(saved[0].accessToken, saved[0].refreshToken, saved[0])
+}
+
+/**
+ * Tell the other tabs of this browser that `signIn` was signed out, so the
+ * ones holding it sign themselves out now instead of at their next request
+ * (#232). Only the sign-in's id is written, never a token, and only for as
+ * long as it takes to raise the other tabs' storage event.
+ */
+export function announceSignInEnded(signIn: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.setItem(SIGN_IN_ENDED_KEY, JSON.stringify({ signIn, at: Date.now() }))
+    localStorage.removeItem(SIGN_IN_ENDED_KEY)
+  } catch {
+    // Blocked storage: the other tabs find out at their next request.
+  }
+}
+
+/** The sign-in another tab says was signed out, or null for any other event. */
+export function signInEndedBy(event: Pick<StorageEvent, 'key' | 'newValue' | 'storageArea'>): string | null {
+  if (event.key !== SIGN_IN_ENDED_KEY || !event.newValue) return null
+  if (typeof window !== 'undefined' && event.storageArea && event.storageArea !== window.localStorage) return null
+  try {
+    const signIn = (JSON.parse(event.newValue) as { signIn?: unknown })?.signIn
+    return typeof signIn === 'string' && signIn.trim() ? signIn.trim() : null
+  } catch {
+    return null
+  }
 }
