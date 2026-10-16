@@ -41,26 +41,6 @@ describe('signing in without a refresh token in the response', () => {
     expect(storedRefreshToken()).toBeNull()
   })
 
-  it('leaves the shared session with no refresh token, not the previous account’s', () => {
-    localStorage.setItem(TOKEN_KEY, 'a-access')
-    rememberRefreshToken('a-refresh')
-
-    useAuthStore.getState().setAuth(bea, 'b-access', undefined)
-
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('b-access')
-    expect(storedRefreshToken()).toBeNull()
-  })
-
-  it('clears only this tab’s place: the shared refresh token other tabs use stays', () => {
-    rememberRefreshToken('shared-refresh')
-    pinTabToSession('a-access')
-    rememberRefreshToken('a-refresh')
-
-    useAuthStore.getState().setAuth(bea, 'b-access', undefined)
-
-    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('shared-refresh')
-  })
 })
 
 describe('signing in with a refresh token', () => {
@@ -99,16 +79,13 @@ describe('the next 401 after such a sign-in (the #208 scenario, end to end)', ()
   })
 })
 
-describe('where a refresh token goes in a tab whose pin is empty', () => {
-  it('lands beside the access token, in the shared session', () => {
-    // The store treats an empty pin as "not pinned"; the refresh token follows
-    // the same rule, so the two cannot end up in different places (#209 audit).
-    sessionStorage.setItem('stoa_tab_access_token', '')
-
+describe('where a sign-in is kept (#216)', () => {
+  it('lands in this tab only, never in the storage every tab shares', () => {
     useAuthStore.getState().setAuth(bea, 'b-access', 'b-refresh')
 
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('b-access')
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('b-refresh')
-    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('b-access')
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBe('b-refresh')
+    expect(localStorage.getItem('stoa_access_token')).toBeNull()
+    expect(localStorage.getItem('stoa_refresh_token')).toBeNull()
   })
 })

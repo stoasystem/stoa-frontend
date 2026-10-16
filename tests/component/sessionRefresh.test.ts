@@ -26,21 +26,20 @@ afterEach(() => {
 })
 
 describe('where the refresh token is kept', () => {
-  it('is the browser’s when no tab is pinned to an account', () => {
-    rememberRefreshToken('r-1')
-
-    expect(storedRefreshToken()).toBe('r-1')
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('r-1')
-    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
-  })
-
-  it('is the tab’s own when the tab holds its own account', () => {
+  it('is the tab’s own, never in the storage every tab shares (#216)', () => {
     sessionStorage.setItem(TAB_TOKEN_KEY, 'access-for-this-tab')
 
     rememberRefreshToken('r-tab')
 
     expect(storedRefreshToken()).toBe('r-tab')
-    expect(localStorage.getItem('stoa_refresh_token')).toBeNull()
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBe('r-tab')
+    expect(Object.keys(localStorage)).toEqual([])
+  })
+
+  it('does not read the refresh token tabs used to share', () => {
+    localStorage.setItem('stoa_refresh_token', 'r-shared')
+
+    expect(storedRefreshToken()).toBeNull()
   })
 
   it('treats nothing as "unchanged", not as "clear it"', () => {
@@ -51,15 +50,13 @@ describe('where the refresh token is kept', () => {
     expect(storedRefreshToken()).toBe('r-1')
   })
 
-  it('clears only this tab’s place when its session ends', () => {
-    rememberRefreshToken('r-shared')
+  it('clears this tab’s place when its session ends', () => {
     sessionStorage.setItem(TAB_TOKEN_KEY, 'a')
     rememberRefreshToken('r-tab')
 
     replaceRefreshToken(null)
 
     expect(storedRefreshToken()).toBeNull()
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('r-shared')
   })
 })
 
@@ -112,26 +109,13 @@ describe('exchanging it', () => {
     expect(storedRefreshToken()).toBeNull()
   })
 
-  it('throws away only a pinned tab’s own when the server refuses it (#211)', async () => {
-    rememberRefreshToken('r-shared')
+  it('throws away this tab’s when the server refuses it', async () => {
     sessionStorage.setItem(TAB_TOKEN_KEY, 'a-tab')
     rememberRefreshToken('r-tab')
     vi.mocked(fetch).mockResolvedValue(refused(401))
 
     await expect(refreshAccessToken()).resolves.toBeNull()
     expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('r-shared')
-  })
-
-  it('throws away the shared copy too when a pinned tab’s refused token is that same one', async () => {
-    rememberRefreshToken('r-1')
-    sessionStorage.setItem(TAB_TOKEN_KEY, 'a-tab')
-    rememberRefreshToken('r-1')
-    vi.mocked(fetch).mockResolvedValue(refused(401))
-
-    await expect(refreshAccessToken()).resolves.toBeNull()
-    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
-    expect(localStorage.getItem('stoa_refresh_token')).toBeNull()
   })
 
   it('keeps the refresh token of a session that replaced the refused one meanwhile', async () => {

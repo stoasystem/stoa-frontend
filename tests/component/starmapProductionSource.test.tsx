@@ -34,7 +34,7 @@ const OPENING = { timeout: 10_000 }
 
 function openAt(path: string, wrap: (app: ReactNode) => ReactNode = (app) => app) {
   window.history.replaceState(null, '', path)
-  localStorage.setItem(TOKEN_KEY, 'token')
+  sessionStorage.setItem(TOKEN_KEY, 'token')
   useAuthStore.setState({ user: null, accessToken: 'token', isAuthenticated: true })
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(

@@ -68,7 +68,7 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 function renderSignedIn() {
-  localStorage.setItem(TOKEN_KEY, 'shared-token')
+  sessionStorage.setItem(TOKEN_KEY, 'shared-token')
   const clearAuth = vi.fn(storeClearAuth)
   useAuthStore.setState({
     user: { id: 'u-a', name: 'Ada', email: 'ada@example.com', role: 'student' } as CurrentUser,
@@ -91,7 +91,7 @@ function renderSignedIn() {
 function expectSignedOutHere() {
   expect(useAuthStore.getState().isAuthenticated).toBe(false)
   expect(useAuthStore.getState().user).toBeNull()
-  expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+  expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
   expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
 }
 
@@ -131,20 +131,6 @@ describe('useSignOut', () => {
     expect(clearAuth).toHaveBeenCalledOnce()
     expectSignedOutHere()
     expectLeftForLogin(result)
-  })
-
-  it('posts the token a pinned tab holds, not the one the browser shares', async () => {
-    const bodies = answerLogout('ok')
-    const { result } = renderSignedIn()
-    sessionStorage.setItem(TAB_TOKEN_KEY, 'tab-token')
-
-    await act(() => result.current.signOut())
-
-    expect(bodies).toEqual([{ access_token: 'tab-token' }])
-    expect(useAuthStore.getState().isAuthenticated).toBe(false)
-    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
-    // The shared session is another account's and was not revoked (#34).
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('shared-token')
   })
 
   it('empties the query cache, so the next person on this tab is not served these answers', async () => {

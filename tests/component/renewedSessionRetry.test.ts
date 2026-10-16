@@ -25,7 +25,7 @@ import { rememberRefreshToken, replaceRefreshToken } from '@/services/auth/sessi
 import { type CurrentUser, TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
-const SHARED_REFRESH = 'stoa_refresh_token'
+const TAB_REFRESH = 'stoa_tab_refresh_token'
 const bea = { id: 'u-b', name: 'Bea', email: 'bea@example.com', role: 'parent' } as CurrentUser
 
 // Tokens the server accepts. Anything else answers 401.
@@ -63,7 +63,7 @@ beforeEach(() => {
   vi.stubGlobal('location', { ...window.location, pathname: '/', assign })
   localStorage.clear()
   sessionStorage.clear()
-  localStorage.setItem(TOKEN_KEY, 'expired-access')
+  sessionStorage.setItem(TOKEN_KEY, 'expired-access')
   rememberRefreshToken('refresh-1')
   useAuthStore.setState({ user: null, accessToken: 'expired-access', isAuthenticated: true })
   mswServer.use(
@@ -108,7 +108,7 @@ describe('a 401 that arrives after this tab renewed the session (F2)', () => {
     const slow = httpClient.post('/things', { name: 'x' })
     await served.opened
     await expect(httpClient.get('/things/fast')).resolves.toMatchObject({ data: { ok: true } })
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('fresh-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('fresh-access')
 
     late.open()
     await expect(slow).resolves.toMatchObject({ data: { ok: true } })
@@ -142,7 +142,7 @@ describe('a 401 that arrives after this tab renewed the session (F2)', () => {
     const slow = httpClient.post('/things', {})
     await served.opened
     await httpClient.get('/things/fast')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('refresh-2')
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBe('refresh-2')
 
     late.open()
     await expect(slow).resolves.toMatchObject({ data: { ok: true } })
@@ -169,7 +169,7 @@ describe('a 401 that arrives after this tab renewed the session (F2)', () => {
     // Sent on the old token; the tab renewed (here: stored a new one) since.
     const request = httpClient.post('/things', {})
     await served.opened
-    localStorage.setItem(TOKEN_KEY, 'renewed-but-dead')
+    sessionStorage.setItem(TOKEN_KEY, 'renewed-but-dead')
     late.open()
 
     await expect(request).rejects.toBeDefined()
@@ -189,7 +189,7 @@ describe('a 401 that arrives after this tab renewed the session (F2)', () => {
       http.post('https://api.test/things', ({ request }) => {
         seen.push(`slow ${request.headers.get('authorization')}`)
         answered += 1
-        if (answered < 5) localStorage.setItem(TOKEN_KEY, `moved-${answered}`)
+        if (answered < 5) sessionStorage.setItem(TOKEN_KEY, `moved-${answered}`)
         return HttpResponse.json({ detail: 'expired' }, { status: 401 })
       }),
     )
@@ -213,12 +213,12 @@ describe('another tab on the same session renewed first (F3)', () => {
     await vi.waitFor(() => expect(refreshCalls).toBe(1))
     // The other tab's renewal finished first and stored its token in the
     // storage both tabs share; the refresh token is the one both spent.
-    localStorage.setItem(TOKEN_KEY, 'other-tab-access')
+    sessionStorage.setItem(TOKEN_KEY, 'other-tab-access')
     released.open()
 
     await expect(request).resolves.toMatchObject({ data: { ok: true } })
     expect(seen).toContain('fast Bearer other-tab-access')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
     expect(useAuthStore.getState().accessToken).toBe('other-tab-access')
     expect(assign).not.toHaveBeenCalled()
   })
@@ -230,7 +230,7 @@ describe('another tab on the same session renewed first (F3)', () => {
 
     const slow = httpClient.post('/things', {})
     await served.opened
-    localStorage.setItem(TOKEN_KEY, 'other-tab-access')
+    sessionStorage.setItem(TOKEN_KEY, 'other-tab-access')
     late.open()
 
     await expect(slow).resolves.toMatchObject({ data: { ok: true } })
@@ -241,7 +241,7 @@ describe('another tab on the same session renewed first (F3)', () => {
 
 describe('a different account in the tab now (#34)', () => {
   it("does not retry A's late 401 under B, nor sign B out", async () => {
-    localStorage.setItem(TOKEN_KEY, 'token-a')
+    sessionStorage.setItem(TOKEN_KEY, 'token-a')
     rememberRefreshToken('refresh-a')
     useAuthStore.setState({ accessToken: 'token-a' })
     const late = gate()
@@ -257,8 +257,8 @@ describe('a different account in the tab now (#34)', () => {
     await expect(slow).rejects.toMatchObject({ status: 401 })
     expect(seen).not.toContain('slow Bearer token-b')
     expect(refreshCalls).toBe(0)
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('token-b')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('refresh-b')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('token-b')
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBe('refresh-b')
     expect(useAuthStore.getState().user?.id).toBe('u-b')
     expect(assign).not.toHaveBeenCalled()
   })
@@ -274,7 +274,7 @@ describe('a different account in the tab now (#34)', () => {
 
     await expect(request).rejects.toMatchObject({ code: 'session_changed' })
     expect(seen).not.toContain('fast Bearer token-b')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('token-b')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('token-b')
     expect(assign).not.toHaveBeenCalled()
   })
 
@@ -295,7 +295,7 @@ describe('a different account in the tab now (#34)', () => {
     expect(seen).not.toContain('slow Bearer token-b')
     expect(refreshCalls).toBe(0)
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('token-b')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('refresh-1')
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBe('refresh-b')
     expect(assign).not.toHaveBeenCalled()
   })
 
@@ -303,7 +303,7 @@ describe('a different account in the tab now (#34)', () => {
     mswServer.use(
       http.get('https://api.test/things/plain', () => HttpResponse.json({ ok: true })),
     )
-    localStorage.setItem(TOKEN_KEY, 'fresh-access')
+    sessionStorage.setItem(TOKEN_KEY, 'fresh-access')
     const response = await httpClient.get('/things/plain')
     expect(JSON.stringify(response.config)).not.toContain('refresh-1')
   })

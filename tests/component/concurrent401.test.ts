@@ -29,7 +29,7 @@ beforeEach(() => {
   refreshGate = new Promise((resolve) => { releaseRefresh = resolve })
   localStorage.clear()
   sessionStorage.clear()
-  localStorage.setItem(TOKEN_KEY, 'expired-access')
+  sessionStorage.setItem(TOKEN_KEY, 'expired-access')
   rememberRefreshToken('refresh-1')
   useAuthStore.setState({ user: null, accessToken: 'expired-access', isAuthenticated: true })
   mswServer.use(
@@ -95,8 +95,8 @@ describe('the session changing while the renewal is in flight (#34)', () => {
     for (const answer of answers) {
       expect((answer as PromiseRejectedResult).reason).toMatchObject({ code: 'session_changed' })
     }
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('someone-else')
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('refresh-someone')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('someone-else')
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBe('refresh-someone')
     expect(seen.some((line) => line.endsWith('Bearer fresh-access'))).toBe(false)
     expect(seen.some((line) => line.endsWith('Bearer someone-else'))).toBe(false)
   })

@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { AccountChooser } from '@/components/auth/AccountChooser'
 import { LoginForm } from '@/components/auth/LoginForm'
 import { TOP_BAR, TOP_BAR_PHONE } from '@/components/base/sizes'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
@@ -22,6 +23,9 @@ import { LoginNebula } from '@/pages/login/LoginNebula'
  * small beside the caption below it.
  *
  * Signing in itself is LoginForm's, unchanged; this page only places it.
+ * A new tab with several saved accounts gets the account chooser in the
+ * form's place first (#216); its "sign in with another account" brings the
+ * form back.
  */
 
 // A quiet link (the footer) is caption white and turns white on hover.
@@ -55,7 +59,8 @@ function usePaintDocumentWithSky(surface: RefObject<HTMLElement | null>) {
   }, [surface])
 }
 
-export function LoginPage() {
+export function LoginPage({ onSignInOther }: { onSignInOther?: () => void } = {}) {
+  const choosing = Boolean(onSignInOther)
   const { t } = useTranslation(['auth', 'common'])
   const bar = useMediaQuery(WIDE_LOGIN_QUERY) ? TOP_BAR : TOP_BAR_PHONE
   const surface = useRef<HTMLDivElement>(null)
@@ -85,20 +90,20 @@ export function LoginPage() {
       <main className="mx-auto grid w-full max-w-[1120px] flex-1 content-start gap-10 px-4 pt-4 pb-10 md:grid-cols-[minmax(0,360px)_minmax(0,1fr)] md:content-center md:items-center md:gap-[clamp(48px,8vw,120px)] md:px-12 md:py-9">
         <section aria-labelledby="login-title" className="w-full max-w-[420px] md:max-w-none">
           <p className="m-0 text-[13px] leading-[1.3] font-medium tracking-[0.4px] text-[color:var(--on-sky-text-caption)] uppercase">
-            {t('auth:login.eyebrow')}
+            {t(choosing ? 'auth:chooser.eyebrow' : 'auth:login.eyebrow')}
           </p>
           <h1
             id="login-title"
             className="mt-3 mb-0 text-[color:var(--on-sky-text)]"
             style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}
           >
-            {t('auth:login.title')}
+            {t(choosing ? 'auth:chooser.title' : 'auth:login.title')}
           </h1>
           <p className="mt-3 mb-0 text-[17px] leading-[1.45] text-[color:var(--on-sky-text-body)]">
-            {t('auth:login.subtitle')}
+            {t(choosing ? 'auth:chooser.subtitle' : 'auth:login.subtitle')}
           </p>
           <div className="mt-8">
-            <LoginForm />
+            {onSignInOther ? <AccountChooser onSignInOther={onSignInOther} /> : <LoginForm />}
           </div>
         </section>
 

@@ -295,7 +295,7 @@ describe('signing in from /login', () => {
 describe('opening /login while already signed in', () => {
   function alreadySignedInAs(user: User) {
     serve(user)
-    localStorage.setItem(TOKEN_KEY, 'stored-token')
+    sessionStorage.setItem(TOKEN_KEY, 'stored-token')
     useAuthStore.setState({ user, accessToken: 'stored-token', isAuthenticated: true })
   }
 

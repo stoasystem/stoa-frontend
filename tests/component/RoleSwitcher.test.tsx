@@ -20,6 +20,7 @@ import {
   rememberSession,
   tabToken,
 } from '@/lib/devSessions'
+import { tabSignedOut } from '@/lib/tabAccount'
 import { resetAsk, useAskStore } from '@/store/askStore'
 import { useAuthStore } from '@/store/authStore'
 
@@ -116,17 +117,14 @@ describe('switching between the test roles', () => {
   })
 
   it('keeps one role per tab rather than one per browser', () => {
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
-
     pinTabToSession('this-tab-only')
 
     expect(tabToken()).toBe('this-tab-only')
-    expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
+    expect(localStorage.getItem('stoa_access_token')).toBeNull()
   })
 
-  it('reads a pinned tab ahead of the shared session', () => {
+  it('reads the tab’s own session', () => {
     // This is the path the app takes on every load.
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
     pinTabToSession('this-tab-only')
 
     useAuthStore.getState().hydrateFromStorage()
@@ -134,12 +132,13 @@ describe('switching between the test roles', () => {
     expect(useAuthStore.getState().accessToken).toBe('this-tab-only')
   })
 
-  it('falls back to the shared session in a tab that picked nothing', () => {
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
+  it('never falls back on a token tabs used to share (#216)', () => {
+    useAuthStore.setState({ accessToken: null, isAuthenticated: false })
+    localStorage.setItem('stoa_access_token', 'someone-elses')
 
     useAuthStore.getState().hydrateFromStorage()
 
-    expect(useAuthStore.getState().accessToken).toBe('the-shared-one')
+    expect(useAuthStore.getState().accessToken).toBeNull()
   })
 
   it('leaves the page alone until the load, so no guard can reject the new role', async () => {
@@ -181,7 +180,7 @@ describe('switching between the test roles', () => {
       value: { assign, href: 'https://app.stoaedu.ch/chat' },
       writable: true,
     })
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
+    pinTabToSession('this-tab-only')
     rememberSession({
       email: 'parent@test.stoaedu.ch',
       role: 'parent',
@@ -197,8 +196,8 @@ describe('switching between the test roles', () => {
 
     await waitFor(() => expect(screen.getByText(/expired/i)).toBeInTheDocument())
     expect(assign).not.toHaveBeenCalled()
-    expect(sessionStorage.getItem('stoa_tab_access_token')).toBeNull()
-    expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
+    // The tab stays on its own account.
+    expect(tabToken()).toBe('this-tab-only')
     expect(readSessions()).toHaveLength(0)
   })
 
@@ -410,7 +409,7 @@ describe('a tab holding its own role', () => {
     sessionStorage.clear()
   })
 
-  it('sends its own token, not the one the browser shares', async () => {
+  it('sends its own token, not the one tabs used to share', async () => {
     // Without this the tab asks the server who it is using the previous
     // role's token, and the answer puts it straight back.
     localStorage.setItem('stoa_access_token', 'the-shared-one')
@@ -430,7 +429,7 @@ describe('a tab holding its own role', () => {
     expect(config.headers.Authorization).toBe('Bearer this-tab-only')
   })
 
-  it('sends the shared token when the tab has picked nothing', async () => {
+  it('sends no token from another tab when this one has none (#216)', async () => {
     localStorage.setItem('stoa_access_token', 'the-shared-one')
 
     const { httpClient } = await import('@/services/api/httpClient')
@@ -444,18 +443,18 @@ describe('a tab holding its own role', () => {
       headers: {},
     })
 
-    expect(config.headers.Authorization).toBe('Bearer the-shared-one')
+    expect(config.headers.Authorization).toBeUndefined()
   })
 
-  it('drops only the pin when the tab token is refused', async () => {
-    // Clearing everything here took the session the rest of the browser shares
-    // down with the expired one, so the whole app was signed out.
+  it('signs out only this tab when its token is refused, and keeps it signed out', async () => {
+    // Other tabs and the saved accounts are not this tab's to end; and the
+    // tab does not fall back on any of them (#217).
     const assign = vi.fn()
     Object.defineProperty(window, 'location', {
       value: { assign, pathname: '/chat' },
       writable: true,
     })
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
+    rememberSession({ email: 'parent@test.stoaedu.ch', role: 'parent', name: 'P', accessToken: 'parent-token' })
     pinTabToSession('this-tab-only')
 
     const { httpClient } = await import('@/services/api/httpClient')
@@ -471,19 +470,20 @@ describe('a tab holding its own role', () => {
     ).rejects.toBeTruthy()
 
     expect(tabToken()).toBeNull()
-    expect(localStorage.getItem('stoa_access_token')).toBe('the-shared-one')
+    expect(tabSignedOut()).toBe(true)
+    expect(readSessions().map((entry) => entry.accessToken)).toEqual(['parent-token'])
   })
 
-  it('still signs out a tab that holds no pin', async () => {
-    // The other half of the branch above. Without this, replacing the whole
-    // handler with a bare releaseTab() left every test green while ordinary
-    // users stopped being signed out on an expired token.
+  it('still signs the store out and goes to sign-in', async () => {
+    // Without this, replacing the whole handler with a bare releaseTab() left
+    // every test green while readers stopped being signed out on an expired
+    // token.
     const assign = vi.fn()
     Object.defineProperty(window, 'location', {
       value: { assign, pathname: '/chat' },
       writable: true,
     })
-    localStorage.setItem('stoa_access_token', 'the-shared-one')
+    sessionStorage.setItem('stoa_tab_access_token', 'the-shared-one')
 
     const { httpClient } = await import('@/services/api/httpClient')
     const { useAuthStore } = await import('@/store/authStore')
@@ -498,7 +498,7 @@ describe('a tab holding its own role', () => {
       }),
     ).rejects.toBeTruthy()
 
-    expect(localStorage.getItem('stoa_access_token')).toBeNull()
+    expect(sessionStorage.getItem('stoa_tab_access_token')).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(assign).toHaveBeenCalledWith('/login')
   })
