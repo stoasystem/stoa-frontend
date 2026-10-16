@@ -111,6 +111,13 @@ function tokenSent(config?: { headers?: unknown }): string | null {
  * the pin and leaves the session the rest of the browser shares, refresh token
  * included (#211): clearAuth clears only this tab's.
  */
+/**
+ * The code a request fails with when its session could not be renewed because
+ * the server was out of reach. The session is intact; trying again later is
+ * the right answer, signing in again is not.
+ */
+export const SESSION_UNREACHABLE = 'session_unreachable'
+
 function endSession(): never | Promise<never> {
   useAuthStore.getState().clearAuth()
   if (window.location.pathname !== '/login') {
@@ -148,7 +155,7 @@ httpClient.interceptors.response.use(
       if (config && !config._retried) {
         const sent = tokenSent(config)
         return renewSession().then((renewal) => {
-          const token = renewal?.accessToken ?? null
+          const token = renewal.status === 'renewed' ? renewal.accessToken : null
           // Requests that failed together share one renewal, and the first to
           // resume stores its token. For the rest the tab's token has changed,
           // but to the one this same renewal brought back: that is this session
@@ -173,6 +180,14 @@ httpClient.interceptors.response.use(
             }
             return Promise.reject(new ApiError('The session changed while it was being renewed.', { status: 401, code: 'session_changed' }))
           }
+          // The server could not be reached (network, timeout, 5xx, 429). It
+          // refused nothing, so the session stays — access token, refresh
+          // tokens, held accounts — and this request fails on its own. The
+          // next 401 tries the renewal again (#214). No status: this is not a
+          // 401 a caller should read as "signed out".
+          if (renewal.status === 'unreachable') {
+            return Promise.reject(new ApiError('The session could not be renewed right now.', { code: SESSION_UNREACHABLE }))
+          }
           if (!token) return endSession()
           // The first caller stores the token and moves the held entry; the
           // others find both done.
@@ -181,7 +196,7 @@ httpClient.interceptors.response.use(
             useAuthStore.getState().updateAccessToken(token)
             // The account menu holds this account too; keep it on the same pair,
             // or signing out leaves it there dead (#162).
-            if (sent && renewal) renewHeldSession(sent, renewal)
+            if (sent && renewal.status === 'renewed') renewHeldSession(sent, renewal)
           }
           config._retried = true
           return httpClient.request(config)

@@ -148,18 +148,32 @@ export async function exchangeRefreshToken(refreshToken: string): Promise<Refres
  */
 export type Renewal = { accessToken: string; spentRefreshToken: string; refreshToken: string }
 
+/**
+ * What came of trying to renew this tab's session.
+ *
+ * `ended` is the only outcome that means the session is over: there was no
+ * refresh token to offer, or the server refused it. `unreachable` — a network
+ * error, a timeout, a 5xx, a 429 — leaves every token where it was, and the
+ * next 401 tries again. Folding the two into one `null` signed readers out and
+ * deleted a refresh token the server never refused, on every deploy (#214).
+ */
+export type SessionRenewal =
+  | ({ status: 'renewed' } & Renewal)
+  | { status: 'ended' }
+  | { status: 'unreachable' }
+
 /** The refresh in flight, so concurrent callers wait on one attempt. */
-let inFlight: Promise<Renewal | null> | null = null
+let inFlight: Promise<SessionRenewal> | null = null
 
 /**
  * Exchange the stored refresh token for a fresh access token.
  *
- * Returns the new access token, or null when there is nothing to exchange or
- * the server refuses — which is the caller's signal that the session is over
- * for real and signing out is right.
+ * Returns the new access token, or null when there is none — whether the
+ * session ended or the server could not be reached. A caller that has to tell
+ * those apart, as anything that signs out does, uses `renewSession`.
  */
 export function refreshAccessToken(): Promise<string | null> {
-  return renewSession().then((renewal) => renewal?.accessToken ?? null)
+  return renewSession().then((renewal) => (renewal.status === 'renewed' ? renewal.accessToken : null))
 }
 
 /**
@@ -168,7 +182,7 @@ export function refreshAccessToken(): Promise<string | null> {
  * token: matching on the access token alone let one account's renewal be
  * written under another's name (#205 audit).
  */
-export function renewSession(): Promise<Renewal | null> {
+export function renewSession(): Promise<SessionRenewal> {
   if (inFlight) return inFlight
   inFlight = attempt().finally(() => {
     inFlight = null
@@ -176,28 +190,30 @@ export function renewSession(): Promise<Renewal | null> {
   return inFlight
 }
 
-async function attempt(): Promise<Renewal | null> {
+async function attempt(): Promise<SessionRenewal> {
   const refreshToken = storedRefreshToken()
-  if (!refreshToken) return null
+  if (!refreshToken) return { status: 'ended' }
 
   const outcome = await exchangeRefreshToken(refreshToken)
   if (outcome.status === 'refused') {
     // A refused refresh token will never be accepted again; keeping it would
-    // make every later 401 wait on a request that cannot succeed. A network
-    // failure is not a refusal: that token stays, and the next 401 tries again.
+    // make every later 401 wait on a request that cannot succeed.
     // Only the refused one goes: a pinned tab's refusal leaves the shared token
     // other tabs use, and a session that replaced this one meanwhile keeps its
     // own (#211).
     if (storedRefreshToken() === refreshToken) endRefreshToken()
-    return null
+    return { status: 'ended' }
   }
-  if (outcome.status !== 'renewed') return null
+  // A network failure is not a refusal: every token stays — this tab's, the
+  // shared one, the held accounts' — and the next 401 tries again (#214).
+  if (outcome.status === 'unreachable') return { status: 'unreachable' }
   // Kept only for the session that asked: one signed out meanwhile has
   // forgotten its refresh token, and writing the rotated one back would leave
   // the old account's credential in this browser (#34, #172 audit).
-  if (storedRefreshToken() !== refreshToken) return null
+  if (storedRefreshToken() !== refreshToken) return { status: 'ended' }
   rememberRefreshToken(outcome.refreshToken)
   return {
+    status: 'renewed',
     accessToken: outcome.accessToken,
     spentRefreshToken: refreshToken,
     refreshToken: outcome.refreshToken ?? refreshToken,

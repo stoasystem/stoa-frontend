@@ -154,3 +154,34 @@ describe('a renewal and the session around it', () => {
     expect(meCalls[meCalls.length - 1]).toBe('Bearer other-tab-access')
   })
 })
+
+describe('opening the app while /auth/refresh is out of reach (#214)', () => {
+  it('keeps the session and reads the account once the server is back', async () => {
+    let up = false
+    let refreshes = 0
+    mswServer.use(
+      http.post('https://api.test/auth/refresh', () => {
+        refreshes += 1
+        return up
+          ? HttpResponse.json({ accessToken: 'fresh-access', refreshToken: 'refresh-2' })
+          : HttpResponse.json({ detail: 'deploying' }, { status: 503 })
+      }),
+    )
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <AuthBootstrap />
+      </QueryClientProvider>,
+    )
+
+    // The first read fails on a renewal that could not be made: nothing is
+    // dropped, and the account is still on its way rather than signed out.
+    await waitFor(() => expect(refreshes).toBe(1))
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('expired-access')
+    expect(storedRefreshToken()).toBe('refresh-1')
+    up = true
+
+    await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'), { timeout: 5000 })
+    expect(useAuthStore.getState().accessToken).toBe('fresh-access')
+    expect(storedRefreshToken()).toBe('refresh-2')
+  })
+})

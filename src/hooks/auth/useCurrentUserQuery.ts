@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
+import { ApiError, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { getCurrentUser } from '@/services/auth/authApi'
 import { useAuthStore } from '@/store/authStore'
 
@@ -14,7 +15,12 @@ export function useCurrentUserQuery() {
     queryKey: ['auth', 'me'],
     queryFn: getCurrentUser,
     enabled: Boolean(accessToken),
-    retry: false,
+    // A session that could not be renewed because the server was out of reach
+    // (a deploy, a dropped connection) is still there: keep asking, backing
+    // off, and the account comes back with the server. Anything else is not
+    // retried — a refusal has already signed the reader out (#214).
+    retry: (_count, error) => error instanceof ApiError && error.code === SESSION_UNREACHABLE,
+    retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30_000),
   })
 
   useEffect(() => {
