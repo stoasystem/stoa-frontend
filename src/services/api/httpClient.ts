@@ -3,7 +3,7 @@ import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { renewHeldSession } from '@/lib/devSessions'
-import { forgetRefreshToken, renewSession } from '@/services/auth/sessionRefresh'
+import { renewSession } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
 
 export class ApiError extends Error {
@@ -108,10 +108,10 @@ function tokenSent(config?: { headers?: unknown }): string | null {
  * The session is over: drop it and go to sign-in.
  *
  * A tab pinned to one test role fails on that role's own token; clearing drops
- * the pin and leaves the session the rest of the browser shares.
+ * the pin and leaves the session the rest of the browser shares, refresh token
+ * included (#211): clearAuth clears only this tab's.
  */
 function endSession(): never | Promise<never> {
-  forgetRefreshToken()
   useAuthStore.getState().clearAuth()
   if (window.location.pathname !== '/login') {
     window.location.assign('/login')

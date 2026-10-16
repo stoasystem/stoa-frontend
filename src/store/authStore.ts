@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { forgetRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
+import { endRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
 import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
@@ -130,11 +130,12 @@ export const useAuthStore = create<AuthState>((set) => {
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
     clearAuth: () => {
-      forgetRefreshToken()
       // Only the session this tab is using ends. A pinned tab's sign-out
       // revokes its own token; the shared one belongs to whichever account the
       // rest of the browser is signed into and was never revoked, unless it is
-      // the very same token (#34).
+      // the very same token (#34). The refresh token follows the same rule, and
+      // goes first, while the pin still says which place is this tab's (#211).
+      endRefreshToken()
       const pinned = tabToken()
       if (pinned) {
         releaseTab()
