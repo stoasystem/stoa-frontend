@@ -1,4 +1,5 @@
-import { ApiError, httpClient } from '@/services/api/httpClient'
+import { answerUnauthorized, ApiError, httpClient } from '@/services/api/httpClient'
+import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import type { ChatStreamEvent, MessageQuote, PracticeContextRef } from '@/types/chat'
@@ -52,18 +53,19 @@ export async function streamConversationMessage({
   signal?: AbortSignal
   onEvent: (event: ChatStreamEvent) => void
 }): Promise<StreamOutcome> {
-  const token = localStorage.getItem('stoa_access_token')
-  let response: Response
-
-  try {
-    response = await fetch(
+  // This request bypasses httpClient, so it answers for the session itself: the
+  // token of the account this tab is on - a tab pinned to one account sends
+  // that one's, not the browser's (#215) - and an expired one is renewed and
+  // the message sent again, by the same rules as every other request. The
+  // idempotency key makes sending it again safe.
+  const send = async (token: string | null, retried: boolean): Promise<Response> => {
+    const response = await fetch(
       `${apiBaseUrl}/conversations/${conversationId}/messages/stream`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // This request bypasses httpClient, so it carries the reader's
-          // language itself — the assistant answers in it.
+          // The assistant answers in the reader's language.
           'Accept-Language': activeLanguage(),
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
@@ -71,6 +73,14 @@ export async function streamConversationMessage({
         signal,
       },
     )
+    // The demo answers whatever the server says; it has no session to renew.
+    if (response.status !== 401 || allowDemoFallback) return response
+    return (await answerUnauthorized(token, retried, (fresh) => send(fresh, true))) ?? response
+  }
+  let response: Response
+
+  try {
+    response = await send(currentSessionToken(), false)
   } catch (error) {
     if (!allowDemoFallback) {
       throw error

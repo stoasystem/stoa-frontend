@@ -1,5 +1,5 @@
 import { apiBaseUrl, enableAnalytics, isDevelopment } from '@/lib/env'
-import { TOKEN_KEY } from '@/store/authStore'
+import { currentSessionToken } from '@/store/authStore'
 
 export type AnalyticsEventName =
   | 'user_login'
@@ -116,9 +116,13 @@ export function rotateAnalyticsSession() {
   }
 }
 
+/**
+ * The account this tab is on: a tab pinned to one account records its events
+ * under that one, not under the account the browser shares (#215).
+ */
 function getAccessToken() {
   try {
-    return localStorage.getItem(TOKEN_KEY)
+    return currentSessionToken()
   } catch {
     return null
   }
