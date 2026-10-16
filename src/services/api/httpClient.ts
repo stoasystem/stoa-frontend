@@ -2,7 +2,7 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
-import { renewHeldSession } from '@/lib/devSessions'
+import { forgetHeldRefreshToken, renewHeldSession } from '@/lib/devSessions'
 import { isSameSession, renewSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
 
@@ -127,10 +127,18 @@ export const SESSION_UNREACHABLE = 'session_unreachable'
  *
  * Only this tab's session: clearAuth leaves other tabs as they are, and this
  * tab stays signed out rather than falling back on a saved account (#216,
- * #217).
+ * #217). The sign-in page says whose session ended and offers it again; the
+ * page the tab was on is kept for that account to come back to. Everything
+ * else of the account's goes, as on signing out: the stored part with the
+ * tab's own storage, what is held in memory here and by the page load.
  */
 function endSession(): never | Promise<never> {
-  useAuthStore.getState().clearAuth()
+  const { pathname, search, hash } = window.location
+  useAuthStore.getState().clearAuth({
+    reason: 'expired',
+    ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
+  })
+  queryClient.clear()
   if (window.location.pathname !== '/login') {
     window.location.assign('/login')
   }
@@ -259,7 +267,12 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
     if (renewal.status === 'unreachable') {
       return Promise.reject(new ApiError('The session could not be renewed right now.', { code: SESSION_UNREACHABLE }))
     }
-    if (!token) return endSession()
+    if (!token) {
+      // The server refused this refresh token: the saved account holding it
+      // is over too. Only that one, and only while it still holds it (#217).
+      if (renewal.status === 'ended' && renewal.refused) forgetHeldRefreshToken(renewal.refused)
+      return endSession()
+    }
     // The first caller stores the token and moves the held entry; the
     // others find both done.
     if (!renewedByThisRenewal) {

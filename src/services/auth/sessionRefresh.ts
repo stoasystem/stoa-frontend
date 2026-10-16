@@ -146,7 +146,8 @@ export type Renewal = { accessToken: string; spentRefreshToken: string; refreshT
  */
 export type SessionRenewal =
   | ({ status: 'renewed' } & Renewal)
-  | { status: 'ended' }
+  /** `refused`: the refresh token the server turned away, when that is why. */
+  | { status: 'ended'; refused?: string }
   | { status: 'unreachable' }
 
 
@@ -219,7 +220,7 @@ async function attempt(): Promise<SessionRenewal> {
     // Only the refused one goes: a session that replaced this one meanwhile
     // keeps its own (#211).
     if (storedRefreshToken() === refreshToken) endRefreshToken()
-    return { status: 'ended' }
+    return { status: 'ended', refused: refreshToken }
   }
   // A network failure is not a refusal: every token stays — this tab's and the
   // held accounts' — and the next 401 tries again (#214).
