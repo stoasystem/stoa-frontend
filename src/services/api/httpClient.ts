@@ -149,10 +149,18 @@ httpClient.interceptors.response.use(
         const sent = tokenSent(config)
         return renewSession().then((renewal) => {
           const token = renewal?.accessToken ?? null
+          // Requests that failed together share one renewal, and the first to
+          // resume stores its token. For the rest the tab's token has changed,
+          // but to the one this same renewal brought back: that is this session
+          // renewed, not another one, and they retry with it (#207).
+          // (A server handing back the very token it was sent renews nothing:
+          // that first caller still takes the ordinary path below.)
+          const renewedByThisRenewal =
+            token !== null && token !== sent && currentSessionToken() === token
           // Signed out, or another account signed in, while the renewal was in
           // flight: the token it brings back is the old session's, and storing
           // it would sign that account straight back in (#34, #172 audit).
-          if (currentSessionToken() !== sent) {
+          if (currentSessionToken() !== sent && !renewedByThisRenewal) {
             // The tab may still hold a session, just not this one: another tab
             // sharing it renewed first, or another account signed in. Read the
             // account again under whatever the tab holds now, or a start-up in
@@ -166,11 +174,15 @@ httpClient.interceptors.response.use(
             return Promise.reject(new ApiError('The session changed while it was being renewed.', { status: 401, code: 'session_changed' }))
           }
           if (!token) return endSession()
-          // Only the token: at start-up the account has not been read yet.
-          useAuthStore.getState().updateAccessToken(token)
-          // The account menu holds this account too; keep it on the same pair,
-          // or signing out leaves it there dead (#162).
-          if (sent && renewal) renewHeldSession(sent, renewal)
+          // The first caller stores the token and moves the held entry; the
+          // others find both done.
+          if (!renewedByThisRenewal) {
+            // Only the token: at start-up the account has not been read yet.
+            useAuthStore.getState().updateAccessToken(token)
+            // The account menu holds this account too; keep it on the same pair,
+            // or signing out leaves it there dead (#162).
+            if (sent && renewal) renewHeldSession(sent, renewal)
+          }
           config._retried = true
           return httpClient.request(config)
         })
