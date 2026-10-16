@@ -52,6 +52,25 @@ export function rememberRefreshToken(token: string | null | undefined): void {
   }
 }
 
+/**
+ * Put `token` in this tab's place for a refresh token, or empty that place
+ * when there is none. Switching to a held account that has no refresh token
+ * (one held before they were kept, or a sign-in that returned none) used to
+ * leave the previous account's refresh token in the tab, and the next renewal
+ * spent it (#205 audit). Only this tab's place is touched: clearing the shared
+ * one would sign out the other tabs.
+ */
+export function replaceRefreshToken(token: string | null | undefined): void {
+  try {
+    const store = tabPinned() ? sessionStorage : localStorage
+    const key = tabPinned() ? TAB_REFRESH_KEY : REFRESH_KEY
+    if (token) store.setItem(key, token)
+    else store.removeItem(key)
+  } catch {
+    // Blocked storage holds no token to leave behind.
+  }
+}
+
 export function forgetRefreshToken(): void {
   try {
     sessionStorage.removeItem(TAB_REFRESH_KEY)
@@ -108,8 +127,15 @@ export async function exchangeRefreshToken(refreshToken: string): Promise<Refres
   }
 }
 
+/**
+ * A renewal that went through: the new access token, the refresh token it
+ * spent, and the one to use from now on (the spent one, unless the server
+ * sent a new one).
+ */
+export type Renewal = { accessToken: string; spentRefreshToken: string; refreshToken: string }
+
 /** The refresh in flight, so concurrent callers wait on one attempt. */
-let inFlight: Promise<string | null> | null = null
+let inFlight: Promise<Renewal | null> | null = null
 
 /**
  * Exchange the stored refresh token for a fresh access token.
@@ -119,6 +145,16 @@ let inFlight: Promise<string | null> | null = null
  * for real and signing out is right.
  */
 export function refreshAccessToken(): Promise<string | null> {
+  return renewSession().then((renewal) => renewal?.accessToken ?? null)
+}
+
+/**
+ * The same renewal, saying which refresh token it spent. A held account in the
+ * account menu is moved onto the new tokens only if it holds that refresh
+ * token: matching on the access token alone let one account's renewal be
+ * written under another's name (#205 audit).
+ */
+export function renewSession(): Promise<Renewal | null> {
   if (inFlight) return inFlight
   inFlight = attempt().finally(() => {
     inFlight = null
@@ -126,7 +162,7 @@ export function refreshAccessToken(): Promise<string | null> {
   return inFlight
 }
 
-async function attempt(): Promise<string | null> {
+async function attempt(): Promise<Renewal | null> {
   const refreshToken = storedRefreshToken()
   if (!refreshToken) return null
 
@@ -144,5 +180,9 @@ async function attempt(): Promise<string | null> {
   // the old account's credential in this browser (#34, #172 audit).
   if (storedRefreshToken() !== refreshToken) return null
   rememberRefreshToken(outcome.refreshToken)
-  return outcome.accessToken
+  return {
+    accessToken: outcome.accessToken,
+    spentRefreshToken: refreshToken,
+    refreshToken: outcome.refreshToken ?? refreshToken,
+  }
 }

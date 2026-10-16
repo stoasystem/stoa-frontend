@@ -21,7 +21,7 @@ import {
 } from '@/lib/devSessions'
 import { getDefaultRouteForRole } from '@/lib/authRoutes'
 import { apiBaseUrl } from '@/lib/env'
-import { exchangeRefreshToken, rememberRefreshToken } from '@/services/auth/sessionRefresh'
+import { exchangeRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
 
 export type SwitchProblem = 'expired' | 'unreachable' | null
 
@@ -79,8 +79,10 @@ export function useHeldAccounts() {
 
       pinTabToSession(accessToken)
       // The held account's own refresh token travels with it, so switching to
-      // it does not hand the reader a session that ends in an hour.
-      rememberRefreshToken(session.refreshToken)
+      // it does not hand the reader a session that ends in an hour. An account
+      // held without one empties the tab's, rather than keeping the previous
+      // account's for the next renewal to spend (#205 audit).
+      replaceRefreshToken(session.refreshToken)
       // A full load, not a store update: telling the store about the new role
       // while the old role's page is mounted lets that page's guard reject it
       // and land on the forbidden page. The load drops the previous account's

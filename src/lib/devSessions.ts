@@ -153,16 +153,20 @@ export function forgetSessionHolding(accessToken: string): void {
 }
 
 /**
- * Move the held entry carrying `previousAccessToken` onto the tokens it was
- * renewed to. Left on the old pair, the entry is one signing out no longer
- * finds: the sign-in is revoked, the entry stays, and choosing it in the
- * account menu answers "session expired" (#162). Other held accounts are not
- * touched; a refresh token the server did not send back stays as it was.
+ * Move the held entry the app just renewed onto its new tokens. Left on the old
+ * pair, the entry is one signing out no longer finds: the sign-in is revoked,
+ * the entry stays, and choosing it in the account menu answers "session
+ * expired" (#162).
+ *
+ * The entry must carry both the access token the request was sent with and the
+ * refresh token the renewal spent. Matching the access token alone let a tab
+ * that still had another account's refresh token write that account's renewal
+ * under this one's name (#205 audit). An entry with no refresh token is left as
+ * it is: nothing ties it to the renewal.
  */
 export function renewHeldSession(
   previousAccessToken: string,
-  accessToken: string,
-  refreshToken?: string | null,
+  renewal: { accessToken: string; spentRefreshToken: string; refreshToken: string },
 ): void {
   if (typeof window === 'undefined') return
   try {
@@ -171,8 +175,9 @@ export function renewHeldSession(
     let changed = false
     const next = raw.map((entry) => {
       if (entry?.accessToken !== previousAccessToken) return entry
+      if (!entry.refreshToken || entry.refreshToken !== renewal.spentRefreshToken) return entry
       changed = true
-      return { ...entry, accessToken, ...(refreshToken ? { refreshToken } : {}) }
+      return { ...entry, accessToken: renewal.accessToken, refreshToken: renewal.refreshToken }
     })
     if (changed) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
   } catch {
