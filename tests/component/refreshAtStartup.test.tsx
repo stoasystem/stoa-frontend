@@ -12,7 +12,8 @@ import { delay, http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { AuthBootstrap } from '@/app/router/AuthBootstrap'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
-import { httpClient } from '@/services/api/httpClient'
+import { ApiError, httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
+import { retryAccountRead } from '@/hooks/auth/useCurrentUserQuery'
 import { rememberRefreshToken, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
@@ -152,5 +153,52 @@ describe('a renewal and the session around it', () => {
     expect(useAuthStore.getState().accessToken).toBe('other-tab-access')
     expect(localStorage.getItem(TOKEN_KEY)).toBe('other-tab-access')
     expect(meCalls[meCalls.length - 1]).toBe('Bearer other-tab-access')
+  })
+})
+
+describe('opening the app while /auth/refresh is out of reach (#214)', () => {
+  it('keeps the session and reads the account once the server is back', { timeout: 15_000 }, async () => {
+    let up = false
+    let refreshes = 0
+    mswServer.use(
+      http.post('https://api.test/auth/refresh', () => {
+        refreshes += 1
+        return up
+          ? HttpResponse.json({ accessToken: 'fresh-access', refreshToken: 'refresh-2' })
+          : HttpResponse.json({ detail: 'deploying' }, { status: 503 })
+      }),
+    )
+    render(
+      <QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>
+        <AuthBootstrap />
+      </QueryClientProvider>,
+    )
+
+    // The reads fail on a renewal that could not be made: nothing is dropped,
+    // and the account is still on its way rather than signed out. Down for
+    // more than one retry, so a limit of one would not pass.
+    await waitFor(() => expect(refreshes).toBe(3), { timeout: 5000 })
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('expired-access')
+    expect(storedRefreshToken()).toBe('refresh-1')
+    up = true
+
+    await waitFor(() => expect(useAuthStore.getState().user?.email).toBe('teacher@test.stoaedu.ch'), { timeout: 8000 })
+    expect(useAuthStore.getState().accessToken).toBe('fresh-access')
+    expect(storedRefreshToken()).toBe('refresh-2')
+  })
+})
+
+describe('which failed account reads are tried again (#214)', () => {
+  it('a session that could not be renewed, however many times it failed', () => {
+    const unreachable = new ApiError('The session could not be renewed right now.', { code: SESSION_UNREACHABLE })
+    expect(retryAccountRead(0, unreachable)).toBe(true)
+    expect(retryAccountRead(50, unreachable)).toBe(true)
+  })
+
+  it('nothing else', () => {
+    expect(retryAccountRead(0, new ApiError('expired', { status: 401 }))).toBe(false)
+    expect(retryAccountRead(0, new ApiError('changed', { status: 401, code: 'session_changed' }))).toBe(false)
+    expect(retryAccountRead(0, new ApiError('down', { status: 503 }))).toBe(false)
+    expect(retryAccountRead(0, new Error('session_ended'))).toBe(false)
   })
 })
