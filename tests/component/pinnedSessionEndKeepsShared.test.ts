@@ -61,6 +61,21 @@ describe('signing out (clearAuth)', () => {
     expect(localStorage.getItem(TOKEN_KEY)).toBe('s-access')
   })
 
+  it('in a tab pinned to the shared session itself clears the shared refresh token too', () => {
+    // Choosing the current account in Konto wechseln pins the tab to the very
+    // tokens the browser shares. That session is the one ending; left behind,
+    // its refresh token would sign it back in at the next 401 (#212 audit).
+    onShared()
+    pinTabToSession('s-access')
+    rememberRefreshToken('s-refresh')
+
+    useAuthStore.getState().clearAuth()
+
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
+    expect(localStorage.getItem(SHARED_REFRESH)).toBeNull()
+    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+  })
+
   it('in an unpinned tab clears the shared refresh token', () => {
     onShared()
 

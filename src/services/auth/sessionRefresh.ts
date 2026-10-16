@@ -76,6 +76,25 @@ export function replaceRefreshToken(token: string | null | undefined): void {
 }
 
 /**
+ * The session this tab is on has ended: empty this tab's place for a refresh
+ * token. A pinned tab leaves the shared one to the other tabs (#211), unless
+ * it is the very same token, the way the store treats the access token (#34).
+ * A tab pinned to the shared account itself would otherwise sign out and leave
+ * that account's refresh token behind, and the next 401 anywhere would renew
+ * it (#212 audit).
+ */
+export function endRefreshToken(): void {
+  try {
+    const own = storedRefreshToken()
+    const pinned = tabPinned()
+    replaceRefreshToken(null)
+    if (own && pinned && localStorage.getItem(REFRESH_KEY) === own) localStorage.removeItem(REFRESH_KEY)
+  } catch {
+    // Blocked storage holds no token to leave behind.
+  }
+}
+
+/**
  * What came of offering a refresh token to the server.
  *
  * The three outcomes have to stay apart, because only one of them means the
@@ -169,7 +188,7 @@ async function attempt(): Promise<Renewal | null> {
     // Only the refused one goes: a pinned tab's refusal leaves the shared token
     // other tabs use, and a session that replaced this one meanwhile keeps its
     // own (#211).
-    if (storedRefreshToken() === refreshToken) replaceRefreshToken(null)
+    if (storedRefreshToken() === refreshToken) endRefreshToken()
     return null
   }
   if (outcome.status !== 'renewed') return null

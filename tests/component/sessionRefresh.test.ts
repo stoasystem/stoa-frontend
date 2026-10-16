@@ -123,6 +123,17 @@ describe('exchanging it', () => {
     expect(localStorage.getItem('stoa_refresh_token')).toBe('r-shared')
   })
 
+  it('throws away the shared copy too when a pinned tab’s refused token is that same one', async () => {
+    rememberRefreshToken('r-1')
+    sessionStorage.setItem(TAB_TOKEN_KEY, 'a-tab')
+    rememberRefreshToken('r-1')
+    vi.mocked(fetch).mockResolvedValue(refused(401))
+
+    await expect(refreshAccessToken()).resolves.toBeNull()
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
+    expect(localStorage.getItem('stoa_refresh_token')).toBeNull()
+  })
+
   it('keeps the refresh token of a session that replaced the refused one meanwhile', async () => {
     rememberRefreshToken('r-1')
     let answer: (value: Response) => void = () => undefined
