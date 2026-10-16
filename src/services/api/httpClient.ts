@@ -153,7 +153,10 @@ httpClient.interceptors.response.use(
           // resume stores its token. For the rest the tab's token has changed,
           // but to the one this same renewal brought back: that is this session
           // renewed, not another one, and they retry with it (#207).
-          const renewedByThisRenewal = token !== null && currentSessionToken() === token
+          // (A server handing back the very token it was sent renews nothing:
+          // that first caller still takes the ordinary path below.)
+          const renewedByThisRenewal =
+            token !== null && token !== sent && currentSessionToken() === token
           // Signed out, or another account signed in, while the renewal was in
           // flight: the token it brings back is the old session's, and storing
           // it would sign that account straight back in (#34, #172 audit).

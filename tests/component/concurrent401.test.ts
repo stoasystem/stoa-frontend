@@ -8,7 +8,8 @@
  * hour, every request on the first page load but one failed once.
  */
 import { http, HttpResponse } from 'msw'
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { readSessions, rememberSession } from '@/lib/devSessions'
 import { httpClient } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
@@ -16,11 +17,16 @@ import { mswServer } from '../mswServer'
 
 let refreshCalls = 0
 const seen: string[] = []
+// The refresh answers only when a test lets it, so the order of events is set
+// by the test rather than by timers (#210 audit).
+let releaseRefresh: () => void = () => undefined
+let refreshGate: Promise<void> = Promise.resolve()
 
 beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }))
 beforeEach(() => {
   refreshCalls = 0
   seen.length = 0
+  refreshGate = new Promise((resolve) => { releaseRefresh = resolve })
   localStorage.clear()
   sessionStorage.clear()
   localStorage.setItem(TOKEN_KEY, 'expired-access')
@@ -35,7 +41,7 @@ beforeEach(() => {
     }),
     http.post('https://api.test/auth/refresh', async () => {
       refreshCalls += 1
-      await new Promise((resolve) => setTimeout(resolve, 20))
+      await refreshGate
       return HttpResponse.json({ accessToken: 'fresh-access', refreshToken: 'refresh-1' })
     }),
   )
@@ -48,7 +54,12 @@ afterAll(() => mswServer.close())
 
 describe('three requests on one expired token', () => {
   it('renew once and all retry with the new token', async () => {
-    const answers = await Promise.allSettled(['a', 'b', 'c'].map((id) => httpClient.get(`/things/${id}`)))
+    const pending = Promise.allSettled(['a', 'b', 'c'].map((id) => httpClient.get(`/things/${id}`)))
+    // All three have failed and are waiting on the one renewal before it answers.
+    await vi.waitFor(() => expect(seen).toHaveLength(3))
+    await vi.waitFor(() => expect(refreshCalls).toBe(1))
+    releaseRefresh()
+    const answers = await pending
 
     expect(answers.map((answer) => answer.status)).toEqual(['fulfilled', 'fulfilled', 'fulfilled'])
     expect(refreshCalls).toBe(1)
@@ -64,10 +75,13 @@ describe('three requests on one expired token', () => {
 describe('the session changing while the renewal is in flight (#34)', () => {
   it('still refuses to retry when another account signed in meanwhile', async () => {
     const pending = Promise.allSettled(['a', 'b'].map((id) => httpClient.get(`/things/${id}`)))
-    // Another account signs in before the renewal comes back.
-    await new Promise((resolve) => setTimeout(resolve, 5))
+    // Both have failed and the renewal is out; another account signs in
+    // before it comes back.
+    await vi.waitFor(() => expect(seen).toHaveLength(2))
+    await vi.waitFor(() => expect(refreshCalls).toBe(1))
     localStorage.setItem(TOKEN_KEY, 'someone-else')
     useAuthStore.setState({ accessToken: 'someone-else' })
+    releaseRefresh()
 
     const answers = await pending
 
@@ -77,5 +91,29 @@ describe('the session changing while the renewal is in flight (#34)', () => {
     }
     expect(localStorage.getItem(TOKEN_KEY)).toBe('someone-else')
     expect(seen.some((line) => line.endsWith('Bearer fresh-access'))).toBe(false)
+  })
+})
+
+describe('a renewal that hands back the same access token', () => {
+  it('is not taken for one a sibling request already stored', async () => {
+    // Only the first caller can tell: the tab's token equals the one returned,
+    // but nothing was renewed. It takes the ordinary path, which retries once
+    // and ends the session on the second 401 (#210 audit).
+    mswServer.use(
+      http.post('https://api.test/auth/refresh', () =>
+        HttpResponse.json({ accessToken: 'expired-access', refreshToken: 'refresh-2' }),
+      ),
+    )
+    rememberSession({ email: 's@test.stoaedu.ch', role: 'student', name: 'S', accessToken: 'expired-access', refreshToken: 'refresh-1' })
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, pathname: '/', assign })
+
+    await expect(httpClient.get('/things/a')).rejects.toBeDefined()
+
+    // The held entry follows the renewal: it holds the refresh token the
+    // server sent, not the one that was spent.
+    expect(readSessions()[0]).toMatchObject({ refreshToken: 'refresh-2' })
+    expect(assign).toHaveBeenCalledWith('/login')
+    vi.unstubAllGlobals()
   })
 })
