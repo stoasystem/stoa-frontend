@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { forgetRefreshToken, rememberRefreshToken } from '@/services/auth/sessionRefresh'
+import { forgetRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
 import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
@@ -80,6 +80,11 @@ type AuthState = {
   user: CurrentUser | null
   accessToken: string | null
   isAuthenticated: boolean
+  /**
+   * Start a session: sign-in and registration. An omitted refresh token means
+   * this session has none, and the tab's previous one is cleared (#208). A
+   * renewal is not a new session; it goes through `updateAccessToken`.
+   */
   setAuth: (user: CurrentUser, accessToken: string, refreshToken?: string) => void
   /** A renewed access token for the session already held, read account or not. */
   updateAccessToken: (accessToken: string) => void
@@ -96,9 +101,12 @@ export const useAuthStore = create<AuthState>((set) => {
     accessToken: storedToken,
     isAuthenticated: Boolean(storedToken),
     setAuth: (user, accessToken, refreshToken) => {
-      // Undefined means "unchanged", not "none": a refresh hands back a new
-      // access token and keeps the refresh token it already had.
-      rememberRefreshToken(refreshToken)
+      // Only sign-in and registration call this, and both start a session: a
+      // response without a refresh token means this session has none, not
+      // "keep the one there". Kept, the previous account's would be spent at
+      // the next 401 and turn the tab back into that account (#208). A renewal
+      // goes through updateAccessToken and keeps its refresh token there.
+      replaceRefreshToken(refreshToken)
       if (tabToken()) {
         pinTabToSession(accessToken)
       } else {
