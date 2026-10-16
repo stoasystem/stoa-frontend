@@ -79,8 +79,14 @@ describe('the session changing while the renewal is in flight (#34)', () => {
     // before it comes back.
     await vi.waitFor(() => expect(seen).toHaveLength(2))
     await vi.waitFor(() => expect(refreshCalls).toBe(1))
-    localStorage.setItem(TOKEN_KEY, 'someone-else')
-    useAuthStore.setState({ accessToken: 'someone-else' })
+    // The way sign-in does it: a new access token and that account's own
+    // refresh token. Only the refresh token tells another account from this
+    // one renewed by another tab (#219).
+    useAuthStore.getState().setAuth(
+      { id: 'u-2', name: 'Someone', email: 'someone@test.stoaedu.ch', role: 'student' },
+      'someone-else',
+      'refresh-someone',
+    )
     releaseRefresh()
 
     const answers = await pending
@@ -90,7 +96,9 @@ describe('the session changing while the renewal is in flight (#34)', () => {
       expect((answer as PromiseRejectedResult).reason).toMatchObject({ code: 'session_changed' })
     }
     expect(localStorage.getItem(TOKEN_KEY)).toBe('someone-else')
+    expect(localStorage.getItem('stoa_refresh_token')).toBe('refresh-someone')
     expect(seen.some((line) => line.endsWith('Bearer fresh-access'))).toBe(false)
+    expect(seen.some((line) => line.endsWith('Bearer someone-else'))).toBe(false)
   })
 })
 

@@ -57,6 +57,20 @@ export function rememberRefreshToken(token: string | null | undefined): void {
 }
 
 /**
+ * Each refresh token this tab's renewals spent, and the one it handed on.
+ * Cognito hands back the token it was given, so today every entry points at
+ * itself; a pool that rotates would chain them, and a request sent before the
+ * rotation still has to be recognised as this session's (#218).
+ */
+const handedOn = new Map<string, string>()
+/** Renewals come once an hour; a handful covers any request still in flight. */
+const HANDED_ON_LIMIT = 8
+
+function forgetHandedOn(): void {
+  handedOn.clear()
+}
+
+/**
  * Put `token` in this tab's place for a refresh token, or empty that place
  * when there is none. Switching to a held account that has no refresh token
  * (one held before they were kept, or a sign-in that returned none) used to
@@ -65,6 +79,8 @@ export function rememberRefreshToken(token: string | null | undefined): void {
  * one would sign out the other tabs.
  */
 export function replaceRefreshToken(token: string | null | undefined): void {
+  // A new session, or none: the old one's renewals say nothing about it.
+  forgetHandedOn()
   try {
     const store = tabPinned() ? sessionStorage : localStorage
     const key = tabPinned() ? TAB_REFRESH_KEY : REFRESH_KEY
@@ -162,6 +178,37 @@ export type SessionRenewal =
   | { status: 'ended' }
   | { status: 'unreachable' }
 
+
+/**
+ * Whether this tab is still on the session `refreshToken` belonged to: it is
+ * the refresh token stored now, or one of this tab's renewals led from it to
+ * the one stored now.
+ *
+ * The refresh token, not the access token, is what says which session this
+ * is: a renewal replaces the access token and keeps the refresh token, while
+ * signing in, signing out and switching accounts all replace or clear it.
+ * Another tab's renewal of the shared session leaves it as it was (#219).
+ */
+export function isSameSession(refreshToken: string | null | undefined): boolean {
+  const now = storedRefreshToken()
+  let token = refreshToken
+  if (!token || !now) return false
+  for (let step = 0; step <= handedOn.size; step += 1) {
+    if (token === now) return true
+    const next = handedOn.get(token)
+    if (!next || next === token) return false
+    token = next
+  }
+  return false
+}
+
+function recordHandedOn(spent: string, next: string): void {
+  if (spent === next) return
+  handedOn.delete(spent)
+  handedOn.set(spent, next)
+  if (handedOn.size > HANDED_ON_LIMIT) handedOn.delete(handedOn.keys().next().value as string)
+}
+
 /** The refresh in flight, so concurrent callers wait on one attempt. */
 let inFlight: Promise<SessionRenewal> | null = null
 
@@ -212,6 +259,7 @@ async function attempt(): Promise<SessionRenewal> {
   // the old account's credential in this browser (#34, #172 audit).
   if (storedRefreshToken() !== refreshToken) return { status: 'ended' }
   rememberRefreshToken(outcome.refreshToken)
+  recordHandedOn(refreshToken, outcome.refreshToken ?? refreshToken)
   return {
     status: 'renewed',
     accessToken: outcome.accessToken,

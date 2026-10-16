@@ -214,8 +214,10 @@ describe('an expired token on the stream', () => {
     const assign = stubLocation()
     streamAccepts('never')
     refreshAnswers(() => {
-      // Signed out and someone else signed in while the refresh was out.
+      // Signed out and someone else signed in while the refresh was out:
+      // their access token and their own refresh token, as sign-in stores.
       localStorage.setItem(TOKEN_KEY, 'other-access')
+      localStorage.setItem(SHARED_REFRESH, 'other-refresh')
       return HttpResponse.json({ accessToken: 's-fresh' })
     })
 
@@ -234,6 +236,7 @@ describe('an expired token on the stream', () => {
         streamAuth.push(request.headers.get('Authorization'))
         // The answer arrives after someone else signed in.
         localStorage.setItem(TOKEN_KEY, 'other-access')
+        localStorage.setItem(SHARED_REFRESH, 'other-refresh')
         return HttpResponse.json({ detail: 'expired' }, { status: 401 })
       }),
     )
@@ -241,8 +244,54 @@ describe('an expired token on the stream', () => {
 
     await expect(ask()).rejects.toMatchObject({ status: 401 })
 
+    expect(streamAuth).toEqual(['Bearer s-access'])
     expect(refreshCalls).toBe(0)
     expect(localStorage.getItem(TOKEN_KEY)).toBe('other-access')
+    expect(assign).not.toHaveBeenCalled()
+  })
+
+  it('is sent again on the token another tab renewed it to, when its 401 comes late (#218)', async () => {
+    onShared()
+    const assign = stubLocation()
+    let first = true
+    mswServer.use(
+      http.post(STREAM, ({ request }) => {
+        const auth = request.headers.get('Authorization')
+        streamAuth.push(auth)
+        if (first) {
+          first = false
+          // Before this answer, another tab renewed the shared session: a new
+          // access token, the same refresh token.
+          localStorage.setItem(TOKEN_KEY, 's-renewed')
+        }
+        return auth === 'Bearer s-renewed'
+          ? new HttpResponse(null, { status: 202 })
+          : HttpResponse.json({ detail: 'expired' }, { status: 401 })
+      }),
+    )
+    refreshAnswers(() => HttpResponse.json({ accessToken: 's-fresh' }))
+
+    await expect(ask()).resolves.toBe('accepted')
+
+    expect(streamAuth).toEqual(['Bearer s-access', 'Bearer s-renewed'])
+    expect(refreshCalls).toBe(0)
+    expect(assign).not.toHaveBeenCalled()
+  })
+
+  it('is sent on the token another tab stored during its own renewal (#219)', async () => {
+    onShared()
+    const assign = stubLocation()
+    streamAccepts('s-other-tab')
+    refreshAnswers(() => {
+      // The other tab's renewal of the same session finished first.
+      localStorage.setItem(TOKEN_KEY, 's-other-tab')
+      return HttpResponse.json({ accessToken: 's-fresh' })
+    })
+
+    await expect(ask()).resolves.toBe('accepted')
+
+    expect(streamAuth).toEqual(['Bearer s-access', 'Bearer s-other-tab'])
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('s-other-tab')
     expect(assign).not.toHaveBeenCalled()
   })
 })

@@ -3,7 +3,7 @@ import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
 import { renewHeldSession } from '@/lib/devSessions'
-import { renewSession } from '@/services/auth/sessionRefresh'
+import { isSameSession, renewSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
 
 export class ApiError extends Error {
@@ -78,10 +78,18 @@ function isPublicAuthPath(url?: string, method?: string) {
   return false
 }
 
+/**
+ * The refresh token each request went out under. Beside the config rather
+ * than on it: a config travels with every response and error, and anything
+ * that logs one would log the credential (#218 audit).
+ */
+const refreshSent = new WeakMap<object, string>()
+
 httpClient.interceptors.request.use((config) => {
   // A tab holding its own role must send that role's token, not the one
   // the rest of the browser shares.
   const token = currentSessionToken()
+  refreshSent.delete(config)
 
   config.headers['Accept-Language'] = activeLanguage()
 
@@ -89,6 +97,10 @@ httpClient.interceptors.request.use((config) => {
     delete config.headers.Authorization
   } else if (token) {
     config.headers.Authorization = `Bearer ${token}`
+    // Which session the request went out under. The access token alone cannot
+    // say: a renewal replaces it, here or in another tab (#218, #219).
+    const refresh = storedRefreshToken()
+    if (refresh) refreshSent.set(config, refresh)
   }
 
   return config
@@ -127,9 +139,28 @@ function endSession(): never | Promise<never> {
 }
 
 /**
- * What to do with a 401 on a request that went out with `sent` (null: no
- * token). The one answer for every request this app sends with the session's
- * token, through the shared client or not (#215).
+ * The session a request went out under: the access token it carried (null:
+ * none) and the refresh token stored beside it then. The access token says
+ * whether the request is on the tab's token now; only the refresh token can
+ * say whether a different token is still the same session, renewed since
+ * (#218, #219).
+ */
+export type SentSession = { token: string | null; refresh: string | null }
+
+/** How the request already went out again: after a renewal, or once more as it was. */
+export type SentAgain = { retried: boolean; resent: boolean }
+
+/**
+ * Send the request again with `token`. `renewed` says this follows a renewal:
+ * a 401 then ends the session. Otherwise the session had been renewed already,
+ * and the request is only being sent once more on the token the tab holds now.
+ */
+export type Retry<T> = (token: string, renewed: boolean) => Promise<T>
+
+/**
+ * What to do with a 401 on a request that went out under `sent`. The one
+ * answer for every request this app sends with the session's token, through
+ * the shared client or not (#215).
  *
  * Null when the 401 is not this tab's session's to answer: it only says the
  * session the request carried is over, and if this tab now holds a different
@@ -137,19 +168,40 @@ function endSession(): never | Promise<never> {
  * before anyone signed in answers late - that is not the session that failed,
  * and it stays (#34). The caller reports the 401 as an ordinary failure.
  *
+ * Unless the session is the same one, already renewed: the request went out
+ * with the token a renewal has since replaced - a sibling request's, whose 401
+ * came first, or another tab's sharing the session - and its 401 came after.
+ * It is sent once more on the token the tab holds now, without a renewal of
+ * its own (#218). A tab that signed out, or where someone else signed in,
+ * holds another refresh token or none, and the 401 stays an ordinary one.
+ *
  * Otherwise a promise: the retry's result, or a rejection when the session
- * ended, changed meanwhile, or could not be renewed right now. `retried` says
- * the request already went out again with a fresh token; a 401 then ends the
- * session.
+ * ended, changed meanwhile, or could not be renewed right now.
  */
 export function answerUnauthorized<T>(
-  sent: string | null,
-  retried: boolean,
-  retry: (token: string) => Promise<T>,
+  sent: SentSession,
+  again: SentAgain,
+  retry: Retry<T>,
 ): Promise<T> | null {
-  if (sent !== currentSessionToken()) return null
-  if (retried) return endSession()
+  const now = currentSessionToken()
+  if (sent.token !== now) {
+    if (sent.token && now && !again.resent && isSameSession(sent.refresh)) {
+      return resendOnRenewedSession(now, retry)
+    }
+    return null
+  }
+  if (again.retried) return endSession()
   return renewAndRetry(sent, retry)
+}
+
+/**
+ * The tab's token is not the one a request was sent with, but the session is
+ * the same one, renewed since. Send it again with the token the tab holds now.
+ */
+function resendOnRenewedSession<T>(token: string, retry: Retry<T>): Promise<T> {
+  // Another tab's renewal wrote the shared token; keep the store on it too.
+  useAuthStore.getState().hydrateFromStorage()
+  return retry(token, false)
 }
 
 /**
@@ -163,7 +215,7 @@ export function answerUnauthorized<T>(
  *
  * `retry` is called at most once, with the token to send.
  */
-function renewAndRetry<T>(sent: string | null, retry: (token: string) => Promise<T>): Promise<T> {
+function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
   return renewSession().then((renewal) => {
     const token = renewal.status === 'renewed' ? renewal.accessToken : null
     // Requests that failed together share one renewal, and the first to
@@ -173,16 +225,25 @@ function renewAndRetry<T>(sent: string | null, retry: (token: string) => Promise
     // (A server handing back the very token it was sent renews nothing:
     // that first caller still takes the ordinary path below.)
     const renewedByThisRenewal =
-      token !== null && token !== sent && currentSessionToken() === token
+      token !== null && token !== sent.token && currentSessionToken() === token
     // Signed out, or another account signed in, while the renewal was in
     // flight: the token it brings back is the old session's, and storing
     // it would sign that account straight back in (#34, #172 audit).
-    if (currentSessionToken() !== sent && !renewedByThisRenewal) {
-      // The tab may still hold a session, just not this one: another tab
-      // sharing it renewed first, or another account signed in. Read the
-      // account again under whatever the tab holds now, or a start-up in
-      // a second restored tab waits on "Konto wird geladen…" for good.
-      if (currentSessionToken()) {
+    if (currentSessionToken() !== sent.token && !renewedByThisRenewal) {
+      // Another tab sharing this session renewed it first and stored its
+      // token; this tab's refresh token is still the one the request went
+      // out under. Same session: retry with that token rather than failing
+      // as if someone else had signed in (#219).
+      const now = currentSessionToken()
+      if (now && isSameSession(sent.refresh)) {
+        useAuthStore.getState().hydrateFromStorage()
+        return retry(now, true)
+      }
+      // The tab may still hold a session, just not this one: another
+      // account signed in. Read the account again under whatever the tab
+      // holds now, or a start-up in a second restored tab waits on "Konto
+      // wird geladen…" for good.
+      if (now) {
         useAuthStore.getState().hydrateFromStorage()
         // After this rejection has settled: while the first read of the
         // account is still in flight, an invalidation only joins it.
@@ -206,9 +267,9 @@ function renewAndRetry<T>(sent: string | null, retry: (token: string) => Promise
       useAuthStore.getState().updateAccessToken(token)
       // The account menu holds this account too; keep it on the same pair,
       // or signing out leaves it there dead (#162).
-      if (sent && renewal.status === 'renewed') renewHeldSession(sent, renewal)
+      if (sent.token && renewal.status === 'renewed') renewHeldSession(sent.token, renewal)
     }
-    return retry(token)
+    return retry(token, true)
   })
 }
 
@@ -222,14 +283,24 @@ httpClient.interceptors.response.use(
     // out itself; clearing and reloading here as well would race it.
     if (status === 401 && requestPath(error.config?.url) !== LOGOUT_PATH) {
       // `retried` keeps a request that fails again after a fresh token from
-      // looping: the second 401 falls through to signing out.
-      const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined
-      const answered = answerUnauthorized(tokenSent(config), !config || Boolean(config._retried), () => {
-        // Not reached (no config counts as retried); it narrows the type.
-        if (!config) return endSession()
-        config._retried = true
-        return httpClient.request(config)
-      })
+      // looping: the second 401 falls through to signing out. `resent` lets a
+      // request go out once more on a session renewed meanwhile, and only once.
+      const config = error.config as
+        | (typeof error.config & { _retried?: boolean; _resent?: boolean })
+        | undefined
+      const answered = answerUnauthorized(
+        { token: tokenSent(config), refresh: config ? refreshSent.get(config) ?? null : null },
+        // No config counts as retried and resent: there is nothing to send again.
+        { retried: !config || Boolean(config._retried), resent: !config || Boolean(config._resent) },
+        (_token, renewed) => {
+          // Not reached (no config counts as retried); it narrows the type.
+          if (!config) return endSession()
+          // The request interceptor puts the tab's token on it.
+          if (renewed) config._retried = true
+          else config._resent = true
+          return httpClient.request(config)
+        },
+      )
       if (answered) return answered
     }
 
