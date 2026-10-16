@@ -24,9 +24,11 @@ const TAB_REFRESH_KEY = 'stoa_tab_refresh_token'
 /** Long enough for a slow network, short enough that a hung refresh still ends. */
 const REFRESH_TIMEOUT_MS = 10_000
 
+// The same test the store uses (`tabToken()` read as truthy), so a refresh
+// token always lands beside its access token (#209 audit).
 function tabPinned(): boolean {
   try {
-    return sessionStorage.getItem(TAB_TOKEN_KEY) !== null
+    return Boolean(sessionStorage.getItem(TAB_TOKEN_KEY))
   } catch {
     return false
   }

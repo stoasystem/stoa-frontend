@@ -80,6 +80,11 @@ type AuthState = {
   user: CurrentUser | null
   accessToken: string | null
   isAuthenticated: boolean
+  /**
+   * Start a session: sign-in and registration. An omitted refresh token means
+   * this session has none, and the tab's previous one is cleared (#208). A
+   * renewal is not a new session; it goes through `updateAccessToken`.
+   */
   setAuth: (user: CurrentUser, accessToken: string, refreshToken?: string) => void
   /** A renewed access token for the session already held, read account or not. */
   updateAccessToken: (accessToken: string) => void
