@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom'
 import { clearAskQuote } from '@/features/ask/practiceContext'
 import { clearUploadHandoff } from '@/features/uploads/utils/uploadHandoff'
 import { clearPendingMessages } from '@/lib/pendingChatMessages'
-import { forgetSessionHolding } from '@/lib/devSessions'
+import { forgetHeldSignIn, forgetSessionHolding } from '@/lib/devSessions'
+import { signInOf } from '@/lib/signIn'
+import { announceSignInEnded } from '@/lib/tabAccount'
 import { rotateAnalyticsSession } from '@/services/analytics/analyticsClient'
 import { logout, type LogoutOutcome } from '@/services/auth/authApi'
 import { forgetCheckoutOperation } from '@/services/billing/billingApi'
@@ -50,6 +52,7 @@ export function useSignOut() {
     setIsSigningOut(true)
 
     const accessToken = currentSessionToken()
+    const signIn = signInOf(accessToken)
 
     clearAuth()
     // Query keys do not name the user, so whoever signs in next on this tab
@@ -70,9 +73,15 @@ export function useSignOut() {
     // too (#34).
     forgetCheckoutOperation()
     rotateAnalyticsSession()
-    // Roles held in the switcher for other accounts stay: signing out ends this
-    // tab's session only, as it leaves the shared one of a pinned tab (#34).
+    // Saved accounts of other sign-ins stay: signing out ends this sign-in
+    // only (#34). Every saved copy of it goes, and the other tabs holding it
+    // are told, so they sign out now rather than fail at their next request
+    // (#232).
     if (accessToken) forgetSessionHolding(accessToken)
+    if (signIn) {
+      forgetHeldSignIn(signIn)
+      announceSignInEnded(signIn)
+    }
     // Register before navigation unmounts this menu. The login mutation waits
     // for completion or the request's 8 s timeout; server work may outlive it.
     const pending = trackPendingLogout(

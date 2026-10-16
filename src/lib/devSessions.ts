@@ -12,6 +12,8 @@
  * and holding a session here requires signing into that account first.
  */
 
+import { signInOf } from '@/lib/signIn'
+
 export const TAB_TOKEN_KEY = 'stoa_tab_access_token'
 const SESSIONS_KEY = 'stoa_dev_sessions'
 
@@ -218,6 +220,23 @@ export function forgetHeldRefreshToken(refreshToken: string): void {
     const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
     if (!Array.isArray(raw)) return
     const next = raw.filter((entry) => entry?.refreshToken !== refreshToken)
+    if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing this could offer anyone.
+  }
+}
+
+/**
+ * Drop every held entry of one sign-in, whatever access token it holds now: it
+ * was signed out, so none of them will be accepted again. Other sign-ins of
+ * the same account are left as they are (#232).
+ */
+export function forgetHeldSignIn(signIn: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    const next = raw.filter((entry) => signInOf(entry?.accessToken) !== signIn)
     if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
   } catch {
     // Unreadable or blocked storage holds nothing this could offer anyone.
