@@ -1,4 +1,5 @@
 import { answerUnauthorized, ApiError, httpClient } from '@/services/api/httpClient'
+import { storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback, apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
@@ -58,7 +59,13 @@ export async function streamConversationMessage({
   // that one's, not the browser's (#215) - and an expired one is renewed and
   // the message sent again, by the same rules as every other request. The
   // idempotency key makes sending it again safe.
-  const send = async (token: string | null, retried: boolean): Promise<Response> => {
+  const send = async (
+    token: string | null,
+    again: { retried: boolean; resent: boolean },
+  ): Promise<Response> => {
+    // Read beside the token, so a 401 can tell this session renewed since
+    // from another one signed in (#218, #219).
+    const refresh = token ? storedRefreshToken() : null
     const response = await fetch(
       `${apiBaseUrl}/conversations/${conversationId}/messages/stream`,
       {
@@ -75,7 +82,9 @@ export async function streamConversationMessage({
     )
     // The demo answers whatever the server says; it has no session to renew.
     if (response.status !== 401 || allowDemoFallback) return response
-    const answered = answerUnauthorized(token, retried, (fresh) => send(fresh, true))
+    const answered = answerUnauthorized({ token, refresh }, again, (fresh, renewed) =>
+      send(fresh, renewed ? { ...again, retried: true } : { ...again, resent: true }),
+    )
     if (!answered) return response
     // Nothing will read this answer; let its connection go before the retry.
     void response.body?.cancel().catch(() => {})
@@ -84,7 +93,7 @@ export async function streamConversationMessage({
   let response: Response
 
   try {
-    response = await send(currentSessionToken(), false)
+    response = await send(currentSessionToken(), { retried: false, resent: false })
   } catch (error) {
     if (!allowDemoFallback) {
       throw error
