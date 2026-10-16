@@ -216,6 +216,11 @@
     "openLabel": "Notifiche",
     "openLabelUnread": "Notifiche, {{count}} da leggere",
     "subtitle": "Novità sulle tue domande, sugli esercizi e sulle richieste agli insegnanti.",
+    "subtitleByRole": {
+      "admin": "Messaggi operativi e novità sull’account.",
+      "parent": "Novità sull’account e sull’apprendimento dei figli.",
+      "teacher": "Novità sulle richieste degli studenti."
+    },
     "title": "Notifiche",
     "unavailable": "Le notifiche non sono disponibili.",
     "unread": "{{count}} da leggere"

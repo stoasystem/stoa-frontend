@@ -5,6 +5,11 @@ export type TeacherHelpStatus =
   | 'resolved'
   | 'cancelled'
 
+/** Still with a teacher: not yet resolved, not withdrawn or expired. */
+export function isOpenHelpRequest(status: TeacherHelpStatus | undefined): boolean {
+  return status === 'pending' || status === 'assigned' || status === 'in_progress'
+}
+
 export type TeacherHelpRequest = {
   requestId: string
   conversationId: string

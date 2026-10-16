@@ -216,6 +216,11 @@
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} non lue(s)",
     "subtitle": "Les nouveautés sur tes questions, tes entraînements et tes demandes d’enseignant.",
+    "subtitleByRole": {
+      "admin": "Les messages d’exploitation et les nouveautés de votre compte.",
+      "parent": "Les nouveautés sur votre compte et l’apprentissage de vos enfants.",
+      "teacher": "Les nouveautés sur les demandes des élèves."
+    },
     "title": "Notifications",
     "unavailable": "Les notifications ne sont pas disponibles.",
     "unread": "{{count}} non lue(s)"

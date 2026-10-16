@@ -600,5 +600,23 @@
     "selectItem": "Wählen Sie einen Lehrplaneintrag aus der Arbeitsliste.",
     "requestFailed": "Die Anfrage an die Lehrplan-API ist fehlgeschlagen.",
     "invalidJson": "Das JSON ist ungültig"
+  },
+  "operationalNotifications": {
+    "title": "Betriebsmeldungen",
+    "count_one": "{{count}} Ereignis",
+    "count_other": "{{count}} Ereignisse",
+    "loading": "Betriebsmeldungen werden geladen …",
+    "unavailable": "Betriebsmeldungen sind nicht verfügbar.",
+    "empty": "Noch keine Betriebsmeldungen.",
+    "eventTypes": {
+      "teacher_help_expired": "Lehrpersonenhilfe abgelaufen",
+      "teacher_reply": "Antwort einer Lehrperson",
+      "teacher_requested": "Lehrperson angefragt",
+      "teacher_takeover": "Von einer Lehrperson übernommen"
+    },
+    "targetTypes": {
+      "conversation": "Gespräch",
+      "question": "Frage"
+    }
   }
 }

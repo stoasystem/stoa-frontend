@@ -216,6 +216,11 @@
     "openLabel": "Mitteilungen",
     "openLabelUnread": "Mitteilungen, {{count}} ungelesen",
     "subtitle": "Neues zu deinen Fragen, Übungen und Anfragen an Lehrpersonen.",
+    "subtitleByRole": {
+      "admin": "Betriebsmeldungen und Neues zu Ihrem Konto.",
+      "parent": "Neues zu Ihrem Konto und zum Lernen Ihrer Kinder.",
+      "teacher": "Neues zu den Anfragen von Schülerinnen und Schülern."
+    },
     "title": "Mitteilungen",
     "unavailable": "Mitteilungen sind nicht verfügbar.",
     "unread": "{{count}} ungelesen"

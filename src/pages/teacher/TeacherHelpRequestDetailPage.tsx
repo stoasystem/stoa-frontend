@@ -24,7 +24,7 @@ import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTe
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
-import type { TeacherHelpStatus } from '@/types/teacherHelp'
+import { isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 
 const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 const statusActionKey: Record<string, string> = {
@@ -89,43 +89,49 @@ export function TeacherHelpRequestDetailPage() {
               isError={curriculumQuery.isError}
               contextLabel={t('curriculumRollout.teacherContext')}
             />
-            <div className="rounded-lg border p-4">
-              <label className="text-sm font-medium" htmlFor="resolution-note">
-                {tTeacher('detail.resolutionNote')}
-              </label>
-              <textarea
-                id="resolution-note"
-                className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
-                value={resolutionNote}
-                onChange={(event) => setResolutionNote(event.target.value)}
-                placeholder={tTeacher('detail.resolutionNotePlaceholder')}
-              />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {statuses.map((status) => (
-                <Button
-                  key={status}
-                  type="button"
-                  variant="outline"
-                  disabled={
-                    updateStatus.isPending ||
-                    !requestId ||
-                    (status === 'resolved' && resolutionNote.trim().length === 0)
-                  }
-                  onClick={() =>
-                    requestId &&
-                    updateStatus.mutate({
-                      requestId,
-                      status,
-                      resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
-                    })
-                  }
-                >
-                  {tTeacher(statusActionKey[status] ?? 'markResolved')}
-                </Button>
-              ))}
-            </div>
-            {updateStatus.isError && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
+            {/* A finished request takes no more status changes: the server refuses
+                them, so offering "Prüfung starten" on one only led to an error (#162). */}
+            {isOpenHelpRequest(requestQuery.data.status) && (
+              <>
+              <div className="rounded-lg border p-4">
+                <label className="text-sm font-medium" htmlFor="resolution-note">
+                  {tTeacher('detail.resolutionNote')}
+                </label>
+                <textarea
+                  id="resolution-note"
+                  className="mt-2 min-h-20 w-full rounded-md border bg-background px-3 py-2 text-sm"
+                  value={resolutionNote}
+                  onChange={(event) => setResolutionNote(event.target.value)}
+                  placeholder={tTeacher('detail.resolutionNotePlaceholder')}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {statuses.map((status) => (
+                  <Button
+                    key={status}
+                    type="button"
+                    variant="outline"
+                    disabled={
+                      updateStatus.isPending ||
+                      !requestId ||
+                      (status === 'resolved' && resolutionNote.trim().length === 0)
+                    }
+                    onClick={() =>
+                      requestId &&
+                      updateStatus.mutate({
+                        requestId,
+                        status,
+                        resolutionNote: status === 'resolved' ? resolutionNote.trim() : undefined,
+                      })
+                    }
+                  >
+                    {tTeacher(statusActionKey[status] ?? 'markResolved')}
+                  </Button>
+                ))}
+              </div>
+              {updateStatus.isError && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
+              </>
+            )}
             <SectionHeader
               title={tTeacher('detail.replyTitle')}
               description={tTeacher('detail.replyDescription')}

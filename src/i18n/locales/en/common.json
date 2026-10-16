@@ -216,6 +216,11 @@
     "openLabel": "Notifications",
     "openLabelUnread": "Notifications, {{count}} unread",
     "subtitle": "Updates about your questions, practice, and teacher requests.",
+    "subtitleByRole": {
+      "admin": "Operational messages and updates about your account.",
+      "parent": "Updates about your account and your children's learning.",
+      "teacher": "Updates about student requests."
+    },
     "title": "Notifications",
     "unavailable": "Notifications are unavailable.",
     "unread": "{{count}} unread"

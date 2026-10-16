@@ -29,6 +29,17 @@ import {
 } from '@/pages/admin/accountFormRules'
 import { ApiError } from '@/services/api/httpClient'
 import type { AccountRole, AccountRow, AccountStatus } from '@/services/admin/accountsApi'
+import { formatDateTime } from '@/lib/formatDateTime'
+
+/**
+ * The server sends these as ISO timestamps, and the table printed them as such
+ * ("2026-09-23T01:56:24.621354+00:00", #162). One it cannot read is shown as sent.
+ */
+function accountTime(value: string | null | undefined): string {
+  if (!value) return '—'
+  const date = new Date(value)
+  return Number.isNaN(date.getTime()) ? value : formatDateTime(date)
+}
 
 const ROLES: AccountRole[] = ['student', 'teacher', 'parent', 'admin']
 const STATUSES: AccountStatus[] = ['invited', 'active', 'suspended', 'archived']
@@ -432,8 +443,8 @@ export function AdminAccountsPage() {
                             t('accounts.minorNo')
                           )}
                         </td>
-                        <td className="p-2">{row.createdAt || '—'}</td>
-                        <td className="p-2">{row.lastLoginAt || '—'}</td>
+                        <td className="p-2">{accountTime(row.createdAt)}</td>
+                        <td className="p-2">{accountTime(row.lastLoginAt)}</td>
                         <td className="p-2">
                           {row.linkedAccounts.length === 0
                             ? '—'
