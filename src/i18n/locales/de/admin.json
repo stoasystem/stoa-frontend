@@ -609,14 +609,30 @@
     "unavailable": "Betriebsmeldungen sind nicht verfügbar.",
     "empty": "Noch keine Betriebsmeldungen.",
     "eventTypes": {
+      "assignment_update": "Änderung an einer Aufgabe",
+      "learning_profile_update": "Änderung am Lernprofil",
+      "moderation_case_update": "Änderung an einem Moderationsfall",
+      "subscription_request_update": "Änderung an einer Abonnementanfrage",
       "teacher_help_expired": "Lehrpersonenhilfe abgelaufen",
       "teacher_reply": "Antwort einer Lehrperson",
       "teacher_requested": "Lehrperson angefragt",
-      "teacher_takeover": "Von einer Lehrperson übernommen"
+      "teacher_takeover": "Von einer Lehrperson übernommen",
+      "weekly_report_update": "Änderung am Wochenbericht"
     },
     "targetTypes": {
+      "assignment": "Aufgabe",
       "conversation": "Gespräch",
-      "question": "Frage"
-    }
+      "learning_profile": "Lernprofil",
+      "moderation_case": "Moderationsfall",
+      "question": "Frage",
+      "recommendation": "Empfehlung",
+      "report": "Bericht",
+      "subscription_request": "Abonnementanfrage",
+      "system_status": "Systemstatus",
+      "weekly_report": "Wochenbericht"
+    },
+    "unknownEventType": "Anderes Ereignis",
+    "unknownTargetType": "Anderes Ziel",
+    "unknownStatus": "Unbekannter Status"
   }
 }

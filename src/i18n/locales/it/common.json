@@ -190,6 +190,18 @@
         "summary": "Un/a allievo/a chiede aiuto per una domanda di {{subject}}.",
         "title": "Aiuto richiesto"
       },
+      "moderationCreatedHigh": {
+        "summary": "È stato segnalato un caso di moderazione di gravità alta.",
+        "title": "Nuovo caso di moderazione"
+      },
+      "moderationCreatedLow": {
+        "summary": "È stato segnalato un caso di moderazione di gravità bassa.",
+        "title": "Nuovo caso di moderazione"
+      },
+      "moderationCreatedMedium": {
+        "summary": "È stato segnalato un caso di moderazione di gravità media.",
+        "title": "Nuovo caso di moderazione"
+      },
       "replyConversation": {
         "summary": "Il/la tuo/a docente ha risposto nella tua conversazione.",
         "title": "Il/la tuo/a docente ha risposto"
@@ -210,6 +222,7 @@
     "itemStatus": {
       "archived": "Archiviata",
       "created": "Nuova",
+      "failed": "Non riuscita",
       "read": "Letta"
     },
     "loading": "Caricamento delle notifiche...",
@@ -218,7 +231,10 @@
     "subtitle": "Novità sulle tue domande, sugli esercizi e sulle richieste agli insegnanti.",
     "subtitleByRole": {
       "admin": "Messaggi operativi e novità sull’account.",
+      "organization_admin": "Novità sulla tua organizzazione e sul tuo account.",
       "parent": "Novità sull’account e sull’apprendimento dei figli.",
+      "school_teacher": "Novità sulle richieste degli studenti della tua scuola.",
+      "school_viewer": "Novità sulla tua scuola e sul tuo account.",
       "teacher": "Novità sulle richieste degli studenti."
     },
     "title": "Notifiche",

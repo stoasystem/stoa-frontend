@@ -609,14 +609,30 @@
     "unavailable": "Les notifications d’exploitation ne sont pas disponibles.",
     "empty": "Aucun événement d’exploitation pour l’instant.",
     "eventTypes": {
+      "assignment_update": "Mise à jour d’un devoir",
+      "learning_profile_update": "Mise à jour du profil d’apprentissage",
+      "moderation_case_update": "Mise à jour d’un cas de modération",
+      "subscription_request_update": "Mise à jour d’une demande d’abonnement",
       "teacher_help_expired": "Aide enseignante expirée",
       "teacher_reply": "Réponse d’un enseignant",
       "teacher_requested": "Enseignant demandé",
-      "teacher_takeover": "Pris en charge par un enseignant"
+      "teacher_takeover": "Pris en charge par un enseignant",
+      "weekly_report_update": "Mise à jour du rapport hebdomadaire"
     },
     "targetTypes": {
+      "assignment": "Devoir",
       "conversation": "Conversation",
-      "question": "Question"
-    }
+      "learning_profile": "Profil d’apprentissage",
+      "moderation_case": "Cas de modération",
+      "question": "Question",
+      "recommendation": "Recommandation",
+      "report": "Rapport",
+      "subscription_request": "Demande d’abonnement",
+      "system_status": "État du système",
+      "weekly_report": "Rapport hebdomadaire"
+    },
+    "unknownEventType": "Autre événement",
+    "unknownTargetType": "Autre cible",
+    "unknownStatus": "Statut inconnu"
   }
 }

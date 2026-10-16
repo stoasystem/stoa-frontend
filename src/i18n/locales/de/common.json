@@ -190,6 +190,18 @@
         "summary": "Eine Schülerin oder ein Schüler bittet um Hilfe bei einer Frage in {{subject}}.",
         "title": "Hilfe angefragt"
       },
+      "moderationCreatedHigh": {
+        "summary": "Ein Moderationsfall mit hohem Schweregrad wurde gemeldet.",
+        "title": "Neuer Moderationsfall"
+      },
+      "moderationCreatedLow": {
+        "summary": "Ein Moderationsfall mit niedrigem Schweregrad wurde gemeldet.",
+        "title": "Neuer Moderationsfall"
+      },
+      "moderationCreatedMedium": {
+        "summary": "Ein Moderationsfall mit mittlerem Schweregrad wurde gemeldet.",
+        "title": "Neuer Moderationsfall"
+      },
       "replyConversation": {
         "summary": "Deine Lehrperson hat in deinem Gespräch geantwortet.",
         "title": "Deine Lehrperson hat geantwortet"
@@ -210,6 +222,7 @@
     "itemStatus": {
       "archived": "Archiviert",
       "created": "Neu",
+      "failed": "Fehlgeschlagen",
       "read": "Gelesen"
     },
     "loading": "Mitteilungen werden geladen ...",
@@ -218,7 +231,10 @@
     "subtitle": "Neues zu deinen Fragen, Übungen und Anfragen an Lehrpersonen.",
     "subtitleByRole": {
       "admin": "Betriebsmeldungen und Neues zu Ihrem Konto.",
+      "organization_admin": "Neues zu Ihrer Organisation und zu Ihrem Konto.",
       "parent": "Neues zu Ihrem Konto und zum Lernen Ihrer Kinder.",
+      "school_teacher": "Neues zu den Anfragen der Schülerinnen und Schüler Ihrer Schule.",
+      "school_viewer": "Neues zu Ihrer Schule und zu Ihrem Konto.",
       "teacher": "Neues zu den Anfragen von Schülerinnen und Schülern."
     },
     "title": "Mitteilungen",

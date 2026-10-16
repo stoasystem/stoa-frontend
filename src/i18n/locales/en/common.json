@@ -190,6 +190,18 @@
         "summary": "A student requested help with a {{subject}} question.",
         "title": "Teacher help requested"
       },
+      "moderationCreatedHigh": {
+        "summary": "A high-severity moderation case was reported.",
+        "title": "New moderation case"
+      },
+      "moderationCreatedLow": {
+        "summary": "A low-severity moderation case was reported.",
+        "title": "New moderation case"
+      },
+      "moderationCreatedMedium": {
+        "summary": "A medium-severity moderation case was reported.",
+        "title": "New moderation case"
+      },
       "replyConversation": {
         "summary": "Your teacher answered in your conversation.",
         "title": "Your teacher replied"
@@ -210,6 +222,7 @@
     "itemStatus": {
       "archived": "Archived",
       "created": "New",
+      "failed": "Failed",
       "read": "Read"
     },
     "loading": "Loading notifications...",
@@ -218,7 +231,10 @@
     "subtitle": "Updates about your questions, practice, and teacher requests.",
     "subtitleByRole": {
       "admin": "Operational messages and updates about your account.",
+      "organization_admin": "Updates about your organization and your account.",
       "parent": "Updates about your account and your children's learning.",
+      "school_teacher": "Updates about requests from students at your school.",
+      "school_viewer": "Updates about your school and your account.",
       "teacher": "Updates about student requests."
     },
     "title": "Notifications",

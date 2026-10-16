@@ -9,7 +9,9 @@ import { notificationText } from '@/lib/notificationCopy'
  * The system page's recent operational events. Every line of it was English
  * on a German admin page, down to the raw status and event type (#162). The
  * title and summary go through the same mapping as the bell; an event type the
- * labels do not know yet is shown as the server names it, spaced out.
+ * labels do not know is shown as a translated "other", never as the server's id
+ * (#220). The types are those of `EVENT_TYPES` in the backend's
+ * `notification_service.py`, and the targets its notifications point at.
  */
 export function AdminOperationalNotificationsCard() {
   const { t } = useTranslation('admin')
@@ -17,7 +19,11 @@ export function AdminOperationalNotificationsCard() {
   const query = useAdminNotificationsQuery()
   const items = query.data?.items ?? []
   const label = (group: 'eventTypes' | 'targetTypes', value: string) =>
-    t(`operationalNotifications.${group}.${value}`, { defaultValue: value.replace(/_/g, ' ') })
+    t(`operationalNotifications.${group}.${value}`, {
+      defaultValue: t(group === 'eventTypes' ? 'operationalNotifications.unknownEventType' : 'operationalNotifications.unknownTargetType'),
+    })
+  const status = (value: string) =>
+    tCommon(`common:notifications.itemStatus.${value}`, { defaultValue: t('operationalNotifications.unknownStatus') })
 
   return (
     <Card>
@@ -53,7 +59,7 @@ export function AdminOperationalNotificationsCard() {
                       <p className="mt-1 text-sm text-muted-foreground">{text.summary}</p>
                     </div>
                     <Badge variant={event.status === 'created' ? 'default' : 'secondary'}>
-                      {tCommon(`common:notifications.itemStatus.${event.status}`, { defaultValue: event.status })}
+                      {status(event.status)}
                     </Badge>
                   </div>
                   <p className="mt-2 text-xs text-muted-foreground">

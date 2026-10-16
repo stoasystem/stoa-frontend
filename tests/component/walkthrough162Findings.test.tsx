@@ -168,9 +168,21 @@ describe('the new keys exist in all four languages', () => {
   it.each(['de', 'en', 'fr', 'it'])('%s', async (lang) => {
     const common = (await import(`@/i18n/locales/${lang}/common.json`)).default
     const admin = (await import(`@/i18n/locales/${lang}/admin.json`)).default
-    expect(Object.keys(common.notifications.subtitleByRole).sort()).toEqual(['admin', 'parent', 'teacher'])
-    expect(Object.keys(admin.operationalNotifications).sort()).toEqual(
-      ['count_one', 'count_other', 'empty', 'eventTypes', 'loading', 'targetTypes', 'title', 'unavailable'],
+    expect(Object.keys(common.notifications.subtitleByRole).sort()).toEqual(
+      ['admin', 'organization_admin', 'parent', 'school_teacher', 'school_viewer', 'teacher'],
     )
+    expect(Object.keys(admin.operationalNotifications).sort()).toEqual([
+      'count_one',
+      'count_other',
+      'empty',
+      'eventTypes',
+      'loading',
+      'targetTypes',
+      'title',
+      'unavailable',
+      'unknownEventType',
+      'unknownStatus',
+      'unknownTargetType',
+    ])
   })
 })
