@@ -152,6 +152,39 @@ export function forgetSessionHolding(accessToken: string): void {
   }
 }
 
+/**
+ * Move the held entry the app just renewed onto its new tokens. Left on the old
+ * pair, the entry is one signing out no longer finds: the sign-in is revoked,
+ * the entry stays, and choosing it in the account menu answers "session
+ * expired" (#162).
+ *
+ * The entry must carry both the access token the request was sent with and the
+ * refresh token the renewal spent. Matching the access token alone let a tab
+ * that still had another account's refresh token write that account's renewal
+ * under this one's name (#205 audit). An entry with no refresh token is left as
+ * it is: nothing ties it to the renewal.
+ */
+export function renewHeldSession(
+  previousAccessToken: string,
+  renewal: { accessToken: string; spentRefreshToken: string; refreshToken: string },
+): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    let changed = false
+    const next = raw.map((entry) => {
+      if (entry?.accessToken !== previousAccessToken) return entry
+      if (!entry.refreshToken || entry.refreshToken !== renewal.spentRefreshToken) return entry
+      changed = true
+      return { ...entry, accessToken: renewal.accessToken, refreshToken: renewal.refreshToken }
+    })
+    if (changed) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing to keep current.
+  }
+}
+
 /** Live, refused, or no answer — a failed check is not the same as a dead session. */
 export type SessionLiveness = 'live' | 'refused' | 'unknown'
 

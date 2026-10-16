@@ -2,7 +2,8 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
-import { forgetRefreshToken, refreshAccessToken } from '@/services/auth/sessionRefresh'
+import { renewHeldSession } from '@/lib/devSessions'
+import { forgetRefreshToken, renewSession } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
 
 export class ApiError extends Error {
@@ -146,7 +147,8 @@ httpClient.interceptors.response.use(
       const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined
       if (config && !config._retried) {
         const sent = tokenSent(config)
-        return refreshAccessToken().then((token) => {
+        return renewSession().then((renewal) => {
+          const token = renewal?.accessToken ?? null
           // Signed out, or another account signed in, while the renewal was in
           // flight: the token it brings back is the old session's, and storing
           // it would sign that account straight back in (#34, #172 audit).
@@ -166,6 +168,9 @@ httpClient.interceptors.response.use(
           if (!token) return endSession()
           // Only the token: at start-up the account has not been read yet.
           useAuthStore.getState().updateAccessToken(token)
+          // The account menu holds this account too; keep it on the same pair,
+          // or signing out leaves it there dead (#162).
+          if (sent && renewal) renewHeldSession(sent, renewal)
           config._retried = true
           return httpClient.request(config)
         })
