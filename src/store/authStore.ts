@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { forgetRefreshToken, rememberRefreshToken } from '@/services/auth/sessionRefresh'
+import { forgetRefreshToken, replaceRefreshToken } from '@/services/auth/sessionRefresh'
 import { pinTabToSession, releaseTab, tabToken } from '@/lib/devSessions'
 import type { User, UserRole } from '@/types/user'
 
@@ -96,9 +96,12 @@ export const useAuthStore = create<AuthState>((set) => {
     accessToken: storedToken,
     isAuthenticated: Boolean(storedToken),
     setAuth: (user, accessToken, refreshToken) => {
-      // Undefined means "unchanged", not "none": a refresh hands back a new
-      // access token and keeps the refresh token it already had.
-      rememberRefreshToken(refreshToken)
+      // Only sign-in and registration call this, and both start a session: a
+      // response without a refresh token means this session has none, not
+      // "keep the one there". Kept, the previous account's would be spent at
+      // the next 401 and turn the tab back into that account (#208). A renewal
+      // goes through updateAccessToken and keeps its refresh token there.
+      replaceRefreshToken(refreshToken)
       if (tabToken()) {
         pinTabToSession(accessToken)
       } else {
