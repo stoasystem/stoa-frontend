@@ -5,6 +5,7 @@ import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getSubjectLabel } from '@/lib/displayLabels'
 import type { TeacherHelpRequestDetail } from '@/types/teacher'
+import { isOpenHelpRequest } from '@/types/teacherHelp'
 
 export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequestDetail }) {
   const { t, i18n } = useTranslation('teacher')
@@ -37,7 +38,9 @@ export function HelpRequestDetailCard({ request }: { request: TeacherHelpRequest
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <TeacherSlaBadge sla={request.sla} />
+            {/* A finished request has no target left to miss; as on its row in
+              * the list, the badge only shows while it is open (#162). */}
+            {isOpenHelpRequest(request.status) && <TeacherSlaBadge sla={request.sla} />}
             <HelpRequestStatusBadge status={request.status} />
           </div>
         </div>
