@@ -172,7 +172,7 @@ describe('a teacher\'s Requests', () => {
       'In progress',
       'Resolved',
     ])
-    expect(screen.getByText('12 min')).toBeInTheDocument()
+    expect(screen.getByText('12 minutes')).toBeInTheDocument()
   })
 
   it('tells a missed response time from one at risk, and keeps time and priority on a phone', () => {

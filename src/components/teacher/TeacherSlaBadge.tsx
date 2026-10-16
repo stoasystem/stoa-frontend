@@ -28,7 +28,7 @@ export function TeacherSlaBadge({ sla }: { sla?: TeacherSlaSnapshot }) {
   const config = statusConfig[status]
   const Icon = config.Icon
   // A request left for four days read "6576m / 30m". Nobody counts in
-  // thousands of minutes: past an hour this says hours, past two days, days.
+  // thousands of minutes: past an hour this says hours, past a day, days.
   const detail =
     typeof sla?.requestToFirstActionMinutes === 'number'
       ? t('requests.sla.elapsed', {

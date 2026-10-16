@@ -22,6 +22,7 @@ import { describe, expect, it } from 'vitest'
 import i18n from '@/i18n'
 import { getAccountStateLabel, getIssueLabel } from '@/components/parent/accountOperationsView'
 import { TeacherSlaBadge } from '@/components/teacher/TeacherSlaBadge'
+import { TeacherStatsCards } from '@/components/teacher/TeacherStatsCards'
 import { formatMinutes, getSubjectLabel } from '@/lib/displayLabels'
 import deAuth from '@/i18n/locales/de/auth.json'
 import deParent from '@/i18n/locales/de/parent.json'
@@ -237,6 +238,41 @@ describe('the teacher request page', () => {
     // thirty minutes (#162 re-check); the target is named as the target.
     expect(badge?.textContent).toMatch(/\(Ziel: 30 Minuten\)$/)
     expect(badge?.textContent).not.toContain(' von ')
+
+    unmount()
+    await i18n.changeLanguage('en')
+  })
+})
+
+describe('the teacher board says how long a first reply takes (#223)', () => {
+  // The board's average read "6576 Min.": a span nobody reads in minutes.
+  it.each([
+    ['de', 45, '45 Minuten'],
+    ['de', 1, '1 Minute'],
+    ['de', 60, '1 Stunde'],
+    ['de', 135, '2 Stunden 15 Minuten'],
+    ['de', 1441, '1 Tag'],
+    ['de', 6576, '4 Tage 13 Stunden'],
+    ['en', 61, '1 hour 1 minute'],
+    ['en', 6576, '4 days 13 hours'],
+    ['fr', 6576, '4 jours 13 heures'],
+    ['it', 1500, '1 giorno 1 ora'],
+  ])('in %s, %i minutes read "%s"', async (language, minutes, expected) => {
+    await i18n.changeLanguage(language)
+    expect(formatMinutes(minutes, i18n.t)).toBe(expected)
+    await i18n.changeLanguage('en')
+  })
+
+  it('draws the average on the board in days and hours', async () => {
+    await i18n.changeLanguage('de')
+    const { unmount } = render(
+      <I18nextProvider i18n={i18n}>
+        <TeacherStatsCards stats={{ pendingRequests: 2, resolvedToday: 1, averageResponseTimeMinutes: 6576 }} />
+      </I18nextProvider>,
+    )
+
+    expect(screen.getByText('4 Tage 13 Stunden')).toBeTruthy()
+    expect(document.body.textContent).not.toMatch(/6576/)
 
     unmount()
     await i18n.changeLanguage('en')
