@@ -24,7 +24,7 @@ import { useUpdateTeacherHelpRequestMutation } from '@/hooks/teacher/useUpdateTe
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { trackEvent } from '@/services/analytics/analyticsClient'
 import { normalizeCurriculumSubjectId } from '@/services/practice/practiceApi'
-import { isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
+import { acceptsTeacherReply, isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 
 const statuses: TeacherHelpStatus[] = ['in_progress', 'resolved']
 const statusActionKey: Record<string, string> = {
@@ -132,16 +132,22 @@ export function TeacherHelpRequestDetailPage() {
               {updateStatus.isError && <p className="text-sm text-destructive">{tTeacher('detail.updateFailed')}</p>}
               </>
             )}
-            <SectionHeader
-              title={tTeacher('detail.replyTitle')}
-              description={tTeacher('detail.replyDescription')}
-            />
-            <TeacherReplyComposer
-              isSubmitting={addNote.isPending}
-              onSubmit={(content, richContent, onSuccess) =>
-                requestId && addNote.mutate({ requestId, content, richContent }, { onSuccess })
-              }
-            />
+            {/* A resolved request still takes its teacher's follow-up (#222); one
+                withdrawn or expired has no teacher and the server refuses the reply. */}
+            {acceptsTeacherReply(requestQuery.data.status) && (
+              <>
+                <SectionHeader
+                  title={tTeacher('detail.replyTitle')}
+                  description={tTeacher('detail.replyDescription')}
+                />
+                <TeacherReplyComposer
+                  isSubmitting={addNote.isPending}
+                  onSubmit={(content, richContent, onSuccess) =>
+                    requestId && addNote.mutate({ requestId, content, richContent }, { onSuccess })
+                  }
+                />
+              </>
+            )}
             <TeacherRequestTimeline notes={requestQuery.data.notes ?? []} />
           </div>
         )}

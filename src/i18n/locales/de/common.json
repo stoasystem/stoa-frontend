@@ -397,7 +397,9 @@
       "cancelled": "Abgebrochen",
       "in_progress": "In Bearbeitung",
       "pending": "Ausstehend",
-      "resolved": "Abgeschlossen"
+      "resolved": "Abgeschlossen",
+      "withdrawn": "Zurückgezogen",
+      "expired": "Abgelaufen"
     },
     "unavailable": "Status nicht verfügbar"
   },

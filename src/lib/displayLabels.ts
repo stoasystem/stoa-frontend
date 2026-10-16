@@ -12,6 +12,8 @@ const teacherHelpStatusLabels: LabelMap = {
   in_progress: 'In progress',
   resolved: 'Resolved',
   cancelled: 'Cancelled',
+  withdrawn: 'Withdrawn',
+  expired: 'Expired',
 }
 
 const supportTicketStatusLabels: LabelMap = {

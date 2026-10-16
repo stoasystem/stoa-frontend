@@ -397,7 +397,9 @@
       "cancelled": "Cancelled",
       "in_progress": "In progress",
       "pending": "Pending",
-      "resolved": "Resolved"
+      "resolved": "Resolved",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
     },
     "unavailable": "Status unavailable"
   },

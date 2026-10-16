@@ -21,6 +21,8 @@ const statusTones: Record<TeacherHelpStatus, PillTone> = {
   in_progress: 'green',
   resolved: 'neutral',
   cancelled: 'neutral',
+  withdrawn: 'neutral',
+  expired: 'neutral',
 }
 
 const slaTones = { at_risk: 'gold', breached: 'danger' } as const satisfies Record<string, PillTone>
