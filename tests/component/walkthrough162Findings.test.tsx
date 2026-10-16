@@ -19,6 +19,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import i18n from '@/i18n'
 import type { TeacherHelpRequestSummary } from '@/types/teacher'
+import { acceptsTeacherReply, isOpenHelpRequest, type TeacherHelpStatus } from '@/types/teacherHelp'
 
 const detail = vi.hoisted(() => ({ status: 'resolved' as string }))
 const adminEvents = vi.hoisted(() => ({ items: [] as unknown[] }))
@@ -116,6 +117,32 @@ describe('a help request in the teacher view', () => {
     page()
     expect(screen.getByRole('button', { name: 'Prüfung starten' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Als gelöst markieren' })).toBeInTheDocument()
+  })
+
+  // The server takes the holder's reply on a resolved request and refuses one
+  // on a request that ended without a teacher (#222, user decision 2026-10-16).
+  it.each(['pending', 'assigned', 'in_progress', 'resolved'])('offers the reply box when it is %s', (status) => {
+    detail.status = status
+    page()
+    expect(screen.getAllByText('Antwort der Lehrperson').length).toBeGreaterThan(0)
+    expect(screen.getByRole('button', { name: 'Antwort senden' })).toBeInTheDocument()
+  })
+
+  it.each(['withdrawn', 'expired'])('offers no reply box once it is %s', (status) => {
+    detail.status = status
+    page()
+    expect(screen.queryAllByText('Antwort der Lehrperson')).toHaveLength(0)
+    expect(screen.queryByRole('button', { name: 'Antwort senden' })).toBeNull()
+  })
+})
+
+describe('which help requests take a teacher reply (#222)', () => {
+  it('is every open one and a resolved one, not one that ended without a teacher', () => {
+    const statuses: TeacherHelpStatus[] = ['pending', 'assigned', 'in_progress', 'resolved', 'cancelled', 'withdrawn', 'expired']
+    expect(statuses.filter(acceptsTeacherReply)).toEqual(['pending', 'assigned', 'in_progress', 'resolved'])
+    // Not the open check: that one leaves resolved out, and the reply box with it.
+    expect(statuses.filter(isOpenHelpRequest)).not.toContain('resolved')
+    expect(acceptsTeacherReply(undefined)).toBe(false)
   })
 })
 

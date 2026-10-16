@@ -94,7 +94,6 @@
     "pending": "En attente",
     "resolvedToday": "Terminées aujourd’hui",
     "averageResponse": "Première réponse moyenne",
-    "minutes": "{{count}} min",
     "filterLabel": "Filtrer les demandes",
     "all": "Toutes",
     "empty": "Aucune demande d’accompagnement pour le moment.",

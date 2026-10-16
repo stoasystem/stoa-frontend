@@ -12,6 +12,8 @@ const teacherHelpStatusLabels: LabelMap = {
   in_progress: 'In progress',
   resolved: 'Resolved',
   cancelled: 'Cancelled',
+  withdrawn: 'Withdrawn',
+  expired: 'Expired',
 }
 
 const supportTicketStatusLabels: LabelMap = {
@@ -182,15 +184,23 @@ export function getCurriculumTopicLabel(label: string, t: TFunction) {
 }
 
 /**
- * A span of minutes in words. Minutes up to an hour, then hours, then days
- * once two days have passed: a response-time badge printed the raw figure and
- * read "Breached 6576m / 30m".
+ * A span of minutes in words, at most two units: minutes up to an hour, then
+ * hours and minutes, then days and hours ("4 Tage 13 Stunden"). Teacher
+ * figures printed the raw count and read "Breached 6576m / 30m" and
+ * "6576 Min." (#223).
  */
 export function formatMinutes(minutes: number, t: TFunction) {
   const total = Math.max(0, Math.round(minutes))
-  if (total < 60) return t('common:duration.minutes', { count: total })
-  if (total < 2880) return t('common:duration.hours', { count: Math.round(total / 60) })
-  return t('common:duration.days', { count: Math.round(total / 1440) })
+  const say = (unit: 'minutes' | 'hours' | 'days', count: number) =>
+    t(`common:duration.${unit}`, { count })
+  if (total < 60) return say('minutes', total)
+  if (total < 1440) {
+    const rest = total % 60
+    return rest ? `${say('hours', Math.floor(total / 60))} ${say('minutes', rest)}` : say('hours', total / 60)
+  }
+  const rest = Math.floor((total % 1440) / 60)
+  const days = say('days', Math.floor(total / 1440))
+  return rest ? `${days} ${say('hours', rest)}` : days
 }
 
 export function getRecommendationRationale(rationale: string, t: TFunction) {

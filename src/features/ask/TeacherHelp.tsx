@@ -14,6 +14,8 @@ const PILL_TONE: Record<TeacherHelpStatus, PillTone> = {
   in_progress: 'green',
   resolved: 'neutral',
   cancelled: 'neutral',
+  withdrawn: 'neutral',
+  expired: 'neutral',
 }
 
 const TILE_TONE: Record<TeacherHelpStatus, string> = {
@@ -22,6 +24,8 @@ const TILE_TONE: Record<TeacherHelpStatus, string> = {
   in_progress: 'bg-green-tint text-green',
   resolved: 'bg-fill text-pill-neutral',
   cancelled: 'bg-fill text-pill-neutral',
+  withdrawn: 'bg-fill text-pill-neutral',
+  expired: 'bg-fill text-pill-neutral',
 }
 
 /**

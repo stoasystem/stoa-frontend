@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Stats } from '@/components/base'
+import { formatMinutes } from '@/lib/displayLabels'
 import type { TeacherStats } from '@/types/teacher'
 
 const fallbackStats: TeacherStats = {
@@ -19,7 +20,7 @@ export function TeacherStatsCards({ stats = fallbackStats }: { stats?: TeacherSt
         { key: 'resolved', value: stats.resolvedToday, label: t('requests.resolvedToday') },
         {
           key: 'response',
-          value: t('requests.minutes', { count: stats.averageResponseTimeMinutes }),
+          value: formatMinutes(stats.averageResponseTimeMinutes, t),
           label: t('requests.averageResponse'),
         },
       ]}

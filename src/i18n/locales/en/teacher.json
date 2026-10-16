@@ -94,7 +94,6 @@
     "pending": "Pending",
     "resolvedToday": "Resolved today",
     "averageResponse": "Average first response",
-    "minutes": "{{count}} min",
     "filterLabel": "Filter requests",
     "all": "All",
     "empty": "No teacher support requests are available.",
