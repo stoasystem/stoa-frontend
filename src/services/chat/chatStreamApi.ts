@@ -75,7 +75,11 @@ export async function streamConversationMessage({
     )
     // The demo answers whatever the server says; it has no session to renew.
     if (response.status !== 401 || allowDemoFallback) return response
-    return (await answerUnauthorized(token, retried, (fresh) => send(fresh, true))) ?? response
+    const answered = answerUnauthorized(token, retried, (fresh) => send(fresh, true))
+    if (!answered) return response
+    // Nothing will read this answer; let its connection go before the retry.
+    void response.body?.cancel().catch(() => {})
+    return answered
   }
   let response: Response
 

@@ -159,6 +159,22 @@ describe('an expired token on the stream', () => {
     expect(assign).toHaveBeenCalledWith('/login')
   })
 
+  it('in a pinned tab, a refusal ends only that tab\'s session and leaves the shared one', async () => {
+    pinnedToChild()
+    const assign = stubLocation()
+    streamAccepts('never')
+    refreshAnswers(() => HttpResponse.json({ detail: 'refused' }, { status: 401 }))
+
+    await expect(ask()).rejects.toThrow('session_ended')
+
+    expect(streamAuth).toEqual(['Bearer child-access'])
+    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
+    expect(localStorage.getItem(TOKEN_KEY)).toBe('parent-access')
+    expect(localStorage.getItem(SHARED_REFRESH)).toBe('parent-refresh')
+    expect(assign).toHaveBeenCalledWith('/login')
+  })
+
   it('ends the session when the new token is turned away too, without looping', async () => {
     onShared()
     const assign = stubLocation()

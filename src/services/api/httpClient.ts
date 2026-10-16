@@ -225,6 +225,7 @@ httpClient.interceptors.response.use(
       // looping: the second 401 falls through to signing out.
       const config = error.config as (typeof error.config & { _retried?: boolean }) | undefined
       const answered = answerUnauthorized(tokenSent(config), !config || Boolean(config._retried), () => {
+        // Not reached (no config counts as retried); it narrows the type.
         if (!config) return endSession()
         config._retried = true
         return httpClient.request(config)
