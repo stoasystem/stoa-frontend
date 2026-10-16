@@ -77,6 +77,8 @@ export function accountMayBeHeld(email: string | undefined | null): boolean {
 }
 
 export type HeldSession = {
+  /** The account's id, when it was known as the session was saved. */
+  id?: string
   email: string
   role: string
   name: string
@@ -202,6 +204,23 @@ export function completeHeldSession(accessToken: string, refreshToken: string): 
     if (changed) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
   } catch {
     // Unreadable or blocked storage holds no entry to complete.
+  }
+}
+
+/**
+ * Drop the held entry whose refresh token the server just refused. Only that
+ * entry, and only while it still holds that token: one the account has since
+ * signed in again under keeps its new session (#217).
+ */
+export function forgetHeldRefreshToken(refreshToken: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    const next = raw.filter((entry) => entry?.refreshToken !== refreshToken)
+    if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing this could offer anyone.
   }
 }
 

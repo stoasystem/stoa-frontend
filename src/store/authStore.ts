@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { endRefreshToken } from '@/services/auth/sessionRefresh'
 import { pinTabToSession, TAB_TOKEN_KEY, tabToken } from '@/lib/devSessions'
-import { bindTab, initializeTab, signOutTab } from '@/lib/tabAccount'
+import { bindTab, initializeTab, rememberTabAccount, signOutTab, type TabSignOut } from '@/lib/tabAccount'
 import type { User, UserRole } from '@/types/user'
 
 export type CurrentUser = User
@@ -91,7 +91,11 @@ type AuthState = {
   /** A renewed access token for the session already held, read account or not. */
   updateAccessToken: (accessToken: string) => void
   setUser: (user: CurrentUser) => void
-  clearAuth: () => void
+  /**
+   * End this tab's session. A plain sign-out by default; an ending the reader
+   * did not ask for says so, and is remembered with whose it was (#217).
+   */
+  clearAuth: (ending?: TabSignOut) => void
   hydrateFromStorage: () => void
 }
 
@@ -112,7 +116,7 @@ export const useAuthStore = create<AuthState>((set) => {
       // the next 401 and turn the tab back into that account (#208). A renewal
       // goes through updateAccessToken and keeps its refresh token there.
       // This tab only: no other tab's account changes because of it (#216).
-      bindTab(accessToken, refreshToken)
+      bindTab(accessToken, refreshToken, user)
       set({ user: normalizeCurrentUser(user), accessToken, isAuthenticated: true })
     },
     updateAccessToken: (accessToken) => {
@@ -124,14 +128,17 @@ export const useAuthStore = create<AuthState>((set) => {
       set({ accessToken, isAuthenticated: true })
     },
     setUser: (user) => {
+      // The account this tab's session belongs to, for the sign-in page to
+      // name if the session ends (#217).
+      if (tabToken()) rememberTabAccount(user)
       set({ user: normalizeCurrentUser(user), isAuthenticated: true })
     },
-    clearAuth: () => {
+    clearAuth: (ending) => {
       // Only the session this tab is using ends, and the tab stays signed
       // out: it does not fall back on a saved account, not after a refresh
       // either (#216, #217). Other tabs keep theirs.
       endRefreshToken()
-      signOutTab()
+      signOutTab(ending)
       set({ user: null, accessToken: null, isAuthenticated: false })
     },
     hydrateFromStorage: () => {

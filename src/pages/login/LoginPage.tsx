@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, type RefObject } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AccountChooser } from '@/components/auth/AccountChooser'
+import { Button } from '@/components/base/Button'
 import { LoginForm } from '@/components/auth/LoginForm'
 import { TOP_BAR, TOP_BAR_PHONE } from '@/components/base/sizes'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
@@ -9,6 +10,7 @@ import { StoaLogo } from '@/components/common/StoaLogo'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
 import { stoaContactInfo } from '@/lib/brandContact'
 import { LoginNebula } from '@/pages/login/LoginNebula'
+import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
 
 /*
  * The sign-in page (#53): candidate 04, "the night observatory", redrawn with
@@ -25,8 +27,19 @@ import { LoginNebula } from '@/pages/login/LoginNebula'
  * Signing in itself is LoginForm's, unchanged; this page only places it.
  * A new tab with several saved accounts gets the account chooser in the
  * form's place first (#216); its "sign in with another account" brings the
- * form back.
+ * form back. A tab whose session ended says whose it was and has the form
+ * ready for that account, with the same way out to another (#217).
  */
+
+export type LoginMode =
+  | { kind: 'signIn' }
+  | { kind: 'choose'; onSignInOther: () => void }
+  | {
+      kind: 'reauth'
+      reason: Exclude<SignOutReason, 'signed-out'>
+      account: TabAccount
+      onSignInOther: () => void
+    }
 
 // A quiet link (the footer) is caption white and turns white on hover.
 const linkClass =
@@ -59,8 +72,18 @@ function usePaintDocumentWithSky(surface: RefObject<HTMLElement | null>) {
   }, [surface])
 }
 
-export function LoginPage({ onSignInOther }: { onSignInOther?: () => void } = {}) {
-  const choosing = Boolean(onSignInOther)
+export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = {}) {
+  const heading =
+    mode.kind === 'choose'
+      ? { eyebrow: 'auth:chooser.eyebrow', title: 'auth:chooser.title', subtitle: 'auth:chooser.subtitle' }
+      : mode.kind === 'reauth'
+        ? {
+            eyebrow: 'auth:reauth.eyebrow',
+            title: mode.reason === 'expired' ? 'auth:reauth.expiredTitle' : 'auth:reauth.elsewhereTitle',
+            subtitle: 'auth:reauth.subtitle',
+          }
+        : { eyebrow: 'auth:login.eyebrow', title: 'auth:login.title', subtitle: 'auth:login.subtitle' }
+  const name = mode.kind === 'reauth' ? (mode.account.name ?? mode.account.email) : undefined
   const { t } = useTranslation(['auth', 'common'])
   const bar = useMediaQuery(WIDE_LOGIN_QUERY) ? TOP_BAR : TOP_BAR_PHONE
   const surface = useRef<HTMLDivElement>(null)
@@ -90,20 +113,31 @@ export function LoginPage({ onSignInOther }: { onSignInOther?: () => void } = {}
       <main className="mx-auto grid w-full max-w-[1120px] flex-1 content-start gap-10 px-4 pt-4 pb-10 md:grid-cols-[minmax(0,360px)_minmax(0,1fr)] md:content-center md:items-center md:gap-[clamp(48px,8vw,120px)] md:px-12 md:py-9">
         <section aria-labelledby="login-title" className="w-full max-w-[420px] md:max-w-none">
           <p className="m-0 text-[13px] leading-[1.3] font-medium tracking-[0.4px] text-[color:var(--on-sky-text-caption)] uppercase">
-            {t(choosing ? 'auth:chooser.eyebrow' : 'auth:login.eyebrow')}
+            {t(heading.eyebrow)}
           </p>
           <h1
             id="login-title"
             className="mt-3 mb-0 text-[color:var(--on-sky-text)]"
             style={{ font: 'var(--t-large)', letterSpacing: 'var(--t-large-tracking)' }}
           >
-            {t(choosing ? 'auth:chooser.title' : 'auth:login.title')}
+            {t(heading.title, { name })}
           </h1>
           <p className="mt-3 mb-0 text-[17px] leading-[1.45] text-[color:var(--on-sky-text-body)]">
-            {t(choosing ? 'auth:chooser.subtitle' : 'auth:login.subtitle')}
+            {t(heading.subtitle)}
           </p>
           <div className="mt-8">
-            {onSignInOther ? <AccountChooser onSignInOther={onSignInOther} /> : <LoginForm />}
+            {mode.kind === 'choose' ? (
+              <AccountChooser onSignInOther={mode.onSignInOther} />
+            ) : mode.kind === 'reauth' ? (
+              <div className="space-y-3">
+                <LoginForm initialEmail={mode.account.email} />
+                <Button type="button" variant="onSkyPlain" fullWidth onClick={mode.onSignInOther}>
+                  {t('auth:chooser.signInOther')}
+                </Button>
+              </div>
+            ) : (
+              <LoginForm />
+            )}
           </div>
         </section>
 

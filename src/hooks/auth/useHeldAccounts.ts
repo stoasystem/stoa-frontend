@@ -12,7 +12,9 @@
  */
 import { useCallback, useState } from 'react'
 import {
+  forgetHeldRefreshToken,
   forgetSession,
+  forgetSessionHolding,
   readSessions,
   rememberSession,
   sessionLiveness,
@@ -64,7 +66,12 @@ export function useHeldAccounts() {
           return
         }
         if (renewed.status !== 'renewed') {
-          setSessions(forgetSession(session.email))
+          // Only the entry still holding the refused session: the account
+          // may have signed in again in another tab meanwhile, and that
+          // session is not over (#217).
+          if (session.refreshToken) forgetHeldRefreshToken(session.refreshToken)
+          else forgetSessionHolding(session.accessToken)
+          setSessions(readSessions())
           setProblem('expired')
           return
         }
@@ -86,7 +93,7 @@ export function useHeldAccounts() {
       // ends in an hour; an account held without one empties the tab's,
       // rather than keeping the previous account's for the next renewal to
       // spend (#205 audit).
-      bindTab(accessToken, session.refreshToken)
+      bindTab(accessToken, session.refreshToken, session)
       // A full load, not a store update: telling the store about the new role
       // while the old role's page is mounted lets that page's guard reject it
       // and land on the forbidden page. The load drops the previous account's

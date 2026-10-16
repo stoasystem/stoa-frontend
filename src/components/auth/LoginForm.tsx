@@ -20,9 +20,9 @@ import { isEmailVerificationRequiredError } from '@/services/auth/authApi'
  * which exist only inside one. What it does -- validation, the request, the
  * verification hand-off, the errors -- is unchanged from before the redesign.
  */
-export function LoginForm() {
+export function LoginForm({ initialEmail = '' }: { initialEmail?: string } = {}) {
   const { t } = useTranslation(['auth', 'common', 'errors'])
-  const [email, setEmail] = useState('')
+  const [email, setEmail] = useState(initialEmail)
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({})
   const loginMutation = useLoginMutation()

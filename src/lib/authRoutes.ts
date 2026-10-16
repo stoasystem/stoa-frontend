@@ -121,3 +121,16 @@ export function getPostLoginPath(
   // the redirect would resolve to wherever an empty path happens to point.
   return (getDefaultRouteForRole(user.role) as string | undefined) ?? FORBIDDEN_PATH
 }
+
+/**
+ * Where an account that signed in again after its tab's session ended goes:
+ * back to the page the tab was on, if that account may see it, else home
+ * (#217). Only for the same account, which the caller decides.
+ */
+export function getReturnPath(
+  user: { role: UserRole; mustChangePassword?: boolean },
+  returnTo: string | undefined,
+) {
+  if (user.mustChangePassword) return CHANGE_PASSWORD_PATH
+  return resolveDestination(returnTo, user.role) ?? getDefaultRouteForRole(user.role)
+}

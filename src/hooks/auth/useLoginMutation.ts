@@ -39,6 +39,7 @@ export function useLoginMutation() {
       // offered you nothing. The refresh token travels with it: without one
       // the held account is over an hour later, whatever anyone does with it.
       rememberSession({
+        id: data.user.id,
         email: data.user.email,
         role: data.user.role,
         name: data.user.name,
