@@ -9,7 +9,9 @@
  * The refresh token is stored beside the access token and under the same
  * rules: a tab pinned to one account keeps its own, everyone else shares the
  * browser's. It is a credential — it is never logged, never put in a URL, and
- * it is cleared whenever the session it belongs to is.
+ * it is cleared whenever the session it belongs to is, and only then: a
+ * pinned tab whose session ends clears its own, never the one the rest of the
+ * browser shares (#211).
  *
  * One refresh runs at a time. A page that fires six requests into an expired
  * token must not send six refreshes: the first claims the attempt and the
@@ -70,15 +72,6 @@ export function replaceRefreshToken(token: string | null | undefined): void {
     else store.removeItem(key)
   } catch {
     // Blocked storage holds no token to leave behind.
-  }
-}
-
-export function forgetRefreshToken(): void {
-  try {
-    sessionStorage.removeItem(TAB_REFRESH_KEY)
-    localStorage.removeItem(REFRESH_KEY)
-  } catch {
-    // Nothing to clear if storage is blocked.
   }
 }
 
@@ -173,7 +166,10 @@ async function attempt(): Promise<Renewal | null> {
     // A refused refresh token will never be accepted again; keeping it would
     // make every later 401 wait on a request that cannot succeed. A network
     // failure is not a refusal: that token stays, and the next 401 tries again.
-    forgetRefreshToken()
+    // Only the refused one goes: a pinned tab's refusal leaves the shared token
+    // other tabs use, and a session that replaced this one meanwhile keeps its
+    // own (#211).
+    if (storedRefreshToken() === refreshToken) replaceRefreshToken(null)
     return null
   }
   if (outcome.status !== 'renewed') return null

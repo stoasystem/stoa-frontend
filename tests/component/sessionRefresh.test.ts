@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  forgetRefreshToken,
   refreshAccessToken,
   rememberRefreshToken,
+  replaceRefreshToken,
   storedRefreshToken,
 } from '@/services/auth/sessionRefresh'
 import { TAB_TOKEN_KEY } from '@/lib/devSessions'
@@ -51,15 +51,15 @@ describe('where the refresh token is kept', () => {
     expect(storedRefreshToken()).toBe('r-1')
   })
 
-  it('clears both when the session ends', () => {
+  it('clears only this tab’s place when its session ends', () => {
+    rememberRefreshToken('r-shared')
     sessionStorage.setItem(TAB_TOKEN_KEY, 'a')
     rememberRefreshToken('r-tab')
-    sessionStorage.removeItem(TAB_TOKEN_KEY)
-    rememberRefreshToken('r-shared')
 
-    forgetRefreshToken()
+    replaceRefreshToken(null)
 
     expect(storedRefreshToken()).toBeNull()
+    expect(localStorage.getItem('stoa_refresh_token')).toBe('r-shared')
   })
 })
 
@@ -70,7 +70,7 @@ describe('exchanging it', () => {
     vi.mocked(fetch).mockReturnValue(new Promise<Response>((resolve) => { answer = resolve }))
 
     const renewed = refreshAccessToken()
-    forgetRefreshToken()
+    replaceRefreshToken(null)
     answer(ok({ accessToken: 'a-2', refreshToken: 'r-2' }))
 
     await expect(renewed).resolves.toBeNull()
@@ -110,6 +110,30 @@ describe('exchanging it', () => {
 
     await expect(refreshAccessToken()).resolves.toBeNull()
     expect(storedRefreshToken()).toBeNull()
+  })
+
+  it('throws away only a pinned tab’s own when the server refuses it (#211)', async () => {
+    rememberRefreshToken('r-shared')
+    sessionStorage.setItem(TAB_TOKEN_KEY, 'a-tab')
+    rememberRefreshToken('r-tab')
+    vi.mocked(fetch).mockResolvedValue(refused(401))
+
+    await expect(refreshAccessToken()).resolves.toBeNull()
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBeNull()
+    expect(localStorage.getItem('stoa_refresh_token')).toBe('r-shared')
+  })
+
+  it('keeps the refresh token of a session that replaced the refused one meanwhile', async () => {
+    rememberRefreshToken('r-1')
+    let answer: (value: Response) => void = () => undefined
+    vi.mocked(fetch).mockReturnValue(new Promise<Response>((resolve) => { answer = resolve }))
+
+    const renewed = refreshAccessToken()
+    replaceRefreshToken('r-next-account')
+    answer(refused(401))
+
+    await expect(renewed).resolves.toBeNull()
+    expect(storedRefreshToken()).toBe('r-next-account')
   })
 
   it('keeps it when the network failed, which is not a refusal', async () => {
