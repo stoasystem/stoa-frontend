@@ -105,19 +105,19 @@ function tokenSent(config?: { headers?: unknown }): string | null {
 }
 
 /**
- * The session is over: drop it and go to sign-in.
- *
- * A tab pinned to one test role fails on that role's own token; clearing drops
- * the pin and leaves the session the rest of the browser shares, refresh token
- * included (#211): clearAuth clears only this tab's.
- */
-/**
  * The code a request fails with when its session could not be renewed because
  * the server was out of reach. The session is intact; trying again later is
  * the right answer, signing in again is not.
  */
 export const SESSION_UNREACHABLE = 'session_unreachable'
 
+/**
+ * The session is over: drop it and go to sign-in.
+ *
+ * A tab pinned to one test role fails on that role's own token; clearing drops
+ * the pin and leaves the session the rest of the browser shares, refresh token
+ * included (#211): clearAuth clears only this tab's.
+ */
 function endSession(): never | Promise<never> {
   useAuthStore.getState().clearAuth()
   if (window.location.pathname !== '/login') {

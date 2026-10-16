@@ -85,6 +85,18 @@ const failures: Array<[string, () => void]> = [
       return HttpResponse.json({ detail: 'deploying' }, { status: 503 })
     }))
   }],
+  ['answers 429', () => {
+    mswServer.use(http.post('https://api.test/auth/refresh', () => {
+      refreshCalls += 1
+      return HttpResponse.json({ detail: 'slow down' }, { status: 429 })
+    }))
+  }],
+  ['answers 200 with no access token', () => {
+    mswServer.use(http.post('https://api.test/auth/refresh', () => {
+      refreshCalls += 1
+      return HttpResponse.json({})
+    }))
+  }],
   ['fails on the network', () => {
     mswServer.use(http.post('https://api.test/auth/refresh', () => {
       refreshCalls += 1
