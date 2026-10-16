@@ -10,8 +10,8 @@ import type { NotificationEvent } from '@/types/notification'
  *
  * A notification is shown in the reader's language only when its English is
  * exactly one of those sentences, so the translation says what the backend
- * said. Anything else - an admin event, a sentence the backend has since
- * reworded - is shown as the backend sent it, rather than guessed at.
+ * said. Anything else - a sentence the backend has since reworded - is shown
+ * as the backend sent it, rather than guessed at.
  *
  * The English below is never shown: it is the backend's wording, matched to
  * pick a translation, and lives here rather than beside the bell so the
@@ -37,6 +37,13 @@ const KNOWN: Record<string, Copy[]> = {
     { key: 'helpExpiredReturned', title: 'No teacher was available', summary: "Your request for a teacher expired. This week's teacher help was given back." },
     { key: 'helpExpired', title: 'No teacher was available', summary: 'Your request for a teacher expired.' },
   ],
+  // The one admin event the backend still writes in English rather than from
+  // its catalogue, addressed to the admin role as a whole (#220).
+  'moderation_case_update:moderation_case': (['Low', 'Medium', 'High'] as const).map((severity) => ({
+    key: `moderationCreated${severity}`,
+    title: 'New moderation case',
+    summary: `${severity.toLowerCase()} moderation case reported.`,
+  })),
   'teacher_requested:question': [
     {
       key: 'helpRequested',

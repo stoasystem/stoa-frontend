@@ -21,11 +21,19 @@ import type { NotificationEvent } from '@/types/notification'
 
 // The panel's one line about what arrives here. The student's is the default:
 // a teacher read "Neues zu deinen Fragen, Übungen…" about questions they never
-// asked, in the "du" a teacher is not addressed with (#162).
+// asked, in the "du" a teacher is not addressed with (#162), and so did the
+// organisation and school roles (#221).
+const ROLES_WITH_OWN_SUBTITLE = new Set([
+  'teacher',
+  'parent',
+  'admin',
+  'organization_admin',
+  'school_teacher',
+  'school_viewer',
+])
+
 function subtitleKey(role: string | undefined): string {
-  return role === 'teacher' || role === 'parent' || role === 'admin'
-    ? `notifications.subtitleByRole.${role}`
-    : 'notifications.subtitle'
+  return role && ROLES_WITH_OWN_SUBTITLE.has(role) ? `notifications.subtitleByRole.${role}` : 'notifications.subtitle'
 }
 
 const connectionKeys: Record<RealtimeNotificationStatus, string> = {

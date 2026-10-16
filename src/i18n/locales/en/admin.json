@@ -609,14 +609,30 @@
     "unavailable": "Operational notifications are unavailable.",
     "empty": "No operational notification events yet.",
     "eventTypes": {
+      "assignment_update": "Assignment update",
+      "learning_profile_update": "Learning profile update",
+      "moderation_case_update": "Moderation case update",
+      "subscription_request_update": "Subscription request update",
       "teacher_help_expired": "Teacher help expired",
       "teacher_reply": "Teacher reply",
       "teacher_requested": "Teacher requested",
-      "teacher_takeover": "Taken over by a teacher"
+      "teacher_takeover": "Taken over by a teacher",
+      "weekly_report_update": "Weekly report update"
     },
     "targetTypes": {
+      "assignment": "Assignment",
       "conversation": "Conversation",
-      "question": "Question"
-    }
+      "learning_profile": "Learning profile",
+      "moderation_case": "Moderation case",
+      "question": "Question",
+      "recommendation": "Recommendation",
+      "report": "Report",
+      "subscription_request": "Subscription request",
+      "system_status": "System status",
+      "weekly_report": "Weekly report"
+    },
+    "unknownEventType": "Other event",
+    "unknownTargetType": "Other target",
+    "unknownStatus": "Unknown status"
   }
 }
