@@ -109,7 +109,23 @@ const routes: Array<[method: string, pattern: string, handler: Handler]> = [
     demoHeldAccounts.some((account) => account.accessToken === token)
       ? refuse(401, 'token_invalid', 'The session has expired.')
       : demo().demoStudent],
-  ['POST', '/auth/login', () => ({ accessToken: 'design-preview', user: demo().demoStudent, onboardingStatus: 'completed' })],
+  // Login review: #fail refuses credentials; the unverified demo address opens
+  // the existing verification panel. These replies never contact an identity provider.
+  ['POST', '/auth/login', ({ body }) =>
+    field<string>(body, 'password')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(401, 'invalid_credentials', 'Check your email and password, then try signing in again.')
+      : field<string>(body, 'email') === 'unverified@example.com'
+        ? refuse(403, 'email_verification_required', 'Verify your email, then sign in again.')
+        : { accessToken: 'design-preview', user: demo().demoStudent, onboardingStatus: 'completed' }],
+  ['POST', '/auth/email-verification/resend', () => ({
+    status: 'sent', emailVerificationStatus: 'pending_verification', emailVerificationRequired: true,
+    accountActivationStatus: 'pending_email_verification', resendAllowed: true,
+  })],
+  ['POST', '/auth/email-verification/confirm', ({ body }) =>
+    field<string>(body, 'confirmationCode')?.includes(DEMO_FAIL_ONCE)
+      ? refuse(400, 'verification_code_invalid', 'Check the verification code and try again.')
+      : { status: 'confirmed', emailVerificationStatus: 'verified', emailVerificationRequired: false,
+          accountActivationStatus: 'active', resendAllowed: false }],
   ['POST', '/auth/logout', () => ({ ok: true })],
   ['PATCH', '/auth/me/preferences/locale', ({ body }) => {
     const asked = field<string>(body, 'preferredLocale')
