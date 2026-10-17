@@ -233,6 +233,10 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
     // that first caller still takes the ordinary path below.)
     const renewedByThisRenewal =
       token !== null && token !== sent.token && currentSessionToken() === token
+    // The server refused this refresh token: the saved account holding it is
+    // over too, whoever this tab is by now. Only that one, and only while it
+    // still holds it (#217, tab-account audit F3).
+    if (renewal.status === 'ended' && renewal.refused) forgetHeldRefreshToken(renewal.refused)
     // Signed out, or another account signed in, while the renewal was in
     // flight: the token it brings back is the old session's, and storing
     // it would sign that account straight back in (#34, #172 audit).
@@ -267,12 +271,7 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
     if (renewal.status === 'unreachable') {
       return Promise.reject(new ApiError('The session could not be renewed right now.', { code: SESSION_UNREACHABLE }))
     }
-    if (!token) {
-      // The server refused this refresh token: the saved account holding it
-      // is over too. Only that one, and only while it still holds it (#217).
-      if (renewal.status === 'ended' && renewal.refused) forgetHeldRefreshToken(renewal.refused)
-      return endSession()
-    }
+    if (!token) return endSession()
     // The first caller stores the token and moves the held entry; the
     // others find both done.
     if (!renewedByThisRenewal) {

@@ -282,17 +282,33 @@ export async function sessionLiveness(
   }
 }
 
-/** This tab's access token: the session it is on, whatever other tabs hold. */
+/**
+ * This tab's access token: the session it is on, whatever other tabs hold.
+ * Storage the browser refuses (all site data blocked) holds no session: the
+ * tab is signed out rather than the app failing to start (tab-account audit).
+ */
 export function pinTabToSession(accessToken: string): void {
-  sessionStorage.setItem(TAB_TOKEN_KEY, accessToken)
+  try {
+    sessionStorage.setItem(TAB_TOKEN_KEY, accessToken)
+  } catch {
+    // Nothing stored, nothing sent.
+  }
 }
 
 export function tabToken(): string | null {
   if (typeof window === 'undefined') return null
-  return sessionStorage.getItem(TAB_TOKEN_KEY)
+  try {
+    return sessionStorage.getItem(TAB_TOKEN_KEY)
+  } catch {
+    return null
+  }
 }
 
 export function releaseTab(): void {
   if (typeof window === 'undefined') return
-  sessionStorage.removeItem(TAB_TOKEN_KEY)
+  try {
+    sessionStorage.removeItem(TAB_TOKEN_KEY)
+  } catch {
+    // Nothing was stored.
+  }
 }
