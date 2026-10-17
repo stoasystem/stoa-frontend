@@ -10,7 +10,7 @@
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { pinTabToSession, TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { pinTabToSession, readSessions, rememberSession, TAB_TOKEN_KEY } from '@/lib/devSessions'
 import { SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { trackEvent } from '@/services/analytics/analyticsClient'
@@ -27,7 +27,6 @@ vi.mock('@/lib/env', () => ({
 }))
 
 const STREAM = 'https://api.test/conversations/c1/messages/stream'
-const SHARED_REFRESH = 'stoa_refresh_token'
 const TAB_REFRESH = 'stoa_tab_refresh_token'
 
 /** The Authorization header of every stream request, in order. */
@@ -70,18 +69,17 @@ function refreshAnswers(answer: () => Response | Promise<Response>) {
   )
 }
 
-/** Parent A is the browser's shared session; this tab is pinned to child B. */
+/** Parent A is saved in this browser, open in another tab; this tab is child B. */
 function pinnedToChild() {
-  localStorage.setItem(TOKEN_KEY, 'parent-access')
-  rememberRefreshToken('parent-refresh')
+  rememberSession({ email: 'a@test.stoaedu.ch', role: 'parent', name: 'A', accessToken: 'parent-access', refreshToken: 'parent-refresh' })
   pinTabToSession('child-access')
   rememberRefreshToken('child-refresh')
   useAuthStore.setState({ accessToken: 'child-access', isAuthenticated: true })
 }
 
-/** This tab shares the browser's session S. */
+/** This tab is on session S. */
 function onShared() {
-  localStorage.setItem(TOKEN_KEY, 's-access')
+  sessionStorage.setItem(TOKEN_KEY, 's-access')
   rememberRefreshToken('s-refresh')
   useAuthStore.setState({ accessToken: 's-access', isAuthenticated: true })
 }
@@ -101,7 +99,7 @@ function ask() {
 }
 
 describe('the account a pinned tab sends', () => {
-  it('asks a question with the pinned account\'s token, not the shared one', async () => {
+  it('asks a question with this tab\'s account\'s token, not the parent\'s', async () => {
     pinnedToChild()
     streamAccepts('child-access')
 
@@ -137,12 +135,11 @@ describe('an expired token on the stream', () => {
 
     expect(streamAuth).toEqual(['Bearer child-access', 'Bearer child-fresh'])
     expect(refreshCalls).toBe(1)
-    // The renewal is the pinned account's, kept in the tab; the shared session
-    // is untouched.
+    // The renewal is this tab's account's, kept in the tab; the parent's saved
+    // session is untouched.
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('child-fresh')
     expect(sessionStorage.getItem(TAB_REFRESH)).toBe('child-refresh-2')
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('parent-access')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('parent-refresh')
+    expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['parent-access', 'parent-refresh']])
   })
 
   it('ends the session when the renewal is refused', async () => {
@@ -154,12 +151,12 @@ describe('an expired token on the stream', () => {
     await expect(ask()).rejects.toThrow('session_ended')
 
     expect(streamAuth).toEqual(['Bearer s-access'])
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
-    expect(localStorage.getItem(SHARED_REFRESH)).toBeNull()
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
     expect(assign).toHaveBeenCalledWith('/login')
   })
 
-  it('in a pinned tab, a refusal ends only that tab\'s session and leaves the shared one', async () => {
+  it('a refusal ends only this tab\'s session and leaves the parent\'s saved one', async () => {
     pinnedToChild()
     const assign = stubLocation()
     streamAccepts('never')
@@ -170,8 +167,7 @@ describe('an expired token on the stream', () => {
     expect(streamAuth).toEqual(['Bearer child-access'])
     expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
     expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('parent-access')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('parent-refresh')
+    expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['parent-access', 'parent-refresh']])
     expect(assign).toHaveBeenCalledWith('/login')
   })
 
@@ -203,8 +199,8 @@ describe('an expired token on the stream', () => {
     await expect(ask()).rejects.toMatchObject({ code: SESSION_UNREACHABLE })
 
     expect(streamAuth).toEqual(['Bearer s-access'])
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('s-access')
-    expect(localStorage.getItem(SHARED_REFRESH)).toBe('s-refresh')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('s-access')
+    expect(sessionStorage.getItem(TAB_REFRESH)).toBe('s-refresh')
     expect(useAuthStore.getState().accessToken).toBe('s-access')
     expect(assign).not.toHaveBeenCalled()
   })
@@ -216,15 +212,15 @@ describe('an expired token on the stream', () => {
     refreshAnswers(() => {
       // Signed out and someone else signed in while the refresh was out:
       // their access token and their own refresh token, as sign-in stores.
-      localStorage.setItem(TOKEN_KEY, 'other-access')
-      localStorage.setItem(SHARED_REFRESH, 'other-refresh')
+      sessionStorage.setItem(TOKEN_KEY, 'other-access')
+      sessionStorage.setItem(TAB_REFRESH, 'other-refresh')
       return HttpResponse.json({ accessToken: 's-fresh' })
     })
 
     await expect(ask()).rejects.toMatchObject({ status: 401, code: 'session_changed' })
 
     expect(streamAuth).toEqual(['Bearer s-access'])
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('other-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('other-access')
     expect(assign).not.toHaveBeenCalled()
   })
 
@@ -235,8 +231,8 @@ describe('an expired token on the stream', () => {
       http.post(STREAM, ({ request }) => {
         streamAuth.push(request.headers.get('Authorization'))
         // The answer arrives after someone else signed in.
-        localStorage.setItem(TOKEN_KEY, 'other-access')
-        localStorage.setItem(SHARED_REFRESH, 'other-refresh')
+        sessionStorage.setItem(TOKEN_KEY, 'other-access')
+        sessionStorage.setItem(TAB_REFRESH, 'other-refresh')
         return HttpResponse.json({ detail: 'expired' }, { status: 401 })
       }),
     )
@@ -246,7 +242,7 @@ describe('an expired token on the stream', () => {
 
     expect(streamAuth).toEqual(['Bearer s-access'])
     expect(refreshCalls).toBe(0)
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('other-access')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('other-access')
     expect(assign).not.toHaveBeenCalled()
   })
 
@@ -260,9 +256,9 @@ describe('an expired token on the stream', () => {
         streamAuth.push(auth)
         if (first) {
           first = false
-          // Before this answer, another tab renewed the shared session: a new
+          // Before this answer, a renewal in this tab moved the session on: a new
           // access token, the same refresh token.
-          localStorage.setItem(TOKEN_KEY, 's-renewed')
+          sessionStorage.setItem(TOKEN_KEY, 's-renewed')
         }
         return auth === 'Bearer s-renewed'
           ? new HttpResponse(null, { status: 202 })
@@ -284,14 +280,14 @@ describe('an expired token on the stream', () => {
     streamAccepts('s-other-tab')
     refreshAnswers(() => {
       // The other tab's renewal of the same session finished first.
-      localStorage.setItem(TOKEN_KEY, 's-other-tab')
+      sessionStorage.setItem(TOKEN_KEY, 's-other-tab')
       return HttpResponse.json({ accessToken: 's-fresh' })
     })
 
     await expect(ask()).resolves.toBe('accepted')
 
     expect(streamAuth).toEqual(['Bearer s-access', 'Bearer s-other-tab'])
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('s-other-tab')
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBe('s-other-tab')
     expect(assign).not.toHaveBeenCalled()
   })
 })

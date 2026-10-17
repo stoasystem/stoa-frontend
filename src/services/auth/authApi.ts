@@ -2,7 +2,7 @@ import { ApiError, LOGOUT_PATH, httpClient } from '@/services/api/httpClient'
 import { LANGUAGE_STORAGE_KEY, isSupportedLanguage, type SupportedLanguage } from '@/i18n/languages'
 import type { AuthResponse, EmailVerificationResponse, LocalePreferenceResponse, User, UserRole } from '@/types/user'
 import type { RegisterPayload } from '@/types/onboarding'
-import { TOKEN_KEY } from '@/store/authStore'
+import { currentSessionToken } from '@/store/authStore'
 import { allowDemoFallback } from '@/lib/env'
 
 export type LoginRequest = {
@@ -170,7 +170,7 @@ export async function getCurrentUser() {
     return response.data
   } catch (error) {
     if (!allowDemoFallback) throw error
-    const token = localStorage.getItem(TOKEN_KEY)
+    const token = currentSessionToken()
     const role = token?.startsWith('demo:') ? token.replace('demo:', '') as UserRole : 'student'
     return createDemoUser(`${role}@test.com`, role)
   }

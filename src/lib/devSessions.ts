@@ -1,17 +1,18 @@
 /**
- * Holding several roles at once while testing.
+ * The saved accounts, and the place each tab keeps its own session.
  *
- * The access token lives in localStorage, which every tab of the origin
- * shares, so a developer comparing what a parent sees with what their child
- * sees had to sign out and back in between each look. A tab that has picked a
- * role keeps its token to itself instead, which lets four tabs hold four roles
- * at the same time.
+ * Each tab holds its account's tokens in sessionStorage, so four tabs can be
+ * four accounts at once and none of them changes because of another (#216,
+ * src/lib/tabAccount.ts). What localStorage holds is the list of saved
+ * accounts every tab can offer: a new tab starts from it, and the account
+ * menu switches to it.
  *
- * This is a convenience for the test accounts, not a security boundary: it
- * only decides what the interface offers. Every request is still authorised by
- * the token the server issued, and holding a session here requires signing
- * into that account first.
+ * Nothing here is a security boundary: it only decides what the interface
+ * offers. Every request is still authorised by the token the server issued,
+ * and holding a session here requires signing into that account first.
  */
+
+import { signInOf } from '@/lib/signIn'
 
 export const TAB_TOKEN_KEY = 'stoa_tab_access_token'
 const SESSIONS_KEY = 'stoa_dev_sessions'
@@ -78,6 +79,8 @@ export function accountMayBeHeld(email: string | undefined | null): boolean {
 }
 
 export type HeldSession = {
+  /** The account's id, when it was known as the session was saved. */
+  id?: string
   email: string
   role: string
   name: string
@@ -118,7 +121,11 @@ export function rememberSession(session: Omit<DevSession, 'savedAt'>): DevSessio
     (entry) => entry.email.toLowerCase() !== session.email.toLowerCase(),
   )
   const next = [...others, { ...session, savedAt: new Date().toISOString() }]
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Blocked storage saves nothing; the sign-in itself goes on.
+  }
   return next
 }
 
@@ -126,7 +133,11 @@ export function forgetSession(email: string): DevSession[] {
   const next = readSessions().filter(
     (entry) => entry.email.toLowerCase() !== email.toLowerCase(),
   )
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Blocked storage held nothing to forget.
+  }
   return next
 }
 
@@ -136,9 +147,8 @@ export function forgetSession(email: string): DevSession[] {
  * next person on this browser, and if the backend never confirmed the
  * revocation it would still work. Other held roles are left as they are:
  * signing out ends the session this tab used, not the ones held on purpose for
- * other accounts, just as a pinned tab's sign-out leaves the shared session
- * (#34). Each of those is ended by signing out in a tab that uses it, or by
- * Forget in the switcher.
+ * other accounts (#34). Each of those is ended by signing out in a tab that
+ * uses it, or by Forget in the switcher.
  */
 export function forgetSessionHolding(accessToken: string): void {
   if (typeof window === 'undefined') return
@@ -185,6 +195,62 @@ export function renewHeldSession(
   }
 }
 
+/**
+ * Give the held entry carrying `accessToken` this refresh token, if it has
+ * none. Nothing an entry already holds is replaced: the one-off move off the
+ * shared session (#216) may only fill what is missing.
+ */
+export function completeHeldSession(accessToken: string, refreshToken: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    let changed = false
+    const next = raw.map((entry) => {
+      if (entry?.accessToken !== accessToken || entry.refreshToken) return entry
+      changed = true
+      return { ...entry, refreshToken }
+    })
+    if (changed) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds no entry to complete.
+  }
+}
+
+/**
+ * Drop the held entry whose refresh token the server just refused. Only that
+ * entry, and only while it still holds that token: one the account has since
+ * signed in again under keeps its new session (#217).
+ */
+export function forgetHeldRefreshToken(refreshToken: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    const next = raw.filter((entry) => entry?.refreshToken !== refreshToken)
+    if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing this could offer anyone.
+  }
+}
+
+/**
+ * Drop every held entry of one sign-in, whatever access token it holds now: it
+ * was signed out, so none of them will be accepted again. Other sign-ins of
+ * the same account are left as they are (#232).
+ */
+export function forgetHeldSignIn(signIn: string): void {
+  if (typeof window === 'undefined') return
+  try {
+    const raw: unknown = JSON.parse(localStorage.getItem(SESSIONS_KEY) ?? '[]')
+    if (!Array.isArray(raw)) return
+    const next = raw.filter((entry) => signInOf(entry?.accessToken) !== signIn)
+    if (next.length !== raw.length) localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Unreadable or blocked storage holds nothing this could offer anyone.
+  }
+}
+
 /** Live, refused, or no answer — a failed check is not the same as a dead session. */
 export type SessionLiveness = 'live' | 'refused' | 'unknown'
 
@@ -224,17 +290,33 @@ export async function sessionLiveness(
   }
 }
 
-/** Pin this tab to one session, leaving other tabs on whatever they hold. */
+/**
+ * This tab's access token: the session it is on, whatever other tabs hold.
+ * Storage the browser refuses (all site data blocked) holds no session: the
+ * tab is signed out rather than the app failing to start (tab-account audit).
+ */
 export function pinTabToSession(accessToken: string): void {
-  sessionStorage.setItem(TAB_TOKEN_KEY, accessToken)
+  try {
+    sessionStorage.setItem(TAB_TOKEN_KEY, accessToken)
+  } catch {
+    // Nothing stored, nothing sent.
+  }
 }
 
 export function tabToken(): string | null {
   if (typeof window === 'undefined') return null
-  return sessionStorage.getItem(TAB_TOKEN_KEY)
+  try {
+    return sessionStorage.getItem(TAB_TOKEN_KEY)
+  } catch {
+    return null
+  }
 }
 
 export function releaseTab(): void {
   if (typeof window === 'undefined') return
-  sessionStorage.removeItem(TAB_TOKEN_KEY)
+  try {
+    sessionStorage.removeItem(TAB_TOKEN_KEY)
+  } catch {
+    // Nothing was stored.
+  }
 }

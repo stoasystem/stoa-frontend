@@ -511,11 +511,11 @@ describe('a message whose sender signed out meanwhile', () => {
 
   function signOutAndLetBeaIn() {
     clearPendingMessages()
-    localStorage.setItem('stoa_access_token', 'token-b')
+    sessionStorage.setItem('stoa_tab_access_token', 'token-b')
   }
 
   it('is neither kept in the tab nor sent once its ids are ready', async () => {
-    localStorage.setItem('stoa_access_token', 'token-a')
+    sessionStorage.setItem('stoa_tab_access_token', 'token-a')
     let idsReady: () => void = () => {}
     vi.mocked(commandMessageIds).mockImplementationOnce(
       (conversationId, key) =>
@@ -546,7 +546,7 @@ describe('a message whose sender signed out meanwhile', () => {
   })
 
   it('does not report its answer under the next session', async () => {
-    localStorage.setItem('stoa_access_token', 'token-a')
+    sessionStorage.setItem('stoa_tab_access_token', 'token-a')
     let finish: () => void = () => {}
     mockedStream.mockImplementationOnce(
       () => new Promise<StreamOutcome>((resolve) => {

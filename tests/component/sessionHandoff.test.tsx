@@ -15,7 +15,6 @@ import { queryClient } from '@/app/query/queryClient'
 import { useSignOut } from '@/hooks/auth/useSignOut'
 import { useCreateConversationMutation } from '@/hooks/chat/useCreateConversationMutation'
 import { PENDING_MESSAGE_KEY_PREFIX, rememberPendingMessage } from '@/lib/pendingChatMessages'
-import { TAB_TOKEN_KEY } from '@/lib/devSessions'
 import {
   CHECKOUT_OPERATION_STORAGE_KEY,
   createCheckoutSession,
@@ -48,7 +47,7 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 function renderAsAda() {
-  localStorage.setItem(TOKEN_KEY, 'token-a')
+  sessionStorage.setItem(TOKEN_KEY, 'token-a')
   useAuthStore.setState({ user: ada, accessToken: 'token-a', isAuthenticated: true })
   const { result } = renderHook(
     () => ({
@@ -74,7 +73,7 @@ async function adaLeavesAndBeaSignsIn(result: ReturnType<typeof renderAsAda>) {
 }
 
 function expectBeaStillSignedIn() {
-  expect(localStorage.getItem(TOKEN_KEY)).toBe('token-b')
+  expect(sessionStorage.getItem(TOKEN_KEY)).toBe('token-b')
   expect(useAuthStore.getState().accessToken).toBe('token-b')
   expect(useAuthStore.getState().user?.id).toBe('u-b')
   expect(useAuthStore.getState().isAuthenticated).toBe(true)
@@ -161,12 +160,12 @@ describe("the first person's late answers after the next one signed in", () => {
     // A's 401 says nothing about B's session, so B's refresh token is not
     // spent on it: the check after a renewal alone would still rotate it.
     expect(refreshes).not.toHaveBeenCalled()
-    expect(localStorage.getItem('stoa_refresh_token')).toBe('refresh-b')
+    expect(sessionStorage.getItem('stoa_tab_refresh_token')).toBe('refresh-b')
     expectBeaStillSignedIn()
   })
 
   it('does not sign anyone out with a 401 for a request sent before anyone signed in', async () => {
-    localStorage.removeItem(TOKEN_KEY)
+    sessionStorage.removeItem(TOKEN_KEY)
     const late = gate()
     const served = gate()
     mswServer.use(
@@ -199,7 +198,7 @@ describe("the first person's late answers after the next one signed in", () => {
 
     await expect(getConversations()).rejects.toBeTruthy()
 
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
+    expect(sessionStorage.getItem(TOKEN_KEY)).toBeNull()
     expect(useAuthStore.getState().isAuthenticated).toBe(false)
     expect(assign).toHaveBeenCalledWith('/login')
   })
@@ -336,49 +335,5 @@ describe("the first person's late answers after the next one signed in", () => {
       queryClient.fetchQuery({ queryKey: chatQueryKeys.conversations(), queryFn: getConversations }),
     ).resolves.toEqual({ items: [] })
     expectBeaStillSignedIn()
-  })
-})
-
-describe('signing out of a tab pinned to one role', () => {
-  beforeAll(() => mswServer.listen({ onUnhandledRequest: 'error' }))
-  afterEach(() => {
-    mswServer.resetHandlers()
-    queryClient.clear()
-    vi.restoreAllMocks()
-  })
-  afterAll(() => mswServer.close())
-  beforeEach(() => {
-    localStorage.clear()
-    sessionStorage.clear()
-  })
-
-  it('leaves the session the rest of the browser shares, which was never revoked', async () => {
-    const revoked: unknown[] = []
-    mswServer.use(
-      http.post('https://api.test/auth/logout', async ({ request }) => {
-        revoked.push(await request.json())
-        return new HttpResponse(null, { status: 204 })
-      }),
-    )
-    const result = renderAsAda()
-    sessionStorage.setItem(TAB_TOKEN_KEY, 'token-pinned')
-
-    await act(() => result.current.signOut())
-
-    expect(revoked).toEqual([{ access_token: 'token-pinned' }])
-    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
-    expect(localStorage.getItem(TOKEN_KEY)).toBe('token-a')
-    expect(useAuthStore.getState().isAuthenticated).toBe(false)
-  })
-
-  it('clears the shared session too when it is the very one this tab revoked', async () => {
-    mswServer.use(http.post('https://api.test/auth/logout', () => new HttpResponse(null, { status: 204 })))
-    const result = renderAsAda()
-    sessionStorage.setItem(TAB_TOKEN_KEY, 'token-a')
-
-    await act(() => result.current.signOut())
-
-    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBeNull()
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull()
   })
 })

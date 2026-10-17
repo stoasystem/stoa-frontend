@@ -7,40 +7,25 @@
  * when they come back to the tab.
  *
  * The refresh token is stored beside the access token and under the same
- * rules: a tab pinned to one account keeps its own, everyone else shares the
- * browser's. It is a credential — it is never logged, never put in a URL, and
- * it is cleared whenever the session it belongs to is, and only then: a
- * pinned tab whose session ends clears its own, never the one the rest of the
- * browser shares (#211).
+ * rule: each tab keeps its own, in sessionStorage, and no tab reads another's
+ * (#216). It is a credential — it is never logged, never put in a URL, and it
+ * is cleared whenever the session it belongs to is, and only then.
  *
  * One refresh runs at a time. A page that fires six requests into an expired
  * token must not send six refreshes: the first claims the attempt and the
  * others wait on it, so the token is replaced once and every caller retries
  * against the same new one.
  */
-import { TAB_TOKEN_KEY } from '@/lib/devSessions'
 import { apiBaseUrl } from '@/lib/env'
 
-const REFRESH_KEY = 'stoa_refresh_token'
-const TAB_REFRESH_KEY = 'stoa_tab_refresh_token'
+export const TAB_REFRESH_KEY = 'stoa_tab_refresh_token'
 /** Long enough for a slow network, short enough that a hung refresh still ends. */
 const REFRESH_TIMEOUT_MS = 10_000
 
-// The same test the store uses (`tabToken()` read as truthy), so a refresh
-// token always lands beside its access token (#209 audit).
-function tabPinned(): boolean {
-  try {
-    return Boolean(sessionStorage.getItem(TAB_TOKEN_KEY))
-  } catch {
-    return false
-  }
-}
-
-/** The refresh token for whichever session this tab is on. */
+/** The refresh token for the session this tab is on. */
 export function storedRefreshToken(): string | null {
   try {
-    if (tabPinned()) return sessionStorage.getItem(TAB_REFRESH_KEY)
-    return localStorage.getItem(REFRESH_KEY)
+    return sessionStorage.getItem(TAB_REFRESH_KEY)
   } catch {
     return null
   }
@@ -49,8 +34,7 @@ export function storedRefreshToken(): string | null {
 export function rememberRefreshToken(token: string | null | undefined): void {
   try {
     if (!token) return
-    if (tabPinned()) sessionStorage.setItem(TAB_REFRESH_KEY, token)
-    else localStorage.setItem(REFRESH_KEY, token)
+    sessionStorage.setItem(TAB_REFRESH_KEY, token)
   } catch {
     // Blocked storage costs the reader the longer session, nothing else.
   }
@@ -75,17 +59,14 @@ function forgetHandedOn(): void {
  * when there is none. Switching to a held account that has no refresh token
  * (one held before they were kept, or a sign-in that returned none) used to
  * leave the previous account's refresh token in the tab, and the next renewal
- * spent it (#205 audit). Only this tab's place is touched: clearing the shared
- * one would sign out the other tabs.
+ * spent it (#205 audit). Only this tab's place is touched.
  */
 export function replaceRefreshToken(token: string | null | undefined): void {
   // A new session, or none: the old one's renewals say nothing about it.
   forgetHandedOn()
   try {
-    const store = tabPinned() ? sessionStorage : localStorage
-    const key = tabPinned() ? TAB_REFRESH_KEY : REFRESH_KEY
-    if (token) store.setItem(key, token)
-    else store.removeItem(key)
+    if (token) sessionStorage.setItem(TAB_REFRESH_KEY, token)
+    else sessionStorage.removeItem(TAB_REFRESH_KEY)
   } catch {
     // Blocked storage holds no token to leave behind.
   }
@@ -93,21 +74,11 @@ export function replaceRefreshToken(token: string | null | undefined): void {
 
 /**
  * The session this tab is on has ended: empty this tab's place for a refresh
- * token. A pinned tab leaves the shared one to the other tabs (#211), unless
- * it is the very same token, the way the store treats the access token (#34).
- * A tab pinned to the shared account itself would otherwise sign out and leave
- * that account's refresh token behind, and the next 401 anywhere would renew
- * it (#212 audit).
+ * token. Other tabs keep theirs, even on the same sign-in; whether they end
+ * too is the sign-out's to say, not this.
  */
 export function endRefreshToken(): void {
-  try {
-    const own = storedRefreshToken()
-    const pinned = tabPinned()
-    replaceRefreshToken(null)
-    if (own && pinned && localStorage.getItem(REFRESH_KEY) === own) localStorage.removeItem(REFRESH_KEY)
-  } catch {
-    // Blocked storage holds no token to leave behind.
-  }
+  replaceRefreshToken(null)
 }
 
 /**
@@ -175,7 +146,8 @@ export type Renewal = { accessToken: string; spentRefreshToken: string; refreshT
  */
 export type SessionRenewal =
   | ({ status: 'renewed' } & Renewal)
-  | { status: 'ended' }
+  /** `refused`: the refresh token the server turned away, when that is why. */
+  | { status: 'ended'; refused?: string }
   | { status: 'unreachable' }
 
 
@@ -187,7 +159,7 @@ export type SessionRenewal =
  * The refresh token, not the access token, is what says which session this
  * is: a renewal replaces the access token and keeps the refresh token, while
  * signing in, signing out and switching accounts all replace or clear it.
- * Another tab's renewal of the shared session leaves it as it was (#219).
+ * Another tab's renewal of the same sign-in leaves it as it was (#219).
  */
 export function isSameSession(refreshToken: string | null | undefined): boolean {
   const now = storedRefreshToken()
@@ -245,14 +217,13 @@ async function attempt(): Promise<SessionRenewal> {
   if (outcome.status === 'refused') {
     // A refused refresh token will never be accepted again; keeping it would
     // make every later 401 wait on a request that cannot succeed.
-    // Only the refused one goes: a pinned tab's refusal leaves the shared token
-    // other tabs use, and a session that replaced this one meanwhile keeps its
-    // own (#211).
+    // Only the refused one goes: a session that replaced this one meanwhile
+    // keeps its own (#211).
     if (storedRefreshToken() === refreshToken) endRefreshToken()
-    return { status: 'ended' }
+    return { status: 'ended', refused: refreshToken }
   }
-  // A network failure is not a refusal: every token stays — this tab's, the
-  // shared one, the held accounts' — and the next 401 tries again (#214).
+  // A network failure is not a refusal: every token stays — this tab's and the
+  // held accounts' — and the next 401 tries again (#214).
   if (outcome.status === 'unreachable') return { status: 'unreachable' }
   // Kept only for the session that asked: one signed out meanwhile has
   // forgotten its refresh token, and writing the rotated one back would leave

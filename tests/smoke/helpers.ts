@@ -210,14 +210,11 @@ export async function signIn(page: Page, role: SmokeRole): Promise<void> {
 
 /**
  * The token the signed-in page's requests carry, read the way the app reads it
- * (`getStoredToken` in src/store/authStore.ts): a tab pinned to an account
- * holds its own in sessionStorage (#34), every other tab the shared one in
- * localStorage. It is never printed or recorded.
+ * (`getStoredToken` in src/store/authStore.ts): each tab holds its own in
+ * sessionStorage (#216). It is never printed or recorded.
  */
 export async function pageAccessToken(page: Page): Promise<string> {
-  const token = await page.evaluate(
-    () => sessionStorage.getItem('stoa_tab_access_token') ?? localStorage.getItem('stoa_access_token'),
-  )
+  const token = await page.evaluate(() => sessionStorage.getItem('stoa_tab_access_token'))
   if (!token) throw new Error(`no access token in ${new URL(page.url()).origin}'s storage after signing in`)
   return token
 }

@@ -4,7 +4,8 @@ import i18n from '@/i18n'
 import { resolveUserLanguage } from '@/i18n/languages'
 import { ApiError, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { getCurrentUser } from '@/services/auth/authApi'
-import { useAuthStore } from '@/store/authStore'
+import { isSameSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
+import { currentSessionToken, useAuthStore } from '@/store/authStore'
 
 /**
  * Whether to read the account again after `error`.
@@ -21,6 +22,25 @@ export function retryAccountRead(_failureCount: number, error: unknown): boolean
   return error instanceof ApiError && error.code === SESSION_UNREACHABLE
 }
 
+/**
+ * The account the tab's session belongs to. An answer to a read sent under
+ * another session - the tab signed somebody else in while it was out - is not
+ * this session's account, and is dropped rather than shown (tab-account audit
+ * F2): the query key does not say whose session asked.
+ */
+export async function readCurrentAccount() {
+  const sender = currentSessionToken()
+  const senderRefresh = storedRefreshToken()
+  const account = await getCurrentUser()
+  // A renewal while the read was out changes the access token and keeps the
+  // session; only a different session makes the answer someone else's.
+  const sameSession = currentSessionToken() === sender || (sender !== null && isSameSession(senderRefresh))
+  if (!sameSession) {
+    throw new ApiError('The session changed while the account was being read.', { status: 401, code: 'session_changed' })
+  }
+  return account
+}
+
 export function useCurrentUserQuery() {
   const accessToken = useAuthStore((state) => state.accessToken)
   const setUser = useAuthStore((state) => state.setUser)
@@ -28,7 +48,7 @@ export function useCurrentUserQuery() {
 
   const query = useQuery({
     queryKey: ['auth', 'me'],
-    queryFn: getCurrentUser,
+    queryFn: readCurrentAccount,
     enabled: Boolean(accessToken),
     retry: retryAccountRead,
   })

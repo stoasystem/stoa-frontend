@@ -315,7 +315,7 @@ export function useStreamingChat(conversationId: string | null) {
         if (outcome.kind === 'completed') {
           await invalidateConversation()
           trackEvent('chat_response_completed', { conversationId })
-          if (!localStorage.getItem('stoa_access_token')?.startsWith('demo:')) {
+          if (!currentSessionToken()?.startsWith('demo:')) {
             setLocalMessages([])
           }
           return true

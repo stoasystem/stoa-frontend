@@ -4,22 +4,20 @@
  * `/auth/refresh` answering 503 (a deploy), the network dropping, or the ten
  * second timeout came back from the renewal as the same `null` as "no refresh
  * token", and the response interceptor signed the reader out on it: access
- * token and refresh token gone, off to /login. In a tab pinned to the shared
- * account it took the shared refresh token with it, so every tab lost the
- * longer session (F7). The server had refused nothing.
+ * token and refresh token gone, off to /login, and the account menu's saved
+ * entry with them (F7). The server had refused nothing.
  *
  * These go through the interceptor, not `refreshAccessToken` alone: the
  * renewal already said "unreachable", it was the caller that dropped it.
  */
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
-import { pinTabToSession, readSessions, rememberSession, TAB_TOKEN_KEY } from '@/lib/devSessions'
+import { readSessions, rememberSession } from '@/lib/devSessions'
 import { httpClient, SESSION_UNREACHABLE } from '@/services/api/httpClient'
 import { rememberRefreshToken } from '@/services/auth/sessionRefresh'
 import { TOKEN_KEY, useAuthStore } from '@/store/authStore'
 import { mswServer } from '../mswServer'
 
-const SHARED_REFRESH = 'stoa_refresh_token'
 const TAB_REFRESH = 'stoa_tab_refresh_token'
 const HELD = { email: 'reader@test.stoaedu.ch', role: 'student', name: 'Reader' }
 
@@ -42,22 +40,11 @@ afterEach(() => {
   useAuthStore.setState({ user: null, accessToken: null, isAuthenticated: false })
 })
 
-/** This tab shares the browser's session S, which the account menu holds too. */
-function onShared() {
-  localStorage.setItem(TOKEN_KEY, 's-access')
+/** This tab is on session S, which the account menu holds too. */
+function onSession() {
+  sessionStorage.setItem(TOKEN_KEY, 's-access')
   rememberRefreshToken('s-refresh')
   rememberSession({ ...HELD, accessToken: 's-access', refreshToken: 's-refresh' })
-  useAuthStore.setState({ accessToken: 's-access', isAuthenticated: true })
-}
-
-/**
- * This tab picked the shared account in the account menu: it is pinned to S,
- * and the switcher copied S's own refresh token into the tab.
- */
-function pinnedToShared() {
-  onShared()
-  pinTabToSession('s-access')
-  rememberRefreshToken('s-refresh')
   useAuthStore.setState({ accessToken: 's-access', isAuthenticated: true })
 }
 
@@ -67,13 +54,9 @@ function stubLocation() {
   return assign
 }
 
-function expectEverythingKept(pinned: boolean) {
-  expect(localStorage.getItem(TOKEN_KEY)).toBe('s-access')
-  expect(localStorage.getItem(SHARED_REFRESH)).toBe('s-refresh')
-  if (pinned) {
-    expect(sessionStorage.getItem(TAB_TOKEN_KEY)).toBe('s-access')
-    expect(sessionStorage.getItem(TAB_REFRESH)).toBe('s-refresh')
-  }
+function expectEverythingKept() {
+  expect(sessionStorage.getItem(TOKEN_KEY)).toBe('s-access')
+  expect(sessionStorage.getItem(TAB_REFRESH)).toBe('s-refresh')
   expect(readSessions().map((entry) => [entry.accessToken, entry.refreshToken])).toEqual([['s-access', 's-refresh']])
   expect(useAuthStore.getState().accessToken).toBe('s-access')
 }
@@ -105,12 +88,9 @@ const failures: Array<[string, () => void]> = [
   }],
 ]
 
-const tabs: Array<[string, () => void, boolean]> = [
-  ['an unpinned tab', onShared, false],
-  ['a tab pinned to the shared account', pinnedToShared, true],
-]
+describe('in a tab on its account', () => {
+  const setUp = onSession
 
-describe.each(tabs)('in %s', (_tab, setUp, pinned) => {
   it.each(failures)('a refresh that %s keeps every token and stays off /login', async (_how, failRefresh) => {
     failRefresh()
     const assign = stubLocation()
@@ -120,7 +100,7 @@ describe.each(tabs)('in %s', (_tab, setUp, pinned) => {
 
     expect(refreshCalls).toBe(1)
     expect(assign).not.toHaveBeenCalled()
-    expectEverythingKept(pinned)
+    expectEverythingKept()
   })
 
   it('a refresh that times out keeps every token and stays off /login', async () => {
@@ -145,7 +125,7 @@ describe.each(tabs)('in %s', (_tab, setUp, pinned) => {
 
     expect(await settled).toMatchObject({ code: SESSION_UNREACHABLE })
     expect(assign).not.toHaveBeenCalled()
-    expectEverythingKept(pinned)
+    expectEverythingKept()
   })
 
   it('tries the renewal again on the next 401, and resumes once it answers', async () => {
@@ -187,9 +167,7 @@ describe.each(tabs)('in %s', (_tab, setUp, pinned) => {
 
     expect(refreshCalls).toBe(1)
     expect(assign).toHaveBeenCalledWith('/login')
-    // The refused token is gone from wherever this tab kept it — in a tab
-    // pinned to the shared account that is the shared one too (#212 audit).
-    expect(localStorage.getItem(SHARED_REFRESH)).toBeNull()
+    // The refused token is gone from this tab.
     expect(sessionStorage.getItem(TAB_REFRESH)).toBeNull()
   })
 })

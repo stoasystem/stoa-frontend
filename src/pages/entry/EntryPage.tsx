@@ -18,10 +18,21 @@
  * not this page's job in that case — the login itself reloads onto the new
  * account's home, the way switching to a held account does, so the account
  * being left behind takes its cached answers with it.
+ *
+ * A new tab with several saved accounts is asked which one it is before the
+ * sign-in form (#216); a tab whose sign-in ended is not, and neither is
+ * `?add=1`, which is there to sign in somebody new.
+ *
+ * A tab whose session ended without the reader signing out says whose it was
+ * and offers that account again (#217). Signing in again as that same account
+ * goes back to the page the tab was on; choosing "another account", or
+ * signing in as anyone else, goes to that account's home.
  */
+import { useCallback, useState } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { LoginPage } from '@/pages/login/LoginPage'
-import { getPostLoginPath } from '@/lib/authRoutes'
+import { getDefaultRouteForRole, getPostLoginPath, getReturnPath } from '@/lib/authRoutes'
+import { isSameAccount, readTabSignOut, tabNeedsAccountChoice } from '@/lib/tabAccount'
 import { useAuthStore } from '@/store/authStore'
 
 export function EntryPage() {
@@ -30,10 +41,33 @@ export function EntryPage() {
   const location = useLocation()
 
   const addingAnother = new URLSearchParams(location.search).get('add') === '1'
+  const [choosing, setChoosing] = useState(() => !addingAnother && tabNeedsAccountChoice())
+  // Read once, as the page opens: signing in clears it.
+  const [ended] = useState(() => readTabSignOut())
+  const [choseOther, setChoseOther] = useState(false)
+  const signInOther = useCallback(() => {
+    setChoosing(false)
+    setChoseOther(true)
+  }, [])
 
   if (isAuthenticated && user?.role && !addingAnother) {
+    if (ended && ended.reason !== 'signed-out') {
+      const back = !choseOther && isSameAccount(user, ended.account)
+      const to = back
+        ? getReturnPath(user, ended.returnTo)
+        : user.mustChangePassword
+          ? getReturnPath(user, undefined)
+          : getDefaultRouteForRole(user.role)
+      return <Navigate replace to={to} />
+    }
     return <Navigate replace to={getPostLoginPath(user, location)} />
   }
 
+  if (choosing) return <LoginPage mode={{ kind: 'choose', onSignInOther: signInOther }} />
+  if (ended && ended.reason !== 'signed-out' && ended.account && !choseOther && !addingAnother) {
+    return (
+      <LoginPage mode={{ kind: 'reauth', reason: ended.reason, account: ended.account, onSignInOther: signInOther }} />
+    )
+  }
   return <LoginPage />
 }

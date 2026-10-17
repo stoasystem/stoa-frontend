@@ -2,7 +2,7 @@ import axios from 'axios'
 import { apiBaseUrl } from '@/lib/env'
 import { activeLanguage } from '@/i18n/languages'
 import { currentSessionToken, useAuthStore } from '@/store/authStore'
-import { renewHeldSession } from '@/lib/devSessions'
+import { forgetHeldRefreshToken, renewHeldSession } from '@/lib/devSessions'
 import { isSameSession, renewSession, storedRefreshToken } from '@/services/auth/sessionRefresh'
 import { queryClient } from '@/app/query/queryClient'
 
@@ -86,8 +86,7 @@ function isPublicAuthPath(url?: string, method?: string) {
 const refreshSent = new WeakMap<object, string>()
 
 httpClient.interceptors.request.use((config) => {
-  // A tab holding its own role must send that role's token, not the one
-  // the rest of the browser shares.
+  // This tab's own token: no other tab's sign-in changes it (#216).
   const token = currentSessionToken()
   refreshSent.delete(config)
 
@@ -126,12 +125,20 @@ export const SESSION_UNREACHABLE = 'session_unreachable'
 /**
  * The session is over: drop it and go to sign-in.
  *
- * A tab pinned to one test role fails on that role's own token; clearing drops
- * the pin and leaves the session the rest of the browser shares, refresh token
- * included (#211): clearAuth clears only this tab's.
+ * Only this tab's session: clearAuth leaves other tabs as they are, and this
+ * tab stays signed out rather than falling back on a saved account (#216,
+ * #217). The sign-in page says whose session ended and offers it again; the
+ * page the tab was on is kept for that account to come back to. Everything
+ * else of the account's goes, as on signing out: the stored part with the
+ * tab's own storage, what is held in memory here and by the page load.
  */
 function endSession(): never | Promise<never> {
-  useAuthStore.getState().clearAuth()
+  const { pathname, search, hash } = window.location
+  useAuthStore.getState().clearAuth({
+    reason: 'expired',
+    ...(pathname !== '/login' ? { returnTo: `${pathname}${search ?? ''}${hash ?? ''}` } : {}),
+  })
+  queryClient.clear()
   if (window.location.pathname !== '/login') {
     window.location.assign('/login')
   }
@@ -199,7 +206,7 @@ export function answerUnauthorized<T>(
  * the same one, renewed since. Send it again with the token the tab holds now.
  */
 function resendOnRenewedSession<T>(token: string, retry: Retry<T>): Promise<T> {
-  // Another tab's renewal wrote the shared token; keep the store on it too.
+  // A renewal in this tab wrote the token; keep the store on it too.
   useAuthStore.getState().hydrateFromStorage()
   return retry(token, false)
 }
@@ -226,15 +233,19 @@ function renewAndRetry<T>(sent: SentSession, retry: Retry<T>): Promise<T> {
     // that first caller still takes the ordinary path below.)
     const renewedByThisRenewal =
       token !== null && token !== sent.token && currentSessionToken() === token
+    // The server refused this refresh token: the saved account holding it is
+    // over too, whoever this tab is by now. Only that one, and only while it
+    // still holds it (#217, tab-account audit F3).
+    if (renewal.status === 'ended' && renewal.refused) forgetHeldRefreshToken(renewal.refused)
     // Signed out, or another account signed in, while the renewal was in
     // flight: the token it brings back is the old session's, and storing
     // it would sign that account straight back in (#34, #172 audit).
     if (currentSessionToken() !== sent.token && !renewedByThisRenewal) {
-      // Another tab sharing this session renewed it first and stored its
-      // token; this tab's refresh token is still the one the request went
-      // out under. Same session: retry with that token rather than failing
-      // as if someone else had signed in (#219). Not after an ended
-      // renewal: that one says this tab's refresh token is no good.
+      // Another renewal in this tab got there first and stored its token;
+      // this tab's refresh token is still the one the request went out
+      // under. Same session: retry with that token rather than failing as
+      // if someone else had signed in (#219). Not after an ended renewal:
+      // that one says this tab's refresh token is no good.
       const now = currentSessionToken()
       if (now && renewal.status !== 'ended' && isSameSession(sent.refresh)) {
         useAuthStore.getState().hydrateFromStorage()

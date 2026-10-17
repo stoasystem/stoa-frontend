@@ -14,7 +14,7 @@ test('a student signs in, lands on the star map, and stays signed in across a re
 
   await expect(page.getByRole('heading', { name: STAR_MAP_HEADING })).toBeVisible()
   await expect(page.getByRole('textbox', { name: 'Your question' })).toBeVisible()
-  expect(await page.evaluate(() => localStorage.getItem('stoa_access_token'))).toBe(ACCESS_TOKEN)
+  expect(await page.evaluate(() => sessionStorage.getItem('stoa_tab_access_token'))).toBe(ACCESS_TOKEN)
 
   const sessionReads = backend.callsTo('GET', '/auth/me').length
   await page.reload()
@@ -109,7 +109,7 @@ test('signing out ends the session here and on the backend', async ({ page, back
   await expect(page).toHaveURL('/login')
   await expect.poll(() => backend.callsTo('POST', '/auth/logout').length).toBe(1)
   expect(backend.callsTo('POST', '/auth/logout')[0].body).toEqual({ access_token: ACCESS_TOKEN })
-  expect(await page.evaluate(() => localStorage.getItem('stoa_access_token'))).toBeNull()
+  expect(await page.evaluate(() => sessionStorage.getItem('stoa_tab_access_token'))).toBeNull()
 
   // Signed out, `/` is the sign-in form again (the address stays `/`).
   await page.goto('/')
