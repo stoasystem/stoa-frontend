@@ -30,6 +30,12 @@ import { replaceRefreshToken } from '@/services/auth/sessionRefresh'
 
 const TAB_STATE_KEY = 'stoa_tab_state'
 const TAB_ACCOUNT_KEY = 'stoa_tab_account'
+/**
+ * What a tab keeps when it changes account: the sign-in timing, which runs
+ * from pressing Sign in to the new account's first page and names nobody.
+ */
+const KEPT_ACROSS_ACCOUNTS = ['stoa.login.submittedAt']
+
 /** Where a sign-out tells the other tabs which sign-in ended. */
 export const SIGN_IN_ENDED_KEY = 'stoa_sign_in_ended'
 
@@ -129,10 +135,20 @@ export function bindTab(
   account?: TabAccount,
 ): void {
   try {
+    // A tab moving from one account to another takes nothing of the first
+    // along: its pending messages, checkout, upload hand-off and analytics
+    // session all live in this storage, and a page load keeps it (tab-account
+    // audit F1). A signed-out tab was cleared when it signed out; a new tab
+    // has nothing yet.
+    if (tabToken()) {
+      const kept = KEPT_ACROSS_ACCOUNTS.map((key) => [key, sessionStorage.getItem(key)] as const)
+      sessionStorage.clear()
+      for (const [key, value] of kept) if (value !== null) sessionStorage.setItem(key, value)
+    }
     sessionStorage.removeItem(TAB_STATE_KEY)
     sessionStorage.removeItem(TAB_ACCOUNT_KEY)
   } catch {
-    // Blocked storage holds no signed-out mark to clear.
+    // Blocked storage holds nothing to carry over.
   }
   pinTabToSession(accessToken)
   replaceRefreshToken(refreshToken)
@@ -219,7 +235,10 @@ export function initializeTab(): void {
   migrateSharedSession()
   if (tabToken() || tabSignedOut()) return
   const saved = readSessions()
-  if (saved.length === 1) bindTab(saved[0].accessToken, saved[0].refreshToken, saved[0])
+  const only = saved[0]
+  if (saved.length === 1) {
+    bindTab(only.accessToken, typeof only.refreshToken === 'string' ? only.refreshToken : null, only)
+  }
 }
 
 /**

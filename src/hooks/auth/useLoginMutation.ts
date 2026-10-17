@@ -10,7 +10,7 @@ import { getConversations } from '@/services/chat/chatApi'
 import { chatQueryKeys } from '@/services/chat/chatQueryKeys'
 import { isEmailVerificationRequiredError, login, type LoginRequest } from '@/services/auth/authApi'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-import { useAuthStore, waitForPendingLogout } from '@/store/authStore'
+import { currentSessionToken, useAuthStore, waitForPendingLogout } from '@/store/authStore'
 
 export function useLoginMutation() {
   const { t } = useTranslation('auth')
@@ -29,6 +29,12 @@ export function useLoginMutation() {
       if (locale && i18n.language !== locale) {
         await i18n.changeLanguage(locale)
       }
+      // A tab still on another account (one whose account had not loaded
+      // yet, so the sign-in form was up) is changing account, not signing in
+      // from nothing: like 「添加账号」 it lands with a full load, so nothing
+      // of the account left behind - cached answers, a read still in flight
+      // - reaches the new one (tab-account audit F2).
+      const replacing = currentSessionToken() !== null
       // Signing in is all this does. The login screen (EntryPage) sees the
       // session and picks the destination: the password change for a reset
       // account, else a permitted `?next=` or `from`, else the role's home.
@@ -58,7 +64,7 @@ export function useLoginMutation() {
       // moving while `?add=1` is up. A full load, not a route change, so the
       // account being left behind takes its cached answers with it — the same
       // reason switching to a held account reloads.
-      if (new URLSearchParams(window.location.search).get('add') === '1') {
+      if (replacing || new URLSearchParams(window.location.search).get('add') === '1') {
         window.location.assign(getPostLoginPath(data.user, { search: '' }))
         return
       }
