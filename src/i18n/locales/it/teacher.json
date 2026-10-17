@@ -274,6 +274,7 @@
     "historyNeedStudent": "Inserisci sopra l'ID di uno studente per vedere cosa gli è stato assegnato.",
     "historyLoading": "Caricamento delle assegnazioni…",
     "historyFailed": "Impossibile caricare le assegnazioni",
+    "historyNotFound": "Nessuno studente con questo ID, oppure non puoi vederlo.",
     "historyEmpty": "Ancora nessuna assegnazione per questo studente.",
     "subjectPending": "Nessuna materia",
     "topicPending": "nessun argomento",

@@ -274,6 +274,7 @@
     "historyNeedStudent": "Enter a student id above to see what has been assigned to them.",
     "historyLoading": "Loading assignment history…",
     "historyFailed": "Assignment history could not be loaded",
+    "historyNotFound": "No student with this id, or not one you can see.",
     "historyEmpty": "No assignments for this student yet.",
     "subjectPending": "No subject yet",
     "topicPending": "no topic yet",
