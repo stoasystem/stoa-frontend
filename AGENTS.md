@@ -54,8 +54,9 @@ npm run check:untranslated   # 未翻译文案的棘轮，基线在 scripts/untr
 API 契约那步是从 `stoasystem/stoa-backend` 的 **main 分支**实时拉取路由清单。所以涉及
 接口变更时，先推后端再推前端，否则这道门会拦下来。
 
-改版在集成分支 `redesign/planet` / `redesign/cute` 上进行，不直接进 `main`，
-分支命名与门禁见 `docs/agents/redesign-branches.md`。
+方案 A 的集成分支 `redesign/planet` 已于 2026-10 合回 `main` 并删除，app-planet 预览站和它的
+预览工作流也一并停用；前端修复现在直接 PR 到 `main`。方案 B 的 `redesign/cute` 暂缓，
+重启时的分支命名与门禁见 `docs/agents/redesign-branches.md`。
 
 ## 目录约定
 
