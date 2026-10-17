@@ -6,7 +6,8 @@ name: Redesign Branch Gate
 # A PR only runs this when its merge commit carries this file, so hotfix PRs
 # cut from main are untouched until the redesign lands. It only checks; it
 # never builds a release for anyone, holds no secrets and talks to no cloud
-# account. Publishing a preview lives in its own workflow (#28).
+# account. redesign/planet was merged back and deleted in October 2026, and
+# its preview workflow (app-planet, #28) went with it.
 
 on:
   pull_request:
@@ -14,7 +15,6 @@ on:
     # starts a run instead of waiting for the next push.
     types: [opened, synchronize, reopened, edited]
     branches:
-      - redesign/planet
       - redesign/cute
       - main
   workflow_dispatch:
