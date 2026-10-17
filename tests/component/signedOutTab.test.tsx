@@ -79,7 +79,7 @@ describe('the session ending under the reader (#217)', () => {
     expect(storedRefreshToken()).toBeNull()
     expect(readTabSignOut()).toEqual({
       reason: 'expired',
-      account: { id: 'b-id', email: 'b@test.stoaedu.ch', name: 'Bea' },
+      account: { id: 'b-id', email: 'b@test.stoaedu.ch', name: 'Bea', role: 'student' },
       returnTo: '/me?section=password',
     })
 

@@ -8,6 +8,7 @@ import { TOP_BAR, TOP_BAR_PHONE } from '@/components/base/sizes'
 import { LanguageSwitcher } from '@/components/common/LanguageSwitcher'
 import { StoaLogo } from '@/components/common/StoaLogo'
 import { useMediaQuery } from '@/hooks/layout/useMediaQuery'
+import { addressContext } from '@/lib/addressForm'
 import { stoaContactInfo } from '@/lib/brandContact'
 import { LoginNebula } from '@/pages/login/LoginNebula'
 import type { SignOutReason, TabAccount } from '@/lib/tabAccount'
@@ -84,6 +85,8 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
           }
         : { eyebrow: 'auth:login.eyebrow', title: 'auth:login.title', subtitle: 'auth:login.subtitle' }
   const name = mode.kind === 'reauth' ? (mode.account.name ?? mode.account.email) : undefined
+  // A page that knows whose sign-in it is speaks to staff formally (#241).
+  const context = mode.kind === 'reauth' ? addressContext(mode.account.role) : undefined
   const { t } = useTranslation(['auth', 'common'])
   const bar = useMediaQuery(WIDE_LOGIN_QUERY) ? TOP_BAR : TOP_BAR_PHONE
   const surface = useRef<HTMLDivElement>(null)
@@ -123,14 +126,14 @@ export function LoginPage({ mode = { kind: 'signIn' } }: { mode?: LoginMode } = 
             {t(heading.title, { name })}
           </h1>
           <p className="mt-3 mb-0 text-[17px] leading-[1.45] text-[color:var(--on-sky-text-body)]">
-            {t(heading.subtitle)}
+            {t(heading.subtitle, { context })}
           </p>
           <div className="mt-8">
             {mode.kind === 'choose' ? (
               <AccountChooser onSignInOther={mode.onSignInOther} />
             ) : mode.kind === 'reauth' ? (
               <div className="space-y-3">
-                <LoginForm initialEmail={mode.account.email} />
+                <LoginForm initialEmail={mode.account.email} context={context} />
                 <Button type="button" variant="onSkyPlain" fullWidth onClick={mode.onSignInOther}>
                   {t('auth:chooser.signInOther')}
                 </Button>
