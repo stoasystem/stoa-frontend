@@ -26,6 +26,7 @@ import {
   releaseTab,
   tabToken,
 } from '@/lib/devSessions'
+import { LOGIN_SUBMITTED_AT_KEY } from '@/lib/loginTimingKey'
 import { replaceRefreshToken } from '@/services/auth/sessionRefresh'
 
 const TAB_STATE_KEY = 'stoa_tab_state'
@@ -34,7 +35,7 @@ const TAB_ACCOUNT_KEY = 'stoa_tab_account'
  * What a tab keeps when it changes account: the sign-in timing, which runs
  * from pressing Sign in to the new account's first page and names nobody.
  */
-const KEPT_ACROSS_ACCOUNTS = ['stoa.login.submittedAt']
+const KEPT_ACROSS_ACCOUNTS = [LOGIN_SUBMITTED_AT_KEY]
 
 /** Where a sign-out tells the other tabs which sign-in ended. */
 export const SIGN_IN_ENDED_KEY = 'stoa_sign_in_ended'
@@ -139,8 +140,9 @@ export function bindTab(
     // along: its pending messages, checkout, upload hand-off and analytics
     // session all live in this storage, and a page load keeps it (tab-account
     // audit F1). A signed-out tab was cleared when it signed out; a new tab
-    // has nothing yet.
-    if (tabToken()) {
+    // has nothing yet; the same account signing in again keeps its own.
+    const sameAccount = account !== undefined && isSameAccount(account, readTabAccount())
+    if (tabToken() && !sameAccount) {
       const kept = KEPT_ACROSS_ACCOUNTS.map((key) => [key, sessionStorage.getItem(key)] as const)
       sessionStorage.clear()
       for (const [key, value] of kept) if (value !== null) sessionStorage.setItem(key, value)

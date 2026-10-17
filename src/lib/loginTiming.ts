@@ -6,9 +6,8 @@
  * optimised separately: the credential exchange, and everything the landing
  * route does before it is usable.
  */
+import { LOGIN_SUBMITTED_AT_KEY as SUBMITTED_AT_KEY } from '@/lib/loginTimingKey'
 import { trackEvent } from '@/services/analytics/analyticsClient'
-
-const SUBMITTED_AT_KEY = 'stoa.login.submittedAt'
 
 function readSubmittedAt(): number | null {
   try {

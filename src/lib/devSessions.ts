@@ -121,7 +121,11 @@ export function rememberSession(session: Omit<DevSession, 'savedAt'>): DevSessio
     (entry) => entry.email.toLowerCase() !== session.email.toLowerCase(),
   )
   const next = [...others, { ...session, savedAt: new Date().toISOString() }]
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Blocked storage saves nothing; the sign-in itself goes on.
+  }
   return next
 }
 
@@ -129,7 +133,11 @@ export function forgetSession(email: string): DevSession[] {
   const next = readSessions().filter(
     (entry) => entry.email.toLowerCase() !== email.toLowerCase(),
   )
-  localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  try {
+    localStorage.setItem(SESSIONS_KEY, JSON.stringify(next))
+  } catch {
+    // Blocked storage held nothing to forget.
+  }
   return next
 }
 

@@ -176,6 +176,60 @@ describe('F2: a sign-in over a tab still on another account', () => {
   })
 })
 
+describe('re-audit of the fixes', () => {
+  function signInAs(user: { id: string; email: string; name: string; role: string }, search = '') {
+    const assign = vi.fn()
+    vi.stubGlobal('location', { ...window.location, search, assign })
+    mswServer.use(
+      http.post('https://api.test/auth/login', () =>
+        HttpResponse.json({ accessToken: `${user.id}-access-2`, refreshToken: `${user.id}-refresh-2`, user }),
+      ),
+    )
+    function Form() {
+      const login = useLoginMutation()
+      return <button onClick={() => login.mutate({ email: user.email, password: 'secret12' })}>go</button>
+    }
+    render(
+      <QueryClientProvider client={queryClient}>
+        <MemoryRouter>
+          <Form />
+        </MemoryRouter>
+      </QueryClientProvider>,
+    )
+    fireEvent.click(screen.getByText('go'))
+    return assign
+  }
+
+  it('a sign-in over another account still honours ?next=', async () => {
+    bindTab('a-access', 'a-refresh', accountA)
+    useAuthStore.setState({ accessToken: 'a-access', isAuthenticated: true })
+
+    const assign = signInAs({ ...accountB, role: 'parent' }, '?next=/parent/reports')
+
+    await waitFor(() => expect(assign).toHaveBeenCalledWith('/parent/reports'))
+  })
+
+  it('the same account signing in again keeps its own state and is not reloaded', async () => {
+    bindTab('a-access', 'a-refresh', accountA)
+    useAuthStore.setState({ accessToken: 'a-access', isAuthenticated: true })
+    leaveAsState()
+
+    const assign = signInAs(accountA)
+
+    await waitFor(() => expect(currentSessionToken()).toBe('a-access-2'))
+    expect(assign).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem(CHECKOUT_OPERATION_STORAGE_KEY)).not.toBeNull()
+  })
+
+  it('saving an account with storage blocked does not stop the sign-in', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('blocked', 'QuotaExceededError')
+    })
+
+    expect(() => rememberSession({ ...accountB, accessToken: 'b-access' })).not.toThrow()
+  })
+})
+
 describe('F3: a refusal answered after the tab changed account', () => {
   it('still drops the saved account holding the refused refresh token', async () => {
     rememberSession({ ...accountB, accessToken: 'b-access', refreshToken: 'b-refresh' })
